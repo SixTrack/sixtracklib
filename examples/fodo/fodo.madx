@@ -1,0 +1,34 @@
+mq: multipole;
+qf: mq,knl:={0,kqf};
+qd: mq,knl:={0,kqd};
+dr: drift,l:=ld;
+
+fodo : line = (dr,qf,dr,qd);
+
+beam; use,period=fodo;
+
+kqf=0.8;
+kqd=-0.7;
+ld=1.5;
+
+twiss;
+
+
+qx0 = 0.245;
+qy0 = 0.270;
+
+match,sequence=fodo;
+global,q1=qx0,q2=qy0;
+vary,name=kqf;
+vary,name=kqd;
+jacobian,calls=5,tolerance=1e-21;
+endmatch;
+
+value,kqf,kqd;
+
+
+
+
+
+
+
