@@ -17,11 +17,12 @@ def test_track():
   assert beam.particles[2]['py'] ==2.0
 
 def test_track_cl():
-  beam=sixtracklib.cBeam(50)
-  block.track_cl(beam)
+  if hasattr(sixtracklib,'track_cl'):
+    beam=sixtracklib.cBeam(50)
+    block.track_cl(beam)
 
-  assert beam.particles[2]['s'] ==61.0
-  assert beam.particles[2]['px']==-1.0
-  assert beam.particles[2]['py']==2.0
+    assert beam.particles[2]['s'] ==61.0
+    assert beam.particles[2]['px']==-1.0
+    assert beam.particles[2]['py']==2.0
 
 

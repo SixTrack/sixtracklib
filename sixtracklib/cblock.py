@@ -19,7 +19,9 @@ try:
   queue = cl.CommandQueue(ctx)
   mf = cl.mem_flags
   rw=mf.READ_WRITE | mf.COPY_HOST_PTR
-except ImportError("Warning: error import OpenCL: track_cl not available"):
+except ImportError:
+  print("Warning: error import OpenCL: track_cl not available")
+  cl=None
   pass
 
 
@@ -179,29 +181,30 @@ class cBlock(object):
       self.elembyelem=_elembyelem.get_beam()
     if turnbyturn:
       self.turnbyturn=_turnbyturn.get_beam()
-  def track_cl(self,beam,nturn=1,elembyelem=False,turnbyturn=False):
-    elembyelemid=0;turnbyturnid=0;
-    if elembyelem:
-        _elembyelem=self._set_elembyelem(beam,nturn)
-        elembyelemid=_elembyelem.offset
-    if turnbyturn:
-        _turnbyturn=self._set_turnbyturn(beam,nturn)
-        turnbyturnid=_turnbyturn.offset
-    data_g=cl.Buffer(ctx, rw, hostbuf=self.data)
-    part_g=cl.Buffer(ctx, rw, hostbuf=beam.particles)
-    blockid=np.uint64(self.blockid)
-    nturn=np.uint64(nturn)
-    npart=np.uint64(beam.npart)
-    elembyelemid=np.uint64(elembyelemid)
-    turnbyturnid=np.uint64(turnbyturnid)
-    prg.Block_track(queue,[beam.npart],None,
-                    data_g, part_g,
-                    blockid, nturn, npart,
-                    elembyelemid, turnbyturnid)
-    cl.enqueue_copy(queue,self.data,data_g)
-    cl.enqueue_copy(queue,beam.particles,part_g)
-    if elembyelem:
-      self.elembyelem=_elembyelem.get_beam()
-    if turnbyturn:
-      self.turnbyturn=_turnbyturn.get_beam()
+  if cl:
+    def track_cl(self,beam,nturn=1,elembyelem=False,turnbyturn=False):
+     elembyelemid=0;turnbyturnid=0;
+     if elembyelem:
+         _elembyelem=self._set_elembyelem(beam,nturn)
+         elembyelemid=_elembyelem.offset
+     if turnbyturn:
+         _turnbyturn=self._set_turnbyturn(beam,nturn)
+         turnbyturnid=_turnbyturn.offset
+     data_g=cl.Buffer(ctx, rw, hostbuf=self.data)
+     part_g=cl.Buffer(ctx, rw, hostbuf=beam.particles)
+     blockid=np.uint64(self.blockid)
+     nturn=np.uint64(nturn)
+     npart=np.uint64(beam.npart)
+     elembyelemid=np.uint64(elembyelemid)
+     turnbyturnid=np.uint64(turnbyturnid)
+     prg.Block_track(queue,[beam.npart],None,
+                     data_g, part_g,
+                     blockid, nturn, npart,
+                     elembyelemid, turnbyturnid)
+     cl.enqueue_copy(queue,self.data,data_g)
+     cl.enqueue_copy(queue,beam.particles,part_g)
+     if elembyelem:
+       self.elembyelem=_elembyelem.get_beam()
+     if turnbyturn:
+       self.turnbyturn=_turnbyturn.get_beam()
 
