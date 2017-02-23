@@ -177,8 +177,9 @@ CLKERNEL void Block_track(
        }
       track_single(data, particles, elemids,
                    i_part, i_elem, elembyelemoff, turnbyturnoff);
-     }
-   }
+    }
+    if (particles[i_part].state>=0) particles[i_part].turn++;
+  }
 }
 
 #else
@@ -201,18 +202,22 @@ int Block_track(value_t *data, Beam *beam,
             elembyelemoff=elembyelemid +
                          sizeof(Particle)/8 * npart * i_turn +
                          sizeof(Particle)/8 * npart * nturn  * i_elem ;
-            printf("%lu \n",elembyelemoff);
+//            printf("%lu \n",elembyelemoff);
           }
           if (turnbyturnid>0){
             turnbyturnoff=turnbyturnid +
                          sizeof(Particle)/8 * npart * i_turn;
-            printf("%lu \n",turnbyturnoff);
+//            printf("%lu \n",turnbyturnoff);
           }
           track_single(data, beam->particles, elemids,
                        i_part, i_elem, elembyelemoff, turnbyturnoff);
        }
      }
-   }
+     for (uint64_t i_part=0; i_part < npart; i_part++){
+       if (beam->particles[i_part].state >= 0)
+                 beam->particles[i_part].turn++;
+       }
+     }
    return 1;
 }
 

@@ -54,7 +54,7 @@ blocklib.Block_track.argtypes=[ctypes.c_void_p, # *data
 
 
 class ElemByElem(object):
-    def __init__(self,block,offset,size,nelem,npart,nturn):
+    def __init__(self,block,offset,size,nelem,nturn,npart):
         self.block=block
         self.offset=offset
         self.size=size
@@ -65,12 +65,12 @@ class ElemByElem(object):
         particles=self.block.data[self.offset:
                         self.offset+self.size]
         beam=cBeam(particles=particles)
-        print beam.particles.shape
-        beam.particles=beam.particles.reshape((self.nturn,self.npart))
+        beam.particles=beam.particles.reshape(
+            (self.nelem,self.nturn,self.npart))
         return beam
 
 class TurnByTurn(object):
-    def __init__(self,block,offset,size,npart,nturn):
+    def __init__(self,block,offset,size,nturn,npart):
         self.block=block
         self.offset=offset
         self.size=size
@@ -173,7 +173,7 @@ class cBlock(object):
     if turnbyturn:
         _turnbyturn=self._set_turnbyturn(beam,nturn)
         turnbyturnid=_turnbyturn.offset
-    print self.blockid,nturn,elembyelemid,turnbyturnid,self.size
+    #print self.blockid,nturn,elembyelemid,turnbyturnid,self.size
     blocklib.Block_track(self.data.ctypes.data, beam.ctypes(),
                          self.blockid, nturn,
                          elembyelemid,turnbyturnid)
