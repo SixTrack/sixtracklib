@@ -26,7 +26,7 @@ double Drift_get_length(CLGLOBAL value_t *data, uint64_t elemid){
 
 //DriftExact
 
-double driftexact_get_length(CLGLOBAL value_t *data, uint64_t elemid){
+double DriftExact_get_length(CLGLOBAL value_t *data, uint64_t elemid){
     return data[elemid + 1].f64;
 }
 
@@ -149,7 +149,10 @@ int track_single(CLGLOBAL value_t *data,
            case IntegerID: break;
            case DoubleID: break;
            case BlockID: break;
-           case DriftExactID: break;
+           case DriftExactID:
+                DriftExact_track(p,
+                              DriftExact_get_length(data,elemid)  );
+           break;
        }
    }
    return 1;

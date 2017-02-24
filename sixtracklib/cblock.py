@@ -124,6 +124,10 @@ class cBlock(object):
     self.offsets.append(self.last)
     self._add_integer(typeid.DriftID)
     self._add_float(l)
+  def Driftexact(self, l=0):
+    self.offsets.append(self.last)
+    self._add_integer(typeid.DriftExactID)
+    self._add_float(l)
   def Multipole(self,knl=[],ksl=[],l=0,hxl=0,hyl=0):
     if len(knl)>len(ksl):
         ksl+=[0]*(len(knl)-len(ksl))

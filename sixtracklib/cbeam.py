@@ -86,5 +86,27 @@ class cBeam(object):
     return self.particles[kk]
   def __dir__(self):
     return particle_t.names
+  def compare(self,ref):
+    if self.particles.size == self.particles.size:
+      fmt="%-10s: %10.8e %10.8e %10.8e %10.8e"
+      names='x px'.split()
+      for pval,pref in zip(self.particles.flatten(),ref.particles.flatten()):
+          pdiff=0
+          for nn in names:
+              val=pval[nn]
+              ref=pref[nn]
+              diff=ref-val
+              if abs(diff)>0:
+                  if abs(ref)>0:
+                      rdiff=diff/ref
+                  else:
+                      rdiff=diff
+                  print(fmt%(nn,ref,val,diff,rdiff))
+                  pdiff+=rdiff**2
+          if pdiff>0:
+              print("Global diff %10.8e"%np.sqrt(pdiff))
+    else:
+      raise ValueError("Shape ref not compatible")
+
 
 
