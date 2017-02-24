@@ -18,7 +18,7 @@ int Drift_track(CLGLOBAL Particle* p, CLGLOBAL Drift *el){
   yp = p->py * p->rpp;
   p->x += xp * length;
   p->y += yp * length;
-  p->sigma += 1 - length*p->rvv*( 1 + (xp*xp+yp*yp)/2 );
+  p->sigma += length * (1 - p->rvv*( 1 + (xp*xp+yp*yp)/2 ) );
   p->s+=length;
 //  _DP("Drift_track: length=%g\n",length);
   return 1;
