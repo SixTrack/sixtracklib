@@ -92,9 +92,6 @@ double Align_get_dy(CLGLOBAL value_t *data, uint64_t elemid){
 //#ifndef _GPUCODE
 //#include <stdio.h>
 //#endif
-//#ifndef _GPUCODE
-//printf("%lu %d\n",elembyelemid,i_attr);
-//#endif
 
 int track_single(CLGLOBAL value_t *data,
                  CLGLOBAL Particle *particles,
@@ -108,6 +105,13 @@ int track_single(CLGLOBAL value_t *data,
        elemid=elemids[i_elem];
        if (elembyelemoff>0){
          uint64_t dataoff=elembyelemoff+sizeof(Particle)/8 * i_part;
+         for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
+            data[dataoff + i_attr] =
+                 ((CLGLOBAL value_t *) p)[i_attr];
+         }
+       };
+       if ( (turnbyturnoff>0) && (i_elem==0) ){
+         uint64_t dataoff=turnbyturnoff+sizeof(Particle)/8 * i_part;
          for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
             data[dataoff + i_attr] =
                  ((CLGLOBAL value_t *) p)[i_attr];
@@ -168,8 +172,9 @@ CLKERNEL void Block_track(
      for (int i_elem=0; i_elem< nelem; i_elem++) {
        if (elembyelemid>0){
          elembyelemoff=elembyelemid +
-                        sizeof(Particle)/8 * npart * nelem * nturn * i_elem +
-                        sizeof(Particle)/8 * npart * nelem * i_turn ;
+                      sizeof(Particle)/8 * npart * i_turn +
+                      sizeof(Particle)/8 * npart * nturn  * i_elem ;
+//            printf("%lu \n",elembyelemoff);
        }
        if (turnbyturnid>0){
          turnbyturnoff=turnbyturnid +
@@ -178,7 +183,9 @@ CLKERNEL void Block_track(
       track_single(data, particles, elemids,
                    i_part, i_elem, elembyelemoff, turnbyturnoff);
     }
-    if (particles[i_part].state>=0) particles[i_part].turn++;
+    if (particles[i_part].state>=0) {
+      particles[i_part].turn++;
+    }
   }
 }
 
@@ -202,7 +209,7 @@ int Block_track(value_t *data, Beam *beam,
             elembyelemoff=elembyelemid +
                          sizeof(Particle)/8 * npart * i_turn +
                          sizeof(Particle)/8 * npart * nturn  * i_elem ;
-//            printf("%lu \n",elembyelemoff);
+//            printf("cpu %lu \n",elembyelemoff);
           }
           if (turnbyturnid>0){
             turnbyturnoff=turnbyturnid +

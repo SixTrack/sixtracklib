@@ -159,12 +159,15 @@ class cBlock(object):
   def _set_elembyelem(self,beam,nturn):
     nelem=len(self.offsets)
     size=beam.get_size()*nelem*nturn
+    offset=self.last
     self._add_float_array(np.zeros(size))
-    return ElemByElem(self,self.last,size,nelem,nturn,beam.npart)
-  def _set_turnbyturn(self,beam):
+    #print size, nelem, nturn, beam.npart, offset, len(self.data)
+    return ElemByElem(self,offset,size,nelem,nturn,beam.npart)
+  def _set_turnbyturn(self,beam,nturn):
     size=beam.get_size()*nturn
+    offset=self.last
     self._add_float_array(np.zeros(size))
-    return TurnByTurn(self,self.last,size,nturn,beam.npart)
+    return TurnByTurn(self,offset,size,nturn,beam.npart)
   def track(self,beam,nturn=1,elembyelem=False,turnbyturn=False):
     elembyelemid=0;turnbyturnid=0;
     if elembyelem:
