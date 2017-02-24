@@ -10,3 +10,4 @@
 *egg-info
 track.obs*.p*
 .cache
+*.swp
