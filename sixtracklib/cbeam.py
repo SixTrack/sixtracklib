@@ -89,7 +89,8 @@ class cBeam(object):
   def compare(self,ref):
     if self.particles.size == self.particles.size:
       fmt="%-10s: %10.8e %10.8e %10.8e %10.8e"
-      names='x px'.split()
+      names='x px y py sigma psigma delta'.split()
+      general=0
       for pval,pref in zip(self.particles.flatten(),ref.particles.flatten()):
           pdiff=0
           for nn in names:
@@ -105,6 +106,8 @@ class cBeam(object):
                   pdiff+=rdiff**2
           if pdiff>0:
               print("Global diff %10.8e"%np.sqrt(pdiff))
+              general+=pdiff
+      return general==0
     else:
       raise ValueError("Shape ref not compatible")
 

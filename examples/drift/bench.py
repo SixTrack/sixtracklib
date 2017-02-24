@@ -5,7 +5,10 @@ from pyoptics import madlang, MadBeam
 import sixtracklib
 
 def newer(f1,f2):
-    return os.path.getmtime(f1)>os.path.getmtime(f2)
+    if os.path.exists(f2):
+        return os.path.getmtime(f1)>os.path.getmtime(f2)
+    else:
+        return True
 
 mad=madlang.open('bench.madx')
 line,rest=mad.bench.expand_struct()
@@ -22,8 +25,7 @@ block.track(cbeam,nturn=2,turnbyturn=True)
 
 bnew=block.turnbyturn[:,0]
 
-bnew.compare(bref)
-
+assert bnew.compare(bref)
 
 
 
