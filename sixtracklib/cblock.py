@@ -84,6 +84,13 @@ class TurnByTurn(object):
         return beam
 
 class cBlock(object):
+  @classmethod
+  def from_line(cls,line):
+    block=cls()
+    for name,elemtype,args in line:
+        getattr(block,elemtype.capitalize())(**args)
+    block.Block()
+    return block
   def __init__(self,size=512):
     self.size=size
     self.last=0
@@ -113,11 +120,15 @@ class cBlock(object):
     self._resize(len(data))
     self.data['i64'][self.last:self.last+len(data)]=data
     self.last+=len(data)
-  def Drift(self, length=0):
+  def Drift(self, l=0):
     self.offsets.append(self.last)
     self._add_integer(typeid.DriftID)
-    self._add_float(length)
-  def Multipole(self,knl=[],ksl=[],length=0,hxl=0,hyl=0):
+    self._add_float(l)
+  def Multipole(self,knl=[],ksl=[],l=0,hxl=0,hyl=0):
+    if len(knl)>len(ksl):
+        ksl+=[0]*(len(knl)-len(ksl))
+    else:
+        knl+=[0]*(len(ksl)-len(knl))
     bal=np.array(sum(zip(knl,ksl),()))
     fact=1
     for n in range(len(bal)/2):
@@ -130,7 +141,7 @@ class cBlock(object):
     else:
       raise ValueError("Size of bal must be even")
     self._add_integer(order)
-    self._add_float(length)
+    self._add_float(l)
     self._add_float(hxl)
     self._add_float(hyl)
     self._add_float_array(bal)

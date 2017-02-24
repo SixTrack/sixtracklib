@@ -46,7 +46,14 @@ class cBeam(object):
   pradius=pcharge**2/(4*pi*epsilon0*pmass*clight**2)
   anumber=6.022140857e23
   kboltz=8.6173303e-5 #ev K^-1 #1.38064852e-23 #   JK^-1
-  def __init__(self,npart=None,m0=pmass,p0c=450,q0=pcharge,particles=None):
+  @classmethod
+  def from_full_beam(cls,beam):
+      npart=len(beam['x'])
+      particles=np.zeros(npart,particle_t)
+      for nn in particle_t.names:
+         particles[nn]=beam[nn]
+      return cls(particles=particles)
+  def __init__(self,npart=None,m0=pmass,p0c=450,q0=1.0,particles=None):
     if particles is None:
       self.npart=npart
       self.particles=np.zeros(npart,particle_t)
@@ -68,7 +75,16 @@ class cBeam(object):
   def ctypes(self):
     cdata=cBeam_ctypes(self.npart,self.particles.ctypes.data)
     return ctypes.pointer(cdata)
+  def copy(self):
+    return self.__class__(particles=self.particles.copy())
+  def __getitem__(self,kk):
+    particles=self.particles.copy().__getitem__(kk)
+    return self.__class__(particles=particles)
   def get_size(self):
     return self.npart*particle_t.itemsize/8
+  def __getattr__(self,kk):
+    return self.particles[kk]
+  def __dir__(self):
+    return particle_t.names
 
 
