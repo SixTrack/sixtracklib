@@ -30,7 +30,7 @@ int DriftExact_track(CLGLOBAL Particle* p, double length){
   opd=1+p->delta;
   px=p->px; py=p->py;
   lpzi= length/sqrt(opd*opd-px*px-py*py);
-  lbzi=(1+p->psigma)*lpzi;
+  lbzi=(p->beta0*p->beta0*p->psigma+1)*lpzi;
   p->x += px*lpzi ;
   p->y += py*lpzi ;
   p->sigma += length - lbzi;
