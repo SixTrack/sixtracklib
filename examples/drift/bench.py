@@ -23,8 +23,3 @@ block.track(cbeam,nturn=2,turnbyturn=True)
 bnew=block.turnbyturn[:,0]
 
 bnew.compare(bref)
-
-
-
-
-
