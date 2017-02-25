@@ -85,7 +85,7 @@ class cBeam(object):
   def __getattr__(self,kk):
     return self.particles[kk]
   def __dir__(self):
-    return particle_t.names
+    return sorted(particle_t.names)
   def compare(self,ref):
     if self.particles.size == self.particles.size:
       fmt="%-10s: %10.8e %10.8e %10.8e %10.8e"
