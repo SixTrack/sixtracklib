@@ -53,6 +53,9 @@ class cBeam(object):
       for nn in particle_t.names:
          particles[nn]=beam[nn]
       return cls(particles=particles)
+  pt =property(lambda p: (p.psigma*p.beta0))
+  pc =property(lambda p: (p.beta*p.gamma*p.m0))
+  E  =property(lambda p: (p.gamma*p.m0))
   def __init__(self,npart=None,m0=pmass,p0c=450,q0=1.0,particles=None):
     if particles is None:
       self.npart=npart

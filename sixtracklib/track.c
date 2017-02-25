@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#define M_PI 3.14159265358979323846
 
 #endif
 
@@ -76,7 +77,8 @@ int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el){
 
 int Cavity_track(CLGLOBAL Particle* p, double volt, double freq, double lag ){
   double phase;
-  phase=lag-freq/CLIGHT*p->sigma/p->beta0;
+  phase=lag-2*M_PI*freq/CLIGHT*p->sigma/p->beta0;
+  //printf("%e %e %e\n",volt,lag,phase-lag);
   p->psigma+=p->chi*volt*sin(phase)/(p->p0c*p->beta0);
   double pt=p->psigma*p->beta0;
   double opd=sqrt( pt*pt+ 2*p->psigma + 1 );
