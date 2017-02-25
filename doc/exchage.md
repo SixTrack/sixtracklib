@@ -26,15 +26,21 @@ Particles data is exchanged a dictionary where quantities can be scalars or vect
 # Elements
 
 Elements exchanged in the following format:
-  `<name type (arg1 ... argn)>`
+  `<name type arguments>`
 
 Elemement lists are exchanged with
   `[ name | (label,name) ] ....`
 
-Where the second form use label for lookup and name for physical properties.
+where the second form uses label for lookup and name for physical properties.
 
 
+Elements types are:
 
+* drift: l[m]
+* driftexact: l[m]
+* multipole: knl[m^-n] ksl[m^-n] l hxl hyl
+* cavity: volt[V] freq[Hz] lag[degree]
+* align: dx[V] dy[Hz] angle[degree]
 
 
 
