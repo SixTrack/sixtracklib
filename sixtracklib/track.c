@@ -1,6 +1,7 @@
 #ifndef _GPUCODE
 
 #include <math.h>
+#include <stdio.h>
 
 #endif
 
@@ -77,12 +78,15 @@ int Cavity_track(CLGLOBAL Particle* p, double volt, double freq, double lag ){
   double phase;
   phase=lag-freq/CLIGHT*p->sigma/p->beta0;
   p->psigma+=p->chi*volt*sin(phase)/(p->p0c*p->beta0);
-  double pt=p->sigma*p->beta0;
-  p->delta=sqrt( pt*pt+ 2*p->psigma + 1 ) - 1;
-  p->beta=(1+p->delta)/(1+p->psigma)*p->beta0;
-  p->gamma=sqrt(1-1/(p->beta*p->beta));
-  p->rpp=1/(1+p->delta);
-  p->rvv=p->beta/p->beta0;
+  double pt=p->psigma*p->beta0;
+  double opd=sqrt( pt*pt+ 2*p->psigma + 1 );
+  p->delta=opd - 1;
+  //printf("%e %e %e\n",pt,opd,opd/(1/p->beta0+pt));
+  p->beta=opd/(1/p->beta0+pt);
+  p->gamma=1/sqrt(1-p->beta*p->beta);
+  p->gamma=(pt*p->beta0+1)*p->gamma0;
+  p->rpp=1/opd;
+  p->rvv=p->beta0/p->beta;
   return 1;
 }
 

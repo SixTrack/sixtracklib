@@ -87,10 +87,16 @@ class cBeam(object):
   def __dir__(self):
     return sorted(particle_t.names)
   def compare(self,ref):
-    if self.particles.size == self.particles.size:
-      fmt="%-10s: %10.8e %10.8e %10.8e %10.8e"
-      names='x px y py sigma psigma delta'.split()
+    npart=self.particles.size
+    if npart == self.particles.size:
+      names=list(particle_t.names)
+      names.remove('s')
       general=0
+      partn=1
+      fmts="%-12s: %-14s %-14s %-14s %-14s"
+      lgd=('Variable','Reference','Value','Difference','Relative Diff')
+      lgds=True
+      fmt=fmts.replace('-14s','14.6e')
       for pval,pref in zip(self.particles.flatten(),ref.particles.flatten()):
           pdiff=0
           for nn in names:
@@ -102,11 +108,15 @@ class cBeam(object):
                       rdiff=diff/ref
                   else:
                       rdiff=diff
+                  if lgds:
+                      print(fmts%lgd); lgds=False
                   print(fmt%(nn,ref,val,diff,rdiff))
                   pdiff+=rdiff**2
           if pdiff>0:
-              print("Global diff %10.8e"%np.sqrt(pdiff))
+              pl='Part %d/%d'%(partn,npart)
+              print("%-12s:  global diff  %14.6e"%(pl,np.sqrt(pdiff)))
               general+=pdiff
+          partn+=1
       return general==0
     else:
       raise ValueError("Shape ref not compatible")

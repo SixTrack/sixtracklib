@@ -1,7 +1,7 @@
 #TODO
 
 * benchmark cavity with mad line
-* benchmark kickers with mad line
+* [benchmark kickers with mad line]
 * benchmark with sixtrack input
 * benchmark with mad sequence
 * benchmark with twiss+align+error table
