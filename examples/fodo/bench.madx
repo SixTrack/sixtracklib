@@ -1,0 +1,23 @@
+beam,particle=proton,gamma=1.1;
+
+mq: multipole;
+qf: mq,knl:={0,kqf};
+qd: mq,knl:={0,kqd};
+dr: drift,l:=ld;
+
+kqf=0.8;
+kqd=-0.7;
+ld=1.2;
+
+bench : line = (dr,qf,dr,qd);
+
+use,period=bench;
+
+set,format="32.24e";
+
+twiss,betx=1,bety=1,file="twiss_bench.tfs";
+
+track, onepass, dump;
+start, x=0.1, px=0.1, y=0.1, py=0.2, t=0.1, pt=0.01;
+run, turns=1;
+endtrack;
