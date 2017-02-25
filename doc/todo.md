@@ -8,8 +8,11 @@
 * update pysixtrack with new conventions
 * check symplecticity thin bend in madx
 
-* review names of beam (rvv,rpp, m -> mass...) and elements attributes (l -> length)
+* review names of beam quantiries (rvv,rpp, m -> mass...)
+* implement qratio, mratio
 
-* review output buffer in track/track_cl
+* review names of elements attributes (l -> length)
+
+* review output buffer in tracking
 
 * review calling and data structure conventions in track.c

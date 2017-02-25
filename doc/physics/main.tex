@@ -146,18 +146,32 @@ values
 
 \begin{align}
 p(x,y) &= \frac{m_0}{m}\frac{P(x,y)}{P_0}   &
-\chi &= \frac{q}{q_0}\frac{m_0}{m} \\
-a(x,y,s) &= \frac{q_0}{P_0}  A(x,y,s) &
-p_t &= \frac{E \frac{m_0}{m} -E_0}{P_0c} \\
+\chi &= \frac{q}{q_0}\frac{m_0}{m} &
+a(x,y,s) &= \frac{q_0}{P_0}  A(x,y,s) \\
 \delta &= \frac{P \frac{m_0}{m} -P_0}{P_0} &
-\tau &= \frac{s}{\beta_0} - ct
+p_t &= \frac{E \frac{m_0}{m} -E_0}{P_0c} &
+p_\sigma &= \frac{E \frac{m_0}{m} -E_0}{\beta_0 P_0c}
+\\
+\Delta s &= s - \beta c t &
+\tau &= \frac{s}{\beta_0} - ct &
+\sigma &= s - \beta_0 ct &
 \end{align}
 
 and redefine the Hamiltonian by:
 
 \begin{align}
- H&= \frac{p_t}{\beta_0} - \frac{m_0}{m}\frac{P_s}{P_0} \\
- H&= \frac{p_t}{\beta_0} - (1+h x) \left(
+ H_\tau   &= \frac{p_t}{\beta_0} - \frac{m_0}{m}\frac{P_s}{P_0} &
+ H_\sigma &= p_\sigma - \frac{m_0}{m}\frac{P_s}{P_0}
+\end{align}
+
+\begin{align} 
+ H_\tau   &= \frac{p_t}{\beta_0} - (1+h x) \left(
+      \sqrt{ (1+\delta)^2
+           - (p_x - \chi a_x)^2
+           - (p_y - \chi a_y)^2}
+       + \chi a_s
+    \right) \\
+  H_\sigma &= p_\sigma - (1+h x) \left(
       \sqrt{ (1+\delta)^2
            - (p_x - \chi a_x)^2
            - (p_y - \chi a_y)^2}
@@ -174,7 +188,9 @@ The following identities are useful to derive the equation of motion.
 
 \begin{align}
 \delta&=\sqrt{p_t^2 + 2 p_t/\beta_0 +1} -1 &
-\frac{d \delta}{d p_t}= \frac{p_t+1/\beta_0}{1+\delta} = \frac{1}{\beta}
+\frac{d \delta}{d p_t}= \frac{p_t+1/\beta_0}{1+\delta} = \frac{1}{\beta} \\
+\delta&=\sqrt{\beta_0^2 p_\sigma^2 + 2 p_\sigma +1} -1 &
+\frac{d \delta}{d p_\sigma}= \frac{p_\sigma\beta_0^2+1}{1+\delta} = \frac{\beta_0}{\beta}
 \end{align}
 
 
@@ -182,9 +198,14 @@ The following identities are useful to derive the equation of motion.
 A drift is a straight, field-free region ($h(x,y)=0$, $V=0$ and
 $\mathbf{A}=0$).  The exact and expanded Hamiltonian for a drift space are
 \begin{align}
-  H = \frac{p_t}{\beta_0} - \sqrt{(1+\delta)^2 - p_x^2 - p_y^2} &\approx
+  H_\tau = \frac{p_t}{\beta_0} - \sqrt{(1+\delta)^2 - p_x^2 - p_y^2} &\approx
   \frac{p_t}{\beta_0} - \delta + \frac{1}{2}\frac{p_x^2+p_y^2}{1+\delta}.
 \end{align}
+\begin{align}
+  H_\sigma = p_\sigma - \sqrt{(1+\delta)^2 - p_x^2 - p_y^2} &\approx
+  p_\sigma - \delta + \frac{1}{2}\frac{p_x^2+p_y^2}{1+\delta}.
+\end{align}
+
 
 
 
@@ -204,13 +225,23 @@ The map relative to the expanded Hamiltonian is (eq. 3.49 in \cite{ripken95})
     \tau+
     l\left(\frac{\delta}{\beta_0}-\frac{p_t}{1+\delta} - \frac{x_p^2+y_p^2}{2\beta}\right)
 \end{align}
+\begin{align}
+  \sigma & \leftarrow \sigma +
+   l - \frac{\beta_0}{\beta} l -
+    \frac{\beta_0}{\beta} l \frac{x_p^2+y_p^2}{2}=
+    \sigma+
+    l\left(1- \frac{\beta_0}{\beta}\left(1 + \frac{x_p^2+y_p^2}{2}\right)\right)
+\end{align}
 
 \subsection{Exact Drift}
 
 The map relative to the exact Hamiltonian is (eq. 3.49 in \cite{ripken95})
 \begin{align}
-  p_z&=\sqrt{(1+\delta)^2 - p_x^2 - p_y^2} &
+  p_z&=\sqrt{(1+\delta)^2 - p_x^2 - p_y^2} \\
   \frac{d p_z}{d p_t}&= \frac{p_t+1/\beta_0}{p_z} = \frac{1}{\beta_z}  \\
+  \frac{d p_z}{d p_\sigma}&= \frac{\beta_0^2 p_\sigma+1}{p_z} = \frac{\beta_0}{\beta_z}  
+\end{align}
+\begin{align}
   x & \leftarrow x + \frac{p_x}{p_z} l  &
   y & \leftarrow y + \frac{p_x}{p_z} l
 \end{align}
@@ -219,6 +250,14 @@ The map relative to the exact Hamiltonian is (eq. 3.49 in \cite{ripken95})
   -\frac{l}{\beta_z}=
   l\left(\frac{1}{\beta_0}-\frac{p_t+1/\beta_0}{p_z}\right)
 \end{align}
+\begin{align}
+  \sigma & \leftarrow \sigma + l
+  -l \frac{\beta_0}{\beta_z}=
+  l\left(1-\frac{\beta_0^2 p_\sigma+1}{p_z}\right)
+\end{align}
+
+
+
 
 \section{Polar Drift}
 It is possible to define a ``polar'' drift that has the effect of rotating the reference frame
@@ -268,6 +307,25 @@ The map for a thin dipole kick (horizontal or vertical) from the expanded Hamilt
   p_y &\leftarrow p_y - (h_y l - \chi \hat k_0 l) - h_y l \delta + \chi k_0 l h_y y\\
   \tau &\leftarrow \tau - \frac{h_xx - h_yy}{\beta}  l.
 \end{align}
+
+\subsubsection{mad thin dipole}
+
+to be checked
+%??? dipr 
+\begin{align}
+  p_x &\leftarrow p_x + (h_x l - \chi k_0 l)  + h_x l (p_z -1) - \chi k_0 l h_x x \\
+  p_y &\leftarrow p_y - (h_y l - \chi \hat k_0 l) - h_y l (p_z-1) + \chi k_0 l h_y y\\
+  \tau &\leftarrow \tau - \frac{h_xx - h_yy}{\beta_z}  l.
+\end{align}
+
+
+ %   track(2,jtrk) = track(2,jtrk) - (dbr + dxt(jtrk) - dipr * (ttt - one))
+ %    track(4,jtrk) = track(4,jtrk) + (dbi + dyt(jtrk) - dipi * (ttt - one))
+ %    track(5,jtrk) = track(5,jtrk) - &
+ %         (dipr*track(1,jtrk) - dipi*track(3,jtrk)) *   &
+ %         ((one + bet0*track(6,jtrk))/ttt) * bet0i
+
+
 
 \subsubsection{Thick dipole}
 Defining the following quantities,
