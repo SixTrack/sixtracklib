@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import numpy as np
 
 import sixtracktools
@@ -16,22 +17,10 @@ sixtrackbeam=sixtracktools.SixDump3('dump3.dat')
 block=sixtracklib.cBlock.from_line(line)
 bref=sixtracklib.cBeam.from_full_beam(sixtrackbeam.get_full_beam())
 bref=bref.reshape(-1,2)
-cbeam=bref.copy()[0]
-
-block.track(cbeam,nturn=1,elembyelem=True)
-
-bnew=block.elembyelem[:,0][iconv]
-
-for pp in range(len(bnew.x)):
-    res=bnew[pp].compare(bref[pp],include=['s'],verbose=False)
-    if res>1e-6:
-    #if bnew[pp].psigma!=bnew[pp].psigma:
-      print pp,names2[pp]
-      bnew[pp].compare(bref[pp],include=['s'])
-      break
 
 import time
-nturn=20;npart=5000
+import sys
+nturn=int(sys.argv[1]) ;npart=int(sys.argv[2])
 cbeam=bref.copy().reshape(-1)[:npart]
 st=time.time()
 block.track_cl(cbeam,nturn=nturn,turnbyturn=True)
@@ -49,10 +38,6 @@ print("CPU  part %6d %6d: %g msec/part*turn"%(npart,nturn,perfcpu))
 print("GPU/CPU : %g"%(perfcpu/perfgpu))
 
 
-
-#bb=block.turnbyturn
-
-#assert bnew[:10].compare(bref[:10],include=['s'])==0
 
 
 
