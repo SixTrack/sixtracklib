@@ -20,20 +20,21 @@ bref=bref.reshape(-1,2)
 
 import time
 import sys
-nturn=int(sys.argv[1]) ;npart=int(sys.argv[2])
+npart=int(sys.argv[1]);
+nturn=int(sys.argv[2]);
 cbeam=bref.copy().reshape(-1)[:npart]
 st=time.time()
 block.track_cl(cbeam,nturn=nturn,turnbyturn=True)
 st=time.time()-st
 perfgpu=st/npart/nturn*1e3
-print("GPU  part %6d %6d: %g msec/part*turn"%(npart,nturn,perfgpu))
+print("GPU part %4d, turn %4d: %10.3f msec/part*turn"%(npart,nturn,perfgpu))
 
 cbeam=bref.copy().reshape(-1)[:npart]
 st=time.time()
 block.track(cbeam,nturn=nturn,turnbyturn=True)
 st=time.time()-st
 perfcpu=st/npart/nturn*1e3
-print("CPU  part %6d %6d: %g msec/part*turn"%(npart,nturn,perfcpu))
+print("CPU part %4d, turn %4d: %10.3f msec/part*turn"%(npart,nturn,perfcpu))
 
 print("GPU/CPU : %g"%(perfcpu/perfgpu))
 
