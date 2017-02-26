@@ -53,9 +53,10 @@ class cBeam(object):
       for nn in particle_t.names:
          particles[nn]=beam[nn]
       return cls(particles=particles)
-  pt =property(lambda p: (p.psigma*p.beta0))
+  ptau =property(lambda p: (p.psigma*p.beta0))
   pc =property(lambda p: (p.beta*p.gamma*p.mass0))
   energy =property(lambda p: (p.gamma*p.mass0))
+  energy0=property(lambda p: (p.gamma0*p.mass0))
   def __init__(self,npart=None,mass0=pmass,p0c=450,q0=1.0,particles=None):
     if particles is None:
       self.npart=npart
@@ -89,14 +90,18 @@ class cBeam(object):
     return self.particles[kk]
   def __dir__(self):
     return sorted(particle_t.names)
-  def compare(self,ref):
+  def compare(self,ref,exclude=['s','elemid'],include=[],verbose=True):
     npart=self.particles.size
     if npart == self.particles.size:
       names=list(particle_t.names)
-      names.remove('s')
+      for nn in exclude:
+        names.remove(nn)
+      for nn in include:
+        names.append(nn)
       general=0
       partn=1
       fmts="%-12s: %-14s %-14s %-14s %-14s"
+      fmtg="%-12s:  global diff  %14.6e"
       lgd=('Variable','Reference','Value','Difference','Relative Diff')
       lgds=True
       fmt=fmts.replace('-14s','14.6e')
@@ -112,17 +117,21 @@ class cBeam(object):
                   else:
                       rdiff=diff
                   if lgds:
-                      print(fmts%lgd); lgds=False
-                  print(fmt%(nn,ref,val,diff,rdiff))
+                      if verbose: print(fmts%lgd); lgds=False
+                      if verbose: print(fmt%(nn,ref,val,diff,rdiff))
                   pdiff+=rdiff**2
           if pdiff>0:
               pl='Part %d/%d'%(partn,npart)
-              print("%-12s:  global diff  %14.6e"%(pl,np.sqrt(pdiff)))
+              if verbose: print(fmtg%(pl,np.sqrt(pdiff)))
               general+=pdiff
           partn+=1
-      return general==0
+      return np.sqrt(general)
     else:
       raise ValueError("Shape ref not compatible")
+  def shape(self):
+      return self.particles.shape
+  def reshape(self,*args):
+      return self.__class__(particles=self.particles.reshape(*args))
 
 
 

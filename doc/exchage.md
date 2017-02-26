@@ -37,6 +37,7 @@ Coordinates quantities
 * `p0c`    [eV]:
 * `gamma0` [1]:
 * `beta0`  [1]:
+* `charge0`[1]: number of e charges
 
 
 
@@ -61,7 +62,14 @@ Elements types are:
 * driftexact: l[m]
 * multipole: knl[m^-n] ksl[m^-n] l hxl hyl
 * cavity: volt[V] freq[Hz] lag[degree]
-* align: dx[V] dy[Hz] angle[degree]
+* align: dx[m] dy[m] tilt[degree]
 
+## Align
+
+Shift by dx dy tilt the reference frame (e.g. apply negative signs to the variables)
+
+* dx [m]
+* dy [m]
+* tilt [m]
 
 

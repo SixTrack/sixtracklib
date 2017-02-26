@@ -76,31 +76,31 @@ int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el){
 }
 
 int Cavity_track(CLGLOBAL Particle* p, double volt, double freq, double lag ){
-  double phase;
-  phase=lag-2*M_PI*freq/CLIGHT*p->sigma/p->beta0;
-  //printf("%e %e %e\n",volt,lag,phase-lag);
+  double phase, pt, opd;
+  phase=lag-2*M_PI/CLIGHT*freq*p->sigma/p->beta0;
+  //printf("ggg00 %e %e\n",p->psigma,p->psigma+p->chi*volt/(p->p0c));
   p->psigma+=p->chi*volt*sin(phase)/(p->p0c*p->beta0);
-  double pt=p->psigma*p->beta0;
-  double opd=sqrt( pt*pt+ 2*p->psigma + 1 );
+  pt=p->psigma * p->beta0;
+  opd=sqrt( pt*pt+ 2*p->psigma + 1 );
   p->delta=opd - 1;
-  //printf("%e %e %e\n",pt,opd,opd/(1/p->beta0+pt));
   p->beta=opd/(1/p->beta0+pt);
-  p->gamma=1/sqrt(1-p->beta*p->beta);
+  //p->gamma=1/sqrt(1-p->beta*p->beta);
   p->gamma=(pt*p->beta0+1)*p->gamma0;
   p->rpp=1/opd;
   p->rvv=p->beta0/p->beta;
+  //printf("ggg2 %e %e %e\n",pt,opd,p->delta);
   return 1;
 }
 
 int Align_track(CLGLOBAL Particle* p, double cz, double sz,
                                       double dx, double dy){
   double xn,yn;
-  xn= cz*p->x-sz*p->y + dx;
-  yn= sz*p->x+cz*p->y + dy;
+  xn= cz*p->x-sz*p->y - dx;
+  yn= sz*p->x+cz*p->y - dy;
   p->x=xn;
   p->y=yn;
-  xn= cz*p->px-sz*p->py;
-  yn= sz*p->px+cz*p->py;
+  xn= cz*p->px+sz*p->py;
+  yn=-sz*p->px+cz*p->py;
   p->px=xn;
   p->py=yn;
   return 1;

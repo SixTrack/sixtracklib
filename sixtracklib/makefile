@@ -1,6 +1,6 @@
 CFLAGS= -O1 -fPIC
 CFLAGS= -g -fPIC -Wall -Werror
-CFLAGS= -std=c99 -O3 -fPIC -msse -Wall -Werror
+CFLAGS= -std=c99 -g -O3 -fPIC -msse -Wall -Werror
 CC=gcc
 LIBS=-lm
 
