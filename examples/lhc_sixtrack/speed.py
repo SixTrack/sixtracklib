@@ -20,8 +20,8 @@ bref=bref.reshape(-1,2)
 
 import time
 import sys
-npart=int(sys.argv[1]);
-nturn=int(sys.argv[2]);
+npart=int(sys.argv[1])
+nturn=int(sys.argv[2])
 cbeam=bref.copy().reshape(-1)[:npart]
 st=time.time()
 block.track_cl(cbeam,nturn=nturn,turnbyturn=True)
