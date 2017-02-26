@@ -3,29 +3,29 @@ import ctypes
 import numpy as np
 
 particle_t=np.dtype([
-         ('partid','int32'),
-         ('elemid','int32'),
-         ('turn'  ,'int32'),
-         ('state' ,'int32'),
-         ('s'     ,float),
-         ('x'     ,float),
-         ('px'    ,float),
-         ('y'     ,float),
-         ('py'    ,float),
-         ('sigma' ,float),
-         ('psigma',float),
-         ('chi'   ,float),
-         ('delta' ,float),
-         ('rpp'   ,float),
-         ('rvv'   ,float),
-         ('beta'  ,float),
-         ('gamma' ,float),
-         ('m0'    ,float),
-         ('q0'    ,float),
-         ('q'     ,float),
-         ('beta0' ,float),
-         ('gamma0',float),
-         ('p0c',float),
+         ('partid' ,'int32'),
+         ('elemid' ,'int32'),
+         ('turn'   ,'int32'),
+         ('state'  ,'int32'),
+         ('s'      ,float),
+         ('x'      ,float),
+         ('px'     ,float),
+         ('y'      ,float),
+         ('py'     ,float),
+         ('sigma'  ,float),
+         ('psigma' ,float),
+         ('chi'    ,float),
+         ('delta'  ,float),
+         ('rpp'    ,float),
+         ('rvv'    ,float),
+         ('beta'   ,float),
+         ('gamma'  ,float),
+         ('mass0'  ,float),
+         ('charge0',float),
+         ('charge' ,float),
+         ('beta0'  ,float),
+         ('gamma0' ,float),
+         ('p0c'    ,float),
          ])
 
 class cBeam_ctypes(ctypes.Structure):
@@ -54,16 +54,16 @@ class cBeam(object):
          particles[nn]=beam[nn]
       return cls(particles=particles)
   pt =property(lambda p: (p.psigma*p.beta0))
-  pc =property(lambda p: (p.beta*p.gamma*p.m0))
-  E  =property(lambda p: (p.gamma*p.m0))
-  def __init__(self,npart=None,m0=pmass,p0c=450,q0=1.0,particles=None):
+  pc =property(lambda p: (p.beta*p.gamma*p.mass0))
+  energy =property(lambda p: (p.gamma*p.mass0))
+  def __init__(self,npart=None,mass0=pmass,p0c=450,q0=1.0,particles=None):
     if particles is None:
       self.npart=npart
       self.particles=np.zeros(npart,particle_t)
-      self.particles['m0']=m0
-      e0=np.sqrt(p0c**2+m0**2)
-      gamma0=e0/m0
-      beta0=p0c/m0/gamma0
+      self.particles['mass0']=mass0
+      energy0=np.sqrt(p0c**2+mass0**2)
+      gamma0=energy0/mass0
+      beta0=p0c/mass0/gamma0
       chi=1.
       self.particles['partid']=np.arange(npart)
       self.particles['chi']=chi

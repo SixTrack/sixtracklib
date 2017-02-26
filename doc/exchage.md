@@ -6,20 +6,41 @@ Particle coordinates are given in right handed local reference frame with the ax
 
 Coordinates quantities
 
-* partid: 
-* turn: 
-* state:
-* elemid:
-* s:
-* x:
-* px:
-* y:
-* py:
-* tau: s/beta0 - ct
-* sigma: s  - beta0 c t 
-* m0, P0, E0, gamma0, beta0
-* m/m0
-* q/q0
+* `partid`: particle id
+* `state`: >=0 particle valid, <0 particle frozen
+* `elemid`: elem where the particle si
+* `turn`  : turn number
+* `s`: path length in the reference trajectory
+* `x`: transverse plane 
+* `px`: transverse normalized momentum Px/P0
+* `xp`: transverse divergence Px/P
+* `y` : transverse normalized momentum Px/P0
+* `py`: transverse divergence Px/P
+* `tau`: delay : s/beta0 - c T
+* `ptau`: normalized energy deviation: (energy-energy0)/p0c
+* `sigma`: delay : s - beta0 c T
+* `psigma`: normalized energy deviation: (energy-energy0)/(\beta0 p0c)
+* `delta`: relative momentum deviation: (pc -p0c)/p0c
+* `rpp`: beta0/beta
+* `rvv`: p0c/pc = 1/(1+delta)
+* `energy`: 
+* `pc`: 
+* `beta`: pc/energy
+* `gamma`: energy/mass
+* `mass`: 
+* `charge`: 
+* `mratio`: 
+* `qratio`: 
+* `chi`: 
+* `mass0`  [eV/c^2]:  reference mass
+* `energy0`[eV]: reference energy 
+* `p0c`    [eV]:
+* `gamma0` [1]:
+* `beta0`  [1]:
+
+
+
+
 
 Particles data is exchanged a dictionary where quantities can be scalars or vectors of the same shape
 
