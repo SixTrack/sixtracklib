@@ -1,17 +1,30 @@
+beam,particle=proton,gamma=1.1;
+
 mq: multipole;
 qf: mq,knl:={0,kqf};
 qd: mq,knl:={0,kqd};
 dr: drift,l:=ld;
 
-fodo : line = (dr,qf,dr,qd);
-
-beam; use,period=fodo;
-
 kqf=0.8;
 kqd=-0.7;
-ld=1.5;
+ld=1.2;
 
-twiss;
+fodo : line = (dr,qf,dr,qd);
+
+
+use,period=fodo;
+
+
+twiss,file="twiss_fodo.tfs";
+
+
+
+track, onepass, dump;
+start, x=0.1, px=0.1, y=0.1, py=0.2, t=0.1, pt=0.01;
+run, turns=10;
+endtrack;
+
+
 
 
 qx0 = 0.245;

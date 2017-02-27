@@ -1,0 +1,12 @@
+*.tfs
+*.pyc
+*.o
+*.so
+*.tfs
+*.pdf
+*.dat
+*.log
+*.aux
+*egg-info
+track.obs*.p*
+.cache

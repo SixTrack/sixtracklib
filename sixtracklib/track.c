@@ -1,6 +1,8 @@
 #ifndef _GPUCODE
 
 #include <math.h>
+#include <stdio.h>
+#define M_PI 3.14159265358979323846
 
 #endif
 
@@ -18,7 +20,7 @@ int Drift_track(CLGLOBAL Particle* p, CLGLOBAL Drift *el){
   yp = p->py * p->rpp;
   p->x += xp * length;
   p->y += yp * length;
-  p->sigma += 1 - length*p->rvv*( 1 + (xp*xp+yp*yp)/2 );
+  p->sigma += length * (1 - p->rvv*( 1 + (xp*xp+yp*yp)/2 ) );
   p->s+=length;
 //  _DP("Drift_track: length=%g\n",length);
   return 1;
@@ -30,7 +32,7 @@ int DriftExact_track(CLGLOBAL Particle* p, double length){
   opd=1+p->delta;
   px=p->px; py=p->py;
   lpzi= length/sqrt(opd*opd-px*px-py*py);
-  lbzi=(1+p->psigma)*lpzi;
+  lbzi=(p->beta0*p->beta0*p->psigma+1)*lpzi;
   p->x += px*lpzi ;
   p->y += py*lpzi ;
   p->sigma += length - lbzi;
@@ -74,27 +76,31 @@ int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el){
 }
 
 int Cavity_track(CLGLOBAL Particle* p, double volt, double freq, double lag ){
-  double phase;
-  phase=lag-freq/CLIGHT*p->sigma/p->beta0;
+  double phase, pt, opd;
+  phase=lag-2*M_PI/CLIGHT*freq*p->sigma/p->beta0;
+  //printf("ggg00 %e %e\n",p->psigma,p->psigma+p->chi*volt/(p->p0c));
   p->psigma+=p->chi*volt*sin(phase)/(p->p0c*p->beta0);
-  double pt=p->sigma*p->beta0;
-  p->delta=sqrt( pt*pt+ 2*p->psigma + 1 ) - 1;
-  p->beta=(1+p->delta)/(1+p->psigma)*p->beta0;
-  p->gamma=sqrt(1-1/(p->beta*p->beta));
-  p->rpp=1/(1+p->delta);
-  p->rvv=p->beta/p->beta0;
+  pt=p->psigma * p->beta0;
+  opd=sqrt( pt*pt+ 2*p->psigma + 1 );
+  p->delta=opd - 1;
+  p->beta=opd/(1/p->beta0+pt);
+  //p->gamma=1/sqrt(1-p->beta*p->beta);
+  p->gamma=(pt*p->beta0+1)*p->gamma0;
+  p->rpp=1/opd;
+  p->rvv=p->beta0/p->beta;
+  //printf("ggg2 %e %e %e\n",pt,opd,p->delta);
   return 1;
 }
 
 int Align_track(CLGLOBAL Particle* p, double cz, double sz,
                                       double dx, double dy){
   double xn,yn;
-  xn= cz*p->x-sz*p->y + dx;
-  yn= sz*p->x+cz*p->y + dy;
+  xn= cz*p->x-sz*p->y - dx;
+  yn= sz*p->x+cz*p->y - dy;
   p->x=xn;
   p->y=yn;
-  xn= cz*p->px-sz*p->py;
-  yn= sz*p->px+cz*p->py;
+  xn= cz*p->px+sz*p->py;
+  yn=-sz*p->px+cz*p->py;
   p->px=xn;
   p->py=yn;
   return 1;

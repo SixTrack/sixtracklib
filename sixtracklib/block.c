@@ -26,7 +26,7 @@ double Drift_get_length(CLGLOBAL value_t *data, uint64_t elemid){
 
 //DriftExact
 
-double driftexact_get_length(CLGLOBAL value_t *data, uint64_t elemid){
+double DriftExact_get_length(CLGLOBAL value_t *data, uint64_t elemid){
     return data[elemid + 1].f64;
 }
 
@@ -103,13 +103,6 @@ int track_single(CLGLOBAL value_t *data,
    uint64_t elemid;
    if (p->state >= 0 ) {
        elemid=elemids[i_elem];
-       if (elembyelemoff>0){
-         uint64_t dataoff=elembyelemoff+sizeof(Particle)/8 * i_part;
-         for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
-            data[dataoff + i_attr] =
-                 ((CLGLOBAL value_t *) p)[i_attr];
-         }
-       };
        if ( (turnbyturnoff>0) && (i_elem==0) ){
          uint64_t dataoff=turnbyturnoff+sizeof(Particle)/8 * i_part;
          for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
@@ -149,8 +142,18 @@ int track_single(CLGLOBAL value_t *data,
            case IntegerID: break;
            case DoubleID: break;
            case BlockID: break;
-           case DriftExactID: break;
+           case DriftExactID:
+                DriftExact_track(p,
+                              DriftExact_get_length(data,elemid)  );
+           break;
        }
+       if (elembyelemoff>0){
+         uint64_t dataoff=elembyelemoff+sizeof(Particle)/8 * i_part;
+         for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
+            data[dataoff + i_attr] =
+                 ((CLGLOBAL value_t *) p)[i_attr];
+         }
+       };
    }
    return 1;
 }
