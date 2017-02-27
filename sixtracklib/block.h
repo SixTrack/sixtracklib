@@ -1,8 +1,8 @@
+#ifndef _BLOCK_
+#define _BLOCK_
+
 #include "beam.h"
 #include "value.h"
-
-#ifndef _BLOCK
-#define _BLOCK
 
 typedef enum type_t {IntegerID, DoubleID,
              DriftID, DriftExactID,

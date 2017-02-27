@@ -9,7 +9,7 @@
 
 #define CLIGHT 299792458
 
-#include "beam.h"
+#include "particle.h"
 
 #include "track.h"
 
