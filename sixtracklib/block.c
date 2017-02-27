@@ -143,8 +143,11 @@ int track_single(CLGLOBAL value_t *data,
                 LinMap_track(p, (CLGLOBAL LinMap_data*) elem);
            break;
            case BB4DID: {
-                CLGLOBAL BB4D_data* elem_data = (CLGLOBAL BB4D_data*) elem;
-                elem_data->field_map_data = ((CLGLOBAL char*)(elem_data+1)) - sizeof(char*) + sizeof(double);
+//                Old way assigning the pointer from the struct head assuming contiguous data, 
+//                now the struct member contains the offset, the assigment is done in track.c
+//
+//                CLGLOBAL BB4D_data* elem_data = (CLGLOBAL BB4D_data*) elem;
+//                elem_data->field_map_data = ((CLGLOBAL char*)(elem_data+1)) - sizeof(char*) + sizeof(double);
                 BB4D_track(p, (CLGLOBAL BB4D_data*) elem);
            }
            break;

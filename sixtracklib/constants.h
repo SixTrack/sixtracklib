@@ -1,6 +1,8 @@
 #ifndef _MY_CONSTANTS_
 #define _MY_CONSTANTS_
 
+#undef M_PI
+
 #define C_LIGHT   (299792458.0)
 #define EPSILON_0 (8.854187817620e-12)
 #define PI        (3.14159265358979323846)

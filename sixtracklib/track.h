@@ -81,7 +81,7 @@ typedef struct {
     double beta_s;
     double q_s;
     long int trasv_field_type; //1: round gaussian
-    CLGLOBAL char* field_map_data;
+    CLGLOBAL void* field_map_data;
 } BB4D_data;
 
 
