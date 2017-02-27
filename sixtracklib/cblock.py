@@ -41,6 +41,8 @@ class typeid(object):
   CavityID=5
   AlignID=6
   BlockID=7
+  LinMapID=8
+  BB4DID=9
 
 
 blocklibpath=os.path.join(modulepath, 'block.so')
@@ -164,6 +166,47 @@ class cBlock(object):
     self._add_float(sz)
     self._add_float(dx)
     self._add_float(dy)
+  def LinMap(self,alpha_x_s0, beta_x_s0, D_x_s0, alpha_x_s1, beta_x_s1, D_x_s1,
+                  alpha_y_s0, beta_y_s0, D_y_s0, alpha_y_s1, beta_y_s1, D_y_s1,
+                  dQ_x, dQ_y):
+    self.offsets.append(self.last)
+    self._add_integer(typeid.LinMapID)
+
+    # Dispersion not implemented
+    assert D_x_s0==0
+    assert D_y_s0==0
+    assert D_x_s1==0
+    assert D_y_s1==0
+
+    from linmap import twiss2matrix
+    self._add_float_array(
+      twiss2matrix(alpha_x_s0, beta_x_s0, alpha_x_s1, beta_x_s1, D_x_s1,
+                   alpha_y_s0, beta_y_s0, alpha_y_s1, beta_y_s1, D_y_s1,
+                   dQ_x, dQ_y))
+    self._add_float_array(np.array([D_x_s0, D_y_s0, D_x_s1, D_y_s1]))
+
+  def BB4D(self, N_s, beta_s, q_s, transv_field_data):
+    self.offsets.append(self.last)
+    self._add_integer(typeid.BB4DID)
+    self._add_float(N_s)
+    self._add_float(beta_s)
+    self._add_float(q_s)
+    if transv_field_data['type'] == 'gauss_round':
+        self._add_integer(1) #bb distrib
+        self._add_float(-1.)
+        self._add_float(transv_field_data['sigma'])
+        self._add_float(transv_field_data['Delta_x'])
+        self._add_float(transv_field_data['Delta_y'])
+    elif transv_field_data['type'] == 'gauss_ellip':
+        self._add_integer(2) #bb distrib
+        self._add_float(-1.)
+        self._add_float(transv_field_data['sigma_x'])
+        self._add_float(transv_field_data['sigma_y'])
+        self._add_float(transv_field_data['Delta_x'])
+        self._add_float(transv_field_data['Delta_y'])
+    else:
+        raise ValueError('Type "%s" not recognized!'%transv_field_data['type'])
+
   def Block(self,offsets=None):
     if offsets==None:
        offsets=self.offsets

@@ -5,7 +5,7 @@ typedef struct Particle {
   int partid;
   int elemid;
   int turn;
-  int state; //negativeparticle lost
+  int state; //negative particle lost
   double s;
   double x;
   double px; // Px/P0
@@ -21,7 +21,7 @@ typedef struct Particle {
   double gamma;
   double m0; // eV
   double q0; // C
-  double q; // C
+  double q;  // C
   double beta0;
   double gamma0;
   double p0c; //eV
