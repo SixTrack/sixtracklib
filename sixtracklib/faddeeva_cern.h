@@ -13,8 +13,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __FADDCERN
-#define __FADDCERN
+#ifndef _FADDCERN_
+#define _FADDCERN_
 
 #ifndef _GPUCODE
   #include <math.h>

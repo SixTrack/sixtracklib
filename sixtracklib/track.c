@@ -1,17 +1,11 @@
-#ifndef _GPUCODE
-
-#include <math.h>
-#include <stdio.h>
-#define M_PI 3.14159265358979323846
-
-#endif
-
-
-#define CLIGHT 299792458
-
-#include "particle.h"
-
 #include "track.h"
+#include "particle.h"
+#include "constants.h"
+
+#ifndef _GPUCODE
+  #include <math.h>
+  #include <stdio.h>
+#endif
 
 __CUDA_HOST_DEVICE__
 int Drift_track(CLGLOBAL Particle* p, CLGLOBAL Drift *el){
@@ -81,7 +75,7 @@ int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el){
 __CUDA_HOST_DEVICE__
 int Cavity_track(CLGLOBAL Particle* p, double volt, double freq, double lag ){
   double phase, pt, opd;
-  phase=lag-2*M_PI/CLIGHT*freq*p->sigma/p->beta0;
+  phase=lag-2*M_PI/C_LIGHT*freq*p->sigma/p->beta0;
   //printf("ggg00 %e %e\n",p->psigma,p->psigma+p->chi*volt/(p->p0c));
   p->psigma+=p->chi*volt*sin(phase)/(p->p0c*p->beta0);
   pt=p->psigma * p->beta0;

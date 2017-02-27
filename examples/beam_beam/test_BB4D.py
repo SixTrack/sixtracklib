@@ -24,15 +24,13 @@ block.BB4D(N_s = 1e11*100, beta_s = 1.0, q_s = qelem, transv_field_data = {'type
 
 block.Block()
 
-
-
 # Setup simulation
 
 # test CPU
-track_fun =  block.track
+#track_fun =  block.track
 
 # test OPENCL:
-#track_fun =  block.track_cl
+track_fun =  block.track_cl
 
 # test CUDA:
 # to be finalized :-P
