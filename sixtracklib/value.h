@@ -1,5 +1,5 @@
-#ifndef _VALUE
-#define _VALUE
+#ifndef _VALUE_
+#define _VALUE_
 
 //#define DEBUG
 
