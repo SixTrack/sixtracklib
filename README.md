@@ -6,9 +6,20 @@ Use
 
 ```
 git clone git@github.com:SixTrack/SixTrackLib.git
-cd sixtracklib
-pip install [--user] -e .
+pip install [--user] -e sixtraclib
 ```
 
-To run the examples other libraries are needed: github.com/rdemaria/sixtracktools and github.com/rdemaria/pyoptics.
+To run the examples other libraries are needed: http://github.com/rdemaria/sixtracktools and http://github.com/rdemaria/pyoptics that can be installed in a similar way
 
+## Tests
+
+A test suite can be run using
+
+```
+cd sixtracklib
+pytest tests
+```
+
+## Documentation
+
+A draft of the physics manual is being edited in  https://www.overleaf.com/read/jsfjffbnvhvl
