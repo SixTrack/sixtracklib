@@ -32,3 +32,10 @@ typedef struct {
       double freq;
       double lag;
 } Cavity;
+
+typedef struct {
+      double cz;
+      double sz;
+      double dx;
+      double dy;
+} Align;

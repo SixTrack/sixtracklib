@@ -107,9 +107,12 @@ int Cavity_track(CLGLOBAL Particle* p, CLGLOBAL Cavity *el){
   return 1;
 }
 
-int Align_track(CLGLOBAL Particle* p, double cz, double sz,
-                                      double dx, double dy){
+int Align_track(CLGLOBAL Particle* p, CLGLOBAL *Align el){
   double xn,yn;
+  double cz = el->cz;
+  double sz = el->sz;
+  double dx = el->dx;
+  double dy = el->dy;
   xn= cz*p->x-sz*p->y - dx;
   yn= sz*p->x+cz*p->y - dy;
   p->x=xn;
