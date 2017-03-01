@@ -40,8 +40,9 @@ int Drift_track(CLGLOBAL Particle* p, CLGLOBAL Drift *el){
 };
 
 
-int DriftExact_track(CLGLOBAL Particle* p, double length){
+int DriftExact_track(CLGLOBAL Particle* p, CLGLOBAL DriftExact *el){
   double lpzi, lbzi, px, py, opd;
+  double length = el->length;
   opd=1+p->delta;
   px=p->px; py=p->py;
   lpzi= length/sqrt(opd*opd-px*px-py*py);
@@ -53,8 +54,6 @@ int DriftExact_track(CLGLOBAL Particle* p, double length){
   return 1;
 }
 
-//int Multipole_track(CLGLOBAL Particle* p, long int order,
-//                     double l, double hxl, double hyl, CLGLOBAL double *bal){
 int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el){
   double x,y,chi,dpx,dpy,zre,zim,b1l,a1l,hxx,hyy;
   long int order=el->order;
@@ -88,7 +87,10 @@ int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el){
   return 1 ;
 }
 
-int Cavity_track(CLGLOBAL Particle* p, double volt, double freq, double lag ){
+int Cavity_track(CLGLOBAL Particle* p, CLGLOBAL Cavity *el){
+  double volt = el->volt;
+  double freq = el->freq;
+  double lag = el->lag;
   double phase, pt, opd;
   phase=lag-2*M_PI/CLIGHT*freq*p->sigma/p->beta0;
   //printf("ggg00 %e %e\n",p->psigma,p->psigma+p->chi*volt/(p->p0c));
