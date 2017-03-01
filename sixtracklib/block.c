@@ -46,61 +46,7 @@ double DriftExact_get_length(CLGLOBAL value_t *data, uint64_t elemid){
 //Multipole
 
 
-//long int Multipole_get_order(CLGLOBAL value_t *data, uint64_t elemid){
-//    return data[elemid + 1].i64;
-//}
-//
-//double Multipole_get_l(CLGLOBAL value_t *data, uint64_t elemid){
-//    return data[elemid + 2].f64;
-//}
-//
-//double Multipole_get_hxl(CLGLOBAL value_t *data, uint64_t elemid){
-//    return data[elemid + 3].f64;
-//}
-//
-//double Multipole_get_hyl(CLGLOBAL value_t *data, uint64_t elemid){
-//    return data[elemid + 4].f64;
-//}
-//
-//CLGLOBAL double* Multipole_get_bal(CLGLOBAL value_t *data, uint64_t elemid){
-//    return &data[elemid + 5].f64;
-//}
-
-//Cavity
-//double Cavity_get_volt(CLGLOBAL value_t *data, uint64_t elemid){
-//    return data[elemid + 1].f64;
-//}
-
-//double Cavity_get_freq(CLGLOBAL value_t *data, uint64_t elemid){
-//    return data[elemid + 2].f64;
-//}
-
-//double Cavity_get_lag(CLGLOBAL value_t *data, uint64_t elemid){
-//    return data[elemid + 3].f64;
-//}
-
-//Align
-
-
-double Align_get_cz(CLGLOBAL value_t *data, uint64_t elemid){
-    return data[elemid + 1].f64;
-}
-
-double Align_get_sz(CLGLOBAL value_t *data, uint64_t elemid){
-    return data[elemid + 2].f64;
-}
-
-double Align_get_dx(CLGLOBAL value_t *data, uint64_t elemid){
-    return data[elemid + 3].f64;
-}
-
-double Align_get_dy(CLGLOBAL value_t *data, uint64_t elemid){
-    return data[elemid + 3].f64;
-}
-
-
-
-// Tracking signle
+// Tracking single
 
 //#ifndef _GPUCODE
 //#include <stdio.h>
@@ -138,11 +84,7 @@ int track_single(CLGLOBAL value_t *data,
                 Cavity_track(p, (CLGLOBAL Cavity*) elem);
            break;
            case AlignID:
-                Align_track(p,
-                               Align_get_cz(data,elemid),
-                               Align_get_sz(data,elemid),
-                               Align_get_dx(data,elemid),
-                               Align_get_dy(data,elemid)    );
+                Align_track(p, (CLGLOBAL Align*) elem);
            break;
            case IntegerID: break;
            case DoubleID: break;
