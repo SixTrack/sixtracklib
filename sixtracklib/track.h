@@ -27,3 +27,8 @@ typedef struct {
       double bal[1];
 } Multipole;
 
+typedef struct {
+      double volt;
+      double freq;
+      double lag;
+} Cavity;
