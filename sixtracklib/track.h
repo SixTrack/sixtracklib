@@ -12,47 +12,57 @@
 #include "particle.h"
 
 
-/*********************************/
+/******************************************/
+/*Drift*/
+/******************************************/
 
 typedef struct {
-    double length;
+  double length;
 } Drift ;
 
+/******************************************/
+/*Exact Drift*/
+/******************************************/
+
 typedef struct {
-      double length;
+  double length;
 } DriftExact ;
 
+/******************************************/
+/*Multipole*/
+/******************************************/
+
 typedef struct {
-      long int order;
-      double l ;
-      double hxl;
-      double hyl;
-      double bal[1];
+  long int order;
+  double l ;
+  double hxl;
+  double hyl;
+  double bal[1];
 } Multipole;
 
-/*********************************/
-// **** NOT YET ADAPTED TO NEW STRUCTURE!!!
-__CUDA_HOST_DEVICE__
-int Drift_track(CLGLOBAL Particle* p, CLGLOBAL Drift *el);
-
-__CUDA_HOST_DEVICE__
-int DriftExact_track(CLGLOBAL Particle* p, double length);
-
-__CUDA_HOST_DEVICE__
-int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el);
-
-__CUDA_HOST_DEVICE__
-int Cavity_track(CLGLOBAL Particle* p, double volt, double freq, double lag );
-__CUDA_HOST_DEVICE__
-int Align_track(CLGLOBAL Particle* p, double cz, double sz,
-                                      double dx, double dy);
+/******************************************/
+/*RF Cavity*/
 /******************************************/
 
-// ADAPTED TO NEW STRUCTURE:
-
+typedef struct {
+  double volt;
+  double freq;
+  double lag;
+} Cavity;
 
 /******************************************/
-/*LINEAR MAP*/
+/*Align*/
+/******************************************/
+
+typedef struct {
+  double cz;
+  double sz;
+  double dx;
+  double dy;
+} Align;
+
+/******************************************/
+/*Linear Map*/
 /******************************************/
 
 typedef struct {
@@ -84,12 +94,8 @@ typedef struct {
     CLGLOBAL void* field_map_data;
 } BB4D_data;
 
-
-
 __CUDA_HOST_DEVICE__
 int BB4D_track(CLGLOBAL Particle* p, CLGLOBAL BB4D_data *el);
-
-
 
 
 #endif
