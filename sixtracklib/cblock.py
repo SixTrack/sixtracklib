@@ -193,13 +193,13 @@ class cBlock(object):
     self._add_float(q_s)
     if transv_field_data['type'] == 'gauss_round':
         self._add_integer(1) #bb distrib
-        self._add_integer(1) #data starts next register
+        self._add_integer(0) #data starts next register
         self._add_float(transv_field_data['sigma'])
         self._add_float(transv_field_data['Delta_x'])
         self._add_float(transv_field_data['Delta_y'])
     elif transv_field_data['type'] == 'gauss_ellip':
         self._add_integer(2) #bb distrib
-        self._add_integer(1) #data starts next register
+        self._add_integer(0) #data starts next register
         self._add_float(transv_field_data['sigma_x'])
         self._add_float(transv_field_data['sigma_y'])
         self._add_float(transv_field_data['Delta_x'])

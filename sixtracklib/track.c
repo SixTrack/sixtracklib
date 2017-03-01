@@ -165,16 +165,12 @@ int BB4D_track(CLGLOBAL Particle* p, CLGLOBAL BB4D_data *el){
   
   double Ex, Ey;
 
-  /* setting the pointer to the distribution data */
-  CLGLOBAL void * ptr = (CLGLOBAL uint64_t*) (&(el->field_map_data)) + (uint64_t) el->field_map_data;
-
   switch(el->trasv_field_type){
-    case 1: {
-      get_transv_field_gauss_round( (CLGLOBAL transv_field_gauss_round_data*) ptr, p->x, p->y, &Ex, &Ey);
+    case 1: 
+      get_transv_field_gauss_round( (CLGLOBAL transv_field_gauss_round_data*) el->field_map_data, p->x, p->y, &Ex, &Ey);
       break;
-    }
     case 2:
-      get_transv_field_gauss_ellip( (CLGLOBAL transv_field_gauss_ellip_data*) ptr, p->x, p->y, &Ex, &Ey);
+      get_transv_field_gauss_ellip( (CLGLOBAL transv_field_gauss_ellip_data*) el->field_map_data, p->x, p->y, &Ex, &Ey);
       break;
     default:
       Ex = 1/0.;

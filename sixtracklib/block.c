@@ -64,12 +64,18 @@ int track_single(CLGLOBAL value_t *data,
                 LinMap_track(p, (CLGLOBAL LinMap_data*) elem);
            break;
            case BB4DID: {
-//                Old way assigning the pointer from the struct head assuming contiguous data, 
-//                now the struct member contains the offset, the assigment is done in track.c
-//
-//                CLGLOBAL BB4D_data* elem_data = (CLGLOBAL BB4D_data*) elem;
-//                elem_data->field_map_data = ((CLGLOBAL char*)(elem_data+1)) - sizeof(char*) + sizeof(double);
-                BB4D_track(p, (CLGLOBAL BB4D_data*) elem);
+                /* cast elem to beam_beam */
+                CLGLOBAL BB4D_data * elbb = (CLGLOBAL BB4D_data*) elem;
+                /* save the offset of the beam_beam data */
+                CLGLOBAL void * data_offset = elbb->field_map_data;
+                /* change the pointer so that instead of the offset, it points to the actual data */
+                elbb->field_map_data = (CLGLOBAL uint64_t*) (&(elbb->field_map_data)) + (uint64_t) data_offset + 1;
+
+                BB4D_track(p, elbb);
+
+                /* restore the offset in the pointer so that the procedure can be repeated */
+                elbb->field_map_data = data_offset;
+                /* WHY THIS WORKS WITH CONCURRENT ACCESSES FROM OPENCL ???????????????? */
            }
            break;
            case IntegerID: break;
@@ -112,8 +118,8 @@ CLKERNEL void Block_track(
          turnbyturnoff=turnbyturnid +
                         sizeof(Particle)/8 * npart * i_turn;
        }
-      track_single(data, particles, elemids,
-                   i_part, i_elem, elembyelemoff, turnbyturnoff);
+       track_single(data, particles, elemids,
+                    i_part, i_elem, elembyelemoff, turnbyturnoff);
     }
     if (particles[i_part].state>=0) {
       particles[i_part].turn++;
@@ -123,9 +129,7 @@ CLKERNEL void Block_track(
 
 #else
 
-#include <stdio.h>
-
-
+//#include <stdio.h>
 int Block_track(value_t *data, Beam *beam,
                 uint64_t blockid, uint64_t nturn,
                 uint64_t elembyelemid, uint64_t turnbyturnid){
