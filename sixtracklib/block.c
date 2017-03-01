@@ -1,6 +1,7 @@
 #include "block.h"
-#include "track.c"
 
+#define DATA_PTR_IS_OFFSET
+#include "track.c"
 
 // Data management
 
@@ -63,20 +64,8 @@ int track_single(CLGLOBAL value_t *data,
            case LinMapID:
                 LinMap_track(p, (CLGLOBAL LinMap_data*) elem);
            break;
-           case BB4DID: {
-                /* cast elem to beam_beam */
-                CLGLOBAL BB4D_data * elbb = (CLGLOBAL BB4D_data*) elem;
-                /* save the offset of the beam_beam data */
-                CLGLOBAL void * data_offset = elbb->field_map_data;
-                /* change the pointer so that instead of the offset, it points to the actual data */
-                elbb->field_map_data = (CLGLOBAL uint64_t*) (&(elbb->field_map_data)) + (uint64_t) data_offset + 1;
-
-                BB4D_track(p, elbb);
-
-                /* restore the offset in the pointer so that the procedure can be repeated */
-                elbb->field_map_data = data_offset;
-                /* WHY THIS WORKS WITH CONCURRENT ACCESSES FROM OPENCL ???????????????? */
-           }
+           case BB4DID:
+                BB4D_track(p, (CLGLOBAL BB4D_data *) elem);
            break;
            case IntegerID: break;
            case DoubleID: break;
