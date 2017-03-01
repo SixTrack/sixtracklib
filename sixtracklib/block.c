@@ -67,17 +67,17 @@ double DriftExact_get_length(CLGLOBAL value_t *data, uint64_t elemid){
 //}
 
 //Cavity
-double Cavity_get_volt(CLGLOBAL value_t *data, uint64_t elemid){
-    return data[elemid + 1].f64;
-}
+//double Cavity_get_volt(CLGLOBAL value_t *data, uint64_t elemid){
+//    return data[elemid + 1].f64;
+//}
 
-double Cavity_get_freq(CLGLOBAL value_t *data, uint64_t elemid){
-    return data[elemid + 2].f64;
-}
+//double Cavity_get_freq(CLGLOBAL value_t *data, uint64_t elemid){
+//    return data[elemid + 2].f64;
+//}
 
-double Cavity_get_lag(CLGLOBAL value_t *data, uint64_t elemid){
-    return data[elemid + 3].f64;
-}
+//double Cavity_get_lag(CLGLOBAL value_t *data, uint64_t elemid){
+//    return data[elemid + 3].f64;
+//}
 
 //Align
 
@@ -133,17 +133,9 @@ int track_single(CLGLOBAL value_t *data,
            break;
            case MultipoleID:
                 Multipole_track(p, (CLGLOBAL Multipole*) elem);
-//                               Multipole_get_order(data,elemid),
-//                               Multipole_get_l(data,elemid),
-//                               Multipole_get_hxl(data,elemid),
-//                               Multipole_get_hyl(data,elemid),
-//                               Multipole_get_bal(data,elemid)    );
            break;
            case CavityID:
-                Cavity_track(p,
-                               Cavity_get_volt(data,elemid),
-                               Cavity_get_freq(data,elemid),
-                               Cavity_get_lag(data,elemid)       );
+                Cavity_track(p, (CLGLOBAL Cavity*) elem);
            break;
            case AlignID:
                 Align_track(p,
@@ -156,8 +148,7 @@ int track_single(CLGLOBAL value_t *data,
            case DoubleID: break;
            case BlockID: break;
            case DriftExactID:
-                DriftExact_track(p,
-                              DriftExact_get_length(data,elemid)  );
+                DriftExact_track(p, (CLGLOBAL DriftExact*) elem);
            break;
        }
        if (elembyelemoff>0){
