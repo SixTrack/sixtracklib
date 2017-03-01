@@ -31,21 +31,6 @@ CLGLOBAL uint64_t *Block_get_elemids(CLGLOBAL value_t *data, size_t elemid ) {
   return &data[elemid + 2].u64 ;
 }
 
-//Drift
-
-double Drift_get_length(CLGLOBAL value_t *data, uint64_t elemid){
-    return data[elemid + 1].f64;
-}
-
-//DriftExact
-
-double DriftExact_get_length(CLGLOBAL value_t *data, uint64_t elemid){
-    return data[elemid + 1].f64;
-}
-
-//Multipole
-
-
 // Tracking single
 
 //#ifndef _GPUCODE
@@ -75,7 +60,6 @@ int track_single(CLGLOBAL value_t *data,
        switch (typeid) {
            case DriftID:
                 Drift_track(p, (CLGLOBAL Drift*) elem);
-//                           Drift_get_length(data,elemid)        );
            break;
            case MultipoleID:
                 Multipole_track(p, (CLGLOBAL Multipole*) elem);
