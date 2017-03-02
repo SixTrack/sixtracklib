@@ -11,6 +11,7 @@
 //submit itself to any jurisdiction.
 
 
+#include <stdlib.h>
 #include <math.h>
 #include "block.h"
 #include "track.c"
@@ -174,7 +175,7 @@ int Block_track(value_t *data, Beam *beam,
 
 
 CLGLOBAL block_t* block_initialize(unsigned int size) {
-    block_t *block;
+    CLGLOBAL block_t *block = malloc(sizeof(CLGLOBAL block_t*));
     if(!size) {
         size = 512;
     }
@@ -182,30 +183,30 @@ CLGLOBAL block_t* block_initialize(unsigned int size) {
     if(!data) {
         return NULL;
     }
-    block->size = size;
+    block->size = sizeof(CLGLOBAL value_t) * size;
     block->last = 0;
     block->data = data;
     return block;
 }
 
-CLGLOBAL block_t* block_reshape(CLGLOBAL block_t *block, unsigned int n) {
+void block_reshape(CLGLOBAL block_t *block, unsigned int n) {
     if(block->last+(sizeof(CLGLOBAL value_t)*n) >= block->size) {
         CLGLOBAL value_t *ndata = realloc(block->data, (block->size+(sizeof(CLGLOBAL value_t)*n))*2);
         if(!ndata) {
-            return NULL;
+            return;
         }
         block->size = (block->size+(sizeof(CLGLOBAL value_t)*n))*2;
         block-> data = ndata;
     }
-    return block;
 }
 
 void block_clean(CLGLOBAL block_t *block) {
     free(block->data);
+    free(block);
 }
 
 CLGLOBAL block_t* block_add_drift(CLGLOBAL block_t *block, uint64_t *offsets, uint64_t nel, double length) {
-    block = block_reshape(block, 2);
+    block_reshape(block, 2);
     offsets[nel] = block->last;
     block->data[block->last++].u64 = DriftID;
     block->data[block->last++].f64 = length;
@@ -213,7 +214,7 @@ CLGLOBAL block_t* block_add_drift(CLGLOBAL block_t *block, uint64_t *offsets, ui
 }
 
 CLGLOBAL block_t* block_add_cavity(CLGLOBAL block_t *block, uint64_t *offsets, uint64_t nel, double volt, double freq, double lag) {
-    block = block_reshape(block, 4);
+    block_reshape(block, 4);
     offsets[nel] = block->last;
     block->data[block->last++].u64 = CavityID;
     block->data[block->last++].f64 = volt;
@@ -223,7 +224,7 @@ CLGLOBAL block_t* block_add_cavity(CLGLOBAL block_t *block, uint64_t *offsets, u
 }
 
 CLGLOBAL block_t* block_add_align(CLGLOBAL block_t *block, uint64_t *offsets, uint64_t nel, double tilt, double dx, double dy) {
-    block = block_reshape(block, 5);
+    block_reshape(block, 5);
     offsets[nel] = block->last;
     block->data[block->last++].u64 = AlignID;
     block->data[block->last++].f64 = cos(tilt/180.0 * M_PI);
@@ -253,7 +254,7 @@ CLGLOBAL block_t* block_add_multipole(CLGLOBAL block_t *block, uint64_t *offsets
         bal[2*j] /= fact;
         bal[2*j+1] /= fact;
     }
-    block = block_reshape(block, 5+(2*i));
+    block_reshape(block, 5+(2*i));
     offsets[nel] = block->last;
     block->data[block->last++].u64 = MultipoleID;
     block->data[block->last++].u64 = order;
@@ -267,7 +268,7 @@ CLGLOBAL block_t* block_add_multipole(CLGLOBAL block_t *block, uint64_t *offsets
 }
 
 CLGLOBAL block_t* block_add_block(CLGLOBAL block_t *block, uint64_t *offsets, uint64_t nel) {
-    block = block_reshape(block, nel+2);
+    block_reshape(block, nel+2);
     block->data[block->last++].u64 = BlockID;
     block->data[block->last++].u64 = nel;
     for(uint64_t i = 0; i < nel; i++) {
