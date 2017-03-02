@@ -5,8 +5,8 @@
 Use 
 
 ```
-git clone git@github.com:SixTrack/SixTrackLib.git
-pip install [--user] -e sixtraclib
+git clone git@github.com:rdemaria/sixtracklib.git
+pip install [--user] -e sixtracklib
 ```
 
 To run the examples other libraries are needed: http://github.com/rdemaria/sixtracktools and http://github.com/rdemaria/pyoptics that can be installed in a similar way
