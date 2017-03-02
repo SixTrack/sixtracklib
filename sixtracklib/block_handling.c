@@ -99,7 +99,7 @@ CLGLOBAL block_t* block_add_block(CLGLOBAL block_t *block, uint64_t *offsets, ui
     block->data[block->last++].u64 = BlockID;
     block->data[block->last++].u64 = nel;
     for(uint64_t i = 0; i < nel; i++) {
-        block->data[block->last++].u64 = offsets[i++];
+        block->data[block->last++].u64 = offsets[i];
     }
     return block;
 }
