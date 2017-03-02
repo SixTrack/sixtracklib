@@ -77,7 +77,7 @@ CLGLOBAL block_t* block_add_multipole(CLGLOBAL block_t *block, uint64_t *offsets
         }
     }
     uint64_t order = i-1;
-    for(int j = 0, fact = 1; j < i; j++, fact *= j+1) {
+    for(int j = 0, fact = 1; j < i; fact *= ++j) {
         bal[2*j] /= fact;
         bal[2*j+1] /= fact;
     }
