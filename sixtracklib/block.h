@@ -22,6 +22,11 @@ typedef enum type_t {IntegerID, DoubleID,
              MultipoleID, CavityID, AlignID,
              BlockID} type_t;
 
+typedef struct {
+    unsigned int size;
+    unsigned int last;
+    CLGLOBAL value_t *data;
+} block_t;
 
 #ifdef _GPUCODE
 
