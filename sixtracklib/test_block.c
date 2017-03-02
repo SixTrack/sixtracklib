@@ -1,5 +1,7 @@
-#include "block.h"
 #include <stdio.h>
+#include "block.h"
+#include "block_handling.c"
+
 
 int main(int argc, char **argv) {
     CLGLOBAL block_t *block;
