@@ -1,6 +1,6 @@
 //SixTrackLib
 //
-//Authors: R. De Maria, G. Iadarola, D. Pellegrini
+//Authors: R. De Maria, G. Iadarola, D. Pellegrini, H. Jasim
 //
 //Copyright 2017 CERN. This software is distributed under the terms of the GNU
 //Lesser General Public License version 2.1, copied verbatim in the file
@@ -40,8 +40,9 @@ int Drift_track(CLGLOBAL Particle* p, CLGLOBAL Drift *el){
 };
 
 
-int DriftExact_track(CLGLOBAL Particle* p, double length){
+int DriftExact_track(CLGLOBAL Particle* p, CLGLOBAL DriftExact *el){
   double lpzi, lbzi, px, py, opd;
+  double length = el->length;
   opd=1+p->delta;
   px=p->px; py=p->py;
   lpzi= length/sqrt(opd*opd-px*px-py*py);
@@ -53,8 +54,6 @@ int DriftExact_track(CLGLOBAL Particle* p, double length){
   return 1;
 }
 
-//int Multipole_track(CLGLOBAL Particle* p, long int order,
-//                     double l, double hxl, double hyl, CLGLOBAL double *bal){
 int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el){
   double x,y,chi,dpx,dpy,zre,zim,b1l,a1l,hxx,hyy;
   long int order=el->order;
@@ -88,7 +87,10 @@ int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el){
   return 1 ;
 }
 
-int Cavity_track(CLGLOBAL Particle* p, double volt, double freq, double lag ){
+int Cavity_track(CLGLOBAL Particle* p, CLGLOBAL Cavity *el){
+  double volt = el->volt;
+  double freq = el->freq;
+  double lag = el->lag;
   double phase, pt, opd;
   phase=lag-2*M_PI/CLIGHT*freq*p->sigma/p->beta0;
   //printf("ggg00 %e %e\n",p->psigma,p->psigma+p->chi*volt/(p->p0c));
@@ -105,9 +107,12 @@ int Cavity_track(CLGLOBAL Particle* p, double volt, double freq, double lag ){
   return 1;
 }
 
-int Align_track(CLGLOBAL Particle* p, double cz, double sz,
-                                      double dx, double dy){
+int Align_track(CLGLOBAL Particle* p, CLGLOBAL Align *el){
   double xn,yn;
+  double cz = el->cz;
+  double sz = el->sz;
+  double dx = el->dx;
+  double dy = el->dy;
   xn= cz*p->x-sz*p->y - dx;
   yn= sz*p->x+cz*p->y - dy;
   p->x=xn;
