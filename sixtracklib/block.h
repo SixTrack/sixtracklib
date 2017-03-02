@@ -44,7 +44,7 @@ int Block_track(value_t *data, Beam *beam,
 
 // declarations for block handling functions
 CLGLOBAL block_t* block_initialize(unsigned int size);
-CLGLOBAL block_t* block_reshape(CLGLOBAL block_t *block, unsigned int n);
+void block_reshape(CLGLOBAL block_t *block, unsigned int n);
 void block_clean(CLGLOBAL block_t *block);
 CLGLOBAL block_t* block_add_drift(CLGLOBAL block_t *block, uint64_t *offsets, uint64_t nel, double length);
 CLGLOBAL block_t* block_add_cavity(CLGLOBAL block_t *block, uint64_t *offsets, uint64_t nel, double volt, double freq, double lag);
