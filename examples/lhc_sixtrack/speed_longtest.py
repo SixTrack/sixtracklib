@@ -43,6 +43,7 @@ def mkbench(npart,nturn):
   return st,npart,nturn,perfgpu,perfcpu
 
 out=open(time.strftime("bench_%Y%M%dT%H%m%S.txt"),'w')
+out.write("#%s"%pyopencl.get_platforms()[0].get_devices()[0])
 for npart in [100,1000,10000,20000]:
     for nturn in [1,2,5,10,20,100]:
         st,npart,nturn,perfgpu,perfcpu=mkbench(npart,nturn)
