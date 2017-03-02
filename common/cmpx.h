@@ -10,6 +10,7 @@ typedef struct {
     double i;
 } cmpx;
 
+_CUDA_HOST_DEVICE_
 cmpx makecmpx(double r, double i){
     cmpx res;
     res.r = r;
@@ -17,18 +18,21 @@ cmpx makecmpx(double r, double i){
     return res;
 }
 
+_CUDA_HOST_DEVICE_
 cmpx cadd(cmpx a, cmpx b){
     a.r += b.r;
     a.i += b.i;
     return a;
 }
 
+_CUDA_HOST_DEVICE_
 cmpx csub(cmpx a, cmpx b){
     a.r -= b.r;
     a.i -= b.i;
     return a;
 }
 
+_CUDA_HOST_DEVICE_
 cmpx cmul(cmpx a, cmpx b){
     cmpx res;
     res.r = a.r*b.r-a.i*b.i;
@@ -36,6 +40,7 @@ cmpx cmul(cmpx a, cmpx b){
     return res;
 }
 
+_CUDA_HOST_DEVICE_
 cmpx cdiv(cmpx a, cmpx b){
     double den;
     cmpx res;
@@ -45,6 +50,7 @@ cmpx cdiv(cmpx a, cmpx b){
     return res;
 }
 
+_CUDA_HOST_DEVICE_
 cmpx expc(cmpx a){
     double mod;
     cmpx res;
@@ -54,6 +60,7 @@ cmpx expc(cmpx a){
     return res;
 }
 
+_CUDA_HOST_DEVICE_
 cmpx cscale(cmpx a, double f){
     a.r *= f;
     a.i *= f;

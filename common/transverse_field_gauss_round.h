@@ -14,6 +14,7 @@ typedef struct{
   double Delta_y;
 }transv_field_gauss_round_data;
 
+_CUDA_HOST_DEVICE_
 void get_transv_field_gauss_round(CLGLOBAL transv_field_gauss_round_data* data, 
                                   double x, double y, double* Ex, double* Ey){    
   double r2, temp;

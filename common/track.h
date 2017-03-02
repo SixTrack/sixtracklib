@@ -1,8 +1,6 @@
-#ifndef _TRACK
-#define _TRACK
+#ifndef _TRACK_
+#define _TRACK_
 
-
-#define __CUDA_HOST_DEVICE__
 
 #ifndef _GPUCODE
   #include <math.h>
@@ -70,12 +68,12 @@ typedef struct {
       //double disp[4];
 } LinMap_data;
 
-__CUDA_HOST_DEVICE__
+_CUDA_HOST_DEVICE_
 LinMap_data LinMap_init( double alpha_x_s0, double beta_x_s0, double alpha_x_s1, double beta_x_s1,
                          double alpha_y_s0, double beta_y_s0, double alpha_y_s1, double beta_y_s1,
                          double dQ_x, double dQ_y );
                          
-__CUDA_HOST_DEVICE__
+_CUDA_HOST_DEVICE_
 int LinMap_track(CLGLOBAL Particle* p, CLGLOBAL LinMap_data *el);
 
 
@@ -94,7 +92,7 @@ typedef struct {
     CLGLOBAL void* field_map_data;
 } BB4D_data;
 
-__CUDA_HOST_DEVICE__
+_CUDA_HOST_DEVICE_
 int BB4D_track(CLGLOBAL Particle* p, CLGLOBAL BB4D_data *el);
 
 

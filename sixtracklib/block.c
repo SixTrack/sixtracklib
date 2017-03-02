@@ -1,9 +1,9 @@
 #include "block.h"
 
 #define DATA_PTR_IS_OFFSET
-#include "track.c"
+#include "../common/track.c"
 
-// Data management
+//Data managemen
 
 type_t get_type(CLGLOBAL value_t *data, uint64_t elemid ) {
   return (type_t) data[elemid].i64;
@@ -37,7 +37,7 @@ int track_single(CLGLOBAL value_t *data,
        elemid=elemids[i_elem];
        if ( (turnbyturnoff>0) && (i_elem==0) ){
          uint64_t dataoff=turnbyturnoff+sizeof(Particle)/8 * i_part;
-         for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
+         for (unsigned i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
             data[dataoff + i_attr] =
                  ((CLGLOBAL value_t *) p)[i_attr];
          }
@@ -73,7 +73,7 @@ int track_single(CLGLOBAL value_t *data,
        }
        if (elembyelemoff>0){
          uint64_t dataoff=elembyelemoff+sizeof(Particle)/8 * i_part;
-         for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
+         for (unsigned i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
             data[dataoff + i_attr] =
                  ((CLGLOBAL value_t *) p)[i_attr];
          }
@@ -127,8 +127,8 @@ int Block_track(value_t *data, Beam *beam,
    uint64_t npart=beam->npart;
    uint64_t elembyelemoff=0;
    uint64_t turnbyturnoff=0;
-   for (int i_turn=0; i_turn< nturn; i_turn++) {
-     for (int i_elem=0; i_elem< nelem; i_elem++) {
+   for (uint64_t i_turn=0; i_turn< nturn; i_turn++) {
+     for (uint64_t i_elem=0; i_elem< nelem; i_elem++) {
        for (uint64_t i_part=0; i_part < npart; i_part++){
           if (elembyelemid>0){
             elembyelemoff=elembyelemid +
@@ -154,9 +154,5 @@ int Block_track(value_t *data, Beam *beam,
 }
 
 #endif
-
-
-
-
 
 

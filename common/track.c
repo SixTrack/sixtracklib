@@ -5,9 +5,10 @@
 #ifndef _GPUCODE
   #include <math.h>
   #include <stdio.h>
+HHHHHHHHHHHHHHHEEEEEEEEEEEEEEEEEEEELLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOOOOOOOOOOOOOOOOO!
 #endif
 
-__CUDA_HOST_DEVICE__
+_CUDA_HOST_DEVICE_
 int Drift_track(CLGLOBAL Particle* p, CLGLOBAL Drift *el){
   double xp, yp;
   double length=el->length;
@@ -19,10 +20,10 @@ int Drift_track(CLGLOBAL Particle* p, CLGLOBAL Drift *el){
   p->s+=length;
 //  _DP("Drift_track: length=%g\n",length);
   return 1;
-};
+}
 
 
-__CUDA_HOST_DEVICE__
+_CUDA_HOST_DEVICE_
 int DriftExact_track(CLGLOBAL Particle* p, CLGLOBAL DriftExact *el){
   double lpzi, lbzi, px, py, opd;
   double length = el->length;
@@ -37,7 +38,7 @@ int DriftExact_track(CLGLOBAL Particle* p, CLGLOBAL DriftExact *el){
   return 1;
 }
 
-__CUDA_HOST_DEVICE__
+_CUDA_HOST_DEVICE_
 int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el){
   double x,y,chi,dpx,dpy,zre,zim,b1l,a1l,hxx,hyy;
   long int order=el->order;
@@ -71,7 +72,7 @@ int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el){
   return 1 ;
 }
 
-__CUDA_HOST_DEVICE__
+_CUDA_HOST_DEVICE_
 int Cavity_track(CLGLOBAL Particle* p, CLGLOBAL Cavity *el){
   double volt = el->volt;
   double freq = el->freq;
@@ -92,7 +93,7 @@ int Cavity_track(CLGLOBAL Particle* p, CLGLOBAL Cavity *el){
   return 1;
 }
 
-__CUDA_HOST_DEVICE__
+_CUDA_HOST_DEVICE_
 int Align_track(CLGLOBAL Particle* p, CLGLOBAL Align *el){
   double xn,yn;
   double cz = el->cz;
@@ -108,13 +109,13 @@ int Align_track(CLGLOBAL Particle* p, CLGLOBAL Align *el){
   p->px=xn;
   p->py=yn;
   return 1;
-};
+}
 
 /******************************************/
 
 
 
-__CUDA_HOST_DEVICE__
+_CUDA_HOST_DEVICE_
 LinMap_data LinMap_init( double alpha_x_s0, double beta_x_s0, double alpha_x_s1, double beta_x_s1,
                          double alpha_y_s0, double beta_y_s0, double alpha_y_s1, double beta_y_s1,
                          double dQ_x, double dQ_y ) {
@@ -138,7 +139,7 @@ LinMap_data LinMap_init( double alpha_x_s0, double beta_x_s0, double alpha_x_s1,
 }
 
 
-__CUDA_HOST_DEVICE__
+_CUDA_HOST_DEVICE_
 int LinMap_track(CLGLOBAL Particle* p, CLGLOBAL LinMap_data *el){
   double M00 = el->matrix[0];
   double M01 = el->matrix[1];
@@ -160,7 +161,7 @@ int LinMap_track(CLGLOBAL Particle* p, CLGLOBAL LinMap_data *el){
   return 1;
 }
 
-__CUDA_HOST_DEVICE__
+_CUDA_HOST_DEVICE_
 int BB4D_track(CLGLOBAL Particle* p, CLGLOBAL BB4D_data *el){
   
   double Ex, Ey;

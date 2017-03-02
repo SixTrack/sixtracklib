@@ -35,7 +35,7 @@ track_fun =  block.track_cl
 # test CUDA:
 # to be finalized :-P
 
-beam=sixtracklib.cBeam(npart=50)
+beam=sixtracklib.cBeam(npart=100000)
 for ii in xrange(len(beam.particles)):
   beam.particles[ii]['partid'] = ii
   beam.particles[ii]['elemid'] = 0
@@ -73,7 +73,8 @@ for i in range(N_turns):
   px.append(beam.particles[2]['px'])
   y.append(beam.particles[2]['y'])
   py.append(beam.particles[2]['py'])
-  print i
+  if i%100 == 0:
+    print i
   track_fun(beam)
 
 
@@ -106,14 +107,4 @@ plt.show()
 #~ print(beam.particles[2]['s'])
 #~ print(beam.particles[2]['px'])
 #~ print(beam.particles[2]['py'])
-
-
-
-
-
-
-
-
-
-
 

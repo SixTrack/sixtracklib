@@ -20,6 +20,7 @@
   #include <math.h>
 #endif
 
+_CUDA_HOST_DEVICE_
 void cerrf(double in_real, double in_imag, double* out_real, double* out_imag)
 {
 	/**

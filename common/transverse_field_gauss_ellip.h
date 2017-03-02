@@ -22,6 +22,8 @@
 
 // To use CERNLIB Faddeeva 
 #include "faddeeva_cern.h"
+
+_CUDA_HOST_DEVICE_
 cmpx wfun(cmpx zz){
   cmpx res;
   cerrf(zz.r, zz.i , &(res.r), &(res.i));
@@ -36,6 +38,7 @@ typedef struct{
 }transv_field_gauss_ellip_data;
 
 
+_CUDA_HOST_DEVICE_
 void get_transv_field_gauss_ellip(CLGLOBAL transv_field_gauss_ellip_data* data,
                                   double x, double y, double* Ex_out, double* Ey_out){
     
