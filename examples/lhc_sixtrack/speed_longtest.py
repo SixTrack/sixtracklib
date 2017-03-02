@@ -49,5 +49,5 @@ for npart in [100,1000,10000,20000]:
     for nturn in [1,2,5,10,20,100]:
         st,npart,nturn,perfgpu,perfcpu=mkbench(npart,nturn)
         fmt="%5d %5d %10.3f %10.3f %10.3f\n"
-        out.write(fmt%(npart,nturn,perfgpu,perfcpu,perfgpu/perfcpu))
+        out.write(fmt%(npart,nturn,perfgpu,perfcpu,perfcpu/perfgpu))
 
