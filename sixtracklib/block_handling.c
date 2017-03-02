@@ -88,7 +88,7 @@ CLGLOBAL block_t* block_add_multipole(CLGLOBAL block_t *block, uint64_t *offsets
     block->data[block->last++].f64 = length;
     block->data[block->last++].f64 = hxl;
     block->data[block->last++].f64 = hyl;
-    for(int j = 0; j < i; j++) {
+    for(int j = 0; j < 2*i; j++) {
         block->data[block->last++].f64 = bal[j];
     }
     return block;
