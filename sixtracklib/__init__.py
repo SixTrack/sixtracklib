@@ -1,7 +1,7 @@
 """
 SixTrackLib
 
-Authors: R. De Maria, G. Iadarola, D. Pellegrini
+Authors: R. De Maria, G. Iadarola, D. Pellegrini, H. Jasim
 
 Copyright 2017 CERN. This software is distributed under the terms of the GNU
 Lesser General Public License version 2.1, copied verbatim in the file
