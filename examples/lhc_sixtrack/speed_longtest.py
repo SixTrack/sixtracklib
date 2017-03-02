@@ -22,6 +22,7 @@ import time
 import sys
 
 def mkbench(npart,nturn):
+  block=sixtracklib.cBlock.from_line(line)
   cbeam=bref.copy().reshape(-1)[:npart]
   st=time.time()
   block.track_cl(cbeam,nturn=nturn,turnbyturn=True)
@@ -29,6 +30,7 @@ def mkbench(npart,nturn):
   perfgpu=st/npart/nturn*1e6
   print("GPU part %4d, turn %4d: %10.3f usec/part*turn"%(npart,nturn,perfgpu))
 
+  block=sixtracklib.cBlock.from_line(line)
   npart2=npart/100
   cbeam=bref.copy().reshape(-1)[:npart2]
   st=time.time()
