@@ -20,6 +20,7 @@ bref=bref.reshape(-1,2)
 
 import time
 import sys
+import pyopencl
 
 def mkbench(npart,nturn):
   block=sixtracklib.cBlock.from_line(line)
