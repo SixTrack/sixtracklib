@@ -173,7 +173,7 @@ int Block_track(value_t *data, Beam *beam,
 */
 
 
-CLGLOBAL block_t* initialize_block(unsigned int size) {
+CLGLOBAL block_t* block_initialize(unsigned int size) {
     block_t *block;
     if(!size) {
         size = 512;
