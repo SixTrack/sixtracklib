@@ -24,7 +24,7 @@ typedef enum type_t {IntegerID, DoubleID,
 
 typedef struct {
     unsigned int size;
-    unsigned int last;
+    uint64_t last;
     CLGLOBAL value_t *data;
 } block_t;
 
