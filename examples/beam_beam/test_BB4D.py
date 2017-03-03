@@ -35,7 +35,7 @@ track_fun =  block.track_cl
 # test CUDA:
 # to be finalized :-P
 
-beam=sixtracklib.cBeam(npart=100000)
+beam=sixtracklib.cBeam(npart=100)
 for ii in xrange(len(beam.particles)):
   beam.particles[ii]['partid'] = ii
   beam.particles[ii]['elemid'] = 0

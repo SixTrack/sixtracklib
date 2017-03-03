@@ -15,9 +15,9 @@
 
 #define _CUDA_HOST_DEVICE_
 #define DATA_PTR_IS_OFFSET
-#include "../common/track.c"
+#include "../common/track.h"
 
-//Data managemen
+//Data management
 
 type_t get_type(CLGLOBAL value_t *data, uint64_t elemid ) {
   return (type_t) data[elemid].i64;
@@ -169,7 +169,3 @@ int Block_track(value_t *data, Beam *beam,
 
 #endif
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 088c4c913f80a429082b5d43bd7aa1703473f700

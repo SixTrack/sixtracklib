@@ -20,11 +20,6 @@ CUDA_CPPFLAGS = -I$(CUDA_PATH)/include
 CUDA_LDFLAGS = -L$(CUDA_PATH)/lib64
 
 
-# files required to compile the cuda kernels
-
-CUDA_HEADERS = elements.h complex.h float_type.h particle.h track.h 
-CUDA_NAMES = $(basename $(CUDA_HEADERS))
-
 # compile mesh classes
 tracker.so: interface.o
 	echo "Linking tracker..."
@@ -32,11 +27,9 @@ tracker.so: interface.o
 
 interface.o: interface.cpp $(wildcard *.h)
 	echo "Compiling tracker..."
-	gcc -E -P -D_GPUCODE -DCLGLOBAL='' -D_CUDA_HOST_DEVICE_=__device__ ../common/track.c | xxd -i > track.xxd
-#	$(foreach h,$(CUDA_NAMES), xxd -i < ../common/$(h).h > $(h).xxd && echo ', 0' >> $(h).xxd;)
+	gcc -E -P -D_GPUCODE='' -DCLGLOBAL='' -D_CUDA_HOST_DEVICE_=__device__ ../common/track.h | xxd -i > track.xxd
 	$(CXX) $(OPTS) $(PYTHON_CPPFLAGS) $(BOOST_CPPFLAGS) $(CUDA_CPPFLAGS) -I../common -fPIC -c interface.cpp
 	rm -f track.xxd
-#	$(foreach h,$(CUDA_NAMES), rm $(h).xxd;)
 
 clean:
 	rm -f interface.o tracker.so
