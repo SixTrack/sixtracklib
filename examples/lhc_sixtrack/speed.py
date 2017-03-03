@@ -26,15 +26,16 @@ cbeam=bref.copy().reshape(-1)[:npart]
 st=time.time()
 block.track_cl(cbeam,nturn=nturn,turnbyturn=True)
 st=time.time()-st
-perfgpu=st/npart/nturn*1e3
-print("GPU part %4d, turn %4d: %10.3f msec/part*turn"%(npart,nturn,perfgpu))
+perfgpu=st/npart/nturn*1e6
+print("GPU part %4d, turn %4d: %10.3f usec/part*turn"%(npart,nturn,perfgpu))
 
+npart/=100
 cbeam=bref.copy().reshape(-1)[:npart]
 st=time.time()
 block.track(cbeam,nturn=nturn,turnbyturn=True)
 st=time.time()-st
-perfcpu=st/npart/nturn*1e3
-print("CPU part %4d, turn %4d: %10.3f msec/part*turn"%(npart,nturn,perfcpu))
+perfcpu=st/npart/nturn*1e6
+print("CPU part %4d, turn %4d: %10.3f usec/part*turn"%(npart,nturn,perfcpu))
 
 print("GPU/CPU : %g"%(perfcpu/perfgpu))
 
