@@ -5,7 +5,6 @@
 #ifndef _GPUCODE
   #include <math.h>
   #include <stdio.h>
-HHHHHHHHHHHHHHHEEEEEEEEEEEEEEEEEEEELLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOOOOOOOOOOOOOOOOO!
 #endif
 
 _CUDA_HOST_DEVICE_
@@ -123,7 +122,7 @@ LinMap_data LinMap_init( double alpha_x_s0, double beta_x_s0, double alpha_x_s1,
   double s,c;
   
   //sincos(dQ_x, &s, &c);
-  s = sin(dQ_x); c = cos(dQ_x);
+  s = sin(2.*M_PI*dQ_x); c = cos(2.*M_PI*dQ_x);
   res.matrix[0] = sqrt(beta_x_s1/beta_x_s0)*(c+alpha_x_s0*s);
   res.matrix[1] = sqrt(beta_x_s1*beta_x_s0)*s;
   res.matrix[2] = ((alpha_x_s0-alpha_x_s1)*c - (1.+alpha_x_s0*alpha_x_s1)*s)/sqrt(beta_x_s1*beta_x_s0);

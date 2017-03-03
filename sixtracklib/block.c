@@ -1,5 +1,6 @@
 #include "block.h"
 
+#define _CUDA_HOST_DEVICE_
 #define DATA_PTR_IS_OFFSET
 #include "../common/track.c"
 
