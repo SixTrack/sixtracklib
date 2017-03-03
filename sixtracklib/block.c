@@ -1,3 +1,16 @@
+//SixTrackLib
+//
+//Authors: R. De Maria, G. Iadarola, D. Pellegrini, H. Jasim
+//
+//Copyright 2017 CERN. This software is distributed under the terms of the GNU
+//Lesser General Public License version 2.1, copied verbatim in the file
+//`COPYING''.
+//
+//In applying this licence, CERN does not waive the privileges and immunities
+//granted to it by virtue of its status as an Intergovernmental Organization or
+//submit itself to any jurisdiction.
+
+
 #include "block.h"
 
 #define _CUDA_HOST_DEVICE_
@@ -32,7 +45,7 @@ int track_single(CLGLOBAL value_t *data,
                  uint64_t i_part, uint64_t i_elem,
                  uint64_t elembyelemoff, uint64_t turnbyturnoff){
    CLGLOBAL Particle* p = &particles[i_part];
-   CLGLOBAL value_t * elem;
+   CLGLOBAL value_t *elem;
    uint64_t elemid;
    if (p->state >= 0 ) {
        elemid=elemids[i_elem];
@@ -156,4 +169,7 @@ int Block_track(value_t *data, Beam *beam,
 
 #endif
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 088c4c913f80a429082b5d43bd7aa1703473f700
