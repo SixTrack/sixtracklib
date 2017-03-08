@@ -40,9 +40,9 @@ CLGLOBAL uint64_t *Block_get_elemids(CLGLOBAL value_t *data, size_t elemid ) {
 int track_single(CLGLOBAL value_t *data,
                  CLGLOBAL Particle *particles,
                  CLGLOBAL uint64_t *elemids,
-                 uint64_t i_part, uint64_t i_elem,
+                 Particle *p, uint64_t i_elem, uint64_t i_part,
                  uint64_t elembyelemoff, uint64_t turnbyturnoff){
-   CLGLOBAL Particle* p = &particles[i_part];
+   //CLGLOBAL Particle* p = &particles[i_part];
    CLGLOBAL value_t *elem;
    uint64_t elemid;
    if (p->state >= 0 ) {
@@ -51,7 +51,7 @@ int track_single(CLGLOBAL value_t *data,
          uint64_t dataoff=turnbyturnoff+sizeof(Particle)/8 * i_part;
          for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
             data[dataoff + i_attr] =
-                 ((CLGLOBAL value_t *) p)[i_attr];
+                 ((value_t *) p)[i_attr];
          }
        };
        enum type_t typeid = get_type(data, elemid);
@@ -81,7 +81,7 @@ int track_single(CLGLOBAL value_t *data,
          uint64_t dataoff=elembyelemoff+sizeof(Particle)/8 * i_part;
          for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
             data[dataoff + i_attr] =
-                 ((CLGLOBAL value_t *) p)[i_attr];
+                 ((value_t *) p)[i_attr];
          }
        };
    }
@@ -101,6 +101,7 @@ CLKERNEL void Block_track(
    uint64_t i_part = get_global_id(0);
    uint64_t elembyelemoff=0;
    uint64_t turnbyturnoff=0;
+   Particle pp=particles[i_part];
    for (int i_turn=0; i_turn< nturn; i_turn++){
      for (int i_elem=0; i_elem< nelem; i_elem++) {
        if (elembyelemid>0){
@@ -114,12 +115,13 @@ CLKERNEL void Block_track(
                         sizeof(Particle)/8 * npart * i_turn;
        }
       track_single(data, particles, elemids,
-                   i_part, i_elem, elembyelemoff, turnbyturnoff);
+                   &pp, i_elem, i_part,elembyelemoff, turnbyturnoff);
     }
     if (particles[i_part].state>=0) {
       particles[i_part].turn++;
     }
   }
+  particles[i_part]=pp;
 }
 
 #else
@@ -138,6 +140,7 @@ int Block_track(value_t *data, Beam *beam,
    for (int i_turn=0; i_turn< nturn; i_turn++) {
      for (int i_elem=0; i_elem< nelem; i_elem++) {
        for (uint64_t i_part=0; i_part < npart; i_part++){
+          Particle pp=particles[i_part];
           if (elembyelemid>0){
             elembyelemoff=elembyelemid +
                          sizeof(Particle)/8 * npart * i_turn +
@@ -150,7 +153,8 @@ int Block_track(value_t *data, Beam *beam,
 //            printf("%lu \n",turnbyturnoff);
           }
           track_single(data, beam->particles, elemids,
-                       i_part, i_elem, elembyelemoff, turnbyturnoff);
+                       &pp, i_elem, i_part, elembyelemoff, turnbyturnoff);
+          particles[i_part]=pp;
        }
      }
      for (uint64_t i_part=0; i_part < npart; i_part++){

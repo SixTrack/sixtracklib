@@ -26,7 +26,7 @@
 
 #include "track.h"
 
-int Drift_track(CLGLOBAL Particle* p, CLGLOBAL Drift *el){
+int Drift_track(Particle* p, CLGLOBAL Drift *el){
   double xp, yp;
   double length=el->length;
   xp = p->px * p->rpp;
@@ -40,7 +40,7 @@ int Drift_track(CLGLOBAL Particle* p, CLGLOBAL Drift *el){
 };
 
 
-int DriftExact_track(CLGLOBAL Particle* p, CLGLOBAL DriftExact *el){
+int DriftExact_track(Particle* p, CLGLOBAL DriftExact *el){
   double lpzi, lbzi, px, py, opd;
   double length = el->length;
   opd=1+p->delta;
@@ -54,7 +54,7 @@ int DriftExact_track(CLGLOBAL Particle* p, CLGLOBAL DriftExact *el){
   return 1;
 }
 
-int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el){
+int Multipole_track(Particle* p, CLGLOBAL Multipole *el){
   double x,y,chi,dpx,dpy,zre,zim,b1l,a1l,hxx,hyy;
   long int order=el->order;
   double hxl=el->hxl;
@@ -87,7 +87,7 @@ int Multipole_track(CLGLOBAL Particle* p, CLGLOBAL Multipole *el){
   return 1 ;
 }
 
-int Cavity_track(CLGLOBAL Particle* p, CLGLOBAL Cavity *el){
+int Cavity_track(Particle* p, CLGLOBAL Cavity *el){
   double volt = el->volt;
   double freq = el->freq;
   double lag = el->lag;
@@ -107,7 +107,7 @@ int Cavity_track(CLGLOBAL Particle* p, CLGLOBAL Cavity *el){
   return 1;
 }
 
-int Align_track(CLGLOBAL Particle* p, CLGLOBAL Align *el){
+int Align_track(Particle* p, CLGLOBAL Align *el){
   double xn,yn;
   double cz = el->cz;
   double sz = el->sz;
