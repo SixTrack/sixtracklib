@@ -2,7 +2,7 @@
 
 * ~~benchmark cavity with mad line~~
 * ~~check symplecticity thin bend in madx~~
-* benchmark with sixtrack input
+* ~~benchmark with sixtrack input~~
 * benchmark kickers with mad line
 * benchmark with mad sequence
 * benchmark with twiss+align+error table
@@ -16,5 +16,3 @@
 * review output buffer in tracking
 
 * review calling and data structure conventions in track.c
-
-

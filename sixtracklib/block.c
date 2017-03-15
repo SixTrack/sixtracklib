@@ -12,10 +12,12 @@
 
 
 #include "block.h"
-#include "track.c"
 
+#define _CUDA_HOST_DEVICE_
+#define DATA_PTR_IS_OFFSET
+#include "../common/track.h"
 
-// Data management
+//Data management
 
 type_t get_type(CLGLOBAL value_t *data, uint64_t elemid ) {
   return (type_t) data[elemid].i64;
@@ -49,7 +51,7 @@ int track_single(CLGLOBAL value_t *data,
        elemid=elemids[i_elem];
        if ( (turnbyturnoff>0) && (i_elem==0) ){
          uint64_t dataoff=turnbyturnoff+sizeof(Particle)/8 * i_part;
-         for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
+         for (unsigned i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
             data[dataoff + i_attr] =
                  ((CLGLOBAL value_t *) p)[i_attr];
          }
@@ -61,6 +63,9 @@ int track_single(CLGLOBAL value_t *data,
            case DriftID:
                 Drift_track(p, (CLGLOBAL Drift*) elem);
            break;
+           case DriftExactID:
+                DriftExact_track(p, (CLGLOBAL DriftExact*) elem);
+           break;
            case MultipoleID:
                 Multipole_track(p, (CLGLOBAL Multipole*) elem);
            break;
@@ -70,16 +75,19 @@ int track_single(CLGLOBAL value_t *data,
            case AlignID:
                 Align_track(p, (CLGLOBAL Align*) elem);
            break;
+           case LinMapID:
+                LinMap_track(p, (CLGLOBAL LinMap_data*) elem);
+           break;
+           case BB4DID:
+                BB4D_track(p, (CLGLOBAL BB4D_data *) elem);
+           break;
            case IntegerID: break;
            case DoubleID: break;
            case BlockID: break;
-           case DriftExactID:
-                DriftExact_track(p, (CLGLOBAL DriftExact*) elem);
-           break;
        }
        if (elembyelemoff>0){
          uint64_t dataoff=elembyelemoff+sizeof(Particle)/8 * i_part;
-         for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
+         for (unsigned i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
             data[dataoff + i_attr] =
                  ((CLGLOBAL value_t *) p)[i_attr];
          }
@@ -113,8 +121,8 @@ CLKERNEL void Block_track(
          turnbyturnoff=turnbyturnid +
                         sizeof(Particle)/8 * npart * i_turn;
        }
-      track_single(data, particles, elemids,
-                   i_part, i_elem, elembyelemoff, turnbyturnoff);
+       track_single(data, particles, elemids,
+                    i_part, i_elem, elembyelemoff, turnbyturnoff);
     }
     if (particles[i_part].state>=0) {
       particles[i_part].turn++;
@@ -124,9 +132,7 @@ CLKERNEL void Block_track(
 
 #else
 
-#include <stdio.h>
-
-
+//#include <stdio.h>
 int Block_track(value_t *data, Beam *beam,
                 uint64_t blockid, uint64_t nturn,
                 uint64_t elembyelemid, uint64_t turnbyturnid){
@@ -135,8 +141,8 @@ int Block_track(value_t *data, Beam *beam,
    uint64_t npart=beam->npart;
    uint64_t elembyelemoff=0;
    uint64_t turnbyturnoff=0;
-   for (int i_turn=0; i_turn< nturn; i_turn++) {
-     for (int i_elem=0; i_elem< nelem; i_elem++) {
+   for (uint64_t i_turn=0; i_turn< nturn; i_turn++) {
+     for (uint64_t i_elem=0; i_elem< nelem; i_elem++) {
        for (uint64_t i_part=0; i_part < npart; i_part++){
           if (elembyelemid>0){
             elembyelemoff=elembyelemid +
