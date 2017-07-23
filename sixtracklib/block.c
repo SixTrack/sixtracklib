@@ -140,7 +140,7 @@ int Block_track(value_t *data, Beam *beam,
    for (int i_turn=0; i_turn< nturn; i_turn++) {
      for (int i_elem=0; i_elem< nelem; i_elem++) {
        for (uint64_t i_part=0; i_part < npart; i_part++){
-          Particle pp=particles[i_part];
+          Particle pp=beam->particles[i_part];
           if (elembyelemid>0){
             elembyelemoff=elembyelemid +
                          sizeof(Particle)/8 * npart * i_turn +
@@ -154,7 +154,7 @@ int Block_track(value_t *data, Beam *beam,
           }
           track_single(data, beam->particles, elemids,
                        &pp, i_elem, i_part, elembyelemoff, turnbyturnoff);
-          particles[i_part]=pp;
+          beam->particles[i_part]=pp;
        }
      }
      for (uint64_t i_part=0; i_part < npart; i_part++){
