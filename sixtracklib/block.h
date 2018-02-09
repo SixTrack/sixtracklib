@@ -1,55 +1,51 @@
-//SixTrackLib
-//
-//Authors: R. De Maria, G. Iadarola, D. Pellegrini, H. Jasim
-//
-//Copyright 2017 CERN. This software is distributed under the terms of the GNU
-//Lesser General Public License version 2.1, copied verbatim in the file
-//`COPYING''.
-//
-//In applying this licence, CERN does not waive the privileges and immunities
-//granted to it by virtue of its status as an Intergovernmental Organization or
-//submit itself to any jurisdiction.
+
+#ifndef _BLOC_
+#define _BLOC_
 
 
-#ifndef _BLOCK_
-#define _BLOCK_
+//#define DEBUG
 
-#include "beam.h"
-#include "value.h"
-
-typedef enum type_t {IntegerID, DoubleID,
-             DriftID, DriftExactID,
-             MultipoleID, CavityID, AlignID,
-             BlockID} type_t;
-
-typedef struct {
-    unsigned int size;
-    uint64_t last;
-    CLGLOBAL value_t *data;
-} block_t;
-
-#ifdef _GPUCODE
-
-CLKERNEL void Block_track(CLGLOBAL value_t *data,
-                         CLGLOBAL Particle *particles,
-                         uint64_t blockid, uint64_t nturn, uint64_t npart,
-                         uint64_t elembyelemid,  uint64_t turnbyturnid);
+#ifdef DEBUG
+ #include <stdio.h>
+ #define _D
+  #define _DP(...) printf (__VA_ARGS__)
 #else
+ //int printf(const char *format, ...);
+  #define _D for(;0;)
+  // #define _DP(...)
+#endif
 
-int Block_track(value_t *data, Beam *beam,
-                uint64_t blockid, uint64_t nturn,
-                uint64_t elembyelemid,  uint64_t turnbyturnid);
+
+
+#ifdef __OPENCL_VERSION__
+  #define CLGLOBAL __global
+  #define CLKERNEL __kernel
+  #if __OPENCL_VERSION__ <= CL_VERSION_1_1
+    #pragma OPENCL EXTENSION cl_khr_fp64 : enable
+  #endif
+  #define _GPUCODE
+#else
+  #define CLGLOBAL
+  #define CLKERNEL
+#endif
+
+
+#include "myint.h"
+
+
+typedef union {
+    double   f64;
+    int64_t  i64;
+    uint64_t u64;
+    float    f32[2];
+    int8_t   i8[8];
+    uint8_t  u8[8];
+} value_t;
+
+typedef enum type_t {
+             DriftID=2, DriftExactID=3,
+             MultipoleID=4, CavityID=5, AlignID=6}
+             type_t;
 
 #endif
 
-// declarations for block handling functions
-CLGLOBAL block_t* block_initialize(unsigned int size);
-void block_reshape(CLGLOBAL block_t *block, unsigned int n);
-void block_clean(CLGLOBAL block_t *block);
-CLGLOBAL block_t* block_add_drift(CLGLOBAL block_t *block, uint64_t *offsets, uint64_t nel, double length);
-CLGLOBAL block_t* block_add_cavity(CLGLOBAL block_t *block, uint64_t *offsets, uint64_t nel, double volt, double freq, double lag);
-CLGLOBAL block_t* block_add_align(CLGLOBAL block_t *block, uint64_t *offsets, uint64_t nel, double tilt, double dx, double dy);
-CLGLOBAL block_t* block_add_multipole(CLGLOBAL block_t *block, uint64_t *offsets, uint64_t nel, double *knl, unsigned int knl_len, double *ksl, unsigned int ksl_len, double length, double hxl, double hyl);
-CLGLOBAL block_t* block_add_block(CLGLOBAL block_t *block, uint64_t *offsets, uint64_t nel);
-
-#endif

@@ -1,28 +1,26 @@
 import numpy as np
+
 import sixtracklib
 
+def test_add_drift():
+    blk=sixtracklib.CBlock()
+    blk.add_Drift(length=3)
+    blk.add_Drift(length=2.5)
+    assert blk.obj_ids==[0,2]
 
-block=sixtracklib.cBlock(2)
-block.Multipole([1.,3.,5.],[2.,4.,6.],0,0,0,)
-block.Drift(56.)
-block.Drift(5.)
-block.Block()
+def test_add_fodo():
+    fodo=sixtracklib.CBlock()
+    fodo.add_Drift(length=1.5)
+    fodo.add_Multipole(knl=[0.0,0.001])
+    fodo.add_Drift(length=1.3)
+    fodo.add_Multipole(name='qd',knl=[0.0,-0.001])
+    assert fodo.obj[0].length==1.5
+    assert fodo.obj['qd'][0].bal[2]==-0.001
 
-def test_track():
-  beam=sixtracklib.cBeam(50)
-  block.track(beam)
-
-  assert beam.particles[2]['s']  ==61.0
-  assert beam.particles[2]['px'] ==-1.0
-  assert beam.particles[2]['py'] ==2.0
-
-def test_track_cl():
-  if hasattr(block,'track_cl'):
-    beam=sixtracklib.cBeam(50)
-    block.track_cl(beam)
-
-    assert beam.particles[2]['s'] ==61.0
-    assert beam.particles[2]['px']==-1.0
-    assert beam.particles[2]['py']==2.0
-
-
+def test_particle():
+    bunch=sixtracklib.CParticles(npart=4)
+    bunch.x[1]=0.3
+    bunch.y[2]=0.2
+    bunch.sigma[3]=0.1
+    assert len(bunch.partid)==4
+    assert bunch.sigma[3]==0.1
