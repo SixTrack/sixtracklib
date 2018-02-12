@@ -1,167 +1,124 @@
-//SixTrackLib
-//
-//Authors: R. De Maria, G. Iadarola, D. Pellegrini, H. Jasim
-//
-//Copyright 2017 CERN. This software is distributed under the terms of the GNU
-//Lesser General Public License version 2.1, copied verbatim in the file
-//`COPYING''.
-//
-//In applying this licence, CERN does not waive the privileges and immunities
-//granted to it by virtue of its status as an Intergovernmental Organization or
-//submit itself to any jurisdiction.
-
-
 #include "block.h"
+
+#include "particle.h"
 #include "track.c"
 
 
 // Data management
 
-type_t get_type(CLGLOBAL value_t *data, uint64_t elemid ) {
-  return (type_t) data[elemid].i64;
+type_t get_type(CLGLOBAL value_t *elem) { return (type_t) elem[0].u64; }
+
+//Drift
+
+double Drift_get_length(CLGLOBAL value_t *elem){ return elem[1].f64;}
+
+//DriftExact
+
+double DriftExact_get_length(CLGLOBAL value_t *elem){ return elem[1].f64;}
+
+//Multipole
+
+int64_t Multipole_get_order(CLGLOBAL value_t *elem){ return elem[1].i64;}
+double  Multipole_get_l    (CLGLOBAL value_t *elem){ return elem[2].f64;}
+double  Multipole_get_hxl  (CLGLOBAL value_t *elem){ return elem[3].f64;}
+double  Multipole_get_hyl  (CLGLOBAL value_t *elem){ return elem[4].f64;}
+CLGLOBAL double* Multipole_get_bal(CLGLOBAL value_t *elem){
+    return &elem[6].f64;
 }
 
-//Block
+//Cavity
+double Cavity_get_volt(CLGLOBAL value_t *elem){ return elem[1].f64;}
+double Cavity_get_freq(CLGLOBAL value_t *elem){ return elem[2].f64;}
+double Cavity_get_lag (CLGLOBAL value_t *elem){ return elem[3].f64;}
 
-uint64_t Block_get_nelen(CLGLOBAL value_t *data, size_t elemid ) {
-  return data[elemid + 1].i64;
-}
+//Align
 
-CLGLOBAL uint64_t *Block_get_elemids(CLGLOBAL value_t *data, size_t elemid ) {
-  return &data[elemid + 2].u64 ;
-}
+double Align_get_cz(CLGLOBAL value_t *elem){return elem[1].f64;}
+double Align_get_sz(CLGLOBAL value_t *elem){return elem[2].f64;}
+double Align_get_dx(CLGLOBAL value_t *elem){return elem[3].f64;}
+double Align_get_dy(CLGLOBAL value_t *elem){return elem[4].f64;}
 
-// Tracking single
-
-//#ifndef _GPUCODE
-//#include <stdio.h>
-//#endif
-
-int track_single(CLGLOBAL value_t *data,
-                 CLGLOBAL Particle *particles,
-                 CLGLOBAL uint64_t *elemids,
-                 Particle *p, uint64_t i_elem, uint64_t i_part,
-                 uint64_t elembyelemoff, uint64_t turnbyturnoff){
-   //CLGLOBAL Particle* p = &particles[i_part];
-   CLGLOBAL value_t *elem;
-   uint64_t elemid;
-   if (p->state >= 0 ) {
-       elemid=elemids[i_elem];
-       if ( (turnbyturnoff>0) && (i_elem==0) ){
-         uint64_t dataoff=turnbyturnoff+sizeof(Particle)/8 * i_part;
-         for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
-            data[dataoff + i_attr] =
-                 ((value_t *) p)[i_attr];
-         }
-       };
-       enum type_t typeid = get_type(data, elemid);
-       elem=data+elemid+1; //Data starts after typeid
-//       _DP("Block_track: elemid=%zu typedid=%u\n",elemid,typeid);
-       switch (typeid) {
-           case DriftID:
-                Drift_track(p, (CLGLOBAL Drift*) elem);
-           break;
-           case MultipoleID:
-                Multipole_track(p, (CLGLOBAL Multipole*) elem);
-           break;
-           case CavityID:
-                Cavity_track(p, (CLGLOBAL Cavity*) elem);
-           break;
-           case AlignID:
-                Align_track(p, (CLGLOBAL Align*) elem);
-           break;
-           case IntegerID: break;
-           case DoubleID: break;
-           case BlockID: break;
-           case DriftExactID:
-                DriftExact_track(p, (CLGLOBAL DriftExact*) elem);
-           break;
-       }
-       if (elembyelemoff>0){
-         uint64_t dataoff=elembyelemoff+sizeof(Particle)/8 * i_part;
-         for (int i_attr=0;i_attr<sizeof(Particle)/8;i_attr++) {
-            data[dataoff + i_attr] =
-                 ((value_t *) p)[i_attr];
-         }
-       };
-   }
-   return 1;
-}
 
 // Tracking loop
 
 #ifdef _GPUCODE
 
-CLKERNEL void Block_track(
-                 CLGLOBAL value_t *data, CLGLOBAL Particle *particles,
-                 uint64_t blockid, uint64_t nturn, uint64_t npart,
-                 uint64_t elembyelemid, uint64_t turnbyturnid){
-   uint64_t nelem    = Block_get_nelen(data, blockid);
-   CLGLOBAL uint64_t *elemids = Block_get_elemids(data, blockid);
-   uint64_t i_part = get_global_id(0);
-   uint64_t elembyelemoff=0;
-   uint64_t turnbyturnoff=0;
-   Particle pp=particles[i_part];
-   for (int i_turn=0; i_turn< nturn; i_turn++){
-     for (int i_elem=0; i_elem< nelem; i_elem++) {
-       if (elembyelemid>0){
-         elembyelemoff=elembyelemid +
-                      sizeof(Particle)/8 * npart * i_turn +
-                      sizeof(Particle)/8 * npart * nturn  * i_elem ;
-//            printf("%lu \n",elembyelemoff);
-       }
-       if (turnbyturnid>0){
-         turnbyturnoff=turnbyturnid +
-                        sizeof(Particle)/8 * npart * i_turn;
-       }
-      track_single(data, particles, elemids,
-                   &pp, i_elem, i_part,elembyelemoff, turnbyturnoff);
-    }
-    if (particles[i_part].state>=0) {
-      particles[i_part].turn++;
-    }
-  }
-  particles[i_part]=pp;
+
+void track_single(Particles *particles, uint64_t partid, CLGLOBAL value_t * elem){
+       if (particles->state[partid] >= 0 ) {
+           enum type_t typeid = get_type(elem);
+//           _DP("Block_track: elemid=%zu typedid=%u\n",elemid,typeid);
+           switch (typeid) {
+               case DriftID:
+                    Drift_track(particles, partid,
+                                Drift_get_length(elem)        );
+               break;
+               case DriftExactID:
+                    Drift_track(particles, partid,
+                                Drift_get_length(elem)        );
+               break;
+               case MultipoleID:
+                    Multipole_track(particles, partid,
+                                   Multipole_get_order(elem),
+                                   Multipole_get_l(elem),
+                                   Multipole_get_hxl(elem),
+                                   Multipole_get_hyl(elem),
+                                   Multipole_get_bal(elem)    );
+               break;
+               case CavityID:
+                    Cavity_track(particles, partid,
+                                   Cavity_get_volt(elem),
+                                   Cavity_get_freq(elem),
+                                   Cavity_get_lag(elem)       );
+               break;
+               case AlignID:
+                    Align_track(particles, partid,
+                                   Align_get_cz(elem),
+                                   Align_get_sz(elem),
+                                   Align_get_dx(elem),
+                                   Align_get_dy(elem)    );
+               break;
+         }//end switch
+       }//end if state
+}
+
+
+CLKERNEL void Block_track(CLGLOBAL value_t   *data,
+                          Particles *particles,
+                          CLGLOBAL uint64_t  *elemids,
+                          uint64_t  nelems,
+                          uint64_t  nturns,
+                          ElembyElem *elembyelem,
+                          TurnbyTurn *turnbyturn) {
+   CLGLOBAL value_t * elem;
+   uint64_t elemid;
+   uint64_t partid = get_global_id(0);
+
+   Particles_unpack(particles);
+   ElembyElem_unpack(elembyelem);
+   TurnbyTurn_unpack(turnbyturn);
+
+   for (int jj=0; jj< nturns; jj++) {
+     for (int ii=0; ii< nelems; ii++) {
+       elemid=elemids[ii];
+       elem  =data+elemid;
+       track_single(particles,partid,elem);
+     }//end elem loop
+   }//end turn loop
 }
 
 #else
 
-#include <stdio.h>
-
-
-int Block_track(value_t *data, Beam *beam,
-                uint64_t blockid, uint64_t nturn,
-                uint64_t elembyelemid, uint64_t turnbyturnid){
+int Block_track(value_t *data, Beam *beam, uint64_t blockid){
    uint64_t nelem    = Block_get_nelen(data, blockid);
    uint64_t *elemids = Block_get_elemids(data, blockid);
-   uint64_t npart=beam->npart;
-   uint64_t elembyelemoff=0;
-   uint64_t turnbyturnoff=0;
-   for (int i_turn=0; i_turn< nturn; i_turn++) {
-     for (int i_elem=0; i_elem< nelem; i_elem++) {
-       for (uint64_t i_part=0; i_part < npart; i_part++){
-          Particle pp=particles[i_part];
-          if (elembyelemid>0){
-            elembyelemoff=elembyelemid +
-                         sizeof(Particle)/8 * npart * i_turn +
-                         sizeof(Particle)/8 * npart * nturn  * i_elem ;
-//            printf("cpu %lu \n",elembyelemoff);
-          }
-          if (turnbyturnid>0){
-            turnbyturnoff=turnbyturnid +
-                         sizeof(Particle)/8 * npart * i_turn;
-//            printf("%lu \n",turnbyturnoff);
-          }
-          track_single(data, beam->particles, elemids,
-                       &pp, i_elem, i_part, elembyelemoff, turnbyturnoff);
-          particles[i_part]=pp;
-       }
-     }
-     for (uint64_t i_part=0; i_part < npart; i_part++){
-       if (beam->particles[i_part].state >= 0)
-                 beam->particles[i_part].turn++;
-       }
-     }
+   uint64_t elemid;
+   for (int ii=0; ii< nelem; ii++) {
+     elemid=elemids[ii];
+     for (uint64_t partid=0; partid < beam->npart; partid++){
+        track_single(data, beam->particles, elemid, partid,0);
+     };
+   }
    return 1;
 }
 
