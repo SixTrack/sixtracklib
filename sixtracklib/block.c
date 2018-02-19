@@ -96,6 +96,8 @@ CLKERNEL void Block_track(CLGLOBAL value_t   *elems,
 
     Particles*  particles = (Particles*)  particles_p;
 
+    printf( "%s test\n","test" );
+
     bool elembyelem_flag = (elembyelem_p[0].i64 >= 0);
     bool turnbyturn_flag = (turnbyturn_p[0].i64 >= 0);
 

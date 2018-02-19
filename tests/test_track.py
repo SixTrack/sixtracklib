@@ -14,8 +14,11 @@ def test_track():
   bunch.y[2]=0.2
   bunch.sigma[3]=0.1
 
-  particles,ebe,tbt=fodo.track_cl(bunch,nturns=1)
+  particles,ebe,tbt=fodo.track_cl(bunch,1,True,True)
   return particles,ebe,tbt
 
+
+if __name__=='__main__':
+    particles,ebe,tbt=test_track()
 
 

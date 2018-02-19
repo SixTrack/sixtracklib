@@ -51,7 +51,7 @@ class Multipole(CObject):
       for n in range(len(bal)//2):
           bal[n*2:n*2+2]/=fact
       if len(bal)>=2 and len(bal)%2==0:
-          order=len(bal)/2-1
+          order=len(bal)//2-1
       else:
           raise ValueError("Size of bal must be even")
       nvargs['bal']=bal
@@ -96,18 +96,18 @@ class CBlock(object):
             particles_g=cl.Buffer(ctx, rw, hostbuf=particles._data)
             #ElemByElem data
             if elembyelem is True:
-              elembyelem=Beam(npart=npart*self.nelems*nturn+1)
+              elembyelem=CParticles(npart=npart*self.nelems*nturns+1)
             if elembyelem is None:
               elembyelem_g=cl.Buffer(ctx, rw, hostbuf=np.array([-1]))
             else:
               elembyelem_g=cl.Buffer(ctx, rw, hostbuf=elembyelem._data)
             #TurnByTurn data
             if turnbyturn is True:
-              turnbyturn=Beam(npart=npart*nturn+1)
+              turnbyturn=CParticles(npart=npart*nturns+1)
             if turnbyturn is None:
               turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=np.array([-1]))
             else:
-              turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=self.turnbyturn._data)
+              turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=turnbyturn._data)
             #Tracking data
             elems_g=cl.Buffer(ctx, rw, hostbuf=self._cbuffer.data)
             elemids=np.array(self.elem_ids,dtype='uint64')
