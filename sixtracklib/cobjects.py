@@ -2,7 +2,8 @@ import numpy as np
 
 
 class CProp(object):
-    def __init__(self,valuetype,offset,default,length=None,const=False):
+    def __init__(self,valuetype=None,offset=None,
+                      default=0,length=None,const=False):
         self.valuetype=valuetype
         self.offset=offset
         self.length=length

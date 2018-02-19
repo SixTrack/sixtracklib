@@ -27,20 +27,20 @@ except ImportError:
 
 
 class Drift(CObject):
-    objid  = CProp('u64',0,2)
-    length = CProp('f64',1,0)
+    objid  = CProp('u64',0,default=2)
+    length = CProp('f64',1,default=0)
 
 class DriftExact(CObject):
-    objid  = CProp('u64',0,3)
-    length = CProp('f64',1,0)
+    objid  = CProp('u64',0,default=3)
+    length = CProp('f64',1,default=0)
 
 class Multipole(CObject):
-    objid  = CProp('u64',0,4)
-    order  = CProp('f64',1,0,const=True)
-    length = CProp('f64',2,0)
-    hxl    = CProp('f64',3,0)
-    hyl    = CProp('f64',4,0)
-    bal    = CProp('f64',5,0,'2*(order+1)')
+    objid  = CProp('u64',0,default=4)
+    order  = CProp('f64',1,default=0,const=True)
+    length = CProp('f64',2,default=0)
+    hxl    = CProp('f64',3,default=0)
+    hyl    = CProp('f64',4,default=0)
+    bal    = CProp('f64',5,default=0,length='2*(order+1)')
     def __init__(self,knl=[],ksl=[],**nvargs):
       if len(knl)>len(ksl):
           ksl+=[0]*(len(knl)-len(ksl))
@@ -57,7 +57,6 @@ class Multipole(CObject):
       nvargs['bal']=bal
       nvargs['order']=order
       CObject.__init__(self,**nvargs)
-
 
 
 
