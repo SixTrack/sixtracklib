@@ -14,7 +14,7 @@ try:
   os.environ['PYOPENCL_COMPILER_OUTPUT']='1'
   srcpath='-I%s'%modulepath
   src=open(os.path.join(modulepath,'block.c')).read()
-  ctx = cl.create_some_context(interactive=False)
+  ctx = cl.create_some_context(interactive=False,answers=[1])
   prg=cl.Program(ctx,src).build(options=[srcpath])
   queue = cl.CommandQueue(ctx)
   mf = cl.mem_flags
@@ -36,7 +36,7 @@ class DriftExact(CObject):
 
 class Multipole(CObject):
     objid  = CProp('u64',0,default=4)
-    order  = CProp('f64',1,default=0,const=True)
+    order  = CProp('u64',1,default=0,const=True)
     length = CProp('f64',2,default=0)
     hxl    = CProp('f64',3,default=0)
     hyl    = CProp('f64',4,default=0)
@@ -98,14 +98,14 @@ class CBlock(object):
             if elembyelem is True:
               elembyelem=CParticles(npart=npart*self.nelems*nturns+1)
             if elembyelem is None:
-              elembyelem_g=cl.Buffer(ctx, rw, hostbuf=np.array([-1]))
+              elembyelem_g=cl.Buffer(ctx, rw, hostbuf=np.array([0]))
             else:
               elembyelem_g=cl.Buffer(ctx, rw, hostbuf=elembyelem._data)
             #TurnByTurn data
             if turnbyturn is True:
               turnbyturn=CParticles(npart=npart*nturns+1)
             if turnbyturn is None:
-              turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=np.array([-1]))
+              turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=np.array([0]))
             else:
               turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=turnbyturn._data)
             #Tracking data
@@ -114,6 +114,8 @@ class CBlock(object):
             elemids_g=cl.Buffer(ctx, rw, hostbuf=elemids)
             nelems=np.int64(self.nelems)
             nturns=np.int64(nturns)
+            prg.Block_unpack(queue,[1],None,
+                             particles_g, elembyelem_g, turnbyturn_g)
             prg.Block_track(queue,[npart],None,
                             elems_g, elemids_g, nelems,
                             nturns,

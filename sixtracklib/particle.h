@@ -48,6 +48,11 @@ typedef CLGLOBAL struct Particles {
 } Particles;
 
 Particles* Particles_unpack(Particles* p) {
+    p->q0     = ( (CLGLOBAL double *) p + ((uint64_t) p->q0    )  );
+    p->mass0  = ( (CLGLOBAL double *) p + ((uint64_t) p->mass0 )  );
+    p->beta0  = ( (CLGLOBAL double *) p + ((uint64_t) p->beta0 )  );
+    p->gamma0 = ( (CLGLOBAL double *) p + ((uint64_t) p->gamma0)  );
+    p->p0c    = ( (CLGLOBAL double *) p + ((uint64_t) p->p0c   )  );
     p->partid = ( (CLGLOBAL int64_t *) p + ((uint64_t) p->partid) );
     p->elemid = ( (CLGLOBAL int64_t *) p + ((uint64_t) p->elemid) );
     p->turn   = ( (CLGLOBAL int64_t *) p + ((uint64_t) p->turn)   );
