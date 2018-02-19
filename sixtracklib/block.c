@@ -84,19 +84,20 @@ void track_single(Particles *particles, uint64_t partid, CLGLOBAL value_t * elem
 
 
 CLKERNEL void Block_track(CLGLOBAL value_t   *data,
-                          Particles *particles,
+                          CLGLOBAL value_t   *particles_p, //Particles
                           CLGLOBAL uint64_t  *elemids,
-                          uint64_t  nelems,
-                          uint64_t  nturns,
-                          ElembyElem *elembyelem,
-                          TurnbyTurn *turnbyturn) {
+                          uint64_t nelems,
+                          uint64_t nturns,
+                          CLGLOBAL value_t *elembyelem_p,  //ElembyElem
+                          CLGLOBAL value_t *turnbyturn_p)  //TurnbyTurn
+                          {
    CLGLOBAL value_t * elem;
    uint64_t elemid;
    uint64_t partid = get_global_id(0);
 
-   Particles_unpack(particles);
-   ElembyElem_unpack(elembyelem);
-   TurnbyTurn_unpack(turnbyturn);
+   Particles*  particles  = Particles_unpack(  (Particles*)  particles_p);
+   ElemByElem* elembyelem = ElemByElem_unpack( (ElemByElem*) elembyelem_p);
+   TurnByTurn* turnbyturn = TurnByTurn_unpack( (TurnByTurn*) turnbyturn_p);
 
    for (int jj=0; jj< nturns; jj++) {
      for (int ii=0; ii< nelems; ii++) {

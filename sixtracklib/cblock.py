@@ -65,11 +65,11 @@ class CBlock(object):
     """ Block object
     """
     _obj_types = dict(Drift      = 2,
-                     DriftExact = 3,
-                     Multipole  = 4,
-                     Cavity     = 5,
-                     Align      = 6,
-                     Block      = 7)
+                      DriftExact = 3,
+                      Multipole  = 4,
+                      Cavity     = 5,
+                      Align      = 6,
+                      Block      = 7)
 
     def __init__(self):
         self._cbuffer=CBuffer(1)

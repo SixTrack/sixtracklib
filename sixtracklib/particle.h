@@ -46,7 +46,7 @@ typedef CLGLOBAL struct Particles {
   CLGLOBAL double *chi; // q/q0 * m/m0
 } Particles;
 
-void Particles_unpack(Particles * p) {
+Particles* Particles_unpack(Particles* p) {
      p->partid = ( (CLGLOBAL int64_t *) p + ((uint64_t) p->partid) );
      p->elemid = ( (CLGLOBAL int64_t *) p + ((uint64_t) p->elemid) );
      p->turn   = ( (CLGLOBAL int64_t *) p + ((uint64_t) p->turn)   );
@@ -62,31 +62,34 @@ void Particles_unpack(Particles * p) {
      p->rpp    = ( (CLGLOBAL double *) p + ((uint64_t) p->rpp)    );
      p->rvv    = ( (CLGLOBAL double *) p + ((uint64_t) p->rvv)    );
      p->chi    = ( (CLGLOBAL double *) p + ((uint64_t) p->chi)    );
+     return (Particles*) p;
 };
 
-typedef CLGLOBAL struct ElembyElem {
+typedef CLGLOBAL struct ElemByElem {
     uint64_t nelems;
     uint64_t nturns;
-    Particles * particles;
-} ElembyElem;
+    Particles* particles;
+} ElemByElem;
 
-void ElembyElem_unpack (ElembyElem * el){
+ElemByElem* ElemByElem_unpack (ElemByElem* el){
    uint64_t ndata = el->nelems*el->nturns;
    for (int jj=0; jj< ndata; jj++) {
        Particles_unpack(&el->particles[jj]);
    };
+   return el;
 };
 
-typedef CLGLOBAL struct TurnbyTurn {
+typedef CLGLOBAL struct TurnByTurn {
     uint64_t nturns;
     Particles * particles;
-} TurnbyTurn;
+} TurnByTurn;
 
-void TurnbyTurn_unpack (TurnbyTurn * el){
+TurnByTurn* TurnByTurn_unpack (TurnByTurn* el){
    uint64_t ndata = el->nturns;
    for (int jj=0; jj< ndata; jj++) {
        Particles_unpack(&el->particles[jj]);
    };
+   return el;
 };
 
 #endif
