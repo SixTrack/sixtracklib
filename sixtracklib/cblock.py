@@ -96,14 +96,14 @@ class CBlock(object):
             particles_g=cl.Buffer(ctx, rw, hostbuf=particles._data)
             #ElemByElem data
             if elembyelem is True:
-              elembyelem=CParticles(npart=npart*self.nelems*nturns+1)
+              elembyelem=CParticles(npart=npart*(self.nelems*nturns+1))
             if elembyelem is None:
               elembyelem_g=cl.Buffer(ctx, rw, hostbuf=np.array([0]))
             else:
               elembyelem_g=cl.Buffer(ctx, rw, hostbuf=elembyelem._data)
             #TurnByTurn data
             if turnbyturn is True:
-              turnbyturn=CParticles(npart=npart*nturns+1)
+              turnbyturn=CParticles(npart=npart*(nturns+1))
             if turnbyturn is None:
               turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=np.array([0]))
             else:

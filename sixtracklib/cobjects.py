@@ -134,4 +134,13 @@ class CObject(object):
                                    nvargs.get(name,prop.default)
             elif isinstance(prop.valuetype,CObject):
                 raise NotImplemented('Nested object not implemented')
-
+    def pretty_print(self):
+        props=self._get_props()
+        out=['%s('%(self.__class__.__name__)]
+        for offset,name,prop in props:
+            val='%s'%getattr(self,name)
+            out.append('  %-8s = %s,'%(name,val[:70]))
+        out.append(')')
+        return '\n'.join(out)
+    def __repr__(self):
+        return self.pretty_print()

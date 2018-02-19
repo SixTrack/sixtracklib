@@ -171,13 +171,13 @@ CLKERNEL void Block_track(CLGLOBAL value_t   *elems,
             elem   = elems+elemid;
             track_single(particles,partid,elem);
             if (elembyelem_flag){
-                ebe+=nparts;
                 Particles_copy(particles, elembyelem, partid, ebe+partid);
+                ebe+=nparts;
             }
         }  //end elem loop
         if (turnbyturn_flag){
-            tbt+=nparts;
             Particles_copy(particles, turnbyturn, partid, tbt+partid);
+            tbt+=nparts;
         }
     }  //end turn loop
 }
