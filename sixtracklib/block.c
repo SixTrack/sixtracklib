@@ -82,8 +82,7 @@ void track_single(Particles *particles, uint64_t partid, CLGLOBAL value_t * elem
     }//end if state
 }
 
-
-CLKERNEL void Block_track(CLGLOBAL value_t   *data,
+CLKERNEL void Block_track(CLGLOBAL value_t   *elems,
         CLGLOBAL uint64_t  *elemids,
         uint64_t nelems,
         uint64_t nturns,
@@ -100,42 +99,48 @@ CLKERNEL void Block_track(CLGLOBAL value_t   *data,
     bool elembyelem_flag = (elembyelem_p[0].i64 >= 0);
     bool turnbyturn_flag = (turnbyturn_p[0].i64 >= 0);
 
-    ElemByElem* elembyelem = (ElemByElem*) elembyelem_p;
-    TurnByTurn* turnbyturn = (TurnByTurn*) turnbyturn_p;
+    Particles* elembyelem = (Particles*) elembyelem_p;
+    Particles* turnbyturn = (Particles*) turnbyturn_p;
 
     Particles_unpack(  particles);
     if (elembyelem_flag) {
-        if (partid==0) ElemByElem_unpack( elembyelem );
-        ElemByElem_append( elembyelem, particles, partid );
+        if (partid==0) Particles_unpack( elembyelem );
+        Particles_copy(particles, elembyelem, partid, partid);
     };
     if (turnbyturn_flag) {
-        if (partid==0) TurnByTurn_unpack( turnbyturn );
-        TurnByTurn_append( turnbyturn, particles, partid );
+        if (partid==0) Particles_unpack( turnbyturn );
+        Particles_copy(particles, turnbyturn, partid, partid);
     };
+
+    uint64_t nparts=particles->npart;
+    uint64_t tbt=nparts;
+    uint64_t ebe=nparts;
 
     for (int jj = 0; jj < nturns; jj++) {
         for (int ii = 0; ii < nelems; ii++) {
             elemid = elemids[ii];
-            elem   = data+elemid;
+            elem   = elems+elemid;
             track_single(particles,partid,elem);
             if (elembyelem_flag)
-                ElemByElem_append(elembyelem, particles, partid);
+                ebe+=nparts;
+                Particles_copy(particles, elembyelem, partid, ebe+partid);
         }  //end elem loop
         if (turnbyturn_flag)
-            TurnByTurn_append(turnbyturn, particles, partid);
+            tbt+=nparts;
+            Particles_copy(particles, turnbyturn, partid, tbt+partid);
     }  //end turn loop
 }
 
 #else
 
-int Block_track(value_t *data, Beam *beam, uint64_t blockid){
-    uint64_t nelem    = Block_get_nelen(data, blockid);
-    uint64_t *elemids = Block_get_elemids(data, blockid);
+int Block_track(value_t *elems, Beam *beam, uint64_t blockid){
+    uint64_t nelem    = Block_get_nelen(elems, blockid);
+    uint64_t *elemids = Block_get_elemids(elems, blockid);
     uint64_t elemid;
     for (int ii=0; ii< nelem; ii++) {
         elemid=elemids[ii];
         for (uint64_t partid=0; partid < beam->npart; partid++){
-            track_single(data, beam->particles, elemid, partid,0);
+            track_single(elems, beam->particles, elemid, partid,0);
         };
     }
     return 1;

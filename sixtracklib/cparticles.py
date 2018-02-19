@@ -86,7 +86,10 @@ class CParticles(CObject):
         raise ValueError("Shape ref not compatible")
 
 
+# To be implemented
 class ElemByElem(CObject):
     nturns =CProp('u64', 0, default=0, const=True)
     nelems =CProp('u64', 1, default=1, const=True)
+    nparts =CProp('u64', 2, default=1, const=True)
+    particles = CProp('CParticles(nparts)', 3,length='nturns*nelems')
 

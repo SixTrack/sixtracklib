@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class CProp(object):
     def __init__(self,valuetype=None,offset=None,
                       default=0,length=None,const=False):
@@ -10,10 +9,16 @@ class CProp(object):
         self.default=default
         self.const=const
     def resolve_length(self,const):
+        if isinstance(self.valuetype,CObject):
+            size=self.valuetype.get_length(const)
+        else:
+            size=1
         if isinstance(self.length,str):
             length=eval(self.length,{},const)
         else:
             length=self.length
+        if length is not None:
+            length*=size
         return length
     def __get__(self,obj,type=None):
         name,offset,length=obj._attr[self.offset]
@@ -114,16 +119,19 @@ class CObject(object):
         lastarray=props[-1][0]+1
         for offset,name,prop in props:
             length=self._lengths[name]
-            if length is None:
-               attr_offset=self._offset+offset
-               self._attr.append((name,attr_offset,None))
-               self._data[prop.valuetype][attr_offset]=  \
-                              nvargs.get(name,prop.default)
-            else:
-               attr_offset=self._offset+lastarray
-               self._attr.append((name,attr_offset,length))
-               self._data['u64'][self._offset+offset]=lastarray
-               lastarray+=length
-               self._data[prop.valuetype][attr_offset:attr_offset+length]= \
-                                 nvargs.get(name,prop.default)
+            if isinstance(prop.valuetype,str):
+              if length is None:
+                 attr_offset=self._offset+offset
+                 self._attr.append((name,attr_offset,None))
+                 self._data[prop.valuetype][attr_offset]=  \
+                                nvargs.get(name,prop.default)
+              else:
+                 attr_offset=self._offset+lastarray
+                 self._attr.append((name,attr_offset,length))
+                 self._data['u64'][self._offset+offset]=lastarray
+                 lastarray+=length
+                 self._data[prop.valuetype][attr_offset:attr_offset+length]= \
+                                   nvargs.get(name,prop.default)
+            elif isinstance(prop.valuetype,CObject):
+                raise NotImplemented('Nested object not implemented')
 

@@ -48,7 +48,7 @@ class Multipole(CObject):
           knl+=[0]*(len(ksl)-len(knl))
       bal=np.array(sum(zip(knl,ksl),()))
       fact=1
-      for n in range(len(bal)/2):
+      for n in range(len(bal)//2):
           bal[n*2:n*2+2]/=fact
       if len(bal)>=2 and len(bal)%2==0:
           order=len(bal)/2-1
@@ -63,7 +63,7 @@ class Multipole(CObject):
 class CBlock(object):
     """ Block object
     """
-    _obj_types = dict(Drift      = 2,
+    _elem_types = dict(Drift      = 2,
                       DriftExact = 3,
                       Multipole  = 4,
                       Cavity     = 5,
@@ -72,58 +72,58 @@ class CBlock(object):
 
     def __init__(self):
         self._cbuffer=CBuffer(1)
-        self.nobj=0
-        self.obj={}
-        self.obj_ids=[]
-        self.obj_revnames={}
-    def _add_obj(self,name,obj):
-        self.obj[self.nobj]=obj
-        self.obj.setdefault(name,[]).append(obj)
-        self.obj_revnames[obj._offset]=name
-        self.obj_ids.append(obj._offset)
-        self.nobj+=1
+        self.nelems=0
+        self.elem={}
+        self.elem_ids=[]
+        self.elem_revnames={}
+    def _add_elem(self,name,elem):
+        self.elem[self.nelems]=elem
+        self.elem.setdefault(name,[]).append(elem)
+        self.elem_revnames[elem._offset]=name
+        self.elem_ids.append(elem._offset)
+        self.nelems+=1
     def add_Drift(self,name=None,**nvargs):
-        obj=Drift(cbuffer=self._cbuffer,**nvargs)
-        self._add_obj(name,obj)
+        elem=Drift(cbuffer=self._cbuffer,**nvargs)
+        self._add_elem(name,elem)
     def add_Multipole(self,name=None,**nvargs):
-        obj=Multipole(cbuffer=self._cbuffer,**nvargs)
-        self._add_obj(name,obj)
+        elem=Multipole(cbuffer=self._cbuffer,**nvargs)
+        self._add_elem(name,elem)
     if cl:
-        def track_cl(self,beam,nturn=1,elembyelem=None,turnbyturn=None):
-            Beam=beam.__class__
+        def track_cl(self,particles,nturns=1,elembyelem=None,turnbyturn=None):
+            CParticles=particles.__class__
+            npart=np.int64(particles.npart)
+            #uint bug in boost/pyopencl/numpy???
+            particles_g=cl.Buffer(ctx, rw, hostbuf=particles._data)
             #ElemByElem data
             if elembyelem is True:
-              elembyelem=Beam(npart=beam.npart*self.blocklen*nturn)
+              elembyelem=Beam(npart=npart*self.nelems*nturn+1)
             if elembyelem is None:
-              elembyelem_flag=np.uint64(0)
-              elembyelem_g=cl.Buffer(ctx, rw, hostbuf=np.zeros(1))
+              elembyelem_g=cl.Buffer(ctx, rw, hostbuf=np.array([-1]))
             else:
-              elembyelem_flag=np.uint64(1)
               elembyelem_g=cl.Buffer(ctx, rw, hostbuf=elembyelem._data)
             #TurnByTurn data
             if turnbyturn is True:
-              self.turnbyturn=Beam(npart=beam.npart*nturn)
+              turnbyturn=Beam(npart=npart*nturn+1)
             if turnbyturn is None:
-              turnbyturn_flag=np.uint64(0)
-              turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=np.zeros(1))
+              turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=np.array([-1]))
             else:
-              turnbyturn_flag=np.uint64(1)
               turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=self.turnbyturn._data)
             #Tracking data
-            data_g=cl.Buffer(ctx, rw, hostbuf=self._data)
-            part_g=cl.Buffer(ctx, rw, hostbuf=beam._data)
-            blockid=np.uint64(self.blockid)
-            nturn=np.uint64(nturn)
-            npart=np.uint64(beam.npart)
-            prg.Block_track(queue,[beam.npart],None,
-                            data_g, part_g,
-                            blockid, nturn, npart,
-                            elembyelemid, turnbyturnid)
-            cl.enqueue_copy(queue,self.data,data_g)
-            cl.enqueue_copy(queue,beam.particles,part_g)
-            if elembyelem:
-                self.elembyelem=_elembyelem.get_beam()
+            elems_g=cl.Buffer(ctx, rw, hostbuf=self._cbuffer.data)
+            elemids=np.array(self.elem_ids,dtype='uint64')
+            elemids_g=cl.Buffer(ctx, rw, hostbuf=elemids)
+            nelems=np.int64(self.nelems)
+            nturns=np.int64(nturns)
+            prg.Block_track(queue,[npart],None,
+                            elems_g, elemids_g, nelems,
+                            nturns,
+                            particles_g, elembyelem_g, turnbyturn_g)
+            cl.enqueue_copy(queue,particles._data,particles_g)
             if turnbyturn:
-                self.turnbyturn=_turnbyturn.get_beam()
+                cl.enqueue_copy(queue,turnbyturn._data,turnbyturn_g)
+            if elembyelem:
+                cl.enqueue_copy(queue,elembyelem._data,elembyelem_g)
+            return particles,elembyelem, turnbyturn
+
 
 

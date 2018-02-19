@@ -66,74 +66,72 @@ Particles* Particles_unpack(Particles* p) {
     return (Particles*) p;
 };
 
-void Particles_copy(Particles* src, Particles* dst, int64_t partid){
-    if (partid==0) {
-        dst->npart = src->npart;
-    };
-    dst->q0[partid]         = src->q0[partid]    ;
-    dst->mass0[partid]      = src->mass0[partid] ;
-    dst->beta0[partid]      = src->beta0[partid] ;
-    dst->gamma0[partid]     = src->gamma0[partid];
-    dst->p0c[partid]        = src->p0c[partid]   ;
-    dst->partid[partid]     = src->partid[partid];
-    dst->elemid[partid]     = src->elemid[partid];
-    dst->turn[partid]       = src->turn[partid]  ;
-    dst->state[partid]      = src->state[partid] ;
-    dst->s[partid]          = src->s[partid]     ;
-    dst->x[partid]          = src->x[partid]     ;
-    dst->px[partid]         = src->px[partid]    ;
-    dst->y[partid]          = src->y[partid]     ;
-    dst->py[partid]         = src->py[partid]    ;
-    dst->sigma[partid]      = src->sigma[partid] ;
-    dst->psigma[partid]     = src->psigma[partid];
-    dst->delta[partid]      = src->delta[partid] ;
-    dst->rpp[partid]        = src->rpp[partid]   ;
-    dst->rvv[partid]        = src->rvv[partid]   ;
-    dst->chi[partid]        = src->chi[partid]   ;
+void Particles_copy(Particles* src, Particles* dst,
+                    int64_t srcid, int64_t dstid){
+    dst->q0[dstid]         = src->q0[srcid]    ;
+    dst->mass0[dstid]      = src->mass0[srcid] ;
+    dst->beta0[dstid]      = src->beta0[srcid] ;
+    dst->gamma0[dstid]     = src->gamma0[srcid];
+    dst->p0c[dstid]        = src->p0c[srcid]   ;
+    dst->partid[dstid]     = src->partid[srcid];
+    dst->elemid[dstid]     = src->elemid[srcid];
+    dst->turn[dstid]       = src->turn[srcid]  ;
+    dst->state[dstid]      = src->state[srcid] ;
+    dst->s[dstid]          = src->s[srcid]     ;
+    dst->x[dstid]          = src->x[srcid]     ;
+    dst->px[dstid]         = src->px[srcid]    ;
+    dst->y[dstid]          = src->y[srcid]     ;
+    dst->py[dstid]         = src->py[srcid]    ;
+    dst->sigma[dstid]      = src->sigma[srcid] ;
+    dst->psigma[dstid]     = src->psigma[srcid];
+    dst->delta[dstid]      = src->delta[srcid] ;
+    dst->rpp[dstid]        = src->rpp[srcid]   ;
+    dst->rvv[dstid]        = src->rvv[srcid]   ;
+    dst->chi[dstid]        = src->chi[srcid]   ;
 };
 
 
-// ElemByElem Type
-
-
-typedef CLGLOBAL struct ElemByElem {
-    uint64_t nturns;
-    uint64_t nelems;
-    uint64_t next;
-    Particles* particles;
-} ElemByElem;
-
-void ElemByElem_unpack (ElemByElem* el){
-    uint64_t ndata = el->nelems*el->nturns;
-    for (int jj=0; jj< ndata; jj++) {
-        Particles_unpack(&el->particles[jj]);
-    };
-};
-
-void ElemByElem_append (ElemByElem* el, Particles* p, int64_t partid){
-    Particles_copy(p, &el->particles[el->next], partid);
-    el->next++;
-};
-
-// TurnByTurn Type
-
-typedef CLGLOBAL struct TurnByTurn {
-    uint64_t nturns;
-    uint64_t next;
-    Particles * particles;
-} TurnByTurn;
-
-void TurnByTurn_unpack (TurnByTurn* el){
-    uint64_t ndata = el->nturns;
-    for (int jj=0; jj< ndata; jj++) {
-        Particles_unpack(&el->particles[jj]);
-    };
-};
-
-void TurnByTurn_append (TurnByTurn* el, Particles* p, int64_t partid){
-    Particles_copy(p, &el->particles[el->next], partid);
-    el->next++;
-};
+//// ElemByElem Type
+//
+//
+//typedef CLGLOBAL struct ElemByElem {
+//    uint64_t nturns;
+//    uint64_t nelems;
+//    uint64_t next;
+//    Particles* particles;
+//} ElemByElem;
+//
+//void ElemByElem_unpack (ElemByElem* el){
+//    uint64_t ndata = el->nelems*el->nturns;
+//    for (int jj=0; jj< ndata; jj++) {
+//        Particles_unpack(&el->particles[jj]);
+//    };
+//};
+//
+//void ElemByElem_append (ElemByElem* el, Particles* p, int64_t partid){
+//    Particles_copy(p, &el->particles[el->next], partid);
+//    el->next++;
+//};
+//
+//// TurnByTurn Type
+//
+//typedef CLGLOBAL struct TurnByTurn {
+//    uint64_t nturns;
+//    uint64_t next;
+//    Particles * particles;
+//} TurnByTurn;
+//
+//void TurnByTurn_unpack (TurnByTurn* el){
+//    uint64_t ndata = el->nturns;
+//    for (int jj=0; jj< ndata; jj++) {
+//        Particles_unpack(&el->particles[jj]);
+//    };
+//};
+//
+//void TurnByTurn_append (TurnByTurn* el, Particles* p, int64_t partid){
+//    Particles_copy(p, &el->particles[el->next], partid);
+//    el->next++;
+//};
 
 #endif
 
