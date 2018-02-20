@@ -57,9 +57,12 @@ inline int DriftExact_track(Particles* p, uint64_t ip,
 
 
 inline int Multipole_track(Particles* p, uint64_t ip,
-        long int order, double l,
+        uint64_t order, double l,
         double hxl, double hyl, CLGLOBAL double* bal){
     double x,y,chi,dpx,dpy,zre,zim,b1l,a1l,hxx,hyy;
+
+    //printf("multipole: partid:%d, order:%d, bal[2]:%g \n",
+    //        ip,order,bal[2]);
 
     dpx = bal[order*2];
     dpy = bal[order*2+1];

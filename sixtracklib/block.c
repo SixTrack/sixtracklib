@@ -44,10 +44,13 @@ double Align_get_dy(CLGLOBAL value_t *elem){return elem[4].f64;}
 #ifdef _GPUCODE
 
 
-void track_single(Particles *particles, uint64_t partid, CLGLOBAL value_t * elem){
+void track_single(Particles *particles, uint64_t partid,
+                  CLGLOBAL value_t * elem){
+    //printf("single: partid=%u, typeid=%zu\n",partid, elem[0].u64);
     if (particles->state[partid] >= 0 ) {
+        //printf("single: typeid=%zu\n",elem[0].u64);
         enum type_t typeid = get_type(elem);
-        //           _DP("Block_track: elemid=%zu typedid=%u\n",elemid,typeid);
+        //printf("single: typedid=%u\n",typeid);
         switch (typeid) {
             case DriftID:
                 Drift_track(particles, partid,
@@ -82,6 +85,50 @@ void track_single(Particles *particles, uint64_t partid, CLGLOBAL value_t * elem
     }//end if state
 }
 
+
+CLKERNEL void Block_unpack(
+        CLGLOBAL value_t *particles_p, //Particles
+        CLGLOBAL value_t *elembyelem_p,  //ElembyElem
+        CLGLOBAL value_t *turnbyturn_p)  //TurnbyTurn
+{
+    uint64_t partid = get_global_id(0);
+
+    bool elembyelem_flag = (elembyelem_p[0].i64 != 0);
+    bool turnbyturn_flag = (turnbyturn_p[0].i64 != 0);
+
+    Particles*  particles = (Particles*)  particles_p;
+    Particles* elembyelem = (Particles*) elembyelem_p;
+    Particles* turnbyturn = (Particles*) turnbyturn_p;
+
+    Particles_unpack( particles );
+
+    //printf( "p->beta0[0] %g\n", particles->beta0[0]);
+    //printf( "p->beta0[3] %g\n", particles->beta0[3]);
+    //printf( "elembyelem[0] %i \n", elembyelem_p[0].u64);
+    //printf( "turnbyturn[0] %i \n", turnbyturn_p[0].u64);
+    //printf( "elembyelem[1] %i \n", elembyelem_p[1].u64);
+    //printf( "turnbyturn[1] %i \n", turnbyturn_p[1].u64);
+    //printf( "elembyelem[2] %i \n", elembyelem_p[2].u64);
+    //printf( "turnbyturn[2] %i \n", turnbyturn_p[2].u64);
+
+
+    if (elembyelem_flag) Particles_unpack( elembyelem );
+    if (turnbyturn_flag) Particles_unpack( turnbyturn );
+
+    //printf( "elembyelem[0] %i \n", elembyelem_p[0].u64);
+    //printf( "turnbyturn[0] %i \n", turnbyturn_p[0].u64);
+    //printf( "elembyelem[1] %i \n", elembyelem_p[1].u64);
+    //printf( "turnbyturn[1] %i \n", turnbyturn_p[1].u64);
+    //printf( "elembyelem[2] %i \n", elembyelem_p[2].u64);
+    //printf( "turnbyturn[2] %i \n", turnbyturn_p[2].u64);
+
+    //printf( "ele->beta0[0] %g\n", elembyelem->beta0[0]);
+    //printf( "ele->beta0[3] %g\n", elembyelem->beta0[3]);
+};
+
+
+
+
 CLKERNEL void Block_track(CLGLOBAL value_t   *elems,
         CLGLOBAL uint64_t  *elemids,
         uint64_t nelems,
@@ -96,23 +143,22 @@ CLKERNEL void Block_track(CLGLOBAL value_t   *elems,
 
     Particles*  particles = (Particles*)  particles_p;
 
-    printf( "%s test\n","test" );
+    //printf( "beta0[%d] %g\n",partid, particles->beta0[partid]);
 
-    bool elembyelem_flag = (elembyelem_p[0].i64 >= 0);
-    bool turnbyturn_flag = (turnbyturn_p[0].i64 >= 0);
+    bool elembyelem_flag = (elembyelem_p[0].i64 != 0);
+    bool turnbyturn_flag = (turnbyturn_p[0].i64 != 0);
 
     Particles* elembyelem = (Particles*) elembyelem_p;
     Particles* turnbyturn = (Particles*) turnbyturn_p;
 
-    Particles_unpack(  particles);
     if (elembyelem_flag) {
-        if (partid==0) Particles_unpack( elembyelem );
         Particles_copy(particles, elembyelem, partid, partid);
     };
     if (turnbyturn_flag) {
-        if (partid==0) Particles_unpack( turnbyturn );
         Particles_copy(particles, turnbyturn, partid, partid);
     };
+
+    //printf( "tbt->beta0[%d] %g\n",partid, turnbyturn->beta0[partid]);
 
     uint64_t nparts=particles->npart;
     uint64_t tbt=nparts;
@@ -121,15 +167,18 @@ CLKERNEL void Block_track(CLGLOBAL value_t   *elems,
     for (int jj = 0; jj < nturns; jj++) {
         for (int ii = 0; ii < nelems; ii++) {
             elemid = elemids[ii];
+            //printf("elemid %u\n",elemid);
             elem   = elems+elemid;
             track_single(particles,partid,elem);
-            if (elembyelem_flag)
-                ebe+=nparts;
+            if (elembyelem_flag){
                 Particles_copy(particles, elembyelem, partid, ebe+partid);
+                ebe+=nparts;
+            }
         }  //end elem loop
-        if (turnbyturn_flag)
-            tbt+=nparts;
+        if (turnbyturn_flag){
             Particles_copy(particles, turnbyturn, partid, tbt+partid);
+            tbt+=nparts;
+        }
     }  //end turn loop
 }
 

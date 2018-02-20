@@ -17,11 +17,11 @@ class CParticles(CObject):
     kboltz=8.6173303e-5 #ev K^-1 #1.38064852e-23 #   JK^-1
 
     npart =CProp('u64', 0, 0, const=True)
-    q0    =CProp('f64', 1, 1,     length='npart'  )
+    q0    =CProp('f64', 1, 1,     length='npart')
     mass0 =CProp('f64', 2, pmass, length='npart')
-    p0c   =CProp('f64', 5, 450e6, length='npart')
-    beta0 =CProp('f64', 3, 450e6/np.sqrt(450e6**2+pmass**2), length='npart')
-    gamma0=CProp('f64', 4, np.sqrt(450e6**2+pmass**2)/pmass, length='npart')
+    p0c   =CProp('f64', 5, 450e9, length='npart')
+    beta0 =CProp('f64', 3, 450e9/np.sqrt(450e9**2+pmass**2), length='npart')
+    gamma0=CProp('f64', 4, np.sqrt(450e9**2+pmass**2)/pmass, length='npart')
     partid=CProp('u64', 6, 0, length='npart')
     elemid=CProp('u64', 7, 0, length='npart')
     turn  =CProp('u64', 8, 0, length='npart')
