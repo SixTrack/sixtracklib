@@ -16,8 +16,14 @@ def test_add_fodo():
     fodo.add_Multipole(name='qd',knl=[0.0,-0.001])
     fodo.add_Cavity(voltage=3.,frequency=4.,lag=5)
     fodo.add_Align(dx=1.,dy=-2.,tilt=30)
+    data=np.array([1,2,3,4],dtype='float')
+    fodo.add_BeamBeam(name='bb',datasize=len(data),data=data)
     assert fodo.elem[0].length==1.5
     assert fodo.elem['qd'][0].bal[2]==-0.001
+    assert fodo.elem['bb'][0].data[1]==2.0
+
+
+
 
 def test_particle():
     bunch=sixtracklib.CParticles(npart=4)

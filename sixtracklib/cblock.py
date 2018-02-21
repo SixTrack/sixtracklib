@@ -116,6 +116,9 @@ class CBlock(object):
     def add_Align(self,name=None,**nvargs):
         elem=Align(cbuffer=self._cbuffer,**nvargs)
         self._add_elem(name,elem)
+    def add_BeamBeam(self,name=None,**nvargs):
+        elem=BeamBeam(cbuffer=self._cbuffer,**nvargs)
+        self._add_elem(name,elem)
     if cl:
         def track_cl(self,particles,nturns=1,elembyelem=None,turnbyturn=None):
             CParticles=particles.__class__
