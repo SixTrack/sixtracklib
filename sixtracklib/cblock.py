@@ -14,7 +14,7 @@ try:
   os.environ['PYOPENCL_COMPILER_OUTPUT']='1'
   srcpath='-I%s'%modulepath
   src=open(os.path.join(modulepath,'block.c')).read()
-  ctx = cl.create_some_context(interactive=False,answers=[1])
+  ctx = cl.create_some_context(interactive=False)
   prg=cl.Program(ctx,src).build(options=[srcpath])
   queue = cl.CommandQueue(ctx)
   mf = cl.mem_flags
@@ -59,11 +59,28 @@ class Multipole(CObject):
       CObject.__init__(self,**nvargs)
 
 
+class Cavity(CObject):
+    objid     = CProp('u64',0,default=5)
+    voltage   = CProp('f64',1)
+    frequency = CProp('f64',2)
+    lag       = CProp('f64',3)
+
+class Align(CObject):
+    objid  = CProp('u64',0,default=6)
+    cz     = CProp('f64',1)
+    sz     = CProp('f64',2)
+    dx     = CProp('f64',3)
+    dy     = CProp('f64',3)
+    def __init__(self,tilt,**nvargs):
+      cz=np.cos(tilt/180.*np.pi)
+      sz=np.sin(tilt/180.*np.pi)
+      CObject.__init__(self,cz=cz,sz=sz,**nvargs)
+
 
 class CBlock(object):
     """ Block object
     """
-    _elem_types = dict(Drift      = 2,
+    _elem_types = dict(Drift     = 2,
                       DriftExact = 3,
                       Multipole  = 4,
                       Cavity     = 5,
@@ -87,6 +104,12 @@ class CBlock(object):
         self._add_elem(name,elem)
     def add_Multipole(self,name=None,**nvargs):
         elem=Multipole(cbuffer=self._cbuffer,**nvargs)
+        self._add_elem(name,elem)
+    def add_Cavity(self,name=None,**nvargs):
+        elem=Cavity(cbuffer=self._cbuffer,**nvargs)
+        self._add_elem(name,elem)
+    def add_Align(self,name=None,**nvargs):
+        elem=Align(cbuffer=self._cbuffer,**nvargs)
         self._add_elem(name,elem)
     if cl:
         def track_cl(self,particles,nturns=1,elembyelem=None,turnbyturn=None):
