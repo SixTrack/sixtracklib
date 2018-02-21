@@ -149,10 +149,10 @@ class CBlock(object):
             nturns=np.int64(nturns)
             prg.Block_unpack(queue,[1],None,
                              particles_g, elembyelem_g, turnbyturn_g)
-            #prg.Block_track(queue,[npart],None,
-            #                elems_g, elemids_g, nelems,
-            #                nturns,
-            #                particles_g, elembyelem_g, turnbyturn_g)
+            prg.Block_track(queue,[npart],None,
+                            elems_g, elemids_g, nelems,
+                            nturns,
+                            particles_g, elembyelem_g, turnbyturn_g)
             cl.enqueue_copy(queue,particles._cbuffer.data,particles_g)
             if turnbyturn:
                 cl.enqueue_copy(queue,turnbyturn._cbuffer.data,turnbyturn_g)
