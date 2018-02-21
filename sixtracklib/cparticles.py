@@ -47,6 +47,12 @@ class CParticles(CObject):
         part=cls(npart=npart)
         for nn in part._names:
           setattr(part,nn,getattr(beam,nn))
+    def reshape(self,*shape):
+        props=self._get_props()
+        for offset,name,prop in props:
+            if prop.length=='npart':
+                self._shape[name]=shape
+        return self
     def compare(self,ref,exclude=['s','elemid'],include=[],verbose=True):
       if self.npart == ref.npart:
         names=list(self._names)

@@ -3,15 +3,20 @@ step 1:
 ster 2:
   track fodo
 step 3:
-  remake SixTrack benchmark using sixtrack tools
-
+  remake SixTrack Benchmark using sixtrack tools
+step 4:
+  remake madx Benchmark using pyoptics
+step 5:
+  document python element interfaces
 
 Big Picture:
 
-sixtracklib in C:
-  track (CParticle, CBlock, blocks or blockid
-        elembyelem *
-        turnbyturn *)
+sixtracklib in C/Cl:
+  track ( CBlock elems, elemids, nelems,
+          CParticles particles,
+          nturns,
+          CParticles elembyelem
+          CParticles turnbyturn)
 
 sixtracklib in python:
   python objects helper class to interact with CBuffers

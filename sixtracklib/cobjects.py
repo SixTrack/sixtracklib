@@ -2,7 +2,8 @@ import numpy as np
 
 class CProp(object):
     def __init__(self,valuetype=None,offset=None,
-                      default=0,length=None,const=False):
+                      default=0,const=False,
+                      length=None):
         self.valuetype=valuetype
         self.offset=offset
         self.length=length
@@ -22,17 +23,25 @@ class CProp(object):
         return length
     def __get__(self,obj,type=None):
         name,offset,length=obj._attr[self.offset]
+        shape=obj._shape.get(name)
         if length is None:
-           return obj._data[self.valuetype][offset]
+           val=obj._data[self.valuetype][offset]
         else:
-           return obj._data[self.valuetype][offset:offset+length]
+           val=obj._data[self.valuetype][offset:offset+length]
+           if shape is not None:
+               val=val.reshape(*shape)
+        return val
     def __set__(self,obj,val):
         name,offset,length=obj._attr[self.offset]
+        shape=obj._shape.get(name)
         if not self.const:
            if length is None:
               obj._data[self.valuetype][offset]=val
            else:
-              obj._data[self.valuetype][offset:offset+length]=val
+              if shape is None:
+                obj._data[self.valuetype][offset:offset+length]=val
+              else:
+                self.__get__(obj)[:]=val
         else:
            raise ValueError('property read-only')
 
@@ -89,6 +98,7 @@ class CObject(object):
         self._cbuffer.next+=self._size
         self._data=self._cbuffer.data
         self._fill_args(nvargs)
+        self._shape={}
     def _get_props(self):
         props=[(prop.offset,name,prop) for name,prop
                                        in self.__class__.__dict__.items()
@@ -139,7 +149,7 @@ class CObject(object):
         out=['%s('%(self.__class__.__name__)]
         for offset,name,prop in props:
             val='%s'%getattr(self,name)
-            out.append('  %-8s = %s,'%(name,val[:70]))
+            out.append('  %-8s = %s,'%(name,val))
         out.append(')')
         return '\n'.join(out)
     def __repr__(self):

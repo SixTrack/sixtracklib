@@ -18,18 +18,18 @@ double DriftExact_get_length(CLGLOBAL value_t *elem){ return elem[1].f64;}
 
 //Multipole
 
-int64_t Multipole_get_order(CLGLOBAL value_t *elem){ return elem[1].i64;}
-double  Multipole_get_l    (CLGLOBAL value_t *elem){ return elem[2].f64;}
-double  Multipole_get_hxl  (CLGLOBAL value_t *elem){ return elem[3].f64;}
-double  Multipole_get_hyl  (CLGLOBAL value_t *elem){ return elem[4].f64;}
+int64_t Multipole_get_order (CLGLOBAL value_t *elem){ return elem[1].i64;}
+double  Multipole_get_length(CLGLOBAL value_t *elem){ return elem[2].f64;}
+double  Multipole_get_hxl   (CLGLOBAL value_t *elem){ return elem[3].f64;}
+double  Multipole_get_hyl   (CLGLOBAL value_t *elem){ return elem[4].f64;}
 CLGLOBAL double* Multipole_get_bal(CLGLOBAL value_t *elem){
     return &elem[6].f64;
 }
 
 //Cavity
-double Cavity_get_volt(CLGLOBAL value_t *elem){ return elem[1].f64;}
-double Cavity_get_freq(CLGLOBAL value_t *elem){ return elem[2].f64;}
-double Cavity_get_lag (CLGLOBAL value_t *elem){ return elem[3].f64;}
+double Cavity_get_voltage  (CLGLOBAL value_t *elem){ return elem[1].f64;}
+double Cavity_get_frequency(CLGLOBAL value_t *elem){ return elem[2].f64;}
+double Cavity_get_lag      (CLGLOBAL value_t *elem){ return elem[3].f64;}
 
 //Align
 
@@ -63,15 +63,15 @@ void track_single(Particles *particles, uint64_t partid,
             case MultipoleID:
                 Multipole_track(particles, partid,
                         Multipole_get_order(elem),
-                        Multipole_get_l(elem),
+                        Multipole_get_length(elem),
                         Multipole_get_hxl(elem),
                         Multipole_get_hyl(elem),
                         Multipole_get_bal(elem)    );
                 break;
             case CavityID:
                 Cavity_track(particles, partid,
-                        Cavity_get_volt(elem),
-                        Cavity_get_freq(elem),
+                        Cavity_get_voltage(elem),
+                        Cavity_get_frequency(elem),
                         Cavity_get_lag(elem)       );
                 break;
             case AlignID:
@@ -151,9 +151,6 @@ CLKERNEL void Block_track(CLGLOBAL value_t   *elems,
     Particles* elembyelem = (Particles*) elembyelem_p;
     Particles* turnbyturn = (Particles*) turnbyturn_p;
 
-    if (elembyelem_flag) {
-        Particles_copy(particles, elembyelem, partid, partid);
-    };
     if (turnbyturn_flag) {
         Particles_copy(particles, turnbyturn, partid, partid);
     };
@@ -162,7 +159,8 @@ CLKERNEL void Block_track(CLGLOBAL value_t   *elems,
 
     uint64_t nparts=particles->npart;
     uint64_t tbt=nparts;
-    uint64_t ebe=nparts;
+    uint64_t ebe=0;
+    //printf("%g %g %g\n",nparts,tbt,ebe);
 
     for (int jj = 0; jj < nturns; jj++) {
         for (int ii = 0; ii < nelems; ii++) {

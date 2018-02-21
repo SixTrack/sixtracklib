@@ -8,9 +8,6 @@ def test_add_drift():
     blk.add_Drift(length=2.5)
     assert blk.elem_ids==[0,2]
 
-
-
-
 def test_add_fodo():
     fodo=sixtracklib.CBlock()
     fodo.add_Drift(length=1.5)
