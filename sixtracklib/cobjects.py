@@ -25,9 +25,9 @@ class CProp(object):
         name,offset,length=obj._attr[self.offset]
         shape=obj._shape.get(name)
         if length is None:
-           val=obj._data[self.valuetype][offset]
+           val=obj._cbuffer.data[self.valuetype][offset]
         else:
-           val=obj._data[self.valuetype][offset:offset+length]
+           val=obj._cbuffer.data[self.valuetype][offset:offset+length]
            if shape is not None:
                val=val.reshape(*shape)
         return val
@@ -36,10 +36,10 @@ class CProp(object):
         shape=obj._shape.get(name)
         if not self.const:
            if length is None:
-              obj._data[self.valuetype][offset]=val
+              obj._cbuffer.data[self.valuetype][offset]=val
            else:
               if shape is None:
-                obj._data[self.valuetype][offset:offset+length]=val
+                obj._cbuffer.data[self.valuetype][offset:offset+length]=val
               else:
                 self.__get__(obj)[:]=val
         else:
@@ -96,7 +96,6 @@ class CObject(object):
         self._offset=self._cbuffer.new_object()
         self._cbuffer.reserve_memory(self._size)
         self._cbuffer.next+=self._size
-        self._data=self._cbuffer.data
         self._fill_args(nvargs)
         self._shape={}
     def _get_props(self):
@@ -133,14 +132,14 @@ class CObject(object):
               if length is None:
                  attr_offset=self._offset+offset
                  self._attr.append((name,attr_offset,None))
-                 self._data[prop.valuetype][attr_offset]=  \
+                 self._cbuffer.data[prop.valuetype][attr_offset]=  \
                                 nvargs.get(name,prop.default)
               else:
                  attr_offset=self._offset+lastarray
                  self._attr.append((name,attr_offset,length))
-                 self._data['u64'][self._offset+offset]=lastarray
+                 self._cbuffer.data['u64'][self._offset+offset]=lastarray
                  lastarray+=length
-                 self._data[prop.valuetype][attr_offset:attr_offset+length]= \
+                 self._cbuffer.data[prop.valuetype][attr_offset:attr_offset+length]= \
                                    nvargs.get(name,prop.default)
             elif isinstance(prop.valuetype,CObject):
                 raise NotImplemented('Nested object not implemented')
