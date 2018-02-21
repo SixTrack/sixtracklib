@@ -2,7 +2,8 @@ import numpy as np
 
 class CProp(object):
     def __init__(self,valuetype=None,offset=None,
-                      default=0,length=None,const=False):
+                      default=0,const=False,
+                      length=None):
         self.valuetype=valuetype
         self.offset=offset
         self.length=length
@@ -22,17 +23,25 @@ class CProp(object):
         return length
     def __get__(self,obj,type=None):
         name,offset,length=obj._attr[self.offset]
+        shape=obj._shape.get(name)
         if length is None:
-           return obj._data[self.valuetype][offset]
+           val=obj._cbuffer.data[self.valuetype][offset]
         else:
-           return obj._data[self.valuetype][offset:offset+length]
+           val=obj._cbuffer.data[self.valuetype][offset:offset+length]
+           if shape is not None:
+               val=val.reshape(*shape)
+        return val
     def __set__(self,obj,val):
         name,offset,length=obj._attr[self.offset]
+        shape=obj._shape.get(name)
         if not self.const:
            if length is None:
-              obj._data[self.valuetype][offset]=val
+              obj._cbuffer.data[self.valuetype][offset]=val
            else:
-              obj._data[self.valuetype][offset:offset+length]=val
+              if shape is None:
+                obj._cbuffer.data[self.valuetype][offset:offset+length]=val
+              else:
+                self.__get__(obj)[:]=val
         else:
            raise ValueError('property read-only')
 
@@ -78,6 +87,9 @@ class CBuffer(object):
 
 
 class CObject(object):
+    @classmethod
+    def get_length(cls,const):
+        return cls(cbuffer = None,**const)._size
     def __init__(self, cbuffer = None, **nvargs):
         self._size = self._get_size(nvargs)
         if cbuffer is None:
@@ -87,8 +99,8 @@ class CObject(object):
         self._offset=self._cbuffer.new_object()
         self._cbuffer.reserve_memory(self._size)
         self._cbuffer.next+=self._size
-        self._data=self._cbuffer.data
         self._fill_args(nvargs)
+        self._shape={}
     def _get_props(self):
         props=[(prop.offset,name,prop) for name,prop
                                        in self.__class__.__dict__.items()
@@ -123,14 +135,14 @@ class CObject(object):
               if length is None:
                  attr_offset=self._offset+offset
                  self._attr.append((name,attr_offset,None))
-                 self._data[prop.valuetype][attr_offset]=  \
+                 self._cbuffer.data[prop.valuetype][attr_offset]=  \
                                 nvargs.get(name,prop.default)
               else:
                  attr_offset=self._offset+lastarray
                  self._attr.append((name,attr_offset,length))
-                 self._data['u64'][self._offset+offset]=lastarray
+                 self._cbuffer.data['u64'][self._offset+offset]=lastarray
                  lastarray+=length
-                 self._data[prop.valuetype][attr_offset:attr_offset+length]= \
+                 self._cbuffer.data[prop.valuetype][attr_offset:attr_offset+length]= \
                                    nvargs.get(name,prop.default)
             elif isinstance(prop.valuetype,CObject):
                 raise NotImplemented('Nested object not implemented')
@@ -139,7 +151,7 @@ class CObject(object):
         out=['%s('%(self.__class__.__name__)]
         for offset,name,prop in props:
             val='%s'%getattr(self,name)
-            out.append('  %-8s = %s,'%(name,val[:70]))
+            out.append('  %-8s = %s,'%(name,val))
         out.append(')')
         return '\n'.join(out)
     def __repr__(self):

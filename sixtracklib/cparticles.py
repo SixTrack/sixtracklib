@@ -19,9 +19,9 @@ class CParticles(CObject):
     npart =CProp('u64', 0, 0, const=True)
     q0    =CProp('f64', 1, 1,     length='npart')
     mass0 =CProp('f64', 2, pmass, length='npart')
-    p0c   =CProp('f64', 5, 450e9, length='npart')
     beta0 =CProp('f64', 3, 450e9/np.sqrt(450e9**2+pmass**2), length='npart')
     gamma0=CProp('f64', 4, np.sqrt(450e9**2+pmass**2)/pmass, length='npart')
+    p0c   =CProp('f64', 5, 450e9, length='npart')
     partid=CProp('u64', 6, 0, length='npart')
     elemid=CProp('u64', 7, 0, length='npart')
     turn  =CProp('u64', 8, 0, length='npart')
@@ -47,6 +47,12 @@ class CParticles(CObject):
         part=cls(npart=npart)
         for nn in part._names:
           setattr(part,nn,getattr(beam,nn))
+    def reshape(self,*shape):
+        props=self._get_props()
+        for offset,name,prop in props:
+            if prop.length=='npart':
+                self._shape[name]=shape
+        return self
     def compare(self,ref,exclude=['s','elemid'],include=[],verbose=True):
       if self.npart == ref.npart:
         names=list(self._names)
