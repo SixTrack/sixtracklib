@@ -8,6 +8,16 @@ def test_add_drift():
     blk.add_Drift(length=2.5)
     assert blk.elem_ids==[0,2]
 
+def test_add_multipole():
+    fodo=sixtracklib.CBlock()
+    fodo.add_Multipole(knl=[0.0])
+    fodo.add_Multipole(knl=[0.1,0.2])
+    fodo.add_Multipole(knl=[0.1,0.2,0.3])
+    assert fodo.elem[0].order==0
+    assert fodo.elem[1].order==1
+    assert fodo.elem[2].order==2
+
+
 def test_add_fodo():
     fodo=sixtracklib.CBlock()
     fodo.add_Drift(length=1.5)
