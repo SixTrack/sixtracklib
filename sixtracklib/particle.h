@@ -47,27 +47,30 @@ typedef CLGLOBAL struct Particles {
     CLGLOBAL double  *chi; // q/q0 * m/m0
 } Particles;
 
-Particles* Particles_unpack(Particles* p) {
-    p->q0     = ( (CLGLOBAL double *) p + ((uint64_t) p->q0    )  );
-    p->mass0  = ( (CLGLOBAL double *) p + ((uint64_t) p->mass0 )  );
-    p->beta0  = ( (CLGLOBAL double *) p + ((uint64_t) p->beta0 )  );
-    p->gamma0 = ( (CLGLOBAL double *) p + ((uint64_t) p->gamma0)  );
-    p->p0c    = ( (CLGLOBAL double *) p + ((uint64_t) p->p0c   )  );
-    p->partid = ( (CLGLOBAL int64_t *) p + ((uint64_t) p->partid) );
-    p->elemid = ( (CLGLOBAL int64_t *) p + ((uint64_t) p->elemid) );
-    p->turn   = ( (CLGLOBAL int64_t *) p + ((uint64_t) p->turn)   );
-    p->state  = ( (CLGLOBAL int64_t *) p + ((uint64_t) p->state)  );
-    p->s      = ( (CLGLOBAL double *) p + ((uint64_t) p->s)      );
-    p->x      = ( (CLGLOBAL double *) p + ((uint64_t) p->x)      );
-    p->px     = ( (CLGLOBAL double *) p + ((uint64_t) p->px)     );
-    p->y      = ( (CLGLOBAL double *) p + ((uint64_t) p->y)      );
-    p->py     = ( (CLGLOBAL double *) p + ((uint64_t) p->py)     );
-    p->sigma  = ( (CLGLOBAL double *) p + ((uint64_t) p->sigma)  );
-    p->psigma = ( (CLGLOBAL double *) p + ((uint64_t) p->psigma) );
-    p->delta  = ( (CLGLOBAL double *) p + ((uint64_t) p->delta)  );
-    p->rpp    = ( (CLGLOBAL double *) p + ((uint64_t) p->rpp)    );
-    p->rvv    = ( (CLGLOBAL double *) p + ((uint64_t) p->rvv)    );
-    p->chi    = ( (CLGLOBAL double *) p + ((uint64_t) p->chi)    );
+typedef __constant char * cc;
+
+
+Particles* Particles_unpack(Particles* p, CLGLOBAL value_t* pp) {
+    p->q0     = ( (CLGLOBAL double *) p + pp[1].u64  );
+    p->mass0  = ( (CLGLOBAL double *) p + pp[2].u64 );
+    p->beta0  = ( (CLGLOBAL double *) p + pp[3].u64 );
+    p->gamma0 = ( (CLGLOBAL double *) p + pp[4].u64 );
+    p->p0c    = ( (CLGLOBAL double *) p + pp[5].u64 );
+    p->partid = ( (CLGLOBAL int64_t*) p + pp[6].u64 );
+    p->elemid = ( (CLGLOBAL int64_t*) p + pp[7].u64 );
+    p->turn   = ( (CLGLOBAL int64_t*) p + pp[8].u64 );
+    p->state  = ( (CLGLOBAL int64_t*) p + pp[9].u64 );
+    p->s      = ( (CLGLOBAL double *) p + pp[10].u64 );
+    p->x      = ( (CLGLOBAL double *) p + pp[11].u64 );
+    p->px     = ( (CLGLOBAL double *) p + pp[12].u64 );
+    p->y      = ( (CLGLOBAL double *) p + pp[13].u64 );
+    p->py     = ( (CLGLOBAL double *) p + pp[14].u64 );
+    p->sigma  = ( (CLGLOBAL double *) p + pp[15].u64 );
+    p->psigma = ( (CLGLOBAL double *) p + pp[16].u64 );
+    p->delta  = ( (CLGLOBAL double *) p + pp[17].u64 );
+    p->rpp    = ( (CLGLOBAL double *) p + pp[18].u64 );
+    p->rvv    = ( (CLGLOBAL double *) p + pp[19].u64 );
+    p->chi    = ( (CLGLOBAL double *) p + pp[20].u64 );
     return (Particles*) p;
 };
 

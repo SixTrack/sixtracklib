@@ -85,7 +85,6 @@ void track_single(Particles *particles, uint64_t partid,
     }//end if state
 }
 
-
 CLKERNEL void Block_unpack(
         CLGLOBAL value_t *particles_p, //Particles
         CLGLOBAL value_t *elembyelem_p,  //ElembyElem
@@ -100,30 +99,53 @@ CLKERNEL void Block_unpack(
     Particles* elembyelem = (Particles*) elembyelem_p;
     Particles* turnbyturn = (Particles*) turnbyturn_p;
 
-    Particles_unpack( particles );
+    //printf( (cc) "p[0] %i \n", particles_p[0].u64);
+    //printf( (cc) "p[1] %i \n", particles_p[1].u64);
+    //printf( (cc) "p[2] %i \n", particles_p[2].u64);
+    //printf( (cc) "p[3] %i \n", particles_p[3].u64);
+    //printf( (cc) "p[4] %i \n", particles_p[4].u64);
+    //printf( (cc) "p[5] %i \n", particles_p[5].u64);
+    //printf( (cc) "p->q0 %i \n", particles->q0);
+    //printf( (cc) "p->mass0 %i \n", particles->mass0);
+    //printf( (cc) "p->beta0 %i \n", particles->beta0);
+    //printf( (cc) "p->gamma0 %i \n", particles->gamma0);
+    //printf( (cc) "p->p0c %i \n", particles->p0c);
 
-    //printf( "p->beta0[0] %g\n", particles->beta0[0]);
-    //printf( "p->beta0[3] %g\n", particles->beta0[3]);
-    //printf( "elembyelem[0] %i \n", elembyelem_p[0].u64);
-    //printf( "turnbyturn[0] %i \n", turnbyturn_p[0].u64);
-    //printf( "elembyelem[1] %i \n", elembyelem_p[1].u64);
-    //printf( "turnbyturn[1] %i \n", turnbyturn_p[1].u64);
-    //printf( "elembyelem[2] %i \n", elembyelem_p[2].u64);
-    //printf( "turnbyturn[2] %i \n", turnbyturn_p[2].u64);
+
+    Particles_unpack( particles, particles_p );
+
+    //printf( (cc) "&p[0] %u \n", particles_p);
+    //printf( (cc) "&p[0] %u \n", &particles_p[0]);
+    //printf( (cc) "&p[1] %u \n", &particles_p[1]);
+    //printf( (cc) "p[1] %u \n", particles_p[1].u64);
+    //printf( (cc) "p[2] %u \n", particles_p[2].u64);
+    //printf( (cc) "p[3] %u \n", particles_p[3].u64);
+    //printf( (cc) "p[4] %u \n", particles_p[4].u64);
+    //printf( (cc) "p[5] %u \n", particles_p[5].u64);
 
 
-    if (elembyelem_flag) Particles_unpack( elembyelem );
-    if (turnbyturn_flag) Particles_unpack( turnbyturn );
+    //printf((cc) "p->npart %d\n", particles->npart);
+    //printf((cc) "p->beta0[0] %g\n", particles->beta0[0]);
+    //printf((cc) "p->beta0[3] %g\n", particles->beta0[3]);
+    //printf((cc) "elembyelem[0] %i \n", elembyelem_p[0].u64);
+    //printf((cc) "turnbyturn[0] %i \n", turnbyturn_p[0].u64);
+    //printf((cc) "elembyelem[1] %i \n", elembyelem_p[1].u64);
+    //printf((cc) "turnbyturn[1] %i \n", turnbyturn_p[1].u64);
+    //printf((cc) "elembyelem[2] %i \n", elembyelem_p[2].u64);
+    //printf((cc) "turnbyturn[2] %i \n", turnbyturn_p[2].u64);
 
-    //printf( "elembyelem[0] %i \n", elembyelem_p[0].u64);
-    //printf( "turnbyturn[0] %i \n", turnbyturn_p[0].u64);
-    //printf( "elembyelem[1] %i \n", elembyelem_p[1].u64);
-    //printf( "turnbyturn[1] %i \n", turnbyturn_p[1].u64);
-    //printf( "elembyelem[2] %i \n", elembyelem_p[2].u64);
-    //printf( "turnbyturn[2] %i \n", turnbyturn_p[2].u64);
 
-    //printf( "ele->beta0[0] %g\n", elembyelem->beta0[0]);
-    //printf( "ele->beta0[3] %g\n", elembyelem->beta0[3]);
+    if (elembyelem_flag) Particles_unpack( elembyelem, elembyelem_p );
+    if (turnbyturn_flag) Particles_unpack( turnbyturn, turnbyturn_p );
+
+    //printf((cc) "elembyelem[0] %i \n", elembyelem_p[0].u64);
+    //printf((cc) "turnbyturn[0] %i \n", turnbyturn_p[0].u64);
+    //printf((cc) "elembyelem[1] %i \n", elembyelem_p[1].u64);
+    //printf((cc) "turnbyturn[1] %i \n", turnbyturn_p[1].u64);
+    //printf((cc) "elembyelem[2] %i \n", elembyelem_p[2].u64);
+    //printf((cc) "turnbyturn[2] %i \n", turnbyturn_p[2].u64);
+    //printf((cc) "ele->beta0[0] %g\n", elembyelem->beta0[0]);
+    //printf((cc) "ele->beta0[3] %g\n", elembyelem->beta0[3]);
 };
 
 
