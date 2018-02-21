@@ -76,6 +76,10 @@ class Align(CObject):
       sz=np.sin(tilt/180.*np.pi)
       CObject.__init__(self,cz=cz,sz=sz,**nvargs)
 
+class BeamBeam(CObject):
+    objid       = CProp('u64',0,default=10)
+    datasize    = CProp('u64',1,const=True)
+    data        = CProp('f64',2,length='datasize')
 
 class CBlock(object):
     """ Block object
@@ -85,7 +89,8 @@ class CBlock(object):
                       Multipole  = 4,
                       Cavity     = 5,
                       Align      = 6,
-                      Block      = 7)
+                      Block      = 7,
+                      BeamBeam   = 10)
 
     def __init__(self):
         self._cbuffer=CBuffer(1)

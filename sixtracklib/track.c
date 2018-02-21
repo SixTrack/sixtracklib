@@ -27,7 +27,7 @@
 
 #include "particle.h"
 
-inline int Drift_track(Particles* p, uint64_t ip,
+int Drift_track(Particles* p, uint64_t ip,
         double length){
     double xp, yp;
     xp = p->px[ip] * p->rpp[ip];
@@ -41,7 +41,7 @@ inline int Drift_track(Particles* p, uint64_t ip,
 };
 
 
-inline int DriftExact_track(Particles* p, uint64_t ip, 
+int DriftExact_track(Particles* p, uint64_t ip, 
         double length){
     double lpzi, lbzi, px, py, opd;
     opd = 1+p->delta[ip];
@@ -56,7 +56,7 @@ inline int DriftExact_track(Particles* p, uint64_t ip,
 }
 
 
-inline int Multipole_track(Particles* p, uint64_t ip,
+int Multipole_track(Particles* p, uint64_t ip,
         uint64_t order, double l,
         double hxl, double hyl, CLGLOBAL double* bal){
     double x,y,chi,dpx,dpy,zre,zim,b1l,a1l,hxx,hyy;
@@ -90,8 +90,8 @@ inline int Multipole_track(Particles* p, uint64_t ip,
     return 1 ;
 }
 
-inline int Cavity_track(Particles* p, uint64_t ip,
-        double volt, double freq, double lag){
+int Cavity_track(Particles* p, uint64_t ip,
+                 double volt, double freq, double lag){
 
     double phase, pt, opd, beta;
     phase = lag-2*M_PI/CLIGHT*freq*p->sigma[ip]/p->beta0[ip];
@@ -108,7 +108,7 @@ inline int Cavity_track(Particles* p, uint64_t ip,
 }
 
 
-inline int Align_track(Particles* p, uint64_t ip,
+int Align_track(Particles* p, uint64_t ip,
         double cz, double sz, double dx, double dy){
     double xn,yn;
     xn = cz*p->x[ip]-sz*p->y[ip] - dx;

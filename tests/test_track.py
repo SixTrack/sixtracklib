@@ -15,10 +15,10 @@ def test_track():
 
   particles,ebe,tbt=fodo.track_cl(bunch,nturns=1,
                                   elembyelem=True,turnbyturn=True)
-  return particles,ebe,tbt
+  return fodo,particles,ebe,tbt
 
 
 if __name__=='__main__':
-    particles,ebe,tbt=test_track()
+    fodo,particles,ebe,tbt=test_track()
 
 
