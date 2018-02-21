@@ -124,7 +124,7 @@ class CBlock(object):
             CParticles=particles.__class__
             npart=np.int64(particles.npart)
             #uint bug in boost/pyopencl/numpy???
-            particles_g=cl.Buffer(ctx, rw, hostbuf=particles._data)
+            particles_g=cl.Buffer(ctx, rw, hostbuf=particles._cbuffer.data)
             #ElemByElem data
             if elembyelem is True:
               elembyelem=CParticles(npart=npart*self.nelems*nturns)
@@ -132,7 +132,7 @@ class CBlock(object):
             if elembyelem is None:
               elembyelem_g=cl.Buffer(ctx, rw, hostbuf=np.array([0]))
             else:
-              elembyelem_g=cl.Buffer(ctx, rw, hostbuf=elembyelem._data)
+              elembyelem_g=cl.Buffer(ctx, rw, hostbuf=elembyelem._cbuffer.data)
             #TurnByTurn data
             if turnbyturn is True:
               turnbyturn=CParticles(npart=npart*(nturns+1))
@@ -140,7 +140,7 @@ class CBlock(object):
             if turnbyturn is None:
               turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=np.array([0]))
             else:
-              turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=turnbyturn._data)
+              turnbyturn_g=cl.Buffer(ctx, rw, hostbuf=turnbyturn._cbuffer.data)
             #Tracking data
             elems_g=cl.Buffer(ctx, rw, hostbuf=self._cbuffer.data)
             elemids=np.array(self.elem_ids,dtype='uint64')
@@ -153,11 +153,11 @@ class CBlock(object):
             #                elems_g, elemids_g, nelems,
             #                nturns,
             #                particles_g, elembyelem_g, turnbyturn_g)
-            cl.enqueue_copy(queue,particles._data,particles_g)
+            cl.enqueue_copy(queue,particles._cbuffer.data,particles_g)
             if turnbyturn:
-                cl.enqueue_copy(queue,turnbyturn._data,turnbyturn_g)
+                cl.enqueue_copy(queue,turnbyturn._cbuffer.data,turnbyturn_g)
             if elembyelem:
-                cl.enqueue_copy(queue,elembyelem._data,elembyelem_g)
+                cl.enqueue_copy(queue,elembyelem._cbuffer.data,elembyelem_g)
             return particles,elembyelem, turnbyturn
 
 

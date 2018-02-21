@@ -87,6 +87,9 @@ class CBuffer(object):
 
 
 class CObject(object):
+    @classmethod
+    def get_length(cls,const):
+        return cls(cbuffer = None,**const)._size
     def __init__(self, cbuffer = None, **nvargs):
         self._size = self._get_size(nvargs)
         if cbuffer is None:
