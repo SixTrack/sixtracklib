@@ -35,23 +35,23 @@ void BB6D_track(CLGLOBAL value_t *bb6ddata_ptr){
 
     printf("qpart=%e\n", bb6ddata->q_part);
 
-    //CLGLOBAL double* N_part_per_slice = (valuet_t*)(((CLGLOBAL uint64_t*) (&(bb6ddata->N_part_per_slice))) + ((uint64_t) bb6ddata->N_part_per_slice) + 1);
+    CLGLOBAL double* N_part_per_slice = ((CLGLOBAL double*)(&(bb6ddata->ptr_N_part_per_slice)))+(bb6ddata->ptr_N_part_per_slice)+1;
     // CLGLOBAL double* x_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->x_slices_star))) + ((uint64_t) bb6ddata->x_slices_star) + 1);
     // CLGLOBAL double* y_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->y_slices_star))) + ((uint64_t) bb6ddata->y_slices_star) + 1);
     // CLGLOBAL double* sigma_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->sigma_slices_star))) + ((uint64_t) bb6ddata->sigma_slices_star) + 1);
 
     
-//     int N_slices = (int)(bb6ddata->N_slices);
-//     int i_slice;
+    int N_slices = (int)(bb6ddata->N_slices);
+    int i_slice;
     
 //     /*// Check data transfer
 //     printf("x=%e\n",*x);
-//     printf("sphi=%e\n",(bb6ddata->parboost).sphi);
-//     printf("calpha=%e\n",(bb6ddata->parboost).calpha);
-//     printf("S33=%e\n",(bb6ddata->Sigmas_0_star).Sig_33_0);
-//     printf("N_slices=%d\n",N_slices);
-//     printf("N_part_per_slice[0]=%e\n",N_part_per_slice[0]); 
-//     printf("N_part_per_slice[5]=%e\n",N_part_per_slice[5]); 
+    printf("sphi=%e\n",(bb6ddata->parboost).sphi);
+    printf("calpha=%e\n",(bb6ddata->parboost).calpha);
+    printf("S33=%e\n",(bb6ddata->Sigmas_0_star).Sig_33_0);
+    printf("N_slices=%d\n",N_slices);
+    printf("N_part_per_slice[0]=%e\n",N_part_per_slice[0]); 
+    printf("N_part_per_slice[50]=%e\n",N_part_per_slice[49]); 
 //     printf("x_slices_star[0]=%e\n",x_slices_star[0]); 
 //     printf("x_slices_star[5]=%e\n",x_slices_star[5]); 
 //     printf("y_slices_star[0]=%e\n",y_slices_star[0]); 
