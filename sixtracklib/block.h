@@ -44,7 +44,7 @@ typedef union {
 
 typedef enum type_t {
              DriftID=2, DriftExactID=3,
-             MultipoleID=4, CavityID=5, AlignID=6}
+             MultipoleID=4, CavityID=5, AlignID=6, BeamBeamID=10}
              type_t;
 
 #endif
