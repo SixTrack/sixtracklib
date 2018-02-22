@@ -55,6 +55,8 @@ machine.add_BeamBeam(name='bb',
                 Sig_34_0=Sig_34_0, 
                 Sig_44_0=Sig_44_0)
 
+bb = machine.bb_data_list[0]
+
 bunch=sixtracklib.CParticles(npart=2)
 bunch.x[0]=0.3
 bunch.y[0]=0.2

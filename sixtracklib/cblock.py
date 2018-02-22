@@ -86,7 +86,7 @@ class BeamBeam(CObject):
                 phi, alpha, 
                 Sig_11_0, Sig_12_0, Sig_13_0, 
                 Sig_14_0, Sig_22_0, Sig_23_0, 
-                Sig_24_0, Sig_33_0, Sig_34_0, Sig_44_0,
+                Sig_24_0, Sig_33_0, Sig_34_0, Sig_44_0, bb_data_list, 
                 **nvargs):
 
       import BB6D_data
@@ -95,8 +95,9 @@ class BeamBeam(CObject):
                 Sig_11_0, Sig_12_0, Sig_13_0, 
                 Sig_14_0, Sig_22_0, Sig_23_0, 
                 Sig_24_0, Sig_33_0, Sig_34_0, Sig_44_0)
-      buffer = bb6d_data.tobuffer()
 
+      bb_data_list.append(bb6d_data)
+      buffer = bb6d_data.tobuffer()
       CObject.__init__(self, data=buffer, datasize=len(buffer), **nvargs)
 
 class CBlock(object):
@@ -109,6 +110,8 @@ class CBlock(object):
                       Align      = 6,
                       Block      = 7,
                       BeamBeam   = 10)
+
+    bb_data_list = []
 
     def __init__(self):
         self._cbuffer=CBuffer(1)
@@ -135,7 +138,7 @@ class CBlock(object):
         elem=Align(cbuffer=self._cbuffer,**nvargs)
         self._add_elem(name,elem)
     def add_BeamBeam(self,name=None,**nvargs):
-        elem=BeamBeam(cbuffer=self._cbuffer,**nvargs)
+        elem=BeamBeam(cbuffer=self._cbuffer, bb_data_list = self.bb_data_list, **nvargs)
         self._add_elem(name,elem)
     if cl:
         def track_cl(self,particles,nturns=1,elembyelem=None,turnbyturn=None):

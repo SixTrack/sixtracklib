@@ -19,7 +19,7 @@ typedef struct{
     double threshold_singular;
     long int N_slices;
     long int ptr_N_part_per_slice;
-    long int prt_x_slices_star;
+    long int ptr_x_slices_star;
     long int ptr_y_slices_star;
     long int ptr_sigma_slices_star;
 }BB6D_data;
@@ -36,9 +36,9 @@ void BB6D_track(CLGLOBAL value_t *bb6ddata_ptr){
     printf("qpart=%e\n", bb6ddata->q_part);
 
     CLGLOBAL double* N_part_per_slice = ((CLGLOBAL double*)(&(bb6ddata->ptr_N_part_per_slice)))+(bb6ddata->ptr_N_part_per_slice)+1;
-    // CLGLOBAL double* x_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->x_slices_star))) + ((uint64_t) bb6ddata->x_slices_star) + 1);
-    // CLGLOBAL double* y_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->y_slices_star))) + ((uint64_t) bb6ddata->y_slices_star) + 1);
-    // CLGLOBAL double* sigma_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->sigma_slices_star))) + ((uint64_t) bb6ddata->sigma_slices_star) + 1);
+    CLGLOBAL double* x_slices_star = ((CLGLOBAL double*)(&(bb6ddata->ptr_x_slices_star)))+(bb6ddata->ptr_x_slices_star)+1;
+    CLGLOBAL double* y_slices_star = ((CLGLOBAL double*)(&(bb6ddata->ptr_y_slices_star)))+(bb6ddata->ptr_y_slices_star)+1;
+    CLGLOBAL double* sigma_slices_star = ((CLGLOBAL double*)(&(bb6ddata->ptr_sigma_slices_star)))+(bb6ddata->ptr_sigma_slices_star)+1;
 
     
     int N_slices = (int)(bb6ddata->N_slices);
@@ -52,12 +52,13 @@ void BB6D_track(CLGLOBAL value_t *bb6ddata_ptr){
     printf("N_slices=%d\n",N_slices);
     printf("N_part_per_slice[0]=%e\n",N_part_per_slice[0]); 
     printf("N_part_per_slice[50]=%e\n",N_part_per_slice[49]); 
-//     printf("x_slices_star[0]=%e\n",x_slices_star[0]); 
-//     printf("x_slices_star[5]=%e\n",x_slices_star[5]); 
-//     printf("y_slices_star[0]=%e\n",y_slices_star[0]); 
-//     printf("y_slices_star[5]=%e\n",y_slices_star[5]);         
-//     printf("sigma_slices_star[0]=%e\n",sigma_slices_star[0]); 
-//     printf("sigma_slices_star[5]=%e\n",sigma_slices_star[5]); */
+    printf("x_slices_star[0]=%e\n",x_slices_star[0]); 
+    printf("x_slices_star[5]=%e\n",x_slices_star[5]); 
+    printf("y_slices_star[0]=%e\n",y_slices_star[0]); 
+    printf("y_slices_star[5]=%e\n",y_slices_star[5]);         
+    printf("sigma_slices_star[0]=%e\n",sigma_slices_star[0]); 
+    printf("sigma_slices_star[5]=%e\n",sigma_slices_star[5]);
+    // */
     
 
 //     double x_star = *x;
