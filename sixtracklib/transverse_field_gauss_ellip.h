@@ -37,7 +37,7 @@ typedef struct{
 }transv_field_gauss_ellip_data;
 
 
-void get_transv_field_gauss_ellip(CLGLOBAL transv_field_gauss_ellip_data* data,
+void get_transv_field_gauss_ellip(transv_field_gauss_ellip_data* data,
                                   double x, double y, double* Ex_out, double* Ey_out){
     
   double sigmax = data->sigma_x;

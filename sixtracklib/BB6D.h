@@ -3,7 +3,7 @@
 
 #include "BB6D_boost.h"
 #include "BB6D_propagateSigma.h"
-// #include "BB6D_transverse_fields.h"
+#include "BB6D_transverse_fields.h"
 #include "constants.h"
 
 #include "block.h"
@@ -116,32 +116,32 @@ void BB6D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb6ddat
         
         // Get transverse fieds
         double Ex, Ey, Gx, Gy;
-//         get_Ex_Ey_Gx_Gy_gauss(x_bar_hat_star, y_bar_hat_star, 
-//             sqrt(Sig_11_hat_star), sqrt(Sig_33_hat_star), bb6ddata->min_sigma_diff,
-//             &Ex, &Ey, &Gx, &Gy);
+        get_Ex_Ey_Gx_Gy_gauss(x_bar_hat_star, y_bar_hat_star, 
+            sqrt(Sig_11_hat_star), sqrt(Sig_33_hat_star), bb6ddata->min_sigma_diff,
+            &Ex, &Ey, &Gx, &Gy);
             
-//         // Compute kicks
-//         double Fx_hat_star = Ksl*Ex;
-//         double Fy_hat_star = Ksl*Ey;
-//         double Gx_hat_star = Ksl*Gx;
-//         double Gy_hat_star = Ksl*Gy;
+        // Compute kicks
+        double Fx_hat_star = Ksl*Ex;
+        double Fy_hat_star = Ksl*Ey;
+        double Gx_hat_star = Ksl*Gx;
+        double Gy_hat_star = Ksl*Gy;
         
-//         // Move kisks to coupled reference frame
-//         double Fx_star = Fx_hat_star*costheta - Fy_hat_star*sintheta;
-//         double Fy_star = Fx_hat_star*sintheta + Fy_hat_star*costheta;
+        // Move kisks to coupled reference frame
+        double Fx_star = Fx_hat_star*costheta - Fy_hat_star*sintheta;
+        double Fy_star = Fx_hat_star*sintheta + Fy_hat_star*costheta;
         
-//         // Compute longitudinal kick
-//         double Fz_star = 0.5*(Fx_hat_star*dS_x_bar_hat_star  + Fy_hat_star*dS_y_bar_hat_star+
-//                        Gx_hat_star*dS_Sig_11_hat_star + Gy_hat_star*dS_Sig_33_hat_star);
+        // Compute longitudinal kick
+        double Fz_star = 0.5*(Fx_hat_star*dS_x_bar_hat_star  + Fy_hat_star*dS_y_bar_hat_star+
+                       Gx_hat_star*dS_Sig_11_hat_star + Gy_hat_star*dS_Sig_33_hat_star);
                        
-//         // Apply the kicks (Hirata's synchro-beam)
-//         delta_star = delta_star + Fz_star+0.5*(
-//                     Fx_star*(px_star+0.5*Fx_star)+
-//                     Fy_star*(py_star+0.5*Fy_star));
-//         x_star = x_star - S*Fx_star;
-//         px_star = px_star + Fx_star;
-//         y_star = y_star - S*Fy_star;
-//         py_star = py_star + Fy_star;
+        // Apply the kicks (Hirata's synchro-beam)
+        delta_star = delta_star + Fz_star+0.5*(
+                    Fx_star*(px_star+0.5*Fx_star)+
+                    Fy_star*(py_star+0.5*Fy_star));
+        x_star = x_star - S*Fx_star;
+        px_star = px_star + Fx_star;
+        y_star = y_star - S*Fy_star;
+        py_star = py_star + Fy_star;
         
 
     }
