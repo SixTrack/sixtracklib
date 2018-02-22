@@ -92,7 +92,7 @@ void track_single(Particles *particles, uint64_t partid,
 
                 CLGLOBAL value_t* data = elem + data_offset;
                 
-                BB6D_track(data);
+                BB6D_track(particles, partid, data);
 
                 // int ibb;
                 // for (ibb=0; ibb<data_size; ibb++){

@@ -27,7 +27,7 @@ typedef struct{
 // void BB6D_track(double* x, double* px, double* y, double* py, double* sigma, 
 //                 double* delta, double q0, double p0, BB6D_data *bb6ddata){
 
-void BB6D_track(CLGLOBAL value_t *bb6ddata_ptr){
+void BB6D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb6ddata_ptr){
    
     printf("qpart=%e\n", bb6ddata_ptr[0].f64);
 
@@ -45,7 +45,7 @@ void BB6D_track(CLGLOBAL value_t *bb6ddata_ptr){
     int i_slice;
     
 //     /*// Check data transfer
-//     printf("x=%e\n",*x);
+    printf("x=%e\n",particles->x[partid]);
     printf("sphi=%e\n",(bb6ddata->parboost).sphi);
     printf("calpha=%e\n",(bb6ddata->parboost).calpha);
     printf("S33=%e\n",(bb6ddata->Sigmas_0_star).Sig_33_0);
@@ -61,57 +61,61 @@ void BB6D_track(CLGLOBAL value_t *bb6ddata_ptr){
     // */
     
 
-//     double x_star = *x;
-//     double px_star = *px;
-//     double y_star = *y;
-//     double py_star = *py;              
-//     double sigma_star = *sigma;
-//     double delta_star = *delta ;  
-    
-    
-//     // Boost coordinates of the weak beam
-//     BB6D_boost(&(bb6ddata->parboost), &x_star, &px_star, &y_star, &py_star, 
-//                 &sigma_star, &delta_star);
-    
-//     // Synchro beam
-//     for (i_slice=0; i_slice<N_slices; i_slice++)
-//     {
-//         double sigma_slice_star = sigma_slices_star[i_slice];
-//         double x_slice_star = x_slices_star[i_slice];
-//         double y_slice_star = y_slices_star[i_slice];
-        
-//         //Compute force scaling factor
-//         double Ksl = N_part_per_slice[i_slice]*bb6ddata->q_part*q0/(p0*C_LIGHT);
+    double x_star     = particles->x[partid];
+    double px_star    = particles->px[partid];
+    double y_star     = particles->y[partid];
+    double py_star    = particles->py[partid];              
+    double sigma_star = particles->sigma[partid];
+    double delta_star = particles->delta[partid];  
 
-//         //Identify the Collision Point (CP)
-//         double S = 0.5*(sigma_star - sigma_slice_star);
+    double p0 = particles->p0c[partid]*QELEM/C_LIGHT;  
+    double q0 = particles->q0[partid]; 
+    
+    
+    // Boost coordinates of the weak beam
+    BB6D_boost(&(bb6ddata->parboost), &x_star, &px_star, &y_star, &py_star, 
+                &sigma_star, &delta_star);
+
+    
+    // Synchro beam
+    for (i_slice=0; i_slice<N_slices; i_slice++)
+    {
+        double sigma_slice_star = sigma_slices_star[i_slice];
+        double x_slice_star = x_slices_star[i_slice];
+        double y_slice_star = y_slices_star[i_slice];
         
-//         // Propagate sigma matrix
-//         double Sig_11_hat_star, Sig_33_hat_star, costheta, sintheta;
-//         double dS_Sig_11_hat_star, dS_Sig_33_hat_star, dS_costheta, dS_sintheta;
+        //Compute force scaling factor
+        double Ksl = N_part_per_slice[i_slice]*bb6ddata->q_part*q0/(p0*C_LIGHT);
+
+        //Identify the Collision Point (CP)
+        double S = 0.5*(sigma_star - sigma_slice_star);
         
-//         // Get strong beam shape at the CP
-//         BB6D_propagate_Sigma_matrix(&(bb6ddata->Sigmas_0_star),
-//             S, bb6ddata->threshold_singular, 1,
-//             &Sig_11_hat_star, &Sig_33_hat_star, 
-//             &costheta, &sintheta,
-//             &dS_Sig_11_hat_star, &dS_Sig_33_hat_star, 
-//             &dS_costheta, &dS_sintheta);
+        // Propagate sigma matrix
+        double Sig_11_hat_star, Sig_33_hat_star, costheta, sintheta;
+        double dS_Sig_11_hat_star, dS_Sig_33_hat_star, dS_costheta, dS_sintheta;
+        
+        // Get strong beam shape at the CP
+        BB6D_propagate_Sigma_matrix(&(bb6ddata->Sigmas_0_star),
+            S, bb6ddata->threshold_singular, 1,
+            &Sig_11_hat_star, &Sig_33_hat_star, 
+            &costheta, &sintheta,
+            &dS_Sig_11_hat_star, &dS_Sig_33_hat_star, 
+            &dS_costheta, &dS_sintheta);
             
-//         // Evaluate transverse coordinates of the weake baem w.r.t. the strong beam centroid
-//         double x_bar_star = x_star + px_star*S - x_slice_star;
-//         double y_bar_star = y_star + py_star*S - y_slice_star;
+        // Evaluate transverse coordinates of the weake baem w.r.t. the strong beam centroid
+        double x_bar_star = x_star + px_star*S - x_slice_star;
+        double y_bar_star = y_star + py_star*S - y_slice_star;
         
-//         // Move to the uncoupled reference frame
-//         double x_bar_hat_star = x_bar_star*costheta +y_bar_star*sintheta;
-//         double y_bar_hat_star = -x_bar_star*sintheta +y_bar_star*costheta;
+        // Move to the uncoupled reference frame
+        double x_bar_hat_star = x_bar_star*costheta +y_bar_star*sintheta;
+        double y_bar_hat_star = -x_bar_star*sintheta +y_bar_star*costheta;
         
-//         // Compute derivatives of the transformation
-//         double dS_x_bar_hat_star = x_bar_star*dS_costheta +y_bar_star*dS_sintheta;
-//         double dS_y_bar_hat_star = -x_bar_star*dS_sintheta +y_bar_star*dS_costheta;
+        // Compute derivatives of the transformation
+        double dS_x_bar_hat_star = x_bar_star*dS_costheta +y_bar_star*dS_sintheta;
+        double dS_y_bar_hat_star = -x_bar_star*dS_sintheta +y_bar_star*dS_costheta;
         
-//         // Get transverse fieds
-//         double Ex, Ey, Gx, Gy;
+        // Get transverse fieds
+        double Ex, Ey, Gx, Gy;
 //         get_Ex_Ey_Gx_Gy_gauss(x_bar_hat_star, y_bar_hat_star, 
 //             sqrt(Sig_11_hat_star), sqrt(Sig_33_hat_star), bb6ddata->min_sigma_diff,
 //             &Ex, &Ey, &Gx, &Gy);
@@ -140,18 +144,18 @@ void BB6D_track(CLGLOBAL value_t *bb6ddata_ptr){
 //         py_star = py_star + Fy_star;
         
 
-//     }
+    }
     
-//     // Inverse boost on the coordinates of the weak beam
-//     BB6D_inv_boost(&(bb6ddata->parboost), &x_star, &px_star, &y_star, &py_star, 
-//                 &sigma_star, &delta_star);
+    // Inverse boost on the coordinates of the weak beam
+    BB6D_inv_boost(&(bb6ddata->parboost), &x_star, &px_star, &y_star, &py_star, 
+                &sigma_star, &delta_star);
                 
-//     *x = x_star;
-//     *px = px_star;
-//     *y = y_star;
-//     *py = py_star;
-//     *sigma = sigma_star;
-//     *delta = delta_star;
+    particles->x[partid] = x_star;
+    particles->px[partid] = px_star;
+    particles->y[partid] = y_star;
+    particles->py[partid] = py_star;
+    particles->sigma[partid] = sigma_star;
+    particles->delta[partid] = delta_star;
                     
 }
 

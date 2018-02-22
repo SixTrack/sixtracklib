@@ -58,8 +58,8 @@ machine.add_BeamBeam(name='bb',
 bb = machine.bb_data_list[0]
 
 bunch=sixtracklib.CParticles(npart=2)
-bunch.x[0]=0.3
-bunch.y[0]=0.2
+bunch.x = bunch.x*0.+0.3
+bunch.y = bunch.y*0.+0.2
 
 particles,ebe,tbt=machine.track_cl(bunch,nturns=1,
                                   elembyelem=True,turnbyturn=True)
