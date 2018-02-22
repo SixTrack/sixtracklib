@@ -7,8 +7,8 @@
 #endif
 
 //From sixtraclib
-#include "transverse_field_gauss_ellip.h"
-#include "transverse_field_gauss_round.h"
+#include "BB_transverse_field_gauss_ellip.h"
+#include "BB_transverse_field_gauss_round.h"
 #include "constants.h"
 
 void get_Ex_Ey_Gx_Gy_gauss(double x, double  y, 

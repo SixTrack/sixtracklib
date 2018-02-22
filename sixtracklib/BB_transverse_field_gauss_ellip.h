@@ -2,7 +2,7 @@
 #define _TRANS_FIELD_GUASS_ELLIP_
 
 #include "constants.h"
-#include "cmpx.h"
+#include "BB_cmpx.h"
 
 #ifndef _GPUCODE
   #include <math.h>
@@ -21,7 +21,7 @@
 //}   
 
 // To use CERNLIB Faddeeva 
-#include "faddeeva_cern.h"
+#include "BB_faddeeva_cern.h"
 
 cmpx wfun(cmpx zz){
   cmpx res;

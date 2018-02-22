@@ -1,6 +1,6 @@
-import propagate_sigma_matrix as psm
-import boost as boost
-import slicing
+import BB6D_propagate_sigma_matrix as psm
+import BB6D_boost as boost
+import BB6D_slicing as slicing
 
 import numpy as np
 
