@@ -44,7 +44,7 @@ void BB6D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb6ddat
     int N_slices = (int)(bb6ddata->N_slices);
     int i_slice;
     
-//     /*// Check data transfer
+     /*// Check data transfer
     printf("x=%e\n",particles->x[partid]);
     printf("sphi=%e\n",(bb6ddata->parboost).sphi);
     printf("calpha=%e\n",(bb6ddata->parboost).calpha);
@@ -58,7 +58,7 @@ void BB6D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb6ddat
     printf("y_slices_star[5]=%e\n",y_slices_star[5]);         
     printf("sigma_slices_star[0]=%e\n",sigma_slices_star[0]); 
     printf("sigma_slices_star[5]=%e\n",sigma_slices_star[5]);
-    // */
+     */
     
 
     double x_star     = particles->x[partid];
@@ -69,7 +69,7 @@ void BB6D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb6ddat
     double delta_star = particles->delta[partid];  
 
     double p0 = particles->p0c[partid]*QELEM/C_LIGHT;  
-    double q0 = particles->q0[partid]; 
+    double q0 = particles->q0[partid]*QELEM; 
     
     
     // Boost coordinates of the weak beam
@@ -86,6 +86,15 @@ void BB6D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb6ddat
         
         //Compute force scaling factor
         double Ksl = N_part_per_slice[i_slice]*bb6ddata->q_part*q0/(p0*C_LIGHT);
+
+        /*// DEBUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        printf("Ksl=%f\n", Ksl);
+        printf("p0=%e\n", p0);
+        printf("q0=%e\n", q0);
+        printf("N_part_per_slice[i_slice]=%e\n", N_part_per_slice[i_slice]);
+        printf("b6ddata->q_part=%e\n", bb6ddata->q_part);
+        break;
+        // END DEBUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
         //Identify the Collision Point (CP)
         double S = 0.5*(sigma_star - sigma_slice_star);
@@ -113,7 +122,7 @@ void BB6D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb6ddat
         // Compute derivatives of the transformation
         double dS_x_bar_hat_star = x_bar_star*dS_costheta +y_bar_star*dS_sintheta;
         double dS_y_bar_hat_star = -x_bar_star*dS_sintheta +y_bar_star*dS_costheta;
-        
+
         // Get transverse fieds
         double Ex, Ey, Gx, Gy;
         get_Ex_Ey_Gx_Gy_gauss(x_bar_hat_star, y_bar_hat_star, 

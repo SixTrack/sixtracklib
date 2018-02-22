@@ -4,6 +4,7 @@ import sixtracklib
 import numpy as np
 
 from scipy.constants import e as qe
+from scipy.constants import c as c_light
 
 #crossing plane
 alpha = 0.7
@@ -57,9 +58,29 @@ machine.add_BeamBeam(name='bb',
 
 bb = machine.bb_data_list[0]
 
-bunch=sixtracklib.CParticles(npart=2)
-bunch.x = bunch.x*0.+0.3
-bunch.y = bunch.y*0.+0.2
+bunch=sixtracklib.CParticles(npart=2, p0c =6.5e12)
+
+
+x = 1e-3
+px = 50e-3
+y = 2e-3
+py = 27e-3
+sigma = 3.
+delta = 2e-4
+
+
+bunch.x = bunch.x*0.+x
+bunch.y = bunch.x*0.+y
+bunch.px = bunch.x*0.+px
+bunch.py = bunch.x*0.+py
+bunch.sigma = bunch.x*0.+sigma
+bunch.delta = bunch.x*0.+delta
 
 particles,ebe,tbt=machine.track_cl(bunch,nturns=1,
                                   elembyelem=True,turnbyturn=True)
+
+#Compare the two
+print('\n\n\n')
+names_list = 'x px y py sigma delta'.split()
+for name in names_list:
+    print('D_'+name+ ' %.10e'%np.diff(getattr(tbt, name), axis=0)[0,0])
