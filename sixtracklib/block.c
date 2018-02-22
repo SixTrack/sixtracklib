@@ -82,31 +82,16 @@ void track_single(Particles *particles, uint64_t partid,
                         Align_get_sz(elem),
                         Align_get_dx(elem),
                         Align_get_dy(elem)    );
+                break;
             case BeamBeamID:
-                printf("In BB!\n");
+                printf("Strange!\n");
                 uint64_t data_size = elem[1].i64;
                 uint64_t data_offset = elem[2].i64;
-
-                printf("data size %d\n", data_size);
-                printf("data offset %d\n", data_offset);
 
                 CLGLOBAL value_t* data = elem + data_offset;
                 
                 BB6D_track(particles, partid, data);
-
-                // int ibb;
-                // for (ibb=0; ibb<data_size; ibb++){
-                //     printf("data[%d] = %f\n", ibb, data[ibb].f64);
-                // }
-
-                // = elem;// + data_offset*sizeof(value_t);
-
-                // printf("Elem[0] (int) %d\n", elem[0].i64);
-                // printf("Elem[1] (int) %d\n", elem[1].i64);
-                // printf("Elem[2] (int) %d\n", elem[2].i64);
-                // printf("Elem[3] (float) %f\n", elem[3].f64);
-                // printf("Elem[4] (float) %f\n", elem[4].f64);    
-                // printf("Elem[5] (float) %f\n", elem[5].f64);             
+         
                 break;
         }//end switch
     }//end if state
