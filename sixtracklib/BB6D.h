@@ -29,11 +29,7 @@ typedef struct{
 
 void BB6D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb6ddata_ptr){
    
-    // printf("qpart=%e\n", bb6ddata_ptr[0].f64);
-
     CLGLOBAL BB6D_data *bb6ddata = (CLGLOBAL BB6D_data*) bb6ddata_ptr;
-
-    // printf("qpart=%e\n", bb6ddata->q_part);
 
     CLGLOBAL double* N_part_per_slice = ((CLGLOBAL double*)(&(bb6ddata->ptr_N_part_per_slice)))+(bb6ddata->ptr_N_part_per_slice)+1;
     CLGLOBAL double* x_slices_star = ((CLGLOBAL double*)(&(bb6ddata->ptr_x_slices_star)))+(bb6ddata->ptr_x_slices_star)+1;
@@ -86,15 +82,6 @@ void BB6D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb6ddat
         
         //Compute force scaling factor
         double Ksl = N_part_per_slice[i_slice]*bb6ddata->q_part*q0/(p0*C_LIGHT);
-
-        /*// DEBUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        printf("Ksl=%f\n", Ksl);
-        printf("p0=%e\n", p0);
-        printf("q0=%e\n", q0);
-        printf("N_part_per_slice[i_slice]=%e\n", N_part_per_slice[i_slice]);
-        printf("b6ddata->q_part=%e\n", bb6ddata->q_part);
-        break;
-        // END DEBUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
         //Identify the Collision Point (CP)
         double S = 0.5*(sigma_star - sigma_slice_star);
