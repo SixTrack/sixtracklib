@@ -92,10 +92,12 @@ void track_single(Particles *particles, uint64_t partid,
 
                 CLGLOBAL value_t* data = elem + data_offset;
                 
-                int ibb;
-                for (ibb=0; ibb<data_size; ibb++){
-                    printf("data[%d] = %f\n", ibb, data[ibb].f64);
-                }
+                BB6D_track(data);
+
+                // int ibb;
+                // for (ibb=0; ibb<data_size; ibb++){
+                //     printf("data[%d] = %f\n", ibb, data[ibb].f64);
+                // }
 
                 // = elem;// + data_offset*sizeof(value_t);
 

@@ -6,6 +6,8 @@
 // #include "BB6D_transverse_fields.h"
 #include "constants.h"
 
+#include "block.h"
+
 // To have uint64_t
 //#include <stdint.h>
 
@@ -24,8 +26,10 @@ typedef struct{
 
 // void BB6D_track(double* x, double* px, double* y, double* py, double* sigma, 
 //                 double* delta, double q0, double p0, BB6D_data *bb6ddata){
-    
-    
+
+void BB6D_track(CLGLOBAL value_t *bb6ddata){
+   
+    printf("qpart=%e\n", bb6ddata[0].f64);
 //     #ifdef DATA_PTR_IS_OFFSET
 //     CLGLOBAL double* N_part_per_slice = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->N_part_per_slice))) + ((uint64_t) bb6ddata->N_part_per_slice) + 1);
 //     CLGLOBAL double* x_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->x_slices_star))) + ((uint64_t) bb6ddata->x_slices_star) + 1);
@@ -151,6 +155,6 @@ typedef struct{
 //     *sigma = sigma_star;
 //     *delta = delta_star;
                     
-// }
+}
 
 #endif
