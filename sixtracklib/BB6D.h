@@ -18,31 +18,28 @@ typedef struct{
     double min_sigma_diff;
     double threshold_singular;
     long int N_slices;
-    long int N_part_per_slice;
-    long int x_slices_star;
-    long int y_slices_star;
-    long int sigma_slices_star;
+    long int ptr_N_part_per_slice;
+    long int prt_x_slices_star;
+    long int ptr_y_slices_star;
+    long int ptr_sigma_slices_star;
 }BB6D_data;
 
 // void BB6D_track(double* x, double* px, double* y, double* py, double* sigma, 
 //                 double* delta, double q0, double p0, BB6D_data *bb6ddata){
 
-void BB6D_track(CLGLOBAL value_t *bb6ddata){
+void BB6D_track(CLGLOBAL value_t *bb6ddata_ptr){
    
-    printf("qpart=%e\n", bb6ddata[0].f64);
-//     #ifdef DATA_PTR_IS_OFFSET
-//     CLGLOBAL double* N_part_per_slice = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->N_part_per_slice))) + ((uint64_t) bb6ddata->N_part_per_slice) + 1);
-//     CLGLOBAL double* x_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->x_slices_star))) + ((uint64_t) bb6ddata->x_slices_star) + 1);
-//     CLGLOBAL double* y_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->y_slices_star))) + ((uint64_t) bb6ddata->y_slices_star) + 1);
-//     CLGLOBAL double* sigma_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->sigma_slices_star))) + ((uint64_t) bb6ddata->sigma_slices_star) + 1);
-//     //printf("Right branch\n");
-//     #else
-//     double* sigma_slices_star = bb6ddata->sigma_slices_star;
-//     double* N_part_per_slice = bb6ddata->N_part_per_slice;
-//     double* x_slices_star = bb6ddata->x_slices_star;
-//     double* y_slices_star = bb6ddata->y_slices_star;
-//     double* sigma_slices_star = bb6ddata->sigma_slices_star;
-//     #endif
+    printf("qpart=%e\n", bb6ddata_ptr[0].f64);
+
+    CLGLOBAL BB6D_data *bb6ddata = (CLGLOBAL BB6D_data*) bb6ddata_ptr;
+
+    printf("qpart=%e\n", bb6ddata->q_part);
+
+    //CLGLOBAL double* N_part_per_slice = (valuet_t*)(((CLGLOBAL uint64_t*) (&(bb6ddata->N_part_per_slice))) + ((uint64_t) bb6ddata->N_part_per_slice) + 1);
+    // CLGLOBAL double* x_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->x_slices_star))) + ((uint64_t) bb6ddata->x_slices_star) + 1);
+    // CLGLOBAL double* y_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->y_slices_star))) + ((uint64_t) bb6ddata->y_slices_star) + 1);
+    // CLGLOBAL double* sigma_slices_star = (double*)(((CLGLOBAL uint64_t*) (&(bb6ddata->sigma_slices_star))) + ((uint64_t) bb6ddata->sigma_slices_star) + 1);
+
     
 //     int N_slices = (int)(bb6ddata->N_slices);
 //     int i_slice;
