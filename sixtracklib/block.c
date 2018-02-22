@@ -84,7 +84,8 @@ void track_single(Particles *particles, uint64_t partid,
                         Align_get_dy(elem)    );
                 break;
             case BeamBeamID:
-                printf("Strange!\n");
+                // printf("Strange!\n");
+                {
                 uint64_t data_size = elem[1].i64;
                 uint64_t data_offset = elem[2].i64;
 
@@ -93,6 +94,7 @@ void track_single(Particles *particles, uint64_t partid,
                 BB6D_track(particles, partid, data);
          
                 break;
+                }
         }//end switch
     }//end if state
 }
