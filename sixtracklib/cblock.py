@@ -81,6 +81,17 @@ class BeamBeam(CObject):
     datasize    = CProp('u64',1,const=True)
     data        = CProp('f64',2,length='datasize')
 
+    def __init__(self,
+                q_part, N_part_tot, sigmaz, N_slices, min_sigma_diff, threshold_singular,
+                phi, alpha, 
+                Sig_11_0, Sig_12_0, Sig_13_0, 
+                Sig_14_0, Sig_22_0, Sig_23_0, 
+                Sig_24_0, Sig_33_0, Sig_34_0, Sig_44_0,
+                **nvargs):
+       print repr(nvargs)
+       data=np.array([1,2,3,4],dtype='float')
+       CObject.__init__(self, data=data, datasize=len(data), **nvargs)
+
 class CBlock(object):
     """ Block object
     """
