@@ -2,18 +2,19 @@ import sys; sys.path.append('../')
 sys.path.append('../../pyoptics/')
 
 import sixtracklib
-import metaclass as mtc
 import numpy as np
 
-twob = mtc.twiss('twiss.out')
+import tfsdata
+
+twdict = tfsdata.open('twiss.out')
 
 machine = sixtracklib.CBlock()
 
-for i_ele, name in enumerate(twob.NAME):
-	if twob.KEYWORD[i_ele]=='MULTIPOLE':
-		machine.add_Multipole(name=name, knl=[0.0,twob.K1L[i_ele]])
-	elif twob.KEYWORD[i_ele]=='DRIFT':
-		machine.add_Drift(name=name, length=twob.L[i_ele])
+for i_ele, name in enumerate(twdict['name']):
+	if twdict['keyword'][i_ele]=='MULTIPOLE':
+		machine.add_Multipole(name=name, knl=[0.0,twdict['k1l'][i_ele]])
+	elif twdict['keyword'][i_ele]=='DRIFT':
+		machine.add_Drift(name=name, length=twdict['l'][i_ele])
 	else:
 		print('Skipped: %s'%name)
 
