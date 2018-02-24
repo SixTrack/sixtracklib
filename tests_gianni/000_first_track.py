@@ -111,7 +111,10 @@ for i_part in range(npart):
 	spphase.plot(tbt.sigma[:,i_part], tbt.delta[:,i_part])
 
 
+spphase.set_xlim(-.6, .6)
+sps.set_ylim(-.6, .6)
 
+spfx.set_xlim(left=-.05)
 
 # pl.figure(1)
 # ax1 = pl.subplot(2,1,1)
