@@ -25,7 +25,7 @@ f_RF = h_RF*c_light/(length)
 for i_ele, name in enumerate(twdict['name']):
 	if twdict['keyword'][i_ele]=='MULTIPOLE':
 		if twdict['k0l'][i_ele] != 0:
-			machine.add_Multipole(name=name, knl=[twdict['k0l'][i_ele]], hxl=twdict['k0l'][i_ele], l=1e-3)
+			machine.add_Multipole(name=name, knl=[twdict['k0l'][i_ele]], hxl=twdict['k0l'][i_ele], length=1e10)
 		else:
 			machine.add_Multipole(name=name, knl=[0.,twdict['k1l'][i_ele]])
 	elif twdict['keyword'][i_ele]=='DRIFT':
