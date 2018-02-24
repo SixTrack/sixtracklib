@@ -6,9 +6,9 @@ import numpy as np
 from scipy.constants import c as c_light
 pmass_eV = 938.272046e6
 
-V_RF = 100e6
-lag_RF = 0.5
-h_RF = 9000
+V_RF = 10e6
+lag_RF = 0.
+h_RF = 1
 
 
 import tfsdata
@@ -20,12 +20,13 @@ machine = sixtracklib.CBlock()
 length = twdict['param']['length'] 
 f_RF = h_RF*c_light/(length)
 
-#machine.add_Cavity(voltage=V_RF,frequency=f_RF,lag=lag_RF)
+machine.add_Cavity(voltage=V_RF,frequency=f_RF,lag=lag_RF)
 
 for i_ele, name in enumerate(twdict['name']):
 	if twdict['keyword'][i_ele]=='MULTIPOLE':
 		if twdict['k0l'][i_ele] != 0:
-			machine.add_Multipole(name=name, knl=[twdict['k0l'][i_ele]], hxl=twdict['k0l'][i_ele], length=1e10)
+			pass
+			#machine.add_Multipole(name=name, knl=[twdict['k0l'][i_ele]], hxl=twdict['k0l'][i_ele], length=1e10)
 		else:
 			machine.add_Multipole(name=name, knl=[0.,twdict['k1l'][i_ele]])
 	elif twdict['keyword'][i_ele]=='DRIFT':
@@ -40,7 +41,7 @@ p0c_eV = 6500e9
 gamma0 = np.sqrt(p0c_eV**2+pmass_eV**2)/pmass_eV
 beta0 = p0c_eV/np.sqrt(p0c_eV**2+pmass_eV**2)
 
-delta = 0.#1e-3
+delta = 1e-6
 rpp = 1./(delta+1)
 pc_eV = p0c_eV/rpp
 gamma = np.sqrt(1. + (pc_eV/pmass_eV)**2)
@@ -56,10 +57,10 @@ bunch=sixtracklib.CParticles(npart=1,
 		rvv = rvv,
 		rpp = rpp,
 		psigma = psigma)
-bunch.x[0]=0.3
-bunch.y[0]=0.2
+bunch.x[0]=0.0
+bunch.y[0]=0.0
 
-particles,ebe,tbt=machine.track_cl(bunch,nturns=1024,elembyelem=None,turnbyturn=True)
+particles,ebe,tbt=machine.track_cl(bunch,nturns=1024*10,elembyelem=None,turnbyturn=True)
 
 import numpy.fft as fft
 spec_x = fft.fft(tbt.x[:,0])
@@ -85,5 +86,7 @@ pl.figure(3)
 axl1 = pl.subplot(2,1,1)
 pl.plot(tbt.delta[:,0])
 
+axl2 = pl.subplot(2,1,2)
+pl.plot(tbt.sigma[:,0])
 
 pl.show()

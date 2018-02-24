@@ -5,7 +5,7 @@ import sixtracklib
 import numpy as np
 
 machine = sixtracklib.CBlock()
-machine.add_Multipole(name='test_dip', knl=[1e-3], length=1.e10, hxl=1e-3)
+machine.add_Multipole(name='test_dip', knl=[1e-3], length=1., hxl=1e-3)
 
 
 #from scipy.constants import c as c_light
