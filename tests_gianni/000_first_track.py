@@ -51,8 +51,9 @@ for i_ele in indices:
 
 
 
+npart = 10
 
-delta = 3e-4
+delta = np.linspace(0, 8e-4, npart)
 rpp = 1./(delta+1)
 pc_eV = p0c_eV/rpp
 gamma = np.sqrt(1. + (pc_eV/pmass_eV)**2)
@@ -60,7 +61,7 @@ beta = np.sqrt(1.-1./gamma**2)
 rvv=beta/beta0
 psigma = pmass_eV*(gamma-gamma0)/(beta0*p0c_eV)
 
-bunch=sixtracklib.CParticles(npart=1, 
+bunch=sixtracklib.CParticles(npart=npart, 
 		p0c=p0c_eV,
 		beta0 = beta0,
 		gamma0 = gamma0,
@@ -68,41 +69,72 @@ bunch=sixtracklib.CParticles(npart=1,
 		rvv = rvv,
 		rpp = rpp,
 		psigma = psigma)
-bunch.x[0]=0.001
-bunch.y[0]=0.002
+bunch.x+=0.001
+bunch.y+=0.002
 
 particles,ebe,tbt=machine.track_cl(bunch,nturns=512,elembyelem=None,turnbyturn=True)
-
-import numpy.fft as fft
-spec_x = fft.fft(tbt.x[:,0])
-freq = fft.fftfreq(len(spec_x))
-spec_y = fft.fft(tbt.y[:,0])
 
 
 import matplotlib.pyplot as pl
 pl.close('all')
-pl.figure(1)
-ax1 = pl.subplot(2,1,1)
-pl.plot(tbt.x[:,0])
-ax2 = pl.subplot(2,1,2, sharex=ax1)
-pl.plot(tbt.y[:,0])
+fig1 = pl.figure(1, figsize=(8*2,6))
+fig1.set_facecolor('w')
+spx = pl.subplot(2,2,1)
+spy = pl.subplot(2,2,3, sharex=spx)
+spfx = pl.subplot(2,2,2)
+spfy = pl.subplot(2,2,4, sharex=spfx)
 
-pl.figure(2)
-axf1 = pl.subplot(2,1,1)
-pl.plot(freq, np.abs(spec_x))
-axf2 = pl.subplot(2,1,2, sharex=axf1)
-pl.plot(freq, np.abs(spec_y))
+fig2 = pl.figure(2, figsize=(8*2,6))
+fig2.set_facecolor('w')
+sps = pl.subplot(2,2,1)
+spd = pl.subplot(2,2,3, sharex=spx)
+spphase = pl.subplot2grid(shape=(2,2), loc=(0,1), rowspan=2)
 
-pl.figure(3)
-axl1 = pl.subplot(2,1,1)
-pl.plot(tbt.delta[:,0])
 
-axl2 = pl.subplot(2,1,2)
-pl.plot(tbt.sigma[:,0])
+import numpy.fft as fft
 
-pl.figure(4)
-axl1 = pl.subplot(2,1,1)
-pl.plot(tbt.sigma[:,0], tbt.delta[:,0])
+for i_part in range(npart):
+
+	spec_x = fft.fft(tbt.x[:,i_part])
+	freq = fft.fftfreq(len(spec_x))
+	spec_y = fft.fft(tbt.y[:,i_part])
+
+	spx.plot(tbt.x[:,i_part])
+	spy.plot(tbt.y[:,i_part])
+
+	spfx.plot(freq, np.abs(spec_x))
+	spfy.plot(freq, np.abs(spec_y))
+
+	sps.plot(tbt.sigma[:,i_part])
+	spd.plot(tbt.delta[:,i_part])
+
+	spphase.plot(tbt.sigma[:,i_part], tbt.delta[:,i_part])
+
+
+
+
+# pl.figure(1)
+# ax1 = pl.subplot(2,1,1)
+# 
+# ax2 = pl.subplot(2,1,2, sharex=ax1)
+# pl.plot(tbt.y[:,i_part])
+
+# pl.figure(2)
+# axf1 = pl.subplot(2,1,1)
+# pl.plot(freq, np.abs(spec_x))
+# axf2 = pl.subplot(2,1,2, sharex=axf1)
+# pl.plot(freq, np.abs(spec_y))
+
+# pl.figure(3)
+# axl1 = pl.subplot(2,1,1)
+# pl.plot(tbt.delta[:,i_part])
+
+# axl2 = pl.subplot(2,1,2)
+# pl.plot(tbt.sigma[:,i_part])
+
+# pl.figure(4)
+# axl1 = pl.subplot(2,1,1)
+# pl.plot(tbt.sigma[:,i_part], tbt.delta[:,i_part])
 
 
 pl.show()
