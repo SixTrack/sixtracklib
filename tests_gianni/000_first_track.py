@@ -7,7 +7,7 @@ from scipy.constants import c as c_light
 pmass_eV = 938.272046e6
 
 V_RF = 10e6
-lag_RF = np.pi/2
+lag_RF = np.pi
 h_RF = 35000
 
 
@@ -24,15 +24,22 @@ beta0 = p0c_eV/np.sqrt(p0c_eV**2+pmass_eV**2)
 length = twdict['param']['length'] 
 f_RF = h_RF*c_light*beta0/(length)
 
+# I want to start in a place with 0 dispersion
+start_at = 'AT_IP5'
+i_start = np.where(twdict['name']==start_at)[0][0]
 
+indices = range(i_start, len(twdict['name']))+range(0, i_start)
 
-for i_ele, name in enumerate(twdict['name']):
+for i_ele in indices:
+
+	name = twdict['name'][i_ele]
+
 	if twdict['keyword'][i_ele]=='MULTIPOLE':
 		if twdict['k0l'][i_ele] != 0:
 			machine.add_Multipole(name=name, knl=[twdict['k0l'][i_ele]], hxl=twdict['k0l'][i_ele], length=1e20)
 		else:
-			print name
-			machine.add_Multipole(name=name, knl=[0.,twdict['k1l'][i_ele],twdict['k2l'][i_ele]])
+			#print name
+			machine.add_Multipole(name=name, knl=[0.,twdict['k1l'][i_ele],twdict['k2l'][i_ele]/2.])
 	elif twdict['keyword'][i_ele]=='DRIFT':
 		machine.add_Drift(name=name, length=twdict['l'][i_ele])
 	elif twdict['keyword'][i_ele]=='RFCAVITY':
@@ -45,7 +52,7 @@ for i_ele, name in enumerate(twdict['name']):
 
 
 
-delta = 5e-4
+delta = 3e-4
 rpp = 1./(delta+1)
 pc_eV = p0c_eV/rpp
 gamma = np.sqrt(1. + (pc_eV/pmass_eV)**2)
@@ -63,8 +70,6 @@ bunch=sixtracklib.CParticles(npart=1,
 		psigma = psigma)
 bunch.x[0]=0.001
 bunch.y[0]=0.002
-
-
 
 particles,ebe,tbt=machine.track_cl(bunch,nturns=512,elembyelem=None,turnbyturn=True)
 
