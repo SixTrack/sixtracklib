@@ -1,5 +1,4 @@
 import sys; sys.path.append('../')
-sys.path.append('../../pyoptics/')
 
 import sixtracklib
 import numpy as np
@@ -10,7 +9,6 @@ pmass_eV = 938.272046e6
 V_RF = 100e6
 lag_RF = 0.5
 h_RF = 9000
-
 
 
 import tfsdata
@@ -26,8 +24,10 @@ f_RF = h_RF*c_light/(length)
 
 for i_ele, name in enumerate(twdict['name']):
 	if twdict['keyword'][i_ele]=='MULTIPOLE':
-		machine.add_Multipole(name=name, knl=[twdict['k0l'][i_ele],twdict['k1l'][i_ele]], 
-								angle = twdict['k0l'][i_ele])
+		if twdict['k0l'][i_ele] != 0:
+			machine.add_Multipole(name=name, knl=[twdict['k0l'][i_ele]], hxl=twdict['k0l'][i_ele], l=1e-3)
+		else:
+			machine.add_Multipole(name=name, knl=[0.,twdict['k1l'][i_ele]])
 	elif twdict['keyword'][i_ele]=='DRIFT':
 		machine.add_Drift(name=name, length=twdict['l'][i_ele])
 	else:
