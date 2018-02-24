@@ -95,7 +95,10 @@ int Cavity_track(Particles* p, uint64_t ip,
 
     double phase, pt, opd, beta;
     phase = lag-2*M_PI/CLIGHT*freq*p->sigma[ip]/p->beta0[ip];
-    printf("phase=%e\n", phase);
+    // printf("phase=%e\n", phase);
+    // printf("lag=%e\n", lag);
+    // printf("p->sigma[ip]=%e\n", p->sigma[ip]);
+
     p->psigma[ip] += p->chi[ip]*volt*sin(phase)/(p->p0c[ip]*p->beta0[ip]);
     pt = p->psigma[ip] * p->beta0[ip];
     opd = sqrt( pt*pt+ 2*p->psigma[ip] + 1 );
