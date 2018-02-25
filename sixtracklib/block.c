@@ -30,13 +30,15 @@ CLGLOBAL double* Multipole_get_bal(CLGLOBAL value_t *elem){
 double Cavity_get_voltage  (CLGLOBAL value_t *elem){ return elem[1].f64;}
 double Cavity_get_frequency(CLGLOBAL value_t *elem){ return elem[2].f64;}
 double Cavity_get_lag      (CLGLOBAL value_t *elem){ return elem[3].f64;}
+double Cavity_get_lag_rad  (CLGLOBAL value_t *elem){ return elem[4].f64;}
 
 //Align
 
-double Align_get_cz(CLGLOBAL value_t *elem){return elem[1].f64;}
-double Align_get_sz(CLGLOBAL value_t *elem){return elem[2].f64;}
-double Align_get_dx(CLGLOBAL value_t *elem){return elem[3].f64;}
-double Align_get_dy(CLGLOBAL value_t *elem){return elem[4].f64;}
+double Align_get_tilt(CLGLOBAL value_t *elem){return elem[1].f64;}
+double Align_get_cz  (CLGLOBAL value_t *elem){return elem[2].f64;}
+double Align_get_sz  (CLGLOBAL value_t *elem){return elem[3].f64;}
+double Align_get_dx  (CLGLOBAL value_t *elem){return elem[4].f64;}
+double Align_get_dy  (CLGLOBAL value_t *elem){return elem[5].f64;}
 
 
 // Tracking loop
@@ -72,7 +74,7 @@ void track_single(Particles *particles, uint64_t partid,
                 Cavity_track(particles, partid,
                         Cavity_get_voltage(elem),
                         Cavity_get_frequency(elem),
-                        Cavity_get_lag(elem)       );
+                        Cavity_get_lag_rad(elem)   );
                 break;
             case AlignID:
                 Align_track(particles, partid,

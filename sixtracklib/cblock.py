@@ -65,15 +65,17 @@ class Cavity(CObject):
     voltage   = CProp('f64',1)
     frequency = CProp('f64',2)
     lag       = CProp('f64',3)
+    lag_rad   = CProp('f64',4)
     def __init__(self,lag=0.,**nvargs):
-        CObject.__init__(self,lag=lag/180.*np.pi,**nvargs)
+        CObject.__init__(self,lag_rad=lag/180.*np.pi,**nvargs)
 
 class Align(CObject):
     objid  = CProp('u64',0,default=6)
-    cz     = CProp('f64',1)
-    sz     = CProp('f64',2)
-    dx     = CProp('f64',3)
-    dy     = CProp('f64',3)
+    tilt   = CProp('f64',1)
+    cz     = CProp('f64',2)
+    sz     = CProp('f64',3)
+    dx     = CProp('f64',4)
+    dy     = CProp('f64',5)
     def __init__(self,tilt=0.,**nvargs):
       cz=np.cos(tilt/180.*np.pi)
       sz=np.sin(tilt/180.*np.pi)
