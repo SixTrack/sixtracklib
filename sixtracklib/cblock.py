@@ -50,6 +50,7 @@ class Multipole(CObject):
       fact=1
       for n in range(len(bal)//2):
           bal[n*2:n*2+2]/=fact
+          fact*=(n+1)
       if len(bal)>=2 and len(bal)%2==0:
           order=len(bal)//2-1
       else:
@@ -64,6 +65,8 @@ class Cavity(CObject):
     voltage   = CProp('f64',1)
     frequency = CProp('f64',2)
     lag       = CProp('f64',3)
+    def __init__(self,lag=0.,**nvargs):
+        CObject.__init__(self,lag=lag/180.*np.pi,**nvargs)
 
 class Align(CObject):
     objid  = CProp('u64',0,default=6)
@@ -71,7 +74,7 @@ class Align(CObject):
     sz     = CProp('f64',2)
     dx     = CProp('f64',3)
     dy     = CProp('f64',3)
-    def __init__(self,tilt,**nvargs):
+    def __init__(self,tilt=0.,**nvargs):
       cz=np.cos(tilt/180.*np.pi)
       sz=np.sin(tilt/180.*np.pi)
       CObject.__init__(self,cz=cz,sz=sz,**nvargs)
