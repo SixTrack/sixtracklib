@@ -100,12 +100,23 @@ int Cavity_track(Particles* p, uint64_t ip,
     opd = sqrt( pt*pt+ 2*p->psigma[ip] + 1 );
     p->delta[ip] = opd - 1;
     beta = opd/(1/p->beta0[ip]+pt);
-
     p->rpp[ip] = 1/opd;
     p->rvv[ip] = p->beta0[ip]/beta;
 
     return 1;
 }
+
+int Cavity_track2(Particles* p, uint64_t ip,
+                 double volt, double freq, double lag){
+
+    double sigma=Particles_sigma(p,ip);
+    double beta0=Particles_beta0(p,ip);
+    double phase = lag-2*M_PI/CLIGHT*freq*p->sigma[ip]/p->beta0[ip];
+    Particles_addto_energy(p,ip,volt*sin(phase));
+    return 1;
+}
+
+
 
 
 int Align_track(Particles* p, uint64_t ip,
