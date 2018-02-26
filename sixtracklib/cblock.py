@@ -25,7 +25,6 @@ except ImportError:
     pass
 
 
-
 class Drift(CObject):
     objid = CProp('u64', 0, default=2)
     length = CProp('f64', 1, default=0)
@@ -37,12 +36,12 @@ class DriftExact(CObject):
 
 
 class Multipole(CObject):
-    objid  = CProp('u64', 0, default=4)
-    order  = CProp('u64', 1, default=0, const=True)
+    objid = CProp('u64', 0, default=4)
+    order = CProp('u64', 1, default=0, const=True)
     length = CProp('f64', 2, default=0)
-    hxl    = CProp('f64', 3, default=0)
-    hyl    = CProp('f64', 4, default=0)
-    bal    = CProp('f64', 5, default=0, length='2*(order+1)')
+    hxl = CProp('f64', 3, default=0)
+    hyl = CProp('f64', 4, default=0)
+    bal = CProp('f64', 5, default=0, length='2*(order+1)')
 
     def __init__(self, knl=[], ksl=[], **nvargs):
         if len(knl) > len(ksl):
@@ -64,41 +63,46 @@ class Multipole(CObject):
 
 
 class Cavity(CObject):
-    objid     = CProp('u64',0,default=5)
-    voltage   = CProp('f64',1)
-    frequency = CProp('f64',2)
-    lag       = CProp('f64',3)
-    lag_rad   = CProp('f64',4)
+    objid = CProp('u64', 0, default=5)
+    voltage = CProp('f64', 1)
+    frequency = CProp('f64', 2)
+    lag = CProp('f64', 3)
+    lag_rad = CProp('f64', 4)
+
     def __init__(self, lag=0., **nvargs):
         CObject.__init__(self, lag_rad=lag/180.*np.pi, **nvargs)
 
+
 class Align(CObject):
-    objid  = CProp('u64',0,default=6)
-    tilt   = CProp('f64',1)
-    cz     = CProp('f64',2)
-    sz     = CProp('f64',3)
-    dx     = CProp('f64',4)
-    dy     = CProp('f64',5)
+    objid = CProp('u64', 0, default=6)
+    tilt = CProp('f64', 1)
+    cz = CProp('f64', 2)
+    sz = CProp('f64', 3)
+    dx = CProp('f64', 4)
+    dy = CProp('f64', 5)
+
     def __init__(self, tilt=0., **nvargs):
         cz = np.cos(tilt/180.*np.pi)
         sz = np.sin(tilt/180.*np.pi)
         CObject.__init__(self, cz=cz, sz=sz, **nvargs)
 
+
 class BeamBeam(CObject):
-    objid       = CProp('u64',0,default=10)
-    datasize    = CProp('u64',1,const=True)
-    data        = CProp('f64',2,length='datasize')
+    objid = CProp('u64', 0, default=10)
+    datasize = CProp('u64', 1, const=True)
+    data = CProp('f64', 2, length='datasize')
+
 
 class CBlock(object):
     """ Block object
     """
-    _elem_types = dict(Drift     = 2,
-                      DriftExact = 3,
-                      Multipole  = 4,
-                      Cavity     = 5,
-                      Align      = 6,
-                      Block      = 7,
-                      BeamBeam   = 10)
+    _elem_types = dict(Drift=2,
+                       DriftExact=3,
+                       Multipole=4,
+                       Cavity=5,
+                       Align=6,
+                       Block=7,
+                       BeamBeam=10)
 
     def __init__(self):
         self._cbuffer = CBuffer(1)
@@ -175,6 +179,3 @@ class CBlock(object):
             if elembyelem:
                 cl.enqueue_copy(queue, elembyelem._cbuffer.data, elembyelem_g)
             return particles, elembyelem, turnbyturn
-
-
-
