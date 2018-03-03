@@ -52,6 +52,38 @@ for i_ele in indices:
 machine.add_Multipole(name=name, knl=[20.e-6])
 machine.add_Multipole(name=name, ksl=[30.e-6])
 
+def one_turn_map(coord):
+
+	# coord = np.array([x, px, y, py, sigma, delta])
+
+	npart = 1
+
+	delta = coord[5]
+	rpp = 1./(delta+1)
+	pc_eV = p0c_eV/rpp
+	gamma = np.sqrt(1. + (pc_eV/pmass_eV)**2)
+	beta = np.sqrt(1.-1./gamma**2)
+	rvv=beta/beta0
+	psigma = pmass_eV*(gamma-gamma0)/(beta0*p0c_eV)
+
+	bunch=sixtracklib.CParticles(npart=npart, 
+			p0c=p0c_eV,
+			beta0 = beta0,
+			gamma0 = gamma0,
+			delta = delta,
+			rvv = rvv,
+			rpp = rpp,
+			psigma = psigma)
+	bunch.x+=coord[0]
+	bunch.px+=coord[1]
+	bunch.y+=coord[2]
+	bunch.py+=coord[3]
+	bunch.sigma+=coord[4]
+
+	particles,ebe,tbt = machine.track_cl(bunch,nturns=1,elembyelem=None,turnbyturn=None)
+
+	return np.array([particles.x[0], particles.px[0], particles.y[0], particles.py[0], 
+					particles.sigma[0], particles.delta[0]])
 
 
 npart = 1
