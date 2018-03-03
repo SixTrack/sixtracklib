@@ -3,6 +3,8 @@ import sys; sys.path.append('../')
 import sixtracklib
 import numpy as np
 
+import scipy.optimize as so
+
 from scipy.constants import c as c_light
 pmass_eV = 938.272046e6
 
@@ -80,11 +82,17 @@ def one_turn_map(coord):
 	bunch.py+=coord[3]
 	bunch.sigma+=coord[4]
 
-	particles,ebe,tbt = machine.track_cl(bunch,nturns=1,elembyelem=None,turnbyturn=None)
+	particles,ebe,tbt = machine.track_cl(bunch,nturns=1,elembyelem=None,turnbyturn=True)
 
-	return np.array([particles.x[0], particles.px[0], particles.y[0], particles.py[0], 
-					particles.sigma[0], particles.delta[0]])
+	return np.array([tbt.x[1], tbt.px[1], tbt.y[1], tbt.py[1], 
+					tbt.sigma[1], tbt.delta[1]])
 
+
+# fxdpt = so.fixed_point(one_turn_map, np.array([0.,0.,0.,0.,0.,0.]))
+
+tominimize = lambda coord: np.sum((one_turn_map(coord)-coord)**2)
+
+res = so.minimize(tominimize, np.array([0.,0.,0.,0.,0.,0.]), tol=1e-10)
 
 npart = 1
 
