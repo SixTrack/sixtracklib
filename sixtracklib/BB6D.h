@@ -152,6 +152,14 @@ void BB6D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb6ddat
     particles->py[partid] = py_star;
     particles->sigma[partid] = sigma_star;
     particles->delta[partid] = delta_star;
+
+    // Update other longitudinal coordinates (TO BE TESTED!!!!)
+    particles->rpp[partid] = 1./(delta_star+1.);
+    double pc_eV = particles->p0c[partid]/particles->rpp[partid];
+    double gamma = sqrt(1. + (pc_eV/particles->mass0[partid])*(pc_eV/particles->mass0[partid]));
+    double beta = sqrt(1.-1./(gamma*gamma));
+    particles->rvv[partid] = beta/particles->beta0[partid];
+    particles->psigma[partid] = particles->mass0[partid]*(gamma-particles->gamma0[partid])/(particles->beta0[partid]*particles->p0c[partid]);
                     
 }
 
