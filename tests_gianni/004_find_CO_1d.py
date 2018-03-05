@@ -54,18 +54,16 @@ for i_ele in indices:
 machine.add_Multipole(name=name, knl=[100.e-6])
 #machine.add_Multipole(name=name, ksl=[30.e-6])
 
-# devide_by = np.array([1e-3, 1e-6, 1e-3, 1e-6, 1e-3, 1e-4])
-devide_by = np.array([1., 1., 1., 1., 1., 1.])
 
 def one_turn_map(coord_in):
 
 	# coord = np.array([x, px, y, py, sigma, delta])
 
-	coord = coord_in*devide_by
+	coord = coord_in
 
 	npart = 1
 
-	delta = coord[5]
+	delta = np.array([0.])
 	rpp = 1./(delta+1)
 	pc_eV = p0c_eV/rpp
 	gamma = np.sqrt(1. + (pc_eV/pmass_eV)**2)
@@ -83,28 +81,25 @@ def one_turn_map(coord_in):
 			psigma = psigma)
 	bunch.x+=coord[0]
 	bunch.px+=coord[1]
-	bunch.y+=coord[2]
-	bunch.py+=coord[3]
-	bunch.sigma+=coord[4]
+	# bunch.y+=coord[2]
+	# bunch.py+=coord[3]
+	# bunch.sigma+=coord[4]
 
 	particles,ebe,tbt = machine.track_cl(bunch,nturns=1,elembyelem=None,turnbyturn=True)
 
-	coord =  np.array([tbt.x[1][0], tbt.px[1][0], tbt.y[1][0], tbt.py[1][0], 
-					tbt.sigma[1][0], tbt.delta[1][0]])
+	coord =  np.array([tbt.x[1][0], tbt.px[1][0]])
 
-	for ii in range(2, 6):
-		coord[ii] = 0.
-
-	return coord/devide_by
+	return coord
 
 
 # fxdpt = so.fixed_point(one_turn_map, np.array([0.,0.,0.,0.,0.,0.]))
 
-tominimize = lambda coord: np.sum((one_turn_map(coord)-coord)**2)
+tominimize = lambda c: (np.sum((one_turn_map(c)-c)**2))*1e1
 
 
+print 'Start optimization'
+res = so.minimize(tominimize, np.array([0.,0.]), tol=1e-20, method='Nelder-Mead')
 
-res = so.minimize(tominimize, np.array([0.,0.,0.,0.,0.,0.]), tol=1e-20, method='Nelder-Mead')
 
 npart = 1
 
@@ -149,8 +144,6 @@ y_mean = np.mean(tbt.y)
 py_mean = np.mean(tbt.py)
 sigma_mean = np.mean(tbt.sigma)
 delta_mean = np.mean(tbt.delta)
-
-found_mean = np.array([x_mean, px_mean, y_mean, py_mean, sigma_mean, delta_mean])
 
 # res2 = so.minimize(tominimize, np.array([x_mean,px_mean,y_mean, py_mean,sigma_mean,delta_mean]), tol=1e-20)
 # res3 = so.minimize(tominimize, res.x, tol=1e-20)
@@ -217,22 +210,25 @@ spebep3.plot(np.mean(ebe.delta[:,:,0], axis=0))
 
 x_vect = np.linspace(-3e-2, 3e-2, 110)
 pl.figure(1000)
-pl.plot(x_vect, map(lambda x: tominimize(np.array([x, px_mean, 0, 0., 0., 0.])), x_vect))
+pl.plot(x_vect, map(lambda x: tominimize(np.array([x, px_mean])), x_vect))
 pl.axvline(x = x_mean)
 
 px_vect = np.linspace(-3e-4, 3e-4, 100)
 pl.figure(2000)
-pl.plot(px_vect, map(lambda px: tominimize(np.array([x_mean, px, 0, 0., 0., 0.])), px_vect))
+pl.plot(px_vect, map(lambda px: tominimize(np.array([x_mean, px])), px_vect))
 pl.axvline(x = px_mean)
 
 mat = np.zeros((len(x_vect), len(px_vect)))
 
-# for ix, x in enumerate(x_vect):
-# 	print ix
-# 	for ipx, px in enumerate(px_vect):
-# 		mat[ix, ipx] = tominimize(np.array([x, px, 0, 0., 0., 0.]))
+for ix, x in enumerate(x_vect):
+	print ix
+	for ipx, px in enumerate(px_vect):
+		mat[ix, ipx] = tominimize(np.array([x, px]))
 
-# pl.figure(100)
-# pl.pcolormesh(x_vect, px_vect, np.log10(mat).T)
+pl.figure(100)
+pl.pcolormesh(x_vect, px_vect, np.log10(mat).T)
+pl.plot(x_mean, px_mean, 'or')
+pl.plot(res.x[0], res.x[1], 'ob')
+
 
 pl.show()
