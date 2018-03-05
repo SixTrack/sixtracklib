@@ -7,7 +7,7 @@ from scipy.constants import c as c_light
 pmass_eV = 938.272046e6
 
 V_RF = 10e6
-lag_RF = np.pi
+lag_deg = 180
 h_RF = 35000
 
 
@@ -39,12 +39,12 @@ for i_ele in indices:
 			machine.add_Multipole(name=name, knl=[twdict['k0l'][i_ele]], hxl=twdict['k0l'][i_ele], length=1e20)
 		else:
 			#print name
-			machine.add_Multipole(name=name, knl=[0.,twdict['k1l'][i_ele],twdict['k2l'][i_ele]/2.])
+			machine.add_Multipole(name=name, knl=[0.,twdict['k1l'][i_ele],twdict['k2l'][i_ele]])
 	elif twdict['keyword'][i_ele]=='DRIFT':
 		machine.add_Drift(name=name, length=twdict['l'][i_ele])
 	elif twdict['keyword'][i_ele]=='RFCAVITY':
 		print('Found cavity: '+name)
-		machine.add_Cavity(voltage=V_RF,frequency=f_RF,lag=lag_RF)
+		machine.add_Cavity(voltage=V_RF,frequency=f_RF,lag=lag_deg)
 	else:
 		print('Skipped: %s'%name)
 
