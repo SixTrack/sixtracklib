@@ -41,7 +41,7 @@ for i_ele in indices:
 			machine.add_Multipole(name=name, knl=[twdict['k0l'][i_ele]], hxl=twdict['k0l'][i_ele], length=1e20)
 		else:
 			#print name
-			machine.add_Multipole(name=name, knl=[0.,twdict['k1l'][i_ele],twdict['k2l'][i_ele]/2.])
+			machine.add_Multipole(name=name, knl=[0.,twdict['k1l'][i_ele],twdict['k2l'][i_ele]])
 	elif twdict['keyword'][i_ele]=='DRIFT':
 		machine.add_Drift(name=name, length=twdict['l'][i_ele])
 	elif twdict['keyword'][i_ele]=='RFCAVITY':
@@ -52,7 +52,7 @@ for i_ele in indices:
 
 #Add dipole corrector to distort the orbit
 machine.add_Multipole(name=name, knl=[100.e-6])
-#machine.add_Multipole(name=name, ksl=[30.e-6])
+machine.add_Multipole(name=name, ksl=[30.e-6])
 
 # devide_by = np.array([1e-3, 1e-6, 1e-3, 1e-6, 1e-3, 1e-4])
 devide_by = np.array([1., 1., 1., 1., 1., 1.])
@@ -91,9 +91,6 @@ def one_turn_map(coord_in):
 
 	coord =  np.array([tbt.x[1][0], tbt.px[1][0], tbt.y[1][0], tbt.py[1][0], 
 					tbt.sigma[1][0], tbt.delta[1][0]])
-
-	for ii in range(2, 6):
-		coord[ii] = 0.
 
 	return coord/devide_by
 
