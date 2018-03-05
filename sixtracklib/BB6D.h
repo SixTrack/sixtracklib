@@ -65,7 +65,7 @@ void BB6D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb6ddat
     double delta_star = particles->delta[partid];  
 
     double p0 = particles->p0c[partid]*QELEM/C_LIGHT;  
-    double q0 = particles->q0[partid]*QELEM; 
+    double q0 = particles->charge0[partid]*QELEM; 
     
     
     // Boost coordinates of the weak beam

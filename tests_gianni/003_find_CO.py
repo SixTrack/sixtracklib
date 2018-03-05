@@ -9,7 +9,7 @@ from scipy.constants import c as c_light
 pmass_eV = 938.272046e6
 
 V_RF = 10e6
-lag_RF = np.pi
+lag_deg = 180
 h_RF = 35000
 
 
@@ -46,7 +46,7 @@ for i_ele in indices:
 		machine.add_Drift(name=name, length=twdict['l'][i_ele])
 	elif twdict['keyword'][i_ele]=='RFCAVITY':
 		print('Found cavity: '+name)
-		machine.add_Cavity(voltage=V_RF,frequency=f_RF,lag=lag_RF)
+		machine.add_Cavity(voltage=V_RF,frequency=f_RF,lag=lag_deg)
 	else:
 		print('Skipped: %s'%name)
 
@@ -108,7 +108,7 @@ res = so.minimize(tominimize, np.array([0.,0.,0.,0.,0.,0.]), tol=1e-20, method='
 
 npart = 1
 
-delta = np.array([0e-4])
+delta = np.array([1e-4])
 rpp = 1./(delta+1)
 pc_eV = p0c_eV/rpp
 gamma = np.sqrt(1. + (pc_eV/pmass_eV)**2)
@@ -151,6 +151,13 @@ sigma_mean = np.mean(tbt.sigma)
 delta_mean = np.mean(tbt.delta)
 
 found_mean = np.array([x_mean, px_mean, y_mean, py_mean, sigma_mean, delta_mean])
+
+print('Found mean:', found_mean)
+print('Res opt:', res.x)
+
+print('Val at mean:', tominimize(found_mean))
+print('Val at res opt:', tominimize(res.x))
+
 
 # res2 = so.minimize(tominimize, np.array([x_mean,px_mean,y_mean, py_mean,sigma_mean,delta_mean]), tol=1e-20)
 # res3 = so.minimize(tominimize, res.x, tol=1e-20)
