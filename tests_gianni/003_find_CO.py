@@ -9,7 +9,7 @@ from scipy.constants import c as c_light
 pmass_eV = 938.272046e6
 
 V_RF = 10e6
-lag_deg = 180
+lag_deg = 120
 h_RF = 35000
 
 
