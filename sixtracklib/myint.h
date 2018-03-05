@@ -2,7 +2,6 @@
 #ifndef _MYINT_
 #define _MYINT_
 
-
 #ifndef _GPUCODE
 #include <stdint.h>
 #else
@@ -13,4 +12,3 @@ typedef unsigned char uint8_t;
 #endif
 
 #endif
-
