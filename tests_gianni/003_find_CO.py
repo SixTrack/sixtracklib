@@ -54,100 +54,112 @@ for i_ele in indices:
 machine.add_Multipole(name=name, knl=[100.e-6])
 machine.add_Multipole(name=name, ksl=[30.e-6])
 
-# devide_by = np.array([1e-3, 1e-6, 1e-3, 1e-6, 1e-3, 1e-4])
-devide_by = np.array([1., 1., 1., 1., 1., 1.])
 
-def one_turn_map(coord_in):
+# Build 1-turn map function
+def one_turn_map(coord_in, flag_ebe=False):
 
 	# coord = np.array([x, px, y, py, sigma, delta])
 
-	coord = coord_in*devide_by
-
+	coord = coord_in
+	
 	npart = 1
-
-	delta = coord[5]
-	rpp = 1./(delta+1)
-	pc_eV = p0c_eV/rpp
-	gamma = np.sqrt(1. + (pc_eV/pmass_eV)**2)
-	beta = np.sqrt(1.-1./gamma**2)
-	rvv=beta/beta0
-	psigma = pmass_eV*(gamma-gamma0)/(beta0*p0c_eV)
-
+	
 	bunch=sixtracklib.CParticles(npart=npart, 
 			p0c=p0c_eV,
 			beta0 = beta0,
-			gamma0 = gamma0,
-			delta = delta,
-			rvv = rvv,
-			rpp = rpp,
-			psigma = psigma)
+			gamma0 = gamma0)
 	bunch.x+=coord[0]
 	bunch.px+=coord[1]
 	bunch.y+=coord[2]
 	bunch.py+=coord[3]
 	bunch.sigma+=coord[4]
+	bunch.set_delta(coord[5])
 
-	particles,ebe,tbt = machine.track_cl(bunch,nturns=1,elembyelem=None,turnbyturn=True)
+	particles,ebe,tbt = machine.track_cl(bunch,nturns=1,elembyelem={True:True, False:None}[flag_ebe], turnbyturn=True)
 
 	coord =  np.array([tbt.x[1][0], tbt.px[1][0], tbt.y[1][0], tbt.py[1][0], 
 					tbt.sigma[1][0], tbt.delta[1][0]])
 
-	return coord/devide_by
+	if flag_ebe:
+		return coord, ebe
+	else:
+		return coord
 
-
-# fxdpt = so.fixed_point(one_turn_map, np.array([0.,0.,0.,0.,0.,0.]))
-
+# Define function for optimization
 tominimize = lambda coord: np.sum((one_turn_map(coord)-coord)**2)
 
-
-
+# Find fixed point
 res = so.minimize(tominimize, np.array([0.,0.,0.,0.,0.,0.]), tol=1e-20, method='Nelder-Mead')
 
-npart = 1
+temp, ebe_CO = one_turn_map(res.x, flag_ebe=True)
 
-delta = np.array([1e-4])
-rpp = 1./(delta+1)
-pc_eV = p0c_eV/rpp
-gamma = np.sqrt(1. + (pc_eV/pmass_eV)**2)
-beta = np.sqrt(1.-1./gamma**2)
-rvv=beta/beta0
-psigma = pmass_eV*(gamma-gamma0)/(beta0*p0c_eV)
+
+# Track for many turns
+npart = 1
+delta_track = 1e-4
+x_track = 1e-3
+y_track = 2e-3
+n_turns = 1000
+
+n_iter = 10
 
 bunch=sixtracklib.CParticles(npart=npart, 
+	p0c=p0c_eV,
+	beta0 = beta0,
+	gamma0 = gamma0)
+bunch.x = np.array([x_track])
+bunch.y = np.array([y_track])
+bunch.set_delta(delta_track)
+
+
+for i_iter in range(n_iter):
+	print('Segment %d/%d'%(i_iter, n_iter))
+	# print bunch.x
+
+	particles,ebe,tbt=machine.track_cl(bunch,nturns=n_turns,elembyelem=True,turnbyturn=True)
+
+	# print particles.x
+
+	if i_iter == 0:
+		ebe_x_mean = np.sum(ebe.x[:,:,0], axis=0)
+		ebe_px_mean = np.sum(ebe.px[:,:,0], axis=0)
+		ebe_y_mean = np.sum(ebe.y[:,:,0], axis=0)
+		ebe_py_mean = np.sum(ebe.py[:,:,0], axis=0)
+		ebe_sigma_mean = np.sum(ebe.sigma[:,:,0], axis=0)
+		ebe_delta_mean = np.sum(ebe.delta[:,:,0], axis=0)		
+	else:
+		ebe_x_mean = np.sum(ebe.x[:,:,0], axis=0)+ebe_x_mean
+		ebe_px_mean = np.sum(ebe.px[:,:,0], axis=0)+ebe_px_mean
+		ebe_y_mean = np.sum(ebe.y[:,:,0], axis=0)+ebe_y_mean
+		ebe_py_mean = np.sum(ebe.py[:,:,0], axis=0)+ebe_py_mean
+		ebe_sigma_mean = np.sum(ebe.sigma[:,:,0], axis=0)+ebe_sigma_mean
+		ebe_delta_mean = np.sum(ebe.delta[:,:,0], axis=0)+ebe_delta_mean
+
+	# I need to instantiate a new bunch otherwise I get segfault (to be investigated...)
+	bunch=sixtracklib.CParticles(npart=npart, 
 		p0c=p0c_eV,
 		beta0 = beta0,
-		gamma0 = gamma0,
-		delta = delta,
-		rvv = rvv,
-		rpp = rpp,
-		psigma = psigma)
-bunch.x+=0.00
-bunch.y+=0.00
+		gamma0 = gamma0)
+	bunch.x = particles.x
+	bunch.y = particles.y
+	bunch.sigma = particles.sigma
+	bunch.px = particles.px
+	bunch.py = particles.py
+	bunch.set_delta(particles.delta)
 
-n_turns = 2048
+ebe_x_mean = ebe_x_mean/float(n_iter*n_turns)
+ebe_px_mean = ebe_px_mean/float(n_iter*n_turns)
+ebe_y_mean = ebe_y_mean/float(n_iter*n_turns)
+ebe_py_mean = ebe_py_mean/float(n_iter*n_turns)
+ebe_sigma_mean = ebe_sigma_mean/float(n_iter*n_turns)
+ebe_delta_mean = ebe_delta_mean/float(n_iter*n_turns)
 
-particles,ebe,tbt=machine.track_cl(bunch,nturns=n_turns,elembyelem=True,turnbyturn=True)
 
-# coord = np.array(6*[0.])
-# coord_list = []
-# for i_turn in xrange(n_turns):
-# 	coord_list.append(coord)
-# 	coord = one_turn_map(coord)
+# closed orbit from mean
+found_mean = np.array([ ebe_x_mean[-1], ebe_px_mean[-1],
+						ebe_y_mean[-1], ebe_py_mean[-1],
+						ebe_sigma_mean[-1], ebe_delta_mean[-1]])
 
-# coord_mat = np.array(coord_list)
-# x_mean = np.mean(coord_mat[:,0])
-# px_mean = np.mean(coord_mat[:,1])
-# y_mean = np.mean(coord_mat[:,2])
-# py_mean = np.mean(coord_mat[:,3])
-
-x_mean = np.mean(tbt.x)
-px_mean = np.mean(tbt.px)
-y_mean = np.mean(tbt.y)
-py_mean = np.mean(tbt.py)
-sigma_mean = np.mean(tbt.sigma)
-delta_mean = np.mean(tbt.delta)
-
-found_mean = np.array([x_mean, px_mean, y_mean, py_mean, sigma_mean, delta_mean])
 
 print('Found mean:', found_mean)
 print('Res opt:', res.x)
@@ -156,8 +168,6 @@ print('Val at mean:', tominimize(found_mean))
 print('Val at res opt:', tominimize(res.x))
 
 
-# res2 = so.minimize(tominimize, np.array([x_mean,px_mean,y_mean, py_mean,sigma_mean,delta_mean]), tol=1e-20)
-# res3 = so.minimize(tominimize, res.x, tol=1e-20)
 
 import matplotlib.pyplot as pl
 pl.close('all')
@@ -203,33 +213,43 @@ sps.set_ylim(-.6, .6)
 
 spfx.set_xlim(left=-.05)
 
-pl.figure(3)
-spebe1 = pl.subplot(3,1,1)
-spebe2 = pl.subplot(3,1,2, sharex=spebe1, sharey=spebe1)
-spebe3 = pl.subplot(3,1,3, sharex=spebe1)
-spebe1.plot(np.mean(ebe.x[:,:,0], axis=0))
-spebe2.plot(np.mean(ebe.y[:,:,0], axis=0))
-spebe3.plot(np.mean(ebe.sigma[:,:,0], axis=0))
+pl.figure(3, figsize=(8*2, 6))
+spebe1 = pl.subplot(3,2,1)
+spebe2 = pl.subplot(3,2,3, sharex=spebe1, sharey=spebe1)
+spebe3 = pl.subplot(3,2,5, sharex=spebe1)
+spebe1.plot(np.squeeze(ebe_CO.x))
+spebe2.plot(np.squeeze(ebe_CO.y))
+spebe3.plot(np.squeeze(ebe_CO.sigma))
+spebe1.plot(ebe_x_mean)
+spebe2.plot(ebe_y_mean)
+spebe3.plot(ebe_sigma_mean)
 
-pl.figure(4)
-spebep1 = pl.subplot(3,1,1)
-spebep2 = pl.subplot(3,1,2, sharex=spebe1, sharey=spebe1)
-spebep3 = pl.subplot(3,1,3, sharex=spebe1)
-spebep1.plot(np.mean(ebe.px[:,:,0], axis=0))
-spebep2.plot(np.mean(ebe.py[:,:,0], axis=0))
-spebep3.plot(np.mean(ebe.delta[:,:,0], axis=0))
+spebep1 = pl.subplot(3,2,2)
+spebep2 = pl.subplot(3,2,4, sharex=spebe1, sharey=spebep1)
+spebep3 = pl.subplot(3,2,6, sharex=spebep1)
+spebep1.plot(np.squeeze(ebe_CO.px))
+spebep2.plot(np.squeeze(ebe_CO.py))
+spebep3.plot(np.squeeze(ebe_CO.delta))
+spebep1.plot(ebe_px_mean)
+spebep2.plot(ebe_py_mean)
+spebep3.plot(ebe_delta_mean)
 
-x_vect = np.linspace(-3e-2, 3e-2, 110)
-pl.figure(1000)
-pl.plot(x_vect, map(lambda x: tominimize(np.array([x, px_mean, 0, 0., 0., 0.])), x_vect))
-pl.axvline(x = x_mean)
 
-px_vect = np.linspace(-3e-4, 3e-4, 100)
-pl.figure(2000)
-pl.plot(px_vect, map(lambda px: tominimize(np.array([x_mean, px, 0, 0., 0., 0.])), px_vect))
-pl.axvline(x = px_mean)
+for sp in [spebe1, spebe2, spebe3, spebep1, spebep2, spebep3]:
+	sp.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
 
-mat = np.zeros((len(x_vect), len(px_vect)))
+
+# x_vect = np.linspace(-3e-2, 3e-2, 110)
+# pl.figure(1000)
+# pl.plot(x_vect, map(lambda x: tominimize(np.array([x, px_mean, 0, 0., 0., 0.])), x_vect))
+# pl.axvline(x = x_mean)
+
+# px_vect = np.linspace(-3e-4, 3e-4, 100)
+# pl.figure(2000)
+# pl.plot(px_vect, map(lambda px: tominimize(np.array([x_mean, px, 0, 0., 0., 0.])), px_vect))
+# pl.axvline(x = px_mean)
+
+# mat = np.zeros((len(x_vect), len(px_vect)))
 
 # for ix, x in enumerate(x_vect):
 # 	print ix
