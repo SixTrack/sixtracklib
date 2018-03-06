@@ -8,7 +8,7 @@ import scipy.optimize as so
 from scipy.constants import c as c_light
 pmass_eV = 938.272046e6
 
-V_RF = 10e6
+V_RF = 30e6
 lag_deg = 120
 h_RF = 35000
 
@@ -90,7 +90,7 @@ tominimize = lambda coord: np.sum((one_turn_map(coord)-coord)**2)
 
 # Find fixed point
 res = so.minimize(tominimize, np.array([0.,0.,0.,0.,0.,0.]), tol=1e-20, method='Nelder-Mead')
-
+# Get close orbit around the machine
 temp, ebe_CO = one_turn_map(res.x, flag_ebe=True)
 
 
@@ -101,7 +101,7 @@ x_track = 1e-3
 y_track = 2e-3
 n_turns = 1000
 
-n_iter = 10
+n_iter = 40
 
 bunch=sixtracklib.CParticles(npart=npart, 
 	p0c=p0c_eV,
@@ -224,7 +224,7 @@ spebe1.plot(ebe_x_mean)
 spebe2.plot(ebe_y_mean)
 spebe3.plot(ebe_sigma_mean)
 
-spebep1 = pl.subplot(3,2,2)
+spebep1 = pl.subplot(3,2,2, sharex=spebe1)
 spebep2 = pl.subplot(3,2,4, sharex=spebe1, sharey=spebep1)
 spebep3 = pl.subplot(3,2,6, sharex=spebep1)
 spebep1.plot(np.squeeze(ebe_CO.px))
