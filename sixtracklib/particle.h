@@ -42,7 +42,7 @@ typedef CLGLOBAL struct Particles {
   CLGLOBAL double *psigma;  // (E-E0) / (beta0 P0c) conjugate of sigma
   CLGLOBAL double *delta;   // P/P0-1 = 1/rpp-1
   CLGLOBAL double *rpp;     // ratio P0 /P
-  CLGLOBAL double *rvv;     // ratio beta / beta0
+  CLGLOBAL double *rvv;     // ratio beta0 / beta
   CLGLOBAL double *chi;     // q/charge0 * m/m0
   CLGLOBAL double *rcharge; // m/m0
   CLGLOBAL double *rmass;   // q/charge0

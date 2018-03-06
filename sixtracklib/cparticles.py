@@ -105,5 +105,5 @@ class CParticles(CObject):
         pc_eV = self.p0c/self.rpp
         gamma = np.sqrt(1. + (pc_eV/self.mass0)**2)
         beta = np.sqrt(1.-1./gamma**2)
-        self.rvv=beta/self.beta0
+        self.rvv=self.beta0/beta
         self.psigma = self.mass0*(gamma-self.gamma0)/(self.beta0*self.p0c)
