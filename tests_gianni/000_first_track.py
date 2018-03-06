@@ -53,24 +53,22 @@ for i_ele in indices:
 
 npart = 10
 
-delta = np.linspace(0, 8e-4, npart)
-rpp = 1./(delta+1)
-pc_eV = p0c_eV/rpp
-gamma = np.sqrt(1. + (pc_eV/pmass_eV)**2)
-beta = np.sqrt(1.-1./gamma**2)
-rvv=beta/beta0
-psigma = pmass_eV*(gamma-gamma0)/(beta0*p0c_eV)
+# delta = np.linspace(0, 8e-4, npart)
+# rpp = 1./(delta+1)
+# pc_eV = p0c_eV/rpp
+# gamma = np.sqrt(1. + (pc_eV/pmass_eV)**2)
+# beta = np.sqrt(1.-1./gamma**2)
+# rvv=beta/beta0
+# psigma = pmass_eV*(gamma-gamma0)/(beta0*p0c_eV)
 
 bunch=sixtracklib.CParticles(npart=npart, 
 		p0c=p0c_eV,
 		beta0 = beta0,
-		gamma0 = gamma0,
-		delta = delta,
-		rvv = rvv,
-		rpp = rpp,
-		psigma = psigma)
+		gamma0 = gamma0)
 bunch.x+=0.001
 bunch.y+=0.002
+
+bunch.set_delta(np.linspace(0, 8e-4, npart))
 
 particles,ebe,tbt=machine.track_cl(bunch,nturns=512,elembyelem=None,turnbyturn=True)
 

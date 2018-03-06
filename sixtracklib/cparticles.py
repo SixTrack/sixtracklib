@@ -99,4 +99,11 @@ class CParticles(CObject):
         else:
             raise ValueError("Shape ref not compatible")
 
-
+    def set_delta(self, delta):
+        self.delta = delta
+        self.rpp = 1./(delta+1)
+        pc_eV = self.p0c/self.rpp
+        gamma = np.sqrt(1. + (pc_eV/self.mass0)**2)
+        beta = np.sqrt(1.-1./gamma**2)
+        self.rvv=beta/self.beta0
+        self.psigma = self.mass0*(gamma-self.gamma0)/(self.beta0*self.p0c)
