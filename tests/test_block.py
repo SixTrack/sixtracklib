@@ -1,28 +1,44 @@
 import numpy as np
+
 import sixtracklib
 
+def test_add_drift():
+    blk=sixtracklib.CBlock()
+    blk.add_Drift(length=3)
+    blk.add_Drift(length=2.5)
+    assert blk.elem_ids==[0,2]
 
-block=sixtracklib.cBlock(2)
-block.Multipole([1.,3.,5.],[2.,4.,6.],0,0,0,)
-block.Drift(56.)
-block.Drift(5.)
-block.Block()
-
-def test_track():
-  beam=sixtracklib.cBeam(50)
-  block.track(beam)
-
-  assert beam.particles[2]['s']  ==61.0
-  assert beam.particles[2]['px'] ==-1.0
-  assert beam.particles[2]['py'] ==2.0
-
-def test_track_cl():
-  if hasattr(block,'track_cl'):
-    beam=sixtracklib.cBeam(50)
-    block.track_cl(beam)
-
-    assert beam.particles[2]['s'] ==61.0
-    assert beam.particles[2]['px']==-1.0
-    assert beam.particles[2]['py']==2.0
+def test_add_multipole():
+    fodo=sixtracklib.CBlock()
+    fodo.add_Multipole(knl=[0.0])
+    fodo.add_Multipole(knl=[0.1,0.2])
+    fodo.add_Multipole(knl=[0.1,0.2,0.3])
+    assert fodo.elem[0].order==0
+    assert fodo.elem[1].order==1
+    assert fodo.elem[2].order==2
 
 
+def test_add_fodo():
+    fodo=sixtracklib.CBlock()
+    fodo.add_Drift(length=1.5)
+    fodo.add_Multipole(knl=[0.0,0.001])
+    fodo.add_Drift(length=1.3)
+    fodo.add_Multipole(name='qd',knl=[0.0,-0.001])
+    fodo.add_Cavity(voltage=3.,frequency=4.,lag=5)
+    fodo.add_Align(dx=1.,dy=-2.,tilt=30)
+    data=np.array([1,2,3,4],dtype='float')
+    fodo.add_BeamBeam(name='bb',datasize=len(data),data=data)
+    assert fodo.elem[0].length==1.5
+    assert fodo.elem['qd'][0].bal[2]==-0.001
+    assert fodo.elem['bb'][0].data[1]==2.0
+
+
+
+
+def test_particle():
+    bunch=sixtracklib.CParticles(npart=4)
+    bunch.x[1]=0.3
+    bunch.y[2]=0.2
+    bunch.sigma[3]=0.1
+    assert len(bunch.partid)==4
+    assert bunch.sigma[3]==0.1
