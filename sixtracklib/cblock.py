@@ -117,7 +117,7 @@ class Rotation(CObject):
 
     
 
-class BeamBeam(CObject):
+class BeamBeam6D(CObject):
     objid = CProp('u64', 0, default=10)
     datasize = CProp('u64', 1, const=True)
     data = CProp('f64', 2, length='datasize')
@@ -151,7 +151,7 @@ class CBlock(object):
                        Cavity=5,
                        Align=6,
                        Block=7,
-                       BeamBeam=10,
+                       BeamBeam6D=10,
                        Rotation=11)
 
     bb_data_list = []
@@ -186,12 +186,9 @@ class CBlock(object):
         elem = Align(cbuffer=self._cbuffer, **nvargs)
         self._add_elem(name, elem)
 
-    def add_BeamBeam(self, name=None, **nvargs):
-        elem = BeamBeam(cbuffer=self._cbuffer, **nvargs)
-        self._add_elem(name, elem)
 
-    def add_BeamBeam(self,name=None,**nvargs):
-        elem=BeamBeam(cbuffer=self._cbuffer, bb_data_list = self.bb_data_list, **nvargs)
+    def add_BeamBeam6D(self,name=None,**nvargs):
+        elem=BeamBeam6D(cbuffer=self._cbuffer, bb_data_list = self.bb_data_list, **nvargs)
         self._add_elem(name,elem)
 
     def add_Rotation(self, name=None, **nvargs):

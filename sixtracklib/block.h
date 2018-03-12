@@ -43,7 +43,7 @@ typedef enum type_t {
   MultipoleID = 4,
   CavityID = 5,
   AlignID = 6,
-  BeamBeamID=10,
+  BeamBeam6DID=10,
   RotationID=11
 } type_t;
 

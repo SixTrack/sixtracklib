@@ -94,7 +94,7 @@ void track_single(Particles *particles, uint64_t partid,
                    Rotation_get_h(elem),Rotation_get_fRF(elem) );
       break;
       
-    case BeamBeamID:
+    case BeamBeam6DID:
         // printf("Strange!\n");
         {
         uint64_t data_size = elem[1].i64;

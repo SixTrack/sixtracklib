@@ -36,7 +36,7 @@ Sig_24_0, Sig_33_0, Sig_34_0, Sig_44_0) = (
 machine = sixtracklib.CBlock()
 
 
-machine.add_BeamBeam(name='bb',
+machine.add_BeamBeam6D(name='bb',
                 q_part=q_part, 
                 N_part_tot=N_part_tot, 
                 sigmaz=sigmaz, 
