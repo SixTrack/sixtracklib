@@ -1,0 +1,25 @@
+beam, particle=proton, npart = 1.00e11, energy=7000.00, exn=2.500000e-06, eyn=1.000000e-06;
+
+tune_x = 0.0000;
+tune_y =  0.0000;
+beta_s = 0.4000;
+
+            one_turn: matrix, 
+            rm11= cos(2*pi*tune_x),        rm12=sin(2*pi*tune_x)*beta_s,
+            rm21=-sin(2*pi*tune_x)/beta_s, rm22=cos(2*pi*tune_x),
+            rm33= cos(2*pi*tune_y),        rm34=sin(2*pi*tune_y)*beta_s,
+            rm43=-sin(2*pi*tune_y)/beta_s, rm44=cos(2*pi*tune_y)  
+
+            ;
+
+            linmap:   line=(one_turn);
+
+            beam_beam: beambeam, charge=1, xma=0.000000e+00, yma=0.000000e+00, sigx=1.157752e-05, sigy=7.322264e-06;
+            myring: line=(linmap, beam_beam);
+            use,period=myring;
+
+
+            track, dump;
+start, x= 1.348107e-04, px=0.000000e+00, y=4.380265e-05, py=0.000000e+00;
+run,turns=1;
+endtrack;

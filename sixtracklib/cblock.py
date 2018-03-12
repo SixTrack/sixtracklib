@@ -141,6 +141,20 @@ class BeamBeam6D(CObject):
       bb_data_list.append(bb6d_data)
       buffer = bb6d_data.tobuffer()
       CObject.__init__(self, data=buffer, datasize=len(buffer), **nvargs)
+      
+#~ class Drift(CObject):
+    #~ objid = CProp('u64', 0, default=2)
+    #~ length = CProp('f64', 1, default=0)
+      
+class BeamBeam4D(CObject):
+    objid = CProp('u64', 0, default=9)
+    q_part = CProp('f64', 1)
+    N_part = CProp('f64', 2)
+    sigma_x = CProp('f64', 3)
+    sigma_y = CProp('f64', 4)
+    beta_s = CProp('f64', 5)
+    min_sigma_diff = CProp('f64', 6)
+    
 
 class CBlock(object):
     """ Block object
@@ -151,6 +165,7 @@ class CBlock(object):
                        Cavity=5,
                        Align=6,
                        Block=7,
+                       BeamBeam4D=9,
                        BeamBeam6D=10,
                        Rotation=11)
 
@@ -186,9 +201,12 @@ class CBlock(object):
         elem = Align(cbuffer=self._cbuffer, **nvargs)
         self._add_elem(name, elem)
 
-
     def add_BeamBeam6D(self,name=None,**nvargs):
         elem=BeamBeam6D(cbuffer=self._cbuffer, bb_data_list = self.bb_data_list, **nvargs)
+        self._add_elem(name,elem)
+        
+    def add_BeamBeam4D(self,name=None,**nvargs):
+        elem=BeamBeam4D(cbuffer=self._cbuffer, **nvargs)
         self._add_elem(name,elem)
 
     def add_Rotation(self, name=None, **nvargs):
