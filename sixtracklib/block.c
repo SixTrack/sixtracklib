@@ -98,15 +98,21 @@ void track_single(Particles *particles, uint64_t partid,
     case BeamBeam6DID:
         // printf("Strange!\n");
         {
-        uint64_t data_size = elem[1].i64;
-        uint64_t data_offset = elem[2].i64;
+            uint64_t data_size = elem[1].i64;
+            uint64_t data_offset = elem[2].i64;
 
-        CLGLOBAL value_t* data = elem + data_offset;
-        
-        BB6D_track(particles, partid, data);
+            CLGLOBAL value_t* data = elem + data_offset;
+            
+            BB6D_track(particles, partid, data);
 
-        break;
+            break;
         }
+    case BeamBeam4DID:
+        {
+            CLGLOBAL value_t* data = elem+1;
+            BB4D_track(particles, partid, data);
+        }
+        
     } // end switch
   }   // end if state
 }
