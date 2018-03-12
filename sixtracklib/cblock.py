@@ -86,6 +86,36 @@ class Align(CObject):
         sz = np.sin(tilt/180.*np.pi)
         CObject.__init__(self, cz=cz, sz=sz, **nvargs)
 
+class Rotation(CObject):
+    objid = CProp('u64', 0, default=11)
+    cx  = CProp('f64', 1)
+    sx  = CProp('f64', 2)
+    cpx = CProp('f64', 3)
+    spx = CProp('f64', 4)
+    cy  = CProp('f64', 5)
+    sy  = CProp('f64', 6)
+    cpy = CProp('f64', 7)
+    spy = CProp('f64', 8)
+    ap   = CProp('f64', 9)
+    h   = CProp('f64', 10)
+    fRF   = CProp('f64', 11)
+     
+    def __init__(self,qx=0.,qy=0.,betax=0.,betay=0.,alfax=0.,alfay=0.,gamma_tr=0.,h=0.,fRF=0., **nvargs):
+        gammax = (1. + alfax**2)/betax
+        gammay = (1. + alfay**2)/betay
+        cx  = np.cos(2.0*np.pi*qx) + alfax*np.sin(2.0*np.pi*qx)
+        sx  = betax*np.sin(2.0*np.pi*qx)
+        cpx = -gammax*np.sin(2.0*np.pi*qx)
+        spx = np.cos(2.0*np.pi*qx) - alfax*np.sin(2.0*np.pi*qx)
+        cy  = np.cos(2.0*np.pi*qy) + alfay*np.sin(2.0*np.pi*qy)
+        sy  = betay*np.sin(2.0*np.pi*qy)
+        cpy = -gammay*np.sin(2.0*np.pi*qy)
+        spy = np.cos(2.0*np.pi*qy) - alfay*np.sin(2.0*np.pi*qy)
+        ap  = 1./(gamma_tr**2)
+
+        CObject.__init__(self, cx=cx, sx=sx, cpx=cpx, spx=spx, cy=cy, sy=sy, cpy=cpy, spy=spy, ap=ap, h=h, fRF=fRF,**nvargs)
+
+    
 
 class BeamBeam(CObject):
     objid = CProp('u64', 0, default=10)
@@ -121,7 +151,8 @@ class CBlock(object):
                        Cavity=5,
                        Align=6,
                        Block=7,
-                       BeamBeam=10)
+                       BeamBeam=10,
+                       Rotation=11)
 
     bb_data_list = []
 
@@ -162,6 +193,10 @@ class CBlock(object):
     def add_BeamBeam(self,name=None,**nvargs):
         elem=BeamBeam(cbuffer=self._cbuffer, bb_data_list = self.bb_data_list, **nvargs)
         self._add_elem(name,elem)
+
+    def add_Rotation(self, name=None, **nvargs):
+        elem = Rotation(cbuffer=self._cbuffer, **nvargs)
+        self._add_elem(name, elem)
     if cl:
         def track_cl(self, particles, nturns=1, elembyelem=None, turnbyturn=None):
             CParticles = particles.__class__
