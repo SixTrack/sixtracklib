@@ -37,12 +37,12 @@ machine = sixtracklib.CBlock()
 
 
 machine.add_BeamBeam(name='bb',
-				q_part=q_part, 
-				N_part_tot=N_part_tot, 
-				sigmaz=sigmaz, 
-				N_slices=N_slices, 
-				min_sigma_diff=min_sigma_diff, 
-				threshold_singular=threshold_singular,
+                q_part=q_part, 
+                N_part_tot=N_part_tot, 
+                sigmaz=sigmaz, 
+                N_slices=N_slices, 
+                min_sigma_diff=min_sigma_diff, 
+                threshold_singular=threshold_singular,
                 phi=phi, 
                 alpha=alpha, 
                 Sig_11_0=Sig_11_0,
@@ -58,7 +58,15 @@ machine.add_BeamBeam(name='bb',
 
 bb = machine.bb_data_list[0]
 
-bunch=sixtracklib.CParticles(npart=2, p0c =6.5e12)
+p0c_eV = 6.5e12
+pmass_eV = 938.272046e6
+gamma0 = np.sqrt(p0c_eV**2+pmass_eV**2)/pmass_eV
+beta0 = p0c_eV/np.sqrt(p0c_eV**2+pmass_eV**2)
+
+bunch=sixtracklib.CParticles(npart=2, 
+                        p0c=p0c_eV,
+                        beta0 = beta0,
+                        gamma0 = gamma0)
 
 
 x = 1e-3
@@ -79,8 +87,9 @@ bunch.delta = bunch.x*0.+delta
 particles,ebe,tbt=machine.track_cl(bunch,nturns=1,
                                   elembyelem=True,turnbyturn=True)
 
-#Compare the two
+#For comparison
 print('\n\n\n')
 names_list = 'x px y py sigma delta'.split()
 for name in names_list:
     print('D_'+name+ ' %.10e'%np.diff(getattr(tbt, name), axis=0)[0,0])
+    
