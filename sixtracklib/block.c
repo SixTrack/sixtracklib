@@ -41,6 +41,19 @@ double Align_get_sz(CLGLOBAL value_t *elem) { return elem[3].f64; }
 double Align_get_dx(CLGLOBAL value_t *elem) { return elem[4].f64; }
 double Align_get_dy(CLGLOBAL value_t *elem) { return elem[5].f64; }
 
+// Rotation
+double Rotation_get_cx(CLGLOBAL value_t *elem) { return elem[1].f64; }
+double Rotation_get_sx(CLGLOBAL value_t *elem) { return elem[2].f64; }
+double Rotation_get_cpx(CLGLOBAL value_t *elem) { return elem[3].f64; }
+double Rotation_get_spx(CLGLOBAL value_t *elem) { return elem[4].f64; }
+double Rotation_get_cy(CLGLOBAL value_t *elem) { return elem[5].f64; }
+double Rotation_get_sy(CLGLOBAL value_t *elem) { return elem[6].f64; }
+double Rotation_get_cpy(CLGLOBAL value_t *elem) { return elem[7].f64; }
+double Rotation_get_spy(CLGLOBAL value_t *elem) { return elem[8].f64; }
+double Rotation_get_ap(CLGLOBAL value_t *elem) { return elem[9].f64; }
+double Rotation_get_h(CLGLOBAL value_t *elem) { return elem[10].f64; }
+double Rotation_get_fRF(CLGLOBAL value_t *elem) { return elem[11].f64; }
+
 // Tracking loop
 
 #ifdef _GPUCODE
@@ -71,6 +84,14 @@ void track_single(Particles *particles, uint64_t partid,
     case AlignID:
       Align_track(particles, partid, Align_get_cz(elem), Align_get_sz(elem),
                   Align_get_dx(elem), Align_get_dy(elem));
+      break;
+    case RotationID:
+      Rotation_track(particles, partid, Rotation_get_cx(elem),
+                   Rotation_get_sx(elem), Rotation_get_cpx(elem), 
+                   Rotation_get_spx(elem),Rotation_get_cy(elem), 
+                   Rotation_get_sy(elem), Rotation_get_cpy(elem),
+                   Rotation_get_spy(elem),Rotation_get_ap(elem),
+                   Rotation_get_h(elem),Rotation_get_fRF(elem) );
       break;
       
     case BeamBeamID:

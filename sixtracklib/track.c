@@ -128,3 +128,24 @@ int Align_track(Particles *p, uint64_t ip, double cz, double sz, double dx,
   p->py[ip] = yn;
   return 1;
 };
+
+int Rotation_track(Particles *p, uint64_t ip, double cx, double sx, double cpx, double spx, double cy, double sy, double cpy, double spy, double ap, double h, double fRF) {
+                   
+  double xn, yn, xpn, ypn;
+  
+  xn  = cx  * p->x[ip]  + sx  * p->px[ip];
+  xpn = cpx * p->x[ip]  + spx * p->px[ip];
+  yn  = cy  * p->y[ip]  + sy  * p->py[ip];
+  ypn = cpy * p->y[ip]  + spy * p->py[ip];
+
+  p->x[ip]  = xn;
+  p->px[ip] = xpn;
+  p->y[ip]  = yn;
+  p->py[ip] = ypn;
+
+  // sigma = sigma -b0*c_light*t=sigma-b0*c_light*t/t0*t0=
+  // =sigma-b0*c_light*eta*psigma*t0 = sigma - b0*c_light*eta*psigma*1/frev=
+  // = sigma - b0*c_light*eta*psigma*h/frf = sigma - (b0*c_light*h*eta/frf)*p  //sigma
+  p->sigma[ip] -= (CLIGHT*h*ap/fRF)*p->psigma[ip];
+  return 1;
+};
