@@ -4,6 +4,7 @@
 #include "track.c"
 
 #include "BB6D.h"
+#include "BB4D.h"
 
 // Data management
 
