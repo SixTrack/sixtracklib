@@ -16,6 +16,8 @@ typedef struct{
     double sigma_y;
     double beta_s;
     double min_sigma_diff;
+    double Delta_x;
+    double Delta_y;
 }BB4D_data;
 
 // void BB6D_track(double* x, double* px, double* y, double* py, double* sigma, 
@@ -25,6 +27,8 @@ void BB4D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb4ddat
    
     CLGLOBAL BB4D_data *bb4ddata = (CLGLOBAL BB4D_data*) bb4ddata_ptr;
 
+    particles->x[partid]  -= bb4ddata->Delta_x;
+    particles->y[partid]  -= bb4ddata->Delta_y;
     
     // Get weak-beam particle data
     //double p0 = particles->p0c[partid]*QELEM/C_LIGHT;  
@@ -42,21 +46,23 @@ void BB4D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb4ddat
     
     
     double Ex, Ey, Gx, Gy;
+    bool flag_4D = true;
     get_Ex_Ey_Gx_Gy_gauss(x, y, 
         bb4ddata->sigma_x,
         bb4ddata->sigma_y,
         bb4ddata->min_sigma_diff,
-        &Ex, &Ey, &Gx, &Gy);
+        &Ex, &Ey, &Gx, &Gy, &flag_4D);
         
     double fact_kick = chi * bb4ddata->N_part * bb4ddata->q_part * q0 * (1. + beta * bb4ddata->beta_s)/(p0c*(beta + bb4ddata->beta_s));
     
     px += fact_kick*Ex;
     py += fact_kick*Ey;
 
-
     particles->px[partid] = px;
     particles->py[partid] = py;
 
+    particles->x[partid]  += bb4ddata->Delta_x;
+    particles->y[partid]  += bb4ddata->Delta_y;
 
 }
 

@@ -25,6 +25,8 @@ def test_track():
   eyn      = 2.5e-6  
   npart    = 10**2
   nturns   = 2*556
+  
+  ap = 1./(gamma_tr**2)
 
   gamma0   = np.sqrt(p0c_eV**2+pmass_eV**2)/pmass_eV
   beta0    = p0c_eV/np.sqrt(p0c_eV**2+pmass_eV**2)
@@ -36,7 +38,7 @@ def test_track():
   sigma_py = np.sqrt(egeomy/betay)
 
   machine=sixtracklib.CBlock()
-  machine.add_Rotation(qx=qx,qy=qy,betax=betax,betay=betay,alfax=alfax,alfay=alfay,gamma_tr=gamma_tr,h=h, fRF=fRF)
+  machine.add_LinearMap(qx=qx,qy=qy,betax=betax,betay=betay,alfax=alfax,alfay=alfay,ap=ap,h=h, fRF=fRF)
   machine.add_Cavity(voltage=V_RF,frequency=fRF,lag=lag_deg)
 
   bunch=sixtracklib.CParticles(npart=npart,

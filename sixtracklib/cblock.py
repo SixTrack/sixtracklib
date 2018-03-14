@@ -86,7 +86,7 @@ class Align(CObject):
         sz = np.sin(tilt/180.*np.pi)
         CObject.__init__(self, cz=cz, sz=sz, **nvargs)
 
-class Rotation(CObject):
+class LinearMap(CObject):
     objid = CProp('u64', 0, default=11)
     cx  = CProp('f64', 1)
     sx  = CProp('f64', 2)
@@ -100,7 +100,7 @@ class Rotation(CObject):
     h   = CProp('f64', 10)
     fRF   = CProp('f64', 11)
      
-    def __init__(self,qx=0.,qy=0.,betax=0.,betay=0.,alfax=0.,alfay=0.,gamma_tr=0.,h=0.,fRF=0., **nvargs):
+    def __init__(self,qx=0.,qy=0.,betax=0.,betay=0.,alfax=0.,alfay=0.,ap=0.,h=0.,fRF=0., **nvargs):
         gammax = (1. + alfax**2)/betax
         gammay = (1. + alfay**2)/betay
         cx  = np.cos(2.0*np.pi*qx) + alfax*np.sin(2.0*np.pi*qx)
@@ -111,7 +111,6 @@ class Rotation(CObject):
         sy  = betay*np.sin(2.0*np.pi*qy)
         cpy = -gammay*np.sin(2.0*np.pi*qy)
         spy = np.cos(2.0*np.pi*qy) - alfay*np.sin(2.0*np.pi*qy)
-        ap  = 1./(gamma_tr**2)
 
         CObject.__init__(self, cx=cx, sx=sx, cpx=cpx, spx=spx, cy=cy, sy=sy, cpy=cpy, spy=spy, ap=ap, h=h, fRF=fRF,**nvargs)
 
@@ -154,6 +153,8 @@ class BeamBeam4D(CObject):
     sigma_y = CProp('f64', 4)
     beta_s = CProp('f64', 5)
     min_sigma_diff = CProp('f64', 6)
+    Delta_x = CProp('f64', 7)
+    Delta_y = CProp('f64', 8)
     
 
 class CBlock(object):
@@ -167,7 +168,7 @@ class CBlock(object):
                        Block=7,
                        BeamBeam4D=9,
                        BeamBeam6D=10,
-                       Rotation=11)
+                       LinearMap=11)
 
     bb_data_list = []
 
@@ -209,8 +210,8 @@ class CBlock(object):
         elem=BeamBeam4D(cbuffer=self._cbuffer, **nvargs)
         self._add_elem(name,elem)
 
-    def add_Rotation(self, name=None, **nvargs):
-        elem = Rotation(cbuffer=self._cbuffer, **nvargs)
+    def add_LinearMap(self, name=None, **nvargs):
+        elem = LinearMap(cbuffer=self._cbuffer, **nvargs)
         self._add_elem(name, elem)
     if cl:
         def track_cl(self, particles, nturns=1, elembyelem=None, turnbyturn=None):
