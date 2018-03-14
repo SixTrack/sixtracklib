@@ -27,16 +27,13 @@ void BB4D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb4ddat
    
     CLGLOBAL BB4D_data *bb4ddata = (CLGLOBAL BB4D_data*) bb4ddata_ptr;
 
-    particles->x[partid]  -= bb4ddata->Delta_x;
-    particles->y[partid]  -= bb4ddata->Delta_y;
-    
     // Get weak-beam particle data
     //double p0 = particles->p0c[partid]*QELEM/C_LIGHT;  
     double q0 = particles->charge0[partid]*QELEM; 
     
-    double x     = particles->x[partid];
+    double x     = particles->x[partid] -  bb4ddata->Delta_x;
     double px    = particles->px[partid];
-    double y    = particles->y[partid];
+    double y    = particles->y[partid] - bb4ddata->Delta_y;;
     double py   = particles->py[partid];  
     
     double chi = particles->chi[partid]; 
@@ -61,8 +58,6 @@ void BB4D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb4ddat
     particles->px[partid] = px;
     particles->py[partid] = py;
 
-    particles->x[partid]  += bb4ddata->Delta_x;
-    particles->y[partid]  += bb4ddata->Delta_y;
 
 }
 

@@ -21,7 +21,7 @@ beta_s = 0.40
 
 include_beambeam = True
 
-offsetx_s = 0.
+offsetx_s = 5e-5
 offsety_s = 0.
 nturns =1
 #offsetx_s = 0.
