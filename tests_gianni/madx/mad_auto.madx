@@ -1,7 +1,7 @@
 beam, particle=proton, npart = 1.00e11, energy=7000.00, exn=2.500000e-06, eyn=1.000000e-06;
 
-tune_x = 0.0000;
-tune_y =  0.0000;
+tune_x = 0.3100;
+tune_y =  0.3200;
 beta_s = 0.4000;
 
             one_turn: matrix, 
@@ -20,6 +20,6 @@ beta_s = 0.4000;
 
 
             track, dump;
-start, x= 0.000000e+00, px=0.000000e+00, y=0.000000e+00, py=0.000000e+00;
-run,turns=1;
+start, x= 6.137124e-05, px=0.000000e+00, y=3.358723e-05, py=0.000000e+00;
+run,turns=1024;
 endtrack;
