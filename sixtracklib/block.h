@@ -45,7 +45,7 @@ typedef enum type_t {
   AlignID = 6,
   BeamBeam4DID=9,
   BeamBeam6DID=10,
-  RotationID=11
+  LinearMapID=11
 } type_t;
 
 

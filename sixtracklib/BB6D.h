@@ -112,9 +112,10 @@ void BB6D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb6ddat
 
         // Get transverse fieds
         double Ex, Ey, Gx, Gy;
+        bool skip_Gs=false;
         get_Ex_Ey_Gx_Gy_gauss(x_bar_hat_star, y_bar_hat_star, 
             sqrt(Sig_11_hat_star), sqrt(Sig_33_hat_star), bb6ddata->min_sigma_diff,
-            &Ex, &Ey, &Gx, &Gy);
+            &Ex, &Ey, skip_Gs, &Gx, &Gy);
             
         // Compute kicks
         double Fx_hat_star = Ksl*Ex;

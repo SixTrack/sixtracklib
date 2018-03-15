@@ -1,7 +1,7 @@
 beam, particle=proton, npart = 1.00e11, energy=7000.00, exn=2.500000e-06, eyn=1.000000e-06;
 
-tune_x = 0.0000;
-tune_y =  0.0000;
+tune_x = 0.3100;
+tune_y =  0.3200;
 beta_s = 0.4000;
 
             one_turn: matrix, 
@@ -14,12 +14,12 @@ beta_s = 0.4000;
 
             linmap:   line=(one_turn);
 
-            beam_beam: beambeam, charge=1, xma=0.000000e+00, yma=0.000000e+00, sigx=1.157752e-05, sigy=7.322264e-06;
+            beam_beam: beambeam, charge=1, xma=5.000000e-05, yma=0.000000e+00, sigx=1.157752e-05, sigy=7.322264e-06;
             myring: line=(linmap, beam_beam);
             use,period=myring;
 
 
             track, dump;
-start, x= 1.348107e-04, px=0.000000e+00, y=4.380265e-05, py=0.000000e+00;
-run,turns=1;
+start, x= 6.137124e-05, px=0.000000e+00, y=3.358723e-05, py=0.000000e+00;
+run,turns=1024;
 endtrack;

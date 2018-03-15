@@ -23,15 +23,21 @@ min_sigma_diff = 1e-16
 threshold_singular = 1e-16
 
  
-# strong beam shape at the IP (decoupled round beam)
+#~ # strong beam shape at the IP (decoupled round beam)
+#~ (Sig_11_0, Sig_12_0, Sig_13_0, 
+#~ Sig_14_0, Sig_22_0, Sig_23_0, 
+#~ Sig_24_0, Sig_33_0, Sig_34_0, Sig_44_0) = (
+#~ 20e-06,  0.,  0.,
+#~ 0., 0., 0.,
+#~ 0., 20e-6, 0., 0.)
+
+# strong beam shape at the IP (coupled beam)
 (Sig_11_0, Sig_12_0, Sig_13_0, 
 Sig_14_0, Sig_22_0, Sig_23_0, 
 Sig_24_0, Sig_33_0, Sig_34_0, Sig_44_0) = (
-20e-06,  0.,  0.,
-0., 0., 0.,
-0., 20e-6, 0., 0.)
-
-
+  8.4282060230000004e-06,  1.8590458800000001e-07,  -3.5512334410000001e-06,
+ -3.8254462239999997e-08, 4.101510281e-09, -7.5517657920000006e-08,
+ -8.1134615060000002e-10, 1.031446898e-05, 1.177863077e-07, 1.3458251810000001e-09)
 
 machine = sixtracklib.CBlock()
 

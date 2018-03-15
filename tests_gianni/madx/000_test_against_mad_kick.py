@@ -8,24 +8,24 @@ nemittx = 2.5e-6
 nemitty = 1.e-6
 
 gamma_tr = 55.
-hRF = 0.
-fRF = 0.
+#ap  = 1./(gamma_tr**2)
+ap = 0.
+
+hRF = 35640
+fRF = 400e6
 
 tune_x = 0.
 tune_y = 0.
 beta_s = 0.40
 
 
-
 include_beambeam = True
-# This does not work, offset still to be implemented
+
 offsetx_s = 5e-5
 offsety_s = 0.
-
-# This works
-offsetx_s = 0.
-offsety_s = 0.
-
+nturns =1
+#offsetx_s = 0.
+#offsety_s = 0.
 
 #compute sigmas
 mp_GeV = m_p*c**2/qe/1e9
@@ -71,10 +71,10 @@ beam.set_delta(0.)
 
 
 machine = sixtracklib.CBlock()
-machine.add_Rotation(qx=tune_x,qy=tune_y,
+machine.add_LinearMap(qx=tune_x,qy=tune_y,
             betax=beta_s,betay=beta_s, 
             alfax=0.,alfay=0.,
-            gamma_tr=gamma_tr,h=hRF, fRF=fRF)
+            ap=ap,h=hRF, fRF=fRF)
 
 machine.add_BeamBeam4D(name='bb4d',
     q_part = qe,
@@ -82,14 +82,15 @@ machine.add_BeamBeam4D(name='bb4d',
     sigma_x = sigmax_s,
     sigma_y = sigmay_s,
     beta_s = beta0,
-    min_sigma_diff = 1e-10)
+    min_sigma_diff = 1e-10,
+    Delta_x = offsetx_s,
+    Delta_y = offsety_s )
     
-particles,ebe,tbt=machine.track_cl(beam,nturns=1,elembyelem=True,turnbyturn=True)
+particles,ebe,tbt=machine.track_cl(beam,nturns=nturns,elembyelem=True,turnbyturn=True)
 
 #Remove Dipole kick
 kick_x = beam.px[1:]-beam.px[0] #we are building the vectors so that the first particle is the ref particle
 kick_y = beam.py[1:]-beam.py[0]
-
 
 
   
@@ -97,9 +98,9 @@ kick_y = beam.py[1:]-beam.py[0]
 import track_mad as tm
 _, _, px_particles_mad, py_particles_mad = tm.track_mad_linmap_and_beambeam(intensity_pbun, energy_GeV, nemittx, nemitty, 
                     tune_x, tune_y, beta_s, include_beambeam, offsetx_s, offsety_s, sigmax_s, sigmay_s, 
-                    x0_particles, px0_particles, y0_particles, py0_particles, nturns=1)
-kick_x_mad = px_particles_mad[1:, 1]
-kick_y_mad = py_particles_mad[1:, 1]
+                    x0_particles, px0_particles, y0_particles, py0_particles, nturns=nturns)
+kick_x_mad = px_particles_mad[1:, nturns]
+kick_y_mad = py_particles_mad[1:, nturns]
 import pylab as pl
 pl.close('all')
 pl.figure(1)

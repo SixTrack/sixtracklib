@@ -129,7 +129,7 @@ int Align_track(Particles *p, uint64_t ip, double cz, double sz, double dx,
   return 1;
 };
 
-int Rotation_track(Particles *p, uint64_t ip, double cx, double sx, double cpx, double spx, double cy, double sy, double cpy, double spy, double ap, double h, double fRF) {
+int LinearMap_track(Particles *p, uint64_t ip, double cx, double sx, double cpx, double spx, double cy, double sy, double cpy, double spy, double ap, double h, double fRF) {
                    
   double xn, yn, xpn, ypn;
   
