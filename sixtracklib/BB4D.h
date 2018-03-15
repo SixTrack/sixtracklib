@@ -43,12 +43,12 @@ void BB4D_track(Particles *particles, uint64_t partid, CLGLOBAL value_t *bb4ddat
     
     
     double Ex, Ey, Gx, Gy;
-    bool flag_4D = true;
+    bool skip_Gs = true;
     get_Ex_Ey_Gx_Gy_gauss(x, y, 
         bb4ddata->sigma_x,
         bb4ddata->sigma_y,
         bb4ddata->min_sigma_diff,
-        &Ex, &Ey, &Gx, &Gy, &flag_4D);
+        &Ex, &Ey, skip_Gs, &Gx, &Gy);
         
     double fact_kick = chi * bb4ddata->N_part * bb4ddata->q_part * q0 * (1. + beta * bb4ddata->beta_s)/(p0c*(beta + bb4ddata->beta_s));
     
