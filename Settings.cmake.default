@@ -1,0 +1,15 @@
+# sixtracklib/Settings.cmake.default: default settings file
+# 
+# Usage: if you want to deviate from the provided default values, create a copy
+#        of this file named Settings.cmake in the same directory and perform the 
+#        modifications therein. 
+
+option( SIXTRACKL_ENABLE_PROGRAMM_TESTS    "Enable programmatic unit-tests" OFF )
+
+option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"       OFF )
+
+option( SIXTRACKL_ENABLE_SIMD              "Enable manual SIMD backend"     OFF ) 
+option( SIXTRACKL_ENABLE_OPENMP            "Enable OpenMP backend"          OFF )
+option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL backend"          OFF )
+option( SIXTRACKL_ENABLE_CUDA              "Enable CUDA backend"            OFF )
+
