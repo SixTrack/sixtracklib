@@ -1,3 +1,5 @@
+#if !defined( _GPUCODE )
+
 #include "sixtracklib/common/particles.h"
 
 #include <assert.h>
@@ -9,10 +11,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
     
 extern bool Particles_has_values( const Particles *const SIXTRL_RESTRICT p );
     
@@ -26,6 +24,8 @@ extern void Particles_copy(
 extern void Particles_init_from_single( 
     Particles* SIXTRL_RESTRICT dest, 
     struct SingleParticle const* SIXTRL_RESTRICT src );
+
+#endif /* !defined( _GPUCODE ) */
 
 /* -------------------------------------------------------------------------- */
 
@@ -149,9 +149,5 @@ void Particles_init_from_single(
     
     return;
 }
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 /* end: sixtracklib/common/details/particles.c */

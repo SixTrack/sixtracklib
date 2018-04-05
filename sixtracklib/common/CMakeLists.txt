@@ -1,6 +1,8 @@
 # sixtracklib/sixtracklib/common/CMakeLists.txt
 
 set( SIXTRACKLIB_COMMON_HEADERS 
+     impl/particles_type.h
+     impl/track_single.h
      single_particle.h
      particles.h
      restrict.h
@@ -9,10 +11,11 @@ set( SIXTRACKLIB_COMMON_HEADERS
 
 
 set( SIXTRACKLIB_COMMON_SOURCES
-     details/single_particle.c
      details/particles.c
+     details/single_particle.c
+     details/track_single.c
+     details/track.c
 )
-
 
 add_library( sixtrack_common OBJECT 
              ${SIXTRACKLIB_COMMON_HEADERS}
