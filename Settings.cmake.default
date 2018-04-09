@@ -4,11 +4,21 @@
 #        of this file named Settings.cmake in the same directory and perform the 
 #        modifications therein. 
 
-option( SIXTRACKL_ENABLE_PROGRAMM_TESTS    "Enable programmatic unit-tests" OFF )
+# ------------------------------------------------------------------------------
+# Unit-testing related settings:
 
-option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"       OFF )
+option( SIXTRACKL_ENABLE_PROGRAMM_TESTS "Enable programmatic unit-tests"  OFF )
+set( GTEST_ROOT "" CACHE PATH 
+     "Path to include/gtest/gtest.h (for non-standard installations)" )
+     
+# ------------------------------------------------------------------------------
 
-option( SIXTRACKL_ENABLE_SIMD              "Enable manual SIMD backend"     OFF ) 
+option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"  OFF )
+
+option( SIXTRACKL_ENABLE_SIMD "Enable manual SIMD backend"     OFF ) 
+set( SIXTRACKL_SIMD_ARCH  "SSE2" CACHE STRING 
+     "Target SIMD architecture (SSE2, AVX, AVX2) default: SSE2" )
+
 option( SIXTRACKL_ENABLE_OPENMP            "Enable OpenMP backend"          OFF )
 option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL backend"          OFF )
 option( SIXTRACKL_ENABLE_CUDA              "Enable CUDA backend"            OFF )

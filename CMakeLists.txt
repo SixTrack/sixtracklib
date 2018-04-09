@@ -65,6 +65,11 @@ set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake" 
 message( STATUS "cmake_module_path: ${CMAKE_MODULE_PATH}" )
 
 # ------------------------------------------------------------------------------
+# Unit-testing:
+
+include( SetupUnitTesting )
+
+# ------------------------------------------------------------------------------
 # OpenCL:
 
 if( SIXTRACKL_ENABLE_OPENCL )
@@ -73,6 +78,8 @@ endif()
 
 # ==============================================================================
 # build libraries and modules:
+
+include_directories( ${CMAKE_SOURCE_DIR} )
 
 add_subdirectory( sixtracklib )
 
