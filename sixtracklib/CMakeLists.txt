@@ -12,7 +12,13 @@
 
 # ------------------------------------------------------------------------------
 
-set( SIXTRACKL_HEADERS )
+set( SIXTRACKL_TEST_LIBRARIES sixtrack )
+
+set( SIXTRACKL_HEADERS 
+     _impl/namespace_begin.h 
+     _impl/namespace_end.h
+)
+
 set( SIXTRACKL_SOURCES )
 
 # ------------------------------------------------------------------------------
