@@ -1,6 +1,8 @@
 #ifndef SIXTRACKLIB_COMMON_TRACK_H__
 #define SIXTRACKLIB_COMMON_TRACK_H__
 
+#include "sixtracklib/_impl/namespace_begin.h"
+
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -10,17 +12,18 @@
 extern "C" {
 #endif /* __cplusplus */
 
-struct Particles;
+struct NS(Particles);
 
-int Drift_track( 
-    struct Particles* SIXTRL_RESTRICT particles, uint64_t ip, double length );
+int NS(Drift_track)( 
+    struct NS(Particles)* SIXTRL_RESTRICT particles, uint64_t ip, double length );
 
-int DriftExact_track(
-    struct Particles* SIXTRL_RESTRICT particles, uint64_t ip, double length );
-
+int NS(DriftExact_track)(
+    struct NS(Particles)* SIXTRL_RESTRICT particles, uint64_t ip, double length );
    
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
 #endif /* SIXTRACKLIB_COMMON_TRACK_H__ */
+
+/* end: sixtracklib/common/track.h */

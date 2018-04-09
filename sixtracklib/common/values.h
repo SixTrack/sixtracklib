@@ -1,5 +1,7 @@
-#ifndef SIXTRACKLIB_BASELINE_VALUES_H__
-#define SIXTRACKLIB_BASELINE_VALUES_H__
+#ifndef SIXTRACKLIB_COMMON_VALUES_H__
+#define SIXTRACKLIB_COMMON_VALUES_H__
+
+#include "sixtracklib/_impl/namespace_begin.h"
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -8,7 +10,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-typedef union CommonValues
+typedef union NS(CommonValues)
 {
     double      f64;
     int64_t     i64;
@@ -17,7 +19,7 @@ typedef union CommonValues
     int8_t      i8[ 8 ];
     uint8_t     u8[ 8 ];
 }
-value_t;
+NS(value_t);
 
 #ifdef __cplusplus
 }
@@ -25,4 +27,4 @@ value_t;
 
 #endif /* SIXTRACKLIB_BASELINE_VALUES_H__ */
 
-/* end: sixtracklib/baseline/values.h */
+/* end: sixtracklib/common/values.h */
