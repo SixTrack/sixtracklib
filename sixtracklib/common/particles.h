@@ -3,7 +3,7 @@
 
 #if !defined( _GPUCODE )
 
-#include "sixtracklib/common/impl/particles_type.h"
+#include "sixtracklib/_impl/namespace_begin.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -14,28 +14,28 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-    
-struct SingleParticle;
-union  CommonValues;
+
+struct NS(Particles);    
+struct NS(SingleParticle);
+union  NS(CommonValues);
 
 #endif /* !defined( _GPUCODE ) */
 
 /* -------------------------------------------------------------------------- */
 
-bool Particles_has_values( const Particles *const SIXTRL_RESTRICT p );
+bool Particles_has_values( const struct NS(Particles) *const SIXTRL_RESTRICT p );
 
-Particles* Particles_unpack_values( 
-    Particles* SIXTRL_RESTRICT p, 
-    union CommonValues const* SIXTRL_RESTRICT pp );
+struct NS(Particles)* NS(Particles_unpack_values)( 
+    struct NS(Particles)* SIXTRL_RESTRICT p, 
+    union NS(CommonValues) const* SIXTRL_RESTRICT pp );
 
-void Particles_copy( 
-    Particles* SIXTRL_RESTRICT dest, uint64_t const dest_id, 
-    Particles const* SIXTRL_RESTRICT src, uint64_t const src_id );
+void NS(Particles_copy)( 
+    struct NS(Particles)* SIXTRL_RESTRICT dest, uint64_t const dest_id, 
+    struct NS(Particles) const* SIXTRL_RESTRICT src, uint64_t const src_id );
 
-void Particles_init_from_single( 
-    Particles* SIXTRL_RESTRICT dest, 
-    struct SingleParticle const* SIXTRL_RESTRICT src );
-
+void NS(Particles_init_from_single)( 
+    struct NS(Particles)* SIXTRL_RESTRICT dest, 
+    struct NS(SingleParticle) const* SIXTRL_RESTRICT src );
 
 /* -------------------------------------------------------------------------- */
 

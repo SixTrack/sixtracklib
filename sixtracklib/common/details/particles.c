@@ -1,6 +1,8 @@
 #if !defined( _GPUCODE )
 
+#include "sixtracklib/_impl/namespace_begin.h"
 #include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/impl/particles_type.h"
 
 #include <assert.h>
 
@@ -12,24 +14,24 @@
 #include <stdint.h>
 #include <stdlib.h>
     
-extern bool Particles_has_values( const Particles *const SIXTRL_RESTRICT p );
+extern bool NS(Particles_has_values)( const NS(Particles) *const SIXTRL_RESTRICT p );
     
-extern Particles* Particles_unpack_values( 
-    Particles* SIXTRL_RESTRICT p, union CommonValues const* SIXTRL_RESTRICT pp );
+extern NS(Particles)* NS(Particles_unpack_values)( 
+    NS(Particles)* SIXTRL_RESTRICT p, union NS(CommonValues) const* SIXTRL_RESTRICT pp );
 
-extern void Particles_copy( 
-    Particles* SIXTRL_RESTRICT dest, uint64_t const dest_id, 
-    Particles const* SIXTRL_RESTRICT src, uint64_t const src_id );
+extern void NS(Particles_copy)( 
+    NS(Particles)* SIXTRL_RESTRICT dest, uint64_t const dest_id, 
+    NS(Particles) const* SIXTRL_RESTRICT src, uint64_t const src_id );
 
-extern void Particles_init_from_single( 
-    Particles* SIXTRL_RESTRICT dest, 
-    struct SingleParticle const* SIXTRL_RESTRICT src );
+extern void NS(Particles_init_from_single)( 
+    NS(Particles)* SIXTRL_RESTRICT dest, 
+    struct NS(SingleParticle) const* SIXTRL_RESTRICT src );
 
 #endif /* !defined( _GPUCODE ) */
 
 /* -------------------------------------------------------------------------- */
 
-bool Particles_has_values( const Particles *const SIXTRL_RESTRICT p )
+bool NS(Particles_has_values)( const NS(Particles) *const SIXTRL_RESTRICT p )
 {
     bool const is_valid = (
         ( p != 0 ) && 
@@ -45,8 +47,8 @@ bool Particles_has_values( const Particles *const SIXTRL_RESTRICT p )
     return is_valid;
 }
 
-Particles* Particles_unpack_values( 
-    Particles* SIXTRL_RESTRICT p, value_t const* SIXTRL_RESTRICT pp )
+NS(Particles)* NS(Particles_unpack_values)( 
+    NS(Particles)* SIXTRL_RESTRICT p, NS(value_t) const* SIXTRL_RESTRICT pp )
 {
     double*     ptr_double = ( double*  )( p );
     int64_t*    ptr_int64  = ( int64_t* )( p );
@@ -78,15 +80,15 @@ Particles* Particles_unpack_values(
     return p;
 }
 
-void Particles_copy( 
-    Particles* SIXTRL_RESTRICT dest, uint64_t const dest_id, 
-    Particles const* SIXTRL_RESTRICT src, uint64_t const src_id )
+void NS(Particles_copy)( 
+    NS(Particles)* SIXTRL_RESTRICT dest, uint64_t const dest_id, 
+    NS(Particles) const* SIXTRL_RESTRICT src, uint64_t const src_id )
 {
-    assert( ( ( Particles* SIXTRL_RESTRICT )src != dest ) &&
-            ( Particles_has_values( dest ) ) &&
+    assert( ( ( NS(Particles)* SIXTRL_RESTRICT )src != dest ) &&
+            ( NS(Particles_has_values)( dest ) ) &&
             ( dest_id >= dest->partid[ 0 ] ) && 
             ( dest->npart > ( dest_id - dest->partid[ 0 ] ) ) &&
-            ( Particles_has_values( src  ) ) && 
+            ( NS(Particles_has_values)( src  ) ) && 
             ( src_id  >= src->partid[ 0 ]  ) &&
             ( src->npart > ( src_id  - src->partid[ 0 ] ) ) );
     
@@ -112,16 +114,16 @@ void Particles_copy(
     dest->chi[ dest_id ]    = src->chi[ src_id ];
 }
 
-void Particles_init_from_single( 
-    Particles* SIXTRL_RESTRICT dest, 
-    SingleParticle const* SIXTRL_RESTRICT const_src )
+void NS(Particles_init_from_single)( 
+    NS(Particles)* SIXTRL_RESTRICT dest, 
+    NS(SingleParticle) const* SIXTRL_RESTRICT const_src )
 {
     /* Casting away the constness -> this is ugly, but the API should be const
      * to hint at the usage.
      * TODO: Search for a cleaner way to do this once the API becomes a little
      * more settled */
     
-    SingleParticle * src = ( SingleParticle* )const_src; 
+    NS(SingleParticle) * src = ( SingleParticle* )const_src; 
     
     assert( ( dest != 0 ) && ( src != 0 ) );
     
