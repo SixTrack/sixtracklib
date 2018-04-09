@@ -1,6 +1,7 @@
 # sixtracklib/sixtracklib/common/CMakeLists.txt
 
 set( SIXTRACKLIB_COMMON_HEADERS 
+     details/mem_pool.h
      impl/particles_type.h
      impl/track_single.h
      single_particle.h
@@ -11,6 +12,7 @@ set( SIXTRACKLIB_COMMON_HEADERS
 
 
 set( SIXTRACKLIB_COMMON_SOURCES
+     details/mem_pool.c
      details/particles.c
      details/single_particle.c
      details/track_single.c
@@ -27,5 +29,9 @@ set_target_properties(  sixtrack_common PROPERTIES LINKER_LANGUAGE C )
 set_target_properties(  sixtrack_common PROPERTIES POSITION_INDEPENDENT_CODE True )
 set_target_properties(  sixtrack_common PROPERTIES C_STANDARD 99 )
 target_compile_options( sixtrack_common BEFORE PUBLIC -Wall -Werror -pedantic -ansi )
+
+if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
+    add_subdirectory( tests )
+endif()
 
 #end sixtracklib/sixtracklib/common/CMakeLists.txt
