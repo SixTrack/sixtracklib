@@ -1,8 +1,10 @@
 #ifndef SIXTRACKLIB_COMMON_IMPL_TRACK_SINGLE_H__
 #define SIXTRACKLIB_COMMON_IMPL_TRACK_SINGLE_H__
 
-#include <stdlib.h>
+#include "sixtracklib/_impl/namespace_begin.h"
+
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "sixtracklib/common/restrict.h"
 
@@ -10,14 +12,16 @@
 extern "C" {
 #endif /* __cplusplus */
 
-struct SingleParticle;
+struct NS( SingleParticle );
 
-int Drift_track_single( 
-    struct SingleParticle* SIXTRL_RESTRICT particle, double length );
+int NS( Drift_track_single )( struct NS( SingleParticle ) *
+                                  SIXTRL_RESTRICT particle,
+                              double length );
 
-int DriftExact_track_single(
-    struct SingleParticle* SIXTRL_RESTRICT particle, double length );
-   
+int NS( DriftExact_track_single )( struct NS( SingleParticle ) *
+                                       SIXTRL_RESTRICT particle,
+                                   double length );
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
