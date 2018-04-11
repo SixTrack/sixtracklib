@@ -6,7 +6,7 @@
 
 #include "sixtracklib/_impl/inline.h"
 
-#include "sixtracklib/common/details/mem_pool.h"
+#include "sixtracklib/common/mem_pool.h"
 #include "sixtracklib/common/restrict.h"
 #include "sixtracklib/common/single_particle.h"
 #include "sixtracklib/common/values.h"
@@ -20,6 +20,12 @@
 static NS( Particles ) *
     NS( Particles_preset )( NS( Particles ) * SIXTRL_RESTRICT p );
 
+/* ------------------------------------------------------------------------- */
+
+extern size_t NS( Particles_predict_required_capacity )( 
+    size_t num_particles, size_t* SIXTRL_RESTRICT ptr_chunk_size,
+    size_t* SIXTRL_RESTRICT ptr_alignment, bool make_packed );
+    
 /* ------------------------------------------------------------------------- */
 
 extern bool NS( Particles_is_packed )( const struct NS( Particles ) *
@@ -64,7 +70,8 @@ static bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                                             struct NS( MemPool ) *
                                                 SIXTRL_RESTRICT pool,
                                             size_t npart,
-                                            size_t alignment );
+                                            size_t alignment, 
+                                            bool make_packed );
 
 static bool NS( Particles_map_to_single_particle )(
     struct NS( Particles ) * SIXTRL_RESTRICT particles,
@@ -140,9 +147,143 @@ NS( Particles ) * NS( Particles_preset )( NS( Particles ) * SIXTRL_RESTRICT p )
         NS( Particles_set_size )( p, UINT64_C( 0 ) );
         NS( Particles_set_flags )( p, NS( PARTICLES_FLAGS_NONE ) );
         NS( Particles_set_ptr_mem_context )( p, 0 );
+        NS( Particles_set_ptr_mem_begin   )( p, 0 );
     }
 
     return p;
+}
+
+/* ------------------------------------------------------------------------ */
+
+size_t NS( Particles_predict_required_capacity )( 
+    size_t num_particles, size_t* SIXTRL_RESTRICT ptr_chunk_size,
+    size_t* SIXTRL_RESTRICT ptr_alignment, bool make_packed )
+{
+    static size_t const ZERO_SIZE = (size_t)0u;
+
+    size_t predicted_capacity = ZERO_SIZE;
+
+    if( ( num_particles > ZERO_SIZE ) && ( ptr_chunk_size != 0 ) &&
+        ( ptr_alignment != 0 ) )
+    {
+        size_t double_elem_length  = sizeof( double  ) * num_particles;
+        size_t int64_elem_length   = sizeof( int64_t ) * num_particles;
+
+        size_t chunk_size = *ptr_chunk_size;
+        size_t alignment = *ptr_alignment;
+
+        assert( ptr_chunk_size != ptr_alignment );
+
+        if( chunk_size == ZERO_SIZE )
+        {
+            chunk_size = NS( PARTICLES_DEFAULT_MEMPOOL_CHUNK_SIZE );
+        }
+
+        assert( chunk_size <= NS( PARTICLES_MAX_ALIGNMENT ) );
+
+        if( alignment == ZERO_SIZE )
+        {
+            alignment = NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT );
+        }
+
+        if( alignment < chunk_size )
+        {
+            alignment = chunk_size;
+        }
+
+        if( ( alignment % chunk_size ) != ZERO_SIZE )
+        {
+            alignment =
+                chunk_size + ( ( alignment / chunk_size ) * chunk_size );
+        }
+
+        assert( ( alignment <= NS( PARTICLES_MAX_ALIGNMENT ) ) &&
+                ( alignment >= chunk_size ) &&
+                ( ( alignment % chunk_size ) == ZERO_SIZE ) );
+
+        /* ----------------------------------------------------------------- */
+        
+        if( make_packed )
+        {
+            /* Packing information: 
+             * - 1 x uint64_t .... indicator, i.e. what has been packed
+             *                     note: Particles = 1
+             * - 1 x uint64_t .... npart, i.e. the number of particles that 
+             *                     are packed
+             * - 1 x uint64_t .... nelem, i.e. the number of elements 
+             *                     that have been packed
+             * - num x uint64_t .. nelem x offsets, i.e. for each of the num 
+             *                     elemens an offset in bytes on where the 
+             *                     data is stored.
+             *                     Note: the base address from where to add 
+             *                     add these offsets is specific to the storage
+             *                     mechanism. For NS(MemPool) instances, its
+             *                     the NS(MemPool_get_buffer) address */
+            
+            size_t pack_info_length = 
+                sizeof( uint64_t ) + sizeof( uint64_t ) + sizeof( uint64_t ) + 
+                sizeof( uint64_t ) * (
+                    NS( PARTICLES_NUM_OF_DOUBLE_ELEMENTS ) +
+                    NS( PARTICLES_NUM_OF_INT64_ELEMENTS  ) );
+            
+            size_t const temp = ( pack_info_length / alignment ) * alignment;
+            
+            if( temp < pack_info_length )
+            {
+                pack_info_length = temp + alignment;
+            }
+            
+            assert( ( pack_info_length % alignment ) == ZERO_SIZE );            
+            predicted_capacity += pack_info_length;
+        }
+                
+        /* ----------------------------------------------------------------- */
+
+        size_t temp = ( double_elem_length / ( alignment ) ) * ( alignment );
+
+        if( temp < double_elem_length )
+        {
+            temp += alignment;
+        }
+
+        double_elem_length = temp;
+
+        /* ----------------------------------------------------------------- */
+
+        temp = ( int64_elem_length / ( alignment ) ) * ( alignment );
+
+        if( temp < int64_elem_length )
+        {
+            temp += alignment;
+        }
+
+        int64_elem_length = temp;
+
+        /* ----------------------------------------------------------------- */
+
+        assert( ( double_elem_length > ZERO_SIZE ) &&
+                ( ( double_elem_length % alignment ) == ZERO_SIZE ) &&
+                ( int64_elem_length > ZERO_SIZE ) &&
+                ( ( int64_elem_length % alignment ) == ZERO_SIZE ) );
+
+        predicted_capacity +=
+            NS( PARTICLES_NUM_OF_DOUBLE_ELEMENTS ) * double_elem_length +
+            NS( PARTICLES_NUM_OF_INT64_ELEMENTS  ) * int64_elem_length;
+
+        /* By aligning every part of the Particles struct to the
+         * required alignment, we can ensure that the whole block used for
+         * packing the data will be aligned internally. We have, however, to
+         * account for the possibility that the initial address of the whole
+         * memory region will be not properly aligned -> increase the capacity
+         * by the alignment to allow for some wiggle room here */
+
+        predicted_capacity += alignment;
+
+        *ptr_chunk_size = chunk_size;
+        *ptr_alignment = alignment;
+    }
+
+    return predicted_capacity;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -247,6 +388,8 @@ bool NS( Particles_map_to_single_particle )( struct NS( Particles ) *
         NS( Particles_assign_ptr_to_rvv )( particles, &single->rvv );
         NS( Particles_assign_ptr_to_chi )( particles, &single->chi );
         
+        NS( Particles_set_ptr_mem_begin )( particles, &single );
+        
         success = true;
     }
 
@@ -258,15 +401,21 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                                      struct NS( MemPool ) *
                                          SIXTRL_RESTRICT pool,
                                      size_t npart,
-                                     size_t alignment )
+                                     size_t alignment, 
+                                     bool make_packed )
 {
     bool success = false;
 
+    typedef unsigned char  uchar_t;
+    
     static size_t const ZERO_SIZE = (size_t)0u;
 
     if( ( pool != 0 ) && ( particles != 0 ) && ( npart > ZERO_SIZE ) &&
+        ( npart <= ( size_t )UINT64_MAX ) &&
         ( alignment > ZERO_SIZE ) )
     {
+        unsigned char* particles_begin = 0;
+        
         NS( Particles ) rollback_particles = *particles;
         NS( MemPool ) rollback_mem_pool = *pool;
 
@@ -276,454 +425,509 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
 
         do
         {
-            size_t const min_double_member_length = sizeof( double ) * npart;
-            size_t const min_int64_member_length = sizeof( int64_t ) * npart;
+            NS( AllocResult ) add_result;
+            
+            uint64_t  elem_length;
+            uint64_t  elem_offset;
+            uint64_t* pack_info_iter = 0;            
+            
+            uint64_t const num_of_attributes =                 
+                NS(PARTICLES_NUM_OF_DOUBLE_ELEMENTS) +
+                NS(PARTICLES_NUM_OF_INT64_ELEMENTS);
+            
+            unsigned char* ptr_elem = 0;
+            
+            size_t const min_double_member_length = sizeof( double  ) * npart;
+            size_t const min_int64_member_length  = sizeof( int64_t ) * npart;
+            
+            assert( ( ( alignment % sizeof( uint64_t ) ) == ZERO_SIZE ) &&
+                    ( ( alignment % sizeof( double   ) ) == ZERO_SIZE ) &&
+                    ( ( alignment % sizeof( int64_t  ) ) == ZERO_SIZE ) );
+            
+            NS( AllocResult_preset )( &add_result );
 
-            NS( AllocResult ) add_member_result;
-            NS( AllocResult_preset )( &add_member_result );
-
+            /* ------------------------------------------------------------- */
+            /* Pack information: */
+            
+            if( make_packed )
+            {
+                /* TODO: provide this information somewhere centrally!!!!! */
+                uint64_t const pack_indicator   = UINT64_C( 1 );                
+                uint64_t const num_of_particles = ( uint64_t )npart;
+                
+                size_t const offset_info_block_len = 
+                    sizeof( pack_indicator ) + 
+                    sizeof( num_of_attributes ) + 
+                    sizeof( num_of_particles ) + 
+                    sizeof( uint64_t ) * num_of_attributes;
+                    
+                add_result = NS(MemPool_append_aligned)(
+                    pool, offset_info_block_len, alignment );
+                
+                if( ( !NS( AllocResult_valid )( &add_result ) ) ||
+                    ( !NS( AllocResult_is_aligned)( &add_result, alignment ) ) )
+                {
+                    break;                
+                }
+                
+                particles_begin = NS( AllocResult_get_pointer )( &add_result );
+                pack_info_iter  = ( uint64_t* )particles_begin;
+                
+                *pack_info_iter++ = pack_indicator;
+                *pack_info_iter++ = num_of_particles;
+                *pack_info_iter++ = num_of_attributes;
+            }
+            
+            ptr_elem = NS(MemPool_get_next_begin_pointer)( pool, alignment );
+            
+            assert( ( !make_packed ) || ( 0 <= ( ptr_elem - 
+                ( ( uchar_t* )( pack_info_iter + num_of_attributes ) ) ) ) );
+            
             /* ------------------------------------------------------------- */
             /* q0: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( !make_packed )
+            {
+                particles_begin = ptr_elem;
+            }
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_q0 )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_q0 )( particles, ( double*) ptr_elem );            
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* mass0: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_mass0 )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_mass0 )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* beta0: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_beta0 )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
-
+            
+            NS( Particles_assign_ptr_to_beta0 )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
+            
             /* ------------------------------------------------------------- */
             /* gamma0: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_gamma0 )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
-
+            
+            NS( Particles_assign_ptr_to_gamma0 )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
+            
             /* ------------------------------------------------------------- */
             /* p0c: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_p0c )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_p0c )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* partid: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_int64_member_length, alignment );
-
-            if( !NS( AllocResult_valid )( &add_member_result ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_int64_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_int64_member_length );
-
-            NS( Particles_assign_ptr_to_particle_id )
-            ( particles,
-              (int64_t*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_particle_id )( 
+                particles, ( int64_t* )ptr_elem );
+            
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* elemid: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_int64_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_int64_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_int64_member_length );
-
-            NS( Particles_assign_ptr_to_lost_at_element_id )
-            ( particles,
-              (int64_t*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_lost_at_element_id)( 
+                particles, ( int64_t* )ptr_elem );
+            
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* turn: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_int64_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_int64_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_int64_member_length );
-
-            NS( Particles_assign_ptr_to_lost_at_turn )
-            ( particles,
-              (int64_t*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_lost_at_turn )( 
+                particles, ( int64_t* )ptr_elem );
+            
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* state: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_int64_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_int64_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_int64_member_length );
-
-            NS( Particles_assign_ptr_to_state )
-            ( particles,
-              (int64_t*)NS( AllocResult_get_pointer )( &add_member_result ) );
-
+            
+            NS( Particles_assign_ptr_to_state )( 
+                particles, ( int64_t* )ptr_elem );
+            
+            if( make_packed ) *pack_info_iter++ = elem_offset;
+            
             /* ------------------------------------------------------------- */
             /* s: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_s )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_s )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* x: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_x )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_x )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* y: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_y )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_y )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* px: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_px )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_px )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* py: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_py )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_py )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* sigma: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_sigma )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_sigma )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* psigma: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_psigma )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_psigma )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* delta: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_delta )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_delta )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* rpp: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_rpp )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_rpp )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* rvv: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_rvv )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_rvv )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* chi: */
 
-            add_member_result = NS( MemPool_append_aligned )(
+            add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
-
-            if( ( !NS( AllocResult_valid )( &add_member_result ) ) ||
-                ( NS( AllocResult_get_pointer )( &add_member_result ) == 0 ) ||
-                ( ( ( (uintptr_t)NS( AllocResult_get_pointer )(
-                        &add_member_result ) ) %
-                    alignment ) != ZERO_SIZE ) )
+            
+            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            
+            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
+            elem_offset = NS( AllocResult_get_offset )( &add_result );
+            elem_length = NS( AllocResult_get_length )( &add_result );
+            
+            if( ( elem_length < min_double_member_length ) ||
+                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
             {
                 break;
             }
-
-            assert( NS( AllocResult_get_length )( &add_member_result ) >=
-                    min_double_member_length );
-
-            NS( Particles_assign_ptr_to_chi )
-            ( particles,
-              (double*)NS( AllocResult_get_pointer )( &add_member_result ) );
+            
+            NS( Particles_assign_ptr_to_chi )( particles, ( double*)ptr_elem );
+            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ============================================================= */
-
+            
             success = true;
+            
         } while( false );
 
-        if( !success )
+        if( success )
+        {
+            assert( particles_begin != 0 );
+            NS(Particles_set_ptr_mem_begin)( particles, particles_begin );
+        }
+        else
         {
             *particles = rollback_particles;
             *pool = rollback_mem_pool;
@@ -744,7 +948,8 @@ NS( Particles ) * NS( Particles_new )( size_t npart )
     size_t alignment = NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT );
 
     size_t const required_capacity =
-        NS( Particles_get_capacity_for_size )( npart, &chunk_size, &alignment );
+        NS( Particles_predict_required_capacity )( 
+            npart, &chunk_size, &alignment, true );
 
     if( ( required_capacity > (size_t)0u ) && ( (uint64_t)npart < UINT64_MAX ) )
     {
@@ -773,7 +978,7 @@ NS( Particles ) * NS( Particles_new )( size_t npart )
 
         if( ( ptr_mem_pool != 0 ) && ( particles != 0 ) &&
             ( NS( Particles_map_to_mempool )(
-                particles, ptr_mem_pool, npart, alignment ) ) )
+                particles, ptr_mem_pool, npart, alignment, true ) ) )
         {
             uint64_t flags = NS( PARTICLES_FLAGS_PACKED ) |
                              NS( PARTICLES_FLAGS_OWNS_MEMORY ) |
@@ -791,6 +996,8 @@ NS( Particles ) * NS( Particles_new )( size_t npart )
                 flags &= ~( NS( PARTICLES_FLAGS_ALIGN_MASK ) );
             }
 
+            assert( NS(Particles_get_mem_begin )( particles ) != 0 );
+            
             NS( Particles_set_flags )( particles, flags );
             NS( Particles_set_size )( particles, (uint64_t)npart );
             NS( Particles_set_ptr_mem_context )( particles, ptr_mem_pool );
@@ -835,7 +1042,8 @@ NS( Particles ) *
     size_t alignment = NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT );
 
     size_t const required_capacity =
-        NS( Particles_get_capacity_for_size )( npart, &chunk_size, &alignment );
+        NS( Particles_predict_required_capacity )( 
+            npart, &chunk_size, &alignment, true );
 
     if( ( required_capacity > (size_t)0u ) &&
         ( chunk_size == NS( MemPool_get_chunk_size )( pool ) ) &&
@@ -847,8 +1055,9 @@ NS( Particles ) *
         particles = NS( Particles_preset )(
             (NS( Particles )*)malloc( sizeof( NS( Particles ) ) ) );
 
-        if( ( particles != 0 ) && ( NS( Particles_map_to_mempool )(
-                                      particles, pool, npart, alignment ) ) )
+        if( ( particles != 0 ) && 
+            ( NS( Particles_map_to_mempool )( 
+                particles, pool, npart, alignment, true ) ) )
         {
             uint64_t flags = NS( PARTICLES_FLAGS_PACKED ) |
                              NS( PARTICLES_FLAGS_MEM_CTX_MEMPOOL );
@@ -865,10 +1074,12 @@ NS( Particles ) *
                 flags &= ~( NS( PARTICLES_FLAGS_ALIGN_MASK ) );
             }
 
+            assert( NS(Particles_get_mem_begin )( particles ) != 0 );
+            
             NS( Particles_set_flags )( particles, flags );
             NS( Particles_set_size )( particles, (uint64_t)npart );
             NS( Particles_set_ptr_mem_context )( particles, pool );
-
+            
             success = true;
         }
 

@@ -50,8 +50,9 @@ typedef struct NS( Particles )
     double* rvv;    /* ratio beta / beta0 */
     double* chi;    /* q/q0 * m/m0  */
 
-    uint64_t flags;        /* particle flags */
-    void* ptr_mem_context; /* memory_context -> can contain */
+    uint64_t flags;         /* particle flags */
+    void* ptr_mem_context;  /* memory_context -> can contain */
+    void* ptr_mem_begin; /* reference memory addr for (un)packing (optional) */
 } NS( Particles );
 
 static int64_t const NS( PARTICLE_VALID_STATE ) = INT64_C( 0 );
@@ -82,10 +83,7 @@ static size_t const NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT ) = (size_t)16u;
 static size_t const NS( PARTICLES_NUM_OF_DOUBLE_ELEMENTS ) = (size_t)16u;
 static size_t const NS( PARTICLES_NUM_OF_INT64_ELEMENTS ) = (size_t)4u;
 
-static uint64_t
-    NS( Particles_get_capacity_for_size )( size_t num_particles,
-                                           size_t* SIXTRL_RESTRICT chunk_size,
-                                           size_t* SIXTRL_RESTRICT alignment );
+
 
 /* ========================================================================= */
 
@@ -109,9 +107,18 @@ static void const* NS( Particles_get_const_ptr_mem_context )(
 static void* NS( Particles_get_ptr_mem_context )( struct NS( Particles ) *
                                                   SIXTRL_RESTRICT p );
 
+static void const* NS( Particles_get_const_mem_begin )(
+    const struct NS(Particles) *const SIXTRL_RESTRICT p );
+
+static void* NS( Particles_get_mem_begin )(
+    struct NS(Particles)* SIXTRL_RESTRICT p );
+
 static void NS( Particles_set_ptr_mem_context )( struct NS( Particles ) *
                                                      SIXTRL_RESTRICT p,
                                                  void* ptr_mem_context );
+
+static void NS( Particles_set_ptr_mem_begin )( 
+    struct NS(Particles)* SIXTRL_RESTRICT p, void* ptr_mem_begin );
 
 /* ========================================================================= */
 
@@ -561,104 +568,6 @@ static void NS( Particles_assign_ptr_to_chi )( NS( Particles ) *
 
 /* ========================================================================= */
 
-SIXTRL_INLINE size_t NS( Particles_get_capacity_for_size )(
-    size_t num_particles,
-    size_t* SIXTRL_RESTRICT ptr_chunk_size,
-    size_t* SIXTRL_RESTRICT ptr_alignment )
-{
-    static size_t const ZERO_SIZE = (size_t)0u;
-
-    size_t predicted_capacity = ZERO_SIZE;
-
-    if( ( num_particles > ZERO_SIZE ) && ( ptr_chunk_size != 0 ) &&
-        ( ptr_alignment != 0 ) )
-    {
-        size_t double_elem_length = sizeof( double ) * num_particles;
-        size_t int64_elem_length = sizeof( int64_t ) * num_particles;
-
-        size_t chunk_size = *ptr_chunk_size;
-        size_t alignment = *ptr_alignment;
-
-        assert( ptr_chunk_size != ptr_alignment );
-
-        if( chunk_size == ZERO_SIZE )
-        {
-            chunk_size = NS( PARTICLES_DEFAULT_MEMPOOL_CHUNK_SIZE );
-        }
-
-        assert( chunk_size <= NS( PARTICLES_MAX_ALIGNMENT ) );
-
-        if( alignment == ZERO_SIZE )
-        {
-            alignment = NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT );
-        }
-
-        if( alignment < chunk_size )
-        {
-            alignment = chunk_size;
-        }
-
-        if( ( alignment % chunk_size ) != ZERO_SIZE )
-        {
-            alignment =
-                chunk_size + ( ( alignment / chunk_size ) * chunk_size );
-        }
-
-        assert( ( alignment <= NS( PARTICLES_MAX_ALIGNMENT ) ) &&
-                ( alignment >= chunk_size ) &&
-                ( ( alignment % chunk_size ) == ZERO_SIZE ) );
-
-        /* ----------------------------------------------------------------- */
-
-        size_t temp = ( double_elem_length / ( alignment ) ) * ( alignment );
-
-        if( temp < double_elem_length )
-        {
-            temp += alignment;
-        }
-
-        double_elem_length = temp;
-
-        /* ----------------------------------------------------------------- */
-
-        temp = ( int64_elem_length / ( alignment ) ) * ( alignment );
-
-        if( temp < int64_elem_length )
-        {
-            temp += alignment;
-        }
-
-        int64_elem_length = temp;
-
-        /* ----------------------------------------------------------------- */
-
-        assert( ( double_elem_length > ZERO_SIZE ) &&
-                ( ( double_elem_length % alignment ) == ZERO_SIZE ) &&
-                ( int64_elem_length > ZERO_SIZE ) &&
-                ( ( int64_elem_length % alignment ) == ZERO_SIZE ) );
-
-        predicted_capacity =
-            NS( PARTICLES_NUM_OF_DOUBLE_ELEMENTS ) * double_elem_length +
-            NS( PARTICLES_NUM_OF_INT64_ELEMENTS ) * int64_elem_length;
-
-        /* By aligning every individual member of the Particles struct to the
-         * required alignment, we can ensure that the whole block used for
-         * packing the data will be aligned internall. We have, however, to
-         * account for the possibility that the initial address of the whole
-         * memory region will be not properly aligned -> increase the capacity
-         * by the alignment to allow for some wiggle room here */
-
-        predicted_capacity += alignment;
-
-        *ptr_chunk_size = chunk_size;
-        *ptr_alignment = alignment;
-    }
-
-    return predicted_capacity;
-}
-
-/* ========================================================================= */
-
 SIXTRL_INLINE uint64_t NS( Particles_get_size )( const struct NS( Particles ) *
                                                  const SIXTRL_RESTRICT p )
 {
@@ -708,6 +617,19 @@ SIXTRL_INLINE void* NS( Particles_get_ptr_mem_context )(
     return (void*)NS( Particles_get_const_ptr_mem_context )( p );
 }
 
+SIXTRL_INLINE void const* NS( Particles_get_const_mem_begin )(
+    const struct NS( Particles ) *const SIXTRL_RESTRICT p )
+{
+    return ( p != 0 ) ? p->ptr_mem_begin : 0;
+}
+
+SIXTRL_INLINE void* NS( Particles_get_mem_begin )(
+    struct NS( Particles )* SIXTRL_RESTRICT p )
+{
+    /* casting away const-ness of a pointer is ok even in C */
+    return ( void* )NS( Particles_get_const_mem_begin )( p );
+}
+
 SIXTRL_INLINE void NS( Particles_set_ptr_mem_context )( struct NS( Particles ) *
                                                             SIXTRL_RESTRICT p,
                                                         void* ptr_mem_context )
@@ -717,6 +639,17 @@ SIXTRL_INLINE void NS( Particles_set_ptr_mem_context )( struct NS( Particles ) *
 #endif /* !defiend( _GPUCODE ) */
 
     p->ptr_mem_context = ptr_mem_context;
+    return;
+}
+
+SIXTRL_INLINE void NS( Particles_set_ptr_mem_begin )( 
+    struct NS( Particles ) * SIXTRL_RESTRICT p, void* ptr_mem_begin )
+{
+    #if !defined( _GPUCODE )
+        assert( p != 0 );
+    #endif /* !defiend( _GPUCODE ) */
+
+    p->ptr_mem_begin = ptr_mem_begin;
     return;
 }
 

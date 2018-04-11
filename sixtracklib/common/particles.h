@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "sixtracklib/common/restrict.h"
+#include "sixtracklib/common/mem_pool.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,6 +19,12 @@ struct NS( SingleParticle );
 struct NS( Particles );
 
 /* -------------------------------------------------------------------------- */
+
+size_t NS( Particles_predict_required_capacity )( 
+    size_t num_particles,
+    size_t* SIXTRL_RESTRICT chunk_size,
+    size_t* SIXTRL_RESTRICT alignment, 
+    bool make_packed );
 
 struct NS( Particles ) * NS( Particles_new )( size_t npart );
 
