@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_DETAILS_MEMORY_POOL_H__
-#define SIXTRACKLIB_COMMON_DETAILS_MEMORY_POOL_H__
+#ifndef SIXTRACKLIB_COMMON_MEMORY_POOL_H__
+#define SIXTRACKLIB_COMMON_MEMORY_POOL_H__
 
 #include "sixtracklib/_impl/namespace_begin.h"
 
@@ -23,7 +23,12 @@ typedef struct NS( AllocResult )
     uint64_t length;
 } NS( AllocResult );
 
-bool NS( AllocResult_valid )( const NS( AllocResult ) * const result );
+bool NS( AllocResult_valid )( 
+    const NS( AllocResult ) * const SIXTRL_RESTRICT result );
+
+bool NS(AllocResult_is_aligned)( 
+    const NS(AllocResult) *const SIXTRL_RESTRICT result, 
+    size_t alignment );
 
 NS( AllocResult ) *
     NS( AllocResult_preset )( NS( AllocResult ) * SIXTRL_RESTRICT result );
@@ -46,7 +51,7 @@ typedef struct NS( MemPool )
     size_t capacity;
     size_t size;
     size_t chunk_size;
-} NS( MemPool );
+} NS(MemPool);
 
 NS( MemPool ) * NS( MemPool_preset )( NS( MemPool ) * SIXTRL_RESTRICT pool );
 
@@ -115,6 +120,6 @@ NS( MemPool_append_aligned )
 }
 #endif /* defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_COMMON_DETAILS_MEMORY_POOL_H__ */
+#endif /* SIXTRACKLIB_COMMON_MEMORY_POOL_H__ */
 
-/* end: sixtracklib/common/details/mem_pool.h */
+/* end: sixtracklib/common/mem_pool.h */
