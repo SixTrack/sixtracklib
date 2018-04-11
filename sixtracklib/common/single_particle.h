@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_BASELINE_SINGLE_PARTICLE_H__
-#define SIXTRACKLIB_BASELINE_SINGLE_PARTICLE_H__
+#ifndef SIXTRACKLIB_COMMON_SINGLE_PARTICLE_H__
+#define SIXTRACKLIB_COMMON_SINGLE_PARTICLE_H__
 
 #include "sixtracklib/_impl/namespace_begin.h"
 
@@ -46,6 +46,6 @@ void NS( SingleParticle_init )( NS( SingleParticle ) *
 }
 #endif /* __cplusplus */
 
-#endif /* SIXTRACKLIB_BASELINE_SINGLE_PARTICLE_H__ */
+#endif /* SIXTRACKLIB_COMMON_SINGLE_PARTICLE_H__ */
 
 /* end: sixtracklib/baseline/single_particle.h */
