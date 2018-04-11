@@ -1,12 +1,12 @@
 # sixtracklib/sixtracklib/common/CMakeLists.txt
 
 set( SIXTRACKLIB_COMMON_HEADERS 
-     details/mem_pool.h
      impl/particles_type.h
      impl/track_single.h
-     single_particle.h
+     mem_pool.h
      particles.h
      restrict.h
+     single_particle.h
      values.h
 )
 
