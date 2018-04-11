@@ -246,6 +246,8 @@ bool NS( Particles_map_to_single_particle )( struct NS( Particles ) *
         NS( Particles_assign_ptr_to_rpp )( particles, &single->rpp );
         NS( Particles_assign_ptr_to_rvv )( particles, &single->rvv );
         NS( Particles_assign_ptr_to_chi )( particles, &single->chi );
+        
+        success = true;
     }
 
     return success;
@@ -738,8 +740,8 @@ NS( Particles ) * NS( Particles_new )( size_t npart )
     NS( Particles )* particles = 0;
     NS( MemPool )* ptr_mem_pool = 0;
 
-    size_t chunk_size = NS( PARTICLES_DEFAULT_CHUNK_SIZE );
-    size_t alignment = NS( PARTICLES_DEFAULT_ALIGNMENT );
+    size_t chunk_size = NS( PARTICLES_DEFAULT_MEMPOOL_CHUNK_SIZE );
+    size_t alignment = NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT );
 
     size_t const required_capacity =
         NS( Particles_get_capacity_for_size )( npart, &chunk_size, &alignment );
@@ -830,7 +832,7 @@ NS( Particles ) *
     NS( Particles )* particles = 0;
 
     size_t chunk_size = NS( MemPool_get_chunk_size )( pool );
-    size_t alignment = NS( PARTICLES_DEFAULT_ALIGNMENT );
+    size_t alignment = NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT );
 
     size_t const required_capacity =
         NS( Particles_get_capacity_for_size )( npart, &chunk_size, &alignment );
@@ -1143,27 +1145,26 @@ bool NS( Particles_is_consistent )( const NS( Particles ) *
 
     if( ( p != 0 ) && ( num_particles > ZERO ) )
     {
-        is_consistent =
-            ( ( NS( Particles_get_q0 )( p ) != 0 ) &&
-              ( NS( Particles_get_mass0 )( p ) != 0 ) &&
-              ( NS( Particles_get_beta0 )( p ) != 0 ) &&
-              ( NS( Particles_get_gamma0 )( p ) != 0 ) &&
-              ( NS( Particles_get_p0c )( p ) != 0 ) &&
-              ( NS( Particles_get_particle_id )( p ) != 0 ) &&
-              ( NS( Particles_get_lost_at_element_id )( p ) != 0 ) &&
-              ( NS( Particles_get_lost_at_turn )( p ) != 0 ) &&
-              ( NS( Particles_get_state )( p ) != 0 ) &&
-              ( NS( Particles_get_s )( p ) != 0 ) &&
-              ( NS( Particles_get_x )( p ) != 0 ) &&
-              ( NS( Particles_get_y )( p ) != 0 ) &&
-              ( NS( Particles_get_px )( p ) != 0 ) &&
-              ( NS( Particles_get_py )( p ) != 0 ) &&
-              ( NS( Particles_get_sigma )( p ) != 0 ) &&
-              ( NS( Particles_get_psigma )( p ) != 0 ) &&
-              ( NS( Particles_get_delta )( p ) != 0 ) &&
-              ( NS( Particles_get_rpp )( p ) != 0 ) &&
-              ( NS( Particles_get_rvv )( p ) != 0 ) &&
-              ( NS( Particles_get_chi )( p ) != 0 ) );
+        is_consistent  = ( NS( Particles_get_q0 )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_mass0 )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_beta0 )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_gamma0 )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_p0c )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_particle_id )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_lost_at_element_id )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_lost_at_turn )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_state )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_s )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_x )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_y )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_px )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_py )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_sigma )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_psigma )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_delta )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_rpp )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_rvv )( p ) != 0 );
+        is_consistent &= ( NS( Particles_get_chi )( p ) != 0 );
 
         if( ( is_consistent ) && ( NS( Particles_manages_own_memory )( p ) ) )
         {
@@ -1186,6 +1187,9 @@ bool NS( Particles_is_consistent )( const NS( Particles ) *
             ptrdiff_t const min_double_len = sizeof( double ) * num_particles;
             ptrdiff_t const min_int64_len = sizeof( int64_t ) * num_particles;
 
+            /* ------------------------------------------------------------- */
+            /* distance q0 -> mass0 */
+            
             unsigned char const* prev_elem =
                 (unsigned char*)NS( Particles_get_q0 )( p );
 
@@ -1193,13 +1197,6 @@ bool NS( Particles_is_consistent )( const NS( Particles ) *
                 (unsigned char*)NS( Particles_get_mass0 )( p );
 
             is_consistent = ( ( ptr_elem - prev_elem ) >= min_double_len );
-
-            /* ------------------------------------------------------------- */
-            /* distance q0 -> mass0 */
-
-            prev_elem = ptr_elem;
-            ptr_elem = (unsigned char*)NS( Particles_get_mass0 )( p );
-            is_consistent &= ( ( ptr_elem - prev_elem ) >= min_double_len );
 
             /* ------------------------------------------------------------- */
             /* distance mass0 -> beta0 */
