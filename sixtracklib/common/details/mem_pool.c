@@ -1,6 +1,5 @@
-#include "sixtracklib/common/details/mem_pool.h"
-
 #include "sixtracklib/_impl/namespace_begin.h"
+#include "sixtracklib/common/mem_pool.h"
 
 #include <assert.h>
 #include <stdbool.h>
@@ -15,6 +14,10 @@
 
 extern bool NS( AllocResult_valid )( const NS( AllocResult ) *
                                      const SIXTRL_RESTRICT result );
+
+extern bool NS(AllocResult_is_aligned)( 
+    const NS(AllocResult) *const SIXTRL_RESTRICT result, 
+    size_t alignment );
 
 extern NS( AllocResult ) *
     NS( AllocResult_preset )( NS( AllocResult ) * SIXTRL_RESTRICT result );
@@ -116,6 +119,18 @@ bool NS( AllocResult_valid )( const NS( AllocResult ) *
     }
 
     return is_valid;
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool NS(AllocResult_is_aligned)( 
+    const NS(AllocResult) *const SIXTRL_RESTRICT result, size_t alignment )
+{
+    static size_t const ZERO_SIZE = ( size_t )0u;    
+    
+    return ( 
+        ( alignment > ZERO_SIZE ) && ( result != 0 ) && ( result->p != 0 ) && 
+        ( ( ( ( uintptr_t )result->p ) % alignment ) == ZERO_SIZE ) );
 }
 
 /* ------------------------------------------------------------------------- */
