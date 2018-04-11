@@ -1,5 +1,10 @@
+#if !defined( __NAMESPACE )
+    #define __NAMESPACE st_
+    #define __UNDEF_NAMESPACE_AT_END 1
+#endif /* !defiend( __NAMESPACE ) */
+
 #include "sixtracklib/_impl/namespace_begin.h"
-#include "sixtracklib/common/details/mem_pool.h"
+#include "sixtracklib/common/mem_pool.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/impl/particles_type.h"
 #include "sixtracklib/common/single_particle.h"
@@ -10,6 +15,11 @@
 #include <cstdlib>
 
 #include <gtest/gtest.h>
+
+#if defined( __NAMESPACE ) && defined( __UNDEF_NAMESPACE_AT_END )
+    #undef __NAMESPACE
+    #undef __UNDEF_NAMESPACE_AT_END
+#endif /* !defined( __NAMESPACE ) && defined( __UNDEF_NAMESPACE_AT_END ) */
 
 /* ------------------------------------------------------------------------- */
 /* --- Helper function for checking the consistency of a SingleParticle ---- */
@@ -136,11 +146,15 @@ TEST( ParticlesTests, InitOwnMemPoolBasic )
 TEST( ParticlesTests, InitExtMemPoolBasic )
 {
     std::size_t const NUM_OF_PARTICLES  = std::size_t{ 4 };
-    std::size_t const MEM_POOL_CAPACITY = std::size_t{ 1024 };
+    
+    std::size_t chunk_size = NS(PARTICLES_DEFAULT_MEMPOOL_CHUNK_SIZE);
+    std::size_t alignment  = NS(PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT);
+    
+    std::size_t const MEM_POOL_CAPACITY = NS(Particles_predict_required_capacity)( 
+            NUM_OF_PARTICLES, &chunk_size, &alignment, true );
     
     NS(MemPool) mem_pool;
-    NS(MemPool_init)( &mem_pool, MEM_POOL_CAPACITY, 
-                      NS(PARTICLES_DEFAULT_MEMPOOL_CHUNK_SIZE) );
+    NS(MemPool_init)( &mem_pool, MEM_POOL_CAPACITY, chunk_size );
     
     NS(Particles)* particles = 
         NS(Particles_new_on_mempool)( NUM_OF_PARTICLES, &mem_pool );
@@ -161,10 +175,10 @@ TEST( ParticlesTests, InitExtMemPoolBasic )
         
     ASSERT_TRUE(  NS(Particles_has_defined_alignment)( particles ) );
     
-    uint64_t const alignment = NS(Particles_alignment)( particles );
-    ASSERT_TRUE( alignment == NS(PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT) );
-    ASSERT_TRUE( ( size_t )alignment >= NS(MemPool_get_chunk_size)( &mem_pool ));
-    ASSERT_TRUE( NS(Particles_check_alignment)( particles, alignment ) );
+    uint64_t const def_alignment = NS(Particles_alignment)( particles );
+    ASSERT_TRUE( def_alignment == NS(PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT) );
+    ASSERT_TRUE( ( size_t )def_alignment >= NS(MemPool_get_chunk_size)( &mem_pool ));
+    ASSERT_TRUE( NS(Particles_check_alignment)( particles, def_alignment ) );
     
     NS(Particles_free)( particles );
     free( particles );
@@ -179,14 +193,19 @@ TEST( ParticlesTests, InitExtMemPoolBasic )
 
 TEST( ParticlesTests, InitExtMemPoolBasicForceAlignment32 )
 {
-    std::size_t const NUM_OF_PARTICLES  = std::size_t{ 5 };
-    std::size_t const MEM_POOL_CAPACITY = std::size_t{ 2048 };
-    
+    std::size_t const NUM_OF_PARTICLES  = std::size_t{ 5 };    
     /* to force alignment */
-    std::size_t const CHUNK_SIZE        = std::size_t{ 32 }; 
+    std::size_t chunk_size = std::size_t{ 32 }; 
+    std::size_t alignment  = NS(PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT);
+    
+    std::size_t const MEM_POOL_CAPACITY = NS(Particles_predict_required_capacity)( 
+        NUM_OF_PARTICLES, &chunk_size, &alignment, true );
+            
+    ASSERT_TRUE(   alignment >= chunk_size );
+    ASSERT_TRUE( ( alignment % chunk_size ) == ( size_t )0u );
     
     NS(MemPool) mem_pool;
-    NS(MemPool_init)( &mem_pool, MEM_POOL_CAPACITY, CHUNK_SIZE );
+    NS(MemPool_init)( &mem_pool, MEM_POOL_CAPACITY, chunk_size );
     
     NS(Particles)* particles = 
         NS(Particles_new_on_mempool)( NUM_OF_PARTICLES, &mem_pool );
@@ -207,9 +226,9 @@ TEST( ParticlesTests, InitExtMemPoolBasicForceAlignment32 )
         
     ASSERT_TRUE(  NS(Particles_has_defined_alignment)( particles ) );
     
-    uint64_t const alignment = NS(Particles_alignment)( particles );
-    ASSERT_TRUE( ( size_t )alignment == CHUNK_SIZE );
-    ASSERT_TRUE( NS(Particles_check_alignment)( particles, alignment ) );
+    uint64_t const def_alignment = NS(Particles_alignment)( particles );
+    ASSERT_TRUE( ( size_t )def_alignment == chunk_size );
+    ASSERT_TRUE( NS(Particles_check_alignment)( particles, def_alignment ) );
     
     NS(Particles_free)( particles );
     free( particles );

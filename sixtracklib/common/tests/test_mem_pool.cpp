@@ -1,5 +1,10 @@
+#if !defined( __NAMESPACE )
+    #define __NAMESPACE st_
+    #define __UNDEF_NAMESPACE_AT_END 1
+#endif /* !defiend( __NAMESPACE ) */
+
 #include "sixtracklib/_impl/namespace_begin.h"
-#include "sixtracklib/common/details/mem_pool.h"
+#include "sixtracklib/common/mem_pool.h"
 
 #include <algorithm>
 #include <cstddef>
@@ -7,6 +12,11 @@
 #include <cstdlib>
 
 #include <gtest/gtest.h>
+
+#if defined( __NAMESPACE ) && defined( __UNDEF_NAMESPACE_AT_END )
+    #undef __NAMESPACE
+    #undef __UNDEF_NAMESPACE_AT_END
+#endif /* !defined( __NAMESPACE ) && defined( __UNDEF_NAMESPACE_AT_END ) */
 
 /* ========================================================================== */
 /* ====  Test basic usage of MemPool: init and free operations */
