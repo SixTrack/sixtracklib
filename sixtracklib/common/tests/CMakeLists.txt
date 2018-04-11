@@ -14,4 +14,12 @@ if( GTEST_FOUND )
     target_compile_options( test_mem_pool BEFORE PUBLIC -std=c++11 -Wall -Werror -pedantic )
     add_test( MemPoolTests test_mem_pool )
     
+    # --------------------------------------------------------------------------
+    # test_particles:
+    
+    add_executable( test_particles test_particles.cpp )
+    target_link_libraries( test_particles ${SIXTRACKL_TEST_LIBRARIES} )
+    target_compile_options( test_particles BEFORE PUBLIC -std=c++11 -Wall -Werror -pedantic )
+    add_test( ParticlesTests test_particles )
+    
 endif()
