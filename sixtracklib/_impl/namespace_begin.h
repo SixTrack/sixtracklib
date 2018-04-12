@@ -8,12 +8,12 @@
     #define NS_CONCAT( A, B ) NS_CONCAT_( A, B )
 #endif /* !defined( NS_CONCAT ) */
 
-#if !defined( NAMESPACE )
-    #define NAMESPACE 
-#endif /* !defined( NAMESPACE ) */
+#if !defined( __NAMESPACE )
+    #define __NAMESPACE 
+#endif /* !defined( __NAMESPACE ) */
 
 #if !defined( NS )
-    #define NS(name) NS_CONCAT( NAMESPACE, name )
+    #define NS(name) NS_CONCAT( __NAMESPACE, name )
 #endif /* !defined( NS ) */
 
 /* end: sixtracklib/_impl/namespace_begin.h */
