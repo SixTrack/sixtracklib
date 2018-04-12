@@ -55,6 +55,8 @@ typedef struct NS( Particles )
     void* ptr_mem_begin; /* reference memory addr for (un)packing (optional) */
 } NS( Particles );
 
+static uint64_t const NS(PARTICLES_PACK_INDICATOR) = UINT64_C( 1 );
+
 static int64_t const NS( PARTICLE_VALID_STATE ) = INT64_C( 0 );
 
 static uint64_t const NS( PARTICLES_FLAGS_NONE ) = UINT64_C( 0x0000 );
@@ -68,6 +70,9 @@ static uint64_t const
 
 static uint64_t const
     NS( PARTICLES_FLAGS_MEM_CTX_SINGLEPARTICLE ) = UINT64_C( 0x0020 );
+    
+static uint64_t const 
+    NS(PARTICLES_FLAGS_MEM_CTX_FLAT_MEMORY ) = UINT64_C( 0x0040 );
 
 static uint64_t const NS( PARTICLES_FLAGS_ALIGN_MASK ) = UINT64_C( 0xFFFF00 );
 
@@ -82,8 +87,14 @@ static size_t const NS( PARTICLES_DEFAULT_MEMPOOL_CHUNK_SIZE ) = (size_t)8u;
 static size_t const NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT ) = (size_t)16u;
 static size_t const NS( PARTICLES_NUM_OF_DOUBLE_ELEMENTS ) = (size_t)16u;
 static size_t const NS( PARTICLES_NUM_OF_INT64_ELEMENTS ) = (size_t)4u;
+static size_t const NS( PARTICLES_NUM_OF_ATTRIBUTES ) = ( size_t )20u;
+static size_t const NS( PARTICLES_PACK_BLOCK_LENGTH ) = ( size_t )192u;
 
 
+static uint64_t const NS( PARTICLES_UNPACK_MAP  ) = UINT64_C( 0x0000 );
+static uint64_t const NS( PARTICLES_UNPACK_COPY ) = UINT64_C( 0x0001 );
+static uint64_t const NS( PARTICLES_UNPACK_CHECK_CONSISTENCY ) = 
+    UINT64_C( 0x02 );
 
 /* ========================================================================= */
 
