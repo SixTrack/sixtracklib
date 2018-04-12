@@ -20,6 +20,9 @@ struct NS( Particles );
 
 /* -------------------------------------------------------------------------- */
 
+struct NS( Particles ) *
+    NS( Particles_preset )( struct NS( Particles ) * SIXTRL_RESTRICT p );
+
 size_t NS( Particles_predict_required_capacity )( 
     size_t num_particles,
     size_t* SIXTRL_RESTRICT chunk_size,
@@ -39,6 +42,10 @@ struct NS( Particles ) *
     NS( Particles_new_on_single )( struct NS( SingleParticle ) *
                                    ptr_single_particle );
 
+bool NS(Particles_unpack)(
+    struct NS(Particles)* SIXTRL_RESTRICT particles, 
+    unsigned char* SIXTRL_RESTRICT mem, uint64_t flags );
+    
 void NS( Particles_free )( struct NS( Particles ) * SIXTRL_RESTRICT particles );
 
 /* -------------------------------------------------------------------------- */
@@ -55,6 +62,9 @@ bool NS( Particles_uses_mempool )( const struct NS( Particles ) *
 bool NS( Particles_uses_single_particle )( const struct NS( Particles ) *
                                            const SIXTRL_RESTRICT p );
 
+bool NS( Particles_uses_flat_memory )( 
+    const struct NS(Particles )* const SIXTRL_RESTRICT p );
+
 struct NS( MemPool ) const* NS( Particles_get_const_mem_pool )(
     const struct NS( Particles ) * const SIXTRL_RESTRICT p );
 
@@ -62,6 +72,9 @@ struct NS( SingleParticle ) const* NS(
     Particles_get_const_base_single_particle )( const struct NS( Particles ) *
                                                 const SIXTRL_RESTRICT p );
 
+unsigned char const* NS( Particles_get_const_flat_memory )(
+    const struct NS( Particles ) * const SIXTRL_RESTRICT p );
+    
 /* -------------------------------------------------------------------------- */
 
 bool NS( Particles_has_defined_alignment )( const struct NS( Particles ) *

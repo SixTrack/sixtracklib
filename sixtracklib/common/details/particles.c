@@ -14,10 +14,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* ------------------------------------------------------------------------- */
 
-static NS( Particles ) *
+extern NS( Particles ) *
     NS( Particles_preset )( NS( Particles ) * SIXTRL_RESTRICT p );
 
 /* ------------------------------------------------------------------------- */
@@ -40,12 +41,18 @@ extern bool NS( Particles_uses_mempool )( const struct NS( Particles ) *
 extern bool NS( Particles_uses_single_particle )( const struct NS( Particles ) *
                                                   const SIXTRL_RESTRICT p );
 
+extern bool NS( Particles_uses_flat_memory )( 
+    const struct NS(Particles )* const SIXTRL_RESTRICT p );
+
 extern struct NS( MemPool ) const* NS( Particles_get_const_mem_pool )(
     const struct NS( Particles ) * const SIXTRL_RESTRICT p );
 
 extern struct NS( SingleParticle ) const* NS(
     Particles_get_const_base_single_particle )( const struct NS( Particles ) *
                                                 const SIXTRL_RESTRICT p );
+    
+extern unsigned char const* NS( Particles_get_const_flat_memory )(
+    const struct NS( Particles ) * const SIXTRL_RESTRICT p );
 
 /* ------------------------------------------------------------------------- */
 
@@ -76,6 +83,24 @@ static bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
 static bool NS( Particles_map_to_single_particle )(
     struct NS( Particles ) * SIXTRL_RESTRICT particles,
     struct NS( SingleParticle ) * SIXTRL_RESTRICT single_particle );
+
+/* -------------------------------------------------------------------------- */
+
+extern bool NS(Particles_unpack)( struct NS(Particles)* SIXTRL_RESTRICT particles, 
+    unsigned char* SIXTRL_RESTRICT mem, uint64_t flags ); 
+
+static bool NS(Particles_unpack_read_header)(
+    unsigned char const* SIXTRL_RESTRICT ptr_mem_begin, 
+    size_t* ptr_length, size_t* ptr_num_particles, size_t* ptr_num_attrs );
+
+static bool NS(Particles_unpack_check_consistency)(
+    unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,
+    size_t  length, size_t num_of_particles, size_t num_of_attributes );
+
+static bool NS(Particles_unpack_map_memory)(
+    struct NS(Particles)* SIXTRL_RESTRICT particles, 
+    unsigned char* ptr_mem_begin, size_t length, size_t num_of_particles,
+    size_t num_of_attributes );
 
 /* -------------------------------------------------------------------------- */
 
@@ -206,25 +231,30 @@ size_t NS( Particles_predict_required_capacity )(
         if( make_packed )
         {
             /* Packing information: 
-             * - 1 x uint64_t .... indicator, i.e. what has been packed
-             *                     note: Particles = 1
-             * - 1 x uint64_t .... npart, i.e. the number of particles that 
-             *                     are packed
-             * - 1 x uint64_t .... nelem, i.e. the number of elements 
-             *                     that have been packed
-             * - num x uint64_t .. nelem x offsets, i.e. for each of the num 
+             * - 1 x uint64_t .... length of the whole serialized slab of memory
+             *                     including the length indicator itself. I.e. 
+             *                     ( current_pos + length bytes ) == first byte
+             *                     past the serialized item
+             * - 1 x uint64_t .... indicator, i.e. what type of element has been 
+             *                     packed; note: Particles = 1
+             * - 1 x uint64_t .... nelem, i.e. number of elements to be serialized
+             * - 1 x uint64_t .... nattr, i.e. the number of attributes 
+             *                     that have been packed per element -> should 
+             *                     be NS(PARTICLES_NUM_OF_ATTRIBUTES), store for
+             *                     format versioning reasons
+             * - num x uint64_t .. nattr x offsets, i.e. for each of the num 
              *                     elemens an offset in bytes on where the 
              *                     data is stored.
-             *                     Note: the base address from where to add 
-             *                     add these offsets is specific to the storage
-             *                     mechanism. For NS(MemPool) instances, its
-             *                     the NS(MemPool_get_buffer) address */
+             *                     Note: the offset is calculated relative to 
+             *                     the current_pos, i.e. the pointer pointing 
+             *                     to the length indicator. The minimum 
+             *                     offset for Particles is therefore 
+             *                     NS(PARTICLES_PACK_BLOCK_LENGTH) */
             
             size_t pack_info_length = 
-                sizeof( uint64_t ) + sizeof( uint64_t ) + sizeof( uint64_t ) + 
-                sizeof( uint64_t ) * (
-                    NS( PARTICLES_NUM_OF_DOUBLE_ELEMENTS ) +
-                    NS( PARTICLES_NUM_OF_INT64_ELEMENTS  ) );
+                sizeof( uint64_t ) + sizeof( uint64_t ) + sizeof( uint64_t ) +
+                sizeof( uint64_t ) + 
+                sizeof( uint64_t ) * NS(PARTICLES_NUM_OF_ATTRIBUTES);
             
             size_t const temp = ( pack_info_length / alignment ) * alignment;
             
@@ -234,6 +264,8 @@ size_t NS( Particles_predict_required_capacity )(
             }
             
             assert( ( pack_info_length % alignment ) == ZERO_SIZE );            
+            assert( pack_info_length >= NS( PARTICLES_PACK_BLOCK_LENGTH ) );
+            
             predicted_capacity += pack_info_length;
         }
                 
@@ -319,6 +351,13 @@ bool NS( Particles_uses_single_particle )( const struct NS( Particles ) *
                NS( PARTICLES_FLAGS_MEM_CTX_SINGLEPARTICLE ) ) );
 }
 
+bool NS( Particles_uses_flat_memory )( const NS(Particles )* const SIXTRL_RESTRICT p )
+{
+    return ( ( p != 0 ) && ( p->ptr_mem_context != 0 ) &&
+             ( ( p->flags & NS( PARTICLES_FLAGS_MEM_CTX_FLAT_MEMORY ) ) ==
+                 NS( PARTICLES_FLAGS_MEM_CTX_FLAT_MEMORY ) ) );
+}
+
 NS( MemPool )
 const* NS( Particles_get_const_mem_pool )( const struct NS( Particles ) *
                                            const SIXTRL_RESTRICT p )
@@ -349,6 +388,21 @@ const* NS( Particles_get_const_base_single_particle )(
     }
 
     return ptr_single_particle;
+}
+
+unsigned char const* NS( Particles_get_const_flat_memory )(
+    const struct NS( Particles ) * const SIXTRL_RESTRICT p )
+{
+    unsigned char const* ptr_flat_mem_block = 0;
+    
+    if( ( p != 0 ) && ( p->ptr_mem_context != 0 ) &&
+        ( ( p->flags & NS( PARTICLES_FLAGS_MEM_CTX_FLAT_MEMORY ) ) ==
+          NS( PARTICLES_FLAGS_MEM_CTX_FLAT_MEMORY ) ) )
+    {
+        ptr_flat_mem_block = ( unsigned char const* )p->ptr_mem_context;
+    }
+    
+    return ptr_flat_mem_block;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -405,14 +459,13 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                                      bool make_packed )
 {
     bool success = false;
-
-    typedef unsigned char  uchar_t;
     
     static size_t const ZERO_SIZE = (size_t)0u;
 
     if( ( pool != 0 ) && ( particles != 0 ) && ( npart > ZERO_SIZE ) &&
         ( npart <= ( size_t )UINT64_MAX ) &&
-        ( alignment > ZERO_SIZE ) )
+        ( alignment > ZERO_SIZE ) && 
+        ( alignment <= NS(PARTICLES_MAX_ALIGNMENT) ) )
     {
         unsigned char* particles_begin = 0;
         
@@ -427,21 +480,19 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
         {
             NS( AllocResult ) add_result;
             
-            uint64_t  elem_length;
-            uint64_t  elem_offset;
-            uint64_t* pack_info_iter = 0;            
-            
             uint64_t const num_of_attributes =                 
                 NS(PARTICLES_NUM_OF_DOUBLE_ELEMENTS) +
                 NS(PARTICLES_NUM_OF_INT64_ELEMENTS);
             
-            unsigned char* ptr_elem = 0;
+            unsigned char* ptr_attr = 0;
+            unsigned char* pack_info_it = 0;
+            unsigned char* ptr_length_info = 0;
             
+            size_t const u64_stride = sizeof( uint64_t );
             size_t const min_double_member_length = sizeof( double  ) * npart;
             size_t const min_int64_member_length  = sizeof( int64_t ) * npart;
             
-            assert( ( ( alignment % sizeof( uint64_t ) ) == ZERO_SIZE ) &&
-                    ( ( alignment % sizeof( double   ) ) == ZERO_SIZE ) &&
+            assert( ( ( alignment % sizeof( double   ) ) == ZERO_SIZE ) &&
                     ( ( alignment % sizeof( int64_t  ) ) == ZERO_SIZE ) );
             
             NS( AllocResult_preset )( &add_result );
@@ -451,15 +502,12 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             
             if( make_packed )
             {
-                /* TODO: provide this information somewhere centrally!!!!! */
-                uint64_t const pack_indicator   = UINT64_C( 1 );                
+                uint64_t const pack_indicator = NS(PARTICLES_PACK_INDICATOR);
                 uint64_t const num_of_particles = ( uint64_t )npart;
                 
-                size_t const offset_info_block_len = 
-                    sizeof( pack_indicator ) + 
-                    sizeof( num_of_attributes ) + 
-                    sizeof( num_of_particles ) + 
-                    sizeof( uint64_t ) * num_of_attributes;
+                size_t const offset_info_block_len = u64_stride + 
+                    u64_stride + u64_stride + u64_stride + 
+                    u64_stride * num_of_attributes;
                     
                 add_result = NS(MemPool_append_aligned)(
                     pool, offset_info_block_len, alignment );
@@ -471,17 +519,23 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 }
                 
                 particles_begin = NS( AllocResult_get_pointer )( &add_result );
-                pack_info_iter  = ( uint64_t* )particles_begin;
+                ptr_length_info = particles_begin;
+                pack_info_it    = particles_begin;
                 
-                *pack_info_iter++ = pack_indicator;
-                *pack_info_iter++ = num_of_particles;
-                *pack_info_iter++ = num_of_attributes;
+                memset( pack_info_it, ( int )0, u64_stride );
+                pack_info_it    = pack_info_it + u64_stride;
+                
+                memcpy( pack_info_it, &pack_indicator, u64_stride );
+                pack_info_it = pack_info_it + u64_stride;
+                
+                memcpy( pack_info_it, &num_of_particles, u64_stride );
+                pack_info_it = pack_info_it + u64_stride;
+                
+                memcpy( pack_info_it, &num_of_attributes, u64_stride );
+                pack_info_it = pack_info_it + u64_stride;
             }
             
-            ptr_elem = NS(MemPool_get_next_begin_pointer)( pool, alignment );
-            
-            assert( ( !make_packed ) || ( 0 <= ( ptr_elem - 
-                ( ( uchar_t* )( pack_info_iter + num_of_attributes ) ) ) ) );
+            assert( ( pack_info_it != 0 ) || ( !make_packed ) );
             
             /* ------------------------------------------------------------- */
             /* q0: */
@@ -489,25 +543,34 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            assert( NS( AllocResult_valid )( &add_result ) );                
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
             
-            if( !make_packed )
+            /* If not packed, we have not yet written anything to the mempool,
+             * i.e. we have to take the "beginning" of the memory section 
+             * from the first member */
+            
+            if( !make_packed )  particles_begin = ptr_attr;            
+            assert( NS(AllocResult_is_aligned)( &add_result, alignment ) );
+            
+            NS( Particles_assign_ptr_to_q0 )( particles, ( double*) ptr_attr );            
+            
+            if( make_packed )
             {
-                particles_begin = ptr_elem;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
-            
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
-            {
-                break;
-            }
-            
-            NS( Particles_assign_ptr_to_q0 )( particles, ( double*) ptr_elem );            
-            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* mass0: */
@@ -515,20 +578,27 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_mass0 )( particles, ( double*)ptr_attr );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
-            
-            NS( Particles_assign_ptr_to_mass0 )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* beta0: */
@@ -536,20 +606,27 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_beta0 )( particles, ( double*)ptr_attr );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
-            
-            NS( Particles_assign_ptr_to_beta0 )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
             
             /* ------------------------------------------------------------- */
             /* gamma0: */
@@ -557,20 +634,27 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_gamma0 )( particles, ( double*)ptr_attr );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
-            
-            NS( Particles_assign_ptr_to_gamma0 )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
             
             /* ------------------------------------------------------------- */
             /* p0c: */
@@ -578,43 +662,56 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_p0c )( particles, ( double*)ptr_attr );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_p0c )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
-
             /* ------------------------------------------------------------- */
             /* partid: */
 
             add_result = NS( MemPool_append_aligned )(
                 pool, min_int64_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
-            
-            if( ( elem_length < min_int64_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
-            {
-                break;
-            }
-            
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
             NS( Particles_assign_ptr_to_particle_id )( 
-                particles, ( int64_t* )ptr_elem );
+                particles, ( int64_t* )ptr_attr );
             
-            if( make_packed ) *pack_info_iter++ = elem_offset;
+            if( make_packed )
+            {
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
+            }
 
             /* ------------------------------------------------------------- */
             /* elemid: */
@@ -622,68 +719,88 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             add_result = NS( MemPool_append_aligned )(
                 pool, min_int64_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_lost_at_element_id)( 
+                particles, ( int64_t* )ptr_attr );
             
-            if( ( elem_length < min_int64_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_lost_at_element_id)( 
-                particles, ( int64_t* )ptr_elem );
-            
-            if( make_packed ) *pack_info_iter++ = elem_offset;
-
             /* ------------------------------------------------------------- */
             /* turn: */
 
             add_result = NS( MemPool_append_aligned )(
                 pool, min_int64_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_lost_at_turn )( 
+                particles, ( int64_t* )ptr_attr );
             
-            if( ( elem_length < min_int64_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_lost_at_turn )( 
-                particles, ( int64_t* )ptr_elem );
-            
-            if( make_packed ) *pack_info_iter++ = elem_offset;
-
             /* ------------------------------------------------------------- */
             /* state: */
 
             add_result = NS( MemPool_append_aligned )(
                 pool, min_int64_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            if( !NS( AllocResult_valid )( &add_result ) ) break;
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            if( ( elem_length < min_int64_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
-            {
-                break;
-            }
-            
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
             NS( Particles_assign_ptr_to_state )( 
-                particles, ( int64_t* )ptr_elem );
+                particles, ( int64_t* )ptr_attr );
             
-            if( make_packed ) *pack_info_iter++ = elem_offset;
+            if( make_packed )
+            {
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
+            }
             
             /* ------------------------------------------------------------- */
             /* s: */
@@ -691,41 +808,60 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            if( !NS( AllocResult_valid )( &add_result ) ) break; 
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_s )( particles, ( double*)ptr_attr );
+            
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_s )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
-
             /* ------------------------------------------------------------- */
             /* x: */
 
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            if( !NS( AllocResult_valid )( &add_result ) ) break; 
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_x )( particles, ( double*)ptr_attr );
+            
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_x )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* y: */
@@ -733,104 +869,148 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            if( !NS( AllocResult_valid )( &add_result ) ) break;  
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_y )( particles, ( double*)ptr_attr );
+            
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_y )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
-
             /* ------------------------------------------------------------- */
             /* px: */
 
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            if( !NS( AllocResult_valid )( &add_result ) ) break; 
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_px )( particles, ( double*)ptr_attr );
+            
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_px )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
-
             /* ------------------------------------------------------------- */
             /* py: */
 
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            if( !NS( AllocResult_valid )( &add_result ) ) break;  
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_py )( particles, ( double*)ptr_attr );
+            
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_py )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
-
             /* ------------------------------------------------------------- */
             /* sigma: */
 
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            if( !NS( AllocResult_valid )( &add_result ) ) break;
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_sigma )( particles, ( double*)ptr_attr );
+            
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_sigma )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
-
             /* ------------------------------------------------------------- */
             /* psigma: */
 
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_psigma )( particles, ( double*)ptr_attr );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_psigma )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* delta: */
@@ -838,20 +1018,28 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_delta )( particles, ( double*)ptr_attr );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_delta )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ------------------------------------------------------------- */
             /* rpp: */
@@ -859,64 +1047,110 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            if( !NS( AllocResult_valid )( &add_result ) ) break; 
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_rpp )( particles, ( double*)ptr_attr );
+            
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_rpp )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
-
             /* ------------------------------------------------------------- */
             /* rvv: */
 
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            if( !NS( AllocResult_valid )( &add_result ) ) break;
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_rvv )( particles, ( double*)ptr_attr );
+            
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
             
-            NS( Particles_assign_ptr_to_rvv )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
-
             /* ------------------------------------------------------------- */
             /* chi: */
 
             add_result = NS( MemPool_append_aligned )(
                 pool, min_double_member_length, alignment );
             
-            if( !NS( AllocResult_valid )( &add_result ) ) break;                
+            if( !NS( AllocResult_valid )( &add_result ) ) break; 
             
-            ptr_elem    = NS( AllocResult_get_pointer )( &add_result );
-            elem_offset = NS( AllocResult_get_offset )( &add_result );
-            elem_length = NS( AllocResult_get_length )( &add_result );
+            assert( ( NS( AllocResult_valid )( &add_result ) ) &&
+                    ( NS(AllocResult_is_aligned)( &add_result, alignment ) ) );
             
-            if( ( elem_length < min_double_member_length ) ||
-                ( !NS(AllocResult_is_aligned)( &add_result, alignment ) ) )
+            ptr_attr = NS( AllocResult_get_pointer )( &add_result );
+            NS( Particles_assign_ptr_to_chi )( particles, ( double*)ptr_attr );
+            
+            if( make_packed )
             {
-                break;
+                ptrdiff_t const dist = ( ptr_attr - particles_begin );
+                
+                if( dist > 0 )
+                {
+                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    memcpy( pack_info_it, &attr_offset, u64_stride );
+                    pack_info_it = pack_info_it + u64_stride;
+                }
+                else
+                {
+                    break;
+                }
             }
-            
-            NS( Particles_assign_ptr_to_chi )( particles, ( double*)ptr_elem );
-            if( make_packed ) *pack_info_iter++ = elem_offset;
 
             /* ============================================================= */
+            
+            if( make_packed )
+            {
+                ptrdiff_t temp_length;
+                uint64_t  length = UINT64_C( 0 );
+                
+                unsigned char* end_ptr = 
+                    NS(MemPool_get_next_begin_pointer)(pool, alignment );
+                                    
+                assert( ( ptr_length_info != 0 ) && ( end_ptr != 0 ) &&
+                        ( particles_begin != 0 ) );
+                
+                temp_length = ( end_ptr - particles_begin );
+                
+                assert( temp_length > 0 );
+                
+                length = ( uint64_t )temp_length;
+                memcpy( ptr_length_info, &length, u64_stride );                
+            }
             
             success = true;
             
@@ -1184,6 +1418,432 @@ NS( Particles ) *
             ( ( !success ) && ( ptr_particles == 0 ) ) );
 
     return ptr_particles;
+}
+
+/* ------------------------------------------------------------------------ */
+
+bool NS(Particles_unpack_read_header)(
+    unsigned char const* SIXTRL_RESTRICT ptr_mem_begin, 
+    size_t* SIXTRL_RESTRICT ptr_length, 
+    size_t* SIXTRL_RESTRICT ptr_num_particles, 
+    size_t* SIXTRL_RESTRICT ptr_num_attrs )
+{
+    bool success = false;
+    
+    if( ( ptr_mem_begin != 0 ) && ( ptr_length != 0 ) && 
+        ( ptr_num_particles != 0 ) && ( ptr_num_attrs ) )
+    {
+        static size_t const ZERO_SIZE = ( size_t )0u;
+        size_t const u64_stride = sizeof( uint64_t );
+        
+        uint64_t temp = UINT64_C( 0 );
+        
+        unsigned char const* SIXTRL_RESTRICT it = ptr_mem_begin;
+        
+        assert( ptr_num_particles != ptr_length );
+        assert( ptr_num_attrs     != ptr_length );
+        assert( ptr_num_particles != ptr_num_attrs );
+        
+        *ptr_length = ZERO_SIZE;
+        *ptr_num_attrs     = ZERO_SIZE;
+        *ptr_num_particles = ZERO_SIZE;
+        
+        /* ----------------------------------------------------------------- */
+        /* length: */
+        
+        memcpy( &temp, it, u64_stride );
+        it = it + u64_stride;
+        
+        if( temp < NS(PARTICLES_PACK_BLOCK_LENGTH) )
+        {
+            return success;
+        }
+        
+        *ptr_length = ( size_t )temp;
+        
+        /* ----------------------------------------------------------------- */
+        /* pack indicator: */
+        
+        memcpy( &temp, it, u64_stride );
+        it = it + u64_stride;
+        
+        if( temp != NS(PARTICLES_PACK_INDICATOR) )
+        {
+            return success;
+        }
+        
+        /* ----------------------------------------------------------------- */
+        /* num of particles: */
+                
+        memcpy( &temp, it, u64_stride );
+        it = it + u64_stride;
+        
+        if( temp == UINT64_C( 0 ) )
+        {
+            return success;
+        }
+        
+        *ptr_num_particles = ( size_t )temp;
+        
+        /* ----------------------------------------------------------------- */
+        /* num_of_attributes: */
+        
+        memcpy( &temp, it, u64_stride );
+        it = it + u64_stride;
+        
+        *ptr_num_attrs = ( size_t )temp;
+        
+        if( *ptr_num_attrs != NS(PARTICLES_NUM_OF_ATTRIBUTES) )
+        {
+            return success;
+        }
+        
+        success = true;
+    }
+    
+    return success;
+}
+
+bool NS(Particles_unpack_check_consistency)(
+    unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,
+    size_t  length, size_t num_of_particles, size_t num_of_attributes )
+{
+    bool is_consistent = false;
+    
+    static size_t const ZERO_SIZE = ( size_t )0u;
+    
+    if( ( ptr_mem_begin != 0 ) && 
+        ( length > NS(PARTICLES_PACK_BLOCK_LENGTH) ) &&
+        ( num_of_particles  > ( size_t )0u ) &&
+        ( ( num_of_attributes == NS(PARTICLES_NUM_OF_ATTRIBUTES ) ) ) )
+    {
+        size_t const u64_stride = sizeof( uint64_t );   
+        size_t ii = ZERO_SIZE;
+        size_t calculated_size = ZERO_SIZE;
+        
+        uint64_t prev_offset;
+        uint64_t temp = UINT64_C( 0 );        
+        unsigned char const* SIXTRL_RESTRICT it = ptr_mem_begin;
+                
+        /* ----------------------------------------------------------------- */
+        /* length: */
+        
+        memcpy( &temp, it, u64_stride );
+        it = it + u64_stride;        
+        
+        if( length != ( size_t )temp )
+        {
+            return is_consistent;
+        }
+        
+        /* ----------------------------------------------------------------- */
+        /* pack indicator: */
+        
+        memcpy( &temp, it, u64_stride );
+        it = it + u64_stride;
+        
+        if( temp != NS(PARTICLES_PACK_INDICATOR) )
+        {
+            return is_consistent;
+        }
+        
+        /* ----------------------------------------------------------------- */
+        /* num of particles: */
+                
+        memcpy( &temp, it, u64_stride );
+        it = it + u64_stride;
+        
+        if( num_of_particles != ( size_t )temp )
+        {
+            return is_consistent;
+        }
+        
+        /* ----------------------------------------------------------------- */
+        /* num_of_attributes: */
+        
+        memcpy( &temp, it, u64_stride );
+        it = it + u64_stride;
+        
+        if( num_of_attributes != ( size_t )temp )
+        {
+            return is_consistent;
+        }
+        
+        temp = 0;
+        
+        for( ii = ZERO_SIZE ; ii < num_of_attributes ; ++ii )
+        {
+            prev_offset = temp;
+            memcpy( &temp, it, u64_stride );
+            it = it + u64_stride;
+            
+            if( prev_offset < temp )
+            {
+                calculated_size += ( temp - prev_offset );
+            }
+            else
+            {
+                return is_consistent;
+            }
+        }
+        
+        calculated_size += sizeof( double ) * num_of_particles;
+        
+        is_consistent = ( calculated_size <= length );
+    }
+    
+    return is_consistent;    
+}
+
+bool NS(Particles_unpack_map_memory)(
+    struct NS(Particles)* SIXTRL_RESTRICT p, unsigned char* ptr_begin, 
+    size_t length, size_t num_of_particles, size_t num_of_attributes )
+{
+    bool success = false;
+    
+    static size_t const ZERO_SIZE = ( size_t )0u;
+    
+    if( ( p != 0 ) && ( length > NS(PARTICLES_PACK_BLOCK_LENGTH) ) &&
+        ( num_of_particles > ZERO_SIZE ) && 
+        ( num_of_attributes == NS(PARTICLES_NUM_OF_ATTRIBUTES) ) )
+    {
+        size_t const u64_stride = sizeof( uint64_t );
+        
+        unsigned char const*  it = ptr_begin;
+        size_t calculated_size   = ZERO_SIZE;
+        
+        uint64_t prev_off;
+        uint64_t off = UINT64_C( 0 );
+        
+        /* move past the beginning for the header, i.e. 
+         * - the length indicator  (uint64_t)
+         * - the pack   indicator  (uint64_t)
+         * - the num_of_particles  (uint64_t)
+         * - the num_of_attributes (uint64_t) 
+         * Note that the contents of these fields is NOT verified here! */
+        it = it + u64_stride * ( size_t )4u;
+        
+        /* Now read num_of_attributes times the offset, apply it on the base 
+         * pointr and assign the address to the data member: */
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( NS(PARTICLES_PACK_BLOCK_LENGTH) <= off );
+        calculated_size += ( off - prev_off );
+        NS(Particles_assign_ptr_to_q0)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );
+        it = it + u64_stride;        
+        NS(Particles_assign_ptr_to_mass0)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_beta0)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_gamma0)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;        
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_p0c)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;        
+        assert( prev_off + num_of_particles * sizeof( int64_t ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_particle_id)( p, ( int64_t* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( int64_t ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_lost_at_element_id)( p, ( int64_t* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;        
+        assert( prev_off + num_of_particles * sizeof( int64_t ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_lost_at_turn)( p, ( int64_t* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( int64_t ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_state)( p, ( int64_t* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_s)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_x)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_y)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_px)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_py)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_sigma)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_psigma)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_delta)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_rpp)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_rvv)( p, ( double* )( ptr_begin + off ) );
+        
+        prev_off = off;
+        memcpy( &off, it, u64_stride );
+        it = it + u64_stride;
+        assert( prev_off + num_of_particles * sizeof( double ) <= off );
+        calculated_size += ( off - prev_off );        
+        NS(Particles_assign_ptr_to_chi)( p, ( double* )( ptr_begin + off ) );
+        
+        calculated_size += num_of_particles * sizeof( double );
+        
+        success = ( calculated_size <= length );
+    }
+    
+    return success;
+}
+
+bool NS(Particles_unpack)( NS(Particles)* SIXTRL_RESTRICT particles, 
+    unsigned char* SIXTRL_RESTRICT mem, uint64_t flags )
+{
+    bool success = false;
+    
+    static size_t const ZERO_SIZE = ( size_t )0u;
+    
+    if( ( particles != 0 ) && ( mem != 0 ) )
+    {
+        bool const map_memory = 
+            ( ( flags & NS(PARTICLES_UNPACK_MAP) ) == NS(PARTICLES_UNPACK_MAP) );
+        
+        bool const copy_memory = 
+            ( ( flags & NS(PARTICLES_UNPACK_COPY) ) == NS(PARTICLES_UNPACK_COPY) );
+            
+        bool const check_consistency =
+            ( ( flags & NS(PARTICLES_UNPACK_CHECK_CONSISTENCY ) ) ==
+                NS( PARTICLES_UNPACK_CHECK_CONSISTENCY) );
+        
+        size_t length = ZERO_SIZE;
+        size_t num_of_attributes = ZERO_SIZE;
+        size_t num_of_particles  = ZERO_SIZE;
+        
+        if( !NS(Particles_unpack_read_header)( 
+                mem, &length, &num_of_particles, &num_of_attributes ) )
+        {
+            return success;
+        }
+        
+        if( ( check_consistency ) &&
+            ( !NS(Particles_unpack_check_consistency)( 
+                mem, length, num_of_particles, num_of_attributes ) ) )
+        {
+            return success;
+        }
+        
+        /* ------------------------------------------------------------------ */
+        
+        if( copy_memory )
+        {
+            /* TODO: Implement copy_memory operation!!! */
+            return success;
+        }
+        else if( map_memory )
+        {
+            if( NS(Particles_get_const_ptr_mem_context )( particles ) != 0 )
+            {
+                NS(Particles_free)( particles );
+            }
+            
+            assert( NS(Particles_get_const_ptr_mem_context )( particles ) == 0 );
+            
+            if( NS(Particles_unpack_map_memory)( particles, mem, length, 
+                num_of_particles, num_of_attributes ) )
+            {
+                uint64_t const flags = NS(PARTICLES_FLAGS_PACKED) |
+                                       NS(PARTICLES_FLAGS_MEM_CTX_FLAT_MEMORY);
+                                       
+                NS(Particles_set_flags)( particles, flags );
+                
+                NS(Particles_set_ptr_mem_begin)( particles, mem );
+                NS(Particles_set_ptr_mem_context)( particles, mem );
+                NS(Particles_set_size)( particles, num_of_particles );
+                
+                success = true;
+            }
+        }         
+    }
+    
+    return success;
 }
 
 /* ------------------------------------------------------------------------ */
