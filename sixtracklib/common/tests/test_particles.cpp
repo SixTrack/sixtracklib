@@ -117,6 +117,7 @@ TEST( ParticlesTests, InitOwnMemPoolBasic )
     ASSERT_TRUE(  NS(Particles_manages_own_memory( particles ) ) );
     ASSERT_TRUE(  NS(Particles_uses_mempool)( particles ) );
     ASSERT_TRUE( !NS(Particles_uses_single_particle)( particles ) );
+    ASSERT_TRUE( !NS(Particles_uses_flat_memory)( particles ) );
         
     NS(MemPool) const* ptr_mem_pool = 
         NS(Particles_get_const_mem_pool)( particles );
@@ -169,6 +170,7 @@ TEST( ParticlesTests, InitExtMemPoolBasic )
     ASSERT_TRUE( !NS(Particles_manages_own_memory( particles ) ) );
     ASSERT_TRUE(  NS(Particles_uses_mempool)( particles ) );
     ASSERT_TRUE( !NS(Particles_uses_single_particle)( particles ) );
+    ASSERT_TRUE( !NS(Particles_uses_flat_memory)( particles ) );
         
     ASSERT_TRUE(  ( NS(MemPool) const* )&mem_pool == 
                   NS(Particles_get_const_mem_pool)( particles ) );
@@ -220,6 +222,7 @@ TEST( ParticlesTests, InitExtMemPoolBasicForceAlignment32 )
     ASSERT_TRUE( !NS(Particles_manages_own_memory( particles ) ) );
     ASSERT_TRUE(  NS(Particles_uses_mempool)( particles ) );
     ASSERT_TRUE( !NS(Particles_uses_single_particle)( particles ) );
+    ASSERT_TRUE( !NS(Particles_uses_flat_memory)( particles ) );
         
     ASSERT_TRUE(  ( NS(MemPool) const* )&mem_pool == 
                   NS(Particles_get_const_mem_pool)( particles ) );
@@ -254,6 +257,7 @@ TEST( ParticlesTests, InitOwnSingleParticleBasic )
     ASSERT_TRUE(  NS(Particles_manages_own_memory( particles ) ) );
     ASSERT_TRUE( !NS(Particles_uses_mempool)( particles ) );
     ASSERT_TRUE(  NS(Particles_uses_single_particle)( particles ) );
+    ASSERT_TRUE( !NS(Particles_uses_flat_memory)( particles ) );
         
     NS(SingleParticle) const* ptr_single_particle = 
         NS(Particles_get_const_base_single_particle)( particles );
@@ -273,9 +277,8 @@ TEST( ParticlesTests, InitOwnSingleParticleBasic )
     particles = nullptr;
 }
 
-
 /* ========================================================================= */
-/* ====  Test basic usage of Particles with external single-particle        */
+/* ====  Test basic usage of Particles with external single-particle         */
 
 TEST( ParticlesTests, InitExtSingleParticleBasic )
 {
@@ -291,6 +294,7 @@ TEST( ParticlesTests, InitExtSingleParticleBasic )
     ASSERT_TRUE( !NS(Particles_manages_own_memory( particles ) ) );
     ASSERT_TRUE( !NS(Particles_uses_mempool)( particles ) );
     ASSERT_TRUE(  NS(Particles_uses_single_particle)( particles ) );
+    ASSERT_TRUE( !NS(Particles_uses_flat_memory)( particles ) );
         
     ASSERT_TRUE( NS(Particles_get_const_base_single_particle)( particles ) ==
                 ( NS(SingleParticle) const* )&single_particle );
@@ -306,6 +310,106 @@ TEST( ParticlesTests, InitExtSingleParticleBasic )
     NS(Particles_free)( particles );
     free( particles );
     particles = nullptr;
+}
+
+/* ========================================================================= */
+/* ====  Test packing and subsequent unpacking of Particles                  */
+
+TEST( ParticlesTests, TestPackingToMemPoolAndMapDuringUnpacking )
+{
+    std::size_t const NUM_OF_PARTICLES = std::size_t{ 8 };
+    
+    NS(Particles)* packed_particles = NS(Particles_new)( NUM_OF_PARTICLES );
+    
+    NS(Particles) unpacked_particles;
+    NS(Particles_preset)( &unpacked_particles );
+    
+    ASSERT_TRUE(  NS(Particles_get_size)( packed_particles ) == NUM_OF_PARTICLES );
+    ASSERT_TRUE(  NS(Particles_is_consistent( packed_particles ) ) );
+    ASSERT_TRUE(  NS(Particles_is_packed)( packed_particles ) );
+    ASSERT_TRUE(  NS(Particles_manages_own_memory( packed_particles ) ) );
+    ASSERT_TRUE(  NS(Particles_uses_mempool)( packed_particles ) );
+    ASSERT_TRUE( !NS(Particles_uses_single_particle)( packed_particles ) );
+    ASSERT_TRUE( !NS(Particles_uses_flat_memory)( packed_particles ) );
+    
+    NS(MemPool) const* ptr_mem_pool = 
+        NS(Particles_get_const_mem_pool)( packed_particles );
+    
+    ASSERT_TRUE(  ptr_mem_pool != nullptr );
+    ASSERT_TRUE(  NS(MemPool_get_const_buffer)( ptr_mem_pool ) ==
+                  NS(Particles_get_const_mem_begin)( packed_particles ) );
+    
+    bool success = NS(Particles_unpack)( &unpacked_particles, 
+        ( unsigned char* )NS(Particles_get_mem_begin)( packed_particles ), 
+        NS(PARTICLES_UNPACK_MAP) | NS(PARTICLES_UNPACK_CHECK_CONSISTENCY) );
+        
+    ASSERT_TRUE( success );
+    ASSERT_TRUE(  NS(Particles_uses_flat_memory)( &unpacked_particles ) );
+    ASSERT_TRUE( !NS(Particles_manages_own_memory )( &unpacked_particles ) );
+    ASSERT_TRUE( !NS(Particles_uses_mempool)( &unpacked_particles ) );
+    ASSERT_TRUE(  NS(Particles_get_const_flat_memory)( &unpacked_particles ) ==
+                  NS(Particles_get_const_mem_begin)( packed_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_q0)( packed_particles ) ==
+                  NS(Particles_get_q0)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_mass0)( packed_particles ) ==
+                  NS(Particles_get_mass0)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_beta0)( packed_particles ) ==
+                  NS(Particles_get_beta0)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_gamma0)( packed_particles ) ==
+                  NS(Particles_get_gamma0)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_particle_id)( packed_particles ) ==
+                  NS(Particles_get_particle_id)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_lost_at_element_id)( packed_particles ) ==
+                  NS(Particles_get_lost_at_element_id)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_lost_at_turn)( packed_particles ) ==
+                  NS(Particles_get_lost_at_turn)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_state)( packed_particles ) ==
+                  NS(Particles_get_state)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_s)( packed_particles ) ==
+                  NS(Particles_get_s)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_x)( packed_particles ) ==
+                  NS(Particles_get_x)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_y)( packed_particles ) ==
+                  NS(Particles_get_y)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_px)( packed_particles ) ==
+                  NS(Particles_get_px)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_py)( packed_particles ) ==
+                  NS(Particles_get_py)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_sigma)( packed_particles ) ==
+                  NS(Particles_get_sigma)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_psigma)( packed_particles ) ==
+                  NS(Particles_get_psigma)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_delta)( packed_particles ) ==
+                  NS(Particles_get_delta)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_rpp)( packed_particles ) ==
+                  NS(Particles_get_rpp)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_rvv)( packed_particles ) ==
+                  NS(Particles_get_rvv)( &unpacked_particles ) );
+    
+    ASSERT_TRUE(  NS(Particles_get_chi)( packed_particles ) ==
+                  NS(Particles_get_chi)( &unpacked_particles ) );
+    
+    NS(Particles_free)( packed_particles );
+    free( packed_particles );
+    packed_particles = nullptr;    
 }
 
 /* end: sixtracklib/common/tests/test_particles.cpp */
