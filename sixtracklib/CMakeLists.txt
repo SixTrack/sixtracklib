@@ -12,6 +12,14 @@
 
 # ------------------------------------------------------------------------------
 
+if( SIXTRACKL_C_NAMESPACE_PREFIX )
+    add_definitions( "-D__NAMESPACE=${SIXTRACKL_C_NAMESPACE_PREFIX}" )
+else()
+    add_definitions( "-D__NAMESPACE=st_" )
+endif()
+
+# ------------------------------------------------------------------------------
+
 set( SIXTRACKL_TEST_LIBRARIES sixtrack )
 
 set( SIXTRACKL_HEADERS 

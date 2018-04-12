@@ -5,6 +5,12 @@
 #        modifications therein. 
 
 # ------------------------------------------------------------------------------
+# System-wide settings 
+
+set( SIXTRACKL_C_NAMESPACE_PREFIX "st_" CACHE STRING 
+     "SixTrackLib C-Namespace prefix (default: st_)" )
+
+# ------------------------------------------------------------------------------
 # Unit-testing related settings:
 
 option( SIXTRACKL_ENABLE_PROGRAMM_TESTS "Enable programmatic unit-tests"  OFF )
