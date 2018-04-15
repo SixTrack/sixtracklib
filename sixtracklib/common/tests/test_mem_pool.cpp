@@ -3,13 +3,14 @@
     #define __UNDEF_NAMESPACE_AT_END 1
 #endif /* !defiend( __NAMESPACE ) */
 
-#include "sixtracklib/_impl/namespace_begin.h"
-#include "sixtracklib/common/mem_pool.h"
+#include "sixtracklib/_impl/definitions.h"
 
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+
+#include "sixtracklib/common/mem_pool.h"
 
 #include <gtest/gtest.h>
 
@@ -21,7 +22,7 @@
 /* ========================================================================== */
 /* ====  Test basic usage of MemPool: init and free operations */
 
-TEST( MemPoolTests, InitFreeBasic )
+TEST( CommonMemPoolTests, InitFreeBasic )
 {
     NS( MemPool ) mem_pool;
 
@@ -49,7 +50,7 @@ TEST( MemPoolTests, InitFreeBasic )
 /* ========================================================================== */
 /* ====  Test handling of odd-sized but admissible capacities */
 
-TEST( MemPoolTests, InitFreeNonIntegerNumChunks )
+TEST( CommonMemPoolTests, InitFreeNonIntegerNumChunks )
 {
     NS( MemPool ) mem_pool;
 
@@ -79,7 +80,7 @@ TEST( MemPoolTests, InitFreeNonIntegerNumChunks )
 /* ========================================================================== */
 /* ====  Test handling of pathological zero-sized capacities*/
 
-TEST( MemPoolTests, InitFreeZeroCapacityNonZeroChunk )
+TEST( CommonMemPoolTests, InitFreeZeroCapacityNonZeroChunk )
 {
     NS( MemPool ) mem_pool;
 
@@ -104,7 +105,7 @@ TEST( MemPoolTests, InitFreeZeroCapacityNonZeroChunk )
 /* ========================================================================== */
 /* ====  Happy-Path-Testing of adding blocks aligned and non-aligned */
 
-TEST( MemPoolTests, AppendSuccess )
+TEST( CommonMemPoolTests, AppendSuccess )
 {
     NS( MemPool ) mem_pool;
 
@@ -196,9 +197,67 @@ TEST( MemPoolTests, AppendSuccess )
 }
 
 /* ========================================================================== */
+
+TEST( CommonMemPoolTests, AppendAlignedWithPathologicalAlignment )
+{
+    NS( MemPool ) mem_pool;
+
+    static std::uintptr_t const ZERO_ALIGN = std::uintptr_t{ 0 };
+    std::size_t const chunk_size = std::size_t{8u};
+    
+    /* we will use a pathological alignment here, so make sure the buffer is 
+     * large enough! */
+    std::size_t const capacity = chunk_size * chunk_size * std::size_t{ 2 };
+
+    NS( MemPool_init )( &mem_pool, capacity, chunk_size );
+    
+    unsigned char* ptr_buffer_begin = NS(MemPool_get_buffer)( &mem_pool );
+    ASSERT_TRUE( ptr_buffer_begin != nullptr );
+    
+    std::uintptr_t const buffer_begin_addr = 
+        reinterpret_cast< std::uintptr_t >( ptr_buffer_begin );
+        
+    ASSERT_TRUE( buffer_begin_addr > ZERO_ALIGN );
+    
+    /* --------------------------------------------------------------------- */
+    /* Try to add a non-zero-length block with a "strange" alignment -
+     * it should align to the least common multiple of the provided 
+     * alignment and the chunk size to be divisible by both quantities.
+     * 
+     * Note that this is potentially very wasteful with memory, so be 
+     * advised to avoid this! */
+
+    std::size_t const alignment = chunk_size - std::size_t{ 1 };
+    NS(AllocResult) const result = 
+        NS( MemPool_append_aligned )( &mem_pool, chunk_size, alignment );
+    
+    ASSERT_TRUE( NS( AllocResult_valid )( &result ) );
+    
+    unsigned char* ptr_begin    = NS(AllocResult_get_pointer)( &result );
+    uint64_t const block_len    = NS( AllocResult_get_length )( &result );
+    uint64_t const block_offset = NS( AllocResult_get_offset )( &result );
+    
+    ASSERT_TRUE( ptr_begin != nullptr );
+    
+    std::uintptr_t const begin_addr = 
+        reinterpret_cast< std::uintptr_t >( ptr_begin );
+    
+    ASSERT_TRUE( ( block_offset + buffer_begin_addr ) == begin_addr );
+    ASSERT_TRUE( ( begin_addr % chunk_size ) == ZERO_ALIGN );
+    ASSERT_TRUE( ( begin_addr % alignment  ) == ZERO_ALIGN );
+    
+    
+    ASSERT_TRUE( block_len <= capacity );
+    ASSERT_TRUE( NS( MemPool_get_buffer )( &mem_pool )   != nullptr );
+    ASSERT_TRUE( NS( MemPool_get_capacity )( &mem_pool ) == capacity );
+    
+    NS(MemPool_free)( &mem_pool );
+}
+
+/* ========================================================================== */
 /* ====  Test the failing of adding blocks with problematic properties        */
 
-TEST( MemPoolTests, AppendFailures )
+TEST( CommonMemPoolTests, AppendFailures )
 {
     NS( MemPool ) mem_pool;
 
@@ -240,44 +299,6 @@ TEST( MemPoolTests, AppendFailures )
     /* Try to add a block with zero bytes length */
 
     result = NS( MemPool_append )( &mem_pool, ZERO_SIZE );
-
-    ASSERT_TRUE( !NS( AllocResult_valid )( &result ) );
-    ASSERT_TRUE( NS( AllocResult_get_pointer )( &result ) == nullptr );
-    ASSERT_TRUE( NS( AllocResult_get_offset )( &result ) == uint64_t{0} );
-    ASSERT_TRUE( NS( AllocResult_get_length )( &result ) == uint64_t{0} );
-
-    ASSERT_TRUE( NS( MemPool_get_buffer )( &mem_pool ) != nullptr );
-    ASSERT_TRUE( NS( MemPool_get_capacity )( &mem_pool ) == capacity );
-    ASSERT_TRUE( NS( MemPool_get_chunk_size )( &mem_pool ) == chunk_size );
-    ASSERT_TRUE( NS( MemPool_get_size )( &mem_pool ) == current_size );
-
-    /* --------------------------------------------------------------------- */
-    /* Try to add a non-zero-length block with a too short alignment -
-     * alignments have to be multiples of the MemPool's chunk_size */
-
-    std::size_t const half_alignment = chunk_size >> 1;
-    result =
-        NS( MemPool_append_aligned )( &mem_pool, chunk_size, half_alignment );
-
-    ASSERT_TRUE( !NS( AllocResult_valid )( &result ) );
-    ASSERT_TRUE( NS( AllocResult_get_pointer )( &result ) == nullptr );
-    ASSERT_TRUE( NS( AllocResult_get_offset )( &result ) == uint64_t{0} );
-    ASSERT_TRUE( NS( AllocResult_get_length )( &result ) == uint64_t{0} );
-
-    ASSERT_TRUE( NS( MemPool_get_buffer )( &mem_pool ) != nullptr );
-    ASSERT_TRUE( NS( MemPool_get_capacity )( &mem_pool ) == capacity );
-    ASSERT_TRUE( NS( MemPool_get_chunk_size )( &mem_pool ) == chunk_size );
-    ASSERT_TRUE( NS( MemPool_get_size )( &mem_pool ) == current_size );
-
-    /* --------------------------------------------------------------------- */
-    /* Try to add a non-zero-length block with a non-integer-multiple
-     * relationship with the MemPool's chunk_size: */
-
-    std::size_t const one_and_a_half_alignment =
-        chunk_size + ( chunk_size >> 1 );
-
-    result = NS( MemPool_append_aligned )(
-        &mem_pool, chunk_size, one_and_a_half_alignment );
 
     ASSERT_TRUE( !NS( AllocResult_valid )( &result ) );
     ASSERT_TRUE( NS( AllocResult_get_pointer )( &result ) == nullptr );
