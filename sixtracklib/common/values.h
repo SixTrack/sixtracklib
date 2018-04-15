@@ -1,7 +1,9 @@
 #ifndef SIXTRACKLIB_COMMON_VALUES_H__
 #define SIXTRACKLIB_COMMON_VALUES_H__
 
-#include "sixtracklib/_impl/namespace_begin.h"
+#include "sixtracklib/_impl/definitions.h"
+
+#if !defined( _GPUCODE )
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -10,20 +12,26 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#endif /* !defiend( _GPUCODE ) */
+    
 typedef union NS(CommonValues)
 {
-    double      f64;
-    int64_t     i64;
-    uint64_t    u64;
-    float       f32[ 2 ];
-    int8_t      i8[ 8 ];
-    uint8_t     u8[ 8 ];
+    SIXTRL_REAL_T   f64;
+    SIXTRL_INT64_T  i64;
+    SIXTRL_UINT64_T u64;
+    SIXTRL_FLOAT_T  f32[ 2 ];
+    SIXTRL_INT8_T   i8[ 8 ];
+    SIXTRL_UINT8_T  u8[ 8 ];
 }
 NS(value_t);
+
+#if !defined( _GPUCODE )
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#endif /* !defined( _GPUCODE ) */
 
 #endif /* SIXTRACKLIB_BASELINE_VALUES_H__ */
 
