@@ -1,6 +1,5 @@
 #include "sixtracklib/common/single_particle.h"
-#include "sixtracklib/_impl/namespace_begin.h"
-#include "sixtracklib/common/restrict.h"
+#include "sixtracklib/_impl/definitions.h"
 
 #include <assert.h>
 

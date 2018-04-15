@@ -1,19 +1,21 @@
 #ifndef SIXTRACKLIB_COMMON_PARTICLES_H__
 #define SIXTRACKLIB_COMMON_PARTICLES_H__
 
-#include "sixtracklib/_impl/namespace_begin.h"
+#if !defined( _GPUCODE )
+#include "sixtracklib/_impl/definitions.h"
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "sixtracklib/common/restrict.h"
 #include "sixtracklib/common/mem_pool.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
+#endif /* !defined( _GPUCODE ) */
+    
 struct NS( MemPool );
 struct NS( SingleParticle );
 struct NS( Particles );
@@ -112,9 +114,13 @@ bool NS( Particles_deep_copy_all )( struct NS( Particles ) *
 
 /* -------------------------------------------------------------------------- */
 
+#if !defined( _GPUCODE )
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#endif /* !defined( _GPUCODE ) */
 
 #endif /* SIXTRACKLIB_COMMON_PARTICLES_H__ */
 

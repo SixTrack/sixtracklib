@@ -3,16 +3,17 @@
     #define __UNDEF_NAMESPACE_AT_END 1
 #endif /* !defiend( __NAMESPACE ) */
 
-#include "sixtracklib/_impl/namespace_begin.h"
-#include "sixtracklib/common/mem_pool.h"
-#include "sixtracklib/common/particles.h"
-#include "sixtracklib/common/impl/particles_type.h"
-#include "sixtracklib/common/single_particle.h"
+#include "sixtracklib/_impl/definitions.h"
 
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+
+#include "sixtracklib/common/mem_pool.h"
+#include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/impl/particles_type.h"
+#include "sixtracklib/common/single_particle.h"
 
 #include <gtest/gtest.h>
 

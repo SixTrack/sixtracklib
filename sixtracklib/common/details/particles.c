@@ -1,20 +1,16 @@
 #include "sixtracklib/common/particles.h"
-#include "sixtracklib/_impl/namespace_begin.h"
-#include "sixtracklib/common/impl/particles_type.h"
 
 #include <assert.h>
-
-#include "sixtracklib/_impl/inline.h"
-
-#include "sixtracklib/common/mem_pool.h"
-#include "sixtracklib/common/restrict.h"
-#include "sixtracklib/common/single_particle.h"
-#include "sixtracklib/common/values.h"
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "sixtracklib/_impl/definitions.h"
+
+#include "sixtracklib/common/impl/particles_type.h"
+#include "sixtracklib/common/mem_pool.h"
+#include "sixtracklib/common/single_particle.h"
 
 /* ------------------------------------------------------------------------- */
 
@@ -23,9 +19,9 @@ extern NS( Particles ) *
 
 /* ------------------------------------------------------------------------- */
 
-extern size_t NS( Particles_predict_required_capacity )( 
-    size_t num_particles, size_t* SIXTRL_RESTRICT ptr_chunk_size,
-    size_t* SIXTRL_RESTRICT ptr_alignment, bool make_packed );
+extern SIXTRL_SIZE_T NS( Particles_predict_required_capacity )( 
+    SIXTRL_SIZE_T num_particles, SIXTRL_SIZE_T* SIXTRL_RESTRICT ptr_chunk_size,
+    SIXTRL_SIZE_T* SIXTRL_RESTRICT ptr_alignment, bool make_packed );
     
 /* ------------------------------------------------------------------------- */
 
@@ -56,10 +52,10 @@ extern unsigned char const* NS( Particles_get_const_flat_memory )(
 
 /* ------------------------------------------------------------------------- */
 
-extern struct NS( Particles ) * NS( Particles_new )( size_t npart );
+extern struct NS( Particles ) * NS( Particles_new )( SIXTRL_SIZE_T npart );
 
 extern struct NS( Particles ) *
-    NS( Particles_new_on_mempool )( size_t npart,
+    NS( Particles_new_on_mempool )( SIXTRL_SIZE_T npart,
                                     struct NS( MemPool ) *
                                         SIXTRL_RESTRICT pool );
 
@@ -76,8 +72,8 @@ static bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                                                 SIXTRL_RESTRICT particles,
                                             struct NS( MemPool ) *
                                                 SIXTRL_RESTRICT pool,
-                                            size_t npart,
-                                            size_t alignment, 
+                                            SIXTRL_SIZE_T npart,
+                                            SIXTRL_SIZE_T alignment, 
                                             bool make_packed );
 
 static bool NS( Particles_map_to_single_particle )(
@@ -87,20 +83,20 @@ static bool NS( Particles_map_to_single_particle )(
 /* -------------------------------------------------------------------------- */
 
 extern bool NS(Particles_unpack)( struct NS(Particles)* SIXTRL_RESTRICT particles, 
-    unsigned char* SIXTRL_RESTRICT mem, uint64_t flags ); 
+    unsigned char* SIXTRL_RESTRICT mem, SIXTRL_UINT64_T flags ); 
 
 static bool NS(Particles_unpack_read_header)(
     unsigned char const* SIXTRL_RESTRICT ptr_mem_begin, 
-    size_t* ptr_length, size_t* ptr_num_particles, size_t* ptr_num_attrs );
+    SIXTRL_SIZE_T* ptr_length, SIXTRL_SIZE_T* ptr_num_particles, SIXTRL_SIZE_T* ptr_num_attrs );
 
 static bool NS(Particles_unpack_check_consistency)(
     unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,
-    size_t  length, size_t num_of_particles, size_t num_of_attributes );
+    SIXTRL_SIZE_T  length, SIXTRL_SIZE_T num_of_particles, SIXTRL_SIZE_T num_of_attributes );
 
 static bool NS(Particles_unpack_map_memory)(
     struct NS(Particles)* SIXTRL_RESTRICT particles, 
-    unsigned char* ptr_mem_begin, size_t length, size_t num_of_particles,
-    size_t num_of_attributes );
+    unsigned char* ptr_mem_begin, SIXTRL_SIZE_T length, SIXTRL_SIZE_T num_of_particles,
+    SIXTRL_SIZE_T num_of_attributes );
 
 /* -------------------------------------------------------------------------- */
 
@@ -109,13 +105,13 @@ extern bool NS( Particles_has_defined_alignment )(
 
 extern bool NS( Particles_is_aligned )( const struct NS( Particles ) *
                                             const SIXTRL_RESTRICT p,
-                                        size_t alignment );
+                                        SIXTRL_SIZE_T alignment );
 
 extern bool NS( Particles_check_alignment )( const struct NS( Particles ) *
                                                  const SIXTRL_RESTRICT p,
-                                             size_t alignment );
+                                             SIXTRL_SIZE_T alignment );
 
-extern uint64_t NS( Particles_alignment )( const struct NS( Particles ) *
+extern SIXTRL_UINT64_T NS( Particles_alignment )( const struct NS( Particles ) *
                                            const SIXTRL_RESTRICT p );
 
 /* ------------------------------------------------------------------------- */
@@ -127,10 +123,10 @@ extern bool NS( Particles_is_consistent )( const struct NS( Particles ) *
 
 extern bool NS( Particles_deep_copy_one )( struct NS( Particles ) *
                                                SIXTRL_RESTRICT dest,
-                                           uint64_t dest_id,
+                                           SIXTRL_UINT64_T dest_id,
                                            struct NS( Particles )
                                                const* SIXTRL_RESTRICT src,
-                                           uint64_t src_id );
+                                           SIXTRL_UINT64_T src_id );
 
 extern bool NS( Particles_deep_copy_all )( struct NS( Particles ) *
                                                SIXTRL_RESTRICT dest,
@@ -169,7 +165,7 @@ NS( Particles ) * NS( Particles_preset )( NS( Particles ) * SIXTRL_RESTRICT p )
         NS( Particles_assign_ptr_to_rvv )( p, 0 );
         NS( Particles_assign_ptr_to_chi )( p, 0 );
 
-        NS( Particles_set_size )( p, UINT64_C( 0 ) );
+        NS( Particles_set_size )( p, ( SIXTRL_UINT64_T )0u );
         NS( Particles_set_flags )( p, NS( PARTICLES_FLAGS_NONE ) );
         NS( Particles_set_ptr_mem_context )( p, 0 );
         NS( Particles_set_ptr_mem_begin   )( p, 0 );
@@ -180,22 +176,22 @@ NS( Particles ) * NS( Particles_preset )( NS( Particles ) * SIXTRL_RESTRICT p )
 
 /* ------------------------------------------------------------------------ */
 
-size_t NS( Particles_predict_required_capacity )( 
-    size_t num_particles, size_t* SIXTRL_RESTRICT ptr_chunk_size,
-    size_t* SIXTRL_RESTRICT ptr_alignment, bool make_packed )
+SIXTRL_SIZE_T NS( Particles_predict_required_capacity )( 
+    SIXTRL_SIZE_T num_particles, SIXTRL_SIZE_T* SIXTRL_RESTRICT ptr_chunk_size,
+    SIXTRL_SIZE_T* SIXTRL_RESTRICT ptr_alignment, bool make_packed )
 {
-    static size_t const ZERO_SIZE = (size_t)0u;
+    static SIXTRL_SIZE_T const ZERO_SIZE = (SIXTRL_SIZE_T)0u;
 
-    size_t predicted_capacity = ZERO_SIZE;
+    SIXTRL_SIZE_T predicted_capacity = ZERO_SIZE;
 
     if( ( num_particles > ZERO_SIZE ) && ( ptr_chunk_size != 0 ) &&
         ( ptr_alignment != 0 ) )
     {
-        size_t double_elem_length  = sizeof( double  ) * num_particles;
-        size_t int64_elem_length   = sizeof( int64_t ) * num_particles;
+        SIXTRL_SIZE_T double_elem_length  = sizeof( double  ) * num_particles;
+        SIXTRL_SIZE_T int64_elem_length   = sizeof( SIXTRL_INT64_T ) * num_particles;
 
-        size_t chunk_size = *ptr_chunk_size;
-        size_t alignment = *ptr_alignment;
+        SIXTRL_SIZE_T chunk_size = *ptr_chunk_size;
+        SIXTRL_SIZE_T alignment = *ptr_alignment;
 
         assert( ptr_chunk_size != ptr_alignment );
 
@@ -231,18 +227,18 @@ size_t NS( Particles_predict_required_capacity )(
         if( make_packed )
         {
             /* Packing information: 
-             * - 1 x uint64_t .... length of the whole serialized slab of memory
+             * - 1 x SIXTRL_UINT64_T .... length of the whole serialized slab of memory
              *                     including the length indicator itself. I.e. 
              *                     ( current_pos + length bytes ) == first byte
              *                     past the serialized item
-             * - 1 x uint64_t .... indicator, i.e. what type of element has been 
+             * - 1 x SIXTRL_UINT64_T .... indicator, i.e. what type of element has been 
              *                     packed; note: Particles = 1
-             * - 1 x uint64_t .... nelem, i.e. number of elements to be serialized
-             * - 1 x uint64_t .... nattr, i.e. the number of attributes 
+             * - 1 x SIXTRL_UINT64_T .... nelem, i.e. number of elements to be serialized
+             * - 1 x SIXTRL_UINT64_T .... nattr, i.e. the number of attributes 
              *                     that have been packed per element -> should 
              *                     be NS(PARTICLES_NUM_OF_ATTRIBUTES), store for
              *                     format versioning reasons
-             * - num x uint64_t .. nattr x offsets, i.e. for each of the num 
+             * - num x SIXTRL_UINT64_T .. nattr x offsets, i.e. for each of the num 
              *                     elemens an offset in bytes on where the 
              *                     data is stored.
              *                     Note: the offset is calculated relative to 
@@ -251,12 +247,12 @@ size_t NS( Particles_predict_required_capacity )(
              *                     offset for Particles is therefore 
              *                     NS(PARTICLES_PACK_BLOCK_LENGTH) */
             
-            size_t pack_info_length = 
-                sizeof( uint64_t ) + sizeof( uint64_t ) + sizeof( uint64_t ) +
-                sizeof( uint64_t ) + 
-                sizeof( uint64_t ) * NS(PARTICLES_NUM_OF_ATTRIBUTES);
+            SIXTRL_SIZE_T pack_info_length = 
+                sizeof( SIXTRL_UINT64_T ) + sizeof( SIXTRL_UINT64_T ) + sizeof( SIXTRL_UINT64_T ) +
+                sizeof( SIXTRL_UINT64_T ) + 
+                sizeof( SIXTRL_UINT64_T ) * NS(PARTICLES_NUM_OF_ATTRIBUTES);
             
-            size_t const temp = ( pack_info_length / alignment ) * alignment;
+            SIXTRL_SIZE_T const temp = ( pack_info_length / alignment ) * alignment;
             
             if( temp < pack_info_length )
             {
@@ -271,7 +267,7 @@ size_t NS( Particles_predict_required_capacity )(
                 
         /* ----------------------------------------------------------------- */
 
-        size_t temp = ( double_elem_length / ( alignment ) ) * ( alignment );
+        SIXTRL_SIZE_T temp = ( double_elem_length / ( alignment ) ) * ( alignment );
 
         if( temp < double_elem_length )
         {
@@ -442,7 +438,7 @@ bool NS( Particles_map_to_single_particle )( struct NS( Particles ) *
         NS( Particles_assign_ptr_to_rvv )( particles, &single->rvv );
         NS( Particles_assign_ptr_to_chi )( particles, &single->chi );
         
-        NS( Particles_set_ptr_mem_begin )( particles, &single );
+        NS( Particles_set_ptr_mem_begin )( particles, single );
         
         success = true;
     }
@@ -454,16 +450,16 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                                          SIXTRL_RESTRICT particles,
                                      struct NS( MemPool ) *
                                          SIXTRL_RESTRICT pool,
-                                     size_t npart,
-                                     size_t alignment, 
+                                     SIXTRL_SIZE_T npart,
+                                     SIXTRL_SIZE_T alignment, 
                                      bool make_packed )
 {
     bool success = false;
     
-    static size_t const ZERO_SIZE = (size_t)0u;
+    static SIXTRL_SIZE_T const ZERO_SIZE = (SIXTRL_SIZE_T)0u;
 
     if( ( pool != 0 ) && ( particles != 0 ) && ( npart > ZERO_SIZE ) &&
-        ( npart <= ( size_t )UINT64_MAX ) &&
+        ( npart <= ( SIXTRL_SIZE_T )UINT64_MAX ) &&
         ( alignment > ZERO_SIZE ) && 
         ( alignment <= NS(PARTICLES_MAX_ALIGNMENT) ) )
     {
@@ -480,7 +476,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
         {
             NS( AllocResult ) add_result;
             
-            uint64_t const num_of_attributes =                 
+            SIXTRL_UINT64_T const num_of_attributes =                 
                 NS(PARTICLES_NUM_OF_DOUBLE_ELEMENTS) +
                 NS(PARTICLES_NUM_OF_INT64_ELEMENTS);
             
@@ -488,12 +484,12 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             unsigned char* pack_info_it = 0;
             unsigned char* ptr_length_info = 0;
             
-            size_t const u64_stride = sizeof( uint64_t );
-            size_t const min_double_member_length = sizeof( double  ) * npart;
-            size_t const min_int64_member_length  = sizeof( int64_t ) * npart;
+            SIXTRL_SIZE_T const u64_stride = sizeof( SIXTRL_UINT64_T );
+            SIXTRL_SIZE_T const min_double_member_length = sizeof( double  ) * npart;
+            SIXTRL_SIZE_T const min_int64_member_length  = sizeof( SIXTRL_INT64_T ) * npart;
             
             assert( ( ( alignment % sizeof( double   ) ) == ZERO_SIZE ) &&
-                    ( ( alignment % sizeof( int64_t  ) ) == ZERO_SIZE ) );
+                    ( ( alignment % sizeof( SIXTRL_INT64_T  ) ) == ZERO_SIZE ) );
             
             NS( AllocResult_preset )( &add_result );
 
@@ -502,10 +498,10 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             
             if( make_packed )
             {
-                uint64_t const pack_indicator = NS(PARTICLES_PACK_INDICATOR);
-                uint64_t const num_of_particles = ( uint64_t )npart;
+                SIXTRL_UINT64_T const pack_indicator = NS(PARTICLES_PACK_INDICATOR);
+                SIXTRL_UINT64_T const num_of_particles = ( SIXTRL_UINT64_T )npart;
                 
-                size_t const offset_info_block_len = u64_stride + 
+                SIXTRL_SIZE_T const offset_info_block_len = u64_stride + 
                     u64_stride + u64_stride + u64_stride + 
                     u64_stride * num_of_attributes;
                     
@@ -562,7 +558,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -590,7 +586,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -618,7 +614,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -646,7 +642,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -674,7 +670,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -695,7 +691,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             
             ptr_attr = NS( AllocResult_get_pointer )( &add_result );
             NS( Particles_assign_ptr_to_particle_id )( 
-                particles, ( int64_t* )ptr_attr );
+                particles, ( SIXTRL_INT64_T* )ptr_attr );
             
             if( make_packed )
             {
@@ -703,7 +699,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -724,7 +720,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             
             ptr_attr = NS( AllocResult_get_pointer )( &add_result );
             NS( Particles_assign_ptr_to_lost_at_element_id)( 
-                particles, ( int64_t* )ptr_attr );
+                particles, ( SIXTRL_INT64_T* )ptr_attr );
             
             if( make_packed )
             {
@@ -732,7 +728,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -753,7 +749,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             
             ptr_attr = NS( AllocResult_get_pointer )( &add_result );
             NS( Particles_assign_ptr_to_lost_at_turn )( 
-                particles, ( int64_t* )ptr_attr );
+                particles, ( SIXTRL_INT64_T* )ptr_attr );
             
             if( make_packed )
             {
@@ -761,7 +757,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -784,7 +780,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             
             ptr_attr = NS( AllocResult_get_pointer )( &add_result );
             NS( Particles_assign_ptr_to_state )( 
-                particles, ( int64_t* )ptr_attr );
+                particles, ( SIXTRL_INT64_T* )ptr_attr );
             
             if( make_packed )
             {
@@ -792,7 +788,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -822,7 +818,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -852,7 +848,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -883,7 +879,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -913,7 +909,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -943,7 +939,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -973,7 +969,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -1001,7 +997,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -1030,7 +1026,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -1061,7 +1057,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -1091,7 +1087,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -1121,7 +1117,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 if( dist > 0 )
                 {
-                    uint64_t const attr_offset = ( uint64_t )dist;                    
+                    SIXTRL_UINT64_T const attr_offset = ( SIXTRL_UINT64_T )dist;                    
                     memcpy( pack_info_it, &attr_offset, u64_stride );
                     pack_info_it = pack_info_it + u64_stride;
                 }
@@ -1136,7 +1132,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
             if( make_packed )
             {
                 ptrdiff_t temp_length;
-                uint64_t  length = UINT64_C( 0 );
+                SIXTRL_UINT64_T  length = ( SIXTRL_UINT64_T )0u;
                 
                 unsigned char* end_ptr = 
                     NS(MemPool_get_next_begin_pointer)(pool, alignment );
@@ -1148,7 +1144,7 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
                 
                 assert( temp_length > 0 );
                 
-                length = ( uint64_t )temp_length;
+                length = ( SIXTRL_UINT64_T )temp_length;
                 memcpy( ptr_length_info, &length, u64_stride );                
             }
             
@@ -1173,19 +1169,19 @@ bool NS( Particles_map_to_mempool )( struct NS( Particles ) *
 
 /* ------------------------------------------------------------------------- */
 
-NS( Particles ) * NS( Particles_new )( size_t npart )
+NS( Particles ) * NS( Particles_new )( SIXTRL_SIZE_T npart )
 {
     NS( Particles )* particles = 0;
     NS( MemPool )* ptr_mem_pool = 0;
 
-    size_t chunk_size = NS( PARTICLES_DEFAULT_MEMPOOL_CHUNK_SIZE );
-    size_t alignment = NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT );
+    SIXTRL_SIZE_T chunk_size = NS( PARTICLES_DEFAULT_MEMPOOL_CHUNK_SIZE );
+    SIXTRL_SIZE_T alignment = NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT );
 
-    size_t const required_capacity =
+    SIXTRL_SIZE_T const required_capacity =
         NS( Particles_predict_required_capacity )( 
             npart, &chunk_size, &alignment, true );
 
-    if( ( required_capacity > (size_t)0u ) && ( (uint64_t)npart < UINT64_MAX ) )
+    if( ( required_capacity > (SIXTRL_SIZE_T)0u ) && ( (SIXTRL_UINT64_T)npart < UINT64_MAX ) )
     {
         bool success = false;
 
@@ -1214,11 +1210,11 @@ NS( Particles ) * NS( Particles_new )( size_t npart )
             ( NS( Particles_map_to_mempool )(
                 particles, ptr_mem_pool, npart, alignment, true ) ) )
         {
-            uint64_t flags = NS( PARTICLES_FLAGS_PACKED ) |
+            SIXTRL_UINT64_T flags = NS( PARTICLES_FLAGS_PACKED ) |
                              NS( PARTICLES_FLAGS_OWNS_MEMORY ) |
                              NS( PARTICLES_FLAGS_MEM_CTX_MEMPOOL );
 
-            uint64_t temp_alignment = (uint64_t)alignment;
+            SIXTRL_UINT64_T temp_alignment = (SIXTRL_UINT64_T)alignment;
 
             if( temp_alignment <= NS( PARTICLES_MAX_ALIGNMENT ) )
             {
@@ -1233,7 +1229,7 @@ NS( Particles ) * NS( Particles_new )( size_t npart )
             assert( NS(Particles_get_mem_begin )( particles ) != 0 );
             
             NS( Particles_set_flags )( particles, flags );
-            NS( Particles_set_size )( particles, (uint64_t)npart );
+            NS( Particles_set_size )( particles, (SIXTRL_UINT64_T)npart );
             NS( Particles_set_ptr_mem_context )( particles, ptr_mem_pool );
 
             success = true;
@@ -1267,22 +1263,22 @@ NS( Particles ) * NS( Particles_new )( size_t npart )
 /* ------------------------------------------------------------------------- */
 
 NS( Particles ) *
-    NS( Particles_new_on_mempool )( size_t npart,
+    NS( Particles_new_on_mempool )( SIXTRL_SIZE_T npart,
                                     NS( MemPool ) * SIXTRL_RESTRICT pool )
 {
     NS( Particles )* particles = 0;
 
-    size_t chunk_size = NS( MemPool_get_chunk_size )( pool );
-    size_t alignment = NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT );
+    SIXTRL_SIZE_T chunk_size = NS( MemPool_get_chunk_size )( pool );
+    SIXTRL_SIZE_T alignment = NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT );
 
-    size_t const required_capacity =
+    SIXTRL_SIZE_T const required_capacity =
         NS( Particles_predict_required_capacity )( 
             npart, &chunk_size, &alignment, true );
 
-    if( ( required_capacity > (size_t)0u ) &&
+    if( ( required_capacity > (SIXTRL_SIZE_T)0u ) &&
         ( chunk_size == NS( MemPool_get_chunk_size )( pool ) ) &&
-        ( chunk_size > (size_t)0u ) && ( alignment >= chunk_size ) &&
-        ( (uint64_t)npart < UINT64_MAX ) )
+        ( chunk_size > (SIXTRL_SIZE_T)0u ) && ( alignment >= chunk_size ) &&
+        ( (SIXTRL_UINT64_T)npart < UINT64_MAX ) )
     {
         bool success = false;
 
@@ -1293,10 +1289,10 @@ NS( Particles ) *
             ( NS( Particles_map_to_mempool )( 
                 particles, pool, npart, alignment, true ) ) )
         {
-            uint64_t flags = NS( PARTICLES_FLAGS_PACKED ) |
+            SIXTRL_UINT64_T flags = NS( PARTICLES_FLAGS_PACKED ) |
                              NS( PARTICLES_FLAGS_MEM_CTX_MEMPOOL );
 
-            uint64_t temp_alignment = (uint64_t)alignment;
+            SIXTRL_UINT64_T temp_alignment = (SIXTRL_UINT64_T)alignment;
 
             if( temp_alignment <= NS( PARTICLES_MAX_ALIGNMENT ) )
             {
@@ -1311,7 +1307,7 @@ NS( Particles ) *
             assert( NS(Particles_get_mem_begin )( particles ) != 0 );
             
             NS( Particles_set_flags )( particles, flags );
-            NS( Particles_set_size )( particles, (uint64_t)npart );
+            NS( Particles_set_size )( particles, (SIXTRL_UINT64_T)npart );
             NS( Particles_set_ptr_mem_context )( particles, pool );
             
             success = true;
@@ -1349,11 +1345,11 @@ NS( Particles ) * NS( Particles_new_single )()
         ( NS( Particles_map_to_single_particle )( ptr_particles,
                                                   ptr_single ) ) )
     {
-        uint64_t flags = NS( PARTICLES_FLAGS_OWNS_MEMORY ) |
+        SIXTRL_UINT64_T flags = NS( PARTICLES_FLAGS_OWNS_MEMORY ) |
                          NS( PARTICLES_FLAGS_MEM_CTX_SINGLEPARTICLE );
 
         NS( Particles_set_flags )( ptr_particles, flags );
-        NS( Particles_set_size )( ptr_particles, UINT64_C( 1 ) );
+        NS( Particles_set_size )( ptr_particles, ( SIXTRL_UINT64_T )1u );
         NS( Particles_set_ptr_mem_context )( ptr_particles, ptr_single );
 
         success = true;
@@ -1396,10 +1392,10 @@ NS( Particles ) *
         ( NS( Particles_map_to_single_particle )( ptr_particles,
                                                   ptr_single ) ) )
     {
-        uint64_t flags = NS( PARTICLES_FLAGS_MEM_CTX_SINGLEPARTICLE );
+        SIXTRL_UINT64_T flags = NS( PARTICLES_FLAGS_MEM_CTX_SINGLEPARTICLE );
 
         NS( Particles_set_flags )( ptr_particles, flags );
-        NS( Particles_set_size )( ptr_particles, UINT64_C( 1 ) );
+        NS( Particles_set_size )( ptr_particles, ( SIXTRL_UINT64_T )1u );
         NS( Particles_set_ptr_mem_context )( ptr_particles, ptr_single );
 
         success = true;
@@ -1424,19 +1420,19 @@ NS( Particles ) *
 
 bool NS(Particles_unpack_read_header)(
     unsigned char const* SIXTRL_RESTRICT ptr_mem_begin, 
-    size_t* SIXTRL_RESTRICT ptr_length, 
-    size_t* SIXTRL_RESTRICT ptr_num_particles, 
-    size_t* SIXTRL_RESTRICT ptr_num_attrs )
+    SIXTRL_SIZE_T* SIXTRL_RESTRICT ptr_length, 
+    SIXTRL_SIZE_T* SIXTRL_RESTRICT ptr_num_particles, 
+    SIXTRL_SIZE_T* SIXTRL_RESTRICT ptr_num_attrs )
 {
     bool success = false;
     
     if( ( ptr_mem_begin != 0 ) && ( ptr_length != 0 ) && 
         ( ptr_num_particles != 0 ) && ( ptr_num_attrs ) )
     {
-        static size_t const ZERO_SIZE = ( size_t )0u;
-        size_t const u64_stride = sizeof( uint64_t );
+        static SIXTRL_SIZE_T const ZERO_SIZE = ( SIXTRL_SIZE_T )0u;
+        SIXTRL_SIZE_T const u64_stride = sizeof( SIXTRL_UINT64_T );
         
-        uint64_t temp = UINT64_C( 0 );
+        SIXTRL_UINT64_T temp = ( SIXTRL_UINT64_T )0u;
         
         unsigned char const* SIXTRL_RESTRICT it = ptr_mem_begin;
         
@@ -1459,7 +1455,7 @@ bool NS(Particles_unpack_read_header)(
             return success;
         }
         
-        *ptr_length = ( size_t )temp;
+        *ptr_length = ( SIXTRL_SIZE_T )temp;
         
         /* ----------------------------------------------------------------- */
         /* pack indicator: */
@@ -1478,12 +1474,12 @@ bool NS(Particles_unpack_read_header)(
         memcpy( &temp, it, u64_stride );
         it = it + u64_stride;
         
-        if( temp == UINT64_C( 0 ) )
+        if( temp == ( SIXTRL_UINT64_T )0u )
         {
             return success;
         }
         
-        *ptr_num_particles = ( size_t )temp;
+        *ptr_num_particles = ( SIXTRL_SIZE_T )temp;
         
         /* ----------------------------------------------------------------- */
         /* num_of_attributes: */
@@ -1491,7 +1487,7 @@ bool NS(Particles_unpack_read_header)(
         memcpy( &temp, it, u64_stride );
         it = it + u64_stride;
         
-        *ptr_num_attrs = ( size_t )temp;
+        *ptr_num_attrs = ( SIXTRL_SIZE_T )temp;
         
         if( *ptr_num_attrs != NS(PARTICLES_NUM_OF_ATTRIBUTES) )
         {
@@ -1506,23 +1502,23 @@ bool NS(Particles_unpack_read_header)(
 
 bool NS(Particles_unpack_check_consistency)(
     unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,
-    size_t  length, size_t num_of_particles, size_t num_of_attributes )
+    SIXTRL_SIZE_T  length, SIXTRL_SIZE_T num_of_particles, SIXTRL_SIZE_T num_of_attributes )
 {
     bool is_consistent = false;
     
-    static size_t const ZERO_SIZE = ( size_t )0u;
+    static SIXTRL_SIZE_T const ZERO_SIZE = ( SIXTRL_SIZE_T )0u;
     
     if( ( ptr_mem_begin != 0 ) && 
         ( length > NS(PARTICLES_PACK_BLOCK_LENGTH) ) &&
-        ( num_of_particles  > ( size_t )0u ) &&
+        ( num_of_particles  > ( SIXTRL_SIZE_T )0u ) &&
         ( ( num_of_attributes == NS(PARTICLES_NUM_OF_ATTRIBUTES ) ) ) )
     {
-        size_t const u64_stride = sizeof( uint64_t );   
-        size_t ii = ZERO_SIZE;
-        size_t calculated_size = ZERO_SIZE;
+        SIXTRL_SIZE_T const u64_stride = sizeof( SIXTRL_UINT64_T );   
+        SIXTRL_SIZE_T ii = ZERO_SIZE;
+        SIXTRL_SIZE_T calculated_size = ZERO_SIZE;
         
-        uint64_t prev_offset;
-        uint64_t temp = UINT64_C( 0 );        
+        SIXTRL_UINT64_T prev_offset;
+        SIXTRL_UINT64_T temp = ( SIXTRL_UINT64_T )0u;        
         unsigned char const* SIXTRL_RESTRICT it = ptr_mem_begin;
                 
         /* ----------------------------------------------------------------- */
@@ -1531,7 +1527,7 @@ bool NS(Particles_unpack_check_consistency)(
         memcpy( &temp, it, u64_stride );
         it = it + u64_stride;        
         
-        if( length != ( size_t )temp )
+        if( length != ( SIXTRL_SIZE_T )temp )
         {
             return is_consistent;
         }
@@ -1553,7 +1549,7 @@ bool NS(Particles_unpack_check_consistency)(
         memcpy( &temp, it, u64_stride );
         it = it + u64_stride;
         
-        if( num_of_particles != ( size_t )temp )
+        if( num_of_particles != ( SIXTRL_SIZE_T )temp )
         {
             return is_consistent;
         }
@@ -1564,7 +1560,7 @@ bool NS(Particles_unpack_check_consistency)(
         memcpy( &temp, it, u64_stride );
         it = it + u64_stride;
         
-        if( num_of_attributes != ( size_t )temp )
+        if( num_of_attributes != ( SIXTRL_SIZE_T )temp )
         {
             return is_consistent;
         }
@@ -1597,31 +1593,31 @@ bool NS(Particles_unpack_check_consistency)(
 
 bool NS(Particles_unpack_map_memory)(
     struct NS(Particles)* SIXTRL_RESTRICT p, unsigned char* ptr_begin, 
-    size_t length, size_t num_of_particles, size_t num_of_attributes )
+    SIXTRL_SIZE_T length, SIXTRL_SIZE_T num_of_particles, SIXTRL_SIZE_T num_of_attributes )
 {
     bool success = false;
     
-    static size_t const ZERO_SIZE = ( size_t )0u;
+    static SIXTRL_SIZE_T const ZERO_SIZE = ( SIXTRL_SIZE_T )0u;
     
     if( ( p != 0 ) && ( length > NS(PARTICLES_PACK_BLOCK_LENGTH) ) &&
         ( num_of_particles > ZERO_SIZE ) && 
         ( num_of_attributes == NS(PARTICLES_NUM_OF_ATTRIBUTES) ) )
     {
-        size_t const u64_stride = sizeof( uint64_t );
+        SIXTRL_SIZE_T const u64_stride = sizeof( SIXTRL_UINT64_T );
         
         unsigned char const*  it = ptr_begin;
-        size_t calculated_size   = ZERO_SIZE;
+        SIXTRL_SIZE_T calculated_size   = ZERO_SIZE;
         
-        uint64_t prev_off;
-        uint64_t off = UINT64_C( 0 );
+        SIXTRL_UINT64_T prev_off;
+        SIXTRL_UINT64_T off = ( SIXTRL_UINT64_T )0u;
         
         /* move past the beginning for the header, i.e. 
-         * - the length indicator  (uint64_t)
-         * - the pack   indicator  (uint64_t)
-         * - the num_of_particles  (uint64_t)
-         * - the num_of_attributes (uint64_t) 
+         * - the length indicator  (SIXTRL_UINT64_T)
+         * - the pack   indicator  (SIXTRL_UINT64_T)
+         * - the num_of_particles  (SIXTRL_UINT64_T)
+         * - the num_of_attributes (SIXTRL_UINT64_T) 
          * Note that the contents of these fields is NOT verified here! */
-        it = it + u64_stride * ( size_t )4u;
+        it = it + u64_stride * ( SIXTRL_SIZE_T )4u;
         
         /* Now read num_of_attributes times the offset, apply it on the base 
          * pointr and assign the address to the data member: */
@@ -1664,30 +1660,30 @@ bool NS(Particles_unpack_map_memory)(
         prev_off = off;
         memcpy( &off, it, u64_stride );
         it = it + u64_stride;        
-        assert( prev_off + num_of_particles * sizeof( int64_t ) <= off );
+        assert( prev_off + num_of_particles * sizeof( SIXTRL_INT64_T ) <= off );
         calculated_size += ( off - prev_off );        
-        NS(Particles_assign_ptr_to_particle_id)( p, ( int64_t* )( ptr_begin + off ) );
+        NS(Particles_assign_ptr_to_particle_id)( p, ( SIXTRL_INT64_T* )( ptr_begin + off ) );
         
         prev_off = off;
         memcpy( &off, it, u64_stride );
         it = it + u64_stride;
-        assert( prev_off + num_of_particles * sizeof( int64_t ) <= off );
+        assert( prev_off + num_of_particles * sizeof( SIXTRL_INT64_T ) <= off );
         calculated_size += ( off - prev_off );        
-        NS(Particles_assign_ptr_to_lost_at_element_id)( p, ( int64_t* )( ptr_begin + off ) );
+        NS(Particles_assign_ptr_to_lost_at_element_id)( p, ( SIXTRL_INT64_T* )( ptr_begin + off ) );
         
         prev_off = off;
         memcpy( &off, it, u64_stride );
         it = it + u64_stride;        
-        assert( prev_off + num_of_particles * sizeof( int64_t ) <= off );
+        assert( prev_off + num_of_particles * sizeof( SIXTRL_INT64_T ) <= off );
         calculated_size += ( off - prev_off );        
-        NS(Particles_assign_ptr_to_lost_at_turn)( p, ( int64_t* )( ptr_begin + off ) );
+        NS(Particles_assign_ptr_to_lost_at_turn)( p, ( SIXTRL_INT64_T* )( ptr_begin + off ) );
         
         prev_off = off;
         memcpy( &off, it, u64_stride );
         it = it + u64_stride;
-        assert( prev_off + num_of_particles * sizeof( int64_t ) <= off );
+        assert( prev_off + num_of_particles * sizeof( SIXTRL_INT64_T ) <= off );
         calculated_size += ( off - prev_off );        
-        NS(Particles_assign_ptr_to_state)( p, ( int64_t* )( ptr_begin + off ) );
+        NS(Particles_assign_ptr_to_state)( p, ( SIXTRL_INT64_T* )( ptr_begin + off ) );
         
         prev_off = off;
         memcpy( &off, it, u64_stride );
@@ -1775,11 +1771,11 @@ bool NS(Particles_unpack_map_memory)(
 }
 
 bool NS(Particles_unpack)( NS(Particles)* SIXTRL_RESTRICT particles, 
-    unsigned char* SIXTRL_RESTRICT mem, uint64_t flags )
+    unsigned char* SIXTRL_RESTRICT mem, SIXTRL_UINT64_T flags )
 {
     bool success = false;
     
-    static size_t const ZERO_SIZE = ( size_t )0u;
+    static SIXTRL_SIZE_T const ZERO_SIZE = ( SIXTRL_SIZE_T )0u;
     
     if( ( particles != 0 ) && ( mem != 0 ) )
     {
@@ -1793,9 +1789,9 @@ bool NS(Particles_unpack)( NS(Particles)* SIXTRL_RESTRICT particles,
             ( ( flags & NS(PARTICLES_UNPACK_CHECK_CONSISTENCY ) ) ==
                 NS( PARTICLES_UNPACK_CHECK_CONSISTENCY) );
         
-        size_t length = ZERO_SIZE;
-        size_t num_of_attributes = ZERO_SIZE;
-        size_t num_of_particles  = ZERO_SIZE;
+        SIXTRL_SIZE_T length = ZERO_SIZE;
+        SIXTRL_SIZE_T num_of_attributes = ZERO_SIZE;
+        SIXTRL_SIZE_T num_of_particles  = ZERO_SIZE;
         
         if( !NS(Particles_unpack_read_header)( 
                 mem, &length, &num_of_particles, &num_of_attributes ) )
@@ -1829,7 +1825,7 @@ bool NS(Particles_unpack)( NS(Particles)* SIXTRL_RESTRICT particles,
             if( NS(Particles_unpack_map_memory)( particles, mem, length, 
                 num_of_particles, num_of_attributes ) )
             {
-                uint64_t const flags = NS(PARTICLES_FLAGS_PACKED) |
+                SIXTRL_UINT64_T const flags = NS(PARTICLES_FLAGS_PACKED) |
                                        NS(PARTICLES_FLAGS_MEM_CTX_FLAT_MEMORY);
                                        
                 NS(Particles_set_flags)( particles, flags );
@@ -1890,30 +1886,30 @@ void NS( Particles_free )( struct NS( Particles ) * SIXTRL_RESTRICT particles )
 bool NS( Particles_has_defined_alignment )( const struct NS( Particles ) *
                                             const SIXTRL_RESTRICT p )
 {
-    return ( NS( Particles_alignment )( p ) != UINT64_C( 0 ) );
+    return ( NS( Particles_alignment )( p ) != ( SIXTRL_UINT64_T )0u );
 }
 
 bool NS( Particles_is_aligned )( const struct NS( Particles ) *
                                      const SIXTRL_RESTRICT p,
-                                 size_t alignment )
+                                 SIXTRL_SIZE_T alignment )
 {
     bool is_aligned = false;
 
-    if( ( alignment != UINT64_C( 0 ) ) &&
+    if( ( alignment != ( SIXTRL_UINT64_T )0u ) &&
         ( alignment <= NS( PARTICLES_MAX_ALIGNMENT ) ) )
     {
-        uint64_t const align_flags = NS( Particles_alignment )( p );
+        SIXTRL_UINT64_T const align_flags = NS( Particles_alignment )( p );
 
-        if( align_flags != UINT64_C( 0 ) )
+        if( align_flags != ( SIXTRL_UINT64_T )0u )
         {
             /* Has defined alignment == true */
 
-            uint64_t const asked_alignment = (uint64_t)alignment;
+            SIXTRL_UINT64_T const asked_alignment = (SIXTRL_UINT64_T)alignment;
 
             is_aligned =
                 ( ( asked_alignment == align_flags ) ||
                   ( ( asked_alignment < align_flags ) &&
-                    ( ( align_flags % asked_alignment ) == UINT64_C( 0 ) ) ) );
+                    ( ( align_flags % asked_alignment ) == ( SIXTRL_UINT64_T )0u ) ) );
 
             assert( ( !is_aligned ) ||
                     ( NS( Particles_check_alignment )( p, alignment ) ) );
@@ -1931,11 +1927,11 @@ bool NS( Particles_is_aligned )( const struct NS( Particles ) *
 
 bool NS( Particles_check_alignment )( const struct NS( Particles ) *
                                           const SIXTRL_RESTRICT p,
-                                      size_t n )
+                                      SIXTRL_SIZE_T n )
 {
     bool is_aligned = false;
 
-    static size_t const Z0 = (size_t)0u;
+    static SIXTRL_SIZE_T const Z0 = (SIXTRL_SIZE_T)0u;
 
     if( ( p != 0 ) && ( n != Z0 ) && ( NS( Particles_get_q0 )( p ) != 0 ) &&
         ( NS( Particles_get_mass0 )( p ) != 0 ) &&
@@ -1989,14 +1985,14 @@ bool NS( Particles_check_alignment )( const struct NS( Particles ) *
     return is_aligned;
 }
 
-uint64_t NS( Particles_alignment )( const struct NS( Particles ) *
+SIXTRL_UINT64_T NS( Particles_alignment )( const struct NS( Particles ) *
                                     const SIXTRL_RESTRICT p )
 {
-    uint64_t alignment = UINT64_C( 0 );
+    SIXTRL_UINT64_T alignment = ( SIXTRL_UINT64_T )0u;
 
     if( p != 0 )
     {
-        uint64_t const flags = NS( Particles_get_flags )( p );
+        SIXTRL_UINT64_T const flags = NS( Particles_get_flags )( p );
         alignment = ( ( flags & NS( PARTICLES_FLAGS_ALIGN_MASK ) ) >>
                       NS( PARTICLES_FLAGS_ALIGN_MASK_OFFSET_BITS ) );
     }
@@ -2011,8 +2007,8 @@ bool NS( Particles_is_consistent )( const NS( Particles ) *
 {
     bool is_consistent = false;
 
-    static size_t const ZERO = (size_t)0u;
-    size_t const num_particles = NS( Particles_get_size )( p );
+    static SIXTRL_SIZE_T const ZERO = (SIXTRL_SIZE_T)0u;
+    SIXTRL_SIZE_T const num_particles = NS( Particles_get_size )( p );
 
     if( ( p != 0 ) && ( num_particles > ZERO ) )
     {
@@ -2048,7 +2044,7 @@ bool NS( Particles_is_consistent )( const NS( Particles ) *
         if( ( is_consistent ) &&
             ( NS( Particles_has_defined_alignment )( p ) ) )
         {
-            uint64_t const def_alignment = NS( Particles_alignment )( p );
+            SIXTRL_UINT64_T const def_alignment = NS( Particles_alignment )( p );
             is_consistent = NS( Particles_check_alignment )( p, def_alignment );
         }
 
@@ -2056,7 +2052,7 @@ bool NS( Particles_is_consistent )( const NS( Particles ) *
         {
 
             ptrdiff_t const min_double_len = sizeof( double ) * num_particles;
-            ptrdiff_t const min_int64_len = sizeof( int64_t ) * num_particles;
+            ptrdiff_t const min_int64_len = sizeof( SIXTRL_INT64_T ) * num_particles;
 
             /* ------------------------------------------------------------- */
             /* distance q0 -> mass0 */
@@ -2206,10 +2202,10 @@ bool NS( Particles_is_consistent )( const NS( Particles ) *
 
 bool NS( Particles_deep_copy_one )( struct NS( Particles ) *
                                         SIXTRL_RESTRICT dest,
-                                    uint64_t dest_id,
+                                    SIXTRL_UINT64_T dest_id,
                                     struct NS( Particles )
                                         const* SIXTRL_RESTRICT source,
-                                    uint64_t source_id )
+                                    SIXTRL_UINT64_T source_id )
 {
     bool success = false;
 

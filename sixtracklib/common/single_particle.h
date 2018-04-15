@@ -1,50 +1,55 @@
 #ifndef SIXTRACKLIB_COMMON_SINGLE_PARTICLE_H__
 #define SIXTRACKLIB_COMMON_SINGLE_PARTICLE_H__
 
-#include "sixtracklib/_impl/namespace_begin.h"
+#if !defined( _GPUCODE )
+#include "sixtracklib/_impl/definitions.h"
 
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "sixtracklib/common/restrict.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+    
+#endif /* !defined( _GPUCODE ) */
 
 typedef struct NS( SingleParticle )
 {
-    double q0;
-    double mass0;
-    double beta0;
-    double gamma0;
-    double p0c;
+    SIXTRL_REAL_T q0;
+    SIXTRL_REAL_T mass0;
+    SIXTRL_REAL_T beta0;
+    SIXTRL_REAL_T gamma0;
+    SIXTRL_REAL_T p0c;
 
-    int64_t partid;
-    int64_t elemid;
-    int64_t turn;
-    int64_t state;
+    SIXTRL_INT64_T partid;
+    SIXTRL_INT64_T elemid;
+    SIXTRL_INT64_T turn;
+    SIXTRL_INT64_T state;
 
-    double s;
-    double x;
-    double px;
-    double y;
-    double py;
-    double sigma;
+    SIXTRL_REAL_T s;
+    SIXTRL_REAL_T x;
+    SIXTRL_REAL_T px;
+    SIXTRL_REAL_T y;
+    SIXTRL_REAL_T py;
+    SIXTRL_REAL_T sigma;
 
-    double psigma;
-    double delta;
-    double rpp;
-    double rvv;
-    double chi;
+    SIXTRL_REAL_T psigma;
+    SIXTRL_REAL_T delta;
+    SIXTRL_REAL_T rpp;
+    SIXTRL_REAL_T rvv;
+    SIXTRL_REAL_T chi;
 } NS( SingleParticle );
 
 void NS( SingleParticle_init )( NS( SingleParticle ) *
                                 SIXTRL_RESTRICT ptr_particle );
 
+#if !defined( _GPUCODE )
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#endif /* !defined( _GPUCODE ) */
 
 #endif /* SIXTRACKLIB_COMMON_SINGLE_PARTICLE_H__ */
 
