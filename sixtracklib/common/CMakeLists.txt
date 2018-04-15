@@ -1,22 +1,29 @@
 # sixtracklib/sixtracklib/common/CMakeLists.txt
 
 set( SIXTRACKLIB_COMMON_HEADERS 
+     details/tools.h
+     impl/block_type.h
+     impl/block_drift_type.h
      impl/particles_type.h
-     impl/track_single.h
+     impl/track_single.h     
+     block.h
+     block_drift.h
      mem_pool.h
      particles.h
      restrict.h
      single_particle.h
+     track.h
      values.h
 )
 
 
 set( SIXTRACKLIB_COMMON_SOURCES
+     details/block.c
+     details/block_drift.c
      details/mem_pool.c
      details/particles.c
      details/single_particle.c
      details/track_single.c
-     details/track.c
 )
 
 add_library( sixtrack_common OBJECT 
