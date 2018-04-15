@@ -1,52 +1,56 @@
 #include "sixtracklib/common/impl/track_single.h"
-#include "sixtracklib/_impl/namespace_begin.h"
+#include "sixtracklib/_impl/definitions.h"
 
 #include <assert.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "sixtracklib/common/restrict.h"
 #include "sixtracklib/common/single_particle.h"
 
 /* -------------------------------------------------------------------------- */
 
 extern int NS( Drift_track_single )( struct NS( SingleParticle ) *
                                          SIXTRL_RESTRICT particles,
-                                     double length );
+                                     SIXTRL_REAL_T const length );
 
 extern int NS( DriftExact_track_single )( struct NS( SingleParticle ) *
                                               SIXTRL_RESTRICT particles,
-                                          double length );
+                                          SIXTRL_REAL_T const length );
 
 /* -------------------------------------------------------------------------- */
 
 int NS( Drift_track_single )( struct NS( SingleParticle ) * SIXTRL_RESTRICT p,
-                              double length )
+                              SIXTRL_REAL_T const len )
 {
-    double const rpp = p->rpp;
-    double const px = p->px * rpp;
-    double const py = p->py * rpp;
+    SIXTRL_STATIC SIXTRL_REAL_T const ONE = ( SIXTRL_REAL_T )1;
+    SIXTRL_STATIC SIXTRL_REAL_T const TWO = ( SIXTRL_REAL_T )1;
+    
+    SIXTRL_REAL_T const rpp = p->rpp;
+    SIXTRL_REAL_T const px = p->px * rpp;
+    SIXTRL_REAL_T const py = p->py * rpp;
 
-    p->x += px * length;
-    p->y += py * length;
-    p->sigma +=
-        length * ( 1.0 - p->rvv * ( 1.0 + ( px * px + py * py ) / 2.0 ) );
-    p->s += length;
+    p->x += px * len;
+    p->y += py * len;
+    p->sigma += len * ( ONE - p->rvv * ( ONE + ( px * px + py * py ) / TWO ) );
+    p->s += len;
 
     return 1;
 }
 
 int NS( DriftExact_track_single )( struct NS( SingleParticle ) *
                                        SIXTRL_RESTRICT particle,
-                                   double length )
+                                   SIXTRL_REAL_T const length )
 {
-    double const opd = 1.0 + particle->delta;
-    double px = particle->px;
-    double py = particle->py;
-    double const lpzi = length / sqrt( opd * opd - px * px - py * py );
-    double const beta0 = particle->beta0;
-    double const lbzi = ( beta0 * beta0 * particle->psigma + 1.0 ) * lpzi;
+    SIXTRL_STATIC SIXTRL_REAL_T const ONE = ( SIXTRL_REAL_T )1;
+    
+    SIXTRL_REAL_T const opd = ONE + particle->delta;
+    SIXTRL_REAL_T px = particle->px;
+    SIXTRL_REAL_T py = particle->py;
+    SIXTRL_REAL_T const lpzi = length / sqrt( opd * opd - px * px - py * py );
+    SIXTRL_REAL_T const beta0 = particle->beta0;
+    SIXTRL_REAL_T const beta0_squ = beta0 * beta0;
+    SIXTRL_REAL_T const lbzi = ( beta0_squ * particle->psigma + ONE ) * lpzi;
 
     particle->x += px * lpzi;
     particle->y += py * lpzi;
