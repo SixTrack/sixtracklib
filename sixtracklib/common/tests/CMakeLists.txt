@@ -7,6 +7,14 @@ if( GTEST_FOUND )
          ${SIXTRACKL_GTEST_LIBRARIES} )
 
     # --------------------------------------------------------------------------
+    # test_tools:
+    
+    add_executable( test_tools test_tools.cpp )
+    target_link_libraries( test_tools ${SIXTRACKL_TEST_LIBRARIES} )
+    target_compile_options( test_tools BEFORE PUBLIC -std=c++11 -Wall -Werror -pedantic )
+    add_test( CommonToolTests test_tools )
+         
+    # --------------------------------------------------------------------------
     # test_mem_pool:
     
     add_executable( test_mem_pool test_mem_pool.cpp )
