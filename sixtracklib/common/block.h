@@ -19,19 +19,21 @@ struct NS(MemPool);
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_SIZE_T NS(Block_predict_required_mempool_capacity_for_packing)(
-    const struct NS(MemPool) *const SIXTRL_RESTRICT pool,
+SIXTRL_SIZE_T NS(Block_predict_required_num_bytes_on_mempool_for_packing)(
+    unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,
+    SIXTRL_SIZE_T const chunk_size, 
     SIXTRL_SIZE_T* SIXTRL_RESTRICT ptr_alignment, 
     SIXTRL_SIZE_T const num_of_elements, 
-    SIXTRL_SIZE_T const* ptr_attributes_sizes,
-    SIXTRL_SIZE_T const num_of_attributes );
+    SIXTRL_SIZE_T const num_of_attributes,
+    SIXTRL_SIZE_T const* ptr_attributes_sizes
+                                                                         );
 
-SIXTRL_SIZE_T NS(Block_predict_required_capacity_for_packing)(
+SIXTRL_SIZE_T NS(Block_predict_required_num_bytes_for_packing)(
     unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,
     SIXTRL_SIZE_T const alignment, 
     SIXTRL_SIZE_T const num_of_elements,
-    SIXTRL_SIZE_T const* ptr_attributes_sizes,
-    SIXTRL_SIZE_T const num_of_attributes );
+    SIXTRL_SIZE_T const num_of_attributes,
+    SIXTRL_SIZE_T const* ptr_attributes_sizes );
     
 /* ------------------------------------------------------------------------- */
 /*

@@ -13,18 +13,19 @@
 /* ------------------------------------------------------------------------- */
 
 extern SIXTRL_SIZE_T NS(Block_predict_required_mempool_capacity_for_packing)(
-    const struct NS(MemPool) *const SIXTRL_RESTRICT pool,
+    unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,
+    SIXTRL_SIZE_T const chunk_size, 
     SIXTRL_SIZE_T* SIXTRL_RESTRICT ptr_alignment, 
     SIXTRL_SIZE_T const num_of_elements, 
-    SIXTRL_SIZE_T const* ptr_attributes_sizes,
-    SIXTRL_SIZE_T const num_of_attributes );
+    SIXTRL_SIZE_T const num_of_attributes,
+    SIXTRL_SIZE_T const* ptr_attributes_sizes );
 
 extern SIXTRL_SIZE_T NS(Block_predict_required_capacity_for_packing)(
     unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,
     SIXTRL_SIZE_T const alignment, 
     SIXTRL_SIZE_T const num_of_elements,
-    SIXTRL_SIZE_T const* ptr_attributes_sizes,
-    SIXTRL_SIZE_T const num_of_attributes );
+    SIXTRL_SIZE_T const num_of_attributes,
+    SIXTRL_SIZE_T const* ptr_attributes_sizes );
 
 /* ------------------------------------------------------------------------- */
 
@@ -95,78 +96,75 @@ extern void NS(Block_set_alignment)(
 
 /* ************************************************************************* */
 
-SIXTRL_SIZE_T NS(Block_predict_required_mempool_capacity_for_packing)(
-    const NS(MemPool) *const SIXTRL_RESTRICT pool,
+SIXTRL_SIZE_T NS(Block_predict_required_num_bytes_on_mempool_for_packing)(
+    unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,
+    SIXTRL_SIZE_T const chunk_size, 
     SIXTRL_SIZE_T* SIXTRL_RESTRICT ptr_alignment, 
     SIXTRL_SIZE_T const num_of_elements, 
-    SIXTRL_SIZE_T const* ptr_attribute_sizes,
-    SIXTRL_SIZE_T const num_of_attributes )
+    SIXTRL_SIZE_T const num_of_attributes,
+    SIXTRL_SIZE_T const* ptr_attribute_sizes )
 {
     static SIXTRL_SIZE_T const ZERO_SIZE = ( SIXTRL_SIZE_T )0u;
-    SIXTRL_SIZE_T predicted_capacity = ZERO_SIZE;
+    SIXTRL_SIZE_T predicted_num_bytes = ZERO_SIZE;
     
-    if( ( pool != 0 ) && ( ptr_alignment != 0 ) &&
+    if( ( chunk_size > ZERO_SIZE ) && 
         ( ptr_attribute_sizes != 0 ) && ( num_of_elements > ZERO_SIZE ) && 
         ( num_of_attributes > ZERO_SIZE ) )
     {
-        SIXTRL_SIZE_T chunk_size = NS(MemPool_get_chunk_size)( pool );
-        SIXTRL_SIZE_T alignment  = *ptr_alignment;
-
-        unsigned char const* ptr_mem_begin = 
-            NS(MemPool_get_next_begin_const_pointer)( pool, chunk_size );
+        SIXTRL_SIZE_T alignment;
         
-        if( ( ptr_mem_begin == 0 ) || ( chunk_size == ZERO_SIZE ) )
+        if( ptr_alignment != 0 )
         {
-            return predicted_capacity;
-        }
-        
-        if( alignment != chunk_size )
-        {
-            if( alignment == ZERO_SIZE )
+            if( ( *ptr_alignment == chunk_size ) ||
+                ( ( *ptr_alignment < chunk_size ) && 
+                  ( ( chunk_size % *ptr_alignment ) == ZERO_SIZE ) ) )
             {
-                alignment = chunk_size;
+                alignment = chunk_size;                
+            }
+            else if( ( *ptr_alignment > chunk_size ) && 
+                     ( ( *ptr_alignment % chunk_size ) == ZERO_SIZE ) )
+            {
+                alignment = *ptr_alignment;
             }
             else
             {
-                SIXTRL_SIZE_T const temp = 
-                    NS(least_common_multiple)( chunk_size, alignment );
-                
-                assert( ( temp >= alignment  ) && 
-                        ( temp >= chunk_size ) &&
-                        ( ( temp %  alignment  ) == ZERO_SIZE ) &&
-                        ( ( temp %  chunk_size ) == ZERO_SIZE ) );
-                
-                if( temp != alignment )
-                {
-                    alignment = temp;                    
-                }
+                alignment = NS(least_common_multiple)( chunk_size, *ptr_alignment );                
+            }            
+            
+            assert( ( alignment >= chunk_size ) && 
+                    ( alignment >= *ptr_alignment ) &&
+                    ( ( alignment % *ptr_alignment ) == ZERO_SIZE ) &&
+                    ( ( alignment % chunk_size ) == ZERO_SIZE ) );
+        
+            if( alignment != *ptr_alignment )
+            {
+                *ptr_alignment = alignment;
             }
         }
-        
-        if( alignment != *ptr_alignment )
+        else
         {
-            *ptr_alignment = alignment;
+            alignment = chunk_size;
         }
-        
-        predicted_capacity = NS(Block_predict_required_capacity_for_packing)(
-            ptr_mem_begin, alignment, num_of_elements, 
-                ptr_attribute_sizes, num_of_attributes );
+                
+        predicted_num_bytes = NS(Block_predict_required_num_bytes_for_packing)(
+            ptr_mem_begin, alignment, num_of_elements, num_of_attributes,
+            ptr_attribute_sizes );
     }
     
-    return predicted_capacity;
+    return predicted_num_bytes;
 }
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_SIZE_T NS(Block_predict_required_capacity_for_packing)(
+SIXTRL_SIZE_T NS(Block_predict_required_num_bytes_for_packing)(
     unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,
     SIXTRL_SIZE_T const alignment, SIXTRL_SIZE_T const num_of_elements,
-    SIXTRL_SIZE_T const* attr_size_it, SIXTRL_SIZE_T const num_of_attributes )
+    SIXTRL_SIZE_T const num_of_attributes, SIXTRL_SIZE_T const* attr_size_it )
 {
     static SIXTRL_SIZE_T const ZERO_SIZE = ( SIXTRL_SIZE_T )0u;
-    SIXTRL_SIZE_T predicted_capacity = ZERO_SIZE;
+    SIXTRL_SIZE_T predicted_num_bytes = ZERO_SIZE;
     
-    if( ( ptr_mem_begin != 0 ) && ( alignment != ZERO_SIZE ) &&
+    if( ( alignment != ZERO_SIZE ) &&
         ( attr_size_it  != 0 ) && ( num_of_elements > ZERO_SIZE ) && 
         ( num_of_attributes > ZERO_SIZE ) )
     {
@@ -180,6 +178,21 @@ SIXTRL_SIZE_T NS(Block_predict_required_capacity_for_packing)(
         SIXTRL_SIZE_T const u64_size = sizeof( SIXTRL_UINT64_T );
         
         /* ----------------------------------------------------------------- */
+        
+        /* a null - pointer has been submitted, so we have to assume the worst -
+         * add the full alignment  to the predicted capacity to be allow 
+         * alignment under all circumstances;
+         * Otherwise, use the right offset starting from ptr_mem_begin:
+         */
+        
+        if( begin_addr == ZERO_SIZE )
+        {
+            predicted_num_bytes = alignment;
+        }
+        else if( begin_addr_mod != ZERO_SIZE )
+        {
+            predicted_num_bytes = alignment - begin_addr_mod;
+        }
         
         /* Packing information: 
          * -----------------------------------------------------------------
@@ -221,7 +234,7 @@ SIXTRL_SIZE_T NS(Block_predict_required_capacity_for_packing)(
         }
         
         assert( ( pack_info_length % alignment ) == ZERO_SIZE );
-        predicted_capacity = pack_info_length;
+        predicted_num_bytes += pack_info_length;
         
         /* ----------------------------------------------------------------- */
         
@@ -237,27 +250,16 @@ SIXTRL_SIZE_T NS(Block_predict_required_capacity_for_packing)(
                 ? ZERO_SIZE : ( alignment - attr_block_length_mod );
             
             assert( ( attr_block_length % alignment ) == ZERO_SIZE );
-            predicted_capacity += attr_block_length;
+            predicted_num_bytes += attr_block_length;
         }
         
         /* ----------------------------------------------------------------- */
         
-        assert( ( predicted_capacity % alignment ) == ZERO_SIZE );
-        
-        if( begin_addr_mod != ZERO_SIZE )
-        {            
-            uintptr_t offset = alignment;
-            assert( offset > begin_addr_mod );
-            
-            offset -= begin_addr_mod;
-            assert( ( ( ( uintptr_t )( 
-                ptr_mem_begin + offset ) ) % alignment ) == ZERO_SIZE );
-            
-            predicted_capacity += offset;
-        }
+        assert( ( ( predicted_num_bytes + begin_addr ) % alignment ) == 
+            ZERO_SIZE );        
     }
     
-    return predicted_capacity;
+    return predicted_num_bytes;
 }
 
 /* ------------------------------------------------------------------------- */

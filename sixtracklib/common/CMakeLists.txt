@@ -2,17 +2,21 @@
 
 set( SIXTRACKLIB_COMMON_HEADERS 
      details/tools.h
-     impl/block_type.h
-     impl/block_drift_type.h
-     impl/particles_type.h
-     impl/track_single.h     
+     
      block.h
+     impl/block_type.h
+     
      block_drift.h
-     mem_pool.h
+     impl/block_drift_type.h
+     
      particles.h
-     restrict.h
      single_particle.h
+     impl/particles_type.h
+     
      track.h
+#      impl/track_single.h     
+     
+     mem_pool.h
      values.h
 )
 
@@ -23,7 +27,7 @@ set( SIXTRACKLIB_COMMON_SOURCES
      details/mem_pool.c
      details/particles.c
      details/single_particle.c
-     details/track_single.c
+#      details/track_single.c
 )
 
 add_library( sixtrack_common OBJECT 
@@ -39,6 +43,10 @@ target_compile_options( sixtrack_common BEFORE PUBLIC -Wall -Werror -pedantic -a
 
 if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     add_subdirectory( tests )
+endif()
+
+if( SIXTRACKL_ENABLE_TIMING_TESTS )
+    add_subdirectory( tests_benchmark )
 endif()
 
 #end sixtracklib/sixtracklib/common/CMakeLists.txt

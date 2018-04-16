@@ -102,6 +102,7 @@ static SIXTRL_UINT64_T const
 static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_CAPACITY ) = ( SIXTRL_SIZE_T )1024u;
 static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_ELEMENT_CAPACITY ) = (SIXTRL_SIZE_T)64u;
 static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_MEMPOOL_CHUNK_SIZE ) = (SIXTRL_SIZE_T)8u;
+static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_ALIGNMENT) = ( SIXTRL_SIZE_T )8u;
 static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_MEMPOOL_ALIGNMENT ) = (SIXTRL_SIZE_T)16u;
 
 /* ------------------------------------------------------------------------- */

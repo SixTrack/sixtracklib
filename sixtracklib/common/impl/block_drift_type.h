@@ -20,20 +20,54 @@ extern "C" {
     
 typedef struct NS(Drift)
 {
-    SIXTRL_SIZE_T    num_elem;
     SIXTRL_UINT64_T  type_id;
     SIXTRL_REAL_T*   length;
     SIXTRL_INT64_T*  element_id;
 }
 NS(Drift);
 
+#if !defined( _GPUCODE )
+
+typedef struct NS(DriftSingle)
+{
+    SIXTRL_UINT64_T type_id;
+    SIXTRL_REAL_T   length;
+    SIXTRL_INT64_T  element_id;
+}
+NS(DriftSingle);
+
+SIXTRL_STATIC SIXTRL_UINT64_T NS(DriftSingle_get_type_id)( 
+    const NS(DriftSingle) *const SIXTRL_RESTRICT drift );
+
+SIXTRL_STATIC SIXTRL_REAL_T NS(DriftSingle_get_length)(
+    const NS(DriftSingle) *const SIXTRL_RESTRICT drift );
+
+SIXTRL_STATIC SIXTRL_REAL_T* NS(DriftSingle_get_length_ptr)(
+    NS(DriftSingle)* SIXTRL_RESTRICT drift );
+
+SIXTRL_STATIC SIXTRL_INT64_T NS(DriftSingle_get_element_id)(
+    const NS(DriftSingle) *const SIXTRL_RESTRICT drift );
+
+SIXTRL_STATIC SIXTRL_INT64_T* NS(DriftSingle_get_element_id_ptr)(
+    NS(DriftSingle)* SIXTRL_RESTRICT drift );
+
+SIXTRL_STATIC void NS(DriftSingle_set_type_id)(
+    NS(DriftSingle)* SIXTRL_RESTRICT drift, SIXTRL_UINT64_T const type_id );
+
+SIXTRL_STATIC void NS(DriftSingle_set_length)(
+    NS(DriftSingle)* SIXTRL_RESTRICT drift, SIXTRL_REAL_T const length );
+
+SIXTRL_STATIC void NS(DriftSingle_set_element_id)(
+    NS(DriftSingle)* SIXTRL_RESTRICT drift, SIXTRL_INT64_T const element_id );
+
 /* -------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_SIZE_T NS(Drift_get_size)( 
-    const NS(Drift) *const SIXTRL_RESTRICT drift );
+SIXTRL_STATIC void NS(Drift_map_from_single_drift)(
+    NS(Drift)* SIXTRL_RESTRICT drift, NS(DriftSingle)* SIXTRL_RESTRICT single );
 
-SIXTRL_STATIC void NS(Drift_set_size)(
-    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_SIZE_T const new_num_elements );
+#endif /* !defined( _GPUCODE ) */
+
+/* -------------------------------------------------------------------------- */
 
 SIXTRL_STATIC SIXTRL_UINT64_T NS(Drift_get_type_id)(
     const NS(Drift) *const SIXTRL_RESTRICT drift );
@@ -43,73 +77,44 @@ SIXTRL_STATIC void NS(Drift_set_type_id)(
 
 /* -------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_INT64_T const* NS(Drift_get_element_id)( 
+SIXTRL_STATIC SIXTRL_INT64_T NS(Drift_get_element_id)( 
     const NS(Drift) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_STATIC SIXTRL_INT64_T NS(Drift_get_element_id_value)( 
-    const NS(Drift) *const SIXTRL_RESTRICT drift, 
-    SIXTRL_SIZE_T const id );
-
-SIXTRL_STATIC void NS(Drift_set_element_id_value)(
-    const NS(Drift) *const SIXTRL_RESTRICT drift, 
-    SIXTRL_SIZE_T const id, SIXTRL_INT64_T const elem_id );
+SIXTRL_STATIC SIXTRL_INT64_T* NS(Drift_get_element_id_ptr)( 
+    NS(Drift)* SIXTRL_RESTRICT drift );
 
 SIXTRL_STATIC void NS(Drift_set_element_id)(
-    NS(Drift)* SIXTRL_RESTRICT drift,  
-    SIXTRL_INT64_T const* SIXTRL_RESTRICT elem_id );
+    const NS(Drift) *const SIXTRL_RESTRICT drift, SIXTRL_INT64_T const elem_id );
 
 SIXTRL_STATIC void NS(Drift_assign_ptr_to_element_id)(
     NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_INT64_T* ptr_element_id );
     
 /* -------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_REAL_T const* NS(Drift_get_length)( 
+SIXTRL_STATIC SIXTRL_REAL_T NS(Drift_get_length)( 
     const NS(Drift) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_STATIC SIXTRL_REAL_T NS(Drift_get_length_value)( 
-    const NS(Drift) *const SIXTRL_RESTRICT drift, 
-    SIXTRL_SIZE_T const id );
+SIXTRL_STATIC SIXTRL_REAL_T* NS(Drift_get_length_ptr)(
+    NS(Drift)* SIXTRL_RESTRICT drift );
 
 SIXTRL_STATIC void NS(Drift_set_length)( 
-    NS(Drift)* SIXTRL_RESTRICT drift, 
-    SIXTRL_REAL_T const* SIXTRL_RESTRICT length );
-
-SIXTRL_STATIC void NS(Drift_set_length_value)(
-    NS(Drift)* SIXTRL_RESTRICT drift,
-    SIXTRL_SIZE_T const id, SIXTRL_REAL_T const length );
+    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_REAL_T const length );
 
 SIXTRL_STATIC void NS(Drift_assign_ptr_to_length)(
-    NS(Drift)* SIXTRL_RESTRICT drift, 
-    SIXTRL_REAL_T* ptr_length );
+    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_REAL_T* ptr_length );
 
 /* -------------------------------------------------------------------------- */
 
-SIXTRL_STATIC int NS(Drift_map_to_flat_memory_for_packing)(
-    NS(Drift)* SIXTRL_RESTRICT drift, unsigned char* mem,
-    SIXTRL_SIZE_T const alignment );
+SIXTRL_STATIC SIXTRL_SIZE_T NS(Drift_map_to_flat_memory)(
+    NS(Drift)* SIXTRL_RESTRICT mapped, unsigned char* mem_begin,
+    NS(BeamElementType) const type_id, SIXTRL_SIZE_T const alignment );
 
-SIXTRL_STATIC int NS(Drift_unpack_from_flat_memory)(
+SIXTRL_STATIC unsigned char* NS(Drift_unpack_from_flat_memory)(
     NS(Drift)* SIXTRL_RESTRICT drift, unsigned char* mem );
-
-
 
 /* ************************************************************************** */
 /* ******          Implementation of inline functions                   ***** */
 /* ************************************************************************** */
-
-SIXTRL_INLINE SIXTRL_SIZE_T NS(Drift_get_size)( 
-    const NS(Drift) *const SIXTRL_RESTRICT drift )
-{
-    SIXTRL_ASSERT( drift != 0 );
-    return drift->num_elem;
-}
-
-SIXTRL_INLINE void NS(Drift_set_size)(
-    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_SIZE_T const new_num_elements )
-{
-    SIXTRL_ASSERT( drift != 0 );
-    drift->num_elem = new_num_elements;
-}
 
 SIXTRL_INLINE SIXTRL_UINT64_T NS(Drift_get_type_id)(
     const NS(Drift) *const SIXTRL_RESTRICT drift )
@@ -133,40 +138,25 @@ SIXTRL_INLINE void NS(Drift_set_type_id)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_INT64_T const* NS(Drift_get_element_id)( 
+SIXTRL_INLINE SIXTRL_INT64_T NS(Drift_get_element_id)( 
     const NS(Drift) *const SIXTRL_RESTRICT drift )
+{
+    SIXTRL_ASSERT( ( drift != 0 ) && ( drift->element_id != 0 ) );
+    return *( drift->element_id );
+}
+
+SIXTRL_INLINE SIXTRL_INT64_T* NS(Drift_get_element_id_ptr)( 
+    NS(Drift)* SIXTRL_RESTRICT drift )
 {
     SIXTRL_ASSERT( drift != 0 );
     return drift->element_id;
 }
 
-SIXTRL_INLINE SIXTRL_INT64_T NS(Drift_get_element_id_value)( 
-    const NS(Drift) *const SIXTRL_RESTRICT drift, 
-    SIXTRL_SIZE_T const id )
-{
-    SIXTRL_ASSERT( ( drift != 0 ) && ( id < drift->num_elem) && 
-                   ( drift->element_id != 0 ) );
-    
-    return drift->element_id[ id ];
-}
-
-SIXTRL_INLINE void NS(Drift_set_element_id_value)(
-    const NS(Drift) *const SIXTRL_RESTRICT drift, 
-    SIXTRL_SIZE_T const id, SIXTRL_INT64_T const elem_id )
-{
-    SIXTRL_ASSERT( ( drift != 0 ) && ( drift->num_elem > id ) && 
-                   ( drift->element_id != 0 ) );
-    
-    drift->element_id[ id ] = elem_id;
-    return;
-}
-
 SIXTRL_INLINE void NS(Drift_set_element_id)(
-    NS(Drift)* SIXTRL_RESTRICT drift,  
-    SIXTRL_INT64_T const* SIXTRL_RESTRICT elem_id )
+    const NS(Drift) *const SIXTRL_RESTRICT drift, SIXTRL_INT64_T const elem_id )
 {
-    SIXTRACKLIB_COPY_VALUES( 
-        SIXTRL_INT64_T, drift->element_id, elem_id, drift->num_elem );
+    SIXTRL_ASSERT( ( drift != 0 ) && ( drift->element_id != 0 ) );    
+    *( drift->element_id ) = elem_id;
     return;
 }
 
@@ -180,39 +170,26 @@ SIXTRL_INLINE void NS(Drift_assign_ptr_to_element_id)(
     
 /* -------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_REAL_T const* NS(Drift_get_length)( 
+SIXTRL_INLINE SIXTRL_REAL_T NS(Drift_get_length)( 
     const NS(Drift) *const SIXTRL_RESTRICT drift )
+{
+    SIXTRL_ASSERT( ( drift != 0 ) && ( drift->length != 0 ) );
+    return *( drift->length );
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T* NS(Drift_get_length_ptr)( 
+    NS(Drift)* SIXTRL_RESTRICT drift )
 {
     SIXTRL_ASSERT( drift != 0 );
     return drift->length;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(Drift_get_length_value)( 
-    const NS(Drift) *const SIXTRL_RESTRICT drift, 
-    SIXTRL_SIZE_T const id )
-{
-    SIXTRL_ASSERT( ( drift != 0 ) && ( id < drift->num_elem) && 
-                   ( drift->length != 0 ) );
-    
-    return drift->length[ id ];
-}
-
 SIXTRL_INLINE void NS(Drift_set_length)( 
-    NS(Drift)* SIXTRL_RESTRICT drift, 
-    SIXTRL_REAL_T const* SIXTRL_RESTRICT length )
+    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_REAL_T const length )
 {
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, drift->length, length, drift->num_elem );
-    return;
-}
-
-SIXTRL_INLINE void NS(Drift_set_length_value)(
-    NS(Drift)* SIXTRL_RESTRICT drift,
-    SIXTRL_SIZE_T const id, SIXTRL_REAL_T const length )
-{
-    SIXTRL_ASSERT( ( drift != 0 ) && ( drift->num_elem > id ) && 
-                   ( drift->length != 0 ) );
+    SIXTRL_ASSERT( ( drift != 0 ) && ( drift->length != 0 ) );
     
-    drift->length[ id ] = length;
+    *( drift->length ) = length;
     return;
 }
 
@@ -226,12 +203,10 @@ SIXTRL_INLINE void NS(Drift_assign_ptr_to_length)(
 
 /* -------------------------------------------------------------------------- */
 
-SIXTRL_INLINE int NS(Drift_map_to_flat_memory_for_packing)(
-    NS(Drift)* SIXTRL_RESTRICT drift, unsigned char* mem,
-    SIXTRL_SIZE_T const alignment )
+SIXTRL_INLINE SIXTRL_SIZE_T NS(Drift_map_to_flat_memory)(
+    NS(Drift)* SIXTRL_RESTRICT mapped, unsigned char* mem, 
+    NS(BeamElementType) const type_id, SIXTRL_SIZE_T const alignment )
 {
-    int success = -1;
-    
     SIXTRL_STATIC SIXTRL_SIZE_T const ZERO = ( SIXTRL_SIZE_T )0u;
         
     SIXTRL_STATIC SIXTRL_SIZE_T const U64_SIZE = sizeof( SIXTRL_UINT64_T );
@@ -251,27 +226,30 @@ SIXTRL_INLINE int NS(Drift_map_to_flat_memory_for_packing)(
         sizeof( SIXTRL_UINT64_T ) * 5;
         
     SIXTRL_STATIC SIXTRL_UINT64_T const NUM_ATTRIBUTES = ( SIXTRL_UINT64_T )2u;
+    SIXTRL_STATIC SIXTRL_UINT64_T const NUM_ELEMENTS   = ( SIXTRL_UINT64_T )1u;
+    
     SIXTRL_UINT64_T DATA_ADDR_OFFSET = U64_SIZE * 6;
     SIXTRL_UINT64_T const DATA_ADDR_OFFSET_MOD = DATA_ADDR_OFFSET % alignment;
     
-    SIXTRL_UINT64_T const NUM_DRIFTS = NS(Drift_get_size)( drift );
-    SIXTRL_UINT64_T const TYPE_ID    = NS(Drift_get_type_id)(drift);
-    
-    SIXTRL_UINT64_T LENGTH_BLOCK_LEN = NUM_DRIFTS * sizeof( SIXTRL_REAL_T  );
+    SIXTRL_UINT64_T LENGTH_BLOCK_LEN = sizeof( SIXTRL_REAL_T  );
     SIXTRL_UINT64_T const LENGTH_BLOCK_LEN_MOD = LENGTH_BLOCK_LEN % alignment;
     
-    SIXTRL_UINT64_T ELEMID_BLOCK_LEN = NUM_DRIFTS * sizeof( SIXTRL_INT64_T );
+    SIXTRL_UINT64_T ELEMID_BLOCK_LEN = sizeof( SIXTRL_INT64_T );
     SIXTRL_UINT64_T const ELEMID_BLOCK_LEN_MOD = ELEMID_BLOCK_LEN % alignment;
     
     #if !defined( _GPUCODE )
     
-    assert( ( drift != 0 ) && ( alignment >= U64_SIZE ) &&
-            ( NUM_DRIFTS > ZERO ) && ( ( alignment % U64_SIZE ) == ZERO ) &&
+    assert( ( mapped != 0 ) && ( alignment >= U64_SIZE ) &&
+            ( ( alignment % U64_SIZE ) == ZERO ) &&
+            ( ( alignment % sizeof( SIXTRL_REAL_T  ) ) == ZERO ) &&
+            ( ( alignment % sizeof( SIXTRL_INT64_T ) ) == ZERO ) &&
             ( ( ( ( uintptr_t )mem ) % U64_SIZE ) == ZERO ) &&
-            ( ( TYPE_ID == NS(ELEMENT_TYPE_DRIFT) ) ||
-              ( TYPE_ID == NS(ELEMENT_TYPE_DRIFT_EXACT ) ) ) );
+            ( ( type_id == NS(ELEMENT_TYPE_DRIFT) ) ||
+              ( type_id == NS(ELEMENT_TYPE_DRIFT_EXACT ) ) ) );
     
     #endif /* !defined( _GPUCODE ) */
+    
+    NS(Drift_set_type_id)( mapped, ( SIXTRL_UINT64_T )type_id );
     
     DATA_ADDR_OFFSET += ( DATA_ADDR_OFFSET_MOD == ZERO ) 
         ? ZERO : ( alignment - DATA_ADDR_OFFSET_MOD );
@@ -282,23 +260,27 @@ SIXTRL_INLINE int NS(Drift_map_to_flat_memory_for_packing)(
     ELEMID_BLOCK_LEN += ( ELEMID_BLOCK_LEN_MOD == ZERO )
         ? ZERO : ( alignment - ELEMID_BLOCK_LEN_MOD );
         
-    *( ( SIXTRL_UINT64_T* )( mem + TYPEID_ADDR_OFFSET ) ) = TYPE_ID;
-    *( ( SIXTRL_UINT64_T* )( mem + NUM_DRIFTS_ADDR_OFFSET ) ) = NUM_DRIFTS;
+    *( ( SIXTRL_UINT64_T* )( mem + TYPEID_ADDR_OFFSET ) ) = ( SIXTRL_UINT64_T )type_id;
+    *( ( SIXTRL_UINT64_T* )( mem + NUM_DRIFTS_ADDR_OFFSET ) ) = NUM_ELEMENTS;
     *( ( SIXTRL_UINT64_T* )( mem + NUM_ATTRS_ADDR_OFFSET  ) ) = NUM_ATTRIBUTES;
-    
+           
     *( ( SIXTRL_UINT64_T* )( mem + LENGTH_OFF_ADDR_OFFSET ) ) = DATA_ADDR_OFFSET;
+    NS(Drift_assign_ptr_to_length)( 
+        mapped, ( SIXTRL_REAL_T* )( mem + DATA_ADDR_OFFSET ) );    
     DATA_ADDR_OFFSET += LENGTH_BLOCK_LEN;
     
     *( ( SIXTRL_UINT64_T* )( mem + ELEMID_OFF_ADDR_OFFSET ) ) = DATA_ADDR_OFFSET;
+    NS(Drift_assign_ptr_to_element_id)(
+        mapped, ( SIXTRL_INT64_T* )( mem + DATA_ADDR_OFFSET ) );
     DATA_ADDR_OFFSET += ELEMID_BLOCK_LEN;
     
     *( ( SIXTRL_UINT64_T* )( mem ) ) = DATA_ADDR_OFFSET;
     
-    return success;
+    return DATA_ADDR_OFFSET;
 }
 
 
-SIXTRL_INLINE int NS(Drift_unpack_from_flat_memory)(
+SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
     NS(Drift)* SIXTRL_RESTRICT drift, unsigned char* mem )
 {
     SIXTRL_UINT64_T lengths_offset;
@@ -358,8 +340,6 @@ SIXTRL_INLINE int NS(Drift_unpack_from_flat_memory)(
     NS(Drift_set_type_id)( drift, *( ( SIXTRL_UINT64_T* )ptr_type_id ) );
     
     ptr_num_drifts = mem + NDRIFT_ADDR_OFFSET;
-    NS(Drift_set_size)( drift, *( ( SIXTRL_UINT64_T* )ptr_num_drifts ) );
-    
     lengths_offset = *( ( SIXTRL_UINT64_T* )( mem + LENGTH_ADDR_OFFSET ) );
     ptr_lengths =  mem + lengths_offset;
     
@@ -368,7 +348,8 @@ SIXTRL_INLINE int NS(Drift_unpack_from_flat_memory)(
     
     #if !defined( _GPUCODE )
     
-    assert( ( ( ( ( uintptr_t )ptr_lengths ) % REAL_SIZE ) == ZERO ) &&
+    assert( ( *ptr_num_drifts == ( SIXTRL_UINT64_T )1u ) &&
+            ( ( ( ( uintptr_t )ptr_lengths ) % REAL_SIZE ) == ZERO ) &&
             ( ( ( ( uintptr_t )ptr_elemids ) % I64_SIZE  ) == ZERO ) );
     
     #endif /* !defined( _GPUCODE ) */
@@ -376,8 +357,99 @@ SIXTRL_INLINE int NS(Drift_unpack_from_flat_memory)(
     NS(Drift_assign_ptr_to_length)( drift, ( SIXTRL_REAL_T* )ptr_lengths );    
     NS(Drift_assign_ptr_to_element_id)( drift, ( SIXTRL_INT64_T* )ptr_elemids );
     
-    return 0;
+    return ( mem + *serial_len_ptr );
 }
+
+
+/* -------------------------------------------------------------------------- */
+
+#if !defined( _GPUCODE )
+
+SIXTRL_INLINE SIXTRL_UINT64_T NS(DriftSingle_get_type_id)( 
+    const NS(DriftSingle) *const SIXTRL_RESTRICT drift )
+{
+    SIXTRL_ASSERT( drift != 0 );
+    return drift->type_id;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(DriftSingle_get_length)(
+    const NS(DriftSingle) *const SIXTRL_RESTRICT drift )
+{
+    SIXTRL_ASSERT( drift != 0 );
+    return drift->length;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T* NS(DriftSingle_get_length_ptr)(
+    NS(DriftSingle)* SIXTRL_RESTRICT drift )
+{
+    SIXTRL_ASSERT( drift != 0 );
+    return &drift->length;
+}
+
+SIXTRL_INLINE SIXTRL_INT64_T NS(DriftSingle_get_element_id)(
+    const NS(DriftSingle) *const SIXTRL_RESTRICT drift )
+{
+    SIXTRL_ASSERT( drift != 0 );
+    return drift->element_id;
+}
+
+SIXTRL_INLINE SIXTRL_INT64_T* NS(DriftSingle_get_element_id_ptr)(
+    NS(DriftSingle)* SIXTRL_RESTRICT drift )
+{
+    SIXTRL_ASSERT( drift != 0 );
+    return &drift->element_id;
+}
+
+SIXTRL_INLINE void NS(DriftSingle_set_type_id)(
+    NS(DriftSingle)* SIXTRL_RESTRICT drift, SIXTRL_UINT64_T const type_id )
+{
+    SIXTRL_ASSERT( 
+        ( drift != 0 ) && 
+        ( ( type_id == ( SIXTRL_UINT64_T )NS(ELEMENT_TYPE_DRIFT ) ) ||
+          ( type_id == ( SIXTRL_UINT64_T )NS(ELEMENT_TYPE_DRIFT_EXACT ) ) ) );
+    
+    drift->type_id = type_id;
+    return;
+}
+
+SIXTRL_INLINE void NS(DriftSingle_set_length)(
+    NS(DriftSingle)* SIXTRL_RESTRICT drift, SIXTRL_REAL_T const length )
+{
+    SIXTRL_ASSERT( ( drift != 0 ) && ( length >= ( SIXTRL_REAL_T )0 ) );
+    drift->length = length;
+    return;
+}
+
+SIXTRL_INLINE void NS(DriftSingle_set_element_id)(
+    NS(DriftSingle)* SIXTRL_RESTRICT drift, SIXTRL_INT64_T const element_id )
+{
+    SIXTRL_ASSERT( drift != 0 );
+    drift->element_id = element_id;
+    return;
+}
+
+SIXTRL_INLINE void NS(Drift_map_from_single_drift)(
+    NS(Drift)* SIXTRL_RESTRICT drift, NS(DriftSingle)* SIXTRL_RESTRICT single )
+{
+    if( ( drift != 0 ) && ( single != 0 ) )
+    {
+        NS(Drift_set_type_id)( drift, NS(DriftSingle_get_type_id)( single ) );        
+        
+        NS(Drift_assign_ptr_to_length)( 
+            drift, NS(DriftSingle_get_length_ptr)( single ) );        
+        
+        NS(Drift_assign_ptr_to_element_id)( 
+            drift, NS(DriftSingle_get_element_id_ptr)( single ) );
+    }
+    
+    return;
+}
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
+#endif /* !defined( _GPUCODE ) */
 
 /* -------------------------------------------------------------------------- */
 

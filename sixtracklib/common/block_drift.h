@@ -26,31 +26,36 @@ struct NS(Drift)* NS(Drift_preset)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_SIZE_T NS(Drift_predict_required_mempool_capacity_for_packing)(
-    const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
-    const struct NS(MemPool) *const SIXTRL_RESTRICT pool, 
+SIXTRL_SIZE_T NS(Drift_predict_required_num_bytes_on_mempool_for_packing)(
+    unsigned char const* SIXTRL_RESTRICT ptr_mem_begin, 
+    SIXTRL_SIZE_T const chunk_size, 
     SIXTRL_SIZE_T* SIXTRL_RESTRICT ptr_alignment );
 
-SIXTRL_SIZE_T NS(Drift_predict_required_capacity_for_packing)(
-    const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
-    unsigned char const* SIXTRL_RESTRICT ptr_mem_begin, 
+SIXTRL_STATIC SIXTRL_SIZE_T 
+NS(Drift_predict_required_size_on_mempool_for_packing)(
+    SIXTRL_SIZE_T const chunk_size );
+
+SIXTRL_SIZE_T NS(Drift_predict_required_num_bytes_for_packing)(
+    unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,     
     SIXTRL_SIZE_T const alignment );
 
+SIXTRL_STATIC SIXTRL_SIZE_T NS(Drift_predict_required_size_for_packing)();
+    
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_SIZE_T NS(Drift_map_to_pack_flat_memory_aligned)(
+SIXTRL_SIZE_T NS(Drift_pack_to_flat_memory_aligned)(
     const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
     unsigned char* mem_begin, SIXTRL_SIZE_T const alignment );
 
-SIXTRL_STATIC  SIXTRL_SIZE_T NS(Drift_map_to_pack_flat_memory)(
+SIXTRL_STATIC  SIXTRL_SIZE_T NS(Drift_pack_to_flat_memory)(
     const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
     unsigned char* mem_begin );
 
-struct NS(AllocResult) NS(Drift_map_to_pack_aligned)( 
+struct NS(AllocResult) NS(Drift_pack_aligned)( 
     const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
     struct NS(MemPool)* SIXTRL_RESTRICT pool, SIXTRL_SIZE_T alignment );
 
-SIXTRL_STATIC struct NS(AllocResult) NS(Drift_map_to_pack)(
+SIXTRL_STATIC struct NS(AllocResult) NS(Drift_pack)(
     const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
     struct NS(MemPool)* SIXTRL_RESTRICT pool );
 
@@ -64,20 +69,53 @@ SIXTRL_STATIC struct NS(AllocResult) NS(Drift_map_to_pack)(
 
 #endif /* !defined( _GPUCODE ) */
 
-SIXTRL_INLINE SIXTRL_SIZE_T NS(Drift_map_to_pack_flat_memory)(
+SIXTRL_INLINE SIXTRL_SIZE_T NS(Drift_predict_required_size_for_packing)()
+{
+    SIXTRL_STATIC SIXTRL_SIZE_T const U64_SIZE = sizeof( SIXTRL_UINT64_T );    
+    return U64_SIZE * 6 + sizeof( SIXTRL_REAL_T ) + sizeof( SIXTRL_INT64_T );    
+}
+
+SIXTRL_INLINE SIXTRL_SIZE_T 
+NS(Drift_predict_required_size_on_mempool_for_packing)(
+    SIXTRL_SIZE_T const chunk_size )
+{
+    SIXTRL_SIZE_T required_size = ( SIXTRL_SIZE_T )0u;
+    
+    SIXTRL_ASSERT( chunk_size > ( SIXTRL_SIZE_T )0u );
+    SIXTRL_STATIC const SIXTRL_SIZE_T U64_SIZE = sizeof( SIXTRL_UINT64_T );
+    SIXTRL_SIZE_T const header_size = U64_SIZE * 6u;
+    SIXTRL_SIZE_T const length_block_size     = sizeof( SIXTRL_REAL_T );
+    SIXTRL_SIZE_T const element_id_block_size = sizeof( SIXTRL_INT64_T );
+    
+    SIXTRL_SIZE_T temp = ( header_size / chunk_size ) * chunk_size;
+    
+    required_size  = ( temp < header_size ) ? ( temp + chunk_size ) : header_size;
+    
+    temp = ( length_block_size / chunk_size ) * chunk_size;
+    
+    required_size += ( temp < length_block_size ) ? ( temp + chunk_size ) : length_block_size;
+    
+    temp = ( element_id_block_size / chunk_size ) * chunk_size;
+    
+    required_size += ( temp < element_id_block_size ) ? ( temp + chunk_size ) : element_id_block_size;
+    
+    return required_size;
+}
+
+SIXTRL_INLINE SIXTRL_SIZE_T NS(Drift_pack_to_flat_memory)(
     const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
     unsigned char* mem_begin )
 {
-    return NS(Drift_map_to_pack_flat_memory_aligned)(
-        drift, mem_begin, NS(BLOCK_DEFAULT_MEMPOOL_ALIGNMENT) );
+    SIXTRL_SIZE_T const alignment = NS(BLOCK_DEFAULT_ALIGNMENT);
+    return NS(Drift_pack_to_flat_memory_aligned)( drift, mem_begin, alignment );
 }
 
-SIXTRL_INLINE struct NS(AllocResult) NS(Drift_map_to_pack)(
+SIXTRL_INLINE struct NS(AllocResult) NS(Drift_pack)(
     const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
     NS(MemPool)* SIXTRL_RESTRICT pool )
 {
-    return NS(Drift_map_to_pack_aligned)(
-        drift, pool, NS(BLOCK_DEFAULT_MEMPOOL_ALIGNMENT) );
+    SIXTRL_SIZE_T const alignment = NS(BLOCK_DEFAULT_MEMPOOL_ALIGNMENT);
+    return NS(Drift_pack_aligned)( drift, pool, alignment );
 }
 
 #if !defined( _GPUCODE ) 
