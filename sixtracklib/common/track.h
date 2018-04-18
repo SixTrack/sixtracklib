@@ -62,7 +62,7 @@ SIXTRL_INLINE int NS(Drift_track)(
 }
 
 
-SIXTRL_STATIC int NS(DriftExact_track)(
+SIXTRL_INLINE int NS(DriftExact_track)(
     NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_UINT64_T const ip, 
         SIXTRL_REAL_T const length )
 {
@@ -92,6 +92,22 @@ SIXTRL_STATIC int NS(DriftExact_track)(
     NS(Particles_set_sigma_value)( particles, ip, sigma );
     
     return 1;
+}
+
+
+SIXTRL_GPUKERNEL void NS(Block_track)(
+    SIXTRL_SIZE_T const num_of_turns,
+    SIXTRL_SIZE_T const num_of_elements, 
+    SIXTRL_GLOBAL_DEC unsigned char* elements, 
+    SIXTRL_GLOBAL_DEC unsigned char* particles, 
+    SIXTRL_GLOBAL_DEC NS(Particles)** elem_by_eleme_ptr, 
+    SIXTRL_GLOBAL_DEC NS(Particles)** turn_by_turn_ptr )
+{
+    bool const elem_by_elem_flag = ( elem_by_elem_ptr != 0 );
+    bool const turn_by_turn_flag = ( turn_by_turn_ptr != 0 );
+    
+    SIXTRL_SIZE_T const 
+    
 }
 
 #if !defined( _GPUCODE )
