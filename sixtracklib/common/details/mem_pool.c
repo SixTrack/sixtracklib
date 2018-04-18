@@ -444,7 +444,10 @@ SIXTRL_UINT64_T NS( MemPool_get_next_begin_offset )(
 size_t NS( MemPool_get_remaining_bytes )( const NS( MemPool ) *
                                           const SIXTRL_RESTRICT pool )
 {
+    #if defined( _NDEBUG ) 
     static SIXTRL_SIZE_T ZERO_SIZE = (SIXTRL_SIZE_T)0u;
+    #endif /* defined( _NDEBUG ) */
+    
     SIXTRL_SIZE_T const capacity = NS( MemPool_get_capacity )( pool );
     SIXTRL_SIZE_T const chunk_size = NS( MemPool_get_chunk_size )( pool );
     SIXTRL_SIZE_T const size = NS( MemPool_get_size )( pool );
@@ -544,16 +547,13 @@ unsigned char* NS( MemPool_get_pointer_by_offset )( NS( MemPool ) *
 unsigned char const* NS( MemPool_get_const_pointer_by_offset )(
     const NS( MemPool ) * const SIXTRL_RESTRICT pool, SIXTRL_UINT64_T const offset )
 {
-
-    static SIXTRL_SIZE_T const ZERO_SIZE = (SIXTRL_SIZE_T)0u;
-
     unsigned char const* ptr =
         ( pool != 0 ) ? NS( MemPool_get_const_buffer )( pool ) : 0;
     
-        SIXTRL_SIZE_T const chunk_size = NS( MemPool_get_chunk_size )( pool );
-
-    assert( ( ( ptr != 0 ) && ( chunk_size > ZERO_SIZE ) &&
-              ( ( offset % chunk_size ) == ZERO_SIZE ) ) || ( ptr == 0 ) );
+    assert( ( ( ptr != 0 ) && 
+              ( NS( MemPool_get_chunk_size )( pool ) > (SIXTRL_SIZE_T)0u ) &&
+              ( ( offset % NS( MemPool_get_chunk_size )( pool ) ) == 
+                (SIXTRL_SIZE_T)0u ) ) || ( ptr == 0 ) );
 
     return ptr + offset;
 }

@@ -286,35 +286,38 @@ SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
     SIXTRL_UINT64_T lengths_offset;
     SIXTRL_UINT64_T element_ids_offset;
     
-    SIXTRL_STATIC const SIXTRL_SIZE_T U64_SIZE = sizeof( SIXTRL_UINT64_T );
-    
     SIXTRL_STATIC const SIXTRL_SIZE_T TYPEID_ADDR_OFFSET = 
         sizeof( SIXTRL_UINT64_T );
     
-    SIXTRL_STATIC const SIXTRL_SIZE_T NDRIFT_ADDR_OFFSET = 
-        sizeof( SIXTRL_UINT64_T ) * 2;        
-        
     SIXTRL_STATIC const SIXTRL_SIZE_T LENGTH_ADDR_OFFSET = 
         sizeof( SIXTRL_UINT64_T ) * 4;
         
     SIXTRL_STATIC const SIXTRL_SIZE_T ELEMID_ADDR_OFFSET = 
         sizeof( SIXTRL_UINT64_T ) * 5;
     
-    unsigned char* ptr_num_drifts = 0;
     unsigned char* ptr_type_id    = 0;
     unsigned char* ptr_lengths    = 0;
     unsigned char* ptr_elemids    = 0;
     
     #if !defined( _GPUCODE )
     
+    SIXTRL_UINT64_T* serial_len_ptr = ( SIXTRL_UINT64_T* )( mem );
+    
+    #if defined( _NDEBUG )
+    
+    unsigned char* ptr_num_drifts = 0;
+    
+    SIXTRL_STATIC const SIXTRL_SIZE_T U64_SIZE = sizeof( SIXTRL_UINT64_T );
+    
+    SIXTRL_STATIC const SIXTRL_SIZE_T NDRIFT_ADDR_OFFSET = 
+        sizeof( SIXTRL_UINT64_T ) * 2;
+    
     SIXTRL_STATIC SIXTRL_SIZE_T const ZERO = ( SIXTRL_SIZE_T )0u;
     SIXTRL_STATIC SIXTRL_SIZE_T const REAL_SIZE = sizeof( SIXTRL_REAL_T );
     SIXTRL_STATIC SIXTRL_SIZE_T const I64_SIZE  = sizeof( SIXTRL_INT64_T );
-
+    
     SIXTRL_STATIC SIXTRL_SIZE_T const MIN_HEADER_LENGTH = 
         sizeof( SIXTRL_UINT64_T ) * 6;
-    
-    SIXTRL_UINT64_T* serial_len_ptr = ( SIXTRL_UINT64_T* )( mem );
     
     SIXTRL_UINT64_T* pack_id_ptr = ( SIXTRL_UINT64_T* )( mem + U64_SIZE );
     
@@ -334,12 +337,18 @@ SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
               ( *pack_id_ptr == CMP_DRIFT_EXACT_ID ) ) &&
             ( *num_attr_ptr  == CMP_NUM_ATTR ) );
     
+    
+    #endif /* defined( _NDEBUG ) */
+
     #endif /* !defined( GPU_CODE ) */
     
     ptr_type_id = mem + TYPEID_ADDR_OFFSET;
     NS(Drift_set_type_id)( drift, *( ( SIXTRL_UINT64_T* )ptr_type_id ) );
     
+    #if defined( _NDEBUG )
     ptr_num_drifts = mem + NDRIFT_ADDR_OFFSET;
+    #endif /* !defined( _NDEBUG ) */
+    
     lengths_offset = *( ( SIXTRL_UINT64_T* )( mem + LENGTH_ADDR_OFFSET ) );
     ptr_lengths =  mem + lengths_offset;
     
