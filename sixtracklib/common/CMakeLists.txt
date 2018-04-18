@@ -10,8 +10,10 @@ set( SIXTRACKLIB_COMMON_HEADERS
      impl/block_drift_type.h
      
      particles.h
+     particles_sequence.h     
      single_particle.h
      impl/particles_type.h
+     
      
      track.h
 #      impl/track_single.h     
@@ -26,6 +28,7 @@ set( SIXTRACKLIB_COMMON_SOURCES
      details/block_drift.c
      details/mem_pool.c
      details/particles.c
+     details/particles_sequence.c
      details/single_particle.c
 #      details/track_single.c
 )
