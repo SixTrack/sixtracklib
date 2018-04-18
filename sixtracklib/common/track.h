@@ -10,6 +10,8 @@
 #include <stdlib.h>
 
 #include "sixtracklib/common/impl/particles_type.h"
+#include "sixtracklib/common/impl/block_type.h"
+#include "sixtracklib/common/impl/block_drift_type.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,20 +20,22 @@ extern "C" {
 #endif /* !defined( _GPUCODE ) */
     
 struct NS(Particles);
+struct NS(ParticlesSequence);
+struct NS(BeamElementInfo);
 
-SIXTRL_STATIC int NS(Drift_track)( 
+SIXTRL_STATIC int NS(Track_drift)( 
     NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_UINT64_T const ip, SIXTRL_REAL_T const length );
 
-SIXTRL_STATIC int NS(DriftExact_track)(
+SIXTRL_STATIC int NS(Track_drift_exact)(
     NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_UINT64_T const ip, SIXTRL_REAL_T const length );
 
 /* -------------------------------------------------------------------------- */
 /* ----                                                                  ---- */ 
 /* -------------------------------------------------------------------------- */
 
-SIXTRL_INLINE int NS(Drift_track)( 
+SIXTRL_INLINE int NS(Track_drift)( 
     NS(Particles)* SIXTRL_RESTRICT particles, 
-    SIXTRL_UINT64_T const ip, SIXTRL_REAL_T const length )
+    SIXTRL_SIZE_T const ip, SIXTRL_REAL_T const length )
 {
     SIXTRL_STATIC SIXTRL_REAL_T const ONE = ( SIXTRL_REAL_T )1;
     SIXTRL_STATIC SIXTRL_REAL_T const TWO = ( SIXTRL_REAL_T )2;
@@ -62,8 +66,8 @@ SIXTRL_INLINE int NS(Drift_track)(
 }
 
 
-SIXTRL_INLINE int NS(DriftExact_track)(
-    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_UINT64_T const ip, 
+SIXTRL_INLINE int NS(Track_drift_exact)(
+    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_SIZE_T const ip, 
         SIXTRL_REAL_T const length )
 {
     SIXTRL_STATIC SIXTRL_REAL_T const ONE = ( SIXTRL_REAL_T )1;
@@ -94,20 +98,113 @@ SIXTRL_INLINE int NS(DriftExact_track)(
     return 1;
 }
 
-
-SIXTRL_GPUKERNEL void NS(Block_track)(
-    SIXTRL_SIZE_T const num_of_turns,
-    SIXTRL_SIZE_T const num_of_elements, 
-    SIXTRL_GLOBAL_DEC unsigned char* elements, 
-    SIXTRL_GLOBAL_DEC unsigned char* particles, 
-    SIXTRL_GLOBAL_DEC NS(Particles)** elem_by_eleme_ptr, 
-    SIXTRL_GLOBAL_DEC NS(Particles)** turn_by_turn_ptr )
+void NS(Track_single_particle_over_beam_element)(
+    const NS(BeamElementInfo) *const SIXTRL_RESTRICT element,
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    SIXTRL_SIZE_T const particle_index )
 {
-    bool const elem_by_elem_flag = ( elem_by_elem_ptr != 0 );
-    bool const turn_by_turn_flag = ( turn_by_turn_ptr != 0 );
+    typedef NS(BeamElementType) type_id_t;
+    typedef SIXTRL_INT64_T      element_id_t;
     
-    SIXTRL_SIZE_T const 
+    typedef NS(Drift)       drift_t;
+    typedef unsigned char*  ptr_t;
     
+    SIXTRL_ASSERT( NS(BeamElementInfo_is_available)( element ) );
+    SIXTRL_ASSERT( ( particles != 0 ) && 
+                   ( NS(Particles_get_size)( particles ) > particle_index ) );
+    
+    type_id_t const type_id = NS(BeamElementInfo_get_type_id)( element );
+    
+    switch( type_id )
+    {
+        case NS(ELEMENT_TYPE_DRIFT):
+        {
+            drift_t drift;
+            
+            #if defined( _NDEBUG )
+            ptr_t next_ptr = NS(Drift_unpack_from_flat_memory)( &drift, 
+                ( ptr_t )NS(BeamElementInfo_get_const_ptr_mem_begin)( element ) );
+            #else 
+            NS(Drift_unpack_from_flat_memory)( &drift, 
+                ( ptr_t )NS(BeamElementInfo_get_const_ptr_mem_begin)( element ) );
+            SIXTRL_ASSERT( next_ptr != 0 );
+            #endif /* defined( _NDEBUG ) */
+                                        
+            NS(Track_drift)( particles, particle_index, 
+                             NS(Drift_get_length)( &drift ) );
+            
+            break;
+        }
+        
+        case NS(ELEMENT_TYPE_DRIFT_EXACT):
+        {
+            drift_t drift;
+            #if defined( _NDEBUG )
+            ptr_t next_ptr = NS(Drift_unpack_from_flat_memory)( &drift, 
+                ( ptr_t )NS(BeamElementInfo_get_const_ptr_mem_begin)( element ) );
+            #else 
+            NS(Drift_unpack_from_flat_memory)( &drift, 
+                ( ptr_t )NS(BeamElementInfo_get_const_ptr_mem_begin)( element ) );
+            SIXTRL_ASSERT( next_ptr != 0 );
+            #endif /* defined( _NDEBUG ) */
+            
+            NS(Track_drift_exact)( particles, particle_index, 
+                             NS(Drift_get_length)( &drift ) );
+            
+            break;            
+        }
+        
+        default:
+        {
+            element_id_t const beam_elem_id = 
+                NS(BeamElementInfo_get_element_id)( element );
+            
+            NS(Particles_set_lost_at_element_id_value)( 
+                particles, particle_index, beam_elem_id );
+            
+            NS(Particles_set_state_value)( particles, particle_index, -1 );
+        }        
+    };
+    
+    return;
+}
+
+void NS(Track_single_particle)(
+    NS(BeamElementInfo) const* SIXTRL_RESTRICT elements_it,
+    SIXTRL_SIZE_T const num_of_elements,
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    SIXTRL_SIZE_T const particle_index, 
+    NS(ParticlesSequence)* SIXTRL_RESTRICT elem_by_elem )
+{
+    SIXTRL_ASSERT( elements_it != 0 );
+    
+    NS(BeamElementInfo) const* elements_end = elements_it + num_of_elements;
+    
+    if( elem_by_elem == 0 )
+    {
+        for( ; elements_it != elements_end ; ++elements_it )
+        {
+            NS(Track_single_particle_over_beam_element)( 
+                elements_it, particles, particle_index );
+        }
+    }
+    else
+    {
+        SIXTRL_SIZE_T element_index = ( SIXTRL_SIZE_T )0u;
+        
+        for( ; elements_it != elements_end ; ++elements_it, ++element_index )
+        {
+            NS(Track_single_particle_over_beam_element)( 
+                elements_it, particles, particle_index );
+            
+            NS(Particles_copy_single_unchecked)(
+                NS(ParticlesSequence_get_particles_by_index)(
+                    elem_by_elem, element_index ), particle_index, 
+                particles, particle_index );
+        }
+    }
+    
+    return;
 }
 
 #if !defined( _GPUCODE )
