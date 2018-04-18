@@ -18,8 +18,10 @@ extern "C" {
 #endif /* !defined( _GPUCODE ) */
     
 struct NS(Drift);
+struct NS(DriftSingle);
 struct NS(AllocResult);
 struct NS(MemPool);
+enum   NS(BeamElementType);
 
 struct NS(Drift)* NS(Drift_preset)( 
     struct NS(Drift)* SIXTRL_RESTRICT drift );
@@ -47,17 +49,41 @@ SIXTRL_SIZE_T NS(Drift_pack_to_flat_memory_aligned)(
     const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
     unsigned char* mem_begin, SIXTRL_SIZE_T const alignment );
 
+SIXTRL_STATIC SIXTRL_SIZE_T NS(Drift_create_and_pack_to_flat_memory_aligned)(
+    enum NS(BeamElementType) const type_id, SIXTRL_INT64_T const element_id, 
+    SIXTRL_REAL_T const length, unsigned char* mem_begin, 
+    SIXTRL_SIZE_T const alignment );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */ 
+
 SIXTRL_STATIC  SIXTRL_SIZE_T NS(Drift_pack_to_flat_memory)(
     const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
     unsigned char* mem_begin );
+
+SIXTRL_STATIC SIXTRL_SIZE_T NS(Drift_create_and_pack_to_flat_memory)(
+    enum NS(BeamElementType) const type_id, SIXTRL_INT64_T const element_id, 
+    SIXTRL_REAL_T const length, unsigned char* mem_begin );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */ 
 
 struct NS(AllocResult) NS(Drift_pack_aligned)( 
     const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
     struct NS(MemPool)* SIXTRL_RESTRICT pool, SIXTRL_SIZE_T alignment );
 
+SIXTRL_STATIC struct NS(AllocResult) NS(Drift_create_and_pack_aligned)(
+    enum NS(BeamElementType) const type_id, SIXTRL_INT64_T const element_id, 
+    SIXTRL_REAL_T const length, struct NS(MemPool)* SIXTRL_RESTRICT pool,
+    SIXTRL_SIZE_T const alignment );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */ 
+
 SIXTRL_STATIC struct NS(AllocResult) NS(Drift_pack)(
     const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
     struct NS(MemPool)* SIXTRL_RESTRICT pool );
+
+SIXTRL_STATIC struct NS(AllocResult) NS(Drift_create_and_pack)(
+    enum NS(BeamElementType) const type_id, SIXTRL_INT64_T const element_id, 
+    SIXTRL_REAL_T const length, struct NS(MemPool)* SIXTRL_RESTRICT pool );
 
 /* -------------------------------------------------------------------------- */
 /* -----                         Inline functions                             */
@@ -66,6 +92,8 @@ SIXTRL_STATIC struct NS(AllocResult) NS(Drift_pack)(
 #if !defined( _GPUCODE )
 
 #include "sixtracklib/common/mem_pool.h"
+#include "sixtracklib/common/impl/block_type.h"
+#include "sixtracklib/common/impl/block_drift_type.h"
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -101,6 +129,96 @@ NS(Drift_predict_required_size_on_mempool_for_packing)(
     
     return required_size;
 }
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */ 
+
+SIXTRL_INLINE SIXTRL_SIZE_T NS(Drift_create_and_pack_to_flat_memory_aligned)(
+    enum NS(BeamElementType) const type_id, SIXTRL_INT64_T const element_id, 
+    SIXTRL_REAL_T const length, unsigned char* mem_begin, 
+    SIXTRL_SIZE_T const alignment )
+{
+    NS(DriftSingle) single;
+    NS(Drift) drift;
+    
+    SIXTRL_ASSERT( ( length >= ( SIXTRL_REAL_T )0 ) &&
+                   ( element_id >= ( SIXTRL_INT64_T )0 ) &&
+                   ( ( type_id == NS(ELEMENT_TYPE_DRIFT ) ) ||
+                     ( type_id == NS(ELEMENT_TYPE_DRIFT_EXACT ) ) ) );
+    
+    NS(DriftSingle_set_type_id)( &single, type_id );
+    NS(DriftSingle_set_length)( &single, length );
+    NS(DriftSingle_set_element_id )( &single, element_id );
+    
+    NS(Drift_map_from_single_drift)( &drift, &single );
+    return NS(Drift_pack_to_flat_memory_aligned)( &drift, mem_begin, alignment );
+}
+
+SIXTRL_INLINE SIXTRL_SIZE_T NS(Drift_create_and_pack_to_flat_memory)(
+    enum NS(BeamElementType) const type_id, SIXTRL_INT64_T const element_id, 
+    SIXTRL_REAL_T const length, unsigned char* mem_begin )
+{
+    NS(DriftSingle) single;
+    NS(Drift) drift;
+    
+    SIXTRL_ASSERT( ( length >= ( SIXTRL_REAL_T )0 ) &&
+                   ( element_id >= ( SIXTRL_INT64_T )0 ) &&
+                   ( ( type_id == NS(ELEMENT_TYPE_DRIFT ) ) ||
+                     ( type_id == NS(ELEMENT_TYPE_DRIFT_EXACT ) ) ) );
+    
+    NS(DriftSingle_set_type_id)( &single, type_id );
+    NS(DriftSingle_set_length)( &single, length );
+    NS(DriftSingle_set_element_id )( &single, element_id );
+    
+    NS(Drift_map_from_single_drift)( &drift, &single );
+    return NS(Drift_pack_to_flat_memory)( &drift, mem_begin );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */ 
+
+SIXTRL_INLINE struct NS(AllocResult) NS(Drift_create_and_pack_aligned)(
+    enum NS(BeamElementType) const type_id, SIXTRL_INT64_T const element_id, 
+    SIXTRL_REAL_T const length, struct NS(MemPool)* SIXTRL_RESTRICT pool,
+    SIXTRL_SIZE_T const alignment )
+{
+    NS(DriftSingle) single;
+    NS(Drift) drift;
+    
+    SIXTRL_ASSERT( ( length >= ( SIXTRL_REAL_T )0 ) &&
+                   ( element_id >= ( SIXTRL_INT64_T )0 ) &&
+                   ( ( type_id == NS(ELEMENT_TYPE_DRIFT ) ) ||
+                     ( type_id == NS(ELEMENT_TYPE_DRIFT_EXACT ) ) ) );
+    
+    NS(DriftSingle_set_type_id)( &single, type_id );
+    NS(DriftSingle_set_length)( &single, length );
+    NS(DriftSingle_set_element_id )( &single, element_id );
+    
+    NS(Drift_map_from_single_drift)( &drift, &single );
+    return NS(Drift_pack_aligned)( &drift, pool, alignment );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */ 
+
+SIXTRL_INLINE struct NS(AllocResult) NS(Drift_create_and_pack)(
+    enum NS(BeamElementType) const type_id, SIXTRL_INT64_T const element_id, 
+    SIXTRL_REAL_T const length, struct NS(MemPool)* SIXTRL_RESTRICT pool )
+{
+    NS(DriftSingle) single;
+    NS(Drift) drift;
+    
+    SIXTRL_ASSERT( ( length >= ( SIXTRL_REAL_T )0 ) &&
+                   ( element_id >= ( SIXTRL_INT64_T )0 ) &&
+                   ( ( type_id == NS(ELEMENT_TYPE_DRIFT ) ) ||
+                     ( type_id == NS(ELEMENT_TYPE_DRIFT_EXACT ) ) ) );
+    
+    NS(DriftSingle_set_type_id)( &single, type_id );
+    NS(DriftSingle_set_length)( &single, length );
+    NS(DriftSingle_set_element_id )( &single, element_id );
+    
+    NS(Drift_map_from_single_drift)( &drift, &single );
+    return NS(Drift_pack)( &drift, pool );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */ 
 
 SIXTRL_INLINE SIXTRL_SIZE_T NS(Drift_pack_to_flat_memory)(
     const struct NS(Drift) *const SIXTRL_RESTRICT drift, 
