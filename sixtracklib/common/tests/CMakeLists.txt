@@ -28,7 +28,15 @@ if( GTEST_FOUND )
     add_executable( test_particles test_particles.cpp )
     target_link_libraries( test_particles ${SIXTRACKL_TEST_LIBRARIES} )
     target_compile_options( test_particles BEFORE PUBLIC -std=c++11 -Wall -Werror -pedantic )
-    add_test( CommonParticlesTests test_particles )
+    add_test( CommonParticlesTests test_particles )    
+    
+    # --------------------------------------------------------------------------
+    # test_particles_sequence:
+    
+    add_executable( test_particles_sequence test_particles_sequence.cpp )
+    target_link_libraries( test_particles_sequence ${SIXTRACKL_TEST_LIBRARIES} )
+    target_compile_options( test_particles_sequence BEFORE PUBLIC -std=c++11 -Wall -Werror -pedantic )
+    add_test( CommonParticlesSequenceTests test_particles_sequence )    
     
     # --------------------------------------------------------------------------
     # test_block_drift:
@@ -37,5 +45,13 @@ if( GTEST_FOUND )
     target_link_libraries( test_block_drift ${SIXTRACKL_TEST_LIBRARIES} )
     target_compile_options( test_block_drift BEFORE PUBLIC -std=c++11 -Wall -Werror -pedantic )
     add_test( CommonBlockDriftTests test_block_drift )
+    
+    # --------------------------------------------------------------------------
+    # test_blocks:
+    
+    add_executable( test_blocks test_blocks.cpp )
+    target_link_libraries( test_blocks ${SIXTRACKL_TEST_LIBRARIES} )
+    target_compile_options( test_blocks BEFORE PUBLIC -std=c++11 -Wall -Werror -pedantic )
+    add_test( CommonBlocksTests test_blocks )
     
 endif()

@@ -11,7 +11,7 @@ target_compile_options( benchmark_drift_base BEFORE PUBLIC
 set_property( TARGET benchmark_drift_base PROPERTY CXX_STANDARD 11 )
 set_property( TARGET benchmark_drift_base PROPERTY CXX_STANDARD_REQUIRED ON )
 
-add_test( CommonBenchmarksDriftBase benchmark_drift_base )
+add_test( CommonBlockDriftBaseBenchmarks benchmark_drift_base )
 
 
-        
+
