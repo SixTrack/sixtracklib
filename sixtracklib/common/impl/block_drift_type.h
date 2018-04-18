@@ -303,7 +303,7 @@ SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
     
     SIXTRL_UINT64_T* serial_len_ptr = ( SIXTRL_UINT64_T* )( mem );
     
-    #if defined( _NDEBUG )
+    #if !defined( NDEBUG )
     
     unsigned char* ptr_num_drifts = 0;
     
@@ -338,16 +338,16 @@ SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
             ( *num_attr_ptr  == CMP_NUM_ATTR ) );
     
     
-    #endif /* defined( _NDEBUG ) */
+    #endif /* !defined( NDEBUG ) */
 
     #endif /* !defined( GPU_CODE ) */
     
     ptr_type_id = mem + TYPEID_ADDR_OFFSET;
     NS(Drift_set_type_id)( drift, *( ( SIXTRL_UINT64_T* )ptr_type_id ) );
     
-    #if defined( _NDEBUG )
+    #if !defined( NDEBUG )
     ptr_num_drifts = mem + NDRIFT_ADDR_OFFSET;
-    #endif /* !defined( _NDEBUG ) */
+    #endif /* !defined( NDEBUG ) */
     
     lengths_offset = *( ( SIXTRL_UINT64_T* )( mem + LENGTH_ADDR_OFFSET ) );
     ptr_lengths =  mem + lengths_offset;

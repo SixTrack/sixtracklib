@@ -444,9 +444,9 @@ SIXTRL_UINT64_T NS( MemPool_get_next_begin_offset )(
 size_t NS( MemPool_get_remaining_bytes )( const NS( MemPool ) *
                                           const SIXTRL_RESTRICT pool )
 {
-    #if defined( _NDEBUG ) 
+    #if !defined( NDEBUG ) 
     static SIXTRL_SIZE_T ZERO_SIZE = (SIXTRL_SIZE_T)0u;
-    #endif /* defined( _NDEBUG ) */
+    #endif /* !defined( NDEBUG ) */
     
     SIXTRL_SIZE_T const capacity = NS( MemPool_get_capacity )( pool );
     SIXTRL_SIZE_T const chunk_size = NS( MemPool_get_chunk_size )( pool );

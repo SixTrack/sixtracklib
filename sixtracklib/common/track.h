@@ -121,14 +121,14 @@ void NS(Track_single_particle_over_beam_element)(
         {
             drift_t drift;
             
-            #if defined( _NDEBUG )
+            #if !defined( NDEBUG )
             ptr_t next_ptr = NS(Drift_unpack_from_flat_memory)( &drift, 
                 ( ptr_t )NS(BeamElementInfo_get_const_ptr_mem_begin)( element ) );
+            SIXTRL_ASSERT( next_ptr != 0 );
             #else 
             NS(Drift_unpack_from_flat_memory)( &drift, 
                 ( ptr_t )NS(BeamElementInfo_get_const_ptr_mem_begin)( element ) );
-            SIXTRL_ASSERT( next_ptr != 0 );
-            #endif /* defined( _NDEBUG ) */
+            #endif /* !defined( NDEBUG ) */
                                         
             NS(Track_drift)( particles, particle_index, 
                              NS(Drift_get_length)( &drift ) );
@@ -139,14 +139,14 @@ void NS(Track_single_particle_over_beam_element)(
         case NS(ELEMENT_TYPE_DRIFT_EXACT):
         {
             drift_t drift;
-            #if defined( _NDEBUG )
+            #if !defined( NDEBUG )
             ptr_t next_ptr = NS(Drift_unpack_from_flat_memory)( &drift, 
                 ( ptr_t )NS(BeamElementInfo_get_const_ptr_mem_begin)( element ) );
+            SIXTRL_ASSERT( next_ptr != 0 );
             #else 
             NS(Drift_unpack_from_flat_memory)( &drift, 
                 ( ptr_t )NS(BeamElementInfo_get_const_ptr_mem_begin)( element ) );
-            SIXTRL_ASSERT( next_ptr != 0 );
-            #endif /* defined( _NDEBUG ) */
+            #endif /* !defined( NDEBUG ) */
             
             NS(Track_drift_exact)( particles, particle_index, 
                              NS(Drift_get_length)( &drift ) );
