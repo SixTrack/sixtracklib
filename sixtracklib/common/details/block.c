@@ -1,16 +1,28 @@
 #include "sixtracklib/common/block.h"
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/common/details/tools.h"
+#include "sixtracklib/common/impl/block_type.h"
 #include "sixtracklib/common/mem_pool.h"
+#include "sixtracklib/common/details/tools.h"
 
-/* ------------------------------------------------------------------------- */
+#include "sixtracklib/common/block_drift.h"
+#include "sixtracklib/common/impl/block_drift_type.h"
+
+/* ========================================================================= */
+
+extern SIXTRL_INT64_T NS(Block_append_drift_aligned)(
+    NS(Block)* SIXTRL_RESTRICT block, NS(BeamElementType) const type_id, 
+    SIXTRL_REAL_T const length, 
+    SIXTRL_SIZE_T alignment );
+
+/* ========================================================================= */
 
 extern SIXTRL_SIZE_T NS(Block_predict_required_mempool_capacity_for_packing)(
     unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,
@@ -29,72 +41,166 @@ extern SIXTRL_SIZE_T NS(Block_predict_required_capacity_for_packing)(
 
 /* ------------------------------------------------------------------------- */
 
-/*
-extern struct NS(Block)* NS(Block_new)();
 
-extern struct NS(Block)* NS(Block_new_on_mempool)( 
-    struct NS(MemPool)* SIXTRL_RESTRICT pool );
+extern NS(Block)* NS(Block_new)( SIXTRL_SIZE_T const elements_capacity );
 
-extern void NS(Block_free)( struct NS(Block)* SIXTRL_RESTRICT pool );
+extern NS(Block)* NS(Block_new_on_mempool)( 
+    SIXTRL_SIZE_T const capacity, struct NS(MemPool)* SIXTRL_RESTRICT pool );
 
-extern void NS(Block_clear)( struct NS(Block)* SIXTRL_RESTRICT pool );
-*/
+extern void NS(Block_clear)( NS(Block)* SIXTRL_RESTRICT pool );
+
+extern void NS(Block_free)( NS(Block)* SIXTRL_RESTRICT pool );
 
 /* ------------------------------------------------------------------------- */
 
-/*
-extern bool NS( Block_manages_own_memory )( const struct NS( Block )) *
+
+extern bool NS( Block_manages_own_memory )( const struct NS( Block )*
                                          const SIXTRL_RESTRICT p );
 
-extern bool NS( Block_uses_mempool )( const struct NS( Block )) *
+extern bool NS( Block_uses_mempool )( const struct NS( Block )*
                                    const SIXTRL_RESTRICT p );
 
 extern bool NS( Block_uses_flat_memory )( 
-    const struct NS(Particles )* const SIXTRL_RESTRICT p );
+    const struct NS(Block )* const SIXTRL_RESTRICT p );
 
-extern struct NS( MemPool ) const* NS( Block_get_const_mem_pool )(
-    const struct NS( Block )) * const SIXTRL_RESTRICT p );
+extern NS( MemPool ) const* NS( Block_get_const_mem_pool )(
+    const struct NS( Block )* const SIXTRL_RESTRICT p );
 
 extern unsigned char const* NS( Block_get_const_flat_memory )(
-    const struct NS( Block )) * const SIXTRL_RESTRICT p );
+    const struct NS( Block )* const SIXTRL_RESTRICT p );
     
-static void NS(Block_set_size)( 
+/* ------------------------------------------------------------------------- */
+    
+SIXTRL_STATIC void NS(Block_set_size)( 
     NS(Block)* SIXTRL_RESTRICT block, size_t new_size );
 
-static void NS(Block_set_capacity)(
+SIXTRL_STATIC void NS(Block_set_capacity)(
     NS(Block)* SIXTRL_RESTRICT block, size_t new_capacity );
 
-static void NS(Block_set_flags)(
+SIXTRL_STATIC void NS(Block_set_flags)(
     NS(Block)* SIXTRL_RESTRICT block, uint64_t flags );
 
-static void NS(Block_set_next_element_id)( 
+SIXTRL_STATIC void NS(Block_set_next_element_id)( 
     NS(Block)* SIXTRL_RESTRICT block, int64_t next_element_id );
 
-static int64_t NS(Block_get_next_element_id)( NS(Block)* SIXTRL_RESTRICT block );
-*/
+extern int64_t NS(Block_get_next_element_id)( 
+    NS(Block)* SIXTRL_RESTRICT block );
+
+
+SIXTRL_STATIC void const* NS( Block_get_const_ptr_mem_context )(
+    const struct NS( Block ) * const SIXTRL_RESTRICT block );
+
+SIXTRL_STATIC void* NS( Block_get_ptr_mem_context )( struct NS( Block ) *
+                                                  SIXTRL_RESTRICT block );
+
+SIXTRL_STATIC void const* NS( Block_get_const_mem_begin )(
+    const NS(Block) *const SIXTRL_RESTRICT block );
+
+extern void* NS( Block_get_mem_begin )(
+    NS(Block)* SIXTRL_RESTRICT block );
+
+SIXTRL_STATIC void NS( Block_set_ptr_elements_info)( 
+    NS(Block)* SIXTRL_RESTRICT block, 
+    struct NS(BeamElementInfo)* SIXTRL_RESTRICT ptr_info );
+
+SIXTRL_STATIC void NS( Block_set_ptr_mem_context )( struct NS( Block ) *
+                                                     SIXTRL_RESTRICT block,
+                                                 void* ptr_mem_context );
+
+SIXTRL_STATIC void NS( Block_set_ptr_mem_begin )( 
+    NS(Block)* SIXTRL_RESTRICT block, void* ptr_mem_begin );
 
 /* ------------------------------------------------------------------------- */
 
-/*
 extern bool NS( Block_has_defined_alignment )( const struct NS( Block ) *
                                             const SIXTRL_RESTRICT block );
 
+/* 
 extern bool NS( Block_is_aligned )( const struct NS( Block ) *
                                      const SIXTRL_RESTRICT block,
                                  size_t alignment );
 
+                           
 extern bool NS( Block_check_alignment )( const struct NS( Block ) *
                                           const SIXTRL_RESTRICT block,
-                                      size_t alignment );
+                                      size_t alignment ); */
 
 extern size_t NS( Block_get_alignment )( const struct NS( Block ) *
                                     const SIXTRL_RESTRICT block );
                                     
 extern void NS(Block_set_alignment)( 
-    struct NS(Block)* SIXTRL_RESTRICT block, size_t new_alignment );
-*/   
+    NS(Block)* SIXTRL_RESTRICT block, size_t new_alignment );
 
 /* ************************************************************************* */
+
+/* ========================================================================= */
+
+SIXTRL_INT64_T NS(Block_append_drift_aligned)(
+    NS(Block)* SIXTRL_RESTRICT block, NS(BeamElementType) const type_id, 
+    SIXTRL_REAL_T const length, SIXTRL_SIZE_T alignment )
+{
+    typedef NS(BeamElementInfo) elem_info_t;    
+    typedef NS(MemPool)         mem_pool_t;
+    typedef NS(AllocResult)     result_t;
+    
+    SIXTRL_INT64_T element_id = NS(PARTICLES_INVALID_BEAM_ELEMENT_ID);
+    
+    SIXTRL_SIZE_T const current_size = NS(Block_get_size)( block );
+    SIXTRL_SIZE_T const capacity     = NS(Block_get_capacity)( block );
+    
+    if( ( block != 0 ) && ( length >= ( SIXTRL_REAL_T )0 ) &&
+        ( current_size < capacity ) &&
+        ( ( type_id == NS(ELEMENT_TYPE_DRIFT) ) ||
+          ( type_id == NS(ELEMENT_TYPE_DRIFT_EXACT) ) ) )
+    {
+        NS(MemPool) rollback_pool;
+        
+        SIXTRL_INT64_T const next_elem_id = 
+            NS(Block_get_next_element_id)( block );
+        
+        mem_pool_t*  pool = 0;
+        elem_info_t* ptr_elem_info = NS(Block_get_elements_begin)( block );
+        
+        result_t append_result;
+        
+        SIXTRL_ASSERT( ( ptr_elem_info != 0 ) && 
+            ( next_elem_id != NS(PARTICLES_INVALID_BEAM_ELEMENT_ID) ) );
+        
+        /* TODO: Implement for flat memory storage backend as well! */        
+        if( !NS(Block_uses_mempool)( block ) ) return element_id;
+        
+        pool = ( mem_pool_t* )NS(Block_get_const_mem_pool)( block );
+        SIXTRL_ASSERT( pool != 0 );
+        rollback_pool = *pool;
+        
+        append_result = NS(Drift_create_and_pack_aligned)( 
+            type_id, next_elem_id, length, pool, alignment );
+        
+        if( NS(AllocResult_valid)( &append_result ) )
+        {
+            SIXTRL_SIZE_T const new_size = current_size + ( SIXTRL_SIZE_T )1u;
+            
+            ptr_elem_info = ptr_elem_info + current_size;
+            NS(BeamElementInfo_set_type_id)( ptr_elem_info, type_id );
+            NS(BeamElementInfo_set_element_id)( ptr_elem_info, next_elem_id );
+            NS(BeamElementInfo_set_ptr_mem_begin)( ptr_elem_info, 
+                NS(AllocResult_get_pointer)( &append_result ) );
+            
+            NS(Block_set_size)( block, new_size );
+            element_id = next_elem_id;
+        }
+        else
+        {
+            *pool = rollback_pool;
+            NS(Block_set_next_element_id)( block, next_elem_id );
+        }
+    }
+    
+    return element_id;
+    
+}
+
+/* ========================================================================= */
 
 SIXTRL_SIZE_T NS(Block_predict_required_num_bytes_on_mempool_for_packing)(
     unsigned char const* SIXTRL_RESTRICT ptr_mem_begin,
@@ -202,15 +308,15 @@ SIXTRL_SIZE_T NS(Block_predict_required_num_bytes_for_packing)(
          *                     past the serialized item
          * -----------------------------------------------------------------
          * - 1 x uint64_t .... indicator, i.e. what type of element has been 
-         *                     packed; note: Particles = 1
+         *                     packed; note: Drift = 2, DriftExact = 3
          * -----------------------------------------------------------------
          * - 1 x uint64_t .... nelem, i.e. number of elements to be 
-         *                     serialized 
+         *                     serialized. In the case of BeamElements, this
+         *                     is always 1
          * -----------------------------------------------------------------
          * - 1 x uint64_t .... nattr, i.e. the number of attributes 
-         *                     that have been packed per element -> should 
-         *                     be NS(PARTICLES_NUM_OF_ATTRIBUTES), store for
-         *                     format versioning reasons
+         *                     For Drift and DriftExact, this number is 2
+         *                     (length, element_id);
          * -----------------------------------------------------------------
          * - num x uint64_t .. nattr x offsets, i.e. for each of the num 
          *                     elemens an offset in bytes on where the 
@@ -264,28 +370,55 @@ SIXTRL_SIZE_T NS(Block_predict_required_num_bytes_for_packing)(
 
 /* ------------------------------------------------------------------------- */
 
-/*
-NS(Block)* NS(Block_new)()
+NS(Block)* NS(Block_new)( SIXTRL_SIZE_T const capacity )
 {
     bool success = false;
     
-    NS(Block)* block = NS(Block_preset)(
-        ( NS(Block)* )malloc( sizeof( NS(Block) ) ) );
+    typedef NS(Block)           block_t;
+    typedef NS(MemPool)         pool_t;
+    typedef NS(BeamElementInfo) elem_info_t;
     
-    NS(MemPool)* ptr_mem_pool = NS(MemPool_preset)(
-        ( NS(MemPool)* )malloc( sizeof( NS(MemPool) ) ) );
+    SIXTRL_STATIC SIXTRL_SIZE_T const ZERO_SIZE = ( SIXTRL_SIZE_T )0u;
     
-    if( ( block != 0 ) && ( ptr_mem_pool != 0 ) )
+    block_t*  block = 0;
+    pool_t*    pool = 0;
+    elem_info_t* element_infos = 0;
+    
+    if( capacity > ZERO_SIZE )
     {
-        size_t const elem_capacity = NS(BLOCK_DEFAULT_CAPACITY);
+        pool = NS(MemPool_preset)( ( pool_t* )malloc( sizeof( pool_t ) ) );
+        block = NS(Block_preset)( ( block_t* )malloc( sizeof( block_t ) ) );
+        element_infos = NS(BeamElementInfo_preset)( ( elem_info_t* )malloc( 
+            sizeof( elem_info_t ) * capacity ) );
         
-        size_t const mem_pool_capacity = 
-            NS(BLOCK_DEFAULT_CAPACITY) * NS(BLOCK_DEFAULT_ELEMENT_CAPACITY);
+        if( ( block != 0 ) && ( pool != 0 ) && ( element_infos != 0 ) )
+        {
+            SIXTRL_SIZE_T const mem_pool_capacity = 
+                capacity * NS(BLOCK_DEFAULT_ELEMENT_CAPACITY);
+                
+            SIXTRL_SIZE_T const chunk_size = NS(BLOCK_DEFAULT_MEMPOOL_CHUNK_SIZE);
         
-        size_t chunk_size = NS(BLOCK_DEFAULT_MEMPOOL_CHUNK_SIZE);
+            NS(MemPool_init)( pool, mem_pool_capacity, chunk_size );
+        
+            SIXTRL_ASSERT( 
+                ( NS(MemPool_get_buffer)( pool ) != 0 ) &&
+                ( NS(MemPool_get_chunk_size)( pool ) > ZERO_SIZE ) &&
+                ( NS(MemPool_get_capacity)( pool ) >= mem_pool_capacity ) );
+        
+            SIXTRL_UINT64_T const flags = 
+                NS(BLOCK_FLAGS_OWNS_MEMORY) | NS(BLOCK_FLAGS_PACKED) |
+                NS(BLOCK_FLAGS_MEM_CTX_MEMPOOL);
             
-        NS(MemPool_init)( ptr_mem_pool, mem_pool_capacity, NS
-        
+            NS(Block_set_capacity)( block, capacity );
+            NS(Block_set_size)( block, ZERO_SIZE );
+            NS(Block_set_next_element_id)( block, ( SIXTRL_INT64_T )0 );
+            NS(Block_set_flags)( block, flags );
+            NS(Block_set_ptr_mem_context)( block, ( void* )pool );
+            NS(Block_set_ptr_mem_begin)( block, NS(MemPool_get_buffer)( pool ) );
+            NS(Block_set_ptr_elements_info)( block, element_infos );
+            
+            success = true;
+        }        
     }
     
     if( !success )
@@ -294,53 +427,113 @@ NS(Block)* NS(Block_new)()
         {
             NS(Block_free)( block );
             free( block );
+            element_infos = 0;
             block = 0;
         }
         
-        if( ptr_mem_pool != 0 )
+        if( pool != 0 )
         {
-            NS(MemPool_free)( ptr_mem_pool );
-            free( ptr_mem_pool );
-            ptr_mem_pool = 0;
+            NS(MemPool_free)( pool );
+            free( pool );
+            pool = 0;
         }
     }
     
-    assert( ( (  success ) && ( block != 0 ) && ( ptr_mem_pool != 0 ) ) ||
-            ( ( !success ) && ( block == 0 ) && ( ptr_mem_pool == 0 ) ) );
+    assert( ( (  success ) && ( block != 0 ) && ( pool != 0 ) && ( element_infos != 0 ) ) ||
+            ( ( !success ) && ( block == 0 ) && ( pool == 0 ) && ( element_infos == 0 ) ) );
     
     return block;
 }
 
-NS(Block)* NS(Block_new_on_mempool)( struct NS(MemPool)* SIXTRL_RESTRICT pool )
+NS(Block)* NS(Block_new_on_mempool)( SIXTRL_SIZE_T const capacity, 
+    NS(MemPool)* SIXTRL_RESTRICT pool )
 {
+    bool success = false;
     
+    typedef NS(Block)           block_t;
+    typedef NS(BeamElementInfo) elem_info_t;
+    
+    SIXTRL_STATIC SIXTRL_SIZE_T const ZERO_SIZE = ( SIXTRL_SIZE_T )0u;
+    
+    block_t*  block = 0;    
+    elem_info_t* element_infos = 0;
+    
+    SIXTRL_SIZE_T const mem_pool_capacity = 
+        capacity * NS(BLOCK_DEFAULT_ELEMENT_CAPACITY);
+    
+    if( ( pool != 0 ) && ( capacity > ZERO_SIZE ) && 
+        ( NS(MemPool_get_buffer)( pool ) != 0 ) &&
+        ( NS(MemPool_get_remaining_bytes)( pool ) > mem_pool_capacity ) )
+    {
+        block = NS(Block_preset)( ( block_t* )malloc( sizeof( block_t ) ) );
+        element_infos = NS(BeamElementInfo_preset)( ( elem_info_t* )malloc( 
+            sizeof( elem_info_t ) * capacity ) );
+        
+        if( ( block != 0 ) && ( pool != 0 ) && ( element_infos != 0 ) )
+        {
+            SIXTRL_UINT64_T const flags = 
+                NS(BLOCK_FLAGS_PACKED) | NS(BLOCK_FLAGS_MEM_CTX_MEMPOOL);
+            
+            NS(Block_set_capacity)( block, capacity );
+            NS(Block_set_size)( block, ZERO_SIZE );
+            NS(Block_set_next_element_id)( block, ( SIXTRL_INT64_T )0 );
+            NS(Block_set_flags)( block, flags );
+            NS(Block_set_ptr_mem_context)( block, ( void* )pool );
+            NS(Block_set_ptr_mem_begin)( block, NS(MemPool_get_buffer)( pool ) );
+            NS(Block_set_ptr_elements_info)( block, element_infos );
+            
+            success = true;
+        }        
+    }
+    
+    if( !success )
+    {
+        if( block != 0 )
+        {
+            NS(Block_free)( block );
+            free( block );
+            element_infos = 0;
+            block = 0;
+        }
+    }
+    
+    assert( ( (  success ) && ( block != 0 ) && ( element_infos != 0 ) ) ||
+            ( ( !success ) && ( block == 0 ) && ( element_infos == 0 ) ) );
+    
+    return block;
 }
 
-void NS(Block_free)( struct NS(Block)* SIXTRL_RESTRICT block  )
+void NS(Block_free)( NS(Block)* SIXTRL_RESTRICT block  )
 {
-    free( block->elem_info );
+    free( NS(Block_get_elements_begin)( block ) );
+    NS(Block_set_ptr_elements_info)( block, 0 );
         
     if( NS(Block_manages_own_memory)( block  ) )
     {
         if( NS(Block_uses_mempool)( block ) )
         {
-            NS(MemPool)* ptr_mem_pool = NS(MemPool)*block->ptr_mem_context;
-            NS(MemPool_free)( ptr_mem_pool );
-            block->ptr_mem_context = 0;
-            block->ptr_mem_begin   = 0;
+            NS(MemPool)* pool = 
+                ( NS(MemPool* ) )NS(Block_get_const_mem_pool)( block );
+            
+            NS(MemPool_free)( pool );
+            free( pool );
+            
+            NS(Block_set_ptr_mem_context)( block, 0 );
+            NS(Block_set_ptr_mem_begin)( block, 0 );            
         }
     }
     
-    NS(Block_preset)( pool );
+    NS(Block_preset)( block );
     
     return;
 }
 
-void NS(Block_clear)( struct NS(Block)* SIXTRL_RESTRICT block )
+void NS(Block_clear)( NS(Block)* SIXTRL_RESTRICT block )
 {
-    size_t const num_elements = NS(Block_get_size)( block );
+    SIXTRL_STATIC SIXTRL_SIZE_T const ZERO = ( SIXTRL_SIZE_T )0u;
+    SIXTRL_SIZE_T const num_elements = NS(Block_get_size)( block );
     
-    if( num_elements > ( size_t )0u )
+    if( num_elements > ZERO )
     {
         NS(BeamElementInfo)* it  = NS(Block_get_elements_begin)( block );
         NS(BeamElementInfo)* end = NS(Block_get_elements_end)( block );
@@ -350,37 +543,45 @@ void NS(Block_clear)( struct NS(Block)* SIXTRL_RESTRICT block )
             NS(BeamElementInfo_preset)( it );
         }
         
-        NS(Block_set_size)( block, ( size_t )0u );
+        NS(Block_set_size)( block, ZERO );
+        
+        if( ( NS(Block_manages_own_memory)( block ) ) &&
+            ( NS(Block_uses_mempool)( block ) ) )
+        {
+            NS(MemPool)* pool = ( NS(MemPool)* )NS(Block_get_ptr_mem_context)( block );
+            NS(MemPool_clear)( pool );
+        }
     }
     
     return;
 }
 
-SIXTRL_INLINE void NS(Block_set_size)( 
+/* ------------------------------------------------------------------------- */
+
+void NS(Block_set_size)( 
     NS(Block)* SIXTRL_RESTRICT block, size_t new_size )
 {
     if( block != 0 ) block->size = new_size;
     return;
 }
 
-SIXTRL_INLINE void NS(Block_set_capacity)(
+void NS(Block_set_capacity)(
     NS(Block)* SIXTRL_RESTRICT block, size_t new_capacity )
 {
     if( block != 0 ) block->capacity = new_capacity;
     return;
 }
 
-SIXTRL_INLINE void NS(Block_set_flags)(
-    NS(Block)* SIXTRL_RESTRICT block, uint64_t flags )
+void NS(Block_set_flags)( NS(Block)* SIXTRL_RESTRICT block, uint64_t flags )
 {
     if( block != 0 ) block->flags = flags;
     return;
 }
 
-SIXTRL_INLINE void NS(Block_set_next_element_id)( 
+void NS(Block_set_next_element_id)( 
     NS(Block)* SIXTRL_RESTRICT block, int64_t next_element_id )
 {
-    if( block != 0 ) block->next_elemid = next_element_id;
+    if( block != 0 ) block->next_element_id = next_element_id;
 }
 
 int64_t NS(Block_get_next_element_id)( NS(Block)* SIXTRL_RESTRICT block )
@@ -390,57 +591,49 @@ int64_t NS(Block_get_next_element_id)( NS(Block)* SIXTRL_RESTRICT block )
     static int64_t const MAX_ALLOWED_ELEMENT_ID = INT64_MAX - INT64_C( 1 );
     
     if( ( block != 0 ) && 
-        ( block->next_elemid >= INT64_C( 0 ) ) &&
-        ( block->next_elemid < MAX_ALLOWED_ELEMENT_ID ) )
+        ( block->next_element_id >= INT64_C( 0 ) ) &&
+        ( block->next_element_id < MAX_ALLOWED_ELEMENT_ID ) )
     {
-        elem_id = block->next_elemid++;
+        elem_id = block->next_element_id++;
     }
     
     return elem_id;
 }
-*/
 
 /* ------------------------------------------------------------------------- */
 
-/*
-bool NS( Block_manages_own_memory )( const struct NS( Block )) *
+bool NS( Block_manages_own_memory )( const struct NS( Block ) *
                                   const SIXTRL_RESTRICT block )
 {
     return ( ( block != 0 ) && ( block->ptr_mem_context != 0 ) &&
-             ( ( block->flags & NS(BLOCK_FLAGS_OWN_MEMORY) ) ==
-                NS(BLOCK_FLAGS_OWN_MEMORY) ) );
+             ( ( block->flags & NS(BLOCK_FLAGS_OWNS_MEMORY) ) ==
+                NS(BLOCK_FLAGS_OWNS_MEMORY) ) );
 }
-*/
 
 /* ------------------------------------------------------------------------- */
 
-/*
-bool NS( Block_uses_mempool )( const struct NS( Block )) *
+bool NS( Block_uses_mempool )( const struct NS( Block ) *
                             const SIXTRL_RESTRICT block )
 {
     return ( ( block != 0 ) && ( block->ptr_mem_context != 0 ) &&
              ( ( block->flags & NS(BLOCK_FLAGS_MEM_CTX_MEMPOOL ) ) ==
                 NS(BLOCK_FLAGS_MEM_CTX_MEMPOOL) ) );
 }
-*/
 
 /* ------------------------------------------------------------------------- */
 
-/*
 bool NS( Block_uses_flat_memory )( 
-    const struct NS(Particles )* const SIXTRL_RESTRICT block )
+    const NS(Block)* const SIXTRL_RESTRICT block )
 {
     return ( ( block != 0 ) && ( block->ptr_mem_context != 0 ) &&
              ( ( block->flags & NS(BLOCK_FLAGS_MEM_CTX_MEMPOOL ) ) ==
                 NS(BLOCK_FLAGS_MEM_CTX_MEMPOOL) ) );
 }
-*/
 
 /* ------------------------------------------------------------------------- */
 
-/*
 NS( MemPool ) const* NS( Block_get_const_mem_pool )(
-    const struct NS( Block )) * const SIXTRL_RESTRICT block )
+    const struct NS( Block ) * const SIXTRL_RESTRICT block )
 {
     NS( MemPool ) const* ptr_mem_pool = 0;
 
@@ -453,13 +646,11 @@ NS( MemPool ) const* NS( Block_get_const_mem_pool )(
     
     return ptr_mem_pool;
 }
-*/
 
 /* ------------------------------------------------------------------------- */
 
-/*
 unsigned char const* NS( Block_get_const_flat_memory )(
-    const struct NS( Block )) * const SIXTRL_RESTRICT block )
+    const struct NS( Block ) * const SIXTRL_RESTRICT block )
 {
     unsigned char const* ptr_flat_mem_block = 0;
     
@@ -472,17 +663,14 @@ unsigned char const* NS( Block_get_const_flat_memory )(
     
     return ptr_flat_mem_block;
 }
-*/
 
 /* ------------------------------------------------------------------------- */
 
-/*
 bool NS( Block_has_defined_alignment )( 
     const struct NS( Block ) * const SIXTRL_RESTRICT block )
 {
-    return ( NS( Block_alignment )( block ) != UINT64_C( 0 ) );
+    return ( NS( Block_get_alignment )( block ) != ( SIXTRL_UINT64_T )0u );
 }
-*/
 
 /* ------------------------------------------------------------------------- */
 
@@ -565,7 +753,6 @@ bool NS( Block_check_alignment )(
 
 /* ------------------------------------------------------------------------- */
 
-/*
 size_t NS( Block_get_alignment )( 
     const struct NS( Block ) * const SIXTRL_RESTRICT block )
 {
@@ -585,8 +772,64 @@ void NS(Block_set_alignment)( NS(Block)* SIXTRL_RESTRICT block,
     
     return;
 }
-*/
 
 /* ------------------------------------------------------------------------- */
+
+void const* NS( Block_get_const_ptr_mem_context )(
+    const struct NS( Block ) * const SIXTRL_RESTRICT block )
+{
+    return ( block != 0 ) ? block->ptr_mem_context : 0;
+}
+
+void* NS( Block_get_ptr_mem_context )( struct NS( Block ) *
+                                                  SIXTRL_RESTRICT block )
+{
+   return ( void* )NS(Block_get_const_ptr_mem_context)( block );
+}
+
+void const* NS( Block_get_const_mem_begin )(
+    const NS(Block) *const SIXTRL_RESTRICT block )
+{
+    return ( block != 0 ) ? block->ptr_mem_begin : 0;
+}
+
+void* NS( Block_get_mem_begin )( NS(Block)* SIXTRL_RESTRICT block )
+{
+    return ( void* )NS(Block_get_const_mem_begin)( block );
+}
+
+void NS( Block_set_ptr_mem_context )( 
+    struct NS( Block ) * SIXTRL_RESTRICT block, void* ptr_mem_context )
+{
+    if( block != 0 )
+    {
+        block->ptr_mem_context = ptr_mem_context;
+    }
+    
+    return;
+}
+
+void NS( Block_set_ptr_mem_begin )( 
+    NS(Block)* SIXTRL_RESTRICT block, void* ptr_mem_begin )
+{
+    if( block != 0 )
+    {
+        block->ptr_mem_begin = ptr_mem_begin;
+    }
+    
+    return;
+}
+
+void NS( Block_set_ptr_elements_info)( 
+    NS(Block)* SIXTRL_RESTRICT block, 
+    struct NS(BeamElementInfo)* SIXTRL_RESTRICT ptr_info )
+{
+    if( block != 0 )
+    {
+        block->elem_info = ptr_info;        
+    }
+    
+    return;
+}
 
 /* end: sixtracklib/common/details/block.c */

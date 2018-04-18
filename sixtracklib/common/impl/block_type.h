@@ -36,30 +36,45 @@ NS(BeamElementType);
 typedef struct NS(BeamElementInfo)
 {
     SIXTRL_INT64_T      element_id;
-    NS(BeamElementType) type;
+    NS(BeamElementType) type_id;
     void const*         ptr_element;
+    void const*         ptr_mem_begin;
 }
 NS(BeamElementInfo);
 
-static struct NS(BeamElementInfo)* NS(BeamElementInfo_preset)( 
+SIXTRL_STATIC struct NS(BeamElementInfo)* NS(BeamElementInfo_preset)( 
     struct NS(BeamElementInfo)* SIXTRL_RESTRICT info );
 
-static enum NS(BeamElementType) NS(BeamElementInfo_get_type)( 
+SIXTRL_STATIC bool NS(BeamElementInfo_is_available)(
     const struct NS(BeamElementInfo) * const SIXTRL_RESTRICT info );
 
-static SIXTRL_INT64_T NS(BeamElementInfo_get_element_id)(
+
+SIXTRL_STATIC enum NS(BeamElementType) NS(BeamElementInfo_get_type_id)( 
     const struct NS(BeamElementInfo) * const SIXTRL_RESTRICT info );
 
-static bool NS(BeamElementInfo_is_available)(
+SIXTRL_STATIC void NS(BeamElementInfo_set_type_id)(
+    struct NS(BeamElementInfo)* info, enum NS(BeamElementType) type_id );
+
+
+
+SIXTRL_STATIC SIXTRL_INT64_T NS(BeamElementInfo_get_element_id)(
     const struct NS(BeamElementInfo) * const SIXTRL_RESTRICT info );
 
-static void const* NS(BeamElementInfo_get_const_pointer)(
-    const struct NS(BeamElementInfo) * const SIXTRL_RESTRICT info );
+SIXTRL_STATIC void NS(BeamElementInfo_set_element_id)(
+    struct NS(BeamElementInfo)* info, SIXTRL_INT64_T const element_id );
 
-static void* NS(BeamElementInfo_get_pointer)(
+
+SIXTRL_STATIC void const* NS(BeamElementInfo_get_const_ptr_mem_begin)(
+    const struct NS(BeamElementInfo) *const SIXTRL_RESTRICT info );
+
+SIXTRL_STATIC void* NS(BeamElementInfo_get_ptr_mem_begin)(
     struct NS(BeamElementInfo)* SIXTRL_RESTRICT info );
 
-static SIXTRL_INT64_T const NS(PARTICLES_INVALID_BEAM_ELEMENT_ID) = INT64_C( -1 );
+SIXTRL_STATIC void NS(BeamElementInfo_set_ptr_mem_begin)(
+    struct NS(BeamElementInfo)* SIXTRL_RESTRICT info, void* ptr_begin );
+
+
+SIXTRL_STATIC SIXTRL_INT64_T const NS(PARTICLES_INVALID_BEAM_ELEMENT_ID) = INT64_C( -1 );
 
 /* ========================================================================= */
 
@@ -100,7 +115,7 @@ static SIXTRL_UINT64_T const
     NS( BLOCK_FLAGS_ALIGN_MASK_OFFSET_BITS ) = ( SIXTRL_UINT64_T )8u;
 
 static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_CAPACITY ) = ( SIXTRL_SIZE_T )1024u;
-static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_ELEMENT_CAPACITY ) = (SIXTRL_SIZE_T)64u;
+static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_ELEMENT_CAPACITY ) = (SIXTRL_SIZE_T)512u;
 static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_MEMPOOL_CHUNK_SIZE ) = (SIXTRL_SIZE_T)8u;
 static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_ALIGNMENT) = ( SIXTRL_SIZE_T )8u;
 static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_MEMPOOL_ALIGNMENT ) = (SIXTRL_SIZE_T)16u;
@@ -140,18 +155,26 @@ SIXTRL_INLINE NS(BeamElementInfo)* NS(BeamElementInfo_preset)(
 {
     if( info != 0 )
     {
-        info->element_id = NS(PARTICLES_INVALID_BEAM_ELEMENT_ID);
-        info->type   = NS(ELEMENT_TYPE_NONE);
-        info->ptr_element = 0;
+        info->element_id    = NS(PARTICLES_INVALID_BEAM_ELEMENT_ID);
+        info->type_id       = NS(ELEMENT_TYPE_NONE);
+        info->ptr_mem_begin = 0;
     }
     
     return info;
 }
 
-SIXTRL_INLINE NS(BeamElementType) NS(BeamElementInfo_get_type)( 
+SIXTRL_INLINE NS(BeamElementType) NS(BeamElementInfo_get_type_id)( 
     const NS(BeamElementInfo) * const SIXTRL_RESTRICT info )
 {
-    return ( info != 0 ) ? info->type : NS(ELEMENT_TYPE_NONE);
+    return ( info != 0 ) ? info->type_id : NS(ELEMENT_TYPE_NONE);
+}
+
+SIXTRL_INLINE void NS(BeamElementInfo_set_type_id)(
+    struct NS(BeamElementInfo)* info, enum NS(BeamElementType) type_id )
+{
+    SIXTRL_ASSERT( info != 0 );
+    info->type_id = type_id;
+    return;
 }
 
 SIXTRL_INLINE SIXTRL_INT64_T NS(BeamElementInfo_get_element_id)(
@@ -160,23 +183,40 @@ SIXTRL_INLINE SIXTRL_INT64_T NS(BeamElementInfo_get_element_id)(
     return ( info != 0 ) ? info->element_id : NS(PARTICLES_INVALID_BEAM_ELEMENT_ID);
 }
 
+SIXTRL_INLINE void NS(BeamElementInfo_set_element_id)(
+    NS(BeamElementInfo)* SIXTRL_RESTRICT info, SIXTRL_INT64_T const element_id )
+{
+    SIXTRL_ASSERT( info != 0 );
+    info->element_id = element_id;
+    return;
+}
+
 SIXTRL_INLINE bool NS(BeamElementInfo_is_available)(
     const NS(BeamElementInfo) * const SIXTRL_RESTRICT info )
 {
-    return ( ( info != 0 ) && ( info->ptr_element != 0 ) &&
+    return ( ( info != 0 ) && ( info->ptr_mem_begin != 0 ) &&
              ( info->element_id != NS(PARTICLES_INVALID_BEAM_ELEMENT_ID) ) );
 }
 
-SIXTRL_INLINE void const* NS(BeamElementInfo_get_const_pointer)(
-    const NS(BeamElementInfo) * const SIXTRL_RESTRICT info )
+
+SIXTRL_INLINE void const* NS(BeamElementInfo_get_const_ptr_mem_begin)(
+    const struct NS(BeamElementInfo) *const SIXTRL_RESTRICT info )
 {
-    return ( info != 0 ) ? info->ptr_element : 0;
+    return ( info != 0 ) ? info->ptr_mem_begin : 0;    
 }
 
-SIXTRL_INLINE void* NS(BeamElementInfo_get_pointer)(
-    NS(BeamElementInfo)* SIXTRL_RESTRICT info )
+SIXTRL_INLINE void* NS(BeamElementInfo_get_ptr_mem_begin)(
+    struct NS(BeamElementInfo)* SIXTRL_RESTRICT info )
 {
-    return ( void* )NS(BeamElementInfo_get_const_pointer)( info );
+    return ( void* )NS(BeamElementInfo_get_const_ptr_mem_begin)( info );
+}
+
+SIXTRL_INLINE void NS(BeamElementInfo_set_ptr_mem_begin)(
+    struct NS(BeamElementInfo)* SIXTRL_RESTRICT info, void* ptr_mem_begin )
+{
+    SIXTRL_ASSERT( info != 0 );
+    info->ptr_mem_begin = ptr_mem_begin;
+    return;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -188,7 +228,7 @@ SIXTRL_INLINE NS(Block)* NS(Block_preset)( NS(Block)* SIXTRL_RESTRICT block )
         block->size            = ( SIXTRL_SIZE_T )0u;
         block->capacity        = ( SIXTRL_SIZE_T )0u;        
         block->flags           = NS(BLOCK_FLAGS_NONE);
-        block->next_element_id     = ( SIXTRL_INT64_T )0;    
+        block->next_element_id = ( SIXTRL_INT64_T )0;    
         block->alignment       = NS(BLOCK_DEFAULT_MEMPOOL_ALIGNMENT);
         block->elem_info       = 0;
         block->ptr_mem_context = 0;
