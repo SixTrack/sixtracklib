@@ -37,7 +37,6 @@ typedef struct NS(BeamElementInfo)
 {
     SIXTRL_INT64_T      element_id;
     NS(BeamElementType) type_id;
-    void const*         ptr_element;
     void const*         ptr_mem_begin;
 }
 NS(BeamElementInfo);
