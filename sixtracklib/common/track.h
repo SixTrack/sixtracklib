@@ -29,6 +29,18 @@ SIXTRL_STATIC int NS(Track_drift)(
 SIXTRL_STATIC int NS(Track_drift_exact)(
     NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_UINT64_T const ip, SIXTRL_REAL_T const length );
 
+SIXTRL_STATIC void NS(Track_single_particle_over_beam_element)(
+    const NS(BeamElementInfo) *const SIXTRL_RESTRICT element,
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    SIXTRL_SIZE_T const particle_index );
+
+SIXTRL_STATIC void NS(Track_single_particle)(
+    NS(BeamElementInfo) const* SIXTRL_RESTRICT elements_it,
+    SIXTRL_SIZE_T const num_of_elements,
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    SIXTRL_SIZE_T const particle_index, 
+    NS(ParticlesSequence)* SIXTRL_RESTRICT elem_by_elem );
+
 /* -------------------------------------------------------------------------- */
 /* ----                                                                  ---- */ 
 /* -------------------------------------------------------------------------- */
@@ -98,7 +110,7 @@ SIXTRL_INLINE int NS(Track_drift_exact)(
     return 1;
 }
 
-void NS(Track_single_particle_over_beam_element)(
+SIXTRL_INLINE void NS(Track_single_particle_over_beam_element)(
     const NS(BeamElementInfo) *const SIXTRL_RESTRICT element,
     NS(Particles)* SIXTRL_RESTRICT particles, 
     SIXTRL_SIZE_T const particle_index )
@@ -169,7 +181,7 @@ void NS(Track_single_particle_over_beam_element)(
     return;
 }
 
-void NS(Track_single_particle)(
+SIXTRL_INLINE void NS(Track_single_particle)(
     NS(BeamElementInfo) const* SIXTRL_RESTRICT elements_it,
     SIXTRL_SIZE_T const num_of_elements,
     NS(Particles)* SIXTRL_RESTRICT particles, 

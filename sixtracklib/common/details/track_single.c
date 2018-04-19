@@ -10,17 +10,17 @@
 
 /* -------------------------------------------------------------------------- */
 
-extern int NS( Drift_track_single )( struct NS( SingleParticle ) *
+extern int NS( TrackSingle_drift )( struct NS( SingleParticle ) *
                                          SIXTRL_RESTRICT particles,
                                      SIXTRL_REAL_T const length );
 
-extern int NS( DriftExact_track_single )( struct NS( SingleParticle ) *
+extern int NS( TrackSingle_drift_exact )( struct NS( SingleParticle ) *
                                               SIXTRL_RESTRICT particles,
                                           SIXTRL_REAL_T const length );
 
 /* -------------------------------------------------------------------------- */
 
-int NS( Drift_track_single )( struct NS( SingleParticle ) * SIXTRL_RESTRICT p,
+int NS( TrackSingle_drift )( struct NS( SingleParticle ) * SIXTRL_RESTRICT p,
                               SIXTRL_REAL_T const len )
 {
     SIXTRL_STATIC SIXTRL_REAL_T const ONE = ( SIXTRL_REAL_T )1;
@@ -38,7 +38,7 @@ int NS( Drift_track_single )( struct NS( SingleParticle ) * SIXTRL_RESTRICT p,
     return 1;
 }
 
-int NS( DriftExact_track_single )( struct NS( SingleParticle ) *
+int NS( TrackSingle_drift_exact )( struct NS( SingleParticle ) *
                                        SIXTRL_RESTRICT particle,
                                    SIXTRL_REAL_T const length )
 {

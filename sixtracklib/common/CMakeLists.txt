@@ -16,7 +16,7 @@ set( SIXTRACKLIB_COMMON_HEADERS
      
      
      track.h
-#      impl/track_single.h     
+     impl/track_single.h     
      
      mem_pool.h
      values.h
@@ -30,7 +30,7 @@ set( SIXTRACKLIB_COMMON_SOURCES
      details/particles.c
      details/particles_sequence.c
      details/single_particle.c
-#      details/track_single.c
+     details/track_single.c
 )
 
 add_library( sixtrack_common OBJECT 
