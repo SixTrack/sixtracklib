@@ -54,6 +54,9 @@ extern unsigned char const* NS( Particles_get_const_flat_memory )(
 
 extern struct NS( Particles ) * NS( Particles_new )( SIXTRL_SIZE_T npart );
 
+extern struct NS( Particles ) * NS( Particles_new_aligned )( 
+    SIXTRL_SIZE_T const npart, SIXTRL_SIZE_T alignment );
+
 extern struct NS( Particles ) *
     NS( Particles_new_on_mempool )( SIXTRL_SIZE_T npart,
                                     struct NS( MemPool ) *
@@ -1176,6 +1179,97 @@ NS( Particles ) * NS( Particles_new )( SIXTRL_SIZE_T npart )
 
     SIXTRL_SIZE_T chunk_size = NS( PARTICLES_DEFAULT_MEMPOOL_CHUNK_SIZE );
     SIXTRL_SIZE_T alignment = NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT );
+
+    SIXTRL_SIZE_T const required_capacity =
+        NS( Particles_predict_required_capacity )( 
+            npart, &chunk_size, &alignment, true );
+
+    if( ( required_capacity > (SIXTRL_SIZE_T)0u ) && ( (SIXTRL_UINT64_T)npart < UINT64_MAX ) )
+    {
+        bool success = false;
+
+        ptr_mem_pool = (NS( MemPool )*)malloc( sizeof( NS( MemPool ) ) );
+
+        if( ptr_mem_pool != 0 )
+        {
+            NS( MemPool_init )( ptr_mem_pool, required_capacity, chunk_size );
+
+            if( ( NS( MemPool_get_buffer )( ptr_mem_pool ) == 0 ) ||
+                ( NS( MemPool_get_chunk_size )( ptr_mem_pool ) !=
+                  chunk_size ) ||
+                ( NS( MemPool_get_capacity )( ptr_mem_pool ) <
+                  required_capacity ) )
+            {
+                NS( MemPool_free )( ptr_mem_pool );
+                free( ptr_mem_pool );
+                ptr_mem_pool = 0;
+            }
+        }
+
+        particles = NS( Particles_preset )(
+            (NS( Particles )*)malloc( sizeof( NS( Particles ) ) ) );
+
+        if( ( ptr_mem_pool != 0 ) && ( particles != 0 ) &&
+            ( NS( Particles_map_to_mempool )(
+                particles, ptr_mem_pool, npart, alignment, true ) ) )
+        {
+            SIXTRL_UINT64_T flags = NS( PARTICLES_FLAGS_PACKED ) |
+                             NS( PARTICLES_FLAGS_OWNS_MEMORY ) |
+                             NS( PARTICLES_FLAGS_MEM_CTX_MEMPOOL );
+
+            SIXTRL_UINT64_T temp_alignment = (SIXTRL_UINT64_T)alignment;
+
+            if( temp_alignment <= NS( PARTICLES_MAX_ALIGNMENT ) )
+            {
+                flags |= ( temp_alignment
+                           << NS( PARTICLES_FLAGS_ALIGN_MASK_OFFSET_BITS ) );
+            } else
+            {
+                /* this should not be necessary, but for paranoia's sake: */
+                flags &= ~( NS( PARTICLES_FLAGS_ALIGN_MASK ) );
+            }
+
+            assert( NS(Particles_get_mem_begin )( particles ) != 0 );
+            
+            NS( Particles_set_flags )( particles, flags );
+            NS( Particles_set_size )( particles, (SIXTRL_UINT64_T)npart );
+            NS( Particles_set_ptr_mem_context )( particles, ptr_mem_pool );
+
+            success = true;
+        }
+
+        if( !success )
+        {
+            if( ptr_mem_pool != 0 )
+            {
+                NS( MemPool_free )( ptr_mem_pool );
+                free( ptr_mem_pool );
+                ptr_mem_pool = 0;
+            }
+
+            if( particles != 0 )
+            {
+                NS( Particles_free )( particles );
+                free( particles );
+                particles = 0;
+            }
+        }
+
+        assert(
+            ( ( success ) && ( particles != 0 ) && ( ptr_mem_pool != 0 ) ) ||
+            ( ( !success ) && ( particles == 0 ) && ( ptr_mem_pool == 0 ) ) );
+    }
+
+    return particles;
+}
+
+NS( Particles ) * NS( Particles_new_aligned )( 
+    SIXTRL_SIZE_T const npart, SIXTRL_SIZE_T alignment )
+{
+    NS( Particles )* particles = 0;
+    NS( MemPool )* ptr_mem_pool = 0;
+
+    SIXTRL_SIZE_T chunk_size = NS( PARTICLES_DEFAULT_MEMPOOL_CHUNK_SIZE );
 
     SIXTRL_SIZE_T const required_capacity =
         NS( Particles_predict_required_capacity )( 

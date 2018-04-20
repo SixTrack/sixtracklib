@@ -33,6 +33,9 @@ size_t NS( Particles_predict_required_capacity )(
 
 struct NS( Particles ) * NS( Particles_new )( size_t npart );
 
+struct NS( Particles ) * NS( Particles_new_aligned )( 
+    SIXTRL_SIZE_T const npart, SIXTRL_SIZE_T alignment );
+
 struct NS( Particles ) *
     NS( Particles_new_on_mempool )( size_t npart,
                                     struct NS( MemPool ) *
