@@ -13,6 +13,7 @@
 #include "sixtracklib/common/impl/particles_type.h"
 #include "sixtracklib/common/impl/block_type.h"
 #include "sixtracklib/common/impl/block_drift_type.h"
+#include "sixtracklib/common/particles_sequence.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,15 +21,17 @@ extern "C" {
 
 #endif /* !defined( _GPUCODE ) */
     
-struct NS(Particles);
-struct NS(ParticlesSequence);
-struct NS(BeamElementInfo);
+
 
 SIXTRL_STATIC int NS(Track_drift)( 
-    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_UINT64_T const ip, SIXTRL_REAL_T const length );
+    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_UINT64_T const ip, 
+    SIXTRL_REAL_T const length );
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_STATIC int NS(Track_drift_exact)(
-    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_UINT64_T const ip, SIXTRL_REAL_T const length );
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    SIXTRL_UINT64_T const ip, SIXTRL_REAL_T const length );
 
 SIXTRL_STATIC void NS(Track_single_particle_over_beam_element)(
     const NS(BeamElementInfo) *const SIXTRL_RESTRICT element,
@@ -50,33 +53,6 @@ SIXTRL_INLINE int NS(Track_drift)(
     NS(Particles)* SIXTRL_RESTRICT particles, 
     SIXTRL_SIZE_T const ip, SIXTRL_REAL_T const length )
 {
-    /*
-    SIXTRL_STATIC SIXTRL_REAL_T const ONE = ( SIXTRL_REAL_T )1;
-    SIXTRL_STATIC SIXTRL_REAL_T const TWO = ( SIXTRL_REAL_T )2;
-    
-    SIXTRL_REAL_T const rpp = NS(Particles_get_rpp_value)( particles,ip );
-    SIXTRL_REAL_T const rvv = NS(Particles_get_rvv_value)( particles,ip );
-    SIXTRL_REAL_T const px = NS(Particles_get_px_value)(particles, ip ) * rpp;
-    SIXTRL_REAL_T const py = NS(Particles_get_py_value)( particles, ip ) * rpp;
-    SIXTRL_REAL_T const dsigma = 
-        ( ONE - rvv * ( ONE + ( px * px + py * py ) / TWO ) );
-        
-    SIXTRL_REAL_T x     = NS(Particles_get_x_value)( particles, ip );
-    SIXTRL_REAL_T y     = NS(Particles_get_y_value)( particles, ip );
-    SIXTRL_REAL_T s     = NS(Particles_get_s_value)( particles, ip );
-    SIXTRL_REAL_T sigma = NS(Particles_get_sigma_value)( particles, ip );
-    
-    x     += length * px;
-    y     += length * py;
-    sigma += length * dsigma;
-    s     += length;
-    
-    NS(Particles_set_sigma_value)( particles, ip, sigma );
-    NS(Particles_set_x_value)(     particles, ip, x     );
-    NS(Particles_set_y_value)(     particles, ip, y     );
-    NS(Particles_set_s_value)(     particles, ip, s     );        
-    */
-    
     double const _rpp = NS(Particles_get_rpp_value)( particles, ip );
     double const _px  = NS(Particles_get_px_value )( particles, ip ) * _rpp; 
     double const _py  = NS(Particles_get_py_value )( particles, ip ) * _rpp;    

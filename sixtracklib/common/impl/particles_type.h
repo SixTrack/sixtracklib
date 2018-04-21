@@ -49,7 +49,7 @@ typedef struct NS( Particles )
     SIXTRL_UINT64_T flags; /* particle flags */
     void* __restrict__  ptr_mem_context; /* memory_context -> can contain */
     void* __restrict__  ptr_mem_begin; /* reference memory addr for (un)packing (optional) */
-} NS( Particles ) __attribute__ ((aligned (256)));
+} NS( Particles ) __attribute__((aligned (SIXTRL_ALIGN)));
 
 
 SIXTRL_STATIC SIXTRL_UINT64_T const NS(PARTICLES_PACK_INDICATOR) = ( SIXTRL_UINT64_T )1u;
