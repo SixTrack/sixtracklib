@@ -58,6 +58,14 @@ int main( int argc, char* argv[] )
                 "(npart = %8lu, nelem = %8lu, nturns = %8lu)\r\n",
                 NUM_PARTICLES, NUM_ELEMS, NUM_TURNS );
     
+    #if defined( __AVX__ )
+    printf( "Info: using avx  implementation\r\n" );
+    #elif defined( __SSE2__ )    
+    printf( "Info: using sse2 implementation\r\n" );
+    #else
+    #error Undefined/illegal architecture selected for this example -> check your compiler flags
+    #endif /* CPU architecture */
+    
     particles = st_Particles_new_aligned( NUM_PARTICLES, SIXTRL_ALIGN );
     drift_lengths = ( double* )malloc( sizeof( double ) * NUM_ELEMS );
     
@@ -79,14 +87,13 @@ int main( int argc, char* argv[] )
         
         for( jj = 0 ; jj < NUM_ELEMS ; ++jj )        
         {
-            size_t ip;
-            
             double const length = drift_lengths[ jj ];
             
-            for( ip = 0 ; ip < NUM_PARTICLES ; ++ip )
-            {
-                st_Track_drift( particles, ip, length );                
-            }                                    
+            #if defined( __AVX__ )
+            st_Track_simd_drift_avx( particles, length );
+            #elif defined( __SSE2__ )
+            st_Track_simd_drift_sse2( particles, length );
+            #endif /* defined( __SSE2__ ) */
         }
     }
     

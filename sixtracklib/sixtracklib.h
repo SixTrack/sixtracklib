@@ -24,6 +24,14 @@
 #include "sixtracklib/common/track.h"
 #include "sixtracklib/common/values.h"
 
+/* Not optimal having these two as part of the public library interface -> fix this! */
+#include "sixtracklib/common/details/random.h"
+#include "sixtracklib/common/tests/test_particles_tools.h"
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+#include "sixtracklib/simd/track.h"
+
 /* ------------------------------------------------------------------------- */
 
 #include "sixtracklib/_impl/namespace_end.h"
