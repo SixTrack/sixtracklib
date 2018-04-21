@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "sixtracklib/common/impl/particles_type.h"
 #include "sixtracklib/common/impl/block_type.h"
@@ -49,6 +50,7 @@ SIXTRL_INLINE int NS(Track_drift)(
     NS(Particles)* SIXTRL_RESTRICT particles, 
     SIXTRL_SIZE_T const ip, SIXTRL_REAL_T const length )
 {
+    /*
     SIXTRL_STATIC SIXTRL_REAL_T const ONE = ( SIXTRL_REAL_T )1;
     SIXTRL_STATIC SIXTRL_REAL_T const TWO = ( SIXTRL_REAL_T )2;
     
@@ -73,8 +75,25 @@ SIXTRL_INLINE int NS(Track_drift)(
     NS(Particles_set_x_value)(     particles, ip, x     );
     NS(Particles_set_y_value)(     particles, ip, y     );
     NS(Particles_set_s_value)(     particles, ip, s     );        
+    */
     
-    return 1;
+    double const _rpp = NS(Particles_get_rpp_value)( particles, ip );
+    double const _px  = NS(Particles_get_px_value )( particles, ip ) * _rpp; 
+    double const _py  = NS(Particles_get_py_value )( particles, ip ) * _rpp;    
+    double const dsigma = ( 1.0 - NS(Particles_get_rvv_value)( particles, ip ) * 
+                          ( 1.0 + ( _px * _px + _py * _py ) / 2.0 ) );
+    
+    double const _sigma = NS(Particles_get_sigma_value)( particles, ip ) + length * dsigma;
+    double const _s     = NS(Particles_get_s_value)( particles, ip ) + length;
+    double const _x     = NS(Particles_get_x_value)( particles, ip ) + length * _px;
+    double const _y     = NS(Particles_get_y_value)( particles, ip ) + length * _py;
+    
+    NS(Particles_set_s_value)( particles, ip, _s );
+    NS(Particles_set_x_value)( particles, ip, _x );
+    NS(Particles_set_y_value)( particles, ip, _y );
+    NS(Particles_set_sigma_value)( particles, ip, _sigma );
+        
+    return 1;    
 }
 
 
@@ -132,6 +151,7 @@ SIXTRL_INLINE void NS(Track_single_particle_over_beam_element)(
         case NS(ELEMENT_TYPE_DRIFT):
         {
             drift_t drift;
+            double length;
             
             #if !defined( NDEBUG )
             ptr_t next_ptr = NS(Drift_unpack_from_flat_memory)( &drift, 
@@ -141,9 +161,9 @@ SIXTRL_INLINE void NS(Track_single_particle_over_beam_element)(
             NS(Drift_unpack_from_flat_memory)( &drift, 
                 ( ptr_t )NS(BeamElementInfo_get_const_ptr_mem_begin)( element ) );
             #endif /* !defined( NDEBUG ) */
-                                        
-            NS(Track_drift)( particles, particle_index, 
-                             NS(Drift_get_length)( &drift ) );
+            
+            length = NS(Drift_get_length)( &drift );
+            NS(Track_drift)( particles, particle_index, length );
             
             break;
         }
@@ -188,30 +208,28 @@ SIXTRL_INLINE void NS(Track_single_particle)(
     SIXTRL_SIZE_T const particle_index, 
     NS(ParticlesSequence)* SIXTRL_RESTRICT elem_by_elem )
 {
-    SIXTRL_ASSERT( elements_it != 0 );
+    SIXTRL_SIZE_T ii = 0;    
     
-    NS(BeamElementInfo) const* elements_end = elements_it + num_of_elements;
+    SIXTRL_ASSERT( elements_it != 0 );
     
     if( elem_by_elem == 0 )
     {
-        for( ; elements_it != elements_end ; ++elements_it )
+        for( ; ii < num_of_elements ; ++ii )
         {
             NS(Track_single_particle_over_beam_element)( 
-                elements_it, particles, particle_index );
+                &elements_it[ ii ], particles, particle_index );
         }
     }
     else
     {
-        SIXTRL_SIZE_T element_index = ( SIXTRL_SIZE_T )0u;
-        
-        for( ; elements_it != elements_end ; ++elements_it, ++element_index )
+        for( ; ii < num_of_elements ; ++ii )
         {
             NS(Track_single_particle_over_beam_element)( 
-                elements_it, particles, particle_index );
+                &elements_it[ ii ], particles, particle_index );
             
             NS(Particles_copy_single_unchecked)(
                 NS(ParticlesSequence_get_particles_by_index)(
-                    elem_by_elem, element_index ), particle_index, 
+                    elem_by_elem, ii ), particle_index, 
                 particles, particle_index );
         }
     }
