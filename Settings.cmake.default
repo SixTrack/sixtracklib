@@ -37,19 +37,22 @@ set( SIXTRACKL_MEMCHECK_SUPPRESSIONS_FILE "" CACHE PATH
      "Path to the memory check tool suppression file (optional, leave empty)" )
 
 # ------------------------------------------------------------------------------
+# CPU/System architecture settings:
+
+set( SIXTRACKL_CPU_ARCH "sse2" CACHE STRING "CPU/System architecture" )
+set_property( CACHE SIXTRACKL_CPU_ARCH PROPERTY STRINGS sse2 avx native )
+     
+# ------------------------------------------------------------------------------
 # Examples:
 
 option( SIXTRACKL_BUILD_EXAMPLES "Build sixtracklib examples" ON )
 
 # ------------------------------------------------------------------------------
 
-option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"  OFF )
-
-option( SIXTRACKL_ENABLE_SIMD "Enable manual SIMD backend"     OFF ) 
-set( SIXTRACKL_SIMD_ARCH  "SSE2" CACHE STRING 
-     "Target SIMD architecture (SSE2, AVX, AVX2) default: SSE2" )
-
+option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"       OFF )
+option( SIXTRACKL_ENABLE_MANUAL_SIMD       "Enable manual SIMD backend"     OFF )
 option( SIXTRACKL_ENABLE_OPENMP            "Enable OpenMP backend"          OFF )
 option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL backend"          OFF )
 option( SIXTRACKL_ENABLE_CUDA              "Enable CUDA backend"            OFF )
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
