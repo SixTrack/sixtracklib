@@ -37,6 +37,11 @@ set( SIXTRACKL_MEMCHECK_SUPPRESSIONS_FILE "" CACHE PATH
      "Path to the memory check tool suppression file (optional, leave empty)" )
 
 # ------------------------------------------------------------------------------
+# Examples:
+
+option( SIXTRACKL_BUILD_EXAMPLES "Build sixtracklib examples" ON )
+
+# ------------------------------------------------------------------------------
 
 option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"  OFF )
 

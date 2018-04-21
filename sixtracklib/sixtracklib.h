@@ -6,13 +6,23 @@
     #define __SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE 1
 #endif /* !defined( __NAMESPACE ) */
 
-#include "sixtracklib/_impl/namespace_begin.h"
+#include "sixtracklib/_impl/definitions.h"
 
 /* ------------------------------------------------------------------------- */
 
+#include "sixtracklib/_impl/namespace_begin.h"
+#include "sixtracklib/_impl/path.h"
+
 #include "sixtracklib/common/mem_pool.h"
+#include "sixtracklib/common/block.h"
+#include "sixtracklib/common/impl/block_type.h"
+#include "sixtracklib/common/block_drift.h"
+#include "sixtracklib/common/impl/block_drift_type.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/impl/particles_type.h"
+#include "sixtracklib/common/particles_sequence.h"
+#include "sixtracklib/common/track.h"
+#include "sixtracklib/common/values.h"
 
 /* ------------------------------------------------------------------------- */
 

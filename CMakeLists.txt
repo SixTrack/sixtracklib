@@ -76,6 +76,13 @@ if( SIXTRACKL_ENABLE_OPENCL )
     include( SetupOpenCL )
 endif()
 
+# ------------------------------------------------------------------------------
+# OpenMP:
+
+if( SIXTRACKL_ENABLE_OPENMP )
+    include( SetupOpenMP )
+endif()
+
 # ==============================================================================
 # build libraries and modules:
 

@@ -29,6 +29,10 @@
 #include "sixtracklib/common/particles_sequence.h"
 #include "sixtracklib/common/track.h"
 
+#if defined( _OPENMP )
+#include <omp.h>
+#endif /* defined( _OPENMP ) */
+
 #if defined( __SAVED_NAMESPACE )
     #undef __NAMESPACE
     #define __NAMESPACE __SAVED_NAMESPACE
@@ -67,13 +71,13 @@ int main()
         ELEMENT_TYPES{ st_ELEMENT_TYPE_DRIFT, st_ELEMENT_TYPE_DRIFT_EXACT };
     
     std::vector< SIXTRL_SIZE_T > const 
-        NUM_OF_ELEMENTS{ 1, 10, 100, 1000 }; 
+        NUM_OF_ELEMENTS{ 10000000 }; 
     
     std::vector< SIXTRL_SIZE_T > const 
-        NUM_OF_PARTICLES{ 1, 10, 100, 1000, 10000, 100000 };
+        NUM_OF_PARTICLES{ 32 };
         
     std::vector< SIXTRL_SIZE_T > const 
-        NUM_OF_TURNS{ 1, 1000, 10000 };
+        NUM_OF_TURNS{ 1 };
         
     std::cout << std::setw( 20 ) << "NELEMS"
               << std::setw( 20 ) << "NPARTS"
@@ -261,22 +265,43 @@ int main()
                 st_BeamElementInfo const* elements_begin  = 
                     st_Block_get_const_elements_begin( blocks );
                     
-                for( SIXTRL_SIZE_T ii = 0 ; ii < NTURNS ; ++ii )
+                #if defined( _OPENMP )
+                std::size_t const MAX_NUM_THREADS = omp_get_max_threads();
+                
+                if( ( NPARTS >= MAX_NUM_THREADS ) && ( MAX_NUM_THREADS > 0 ) )
                 {
-                    for( SIXTRL_SIZE_T jj = 0 ; jj < NPARTS ; ++jj )
+                    #pragma omp parallel
                     {
-                        st_Track_single_particle( 
-                            elements_begin, NELEMS, particles, jj, 
-                                ptr_elem_by_elem.get() );
-                    }
+                        //int const thread_rank = omp_get_thread_num();
+                #endif /* defined( OPENMP ) */                    
                     
-                    if( turn_by_turn_flag )
-                    {
-                        st_Particles_copy_all_unchecked( 
-                            st_ParticlesSequence_get_particles_by_index( 
-                                ptr_turn_by_turn.get(), ii ), particles );
+                        for( SIXTRL_SIZE_T ii = 0 ; ii < NTURNS ; ++ii )
+                        {
+                            #if defined( _OPENMP )
+                            #pragma omp for 
+                            #endif /* defined( _OPENMP ) */
+                            for( SIXTRL_SIZE_T jj = 0 ; jj < NPARTS ; ++jj )
+                            {
+                                st_Track_single_particle( 
+                                    elements_begin, NELEMS, particles, jj, 
+                                        ptr_elem_by_elem.get() );                                
+                            }
+                            
+                            #if defined( _OPENMP )
+                            #pragma omp single
+                            #endif
+                            if( turn_by_turn_flag )
+                            {
+                                st_Particles_copy_all_unchecked( 
+                                    st_ParticlesSequence_get_particles_by_index( 
+                                        ptr_turn_by_turn.get(), ii ), particles );
+                            }
+                        }                    
+                    
+                #if defined( _OPENMP )
                     }
                 }
+                #endif /* defined( _OPENMP ) */
                 
                 /* ********************************************************* */
                 /* END CODE TO BENCHMARK HERE:                             */

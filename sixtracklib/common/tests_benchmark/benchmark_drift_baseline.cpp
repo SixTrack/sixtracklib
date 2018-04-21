@@ -170,7 +170,7 @@ int main()
                 
                 if( ( NPARTS >= MAX_NUM_THREADS ) && ( MAX_NUM_THREADS > 0 ) )
                 {
-                    #pragma omp parallel
+                    #pragma omp parallel num_threads( MAX_NUM_THREADS )
                     {
                         
                 #endif /* defined( OPENMP ) */                    
@@ -180,7 +180,7 @@ int main()
                             int const nparts = NPARTS;
                             
                             #if defined( _OPENMP )
-                            #pragma omp for nowait num_threads( MAX_NUM_THREADS )
+                            #pragma omp for nowait
                             #endif /* defined( _OPENMP ) */
                             for( int jj = 0 ; jj < nparts ; ++jj )
                             {

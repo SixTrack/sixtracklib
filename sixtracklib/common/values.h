@@ -23,7 +23,7 @@ typedef union NS(CommonValues)
     SIXTRL_INT8_T   i8[ 8 ];
     SIXTRL_UINT8_T  u8[ 8 ];
 }
-NS(value_t);
+NS(value_t) __attribute__ ((aligned (16)));
 
 #if !defined( _GPUCODE )
 
