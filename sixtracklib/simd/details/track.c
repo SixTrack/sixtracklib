@@ -163,7 +163,7 @@ int NS(Track_simd_drift_avx)(
             ( ( ( ( uintptr_t )s      ) % REQ_ALIGN ) == addr_offset ) &&
             ( ( ( ( uintptr_t )x      ) % REQ_ALIGN ) == addr_offset ) &&
             ( ( ( ( uintptr_t )y      ) % REQ_ALIGN ) == addr_offset ) &&
-            ( ( ( ( uintptr_t )sigma  ) % REQ_ALIGN ) == addr_offset ) );
+            ( ( ( ( uintptr_t )sig    ) % REQ_ALIGN ) == addr_offset ) );
     
     if( addr_offset != ( uintptr_t )0u )
     {
@@ -198,7 +198,7 @@ int NS(Track_simd_drift_avx)(
             }
         };
         
-        assert( ( ( add_offset + ii ) % REQ_ALIGN ) == 0u );
+        assert( ( ( addr_offset + ii ) % REQ_ALIGN ) == 0u );
     }
     
     if( ii < num )
