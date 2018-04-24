@@ -1,7 +1,8 @@
 # sixtracklib/sixtracklib/common/CMakeLists.txt
 
 set( SIXTRACKLIB_COMMON_HEADERS 
-     details/tools.h     
+     details/tools.h 
+     details/gpu_kernel_tools.h
      block.h
      impl/block_type.h     
      block_drift.h
@@ -22,6 +23,7 @@ set( SIXTRACKLIB_COMMON_HEADERS
 set( SIXTRACKLIB_COMMON_SOURCES
      details/block.c
      details/block_drift.c
+     details/gpu_kernel_tools.c
      details/mem_pool.c
      details/particles.c
      details/particles_sequence.c
