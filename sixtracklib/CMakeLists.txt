@@ -12,6 +12,10 @@
 
 # ------------------------------------------------------------------------------
 
+set( SIXTRACKL_LINK_LIBRARIES )
+
+# ------------------------------------------------------------------------------
+
 if( SIXTRACKL_C_NAMESPACE_PREFIX )
     add_definitions( "-D__NAMESPACE=${SIXTRACKL_C_NAMESPACE_PREFIX}" )
 else()
@@ -23,9 +27,14 @@ endif()
 # this directory. This is used as prefix for all source files which have to 
 # be processed during run-time (e.g. GPU Kernels, etc.) 
 
-set( SIXTRACKLIB_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" )
+# Note: Paths in CMake always use a slash as separator and always lack a 
+#       trailing slashes -> add them to make it easier to use the 
+#       macro in _impl/path.h as a prefix for filename and directory paths!
+
+set( SIXTRACKLIB_BASE_DIR "${CMAKE_SOURCE_DIR}/" )
 configure_file( _impl/path.h.template "${CMAKE_CURRENT_SOURCE_DIR}/_impl/path.h"
                 @ONLY )
+
 
 # ------------------------------------------------------------------------------
 # CPU/System architecture settings:
@@ -38,11 +47,11 @@ if( SIXTRACKL_CPU_ARCH MATCHES "avx" )
     
 elseif( SIXTRACKL_CPU_ARCH MATCHES "sse2" )
     message( STATUS "---- Optimizing for SSE2 architecture" )
-    set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -msse2 )
+    set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -msse2  )
     
 elseif( SIXTRACKL_CPU_ARCH MATCHES "native" )
     message( STATUS "---- Optimizing for native environment of the CPU" )
-    set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -march=native )
+    set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -march=native  )
     
 endif()
                 
@@ -61,6 +70,7 @@ set( SIXTRACKL_HEADERS
 add_subdirectory( common )
 set( SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_common> )
 
+# ------------------------------------------------------------------------------
 
 if( SIXTRACKL_ENABLE_MANUAL_SIMD )    
     
@@ -68,14 +78,55 @@ if( SIXTRACKL_ENABLE_MANUAL_SIMD )
     
     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
          $<TARGET_OBJECTS:sixtrack_simd> )    
+         
+    set( SIXTRACKL_ENABLE_MODULE_SIMD 1 )
+else()
+    set( SIXTRACKL_ENABLE_MODULE_SIMD 0 )
 endif()
 
 # ------------------------------------------------------------------------------
+
+if( SIXTRACKL_ENABLE_OPENCL )
+    add_subdirectory( opencl )
+    
+    set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
+         $<TARGET_OBJECTS:sixtrack_opencl> )
+         
+    set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} 
+                                  ${SIXTRACKL_OPENCL_LIBRARY} )
+                                  
+    set( SIXTRACKL_ENABLE_MODULE_OPENCL 1 )
+    
+else()
+    
+    set( SIXTRACKL_ENABLE_MODULE_OPENCL 0 )
+
+endif()
+
+# ------------------------------------------------------------------------------
+
+configure_file( _impl/modules.h.template 
+                "${CMAKE_CURRENT_SOURCE_DIR}/_impl/modules.h" @ONLY )
+
+# ------------------------------------------------------------------------------
+
+set( SIXTRACKL_HEADERS
+     _impl/definitions.h
+     _impl/modules.h 
+     _impl/namespace_begin.h
+     _impl/namespace_end.h 
+     _impl/path.h )
+
+set( SIXTRACKL_SOURCES )
 
 add_library( sixtrack SHARED 
              ${SIXTRACKL_HEADERS} ${SIXTRACKL_SOURCES} 
              ${SIXTRACKL_LIBRARY_MODULES} 
 )
+
+if( SIXTRACKL_LINK_LIBRARIES )
+    target_link_libraries( sixtrack ${SIXTRACKL_LINK_LIBRARIES} )
+endif()
 
 set_target_properties( sixtrack PROPERTIES LINKER_LANGUAGE C )
 set_target_properties( sixtrack PROPERTIES POSITION_INDEPENDENT_CODE True )
