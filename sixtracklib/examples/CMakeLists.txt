@@ -6,7 +6,7 @@ target_include_directories( simple_drift PRIVATE ${CMAKE_SOURCE_DIR} )
 target_link_libraries( simple_drift sixtrack m )
 
 target_compile_options( simple_drift BEFORE PRIVATE 
-    -fno-tree-vectorize -fopt-info-loop -fno-fast-math )
+    -g -fno-tree-vectorize -fopt-info-loop -fno-fast-math )
         
 set_target_properties( simple_drift PROPERTIES LINKER_LANGUAGE C )
 set_target_properties( simple_drift PROPERTIES C_STANDARD 99 )
@@ -41,7 +41,7 @@ if( SIXTRACKL_ENABLE_AUTOVECTORIZATION )
     target_link_libraries( simple_drift_autovec sixtrack m )
 
     target_compile_options( simple_drift_autovec BEFORE PRIVATE 
-        -ftree-vectorize -ftree-vectorizer-verbose=6 -fopt-info-loop 
+        -g -ftree-vectorize -ftree-vectorizer-verbose=6 -fopt-info-loop 
         -fno-fast-math --param vect-max-version-for-alias-checks=50 
         ${SIXTRACKL_EXAMPLE_AUTOVEC_CPU_ARCH} )
             
@@ -79,7 +79,7 @@ if( SIXTRACKL_ENABLE_MANUAL_SIMD )
     target_link_libraries( simple_drift_simd sixtrack m )
 
     target_compile_options( simple_drift_simd BEFORE PRIVATE 
-        -g3 -fno-fast-math ${SIXTRACKL_EXAMPLE_SIMD_CPU_ARCH} -Wall -Werror -pedantic -ansi )
+       -g -fno-fast-math ${SIXTRACKL_EXAMPLE_SIMD_CPU_ARCH} -Wall -Werror -pedantic -ansi )
             
     set_target_properties( simple_drift_simd PROPERTIES LINKER_LANGUAGE C )
     set_target_properties( simple_drift_simd PROPERTIES C_STANDARD 99 )
@@ -87,6 +87,26 @@ if( SIXTRACKL_ENABLE_MANUAL_SIMD )
 
 endif()
 
+# ------------------------------------------------------------------------------
+# simple_drift_opencl.c -> simple_drift_opencl :
+
+if( SIXTRACKL_ENABLE_OPENCL )
+
+    message( STATUS "Building OpenCL example .... " )
+    
+    add_executable( simple_drift_opencl simple_drift_opencl.c )
+    
+    target_include_directories( simple_drift_opencl PRIVATE ${CMAKE_SOURCE_DIR} )
+    target_link_libraries( simple_drift_opencl sixtrack m 
+                           ${SIXTRACKL_OPENCL_LIBRARY} )
+
+    target_compile_options( simple_drift_opencl BEFORE PRIVATE 
+       -g  -fno-fast-math -Wall -Werror -pedantic -ansi )
+            
+    set_target_properties( simple_drift_opencl PROPERTIES LINKER_LANGUAGE C )
+    set_target_properties( simple_drift_opencl PROPERTIES C_STANDARD 99 )
+
+endif()
 
 
 
