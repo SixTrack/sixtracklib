@@ -1,16 +1,20 @@
 #ifndef SIXTRACKLIB__IMPL_DEFINITIONS_H__
 #define SIXTRACKLIB__IMPL_DEFINITIONS_H__
 
-#include "sixtracklib/_impl/namespace_begin.h"
-
 #if !defined( _GPUCODE )
+
     #include <assert.h>
     #include <stddef.h>
     #include <stdint.h>
     #include <stdlib.h>
+
+#include "sixtracklib/_impl/namespace_begin.h"
+
 #endif /* defined( _GPUCODE ) */
 
 #if defined( _GPUCODE )
+
+    #define SIXTRL_ALIGN 64u
     
     /* ---------------------------------------------------------------- */
     /* assert: */
@@ -102,6 +106,10 @@
     
     /* ---------------------------------------------------------------- */
     /* static, inline and restrict keywords:                                    */
+    
+    #if !defined( SIXTRL_RESTRICT )
+    #define SIXTRL_RESTRICT SIXTRL_GPUKERNEL_RESTRICT
+    #endif /* !defined( SIXTRL_RESTRICT ) */
     
     #if !defined( SIXTRL_STATIC )
         #define SIXTRL_STATIC static
@@ -298,7 +306,7 @@
         /* ----------------------------------------------------------- */ \
         \
         SIXTRL_SIZE_T __ii = 0; \
-        do{ *( ( dest ) + __ii ) = *( ( source ) + __ii ) } while( __ii < ( n ) )
+        do{ *( ( dest ) + __ii ) = *( ( source ) + __ii ); } while( __ii < ( n ) )
         
     #elif !defined( _GPUCODE )
         #define SIXTRACKLIB_COPY_VALUES( T, dest, source, n )                 \
