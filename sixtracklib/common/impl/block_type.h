@@ -72,8 +72,9 @@ SIXTRL_STATIC void* NS(BeamElementInfo_get_ptr_mem_begin)(
 SIXTRL_STATIC void NS(BeamElementInfo_set_ptr_mem_begin)(
     struct NS(BeamElementInfo)* SIXTRL_RESTRICT info, void* ptr_begin );
 
-
+#if !defined( _GPUCODE )
 SIXTRL_STATIC SIXTRL_INT64_T const NS(PARTICLES_INVALID_BEAM_ELEMENT_ID) = INT64_C( -1 );
+#endif /* !defined( _GPUCODE ) */
 
 /* ========================================================================= */
 
@@ -96,52 +97,56 @@ NS(Block);
 
 /* -------------------------------------------------------------------------- */
 
-static SIXTRL_UINT64_T const NS( BLOCK_FLAGS_NONE ) = ( SIXTRL_UINT64_T )0x0000;
-static SIXTRL_UINT64_T const NS( BLOCK_FLAGS_PACKED ) = ( SIXTRL_UINT64_T )0x0001;
-static SIXTRL_UINT64_T const NS( BLOCK_FLAGS_OWNS_MEMORY ) = ( SIXTRL_UINT64_T )0x0002;
+#if !defined( _GPUCODE )
 
-static SIXTRL_UINT64_T const
+SIXTRL_STATIC SIXTRL_UINT64_T const NS( BLOCK_FLAGS_NONE ) = ( SIXTRL_UINT64_T )0x0000;
+SIXTRL_STATIC SIXTRL_UINT64_T const NS( BLOCK_FLAGS_PACKED ) = ( SIXTRL_UINT64_T )0x0001;
+SIXTRL_STATIC SIXTRL_UINT64_T const NS( BLOCK_FLAGS_OWNS_MEMORY ) = ( SIXTRL_UINT64_T )0x0002;
+
+SIXTRL_STATIC SIXTRL_UINT64_T const
     NS( BLOCK_FLAGS_MEM_CTX_MEMPOOL ) = ( SIXTRL_UINT64_T )0x0010;
 
-static SIXTRL_UINT64_T const 
+SIXTRL_STATIC SIXTRL_UINT64_T const 
     NS( BLOCK_FLAGS_MEM_CTX_FLAT_MEMORY ) = ( SIXTRL_UINT64_T )0x0020;
 
-static SIXTRL_UINT64_T const NS( BLOCK_FLAGS_ALIGN_MASK ) = ( SIXTRL_UINT64_T )0xFFFF00;
+SIXTRL_STATIC SIXTRL_UINT64_T const NS( BLOCK_FLAGS_ALIGN_MASK ) = ( SIXTRL_UINT64_T )0xFFFF00;
 
-static SIXTRL_UINT64_T const NS( BLOCK_MAX_ALIGNMENT ) = ( SIXTRL_UINT64_T )0xFFFF;
+SIXTRL_STATIC SIXTRL_UINT64_T const NS( BLOCK_MAX_ALIGNMENT ) = ( SIXTRL_UINT64_T )0xFFFF;
 
-static SIXTRL_UINT64_T const
+SIXTRL_STATIC SIXTRL_UINT64_T const
     NS( BLOCK_FLAGS_ALIGN_MASK_OFFSET_BITS ) = ( SIXTRL_UINT64_T )8u;
 
-static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_CAPACITY ) = ( SIXTRL_SIZE_T )1024u;
-static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_ELEMENT_CAPACITY ) = (SIXTRL_SIZE_T)512u;
-static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_MEMPOOL_CHUNK_SIZE ) = (SIXTRL_SIZE_T)8u;
-static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_ALIGNMENT) = ( SIXTRL_SIZE_T )8u;
-static SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_MEMPOOL_ALIGNMENT ) = (SIXTRL_SIZE_T)16u;
+SIXTRL_STATIC SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_CAPACITY ) = ( SIXTRL_SIZE_T )1024u;
+SIXTRL_STATIC SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_ELEMENT_CAPACITY ) = (SIXTRL_SIZE_T)512u;
+SIXTRL_STATIC SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_MEMPOOL_CHUNK_SIZE ) = (SIXTRL_SIZE_T)8u;
+SIXTRL_STATIC SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_ALIGNMENT) = ( SIXTRL_SIZE_T )8u;
+SIXTRL_STATIC SIXTRL_SIZE_T const NS( BLOCK_DEFAULT_MEMPOOL_ALIGNMENT ) = (SIXTRL_SIZE_T)16u;
 
 /* ------------------------------------------------------------------------- */
 
-static NS(Block)* NS(Block_preset)( NS(Block)* SIXTRL_RESTRICT block );
+SIXTRL_STATIC NS(Block)* NS(Block_preset)( NS(Block)* SIXTRL_RESTRICT block );
 
-static SIXTRL_SIZE_T NS(Block_get_capacity)(
+#endif /* !defined( _GPUCODE ) */
+
+SIXTRL_STATIC SIXTRL_SIZE_T NS(Block_get_capacity)(
     const struct NS(Block) *const SIXTRL_RESTRICT block );
 
-static SIXTRL_SIZE_T NS(Block_get_size)(
+SIXTRL_STATIC SIXTRL_SIZE_T NS(Block_get_size)(
     const struct NS(Block) *const SIXTRL_RESTRICT block );
 
-static SIXTRL_UINT64_T NS(Block_get_flags)( 
+SIXTRL_STATIC SIXTRL_UINT64_T NS(Block_get_flags)( 
     const struct NS(Block) *const SIXTRL_RESTRICT block );
 
-static struct NS(BeamElementInfo)* NS(Block_get_elements_begin)(
+SIXTRL_STATIC struct NS(BeamElementInfo)* NS(Block_get_elements_begin)(
     struct NS(Block)* SIXTRL_RESTRICT block );
 
-static struct NS(BeamElementInfo)* NS(Block_get_elements_end)(
+SIXTRL_STATIC struct NS(BeamElementInfo)* NS(Block_get_elements_end)(
     struct NS(Block)* SIXTRL_RESTRICT block );
 
-static struct NS(BeamElementInfo) const* NS(Block_get_const_elements_begin)(
+SIXTRL_STATIC struct NS(BeamElementInfo) const* NS(Block_get_const_elements_begin)(
     const struct NS(Block) *const SIXTRL_RESTRICT block );
 
-static struct NS(BeamElementInfo) const* NS(Block_get_const_elements_end)(
+SIXTRL_STATIC struct NS(BeamElementInfo) const* NS(Block_get_const_elements_end)(
     const struct NS(Block) *const SIXTRL_RESTRICT block );
 
 
@@ -154,7 +159,7 @@ SIXTRL_INLINE NS(BeamElementInfo)* NS(BeamElementInfo_preset)(
 {
     if( info != 0 )
     {
-        info->element_id    = NS(PARTICLES_INVALID_BEAM_ELEMENT_ID);
+        info->element_id    = -1;
         info->type_id       = NS(ELEMENT_TYPE_NONE);
         info->ptr_mem_begin = 0;
     }
@@ -179,7 +184,7 @@ SIXTRL_INLINE void NS(BeamElementInfo_set_type_id)(
 SIXTRL_INLINE SIXTRL_INT64_T NS(BeamElementInfo_get_element_id)(
     const NS(BeamElementInfo) * const SIXTRL_RESTRICT info )
 {
-    return ( info != 0 ) ? info->element_id : NS(PARTICLES_INVALID_BEAM_ELEMENT_ID);
+    return ( info != 0 ) ? info->element_id : -1;
 }
 
 SIXTRL_INLINE void NS(BeamElementInfo_set_element_id)(
@@ -194,7 +199,7 @@ SIXTRL_INLINE bool NS(BeamElementInfo_is_available)(
     const NS(BeamElementInfo) * const SIXTRL_RESTRICT info )
 {
     return ( ( info != 0 ) && ( info->ptr_mem_begin != 0 ) &&
-             ( info->element_id != NS(PARTICLES_INVALID_BEAM_ELEMENT_ID) ) );
+             ( info->element_id != -1 ) );
 }
 
 
@@ -220,6 +225,7 @@ SIXTRL_INLINE void NS(BeamElementInfo_set_ptr_mem_begin)(
 
 /* ------------------------------------------------------------------------- */
 
+#if !defined( _GPUCODE )
 SIXTRL_INLINE NS(Block)* NS(Block_preset)( NS(Block)* SIXTRL_RESTRICT block )
 {
     if( block != 0 )
@@ -237,6 +243,8 @@ SIXTRL_INLINE NS(Block)* NS(Block_preset)( NS(Block)* SIXTRL_RESTRICT block )
     return block;
 }
 
+#endif /* !defined( _GPUCODE ) */
+
 SIXTRL_INLINE SIXTRL_SIZE_T NS(Block_get_capacity)(
     const NS(Block) *const SIXTRL_RESTRICT block )
 {
@@ -252,7 +260,7 @@ SIXTRL_INLINE SIXTRL_SIZE_T NS(Block_get_size)(
 SIXTRL_INLINE SIXTRL_UINT64_T NS(Block_get_flags)( 
     const NS(Block) *const SIXTRL_RESTRICT block )
 {
-    return ( block ) ? block->flags : UINT64_C( 0 );
+    return ( block ) ? block->flags : ( SIXTRL_UINT64_T )0u;
 }
 
 SIXTRL_INLINE NS(BeamElementInfo)* NS(Block_get_elements_begin)(
@@ -282,7 +290,7 @@ SIXTRL_INLINE NS(BeamElementInfo) const* NS(Block_get_const_elements_end)(
     if( end_ptr != 0 )
     {
         SIXTRL_SIZE_T const num_of_elements = block->size;
-        assert( num_of_elements <= block->capacity );
+        SIXTRL_ASSERT( num_of_elements <= block->capacity );
         end_ptr = end_ptr + num_of_elements;
     }
     

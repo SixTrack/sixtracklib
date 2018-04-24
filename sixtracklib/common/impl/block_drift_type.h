@@ -299,10 +299,10 @@ SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
     unsigned char* ptr_lengths    = 0;
     unsigned char* ptr_elemids    = 0;
     
-    #if !defined( _GPUCODE )
     
     SIXTRL_UINT64_T* serial_len_ptr = ( SIXTRL_UINT64_T* )( mem );
     
+    #if !defined( _GPUCODE )
     #if !defined( NDEBUG )
     
     unsigned char* ptr_num_drifts = 0;
@@ -345,9 +345,9 @@ SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
     ptr_type_id = mem + TYPEID_ADDR_OFFSET;
     NS(Drift_set_type_id)( drift, *( ( SIXTRL_UINT64_T* )ptr_type_id ) );
     
-    #if !defined( NDEBUG )
+    #if !defined( _GPUCODE ) && !defined( NDEBUG )
     ptr_num_drifts = mem + NDRIFT_ADDR_OFFSET;
-    #endif /* !defined( NDEBUG ) */
+    #endif /* !defined( _GPUCODE ) && !defined( NDEBUG ) */
     
     lengths_offset = *( ( SIXTRL_UINT64_T* )( mem + LENGTH_ADDR_OFFSET ) );
     ptr_lengths =  mem + lengths_offset;
@@ -357,7 +357,7 @@ SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
     
     #if !defined( _GPUCODE )
     
-    assert( ( *ptr_num_drifts == ( SIXTRL_UINT64_T )1u ) &&
+    SIXTRL_ASSERT( ( *ptr_num_drifts == ( SIXTRL_UINT64_T )1u ) &&
             ( ( ( ( uintptr_t )ptr_lengths ) % REAL_SIZE ) == ZERO ) &&
             ( ( ( ( uintptr_t )ptr_elemids ) % I64_SIZE  ) == ZERO ) );
     
