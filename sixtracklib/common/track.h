@@ -1,9 +1,9 @@
 #ifndef SIXTRACKLIB_COMMON_TRACK_H__
 #define SIXTRACKLIB_COMMON_TRACK_H__
 
-#include "sixtracklib/_impl/definitions.h"
-
 #if !defined( _GPUCODE )
+
+#include "sixtracklib/_impl/definitions.h"
 
 #include <stddef.h>
 #include <stdint.h>
