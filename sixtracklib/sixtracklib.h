@@ -12,6 +12,7 @@
 
 #include "sixtracklib/_impl/namespace_begin.h"
 #include "sixtracklib/_impl/path.h"
+#include "sixtracklib/_impl/modules.h"
 
 #include "sixtracklib/common/mem_pool.h"
 #include "sixtracklib/common/block.h"
@@ -30,7 +31,21 @@
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#include "sixtracklib/simd/track.h"
+#if defined( SIXTRACKLIB_ENABLE_MODULE_SIMD ) && \
+           ( SIXTRACKLIB_ENABLE_MODULE_SIMD == 1 )
+    
+    #include "sixtracklib/simd/track.h"
+           
+#endif /* defined( SIXTRACKLIB_ENABLE_MODULE_SIMD ) */
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+#if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
+           ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
+           
+    #include "sixtracklib/opencl/ocl_environment.h"
+           
+#endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
 
 /* ------------------------------------------------------------------------- */
 
