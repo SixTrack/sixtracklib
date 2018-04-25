@@ -61,7 +61,8 @@ typedef struct NS(OpenCLEnv)
     cl_kernel          kernel;
     cl_command_queue   queue;
     cl_mem             particles_buffer;
-    cl_mem             blocks_buffer;
+    cl_mem             beam_elem_info_buffer;
+    cl_mem             beam_elem_data_buffer;
     cl_mem             elem_by_elem_buffer;
     cl_mem             turn_by_turn_buffer;    
         
@@ -69,8 +70,14 @@ typedef struct NS(OpenCLEnv)
     
     struct NS(OpenCLEnvNodeDevice)* nodes;
     struct NS(OpenCLEnvNodeDevice)* default_node;
+    struct NS(OpenCLEnvNodeDevice)* selected_nodes;
     
+    size_t             num_selected_nodes;
     size_t             num_devices;
+    
+    SIXTRL_UINT64_T    num_beam_elements;
+    SIXTRL_UINT64_T    num_particles;
+    SIXTRL_UINT64_T    num_turns;
     
     char*              current_id_str;
     char*              current_kernel_function;
@@ -81,9 +88,7 @@ typedef struct NS(OpenCLEnv)
 NS(OpenCLEnv);
 
 struct NS(Particles);
-struct NS(Drift);
-struct NS(BeamElementInfo);
-struct NS(Drift);
+struct NS(BeamElements);
 
 NS(OpenCLEnv)* NS(OpenCLEnv_init)();
 
@@ -104,20 +109,16 @@ bool NS(OpenCLEnv_is_ready)(
 bool NS(OpenCLEnv_prepare)( struct NS(OpenCLEnv)* ocl_env, 
     char const* node_device_id, char const* kernel_function_name, 
     char* kernel_source_files, char const* compile_options,
-    const struct NS(Particles) *const SIXTRL_RESTRICT particles,
-    const struct NS(BeamElementInfo) *const SIXTRL_RESTRICT beam_elements, 
-    SIXTRL_SIZE_T const num_beam_elements );
+    SIXTRL_SIZE_T const num_turns,
+    struct NS(Particles) const* SIXTRL_RESTRICT particles,
+    struct NS(BeamElements) const* SIXTRL_RESTRICT beam_elements );
 
-bool NS(OpenCLEnv_track_drift)( 
-    NS(OpenCLEnv)* SIXTRL_RESTRICT ocl_env, 
-    struct NS(Particles)* SIXTRL_RESTRICT particles, 
-    const struct NS(Drift) *const SIXTRL_RESTRICT drift );
+bool NS(OpenCLEnv_track_particles)( 
+    struct NS(OpenCLEnv)* ocl_env, 
+    struct NS(Particles)*   SIXTRL_RESTRICT particles, 
+    struct NS(BeamElements)* SIXTRL_RESTRICT beam_elements );
    
-char** NS(OpenCLEnv_build_kernel_files_list)(
-    char* filenames, SIXTRL_SIZE_T* ptr_num_of_files, 
-    char const* prefix, char const* separator );
-
-void NS(OpenCLEnv_free_kernel_files_list)( char** paths_to_kernel_files );
+                       
 
 #endif /* SIXTRACKLIB_OPENCL_CL_ENVIRONMENT_H__ */
 

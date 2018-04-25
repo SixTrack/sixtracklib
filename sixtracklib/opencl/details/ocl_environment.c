@@ -19,10 +19,11 @@
 #include "sixtracklib/_impl/namespace_begin.h"
 #include "sixtracklib/_impl/path.h"
 #include "sixtracklib/common/details/gpu_kernel_tools.h"
-#include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/impl/particles_type.h"
 #include "sixtracklib/common/impl/block_type.h"
 #include "sixtracklib/common/impl/block_drift_type.h"
+#include "sixtracklib/common/beam_elements.h"
+#include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/track.h"
 
 /* ------------------------------------------------------------------------- */
@@ -60,14 +61,14 @@ extern bool NS(OpenCLEnv_is_ready)(
 extern bool NS(OpenCLEnv_prepare)( struct NS(OpenCLEnv)* ocl_env, 
     char const* node_device_id, char const* kernel_function_name, 
     char* kernel_source_files, char const* compile_options,
-    const struct NS(Particles) *const SIXTRL_RESTRICT particles,
-    const struct NS(BeamElementInfo) *const SIXTRL_RESTRICT beam_elements, 
-    SIXTRL_SIZE_T const num_beam_elements );
+    SIXTRL_SIZE_T const num_turns,
+    NS(Particles) const* SIXTRL_RESTRICT particles,
+    NS(BeamElements) const* SIXTRL_RESTRICT beam_elements );
 
-extern bool NS(OpenCLEnv_track_drift)( 
-    struct NS(OpenCLEnv)* SIXTRL_RESTRICT ocl_env, 
-    struct NS(Particles)* SIXTRL_RESTRICT particles, 
-    const struct NS(Drift) *const SIXTRL_RESTRICT drift );
+extern bool NS(OpenCLEnv_track_particles)( 
+    struct NS(OpenCLEnv)* ocl_env, 
+    struct NS(Particles)*   SIXTRL_RESTRICT particles, 
+    struct NS(BeamElements)* SIXTRL_RESTRICT beam_elements );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -80,7 +81,7 @@ static uint64_t const NS(HAS_KERNEL)                 = UINT64_C( 0x00000020 );
 static uint64_t const NS(HAS_QUEUE)                  = UINT64_C( 0x00000040 );
                                                      
 static uint64_t const NS(HAS_PARTICLES_BUFFER)       = UINT64_C( 0x00000080 );
-static uint64_t const NS(HAS_BLOCKS_BUFFER)          = UINT64_C( 0x00000100 );
+static uint64_t const NS(HAS_BEAM_ELEMS_BUFFERS)     = UINT64_C( 0x00000100 );
 static uint64_t const NS(HAS_E_BY_E_BUFFER)          = UINT64_C( 0x00000200 );
 static uint64_t const NS(HAS_T_BY_T_BUFFER)          = UINT64_C( 0x00000400 );
                                                      
@@ -217,14 +218,21 @@ NS(OpenCLEnv)* NS(OpenCLEnv_preset)( NS(OpenCLEnv)* ocl_env )
         ocl_env->devices = 0;        
         ocl_env->ressources_flags = UINT64_C( 0 );
         
-        ocl_env->nodes        = 0;
-        ocl_env->default_node = 0;
-        ocl_env->num_devices  = ZERO_SIZE;
+        ocl_env->nodes                      = 0;
+        ocl_env->default_node               = 0;
+        ocl_env->selected_nodes             = 0;
         
-        ocl_env->current_id_str = 0;
-        ocl_env->current_kernel_function = 0;
-        ocl_env->kernel_source  = 0;
-        ocl_env->is_ready       = false;
+        ocl_env->num_selected_nodes         = ZERO_SIZE;
+        ocl_env->num_devices                = ZERO_SIZE;
+        
+        ocl_env->num_beam_elements          = ( SIXTRL_UINT64_T )0u;
+        ocl_env->num_particles              = ( SIXTRL_UINT64_T )0u;
+        ocl_env->num_turns                  = ( SIXTRL_UINT64_T )0u;
+        
+        ocl_env->current_id_str             = 0;
+        ocl_env->current_kernel_function    = 0;
+        ocl_env->kernel_source              = 0;
+        ocl_env->is_ready                   = false;
     }
     
     return ocl_env;
@@ -414,6 +422,14 @@ void NS(OpenCLEnv_free)( NS(OpenCLEnv)* ocl_env )
         
         if( ( flags & NS(HAS_NODES ) ) == NS(HAS_NODES ) )
         {
+            if( ocl_env->num_selected_nodes > ( SIXTRL_SIZE_T )1u )
+            {
+                free( ocl_env->selected_nodes );                
+            }
+            
+            ocl_env->selected_nodes = 0;
+            ocl_env->num_selected_nodes = ( SIXTRL_SIZE_T )0u;
+            
             NS(OpenCLEnvNodeDevice_free)( ocl_env->nodes );
             flags &= ~( NS(HAS_NODES ) );
         }
@@ -478,17 +494,23 @@ bool NS(OpenCLEnv_is_ready)(
 bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env, 
     char const* node_device_id, char const* kernel_function_name, 
     char* kernel_source_files, char const* compile_options,
-    const struct NS(Particles) *const SIXTRL_RESTRICT particles,
-    const struct NS(BeamElementInfo) *const SIXTRL_RESTRICT beam_elements, 
-    SIXTRL_SIZE_T const num_beam_elements )
+    SIXTRL_SIZE_T const num_turns,
+    NS(Particles) const* SIXTRL_RESTRICT particles,
+    NS(BeamElements) const* SIXTRL_RESTRICT beam_elements )
 {
     bool success = false;
     
     static SIXTRL_SIZE_T const ZERO_SIZE = ( SIXTRL_SIZE_T )0u;
     
+    ( void )particles;
+    
     if( ( ocl_env != 0 ) && 
-        /* ( particles != 0 ) && ( beam_elements != 0 ) && 
-         * ( num_beam_elements > ZERO_SIZE ) && */
+        ( num_turns > 0u ) &&
+        /* ( particles != 0 ) && */
+        ( beam_elements  != 0 ) && 
+        ( beam_elements->num_elements ) && 
+        ( beam_elements->info_begin != 0 ) &&
+        ( beam_elements->data_begin != 0 ) &&
         ( node_device_id != 0 ) && ( kernel_function_name != 0 ) && 
         ( kernel_source_files != 0 ) )
     {
@@ -512,10 +534,7 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                 kernel_source_files, &num_kernel_files, 
                     NS(PATH_TO_BASE_DIR), "," );
                 
-            success = ( ( path_kernel_files != 0 ) && 
-                        ( num_kernel_files > ZERO_SIZE ) );
-            
-            if( success )
+            if( ( path_kernel_files != 0 ) && ( num_kernel_files > ZERO_SIZE ) )
             {
                 source_line_offsets = ( SIXTRL_SIZE_T* )malloc( 
                     sizeof( SIXTRL_SIZE_T ) * num_kernel_files );
@@ -551,6 +570,9 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                 if( node != 0 )
                 {
                     SIXTRL_SIZE_T const id_str_len = strlen( node->id_str );
+                    
+                    ocl_env->selected_nodes = node;
+                    ocl_env->num_selected_nodes = ( SIXTRL_SIZE_T )1u;
                     
                     ocl_env->current_id_str = ( char* )malloc( 
                         sizeof( char ) * ( id_str_len + 1 ) );
@@ -599,15 +621,49 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
             
             if( success )
             {
+                SIXTRL_SIZE_T const DEFAULT_LOC_COMP_OPTIONS_LEN = 10240u;
+                
                 cl_int ret = CL_FALSE;                
-                char default_options[] = "";
+                cl_device_id device = ocl_env->devices[ node->env_device_index ];
                 
-                cl_device_id device = 
-                    ocl_env->devices[ node->env_device_index ];
-                
-                if( compile_options == 0 ) compile_options = &default_options[ 0 ];
-                
+                char* local_compile_options = 0;
+                    
+                SIXTRL_SIZE_T comp_options_len = ( compile_options != 0 ) 
+                        ? ( strlen( compile_options ) + 1u )
+                        : DEFAULT_LOC_COMP_OPTIONS_LEN;
+                      
                 success = false;
+                        
+                if( comp_options_len < DEFAULT_LOC_COMP_OPTIONS_LEN )
+                {
+                    comp_options_len = DEFAULT_LOC_COMP_OPTIONS_LEN;
+                }
+                    
+                local_compile_options = ( char* )malloc( 
+                    comp_options_len * sizeof( char ) );
+                    
+                assert(  local_compile_options != 0 );
+                memset(  local_compile_options, ( int )'\0', comp_options_len );
+                
+                if( compile_options != 0 )
+                {
+                    strncpy( local_compile_options, compile_options, 
+                             comp_options_len );
+                }
+                
+                assert( ( ocl_env->selected_nodes != 0 ) &&
+                        ( ocl_env->num_selected_nodes == 1u ) );
+                
+                if( ( ocl_env->selected_nodes->extensions != 0 ) && 
+                    ( strstr( ocl_env->selected_nodes->extensions, 
+                              "cl_khr_fp64" ) != 0 ) )
+                {
+                    char const enable_fp64_flag[] = " -D SIXTRL_CL_ENABLE_FP64=1 ";
+                    
+                    strncat( local_compile_options, enable_fp64_flag, 
+                             comp_options_len - 
+                             ( 1 + strlen( local_compile_options ) ) );
+                }
                 
                 ret = clBuildProgram( ocl_env->program, 1, &device, 
                                       compile_options, 0, 0 );
@@ -674,6 +730,9 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                         log_buffer = 0;
                     }
                 }
+                
+                free( local_compile_options );
+                local_compile_options = 0;
             }
             
             if( success )
@@ -682,6 +741,8 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                 
                 SIXTRL_SIZE_T const kernel_fn_name_len = (SIXTRL_SIZE_T )1u + 
                     strlen( kernel_function_name );
+                    
+                success = false;
                     
                 ocl_env->current_kernel_function = ( char* )malloc(
                     sizeof( char ) * kernel_fn_name_len );
@@ -697,32 +758,118 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                     ocl_env->kernel = clCreateKernel( 
                         ocl_env->program, ocl_env->current_kernel_function, &ret );
                     
-                    success &= ( ret == CL_SUCCESS );                    
-                    
-                    if( success )
+                    if( ret == CL_SUCCESS )
                     {
                         ocl_env->ressources_flags |= NS(HAS_KERNEL);
                         ocl_env->ressources_flags |= NS(HAS_CURRENT_KERNEL_FN);
+                        
+                        success = true;
                     }
-                }
-                else
-                {
-                    success = false;
                 }
             }
             
             if( success )
             {
                 cl_int ret = CL_FALSE;
+                success    = false;
                 
                 ocl_env->queue = clCreateCommandQueue( 
                     ocl_env->context, ocl_env->devices[ node->env_device_index ], 
                         0, &ret );
                 
-                success &= ( ret == CL_SUCCESS );
                 
-                if( success ) ocl_env->ressources_flags |= NS(HAS_QUEUE );
+                
+                if( ret == CL_SUCCESS )
+                {
+                    ocl_env->ressources_flags |= NS(HAS_QUEUE );
+                    success = true;
+                }
             }
+            
+            if( success )
+            {
+                cl_int ret_info = CL_FALSE;
+                cl_int ret_data = CL_FALSE;
+                
+                SIXTRL_SIZE_T const num_elem  = beam_elements->num_elements;
+                
+                SIXTRL_SIZE_T const info_size = 
+                    sizeof( NS(BeamElemInfo) ) * num_elem;
+                
+                SIXTRL_SIZE_T const data_size = 
+                    beam_elements->info_begin[ num_elem - 1 ].mem_offset +
+                    beam_elements->info_begin[ num_elem - 1 ].num_bytes;
+                
+                printf( "%lu / %lu / %lu / %ld\r\n", 
+                        beam_elements->info_begin[ 16 ].mem_offset,
+                        beam_elements->info_begin[ 16 ].type_id,
+                        beam_elements->info_begin[ 16 ].num_bytes,
+                        beam_elements->info_begin[ 16 ].element_id );
+                    
+                success = false;
+                
+                ocl_env->num_turns = num_turns;
+                ocl_env->num_beam_elements = num_elem;
+                ocl_env->num_particles = ( SIXTRL_SIZE_T )1u; /* HACK!!!! */
+                
+                ocl_env->beam_elem_info_buffer = clCreateBuffer(
+                    ocl_env->context, CL_MEM_READ_WRITE, info_size, 0, &ret_info );
+                
+                ocl_env->beam_elem_data_buffer = clCreateBuffer(
+                    ocl_env->context, CL_MEM_READ_WRITE, data_size, 0, &ret_data );
+                
+                if( ( ret_data == CL_SUCCESS ) && ( ret_info == CL_SUCCESS ) )
+                {
+                    int cl_ret = CL_FALSE;
+                    
+                    ocl_env->ressources_flags |= NS(HAS_BEAM_ELEMS_BUFFERS);
+                    
+                    cl_ret  = clEnqueueWriteBuffer( ocl_env->queue, 
+                        ocl_env->beam_elem_info_buffer, CL_TRUE, 0u, info_size,
+                            beam_elements->info_begin, 0u, 0, 0 );
+                    
+                    cl_ret |= clEnqueueWriteBuffer( ocl_env->queue,
+                        ocl_env->beam_elem_data_buffer, CL_TRUE, 0u, data_size,
+                            beam_elements->data_begin, 0u, 0, 0 );
+                    
+                    if( cl_ret == CL_SUCCESS )
+                    {
+                        printf( "THERE (enqueued buffers) \r\n" );
+                        fflush( stdout );
+                        
+                        SIXTRL_SIZE_T const U64_SIZE = sizeof( SIXTRL_UINT64_T );
+                        
+                        cl_ret |= clSetKernelArg( ocl_env->kernel, 0, 
+                              U64_SIZE, &ocl_env->num_turns );
+                        
+                        printf( "cl_ret = %i\r\n", cl_ret );
+                        
+                        cl_ret |= clSetKernelArg( ocl_env->kernel, 1, 
+                              U64_SIZE, &ocl_env->num_beam_elements );
+                        
+                        printf( "cl_ret = %i\r\n", cl_ret );
+                        
+                        cl_ret |= clSetKernelArg( ocl_env->kernel, 2, 
+                              U64_SIZE, &ocl_env->num_particles );
+                        
+                        printf( "cl_ret = %i\r\n", cl_ret );
+                        
+                        cl_ret |= clSetKernelArg( ocl_env->kernel, 3, 
+                              sizeof( cl_mem ), &ocl_env->beam_elem_info_buffer );
+                        
+                        printf( "cl_ret = %i\r\n", cl_ret );
+                        
+                        cl_ret |= clSetKernelArg( ocl_env->kernel, 4, 
+                              sizeof( cl_mem ), &ocl_env->beam_elem_data_buffer );
+                        
+                        printf( "cl_ret = %i\r\n", cl_ret );
+                        
+                        success = ( cl_ret == CL_SUCCESS );
+                    }
+                }                
+            }
+            
+            if( success ) ocl_env->is_ready = true;
             
             NS(GpuKernel_free_file_list)( 
                     path_kernel_files, num_kernel_files );
@@ -737,23 +884,47 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
     return success;
 }
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-bool NS(OpenCLEnv_track_drift)( 
-    NS(OpenCLEnv)* SIXTRL_RESTRICT ocl_env, 
-    struct NS(Particles)* SIXTRL_RESTRICT particles, 
-    const struct NS(Drift) *const SIXTRL_RESTRICT drift )
+bool NS(OpenCLEnv_track_particles)( 
+    struct NS(OpenCLEnv)* ocl_env, 
+    struct NS(Particles)*   SIXTRL_RESTRICT particles, 
+    struct NS(BeamElements)* SIXTRL_RESTRICT beam_elements )
 {
     bool success = false;
     
-    if( ( ocl_env != 0 ) && ( ocl_env->is_ready ) && 
-        ( particles != 0 ) && ( drift != 0 ) )
-    {
-        success = true;
-    }
+    ( void )particles;
     
+    if( ( ocl_env != 0 ) && ( ocl_env->is_ready ) &&
+        ( beam_elements != 0 ) && 
+        ( beam_elements->num_elements > 0u ) &&
+        ( beam_elements->num_elements == ocl_env->num_beam_elements ) )
+    {
+        size_t work_units_per_kernel = ( size_t )ocl_env->num_particles;
+        
+        cl_event finished_kernel;
+        
+        cl_int ret = clEnqueueNDRangeKernel(
+            ocl_env->queue, ocl_env->kernel, 1u, 0, &work_units_per_kernel,
+            0, 0, 0, &finished_kernel );
+        
+        if( ret == CL_SUCCESS )
+        {
+            ret = clWaitForEvents( 1u, &finished_kernel );
+            
+            if( ret == CL_SUCCESS )
+            {
+                printf( "HERE!!!\r\n" );
+                fflush( stdout );
+                
+                success = true;
+            }
+            
+            clReleaseEvent( finished_kernel );                       
+        }
+    }
+        
     return success;
 }
+
 
 /* -------------------------------------------------------------------------- */
 
@@ -823,10 +994,11 @@ void NS(OpenCLEnv_reset_kernel)( NS(OpenCLEnv)* ocl_env )
             flags &= ~( NS(HAS_T_BY_T_BUFFER) );
         }
         
-        if( NS(HAS_BLOCKS_BUFFER) == ( NS(HAS_BLOCKS_BUFFER) & flags ) )
+        if( NS(HAS_BEAM_ELEMS_BUFFERS) == ( NS(HAS_BEAM_ELEMS_BUFFERS) & flags ) )
         {
-            clReleaseMemObject( ocl_env->blocks_buffer );
-            flags &= ~( NS(HAS_BLOCKS_BUFFER) );            
+            clReleaseMemObject( ocl_env->beam_elem_info_buffer );
+            clReleaseMemObject( ocl_env->beam_elem_data_buffer );
+            flags &= ~( NS(HAS_BEAM_ELEMS_BUFFERS) );            
         }
             
         if( NS(HAS_PARTICLES_BUFFER) == ( NS(HAS_PARTICLES_BUFFER) & flags ) )
@@ -847,8 +1019,8 @@ cl_platform_id* NS(OpenCLEnv_get_valid_platforms)(
     SIXTRL_SIZE_T* ptr_num_valid_platforms, 
     SIXTRL_SIZE_T* ptr_num_of_potentially_valid_devices )
 {
-    static cl_uint const MAX_NUM_PLATFORMS        = ( cl_uint )100u;    
-    static cl_uint const MAX_DEVICES_PER_PLATFORM = ( cl_uint )255u;
+    static cl_uint const MAX_NUM_PLATFORMS        = ( cl_uint )10u;    
+    static cl_uint const MAX_DEVICES_PER_PLATFORM = ( cl_uint )10u;
     static SIXTRL_SIZE_T const ZERO = ( SIXTRL_SIZE_T )0u;
         
     cl_platform_id* valid_platforms = 0;
@@ -965,7 +1137,7 @@ cl_device_id* NS(OpenCLEnv_get_valid_devices)(
     if( ( platforms != 0 ) && ( num_platforms > ZERO ) &&
         ( ptr_num_valid_devices != 0 ) )
     {
-        static SIXTRL_SIZE_T const MAX_DEVS_PER_PLATFORM = ( SIXTRL_SIZE_T )100u;
+        static SIXTRL_SIZE_T const MAX_DEVS_PER_PLATFORM = ( SIXTRL_SIZE_T )10u;
         
         SIXTRL_SIZE_T temp_num_devices  = ( ptr_num_valid_devices != 0 ) 
                 ? *( ptr_num_valid_devices ) : ZERO;
