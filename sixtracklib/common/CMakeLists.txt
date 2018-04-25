@@ -4,6 +4,7 @@ set( SIXTRACKLIB_COMMON_HEADERS
      details/tools.h 
      details/gpu_kernel_tools.h
      block.h
+     beam_elements.h
      impl/block_type.h     
      block_drift.h
      impl/block_drift_type.h
@@ -23,6 +24,7 @@ set( SIXTRACKLIB_COMMON_HEADERS
 set( SIXTRACKLIB_COMMON_SOURCES
      details/block.c
      details/block_drift.c
+     details/beam_elements.c
      details/gpu_kernel_tools.c
      details/mem_pool.c
      details/particles.c
