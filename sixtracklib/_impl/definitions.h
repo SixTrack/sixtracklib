@@ -14,6 +14,7 @@
 
 #if defined( _GPUCODE )
 
+    #pragma OPENCL EXTENSION cl_khr_fp64 : enable 
     #define SIXTRL_ALIGN 64u
     
     /* ---------------------------------------------------------------- */
@@ -112,7 +113,7 @@
     #endif /* !defined( SIXTRL_RESTRICT ) */
     
     #if !defined( SIXTRL_STATIC )
-        #define SIXTRL_STATIC static
+        #define SIXTRL_STATIC 
     #endif /* !defined( SIXTRL_STATIC ) */
     
     #if !defined( SIXTRL_INLINE )
