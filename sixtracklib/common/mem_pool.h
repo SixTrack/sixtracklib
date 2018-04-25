@@ -83,6 +83,9 @@ void NS( MemPool_clone )( NS( MemPool ) * SIXTRL_RESTRICT dest,
 
 bool NS( MemPool_is_empty )( const NS( MemPool ) * const SIXTRL_RESTRICT pool );
 
+bool NS(MemPool_clear_to_aligned_position)( 
+    NS(MemPool)* SIXTRL_RESTRICT pool, SIXTRL_SIZE_T const alignment  );
+
 SIXTRL_SIZE_T NS( MemPool_get_capacity )( const NS( MemPool ) *
                                    const SIXTRL_RESTRICT pool );
 

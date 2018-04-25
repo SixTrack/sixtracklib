@@ -259,6 +259,41 @@ void NS( MemPool_clear )( NS( MemPool ) * SIXTRL_RESTRICT pool )
     return;
 }
 
+bool NS(MemPool_clear_to_aligned_position)( 
+    NS(MemPool)* SIXTRL_RESTRICT pool, SIXTRL_SIZE_T const alignment )
+{
+    bool success = false;
+    
+    NS(MemPool_clear)( pool );
+    
+    if( ( alignment > 0u ) && ( pool->chunk_size > 0u ) &&
+        ( pool->buffer != 0 ) )
+    {
+        SIXTRL_SIZE_T const use_alignment = NS(least_common_multiple)( 
+            alignment, pool->chunk_size );
+        
+        if( use_alignment == 0u ) return false;
+        
+        uintptr_t const buffer_addr = ( uintptr_t )pool->buffer;
+        uintptr_t const buffer_addr_mod = ( buffer_addr % use_alignment );
+        
+        if( buffer_addr_mod != 0u )
+        {
+            SIXTRL_SIZE_T const offset = use_alignment - buffer_addr_mod;
+            
+            if( ( pool->size + offset ) < pool->capacity )
+            {
+                pool->size += offset;                
+            }
+        }
+        
+        success = ( ( ( ( uintptr_t )NS(MemPool_get_next_begin_pointer)( 
+                pool, use_alignment ) ) % use_alignment ) == 0u );
+    }
+    
+    return success;
+}
+
 /* -------------------------------------------------------------------------- */
 
 bool NS( MemPool_reserve )( NS( MemPool ) * SIXTRL_RESTRICT pool,
