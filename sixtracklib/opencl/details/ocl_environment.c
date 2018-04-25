@@ -523,7 +523,11 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                 ocl_env->kernel_source = NS(GpuKernel_collect_source_string)(
                     path_kernel_files, num_kernel_files, 1024u, source_line_offsets );
                 
-                success = ( ocl_env->kernel_source != 0 );                
+                if( ocl_env->kernel_source != 0 )
+                {
+                    ocl_env->ressources_flags |= NS(HAS_CURRENT_KERNEL_SOURCE);
+                    success = true;
+                }
             }
             
             if( success )
@@ -552,6 +556,7 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                         sizeof( char ) * ( id_str_len + 1 ) );
                         
                     strncpy( ocl_env->current_id_str, node->id_str, id_str_len );
+                    ocl_env->ressources_flags |= NS(HAS_CURRENT_ID_STR);
                     success = true;
                 }
             }
@@ -602,12 +607,15 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                 
                 if( compile_options == 0 ) compile_options = &default_options[ 0 ];
                 
+                success = false;
+                
                 ret = clBuildProgram( ocl_env->program, 1, &device, 
                                       compile_options, 0, 0 );
                 
                 if( ret == CL_SUCCESS )
                 {
-                    if( success ) ocl_env->ressources_flags |= NS(HAS_PROGRAM);
+                    success = true;
+                    ocl_env->ressources_flags |= NS(HAS_PROGRAM);
                 }
                 else if( ret == CL_BUILD_PROGRAM_FAILURE )
                 {
@@ -665,12 +673,6 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                         free( log_buffer );
                         log_buffer = 0;
                     }
-                    
-                    success = false;
-                }
-                else
-                {
-                    success = false;
                 }
             }
             
@@ -697,7 +699,11 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                     
                     success &= ( ret == CL_SUCCESS );                    
                     
-                    if( success ) ocl_env->ressources_flags |= NS(HAS_KERNEL);
+                    if( success )
+                    {
+                        ocl_env->ressources_flags |= NS(HAS_KERNEL);
+                        ocl_env->ressources_flags |= NS(HAS_CURRENT_KERNEL_FN);
+                    }
                 }
                 else
                 {
@@ -759,14 +765,27 @@ void NS(OpenCLEnv_reset_kernel)( NS(OpenCLEnv)* ocl_env )
         
         ocl_env->is_ready = false;
         
-        free( ocl_env->current_id_str );
-        ocl_env->current_id_str = 0;
+        if( NS(HAS_CURRENT_ID_STR) == ( flags & NS(HAS_CURRENT_ID_STR) ) )
+        {
+            free( ocl_env->current_id_str );
+            ocl_env->current_id_str = 0;
+            flags &= ~( NS(HAS_CURRENT_ID_STR) );
+        }
         
-        free( ocl_env->current_kernel_function );
-        ocl_env->current_kernel_function = 0;
+        if( NS(HAS_CURRENT_KERNEL_FN) == ( flags & NS(HAS_CURRENT_KERNEL_FN) ) )
+        {
+            free( ocl_env->current_kernel_function );
+            ocl_env->current_kernel_function = 0;
+            flags &= ~( NS(HAS_CURRENT_KERNEL_FN) );
+        }
         
-        free( ocl_env->kernel_source );
-        ocl_env->kernel_source = 0;
+        if( NS(HAS_CURRENT_KERNEL_SOURCE) == 
+            ( flags & NS(HAS_CURRENT_KERNEL_SOURCE ) ) )
+        {
+            free( ocl_env->kernel_source );
+            ocl_env->kernel_source = 0;
+            flags &= ~( NS(HAS_CURRENT_KERNEL_SOURCE) );
+        }
         
         if( NS(HAS_QUEUE) == ( NS(HAS_QUEUE) & flags ) )
         {
@@ -790,6 +809,30 @@ void NS(OpenCLEnv_reset_kernel)( NS(OpenCLEnv)* ocl_env )
         {
             clReleaseContext( ocl_env->context );
             flags &= ~( NS( HAS_CONTEXT ) );
+        }
+        
+        if( NS(HAS_E_BY_E_BUFFER) == ( NS(HAS_E_BY_E_BUFFER) & flags ) )
+        {
+            clReleaseMemObject( ocl_env->elem_by_elem_buffer );
+            flags &= ~( NS(HAS_E_BY_E_BUFFER) );
+        }
+        
+        if( NS(HAS_T_BY_T_BUFFER) == ( NS(HAS_T_BY_T_BUFFER) & flags ) )
+        {
+            clReleaseMemObject( ocl_env->turn_by_turn_buffer );
+            flags &= ~( NS(HAS_T_BY_T_BUFFER) );
+        }
+        
+        if( NS(HAS_BLOCKS_BUFFER) == ( NS(HAS_BLOCKS_BUFFER) & flags ) )
+        {
+            clReleaseMemObject( ocl_env->blocks_buffer );
+            flags &= ~( NS(HAS_BLOCKS_BUFFER) );            
+        }
+            
+        if( NS(HAS_PARTICLES_BUFFER) == ( NS(HAS_PARTICLES_BUFFER) & flags ) )
+        {
+            clReleaseMemObject( ocl_env->particles_buffer );
+            flags &= ~( NS(HAS_PARTICLES_BUFFER) );            
         }
         
         ocl_env->ressources_flags = flags;
