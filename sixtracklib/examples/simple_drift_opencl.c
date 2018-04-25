@@ -20,7 +20,6 @@ int main( int argc, char* argv[] )
     {  '0',  '.',  '0', '\0', '\0', '\0', '\0', '\0', 
       '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'         
     };
-    
         
     size_t NUM_ELEMS     = 100;
     size_t NUM_PARTICLES = 100000;
@@ -43,6 +42,8 @@ int main( int argc, char* argv[] )
     uint64_t seed = UINT64_C( 20180420 );
     st_Random_init_genrand64( seed );
     
+    st_BeamElements* beam_elements = 0;
+    
     /* Init the OpenCL Environment -> this gives us a list of available 
      * devices which is displayed if no command line parameters have been 
      * provided */
@@ -52,28 +53,63 @@ int main( int argc, char* argv[] )
     handle_cmd_line_arguments( argc, argv, ocl_env, device_id_str, 
                                &NUM_PARTICLES, &NUM_ELEMS, &NUM_TURNS );
     
-    if( st_OpenCLEnv_get_num_node_devices( ocl_env ) > ( size_t )0u )
+    if( ( NUM_ELEMS > ( SIXTRL_SIZE_T )0u ) && 
+        ( NUM_TURNS > ( SIXTRL_SIZE_T )0u ) && 
+        ( st_OpenCLEnv_get_num_node_devices( ocl_env ) > ( size_t )0u ) )
     {
+        bool success = true;
+        
+        size_t ii = 0;
+        
         char kernel_files[] = 
             "sixtracklib/_impl/namespace_begin.h, "
             "sixtracklib/_impl/definitions.h, "            
             "sixtracklib/common/impl/particles_type.h, "
+            "sixtracklib/common/impl/track_impl.h, "
             "sixtracklib/common/impl/block_type.h, "
             "sixtracklib/common/impl/block_drift_type.h, "
-            //"sixtracklib/common/track.h, "
-            "sixtracklib/examples/test.cl, "
+            "sixtracklib/common/beam_elements.h, "
+            "sixtracklib/opencl/track_particles_kernel.cl, "
             "sixtracklib/_impl/namespace_end.h";
             
         char compile_options[] = "-D _GPUCODE=1 -D __NAMESPACE=st_";
         
-        bool success = st_OpenCLEnv_prepare( 
-            ocl_env, device_id_str, "Track_print", 
-            kernel_files, compile_options, 0, 0, 0u );
+        
+        beam_elements = st_BeamElements_new( NUM_ELEMS, 1024 * 1024, 8u, 4096u );
+        
+        for( ii = 0 ; ii < NUM_ELEMS ; ++ii )
+        {
+            SIXTRL_REAL_T const MIN_LENGTH = ( SIXTRL_REAL_T )0.1;
+            SIXTRL_REAL_T const SLOPE      = ( SIXTRL_REAL_T )0.01;            
+            SIXTRL_REAL_T const length     = MIN_LENGTH + SLOPE * ii;
+            
+            success &= st_BeamElements_add_drift( 
+                beam_elements, length, ( int64_t )ii );
+        }
+        
+        if( success )
+        {
+            success = st_OpenCLEnv_prepare( ocl_env, device_id_str, 
+                "Track_particles_kernel_opencl", kernel_files, 
+                compile_options, NUM_TURNS, 0, beam_elements );            
+        }
+        
+        if( success )
+        {
+              success = st_OpenCLEnv_track_particles( ocl_env, 0, beam_elements );
+        }
         
         if( success )
         {
             printf( "Success!\r\n" );
         }
+    }
+    
+    if( beam_elements != 0 )
+    {
+        st_BeamElements_free( beam_elements );
+        free( beam_elements );
+        beam_elements = 0;
     }
     
     st_OpenCLEnv_free( ocl_env );
