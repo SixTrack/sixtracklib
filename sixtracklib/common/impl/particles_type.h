@@ -19,36 +19,36 @@ extern "C" {
 
 typedef struct NS( Particles )
 {
-    SIXTRL_REAL_T* __restrict__ q0;     /* C */
-    SIXTRL_REAL_T* __restrict__ mass0;  /* eV */
-    SIXTRL_REAL_T* __restrict__ beta0;  /* nounit */
-    SIXTRL_REAL_T* __restrict__ gamma0; /* nounit */
-    SIXTRL_REAL_T* __restrict__ p0c;    /* eV */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT q0;     /* C */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT mass0;  /* eV */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT beta0;  /* nounit */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT gamma0; /* nounit */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT p0c;    /* eV */
 
     /* coordinate arrays */
-    SIXTRL_INT64_T* __restrict__ partid;
-    SIXTRL_INT64_T* __restrict__ elemid; /* element at which the particle was lost */
-    SIXTRL_INT64_T* __restrict__ turn;   /* turn at which the particle was lost */
-    SIXTRL_INT64_T* __restrict__ state;  /* negative means particle lost */
+    SIXTRL_INT64_T* SIXTRL_RESTRICT partid;
+    SIXTRL_INT64_T* SIXTRL_RESTRICT elemid; /* element at which the particle was lost */
+    SIXTRL_INT64_T* SIXTRL_RESTRICT turn;   /* turn at which the particle was lost */
+    SIXTRL_INT64_T* SIXTRL_RESTRICT state;  /* negative means particle lost */
 
-    SIXTRL_REAL_T* __restrict__ s;     /* [m] */
-    SIXTRL_REAL_T* __restrict__ x;     /* [m] */
-    SIXTRL_REAL_T* __restrict__ px;    /* Px/P0 */
-    SIXTRL_REAL_T* __restrict__ y;     /* [m] */
-    SIXTRL_REAL_T* __restrict__ py;    /* Py/P0 */
-    SIXTRL_REAL_T* __restrict__ sigma; /* s-beta0*c*t  where t is the time
+    SIXTRL_REAL_T* SIXTRL_RESTRICT s;     /* [m] */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT x;     /* [m] */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT px;    /* Px/P0 */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT y;     /* [m] */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT py;    /* Py/P0 */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT sigma; /* s-beta0*c*t  where t is the time
                       since the beginning of the simulation */
 
-    SIXTRL_REAL_T* __restrict__ psigma; /* (E-E0) / (beta0 P0c) conjugate of sigma */
-    SIXTRL_REAL_T* __restrict__ delta;  /* P/P0-1 = 1/rpp-1 */
-    SIXTRL_REAL_T* __restrict__ rpp;    /* ratio P0 /P */
-    SIXTRL_REAL_T* __restrict__ rvv;    /* ratio beta / beta0 */
-    SIXTRL_REAL_T* __restrict__ chi;    /* q/q0 * m/m0  */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT psigma; /* (E-E0) / (beta0 P0c) conjugate of sigma */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT delta;  /* P/P0-1 = 1/rpp-1 */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT rpp;    /* ratio P0 /P */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT rvv;    /* ratio beta / beta0 */
+    SIXTRL_REAL_T* SIXTRL_RESTRICT chi;    /* q/q0 * m/m0  */
 
     SIXTRL_UINT64_T npart;
     SIXTRL_UINT64_T flags; /* particle flags */
-    void* __restrict__  ptr_mem_context; /* memory_context -> can contain */
-    void* __restrict__  ptr_mem_begin; /* reference memory addr for (un)packing (optional) */
+    void* SIXTRL_RESTRICT  ptr_mem_context; /* memory_context -> can contain */
+    void* SIXTRL_RESTRICT  ptr_mem_begin; /* reference memory addr for (un)packing (optional) */
 } NS( Particles ) __attribute__((aligned (SIXTRL_ALIGN)));
 
 /* ========================================================================= */
