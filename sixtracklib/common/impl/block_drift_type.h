@@ -21,8 +21,8 @@ extern "C" {
 typedef struct NS(Drift)
 {
     SIXTRL_UINT64_T  type_id;
-    SIXTRL_REAL_T*   length;
-    SIXTRL_INT64_T*  element_id;
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T*   length;
+    SIXTRL_GLOBAL_DEC SIXTRL_INT64_T*  element_id;
 }
 NS(Drift);
 
@@ -80,37 +80,39 @@ SIXTRL_STATIC void NS(Drift_set_type_id)(
 SIXTRL_STATIC SIXTRL_INT64_T NS(Drift_get_element_id)( 
     const NS(Drift) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_STATIC SIXTRL_INT64_T* NS(Drift_get_element_id_ptr)( 
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_INT64_T* NS(Drift_get_element_id_ptr)( 
     NS(Drift)* SIXTRL_RESTRICT drift );
 
 SIXTRL_STATIC void NS(Drift_set_element_id)(
     const NS(Drift) *const SIXTRL_RESTRICT drift, SIXTRL_INT64_T const elem_id );
 
 SIXTRL_STATIC void NS(Drift_assign_ptr_to_element_id)(
-    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_INT64_T* ptr_element_id );
+    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_GLOBAL_DEC SIXTRL_INT64_T* ptr_element_id );
     
 /* -------------------------------------------------------------------------- */
 
 SIXTRL_STATIC SIXTRL_REAL_T NS(Drift_get_length)( 
     const NS(Drift) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_STATIC SIXTRL_REAL_T* NS(Drift_get_length_ptr)(
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* NS(Drift_get_length_ptr)(
     NS(Drift)* SIXTRL_RESTRICT drift );
 
 SIXTRL_STATIC void NS(Drift_set_length)( 
     NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_REAL_T const length );
 
 SIXTRL_STATIC void NS(Drift_assign_ptr_to_length)(
-    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_REAL_T* ptr_length );
+    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* ptr_length );
 
 /* -------------------------------------------------------------------------- */
 
 SIXTRL_STATIC SIXTRL_SIZE_T NS(Drift_map_to_flat_memory)(
-    NS(Drift)* SIXTRL_RESTRICT mapped, unsigned char* mem_begin,
+    NS(Drift)* SIXTRL_RESTRICT mapped, SIXTRL_GLOBAL_DEC unsigned char* mem_begin,
     NS(BeamElementType) const type_id, SIXTRL_SIZE_T const alignment );
 
-SIXTRL_STATIC unsigned char* NS(Drift_unpack_from_flat_memory)(
-    NS(Drift)* SIXTRL_RESTRICT drift, unsigned char* mem );
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char* 
+    NS(Drift_unpack_from_flat_memory)(
+        NS(Drift)* SIXTRL_RESTRICT drift, 
+        SIXTRL_GLOBAL_DEC unsigned char* mem );
 
 /* ************************************************************************** */
 /* ******          Implementation of inline functions                   ***** */
@@ -145,7 +147,7 @@ SIXTRL_INLINE SIXTRL_INT64_T NS(Drift_get_element_id)(
     return *( drift->element_id );
 }
 
-SIXTRL_INLINE SIXTRL_INT64_T* NS(Drift_get_element_id_ptr)( 
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC SIXTRL_INT64_T* NS(Drift_get_element_id_ptr)( 
     NS(Drift)* SIXTRL_RESTRICT drift )
 {
     SIXTRL_ASSERT( drift != 0 );
@@ -161,7 +163,7 @@ SIXTRL_INLINE void NS(Drift_set_element_id)(
 }
 
 SIXTRL_INLINE void NS(Drift_assign_ptr_to_element_id)(
-    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_INT64_T* ptr_element_id )
+    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_GLOBAL_DEC SIXTRL_INT64_T* ptr_element_id )
 {
     SIXTRL_ASSERT( drift != 0 );
     drift->element_id = ptr_element_id;
@@ -177,7 +179,7 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(Drift_get_length)(
     return *( drift->length );
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T* NS(Drift_get_length_ptr)( 
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* NS(Drift_get_length_ptr)( 
     NS(Drift)* SIXTRL_RESTRICT drift )
 {
     SIXTRL_ASSERT( drift != 0 );
@@ -194,7 +196,7 @@ SIXTRL_INLINE void NS(Drift_set_length)(
 }
 
 SIXTRL_INLINE void NS(Drift_assign_ptr_to_length)(
-    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_REAL_T* ptr_length )
+    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* ptr_length )
 {
     SIXTRL_ASSERT( drift != 0 );
     drift->length = ptr_length;
@@ -204,9 +206,13 @@ SIXTRL_INLINE void NS(Drift_assign_ptr_to_length)(
 /* -------------------------------------------------------------------------- */
 
 SIXTRL_INLINE SIXTRL_SIZE_T NS(Drift_map_to_flat_memory)(
-    NS(Drift)* SIXTRL_RESTRICT mapped, unsigned char* mem, 
+    NS(Drift)* SIXTRL_RESTRICT mapped, SIXTRL_GLOBAL_DEC unsigned char* mem, 
     NS(BeamElementType) const type_id, SIXTRL_SIZE_T const alignment )
 {
+    typedef SIXTRL_GLOBAL_DEC SIXTRL_REAL_T*    g_ptr_real_t;
+    typedef SIXTRL_GLOBAL_DEC SIXTRL_UINT64_T*  g_ptr_u64_t;
+    typedef SIXTRL_GLOBAL_DEC SIXTRL_INT64_T*   g_ptr_i64_t;
+    
     SIXTRL_STATIC SIXTRL_SIZE_T const ZERO = ( SIXTRL_SIZE_T )0u;
         
     SIXTRL_STATIC SIXTRL_SIZE_T const U64_SIZE = sizeof( SIXTRL_UINT64_T );
@@ -260,29 +266,36 @@ SIXTRL_INLINE SIXTRL_SIZE_T NS(Drift_map_to_flat_memory)(
     ELEMID_BLOCK_LEN += ( ELEMID_BLOCK_LEN_MOD == ZERO )
         ? ZERO : ( alignment - ELEMID_BLOCK_LEN_MOD );
         
-    *( ( SIXTRL_UINT64_T* )( mem + TYPEID_ADDR_OFFSET ) ) = ( SIXTRL_UINT64_T )type_id;
-    *( ( SIXTRL_UINT64_T* )( mem + NUM_DRIFTS_ADDR_OFFSET ) ) = NUM_ELEMENTS;
-    *( ( SIXTRL_UINT64_T* )( mem + NUM_ATTRS_ADDR_OFFSET  ) ) = NUM_ATTRIBUTES;
+    *( ( g_ptr_u64_t )( mem + TYPEID_ADDR_OFFSET ) ) = ( SIXTRL_UINT64_T )type_id;
+    *( ( g_ptr_u64_t )( mem + NUM_DRIFTS_ADDR_OFFSET ) ) = NUM_ELEMENTS;
+    *( ( g_ptr_u64_t )( mem + NUM_ATTRS_ADDR_OFFSET  ) ) = NUM_ATTRIBUTES;
            
-    *( ( SIXTRL_UINT64_T* )( mem + LENGTH_OFF_ADDR_OFFSET ) ) = DATA_ADDR_OFFSET;
-    NS(Drift_assign_ptr_to_length)( 
-        mapped, ( SIXTRL_REAL_T* )( mem + DATA_ADDR_OFFSET ) );    
+    *( ( g_ptr_u64_t )( mem + LENGTH_OFF_ADDR_OFFSET ) ) = DATA_ADDR_OFFSET;
+    
+    NS(Drift_assign_ptr_to_length)( mapped, ( g_ptr_real_t )( mem + DATA_ADDR_OFFSET ) );    
     DATA_ADDR_OFFSET += LENGTH_BLOCK_LEN;
     
-    *( ( SIXTRL_UINT64_T* )( mem + ELEMID_OFF_ADDR_OFFSET ) ) = DATA_ADDR_OFFSET;
-    NS(Drift_assign_ptr_to_element_id)(
-        mapped, ( SIXTRL_INT64_T* )( mem + DATA_ADDR_OFFSET ) );
+    *( ( g_ptr_u64_t )( mem + ELEMID_OFF_ADDR_OFFSET ) ) = DATA_ADDR_OFFSET;
+    
+    NS(Drift_assign_ptr_to_element_id)( 
+        mapped, ( g_ptr_i64_t )( mem + DATA_ADDR_OFFSET ) );
     DATA_ADDR_OFFSET += ELEMID_BLOCK_LEN;
     
-    *( ( SIXTRL_UINT64_T* )( mem ) ) = DATA_ADDR_OFFSET;
+    *( ( g_ptr_u64_t )( mem ) ) = DATA_ADDR_OFFSET;
     
     return DATA_ADDR_OFFSET;
 }
 
 
-SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
-    NS(Drift)* SIXTRL_RESTRICT drift, unsigned char* mem )
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC unsigned char* NS(Drift_unpack_from_flat_memory)(
+    NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_GLOBAL_DEC unsigned char* mem )
 {
+    typedef SIXTRL_GLOBAL_DEC unsigned char*    g_ptr_uchar_t;
+    typedef SIXTRL_GLOBAL_DEC SIXTRL_REAL_T*    g_ptr_real_t;
+    typedef SIXTRL_GLOBAL_DEC SIXTRL_UINT64_T*  g_ptr_u64_t;
+    typedef SIXTRL_GLOBAL_DEC SIXTRL_INT64_T*   g_ptr_i64_t;
+    
+    
     SIXTRL_UINT64_T lengths_offset;
     SIXTRL_UINT64_T element_ids_offset;
     
@@ -295,17 +308,17 @@ SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
     SIXTRL_STATIC const SIXTRL_SIZE_T ELEMID_ADDR_OFFSET = 
         sizeof( SIXTRL_UINT64_T ) * 5;
     
-    unsigned char* ptr_type_id    = 0;
-    unsigned char* ptr_lengths    = 0;
-    unsigned char* ptr_elemids    = 0;
-    
-    
-    SIXTRL_UINT64_T* serial_len_ptr = ( SIXTRL_UINT64_T* )( mem );
+    g_ptr_uchar_t ptr_type_id    = 0;
+    g_ptr_uchar_t ptr_lengths    = 0;
+    g_ptr_uchar_t ptr_elemids    = 0;
+        
+    SIXTRL_GLOBAL_DEC SIXTRL_UINT64_T* serial_len_ptr = 
+        ( SIXTRL_GLOBAL_DEC SIXTRL_UINT64_T* )( mem );
     
     #if !defined( _GPUCODE )
     #if !defined( NDEBUG )
     
-    unsigned char* ptr_num_drifts = 0;
+    g_ptr_uchar_t ptr_num_drifts = 0;
     
     SIXTRL_STATIC const SIXTRL_SIZE_T U64_SIZE = sizeof( SIXTRL_UINT64_T );
     
@@ -319,7 +332,8 @@ SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
     SIXTRL_STATIC SIXTRL_SIZE_T const MIN_HEADER_LENGTH = 
         sizeof( SIXTRL_UINT64_T ) * 6;
     
-    SIXTRL_UINT64_T* pack_id_ptr = ( SIXTRL_UINT64_T* )( mem + U64_SIZE );
+    SIXTRL_GLOBAL_DEC SIXTRL_UINT64_T* pack_id_ptr = 
+        ( g_ptr_u64_t )( mem + U64_SIZE );
     
     SIXTRL_STATIC SIXTRL_UINT64_T const CMP_DRIFT_ID = 
         ( SIXTRL_UINT64_T )NS(ELEMENT_TYPE_DRIFT);
@@ -328,9 +342,10 @@ SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
         ( SIXTRL_UINT64_T )NS(ELEMENT_TYPE_DRIFT_EXACT);
         
     SIXTRL_STATIC SIXTRL_UINT64_T const CMP_NUM_ATTR = ( SIXTRL_UINT64_T )2u;
-    SIXTRL_UINT64_T* num_attr_ptr = ( SIXTRL_UINT64_T* )( mem + U64_SIZE * 3 );
+    g_ptr_u64_t num_attr_ptr = ( g_ptr_u64_t )( mem + U64_SIZE * 3 );
     
-    assert( ( mem != 0 ) && ( drift != 0 ) &&
+    SIXTRL_ASSERT( 
+            ( mem != 0 ) && ( drift != 0 ) &&
             ( ( ( ( uintptr_t)mem ) % U64_SIZE ) == ZERO ) &&
             ( *serial_len_ptr >= MIN_HEADER_LENGTH ) &&
             ( ( *pack_id_ptr == CMP_DRIFT_ID ) || 
@@ -343,16 +358,16 @@ SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
     #endif /* !defined( GPU_CODE ) */
     
     ptr_type_id = mem + TYPEID_ADDR_OFFSET;
-    NS(Drift_set_type_id)( drift, *( ( SIXTRL_UINT64_T* )ptr_type_id ) );
+    NS(Drift_set_type_id)( drift, *( ( g_ptr_u64_t )ptr_type_id ) );
     
     #if !defined( _GPUCODE ) && !defined( NDEBUG )
     ptr_num_drifts = mem + NDRIFT_ADDR_OFFSET;
     #endif /* !defined( _GPUCODE ) && !defined( NDEBUG ) */
     
-    lengths_offset = *( ( SIXTRL_UINT64_T* )( mem + LENGTH_ADDR_OFFSET ) );
+    lengths_offset = *( ( g_ptr_u64_t )( mem + LENGTH_ADDR_OFFSET ) );
     ptr_lengths =  mem + lengths_offset;
     
-    element_ids_offset = *( ( SIXTRL_UINT64_T* )( mem + ELEMID_ADDR_OFFSET ) );
+    element_ids_offset = *( ( g_ptr_u64_t )( mem + ELEMID_ADDR_OFFSET ) );
     ptr_elemids = mem + element_ids_offset;
     
     #if !defined( _GPUCODE )
@@ -363,8 +378,8 @@ SIXTRL_INLINE unsigned char* NS(Drift_unpack_from_flat_memory)(
     
     #endif /* !defined( _GPUCODE ) */
     
-    NS(Drift_assign_ptr_to_length)( drift, ( SIXTRL_REAL_T* )ptr_lengths );    
-    NS(Drift_assign_ptr_to_element_id)( drift, ( SIXTRL_INT64_T* )ptr_elemids );
+    NS(Drift_assign_ptr_to_length)( drift, ( g_ptr_real_t )ptr_lengths );        
+    NS(Drift_assign_ptr_to_element_id)( drift, ( g_ptr_i64_t )ptr_elemids );
     
     return ( mem + *serial_len_ptr );
 }
