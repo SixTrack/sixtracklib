@@ -19,6 +19,7 @@
 #include "sixtracklib/common/impl/block_type.h"
 #include "sixtracklib/common/block_drift.h"
 #include "sixtracklib/common/impl/block_drift_type.h"
+#include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/impl/particles_type.h"
 #include "sixtracklib/common/particles_sequence.h"
