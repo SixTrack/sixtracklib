@@ -112,8 +112,8 @@ bool NS(OpenCLEnv_prepare)( struct NS(OpenCLEnv)* ocl_env,
     char const* node_device_id, char const* kernel_function_name, 
     char* kernel_source_files, char const* compile_options,
     SIXTRL_SIZE_T const num_turns,
-    const NS(ParticlesContainer) const* SIXTRL_RESTRICT particles,
-    const NS(BeamElements) const* SIXTRL_RESTRICT beam_elements );
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particles,
+    const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements );
 
 bool NS(OpenCLEnv_track_particles)( 
     struct NS(OpenCLEnv)* ocl_env, 
