@@ -7,27 +7,34 @@
 #include <x86intrin.h>
 
 #include "sixtracklib/_impl/namespace_begin.h"
-#include "sixtracklib/common/track.h"
+#include "sixtracklib/common/impl/particles_impl.h"
 #include "sixtracklib/common/particles.h"
-#include "sixtracklib/common/impl/particles_type.h"
+#include "sixtracklib/common/impl/be_drift_impl.h"
+#include "sixtracklib/common/be_drift.h"
 
 extern int NS(Track_simd_drift_sse2)(
-    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_REAL_T const length );
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    const NS(Drift) *const SIXTRL_RESTRICT drift );
 
 extern int NS(Track_simd_drift_avx)(
-    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_REAL_T const length );
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    const NS(Drift) *const SIXTRL_RESTRICT drift );
 
 /* -------------------------------------------------------------------------- */
 
 int NS(Track_simd_drift_sse2)(
-    NS(Particles)* SIXTRL_RESTRICT particles, double const length )
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    const struct NS(Drift) *const SIXTRL_RESTRICT drift )
 {
     #if defined __SSE2__
     
-    size_t const num = st_Particles_get_size( particles );
+    size_t const num = NS(Particles_get_num_particles)( particles );
     
     static uintptr_t const REQ_ALIGN = ( uintptr_t )16u;
     static size_t    const STRIDE    = ( size_t )2u;
+    
+    double const* length_in = NS(Drift_get_const_length)( drift );
+    double const  length = length_in[ 0 ];
     
     double const* px_in  = NS(Particles_get_px)(  particles );
     double const* py_in  = NS(Particles_get_py)(  particles );
@@ -46,6 +53,8 @@ int NS(Track_simd_drift_sse2)(
      * (mis-)alignment relative to the REQ_ALIGN block-size: */
     
     assert( ( num > 1 ) && 
+            ( NS(Drift_get_num_elements)( drift) == 
+              ( ( NS(block_num_elements_t) )1u ) ) &&
             ( ( addr_offset == ( size_t )0u ) || 
               ( addr_offset == ( size_t )8u ) ) &&
             ( ( ( ( uintptr_t )py_in  ) % REQ_ALIGN ) == addr_offset ) &&
@@ -58,7 +67,8 @@ int NS(Track_simd_drift_sse2)(
     
     if( addr_offset != ( uintptr_t )0u )
     {
-        NS(Track_drift)( particles, ii++, length );        
+        NS(Drift_track_particle_over_single_elem)( 
+            particles, ii++, drift, 0 );       
     }
     
     if( ii < num )
@@ -104,7 +114,8 @@ int NS(Track_simd_drift_sse2)(
         if( ii < num )
         {
             assert( num > 0 );
-            NS(Track_drift)( particles, num - 1, length );
+            NS(Drift_track_particle_over_single_elem)( 
+                particles, num - 1, drift, 0 );
         }
     }
     
@@ -127,14 +138,18 @@ int NS(Track_simd_drift_sse2)(
 }
 
 int NS(Track_simd_drift_avx)(
-    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_REAL_T const length )
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    const struct NS(Drift) *const SIXTRL_RESTRICT drift )
 {
     #if defined( __AVX__ )
     
-    size_t const num = st_Particles_get_size( particles );
+    size_t const num = NS(Particles_get_num_particles)( particles );
     
     static uintptr_t const REQ_ALIGN = ( uintptr_t )32u;
     static size_t    const STRIDE    = ( size_t )4u;
+    
+    double const* length_in = NS(Drift_get_const_length)( drift );
+    double const  length    = length_in[ 0 ];
     
     double const* px_in  = NS(Particles_get_px)(  particles );
     double const* py_in  = NS(Particles_get_py)(  particles );
@@ -153,6 +168,8 @@ int NS(Track_simd_drift_avx)(
      * (mis-)alignment relative to the REQ_ALIGN block-size: */
     
     assert( ( num > 1 ) && 
+            ( NS(Drift_get_num_elements)( drift) == 
+              ( ( NS(block_num_elements_t) )1u ) ) &&
             ( ( addr_offset == ( size_t )0u  ) || 
               ( addr_offset == ( size_t )8u  ) || 
               ( addr_offset == ( size_t )16u ) || 
@@ -171,22 +188,34 @@ int NS(Track_simd_drift_avx)(
         {
             case 8:
             {
-                NS(Track_drift)( particles, ii++, length );
+                NS(Drift_track_particle_over_single_elem)( 
+                    particles, ii++, drift, 0 );
+                
                 break;
             }
             
             case 16:
             {
-                NS(Track_drift)( particles, ii++, length );
-                NS(Track_drift)( particles, ii++, length );
+                NS(Drift_track_particle_over_single_elem)( 
+                    particles, ii++, drift, 0 );
+                
+                NS(Drift_track_particle_over_single_elem)( 
+                    particles, ii++, drift, 0 );
+                
                 break;
             }
             
             case 24:
             {
-                NS(Track_drift)( particles, ii++, length );
-                NS(Track_drift)( particles, ii++, length );
-                NS(Track_drift)( particles, ii++, length );
+                NS(Drift_track_particle_over_single_elem)( 
+                    particles, ii++, drift, 0 );
+                
+                NS(Drift_track_particle_over_single_elem)( 
+                    particles, ii++, drift, 0 );
+                
+                NS(Drift_track_particle_over_single_elem)( 
+                    particles, ii++, drift, 0 );
+                
                 break;
             }
             
@@ -243,7 +272,8 @@ int NS(Track_simd_drift_avx)(
         
         for( ; ii < num ; ++ii )
         {
-            NS(Track_drift)( particles, ii, length );
+            NS(Drift_track_particle_over_single_elem)( 
+                particles, ii, drift, 0 );
         }
     }
     
