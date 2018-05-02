@@ -297,6 +297,7 @@
     
 #endif /* defined( _GPUCODE ) */
 
+typedef SIXTRL_INT64_T NS(element_id_t);
 
 
 #if !defined( SIXTRACKLIB_COPY_VALUES )
@@ -308,6 +309,15 @@
         \
         SIXTRL_SIZE_T __ii = 0; \
         do{ *( ( dest ) + __ii ) = *( ( source ) + __ii ); } while( __ii < ( n ) )
+            
+            
+        #define SIXTRACKLIB_SET_VALUES( T, dest, n, value ) \
+        /* ----------------------------------------------------------- */ \
+        /* ---- Inside SIXTRACKLIB_SET_VALUES  (ELEMENTWISE)       --- */ \
+        /* ----------------------------------------------------------- */ \
+        \
+        SIXTRL_SIZE_T __ii = 0; \
+        do{ *( ( dest ) + __ii ) = ( value ); } while( __ii < ( n ) )
         
     #elif !defined( _GPUCODE )
         #define SIXTRACKLIB_COPY_VALUES( T, dest, source, n )                 \
@@ -318,7 +328,16 @@
             assert( ( ( dest ) != 0 ) && ( ( source ) != 0 ) &&           \
                     ( ( n ) > ( SIXTRL_SIZE_T )( 0u ) ) );                \
             memcpy( ( dest ), ( source ), sizeof( T ) * ( n ) )
-
+            
+        #define SIXTRACKLIB_SET_VALUES( T, dest, n, value ) \
+            /* ----------------------------------------------------------- */ \
+            /* ---- Inside SIXTRACKLIB_SET_VALUES  (MEMCPY_BASED)      --- */ \
+            /* ----------------------------------------------------------- */ \
+            \
+            assert( ( ( dest ) != 0 ) && \
+                    ( ( n ) > ( SIXTRL_SIZE_T )( 0u ) ) ); \
+            memset( ( dest ), ( int )( value ), sizeof( T ) * ( n ) )
+            
     #endif /* defined( _GPUCODE ) */
 #endif /* defined( SIXTRACKLIB_COPY_VALUES ) */
 
