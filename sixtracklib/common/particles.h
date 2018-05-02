@@ -2,167 +2,359 @@
 #define SIXTRACKLIB_COMMON_PARTICLES_H__
 
 #if !defined( _GPUCODE )
+
 #include "sixtracklib/_impl/definitions.h"
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "sixtracklib/common/mem_pool.h"
+#include "sixtracklib/common/impl/block_info_impl.h"
+#include "sixtracklib/common/blocks_container.h"
+#include "sixtracklib/common/impl/particles_impl.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
+    
 #endif /* !defined( _GPUCODE ) */
+   
+/* ------------------------------------------------------------------------- */
+
+typedef NS(BlocksContainer) NS(ParticlesContainer);
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC NS(ParticlesContainer)* NS(ParticlesContainer_preset)( 
+    NS(ParticlesContainer)* particle_buffer );
+
+SIXTRL_STATIC void NS(ParticlesContainer_clear)( 
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC void NS(ParticlesContainer_free)( 
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC int NS(ParticlesContainer_init)( 
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_size_t) const blocks_capacity, 
+    NS(block_size_t) const data_capacity );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC int NS(ParticlesContainer_set_info_begin_alignment)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_alignment_t) const begin_alignment );
+
+SIXTRL_STATIC int NS(ParticlesContainer_set_data_begin_alignment)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_alignment_t) const begin_alignment );
+
+SIXTRL_STATIC int NS(ParticlesContainer_set_data_alignment)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_alignment_t) const alignment );
+
+SIXTRL_STATIC int NS(ParticlesContainer_set_info_alignment )(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_alignment_t) const alignment );
+
+SIXTRL_STATIC void NS(ParticlesContainer_reserve_num_blocks)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_size_t) const new_block_capacity );
+
+SIXTRL_STATIC void NS(ParticlesContainer_reserve_for_data)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_size_t) const new_data_capacity );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC NS(block_alignment_t) NS(ParticlesContainer_get_info_alignment)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC NS(block_alignment_t) NS(ParticlesContainer_get_data_alignment)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC NS(block_alignment_t) 
+NS(ParticlesContainer_get_info_begin_alignment)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC NS(block_alignment_t) 
+NS(ParticlesContainer_get_data_begin_alignment)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC NS(block_size_t) NS(ParticlesContainer_get_data_capacity)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC NS(block_size_t) NS(ParticlesContainer_get_data_size)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC NS(block_size_t) NS(ParticlesContainer_get_block_capacity)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC NS(block_size_t) NS(ParticlesContainer_get_num_of_blocks)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC unsigned char const* 
+NS(ParticlesContainer_get_const_ptr_data_begin)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC unsigned char* 
+NS(ParticlesContainer_get_ptr_data_begin)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC NS(BlockInfo) const* 
+NS(ParticlesContainer_get_const_block_infos_begin)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC NS(BlockInfo) const* 
+NS(ParticlesContainer_get_const_block_infos_end)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer );
+
+
+SIXTRL_STATIC NS(BlockInfo)* NS(ParticlesContainer_get_block_infos_begin)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC NS(BlockInfo)* NS(ParticlesContainer_get_infos_end)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer );
+
+SIXTRL_STATIC NS(BlockInfo) NS(ParticlesContainer_get_block_info_by_index)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer, 
+    NS(block_size_t) const block_index );
+
+SIXTRL_STATIC NS(BlockInfo) const* 
+NS(ParticlesContainer_get_const_ptr_to_block_info_by_index)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer, 
+    NS(block_size_t) const block_index );
+
+SIXTRL_STATIC NS(BlockInfo)* 
+NS(ParticlesContainer_get_ptr_to_block_info_by_index)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_size_t) const block_index );
+
+/* ------------------------------------------------------------------------- */
+
+int NS(ParticlesContainer_add_particles)( 
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particles_buffer, 
+    NS(Particles)* SIXTRL_RESTRICT particle_block,
+    NS(block_num_elements_t) const num_of_particles );
+
+int NS(ParticlesContainer_add_blocks_of_particles)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particles_buffer,
+    NS(Particles)* SIXTRL_RESTRICT particle_blocks,
+    NS(block_size_t) const num_of_blocks, 
+    NS(block_num_elements_t) const* SIXTRL_RESTRICT num_of_particles_vec );
+
+/* ************************************************************************ */
+/* *********     Implementation of inline functions and methods     ******* */
+/* ************************************************************************ */
+
+SIXTRL_INLINE NS(ParticlesContainer)* NS(ParticlesContainer_preset)( 
+    NS(ParticlesContainer)* particle_buffer )
+{
+    return NS(BlocksContainer_preset)( particle_buffer );
+}
+
+SIXTRL_INLINE void NS(ParticlesContainer_clear)( 
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer )
+{
+    NS(BlocksContainer_clear)( particle_buffer );
+    return;
+}
+
+SIXTRL_INLINE void NS(ParticlesContainer_free)( 
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer )
+{
+    NS(BlocksContainer_free)( particle_buffer );
+    return;
+}
+
+SIXTRL_INLINE int NS(ParticlesContainer_init)( 
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_size_t) const blocks_capacity, 
+    NS(block_size_t) const data_capacity )
+{
+    return NS(BlocksContainer_init)( 
+        particle_buffer, blocks_capacity, data_capacity );
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE int NS(ParticlesContainer_set_info_begin_alignment)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_alignment_t) const begin_alignment )
+{
+    return NS(BlocksContainer_set_info_begin_alignment)( 
+        particle_buffer, begin_alignment );
+}
+
+SIXTRL_INLINE int NS(ParticlesContainer_set_data_begin_alignment)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_alignment_t) const begin_alignment )
+{
+    return NS(BlocksContainer_set_data_begin_alignment)( 
+        particle_buffer, begin_alignment );
+}
+
+SIXTRL_INLINE int NS(ParticlesContainer_set_data_alignment)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_alignment_t) const alignment )
+{
+    return NS(BlocksContainer_set_data_alignment)( 
+        particle_buffer, alignment );
+}
+
+SIXTRL_INLINE int NS(ParticlesContainer_set_info_alignment )(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_alignment_t) const alignment )
+{
+    return NS(BlocksContainer_set_info_alignment)( 
+        particle_buffer, alignment );
+}
+
+SIXTRL_INLINE void NS(ParticlesContainer_reserve_num_blocks)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_size_t) const new_block_capacity )
+{
+    NS(BlocksContainer_reserve_num_blocks)( 
+        particle_buffer, new_block_capacity );
     
-struct NS( MemPool );
-struct NS( SingleParticle );
-struct NS( Particles );
+    return;
+}
 
-/* ========================================================================= */
-
-SIXTRL_STATIC SIXTRL_UINT64_T const NS(PARTICLES_PACK_INDICATOR) = ( SIXTRL_UINT64_T )1u;
-
-SIXTRL_STATIC SIXTRL_INT64_T const NS( PARTICLE_VALID_STATE ) = ( SIXTRL_INT64_T )0;
-
-SIXTRL_STATIC SIXTRL_UINT64_T const NS( PARTICLES_FLAGS_NONE ) = ( SIXTRL_UINT64_T )0x0000;
-
-SIXTRL_STATIC SIXTRL_UINT64_T const NS( PARTICLES_FLAGS_PACKED ) = ( SIXTRL_UINT64_T )0x0001;
-
-SIXTRL_STATIC SIXTRL_UINT64_T const NS( PARTICLES_FLAGS_OWNS_MEMORY ) = ( SIXTRL_UINT64_T )0x0002;
-
-SIXTRL_STATIC SIXTRL_UINT64_T const
-    NS( PARTICLES_FLAGS_MEM_CTX_MEMPOOL ) = ( SIXTRL_UINT64_T )0x0010;
-
-SIXTRL_STATIC SIXTRL_UINT64_T const
-    NS( PARTICLES_FLAGS_MEM_CTX_SINGLEPARTICLE ) = ( SIXTRL_UINT64_T )0x0020;
+SIXTRL_INLINE void NS(ParticlesContainer_reserve_for_data)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_size_t) const new_data_capacity )
+{
+    NS(BlocksContainer_reserve_for_data)( 
+        particle_buffer, new_data_capacity );
     
-SIXTRL_STATIC SIXTRL_UINT64_T const 
-    NS(PARTICLES_FLAGS_MEM_CTX_FLAT_MEMORY ) = ( SIXTRL_UINT64_T )0x0040;
+    return;
+}
 
-SIXTRL_STATIC SIXTRL_UINT64_T const NS( PARTICLES_FLAGS_ALIGN_MASK ) = ( SIXTRL_UINT64_T )0xFFFF00;
+/* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_UINT64_T const NS( PARTICLES_MAX_ALIGNMENT ) = ( SIXTRL_UINT64_T )0xFFFF;
+SIXTRL_INLINE NS(block_alignment_t) 
+NS(ParticlesContainer_get_info_alignment)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_info_alignment)( particle_buffer );
+}
 
-SIXTRL_STATIC SIXTRL_UINT64_T const
-    NS( PARTICLES_FLAGS_ALIGN_MASK_OFFSET_BITS ) = ( SIXTRL_UINT64_T )8;
+SIXTRL_INLINE NS(block_alignment_t) NS(ParticlesContainer_get_data_alignment)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_data_alignment)( particle_buffer );
+}
 
-/* ========================================================================= */
+SIXTRL_INLINE NS(block_alignment_t) 
+NS(ParticlesContainer_get_info_begin_alignment)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_info_begin_alignment)( particle_buffer );
+}
 
-SIXTRL_STATIC SIXTRL_SIZE_T const NS( PARTICLES_DEFAULT_MEMPOOL_CHUNK_SIZE ) = (SIXTRL_SIZE_T)8u;
-SIXTRL_STATIC SIXTRL_SIZE_T const NS( PARTICLES_DEFAULT_MEMPOOL_ALIGNMENT ) = (SIXTRL_SIZE_T)16u;
-SIXTRL_STATIC SIXTRL_SIZE_T const NS( PARTICLES_NUM_OF_DOUBLE_ELEMENTS ) = (SIXTRL_SIZE_T)16u;
-SIXTRL_STATIC SIXTRL_SIZE_T const NS( PARTICLES_NUM_OF_INT64_ELEMENTS ) = (SIXTRL_SIZE_T)4u;
-SIXTRL_STATIC SIXTRL_SIZE_T const NS( PARTICLES_NUM_OF_ATTRIBUTES ) = ( SIXTRL_SIZE_T )20u;
-SIXTRL_STATIC SIXTRL_SIZE_T const NS( PARTICLES_PACK_BLOCK_LENGTH ) = ( SIXTRL_SIZE_T )192u;
+SIXTRL_INLINE NS(block_alignment_t) 
+NS(ParticlesContainer_get_data_begin_alignment)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_data_begin_alignment)( particle_buffer );
+}
+
+SIXTRL_INLINE NS(block_size_t) NS(ParticlesContainer_get_data_capacity)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_data_capacity)( particle_buffer );
+}
+
+SIXTRL_INLINE NS(block_size_t) NS(ParticlesContainer_get_data_size)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_data_size)( particle_buffer );
+}
+
+SIXTRL_INLINE NS(block_size_t) NS(ParticlesContainer_get_block_capacity)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_block_capacity)( particle_buffer );
+}
+
+SIXTRL_INLINE NS(block_size_t) NS(ParticlesContainer_get_num_of_blocks)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_num_of_blocks)( particle_buffer );
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE unsigned char const* 
+NS(ParticlesContainer_get_const_ptr_data_begin)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_const_ptr_data_begin)( particle_buffer );
+}
+
+SIXTRL_INLINE unsigned char* NS(ParticlesContainer_get_ptr_data_begin)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_ptr_data_begin)( particle_buffer );
+}
+
+SIXTRL_INLINE NS(BlockInfo) const* 
+NS(ParticlesContainer_get_const_block_infos_begin)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_const_block_infos_begin)( particle_buffer );
+}
+
+SIXTRL_INLINE NS(BlockInfo) const* 
+NS(ParticlesContainer_get_const_block_infos_end)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_const_block_infos_end)( particle_buffer );
+}
 
 
-SIXTRL_STATIC SIXTRL_UINT64_T const NS( PARTICLES_UNPACK_MAP  ) = ( SIXTRL_UINT64_T )0x0000;
-SIXTRL_STATIC SIXTRL_UINT64_T const NS( PARTICLES_UNPACK_COPY ) = ( SIXTRL_UINT64_T )0x0001;
-SIXTRL_STATIC SIXTRL_UINT64_T const NS( PARTICLES_UNPACK_CHECK_CONSISTENCY ) = 
-    ( SIXTRL_UINT64_T )0x02;
+SIXTRL_INLINE NS(BlockInfo)* NS(ParticlesContainer_get_block_infos_begin)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_block_infos_begin)( particle_buffer );
+}
 
+SIXTRL_INLINE NS(BlockInfo)* NS(ParticlesContainer_get_infos_end)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer )
+{
+    return NS(BlocksContainer_get_infos_end)( particle_buffer );
+}
 
-/* -------------------------------------------------------------------------- */
+SIXTRL_INLINE NS(BlockInfo) NS(ParticlesContainer_get_block_info_by_index)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer, 
+    NS(block_size_t) const block_index )
+{
+    return NS(BlocksContainer_get_block_info_by_index)( 
+        particle_buffer, block_index );
+}
 
-struct NS( Particles ) *
-    NS( Particles_preset )( struct NS( Particles ) * SIXTRL_RESTRICT p );
+SIXTRL_INLINE NS(BlockInfo) const* 
+NS(ParticlesContainer_get_const_ptr_to_block_info_by_index)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer, 
+    NS(block_size_t) const block_index )
+{
+    return NS(BlocksContainer_get_const_ptr_to_block_info_by_index)(
+        particle_buffer, block_index );
+}
 
-size_t NS( Particles_predict_required_capacity )( 
-    size_t num_particles,
-    size_t* SIXTRL_RESTRICT chunk_size,
-    size_t* SIXTRL_RESTRICT alignment, 
-    bool make_packed );
-
-struct NS( Particles ) * NS( Particles_new )( size_t npart );
-
-struct NS( Particles ) * NS( Particles_new_aligned )( 
-    SIXTRL_SIZE_T const npart, SIXTRL_SIZE_T alignment );
-
-struct NS( Particles ) *
-    NS( Particles_new_on_mempool )( size_t npart,
-                                    struct NS( MemPool ) *
-                                        SIXTRL_RESTRICT pool );
-
-struct NS( Particles ) * NS( Particles_new_single )();
-
-struct NS( Particles ) *
-    NS( Particles_new_on_single )( struct NS( SingleParticle ) *
-                                   ptr_single_particle );
-
-bool NS(Particles_unpack)(
-    struct NS(Particles)* SIXTRL_RESTRICT particles, 
-    unsigned char* SIXTRL_RESTRICT mem, uint64_t flags );
+SIXTRL_INLINE NS(BlockInfo)* 
+NS(ParticlesContainer_get_ptr_to_block_info_by_index)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer, 
+    NS(block_size_t) const block_index )
+{
+    return NS(BlocksContainer_get_ptr_to_block_info_by_index)(
+        particle_buffer, block_index );
+}
     
-void NS( Particles_free )( struct NS( Particles ) * SIXTRL_RESTRICT particles );
-
-/* -------------------------------------------------------------------------- */
-
-bool NS( Particles_is_packed )( const struct NS( Particles ) *
-                                const SIXTRL_RESTRICT p );
-
-bool NS( Particles_manages_own_memory )( const struct NS( Particles ) *
-                                         const SIXTRL_RESTRICT p );
-
-bool NS( Particles_uses_mempool )( const struct NS( Particles ) *
-                                   const SIXTRL_RESTRICT p );
-
-bool NS( Particles_uses_single_particle )( const struct NS( Particles ) *
-                                           const SIXTRL_RESTRICT p );
-
-bool NS( Particles_uses_flat_memory )( 
-    const struct NS(Particles )* const SIXTRL_RESTRICT p );
-
-struct NS( MemPool ) const* NS( Particles_get_const_mem_pool )(
-    const struct NS( Particles ) * const SIXTRL_RESTRICT p );
-
-struct NS( SingleParticle ) const* NS(
-    Particles_get_const_base_single_particle )( const struct NS( Particles ) *
-                                                const SIXTRL_RESTRICT p );
-
-unsigned char const* NS( Particles_get_const_flat_memory )(
-    const struct NS( Particles ) * const SIXTRL_RESTRICT p );
     
-/* -------------------------------------------------------------------------- */
-
-bool NS( Particles_has_defined_alignment )( const struct NS( Particles ) *
-                                            const SIXTRL_RESTRICT p );
-
-bool NS( Particles_is_aligned )( const struct NS( Particles ) *
-                                     const SIXTRL_RESTRICT p,
-                                 size_t alignment );
-
-bool NS( Particles_check_alignment )( const struct NS( Particles ) *
-                                          const SIXTRL_RESTRICT p,
-                                      size_t alignment );
-
-uint64_t NS( Particles_alignment )( const struct NS( Particles ) *
-                                    const SIXTRL_RESTRICT p );
-
-/* -------------------------------------------------------------------------- */
-
-bool NS( Particles_is_consistent )( const struct NS( Particles ) *
-                                    const SIXTRL_RESTRICT p );
-
-/* -------------------------------------------------------------------------- */
-
-bool NS( Particles_deep_copy_one )( struct NS( Particles ) *
-                                        SIXTRL_RESTRICT dest,
-                                    uint64_t dest_id,
-                                    struct NS( Particles )
-                                        const* SIXTRL_RESTRICT src,
-                                    uint64_t src_id );
-
-bool NS( Particles_deep_copy_all )( struct NS( Particles ) *
-                                        SIXTRL_RESTRICT dest,
-                                    struct NS( Particles )
-                                        const* SIXTRL_RESTRICT src );
-
-/* -------------------------------------------------------------------------- */
-
 #if !defined( _GPUCODE )
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
@@ -171,4 +363,4 @@ bool NS( Particles_deep_copy_all )( struct NS( Particles ) *
 
 #endif /* SIXTRACKLIB_COMMON_PARTICLES_H__ */
 
-/* end: sixtracklib/sixtracklib/common/particles.h */
+/* end: sixtracklib/common/particles.h */
