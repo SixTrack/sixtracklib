@@ -9,15 +9,13 @@
 
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/common/details/random.h"
-#include "sixtracklib/common/impl/particles_type.h"
-#include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/impl/particles_impl.h"
 
 extern void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p );
 
-
 void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
 {
-    SIXTRL_SIZE_T const NUM_PARTICLES = st_Particles_get_size( p );
+    SIXTRL_SIZE_T const NUM_PARTICLES = NS(Particles_get_num_particles)( p );
     
     if( ( p != 0 ) && ( NUM_PARTICLES > ( SIXTRL_SIZE_T )0u ) )
     {

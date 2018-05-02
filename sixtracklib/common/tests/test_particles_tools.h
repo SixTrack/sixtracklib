@@ -7,7 +7,7 @@ extern "C" {
 
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/_impl/namespace_begin.h"
-#include "sixtracklib/common/impl/particles_type.h"
+#include "sixtracklib/common/impl/particles_impl.h"
     
 void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p );
 
