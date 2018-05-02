@@ -115,12 +115,13 @@ int main( int argc, char* argv[] )
         {
             success = st_OpenCLEnv_prepare( ocl_env, device_id_str, 
                 "Track_particles_kernel_opencl", kernel_files, 
-                compile_options, NUM_TURNS, 0, &beam_elements );
+                compile_options, NUM_TURNS, &particles_buffer, &beam_elements );
         }
         
         if( success )
         {
-              success = st_OpenCLEnv_track_particles( ocl_env, 0, &beam_elements );
+              success = st_OpenCLEnv_track_particles( 
+                ocl_env, &particles_buffer, &beam_elements );
         }
         
         gettimeofday( &tstop, 0 );

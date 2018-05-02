@@ -60,12 +60,12 @@ extern bool NS(OpenCLEnv_prepare)( struct NS(OpenCLEnv)* ocl_env,
     char const* node_device_id, char const* kernel_function_name, 
     char* kernel_source_files, char const* compile_options,
     SIXTRL_SIZE_T const num_turns,
-    NS(Particles) const* SIXTRL_RESTRICT particles,
-    NS(BeamElements) const* SIXTRL_RESTRICT beam_elements );
+    const NS(ParticlesContainer) const* SIXTRL_RESTRICT particles,
+    const NS(BeamElements) const* SIXTRL_RESTRICT beam_elements );
 
 extern bool NS(OpenCLEnv_track_particles)( 
     struct NS(OpenCLEnv)* ocl_env, 
-    NS(Particles)*   SIXTRL_RESTRICT particles, 
+    NS(ParticlesContainer)*   SIXTRL_RESTRICT particles, 
     NS(BeamElements)* SIXTRL_RESTRICT beam_elements );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -223,9 +223,11 @@ NS(OpenCLEnv)* NS(OpenCLEnv_preset)( NS(OpenCLEnv)* ocl_env )
         ocl_env->num_selected_nodes         = ZERO_SIZE;
         ocl_env->num_devices                = ZERO_SIZE;
         
-        ocl_env->num_beam_elements          = ( SIXTRL_UINT64_T )0u;
-        ocl_env->num_particles              = ( SIXTRL_UINT64_T )0u;
-        ocl_env->num_turns                  = ( SIXTRL_UINT64_T )0u;
+        ocl_env->num_be_blocks              = ( NS(block_size_t) )0u;
+        ocl_env->num_particle_blocks        = ( NS(block_size_t) )0u;
+        ocl_env->num_turns                  = ( NS(block_size_t) )0u;
+        ocl_env->num_particles              = ( NS(block_num_elements_t) )0u;
+        ocl_env->num_beam_elements          = ( NS(block_num_elements_t) )0u;
         
         ocl_env->current_id_str             = 0;
         ocl_env->current_kernel_function    = 0;
@@ -493,18 +495,16 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
     char const* node_device_id, char const* kernel_function_name, 
     char* kernel_source_files, char const* compile_options,
     SIXTRL_SIZE_T const num_turns,
-    NS(Particles) const* SIXTRL_RESTRICT particles,
-    NS(BeamElements) const* SIXTRL_RESTRICT beam_elements )
+    const NS(ParticlesContainer) const* SIXTRL_RESTRICT particle_blocks,
+    const NS(BeamElements) const* SIXTRL_RESTRICT beam_elements )
 {
     bool success = false;
     
     static SIXTRL_SIZE_T const ZERO_SIZE = ( SIXTRL_SIZE_T )0u;
     
-    ( void )particles;
-    
-    if( ( ocl_env != 0 ) && 
-        ( num_turns > 0u ) &&
-        /* ( particles != 0 ) && */
+    if( ( ocl_env != 0 ) && ( num_turns > 0u ) &&
+        ( NS(ParticlesContainer_get_num_of_blocks)( particle_blocks ) >
+            ( NS(block_num_elements_t) )0u ) &&
         ( NS(BeamElements_get_num_of_blocks)( beam_elements ) > 
             ( NS(block_num_elements_t ) )0u ) && 
         ( NS(BeamElements_get_const_ptr_data_begin)( beam_elements ) != 0 ) &&
@@ -786,44 +786,107 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
             
             if( success )
             {
-                cl_int ret_info = CL_FALSE;
-                cl_int ret_data = CL_FALSE;
+                cl_int ret_be_info = CL_FALSE;
+                cl_int ret_be_data = CL_FALSE;
                 
-                SIXTRL_SIZE_T const num_elem  = 
+                cl_int ret_particle_info = CL_FALSE;
+                cl_int ret_particle_data = CL_FALSE;
+                
+                static NS(block_size_t) const 
+                    INFO_SIZE = sizeof( NS(BlockInfo ) );
+                
+                NS(block_num_elements_t) const num_particle_blocks = 
+                    NS(ParticlesContainer_get_num_of_blocks)( particle_blocks );
+                    
+                NS(block_size_t) const particle_info_size = 
+                    INFO_SIZE * num_particle_blocks;
+                    
+                NS(block_size_t) const num_of_particles =
+                    NS(BlockInfo_get_total_num_of_elements_in_blocks)(
+                        NS(ParticlesContainer_get_const_block_infos_begin)( 
+                            particle_blocks ), num_particle_blocks );
+                    
+                NS(block_size_t) const particle_data_size =
+                    NS(BlockInfo_get_total_storage_size)(
+                        NS(ParticlesContainer_get_const_block_infos_begin)(
+                            particle_blocks ), num_particle_blocks );
+                    
+                /* --------------------------------------------------------- */
+                
+                NS(block_num_elements_t) const num_be_blocks = 
                     NS(BeamElements_get_num_of_blocks)( beam_elements );
                 
-                SIXTRL_SIZE_T const info_size = sizeof( NS(BlockInfo) ) * num_elem;
+                NS(block_size_t) const be_info_size = 
+                    INFO_SIZE * num_be_blocks;
                 
-                SIXTRL_SIZE_T const data_size = 
+                NS(block_size_t) const num_of_beam_elements = 
+                    NS(BlockInfo_get_total_num_of_elements_in_blocks)(
+                        NS(BeamElements_get_const_block_infos_begin)( 
+                            beam_elements ), num_be_blocks );
+                    
+                NS(block_size_t) const be_data_size = 
                     NS(BlockInfo_get_total_storage_size)(
-                        NS(BeamElements_get_const_block_infos_begin)( beam_elements ),
-                        num_elem );
+                        NS(BeamElements_get_const_block_infos_begin)( 
+                            beam_elements ), num_be_blocks );
                 
+                /* --------------------------------------------------------- */
+                    
                 success = false;
                 
-                ocl_env->num_turns = num_turns;
-                ocl_env->num_beam_elements = num_elem;
-                ocl_env->num_particles = ( SIXTRL_SIZE_T )1u; /* HACK!!!! */
+                ocl_env->num_turns           = num_turns;
+                ocl_env->num_be_blocks       = num_be_blocks;
+                ocl_env->num_beam_elements   = num_of_beam_elements;
+                ocl_env->num_particle_blocks = num_particle_blocks;
+                ocl_env->num_particles       = num_of_particles;
                 
                 ocl_env->beam_elem_info_buffer = clCreateBuffer(
-                    ocl_env->context, CL_MEM_READ_WRITE, info_size, 0, &ret_info );
+                    ocl_env->context, CL_MEM_READ_WRITE, be_info_size, 0, 
+                        &ret_be_info );
                 
                 ocl_env->beam_elem_data_buffer = clCreateBuffer(
-                    ocl_env->context, CL_MEM_READ_WRITE, data_size, 0, &ret_data );
+                    ocl_env->context, CL_MEM_READ_WRITE, be_data_size, 0, 
+                        &ret_be_data );
                 
-                if( ( ret_data == CL_SUCCESS ) && ( ret_info == CL_SUCCESS ) )
+                ocl_env->beam_elem_info_buffer = clCreateBuffer(
+                    ocl_env->context, CL_MEM_READ_WRITE, particle_info_size, 0,
+                        &ret_particle_info );
+                
+                ocl_env->particle_data_buffer = clCreateBuffer(
+                    ocl_env->context, CL_MEM_READ_WRITE, particle_data_size, 0,
+                        &ret_particle_data );
+                
+                if( ( ret_be_data == CL_SUCCESS ) && 
+                    ( ret_be_info == CL_SUCCESS ) &&
+                    ( ret_particle_data == CL_SUCCESS ) &&
+                    ( ret_particle_info == CL_SUCCESS ) )
                 {
                     int cl_ret = CL_FALSE;
                     
                     ocl_env->ressources_flags |= NS(HAS_BEAM_ELEMS_BUFFERS);
+                    ocl_env->ressources_flags |= NS(HAS_PARTICLES_BUFFER);
                     
                     cl_ret  = clEnqueueWriteBuffer( ocl_env->queue, 
-                        ocl_env->beam_elem_info_buffer, CL_TRUE, 0u, info_size,
-                            beam_elements->info_begin, 0u, 0, 0 );
+                        ocl_env->beam_elem_info_buffer, CL_TRUE, 0u, be_info_size,
+                            ( NS(BlockInfo)* )NS(
+                                BeamElements_get_const_block_infos_begin)( 
+                                beam_elements ), 0u, 0, 0 );
                     
                     cl_ret |= clEnqueueWriteBuffer( ocl_env->queue,
-                        ocl_env->beam_elem_data_buffer, CL_TRUE, 0u, data_size,
-                            beam_elements->data_begin, 0u, 0, 0 );
+                        ocl_env->beam_elem_data_buffer, CL_TRUE, 0u, be_data_size,
+                        ( unsigned char* )NS(BeamElements_get_const_ptr_data_begin)( 
+                                beam_elements ), 0u, 0, 0 );
+                    
+                    cl_ret |= clEnqueueWriteBuffer( ocl_env->queue,
+                        ocl_env->particle_info_buffer, CL_TRUE, 0u, 
+                        particle_data_size, ( NS(BlockInfo)*                             
+                            ) NS(ParticlesContainer_get_const_block_infos_begin)( 
+                                particle_blocks ), 0u, 0, 0 );
+                    
+                    cl_ret |= clEnqueueWriteBuffer( ocl_env->queue,
+                        ocl_env->particle_data_buffer, CL_TRUE, 0u, 
+                        particle_data_size, ( unsigned char* 
+                            )NS(ParticlesContainer_get_const_ptr_data_begin)( 
+                                particle_blocks ), 0u, 0, 0 );
                     
                     if( cl_ret == CL_SUCCESS )
                     {
@@ -843,6 +906,12 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                         
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 4, 
                               sizeof( cl_mem ), &ocl_env->beam_elem_data_buffer );
+                        
+                        cl_ret |= clSetKernelArg( ocl_env->kernel, 5, 
+                               sizeof( cl_mem ), &ocl_env->particle_data_buffer );
+                        
+                        cl_ret |= clSetKernelArg( ocl_env->kernel, 6, 
+                               sizeof( cl_mem ), &ocl_env->particle_info_buffer );
                         
                         success = ( cl_ret == CL_SUCCESS );
                     }
@@ -866,18 +935,19 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
 
 bool NS(OpenCLEnv_track_particles)( 
     struct NS(OpenCLEnv)* ocl_env, 
-    NS(Particles)*   SIXTRL_RESTRICT particles, 
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_blocks, 
     NS(BeamElements)* SIXTRL_RESTRICT beam_elements )
 {
     bool success = false;
     
-    ( void )particles;
-    
     if( ( ocl_env != 0 ) && ( ocl_env->is_ready ) &&
-        ( beam_elements != 0 ) && 
+        ( beam_elements != 0 ) && ( particle_blocks != 0 ) &&
         ( NS(BeamElements_get_num_of_blocks)( beam_elements) > 0 ) &&
         ( NS(BeamElements_get_num_of_blocks)( beam_elements) == 
-            ocl_env->num_beam_elements ) )
+            ocl_env->num_be_blocks ) &&
+        ( NS(ParticlesContainer_get_num_of_blocks)( particle_blocks ) > 0 ) &&
+        ( NS(ParticlesContainer_get_num_of_blocks)( particle_blocks ) == 
+            ocl_env->num_particle_blocks ) )
     {
         size_t work_units_per_kernel = ( size_t )ocl_env->num_particles;
         
@@ -892,7 +962,7 @@ bool NS(OpenCLEnv_track_particles)(
             ret = clWaitForEvents( 1u, &finished_kernel );
             
             success = ( ret == CL_SUCCESS );            
-            clReleaseEvent( finished_kernel );                       
+            clReleaseEvent( finished_kernel );                     
         }
     }
         
@@ -977,7 +1047,8 @@ void NS(OpenCLEnv_reset_kernel)( NS(OpenCLEnv)* ocl_env )
             
         if( NS(HAS_PARTICLES_BUFFER) == ( NS(HAS_PARTICLES_BUFFER) & flags ) )
         {
-            clReleaseMemObject( ocl_env->particles_buffer );
+            clReleaseMemObject( ocl_env->particle_info_buffer );
+            clReleaseMemObject( ocl_env->particle_data_buffer );
             flags &= ~( NS(HAS_PARTICLES_BUFFER) );            
         }
         
