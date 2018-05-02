@@ -487,9 +487,7 @@ size_t NS( MemPool_get_remaining_bytes )( const NS( MemPool ) *
     SIXTRL_SIZE_T const chunk_size = NS( MemPool_get_chunk_size )( pool );
     SIXTRL_SIZE_T const size = NS( MemPool_get_size )( pool );
 
-    assert( ( capacity >= size ) && ( chunk_size > ZERO_SIZE ) &&
-            ( ( size % chunk_size ) == ZERO_SIZE ) );
-
+    assert( ( capacity >= size ) && ( chunk_size > ZERO_SIZE ) );
     return ( ( capacity - size ) / chunk_size ) * chunk_size;
 }
 
@@ -591,6 +589,17 @@ unsigned char const* NS( MemPool_get_const_pointer_by_offset )(
                 (SIXTRL_SIZE_T)0u ) ) || ( ptr == 0 ) );
 
     return ptr + offset;
+}
+
+void NS(MemPool_increment_size)(
+    NS(MemPool)* SIXTRL_RESTRICT pool,
+    SIXTRL_UINT64_T const new_size )
+{
+    assert( ( pool != 0 ) && ( new_size >= NS(MemPool_get_size)( pool ) ) &&
+            ( new_size < NS(MemPool_get_capacity)( pool ) ) );
+    
+    NS(MemPool_set_size)( pool, new_size );
+    return;
 }
 
 /* ------------------------------------------------------------------------- */

@@ -122,6 +122,10 @@ unsigned char const* NS( MemPool_get_const_pointer_by_offset )(
     const NS( MemPool ) * const SIXTRL_RESTRICT pool, 
     SIXTRL_UINT64_T const offset );
 
+void NS(MemPool_increment_size)(
+    NS(MemPool)* SIXTRL_RESTRICT pool,
+    SIXTRL_UINT64_T const new_size );
+
 NS( AllocResult )
 NS( MemPool_append )( NS( MemPool ) * SIXTRL_RESTRICT pool, 
                       SIXTRL_SIZE_T const num_bytes );
