@@ -17,6 +17,8 @@ extern "C" {
 #include <stdlib.h>
     
 #include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/common/impl/particles_impl.h"
+#include "sixtracklib/common/beam_elements.h"
 
 struct NS(OpenCLEnv);
 struct NS(OpenCLEnvNodeDevice);
@@ -87,9 +89,6 @@ typedef struct NS(OpenCLEnv)
 }
 NS(OpenCLEnv);
 
-struct NS(Particles);
-struct NS(BeamElements);
-
 NS(OpenCLEnv)* NS(OpenCLEnv_init)();
 
 NS(OpenCLEnvNodeDevice) const* NS(OpenCLEnv_get_node_devices)(
@@ -110,13 +109,13 @@ bool NS(OpenCLEnv_prepare)( struct NS(OpenCLEnv)* ocl_env,
     char const* node_device_id, char const* kernel_function_name, 
     char* kernel_source_files, char const* compile_options,
     SIXTRL_SIZE_T const num_turns,
-    struct NS(Particles) const* SIXTRL_RESTRICT particles,
-    struct NS(BeamElements) const* SIXTRL_RESTRICT beam_elements );
+    NS(Particles) const* SIXTRL_RESTRICT particles,
+    NS(BeamElements) const* SIXTRL_RESTRICT beam_elements );
 
 bool NS(OpenCLEnv_track_particles)( 
     struct NS(OpenCLEnv)* ocl_env, 
-    struct NS(Particles)*   SIXTRL_RESTRICT particles, 
-    struct NS(BeamElements)* SIXTRL_RESTRICT beam_elements );
+    NS(Particles)*   SIXTRL_RESTRICT particles, 
+    NS(BeamElements)* SIXTRL_RESTRICT beam_elements );
    
                        
 

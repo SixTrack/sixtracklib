@@ -19,12 +19,10 @@
 #include "sixtracklib/_impl/namespace_begin.h"
 #include "sixtracklib/_impl/path.h"
 #include "sixtracklib/common/details/gpu_kernel_tools.h"
-#include "sixtracklib/common/impl/particles_type.h"
-#include "sixtracklib/common/impl/block_type.h"
-#include "sixtracklib/common/impl/block_drift_type.h"
+#include "sixtracklib/common/impl/block_info_impl.h"
+#include "sixtracklib/common/impl/particles_impl.h"
+#include "sixtracklib/common/impl/be_drift_impl.h"
 #include "sixtracklib/common/beam_elements.h"
-#include "sixtracklib/common/particles.h"
-#include "sixtracklib/common/track.h"
 
 /* ------------------------------------------------------------------------- */
 
@@ -67,8 +65,8 @@ extern bool NS(OpenCLEnv_prepare)( struct NS(OpenCLEnv)* ocl_env,
 
 extern bool NS(OpenCLEnv_track_particles)( 
     struct NS(OpenCLEnv)* ocl_env, 
-    struct NS(Particles)*   SIXTRL_RESTRICT particles, 
-    struct NS(BeamElements)* SIXTRL_RESTRICT beam_elements );
+    NS(Particles)*   SIXTRL_RESTRICT particles, 
+    NS(BeamElements)* SIXTRL_RESTRICT beam_elements );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -507,10 +505,10 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
     if( ( ocl_env != 0 ) && 
         ( num_turns > 0u ) &&
         /* ( particles != 0 ) && */
-        ( beam_elements  != 0 ) && 
-        ( beam_elements->num_elements ) && 
-        ( beam_elements->info_begin != 0 ) &&
-        ( beam_elements->data_begin != 0 ) &&
+        ( NS(BeamElements_get_num_of_blocks)( beam_elements ) > 
+            ( NS(block_num_elements_t ) )0u ) && 
+        ( NS(BeamElements_get_const_ptr_data_begin)( beam_elements ) != 0 ) &&
+        ( NS(BeamElements_get_const_block_infos_begin)( beam_elements ) != 0 ) &&
         ( node_device_id != 0 ) && ( kernel_function_name != 0 ) && 
         ( kernel_source_files != 0 ) )
     {
@@ -791,21 +789,16 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                 cl_int ret_info = CL_FALSE;
                 cl_int ret_data = CL_FALSE;
                 
-                SIXTRL_SIZE_T const num_elem  = beam_elements->num_elements;
+                SIXTRL_SIZE_T const num_elem  = 
+                    NS(BeamElements_get_num_of_blocks)( beam_elements );
                 
-                SIXTRL_SIZE_T const info_size = 
-                    sizeof( NS(BeamElemInfo) ) * num_elem;
+                SIXTRL_SIZE_T const info_size = sizeof( NS(BlockInfo) ) * num_elem;
                 
                 SIXTRL_SIZE_T const data_size = 
-                    beam_elements->info_begin[ num_elem - 1 ].mem_offset +
-                    beam_elements->info_begin[ num_elem - 1 ].num_bytes;
+                    NS(BlockInfo_get_total_storage_size)(
+                        NS(BeamElements_get_const_block_infos_begin)( beam_elements ),
+                        num_elem );
                 
-                printf( "%lu / %lu / %lu / %ld\r\n", 
-                        beam_elements->info_begin[ 16 ].mem_offset,
-                        beam_elements->info_begin[ 16 ].type_id,
-                        beam_elements->info_begin[ 16 ].num_bytes,
-                        beam_elements->info_begin[ 16 ].element_id );
-                    
                 success = false;
                 
                 ocl_env->num_turns = num_turns;
@@ -834,35 +827,22 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                     
                     if( cl_ret == CL_SUCCESS )
                     {
-                        printf( "THERE (enqueued buffers) \r\n" );
-                        fflush( stdout );
-                        
                         SIXTRL_SIZE_T const U64_SIZE = sizeof( SIXTRL_UINT64_T );
                         
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 0, 
                               U64_SIZE, &ocl_env->num_turns );
                         
-                        printf( "cl_ret = %i\r\n", cl_ret );
-                        
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 1, 
                               U64_SIZE, &ocl_env->num_beam_elements );
-                        
-                        printf( "cl_ret = %i\r\n", cl_ret );
                         
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 2, 
                               U64_SIZE, &ocl_env->num_particles );
                         
-                        printf( "cl_ret = %i\r\n", cl_ret );
-                        
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 3, 
                               sizeof( cl_mem ), &ocl_env->beam_elem_info_buffer );
                         
-                        printf( "cl_ret = %i\r\n", cl_ret );
-                        
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 4, 
                               sizeof( cl_mem ), &ocl_env->beam_elem_data_buffer );
-                        
-                        printf( "cl_ret = %i\r\n", cl_ret );
                         
                         success = ( cl_ret == CL_SUCCESS );
                     }
@@ -886,8 +866,8 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
 
 bool NS(OpenCLEnv_track_particles)( 
     struct NS(OpenCLEnv)* ocl_env, 
-    struct NS(Particles)*   SIXTRL_RESTRICT particles, 
-    struct NS(BeamElements)* SIXTRL_RESTRICT beam_elements )
+    NS(Particles)*   SIXTRL_RESTRICT particles, 
+    NS(BeamElements)* SIXTRL_RESTRICT beam_elements )
 {
     bool success = false;
     
@@ -895,8 +875,9 @@ bool NS(OpenCLEnv_track_particles)(
     
     if( ( ocl_env != 0 ) && ( ocl_env->is_ready ) &&
         ( beam_elements != 0 ) && 
-        ( beam_elements->num_elements > 0u ) &&
-        ( beam_elements->num_elements == ocl_env->num_beam_elements ) )
+        ( NS(BeamElements_get_num_of_blocks)( beam_elements) > 0 ) &&
+        ( NS(BeamElements_get_num_of_blocks)( beam_elements) == 
+            ocl_env->num_beam_elements ) )
     {
         size_t work_units_per_kernel = ( size_t )ocl_env->num_particles;
         
@@ -910,14 +891,7 @@ bool NS(OpenCLEnv_track_particles)(
         {
             ret = clWaitForEvents( 1u, &finished_kernel );
             
-            if( ret == CL_SUCCESS )
-            {
-                printf( "HERE!!!\r\n" );
-                fflush( stdout );
-                
-                success = true;
-            }
-            
+            success = ( ret == CL_SUCCESS );            
             clReleaseEvent( finished_kernel );                       
         }
     }
