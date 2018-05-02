@@ -10,7 +10,8 @@
 
 void handle_cmd_line_arguments( int argc, char* argv[], 
     const st_OpenCLEnv *const ocl_env, char device_id_str[], 
-    size_t* ptr_num_particles, size_t* ptr_num_elements, 
+    st_block_num_elements_t* ptr_num_particles, 
+    st_block_num_elements_t* ptr_num_elements, 
     size_t* ptr_num_turns );
 
 
@@ -21,19 +22,9 @@ int main( int argc, char* argv[] )
       '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'         
     };
         
-    size_t NUM_ELEMS     = 100;
-    size_t NUM_PARTICLES = 100000;
+    st_block_num_elements_t NUM_ELEMS     = 100;
+    st_block_num_elements_t NUM_PARTICLES = 100000;
     size_t NUM_TURNS     = 100;
-    
-    /* 
-    size_t ii = 0;
-    
-    struct timeval tstart;
-    struct timeval tstop;
-    
-    st_Particles* particles = 0;
-    double* drift_lengths = 0;
-    */
     
     /* first: init the pseudo random number generator for the particle
      * values randomization - choose a constant seed to have reproducible
@@ -41,8 +32,6 @@ int main( int argc, char* argv[] )
     
     uint64_t seed = UINT64_C( 20180420 );
     st_Random_init_genrand64( seed );
-    
-    st_BeamElements* beam_elements = 0;
     
     /* Init the OpenCL Environment -> this gives us a list of available 
      * devices which is displayed if no command line parameters have been 
@@ -53,65 +42,106 @@ int main( int argc, char* argv[] )
     handle_cmd_line_arguments( argc, argv, ocl_env, device_id_str, 
                                &NUM_PARTICLES, &NUM_ELEMS, &NUM_TURNS );
     
-    if( ( NUM_ELEMS > ( SIXTRL_SIZE_T )0u ) && 
+    if( ( NUM_ELEMS     > ( st_block_num_elements_t )0u ) && 
+        ( NUM_PARTICLES > ( st_block_num_elements_t )0u ) &&
         ( NUM_TURNS > ( SIXTRL_SIZE_T )0u ) && 
         ( st_OpenCLEnv_get_num_node_devices( ocl_env ) > ( size_t )0u ) )
     {
         bool success = true;
         
-        size_t ii = 0;
+        struct timeval tstart;
+        struct timeval tstop;
+        
+        int ret = 0;
+        st_block_num_elements_t jj = 0;
         
         char kernel_files[] = 
-            "sixtracklib/_impl/namespace_begin.h, "
-            "sixtracklib/_impl/definitions.h, "            
-            "sixtracklib/common/impl/particles_type.h, "
-            "sixtracklib/common/impl/track_impl.h, "
-            "sixtracklib/common/impl/block_type.h, "
-            "sixtracklib/common/impl/block_drift_type.h, "
-            "sixtracklib/common/beam_elements.h, "
-            "sixtracklib/opencl/track_particles_kernel.cl, "
-            "sixtracklib/_impl/namespace_end.h";
+            "sixtracklib/_impl/definitions.h, "
+            "sixtracklib/common/impl/particles_impl.h, "
+            "sixtracklib/common/impl/block_info_impl.h, "
+            "sixtracklib/common/impl/be_drift_impl.h, "
+            "sixtracklib/opencl/track_particles_kernel.cl";
             
         char compile_options[] = "-D _GPUCODE=1 -D __NAMESPACE=st_";
         
         
-        beam_elements = st_BeamElements_new( NUM_ELEMS, 1024 * 1024, 8u, 4096u );
+        st_ParticlesContainer particles_buffer;
+        st_Particles          particles;    
+        st_BeamElements       beam_elements;
         
-        for( ii = 0 ; ii < NUM_ELEMS ; ++ii )
+        st_ParticlesContainer_preset( &particles_buffer );  
+        st_ParticlesContainer_reserve_num_blocks( &particles_buffer, 1u );
+        st_ParticlesContainer_reserve_for_data( &particles_buffer, 20000000u );
+                
+        
+        ret = st_ParticlesContainer_add_particles( 
+            &particles_buffer, &particles, NUM_PARTICLES );
+        
+        if( ret == 0 )
         {
-            SIXTRL_REAL_T const MIN_LENGTH = ( SIXTRL_REAL_T )0.1;
-            SIXTRL_REAL_T const SLOPE      = ( SIXTRL_REAL_T )0.01;            
-            SIXTRL_REAL_T const length     = MIN_LENGTH + SLOPE * ii;
-            
-            success &= st_BeamElements_add_drift( 
-                beam_elements, length, ( int64_t )ii );
+            st_Particles_random_init( &particles );
         }
+        else
+        {
+            printf( "Error initializing particles!\r\n" );
+            st_ParticlesContainer_free( &particles_buffer );
+            success = false;
+        }
+        
+        st_BeamElements_preset( &beam_elements );
+        st_BeamElements_reserve_num_blocks( &beam_elements, NUM_ELEMS );
+        st_BeamElements_reserve_for_data( &beam_elements, NUM_ELEMS * sizeof( st_Drift ) );
+                
+        for( jj = 0 ; jj < NUM_ELEMS ; ++jj )
+        {
+            double LENGTH = 0.05 + 0.005 * jj;
+            st_element_id_t const ELEMENT_ID = ( st_element_id_t )jj;
+            
+            
+            st_Drift next_drift = 
+                st_BeamElements_add_drift( &beam_elements, LENGTH, ELEMENT_ID );
+            
+            if( st_Drift_get_type_id( &next_drift ) != st_BLOCK_TYPE_DRIFT )
+            {
+                printf( "Error initializing drift #%lu\r\n", jj );
+                success = false;
+                break;
+            }
+        }
+        
+        gettimeofday( &tstart, 0 );
         
         if( success )
         {
             success = st_OpenCLEnv_prepare( ocl_env, device_id_str, 
                 "Track_particles_kernel_opencl", kernel_files, 
-                compile_options, NUM_TURNS, 0, beam_elements );            
+                compile_options, NUM_TURNS, 0, &beam_elements );
         }
         
         if( success )
         {
-              success = st_OpenCLEnv_track_particles( ocl_env, 0, beam_elements );
+              success = st_OpenCLEnv_track_particles( ocl_env, 0, &beam_elements );
         }
         
+        gettimeofday( &tstop, 0 );
+    
         if( success )
         {
             printf( "Success!\r\n" );
         }
+        
+        double const usec_dist = 1e-6 * ( ( tstop.tv_sec >= tstart.tv_sec ) ?
+            ( tstop.tv_usec - tstart.tv_usec ) : ( 1000000 - tstart.tv_usec ) );
+        
+        double const delta_time = ( double )( tstop.tv_sec - tstart.tv_sec ) + usec_dist;
+        printf( "time elapsed    : %16.8fs \r\n", delta_time );
+        printf( "time / particle : %16.8f [us/Part]\r\n", 
+                    ( delta_time / NUM_PARTICLES ) * 1e6 );
+        
+        st_BeamElements_free( &beam_elements );
+        st_ParticlesContainer_free( &particles_buffer );
     }
-    
-    if( beam_elements != 0 )
-    {
-        st_BeamElements_free( beam_elements );
-        free( beam_elements );
-        beam_elements = 0;
-    }
-    
+       
     st_OpenCLEnv_free( ocl_env );
     free( ocl_env );
     ocl_env = 0;
@@ -123,7 +153,8 @@ int main( int argc, char* argv[] )
 
 void handle_cmd_line_arguments( int argc, char* argv[], 
     const st_OpenCLEnv *const ocl_env, char device_id_str[], 
-    size_t* ptr_num_particles, size_t* ptr_num_elements, size_t* ptr_num_turns )
+    st_block_num_elements_t* ptr_num_particles, st_block_num_elements_t* ptr_num_elements, 
+    size_t* ptr_num_turns )
 {
     if( argc >= 1 )
     {
@@ -175,8 +206,8 @@ void handle_cmd_line_arguments( int argc, char* argv[],
     }
     else if( argc >= 4 )
     {
-        size_t const temp_num_part = atoi( argv[ 1 ] );
-        size_t const temp_num_elem = atoi( argv[ 2 ] );
+        st_block_num_elements_t const temp_num_part = atoi( argv[ 1 ] );
+        st_block_num_elements_t const temp_num_elem = atoi( argv[ 2 ] );
         size_t const temp_num_turn = atoi( argv[ 3 ] );
         
         if( ( temp_num_part > 0 ) && ( ptr_num_particles != 0 ) )

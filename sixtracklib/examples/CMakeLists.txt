@@ -51,7 +51,7 @@ if( SIXTRACKL_ENABLE_AUTOVECTORIZATION )
 endif()
 
 # ------------------------------------------------------------------------------
-# simple_drift_simd.c -> simple_drift_simd :
+#simple_drift_simd.c -> simple_drift_simd :
 
 if( SIXTRACKL_ENABLE_MANUAL_SIMD )
     
