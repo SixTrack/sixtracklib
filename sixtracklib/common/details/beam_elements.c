@@ -9,215 +9,239 @@
 #include <string.h>
 
 #include "sixtracklib/common/mem_pool.h"
+#include "sixtracklib/common/block_info.h"
+#include "sixtracklib/common/impl/block_info_impl.h"
 
-extern NS(BeamElements)* NS(BeamElements_preset)( NS(BeamElements)* beam_elements );
-
-extern NS(BeamElements)* NS(BeamElements_new)( 
-    SIXTRL_SIZE_T const elements_capacity, size_t const   raw_capacity, 
-    SIXTRL_SIZE_T const element_alignment, SIXTRL_SIZE_T const begin_alignment );
-
-extern void NS(BeamElements_free)( NS(BeamElements)* beam_elements );
-
-extern bool NS(BeamElements_add_drift)( 
+extern NS(Drift) NS(BeamElements_add_drift)( 
     NS(BeamElements)* beam_elements, SIXTRL_REAL_T  const length, 
     SIXTRL_INT64_T const element_id );
 
-extern bool NS(BeamElements_add_drift_exact)( 
+extern NS(Drift) NS(BeamElements_add_drift_exact)( 
     NS(BeamElements)* beam_elements, SIXTRL_REAL_T const length, 
     SIXTRL_INT64_T const element_id );
 
-SIXTRL_STATIC bool NS(BeamElements_add_drift_type)(
-    NS(BeamElements)* beam_elements, SIXTRL_REAL_T const length, 
-    SIXTRL_INT64_T const element_id, SIXTRL_UINT64_T const type_id );
+extern NS(Drift) NS(BeamElements_add_drifts)(
+    NS(BeamElements)* SIXTRL_RESTRICT beam_elements, 
+    SIXTRL_UINT64_T const num_of_drifts, 
+    SIXTRL_REAL_T   const* SIXTRL_RESTRICT lengths, 
+    SIXTRL_INT64_T  const* SIXTRL_RESTRICT element_ids );
 
+extern NS(Drift) NS(BeamElements_add_drifts_exact)(
+    NS(BeamElements)* SIXTRL_RESTRICT beam_elements, 
+    SIXTRL_UINT64_T const num_of_drifts, 
+    SIXTRL_REAL_T   const* SIXTRL_RESTRICT lengths, 
+    SIXTRL_INT64_T  const* SIXTRL_RESTRICT element_ids );
 
-NS(BeamElements)* NS(BeamElements_preset)( NS(BeamElements)* elements )
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC NS(Drift) NS(BeamElements_add_drift_type_block)(
+    NS(BeamElements)* SIXTRL_RESTRICT beam_elements, 
+    SIXTRL_REAL_T  const length, 
+    SIXTRL_INT64_T const element_id, 
+    NS(BlockType)  const type_id );
+
+SIXTRL_STATIC NS(Drift) NS(BeamElements_add_multi_drifts_type_block)(
+    NS(BeamElements)* beam_elements, 
+    SIXTRL_REAL_T   const* SIXTRL_RESTRICT length, 
+    NS(element_id_t) const* SIXTRL_RESTRICT element_id, 
+    NS(block_num_elements_t) const  num_elements,
+    NS(BlockType)   const  type_id );
+
+/* ------------------------------------------------------------------------- */
+
+NS(Drift) NS(BeamElements_add_drift_type_block)(
+    NS(BeamElements)* SIXTRL_RESTRICT elements, SIXTRL_REAL_T const length, 
+    NS(element_id_t) const element_id, NS(BlockType) const type_id )
 {
-    if( elements != 0 )
-    {
-        elements->info_begin   = 0;
-        elements->data_begin   = 0;
-                    
-        NS(MemPool_preset)( &elements->info_store );
-        NS(MemPool_preset)( &elements->data_store );
-        
-        elements->num_elements         = ( SIXTRL_SIZE_T )0u;
-        elements->elements_capacity    = ( SIXTRL_SIZE_T )0u;
-        
-        elements->raw_size             = ( SIXTRL_SIZE_T )0u;
-        elements->raw_capacity         = ( SIXTRL_SIZE_T )0u;
-        
-        elements->begin_alignment      = ( SIXTRL_SIZE_T )0u;
-        elements->element_alignment    = ( SIXTRL_SIZE_T )0u;
-        
-    }
+    NS(Drift) drift;
     
-    return elements;
-}
-
-NS(BeamElements)* NS(BeamElements_new)( 
-    SIXTRL_SIZE_T const elements_capacity, size_t const   raw_capacity, 
-    SIXTRL_SIZE_T const element_alignment, SIXTRL_SIZE_T const begin_alignment )
-{    
-    bool success = false;
-    
-    NS(BeamElements)* elements = NS(BeamElements_preset)(
-        ( NS(BeamElements)* )malloc( sizeof( NS(BeamElements) ) ) );
-    
-    if( elements != 0 )
-    {
-        SIXTRL_SIZE_T const INFO_CAPACITY = 
-            sizeof( NS(BeamElemInfo) ) * elements_capacity + begin_alignment;
-            
-        NS(MemPool_init)( &elements->info_store, INFO_CAPACITY, 
-                          sizeof( NS(BeamElemInfo) ) );
-        
-        NS(MemPool_init)( &elements->data_store, 
-                          raw_capacity + begin_alignment, 8u );
-        
-        elements->begin_alignment   = begin_alignment;
-        elements->element_alignment = element_alignment;
-        
-        elements->elements_capacity = elements_capacity;
-        elements->raw_capacity = raw_capacity;
-        
-        success = NS(MemPool_clear_to_aligned_position)(
-            &elements->info_store, elements->begin_alignment );
-        
-        success &= NS(MemPool_clear_to_aligned_position)(
-            &elements->data_store, elements->begin_alignment );
-        
-        if( success )
-        {
-            elements->info_begin = ( NS(BeamElemInfo)* )NS(MemPool_get_next_begin_pointer)( 
-                &elements->info_store, elements->begin_alignment );
-            
-            elements->data_begin = ( unsigned char* )NS(MemPool_get_next_begin_pointer)( 
-                &elements->data_store, elements->begin_alignment );
-            
-            success = ( ( elements->info_begin != 0 ) && 
-                        ( elements->data_begin != 0 ) );
-        }
-    }
-    
-    if( !success )
-    {
-        NS(BeamElements_free)( elements );
-        free( elements );
-        elements = 0;
-    }
-    
-    return elements;
-}
-
-void NS(BeamElements_free)( NS(BeamElements)* elements )
-{
-    if( elements != 0 )
-    {
-        NS(MemPool_free)( &elements->info_store );
-        NS(MemPool_free)( &elements->data_store );
-        
-        NS(BeamElements_preset)( elements );        
-    }
-    
-    return;    
-}
-
-bool NS(BeamElements_add_drift_type)(
-    NS(BeamElements)* elements, SIXTRL_REAL_T const length, 
-    SIXTRL_INT64_T const element_id, SIXTRL_UINT64_T const type_id )
-{
-    bool success = false;
-
     if( ( elements != 0 ) && 
-        ( elements->elements_capacity > elements->num_elements ) )
+        ( NS(BeamElements_get_block_capacity)( elements ) > 
+          NS(BeamElements_get_num_of_blocks)(  elements ) ) &&
+        ( ( type_id == NS(BLOCK_TYPE_DRIFT) ) ||
+          ( type_id == NS(BLOCK_TYPE_DRIFT_EXACT ) ) ) )
+    {
+        NS(block_alignment_t) const info_align = 
+            NS(BeamElements_get_info_alignment)( elements );
+            
+        NS(block_alignment_t) const data_align =
+            NS(BeamElements_get_data_alignment)( elements );
+        
+        NS(MemPool) rollback_info_store = elements->info_store;
+        NS(MemPool) rollback_data_store = elements->data_store;
+        
+        NS(AllocResult) info_result = NS(MemPool_append_aligned)(
+            &elements->info_store, sizeof( NS(BlockInfo) ), info_align );
+        
+        NS(block_size_t) const mem_offset = NS(MemPool_get_next_begin_offset)( 
+            &elements->data_store, data_align );
+        
+        NS(block_size_t) const max_num_bytes_on_mem = 
+            NS(MemPool_get_capacity)( &elements->data_store );
+        
+        if( ( NS(AllocResult_valid)( &info_result ) ) &&
+            ( max_num_bytes_on_mem > mem_offset ) )
+        {
+            NS(BlockInfo)* block_info = 
+                ( NS(BlockInfo)* )NS(AllocResult_get_pointer)( &info_result );
+            
+            unsigned char* data_mem_begin = 
+                NS(BeamElements_get_ptr_data_begin)( elements );
+                
+            NS(BlockInfo_set_mem_offset)( block_info, mem_offset );
+            NS(BlockInfo_set_type_id)( block_info, type_id );
+            NS(BlockInfo_set_common_alignment)( block_info, data_align );
+            NS(BlockInfo_set_num_elements)( 
+                block_info, ( NS(block_num_elements_t) )1 );
+            
+            NS(Drift_preset)( &drift );
+            NS(Drift_set_num_elements)( &drift, ( NS(block_num_elements_t) )1 );
+            NS(Drift_set_type_id)( &drift, type_id );
+            
+            if( 0 == NS(Drift_create_one_on_memory)( &drift, block_info, 0, 
+                data_mem_begin, max_num_bytes_on_mem, length, element_id ) )
+            {
+                ++elements->num_blocks;
+                
+                NS(MemPool_increment_size)( 
+                    &elements->data_store, 
+                    NS(BlockInfo_get_mem_offset)( block_info ) + 
+                    NS(BlockInfo_get_num_of_bytes)( block_info ) );
+                
+                return drift;
+            }
+        }
+        
+        /* if we are here, something went wrong -> rollback and return an 
+         * invalid drift! */
+        
+        SIXTRL_ASSERT( NS(Drift_get_type_id)( &drift ) == 
+                       NS(BLOCK_TYPE_INVALID ) );
+        
+        elements->info_store = rollback_info_store;
+        elements->data_store = rollback_data_store;
+    }
+    
+    NS(Drift_preset)( &drift );
+    return drift;
+}
+
+NS(Drift) NS(BeamElements_add_multi_drifts_type_block)(
+    NS(BeamElements)* SIXTRL_RESTRICT elements, 
+    SIXTRL_REAL_T const* SIXTRL_RESTRICT lengths, 
+    NS(element_id_t) const* SIXTRL_RESTRICT element_ids, 
+    NS(block_num_elements_t) const num_elements, 
+    NS(BlockType)   const type_id )
+{
+    NS(Drift) drift;
+    
+    if( ( elements != 0 ) && 
+        ( num_elements != ( NS(block_num_elements_t) )0u ) &&
+        ( NS(BeamElements_get_block_capacity)( elements ) > 
+          NS(BeamElements_get_num_of_blocks)(  elements ) ) &&        
+        ( ( type_id == NS(BLOCK_TYPE_DRIFT) ) ||
+          ( type_id == NS(BLOCK_TYPE_DRIFT_EXACT ) ) ) )
     {
         NS(MemPool) rollback_info_store = elements->info_store;
         NS(MemPool) rollback_data_store = elements->data_store;
         
-        NS(AllocResult) info_result = NS(MemPool_append)(
-            &elements->info_store, sizeof( NS(BeamElemInfo) ) );
+        NS(block_alignment_t) const info_align =
+            NS(BeamElements_get_info_alignment)( elements );
         
-        NS(AllocResult) data_result = NS(MemPool_append)(
-            &elements->data_store, sizeof( SIXTRL_REAL_T ) );
+        NS(AllocResult) info_result = NS(MemPool_append_aligned)(
+            &elements->info_store, sizeof( NS(BlockInfo) ), info_align );
         
+        NS(block_alignment_t) const data_align = 
+            NS(BeamElements_get_data_alignment)( elements );
+        
+        NS(block_size_t) const mem_offset = NS(MemPool_get_next_begin_offset)( 
+            &elements->data_store, data_align );
+        
+        NS(block_size_t) const max_num_bytes_on_mem = 
+            NS(MemPool_get_capacity)( &elements->data_store );
+            
         if( ( NS(AllocResult_valid)( &info_result ) ) &&
-            ( NS(AllocResult_valid)( &data_result ) ) )
+            ( max_num_bytes_on_mem > mem_offset ) )
         {
-            NS(BeamElemInfo)* ptr_info = 
-                ( NS(BeamElemInfo)* )NS(AllocResult_get_pointer)( &info_result );
+            NS(BlockInfo)* block_info = 
+                ( NS(BlockInfo)* )NS(AllocResult_get_pointer)( &info_result );
             
-            NS(AllocResult) add_data_result = NS(MemPool_append)(
-                &elements->data_store, sizeof( SIXTRL_INT64_T ) );
+            unsigned char* data_mem_begin = 
+                NS(BeamElements_get_ptr_data_begin)( elements );
+                
+            NS(BlockInfo_set_mem_offset)( block_info, mem_offset );
+            NS(BlockInfo_set_type_id)( block_info, type_id );
+            NS(BlockInfo_set_common_alignment)( block_info, data_align );
+            NS(BlockInfo_set_num_elements)( block_info, num_elements );
             
-            SIXTRL_UINT64_T num_bytes = 
-                NS(AllocResult_get_length)( &data_result );
+            NS(Drift_preset)( &drift );
+            NS(Drift_set_num_elements)( &drift, num_elements );
+            NS(Drift_set_type_id)( &drift, type_id );
             
-            unsigned char* data_begin = 
-                NS(AllocResult_get_pointer)( &data_result );
-            
-            unsigned char* data_buffer_begin = elements->data_begin;
-            
-            unsigned char* data_end =
-                NS(AllocResult_get_pointer)( &add_data_result );
-                            
-            if( ( NS(AllocResult_valid)( &add_data_result ) ) &&
-                ( num_bytes >= sizeof( SIXTRL_REAL_T ) ) && ( ptr_info != 0 ) &&
-                ( data_begin != 0 ) && ( data_end != 0 ) && 
-                ( data_buffer_begin != 0 ) &&
-                ( 0 <= ( data_begin - data_buffer_begin ) ) &&
-                ( 0 <  ( data_end - data_begin ) ) )
+            if( 0 == NS(Drift_create_on_memory)( &drift, block_info, 0, 
+                data_mem_begin, max_num_bytes_on_mem, lengths, element_ids ) )
             {
-                unsigned char* ptr_store_length = data_begin;
-                unsigned char* ptr_store_elemid = data_end;
+                ++elements->num_blocks;
                 
-                ptr_info->mem_offset = 
-                    ( SIXTRL_UINT64_T )( data_begin - data_buffer_begin );
+                NS(MemPool_increment_size)( 
+                    &elements->data_store, 
+                    NS(BlockInfo_get_mem_offset)( block_info ) + 
+                    NS(BlockInfo_get_num_of_bytes)( block_info ) );
                 
-                data_end = data_end + 
-                    NS(AllocResult_get_length)( &add_data_result );
-                    
-                ptr_info->num_bytes = 
-                    ( SIXTRL_UINT64_T )( data_end - data_begin );
-                    
-                ptr_info->type_id    = type_id;
-                ptr_info->element_id = element_id;
-                
-                memcpy( ptr_store_length, &length,     sizeof( SIXTRL_REAL_T  ) );
-                memcpy( ptr_store_elemid, &element_id, sizeof( SIXTRL_INT64_T ) );
-                
-                success = true;
+                return drift;
             }
-        }        
+        }
         
-        if( success )
-        {
-            ++elements->num_elements;
-        }
-        else
-        {
-            elements->info_store = rollback_info_store;
-            elements->data_store = rollback_data_store;
-        }
+        /* if we are here, something went wrong -> rollback and return an 
+         * invalid drift! */
+        
+        SIXTRL_ASSERT( NS(Drift_get_type_id)( &drift ) == 
+                       NS(BLOCK_TYPE_INVALID ) );
+        
+        elements->info_store = rollback_info_store;
+        elements->data_store = rollback_data_store;
     }
     
-    return success;
+    NS(Drift_preset)( &drift );
+    return drift;
 }
-
-bool NS(BeamElements_add_drift_exact)( 
-    NS(BeamElements)* elements, SIXTRL_REAL_T const length, 
+        
+NS(Drift) NS(BeamElements_add_drift_exact)( 
+    NS(BeamElements)* SIXTRL_RESTRICT elements, 
+    SIXTRL_REAL_T  const length, 
     SIXTRL_INT64_T const element_id )
 {
-    return NS(BeamElements_add_drift_type)( elements, length, element_id, 3u );
+    return NS(BeamElements_add_drift_type_block)( 
+        elements, length, element_id, NS(BLOCK_TYPE_DRIFT_EXACT) );
 }
 
-bool NS(BeamElements_add_drift)( 
-    NS(BeamElements)* elements, SIXTRL_REAL_T const length, 
+NS(Drift) NS(BeamElements_add_drift)( 
+    NS(BeamElements)* SIXTRL_RESTRICT elements, 
+    SIXTRL_REAL_T  const length, 
     SIXTRL_INT64_T const element_id )
 {
-    return NS(BeamElements_add_drift_type)( elements, length, element_id, 2u );
+    return NS(BeamElements_add_drift_type_block)( 
+        elements, length, element_id, NS(BLOCK_TYPE_DRIFT) );
 }
 
+NS(Drift) NS(BeamElements_add_drifts)(
+    NS(BeamElements)* SIXTRL_RESTRICT elements, 
+    SIXTRL_UINT64_T const num_of_drifts, 
+    SIXTRL_REAL_T   const* SIXTRL_RESTRICT lengths, 
+    SIXTRL_INT64_T  const* SIXTRL_RESTRICT element_ids )
+{
+    return NS(BeamElements_add_multi_drifts_type_block)( 
+        elements, lengths, element_ids, num_of_drifts, NS(BLOCK_TYPE_DRIFT ) );
+}
 
+NS(Drift) NS(BeamElements_BeamElements_add_drifts_exact)(
+    NS(BeamElements)* SIXTRL_RESTRICT elements, 
+    SIXTRL_UINT64_T const num_of_drifts, 
+    SIXTRL_REAL_T   const* SIXTRL_RESTRICT lengths, 
+    SIXTRL_INT64_T  const* SIXTRL_RESTRICT element_ids )
+{
+    return NS(BeamElements_add_multi_drifts_type_block)( elements, lengths, 
+        element_ids, num_of_drifts, NS(BLOCK_TYPE_DRIFT_EXACT ) );
+}
 
-
+/* end: sixtracklib/common/details/beam_elements.c */
