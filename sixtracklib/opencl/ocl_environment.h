@@ -83,6 +83,8 @@ typedef struct NS(OpenCLEnv)
     NS(block_size_t)           num_turns;
     NS(block_num_elements_t)   num_particles;
     NS(block_num_elements_t)   num_beam_elements;
+    NS(block_size_t)           max_num_bytes_particle_data_buffer;
+    NS(block_size_t)           max_num_bytes_be_data_buffer;
     
     char*              current_id_str;
     char*              current_kernel_function;

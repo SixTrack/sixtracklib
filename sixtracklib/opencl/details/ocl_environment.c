@@ -229,6 +229,9 @@ NS(OpenCLEnv)* NS(OpenCLEnv_preset)( NS(OpenCLEnv)* ocl_env )
         ocl_env->num_particles              = ( NS(block_num_elements_t) )0u;
         ocl_env->num_beam_elements          = ( NS(block_num_elements_t) )0u;
         
+        ocl_env->max_num_bytes_particle_data_buffer = ( NS(block_size_t) )0;        
+        ocl_env->max_num_bytes_be_data_buffer = ( NS(block_size_t) )0;
+        
         ocl_env->current_id_str             = 0;
         ocl_env->current_kernel_function    = 0;
         ocl_env->kernel_source              = 0;
@@ -554,7 +557,9 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                 
                 while( node != 0 )
                 {
-                    if( ( strcmp( node->id_str, node_device_id ) == 0 ) &&
+                    int const cmp_result = strcmp( node->id_str, node_device_id );
+                    
+                    if( ( cmp_result == 0 ) &&
                         ( node->ptr_environment == ocl_env ) &&
                         ( node->env_platform_index < ocl_env->num_platforms ) &&
                         ( node->env_device_index < ocl_env->num_devices ) )
@@ -847,7 +852,7 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                     ocl_env->context, CL_MEM_READ_WRITE, be_data_size, 0, 
                         &ret_be_data );
                 
-                ocl_env->beam_elem_info_buffer = clCreateBuffer(
+                ocl_env->particle_info_buffer = clCreateBuffer(
                     ocl_env->context, CL_MEM_READ_WRITE, particle_info_size, 0,
                         &ret_particle_info );
                 
@@ -861,24 +866,27 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                     ( ret_particle_info == CL_SUCCESS ) )
                 {
                     int cl_ret = CL_FALSE;
+                 
+                    ocl_env->max_num_bytes_particle_data_buffer = 
+                        particle_data_size;
+                        
+                    ocl_env->max_num_bytes_be_data_buffer = 
+                        be_data_size;
                     
                     ocl_env->ressources_flags |= NS(HAS_BEAM_ELEMS_BUFFERS);
                     ocl_env->ressources_flags |= NS(HAS_PARTICLES_BUFFER);
                     
                     cl_ret  = clEnqueueWriteBuffer( ocl_env->queue, 
                         ocl_env->beam_elem_info_buffer, CL_TRUE, 0u, be_info_size,
-                            ( NS(BlockInfo)* )NS(
-                                BeamElements_get_const_block_infos_begin)( 
-                                beam_elements ), 0u, 0, 0 );
+                            ( NS(BlockInfo)* )beam_elements->info_begin, 0u, 0, 0 );
                     
                     cl_ret |= clEnqueueWriteBuffer( ocl_env->queue,
                         ocl_env->beam_elem_data_buffer, CL_TRUE, 0u, be_data_size,
-                        ( unsigned char* )NS(BeamElements_get_const_ptr_data_begin)( 
-                                beam_elements ), 0u, 0, 0 );
+                        ( unsigned char* )beam_elements->data_begin, 0u, 0, 0 );
                     
                     cl_ret |= clEnqueueWriteBuffer( ocl_env->queue,
                         ocl_env->particle_info_buffer, CL_TRUE, 0u, 
-                        particle_data_size, ( NS(BlockInfo)*                             
+                        particle_info_size, ( NS(BlockInfo)*                             
                             ) NS(ParticlesContainer_get_const_block_infos_begin)( 
                                 particle_blocks ), 0u, 0, 0 );
                     
@@ -890,28 +898,40 @@ bool NS(OpenCLEnv_prepare)( NS(OpenCLEnv)* ocl_env,
                     
                     if( cl_ret == CL_SUCCESS )
                     {
-                        SIXTRL_SIZE_T const U64_SIZE = sizeof( SIXTRL_UINT64_T );
-                        
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 0, 
-                              U64_SIZE, &ocl_env->num_turns );
+                              sizeof( NS(block_size_t) ), &ocl_env->num_turns );
                         
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 1, 
-                              U64_SIZE, &ocl_env->num_beam_elements );
+                              sizeof( NS(block_num_elements_t) ), 
+                              &ocl_env->num_be_blocks );
                         
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 2, 
-                              U64_SIZE, &ocl_env->num_particles );
+                              sizeof( NS(block_num_elements_t) ), 
+                              &ocl_env->num_particle_blocks );
                         
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 3, 
-                              sizeof( cl_mem ), &ocl_env->beam_elem_info_buffer );
+                              sizeof( cl_mem ), 
+                              &ocl_env->beam_elem_info_buffer );
                         
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 4, 
-                              sizeof( cl_mem ), &ocl_env->beam_elem_data_buffer );
+                              sizeof( cl_mem ), 
+                              &ocl_env->beam_elem_data_buffer );
                         
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 5, 
-                               sizeof( cl_mem ), &ocl_env->particle_data_buffer );
+                              sizeof( NS(block_size_t) ),
+                              &ocl_env->max_num_bytes_be_data_buffer );
                         
                         cl_ret |= clSetKernelArg( ocl_env->kernel, 6, 
-                               sizeof( cl_mem ), &ocl_env->particle_info_buffer );
+                               sizeof( cl_mem ), 
+                               &ocl_env->particle_data_buffer );
+                        
+                        cl_ret |= clSetKernelArg( ocl_env->kernel, 7, 
+                               sizeof( cl_mem ), 
+                               &ocl_env->particle_info_buffer );
+                        
+                        cl_ret |= clSetKernelArg( ocl_env->kernel, 8,
+                               sizeof( NS(block_size_t) ),
+                               &ocl_env->max_num_bytes_particle_data_buffer );
                         
                         success = ( cl_ret == CL_SUCCESS );
                     }
