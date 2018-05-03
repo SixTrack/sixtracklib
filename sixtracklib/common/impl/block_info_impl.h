@@ -104,130 +104,133 @@ typedef struct NS(BlockInfo)
 typedef void NS(BlockExtHeader); 
 typedef void NS(BlockMappingInfo);
 
-SIXTRL_STATIC NS(BlockInfo)* NS(BlockInfo_preset)( 
-    NS(BlockInfo)* SIXTRL_RESTRICT info );
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo)* NS(BlockInfo_preset)( 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC NS(block_size_t) 
 NS(BlockInfo_get_total_num_of_elements_in_blocks)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT infos, 
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT infos, 
     NS(block_size_t) const num_of_blocks );
 
 SIXTRL_STATIC NS(block_size_t) NS(BlockInfo_get_total_storage_size)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT infos, 
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT infos, 
     NS(block_size_t) const num_of_blocks );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC NS(block_size_t) NS(BlockInfo_get_mem_offset)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC NS(block_size_t) NS(BlockInfo_get_next_mem_offset)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC NS(block_size_t) NS(BlockInfo_get_num_of_bytes)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char* 
     NS(BlockInfo_get_ptr_to_data_begin)(
-        const NS(BlockInfo) *const SIXTRL_RESTRICT info, 
+        const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info, 
         SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT memory_begin );
 
 SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const* 
     NS(BlockInfo_get_const_ptr_to_data_begin)(
-        const NS(BlockInfo) *const SIXTRL_RESTRICT info, 
+        const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info, 
         SIXTRL_GLOBAL_DEC unsigned char const* SIXTRL_RESTRICT memory_begin );
 
 SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char* 
     NS(BlockInfo_get_ptr_to_next_data_begin)(
-        const NS(BlockInfo) *const SIXTRL_RESTRICT info, 
+        const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info, 
         SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT memory_begin );
 
 SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const* 
     NS(BlockInfo_get_const_ptr_to_next_data_begin)(
-        const NS(BlockInfo) *const SIXTRL_RESTRICT info, 
+        const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info, 
         SIXTRL_GLOBAL_DEC unsigned char const* SIXTRL_RESTRICT memory_begin );
     
 SIXTRL_STATIC void NS(BlockInfo_set_mem_offset)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info, NS(block_size_t) const offset );
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info, 
+    NS(block_size_t) const offset );
 
 SIXTRL_STATIC void NS(BlockInfo_set_num_of_bytes)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info, NS(block_size_t) const num_bytes );
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info, 
+    NS(block_size_t) const num_bytes );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC NS(BlockType) NS(BlockInfo_get_type_id)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC NS(block_type_num_t) NS(BlockInfo_get_type_id_num)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC void NS(BlockInfo_set_type_id)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info, NS(BlockType) const type_id );
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info, NS(BlockType) const type_id );
 
 SIXTRL_STATIC void NS(BlockInfo_set_type_id_num)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info, 
     NS(block_type_num_t) const type_id );
 
 SIXTRL_STATIC int NS(BlockInfo_is_a_particles_block)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC int NS(BlockInfo_is_a_beam_element_block)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC int NS(BlockInfo_is_a_mapping_info_block)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC int NS(BlockInfo_is_a_userdefined_block)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC NS(block_num_elements_t) NS(BlockInfo_get_num_elements)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC void NS(BlockInfo_set_num_elements)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info, 
     NS(block_num_elements_t) const num_elements );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC int NS(BlockInfo_has_common_alignment)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC int NS(BlockInfo_has_associated_mapping_info)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC NS(block_map_info_id_t) 
 NS(BlockInfo_get_associated_map_info_id)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC NS(block_alignment_t) NS(BlockInfo_get_common_alignment)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC void NS(BlockInfo_set_common_alignment)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info, 
     NS(block_alignment_t) const alignment );
 
 SIXTRL_STATIC void NS(BlockInfo_set_associated_mapping_header_id)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info,
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info,
     NS(block_map_info_id_t) const map_info_id );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC int NS(BlockInfo_generic_map_to_memory_for_writing_aligned)(
-    NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
     SIXTRL_GLOBAL_DEC unsigned char** SIXTRL_RESTRICT attrs_ptr,
     NS(block_size_t)* SIXTRL_RESTRICT num_bytes_for_attrs,
     NS(block_size_t) const num_of_attributes,
-    NS(block_num_elements_t) const num_elements, NS(BlockType) const type_id,
+    NS(block_num_elements_t) const num_elements, 
+    NS(BlockType) const type_id,
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin, 
     NS(block_size_t) const max_num_of_bytes_in_buffer );    
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC int NS(BlockInfo_generic_map_from_memory_for_reading_aligned)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info,
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT block_info,
     SIXTRL_GLOBAL_DEC unsigned char** SIXTRL_RESTRICT attrs_ptr, 
     NS(block_size_t)* SIXTRL_RESTRICT num_bytes_for_attrs, 
     NS(block_size_t) const num_of_attributes, 
@@ -308,8 +311,8 @@ SIXTRL_INLINE int NS(BlockType_is_valid_number)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE NS(BlockInfo)* NS(BlockInfo_preset)( 
-    NS(BlockInfo)* SIXTRL_RESTRICT info )
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BlockInfo)* NS(BlockInfo_preset)( 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info )
 {
     if( info != 0 )
     {
@@ -324,7 +327,7 @@ SIXTRL_INLINE NS(BlockInfo)* NS(BlockInfo_preset)(
 }
 
 SIXTRL_INLINE NS(block_size_t) NS(BlockInfo_get_total_storage_size)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT infos, 
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT infos, 
     NS(block_size_t) const num_of_blocks )
 {
     NS(block_size_t) const last = ( num_of_blocks > 0u )
@@ -371,7 +374,7 @@ SIXTRL_INLINE NS(block_size_t) NS(BlockInfo_get_total_storage_size)(
 
 SIXTRL_INLINE NS(block_size_t) 
 NS(BlockInfo_get_total_num_of_elements_in_blocks)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT infos, 
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT infos, 
     NS(block_size_t) const num_of_blocks )
 {
     NS(block_size_t) total_num_elements = 0u;
@@ -396,21 +399,21 @@ NS(BlockInfo_get_total_num_of_elements_in_blocks)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE NS(block_size_t) NS(BlockInfo_get_mem_offset)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     SIXTRL_ASSERT( info != 0 );
     return info->mem_offset;
 }
 
 SIXTRL_INLINE NS(block_size_t) NS(BlockInfo_get_next_mem_offset)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     SIXTRL_ASSERT( info != 0 );
     return ( info->mem_offset + info->num_bytes );
 }
 
 SIXTRL_INLINE NS(block_size_t) NS(BlockInfo_get_num_of_bytes)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     SIXTRL_ASSERT( info != 0 );
     return info->num_bytes;
@@ -418,7 +421,7 @@ SIXTRL_INLINE NS(block_size_t) NS(BlockInfo_get_num_of_bytes)(
 
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC unsigned char* 
     NS(BlockInfo_get_ptr_to_data_begin)(
-        const NS(BlockInfo) *const SIXTRL_RESTRICT info, 
+        const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info, 
         SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT memory_begin )
 {
     typedef SIXTRL_GLOBAL_DEC unsigned char*  g_ptr_uchar_t;
@@ -429,7 +432,7 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC unsigned char*
 
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC unsigned char const* 
     NS(BlockInfo_get_const_ptr_to_data_begin)(
-        const NS(BlockInfo) *const SIXTRL_RESTRICT info, 
+        const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info, 
         SIXTRL_GLOBAL_DEC unsigned char const* SIXTRL_RESTRICT memory_begin )
 {
     SIXTRL_ASSERT( ( info != 0 ) && ( memory_begin != 0 ) );
@@ -438,7 +441,7 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC unsigned char const*
 
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC unsigned char* 
     NS(BlockInfo_get_ptr_to_next_data_begin)(
-        const NS(BlockInfo) *const SIXTRL_RESTRICT info, 
+        const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info, 
         SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin )
 {
     typedef SIXTRL_GLOBAL_DEC unsigned char*  g_ptr_uchar_t;
@@ -449,7 +452,7 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC unsigned char*
 
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC unsigned char const* 
     NS(BlockInfo_get_const_ptr_to_next_data_begin)(
-        const NS(BlockInfo) *const SIXTRL_RESTRICT info, 
+        const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info, 
         SIXTRL_GLOBAL_DEC unsigned char const* SIXTRL_RESTRICT memory_begin )
 {
     SIXTRL_ASSERT( ( info != 0 ) && ( memory_begin != 0 ) );
@@ -457,7 +460,7 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC unsigned char const*
 }
     
 SIXTRL_INLINE void NS(BlockInfo_set_mem_offset)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info, 
     NS(block_size_t) const offset )
 {
     SIXTRL_ASSERT( info != 0 );
@@ -466,7 +469,7 @@ SIXTRL_INLINE void NS(BlockInfo_set_mem_offset)(
 }
 
 SIXTRL_INLINE void NS(BlockInfo_set_num_of_bytes)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info, 
     NS(block_size_t) const num_bytes )
 {
     SIXTRL_ASSERT( info != 0 );
@@ -477,21 +480,21 @@ SIXTRL_INLINE void NS(BlockInfo_set_num_of_bytes)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE NS(BlockType)  NS(BlockInfo_get_type_id)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     SIXTRL_ASSERT( info != 0 );
     return NS(BlockType_from_number)( info->type_id_num );
 }
 
 SIXTRL_INLINE NS(block_type_num_t) NS(BlockInfo_get_type_id_num)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     SIXTRL_ASSERT( info != 0 );
     return info->type_id_num;
 }
 
 SIXTRL_INLINE void NS(BlockInfo_set_type_id)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info, 
     NS(BlockType) const type_id )
 {
     SIXTRL_ASSERT( info != 0 );
@@ -499,7 +502,7 @@ SIXTRL_INLINE void NS(BlockInfo_set_type_id)(
 }
 
 SIXTRL_INLINE void NS(BlockInfo_set_type_id_num)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info, 
     NS(block_type_num_t) const type_id_num )
 {
     SIXTRL_ASSERT( info );
@@ -507,14 +510,14 @@ SIXTRL_INLINE void NS(BlockInfo_set_type_id_num)(
 }
 
 SIXTRL_INLINE int NS(BlockInfo_is_a_particles_block)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     NS(BlockType) const type_id = NS(BlockInfo_get_type_id)( info );
     return ( type_id == NS(BLOCK_TYPE_PARTICLE) );
 }
 
 SIXTRL_INLINE int NS(BlockInfo_is_a_beam_element_block)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     NS(BlockType) const type_id = NS(BlockInfo_get_type_id)( info );
     return ( ( type_id == NS(BLOCK_TYPE_DRIFT) ) ||
@@ -525,14 +528,14 @@ SIXTRL_INLINE int NS(BlockInfo_is_a_beam_element_block)(
 }
 
 SIXTRL_INLINE int NS(BlockInfo_is_a_mapping_info_block)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     NS(BlockType) const type_id = NS(BlockInfo_get_type_id)( info );
     return ( type_id == NS(BLOCK_TYPE_EXT_MAP_INFO) );
 }
 
 SIXTRL_INLINE int NS(BlockInfo_is_a_userdefined_block)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     NS(BlockType) const type_id = NS(BlockInfo_get_type_id)( info );
     return ( type_id == NS(BLOCK_TYPE_USERDEFINED) );
@@ -541,14 +544,14 @@ SIXTRL_INLINE int NS(BlockInfo_is_a_userdefined_block)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE NS(block_num_elements_t) NS(BlockInfo_get_num_elements)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     SIXTRL_ASSERT( info != 0 );
     return info->num_elements;
 }
 
 SIXTRL_INLINE void NS(BlockInfo_set_num_elements)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info, 
     NS(block_num_elements_t) const neleme )
 {
     SIXTRL_ASSERT( info != 0 );
@@ -559,7 +562,7 @@ SIXTRL_INLINE void NS(BlockInfo_set_num_elements)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE int NS(BlockInfo_has_common_alignment)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     return ( 
         ( info != 0 ) && ( info->store_info > 0 ) && 
@@ -568,7 +571,7 @@ SIXTRL_INLINE int NS(BlockInfo_has_common_alignment)(
 }
 
 SIXTRL_INLINE int NS(BlockInfo_has_associated_mapping_info)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     return ( ( info != 0 ) && ( info->store_info < 0 ) &&
              ( info->type_id_num != NS(BlockType_to_number)(
@@ -577,19 +580,19 @@ SIXTRL_INLINE int NS(BlockInfo_has_associated_mapping_info)(
 
 SIXTRL_INLINE NS(block_map_info_id_t) 
 NS(BlockInfo_get_associated_map_info_id)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     return ( info != 0 ) ? ( -( info->store_info ) ) : 0;
 }
 
 SIXTRL_INLINE NS(block_alignment_t) NS(BlockInfo_get_common_alignment)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT info )
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT info )
 {
     return ( info != 0 ) ? ( info->store_info ) : 0;
 }
 
 SIXTRL_INLINE void NS(BlockInfo_set_common_alignment)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info, 
     NS(block_alignment_t) const alignment )
 {
     if( ( info != 0 ) && ( alignment >= 0 ) )
@@ -601,7 +604,7 @@ SIXTRL_INLINE void NS(BlockInfo_set_common_alignment)(
 }
 
 SIXTRL_INLINE void NS(BlockInfo_set_associated_mapping_header_id)(
-    NS(BlockInfo)* SIXTRL_RESTRICT info,
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info,
     NS(block_map_info_id_t) const map_info_id )
 {
     if( ( info != 0 ) && ( map_info_id >= 0 ) )
@@ -744,7 +747,7 @@ NS(Block_map_attribute_from_const_memory_aligned)(
 }
 
 SIXTRL_INLINE int NS(BlockInfo_generic_map_to_memory_for_writing_aligned)(
-    NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
     SIXTRL_GLOBAL_DEC unsigned char** SIXTRL_RESTRICT attrs_ptr,
     NS(block_size_t)* SIXTRL_RESTRICT num_bytes_for_attrs,
     NS(block_size_t) const num_of_attributes,
@@ -753,7 +756,7 @@ SIXTRL_INLINE int NS(BlockInfo_generic_map_to_memory_for_writing_aligned)(
     NS(block_size_t) const max_num_of_bytes_in_buffer )
 {
     int success = -1;
-    static NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
+    SIXTRL_STATIC NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
     
     NS(block_size_t) mem_offset = 
         NS(BlockInfo_get_mem_offset)( block_info );
@@ -832,7 +835,7 @@ SIXTRL_INLINE int NS(BlockInfo_generic_map_to_memory_for_writing_aligned)(
 }
                                                                           
 SIXTRL_INLINE int NS(BlockInfo_generic_map_from_memory_for_reading_aligned)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info,
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT block_info,
     SIXTRL_GLOBAL_DEC unsigned char** SIXTRL_RESTRICT attrs_ptr, 
     NS(block_size_t)* SIXTRL_RESTRICT num_bytes_for_attrs, 
     NS(block_size_t) const num_of_attributes, 
@@ -840,7 +843,7 @@ SIXTRL_INLINE int NS(BlockInfo_generic_map_from_memory_for_reading_aligned)(
     NS(block_size_t) const max_num_of_bytes_in_buffer )
 {
     int success = -1;
-    static NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
+    SIXTRL_STATIC  NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
     
     NS(block_size_t) prev_num_bytes_in_blk;
     NS(block_size_t) num_of_bytes_in_blk = ZERO;

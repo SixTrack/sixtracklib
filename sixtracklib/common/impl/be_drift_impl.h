@@ -172,7 +172,7 @@ SIXTRL_STATIC void NS(Drift_assign_ptr_to_length)(
 
 SIXTRL_STATIC int NS(Drift_map_to_memory_for_writing_aligned)(
     NS(Drift)* SIXTRL_RESTRICT drift,
-    NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin, 
     NS(block_size_t) max_num_bytes_on_mem );
 
@@ -186,7 +186,7 @@ SIXTRL_STATIC int NS(Drift_map_from_memory_for_reading_aligned)(
 
 SIXTRL_STATIC int NS(Drift_create_one_on_memory)(
     NS(Drift)* SIXTRL_RESTRICT drift, 
-    NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
     const NS(BlockMappingInfo) *const SIXTRL_RESTRICT mapping_info,
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin, 
     NS(block_size_t) const  max_num_bytes_on_mem, 
@@ -195,7 +195,7 @@ SIXTRL_STATIC int NS(Drift_create_one_on_memory)(
 
 SIXTRL_STATIC int NS(Drift_create_on_memory)(
     NS(Drift)* SIXTRL_RESTRICT drift, 
-    NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
     const NS(BlockMappingInfo) *const SIXTRL_RESTRICT mapping_info,
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin, 
     NS(block_size_t) const  max_num_bytes_on_mem, 
@@ -540,7 +540,7 @@ SIXTRL_INLINE  void NS(Drift_assign_ptr_to_length)(
 
 SIXTRL_INLINE int NS(Drift_map_to_memory_for_writing_aligned)(
     NS(Drift)* SIXTRL_RESTRICT drift,
-    NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin, 
     NS(block_size_t) max_num_bytes_on_mem )
 {
@@ -659,7 +659,7 @@ SIXTRL_INLINE int NS(Drift_map_from_memory_for_reading_aligned)(
 
 SIXTRL_INLINE int NS(Drift_create_one_on_memory)(
     NS(Drift)* SIXTRL_RESTRICT drift, 
-    NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
     const NS(BlockMappingInfo) *const SIXTRL_RESTRICT mapping_info,
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin, 
     NS(block_size_t) const  max_num_bytes_on_mem, 
@@ -690,7 +690,7 @@ SIXTRL_INLINE int NS(Drift_create_one_on_memory)(
 
 SIXTRL_INLINE int NS(Drift_create_on_memory)(
     NS(Drift)* SIXTRL_RESTRICT drift, 
-    NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
     const NS(BlockMappingInfo) *const SIXTRL_RESTRICT mapping_info,
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin, 
     NS(block_size_t) const  max_num_bytes_on_mem, 
@@ -710,12 +710,16 @@ SIXTRL_INLINE int NS(Drift_create_on_memory)(
         SIXTRL_ASSERT( NS(Drift_get_element_id)( drift ) != 0 );
         SIXTRL_ASSERT( NS(Drift_get_num_elements)( drift ) == num_elements );
         
-        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, NS(Drift_get_length)( drift ), 
+        {
+            SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, NS(Drift_get_length)( drift ), 
                                  lengths, num_elements );
+        }
         
-        SIXTRACKLIB_COPY_VALUES( NS(element_id_t), 
+        {
+            SIXTRACKLIB_COPY_VALUES( NS(element_id_t), 
                                  NS(Drift_get_element_id)( drift ), 
                                  element_ids, num_elements );
+        }           
         
         success = 0;
     }
