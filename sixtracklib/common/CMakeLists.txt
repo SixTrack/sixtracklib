@@ -45,7 +45,7 @@ target_compile_options( sixtrack_common BEFORE PUBLIC
                         ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic -ansi )
 
 if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
-#     add_subdirectory( tests )
+    add_subdirectory( tests )
 endif()
 
 if( SIXTRACKL_ENABLE_TIMING_TESTS )
