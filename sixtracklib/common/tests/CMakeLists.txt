@@ -39,23 +39,23 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_particles_sequence:
     
-    add_executable( test_particles_sequence test_particles_sequence.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_particles_sequence )
-    add_test( CommonParticlesSequenceTests test_particles_sequence )    
+#     add_executable( test_particles_sequence test_particles_sequence.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_particles_sequence )
+#     add_test( CommonParticlesSequenceTests test_particles_sequence )    
     
     # --------------------------------------------------------------------------
     # test_block_drift:
     
-    add_executable( test_block_drift test_block_drift.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_block_drift )
-    add_test( CommonBlockDriftTests test_block_drift )
+#     add_executable( test_block_drift test_block_drift.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_block_drift )
+#     add_test( CommonBlockDriftTests test_block_drift )
     
     # --------------------------------------------------------------------------
     # test_blocks:
     
-    add_executable( test_blocks test_blocks.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_blocks )
-    add_test( CommonBlocksTests test_blocks )
+#     add_executable( test_blocks test_blocks.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_blocks )
+#     add_test( CommonBlocksTests test_blocks )
     
     # *************************************************************************
     # Set all properties: 
