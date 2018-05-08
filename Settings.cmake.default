@@ -17,7 +17,7 @@ option( SIXTRACKL_ENABLE_PROGRAMM_TESTS "Enable programmatic unit-tests"  OFF )
 
 set( GTEST_ROOT "" CACHE PATH 
      "Path to include/gtest/gtest.h (for non-standard installations)" )
-     
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      
 option( SIXTRACKL_ENABLE_TIMING_TESTS   
@@ -47,6 +47,13 @@ set_property( CACHE SIXTRACKL_CPU_ARCH PROPERTY STRINGS sse2 avx native )
 
 option( SIXTRACKL_BUILD_EXAMPLES "Build sixtracklib examples" ON )
 
+# ------------------------------------------------------------------------------
+
+option( SIXTRACKL_ENABLE_MPFR4 "Enable GMP/MPFR4 backend" OFF )
+        
+option( SIXTRACKL_ENABLE_MPFR_ACCURACY_TESTS 
+        "Enable GMP/MPFR based accuracy tests" OFF )
+        
 # ------------------------------------------------------------------------------
 
 option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"       OFF )
