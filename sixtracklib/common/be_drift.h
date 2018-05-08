@@ -22,16 +22,6 @@ int NS(Drift_create_from_single_drift)(
     struct NS(Drift)* SIXTRL_RESTRICT drift, 
     struct NS(DriftSingle)* SIXTRL_RESTRICT single_drift );
 
-void NS(DriftSingle_track_particle)( 
-    struct NS(Particles)* SIXTRL_RESTRICT particles, 
-    SIXTRL_UINT64_T const particle_index,
-    const struct NS(DriftSingle) *const SIXTRL_RESTRICT single_drift  );
-
-void NS(DriftSingleExact_track_particle)( 
-    struct NS(Particles)* SIXTRL_RESTRICT particles, 
-    SIXTRL_UINT64_T const particle_index,
-    const struct NS(DriftSingle) *const SIXTRL_RESTRICT single_drift  );
-
 int NS(Drift_is_valid)( const NS(Drift) *const SIXTRL_RESTRICT drift );
 
 #ifdef __cplusplus
