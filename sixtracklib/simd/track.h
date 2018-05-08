@@ -1,18 +1,51 @@
 #ifndef SIXTRACKLIB_SIMD_TRACK_H__
 #define SIXTRACKLIB_SIMD_TRACK_H__
 
+#if !defined( _GPUCODE )
+
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+
 #include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/common/impl/block_info_impl.h"
+#include "sixtracklib/common/impl/particles_impl.h"
+#include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/beam_elements.h"
 
-struct NS(Particles);
-struct NS(Drift);
+    #if defined( __cplusplus )
+    extern "C" {
+    #endif /* __cplusplus */
 
-int NS(Track_simd_drift_sse2)(
-    struct NS(Particles)* SIXTRL_RESTRICT particles, 
-    const struct NS(Drift) *const SIXTRL_RESTRICT drift );
+#endif /* !defined( _GPUCODE ) */
 
-int NS(Track_simd_drift_avx)(
-    struct NS(Particles)* SIXTRL_RESTRICT particles, 
-    const struct NS(Drift) *const SIXTRL_RESTRICT drift );
+int NS(Track_beam_elements_simd_sse2)(
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
+    NS(block_num_elements_t) const elem_by_elem_start_index,
+    NS(ParticlesContainer)* SIXTRL_RESTRICT elem_by_elem_buffer );
+
+int NS(Track_beam_elements_simd_avx)(
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
+    NS(block_num_elements_t) const elem_by_elem_start_index,
+    NS(ParticlesContainer)* SIXTRL_RESTRICT elem_by_elem_buffer );
+
+
+int NS(Track_drift_simd_sse2)(
+    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_REAL_T const length );
+
+int NS(Track_drift_simd_avx)(
+    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_REAL_T const length );
+
+#if !defined( _GPUCODE )
+
+    #if defined( __cplusplus )
+    }
+    #endif /* defined( __cplusplus ) */
+
+#endif /* !defined( GPUCODE ) */
+
 
 #endif /* SIXTRACKLIB_SIMD_TRACK_H__ */
 
