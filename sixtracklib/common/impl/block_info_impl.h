@@ -362,7 +362,8 @@ SIXTRL_STATIC int NS(BlocksContainer_has_data_store)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC NS(BlocksContainer) NS(BlocksContainer_assemble)(
+SIXTRL_STATIC int NS(BlocksContainer_assemble)(    
+    NS(BlocksContainer)* SIXTRL_RESTRICT container,
     SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_infos_begin,
     NS(block_size_t) const num_of_blocks,
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin,
@@ -1341,7 +1342,8 @@ SIXTRL_INLINE int NS(BlocksContainer_has_data_store)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_INLINE NS(BlocksContainer) NS(BlocksContainer_assemble)(
+SIXTRL_INLINE int NS(BlocksContainer_assemble)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container,
     SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT blk_infos_begin,
     NS(block_size_t) const num_of_blocks,
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin,
@@ -1349,10 +1351,12 @@ SIXTRL_INLINE NS(BlocksContainer) NS(BlocksContainer_assemble)(
 {
     typedef NS(block_alignment_t) align_t;
     
-    NS(BlocksContainer) container;
-    NS(BlocksContainer_preset)( &container );
+    int success = -1;
     
-    if( ( blk_infos_begin != 0 ) && ( data_mem_begin != 0 ) &&
+    NS(BlocksContainer_preset)( container );
+    
+    if( ( container != 0 ) &&
+        ( blk_infos_begin != 0 ) && ( data_mem_begin != 0 ) &&
         ( num_of_blocks     > ( NS( block_size_t ) )0u ) &&
         ( data_num_of_bytes > ( NS( block_size_t ) )0u ) )
     {
@@ -1366,26 +1370,28 @@ SIXTRL_INLINE NS(BlocksContainer) NS(BlocksContainer_assemble)(
                 NS(BlockInfo_get_common_alignment)( blk_infos_begin ) ) == 
                 ( uintptr_t )0u ) );
         
-        container.data_alignment = 
+        container->data_alignment = 
             NS(BlockInfo_get_common_alignment)( blk_infos_begin );
         
-        container.data_begin_alignment =
+        container->data_begin_alignment =
             NS(BlockInfo_get_common_alignment)( blk_infos_begin );
             
-        container.info_alignment = ( align_t )sizeof( NS(BlockInfo) );
-        container.info_begin_alignment = ( align_t )sizeof( NS(BlockInfo) );
+        container->info_alignment = ( align_t )sizeof( NS(BlockInfo) );
+        container->info_begin_alignment = ( align_t )sizeof( NS(BlockInfo) );
         
-        container.info_begin = blk_infos_begin;
-        container.data_begin = data_mem_begin;
+        container->info_begin = blk_infos_begin;
+        container->data_begin = data_mem_begin;
         
-        container.num_blocks = num_of_blocks;
-        container.blocks_capacity = num_of_blocks;
+        container->num_blocks = num_of_blocks;
+        container->blocks_capacity = num_of_blocks;
         
-        container.data_raw_capacity = data_num_of_bytes;
-        container.data_raw_size     = data_num_of_bytes;        
+        container->data_raw_capacity = data_num_of_bytes;
+        container->data_raw_size     = data_num_of_bytes;        
+        
+        success = 0;
     }
     
-    return container;
+    return success;
 }
 
 #if !defined( _GPUCODE )

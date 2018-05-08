@@ -39,6 +39,13 @@ SIXTRL_STATIC int NS(ParticlesContainer_init)(
     NS(block_size_t) const blocks_capacity, 
     NS(block_size_t) const data_capacity );
 
+SIXTRL_STATIC int NS(ParticlesContainer_assemble)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT container,
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_infos_begin,
+    NS(block_size_t) const num_of_blocks,
+    SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin,
+    NS(block_size_t) const data_num_of_bytes );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_STATIC int NS(ParticlesContainer_set_info_begin_alignment)(
@@ -206,6 +213,17 @@ SIXTRL_INLINE int NS(ParticlesContainer_init)(
 {
     return NS(BlocksContainer_init)( 
         particle_buffer, blocks_capacity, data_capacity );
+}
+
+SIXTRL_INLINE int NS(ParticlesContainer_assemble)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT container,
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_infos_begin,
+    NS(block_size_t) const num_of_blocks,
+    SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin,
+    NS(block_size_t) const data_num_of_bytes )
+{
+    return NS(BlocksContainer_assemble)( ( NS(ParticlesContainer)* )container, 
+        block_infos_begin, num_of_blocks, data_mem_begin, data_num_of_bytes );
 }
 
 /* ------------------------------------------------------------------------- */
