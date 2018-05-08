@@ -9,6 +9,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "sixtracklib/common/impl/alignment_impl.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -217,7 +219,7 @@ SIXTRL_STATIC void NS(BlockInfo_set_associated_mapping_header_id)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC int NS(BlockInfo_generic_map_to_memory_for_writing_aligned)(
+SIXTRL_STATIC int NS(BlockInfo_map_to_memory_aligned)(
     SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
     SIXTRL_GLOBAL_DEC unsigned char** SIXTRL_RESTRICT attrs_ptr,
     NS(block_size_t)* SIXTRL_RESTRICT num_bytes_for_attrs,
@@ -229,13 +231,142 @@ SIXTRL_STATIC int NS(BlockInfo_generic_map_to_memory_for_writing_aligned)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC int NS(BlockInfo_generic_map_from_memory_for_reading_aligned)(
+SIXTRL_STATIC int NS(BlockInfo_remap_from_memory_aligned)(
     const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT block_info,
     SIXTRL_GLOBAL_DEC unsigned char** SIXTRL_RESTRICT attrs_ptr, 
     NS(block_size_t)* SIXTRL_RESTRICT num_bytes_for_attrs, 
     NS(block_size_t) const num_of_attributes, 
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin,
     NS(block_size_t) const max_num_of_bytes_in_buffer );
+
+/* ------------------------------------------------------------------------- */
+
+typedef struct NS(BlocksContainer)
+{
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* info_begin;
+    SIXTRL_GLOBAL_DEC unsigned char* data_begin;
+        
+    void*                            ptr_info_store;
+    void*                            ptr_data_store;
+                                     
+    NS(block_size_t)                 num_blocks;
+    NS(block_size_t)                 blocks_capacity;
+                                     
+    NS(block_size_t)                 data_raw_size;
+    NS(block_size_t)                 data_raw_capacity;
+                                     
+    NS(block_alignment_t)            info_begin_alignment;
+    NS(block_alignment_t)            info_alignment;
+                                     
+    NS(block_alignment_t)            data_begin_alignment;
+    NS(block_alignment_t)            data_alignment;
+}
+NS(BlocksContainer);
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_STATIC NS(BlocksContainer)* NS(BlocksContainer_preset)( 
+    NS(BlocksContainer)* SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC int NS(BlocksContainer_set_info_begin_alignment)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container, 
+    NS(block_alignment_t) const begin_alignment );
+
+SIXTRL_STATIC int NS(BlocksContainer_set_data_begin_alignment)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container, 
+    NS(block_alignment_t) const begin_alignment );
+
+SIXTRL_STATIC int NS(BlocksContainer_set_data_alignment)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container, 
+    NS(block_alignment_t) const alignment );
+
+SIXTRL_STATIC int NS(BlocksContainer_set_info_alignment )(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container, 
+    NS(block_alignment_t) const alignment );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const* 
+NS(BlocksContainer_get_const_ptr_data_begin)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char* 
+NS(BlocksContainer_get_ptr_data_begin)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo) const* 
+NS(BlocksContainer_get_const_block_infos_begin)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo) const* 
+NS(BlocksContainer_get_const_block_infos_end)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
+NS(BlocksContainer_get_block_infos_begin)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
+NS(BlocksContainer_get_block_infos_end)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC NS(BlockInfo) 
+NS(BlocksContainer_get_block_info_by_index)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container, 
+    NS(block_size_t) const block_index );
+
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo) const* 
+NS(BlocksContainer_get_const_ptr_to_block_info_by_index)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container, 
+    NS(block_size_t) const block_index );
+
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
+NS(BlocksContainer_get_ptr_to_block_info_by_index)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container, 
+    NS(block_size_t) const block_index );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_STATIC NS(block_alignment_t) NS(BlocksContainer_get_info_alignment)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC NS(block_alignment_t) NS(BlocksContainer_get_data_alignment)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC NS(block_alignment_t) 
+NS(BlocksContainer_get_info_begin_alignment)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC NS(block_alignment_t) 
+NS(BlocksContainer_get_data_begin_alignment)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC NS(block_size_t) NS(BlocksContainer_get_data_capacity)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC NS(block_size_t) NS(BlocksContainer_get_data_size)( const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC NS(block_size_t) NS(BlocksContainer_get_block_capacity)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC NS(block_size_t) NS(BlocksContainer_get_num_of_blocks)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_STATIC int NS(BlocksContainer_has_info_store)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC int NS(BlocksContainer_has_data_store)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_STATIC NS(BlocksContainer) NS(BlocksContainer_assemble)(
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_infos_begin,
+    NS(block_size_t) const num_of_blocks,
+    SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin,
+    NS(block_size_t) const data_num_of_bytes );
 
 /* ========================================================================= */
 /* ======             Implementation of inline functions            ======== */
@@ -746,7 +877,7 @@ NS(Block_map_attribute_from_const_memory_aligned)(
                  max_num_of_bytes_in_buffer ) ) ? ptr : 0;
 }
 
-SIXTRL_INLINE int NS(BlockInfo_generic_map_to_memory_for_writing_aligned)(
+SIXTRL_INLINE int NS(BlockInfo_map_to_memory_aligned)(
     SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
     SIXTRL_GLOBAL_DEC unsigned char** SIXTRL_RESTRICT attrs_ptr,
     NS(block_size_t)* SIXTRL_RESTRICT num_bytes_for_attrs,
@@ -834,7 +965,7 @@ SIXTRL_INLINE int NS(BlockInfo_generic_map_to_memory_for_writing_aligned)(
     return success;
 }
                                                                           
-SIXTRL_INLINE int NS(BlockInfo_generic_map_from_memory_for_reading_aligned)(
+SIXTRL_INLINE int NS(BlockInfo_remap_from_memory_aligned)(
     const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT block_info,
     SIXTRL_GLOBAL_DEC unsigned char** SIXTRL_RESTRICT attrs_ptr, 
     NS(block_size_t)* SIXTRL_RESTRICT num_bytes_for_attrs, 
@@ -922,6 +1053,340 @@ SIXTRL_INLINE int NS(BlockInfo_generic_map_from_memory_for_reading_aligned)(
     return success;
 }
     
+/* ========================================================================= */
+
+SIXTRL_INLINE NS(BlocksContainer)* NS(BlocksContainer_preset)( 
+    NS(BlocksContainer)* SIXTRL_RESTRICT container )
+{
+    SIXTRL_STATIC NS(block_size_t) const 
+        REAL_SIZE = sizeof( SIXTRL_REAL_T );
+        
+    SIXTRL_STATIC NS(block_size_t) const 
+        ELEMENT_ID_SIZE = sizeof( NS(element_id_t) );
+        
+    SIXTRL_STATIC NS(block_size_t) const ZERO_SIZE = ( NS(block_size_t) )0u;
+    
+    if( container != 0 )
+    {
+        NS(block_size_t) const DEFAULT_DATA_ALIGNMENT = 
+            NS(Alignment_calculate_common)( REAL_SIZE, ELEMENT_ID_SIZE );
+        
+        SIXTRL_STATIC NS(block_size_t) const 
+            DEFAULT_INFO_ALIGNMENT = sizeof( NS(BlockInfo) );
+        
+        container->info_begin           = 0;
+        container->data_begin           = 0;
+        
+        container->ptr_data_store       = 0;
+        container->ptr_info_store       = 0;
+        
+        container->num_blocks           = ZERO_SIZE;
+        container->blocks_capacity      = ZERO_SIZE;
+        
+        container->data_raw_size        = ZERO_SIZE;
+        container->data_raw_capacity    = ZERO_SIZE;
+        
+        container->info_begin_alignment = DEFAULT_INFO_ALIGNMENT;
+        container->info_alignment       = DEFAULT_INFO_ALIGNMENT;
+        
+        container->data_begin_alignment = DEFAULT_DATA_ALIGNMENT;
+        container->data_alignment       = DEFAULT_DATA_ALIGNMENT;        
+    }
+    
+    return container;
+}
+    
+SIXTRL_INLINE int NS(BlocksContainer_set_info_begin_alignment)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container, 
+    NS(block_alignment_t) const begin_alignment )
+{
+    int success = -1;
+    
+    typedef NS(block_alignment_t)   align_t;
+    typedef NS(block_size_t)        bl_size_t;
+    
+    if( ( container != 0 ) && 
+        ( begin_alignment > ( align_t )0u ) &&
+        ( container->num_blocks == ( bl_size_t )0u ) )
+    {
+        container->info_begin_alignment = begin_alignment;
+        success = 0;
+    }
+    
+    return success;
+}
+
+SIXTRL_INLINE int NS(BlocksContainer_set_data_begin_alignment)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container, 
+    NS(block_alignment_t) const begin_alignment )
+{
+    int success = -1;
+    
+    typedef NS(block_alignment_t)   align_t;
+    typedef NS(block_size_t)        bl_size_t;
+    
+    if( ( container != 0 ) && 
+        ( begin_alignment > ( align_t )0u ) &&
+        ( container->data_raw_size == ( bl_size_t )0u ) )
+    {
+        container->data_begin_alignment = begin_alignment;
+        success = 0;
+    }
+    
+    return success;
+}
+
+SIXTRL_INLINE int NS(BlocksContainer_set_data_alignment)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container, 
+    NS(block_alignment_t) const alignment )
+{
+    int success = -1;
+    
+    typedef NS(block_alignment_t)   align_t;
+    typedef NS(block_size_t)        bl_size_t;
+    
+    if( ( container != 0 ) && 
+        ( alignment > ( align_t )0u ) &&
+        ( container->data_raw_size == ( bl_size_t )0u ) )
+    {
+        container->data_alignment = alignment;
+        success = 0;
+    }
+    
+    return success;
+}
+
+SIXTRL_INLINE int NS(BlocksContainer_set_info_alignment )(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container, 
+    NS(block_alignment_t) const alignment )
+{
+    int success = -1;
+    
+    typedef NS(block_alignment_t)   align_t;
+    typedef NS(block_size_t)        bl_size_t;
+    
+    if( ( container != 0 ) && 
+        ( alignment > ( align_t )0u ) &&
+        ( container->num_blocks == ( bl_size_t )0u ) )
+    {
+        container->info_alignment = alignment;
+        success = 0;
+    }
+    
+    return success;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE NS(block_alignment_t) NS(BlocksContainer_get_info_alignment)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    SIXTRL_ASSERT( container != 0 );
+    return container->info_alignment;
+}
+
+SIXTRL_INLINE NS(block_alignment_t) NS(BlocksContainer_get_data_alignment)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    SIXTRL_ASSERT( container != 0 );
+    return container->data_alignment;
+}
+
+SIXTRL_INLINE NS(block_alignment_t) 
+NS(BlocksContainer_get_info_begin_alignment)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    SIXTRL_ASSERT( container != 0 );
+    return container->info_begin_alignment;
+}
+
+SIXTRL_INLINE NS(block_alignment_t) 
+NS(BlocksContainer_get_data_begin_alignment)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    SIXTRL_ASSERT( container != 0 );
+    return container->data_begin_alignment;
+}
+
+SIXTRL_INLINE NS(block_size_t) NS(BlocksContainer_get_data_capacity)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    SIXTRL_ASSERT( container != 0 ) ;
+    return container->data_raw_capacity;
+}
+
+SIXTRL_INLINE NS(block_size_t) NS(BlocksContainer_get_data_size)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    SIXTRL_ASSERT( container != 0 );
+    return container->data_raw_size;
+}
+
+SIXTRL_INLINE NS(block_size_t) NS(BlocksContainer_get_block_capacity)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    SIXTRL_ASSERT( container != 0 );
+    return container->blocks_capacity;
+}
+
+SIXTRL_INLINE NS(block_size_t) NS(BlocksContainer_get_num_of_blocks)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    SIXTRL_ASSERT( container != 0 );
+    return container->num_blocks;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE unsigned char const* 
+NS(BlocksContainer_get_const_ptr_data_begin)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    SIXTRL_ASSERT( container != 0 );
+    return container->data_begin;
+}
+
+SIXTRL_INLINE unsigned char* NS(BlocksContainer_get_ptr_data_begin)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container )
+{
+    return ( unsigned char* )NS(BlocksContainer_get_const_ptr_data_begin)( 
+        container );
+}
+
+SIXTRL_INLINE NS(BlockInfo) const* 
+NS(BlocksContainer_get_const_block_infos_begin)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    SIXTRL_ASSERT( container != 0 );
+    return container->info_begin;
+}
+
+SIXTRL_INLINE NS(BlockInfo) const* 
+NS(BlocksContainer_get_const_block_infos_end)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    NS(BlockInfo) const* end_ptr = 
+        NS(BlocksContainer_get_const_block_infos_begin)( container );
+        
+    if( end_ptr != 0 ) 
+    {
+        end_ptr = end_ptr + 
+            NS(BlocksContainer_get_num_of_blocks)( container );
+    }
+    
+    return end_ptr;
+}
+
+
+SIXTRL_INLINE NS(BlockInfo)* NS(BlocksContainer_get_block_infos_begin)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container )
+{
+    return ( NS(BlockInfo)* )NS(BlocksContainer_get_const_block_infos_begin)(
+        container );
+}
+
+SIXTRL_INLINE NS(BlockInfo)* NS(BlocksContainer_get_block_infos_end)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container )
+{
+    return ( NS(BlockInfo)* )NS(BlocksContainer_get_const_block_infos_end)( 
+        container );
+}
+
+SIXTRL_INLINE NS(BlockInfo) NS(BlocksContainer_get_block_info_by_index)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container, 
+    NS(block_size_t) const block_index )
+{
+    NS(BlockInfo) const* ptr_to_info = 
+        NS(BlocksContainer_get_const_block_infos_end)( container );
+        
+    SIXTRL_ASSERT( ptr_to_info != 0 );
+    return *ptr_to_info;
+}
+
+SIXTRL_INLINE NS(BlockInfo) const* 
+NS(BlocksContainer_get_const_ptr_to_block_info_by_index)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container, 
+    NS(block_size_t) const block_index )
+{
+    SIXTRL_ASSERT( container != 0 );
+    return ( ( container != 0 ) && ( container->info_begin != 0 ) &&
+             ( NS(BlocksContainer_get_block_capacity)( container ) >
+               block_index ) )
+        ? &container->info_begin[ block_index ] : 0;
+}
+
+SIXTRL_INLINE NS(BlockInfo)* 
+NS(BlocksContainer_get_ptr_to_block_info_by_index)(
+    NS(BlocksContainer)* SIXTRL_RESTRICT container, 
+    NS(block_size_t) const block_index )
+{
+    return ( NS(BlockInfo)* 
+        )NS(BlocksContainer_get_const_ptr_to_block_info_by_index)(
+            container, block_index );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE int NS(BlocksContainer_has_info_store)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    return ( container != 0 ) ? ( container->ptr_info_store != 0 ) : 0;
+}
+
+SIXTRL_INLINE int NS(BlocksContainer_has_data_store)(
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    return ( container != 0 ) ? ( container->ptr_data_store != 0 ) : 0;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE NS(BlocksContainer) NS(BlocksContainer_assemble)(
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT blk_infos_begin,
+    NS(block_size_t) const num_of_blocks,
+    SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin,
+    NS(block_size_t) const data_num_of_bytes )
+{
+    typedef NS(block_alignment_t) align_t;
+    
+    NS(BlocksContainer) container;
+    NS(BlocksContainer_preset)( &container );
+    
+    if( ( blk_infos_begin != 0 ) && ( data_mem_begin != 0 ) &&
+        ( num_of_blocks     > ( NS( block_size_t ) )0u ) &&
+        ( data_num_of_bytes > ( NS( block_size_t ) )0u ) )
+    {
+        SIXTRL_ASSERT( 
+            ( NS(BlockInfo_has_common_alignment)( blk_infos_begin ) ) &&
+            ( NS(BlockInfo_get_common_alignment)( blk_infos_begin ) > 
+                ( align_t )0u ) &&
+            ( ( NS(BlockInfo_get_common_alignment)( 
+                blk_infos_begin ) % ( align_t )2u ) == ( align_t )0u ) &&
+            ( ( ( ( uintptr_t )data_mem_begin ) % 
+                NS(BlockInfo_get_common_alignment)( blk_infos_begin ) ) == 
+                ( uintptr_t )0u ) );
+        
+        container.data_alignment = 
+            NS(BlockInfo_get_common_alignment)( blk_infos_begin );
+        
+        container.data_begin_alignment =
+            NS(BlockInfo_get_common_alignment)( blk_infos_begin );
+            
+        container.info_alignment = ( align_t )sizeof( NS(BlockInfo) );
+        container.info_begin_alignment = ( align_t )sizeof( NS(BlockInfo) );
+        
+        container.info_begin = blk_infos_begin;
+        container.data_begin = data_mem_begin;
+        
+        container.num_blocks = num_of_blocks;
+        container.blocks_capacity = num_of_blocks;
+        
+        container.data_raw_capacity = data_num_of_bytes;
+        container.data_raw_size     = data_num_of_bytes;        
+    }
+    
+    return container;
+}
 
 #if !defined( _GPUCODE )
     
