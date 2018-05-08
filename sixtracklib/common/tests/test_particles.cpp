@@ -355,7 +355,7 @@ TEST( ParticlesTests, RandomInitializationAndUnmapping )
     
     st_Particles_preset( &particles_unmapped );
     
-    ret = st_Particles_map_from_memory_for_reading_aligned(
+    ret = st_Particles_remap_from_memory(
         &particles_unmapped, 
         st_ParticlesContainer_get_block_infos_begin( &particles_buffer ),
         st_ParticlesContainer_get_ptr_data_begin( &particles_buffer ),

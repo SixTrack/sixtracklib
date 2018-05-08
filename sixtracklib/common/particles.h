@@ -67,6 +67,30 @@ SIXTRL_STATIC void NS(ParticlesContainer_reserve_for_data)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_STATIC int NS(ParticlesContainer_has_info_store)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC int NS(ParticlesContainer_has_data_store)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC NS(MemPool) const* 
+NS(ParticlesContainer_get_const_ptr_info_store)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC NS(MemPool) const* 
+NS(ParticlesContainer_get_const_ptr_data_store)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC NS(MemPool)* 
+NS(ParticlesContainer_get_ptr_info_store)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT container );
+
+SIXTRL_STATIC NS(MemPool)* 
+NS(ParticlesContainer_get_ptr_data_store)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT container );
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_STATIC NS(block_alignment_t) NS(ParticlesContainer_get_info_alignment)(
     const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer );
 
@@ -115,7 +139,7 @@ NS(ParticlesContainer_get_const_block_infos_end)(
 SIXTRL_STATIC NS(BlockInfo)* NS(ParticlesContainer_get_block_infos_begin)(
     NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer );
 
-SIXTRL_STATIC NS(BlockInfo)* NS(ParticlesContainer_get_infos_end)(
+SIXTRL_STATIC NS(BlockInfo)* NS(ParticlesContainer_get_block_infos_end)(
     NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer );
 
 SIXTRL_STATIC NS(BlockInfo) NS(ParticlesContainer_get_block_info_by_index)(
@@ -134,10 +158,16 @@ NS(ParticlesContainer_get_ptr_to_block_info_by_index)(
 
 /* ------------------------------------------------------------------------- */
 
-int NS(ParticlesContainer_add_particles)( 
+SIXTRL_STATIC int NS(ParticlesContainer_add_particles)( 
     NS(ParticlesContainer)* SIXTRL_RESTRICT particles_buffer, 
     NS(Particles)* SIXTRL_RESTRICT particle_block,
     NS(block_num_elements_t) const num_of_particles );
+
+SIXTRL_STATIC int NS(ParticlesContainer_get_particles)(
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particles_buffer,
+    NS(block_size_t) const block_index );
+
 
 int NS(ParticlesContainer_add_blocks_of_particles)(
     NS(ParticlesContainer)* SIXTRL_RESTRICT particles_buffer,
@@ -234,6 +264,46 @@ SIXTRL_INLINE void NS(ParticlesContainer_reserve_for_data)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_INLINE int NS(ParticlesContainer_has_info_store)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT container )
+{
+    return ( ( container != 0 ) && ( container->ptr_info_store != 0 ) );
+}
+
+SIXTRL_INLINE int NS(ParticlesContainer_has_data_store)(
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT container )
+{
+    return ( ( container != 0 ) && ( container->ptr_data_store != 0 ) );
+}
+
+SIXTRL_INLINE NS(MemPool) const* 
+NS(ParticlesContainer_get_const_ptr_info_store)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT container )
+{
+    return NS(BlocksContainer_get_const_ptr_info_store)( container );
+}
+
+SIXTRL_INLINE NS(MemPool) const* 
+NS(ParticlesContainer_get_const_ptr_data_store)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT container )
+{
+    return NS(BlocksContainer_get_const_ptr_data_store)( container );
+}
+
+SIXTRL_INLINE NS(MemPool)* NS(ParticlesContainer_get_ptr_info_store)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT container )
+{
+    return NS(BlocksContainer_get_ptr_info_store)( container );
+}
+
+SIXTRL_INLINE NS(MemPool)* NS(ParticlesContainer_get_ptr_data_store)(
+    NS(ParticlesContainer)* SIXTRL_RESTRICT container )
+{
+    return NS(BlocksContainer_get_ptr_data_store)( container );
+}
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_INLINE NS(block_alignment_t) 
 NS(ParticlesContainer_get_info_alignment)(
     const NS(ParticlesContainer) *const SIXTRL_RESTRICT particle_buffer )
@@ -321,10 +391,10 @@ SIXTRL_INLINE NS(BlockInfo)* NS(ParticlesContainer_get_block_infos_begin)(
     return NS(BlocksContainer_get_block_infos_begin)( particle_buffer );
 }
 
-SIXTRL_INLINE NS(BlockInfo)* NS(ParticlesContainer_get_infos_end)(
+SIXTRL_INLINE NS(BlockInfo)* NS(ParticlesContainer_get_block_infos_end)(
     NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer )
 {
-    return NS(BlocksContainer_get_infos_end)( particle_buffer );
+    return NS(BlocksContainer_get_block_infos_end)( particle_buffer );
 }
 
 SIXTRL_INLINE NS(BlockInfo) NS(ParticlesContainer_get_block_info_by_index)(
@@ -353,6 +423,134 @@ NS(ParticlesContainer_get_ptr_to_block_info_by_index)(
         particle_buffer, block_index );
 }
     
+
+SIXTRL_INLINE int NS(ParticlesContainer_add_particles)( 
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particles_buffer, 
+    NS(Particles)* SIXTRL_RESTRICT particle_block,
+    NS(block_num_elements_t) const num_of_particles )
+{
+    int success = -1;
+    
+    NS(MemPool)* ptr_info_store = 0;
+    NS(MemPool)* ptr_data_store = 0;
+    
+    NS(MemPool) rollback_info_store;
+    NS(MemPool) rollback_data_store;
+        
+    if( ( !NS(ParticlesContainer_has_data_store)( particles_buffer ) ) ||
+        ( !NS(ParticlesContainer_has_info_store)( particles_buffer ) ) )
+    {
+        return success;
+    }
+    
+    ptr_info_store = 
+        NS(ParticlesContainer_get_ptr_info_store)( particles_buffer );
+    
+    ptr_data_store = 
+        NS(ParticlesContainer_get_ptr_data_store)( particles_buffer );
+    
+    SIXTRL_ASSERT( ( ptr_info_store != 0 ) && ( ptr_data_store != 0 ) );
+        
+    rollback_info_store = *ptr_data_store;
+    rollback_data_store = *ptr_info_store;    
+    
+    if( ( particles_buffer != 0 ) && 
+        ( NS(ParticlesContainer_get_block_capacity)( particles_buffer ) >
+          NS(ParticlesContainer_get_num_of_blocks)( particles_buffer ) ) )
+    {
+        static NS(block_size_t) const INFO_SIZE = sizeof( NS(BlockInfo ) );
+        
+        NS(block_alignment_t) const info_align = 
+            NS(ParticlesContainer_get_info_alignment)( particles_buffer );
+            
+        NS(block_alignment_t) const data_align =
+            NS(ParticlesContainer_get_data_alignment)( particles_buffer );
+        
+        NS(AllocResult) info_result = NS(MemPool_append_aligned)(
+            ptr_info_store, INFO_SIZE, info_align );
+        
+        NS(block_size_t) const mem_offset = NS(MemPool_get_next_begin_offset)( 
+            ptr_data_store, data_align );
+        
+        NS(block_size_t) const max_num_bytes_on_mem = 
+            NS(MemPool_get_capacity)( ptr_data_store );
+        
+        if( ( NS(AllocResult_valid)( &info_result ) ) &&
+            ( max_num_bytes_on_mem > mem_offset ) )
+        {
+            NS(BlockType) const type_id = NS(BLOCK_TYPE_PARTICLE);
+            
+            NS(BlockInfo)* block_info = 
+                ( NS(BlockInfo)* )NS(AllocResult_get_pointer)( &info_result );
+            
+            unsigned char* data_mem_begin = 
+                NS(ParticlesContainer_get_ptr_data_begin)( particles_buffer );
+                
+            NS(BlockInfo_set_mem_offset)( block_info, mem_offset );
+            NS(BlockInfo_set_type_id)( block_info, type_id );
+            NS(BlockInfo_set_common_alignment)( block_info, data_align );
+            NS(BlockInfo_set_num_elements)( block_info, 
+                                            ( NS(block_num_elements_t) )1u );
+            
+            NS(Particles_preset)( particle_block );
+            NS(Particles_set_num_particles)( particle_block, num_of_particles );
+            NS(Particles_set_type_id)( particle_block, NS(BLOCK_TYPE_PARTICLE ) );
+            
+            if( 0 == NS(Particles_create_on_memory)( particle_block, block_info, 
+                    data_mem_begin, max_num_bytes_on_mem ) )
+            {
+                ++particles_buffer->num_blocks;
+                
+                NS(MemPool_increment_size)( ptr_data_store, 
+                    NS(BlockInfo_get_mem_offset)( block_info ) + 
+                    NS(BlockInfo_get_num_of_bytes)( block_info ) );
+                
+                success = 0;
+                
+                return success;
+            }
+        }
+        
+        /* if we are here, something went wrong -> rollback and return an 
+         * invalid drift! */
+        
+        SIXTRL_ASSERT( NS(Particles_get_type_id)( particle_block ) == 
+                       NS(BLOCK_TYPE_INVALID ) );
+        
+        SIXTRL_ASSERT( ( ptr_info_store != 0 ) && ( ptr_data_store != 0 ) );
+        
+        *ptr_data_store = rollback_data_store;        
+        *ptr_info_store = rollback_info_store;
+    }
+    
+    NS(Particles_preset)( particle_block );
+    return success;
+}
+
+
+SIXTRL_INLINE int NS(ParticlesContainer_get_particles)(
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particles_buffer,
+    NS(block_size_t) const block_index )
+{
+    int status = -1;
+    
+    NS(Particles_preset)( particles );
+    
+    if( block_index < 
+        NS(ParticlesContainer_get_num_of_blocks)( particles_buffer ) )
+    {
+        status = NS(Particles_remap_from_memory)( particles, 
+            NS(ParticlesContainer_get_const_ptr_to_block_info_by_index)(
+                particles_buffer, block_index ), 
+            NS(ParticlesContainer_get_ptr_data_begin)( particles_buffer ),
+            NS(ParticlesContainer_get_data_capacity)( particles_buffer ) );
+    }
+    
+    return status;
+}
+
+
     
 #if !defined( _GPUCODE )
 #ifdef __cplusplus

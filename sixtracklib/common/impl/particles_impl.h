@@ -89,6 +89,9 @@ SIXTRL_STATIC int NS(Particles_is_aligned_with)(
     const NS(Particles) *const SIXTRL_RESTRICT particles, 
     NS(block_alignment_t) const alignment );
 
+SIXTRL_STATIC int NS(Particles_is_consistent)(
+    const NS(Particles) *const SIXTRL_RESTRICT particles );
+
 /* ------------------------------------------------------------------------ */
 
 SIXTRL_STATIC void NS( Particles_copy_single_unchecked )( 
@@ -104,20 +107,20 @@ SIXTRL_STATIC void NS( Particles_copy_all_unchecked )(
 /* ------------------------------------------------------------------------ */
 
 SIXTRL_STATIC int NS(Particles_assign_all_ptrs)(
-    NS(Particles)* SIXTRL_RESTRICT particles,
+    struct NS(Particles)* SIXTRL_RESTRICT particles,
     SIXTRL_GLOBAL_DEC unsigned char** SIXTRL_RESTRICT attribute_ptrs, 
     NS(block_size_t) const num_attributes );
 
-SIXTRL_STATIC int NS(Particles_map_to_memory_for_writing_aligned)(
-    NS(Particles)* SIXTRL_RESTRICT particles,
-    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
+SIXTRL_STATIC int NS(Particles_create_on_memory)(
+    struct NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_GLOBAL_DEC struct NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin, 
     NS(block_size_t) max_num_bytes_on_mem );
 
-SIXTRL_STATIC int NS(Particles_map_from_memory_for_reading_aligned)(
-    NS(Particles)* SIXTRL_RESTRICT particles, 
-    SIXTRL_GLOBAL_DEC NS(BlockInfo)*  SIXTRL_RESTRICT block_info,
-    SIXTRL_GLOBAL_DEC unsigned char*  SIXTRL_RESTRICT mem_begin, 
+SIXTRL_STATIC int NS(Particles_remap_from_memory)(
+    struct NS(Particles)* SIXTRL_RESTRICT particles, 
+    const SIXTRL_GLOBAL_DEC struct NS(BlockInfo) *const SIXTRL_RESTRICT block_info,
+    SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin, 
     NS(block_size_t) const max_num_bytes_on_mem );
 
 /* ------------------------------------------------------------------------- */
@@ -2192,6 +2195,394 @@ SIXTRL_INLINE int NS(Particles_is_aligned_with)(
             % align ) == ZERO ) ) ? 1 : 0;
 }
 
+
+SIXTRL_INLINE int NS(Particles_is_consistent)(
+    const NS(Particles) *const SIXTRL_RESTRICT particles )
+{
+    int success = 0;
+    
+    if( ( particles != 0 ) &&
+        ( NS(Particles_get_type_id)( particles ) == NS(BLOCK_TYPE_PARTICLE) ) )
+    {
+        NS(block_num_elements_t) const nn = 
+            NS(Particles_get_num_particles)( particles );
+        
+        success = 1;
+            
+        if( nn > ( NS(block_num_elements_t) )0u )
+        {
+            typedef SIXTRL_GLOBAL_DEC unsigned char const* g_ptr_uchar_t;
+            
+            NS(block_size_t) const REAL_SIZE = sizeof( SIXTRL_REAL_T  );
+            NS(block_size_t) const I64_SIZE  = sizeof( SIXTRL_INT64_T );
+            
+            NS(block_size_t) const REAL_BLOCK_SIZE = REAL_SIZE * nn;
+            NS(block_size_t) const I64_BLOCK_SIZE  = I64_SIZE  * nn;
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+            
+            g_ptr_uchar_t prev_ptr = 
+                ( g_ptr_uchar_t  )NS(Particles_get_const_q0)( particles );                
+                
+            g_ptr_uchar_t ptr = 
+                ( g_ptr_uchar_t  )NS(Particles_get_const_mass0)( particles );
+                
+            ptrdiff_t temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+            
+            if( ( temp_dist <= 0 ) || ( ptr == 0 ) || ( prev_ptr == 0 ) ||
+                ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+            {
+                success = 0;                
+            }
+                
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_beta0)( 
+                    particles );                    
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_gamma0)( 
+                    particles );
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t  )NS(Particles_get_const_p0c)( 
+                    particles );                    
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_s)( particles );                    
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_x)( particles );                    
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_y)( particles );
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_px)( particles );                    
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_py)( particles );
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_sigma)( 
+                    particles );                    
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_psigma)( 
+                    particles );                    
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_delta)( 
+                    particles );                    
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_rpp)( 
+                    particles );                    
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_rvv)( 
+                    particles );                    
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_chi)( 
+                    particles );                    
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < REAL_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % REAL_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_particle_id)( 
+                    particles );                    
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < I64_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % I64_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t                     
+                    )NS(Particles_get_const_lost_at_element_id)( particles );
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < I64_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % I64_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_lost_at_turn)( 
+                    particles );
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < I64_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % I64_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+            
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
+            if( success )
+            {
+                prev_ptr = ptr;
+                ptr = ( g_ptr_uchar_t )NS(Particles_get_const_state)( 
+                    particles );
+                
+                temp_dist = ( ptrdiff_t )( ptr - prev_ptr );
+                
+                if( ( temp_dist <= 0 ) || ( ptr == 0 ) || 
+                    ( ( ( NS(block_size_t) )temp_dist ) < I64_BLOCK_SIZE ) ||
+                    ( ( ( ( uintptr_t )ptr ) % I64_SIZE ) != 0 ) )
+                {
+                    success = 0;                
+                }
+            }
+        }
+        else
+        {
+            success &= (
+                ( ( NS(Particles_get_const_q0)(     particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_mass0)(  particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_beta0)(  particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_gamma0)( particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_p0c)(    particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_s)(      particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_x)(      particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_y)(      particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_px)(     particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_py)(     particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_sigma)(  particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_psigma)( particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_delta)(  particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_rpp)(    particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_rvv)(    particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_chi)(    particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_particle_id)( 
+                    particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_lost_at_element_id)( 
+                    particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_lost_at_turn)( 
+                    particles ) ) == 0 ) &&
+                ( ( NS(Particles_get_const_state)( particles ) ) == 0 ) ) 
+            ? 1 : 0;
+        }        
+    }
+    
+    return success;
+}
+
 /* ------------------------------------------------------------------------ */
 
 SIXTRL_INLINE int NS(Particles_assign_all_ptrs)(
@@ -2273,7 +2664,7 @@ SIXTRL_INLINE int NS(Particles_assign_all_ptrs)(
     return success;
 }
 
-SIXTRL_INLINE int NS(Particles_map_to_memory_for_writing_aligned)(
+SIXTRL_INLINE int NS(Particles_create_on_memory)(
     NS(Particles)* SIXTRL_RESTRICT particles,
     SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info, 
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin, 
@@ -2309,11 +2700,11 @@ SIXTRL_INLINE int NS(Particles_map_to_memory_for_writing_aligned)(
         real_attr_size, real_attr_size, real_attr_size, real_attr_size,
         elem_attr_size, elem_attr_size, elem_attr_size, elem_attr_size
     };
-    
+            
     NS(BlockInfo_set_type_id)( block_info, NS(BLOCK_TYPE_PARTICLE) );
     NS(BlockInfo_set_num_elements)( block_info, num_elem );
     
-    if( 0 == NS(BlockInfo_generic_map_to_memory_for_writing_aligned)(
+    if( 0 == NS(BlockInfo_map_to_memory_aligned)(
         block_info, &attributes_ptr[ 0 ], &num_bytes_for_attribute[ 0 ], 
         num_attributes, NS(Particles_get_num_particles)( particles ), 
         NS(Particles_get_type_id)( particles ), mem_begin, 
@@ -2342,10 +2733,10 @@ SIXTRL_INLINE int NS(Particles_map_to_memory_for_writing_aligned)(
     return success;
 }
 
-SIXTRL_INLINE int NS(Particles_map_from_memory_for_reading_aligned)(
+SIXTRL_INLINE int NS(Particles_remap_from_memory)(
     NS(Particles)* SIXTRL_RESTRICT particles, 
-    SIXTRL_GLOBAL_DEC NS(BlockInfo)*  SIXTRL_RESTRICT block_info,
-    SIXTRL_GLOBAL_DEC unsigned char*  SIXTRL_RESTRICT mem_begin, 
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT block_info,
+    SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT mem_begin, 
     NS(block_size_t) const max_num_bytes_on_mem )
 {
     typedef SIXTRL_GLOBAL_DEC unsigned char* g_ptr_uchar_t;
@@ -2381,10 +2772,10 @@ SIXTRL_INLINE int NS(Particles_map_from_memory_for_reading_aligned)(
         real_attr_size, real_attr_size, real_attr_size, real_attr_size,
         elem_attr_size, elem_attr_size, elem_attr_size, elem_attr_size
     };
-        
+    
     if( ( num_particles > ( NS(block_num_elements_t) )0u ) &&
         ( type_id == NS(BLOCK_TYPE_PARTICLE) ) &&
-        ( 0 == NS(BlockInfo_generic_map_from_memory_for_reading_aligned)(
+        ( 0 == NS(BlockInfo_remap_from_memory_aligned)(
             block_info, &attributes_ptr[ 0 ], &num_bytes_for_attribute[ 0 ],
             num_attributes, mem_begin, max_num_bytes_on_mem ) ) )
     {
