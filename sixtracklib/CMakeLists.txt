@@ -105,6 +105,24 @@ endif()
 
 # ------------------------------------------------------------------------------
 
+if( SIXTRACKL_ENABLE_MPFR4 )
+    add_subdirectory( mpfr4 )    
+    
+    if( TARGET sixtrack_mpfr4 )
+        set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
+            $<TARGET_OBJECTS:sixtrack_mpfr4> )
+    endif()
+         
+    set( SIXTRACKL_ENABLE_MODULE_MPFR4 1 )
+    
+else()
+    
+    set( SIXTRACKL_ENABLE_MODULE_MPFR4 0 )
+    
+endif()
+
+# ------------------------------------------------------------------------------
+
 configure_file( _impl/modules.h.template 
                 "${CMAKE_CURRENT_SOURCE_DIR}/_impl/modules.h" @ONLY )
 
