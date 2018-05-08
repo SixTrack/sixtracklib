@@ -17,22 +17,30 @@
 
 extern int NS(Track_beam_elements_simd_sse2)(
     NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
     const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
     NS(block_num_elements_t) const elem_by_elem_start_index,
     NS(ParticlesContainer)* SIXTRL_RESTRICT elem_by_elem_buffer );
 
 extern int NS(Track_beam_elements_simd_avx)(
     NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
     const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
     NS(block_num_elements_t) const elem_by_elem_start_index,
     NS(ParticlesContainer)* SIXTRL_RESTRICT elem_by_elem_buffer );
 
 extern int NS(Track_drift_simd_sse2)(
     struct NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
     SIXTRL_REAL_T const length );
 
 extern int NS(Track_drift_simd_avx)(
     struct NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
     SIXTRL_REAL_T const length );
 
 /* ========================================================================= */
@@ -41,6 +49,8 @@ extern int NS(Track_drift_simd_avx)(
 
 int NS(Track_beam_elements_simd_sse2)(
     NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
     const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
     NS(block_num_elements_t) const elem_by_elem_start_index,
     NS(ParticlesContainer)* SIXTRL_RESTRICT elem_by_elem_buffer )
@@ -90,7 +100,8 @@ int NS(Track_beam_elements_simd_sse2)(
                     be_block_info_it, be_mem_begin, be_max_num_bytes );
                 
                 status |= NS(Track_drift_simd_sse2)( 
-                    particles, NS(Drift_get_length_value)( &drift ) );
+                    particles, start_particle_index, end_particle_index, 
+                        NS(Drift_get_length_value)( &drift ) );
                 
                 break;
             }
@@ -105,7 +116,8 @@ int NS(Track_beam_elements_simd_sse2)(
                     be_block_info_it, be_mem_begin, be_max_num_bytes );
                 
                 status |= NS(Track_drift_simd_sse2)( 
-                    particles, NS(Drift_get_length_value)( &drift ) );
+                    particles, start_particle_index, end_particle_index, 
+                        NS(Drift_get_length_value)( &drift ) );
                 
                 break;
             }
@@ -136,6 +148,8 @@ int NS(Track_beam_elements_simd_sse2)(
 
 int NS(Track_beam_elements_simd_avx)(
     NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
     const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
     NS(block_num_elements_t) const elem_by_elem_start_index,
     NS(ParticlesContainer)* SIXTRL_RESTRICT elem_by_elem_buffer )
@@ -185,7 +199,8 @@ int NS(Track_beam_elements_simd_avx)(
                     &drift, be_block_info_it, be_mem_begin, be_max_num_bytes );
                 
                 status |= NS(Track_drift_simd_avx)( particles, 
-                    NS(Drift_get_length_value)( &drift ) );
+                    start_particle_index, end_particle_index,
+                        NS(Drift_get_length_value)( &drift ) );
                 
                 break;
             }
@@ -200,7 +215,8 @@ int NS(Track_beam_elements_simd_avx)(
                     &drift, be_block_info_it, be_mem_begin, be_max_num_bytes );
                 
                 status |= NS(Track_drift_simd_avx)( particles, 
-                    NS(Drift_get_length_value)( &drift ) );
+                    start_particle_index, end_particle_index,
+                        NS(Drift_get_length_value)( &drift ) );
                 
                 break;
             }
@@ -229,12 +245,15 @@ int NS(Track_beam_elements_simd_avx)(
 /* ------------------------------------------------------------------------- */
 
 int NS(Track_drift_simd_sse2)(
-    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_REAL_T const length )
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
+    SIXTRL_REAL_T const length )
 {
     #if defined __SSE2__
     
-    NS(block_num_elements_t) const num = 
-        NS(Particles_get_num_particles)( particles );
+    NS(block_num_elements_t) const num = end_particle_index - 
+        start_particle_index;
     
     static uintptr_t const REQ_ALIGN = ( uintptr_t )16u;
     static size_t    const STRIDE    = ( size_t )2u;
@@ -250,7 +269,7 @@ int NS(Track_drift_simd_sse2)(
     double* sigma = ( double* )NS(Particles_get_sigma)( particles );
     
     uintptr_t const addr_offset = ( ( ( uintptr_t )px_in ) % REQ_ALIGN );
-    size_t ii = 0;
+    size_t ii = start_particle_index;
     
     /* verify that every needed member of the particles structure has the same
      * (mis-)alignment relative to the REQ_ALIGN block-size: */
@@ -274,8 +293,8 @@ int NS(Track_drift_simd_sse2)(
     
     if( ii < num )
     {
-        size_t const steps     = ( num - ii ) / STRIDE;
-        size_t const end_index = ii + steps * STRIDE;
+        size_t const steps     = ( end_particle_index - ii ) / STRIDE;
+        NS(block_num_elements_t) const end_index = ii + steps * STRIDE;
         
         __m128d const one      = _mm_set1_pd( ( double )1.0L );
         __m128d const one_half = _mm_set1_pd( ( double )0.5L );
@@ -340,13 +359,16 @@ int NS(Track_drift_simd_sse2)(
 /* ------------------------------------------------------------------------- */
 
 int NS(Track_drift_simd_avx)(
-    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_REAL_T const length )
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
+    SIXTRL_REAL_T const length )
 {
     #if defined( __AVX__ )
     
     NS(block_num_elements_t) const num = 
-        NS(Particles_get_num_particles)( particles );
-    
+        end_particle_index - start_particle_index;
+        
     static uintptr_t const REQ_ALIGN = ( uintptr_t )32u;
     static size_t    const STRIDE    = ( size_t )4u;
     
@@ -361,7 +383,7 @@ int NS(Track_drift_simd_avx)(
     double* sig = ( double* )NS(Particles_get_sigma)( particles );
     
     uintptr_t const addr_offset = ( ( ( uintptr_t )px_in ) % REQ_ALIGN );
-    size_t ii = 0;
+    size_t ii = start_particle_index;
     
     /* verify that every needed member of the particles structure has the same
      * (mis-)alignment relative to the REQ_ALIGN block-size: */
@@ -417,8 +439,8 @@ int NS(Track_drift_simd_avx)(
     
     if( ii < num )
     {
-        size_t const steps     = ( num - ii ) / STRIDE;
-        size_t const end_index = ii + steps * STRIDE;
+        size_t const steps     = ( end_particle_index - ii ) / STRIDE;
+        NS(block_num_elements_t) const end_index = ii + steps * STRIDE;
         
         __m256d const one      = _mm256_set1_pd( ( double )1.0L );
         __m256d const one_half = _mm256_set1_pd( ( double )0.5L );
@@ -455,7 +477,7 @@ int NS(Track_drift_simd_avx)(
             _mm256_store_pd( y + ii, _mm256_add_pd( temp, _mm256_mul_pd( len, py ) ) );
         }
         
-        for( ; ii < num ; ++ii )
+        for( ; ii < end_particle_index ; ++ii )
         {
             NS(Track_drift_particle)( particles, ii++, length );
         }

@@ -115,7 +115,8 @@ int main( int argc, char* argv[] )
     
     for( ii = 0 ; ii < NUM_TURNS ; ++ii )
     {
-        ret |= st_Track_beam_elements( &particles, &beam_elements, 0, 0 );
+        ret |= st_Track_beam_elements( &particles, 0, NUM_PARTICLES, 
+                                       &beam_elements, 0, 0 );
     }
     
     gettimeofday( &tstop, 0 );

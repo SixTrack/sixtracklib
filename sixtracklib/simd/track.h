@@ -21,22 +21,32 @@
 
 int NS(Track_beam_elements_simd_sse2)(
     NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
     const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
     NS(block_num_elements_t) const elem_by_elem_start_index,
     NS(ParticlesContainer)* SIXTRL_RESTRICT elem_by_elem_buffer );
 
 int NS(Track_beam_elements_simd_avx)(
     NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
     const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
     NS(block_num_elements_t) const elem_by_elem_start_index,
     NS(ParticlesContainer)* SIXTRL_RESTRICT elem_by_elem_buffer );
 
 
 int NS(Track_drift_simd_sse2)(
-    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_REAL_T const length );
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
+    SIXTRL_REAL_T const length );
 
 int NS(Track_drift_simd_avx)(
-    NS(Particles)* SIXTRL_RESTRICT particles, SIXTRL_REAL_T const length );
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
+    SIXTRL_REAL_T const length );
 
 #if !defined( _GPUCODE )
 
