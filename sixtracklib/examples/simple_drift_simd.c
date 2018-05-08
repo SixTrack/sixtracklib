@@ -115,66 +115,7 @@ int main( int argc, char* argv[] )
     
     for( ii = 0 ; ii < NUM_TURNS ; ++ii )
     {
-        st_BlockInfo* block_info_it = 
-            st_BeamElements_get_block_infos_begin( &beam_elements );
-            
-        unsigned char* be_mem_begin = 
-            st_BeamElements_get_ptr_data_begin( &beam_elements );            
-
-        st_block_size_t const be_max_num_bytes =
-            st_BeamElements_get_data_capacity( &beam_elements );
-            
-        for( jj = 0 ; jj < NUM_ELEMS ; ++jj, ++block_info_it )
-        {
-            st_BlockType const type_id = st_BlockInfo_get_type_id( block_info_it );
-                        
-            switch( type_id )
-            {
-                case st_BLOCK_TYPE_DRIFT: 
-                {
-                    st_Drift drift;
-                    st_Drift_preset( &drift );
-                    
-                    ret = st_Drift_map_from_memory_for_reading_aligned(
-                        &drift, block_info_it, be_mem_begin, be_max_num_bytes );
-                    
-                    #if defined( __AVX__ )
-                    ret |= st_Track_simd_drift_avx( &particles, &drift );
-                    #elif defined( __SSE2__ )
-                    ret |= st_Track_simd_drift_sse2( &particles, &drift );
-                    #else
-                    #error "Currently requires either SSE2 or AVX support!"
-                    #endif /* __AVX__ || __SSE2__ */
-                    
-                    break;
-                }
-                
-                case st_BLOCK_TYPE_DRIFT_EXACT:
-                {
-                    st_Drift drift;
-                    st_Drift_preset( &drift );
-                    
-                    ret = st_Drift_map_from_memory_for_reading_aligned(
-                        &drift, block_info_it, be_mem_begin, be_max_num_bytes );
-                    
-                    #if defined( __AVX__ )
-                    ret |= st_Track_simd_drift_avx( &particles, &drift );
-                    #elif defined( __SSE2__ )
-                    ret |= st_Track_simd_drift_sse2( &particles, &drift );
-                    #else
-                    #error "Currently requires either SSE2 or AVX support!"
-                    #endif /* __AVX__ || __SSE2__ */
-                    
-                    break;
-                }
-                
-                default:
-                {
-                    printf( "unknown block type_id = %u --> skipping!\r\n",
-                            st_BlockType_to_number( type_id ) );
-                }
-            };
-        }
+        ret |= st_Track_beam_elements( &particles, &beam_elements, 0, 0 );
     }
     
     gettimeofday( &tstop, 0 );
