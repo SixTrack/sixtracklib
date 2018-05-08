@@ -53,44 +53,47 @@ void NS(OpenCLEnvNodeDevice_free)(
     
 typedef struct NS(OpenCLEnv)
 {
-    cl_platform_id*    platforms;
-    size_t             num_platforms;
+    cl_platform_id*                 platforms;
+    size_t                          num_platforms;
     
-    cl_device_id*      devices;
+    cl_device_id*                   devices;
         
-    cl_context         context;
-    cl_program         program;
-    cl_kernel          kernel;
-    cl_command_queue   queue;
-    cl_mem             particle_info_buffer;
-    cl_mem             particle_data_buffer;
-    cl_mem             beam_elem_info_buffer;
-    cl_mem             beam_elem_data_buffer;
-    cl_mem             elem_by_elem_buffer;
-    cl_mem             turn_by_turn_buffer;    
+    cl_context                      context;
+    cl_program                      program;
+    cl_kernel                       kernel;
+    cl_command_queue                queue;
+    
+    cl_mem                          particle_info_buffer;
+    cl_mem                          particle_data_buffer;    
+    cl_mem                          beam_elem_info_buffer;
+    cl_mem                          beam_elem_data_buffer;    
+    cl_mem                          elem_by_elem_info_buffer;
+    cl_mem                          elem_by_elem_data_buffer;    
+    cl_mem                          turn_by_turn_info_buffer;    
+    cl_mem                          turn_by_turn_data_buffer;
         
-    uint64_t           ressources_flags;
+    uint64_t                        ressources_flags;
     
     struct NS(OpenCLEnvNodeDevice)* nodes;
     struct NS(OpenCLEnvNodeDevice)* default_node;
     struct NS(OpenCLEnvNodeDevice)* selected_nodes;
     
-    size_t             num_selected_nodes;
-    size_t             num_devices;
+    size_t                          num_selected_nodes;
+    size_t                          num_devices;
     
-    NS(block_size_t)           num_be_blocks;
-    NS(block_size_t)           num_particle_blocks;
-    NS(block_size_t)           num_turns;
-    NS(block_num_elements_t)   num_particles;
-    NS(block_num_elements_t)   num_beam_elements;
-    NS(block_size_t)           max_num_bytes_particle_data_buffer;
-    NS(block_size_t)           max_num_bytes_be_data_buffer;
+    NS(block_size_t)                num_be_blocks;
+    NS(block_size_t)                num_particle_blocks;
+    NS(block_size_t)                num_turns;
+    NS(block_num_elements_t)        num_particles;
+    NS(block_num_elements_t)        num_beam_elements;
+    NS(block_size_t)                max_num_bytes_particle_data_buffer;
+    NS(block_size_t)                max_num_bytes_be_data_buffer;
     
-    char*              current_id_str;
-    char*              current_kernel_function;
-    char*              kernel_source;
+    char*                           current_id_str;
+    char*                           current_kernel_function;
+    char*                           kernel_source;
     
-    bool               is_ready;
+    bool                            is_ready;
 }
 NS(OpenCLEnv);
 
@@ -115,12 +118,16 @@ bool NS(OpenCLEnv_prepare)( struct NS(OpenCLEnv)* ocl_env,
     char* kernel_source_files, char const* compile_options,
     SIXTRL_SIZE_T const num_turns,
     const NS(ParticlesContainer) *const SIXTRL_RESTRICT particles,
-    const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements );
+    const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements, 
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT elem_by_elem_buffer,
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT turn_by_turn_buffer );
 
 bool NS(OpenCLEnv_track_particles)( 
     struct NS(OpenCLEnv)* ocl_env, 
     NS(ParticlesContainer)* SIXTRL_RESTRICT particles, 
-    NS(BeamElements)* SIXTRL_RESTRICT beam_elements );
+    const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT elem_by_elem_buffer,
+    const NS(ParticlesContainer) *const SIXTRL_RESTRICT turn_by_turn_buffer );
    
                        
 
