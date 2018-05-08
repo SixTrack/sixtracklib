@@ -37,14 +37,14 @@ TEST( CommonMemPoolTests, InitFreeBasic )
 
     st_MemPool_init( &mem_pool, capacity, chunk_size );
 
-    ASSERT_TRUE( st_MemPool_get_buffer( &mem_pool ) != nullptr );
+    ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool ) != nullptr );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool ) == capacity );
     ASSERT_TRUE( st_MemPool_get_chunk_size( &mem_pool ) == chunk_size );
     ASSERT_TRUE( st_MemPool_get_size( &mem_pool ) == std::size_t{0} );
 
     st_MemPool_free( &mem_pool );
 
-    ASSERT_TRUE( st_MemPool_get_buffer( &mem_pool ) == nullptr );
+    ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool ) == nullptr );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool ) == std::size_t{0} );
     ASSERT_TRUE( st_MemPool_get_chunk_size( &mem_pool ) == std::size_t{0} );
     ASSERT_TRUE( st_MemPool_get_size( &mem_pool ) == std::size_t{0} );
@@ -68,7 +68,7 @@ TEST( CommonMemPoolTests, InitFreeNonIntegerNumChunks )
 
     st_MemPool_init( &mem_pool, capacity, chunk_size );
 
-    ASSERT_TRUE( st_MemPool_get_buffer( &mem_pool ) != nullptr );
+    ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool ) != nullptr );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool ) >= capacity );
 
     ASSERT_TRUE( ZERO_SIZE ==
@@ -96,7 +96,7 @@ TEST( CommonMemPoolTests, InitFreeZeroCapacityNonZeroChunk )
 
     st_MemPool_init( &mem_pool, capacity, chunk_size );
 
-    ASSERT_TRUE( st_MemPool_get_buffer( &mem_pool ) != nullptr );
+    ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool ) != nullptr );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool ) >= capacity );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool ) == chunk_size );
     ASSERT_TRUE( st_MemPool_get_chunk_size( &mem_pool ) == chunk_size );
@@ -127,7 +127,7 @@ TEST( CommonMemPoolTests, AppendSuccess )
 
     ASSERT_TRUE( st_AllocResult_valid( &result ) );
     ASSERT_TRUE( st_AllocResult_get_pointer( &result ) ==
-                 st_MemPool_get_buffer( &mem_pool ) );
+                 st_MemPool_get_begin_pos( &mem_pool ) );
 
     ASSERT_TRUE( st_AllocResult_get_offset( &result ) == expected_offset );
     ASSERT_TRUE( st_AllocResult_get_length( &result ) == expected_length );
@@ -144,7 +144,7 @@ TEST( CommonMemPoolTests, AppendSuccess )
     ASSERT_TRUE( st_AllocResult_get_offset( &result ) == expected_offset );
     ASSERT_TRUE( st_AllocResult_get_length( &result ) == expected_length );
     ASSERT_TRUE( st_AllocResult_get_pointer( &result ) ==
-                 ( st_MemPool_get_buffer( &mem_pool ) + expected_offset ) );
+                 ( st_MemPool_get_begin_pos( &mem_pool ) + expected_offset ) );
 
     /* --------------------------------------------------------------------- */
 
@@ -159,7 +159,7 @@ TEST( CommonMemPoolTests, AppendSuccess )
     ASSERT_TRUE( st_AllocResult_get_offset( &result ) == expected_offset );
     ASSERT_TRUE( st_AllocResult_get_length( &result ) == expected_length );
     ASSERT_TRUE( st_AllocResult_get_pointer( &result ) ==
-                 ( st_MemPool_get_buffer( &mem_pool ) + expected_offset ) );
+                 ( st_MemPool_get_begin_pos( &mem_pool ) + expected_offset ) );
 
     /* --------------------------------------------------------------------- */
 
@@ -175,7 +175,7 @@ TEST( CommonMemPoolTests, AppendSuccess )
     ASSERT_TRUE( st_AllocResult_get_offset( &result ) == expected_offset );
     ASSERT_TRUE( st_AllocResult_get_length( &result ) == expected_length );
     ASSERT_TRUE( st_AllocResult_get_pointer( &result ) ==
-        ( st_MemPool_get_buffer( &mem_pool ) + expected_offset ) );
+        ( st_MemPool_get_begin_pos( &mem_pool ) + expected_offset ) );
 
     /* --------------------------------------------------------------------- */
 
@@ -188,7 +188,7 @@ TEST( CommonMemPoolTests, AppendSuccess )
     /* --------------------------------------------------------------------- */
 
     st_MemPool_clear( &mem_pool );
-    ASSERT_TRUE( st_MemPool_get_buffer( &mem_pool ) != nullptr );
+    ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool ) != nullptr );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool ) == capacity );
     ASSERT_TRUE( st_MemPool_get_chunk_size( &mem_pool ) == chunk_size );
     ASSERT_TRUE( st_MemPool_get_size( &mem_pool ) == std::size_t{0} );
@@ -213,7 +213,7 @@ TEST( CommonMemPoolTests, AppendAlignedWithPathologicalAlignment )
 
     st_MemPool_init( &mem_pool, capacity, chunk_size );
     
-    unsigned char* ptr_buffer_begin = st_MemPool_get_buffer( &mem_pool );
+    unsigned char* ptr_buffer_begin = st_MemPool_get_begin_pos( &mem_pool );
     ASSERT_TRUE( ptr_buffer_begin != nullptr );
     
     std::uintptr_t const buffer_begin_addr = 
@@ -250,7 +250,7 @@ TEST( CommonMemPoolTests, AppendAlignedWithPathologicalAlignment )
     
     
     ASSERT_TRUE( block_len <= capacity );
-    ASSERT_TRUE( st_MemPool_get_buffer( &mem_pool )   != nullptr );
+    ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool )   != nullptr );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool ) == capacity );
     
     st_MemPool_free( &mem_pool );
@@ -283,7 +283,7 @@ TEST( CommonMemPoolTests, AppendFailures )
     ASSERT_TRUE( st_AllocResult_get_offset( &result ) == uint64_t{0} );
     ASSERT_TRUE( st_AllocResult_get_length( &result ) == uint64_t{0} );
 
-    ASSERT_TRUE( st_MemPool_get_buffer( &mem_pool ) != nullptr );
+    ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool ) != nullptr );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool ) == capacity );
     ASSERT_TRUE( st_MemPool_get_chunk_size( &mem_pool ) == chunk_size );
     ASSERT_TRUE( st_MemPool_get_size( &mem_pool ) == ZERO_SIZE );
@@ -307,7 +307,7 @@ TEST( CommonMemPoolTests, AppendFailures )
     ASSERT_TRUE( st_AllocResult_get_offset( &result ) == uint64_t{0} );
     ASSERT_TRUE( st_AllocResult_get_length( &result ) == uint64_t{0} );
 
-    ASSERT_TRUE( st_MemPool_get_buffer( &mem_pool ) != nullptr );
+    ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool ) != nullptr );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool ) == capacity );
     ASSERT_TRUE( st_MemPool_get_chunk_size( &mem_pool ) == chunk_size );
     ASSERT_TRUE( st_MemPool_get_size( &mem_pool ) == current_size );
@@ -327,7 +327,7 @@ TEST( CommonMemPoolTests, AppendFailures )
     ASSERT_TRUE( st_AllocResult_get_offset( &result ) == uint64_t{0} );
     ASSERT_TRUE( st_AllocResult_get_length( &result ) == uint64_t{0} );
 
-    ASSERT_TRUE( st_MemPool_get_buffer( &mem_pool ) != nullptr );
+    ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool ) != nullptr );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool ) == capacity );
     ASSERT_TRUE( st_MemPool_get_chunk_size( &mem_pool ) == chunk_size );
     ASSERT_TRUE( st_MemPool_get_size( &mem_pool ) == current_size );
@@ -369,7 +369,7 @@ TEST( CommonMemPoolTests, AppendFailures )
         ASSERT_TRUE( st_AllocResult_get_offset( &result ) == uint64_t{0} );
         ASSERT_TRUE( st_AllocResult_get_length( &result ) == uint64_t{0} );
 
-        ASSERT_TRUE( st_MemPool_get_buffer( &mem_pool ) != nullptr );
+        ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool ) != nullptr );
         ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool ) == capacity );
         ASSERT_TRUE( st_MemPool_get_chunk_size( &mem_pool ) == chunk_size );
         ASSERT_TRUE( st_MemPool_get_size( &mem_pool ) == current_size );
@@ -384,7 +384,7 @@ TEST( CommonMemPoolTests, AppendFailures )
     ASSERT_TRUE( st_AllocResult_get_offset( &result ) == current_size );
     ASSERT_TRUE( st_AllocResult_get_length( &result ) == remaining_bytes );
 
-    ASSERT_TRUE( st_MemPool_get_buffer( &mem_pool ) != nullptr );
+    ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool ) != nullptr );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool ) == capacity );
     ASSERT_TRUE( st_MemPool_get_chunk_size( &mem_pool ) == chunk_size );
     ASSERT_TRUE( st_MemPool_get_size( &mem_pool ) == capacity );
