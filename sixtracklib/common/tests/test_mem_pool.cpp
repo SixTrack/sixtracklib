@@ -135,7 +135,7 @@ TEST( CommonMemPoolTests, AppendSuccess )
     /* --------------------------------------------------------------------- */
 
     num_bytes_to_add = ( chunk_size >> 1 );
-    expected_length = chunk_size;
+    expected_length  =   chunk_size;
     expected_offset += st_AllocResult_get_length( &result );
 
     result = st_MemPool_append( &mem_pool, num_bytes_to_add );
@@ -150,8 +150,8 @@ TEST( CommonMemPoolTests, AppendSuccess )
 
     std::size_t alignment = chunk_size << 1;
     num_bytes_to_add = chunk_size << 2;
-    expected_length = num_bytes_to_add;
-    expected_offset += st_AllocResult_get_length( &result ) + chunk_size;
+    expected_length  = num_bytes_to_add;
+    expected_offset += st_AllocResult_get_length( &result );
 
     result = st_MemPool_append_aligned( &mem_pool, num_bytes_to_add, alignment );
 
