@@ -473,7 +473,6 @@ NS( MemPool_append_aligned )( NS( MemPool ) * SIXTRL_RESTRICT pool,
                               SIXTRL_UINT64_T const num_bytes,
                               SIXTRL_UINT64_T const alignment )
 {
-    typedef unsigned char uchar_t;
     typedef SIXTRL_GLOBAL_DEC unsigned char* g_ptr_uchar_t;
     
     static SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
@@ -489,7 +488,7 @@ NS( MemPool_append_aligned )( NS( MemPool ) * SIXTRL_RESTRICT pool,
         NS( MemPool_get_next_begin_offset )( pool, alignment );
 
     SIXTRL_UINT64_T const chunk_size = NS( MemPool_get_chunk_size )( pool );
-    SIXTRL_ASSERT( sizeof( uchar_t ) == (SIXTRL_UINT64_T)1u );
+    SIXTRL_ASSERT( sizeof( unsigned char ) == (SIXTRL_UINT64_T)1u );
 
     NS( AllocResult_preset )( &result );
 

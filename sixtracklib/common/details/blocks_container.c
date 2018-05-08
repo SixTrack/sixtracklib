@@ -60,11 +60,11 @@ void NS(BlocksContainer_clear)(
         
         static bl_size_t const ZERO_SIZE = ( bl_size_t )0u;
         
-        #if !defined( NDEBUG ) && ( !defined( _GPUCODE ) ) 
-        typedef NS(block_alignment_t) align_t;
         typedef SIXTRL_GLOBAL_DEC NS(BlockInfo)* g_ptr_info_block_t;
         typedef SIXTRL_GLOBAL_DEC unsigned char* g_ptr_uchar_t;
         
+        #if !defined( NDEBUG ) && ( !defined( _GPUCODE ) ) 
+        typedef NS(block_alignment_t) align_t;
         static align_t   const ZERO      = ( align_t )0u;
         static align_t   const TWO       = ( align_t )2u;
         static align_t   const INFO_SIZE = ( align_t )sizeof( NS(BlockInfo ) );
