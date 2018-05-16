@@ -90,7 +90,7 @@ void NS( MemPool_init_aligned)(
             uintptr_t const buffer_addr = ( uintptr_t )new_buffer;
             uintptr_t const addr_mod    = buffer_addr % begin_alignment;
             
-            SIXTRL_UINT64_T const begin_offset = ( addr_mod == ( uintptr_t )0 )
+            SIXTRL_UINT64_T const begin_offset = ( addr_mod != ( uintptr_t )0 )
                 ? ( SIXTRL_UINT64_T )( begin_alignment - addr_mod ) : ZERO;
             
             g_ptr_uchar_t begin_pos = new_buffer + begin_offset;
