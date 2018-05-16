@@ -1,8 +1,6 @@
 # sixtracklib/sixtracklib/common/CMakeLists.txt
 
 set( SIXTRACKLIB_COMMON_HEADERS 
-     details/tools.h 
-     details/gpu_kernel_tools.h
      alignment.h
      impl/alignment_impl.h
      be_drift.h
@@ -13,8 +11,9 @@ set( SIXTRACKLIB_COMMON_HEADERS
      blocks_container.h
      mem_pool.h     
      particles.h
-     single_particle.h
      tests/test_particles_tools.h     
+     details/tools.h 
+     details/gpu_kernel_tools.h
      details/random.h     
 )
 
@@ -28,7 +27,6 @@ set( SIXTRACKLIB_COMMON_SOURCES
      details/mem_pool.c
      details/particles.c
      details/random.c
-     details/single_particle.c
      tests/test_particles_tools.c
 )
 
