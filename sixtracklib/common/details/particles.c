@@ -89,8 +89,7 @@ int NS(Particles_write_to_bin_file)(
         size_t const  I64_SIZE  = sizeof( SIXTRL_INT64_T );
         
         NS(block_size_t) const num_attributes = ( NS(block_size_t) )20u;
-        NS(block_num_elements_t) const num_elements = 1;
-            
+                    
         NS(block_size_t) const attr_sizes[] =
         {
             I64_SIZE,   I64_SIZE,   REAL_SIZE,  REAL_SIZE,  REAL_SIZE,  
@@ -130,7 +129,7 @@ int NS(Particles_write_to_bin_file)(
         };
         
         success = NS(Block_write_to_binary_file)( fp, NS(BLOCK_TYPE_PARTICLE), 
-            num_elements, num_attributes, attr, attr_sizes, attr_counts );
+            num_of_particles, num_attributes, attr, attr_sizes, attr_counts );
     }
     
     return success;

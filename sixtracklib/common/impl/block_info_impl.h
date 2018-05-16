@@ -344,7 +344,8 @@ NS(BlocksContainer_get_data_begin_alignment)(
 SIXTRL_STATIC NS(block_size_t) NS(BlocksContainer_get_data_capacity)(
     const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
 
-SIXTRL_STATIC NS(block_size_t) NS(BlocksContainer_get_data_size)( const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+SIXTRL_STATIC NS(block_size_t) NS(BlocksContainer_get_data_size)( 
+    const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
 
 SIXTRL_STATIC NS(block_size_t) NS(BlocksContainer_get_block_capacity)(
     const NS(BlocksContainer) *const SIXTRL_RESTRICT container );

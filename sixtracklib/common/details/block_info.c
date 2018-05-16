@@ -456,7 +456,7 @@ int NS(Block_read_structure_from_binary_file)( FILE* fp,
             ( ONE == fread( &temp_success_flag,  I64_SIZE, ONE, fp ) ) &&
             ( temp_success_flag == ( SIXTRL_INT64_T )0 ) &&
             ( ONE == fread( &temp_type_id_num,   U64_SIZE, ONE, fp ) ) &&
-            ( temp_type_id_num == 
+            ( temp_type_id_num != 
                 NS(BlockType_to_number)( NS(BLOCK_TYPE_INVALID) ) ) &&
             ( ONE == fread( &num_elem_num,  U64_SIZE, ONE, fp ) ) &&
             ( ONE == fread( &num_attr_num,  U64_SIZE, ONE, fp ) ) )

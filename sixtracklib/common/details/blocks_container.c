@@ -132,6 +132,8 @@ void NS(BlocksContainer_free)(
                 NS(BlocksContainer_get_ptr_info_store)( container );
             
             NS(MemPool_free)( pool );
+            free( pool );
+            pool = 0;
         }
         
         if( NS(BlocksContainer_has_data_store)( container ) )
@@ -140,6 +142,8 @@ void NS(BlocksContainer_free)(
                 NS(BlocksContainer_get_ptr_data_store)( container );
                 
             NS(MemPool_free)( pool );
+            free( pool );
+            pool = 0;
         }
         
         NS(BlocksContainer_preset)( container );
