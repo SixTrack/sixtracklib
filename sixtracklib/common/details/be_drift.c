@@ -127,8 +127,6 @@ int NS(Drift_read_from_bin_file)( FILE* fp, NS(Drift)* SIXTRL_RESTRICT drift )
     SIXTRL_STATIC SIXTRL_UINT64_T  const U64_ZERO = ( SIXTRL_UINT64_T  )0u;
     
     NS(block_size_t) const NUM_ATTRIBUTES = ( NS(block_size_t) )2u;
-    NS(block_size_t) const REAL_SIZE = sizeof( SIXTRL_REAL_T );
-    NS(block_size_t) const I64_SIZE  = sizeof( SIXTRL_INT64_T );
     
     NS(block_size_t) attr_sizes[]  = { ZERO, ZERO };
     NS(block_size_t) attr_counts[] = {  ONE,  ONE };
@@ -163,10 +161,9 @@ int NS(Drift_read_from_bin_file)( FILE* fp, NS(Drift)* SIXTRL_RESTRICT drift )
             ( ( success_flag == 0    ) && 
               ( binary_length > ZERO ) && 
               ( num_elements == ( NS(block_num_elements_t) )1u ) &&
-              ( attr_counts[  0 ] == ONE ) && 
-              ( attr_counts[  1 ] == ONE ) && 
-              ( attr_sizes[   0 ] == I64_SIZE  ) && 
-              ( attr_sizes[   1 ] == REAL_SIZE ) ) );
+              ( attr_counts[ 0 ] == ONE ) && ( attr_counts[ 1 ] == ONE ) && 
+              ( attr_sizes[ 0 ] == sizeof( SIXTRL_INT64_T )  ) && 
+              ( attr_sizes[ 1 ] == sizeof( SIXTRL_REAL_T  ) ) ) );
     }
     
     return success;

@@ -187,9 +187,7 @@ int NS(Particles_read_from_bin_file)(
     SIXTRL_STATIC NS(block_size_t) const ZERO     = ( NS(block_size_t) )0u;
     SIXTRL_STATIC SIXTRL_UINT64_T  const U64_ZERO = ( SIXTRL_UINT64_T  )0u;
     
-    NS(block_size_t) const NUM_ATTRIBUTES = ( NS(block_size_t) )20u;
-    NS(block_size_t) const REAL_SIZE = sizeof( SIXTRL_REAL_T );
-    NS(block_size_t) const I64_SIZE  = sizeof( SIXTRL_INT64_T );
+    NS(block_size_t) const NUM_ATTRIBUTES = ( NS(block_size_t) )20u;    
     
     NS(block_size_t) attr_sizes[] =
     {
@@ -262,26 +260,26 @@ int NS(Particles_read_from_bin_file)(
               ( attr_counts[ 14 ] == ONE ) && ( attr_counts[ 15 ] == ONE ) && 
               ( attr_counts[ 16 ] == ONE ) && ( attr_counts[ 17 ] == ONE ) && 
               ( attr_counts[ 18 ] == ONE ) && ( attr_counts[ 19 ] == ONE ) &&
-              ( attr_sizes[   0 ] == I64_SIZE  ) && 
-              ( attr_sizes[   1 ] == I64_SIZE  ) &&
-              ( attr_sizes[   2 ] == REAL_SIZE ) &&
-              ( attr_sizes[   3 ] == REAL_SIZE ) &&
-              ( attr_sizes[   4 ] == REAL_SIZE ) &&
-              ( attr_sizes[   5 ] == REAL_SIZE ) &&
-              ( attr_sizes[   6 ] == REAL_SIZE ) &&
-              ( attr_sizes[   7 ] == REAL_SIZE ) &&
-              ( attr_sizes[   8 ] == REAL_SIZE ) &&
-              ( attr_sizes[   9 ] == REAL_SIZE ) &&
-              ( attr_sizes[  10 ] == REAL_SIZE ) &&
-              ( attr_sizes[  11 ] == REAL_SIZE ) &&
-              ( attr_sizes[  12 ] == REAL_SIZE ) &&
-              ( attr_sizes[  13 ] == REAL_SIZE ) &&
-              ( attr_sizes[  14 ] == REAL_SIZE ) &&
-              ( attr_sizes[  15 ] == REAL_SIZE ) &&
-              ( attr_sizes[  16 ] == REAL_SIZE ) &&
-              ( attr_sizes[  17 ] == REAL_SIZE ) &&              
-              ( attr_sizes[  18 ] == I64_SIZE  ) &&
-              ( attr_sizes[  19 ] == I64_SIZE  ) ) );              
+              ( attr_sizes[   0 ] == sizeof( SIXTRL_INT64_T ) ) && 
+              ( attr_sizes[   1 ] == sizeof( SIXTRL_INT64_T ) ) &&
+              ( attr_sizes[   2 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[   3 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[   4 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[   5 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[   6 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[   7 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[   8 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[   9 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[  10 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[  11 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[  12 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[  13 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[  14 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[  15 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[  16 ] == sizeof( SIXTRL_REAL_T  ) ) &&
+              ( attr_sizes[  17 ] == sizeof( SIXTRL_REAL_T  ) ) &&              
+              ( attr_sizes[  18 ] == sizeof( SIXTRL_INT64_T ) ) &&
+              ( attr_sizes[  19 ] == sizeof( SIXTRL_INT64_T ) ) ) );              
     }
     
     return success;
