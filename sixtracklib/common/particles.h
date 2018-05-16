@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "sixtracklib/common/impl/block_info_impl.h"
@@ -176,11 +177,29 @@ SIXTRL_STATIC int NS(ParticlesContainer_get_particles)(
     NS(block_size_t) const block_index );
 
 
+/* ------------------------------------------------------------------------- */
+
+#if !defined( _GPUCODE )
+
 int NS(ParticlesContainer_add_blocks_of_particles)(
     NS(ParticlesContainer)* SIXTRL_RESTRICT particles_buffer,
     NS(Particles)* SIXTRL_RESTRICT particle_blocks,
     NS(block_size_t) const num_of_blocks, 
     NS(block_num_elements_t) const* SIXTRL_RESTRICT num_of_particles_vec );
+
+int NS(Particles_write_to_bin_file)( 
+    FILE* fp, const NS(Particles) *const SIXTRL_RESTRICT particles );
+
+int NS(Particles_read_from_bin_file)( 
+    FILE* fp, NS(Particles)* SIXTRL_RESTRICT particles );
+
+NS(block_num_elements_t) 
+NS(Particles_get_next_num_particles_from_bin_file)( FILE* fp );
+
+SIXTRL_STATIC int NS(ParticlesContainer_write_to_bin_file)( FILE* fp, 
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer );
+
+#endif /* !defined( _GPUCODE ) */
 
 /* ************************************************************************ */
 /* *********     Implementation of inline functions and methods     ******* */
@@ -568,8 +587,40 @@ SIXTRL_INLINE int NS(ParticlesContainer_get_particles)(
     return status;
 }
 
+/* ------------------------------------------------------------------------- */
 
+SIXTRL_INLINE int NS(ParticlesContainer_write_to_bin_file)( FILE* fp, 
+    NS(ParticlesContainer)* SIXTRL_RESTRICT particle_buffer )
+{
+    int success = -1;
     
+    NS(block_size_t) const num_particle_blocks = 
+        NS(ParticlesContainer_get_num_of_blocks)( particle_buffer );
+        
+    if( num_particle_blocks > ( NS(block_size_t) )0u )
+    {
+        NS(block_size_t) ii = ( NS(block_size_t) )0u;
+        
+        NS(Particles) particles;
+        NS(Particles_preset)( &particles );
+        
+        success = 0;
+        
+        for( ; ii < num_particle_blocks ; ++ii )
+        {
+            if( ( 0 != NS(ParticlesContainer_get_particles)(
+                        &particles, particle_buffer, ii ) ) ||
+                ( 0 != NS(Particles_write_to_bin_file)( fp, &particles ) ) )
+            {
+                success = -1;
+                break;                
+            }        
+        }
+    }
+    
+    return success;
+}
+
 #if !defined( _GPUCODE )
 #ifdef __cplusplus
 }
