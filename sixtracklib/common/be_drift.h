@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "sixtracklib/_impl/definitions.h"
@@ -23,6 +24,11 @@ int NS(Drift_create_from_single_drift)(
     struct NS(DriftSingle)* SIXTRL_RESTRICT single_drift );
 
 int NS(Drift_is_valid)( const NS(Drift) *const SIXTRL_RESTRICT drift );
+
+int NS(Drift_write_to_bin_file)( 
+    FILE* fp, const NS(Drift) *const SIXTRL_RESTRICT drift );
+
+int NS(Drift_read_from_bin_file)( FILE* fp, NS(Drift)* SIXTRL_RESTRICT drift );
 
 #ifdef __cplusplus
 }
