@@ -45,6 +45,15 @@ void NS(BlocksContainer_reserve_for_data)(
 
 /* ------------------------------------------------------------------------- */
 
+#if !defined( _GPUCODE )
+
+int NS(BlocksContainer_write_to_bin_file)(
+    FILE* fp, const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+#endif /* !defined( _GPUCODE ) */
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_STATIC NS(MemPool) const* NS(BlocksContainer_get_const_ptr_info_store)(
     NS(BlocksContainer)* SIXTRL_RESTRICT container );
 

@@ -12,6 +12,11 @@
 #include "sixtracklib/common/alignment.h"
 #include "sixtracklib/common/impl/alignment_impl.h"
 #include "sixtracklib/common/impl/block_info_impl.h"
+#include "sixtracklib/common/impl/be_drift_impl.h"
+#include "sixtracklib/common/impl/particles_impl.h"
+
+#include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/be_drift.h"
 #include "sixtracklib/common/mem_pool.h"
 
 extern void NS(BlocksContainer_clear)(
@@ -34,6 +39,15 @@ extern void NS(BlocksContainer_reserve_num_blocks)(
 extern void NS(BlocksContainer_reserve_for_data)(
     NS(BlocksContainer)* SIXTRL_RESTRICT container, 
     NS(block_size_t) const new_data_capacity );
+
+/* ------------------------------------------------------------------------- */
+
+#if !defined( _GPUCODE )
+
+extern int NS(BlocksContainer_write_to_bin_file)(
+    FILE* fp, const NS(BlocksContainer) *const SIXTRL_RESTRICT container );
+
+#endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
@@ -198,8 +212,7 @@ void NS(BlocksContainer_reserve_num_blocks)(
             NS(BlocksContainer_get_info_begin_alignment)( container ) );
         
         if( ( NS(MemPool_get_const_begin_pos)( ptr_info_store ) != 0 ) &&
-            ( NS(MemPool_is_begin_aligned_with)( 
-                NS(BlocksContainer_get_ptr_data_store( container ) ),
+            ( NS(MemPool_is_begin_aligned_with)( ptr_info_store, 
                 NS(BlocksContainer_get_info_begin_alignment)( container ) ) 
             ) &&
             ( NS(MemPool_get_capacity)( ptr_info_store ) >= 
@@ -302,6 +315,95 @@ void NS(BlocksContainer_reserve_for_data)(
     
     return;
 }
+
+/* ------------------------------------------------------------------------- */
+
+#if !defined( _GPUCODE )
+
+int NS(BlocksContainer_write_to_bin_file)(
+    FILE* fp, const NS(BlocksContainer) *const SIXTRL_RESTRICT container )
+{
+    int success = -1;
+    
+    NS(block_size_t) const num_of_blocks = 
+        NS(BlocksContainer_get_num_of_blocks)( container );
+    
+    if( ( fp != 0 ) && ( container != 0 ) && 
+        ( num_of_blocks > ( NS(block_size_t) )0u ) )
+    {
+        NS(block_size_t) ii = ( NS(block_size_t) )0u;
+        
+        NS(BlockInfo) const* block_info_it  = 
+            NS(BlocksContainer_get_const_block_infos_begin)( container );
+            
+        NS(BlockInfo) const* block_info_end =
+            NS(BlocksContainer_get_const_block_infos_end)( container );
+            
+        for( ; block_info_it != block_info_end ; ++block_info_it, ++ii )
+        {
+            typedef SIXTRL_GLOBAL_DEC unsigned char* g_ptr_uchar_t;
+            
+            NS(BlockType) const type_id = 
+                NS(BlockInfo_get_type_id)( block_info_it );
+            
+            g_ptr_uchar_t mem_begin = 
+                ( g_ptr_uchar_t )NS(BlocksContainer_get_const_ptr_data_begin)( 
+                    container );
+                
+            NS(block_size_t) const mem_size = 
+                NS(BlocksContainer_get_data_size)( container );
+            
+            success = -1;
+            
+            switch( type_id )
+            {
+                case NS(BLOCK_TYPE_PARTICLE):
+                {
+                    NS(Particles) particles;
+                    NS(Particles_preset)( &particles );
+                    
+                    if( ( 0 == NS(Particles_remap_from_memory)( &particles, 
+                            block_info_it, mem_begin, mem_size ) ) &&
+                        ( 0 == NS(Particles_write_to_bin_file)( fp, 
+                            &particles ) ) )
+                    {
+                        success = 0;
+                    }
+                    
+                    break;
+                }
+                
+                
+                case NS(BLOCK_TYPE_DRIFT):
+                case NS(BLOCK_TYPE_DRIFT_EXACT):
+                {
+                    NS(Drift) drift;
+                    NS(Drift_preset)( &drift );
+                    
+                    if( ( 0 == NS(Drift_remap_from_memory)( 
+                            &drift, block_info_it, mem_begin, mem_size ) ) &&
+                        ( 0 == NS(Drift_write_to_bin_file)( fp, &drift ) ) )
+                    {
+                        success = 0;
+                    }
+                    
+                    break;
+                }
+                
+                default:
+                {
+                    success = -1;
+                }
+            };
+            
+            if( success != 0 ) break;
+        }
+    }
+    
+    return success;
+}
+
+#endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
