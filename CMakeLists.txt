@@ -70,6 +70,14 @@ message( STATUS "cmake_module_path: ${CMAKE_MODULE_PATH}" )
 include( SetupUnitTesting )
 
 # ------------------------------------------------------------------------------
+# MPFR4:
+
+if( SIXTRACKL_ENABLE_MPFR4 OR SIXTRACKL_ENABLE_MPFR_ACCURACY_TESTS )
+    include( SetupMultiPrecision )
+endif()
+
+
+# ------------------------------------------------------------------------------
 # OpenCL:
 
 if( SIXTRACKL_ENABLE_OPENCL )
