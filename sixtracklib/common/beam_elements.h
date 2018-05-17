@@ -599,11 +599,14 @@ SIXTRL_INLINE NS(BlockInfo)* NS(BeamElements_create_beam_element)(
         
         if( ( success == 0 ) && ( block_info != 0 ) )
         {
-            ++elements->num_blocks;
             
             NS(MemPool_increment_size)( ptr_data_store, 
                 NS(BlockInfo_get_mem_offset)( block_info ) + 
                 NS(BlockInfo_get_num_of_bytes)( block_info ) );
+            
+            ++elements->num_blocks;
+            elements->data_raw_size = 
+                NS(MemPool_get_size)( ptr_data_store );
             
             return block_info;
         }
