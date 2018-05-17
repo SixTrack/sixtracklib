@@ -20,7 +20,7 @@ if( GTEST_FOUND )
     
     add_executable( test_gpu_kernel_tools test_gpu_kernel_tools.cpp )        
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_gpu_kernel_tools )         
-    add_test( CommonToolTests test_gpu_kernel_tools )
+    add_test( CommonGpuKernelTools test_gpu_kernel_tools )
     
     # --------------------------------------------------------------------------
     # test_mem_pool:
@@ -37,11 +37,11 @@ if( GTEST_FOUND )
     add_test( CommonParticlesTests test_particles )    
     
     # --------------------------------------------------------------------------
-    # test_particles_sequence:
+    # test_beam_elements:
     
-#     add_executable( test_particles_sequence test_particles_sequence.cpp )
-#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_particles_sequence )
-#     add_test( CommonParticlesSequenceTests test_particles_sequence )    
+    add_executable( test_beam_elements test_beam_elements.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_beam_elements )
+    add_test( CommonBeamElementsTests test_beam_elements )    
     
     # --------------------------------------------------------------------------
     # test_block_drift:
