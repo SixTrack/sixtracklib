@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_IMPL_BLOCK_INFO_IMPL_H__
-#define SIXTRACKLIB_COMMON_IMPL_BLOCK_INFO_IMPL_H__
+#ifndef SIXTRACKLIB_COMMON_BLOCKS_H__
+#define SIXTRACKLIB_COMMON_BLOCKS_H__
 
 #if !defined( _GPUCODE )
 
@@ -48,6 +48,7 @@ SIXTRL_STATIC int NS(BlockType_is_valid_number)(
 /* ------------------------------------------------------------------------- */
 
 typedef SIXTRL_UINT64_T NS(block_size_t);
+typedef SIXTRL_INT64_T  NS(block_num_elements_t);
 typedef SIXTRL_INT64_T  NS(block_element_id_t);
 
 typedef struct NS(block_info_s)
@@ -163,6 +164,10 @@ NS(Blocks_get_const_data_begin)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const* 
 NS(Blocks_get_const_data_end)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 
+SIXTRL_STATIC NS(block_size_t) NS(Blocks_predict_data_capacity_for_num_blocks)(
+    const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
+    NS(block_size_t) const num_of_blocks );
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_total_num_bytes)(
@@ -244,13 +249,13 @@ NS(Blocks_get_block_info_by_index)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-int NS(Blocks_has_data_store)(
+SIXTRL_STATIC int NS(Blocks_has_data_store)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-int NS(Blocks_has_index_store)(
+SIXTRL_STATIC int NS(Blocks_has_index_store)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-int NS(Blocks_has_data_pointers_store)(
+SIXTRL_STATIC int NS(Blocks_has_data_pointers_store)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -265,7 +270,7 @@ void NS(Blocks_free)(  NS(Blocks)* SIXTRL_RESTRICT blocks );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-int NS(Blocks_add_block)( 
+SIXTRL_GLOBAL_DEC NS(BlockInfo)* NS(Blocks_add_block)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(BlockType) const type_id,
     NS(block_size_t) const block_handle_size,
     const void *const SIXTRL_RESTRICT block_handle,
@@ -526,6 +531,17 @@ NS(Blocks_get_const_data_end)( NS(Blocks)* SIXTRL_RESTRICT blocks )
     return end_ptr;
 }
 
+SIXTRL_INLINE NS(block_size_t) NS(Blocks_predict_data_capacity_for_num_blocks)(
+    const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
+    NS(block_size_t) const num_of_blocks )
+{
+    NS(block_size_t) align = NS(Blocks_get_data_alignment)( blocks );
+    NS(block_size_t) data_capacity = 
+        4u * align + num_of_blocks * sizeof( NS(BlockInfo) );
+        
+    return data_capacity;
+}
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(block_size_t) NS(Blocks_get_total_num_bytes)(
@@ -535,7 +551,6 @@ SIXTRL_INLINE NS(block_size_t) NS(Blocks_get_total_num_bytes)(
              ( blocks->ptr_total_num_bytes != 0 ) )
           ? *( blocks->ptr_total_num_bytes ) : ( NS(block_size_t) )0u;    
 }
-
 
 SIXTRL_INLINE int NS(Blocks_remap)( NS(Blocks)* SIXTRL_RESTRICT blocks )
 {
@@ -1078,6 +1093,6 @@ SIXTRL_INLINE int NS(Blocks_has_data_pointers_store)(
 
 #endif /* !defined( _GPUCODE ) */
 
-#endif /* SIXTRACKLIB_COMMON_IMPL_BLOCK_INFO_IMPL_H__ */
+#endif /* SIXTRACKLIB_COMMON_BLOCKS_H__ */
 
-/* end: sixtracklib/common/impl/block_info_impl.h */
+/* end: sixtracklib/common/blocks.h */

@@ -1,4 +1,4 @@
-#include "sixtracklib/common/block.h"
+#include "sixtracklib/common/blocks.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -13,7 +13,7 @@ extern int NS(Blocks_init)( NS(Blocks)* SIXTRL_RESTRICT blocks,
 extern void NS(Blocks_clear)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 extern void NS(Blocks_free)(  NS(Blocks)* SIXTRL_RESTRICT blocks );
 
-extern int NS(Blocks_add_block)( 
+extern SIXTRL_GLOBAL_DEC NS(BlockInfo)* NS(Blocks_add_block)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(BlockType) const type_id,
     NS(block_size_t) const block_handle_size,
     const void *const SIXTRL_RESTRICT block_handle,
@@ -22,7 +22,7 @@ extern int NS(Blocks_add_block)(
     const NS(block_size_t) *const SIXTRL_RESTRICT attr_type_sizes,
     const NS(block_size_t) *const SIXTRL_RESTRICT attr_type_counts );
 
-extern int  NS(Blocks_serializie)( NS(Blocks)* SIXTRL_RESTRICT blocks );
+extern int NS(Blocks_serialize)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 
 /* ------------------------------------------------------------------------- */
 
@@ -67,7 +67,8 @@ int NS(Blocks_init)( NS(Blocks)* SIXTRL_RESTRICT blocks,
                 sizeof( NS(BlockInfo) ) * max_num_blocks;
             
             NS(block_size_t) const data_ptrs_capacity =
-                sizeof( SIXTRL_GLOBAL_DEC void* ) * max_num_blocks;
+                sizeof( SIXTRL_GLOBAL_DEC void** ) * 
+                    max_num_blocks *  MAX_DATA_PTRS_PER_BLOCK;
                 
             if( blocks->data_store == 0 )
             {
@@ -272,7 +273,7 @@ void NS(Blocks_free)(  NS(Blocks)* SIXTRL_RESTRICT blocks )
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-int NS(Blocks_add_block)( 
+SIXTRL_GLOBAL_DEC NS(BlockInfo)* NS(Blocks_add_block)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(BlockType) const type_id,
     NS(block_size_t) const block_handle_size,
     const void *const SIXTRL_RESTRICT block_handle,
@@ -281,7 +282,7 @@ int NS(Blocks_add_block)(
     const NS(block_size_t) *const SIXTRL_RESTRICT attr_type_sizes,
     const NS(block_size_t) *const SIXTRL_RESTRICT attr_type_counts )
 {
-    int success = -1;
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* result_block_infos = 0;
     
     SIXTRL_STATIC NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;    
     NS(block_size_t) const alignment = NS(Blocks_get_data_alignment)( blocks );    
@@ -316,6 +317,8 @@ int NS(Blocks_add_block)(
         pool_t const rollback_data_store      = *ptr_data_store;            
         pool_t const rollback_index_store     = *ptr_index_store;
         pool_t const rollback_data_ptrs_store = *ptr_data_ptrs_store;
+        
+        int success = -1;
         
         NS(AllocResult) result = NS(MemPool_append_aligned)( 
             ptr_data_store, block_handle_size, alignment );
@@ -387,7 +390,10 @@ int NS(Blocks_add_block)(
                         NS(block_size_t) const attr_offset = 
                             attr_data_pointer_offsets[ ii ];
                             
-                        if( ( attr_size > ZERO ) && ( attr_offset > offset ) &&
+                        if( ( attr_size > ZERO ) && 
+                            ( ( attr_offset > offset ) || 
+                              ( ( attr_offset == offset ) &&
+                                ( attr_offset == 0 ) ) ) &&
                             ( attr_offset < block_handle_size ) )
                         {
                             attr_data_size += attr_size;
@@ -449,6 +455,8 @@ int NS(Blocks_add_block)(
             NS(BlockInfo_set_ptr_metadata)( ptr_block_info, 0 );
             NS(BlockInfo_set_ptr_begin)( 
                 ptr_block_info, ( g_void_ptr_t )ptr_block_begin );
+            
+            result_block_infos = ptr_block_info;
         }
         else
         {
@@ -458,7 +466,7 @@ int NS(Blocks_add_block)(
         }
     }
     
-    return success;
+    return result_block_infos;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -656,4 +664,4 @@ int NS(Blocks_serialize)( NS(Blocks)* SIXTRL_RESTRICT blocks )
     return success;
 }
 
-/* ------------------------------------------------------------------------- */
+/* sixtracklib/common/details/blocks.c */
