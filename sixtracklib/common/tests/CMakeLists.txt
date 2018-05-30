@@ -16,6 +16,13 @@ if( GTEST_FOUND )
     add_test( CommonToolTests test_tools )
     
     # --------------------------------------------------------------------------
+    # test_block:
+    
+    add_executable( test_blocks test_blocks.cpp )        
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_blocks )         
+    add_test( CommonToolTests test_blocks )
+    
+    # --------------------------------------------------------------------------
     # test_gpu_kernel_tools:
     
     add_executable( test_gpu_kernel_tools test_gpu_kernel_tools.cpp )        
@@ -39,9 +46,9 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_beam_elements:
     
-    add_executable( test_beam_elements test_beam_elements.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_beam_elements )
-    add_test( CommonBeamElementsTests test_beam_elements )    
+#     add_executable( test_beam_elements test_beam_elements.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_beam_elements )
+#     add_test( CommonBeamElementsTests test_beam_elements )    
     
     # --------------------------------------------------------------------------
     # test_block_drift:

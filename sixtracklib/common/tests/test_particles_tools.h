@@ -6,10 +6,23 @@ extern "C" {
 #endif /* defined( __cplusplus ) */
 
 #include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/namespace_begin.h"
-#include "sixtracklib/common/impl/particles_impl.h"
+#include "sixtracklib/common/particles.h"
     
 void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p );
+
+int NS(Particles_have_same_structure)(
+    const st_Particles *const SIXTRL_RESTRICT lhs, 
+    const st_Particles *const SIXTRL_RESTRICT rhs );
+
+int NS(Particles_map_to_same_memory)(
+    const st_Particles *const SIXTRL_RESTRICT lhs, 
+    const st_Particles *const SIXTRL_RESTRICT rhs );
+
+int NS(Particles_compare_values)(
+    const st_Particles *const SIXTRL_RESTRICT lhs, 
+    const st_Particles *const SIXTRL_RESTRICT rhs );
+
+
 
 #if defined( __cplusplus )
 }
