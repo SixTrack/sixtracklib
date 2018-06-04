@@ -46,9 +46,9 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_beam_elements:
     
-#     add_executable( test_beam_elements test_beam_elements.cpp )
-#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_beam_elements )
-#     add_test( CommonBeamElementsTests test_beam_elements )    
+    add_executable( test_beam_elements test_beam_elements.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_beam_elements )
+    add_test( CommonBeamElementsTests test_beam_elements )    
     
     # --------------------------------------------------------------------------
     # test_block_drift:
