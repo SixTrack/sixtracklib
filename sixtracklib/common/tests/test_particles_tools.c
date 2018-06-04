@@ -9,6 +9,7 @@
 
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/common/details/random.h"
+#include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/particles.h"
 
 extern void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p );

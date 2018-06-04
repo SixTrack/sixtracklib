@@ -3,14 +3,12 @@
 set( SIXTRACKLIB_COMMON_HEADERS 
      alignment.h
      impl/alignment_impl.h
-     be_drift.h
-     impl/be_drift_impl.h
-     block_info.h
-     impl/block_info_impl.h
+     blocks.h
      beam_elements.h
-     blocks_container.h
+     impl/beam_elements_api.h
      mem_pool.h     
      particles.h
+     impl/particles_api.h
      tests/test_particles_tools.h     
      details/tools.h 
      details/gpu_kernel_tools.h
@@ -20,9 +18,8 @@ set( SIXTRACKLIB_COMMON_HEADERS
 
 set( SIXTRACKLIB_COMMON_SOURCES
      details/alignment.c
-     details/be_drift.c
-     details/block_info.c
-     details/blocks_container.c
+     details/blocks.c
+     details/beam_elements.c
      details/gpu_kernel_tools.c
      details/mem_pool.c
      details/particles.c

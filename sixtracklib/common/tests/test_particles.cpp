@@ -48,8 +48,8 @@ TEST( ParticlesTests, RandomInitParticlesCopyAndCompare )
     st_block_size_t const PARTICLES_DATA_CAPACITY = 
         st_Blocks_predict_data_capacity_for_num_blocks( 
             &particles_buffer, NUM_BLOCKS ) + 
-        NUM_BLOCKS * st_Particles_predict_blocks_data_capacity( 
-            &particles_buffer, NUM_PARTICLES );
+        st_Particles_predict_blocks_data_capacity( 
+            &particles_buffer, NUM_BLOCKS, NUM_PARTICLES );
     
     /* --------------------------------------------------------------------- */
     
@@ -130,7 +130,7 @@ TEST( ParticlesTests, RandomInitSerializationToUnserializationSameMemory )
         st_Blocks_predict_data_capacity_for_num_blocks( 
             &particles_buffer, NUM_BLOCKS ) +
         st_Particles_predict_blocks_data_capacity( 
-            &particles_buffer, NUM_PARTICLES );
+            &particles_buffer, NUM_BLOCKS, NUM_PARTICLES );
     
     int ret = st_Blocks_init( 
         &particles_buffer, NUM_BLOCKS, PARTICLES_DATA_CAPACITY );
@@ -222,7 +222,7 @@ TEST( ParticlesTests, RandomInitSerializationCopyMemoryUnserializeCompare )
         st_Blocks_predict_data_capacity_for_num_blocks( 
             &particles_buffer, NUM_BLOCKS ) +
         st_Particles_predict_blocks_data_capacity( 
-            &particles_buffer, NUM_PARTICLES );
+            &particles_buffer, NUM_BLOCKS, NUM_PARTICLES );
         
     int ret = st_Blocks_init( 
         &particles_buffer, NUM_BLOCKS, PARTICLES_DATA_CAPACITY );

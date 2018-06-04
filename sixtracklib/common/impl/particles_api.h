@@ -1,8 +1,6 @@
 #ifndef SIXTRACKLIB_COMMON_IMPL_PARTICLES_API_H__
 #define SIXTRACKLIB_COMMON_IMPL_PARTICLES_API_H__
 
-#pragma message "HERE sixtracklib/impl/particles_api.h"
-
 #if !defined( _GPUCODE )
 
 #include "sixtracklib/_impl/definitions.h"
@@ -20,6 +18,40 @@ extern "C" {
 #endif /* !defined( _GPUCODE ) */
 
 struct NS(Particles);
+
+SIXTRL_STATIC NS(Particles)* NS(Particles_preset)( 
+    NS(Particles)* SIXTRL_RESTRICT particles );
+
+
+SIXTRL_STATIC NS(block_num_elements_t) NS(Particles_get_num_particles)( 
+    const NS(Particles) *const SIXTRL_RESTRICT particles );
+
+SIXTRL_STATIC void NS(Particles_set_num_particles)( 
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(block_num_elements_t) const num_of_particles );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Particles) const* 
+NS(Blocks_get_const_particles)(
+    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
+
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Particles)* NS(Blocks_get_particles)(
+    NS(BlockInfo)* SIXTRL_RESTRICT block_info );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC void NS( Particles_copy_single_unchecked )( 
+    struct NS( Particles ) * SIXTRL_RESTRICT des, 
+    NS(block_num_elements_t) const des_id,
+    const struct NS( Particles ) *const SIXTRL_RESTRICT src, 
+    NS(block_num_elements_t) const src_id );
+
+SIXTRL_STATIC void NS( Particles_copy_all_unchecked )(
+    struct NS( Particles ) * SIXTRL_RESTRICT des,
+    const struct NS( Particles ) *const SIXTRL_RESTRICT src );
+
+/* ------------------------------------------------------------------------- */
     
 SIXTRL_STATIC SIXTRL_REAL_T NS(Particles_get_q0_value)(
     const NS(Particles) *const SIXTRL_RESTRICT particles, 
@@ -534,6 +566,196 @@ SIXTRL_STATIC void NS(Particles_assign_ptr_to_state)(
 #if !defined( _GPUCODE )
 #include "sixtracklib/common/particles.h"
 #endif /* !defined( _GPUCODE ) */
+
+SIXTRL_INLINE NS(Particles)* NS(Particles_preset)( 
+    NS(Particles)* SIXTRL_RESTRICT particles )
+{
+    if( particles != 0 )
+    {
+        particles->q0                 = 0;    
+        particles->mass0              = 0; 
+        particles->beta0              = 0; 
+        particles->gamma0             = 0;
+        particles->p0c                = 0;   
+        particles->s                  = 0;     
+        particles->x                  = 0;     
+        particles->px                 = 0;    
+        particles->y                  = 0;     
+        particles->py                 = 0;    
+        particles->sigma              = 0; 
+        particles->psigma             = 0;
+        particles->delta              = 0;
+        particles->rpp                = 0;
+        particles->rvv                = 0;
+        particles->chi                = 0;
+
+        particles->particle_id        = 0;
+        particles->lost_at_element_id = 0;
+        particles->lost_at_turn       = 0;
+        particles->state              = 0;
+        
+        NS(Particles_set_num_particles)( 
+            particles, ( NS(block_num_elements_t) )0 );        
+    }
+    
+    return particles;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE NS(Particles) const* NS(Blocks_get_const_particles)(
+    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info )
+{
+    return ( ( block_info != 0 ) && 
+             ( NS(BlockInfo_get_const_ptr_begin)( block_info ) != 0 ) &&
+             ( ( ( ( uintptr_t )NS(BlockInfo_get_const_ptr_begin)( block_info ) 
+                 ) % 8u ) == 0u ) ) 
+        ? ( SIXTRL_GLOBAL_DEC NS(Particles) const*                
+            )NS(BlockInfo_get_const_ptr_begin)( block_info )
+        : 0;
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Particles)* NS(Blocks_get_particles)(
+    NS(BlockInfo)* SIXTRL_RESTRICT block_info )
+{
+    return ( SIXTRL_GLOBAL_DEC NS(Particles)*            
+        )NS(Blocks_get_const_particles)( block_info );
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE NS(block_num_elements_t) NS(Particles_get_num_particles)( 
+    const NS(Particles) *const SIXTRL_RESTRICT particles )
+{
+    return ( particles != 0 ) ? particles->num_of_particles : 0;
+}
+
+SIXTRL_INLINE void NS(Particles_set_num_particles)( 
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(block_num_elements_t) const num_of_particles )
+{
+    if( particles != 0 ) particles->num_of_particles = num_of_particles;
+    return;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE void NS( Particles_copy_single_unchecked )( 
+    struct NS( Particles ) * SIXTRL_RESTRICT des, 
+    NS(block_num_elements_t) const des_id,
+    const struct NS( Particles ) *const SIXTRL_RESTRICT src, 
+    NS(block_num_elements_t) const src_id )
+{
+    SIXTRL_ASSERT( ( des != 0 ) && ( src != 0 ) &&
+                   ( NS(Particles_get_num_particles)( des ) > des_id ) &&
+                   ( NS(Particles_get_num_particles)( src ) > src_id ) );
+    
+    NS( Particles_set_q0_value )
+        ( des, des_id, NS( Particles_get_q0_value )( src, src_id ) );
+
+    NS( Particles_set_mass0_value )
+        ( des, des_id, NS( Particles_get_mass0_value )( src, src_id ) );
+
+    NS( Particles_set_beta0_value )
+        ( des, des_id, NS( Particles_get_beta0_value )( src, src_id ) );
+
+    NS( Particles_set_gamma0_value )
+        ( des, des_id, NS( Particles_get_gamma0_value )( src, src_id ) );
+
+    NS( Particles_set_p0c_value )
+        ( des, des_id, NS( Particles_get_p0c_value )( src, src_id ) );
+
+    NS( Particles_set_s_value )
+        ( des, des_id, NS( Particles_get_s_value )( src, src_id ) );
+
+    NS( Particles_set_x_value )
+        ( des, des_id, NS( Particles_get_x_value )( src, src_id ) );
+
+    NS( Particles_set_y_value )
+        ( des, des_id, NS( Particles_get_y_value )( src, src_id ) );
+
+    NS( Particles_set_px_value )
+        ( des, des_id, NS( Particles_get_px_value )( src, src_id ) );
+
+    NS( Particles_set_py_value )
+        ( des, des_id, NS( Particles_get_py_value )( src, src_id ) );
+
+    NS( Particles_set_sigma_value )
+        ( des, des_id, NS( Particles_get_sigma_value )( src, src_id ) );
+
+    NS( Particles_set_psigma_value )
+        ( des, des_id, NS( Particles_get_psigma_value )( src, src_id ) );
+
+    NS( Particles_set_delta_value )
+        ( des, des_id, NS( Particles_get_delta_value )( src, src_id ) );
+
+    NS( Particles_set_rpp_value )
+        ( des, des_id, NS( Particles_get_rpp_value )( src, src_id ) );
+
+    NS( Particles_set_rvv_value )
+        ( des, des_id, NS( Particles_get_rvv_value )( src, src_id ) );
+
+    NS( Particles_set_chi_value )
+        ( des, des_id, NS( Particles_get_chi_value )( src, src_id ) );
+    
+    NS( Particles_set_particle_id_value )
+        ( des, des_id, NS( Particles_get_particle_id_value )( src, src_id ) );
+
+    NS( Particles_set_lost_at_element_id_value )
+        ( des, des_id, 
+          NS( Particles_get_lost_at_element_id_value )( src, src_id ) );
+
+    NS( Particles_set_lost_at_turn_value )
+        ( des, des_id, NS( Particles_get_lost_at_turn_value )( src, src_id ) );
+
+    NS( Particles_set_state_value )
+        ( des, des_id, NS( Particles_get_state_value )( src, src_id ) );
+
+    return;
+}
+
+SIXTRL_INLINE void NS( Particles_copy_all_unchecked )(
+    struct NS( Particles ) * SIXTRL_RESTRICT des,
+    const struct NS( Particles ) *const SIXTRL_RESTRICT src )
+{
+    SIXTRL_ASSERT( 
+        ( des != 0 ) && ( src != 0 ) &&
+        ( NS(Particles_get_num_particles)( des ) == 
+          NS(Particles_get_num_particles( src ) ) ) );
+    
+    NS( Particles_set_q0     )( des, NS( Particles_get_const_q0     )( src ) );
+    NS( Particles_set_mass0  )( des, NS( Particles_get_const_mass0  )( src ) );
+    NS( Particles_set_beta0  )( des, NS( Particles_get_const_beta0  )( src ) );
+    NS( Particles_set_gamma0 )( des, NS( Particles_get_const_gamma0 )( src ) );
+    NS( Particles_set_p0c    )( des, NS( Particles_get_const_p0c    )( src ) );
+    
+    NS( Particles_set_s      )( des, NS( Particles_get_const_s      )( src ) );
+    NS( Particles_set_x      )( des, NS( Particles_get_const_x      )( src ) );
+    NS( Particles_set_y      )( des, NS( Particles_get_const_y      )( src ) );
+    NS( Particles_set_px     )( des, NS( Particles_get_const_px     )( src ) );
+    NS( Particles_set_py     )( des, NS( Particles_get_const_py     )( src ) );
+    NS( Particles_set_sigma  )( des, NS( Particles_get_const_sigma  )( src ) );
+    
+    NS( Particles_set_state  )( des, NS( Particles_get_const_state  )( src ) );        
+    NS( Particles_set_psigma )( des, NS( Particles_get_const_psigma )( src ) );
+    NS( Particles_set_delta  )( des, NS( Particles_get_const_delta  )( src ) );
+    NS( Particles_set_rpp    )( des, NS( Particles_get_const_rpp    )( src ) );
+    NS( Particles_set_rvv    )( des, NS( Particles_get_const_rvv    )( src ) );
+    NS( Particles_set_chi    )( des, NS( Particles_get_const_chi    )( src ) );
+    
+    NS( Particles_set_particle_id )( des, 
+        NS( Particles_get_const_particle_id )( src ) );
+    
+    NS( Particles_set_lost_at_element_id )( des, 
+        NS( Particles_get_const_lost_at_element_id)( src ) );
+    
+    NS( Particles_set_lost_at_turn)( des, 
+        NS(Particles_get_const_lost_at_turn)( src ) );
+    
+    return;
+}
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(Particles_get_q0_value)(
     const NS(Particles) *const SIXTRL_RESTRICT p, 

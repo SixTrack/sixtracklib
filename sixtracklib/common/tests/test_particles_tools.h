@@ -6,6 +6,7 @@ extern "C" {
 #endif /* defined( __cplusplus ) */
 
 #include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/particles.h"
     
 void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p );
