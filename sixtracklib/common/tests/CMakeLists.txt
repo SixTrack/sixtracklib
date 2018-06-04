@@ -20,7 +20,7 @@ if( GTEST_FOUND )
     
     add_executable( test_blocks test_blocks.cpp )        
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_blocks )         
-    add_test( CommonToolTests test_blocks )
+    add_test( CommonBlocksTests test_blocks )
     
     # --------------------------------------------------------------------------
     # test_gpu_kernel_tools:
@@ -55,7 +55,7 @@ if( GTEST_FOUND )
     
     add_executable( test_track test_track.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track )
-    add_test( CommonBlockDriftTests test_track )
+    add_test( CommonTrackTests test_track )
     
     # *************************************************************************
     # Set all properties: 
