@@ -51,7 +51,7 @@ typedef SIXTRL_UINT64_T NS(block_size_t);
 typedef SIXTRL_INT64_T  NS(block_num_elements_t);
 typedef SIXTRL_INT64_T  NS(block_element_id_t);
 
-typedef struct NS(block_info_s)
+typedef struct NS(BlockInfo)
 {
     NS(block_type_num_t) type_id_num  __attribute__(( aligned( 8 ) ));            
     
@@ -118,7 +118,7 @@ SIXTRL_STATIC void NS(BlockInfo_set_block_size)(
 
 /* ------------------------------------------------------------------------- */
 
-typedef struct NS(blocks_s)
+typedef struct NS(Blocks)
 {
     SIXTRL_GLOBAL_DEC unsigned char* 
         SIXTRL_RESTRICT ptr_data_begin       __attribute__(( aligned( 8 ) ));
