@@ -51,18 +51,11 @@ if( GTEST_FOUND )
     add_test( CommonBeamElementsTests test_beam_elements )    
     
     # --------------------------------------------------------------------------
-    # test_block_drift:
+    # test_track:
     
-#     add_executable( test_block_drift test_block_drift.cpp )
-#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_block_drift )
-#     add_test( CommonBlockDriftTests test_block_drift )
-    
-    # --------------------------------------------------------------------------
-    # test_blocks:
-    
-#     add_executable( test_blocks test_blocks.cpp )
-#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_blocks )
-#     add_test( CommonBlocksTests test_blocks )
+    add_executable( test_track test_track.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track )
+    add_test( CommonBlockDriftTests test_track )
     
     # *************************************************************************
     # Set all properties: 
