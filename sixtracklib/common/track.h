@@ -10,158 +10,51 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "sixtracklib/common/impl/particles_impl.h"
-#include "sixtracklib/common/impl/block_info_impl.h"
-#include "sixtracklib/common/beam_elements.h"
+#include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/beam_elements.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
 #endif /* !defined( _GPUCODE ) */
-    
-/* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC int NS(Track_drift)(
+SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_drift_particle)( 
+    NS(Particles)* SIXTRL_RESTRICT particles,                                                            
+    NS(block_num_elements_t) const ii, 
+    const NS(Drift) *const SIXTRL_RESTRICT drift );
+
+SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_drift_exact_particle)( 
     NS(Particles)* SIXTRL_RESTRICT particles, 
-    NS(block_num_elements_t) const start_particle_index,
-    NS(block_num_elements_t) const end_particle_index,
-    SIXTRL_REAL_T const length );
+    NS(block_num_elements_t)  const ii, 
+    const NS(DriftExact) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_STATIC int NS(Track_drift_particle)( 
+SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_multipole_particle)( 
     NS(Particles)* SIXTRL_RESTRICT particles, 
-    NS(block_num_elements_t) const ii, SIXTRL_REAL_T const length );
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-SIXTRL_STATIC int NS(Track_drift_exact)(
-    NS(Particles)* SIXTRL_RESTRICT particles, 
-    NS(block_num_elements_t) const start_particle_index,
-    NS(block_num_elements_t) const end_particle_index,
-    SIXTRL_REAL_T const length );
-
-SIXTRL_STATIC int NS(Track_drift_exact_particle)( 
-    NS(Particles)* SIXTRL_RESTRICT particles, 
-    NS(block_num_elements_t)  const ii, SIXTRL_REAL_T const length );
-
-/* ------------------------------------------------------------------------- */
-
-SIXTRL_STATIC int NS(Track_beam_elements)(
-    NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(block_num_elements_t) const start_particle_index,
-    NS(block_num_elements_t) const end_particle_index,
-    const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
-    NS(block_num_elements_t) const elem_by_elem_start_index,
-    NS(ParticlesContainer)* SIXTRL_RESTRICT elem_by_elem_buffer );
+    NS(block_num_elements_t)  const ii, 
+    const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
 
 /* ========================================================================= */
 /* =====        Implementation of Inline functions and methods         ===== */
 /* ========================================================================= */
 
+#if !defined( _GPUCODE )
 
-SIXTRL_INLINE int NS(Track_beam_elements)(NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(block_num_elements_t) const start_particle_index,
-    NS(block_num_elements_t) const end_particle_index,
-    const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
-    NS(block_num_elements_t) const elem_by_elem_start_index,
-    NS(ParticlesContainer)* SIXTRL_RESTRICT elem_by_elem_buffer )
-{
-    int status = 0;
-    
-    int const use_elem_by_elem_store = (
-        ( elem_by_elem_buffer != 0 ) && 
-        ( NS(ParticlesContainer_get_num_of_blocks)( elem_by_elem_buffer ) >=
-          ( NS(BeamElements_get_num_of_blocks)( beam_elements ) + 
-                elem_by_elem_start_index ) ) );
-    
-    NS(BlockInfo) const* be_block_info_it  = 
-        NS(BeamElements_get_const_block_infos_begin)( beam_elements );
-        
-    NS(BlockInfo) const* be_block_info_end =
-        NS(BeamElements_get_const_block_infos_end)( beam_elements );
-    
-    NS(block_num_elements_t) elem_by_elem_idx = elem_by_elem_start_index;
-        
-    SIXTRL_ASSERT( ( beam_elements != 0 ) && ( particles != 0 ) && 
-                   ( be_block_info_it != 0 ) );
-        
-    for( ; be_block_info_it != be_block_info_end ; ++be_block_info_it )
-    {
-        typedef SIXTRL_GLOBAL_DEC unsigned char* g_ptr_uchar_t;
-        
-        NS(BlockType) const type_id = 
-            NS(BlockInfo_get_type_id)( be_block_info_it );
-        
-        int status = 0;    
-            
-        switch( type_id )
-        {
-            case NS(BLOCK_TYPE_DRIFT):
-            {
-                NS(Drift) drift;
-                NS(Drift_preset)( &drift ); /* only to get rid of warnings! */
-                
-                status |= NS(Drift_remap_from_memory)( &drift, be_block_info_it, 
-                    ( g_ptr_uchar_t )NS(BeamElements_get_const_ptr_data_begin)( 
-                        beam_elements ), 
-                    NS(BeamElements_get_data_capacity)( beam_elements ) );
-                
-                status |= NS(Track_drift)( 
-                    particles, start_particle_index, end_particle_index, 
-                        NS(Drift_get_length_value)( &drift ) );
-                
-                break;
-            }
-            
-            
-            case NS(BLOCK_TYPE_DRIFT_EXACT):
-            {
-                NS(Drift) drift;
-                NS(Drift_preset)( &drift );
-                
-                status |= NS(Drift_remap_from_memory)( &drift, be_block_info_it, 
-                    ( g_ptr_uchar_t )NS(BeamElements_get_const_ptr_data_begin)( 
-                        beam_elements ),
-                    NS(BeamElements_get_data_capacity)( beam_elements ) );
-                
-                status |= NS(Track_drift_exact)( 
-                    particles, start_particle_index, end_particle_index, 
-                    NS(Drift_get_length_value)( &drift ) );
-                
-                break;
-            }
-            
-            default:
-            {
-                status = -1;
-            }
-        };
-        
-        if( use_elem_by_elem_store )
-        {
-            NS(Particles) particles_after_elem;
-             
-            status |= NS(ParticlesContainer_get_particles)( 
-                &particles_after_elem, elem_by_elem_buffer, elem_by_elem_idx );
-            
-            NS(Particles_copy_all_unchecked)( &particles_after_elem, particles );
-            ++elem_by_elem_idx;
-        }
-    }
-    
-    return status;
-}
+#include "sixtracklib/common/impl/beam_elements_api.h"
+#include "sixtracklib/common/impl/particles_api.h"
 
-/* ------------------------------------------------------------------------- */
+#endif /* !defined( _GPUCODE ) */
 
-SIXTRL_INLINE int NS(Track_drift_particle)( 
+SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_drift_particle)( 
     NS(Particles)* SIXTRL_RESTRICT particles, 
-    NS(block_num_elements_t) const ii, SIXTRL_REAL_T const length )
+    NS(block_num_elements_t) const ii, 
+    const NS(Drift) *const SIXTRL_RESTRICT drift )
 {
     SIXTRL_STATIC SIXTRL_REAL_T const ONE      = ( SIXTRL_REAL_T )1;
     SIXTRL_STATIC SIXTRL_REAL_T const ONE_HALF = ( SIXTRL_REAL_T )0.5L;
     
+    SIXTRL_REAL_T const length = NS(Drift_get_length)( drift );
     SIXTRL_REAL_T const rpp = NS(Particles_get_rpp_value)( particles, ii );
     SIXTRL_REAL_T const px  = NS(Particles_get_px_value )( particles, ii ) * rpp;
     SIXTRL_REAL_T const py  = NS(Particles_get_py_value )( particles, ii ) * rpp;    
@@ -188,19 +81,20 @@ SIXTRL_INLINE int NS(Track_drift_particle)(
     return 0;
 }
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE int NS(Track_drift_exact_particle)(
+SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_drift_exact_particle)(
     NS(Particles)* SIXTRL_RESTRICT particles, NS(block_num_elements_t) const ii,
-    SIXTRL_REAL_T const length )
+    const NS(DriftExact) *const SIXTRL_RESTRICT drift )
 {
     SIXTRL_STATIC SIXTRL_REAL_T const ONE = ( SIXTRL_REAL_T )1u;
     
-    SIXTRL_REAL_T const delta = NS(Particles_get_delta_value)( particles, ii );
-    SIXTRL_REAL_T const beta0 = NS(Particles_get_beta0_value)( particles, ii );
-    SIXTRL_REAL_T const px    = NS(Particles_get_px_value)(    particles, ii );
-    SIXTRL_REAL_T const py    = NS(Particles_get_py_value)(    particles, ii );
-    SIXTRL_REAL_T sigma       = NS(Particles_get_sigma_value)( particles, ii );
+    SIXTRL_REAL_T const length = NS(DriftExact_get_length)( drift );
+    SIXTRL_REAL_T const delta  = NS(Particles_get_delta_value)( particles, ii );
+    SIXTRL_REAL_T const beta0  = NS(Particles_get_beta0_value)( particles, ii );
+    SIXTRL_REAL_T const px     = NS(Particles_get_px_value)(    particles, ii );
+    SIXTRL_REAL_T const py     = NS(Particles_get_py_value)(    particles, ii );
+    SIXTRL_REAL_T sigma        = NS(Particles_get_sigma_value)( particles, ii );
                         
     SIXTRL_REAL_T const opd   = delta + ONE;
     SIXTRL_REAL_T const lpzi  = ( length ) / 
@@ -225,62 +119,83 @@ SIXTRL_INLINE int NS(Track_drift_exact_particle)(
     return 0;
 }
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE int NS(Track_drift)(
+SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_multipole_particle)( 
     NS(Particles)* SIXTRL_RESTRICT particles, 
-    NS(block_num_elements_t) const start_particle_index,
-    NS(block_num_elements_t) const end_particle_index,
-    SIXTRL_REAL_T const length )
+    NS(block_num_elements_t)  const ii, 
+    const NS(MultiPole) *const SIXTRL_RESTRICT multipole )
 {
-    int status = 0;
+    SIXTRL_INT64_T const order = NS(MultiPole_get_order)( multipole );
+    SIXTRL_INT64_T index_x = 2 * order;
+    SIXTRL_INT64_T index_y = index_x + 1;
+        
+    SIXTRL_REAL_T dpx = NS(MultiPole_get_bal_value)( multipole, index_x );    
+    SIXTRL_REAL_T dpy = NS(MultiPole_get_bal_value)( multipole, index_y );
+        
+    SIXTRL_REAL_T const x   = NS(Particles_get_x_value)( particles, ii );
+    SIXTRL_REAL_T const y   = NS(Particles_get_y_value)( particles, ii );
+    SIXTRL_REAL_T const chi = NS(Particles_get_chi_value)( particles, ii );
+    SIXTRL_REAL_T const len = NS(MultiPole_get_length)( multipole );
     
-    NS(block_num_elements_t) ii = start_particle_index;
+    SIXTRL_REAL_T px = NS(Particles_get_px_value)( particles, ii );
+    SIXTRL_REAL_T py = NS(Particles_get_py_value)( particles, ii );
     
-    SIXTRL_ASSERT( 
-        ( start_particle_index <= end_particle_index ) &&
-        ( end_particle_index <= NS(Particles_get_num_particles)( particles ) ) 
-    );
-    
-    for( ; ii < end_particle_index ; ++ii )
+    for( ; index_x >= 0 ; index_x -= 2, index_y -= 2 )
     {
-        status |= NS(Track_drift_particle)( particles, ii, length );
+        SIXTRL_REAL_T const zre = dpx * x - dpy * y;
+        SIXTRL_REAL_T const zim = dpx * y + dpy * x;
+        
+        dpx = NS(MultiPole_get_bal_value)( multipole, index_x ) + zre;
+        dpy = NS(MultiPole_get_bal_value)( multipole, index_y ) + zim;
     }
     
-    return status;
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-SIXTRL_INLINE int NS(Track_drift_exact)(
-    NS(Particles)* SIXTRL_RESTRICT particles, NS(block_num_elements_t) const start_particle_index,
-    NS(block_num_elements_t) const end_particle_index,
-    SIXTRL_REAL_T const length )
-{
-    int status = 0;
+    dpx = -chi * dpx;
+    dpy =  chi * dpy;
     
-    NS(block_num_elements_t) ii = start_particle_index;
-    
-    SIXTRL_ASSERT( 
-        ( start_particle_index <= end_particle_index ) &&
-        ( end_particle_index <= NS(Particles_get_num_particles)( particles ) ) 
-    );
-    
-    for( ; ii < end_particle_index ; ++ii )
+    if( len > 0.0 )
     {
-        status |= NS(Track_drift_exact_particle)( particles, ii, length );
+        SIXTRL_REAL_T const hxl   = NS(MultiPole_get_hxl)( multipole );
+        SIXTRL_REAL_T const hyl   = NS(MultiPole_get_hyl)( multipole );            
+        
+        SIXTRL_REAL_T const delta = 
+            NS(Particles_get_delta_value)( particles, ii );
+            
+        SIXTRL_REAL_T const hxx   = x * hxl / len;
+        SIXTRL_REAL_T const hyy   = y * hyl / len;
+        
+        SIXTRL_REAL_T sigma = NS(Particles_get_sigma_value)( particles, ii );
+        
+        dpx += hxl + hxl * delta 
+             - hxx * chi * NS(MultiPole_get_bal_value)( multipole, 0 );
+             
+        dpy -= hyl + hyl * delta
+             - chi * NS(MultiPole_get_bal_value)( multipole, 1 );  
+             
+        sigma -= chi * ( hxx - hyy ) * len 
+               * NS(Particles_get_rvv_value)( particles, ii );
+               
+        NS(Particles_set_sigma_value)( particles, ii, sigma );
     }
     
-    return status;
+    px += dpx;
+    py += dpy;
+    
+    NS(Particles_set_px_value)( particles, ii, px );
+    NS(Particles_set_py_value)( particles, ii, py );
+    
+    return 0;
 }
 
-
+/* ------------------------------------------------------------------------- */
 
 #if !defined( _GPUCODE )
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#include "sixtracklib/common/impl/track_api.h"
 
 #endif /* !defined( _GPUCODE ) */
 
