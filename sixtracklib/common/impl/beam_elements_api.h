@@ -334,8 +334,8 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(MultiPole_get_bal_value)(
     const NS(MultiPole) *const SIXTRL_RESTRICT mp, SIXTRL_INT64_T const index )
 {
     SIXTRL_ASSERT( ( mp != 0 ) && ( index >= 0 ) && 
-                   ( index < ( 2 * mp->order  ) ) );
-    
+                   ( index < ( 2 * mp->order + 2 ) ) );
+     
     return ( mp->bal != 0 ) ? mp->bal[ index ] : ( SIXTRL_REAL_T )0.0;
 }
 
@@ -380,7 +380,7 @@ SIXTRL_INLINE void NS(MultiPole_set_bal_value)(
     SIXTRL_INT64_T const index, SIXTRL_REAL_T const value )
 {
     SIXTRL_ASSERT( ( multipole != 0 ) && ( index >= 0 ) &&
-                   ( index < ( 2 * multipole->order ) ) );
+                   ( index < ( 2 * multipole->order + 2 ) ) );
     
     multipole->bal[ index ] = value;
     return;
@@ -391,7 +391,8 @@ SIXTRL_INLINE void NS(MultiPole_set_bal)(
     SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT bal )
 {
     SIXTRL_ASSERT( ( multipole != 0 ) && ( order > 0 ) && ( bal != 0 ) );    
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, multipole->bal, bal, 2 * order );
+    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, multipole->bal, bal, 
+                             ( 2 * order + 2 ) );
     
     return;
 }

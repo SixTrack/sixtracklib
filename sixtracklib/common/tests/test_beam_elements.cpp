@@ -396,7 +396,7 @@ TEST( CommonTestsBeamElements,
         SIXTRL_INT64_T const order = MIN_ORDER + static_cast< SIXTRL_INT64_T >( 
                 ORDER_RANGE * st_Random_genrand64_real1() );
         
-        SIXTRL_INT64_T const nn = 2 * order;
+        SIXTRL_INT64_T const nn = 2 * order + 2;
         
         bal_values.clear();
         bal_values.reserve( nn );
@@ -481,8 +481,8 @@ TEST( CommonTestsBeamElements,
         
         ASSERT_TRUE( 0 == memcmp( 
             st_MultiPole_get_const_bal( multipole ), 
-            cmp_multi_poles[ ii ].bal,
-            sizeof( SIXTRL_REAL_T ) * cmp_multi_poles[ ii ].order * 2u ) );
+            cmp_multi_poles[ ii ].bal, ( sizeof( SIXTRL_REAL_T ) * ( 
+                cmp_multi_poles[ ii ].order * 2u + 2u ) ) ) );
     }
     
     /* --------------------------------------------------------------------- */
@@ -548,8 +548,8 @@ TEST( CommonTestsBeamElements,
         
         ASSERT_TRUE( 0 == memcmp( 
             st_MultiPole_get_const_bal( multipole ), 
-            cmp_multi_poles[ ii ].bal,
-            sizeof( SIXTRL_REAL_T ) * cmp_multi_poles[ ii ].order * 2u ) );
+            cmp_multi_poles[ ii ].bal, sizeof( SIXTRL_REAL_T ) * ( 
+                cmp_multi_poles[ ii ].order * 2u + 2u ) ) );
     }
     
     st_Blocks_free( &beam_elements );

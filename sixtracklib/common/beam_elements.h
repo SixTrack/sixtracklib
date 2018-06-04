@@ -195,7 +195,7 @@ SIXTRL_INLINE NS(block_size_t) NS(MultiPole_predict_blocks_data_capacity)(
         SIXTRL_STATIC NS(block_size_t) const 
             NUM_REAL_ATTRIBUTES = 1u;        
         
-        NS(block_size_t) const NUM_OF_BAL_VALUES = max_order * 2u;
+        NS(block_size_t) const NUM_OF_BAL_VALUES = max_order * 2u + 2u;
             
         NS(block_size_t) const REAL_ATTRIBUTE_SIZE = 
             NUM_OF_BAL_VALUES * sizeof( SIXTRL_REAL_T );

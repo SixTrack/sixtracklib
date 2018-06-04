@@ -86,7 +86,9 @@ SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(Blocks_reserve_multipole)(
         NS(MultiPole_preset)( &multipole );
         NS(MultiPole_set_order)( &multipole, ord );
         
-        NS(block_size_t) const num_bal_values = 2u * ( NS(block_size_t) )ord;
+        NS(block_size_t) const num_bal_values = 
+            2u * ( ( ( NS(block_size_t) )ord ) + 1u );
+        
         NS(block_size_t) const data_attr_counts[] = { num_bal_values };
         
         NS(block_size_t) const data_attr_offsets[] = 
