@@ -12,6 +12,10 @@
 
 #endif /* defined( _GPUCODE ) */
 
+#if !defined( SIXTRL_TRACK_RETURN )
+    #define SIXTRL_TRACK_RETURN int
+#endif /* !defined( SIXTRL_TRACK_RETURN ) */
+
 #if defined( _GPUCODE )
 
     #pragma OPENCL EXTENSION cl_khr_fp64 : enable 
