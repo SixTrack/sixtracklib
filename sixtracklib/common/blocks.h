@@ -755,10 +755,7 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
         blocks->num_data_pointers       = num_of_data_ptrs;
         blocks->data_size               = *ptr_total_num_bytes;
                                         
-        blocks->data_store              = 0;
-        blocks->index_store             = 0;
-        blocks->data_ptrs_store         = 0;            
-        blocks->is_serialized            = 1;
+        blocks->is_serialized           = 1;
 
         success = 0;
     }
