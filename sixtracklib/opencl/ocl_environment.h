@@ -17,6 +17,7 @@ extern "C" {
 #include <stdlib.h>
     
 #include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/beam_elements.h"
 
@@ -53,6 +54,7 @@ void NS(OpenCLEnvNodeDevice_free)(
     
 typedef struct NS(OpenCLEnv)
 {
+    uint64_t                        empty_elem_by_elem_data_buffer[ 4 ];
     cl_platform_id*                 platforms;
     size_t                          num_platforms;
     
@@ -63,14 +65,13 @@ typedef struct NS(OpenCLEnv)
     cl_kernel                       kernel;
     cl_command_queue                queue;
     
-    cl_mem                          particle_info_buffer;
-    cl_mem                          particle_data_buffer;    
-    cl_mem                          beam_elem_info_buffer;
-    cl_mem                          beam_elem_data_buffer;    
-    cl_mem                          elem_by_elem_info_buffer;
-    cl_mem                          elem_by_elem_data_buffer;    
-    cl_mem                          turn_by_turn_info_buffer;    
-    cl_mem                          turn_by_turn_data_buffer;
+    cl_mem                          cl_particles_buffer;
+    cl_mem                          cl_beam_elements_buffer;    
+    cl_mem                          cl_elem_by_elem_buffer;
+    
+    NS(block_size_t)                cl_particles_buffer_size;
+    NS(block_size_t)                cl_beam_elements_buffer_size;
+    NS(block_size_t)                cl_elem_by_elem_buffer_size;
         
     uint64_t                        ressources_flags;
     
@@ -81,13 +82,9 @@ typedef struct NS(OpenCLEnv)
     size_t                          num_selected_nodes;
     size_t                          num_devices;
     
-    NS(block_size_t)                num_be_blocks;
-    NS(block_size_t)                num_particle_blocks;
     NS(block_size_t)                num_turns;
     NS(block_num_elements_t)        num_particles;
     NS(block_num_elements_t)        num_beam_elements;
-    NS(block_size_t)                max_num_bytes_particle_data_buffer;
-    NS(block_size_t)                max_num_bytes_be_data_buffer;
     
     char*                           current_id_str;
     char*                           current_kernel_function;
@@ -117,17 +114,15 @@ bool NS(OpenCLEnv_prepare)( struct NS(OpenCLEnv)* ocl_env,
     char const* node_device_id, char const* kernel_function_name, 
     char* kernel_source_files, char const* compile_options,
     SIXTRL_SIZE_T const num_turns,
-    const NS(ParticlesContainer) *const SIXTRL_RESTRICT particles,
-    const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements, 
-    const NS(ParticlesContainer) *const SIXTRL_RESTRICT elem_by_elem_buffer,
-    const NS(ParticlesContainer) *const SIXTRL_RESTRICT turn_by_turn_buffer );
+    const NS(Blocks) *const SIXTRL_RESTRICT particles_buffer,
+    const NS(Blocks) *const SIXTRL_RESTRICT beam_elements, 
+    const NS(Blocks) *const SIXTRL_RESTRICT elem_by_elem_buffer );
 
 bool NS(OpenCLEnv_track_particles)( 
     struct NS(OpenCLEnv)* ocl_env, 
-    NS(ParticlesContainer)* SIXTRL_RESTRICT particles, 
-    const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
-    const NS(ParticlesContainer) *const SIXTRL_RESTRICT elem_by_elem_buffer,
-    const NS(ParticlesContainer) *const SIXTRL_RESTRICT turn_by_turn_buffer );
+    NS(Blocks)* SIXTRL_RESTRICT particles_buffer, 
+    const NS(Blocks) *const SIXTRL_RESTRICT beam_elements,
+    NS(Blocks)* SIXTRL_RESTRICT elem_by_elem_buffer );
    
                        
 
