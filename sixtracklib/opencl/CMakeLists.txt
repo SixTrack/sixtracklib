@@ -1,8 +1,10 @@
 set( SIXTRACKLIB_COMMON_HEADERS
      ocl_environment.h
+     tests/test_opencl_tools.h
 )
 
 set( SIXTRACKLIB_COMMON_SOURCES 
+     tests/test_opencl_tools.c
      details/ocl_environment.c
 )
 
