@@ -574,7 +574,10 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
         typedef SIXTRL_GLOBAL_DEC void***           g_ptr2_void_ptr_t;
         typedef SIXTRL_GLOBAL_DEC void****          g_ptr3_void_ptr_t;
         
+        #ifndef NDEBUG
         typedef SIXTRL_GLOBAL_DEC NS(BlockInfo)     g_info_t;
+        #endif /* !defined( NDEBUG ) */
+        
         typedef SIXTRL_GLOBAL_DEC NS(BlockInfo)*    g_info_ptr_t;
         typedef SIXTRL_GLOBAL_DEC NS(BlockInfo)**   g_ptr_info_ptr_t;
         
