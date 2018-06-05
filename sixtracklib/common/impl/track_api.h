@@ -36,12 +36,18 @@ SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_multipole)(
     const NS(MultiPole) *const SIXTRL_RESTRICT multipole, 
     NS(Particles)* SIXTRL_RESTRICT io_particles );
 
+SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_beam_elements_particle)(
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const particle_index,
+    const NS(Blocks) *const SIXTRL_RESTRICT beam_elements, 
+    NS(BlockInfo)* SIXTRL_RESTRICT elem_by_elem_info_begin );
+
 SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_beam_elements)(
     NS(Particles)* SIXTRL_RESTRICT particles,
     NS(block_num_elements_t) const start_particle_index,
     NS(block_num_elements_t) const end_particle_index,
     const NS(Blocks) *const SIXTRL_RESTRICT beam_elements, 
-    NS(Blocks)* SIXTRL_RESTRICT elem_by_elem );
+    NS(BlockInfo)* SIXTRL_RESTRICT elem_by_elem_info_begin );
 
 /* ========================================================================= */
 /* =====        Implementation of Inline functions and methods         ===== */
@@ -170,12 +176,127 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_multipole)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements_particle)(
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(block_num_elements_t) const index,
+    const NS(Blocks) *const SIXTRL_RESTRICT beam_elements, 
+    NS(BlockInfo)* SIXTRL_RESTRICT elem_by_elem_info_begin )
+{
+    int status = 0;
+    
+    NS(BlockInfo) const* be_block_it  = ( NS(BlockInfo) const* 
+        )NS(Blocks_get_const_block_infos_begin)( beam_elements );
+    
+    NS(BlockInfo) const* be_block_end = ( NS(BlockInfo) const* 
+        )NS(Blocks_get_const_block_infos_end)( beam_elements );
+        
+    NS(BlockInfo)* io_block_it = elem_by_elem_info_begin;
+        
+    SIXTRL_ASSERT( ( beam_elements != 0 ) && ( particles != 0 ) && 
+                   ( be_block_it   != 0 ) );
+    
+    if( io_block_it == 0 )
+    {
+        for( ; be_block_it != be_block_end ; ++be_block_it )
+        {
+            NS(BlockType) const type_id = 
+                NS(BlockInfo_get_type_id)( be_block_it );
+            
+            switch( type_id )
+            {
+                case NS(BLOCK_TYPE_DRIFT):
+                {
+                    status |= NS(Track_drift_particle)( particles, index, 
+                        NS(Blocks_get_const_drift)( be_block_it ) );
+                    
+                    break;
+                }
+                
+                case NS(BLOCK_TYPE_DRIFT_EXACT):
+                {
+                    status |= NS(Track_drift_exact_particle)( particles, index, 
+                        NS(Blocks_get_const_drift_exact)( be_block_it ) );
+                    
+                    break;
+                }
+                
+                case NS(BLOCK_TYPE_MULTIPOLE):
+                {
+                    status |= NS(Track_multipole_particle)( particles, index, 
+                        NS(Blocks_get_const_multipole)( be_block_it ) );
+                    
+                    break;
+                }
+                
+                default:
+                {
+                    status = -1;
+                }
+            };
+        }
+    }
+    else
+    {
+        for( ; be_block_it != be_block_end ; ++be_block_it, ++io_block_it )
+        {
+            NS(Particles)* io_particles = 
+                NS(Blocks_get_particles)( io_block_it );
+            
+            NS(BlockType) const type_id = 
+                NS(BlockInfo_get_type_id)( be_block_it );
+            
+            switch( type_id )
+            {
+                case NS(BLOCK_TYPE_DRIFT):
+                {
+                    status |= NS(Track_drift_particle)( particles, index, 
+                        NS(Blocks_get_const_drift)( be_block_it ) );
+                    
+                    NS(Particles_copy_single_unchecked)(
+                        io_particles, index, particles, index );
+                    
+                    break;
+                }
+                
+                case NS(BLOCK_TYPE_DRIFT_EXACT):
+                {
+                    status |= NS(Track_drift_exact_particle)( particles, index, 
+                        NS(Blocks_get_const_drift_exact)( be_block_it ) );
+                    
+                    NS(Particles_copy_single_unchecked)(
+                        io_particles, index, particles, index );
+                    
+                    break;
+                }
+                
+                case NS(BLOCK_TYPE_MULTIPOLE):
+                {
+                    status |= NS(Track_multipole_particle)( particles, index, 
+                        NS(Blocks_get_const_multipole)( be_block_it ) );
+                    
+                    NS(Particles_copy_single_unchecked)(
+                        io_particles, index, particles, index );
+                    
+                    break;
+                }
+                
+                default:
+                {
+                    status = -1;
+                }
+            };
+        }
+    }
+    
+    return status;
+}
+
 SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements)(
     NS(Particles)* SIXTRL_RESTRICT particles,
     NS(block_num_elements_t) const start_particle_index,
     NS(block_num_elements_t) const end_particle_index,
     const NS(Blocks) *const SIXTRL_RESTRICT beam_elements,
-    NS(Blocks)* SIXTRL_RESTRICT elem_by_elem )
+    NS(BlockInfo)* SIXTRL_RESTRICT elem_by_elem_info_begin )
 {
     int status = 0;
     
@@ -185,70 +306,102 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements)(
     NS(BlockInfo) const* be_block_end = ( NS(BlockInfo) const* 
         )NS(Blocks_get_const_block_infos_end)( beam_elements );
         
-    NS(BlockInfo)* io_block_it = ( NS(BlockInfo)* 
-        )NS(Blocks_get_block_infos_begin)( elem_by_elem );
+    NS(BlockInfo)* io_block_it = elem_by_elem_info_begin;
     
     SIXTRL_ASSERT( ( beam_elements != 0 ) && ( particles != 0 ) && 
                    ( be_block_it   != 0 ) );
         
-    for( ; be_block_it != be_block_end ; ++be_block_it )
+    if( io_block_it == 0 )
     {
-        NS(BlockType) const type_id = NS(BlockInfo_get_type_id)( be_block_it );
-        
-        switch( type_id )
+        for( ; be_block_it != be_block_end ; ++be_block_it )
         {
-            case NS(BLOCK_TYPE_DRIFT):
-            {
-                NS(Drift) const* drift = ( NS(Drift const* ) 
-                    )NS(Blocks_get_const_drift)( be_block_it );
-                
-                NS(Particles)* io_particles = ( NS(Particles)* 
-                    )NS(Blocks_get_particles)( io_block_it );
-                
-                status |= NS(Track_drift)( particles, start_particle_index, 
-                    end_particle_index, drift, io_particles );
-                
-                break;
-            }
+            NS(BlockType) const type_id = 
+                NS(BlockInfo_get_type_id)( be_block_it );
             
-            
-            case NS(BLOCK_TYPE_DRIFT_EXACT):
+            switch( type_id )
             {
-                NS(DriftExact) const* drift = ( NS(DriftExact const* ) 
-                    )NS(Blocks_get_const_drift_exact)( be_block_it );
-                
-                NS(Particles)* io_particles = ( NS(Particles)* 
-                    )NS(Blocks_get_particles)( io_block_it );
+                case NS(BLOCK_TYPE_DRIFT):
+                {
+                    status |= NS(Track_drift)( 
+                        particles, start_particle_index, end_particle_index, 
+                        NS(Blocks_get_const_drift)( be_block_it ), 0 );
                     
-                status |= NS(Track_drift_exact)( particles, 
-                    start_particle_index, end_particle_index, 
-                        drift, io_particles );
+                    break;
+                }
                 
-                break;
-            }
-            
-            case NS(BLOCK_TYPE_MULTIPOLE):
-            {
-                NS(MultiPole) const* multipole = ( NS(MultiPole const* ) 
-                    )NS(Blocks_get_const_multipole)( be_block_it );
-                
-                NS(Particles)* io_particles = ( NS(Particles)* 
-                    )NS(Blocks_get_particles)( io_block_it );
+                case NS(BLOCK_TYPE_DRIFT_EXACT):
+                {
+                    status |= NS(Track_drift_exact)( particles, 
+                        start_particle_index, end_particle_index, 
+                        NS(Blocks_get_const_drift_exact)( be_block_it ), 0 );
                     
-                status |= NS(Track_multipole)( particles, 
-                    start_particle_index, end_particle_index, 
-                        multipole, io_particles );
+                    break;
+                }
                 
-                break;
-            }
+                case NS(BLOCK_TYPE_MULTIPOLE):
+                {
+                    status |= NS(Track_multipole)( particles, 
+                        start_particle_index, end_particle_index, 
+                        NS(Blocks_get_const_multipole)( be_block_it ), 0 );
+                    
+                    break;
+                }
+                
+                default:
+                {
+                    status = -1;
+                }
+            };
+        }
+    }
+    else
+    {
+        for( ; be_block_it != be_block_end ; ++be_block_it, ++io_block_it )
+        {
+            NS(BlockType) const type_id = 
+                NS(BlockInfo_get_type_id)( be_block_it );
             
-            default:
+            NS(Particles)* io_particles = 
+                ( NS(Particles)* )NS(Blocks_get_particles)( io_block_it );
+                
+            switch( type_id )
             {
-                status = -1;
-            }
-        };
-        
-        if( io_block_it != 0 ) ++io_block_it;
+                case NS(BLOCK_TYPE_DRIFT):
+                {
+                    status |= NS(Track_drift)( particles, start_particle_index, 
+                        end_particle_index, NS(Blocks_get_const_drift)( 
+                            be_block_it ), io_particles );
+                    
+                    break;
+                }
+                
+                
+                case NS(BLOCK_TYPE_DRIFT_EXACT):
+                {
+                    status |= NS(Track_drift_exact)( particles, 
+                        start_particle_index, end_particle_index, 
+                            NS(Blocks_get_const_drift_exact)( be_block_it ), 
+                                io_particles );
+                    
+                    break;
+                }
+                
+                case NS(BLOCK_TYPE_MULTIPOLE):
+                {
+                    status |= NS(Track_multipole)( particles, 
+                        start_particle_index, end_particle_index, 
+                            NS(Blocks_get_const_multipole)( be_block_it ), 
+                                io_particles );
+                    
+                    break;
+                }
+                
+                default:
+                {
+                    status = -1;
+                }
+            };
+        }
     }
     
     return status;
