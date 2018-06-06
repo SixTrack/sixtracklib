@@ -116,9 +116,9 @@ if( SIXTRACKL_ENABLE_MPFR4 )
     set( SIXTRACKL_ENABLE_MODULE_MPFR4 1 )
     
 else()
-    
-    set( SIXTRACKL_ENABLE_MODULE_MPFR4 0 )
-    
+
+    set( SIXTRACKL_ENABLE_MODULE_MPFR4 0 )    
+
 endif()
 
 # ------------------------------------------------------------------------------
