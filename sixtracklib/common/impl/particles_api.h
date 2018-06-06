@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "sixtracklib/common/impl/particles_type.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -34,10 +36,10 @@ SIXTRL_STATIC void NS(Particles_set_num_particles)(
 
 SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Particles) const* 
 NS(Blocks_get_const_particles)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
 
 SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Particles)* NS(Blocks_get_particles)(
-    NS(BlockInfo)* SIXTRL_RESTRICT block_info );
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info );
 
 /* ------------------------------------------------------------------------- */
 
@@ -603,20 +605,40 @@ SIXTRL_INLINE NS(Particles)* NS(Particles_preset)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE NS(Particles) const* NS(Blocks_get_const_particles)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info )
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Particles) const* NS(Blocks_get_const_particles)(
+    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT block_info )
 {
-    return ( ( block_info != 0 ) && 
-             ( NS(BlockInfo_get_const_ptr_begin)( block_info ) != 0 ) &&
-             ( ( ( ( uintptr_t )NS(BlockInfo_get_const_ptr_begin)( block_info ) 
-                 ) % 8u ) == 0u ) ) 
-        ? ( SIXTRL_GLOBAL_DEC NS(Particles) const*                
-            )NS(BlockInfo_get_const_ptr_begin)( block_info )
-        : 0;
+    #if !defined( _GPUCODE )
+    
+    NS(BlockType) const type_id = 
+        NS(BlockInfo_get_type_id)( block_info );
+    
+    SIXTRL_GLOBAL_DEC void const* ptr_begin = 
+        NS(BlockInfo_get_const_ptr_begin)( block_info );    
+    
+    #else
+    
+    SIXTRL_GLOBAL_DEC void const* ptr_begin = 0;
+    NS(BlockType) type_id = NS(BLOCK_TYPE_INVALID);    
+    
+    if( block_info != 0 )
+    {
+        NS(BlockInfo) const info = *block_info;
+        ptr_begin = NS(BlockInfo_get_const_ptr_begin)( &info );
+        type_id   = NS(BlockInfo_get_type_id)( &info );
+    }
+    
+    #endif /* !defined( _GPUCODE ) */
+    
+    SIXTRL_ASSERT( ( ptr_begin == 0 ) ||
+                   ( ( ( ( uintptr_t )ptr_begin ) % 8u ) == 0u ) );
+    
+    return ( type_id == NS(BLOCK_TYPE_PARTICLE) )
+        ? ( SIXTRL_GLOBAL_DEC NS(Particles) const* )ptr_begin : 0;
 }
 
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Particles)* NS(Blocks_get_particles)(
-    NS(BlockInfo)* SIXTRL_RESTRICT block_info )
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info )
 {
     return ( SIXTRL_GLOBAL_DEC NS(Particles)*            
         )NS(Blocks_get_const_particles)( block_info );
@@ -712,6 +734,18 @@ SIXTRL_INLINE void NS( Particles_copy_single_unchecked )(
         ( des, des_id, NS( Particles_get_state_value )( src, src_id ) );
 
     return;
+}
+
+SIXTRL_INLINE void NS( Particles_copy_range_unchecked )(
+    struct NS(Particles)* SIXTRL_RESTRICT destination, 
+    const struct NS(Particles) *const SIXTRL_RESTRICT source, 
+    NS(block_num_elements_t) const start_index, 
+    NS(block_num_elements_t) const end_index )
+{
+    SIXTRL_ASSERT( 
+        ( destination != 0 ) && ( source != 0 ) &&
+        ( NS(Particles_get_num_particles)( des ) == 
+          NS(Particles_get_num_particles( src ) ) ) );
 }
 
 SIXTRL_INLINE void NS( Particles_copy_all_unchecked )(
