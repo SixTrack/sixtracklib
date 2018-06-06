@@ -13,7 +13,7 @@ extern int NS(Blocks_init)( NS(Blocks)* SIXTRL_RESTRICT blocks,
 extern void NS(Blocks_clear)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 extern void NS(Blocks_free)(  NS(Blocks)* SIXTRL_RESTRICT blocks );
 
-extern SIXTRL_GLOBAL_DEC NS(BlockInfo)* NS(Blocks_add_block)( 
+extern NS(BlockInfo)* NS(Blocks_add_block)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(BlockType) const type_id,
     NS(block_size_t) const block_handle_size,
     const void *const SIXTRL_RESTRICT block_handle,
@@ -26,7 +26,7 @@ extern int NS(Blocks_serialize)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC NS(block_size_t) const DEFAULT_ALIGN = ( NS(block_size_t) )8u;
+//SIXTRL_STATIC NS(block_size_t) const DEFAULT_ALIGN = ( NS(block_size_t) )8u;
 SIXTRL_STATIC NS(block_size_t) const ZERO_SIZE     = ( NS(block_size_t) )0u;
 
 SIXTRL_STATIC NS(block_size_t) const MAX_DATA_PTRS_PER_BLOCK = 
@@ -273,7 +273,7 @@ void NS(Blocks_free)(  NS(Blocks)* SIXTRL_RESTRICT blocks )
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_GLOBAL_DEC NS(BlockInfo)* NS(Blocks_add_block)( 
+NS(BlockInfo)* NS(Blocks_add_block)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(BlockType) const type_id,
     NS(block_size_t) const block_handle_size,
     const void *const SIXTRL_RESTRICT block_handle,

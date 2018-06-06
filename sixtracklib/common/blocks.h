@@ -67,8 +67,8 @@ NS(BlockInfo);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
-NS(BlockInfo_preset)( SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info );
+SIXTRL_STATIC NS(BlockInfo)* NS(BlockInfo_preset)( 
+    NS(BlockInfo)* SIXTRL_RESTRICT info );
 
 SIXTRL_STATIC NS(BlockType) NS(BlockInfo_get_type_id)( 
     const NS(BlockInfo) *const SIXTRL_RESTRICT info );
@@ -270,7 +270,7 @@ void NS(Blocks_free)(  NS(Blocks)* SIXTRL_RESTRICT blocks );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_GLOBAL_DEC NS(BlockInfo)* NS(Blocks_add_block)( 
+NS(BlockInfo)* NS(Blocks_add_block)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(BlockType) const type_id,
     NS(block_size_t) const block_handle_size,
     const void *const SIXTRL_RESTRICT block_handle,
@@ -361,8 +361,8 @@ SIXTRL_INLINE int NS(BlockType_is_valid_number)(
 
 /* ========================================================================= */
 
-SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BlockInfo)* NS(BlockInfo_preset)( 
-    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT info )
+SIXTRL_INLINE NS(BlockInfo)* NS(BlockInfo_preset)( 
+    NS(BlockInfo)* SIXTRL_RESTRICT info )
 {
     NS(BlockInfo_set_ptr_begin)( info, 0 );
     NS(BlockInfo_set_type_id)( info, NS(BLOCK_TYPE_INVALID) );
@@ -371,7 +371,6 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BlockInfo)* NS(BlockInfo_preset)(
     
     return info;
 }
-
 
 SIXTRL_INLINE NS(BlockType) NS(BlockInfo_get_type_id)( 
     const NS(BlockInfo) *const SIXTRL_RESTRICT info )
@@ -412,7 +411,8 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC void const* NS(BlockInfo_get_const_ptr_begin)(
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC void* NS(BlockInfo_get_ptr_begin)(
     NS(BlockInfo)* SIXTRL_RESTRICT info )
 {
-    return ( void* )NS(BlockInfo_get_const_ptr_begin)( info );
+    return ( SIXTRL_GLOBAL_DEC void* 
+        )NS(BlockInfo_get_const_ptr_begin)( info );
 }
 
 SIXTRL_INLINE void NS(BlockInfo_set_ptr_begin)( 
@@ -433,7 +433,8 @@ NS(BlockInfo_get_const_ptr_metadata)(
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC void* NS(BlockInfo_get_ptr_metadata)(
     NS(BlockInfo)* SIXTRL_RESTRICT info )
 {
-    return ( void* )NS(BlockInfo_get_const_ptr_metadata)( info );
+    return ( SIXTRL_GLOBAL_DEC void* 
+        )NS(BlockInfo_get_const_ptr_metadata)( info );
 }
 
 SIXTRL_INLINE void NS(BlockInfo_set_ptr_metadata)( 
@@ -464,7 +465,7 @@ SIXTRL_INLINE NS(Blocks)* NS(Blocks_preset)(
 {
     if( blocks != 0 )
     {
-        static NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
+        SIXTRL_STATIC NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
         
         blocks->ptr_data_begin          = 0;        
         blocks->ptr_block_infos         = 0;
@@ -589,13 +590,22 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
         
         intptr_t offset = 0;
         
-        g_ptr_uchar_ptr_t begin = ( g_ptr_uchar_ptr_t )data_mem_begin;
+        uintptr_t         temp_addr    = ( uintptr_t )data_mem_begin;
+        g_uchar_ptr_t     ptr_a        = ( g_uchar_ptr_t )temp_addr;
+        g_ptr_uchar_ptr_t ptr_to_ptr_a = ( g_ptr_uchar_ptr_t )temp_addr;
+        
+        g_ptr_uchar_ptr_t begin = ( g_ptr_uchar_ptr_t )( ( uintptr_t )data_mem_begin );
+        
         g_uchar_ptr_t data_mem_end = 0;        
         g_ptr_info_ptr_t ptr_block_infos = 0;
         g_ptr3_void_ptr_t ptr_data_ptrs = 0;
         g_u64_ptr_t ptr_total_num_bytes = 0;
         
+        ( void )ptr_a;
+        ( void )ptr_to_ptr_a;
+        
         SIXTRL_ASSERT( ( begin != 0 ) && ( align != 0u ) );
+        SIXTRL_ASSERT( sizeof( uintptr_t ) >= ( uintptr_t )8u );
         
         SIXTRL_ASSERT( align == sizeof( g_u64_ptr_t ) );
         SIXTRL_ASSERT( align == sizeof( g_uchar_ptr_t ) );
@@ -612,9 +622,9 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
         SIXTRL_ASSERT( ( ( ( uintptr_t ) begin ) % align ) == 0u );
         SIXTRL_ASSERT( ( ( ( uintptr_t )*begin ) % align ) == 0u );
         
-        ptr_block_infos = ( g_ptr_info_ptr_t  )( data_mem_begin + align );
-        ptr_data_ptrs   = ( g_ptr3_void_ptr_t )( data_mem_begin + align * 2u );
-        ptr_total_num_bytes = ( g_u64_ptr_t   )( data_mem_begin + align * 3u );
+        ptr_block_infos = ( g_ptr_info_ptr_t  )( ( ( uintptr_t )data_mem_begin ) + align );
+        ptr_data_ptrs   = ( g_ptr3_void_ptr_t )( ( ( uintptr_t )data_mem_begin ) + align * 2u );
+        ptr_total_num_bytes = ( g_u64_ptr_t   )( ( ( uintptr_t )data_mem_begin ) + align * 3u );
         
         SIXTRL_ASSERT( *ptr_total_num_bytes >= 4u * align );
                 
@@ -629,8 +639,8 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
             if( *ptr_data_ptrs != 0 )
             {
                 dist = ( ptrdiff_t )( 
-                    ( ( g_uchar_ptr_t )*ptr_data_ptrs ) - 
-                    ( ( g_uchar_ptr_t )*ptr_block_infos ) );
+                    ( ( g_uchar_ptr_t )( uintptr_t )*ptr_data_ptrs ) - 
+                    ( ( g_uchar_ptr_t )( uintptr_t )*ptr_block_infos ) );
             }
             else
             {
@@ -638,7 +648,7 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
                     ( ( ( intptr_t )*ptr_block_infos ) > offset ) );
                 
                 dist = ( ptrdiff_t )( data_mem_end - 
-                    ( ( ( g_uchar_ptr_t )*ptr_block_infos ) + offset ) );
+                    ( ( ( g_uchar_ptr_t )( uintptr_t )*ptr_block_infos ) + offset ) );
             }
             
             num_of_blocks = ( ( dist > 0 ) && 
@@ -653,7 +663,7 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
                 ( ( intptr_t )ptr_data_ptrs ) > offset );
             
             ptrdiff_t const dist = ( ptrdiff_t )( data_mem_end - 
-                ( ( ( g_uchar_ptr_t )*ptr_data_ptrs ) + offset ) );
+                ( ( ( g_uchar_ptr_t )( uintptr_t )*ptr_data_ptrs ) + offset ) );
             
             num_of_data_ptrs = ( ( dist > 0 ) &&
                 ( 0 == ( dist % align ) ) &&
@@ -677,16 +687,17 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
                     ( ( ( intptr_t )*ptr_block_infos ) > -offset ) );
                 
                 *ptr_block_infos = ( g_info_ptr_t )( 
-                    ( ( g_uchar_ptr_t )*ptr_block_infos ) + offset );
+                    ( ( g_uchar_ptr_t )( uintptr_t )*ptr_block_infos ) + offset );
                 
                 info_it = *ptr_block_infos;
                 
                 for( ; ii < num_of_blocks ; ++ii, ++info_it )
                 {
+                    NS(BlockInfo) info = *info_it;
                     g_void_ptr_t  ptr_begin    = 0;
                     g_void_ptr_t  ptr_metadata = 0;
                     
-                    ptr_begin    = NS(BlockInfo_get_ptr_begin)( info_it );
+                    ptr_begin    = NS(BlockInfo_get_ptr_begin)( &info );
                     
                     SIXTRL_ASSERT( ( ptr_begin != 0 ) && ( ( offset > 0 ) || 
                         ( ( ( intptr_t )ptr_begin ) > -offset ) ) );
@@ -694,9 +705,9 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
                     ptr_begin = ( g_void_ptr_t )( 
                         ( ( g_uchar_ptr_t )ptr_begin ) + offset );
                     
-                    NS(BlockInfo_set_ptr_begin)( info_it, ptr_begin );
+                    NS(BlockInfo_set_ptr_begin)( &info, ptr_begin );
                     
-                    ptr_metadata = NS(BlockInfo_get_ptr_metadata)( info_it );
+                    ptr_metadata = NS(BlockInfo_get_ptr_metadata)( &info );
                     
                     if( ptr_metadata != 0 )
                     {
@@ -708,8 +719,10 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
                             ( ( g_uchar_ptr_t )ptr_metadata ) + offset );
                         
                         NS(BlockInfo_set_ptr_metadata)( 
-                            info_it, ptr_metadata );
+                            &info, ptr_metadata );
                     }
+                    
+                    *info_it = info;
                 }
             }
             
@@ -721,8 +734,9 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
                 SIXTRL_ASSERT( ( offset > 0 ) ||
                     ( ( ( intptr_t )*ptr_data_ptrs ) > -offset ) );
                 
-                ptr_to_data_pointers_begin = ( g_ptr2_void_ptr_t 
-                    )( ( ( g_uchar_ptr_t )*ptr_data_ptrs ) + offset );
+                ptr_to_data_pointers_begin = 
+                    ( g_ptr2_void_ptr_t )( uintptr_t )( ( 
+                        ( g_uchar_ptr_t )( uintptr_t )*ptr_data_ptrs ) + offset );
                 
                 for( ; ii < num_of_data_ptrs ; ++ii )
                 {
@@ -732,14 +746,14 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
                     SIXTRL_ASSERT( ( offset > 0 ) || ( -offset <
                         ( ( intptr_t )ptr_to_data_pointers_begin[ ii ] ) ) );
                     
-                    ptr_to_data_ptr = ( g_ptr_void_ptr_t )( offset +
-                        ( ( g_uchar_ptr_t )ptr_to_data_pointers_begin[ ii ] ) );
+                    ptr_to_data_ptr = ( g_ptr_void_ptr_t )( uintptr_t )( offset +
+                        ( ( g_uchar_ptr_t )( uintptr_t )ptr_to_data_pointers_begin[ ii ] ) );
                     
                     SIXTRL_ASSERT( ( offset > 0 ) || ( -offset <
                         ( ( intptr_t )*ptr_to_data_ptr ) ) );
                     
-                    ptr_to_data = ( g_void_ptr_t )( offset +
-                        ( ( g_uchar_ptr_t )*ptr_to_data_ptr ) );
+                    ptr_to_data = ( g_void_ptr_t )( uintptr_t )( offset +
+                        ( ( g_uchar_ptr_t )( uintptr_t )*ptr_to_data_ptr ) );
                     
                     *ptr_to_data_ptr = ptr_to_data;
                     ptr_to_data_pointers_begin[ ii ] = ptr_to_data_ptr;
@@ -962,7 +976,7 @@ SIXTRL_INLINE NS(block_size_t) NS(Blocks_get_data_pointers_write_capacity)(
 SIXTRL_INLINE void NS(Blocks_set_data_alignment)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(block_size_t) const alignment )
 {
-    static NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
+    SIXTRL_STATIC NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
     
     SIXTRL_ASSERT( NS(Blocks_get_num_of_blocks)( blocks ) == ZERO );
     
@@ -983,7 +997,7 @@ SIXTRL_INLINE NS(block_size_t) NS(Blocks_get_data_alignment)(
 SIXTRL_INLINE void NS(Blocks_set_begin_alignment)(
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(block_size_t) const alignment )
 {
-    static NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
+    SIXTRL_STATIC NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
     
     SIXTRL_ASSERT( NS(Blocks_get_num_of_blocks)( blocks ) == ZERO );
     
@@ -1046,20 +1060,22 @@ NS(Blocks_get_const_block_info_by_index)(
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BlockInfo)*
 NS(Blocks_get_block_infos_begin)( NS(Blocks)* SIXTRL_RESTRICT blocks )
 {
-    return ( NS(BlockInfo)* )NS(Blocks_get_const_block_infos_begin)( blocks );
+    return ( SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
+        )NS(Blocks_get_const_block_infos_begin)( blocks );
 }
 
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
 NS(Blocks_get_block_infos_end)( NS(Blocks)* SIXTRL_RESTRICT blocks )
 {
-    return ( NS(BlockInfo)* )NS(Blocks_get_const_block_infos_end)( blocks );
+    return ( SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
+        )NS(Blocks_get_const_block_infos_end)( blocks );
 }
 
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
 NS(Blocks_get_block_info_by_index)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(block_size_t) const index )
 {
-    return ( NS(BlockInfo)* 
+    return ( SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
         )NS(Blocks_get_const_block_info_by_index)( blocks, index );
 }
 
