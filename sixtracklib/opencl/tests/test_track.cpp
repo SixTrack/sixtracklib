@@ -193,6 +193,8 @@ TEST( CommonTrackTests, TrackDrifts )
         PATH_TO_KERNEL_DIR + std::string{ "common/impl/beam_elements_type.h" },
         PATH_TO_KERNEL_DIR + std::string{ "common/impl/beam_elements_api.h" },
         PATH_TO_KERNEL_DIR + std::string{ "common/beam_elements.h" },
+        PATH_TO_KERNEL_DIR + std::string{ "common/track.h" },
+        PATH_TO_KERNEL_DIR + std::string{ "common/impl/track_api.h" },
         PATH_TO_KERNEL_DIR + std::string{ "opencl/track_particles_kernel.cl" },
         PATH_TO_KERNEL_DIR + std::string{ "_impl/namespace_end.h" }
     };
