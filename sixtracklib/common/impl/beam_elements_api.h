@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/common/impl/beam_elements_type.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/blocks.h"
 
@@ -21,10 +22,7 @@ extern "C" {
 
 /* ------------------------------------------------------------------------- */
 
-struct NS(Drift);
-
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Drift)* NS(Drift_preset)(
-    SIXTRL_GLOBAL_DEC NS(Drift)* drift );
+SIXTRL_STATIC NS(Drift)* NS(Drift_preset)( NS(Drift)* drift );
 
 SIXTRL_STATIC NS(BlockType) NS(Drift_get_type_id)(
     const NS(Drift) *const SIXTRL_RESTRICT drift );
@@ -38,19 +36,16 @@ SIXTRL_STATIC SIXTRL_REAL_T NS(Drift_get_length)(
 SIXTRL_STATIC void NS(Drift_set_length)(
     NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_REAL_T const length );
     
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Drift) const* 
-NS(Blocks_get_const_drift)( 
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Drift) const* NS(Blocks_get_const_drift)( 
     const NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Drift)* 
-NS(Blocks_get_drift)( NS(BlockInfo)* SIXTRL_RESTRICT block_info );
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Drift)* NS(Blocks_get_drift)( 
+    NS(BlockInfo)* SIXTRL_RESTRICT block_info );
 
 /* ------------------------------------------------------------------------- */
 
-struct NS(DriftExact);
-
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(DriftExact)* NS(DriftExact_preset)(
-    SIXTRL_GLOBAL_DEC NS(DriftExact)* drift_exact );
+SIXTRL_STATIC NS(DriftExact)* NS(DriftExact_preset)(
+    NS(DriftExact)* drift_exact );
 
 SIXTRL_STATIC NS(BlockType) NS(DriftExact_get_type_id)(
     const NS(DriftExact) *const SIXTRL_RESTRICT drift_exact );
@@ -68,15 +63,12 @@ SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(DriftExact) const*
 NS(Blocks_get_const_drift_exact)( 
     const NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(DriftExact)* 
-NS(Blocks_get_drift_exact)( NS(BlockInfo)* SIXTRL_RESTRICT block_info );
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(DriftExact)* NS(Blocks_get_drift_exact)( 
+    NS(BlockInfo)* SIXTRL_RESTRICT block_info );
 
 /* ------------------------------------------------------------------------- */
     
-struct NS(MultiPole);
-
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(MultiPole_preset)(
-    SIXTRL_GLOBAL_DEC NS(MultiPole)* multipole );
+SIXTRL_STATIC NS(MultiPole)* NS(MultiPole_preset)( NS(MultiPole)* multipole );
 
 SIXTRL_STATIC NS(BlockType) NS(MultiPole_get_type_id)(
     const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
@@ -135,17 +127,18 @@ SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(MultiPole) const*
 NS(Blocks_get_const_multipole)( 
     const NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(MultiPole)*
-NS(Blocks_get_multipole)( NS(BlockInfo)* SIXTRL_RESTRICT block_info );
+SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(Blocks_get_multipole)( 
+    NS(BlockInfo)* SIXTRL_RESTRICT block_info );
 
 /* ========================================================================= */
 /* ======             Implementation of inline functions            ======== */
 /* ========================================================================= */
 
+#if !defined( _GPUCODE )
 #include "sixtracklib/common/beam_elements.h"
+#endif /* !defined( _GPUCODE ) */
 
-SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Drift)* NS(Drift_preset)(
-    SIXTRL_GLOBAL_DEC NS(Drift)* drift )
+SIXTRL_INLINE NS(Drift)* NS(Drift_preset)( NS(Drift)* drift )
 {
     NS(Drift_set_length)( drift, ( SIXTRL_REAL_T )0.0 );
     return drift;
@@ -181,19 +174,40 @@ SIXTRL_INLINE void NS(Drift_set_length)(
     return;
 }
     
-SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Drift) const* 
-NS(Blocks_get_const_drift)( 
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Drift) const* NS(Blocks_get_const_drift)( 
     const NS(BlockInfo) *const SIXTRL_RESTRICT block_info )
 {
-    return ( ( block_info != 0 ) && 
-        ( NS(BlockInfo_get_type_id)( block_info ) == NS(BLOCK_TYPE_DRIFT ) ) )
-            ? ( SIXTRL_GLOBAL_DEC NS(Drift) const* 
-                )NS(BlockInfo_get_const_ptr_begin)( block_info ) 
-            : 0;
+    #if !defined( _GPUCODE )
+    
+    NS(BlockType) const type_id = 
+        NS(BlockInfo_get_type_id)( block_info );
+    
+    SIXTRL_GLOBAL_DEC void const* ptr_begin = 
+        NS(BlockInfo_get_const_ptr_begin)( block_info );    
+    
+    #else
+    
+    SIXTRL_GLOBAL_DEC void const* ptr_begin = 0;
+    NS(BlockType) type_id = NS(BLOCK_TYPE_INVALID);    
+    
+    if( block_info != 0 )
+    {
+        NS(BlockInfo) const info = *block_info;
+        ptr_begin = NS(BlockInfo_get_const_ptr_begin)( &info );
+        type_id   = NS(BlockInfo_get_type_id)( &info );
+    }
+    
+    #endif /* !defined( _GPUCODE ) */
+    
+    SIXTRL_ASSERT( ( ptr_begin == 0 ) ||
+                   ( ( ( ( uintptr_t )ptr_begin ) % 8u ) == 0u ) );
+    
+    return ( type_id == NS(BLOCK_TYPE_DRIFT) )
+        ? ( SIXTRL_GLOBAL_DEC NS(Drift) const* )ptr_begin : 0;
 }
 
-SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Drift)* 
-NS(Blocks_get_drift)( NS(BlockInfo)* SIXTRL_RESTRICT block_info )
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Drift)* NS(Blocks_get_drift)( 
+    NS(BlockInfo)* SIXTRL_RESTRICT block_info )
 {
     return ( SIXTRL_GLOBAL_DEC NS(Drift)* 
         )NS(Blocks_get_const_drift)( block_info );
@@ -201,8 +215,7 @@ NS(Blocks_get_drift)( NS(BlockInfo)* SIXTRL_RESTRICT block_info )
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(DriftExact)* NS(DriftExact_preset)(
-    SIXTRL_GLOBAL_DEC NS(DriftExact)* drift )
+SIXTRL_INLINE NS(DriftExact)* NS(DriftExact_preset)( NS(DriftExact)* drift )
 {
     NS(DriftExact_set_length)( drift, ( SIXTRL_REAL_T )0.0 );
     return drift;
@@ -242,16 +255,37 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(DriftExact) const*
 NS(Blocks_get_const_drift_exact)( 
     const NS(BlockInfo) *const SIXTRL_RESTRICT block_info )
 {
-    return ( ( block_info != 0 ) && 
-        ( NS(BlockInfo_get_type_id)( block_info ) == 
-            NS(BLOCK_TYPE_DRIFT_EXACT ) ) )
-            ? ( SIXTRL_GLOBAL_DEC NS(DriftExact) const* 
-                )NS(BlockInfo_get_const_ptr_begin)( block_info )
-            : 0;
+    #if !defined( _GPUCODE )
+    
+    NS(BlockType) const type_id = 
+        NS(BlockInfo_get_type_id)( block_info );
+    
+    SIXTRL_GLOBAL_DEC void const* ptr_begin = 
+        NS(BlockInfo_get_const_ptr_begin)( block_info );    
+    
+    #else
+    
+    SIXTRL_GLOBAL_DEC void const* ptr_begin = 0;
+    NS(BlockType) type_id = NS(BLOCK_TYPE_INVALID);    
+    
+    if( block_info != 0 )
+    {
+        NS(BlockInfo) const info = *block_info;
+        ptr_begin = NS(BlockInfo_get_const_ptr_begin)( &info );
+        type_id   = NS(BlockInfo_get_type_id)( &info );
+    }
+    
+    #endif /* !defined( _GPUCODE ) */
+    
+    SIXTRL_ASSERT( ( ptr_begin == 0 ) ||
+                   ( ( ( ( uintptr_t )ptr_begin ) % 8u ) == 0u ) );
+    
+    return ( type_id == NS(BLOCK_TYPE_DRIFT_EXACT) )
+        ? ( SIXTRL_GLOBAL_DEC NS(DriftExact) const* )ptr_begin : 0;
 }
 
-SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(DriftExact)* 
-NS(Blocks_get_drift_exact)( NS(BlockInfo)* SIXTRL_RESTRICT block_info )
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(DriftExact)* NS(Blocks_get_drift_exact)( 
+    NS(BlockInfo)* SIXTRL_RESTRICT block_info )
 {
     return ( SIXTRL_GLOBAL_DEC NS(DriftExact)* 
         )NS(Blocks_get_const_drift_exact)( block_info );
@@ -259,8 +293,7 @@ NS(Blocks_get_drift_exact)( NS(BlockInfo)* SIXTRL_RESTRICT block_info )
 
 /* ------------------------------------------------------------------------- */
     
-SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(MultiPole_preset)(
-    SIXTRL_GLOBAL_DEC NS(MultiPole)* multipole )
+SIXTRL_INLINE NS(MultiPole)* NS(MultiPole_preset)( NS(MultiPole)* multipole )
 {
     NS(MultiPole_set_order)(  multipole, ( SIXTRL_INT64_T )0 );
     NS(MultiPole_set_hxl)(    multipole, ( SIXTRL_REAL_T )0.0 );
@@ -411,20 +444,40 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(MultiPole) const*
 NS(Blocks_get_const_multipole)(
     const NS(BlockInfo) *const SIXTRL_RESTRICT block_info )
 {
+    #if !defined( _GPUCODE )
+    
     NS(BlockType) const type_id = 
         NS(BlockInfo_get_type_id)( block_info );
     
-    SIXTRL_GLOBAL_DEC void const* ptr_begin =
-        NS(BlockInfo_get_const_ptr_begin)( block_info );
+    SIXTRL_GLOBAL_DEC void const* ptr_begin = 
+        NS(BlockInfo_get_const_ptr_begin)( block_info );    
     
-    return ( type_id == NS(BLOCK_TYPE_MULTIPOLE ) && ( ptr_begin != 0 ) )
-        ? ( NS(MultiPole) const* )ptr_begin : 0;
+    #else
+    
+    SIXTRL_GLOBAL_DEC void const* ptr_begin = 0;
+    NS(BlockType) type_id = NS(BLOCK_TYPE_INVALID);    
+    
+    if( block_info != 0 )
+    {
+        NS(BlockInfo) const info = *block_info;
+        ptr_begin = NS(BlockInfo_get_const_ptr_begin)( &info );
+        type_id   = NS(BlockInfo_get_type_id)( &info );
+    }
+    
+    #endif /* !defined( _GPUCODE ) */
+    
+    SIXTRL_ASSERT( ( ptr_begin == 0 ) ||
+                   ( ( ( ( uintptr_t )ptr_begin ) % 8u ) == 0u ) );
+    
+    return ( type_id == NS(BLOCK_TYPE_MULTIPOLE) )
+        ? ( SIXTRL_GLOBAL_DEC NS(MultiPole) const* )ptr_begin : 0;
 }
 
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(MultiPole)*
 NS(Blocks_get_multipole)( NS(BlockInfo)* SIXTRL_RESTRICT block_info )
 {
-    return ( NS(MultiPole)* )NS(Blocks_get_const_multipole)( block_info );
+    return ( SIXTRL_GLOBAL_DEC NS(MultiPole)* )NS(Blocks_get_const_multipole)( 
+        block_info );
 }
 
 #if !defined( _GPUCODE )

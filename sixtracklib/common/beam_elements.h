@@ -9,6 +9,7 @@
 
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/common/blocks.h"
+#include "sixtracklib/common/impl/beam_elements_type.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,12 +20,6 @@ extern "C" {
 struct NS(Blocks);
 
 /* ************************************************************************* */
-
-typedef struct NS(Drift)
-{
-    SIXTRL_REAL_T length __attribute__(( aligned( 8 ) ));
-}
-NS(Drift);
 
 SIXTRL_STATIC NS(block_size_t) NS(Drift_predict_blocks_data_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
@@ -42,12 +37,6 @@ SIXTRL_GLOBAL_DEC NS(Drift)* NS(Blocks_reserve_drift)(
 
 /* ------------------------------------------------------------------------- */
 
-typedef struct NS(DriftExact)
-{
-    SIXTRL_REAL_T length __attribute__(( aligned( 8 ) ));
-}
-NS(DriftExact);
-
 SIXTRL_STATIC NS(block_size_t) NS(DriftExact_predict_blocks_data_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
     NS(block_size_t) const num_of_blocks );
@@ -63,18 +52,6 @@ SIXTRL_GLOBAL_DEC NS(DriftExact)* NS(Blocks_reserve_drift_exact)(
 #endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
-
-typedef struct NS(MultiPole)
-{
-    SIXTRL_REAL_T   length  __attribute__(( aligned( 8 ) ));
-    SIXTRL_REAL_T   hxl     __attribute__(( aligned( 8 ) ));
-    SIXTRL_REAL_T   hyl     __attribute__(( aligned( 8 ) ));
-    SIXTRL_INT64_T  order   __attribute__(( aligned( 8 ) ));
-    
-    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
-        SIXTRL_RESTRICT bal __attribute__(( aligned( 8 ) ));
-}
-NS(MultiPole);
 
 SIXTRL_STATIC NS(block_size_t) NS(MultiPole_predict_blocks_data_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
@@ -98,8 +75,10 @@ SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(Blocks_reserve_multipole)(
 /* =====             Implementation of inline functions                ===== */
 /* ========================================================================= */
 
+#if !defined( _GPUCODE )
 #include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/impl/beam_elements_api.h"
+#endif /* !defined( _GPUCODE ) */
 
 SIXTRL_INLINE NS(block_size_t) NS(Drift_predict_blocks_data_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
