@@ -19,7 +19,10 @@ void __kernel Track_particles_kernel_opencl(
     NS(Blocks) beam_elements;
     NS(Blocks) elem_by_elem_buffer;
     
-    NS(Particles)* particles = 0;
+    NS(Particles) particles;
+    
+    __global NS(BlockInfo)* ptr_particles_info = 0;
+    __global NS(Particles)* ptr_particles = 0;
     
     int ret = 0;
     
@@ -38,36 +41,52 @@ void __kernel Track_particles_kernel_opencl(
     ret |= NS(Blocks_unserialize)( 
         &elem_by_elem_buffer, elem_by_elem_data_buffer );
     
-    elem_by_elem_blocks = NS(Blocks_get_num_of_blocks)( &elem_by_elem_buffer );
+    num_elem_by_elem_blocks = 
+        NS(Blocks_get_num_of_blocks)( &elem_by_elem_buffer );
     
-    particles = NS(Blocks_get_particles)( 
-        NS(Blocks_get_const_block_infos_begin)( &particles_buffer ) );
+    ptr_particles_info = NS(Blocks_get_block_infos_begin)( &particles_buffer );        
+    ptr_particles = NS(Blocks_get_particles)( ptr_particles_info );
+    
+    if( ptr_particles != 0 )
+    {
+        particles = *ptr_particles;
+    }
+    else
+    {
+        NS(Particles_preset)( &particles );
+    }
     
     if( ( ret == 0 ) && ( num_beam_elements != 0u ) && 
-        ( num_of_turns != 0 ) && ( num_particle_blocks == 1u ) &&
-        ( global_id < NS(Particles_get_num_particles)( particles ) ) )
+        ( ptr_particles != 0 ) && ( num_of_turns != 0 ) && 
+        ( num_particle_blocks == 1u ) &&
+        ( global_id < NS(Particles_get_num_particles)( &particles ) ) )
     {
-        unsigned long ii = 0;
-        
-        if( ( elem_by_elem_blocks != 0 ) && 
-            ( elem_by_elem_blocks >= ( num_of_turns * num_beam_elements ) ) )
+        NS(block_size_t) const required_num_elem_by_elem = 
+            num_of_turns * num_beam_elements;
+                
+        if( ( elem_by_elem_data_buffer != 0 ) && 
+            ( num_elem_by_elem_blocks >= required_num_elem_by_elem ) )
         {
-            NS(BlockInfo)* io_info_it =
+            unsigned long ii = 0;
+            
+            SIXTRL_GLOBAL_DEC NS(BlockInfo)* io_info_it =
                 NS(Blocks_get_const_block_infos_begin)( &elem_by_elem_buffer );
             
             for( ; ii < num_of_turns ; ++ii, 
                     io_info_it = io_info_it + num_beam_elements )
             {
                 ret |= NS(Track_beam_elements_particle)( 
-                        particles, global_id, &beam_elements, io_info_it );
+                        &particles, global_id, &beam_elements, io_info_it );
             }
         }
         else
         {
+            unsigned long ii = 0;
+            
             for( ; ii < num_of_turns ; ++ii )
             {
                 ret |= NS(Track_beam_elements_particle)( 
-                        particles, global_id, &beam_elements, 0 );
+                        &particles, global_id, &beam_elements, 0 );
             }
         }
     }

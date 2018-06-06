@@ -5,11 +5,13 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <iterator>
 #include <fstream>
 #include <sstream>
 #include <cmath>
 
 #include <gtest/gtest.h>
+#include <CL/cl.hpp>
 
 #if defined( __NAMESPACE )
     #define __SAVED_NAMESPACE __NAMESPACE
@@ -23,12 +25,11 @@
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/_impl/path.h"
 
-#include "sixtracklib/opencl/ocl_environment.h"
-
 #include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/track.h"
+#include "sixtracklib/common/details/gpu_kernel_tools.h"
 
 #include "sixtracklib/common/details/random.h"
 #include "sixtracklib/common/tests/test_particles_tools.h"
@@ -164,39 +165,69 @@ TEST( CommonTrackTests, TrackDrifts )
     /* *****                 OpenCL based tracking                    ***** */
     /* ******************************************************************** */
     
-    st_OpenCLEnv* ocl_env = st_OpenCLEnv_init();
+    std::vector< cl::Platform >platforms;
+    cl::Platform::get( &platforms );
     
-    ASSERT_TRUE( ocl_env != nullptr );
-    ASSERT_TRUE( st_OpenCLEnv_get_num_node_devices( ocl_env ) > 
-                ( st_block_size_t )0u );
+    ASSERT_TRUE( !platforms.empty() );
+    cl::Platform platform = platforms.front();
     
-    char device_id_str[ 16 ] = 
-    {  '0',  '.',  '0', '\0', '\0', '\0', '\0', '\0', 
-      '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'         
+    std::vector< cl::Device > devices;
+    platform.getDevices( CL_DEVICE_TYPE_ALL, &devices );
+            
+    ASSERT_TRUE( !devices.empty() );
+    
+    cl::Device device = devices.front();
+    cl::Context context( device );
+    
+    std::string PATH_TO_KERNEL_DIR( st_PATH_TO_BASE_DIR );
+    
+    PATH_TO_KERNEL_DIR += std::string( "sixtracklib/" );
+    
+    std::vector< std::string > const paths_to_kernel_files{
+        PATH_TO_KERNEL_DIR + std::string{ "_impl/namespace_begin.h" },
+        PATH_TO_KERNEL_DIR + std::string{ "_impl/definitions.h" },
+        PATH_TO_KERNEL_DIR + std::string{ "common/blocks.h" },
+        PATH_TO_KERNEL_DIR + std::string{ "common/impl/particles_type.h" },
+        PATH_TO_KERNEL_DIR + std::string{ "common/impl/particles_api.h" },
+        PATH_TO_KERNEL_DIR + std::string{ "common/particles.h" },
+        PATH_TO_KERNEL_DIR + std::string{ "common/impl/beam_elements_type.h" },
+        PATH_TO_KERNEL_DIR + std::string{ "common/impl/beam_elements_api.h" },
+        PATH_TO_KERNEL_DIR + std::string{ "common/beam_elements.h" },
+        PATH_TO_KERNEL_DIR + std::string{ "opencl/track_particles_kernel.cl" },
+        PATH_TO_KERNEL_DIR + std::string{ "_impl/namespace_end.h" }
     };
     
-    char kernel_files[] =
-        "sixtracklib/_impl/definitions.h, "
-        "sixtracklib/common/blocks.h, "
-        "sixtracklib/common/impl/blocks_api.h, "
-        "sixtracklib/common/particles.h, "
-        "sixtracklib/common/impl/particles_api.h, "
-        "sixtracklib/common/beam_elements.h, "
-        "sixtracklib/common/impl/beam_elements_api.h, "
-        "sixtracklib/opencl/track_particles_kernel.cl";
+    std::string kernel_source( 1024 * 1024, '\0' );
+    kernel_source.clear();
+    
+    for( auto const& path : paths_to_kernel_files )
+    {
+        std::ifstream const one_kernel_file( path, std::ios::in );
         
+        std::istreambuf_iterator< char > one_kernel_file_begin( 
+            one_kernel_file.rdbuf() );
+        std::istreambuf_iterator< char > end_of_file;
+        
+        kernel_source.insert( kernel_source.end(), 
+                              one_kernel_file_begin, end_of_file );
+    }
+        
+    cl::Program program( context, kernel_source );
+    
     char compile_options[] = "-D _GPUCODE=1 -D __NAMESPACE=st_";
     
-    bool success = st_OpenCLEnv_prepare( ocl_env, device_id_str, 
-        "Track_particles_kernel_opencl", kernel_files, compile_options, 
-        NUM_OF_TURNS, &particles_buffer, &beam_elements, &elem_by_elem );
-    
-    ASSERT_TRUE( success );
-    
-    success = st_OpenCLEnv_track_particles(
-        ocl_env, &particles_buffer, &beam_elements, &elem_by_elem );
-    
-    ASSERT_TRUE( success );
+    if( program.build( compile_options ) != CL_SUCCESS )
+    {  
+        std::ofstream tmp( "/tmp/out.cl" );
+        tmp << kernel_source << std::endl;
+        tmp.flush();
+        tmp.close();
+        
+        std::cout  << "Error building: " 
+                   << program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( device ) 
+                   << "\n";
+        exit(1);
+    }
         
     /* ******************************************************************** */
     /* *****             End of OpenCL based tracking                 ***** */
