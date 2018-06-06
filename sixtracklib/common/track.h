@@ -35,6 +35,15 @@ SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_multipole_particle)(
     NS(block_num_elements_t)  const ii, 
     const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC SIXTRL_TRACK_RETURN 
+NS(Track_range_of_particles_over_beam_element)(    
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(block_num_elements_t) index,
+    NS(block_num_elements_t) const index_end,    
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT be_block_it );
+
 /* ========================================================================= */
 /* =====        Implementation of Inline functions and methods         ===== */
 /* ========================================================================= */
@@ -185,6 +194,93 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_multipole_particle)(
     NS(Particles_set_py_value)( particles, ii, py );
     
     return 0;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE SIXTRL_TRACK_RETURN 
+NS(Track_range_of_particles_over_beam_element)(    
+    NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(block_num_elements_t) index,
+    NS(block_num_elements_t) const index_end,    
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT be_block_it )
+{
+    int ret = 0;
+    
+    #if !defined( _GPUCODE )
+    
+    NS(BlockType) const type_id = 
+        NS(BlockInfo_get_type_id)( be_block_it );
+    
+    SIXTRL_GLOBAL_DEC void const* pr_beam_element_begin =
+        NS(BlockInfo_get_const_ptr_begin)( be_block_it );
+        
+    #else /* !defined( _GPUCODE ) */
+    
+    NS(BlockInfo) const info    = *be_block_it;
+    NS(BlockType) const type_id = NS(BlockInfo_get_type_id)( &info );
+    
+    SIXTRL_GLOBAL_DEC void const* pr_beam_element_begin =
+            NS(BlockInfo_get_const_ptr_begin)( &info );
+    
+    #endif /* !defined( _GPUCODE ) */
+    
+    SIXTRL_ASSERT( ptr_beam_element_begin != 0 );
+            
+    switch( type_id )
+    {
+        case NS(BLOCK_TYPE_DRIFT):
+        {
+            typedef NS(Drift) be_t;
+            typedef SIXTRL_GLOBAL_DEC be_t const* g_be_ptr_t;
+            
+            be_t const be = *( ( g_be_ptr_t )ptr_beam_element_begin );
+            
+            for( ; index < index_end ; ++index )
+            {
+                ret |= NS(Track_drift_particle)( particles, index, &be );
+            }
+            
+            break;
+        }
+        
+        case NS(BLOCK_TYPE_DRIFT_EXACT):
+        {
+            typedef NS(DriftExact) be_t;
+            typedef SIXTRL_GLOBAL_DEC be_t const* g_be_ptr_t;
+            
+            be_t const be = *( ( g_be_ptr_t )ptr_beam_element_begin );            
+            
+            for( ; index < index_end ; ++index )
+            {
+                ret |= NS(Track_drift_exact_particle)( particles, index, &be );
+            }
+            
+            break;
+        }
+        
+        case NS(BLOCK_TYPE_MULTIPOLE):
+        {
+            typedef NS(MultiPole) be_t;
+            typedef SIXTRL_GLOBAL_DEC be_t const* g_be_ptr_t;
+            
+            be_t const be = *( ( g_be_ptr_t )ptr_beam_element_begin );
+            
+            for( ; index < index_end ; ++index )
+            {
+                ret |= NS(Track_multipole_particle)( particles, index, &be );
+            }
+            
+            break;
+        }
+        
+        default:
+        {
+            ret = -1;
+        }
+    };
+    
+    return ret;
 }
 
 /* ------------------------------------------------------------------------- */

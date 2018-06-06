@@ -40,14 +40,14 @@ SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_beam_elements_particle)(
     NS(Particles)* SIXTRL_RESTRICT particles,
     NS(block_num_elements_t) const particle_index,
     const NS(Blocks) *const SIXTRL_RESTRICT beam_elements, 
-    NS(BlockInfo)* SIXTRL_RESTRICT elem_by_elem_info_begin );
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT elem_by_elem_info_begin );
 
 SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_beam_elements)(
     NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const start_index,
     NS(block_num_elements_t) const end_particle_index,
     const NS(Blocks) *const SIXTRL_RESTRICT beam_elements, 
-    NS(BlockInfo)* SIXTRL_RESTRICT elem_by_elem_info_begin );
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT elem_by_elem_info_begin );
 
 /* ========================================================================= */
 /* =====        Implementation of Inline functions and methods         ===== */
@@ -180,17 +180,17 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements_particle)(
     NS(Particles)* SIXTRL_RESTRICT particles, 
     NS(block_num_elements_t) const index,
     const NS(Blocks) *const SIXTRL_RESTRICT beam_elements, 
-    NS(BlockInfo)* SIXTRL_RESTRICT elem_by_elem_info_begin )
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT elem_by_elem_info_begin )
 {
-    int status = 0;
+    int ret = 0;
     
-    NS(BlockInfo) const* be_block_it  = ( NS(BlockInfo) const* 
-        )NS(Blocks_get_const_block_infos_begin)( beam_elements );
+    SIXTRL_GLOBAL_DEC NS(BlockInfo) const* be_block_it = 
+        NS(Blocks_get_const_block_infos_begin)( beam_elements );
     
-    NS(BlockInfo) const* be_block_end = ( NS(BlockInfo) const* 
-        )NS(Blocks_get_const_block_infos_end)( beam_elements );
+    SIXTRL_GLOBAL_DEC NS(BlockInfo) const* be_block_end = 
+        NS(Blocks_get_const_block_infos_end)( beam_elements );
         
-    NS(BlockInfo)* io_block_it = elem_by_elem_info_begin;
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* io_block_it = elem_by_elem_info_begin;
         
     SIXTRL_ASSERT( ( beam_elements != 0 ) && ( particles != 0 ) && 
                    ( be_block_it   != 0 ) );
@@ -199,96 +199,36 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements_particle)(
     {
         for( ; be_block_it != be_block_end ; ++be_block_it )
         {
-            NS(BlockType) const type_id = 
-                NS(BlockInfo_get_type_id)( be_block_it );
-            
-            switch( type_id )
-            {
-                case NS(BLOCK_TYPE_DRIFT):
-                {
-                    status |= NS(Track_drift_particle)( particles, index, 
-                        NS(Blocks_get_const_drift)( be_block_it ) );
-                    
-                    break;
-                }
-                
-                case NS(BLOCK_TYPE_DRIFT_EXACT):
-                {
-                    status |= NS(Track_drift_exact_particle)( particles, index, 
-                        NS(Blocks_get_const_drift_exact)( be_block_it ) );
-                    
-                    break;
-                }
-                
-                case NS(BLOCK_TYPE_MULTIPOLE):
-                {
-                    status |= NS(Track_multipole_particle)( particles, index, 
-                        NS(Blocks_get_const_multipole)( be_block_it ) );
-                    
-                    break;
-                }
-                
-                default:
-                {
-                    status = -1;
-                }
-            };
+            ret |= NS(Track_range_of_particles_over_beam_element)(
+                particles, index, index + 1, be_block_it );
         }
     }
     else
     {
+        #if !defined( _GPUCODE )
+            
+        NS(Particles)* io_particles = NS(Blocks_get_particles)( io_block_it );
+        
+        #else /* !defined( _GPUCODE ) */
+        
+        NS(BlockInfo) const info = *io_block_it;
+        
+        SIXTRL_GLOBAL_DEC NS(Particles)* io_particles =
+            NS(Blocks_get_particles)( &info );
+                
+        #endif /* !defined( _GPUCODE ) */
+        
         for( ; be_block_it != be_block_end ; ++be_block_it, ++io_block_it )
         {
-            NS(Particles)* io_particles = 
-                NS(Blocks_get_particles)( io_block_it );
+            ret |= NS(Track_range_of_particles_over_beam_element)(
+                particles, index, index + 1, be_block_it );
             
-            NS(BlockType) const type_id = 
-                NS(BlockInfo_get_type_id)( be_block_it );
-            
-            switch( type_id )
-            {
-                case NS(BLOCK_TYPE_DRIFT):
-                {
-                    status |= NS(Track_drift_particle)( particles, index, 
-                        NS(Blocks_get_const_drift)( be_block_it ) );
-                    
-                    NS(Particles_copy_single_unchecked)(
-                        io_particles, index, particles, index );
-                    
-                    break;
-                }
-                
-                case NS(BLOCK_TYPE_DRIFT_EXACT):
-                {
-                    status |= NS(Track_drift_exact_particle)( particles, index, 
-                        NS(Blocks_get_const_drift_exact)( be_block_it ) );
-                    
-                    NS(Particles_copy_single_unchecked)(
-                        io_particles, index, particles, index );
-                    
-                    break;
-                }
-                
-                case NS(BLOCK_TYPE_MULTIPOLE):
-                {
-                    status |= NS(Track_multipole_particle)( particles, index, 
-                        NS(Blocks_get_const_multipole)( be_block_it ) );
-                    
-                    NS(Particles_copy_single_unchecked)(
-                        io_particles, index, particles, index );
-                    
-                    break;
-                }
-                
-                default:
-                {
-                    status = -1;
-                }
-            };
+            NS(Particles_copy_single_unchecked)( 
+                io_particles, index, particles, index );
         }
     }
     
-    return status;
+    return ret;
 }
 
 SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements)(
@@ -296,7 +236,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements)(
     NS(block_num_elements_t) const start_particle_index,
     NS(block_num_elements_t) const end_particle_index,
     const NS(Blocks) *const SIXTRL_RESTRICT beam_elements,
-    NS(BlockInfo)* SIXTRL_RESTRICT elem_by_elem_info_begin )
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT elem_by_elem_info_begin )
 {
     int status = 0;
     
