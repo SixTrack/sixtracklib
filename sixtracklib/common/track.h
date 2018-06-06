@@ -42,7 +42,7 @@ NS(Track_range_of_particles_over_beam_element)(
     NS(Particles)* SIXTRL_RESTRICT particles, 
     NS(block_num_elements_t) index,
     NS(block_num_elements_t) const index_end,    
-    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT be_block_it );
+    SIXTRL_GLOBAL_DEC NS(BlockInfo) const* SIXTRL_RESTRICT be_block_it );
 
 /* ========================================================================= */
 /* =====        Implementation of Inline functions and methods         ===== */
@@ -203,7 +203,7 @@ NS(Track_range_of_particles_over_beam_element)(
     NS(Particles)* SIXTRL_RESTRICT particles, 
     NS(block_num_elements_t) index,
     NS(block_num_elements_t) const index_end,    
-    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT be_block_it )
+    SIXTRL_GLOBAL_DEC NS(BlockInfo) const* SIXTRL_RESTRICT be_block_it )
 {
     int ret = 0;
     
@@ -212,7 +212,7 @@ NS(Track_range_of_particles_over_beam_element)(
     NS(BlockType) const type_id = 
         NS(BlockInfo_get_type_id)( be_block_it );
     
-    SIXTRL_GLOBAL_DEC void const* pr_beam_element_begin =
+    SIXTRL_GLOBAL_DEC void const* ptr_beam_element_begin =
         NS(BlockInfo_get_const_ptr_begin)( be_block_it );
         
     #else /* !defined( _GPUCODE ) */
@@ -220,7 +220,7 @@ NS(Track_range_of_particles_over_beam_element)(
     NS(BlockInfo) const info    = *be_block_it;
     NS(BlockType) const type_id = NS(BlockInfo_get_type_id)( &info );
     
-    SIXTRL_GLOBAL_DEC void const* pr_beam_element_begin =
+    SIXTRL_GLOBAL_DEC void const* ptr_beam_element_begin =
             NS(BlockInfo_get_const_ptr_begin)( &info );
     
     #endif /* !defined( _GPUCODE ) */
