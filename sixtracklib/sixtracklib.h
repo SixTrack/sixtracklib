@@ -14,16 +14,16 @@
 #include "sixtracklib/_impl/path.h"
 #include "sixtracklib/_impl/modules.h"
 
-#include "sixtracklib/common/impl/be_drift_impl.h"
-#include "sixtracklib/common/be_drift.h"
-#include "sixtracklib/common/impl/block_info_impl.h"
-#include "sixtracklib/common/block_info.h"
-#include "sixtracklib/common/blocks_container.h"
-#include "sixtracklib/common/beam_elements.h"
-#include "sixtracklib/common/impl/particles_impl.h"
-#include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/mem_pool.h"
-#include "sixtracklib/common/track.h"
+#include "sixtracklib/common/blocks.h"
+
+#include "sixtracklib/common/impl/beam_elements_type.h"
+#include "sixtracklib/common/beam_elements.h"
+#include "sixtracklib/common/impl/beam_elements_api.h"
+
+#include "sixtracklib/common/impl/particles_type.h"
+#include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/impl/particles_api.h"
 
 /* Not optimal having these two as part of the public library interface -> fix this! */
 #include "sixtracklib/common/details/random.h"
