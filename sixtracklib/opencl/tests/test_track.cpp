@@ -179,24 +179,24 @@ TEST( CommonTrackTests, TrackDrifts )
     cl::Device device = devices.front();
     cl::Context context( device );
     
-    std::string PATH_TO_KERNEL_DIR( st_PATH_TO_BASE_DIR );
+    std::string PATH_TO_SOURCE_DIR( st_PATH_TO_BASE_DIR );
     
-    PATH_TO_KERNEL_DIR += std::string( "sixtracklib/" );
+    PATH_TO_SOURCE_DIR += std::string( "sixtracklib/" );
     
     std::vector< std::string > const paths_to_kernel_files{
-        PATH_TO_KERNEL_DIR + std::string{ "_impl/namespace_begin.h" },
-        PATH_TO_KERNEL_DIR + std::string{ "_impl/definitions.h" },
-        PATH_TO_KERNEL_DIR + std::string{ "common/blocks.h" },
-        PATH_TO_KERNEL_DIR + std::string{ "common/impl/particles_type.h" },
-        PATH_TO_KERNEL_DIR + std::string{ "common/impl/particles_api.h" },
-        PATH_TO_KERNEL_DIR + std::string{ "common/particles.h" },
-        PATH_TO_KERNEL_DIR + std::string{ "common/impl/beam_elements_type.h" },
-        PATH_TO_KERNEL_DIR + std::string{ "common/impl/beam_elements_api.h" },
-        PATH_TO_KERNEL_DIR + std::string{ "common/beam_elements.h" },
-        PATH_TO_KERNEL_DIR + std::string{ "common/track.h" },
-        PATH_TO_KERNEL_DIR + std::string{ "common/impl/track_api.h" },
-        PATH_TO_KERNEL_DIR + std::string{ "opencl/track_particles_kernel.cl" },
-        PATH_TO_KERNEL_DIR + std::string{ "_impl/namespace_end.h" }
+        PATH_TO_SOURCE_DIR + std::string{ "_impl/namespace_begin.h" },
+        PATH_TO_SOURCE_DIR + std::string{ "_impl/definitions.h" },
+        PATH_TO_SOURCE_DIR + std::string{ "common/blocks.h" },
+        PATH_TO_SOURCE_DIR + std::string{ "common/impl/particles_type.h" },
+        PATH_TO_SOURCE_DIR + std::string{ "common/impl/particles_api.h" },
+        PATH_TO_SOURCE_DIR + std::string{ "common/particles.h" },
+        PATH_TO_SOURCE_DIR + std::string{ "common/impl/beam_elements_type.h" },
+        PATH_TO_SOURCE_DIR + std::string{ "common/impl/beam_elements_api.h" },
+        PATH_TO_SOURCE_DIR + std::string{ "common/beam_elements.h" },
+        PATH_TO_SOURCE_DIR + std::string{ "common/track.h" },
+        PATH_TO_SOURCE_DIR + std::string{ "common/impl/track_api.h" },
+        PATH_TO_SOURCE_DIR + std::string{ "opencl/track_particles_kernel.cl" },
+        PATH_TO_SOURCE_DIR + std::string{ "_impl/namespace_end.h" }
     };
     
     std::string kernel_source( 1024 * 1024, '\0' );
@@ -212,6 +212,14 @@ TEST( CommonTrackTests, TrackDrifts )
         
         kernel_source.insert( kernel_source.end(), 
                               one_kernel_file_begin, end_of_file );
+    }
+    
+    if( !kernel_source.empty() )
+    {
+        std::ofstream tmp( "/tmp/out.cl" );
+        tmp << kernel_source << std::endl;
+        tmp.flush();
+        tmp.close();
     }
         
     cl::Program program( context, kernel_source );
@@ -230,7 +238,173 @@ TEST( CommonTrackTests, TrackDrifts )
                    << "\n";
         exit(1);
     }
+    
+    std::size_t const PARTICLES_BUFFER_SIZE = 
+        st_Blocks_get_total_num_bytes( &particles_buffer );
         
+    std::size_t const BEAM_ELEMENTS_BUFFER_SIZE =
+        st_Blocks_get_total_num_bytes( &beam_elements );
+        
+    std::size_t const ELEM_BY_ELEM_BUFFER_SIZE =
+        st_Blocks_get_total_num_bytes( &elem_by_elem );
+        
+    ret = CL_SUCCESS;
+    
+    /* --------------------------------------------------------------------- */
+    
+    cl::Buffer cl_particles_buffer( 
+        context, CL_MEM_READ_WRITE, PARTICLES_BUFFER_SIZE, 0, &ret );
+    
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    cl::Buffer cl_beam_elements_buffer(
+        context, CL_MEM_READ_WRITE, BEAM_ELEMENTS_BUFFER_SIZE, 0, &ret );
+    
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    cl::Buffer cl_elem_by_elem_buffer(
+        context, CL_MEM_READ_WRITE, ELEM_BY_ELEM_BUFFER_SIZE, 0, &ret );
+    
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    /* --------------------------------------------------------------------- */
+    
+    cl::Kernel track_kernel( program, "Track_particles_kernel_opencl", &ret );
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    ret  = track_kernel.setArg( 0, static_cast< cl_ulong >( NUM_OF_PARTICLES ) );
+    ret |= track_kernel.setArg( 1, cl_particles_buffer );
+    ret |= track_kernel.setArg( 2, cl_beam_elements_buffer );
+    ret |= track_kernel.setArg( 3, cl_elem_by_elem_buffer );
+    
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    size_t const local_work_group_size = 
+        track_kernel.getWorkGroupInfo< CL_KERNEL_WORK_GROUP_SIZE >( device );
+        
+    ASSERT_TRUE( local_work_group_size != 0u );
+    
+    size_t global_work_size = NUM_OF_PARTICLES;
+    
+    if( ( global_work_size % local_work_group_size ) != 0u )
+    {
+        global_work_size /= local_work_group_size;
+        ++global_work_size;
+        
+        global_work_size *= local_work_group_size;
+    }
+    
+    ASSERT_TRUE( ( global_work_size >= NUM_OF_PARTICLES ) &&
+                 ( ( global_work_size % local_work_group_size ) == 0u ) );
+    
+    /* --------------------------------------------------------------------- */
+    
+    cl::CommandQueue queue(context, device, CL_QUEUE_PROFILING_ENABLE, &ret );
+    ASSERT_TRUE( ret == CL_SUCCESS );
+     
+    /* --------------------------------------------------------------------- */
+    
+    unsigned char* particles_data_buffer = 
+        st_Blocks_get_data_begin( &particles_buffer );
+        
+    unsigned char* beam_elements_data_buffer =
+        st_Blocks_get_data_begin( &beam_elements );
+        
+    unsigned char* elem_by_elem_data_buffer =
+        st_Blocks_get_data_begin( &elem_by_elem );
+        
+    ASSERT_TRUE( particles_data_buffer     != nullptr );
+    ASSERT_TRUE( beam_elements_data_buffer != nullptr );
+    ASSERT_TRUE( elem_by_elem_data_buffer  != nullptr );
+    
+    
+    ret =  queue.enqueueWriteBuffer( 
+                cl_particles_buffer, CL_TRUE, 0, PARTICLES_BUFFER_SIZE, 
+                particles_data_buffer );
+    
+    ret |= queue.enqueueWriteBuffer(
+                cl_beam_elements_buffer, CL_TRUE, 0, BEAM_ELEMENTS_BUFFER_SIZE,
+                beam_elements_data_buffer );
+    
+    ret |= queue.enqueueWriteBuffer(
+                cl_elem_by_elem_buffer, CL_TRUE, 0, ELEM_BY_ELEM_BUFFER_SIZE,
+                elem_by_elem_data_buffer );
+    
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    /* --------------------------------------------------------------------- */
+    
+    cl::Event event;
+    
+    std::cout << "here" << std::endl;
+    std::cout.flush();
+    
+    ret = queue.enqueueNDRangeKernel(
+                track_kernel, cl::NullRange, cl::NDRange( global_work_size ),
+                cl::NDRange( local_work_group_size ), nullptr, &event );
+    
+    ret |= queue.flush();
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    ret = event.wait();
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    cl_ulong when_kernel_queued    = 0;
+    cl_ulong when_kernel_submitted = 0;
+    cl_ulong when_kernel_started   = 0;
+    cl_ulong when_kernel_ended     = 0;
+
+    ret  = event.getProfilingInfo< cl_ulong >( 
+      CL_PROFILING_COMMAND_QUEUED, &when_kernel_queued );
+
+    ret |= event.getProfilingInfo< cl_ulong >( 
+      CL_PROFILING_COMMAND_SUBMIT, &when_kernel_submitted );
+
+    ret |= event.getProfilingInfo< cl_ulong >( 
+      CL_PROFILING_COMMAND_START, &when_kernel_started );
+
+    ret |= event.getProfilingInfo< cl_ulong >( 
+      CL_PROFILING_COMMAND_END, &when_kernel_ended );
+
+    assert( ret == CL_SUCCESS );
+    
+    double const kernel_time_elapsed = when_kernel_ended - when_kernel_started;
+    std::cout << "kernel_time_elapsed: " << kernel_time_elapsed << std::endl;
+    std::cout.flush();
+    
+    /* --------------------------------------------------------------------- */
+    
+    ret  = queue.enqueueReadBuffer(
+            cl_particles_buffer, CL_TRUE, 0, PARTICLES_BUFFER_SIZE, 
+            particles_data_buffer );
+    
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    
+    ret = queue.enqueueReadBuffer(
+            cl_elem_by_elem_buffer, CL_TRUE, 0, ELEM_BY_ELEM_BUFFER_SIZE,
+            elem_by_elem_data_buffer );
+    
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    /* --------------------------------------------------------------------- */
+    
+    st_Blocks result_particles_buffer;
+    st_Blocks result_elem_by_elem_buffer;
+    
+    st_Blocks_preset( &result_particles_buffer );
+    st_Blocks_preset( &result_elem_by_elem_buffer );
+    
+    ret = st_Blocks_unserialize( 
+        &result_particles_buffer, particles_data_buffer );
+    
+    ASSERT_TRUE( ret == 0 );
+    
+    ret = st_Blocks_unserialize( 
+        &result_elem_by_elem_buffer, elem_by_elem_data_buffer );
+    
+    ASSERT_TRUE( ret == 0 );
+    
     /* ******************************************************************** */
     /* *****             End of OpenCL based tracking                 ***** */
     /* ******************************************************************** */
@@ -255,36 +429,32 @@ TEST( CommonTrackTests, TrackDrifts )
     test_data_out << NUM_OF_PARTICLES;
     test_data_out << NUM_OF_BEAM_ELEMENTS;
     
-    uint64_t const beam_elements_bytes = 
-        st_Blocks_get_total_num_bytes( &beam_elements );
+    uint64_t const beam_elements_bytes = BEAM_ELEMENTS_BUFFER_SIZE;
     
     test_data_out << beam_elements_bytes;
     test_data_out.write( 
         ( char* )st_Blocks_get_const_data_begin( &beam_elements ), 
         beam_elements_bytes );
     
-    uint64_t const initial_particles_size =
-        st_Blocks_get_total_num_bytes( &copy_particles_buffer );
+    uint64_t const initial_particles_size = PARTICLES_BUFFER_SIZE;
         
     test_data_out << initial_particles_size;
     test_data_out.write(
         ( char* )st_Blocks_get_const_data_begin( &copy_particles_buffer ),
         initial_particles_size );
     
-    uint64_t const elem_by_elem_size =
-        st_Blocks_get_total_num_bytes( &elem_by_elem );
+    uint64_t const elem_by_elem_size = ELEM_BY_ELEM_BUFFER_SIZE;
         
     test_data_out << elem_by_elem_size;
-    test_data_out.write(
-        ( char* )st_Blocks_get_const_data_begin( &elem_by_elem ),
-        elem_by_elem_size );
+    test_data_out.write( ( char* )st_Blocks_get_const_data_begin( 
+        &result_elem_by_elem_buffer ), elem_by_elem_size );
     
     uint64_t const end_particles_size =
-        st_Blocks_get_total_num_bytes( &particles_buffer );
+        st_Blocks_get_total_num_bytes( &result_particles_buffer );
         
     test_data_out << end_particles_size;
     test_data_out.write(
-        ( char* )st_Blocks_get_const_data_begin( &particles_buffer ),
+        ( char* )st_Blocks_get_const_data_begin( &result_particles_buffer ),
         end_particles_size );
     
     test_data_out.close();
