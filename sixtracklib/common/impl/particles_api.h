@@ -36,10 +36,10 @@ SIXTRL_STATIC void NS(Particles_set_num_particles)(
 
 SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Particles) const* 
 NS(Blocks_get_const_particles)(
-    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
+    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
 
 SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Particles)* NS(Blocks_get_particles)(
-    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info );
+    NS(BlockInfo)* SIXTRL_RESTRICT block_info );
 
 /* ------------------------------------------------------------------------- */
 
@@ -612,29 +612,13 @@ SIXTRL_INLINE NS(Particles)* NS(Particles_preset)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Particles) const* NS(Blocks_get_const_particles)(
-    const SIXTRL_GLOBAL_DEC NS(BlockInfo) *const SIXTRL_RESTRICT block_info )
+    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info )
 {
-    #if !defined( _GPUCODE )
-    
     NS(BlockType) const type_id = 
         NS(BlockInfo_get_type_id)( block_info );
     
     SIXTRL_GLOBAL_DEC void const* ptr_begin = 
         NS(BlockInfo_get_const_ptr_begin)( block_info );    
-    
-    #else
-    
-    SIXTRL_GLOBAL_DEC void const* ptr_begin = 0;
-    NS(BlockType) type_id = NS(BLOCK_TYPE_INVALID);    
-    
-    if( block_info != 0 )
-    {
-        NS(BlockInfo) const info = *block_info;
-        ptr_begin = NS(BlockInfo_get_const_ptr_begin)( &info );
-        type_id   = NS(BlockInfo_get_type_id)( &info );
-    }
-    
-    #endif /* !defined( _GPUCODE ) */
     
     SIXTRL_ASSERT( ( ptr_begin == 0 ) ||
                    ( ( ( ( uintptr_t )ptr_begin ) % 8u ) == 0u ) );
@@ -644,7 +628,7 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Particles) const* NS(Blocks_get_const_particl
 }
 
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Particles)* NS(Blocks_get_particles)(
-    SIXTRL_GLOBAL_DEC NS(BlockInfo)* SIXTRL_RESTRICT block_info )
+    NS(BlockInfo)* SIXTRL_RESTRICT block_info )
 {
     return ( SIXTRL_GLOBAL_DEC NS(Particles)*            
         )NS(Blocks_get_const_particles)( block_info );
@@ -759,72 +743,127 @@ SIXTRL_INLINE void NS( Particles_copy_range_unchecked )(
     
     num_to_copy = end_index - start_index;
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->q0[ start_index ], 
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->q0[ start_index ], 
                              &source->q0[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->beta0[ start_index ], 
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                             &destination->beta0[ start_index ], 
                              &source->beta0[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->mass0[ start_index ], 
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                             &destination->mass0[ start_index ], 
                              &source->mass0[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->gamma0[ start_index ], 
-                             &source->gamma0[ start_index ], num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                                 &destination->gamma0[ start_index ], 
+                                 &source->gamma0[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->p0c[ start_index ], 
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                             &destination->p0c[ start_index ], 
                              &source->p0c[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->s[ start_index ], 
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                             &destination->s[ start_index ], 
                              &source->s[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->x[ start_index ], 
-                             &source->x[ start_index ], num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                                 &destination->x[ start_index ], 
+                                 &source->x[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->y[ start_index ], 
-                             &source->y[ start_index ], num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                                 &destination->y[ start_index ], 
+                                 &source->y[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->px[ start_index ], 
-                             &source->px[ start_index ], num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                                 &destination->px[ start_index ], 
+                                 &source->px[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->py[ start_index ], 
-                             &source->py[ start_index ], num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                                 &destination->py[ start_index ], 
+                                 &source->py[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->sigma[ start_index ], 
-                             &source->sigma[ start_index ], num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                                 &destination->sigma[ start_index ], 
+                                 &source->sigma[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->psigma[ start_index ], 
-                             &source->psigma[ start_index ], num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                                 &destination->psigma[ start_index ], 
+                                 &source->psigma[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->delta[ start_index ], 
-                             &source->delta[ start_index ], num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                                 &destination->delta[ start_index ], 
+                                 &source->delta[ start_index ], num_to_copy );
+    }
+        
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                                 &destination->rpp[ start_index ], 
+                                 &source->rpp[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->rpp[ start_index ], 
-                             &source->rpp[ start_index ], num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                                 &destination->rvv[ start_index ], 
+                                 &source->rvv[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->rvv[ start_index ], 
-                             &source->rvv[ start_index ], num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, 
+                                 &destination->chi[ start_index ], 
+                                 &source->chi[ start_index ], num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, &destination->chi[ start_index ], 
-                             &source->chi[ start_index ], num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_INT64_T, 
+                                 &destination->particle_id[ start_index ], 
+                                 &source->particle_id[ start_index ], 
+                                 num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_INT64_T, 
-                             &destination->particle_id[ start_index ], 
-                             &source->particle_id[ start_index ], 
-                             num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_INT64_T, 
+                                 &destination->lost_at_element_id[ start_index ], 
+                                 &source->lost_at_element_id[ start_index ], 
+                                 num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_INT64_T, 
-                             &destination->lost_at_element_id[ start_index ], 
-                             &source->lost_at_element_id[ start_index ], 
-                             num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_INT64_T, 
+                                 &destination->lost_at_turn[ start_index ], 
+                                 &source->lost_at_turn[ start_index ], 
+                                 num_to_copy );
+    }
     
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_INT64_T, 
-                             &destination->lost_at_turn[ start_index ], 
-                             &source->lost_at_turn[ start_index ], 
-                             num_to_copy );
-    
-    SIXTRACKLIB_COPY_VALUES( SIXTRL_INT64_T, 
-                             &destination->state[ start_index ], 
-                             &source->state[ start_index ], num_to_copy );
+    {
+        SIXTRACKLIB_COPY_VALUES( SIXTRL_INT64_T, 
+                                 &destination->state[ start_index ], 
+                                 &source->state[ start_index ], num_to_copy );
+    }
     
     return;
 }
