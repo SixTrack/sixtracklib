@@ -118,6 +118,10 @@ SIXTRL_STATIC void NS(BlockInfo_set_block_size)(
 
 /* ------------------------------------------------------------------------- */
 
+typedef SIXTRL_GLOBAL_DEC void*                     NS(g_blk_void_ptr_t);
+typedef SIXTRL_GLOBAL_DEC NS(g_blk_void_ptr_t)*     NS(g_blk_ptr_void_ptr_t);
+typedef SIXTRL_GLOBAL_DEC NS(g_blk_ptr_void_ptr_t)* NS(g_blk_ptr2_void_ptr_t);
+
 typedef struct NS(Blocks)
 {
     SIXTRL_GLOBAL_DEC unsigned char* 
@@ -126,7 +130,7 @@ typedef struct NS(Blocks)
     SIXTRL_GLOBAL_DEC NS(BlockInfo)*         
         SIXTRL_RESTRICT ptr_block_infos      __attribute__(( aligned( 8 ) ));
     
-    SIXTRL_GLOBAL_DEC void*** SIXTRL_RESTRICT
+    NS(g_blk_ptr2_void_ptr_t) SIXTRL_RESTRICT 
         ptr_data_pointers_begin              __attribute__(( aligned( 8 ) ));
     
     SIXTRL_GLOBAL_DEC SIXTRL_UINT64_T*       
@@ -173,7 +177,12 @@ SIXTRL_STATIC NS(block_size_t) NS(Blocks_predict_data_capacity_for_num_blocks)(
 SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_total_num_bytes)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC int NS(Blocks_remap)( NS(Blocks)* SIXTRL_RESTRICT blocks );
+SIXTRL_STATIC int NS(Blocks_remap)( 
+    NS(Blocks)* SIXTRL_RESTRICT blocks, 
+    SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin,
+    SIXTRL_INT64_T const mem_addr_offset, 
+    NS(block_size_t)* SIXTRL_RESTRICT ptr_num_of_blocks, 
+    NS(block_size_t)* SIXTRL_RESTRICT ptr_num_of_data_ptrs );
 
 SIXTRL_STATIC int NS(Blocks_unserialize)( NS(Blocks)* SIXTRL_RESTRICT blocks,
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin );
@@ -553,56 +562,47 @@ SIXTRL_INLINE NS(block_size_t) NS(Blocks_get_total_num_bytes)(
           ? *( blocks->ptr_total_num_bytes ) : ( NS(block_size_t) )0u;    
 }
 
-SIXTRL_INLINE int NS(Blocks_remap)( NS(Blocks)* SIXTRL_RESTRICT blocks )
-{
-    ( void )blocks;
-    return -1;
-}
-
-SIXTRL_INLINE int NS(Blocks_unserialize)( 
-    NS(Blocks)* SIXTRL_RESTRICT blocks,
-    SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin )
+SIXTRL_INLINE int NS(Blocks_remap)( 
+    NS(Blocks)* SIXTRL_RESTRICT blocks, 
+    SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin,
+    SIXTRL_INT64_T const mem_addr_offset, 
+    NS(block_size_t)* SIXTRL_RESTRICT ptr_num_of_blocks, 
+    NS(block_size_t)* SIXTRL_RESTRICT ptr_num_of_data_ptrs )
 {
     int success = -1;
     
-    if( ( blocks != 0 ) && ( data_mem_begin != 0 ) )
+    if( ( blocks != 0 ) && ( data_mem_begin != 0 ) &&
+        ( ptr_num_of_blocks != 0 ) && ( ptr_num_of_data_ptrs != 0 ) )
     {
-        typedef SIXTRL_GLOBAL_DEC unsigned char*    g_uchar_ptr_t;
-        typedef SIXTRL_GLOBAL_DEC unsigned char**   g_ptr_uchar_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC unsigned char*     g_uchar_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC g_uchar_ptr_t*     g_ptr_uchar_ptr_t;
         
-        typedef SIXTRL_GLOBAL_DEC void*             g_void_ptr_t;
-        typedef SIXTRL_GLOBAL_DEC void**            g_ptr_void_ptr_t;
-        typedef SIXTRL_GLOBAL_DEC void***           g_ptr2_void_ptr_t;
-        typedef SIXTRL_GLOBAL_DEC void****          g_ptr3_void_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC void*              g_void_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC g_void_ptr_t*      g_ptr_void_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC g_ptr_void_ptr_t*  g_ptr2_void_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC g_ptr2_void_ptr_t* g_ptr3_void_ptr_t;
         
         #ifndef NDEBUG
-        typedef SIXTRL_GLOBAL_DEC NS(BlockInfo)     g_info_t;
+        typedef SIXTRL_GLOBAL_DEC NS(BlockInfo)      g_info_t;
         #endif /* !defined( NDEBUG ) */
         
-        typedef SIXTRL_GLOBAL_DEC NS(BlockInfo)*    g_info_ptr_t;
-        typedef SIXTRL_GLOBAL_DEC NS(BlockInfo)**   g_ptr_info_ptr_t;
-        
-        typedef SIXTRL_GLOBAL_DEC SIXTRL_UINT64_T*  g_u64_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC NS(BlockInfo)*     g_info_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC g_info_ptr_t*      g_ptr_info_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC SIXTRL_UINT64_T*   g_u64_ptr_t;
         
         NS(block_size_t) const align = NS(Blocks_get_data_alignment)( blocks );
-        NS(block_size_t) num_of_blocks = 0u;        
+        NS(block_size_t) num_of_blocks    = 0u;
         NS(block_size_t) num_of_data_ptrs = 0u;
         
-        intptr_t offset = 0;
+        intptr_t offset = ( intptr_t )mem_addr_offset;
         
-        uintptr_t         temp_addr    = ( uintptr_t )data_mem_begin;
-        g_uchar_ptr_t     ptr_a        = ( g_uchar_ptr_t )temp_addr;
-        g_ptr_uchar_ptr_t ptr_to_ptr_a = ( g_ptr_uchar_ptr_t )temp_addr;
-        
-        g_ptr_uchar_ptr_t begin = ( g_ptr_uchar_ptr_t )( ( uintptr_t )data_mem_begin );
+        g_ptr_uchar_ptr_t begin = ( g_ptr_uchar_ptr_t )( 
+            ( uintptr_t )data_mem_begin );
         
         g_uchar_ptr_t data_mem_end = 0;        
         g_ptr_info_ptr_t ptr_block_infos = 0;
         g_ptr3_void_ptr_t ptr_data_ptrs = 0;
         g_u64_ptr_t ptr_total_num_bytes = 0;
-        
-        ( void )ptr_a;
-        ( void )ptr_to_ptr_a;
         
         SIXTRL_ASSERT( ( begin != 0 ) && ( align != 0u ) );
         SIXTRL_ASSERT( sizeof( uintptr_t ) >= ( uintptr_t )8u );
@@ -629,8 +629,6 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
         SIXTRL_ASSERT( *ptr_total_num_bytes >= 4u * align );
                 
         data_mem_end = data_mem_begin + *ptr_total_num_bytes;
-        
-        offset = ( ( intptr_t )begin ) - ( ( intptr_t )*begin );
         
         if( *ptr_block_infos != 0 )
         {
@@ -671,12 +669,18 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
                     ? (  dist / sizeof( g_ptr_void_ptr_t ) ) : ( 0u );
         }
         
-        if( offset != 0 )
+        if( offset == 0 )
+        {
+            *ptr_num_of_blocks    = num_of_blocks;
+            *ptr_num_of_data_ptrs = num_of_data_ptrs;
+            
+            success = 0;
+        }
+        else if(
+            ( ( offset > 0 ) || ( ( intptr_t )( *begin ) > -offset ) ) &&
+            ( ( ( uintptr_t )( *begin ) + offset ) == ( uintptr_t )begin ) )
         {
             *begin = *begin + offset;
-            
-            SIXTRL_ASSERT( ( ( uintptr_t )*begin ) == 
-                           ( ( uintptr_t )begin  ) );
             
             if( *ptr_block_infos != 0 )
             {
@@ -761,22 +765,98 @@ SIXTRL_INLINE int NS(Blocks_unserialize)(
                 
                 *ptr_data_ptrs = ptr_to_data_pointers_begin;
             }
+            
+            *ptr_num_of_blocks    = num_of_blocks;
+            *ptr_num_of_data_ptrs = num_of_data_ptrs;
+            
+            success = 0;
+        }
+        else
+        {
+            *ptr_num_of_blocks = 0u;
+            *ptr_num_of_data_ptrs = 0u;
         }
         
-        blocks->ptr_data_begin          = *begin;
-        blocks->ptr_block_infos         = *ptr_block_infos;
-        blocks->ptr_data_pointers_begin = *ptr_data_ptrs;
-        blocks->ptr_total_num_bytes     = ptr_total_num_bytes;
-        
-        blocks->num_blocks              = num_of_blocks;            
-        blocks->num_data_pointers       = num_of_data_ptrs;
-        blocks->data_size               = *ptr_total_num_bytes;
-                                        
-        blocks->is_serialized           = 1;
-
-        success = 0;
+        SIXTRL_ASSERT( ( success != 0 ) ||
+            ( ( ( uintptr_t )begin ) == ( ( uintptr_t )*begin ) ) );
     }
+    
+    return success;
+}
+
+SIXTRL_INLINE int NS(Blocks_unserialize)( 
+    NS(Blocks)* SIXTRL_RESTRICT blocks,
+    SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin )
+{
+    int success = -1;
+    
+    if( ( blocks != 0 ) && ( data_mem_begin != 0 ) )
+    {
+        typedef SIXTRL_GLOBAL_DEC unsigned char*    g_uchar_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC g_uchar_ptr_t*    g_ptr_uchar_ptr_t;
         
+        typedef SIXTRL_GLOBAL_DEC void*             g_void_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC g_void_ptr_t*     g_ptr_void_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC g_ptr_void_ptr_t* g_ptr2_void_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC g_ptr2_void_ptr_t* g_ptr3_void_ptr_t;
+        
+        typedef SIXTRL_GLOBAL_DEC NS(BlockInfo)*    g_info_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC g_info_ptr_t*     g_ptr_info_ptr_t;        
+        typedef SIXTRL_GLOBAL_DEC SIXTRL_UINT64_T*  g_u64_ptr_t;
+        
+        NS(block_size_t) const align = NS(Blocks_get_data_alignment)( blocks );
+        
+        g_ptr_uchar_ptr_t begin = 
+            ( g_ptr_uchar_ptr_t )( ( uintptr_t )data_mem_begin );
+        
+        g_ptr_info_ptr_t ptr_block_infos = 0;
+        g_ptr3_void_ptr_t ptr_data_ptrs = 0;
+        g_u64_ptr_t ptr_total_num_bytes = 0;
+        
+        SIXTRL_ASSERT( ( begin != 0 ) && ( align != 0u ) );
+        SIXTRL_ASSERT( sizeof( uintptr_t ) >= ( uintptr_t )8u );
+        
+        SIXTRL_ASSERT( ( ( ( uintptr_t ) begin ) % align ) == 0u );
+        SIXTRL_ASSERT( ( ( ( uintptr_t )*begin ) % align ) == 0u );
+        
+        ptr_block_infos = ( g_ptr_info_ptr_t  )( 
+            ( ( uintptr_t )data_mem_begin ) + align );
+        
+        ptr_data_ptrs   = ( g_ptr3_void_ptr_t )( 
+            ( ( uintptr_t )data_mem_begin ) + align * 2u );
+        
+        ptr_total_num_bytes = ( g_u64_ptr_t   )( 
+            ( ( uintptr_t )data_mem_begin ) + align * 3u );
+        
+        if( *ptr_total_num_bytes >= ( 4u * align ) )
+        {
+            NS(block_size_t) num_of_blocks = 0u;        
+            NS(block_size_t) num_of_data_ptrs = 0u;
+            
+            SIXTRL_INT64_T const offset = ( SIXTRL_INT64_T )( 
+                ( ( intptr_t )begin ) - ( ( intptr_t )*begin ) );
+            
+            if( 0 == NS(Blocks_remap)( blocks, data_mem_begin, offset, 
+                    &num_of_blocks, &num_of_data_ptrs ) )
+            {
+                blocks->ptr_data_begin          = *begin;
+                blocks->ptr_block_infos         = *ptr_block_infos;
+                blocks->ptr_data_pointers_begin = *ptr_data_ptrs;
+                blocks->ptr_data_pointers_begin = 0;
+                blocks->ptr_total_num_bytes     = ptr_total_num_bytes;
+                
+                blocks->num_blocks              = num_of_blocks;            
+                blocks->num_data_pointers       = num_of_data_ptrs;
+                blocks->data_size               = *ptr_total_num_bytes;
+                blocks->is_serialized           = 1;
+
+                success = 0;
+            }
+        }
+        
+        blocks->is_serialized = ( success == 0 ) ? 1 : 0;
+    }
+    
     return success;
 }
 
