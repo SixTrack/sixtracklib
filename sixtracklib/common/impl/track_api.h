@@ -205,21 +205,30 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements_particle)(
     }
     else
     {
-        #if !defined( _GPUCODE )
-            
-        NS(Particles)* io_particles = NS(Blocks_get_particles)( io_block_it );
-        
-        #else /* !defined( _GPUCODE ) */
-        
-        NS(BlockInfo) const info = *io_block_it;
-        
-        SIXTRL_GLOBAL_DEC NS(Particles)* io_particles =
-            NS(Blocks_get_particles)( &info );
-                
-        #endif /* !defined( _GPUCODE ) */
-        
         for( ; be_block_it != be_block_end ; ++be_block_it, ++io_block_it )
         {
+            #if !defined( _GPUCODE )
+                
+            NS(Particles)* io_particles = 
+                NS(Blocks_get_particles)( io_block_it );
+            
+            #else /* !defined( _GPUCODE ) */
+            
+            NS(Particles) temp_particles;
+            NS(Particles)* io_particles = 0;
+            
+            NS(BlockInfo) info = *io_block_it;
+            
+            SIXTRL_GLOBAL_DEC NS(Particles)* ptr_io_particles =
+                NS(Blocks_get_particles)( &info );
+                
+            SIXTRL_ASSERT( ptr_io_particles != 0 );
+            
+            temp_particles = *ptr_io_particles;
+            io_particles   = &temp_particles;
+                    
+            #endif /* !defined( _GPUCODE ) */
+            
             ret |= NS(Track_range_of_particles_over_beam_element)(
                 particles, index, index + 1, be_block_it );
             
@@ -261,21 +270,30 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements)(
     }
     else
     {
-        #if !defined( _GPUCODE )
-            
-        NS(Particles)* io_particles = NS(Blocks_get_particles)( io_block_it );
-        
-        #else /* !defined( _GPUCODE ) */
-        
-        NS(BlockInfo) const info = *io_block_it;
-        
-        SIXTRL_GLOBAL_DEC NS(Particles)* io_particles =
-            NS(Blocks_get_particles)( &info );
-                
-        #endif /* !defined( _GPUCODE ) */
-        
         for( ; be_block_it != be_block_end ; ++be_block_it, ++io_block_it )
         {
+            #if !defined( _GPUCODE )
+                
+            NS(Particles)* io_particles = 
+                NS(Blocks_get_particles)( io_block_it );
+            
+            #else /* !defined( _GPUCODE ) */
+            
+            NS(Particles) temp_particles;
+            NS(Particles)* io_particles = 0;
+            
+            NS(BlockInfo) info = *io_block_it;
+            
+            SIXTRL_GLOBAL_DEC NS(Particles)* ptr_io_particles =
+                NS(Blocks_get_particles)( &info );
+                
+            SIXTRL_ASSERT( ptr_io_particles != 0 );
+            
+            temp_particles = *ptr_io_particles;
+            io_particles   = &temp_particles;
+                    
+            #endif /* !defined( _GPUCODE ) */
+            
             ret |= NS(Track_range_of_particles_over_beam_element)( particles, 
                 start_particle_index, end_particle_index, be_block_it );
             
