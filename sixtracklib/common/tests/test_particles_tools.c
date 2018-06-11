@@ -14,6 +14,8 @@
 
 extern void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p );
 
+/* ------------------------------------------------------------------------- */
+
 extern int NS(Particles_have_same_structure)(
     const st_Particles *const SIXTRL_RESTRICT lhs, 
     const st_Particles *const SIXTRL_RESTRICT rhs );
@@ -25,6 +27,22 @@ extern int NS(Particles_map_to_same_memory)(
 extern int NS(Particles_compare_values)(
     const st_Particles *const SIXTRL_RESTRICT lhs, 
     const st_Particles *const SIXTRL_RESTRICT rhs );
+
+/* ------------------------------------------------------------------------- */
+
+extern int NS(Particles_buffers_have_same_structure)(
+    const NS(Blocks) *const SIXTRL_RESTRICT lhs_buffer,
+    const NS(Blocks) *const SIXTRL_RESTRICT rhs_buffer );
+
+extern int NS(Particles_buffers_map_to_same_memory)(
+    const NS(Blocks) *const SIXTRL_RESTRICT lhs_buffer,
+    const NS(Blocks) *const SIXTRL_RESTRICT rhs_buffer );
+
+extern int NS(Particles_buffer_compare_values)(
+    const NS(Blocks) *const SIXTRL_RESTRICT lhs_buffer,
+    const NS(Blocks) *const SIXTRL_RESTRICT rhs_buffer );
+
+/* ------------------------------------------------------------------------- */
 
 
 void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
@@ -372,5 +390,151 @@ int NS(Particles_compare_values)(
     
     return cmp_result;
 }
+
+/* ------------------------------------------------------------------------- */
+
+int NS(Particles_buffers_have_same_structure)(
+    const NS(Blocks) *const SIXTRL_RESTRICT lhs_buffer,
+    const NS(Blocks) *const SIXTRL_RESTRICT rhs_buffer )
+{
+    int has_same_structure = 0;
+    
+    if( ( lhs_buffer != 0 ) && 
+        ( rhs_buffer != 0 ) &&
+        ( NS(Blocks_are_serialized)( lhs_buffer ) ) &&
+        ( NS(Blocks_are_serialized)( rhs_buffer ) ) &&
+        ( NS(Blocks_get_num_of_blocks)( lhs_buffer ) ==
+          NS(Blocks_get_num_of_blocks)( rhs_buffer ) ) )
+    {
+        NS(BlockInfo) const* lhs_it  =
+            NS(Blocks_get_const_block_infos_begin)( lhs_buffer );
+            
+        NS(BlockInfo) const* lhs_end =
+            NS(Blocks_get_const_block_infos_end)( lhs_buffer );
+            
+        NS(BlockInfo) const* rhs_it  =
+            NS(Blocks_get_const_block_infos_begin)( rhs_buffer );
+        
+        if( ( ( lhs_it != 0 ) && ( lhs_end != 0 ) && ( rhs_it != 0 ) ) ||
+            ( ( lhs_it == 0 ) && ( lhs_end == 0 ) && ( rhs_it == 0 ) ) )
+        {
+            has_same_structure = 1;
+            
+            for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it )
+            {
+                NS(Particles) const* lhs_particles =
+                    NS(Blocks_get_const_particles)( lhs_it );
+                    
+                NS(Particles) const* rhs_particles =
+                    NS(Blocks_get_const_particles)( rhs_it );
+                
+                if( ( lhs_particles == 0 ) || ( rhs_particles == 0 ) ||
+                    ( !NS(Particles_have_same_structure)( 
+                        lhs_particles, rhs_particles ) ) )
+                {
+                    has_same_structure = 0;
+                    break;
+                }
+            }
+        }
+    }
+    
+    return has_same_structure;
+}
+
+int NS(Particles_buffers_map_to_same_memory)(
+    const NS(Blocks) *const SIXTRL_RESTRICT lhs_buffer,
+    const NS(Blocks) *const SIXTRL_RESTRICT rhs_buffer )
+{
+    int maps_to_same_memory = 0;
+    
+    if( ( lhs_buffer != 0 ) && 
+        ( rhs_buffer != 0 ) &&
+        ( NS(Blocks_are_serialized)( lhs_buffer ) ) &&
+        ( NS(Blocks_are_serialized)( rhs_buffer ) ) &&
+        ( NS(Blocks_get_num_of_blocks)( lhs_buffer ) ==
+          NS(Blocks_get_num_of_blocks)( rhs_buffer ) ) )
+    {
+        NS(BlockInfo) const* lhs_it  =
+            NS(Blocks_get_const_block_infos_begin)( lhs_buffer );
+            
+        NS(BlockInfo) const* lhs_end =
+            NS(Blocks_get_const_block_infos_end)( lhs_buffer );
+            
+        NS(BlockInfo) const* rhs_it  =
+            NS(Blocks_get_const_block_infos_begin)( rhs_buffer );
+        
+        if( ( lhs_it != 0 ) && ( lhs_end != 0 ) && ( rhs_it != 0 ) )
+        {
+            maps_to_same_memory = 1;
+            
+            for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it )
+            {
+                NS(Particles) const* lhs_particles =
+                    NS(Blocks_get_const_particles)( lhs_it );
+                    
+                NS(Particles) const* rhs_particles =
+                    NS(Blocks_get_const_particles)( rhs_it );
+                
+                if( ( lhs_particles == 0 ) || ( rhs_particles == 0 ) ||
+                    ( !NS(Particles_map_to_same_memory)( 
+                        lhs_particles, rhs_particles ) ) )
+                {
+                    maps_to_same_memory = 0;
+                    break;
+                }
+            }
+        }
+    }
+    
+    return maps_to_same_memory;
+}
+
+int NS(Particles_buffer_compare_values)(
+    const NS(Blocks) *const SIXTRL_RESTRICT lhs_buffer,
+    const NS(Blocks) *const SIXTRL_RESTRICT rhs_buffer )
+{
+    int cmp_result = -1;
+    
+    if( ( lhs_buffer != 0 ) && 
+        ( rhs_buffer != 0 ) &&
+        ( NS(Blocks_are_serialized)( lhs_buffer ) ) &&
+        ( NS(Blocks_are_serialized)( rhs_buffer ) ) &&
+        ( NS(Blocks_get_num_of_blocks)( lhs_buffer ) ==
+          NS(Blocks_get_num_of_blocks)( rhs_buffer ) ) )
+    {
+        NS(BlockInfo) const* lhs_it  =
+            NS(Blocks_get_const_block_infos_begin)( lhs_buffer );
+            
+        NS(BlockInfo) const* lhs_end =
+            NS(Blocks_get_const_block_infos_end)( lhs_buffer );
+            
+        NS(BlockInfo) const* rhs_it  =
+            NS(Blocks_get_const_block_infos_begin)( rhs_buffer );
+        
+        if( ( lhs_it != 0 ) && ( lhs_end != 0 ) && ( rhs_it != 0 ) )
+        {
+            cmp_result = 0;
+            
+            for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it )
+            {
+                NS(Particles) const* lhs_particles =
+                    NS(Blocks_get_const_particles)( lhs_it );
+                    
+                NS(Particles) const* rhs_particles =
+                    NS(Blocks_get_const_particles)( rhs_it );
+                
+                cmp_result = NS(Particles_compare_values)(
+                    lhs_particles, rhs_particles );
+                
+                if( cmp_result != 0 ) break;
+            }
+        }
+    }
+    
+    return cmp_result;
+}
+
+/* ------------------------------------------------------------------------- */
 
 /* end: sixtracklib/common/tests/test_particles_tools.c */

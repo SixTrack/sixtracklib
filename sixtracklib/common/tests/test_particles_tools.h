@@ -11,19 +11,35 @@ extern "C" {
     
 void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p );
 
+/* ------------------------------------------------------------------------- */
+
 int NS(Particles_have_same_structure)(
-    const st_Particles *const SIXTRL_RESTRICT lhs, 
-    const st_Particles *const SIXTRL_RESTRICT rhs );
+    const NS(Particles) *const SIXTRL_RESTRICT lhs, 
+    const NS(Particles) *const SIXTRL_RESTRICT rhs );
 
 int NS(Particles_map_to_same_memory)(
-    const st_Particles *const SIXTRL_RESTRICT lhs, 
-    const st_Particles *const SIXTRL_RESTRICT rhs );
+    const NS(Particles) *const SIXTRL_RESTRICT lhs, 
+    const NS(Particles) *const SIXTRL_RESTRICT rhs );
 
 int NS(Particles_compare_values)(
-    const st_Particles *const SIXTRL_RESTRICT lhs, 
-    const st_Particles *const SIXTRL_RESTRICT rhs );
+    const NS(Particles) *const SIXTRL_RESTRICT lhs, 
+    const NS(Particles) *const SIXTRL_RESTRICT rhs );
 
+/* ------------------------------------------------------------------------- */
 
+int NS(Particles_buffers_have_same_structure)(
+    const NS(Blocks) *const SIXTRL_RESTRICT lhs_buffer,
+    const NS(Blocks) *const SIXTRL_RESTRICT rhs_buffer );
+
+int NS(Particles_buffers_map_to_same_memory)(
+    const NS(Blocks) *const SIXTRL_RESTRICT lhs_buffer,
+    const NS(Blocks) *const SIXTRL_RESTRICT rhs_buffer );
+
+int NS(Particles_buffer_compare_values)(
+    const NS(Blocks) *const SIXTRL_RESTRICT lhs_buffer,
+    const NS(Blocks) *const SIXTRL_RESTRICT rhs_buffer );
+
+/* ------------------------------------------------------------------------- */
 
 #if defined( __cplusplus )
 }
