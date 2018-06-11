@@ -229,6 +229,8 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements_particle)(
                     
             #endif /* !defined( _GPUCODE ) */
             
+            SIXTRL_ASSERT( io_particles != 0 );
+            
             ret |= NS(Track_range_of_particles_over_beam_element)(
                 particles, index, index + 1, be_block_it );
             

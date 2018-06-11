@@ -148,8 +148,6 @@ bool NS(TestData_test_tracking_single_particle_over_specific_be_type)(
         success &= ( !NS(Particles_buffers_map_to_same_memory)(
             &result_particles_buffer, &particles_buffer ) );
         
-        NS(Particles_buffer_preset_values)( &particles_buffer );
-        
         if( NS(Blocks_get_num_of_blocks)( &elem_by_elem ) > 0 )
         {
             int const elem_by_elem_succes = 
@@ -179,6 +177,8 @@ bool NS(TestData_test_tracking_single_particle_over_specific_be_type)(
             io_block_it = NS(Blocks_get_block_infos_begin)( 
                 &calculated_elem_by_elem );
         }
+        
+        bool const use_elem_by_elem_buffer = ( io_block_it != nullptr );
         
         for( NS(block_size_t) ii = 0 ; ii < NUM_OF_TURNS ; ++ii )
         {
@@ -269,9 +269,9 @@ bool NS(TestData_test_tracking_single_particle_over_specific_be_type)(
         
             success = ( cmp_result_particles == 0 );
         
-            if( NS(Blocks_get_num_of_blocks)( &elem_by_elem ) > 0 )
+            if( ( success ) && ( use_elem_by_elem_buffer ) )
             {
-                success &= ( NS(Particles_buffers_have_same_structure)( 
+                success = ( NS(Particles_buffers_have_same_structure)( 
                     &elem_by_elem, &calculated_elem_by_elem ) );
                 
                 success &= ( !NS(Particles_buffers_map_to_same_memory)(
@@ -378,8 +378,6 @@ bool NS(TestData_test_tracking_particles_over_specific_be_type)(
         success &= ( !NS(Particles_buffers_map_to_same_memory)(
             &result_particles_buffer, &particles_buffer ) );
         
-        NS(Particles_buffer_preset_values)( &particles_buffer );
-        
         if( NS(Blocks_get_num_of_blocks)( &elem_by_elem ) > 0 )
         {
             int const elem_by_elem_succes = 
@@ -409,6 +407,8 @@ bool NS(TestData_test_tracking_particles_over_specific_be_type)(
             io_block_it = NS(Blocks_get_block_infos_begin)( 
                 &calculated_elem_by_elem );
         }
+        
+        bool const use_elem_by_elem_buffer = ( io_block_it != nullptr );
         
         for( NS(block_size_t) ii = 0 ; ii < NUM_OF_TURNS ; ++ii )
         {
@@ -490,9 +490,9 @@ bool NS(TestData_test_tracking_particles_over_specific_be_type)(
         
             success = ( cmp_result_particles == 0 );
         
-            if( NS(Blocks_get_num_of_blocks)( &elem_by_elem ) > 0 )
+            if( ( success ) && ( use_elem_by_elem_buffer ) )
             {
-                success &= ( NS(Particles_buffers_have_same_structure)( 
+                success = ( NS(Particles_buffers_have_same_structure)( 
                     &elem_by_elem, &calculated_elem_by_elem ) );
                 
                 success &= ( !NS(Particles_buffers_map_to_same_memory)(

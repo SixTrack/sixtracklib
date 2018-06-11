@@ -89,7 +89,7 @@ bool NS(Tracks_store_testdata_to_binary_file)(
         uint64_t* num_particles_vec = ( uint64_t* )malloc( 
             sizeof( uint64_t ) * num_of_particle_blocks );
         
-        if( num_particles_vec != 0 ) return success;
+        if( num_particles_vec == 0 ) return success;
             
         if( ( num_of_particle_blocks == ( uint64_t 
                 )NS(Blocks_get_num_of_blocks)( result_particles_buffer ) ) )
@@ -513,7 +513,6 @@ bool NS(Tracks_restore_testdata_from_binary_file)(
     
     if( fp != 0 )
     {
-        fflush( fp );
         fclose( fp );
         fp = 0;
     }
@@ -595,8 +594,6 @@ bool NS(TestData_test_tracking_single_particle)(
         success &= ( !NS(Particles_buffers_map_to_same_memory)(
             &result_particles_buffer, &particles_buffer ) );
         
-        NS(Particles_buffer_preset_values)( &particles_buffer );
-        
         if( NS(Blocks_get_num_of_blocks)( &elem_by_elem ) > 0 )
         {
             int const elem_by_elem_succes = 
@@ -627,72 +624,59 @@ bool NS(TestData_test_tracking_single_particle)(
                 &calculated_elem_by_elem );
         }
         
+        bool const use_elem_by_elem_buffer = ( io_block_it != 0 );
+        
         for( NS(block_size_t) ii = 0 ; ii < NUM_OF_TURNS ; ++ii )
         {
-            NS(BlockInfo)* be_info_it = NS(Blocks_get_block_infos_begin)( 
-                ( NS(Blocks)* )&beam_elements );
+            NS(BlockInfo)* part_block_it =
+                NS(Blocks_get_block_infos_begin)( &particles_buffer );
             
-            if( ( !success ) || ( be_info_it == 0 ) )
+            NS(BlockInfo)* part_block_end = 
+                NS(Blocks_get_block_infos_end)( &particles_buffer );
+            
+            success &= ( part_block_it  != 0 );
+            success &= ( part_block_end != 0 );
+                
+            if( !success )
             {
-                success = false;
                 break;
             }
-                
-            NS(block_size_t) jj = 0; 
-                
-            for( ; jj < NUM_OF_BEAM_ELEMENTS ; ++jj, ++be_info_it )
+                        
+            for( ; part_block_it != part_block_end ; ++part_block_it )
             {
-                NS(BlockInfo)* particles_block_it =
-                    NS(Blocks_get_block_infos_begin)( &particles_buffer );
+                NS(Particles)* io_particles = 
+                    NS(Blocks_get_particles)( io_block_it );
                 
-                NS(BlockInfo)* particles_block_end = 
-                    NS(Blocks_get_block_infos_end)( &particles_buffer );
+                NS(Particles)* particles = 
+                    NS(Blocks_get_particles)( part_block_it );
                 
-                success &= ( particles_block_it  != 0 );
-                success &= ( particles_block_end != 0 );
-                
-                if( !success )
+                NS(block_num_elements_t) const num_of_particles =
+                    NS(Particles_get_num_particles)( particles );
+                    
+                if( ( particles == 0 ) || 
+                    ( ( io_block_it  != 0 ) && ( io_particles == 0 ) ) ||
+                    ( num_of_particles <= 0 ) )
                 {
+                    success = false;
                     break;
                 }
-                        
-                for( ; particles_block_it != particles_block_end ; 
-                        ++particles_block_it )
+                
+                NS(block_num_elements_t) ll = 0;
+                
+                for( ; ll < num_of_particles ; ++ll )
                 {
-                    NS(Particles)* io_particles = 
-                        NS(Blocks_get_particles)( io_block_it );
-                    
-                    NS(Particles)* particles = 
-                        NS(Blocks_get_particles)( particles_block_it );
-                    
-                    NS(block_num_elements_t) const num_of_particles =
-                        NS(Particles_get_num_particles)( particles );
-                        
-                    if( ( particles == 0 ) || 
-                        ( ( io_block_it  != 0 ) && 
-                          ( io_particles == 0 ) ) ||
-                        ( num_of_particles <= 0 ) )
+                    if( 0 != NS(Track_beam_elements_particle)( 
+                            particles, ll, &beam_elements, io_block_it ) )
                     {
                         success = false;
                         break;
                     }
-                    
-                    NS(block_num_elements_t) ll = 0;
-                    
-                    for( ; ll < num_of_particles ; ++ll )
-                    {
-                        if( 0 != NS(Track_beam_elements_particle)( 
-                                particles, ll, &beam_elements, be_info_it ) )
-                        {
-                            success = false;
-                            break;
-                        }
-                    }
-                    
-                    if( ( success ) && ( be_info_it != 0 ) )
-                    {
-                        be_info_it = be_info_it + NUM_IO_ELEMENTS_PER_TURN;
-                    }
+                }
+                
+                if( ( success ) && ( use_elem_by_elem_buffer ) )
+                {
+                    SIXTRL_ASSERT( io_block_it != 0 );
+                    io_block_it = io_block_it + NUM_IO_ELEMENTS_PER_TURN;
                 }
             }
         }
@@ -707,9 +691,9 @@ bool NS(TestData_test_tracking_single_particle)(
         
             success = ( cmp_result_particles == 0 );
         
-            if( NS(Blocks_get_num_of_blocks)( &elem_by_elem ) > 0 )
+            if( ( success ) && ( use_elem_by_elem_buffer ) )
             {
-                success &= ( NS(Particles_buffers_have_same_structure)( 
+                success  = ( NS(Particles_buffers_have_same_structure)( 
                     &elem_by_elem, &calculated_elem_by_elem ) );
                 
                 success &= ( !NS(Particles_buffers_map_to_same_memory)(
@@ -811,8 +795,6 @@ bool NS(TestData_test_tracking_particles)(
         success &= ( !NS(Particles_buffers_map_to_same_memory)(
             &result_particles_buffer, &particles_buffer ) );
         
-        NS(Particles_buffer_preset_values)( &particles_buffer );
-        
         if( NS(Blocks_get_num_of_blocks)( &elem_by_elem ) > 0 )
         {
             int const elem_by_elem_succes = 
@@ -843,67 +825,54 @@ bool NS(TestData_test_tracking_particles)(
                 &calculated_elem_by_elem );
         }
         
+        bool const use_elem_by_elem_buffer = ( io_block_it != 0 );
+        
         for( NS(block_size_t) ii = 0 ; ii < NUM_OF_TURNS ; ++ii )
         {
-            NS(BlockInfo)* be_info_it = NS(Blocks_get_block_infos_begin)( 
-                ( NS(Blocks)* )&beam_elements );
+            NS(BlockInfo)* part_block_it =
+                NS(Blocks_get_block_infos_begin)( &particles_buffer );
             
-            if( ( !success ) || ( be_info_it == 0 ) )
+            NS(BlockInfo)* part_block_end = 
+                NS(Blocks_get_block_infos_end)( &particles_buffer );
+            
+            success &= ( part_block_it  != 0 );
+            success &= ( part_block_end != 0 );
+            
+            if( !success )
             {
-                success = false;
                 break;
             }
-                
-            NS(block_size_t) jj = 0;
-                
-            for( ; jj < NUM_OF_BEAM_ELEMENTS ; ++jj, ++be_info_it )
+                    
+            for( ; part_block_it != part_block_end ; ++part_block_it )
             {
-                NS(BlockInfo)* particles_block_it =
-                    NS(Blocks_get_block_infos_begin)( &particles_buffer );
+                NS(Particles)* io_particles = 
+                    NS(Blocks_get_particles)( io_block_it );
                 
-                NS(BlockInfo)* particles_block_end = 
-                    NS(Blocks_get_block_infos_end)( &particles_buffer );
+                NS(Particles)* particles = 
+                    NS(Blocks_get_particles)( part_block_it );
                 
-                success &= ( particles_block_it  != 0 );
-                success &=  ( particles_block_end != 0 );
-                
-                if( !success )
+                NS(block_num_elements_t) const num_of_particles =
+                    NS(Particles_get_num_particles)( particles );
+                    
+                if( ( particles == 0 ) || 
+                    ( ( io_block_it  != 0 ) && ( io_particles == 0 ) ) ||
+                    ( num_of_particles <= 0 ) )
                 {
+                    success = false;
                     break;
                 }
-                        
-                for( ; particles_block_it != particles_block_end ; 
-                        ++particles_block_it )
+                
+                if( 0 != NS(Track_beam_elements)( particles, 0, 
+                        num_of_particles, &beam_elements, io_block_it ) )
                 {
-                    NS(Particles)* io_particles = 
-                        NS(Blocks_get_particles)( io_block_it );
-                    
-                    NS(Particles)* particles = 
-                        NS(Blocks_get_particles)( particles_block_it );
-                    
-                    NS(block_num_elements_t) const num_of_particles =
-                        NS(Particles_get_num_particles)( particles );
-                        
-                    if( ( particles == 0 ) || 
-                        ( ( io_block_it  != 0 ) && 
-                          ( io_particles == 0 ) ) ||
-                        ( num_of_particles <= 0 ) )
-                    {
-                        success = false;
-                        break;
-                    }
-                    
-                    if( 0 != NS(Track_beam_elements)( particles, 0, 
-                            num_of_particles, &beam_elements, be_info_it ) )
-                    {
-                        success = false;
-                        break;
-                    }
-                    
-                    if( ( success ) && ( be_info_it != 0 ) )
-                    {
-                        be_info_it = be_info_it + NUM_IO_ELEMENTS_PER_TURN;
-                    }
+                    success = false;
+                    break;
+                }
+                
+                if( ( success ) && ( use_elem_by_elem_buffer ) )
+                {
+                    SIXTRL_ASSERT( io_block_it != 0 );
+                    io_block_it = io_block_it + NUM_IO_ELEMENTS_PER_TURN;
                 }
             }
         }
@@ -917,9 +886,9 @@ bool NS(TestData_test_tracking_particles)(
         
             success = ( cmp_result_particles == 0 );
         
-            if( NS(Blocks_get_num_of_blocks)( &elem_by_elem ) > 0 )
+            if( ( success ) && ( use_elem_by_elem_buffer ) )
             {
-                success &= ( NS(Particles_buffers_have_same_structure)( 
+                success = ( NS(Particles_buffers_have_same_structure)( 
                     &elem_by_elem, &calculated_elem_by_elem ) );
                 
                 success &= ( !NS(Particles_buffers_map_to_same_memory)(
