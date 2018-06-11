@@ -16,8 +16,7 @@ void __kernel Track_particles_kernel_opencl(
     size_t const local_size  = get_local_size( 0 );
     size_t const global_size = get_global_size( 0 );
         
-    size_t const gid_to_remap_particles = 0;
-    
+    size_t const gid_to_remap_particles = 0;    
     size_t const gid_to_remap_beam_elements = 
         ( global_size > 1 ) ? 1 : gid_to_remap_particles;
         
@@ -40,13 +39,42 @@ void __kernel Track_particles_kernel_opencl(
     
     int ret = 0;
     
+    /* *****  SECTION FOR DEFUSING THE HEISENBUG *** */
+    /* This printf section seems to defuse the Heisenbug on the AMDGPU 
+     * implementation available to the author -> YMMV */
+    
+    /*s
+    if( global_id == gid_to_remap_particles )
+    {
+        __global ulong const* header = ( __global ulong const* )particles_data_buffer;
+            
+        printf( "before unserialization: \r\n" );
+        printf( "global_id     = %u\r\n", global_id );
+        printf( "header[ 0 ]   = %16x at %18x\r\n", header[ 0 ], 
+            ( uintptr_t )( particles_data_buffer +  0 ) );
+            
+        printf( "header[ 1 ]   = %16x at %18x\r\n", header[ 1 ], 
+            ( uintptr_t )( particles_data_buffer +  8 ) );
+            
+        printf( "header[ 2 ]   = %16x at %18x\r\n", header[ 2 ], 
+            ( uintptr_t )( particles_data_buffer + 16 ) );
+            
+        printf( "header[ 3 ]   = %16x at %18x\r\n", header[ 3 ], 
+            ( uintptr_t )( particles_data_buffer + 32 ) );
+    }
+    
+    barrier( CLK_GLOBAL_MEM_FENCE );    
+    */
+    
+    /* *****  END OF SECTION FOR DEFUSING THE HEISENBUG *** */
+    
     NS(Blocks_preset)( &particles_buffer );
     NS(Blocks_preset)( &beam_elements );
     NS(Blocks_preset)( &elem_by_elem_buffer );
     
     if( global_id == gid_to_remap_particles )
     {
-        ret  = NS(Blocks_unserialize)( &particles_buffer, particles_data_buffer );
+        ret  = NS(Blocks_unserialize)( &particles_buffer, particles_data_buffer );        
     }
     
     if( global_id == gid_to_remap_beam_elements )
@@ -124,7 +152,7 @@ void __kernel Track_particles_kernel_opencl(
             unsigned long ii = 0;
             
             SIXTRL_GLOBAL_DEC NS(BlockInfo)* io_info_it =
-                NS(Blocks_get_const_block_infos_begin)( &elem_by_elem_buffer );
+                NS(Blocks_get_block_infos_begin)( &elem_by_elem_buffer );
             
             for( ; ii < num_of_turns ; ++ii, 
                     io_info_it = io_info_it + num_beam_elements )
