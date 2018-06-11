@@ -1,0 +1,42 @@
+step 1:
+  build memory for cl track
+ster 2:
+  track fodo
+step 3:
+  remake SixTrack Benchmark using sixtrack tools
+step 4:
+  remake madx Benchmark using pyoptics
+step 5:
+  document python element interfaces
+
+Big Picture:
+
+sixtracklib in C/Cl:
+  track ( CBlock elems, elemids, nelems,
+          CParticles particles,
+          nturns,
+          CParticles elembyelem
+          CParticles turnbyturn)
+
+sixtracklib in python:
+  python objects helper class to interact with CBuffers
+
+
+pysixtrack:
+Element:
+  validate attributes
+  track with the attributes anything Particles-like
+  generate CObject
+  track using sixtracklib a CParticles
+
+Particles:
+  collection of specific coordinates
+  generate a CObject
+
+
+
+
+
+
+
+

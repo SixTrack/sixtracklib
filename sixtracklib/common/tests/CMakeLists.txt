@@ -1,0 +1,71 @@
+# sixtracklib/common/tests/CMakeLists.txt 
+
+if( GTEST_FOUND )
+
+    include_directories( ${SIXTRACKL_GTEST_INCLUDE_DIRS} )
+
+    set( UNIT_TEST_TARGETS ) 
+    set( SIXTRACKL_TEST_LIBRARIES ${SIXTRACKL_TEST_LIBRARIES} 
+         ${SIXTRACKL_GTEST_LIBRARIES} )
+    
+    # --------------------------------------------------------------------------
+    # test_tools:
+    
+    add_executable( test_tools test_tools.cpp )        
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_tools )         
+    add_test( CommonToolTests test_tools )
+    
+    # --------------------------------------------------------------------------
+    # test_block:
+    
+    add_executable( test_blocks test_blocks.cpp )        
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_blocks )         
+    add_test( CommonBlocksTests test_blocks )
+    
+    # --------------------------------------------------------------------------
+    # test_gpu_kernel_tools:
+    
+    add_executable( test_gpu_kernel_tools test_gpu_kernel_tools.cpp )        
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_gpu_kernel_tools )         
+    add_test( CommonGpuKernelTools test_gpu_kernel_tools )
+    
+    # --------------------------------------------------------------------------
+    # test_mem_pool:
+    
+    add_executable( test_mem_pool test_mem_pool.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_mem_pool )
+    add_test( CommonMemPoolTests test_mem_pool )
+    
+    # --------------------------------------------------------------------------
+    # test_particles:
+    
+    add_executable( test_particles test_particles.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_particles )
+    add_test( CommonParticlesTests test_particles )    
+    
+    # --------------------------------------------------------------------------
+    # test_beam_elements:
+    
+    add_executable( test_beam_elements test_beam_elements.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_beam_elements )
+    add_test( CommonBeamElementsTests test_beam_elements )    
+    
+    # --------------------------------------------------------------------------
+    # test_track:
+    
+    add_executable( test_track test_track.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track )
+    add_test( CommonTrackTests test_track )
+    
+    # *************************************************************************
+    # Set all properties: 
+    
+    set_property( TARGET ${UNIT_TEST_TARGETS} 
+                  PROPERTY LINK_LIBRARIES ${SIXTRACKL_TEST_LIBRARIES} )
+                  
+    set_property( TARGET ${UNIT_TEST_TARGETS} PROPERTY CXX_STANDARD 11 )
+    set_property( TARGET ${UNIT_TEST_TARGETS} PROPERTY CXX_STANDARD_REQUIRED ON )
+    set_property( TARGET ${UNIT_TEST_TARGETS} PROPERTY COMPILE_OPTIONS 
+                  ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic )
+    
+endif()

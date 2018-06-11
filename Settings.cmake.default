@@ -1,0 +1,65 @@
+# sixtracklib/Settings.cmake.default: default settings file
+# 
+# Usage: if you want to deviate from the provided default values, create a copy
+#        of this file named Settings.cmake in the same directory and perform the 
+#        modifications therein. 
+
+# ------------------------------------------------------------------------------
+# System-wide settings 
+
+set( SIXTRACKL_C_NAMESPACE_PREFIX "st_" CACHE STRING 
+     "SixTrackLib C-Namespace prefix (default: st_)" )
+
+# ------------------------------------------------------------------------------
+# Unit-testing related settings:
+
+option( SIXTRACKL_ENABLE_PROGRAMM_TESTS "Enable programmatic unit-tests"  ON )
+
+set( GTEST_ROOT "" CACHE PATH 
+     "Path to include/gtest/gtest.h (for non-standard installations)" )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     
+option( SIXTRACKL_ENABLE_TIMING_TESTS   
+        "Enable timing/benchmarking tests (requires C++11 support)" ON )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+option( SIXTRACKL_ENABLE_PROGRAM_MEMTESTS "Enable programming memory tests" ON )
+
+set( SIXTRACKL_MEMCHECK_COMMAND "valgrind" CACHE STRING 
+     "name of the memory check tool (i.e. valgrind)" )
+
+set( SIXTRACKL_MEMCHECK_COMMAND_OPTIONS "--trace-children=yes --leak-check=full" 
+     CACHE STRING "Command line options for the memcheck tool" )
+     
+set( SIXTRACKL_MEMCHECK_SUPPRESSIONS_FILE "" CACHE PATH 
+     "Path to the memory check tool suppression file (optional, leave empty)" )
+
+# ------------------------------------------------------------------------------
+# CPU/System architecture settings:
+
+set( SIXTRACKL_CPU_ARCH "sse2" CACHE STRING "CPU/System architecture" )
+set_property( CACHE SIXTRACKL_CPU_ARCH PROPERTY STRINGS sse2 avx native )
+     
+# ------------------------------------------------------------------------------
+# Examples:
+
+option( SIXTRACKL_BUILD_EXAMPLES "Build sixtracklib examples" OFF )
+
+# ------------------------------------------------------------------------------
+
+option( SIXTRACKL_ENABLE_MPFR4 "Enable GMP/MPFR4 backend" OFF )
+        
+option( SIXTRACKL_ENABLE_MPFR_ACCURACY_TESTS 
+        "Enable GMP/MPFR based accuracy tests" OFF )
+        
+# ------------------------------------------------------------------------------
+
+option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"       OFF )
+option( SIXTRACKL_ENABLE_MANUAL_SIMD       "Enable manual SIMD backend"     OFF )
+option( SIXTRACKL_ENABLE_OPENMP            "Enable OpenMP backend"          OFF )
+option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL backend"          ON  )
+option( SIXTRACKL_ENABLE_CUDA              "Enable CUDA backend"            OFF )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
