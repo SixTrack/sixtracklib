@@ -718,16 +718,35 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Particles)* NS(Blocks_get_particles)(
 SIXTRL_INLINE void NS(Particles_buffer_preset_values)(
     NS(Blocks)* SIXTRL_RESTRICT blocks )
 {
-    NS(BlockInfo)* blocks_it = NS(Blocks_get_block_infos_begin)( blocks );
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)* blocks_it = 
+        NS(Blocks_get_block_infos_begin)( blocks );
     
     if( blocks_it != 0 )
     {
-        NS(BlockInfo)* blocks_end = NS(Blocks_get_block_infos_end)( blocks );
+        SIXTRL_GLOBAL_DEC NS(BlockInfo)* blocks_end = 
+            NS(Blocks_get_block_infos_end)( blocks );
         
         for( ; blocks_it != blocks_end ; ++blocks_it )
         {
-            NS(Particles)* particles = NS(Blocks_get_particles)( blocks_it );
-            if( particles != 0 ) NS(Particles_preset_values)( particles );
+            NS(Particles)* particles = 0;
+            
+            #if !defined( _GPUCODE )
+            particles = NS(Blocks_get_particles)( blocks_it );
+            #else /* defined( _GPUCODE ) */
+            NS(Particles) temp_particles;
+            
+            NS(BlockInfo) info = *blocks_it;
+            SIXTRL_GLOBAL_DEC NS(Particles)* ptr_to_particles = 
+                NS(Blocks_get_particles)( &info );
+            
+            if( ptr_to_particles != 0 )
+            {
+                temp_particles = *ptr_to_particles;
+                particles = &temp_particles;
+            }                
+            #endif /* !defined( _GPUCODE ) */
+            
+             NS(Particles_preset_values)( particles );
         }
     }
     
