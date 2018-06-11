@@ -23,7 +23,7 @@ add_executable( benchmark_drift_baseline_autov_sse2 benchmark_drift_baseline.cpp
 target_link_libraries( benchmark_drift_baseline_autov_sse2 ${SIXTRACKL_TEST_LIBRARIES} )
 target_compile_options( benchmark_drift_baseline_autov_sse2 BEFORE PUBLIC 
     -fno-fast-math -ftree-vectorize -march=native -mtune=native 
-    #-fopt-info-all -fopt-info-all-missed 
+    -fopt-info-all -fopt-info-all-missed 
     -std=c++11 -Wall -Werror -pedantic )
 
 set_property( TARGET benchmark_drift_baseline_autov_sse2 

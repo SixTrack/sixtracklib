@@ -43,7 +43,7 @@ void __kernel Track_particles_kernel_opencl(
     /* This printf section seems to defuse the Heisenbug on the AMDGPU 
      * implementation available to the author -> YMMV */
     
-    /*s
+    /*
     if( global_id == gid_to_remap_particles )
     {
         __global ulong const* header = ( __global ulong const* )particles_data_buffer;
