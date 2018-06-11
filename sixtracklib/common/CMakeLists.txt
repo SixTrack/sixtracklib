@@ -10,6 +10,7 @@ set( SIXTRACKLIB_COMMON_HEADERS
      particles.h
      impl/particles_api.h
      tests/test_particles_tools.h     
+     tests/test_track_tools.h
      details/tools.h 
      details/gpu_kernel_tools.h
      details/random.h     
@@ -25,6 +26,7 @@ set( SIXTRACKLIB_COMMON_SOURCES
      details/particles.c
      details/random.c
      tests/test_particles_tools.c
+     tests/test_track_tools.c
 )
 
 add_library( sixtrack_common OBJECT 

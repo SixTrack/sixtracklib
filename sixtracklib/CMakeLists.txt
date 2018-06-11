@@ -72,17 +72,17 @@ set( SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_common> )
 
 # ------------------------------------------------------------------------------
 
-if( SIXTRACKL_ENABLE_MANUAL_SIMD )    
-    
-    add_subdirectory( simd )
-    
-    set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-         $<TARGET_OBJECTS:sixtrack_simd> )    
-         
-    set( SIXTRACKL_ENABLE_MODULE_SIMD 1 )
-else()
+# if( SIXTRACKL_ENABLE_MANUAL_SIMD )    
+#     
+#     add_subdirectory( simd )
+#     
+#     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
+#          $<TARGET_OBJECTS:sixtrack_simd> )    
+#          
+#     set( SIXTRACKL_ENABLE_MODULE_SIMD 1 )
+# else()
     set( SIXTRACKL_ENABLE_MODULE_SIMD 0 )
-endif()
+# endif()
 
 # ------------------------------------------------------------------------------
 
@@ -105,21 +105,21 @@ endif()
 
 # ------------------------------------------------------------------------------
 
-if( SIXTRACKL_ENABLE_MPFR4 )
-    add_subdirectory( mpfr4 )    
-    
-    if( TARGET sixtrack_mpfr4 )
-        set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-            $<TARGET_OBJECTS:sixtrack_mpfr4> )
-    endif()
-         
-    set( SIXTRACKL_ENABLE_MODULE_MPFR4 1 )
-    
-else()
-
+# if( SIXTRACKL_ENABLE_MPFR4 )
+#     add_subdirectory( mpfr4 )    
+#     
+#     if( TARGET sixtrack_mpfr4 )
+#         set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
+#             $<TARGET_OBJECTS:sixtrack_mpfr4> )
+#     endif()
+#          
+#     set( SIXTRACKL_ENABLE_MODULE_MPFR4 1 )
+#     
+# else()
+# 
     set( SIXTRACKL_ENABLE_MODULE_MPFR4 0 )    
-
-endif()
+# 
+# endif()
 
 # ------------------------------------------------------------------------------
 
@@ -155,9 +155,13 @@ target_compile_options( sixtrack PUBLIC
 
 # ------------------------------------------------------------------------------
 
-if( SIXTRACKL_BUILD_EXAMPLES )
-    add_subdirectory( examples )
-endif()
+add_subdirectory( testdata )
+    
+# ------------------------------------------------------------------------------
+
+# if( SIXTRACKL_BUILD_EXAMPLES )
+#     add_subdirectory( examples )
+# endif()
 
 # ------------------------------------------------------------------------------
 
