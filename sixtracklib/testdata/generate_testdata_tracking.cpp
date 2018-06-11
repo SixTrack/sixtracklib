@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <iomanip>
+#include <vector>
 
 #if defined( __NAMESPACE )
     #define __SAVED_NAMESPACE __NAMESPACE
