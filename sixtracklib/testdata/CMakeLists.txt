@@ -1,5 +1,4 @@
-
-set( SIXTRACKLIB_TESTDATA_DIR "${CMAKE_BINARY_DIR}/testdata" )
+set( SIXTRACKLIB_TESTDATA_DIR ${CMAKE_CURRENT_BINARY_DIR} )
 
 configure_file( tracking_testfiles.h.template 
                 "${CMAKE_CURRENT_SOURCE_DIR}/tracking_testfiles.h" 
