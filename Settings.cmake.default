@@ -13,7 +13,7 @@ set( SIXTRACKL_C_NAMESPACE_PREFIX "st_" CACHE STRING
 # ------------------------------------------------------------------------------
 # Unit-testing related settings:
 
-option( SIXTRACKL_ENABLE_PROGRAMM_TESTS "Enable programmatic unit-tests"  OFF )
+option( SIXTRACKL_ENABLE_PROGRAMM_TESTS "Enable programmatic unit-tests"  ON )
 
 set( GTEST_ROOT "" CACHE PATH 
      "Path to include/gtest/gtest.h (for non-standard installations)" )
