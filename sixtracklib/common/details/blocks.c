@@ -10,6 +10,15 @@
 extern int NS(Blocks_init)( NS(Blocks)* SIXTRL_RESTRICT blocks,
     NS(block_size_t) max_num_blocks, NS(block_size_t) const data_capacity );
 
+extern int NS(Blocks_init_with_same_structure_as)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks, 
+    const NS(Blocks) *const SIXTRL_RESTRICT ref_blocks );
+
+extern int NS(Blocks_init_from_serialized_data)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks, 
+    SIXTRL_GLOBAL_DEC unsigned char const* SIXTRL_RESTRICT data_mem_begin,
+    NS(block_size_t) const total_num_of_bytes );
+
 extern void NS(Blocks_clear)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 extern void NS(Blocks_free)(  NS(Blocks)* SIXTRL_RESTRICT blocks );
 
@@ -134,6 +143,78 @@ int NS(Blocks_init)( NS(Blocks)* SIXTRL_RESTRICT blocks,
         else
         {
             NS(Blocks_free)( blocks );
+        }
+    }
+    
+    return success;
+}
+
+int NS(Blocks_init_with_same_structure_as)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks, 
+    const NS(Blocks) *const SIXTRL_RESTRICT ref_blocks )
+{
+    ( void )blocks;
+    ( void )ref_blocks;
+
+    return -1;
+}
+
+int NS(Blocks_init_from_serialized_data)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks, 
+    SIXTRL_GLOBAL_DEC unsigned char const* SIXTRL_RESTRICT data_mem_begin,
+    NS(block_size_t) const total_num_of_bytes )
+{
+    int success = -1;
+    
+    if( ( blocks != 0 ) && ( data_mem_begin != 0 ) &&
+        ( total_num_of_bytes > 0u ) &&
+        ( !NS(Blocks_are_serialized)( blocks ) ) &&
+        ( !NS(Blocks_has_data_pointers_store)( blocks ) ) &&
+        ( !NS(Blocks_has_index_store)( blocks ) ) &&
+        ( !NS(Blocks_has_data_pointers_store)( blocks ) ) )
+    {
+        NS(block_size_t) const begin_align = 
+            NS(Blocks_get_begin_alignment)( blocks );
+        
+        NS(block_size_t) const align = 
+            NS(Blocks_get_data_alignment)( blocks );
+        
+        NS(MemPool)* ptr_data_store = NS(MemPool_preset)(
+            ( NS(MemPool)* )malloc( sizeof( NS(MemPool) ) ) );
+            
+        if( ptr_data_store != 0 )
+        {
+            NS(AllocResult) result;
+            unsigned char* serialized_data_begin = 0;
+            
+            NS(MemPool_init_aligned)( ptr_data_store, total_num_of_bytes, 
+                                      align, begin_align );
+            
+            result = NS(MemPool_append_aligned)( 
+                ptr_data_store, total_num_of_bytes, align );
+            
+            if( NS(AllocResult_valid)( &result ) )
+            {
+                serialized_data_begin = 
+                    ( unsigned char* )NS(AllocResult_get_pointer)( &result );
+                
+                memcpy( serialized_data_begin, data_mem_begin, 
+                        total_num_of_bytes );                
+            }
+            
+            if( ( serialized_data_begin != 0 ) && ( NS(Blocks_unserialize)( 
+                    blocks, serialized_data_begin ) == 0 ) )
+            {
+                blocks->data_store = ( void* )ptr_data_store;                
+                success = 0;
+            }
+        }
+        
+        if( success != 0 )
+        {
+            NS(MemPool_free)( ptr_data_store );
+            free( ptr_data_store );
+            ptr_data_store = 0;
         }
     }
     

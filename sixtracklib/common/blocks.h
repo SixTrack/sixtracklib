@@ -274,6 +274,15 @@ SIXTRL_STATIC int NS(Blocks_has_data_pointers_store)(
 int NS(Blocks_init)( NS(Blocks)* SIXTRL_RESTRICT blocks,
     NS(block_size_t) max_num_blocks, NS(block_size_t) const data_capacity );
 
+int NS(Blocks_init_with_same_structure_as)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks, 
+    const NS(Blocks) *const SIXTRL_RESTRICT ref_blocks );
+
+int NS(Blocks_init_from_serialized_data)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks, 
+    SIXTRL_GLOBAL_DEC unsigned char const* SIXTRL_RESTRICT data_mem_begin,
+    NS(block_size_t) const total_num_of_bytes );
+
 void NS(Blocks_clear)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 void NS(Blocks_free)(  NS(Blocks)* SIXTRL_RESTRICT blocks );
 
