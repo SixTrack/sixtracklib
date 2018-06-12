@@ -45,7 +45,7 @@
 /* =====  track drifts of constant length                                    */
 /* ========================================================================= */
 
-TEST( CommonTrackTests, TrackDrifts )
+TEST( OpenCLTrackTests, TrackDrifts )
 {
     uint64_t dummy_elem_by_elem_buffer[ 4 ] = { 
             uint64_t{ 0 }, uint64_t{ 0 }, uint64_t{ 0 }, uint64_t{ 0 } };
@@ -338,10 +338,6 @@ TEST( CommonTrackTests, TrackDrifts )
     std::cout << "kernel_time_elapsed: " << kernel_time_elapsed << std::endl;
     std::cout.flush();
     
-    /* ******************************************************************** */
-    /* *****             End of OpenCL based tracking                 ***** */
-    /* ******************************************************************** */
-    
     ret  = queue.enqueueReadBuffer(
             cl_particles_buffer, CL_TRUE, 0, PARTICLES_BUFFER_SIZE, 
             particles_data_buffer );
@@ -355,6 +351,10 @@ TEST( CommonTrackTests, TrackDrifts )
     
     ASSERT_TRUE( ret == CL_SUCCESS );
     
+    /* ******************************************************************** */
+    /* *****             End of OpenCL based tracking                 ***** */
+    /* ******************************************************************** */
+        
     ASSERT_TRUE( 0 == st_Blocks_unserialize( 
         &particles_buffer, particles_data_buffer ) );
     
@@ -372,7 +372,7 @@ TEST( CommonTrackTests, TrackDrifts )
     ASSERT_TRUE( !st_Particles_buffers_map_to_same_memory(
         &initial_particles_buffer, &particles_buffer ) );
     
-    ASSERT_TRUE( 0 == !st_Particles_buffer_compare_values(
+    ASSERT_TRUE( 0 == st_Particles_buffer_compare_values(
         &result_particles_buffer, &particles_buffer ) );
     
     if( use_elem_by_elem_buffer )
@@ -430,4 +430,4 @@ TEST( CommonTrackTests, TrackDrifts )
 /* ************************************************************************* */
 
 
-/* end: sixtracklib/common/tests/test_particles.cpp */
+/* end: sixtracklib/opencl/tests/test_track.cpp */
