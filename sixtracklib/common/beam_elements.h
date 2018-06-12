@@ -21,51 +21,54 @@ struct NS(Blocks);
 
 /* ************************************************************************* */
 
-SIXTRL_STATIC NS(block_size_t) NS(Drift_predict_blocks_data_capacity)(
+SIXTRL_FN SIXTRL_STATIC 
+NS(block_size_t) NS(Drift_predict_blocks_data_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
     NS(block_size_t) const num_of_blocks );
 
 #if !defined( _GPUCODE )
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Drift)* NS(Blocks_add_drift)( 
+SIXTRL_HOST_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Drift)* NS(Blocks_add_drift)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, SIXTRL_REAL_T const length );
 
-SIXTRL_GLOBAL_DEC NS(Drift)* NS(Blocks_reserve_drift)( 
+SIXTRL_HOST_FN SIXTRL_GLOBAL_DEC NS(Drift)* NS(Blocks_reserve_drift)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks );
 
 #endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC NS(block_size_t) NS(DriftExact_predict_blocks_data_capacity)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) 
+NS(DriftExact_predict_blocks_data_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
     NS(block_size_t) const num_of_blocks );
 
 #if !defined( _GPUCODE )
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(DriftExact)* NS(Blocks_add_drift_exact)( 
-    NS(Blocks)* SIXTRL_RESTRICT blocks, SIXTRL_REAL_T const length );
+SIXTRL_HOST_FN  SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(DriftExact)* 
+NS(Blocks_add_drift_exact)( NS(Blocks)* SIXTRL_RESTRICT blocks, 
+                            SIXTRL_REAL_T const length );
 
-SIXTRL_GLOBAL_DEC NS(DriftExact)* NS(Blocks_reserve_drift_exact)( 
-    NS(Blocks)* SIXTRL_RESTRICT blocks );
+SIXTRL_HOST_FN  SIXTRL_GLOBAL_DEC NS(DriftExact)* 
+NS(Blocks_reserve_drift_exact)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 
 #endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC NS(block_size_t) NS(MultiPole_predict_blocks_data_capacity)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(MultiPole_predict_blocks_data_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
     NS(block_size_t) const num_of_blocks, NS(block_size_t) const max_order );
 
 #if !defined( _GPUCODE )
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(Blocks_add_multipole)(
+SIXTRL_HOST_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(Blocks_add_multipole)(
     NS(Blocks)* SIXTRL_RESTRICT blocks, SIXTRL_REAL_T const length, 
     SIXTRL_REAL_T const hxl, SIXTRL_REAL_T const hyl, 
     SIXTRL_INT64_T const order, 
     SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT bal );
     
-SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(Blocks_reserve_multipole)(
+SIXTRL_HOST_FN SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(Blocks_reserve_multipole)(
     NS(Blocks)* SIXTRL_RESTRICT blocks, 
     SIXTRL_INT64_T const order );
 

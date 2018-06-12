@@ -36,13 +36,13 @@ typedef enum NS(BlockType)
 }
 NS(BlockType);
 
-SIXTRL_STATIC NS(block_type_num_t) NS(BlockType_to_number)(
+SIXTRL_FN SIXTRL_STATIC NS(block_type_num_t) NS(BlockType_to_number)(
     NS(BlockType) const type_id );
     
-SIXTRL_STATIC NS(BlockType) NS(BlockType_from_number)(
+SIXTRL_FN SIXTRL_STATIC NS(BlockType) NS(BlockType_from_number)(
     NS(block_type_num_t) const type_id_num );
 
-SIXTRL_STATIC int NS(BlockType_is_valid_number)(
+SIXTRL_FN SIXTRL_STATIC int NS(BlockType_is_valid_number)(
     NS(block_type_num_t) const type_id_num );
 
 /* ------------------------------------------------------------------------- */
@@ -67,53 +67,53 @@ NS(BlockInfo);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC NS(BlockInfo)* NS(BlockInfo_preset)( 
+SIXTRL_FN SIXTRL_STATIC NS(BlockInfo)* NS(BlockInfo_preset)( 
     NS(BlockInfo)* SIXTRL_RESTRICT info );
 
-SIXTRL_STATIC NS(BlockType) NS(BlockInfo_get_type_id)( 
+SIXTRL_FN SIXTRL_STATIC NS(BlockType) NS(BlockInfo_get_type_id)( 
     const NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
-SIXTRL_STATIC NS(block_type_num_t) NS(BlockInfo_get_type_id_num)(
+SIXTRL_FN SIXTRL_STATIC NS(block_type_num_t) NS(BlockInfo_get_type_id_num)(
     const NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
-SIXTRL_STATIC void NS(BlockInfo_set_type_id)(
+SIXTRL_FN SIXTRL_STATIC void NS(BlockInfo_set_type_id)(
     NS(BlockInfo)* SIXTRL_RESTRICT info, NS(BlockType) const type_id );
 
-SIXTRL_STATIC void NS(BlockInfo_set_type_id_num)(
+SIXTRL_FN SIXTRL_STATIC void NS(BlockInfo_set_type_id_num)(
     NS(BlockInfo)* SIXTRL_RESTRICT info, NS(block_type_num_t) const num );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC void const* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC void const* 
 NS(BlockInfo_get_const_ptr_begin)(
     const NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC void* NS(BlockInfo_get_ptr_begin)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC void* NS(BlockInfo_get_ptr_begin)(
     NS(BlockInfo)* SIXTRL_RESTRICT info );
 
-SIXTRL_STATIC void NS(BlockInfo_set_ptr_begin)( 
+SIXTRL_FN SIXTRL_STATIC void NS(BlockInfo_set_ptr_begin)( 
     NS(BlockInfo)* SIXTRL_RESTRICT info, 
     SIXTRL_GLOBAL_DEC void* SIXTRL_RESTRICT ptr_begin );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC void const* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC void const* 
 NS(BlockInfo_get_const_ptr_metadata)(
     const NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC void* NS(BlockInfo_get_ptr_metadata)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC void* NS(BlockInfo_get_ptr_metadata)(
     NS(BlockInfo)* SIXTRL_RESTRICT info );
 
-SIXTRL_STATIC void NS(BlockInfo_set_ptr_metadata)( 
+SIXTRL_FN SIXTRL_STATIC void NS(BlockInfo_set_ptr_metadata)( 
     NS(BlockInfo)* SIXTRL_RESTRICT info, 
     SIXTRL_GLOBAL_DEC void* SIXTRL_RESTRICT ptr_metadata );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC NS(block_size_t) NS(BlockInfo_get_block_size)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(BlockInfo_get_block_size)(
     const NS(BlockInfo) *const SIXTRL_RESTRICT info );
 
-SIXTRL_STATIC void NS(BlockInfo_set_block_size)(
+SIXTRL_FN SIXTRL_STATIC void NS(BlockInfo_set_block_size)(
     NS(BlockInfo)* SIXTRL_RESTRICT info, NS(block_size_t) const length );
 
 /* ------------------------------------------------------------------------- */
@@ -150,145 +150,148 @@ typedef struct NS(Blocks)
 }
 NS(Blocks);
 
-SIXTRL_STATIC NS(Blocks)* NS(Blocks_preset)( 
+SIXTRL_FN SIXTRL_STATIC NS(Blocks)* NS(Blocks_preset)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC int NS(Blocks_are_serialized)( 
+SIXTRL_FN SIXTRL_STATIC int NS(Blocks_are_serialized)( 
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char* 
 NS(Blocks_get_data_begin)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char* 
 NS(Blocks_get_data_end)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const* 
 NS(Blocks_get_const_data_begin)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const* 
 NS(Blocks_get_const_data_end)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_predict_data_capacity_for_num_blocks)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) 
+NS(Blocks_predict_data_capacity_for_num_blocks)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
     NS(block_size_t) const num_of_blocks );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_total_num_bytes)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_total_num_bytes)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC int NS(Blocks_remap)( 
+SIXTRL_FN SIXTRL_STATIC int NS(Blocks_remap)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, 
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin,
     SIXTRL_INT64_T const mem_addr_offset, 
     NS(block_size_t)* SIXTRL_RESTRICT ptr_num_of_blocks, 
     NS(block_size_t)* SIXTRL_RESTRICT ptr_num_of_data_ptrs );
 
-SIXTRL_STATIC int NS(Blocks_unserialize)( NS(Blocks)* SIXTRL_RESTRICT blocks,
+SIXTRL_FN SIXTRL_STATIC int NS(Blocks_unserialize)( 
+    NS(Blocks)* SIXTRL_RESTRICT blocks,
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT data_mem_begin );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_max_num_of_blocks)( 
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_max_num_of_blocks)( 
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_num_of_blocks)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_num_of_blocks)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_blocks_write_capacity)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_blocks_write_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_data_capacity)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_data_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_data_size)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_data_size)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_data_write_capacity)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_data_write_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_max_num_data_pointers)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_max_num_data_pointers)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_num_data_pointers)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_num_data_pointers)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_data_pointers_write_capacity)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) 
+NS(Blocks_get_data_pointers_write_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC void NS(Blocks_set_data_alignment)( 
+SIXTRL_FN SIXTRL_STATIC void NS(Blocks_set_data_alignment)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(block_size_t) const alignment );
                 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_data_alignment)( 
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_data_alignment)( 
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC void NS(Blocks_set_begin_alignment)(
+SIXTRL_FN SIXTRL_STATIC void NS(Blocks_set_begin_alignment)(
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(block_size_t) const alignment );
 
-SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_begin_alignment)(
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) NS(Blocks_get_begin_alignment)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo) const*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo) const*
 NS(Blocks_get_const_block_infos_begin)( 
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo) const* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo) const* 
 NS(Blocks_get_const_block_infos_end)( 
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo) const* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo) const* 
 NS(Blocks_get_const_block_info_by_index)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
     NS(block_size_t) const index );
 
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo)*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo)*
 NS(Blocks_get_block_infos_begin)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
 NS(Blocks_get_block_infos_end)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BlockInfo)* 
 NS(Blocks_get_block_info_by_index)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(block_size_t) const index );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC int NS(Blocks_has_data_store)(
+SIXTRL_FN SIXTRL_STATIC int NS(Blocks_has_data_store)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC int NS(Blocks_has_index_store)(
+SIXTRL_FN SIXTRL_STATIC int NS(Blocks_has_index_store)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
-SIXTRL_STATIC int NS(Blocks_has_data_pointers_store)(
+SIXTRL_FN SIXTRL_STATIC int NS(Blocks_has_data_pointers_store)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #if !defined( _GPUCODE )
 
-int NS(Blocks_init)( NS(Blocks)* SIXTRL_RESTRICT blocks,
+SIXTRL_HOST_FN int NS(Blocks_init)( NS(Blocks)* SIXTRL_RESTRICT blocks,
     NS(block_size_t) max_num_blocks, NS(block_size_t) const data_capacity );
 
-int NS(Blocks_init_with_same_structure_as)(
+SIXTRL_HOST_FN int NS(Blocks_init_with_same_structure_as)(
     NS(Blocks)* SIXTRL_RESTRICT blocks, 
     const NS(Blocks) *const SIXTRL_RESTRICT ref_blocks );
 
-int NS(Blocks_init_from_serialized_data)(
+SIXTRL_HOST_FN int NS(Blocks_init_from_serialized_data)(
     NS(Blocks)* SIXTRL_RESTRICT blocks, 
     SIXTRL_GLOBAL_DEC unsigned char const* SIXTRL_RESTRICT data_mem_begin,
     NS(block_size_t) const total_num_of_bytes );
 
-void NS(Blocks_clear)( NS(Blocks)* SIXTRL_RESTRICT blocks );
-void NS(Blocks_free)(  NS(Blocks)* SIXTRL_RESTRICT blocks );
+SIXTRL_HOST_FN void NS(Blocks_clear)( NS(Blocks)* SIXTRL_RESTRICT blocks );
+SIXTRL_HOST_FN void NS(Blocks_free)(  NS(Blocks)* SIXTRL_RESTRICT blocks );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-NS(BlockInfo)* NS(Blocks_add_block)( 
+SIXTRL_HOST_FN NS(BlockInfo)* NS(Blocks_add_block)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(BlockType) const type_id,
     NS(block_size_t) const block_handle_size,
     const void *const SIXTRL_RESTRICT block_handle,
@@ -299,7 +302,7 @@ NS(BlockInfo)* NS(Blocks_add_block)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-int NS(Blocks_serialize)( NS(Blocks)* SIXTRL_RESTRICT blocks );
+SIXTRL_HOST_FN int NS(Blocks_serialize)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 
 #endif /* !defined( _GPUCODE ) */
     

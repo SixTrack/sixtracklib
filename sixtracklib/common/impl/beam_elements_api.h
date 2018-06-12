@@ -22,112 +22,116 @@ extern "C" {
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC NS(Drift)* NS(Drift_preset)( NS(Drift)* drift );
+SIXTRL_FN SIXTRL_STATIC NS(Drift)* NS(Drift_preset)( NS(Drift)* drift );
 
-SIXTRL_STATIC NS(BlockType) NS(Drift_get_type_id)(
+SIXTRL_FN SIXTRL_STATIC NS(BlockType) NS(Drift_get_type_id)(
     const NS(Drift) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_STATIC NS(block_type_num_t) NS(Drift_get_type_id_num)(
+SIXTRL_FN SIXTRL_STATIC NS(block_type_num_t) NS(Drift_get_type_id_num)(
     const NS(Drift) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_STATIC SIXTRL_REAL_T NS(Drift_get_length)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Drift_get_length)(
     const NS(Drift) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_STATIC void NS(Drift_set_length)(
+SIXTRL_FN SIXTRL_STATIC void NS(Drift_set_length)(
     NS(Drift)* SIXTRL_RESTRICT drift, SIXTRL_REAL_T const length );
     
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Drift) const* NS(Blocks_get_const_drift)( 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC 
+NS(Drift) const* NS(Blocks_get_const_drift)( 
     const NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Drift)* NS(Blocks_get_drift)( 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Drift)* NS(Blocks_get_drift)( 
     NS(BlockInfo)* SIXTRL_RESTRICT block_info );
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC NS(DriftExact)* NS(DriftExact_preset)(
+SIXTRL_FN SIXTRL_STATIC NS(DriftExact)* NS(DriftExact_preset)(
     NS(DriftExact)* drift_exact );
 
-SIXTRL_STATIC NS(BlockType) NS(DriftExact_get_type_id)(
+SIXTRL_FN SIXTRL_STATIC NS(BlockType) NS(DriftExact_get_type_id)(
     const NS(DriftExact) *const SIXTRL_RESTRICT drift_exact );
 
-SIXTRL_STATIC NS(block_type_num_t) NS(DriftExact_get_type_id_num)(
+SIXTRL_FN SIXTRL_STATIC NS(block_type_num_t) NS(DriftExact_get_type_id_num)(
     const NS(DriftExact) *const SIXTRL_RESTRICT drift_exact );
 
-SIXTRL_STATIC SIXTRL_REAL_T NS(DriftExact_get_length)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(DriftExact_get_length)(
     const NS(DriftExact) *const SIXTRL_RESTRICT drift_exact );
 
-SIXTRL_STATIC void NS(DriftExact_set_length)(
+SIXTRL_FN SIXTRL_STATIC void NS(DriftExact_set_length)(
     NS(DriftExact)* SIXTRL_RESTRICT drift_exact, SIXTRL_REAL_T const length );
     
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(DriftExact) const* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(DriftExact) const* 
 NS(Blocks_get_const_drift_exact)( 
     const NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(DriftExact)* NS(Blocks_get_drift_exact)( 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC 
+NS(DriftExact)* NS(Blocks_get_drift_exact)( 
     NS(BlockInfo)* SIXTRL_RESTRICT block_info );
 
 /* ------------------------------------------------------------------------- */
     
-SIXTRL_STATIC NS(MultiPole)* NS(MultiPole_preset)( NS(MultiPole)* multipole );
+SIXTRL_FN SIXTRL_STATIC NS(MultiPole)* 
+NS(MultiPole_preset)( NS(MultiPole)* multipole );
 
-SIXTRL_STATIC NS(BlockType) NS(MultiPole_get_type_id)(
+SIXTRL_FN SIXTRL_STATIC NS(BlockType) NS(MultiPole_get_type_id)(
     const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
 
-SIXTRL_STATIC NS(block_type_num_t) NS(MultiPole_get_type_id_num)(
+SIXTRL_FN SIXTRL_STATIC NS(block_type_num_t) NS(MultiPole_get_type_id_num)(
     const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
 
-SIXTRL_STATIC SIXTRL_REAL_T NS(MultiPole_get_length)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(MultiPole_get_length)(
     const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
 
-SIXTRL_STATIC SIXTRL_REAL_T NS(MultiPole_get_hxl)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(MultiPole_get_hxl)(
     const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
 
-SIXTRL_STATIC SIXTRL_REAL_T NS(MultiPole_get_hyl)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(MultiPole_get_hyl)(
     const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
 
-SIXTRL_STATIC SIXTRL_INT64_T NS(MultiPole_get_order)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_INT64_T NS(MultiPole_get_order)(
     const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* 
 NS(MultiPole_get_const_bal)( const NS(MultiPole) *const SIXTRL_RESTRICT mp );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
 NS(MultiPole_get_bal)( NS(MultiPole)* SIXTRL_RESTRICT mp );
 
-SIXTRL_STATIC SIXTRL_REAL_T NS(MultiPole_get_bal_value)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(MultiPole_get_bal_value)(
     const NS(MultiPole) *const SIXTRL_RESTRICT mp, 
     SIXTRL_INT64_T const index );
 
-SIXTRL_STATIC void NS(MultiPole_set_length)(
+SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_set_length)(
     NS(MultiPole)* SIXTRL_RESTRICT multipole, SIXTRL_REAL_T const length );
 
-SIXTRL_STATIC void NS(MultiPole_set_hxl)(
+SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_set_hxl)(
     NS(MultiPole)* SIXTRL_RESTRICT multipole, SIXTRL_REAL_T const hxl );
 
-SIXTRL_STATIC void NS(MultiPole_set_hyl)(
+SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_set_hyl)(
     NS(MultiPole)* SIXTRL_RESTRICT multipole, SIXTRL_REAL_T const hyl );
 
-SIXTRL_STATIC void NS(MultiPole_set_order)(
+SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_set_order)(
     NS(MultiPole)* SIXTRL_RESTRICT multipole, SIXTRL_INT64_T const order );
 
-SIXTRL_STATIC void NS(MultiPole_set_bal_value)(
+SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_set_bal_value)(
     NS(MultiPole)* SIXTRL_RESTRICT multipole, 
     SIXTRL_INT64_T const index, SIXTRL_REAL_T const value );
 
-SIXTRL_STATIC void NS(MultiPole_set_bal)(
+SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_set_bal)(
     NS(MultiPole)* SIXTRL_RESTRICT multipole, 
     SIXTRL_INT64_T const order, 
     SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT bal );
 
-SIXTRL_STATIC void NS(MultiPole_assign_ptr_to_bal)(
+SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_assign_ptr_to_bal)(
     NS(MultiPole)* SIXTRL_RESTRICT multipole, 
     SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT ptr_to_bal );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(MultiPole) const* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(MultiPole) const* 
 NS(Blocks_get_const_multipole)( 
     const NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(Blocks_get_multipole)( 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC 
+NS(MultiPole)* NS(Blocks_get_multipole)( 
     NS(BlockInfo)* SIXTRL_RESTRICT block_info );
 
 /* ========================================================================= */

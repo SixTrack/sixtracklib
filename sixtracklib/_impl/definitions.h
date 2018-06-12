@@ -1,7 +1,7 @@
 #ifndef SIXTRACKLIB__IMPL_DEFINITIONS_H__
 #define SIXTRACKLIB__IMPL_DEFINITIONS_H__
 
-#if !defined( _GPUCODE )
+#if !defined( _GPUCODE ) || defined(__CUDACC__ )
 
     #include <assert.h>
     #include <stddef.h>
@@ -18,111 +18,248 @@
 
 #if defined( _GPUCODE )
 
-    #pragma OPENCL EXTENSION cl_khr_fp64 : enable 
-    #define SIXTRL_ALIGN 64u
-    
-    /* ---------------------------------------------------------------- */
-    /* assert: */
-    
-    #if !defined (SIXTRL_ASSERT )
-        #define SIXTRL_ASSERT( expr )   
-    #endif /* !defined( SIXTRL_ASSERT ) */
-    
-    /* ---------------------------------------------------------------- */
-    /* Type abstracts : */
-    
-    #if !defined( SIXTRL_REAL_T )
-        #define SIXTRL_REAL_T double 
-    #endif /* !defined( SIXTRL_REAL_T ) */
-    
-    #if !defined( SIXTRL_FLOAT_T )
-        #define SIXTRL_FLOAT_T float  
-    #endif /* !defined( SIXTRL_FLOAT_T ) */
-    
-    #if !defined( SIXTRL_UINT64_T )
-        #define SIXTRL_UINT64_T unsigned long
-    #endif /* !defined( SIXTRL_UINT64_T ) */
-    
-    #if !defined( SIXTRL_INT64_T )
-        #define SIXTRL_INT64_T long
-    #endif /* !defined( SIXTRL_INT64_T ) */
-    
-    #if !defined( SIXTRL_UINT32_T )
-        #define SIXTRL_UINT32_T unsigned int
-    #endif /* !defined( SIXTRL_UINT32_T ) */
-    
-    #if !defined( SIXTRL_INT32_T )
-        #define SIXTRL_INT32_T int
-    #endif /* !defined( SIXTRL_INT32_T ) */
-    
-    #if !defined( SIXTRL_UINT16_T )
-        #define SIXTRL_UINT16_T unsigned short int
-    #endif /* !defined( SIXTRL_UINT32_T ) */
-    
-    #if !defined( SIXTRL_INT16_T )
-        #define SIXTRL_INT16_T short int
-    #endif /* !defined( SIXTRL_INT16_T ) */
-    
-    #if !defined( SIXTRL_UINT8_T )
-        #define SIXTRL_UINT8_T unsigned char 
-    #endif /* !defined( SIXTRL_UINT32_T ) */
-    
-    #if !defined( SIXTRL_INT8_T )
-        #define SIXTRL_INT8_T char
-    #endif /* !defined( SIXTRL_INT8_T ) */
-    
-    #if !defined( SIXTRL_SIZE_T )
-        #define SIXTRL_SIZE_T  size_t
-    #endif /* !defined( SIXTRL_SIZE_T ) */
-    
-    /* ---------------------------------------------------------------- */
-    /* Type decorators -> these go in front of the SIXTRL_*_T type      */
-    
-    #if !defined( SIXTRL_PRIVATE_DEC )
-        #define SIXTRL_PRIVATE_DEC 
-    #endif /* !defined( SIXTRL_PRIVATE_DEC ) */
-    
-    #if !defined( SIXTRL_LOCAL_DEC )
-        #define SIXTRL_LOCAL_DEC __local
-    #endif /* !defined( SIXTRL_LOCAL_DEC ) */
-    
-    #if !defined( SIXTRL_GLOBAL_DEC )
-        #define SIXTRL_GLOBAL_DEC __global
-    #endif /* !defined( SIXTRL_GLOBAL_DEC ) */
-    
-    #if !defined( SIXTRL_CONSTANT_DEC )
-        #define SIXTRL_CONSTANT_DEC __constant
-    #endif /* !defined( SIXTRL_CONSTANT_DEC ) */
-    
-    /* ---------------------------------------------------------------- */
-    /* kernel and restrict key word for kernel parameters: */
-    
-    #if !defined( SIXTRL_GPUKERNEL )
-        #define SIXTRL_GPUKERNEL __kernel 
-    #endif /* !defined( SIXTRL_GPU_KERNEL ) */
-    
-    #if !defined( SIXTRL_GPUKERNEL_RESTRICT )
-        #define   SIXTRL_GPUKERNEL_RESTRICT restrict 
-    #endif /* !defined( SIXTRL_KERNELPARAM_RESTRICT ) */
-    
-    #if !defined( SIXTRL_GPUKERNEL_RESTRICT_REF )
-        #define   SIXTRL_GPUKERNEL_RESTRICT_REF 
-    #endif /* !defined( SIXTRL_KERNELPARAM_RESTRICT_REF ) */
-    
-    /* ---------------------------------------------------------------- */
-    /* static, inline and restrict keywords:                                    */
-    
-    #if !defined( SIXTRL_RESTRICT )
-    #define SIXTRL_RESTRICT SIXTRL_GPUKERNEL_RESTRICT
-    #endif /* !defined( SIXTRL_RESTRICT ) */
-    
-    #if !defined( SIXTRL_STATIC )
-        #define SIXTRL_STATIC 
-    #endif /* !defined( SIXTRL_STATIC ) */
-    
-    #if !defined( SIXTRL_INLINE )
-        #define SIXTRL_INLINE inline 
-    #endif /* !defined( SIXTRL_INLINE ) */
+    #if defined( __OPENCL_C_VERSION__ )
+        #pragma OPENCL EXTENSION cl_khr_fp64 : enable 
+        #define SIXTRL_ALIGN 64u
+        
+        /* ---------------------------------------------------------------- */
+        /* assert: */
+        
+        #if !defined (SIXTRL_ASSERT )
+            #define SIXTRL_ASSERT( expr )   
+        #endif /* !defined( SIXTRL_ASSERT ) */
+        
+        /* ---------------------------------------------------------------- */
+        /* Type abstracts : */
+        
+        #if !defined( SIXTRL_REAL_T )
+            #define SIXTRL_REAL_T double 
+        #endif /* !defined( SIXTRL_REAL_T ) */
+        
+        #if !defined( SIXTRL_FLOAT_T )
+            #define SIXTRL_FLOAT_T float  
+        #endif /* !defined( SIXTRL_FLOAT_T ) */
+        
+        #if !defined( SIXTRL_UINT64_T )
+            #define SIXTRL_UINT64_T unsigned long
+        #endif /* !defined( SIXTRL_UINT64_T ) */
+        
+        #if !defined( SIXTRL_INT64_T )
+            #define SIXTRL_INT64_T long
+        #endif /* !defined( SIXTRL_INT64_T ) */
+        
+        #if !defined( SIXTRL_UINT32_T )
+            #define SIXTRL_UINT32_T unsigned int
+        #endif /* !defined( SIXTRL_UINT32_T ) */
+        
+        #if !defined( SIXTRL_INT32_T )
+            #define SIXTRL_INT32_T int
+        #endif /* !defined( SIXTRL_INT32_T ) */
+        
+        #if !defined( SIXTRL_UINT16_T )
+            #define SIXTRL_UINT16_T unsigned short int
+        #endif /* !defined( SIXTRL_UINT32_T ) */
+        
+        #if !defined( SIXTRL_INT16_T )
+            #define SIXTRL_INT16_T short int
+        #endif /* !defined( SIXTRL_INT16_T ) */
+        
+        #if !defined( SIXTRL_UINT8_T )
+            #define SIXTRL_UINT8_T unsigned char 
+        #endif /* !defined( SIXTRL_UINT32_T ) */
+        
+        #if !defined( SIXTRL_INT8_T )
+            #define SIXTRL_INT8_T char
+        #endif /* !defined( SIXTRL_INT8_T ) */
+        
+        #if !defined( SIXTRL_SIZE_T )
+            #define SIXTRL_SIZE_T  size_t
+        #endif /* !defined( SIXTRL_SIZE_T ) */
+        
+        /* ---------------------------------------------------------------- */
+        /* Type decorators -> these go in front of the SIXTRL_*_T type      */
+        
+        #if !defined( SIXTRL_PRIVATE_DEC )
+            #define SIXTRL_PRIVATE_DEC 
+        #endif /* !defined( SIXTRL_PRIVATE_DEC ) */
+        
+        #if !defined( SIXTRL_LOCAL_DEC )
+            #define SIXTRL_LOCAL_DEC __local
+        #endif /* !defined( SIXTRL_LOCAL_DEC ) */
+        
+        #if !defined( SIXTRL_GLOBAL_DEC )
+            #define SIXTRL_GLOBAL_DEC __global
+        #endif /* !defined( SIXTRL_GLOBAL_DEC ) */
+        
+        #if !defined( SIXTRL_CONSTANT_DEC )
+            #define SIXTRL_CONSTANT_DEC __constant
+        #endif /* !defined( SIXTRL_CONSTANT_DEC ) */
+        
+        /* ---------------------------------------------------------------- */
+        /* kernel and restrict key word for kernel parameters: */
+        
+        #if !defined( SIXTRL_GPUKERNEL )
+            #define SIXTRL_GPUKERNEL __kernel 
+        #endif /* !defined( SIXTRL_GPU_KERNEL ) */
+        
+        #if !defined( SIXTRL_GPUKERNEL_RESTRICT )
+            #define   SIXTRL_GPUKERNEL_RESTRICT restrict 
+        #endif /* !defined( SIXTRL_KERNELPARAM_RESTRICT ) */
+        
+        #if !defined( SIXTRL_GPUKERNEL_RESTRICT_REF )
+            #define   SIXTRL_GPUKERNEL_RESTRICT_REF 
+        #endif /* !defined( SIXTRL_KERNELPARAM_RESTRICT_REF ) */
+        
+        /* ---------------------------------------------------------------- */
+        /* static, inline and restrict keywords:                                    */
+        
+        #if !defined( SIXTRL_RESTRICT )
+        #define SIXTRL_RESTRICT SIXTRL_GPUKERNEL_RESTRICT
+        #endif /* !defined( SIXTRL_RESTRICT ) */
+        
+        #if !defined( SIXTRL_STATIC )
+            #define SIXTRL_STATIC 
+        #endif /* !defined( SIXTRL_STATIC ) */
+        
+        #if !defined( SIXTRL_INLINE )
+            #define SIXTRL_INLINE inline 
+        #endif /* !defined( SIXTRL_INLINE ) */
+        
+        /* ---------------------------------------------------------------- */
+        /* Function header decorators:                                      */
+        
+        #if !defined( SIXTRL_HOST_FN )
+            #define   SIXTRL_HOST_FN 
+        #endif /* SIXTRL_HOST_FN */
+        
+        #if !defined( SIXTRL_DEVICE_FN )
+            #define   SIXTRL_DEVICE_FN 
+        #endif /* SIXTRL_DEVICE_FN */
+        
+        #if !defined( SIXTRL_FN )
+            #define   SIXTRL_FN 
+        #endif /* SIXTRL_FN */
+        
+    #elif defined( __CUDACC__ )
+        /* ---------------------------------------------------------------- */
+        /* assert: */
+        
+        #if !defined (SIXTRL_ASSERT )
+            #define SIXTRL_ASSERT( expr )   
+        #endif /* !defined( SIXTRL_ASSERT ) */
+        
+        /* ---------------------------------------------------------------- */
+        /* Type abstracts : */
+        
+        #if !defined( SIXTRL_REAL_T )
+            #define SIXTRL_REAL_T double 
+        #endif /* !defined( SIXTRL_REAL_T ) */
+        
+        #if !defined( SIXTRL_FLOAT_T )
+            #define SIXTRL_FLOAT_T float  
+        #endif /* !defined( SIXTRL_FLOAT_T ) */
+        
+        #if !defined( SIXTRL_UINT64_T )
+            #define SIXTRL_UINT64_T  uint64_t
+        #endif /* !defined( SIXTRL_UINT64_T ) */
+        
+        #if !defined( SIXTRL_INT64_T )
+            #define SIXTRL_INT64_T int64_t
+        #endif /* !defined( SIXTRL_INT64_T ) */
+        
+        #if !defined( SIXTRL_UINT32_T )
+            #define SIXTRL_UINT32_T uint32_t
+        #endif /* !defined( SIXTRL_UINT32_T ) */
+        
+        #if !defined( SIXTRL_INT32_T )
+            #define SIXTRL_INT32_T int32_t
+        #endif /* !defined( SIXTRL_INT32_T ) */
+        
+        #if !defined( SIXTRL_UINT16_T )
+            #define SIXTRL_UINT16_T uint16_t
+        #endif /* !defined( SIXTRL_UINT32_T ) */
+        
+        #if !defined( SIXTRL_INT16_T )
+            #define SIXTRL_INT16_T int16_t
+        #endif /* !defined( SIXTRL_INT16_T ) */
+        
+        #if !defined( SIXTRL_UINT8_T )
+            #define SIXTRL_UINT8_T uint8_t
+        #endif /* !defined( SIXTRL_UINT32_T ) */
+        
+        #if !defined( SIXTRL_INT8_T )
+            #define SIXTRL_INT8_T int8_t
+        #endif /* !defined( SIXTRL_INT8_T ) */
+        
+        #if !defined( SIXTRL_SIZE_T )
+            #define SIXTRL_SIZE_T  size_t
+        #endif /* !defined( SIXTRL_SIZE_T ) */
+        
+        /* ---------------------------------------------------------------- */
+        /* Type decorators -> these go in front of the SIXTRL_*_T type      */
+        
+        #if !defined( SIXTRL_PRIVATE_DEC )
+            #define SIXTRL_PRIVATE_DEC 
+        #endif /* !defined( SIXTRL_PRIVATE_DEC ) */
+        
+        #if !defined( SIXTRL_LOCAL_DEC )
+            #define SIXTRL_LOCAL_DEC 
+        #endif /* !defined( SIXTRL_LOCAL_DEC ) */
+        
+        #if !defined( SIXTRL_GLOBAL_DEC )
+            #define SIXTRL_GLOBAL_DEC
+        #endif /* !defined( SIXTRL_GLOBAL_DEC ) */
+        
+        #if !defined( SIXTRL_CONSTANT_DEC )
+            #define SIXTRL_CONSTANT_DEC 
+        #endif /* !defined( SIXTRL_CONSTANT_DEC ) */
+        
+        /* ---------------------------------------------------------------- */
+        /* kernel and restrict key word for kernel parameters: */
+        
+        #if !defined( SIXTRL_GPUKERNEL )
+            #define SIXTRL_GPUKERNEL __global__ 
+        #endif /* !defined( SIXTRL_GPU_KERNEL ) */
+        
+        #if !defined( SIXTRL_GPUKERNEL_RESTRICT )
+            #define   SIXTRL_GPUKERNEL_RESTRICT __restrict__
+        #endif /* !defined( SIXTRL_KERNELPARAM_RESTRICT ) */
+        
+        #if !defined( SIXTRL_GPUKERNEL_RESTRICT_REF )
+            #define   SIXTRL_GPUKERNEL_RESTRICT_REF 
+        #endif /* !defined( SIXTRL_KERNELPARAM_RESTRICT_REF ) */
+        
+        /* ---------------------------------------------------------------- */
+        /* static, inline and restrict keywords:                            */
+        
+        #if !defined( SIXTRL_RESTRICT )
+        #define SIXTRL_RESTRICT SIXTRL_GPUKERNEL_RESTRICT
+        #endif /* !defined( SIXTRL_RESTRICT ) */
+        
+        #if !defined( SIXTRL_STATIC )
+            #define SIXTRL_STATIC static
+        #endif /* !defined( SIXTRL_STATIC ) */
+        
+        #if !defined( SIXTRL_INLINE )
+            #define SIXTRL_INLINE 
+        #endif /* !defined( SIXTRL_INLINE ) */
+        
+        /* ---------------------------------------------------------------- */
+        /* Function header decorators:                                      */
+        
+        #if !defined( SIXTRL_HOST_FN )
+            #define   SIXTRL_HOST_FN __host__
+        #endif /* SIXTRL_HOST_FN */
+        
+        #if !defined( SIXTRL_DEVICE_FN )
+            #define   SIXTRL_DEVICE_FN __device__
+        #endif /* SIXTRL_DEVICE_FN */
+        
+        #if !defined( SIXTRL_FN )
+            #define   SIXTRL_FN __host__ __device__
+        #endif /* SIXTRL_FN */
+        
+    #endif /* defined( __OPENCL_C_VERSION__ ) || defined( __CUDACC__ ) */
     
 #else /* !defined( _GPUCODE ) */
     
@@ -298,6 +435,21 @@
     #if !defined( SIXTRL_GPUKERNEL_RESTRICT_REF )
         #define   SIXTRL_GPUKERNEL_RESTRICT_REF SIXTRL_RESTRICT_REF
     #endif /* !defined( SIXTRL_KERNELPARAM_RESTRICT_REF ) */
+    
+    /* ---------------------------------------------------------------- */
+    /* Function header decorators:                                      */
+    
+    #if !defined( SIXTRL_HOST_FN )
+        #define   SIXTRL_HOST_FN 
+    #endif /* SIXTRL_HOST_FN */
+    
+    #if !defined( SIXTRL_DEVICE_FN )
+        #define   SIXTRL_DEVICE_FN 
+    #endif /* SIXTRL_DEVICE_FN */
+    
+    #if !defined( SIXTRL_FN )
+        #define   SIXTRL_FN 
+    #endif /* SIXTRL_FN */
     
 #endif /* defined( _GPUCODE ) */
 

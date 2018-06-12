@@ -24,26 +24,26 @@ struct NS(Blocks);
     
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC NS(BlockType) NS(Particles_get_type_id)(
+SIXTRL_FN SIXTRL_STATIC NS(BlockType) NS(Particles_get_type_id)(
     const NS(Particles) *const SIXTRL_RESTRICT particles );
 
-SIXTRL_STATIC NS(block_type_num_t) NS(Particles_get_type_id_num)(
+SIXTRL_FN SIXTRL_STATIC NS(block_type_num_t) NS(Particles_get_type_id_num)(
     const NS(Particles) *const SIXTRL_RESTRICT particles );
 
-SIXTRL_STATIC NS(block_type_num_t) NS(Particles_predict_blocks_data_capacity)(
+SIXTRL_FN SIXTRL_STATIC NS(block_type_num_t) NS(Particles_predict_blocks_data_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
     NS(block_size_t) const num_of_blocks, 
     NS(block_size_t) const num_of_particles );
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC int NS(Particles_is_valid)(
+SIXTRL_FN SIXTRL_STATIC int NS(Particles_is_valid)(
     const NS(Particles) *const SIXTRL_RESTRICT particles );
 
-SIXTRL_STATIC int NS(Particles_has_mapping)(
+SIXTRL_FN SIXTRL_STATIC int NS(Particles_has_mapping)(
     const NS(Particles) *const SIXTRL_RESTRICT particles );
 
-SIXTRL_STATIC int NS(Particles_is_aligned_with)( 
+SIXTRL_FN SIXTRL_STATIC int NS(Particles_is_aligned_with)( 
     const NS(Particles) *const SIXTRL_RESTRICT particles, 
     NS(block_size_t) const alignment );
 
@@ -51,7 +51,7 @@ SIXTRL_STATIC int NS(Particles_is_aligned_with)(
 
 #if !defined( _GPUCODE )
 
-SIXTRL_GLOBAL_DEC NS(Particles)* 
+SIXTRL_HOST_FN SIXTRL_GLOBAL_DEC NS(Particles)* 
 NS(Blocks_add_particles)( NS(Blocks)* SIXTRL_RESTRICT blocks, 
     NS(block_num_elements_t) const num_of_particles );
 

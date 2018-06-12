@@ -20,24 +20,24 @@ extern "C" {
 
 #endif /* !defined( _GPUCODE ) */
 
-SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_drift_particle)( 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_drift_particle)( 
     NS(Particles)* SIXTRL_RESTRICT particles,                                                            
     NS(block_num_elements_t) const ii, 
     const NS(Drift) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_drift_exact_particle)( 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_drift_exact_particle)( 
     NS(Particles)* SIXTRL_RESTRICT particles, 
     NS(block_num_elements_t)  const ii, 
     const NS(DriftExact) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_multipole_particle)( 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_multipole_particle)( 
     NS(Particles)* SIXTRL_RESTRICT particles, 
     NS(block_num_elements_t)  const ii, 
     const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_TRACK_RETURN 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN 
 NS(Track_range_of_particles_over_beam_element)(    
     NS(Particles)* SIXTRL_RESTRICT particles, 
     NS(block_num_elements_t) index,
