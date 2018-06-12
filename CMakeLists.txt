@@ -85,6 +85,13 @@ if( SIXTRACKL_ENABLE_OPENCL )
 endif()
 
 # ------------------------------------------------------------------------------
+# CUDA:
+
+if( SIXTRACKL_ENABLE_CUDA )
+    include( SetupCuda )
+endif()
+
+# ------------------------------------------------------------------------------
 # OpenMP:
 
 if( SIXTRACKL_ENABLE_OPENMP )

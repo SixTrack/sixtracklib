@@ -105,6 +105,26 @@ endif()
 
 # ------------------------------------------------------------------------------
 
+if( SIXTRACKL_ENABLE_CUDA )
+
+    set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} 
+                                  ${SIXTRACKL_CUDA_LIBRARIES} )
+    
+    add_subdirectory( cuda )
+        
+#     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
+#          $<TARGET_OBJECTS:sixtrack_cuda_part> )
+        
+    set( SIXTRACKL_ENABLE_MODULE_CUDA 1 )
+    
+else()
+    
+    set( SIXTRACKL_ENABLE_MODULE_CUDA 0 )
+
+endif()
+
+# ------------------------------------------------------------------------------
+
 # if( SIXTRACKL_ENABLE_MPFR4 )
 #     add_subdirectory( mpfr4 )    
 #     
