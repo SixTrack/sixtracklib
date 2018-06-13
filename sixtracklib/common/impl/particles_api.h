@@ -72,7 +72,7 @@ SIXTRL_FN SIXTRL_STATIC void NS( Particles_calculate_difference)(
 
 SIXTRL_FN SIXTRL_STATIC void NS( Particles_get_max_value)(
     struct NS(Particles)* SIXTRL_RESTRICT destination, 
-    NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
+    SIXTRL_GLOBAL_DEC NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
     const struct NS(Particles) *const SIXTRL_RESTRICT source );
 
 SIXTRL_FN SIXTRL_STATIC void NS( Particles_buffer_calculate_difference)(
@@ -82,7 +82,7 @@ SIXTRL_FN SIXTRL_STATIC void NS( Particles_buffer_calculate_difference)(
 
 SIXTRL_FN SIXTRL_STATIC void NS( Particles_buffer_get_max_value )(
     struct NS(Blocks)* SIXTRL_RESTRICT destination,
-    NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
+    SIXTRL_GLOBAL_DEC NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
     const struct NS(Blocks) *const SIXTRL_RESTRICT source );
 
 /* ------------------------------------------------------------------------- */
@@ -1133,12 +1133,12 @@ SIXTRL_INLINE void NS( Particles_calculate_difference)(
 
 SIXTRL_INLINE void NS( Particles_get_max_value)(
     NS(Particles)* SIXTRL_RESTRICT destination, 
-    NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
+    SIXTRL_GLOBAL_DEC NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
     const NS(Particles) *const SIXTRL_RESTRICT source )
 {
-    static SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0L;
+    SIXTRL_STATIC SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0L;
     
-    if( ( destination     != NULL ) && ( source != NULL ) && 
+    if( ( destination     != 0 ) && ( source != 0 ) && 
         ( NS(Particles_get_num_particles)( destination ) > 0u ) &&
         ( NS(Particles_get_num_particles)( source      ) > 0u ) )
     {
@@ -1241,9 +1241,6 @@ SIXTRL_INLINE void NS( Particles_get_max_value)(
             in_int64_values_begin[  3 ] + num_particles
         };
         
-        if( max_value_index == NULL ) 
-                max_value_index = &dummy_max_value_indices[ 0 ];
-        
         for( ; ii < 16 ; ++ii )
         {
             g_real_ptr_t in_it  = in_real_values_begin[ ii ];
@@ -1252,8 +1249,8 @@ SIXTRL_INLINE void NS( Particles_get_max_value)(
             SIXTRL_REAL_T max_value     = ( SIXTRL_REAL_T )0.0;
             SIXTRL_REAL_T cmp_max_value = max_value;
             
-            NS(block_size_t) kk     = ( NS(block_size_t) )0u;
-            max_value_index[ ii ]   = ( NS(block_size_t) )0u;
+            NS(block_size_t) kk = ( NS(block_size_t) )0u;
+            dummy_max_value_indices[ ii ] = ( NS(block_size_t) )0u;
             
             for( ; in_it != in_end ; ++in_it, ++kk )
             {
@@ -1265,7 +1262,7 @@ SIXTRL_INLINE void NS( Particles_get_max_value)(
                 {
                     max_value = value;
                     cmp_max_value = cmp_value;
-                    max_value_index[ ii ] = kk;
+                    dummy_max_value_indices[ ii ] = kk;
                 }
             }
             
@@ -1281,7 +1278,7 @@ SIXTRL_INLINE void NS( Particles_get_max_value)(
             SIXTRL_INT64_T cmp_max_value = max_value;
             
             NS(block_size_t)      kk = ( NS(block_size_t ) )0u;
-            max_value_index[ jj ]    = ( NS(block_size_t ) )0u;
+            dummy_max_value_indices[ jj ] = ( NS(block_size_t ) )0u;
             
             for( ; in_it != in_end ; ++in_it, ++kk )
             {
@@ -1292,11 +1289,19 @@ SIXTRL_INLINE void NS( Particles_get_max_value)(
                 {
                     cmp_max_value = cmp_value;
                     max_value     = value;
-                    max_value_index[ ii ] = kk; 
+                    dummy_max_value_indices[ jj ] = kk; 
                 }
             }
             
             *out_int64_values_begin[ ii ] = max_value;
+        }
+        
+        if( max_value_index != 0 )
+        {
+            SIXTRACKLIB_COPY_VALUES( NS(block_size_t), max_value_index, 
+                                     &dummy_max_value_indices[ 0 ], 20 );
+            
+            max_value_index = max_value_index + 20;
         }
     }
     
@@ -1305,7 +1310,7 @@ SIXTRL_INLINE void NS( Particles_get_max_value)(
 
 SIXTRL_INLINE void NS( Particles_buffer_get_max_value )(
     NS(Blocks)* SIXTRL_RESTRICT destination,
-    NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
+    SIXTRL_GLOBAL_DEC NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
     const NS(Blocks) *const SIXTRL_RESTRICT source )
 {
     if( ( destination != 0 ) && ( source != 0 ) && 
@@ -1313,23 +1318,53 @@ SIXTRL_INLINE void NS( Particles_buffer_get_max_value )(
           NS(Blocks_get_num_of_blocks)( source ) ) &&
         ( NS(Blocks_get_num_of_blocks)( destination ) > 0u ) )
     {
-        NS(BlockInfo)* dest_it = 
+        SIXTRL_GLOBAL_DEC NS(BlockInfo)* dest_it = 
             NS(Blocks_get_block_infos_begin)( destination );
             
-        NS(BlockInfo)* dest_end =
+        SIXTRL_GLOBAL_DEC NS(BlockInfo)* dest_end =
             NS(Blocks_get_block_infos_end)( destination );
             
-        NS(BlockInfo) const* src_it =
+        SIXTRL_GLOBAL_DEC NS(BlockInfo) const* src_it =
             NS(Blocks_get_const_block_infos_begin)( source );
             
         for( ; dest_it != dest_end ; ++dest_it, ++src_it )
         {
-            NS(Particles)* dest_particles = 
-                NS(Blocks_get_particles)( dest_it );
+            NS(Particles)* dest_particles = 0;
+            NS(Particles) const* source_particles = 0;
+            
+            #if defined( _GPUCODE ) && !defined( __CUDACC__ )
+            
+            NS(BlockInfo) temp_dest_info   = *dest_it;
+            NS(BlockInfo) temp_source_info = *src_it;
+            
+            SIXTRL_GLOBAL_DEC NS(Particles)* ptr_dest_particles = 
+                NS(Blocks_get_particles)( &temp_dest_info );
                 
-            NS(Particles) const* source_particles =
-                NS(Blocks_get_const_particles)( src_it );
-                
+            SIXTRL_GLOBAL_DEC NS(Particles) const* ptr_source_particles =
+                NS(Blocks_get_const_particles)( &temp_source_info );
+            
+            NS(Particles) temp_dest_particles;
+            NS(Particles) temp_source_particles;
+            
+            if( ptr_dest_particles != 0 )
+            {
+                temp_dest_particles = *ptr_dest_particles;
+                dest_particles = &temp_dest_particles;
+            }
+            
+            if( ptr_source_particles != 0 )
+            {
+                temp_source_particles = *ptr_source_particles;
+                source_particles = &temp_source_particles;
+            }
+            
+            #else
+            
+            dest_particles   = NS(Blocks_get_particles)( dest_it );                
+            source_particles = NS(Blocks_get_const_particles)( src_it );
+            
+            #endif /* defined( _GPUCODE ) && !defined( __CUDACC__ ) */
+            
             NS(Particles_get_max_value)( 
                 dest_particles, max_value_index, source_particles );
             
@@ -1346,17 +1381,24 @@ SIXTRL_INLINE void NS( Particles_buffer_calculate_difference)(
     const NS(Blocks) *const SIXTRL_RESTRICT rhs, 
     NS(Blocks)* SIXTRL_RESTRICT diff )
 {
-    NS(BlockInfo) const* lhs_it  = NS(Blocks_get_const_block_infos_begin)( lhs );
-    NS(BlockInfo) const* lhs_end = NS(Blocks_get_const_block_infos_end)( lhs );
-    NS(BlockInfo) const* rhs_it  = NS(Blocks_get_const_block_infos_begin)( rhs );
-    NS(BlockInfo)*      diff_it  = NS(Blocks_get_block_infos_begin)( diff );
+    SIXTRL_GLOBAL_DEC NS(BlockInfo) const* lhs_it  = 
+        NS(Blocks_get_const_block_infos_begin)( lhs );
+        
+    SIXTRL_GLOBAL_DEC NS(BlockInfo) const* lhs_end = 
+        NS(Blocks_get_const_block_infos_end)( lhs );
+        
+    SIXTRL_GLOBAL_DEC NS(BlockInfo) const* rhs_it  = 
+        NS(Blocks_get_const_block_infos_begin)( rhs );
+        
+    SIXTRL_GLOBAL_DEC NS(BlockInfo)*      diff_it  = 
+        NS(Blocks_get_block_infos_begin)( diff );
     
     
-    if( ( lhs_it  != NULL ) && ( lhs_end != NULL ) && 
-        ( rhs_it  != NULL ) && ( rhs_it  != lhs_it ) &&
-        ( diff_it != NULL ) && ( diff_it != lhs_it ) && ( diff_it != rhs_it ) )
+    if( ( lhs_it  != 0 ) && ( lhs_end != 0 ) && 
+        ( rhs_it  != 0 ) && ( rhs_it  != lhs_it ) &&
+        ( diff_it != 0 ) && ( diff_it != lhs_it ) && ( diff_it != rhs_it ) )
     {
-        #if !defined( NDEBUG )
+        #if !defined( NDEBUG ) && !defined( _GPUCODE ) && !defined( __CUDACC__ )
         ptrdiff_t const num_blocks = lhs_end - lhs_it;
         #endif /* !defined( NDEBUG ) */
         
@@ -1368,13 +1410,54 @@ SIXTRL_INLINE void NS( Particles_buffer_calculate_difference)(
         
         for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it, ++diff_it )
         {
-            NS(Particles) const* lhs_particles = 
-                NS(Blocks_get_const_particles)( lhs_it );
+            NS(Particles) const* lhs_particles = 0;
+            NS(Particles) const* rhs_particles = 0;
+            NS(Particles)* diff_particles = 0;
+            
+            #if defined( _GPUCODE ) && !defined( __CUDACC__ )
+            
+            NS(BlockInfo) temp_lhs_info  = *lhs_it;
+            NS(BlockInfo) temp_rhs_info  = *rhs_it;
+            NS(BlockInfo) temp_diff_info = *diff_it;
+            
+            SIXTRL_GLOBAL_DEC NS(Particles) const* ptr_lhs_particles =
+                NS(Blocks_get_const_particles)( &temp_lhs_info );
                 
-            NS(Particles) const* rhs_particles =
-                NS(Blocks_get_const_particles)( rhs_it );
+            SIXTRL_GLOBAL_DEC NS(Particles) const* ptr_rhs_particles =
+                NS(Blocks_get_const_particles)( &temp_rhs_info );
                 
-            NS(Particles)* diff_particles = NS(Blocks_get_particles)( diff_it );
+            SIXTRL_GLOBAL_DEC NS(Particles)* ptr_diff_particles =
+                NS(Blocks_get_particles)( &temp_diff_info );
+                
+            NS(Particles) temp_lhs_particles;
+            NS(Particles) temp_rhs_particles;
+            NS(Particles) temp_diff_particles;
+            
+            if( ptr_lhs_particles != 0 )
+            {
+                temp_lhs_particles = *ptr_lhs_particles;
+                lhs_particles = &temp_lhs_particles;
+            }
+            
+            if( ptr_rhs_particles != 0 )
+            {
+                temp_rhs_particles = *ptr_rhs_particles;
+                rhs_particles = &temp_rhs_particles;
+            }
+            
+            if( ptr_diff_particles != 0 )
+            {
+                temp_diff_particles = *ptr_diff_particles;
+                diff_particles = &temp_diff_particles;
+            }
+            
+            #else
+            
+            lhs_particles  = NS(Blocks_get_const_particles)( lhs_it );
+            rhs_particles  = NS(Blocks_get_const_particles)( rhs_it );
+            diff_particles = NS(Blocks_get_particles)( diff_it );
+            
+            #endif /* defined( _GPUCODE ) && !defined( __CUDACC__ ) */
                 
             NS(Particles_calculate_difference)( 
                 lhs_particles, rhs_particles, diff_particles );
