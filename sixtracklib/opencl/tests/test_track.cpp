@@ -5,11 +5,12 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <iterator>
-#include <fstream>
-#include <sstream>
 #include <cmath>
+#include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <CL/cl.hpp>
@@ -372,11 +373,56 @@ TEST( OpenCLTrackTests, TrackDrifts )
     ASSERT_TRUE( !st_Particles_buffers_map_to_same_memory(
         &initial_particles_buffer, &particles_buffer ) );
     
-    ASSERT_TRUE( 0 == st_Particles_buffer_compare_values(
-        &result_particles_buffer, &particles_buffer ) );
+    if( 0 != st_Particles_buffer_compare_values(
+        &result_particles_buffer, &particles_buffer ) )
+    {
+        st_Blocks max_diff_buffer;
+        st_Blocks_preset( &max_diff_buffer );
+        
+        st_block_size_t const MAX_DIST_DATA_CAPACITY = 
+            st_Blocks_predict_data_capacity_for_num_blocks(
+                &max_diff_buffer, NUM_OF_PARTICLE_BLOCKS ) +
+            st_Particles_predict_blocks_data_capacity(
+                &max_diff_buffer, NUM_OF_PARTICLE_BLOCKS, 1u );
+        
+        st_Blocks_init( &max_diff_buffer, 
+                        NUM_OF_PARTICLE_BLOCKS, MAX_DIST_DATA_CAPACITY );
+        
+        for( st_block_size_t ii = 0 ; ii < NUM_OF_PARTICLE_BLOCKS ; ++ii )
+        {
+            st_Particles* particles = st_Blocks_add_particles( 
+                &max_diff_buffer, 1u );
+            
+            if( particles != nullptr )
+            {
+                st_Particles_preset_values( particles );
+            }
+        }
+        
+        std::vector< st_block_size_t > max_diff_index(
+            NUM_OF_PARTICLE_BLOCKS * 20, st_block_size_t{ 0 } );
+        
+        st_Blocks_serialize( &max_diff_buffer );
+        
+        st_Particles_buffer_get_max_difference( 
+            &max_diff_buffer, max_diff_index.data(),
+            &result_particles_buffer, &particles_buffer );
+        
+        fprintf( stdout, "|Diff| = |precalculated result - calculated|\r\n" );
+        
+        st_Particles_buffer_print_max_diff( 
+            stdout, &max_diff_buffer, max_diff_index.data() );
+        
+        st_Blocks_free( &max_diff_buffer );
+    }
     
     if( use_elem_by_elem_buffer )
     {
+        st_block_size_t ll = 0;
+        
+        st_block_size_t const num_elem_by_elem_per_turn = 
+            NUM_OF_PARTICLE_BLOCKS * NUM_OF_BEAM_ELEMENTS;
+        
         st_BlockInfo const* block_it = st_Blocks_get_const_block_infos_begin( 
             &calculated_elem_by_elem_buffer );
         
@@ -397,7 +443,7 @@ TEST( OpenCLTrackTests, TrackDrifts )
         ASSERT_TRUE( std::distance( cmp_block_end, cmp_block_it ) >=
                      std::distance( block_end,     block_it     ) );
         
-        for( ; block_it != block_end ; ++block_it, ++cmp_block_it )
+        for( ; block_it != block_end ; ++block_it, ++cmp_block_it, ++ll )
         {
             st_Particles const* particles = 
                 st_Blocks_get_const_particles( block_it );
@@ -411,8 +457,25 @@ TEST( OpenCLTrackTests, TrackDrifts )
             ASSERT_TRUE( !st_Particles_map_to_same_memory(
                 particles, cmp_particles ) );
             
-            ASSERT_TRUE( 0 == st_Particles_compare_values(
-                particles, cmp_particles ) );
+            if( 0 != st_Particles_compare_values( particles, cmp_particles ) )
+            {
+                st_block_size_t const turn = ll / num_elem_by_elem_per_turn;
+                st_block_size_t       temp = ll % num_elem_by_elem_per_turn;
+                
+                st_block_size_t const particle_block_index = 
+                    temp / NUM_OF_BEAM_ELEMENTS;
+                    
+                st_block_size_t const beam_element_index =
+                    temp % NUM_OF_BEAM_ELEMENTS;
+                
+                fprintf( stdout, "first deviation in elem_by_elem buffer @"
+                         "elem_by_elem_block_index = %8lu :: "
+                         "turn = %8lu / part_block_idx = %8ld / "
+                         "beam_elem_id = %8ld\r\n", 
+                         ll, turn, particle_block_index, beam_element_index );
+                
+                break;
+            }
         }
     }
     
