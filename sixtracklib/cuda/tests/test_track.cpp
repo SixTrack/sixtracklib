@@ -9,7 +9,7 @@
 #include <cmath>
 #include <vector>
 
-// #include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 #if defined( __NAMESPACE )
     #define __SAVED_NAMESPACE __NAMESPACE
@@ -44,8 +44,8 @@
 /* =====  track drifts of constant length                                    */
 /* ========================================================================= */
 
-// TEST( CudaTrackTests, TrackDrifts )
-int main()
+TEST( CudaTrackTests, TrackDrifts )
+// int main()
 {
     st_Blocks initial_particles_buffer;
     st_Blocks result_particles_buffer;
@@ -59,7 +59,7 @@ int main()
     
     uint64_t NUM_OF_TURNS = uint64_t{ 0 };
     
-    SIXTRL_ASSERT( st_Tracks_restore_testdata_from_binary_file(
+    ASSERT_TRUE( st_Tracks_restore_testdata_from_binary_file(
         st_PATH_TO_TEST_TRACKING_DRIFT_DATA, &NUM_OF_TURNS,
         &initial_particles_buffer, 
         &result_particles_buffer, 
@@ -94,7 +94,7 @@ int main()
     st_Blocks particles_buffer;
     st_Blocks_preset( &particles_buffer );
     
-    SIXTRL_ASSERT( 0 == st_Blocks_init_from_serialized_data( &particles_buffer, 
+    ASSERT_TRUE( 0 == st_Blocks_init_from_serialized_data( &particles_buffer, 
        st_Blocks_get_const_data_begin( &initial_particles_buffer ),
        st_Blocks_get_total_num_bytes(  &initial_particles_buffer ) ) );
     
@@ -113,7 +113,7 @@ int main()
         ( ( NUM_OF_TURNS * NUM_IO_ELEMENTS_PER_TURN ) 
             <= AVAILABLE_ELEM_BY_ELEM_BLOCKS ) )
     {
-        SIXTRL_ASSERT( 0 == st_Blocks_init_from_serialized_data( 
+        ASSERT_TRUE( 0 == st_Blocks_init_from_serialized_data( 
             &calculated_elem_by_elem_buffer,
             st_Blocks_get_const_data_begin( &calculated_elem_by_elem_buffer ),
             st_Blocks_get_total_num_bytes(  &calculated_elem_by_elem_buffer ) ) 
@@ -131,7 +131,7 @@ int main()
     /* *****                  CUDA based tracking                     ***** */
     /* ******************************************************************** */
     
-    SIXTRL_ASSERT( st_Track_particles_on_cuda( 
+    ASSERT_TRUE( st_Track_particles_on_cuda( 
         32, 8, NUM_OF_TURNS, &particles_buffer, &beam_elements, 
         ptr_elem_by_elem_buffer ) );
     
@@ -139,20 +139,25 @@ int main()
     /* *****              End of CUDA based tracking                  ***** */
     /* ******************************************************************** */
     
-    SIXTRL_ASSERT( st_Particles_buffers_have_same_structure( 
+    ASSERT_TRUE( st_Particles_buffers_have_same_structure( 
         &initial_particles_buffer, &result_particles_buffer ) );
     
-    SIXTRL_ASSERT( st_Particles_buffers_have_same_structure( 
+    ASSERT_TRUE( st_Particles_buffers_have_same_structure( 
         &initial_particles_buffer, &particles_buffer ) );
     
-    SIXTRL_ASSERT( !st_Particles_buffers_map_to_same_memory(
+    ASSERT_TRUE( !st_Particles_buffers_map_to_same_memory(
         &initial_particles_buffer, &result_particles_buffer ) );
     
-    SIXTRL_ASSERT( !st_Particles_buffers_map_to_same_memory(
+    ASSERT_TRUE( !st_Particles_buffers_map_to_same_memory(
         &initial_particles_buffer, &particles_buffer ) );
     
-    if( 0 != st_Particles_buffer_compare_values(
+    if( 0 == st_Particles_buffer_compare_values(
         &result_particles_buffer, &particles_buffer ) )
+    {
+        std::cout << "calculated result and result from testdata are "
+                     "bit-for-bit identical --> Success!" << std::endl;
+    }
+    else
     {
         st_Blocks max_diff_buffer;
         st_Blocks_preset( &max_diff_buffer );
@@ -213,12 +218,12 @@ int main()
         st_BlockInfo const* cmp_block_end =
             st_Blocks_get_const_block_infos_end( &elem_by_elem_buffer );
         
-        SIXTRL_ASSERT( ( block_it      != nullptr ) && 
+        ASSERT_TRUE( ( block_it      != nullptr ) && 
                        ( block_end     != nullptr ) &&
                        ( cmp_block_it  != nullptr ) && 
                        ( cmp_block_end != nullptr ) );
              
-        SIXTRL_ASSERT( std::distance( cmp_block_end, cmp_block_it ) >=
+        ASSERT_TRUE( std::distance( cmp_block_end, cmp_block_it ) >=
                        std::distance( block_end,     block_it     ) );
         
         for( ; block_it != block_end ; ++block_it, ++cmp_block_it )
@@ -229,10 +234,10 @@ int main()
             st_Particles const* cmp_particles = 
                 st_Blocks_get_const_particles( cmp_block_it );
             
-            SIXTRL_ASSERT( st_Particles_have_same_structure( 
+            ASSERT_TRUE( st_Particles_have_same_structure( 
                 particles, cmp_particles ) );
             
-            SIXTRL_ASSERT( !st_Particles_map_to_same_memory(
+            ASSERT_TRUE( !st_Particles_map_to_same_memory(
                 particles, cmp_particles ) );
             
             if( 0 != st_Particles_compare_values( particles, cmp_particles ) )
@@ -267,7 +272,7 @@ int main()
     st_Blocks_free( &beam_elements );
     st_Blocks_free( &elem_by_elem_buffer );    
     
-    return 0;
+//     return 0;
 }
 
 /* ************************************************************************* */
