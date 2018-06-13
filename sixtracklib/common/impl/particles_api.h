@@ -1356,7 +1356,9 @@ SIXTRL_INLINE void NS( Particles_buffer_calculate_difference)(
         ( rhs_it  != NULL ) && ( rhs_it  != lhs_it ) &&
         ( diff_it != NULL ) && ( diff_it != lhs_it ) && ( diff_it != rhs_it ) )
     {
+        #if !defined( NDEBUG )
         ptrdiff_t const num_blocks = lhs_end - lhs_it;
+        #endif /* !defined( NDEBUG ) */
         
         SIXTRL_ASSERT( 
             ( num_blocks == ( ptrdiff_t 
