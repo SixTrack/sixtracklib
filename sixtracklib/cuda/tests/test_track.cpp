@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <vector>
 
 // #include <gtest/gtest.h>
 
@@ -195,6 +196,11 @@ int main()
     
     if( use_elem_by_elem_buffer )
     {
+        st_block_size_t ll = ( st_block_size_t )0u;
+        
+        st_block_size_t const num_elem_by_elem_per_turn = 
+            NUM_OF_PARTICLE_BLOCKS * NUM_OF_BEAM_ELEMENTS;
+        
         st_BlockInfo const* block_it = st_Blocks_get_const_block_infos_begin( 
             &calculated_elem_by_elem_buffer );
         
