@@ -1110,102 +1110,102 @@ void NS(Particles_print_max_diff)(
     
     if( ( fp != 0 ) && ( max_diff != 0 ) && ( num_particles >= 1u ) )
     {
-        fprintf( fp, "Delta |q0|             = %8.4f"
+        fprintf( fp, "Delta |q0|             = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_q0_value)( max_diff, 0 ), 
                     max_diff_indices[  0 ] );
         
-        fprintf( fp, "Delta |mass0|          = %8.4f"
+        fprintf( fp, "Delta |mass0|          = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_mass0_value)( max_diff, 0 ), 
                     max_diff_indices[  1 ]  );
         
-        fprintf( fp, "Delta |beta0|          = %8.4f"
+        fprintf( fp, "Delta |beta0|          = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_beta0_value)( max_diff, 0 ), 
                     max_diff_indices[  2 ]  );
         
-        fprintf( fp, "Delta |gamma0|         = %8.4f"
+        fprintf( fp, "Delta |gamma0|         = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_gamma0_value)( max_diff, 0 ), 
                     max_diff_indices[  3 ]  );
         
-        fprintf( fp, "Delta |p0c|            = %8.4f"
+        fprintf( fp, "Delta |p0c|            = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_p0c_value)( max_diff, 0 ), 
                     max_diff_indices[  4 ]  );
         
-        fprintf( fp, "Delta |s|              = %8.4f"
+        fprintf( fp, "Delta |s|              = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_s_value)( max_diff, 0 ), 
                     max_diff_indices[  5 ]  );
         
-        fprintf( fp, "Delta |x|              = %8.4f"
+        fprintf( fp, "Delta |x|              = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_x_value)( max_diff, 0 ), 
                     max_diff_indices[  6 ]  );
         
-        fprintf( fp, "Delta |y|              = %8.4f"
+        fprintf( fp, "Delta |y|              = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_y_value)( max_diff, 0 ), 
                     max_diff_indices[  7 ]  );
         
-        fprintf( fp, "Delta |px|             = %8.4f"
+        fprintf( fp, "Delta |px|             = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_px_value)( max_diff, 0 ), 
                     max_diff_indices[  8 ]  );
         
-        fprintf( fp, "Delta |py|             = %8.4f"
+        fprintf( fp, "Delta |py|             = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_py_value)( max_diff, 0 ), 
                     max_diff_indices[  9 ]  );
         
-        fprintf( fp, "Delta |sigma|          = %8.4f"
+        fprintf( fp, "Delta |sigma|          = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_sigma_value)( max_diff, 0 ), 
                     max_diff_indices[ 10 ]  );
         
-        fprintf( fp, "Delta |psigma|         = %8.4f"
+        fprintf( fp, "Delta |psigma|         = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_psigma_value)( max_diff, 0 ), 
                     max_diff_indices[ 11 ]  );
         
-        fprintf( fp, "Delta |delta|          = %8.4f"
+        fprintf( fp, "Delta |delta|          = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_delta_value)( max_diff, 0 ), 
                     max_diff_indices[ 12 ]  );
         
-        fprintf( fp, "Delta |rpp|            = %8.4f"
+        fprintf( fp, "Delta |rpp|            = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_rpp_value)( max_diff, 0 ), 
                     max_diff_indices[ 13 ]  );
         
-        fprintf( fp, "Delta |rvv|            = %8.4f"
+        fprintf( fp, "Delta |rvv|            = %.16e  "
 					 "max diff at index = %8lu\r\n", 
                     NS(Particles_get_rvv_value)( max_diff, 0 ), 
                     max_diff_indices[ 14 ]  );
         
-        fprintf( fp, "Delta |chi|            = %8.4f  "
+        fprintf( fp, "Delta |chi|            = %.16e  "
                      "max diff at index = %8lu\r\n", 
                     NS(Particles_get_chi_value)( max_diff, 0 ), 
                     max_diff_indices[ 15 ]  );
         
-        fprintf( fp, "Delta |particle_id|    = %8ld  "
+        fprintf( fp, "Delta |particle_id|    = %22ld  "
                      "max diff at index = %8lu\r\n", 
                     NS(Particles_get_particle_id_value)( max_diff, 0 ), 
                     max_diff_indices[ 16 ]  );
         
-        fprintf( fp, "Delta |lost| @ elem_id = %8ld  "
+        fprintf( fp, "Delta |lost| @ elem_id = %22ld  "
                      "max diff at index = %8lu\r\n", 
                     NS(Particles_get_lost_at_element_id_value)( max_diff, 0 ), 
                     max_diff_indices[ 17 ]  );
         
-        fprintf( fp, "Delta |lost| @ turn    = %8ld  "
+        fprintf( fp, "Delta |lost| @ turn    = %22ld  "
                      "max diff at index = %8lu\r\n",
                     NS(Particles_get_lost_at_turn_value)( max_diff, 0 ), 
                     max_diff_indices[ 18 ]  );
                     
-        fprintf( fp, "Delta |state|          = %8ld  "
+        fprintf( fp, "Delta |state|          = %22ld  "
                      "max diff at index = %8lu\r\n\r\n",
                     NS(Particles_get_state_value)( max_diff, 0 ), 
                     max_diff_indices[ 19 ]  );
