@@ -65,6 +65,26 @@ SIXTRL_FN SIXTRL_STATIC void NS( Particles_copy_all_unchecked )(
     struct NS( Particles ) * SIXTRL_RESTRICT des,
     const struct NS( Particles ) *const SIXTRL_RESTRICT src );
 
+SIXTRL_FN SIXTRL_STATIC void NS( Particles_calculate_difference)(
+    const struct NS(Particles) *const SIXTRL_RESTRICT lhs, 
+    const struct NS(Particles) *const SIXTRL_RESTRICT rhs, 
+    struct NS(Particles)* SIXTRL_RESTRICT diff );
+
+SIXTRL_FN SIXTRL_STATIC void NS( Particles_get_max_value)(
+    struct NS(Particles)* SIXTRL_RESTRICT destination, 
+    NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
+    const struct NS(Particles) *const SIXTRL_RESTRICT source );
+
+SIXTRL_FN SIXTRL_STATIC void NS( Particles_buffer_calculate_difference)(
+    const struct NS(Blocks) *const SIXTRL_RESTRICT lhs, 
+    const struct NS(Blocks) *const SIXTRL_RESTRICT rhs, 
+    struct NS(Blocks)* SIXTRL_RESTRICT diff );
+
+SIXTRL_FN SIXTRL_STATIC void NS( Particles_buffer_get_max_value )(
+    struct NS(Blocks)* SIXTRL_RESTRICT destination,
+    NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
+    const struct NS(Blocks) *const SIXTRL_RESTRICT source );
+
 /* ------------------------------------------------------------------------- */
     
 SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Particles_get_q0_value)(
@@ -696,8 +716,9 @@ SIXTRL_INLINE void NS(Particles_preset_values)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Particles) const* NS(Blocks_get_const_particles)(
-    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info )
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Particles) const* 
+NS(Blocks_get_const_particles)( const NS(BlockInfo) 
+    *const SIXTRL_RESTRICT block_info )
 {
     NS(BlockType) const type_id = 
         NS(BlockInfo_get_type_id)( block_info );
@@ -1005,6 +1026,359 @@ SIXTRL_INLINE void NS( Particles_copy_all_unchecked )(
     
     NS(Particles_copy_range_unchecked)( destination, source, 0, num );
 
+    return;
+}
+
+SIXTRL_INLINE void NS( Particles_calculate_difference)(
+    const NS(Particles) *const SIXTRL_RESTRICT lhs, 
+    const NS(Particles) *const SIXTRL_RESTRICT rhs, 
+    NS(Particles)* SIXTRL_RESTRICT diff )
+{
+    NS(block_num_elements_t) const num_particles = 
+        NS(Particles_get_num_particles)( lhs );
+    
+    if( ( lhs != 0 ) && ( rhs != 0 ) && ( diff != 0 ) &&
+        ( num_particles > ( NS(block_num_elements_t ) )0u ) &&
+        ( num_particles == NS(Particles_get_num_particles)( rhs  ) ) &&
+        ( num_particles == NS(Particles_get_num_particles)( diff ) ) )
+    {
+        NS(block_num_elements_t) ii = 0;
+        
+        for( ; ii < num_particles ; ++ii )
+        {
+            NS(Particles_set_q0_value)( diff, ii, 
+                NS(Particles_get_q0_value)( lhs, ii ) -
+                NS(Particles_get_q0_value)( rhs, ii ) );
+            
+            NS(Particles_set_mass0_value)( diff, ii, 
+                NS(Particles_get_mass0_value)( lhs, ii ) -
+                NS(Particles_get_mass0_value)( rhs, ii ) );
+            
+            NS(Particles_set_beta0_value)( diff, ii, 
+                NS(Particles_get_beta0_value)( lhs, ii ) -
+                NS(Particles_get_beta0_value)( rhs, ii ) );
+            
+            NS(Particles_set_gamma0_value)( diff, ii, 
+                NS(Particles_get_gamma0_value)( lhs, ii ) -
+                NS(Particles_get_gamma0_value)( rhs, ii ) );
+            
+            NS(Particles_set_p0c_value)( diff, ii, 
+                NS(Particles_get_p0c_value)( lhs, ii ) -
+                NS(Particles_get_p0c_value)( rhs, ii ) );
+            
+            NS(Particles_set_s_value)( diff, ii, 
+                NS(Particles_get_s_value)( lhs, ii ) -
+                NS(Particles_get_s_value)( rhs, ii ) );
+            
+            NS(Particles_set_x_value)( diff, ii, 
+                NS(Particles_get_x_value)( lhs, ii ) -
+                NS(Particles_get_x_value)( rhs, ii ) );
+            
+            NS(Particles_set_y_value)( diff, ii, 
+                NS(Particles_get_y_value)( lhs, ii ) -
+                NS(Particles_get_y_value)( rhs, ii ) );
+            
+            NS(Particles_set_px_value)( diff, ii, 
+                NS(Particles_get_px_value)( lhs, ii ) -
+                NS(Particles_get_px_value)( rhs, ii ) );
+            
+            NS(Particles_set_py_value)( diff, ii, 
+                NS(Particles_get_py_value)( lhs, ii ) -
+                NS(Particles_get_py_value)( rhs, ii ) );
+            
+            NS(Particles_set_sigma_value)( diff, ii, 
+                NS(Particles_get_sigma_value)( lhs, ii ) -
+                NS(Particles_get_sigma_value)( rhs, ii ) );
+            
+            NS(Particles_set_psigma_value)( diff, ii, 
+                NS(Particles_get_psigma_value)( lhs, ii ) -
+                NS(Particles_get_psigma_value)( rhs, ii ) );
+            
+            NS(Particles_set_delta_value)( diff, ii, 
+                NS(Particles_get_delta_value)( lhs, ii ) -
+                NS(Particles_get_delta_value)( rhs, ii ) );
+            
+            NS(Particles_set_rpp_value)( diff, ii, 
+                NS(Particles_get_rpp_value)( lhs, ii ) -
+                NS(Particles_get_rpp_value)( rhs, ii ) );
+            
+            NS(Particles_set_rvv_value)( diff, ii, 
+                NS(Particles_get_rvv_value)( lhs, ii ) -
+                NS(Particles_get_rvv_value)( rhs, ii ) );
+            
+            NS(Particles_set_chi_value)( diff, ii, 
+                NS(Particles_get_chi_value)( lhs, ii ) -
+                NS(Particles_get_chi_value)( rhs, ii ) );
+            
+            NS(Particles_set_particle_id_value)( diff, ii, 
+                NS(Particles_get_particle_id_value)( lhs, ii ) -
+                NS(Particles_get_particle_id_value)( rhs, ii ) );
+            
+            NS(Particles_set_lost_at_element_id_value)( diff, ii, 
+                NS(Particles_get_lost_at_element_id_value)( lhs, ii ) -
+                NS(Particles_get_lost_at_element_id_value)( rhs, ii ) );
+            
+            NS(Particles_set_lost_at_turn_value)( diff, ii, 
+                NS(Particles_get_lost_at_turn_value)( lhs, ii ) -
+                NS(Particles_get_lost_at_turn_value)( rhs, ii ) );
+            
+            NS(Particles_set_state_value)( diff, ii, 
+                NS(Particles_get_state_value)( lhs, ii ) -
+                NS(Particles_get_state_value)( rhs, ii ) );
+        }
+    }
+    
+    return;
+}
+
+SIXTRL_INLINE void NS( Particles_get_max_value)(
+    NS(Particles)* SIXTRL_RESTRICT destination, 
+    NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
+    const NS(Particles) *const SIXTRL_RESTRICT source )
+{
+    static SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0L;
+    
+    if( ( destination     != NULL ) && ( source != NULL ) && 
+        ( NS(Particles_get_num_particles)( destination ) > 0u ) &&
+        ( NS(Particles_get_num_particles)( source      ) > 0u ) )
+    {
+        typedef SIXTRL_GLOBAL_DEC SIXTRL_REAL_T*  g_real_ptr_t;
+        typedef SIXTRL_GLOBAL_DEC SIXTRL_INT64_T* g_int64_ptr_t;
+        
+        NS(block_size_t) dummy_max_value_indices[ 20 ] =
+        {
+            0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+            0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u
+        };
+        
+        g_real_ptr_t out_real_values_begin[ 16 ] =
+        {
+            NS(Particles_get_q0)(     destination ), 
+            NS(Particles_get_beta0)(  destination ),
+            NS(Particles_get_mass0)(  destination ),
+            NS(Particles_get_gamma0)( destination ),
+            NS(Particles_get_p0c)(    destination ),
+            NS(Particles_get_s)(      destination ),
+            NS(Particles_get_x)(      destination ),
+            NS(Particles_get_y)(      destination ),
+            NS(Particles_get_px)(     destination ),
+            NS(Particles_get_py)(     destination ),
+            NS(Particles_get_sigma)(  destination ),
+            NS(Particles_get_psigma)( destination ),
+            NS(Particles_get_delta)(  destination ),
+            NS(Particles_get_rpp)(    destination ),
+            NS(Particles_get_rvv)(    destination ),
+            NS(Particles_get_chi)(    destination )
+        };
+        
+        g_int64_ptr_t out_int64_values_begin[ 4 ] =
+        {
+            NS(Particles_get_particle_id)(        destination ),
+            NS(Particles_get_lost_at_element_id)( destination ),
+            NS(Particles_get_lost_at_turn)(       destination ),
+            NS(Particles_get_state)(              destination )
+        };
+        
+        g_real_ptr_t in_real_values_begin[ 16 ] = 
+        {
+            ( g_real_ptr_t )NS(Particles_get_const_q0)(     source ), 
+            ( g_real_ptr_t )NS(Particles_get_const_beta0)(  source ),
+            ( g_real_ptr_t )NS(Particles_get_const_mass0)(  source ),
+            ( g_real_ptr_t )NS(Particles_get_const_gamma0)( source ),
+            ( g_real_ptr_t )NS(Particles_get_const_p0c)(    source ),
+            ( g_real_ptr_t )NS(Particles_get_const_s)(      source ),
+            ( g_real_ptr_t )NS(Particles_get_const_x)(      source ),
+            ( g_real_ptr_t )NS(Particles_get_const_y)(      source ),
+            ( g_real_ptr_t )NS(Particles_get_const_px)(     source ),
+            ( g_real_ptr_t )NS(Particles_get_const_py)(     source ),
+            ( g_real_ptr_t )NS(Particles_get_const_sigma)(  source ),
+            ( g_real_ptr_t )NS(Particles_get_const_psigma)( source ),
+            ( g_real_ptr_t )NS(Particles_get_const_delta)(  source ),
+            ( g_real_ptr_t )NS(Particles_get_const_rpp)(    source ),
+            ( g_real_ptr_t )NS(Particles_get_const_rvv)(    source ),
+            ( g_real_ptr_t )NS(Particles_get_const_chi)(    source )
+        };
+        
+        g_int64_ptr_t in_int64_values_begin[ 4 ] =
+        {
+            ( g_int64_ptr_t )NS(Particles_get_const_particle_id)( source ),
+            ( g_int64_ptr_t )NS(Particles_get_const_lost_at_element_id)( 
+                source ),
+            ( g_int64_ptr_t )NS(Particles_get_const_lost_at_turn)( source ),
+            ( g_int64_ptr_t )NS(Particles_get_const_state)( source )
+        };
+        
+        NS(block_size_t) ii = 0;
+        NS(block_size_t) jj = 0;
+        NS(block_size_t) const num_particles = 
+            NS(Particles_get_num_particles)( destination );
+        
+        g_real_ptr_t in_real_values_end[ 16 ] = 
+        {
+            in_real_values_begin[  0 ] + num_particles, 
+            in_real_values_begin[  1 ] + num_particles,
+            in_real_values_begin[  2 ] + num_particles,
+            in_real_values_begin[  3 ] + num_particles,
+            in_real_values_begin[  4 ] + num_particles,
+            in_real_values_begin[  5 ] + num_particles,
+            in_real_values_begin[  6 ] + num_particles,
+            in_real_values_begin[  7 ] + num_particles,
+            in_real_values_begin[  8 ] + num_particles,
+            in_real_values_begin[  9 ] + num_particles,
+            in_real_values_begin[ 10 ] + num_particles,
+            in_real_values_begin[ 11 ] + num_particles,
+            in_real_values_begin[ 12 ] + num_particles,
+            in_real_values_begin[ 13 ] + num_particles,
+            in_real_values_begin[ 14 ] + num_particles,
+            in_real_values_begin[ 15 ] + num_particles
+        };
+        
+        g_int64_ptr_t in_int64_values_end[ 4 ] =
+        {
+            in_int64_values_begin[  0 ] + num_particles, 
+            in_int64_values_begin[  1 ] + num_particles,
+            in_int64_values_begin[  2 ] + num_particles,
+            in_int64_values_begin[  3 ] + num_particles
+        };
+        
+        if( max_value_index == NULL ) 
+                max_value_index = &dummy_max_value_indices[ 0 ];
+        
+        for( ; ii < 16 ; ++ii )
+        {
+            g_real_ptr_t in_it  = in_real_values_begin[ ii ];
+            g_real_ptr_t in_end = in_real_values_end[ ii ];
+            
+            SIXTRL_REAL_T max_value     = ( SIXTRL_REAL_T )0.0;
+            SIXTRL_REAL_T cmp_max_value = max_value;
+            
+            NS(block_size_t) kk     = ( NS(block_size_t) )0u;
+            max_value_index[ ii ]   = ( NS(block_size_t) )0u;
+            
+            for( ; in_it != in_end ; ++in_it, ++kk )
+            {
+                SIXTRL_REAL_T const value = *in_it;
+                SIXTRL_REAL_T const cmp_value = 
+                    ( value >= ZERO ) ? value : -value;
+                
+                if( cmp_max_value < cmp_value )
+                {
+                    max_value = value;
+                    cmp_max_value = cmp_value;
+                    max_value_index[ ii ] = kk;
+                }
+            }
+            
+            *out_real_values_begin[ ii ] = max_value;
+        }
+        
+        for( ii = 0, jj = 16 ; ii < 4 ; ++ii, ++jj )
+        {
+            g_int64_ptr_t in_it  = in_int64_values_begin[ ii ];
+            g_int64_ptr_t in_end = in_int64_values_end[ ii ];
+            
+            SIXTRL_INT64_T max_value = ( SIXTRL_INT64_T )0;
+            SIXTRL_INT64_T cmp_max_value = max_value;
+            
+            NS(block_size_t)      kk = ( NS(block_size_t ) )0u;
+            max_value_index[ jj ]    = ( NS(block_size_t ) )0u;
+            
+            for( ; in_it != in_end ; ++in_it, ++kk )
+            {
+                SIXTRL_INT64_T const value = *in_it;
+                SIXTRL_INT64_T const cmp_value = ( value > 0 ) ? value : -value;
+                    
+                if( cmp_max_value < cmp_value )
+                {
+                    cmp_max_value = cmp_value;
+                    max_value     = value;
+                    max_value_index[ ii ] = kk; 
+                }
+            }
+            
+            *out_int64_values_begin[ ii ] = max_value;
+        }
+    }
+    
+    return;
+}
+
+SIXTRL_INLINE void NS( Particles_buffer_get_max_value )(
+    NS(Blocks)* SIXTRL_RESTRICT destination,
+    NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
+    const NS(Blocks) *const SIXTRL_RESTRICT source )
+{
+    if( ( destination != 0 ) && ( source != 0 ) && 
+        ( NS(Blocks_get_num_of_blocks)( destination   ) == 
+          NS(Blocks_get_num_of_blocks)( source ) ) &&
+        ( NS(Blocks_get_num_of_blocks)( destination ) > 0u ) )
+    {
+        NS(BlockInfo)* dest_it = 
+            NS(Blocks_get_block_infos_begin)( destination );
+            
+        NS(BlockInfo)* dest_end =
+            NS(Blocks_get_block_infos_end)( destination );
+            
+        NS(BlockInfo) const* src_it =
+            NS(Blocks_get_const_block_infos_begin)( source );
+            
+        for( ; dest_it != dest_end ; ++dest_it, ++src_it )
+        {
+            NS(Particles)* dest_particles = 
+                NS(Blocks_get_particles)( dest_it );
+                
+            NS(Particles) const* source_particles =
+                NS(Blocks_get_const_particles)( src_it );
+                
+            NS(Particles_get_max_value)( 
+                dest_particles, max_value_index, source_particles );
+            
+            if( max_value_index != 0 ) max_value_index = max_value_index + 20;
+        }
+    }
+    
+    return;
+}
+
+
+SIXTRL_INLINE void NS( Particles_buffer_calculate_difference)(
+    const NS(Blocks) *const SIXTRL_RESTRICT lhs, 
+    const NS(Blocks) *const SIXTRL_RESTRICT rhs, 
+    NS(Blocks)* SIXTRL_RESTRICT diff )
+{
+    NS(BlockInfo) const* lhs_it  = NS(Blocks_get_const_block_infos_begin)( lhs );
+    NS(BlockInfo) const* lhs_end = NS(Blocks_get_const_block_infos_end)( lhs );
+    NS(BlockInfo) const* rhs_it  = NS(Blocks_get_const_block_infos_begin)( rhs );
+    NS(BlockInfo)*      diff_it  = NS(Blocks_get_block_infos_begin)( diff );
+    
+    
+    if( ( lhs_it  != NULL ) && ( lhs_end != NULL ) && 
+        ( rhs_it  != NULL ) && ( rhs_it  != lhs_it ) &&
+        ( diff_it != NULL ) && ( diff_it != lhs_it ) && ( diff_it != rhs_it ) )
+    {
+        ptrdiff_t const num_blocks = lhs_end - lhs_it;
+        
+        SIXTRL_ASSERT( 
+            ( num_blocks == ( ptrdiff_t 
+                )NS(Blocks_get_num_of_blocks)( rhs  ) ) &&
+            ( num_blocks == ( ptrdiff_t 
+                )NS(Blocks_get_num_of_blocks)( diff ) ) );
+        
+        for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it, ++diff_it )
+        {
+            NS(Particles) const* lhs_particles = 
+                NS(Blocks_get_const_particles)( lhs_it );
+                
+            NS(Particles) const* rhs_particles =
+                NS(Blocks_get_const_particles)( rhs_it );
+                
+            NS(Particles)* diff_particles = NS(Blocks_get_particles)( diff_it );
+                
+            NS(Particles_calculate_difference)( 
+                lhs_particles, rhs_particles, diff_particles );
+        }
+    }
+    
     return;
 }
 
