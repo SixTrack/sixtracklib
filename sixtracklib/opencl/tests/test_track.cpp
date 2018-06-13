@@ -240,7 +240,7 @@ TEST( OpenCLTrackTests, TrackDrifts )
     cl::Kernel track_kernel( program, "Track_particles_kernel_opencl", &ret );
     ASSERT_TRUE( ret == CL_SUCCESS );
     
-    ret  = track_kernel.setArg( 0, NUM_OF_PARTICLES );
+    ret  = track_kernel.setArg( 0, NUM_OF_TURNS );
     ret |= track_kernel.setArg( 1, cl_particles_buffer );
     ret |= track_kernel.setArg( 2, cl_beam_elements_buffer );
     ret |= track_kernel.setArg( 3, cl_elem_by_elem_buffer );
@@ -309,6 +309,8 @@ TEST( OpenCLTrackTests, TrackDrifts )
     ret = queue.enqueueNDRangeKernel(
                 track_kernel, cl::NullRange, cl::NDRange( global_work_size ),
                 cl::NDRange( local_work_group_size ), nullptr, &event );
+    
+    ASSERT_TRUE( ret == CL_SUCCESS );
     
     ret |= queue.flush();
     ASSERT_TRUE( ret == CL_SUCCESS );
