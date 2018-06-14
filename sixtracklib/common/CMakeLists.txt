@@ -1,21 +1,31 @@
 # sixtracklib/sixtracklib/common/CMakeLists.txt
 
-set( SIXTRACKLIB_COMMON_HEADERS 
-     alignment.h
+set( SIXTRACKLIB_COMMON_IMPL_HEADERS 
      impl/alignment_impl.h
-     blocks.h
-     beam_elements.h
+     impl/beam_elements_type.h
      impl/beam_elements_api.h
-     mem_pool.h     
-     particles.h
+     impl/particles_type.h
      impl/particles_api.h
-     tests/test_particles_tools.h     
-     tests/test_track_tools.h
-     details/tools.h 
-     details/gpu_kernel_tools.h
-     details/random.h     
 )
 
+set( SIXTRACKLIB_COMMON_DETAILS_HEADERS 
+     details/tools.h 
+     details/gpu_kernel_tools.h
+     details/random.h
+)
+
+set( SIXTRACKLIB_COMMON_TESTS_HEADERS
+     tests/test_particles_tools.h     
+     tests/test_track_tools.h
+)
+
+set( SIXTRACKLIB_COMMON_HEADERS 
+     alignment.h
+     blocks.h
+     beam_elements.h
+     mem_pool.h     
+     particles.h
+)
 
 set( SIXTRACKLIB_COMMON_SOURCES
      details/alignment.c
@@ -30,14 +40,23 @@ set( SIXTRACKLIB_COMMON_SOURCES
 )
 
 add_library( sixtrack_common OBJECT 
+             ${SIXTRACKLIB_COMMON_IMPL_HEADERS}
+             ${SIXTRACKLIB_COMMON_DETAILS_HEADERS}
+             ${SIXTRACKLIB_COMMON_TESTS_HEADERS}
              ${SIXTRACKLIB_COMMON_HEADERS}
              ${SIXTRACKLIB_COMMON_SOURCES} )
              
-target_include_directories( sixtrack_common PUBLIC ${CMAKE_SOURCE_DIR} )
+target_include_directories( sixtrack_common 
+                            PUBLIC $<INSTALL_INTERFACE:include>
+                                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
              
 set_target_properties(  sixtrack_common PROPERTIES LINKER_LANGUAGE C )
 set_target_properties(  sixtrack_common PROPERTIES POSITION_INDEPENDENT_CODE True )
 set_target_properties(  sixtrack_common PROPERTIES C_STANDARD 99 )
+
+target_compile_definitions( sixtrack_common PUBLIC 
+                            ${SIXTRACKLIB_NAMESPACE_FLAGS} )
+
 target_compile_options( sixtrack_common BEFORE PUBLIC 
                         ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic -ansi )
 
@@ -48,5 +67,14 @@ endif()
 if( SIXTRACKL_ENABLE_TIMING_TESTS )
 #     add_subdirectory( tests_benchmark )
 endif()
+
+
+set( SIXTRACKLIB_COMMON_INSTALL_PATH include/sixtracklib/common )
+
+install( FILES ${SIXTRACKLIB_COMMON_HEADERS} 
+         DESTINATION ${SIXTRACKLIB_COMMON_INSTALL_PATH} )
+         
+install( FILES ${SIXTRACKLIB_COMMON_IMPL_HEADERS}
+         DESTINATION "${SIXTRACKLIB_COMMON_INSTALL_PATH}/impl" )
 
 #end sixtracklib/sixtracklib/common/CMakeLists.txt

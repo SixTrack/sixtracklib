@@ -65,6 +65,7 @@ if( GTEST_FOUND )
                   
     set_property( TARGET ${UNIT_TEST_TARGETS} PROPERTY CXX_STANDARD 11 )
     set_property( TARGET ${UNIT_TEST_TARGETS} PROPERTY CXX_STANDARD_REQUIRED ON )
+    
     set_property( TARGET ${UNIT_TEST_TARGETS} PROPERTY COMPILE_OPTIONS 
                   ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic )
     

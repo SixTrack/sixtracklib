@@ -15,28 +15,6 @@
 set( SIXTRACKL_LINK_LIBRARIES )
 
 # ------------------------------------------------------------------------------
-
-if( SIXTRACKL_C_NAMESPACE_PREFIX )
-    add_definitions( "-D__NAMESPACE=${SIXTRACKL_C_NAMESPACE_PREFIX}" )
-else()
-    add_definitions( "-D__NAMESPACE=st_" )
-endif()
-
-# ------------------------------------------------------------------------------
-# create a header file _impl/path.h with the current, local absolute path to 
-# this directory. This is used as prefix for all source files which have to 
-# be processed during run-time (e.g. GPU Kernels, etc.) 
-
-# Note: Paths in CMake always use a slash as separator and always lack a 
-#       trailing slashes -> add them to make it easier to use the 
-#       macro in _impl/path.h as a prefix for filename and directory paths!
-
-set( SIXTRACKLIB_BASE_DIR "${CMAKE_SOURCE_DIR}/" )
-configure_file( _impl/path.h.template "${CMAKE_CURRENT_SOURCE_DIR}/_impl/path.h"
-                @ONLY )
-
-
-# ------------------------------------------------------------------------------
 # CPU/System architecture settings:
 
 set( SIXTRACKLIB_CPU_FLAGS )
@@ -56,14 +34,24 @@ elseif( SIXTRACKL_CPU_ARCH MATCHES "native" )
 endif()
                 
 # ------------------------------------------------------------------------------
+# C Namespace handling:
+
+if( SIXTRACKL_C_NAMESPACE_PREFIX )
+    set( SIXTRACKLIB_NAMESPACE_FLAGS 
+         "-D__NAMESPACE=${SIXTRACKL_C_NAMESPACE_PREFIX}" )
+else()
+    set( SIXTRACKLIB_NAMESPACE_FLAGS "-D__NAMESPACE=st_" )
+endif()
+
+# ------------------------------------------------------------------------------
 
 set( SIXTRACKL_LIBRARY_MODULES )
 set( SIXTRACKL_TEST_LIBRARIES sixtrack )
 
-set( SIXTRACKL_HEADERS 
-     _impl/namespace_begin.h 
-     _impl/namespace_end.h
-)
+set( SIXTRACKL_HEADERS sixtracklib.h )
+set( SIXTRACKL_SOURCES )
+
+add_subdirectory( _impl )
 
 # ------------------------------------------------------------------------------
 
@@ -72,90 +60,41 @@ set( SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_common> )
 
 # ------------------------------------------------------------------------------
 
-# if( SIXTRACKL_ENABLE_MANUAL_SIMD )    
-#     
-#     add_subdirectory( simd )
-#     
-#     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-#          $<TARGET_OBJECTS:sixtrack_simd> )    
-#          
-#     set( SIXTRACKL_ENABLE_MODULE_SIMD 1 )
-# else()
-    set( SIXTRACKL_ENABLE_MODULE_SIMD 0 )
-# endif()
-
-# ------------------------------------------------------------------------------
-
-if( SIXTRACKL_ENABLE_OPENCL )
-    add_subdirectory( opencl )
+if( SIXTRACKL_ENABLE_MANUAL_SIMD )    
+     
+    add_subdirectory( simd )
     
     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-         $<TARGET_OBJECTS:sixtrack_opencl> )
-         
-    set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} 
-                                  ${SIXTRACKL_OPENCL_LIBRARY} )
-                                  
-    set( SIXTRACKL_ENABLE_MODULE_OPENCL 1 )
-    
-else()
-    
-    set( SIXTRACKL_ENABLE_MODULE_OPENCL 0 )
+         $<TARGET_OBJECTS:sixtrack_simd> )
 
 endif()
 
 # ------------------------------------------------------------------------------
+
+if( SIXTRACKL_ENABLE_OPENCL )
+    
+    set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} 
+                                  ${SIXTRACKL_OPENCL_LIBRARY} )
+    add_subdirectory( opencl )
+    
+    set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
+         $<TARGET_OBJECTS:sixtrack_opencl> )
+    
+endif()
 
 if( SIXTRACKL_ENABLE_CUDA )
 
     set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} 
                                   ${SIXTRACKL_CUDA_LIBRARIES} )
-    
+        
     add_subdirectory( cuda )
-        
+
 #     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-#          $<TARGET_OBJECTS:sixtrack_cuda_part> )
-        
-    set( SIXTRACKL_ENABLE_MODULE_CUDA 1 )
+#          $<TARGET_OBJECTS:sixtrack_cuda_part> PARENT_SCOPE )
     
-else()
-    
-    set( SIXTRACKL_ENABLE_MODULE_CUDA 0 )
-
 endif()
-
+                
 # ------------------------------------------------------------------------------
-
-# if( SIXTRACKL_ENABLE_MPFR4 )
-#     add_subdirectory( mpfr4 )    
-#     
-#     if( TARGET sixtrack_mpfr4 )
-#         set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-#             $<TARGET_OBJECTS:sixtrack_mpfr4> )
-#     endif()
-#          
-#     set( SIXTRACKL_ENABLE_MODULE_MPFR4 1 )
-#     
-# else()
-# 
-    set( SIXTRACKL_ENABLE_MODULE_MPFR4 0 )    
-# 
-# endif()
-
-# ------------------------------------------------------------------------------
-
-configure_file( _impl/modules.h.template 
-                "${CMAKE_CURRENT_SOURCE_DIR}/_impl/modules.h" @ONLY )
-
-# ------------------------------------------------------------------------------
-
-set( SIXTRACKL_HEADERS
-     _impl/definitions.h
-     _impl/modules.h 
-     _impl/namespace_begin.h
-     _impl/namespace_end.h 
-     _impl/path.h )
-
-set( SIXTRACKL_SOURCES )
 
 add_library( sixtrack SHARED 
              ${SIXTRACKL_HEADERS} ${SIXTRACKL_SOURCES} 
@@ -166,13 +105,34 @@ if( SIXTRACKL_LINK_LIBRARIES )
     target_link_libraries( sixtrack ${SIXTRACKL_LINK_LIBRARIES} )
 endif()
 
+target_include_directories( 
+    sixtrack PUBLIC $<INSTALL_INTERFACE:include>
+                    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
+
 set_target_properties( sixtrack PROPERTIES LINKER_LANGUAGE C )
 set_target_properties( sixtrack PROPERTIES POSITION_INDEPENDENT_CODE True )
 set_target_properties( sixtrack PROPERTIES C_STANDARD 99 )
+set_target_properties( sixtrack PROPERTIES DEBUG_POSTFIX d )
 
-target_compile_options( sixtrack PUBLIC 
-    ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic -ansi )
+target_compile_definitions( sixtrack PUBLIC ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
+target_compile_options( sixtrack PUBLIC ${SIXTRACKLIB_CPU_FLAGS} 
+    -Wall -Werror -pedantic -ansi )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    
+install( TARGETS sixtrack 
+         EXPORT  SixTracklib-targets 
+         RUNTIME DESTINATION bin 
+         LIBRARY DESTINATION lib 
+         ARCHIVE DESTINATION lib )
+    
+install( EXPORT SixTracklib-targets 
+         FILE   SixTracklibTargets.cmake 
+         NAMESPACE SixTracklib::
+         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake
+)
+    
 # ------------------------------------------------------------------------------
 
 add_subdirectory( testdata )
@@ -184,4 +144,3 @@ add_subdirectory( testdata )
 # endif()
 
 # ------------------------------------------------------------------------------
-

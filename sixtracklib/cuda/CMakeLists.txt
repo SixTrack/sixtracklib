@@ -23,7 +23,10 @@ set( SIXTRACKLIB_CUDA_PART_SOURCES
     
 # ------------------------------------------------------------------------------
 
-set( CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS};-g;-G;-O0;-arch=sm_50;-D_GPUCODE=1;" )
+#set( CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS};-g;-G;-O0;-arch=sm_50;-D_GPUCODE=1;" )
+set( CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} 
+                     ${SIXTRACKLIB_NAMESPACE_FLAGS} 
+                     "-arch=sm_50;-D_GPUCODE=1" )
 
 cuda_add_library( sixtrack_cuda SHARED 
                   cuda_env.h

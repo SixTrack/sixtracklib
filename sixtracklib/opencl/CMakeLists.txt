@@ -20,12 +20,13 @@ target_include_directories( sixtrack_opencl PUBLIC
 set_target_properties(  sixtrack_opencl PROPERTIES LINKER_LANGUAGE C )
 set_target_properties(  sixtrack_opencl PROPERTIES POSITION_INDEPENDENT_CODE True )
 set_target_properties(  sixtrack_opencl PROPERTIES C_STANDARD 99 )
-target_compile_options( sixtrack_opencl BEFORE PUBLIC 
-                        ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic -ansi )
-                        
-target_compile_definitions( sixtrack_opencl PUBLIC 
-                        -DCL_USE_DEPRECATED_OPENCL_1_2_APIS )
 
+target_compile_definitions( sixtrack_opencl PUBLIC 
+        ${SIXTRACKLIB_NAMESPACE_FLAGS} -DCL_USE_DEPRECATED_OPENCL_1_2_APIS )
+
+target_compile_options( sixtrack_opencl BEFORE PUBLIC 
+        ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic -ansi )
+                        
 if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )                                                                                                                                                                             
     add_subdirectory( tests )                                                                                                                                                                                     
 endif()                                                                                                                                                                                                           
