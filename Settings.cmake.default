@@ -59,7 +59,7 @@ option( SIXTRACKL_ENABLE_MPFR_ACCURACY_TESTS
 option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"       OFF )
 option( SIXTRACKL_ENABLE_MANUAL_SIMD       "Enable manual SIMD backend"     OFF )
 option( SIXTRACKL_ENABLE_OPENMP            "Enable OpenMP backend"          OFF )
-option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL backend"          ON  )
+option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL backend"          OFF )
 option( SIXTRACKL_ENABLE_CUDA              "Enable CUDA backend"            OFF )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
