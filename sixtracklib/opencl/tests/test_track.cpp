@@ -235,22 +235,45 @@ TEST( OpenCLTrackTests, TrackDrifts )
     
     ASSERT_TRUE( ret == CL_SUCCESS );
     
+    cl::Buffer cl_success_flag_buffer(
+        context, CL_MEM_READ_WRITE, sizeof( cl_long ), 0, &ret );
+    
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
     /* --------------------------------------------------------------------- */
     
+    cl::Kernel remap_kernel( 
+        program, "Track_remap_serialized_blocks_buffer", &ret );
+    
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    ret  = remap_kernel.setArg( 0, cl_particles_buffer );
+    ret |= remap_kernel.setArg( 1, cl_beam_elements_buffer );
+    ret |= remap_kernel.setArg( 2, cl_elem_by_elem_buffer );
+    ret |= remap_kernel.setArg( 3, cl_success_flag_buffer );
+    
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
     cl::Kernel track_kernel( program, "Track_particles_kernel_opencl", &ret );
+    
     ASSERT_TRUE( ret == CL_SUCCESS );
     
     ret  = track_kernel.setArg( 0, NUM_OF_TURNS );
     ret |= track_kernel.setArg( 1, cl_particles_buffer );
     ret |= track_kernel.setArg( 2, cl_beam_elements_buffer );
     ret |= track_kernel.setArg( 3, cl_elem_by_elem_buffer );
+    ret |= track_kernel.setArg( 4, cl_success_flag_buffer );
     
     ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    size_t const remap_work_group_multiple = remap_kernel.getWorkGroupInfo< 
+            CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE >( device );
     
     size_t const local_work_group_size = 
         track_kernel.getWorkGroupInfo< CL_KERNEL_WORK_GROUP_SIZE >( device );
         
-    ASSERT_TRUE( local_work_group_size != 0u );
+    ASSERT_TRUE( remap_work_group_multiple != 0u );
+    ASSERT_TRUE( local_work_group_size     != 0u );
     
     size_t global_work_size = NUM_OF_PARTICLES;
     
@@ -263,7 +286,7 @@ TEST( OpenCLTrackTests, TrackDrifts )
     }
     
     ASSERT_TRUE( ( global_work_size >= NUM_OF_PARTICLES ) &&
-                 ( ( global_work_size % local_work_group_size ) == 0u ) );
+               ( ( global_work_size % local_work_group_size ) == 0u ) );
     
     /* --------------------------------------------------------------------- */
     
@@ -283,6 +306,8 @@ TEST( OpenCLTrackTests, TrackDrifts )
              st_Blocks_get_data_begin( &calculated_elem_by_elem_buffer ) )
          : reinterpret_cast< unsigned char* >( 
              &dummy_elem_by_elem_buffer[ 0 ] );
+         
+    cl_long success_flag = 0;
         
     ASSERT_TRUE( particles_data_buffer     != nullptr );
     ASSERT_TRUE( beam_elements_data_buffer != nullptr );
@@ -300,22 +325,51 @@ TEST( OpenCLTrackTests, TrackDrifts )
                 cl_elem_by_elem_buffer, CL_TRUE, 0, ELEM_BY_ELEM_BUFFER_SIZE,
                 elem_by_elem_data_buffer );
     
+    ret |= queue.enqueueWriteBuffer( cl_success_flag_buffer, CL_TRUE, 0, 
+                sizeof( cl_long ), &success_flag );
+    
     ASSERT_TRUE( ret == CL_SUCCESS );
     
     /* --------------------------------------------------------------------- */
     
-    cl::Event event;
+    cl::Event event_remap;
+    
+    ret = queue.enqueueNDRangeKernel(
+                remap_kernel, cl::NullRange, 
+                cl::NDRange( remap_work_group_multiple ),
+                cl::NDRange( remap_work_group_multiple ), 
+                nullptr, &event_remap );    
+    
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    ret = queue.flush();
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    ret = event_remap.wait();
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    /* --------------------------------------------------------------------- */
+    
+    ret = queue.enqueueReadBuffer( cl_success_flag_buffer, CL_TRUE, 0,
+                                   sizeof( cl_long ), &success_flag );
+    
+    ASSERT_TRUE( success_flag == 0 );
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
+    /* --------------------------------------------------------------------- */
+    
+    cl::Event event_track;
     
     ret = queue.enqueueNDRangeKernel(
                 track_kernel, cl::NullRange, cl::NDRange( global_work_size ),
-                cl::NDRange( local_work_group_size ), nullptr, &event );
+                cl::NDRange( local_work_group_size ), nullptr, &event_track );
     
     ASSERT_TRUE( ret == CL_SUCCESS );
     
     ret |= queue.flush();
     ASSERT_TRUE( ret == CL_SUCCESS );
     
-    ret = event.wait();
+    ret = event_track.wait();
     ASSERT_TRUE( ret == CL_SUCCESS );
     
     cl_ulong when_kernel_queued    = 0;
@@ -323,16 +377,16 @@ TEST( OpenCLTrackTests, TrackDrifts )
     cl_ulong when_kernel_started   = 0;
     cl_ulong when_kernel_ended     = 0;
 
-    ret  = event.getProfilingInfo< cl_ulong >( 
+    ret  = event_track.getProfilingInfo< cl_ulong >( 
       CL_PROFILING_COMMAND_QUEUED, &when_kernel_queued );
 
-    ret |= event.getProfilingInfo< cl_ulong >( 
+    ret |= event_track.getProfilingInfo< cl_ulong >( 
       CL_PROFILING_COMMAND_SUBMIT, &when_kernel_submitted );
 
-    ret |= event.getProfilingInfo< cl_ulong >( 
+    ret |= event_track.getProfilingInfo< cl_ulong >( 
       CL_PROFILING_COMMAND_START, &when_kernel_started );
 
-    ret |= event.getProfilingInfo< cl_ulong >( 
+    ret |= event_track.getProfilingInfo< cl_ulong >( 
       CL_PROFILING_COMMAND_END, &when_kernel_ended );
 
     ASSERT_TRUE( ret == CL_SUCCESS );
@@ -341,12 +395,17 @@ TEST( OpenCLTrackTests, TrackDrifts )
     std::cout << "kernel_time_elapsed: " << kernel_time_elapsed << std::endl;
     std::cout.flush();
     
+    ret  = queue.enqueueReadBuffer( cl_success_flag_buffer, CL_TRUE, 
+            0, sizeof( cl_long ), &success_flag );
+    
+    ASSERT_TRUE( success_flag == 0 );
+    ASSERT_TRUE( ret == CL_SUCCESS );
+    
     ret  = queue.enqueueReadBuffer(
             cl_particles_buffer, CL_TRUE, 0, PARTICLES_BUFFER_SIZE, 
             particles_data_buffer );
     
     ASSERT_TRUE( ret == CL_SUCCESS );
-    
     
     ret = queue.enqueueReadBuffer(
             cl_elem_by_elem_buffer, CL_TRUE, 0, ELEM_BY_ELEM_BUFFER_SIZE,
