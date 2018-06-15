@@ -24,11 +24,6 @@ void __kernel Track_remap_serialized_blocks_buffer(
         
     if( global_id <= gid_to_remap_elem_by_elem )
     {
-        int ret = 0;
-    
-        NS(Blocks) elem_by_elem_buffer;
-        NS(Blocks_preset)( &elem_by_elem_buffer );
-        
         if( global_id == gid_to_remap_particles )
         {
             NS(Blocks) particles_buffer;
@@ -37,12 +32,12 @@ void __kernel Track_remap_serialized_blocks_buffer(
             if( 0 != NS(Blocks_unserialize)( &particles_buffer, 
                         particles_data_buffer ) )
             {
-                ret = -1;
                 success_flag |= -1;
             }
         }
         
-        if( ( ret == 0 ) && ( global_id == gid_to_remap_beam_elements ) )
+        if( ( success_flag == 0 ) && 
+            ( global_id == gid_to_remap_beam_elements ) )
         {        
             NS(Blocks) beam_elements;
             NS(Blocks_preset)( &beam_elements );
@@ -50,25 +45,23 @@ void __kernel Track_remap_serialized_blocks_buffer(
             if( 0 != NS(Blocks_unserialize)( &beam_elements, 
                         beam_elements_data_buffer ) )
             {
-                ret = -1;
                 success_flag = -2;
             }
         }
         
-        if( ( ret == 0 ) && ( global_id == gid_to_remap_elem_by_elem ) )
+        if( ( success_flag == 0 ) && 
+            ( global_id == gid_to_remap_elem_by_elem ) )
         {
             __global unsigned long const* header = 
                     ( __global unsigned long const* )elem_by_elem_data_buffer;
             
-            if( header != 0 )
+            if( ( header != 0 ) && ( header[ 0 ] != 0u ) )
             {
                 NS(Blocks) elem_by_elem_buffer;
                 NS(Blocks_preset)( &elem_by_elem_buffer );
                 
-                if( ( 0 != NS(Blocks_unserialize)( &elem_by_elem_buffer ) ) &&
-                    ( *header != ( unsigned long )0 ) )
+                if( 0 != NS(Blocks_unserialize)( &elem_by_elem_buffer ) )
                 {
-                    ret = -1;
                     success_flag = -4;
                 }
             }
@@ -151,7 +144,6 @@ void __kernel Track_particles_kernel_opencl(
     /* --------------------------------------------------------------------- */
     
     NS(Blocks_preset)( &particles_buffer );
-    NS(Blocks_preset)( &beam_elements );
         
     if( 0 == NS(Blocks_unserialize_without_remapping)( 
                 &particles_buffer, particles_data_buffer ) )
@@ -189,19 +181,23 @@ void __kernel Track_particles_kernel_opencl(
             num_of_particles = NS(Particles_get_num_particles)( &particles );
         }
     }
-    else
+    
+    if( num_of_particles == 0u )
     {
         NS(Blocks_preset)( &particles_buffer );
         NS(Particles_preset)( &particles );
         success_flag |= -1;
     }
     
+    NS(Blocks_preset)( &beam_elements );
+    
     if( 0 == NS(Blocks_unserialize_without_remapping)( 
                 &beam_elements, beam_elements_data_buffer ) )
     {
         num_beam_elements = NS(Blocks_get_num_of_blocks)( &beam_elements );
     }
-    else
+    
+    if( num_beam_elements == 0u )
     {
         NS(Blocks_preset)( &beam_elements );
         success_flag |= -2;
@@ -234,6 +230,7 @@ void __kernel Track_particles_kernel_opencl(
         }
         else if( elem_by_elem_header[ 0 ] != ( unsigned long )0u )
         {
+            NS(Blocks_preset)( &elem_by_elem_buffer );
             success_flag |= -4;
         }
     }
@@ -274,6 +271,10 @@ void __kernel Track_particles_kernel_opencl(
             
             if( ret != 0 ) success_flag |= -16;
         }
+    }
+    else
+    {
+        success_flag |= -32;
     }
     
     if( ( success_flag != 0 ) && ( ptr_success_flag != 0 ) )
