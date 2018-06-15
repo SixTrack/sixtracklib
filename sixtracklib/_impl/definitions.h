@@ -121,6 +121,10 @@
             #define SIXTRL_STATIC 
         #endif /* !defined( SIXTRL_STATIC ) */
         
+        #if !defined( SIXTRL_STATIC_VAR )
+            #define SIXTRL_STATIC_VAR
+        #endif /* !defined( SIXTRL_STATIC_VAR ) */
+        
         #if !defined( SIXTRL_INLINE )
             #define SIXTRL_INLINE inline 
         #endif /* !defined( SIXTRL_INLINE ) */
@@ -239,6 +243,10 @@
         #if !defined( SIXTRL_STATIC )
             #define SIXTRL_STATIC static
         #endif /* !defined( SIXTRL_STATIC ) */
+        
+        #if !defined( SIXTRL_STATIC_VAR )
+            #define SIXTRL_STATIC_VAR
+        #endif /* !defined( SIXTRL_STATIC_VAR ) */
         
         #if !defined( SIXTRL_INLINE )
             #define SIXTRL_INLINE 
@@ -366,6 +374,10 @@
     #if !defined( SIXTRL_STATIC )
         #define SIXTRL_STATIC static
     #endif /* !defined( SIXTRL_STATIC ) */
+    
+    #if !defined( SIXTRL_STATIC_VAR )
+            #define SIXTRL_STATIC_VAR static
+        #endif /* !defined( SIXTRL_STATIC_VAR ) */
     
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
     
