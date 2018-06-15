@@ -27,15 +27,18 @@ bool NS(Track_particles_on_cuda)(
     {
         cudaError_t err;
         
+        SIXTRL_STATIC_VAR uint64_t const U64_ZERO = 
+            static_cast< uint64_t >( 0 );
+        
         uint64_t dummy_elem_by_elem_header[ 4 ] = 
         {
-            uint64_t{ 0 }, uint64_t{ 0 }, uint64_t{ 0 }, uint64_t{ 0 }
+            U64_ZERO, U64_ZERO, U64_ZERO ,U64_ZERO 
         };
         
         /* ----------------------------------------------------------------- */
         
-        unsigned char* cuda_particles_data_buffer = nullptr;
-        unsigned char* host_particles_data_buffer = nullptr;
+        unsigned char* cuda_particles_data_buffer = NULL;
+        unsigned char* host_particles_data_buffer = NULL;
         
         NS(block_size_t) const particles_buffer_size =
             NS(Blocks_get_total_num_bytes)( particles_buffer );
@@ -46,7 +49,7 @@ bool NS(Track_particles_on_cuda)(
                               particles_buffer_size );
             
             success  = ( err == cudaSuccess );
-            success &= ( cuda_particles_data_buffer != 0 );
+            success &= ( cuda_particles_data_buffer != NULL );
             
             host_particles_data_buffer = NS(Blocks_get_data_begin)( 
                 particles_buffer );
@@ -60,8 +63,8 @@ bool NS(Track_particles_on_cuda)(
         
         /* ----------------------------------------------------------------- */
         
-        unsigned char* cuda_beam_elements_data_buffer = nullptr;
-        unsigned char* host_beam_elements_data_buffer = nullptr;
+        unsigned char* cuda_beam_elements_data_buffer = NULL;
+        unsigned char* host_beam_elements_data_buffer = NULL;
         
         NS(block_size_t) const beam_elements_buffer_size =
             NS(Blocks_get_total_num_bytes)( beam_elements );
@@ -74,7 +77,7 @@ bool NS(Track_particles_on_cuda)(
                                     beam_elements_buffer_size );
                 
                 success  = ( err == cudaSuccess );
-                success &= ( cuda_beam_elements_data_buffer != 0 );
+                success &= ( cuda_beam_elements_data_buffer != NULL );
                 
                 host_beam_elements_data_buffer = NS(Blocks_get_data_begin)( 
                     beam_elements );
@@ -94,8 +97,8 @@ bool NS(Track_particles_on_cuda)(
         /* ----------------------------------------------------------------- */
         
         bool use_elem_by_elem_buffer = false;
-        unsigned char* cuda_elem_by_elem_data_buffer = nullptr;
-        unsigned char* host_elem_by_elem_data_buffer = nullptr;
+        unsigned char* cuda_elem_by_elem_data_buffer = NULL;
+        unsigned char* host_elem_by_elem_data_buffer = NULL;
         
         NS(block_size_t) elem_by_elem_buffer_size =
             ( NS(Blocks_are_serialized)( elem_by_elem_buffer ) ) 
@@ -124,8 +127,8 @@ bool NS(Track_particles_on_cuda)(
             }
             
             success  = ( err == cudaSuccess );
-            success &= ( cuda_elem_by_elem_data_buffer != nullptr );
-            success &= ( host_elem_by_elem_data_buffer != nullptr );
+            success &= ( cuda_elem_by_elem_data_buffer != NULL );
+            success &= ( host_elem_by_elem_data_buffer != NULL );
             success &= ( elem_by_elem_buffer_size > 0u );
             
             use_elem_by_elem_buffer &= success;
@@ -141,8 +144,8 @@ bool NS(Track_particles_on_cuda)(
             success = ( err == cudaSuccess );
         }
         
-        int64_t* cuda_success_flag = nullptr;
-        int64_t  host_success_flag = int64_t{ 0 };
+        int64_t* cuda_success_flag = NULL;
+        int64_t  host_success_flag = static_cast< int64_t >( 0 );
         
         if( success )
         {
@@ -176,7 +179,7 @@ bool NS(Track_particles_on_cuda)(
                                   sizeof( int64_t ), cudaMemcpyDeviceToHost );
                 
                 success  = ( err == cudaSuccess );
-                success &= ( host_success_flag == int64_t{ 0 } );
+                success &= ( host_success_flag == static_cast<int64_t>( 0 ) );
             }
         }
         
@@ -195,8 +198,8 @@ bool NS(Track_particles_on_cuda)(
                 err = cudaMemcpy( &host_success_flag, cuda_success_flag, 
                                   sizeof( int64_t ), cudaMemcpyDeviceToHost );
             
-                success = ( err == cudaSuccess );        
-                success &= ( host_success_flag == uint64_t{ 0 } );
+                success  = ( err == cudaSuccess );        
+                success &= ( host_success_flag == U64_ZERO );
             }
             
             if( success )
