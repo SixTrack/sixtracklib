@@ -490,7 +490,7 @@ SIXTRL_INLINE NS(Blocks)* NS(Blocks_preset)(
 {
     if( blocks != 0 )
     {
-        SIXTRL_STATIC NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
+        SIXTRL_STATIC_VAR NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
         
         blocks->ptr_data_begin          = 0;        
         blocks->ptr_block_infos         = 0;
@@ -1149,7 +1149,7 @@ SIXTRL_INLINE NS(block_size_t) NS(Blocks_get_data_pointers_write_capacity)(
 SIXTRL_INLINE void NS(Blocks_set_data_alignment)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(block_size_t) const alignment )
 {
-    SIXTRL_STATIC NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
+    SIXTRL_STATIC_VAR NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
     
     SIXTRL_ASSERT( NS(Blocks_get_num_of_blocks)( blocks ) == ZERO );
     
@@ -1170,7 +1170,7 @@ SIXTRL_INLINE NS(block_size_t) NS(Blocks_get_data_alignment)(
 SIXTRL_INLINE void NS(Blocks_set_begin_alignment)(
     NS(Blocks)* SIXTRL_RESTRICT blocks, NS(block_size_t) const alignment )
 {
-    SIXTRL_STATIC NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
+    SIXTRL_STATIC_VAR NS(block_size_t) const ZERO = ( NS(block_size_t) )0u;
     
     SIXTRL_ASSERT( NS(Blocks_get_num_of_blocks)( blocks ) == ZERO );
     

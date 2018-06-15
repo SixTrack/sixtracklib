@@ -60,8 +60,8 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_drift_particle)(
     NS(block_num_elements_t) const ii, 
     const NS(Drift) *const SIXTRL_RESTRICT drift )
 {
-    SIXTRL_STATIC SIXTRL_REAL_T const ONE      = ( SIXTRL_REAL_T )1;
-    SIXTRL_STATIC SIXTRL_REAL_T const ONE_HALF = ( SIXTRL_REAL_T )0.5L;
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE      = ( SIXTRL_REAL_T )1;
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE_HALF = ( SIXTRL_REAL_T )0.5L;
     
     SIXTRL_REAL_T const length = NS(Drift_get_length)( drift );
     SIXTRL_REAL_T const rpp = NS(Particles_get_rpp_value)( particles, ii );
@@ -96,7 +96,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_drift_exact_particle)(
     NS(Particles)* SIXTRL_RESTRICT particles, NS(block_num_elements_t) const ii,
     const NS(DriftExact) *const SIXTRL_RESTRICT drift )
 {
-    SIXTRL_STATIC SIXTRL_REAL_T const ONE = ( SIXTRL_REAL_T )1u;
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE = ( SIXTRL_REAL_T )1u;
     
     SIXTRL_REAL_T const length = NS(DriftExact_get_length)( drift );
     SIXTRL_REAL_T const delta  = NS(Particles_get_delta_value)( particles, ii );

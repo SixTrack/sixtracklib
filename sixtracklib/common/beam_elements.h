@@ -91,7 +91,7 @@ SIXTRL_INLINE NS(block_size_t) NS(Drift_predict_blocks_data_capacity)(
     
     if( ( blocks != 0 ) && ( num_of_blocks > 0u ) )
     {
-        SIXTRL_STATIC NS(block_size_t) const NUM_REAL_ATTRIBUTES = 1u;        
+        SIXTRL_STATIC_VAR NS(block_size_t) const NUM_REAL_ATTRIBUTES = 1u;        
         
         NS(block_size_t) const REAL_ATTRIBUTE_SIZE = sizeof( SIXTRL_REAL_T );
         
@@ -131,7 +131,7 @@ SIXTRL_INLINE NS(block_size_t) NS(DriftExact_predict_blocks_data_capacity)(
     
     if( ( blocks != 0 ) && ( num_of_blocks > 0u ) )
     {
-        SIXTRL_STATIC NS(block_size_t) const NUM_REAL_ATTRIBUTES = 1u;        
+        SIXTRL_STATIC_VAR NS(block_size_t) const NUM_REAL_ATTRIBUTES = 1u;        
         
         NS(block_size_t) const REAL_ATTRIBUTE_SIZE = sizeof( SIXTRL_REAL_T );
         
@@ -174,7 +174,7 @@ SIXTRL_INLINE NS(block_size_t) NS(MultiPole_predict_blocks_data_capacity)(
     
     if( ( blocks != 0 ) && ( num_of_blocks > 0u ) && ( max_order > 0u ) )
     {
-        SIXTRL_STATIC NS(block_size_t) const 
+        SIXTRL_STATIC_VAR NS(block_size_t) const 
             NUM_REAL_ATTRIBUTES = 1u;        
         
         NS(block_size_t) const NUM_OF_BAL_VALUES = max_order * 2u + 2u;

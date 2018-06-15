@@ -1136,7 +1136,7 @@ SIXTRL_INLINE void NS( Particles_get_max_value)(
     SIXTRL_GLOBAL_DEC NS(block_size_t)* SIXTRL_RESTRICT max_value_index,
     const NS(Particles) *const SIXTRL_RESTRICT source )
 {
-    SIXTRL_STATIC SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0L;
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0L;
     
     if( ( destination     != 0 ) && ( source != 0 ) && 
         ( NS(Particles_get_num_particles)( destination ) > 0u ) &&

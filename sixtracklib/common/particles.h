@@ -90,8 +90,8 @@ SIXTRL_INLINE NS(block_type_num_t) NS(Particles_predict_blocks_data_capacity)(
     if( ( blocks != 0 ) && ( num_of_particles > 0u ) && 
         ( num_of_blocks > 0u ) )
     {
-        SIXTRL_STATIC NS(block_size_t) const NUM_REAL_ATTRIBUTES = 16u;        
-        SIXTRL_STATIC NS(block_size_t) const NUM_I64_ATTRIBUTES  =  4u;
+        SIXTRL_STATIC_VAR NS(block_size_t) const NUM_REAL_ATTRIBUTES = 16u;        
+        SIXTRL_STATIC_VAR NS(block_size_t) const NUM_I64_ATTRIBUTES  =  4u;
         
         NS(block_size_t) const alignment = 
             NS(Blocks_get_data_alignment)( blocks );
@@ -165,7 +165,7 @@ SIXTRL_INLINE int NS(Particles_is_aligned_with)(
 {
     typedef NS(block_type_num_t) align_t;
     
-    SIXTRL_STATIC uintptr_t const ZERO = ( uintptr_t )0u;
+    SIXTRL_STATIC_VAR uintptr_t const ZERO = ( uintptr_t )0u;
     
     return ( 
         ( particles != 0 ) &&
