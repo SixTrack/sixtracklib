@@ -13,7 +13,7 @@ set( SIXTRACKL_C_NAMESPACE_PREFIX "st_" CACHE STRING
 # ------------------------------------------------------------------------------
 # Unit-testing related settings:
 
-option( SIXTRACKL_ENABLE_PROGRAMM_TESTS "Enable programmatic unit-tests"  ON )
+option( SIXTRACKL_ENABLE_PROGRAMM_TESTS "Enable programmatic unit-tests"  OFF )
 
 set( GTEST_ROOT "" CACHE PATH 
      "Path to include/gtest/gtest.h (for non-standard installations)" )
@@ -21,11 +21,11 @@ set( GTEST_ROOT "" CACHE PATH
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      
 option( SIXTRACKL_ENABLE_TIMING_TESTS   
-        "Enable timing/benchmarking tests (requires C++11 support)" ON )
+        "Enable timing/benchmarking tests (requires C++11 support)" OFF )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-option( SIXTRACKL_ENABLE_PROGRAM_MEMTESTS "Enable programming memory tests" ON )
+option( SIXTRACKL_ENABLE_PROGRAM_MEMTESTS "Enable programming memory tests" OFF )
 
 set( SIXTRACKL_MEMCHECK_COMMAND "valgrind" CACHE STRING 
      "name of the memory check tool (i.e. valgrind)" )
