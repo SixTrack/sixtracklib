@@ -482,8 +482,13 @@ TEST( OpenCLTrackTests, TrackDrifts )
     ASSERT_TRUE( !st_Particles_buffers_map_to_same_memory(
         &initial_particles_buffer, &particles_buffer ) );
     
-    if( 0 != st_Particles_buffer_compare_values(
+    if( 0 == st_Particles_buffer_compare_values(
         &result_particles_buffer, &particles_buffer ) )
+    {
+        std::cout << "calculated result and result from testdata are "
+                     "bit-for-bit identical --> Success!" << std::endl;
+    }
+    else
     {
         st_Blocks max_diff_buffer;
         st_Blocks_preset( &max_diff_buffer );
