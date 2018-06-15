@@ -138,12 +138,60 @@ TEST( OpenCLTrackTests, TrackDrifts )
     ASSERT_TRUE( !platforms.empty() );
     cl::Platform platform = platforms.front();
     
+    cl_int ret = 0;
+    
+    if( !platforms.empty() )
+    {
+        std::string name;
+        ret  = platform.getInfo( CL_PLATFORM_NAME, &name );
+    
+        std::string vendor;
+        ret |= platform.getInfo( CL_PLATFORM_VENDOR, &vendor );
+    
+        std::string profile;
+        ret |= platform.getInfo( CL_PLATFORM_PROFILE, &profile );
+        
+        ASSERT_TRUE( ret == CL_SUCCESS );
+        
+        
+        std::cout << "selected platform  : \r\n" 
+                  << " -> name           = " << name    << "\r\n"
+                  << " -> vendor         = " << vendor  << "\r\n"
+                  << " -> profile        = " << profile << "\r\n"
+                  << "\r\n" << std::endl;
+    }
+    
     std::vector< cl::Device > devices;
     platform.getDevices( CL_DEVICE_TYPE_ALL, &devices );
-            
     ASSERT_TRUE( !devices.empty() );
     
     cl::Device device = devices.front();
+        
+    if( !devices.empty() )        
+    {
+        std::string name;
+        ret  = device.getInfo( CL_DEVICE_NAME, &name );
+        
+        std::string vendor;
+        ret |= device.getInfo( CL_DEVICE_VENDOR, &vendor );
+        
+        std::string profile;
+        ret |= device.getInfo( CL_DEVICE_PROFILE, &profile );
+        
+        std::string opencl_version;
+        ret |= device.getInfo( CL_DEVICE_OPENCL_C_VERSION, &opencl_version );
+        
+        ASSERT_TRUE( ret == CL_SUCCESS );
+        
+        std::cout   << "selected device : \r\n"
+                    << " -> name           = " <<  name    << "\r\n"
+                    << " -> vendor         = " <<  vendor  << "\r\n"
+                    << " -> profile        = " <<  profile << "\r\n"
+                    << " -> OpenCL Version = " << opencl_version << "\r\n"
+                    << std::endl;
+    }
+    
+    
     cl::Context context( device );
     
     std::string PATH_TO_SOURCE_DIR( st_PATH_TO_BASE_DIR );
@@ -216,7 +264,7 @@ TEST( OpenCLTrackTests, TrackDrifts )
         ? st_Blocks_get_total_num_bytes( &calculated_elem_by_elem_buffer )
         : 32u;
         
-    cl_int ret = CL_SUCCESS;
+    ret = CL_SUCCESS;
     
     /* --------------------------------------------------------------------- */
     
