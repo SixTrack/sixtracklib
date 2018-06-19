@@ -6,10 +6,9 @@
     #define __SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE 1
 #endif /* !defined( __NAMESPACE ) */
 
-#include "sixtracklib/_impl/definitions.h"
-
 /* ------------------------------------------------------------------------- */
 
+#include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/_impl/namespace_begin.h"
 #include "sixtracklib/_impl/path.h"
 #include "sixtracklib/_impl/modules.h"
