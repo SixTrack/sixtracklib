@@ -16,7 +16,7 @@ extern "C" {
 
 #endif /* !defined( _GPUCODE ) */
 
-/* ------------------------------------------------------------------------- */
+/* ========================================================================= */
     
 typedef struct NS(Drift)
 {
@@ -24,7 +24,7 @@ typedef struct NS(Drift)
 }
 NS(Drift);   
 
-/* ------------------------------------------------------------------------- */
+/* ========================================================================= */
 
 typedef struct NS(DriftExact)
 {
@@ -32,7 +32,7 @@ typedef struct NS(DriftExact)
 }
 NS(DriftExact);
 
-/* ------------------------------------------------------------------------- */
+/* ========================================================================= */
 
 typedef struct NS(MultiPole)
 {
@@ -46,7 +46,71 @@ typedef struct NS(MultiPole)
 }
 NS(MultiPole);
 
-/* ------------------------------------------------------------------------- */
+/* ========================================================================= */
+
+struct NS(BeamBeamBoostData);
+struct NS(BeamBeamSigmas);
+
+typedef struct NS(BeamBeam)
+{
+    SIXTRL_GLOBAL_DEC struct NS(BeamBeamBoostData)* SIXTRL_RESTRICT   
+        boost                            __attribute__(( aligned( 8 ) ));
+        
+    SIXTRL_GLOBAL_DEC struct NS(BeamBeamSigmas)* SIXTRL_RESTRICT 
+        sigmas                           __attribute__(( aligned( 8 ) ));
+    
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT
+        n_part_per_slice                 __attribute__(( aligned( 8 ) ));
+    
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT 
+        x_slices_star                    __attribute__(( aligned( 8 ) ));
+        
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT 
+        y_slices_star                    __attribute__(( aligned( 8 ) ));
+        
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT 
+        sigma_slices_star                __attribute__(( aligned( 8 ) ));
+    
+    NS(block_num_elements_t) num_of_slices  __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T            q_part         __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T            min_sigma_diff __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T            treshold_sing  __attribute__(( aligned( 8 ) ));
+}
+NS(BeamBeam);
+
+/* ========================================================================= */
+
+typedef struct NS(Cavity)
+{
+    SIXTRL_REAL_T   voltage     __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T   frequency   __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T   lag         __attribute__(( aligned( 8 ) ));    
+}
+NS(Cavity);
+
+/* ========================================================================= */
+
+typedef struct NS(Align)
+{
+    SIXTRL_REAL_T   tilt        __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T   cz          __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T   sz          __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T   dx          __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T   dy          __attribute__(( aligned( 8 ) ));
+}
+NS(Align);
+
+/* ========================================================================= */
+
+typedef struct NS(BeamBeamBoostData)
+{
+    SIXTRL_REAL_T sphi   __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T cphi   __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T tphi   __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T salpha __attribute__(( aligned( 8 ) ));
+    SIXTRL_REAL_T calpha __attribute__(( aligned( 8 ) ));
+}
+NS(BeamBeamBoostData);
 
 typedef struct NS(BeamBeamSigmas)
 {
@@ -71,43 +135,6 @@ typedef struct NS(BeamBeamPropagatedSigmasResult)
     SIXTRL_REAL_T  sin_theta    __attribute__(( aligned( 8 ) ));    
 }
 NS(BeamBeamPropagatedSigmasResult);
-
-typedef struct NS(BeamBeamBoostData)
-{
-    SIXTRL_REAL_T sphi   __attribute__(( aligned( 8 ) ));
-    SIXTRL_REAL_T cphi   __attribute__(( aligned( 8 ) ));
-    SIXTRL_REAL_T tphi   __attribute__(( aligned( 8 ) ));
-    SIXTRL_REAL_T salpha __attribute__(( aligned( 8 ) ));
-    SIXTRL_REAL_T calpha __attribute__(( aligned( 8 ) ));
-}
-NS(BeamBeamBoostData);
-
-typedef struct NS(BeamBeam)
-{
-    SIXTRL_GLOBAL_DEC NS(BeamBeamBoostData)* SIXTRL_RESTRICT   
-        boost                            __attribute__(( aligned( 8 ) ));
-        
-    SIXTRL_GLOBAL_DEC NS(BeamBeamSigmas)* SIXTRL_RESTRICT 
-        sigmas                           __attribute__(( aligned( 8 ) ));
-    
-    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT
-        n_part_per_slice                 __attribute__(( aligned( 8 ) ));
-    
-    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT 
-        x_slices_star                    __attribute__(( aligned( 8 ) ));
-        
-    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT 
-        y_slices_star                    __attribute__(( aligned( 8 ) ));
-        
-    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT 
-        sigma_slices_star                __attribute__(( aligned( 8 ) ));
-    
-    NS(block_num_elements_t) num_of_slices  __attribute__(( aligned( 8 ) ));
-    SIXTRL_REAL_T            q_part         __attribute__(( aligned( 8 ) ));
-    SIXTRL_REAL_T            min_sigma_diff __attribute__(( aligned( 8 ) ));
-    SIXTRL_REAL_T            treshold_sing  __attribute__(( aligned( 8 ) ));
-}
-NS(BeamBeam);
 
 /* ------------------------------------------------------------------------- */
 

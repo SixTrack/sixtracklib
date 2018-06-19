@@ -507,6 +507,77 @@ SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamBoostData_set_calpha)(
     SIXTRL_REAL_T const calpha );
 
 /* ========================================================================= */
+
+SIXTRL_FN SIXTRL_STATIC NS(Cavity)* NS(Cavity_preset)( 
+    NS(Cavity)* SIXTRL_RESTRICT cavity );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Cavity_get_voltage)(
+    const NS(Cavity) *const SIXTRL_RESTRICT cavity );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Cavity_set_voltage)(
+    NS(Cavity)* SIXTRL_RESTRICT cavity, SIXTRL_REAL_T const voltage );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Cavity_get_frequency)(
+    const NS(Cavity) *const SIXTRL_RESTRICT cavity );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Cavity_set_frequency)(
+    NS(Cavity)* SIXTRL_RESTRICT cavity, SIXTRL_REAL_T const frequency );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Cavity_get_lag)(
+    const NS(Cavity) *const SIXTRL_RESTRICT cavity );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Cavity_set_lag)(
+    NS(Cavity)* SIXTRL_RESTRICT cavity, SIXTRL_REAL_T const lag );
+
+/* ========================================================================= */
+
+SIXTRL_FN SIXTRL_STATIC NS(Align)* NS(Align_preset)( 
+    NS(Align)* SIXTRL_RESTRICT align );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Align) const* 
+NS(Blocks_get_const_align)( 
+    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Align)* 
+NS(Blocks_get_align)( NS(BlockInfo)* SIXTRL_RESTRICT block_info );
+
+SIXTRL_FN SIXTRL_STATIC NS(BlockType) NS(Align_get_type_id)(
+    const NS(Align) *const SIXTRL_RESTRICT align );
+
+SIXTRL_FN SIXTRL_STATIC NS(block_type_num_t) NS(Align_get_type_id_num)(
+    const NS(Align) *const SIXTRL_RESTRICT align );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Align_get_tilt)(
+    const NS(Align) *const SIXTRL_RESTRICT align );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Align_set_tilt)(
+    NS(Align)* SIXTRL_RESTRICT align, SIXTRL_REAL_T const tilt );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Align_get_cz)(
+    const NS(Align) *const SIXTRL_RESTRICT align );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Align_set_cz)(
+    NS(Align)* SIXTRL_RESTRICT align, SIXTRL_REAL_T const cz );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Align_get_cz)(
+    const NS(Align) *const SIXTRL_RESTRICT align );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Align_set_sz)(
+    NS(Align)* SIXTRL_RESTRICT align, SIXTRL_REAL_T const sz );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Align_get_dx)(
+    const NS(Align) *const SIXTRL_RESTRICT align );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Align_set_dx)(
+    NS(Align)* SIXTRL_RESTRICT align, SIXTRL_REAL_T const dx );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Align_get_dy)(
+    const NS(Align) *const SIXTRL_RESTRICT align );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Align_set_dy)(
+    NS(Align)* SIXTRL_RESTRICT align, SIXTRL_REAL_T const dy );
+
+/* ========================================================================= */
 /* ======             Implementation of inline functions            ======== */
 /* ========================================================================= */
 
@@ -1738,6 +1809,163 @@ SIXTRL_INLINE void NS(BeamBeamBoostData_set_calpha)(
     boost_data->calpha = calpha;
     return;
 }
+
+/* ========================================================================= */
+
+SIXTRL_INLINE NS(Cavity)* NS(Cavity_preset)( 
+    NS(Cavity)* SIXTRL_RESTRICT cavity )
+{
+    if( cavity != 0 )
+    {
+        SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0L;
+        
+        cavity->voltage   = ZERO;
+        cavity->frequency = ZERO;
+        cavity->lag       = ZERO;
+    }
+    
+    return cavity;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_get_voltage)(
+    const NS(Cavity) *const SIXTRL_RESTRICT cavity )
+{
+    SIXTRL_ASSERT( cavity != 0 );
+    return cavity->voltage;
+}
+
+SIXTRL_INLINE void NS(Cavity_set_voltage)(
+    NS(Cavity)* SIXTRL_RESTRICT cavity, SIXTRL_REAL_T const voltage )
+{
+    SIXTRL_ASSERT( cavity != 0 );
+    cavity->voltage = voltage;
+    return;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_get_frequency)(
+    const NS(Cavity) *const SIXTRL_RESTRICT cavity )
+{
+    SIXTRL_ASSERT( cavity != 0 );
+    return cavity->frequency;
+}
+
+SIXTRL_INLINE void NS(Cavity_set_frequency)(
+    NS(Cavity)* SIXTRL_RESTRICT cavity, SIXTRL_REAL_T const frequency )
+{
+    SIXTRL_ASSERT( cavity != 0 );
+    cavity->frequency = frequency;
+    return;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_get_lag)(
+    const NS(Cavity) *const SIXTRL_RESTRICT cavity )
+{
+    SIXTRL_ASSERT( cavity != 0 );
+    return cavity->lag;
+}
+
+SIXTRL_INLINE void NS(Cavity_set_lag)( 
+    NS(Cavity)* SIXTRL_RESTRICT cavity, SIXTRL_REAL_T const lag )
+{
+    SIXTRL_ASSERT( cavity != 0 );
+    cavity->lag = lag;
+    return;
+}
+
+/* ========================================================================= */
+
+SIXTRL_INLINE NS(Align)* NS(Align_preset)( NS(Align)* SIXTRL_RESTRICT align )
+{
+    if( align != 0 )
+    {
+        SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0L;
+        
+        align->tilt     = ZERO;
+        align->cz       = ZERO;
+        align->sz       = ZERO;
+        align->dx       = ZERO;
+        align->dy       = ZERO;
+    }
+    
+    return align;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(Align_get_tilt)(
+    const NS(Align) *const SIXTRL_RESTRICT align )
+{
+    SIXTRL_ASSERT( align != 0 );
+    return align->tilt;
+}
+
+SIXTRL_INLINE void NS(Align_set_tilt)(
+    NS(Align)* SIXTRL_RESTRICT align, SIXTRL_REAL_T const tilt )
+{
+    SIXTRL_ASSERT( align != 0 );
+    align->tilt = tilt;
+    return;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(Align_get_cz)(
+    const NS(Align) *const SIXTRL_RESTRICT align )
+{
+    SIXTRL_ASSERT( align != 0 );
+    return align->cz;
+}
+
+SIXTRL_INLINE void NS(Align_set_cz)(
+    NS(Align)* SIXTRL_RESTRICT align, SIXTRL_REAL_T const cz )
+{
+    SIXTRL_ASSERT( align != 0 );
+    align->cz = cz;
+    return;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(Align_get_sz)(
+    const NS(Align) *const SIXTRL_RESTRICT align )
+{
+    SIXTRL_ASSERT( align != 0 );
+    return align->sz;
+}
+
+SIXTRL_INLINE void NS(Align_set_sz)(
+    NS(Align)* SIXTRL_RESTRICT align, SIXTRL_REAL_T const sz )
+{
+    SIXTRL_ASSERT( align != 0 );
+    align->sz = sz;
+    return;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(Align_get_dx)( 
+    const NS(Align) *const SIXTRL_RESTRICT align )
+{
+    SIXTRL_ASSERT( align != 0 );
+    return align->dx;
+}
+
+SIXTRL_INLINE void NS(Align_set_dx)(
+    NS(Align)* SIXTRL_RESTRICT align, SIXTRL_REAL_T const dx )
+{
+    SIXTRL_ASSERT( align != 0 );
+    align->dx = dx;
+    return;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(Align_get_dy)(
+    const NS(Align) *const SIXTRL_RESTRICT align )
+{
+    SIXTRL_ASSERT( align != 0 );
+    return align->dy;
+}
+
+SIXTRL_INLINE void NS(Align_set_dy)(
+    NS(Align)* SIXTRL_RESTRICT align, SIXTRL_REAL_T const dy )
+{
+    SIXTRL_ASSERT( align != 0 );
+    align->dy = dy;
+    return;
+}
+
+/* ========================================================================= */
 
 #if !defined( _GPUCODE )
 #ifdef __cplusplus

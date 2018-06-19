@@ -103,6 +103,49 @@ SIXTRL_HOST_FN SIXTRL_GLOBAL_DEC NS(BeamBeam)* NS(Blocks_reserve_beam_beam)(
 
 #endif /* !defined( _GPUCODE ) */
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) 
+NS(Cavity_predict_blocks_data_capacity)(
+    const NS(Blocks) *const SIXTRL_RESTRICT blocks,
+    NS(block_size_t) const num_of_blocks );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_HOST_FN SIXTRL_STATIC 
+SIXTRL_GLOBAL_DEC NS(Cavity)* NS(Blocks_add_cavity)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks,
+    SIXTRL_REAL_T const voltage, 
+    SIXTRL_REAL_T const frequency, 
+    SIXTRL_REAL_T const lag );
+    
+SIXTRL_HOST_FN SIXTRL_GLOBAL_DEC NS(Cavity)* 
+NS(Blocks_reserve_beam_beam)( NS(Blocks)* SIXTRL_RESTRICT blocks );
+
+#endif /* !defined( _GPUCODE ) */
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC NS(block_size_t) 
+NS(Align_predict_blocks_data_capacity)(
+    const NS(Blocks) *const SIXTRL_RESTRICT blocks,
+    NS(block_size_t) const num_of_blocks );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_HOST_FN SIXTRL_STATIC 
+SIXTRL_GLOBAL_DEC NS(Align)* NS(Blocks_add_align)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks,
+    SIXTRL_REAL_T const tilt 
+    SIXTRL_REAL_T const cz,  SIXTRL_REAL_T const sz,
+    SIXTRL_REAL_T const dx,  SIXTRL_REAL_T const dy 
+);
+    
+SIXTRL_HOST_FN SIXTRL_GLOBAL_DEC NS(Align)* 
+NS(Blocks_reserve_align)( NS(Blocks)* SIXTRL_RESTRICT blocks );
+
+#endif /* !defined( _GPUCODE ) */
+
 /* ========================================================================= */
 /* =====             Implementation of inline functions                ===== */
 /* ========================================================================= */
@@ -253,8 +296,6 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(Blocks_add_multipole)(
 
 /* ------------------------------------------------------------------------- */
 
-/* ------------------------------------------------------------------------- */
-
 SIXTRL_INLINE NS(block_size_t) NS(BeamBeam_predict_blocks_data_capacity)(
     const NS(Blocks) *const SIXTRL_RESTRICT blocks,
     NS(block_size_t) const num_of_blocks, 
@@ -332,6 +373,93 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BeamBeam)* NS(Blocks_add_beam_beam)(
     }
     
     return beam_beam;
+}
+
+#endif /* !defined( _GPUCODE ) */
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE NS(block_size_t) NS(Cavity_predict_blocks_data_capacity)( 
+    const NS(Blocks) *const SIXTRL_RESTRICT blocks, 
+    NS(block_size_t) const num_of_blocks )
+{
+    NS(block_size_t) attr_data_capacity = ( NS(block_size_t) )0u;
+    
+    if( ( blocks != 0 ) && ( num_of_blocks > 0u ) )
+    {
+        SIXTRL_STATIC_VAR NS(block_size_t) const CAVITY_SIZE = 
+            sizeof( NS(Cavity ) );
+        
+        NS(block_size_t) const alignment = 
+            NS(Blocks_get_data_alignment)( blocks );
+            
+        attr_data_capacity = num_of_blocks * ( alignment + CAVITY_SIZE );
+    }
+        
+    return attr_data_capacity;
+}
+
+#if !defined( _GPUCODE )
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Cavity)* NS(Blocks_add_cavity)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks, SIXTRL_REAL_T const voltage, 
+    SIXTRL_REAL_T const frequency, SIXTRL_REAL_T const lag )
+{
+    SIXTRL_GLOBAL_DEC NS(Cavity)* cavity = NS(Blocks_reserve_cavity)( blocks );
+    
+    if( cavity != 0 )
+    {
+        NS(Cavity_set_voltage)( cavity, voltage );
+        NS(Cavity_set_frequency)( cavity, frequency );
+        NS(Cavity_set_lag)( cavity, lag );
+    }
+    
+    return cavity;
+}
+    
+#endif /* !defined( _GPUCODE ) */
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE NS(block_size_t) NS(Align_predict_blocks_data_capacity)(
+    const NS(Blocks) *const SIXTRL_RESTRICT blocks,
+    NS(block_size_t) const num_of_blocks )
+{
+    NS(block_size_t) attr_data_capacity = ( NS(block_size_t) )0u;
+    
+    if( ( blocks != 0 ) && ( num_of_blocks > 0u ) )
+    {
+        SIXTRL_STATIC_VAR NS(block_size_t) const 
+            ALIGN_SIZE = sizeof( NS(Align ) );
+        
+        NS(block_size_t) const alignment = 
+            NS(Blocks_get_data_alignment)( blocks );
+            
+        attr_data_capacity = num_of_blocks * ( alignment + ALIGN_SIZE );
+    }
+        
+    return attr_data_capacity;
+}
+
+#if !defined( _GPUCODE )
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Align)* NS(Blocks_add_align)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks, SIXTRL_REAL_T const tilt 
+    SIXTRL_REAL_T const cz,  SIXTRL_REAL_T const sz,
+    SIXTRL_REAL_T const dx,  SIXTRL_REAL_T const dy )
+{
+    SIXTRL_GLOBAL_DEC NS(Align)* align = NS(Blocks_reserve_align)( blocks );
+    
+    if( align != 0 )
+    {
+        NS(Align_set_tilt)( align, tilt );
+        NS(Align_set_cz)( align, cz );
+        NS(Align_set_sz)( align, sz );
+        NS(Align_set_dx)( align, dx );
+        NS(Align_set_dy)( align, dy );
+    }
+    
+    return align;
 }
 
 #endif /* !defined( _GPUCODE ) */

@@ -24,6 +24,12 @@ extern SIXTRL_GLOBAL_DEC NS(BeamBeam)* NS(Blocks_reserve_beam_beam)(
     NS(Blocks)* SIXTRL_RESTRICT blocks, 
     NS(block_num_elements_t) const num_of_slices );
 
+extern SIXTRL_GLOBAL_DEC NS(Cavity)* NS(Blocks_reserve_beam_beam)( 
+    NS(Blocks)* SIXTRL_RESTRICT blocks );
+
+extern SIXTRL_GLOBAL_DEC NS(Align)* NS(Blocks_reserve_align)( 
+    NS(Blocks)* SIXTRL_RESTRICT blocks );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_GLOBAL_DEC NS(Drift)* NS(Blocks_reserve_drift)( 
@@ -173,5 +179,54 @@ SIXTRL_GLOBAL_DEC NS(BeamBeam)* NS(Blocks_reserve_beam_beam)(
     
     return ptr_beam_beam;
 }
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_GLOBAL_DEC NS(Cavity)* NS(Blocks_reserve_cavity)( 
+    NS(Blocks)* SIXTRL_RESTRICT blocks )
+{
+    SIXTRL_GLOBAL_DEC NS(Cavity)* ptr_cavity = 0;
+    
+    if( blocks != 0 )
+    {
+        NS(Cavity) cavity;
+        NS(Cavity_preset)( &cavity );
+        
+        NS(BlockInfo)* ptr_info_block = NS(Blocks_add_block)( blocks, 
+            NS(BLOCK_TYPE_CAVITY), sizeof( cavity ), &cavity, 0u, 0, 0, 0 );
+        
+        if( ptr_info_block != 0 )
+        {
+            ptr_cavity = NS(Blocks_get_cavity)( ptr_info_block );
+        }
+    }
+    
+    return ptr_cavity;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_GLOBAL_DEC NS(Align)* NS(Blocks_reserve_align)( 
+    NS(Blocks)* SIXTRL_RESTRICT blocks )
+{
+    SIXTRL_GLOBAL_DEC NS(Align)* ptr_align = 0;
+    
+    if( blocks != 0 )
+    {
+        NS(Align) align;
+        NS(Align_preset)( &align );
+        
+        NS(BlockInfo)* ptr_info_block = NS(Blocks_add_block)( blocks, 
+            NS(BLOCK_TYPE_ALIGN), sizeof( align ), &align, 0u, 0, 0, 0 );
+        
+        if( ptr_info_block != 0 )
+        {
+            ptr_align = NS(Blocks_get_align)( ptr_info_block );
+        }
+    }
+    
+    return ptr_align;
+}
+
 
 /* end: sixtracklib/common/details/beam_elements.c */
