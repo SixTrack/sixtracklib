@@ -134,6 +134,378 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC
 NS(MultiPole)* NS(Blocks_get_multipole)( 
     NS(BlockInfo)* SIXTRL_RESTRICT block_info );
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BeamBeamBoostData) const* 
+NS(BeamBeam_get_const_ptr_boost_data)( 
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BeamBeamBoostData)*
+NS(BeamBeam_get_ptr_boost_data)( NS(BeamBeam)* SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_boost_data)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC const NS(BeamBeamBoostData) *const 
+        SIXTRL_RESTRICT ptr_boost_data );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_boost_data_value)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    const NS(BeamBeamBoostData) *const SIXTRL_RESTRICT ptr_boost_data );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_assign_boost_data_ptr)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC NS(BeamBeamBoostData)* SIXTRL_RESTRICT ptr_boost_data );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BeamBeamSigmas) const* 
+NS(BeamBeam_get_const_ptr_sigmas_matrix)( 
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BeamBeamSigmas)*
+NS(BeamBeam_get_ptr_sigmas_matrix)( NS(BeamBeam)* SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_sigmas_matrix)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC const NS(BeamBeamSigmas) *const 
+        SIXTRL_RESTRICT ptr_sigmas );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_sigmas_matrix_value)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT ptr_sigmas );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_assign_sigmas_matrix_ptr)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC NS(BeamBeamSigmas)* SIXTRL_RESTRICT ptr_sigmas );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC NS(BeamBeam)* NS(BeamBeam_preset)( 
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BeamBeam) const* 
+NS(Blocks_get_const_beam_beam)( 
+    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(BeamBeam)* 
+NS(Blocks_get_beam_beam)( NS(BlockInfo)* SIXTRL_RESTRICT block_info );
+
+SIXTRL_FN SIXTRL_STATIC NS(BlockType) NS(BeamBeam_get_type_id)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT drift );
+
+SIXTRL_FN SIXTRL_STATIC NS(block_type_num_t) NS(BeamBeam_get_type_id_num)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT drift );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* 
+NS(BeamBeam_get_const_n_part_per_slice)( 
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+NS(BeamBeam_get_n_part_per_slice)( NS(BeamBeam)* SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(BeamBeam_get_n_part_per_slice_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_n_part_per_slice_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index,
+    SIXTRL_REAL_T const value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_n_part_per_slice)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* n_part_per_slice_begin );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_assign_n_part_per_slice_ptr)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* n_part_per_slice_begin );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* 
+NS(BeamBeam_get_const_x_slices_star)( 
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+NS(BeamBeam_get_x_slices_star)( NS(BeamBeam)* SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(BeamBeam_get_x_slices_star_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_x_slices_star_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index,
+    SIXTRL_REAL_T const value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_x_slices_star)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* x_slices_star_begin );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_assign_x_slices_star_ptr)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* x_slices_star_begin );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* 
+NS(BeamBeam_get_const_y_slices_star)( 
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+NS(BeamBeam_get_y_slices_star)( NS(BeamBeam)* SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(BeamBeam_get_y_slices_star_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_y_slices_star_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index,
+    SIXTRL_REAL_T const value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_y_slices_star)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* y_slices_star_begin );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_assign_y_slices_star_ptr)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* y_slices_star_begin );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* 
+NS(BeamBeam_get_const_sigma_slices_star)( 
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+NS(BeamBeam_get_sigma_slices_star)( NS(BeamBeam)* SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(BeamBeam_get_sigma_slices_star_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_sigma_slices_star_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index,
+    SIXTRL_REAL_T const value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_sigma_slices_star)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* sigma_slices_star_begin );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_assign_sigma_slices_star_ptr)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* sigma_slices_star_begin );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC NS(block_num_elements_t) NS(BeamBeam_get_num_of_slices)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_num_of_slices)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const num_of_slices );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(BeamBeam_get_q_part)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_q_part)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, SIXTRL_REAL_T const q_part );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(BeamBeam_get_min_sigma_diff)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_min_sigma_diff)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_REAL_T const min_sigma_diff );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(BeamBeam_get_treshold_singular)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam_set_treshold_singular)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_REAL_T const treshold_singular );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC NS(BeamBeamSigmas)* NS(BeamBeamSigmas_preset)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma11)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamSigmas_set_sigma11)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_11 );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma12)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamSigmas_set_sigma12)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_12 );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma13)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamSigmas_set_sigma13)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_13 );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T  NS(BeamBeamSigmas_get_sigma14)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamSigmas_set_sigma14)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_14 );
+
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T  NS(BeamBeamSigmas_get_sigma22)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamSigmas_set_sigma22)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_22 );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T  NS(BeamBeamSigmas_get_sigma23)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamSigmas_set_sigma23)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_23 );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T  NS(BeamBeamSigmas_get_sigma24)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamSigmas_set_sigma24)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_24 );
+
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T  NS(BeamBeamSigmas_get_sigma33)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamSigmas_set_sigma33)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_33 );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T  NS(BeamBeamSigmas_get_sigma34)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamSigmas_set_sigma34)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_34 );
+
+
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T  NS(BeamBeamSigmas_get_sigma44)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamSigmas_set_sigma44)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_44 );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC NS(BeamBeamPropagatedSigmasResult)* 
+NS(BeamBeamPropagatedSigmasResult_preset)(
+    NS(BeamBeamPropagatedSigmasResult)* SIXTRL_RESTRICT result );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T 
+NS(BeamBeamPropagatedSigmasResult_get_cos_theta)( 
+    const NS(BeamBeamPropagatedSigmasResult) *const SIXTRL_RESTRICT result );
+    
+SIXTRL_FN SIXTRL_STATIC void 
+NS(BeamBeamPropagatedSigmasResult_set_cos_theta)(
+    NS(BeamBeamPropagatedSigmasResult)* SIXTRL_RESTRICT result,
+    SIXTRL_REAL_T const cos_theta );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T 
+NS(BeamBeamPropagatedSigmasResult_get_sin_theta)( 
+    const NS(BeamBeamPropagatedSigmasResult) *const SIXTRL_RESTRICT result );
+    
+SIXTRL_FN SIXTRL_STATIC void 
+NS(BeamBeamPropagatedSigmasResult_set_sin_theta)(
+    NS(BeamBeamPropagatedSigmasResult)* SIXTRL_RESTRICT result,
+    SIXTRL_REAL_T const sin_theta );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T 
+NS(BeamBeamPropagatedSigmasResult_get_sigma_11_hat)( 
+    const NS(BeamBeamPropagatedSigmasResult) *const SIXTRL_RESTRICT result );
+    
+SIXTRL_FN SIXTRL_STATIC void 
+NS(BeamBeamPropagatedSigmasResult_set_sigma_11_hat)(
+    NS(BeamBeamPropagatedSigmasResult)* SIXTRL_RESTRICT result,
+    SIXTRL_REAL_T const sigma_11_hat );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T 
+NS(BeamBeamPropagatedSigmasResult_get_sigma_33_hat)( 
+    const NS(BeamBeamPropagatedSigmasResult) *const SIXTRL_RESTRICT result );
+    
+SIXTRL_FN SIXTRL_STATIC void 
+NS(BeamBeamPropagatedSigmasResult_set_sigma_33_hat)(
+    NS(BeamBeamPropagatedSigmasResult)* SIXTRL_RESTRICT result,
+    SIXTRL_REAL_T const sigma_11_hat );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC NS(BeamBeamBoostData)* NS(BeamBeamBoostData_preset)(
+    NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T 
+NS(BeamBeamBoostData_get_sphi)( SIXTRL_GLOBAL_DEC const 
+    NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamBoostData_set_sphi)(
+    NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data, 
+    SIXTRL_REAL_T const sphi );
+
+
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T 
+NS(BeamBeamBoostData_get_cphi)( 
+    const NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamBoostData_set_cphi)(
+    NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data, 
+    SIXTRL_REAL_T const cphi );
+
+
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T 
+NS(BeamBeamBoostData_get_tphi)( 
+    const NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamBoostData_set_tphi)(
+    NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data, 
+    SIXTRL_REAL_T const tphi );
+
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T 
+NS(BeamBeamBoostData_get_salpha)( 
+    const NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamBoostData_set_salpha)(
+    NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data, 
+    SIXTRL_REAL_T const salpha );
+    
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T 
+NS(BeamBeamBoostData_get_calpha)( 
+    const NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamBoostData_set_calpha)(
+    NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data, 
+    SIXTRL_REAL_T const calpha );
+
 /* ========================================================================= */
 /* ======             Implementation of inline functions            ======== */
 /* ========================================================================= */
@@ -482,6 +854,889 @@ NS(Blocks_get_multipole)( NS(BlockInfo)* SIXTRL_RESTRICT block_info )
 {
     return ( SIXTRL_GLOBAL_DEC NS(MultiPole)* )NS(Blocks_get_const_multipole)( 
         block_info );
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BeamBeamBoostData) const* 
+NS(BeamBeam_get_const_ptr_boost_data)( 
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
+{
+    return ( beam_beam != 0 ) ? beam_beam->boost : 0;
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BeamBeamBoostData)*
+NS(BeamBeam_get_ptr_boost_data)( NS(BeamBeam)* SIXTRL_RESTRICT beam_beam )
+{
+    return ( SIXTRL_GLOBAL_DEC NS(BeamBeamBoostData)* 
+        )NS(BeamBeam_get_const_ptr_boost_data)( beam_beam );
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_boost_data)( NS(BeamBeam)* SIXTRL_RESTRICT 
+    beam_beam, SIXTRL_GLOBAL_DEC const NS(BeamBeamBoostData) *const 
+        SIXTRL_RESTRICT ptr_boost_data )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && ( beam_beam->boost != 0 ) );
+    SIXTRL_ASSERT( ptr_boost_data != 0 );
+    
+    SIXTRACKLIB_COPY_VALUES( NS(BeamBeamBoostData), beam_beam->boost, 
+                             ptr_boost_data, 1u );
+    
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_boost_data_value)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    const NS(BeamBeamBoostData) *const SIXTRL_RESTRICT ptr_boost_data )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && ( beam_beam->boost != 0 ) );
+    SIXTRL_ASSERT( ptr_boost_data != 0 );
+    
+    *beam_beam->boost = *ptr_boost_data;
+    
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_assign_boost_data_ptr)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC NS(BeamBeamBoostData)* SIXTRL_RESTRICT ptr_boost_data )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );
+    beam_beam->boost = ptr_boost_data;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BeamBeamSigmas) const* 
+NS(BeamBeam_get_const_ptr_sigmas_matrix)( 
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
+{
+    return ( beam_beam != 0 ) ? beam_beam->sigmas : 0;
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BeamBeamSigmas)*
+NS(BeamBeam_get_ptr_sigmas_matrix)( NS(BeamBeam)* SIXTRL_RESTRICT beam_beam )
+{
+    return ( SIXTRL_GLOBAL_DEC NS(BeamBeamSigmas)* 
+        )NS(BeamBeam_get_const_ptr_sigmas_matrix)( beam_beam );
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_sigmas_matrix)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC const NS(BeamBeamSigmas) *const 
+        SIXTRL_RESTRICT ptr_sigmas )
+{
+    SIXTRL_ASSERT( ( beam_beam  != 0 ) && ( beam_beam->sigmas != 0 ) );
+    SIXTRL_ASSERT(   ptr_sigmas != 0 );
+    
+    SIXTRACKLIB_COPY_VALUES( NS(BeamBeamSigmas), beam_beam->sigmas, 
+                             ptr_sigmas, 1u );
+    
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_sigmas_matrix_value)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT ptr_sigmas )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && ( beam_beam->sigmas != 0 ) );
+    SIXTRL_ASSERT(  ptr_sigmas != 0 );
+    
+    *beam_beam->sigmas = *ptr_sigmas;    
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_assign_sigmas_matrix_ptr)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC NS(BeamBeamSigmas)* SIXTRL_RESTRICT ptr_sigmas )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );
+    beam_beam->sigmas = ptr_sigmas;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE NS(BeamBeam)* NS(BeamBeam_preset)( 
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam )
+{
+    if( beam_beam != 0 )
+    {
+        SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0;
+        
+        beam_beam->boost             = 0;
+        beam_beam->sigmas            = 0;
+        beam_beam->n_part_per_slice  = 0;
+        beam_beam->x_slices_star     = 0;
+        beam_beam->y_slices_star     = 0;
+        beam_beam->sigma_slices_star = 0;
+        
+        beam_beam->num_of_slices     = ( NS(block_num_elements_t) )0u;
+        beam_beam->q_part            = ZERO;
+        beam_beam->min_sigma_diff    = ZERO;
+        beam_beam->treshold_sing     = ZERO;        
+    }
+    
+    return beam_beam;
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BeamBeam) const* 
+NS(Blocks_get_const_beam_beam)( 
+    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info )
+{
+    #if !defined( _GPUCODE )
+    
+    NS(BlockType) const type_id = 
+        NS(BlockInfo_get_type_id)( block_info );
+    
+    SIXTRL_GLOBAL_DEC void const* ptr_begin = 
+        NS(BlockInfo_get_const_ptr_begin)( block_info );    
+    
+    #else
+    
+    SIXTRL_GLOBAL_DEC void const* ptr_begin = 0;
+    NS(BlockType) type_id = NS(BLOCK_TYPE_INVALID);    
+    
+    if( block_info != 0 )
+    {
+        NS(BlockInfo) const info = *block_info;
+        ptr_begin = NS(BlockInfo_get_const_ptr_begin)( &info );
+        type_id   = NS(BlockInfo_get_type_id)( &info );
+    }
+    
+    #endif /* !defined( _GPUCODE ) */
+    
+    SIXTRL_ASSERT( ( ptr_begin == 0 ) ||
+                   ( ( ( ( uintptr_t )ptr_begin ) % 8u ) == 0u ) );
+    
+    return ( type_id == NS(BLOCK_TYPE_BEAM_BEAM) )
+        ? ( SIXTRL_GLOBAL_DEC NS(BeamBeam) const* )ptr_begin : 0;
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(BeamBeam)* 
+NS(Blocks_get_beam_beam)( NS(BlockInfo)* SIXTRL_RESTRICT block_info )
+{
+    return ( SIXTRL_GLOBAL_DEC NS(BeamBeam)* )NS(Blocks_get_const_beam_beam)(
+        block_info );
+}
+
+SIXTRL_INLINE NS(BlockType) NS(BeamBeam_get_type_id)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
+{
+    return ( beam_beam != 0 ) ? NS(BLOCK_TYPE_BEAM_BEAM) 
+                              : NS(BLOCK_TYPE_INVALID);
+}
+
+SIXTRL_INLINE NS(block_type_num_t) NS(BeamBeam_get_type_id_num)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
+{
+    return NS(BlockType_to_number)( NS(BeamBeam_get_type_id)( beam_beam ) );
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* 
+NS(BeamBeam_get_const_n_part_per_slice)( 
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
+{
+    return ( beam_beam != 0 ) ? beam_beam->n_part_per_slice : 0;
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+NS(BeamBeam_get_n_part_per_slice)( NS(BeamBeam)* SIXTRL_RESTRICT beam_beam )
+{
+    return ( SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+        )NS(BeamBeam_get_const_n_part_per_slice)( beam_beam );
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeam_get_n_part_per_slice_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && 
+                   ( beam_beam->n_part_per_slice != 0 ) &&
+                   ( beam_beam->num_of_slices > index ) );
+    
+    return beam_beam->n_part_per_slice[ index ];
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_n_part_per_slice_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index,
+    SIXTRL_REAL_T const value )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && 
+                   ( beam_beam->n_part_per_slice != 0 ) &&
+                   ( beam_beam->num_of_slices > index ) );
+    
+    beam_beam->n_part_per_slice[ index ] = value;
+    
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_n_part_per_slice)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* n_part_per_slice_begin )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && 
+                   ( beam_beam->n_part_per_slice != 0 ) &&
+                   ( beam_beam->num_of_slices > 0 ) );
+    
+    SIXTRL_ASSERT( n_part_per_slice_begin != 0 );
+    
+    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, beam_beam->n_part_per_slice, 
+                             n_part_per_slice_begin, 
+                             beam_beam->num_of_slices );
+    
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_assign_n_part_per_slice_ptr)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* n_part_per_slice_begin )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );
+    beam_beam->n_part_per_slice = n_part_per_slice_begin;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* 
+NS(BeamBeam_get_const_x_slices_star)( 
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
+{
+    return ( beam_beam != 0 ) ? beam_beam->x_slices_star : 0;
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+NS(BeamBeam_get_x_slices_star)( NS(BeamBeam)* SIXTRL_RESTRICT beam_beam )
+{
+    return ( SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+        )NS(BeamBeam_get_const_x_slices_star)( beam_beam );
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeam_get_x_slices_star_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && ( beam_beam->x_slices_star != 0 ) &&
+                   ( beam_beam->num_of_slices > index ) );
+    
+    return beam_beam->x_slices_star[ index ];
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_x_slices_star_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index,
+    SIXTRL_REAL_T const value )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && ( beam_beam->x_slices_star != 0 ) &&
+                   ( beam_beam->num_of_slices > index ) );
+    
+    beam_beam->x_slices_star[ index ] = value;
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_x_slices_star)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* x_slices_star_begin )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && ( beam_beam->x_slices_star != 0 ) &&
+                   ( beam_beam->num_of_slices > 0 ) );
+    
+    SIXTRL_ASSERT( x_slices_star_begin != 0 );
+    
+    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, beam_beam->x_slices_star, 
+                             x_slices_star_begin, beam_beam->num_of_slices );
+    
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_assign_x_slices_star_ptr)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* x_slices_star_begin )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );
+    beam_beam->x_slices_star = x_slices_star_begin;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* 
+NS(BeamBeam_get_const_y_slices_star)( 
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
+{
+    return ( beam_beam != 0 ) ? beam_beam->y_slices_star : 0;
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+NS(BeamBeam_get_y_slices_star)( NS(BeamBeam)* SIXTRL_RESTRICT beam_beam )
+{
+    return ( SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+        )NS(BeamBeam_get_const_y_slices_star)( beam_beam );
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeam_get_y_slices_star_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && ( beam_beam->y_slices_star != 0 ) &&
+                   ( beam_beam->num_of_slices > index ) );
+    
+    return beam_beam->y_slices_star[ index ];
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_y_slices_star_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index,
+    SIXTRL_REAL_T const value )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && ( beam_beam->y_slices_star != 0 ) &&
+                   ( beam_beam->num_of_slices > index ) );
+    
+    beam_beam->y_slices_star[ index ] = value;
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_y_slices_star)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* y_slices_star_begin )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && ( beam_beam->y_slices_star != 0 ) &&
+                   ( beam_beam->num_of_slices > 0 ) );
+    
+    SIXTRL_ASSERT( y_slices_star_begin != 0 );
+    
+    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, beam_beam->y_slices_star, 
+                             y_slices_star_begin, beam_beam->num_of_slices );
+    
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_assign_y_slices_star_ptr)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* y_slices_star_begin )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );
+    beam_beam->y_slices_star = y_slices_star_begin;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* 
+NS(BeamBeam_get_const_sigma_slices_star)( 
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
+{
+    return ( beam_beam != 0 ) ? beam_beam->sigma_slices_star : 0;
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+NS(BeamBeam_get_sigma_slices_star)( NS(BeamBeam)* SIXTRL_RESTRICT beam_beam )
+{
+    return ( SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* 
+        )NS(BeamBeam_get_const_sigma_slices_star)( beam_beam );
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeam_get_sigma_slices_star_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && 
+                   ( beam_beam->sigma_slices_star != 0 ) &&
+                   ( beam_beam->num_of_slices > index ) );
+    
+    return beam_beam->sigma_slices_star[ index ];
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_sigma_slices_star_value)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const index,
+    SIXTRL_REAL_T const value )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && 
+                   ( beam_beam->sigma_slices_star != 0 ) &&
+                   ( beam_beam->num_of_slices > index ) );
+    
+    beam_beam->sigma_slices_star[ index ] = value;
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_sigma_slices_star)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* sigma_slices_star_begin )
+{
+    SIXTRL_ASSERT( ( beam_beam != 0 ) && ( beam_beam->sigma_slices_star != 0 ) &&
+                   ( beam_beam->num_of_slices > 0 ) );
+    
+    SIXTRL_ASSERT( sigma_slices_star_begin != 0 );
+    
+    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T, beam_beam->sigma_slices_star, 
+                             sigma_slices_star_begin, 
+                             beam_beam->num_of_slices );
+    
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_assign_sigma_slices_star_ptr)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* sigma_slices_star_begin )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );
+    beam_beam->sigma_slices_star = sigma_slices_star_begin;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE NS(block_num_elements_t) NS(BeamBeam_get_num_of_slices)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
+{
+    return ( beam_beam != 0 ) 
+        ? beam_beam->num_of_slices : ( NS(block_num_elements_t) )0u;    
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_num_of_slices)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    NS(block_num_elements_t) const num_of_slices )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );    
+    beam_beam->num_of_slices = num_of_slices;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeam_get_q_part)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );
+    return beam_beam->q_part;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_q_part)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, SIXTRL_REAL_T const q_part )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );
+    beam_beam->q_part = q_part;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeam_get_min_sigma_diff)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );
+    return beam_beam->min_sigma_diff;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_min_sigma_diff)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_REAL_T const min_sigma_diff )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );
+    beam_beam->min_sigma_diff = min_sigma_diff;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeam_get_treshold_singular)(
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );
+    return beam_beam->treshold_sing;
+}
+
+SIXTRL_INLINE void NS(BeamBeam_set_treshold_singular)(
+    NS(BeamBeam)* SIXTRL_RESTRICT beam_beam, 
+    SIXTRL_REAL_T const treshold_singular )
+{
+    SIXTRL_ASSERT( beam_beam != 0 );
+    beam_beam->treshold_sing = treshold_singular;
+    return;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE NS(BeamBeamSigmas)* NS(BeamBeamSigmas_preset)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix )
+{
+    if( sigma_matrix != 0 )
+    {
+        SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0L;
+        
+        sigma_matrix->sigma_11 = ZERO;
+        sigma_matrix->sigma_12 = ZERO;
+        sigma_matrix->sigma_13 = ZERO;
+        sigma_matrix->sigma_14 = ZERO;
+        
+        sigma_matrix->sigma_22 = ZERO;
+        sigma_matrix->sigma_23 = ZERO;
+        sigma_matrix->sigma_24 = ZERO;
+        
+        sigma_matrix->sigma_33 = ZERO;
+        sigma_matrix->sigma_34 = ZERO;
+        
+        sigma_matrix->sigma_44 = ZERO;
+    }
+    
+    return sigma_matrix;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma11)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    return sigma_matrix->sigma_11;
+}
+
+SIXTRL_INLINE void NS(BeamBeamSigmas_set_sigma11)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_11 )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    sigma_matrix->sigma_11 = sigma_11;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma12)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    return sigma_matrix->sigma_12;
+}
+
+SIXTRL_INLINE void NS(BeamBeamSigmas_set_sigma12)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_12 )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    sigma_matrix->sigma_12 = sigma_12;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma13)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    return sigma_matrix->sigma_13;
+}
+
+SIXTRL_INLINE void NS(BeamBeamSigmas_set_sigma13)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_13 )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    sigma_matrix->sigma_13 = sigma_13;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma14)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    return sigma_matrix->sigma_14;
+}
+
+SIXTRL_INLINE void NS(BeamBeamSigmas_set_sigma14)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_14 )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    sigma_matrix->sigma_14 = sigma_14;
+}
+
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma22)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    return sigma_matrix->sigma_22;
+}
+
+SIXTRL_INLINE void  NS(BeamBeamSigmas_set_sigma22)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_22 )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    sigma_matrix->sigma_22 = sigma_22;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma23)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    return sigma_matrix->sigma_23;
+}
+
+SIXTRL_INLINE void NS(BeamBeamSigmas_set_sigma23)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_23 )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    sigma_matrix->sigma_23 = sigma_23;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma24)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    return sigma_matrix->sigma_24;
+}
+
+SIXTRL_INLINE void NS(BeamBeamSigmas_set_sigma24)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_24 )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    sigma_matrix->sigma_24 = sigma_24;
+}
+
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma33)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    return sigma_matrix->sigma_33;
+}
+
+SIXTRL_INLINE void NS(BeamBeamSigmas_set_sigma33)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_33 )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    sigma_matrix->sigma_33 = sigma_33;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma34)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    return sigma_matrix->sigma_34;
+}
+
+SIXTRL_INLINE void NS(BeamBeamSigmas_set_sigma34)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_34 )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    sigma_matrix->sigma_34 = sigma_34;
+}
+
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeamSigmas_get_sigma44)( 
+    const NS(BeamBeamSigmas) *const SIXTRL_RESTRICT sigma_matrix )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    return sigma_matrix->sigma_44;
+}
+
+SIXTRL_INLINE void NS(BeamBeamSigmas_set_sigma44)( 
+    NS(BeamBeamSigmas)* SIXTRL_RESTRICT sigma_matrix, 
+    SIXTRL_REAL_T const sigma_44 )
+{
+    SIXTRL_ASSERT( sigma_matrix != 0 );
+    sigma_matrix->sigma_44 = sigma_44;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE NS(BeamBeamPropagatedSigmasResult)* 
+NS(BeamBeamPropagatedSigmasResult_preset)(
+    NS(BeamBeamPropagatedSigmasResult)* SIXTRL_RESTRICT result )
+{
+    if( result != 0 )
+    {
+        SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0L;
+        
+        result->cos_theta    = ZERO;
+        result->sin_theta    = ZERO;
+        result->sigma_11_hat = ZERO;
+        result->sigma_33_hat = ZERO;
+    }
+    
+    return result;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T 
+NS(BeamBeamPropagatedSigmasResult_get_cos_theta)( 
+    const NS(BeamBeamPropagatedSigmasResult) *const SIXTRL_RESTRICT result )
+{
+    SIXTRL_ASSERT( result != 0 );
+    return result->cos_theta;
+}
+    
+SIXTRL_INLINE void 
+NS(BeamBeamPropagatedSigmasResult_set_cos_theta)(
+    NS(BeamBeamPropagatedSigmasResult)* SIXTRL_RESTRICT result,
+    SIXTRL_REAL_T const cos_theta )
+{
+    SIXTRL_ASSERT( result != 0 );
+    result->cos_theta = cos_theta;
+    return;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T 
+NS(BeamBeamPropagatedSigmasResult_get_sin_theta)( 
+    const NS(BeamBeamPropagatedSigmasResult) *const SIXTRL_RESTRICT result )
+{
+    SIXTRL_ASSERT( result != 0 );
+    return result->sin_theta;
+}
+    
+SIXTRL_INLINE void 
+NS(BeamBeamPropagatedSigmasResult_set_sin_theta)(
+    NS(BeamBeamPropagatedSigmasResult)* SIXTRL_RESTRICT result,
+    SIXTRL_REAL_T const sin_theta )
+{
+    SIXTRL_ASSERT( result != 0 );
+    result->sin_theta = sin_theta;
+    return;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T 
+NS(BeamBeamPropagatedSigmasResult_get_sigma_11_hat)( 
+    const NS(BeamBeamPropagatedSigmasResult) *const SIXTRL_RESTRICT result )
+{
+    SIXTRL_ASSERT( result != 0 );
+    return result->sigma_11_hat;
+}
+    
+SIXTRL_INLINE void 
+NS(BeamBeamPropagatedSigmasResult_set_sigma_11_hat)(
+    NS(BeamBeamPropagatedSigmasResult)* SIXTRL_RESTRICT result,
+    SIXTRL_REAL_T const sigma_11_hat )
+{
+    SIXTRL_ASSERT( result != 0 );
+    result->sigma_11_hat = sigma_11_hat;
+    return;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T 
+NS(BeamBeamPropagatedSigmasResult_get_sigma_33_hat)( 
+    const NS(BeamBeamPropagatedSigmasResult) *const SIXTRL_RESTRICT result )
+{
+    SIXTRL_ASSERT( result != 0 );
+    return result->sigma_33_hat;
+}
+    
+SIXTRL_INLINE void 
+NS(BeamBeamPropagatedSigmasResult_set_sigma_33_hat)(
+    NS(BeamBeamPropagatedSigmasResult)* SIXTRL_RESTRICT result,
+    SIXTRL_REAL_T const sigma_33_hat )
+{
+    SIXTRL_ASSERT( result != 0 );
+    result->sigma_33_hat = sigma_33_hat;
+    return;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE NS(BeamBeamBoostData)* NS(BeamBeamBoostData_preset)(
+    NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data )
+{
+    if( boost_data != 0 )
+    {
+        SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0L;
+        boost_data->sphi   = ZERO;
+        boost_data->cphi   = ZERO;
+        boost_data->tphi   = ZERO;
+        boost_data->salpha = ZERO;
+        boost_data->calpha = ZERO;
+    }
+    
+    return boost_data;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T 
+NS(BeamBeamBoostData_get_sphi)( SIXTRL_GLOBAL_DEC const 
+    NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data )
+{
+    SIXTRL_ASSERT( boost_data != 0 );
+    return boost_data->sphi;
+}
+
+SIXTRL_INLINE void NS(BeamBeamBoostData_set_sphi)(
+    NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data, 
+    SIXTRL_REAL_T const sphi )
+{
+    SIXTRL_ASSERT( boost_data != 0 );
+    boost_data->sphi = sphi;
+    return;
+}
+
+
+
+SIXTRL_INLINE SIXTRL_REAL_T 
+NS(BeamBeamBoostData_get_cphi)( 
+    const NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data )
+{
+    SIXTRL_ASSERT( boost_data != 0 );
+    return boost_data->cphi;
+}
+
+SIXTRL_INLINE void NS(BeamBeamBoostData_set_cphi)(
+    NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data, 
+    SIXTRL_REAL_T const cphi )
+{
+    SIXTRL_ASSERT( boost_data != 0 );
+    boost_data->cphi = cphi;
+    return;
+}
+
+
+SIXTRL_INLINE SIXTRL_REAL_T 
+NS(BeamBeamBoostData_get_tphi)( 
+    const NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data )
+{
+    SIXTRL_ASSERT( boost_data != 0 );
+    return boost_data->tphi;
+}
+
+SIXTRL_INLINE void NS(BeamBeamBoostData_set_tphi)(
+    NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data, 
+    SIXTRL_REAL_T const tphi )
+{
+    SIXTRL_ASSERT( boost_data != 0 );
+    boost_data->tphi = tphi;
+    return;
+}
+
+
+SIXTRL_INLINE SIXTRL_REAL_T 
+NS(BeamBeamBoostData_get_salpha)( 
+    const NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data )
+{
+    SIXTRL_ASSERT( boost_data != 0 );
+    return boost_data->salpha;
+}
+
+SIXTRL_INLINE void NS(BeamBeamBoostData_set_salpha)(
+    NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data, 
+    SIXTRL_REAL_T const salpha )
+{
+    SIXTRL_ASSERT( boost_data != 0 );
+    boost_data->salpha = salpha;
+    return;
+}
+    
+
+SIXTRL_INLINE SIXTRL_REAL_T 
+NS(BeamBeamBoostData_get_calpha)( 
+    const NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data )
+{
+    SIXTRL_ASSERT( boost_data != 0 );
+    return boost_data->calpha;
+}
+
+SIXTRL_INLINE void NS(BeamBeamBoostData_set_calpha)(
+    NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data, 
+    SIXTRL_REAL_T const calpha )
+{
+    SIXTRL_ASSERT( boost_data != 0 );
+    boost_data->calpha = calpha;
+    return;
 }
 
 #if !defined( _GPUCODE )

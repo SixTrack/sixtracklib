@@ -20,6 +20,10 @@ extern SIXTRL_GLOBAL_DEC NS(DriftExact)* NS(Blocks_reserve_drift_exact)(
 extern SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(Blocks_reserve_multipole)(
     NS(Blocks)* SIXTRL_RESTRICT blocks, SIXTRL_INT64_T const order );
 
+extern SIXTRL_GLOBAL_DEC NS(BeamBeam)* NS(Blocks_reserve_beam_beam)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks, 
+    NS(block_num_elements_t) const num_of_slices );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_GLOBAL_DEC NS(Drift)* NS(Blocks_reserve_drift)( 
@@ -111,5 +115,63 @@ SIXTRL_GLOBAL_DEC NS(MultiPole)* NS(Blocks_reserve_multipole)(
 }
 
 /* ------------------------------------------------------------------------- */
+
+SIXTRL_GLOBAL_DEC NS(BeamBeam)* NS(Blocks_reserve_beam_beam)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks, 
+    NS(block_num_elements_t) const num_of_slices )
+{
+    SIXTRL_GLOBAL_DEC NS(BeamBeam)* ptr_beam_beam = 0;
+    
+    SIXTRL_STATIC NS(block_size_t) const NUM_ATTR_DATA_POINTERS = 6u;
+    
+    if( ( blocks != 0 ) && 
+        ( num_of_slices > ( NS(block_num_elements_t) )0u ) )
+    {
+        SIXTRL_STATIC_VAR NS(block_size_t) const ONE = ( NS(block_size_t) )1u;            
+        
+        NS(BeamBeam) beam_beam;
+        NS(BeamBeam_preset)( &beam_beam );
+        NS(BeamBeam_set_num_of_slices)( &beam_beam, num_of_slices );
+        
+        NS(block_size_t) const N = ( NS(block_size_t) )num_of_slices;
+        
+        NS(block_size_t) const data_attr_counts[] = 
+        {
+            ONE, ONE, N, N, N, N             
+        };
+        
+        NS(block_size_t) const data_attr_sizes[] = 
+        {
+            sizeof( NS(BeamBeamBoostData) ), 
+            sizeof( NS(BeamBeamSigmas) ), 
+            sizeof( SIXTRL_REAL_T ), 
+            sizeof( SIXTRL_REAL_T ),
+            sizeof( SIXTRL_REAL_T ), 
+            sizeof( SIXTRL_REAL_T ) 
+        };
+        
+        NS(block_size_t) const data_attr_offsets[] = 
+        {
+            ( NS(block_size_t) )offsetof( NS(BeamBeam), boost  ),
+            ( NS(block_size_t) )offsetof( NS(BeamBeam), sigmas ),
+            ( NS(block_size_t) )offsetof( NS(BeamBeam), n_part_per_slice ),
+            ( NS(block_size_t) )offsetof( NS(BeamBeam), x_slices_star ),
+            ( NS(block_size_t) )offsetof( NS(BeamBeam), y_slices_star ),
+            ( NS(block_size_t) )offsetof( NS(BeamBeam), sigma_slices_star )
+        };
+                
+        NS(BlockInfo)* ptr_info_block = NS(Blocks_add_block)( blocks,
+            NS(BLOCK_TYPE_BEAM_BEAM), sizeof( beam_beam ), &beam_beam,
+            NUM_ATTR_DATA_POINTERS, data_attr_offsets, data_attr_sizes, 
+                data_attr_counts );
+        
+        if( ptr_info_block != 0 )
+        {
+            ptr_beam_beam = NS(Blocks_get_beam_beam)( ptr_info_block );
+        }
+    }
+    
+    return ptr_beam_beam;
+}
 
 /* end: sixtracklib/common/details/beam_elements.c */

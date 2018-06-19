@@ -31,7 +31,8 @@ typedef enum NS(BlockType)
     NS(BLOCK_TYPE_MULTIPOLE)        = 0x0000004,
     NS(BLOCK_TYPE_CAVITY)           = 0x0000005,
     NS(BLOCK_TYPE_ALIGN)            = 0x0000006,
-    NS(BLOCK_TYPE_USERDEFINED)      = 0x0000007,
+    NS(BLOCK_TYPE_BEAM_BEAM)        = 0x0000007,
+    NS(BLOCK_TYPE_USERDEFINED)      = 0x8000000,
     NS(BLOCK_TYPE_INVALID)          = 0xfffffff
 }
 NS(BlockType);
@@ -328,6 +329,7 @@ SIXTRL_INLINE NS(block_type_num_t) NS(BlockType_to_number)(
         case NS(BLOCK_TYPE_MULTIPOLE):
         case NS(BLOCK_TYPE_CAVITY):
         case NS(BLOCK_TYPE_ALIGN):
+        case NS(BLOCK_TYPE_BEAM_BEAM):
         case NS(BLOCK_TYPE_USERDEFINED):
         {
             type_id_num = ( NS(block_type_num_t) )type_id;
@@ -360,6 +362,7 @@ SIXTRL_INLINE NS(BlockType) NS(BlockType_from_number)(
         case ( NS(block_type_num_t) )NS(BLOCK_TYPE_MULTIPOLE):
         case ( NS(block_type_num_t) )NS(BLOCK_TYPE_CAVITY):
         case ( NS(block_type_num_t) )NS(BLOCK_TYPE_ALIGN):
+        case ( NS(block_type_num_t) )NS(BLOCK_TYPE_BEAM_BEAM):
         case ( NS(block_type_num_t) )NS(BLOCK_TYPE_USERDEFINED):
         {
             type_id = ( NS(BlockType) )type_id_num;
