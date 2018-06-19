@@ -511,6 +511,19 @@ SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamBoostData_set_calpha)(
 SIXTRL_FN SIXTRL_STATIC NS(Cavity)* NS(Cavity_preset)( 
     NS(Cavity)* SIXTRL_RESTRICT cavity );
 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC NS(Cavity) const* 
+NS(Blocks_get_const_cavity)( 
+    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info );
+
+SIXTRL_FN SIXTRL_STATIC  SIXTRL_GLOBAL_DEC NS(Cavity)* NS(Blocks_get_cavity)( 
+    NS(BlockInfo)* SIXTRL_RESTRICT block_info );
+
+SIXTRL_FN SIXTRL_STATIC  NS(BlockType) NS(Cavity_get_type_id)( 
+    const NS(Cavity) *const SIXTRL_RESTRICT cavity );
+
+SIXTRL_FN SIXTRL_STATIC  NS(block_type_num_t) NS(Cavity_get_type_id_num)(
+    const NS(Cavity) *const SIXTRL_RESTRICT cavity );
+
 SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Cavity_get_voltage)(
     const NS(Cavity) *const SIXTRL_RESTRICT cavity );
 
@@ -1827,6 +1840,34 @@ SIXTRL_INLINE NS(Cavity)* NS(Cavity_preset)(
     return cavity;
 }
 
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Cavity) const* NS(Blocks_get_const_cavity)( 
+    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info )
+{
+    return ( NS(BlockInfo_get_type_id)( block_info ) == NS(BLOCK_TYPE_CAVITY) )
+        ? ( SIXTRL_GLOBAL_DEC NS(Cavity) const* 
+            )NS(BlockInfo_get_const_ptr_begin)( block_info )
+        : 0;
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Cavity)* NS(Blocks_get_cavity)( 
+    NS(BlockInfo)* SIXTRL_RESTRICT block_info )
+{
+    return ( SIXTRL_GLOBAL_DEC NS(Cavity)* 
+        )NS(Blocks_get_const_align)( block_info );
+}
+
+SIXTRL_INLINE NS(BlockType) NS(Cavity_get_type_id)( 
+    const NS(Cavity) *const SIXTRL_RESTRICT cavity )
+{
+    return ( cavity != 0 ) ? NS(BLOCK_TYPE_ALIGN) : NS(BLOCK_TYPE_INVALID);
+}
+
+SIXTRL_INLINE NS(block_type_num_t) NS(Cavity_get_type_id_num)(
+    const NS(Cavity) *const SIXTRL_RESTRICT cavity )
+{
+    return NS(BlockType_to_number)( NS(Cavity_get_type_id)( cavity ) );
+}
+
 SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_get_voltage)(
     const NS(Cavity) *const SIXTRL_RESTRICT cavity )
 {
@@ -1888,6 +1929,34 @@ SIXTRL_INLINE NS(Align)* NS(Align_preset)( NS(Align)* SIXTRL_RESTRICT align )
     }
     
     return align;
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Align) const* NS(Blocks_get_const_align)( 
+    const NS(BlockInfo) *const SIXTRL_RESTRICT block_info )
+{
+    return ( NS(BlockInfo_get_type_id)( block_info ) == NS(BLOCK_TYPE_ALIGN ) )
+        ? ( SIXTRL_GLOBAL_DEC NS(Align) const* 
+            )NS(BlockInfo_get_const_ptr_begin)( block_info )
+        : 0;
+}
+
+SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Align)* NS(Blocks_get_align)( 
+    NS(BlockInfo)* SIXTRL_RESTRICT block_info )
+{
+    return ( SIXTRL_GLOBAL_DEC NS(Align)* 
+        )NS(Blocks_get_const_align)( block_info );
+}
+
+SIXTRL_INLINE NS(BlockType) NS(Align_get_type_id)( 
+    const NS(Align) *const SIXTRL_RESTRICT align )
+{
+    return ( align != 0 ) ? NS(BLOCK_TYPE_ALIGN) : NS(BLOCK_TYPE_INVALID);
+}
+
+SIXTRL_INLINE NS(block_type_num_t) NS(Align_get_type_id_num)(
+    const NS(Align) *const SIXTRL_RESTRICT align )
+{
+    return NS(BlockType_to_number)( NS(Align_get_type_id)( align ) );
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(Align_get_tilt)(

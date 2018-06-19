@@ -24,7 +24,7 @@ extern SIXTRL_GLOBAL_DEC NS(BeamBeam)* NS(Blocks_reserve_beam_beam)(
     NS(Blocks)* SIXTRL_RESTRICT blocks, 
     NS(block_num_elements_t) const num_of_slices );
 
-extern SIXTRL_GLOBAL_DEC NS(Cavity)* NS(Blocks_reserve_beam_beam)( 
+extern SIXTRL_GLOBAL_DEC NS(Cavity)* NS(Blocks_reserve_cavity)( 
     NS(Blocks)* SIXTRL_RESTRICT blocks );
 
 extern SIXTRL_GLOBAL_DEC NS(Align)* NS(Blocks_reserve_align)( 

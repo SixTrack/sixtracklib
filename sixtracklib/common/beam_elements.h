@@ -120,7 +120,7 @@ SIXTRL_GLOBAL_DEC NS(Cavity)* NS(Blocks_add_cavity)(
     SIXTRL_REAL_T const lag );
     
 SIXTRL_HOST_FN SIXTRL_GLOBAL_DEC NS(Cavity)* 
-NS(Blocks_reserve_beam_beam)( NS(Blocks)* SIXTRL_RESTRICT blocks );
+NS(Blocks_reserve_cavity)( NS(Blocks)* SIXTRL_RESTRICT blocks );
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -136,7 +136,7 @@ NS(Align_predict_blocks_data_capacity)(
 SIXTRL_HOST_FN SIXTRL_STATIC 
 SIXTRL_GLOBAL_DEC NS(Align)* NS(Blocks_add_align)(
     NS(Blocks)* SIXTRL_RESTRICT blocks,
-    SIXTRL_REAL_T const tilt 
+    SIXTRL_REAL_T const tilt, 
     SIXTRL_REAL_T const cz,  SIXTRL_REAL_T const sz,
     SIXTRL_REAL_T const dx,  SIXTRL_REAL_T const dy 
 );
@@ -444,7 +444,7 @@ SIXTRL_INLINE NS(block_size_t) NS(Align_predict_blocks_data_capacity)(
 #if !defined( _GPUCODE )
 
 SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Align)* NS(Blocks_add_align)(
-    NS(Blocks)* SIXTRL_RESTRICT blocks, SIXTRL_REAL_T const tilt 
+    NS(Blocks)* SIXTRL_RESTRICT blocks, SIXTRL_REAL_T const tilt,
     SIXTRL_REAL_T const cz,  SIXTRL_REAL_T const sz,
     SIXTRL_REAL_T const dx,  SIXTRL_REAL_T const dy )
 {
