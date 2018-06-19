@@ -84,8 +84,11 @@ NS(BeamBeamBoostData);
 
 typedef struct NS(BeamBeam)
 {
-    NS(BeamBeamBoostData)   boost        __attribute__(( aligned( 8 ) ));
-    NS(BeamBeamSigmas)      sigmas       __attribute__(( aligned( 8 ) ));
+    SIXTRL_GLOBAL_DEC NS(BeamBeamBoostData)* SIXTRL_RESTRICT   
+        boost                            __attribute__(( aligned( 8 ) ));
+        
+    SIXTRL_GLOBAL_DEC NS(BeamBeamSigmas)* SIXTRL_RESTRICT 
+        sigmas                           __attribute__(( aligned( 8 ) ));
     
     SIXTRL_GLOBAL_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT
         n_part_per_slice                 __attribute__(( aligned( 8 ) ));
