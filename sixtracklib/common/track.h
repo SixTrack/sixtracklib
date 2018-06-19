@@ -61,7 +61,7 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN
         const NS(BeamBeamSigmas) *const sigma_matrix, 
         SIXTRL_REAL_T  const s, 
         SIXTRL_REAL_T  const treshold_singular, 
-        SIXTRL_INT64_t const handle_sigularity );
+        SIXTRL_INT64_T const handle_sigularity );
     
 SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN 
     NS(BeamBeam_get_transverse_fields)(
@@ -265,15 +265,14 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(BeamBeam_boost_particle)(
     SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0;
     
     #if !defined( NDEBUG ) && !defined( __CUDACC__ )
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO    = ( SIXTRL_REAL_T )0.0L;
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const MIN_EPS = ( SIXTRL_REAL_T )1e-12L; /* ?? */
     #endif /* !defined( NDEBUG ) && !defined( __CUDACC__ ) */
     
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE  = ( SIXTRL_REAL_T )1.0L;
     
-    SIXTRL_REAL_T px      = NS(Particles_get_px_value)(    particles, ii );
-    SIXTRL_REAL_T py      = NS(Particles_get_px_value)(    particles, ii );
-    SIXTRL_REAL_T delta   = NS(Particles_get_delta_value)( particles, ii );
+    SIXTRL_REAL_T px      = NS(Particles_get_px_value)(    particles, index );
+    SIXTRL_REAL_T py      = NS(Particles_get_px_value)(    particles, index );
+    SIXTRL_REAL_T delta   = NS(Particles_get_delta_value)( particles, index );
     
     SIXTRL_REAL_T const tphi   = NS(BeamBeamBoostData_get_tphi)( boost );
     SIXTRL_REAL_T const salpha = NS(BeamBeamBoostData_get_salpha)( boost );
@@ -317,20 +316,20 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(BeamBeam_boost_particle)(
     SIXTRL_REAL_T const L32         = hsigma_st * SALPHA_SPHI;
     SIXTRL_REAL_T const L33         = ONE / cphi;
     
-    SIXTRL_REAL_T const x     = NS(Particles_get_x_value)(     particles, ii );
-    SIXTRL_REAL_T const y     = NS(Particles_get_y_value)(     particles, ii );
-    SIXTRL_REAL_T const sigma = NS(Particles_get_sigma_value)( particles, ii );
+    SIXTRL_REAL_T const x     = NS(Particles_get_x_value)(     particles, index );
+    SIXTRL_REAL_T const y     = NS(Particles_get_y_value)(     particles, index );
+    SIXTRL_REAL_T const sigma = NS(Particles_get_sigma_value)( particles, index );
     
     SIXTRL_REAL_T const x_star     = L11 * x + L12 * y + L13 * sigma;
     SIXTRL_REAL_T const y_star     = L21 * x + L22 * y + L23 * sigma;
     SIXTRL_REAL_T const sigma_star = L31 * x + L32 * y + L33 * sigma;
     
-    NS(Particles_set_x_value)(     particles, ii, x_star );
-    NS(Particles_set_y_value)(     particles, ii, y_star );
-    NS(Particles_set_sigma_value)( particles, ii, sigma_star );    
-    NS(Particles_set_px_value)(    particles, ii, px_st );
-    NS(Particles_set_py_value)(    particles, ii, py_st );
-    NS(Particles_set_delta_value)( particles, ii, delta_st );
+    NS(Particles_set_x_value)(     particles, index, x_star );
+    NS(Particles_set_y_value)(     particles, index, y_star );
+    NS(Particles_set_sigma_value)( particles, index, sigma_star );    
+    NS(Particles_set_px_value)(    particles, index, px_st );
+    NS(Particles_set_py_value)(    particles, index, py_st );
+    NS(Particles_set_delta_value)( particles, index, delta_st );
     
     SIXTRL_ASSERT( 
         ( ( cphi  > MIN_EPS ) || ( -cphi  < MIN_EPS ) ) && 
@@ -350,15 +349,14 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(BeamBeam_inv_boost_particle)(
     SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0;
     
     #if !defined( NDEBUG ) && !defined( __CUDACC__ )
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO    = ( SIXTRL_REAL_T )0.0L;
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const MIN_EPS = ( SIXTRL_REAL_T )1e-12L; /* ?? */
     #endif /* !defined( NDEBUG ) && !defined( __CUDACC__ ) */
     
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE  = ( SIXTRL_REAL_T )1.0L;
     
-    SIXTRL_REAL_T px_st    = NS(Particles_get_px_value)(    particles, ii );
-    SIXTRL_REAL_T py_st    = NS(Particles_get_px_value)(    particles, ii );
-    SIXTRL_REAL_T delta_st = NS(Particles_get_delta_value)( particles, ii );
+    SIXTRL_REAL_T px_st    = NS(Particles_get_px_value)(    particles, index );
+    SIXTRL_REAL_T py_st    = NS(Particles_get_px_value)(    particles, index );
+    SIXTRL_REAL_T delta_st = NS(Particles_get_delta_value)( particles, index );
     
     SIXTRL_REAL_T const delta_st_plus_one = delta_st + ONE;
     
@@ -412,9 +410,9 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(BeamBeam_inv_boost_particle)(
         ( ONE + hx_st * CALPHA_SPHI + hy_st * SALPHA_SPHI );
 
     
-    SIXTRL_REAL_T const x_st     = NS(Particles_get_x_value)(     particles, ii );
-    SIXTRL_REAL_T const y_st     = NS(Particles_get_y_value)(     particles, ii );
-    SIXTRL_REAL_T const sigma_st = NS(Particles_get_sigma_value)( particles, ii );
+    SIXTRL_REAL_T const x_st     = NS(Particles_get_x_value)(     particles, index );
+    SIXTRL_REAL_T const y_st     = NS(Particles_get_y_value)(     particles, index );
+    SIXTRL_REAL_T const sigma_st = NS(Particles_get_sigma_value)( particles, index );
     
     SIXTRL_REAL_T const x_inv     = 
         L11_inv * x_st + L12_inv * y_st + L13_inv * sigma_st;
@@ -429,16 +427,16 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(BeamBeam_inv_boost_particle)(
     
     SIXTRL_REAL_T const px_inv    = px_st * cphi + h * CALPHA_TPHI;
     SIXTRL_REAL_T const py_inv    = py_st * cphi + h * SALPHA_TPHI;
-    SIXTRL_REAL_T cosnt delta_inv = delta_st + 
+    SIXTRL_REAL_T const delta_inv = delta_st + 
         px_inv * CALPHA_TPHI + py_inv * SALPHA_TPHI - h * tphi * tphi;
         
-    NS(Particles_set_x_value)(     particles, ii, x_inv );
-    NS(Particles_set_y_value)(     particles, ii, y_inv );
-    NS(Particles_set_sigma_value)( particles, ii, sigma_inv );
+    NS(Particles_set_x_value)(     particles, index, x_inv );
+    NS(Particles_set_y_value)(     particles, index, y_inv );
+    NS(Particles_set_sigma_value)( particles, index, sigma_inv );
     
-    NS(Particles_set_px_value)(    particles, ii, px_inv );
-    NS(Particles_set_py_value)(    particles, ii, py_inv );
-    NS(Particles_set_delta_value)( particles, ii, delta_inv );
+    NS(Particles_set_px_value)(    particles, index, px_inv );
+    NS(Particles_set_py_value)(    particles, index, py_inv );
+    NS(Particles_set_delta_value)( particles, index, delta_inv );
     
     SIXTRL_ASSERT( 
         ( ( cphi  > MIN_EPS ) || ( -cphi  > MIN_EPS ) ) && 
@@ -453,7 +451,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(BeamBeam_propagate_sigma_matrix)(
     NS(BeamBeamPropagatedSigmasResult)* SIXTRL_RESTRICT ptr_deriv_result, 
     const NS(BeamBeamSigmas) *const sigmas, SIXTRL_REAL_T  const s, 
     SIXTRL_REAL_T  const treshold_singular, 
-    SIXTRL_INT64_t const handle_sigularity )
+    SIXTRL_INT64_T const handle_sigularity )
 {
     SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0;
     
@@ -493,7 +491,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(BeamBeam_propagate_sigma_matrix)(
     SIXTRL_REAL_T const sigma_23_p = sigma_23 + sigma_24 * s;
     SIXTRL_REAL_T const sigma_24_p = sigma_24;
     
-    SIXTRL_REAL_T const sigma_33_p = sigma_33 + TWO * sigmal_34 * s 
+    SIXTRL_REAL_T const sigma_33_p = sigma_33 + TWO * sigma_34 * s 
                                    + sigma_44 * s_squ;
                              
     SIXTRL_REAL_T const sigma_34_p = sigma_34 + sigma_44 * s;
@@ -554,7 +552,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(BeamBeam_propagate_sigma_matrix)(
                 cos2theta = FABS_B / sqrt( B * B + FOUR * D * D );                
             }
             
-            result.cos_theta =  sqrt( ONE_HALF * ( ONE + cos2theta );
+            result.cos_theta =  sqrt( ONE_HALF * ( ONE + cos2theta ) );
             result.sin_theta = B_SIGN * D_SIGN * 
                 sqrt( ONE_HALF * ( ONE - cos2theta ) );
                 
@@ -605,7 +603,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(BeamBeam_propagate_sigma_matrix)(
             ( sigma_13_p >= ZERO ) ? ONE : -ONE;
         
         SIXTRL_REAL_T const SIN_THETA = 
-            SIGN_R * SIGN_SIGMA_13_P * sqrt( ONE_HALF * ( ONE - cos2theta ) );
+            SIGN_R * SIGN_SIGMA_13_P * sqrt( ONE_HALF * ( ONE - COS2THETA ) );
         
         SIXTRL_REAL_T const FABS_SIN_THETA = 
             ( SIN_THETA >= ZERO ) ? SIN_THETA : -SIN_THETA;
@@ -670,7 +668,7 @@ SIXTRL_INLINE void NS(BeamBeam_complex_error_function)(
     
     if( ( y < yLim ) && ( x < xLim ) )
     {
-        SIXTRL_REAL_T const x_sc = x / xLim;s
+        SIXTRL_REAL_T const x_sc = x / xLim;
         SIXTRL_REAL_T const q  = ( ONE - y / yLim ) * sqrt( ONE - x_sc * x_sc );
         SIXTRL_REAL_T const h  = ONE / ( ( SIXTRL_REAL_T )3.2L * q );
         
@@ -678,7 +676,7 @@ SIXTRL_INLINE void NS(BeamBeam_complex_error_function)(
         SIXTRL_INT64_T  const nc = ( SIXTRL_INT64_T )7u + ( SIXTRL_INT64_T )( 
             q * ( ( SIXTRL_REAL_T )23.0L ) );
         
-        SIXTRL_REAL_T const xl = pow( h, ( ONE - nc ) );
+        SIXTRL_REAL_T       xl = pow( h, ( ONE - nc ) );
         SIXTRL_REAL_T const xh = y + ONE_HALF * h;
         SIXTRL_REAL_T const yh = x;
         
@@ -763,12 +761,12 @@ SIXTRL_INLINE void NS(BeamBeam_complex_error_function)(
         Wx =  TWO * exp( y * y - x * x ) * cos( TWO * x * y) - Wx;
         Wy = -TWO * exp( y * y - x * x ) * sin( TWO * x * y) - Wy;
         
-        if( in_real > ZERO )
+        if( input_real > ZERO )
         {
             Wy = -Wy;            
         }
     }
-    else if (in_real < 0.) 
+    else if( input_real < ZERO ) 
     {
         Wy = -Wy;
     }
@@ -798,6 +796,7 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO     = ( SIXTRL_REAL_T )0.0L;
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE_HALF = ( SIXTRL_REAL_T )0.5L;
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE      = ( SIXTRL_REAL_T )1.0L;
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const TWO      = ( SIXTRL_REAL_T )2.0L;
     
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const EPSILON_0 = 
         ( SIXTRL_REAL_T )8.854187817620e-12L;
@@ -852,10 +851,15 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN
             SIXTRL_REAL_T const y_squ  = y * y;
             SIXTRL_REAL_T const FACTOR = TWO * PI * EPSILON_0;
             SIXTRL_REAL_T const DELTA_SIGMA_11_33 = sigma_11 - sigma_33;
-            SIXTRL_REAL_T const TEMP = x_squ / sigma_11 + y_squ / sigma_33 - TWO;
+            SIXTRL_REAL_T const TEMP = x_squ / sigma_11 + y_squ / sigma_33;
             
-            *gx_component = -ONE / ( TWO * DELTA_SIGMA_11_33 ) *
-                ( x * Ex + y * Ey + ONE / 
+            *gx_component = ( x * Ex + y * Ey + 
+                ( ( sigma_y / sigma_x ) * exp( TEMP ) - ONE ) / FACTOR ) /
+                    ( TWO * DELTA_SIGMA_11_33 );
+                    
+            *gy_component = ( x * Ex + y * Ey +
+                ( ( sigma_x / sigma_y ) * exp( TEMP ) - ONE ) / FACTOR ) /
+                    ( TWO * DELTA_SIGMA_11_33 );            
         }
     }
     
@@ -888,8 +892,7 @@ NS(BeamBeam_get_transverse_fields_gauss_round)(
     SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0u;
         
     SIXTRL_REAL_T const diff_x    = ( x - delta_x );
-    SIXTRL_REAL_T const diff_y    = ( y - delta_y );
-    SIXTRL_REAL_T const sigma_squ = sigma * sigma;
+    SIXTRL_REAL_T const diff_y    = ( y - delta_y );    
     SIXTRL_REAL_T const r_squ     = diff_x * diff_x + diff_y * diff_y;
     
     SIXTRL_REAL_T const temp = ( r_squ >= ( SIXTRL_REAL_T )1e-20 )
@@ -913,8 +916,11 @@ NS(BeamBeam_get_transverse_fields_gauss_elliptical)(
     SIXTRL_REAL_T const sigma_x, SIXTRL_REAL_T const sigma_y,
     SIXTRL_REAL_T const delta_x, SIXTRL_REAL_T const delta_y )
 {
+    SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0u;
+    
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO     = ( SIXTRL_REAL_T )0.0L;
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE_HALF = ( SIXTRL_REAL_T )0.5L;
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE      = ( SIXTRL_REAL_T )1.0L;
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const TWO      = ( SIXTRL_REAL_T )2.0L;
     
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const EPSILON_0 = 
@@ -930,8 +936,8 @@ NS(BeamBeam_get_transverse_fields_gauss_elliptical)(
     SIXTRL_REAL_T const abs_diff_y  = ( diff_y >= ZERO ) ? diff_y : -diff_y;
     
     SIXTRL_REAL_T const ETA_ERRFUN_SCALE_FACTOR = exp( -ONE_HALF * 
-            ( ( abx * abx ) / ( sigma_x * sigma_x ) + 
-              ( aby * aby ) / ( sigma_y * sigma_y ) ) );
+            ( ( abs_diff_x * abs_diff_x ) / ( sigma_x * sigma_x ) + 
+              ( abs_diff_y * abs_diff_y ) / ( sigma_y * sigma_y ) ) );
     
     SIXTRL_ASSERT( ( sigma_x * sigma_x ) >= ( SIXTRL_REAL_T )1e-16L );
     SIXTRL_ASSERT( ( sigma_y * sigma_y ) >= ( SIXTRL_REAL_T )1e-16L );
@@ -944,11 +950,11 @@ NS(BeamBeam_get_transverse_fields_gauss_elliptical)(
         
         SIXTRL_REAL_T const factBE = ONE / ( TWO * EPSILON_0 * SQRT_PI * S );
         
-        SIXTRL_REAL_T eta_be_x  = ( sigma_y / sigma_x * abx ) / S;
-        SIXTRL_REAL_T eta_be_y  = ( sigma_x / sigma_y * aby ) / S;
+        SIXTRL_REAL_T eta_be_x  = ( sigma_y / sigma_x * abs_diff_x ) / S;
+        SIXTRL_REAL_T eta_be_y  = ( sigma_x / sigma_y * abs_diff_y ) / S;
                 
-        SIXTRL_REAL_T zeta_be_x = abx / S;
-        SIXTRL_REAL_T zeta_be_y = aby / S;
+        SIXTRL_REAL_T zeta_be_x = abs_diff_x / S;
+        SIXTRL_REAL_T zeta_be_y = abs_diff_y / S;
         
         NS(BeamBeam_complex_error_function)( 
             &zeta_be_x, &zeta_be_y, zeta_be_x, zeta_be_y );
@@ -969,11 +975,11 @@ NS(BeamBeam_get_transverse_fields_gauss_elliptical)(
         
         SIXTRL_REAL_T const factBE =  ONE / ( TWO * EPSILON_0 * SQRT_PI * S );
         
-        SIXTRL_REAL_T eta_be_x  = ( sigma_x / sigma_y * aby ) / S;
-        SIXTRL_REAL_T eta_be_y  = ( sigma_y / sigma_x * abx ) / S;
+        SIXTRL_REAL_T eta_be_x  = ( sigma_x / sigma_y * abs_diff_y ) / S;
+        SIXTRL_REAL_T eta_be_y  = ( sigma_y / sigma_x * abs_diff_x ) / S;
                 
-        SIXTRL_REAL_T zeta_be_x = aby / S;
-        SIXTRL_REAL_T zeta_be_y = abx / S;
+        SIXTRL_REAL_T zeta_be_x = abs_diff_y / S;
+        SIXTRL_REAL_T zeta_be_y = abs_diff_x / S;
         
         NS(BeamBeam_complex_error_function)( 
             &zeta_be_x, &zeta_be_y, zeta_be_x, zeta_be_y );
@@ -1005,13 +1011,11 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_beam_particle)(
     NS(block_num_elements_t) const ii,
     const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam )
 {
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE_HALF = ( SIXTRL_REAL_T )0.5L;
-    
     SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0u;
     
-    NS(BeamBeamPropagatedSigmasResult) result;
-    NS(BeamBeamPropagatedSigmasResult) deriv_result;
-    
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE_HALF = ( SIXTRL_REAL_T )0.5L;
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO     = ( SIXTRL_REAL_T )0.0L;
+        
     SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* x_slices_st_begin = 
         NS(BeamBeam_get_const_x_slices_star)( beam_beam );
         
@@ -1024,65 +1028,175 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_beam_particle)(
     SIXTRL_GLOBAL_DEC SIXTRL_REAL_T const* n_part_per_slice_begin =
         NS(BeamBeam_get_const_n_part_per_slice)( beam_beam );
         
-    SIXTRL_REAL_T const x     = NS(Particles_get_x_value)(  particles, ii );
-    SIXTRL_REAL_T const px    = NS(Particles_get_px_value)( particles, ii );
-    
-    SIXTRL_REAL_T const y     = NS(Particles_get_y_value)(  particles, ii );
-    SIXTRL_REAL_T const py    = NS(Particles_get_py_value)( particles, ii );
-    SIXTRL_REAL_T const delta = NS(Particles_get_delta_value)( particles, ii );
-    
-    
-    SIXTRL_REAL_T const sigma = NS(Particles_get_sigma_value)( particles, ii );        
-    SIXTRL_REAL_T const p0c   = NS(Particles_get_p0c)( particles, ii );
-    SIXTRL_REAL_T const q0    = NS(Particles_get_q0)(  particles, ii );
-    
+    SIXTRL_REAL_T x_st      = ZERO;
+    SIXTRL_REAL_T y_st      = ZERO;
+    SIXTRL_REAL_T px_st     = ZERO;
+    SIXTRL_REAL_T py_st     = ZERO;
+    SIXTRL_REAL_T sigma_st  = ZERO;
+    SIXTRL_REAL_T delta_st  = ZERO;
+        
+    SIXTRL_REAL_T const p0c = NS(Particles_get_p0c_value)( particles, ii );
+    SIXTRL_REAL_T const q0  = NS(Particles_get_q0_value)(  particles, ii );
+        
     SIXTRL_REAL_T const q_part = NS(BeamBeam_get_q_part)( beam_beam );
+    SIXTRL_REAL_T const min_sigma_diff = 
+        NS(BeamBeam_get_min_sigma_diff)( beam_beam );
     
     SIXTRL_REAL_T const treshold_singular = 
         NS(BeamBeam_get_treshold_singular)( beam_beam );
     
-    NS(BeamBeamBoostData) const* ptr_boost = 
-        NS(BeamBeam_get_const_ptr_boost_data)( beam_beam );
-    
-    NS(BeamBeamSigmas) const* ptr_sigmas_matrix = 
-        NS(BeamBeam_get_const_ptr_sigmas_matrix)( beam_beam );
-        
     NS(block_num_elements_t) const  NUM_SLICES = 
         NS(BeamBeam_get_num_of_slices)( beam_beam );
         
     NS(block_num_elements_t) jj = 0;
         
-    SIXTRL_ASSERT( ( ptr_boost              != 0 ) && 
-                   ( ptr_sigmas_matrix      != 0 ) &&
+    #if defined( _GPUCODE ) && !defined( _CUDACC__ )
+    
+    NS(BeamBeamBoostData) const* boost_data  = 0;
+    NS(BeamBeamSigmas)    const* sigmas_data = 0;
+    
+    SIXTRL_GLOBAL_DEC NS(BeamBeamBoostData) const* ptr_g_boost = 
+        NS(BeamBeam_get_const_ptr_boost_data)( beam_beam );
+    
+    SIXTRL_GLOBAL_DEC NS(BeamBeamSigmas) const* ptr_g_sigmas_matrix = 
+        NS(BeamBeam_get_const_ptr_sigmas_matrix)( beam_beam );
+        
+    NS(BeamBeamBoostData) temp_boost;
+    NS(BeamBeamSigmas)    temp_sigmas;
+        
+    if( ptr_g_boost != 0 )
+    {
+        temp_boost = *ptr_g_boost;        
+    }
+    else
+    {
+        NS(BeamBeamBoostData_preset)( &temp_boost );
+    }
+    
+    if( ptr_g_sigmas_matrix != 0 )
+    {
+        temp_sigmas = *ptr_g_sigmas_matrix;
+    }
+    else
+    {
+        NS(BeamBeamSigmas_preset)( &temp_sigmas );
+    }
+            
+    boost_data  = &temp_boost;
+    sigmas_data = &temp_sigmas;
+    
+    #else /* !defined( _GPUCODE ) || defined( _CUDACC__ ) */
+    
+    NS(BeamBeamBoostData) const* boost_data  = 
+        NS(BeamBeam_get_const_ptr_boost_data)( beam_beam );
+        
+    NS(BeamBeamSigmas) const* sigmas_data =
+        NS(BeamBeam_get_const_ptr_sigmas_matrix)( beam_beam );
+    
+    #endif /* defined( _GPUCODE ) && !defined( _CUDACC__ ) */
+        
+    SIXTRL_ASSERT( ( boost_data             != 0 ) && 
+                   ( sigmas_data            != 0 ) &&
                    ( x_slices_st_begin      != 0 ) &&
                    ( y_slices_st_begin      != 0 ) &&
                    ( sigma_slices_st_begin  != 0 ) &&
                    ( n_part_per_slice_begin != 0 ) );
     
-    NS(BeamBeam_boost_particle)( particles, ii, ptr_boost );
+    ret = NS(BeamBeam_boost_particle)( particles, ii, boost_data );
+    
+    x_st      = NS(Particles_get_x_value)( particles, ii );
+    y_st      = NS(Particles_get_y_value)( particles, ii );
+    px_st     = NS(Particles_get_px_value)( particles, ii );
+    py_st     = NS(Particles_get_py_value)( particles, ii );
+    sigma_st  = NS(Particles_get_sigma_value)( particles, ii );
+    delta_st  = NS(Particles_get_delta_value)( particles, ii );
     
     for( ; jj < NUM_SLICES ; ++jj )
     {
         SIXTRL_REAL_T const sigma_sl_st = sigma_slices_st_begin[ jj ];
         SIXTRL_REAL_T const x_sl_st     = x_slices_st_begin[ jj ];
         SIXTRL_REAL_T const y_sl_st     = y_slices_st_begin[ jj ];        
+        
         SIXTRL_REAL_T const ksl         = 
             n_part_per_slice_begin[ jj ] * q_part * q0 / p0c;
+                
+        SIXTRL_REAL_T const S = ONE_HALF * ( sigma_st - sigma_sl_st );
         
-        SIXTRL_REAL_T x_bar_st, y_bar_st, x_bar_hat_st, y_bar_hat_st;
-        SIXTRL_REAL_T dS_x_bar_hat_st, dS_y_bar_hat_st;
-        SIXTRL_REAL_T Ex, Ey, Gx, Gy;
-        SIXTRL_REAL_T Fx_st, Fy_st, Gx_st, Gy_st;
-        SIXTRL_REAL_T Fx_hat_st, Fy_hat_st, Gx_hat_st, Gy_hat_st;
+        NS(BeamBeamPropagatedSigmasResult) result;
+        NS(BeamBeamPropagatedSigmasResult) dS_result;
+        
+        SIXTRL_TRACK_RETURN const ret_sigma = 
+            NS(BeamBeam_propagate_sigma_matrix)( &result, &dS_result, 
+                sigmas_data, S, treshold_singular, 1 );
+        
+        SIXTRL_REAL_T const x_bar_st = x_st + px_st * S - x_sl_st;
+        SIXTRL_REAL_T const y_bar_st = y_st + py_st * S - y_sl_st;
+        
+        SIXTRL_REAL_T const x_bar_hat_st =  x_bar_st * result.cos_theta +
+                                            y_bar_st * result.sin_theta;
+        
+        SIXTRL_REAL_T const y_bar_hat_st = -x_bar_st * result.sin_theta +
+                                            y_bar_st * result.cos_theta;
+                                            
+        SIXTRL_REAL_T const dS_x_bar_hat_st = x_bar_st * dS_result.cos_theta 
+                                            + y_bar_st * dS_result.sin_theta;
+        
+        SIXTRL_REAL_T const dS_y_bar_hat_st = -x_bar_st * dS_result.sin_theta +
+                                               y_bar_st * dS_result.cos_theta;
+        
+        SIXTRL_REAL_T Ex = ZERO;
+        SIXTRL_REAL_T Ey = ZERO;
+        SIXTRL_REAL_T Gx = ZERO; 
+        SIXTRL_REAL_T Gy = ZERO;
+        
+        SIXTRL_TRACK_RETURN const ret_get_transverse_fields = 
+            NS(BeamBeam_get_transverse_fields)( &Ex, &Ey, &Gx, &Gy, 
+                x_bar_hat_st, y_bar_hat_st, 
+                sqrt( result.sigma_11_hat ), sqrt( result.sigma_33_hat ),
+                min_sigma_diff );
             
-        SIXTRL_REAL_T const S = ONE_HALF * ( sigma - sigma_sl_st );
+        SIXTRL_REAL_T const Fx_hat_st = ksl * Ex;
+        SIXTRL_REAL_T const Fy_hat_st = ksl * Ey;
+        SIXTRL_REAL_T const Gx_hat_st = ksl * Gx;
+        SIXTRL_REAL_T const Gy_hat_st = ksl * Gy;
         
-        ret |= NS(BeamBeam_propagate_sigma_matrix)( 
-            &result, &deriv_result, ptr_sigmas_matrix, 
-                S, treshold_singular, 1 );
+        SIXTRL_REAL_T const Fx_st = Fx_hat_st * result.cos_theta - 
+                                    Fy_hat_st * result.sin_theta;
+                                    
+        SIXTRL_REAL_T const Fy_st = Fx_hat_st * result.sin_theta +
+                                    Fy_hat_st * result.cos_theta;
+        
+        SIXTRL_REAL_T const Fz_st = ONE_HALF * (
+            Fx_hat_st * dS_x_bar_hat_st        + 
+            Fy_hat_st * dS_y_bar_hat_st        +
+            Gx_hat_st * dS_result.sigma_11_hat +
+            Gy_hat_st * dS_result.sigma_33_hat );
+        
+        
+        delta_st += Fz_st + ONE_HALF * (
+                    Fx_st * ( px_st + ONE_HALF * Fx_st ) + 
+                    Fy_st * ( py_st + ONE_HALF * Fy_st ) );
+        
+        x_st  -= S * Fx_st;
+        y_st  -= S * Fy_st;
+        
+        px_st += Fx_st;
+        py_st += Fy_st;
+        
+        ret |= ret_sigma;
+        ret |= ret_get_transverse_fields;
     }
     
-    NS(BeamBeam_inv_boost_particle)( particles, ii, ptr_boost );
+    NS(Particles_set_x_value)(     particles, ii, x_st  );
+    NS(Particles_set_y_value)(     particles, ii, y_st  );
+    NS(Particles_set_px_value)(    particles, ii, px_st );
+    NS(Particles_set_py_value)(    particles, ii, py_st );
+    NS(Particles_set_sigma_value)( particles, ii, sigma_st );
+    NS(Particles_set_delta_value)( particles, ii, delta_st );
+    
+    ret |= NS(BeamBeam_inv_boost_particle)( particles, ii, boost_data );
+    
+    return ret;
 }
 
 /* ------------------------------------------------------------------------- */
