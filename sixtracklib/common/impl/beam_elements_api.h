@@ -572,7 +572,7 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Align_get_cz)(
 SIXTRL_FN SIXTRL_STATIC void NS(Align_set_cz)(
     NS(Align)* SIXTRL_RESTRICT align, SIXTRL_REAL_T const cz );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Align_get_cz)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Align_get_sz)(
     const NS(Align) *const SIXTRL_RESTRICT align );
 
 SIXTRL_FN SIXTRL_STATIC void NS(Align_set_sz)(
@@ -1853,7 +1853,7 @@ SIXTRL_INLINE SIXTRL_GLOBAL_DEC NS(Cavity)* NS(Blocks_get_cavity)(
     NS(BlockInfo)* SIXTRL_RESTRICT block_info )
 {
     return ( SIXTRL_GLOBAL_DEC NS(Cavity)* 
-        )NS(Blocks_get_const_align)( block_info );
+        )NS(Blocks_get_const_cavity)( block_info );
 }
 
 SIXTRL_INLINE NS(BlockType) NS(Cavity_get_type_id)( 
