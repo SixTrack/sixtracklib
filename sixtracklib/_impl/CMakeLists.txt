@@ -1,8 +1,30 @@
 # sitracklib/_impl/CMakeLists.txt
 
 set( IMPL_INSTALL_PATH "include/sixtracklib/_impl" )
-      
 
+# ------------------------------------------------------------------------------
+# generate the testdata_files.h header to be used with examples and unit-tests 
+
+set( SIXTRACKLIB_TESTDATA_DIR "${CMAKE_SOURCE_DIR}/testdata" )
+set( TESTDATA_FILES_H_IN_PATH 
+     "$C{CMAKE_CURRENT_SOURCE_DIR}/testdata_files.h.template" )
+
+set( TESTDATA_FILES_H_OUT_PATH
+     "${CMAKE_CURRENT_SOURCE_DIR}/testdata_files.h" )
+     
+set( TESTDATA_FILES_H_INSTALL_PATH
+     "${IMPL_INSTALL_PATH}/testdata_files.h" )
+     
+configure_file( TESTDATA_FILES_H_IN_PATH, 
+                TESTDATA_FILES_H_OUT_PATH, 
+                @ONLY )
+                
+install( CODE "
+    set( SIXTRACKLIB_TESTDATA_DIR \"${CMAKE_INSTALL_PREFIX}/testdata\" )
+    message( STATUS \"Generating: ${TESTDATA_FILES_H_INSTALL_PATH}\" )
+    configure_file( \"${TESTDATA_FILES_H_IN_PATH}\" 
+                    \"${TESTDATA_FILES_H_INSTALL_PATH}\" @ONLY ) " )
+     
 # ------------------------------------------------------------------------------
 # modules.h is a header file with pre-defined constants, allownig the user 
 # of the library to query which modules are present in from C/C++ code 
