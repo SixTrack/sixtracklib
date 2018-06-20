@@ -144,15 +144,9 @@ TEST( CommonTestsBeamElements, CreateAndRandomInitDriftsUnserializeCompare )
     ASSERT_TRUE( st_Blocks_get_num_of_blocks( &copy_beam_elements ) == 
                  NUM_BLOCKS );
     
-    blocks_it  = st_Blocks_get_const_block_infos_begin( &ref_beam_elements );        
-    blocks_end = st_Blocks_get_const_block_infos_end( &ref_beam_elements );
+    blocks_it  = st_Blocks_get_const_block_infos_begin( &copy_beam_elements );        
+    blocks_end = st_Blocks_get_const_block_infos_end( &copy_beam_elements );
         
-    ASSERT_TRUE( blocks_it != 
-        st_Blocks_get_const_block_infos_begin( &copy_beam_elements ) );
-    
-    ASSERT_TRUE( blocks_end != 
-        st_Blocks_get_const_block_infos_end( &copy_beam_elements ) );
-    
     ASSERT_TRUE( std::distance( blocks_it, blocks_end ) == 
         static_cast< std::ptrdiff_t >( NUM_BLOCKS ) );
     
@@ -168,7 +162,6 @@ TEST( CommonTestsBeamElements, CreateAndRandomInitDriftsUnserializeCompare )
         
         st_Drift const* drift = st_Blocks_get_const_drift( blocks_it );
         ASSERT_TRUE( drift != nullptr );
-        ASSERT_TRUE( std::distance( drift, ptr_drifts[ ii ] ) == 0 );
         ASSERT_TRUE( DRIFT_LEN_CMP_EPS >= std::fabs( 
             st_Drift_get_length( drift ) - cmp_drift_lengths[ ii ] ) );
     }
@@ -297,15 +290,9 @@ TEST( CommonTestsBeamElements,
     ASSERT_TRUE( st_Blocks_get_num_of_blocks( &copy_beam_elements ) == 
                  NUM_BLOCKS );
     
-    blocks_it  = st_Blocks_get_const_block_infos_begin( &ref_beam_elements );        
-    blocks_end = st_Blocks_get_const_block_infos_end( &ref_beam_elements );
+    blocks_it  = st_Blocks_get_const_block_infos_begin( &copy_beam_elements );        
+    blocks_end = st_Blocks_get_const_block_infos_end( &copy_beam_elements );
         
-    ASSERT_TRUE( blocks_it != 
-        st_Blocks_get_const_block_infos_begin( &copy_beam_elements ) );
-    
-    ASSERT_TRUE( blocks_end != 
-        st_Blocks_get_const_block_infos_end( &copy_beam_elements ) );
-    
     ASSERT_TRUE( std::distance( blocks_it, blocks_end ) == 
         static_cast< std::ptrdiff_t >( NUM_BLOCKS ) );
     
@@ -320,8 +307,7 @@ TEST( CommonTestsBeamElements,
                      nullptr );  
         
         st_DriftExact const* drift = st_Blocks_get_const_drift_exact( blocks_it );
-        ASSERT_TRUE( drift != nullptr );
-        ASSERT_TRUE( std::distance( drift, ptr_drifts[ ii ] ) == 0 );
+        ASSERT_TRUE( drift != nullptr );        
         ASSERT_TRUE( DRIFT_LEN_CMP_EPS >= std::fabs( 
             st_DriftExact_get_length( drift ) - cmp_drift_lengths[ ii ] ) );
     }
@@ -507,15 +493,9 @@ TEST( CommonTestsBeamElements,
     ASSERT_TRUE( st_Blocks_get_num_of_blocks( &copy_beam_elements ) == 
                  NUM_BLOCKS );
     
-    blocks_it  = st_Blocks_get_const_block_infos_begin( &ref_beam_elements );        
-    blocks_end = st_Blocks_get_const_block_infos_end( &ref_beam_elements );
+    blocks_it  = st_Blocks_get_const_block_infos_begin( &copy_beam_elements );        
+    blocks_end = st_Blocks_get_const_block_infos_end( &copy_beam_elements );
         
-    ASSERT_TRUE( blocks_it != 
-        st_Blocks_get_const_block_infos_begin( &copy_beam_elements ) );
-    
-    ASSERT_TRUE( blocks_end != 
-        st_Blocks_get_const_block_infos_end( &copy_beam_elements ) );
-    
     ASSERT_TRUE( std::distance( blocks_it, blocks_end ) == 
         static_cast< std::ptrdiff_t >( NUM_BLOCKS ) );
     
@@ -593,45 +573,30 @@ TEST( CommonTestsBeamElements,
     uint64_t seed = UINT64_C( 20180420 );
     st_Random_init_genrand64( seed );
     
-    st_BeamBeamBoostData boost_data;
-    st_BeamBeamBoostData_preset( &boost_data );
+    SIXTRL_REAL_T const MIN_X          = 0.01;
+    SIXTRL_REAL_T const MAX_X          = 1.00;
+    SIXTRL_REAL_T const DELTA_X        = MAX_X - MIN_X;
+                                       
+    SIXTRL_REAL_T const MIN_Y          = 0.01;
+    SIXTRL_REAL_T const MAX_Y          = 1.00;
+    SIXTRL_REAL_T const DELTA_Y        = MAX_Y - MIN_Y;
+                                       
+    SIXTRL_REAL_T const MIN_SIGMA      = 0.01;
+    SIXTRL_REAL_T const MAX_SIGMA      = 1.00;
+    SIXTRL_REAL_T const DELTA_SIGMA    = MAX_SIGMA - MIN_SIGMA;
+                                       
+    SIXTRL_REAL_T const MIN_PHI        = ( -10.0 * M_PI ) / 180.0;
+    SIXTRL_REAL_T const MAX_PHI        = ( -10.0 * M_PI ) / 180.0;
+    SIXTRL_REAL_T const DELTA_PHI      = MAX_PHI - MIN_PHI;
+                                       
+    SIXTRL_REAL_T const MIN_ALPHA      = ( -45.0 * M_PI ) / 180.0;
+    SIXTRL_REAL_T const MAX_ALPHA      = ( +45.0 * M_PI ) / 180.0;
+    SIXTRL_REAL_T const DELTA_ALPHA    = MAX_ALPHA - MIN_ALPHA;
     
-    st_BeamBeamBoostData_set_sphi(   &boost_data, 1.0 );
-    st_BeamBeamBoostData_set_cphi(   &boost_data, 2.0 );
-    st_BeamBeamBoostData_set_tphi(   &boost_data, 3.0 );
-    st_BeamBeamBoostData_set_salpha( &boost_data, 4.0 );
-    st_BeamBeamBoostData_set_calpha( &boost_data, 5.0 );
+    SIXTRL_REAL_T const MIN_BB_SIGMA   =   0.0;
+    SIXTRL_REAL_T const MAX_BB_SIGMA   =  20.0;
+    SIXTRL_REAL_T const DELTA_BB_SIGMA = MAX_BB_SIGMA - MIN_BB_SIGMA;
     
-    
-    st_BeamBeamSigmas sigmas;
-    st_BeamBeamSigmas_preset( &sigmas );
-    
-    st_BeamBeamSigmas_set_sigma11( &sigmas,  1.0 );
-    st_BeamBeamSigmas_set_sigma12( &sigmas,  2.0 );
-    st_BeamBeamSigmas_set_sigma13( &sigmas,  3.0 );
-    st_BeamBeamSigmas_set_sigma14( &sigmas,  4.0 );
-    
-    st_BeamBeamSigmas_set_sigma22( &sigmas,  5.0 );
-    st_BeamBeamSigmas_set_sigma23( &sigmas,  6.0 );
-    st_BeamBeamSigmas_set_sigma24( &sigmas,  7.0 );
-    
-    st_BeamBeamSigmas_set_sigma33( &sigmas,  8.0 );
-    st_BeamBeamSigmas_set_sigma34( &sigmas,  9.0 );
-    
-    st_BeamBeamSigmas_set_sigma44( &sigmas, 10.0 );
-    
-    SIXTRL_REAL_T const MIN_X = 0.01;
-    SIXTRL_REAL_T const MAX_X = 1.00;
-    SIXTRL_REAL_T const DELTA_X = MAX_X - MIN_X;
-    
-    SIXTRL_REAL_T const MIN_Y = 0.01;
-    SIXTRL_REAL_T const MAX_Y = 1.00;
-    SIXTRL_REAL_T const DELTA_Y = MAX_Y - MIN_Y;
-    
-    SIXTRL_REAL_T const MIN_SIGMA = 0.01;
-    SIXTRL_REAL_T const MAX_SIGMA = 1.00;
-    SIXTRL_REAL_T const DELTA_SIGMA = MAX_SIGMA - MIN_SIGMA;
-        
     std::vector< SIXTRL_REAL_T > n_part_per_slice( MAX_NUM_SLICES, 0.0 );
     std::vector< SIXTRL_REAL_T > x_slices_star( MAX_NUM_SLICES, 0.0 );
     std::vector< SIXTRL_REAL_T > y_slices_star( MAX_NUM_SLICES, 0.0 );
@@ -640,10 +605,62 @@ TEST( CommonTestsBeamElements,
     std::vector< st_BeamBeam > cmp_beam_beam( NUM_BLOCKS );
     std::vector< st_BeamBeam const* > beam_beam_ptrs( NUM_BLOCKS, nullptr );
     
+    std::vector< st_BeamBeamBoostData > cmp_beam_beam_boost_data( NUM_BLOCKS );
+    std::vector< st_BeamBeamSigmas    > cmp_beam_beam_sigmas( NUM_BLOCKS );
+    
     st_block_size_t ii = 0u;
     
     for( ; ii < NUM_BLOCKS ; ++ii )
     {
+        SIXTRL_REAL_T const alpha = 
+            MIN_ALPHA + DELTA_ALPHA * st_Random_genrand64_real1();
+            
+        SIXTRL_REAL_T const phi   =
+            MIN_PHI + DELTA_PHI * st_Random_genrand64_real1();
+            
+        st_BeamBeamBoostData& boost_data = cmp_beam_beam_boost_data[ ii ];
+        st_BeamBeamBoostData_preset( &boost_data );
+                        
+        st_BeamBeamBoostData_set_sphi(   &boost_data, sin( phi )   );
+        st_BeamBeamBoostData_set_cphi(   &boost_data, cos( phi )   );
+        st_BeamBeamBoostData_set_tphi(   &boost_data, tan( phi )   );
+        st_BeamBeamBoostData_set_salpha( &boost_data, sin( alpha ) );
+        st_BeamBeamBoostData_set_calpha( &boost_data, cos( alpha ) );
+                
+        st_BeamBeamSigmas& sigmas = cmp_beam_beam_sigmas[ ii ];
+        st_BeamBeamSigmas_preset( &sigmas );
+        
+        st_BeamBeamSigmas_set_sigma11( &sigmas,  
+            MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1() );
+        
+        st_BeamBeamSigmas_set_sigma12( &sigmas,
+            MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1() );
+        
+        st_BeamBeamSigmas_set_sigma13( &sigmas,
+            MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1() );
+        
+        st_BeamBeamSigmas_set_sigma14( &sigmas,
+            MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1() );
+        
+        st_BeamBeamSigmas_set_sigma22( &sigmas, 
+            MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1() );
+        
+        st_BeamBeamSigmas_set_sigma23( &sigmas,
+            MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1() );
+        
+        st_BeamBeamSigmas_set_sigma24( &sigmas,
+            MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1() );
+        
+        st_BeamBeamSigmas_set_sigma33( &sigmas,
+            MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1() );
+        
+        st_BeamBeamSigmas_set_sigma34( &sigmas,
+            MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1() );
+        
+        st_BeamBeamSigmas_set_sigma44( &sigmas,
+            MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1() );
+        
+        
         st_block_num_elements_t const num_slices = 
             static_cast< st_block_num_elements_t >( MIN_NUM_SLICES + 
                 NUM_SLICES_RANGE * st_Random_genrand64_real1() );
@@ -813,15 +830,9 @@ TEST( CommonTestsBeamElements,
     ASSERT_TRUE( st_Blocks_get_num_of_blocks( &copy_beam_elements ) == 
                  NUM_BLOCKS );
     
-    blocks_it  = st_Blocks_get_const_block_infos_begin( &ref_beam_elements );        
-    blocks_end = st_Blocks_get_const_block_infos_end( &ref_beam_elements );
+    blocks_it  = st_Blocks_get_const_block_infos_begin( &copy_beam_elements );        
+    blocks_end = st_Blocks_get_const_block_infos_end( &copy_beam_elements );
         
-    ASSERT_TRUE( blocks_it != 
-        st_Blocks_get_const_block_infos_begin( &copy_beam_elements ) );
-    
-    ASSERT_TRUE( blocks_end != 
-        st_Blocks_get_const_block_infos_end( &copy_beam_elements ) );
-    
     ASSERT_TRUE( std::distance( blocks_it, blocks_end ) == 
         static_cast< std::ptrdiff_t >( NUM_BLOCKS ) );
     
@@ -856,8 +867,18 @@ TEST( CommonTestsBeamElements,
             st_BeamBeam_get_const_ptr_boost_data( beam_beam ), 
             sizeof( st_BeamBeamBoostData ) ) );
         
+        ASSERT_TRUE( 0 == std::memcmp( 
+            &cmp_beam_beam_boost_data[ ii ],
+            st_BeamBeam_get_const_ptr_boost_data( beam_beam ), 
+            sizeof( st_BeamBeamBoostData ) ) );
+        
         ASSERT_TRUE( 0 == std::memcmp(
             cmp_beam_beam[ ii ].sigmas,
+            st_BeamBeam_get_const_ptr_sigmas_matrix( beam_beam ),
+            sizeof( st_BeamBeamSigmas ) ) );
+        
+        ASSERT_TRUE( 0 == std::memcmp(
+            &cmp_beam_beam_sigmas[ ii ],
             st_BeamBeam_get_const_ptr_sigmas_matrix( beam_beam ),
             sizeof( st_BeamBeamSigmas ) ) );
         
@@ -884,6 +905,378 @@ TEST( CommonTestsBeamElements,
             st_BeamBeam_get_const_sigma_slices_star( beam_beam ),
             st_BeamBeam_get_num_of_slices( beam_beam ) * 
                 sizeof( SIXTRL_REAL_T ) ) );
+    }
+    
+    st_Blocks_free( &beam_elements );
+    st_Blocks_free( &ref_beam_elements );
+    st_Blocks_free( &copy_beam_elements );    
+}
+
+
+/* ------------------------------------------------------------------------- */
+
+TEST( CommonTestsBeamElements, 
+      CreateAndRandomInitAlignUnserializeCompare )
+{
+    st_Blocks beam_elements;
+    st_Blocks_preset( &beam_elements );
+    
+    SIXTRL_STATIC st_block_size_t const NUM_BLOCKS = 1000u;
+    
+    SIXTRL_STATIC st_block_size_t const BEAM_ELEMENTS_DATA_CAPACITY =
+        st_Blocks_predict_data_capacity_for_num_blocks( 
+            &beam_elements, NUM_BLOCKS ) +
+        st_Align_predict_blocks_data_capacity( &beam_elements, NUM_BLOCKS );
+        
+    int ret = st_Blocks_init( 
+        &beam_elements, NUM_BLOCKS, BEAM_ELEMENTS_DATA_CAPACITY );
+    
+    ASSERT_TRUE( ret == 0 );
+    
+    SIXTRL_REAL_T const REAL_CMP_EPS = 
+        std::numeric_limits< SIXTRL_REAL_T >::epsilon();
+        
+    /* --------------------------------------------------------------------- */
+        
+    uint64_t seed = UINT64_C( 20180420 );
+    st_Random_init_genrand64( seed );
+    
+    SIXTRL_REAL_T const MIN_TILT       =  0.0;
+    SIXTRL_REAL_T const MAX_TILT       =  1.0;
+    SIXTRL_REAL_T const DELTA_TILT     = MAX_TILT - MIN_TILT;
+    
+    SIXTRL_REAL_T const MIN_Z          = ( -5.0 * M_PI ) / 180.0;
+    SIXTRL_REAL_T const MAX_Z          = (  5.0 * M_PI ) / 180.0;
+    SIXTRL_REAL_T const DELTA_Z        = MAX_Z - MIN_Z;
+    
+    SIXTRL_REAL_T const MIN_DX         = -0.5;
+    SIXTRL_REAL_T const MAX_DX         =  0.5;
+    SIXTRL_REAL_T const DELTA_DX       = MAX_DX - MIN_DX;
+                                       
+    SIXTRL_REAL_T const MIN_DY         = -0.5;
+    SIXTRL_REAL_T const MAX_DY         =  0.5;
+    SIXTRL_REAL_T const DELTA_DY       = MAX_DY - MIN_DY;
+                                       
+    std::vector< st_Align        > cmp_align(  NUM_BLOCKS );
+    std::vector< st_Align const* > align_ptrs( NUM_BLOCKS, nullptr );
+    
+    st_block_size_t ii = 0u;
+    
+    for( ; ii < NUM_BLOCKS ; ++ii )
+    {
+        SIXTRL_REAL_T const z = 
+            MIN_Z + DELTA_Z * st_Random_genrand64_real1();
+            
+        SIXTRL_REAL_T const tilt = 
+            MIN_TILT + DELTA_TILT * st_Random_genrand64_real1();
+        
+        SIXTRL_REAL_T const dx = 
+            MIN_DX + DELTA_DX * st_Random_genrand64_real1();
+        
+        SIXTRL_REAL_T const dy = 
+            MIN_DY + DELTA_DY * st_Random_genrand64_real1();
+            
+        align_ptrs[ ii ] = st_Blocks_add_align( 
+            &beam_elements, tilt, cos( z ), sin( z ), dx, dy );
+        
+        ASSERT_TRUE( align_ptrs[ ii ] != nullptr );
+        
+        cmp_align[ ii ] = *align_ptrs[ ii ];
+    }
+    
+    /* --------------------------------------------------------------------- */
+    
+    ASSERT_TRUE( st_Blocks_get_num_of_blocks( &beam_elements ) == NUM_BLOCKS );
+    ASSERT_TRUE( !st_Blocks_are_serialized( &beam_elements ) );
+    
+    ASSERT_TRUE( st_Blocks_serialize( &beam_elements ) == 0 );
+    ASSERT_TRUE( st_Blocks_are_serialized( &beam_elements ) );
+    
+    ASSERT_TRUE( st_Blocks_get_num_of_blocks( &beam_elements ) == NUM_BLOCKS );
+    
+    SIXTRL_GLOBAL_DEC unsigned char* data_mem_begin =
+        st_Blocks_get_data_begin( &beam_elements );
+        
+    ASSERT_TRUE( data_mem_begin != nullptr );
+    
+    st_Blocks ref_beam_elements;
+    st_Blocks_preset( &ref_beam_elements );
+    
+    ret = st_Blocks_unserialize( &ref_beam_elements, data_mem_begin );
+    
+    ASSERT_TRUE( ret == 0 );    
+    ASSERT_TRUE( st_Blocks_get_num_of_blocks( 
+        &ref_beam_elements ) == NUM_BLOCKS );
+    
+    SIXTRL_GLOBAL_DEC st_BlockInfo const* blocks_it  = 
+        st_Blocks_get_const_block_infos_begin( &ref_beam_elements );
+        
+    SIXTRL_GLOBAL_DEC st_BlockInfo const* blocks_end =
+        st_Blocks_get_const_block_infos_end( &ref_beam_elements );
+        
+    ASSERT_TRUE( std::distance( blocks_it, blocks_end ) == 
+        static_cast< std::ptrdiff_t >( NUM_BLOCKS ) );
+    
+    /* --------------------------------------------------------------------- */
+    
+    for( ii = 0 ; blocks_it != blocks_end ; ++blocks_it, ++ii )
+    {
+        ASSERT_TRUE( st_BlockInfo_get_type_id( blocks_it ) == 
+                     st_BLOCK_TYPE_ALIGN );
+        
+        ASSERT_TRUE( st_BlockInfo_get_const_ptr_begin( blocks_it ) != 
+                     nullptr );  
+        
+        st_Align const* align = st_Blocks_get_const_align( blocks_it );
+            
+        ASSERT_TRUE( align != nullptr );
+        ASSERT_TRUE( std::distance( align, align_ptrs[ ii ] ) == 0 );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Align_get_tilt( align ) - cmp_align[ ii ].tilt ) );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Align_get_cz( align ) - cmp_align[ ii ].cz ) );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Align_get_sz( align ) - cmp_align[ ii ].sz ) );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Align_get_dx( align ) - cmp_align[ ii ].dx ) );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Align_get_dy( align ) - cmp_align[ ii ].dy ) );
+    }
+    
+    /* --------------------------------------------------------------------- */
+    
+    std::vector< unsigned char > copy_data_buffer(
+        st_Blocks_get_const_data_begin( &beam_elements ),
+        st_Blocks_get_const_data_end( &beam_elements ) );
+    
+    ASSERT_TRUE( copy_data_buffer.size() == 
+                 st_Blocks_get_total_num_bytes( &beam_elements ) );
+    
+    st_Blocks copy_beam_elements;
+    st_Blocks_preset( &copy_beam_elements );
+    
+    ret = st_Blocks_unserialize( 
+        &copy_beam_elements, copy_data_buffer.data() );
+    
+    ASSERT_TRUE( ret == 0 );
+    ASSERT_TRUE( st_Blocks_get_num_of_blocks( &copy_beam_elements ) == 
+                 NUM_BLOCKS );
+    
+    blocks_it  = st_Blocks_get_const_block_infos_begin( &copy_beam_elements );        
+    blocks_end = st_Blocks_get_const_block_infos_end( &copy_beam_elements );
+        
+    ASSERT_TRUE( std::distance( blocks_it, blocks_end ) == 
+        static_cast< std::ptrdiff_t >( NUM_BLOCKS ) );
+    
+    /* --------------------------------------------------------------------- */
+    
+    for( ii = 0 ; blocks_it != blocks_end ; ++blocks_it, ++ii )
+    {
+        ASSERT_TRUE( st_BlockInfo_get_type_id( blocks_it ) == 
+                     st_BLOCK_TYPE_ALIGN );
+        
+        ASSERT_TRUE( st_BlockInfo_get_const_ptr_begin( blocks_it ) != 
+                     nullptr );  
+        
+        st_Align const* align = st_Blocks_get_const_align( blocks_it );
+            
+        ASSERT_TRUE( align != nullptr );
+                
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Align_get_tilt( align ) - cmp_align[ ii ].tilt ) );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Align_get_cz( align ) - cmp_align[ ii ].cz ) );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Align_get_sz( align ) - cmp_align[ ii ].sz ) );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Align_get_dx( align ) - cmp_align[ ii ].dx ) );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Align_get_dy( align ) - cmp_align[ ii ].dy ) );
+    }
+    
+    st_Blocks_free( &beam_elements );
+    st_Blocks_free( &ref_beam_elements );
+    st_Blocks_free( &copy_beam_elements );    
+}
+
+/* ------------------------------------------------------------------------- */
+
+TEST( CommonTestsBeamElements, 
+      CreateAndRandomInitCavityUnserializeCompare )
+{
+    st_Blocks beam_elements;
+    st_Blocks_preset( &beam_elements );
+    
+    SIXTRL_STATIC st_block_size_t const NUM_BLOCKS = 1000u;
+    
+    SIXTRL_STATIC st_block_size_t const BEAM_ELEMENTS_DATA_CAPACITY =
+        st_Blocks_predict_data_capacity_for_num_blocks( 
+            &beam_elements, NUM_BLOCKS ) +
+        st_Cavity_predict_blocks_data_capacity( &beam_elements, NUM_BLOCKS );
+        
+    int ret = st_Blocks_init( 
+        &beam_elements, NUM_BLOCKS, BEAM_ELEMENTS_DATA_CAPACITY );
+    
+    ASSERT_TRUE( ret == 0 );
+    
+    SIXTRL_REAL_T const REAL_CMP_EPS = 
+        std::numeric_limits< SIXTRL_REAL_T >::epsilon();
+        
+    /* --------------------------------------------------------------------- */
+        
+    uint64_t seed = UINT64_C( 20180420 );
+    st_Random_init_genrand64( seed );
+    
+    SIXTRL_REAL_T const MIN_VOLTAGE     =  0.0;
+    SIXTRL_REAL_T const MAX_VOLTAGE     =  1e5;
+    SIXTRL_REAL_T const DELTA_VOLTAGE   = MAX_VOLTAGE - MIN_VOLTAGE;
+    
+    SIXTRL_REAL_T const MIN_FREQUENCY   = 0.0;
+    SIXTRL_REAL_T const MAX_FREQUENCY   = 400.0;
+    SIXTRL_REAL_T const DELTA_FREQUENCY = MAX_FREQUENCY - MIN_FREQUENCY;
+    
+    SIXTRL_REAL_T const MIN_LAG         = 0.0;
+    SIXTRL_REAL_T const MAX_LAG         = 0.1;
+    SIXTRL_REAL_T const DELTA_LAG       = MAX_LAG - MIN_LAG;
+    
+    std::vector< st_Cavity        > cmp_cavity(  NUM_BLOCKS );
+    std::vector< st_Cavity const* > cavity_ptrs( NUM_BLOCKS, nullptr );
+    
+    st_block_size_t ii = 0u;
+    
+    for( ; ii < NUM_BLOCKS ; ++ii )
+    {
+        SIXTRL_REAL_T const voltage = 
+            MIN_VOLTAGE + DELTA_VOLTAGE * st_Random_genrand64_real1();
+            
+        SIXTRL_REAL_T const frequency = 
+            MIN_FREQUENCY + DELTA_FREQUENCY * st_Random_genrand64_real1();
+        
+        SIXTRL_REAL_T const lag = 
+            MIN_LAG + DELTA_LAG * st_Random_genrand64_real1();
+        
+        cavity_ptrs[ ii ] = st_Blocks_add_cavity( 
+            &beam_elements, voltage, frequency, lag );
+        
+        ASSERT_TRUE( cavity_ptrs[ ii ] != nullptr );
+        
+        cmp_cavity[ ii ] = *cavity_ptrs[ ii ];
+    }
+    
+    /* --------------------------------------------------------------------- */
+    
+    ASSERT_TRUE( st_Blocks_get_num_of_blocks( &beam_elements ) == NUM_BLOCKS );
+    ASSERT_TRUE( !st_Blocks_are_serialized( &beam_elements ) );
+    
+    ASSERT_TRUE( st_Blocks_serialize( &beam_elements ) == 0 );
+    ASSERT_TRUE( st_Blocks_are_serialized( &beam_elements ) );
+    
+    ASSERT_TRUE( st_Blocks_get_num_of_blocks( &beam_elements ) == NUM_BLOCKS );
+    
+    SIXTRL_GLOBAL_DEC unsigned char* data_mem_begin =
+        st_Blocks_get_data_begin( &beam_elements );
+        
+    ASSERT_TRUE( data_mem_begin != nullptr );
+    
+    st_Blocks ref_beam_elements;
+    st_Blocks_preset( &ref_beam_elements );
+    
+    ret = st_Blocks_unserialize( &ref_beam_elements, data_mem_begin );
+    
+    ASSERT_TRUE( ret == 0 );    
+    ASSERT_TRUE( st_Blocks_get_num_of_blocks( 
+        &ref_beam_elements ) == NUM_BLOCKS );
+    
+    SIXTRL_GLOBAL_DEC st_BlockInfo const* blocks_it  = 
+        st_Blocks_get_const_block_infos_begin( &ref_beam_elements );
+        
+    SIXTRL_GLOBAL_DEC st_BlockInfo const* blocks_end =
+        st_Blocks_get_const_block_infos_end( &ref_beam_elements );
+        
+    ASSERT_TRUE( std::distance( blocks_it, blocks_end ) == 
+        static_cast< std::ptrdiff_t >( NUM_BLOCKS ) );
+    
+    /* --------------------------------------------------------------------- */
+    
+    for( ii = 0 ; blocks_it != blocks_end ; ++blocks_it, ++ii )
+    {
+        ASSERT_TRUE( st_BlockInfo_get_type_id( blocks_it ) == 
+                     st_BLOCK_TYPE_CAVITY );
+        
+        ASSERT_TRUE( st_BlockInfo_get_const_ptr_begin( blocks_it ) != 
+                     nullptr );  
+        
+        st_Cavity const* cavity = st_Blocks_get_const_cavity( blocks_it );
+            
+        ASSERT_TRUE( cavity != nullptr );
+        ASSERT_TRUE( std::distance( cavity, cavity_ptrs[ ii ] ) == 0 );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Cavity_get_voltage( cavity ) - cmp_cavity[ ii ].voltage ) );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Cavity_get_frequency( cavity ) - cmp_cavity[ ii ].frequency ) );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Cavity_get_lag( cavity ) - cmp_cavity[ ii ].lag ) );        
+    }
+    
+    /* --------------------------------------------------------------------- */
+    
+    std::vector< unsigned char > copy_data_buffer(
+        st_Blocks_get_const_data_begin( &beam_elements ),
+        st_Blocks_get_const_data_end( &beam_elements ) );
+    
+    ASSERT_TRUE( copy_data_buffer.size() == 
+                 st_Blocks_get_total_num_bytes( &beam_elements ) );
+    
+    st_Blocks copy_beam_elements;
+    st_Blocks_preset( &copy_beam_elements );
+    
+    ret = st_Blocks_unserialize( 
+        &copy_beam_elements, copy_data_buffer.data() );
+    
+    ASSERT_TRUE( ret == 0 );
+    ASSERT_TRUE( st_Blocks_get_num_of_blocks( &copy_beam_elements ) == 
+                 NUM_BLOCKS );
+    
+    blocks_it  = st_Blocks_get_const_block_infos_begin( &copy_beam_elements );        
+    blocks_end = st_Blocks_get_const_block_infos_end( &copy_beam_elements );
+        
+    ASSERT_TRUE( std::distance( blocks_it, blocks_end ) == 
+        static_cast< std::ptrdiff_t >( NUM_BLOCKS ) );
+    
+    /* --------------------------------------------------------------------- */
+    
+    for( ii = 0 ; blocks_it != blocks_end ; ++blocks_it, ++ii )
+    {
+        ASSERT_TRUE( st_BlockInfo_get_type_id( blocks_it ) == 
+                     st_BLOCK_TYPE_CAVITY );
+        
+        ASSERT_TRUE( st_BlockInfo_get_const_ptr_begin( blocks_it ) != 
+                     nullptr );  
+        
+        st_Cavity const* cavity = st_Blocks_get_const_cavity( blocks_it );
+            
+        ASSERT_TRUE( cavity != nullptr );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Cavity_get_voltage( cavity ) - cmp_cavity[ ii ].voltage ) );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Cavity_get_frequency( cavity ) - cmp_cavity[ ii ].frequency ) );
+        
+        ASSERT_TRUE( REAL_CMP_EPS >= std::fabs( 
+            st_Cavity_get_lag( cavity ) - cmp_cavity[ ii ].lag ) ); 
     }
     
     st_Blocks_free( &beam_elements );
