@@ -36,6 +36,28 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_multipole)(
     const NS(MultiPole) *const SIXTRL_RESTRICT multipole, 
     NS(Particles)* SIXTRL_RESTRICT io_particles );
 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_cavity)(
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
+    const NS(Cavity) *const SIXTRL_RESTRICT cavity, 
+    NS(Particles)* SIXTRL_RESTRICT io_particles );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_align)(
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
+    const NS(Align) *const SIXTRL_RESTRICT align, 
+    NS(Particles)* SIXTRL_RESTRICT io_particles );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_beam_beam)(
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(Particles)* SIXTRL_RESTRICT io_particles );
+
+
 SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_beam_elements_particle)(
     NS(Particles)* SIXTRL_RESTRICT particles,
     NS(block_num_elements_t) const particle_index,
@@ -165,6 +187,129 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_multipole)(
         for( ; ii < end_particle_index ; ++ii )
         {
             status |= NS(Track_multipole_particle)( particles, ii, multipole );
+            
+            NS(Particles_copy_single_unchecked)( 
+                io_particles, ii, particles, ii );
+        }
+    }
+    
+    return status;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_cavity)(
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
+    const NS(Cavity) *const SIXTRL_RESTRICT cavity, 
+    NS(Particles)* SIXTRL_RESTRICT io_particles )
+{
+    SIXTRL_TRACK_RETURN status = 0;
+    
+    NS(block_num_elements_t) ii = start_particle_index;
+    
+    SIXTRL_ASSERT( ( start_particle_index <= end_particle_index ) &&
+        ( end_particle_index <= NS(Particles_get_num_particles)( particles ) ) 
+    );
+    
+    if( io_particles == 0 )        
+    {
+        for( ; ii < end_particle_index ; ++ii )
+        {
+            status |= NS(Track_cavity_particle)( particles, ii, cavity );
+        }
+    }
+    else
+    {
+        SIXTRL_ASSERT( NS(Particles_get_num_particles)( io_particles ) ==
+                       NS(Particles_get_num_particles)( particles ) );
+        
+        for( ; ii < end_particle_index ; ++ii )
+        {
+            status |= NS(Track_cavity_particle)( particles, ii, cavity );
+            
+            NS(Particles_copy_single_unchecked)( 
+                io_particles, ii, particles, ii );
+        }
+    }
+    
+    return status;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_align)(
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
+    const NS(Align) *const SIXTRL_RESTRICT align, 
+    NS(Particles)* SIXTRL_RESTRICT io_particles )
+{
+    SIXTRL_TRACK_RETURN status = 0;
+    
+    NS(block_num_elements_t) ii = start_particle_index;
+    
+    SIXTRL_ASSERT( ( start_particle_index <= end_particle_index ) &&
+        ( end_particle_index <= NS(Particles_get_num_particles)( particles ) ) 
+    );
+    
+    if( io_particles == 0 )        
+    {
+        for( ; ii < end_particle_index ; ++ii )
+        {
+            status |= NS(Track_align_particle)( particles, ii, align );
+        }
+    }
+    else
+    {
+        SIXTRL_ASSERT( NS(Particles_get_num_particles)( io_particles ) ==
+                       NS(Particles_get_num_particles)( particles ) );
+        
+        for( ; ii < end_particle_index ; ++ii )
+        {
+            status |= NS(Track_align_particle)( particles, ii, align );
+            
+            NS(Particles_copy_single_unchecked)( 
+                io_particles, ii, particles, ii );
+        }
+    }
+    
+    return status;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_beam)(
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(block_num_elements_t) const start_particle_index,
+    NS(block_num_elements_t) const end_particle_index,
+    const NS(BeamBeam) *const SIXTRL_RESTRICT beam_beam, 
+    NS(Particles)* SIXTRL_RESTRICT io_particles )
+{
+    SIXTRL_TRACK_RETURN status = 0;
+    
+    NS(block_num_elements_t) ii = start_particle_index;
+    
+    SIXTRL_ASSERT( ( start_particle_index <= end_particle_index ) &&
+        ( end_particle_index <= NS(Particles_get_num_particles)( particles ) ) 
+    );
+    
+    if( io_particles == 0 )        
+    {
+        for( ; ii < end_particle_index ; ++ii )
+        {
+            status |= NS(Track_beam_beam_particle)( particles, ii, beam_beam );
+        }
+    }
+    else
+    {
+        SIXTRL_ASSERT( NS(Particles_get_num_particles)( io_particles ) ==
+                       NS(Particles_get_num_particles)( particles ) );
+        
+        for( ; ii < end_particle_index ; ++ii )
+        {
+            status |= NS(Track_beam_beam_particle)( particles, ii, beam_beam );
             
             NS(Particles_copy_single_unchecked)( 
                 io_particles, ii, particles, ii );
