@@ -9,6 +9,13 @@ if( GTEST_FOUND )
          ${SIXTRACKL_GTEST_LIBRARIES} )
     
     # --------------------------------------------------------------------------
+    # test_ocl_environment_opencl:
+    
+    add_executable( test_ocl_environment_opencl test_ocl_environment.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_ocl_environment_opencl )
+    add_test( OpenCLOclEnvironmentTests test_ocl_environment_opencl )
+    
+    # --------------------------------------------------------------------------
     # test_track_opencl:
     
     add_executable( test_track_opencl test_track.cpp )

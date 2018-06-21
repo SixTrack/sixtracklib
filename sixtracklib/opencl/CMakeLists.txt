@@ -1,11 +1,9 @@
 set( SIXTRACKLIB_COMMON_HEADERS
      ocl_environment.h
-     tests/test_opencl_tools.h
 )
 
 set( SIXTRACKLIB_COMMON_SOURCES 
-     tests/test_opencl_tools.c
-     details/ocl_environment.c
+     details/ocl_environment.cpp
 )
 
 add_library( sixtrack_opencl OBJECT 
@@ -17,9 +15,10 @@ target_include_directories( sixtrack_opencl PUBLIC
     ${CMAKE_SOURCE_DIR} 
     ${SIXTRACKL_OPENCL_INCLUDE_DIR} )
              
-set_target_properties(  sixtrack_opencl PROPERTIES LINKER_LANGUAGE C )
-set_target_properties(  sixtrack_opencl PROPERTIES POSITION_INDEPENDENT_CODE True )
-set_target_properties(  sixtrack_opencl PROPERTIES C_STANDARD 99 )
+set_target_properties( sixtrack_opencl PROPERTIES LINKER_LANGUAGE CXX )
+set_target_properties( sixtrack_opencl PROPERTIES POSITION_INDEPENDENT_CODE True )
+set_target_properties( sixtrack_opencl PROPERTIES CXX_STANDARD 11 )
+set_target_properties( sixtrack_opencl PROPERTIES CXX_STANDARD_REQUIRED ON   )
 
 target_compile_definitions( sixtrack_opencl PUBLIC 
         ${SIXTRACKLIB_NAMESPACE_FLAGS} -DCL_USE_DEPRECATED_OPENCL_1_2_APIS )
