@@ -224,7 +224,8 @@ void __kernel Track_particles_kernel_opencl(
                 NS(Blocks_get_num_of_blocks)( &elem_by_elem_buffer );
                 
             if( ( num_required_elem_by_elem_blocks > 0u ) &&
-                ( num_elem_by_elem_blocks >= num_required_elem_by_elem_blocks ) )
+                ( num_elem_by_elem_blocks >= 
+                    num_required_elem_by_elem_blocks ) )
             {
                 use_elem_by_elem_buffer = true;
             }
@@ -238,39 +239,43 @@ void __kernel Track_particles_kernel_opencl(
     
     if( ( success_flag        == 0  ) && ( num_of_turns     != 0u ) &&
         ( num_beam_elements   != 0u ) && ( num_of_particles != 0u ) &&
-        ( num_particle_blocks == 1u ) && ( global_id < num_of_particles ) )
+        ( num_particle_blocks == 1u ) )
     {
         int ret = 0;
         unsigned long ii = 0u;
         
-        if( !use_elem_by_elem_buffer )
+        if( global_id < num_of_particles )
         {
-            for( ; ii < num_of_turns ; ++ii )
+            if( !use_elem_by_elem_buffer )
             {
-                ret |= NS(Track_beam_elements_particle)( 
-                        &particles, global_id, &beam_elements, 0 );
-            }
-            
-            if( ret != 0 ) success_flag |= -8;
-        }
-        else
-        {
-            SIXTRL_GLOBAL_DEC NS(BlockInfo)* io_info_it =
-                NS(Blocks_get_block_infos_begin)( &elem_by_elem_buffer );
-            
-            for( ; ii < num_of_turns ; ++ii, 
-                    io_info_it = io_info_it + num_beam_elements )
-            {
-                ret |= NS(Track_beam_elements_particle)( 
-                        &particles, global_id, &beam_elements, io_info_it );
-                
-                if( io_info_it != 0 )
+                for( ; ii < num_of_turns ; ++ii )
                 {
-                    io_info_it = io_info_it + num_elem_by_elem_blocks_per_turn;
+                    ret |= NS(Track_beam_elements_particle)( 
+                            &particles, global_id, &beam_elements, 0 );
                 }
+                
+                if( ret != 0 ) success_flag |= -8;
             }
-            
-            if( ret != 0 ) success_flag |= -16;
+            else
+            {
+                SIXTRL_GLOBAL_DEC NS(BlockInfo)* io_info_it =
+                    NS(Blocks_get_block_infos_begin)( &elem_by_elem_buffer );
+                
+                for( ; ii < num_of_turns ; ++ii, 
+                        io_info_it = io_info_it + num_beam_elements )
+                {
+                    ret |= NS(Track_beam_elements_particle)( 
+                            &particles, global_id, &beam_elements, io_info_it );
+                    
+                    if( io_info_it != 0 )
+                    {
+                        io_info_it = io_info_it + 
+                            num_elem_by_elem_blocks_per_turn;
+                    }
+                }
+                
+                if( ret != 0 ) success_flag |= -16;
+            }
         }
     }
     else
