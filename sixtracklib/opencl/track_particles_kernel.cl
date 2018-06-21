@@ -60,7 +60,8 @@ void __kernel Track_remap_serialized_blocks_buffer(
                 NS(Blocks) elem_by_elem_buffer;
                 NS(Blocks_preset)( &elem_by_elem_buffer );
                 
-                if( 0 != NS(Blocks_unserialize)( &elem_by_elem_buffer ) )
+                if( 0 != NS(Blocks_unserialize)( 
+                        &elem_by_elem_buffer, elem_by_elem_data_buffer ) )
                 {
                     success_flag = -4;
                 }
@@ -222,8 +223,8 @@ void __kernel Track_particles_kernel_opencl(
             num_elem_by_elem_blocks = 
                 NS(Blocks_get_num_of_blocks)( &elem_by_elem_buffer );
                 
-            if( ( required_num_elem_by_elem > 0u ) &&
-                ( num_elem_by_elem_blocks >= required_num_elem_by_elem ) )
+            if( ( num_required_elem_by_elem_blocks > 0u ) &&
+                ( num_elem_by_elem_blocks >= num_required_elem_by_elem_blocks ) )
             {
                 use_elem_by_elem_buffer = true;
             }
