@@ -18,8 +18,11 @@
 
 #if defined( _GPUCODE )
 
-    #if defined( __OPENCL_C_VERSION__ )
-        #pragma OPENCL EXTENSION cl_khr_fp64 : enable 
+    #if defined( __OPENCL_C_VERSION__ )        
+        #if __OPENCL_VERSION__ < 120 || defined( cl_khr_fp64 )
+            #pragma OPENCL EXTENSION cl_khr_fp64 : enable 
+        #endif
+        
         #define SIXTRL_ALIGN 64u
         
         /* ---------------------------------------------------------------- */
