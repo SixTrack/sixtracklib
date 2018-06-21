@@ -51,6 +51,8 @@ set( SIXTRACKL_TEST_LIBRARIES sixtrack )
 set( SIXTRACKL_HEADERS sixtracklib.h )
 set( SIXTRACKL_SOURCES )
 
+set( SIXTRACKLIB_TESTDATA_DIR "${CMAKE_SOURCE_DIR}/testdata" )
+
 add_subdirectory( _impl )
 
 # ------------------------------------------------------------------------------
@@ -132,10 +134,6 @@ install( EXPORT SixTracklib-targets
          NAMESPACE SixTracklib::
          DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake
 )
-    
-# ------------------------------------------------------------------------------
-
-add_subdirectory( testdata )
     
 # ------------------------------------------------------------------------------
 

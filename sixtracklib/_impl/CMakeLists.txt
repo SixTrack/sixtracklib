@@ -5,9 +5,8 @@ set( IMPL_INSTALL_PATH "include/sixtracklib/_impl" )
 # ------------------------------------------------------------------------------
 # generate the testdata_files.h header to be used with examples and unit-tests 
 
-set( SIXTRACKLIB_TESTDATA_DIR "${CMAKE_SOURCE_DIR}/testdata" )
 set( TESTDATA_FILES_H_IN_PATH 
-     "$C{CMAKE_CURRENT_SOURCE_DIR}/testdata_files.h.template" )
+     "${CMAKE_CURRENT_SOURCE_DIR}/testdata_files.h.template" )
 
 set( TESTDATA_FILES_H_OUT_PATH
      "${CMAKE_CURRENT_SOURCE_DIR}/testdata_files.h" )
@@ -15,8 +14,7 @@ set( TESTDATA_FILES_H_OUT_PATH
 set( TESTDATA_FILES_H_INSTALL_PATH
      "${IMPL_INSTALL_PATH}/testdata_files.h" )
      
-configure_file( TESTDATA_FILES_H_IN_PATH, 
-                TESTDATA_FILES_H_OUT_PATH, 
+configure_file( ${TESTDATA_FILES_H_IN_PATH} ${TESTDATA_FILES_H_OUT_PATH} 
                 @ONLY )
                 
 install( CODE "
