@@ -461,8 +461,8 @@ SIXTRL_FN SIXTRL_STATIC NS(BeamBeamBoostData)* NS(BeamBeamBoostData_preset)(
     NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data );
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T 
-NS(BeamBeamBoostData_get_sphi)( SIXTRL_GLOBAL_DEC const 
-    NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data );
+NS(BeamBeamBoostData_get_sphi)( 
+    const NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data );
 
 SIXTRL_FN SIXTRL_STATIC void NS(BeamBeamBoostData_set_sphi)(
     NS(BeamBeamBoostData)* SIXTRL_RESTRICT boost_data, 
@@ -1733,9 +1733,8 @@ SIXTRL_INLINE NS(BeamBeamBoostData)* NS(BeamBeamBoostData_preset)(
     return boost_data;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T 
-NS(BeamBeamBoostData_get_sphi)( SIXTRL_GLOBAL_DEC const 
-    NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data )
+SIXTRL_INLINE SIXTRL_REAL_T NS(BeamBeamBoostData_get_sphi)( 
+    const NS(BeamBeamBoostData) *const SIXTRL_RESTRICT boost_data )
 {
     SIXTRL_ASSERT( boost_data != 0 );
     return boost_data->sphi;
