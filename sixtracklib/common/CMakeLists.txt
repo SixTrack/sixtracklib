@@ -21,16 +21,18 @@ set( SIXTRACKLIB_COMMON_TESTS_HEADERS
 
 set( SIXTRACKLIB_COMMON_HEADERS 
      alignment.h
-     blocks.h
      beam_elements.h
+     blocks.h
+     compute_arch.h
      mem_pool.h     
      particles.h
 )
 
 set( SIXTRACKLIB_COMMON_SOURCES
      details/alignment.c
-     details/blocks.c
      details/beam_elements.c
+     details/blocks.c
+     details/compute_arch.c
      details/gpu_kernel_tools.c
      details/mem_pool.c
      details/particles.c
