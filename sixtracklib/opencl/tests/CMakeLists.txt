@@ -20,7 +20,7 @@ if( GTEST_FOUND )
     
     add_executable( test_track_opencl test_track.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_opencl )
-#     add_test( OpenCLTrackTests test_track_opencl )
+    add_test( OpenCLTrackTests test_track_opencl )
     
     # *************************************************************************
     # Set all properties: 
