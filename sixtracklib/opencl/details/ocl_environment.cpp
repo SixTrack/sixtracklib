@@ -217,7 +217,8 @@ bool NS(OclEnvironment)::prepareParticlesTracking(
         NS(ComputeNodeId) const* selected_nodes_end = selected_nodes_begin;
         std::advance( selected_nodes_end, num_of_selected_nodes );
         
-        std::string const PATH_TO_SOURCE_DIR( st_PATH_TO_BASE_DIR );
+        std::string PATH_TO_SOURCE_DIR( st_PATH_TO_BASE_DIR );
+        PATH_TO_SOURCE_DIR += "sixtracklib/";
         
         std::vector< std::string > const paths_to_kernel_files{
             PATH_TO_SOURCE_DIR + std::string{ "_impl/namespace_begin.h" },
@@ -309,7 +310,7 @@ bool NS(OclEnvironment)::prepareParticlesTracking(
                 cl::Device   device(   find_it->second.second );
                 
                 this->m_selected_nodes.push_back( *sel_node_it );
-                this->m_contexts.emplace_back( device );
+                this->m_contexts.push_back( cl::Context( device ) );
                 cl::Context& context = this->m_contexts.back();
                 
                 /* -------------------------------------------------------- */
@@ -317,26 +318,23 @@ bool NS(OclEnvironment)::prepareParticlesTracking(
                 this->m_buffers.emplace_back( std::vector< cl::Buffer >( 4 ) );
                 std::vector< cl::Buffer >& buffers = this->m_buffers.back();
                 
-                buffers.push_back( cl::Buffer( context, CL_MEM_READ_WRITE, 
-                                      this->m_particles_data_buffer_size, 
-                                      0, &ret ) );
+                buffers[ 0 ] = cl::Buffer( context, CL_MEM_READ_WRITE, 
+                    this->m_particles_data_buffer_size, 0, &ret );
                 
                 success &= ( ret == CL_SUCCESS );
                 
-                buffers.push_back( cl::Buffer( context, CL_MEM_READ_WRITE,
-                                      this->m_beam_elements_data_buffer_size,
-                                      0, &ret ) );
+                buffers[ 1 ] = cl::Buffer( context, CL_MEM_READ_WRITE,
+                    this->m_beam_elements_data_buffer_size, 0, &ret );
                 
                 success &= ( ret == CL_SUCCESS );
                 
-                buffers.push_back( cl::Buffer( context, CL_MEM_READ_WRITE,
-                                      this->m_elem_by_elem_data_buffer_size, 
-                                      0, &ret ) );
+                buffers[ 2 ] = cl::Buffer( context, CL_MEM_READ_WRITE,
+                     this->m_elem_by_elem_data_buffer_size, 0, &ret );
                 
                 success &= ( ret == CL_SUCCESS );
                 
-                buffers.push_back( cl::Buffer( context, CL_MEM_READ_WRITE, 
-                                      sizeof( int64_t ), 0, &ret ) );
+                buffers[ 3 ] = cl::Buffer( context, CL_MEM_READ_WRITE, 
+                    sizeof( int64_t ), 0, &ret );
                 
                 success &= ( ret == CL_SUCCESS );
                 
@@ -344,16 +342,17 @@ bool NS(OclEnvironment)::prepareParticlesTracking(
                 
                 /* -------------------------------------------------------- */
                 
-                this->m_programs.emplace_back( 
-                    this->m_contexts.back(), kernel_source );
+                this->m_programs.push_back( 
+                    cl::Program( context, kernel_source ) );
                 
                 cl::Program& program = this->m_programs.back();
                 
                 if( ( program.build( compile_options.c_str() ) ) != CL_SUCCESS )
                 {
-                    std::cout << "Error building: " 
-                        << program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( 
-                            device ) << "\r\n";
+                    std::string const build_log = 
+                        program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( device );
+                    
+                    std::cout << "Error building: " << build_log << "\r\n";
                     
                     success = false;
                 }
@@ -365,17 +364,19 @@ bool NS(OclEnvironment)::prepareParticlesTracking(
                 this->m_kernels.emplace_back( std::vector< cl::Kernel >( 2 ) );
                 std::vector< cl::Kernel >& kernels = this->m_kernels.back();
                 
-                kernels.emplace_back( 
-                    program, "Track_remap_serialized_blocks_buffer", &ret );
+                success &= ( kernels.size() == 2u );
+                
+                kernels[ 0 ] = cl::Kernel( program, 
+                       "Track_remap_serialized_blocks_buffer", &ret );                
                 
                 success &= ( ret == CL_SUCCESS );
                 
-                kernels.emplace_back( 
+                kernels[ 1 ] = cl::Kernel( 
                     program, "Track_particles_kernel_opencl", &ret );
                 
                 success &= ( ret == CL_SUCCESS );
                 
-                cl::Kernel& track_kernel = kernels.back();
+                cl::Kernel& track_kernel = kernels[ 1 ];
                 
                 this->m_local_workgroup_size.push_back(
                     track_kernel.getWorkGroupInfo<
@@ -388,8 +389,9 @@ bool NS(OclEnvironment)::prepareParticlesTracking(
                 
                 /* -------------------------------------------------------- */
                 
-                this->m_queues.emplace_back( 
-                    context, device, CL_QUEUE_PROFILING_ENABLE, &ret );
+                this->m_queues.push_back( 
+                    cl::CommandQueue( context, device, 
+                                      CL_QUEUE_PROFILING_ENABLE, &ret ) );
                 
                 success &= ( ret == CL_SUCCESS );
             }
@@ -490,7 +492,7 @@ bool NS(OclEnvironment)::runParticlesTracking(
             ret |= remap_kernel.setArg( 2, buffers[ 2 ] );
             ret |= remap_kernel.setArg( 3, buffers[ 3 ] );
             
-            success &= ( ret == CL_SUCCESS );
+            success = ( ret == CL_SUCCESS );
             
             cl::Kernel& track_kernel = kernels[ 1 ];
             
@@ -499,7 +501,6 @@ bool NS(OclEnvironment)::runParticlesTracking(
             ret |= track_kernel.setArg( 2, buffers[ 1 ] );
             ret |= track_kernel.setArg( 3, buffers[ 2 ] );
             ret |= track_kernel.setArg( 4, buffers[ 3 ] );
-            ret |= track_kernel.setArg( 5, buffers[ 4 ] );
             
             success &= ( ret == CL_SUCCESS );
             
@@ -623,12 +624,24 @@ bool NS(OclEnvironment)::runParticlesTracking(
             
             success &= ( ret == CL_SUCCESS );
             
+            if( success )
+            {
+                success = ( 0 == st_Blocks_unserialize( 
+                    &particles_buffer, particles_data_buffer ) );
+            }
+            
             ret = queue.enqueueReadBuffer(
                     buffers[ 2 ], CL_TRUE, 0, 
                     this->m_elem_by_elem_data_buffer_size, 
                     elem_by_elem_data_buffer );
             
             success &= ( ret == CL_SUCCESS );
+            
+            if( ( success ) && ( elem_by_elem_buffer != nullptr ) )
+            {
+                success = ( 0 == NS(Blocks_unserialize)(
+                    elem_by_elem_buffer, elem_by_elem_data_buffer ) );
+            }
             
             if( !success ) break;
         }

@@ -103,7 +103,7 @@ TEST( OpenCLTrackTests, TrackDrifts )
         std::size_t const num_nodes = ocl_env.numAvailableNodes();
         
         std::cout << "found " << num_nodes  
-                  << "number of nodes -> repeat unit-test for each node!" 
+                  << " nodes ==> repeat unit-test for each node!" 
                   << std::endl << std::endl;
                   
         auto node_it  = ocl_env.constAvailableNodesBegin();
@@ -170,17 +170,36 @@ TEST( OpenCLTrackTests, TrackDrifts )
                     use_elem_by_elem_buffer = true;
                 }
                     
-                bool const prepare_success = ocl_env.prepareParticlesTracking( 
-                    particles_buffer, beam_elements, &calculated_elem_by_elem_buffer, 
-                    node_it, 1 );
+                if( use_elem_by_elem_buffer )
+                {
+                    bool const prepare_success = 
+                        ocl_env.prepareParticlesTracking( 
+                            particles_buffer, beam_elements, 
+                            &calculated_elem_by_elem_buffer, node_it, 1 );
+                        
+                    ASSERT_TRUE( prepare_success );
                 
-                ASSERT_TRUE( prepare_success );
+                    bool const run_success = 
+                        ocl_env.runParticlesTracking(
+                            NUM_OF_TURNS, particles_buffer, beam_elements, 
+                            &calculated_elem_by_elem_buffer );
                 
-                bool const run_success = ocl_env.runParticlesTracking(
-                    NUM_OF_TURNS, particles_buffer, beam_elements, 
-                    &calculated_elem_by_elem_buffer );
+                    ASSERT_TRUE( run_success );
+                }
+                else 
+                {
+                    bool const prepare_success = 
+                        ocl_env.prepareParticlesTracking( particles_buffer, 
+                            beam_elements, nullptr, node_it, 1 );
+                        
+                    ASSERT_TRUE( prepare_success );
                 
-                ASSERT_TRUE( run_success );
+                    bool const run_success = 
+                        ocl_env.runParticlesTracking( NUM_OF_TURNS,
+                            particles_buffer, beam_elements, nullptr);
+                
+                    ASSERT_TRUE( run_success );
+                }
                 
                 ASSERT_TRUE( st_Particles_buffers_have_same_structure( 
                     &initial_particles_buffer, &result_particles_buffer ) );
@@ -194,9 +213,18 @@ TEST( OpenCLTrackTests, TrackDrifts )
                 ASSERT_TRUE( !st_Particles_buffers_map_to_same_memory(
                     &initial_particles_buffer, &particles_buffer ) );
                 
-                if( 0 != st_Particles_buffer_compare_values(
+                if( 0 == st_Particles_buffer_compare_values(
                     &result_particles_buffer, &particles_buffer ) )
                 {
+                    std::cout << "Calculated particles and result particles match exactly --> SUCCESS"
+                              << std::endl;
+                }
+                else
+                {
+                    std::cout << "Calculated particles and result particles differ --> "
+                                 "investigate numerical differences"
+                              << std::endl;
+                    
                     st_Blocks max_diff_buffer;
                     st_Blocks_preset( &max_diff_buffer );
                     
