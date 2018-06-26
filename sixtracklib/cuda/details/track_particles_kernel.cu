@@ -10,6 +10,8 @@
 #include "sixtracklib/common/impl/beam_elements_type.h"
 #include "sixtracklib/common/impl/beam_elements_api.h"
 #include "sixtracklib/common/beam_elements.h"
+#include "sixtracklib/common/impl/faddeeva.h"
+#include "sixtracklib/common/impl/beam_beam_element_6d.h"
 #include "sixtracklib/common/track.h"
 #include "sixtracklib/common/impl/track_api.h"
 

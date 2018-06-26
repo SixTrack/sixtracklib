@@ -9,9 +9,8 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
-cmake_minimum_required( VERSION 3.3 )
-
-project( sixtracklib )
+cmake_minimum_required( VERSION 3.8 FATAL_ERROR )
+project( sixtracklib LANGUAGES C CXX )
 
 message( STATUS "---- Project sixtracklib" )
 message( STATUS "---- Inside main CMakeLists.txt" )
@@ -89,6 +88,7 @@ endif()
 
 if( SIXTRACKL_ENABLE_CUDA )
     include( SetupCuda )
+    enable_language( CUDA )
 endif()
 
 # ------------------------------------------------------------------------------

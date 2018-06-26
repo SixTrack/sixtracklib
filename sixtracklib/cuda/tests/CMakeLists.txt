@@ -5,7 +5,7 @@ if( GTEST_FOUND )
     include_directories( ${SIXTRACKL_GTEST_INCLUDE_DIRS} )
 
     set( UNIT_TEST_TARGETS ) 
-    set( SIXTRACKL_TEST_LIBRARIES sixtrack_cuda ${SIXTRACKL_TEST_LIBRARIES} 
+    set( SIXTRACKL_TEST_LIBRARIES ${SIXTRACKL_TEST_LIBRARIES} 
          ${SIXTRACKL_GTEST_LIBRARIES} )
     
     # --------------------------------------------------------------------------

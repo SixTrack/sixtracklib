@@ -91,8 +91,8 @@ if( SIXTRACKL_ENABLE_CUDA )
         
     add_subdirectory( cuda )
 
-#     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-#          $<TARGET_OBJECTS:sixtrack_cuda_part> PARENT_SCOPE )
+    set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
+         $<TARGET_OBJECTS:sixtrack_cuda_part> )
     
 endif()
                 

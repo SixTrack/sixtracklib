@@ -10,7 +10,7 @@
 
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/common/blocks.h"
-#include "sixtracklib/cuda/track_particles_kernel.cuh"
+#include "sixtracklib/cuda/impl/track_particles_kernel.cuh"
 
 bool NS(Track_particles_on_cuda)(
     int const num_of_blocks, 

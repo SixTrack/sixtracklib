@@ -22,6 +22,7 @@
 
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/_impl/path.h"
+#include "sixtracklib/_impl/testdata_files.h"
 
 #include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/beam_elements.h"
@@ -31,7 +32,6 @@
 
 #include "sixtracklib/common/tests/test_particles_tools.h"
 #include "sixtracklib/common/tests/test_track_tools.h"
-#include "sixtracklib/testdata/tracking_testfiles.h"
 
 #include "sixtracklib/cuda/cuda_env.h"
 
