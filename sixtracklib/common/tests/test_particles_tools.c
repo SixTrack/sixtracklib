@@ -320,7 +320,7 @@ void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
         SIXTRL_REAL_T const MASS0   = 1.0;
         SIXTRL_REAL_T const BETA0   = 1.0;
         SIXTRL_REAL_T const GAMMA0  = 1.0;
-        SIXTRL_REAL_T const P0C     = 0.0;
+        SIXTRL_REAL_T const P0C     = 1.0;
             
         SIXTRL_REAL_T const S       = 0.0;
         SIXTRL_REAL_T const MIN_X   = 0.0;
@@ -1023,65 +1023,65 @@ void NS(Particles_print)(
                 fprintf( fp, "particle id    = %8lu\r\n", ii );                
             }
             
-            fprintf( fp, "q0             = %8.4f\r\n", 
+            fprintf( fp, "q0             = %.16f\r\n", 
                      NS(Particles_get_q0_value)( particles, ii ) );
             
-            fprintf( fp, "mass0          = %8.4f\r\n", 
+            fprintf( fp, "mass0          = %.16f\r\n", 
                      NS(Particles_get_mass0_value)( particles, ii ) );
             
-            fprintf( fp, "beta0          = %8.4f\r\n", 
+            fprintf( fp, "beta0          = %.16f\r\n", 
                      NS(Particles_get_beta0_value)( particles, ii ) );
             
-            fprintf( fp, "gamma0         = %8.4f\r\n", 
+            fprintf( fp, "gamma0         = %.16f\r\n", 
                      NS(Particles_get_gamma0_value)( particles, ii ) );
             
-            fprintf( fp, "p0c            = %8.4f\r\n", 
+            fprintf( fp, "p0c            = %.16f\r\n", 
                      NS(Particles_get_p0c_value)( particles, ii ) );
             
-            fprintf( fp, "s              = %8.4f\r\n", 
+            fprintf( fp, "s              = %.16f\r\n", 
                      NS(Particles_get_s_value)( particles, ii ) );
             
-            fprintf( fp, "x              = %8.4f\r\n", 
+            fprintf( fp, "x              = %.16f\r\n", 
                      NS(Particles_get_x_value)( particles, ii ) );
             
-            fprintf( fp, "y              = %8.4f\r\n", 
+            fprintf( fp, "y              = %.16f\r\n", 
                      NS(Particles_get_y_value)( particles, ii ) );
             
-            fprintf( fp, "px             = %8.4f\r\n", 
+            fprintf( fp, "px             = %.16f\r\n", 
                      NS(Particles_get_px_value)( particles, ii ) );
             
-            fprintf( fp, "py             = %8.4f\r\n", 
+            fprintf( fp, "py             = %.16f\r\n", 
                      NS(Particles_get_py_value)( particles, ii ) );
             
-            fprintf( fp, "sigma          = %8.4f\r\n", 
+            fprintf( fp, "sigma          = %.16f\r\n", 
                      NS(Particles_get_sigma_value)( particles, ii ) );
             
-            fprintf( fp, "psigma         = %8.4f\r\n", 
+            fprintf( fp, "psigma         = %.16f\r\n", 
                      NS(Particles_get_psigma_value)( particles, ii ) );
             
-            fprintf( fp, "delta          = %8.4f\r\n", 
+            fprintf( fp, "delta          = %.16f\r\n", 
                      NS(Particles_get_delta_value)( particles, ii ) );
             
-            fprintf( fp, "rpp            = %8.4f\r\n", 
+            fprintf( fp, "rpp            = %.16f\r\n", 
                      NS(Particles_get_rpp_value)( particles, ii ) );
             
-            fprintf( fp, "rvv            = %8.4f\r\n", 
+            fprintf( fp, "rvv            = %.16f\r\n", 
                      NS(Particles_get_rvv_value)( particles, ii ) );
             
-            fprintf( fp, "chi            = %8.4f\r\n", 
+            fprintf( fp, "chi            = %.16f\r\n", 
                      NS(Particles_get_chi_value)( particles, ii ) );
             
-            fprintf( fp, "particle_id    = %8ld\r\n", 
+            fprintf( fp, "particle_id    = %18ld\r\n", 
                      NS(Particles_get_particle_id_value)( particles, ii ) );
             
-            fprintf( fp, "lost @ elem_id = %8ld\r\n", 
+            fprintf( fp, "lost @ elem_id = %18ld\r\n", 
                      NS(Particles_get_lost_at_element_id_value)( 
                         particles, ii ) );
             
-            fprintf( fp, "lost @ turn    = %8ld\r\n",
+            fprintf( fp, "lost @ turn    = %18ld\r\n",
                      NS(Particles_get_lost_at_turn_value)( particles, ii ) );
                      
-            fprintf( fp, "state          = %8ld\r\n\r\n",
+            fprintf( fp, "state          = %18ld\r\n\r\n",
                      NS(Particles_get_state_value)( particles, ii ) );
         }
     }
