@@ -82,7 +82,7 @@ SIXTRL_INLINE int NS(BeamBeam_boost_particle)(
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE     = ( SIXTRL_REAL_T )1.0L;
     
     SIXTRL_REAL_T px    = NS(Particles_get_px_value)(    p, ii );
-    SIXTRL_REAL_T py    = NS(Particles_get_px_value)(    p, ii );
+    SIXTRL_REAL_T py    = NS(Particles_get_py_value)(    p, ii );
     SIXTRL_REAL_T delta = NS(Particles_get_delta_value)( p, ii );
     
     SIXTRL_REAL_T const cos_phi   = NS(BeamBeamBoostData_get_cphi)( boost );    
@@ -94,7 +94,8 @@ SIXTRL_INLINE int NS(BeamBeam_boost_particle)(
     SIXTRL_REAL_T const sin_alpha_tan_phi = sin_alpha * tan_phi;
     SIXTRL_REAL_T const cos_alpha_tan_phi = cos_alpha * tan_phi;
     SIXTRL_REAL_T const sin_alpha_sin_phi = sin_alpha * sin_phi;
-    SIXTRL_REAL_T const cos_alpha_sin_phi = sin_alpha * cos_phi;
+    SIXTRL_REAL_T const cos_alpha_sin_phi = cos_alpha * sin_phi;
+    SIXTRL_REAL_T const inv_cos_phi       = ONE / cos_phi;
     
     SIXTRL_REAL_T const delta_plus_one = delta + ONE;
     
@@ -112,18 +113,15 @@ SIXTRL_INLINE int NS(BeamBeam_boost_particle)(
         
     SIXTRL_REAL_T const delta_star_plus_one = delta_star + ONE;
                 
-    SIXTRL_REAL_T const px_star     = 
-        px / cos_phi - h * cos_alpha_tan_phi / cos_phi;
+    SIXTRL_REAL_T const px_star = inv_cos_phi * ( px - h * cos_alpha_tan_phi );        
+    SIXTRL_REAL_T const py_star = inv_cos_phi * ( py - h * sin_alpha_tan_phi );
         
-    SIXTRL_REAL_T const py_star     =
-        py / cos_phi - h * sin_alpha_tan_phi / cos_phi;
-        
-    SIXTRL_REAL_T const pz_star_sqrt_arg = 
+    SIXTRL_REAL_T const pz_star_squ = 
         delta_star_plus_one * delta_star_plus_one 
         - px_star * px_star 
         - py_star * py_star;
         
-    SIXTRL_REAL_T const pz_star     = sqrt( pz_star_sqrt_arg );
+    SIXTRL_REAL_T const pz_star     = sqrt( pz_star_squ );
     SIXTRL_REAL_T const hx_star     = px_star / pz_star;
     SIXTRL_REAL_T const hy_star     = py_star / pz_star;
     SIXTRL_REAL_T const hsigma_star = ONE - ( delta_star_plus_one / pz_star );
@@ -138,7 +136,7 @@ SIXTRL_INLINE int NS(BeamBeam_boost_particle)(
                                     
     SIXTRL_REAL_T const L31         = hsigma_star * cos_alpha_sin_phi;
     SIXTRL_REAL_T const L32         = hsigma_star * sin_alpha_sin_phi;
-    SIXTRL_REAL_T const L33         = ONE / cos_phi;
+    SIXTRL_REAL_T const L33         = inv_cos_phi;
     
     SIXTRL_REAL_T const x     = NS(Particles_get_x_value)(     p, ii );
     SIXTRL_REAL_T const y     = NS(Particles_get_y_value)(     p, ii );
@@ -156,8 +154,8 @@ SIXTRL_INLINE int NS(BeamBeam_boost_particle)(
     SIXTRL_ASSERT( ( ( pz_star > ZERO ) && (  pz_star > MIN_EPS ) ) ||
                    ( ( pz_star < ZERO ) && ( -pz_star > MIN_EPS ) ) );
     
-    SIXTRL_ASSERT( h_sqrt_arg       > ZERO );
-    SIXTRL_ASSERT( pz_star_sqrt_arg > ZERO );
+    SIXTRL_ASSERT( h_sqrt_arg  > ZERO );
+    SIXTRL_ASSERT( pz_star_squ > ZERO );
     
     #endif /* !defined( NDEBUG ) && !defined( __CUDACC__ ) */
     
@@ -185,20 +183,19 @@ SIXTRL_INLINE int NS(BeamBeam_inv_boost_particle)(
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE  = ( SIXTRL_REAL_T )1.0L;
     
     SIXTRL_REAL_T px_star    = NS(Particles_get_px_value)(    p, ii );
-    SIXTRL_REAL_T py_star    = NS(Particles_get_px_value)(    p, ii );
+    SIXTRL_REAL_T py_star    = NS(Particles_get_py_value)(    p, ii );
     SIXTRL_REAL_T delta_star = NS(Particles_get_delta_value)( p, ii );
     
     SIXTRL_REAL_T const delta_star_plus_one = delta_star + ONE;
-    SIXTRL_REAL_T const pz_star_sqrt_arg = 
+    SIXTRL_REAL_T const pz_star_squ = 
         delta_star_plus_one * delta_star_plus_one 
         - px_star * px_star 
         - py_star * py_star;
         
-    SIXTRL_REAL_T const pz_star = sqrt( pz_star_sqrt_arg );
-    
+    SIXTRL_REAL_T const pz_star     = sqrt( pz_star_squ );    
     SIXTRL_REAL_T const hx_star     = px_star / pz_star;
     SIXTRL_REAL_T const hy_star     = py_star / pz_star;
-    SIXTRL_REAL_T const hsigma_star = ONE - delta_star_plus_one / pz_star;
+    SIXTRL_REAL_T const hsigma_star = ONE - ( delta_star_plus_one / pz_star );
     
     SIXTRL_REAL_T const cos_phi   = NS(BeamBeamBoostData_get_cphi)( boost );
     SIXTRL_REAL_T const sin_phi   = NS(BeamBeamBoostData_get_sphi)( boost );
@@ -218,14 +215,16 @@ SIXTRL_INLINE int NS(BeamBeam_inv_boost_particle)(
         
     SIXTRL_REAL_T const inv_det_L = ONE / det_L;
     
+    
     SIXTRL_REAL_T const L11_inv = inv_det_L * ( inv_cos_phi + 
         sin_alpha_tan_phi * ( hy_star - hsigma_star * sin_alpha_sin_phi ) );
     
     SIXTRL_REAL_T const L12_inv = inv_det_L * (  
-        sin_alpha_tan_phi * ( hsigma_star * cos_alpha_sin_phi - hx_star ) );
+        sin_alpha_tan_phi * ( hsigma_star* cos_alpha_sin_phi - hx_star ) );
     
-    SIXTRL_REAL_T const L13_inv = inv_det_L * (
-        sin_alpha_sin_phi * ( hx_star * sin_alpha + hy_star * cos_alpha ) );
+    SIXTRL_REAL_T const L13_inv = -inv_det_L * tan_phi * ( cos_alpha -
+            sin_alpha_sin_phi * ( hx_star * sin_alpha - hy_star * cos_alpha ) );
+    
     
     SIXTRL_REAL_T const L21_inv = inv_det_L * (
         cos_alpha_tan_phi * ( hsigma_star * sin_alpha_sin_phi - hy_star ) );
@@ -233,9 +232,10 @@ SIXTRL_INLINE int NS(BeamBeam_inv_boost_particle)(
     SIXTRL_REAL_T const L22_inv = inv_det_L * ( inv_cos_phi + 
         cos_alpha_tan_phi * ( hx_star - hsigma_star * cos_alpha_sin_phi ) );
     
-    SIXTRL_REAL_T const L23_inv = -inv_det_L * tan_phi * ( sin_alpha -
-        cos_alpha_sin_phi * ( hy_star * cos_alpha + hx_star * sin_alpha ) );
+    SIXTRL_REAL_T const L23_inv = -inv_det_L * tan_phi * ( sin_alpha +
+        cos_alpha_sin_phi * ( hx_star * sin_alpha - hy_star * cos_alpha ) );
     
+        
     SIXTRL_REAL_T const L31_inv = -inv_det_L * hsigma_star * cos_alpha_sin_phi;
     SIXTRL_REAL_T const L32_inv = -inv_det_L * hsigma_star * sin_alpha_sin_phi;
     SIXTRL_REAL_T const L33_inv =  inv_det_L * 
@@ -275,7 +275,7 @@ SIXTRL_INLINE int NS(BeamBeam_inv_boost_particle)(
     SIXTRL_ASSERT( ( ( det_L   > ZERO ) && (  det_L   > MIN_EPS ) ) ||
                    ( ( det_L   < ZERO ) && ( -det_L   > MIN_EPS ) ) );
         
-    SIXTRL_ASSERT( pz_star_sqrt_arg > ZERO );
+    SIXTRL_ASSERT( pz_star_squ > ZERO );
     
     #endif /* !defined( NDEBUG ) && !defined( __CUDACC__ ) */
                  

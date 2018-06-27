@@ -124,13 +124,16 @@ TEST( CommonBeamBeamElement6dTests, TestLorentzBoostAndInverseLorentzBoost )
     st_Particles_set_lost_at_turn_value( initial_particles,       0, -1 );
     st_Particles_set_lost_at_turn_value( initial_particles,       1, -1 );
     
+    st_Blocks_serialize( &copied_particles_buffer );
+    st_Blocks_serialize( &particles_buffer );
+    
     /* --------------------------------------------------------------------- */
     
-    double const MIN_PHI        = ( -10.0 * M_PI ) / 180.0;
-    double const MAX_PHI        = ( -10.0 * M_PI ) / 180.0;
+    double const MIN_PHI        = ( -80.0 * M_PI ) / 180.0;
+    double const MAX_PHI        = ( +80.0 * M_PI ) / 180.0;
                                     
-    double const MIN_ALPHA      = ( -45.0 * M_PI ) / 180.0;
-    double const MAX_ALPHA      = ( +45.0 * M_PI ) / 180.0;
+    double const MIN_ALPHA      = M_PI;
+    double const MAX_ALPHA      = M_PI;
     
     std::mt19937_64 prng( 20180626 );
     
@@ -165,17 +168,25 @@ TEST( CommonBeamBeamElement6dTests, TestLorentzBoostAndInverseLorentzBoost )
         
         ASSERT_TRUE( ret == 0 );
         
-        if( !st_Particles_buffer_compare_values( 
-                &particles_buffer, &copied_particles_buffer ) )
+        double const EPS = std::numeric_limits< double >::epsilon();
+        
+        if( 0 != st_Particles_buffer_compare_values_with_treshold( 
+                &particles_buffer, &copied_particles_buffer, EPS ) )
         {
+            std::cout << "boosted + inv_boosted particle has a difference to "
+                         "the initial state > EPS = " << EPS << "\r\n"
+                      << "print details for the particles: \r\n";
+            
             st_Particles_calculate_difference(
                 initial_particles, particles, diff_particles );
             
             printf( "ii = %6u\r\n", static_cast< unsigned >( ii ) );
-            st_Particles_print( stdout, diff_particles );
+            st_Particles_print( stdout, diff_particles );            
             printf( "\r\n" );
-        }
+        }                
     }
+    
+    std::cout << std::endl;
     
     /* --------------------------------------------------------------------- */
     
