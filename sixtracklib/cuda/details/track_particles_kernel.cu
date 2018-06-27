@@ -1,4 +1,4 @@
-#include "sixtracklib/cuda/track_particles_kernel.cuh"
+#include "sixtracklib/cuda/impl/track_particles_kernel.cuh"
 
 #include <stdio.h>
 

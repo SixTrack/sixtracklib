@@ -24,10 +24,13 @@ set( SIXTRACKL_CUDA_PART_CXX_FLAGS
 
 set( SIXTRACKL_CUDA_PART_CUDA_FLAGS "${SIXTRACKL_CUDA_ARCH_FLAGS}" )
 set( SIXTRACKL_CUDA_PART_CUDA_DEFS "_GPUCODE=1" )
+
 set( SIXTRACKL_CUDA_PART_CUDA_DEFS ${SIXTRACKL_CUDA_PART_CUDA_DEFS} 
                                    ${SIXTRACKLIB_NAMESPACE_FLAGS} )
+
+set( SIXTRACKL_CUDA_PART_CUDA_DEFS ${SIXTRACKL_CUDA_PART_CUDA_DEFS} 
+                                   "_FORCE_INLINES=1" )
                                    
-    
 add_library( sixtrack_cuda_part OBJECT 
              ${SIXTRACKLIB_CUDA_PART_HEADERS}
              ${SIXTRACKLIB_CUDA_PART_SOURCES} 
