@@ -346,18 +346,9 @@ SIXTRL_INLINE int NS(BeamBeam_propagate_sigma_matrix)(
     SIXTRL_REAL_T const W = sigma_11_p + sigma_33_p;
     SIXTRL_REAL_T const T = R * R + FOUR * sigma_13_p * sigma_13_p;
     
-    SIXTRL_REAL_T const dS_R = TWO *     ( sigma_12 - sigma_34 ) 
-                             + TWO * s * ( sigma_22 - sigma_44 );
-                             
     SIXTRL_REAL_T const dS_W = TWO *     ( sigma_12 + sigma_34 ) 
                              + TWO * s * ( sigma_22 + sigma_44 );
                              
-    SIXTRL_REAL_T const dS_sigma_13_p = sigma_14 + sigma_23 
-                                      + TWO * s * sigma_24;
-                                      
-    SIXTRL_REAL_T const dS_T = TWO * R * dS_R 
-                             + EIGHT * sigma_13_p * dS_sigma_13_p;
-    
     SIXTRL_ASSERT( ( sigmas != 0 ) && 
                    ( ptr_result != 0 ) && ( ptr_deriv_result != 0 ) );
     
@@ -377,7 +368,7 @@ SIXTRL_INLINE int NS(BeamBeam_propagate_sigma_matrix)(
         SIXTRL_REAL_T const A_SQU_PLUS_C_SQU = A * A + C * C;
         SIXTRL_REAL_T const SQRT_A_SQU_C_SQU = sqrt( A_SQU_PLUS_C_SQU );
         
-        SIXTRL_REAL_T const SQRT_A_SQU_C_SQU_POW_32 = 
+        SIXTRL_REAL_T const A_SQU_C_SQU_POW_3_2 = 
             A_SQU_PLUS_C_SQU * SQRT_A_SQU_C_SQU;
         
         result.sigma_11_hat = 
@@ -386,22 +377,19 @@ SIXTRL_INLINE int NS(BeamBeam_propagate_sigma_matrix)(
         deriv_result.sigma_11_hat = 
         deriv_result.sigma_33_hat = ONE_HALF * dS_W;
             
-        if( SQRT_A_SQU_C_SQU_POW_32 < treshold_singular )
+        if( A_SQU_C_SQU_POW_3_2 < treshold_singular )
         {
-            SIXTRL_REAL_T cos2theta    = ONE;
             SIXTRL_REAL_T const FABS_D = ( D >= ZERO ) ? D : -D;
             
-            if( FABS_D > treshold_singular )
-            {
-                SIXTRL_REAL_T const FABS_B    = ( B >= ZERO ) ? B : -B;
-                cos2theta = FABS_B / sqrt( B * B + FOUR * D * D );                
-            }
+            SIXTRL_REAL_T cos2theta = ( FABS_D > treshold_singular )
+                ? ( ( B_SIGN * B ) / sqrt( B * B + FOUR * D * D ) ) 
+                : ONE;
             
-            result.cos_theta =  sqrt( ONE_HALF * ( ONE + cos2theta ) );
-            result.sin_theta = B_SIGN * D_SIGN * 
-                sqrt( ONE_HALF * ( ONE - cos2theta ) );
-                
-            deriv_result.cos_theta =
+            result.cos_theta    = sqrt( ONE_HALF * ( ONE + cos2theta ) );
+            result.sin_theta    = B_SIGN * D_SIGN * sqrt( 
+                ONE_HALF * ( ONE - cos2theta ) );
+            
+            deriv_result.cos_theta = ZERO;
             deriv_result.sin_theta = ZERO;
         }
         else
@@ -410,28 +398,27 @@ SIXTRL_INLINE int NS(BeamBeam_propagate_sigma_matrix)(
             SIXTRL_REAL_T const SIGN_C    = ( C >= ZERO ) ? ONE : -ONE;
             SIXTRL_REAL_T const cos2theta = ( SIGN_A * A ) / SQRT_A_SQU_C_SQU;
             
-            SIXTRL_REAL_T FABS_SIN_THETA  = ZERO;
-            SIXTRL_REAL_T COS_THETA       = ZERO;
-            SIXTRL_REAL_T SIN_THETA       = ZERO;            
-            
-            SIXTRL_REAL_T dS_cos2theta = 
-                SIGN_A * ( ONE_HALF * B / SQRT_A_SQU_C_SQU - 
-                    A * ( A * B + TWO * C * D ) / 
-                        ( TWO * SQRT_A_SQU_C_SQU_POW_32 ) );
-            
-            COS_THETA = result.cos_theta = 
+            SIXTRL_REAL_T const cos_theta = 
                 sqrt( ONE_HALF * ( ONE + cos2theta ) );
             
-            SIN_THETA = result.sin_theta = 
+            SIXTRL_REAL_T const sin_theta = 
                 SIGN_A * SIGN_C * sqrt( ONE_HALF * ( ONE - cos2theta ) );
             
-            FABS_SIN_THETA = ( SIN_THETA > ZERO ) ? SIN_THETA : -SIN_THETA;
                 
-            deriv_result.cos_theta = dS_cos2theta / ( FOUR * COS_THETA );
+            SIXTRL_REAL_T const dS_cos2theta = SIGN_A * ( 
+                ONE_HALF * B / SQRT_A_SQU_C_SQU - 
+                A * ( A * B + TWO * C * D ) / ( TWO * A_SQU_C_SQU_POW_3_2 ) );
+                
+            result.cos_theta = cos_theta;
+            result.sin_theta = sin_theta;
             
-            deriv_result.sin_theta = ( FABS_SIN_THETA > treshold_singular )
-                ? -ONE / ( FOUR * result.sin_theta ) * dS_cos2theta
-                : D / ( TWO * A );
+            deriv_result.cos_theta = dS_cos2theta / ( FOUR * cos_theta );
+            
+            deriv_result.sin_theta = 
+                ( ( ( sin_theta > ZERO ) ? sin_theta : -sin_theta ) > 
+                    treshold_singular )
+                    ?  -dS_cos2theta / ( FOUR * sin_theta )
+                    :   D / ( A + A );
             
             deriv_result.sigma_11_hat += SIGN_A * SQRT_A_SQU_C_SQU;
             deriv_result.sigma_33_hat -= SIGN_A * SQRT_A_SQU_C_SQU;
@@ -439,42 +426,46 @@ SIXTRL_INLINE int NS(BeamBeam_propagate_sigma_matrix)(
     }
     else
     {
+        SIXTRL_REAL_T const dS_R = TWO *     ( sigma_12 - sigma_34 ) 
+                             + TWO * s * ( sigma_22 - sigma_44 );
+        
+        SIXTRL_REAL_T const dS_sigma_13_p = sigma_14 + sigma_23 
+                                      + TWO * s * sigma_24;
+        
+        SIXTRL_REAL_T const dS_T = TWO * R * dS_R 
+                             + EIGHT * sigma_13_p * dS_sigma_13_p;
+        
         SIXTRL_REAL_T const SQRT_T    = sqrt( T );
         SIXTRL_REAL_T const SIGN_R    = ( R >= ZERO ) ? ONE : -ONE;
-        SIXTRL_REAL_T const COS2THETA = SIGN_R * R / SQRT_T;
-        SIXTRL_REAL_T const COS_THETA = sqrt( ONE_HALF * ( ONE + COS2THETA ) );
         
-        SIXTRL_REAL_T const SIGN_SIGMA_13_P = 
-            ( sigma_13_p >= ZERO ) ? ONE : -ONE;
+        SIXTRL_REAL_T const cos2theta = SIGN_R * R / SQRT_T;
+        SIXTRL_REAL_T const cos_theta = sqrt( ONE_HALF * ( ONE + cos2theta ) );
         
-        SIXTRL_REAL_T const SIN_THETA = 
-            SIGN_R * SIGN_SIGMA_13_P * sqrt( ONE_HALF * ( ONE - COS2THETA ) );
+        SIXTRL_REAL_T const sin_theta = 
+            SIGN_R * ( ( sigma_13_p >= ZERO ) ? ONE : -ONE ) * 
+                sqrt( ONE_HALF * ( ONE - cos2theta ) );
         
-        SIXTRL_REAL_T const FABS_SIN_THETA = 
-            ( SIN_THETA >= ZERO ) ? SIN_THETA : -SIN_THETA;
-            
         SIXTRL_REAL_T const dS_cos2theta = SIGN_R * ( dS_R / SQRT_T - 
             dS_T * R / ( TWO * SQRT_T * SQRT_T * SQRT_T ) );
         
-        SIXTRL_REAL_T const dS_costheta = dS_cos2theta / ( FOUR * COS_THETA );
-            
-        result.cos_theta = COS_THETA;
-        result.sin_theta = SIN_THETA;
-        
+        result.cos_theta    = cos_theta;
+        result.sin_theta    = sin_theta;        
         result.sigma_11_hat = ONE_HALF * ( W + SIGN_R * SQRT_T );
         result.sigma_33_hat = ONE_HALF * ( W - SIGN_R * SQRT_T );
-            
-        deriv_result.cos_theta = dS_costheta;
-        deriv_result.sin_theta = ( ( !handle_sigularity ) ||
-            ( FABS_SIN_THETA >= treshold_singular ) )
-            ? -dS_cos2theta / ( FOUR * SIN_THETA )
+        
+        deriv_result.cos_theta = dS_cos2theta / ( FOUR * cos_theta );
+        deriv_result.sin_theta = 
+            ( ( !handle_sigularity ) ||
+              ( ( ( sin_theta >= ZERO ) ? sin_theta : -sin_theta ) <
+                treshold_singular ) )
+            ? -dS_cos2theta / ( FOUR * sin_theta )
             : ( sigma_14_p + sigma_23_p ) / R;
             
         deriv_result.sigma_11_hat = 
-            ONE_HALF * ( dS_W + SIGN_R * dS_T / SQRT_T  );
+            ONE_HALF * ( dS_W + ONE_HALF * SIGN_R * dS_T / SQRT_T  );
             
         deriv_result.sigma_33_hat = 
-            ONE_HALF * ( dS_W - SIGN_R * dS_T / SQRT_T  );
+            ONE_HALF * ( dS_W - ONE_HALF * SIGN_R * dS_T / SQRT_T  );
     }
     
     *ptr_result       = result;
@@ -494,73 +485,81 @@ SIXTRL_INLINE int NS(BeamBeam_get_transverse_fields)(
 {
     int ret = 0;
     
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO     = ( SIXTRL_REAL_T )0.0L;
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE_HALF = ( SIXTRL_REAL_T )0.5L;
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE      = ( SIXTRL_REAL_T )1.0L;
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const TWO      = ( SIXTRL_REAL_T )2.0L;
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0;
     
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const EPSILON_0 = 
-        ( SIXTRL_REAL_T )8.854187817620e-12L;
-        
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const PI = 
-        ( SIXTRL_REAL_T )3.1415926535897932384626433832795028841971693993751L;
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const C =
+        ( SIXTRL_REAL_T )3.1415926535897932384626433832795028841971693993751 *
+        ( SIXTRL_REAL_T )8.854187817620e-12;
     
-    SIXTRL_REAL_T const delta_sigma = sigma_x - sigma_y;
-    
-    SIXTRL_REAL_T const abs_delta_sigma = 
-        ( delta_sigma >= ZERO ) ? delta_sigma : -delta_sigma;
+    SIXTRL_REAL_T const abs_delta_sigma = ( sigma_x >= sigma_y ) 
+        ? ( sigma_x - sigma_y ) : ( sigma_y - sigma_x );
     
     SIXTRL_REAL_T Ex = ZERO;
     SIXTRL_REAL_T Ey = ZERO;
         
     if( abs_delta_sigma < min_sigma_diff )
     {
-        SIXTRL_REAL_T const sigma = ONE_HALF * ( sigma_x + sigma_y );
+        SIXTRL_REAL_T const sigma = 
+            ( SIXTRL_REAL_T )0.5L * ( sigma_x + sigma_y );
         
         ret = NS(BeamBeam_get_transverse_fields_gauss_round)(
             &Ex, &Ey, x, y, sigma, ZERO, ZERO );
         
         if( ( ret == 0 ) && ( gx_component != 0 ) && ( gy_component != 0 ) )
         {
-            SIXTRL_REAL_T const TWO_SIGMA_SQU = TWO * sigma * sigma;
-            SIXTRL_REAL_T const FACTOR = TWO_SIGMA_SQU * PI * EPSILON_0;
+            SIXTRL_REAL_T const TWO_SIGMA_SQU = 
+                ( SIXTRL_REAL_T )2.0 * sigma * sigma;
+                
+            SIXTRL_REAL_T const INV_FACTOR = 
+                ( SIXTRL_REAL_T )1.0 / ( TWO_SIGMA_SQU * C );
             
             SIXTRL_REAL_T const x_squ = x * x;
             SIXTRL_REAL_T const y_squ = y * y;
             SIXTRL_REAL_T const r_squ = x_squ + y_squ;
             
+            SIXTRL_REAL_T const exp_r_squ = exp( -r_squ / TWO_SIGMA_SQU );
+            SIXTRL_REAL_T const two_r_squ = ( SIXTRL_REAL_T )2.0 * r_squ;
+            
             SIXTRL_ASSERT( ( gx_component != 0 ) && ( gy_component != 0 ) );
             
-            *gx_component = ( x_squ * exp( -r_squ / TWO_SIGMA_SQU ) *
-                ( y * Ey - x * Ex + ONE / FACTOR ) ) / ( TWO * r_squ );
+            *gx_component = ( y * Ey - x * Ex + 
+                x_squ * exp_r_squ * INV_FACTOR ) / ( two_r_squ );
                 
-            *gy_component = ( y_squ * exp( -r_squ / TWO_SIGMA_SQU ) *
-                ( x * Ex - y * Ey + ONE / FACTOR ) ) / ( TWO * r_squ );
+            *gy_component = ( x * Ex - y * Ey +
+                y_squ * exp_r_squ * INV_FACTOR ) / ( two_r_squ );
         }
     }
     else 
     {
-        SIXTRL_REAL_T const sigma_11 = sigma_x * sigma_x;
-        SIXTRL_REAL_T const sigma_33 = sigma_y * sigma_y;
-        
         ret = NS(BeamBeam_get_transverse_fields_gauss_elliptical)(
             &Ex, &Ey, x, y, sigma_x, sigma_y, ZERO, ZERO );
         
         if( ( ret == 0 ) && ( gx_component != 0 ) && ( gy_component != 0 ) )
         {
-            SIXTRL_REAL_T const x_squ  = x * x;
-            SIXTRL_REAL_T const y_squ  = y * y;
-            SIXTRL_REAL_T const FACTOR = TWO * PI * EPSILON_0;
-            SIXTRL_REAL_T const DELTA_SIGMA_11_33 = sigma_11 - sigma_33;
-            SIXTRL_REAL_T const TEMP = x_squ / sigma_11 + y_squ / sigma_33;
+            SIXTRL_REAL_T const sigma_11   = sigma_x * sigma_x;
+            SIXTRL_REAL_T const sigma_33   = sigma_y * sigma_y;
             
-            *gx_component = ( x * Ex + y * Ey + 
-                ( ( sigma_y / sigma_x ) * exp( TEMP ) - ONE ) / FACTOR ) /
-                    ( TWO * DELTA_SIGMA_11_33 );
+            SIXTRL_REAL_T const x_squ      = x * x;
+            SIXTRL_REAL_T const y_squ      = y * y;
+            
+            SIXTRL_REAL_T const exp_r_squ  =
+                exp( -x_squ / ( ( SIXTRL_REAL_T )2.0 * sigma_11 ) 
+                     -y_squ / ( ( SIXTRL_REAL_T )2.0 * sigma_33 ) );
+            
+            SIXTRL_REAL_T const INV_FACTOR = 
+                ( SIXTRL_REAL_T )1. / ( ( SIXTRL_REAL_T )2. * C );
+                
+            SIXTRL_REAL_T const INV_DELTA_SIGMA = ( SIXTRL_REAL_T )1. / 
+                ( ( SIXTRL_REAL_T )2. * ( sigma_11 - sigma_33 ) );
+                        
+            
+            *gx_component = -( x * Ex + y * Ey + 
+                ( INV_FACTOR * ( sigma_y / sigma_x ) * exp_r_squ - 
+                    ( SIXTRL_REAL_T )1.0 ) ) * INV_DELTA_SIGMA;
                     
-            *gy_component = ( x * Ex + y * Ey +
-                ( ( sigma_x / sigma_y ) * exp( TEMP ) - ONE ) / FACTOR ) /
-                    ( TWO * DELTA_SIGMA_11_33 );            
+            *gy_component =  ( x * Ex + y * Ey +
+                ( INV_FACTOR * ( sigma_x / sigma_y ) * exp_r_squ -
+                    ( SIXTRL_REAL_T )1.0 ) ) * INV_DELTA_SIGMA;            
         }
     }
     
@@ -581,24 +580,19 @@ SIXTRL_INLINE int NS(BeamBeam_get_transverse_fields_gauss_round)(
 {
     int ret = 0;
     
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE_HALF = ( SIXTRL_REAL_T )0.5L;
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE      = ( SIXTRL_REAL_T )1.0L;
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const TWO      = ( SIXTRL_REAL_T )2.0L;
-    
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const EPSILON_0 = 
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const C =  
+        ( SIXTRL_REAL_T )2.0L * 
+        ( SIXTRL_REAL_T )3.1415926535897932384626433832795028841971693993751L * 
         ( SIXTRL_REAL_T )8.854187817620e-12L;
-        
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const PI = 
-        ( SIXTRL_REAL_T )3.1415926535897932384626433832795028841971693993751L;
     
     SIXTRL_REAL_T const diff_x = ( x - delta_x );
     SIXTRL_REAL_T const diff_y = ( y - delta_y );    
     SIXTRL_REAL_T const r_squ  = diff_x * diff_x + diff_y * diff_y;
     
-    SIXTRL_REAL_T const temp = ( r_squ >= ( SIXTRL_REAL_T )1e-20 )
-        ? sqrt( r_squ ) / ( TWO * PI * EPSILON_0 * sigma )
-        : ( ONE - exp( -ONE_HALF * r_squ / ( sigma * sigma ) ) ) / 
-            ( TWO * PI * EPSILON_0 * r_squ );
+    SIXTRL_REAL_T const temp = ( r_squ >= ( SIXTRL_REAL_T )1e-20L )
+        ? ( ( SIXTRL_REAL_T )1.0 - exp( -r_squ / 
+            ( ( SIXTRL_REAL_T )2.0L * sigma * sigma ) ) ) / ( C * r_squ )
+        : sqrt( r_squ ) / ( C * sigma );
     
     SIXTRL_ASSERT( ( ex_component != 0 ) && ( ey_component != 0 ) );
     
@@ -617,86 +611,97 @@ SIXTRL_INLINE int NS(BeamBeam_get_transverse_fields_gauss_elliptical)(
 {
      int ret = 0;
     
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO     = ( SIXTRL_REAL_T )0.0L;
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE_HALF = ( SIXTRL_REAL_T )0.5L;
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE      = ( SIXTRL_REAL_T )1.0L;
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const TWO      = ( SIXTRL_REAL_T )2.0L;
+    #if !defined( NDEBUG ) && !defined( __CUDACC__ )
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0L;
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const EPS  = ( SIXTRL_REAL_T )1e-16;
+    #endif /* !defined( NDEBUG ) && !defined( __CUDACC__ ) */
     
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const EPSILON_0 = 
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const C =
+        ( SIXTRL_REAL_T )2.0L * 
+        ( SIXTRL_REAL_T )1.7724538509055160272981674833411451827975494561224L *
         ( SIXTRL_REAL_T )8.854187817620e-12L;
         
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const SQRT_PI = 
-        ( SIXTRL_REAL_T )1.7724538509055160272981674833411451827975494561224L;
+    SIXTRL_REAL_T const abs_diff_x = ( x >= delta_x ) 
+        ? ( x - delta_x ) : ( delta_x - x );
+        
+    SIXTRL_REAL_T const abs_diff_y = ( y >= delta_y )
+        ? ( y - delta_y ) : ( delta_y - y );
     
-    SIXTRL_REAL_T const diff_x      = x - delta_x;
-    SIXTRL_REAL_T const abs_diff_x  = ( diff_x >= ZERO ) ? diff_x : -diff_x;
-    
-    SIXTRL_REAL_T const diff_y      = y - delta_y;
-    SIXTRL_REAL_T const abs_diff_y  = ( diff_y >= ZERO ) ? diff_y : -diff_y;
-    
-    SIXTRL_REAL_T const ETA_ERRFUN_SCALE_FACTOR = exp( -ONE_HALF * 
+    SIXTRL_REAL_T const ETA_ERRFUN_SCALE_FACTOR = exp( -( SIXTRL_REAL_T )0.5L * 
             ( ( abs_diff_x * abs_diff_x ) / ( sigma_x * sigma_x ) + 
               ( abs_diff_y * abs_diff_y ) / ( sigma_y * sigma_y ) ) );
     
-    SIXTRL_REAL_T const S_SQU = sigma_x * sigma_x - sigma_y * sigma_y;
-    SIXTRL_REAL_T factBE = ONE;
+    SIXTRL_REAL_T const HALF_S_SQU = sigma_x * sigma_x - sigma_y * sigma_y;
+    SIXTRL_REAL_T factBE = ( SIXTRL_REAL_T )1.0 / C;
     
-    SIXTRL_REAL_T eta_be_x  = ZERO;
-    SIXTRL_REAL_T eta_be_y  = ZERO;
+    SIXTRL_REAL_T eta_be_re;
+    SIXTRL_REAL_T eta_be_im;
     
-    SIXTRL_REAL_T zeta_be_x = ZERO;
-    SIXTRL_REAL_T zeta_be_y = ZERO;
+    SIXTRL_REAL_T zeta_be_re;
+    SIXTRL_REAL_T zeta_be_im;
     
-    SIXTRL_REAL_T temp_x    = ZERO;
-    SIXTRL_REAL_T temp_y    = ZERO;
+    SIXTRL_REAL_T temp_re;
+    SIXTRL_REAL_T temp_im;
     
-    SIXTRL_ASSERT( ( sigma_x * sigma_x ) >= ( SIXTRL_REAL_T )1e-16L );
-    SIXTRL_ASSERT( ( sigma_y * sigma_y ) >= ( SIXTRL_REAL_T )1e-16L );
     SIXTRL_ASSERT( ( ex_component != 0 ) && ( ey_component != 0 ) );
+    
+    SIXTRL_ASSERT( ( sigma_x * sigma_x ) >= EPS );
+    SIXTRL_ASSERT( ( sigma_y * sigma_y ) >= EPS );
+    SIXTRL_ASSERT( ( sigma_x > sigma_y ) || ( sigma_x < sigma_y ) );
+    SIXTRL_ASSERT( ( EPS < 
+        ( HALF_S_SQU >= ZERO ) ? HALF_S_SQU : -HALF_S_SQU ) );
     
     if( sigma_x > sigma_y )
     {
-        SIXTRL_REAL_T const S = sqrt( S_SQU );        
+        SIXTRL_REAL_T const INV_S = ( SIXTRL_REAL_T )1.0L / 
+            sqrt( ( SIXTRL_REAL_T )2.0 * HALF_S_SQU );
         
-        factBE    /= TWO * EPSILON_0 * SQRT_PI * S;
-        eta_be_x   = ( sigma_y / sigma_x * abs_diff_x ) / S;
-        eta_be_y   = ( sigma_x / sigma_y * abs_diff_y ) / S;
+        factBE    *= INV_S;
+        eta_be_re   = ( sigma_y / sigma_x * abs_diff_x ) * INV_S;
+        eta_be_im   = ( sigma_x / sigma_y * abs_diff_y ) * INV_S;
                   
-        zeta_be_x  = abs_diff_x / S;
-        zeta_be_y  = abs_diff_y / S;
+        zeta_be_re  = abs_diff_x * INV_S;
+        zeta_be_im  = abs_diff_y * INV_S;
     }
     else if( sigma_x < sigma_y )
     {
-        SIXTRL_REAL_T const S = sqrt( -S_SQU );
+        SIXTRL_REAL_T const INV_S = ( SIXTRL_REAL_T )1.0L / 
+            sqrt( ( SIXTRL_REAL_T )2.0 * -HALF_S_SQU );
         
-        factBE    /= TWO * EPSILON_0 * SQRT_PI * S;
-        eta_be_x   = ( sigma_x / sigma_y * abs_diff_x ) / S;
-        eta_be_y   = ( sigma_y / sigma_x * abs_diff_y ) / S;
+        factBE    *= INV_S;
+        eta_be_re   = ( sigma_x / sigma_y * abs_diff_y ) * INV_S;
+        eta_be_im   = ( sigma_y / sigma_x * abs_diff_x ) * INV_S;
                   
-        zeta_be_x  = abs_diff_y / S;
-        zeta_be_y  = abs_diff_x / S;        
+        zeta_be_re  = abs_diff_y * INV_S;
+        zeta_be_im  = abs_diff_x * INV_S;
     }
     else
     {
-        /* ?????? */
-        *ex_component = *ey_component = ONE / ZERO;
-        return ret;
+        ret = -1;        
     }
     
     NS(Faddeeva_calculate_w_cern335)( 
-        &eta_be_x, &eta_be_y, eta_be_x, eta_be_y );
+        &eta_be_re, &eta_be_im, eta_be_re, eta_be_im );
     
     NS(Faddeeva_calculate_w_cern335)(
-        &zeta_be_x, &zeta_be_y, zeta_be_x, zeta_be_y );
+        &zeta_be_re, &zeta_be_im, zeta_be_re, zeta_be_im );
     
-    eta_be_x *= ETA_ERRFUN_SCALE_FACTOR;
-    temp_x    = ( zeta_be_x - eta_be_x ) * factBE;
+    eta_be_re *= ETA_ERRFUN_SCALE_FACTOR;
+    temp_re    = ( zeta_be_re - eta_be_re ) * factBE;
     
-    eta_be_y *= ETA_ERRFUN_SCALE_FACTOR;
-    temp_y    = ( zeta_be_y - eta_be_y ) * factBE;
+    eta_be_im *= ETA_ERRFUN_SCALE_FACTOR;
+    temp_im    = ( zeta_be_im - eta_be_im ) * factBE;
         
-    *ex_component = ( delta_x >= ZERO ) ? temp_x : -temp_x;
-    *ey_component = ( delta_y >= ZERO ) ? temp_y : -temp_y;
+    if( sigma_x > sigma_y )
+    {
+        *ex_component = ( x >= delta_x ) ? ( temp_im ) : ( -temp_im );
+        *ey_component = ( y >= delta_y ) ? ( temp_re ) : ( -temp_re );
+    }
+    else if( sigma_y < sigma_x )
+    {    
+        *ex_component = ( x >= delta_x ) ? temp_re : -temp_re;
+        *ey_component = ( y >= delta_y ) ? temp_im : -temp_im;
+    }
     
     return ret;
 }
