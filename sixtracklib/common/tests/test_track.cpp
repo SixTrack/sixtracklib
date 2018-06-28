@@ -22,7 +22,7 @@
 
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/_impl/path.h"
-#include "sixtracklib/testdata/tracking_testfiles.h"
+#include "sixtracklib/_impl/testdata_files.h"
 
 #include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/beam_elements.h"
