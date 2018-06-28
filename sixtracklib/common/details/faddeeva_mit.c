@@ -10,93 +10,95 @@
 
 #include "sixtracklib/_impl/definitions.h"
 
-extern SIXTRL_FN int NS(Faddeeva_calculate_w_mit)( 
-    SIXTRL_REAL_T* SIXTRL_RESTRICT out_re, 
+extern SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
+    SIXTRL_REAL_T* SIXTRL_RESTRICT out_re,
     SIXTRL_REAL_T* SIXTRL_RESTRICT out_im,
     SIXTRL_REAL_T const re, SIXTRL_REAL_T const im,
-    SIXTRL_REAL_T rel_error, 
+    SIXTRL_REAL_T rel_error,
     int const use_continued_fractions );
 
 
+/* ************************************************************************ */
+/* *****             Implementation of inline functions             ******* */
+/* ************************************************************************ */
 
-
-SIXTRL_FN int NS(Faddeeva_calculate_w_mit)( 
-    SIXTRL_REAL_T* SIXTRL_RESTRICT out_re, 
+int NS(Faddeeva_calculate_w_mit)(
+    SIXTRL_REAL_T* SIXTRL_RESTRICT out_re,
     SIXTRL_REAL_T* SIXTRL_RESTRICT out_im,
-    SIXTRL_REAL_T const re, SIXTRL_REAL_T const im, 
-    SIXTRL_REAL_T rel_error, 
+    SIXTRL_REAL_T const re, SIXTRL_REAL_T const im,
+    SIXTRL_REAL_T rel_error,
     int const use_continued_fractions  )
 {
     int ret = -1;
-    
+
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO     = ( SIXTRL_REAL_T )0.0L;
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE      = ( SIXTRL_REAL_T )1.0L;
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const TWO      = ( SIXTRL_REAL_T )2.0L;
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE_HALF = ( SIXTRL_REAL_T )0.5L;
-    
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const INV_SQURT_PI = 
+
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const INV_SQURT_PI =
             ( SIXTRL_REAL_T )0.56418958354775628694807945156L;
-    
+
     SIXTRL_REAL_T a    = ZERO;
     SIXTRL_REAL_T a2   = ZERO;
     SIXTRL_REAL_T c    = ZERO;
-    
+
     SIXTRL_REAL_T sum1 = ZERO;
     SIXTRL_REAL_T sum2 = ZERO;
     SIXTRL_REAL_T sum3 = ZERO;
     SIXTRL_REAL_T sum4 = ZERO;
     SIXTRL_REAL_T sum5 = ZERO;
-    
+
     SIXTRL_REAL_T const x  = ( re >= ZERO ) ? re : -re;
     SIXTRL_REAL_T const y = im;
-    
+
     SIXTRL_REAL_T y_abs  = ( y >= ZERO ) ? y : -y;
     SIXTRL_REAL_T result_re = ZERO;
     SIXTRL_REAL_T result_im = ZERO;
-    
+
     /*
     if( re == ZERO )
     {
-        
+
     }
     else if( im == ZERO )
     {
-        
+
     }
     */
-    
+
     if( rel_error <= DBL_EPSILON )
     {
         rel_error = DBL_EPSILON;
         a         = ( SIXTRL_REAL_T )0.518321480430085929872L;
         c         = ( SIXTRL_REAL_T )0.329973702884629072537L;
-        a2        = ( SIXTRL_REAL_T )0.268657157075235951582L;        
+        a2        = ( SIXTRL_REAL_T )0.268657157075235951582L;
     }
     else
     {
-        SIXTRL_STATIC_VAR SIXTRL_REAL_T const MAX_REL_ERROR = 
+        SIXTRL_STATIC_VAR SIXTRL_REAL_T const MAX_REL_ERROR =
             ( SIXTRL_REAL_T )0.1L;
-            
-        SIXTRL_STATIC_VAR SIXTRL_REAL_T const PI = 
+
+        SIXTRL_STATIC_VAR SIXTRL_REAL_T const PI =
             ( SIXTRL_REAL_T )3.14159265358979323846264338327950288419716939937510582L;
-            
+
         if( rel_error > MAX_REL_ERROR ) rel_error = MAX_REL_ERROR;
-        
+
         a  = PI / sqrt( -log( rel_error * ONE_HALF ) );
         c  = ( TWO / PI ) * a;
         a2 = a*a;
     }
-    
+
     if( use_continued_fractions )
     {
-        if( ( y_abs > 7.0 ) || 
-            ( ( x > 6.0 ) && ( ( y_abs > 0.1 ) || 
+        if( ( y_abs > 7.0 ) ||
+            ( ( x > 6.0 ) && ( ( y_abs > 0.1 ) ||
                                ( ( x > 8.0 ) && ( y_abs > 1e-10 ) ) ||
                                ( x > 28.0 ) ) ) )
         {
             SIXTRL_REAL_T const xs = ( y < ZERO ) ? -re : +re;
             SIXTRL_REAL_T const d  = x + y_abs;
-            
+
             if( d > 4000.0 )
             {
                 if( d > 1e7 )
@@ -104,9 +106,9 @@ SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
                     if( x > y_abs )
                     {
                         SIXTRL_REAL_T const y_abs_x = y_abs / xs;
-                        SIXTRL_REAL_T const denom = 
+                        SIXTRL_REAL_T const denom =
                             INV_SQURT_PI / ( xs + y_abs_x * y_abs );
-                            
+
                         result_re = denom * y_abs_x;
                         result_im = denom;
                         ret = 0;
@@ -118,15 +120,15 @@ SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
                             result_re = NAN;
                             result_im = NAN;
                         }
-                        
+
                         ret = 0;
                     }
                     else
                     {
-                        SIXTRL_REAL_T const x_y_abs = xs / y_abs; 
-                        SIXTRL_REAL_T const denom = 
+                        SIXTRL_REAL_T const x_y_abs = xs / y_abs;
+                        SIXTRL_REAL_T const denom =
                             INV_SQURT_PI / ( x_y_abs * xs + y_abs );
-                            
+
                         result_re = denom;
                         result_im = denom * x_y_abs;
                         ret = 0;
@@ -136,9 +138,9 @@ SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
                 {
                     SIXTRL_REAL_T const dr = xs  * xs - y_abs * y_abs - ONE_HALF;
                     SIXTRL_REAL_T const di = TWO * xs * y_abs;
-                    SIXTRL_REAL_T const denom = 
+                    SIXTRL_REAL_T const denom =
                         INV_SQURT_PI / ( dr * dr + di * di );
-                        
+
                     result_re = denom * ( xs * di - y_abs * dr );
                     result_im = denom * ( xs * dr + y_abs * di );
                     ret = 0;
@@ -146,49 +148,49 @@ SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
             }
             else
             {
-                SIXTRL_STATIC_VAR SIXTRL_REAL_T const C0 = 
+                SIXTRL_STATIC_VAR SIXTRL_REAL_T const C0 =
                     ( SIXTRL_REAL_T )3.9L;
-                    
+
                 SIXTRL_STATIC_VAR SIXTRL_REAL_T const C1 =
                     ( SIXTRL_REAL_T )11.398L;
-                    
-                SIXTRL_STATIC_VAR SIXTRL_REAL_T const C2 = 
+
+                SIXTRL_STATIC_VAR SIXTRL_REAL_T const C2 =
                     ( SIXTRL_REAL_T )0.08254L;
-                    
-                SIXTRL_STATIC_VAR SIXTRL_REAL_T const C3 = 
+
+                SIXTRL_STATIC_VAR SIXTRL_REAL_T const C3 =
                     ( SIXTRL_REAL_T )0.1421L;
-                    
-                SIXTRL_STATIC_VAR SIXTRL_REAL_T const C4 = 
-                    ( SIXTRL_REAL_T )0.2023L; 
-                    
-                SIXTRL_REAL_T nu = 
+
+                SIXTRL_STATIC_VAR SIXTRL_REAL_T const C4 =
+                    ( SIXTRL_REAL_T )0.2023L;
+
+                SIXTRL_REAL_T nu =
                     floor( C0 + C1 / ( C2 * x + C3 * y_abs + C4 ) );
 
                 SIXTRL_REAL_T denom = ZERO;
-                    
+
                 SIXTRL_REAL_T wr = xs;
                 SIXTRL_REAL_T wi = y_abs;
-                
-                for( nu  = ONE_HALF * ( nu - ONE ) ; 
+
+                for( nu  = ONE_HALF * ( nu - ONE ) ;
                      nu  > ( SIXTRL_REAL_T )0.4L ; nu -= ONE_HALF )
                 {
                     denom = nu / ( wr * wr + wi * wi );
                     wr    = xs    - wr * denom;
-                    wi    = y_abs + wi * denom;                                        
+                    wi    = y_abs + wi * denom;
                 }
-                    
+
                 denom = INV_SQURT_PI / ( wr * wr + wi * wi );
-                
+
                 result_re = denom * wi;
                 result_im = denom * wr;
                 ret = 0;
             }
-            
+
             if( y < ZERO )
             {
                 SIXTRL_REAL_T const exp_re = exp( ( y_abs - xs ) * ( xs + y_abs ) );
                 SIXTRL_REAL_T const arg_im = TWO * xs * y;
-                
+
                 result_re = TWO * exp_re * cos( arg_im ) - result_re;
                 result_im = TWO * exp_re * sin( arg_im ) - result_im;
                 ret = 0;
@@ -203,15 +205,15 @@ SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
     {
         SIXTRL_REAL_T const xs = ( y < ZERO ) ? -re : +re;
         SIXTRL_REAL_T const d  = x + y_abs;
-        
-        if( d > 1e7 ) 
-        { 
+
+        if( d > 1e7 )
+        {
             if( x > y_abs )
             {
                 SIXTRL_REAL_T const y_abs_x = y_abs / xs;
-                SIXTRL_REAL_T const denom = 
+                SIXTRL_REAL_T const denom =
                     INV_SQURT_PI / ( xs + y_abs_x * y_abs );
-                    
+
                 result_re = denom * y_abs_x;
                 result_im = denom;
                 ret = 0;
@@ -219,26 +221,26 @@ SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
             else
             {
                 SIXTRL_REAL_T const x_y_abs = xs / y_abs;
-                SIXTRL_REAL_T const denom = 
+                SIXTRL_REAL_T const denom =
                     INV_SQURT_PI / ( x_y_abs * xs + y_abs );
-                    
+
                 result_re = denom;
                 result_im = denom * x_y_abs;
                 ret = 0;
             }
-            
+
             if( y < ZERO )
             {
                 SIXTRL_REAL_T const exp_re = exp( ( y_abs - xs ) * ( xs + y_abs ) );
                 SIXTRL_REAL_T const arg_im = TWO * xs * y;
-                
+
                 result_re = TWO * exp_re * cos( arg_im ) - result_re;
                 result_im = TWO * exp_re * sin( arg_im ) - result_im;
                 ret = 0;
             }
         }
     }
-  
+
   /* Note: The test that seems to be suggested in the paper is x <
      sqrt(-log(DBL_MIN)), about 26.6, since otherwise exp(-x^2)
      underflows to zero and sum1,sum2,sum4 are zero.  However, long
@@ -258,7 +260,7 @@ SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
 
     if (isnan(y))
       return C(y,y); */
-    
+
     /* Somewhat ugly copy-and-paste duplication here, but I see significant
        speedups from using the special-case code with the precomputed
        exponential, and the x < 5e-4 special case is needed for accuracy. */
@@ -280,10 +282,10 @@ SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
           sum1 += coef;
           sum2 += coef * prodm2ax;
           sum3 += coef * prod2ax;
-          
+
           // really = sum5 - sum4
           sum5 += coef * (2*a) * n * sinh_taylor((2*a)*n*x);
-          
+
           // test convergence via sum3
           if (coef * prod2ax < relerr * sum3) break;
         }
@@ -317,10 +319,10 @@ SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
           sum1 += coef;
           sum2 += coef * prodm2ax;
           sum3 += coef * prod2ax;
-          
+
           // really = sum5 - sum4
           sum5 += coef * (2*a) * n * sinh_taylor((2*a)*n*x);
-          
+
           // test convergence via sum3
           if (coef * prod2ax < relerr * sum3) break;
         }
@@ -359,7 +361,7 @@ SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
               coef2 * sinc(2*xs*y, sin2xy) - coef1 * sin2xy);
     }
   }
-  else { // x large: only sum3 & sum5 contribute (see above note)    
+  else { // x large: only sum3 & sum5 contribute (see above note)
     if (isnan(x))
       return C(x,x);
     if (isnan(y))
@@ -406,18 +408,18 @@ SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
     }
   }
  finish:
-  return ret + C((0.5*c)*y*(sum2+sum3), 
+  return ret + C((0.5*c)*y*(sum2+sum3),
                  (0.5*c)*copysign(sum5-sum4, creal(z)));
                  */
     ( void )a2;
     ( void )c;
-    
+
     ( void )sum1;
     ( void )sum2;
     ( void )sum3;
     ( void )sum4;
     ( void )sum5;
-    
+
     if( ret == 0 )
     {
         if( ( out_re != 0 ) && ( out_im != 0 ) )
@@ -425,7 +427,7 @@ SIXTRL_FN int NS(Faddeeva_calculate_w_mit)(
             *out_re = result_re;
             *out_im = result_im;
         }
-        else 
+        else
         {
             ret = -1;
         }
