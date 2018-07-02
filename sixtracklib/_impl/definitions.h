@@ -458,17 +458,35 @@
     /* ---------------------------------------------------------------- */
     /* Function header decorators:                                      */
 
-    #if !defined( SIXTRL_HOST_FN )
-        #define   SIXTRL_HOST_FN
-    #endif /* SIXTRL_HOST_FN */
+    #if !defined( __CUDACC__ )
+    
+        #if !defined( SIXTRL_HOST_FN )
+            #define   SIXTRL_HOST_FN
+        #endif /* SIXTRL_HOST_FN */
 
-    #if !defined( SIXTRL_DEVICE_FN )
-        #define   SIXTRL_DEVICE_FN
-    #endif /* SIXTRL_DEVICE_FN */
+        #if !defined( SIXTRL_DEVICE_FN )
+            #define   SIXTRL_DEVICE_FN
+        #endif /* SIXTRL_DEVICE_FN */
 
-    #if !defined( SIXTRL_FN )
-        #define   SIXTRL_FN
-    #endif /* SIXTRL_FN */
+        #if !defined( SIXTRL_FN )
+            #define   SIXTRL_FN
+        #endif /* SIXTRL_FN */
+        
+    #else /* defined( __CUDACC__ ) */
+        
+        #if !defined( SIXTRL_HOST_FN)
+            #define   SIXTRL_HOST_FN __host__ 
+        #endif /* SIXTRL_HOST_FN */
+
+        #if !defined( SIXTRL_DEVICE_FN )
+            #define   SIXTRL_DEVICE_FN __device__
+        #endif /* SIXTRL_DEVICE_FN */
+
+        #if !defined( SIXTRL_FN )
+            #define   SIXTRL_FN __host__ __device__
+        #endif /* SIXTRL_FN */
+        
+    #endif /* defined( __CUDACC__ ) */
 
 #endif /* defined( _GPUCODE ) */
 
