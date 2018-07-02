@@ -17,41 +17,41 @@ extern "C" {
 
 /* ========================================================================= */
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS(log2_floor)( SIXTRL_UINT64_T const x );
-SIXTRL_STATIC SIXTRL_UINT64_T NS(log2_ceil)( SIXTRL_UINT64_T const x );
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(log2_floor)( SIXTRL_UINT64_T const x );
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(log2_ceil)( SIXTRL_UINT64_T const x );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS(greatest_common_divisor)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(greatest_common_divisor)(
     SIXTRL_UINT64_T a, SIXTRL_UINT64_T b );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS(least_common_multiple)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(least_common_multiple)(
     SIXTRL_UINT64_T a, SIXTRL_UINT64_T b );
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common)(
     SIXTRL_UINT64_T s, SIXTRL_UINT64_T t );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common3)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common3)(
     SIXTRL_UINT64_T s, SIXTRL_UINT64_T t, SIXTRL_UINT64_T u );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common4)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common4)(
     SIXTRL_UINT64_T s, SIXTRL_UINT64_T t, SIXTRL_UINT64_T u,
     SIXTRL_UINT64_T v );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common5)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common5)(
     SIXTRL_UINT64_T s, SIXTRL_UINT64_T t, SIXTRL_UINT64_T u,
     SIXTRL_UINT64_T v, SIXTRL_UINT64_T w );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common6)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common6)(
     SIXTRL_UINT64_T s, SIXTRL_UINT64_T t, SIXTRL_UINT64_T u,
     SIXTRL_UINT64_T v, SIXTRL_UINT64_T w, SIXTRL_UINT64_T x );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common7)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common7)(
     SIXTRL_UINT64_T s, SIXTRL_UINT64_T t, SIXTRL_UINT64_T u,
     SIXTRL_UINT64_T v, SIXTRL_UINT64_T w, SIXTRL_UINT64_T x,
     SIXTRL_UINT64_T y );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common8)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common8)(
     SIXTRL_UINT64_T s, SIXTRL_UINT64_T t, SIXTRL_UINT64_T u,
     SIXTRL_UINT64_T v, SIXTRL_UINT64_T w, SIXTRL_UINT64_T x,
     SIXTRL_UINT64_T y, SIXTRL_UINT64_T z );

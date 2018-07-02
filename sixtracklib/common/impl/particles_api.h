@@ -1407,13 +1407,14 @@ SIXTRL_INLINE void NS( Particles_buffer_calculate_difference)(
     {
         #if !defined( NDEBUG ) && !defined( _GPUCODE ) && !defined( __CUDACC__ )
         ptrdiff_t const num_blocks = lhs_end - lhs_it;
-        #endif /* !defined( NDEBUG ) */
 
         SIXTRL_ASSERT(
             ( num_blocks == ( ptrdiff_t
                 )NS(Blocks_get_num_of_blocks)( rhs  ) ) &&
             ( num_blocks == ( ptrdiff_t
                 )NS(Blocks_get_num_of_blocks)( diff ) ) );
+        
+        #endif /* !defined( NDEBUG ) */
 
         for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it, ++diff_it )
         {

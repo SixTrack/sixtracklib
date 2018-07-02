@@ -628,12 +628,7 @@ SIXTRL_INLINE int NS(BeamBeam_get_transverse_fields_gauss_elliptical)(
         SIXTRL_REAL_T const sigma_x, SIXTRL_REAL_T const sigma_y,
         SIXTRL_REAL_T const delta_x, SIXTRL_REAL_T const delta_y )
 {
-     int ret = 0;
-
-    #if !defined( NDEBUG ) && !defined( __CUDACC__ )
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0L;
-    SIXTRL_STATIC_VAR SIXTRL_REAL_T const EPS  = ( SIXTRL_REAL_T )1e-16;
-    #endif /* !defined( NDEBUG ) && !defined( __CUDACC__ ) */
+    int ret = 0;
 
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const C =
         ( SIXTRL_REAL_T )2.0L *
@@ -664,11 +659,11 @@ SIXTRL_INLINE int NS(BeamBeam_get_transverse_fields_gauss_elliptical)(
 
     SIXTRL_ASSERT( ( ex_component != 0 ) && ( ey_component != 0 ) );
 
-    SIXTRL_ASSERT( ( sigma_x * sigma_x ) >= EPS );
-    SIXTRL_ASSERT( ( sigma_y * sigma_y ) >= EPS );
+    SIXTRL_ASSERT( ( sigma_x * sigma_x ) >= ( SIXTRL_REAL_T )1e-16 );
+    SIXTRL_ASSERT( ( sigma_y * sigma_y ) >= ( SIXTRL_REAL_T )1e-16 );
     SIXTRL_ASSERT( ( sigma_x > sigma_y ) || ( sigma_x < sigma_y ) );
-    SIXTRL_ASSERT( ( EPS <
-        ( HALF_S_SQU >= ZERO ) ? HALF_S_SQU : -HALF_S_SQU ) );
+    SIXTRL_ASSERT( ( ( SIXTRL_REAL_T )1e-16 <
+        ( HALF_S_SQU >= ( SIXTRL_REAL_T )0.0 ) ? HALF_S_SQU : -HALF_S_SQU ) );
 
     if( sigma_x > sigma_y )
     {

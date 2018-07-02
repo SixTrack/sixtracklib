@@ -966,7 +966,7 @@ SIXTRL_INLINE NS(block_size_t) NS(Blocks_get_max_num_of_blocks)(
     {
         max_num_blocks = blocks->num_blocks;
     }
-    #if !defined( _GPUCODE )
+    #if !defined( _GPUCODE ) 
     else
     {
         max_num_blocks = NS(MemPool_get_capacity)(

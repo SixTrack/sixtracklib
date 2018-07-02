@@ -27,34 +27,34 @@ typedef struct NS( AllocResult )
     SIXTRL_UINT64_T length;
 } NS( AllocResult );
 
-SIXTRL_STATIC bool NS( AllocResult_valid )(
+SIXTRL_FN SIXTRL_STATIC bool NS( AllocResult_valid )(
     const NS( AllocResult ) * const SIXTRL_RESTRICT result );
 
-SIXTRL_STATIC bool NS(AllocResult_is_aligned)(
+SIXTRL_FN SIXTRL_STATIC bool NS(AllocResult_is_aligned)(
     const NS(AllocResult) *const SIXTRL_RESTRICT result,
     size_t alignment );
 
-SIXTRL_STATIC NS( AllocResult ) *
+SIXTRL_FN SIXTRL_STATIC NS( AllocResult ) *
     NS( AllocResult_preset )( NS( AllocResult ) * SIXTRL_RESTRICT result );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char*
 NS( AllocResult_get_pointer )(
     const NS( AllocResult ) * const SIXTRL_RESTRICT result );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS( AllocResult_get_offset )(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS( AllocResult_get_offset )(
     const NS( AllocResult ) * const SIXTRL_RESTRICT result );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS( AllocResult_get_length )(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS( AllocResult_get_length )(
     const NS( AllocResult ) * const SIXTRL_RESTRICT result );
 
-SIXTRL_STATIC void NS(AllocResult_assign_ptr)(
+SIXTRL_FN SIXTRL_STATIC void NS(AllocResult_assign_ptr)(
     NS(AllocResult)* SIXTRL_RESTRICT result,
     unsigned char* SIXTRL_RESTRICT ptr );
 
-SIXTRL_STATIC void NS(AllocResult_set_length)(
+SIXTRL_FN SIXTRL_STATIC void NS(AllocResult_set_length)(
     NS(AllocResult)* SIXTRL_RESTRICT result, SIXTRL_UINT64_T const length );
 
-SIXTRL_STATIC void NS(AllocResult_set_offset)(
+SIXTRL_FN SIXTRL_STATIC void NS(AllocResult_set_offset)(
     NS(AllocResult)* SIXTRL_RESTRICT result, SIXTRL_UINT64_T const offset );
 
 /* -------------------------------------------------------------------------- */
@@ -71,10 +71,10 @@ typedef struct NS( MemPool )
 
 } NS(MemPool);
 
-SIXTRL_STATIC NS( MemPool ) * NS( MemPool_preset )(
+SIXTRL_FN SIXTRL_STATIC NS( MemPool ) * NS( MemPool_preset )(
     NS( MemPool ) * SIXTRL_RESTRICT pool );
 
-SIXTRL_STATIC void NS( MemPool_init )(
+SIXTRL_HOST_FN SIXTRL_STATIC void NS( MemPool_init )(
     NS( MemPool ) * SIXTRL_RESTRICT pool, SIXTRL_UINT64_T capacity,
     SIXTRL_UINT64_T const chunk_size );
 
@@ -82,91 +82,91 @@ SIXTRL_STATIC void NS( MemPool_init )(
 
 #if !defined( _GPUCODE )
 
-void NS( MemPool_init_aligned)(
+SIXTRL_HOST_FN void NS( MemPool_init_aligned)(
     NS( MemPool ) * SIXTRL_RESTRICT pool, SIXTRL_UINT64_T capacity,
     SIXTRL_UINT64_T const chunk_size,  SIXTRL_UINT64_T const begin_alignment );
 
-SIXTRL_STATIC bool NS( MemPool_reserve )(
+SIXTRL_HOST_FN SIXTRL_STATIC bool NS( MemPool_reserve )(
     NS( MemPool ) * SIXTRL_RESTRICT pool, SIXTRL_UINT64_T new_capacity );
 
-bool NS( MemPool_reserve_aligned )(
+SIXTRL_HOST_FN bool NS( MemPool_reserve_aligned )(
     NS( MemPool ) * SIXTRL_RESTRICT pool,
     SIXTRL_UINT64_T const new_capacity, SIXTRL_UINT64_T const alignment );
 
-bool NS(MemPool_clear_to_aligned_position)(
+SIXTRL_HOST_FN bool NS(MemPool_clear_to_aligned_position)(
     NS(MemPool)* SIXTRL_RESTRICT pool, SIXTRL_UINT64_T const alignment  );
 
 #endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC void NS( MemPool_free )(
+SIXTRL_FN SIXTRL_STATIC void NS( MemPool_free )(
     NS( MemPool ) * SIXTRL_RESTRICT pool );
 
-SIXTRL_STATIC void NS( MemPool_clear )(
+SIXTRL_FN SIXTRL_STATIC void NS( MemPool_clear )(
     NS( MemPool ) * SIXTRL_RESTRICT pool );
 
-SIXTRL_STATIC bool NS( MemPool_is_empty )(
+SIXTRL_FN SIXTRL_STATIC bool NS( MemPool_is_empty )(
     const NS( MemPool ) * const SIXTRL_RESTRICT pool );
 
-SIXTRL_STATIC bool NS(MemPool_is_begin_aligned_with)(
+SIXTRL_FN SIXTRL_STATIC bool NS(MemPool_is_begin_aligned_with)(
     const NS(MemPool) *const pool, SIXTRL_UINT64_T const alignment );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_capacity )(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_capacity )(
     const NS( MemPool ) * const SIXTRL_RESTRICT pool );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_buffer_capacity )(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_buffer_capacity )(
     const NS( MemPool ) * const SIXTRL_RESTRICT pool );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_size )(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_size )(
     const NS( MemPool ) * const SIXTRL_RESTRICT pool );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_chunk_size )(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_chunk_size )(
     const NS( MemPool ) * const SIXTRL_RESTRICT pool );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_begin_offset)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_begin_offset)(
     const NS( MemPool ) *const SIXTRL_RESTRICT pool );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_remaining_bytes )(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_remaining_bytes )(
     const NS( MemPool ) * const SIXTRL_RESTRICT pool );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_next_begin_offset )(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_next_begin_offset )(
     const NS( MemPool ) * const pool, SIXTRL_UINT64_T block_alignment );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char* NS( MemPool_get_begin_pos )(
-    NS( MemPool ) * SIXTRL_RESTRICT pool );
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char* 
+NS( MemPool_get_begin_pos )( NS( MemPool ) * SIXTRL_RESTRICT pool );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const*
 NS( MemPool_get_const_begin_pos )(
     const NS( MemPool ) * const SIXTRL_RESTRICT pool );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char*
 NS( MemPool_get_next_begin_pointer )(
     NS( MemPool ) * SIXTRL_RESTRICT pool, SIXTRL_UINT64_T block_alignment );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char*
 NS( MemPool_get_pointer_by_offset )(
         NS( MemPool ) * SIXTRL_RESTRICT pool, SIXTRL_UINT64_T const offset );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const*
 NS( MemPool_get_next_begin_const_pointer )(
     const NS( MemPool ) * const SIXTRL_RESTRICT pool,
     SIXTRL_UINT64_T const alignment );
 
-SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const*
 NS( MemPool_get_const_pointer_by_offset )(
     const NS( MemPool ) * const SIXTRL_RESTRICT pool,
     SIXTRL_UINT64_T const offset );
 
-SIXTRL_STATIC void NS(MemPool_increment_size)(
+SIXTRL_FN SIXTRL_STATIC void NS(MemPool_increment_size)(
     NS(MemPool)* SIXTRL_RESTRICT pool,
     SIXTRL_UINT64_T const new_size );
 
-SIXTRL_STATIC NS( AllocResult ) NS( MemPool_append )(
+SIXTRL_FN SIXTRL_STATIC NS( AllocResult ) NS( MemPool_append )(
     NS( MemPool ) * SIXTRL_RESTRICT pool,
     SIXTRL_UINT64_T const num_bytes );
 
-SIXTRL_STATIC NS( AllocResult ) NS( MemPool_append_aligned )
+SIXTRL_FN SIXTRL_STATIC NS( AllocResult ) NS( MemPool_append_aligned )
 ( NS( MemPool ) * SIXTRL_RESTRICT pool,
     SIXTRL_UINT64_T const num_bytes, SIXTRL_UINT64_T const alignment );
 
@@ -319,7 +319,10 @@ SIXTRL_INLINE void NS( MemPool_free )( NS( MemPool ) * SIXTRL_RESTRICT pool )
 {
     if( pool != 0 )
     {
+        #if !defined( _GPUCODE ) 
         free( pool->buffer );
+        #endif /* !defined( _GPUCODE ) */   
+        
         NS( MemPool_preset )( pool );
     }
 

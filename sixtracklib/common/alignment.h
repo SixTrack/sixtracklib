@@ -10,7 +10,7 @@
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_UINT64_T NS(Alignment_calculate_commonN)(
+SIXTRL_HOST_FN SIXTRL_UINT64_T NS(Alignment_calculate_commonN)(
     SIXTRL_UINT64_T const* SIXTRL_RESTRICT numbers,
     SIXTRL_UINT64_T const num_of_operands );
 
