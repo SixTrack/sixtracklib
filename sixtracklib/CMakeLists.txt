@@ -86,13 +86,13 @@ endif()
 
 if( SIXTRACKL_ENABLE_CUDA )
 
-    set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} 
-                                  ${SIXTRACKL_CUDA_LIBRARIES} )
+#     set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} 
+#                                   ${SIXTRACKL_CUDA_LIBRARIES} )
         
     add_subdirectory( cuda )
 
     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-         $<TARGET_OBJECTS:sixtrack_cuda_part> )
+         $<TARGET_OBJECTS:sixtrack_cuda> )
     
 endif()
                 
@@ -112,14 +112,13 @@ target_include_directories(
                     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
 
 set_target_properties( sixtrack PROPERTIES LINKER_LANGUAGE C )
-set_target_properties( sixtrack PROPERTIES POSITION_INDEPENDENT_CODE True )
+set_target_properties( sixtrack PROPERTIES POSITION_INDEPENDENT_CODE ON )
 set_target_properties( sixtrack PROPERTIES C_STANDARD 99 )
 set_target_properties( sixtrack PROPERTIES DEBUG_POSTFIX d )
 
 target_compile_definitions( sixtrack PUBLIC ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
-target_compile_options( sixtrack PUBLIC ${SIXTRACKLIB_CPU_FLAGS} 
-    -Wall -Werror -pedantic -ansi )
+target_compile_options( sixtrack PRIVATE -Wall -Werror -pedantic -ansi ${SIXTRACKLIB_CPU_FLAGS} )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     

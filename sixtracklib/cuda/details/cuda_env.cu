@@ -12,7 +12,15 @@
 #include "sixtracklib/common/blocks.h"
 #include "sixtracklib/cuda/impl/track_particles_kernel.cuh"
 
-bool NS(Track_particles_on_cuda)(
+extern __host__ bool NS(Track_particles_on_cuda)(
+    int const num_of_blocks, 
+    int const num_threads_per_block,
+    SIXTRL_UINT64_T const num_of_turns,
+    NS(Blocks)* SIXTRL_RESTRICT particles_buffer,
+    NS(Blocks)* SIXTRL_RESTRICT beam_elements,
+    NS(Blocks)* SIXTRL_RESTRICT elem_by_elem_buffer );
+
+bool __host__ NS(Track_particles_on_cuda)(
     int const num_of_blocks, 
     int const num_threads_per_block,
     SIXTRL_UINT64_T const num_of_turns,

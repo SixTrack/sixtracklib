@@ -87,7 +87,6 @@ endif()
 # CUDA:
 
 if( SIXTRACKL_ENABLE_CUDA )
-    include( SetupCuda )
     enable_language( CUDA )
 endif()
 
