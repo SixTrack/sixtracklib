@@ -378,13 +378,26 @@
     /* ---------------------------------------------------------------- */
     /* static, inline and restrict keywords: */
 
-    #if !defined( SIXTRL_STATIC )
-        #define SIXTRL_STATIC static
-    #endif /* !defined( SIXTRL_STATIC ) */
+    #if !defined( __CUDACC__ )
+        #if !defined( SIXTRL_STATIC )
+            #define SIXTRL_STATIC static
+        #endif /* !defined( SIXTRL_STATIC ) */
 
-    #if !defined( SIXTRL_STATIC_VAR )
-            #define SIXTRL_STATIC_VAR static
+        #if !defined( SIXTRL_STATIC_VAR )
+                #define SIXTRL_STATIC_VAR static
         #endif /* !defined( SIXTRL_STATIC_VAR ) */
+
+    #else /* !defined( __CUDACC__ ) */
+
+        #if !defined( SIXTRL_STATIC )
+            #define SIXTRL_STATIC static
+        #endif /* !defined( SIXTRL_STATIC ) */
+
+        #if !defined( SIXTRL_STATIC_VAR )
+                #define SIXTRL_STATIC_VAR
+        #endif /* !defined( SIXTRL_STATIC_VAR ) */
+
+    #endif /* */
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
@@ -459,7 +472,7 @@
     /* Function header decorators:                                      */
 
     #if !defined( __CUDACC__ )
-    
+
         #if !defined( SIXTRL_HOST_FN )
             #define   SIXTRL_HOST_FN
         #endif /* SIXTRL_HOST_FN */
@@ -471,11 +484,11 @@
         #if !defined( SIXTRL_FN )
             #define   SIXTRL_FN
         #endif /* SIXTRL_FN */
-        
+
     #else /* defined( __CUDACC__ ) */
-        
+
         #if !defined( SIXTRL_HOST_FN)
-            #define   SIXTRL_HOST_FN __host__ 
+            #define   SIXTRL_HOST_FN __host__
         #endif /* SIXTRL_HOST_FN */
 
         #if !defined( SIXTRL_DEVICE_FN )
@@ -485,7 +498,7 @@
         #if !defined( SIXTRL_FN )
             #define   SIXTRL_FN __host__ __device__
         #endif /* SIXTRL_FN */
-        
+
     #endif /* defined( __CUDACC__ ) */
 
 #endif /* defined( _GPUCODE ) */
