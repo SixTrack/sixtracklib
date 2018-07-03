@@ -22,7 +22,7 @@ extern "C" {
 
 typedef struct NS( AllocResult )
 {
-    unsigned char* p;
+    SIXTRL_GLOBAL_DEC unsigned char* p;
     SIXTRL_UINT64_T offset;
     SIXTRL_UINT64_T length;
 } NS( AllocResult );
@@ -49,7 +49,7 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS( AllocResult_get_length )(
 
 SIXTRL_FN SIXTRL_STATIC void NS(AllocResult_assign_ptr)(
     NS(AllocResult)* SIXTRL_RESTRICT result,
-    unsigned char* SIXTRL_RESTRICT ptr );
+    SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT ptr );
 
 SIXTRL_FN SIXTRL_STATIC void NS(AllocResult_set_length)(
     NS(AllocResult)* SIXTRL_RESTRICT result, SIXTRL_UINT64_T const length );
@@ -464,7 +464,7 @@ SIXTRL_INLINE SIXTRL_UINT64_T NS( MemPool_get_remaining_bytes )(
     SIXTRL_UINT64_T const chunk_size = NS( MemPool_get_chunk_size )( pool );
     SIXTRL_UINT64_T const size       = NS( MemPool_get_size )( pool );
 
-    assert( ( capacity >= size ) && ( chunk_size > (SIXTRL_UINT64_T)0u ) );
+    SIXTRL_ASSERT( ( capacity >= size ) && ( chunk_size > (SIXTRL_UINT64_T)0u ) );
     return ( ( capacity - size ) / chunk_size ) * chunk_size;
 }
 
@@ -570,8 +570,9 @@ NS( MemPool_get_const_pointer_by_offset )(
 SIXTRL_INLINE void NS(MemPool_increment_size)(
     NS(MemPool)* SIXTRL_RESTRICT pool, SIXTRL_UINT64_T const new_size )
 {
-    assert( ( pool != 0 ) && ( new_size >= NS(MemPool_get_size)( pool ) ) &&
-            ( new_size <= NS(MemPool_get_capacity)( pool ) ) );
+    SIXTRL_ASSERT(
+        ( pool != 0 ) && ( new_size >= NS(MemPool_get_size)( pool ) ) &&
+        ( new_size <= NS(MemPool_get_capacity)( pool ) ) );
 
     pool->size = new_size;
     return;
