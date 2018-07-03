@@ -18,7 +18,7 @@ if( GTEST_FOUND )
     add_executable( test_track_cuda test_track.cpp )
     target_link_libraries( test_track_cuda PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_cuda )
-    add_test( CommonTrackTests test_track_cuda )
+    add_test( CudaTrackTests test_track_cuda )
 
     # ==========================================================================
     # ====  set all properties:

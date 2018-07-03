@@ -29,15 +29,6 @@ add_library( sixtrack_cuda_host OBJECT
 target_compile_definitions( sixtrack_cuda_host
     PUBLIC ${SIXTRACKL_CUDA_HOST_DEFINITIONS} )
 
-set_target_properties( sixtrack_cuda_host PROPERTIES POSITION_INDEPENDENT_CODE ON )
-set_target_properties( sixtrack_cuda_host PROPERTIES LINKER_LANGUAGE C )
-set_target_properties( sixtrack_cuda_host PROPERTIES CXX_STANDARD 11 )
-set_target_properties( sixtrack_cuda_host PROPERTIES CXX_STANDARD_REQUIRED ON )
-set_target_properties( sixtrack_cuda_host PROPERTIES CUDA_SEPARABLE_COMPILATION  ON  )
-set_target_properties( sixtrack_cuda_host PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS OFF )
-set_target_properties( sixtrack_cuda_host PROPERTIES CUDA_STANDARD 11 )
-set_target_properties( sixtrack_cuda_host PROPERTIES CUDA_STANDARD_REQUIRED 11 )
-
 # ------------------------------------------------------------------------------
 # --- CUDA Kernel object library:
 
@@ -63,22 +54,40 @@ add_library( sixtrack_cuda_kernel OBJECT
 target_compile_definitions( sixtrack_cuda_kernel
     PUBLIC ${SIXTRACKL_CUDA_KERNEL_DEFINITIONS} )
 
-set_target_properties( sixtrack_cuda_kernel PROPERTIES POSITION_INDEPENDENT_CODE ON )
-set_target_properties( sixtrack_cuda_kernel PROPERTIES LINKER_LANGUAGE C )
-set_target_properties( sixtrack_cuda_kernel PROPERTIES CXX_STANDARD 11 )
-set_target_properties( sixtrack_cuda_kernel PROPERTIES CXX_STANDARD_REQUIRED ON )
-set_target_properties( sixtrack_cuda_kernel PROPERTIES CUDA_SEPARABLE_COMPILATION  ON  )
-set_target_properties( sixtrack_cuda_kernel PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS OFF )
-set_target_properties( sixtrack_cuda_kernel PROPERTIES CUDA_STANDARD 11 )
-set_target_properties( sixtrack_cuda_kernel PROPERTIES CUDA_STANDARD_REQUIRED 11 )
+# ------------------------------------------------------------------------------
 
+set( SIXTRACKL_CUDA_OBJECT_LIBS sixtrack_cuda_host sixtrack_cuda_kernel )
 
+set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
+              PROPERTY POSITION_INDEPENDENT_CODE ON )
+
+set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
+              PROPERTY LINKER_LANGUAGE C )
+
+set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
+              PROPERTY CXX_STANDARD 11 )
+
+set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
+              PROPERTY CXX_STANDARD_REQUIRED ON )
+
+set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
+              PROPERTY CUDA_SEPARABLE_COMPILATION  ON  )
+
+set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
+              PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS OFF )
+
+set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
+              PROPERTY CUDA_STANDARD 11 )
+
+set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
+              PROPERTY CUDA_STANDARD_REQUIRED 11 )
+
+# ------------------------------------------------------------------------------
 
 if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     add_subdirectory( tests )
 endif()
 
 # ------------------------------------------------------------------------------
-
 # set( CUDA_PROPAGATE_HOST_FLAGS ${SAVED_CUDA_PROPAGATE_HOST_FLAGS} )
 
