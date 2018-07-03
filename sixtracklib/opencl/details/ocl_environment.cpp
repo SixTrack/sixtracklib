@@ -217,39 +217,25 @@ bool NS(OclEnvironment)::prepareParticlesTracking(
         NS(ComputeNodeId) const* selected_nodes_end = selected_nodes_begin;
         std::advance( selected_nodes_end, num_of_selected_nodes );
 
-        std::string PATH_TO_SOURCE_DIR( st_PATH_TO_BASE_DIR );
-        PATH_TO_SOURCE_DIR += "sixtracklib/";
+        std::string PATH_TO_KERNEL_FILE( st_PATH_TO_BASE_DIR );
+        PATH_TO_KERNEL_FILE += "sixtracklib/opencl/track_particles_kernel.cl";
 
-        std::vector< std::string > const paths_to_kernel_files{
-            PATH_TO_SOURCE_DIR + std::string{ "_impl/namespace_begin.h" },
-            PATH_TO_SOURCE_DIR + std::string{ "_impl/definitions.h" },
-            PATH_TO_SOURCE_DIR + std::string{ "common/blocks.h" },
-            PATH_TO_SOURCE_DIR + std::string{ "common/impl/particles_type.h" },
-            PATH_TO_SOURCE_DIR + std::string{ "common/impl/particles_api.h" },
-            PATH_TO_SOURCE_DIR + std::string{ "common/particles.h" },
-            PATH_TO_SOURCE_DIR + std::string{ "common/impl/beam_elements_type.h" },
-            PATH_TO_SOURCE_DIR + std::string{ "common/impl/beam_elements_api.h" },
-            PATH_TO_SOURCE_DIR + std::string{ "common/beam_elements.h" },
-            PATH_TO_SOURCE_DIR + std::string{ "common/track.h" },
-            PATH_TO_SOURCE_DIR + std::string{ "common/impl/track_api.h" },
-            PATH_TO_SOURCE_DIR + std::string{ "opencl/track_particles_kernel.cl" },
-            PATH_TO_SOURCE_DIR + std::string{ "_impl/namespace_end.h" }
-        };
+        std::string kernel_source( "" );
+        std::ifstream kernel_file( PATH_TO_KERNEL_FILE.c_str(),
+                                   std::ios::in | std::ios::binary );
 
-        std::string kernel_source( 2048 * 1024, '\0' );
-        kernel_source.clear();
-
-        for( auto const& path : paths_to_kernel_files )
+        if( kernel_file.is_open() )
         {
-            std::ifstream const one_kernel_file( path, std::ios::in );
-
-            std::istreambuf_iterator< char > one_kernel_file_begin(
-                one_kernel_file.rdbuf() );
+            std::istreambuf_iterator< char > file_begin( kernel_file.rdbuf() );
             std::istreambuf_iterator< char > end_of_file;
 
-            kernel_source.insert( kernel_source.end(),
-                                one_kernel_file_begin, end_of_file );
+            kernel_source.assign( file_begin, end_of_file );
+            kernel_file.close();
         }
+
+        std::string compile_options( "-D_GPUCODE=1 -D__NAMESPACE=st_ " );
+        compile_options += "-DSIXTRL_NO_SYSTEM_INCLUDES=1 -I ";
+        compile_options += st_PATH_TO_BASE_DIR;
 
         this->m_selected_nodes.clear();
         this->m_selected_nodes.reserve( num_of_selected_nodes );
@@ -293,8 +279,6 @@ bool NS(OclEnvironment)::prepareParticlesTracking(
         {
             this->m_elem_by_elem_data_buffer_size = 4 * sizeof( uint64_t );
         }
-
-        std::string const compile_options( "-D_GPUCODE=1 -D__NAMESPACE=st_" );
 
         success = true;
 

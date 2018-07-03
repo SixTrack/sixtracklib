@@ -13,36 +13,20 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <CL/cl.hpp>
-
-#if defined( __NAMESPACE )
-    #define __SAVED_NAMESPACE __NAMESPACE
-    #undef  __NAMESPACE
-#endif /* !defiend( __NAMESPACE ) */
-
-#if !defined( __NAMESPACE )
-    #define __NAMESPACE st_
-#endif /* !defiend( __NAMESPACE ) */
 
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/_impl/path.h"
+#include "sixtracklib/_impl/testdata_files.h"
 
 #include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/track.h"
-#include "sixtracklib/common/details/gpu_kernel_tools.h"
 
+#include "sixtracklib/common/details/gpu_kernel_tools.h"
 #include "sixtracklib/common/tests/test_particles_tools.h"
 #include "sixtracklib/common/tests/test_track_tools.h"
 #include "sixtracklib/opencl/ocl_environment.h"
-
-#include "sixtracklib/testdata/tracking_testfiles.h"
-
-#if defined( __SAVED_NAMESPACE )
-    #undef __NAMESPACE
-    #define __NAMESPACE __SAVED_NAMESPACE
-#endif /* defined( __SAVED_NAMESPACE ) */
 
 /* ========================================================================= */
 /* =====  track drifts of constant length                                    */
