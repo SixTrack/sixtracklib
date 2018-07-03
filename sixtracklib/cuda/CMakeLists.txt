@@ -1,39 +1,78 @@
-string( APPEND CMAKE_CUDA_FLAGS " -gencode=arch=compute_30,code=compute_30" )
-string( APPEND CMAKE_CUDA_FLAGS " -gencode=arch=compute_50,code=compute_50" )
-string( APPEND CMAKE_CUDA_FLAGS " -gencode=arch=compute_60,code=compute_60" )
-string( APPEND CMAKE_CUDA_FLAGS " -gencode=arch=compute_61,code=compute_61" )
-string( APPEND CMAKE_CUDA_FLAGS " -gencode=arch=compute_62,code=compute_62" )
+# ------------------------------------------------------------------------------
+# --- CUDA Kernel host library:
 
-set( SIXTRACKL_CUDA_DEFINITIONS "_GPUCODE=1" )
-list( APPEND SIXTRACKL_CUDA_DEFINITIONS "__NAMESPACE=st_" )
+if( SIXTRACKL_CUDA_COMPUTE_ARCH_LIST )
 
-set( SIXTRACKLIB_CUDA_PART_HEADERS
+    foreach( A IN LISTS SIXTRACKL_CUDA_COMPUTE_ARCH_LIST )
+        string( APPEND CMAKE_CUDA_FLAGS
+                " -gencode=arch=compute_${A},code=compute_${A}" )
+    endforeach()
+endif()
+
+set( SIXTRACKL_CUDA_HOST_DEFINITIONS )
+list( APPEND SIXTRACKL_CUDA_HOST_DEFINITIONS
+      "__NAMESPACE=${SIXTRACKL_C_NAMESPACE_PREFIX}" )
+
+set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
      cuda_env.h
+)
+
+set( SIXTRACKLIB_CUDA_PART_HOST_SOURCES
+     details/cuda_env.cu
+)
+
+add_library( sixtrack_cuda_host OBJECT
+             ${SIXTRACKLIB_CUDA_PART_HOST_HEADERS}
+             ${SIXTRACKLIB_CUDA_PART_HOST_SOURCES}
+)
+
+target_compile_definitions( sixtrack_cuda_host
+    PUBLIC ${SIXTRACKL_CUDA_HOST_DEFINITIONS} )
+
+set_target_properties( sixtrack_cuda_host PROPERTIES POSITION_INDEPENDENT_CODE ON )
+set_target_properties( sixtrack_cuda_host PROPERTIES LINKER_LANGUAGE C )
+set_target_properties( sixtrack_cuda_host PROPERTIES CXX_STANDARD 11 )
+set_target_properties( sixtrack_cuda_host PROPERTIES CXX_STANDARD_REQUIRED ON )
+set_target_properties( sixtrack_cuda_host PROPERTIES CUDA_SEPARABLE_COMPILATION  ON  )
+set_target_properties( sixtrack_cuda_host PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS OFF )
+set_target_properties( sixtrack_cuda_host PROPERTIES CUDA_STANDARD 11 )
+set_target_properties( sixtrack_cuda_host PROPERTIES CUDA_STANDARD_REQUIRED 11 )
+
+# ------------------------------------------------------------------------------
+# --- CUDA Kernel object library:
+
+set( SIXTRACKL_CUDA_KERNEL_DEFINITIONS )
+list( APPEND SIXTRACKL_CUDA_KERNEL_DEFINITIONS "_GPUCODE=1" )
+list( APPEND SIXTRACKL_CUDA_KERNEL_DEFINITIONS
+      "__NAMESPACE=${SIXTRACKL_C_NAMESPACE_PREFIX}" )
+
+
+set( SIXTRACKLIB_CUDA_PART_KERNEL_HEADERS
      impl/track_particles_kernel.cuh
 )
 
-set( SIXTRACKLIB_CUDA_PART_SOURCES 
-     details/cuda_env.cu
+set( SIXTRACKLIB_CUDA_PART_KERNEL_SOURCES
      details/track_particles_kernel.cu
 )
 
-add_library( sixtrack_cuda OBJECT
-             ${SIXTRACKLIB_CUDA_PART_HEADERS}
-             ${SIXTRACKLIB_CUDA_PART_SOURCES}
+add_library( sixtrack_cuda_kernel OBJECT
+             ${SIXTRACKLIB_CUDA_PART_KERNEL_HEADERS}
+             ${SIXTRACKLIB_CUDA_PART_KERNEL_SOURCES}
 )
 
-target_compile_definitions( sixtrack_cuda PUBLIC ${SIXTRACKL_CUDA_DEFINITIONS} )
+target_compile_definitions( sixtrack_cuda_kernel
+    PUBLIC ${SIXTRACKL_CUDA_KERNEL_DEFINITIONS} )
 
-set_target_properties( sixtrack_cuda PROPERTIES POSITION_INDEPENDENT_CODE ON )
-set_target_properties( sixtrack_cuda PROPERTIES LINKER_LANGUAGE C )
-set_target_properties( sixtrack_cuda PROPERTIES CXX_STANDARD 11 )
-set_target_properties( sixtrack_cuda PROPERTIES CXX_STANDARD_REQUIRED ON )
-set_target_properties( sixtrack_cuda PROPERTIES CUDA_SEPARABLE_COMPILATION  ON  )
-set_target_properties( sixtrack_cuda PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS OFF )
-set_target_properties( sixtrack_cuda PROPERTIES CUDA_STANDARD 11 )
-set_target_properties( sixtrack_cuda PROPERTIES CUDA_STANDARD_REQUIRED 11 )
+set_target_properties( sixtrack_cuda_kernel PROPERTIES POSITION_INDEPENDENT_CODE ON )
+set_target_properties( sixtrack_cuda_kernel PROPERTIES LINKER_LANGUAGE C )
+set_target_properties( sixtrack_cuda_kernel PROPERTIES CXX_STANDARD 11 )
+set_target_properties( sixtrack_cuda_kernel PROPERTIES CXX_STANDARD_REQUIRED ON )
+set_target_properties( sixtrack_cuda_kernel PROPERTIES CUDA_SEPARABLE_COMPILATION  ON  )
+set_target_properties( sixtrack_cuda_kernel PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS OFF )
+set_target_properties( sixtrack_cuda_kernel PROPERTIES CUDA_STANDARD 11 )
+set_target_properties( sixtrack_cuda_kernel PROPERTIES CUDA_STANDARD_REQUIRED 11 )
 
-# ------------------------------------------------------------------------------
+
 
 if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     add_subdirectory( tests )
