@@ -1,7 +1,7 @@
 #ifndef SIXTRACKLIB_COMMON_IMPL_PARTICLES_TYPE_H__
 #define SIXTRACKLIB_COMMON_IMPL_PARTICLES_TYPE_H__
 
-#if !defined( SIXTRL_NO_INCLUDES )
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stddef.h>
     #include <stdint.h>
     #include <stdlib.h>
