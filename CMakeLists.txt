@@ -19,45 +19,45 @@ message( STATUS "---- Inside main CMakeLists.txt" )
 # load local settings file -> this is optional, if not loaded then the default
 # settings file will be loaded:
 
-set( PATH_TO_DEFAULT_SETTINGS_FILE 
+set( PATH_TO_DEFAULT_SETTINGS_FILE
      "${CMAKE_CURRENT_SOURCE_DIR}/Settings.cmake.default" )
-     
-set( PATH_TO_LOCAL_SETTINGS_FILE   
+
+set( PATH_TO_LOCAL_SETTINGS_FILE
      "${CMAKE_CURRENT_SOURCE_DIR}/Settings.cmake" )
 
 if( EXISTS ${PATH_TO_LOCAL_SETTINGS_FILE} )
-    
-    include( ${PATH_TO_LOCAL_SETTINGS_FILE} OPTIONAL 
+
+    include( ${PATH_TO_LOCAL_SETTINGS_FILE} OPTIONAL
              RESULT_VARIABLE STATUS_INCLUDE_LOCAL_SETTINGS_FILE )
-             
+
     if( STATUS_INCLUDE_LOCAL_SETTINGS_FILE )
         message( STATUS "---- Loaded local settings file ${PATH_TO_LOCAL_SETTINGS_FILE}" )
     endif()
-             
+
 elseif( EXISTS ${PATH_TO_DEFAULT_SETTINGS_FILE} )
-    
+
     include( ${PATH_TO_DEFAULT_SETTINGS_FILE} OPTIONAL
-             RESULT_VARIABLE STATUS_INCLUDE_DEFAULT_SETTINGS_FILE )        
-             
+             RESULT_VARIABLE STATUS_INCLUDE_DEFAULT_SETTINGS_FILE )
+
     if( STATUS_INCLUDE_DEFAULT_SETTINGS_FILE )
         message( STATUS "---- Loaded default settings file ${PATH_TO_DEFAULT_SETTINGS_FILE}" )
     endif()
-    
+
 endif()
 
-if( NOT STATUS_INCLUDE_LOCAL_SETTINGS_FILE AND 
+if( NOT STATUS_INCLUDE_LOCAL_SETTINGS_FILE AND
     NOT STATUS_INCLUDE_DEFAULT_SETTINGS_FILE )
-    
+
     message( WARNING "No settings file (i.e. neither settings.cmake nor "
              "settings.cmake.default) included" )
-        
+
 endif()
 
 # ==============================================================================
 # handle dependencies and external libraries/toolkits:
 
 # ------------------------------------------------------------------------------
-# place all contributed cmake modules and snipplets into the cmake subdirectory 
+# place all contributed cmake modules and snipplets into the cmake subdirectory
 # of the project's root folder:
 
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake" )
