@@ -10,7 +10,7 @@
 #endif /* !defined( NS_CONCAT ) */
 
 #if !defined( __NAMESPACE )
-    #define __NAMESPACE 
+    #define __NAMESPACE
 #endif /* !defined( __NAMESPACE ) */
 
 #if !defined( NS )

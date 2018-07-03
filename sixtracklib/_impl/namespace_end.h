@@ -1,5 +1,5 @@
 #if defined( NS )
-    #undef NS 
+    #undef NS
 #endif /* defined( NS ) */
 
 #if defined( NS_CONCAT )

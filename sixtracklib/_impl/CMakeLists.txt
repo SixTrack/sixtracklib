@@ -3,31 +3,31 @@
 set( IMPL_INSTALL_PATH "include/sixtracklib/_impl" )
 
 # ------------------------------------------------------------------------------
-# generate the testdata_files.h header to be used with examples and unit-tests 
+# generate the testdata_files.h header to be used with examples and unit-tests
 
-set( TESTDATA_FILES_H_IN_PATH 
+set( TESTDATA_FILES_H_IN_PATH
      "${CMAKE_CURRENT_SOURCE_DIR}/testdata_files.h.template" )
 
 set( TESTDATA_FILES_H_OUT_PATH
      "${CMAKE_CURRENT_SOURCE_DIR}/testdata_files.h" )
-     
+
 set( TESTDATA_FILES_H_INSTALL_PATH
      "${IMPL_INSTALL_PATH}/testdata_files.h" )
-     
-configure_file( ${TESTDATA_FILES_H_IN_PATH} ${TESTDATA_FILES_H_OUT_PATH} 
+
+configure_file( ${TESTDATA_FILES_H_IN_PATH} ${TESTDATA_FILES_H_OUT_PATH}
                 @ONLY )
-                
+
 install( CODE "
     set( SIXTRACKLIB_TESTDATA_DIR \"${CMAKE_INSTALL_PREFIX}/testdata\" )
     message( STATUS \"Generating: ${TESTDATA_FILES_H_INSTALL_PATH}\" )
-    configure_file( \"${TESTDATA_FILES_H_IN_PATH}\" 
+    configure_file( \"${TESTDATA_FILES_H_IN_PATH}\"
                     \"${TESTDATA_FILES_H_INSTALL_PATH}\" @ONLY ) " )
-     
-# ------------------------------------------------------------------------------
-# modules.h is a header file with pre-defined constants, allownig the user 
-# of the library to query which modules are present in from C/C++ code 
 
-if( SIXTRACKL_ENABLE_MANUAL_SIMD )       
+# ------------------------------------------------------------------------------
+# modules.h is a header file with pre-defined constants, allownig the user
+# of the library to query which modules are present in from C/C++ code
+
+if( SIXTRACKL_ENABLE_MANUAL_SIMD )
     set( SIXTRACKL_ENABLE_MODULE_SIMD 1 )
 else()
     set( SIXTRACKL_ENABLE_MODULE_SIMD 0 )
@@ -50,7 +50,7 @@ endif()
 if( SIXTRACKL_ENABLE_MPFR4 )
     set( SIXTRACKL_ENABLE_MODULE_MPFR4 1 )
 else()
-    set( SIXTRACKL_ENABLE_MODULE_MPFR4 0 )    
+    set( SIXTRACKL_ENABLE_MODULE_MPFR4 0 )
 endif()
 
 
@@ -62,29 +62,29 @@ configure_file( ${MODULES_H_IN_PATH} ${MODULES_H_OUT_PATH} @ONLY )
 set( SIXTRACKL_HEADERS ${SIXTRACKL_HEADERS} ${MODULES_H_OUT_PATH} PARENT_SCOPE )
 
 
-set( MODULES_H_INSTALL_PATH 
+set( MODULES_H_INSTALL_PATH
      "${CMAKE_INSTALL_PREFIX}/${IMPL_INSTALL_PATH}/modules.h" )
 
-set( MODULES_ENABLE_DISABLE_INFO 
+set( MODULES_ENABLE_DISABLE_INFO
     "set( SIXTRACKL_ENABLE_MODULE_OPENCL ${SIXTRACKL_ENABLE_MODULE_OPENCL} )
-     set( SIXTRACKL_ENABLE_MODULE_CUDA   ${SIXTRACKL_ENABLE_MODULE_CUDA}   ) 
-     set( SIXTRACKL_ENABLE_MODULE_SIMD   ${SIXTRACKL_ENABLE_MODULE_SIMD}   ) 
+     set( SIXTRACKL_ENABLE_MODULE_CUDA   ${SIXTRACKL_ENABLE_MODULE_CUDA}   )
+     set( SIXTRACKL_ENABLE_MODULE_SIMD   ${SIXTRACKL_ENABLE_MODULE_SIMD}   )
      set( SIXTRACKL_ENABLE_MODULE_MPFR4  ${SIXTRACKL_ENABLE_MODULE_MPFR4}  )" )
-     
+
 install( CODE "
-    ${MODULES_ENABLE_DISABLE_INFO} 
+    ${MODULES_ENABLE_DISABLE_INFO}
     message( STATUS \"Generating: ${MODULES_H_INSTALL_PATH}\" )
-    configure_file( \"${MODULES_H_IN_PATH}\" \"${MODULES_H_INSTALL_PATH}\" 
+    configure_file( \"${MODULES_H_IN_PATH}\" \"${MODULES_H_INSTALL_PATH}\"
         @ONLY ) " )
-    
+
 
 # ------------------------------------------------------------------------------
-# create a header file _impl/path.h with the current, local absolute path to 
-# this directory. This is used as prefix for all source files which have to 
-# be processed during run-time (e.g. GPU Kernels, etc.) 
+# create a header file _impl/path.h with the current, local absolute path to
+# this directory. This is used as prefix for all source files which have to
+# be processed during run-time (e.g. GPU Kernels, etc.)
 
-# Note: Paths in CMake always use a slash as separator and always lack a 
-#       trailing slashes -> add them to make it easier to use the 
+# Note: Paths in CMake always use a slash as separator and always lack a
+#       trailing slashes -> add them to make it easier to use the
 #       macro in _impl/path.h as a prefix for filename and directory paths!
 
 set( SIXTRACKLIB_BASE_DIR "${CMAKE_SOURCE_DIR}/" )
@@ -103,28 +103,28 @@ set( PATH_H_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${IMPL_INSTALL_PATH}/path.h" )
 install( CODE "
          set( SIXTRACKLIB_BASE_DIR \"${CMAKE_INSTALL_PREFIX}/\" )
          message( STATUS \"Generating: ${PATH_H_INSTALL_PATH}\" )
-         configure_file( \"${PATH_H_IN_PATH}\" \"${PATH_H_INSTALL_PATH}\" 
+         configure_file( \"${PATH_H_IN_PATH}\" \"${PATH_H_INSTALL_PATH}\"
             @ONLY ) " )
 
 # ------------------------------------------------------------------------------
-# Generate the SixTracklibConfig.cmake package configuration file to the 
+# Generate the SixTracklibConfig.cmake package configuration file to the
 # lib/cmake directory inside CMAKE_INSTALL_PREFIX:
 
-set( SIXTRACKL_PKG_IN_CONFIG 
+set( SIXTRACKL_PKG_IN_CONFIG
      "${CMAKE_CURRENT_SOURCE_DIR}/SixTracklibConfig.cmake.template" )
-     
+
 set( SIXTRACKL_PKG_INSTALL_CONFIG
      "${CMAKE_INSTALL_PREFIX}/lib/cmake/SixTracklibConfig.cmake" )
-     
+
 install( CODE "
          ${MODULES_ENABLE_DISABLE_INFO}
          message( STATUS \"Generating: ${SIXTRACKL_PKG_INSTALL_CONFIG}\" )
-         configure_file( \"${SIXTRACKL_PKG_IN_CONFIG}\" 
+         configure_file( \"${SIXTRACKL_PKG_IN_CONFIG}\"
                          \"${SIXTRACKL_PKG_INSTALL_CONFIG}\" @ONLY )" )
 
 # ------------------------------------------------------------------------------
-              
-set( SIXTRACKL_IMPL_HEADERS 
+
+set( SIXTRACKL_IMPL_HEADERS
      namespace_begin.h
      definitions.h
      namespace_end.h
@@ -134,9 +134,9 @@ install( FILES ${SIXTRACKL_IMPL_HEADERS} DESTINATION ${IMPL_INSTALL_PATH} )
 
 # ------------------------------------------------------------------------------
 
-string( REGEX REPLACE "([^;]+)" "_impl/\\1" SIXTRACKL_IMPL_HEADERS 
+string( REGEX REPLACE "([^;]+)" "_impl/\\1" SIXTRACKL_IMPL_HEADERS
                       "${SIXTRACKL_IMPL_HEADERS}" )
-                      
-set( SIXTRACKL_HEADERS 
+
+set( SIXTRACKL_HEADERS
      ${SIXTRACKL_HEADERS} ${SIXTRACKL_IMPL_HEADERS} PARENT_SCOPE )
 

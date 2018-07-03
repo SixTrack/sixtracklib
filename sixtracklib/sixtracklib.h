@@ -32,18 +32,18 @@
 
 #if defined( SIXTRACKLIB_ENABLE_MODULE_SIMD ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_SIMD == 1 )
-    
+
     #include "sixtracklib/simd/track.h"
-           
+
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_SIMD ) */
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
-           
+
     #include "sixtracklib/opencl/ocl_environment.h"
-           
+
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
 
 /* ------------------------------------------------------------------------- */
@@ -51,7 +51,7 @@
 #include "sixtracklib/_impl/namespace_end.h"
 
 #if defined( SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE )
-    #undef __NAMESPACE 
+    #undef __NAMESPACE
     #undef __SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE
 #endif /* defined( SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE ) */
 

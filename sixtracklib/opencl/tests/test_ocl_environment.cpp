@@ -21,27 +21,27 @@ TEST( OpenCLOclEnvironmentTests, BasicUsage )
 {
     std::vector< cl::Platform > platforms;
     cl::Platform::get( &platforms );
-    
+
     st_OclEnvironment ocl_environment;
-    
-    NS(ComputeNodeId) const* nodes_it  = 
+
+    NS(ComputeNodeId) const* nodes_it  =
         st_OclEnvironment_get_available_nodes_begin( &ocl_environment );
-        
-    NS(ComputeNodeId) const* nodes_end = 
+
+    NS(ComputeNodeId) const* nodes_end =
         st_OclEnvironment_get_available_nodes_end( &ocl_environment );
-    
+
     for( ; nodes_it != nodes_end ; ++nodes_it )
     {
-        auto node_info = st_OclEnvironment_get_ptr_node_info( 
+        auto node_info = st_OclEnvironment_get_ptr_node_info(
             &ocl_environment, nodes_it );
-        
+
         ASSERT_TRUE( node_info != nullptr );
-        
-        std::cout 
+
+        std::cout
             << " --------------------------------------------------------\r\n"
-            << "platform_id  : " 
+            << "platform_id  : "
             << st_ComputeNodeInfo_get_platform_id( node_info ) << "\r\n"
-            << "device_id    : " 
+            << "device_id    : "
             << st_ComputeNodeInfo_get_device_id( node_info ) << "\r\n"
             << "\r\n"
             << "architecture : "
@@ -50,10 +50,10 @@ TEST( OpenCLOclEnvironmentTests, BasicUsage )
             << st_ComputeNodeInfo_get_platform( node_info ) << "\r\n"
             << "device name  : "
             << st_ComputeNodeInfo_get_name( node_info ) << "\r\n"
-            << "description  : " 
+            << "description  : "
             << st_ComputeNodeInfo_get_description( node_info ) << "\r\n"
             << "\r\n";
-    }    
+    }
 }
 
 /* end: sixtracklib/opencl/tests/test_ocl_environment.cpp */
