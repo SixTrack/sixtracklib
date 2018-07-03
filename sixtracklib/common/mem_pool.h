@@ -133,7 +133,7 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_remaining_bytes )(
 SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS( MemPool_get_next_begin_offset )(
     const NS( MemPool ) * const pool, SIXTRL_UINT64_T block_alignment );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char* 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char*
 NS( MemPool_get_begin_pos )( NS( MemPool ) * SIXTRL_RESTRICT pool );
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_GLOBAL_DEC unsigned char const*
@@ -194,7 +194,7 @@ SIXTRL_INLINE bool NS(AllocResult_is_aligned)(
     const NS(AllocResult) *const SIXTRL_RESTRICT result,
     SIXTRL_SIZE_T const alignment )
 {
-    static SIXTRL_SIZE_T const ZERO_SIZE = ( SIXTRL_SIZE_T )0u;
+    SIXTRL_STATIC_VAR SIXTRL_SIZE_T const ZERO_SIZE = ( SIXTRL_SIZE_T )0u;
 
     return (
         ( alignment > ZERO_SIZE ) && ( result != 0 ) && ( result->p != 0 ) &&
@@ -278,7 +278,7 @@ SIXTRL_INLINE NS( MemPool ) * NS( MemPool_preset )(
     {
         typedef SIXTRL_GLOBAL_DEC unsigned char* g_ptr_uchar_t;
 
-        static SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
+        SIXTRL_STATIC_VAR SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
 
         pool->buffer        = ( g_ptr_uchar_t )0;
         pool->begin_pos     = ( g_ptr_uchar_t )0;
@@ -319,10 +319,10 @@ SIXTRL_INLINE void NS( MemPool_free )( NS( MemPool ) * SIXTRL_RESTRICT pool )
 {
     if( pool != 0 )
     {
-        #if !defined( _GPUCODE ) 
+        #if !defined( _GPUCODE )
         free( pool->buffer );
-        #endif /* !defined( _GPUCODE ) */   
-        
+        #endif /* !defined( _GPUCODE ) */
+
         NS( MemPool_preset )( pool );
     }
 
@@ -410,9 +410,9 @@ SIXTRL_INLINE SIXTRL_UINT64_T NS( MemPool_get_next_begin_offset )(
 {
     typedef SIXTRL_GLOBAL_DEC unsigned char const* g_ptr_uchar_t;
 
-    SIXTRL_STATIC SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
+    SIXTRL_STATIC_VAR SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
 
-    SIXTRL_STATIC SIXTRL_UINT64_T const U64_MAX =
+    SIXTRL_STATIC_VAR SIXTRL_UINT64_T const U64_MAX =
         ( SIXTRL_UINT64_T )0xffffffffffffffff;
 
     SIXTRL_UINT64_T next_offset = U64_MAX;
@@ -486,9 +486,9 @@ NS( MemPool_append_aligned )( NS( MemPool ) * SIXTRL_RESTRICT pool,
 {
     typedef SIXTRL_GLOBAL_DEC unsigned char* g_ptr_uchar_t;
 
-    static SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
+    SIXTRL_STATIC_VAR SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
 
-    static SIXTRL_UINT64_T const U64_MAX =
+    SIXTRL_STATIC_VAR SIXTRL_UINT64_T const U64_MAX =
         ( SIXTRL_UINT64_T )0xffffffffffffffff;
 
     NS( AllocResult ) result;

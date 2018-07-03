@@ -60,7 +60,7 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(Alignment_calculate_common8)(
 
 SIXTRL_INLINE SIXTRL_UINT64_T NS(log2_floor)( SIXTRL_UINT64_T const x )
 {
-    static SIXTRL_UINT64_T const MAX_TRESHOLD = 0x7FFFFFFFFFFFFFFF;
+    SIXTRL_STATIC_VAR SIXTRL_UINT64_T const MAX_TRESHOLD = 0x7FFFFFFFFFFFFFFF;
     SIXTRL_UINT64_T result = ( SIXTRL_UINT64_T )0u;
 
     if( x > MAX_TRESHOLD )
@@ -69,7 +69,7 @@ SIXTRL_INLINE SIXTRL_UINT64_T NS(log2_floor)( SIXTRL_UINT64_T const x )
     }
     else if( x > ( SIXTRL_UINT64_T )0u )
     {
-        static SIXTRL_UINT64_T const ONE = ( SIXTRL_UINT64_T )1u;
+        SIXTRL_STATIC_VAR SIXTRL_UINT64_T const ONE = ( SIXTRL_UINT64_T )1u;
         SIXTRL_UINT64_T N = ( SIXTRL_UINT64_T )1u;
 
         for( result = 0u ; N < 64 ; result = N++ )
@@ -84,7 +84,7 @@ SIXTRL_INLINE SIXTRL_UINT64_T NS(log2_floor)( SIXTRL_UINT64_T const x )
 
 SIXTRL_INLINE SIXTRL_UINT64_T NS(log2_ceil)( SIXTRL_UINT64_T const x )
 {
-    static SIXTRL_UINT64_T const MAX_FLOOR_N = 63u;
+    SIXTRL_STATIC_VAR SIXTRL_UINT64_T const MAX_FLOOR_N = 63u;
 
     SIXTRL_UINT64_T const floor_result = NS(log2_floor)( x );
     return ( floor_result < MAX_FLOOR_N ) ? floor_result + 1u : floor_result;
@@ -95,7 +95,7 @@ SIXTRL_INLINE SIXTRL_UINT64_T NS(log2_ceil)( SIXTRL_UINT64_T const x )
 SIXTRL_INLINE SIXTRL_UINT64_T NS(greatest_common_divisor)(
     SIXTRL_UINT64_T a, SIXTRL_UINT64_T b )
 {
-    static SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
+    SIXTRL_STATIC_VAR SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
 
     while( ( a != ZERO ) && ( b != ZERO ) )
     {
@@ -114,7 +114,7 @@ SIXTRL_INLINE SIXTRL_UINT64_T NS(greatest_common_divisor)(
 SIXTRL_INLINE SIXTRL_UINT64_T NS(least_common_multiple)(
     SIXTRL_UINT64_T a, SIXTRL_UINT64_T b )
 {
-    static SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
+    SIXTRL_STATIC_VAR SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
     SIXTRL_UINT64_T const gcd = NS(greatest_common_divisor)( a, b );
 
     return ( gcd != ZERO ) ? ( ( a * b ) / gcd ) : ( ZERO );
