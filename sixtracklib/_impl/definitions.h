@@ -23,7 +23,7 @@
             #pragma OPENCL EXTENSION cl_khr_fp64 : enable
         #endif
 
-        #if !defined( SIXTRL_NO_SYSTEM_INCLUDES
+        #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
             #define  SIXTRL_NO_SYSTEM_INCLUDES  1
         #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES */
 
