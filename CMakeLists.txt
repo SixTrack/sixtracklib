@@ -140,4 +140,13 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     add_subdirectory( tests )
 endif()
 
+# ------------------------------------------------------------------------------
 
+if( SIXTRACKL_BUILD_EXAMPLES )
+    add_subdirectory( examples )
+endif()
+
+# ------------------------------------------------------------------------------
+#
+# end: sixtracklib/CMakeLists.txt
+#
