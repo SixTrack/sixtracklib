@@ -189,8 +189,6 @@ int main( int argc, char* argv[] )
         std::cout << "FAILURE" << std::endl << std::endl;
     }
 
-    /*
-
     std::cout << "-------------------------------------------------------"
                  "-------------------------------------------------------\r\n"
               << "Generating beam_beam testdata ["
@@ -209,8 +207,6 @@ int main( int argc, char* argv[] )
         success = false;
         std::cout << "FAILURE" << std::endl << std::endl;
     }
-
-    */
 
     std::cout << "-------------------------------------------------------"
                  "-------------------------------------------------------\r\n"
@@ -841,7 +837,7 @@ namespace st
                 &initial_particles_buffer, num_of_particles );
 
             success &= ( initial_particles != nullptr );
-            st_Particles_random_init( initial_particles );
+            st_Particles_realistic_init( initial_particles );
 
             success &= ( 0 == st_Blocks_init( &result_particles_buffer,
                 num_of_particle_blocks, initial_particles_data_capacity ) );
@@ -886,10 +882,6 @@ namespace st
             double const MAX_ALPHA      = ( +45.0 * M_PI ) / 180.0;
             double const DELTA_ALPHA    = MAX_ALPHA - MIN_ALPHA;
 
-            double const MIN_BB_SIGMA   =   1.0;
-            double const MAX_BB_SIGMA   =  20.0;
-            double const DELTA_BB_SIGMA = MAX_BB_SIGMA - MIN_BB_SIGMA;
-
             std::vector< double > n_part_per_slice( MAX_NUM_SLICES, 0.0 );
             std::vector< double > x_slices_star( MAX_NUM_SLICES, 0.0 );
             std::vector< double > y_slices_star( MAX_NUM_SLICES, 0.0 );
@@ -915,6 +907,7 @@ namespace st
                 double const phi   =
                     MIN_PHI + DELTA_PHI * st_Random_genrand64_real1();
 
+
                 st_BeamBeamBoostData boost_data;
                 st_BeamBeamBoostData_preset( &boost_data );
 
@@ -924,35 +917,22 @@ namespace st
                 st_BeamBeamBoostData_set_salpha( &boost_data, sin( alpha ) );
                 st_BeamBeamBoostData_set_calpha( &boost_data, cos( alpha ) );
 
+                double const sigma_11 = double{  5.0520080285947416e-05 };
+                double const sigma_12 = double{ -6.010204282021668e-07  };
+                double const sigma_13 = double{ -3.652806100753075e-09  };
+                double const sigma_14 = double{  2.6610093044576255e-08 };
+
+                double const sigma_22 = double{  0.0022227616225043104  };
+                double const sigma_23 = double{  3.638671306963995e-08  };
+                double const sigma_24 = double{  1.1594620089159194e-07 };
+
+                double const sigma_33 = double{  5.028688239114574e-05  };
+                double const sigma_34 = double{  7.703697650056183e-07  };
+
+                double const sigma_44 = double{  0.0022330904282531743  };
+
                 st_BeamBeamSigmas sigmas;
                 st_BeamBeamSigmas_preset( &sigmas );
-
-                double const sigma_11 =
-                    MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1();
-
-                double const sigma_12 =
-                    MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1();
-
-                double const sigma_33 =
-                    MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1();
-
-                double const sigma_34 = ( sigma_33 / sigma_11 ) * sigma_12;
-
-                double const sigma_22 =
-                    MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1();
-
-                double const sigma_44 =
-                    MIN_BB_SIGMA + DELTA_BB_SIGMA * st_Random_genrand64_real1();
-
-
-
-                double const sigma_13 = sqrt( 0.5 * sigma_11 * sigma_33 );
-                double const sigma_24 = sqrt( 0.5 * sigma_22 * sigma_44 );
-                double const sigma_14 = sqrt( 0.5 * sigma_11 * sigma_44 );
-
-                double const sigma_23 =
-                    0.25 * ( sigma_12 * sigma_33 + sigma_11 * sigma_34 -
-                        sigma_13 * sigma_14 ) / sigma_13;
 
                 st_BeamBeamSigmas_set_sigma11( &sigmas, sigma_11 );
                 st_BeamBeamSigmas_set_sigma12( &sigmas, sigma_12 );
@@ -1014,7 +994,7 @@ namespace st
                     &beam_elements, &boost_data, &sigmas, num_slices,
                     n_part_per_slice.data(), x_slices_star.data(),
                     y_slices_star.data(), sigma_slices_star.data(),
-                    n_part, 0.0, 1.0 );
+                    n_part, 0.1, 1.0 );
 
                 success &= ( beam_beam != nullptr );
             }
