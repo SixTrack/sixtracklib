@@ -5,22 +5,8 @@
 
 #include <gtest/gtest.h>
 
-#if defined( __NAMESPACE )
-    #define __SAVED_NAMESPACE __NAMESPACE
-    #undef  __NAMESPACE     
-#endif /* !defiend( __NAMESPACE ) */
-
-#if !defined( __NAMESPACE )
-    #define __NAMESPACE st_    
-#endif /* !defiend( __NAMESPACE ) */
-
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/common/mem_pool.h"
-
-#if defined( __SAVED_NAMESPACE )
-    #undef __NAMESPACE
-    #define __NAMESPACE __SAVED_NAMESPACE
-#endif /* defined( __SAVED_NAMESPACE ) */
 
 /* ========================================================================== */
 /* ====  Test basic usage of MemPool: init and free operations */
@@ -133,7 +119,7 @@ TEST( CommonMemPoolTests, AppendSuccess )
 
     num_bytes_to_add = ( chunk_size >> 1 );
     expected_length  =   chunk_size;
-    expected_offset  = st_AllocResult_get_offset( &result ) 
+    expected_offset  = st_AllocResult_get_offset( &result )
                      + st_AllocResult_get_length( &result );
 
     result = st_MemPool_append( &mem_pool, num_bytes_to_add );
@@ -147,10 +133,10 @@ TEST( CommonMemPoolTests, AppendSuccess )
     std::size_t alignment = chunk_size << 1;
     num_bytes_to_add = chunk_size << 2;
     expected_length  = num_bytes_to_add;
-    expected_offset  = st_AllocResult_get_offset( &result ) 
+    expected_offset  = st_AllocResult_get_offset( &result )
                      + st_AllocResult_get_length( &result );
 
-    result = st_MemPool_append_aligned( &mem_pool, num_bytes_to_add, 
+    result = st_MemPool_append_aligned( &mem_pool, num_bytes_to_add,
                                         alignment );
 
     ASSERT_TRUE( st_AllocResult_valid( &result ) );
@@ -162,7 +148,7 @@ TEST( CommonMemPoolTests, AppendSuccess )
     alignment = chunk_size;
     num_bytes_to_add = chunk_size << 1;
     expected_length  = num_bytes_to_add;
-    expected_offset  = st_AllocResult_get_offset( &result ) 
+    expected_offset  = st_AllocResult_get_offset( &result )
                      + st_AllocResult_get_length( &result );
 
     result =
@@ -174,15 +160,15 @@ TEST( CommonMemPoolTests, AppendSuccess )
 
     /* --------------------------------------------------------------------- */
 
-    expected_offset = st_AllocResult_get_offset( &result ) 
+    expected_offset = st_AllocResult_get_offset( &result )
                     + st_AllocResult_get_length( &result );
-    
+
     ASSERT_TRUE( st_MemPool_get_size( &mem_pool ) >= expected_offset );
-    
+
     /* --------------------------------------------------------------------- */
 
     st_MemPool_clear( &mem_pool );
-    
+
     ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool )  != nullptr );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool )   >= capacity );
     ASSERT_TRUE( st_MemPool_get_chunk_size( &mem_pool ) == chunk_size );
@@ -201,53 +187,53 @@ TEST( CommonMemPoolTests, AppendAlignedWithPathologicalAlignment )
 
     static std::uintptr_t const ZERO_ALIGN = std::uintptr_t{ 0 };
     std::size_t const chunk_size = std::size_t{8u};
-    
-    /* we will use a pathological alignment here, so make sure the buffer is 
+
+    /* we will use a pathological alignment here, so make sure the buffer is
      * large enough! */
     std::size_t const capacity = chunk_size * chunk_size * std::size_t{ 2 };
 
     st_MemPool_init( &mem_pool, capacity, chunk_size );
-    
+
     unsigned char* ptr_buffer_begin = st_MemPool_get_begin_pos( &mem_pool );
     ASSERT_TRUE( ptr_buffer_begin != nullptr );
-    
-    std::uintptr_t const buffer_begin_addr = 
+
+    std::uintptr_t const buffer_begin_addr =
         reinterpret_cast< std::uintptr_t >( ptr_buffer_begin );
-        
+
     ASSERT_TRUE( buffer_begin_addr > ZERO_ALIGN );
-    
+
     /* --------------------------------------------------------------------- */
     /* Try to add a non-zero-length block with a "strange" alignment -
-     * it should align to the least common multiple of the provided 
+     * it should align to the least common multiple of the provided
      * alignment and the chunk size to be divisible by both quantities.
-     * 
-     * Note that this is potentially very wasteful with memory, so be 
+     *
+     * Note that this is potentially very wasteful with memory, so be
      * advised to avoid this! */
 
     std::size_t const alignment = chunk_size - std::size_t{ 1 };
-    st_AllocResult const result = 
+    st_AllocResult const result =
         st_MemPool_append_aligned( &mem_pool, chunk_size, alignment );
-    
+
     ASSERT_TRUE( st_AllocResult_valid( &result ) );
-    
+
     unsigned char* ptr_begin    = st_AllocResult_get_pointer( &result );
     uint64_t const block_len    = st_AllocResult_get_length( &result );
     uint64_t const block_offset = st_AllocResult_get_offset( &result );
-    
+
     ASSERT_TRUE( ptr_begin != nullptr );
-    
-    std::uintptr_t const begin_addr = 
+
+    std::uintptr_t const begin_addr =
         reinterpret_cast< std::uintptr_t >( ptr_begin );
-    
+
     ASSERT_TRUE( ( block_offset + buffer_begin_addr ) == begin_addr );
     ASSERT_TRUE( ( begin_addr % chunk_size ) == ZERO_ALIGN );
     ASSERT_TRUE( ( begin_addr % alignment  ) == ZERO_ALIGN );
-    
-    
+
+
     ASSERT_TRUE( block_len <= capacity );
     ASSERT_TRUE( st_MemPool_get_begin_pos( &mem_pool ) != nullptr  );
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool )  >= capacity );
-    
+
     st_MemPool_free( &mem_pool );
 }
 
@@ -383,7 +369,7 @@ TEST( CommonMemPoolTests, AppendFailures )
     ASSERT_TRUE( st_MemPool_get_capacity( &mem_pool )   >= capacity );
     ASSERT_TRUE( st_MemPool_get_chunk_size( &mem_pool ) == chunk_size );
     ASSERT_TRUE( st_MemPool_get_size( &mem_pool )       >= capacity );
-    ASSERT_TRUE( st_MemPool_get_size( &mem_pool )       == 
+    ASSERT_TRUE( st_MemPool_get_size( &mem_pool )       ==
                  st_MemPool_get_capacity( &mem_pool )  );
     ASSERT_TRUE( st_MemPool_get_remaining_bytes( &mem_pool ) == ZERO_SIZE );
 
@@ -392,4 +378,4 @@ TEST( CommonMemPoolTests, AppendFailures )
     st_MemPool_free( &mem_pool );
 }
 
-/* end: sixtracklib/common/tests/test_mem_pool.cpp */
+/* end: tests/sixtracklib/common/test_mem_pool.cpp */

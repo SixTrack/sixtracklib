@@ -11,24 +11,10 @@
 
 #include <gtest/gtest.h>
 
-#if defined( __NAMESPACE )
-    #define __SAVED_NAMESPACE __NAMESPACE
-    #undef  __NAMESPACE
-#endif /* !defiend( __NAMESPACE ) */
-
-#if !defined( __NAMESPACE )
-    #define __NAMESPACE st_
-#endif /* !defiend( __NAMESPACE ) */
-
+#include "sixtracklib/testlib.h"
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/_impl/path.h"
-#include "sixtracklib/_impl/testdata_files.h"
 #include "sixtracklib/common/impl/faddeeva.h"
-
-#if defined( __SAVED_NAMESPACE )
-    #undef __NAMESPACE
-    #define __NAMESPACE __SAVED_NAMESPACE
-#endif /* defined( __SAVED_NAMESPACE ) */
 
 TEST( CommonFaddeevaErrfnTests, CompareWCern355WithTabulatedValues )
 {
@@ -127,4 +113,4 @@ TEST( CommonFaddeevaErrfnTests, CompareWCern355WithTabulatedValues )
     }
 }
 
-/* end: sixtracklib/common/tests/test_faddeeva_errf.cpp */
+/* end: tests/sixtracklib/common/test_faddeeva_errf.cpp */

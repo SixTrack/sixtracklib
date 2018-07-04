@@ -1,4 +1,4 @@
-#define _USE_MATH_DEFINES 
+#define _USE_MATH_DEFINES
 
 #include <algorithm>
 #include <cstddef>
@@ -11,32 +11,14 @@
 
 #include <gtest/gtest.h>
 
-#if defined( __NAMESPACE )
-    #define __SAVED_NAMESPACE __NAMESPACE
-    #undef  __NAMESPACE     
-#endif /* !defiend( __NAMESPACE ) */
-
-#if !defined( __NAMESPACE )
-    #define __NAMESPACE st_    
-#endif /* !defiend( __NAMESPACE ) */
-
+#include "sixtracklib/testlib.h"
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/_impl/path.h"
-#include "sixtracklib/_impl/testdata_files.h"
 
 #include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/track.h"
-#include "sixtracklib/common/details/random.h"
-
-#include "sixtracklib/common/tests/test_particles_tools.h"
-#include "sixtracklib/common/tests/test_track_tools.h"
-
-#if defined( __SAVED_NAMESPACE )
-    #undef __NAMESPACE
-    #define __NAMESPACE __SAVED_NAMESPACE
-#endif /* defined( __SAVED_NAMESPACE ) */
 
 /* ************************************************************************* */
 /* *****                TESTS FOR BEAM_ELEMENT DRIFT                   ***** */
@@ -56,11 +38,11 @@
 
 TEST( CommonTrackTests, TrackDriftParticle )
 {
-    bool const success = 
-        ::st_TestData_test_tracking_single_particle_over_specific_be_type< 
-            st_Drift >( st_PATH_TO_TEST_TRACKING_DRIFT_DATA, 
+    bool const success =
+        ::st_TestData_test_tracking_single_particle_over_specific_be_type<
+            st_Drift >( st_PATH_TO_TEST_TRACKING_DRIFT_DATA,
                         st_Track_drift_particle );
-        
+
     ASSERT_TRUE( success );
 }
 
@@ -79,10 +61,10 @@ TEST( CommonTrackTests, TrackDriftParticle )
 TEST( CommonTrackTests, TrackDrift )
 {
     bool const success =
-        ::st_TestData_test_tracking_particles_over_specific_be_type< 
-            st_Drift >( st_PATH_TO_TEST_TRACKING_DRIFT_DATA, 
+        ::st_TestData_test_tracking_particles_over_specific_be_type<
+            st_Drift >( st_PATH_TO_TEST_TRACKING_DRIFT_DATA,
                         st_Track_drift );
-        
+
     ASSERT_TRUE( success );
 }
 
@@ -103,7 +85,7 @@ TEST( CommonTrackTests, TrackBeamElementParticleForDrift )
 {
     bool const success = ::st_TestData_test_tracking_single_particle(
         st_PATH_TO_TEST_TRACKING_DRIFT_DATA );
-    
+
     ASSERT_TRUE( success );
 }
 
@@ -124,7 +106,7 @@ TEST( CommonTrackTests, TrackBeamElementForDrift )
 {
     bool const success = ::st_TestData_test_tracking_particles(
         st_PATH_TO_TEST_TRACKING_DRIFT_DATA );
-    
+
     ASSERT_TRUE( success );
 }
 
@@ -146,11 +128,11 @@ TEST( CommonTrackTests, TrackBeamElementForDrift )
 
 TEST( CommonTrackTests, TrackDriftExactParticle )
 {
-    bool const success = 
-        ::st_TestData_test_tracking_single_particle_over_specific_be_type< 
-            st_DriftExact >( st_PATH_TO_TEST_TRACKING_DRIFT_EXACT_DATA, 
+    bool const success =
+        ::st_TestData_test_tracking_single_particle_over_specific_be_type<
+            st_DriftExact >( st_PATH_TO_TEST_TRACKING_DRIFT_EXACT_DATA,
                         st_Track_drift_exact_particle );
-        
+
     ASSERT_TRUE( success );
 }
 
@@ -169,10 +151,10 @@ TEST( CommonTrackTests, TrackDriftExactParticle )
 TEST( CommonTrackTests, TrackDriftExact )
 {
     bool const success =
-        ::st_TestData_test_tracking_particles_over_specific_be_type< 
-            st_DriftExact >( st_PATH_TO_TEST_TRACKING_DRIFT_EXACT_DATA, 
+        ::st_TestData_test_tracking_particles_over_specific_be_type<
+            st_DriftExact >( st_PATH_TO_TEST_TRACKING_DRIFT_EXACT_DATA,
                         st_Track_drift_exact );
-        
+
     ASSERT_TRUE( success );
 }
 
@@ -193,7 +175,7 @@ TEST( CommonTrackTests, TrackBeamElementParticleForDriftExact )
 {
     bool const success = ::st_TestData_test_tracking_single_particle(
         st_PATH_TO_TEST_TRACKING_DRIFT_EXACT_DATA );
-    
+
     ASSERT_TRUE( success );
 }
 
@@ -214,7 +196,7 @@ TEST( CommonTrackTests, TrackBeamElementForDriftExact )
 {
     bool const success = ::st_TestData_test_tracking_particles(
         st_PATH_TO_TEST_TRACKING_DRIFT_EXACT_DATA );
-    
+
     ASSERT_TRUE( success );
 }
 
@@ -236,11 +218,11 @@ TEST( CommonTrackTests, TrackBeamElementForDriftExact )
 
 TEST( CommonTrackTests, TrackMultiPoleParticle )
 {
-    bool const success = 
-        ::st_TestData_test_tracking_single_particle_over_specific_be_type< 
-            st_MultiPole >( st_PATH_TO_TEST_TRACKING_MULTIPOLE_DATA, 
+    bool const success =
+        ::st_TestData_test_tracking_single_particle_over_specific_be_type<
+            st_MultiPole >( st_PATH_TO_TEST_TRACKING_MULTIPOLE_DATA,
                         st_Track_multipole_particle );
-        
+
     ASSERT_TRUE( success );
 }
 
@@ -259,10 +241,10 @@ TEST( CommonTrackTests, TrackMultiPoleParticle )
 TEST( CommonTrackTests, TrackMultiPole )
 {
     bool const success =
-        ::st_TestData_test_tracking_particles_over_specific_be_type< 
-            st_MultiPole >( st_PATH_TO_TEST_TRACKING_MULTIPOLE_DATA, 
+        ::st_TestData_test_tracking_particles_over_specific_be_type<
+            st_MultiPole >( st_PATH_TO_TEST_TRACKING_MULTIPOLE_DATA,
                         st_Track_multipole );
-        
+
     ASSERT_TRUE( success );
 }
 
@@ -283,7 +265,7 @@ TEST( CommonTrackTests, TrackBeamElementParticleForMultiPole )
 {
     bool const success = ::st_TestData_test_tracking_single_particle(
         st_PATH_TO_TEST_TRACKING_MULTIPOLE_DATA );
-    
+
     ASSERT_TRUE( success );
 }
 
@@ -304,8 +286,8 @@ TEST( CommonTrackTests, TrackBeamElementForMultiPole )
 {
     bool const success = ::st_TestData_test_tracking_particles(
         st_PATH_TO_TEST_TRACKING_MULTIPOLE_DATA );
-    
+
     ASSERT_TRUE( success );
 }
 
-/* end: sixtracklib/common/tests/test_particles.cpp */
+/* end: tests/sixtracklib/common/test_particles.cpp */
