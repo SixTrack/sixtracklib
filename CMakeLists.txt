@@ -100,8 +100,44 @@ endif()
 # ==============================================================================
 # build libraries and modules:
 
-include_directories( ${CMAKE_SOURCE_DIR} )
+# ------------------------------------------------------------------------------
+# sixtracklib: C/C++ library
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# CPU/System architecture settings:
+
+set( SIXTRACKLIB_CPU_FLAGS )
+
+if( SIXTRACKL_CPU_ARCH MATCHES "avx" )
+    message( STATUS "---- Optimizing for AVX architecture" )
+    set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -mavx )
+
+elseif( SIXTRACKL_CPU_ARCH MATCHES "sse2" )
+    message( STATUS "---- Optimizing for SSE2 architecture" )
+    set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -msse2  )
+
+elseif( SIXTRACKL_CPU_ARCH MATCHES "native" )
+    message( STATUS "---- Optimizing for native environment of the CPU" )
+    set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -march=native  )
+
+endif()
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# C Namespace handling:
+
+if( SIXTRACKL_C_NAMESPACE_PREFIX )
+    set( SIXTRACKLIB_NAMESPACE_FLAGS
+         "-D__NAMESPACE=${SIXTRACKL_C_NAMESPACE_PREFIX}" )
+else()
+    set( SIXTRACKLIB_NAMESPACE_FLAGS "-D__NAMESPACE=st_" )
+endif()
 
 add_subdirectory( sixtracklib )
 
 # ------------------------------------------------------------------------------
+
+if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
+    add_subdirectory( tests )
+endif()
+
+
