@@ -236,11 +236,9 @@ int main( int argc, char* argv[] )
               << "Generating align testdata ["
               << st_PATH_TO_TEST_TRACKING_ALIGN_DATA << "] .... ";
 
-    if( st::create_testdata_cavity(
-            NUM_OF_TURNS, NUM_OF_PARTICLES, NUM_OF_BEAM_ELEMENTS,
-            GENERATE_ELEM_BY_ELEM_DATA,
-            st_PATH_TO_TEST_TRACKING_ALIGN_DATA,
-            PRNG_SEED ) )
+    if( st::create_testdata_align( NUM_OF_TURNS, NUM_OF_PARTICLES,
+            NUM_OF_BEAM_ELEMENTS, GENERATE_ELEM_BY_ELEM_DATA,
+            st_PATH_TO_TEST_TRACKING_ALIGN_DATA, PRNG_SEED ) )
     {
         std::cout << "SUCCESS" << std::endl << std::endl;
     }
