@@ -382,8 +382,6 @@ TEST( CommonTrackTests, TrackBeamElementForAlign )
     ASSERT_TRUE( success );
 }
 
-
-
 /* ************************************************************************* */
 /* *****               TESTS FOR BEAM_ELEMENT CAVITY                   ***** */
 /* ************************************************************************* */
@@ -470,6 +468,97 @@ TEST( CommonTrackTests, TrackBeamElementForCavity )
 {
     bool const success = ::st_TestData_test_tracking_particles(
         st_PATH_TO_TEST_TRACKING_CAVITY_DATA );
+
+    ASSERT_TRUE( success );
+}
+
+/* ************************************************************************* */
+/* *****             TESTS FOR BEAM_ELEMENT BEAM_BEAM                  ***** */
+/* ************************************************************************* */
+
+/* ========================================================================= */
+/* ====   Test using the beam_beam-only testdata file and call          ==== */
+/* ====   the minimal st_Track_beam_beam_particle() func. from track.h  ==== */
+/* ====   manually -> i.e. do everything by hand, incl. elem_by_elem io ==== */
+/* ====                                                                 ==== */
+/* ====   Since this has to be repeated for each and every BeamElement, ==== */
+/* ====   and to avoid code duplication even in the unit-tests, cf.     ==== */
+/* ====   the sixtracklib/common/tests/test_track_tools.h file for the  ==== */
+/* ====   declaration and definition of the helper function which       ==== */
+/* ====   contains the whole unit-test!                                 ==== */
+/* ========================================================================= */
+
+TEST( CommonTrackTests, TrackBeamBeamParticle )
+{
+    bool const success =
+        ::st_TestData_test_tracking_single_particle_over_specific_be_type<
+            st_BeamBeam >( st_PATH_TO_TEST_TRACKING_BEAM_BEAM_DATA,
+                        st_Track_beam_beam_particle );
+
+    ASSERT_TRUE( success );
+}
+
+/* ========================================================================= */
+/* ====   Test using the beam_beam-only testdata file and call          ==== */
+/* ====   st_Track_beam_beam()  from track_api.h. Expected are same     ==== */
+/* ====   results as from st_Track_beam_beam()                          ==== */
+/* ====                                                                 ==== */
+/* ====   Since this has to be repeated for each and every BeamElement, ==== */
+/* ====   and to avoid code duplication even in the unit-tests, cf.     ==== */
+/* ====   the sixtracklib/common/tests/test_track_tools.h file for the  ==== */
+/* ====   declaration and definition of the helper function which       ==== */
+/* ====   contains the whole unit-test!                                 ==== */
+/* ========================================================================= */
+
+TEST( CommonTrackTests, TrackBeamBeam )
+{
+    bool const success =
+        ::st_TestData_test_tracking_particles_over_specific_be_type<
+            st_BeamBeam >( st_PATH_TO_TEST_TRACKING_BEAM_BEAM_DATA,
+                        st_Track_beam_beam );
+
+    ASSERT_TRUE( success );
+}
+
+/* ========================================================================= */
+/* ====   Test using the beam_beam-only testdata file and call          ==== */
+/* ====   st_Track_beam_elements_particle() function from track_api.h.  ==== */
+/* ====   Expected are same results as f. st_Track_beam_beam_particle() ==== */
+/* ====                                                                 ==== */
+/* ====   Since this has to be repeated for each and every BeamElement, ==== */
+/* ====   and to avoid code duplication even in the unit-tests, cf.     ==== */
+/* ====   the sixtracklib/common/tests/test_track_tools.h and           ==== */
+/* ====   sixtracklib/common/tests/test_track_tools.c files for the     ==== */
+/* ====   declaration and definition of the helper functionm which      ==== */
+/* ====   contains the whole unit-test, respectively!                   ==== */
+/* ========================================================================= */
+
+TEST( CommonTrackTests, TrackBeamElementParticleForBeamBeam )
+{
+    bool const success = ::st_TestData_test_tracking_single_particle(
+        st_PATH_TO_TEST_TRACKING_BEAM_BEAM_DATA );
+
+    ASSERT_TRUE( success );
+}
+
+/* ========================================================================= */
+/* ====   Test using the beam_beam-only testdata file and call          ==== */
+/* ====   st_Track_beam_elements_particle() function from track_api.h.  ==== */
+/* ====   Expected are same results as from                             ==== */
+/* ====   st_Track_beam_beam_particle()                                 ==== */
+/* ====                                                                 ==== */
+/* ====   Since this has to be repeated for each and every BeamElement, ==== */
+/* ====   and to avoid code duplication even in the unit-tests, cf.     ==== */
+/* ====   the sixtracklib/common/tests/test_track_tools.h and           ==== */
+/* ====   sixtracklib/common/tests/test_track_tools.c files for the     ==== */
+/* ====   declaration and definition of the helper functionm which      ==== */
+/* ====   contains the whole unit-test, respectively!                   ==== */
+/* ========================================================================= */
+
+TEST( CommonTrackTests, TrackBeamElementForBeamBeam )
+{
+    bool const success = ::st_TestData_test_tracking_particles(
+        st_PATH_TO_TEST_TRACKING_BEAM_BEAM_DATA );
 
     ASSERT_TRUE( success );
 }
