@@ -121,7 +121,7 @@ set( SIXTRACKL_HEADERS
 
 set( SIXTRACKL_HEADERS
      ${SIXTRACKL_HEADERS}
-     modules.h
-     path.h
+     ${MODULES_H_OUT_PATH}
+     ${PATH_H_OUT_PATH}
      PARENT_SCOPE
 )
