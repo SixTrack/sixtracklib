@@ -42,6 +42,16 @@
 
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+#if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
+           ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
+
+    #include "sixtracklib/cuda/cuda_env.h"
+
+#endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
+
+
 /* ------------------------------------------------------------------------- */
 
 #if defined( SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE )
