@@ -693,7 +693,7 @@ TEST( CommonTestsBeamElements,
             &beam_elements, &boost_data, &sigmas, num_slices,
             n_part_per_slice.data(), x_slices_star.data(),
             y_slices_star.data(), sigma_slices_star.data(),
-            n_part, 0.0, 1.0 );
+            n_part, 0.1, 1.0 );
 
         ASSERT_TRUE( beam_beam_ptrs[ ii ] != nullptr );
 
