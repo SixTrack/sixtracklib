@@ -24,10 +24,6 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/impl/particles_api.h"
 
-/* Not optimal having these two as part of the public library interface -> fix this! */
-#include "sixtracklib/common/details/random.h"
-#include "sixtracklib/common/tests/test_particles_tools.h"
-
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #if defined( SIXTRACKLIB_ENABLE_MODULE_SIMD ) && \
@@ -48,9 +44,9 @@
 
 /* ------------------------------------------------------------------------- */
 
-#include "sixtracklib/_impl/namespace_end.h"
-
 #if defined( SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE )
+    #include "sixtracklib/_impl/namespace_end.h"
+
     #undef __NAMESPACE
     #undef __SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE
 #endif /* defined( SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE ) */
