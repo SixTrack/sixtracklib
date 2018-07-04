@@ -16,17 +16,18 @@
 
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/_impl/path.h"
-#include "sixtracklib/_impl/testdata_files.h"
 
 #include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/track.h"
 
-#include "sixtracklib/common/details/gpu_kernel_tools.h"
-#include "sixtracklib/common/tests/test_particles_tools.h"
-#include "sixtracklib/common/tests/test_track_tools.h"
 #include "sixtracklib/opencl/ocl_environment.h"
+
+#include "sixtracklib/testlib/gpu_kernel_tools.h"
+#include "sixtracklib/testlib/test_particles_tools.h"
+#include "sixtracklib/testlib/test_track_tools.h"
+#include "sixtracklib/testlib/testdata_files.h"
 
 /* ========================================================================= */
 /* =====  track drifts of constant length                                    */
@@ -329,4 +330,4 @@ TEST( OpenCLTrackTests, TrackDrifts )
 /* ************************************************************************* */
 
 
-/* end: sixtracklib/opencl/tests/test_track.cpp */
+/* end: tests/sixtracklib/opencl/test_track.cpp */

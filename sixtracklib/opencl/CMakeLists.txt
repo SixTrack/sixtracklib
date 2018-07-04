@@ -26,12 +26,4 @@ target_compile_definitions( sixtrack_opencl PUBLIC
 target_compile_options( sixtrack_opencl BEFORE PUBLIC
         ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic -ansi )
 
-if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
-    add_subdirectory( tests )
-endif()
-
-if( SIXTRACKL_ENABLE_TIMING_TESTS )
-    add_subdirectory( tests_benchmark )
-endif()
-
 # end: sixtracklib/opencl/CMakeLists.txt

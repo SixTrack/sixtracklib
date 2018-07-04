@@ -29,6 +29,8 @@ add_library( sixtrack_cuda_host OBJECT
 target_compile_definitions( sixtrack_cuda_host
     PUBLIC ${SIXTRACKL_CUDA_HOST_DEFINITIONS} )
 
+target_include_directories( sixtrack_cuda_host PUBLIC ${CMAKE_SOURCE_DIR} )
+
 # ------------------------------------------------------------------------------
 # --- CUDA Kernel object library:
 
@@ -53,6 +55,8 @@ add_library( sixtrack_cuda_kernel OBJECT
 
 target_compile_definitions( sixtrack_cuda_kernel
     PUBLIC ${SIXTRACKL_CUDA_KERNEL_DEFINITIONS} )
+
+target_include_directories( sixtrack_cuda_kernel PUBLIC ${CMAKE_SOURCE_DIR} )
 
 # ------------------------------------------------------------------------------
 
@@ -82,12 +86,4 @@ set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
 set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
               PROPERTY CUDA_STANDARD_REQUIRED 11 )
 
-# ------------------------------------------------------------------------------
-
-if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
-    add_subdirectory( tests )
-endif()
-
-# ------------------------------------------------------------------------------
-# set( CUDA_PROPAGATE_HOST_FLAGS ${SAVED_CUDA_PROPAGATE_HOST_FLAGS} )
-
+# end: sixtracklib/cuda/CMakeLists.txt
