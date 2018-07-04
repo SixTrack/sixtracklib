@@ -1,4 +1,4 @@
-#include "sixtracklib/common/tests/test_track_tools.h"
+#include "sixtracklib/testlib/test_track_tools.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -14,8 +14,8 @@
 #include "sixtracklib/common/track.h"
 #include "sixtracklib/common/impl/track_api.h"
 
-#include "sixtracklib/common/details/random.h"
-#include "sixtracklib/common/tests/test_particles_tools.h"
+#include "sixtracklib/testlib/random.h"
+#include "sixtracklib/testlib/test_particles_tools.h"
 
 extern bool NS(Tracks_store_testdata_to_binary_file)(
         uint64_t const num_of_turns,
@@ -916,4 +916,4 @@ bool NS(TestData_test_tracking_particles)(
     return success;
 }
 
-/* end: sixtracklib/common/tests/test_track_tools.c */
+/* end: tests/sixtracklib/testlib/details/test_track_tools.c */

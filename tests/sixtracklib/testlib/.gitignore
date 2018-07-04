@@ -1,0 +1,2 @@
+testdata_files.h*
+!testdata_files.h.template

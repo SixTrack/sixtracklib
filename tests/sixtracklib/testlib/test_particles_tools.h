@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_TESTS_TEST_PARTICLES_TOOLS_H__
-#define SIXTRACKLIB_COMMON_TESTS_TEST_PARTICLES_TOOLS_H__
+#ifndef SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TEST_PARTICLES_TOOLS_H__
+#define SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TEST_PARTICLES_TOOLS_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdio.h>
@@ -91,6 +91,6 @@ void NS(Particles_buffer_print_max_diff)(
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_COMMON_TESTS_TEST_PARTICLES_TOOLS_H__ */
+#endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TEST_PARTICLES_TOOLS_H__ */
 
-/* end: sixtracklib/common/tests/test_particles_tools.h */
+/* end: tests/sixtracklib/testlib/test_particles_tools.h */
