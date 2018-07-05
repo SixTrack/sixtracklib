@@ -24,6 +24,8 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/impl/particles_api.h"
 
+#include "sixtracklib/common/track.h"
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #if defined( SIXTRACKLIB_ENABLE_MODULE_SIMD ) && \
