@@ -16,6 +16,7 @@ extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p );
+void NS(Particles_realistic_init)( NS(Particles)* SIXTRL_RESTRICT p );
 
 /* ------------------------------------------------------------------------- */
 

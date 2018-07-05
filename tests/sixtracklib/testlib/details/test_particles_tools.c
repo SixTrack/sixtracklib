@@ -15,6 +15,7 @@
 #include "sixtracklib/testlib/random.h"
 
 extern void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p );
+extern void NS(Particles_realistic_init)( NS(Particles)* SIXTRL_RESTRICT p );
 
 /* ------------------------------------------------------------------------- */
 
@@ -309,6 +310,67 @@ void NS(compare_int64_sequences_and_get_max_difference)(
 
 /* ------------------------------------------------------------------------- */
 
+void NS(Particles_realistic_init)( NS(Particles)* SIXTRL_RESTRICT p )
+{
+    SIXTRL_SIZE_T const NUM_PARTICLES = NS(Particles_get_num_particles)( p );
+
+    if( ( p != 0 ) && ( NUM_PARTICLES > ( SIXTRL_SIZE_T )0u ) )
+    {
+        SIXTRL_SIZE_T ii;
+        SIXTRL_INT64_T particle_id = 0;
+
+        SIXTRL_REAL_T const Q0     = ( SIXTRL_REAL_T )1.0;
+        SIXTRL_REAL_T const MASS0  = ( SIXTRL_REAL_T )938272013.0;
+        SIXTRL_REAL_T const BETA0  = ( SIXTRL_REAL_T )0.9999999895816052;
+        SIXTRL_REAL_T const GAMMA0 = ( SIXTRL_REAL_T )6927.628566067013;
+        SIXTRL_REAL_T const P0C    = ( SIXTRL_REAL_T )6499999932280.434;
+
+        SIXTRL_REAL_T const S      = ( SIXTRL_REAL_T )0.0;
+        SIXTRL_REAL_T const X0     = ( SIXTRL_REAL_T )0.0007145746958428162;
+        SIXTRL_REAL_T const Y      = ( SIXTRL_REAL_T )0.0006720936794100408;
+        SIXTRL_REAL_T const PX     = ( SIXTRL_REAL_T )-1.7993573732749124e-05;
+        SIXTRL_REAL_T const PY     = ( SIXTRL_REAL_T )7.738322282156584e-06;
+        SIXTRL_REAL_T const SIGMA  = ( SIXTRL_REAL_T )1.700260986257983e-05;
+        SIXTRL_REAL_T const PSIGMA = ( SIXTRL_REAL_T )0.00027626172996313825;
+        SIXTRL_REAL_T const DELTA  = ( SIXTRL_REAL_T )0.00027626172996228097;
+        SIXTRL_REAL_T const RPP    = ( SIXTRL_REAL_T )0.9997238145695025;
+        SIXTRL_REAL_T const RVV    = ( SIXTRL_REAL_T )0.999999999994246;
+        SIXTRL_REAL_T const CHI    = ( SIXTRL_REAL_T )1.0;
+
+        SIXTRL_REAL_T const DELTA_X = ( SIXTRL_REAL_T )1e-9;
+
+        for( ii = 0 ; ii < NUM_PARTICLES ; ++ii, ++particle_id )
+        {
+            SIXTRL_REAL_T const X = X0 + DELTA_X * ii;
+
+            NS(Particles_set_q0_value)(                 p, ii, Q0 );
+            NS(Particles_set_mass0_value)(              p, ii, MASS0 );
+            NS(Particles_set_beta0_value)(              p, ii, BETA0 );
+            NS(Particles_set_gamma0_value)(             p, ii, GAMMA0 );
+            NS(Particles_set_p0c_value)(                p, ii, P0C );
+
+            NS(Particles_set_particle_id_value)(        p, ii, particle_id );
+            NS(Particles_set_lost_at_element_id_value)( p, ii, -1 );
+            NS(Particles_set_lost_at_turn_value)(       p, ii, -1 );
+            NS(Particles_set_state_value)(              p, ii,  0 );
+
+            NS(Particles_set_s_value)(                  p, ii, S );
+            NS(Particles_set_x_value)(                  p, ii, X );
+            NS(Particles_set_y_value)(                  p, ii, Y );
+            NS(Particles_set_px_value)(                 p, ii, PX );
+            NS(Particles_set_py_value)(                 p, ii, PY );
+            NS(Particles_set_sigma_value)(              p, ii, SIGMA );
+
+            NS(Particles_set_psigma_value)(             p, ii, PSIGMA );
+            NS(Particles_set_delta_value)(              p, ii, DELTA );
+            NS(Particles_set_rpp_value)(                p, ii, RPP );
+            NS(Particles_set_rvv_value)(                p, ii, RVV );
+            NS(Particles_set_chi_value)(                p, ii, CHI );
+        }
+    }
+
+    return;
+}
 
 void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
 {

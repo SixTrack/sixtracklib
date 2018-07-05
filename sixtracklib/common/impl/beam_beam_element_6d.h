@@ -65,6 +65,7 @@ SIXTRL_FN SIXTRL_STATIC int NS(BeamBeam_get_transverse_fields_gauss_elliptical)(
 /* ========================================================================= */
 
 #if !defined ( SIXTRL_NO_SYSTEM_INCLUDES )
+    #include <math.h>
     #include <stddef.h>
     #include <stdint.h>
     #include <stdlib.h>
@@ -161,14 +162,24 @@ SIXTRL_INLINE int NS(BeamBeam_boost_particle)(
 
     #if !defined( NDEBUG ) && !defined( __CUDACC__ )
 
+    SIXTRL_ASSERT( ( isfinite( x     ) ) && ( isfinite( y     ) ) &&
+                   ( isfinite( px    ) ) && ( isfinite( py    ) ) &&
+                   ( isfinite( sigma ) ) && ( isfinite( delta ) ) );
+
     SIXTRL_ASSERT( ( ( cos_phi > ZERO ) && (  cos_phi > MIN_EPS ) ) ||
                    ( ( cos_phi < ZERO ) && ( -cos_phi > MIN_EPS ) ) );
 
-    SIXTRL_ASSERT( ( ( pz_star > ZERO ) && (  pz_star > MIN_EPS ) ) ||
-                   ( ( pz_star < ZERO ) && ( -pz_star > MIN_EPS ) ) );
-
-    SIXTRL_ASSERT( h_sqrt_arg  > ZERO );
     SIXTRL_ASSERT( pz_star_squ > ZERO );
+    SIXTRL_ASSERT( h_sqrt_arg  > ZERO );
+
+    SIXTRL_ASSERT( ( isfinite( pz_star ) ) &&
+                   ( ( ( pz_star > ZERO ) && (  pz_star > MIN_EPS ) ) ||
+                     ( ( pz_star < ZERO ) && ( -pz_star > MIN_EPS ) ) ) );
+
+    SIXTRL_ASSERT( ( isfinite( x_star     ) ) && ( isfinite( y_star     ) ) &&
+                   ( isfinite( px_star    ) ) && ( isfinite( py_star    ) ) &&
+                   ( isfinite( sigma_star ) ) && ( isfinite( delta_star ) ) );
+
 
     #endif /* !defined( NDEBUG ) && !defined( __CUDACC__ ) */
 
@@ -279,16 +290,26 @@ SIXTRL_INLINE int NS(BeamBeam_inv_boost_particle)(
 
     #if !defined( NDEBUG ) && !defined( __CUDACC__ )
 
+    SIXTRL_ASSERT( ( isfinite( x_star     ) ) && ( isfinite( y_star     ) ) &&
+                   ( isfinite( px_star    ) ) && ( isfinite( py_star    ) ) &&
+                   ( isfinite( sigma_star ) ) && ( isfinite( delta_star ) ) );
+
     SIXTRL_ASSERT( ( ( cos_phi > ZERO ) && (  cos_phi > MIN_EPS ) ) ||
                    ( ( cos_phi < ZERO ) && ( -cos_phi > MIN_EPS ) ) );
 
-    SIXTRL_ASSERT( ( ( pz_star > ZERO ) && (  pz_star > MIN_EPS ) ) ||
-                   ( ( pz_star < ZERO ) && ( -pz_star > MIN_EPS ) ) );
-
-    SIXTRL_ASSERT( ( ( det_L   > ZERO ) && (  det_L   > MIN_EPS ) ) ||
-                   ( ( det_L   < ZERO ) && ( -det_L   > MIN_EPS ) ) );
-
     SIXTRL_ASSERT( pz_star_squ > ZERO );
+
+    SIXTRL_ASSERT( ( isfinite( pz_star ) ) &&
+                   ( ( ( pz_star > ZERO ) && (  pz_star > MIN_EPS ) ) ||
+                     ( ( pz_star < ZERO ) && ( -pz_star > MIN_EPS ) ) ) );
+
+    SIXTRL_ASSERT( ( isfinite( det_L ) ) &&
+                   ( ( ( det_L   > ZERO ) && (  det_L   > MIN_EPS ) ) ||
+                     ( ( det_L   < ZERO ) && ( -det_L   > MIN_EPS ) ) ) );
+
+    SIXTRL_ASSERT( ( isfinite( x     ) ) && ( isfinite( y     ) ) &&
+                   ( isfinite( px    ) ) && ( isfinite( py    ) ) &&
+                   ( isfinite( sigma ) ) && ( isfinite( delta ) ) );
 
     #endif /* !defined( NDEBUG ) && !defined( __CUDACC__ ) */
 
@@ -461,7 +482,8 @@ SIXTRL_INLINE int NS(BeamBeam_propagate_sigma_matrix)(
         SIXTRL_REAL_T const dS_cos2theta = SIGN_R * ( dS_R / SQRT_T -
             dS_T * R / ( TWO * SQRT_T * SQRT_T * SQRT_T ) );
 
-        SIXTRL_ASSERT( W >= SQRT_T );
+        SIXTRL_ASSERT( ( isfinite( W ) ) && ( isfinite( SQRT_T ) ) &&
+                       ( W >= SQRT_T ) );
 
         result.cos_theta    = cos_theta;
         result.sin_theta    = sin_theta;
@@ -483,9 +505,13 @@ SIXTRL_INLINE int NS(BeamBeam_propagate_sigma_matrix)(
             ONE_HALF * ( dS_W - ONE_HALF * SIGN_R * dS_T / SQRT_T  );
     }
 
-    SIXTRL_ASSERT( T >= ZERO );
-    SIXTRL_ASSERT( result.sigma_11_hat >= ZERO );
-    SIXTRL_ASSERT( result.sigma_33_hat >= ZERO );
+    SIXTRL_ASSERT( ( isfinite( T ) ) && ( T >= ZERO ) );
+
+    SIXTRL_ASSERT( ( isfinite( result.sigma_11_hat ) ) &&
+                   ( result.sigma_11_hat >= ZERO ) );
+
+    SIXTRL_ASSERT( ( isfinite( result.sigma_33_hat ) ) &&
+                   ( result.sigma_33_hat >= ZERO ) );
 
     *ptr_result       = result;
     *ptr_deriv_result = deriv_result;
@@ -587,6 +613,8 @@ SIXTRL_INLINE int NS(BeamBeam_get_transverse_fields)(
     *ex_component = Ex;
     *ey_component = Ey;
 
+    SIXTRL_ASSERT( ( isfinite( Ex ) ) && ( isfinite( Ey ) ) );
+
     return ret;
 }
 
@@ -617,6 +645,9 @@ SIXTRL_INLINE int NS(BeamBeam_get_transverse_fields_gauss_round)(
 
     *ex_component = temp * diff_x;
     *ey_component = temp * diff_y;
+
+    SIXTRL_ASSERT( ( isfinite( *ex_component ) ) &&
+                   ( isfinite( *ey_component ) ) );
 
     return ret;
 }
@@ -713,6 +744,9 @@ SIXTRL_INLINE int NS(BeamBeam_get_transverse_fields_gauss_elliptical)(
         *ex_component = ( x >= delta_x ) ? temp_re : -temp_re;
         *ey_component = ( y >= delta_y ) ? temp_im : -temp_im;
     }
+
+    SIXTRL_ASSERT( ( isfinite( *ex_component ) ) &&
+                   ( isfinite( *ey_component ) ) );
 
     return ret;
 }
