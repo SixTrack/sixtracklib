@@ -402,8 +402,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements)(
 
     SIXTRL_GLOBAL_DEC NS(BlockInfo)* io_block_it = elem_by_elem_info_begin;
 
-    SIXTRL_ASSERT( ( beam_elements != 0 ) && ( particles != 0 ) &&
-                   ( be_block_it   != 0 ) );
+    SIXTRL_ASSERT( ( beam_elements != 0 ) && ( particles != 0 ) );
 
     if( io_block_it == 0 )
     {

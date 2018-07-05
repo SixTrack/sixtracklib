@@ -721,11 +721,11 @@ SIXTRL_INLINE int NS(BeamBeam_get_transverse_fields_gauss_elliptical)(
             sqrt( ( SIXTRL_REAL_T )2.0 * HALF_S_SQU );
 
         factBE    *= INV_S;
-        eta_be_re   = ( sigma_y / sigma_x * abs_diff_x ) * INV_S;
-        eta_be_im   = ( sigma_x / sigma_y * abs_diff_y ) * INV_S;
+        eta_be_re  = ( sigma_y / sigma_x * abs_diff_x ) * INV_S;
+        eta_be_im  = ( sigma_x / sigma_y * abs_diff_y ) * INV_S;
 
-        zeta_be_re  = abs_diff_x * INV_S;
-        zeta_be_im  = abs_diff_y * INV_S;
+        zeta_be_re = abs_diff_x * INV_S;
+        zeta_be_im = abs_diff_y * INV_S;
     }
     else if( sigma_x < sigma_y )
     {
@@ -741,6 +741,13 @@ SIXTRL_INLINE int NS(BeamBeam_get_transverse_fields_gauss_elliptical)(
     }
     else
     {
+        eta_be_re  = ( SIXTRL_REAL_T )0.0;
+        eta_be_im  = ( SIXTRL_REAL_T )0.0;
+        zeta_be_re = ( SIXTRL_REAL_T )0.0;
+        zeta_be_im = ( SIXTRL_REAL_T )0.0;
+        temp_re    = ( SIXTRL_REAL_T )0.0;
+        temp_im    = ( SIXTRL_REAL_T )0.0;
+
         ret = -1;
     }
 
