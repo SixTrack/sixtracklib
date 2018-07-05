@@ -1,11 +1,19 @@
 #ifndef SIXTRACKLIB__IMPL_DEFINITIONS_H__
 #define SIXTRACKLIB__IMPL_DEFINITIONS_H__
 
-#if !defined( _GPUCODE ) || defined(__CUDACC__ )
-    #include <assert.h>
-    #include <stddef.h>
-    #include <stdint.h>
-    #include <stdlib.h>
+#if !defined( _GPUCODE ) || defined( __CUDACC__ )
+    #if defined( __cplusplus )
+        #include <cassert>
+        #include <cmath>
+        #include <cstddef>
+        #include <cstdint>
+        #include <cstdlib>
+    #else
+        #include <assert.h>
+        #include <stddef.h>
+        #include <stdint.h>
+        #include <stdlib.h>
+    #endif /* __cplusplus */
 #endif /* !defined( _GPUCODE ) || defined(__CUDACC__ ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
@@ -505,7 +513,6 @@
 
 typedef SIXTRL_INT64_T NS(element_id_t);
 
-
 #if !defined( SIXTRACKLIB_COPY_VALUES )
     #if defined( _GPUCODE )
         #define SIXTRACKLIB_COPY_VALUES( T, dest, source, n )             \
@@ -545,6 +552,15 @@ typedef SIXTRL_INT64_T NS(element_id_t);
     #endif /* defined( _GPUCODE ) */
 #endif /* defined( SIXTRACKLIB_COPY_VALUES ) */
 
+#if !defined( SIXTRL_ISFINITE )
+    #if defined( __cplusplus ) && ( __cplusplus >= 201103L )
+        #define SIXTRL_ISFINITE( x ) std::isfinite( x )
+    #elif defined( __STDC_VERSION__ ) && ( __STDC_VERSION__ >= 199901L )
+        #define SIXTRL_ISFINITE( x ) isfinite( x )
+    #else
+        #define SIXTRL_ISFINITE( x ) ( 1 )
+    #endif /* defined( __cplusplus ) */
+#endif /* defined( SIXTRL_ISFINITE ) */
 
 #endif /* SIXTRACKLIB__IMPL_DEFINITIONS_H__ */
 
