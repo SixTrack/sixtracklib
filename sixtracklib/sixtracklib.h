@@ -14,6 +14,7 @@
 #include "sixtracklib/_impl/modules.h"
 
 #include "sixtracklib/common/mem_pool.h"
+#include "sixtracklib/common/compute_arch.h"
 #include "sixtracklib/common/blocks.h"
 
 #include "sixtracklib/common/impl/beam_elements_type.h"
