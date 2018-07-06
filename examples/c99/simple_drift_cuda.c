@@ -29,7 +29,7 @@ int main( int argc, char* argv[] )
     st_Blocks     particles_buffer;
     st_Blocks     beam_elements;
 
-    int ret = 0;
+    bool ret = false;
 
     /* first: init the pseudo random number generator for the particle
      * values randomization - choose a constant seed to have reproducible
@@ -175,7 +175,7 @@ int main( int argc, char* argv[] )
 
     gettimeofday( &tstop, 0 );
 
-    if( ret == 0 )
+    if( ret )
     {
         double const usec_dist = 1e-6 * ( ( tstop.tv_sec >= tstart.tv_sec )
             ? ( tstop.tv_usec - tstart.tv_usec )
