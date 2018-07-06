@@ -24,6 +24,16 @@ if( SIXTRACKL_ENABLE_AUTOVECTORIZATION )
         -fno-fast-math --param vect-max-version-for-alias-checks=50 )
 endif()
 
+# -----------------------------------------------------------------------------
+# simple_drift_opencl:
+
+if( SIXTRACKL_ENABLE_OPENCL )
+    add_executable( simple_drift_opencl simple_drift_opencl.c )
+    set( EXAMPLE_PROGRAMS ${EXAMPLE_PROGRAMS} simple_drift_opencl )
+
+endif()
+
+
 # ==============================================================================
 # Common settings for all programs:
 
