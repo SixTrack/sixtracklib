@@ -49,11 +49,11 @@ SIXTRL_HOST_FN NS(ComputeNodeId)* NS(ComputeNodeId_preset)(
     NS(ComputeNodeId)* SIXTRL_RESTRICT id );
 
 SIXTRL_HOST_FN SIXTRL_STATIC NS(comp_node_id_num_t)
-NS(ComputeNodeID_get_platform_id)(
+NS(ComputeNodeId_get_platform_id)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id );
 
 SIXTRL_HOST_FN SIXTRL_STATIC NS(comp_node_id_num_t)
-NS(ComputeNodeID_get_device_id)(
+NS(ComputeNodeId_get_device_id)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id );
 
 SIXTRL_HOST_FN SIXTRL_STATIC void NS(ComputeNodeId_set_platform_id)(
@@ -132,13 +132,13 @@ SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_description)(
 /* ******                                                               ***** */
 /* ************************************************************************** */
 
-SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeID_get_platform_id)(
+SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeId_get_platform_id)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id )
 {
     return ( id != 0 ) ? id->platform_id : -1;
 }
 
-SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeID_get_device_id)(
+SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeId_get_device_id)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id )
 {
     return ( id != 0 ) ? id->device_id : -1;
@@ -199,16 +199,16 @@ SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeInfo_get_platform_id)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info )
 {
     return ( node_info != 0 )
-        ? NS(ComputeNodeID_get_platform_id)( &node_info->id )
-        : NS(ComputeNodeID_get_platform_id)( 0 );
+        ? NS(ComputeNodeId_get_platform_id)( &node_info->id )
+        : NS(ComputeNodeId_get_platform_id)( 0 );
 }
 
 SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeInfo_get_device_id)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info )
 {
     return ( node_info != 0 )
-        ? NS(ComputeNodeID_get_device_id)( &node_info->id )
-        : NS(ComputeNodeID_get_device_id)( 0 );
+        ? NS(ComputeNodeId_get_device_id)( &node_info->id )
+        : NS(ComputeNodeId_get_device_id)( 0 );
 }
 
 SIXTRL_INLINE char const* NS(ComputeNodeInfo_get_arch)(
