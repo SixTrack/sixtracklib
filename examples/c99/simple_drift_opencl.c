@@ -270,29 +270,55 @@ int main( int argc, char* argv[] )
 
     gettimeofday( &tstop, 0 );
 
-    double usec_dist = 1e-6 * ( ( tstop.tv_sec >= tstart.tv_sec ) ?
-        ( tstop.tv_usec - tstart.tv_usec ) : ( 1000000 - tstart.tv_usec ) );
+    if( ret == 0 )
+    {
+        double usec_dist = 1e-6 * ( ( tstop.tv_sec >= tstart.tv_sec )
+            ? ( tstop.tv_usec - tstart.tv_usec )
+            : ( 1000000 - tstart.tv_usec ) );
 
-    double delta_time = ( double )( tstop.tv_sec - tstart.tv_sec ) + usec_dist;
-    printf( " -> time elapsed    : %16.8fs \r\n", delta_time );
+        double delta_time =
+            ( double )( tstop.tv_sec - tstart.tv_sec ) + usec_dist;
+
+        printf( " -> time elapsed    : %16.8fs \r\n", delta_time );
+    }
+    else
+    {
+        printf( "\r\n" "-> Error while preparing for tracking "
+                           "[error_code=%d]\r\n", ret );
+
+        st_Blocks_free( &particles_buffer );
+        st_Blocks_free( &beam_elements );
+        st_OclEnvironment_free( ocl_env );
+
+        return 0;
+    }
 
     printf( "\r\nStart tracking for %lu turns:\r\n", NUM_TURNS );
-
     gettimeofday( &tstart, 0 );
 
-    ret |= st_OclEnvironment_run_particle_tracking(
+    ret = st_OclEnvironment_run_particle_tracking(
         ocl_env, NUM_TURNS, &particles_buffer, &beam_elements, 0 );
 
     gettimeofday( &tstop, 0 );
 
-    usec_dist = 1e-6 * ( ( tstop.tv_sec >= tstart.tv_sec ) ?
-        ( tstop.tv_usec - tstart.tv_usec ) : ( 1000000 - tstart.tv_usec ) );
+    if( ret == 0 )
+    {
+        double const usec_dist = 1e-6 * ( ( tstop.tv_sec >= tstart.tv_sec )
+            ? ( tstop.tv_usec - tstart.tv_usec )
+            : ( 1000000 - tstart.tv_usec ) );
 
-    delta_time = ( double )( tstop.tv_sec - tstart.tv_sec ) + usec_dist;
-    printf( "\r\n"
-            " -> time elapsed    : %16.8fs \r\n", delta_time );
-    printf( " -> time / particle : %16.8f [us/Part]\r\n",
+        double const delta_time =
+            ( double )( tstop.tv_sec - tstart.tv_sec ) + usec_dist;
+
+        printf( " -> time elapsed    : %16.8fs \r\n", delta_time );
+        printf( " -> time / particle : %16.8f [us/Part]\r\n",
                 ( delta_time / NUM_PARTICLES ) * 1e6 );
+    }
+    else
+    {
+        printf( "\r\n" "-> Error while running tracking code "
+                           "[error_code=%d]\r\n", ret );
+    }
 
     /* --------------------------------------------------------------------- */
     /* cleanup: */
@@ -304,4 +330,4 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
-/* end:  examples/c99/simple_drift.c */
+/* end:  examples/c99/simple_drift_opencl.c */

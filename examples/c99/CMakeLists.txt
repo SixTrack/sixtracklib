@@ -33,6 +33,15 @@ if( SIXTRACKL_ENABLE_OPENCL )
 
 endif()
 
+# -----------------------------------------------------------------------------
+# simple_drift_cuda:
+
+if( SIXTRACKL_ENABLE_CUDA )
+    add_executable( simple_drift_cuda simple_drift_cuda.c )
+    set( EXAMPLE_PROGRAMS ${EXAMPLE_PROGRAMS} simple_drift_cuda )
+
+endif()
+
 
 # ==============================================================================
 # Common settings for all programs:
