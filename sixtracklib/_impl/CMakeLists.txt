@@ -50,11 +50,15 @@ set( MODULES_ENABLE_DISABLE_INFO
      set( SIXTRACKL_ENABLE_MODULE_SIMD   ${SIXTRACKL_ENABLE_MODULE_SIMD}   )
      set( SIXTRACKL_ENABLE_MODULE_MPFR4  ${SIXTRACKL_ENABLE_MODULE_MPFR4}  )" )
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# install:
+
 install( CODE "
     ${MODULES_ENABLE_DISABLE_INFO}
     message( STATUS \"Generating: ${MODULES_H_INSTALL_PATH}\" )
     configure_file( \"${MODULES_H_IN_PATH}\" \"${MODULES_H_INSTALL_PATH}\"
         @ONLY ) " )
+
 
 
 # ------------------------------------------------------------------------------
@@ -75,9 +79,11 @@ configure_file( ${PATH_H_IN_PATH} ${PATH_H_OUT_PATH} @ONLY )
 
 set( SIXTRACKL_HEADERS ${SIXTRACKL_HEADERS} ${PATH_H_OUT_PATH} PARENT_SCOPE )
 
-
-
 set( PATH_H_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${IMPL_INSTALL_PATH}/path.h" )
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# install:
 
 install( CODE "
          set( SIXTRACKLIB_BASE_DIR \"${CMAKE_INSTALL_PREFIX}/\" )
@@ -89,14 +95,27 @@ install( CODE "
 # Generate the SixTracklibConfig.cmake package configuration file to the
 # lib/cmake directory inside CMAKE_INSTALL_PREFIX:
 
+set( SIXTRACKL_PKG_CONFIG_OPTIONS "" )
+
+if( SIXTRACKL_ENABLE_PROGRAMM_TESTS OR SIXTRACKL_BUILD_EXAMPLES )
+    set(   SIXTRACKL_PKG_CONFIG_OPTIONS
+         ${SIXTRACKL_PKG_CONFIG_OPTIONS} "set( SixTrackTestlib_FOUND On )" )
+else()
+    set(   SIXTRACKL_PKG_CONFIG_OPTIONS
+         ${SIXTRACKL_PKG_CONFIG_OPTIONS} "set( SixTrackTestlib_FOUND Off )" )
+endif()
+
 set( SIXTRACKL_PKG_IN_CONFIG
      "${CMAKE_CURRENT_SOURCE_DIR}/SixTracklibConfig.cmake.template" )
 
 set( SIXTRACKL_PKG_INSTALL_CONFIG
      "${CMAKE_INSTALL_PREFIX}/lib/cmake/SixTracklibConfig.cmake" )
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# install:
+
 install( CODE "
-         ${MODULES_ENABLE_DISABLE_INFO}
+         ${SIXTRACKL_PKG_CONFIG_OPTIONS}
          message( STATUS \"Generating: ${SIXTRACKL_PKG_INSTALL_CONFIG}\" )
          configure_file( \"${SIXTRACKL_PKG_IN_CONFIG}\"
                          \"${SIXTRACKL_PKG_INSTALL_CONFIG}\" @ONLY )" )
@@ -108,6 +127,9 @@ set( SIXTRACKL_IMPL_HEADERS
      definitions.h
      namespace_end.h
 )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# install:
 
 install( FILES ${SIXTRACKL_IMPL_HEADERS} DESTINATION ${IMPL_INSTALL_PATH} )
 

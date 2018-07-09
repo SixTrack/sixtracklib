@@ -3,7 +3,8 @@
 # ------------------------------------------------------------------------------
 # generate the testdata_files.h header to be used with examples and unit-tests
 
-set( SIXTRACKLIB_TESTLIB_INSTALL_PATH "tests/sixtracklib" )
+set( SIXTRACKLIB_TESTLIB_INSTALL_PATH
+     "${CMAKE_INSTALL_PREFIX}/include/sixtracklib/testlib" )
 
 set( SIXTRACKLIB_TESTDATA_DIR "${CMAKE_SOURCE_DIR}/tests/testdata" )
 
@@ -29,6 +30,9 @@ install( CODE "
 # -----------------------------------------------------------------------------
 # build sixtrack_test library:
 
+set( SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS
+     ../testlib.h )
+
 set( SIXTRACKL_TESTLIB_HEADERS
      gpu_kernel_tools.h
      random.h
@@ -44,6 +48,7 @@ set( SIXTRACKL_TESTLIB_SOURCES
 )
 
 add_library( sixtrack_test STATIC
+             ${SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS}
              ${SIXTRACKL_TESTLIB_HEADERS}
              ${SIXTRACKL_TESTLIB_SOURCES}
 )
@@ -51,7 +56,7 @@ add_library( sixtrack_test STATIC
 target_include_directories(
     sixtrack_test
     PUBLIC $<INSTALL_INTERFACE:include>
-           $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests> )
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests> )
 
 target_link_libraries( sixtrack_test sixtrack )
 
@@ -66,3 +71,32 @@ target_compile_options( sixtrack_test
                         PRIVATE -Wall -Werror -pedantic -ansi
                         ${SIXTRACKLIB_CPU_FLAGS} )
 
+
+# ------------------------------------------------------------------------------
+# install :
+
+set( SIXTRACKL_TESTLIB_TOP_LEVEL_INSTALL_INCLUDE_PATH include/sixtracklib )
+
+install( FILES ${SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS}
+         DESTINATION ${SIXTRACKL_TESTLIB_TOP_LEVEL_INSTALL_INCLUDE_PATH} )
+
+set( SIXTRACKL_TESTLIB_INSTALL_CONDIG_PATH ${CMAKE_INSTALL_PREFIX}/lib/cmake )
+
+install( TARGETS sixtrack_test
+         EXPORT  SixTrackTestlib-targets
+         RUNTIME DESTINATION bin
+         LIBRARY DESTINATION lib
+         ARCHIVE DESTINATION lib )
+
+install( EXPORT SixTrackTestlib-targets
+         FILE   SixTrackTestlibTargets.cmake
+         NAMESPACE SixTracklib::
+         DESTINATION ${SIXTRACKL_TESTLIB_INSTALL_CONDIG_PATH}
+)
+
+set( SIXTRACKL_TESTLIB_INSTALL_INCLUDE_PATH include/sixtracklib/testlib )
+
+install( FILES ${SIXTRACKL_TESTLIB_HEADERS}
+         DESTINATION ${SIXTRACKL_TESTLIB_INSTALL_INCLUDE_PATH} )
+
+#end sixtracklib/common/CMakeLists.txt

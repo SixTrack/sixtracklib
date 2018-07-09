@@ -40,3 +40,20 @@ endif()
 if( TARGET SixTracklib::sixtrack )
     set( SixTracklib_LIBRARIES SixTracklib::sixtrack )
 endif()
+
+# sixtrack testlib
+set( SixTrackTestlib_FOUND @SixTrackTestlib_FOUND@ )
+
+if( SixTrackTestlib_FOUND )
+    set( SixTrackTestlib_INCLUDE_DIRS "${SixTracklib_CMAKE_DIR}/../../include" )
+    set( SixTrackTestlib_LIBRARY_DIRS "${SixTracklib_CMAKE_DIR}/../lib" )
+
+    if( NOT TARGET SixTracklib::sixtrack_test )
+        include( "${SixTracklib_CMAKE_DIR}/SixTrackTestlibTargets.cmake" )
+    endif()
+
+    if( TARGET SixTracklib::sixtrack_test )
+        set( SixTrackTestlib_LIBRARIES SixTracklib::sixtrack_test )
+    endif()
+
+endif()
