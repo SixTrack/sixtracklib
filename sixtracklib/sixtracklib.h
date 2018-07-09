@@ -6,15 +6,15 @@
     #define __SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE 1
 #endif /* !defined( __NAMESPACE ) */
 
-#include "sixtracklib/_impl/definitions.h"
-
 /* ------------------------------------------------------------------------- */
 
+#include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/_impl/namespace_begin.h"
 #include "sixtracklib/_impl/path.h"
 #include "sixtracklib/_impl/modules.h"
 
 #include "sixtracklib/common/mem_pool.h"
+#include "sixtracklib/common/compute_arch.h"
 #include "sixtracklib/common/blocks.h"
 
 #include "sixtracklib/common/impl/beam_elements_type.h"
@@ -25,34 +25,42 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/impl/particles_api.h"
 
-/* Not optimal having these two as part of the public library interface -> fix this! */
-#include "sixtracklib/common/details/random.h"
-#include "sixtracklib/common/tests/test_particles_tools.h"
+#include "sixtracklib/common/track.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #if defined( SIXTRACKLIB_ENABLE_MODULE_SIMD ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_SIMD == 1 )
-    
+
     #include "sixtracklib/simd/track.h"
-           
+
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_SIMD ) */
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
-           
+
     #include "sixtracklib/opencl/ocl_environment.h"
-           
+
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+#if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
+           ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
+
+    #include "sixtracklib/cuda/cuda_env.h"
+
+#endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
+
 
 /* ------------------------------------------------------------------------- */
 
-#include "sixtracklib/_impl/namespace_end.h"
-
 #if defined( SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE )
-    #undef __NAMESPACE 
+    #include "sixtracklib/_impl/namespace_end.h"
+
+    #undef __NAMESPACE
     #undef __SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE
 #endif /* defined( SIXTRACKLIB_SIXTRACKLIB_UNDEF_NAMESPACE ) */
 
