@@ -88,4 +88,15 @@ set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
 set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
               PROPERTY CUDA_STANDARD_REQUIRED 11 )
 
+# ------------------------------------------------------------------------------
+# install:
+
+set( SIXTRACKLIB_CUDA_INSTALL_PATH include/sixtracklib/cuda )
+
+install( FILES ${SIXTRACKLIB_CUDA_PART_HOST_HEADERS}
+         DESTINATION ${SIXTRACKLIB_CUDA_INSTALL_PATH} )
+
+install( FILES ${SIXTRACKLIB_CUDA_PART_KERNEL_HEADERS}
+         DESTINATION "${SIXTRACKLIB_CUDA_INSTALL_PATH}/impl" )
+
 # end: sixtracklib/cuda/CMakeLists.txt
