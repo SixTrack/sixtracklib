@@ -31,7 +31,8 @@ if( EXISTS ${PATH_TO_LOCAL_SETTINGS_FILE} )
              RESULT_VARIABLE STATUS_INCLUDE_LOCAL_SETTINGS_FILE )
 
     if( STATUS_INCLUDE_LOCAL_SETTINGS_FILE )
-        message( STATUS "---- Loaded local settings file ${PATH_TO_LOCAL_SETTINGS_FILE}" )
+        message( STATUS "---- Loaded local settings file
+                 ${PATH_TO_LOCAL_SETTINGS_FILE}" )
     endif()
 
 elseif( EXISTS ${PATH_TO_DEFAULT_SETTINGS_FILE} )
@@ -40,7 +41,8 @@ elseif( EXISTS ${PATH_TO_DEFAULT_SETTINGS_FILE} )
              RESULT_VARIABLE STATUS_INCLUDE_DEFAULT_SETTINGS_FILE )
 
     if( STATUS_INCLUDE_DEFAULT_SETTINGS_FILE )
-        message( STATUS "---- Loaded default settings file ${PATH_TO_DEFAULT_SETTINGS_FILE}" )
+        message( STATUS "---- Loaded default settings file
+                 ${PATH_TO_DEFAULT_SETTINGS_FILE}" )
     endif()
 
 endif()
@@ -136,7 +138,7 @@ add_subdirectory( sixtracklib )
 
 # ------------------------------------------------------------------------------
 
-if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
+if( SIXTRACKL_ENABLE_PROGRAMM_TESTS OR SIXTRACKL_BUILD_EXAMPLES )
     add_subdirectory( tests )
 endif()
 
