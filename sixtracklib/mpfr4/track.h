@@ -32,7 +32,7 @@ st_MpfrWrapper;
 #include "sixtracklib/common/impl/particles_impl.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/particles.h"
-    
+
 int NS(Track_beam_elements_mpfr4)(
     NS(Particles)* SIXTRL_RESTRICT particles,
     const NS(BeamElements) *const SIXTRL_RESTRICT beam_elements,
@@ -41,13 +41,13 @@ int NS(Track_beam_elements_mpfr4)(
     NS(ParticlesContainer)* SIXTRL_RESTRICT elem_by_elem_buffer );
 
 int NS(Track_drift_mpfr4)(
-    NS(Particles)* SIXTRL_RESTRICT particles, 
-    SIXTRL_REAL_T const drift_length, 
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_REAL_T const drift_length,
     mpfr_prec_t const prec, mpfr_rnd_t const rnd );
 
 int NS(Track_drift_exact_mpfr4)(
-    NS(Particles)* SIXTRL_RESTRICT particles, 
-    SIXTRL_REAL_T const drift_length, 
+    NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_REAL_T const drift_length,
     mpfr_prec_t const prec, mpfr_rnd_t const rnd );
 
 #if defined( __cplusplus )

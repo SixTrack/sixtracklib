@@ -37,13 +37,13 @@ int NS(Track_beam_elements_simd_avx)(
 
 
 int NS(Track_drift_simd_sse2)(
-    NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(Particles)* SIXTRL_RESTRICT particles,
     NS(block_num_elements_t) const start_particle_index,
     NS(block_num_elements_t) const end_particle_index,
     SIXTRL_REAL_T const length );
 
 int NS(Track_drift_simd_avx)(
-    NS(Particles)* SIXTRL_RESTRICT particles, 
+    NS(Particles)* SIXTRL_RESTRICT particles,
     NS(block_num_elements_t) const start_particle_index,
     NS(block_num_elements_t) const end_particle_index,
     SIXTRL_REAL_T const length );
