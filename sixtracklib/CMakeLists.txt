@@ -17,7 +17,8 @@ set( SIXTRACKL_LINK_LIBRARIES )
 # ------------------------------------------------------------------------------
 
 set( SIXTRACKL_LIBRARY_MODULES )
-set( SIXTRACKL_HEADERS sixtracklib.h )
+set( SIXTRACKL_TOP_LEVEL_HEADERS sixtracklib.h )
+set( SIXTRACKL_HEADERS )
 set( SIXTRACKL_SOURCES )
 
 add_subdirectory( _impl )
@@ -63,6 +64,8 @@ endif()
 
 # ------------------------------------------------------------------------------
 
+set( SIXTRACKL_HEADERS ${SIXTRACKL_HEADERS} ${SIXTRACKL_TOP_LEVEL_HEADERS} )
+
 add_library( sixtrack SHARED
              ${SIXTRACKL_HEADERS} ${SIXTRACKL_SOURCES}
              ${SIXTRACKL_LIBRARY_MODULES}
@@ -87,7 +90,8 @@ target_compile_options( sixtrack
                         PRIVATE -Wall -Werror -pedantic -ansi
                         ${SIXTRACKLIB_CPU_FLAGS} )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# ------------------------------------------------------------------------------
+# install :
 
 install( TARGETS sixtrack
          EXPORT  SixTracklib-targets
@@ -100,5 +104,10 @@ install( EXPORT SixTracklib-targets
          NAMESPACE SixTracklib::
          DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake
 )
+
+set( SIXTRACKLIB_TLD_INSTALL_PATH include/sixtracklib )
+
+install( FILES ${SIXTRACKL_TOP_LEVEL_HEADERS}
+         DESTINATION ${SIXTRACKLIB_TLD_INSTALL_PATH} )
 
 # ------------------------------------------------------------------------------
