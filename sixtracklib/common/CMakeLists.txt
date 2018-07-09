@@ -9,6 +9,7 @@ set( SIXTRACKLIB_COMMON_IMPL_HEADERS
      impl/faddeeva_mit.h
      impl/particles_type.h
      impl/particles_api.h
+     impl/track_api.h
 )
 
 set( SIXTRACKLIB_COMMON_DETAILS_HEADERS
@@ -22,6 +23,7 @@ set( SIXTRACKLIB_COMMON_HEADERS
      compute_arch.h
      mem_pool.h
      particles.h
+     track.h
 )
 
 set( SIXTRACKLIB_COMMON_SOURCES
@@ -53,6 +55,9 @@ target_compile_definitions( sixtrack_common PUBLIC
 
 target_compile_options( sixtrack_common BEFORE PUBLIC
                         ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic -ansi )
+
+# ------------------------------------------------------------------------------
+# install :
 
 set( SIXTRACKLIB_COMMON_INSTALL_PATH include/sixtracklib/common )
 
