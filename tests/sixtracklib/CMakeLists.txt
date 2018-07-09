@@ -18,16 +18,20 @@ add_subdirectory( testlib )
 # ------------------------------------------------------------------------------
 # ---- run the submodule - unit-tests
 
-set( SIXTRACKL_TEST_LIBRARIES sixtrack_test sixtrack )
+if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
 
-add_subdirectory( common )
+    set( SIXTRACKL_TEST_LIBRARIES sixtrack_test sixtrack )
 
-if( SIXTRACKL_ENABLE_OPENCL )
-    add_subdirectory( opencl )
+    add_subdirectory( common )
+    add_custom_target( testdata DEPENDS testdata_common )
+
+    if( SIXTRACKL_ENABLE_OPENCL )
+        add_subdirectory( opencl )
+    endif()
+
+    if( SIXTRACKL_ENABLE_CUDA )
+        add_subdirectory( cuda )
+    endif()
+
 endif()
-
-if( SIXTRACKL_ENABLE_CUDA )
-    add_subdirectory( cuda )
-endif()
-
 

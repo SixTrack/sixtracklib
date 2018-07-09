@@ -35,8 +35,8 @@ add_custom_command(
     COMMENT "Generating testdata for tracking from common .... "
     VERBATIM )
 
-add_custom_target( recreate_testdata_tracking_common ALL
-        DEPENDS "${SIXTRACKLIB_TESTDATA_DIR}/test_tracking.generated" )
+add_custom_target( testdata_common
+    DEPENDS "${SIXTRACKLIB_TESTDATA_DIR}/test_tracking.generated" )
 
 
 if( GTEST_FOUND )
@@ -99,12 +99,8 @@ if( GTEST_FOUND )
     # test_beam_elements:
 
     add_executable( test_beam_elements_common test_beam_elements.cpp )
-
     set(   UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_beam_elements_common )
-
     add_test( CommonBeamElementsTests test_beam_elements_common )
-    add_dependencies( test_beam_elements_common
-                      recreate_testdata_tracking_common )
 
     # --------------------------------------------------------------------------
     # test_track:
@@ -112,7 +108,6 @@ if( GTEST_FOUND )
     add_executable( test_track_common test_track.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_common )
     add_test( CommonTrackTests test_track_common )
-    add_dependencies( test_track_common recreate_testdata_tracking_common )
 
     # *************************************************************************
     # Set all properties:
