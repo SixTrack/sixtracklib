@@ -9,13 +9,13 @@
 - _optionally_ NVidia CUDA 7.5 or higher 
 - _optionally_ OpenCL 1.2 or higher (with C++ host bindings)
 
-The default configuration builds a CPU only library without any examples and tests. To condigure the building process
-- Create a copy of Settings.cmake.default and name it Settings.cmake
+The default configuration builds a CPU only library without any examples or tests. To configure the building process
+- Create a copy of `Settings.cmake.default` and name it `Settings.cmake`
 - Change the settings / options from `Off` to `On` to enable building specific modules or condigurations
 - Save the file
 
 ### Building
-
+Within the top-level directory of the repository, 
 ```
 mkdir build
 cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/opt/sixtracklib
@@ -33,8 +33,7 @@ If you configured sixtracklib with unit-test support enabled in the previous ste
 make testdata
 make test
 ```
-Alternatively, you can run the unit-tests individually from the `tests/sixtracklib/` sub-directory within build.
-
+Alternatively, you can run the unit-tests individually from the `tests/sixtracklib/` sub-directory within build. Please ensure to always have a proper set of testdata ready before running any test. If in doubt, please run `make testdata`.
 
 ## Documentation
 
