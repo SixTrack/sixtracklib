@@ -20,11 +20,7 @@ The default configuration builds a CPU only library without any examples and tes
 mkdir build
 cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/opt/sixtracklib
 ```
-If you have enabled the building of unit tests in the settings file, you may have to pass the location of the googletest library location to cmake. Please assuming you installed googletest with the install prefix `/opt/googletest`, please call cmake like this
-```
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/opt/sixtracklib -DGTEST_ROOT=/opt/googletest
-```
-Alternatively, you can also set the GTEST_ROOT option in the settings file.
+If you have enabled the building of unit tests in the settings file, you may have to pass the location of the googletest library location to cmake. Assuming you installed googletest with the install prefix `/opt/googletest`, please set the `SIXTRACKL_GOOGLETEST_ROOT` variable in `Settings.cmake` to this value.
 
 Assuming cmake finished successfully, build and (optionally) install the library by running
 ```
