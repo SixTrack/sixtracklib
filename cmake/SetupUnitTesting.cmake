@@ -44,6 +44,14 @@ if(  NOT SETUP_UNIT_TESTING_FINISHED )
             set( SIXTRACKL_GTEST_LIBRARIES ${SIXTRACKL_GTEST_LIBRARIES}
                 ${CMAKE_THREAD_LIBS_INIT} )
 
+            if( DEFINED SIXTRACKL_GOOGLETEST_ROOT AND
+                ( DEFINED GTEST_ROOT AND
+                  NOT ( GTEST_ROOT STREQUAL SIXTRACKL_GOOGLETEST_ROOT ) ) OR
+                ( NOT DEFINED GTEST_ROOT ) )
+                unset( GTEST_ROOT CACHE )
+                set( GTEST_ROOT ${SIXTRACKL_GOOGLETEST_ROOT} )
+            endif()
+
             find_package( GTest REQUIRED )
 
         endif()

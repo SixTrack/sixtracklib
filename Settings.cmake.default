@@ -59,7 +59,7 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     option( SIXTRACKL_ENABLE_MPFR_ACCURACY_TESTS
             "Enable GMP/MPFR based accuracy tests" OFF )
 
-    set( GTEST_ROOT "" CACHE PATH
+    set( SIXTRACKL_GOOGLETEST_ROOT "" CACHE PATH
          "Path to include/gtest/gtest.h (for non-standard installations)" )
 
     set( SIXTRACKL_MEMCHECK_COMMAND "valgrind" CACHE STRING
