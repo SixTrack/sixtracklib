@@ -44,10 +44,10 @@ TEST( CommonBlocksTests, InitAssembleCommitFree )
     ASSERT_TRUE( st_Blocks_get_data_alignment( &blocks ) > 0u );
 
     ASSERT_TRUE( st_Blocks_get_begin_alignment( &blocks ) >=
-                 st_Blocks_get_data_alignment( &blocks  ) );
+                 st_Blocks_get_data_alignment(  &blocks ) );
 
     ASSERT_TRUE( ( st_Blocks_get_begin_alignment( &blocks ) %
-                   st_Blocks_get_data_alignment( &blocks ) ) == 0u );
+                   st_Blocks_get_data_alignment(  &blocks ) ) == 0u );
 
     int success = st_Blocks_init( &blocks, BLOCKS_CAPACITY, DATA_CAPACITY );
     ASSERT_TRUE( success == 0 );
@@ -331,6 +331,62 @@ TEST( CommonBlocksTests, InitAssembleCommitFree )
 
 
     st_Blocks_free( &blocks );
+}
+
+TEST( CommonBlocksTests, NewDeleteAddMinimalTest )
+{
+    static st_block_size_t const BLOCKS_CAPACITY = ( st_block_size_t )2;
+    static st_block_size_t const DATA_CAPACITY   = ( st_block_size_t )0x1FFFFF;
+
+    st_Blocks* blocks = st_Blocks_new( BLOCKS_CAPACITY, DATA_CAPACITY );
+    ASSERT_TRUE( blocks != nullptr );
+
+    ASSERT_TRUE( !st_Blocks_are_serialized( blocks ) );
+    ASSERT_TRUE(  st_Blocks_has_data_store( blocks ) );
+    ASSERT_TRUE(  st_Blocks_has_index_store( blocks ) );
+    ASSERT_TRUE(  st_Blocks_has_data_pointers_store( blocks ) );
+    ASSERT_TRUE(  st_Blocks_get_num_of_blocks( blocks ) == 0u );
+    ASSERT_TRUE(  st_Blocks_get_max_num_of_blocks( blocks ) >=
+                  BLOCKS_CAPACITY );
+
+    ASSERT_TRUE(  st_Blocks_get_data_size( blocks ) != 0u );
+    ASSERT_TRUE(  st_Blocks_get_data_capacity( blocks ) >= DATA_CAPACITY );
+
+    ASSERT_TRUE(  st_Blocks_get_num_data_pointers( blocks ) == 0u );
+    ASSERT_TRUE(  st_Blocks_get_max_num_data_pointers( blocks ) >=
+                  BLOCKS_CAPACITY );
+
+    st_TestDrift test_drift;
+
+    test_drift.type_id   = st_BlockType_to_number( st_BLOCK_TYPE_DRIFT );
+    test_drift.object_id = 1;
+    test_drift.length    = 1.0;
+
+    st_BlockInfo* ptr_drift_info = st_Blocks_add_block(
+        blocks, st_BLOCK_TYPE_DRIFT,
+        sizeof( test_drift ), &test_drift, 0u, 0, 0, 0 );
+
+    ASSERT_TRUE( ptr_drift_info != nullptr );
+    ASSERT_TRUE( st_BlockInfo_get_type_id( ptr_drift_info ) ==
+                 st_BLOCK_TYPE_DRIFT );
+
+    ASSERT_TRUE( st_BlockInfo_get_block_size( ptr_drift_info ) >=
+                 sizeof( test_drift ) );
+
+    ASSERT_TRUE( st_BlockInfo_get_const_ptr_begin( ptr_drift_info ) !=
+                 nullptr );
+
+    ASSERT_TRUE( st_BlockInfo_get_const_ptr_metadata( ptr_drift_info ) ==
+                 nullptr );
+
+    ASSERT_TRUE( st_Blocks_get_num_of_blocks( blocks ) == 1u );
+    ASSERT_TRUE( st_Blocks_get_num_data_pointers( blocks ) == 0u );
+
+    ASSERT_TRUE( 0 == st_Blocks_serialize( blocks ) );
+    ASSERT_TRUE( st_Blocks_are_serialized( blocks ) );
+
+    st_Blocks_delete( blocks );
+    blocks = 0;
 }
 
 /* end: tests/sixtracklib/common/test_blocks.cpp */

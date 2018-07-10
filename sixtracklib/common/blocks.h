@@ -278,6 +278,9 @@ SIXTRL_FN SIXTRL_STATIC int NS(Blocks_has_data_pointers_store)(
 
 #if !defined( _GPUCODE )
 
+SIXTRL_HOST_FN SIXTRL_STATIC NS(Blocks)* NS(Blocks_new)(
+    NS(block_size_t) max_num_blocks, NS(block_size_t) const data_capacity );
+
 SIXTRL_HOST_FN int NS(Blocks_init)( NS(Blocks)* SIXTRL_RESTRICT blocks,
     NS(block_size_t) max_num_blocks, NS(block_size_t) const data_capacity );
 
@@ -290,8 +293,11 @@ SIXTRL_HOST_FN int NS(Blocks_init_from_serialized_data)(
     SIXTRL_GLOBAL_DEC unsigned char const* SIXTRL_RESTRICT data_mem_begin,
     NS(block_size_t) const total_num_of_bytes );
 
-SIXTRL_HOST_FN void NS(Blocks_clear)( NS(Blocks)* SIXTRL_RESTRICT blocks );
-SIXTRL_HOST_FN void NS(Blocks_free)(  NS(Blocks)* SIXTRL_RESTRICT blocks );
+SIXTRL_HOST_FN void NS(Blocks_clear)(  NS(Blocks)* SIXTRL_RESTRICT blocks );
+SIXTRL_HOST_FN void NS(Blocks_free)(   NS(Blocks)* SIXTRL_RESTRICT blocks );
+
+SIXTRL_HOST_FN SIXTRL_STATIC void NS(Blocks_delete)(
+    NS(Blocks)* SIXTRL_RESTRICT blocks );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -515,6 +521,36 @@ SIXTRL_INLINE NS(Blocks)* NS(Blocks_preset)(
 
     return blocks;
 }
+
+#if !defined( _GPUCODE )
+
+SIXTRL_INLINE NS(Blocks)* NS(Blocks_new)(
+    NS(block_size_t) max_num_blocks, NS(block_size_t) const data_capacity )
+{
+    NS(Blocks)* container = NS(Blocks_preset)( ( NS(Blocks)* )malloc(
+        sizeof( NS(Blocks) ) ) );
+
+    if( container != 0 )
+    {
+        if( 0 != NS(Blocks_init)( container, max_num_blocks, data_capacity ) )
+        {
+            NS(Blocks_delete)( container );
+            container = 0;
+        }
+    }
+
+    return container;
+}
+
+SIXTRL_INLINE void NS(Blocks_delete)( NS(Blocks)* SIXTRL_RESTRICT blocks )
+{
+    NS(Blocks_free)( blocks );
+    free( blocks );
+
+    return;
+}
+
+#endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
