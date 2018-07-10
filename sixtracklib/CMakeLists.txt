@@ -64,6 +64,7 @@ endif()
 
 # ------------------------------------------------------------------------------
 
+set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} m )
 set( SIXTRACKL_HEADERS ${SIXTRACKL_HEADERS} ${SIXTRACKL_TOP_LEVEL_HEADERS} )
 
 add_library( sixtrack SHARED
