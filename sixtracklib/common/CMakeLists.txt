@@ -5,6 +5,8 @@ set( SIXTRACKLIB_COMMON_IMPL_HEADERS
      impl/beam_beam_element_6d.h
      impl/beam_elements_type.h
      impl/beam_elements_api.h
+     impl/buffer_generic.h
+     impl/buffer_type.h
      impl/faddeeva.h
      impl/faddeeva_mit.h
      impl/particles_type.h
@@ -20,6 +22,7 @@ set( SIXTRACKLIB_COMMON_HEADERS
      alignment.h
      beam_elements.h
      blocks.h
+     buffer.h
      compute_arch.h
      mem_pool.h
      particles.h
@@ -30,6 +33,7 @@ set( SIXTRACKLIB_COMMON_SOURCES
      details/alignment.c
      details/beam_elements.c
      details/blocks.c
+     details/buffer.c
      details/compute_arch.c
      details/faddeeva_mit.c
      details/mem_pool.c
