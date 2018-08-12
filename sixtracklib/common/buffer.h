@@ -48,6 +48,29 @@ SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_size)(
 
 /* ------------------------------------------------------------------------- */
 
+struct NS(BufferGarbage);
+
+SIXTRL_FN SIXTRL_STATIC struct NS(BufferGarbage)* NS(BufferGarbage_preset)(
+    struct NS(BufferGarbage)* SIXTRL_RESTRICT garbage_range );
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(BufferGarbage_get_begin_addr)(
+    const struct NS(BufferGarbage) *const SIXTRL_RESTRICT garbage_range );
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(BufferGarbage_get_size)(
+    const struct NS(BufferGarbage) *const SIXTRL_RESTRICT garbage_range );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BufferGarbage_set_begin_addr)(
+    struct NS(BufferGarbage)* SIXTRL_RESTRICT garbage_range,
+    NS(buffer_addr_t) const begin_addr );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BufferGarbage_set_size)(
+    struct NS(BufferGarbage)* SIXTRL_RESTRICT garbage_range,
+    NS(buffer_size_t) const range_size );
+
+/* ------------------------------------------------------------------------- */
+
+struct NS(Buffer);
+
 SIXTRL_FN SIXTRL_STATIC  NS(Buffer)* NS(Buffer_preset)(
    NS(Buffer)* SIXTRL_RESTRICT buffer );
 
@@ -57,7 +80,7 @@ SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_diff_t)
 SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_diff_t)
     NS(Buffer_get_limit_offset_min)( void );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_check_addr_artithmetic)(
+SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_check_addr_arithmetic)(
     NS(buffer_addr_t) const addr, NS(buffer_addr_diff_t) const offset,
     NS(buffer_size_t) const slot_size );
 
@@ -179,7 +202,7 @@ SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_garbage_extent)(
     const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
 SIXTRL_FN SIXTRL_STATIC  NS(buffer_size_t)
-NS(Buffer_get_num_of_garbage_elements)(
+NS(Buffer_get_num_of_garbage_ranges)(
     const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -352,6 +375,63 @@ SIXTRL_INLINE void NS(Object_set_size)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_INLINE NS(BufferGarbage)* NS(BufferGarbage_preset)(
+    struct NS(BufferGarbage)* SIXTRL_RESTRICT garbage_range )
+{
+    NS(BufferGarbage_set_begin_addr)( garbage_range, 0 );
+    NS(BufferGarbage_set_size)( garbage_range, 0u );
+
+    return garbage_range;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE NS(buffer_addr_t) NS(BufferGarbage_get_begin_addr)(
+    const struct NS(BufferGarbage) *const SIXTRL_RESTRICT garbage_range )
+{
+    return ( garbage_range != SIXTRL_NULLPTR )
+        ? garbage_range->begin_addr : ( NS(buffer_addr_t) )0u;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE NS(buffer_size_t) NS(BufferGarbage_get_size)(
+    const struct NS(BufferGarbage) *const SIXTRL_RESTRICT garbage_range )
+{
+    return ( garbage_range != SIXTRL_NULLPTR )
+        ? garbage_range->size : ( NS(buffer_size_t) )0u;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE void NS(BufferGarbage_set_begin_addr)(
+    struct NS(BufferGarbage)* SIXTRL_RESTRICT garbage_range,
+    NS(buffer_addr_t) const begin_addr )
+{
+    if( garbage_range != SIXTRL_NULLPTR )
+    {
+        garbage_range->begin_addr = begin_addr;
+    }
+
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE void NS(BufferGarbage_set_size)(
+    struct NS(BufferGarbage)* SIXTRL_RESTRICT garbage_range,
+    NS(buffer_size_t) const range_size )
+{
+    if( garbage_range != SIXTRL_NULLPTR )
+    {
+        garbage_range->size = range_size;
+    }
+
+    return;
+}
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_INLINE NS(Buffer)* NS(Buffer_preset)( NS(Buffer)* SIXTRL_RESTRICT buf )
 {
     if( buf != SIXTRL_NULLPTR )
@@ -463,7 +543,7 @@ SIXTRL_INLINE NS(buffer_addr_diff_t) NS(Buffer_get_limit_offset_min)( void )
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_INLINE bool NS(Buffer_check_addr_artithmetic)(
+SIXTRL_INLINE bool NS(Buffer_check_addr_arithmetic)(
     NS(buffer_addr_t) const addr,
     NS(buffer_addr_diff_t) const offset,
     NS(buffer_size_t) const slot_size )
@@ -494,7 +574,7 @@ SIXTRL_INLINE NS(buffer_addr_t) NS(Buffer_perform_addr_shift)(
     NS(buffer_addr_diff_t) const offset,
     NS(buffer_size_t) const slot_size )
 {
-    SIXTRL_ASSERT( NS(Buffer_check_addr_artithmetic)(
+    SIXTRL_ASSERT( NS(Buffer_check_addr_arithmetic)(
         addr, offset, slot_size) );
 
     #if !defined( NDEBUG )
@@ -771,16 +851,28 @@ SIXTRL_INLINE NS(buffer_addr_t) NS(Buffer_get_objects_begin_addr)(
 SIXTRL_INLINE NS(buffer_addr_t) NS(Buffer_get_objects_end_addr)(
     const NS(Buffer) *const SIXTRL_RESTRICT buffer )
 {
-    NS(buffer_addr_t) end_addr = NS(Buffer_get_data_begin_addr)( buffer );
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(buffer_addr_t) address_t;
 
-    if( end_addr != ( NS(buffer_size_t) )0u )
+    SIXTRL_STATIC_VAR buf_size_t const ZERO_SIZE = ( buf_size_t )0u;
+
+    address_t end_addr = NS(Buffer_get_objects_begin_addr)( buffer );
+
+    if( end_addr != ZERO_SIZE )
     {
-        end_addr += NS(Buffer_get_size)( buffer );
-    }
+        buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+        buf_size_t const obj_size  = NS(Buffer_get_slot_based_length)(
+            sizeof( NS(Object) ), slot_size );
 
-    SIXTRL_ASSERT(
-        ( NS(Buffer_get_slot_size)( buffer ) > ( NS(buffer_size_t) )0u ) &&
-        ( ( end_addr % NS(Buffer_get_slot_size)( buffer ) ) == 0u ) );
+        SIXTRL_ASSERT( buffer    != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( slot_size != ZERO_SIZE );
+        SIXTRL_ASSERT( obj_size  != ZERO_SIZE );
+
+        end_addr += obj_size * buffer->num_objects;
+
+        SIXTRL_ASSERT( ( end_addr % slot_size ) == 0u );
+        SIXTRL_ASSERT( end_addr < NS(Buffer_get_data_end_addr)( buffer ) );
+    }
 
     return end_addr;
 }
@@ -855,7 +947,7 @@ SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_section_num_elements)(
         #endif /* SIXTRACKLIB_ENABLE_MODULE_CUDA */
 
         {
-            num_elements = NS(Buffer_get_section_num_elements_generic)(
+            num_elements = NS(Buffer_get_section_num_entities_generic)(
                 buffer, header_slot_id );
         }
     }
@@ -916,8 +1008,10 @@ SIXTRL_INLINE NS(buffer_size_t) NS(Buffer_get_num_of_objects)(
     NS(buffer_size_t) const num_objects = ( buffer != SIXTRL_NULLPTR )
         ? ( buffer->num_objects ) : ( NS(buffer_size_t) )0u;
 
-    SIXTRL_ASSERT( num_objects ==
-        NS(Buffer_get_section_num_elements)( buffer, OBJ_HEADER_SLOT_ID ) );
+    NS(buffer_size_t) const cmp_num_objects =
+        NS(Buffer_get_section_num_elements)( buffer, OBJ_HEADER_SLOT_ID );
+
+    SIXTRL_ASSERT( num_objects == cmp_num_objects );
 
     return num_objects;
 }
@@ -954,7 +1048,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(Buffer_get_garbage_extent)(
     return NS(Buffer_get_section_extent)( buffer, GARBAGE_HEADER_SLOT_ID );
 }
 
-SIXTRL_INLINE NS(buffer_size_t) NS(Buffer_get_num_of_garbage_elements)(
+SIXTRL_INLINE NS(buffer_size_t) NS(Buffer_get_num_of_garbage_ranges)(
     const NS(Buffer) *const SIXTRL_RESTRICT buffer )
 {
     SIXTRL_STATIC_VAR NS(buffer_size_t) const
