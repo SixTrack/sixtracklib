@@ -160,6 +160,15 @@ NS(Object);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+typedef struct NS(BufferGarbage)
+{
+    NS(buffer_addr_t)    begin_addr       SIXTRL_ALIGN( 8u );
+    NS(buffer_addr_t)    size             SIXTRL_ALIGN( 8u );
+}
+NS(BufferGarbage);
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 typedef struct NS(Buffer)
 {
     NS(buffer_addr_t)    data_addr        SIXTRL_ALIGN( 8u );
