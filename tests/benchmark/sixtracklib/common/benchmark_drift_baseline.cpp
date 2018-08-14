@@ -46,6 +46,7 @@ int main( int argc, char* argv[] )
     for( std::size_t ii = 0u ; ii < NUM_BEAM_ELEMENTS ; ++ii )
     {
         st_Drift* drift = st_Blocks_add_drift( beam_elements, 1.0 );
+        (void) drift;
         assert( drift != nullptr );
     }
 
