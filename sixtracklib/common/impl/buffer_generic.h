@@ -237,15 +237,16 @@ SIXTRL_FN SIXTRL_STATIC void NS(Buffer_free_generic)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_FN SIXTRL_STATIC NS(Object)* NS(Buffer_add_object)(
-    NS(Buffer)* SIXTRL_RESTRICT buffer,
-    const void *const SIXTRL_RESTRICT object,
-    NS(buffer_size_t)        const object_size,
-    NS(object_type_id_t)     const type_id,
-    NS(buffer_size_t)        const num_obj_dataptr,
-    const NS(buffer_size_t) *const SIXTRL_RESTRICT obj_dataptr_offsets,
-    const NS(buffer_size_t) *const SIXTRL_RESTRICT obj_dataptr_sizes,
-    const NS(buffer_size_t) *const SIXTRL_RESTRICT obj_dataptr_counts );
+SIXTRL_FN SIXTRL_STATIC
+SIXTRL_ARGPTR_DEC NS(Object)* NS(Buffer_add_object_generic)(
+    SIXTRL_ARGPTR_DEC NS(Buffer)*       SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC const void *const SIXTRL_RESTRICT object_handle,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const  object_size,
+    NS(object_type_id_t)                const  type_id,
+    NS(buffer_size_t)                   const  num_obj_dataptrs,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT offsets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts );
 
 /* ------------------------------------------------------------------------- */
 
@@ -1626,6 +1627,9 @@ SIXTRL_INLINE int NS(Buffer_remap_section_objects_generic)(
             {
                 buf_size_t const obj_size = NS(Object_get_size)( obj_it );
 
+                buf_size_t const obj_offset =
+                    NS(Buffer_get_slot_based_length)( obj_size, slot_size );
+
                 address_t  const obj_begin_addr =
                     NS(Object_get_begin_addr)( obj_it );
 
@@ -1647,7 +1651,7 @@ SIXTRL_INLINE int NS(Buffer_remap_section_objects_generic)(
                     break;
                 }
 
-                min_valid_obj_addr = obj_begin_addr + obj_size;
+                min_valid_obj_addr = remapped_obj_begin_addr + obj_offset;
                 NS(Object_set_begin_addr)( obj_it, remapped_obj_begin_addr );
             }
         }
@@ -2525,15 +2529,15 @@ SIXTRL_INLINE void NS(Buffer_free_generic)(
 
 /* ========================================================================= */
 
-SIXTRL_INLINE NS(Object)* NS(Buffer_add_object)(
-    NS(Buffer)* SIXTRL_RESTRICT buffer,
-    const void *const SIXTRL_RESTRICT ptr_to_object,
+SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
+    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC const void *const SIXTRL_RESTRICT ptr_to_object,
     NS(buffer_size_t)        const object_size,
     NS(object_type_id_t)     const type_id,
-    NS(buffer_size_t)        const num_obj_dataptr,
-    const NS(buffer_size_t) *const SIXTRL_RESTRICT obj_dataptr_offsets,
-    const NS(buffer_size_t) *const SIXTRL_RESTRICT obj_dataptr_sizes,
-    const NS(buffer_size_t) *const SIXTRL_RESTRICT obj_dataptr_counts )
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const num_obj_dataptr,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT dataptr_offsets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT dataptr_sizes,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT dataptr_counts )
 {
     typedef NS(Object)              object_t;
     typedef NS(buffer_size_t)       buf_size_t;
@@ -2602,19 +2606,19 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object)(
         {
             buf_size_t ii = ZERO_SIZE;
 
-            SIXTRL_ASSERT( obj_dataptr_offsets != SIXTRL_NULLPTR );
-            SIXTRL_ASSERT( obj_dataptr_sizes   != SIXTRL_NULLPTR );
-            SIXTRL_ASSERT( obj_dataptr_counts  != SIXTRL_NULLPTR );
+            SIXTRL_ASSERT( dataptr_offsets != SIXTRL_NULLPTR );
+            SIXTRL_ASSERT( dataptr_sizes   != SIXTRL_NULLPTR );
+            SIXTRL_ASSERT( dataptr_counts  != SIXTRL_NULLPTR );
 
             for( ; ii < num_obj_dataptr ; ++ii )
             {
-                buf_size_t const elem_size = obj_dataptr_sizes[ ii ];
-                buf_size_t const attr_cnt  = obj_dataptr_counts[ ii ];
+                buf_size_t const elem_size = dataptr_sizes[ ii ];
+                buf_size_t const attr_cnt  = dataptr_counts[ ii ];
                 buf_size_t const attr_size = NS(Buffer_get_slot_based_length)(
                     elem_size * attr_cnt, slot_size );
 
-                SIXTRL_ASSERT( ( obj_dataptr_offsets[ ii ] % slot_size ) == 0u );
-                SIXTRL_ASSERT(   obj_dataptr_offsets[ ii ] < object_size );
+                SIXTRL_ASSERT( ( dataptr_offsets[ ii ] % slot_size ) == 0u );
+                SIXTRL_ASSERT(   dataptr_offsets[ ii ] < object_size );
 
                 SIXTRL_ASSERT( elem_size > ZERO_SIZE );
                 SIXTRL_ASSERT( attr_cnt  > ZERO_SIZE );
@@ -2741,9 +2745,9 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object)(
 
                 for( ; ii < num_obj_dataptr ; ++ii, ++out_it )
                 {
-                    buf_size_t const offset    = obj_dataptr_offsets[ ii ];
-                    buf_size_t const attr_cnt  = obj_dataptr_counts[ ii ];
-                    buf_size_t const elem_size = obj_dataptr_sizes[ ii ];
+                    buf_size_t const offset    = dataptr_offsets[ ii ];
+                    buf_size_t const attr_cnt  = dataptr_counts[ ii ];
+                    buf_size_t const elem_size = dataptr_sizes[ ii ];
                     buf_size_t const attr_size = attr_cnt * elem_size;
 
                     buf_size_t const attr_extent =

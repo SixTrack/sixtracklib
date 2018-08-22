@@ -24,21 +24,61 @@
 extern "C" {
 #endif /* defined( __cplusplus ) */
 
-typedef SIXTRL_UINT64_T NS(object_type_id_t);
+/* ------------------------------------------------------------------------- */
 
 typedef SIXTRL_UINT64_T NS(buffer_addr_t);
 typedef SIXTRL_INT64_T  NS(buffer_addr_diff_t);
 typedef SIXTRL_UINT64_T NS(buffer_size_t);
 typedef SIXTRL_UINT64_T NS(buffer_flags_t);
 
+typedef SIXTRL_UINT64_T NS(object_type_id_t);
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_NONE) = ( NS(object_type_id_t) )0x00000000;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_PARTICLE) = ( NS(object_type_id_t) )0x00000001;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_DRIFT) = ( NS(object_type_id_t) )0x00000002;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_DRIFT_EXACT) = ( NS(object_type_id_t) )0x00000003;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_MULTIPOLE) = ( NS(object_type_id_t) )0x00000004;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_CAVITY) = ( NS(object_type_id_t) )0x00000005;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_XYSHIFT) = ( NS(object_type_id_t) )0x00000006;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_SROTATION) = ( NS(object_type_id_t) )0x00000007;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_BEAM_BEAM_4D) = ( NS(object_type_id_t) )0x00000008;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_BEAM_BEAM_6D) = ( NS(object_type_id_t) )0x00000009;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_LINE) = ( NS(object_type_id_t) )0x00000100;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_INVALID) = ( NS(object_type_id_t) )0xffffffff;
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_STATIC_VAR NS(buffer_flags_t) const
     NS(BUFFER_FLAGS_NONE)                   = ( NS(buffer_flags_t) )0x00000000;
 
 SIXTRL_STATIC_VAR NS(buffer_flags_t) const
-    NS(BUFFER_USES_DATASTORE)              = ( NS(buffer_flags_t) )0x00000001;
+    NS(BUFFER_USES_DATASTORE)               = ( NS(buffer_flags_t) )0x00000001;
 
 SIXTRL_STATIC_VAR NS(buffer_flags_t) const
-    NS(BUFFER_OWNS_DATASTORE)              = ( NS(buffer_flags_t) )0x00000002;
+    NS(BUFFER_OWNS_DATASTORE)               = ( NS(buffer_flags_t) )0x00000002;
 
 SIXTRL_STATIC_VAR NS(buffer_flags_t) const
     NS(BUFFER_DATASTORE_ALLOW_APPENDS)      = ( NS(buffer_flags_t) )0x00000004;
@@ -85,6 +125,56 @@ SIXTRL_STATIC_VAR NS(buffer_size_t) const
 #endif /* defined( __cplusplus ) */
 
 #else
+
+    #if !defined( NS(OBJECT_TYPE_NONE)         )
+        #define NS(OBJECT_TYPE_NONE)         0x00000000
+    #endif /* !defined( NS(OBJECT_TYPE_NONE)         ) */
+
+    #if !defined( NS(OBJECT_TYPE_PARTICLE)     )
+        #define NS(OBJECT_TYPE_PARTICLE)     0x00000001
+    #endif /* !defined( NS(OBJECT_TYPE_PARTICLE)     ) */
+
+    #if !defined( NS(OBJECT_TYPE_DRIFT)        )
+        #define NS(OBJECT_TYPE_DRIFT)        0x00000002
+    #endif /* !defined( NS(OBJECT_TYPE_DRIFT)        ) */
+
+    #if !defined( NS(OBJECT_TYPE_DRIFT_EXACT)  )
+        #define NS(OBJECT_TYPE_DRIFT_EXACT)  0x00000003
+    #endif /* !defined( NS(OBJECT_TYPE_DRIFT_EXACT)  ) */
+
+    #if !defined( NS(OBJECT_TYPE_MULTIPOLE)    )
+        #define NS(OBJECT_TYPE_MULTIPOLE)    0x00000004
+    #endif /* !defined( NS(OBJECT_TYPE_MULTIPOLE)    ) */
+
+    #if !defined( NS(OBJECT_TYPE_CAVITY)       )
+        #define NS(OBJECT_TYPE_CAVITY)       0x00000005
+    #endif /* !defined( NS(OBJECT_TYPE_CAVITY)       ) */
+
+    #if !defined( NS(OBJECT_TYPE_XYSHIFT)      )
+        #define NS(OBJECT_TYPE_XYSHIFT)      0x00000006
+    #endif /* !defined( NS(OBJECT_TYPE_XYSHIFT)      ) */
+
+    #if !defined( NS(OBJECT_TYPE_SROTATION)    )
+        #define NS(OBJECT_TYPE_SROTATION)    0x00000007
+    #endif /* !defined( NS(OBJECT_TYPE_SROTATION)    ) */
+
+    #if !defined( NS(OBJECT_TYPE_BEAM_BEAM_4D) )
+        #define NS(OBJECT_TYPE_BEAM_BEAM_4D) 0x00000008
+    #endif /* !defined( NS(OBJECT_TYPE_BEAM_BEAM_4D) ) */
+
+    #if !defined( NS(OBJECT_TYPE_BEAM_BEAM_6D) )
+        #define NS(OBJECT_TYPE_BEAM_BEAM_6D) 0x00000009
+    #endif /* !defined( NS(OBJECT_TYPE_BEAM_BEAM_6D) ) */
+
+    #if !defined( NS(OBJECT_TYPE_LINE)         )
+        #define NS(OBJECT_TYPE_LINE)         0x00000100
+    #endif /* !defined( NS(OBJECT_TYPE_LINE)         ) */
+
+    #if !defined( NS(OBJECT_TYPE_INVALID)      )
+        #define NS(OBJECT_TYPE_INVALID)      0xffffffff
+    #endif /* !defined( NS(OBJECT_TYPE_INVALID)      ) */
+
+    /* --------------------------------------------------------------------- */
 
    #if !defined( NS(BUFFER_FLAGS_NONE) )
        #define NS(BUFFER_FLAGS_NONE)                        0x00000000
@@ -148,6 +238,10 @@ SIXTRL_STATIC_VAR NS(buffer_size_t) const
 
 #endif /* !defined( _GPUCODE ) */
 
+#if defined( __cplusplus )
+extern "C" {
+#endif /* defined( __cplusplus ) */
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 typedef struct NS(Object)
@@ -186,6 +280,10 @@ typedef struct NS(Buffer)
 }
 NS(Buffer);
 
+#if defined( __cplusplus )
+}
+#endif /* defined( __cplusplus ) */
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #if defined( __cplusplus )
@@ -197,8 +295,48 @@ namespace SIXTRL_NAMESPACE
     using buffer_size_t    = NS(buffer_size_t);
     using buffer_flags_t   = NS(buffer_flags_t);
 
-    using Buffer = ::NS(Buffer);
-    using Object = ::NS(Object);
+    using Buffer     = ::NS(Buffer);
+    using Object     = ::NS(Object);
+
+    /* --------------------------------------------------------------------- */
+
+    static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_NONE         = NS(OBJECT_TYPE_NONE);
+
+    static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_PARTICLE     = NS(OBJECT_TYPE_PARTICLE);
+
+    static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_DRIFT        = NS(OBJECT_TYPE_DRIFT);
+
+    static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_DRIFT_EXACT  = NS(OBJECT_TYPE_DRIFT_EXACT);
+
+    static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_MULTIPOLE    = NS(OBJECT_TYPE_MULTIPOLE);
+
+    static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_CAVITY       = NS(OBJECT_TYPE_CAVITY);
+
+    static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_XYSHIFT      = NS(OBJECT_TYPE_XYSHIFT);
+
+    static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_SROTATION    = NS(OBJECT_TYPE_SROTATION);
+
+    static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_BEAM_BEAM_4D = NS(OBJECT_TYPE_BEAM_BEAM_4D);
+
+    static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_BEAM_BEAM_6D = NS(OBJECT_TYPE_BEAM_BEAM_6D);
+
+    static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_LINE         = NS(OBJECT_TYPE_LINE);
+
+    static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_INVALID      = NS(OBJECT_TYPE_INVALID);
+
+    /* --------------------------------------------------------------------- */
 
     static SIXTRL_CONSTEXPR_OR_CONST buffer_flags_t
         BUFFER_FLAGS_NONE = NS(BUFFER_FLAGS_NONE);
@@ -226,6 +364,7 @@ namespace SIXTRL_NAMESPACE
         BUFFER_DATASTORE_ALLOW_RESIZE =
             NS(BUFFER_DATASTORE_ALLOW_RESIZE);
 
+    /* --------------------------------------------------------------------- */
 
     static SIXTRL_CONSTEXPR_OR_CONST buffer_flags_t
         BUFFER_DATASTORE_MEMPOOL = NS(BUFFER_DATASTORE_MEMPOOL);
