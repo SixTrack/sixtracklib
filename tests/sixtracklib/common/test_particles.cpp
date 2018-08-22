@@ -10,279 +10,111 @@
 #include "sixtracklib/testlib.h"
 
 #include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/common/blocks.h"
+#include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
 
 /* ========================================================================= */
 /* ====  Test random initialization of particles                             */
 
-TEST( ParticlesTests, RandomInitParticlesCopyAndCompare )
+TEST( CParticlesTests, RandomInitParticlesCopyAndCompare )
 {
     uint64_t seed = UINT64_C( 20180420 );
     st_Random_init_genrand64( seed );
 
-    /* --------------------------------------------------------------------- */
-
-    st_Blocks particles_buffer;
-    st_Blocks_preset( &particles_buffer );
-
-    st_block_size_t const NUM_BLOCKS = 2u;
-
-    st_block_num_elements_t const NUM_PARTICLES =
-        ( st_block_num_elements_t )1000u;
-
-    st_block_size_t const PARTICLES_DATA_CAPACITY =
-        st_Blocks_predict_data_capacity_for_num_blocks(
-            &particles_buffer, NUM_BLOCKS ) +
-        st_Particles_predict_blocks_data_capacity(
-            &particles_buffer, NUM_BLOCKS, NUM_PARTICLES );
+    st_buffer_size_t const NUM_PARTICLES = ( st_buffer_size_t )1000u;
 
     /* --------------------------------------------------------------------- */
 
-    int ret = st_Blocks_init(
-        &particles_buffer, NUM_BLOCKS, PARTICLES_DATA_CAPACITY );
+    st_Buffer* pb = st_Buffer_new( ( st_buffer_size_t )( 1u << 20u ) );
+    ASSERT_TRUE( pb != SIXTRL_NULLPTR );
 
-    ASSERT_TRUE( ret == 0 );
+    st_Particles* p = st_Particles_new( pb, NUM_PARTICLES );
+    ASSERT_TRUE( p != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Buffer_get_num_of_objects( pb ) == st_buffer_size_t{ 1 } );
 
-    st_Particles* particles = st_Blocks_add_particles(
-        &particles_buffer, NUM_PARTICLES );
+    ASSERT_TRUE( st_Particles_get_num_of_particles( p ) == NUM_PARTICLES );
 
-    ASSERT_TRUE( particles != nullptr );
+    ASSERT_TRUE( st_Particles_get_const_q0( p )     != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_mass0( p )  != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_beta0( p )  != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_gamma0( p ) != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_p0c( p )    != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_s( p )      != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_x( p )      != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_y( p )      != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_px( p )     != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_py( p )     != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_zeta( p )   != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_psigma( p ) != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_delta( p )  != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_rpp( p )    != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_rvv( p )    != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_chi( p )    != SIXTRL_NULLPTR );
 
-    ASSERT_TRUE( st_Blocks_get_num_of_blocks( &particles_buffer ) == 1u );
-
-    ASSERT_TRUE( st_Particles_get_num_particles( particles ) ==
-                 NUM_PARTICLES );
-
-    ASSERT_TRUE( st_Particles_get_type_id( particles ) ==
-                 st_BLOCK_TYPE_PARTICLE );
-
-    st_Particles_random_init( particles );
-
-    /* --------------------------------------------------------------------- */
-
-    st_Particles* particles_copy = st_Blocks_add_particles(
-        &particles_buffer, NUM_PARTICLES );
-
-    ASSERT_TRUE( particles_copy != nullptr );
-    ASSERT_TRUE( st_Blocks_get_num_of_blocks( &particles_buffer ) == 2 );
-
-    ASSERT_TRUE( st_Particles_get_num_particles( particles_copy ) ==
-                 NUM_PARTICLES );
-
-    ASSERT_TRUE( st_Particles_get_type_id( particles_copy ) ==
-                 st_BLOCK_TYPE_PARTICLE );
+    ASSERT_TRUE( st_Particles_get_const_particle_id( p )   != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_at_element_id( p ) != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_at_turn( p )       != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_state( p )         != SIXTRL_NULLPTR );
 
     /* --------------------------------------------------------------------- */
 
-    st_Particles_copy_all_unchecked( particles_copy, particles );
+    st_Particles* p_copy =  st_Particles_new( pb, NUM_PARTICLES );
+    ASSERT_TRUE(  p_copy != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Buffer_get_num_of_objects( pb ) == st_buffer_size_t{ 2 } );
 
-    ASSERT_TRUE( st_Particles_have_same_structure(
-        particles_copy, particles ) );
+    ASSERT_TRUE( st_Particles_get_num_of_particles( p_copy ) == NUM_PARTICLES );
 
-    ASSERT_TRUE( !st_Particles_map_to_same_memory(
-        particles_copy, particles ) );
+    ASSERT_TRUE( st_Particles_get_const_q0( p_copy )     != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_mass0( p_copy )  != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_beta0( p_copy )  != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_gamma0( p_copy ) != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_p0c( p_copy )    != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_s( p_copy )      != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_x( p_copy )      != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_y( p_copy )      != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_px( p_copy )     != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_py( p_copy )     != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_zeta( p_copy )   != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_psigma( p_copy ) != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_delta( p_copy )  != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_rpp( p_copy )    != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_rvv( p_copy )    != SIXTRL_NULLPTR );
+    ASSERT_TRUE( st_Particles_get_const_chi( p_copy )    != SIXTRL_NULLPTR );
 
-    ASSERT_TRUE( 0 == st_Particles_compare_values(
-        particles_copy, particles ) );
+    ASSERT_TRUE( st_Particles_get_const_particle_id( p_copy ) !=
+                 SIXTRL_NULLPTR );
+
+    ASSERT_TRUE( st_Particles_get_const_at_element_id( p_copy ) !=
+                 SIXTRL_NULLPTR );
+
+    ASSERT_TRUE( st_Particles_get_const_at_turn( p_copy ) !=
+                 SIXTRL_NULLPTR );
+
+    ASSERT_TRUE( st_Particles_get_const_state( p_copy ) !=
+                 SIXTRL_NULLPTR );
 
     /* --------------------------------------------------------------------- */
 
-    particles      = nullptr;
-    particles_copy = nullptr;
+    st_Particles_random_init( p );
+    st_Particles_copy_all_unchecked( p_copy, p );
 
-    st_Blocks_free( &particles_buffer );
+    /* --------------------------------------------------------------------- */
+
+    ASSERT_TRUE( st_Particles_have_same_structure( p_copy, p ) );
+    ASSERT_TRUE( !st_Particles_map_to_same_memory( p_copy, p ) );
+    ASSERT_TRUE( 0 == st_Particles_compare_values( p_copy, p ) );
+
+    /* --------------------------------------------------------------------- */
+
+    p      = SIXTRL_NULLPTR;
+    p_copy = SIXTRL_NULLPTR;
+
+    st_Buffer_delete( pb );
+    pb = SIXTRL_NULLPTR;
 }
 
 /* ========================================================================= */
 /* ====  test: init, serialize and unserialize from same memory -> compare   */
 
-TEST( ParticlesTests, RandomInitSerializationToUnserializationSameMemory )
-{
-    uint64_t seed = UINT64_C( 20180420 );
-    st_Random_init_genrand64( seed );
-
-    /* --------------------------------------------------------------------- */
-
-    st_Blocks particles_buffer;
-    st_Blocks_preset( &particles_buffer );
-
-    st_block_size_t const NUM_BLOCKS = ( st_block_size_t )1u;
-
-    st_block_num_elements_t const NUM_PARTICLES =
-        ( st_block_num_elements_t )1000u;
-
-    st_block_size_t const PARTICLES_DATA_CAPACITY =
-        st_Blocks_predict_data_capacity_for_num_blocks(
-            &particles_buffer, NUM_BLOCKS ) +
-        st_Particles_predict_blocks_data_capacity(
-            &particles_buffer, NUM_BLOCKS, NUM_PARTICLES );
-
-    int ret = st_Blocks_init(
-        &particles_buffer, NUM_BLOCKS, PARTICLES_DATA_CAPACITY );
-
-    ASSERT_TRUE( ret == 0 );
-
-    /* --------------------------------------------------------------------- */
-
-    st_Particles* particles = st_Blocks_add_particles(
-        &particles_buffer, NUM_PARTICLES );
-
-    ASSERT_TRUE( particles != nullptr );
-
-    st_Particles_random_init( particles );
-
-    ASSERT_TRUE( !st_Blocks_are_serialized( &particles_buffer ) );
-    ASSERT_TRUE(  st_Blocks_serialize( &particles_buffer ) == 0 );
-    ASSERT_TRUE(  st_Blocks_are_serialized( &particles_buffer ) );
-
-    /* --------------------------------------------------------------------- */
-
-    SIXTRL_GLOBAL_DEC unsigned char* serialized_particles_begin =
-        st_Blocks_get_data_begin( &particles_buffer );
-
-    ASSERT_TRUE( serialized_particles_begin != nullptr );
-
-    st_Blocks ref_particles_buffer;
-    st_Blocks_preset( &ref_particles_buffer );
-
-    ASSERT_TRUE( st_Blocks_unserialize(
-        &ref_particles_buffer, serialized_particles_begin ) == 0 );
-
-    ASSERT_TRUE( st_Blocks_get_num_of_blocks( &ref_particles_buffer ) == 1u );
-
-    SIXTRL_GLOBAL_DEC st_BlockInfo const* blocks_it  =
-        st_Blocks_get_const_block_infos_begin( &ref_particles_buffer );
-
-    SIXTRL_GLOBAL_DEC st_BlockInfo const* blocks_end =
-        st_Blocks_get_const_block_infos_end( &ref_particles_buffer );
-
-    ASSERT_TRUE( std::distance( blocks_it, blocks_end ) == 1 );
-
-    ASSERT_TRUE( st_BlockInfo_get_type_id( blocks_it ) ==
-                 st_BLOCK_TYPE_PARTICLE );
-
-    SIXTRL_GLOBAL_DEC st_Particles const* ref_particles =
-        st_Blocks_get_const_particles( blocks_it );
-
-    ASSERT_TRUE( ref_particles != nullptr );
-
-    /* --------------------------------------------------------------------- */
-
-    ASSERT_TRUE( st_Particles_have_same_structure(
-        ref_particles, particles ) );
-
-    ASSERT_TRUE( st_Particles_map_to_same_memory(
-        ref_particles, particles ) );
-
-    ASSERT_TRUE( 0 == st_Particles_compare_values(
-        ref_particles, particles ) );
-
-    /* --------------------------------------------------------------------- */
-
-    particles = nullptr;
-    ref_particles = nullptr;
-
-    st_Blocks_free( &particles_buffer );
-}
-
-/* ========================================================================= */
-/* ====  test: init, serialize, copy memory, unserialize -> compare   */
-
-TEST( ParticlesTests, RandomInitSerializationCopyMemoryUnserializeCompare )
-{
-    uint64_t seed = UINT64_C( 20180420 );
-    st_Random_init_genrand64( seed );
-
-    /* --------------------------------------------------------------------- */
-
-    st_Blocks particles_buffer;
-    st_Blocks_preset( &particles_buffer );
-
-    st_block_size_t const NUM_BLOCKS = ( st_block_size_t )1u;
-
-    st_block_num_elements_t const NUM_PARTICLES =
-        ( st_block_num_elements_t )1000u;
-
-    st_block_size_t const PARTICLES_DATA_CAPACITY =
-        st_Blocks_predict_data_capacity_for_num_blocks(
-            &particles_buffer, NUM_BLOCKS ) +
-        st_Particles_predict_blocks_data_capacity(
-            &particles_buffer, NUM_BLOCKS, NUM_PARTICLES );
-
-    int ret = st_Blocks_init(
-        &particles_buffer, NUM_BLOCKS, PARTICLES_DATA_CAPACITY );
-
-    ASSERT_TRUE( ret == 0 );
-
-    /* --------------------------------------------------------------------- */
-
-    st_Particles* particles = st_Blocks_add_particles(
-        &particles_buffer, NUM_PARTICLES );
-
-    ASSERT_TRUE( particles != nullptr );
-
-    st_Particles_random_init( particles );
-
-    ASSERT_TRUE( !st_Blocks_are_serialized( &particles_buffer ) );
-    ASSERT_TRUE(  st_Blocks_serialize( &particles_buffer ) == 0 );
-    ASSERT_TRUE(  st_Blocks_are_serialized( &particles_buffer ) );
-
-    /* --------------------------------------------------------------------- */
-
-    std::vector< unsigned char > copied_raw_data(
-        st_Blocks_get_const_data_begin( &particles_buffer ),
-        st_Blocks_get_const_data_end( &particles_buffer ) );
-
-    ASSERT_TRUE( copied_raw_data.size() ==
-                 st_Blocks_get_total_num_bytes( &particles_buffer ) );
-
-    st_Blocks copied_particles_buffer;
-    st_Blocks_preset( &copied_particles_buffer );
-
-    ret = st_Blocks_unserialize(
-        &copied_particles_buffer, copied_raw_data.data() );
-
-    ASSERT_TRUE( ret == 0 );
-
-    ASSERT_TRUE( st_Blocks_get_num_of_blocks( &copied_particles_buffer ) == 1u );
-
-    SIXTRL_GLOBAL_DEC st_BlockInfo const* blocks_it  =
-        st_Blocks_get_const_block_infos_begin(
-            &copied_particles_buffer );
-
-    SIXTRL_GLOBAL_DEC st_BlockInfo const* blocks_end =
-        st_Blocks_get_const_block_infos_end(
-            &copied_particles_buffer );
-
-    ASSERT_TRUE( std::distance( blocks_it, blocks_end ) == 1 );
-
-    ASSERT_TRUE( st_BlockInfo_get_type_id( blocks_it ) ==
-                 st_BLOCK_TYPE_PARTICLE );
-
-    SIXTRL_GLOBAL_DEC st_Particles const* copied_particles =
-        st_Blocks_get_const_particles( blocks_it );
-
-    ASSERT_TRUE( copied_particles != nullptr );
-
-    /* --------------------------------------------------------------------- */
-
-    ASSERT_TRUE( st_Particles_have_same_structure(
-        copied_particles, particles ) );
-
-    ASSERT_TRUE( !st_Particles_map_to_same_memory(
-        copied_particles, particles ) );
-
-    ASSERT_TRUE( 0 == st_Particles_compare_values(
-        copied_particles, particles ) );
-
-    /* --------------------------------------------------------------------- */
-
-    particles = nullptr;
-    copied_particles = nullptr;
-
-    st_Blocks_free( &particles_buffer );
-    st_Blocks_free( &copied_particles_buffer );
-}
 
 /* end: tests/sixtracklib/common/test_particles.cpp */
