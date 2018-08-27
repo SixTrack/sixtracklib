@@ -2,16 +2,20 @@
 
 set( SIXTRACKLIB_COMMON_IMPL_HEADERS
      impl/alignment_impl.h
-     impl/beam_beam_element_6d.h
-     impl/beam_elements_type.h
-     impl/beam_elements_api.h
-     impl/buffer_generic.h
+#      impl/beam_beam_element_6d.h
+#      impl/beam_elements_type.h
+#      impl/beam_elements_api.h
      impl/buffer_type.h
-     impl/faddeeva.h
-     impl/faddeeva_mit.h
-     impl/particles_type.h
-     impl/particles_api.h
-     impl/track_api.h
+     impl/buffer_mem_minimal.h
+     impl/buffer_mem_remap.h
+     impl/buffer_mem.h
+     impl/buffer_object.h
+     impl/buffer_generic.h
+#      impl/faddeeva.h
+#      impl/faddeeva_mit.h
+#      impl/particles_type.h
+#      impl/particles_api.h
+#      impl/track_api.h
 )
 
 set( SIXTRACKLIB_COMMON_DETAILS_HEADERS
@@ -20,24 +24,24 @@ set( SIXTRACKLIB_COMMON_DETAILS_HEADERS
 
 set( SIXTRACKLIB_COMMON_HEADERS
      alignment.h
-     beam_elements.h
-     blocks.h
+#      beam_elements.h
+#      blocks.h
      buffer.h
      compute_arch.h
      mem_pool.h
      particles.h
-     track.h
+#      track.h
 )
 
 set( SIXTRACKLIB_COMMON_SOURCES
      details/alignment.c
-     details/beam_elements.c
-     details/blocks.c
+#      details/beam_elements.c
+#      details/blocks.c
      details/buffer.c
      details/compute_arch.c
-     details/faddeeva_mit.c
+#      details/faddeeva_mit.c
      details/mem_pool.c
-     details/particles.c
+#      details/particles.c
 )
 
 add_library( sixtrack_common OBJECT

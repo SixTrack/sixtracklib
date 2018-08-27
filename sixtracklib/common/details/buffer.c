@@ -8,8 +8,12 @@
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/common/mem_pool.h"
 
-#include "sixtracklib/common/impl/buffer_type.h"
 #include "sixtracklib/common/impl/buffer_generic.h"
+#include "sixtracklib/common/impl/buffer_mem.h"
+#include "sixtracklib/common/impl/buffer_mem_minimal.h"
+#include "sixtracklib/common/impl/buffer_mem_remap.h"
+#include "sixtracklib/common/impl/buffer_object.h"
+#include "sixtracklib/common/impl/buffer_type.h"
 
 #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
         ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
@@ -52,14 +56,13 @@ NS(Buffer)* NS(Buffer_allocate_generic)(
 
     buf_size_t const slot_size = NS(Buffer_get_slot_size)( ptr_buffer );
 
-    buf_size_t const addr_size = NS(Buffer_get_slot_based_length)(
+    buf_size_t const addr_size = NS(BufferMem_get_slot_based_length)(
         sizeof( address_t ), slot_size );
 
     buf_size_t const section_hd_size = ( buf_size_t )2u * addr_size;
 
     buf_size_t const min_required_capacity =
-        ( buf_size_t )8u * addr_size +
-        ( buf_size_t )4u * section_hd_size;
+        NS(BUFFER_DEFAULT_HEADER_SIZE) + ( buf_size_t )4u * section_hd_size;
 
     if( ( ptr_buffer != SIXTRL_NULLPTR ) &&
         ( min_required_capacity <= buffer_capacity ) )
@@ -73,6 +76,8 @@ NS(Buffer)* NS(Buffer_allocate_generic)(
             ptr_to_mem_pool_t ptr_mem_pool = NS(MemPool_preset)(
                 ( mem_pool_t* )malloc( sizeof( mem_pool_t ) ) );
 
+            NS(MemPool_set_chunk_size)( ptr_mem_pool, slot_size );
+
             if( NS(MemPool_reserve_aligned)( ptr_mem_pool,
                     buffer_capacity, slot_size ) )
             {
@@ -81,22 +86,24 @@ NS(Buffer)* NS(Buffer_allocate_generic)(
 
                 if( NS(AllocResult_valid)( &result ) )
                 {
-                    ptr_buffer->data_addr = ( address_t )(
-                        uintptr_t )NS(AllocResult_get_pointer)( &result );
+                    success = NS(Buffer_init_on_flat_memory)( ptr_buffer,
+                        NS(AllocResult_get_pointer)( &result ),
+                        NS(AllocResult_get_length)(  &result ) );
 
-                    ptr_buffer->data_capacity = ( address_t )(
-                        uintptr_t )NS(AllocResult_get_length)( &result );
+                    if( success == 0 )
+                    {
+                        ptr_buffer->datastore_addr =
+                            ( address_t )( uintptr_t )ptr_mem_pool;
 
-                    ptr_buffer->datastore_addr = ( address_t )(
-                        uintptr_t )ptr_mem_pool;
-
-                    ptr_buffer->datastore_addr = buffer_flags |
-                        NS(BUFFER_DATASTORE_ALLOW_APPENDS) |
-                        NS(BUFFER_DATASTORE_ALLOW_CLEAR)   |
-                        NS(BUFFER_DATASTORE_ALLOW_REMAPPING) |
-                        NS(BUFFER_DATASTORE_ALLOW_RESIZE);
-
-                    success = 0;
+                        ptr_buffer->datastore_flags = buffer_flags |
+                            NS(BUFFER_USES_DATASTORE) |
+                            NS(BUFFER_OWNS_DATASTORE) |
+                            NS(BUFFER_DATASTORE_MEMPOOL) |
+                            NS(BUFFER_DATASTORE_ALLOW_APPENDS) |
+                            NS(BUFFER_DATASTORE_ALLOW_CLEAR)   |
+                            NS(BUFFER_DATASTORE_ALLOW_REMAPPING) |
+                            NS(BUFFER_DATASTORE_ALLOW_RESIZE);
+                    }
                 }
             }
         }
@@ -160,13 +167,13 @@ NS(Buffer)* NS(Buffer_new_detailed)(
 
     buf_size_t const slot_size = NS(BUFFER_DEFAULT_SLOT_SIZE);
 
-    buf_size_t const addr_size = NS(Buffer_get_slot_based_length)(
+    buf_size_t const addr_size = NS(BufferMem_get_slot_based_length)(
         sizeof( address_t ), slot_size );
 
-    buf_size_t const obj_info_size = NS(Buffer_get_slot_based_length)(
+    buf_size_t const obj_info_size = NS(BufferMem_get_slot_based_length)(
         sizeof( NS(Object) ), slot_size );
 
-    buf_size_t const dataptrs_size = NS(Buffer_get_slot_based_length)(
+    buf_size_t const dataptrs_size = NS(BufferMem_get_slot_based_length)(
         sizeof( address_t* ), slot_size );
 
     buf_size_t const garbage_size = slot_size;
