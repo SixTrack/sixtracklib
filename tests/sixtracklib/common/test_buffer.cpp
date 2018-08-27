@@ -31,7 +31,7 @@ namespace sixtrl
 
 /* ************************************************************************* */
 
-TEST( CommonBufferTests, InitOnExistingFlatMemory)
+TEST( C99_CommonBufferTests, InitOnExistingFlatMemory)
 {
     std::vector< unsigned char > too_small( 36u, uint8_t{ 0 } );
     std::vector< unsigned char > data_buffer( ( 1u << 20u ), uint8_t{ 0 } );
@@ -54,7 +54,7 @@ TEST( CommonBufferTests, InitOnExistingFlatMemory)
 
 /* ************************************************************************* */
 
-TEST( CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
+TEST( C99_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 {
     using my_obj_t = sixtrl::MyObj;
     using obj_t    = NS(Object);
@@ -556,7 +556,7 @@ TEST( CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 
 /* ************************************************************************* */
 
-TEST( CommonBufferTests, ReconstructFromCObjectFile )
+TEST( C99_CommonBufferTests, ReconstructFromCObjectFile )
 {
     using my_obj_t = sixtrl::MyObj;
     using obj_t    = NS(Object);
@@ -597,6 +597,7 @@ TEST( CommonBufferTests, ReconstructFromCObjectFile )
     attr_counts[ 1 ] = num_e_values;
 
     my_obj_t cmp_my_obj[ 3 ];
+    std::memset( &cmp_my_obj[ 0 ], ( int )0, sizeof( my_obj_t ) * 3u );
 
     my_obj_t& obj1 = cmp_my_obj[ 0 ];
     obj1.type_id = 3u;
@@ -680,7 +681,6 @@ TEST( CommonBufferTests, ReconstructFromCObjectFile )
 
         ASSERT_TRUE( cnt == st_buffer_size_t{ 1 } );
 
-        std::fflush( fp );
         std::fclose( fp );
         fp = nullptr;
     }
@@ -779,7 +779,214 @@ TEST( CommonBufferTests, ReconstructFromCObjectFile )
     }
 
     st_Buffer_free( &buffer );
+}
 
+TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
+{
+    using my_obj_t   = sixtrl::MyObj;
+    using obj_t      = NS(Object);
+    using buf_size_t = st_buffer_size_t;
+    using type_id_t  = st_object_type_id_t;
+
+    static constexpr buf_size_t ZERO_SIZE = buf_size_t{ 0u };
+
+    st_Buffer* buffer = st_Buffer_new( buf_size_t{ 1u << 20u } );
+
+    ASSERT_TRUE( buffer != nullptr );
+
+    ASSERT_TRUE(  st_Buffer_has_datastore( buffer ) );
+    ASSERT_TRUE(  st_Buffer_uses_datastore( buffer ) );
+    ASSERT_TRUE(  st_Buffer_owns_datastore( buffer ) );
+    ASSERT_TRUE(  st_Buffer_allow_modify_datastore_contents( buffer ) );
+    ASSERT_TRUE(  st_Buffer_allow_clear( buffer ) );
+    ASSERT_TRUE(  st_Buffer_allow_append_objects( buffer ) );
+    ASSERT_TRUE(  st_Buffer_allow_remapping( buffer ) );
+    ASSERT_TRUE(  st_Buffer_allow_resize( buffer ) );
+    ASSERT_TRUE(  st_Buffer_uses_mempool_datastore( buffer ) );
+    ASSERT_TRUE( !st_Buffer_uses_special_opencl_datastore( buffer ) );
+    ASSERT_TRUE( !st_Buffer_uses_special_cuda_datastore( buffer ) );
+
+    buf_size_t const slot_size = st_Buffer_get_slot_size( buffer );
+    ASSERT_TRUE( slot_size > ZERO_SIZE );
+
+    buf_size_t const sect_hdr_len = st_Buffer_get_section_header_size( buffer );
+
+    ASSERT_TRUE( st_Buffer_get_size( buffer )                  >  ZERO_SIZE );
+
+    ASSERT_TRUE( st_Buffer_get_num_of_slots( buffer )          == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_max_num_of_slots( buffer )      == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_slots_extent( buffer )          == sect_hdr_len );
+
+    ASSERT_TRUE( st_Buffer_get_num_of_objects( buffer )        == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_max_num_of_objects( buffer )    == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_objects_extent( buffer )        == sect_hdr_len );
+
+    ASSERT_TRUE( st_Buffer_get_num_of_dataptrs( buffer )       == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_max_num_of_dataptrs( buffer )   == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_dataptrs_extent( buffer )       == sect_hdr_len );
+
+    ASSERT_TRUE( st_Buffer_get_num_of_garbage_ranges( buffer ) == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_max_num_of_garbage_ranges( buffer ) == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_garbage_extent( buffer )        == sect_hdr_len );
+
+    /* --------------------------------------------------------------------- *
+     * ADD A MYOBJ INSTANCE TO THE BUFFER -> THE BUFFER HAS TO GROW          *
+     * --------------------------------------------------------------------- */
+
+    constexpr buf_size_t num_d_values = buf_size_t{ 16000 };
+    constexpr buf_size_t num_e_values = buf_size_t{ 8000  };
+    constexpr buf_size_t num_dataptrs = buf_size_t{ 2u };
+
+    buf_size_t const uint8_size  = sizeof( uint8_t );
+    buf_size_t const double_size = sizeof( double );
+
+    buf_size_t const attr_offsets[ num_dataptrs ] =
+    {
+        offsetof( my_obj_t, d ),
+        offsetof( my_obj_t, e )
+    };
+
+    buf_size_t attr_sizes[  num_dataptrs ] = { uint8_size, double_size };
+    buf_size_t attr_counts[ num_dataptrs ] = { num_d_values, num_e_values };
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+     * Add first obj -> obj1
+     * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    my_obj_t obj1;
+    std::memset( &obj1, ( int )0, sizeof( my_obj_t ) );
+
+    obj1.type_id   = 3u;
+    obj1.a         = 1;
+    obj1.b         = 2.0;
+    obj1.c[ 0 ]    = 3.0;
+    obj1.c[ 1 ]    = 4.0;
+    obj1.c[ 2 ]    = 5.0;
+    obj1.c[ 3 ]    = 6.0;
+    obj1.d         = nullptr;
+    obj1.e         = nullptr;
+
+    obj_t* ptr_object = st_Buffer_add_object( buffer, &obj1, sizeof( my_obj_t ),
+        static_cast< type_id_t >( obj1.type_id ), num_dataptrs, attr_offsets,
+            attr_sizes, attr_counts );
+
+    ASSERT_TRUE( ptr_object != nullptr );
+    ASSERT_TRUE( st_Buffer_get_num_of_objects( buffer ) == buf_size_t{ 1u } );
+    ASSERT_TRUE( st_Buffer_get_num_of_slots( buffer ) > ZERO_SIZE );
+
+    ASSERT_TRUE( st_Object_get_size( ptr_object ) >= sizeof( my_obj_t ) );
+    ASSERT_TRUE( st_Object_get_type_id( ptr_object ) ==
+                 static_cast< type_id_t >( obj1.type_id ) );
+
+    ASSERT_TRUE( st_Object_get_begin_ptr( ptr_object ) != nullptr );
+
+    my_obj_t* ptr_my_obj = reinterpret_cast< my_obj_t* >(
+        st_Object_get_begin_ptr( ptr_object ) );
+
+    ASSERT_TRUE( ptr_my_obj   != nullptr );
+    ASSERT_TRUE( obj1.type_id == ptr_my_obj->type_id );
+    ASSERT_TRUE( obj1.a       == ptr_my_obj->a       );
+
+    ASSERT_TRUE( std::fabs( obj1.b - ptr_my_obj->b ) <
+        std::numeric_limits< double >::epsilon() );
+
+    for( buf_size_t ii = 0u ; ii < 4u ; ++ii )
+    {
+        ASSERT_TRUE( std::fabs( obj1.c[ ii ] - ptr_my_obj->c[ ii ] ) <
+            std::numeric_limits< double >::epsilon() );
+    }
+
+    ASSERT_TRUE( ptr_my_obj->d != nullptr );
+    ASSERT_TRUE( ptr_my_obj->e != nullptr );
+
+    std::ptrdiff_t const dist_obj1_begin_d = std::distance(
+        reinterpret_cast< unsigned char const* >( ptr_my_obj ),
+        reinterpret_cast< unsigned char const* >( ptr_my_obj->d ) );
+
+    ASSERT_TRUE( dist_obj1_begin_d == std::distance(
+        reinterpret_cast< unsigned char const* >( &obj1 ),
+        reinterpret_cast< unsigned char const* >(  obj1.d ) ) );
+
+    std::ptrdiff_t const dist_obj1_d_e = std::distance(
+        reinterpret_cast< unsigned char const* >( ptr_my_obj->d ),
+        reinterpret_cast< unsigned char const* >( ptr_my_obj->e ) );
+
+    ASSERT_TRUE( dist_obj1_d_e == std::distance(
+        reinterpret_cast< unsigned char const* >( obj1.d ),
+        reinterpret_cast< unsigned char const* >( obj1.e ) ) );
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+     * Add second obj -> obj2
+     * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    my_obj_t obj2;
+    std::memset( &obj2, ( int )0, sizeof( my_obj_t ) );
+
+    obj2.type_id   = 9u;
+    obj2.a         = 10;
+    obj2.b         = 12.0;
+    obj2.c[ 0 ]    = 13.0;
+    obj2.c[ 1 ]    = 14.0;
+    obj2.c[ 2 ]    = 15.0;
+    obj2.c[ 3 ]    = 16.0;
+    obj2.d         = nullptr;
+    obj2.e         = nullptr;
+
+    ptr_object = st_Buffer_add_object( buffer, &obj2, sizeof( my_obj_t ),
+        static_cast< type_id_t >( obj2.type_id ), num_dataptrs, attr_offsets,
+            attr_sizes, attr_counts );
+
+    ASSERT_TRUE( ptr_object != nullptr );
+    ASSERT_TRUE( st_Buffer_get_num_of_objects( buffer ) == buf_size_t{ 1u } );
+    ASSERT_TRUE( st_Buffer_get_num_of_slots( buffer ) > ZERO_SIZE );
+
+    ASSERT_TRUE( st_Object_get_size( ptr_object ) >= sizeof( my_obj_t ) );
+    ASSERT_TRUE( st_Object_get_type_id( ptr_object ) ==
+                 static_cast< type_id_t >( obj2.type_id ) );
+
+    ASSERT_TRUE( st_Object_get_begin_ptr( ptr_object ) != nullptr );
+
+    ptr_my_obj = reinterpret_cast< my_obj_t* >(
+        st_Object_get_begin_ptr( ptr_object ) );
+
+    ASSERT_TRUE( ptr_my_obj   != nullptr );
+    ASSERT_TRUE( obj2.type_id == ptr_my_obj->type_id );
+    ASSERT_TRUE( obj2.a       == ptr_my_obj->a       );
+
+    ASSERT_TRUE( std::fabs( obj2.b - ptr_my_obj->b ) <
+        std::numeric_limits< double >::epsilon() );
+
+    for( buf_size_t ii = 0u ; ii < 4u ; ++ii )
+    {
+        ASSERT_TRUE( std::fabs( obj2.c[ ii ] - ptr_my_obj->c[ ii ] ) <
+            std::numeric_limits< double >::epsilon() );
+    }
+
+    ASSERT_TRUE( ptr_my_obj->d != nullptr );
+    ASSERT_TRUE( ptr_my_obj->e != nullptr );
+
+    std::ptrdiff_t const dist_obj2_begin_d = std::distance(
+        reinterpret_cast< unsigned char const* >( ptr_my_obj ),
+        reinterpret_cast< unsigned char const* >( ptr_my_obj->d ) );
+
+    ASSERT_TRUE( dist_obj2_begin_d == std::distance(
+        reinterpret_cast< unsigned char const* >( &obj2 ),
+        reinterpret_cast< unsigned char const* >(  obj2.d ) ) );
+
+    std::ptrdiff_t const dist_obj2_d_e = std::distance(
+        reinterpret_cast< unsigned char const* >( ptr_my_obj->d ),
+        reinterpret_cast< unsigned char const* >( ptr_my_obj->e ) );
+
+    ASSERT_TRUE( dist_obj2_d_e == std::distance(
+        reinterpret_cast< unsigned char const* >( obj2.d ),
+        reinterpret_cast< unsigned char const* >( obj2.e ) ) );
+
+    /* --------------------------------------------------------------------- *
+     * CLEANUP & RESSOURCE MANAGEMENT                                        *
+     * --------------------------------------------------------------------- */
+
+    st_Buffer_delete( buffer );
+    buffer = nullptr;
 }
 
 /* ************************************************************************* */

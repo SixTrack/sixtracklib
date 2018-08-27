@@ -9,34 +9,34 @@ set( SIXTRACKL_COMMON_GENERATE_TESTDATA_TRACKING_SOURCES
      generate_testdata_tracking.cpp
 )
 
-add_executable( generate_testdata_tracking_common
-                ${SIXTRACKL_COMMON_GENERATE_TESTDATA_TRACKING_HEADERS}
-                ${SIXTRACKL_COMMON_GENERATE_TESTDATA_TRACKING_SOURCES} )
+# add_executable( generate_testdata_tracking_common
+#                 ${SIXTRACKL_COMMON_GENERATE_TESTDATA_TRACKING_HEADERS}
+#                 ${SIXTRACKL_COMMON_GENERATE_TESTDATA_TRACKING_SOURCES} )
 
-target_link_libraries(  generate_testdata_tracking_common
-                        sixtrack_test sixtrack )
+# target_link_libraries(  generate_testdata_tracking_common
+#                         sixtrack_test sixtrack )
 
-set_property( TARGET generate_testdata_tracking_common
-              PROPERTY LINKER_LANGUAGE CXX )
+# set_property( TARGET generate_testdata_tracking_common
+#               PROPERTY LINKER_LANGUAGE CXX )
 
-set_property( TARGET generate_testdata_tracking_common
-              PROPERTY CXX_STANDARD 11 )
+# set_property( TARGET generate_testdata_tracking_common
+#               PROPERTY CXX_STANDARD 11 )
 
-set_property( TARGET generate_testdata_tracking_common
-              PROPERTY CXX_STANDARD_REQUIRED ON )
+# set_property( TARGET generate_testdata_tracking_common
+#               PROPERTY CXX_STANDARD_REQUIRED ON )
 
-set_property( TARGET generate_testdata_tracking_common
-    PROPERTY COMPILE_OPTIONS ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic )
+# set_property( TARGET generate_testdata_tracking_common
+#     PROPERTY COMPILE_OPTIONS ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic )
 
-add_custom_command(
-    OUTPUT  "${SIXTRACKLIB_TESTDATA_DIR}/test_tracking.generated"
-    DEPENDS generate_testdata_tracking_common
-    COMMAND generate_testdata_tracking_common
-    COMMENT "Generating testdata for tracking from common .... "
-    VERBATIM )
+# add_custom_command(
+#     OUTPUT  "${SIXTRACKLIB_TESTDATA_DIR}/test_tracking.generated"
+#     DEPENDS generate_testdata_tracking_common
+#     COMMAND generate_testdata_tracking_common
+#     COMMENT "Generating testdata for tracking from common .... "
+#     VERBATIM )
 
-add_custom_target( testdata_common
-    DEPENDS "${SIXTRACKLIB_TESTDATA_DIR}/test_tracking.generated" )
+# add_custom_target( testdata_common
+#     DEPENDS "${SIXTRACKLIB_TESTDATA_DIR}/test_tracking.generated" )
 
 
 if( GTEST_FOUND )
@@ -56,9 +56,23 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_block:
 
-    add_executable( test_blocks_common test_blocks.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_blocks_common )
-    add_test( CommonBlocksTests test_blocks_common )
+#     add_executable( test_blocks_common test_blocks.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_blocks_common )
+#     add_test( CommonBlocksTests test_blocks_common )
+
+    # --------------------------------------------------------------------------
+    # test_buffer_mem:
+
+    add_executable( test_buffer_mem_common test_buffer_mem.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_buffer_mem_common )
+    add_test( CommonBufferTests test_buffer_mem_common )
+
+    # --------------------------------------------------------------------------
+    # test_buffer:
+
+#     add_executable( test_buffer_common test_buffer.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_buffer_common )
+#     add_test( CommonBufferTests test_buffer_common )
 
     # --------------------------------------------------------------------------
     # test_gpu_kernel_tools:
@@ -84,30 +98,30 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_faddeeva_errf:
 
-    add_executable( test_faddeeva_errf test_faddeeva_errf.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_faddeeva_errf )
-    add_test( CommonFaddeevaErrfnTests test_faddeeva_errf )
+#     add_executable( test_faddeeva_errf test_faddeeva_errf.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_faddeeva_errf )
+#     add_test( CommonFaddeevaErrfnTests test_faddeeva_errf )
 
     # --------------------------------------------------------------------------
     # test_beam_beam_element_6d:
 
-    add_executable( test_beam_beam_element_6d test_beam_beam_element_6d.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_beam_beam_element_6d )
-    add_test( CommonBeamBeamElement6dTests, test_beam_beam_element_6d )
+#     add_executable( test_beam_beam_element_6d test_beam_beam_element_6d.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_beam_beam_element_6d )
+#     add_test( CommonBeamBeamElement6dTests, test_beam_beam_element_6d )
 
     # --------------------------------------------------------------------------
     # test_beam_elements:
 
-    add_executable( test_beam_elements_common test_beam_elements.cpp )
-    set(   UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_beam_elements_common )
-    add_test( CommonBeamElementsTests test_beam_elements_common )
+#     add_executable( test_beam_elements_common test_beam_elements.cpp )
+#     set(   UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_beam_elements_common )
+#     add_test( CommonBeamElementsTests test_beam_elements_common )
 
     # --------------------------------------------------------------------------
     # test_track:
 
-    add_executable( test_track_common test_track.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_common )
-    add_test( CommonTrackTests test_track_common )
+#     add_executable( test_track_common test_track.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_common )
+#     add_test( CommonTrackTests test_track_common )
 
     # *************************************************************************
     # Set all properties:
@@ -127,5 +141,13 @@ if( GTEST_FOUND )
     set_property( TARGET ${UNIT_TEST_TARGETS}
                   APPEND PROPERTY COMPILE_OPTIONS
                   ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic )
+
+endif()
+
+# ------------------------------------------------------------------------------
+# --- benchmark drifts:
+
+if( SIXTRACKL_ENABLE_BENCHMARKS )
+
 
 endif()
