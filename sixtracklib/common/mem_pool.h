@@ -71,8 +71,12 @@ typedef struct NS( MemPool )
 
 } NS(MemPool);
 
-SIXTRL_FN SIXTRL_STATIC NS( MemPool ) * NS( MemPool_preset )(
-    NS( MemPool ) * SIXTRL_RESTRICT pool );
+SIXTRL_FN SIXTRL_STATIC NS(MemPool)* NS(MemPool_preset)(
+    NS(MemPool)* SIXTRL_RESTRICT pool );
+
+SIXTRL_FN SIXTRL_STATIC void NS(MemPool_set_chunk_size)(
+    NS(MemPool)* SIXTRL_RESTRICT pool, SIXTRL_UINT64_T const chunk_size );
+
 
 SIXTRL_HOST_FN SIXTRL_STATIC void NS( MemPool_init )(
     NS( MemPool ) * SIXTRL_RESTRICT pool, SIXTRL_UINT64_T capacity,
@@ -290,6 +294,17 @@ SIXTRL_INLINE NS( MemPool ) * NS( MemPool_preset )(
     }
 
     return pool;
+}
+
+SIXTRL_INLINE void NS(MemPool_set_chunk_size)(
+    NS(MemPool)* SIXTRL_RESTRICT pool, SIXTRL_UINT64_T const chunk_size )
+{
+    if( pool != SIXTRL_NULLPTR )
+    {
+        pool->chunk_size = chunk_size;
+    }
+
+    return;
 }
 
 /* ------------------------------------------------------------------------- */
