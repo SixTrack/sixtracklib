@@ -380,14 +380,20 @@ NS(BufferMem_get_const_ptr_to_section_data)(
     NS(buffer_size_t) const slot_size )
 {
     typedef SIXTRL_DATAPTR_DEC unsigned char const* ptr_to_raw_t;
+    typedef NS(buffer_size_t)                       buf_size_t;
 
-    ptr_to_raw_t ptr_section_begin = NS(BufferMem_get_const_ptr_to_section)(
+    ptr_to_raw_t ptr_data_begin = NS(BufferMem_get_const_ptr_to_section)(
         begin, section_id, slot_size );
 
-    return ( ptr_section_begin != SIXTRL_NULLPTR )
-        ? ( ptr_section_begin + NS(BufferMem_get_section_header_length)(
-                begin, slot_size ) )
-        : ( ptr_section_begin );
+    if( ptr_data_begin != SIXTRL_NULLPTR )
+    {
+        buf_size_t const section_hdr_len =
+            NS(BufferMem_get_section_header_length)( begin, slot_size );
+
+        ptr_data_begin = ptr_data_begin + section_hdr_len;
+    }
+
+    return ptr_data_begin;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -397,17 +403,21 @@ NS(BufferMem_get_const_ptr_to_section_end)(
     SIXTRL_ARGPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const section_id, NS(buffer_size_t) const slot_size )
 {
-    typedef SIXTRL_DATAPTR_DEC unsigned char const*     ptr_to_raw_t;
-    typedef NS(buffer_size_t)                           buf_size_t;
+    typedef SIXTRL_DATAPTR_DEC unsigned char const* ptr_to_raw_t;
+    typedef NS(buffer_size_t)                       buf_size_t;
 
     ptr_to_raw_t end_ptr =
         NS(BufferMem_get_const_ptr_to_section)( begin, section_id, slot_size );
 
-    buf_size_t const section_size =
-        NS(BufferMem_get_section_size)( begin, section_id, slot_size );
+    if( end_ptr != SIXTRL_NULLPTR )
+    {
+        buf_size_t const section_size =
+            NS(BufferMem_get_section_size)( begin, section_id, slot_size );
 
-    return ( end_ptr != SIXTRL_NULLPTR )
-         ? ( end_ptr + section_size ) : ( end_ptr );
+        end_ptr = end_ptr + section_size;
+    }
+
+    return end_ptr;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
