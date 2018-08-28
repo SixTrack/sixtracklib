@@ -8,11 +8,14 @@
         #include <cstddef>
         #include <cstdint>
         #include <cstdlib>
+        #include <cstring>
     #else
         #include <assert.h>
         #include <stddef.h>
         #include <stdint.h>
+        #include <stdio.h>
         #include <stdlib.h>
+        #include <string.h>
     #endif /* __cplusplus */
 #endif /* !defined( _GPUCODE ) || defined(__CUDACC__ ) */
 
@@ -35,7 +38,7 @@
             #define  SIXTRL_NO_SYSTEM_INCLUDES  1
         #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES */
 
-        #define SIXTRL_ALIGN 64u
+        #define SIXTRL_ALIGN_NUM 8u
 
         /* ---------------------------------------------------------------- */
         /* assert: */
@@ -99,7 +102,7 @@
         #endif /* !defined( SIXTRL_PRIVATE_DEC ) */
 
         #if !defined( SIXTRL_LOCAL_DEC )
-            #define SIXTRL_LOCAL_DEC __local
+            #define SIXTRL_SHARED_DEC __local
         #endif /* !defined( SIXTRL_LOCAL_DEC ) */
 
         #if !defined( SIXTRL_GLOBAL_DEC )
@@ -218,11 +221,11 @@
         /* Type decorators -> these go in front of the SIXTRL_*_T type      */
 
         #if !defined( SIXTRL_PRIVATE_DEC )
-            #define SIXTRL_PRIVATE_DEC
+            #define SIXTRL_PRIVATE_DEC __local__
         #endif /* !defined( SIXTRL_PRIVATE_DEC ) */
 
         #if !defined( SIXTRL_LOCAL_DEC )
-            #define SIXTRL_LOCAL_DEC
+            #define SIXTRL_LOCAL_DEC __shared__
         #endif /* !defined( SIXTRL_LOCAL_DEC ) */
 
         #if !defined( SIXTRL_GLOBAL_DEC )
@@ -230,7 +233,7 @@
         #endif /* !defined( SIXTRL_GLOBAL_DEC ) */
 
         #if !defined( SIXTRL_CONSTANT_DEC )
-            #define SIXTRL_CONSTANT_DEC
+            #define SIXTRL_CONSTANT_DEC __constant__
         #endif /* !defined( SIXTRL_CONSTANT_DEC ) */
 
         /* ---------------------------------------------------------------- */
@@ -286,7 +289,7 @@
 
 #else /* !defined( _GPUCODE ) */
 
-    #define SIXTRL_ALIGN 64u
+    #define SIXTRL_ALIGN_NUM 8u
 
     /* ----------------------------------------------------------------- */
     /* assert */
@@ -511,46 +514,100 @@
 
 #endif /* defined( _GPUCODE ) */
 
-typedef SIXTRL_INT64_T NS(element_id_t);
+/* ------------------------------------------------------------------------- */
+
+#if !defined( SIXTRL_ARGPTR_DEC )
+    #define SIXTRL_ARGPTR_DEC
+#endif /* defined( SIXTRL_ARGPTR_DEC ) */
+
+#if !defined( SIXTRL_DATAPTR_DEC )
+    #define SIXTRL_DATAPTR_DEC
+#endif /* defined( SIXTRL_DATAPTR_DEC ) */
+
+/* ------------------------------------------------------------------------- */
 
 #if !defined( SIXTRACKLIB_COPY_VALUES )
     #if defined( _GPUCODE )
-        #define SIXTRACKLIB_COPY_VALUES( T, dest, source, n )             \
-        /* ----------------------------------------------------------- */ \
-        /* ---- Inside SIXTRACKLIB_COPY_VALUES (ELEMENTWISE)       --- */ \
-        /* ----------------------------------------------------------- */ \
-        \
-        SIXTRL_INT64_T __ii = 0; \
-        do{ *( ( dest ) + __ii ) = *( ( source ) + __ii ); } while( __ii < ( n ) )
+        #define SIXTRACKLIB_COPY_VALUES( T, destination, source, n ) \
+        do \
+        {  \
+           SIXTRL_INT64_T ii = ( SIXTRL_INT64_T )0; \
+           for( ; ii < ( n ) ; ++ii ) \
+           {   \
+               *( ( destination ) + ii ) = *( ( source ) + ii );\
+           }   \
+        }  \
+        while( 0 )
 
-
-        #define SIXTRACKLIB_SET_VALUES( T, dest, n, value ) \
-        /* ----------------------------------------------------------- */ \
-        /* ---- Inside SIXTRACKLIB_SET_VALUES  (ELEMENTWISE)       --- */ \
-        /* ----------------------------------------------------------- */ \
-        \
-        SIXTRL_INT64_T __ii = 0; \
-        do{ *( ( dest ) + __ii ) = ( value ); } while( __ii < ( n ) )
-
-    #elif !defined( _GPUCODE )
-        #define SIXTRACKLIB_COPY_VALUES( T, dest, source, n )                 \
-            /* ----------------------------------------------------------- */ \
-            /* ----  Inside SIXTRACKLIB_COPY_VALUES (MEMCPY BASED)    ---- */ \
-            /* ----------------------------------------------------------- */ \
-            \
-            assert( ( ( dest ) != 0 ) && ( ( source ) != 0 ) && ( (n) > 0 ) );\
-            memcpy( ( dest ), ( source ), sizeof( T ) * ( n ) )
-
-        #define SIXTRACKLIB_SET_VALUES( T, dest, n, value ) \
-            /* ----------------------------------------------------------- */ \
-            /* ---- Inside SIXTRACKLIB_SET_VALUES  (MEMCPY_BASED)      --- */ \
-            /* ----------------------------------------------------------- */ \
-            \
-            assert( ( ( dest ) != 0 ) && ( ( n ) > 0 ) ); \
-            memset( ( dest ), ( int )( value ), sizeof( T ) * ( n ) )
+    #else /* defined( _GPUCODE ) */
+        #define SIXTRACKLIB_COPY_VALUES( T, destination, source, n ) \
+        memcpy( ( destination ), ( source ), sizeof( T ) * ( n ) )
 
     #endif /* defined( _GPUCODE ) */
-#endif /* defined( SIXTRACKLIB_COPY_VALUES ) */
+#endif /* !defined( SIXTRACKLIB_COPY_VALUES ) */
+
+/* ------------------------------------------------------------------------- */
+
+#if !defined( SIXTRACKLIB_MOVE_VALUES )
+    #if defined( _GPUCODE )
+        #define SIXTRACKLIB_MOVE_VALUES( T, destination, source, n ) \
+        do \
+        {  \
+           if( ( ( uintptr_t )( source ) ) < ( ( uintptr_t )( destination ) ) ) \
+           {    \
+                SIXTRL_INT64_T const end_idx = ( SIXTRL_INT64_T )-1; \
+                SIXTRL_INT64_T ii = ( SIXTRL_INT64_T )( n ) - end_idx; \
+                \
+                for( ; ii > end_idx ; --ii ) \
+                {   \
+                    *( ( destination ) + ii ) = *( ( source ) + ii ); \
+                }   \
+           }    \
+           else \
+           {    \
+                SIXTRL_INT64_T ii = ( SIXTRL_INT64_T )0; \
+                \
+                for( ; ii < ( n ) ; ++ii ) \
+                {   \
+                    *( ( destination ) + ii ) = *( ( source ) + ii ); \
+                }   \
+           }    \
+        }  \
+        while( 0 )
+
+    #else /* defined( _GPUCODE ) */
+        #define SIXTRACKLIB_MOVE_VALUES( T, destination, source, n ) \
+            memmove( ( destination ), ( source ), sizeof( T ) * ( n ) )
+
+    #endif /* defined( _GPUCODE ) */
+
+#endif /* !defined( SIXTRACKLIB_MOVE_VALUES ) */
+
+/* ------------------------------------------------------------------------- */
+
+#if !defined( SIXTRACKLIB_SET_VALUES )
+    #if defined( _GPUCODE )
+        #define SIXTRACKLIB_SET_VALUES( T, destination, n, value ) \
+        do \
+        {  \
+           SIXTRL_INT64_T ii = ( SIXTRL_INT64_T )0; \
+           SIXTRL_INT64_T const end_idx = ( SIXTRL_INT64_T )( n ); \
+           \
+           for( ; ii < end_idx ; ++ii ) \
+           {  \
+              *( ( destination ) + ii ) = value; \
+           }  \
+        }  \
+        while( 0 )
+
+    #else /* defined( _GPUCODE ) */
+        #define SIXTRACKLIB_SET_VALUES( T, destination, n, value ) \
+        memset( ( destination ), ( value ), sizeof( T ) * ( n ) )
+
+    #endif /* defined( _GPUCODE ) */
+#endif /* !defined( SIXTRACKLIB_SET_VALUES ) */
+
+/* ------------------------------------------------------------------------- */
 
 #if !defined( SIXTRL_ISFINITE )
     #if defined( __cplusplus ) && ( __cplusplus >= 201103L )
@@ -561,6 +618,113 @@ typedef SIXTRL_INT64_T NS(element_id_t);
         #define SIXTRL_ISFINITE( x ) ( 1 )
     #endif /* defined( __cplusplus ) */
 #endif /* defined( SIXTRL_ISFINITE ) */
+
+/* ------------------------------------------------------------------------- */
+
+#if defined(__CUDACC__) // NVCC
+    #define SIXTRL_ALIGN(n) __align__((n))
+#elif defined(__GNUC__) || defined(__clang__) // GCC, CLANG
+    #define SIXTRL_ALIGN(n) __attribute__((aligned((n))))
+#elif defined(_MSC_VER) || defined(__INTEL_COMPILER) // MSVC, INTEL
+    #define SIXTRL_ALIGN(n) __declspec(align((n)))
+#else
+    #error "Please provide a definition for SIXTRL_ALIGN macro for your host compiler!"
+#endif /* SIXTRL_ALIGN */
+
+/* ------------------------------------------------------------------------- */
+
+#if !defined( SIXTRL_NULLPTR )
+    #if  defined( __cplusplus ) && __cplusplus >= 201103L && \
+        !defined( __CUDACC__  )
+        #define SIXTRL_NULLPTR nullptr
+
+    #elif !defined( __cplusplus ) && defined( __CUDACC__ )
+        #define SIXTRL_NULLPTR NULL
+    #else
+        #define SIXTRL_NULLPTR 0
+    #endif /* nullptr */
+#endif /* !defined( SIXTRL_NULLPTR ) */
+
+/* ------------------------------------------------------------------------- */
+
+#if !defined( SIXTRL_CONSTEXPR_OR_CONST ) || !defined( SIXTRL_CONSTEXPR ) || \
+    !defined( SIXTRL_STATIC_CONSTEXPR_FN )
+    #if defined( __cplusplus ) && ( __cplusplus >= 201103L )
+        #if ( defined( __GNUC__  ) && ( ( __GNUC__ >= 5 ) || \
+              ( ( __GNUC__ == 4  ) && ( __GNUC_MINOR__ >= 8 ) ) ) ) || \
+            ( defined( __CUDACC__ ) && defined( CUDA_VERSION ) && \
+                ( CUDA_VERSION >= 800 ) ) || \
+            ( defined( _MSC_VER  ) && ( _MSC_VER >= 1900 ) ) || \
+            ( defined( __clang__ ) && ( ( __clang_major__ > 3 ) || \
+              ( ( __clang_major__ == 3 ) && ( __clang_minor__ >= 3 ) ) ) ) || \
+            ( defined( __INTEL_COMPILER ) && ( __INTEL_COMPILER >= 14 ) )
+
+            #if !defined( SIXTRL_CONSTEXPR_OR_CONST )
+                #define SIXTRL_CONSTEXPR_OR_CONST constexpr
+            #endif /* !defined( SIXTRL_CONSTEXPR_OR_CONST ) */
+
+            #if !defined( SIXTRL_CONSTEXPR )
+                #define SIXTRL_CONSTEXPR constexpr
+            #endif /* !defined( SIXTRL_CONSTEXPR_OR_CONST ) */
+
+            #if !defined( SIXTRL_STATIC_CONSTEXPR_FN )
+                #define SIXTRL_STATIC_CONSTEXPR_FN static constexpr
+            #endif /* !defined( SIXTRL_STATIC_CONSTEXPR_FN ) */
+
+        #endif /* compilers */
+
+    #endif /*  defined( __cplusplus ) && ( __cplusplus >= 201103L ) */
+
+    #if !defined( SIXTRL_CONSTEXPR_OR_CONST )
+        #define SIXTRL_CONSTEXPR_OR_CONST const
+    #endif /* !defined( SIXTRL_CONSTEXPR_OR_CONST ) */
+
+    #if !defined( SIXTRL_CONSTEXPR )
+        #define SIXTRL_CONSTEXPR
+    #endif /* !defined( SIXTRL_CONSTEXPR_OR_CONST ) */
+
+    #if !defined( SIXTRL_STATIC_CONSTEXPR_FN )
+        #define SIXTRL_STATIC_CONSTEXPR_FN static
+    #endif /* !defined( SIXTRL_STATIC_CONSTEXPR_FN ) */
+
+#endif /*!defined( SIXTRL_CONSTEXPR_OR_CONST )||!defined( SIXTRL_CONSTEXPR ) */
+
+/* ------------------------------------------------------------------------- */
+
+#if !defined( SIXTRL_NOEXCEPT ) || !defined( SIXTRL_NOEXCEPT_COND )
+    #if defined( __cplusplus ) && ( __cplusplus >= 201103L )
+        #if ( defined( __GNUC__   ) && ( ( __GNUC__ >= 5 ) || \
+              ( ( __GNUC__ == 4   ) && ( __GNUC_MINOR__ >= 8 ) ) ) ) || \
+            ( defined( __CUDACC__ ) && defined( CUDA_VERSION ) && \
+                ( CUDA_VERSION >= 800 ) ) || \
+            ( defined( _MSC_VER   ) && ( _MSC_VER >= 1900 ) ) || \
+            ( defined( __clang__  ) && ( ( __clang_major__ > 3 ) || \
+              ( ( __clang_major__ == 3 ) && ( __clang_minor__ >= 3 ) ) ) ) || \
+            ( defined( __INTEL_COMPILER ) && ( __INTEL_COMPILER >= 14 ) )
+
+            #if !defined( SIXTRL_NOEXCEPT )
+                #define SIXTRL_NOEXCEPT noexcept
+            #endif /* !defined( SIXTRL_NOEXCEPT ) */
+
+            #if !defined( SIXTRL_NOEXCEPT_COND )
+                #define SIXTRL_NOEXCEPT_COND( cond ) noexcept( ( cond ) )
+            #endif /* !defined( SIXTRL_NOEXCEPT_COND ) */
+
+        #endif /* compilers */
+
+    #endif /*  defined( __cplusplus ) && ( __cplusplus >= 201103L ) */
+
+    #if !defined( SIXTRL_NOEXCEPT )
+        #define SIXTRL_NOEXCEPT
+    #endif /* !defined( SIXTRL_NOEXCEPT ) */
+
+    #if !defined( SIXTRL_NOEXCEPT_COND )
+        #define SIXTRL_NOEXCEPT_COND( cond )
+    #endif /* !defined( SIXTRL_NOEXCEPT_COND ) */
+
+#endif /* !defined( SIXTRL_NOEXCEPT ) || !defined( SIXTRL_NOEXCEPT_COND ) */
+
+/* ------------------------------------------------------------------------- */
 
 #endif /* SIXTRACKLIB__IMPL_DEFINITIONS_H__ */
 
