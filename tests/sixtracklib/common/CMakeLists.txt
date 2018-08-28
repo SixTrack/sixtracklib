@@ -70,9 +70,9 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_buffer:
 
-#     add_executable( test_buffer_common test_buffer.cpp )
-#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_buffer_common )
-#     add_test( CommonBufferTests test_buffer_common )
+    add_executable( test_buffer_common test_buffer.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_buffer_common )
+    add_test( CommonBufferTests test_buffer_common )
 
     # --------------------------------------------------------------------------
     # test_gpu_kernel_tools:

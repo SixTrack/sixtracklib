@@ -281,7 +281,9 @@ TEST( C99_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
     st_Buffer cmp_buffer;
     st_Buffer_preset( &cmp_buffer );
 
-    success = st_Buffer_init_from_data( &cmp_buffer, copy_buffer.data() );
+    success = st_Buffer_init_from_data(
+        &cmp_buffer, copy_buffer.data(), copy_buffer.size() );
+
     ASSERT_TRUE( success == 0 );
 
     /* --------------------------------------------------------------------- */
@@ -317,23 +319,23 @@ TEST( C99_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    ASSERT_TRUE( st_Buffer_get_slots_extent( &buffer ) ==
-                 st_Buffer_get_slots_extent( &cmp_buffer ) );
+    ASSERT_TRUE( st_Buffer_get_slots_size( &buffer ) ==
+                 st_Buffer_get_slots_size( &cmp_buffer ) );
 
     ASSERT_TRUE( st_Buffer_get_num_of_slots( &buffer ) ==
                  st_Buffer_get_num_of_slots( &cmp_buffer ) );
 
-    ASSERT_TRUE( st_Buffer_get_objects_extent( &buffer ) ==
-                 st_Buffer_get_objects_extent( &cmp_buffer ) );
+    ASSERT_TRUE( st_Buffer_get_objects_size( &buffer ) ==
+                 st_Buffer_get_objects_size( &cmp_buffer ) );
 
-    ASSERT_TRUE( st_Buffer_get_dataptrs_extent( &buffer ) ==
-                 st_Buffer_get_dataptrs_extent( &cmp_buffer ) );
+    ASSERT_TRUE( st_Buffer_get_dataptrs_size( &buffer ) ==
+                 st_Buffer_get_dataptrs_size( &cmp_buffer ) );
 
     ASSERT_TRUE( st_Buffer_get_num_of_dataptrs( &buffer ) ==
                  st_Buffer_get_num_of_dataptrs( &cmp_buffer ) );
 
-    ASSERT_TRUE( st_Buffer_get_garbage_extent( &buffer ) ==
-                 st_Buffer_get_garbage_extent( &cmp_buffer ) );
+    ASSERT_TRUE( st_Buffer_get_garbage_size( &buffer ) ==
+                 st_Buffer_get_garbage_size( &cmp_buffer ) );
 
     ASSERT_TRUE( st_Buffer_get_num_of_garbage_ranges( &buffer ) ==
                  st_Buffer_get_num_of_garbage_ranges( &cmp_buffer ) );
@@ -417,7 +419,9 @@ TEST( C99_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 
     st_Buffer_preset( &cmp_buffer );
 
-    success = st_Buffer_init_from_data( &cmp_buffer, copy_buffer.data() );
+    success = st_Buffer_init_from_data(
+        &cmp_buffer, copy_buffer.data(), copy_buffer.size() );
+
     ASSERT_TRUE( success == 0 );
 
     /* --------------------------------------------------------------------- */
@@ -453,23 +457,23 @@ TEST( C99_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    ASSERT_TRUE( st_Buffer_get_slots_extent( &buffer ) ==
-                 st_Buffer_get_slots_extent( &cmp_buffer ) );
+    ASSERT_TRUE( st_Buffer_get_slots_size( &buffer ) ==
+                 st_Buffer_get_slots_size( &cmp_buffer ) );
 
     ASSERT_TRUE( st_Buffer_get_num_of_slots( &buffer ) ==
                  st_Buffer_get_num_of_slots( &cmp_buffer ) );
 
-    ASSERT_TRUE( st_Buffer_get_objects_extent( &buffer ) ==
-                 st_Buffer_get_objects_extent( &cmp_buffer ) );
+    ASSERT_TRUE( st_Buffer_get_objects_size( &buffer ) ==
+                 st_Buffer_get_objects_size( &cmp_buffer ) );
 
-    ASSERT_TRUE( st_Buffer_get_dataptrs_extent( &buffer ) ==
-                 st_Buffer_get_dataptrs_extent( &cmp_buffer ) );
+    ASSERT_TRUE( st_Buffer_get_dataptrs_size( &buffer ) ==
+                 st_Buffer_get_dataptrs_size( &cmp_buffer ) );
 
     ASSERT_TRUE( st_Buffer_get_num_of_dataptrs( &buffer ) ==
                  st_Buffer_get_num_of_dataptrs( &cmp_buffer ) );
 
-    ASSERT_TRUE( st_Buffer_get_garbage_extent( &buffer ) ==
-                 st_Buffer_get_garbage_extent( &cmp_buffer ) );
+    ASSERT_TRUE( st_Buffer_get_garbage_size( &buffer ) ==
+                 st_Buffer_get_garbage_size( &cmp_buffer ) );
 
     ASSERT_TRUE( st_Buffer_get_num_of_garbage_ranges( &buffer ) ==
                  st_Buffer_get_num_of_garbage_ranges( &cmp_buffer ) );
@@ -726,7 +730,9 @@ TEST( C99_CommonBufferTests, ReconstructFromCObjectFile )
     st_Buffer buffer;
     st_Buffer_preset( &buffer );
 
-    int success = st_Buffer_init_from_data( &buffer, data_buffer_begin );
+    int success = st_Buffer_init_from_data(
+        &buffer, data_buffer_begin, buffer_size );
+
     ASSERT_TRUE( success == 0 );
 
     ASSERT_TRUE( st_Buffer_get_size( &buffer ) == buffer_size );
@@ -811,23 +817,23 @@ TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
 
     buf_size_t const sect_hdr_len = st_Buffer_get_section_header_size( buffer );
 
-    ASSERT_TRUE( st_Buffer_get_size( buffer )                  >  ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_size( buffer ) > ZERO_SIZE );
 
-    ASSERT_TRUE( st_Buffer_get_num_of_slots( buffer )          == ZERO_SIZE );
-    ASSERT_TRUE( st_Buffer_get_max_num_of_slots( buffer )      == ZERO_SIZE );
-    ASSERT_TRUE( st_Buffer_get_slots_extent( buffer )          == sect_hdr_len );
+    ASSERT_TRUE( st_Buffer_get_num_of_slots( buffer ) == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_max_num_of_slots( buffer ) == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_slots_size( buffer ) == sect_hdr_len );
 
-    ASSERT_TRUE( st_Buffer_get_num_of_objects( buffer )        == ZERO_SIZE );
-    ASSERT_TRUE( st_Buffer_get_max_num_of_objects( buffer )    == ZERO_SIZE );
-    ASSERT_TRUE( st_Buffer_get_objects_extent( buffer )        == sect_hdr_len );
+    ASSERT_TRUE( st_Buffer_get_num_of_objects( buffer ) == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_max_num_of_objects( buffer ) == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_objects_size( buffer ) == sect_hdr_len );
 
-    ASSERT_TRUE( st_Buffer_get_num_of_dataptrs( buffer )       == ZERO_SIZE );
-    ASSERT_TRUE( st_Buffer_get_max_num_of_dataptrs( buffer )   == ZERO_SIZE );
-    ASSERT_TRUE( st_Buffer_get_dataptrs_extent( buffer )       == sect_hdr_len );
+    ASSERT_TRUE( st_Buffer_get_num_of_dataptrs( buffer ) == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_max_num_of_dataptrs( buffer ) == ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_dataptrs_size( buffer ) == sect_hdr_len );
 
     ASSERT_TRUE( st_Buffer_get_num_of_garbage_ranges( buffer ) == ZERO_SIZE );
     ASSERT_TRUE( st_Buffer_get_max_num_of_garbage_ranges( buffer ) == ZERO_SIZE );
-    ASSERT_TRUE( st_Buffer_get_garbage_extent( buffer )        == sect_hdr_len );
+    ASSERT_TRUE( st_Buffer_get_garbage_size( buffer ) == sect_hdr_len );
 
     /* --------------------------------------------------------------------- *
      * ADD A MYOBJ INSTANCE TO THE BUFFER -> THE BUFFER HAS TO GROW          *
@@ -899,25 +905,30 @@ TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
     ASSERT_TRUE( ptr_my_obj->d != nullptr );
     ASSERT_TRUE( ptr_my_obj->e != nullptr );
 
-    std::ptrdiff_t const dist_obj1_begin_d = std::distance(
-        reinterpret_cast< unsigned char const* >( ptr_my_obj ),
-        reinterpret_cast< unsigned char const* >( ptr_my_obj->d ) );
-
-    ASSERT_TRUE( dist_obj1_begin_d == std::distance(
-        reinterpret_cast< unsigned char const* >( &obj1 ),
-        reinterpret_cast< unsigned char const* >(  obj1.d ) ) );
-
-    std::ptrdiff_t const dist_obj1_d_e = std::distance(
+    std::ptrdiff_t dist_d_to_e = std::distance(
         reinterpret_cast< unsigned char const* >( ptr_my_obj->d ),
         reinterpret_cast< unsigned char const* >( ptr_my_obj->e ) );
 
-    ASSERT_TRUE( dist_obj1_d_e == std::distance(
-        reinterpret_cast< unsigned char const* >( obj1.d ),
-        reinterpret_cast< unsigned char const* >( obj1.e ) ) );
+    ASSERT_TRUE( dist_d_to_e > 0 );
+    ASSERT_TRUE( static_cast< size_t >( dist_d_to_e ) >=
+        st_BufferMem_get_slot_based_length(
+            num_d_values * sizeof( uint8_t ), slot_size ) );
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
      * Add second obj -> obj2
      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    size_t const num_objects_after_obj1 =
+        st_Buffer_get_num_of_objects( buffer );
+
+    size_t const num_slots_after_obj1    =
+        st_Buffer_get_num_of_slots( buffer );
+
+    size_t const num_dataptrs_after_obj1 =
+        st_Buffer_get_num_of_dataptrs( buffer );
+
+    size_t const num_garbage_ranges_after_obj1 =
+        st_Buffer_get_num_of_garbage_ranges( buffer );
 
     my_obj_t obj2;
     std::memset( &obj2, ( int )0, sizeof( my_obj_t ) );
@@ -937,8 +948,17 @@ TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
             attr_sizes, attr_counts );
 
     ASSERT_TRUE( ptr_object != nullptr );
-    ASSERT_TRUE( st_Buffer_get_num_of_objects( buffer ) == buf_size_t{ 1u } );
-    ASSERT_TRUE( st_Buffer_get_num_of_slots( buffer ) > ZERO_SIZE );
+    ASSERT_TRUE( st_Buffer_get_num_of_objects( buffer ) ==
+        ( num_objects_after_obj1 + 1u ) );
+
+    ASSERT_TRUE( st_Buffer_get_num_of_slots( buffer ) >
+        ( num_slots_after_obj1 ) );
+
+    ASSERT_TRUE( st_Buffer_get_num_of_dataptrs( buffer ) ==
+        ( num_dataptrs_after_obj1 + num_dataptrs ) );
+
+    ASSERT_TRUE( st_Buffer_get_num_of_garbage_ranges( buffer ) ==
+                 num_garbage_ranges_after_obj1 );
 
     ASSERT_TRUE( st_Object_get_size( ptr_object ) >= sizeof( my_obj_t ) );
     ASSERT_TRUE( st_Object_get_type_id( ptr_object ) ==
@@ -946,10 +966,22 @@ TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
 
     ASSERT_TRUE( st_Object_get_begin_ptr( ptr_object ) != nullptr );
 
+    unsigned char const* ptr_obj1_e =
+        reinterpret_cast< unsigned char const* >( ptr_my_obj->e );
+
     ptr_my_obj = reinterpret_cast< my_obj_t* >(
         st_Object_get_begin_ptr( ptr_object ) );
 
-    ASSERT_TRUE( ptr_my_obj   != nullptr );
+    ASSERT_TRUE( ptr_my_obj != nullptr );
+
+    std::ptrdiff_t dist_obj1_e_to_obj2 = std::distance( ptr_obj1_e,
+        reinterpret_cast< unsigned char const* >( ptr_my_obj ) );
+
+    ASSERT_TRUE( dist_obj1_e_to_obj2 > 0 );
+    ASSERT_TRUE( static_cast< size_t >( dist_obj1_e_to_obj2 ) >=
+        st_BufferMem_get_slot_based_length(
+            num_e_values * sizeof( double ), slot_size ) );
+
     ASSERT_TRUE( obj2.type_id == ptr_my_obj->type_id );
     ASSERT_TRUE( obj2.a       == ptr_my_obj->a       );
 
@@ -965,21 +997,14 @@ TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
     ASSERT_TRUE( ptr_my_obj->d != nullptr );
     ASSERT_TRUE( ptr_my_obj->e != nullptr );
 
-    std::ptrdiff_t const dist_obj2_begin_d = std::distance(
-        reinterpret_cast< unsigned char const* >( ptr_my_obj ),
-        reinterpret_cast< unsigned char const* >( ptr_my_obj->d ) );
-
-    ASSERT_TRUE( dist_obj2_begin_d == std::distance(
-        reinterpret_cast< unsigned char const* >( &obj2 ),
-        reinterpret_cast< unsigned char const* >(  obj2.d ) ) );
-
-    std::ptrdiff_t const dist_obj2_d_e = std::distance(
+    dist_d_to_e = std::distance(
         reinterpret_cast< unsigned char const* >( ptr_my_obj->d ),
         reinterpret_cast< unsigned char const* >( ptr_my_obj->e ) );
 
-    ASSERT_TRUE( dist_obj2_d_e == std::distance(
-        reinterpret_cast< unsigned char const* >( obj2.d ),
-        reinterpret_cast< unsigned char const* >( obj2.e ) ) );
+    ASSERT_TRUE( dist_d_to_e > 0 );
+    ASSERT_TRUE( static_cast< size_t >( dist_d_to_e ) >=
+        st_BufferMem_get_slot_based_length(
+            num_d_values * sizeof( uint8_t ), slot_size ) );
 
     /* --------------------------------------------------------------------- *
      * CLEANUP & RESSOURCE MANAGEMENT                                        *
