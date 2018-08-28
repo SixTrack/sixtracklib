@@ -461,7 +461,7 @@ SIXTRL_INLINE int NS(Buffer_reserve_generic)(
 
             success = NS(BufferMem_reserve)( new_begin, &cur_buffer_size,
                 max_num_objects, max_num_slots, max_num_dataptrs,
-                    max_num_garbage_ranges, requ_buffer_capacity, slot_size );
+                    max_num_garbage_ranges, current_capacity, slot_size );
 
             if( success == 0 )
             {
@@ -1005,14 +1005,24 @@ SIXTRL_INLINE int NS(Buffer_init_on_flat_memory_detailed)(
     buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
 
     int success = NS(BufferMem_init)( data_buffer_begin, &new_buffer_size,
-        buffer_capacity, max_num_objects,  max_num_slots, max_num_dataptrs,
-            max_num_garbage_ranges, slot_size );
+        max_num_objects,  max_num_slots, max_num_dataptrs,
+            max_num_garbage_ranges, buffer_capacity, slot_size );
 
     if( success == 0 )
     {
+        SIXTRL_STATIC_VAR buf_size_t const OBJECTS_ID = ( buf_size_t )4u;
+
         buffer->data_addr       = ( address_t )( uintptr_t )data_buffer_begin;
         buffer->data_size       = new_buffer_size;
         buffer->data_capacity   = buffer_capacity;
+
+        buffer->num_objects     = NS(BufferMem_get_section_num_entities)(
+            data_buffer_begin, OBJECTS_ID, slot_size );
+
+        buffer->object_addr     = ( address_t )( uintptr_t
+            )NS(BufferMem_get_ptr_to_section_data)(
+                data_buffer_begin, OBJECTS_ID, slot_size );
+
         buffer->datastore_addr  = buffer->data_addr;
         buffer->datastore_flags =
             NS(BUFFER_DATASTORE_ALLOW_APPENDS) |

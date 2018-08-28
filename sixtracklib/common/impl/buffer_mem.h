@@ -769,10 +769,10 @@ SIXTRL_INLINE int NS(BufferMem_init)(
                 slots_offset + slots_section_max_size;
 
             buf_size_t const dataptrs_offset =
-                objs_offset + dataptrs_section_max_size;
+                objs_offset + objs_section_max_size;
 
             buf_size_t const garbage_offset  =
-                dataptrs_offset + garbage_section_max_size;
+                dataptrs_offset + dataptrs_section_max_size;
 
             ptr_to_addr_t slots_section_begin =
                 ( ptr_to_addr_t )( begin + slots_offset );
