@@ -48,6 +48,7 @@ NS(Buffer)* NS(Buffer_allocate_generic)(
     typedef NS(Buffer)              buffer_t;
     typedef NS(buffer_size_t)       buf_size_t;
     typedef NS(buffer_addr_t)       address_t;
+    typedef unsigned char           raw_t;
 
     int success = -1;
 
@@ -86,6 +87,12 @@ NS(Buffer)* NS(Buffer_allocate_generic)(
 
                 if( NS(AllocResult_valid)( &result ) )
                 {
+                    raw_t const z = ( raw_t )0u;
+
+                    SIXTRACKLIB_SET_VALUES( raw_t,
+                        NS(AllocResult_get_pointer)( &result ),
+                        NS(AllocResult_get_length)(  &result ), z );
+
                     success = NS(Buffer_init_on_flat_memory)( ptr_buffer,
                         NS(AllocResult_get_pointer)( &result ),
                         NS(AllocResult_get_length)(  &result ) );
