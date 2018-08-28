@@ -82,6 +82,7 @@ SIXTRL_FN SIXTRL_STATIC int NS(BufferMem_remap)(
  * ========================================================================= */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/impl/buffer_object.h"
     #include "sixtracklib/common/impl/buffer_mem_minimal.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
