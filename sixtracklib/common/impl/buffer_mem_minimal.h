@@ -176,9 +176,10 @@ SIXTRL_INLINE NS(buffer_size_t) NS(BufferMem_get_section_entity_size)(
 
     buf_size_t entity_size = ZERO_SIZE;
 
-    if( ( begin != SIXTRL_NULLPTR ) && ( slot_size > ZERO_SIZE ) &&
-        ( ( ( ( uintptr_t )begin ) % slot_size )  == ZERO_SIZE ) )
+    if( ( begin != SIXTRL_NULLPTR ) && ( slot_size > ZERO_SIZE ) )
     {
+        SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) % slot_size )  == ZERO_SIZE );
+
         switch( header_section_id )
         {
             case 3u:
@@ -240,11 +241,13 @@ SIXTRL_INLINE NS(buffer_size_t) NS(BufferMem_get_section_header_length)(
 
     buf_size_t section_header_length = ZERO_SIZE;
 
-    if( ( begin != SIXTRL_NULLPTR ) && ( slot_size > ZERO_SIZE ) &&
-        ( ( ( ( uintptr_t )begin ) % slot_size )  == ZERO_SIZE ) )
+    if( ( begin != SIXTRL_NULLPTR ) && ( slot_size > ZERO_SIZE ) )
     {
         buf_size_t const addr_size = NS(BufferMem_get_slot_based_length)(
             sizeof( address_t ), slot_size );
+
+        SIXTRL_ASSERT( addr_size > ZERO_SIZE );
+        SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) % slot_size )  == ZERO_SIZE );
 
         section_header_length = ( buf_size_t )2u * addr_size;
     }
@@ -262,22 +265,31 @@ SIXTRL_INLINE NS(buffer_size_t) NS(BufferMem_get_header_length)(
     typedef NS(buffer_addr_t)            address_t;
     typedef SIXTRL_ARGPTR_DEC address_t* ptr_to_addr_t;
 
-    SIXTRL_STATIC_VAR buf_size_t const ZERO_SIZE = ( buf_size_t )0u;
+    SIXTRL_STATIC_VAR buf_size_t const ZERO_SIZE       = ( buf_size_t )0u;
+    SIXTRL_STATIC_VAR buf_size_t const NUM_HDR_ENTRIES = ( buf_size_t )8u;
 
     buf_size_t header_length = ZERO_SIZE;
 
-    if( ( begin != SIXTRL_NULLPTR ) && ( slot_size > ZERO_SIZE ) &&
-        ( ( ( ( uintptr_t )begin ) % slot_size )  == ZERO_SIZE ) )
+    if( ( begin != SIXTRL_NULLPTR ) && ( slot_size > ZERO_SIZE ) )
     {
-        ptr_to_addr_t  ptr_header  = ( ptr_to_addr_t )begin;
+        ptr_to_addr_t ptr_header = ( ptr_to_addr_t )begin;
 
+        header_length = ptr_header[ 2 ];
+
+        SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) % slot_size )  == ZERO_SIZE );
         SIXTRL_ASSERT( ptr_header != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( ( ( ( uintptr_t )ptr_header ) %
             sizeof( address_t ) ) == 0u );
 
-        SIXTRL_ASSERT( ptr_header[ 1 ]  >= ptr_header[ 2 ]  );
+        if( header_length == ZERO_SIZE )
+        {
+            header_length = NS(BufferMem_get_slot_based_length)(
+                sizeof( address_t ), slot_size ) * NUM_HDR_ENTRIES;
+        }
 
-        header_length = ptr_header[ 2 ];
+        SIXTRL_ASSERT( ( ptr_header[ 1 ] >= header_length ) ||
+                           ( ( ptr_header[ 1 ] == ZERO_SIZE ) &&
+                             ( ptr_header[ 2 ] == ZERO_SIZE ) ) );
     }
 
     return header_length;
@@ -297,18 +309,25 @@ SIXTRL_INLINE NS(buffer_size_t) NS(BufferMem_get_buffer_length)(
 
     buf_size_t buffer_length = ZERO_SIZE;
 
-    if( ( begin != SIXTRL_NULLPTR ) && ( slot_size > ZERO_SIZE ) &&
-        ( ( ( ( uintptr_t )begin ) % slot_size )  == ZERO_SIZE ) )
+    if( ( begin != SIXTRL_NULLPTR ) && ( slot_size > ZERO_SIZE ) )
     {
         ptr_to_addr_t  ptr_header  = ( ptr_to_addr_t )begin;
 
+        #if !defined( NDEBUG )
+        buf_size_t const header_length =
+            NS(BufferMem_get_header_length)( begin, slot_size );
+
+        #endif /* !defined( NDEBUG ) */
+
+        SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) % slot_size ) == ZERO_SIZE );
         SIXTRL_ASSERT( ptr_header != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( ( ( ( uintptr_t )ptr_header ) %
             sizeof( address_t ) ) == 0u );
 
-        SIXTRL_ASSERT( ptr_header[ 2 ] <= ptr_header[ 1 ] );
-
         buffer_length = ptr_header[ 1 ];
+
+        SIXTRL_ASSERT( ( header_length <= buffer_length ) ||
+                       ( buffer_length == ZERO_SIZE ) );
     }
 
     return buffer_length;
@@ -335,10 +354,14 @@ NS(BufferMem_get_const_ptr_to_section)(
         ptr_to_addr_t ptr_header = ( ptr_to_addr_t )begin;
 
         #if !defined( NDEBUG )
+        buf_size_t const addr_size = NS(BufferMem_get_slot_based_length)(
+            sizeof( address_t ), slot_size );
+
+        buf_size_t const header_length =
+            NS(BufferMem_get_header_length)( begin, slot_size );
+
         SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) % slot_size ) == 0u );
-        SIXTRL_ASSERT( ( buf_size_t )ptr_header[ 2 ] >
-                       ( section_id * NS(BufferMem_get_slot_based_length)(
-                           sizeof( address_t ), slot_size ) ) );
+        SIXTRL_ASSERT( header_length >= ( section_id * addr_size ) );
 
         #endif /* !defined( NDEBUG ) */
 

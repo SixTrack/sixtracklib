@@ -134,9 +134,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(BufferMem_calculate_section_size)(
 
     buf_size_t calculated_size = ZERO_SIZE;
 
-    if( ( begin != SIXTRL_NULLPTR ) &&
-        ( slot_size > ZERO_SIZE ) && ( num_entities > ZERO_SIZE ) &&
-        ( ( ( ( uintptr_t )begin ) %  slot_size )  == ZERO_SIZE ) )
+    if( ( begin != SIXTRL_NULLPTR ) && ( slot_size > ZERO_SIZE ) )
     {
         buf_size_t const entity_size = NS(BufferMem_get_section_entity_size)(
             begin, header_section_id, slot_size );
@@ -144,8 +142,9 @@ SIXTRL_INLINE NS(buffer_size_t) NS(BufferMem_calculate_section_size)(
         buf_size_t const section_header_length =
             NS(BufferMem_get_section_header_length)( begin, slot_size );
 
-        SIXTRL_ASSERT( entity_size > ZERO_SIZE );
+        SIXTRL_ASSERT( entity_size           > ZERO_SIZE );
         SIXTRL_ASSERT( section_header_length > ZERO_SIZE );
+        SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) %  slot_size )  == ZERO_SIZE );
 
         calculated_size = num_entities * entity_size + section_header_length;
     }
@@ -163,10 +162,11 @@ SIXTRL_INLINE NS(buffer_size_t) NS(BufferMem_get_section_offset)(
     typedef NS(buffer_addr_t)                       address_t;
     typedef SIXTRL_DATAPTR_DEC address_t const*     ptr_to_addr_t;
 
-    buf_size_t section_offset = ( buf_size_t )0u;
+    SIXTRL_STATIC_VAR buf_size_t const ZERO_SIZE = ( buf_size_t )0u;
 
-    if( ( begin != SIXTRL_NULLPTR ) && ( slot_size > ( buf_size_t )0u ) &&
-        ( ( ( ( uintptr_t )begin ) % slot_size ) == 0u ) )
+    buf_size_t section_offset = ZERO_SIZE;
+
+    if( ( begin != SIXTRL_NULLPTR ) && ( slot_size > ZERO_SIZE ) )
     {
         ptr_to_addr_t ptr_header = ( ptr_to_addr_t )begin;
 
@@ -177,15 +177,16 @@ SIXTRL_INLINE NS(buffer_size_t) NS(BufferMem_get_section_offset)(
         buf_size_t const header_length  = ptr_header[ 2 ];
 
         SIXTRL_ASSERT( ptr_header[ 0 ] != ( address_t )0u );
-        SIXTRL_ASSERT(   addr_size > ( buf_size_t )0u );
+        SIXTRL_ASSERT(   addr_size > ZERO_SIZE );
         SIXTRL_ASSERT( ( addr_size * section_id ) < header_length  );
-        SIXTRL_ASSERT( ( section_id != 2u ) && ( section_id != 3u ) );
+        SIXTRL_ASSERT( ( section_id >= 3u ) && ( section_id <= 6u ) );
+        SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) % slot_size ) == 0u );
 
         #endif /* !defined( NDEBUG ) */
 
         section_offset = (    ptr_header[ section_id ] >= ptr_header[ 0 ] )
             ? ( buf_size_t )( ptr_header[ section_id ] -  ptr_header[ 0 ] )
-            : ( buf_size_t )0u;
+            : ZERO_SIZE;
     }
 
     return section_offset;
@@ -287,11 +288,11 @@ SIXTRL_INLINE NS(buffer_size_t) NS(BufferMem_calculate_buffer_length)(
 SIXTRL_INLINE bool NS(BufferMem_can_reserve)(
     SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_buffer_len,
-    NS(buffer_size_t) const max_buffer_length,
     NS(buffer_size_t) const max_num_objects,
     NS(buffer_size_t) const max_num_slots,
     NS(buffer_size_t) const max_num_dataptrs,
     NS(buffer_size_t) const max_num_garbage_ranges,
+    NS(buffer_size_t) const max_data_buffer_length,
     NS(buffer_size_t) const slot_size )
 {
     typedef NS(buffer_size_t) buf_size_t;
@@ -311,15 +312,15 @@ SIXTRL_INLINE bool NS(BufferMem_can_reserve)(
     }
 
     return (
-        ( requ_buffer_length <= max_buffer_length ) &&
+        ( requ_buffer_length <= max_data_buffer_length ) &&
         ( NS(BufferMem_get_section_num_entities)(
-            begin, SLOTS_ID, slot_size ) <= max_num_slots ) &&
+            begin, SLOTS_ID, slot_size )    <= max_num_slots ) &&
         ( NS(BufferMem_get_section_num_entities)(
-            begin, OBJECTS_ID, slot_size ) <= max_num_objects ) &&
+            begin, OBJECTS_ID, slot_size )  <= max_num_objects ) &&
         ( NS(BufferMem_get_section_num_entities)(
             begin, DATAPTRS_ID, slot_size ) <= max_num_dataptrs ) &&
         ( NS(BufferMem_get_section_num_entities)(
-            begin, GARBAGE_ID, slot_size ) <= max_num_garbage_ranges ) );
+            begin, GARBAGE_ID, slot_size )  <= max_num_garbage_ranges ) );
 }
 
 /* ------------------------------------------------------------------------- */
@@ -489,11 +490,25 @@ SIXTRL_INLINE int NS(BufferMem_reserve)(
             {
                 if( new_garbage_offset > cur_garbage_offset )
                 {
-                    ptr_to_const_raw_t source  = begin + cur_garbage_offset;
-                    ptr_to_raw_t  destination  = begin + new_garbage_offset;
+                    ptr_to_const_raw_t source = begin + cur_garbage_offset;
+                    ptr_to_raw_t  destination = begin + new_garbage_offset;
+
+                    raw_t const z = ( raw_t )0u;
 
                     SIXTRACKLIB_MOVE_VALUES(
                         raw_t, destination, source, cur_garbage_size );
+
+                    SIXTRACKLIB_SET_VALUES(
+                        raw_t, ( ptr_to_raw_t )source, cur_garbage_size, z );
+
+                    if( requ_garbage_extent > cur_garbage_size )
+                    {
+                        buf_size_t const bytes_to_fill =
+                            requ_garbage_extent - cur_garbage_size;
+
+                        SIXTRACKLIB_SET_VALUES( raw_t,
+                            destination + cur_garbage_size, bytes_to_fill, z );
+                    }
 
                     garbage_finished = true;
                 }
@@ -519,8 +534,22 @@ SIXTRL_INLINE int NS(BufferMem_reserve)(
                     ptr_to_const_raw_t source  = begin + cur_dataptrs_offset;
                     ptr_to_raw_t  destination  = begin + new_dataptrs_offset;
 
+                    raw_t const z = ( raw_t )0u;
+
                     SIXTRACKLIB_MOVE_VALUES(
                         raw_t, destination, source, cur_dataptrs_size );
+
+                    SIXTRACKLIB_SET_VALUES(
+                        raw_t, ( ptr_to_raw_t )source, cur_dataptrs_size, z );
+
+                    if( requ_dataptrs_extent > cur_dataptrs_size )
+                    {
+                        buf_size_t const bytes_to_fill =
+                            requ_dataptrs_extent - cur_dataptrs_size;
+
+                        SIXTRACKLIB_SET_VALUES( raw_t,
+                            destination + cur_dataptrs_size, bytes_to_fill, z);
+                    }
 
                     dataptrs_finished = true;
                 }
@@ -547,8 +576,22 @@ SIXTRL_INLINE int NS(BufferMem_reserve)(
                     ptr_to_const_raw_t source  = begin + cur_objs_offset;
                     ptr_to_raw_t  destination  = begin + new_objs_offset;
 
+                    raw_t const z = ( raw_t )0u;
+
                     SIXTRACKLIB_MOVE_VALUES(
                         raw_t, destination, source, cur_objs_size );
+
+                    SIXTRACKLIB_SET_VALUES(
+                        raw_t, ( ptr_to_raw_t )source, cur_objs_size, z );
+
+                    if( requ_objs_extent > cur_objs_size )
+                    {
+                        buf_size_t const bytes_to_fill =
+                            requ_objs_extent - cur_objs_size;
+
+                        SIXTRACKLIB_SET_VALUES( raw_t,
+                            destination + cur_objs_size, bytes_to_fill, z );
+                    }
 
                     objs_finished = true;
                 }
@@ -562,6 +605,25 @@ SIXTRL_INLINE int NS(BufferMem_reserve)(
                         raw_t, destination, source, cur_objs_size );
 
                     objs_finished = true;
+                }
+            }
+
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+            if( ( slots_finished ) && ( dataptrs_finished ) &&
+                ( objs_finished  ) && ( garbage_finished  ) )
+            {
+                if( requ_slots_extent > cur_slots_size )
+                {
+                    ptr_to_raw_t destination = begin + new_slots_offset;
+
+                    raw_t const z = ( raw_t )0u;
+
+                    buf_size_t const bytes_to_fill =
+                        requ_slots_extent - cur_slots_size;
+
+                    SIXTRACKLIB_SET_VALUES( raw_t,
+                        destination + cur_slots_size, bytes_to_fill, z );
                 }
             }
 
@@ -668,10 +730,10 @@ SIXTRL_INLINE int NS(BufferMem_init)(
 
     if( ( begin != SIXTRL_NULLPTR ) && ( slot_size != ZERO_SIZE ) )
     {
-        SIXTRL_STATIC_VAR buf_size_t const SLOTS_ID    = ( buf_size_t )3u;
-        SIXTRL_STATIC_VAR buf_size_t const OBJECTS_ID  = ( buf_size_t )4u;
-        SIXTRL_STATIC_VAR buf_size_t const DATAPTRS_ID = ( buf_size_t )5u;
-        SIXTRL_STATIC_VAR buf_size_t const GARBAGE_ID  = ( buf_size_t )6u;
+        SIXTRL_STATIC_VAR buf_size_t const SLOTS_ID        = ( buf_size_t )3u;
+        SIXTRL_STATIC_VAR buf_size_t const OBJECTS_ID      = ( buf_size_t )4u;
+        SIXTRL_STATIC_VAR buf_size_t const DATAPTRS_ID     = ( buf_size_t )5u;
+        SIXTRL_STATIC_VAR buf_size_t const GARBAGE_ID      = ( buf_size_t )6u;
 
         buf_size_t const header_length =
             NS(BufferMem_get_header_length)( begin, slot_size );
