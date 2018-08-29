@@ -63,16 +63,23 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_buffer_mem:
 
-    add_executable( test_buffer_mem_common test_buffer_mem.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_buffer_mem_common )
-    add_test( CommonBufferTests test_buffer_mem_common )
+    add_executable( test_managed_buffer_common test_managed_buffer.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_managed_buffer_common )
+    add_test( CommonBufferTests test_managed_buffer_common )
 
     # --------------------------------------------------------------------------
-    # test_buffer:
+    # test_buffer_common_c99:
 
-    add_executable( test_buffer_common test_buffer.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_buffer_common )
-    add_test( CommonBufferTests test_buffer_common )
+    add_executable( test_buffer_common_c99 test_buffer_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_buffer_common_c99 )
+    add_test( CommonBufferTests test_buffer_common_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_buffer_common_cxx:
+
+    add_executable( test_buffer_common_cxx test_buffer_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_buffer_common_cxx )
+    add_test( CommonBufferTests test_buffer_common_cxx )
 
     # --------------------------------------------------------------------------
     # test_gpu_kernel_tools:
