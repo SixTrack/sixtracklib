@@ -911,7 +911,7 @@ TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
 
     ASSERT_TRUE( dist_d_to_e > 0 );
     ASSERT_TRUE( static_cast< size_t >( dist_d_to_e ) >=
-        st_BufferMem_get_slot_based_length(
+        st_ManagedBuffer_get_slot_based_length(
             num_d_values * sizeof( uint8_t ), slot_size ) );
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
@@ -979,7 +979,7 @@ TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
 
     ASSERT_TRUE( dist_obj1_e_to_obj2 > 0 );
     ASSERT_TRUE( static_cast< size_t >( dist_obj1_e_to_obj2 ) >=
-        st_BufferMem_get_slot_based_length(
+        st_ManagedBuffer_get_slot_based_length(
             num_e_values * sizeof( double ), slot_size ) );
 
     ASSERT_TRUE( obj2.type_id == ptr_my_obj->type_id );
@@ -1003,7 +1003,7 @@ TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
 
     ASSERT_TRUE( dist_d_to_e > 0 );
     ASSERT_TRUE( static_cast< size_t >( dist_d_to_e ) >=
-        st_BufferMem_get_slot_based_length(
+        st_ManagedBuffer_get_slot_based_length(
             num_d_values * sizeof( uint8_t ), slot_size ) );
 
     /* --------------------------------------------------------------------- *
@@ -1014,6 +1014,4 @@ TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
     buffer = nullptr;
 }
 
-/* ************************************************************************* */
-
-/* end: tests/sixtracklib/common/test_buffer.cpp */
+/* end: tests/sixtracklib/common/test_buffer_c99.cpp */
