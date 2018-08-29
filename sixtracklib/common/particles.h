@@ -2776,7 +2776,7 @@ SIXTRL_INLINE NS(particle_index_ptr_t)
 NS(Particles_get_particle_id)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p )
 {
-    return ( NS(particle_index_ptr_t) )NS(Particles_get_particle_id)( p );
+    return ( NS(particle_index_ptr_t) )NS(Particles_get_const_particle_id)( p );
 }
 
 SIXTRL_INLINE void NS(Particles_set_particle_id)(
@@ -2843,7 +2843,7 @@ SIXTRL_INLINE NS(particle_index_ptr_t)
 NS(Particles_get_at_element_id)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p )
 {
-    return ( NS(particle_index_ptr_t) )NS(Particles_get_at_element_id)( p );
+    return ( NS(particle_index_ptr_t) )NS(Particles_get_const_at_element_id)( p );
 }
 
 SIXTRL_INLINE void NS(Particles_set_at_element_id)(
@@ -2910,7 +2910,7 @@ SIXTRL_INLINE NS(particle_index_ptr_t)
 NS(Particles_get_at_turn)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p )
 {
-    return ( NS(particle_index_ptr_t) )NS(Particles_get_at_turn)( p );
+    return ( NS(particle_index_ptr_t) )NS(Particles_get_const_at_turn)( p );
 }
 
 SIXTRL_INLINE void NS(Particles_set_at_turn)(
@@ -2977,7 +2977,7 @@ SIXTRL_INLINE NS(particle_index_ptr_t)
 NS(Particles_get_state)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles )
 {
-    return ( NS(particle_index_ptr_t) )NS(Particles_get_state)( particles );
+    return ( NS(particle_index_ptr_t) )NS(Particles_get_const_state)( particles );
 }
 
 SIXTRL_INLINE void NS(Particles_set_state)(
