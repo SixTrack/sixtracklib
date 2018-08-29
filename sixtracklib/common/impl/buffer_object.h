@@ -120,7 +120,7 @@ SIXTRL_INLINE NS(buffer_addr_t) NS(Object_get_begin_addr)(
         ( ( sizeof( ptr_to_raw_t ) == 4u ) &&
           ( sizeof( address_t    ) == 8u ) &&
           ( ( ( object != SIXTRL_NULLPTR ) &&
-              ( ( ( address_t )NS(BufferMem_get_limit_offset_max)() >
+              ( ( ( address_t )NS(ManagedBuffer_get_limit_offset_max)() >
                 object->begin_addr ) ) ) ||
             (   object == SIXTRL_NULLPTR ) ) ) );
 
@@ -139,7 +139,7 @@ SIXTRL_INLINE void NS(Object_set_begin_addr)(
         (   sizeof( ptr_to_raw_t ) >= sizeof( address_t ) ) ||
         ( ( sizeof( ptr_to_raw_t ) == 4u ) &&
           ( sizeof( address_t    ) == 8u ) &&
-          ( ( address_t )NS(BufferMem_get_limit_offset_max)() >
+          ( ( address_t )NS(ManagedBuffer_get_limit_offset_max)() >
               begin_addr ) ) );
 
     if( object != SIXTRL_NULLPTR ) object->begin_addr = begin_addr;

@@ -9,9 +9,9 @@
 #include "sixtracklib/common/mem_pool.h"
 
 #include "sixtracklib/common/impl/buffer_generic.h"
-#include "sixtracklib/common/impl/buffer_mem.h"
-#include "sixtracklib/common/impl/buffer_mem_minimal.h"
-#include "sixtracklib/common/impl/buffer_mem_remap.h"
+#include "sixtracklib/common/impl/managed_buffer_minimal.h"
+#include "sixtracklib/common/impl/managed_buffer_remap.h"
+#include "sixtracklib/common/impl/managed_buffer.h"
 #include "sixtracklib/common/impl/buffer_object.h"
 #include "sixtracklib/common/impl/buffer_type.h"
 
@@ -57,7 +57,7 @@ NS(Buffer)* NS(Buffer_allocate_generic)(
 
     buf_size_t const slot_size = NS(Buffer_get_slot_size)( ptr_buffer );
 
-    buf_size_t const addr_size = NS(BufferMem_get_slot_based_length)(
+    buf_size_t const addr_size = NS(ManagedBuffer_get_slot_based_length)(
         sizeof( address_t ), slot_size );
 
     buf_size_t const section_hd_size = ( buf_size_t )2u * addr_size;
@@ -174,13 +174,13 @@ NS(Buffer)* NS(Buffer_new_detailed)(
 
     buf_size_t const slot_size = NS(BUFFER_DEFAULT_SLOT_SIZE);
 
-    buf_size_t const addr_size = NS(BufferMem_get_slot_based_length)(
+    buf_size_t const addr_size = NS(ManagedBuffer_get_slot_based_length)(
         sizeof( address_t ), slot_size );
 
-    buf_size_t const obj_info_size = NS(BufferMem_get_slot_based_length)(
+    buf_size_t const obj_info_size = NS(ManagedBuffer_get_slot_based_length)(
         sizeof( NS(Object) ), slot_size );
 
-    buf_size_t const dataptrs_size = NS(BufferMem_get_slot_based_length)(
+    buf_size_t const dataptrs_size = NS(ManagedBuffer_get_slot_based_length)(
         sizeof( address_t* ), slot_size );
 
     buf_size_t const garbage_size = slot_size;

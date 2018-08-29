@@ -295,9 +295,6 @@ namespace SIXTRL_NAMESPACE
     using buffer_size_t    = NS(buffer_size_t);
     using buffer_flags_t   = NS(buffer_flags_t);
 
-    using Buffer     = ::NS(Buffer);
-    using Object     = ::NS(Object);
-
     /* --------------------------------------------------------------------- */
 
     static SIXTRL_CONSTEXPR_OR_CONST object_type_id_t

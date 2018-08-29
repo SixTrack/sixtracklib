@@ -121,9 +121,9 @@ SIXTRL_FN SIXTRL_STATIC  int NS(Buffer_init_on_flat_memory_detailed)(
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/mem_pool.h"
-    #include "sixtracklib/common/impl/buffer_mem.h"
-    #include "sixtracklib/common/impl/buffer_mem_minimal.h"
-    #include "sixtracklib/common/impl/buffer_mem_remap.h"
+    #include "sixtracklib/common/impl/managed_buffer.h"
+    #include "sixtracklib/common/impl/managed_buffer_minimal.h"
+    #include "sixtracklib/common/impl/managed_buffer_remap.h"
     #include "sixtracklib/common/impl/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -185,7 +185,7 @@ SIXTRL_INLINE int NS(Buffer_clear_generic)(
         ptr_to_raw_t begin = ( ptr_to_raw_t )( uintptr_t
             )NS(Buffer_get_data_begin_addr)( buffer );
 
-        NS(BufferMem_clear)( begin, set_data_to_zero, slot_size );
+        NS(ManagedBuffer_clear)( begin, set_data_to_zero, slot_size );
         success = 0;
     }
 
@@ -222,7 +222,7 @@ SIXTRL_INLINE int NS(Buffer_reset_detailed_generic)(
 
     SIXTRL_ASSERT( slot_size > 0u );
     SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) % slot_size ) == 0u );
-    SIXTRL_ASSERT( !NS(BufferMem_needs_remapping)( begin, slot_size ) );
+    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( begin, slot_size ) );
 
     if( ( NS(Buffer_uses_datastore)( buffer ) ) &&
         ( NS(Buffer_allow_modify_datastore_contents)( buffer ) ) &&
@@ -231,7 +231,7 @@ SIXTRL_INLINE int NS(Buffer_reset_detailed_generic)(
         buf_size_t const capacity = NS(Buffer_get_capacity)( buffer );
         buf_size_t buffer_size    = ( buf_size_t )0u;
 
-        success = NS(BufferMem_init)( begin, &buffer_size, max_num_objects,
+        success = NS(ManagedBuffer_init)( begin, &buffer_size, max_num_objects,
             max_num_slots, max_num_dataptrs, max_num_garbage_ranges,
                 capacity, slot_size );
 
@@ -241,7 +241,8 @@ SIXTRL_INLINE int NS(Buffer_reset_detailed_generic)(
             SIXTRL_ASSERT( buffer_size <= capacity );
 
             SIXTRL_ASSERT( buffer_size >
-                NS(BufferMem_get_section_header_length)( begin, slot_size ) );
+                NS(ManagedBuffer_get_section_header_length)(
+                    begin, slot_size ) );
 
             buffer->data_addr     = ( address_t )( uintptr_t )begin;
             buffer->data_size     = buffer_size;
@@ -249,7 +250,7 @@ SIXTRL_INLINE int NS(Buffer_reset_detailed_generic)(
 
             buffer->num_objects   = ( buf_size_t )0u;
             buffer->object_addr   = ( address_t )( uintptr_t
-                )NS(BufferMem_get_const_objects_index_begin)(
+                )NS(ManagedBuffer_get_const_objects_index_begin)(
                     begin, slot_size );
         }
     }
@@ -288,7 +289,7 @@ SIXTRL_INLINE int NS(Buffer_remap_generic)(
                  ( slot_size > 0u ) && ( begin != SIXTRL_NULLPTR ) )
         {
             SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) % slot_size ) == 0u );
-            success = NS(BufferMem_remap)( begin, slot_size );
+            success = NS(ManagedBuffer_remap)( begin, slot_size );
 
             if( success == 0 )
             {
@@ -302,10 +303,11 @@ SIXTRL_INLINE int NS(Buffer_remap_generic)(
                 buffer->header_size = ptr_header[ 2 ];
 
                 buffer->object_addr = ( address_t )( uintptr_t
-                    )NS(BufferMem_get_ptr_to_section_data)(
+                    )NS(ManagedBuffer_get_ptr_to_section_data)(
                         begin, OBJS_ID, slot_size );
 
-                buffer->num_objects = NS(BufferMem_get_section_num_entities)(
+                buffer->num_objects =
+                    NS(ManagedBuffer_get_section_num_entities)(
                         begin, OBJS_ID, slot_size );
             }
         }
@@ -341,24 +343,24 @@ SIXTRL_INLINE int NS(Buffer_reserve_generic)(
 
     buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
 
-    SIXTRL_ASSERT(!NS(BufferMem_needs_remapping)( begin, slot_size ) );
+    SIXTRL_ASSERT(!NS(ManagedBuffer_needs_remapping)( begin, slot_size ) );
 
     if( ( NS(Buffer_uses_datastore)( buffer ) ) &&
         ( NS(Buffer_allow_modify_datastore_contents)( buffer ) ) &&
-        ( ( max_num_objects != NS(BufferMem_get_section_max_num_entities)(
+        ( ( max_num_objects != NS(ManagedBuffer_get_section_max_num_entities)(
                 begin, OBJECTS_ID, slot_size ) ) ||
-          ( max_num_slots != NS(BufferMem_get_section_max_num_entities)(
+          ( max_num_slots != NS(ManagedBuffer_get_section_max_num_entities)(
                 begin, SLOTS_ID, slot_size ) ) ||
-          ( max_num_dataptrs != NS(BufferMem_get_section_max_num_entities)(
+          ( max_num_dataptrs != NS(ManagedBuffer_get_section_max_num_entities)(
                 begin, DATAPTRS_ID, slot_size ) ) ||
           ( max_num_garbage_ranges !=
-            NS(BufferMem_get_section_max_num_entities)(
+            NS(ManagedBuffer_get_section_max_num_entities)(
                 begin, GARBAGE_ID, slot_size ) ) ) )
     {
         buf_size_t current_capacity = NS(Buffer_get_capacity)( buffer );
 
         buf_size_t const requ_buffer_capacity =
-            NS(BufferMem_calculate_buffer_length)( begin,
+            NS(ManagedBuffer_calculate_buffer_length)( begin,
                 max_num_objects, max_num_slots, max_num_dataptrs,
                     max_num_garbage_ranges, slot_size );
 
@@ -415,10 +417,10 @@ SIXTRL_INLINE int NS(Buffer_reserve_generic)(
                         ptr_to_raw_t new_begin = ( ptr_to_raw_t )( uintptr_t
                             )NS(MemPool_get_begin_pos)( mem_pool );
 
-                        if( !NS(BufferMem_needs_remapping)(
+                        if( !NS(ManagedBuffer_needs_remapping)(
                                 new_begin, slot_size ) )
                         {
-                            success = NS(BufferMem_remap)(
+                            success = NS(ManagedBuffer_remap)(
                                 new_begin, slot_size );
                         }
                         else
@@ -459,7 +461,7 @@ SIXTRL_INLINE int NS(Buffer_reserve_generic)(
 
             SIXTRL_ASSERT( success == 0 );
 
-            success = NS(BufferMem_reserve)( new_begin, &cur_buffer_size,
+            success = NS(ManagedBuffer_reserve)( new_begin, &cur_buffer_size,
                 max_num_objects, max_num_slots, max_num_dataptrs,
                     max_num_garbage_ranges, current_capacity, slot_size );
 
@@ -472,11 +474,12 @@ SIXTRL_INLINE int NS(Buffer_reserve_generic)(
                 buffer->data_size = cur_buffer_size;
 
                 buffer->object_addr = ( address_t )( uintptr_t
-                    )NS(BufferMem_get_const_objects_index_begin)(
+                    )NS(ManagedBuffer_get_const_objects_index_begin)(
                         new_begin, slot_size );
 
-                buffer->num_objects = NS(BufferMem_get_section_num_entities)(
-                    new_begin, OBJS_ID, slot_size );
+                buffer->num_objects =
+                    NS(ManagedBuffer_get_section_num_entities)(
+                        new_begin, OBJS_ID, slot_size );
             }
         }
     }
@@ -566,38 +569,38 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
             )NS(Buffer_get_data_begin_addr)( buffer );
 
         buf_size_t const cur_num_slots =
-            NS(BufferMem_get_section_num_entities)(
+            NS(ManagedBuffer_get_section_num_entities)(
                 begin, SLOTS_ID, slot_size );
 
         buf_size_t max_num_slots =
-            NS(BufferMem_get_section_max_num_entities)(
+            NS(ManagedBuffer_get_section_max_num_entities)(
                 begin, SLOTS_ID, slot_size );
 
         buf_size_t const cur_num_objects =
-            NS(BufferMem_get_section_num_entities)(
+            NS(ManagedBuffer_get_section_num_entities)(
                 begin, OBJS_ID, slot_size );
 
         buf_size_t max_num_objects =
-            NS(BufferMem_get_section_max_num_entities)(
+            NS(ManagedBuffer_get_section_max_num_entities)(
                 begin, OBJS_ID, slot_size );
 
         buf_size_t const cur_num_dataptrs =
-            NS(BufferMem_get_section_num_entities)(
+            NS(ManagedBuffer_get_section_num_entities)(
                 begin, DATAPTRS_ID, slot_size );
 
         buf_size_t max_num_dataptrs =
-            NS(BufferMem_get_section_max_num_entities)(
+            NS(ManagedBuffer_get_section_max_num_entities)(
                 begin, DATAPTRS_ID, slot_size );
 
         buf_size_t const max_num_garbage_ranges =
-            NS(BufferMem_get_section_max_num_entities)(
+            NS(ManagedBuffer_get_section_max_num_entities)(
                 begin, GARBAGE_ID, slot_size );
 
         buf_size_t const requ_num_objects  = cur_num_objects  + 1u;
         buf_size_t const requ_num_dataptrs = cur_num_dataptrs + num_obj_dataptr;
 
         buf_size_t const obj_handle_size =
-            NS(BufferMem_get_slot_based_length)( object_size, slot_size );
+            NS(ManagedBuffer_get_slot_based_length)( object_size, slot_size );
 
         buf_size_t requ_num_slots            = cur_num_slots;
         buf_size_t additional_num_slots      = ZERO_SIZE;
@@ -616,7 +619,7 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
                 buf_size_t const elem_size = dataptr_sizes[ ii ];
                 buf_size_t const attr_cnt  = dataptr_counts[ ii ];
                 buf_size_t const attr_size =
-                    NS(BufferMem_get_slot_based_length)(
+                    NS(ManagedBuffer_get_slot_based_length)(
                         elem_size * attr_cnt, slot_size );
 
                 SIXTRL_ASSERT( ( dataptr_offsets[ ii ] % slot_size ) == 0u );
@@ -654,14 +657,17 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
 
         SIXTRL_ASSERT(
             ( success != 0 ) ||
-            ( ( requ_num_objects <= NS(BufferMem_get_section_max_num_entities)(
+            ( ( requ_num_objects <=
+                NS(ManagedBuffer_get_section_max_num_entities)(
                     begin, OBJS_ID, slot_size ) ) &&
-              ( requ_num_slots <= NS(BufferMem_get_section_max_num_entities)(
+              ( requ_num_slots <=
+                NS(ManagedBuffer_get_section_max_num_entities)(
                     begin, SLOTS_ID, slot_size ) ) &&
-              ( requ_num_dataptrs <= NS(BufferMem_get_section_max_num_entities)(
+              ( requ_num_dataptrs <=
+                NS(ManagedBuffer_get_section_max_num_entities)(
                     begin, DATAPTRS_ID, slot_size ) ) &&
               ( max_num_garbage_ranges <=
-                NS(BufferMem_get_section_max_num_entities)(
+                NS(ManagedBuffer_get_section_max_num_entities)(
                     begin, GARBAGE_ID, slot_size ) )
             ) );
 
@@ -671,18 +677,19 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
         {
 
             buf_size_t const current_slots_size =
-                NS(BufferMem_get_section_size)( begin, SLOTS_ID, slot_size );
+                NS(ManagedBuffer_get_section_size)(
+                    begin, SLOTS_ID, slot_size );
 
-            ptr_to_raw_t dest_slots = ( ( ptr_to_raw_t
-                )NS(BufferMem_get_ptr_to_section)( begin, SLOTS_ID, slot_size )
-                    ) + current_slots_size;
+            ptr_to_raw_t dest_slots = (
+                ( ptr_to_raw_t )NS(ManagedBuffer_get_ptr_to_section)(
+                    begin, SLOTS_ID, slot_size ) ) + current_slots_size;
 
             ptr_to_raw_t stored_obj_begin = dest_slots;
 
             if( object_size > ZERO_SIZE )
             {
                 ptr_to_raw_t dest_obj_info = ( ( ptr_to_raw_t
-                    )NS(BufferMem_get_ptr_to_section)(
+                    )NS(ManagedBuffer_get_ptr_to_section)(
                         begin, OBJS_ID, slot_size ) );
 
                 object_t obj_info;
@@ -708,7 +715,7 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
                 if( ( success == 0 ) && ( dest_obj_info != SIXTRL_NULLPTR ) )
                 {
                     dest_obj_info = dest_obj_info +
-                        NS(BufferMem_get_section_size)(
+                        NS(ManagedBuffer_get_section_size)(
                             begin, OBJS_ID, slot_size );
 
                     SIXTRL_ASSERT( ( ( ( uintptr_t )dest_obj_info )
@@ -733,13 +740,13 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
             if( ( success == 0 ) && ( num_obj_dataptr > ZERO_SIZE ) )
             {
                 buf_size_t const current_dataptrs_size =
-                    NS(BufferMem_get_section_size)(
+                    NS(ManagedBuffer_get_section_size)(
                         begin, DATAPTRS_ID, slot_size );
 
                 buf_size_t ii = ZERO_SIZE;
 
                 ptr_to_raw_t dest_dataptrs = ( ( ptr_to_raw_t
-                    )NS(BufferMem_get_ptr_to_section)(
+                    )NS(ManagedBuffer_get_ptr_to_section)(
                         begin, DATAPTRS_ID, slot_size ) ) +
                     current_dataptrs_size;
 
@@ -756,7 +763,7 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
                     buf_size_t const attr_size = attr_cnt * elem_size;
 
                     buf_size_t const attr_extent =
-                        NS(BufferMem_get_slot_based_length)(
+                        NS(ManagedBuffer_get_slot_based_length)(
                             attr_size, slot_size );
 
                     ptr_to_raw_t ptr_attr_slot = stored_obj_begin + offset;
@@ -797,16 +804,16 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
                 SIXTRL_ASSERT( requ_num_dataptrs ==
                     ( cur_num_dataptrs + num_obj_dataptr ) );
 
-                NS(BufferMem_set_section_num_entities)( begin, DATAPTRS_ID,
+                NS(ManagedBuffer_set_section_num_entities)( begin, DATAPTRS_ID,
                         requ_num_dataptrs, slot_size );
             }
 
             if( success == 0 )
             {
-                NS(BufferMem_set_section_num_entities)(
+                NS(ManagedBuffer_set_section_num_entities)(
                     begin, SLOTS_ID, requ_num_slots, slot_size );
 
-                NS(BufferMem_set_section_num_entities)(
+                NS(ManagedBuffer_set_section_num_entities)(
                     begin, OBJS_ID, requ_num_objects, slot_size );
 
                 buffer->num_objects = requ_num_objects;
@@ -847,16 +854,16 @@ SIXTRL_INLINE int NS(Buffer_init_from_data)(
 
         SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) % slot_size ) == ZERO_SIZE );
 
-        if( NS(BufferMem_needs_remapping)( begin, slot_size ) )
+        if( NS(ManagedBuffer_needs_remapping)( begin, slot_size ) )
         {
-            if( NS(BufferMem_remap)( begin, slot_size ) != 0 )
+            if( NS(ManagedBuffer_remap)( begin, slot_size ) != 0 )
             {
                 return success;
             }
         }
 
-        SIXTRL_ASSERT( !NS(BufferMem_needs_remapping)( begin, slot_size ) );
-        in_length = NS(BufferMem_get_buffer_length)( begin, slot_size );
+        SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( begin, slot_size ) );
+        in_length = NS(ManagedBuffer_get_buffer_length)( begin, slot_size );
 
         SIXTRL_ASSERT( in_length <= max_data_buffer_length );
 
@@ -867,10 +874,10 @@ SIXTRL_INLINE int NS(Buffer_init_from_data)(
             buffer->data_capacity = max_data_buffer_length;
 
             buffer->object_addr = ( address_t )( uintptr_t
-                )NS(BufferMem_get_const_objects_index_begin)(
+                )NS(ManagedBuffer_get_const_objects_index_begin)(
                     begin, slot_size );
 
-            buffer->num_objects = NS(BufferMem_get_section_num_entities)(
+            buffer->num_objects = NS(ManagedBuffer_get_section_num_entities)(
                 begin, OBJECTS_ID, slot_size );
 
             buffer->datastore_flags =
@@ -946,9 +953,9 @@ SIXTRL_INLINE int NS(Buffer_init_from_data)(
 
                 SIXTRACKLIB_COPY_VALUES( raw_t, out_begin, begin, in_length );
 
-                if( NS(BufferMem_needs_remapping)( out_begin, slot_size ) )
+                if( NS(ManagedBuffer_needs_remapping)( out_begin, slot_size ) )
                 {
-                    success = NS(BufferMem_remap)( out_begin, slot_size );
+                    success = NS(ManagedBuffer_remap)( out_begin, slot_size );
                 }
 
                 if( success == 0 )
@@ -956,11 +963,11 @@ SIXTRL_INLINE int NS(Buffer_init_from_data)(
                     buffer->data_addr   = ( address_t )( uintptr_t )out_begin;
                     buffer->data_size   = in_length;
                     buffer->object_addr = ( address_t )( uintptr_t
-                        )NS(BufferMem_get_const_objects_index_begin)(
+                        )NS(ManagedBuffer_get_const_objects_index_begin)(
                             begin, slot_size );
 
                     buffer->num_objects =
-                        NS(BufferMem_get_section_num_entities)(
+                        NS(ManagedBuffer_get_section_num_entities)(
                             begin, OBJECTS_ID, slot_size );
 
                     buffer->datastore_flags |=
@@ -1004,7 +1011,7 @@ SIXTRL_INLINE int NS(Buffer_init_on_flat_memory_detailed)(
     buf_size_t new_buffer_size = ( buf_size_t )0u;
     buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
 
-    int success = NS(BufferMem_init)( data_buffer_begin, &new_buffer_size,
+    int success = NS(ManagedBuffer_init)( data_buffer_begin, &new_buffer_size,
         max_num_objects,  max_num_slots, max_num_dataptrs,
             max_num_garbage_ranges, buffer_capacity, slot_size );
 
@@ -1016,11 +1023,11 @@ SIXTRL_INLINE int NS(Buffer_init_on_flat_memory_detailed)(
         buffer->data_size       = new_buffer_size;
         buffer->data_capacity   = buffer_capacity;
 
-        buffer->num_objects     = NS(BufferMem_get_section_num_entities)(
+        buffer->num_objects     = NS(ManagedBuffer_get_section_num_entities)(
             data_buffer_begin, OBJECTS_ID, slot_size );
 
         buffer->object_addr     = ( address_t )( uintptr_t
-            )NS(BufferMem_get_ptr_to_section_data)(
+            )NS(ManagedBuffer_get_ptr_to_section_data)(
                 data_buffer_begin, OBJECTS_ID, slot_size );
 
         buffer->datastore_addr  = buffer->data_addr;

@@ -6,9 +6,9 @@ set( SIXTRACKLIB_COMMON_IMPL_HEADERS
 #      impl/beam_elements_type.h
 #      impl/beam_elements_api.h
      impl/buffer_type.h
-     impl/buffer_mem_minimal.h
-     impl/buffer_mem_remap.h
-     impl/buffer_mem.h
+     impl/managed_buffer_minimal.h
+     impl/managed_buffer_remap.h
+     impl/managed_buffer.h
      impl/buffer_object.h
      impl/buffer_generic.h
 #      impl/faddeeva.h

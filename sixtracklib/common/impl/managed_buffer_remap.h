@@ -1,5 +1,5 @@
-#ifndef SIXTRL_COMMON_IMPL_BUFFER_REMAP_H__
-#define SIXTRL_COMMON_IMPL_BUFFER_REMAP_H__
+#ifndef SIXTRL_COMMON_IMPL_MANAGED_BUFFER_REMAP_H__
+#define SIXTRL_COMMON_IMPL_MANAGED_BUFFER_REMAP_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -21,17 +21,17 @@ extern "C" {
 /* ========================================================================= */
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_diff_t)
-    NS(BufferMem_get_limit_offset_max)( void );
+    NS(ManagedBuffer_get_limit_offset_max)( void );
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_diff_t)
-    NS(BufferMem_get_limit_offset_min)( void );
+    NS(ManagedBuffer_get_limit_offset_min)( void );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(BufferMem_check_addr_arithmetic)(
+SIXTRL_FN SIXTRL_STATIC bool NS(ManagedBuffer_check_addr_arithmetic)(
     NS(buffer_addr_t) const addr,
     NS(buffer_addr_diff_t) const offset,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(BufferMem_perform_addr_shift)(
+SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(ManagedBuffer_perform_addr_shift)(
     NS(buffer_addr_t) const addr,
     NS(buffer_addr_diff_t) const offset,
     NS(buffer_size_t) const slot_size );
@@ -39,37 +39,37 @@ SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(BufferMem_perform_addr_shift)(
 /* ========================================================================= */
 
 SIXTRL_FN SIXTRL_STATIC int
-NS(BufferMem_get_addr_offset)(
-    SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t)* SIXTRL_RESTRICT ptr_to_addr_offset,
+NS(ManagedBuffer_get_addr_offset)( SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t)*
+        SIXTRL_RESTRICT ptr_to_addr_offset,
     SIXTRL_ARGPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BufferMem_remap_header)(
+SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap_header)(
     SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BufferMem_remap_section_slots)(
+SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap_section_slots)(
     SIXTRL_ARGPTR_DEC unsigned char*  SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BufferMem_remap_section_objects)(
+SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap_section_objects)(
     SIXTRL_ARGPTR_DEC unsigned char*      SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BufferMem_remap_section_dataptrs)(
+SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap_section_dataptrs)(
     SIXTRL_ARGPTR_DEC unsigned char*      SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BufferMem_remap_section_garbage)(
+SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap_section_garbage)(
     SIXTRL_ARGPTR_DEC unsigned char*      SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BufferMem_remap)(
+SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap)(
     SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size );
 
@@ -83,14 +83,14 @@ SIXTRL_FN SIXTRL_STATIC int NS(BufferMem_remap)(
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/impl/buffer_object.h"
-    #include "sixtracklib/common/impl/buffer_mem_minimal.h"
+    #include "sixtracklib/common/impl/managed_buffer_minimal.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_INLINE NS(buffer_addr_diff_t) NS(BufferMem_get_limit_offset_max)()
+SIXTRL_INLINE NS(buffer_addr_diff_t) NS(ManagedBuffer_get_limit_offset_max)()
 {
     #if defined( _GPUCODE )
          #if defined( __OPENCL_VERSION__ ) &&
@@ -134,7 +134,8 @@ SIXTRL_INLINE NS(buffer_addr_diff_t) NS(BufferMem_get_limit_offset_max)()
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_INLINE NS(buffer_addr_diff_t) NS(BufferMem_get_limit_offset_min)( void )
+SIXTRL_INLINE NS(buffer_addr_diff_t)
+    NS(ManagedBuffer_get_limit_offset_min)( void )
 {
     #if defined( _GPUCODE )
          #if defined( __OPENCL_VERSION__ ) &&
@@ -178,7 +179,7 @@ SIXTRL_INLINE NS(buffer_addr_diff_t) NS(BufferMem_get_limit_offset_min)( void )
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_INLINE bool NS(BufferMem_check_addr_arithmetic)(
+SIXTRL_INLINE bool NS(ManagedBuffer_check_addr_arithmetic)(
     NS(buffer_addr_t) const addr,
     NS(buffer_addr_diff_t) const offset, NS(buffer_size_t) const slot_size )
 {
@@ -189,7 +190,8 @@ SIXTRL_INLINE bool NS(BufferMem_check_addr_arithmetic)(
     SIXTRL_ASSERT( sizeof( address_t ) >= 8u );
     SIXTRL_ASSERT( slot_size > 0u );
 
-    addr_diff_t const LIMIT_OFFSET_MAX = NS(BufferMem_get_limit_offset_max)();
+    addr_diff_t const LIMIT_OFFSET_MAX =
+        NS(ManagedBuffer_get_limit_offset_max)();
 
     return (
         ( addr != ( address_t )0u ) && ( ( addr % slot_size ) == 0u ) &&
@@ -203,11 +205,11 @@ SIXTRL_INLINE bool NS(BufferMem_check_addr_arithmetic)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_INLINE NS(buffer_addr_t) NS(BufferMem_perform_addr_shift)(
+SIXTRL_INLINE NS(buffer_addr_t) NS(ManagedBuffer_perform_addr_shift)(
     NS(buffer_addr_t) const addr, NS(buffer_addr_diff_t) const offset,
     NS(buffer_size_t) const slot_size )
 {
-    SIXTRL_ASSERT( NS(BufferMem_check_addr_arithmetic)(
+    SIXTRL_ASSERT( NS(ManagedBuffer_check_addr_arithmetic)(
         addr, offset, slot_size) );
 
     #if !defined( NDEBUG )
@@ -219,7 +221,7 @@ SIXTRL_INLINE NS(buffer_addr_t) NS(BufferMem_perform_addr_shift)(
 
 /* ========================================================================= */
 
-SIXTRL_INLINE int NS(BufferMem_get_addr_offset)(
+SIXTRL_INLINE int NS(ManagedBuffer_get_addr_offset)(
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t)* SIXTRL_RESTRICT ptr_addr_offset,
     SIXTRL_ARGPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size )
@@ -260,7 +262,7 @@ SIXTRL_INLINE int NS(BufferMem_get_addr_offset)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE int NS(BufferMem_remap_header)(
+SIXTRL_INLINE int NS(ManagedBuffer_remap_header)(
     SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size )
@@ -285,7 +287,7 @@ SIXTRL_INLINE int NS(BufferMem_remap_header)(
         addr_diff_t const dataptrs_addr_offset = offsets[ 3 ];
         addr_diff_t const garbage_addr_offset  = offsets[ 4 ];
 
-        success = NS(BufferMem_get_addr_offset)(
+        success = NS(ManagedBuffer_get_addr_offset)(
             &base_addr_offset, begin, slot_size );
 
         if( ( success != 0 ) ||
@@ -311,8 +313,9 @@ SIXTRL_INLINE int NS(BufferMem_remap_header)(
 
             ptr_to_addr_t header = ( ptr_to_addr_t )begin;
 
-            address_t const remap_base_addr = NS(BufferMem_perform_addr_shift)(
-                header[ BASE_ID ], base_addr_offset, slot_size );
+            address_t const remap_base_addr =
+                NS(ManagedBuffer_perform_addr_shift)(
+                    header[ BASE_ID ], base_addr_offset, slot_size );
 
             if( ( remap_base_addr != ( address_t )0u ) &&
                 ( remap_base_addr == ( address_t )( uintptr_t )begin ) )
@@ -322,19 +325,19 @@ SIXTRL_INLINE int NS(BufferMem_remap_header)(
                 #endif /* !defined( NDEBUG ) */
 
                 address_t const remap_slots_begin_addr =
-                    NS(BufferMem_perform_addr_shift)( header[ SLOTS_ID ],
+                    NS(ManagedBuffer_perform_addr_shift)( header[ SLOTS_ID ],
                         slots_addr_offset, slot_size );
 
                 address_t const remap_objs_begin_addr =
-                    NS(BufferMem_perform_addr_shift)( header[ OBJECTS_ID ],
+                    NS(ManagedBuffer_perform_addr_shift)( header[ OBJECTS_ID ],
                         objs_addr_offset, slot_size );
 
                 address_t const remap_dataptrs_begin_addr =
-                    NS(BufferMem_perform_addr_shift)( header[ DATAPTRS_ID ],
+                    NS(ManagedBuffer_perform_addr_shift)( header[ DATAPTRS_ID ],
                         dataptrs_addr_offset, slot_size );
 
                 address_t const remap_garbage_begin_addr =
-                    NS(BufferMem_perform_addr_shift)( header[ GARBAGE_ID ],
+                    NS(ManagedBuffer_perform_addr_shift)( header[ GARBAGE_ID ],
                         garbage_addr_offset, slot_size );
 
                 #if !defined( NDEBUG )
@@ -385,7 +388,7 @@ SIXTRL_INLINE int NS(BufferMem_remap_header)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE int NS(BufferMem_remap_section_slots)(
+SIXTRL_INLINE int NS(ManagedBuffer_remap_section_slots)(
     SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size )
@@ -405,7 +408,7 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_slots)(
         SIXTRL_STATIC_VAR buf_size_t const SECTION_ID = 3u;
 
         ptr_to_addr_t ptr_section_begin = ( ptr_to_addr_t )(
-            NS(BufferMem_get_const_ptr_to_section)( begin,
+            NS(ManagedBuffer_get_const_ptr_to_section)( begin,
                 SECTION_ID, slot_size ) );
 
         if( ptr_section_begin != SIXTRL_NULLPTR )
@@ -413,7 +416,7 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_slots)(
             buf_size_t const slots_capacity  =  ptr_section_begin[ 0 ];
             buf_size_t const num_entities    =  ptr_section_begin[ 1 ];
             buf_size_t const entity_size     =
-                NS(BufferMem_get_section_entity_size)(
+                NS(ManagedBuffer_get_section_entity_size)(
                     begin, SECTION_ID, slot_size );
 
             success = ( slots_capacity >= ( num_entities * entity_size ) )
@@ -426,7 +429,7 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_slots)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE int NS(BufferMem_remap_section_objects)(
+SIXTRL_INLINE int NS(ManagedBuffer_remap_section_objects)(
     SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size )
@@ -450,19 +453,23 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_objects)(
         SIXTRL_STATIC_VAR buf_size_t const OBJS_ID  = ( buf_size_t )4u;
 
         ptr_to_addr_t ptr_section_begin = ( ptr_to_addr_t )(
-            NS(BufferMem_get_ptr_to_section)( begin, OBJS_ID, slot_size ) );
+            NS(ManagedBuffer_get_ptr_to_section)(
+                begin, OBJS_ID, slot_size ) );
 
         buf_size_t const objs_max_size =
-            NS(BufferMem_get_section_max_size)( begin, OBJS_ID, slot_size );
+            NS(ManagedBuffer_get_section_max_size)(
+                begin, OBJS_ID, slot_size );
 
         buf_size_t const objs_size =
-            NS(BufferMem_get_section_size)( begin, OBJS_ID, slot_size );
+            NS(ManagedBuffer_get_section_size)( begin, OBJS_ID, slot_size );
 
         ptr_to_object_t ptr_objects_begin = (ptr_to_object_t
-            )NS(BufferMem_get_ptr_to_section_data)( begin, OBJS_ID, slot_size );
+            )NS(ManagedBuffer_get_ptr_to_section_data)(
+                begin, OBJS_ID, slot_size );
 
         buf_size_t const num_objects =
-            NS(BufferMem_get_section_num_entities)( begin, OBJS_ID, slot_size );
+            NS(ManagedBuffer_get_section_num_entities)(
+                begin, OBJS_ID, slot_size );
 
         SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) % slot_size ) == 0u );
 
@@ -474,10 +481,12 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_objects)(
             addr_diff_t const slots_addr_offset = offsets[ 1 ];
 
             address_t const slots_section_begin_addr = ( address_t )( uintptr_t
-                )NS(BufferMem_get_ptr_to_section_data)( begin, SLOTS_ID, slot_size );
+                )NS(ManagedBuffer_get_ptr_to_section_data)(
+                    begin, SLOTS_ID, slot_size );
 
             address_t const slots_section_end_addr = ( address_t )( uintptr_t
-                )NS(BufferMem_get_ptr_to_section_end)( begin, SLOTS_ID, slot_size );
+                )NS(ManagedBuffer_get_ptr_to_section_end)(
+                    begin, SLOTS_ID, slot_size );
 
             address_t min_valid_obj_addr = slots_section_begin_addr;
 
@@ -491,13 +500,14 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_objects)(
                 buf_size_t const obj_size = NS(Object_get_size)( obj_it );
 
                 buf_size_t const obj_offset =
-                    NS(BufferMem_get_slot_based_length)( obj_size, slot_size );
+                    NS(ManagedBuffer_get_slot_based_length)(
+                        obj_size, slot_size );
 
                 address_t const obj_begin_addr =
                     NS(Object_get_begin_addr)( obj_it );
 
                 address_t const remapped_obj_begin_addr =
-                    NS(BufferMem_perform_addr_shift)(
+                    NS(ManagedBuffer_perform_addr_shift)(
                         obj_begin_addr, slots_addr_offset, slot_size );
 
                 SIXTRL_ASSERT( ( min_valid_obj_addr % slot_size ) == 0u );
@@ -525,7 +535,7 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_objects)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE int NS(BufferMem_remap_section_dataptrs)(
+SIXTRL_INLINE int NS(ManagedBuffer_remap_section_dataptrs)(
     SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size )
@@ -547,17 +557,20 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_dataptrs)(
         SIXTRL_STATIC_VAR buf_size_t const DATAPTRS_ID = ( buf_size_t )5u;
 
         ptr_to_addr_t ptr_section_begin = ( ptr_to_addr_t )(
-            NS(BufferMem_get_ptr_to_section_data)(
+            NS(ManagedBuffer_get_ptr_to_section_data)(
                 begin, DATAPTRS_ID, slot_size ) );
 
-        buf_size_t const num_dataptrs = NS(BufferMem_get_section_num_entities)(
-            begin, DATAPTRS_ID, slot_size );
+        buf_size_t const num_dataptrs =
+            NS(ManagedBuffer_get_section_num_entities)(
+                begin, DATAPTRS_ID, slot_size );
 
-        buf_size_t const dataptrs_size = NS(BufferMem_get_section_size)(
-            begin, DATAPTRS_ID, slot_size );
+        buf_size_t const dataptrs_size =
+            NS(ManagedBuffer_get_section_size)(
+                begin, DATAPTRS_ID, slot_size );
 
-        buf_size_t const max_dataptrs_size = NS(BufferMem_get_section_max_size)(
-            begin, DATAPTRS_ID, slot_size );
+        buf_size_t const max_dataptrs_size =
+            NS(ManagedBuffer_get_section_max_size)(
+                begin, DATAPTRS_ID, slot_size );
 
         SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) % slot_size ) == 0u );
 
@@ -569,11 +582,11 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_dataptrs)(
             addr_diff_t const slots_addr_offset = offsets[ 1 ];
 
             address_t const slots_section_begin_addr = ( address_t )( uintptr_t
-                )NS(BufferMem_get_ptr_to_section_data)(
+                )NS(ManagedBuffer_get_ptr_to_section_data)(
                     begin, SLOTS_ID, slot_size );
 
             address_t const slots_section_end_addr = ( address_t )( uintptr_t
-                )NS(BufferMem_get_ptr_to_section_end)(
+                )NS(ManagedBuffer_get_ptr_to_section_end)(
                     begin, SLOTS_ID, slot_size );
 
             ptr_to_addr_t dataptr_it  = ptr_section_begin;
@@ -587,14 +600,15 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_dataptrs)(
                 address_t const slot_ptr_addr = *dataptr_it;
 
                 address_t const remap_slot_ptr_addr =
-                    NS(BufferMem_perform_addr_shift)( slot_ptr_addr,
+                    NS(ManagedBuffer_perform_addr_shift)( slot_ptr_addr,
                         slots_addr_offset, slot_size );
 
                 ptr_to_addr_t slot_ptr =
                     ( ptr_to_addr_t )( uintptr_t )remap_slot_ptr_addr;
 
-                address_t const remap_slot_addr = ( slot_ptr != SIXTRL_NULLPTR )
-                    ? ( NS(BufferMem_perform_addr_shift)( *slot_ptr,
+                address_t const remap_slot_addr =
+                    ( slot_ptr != SIXTRL_NULLPTR )
+                    ? ( NS(ManagedBuffer_perform_addr_shift)( *slot_ptr,
                             slots_addr_offset, slot_size ) )
                     : ( address_t )0u;
 
@@ -622,7 +636,7 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_dataptrs)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE int NS(BufferMem_remap_section_garbage)(
+SIXTRL_INLINE int NS(ManagedBuffer_remap_section_garbage)(
     SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size )
@@ -646,17 +660,19 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_garbage)(
         SIXTRL_STATIC_VAR buf_size_t const GARBAGE_ID = ( buf_size_t )6u;
 
         ptr_to_addr_t ptr_section_begin = ( ptr_to_addr_t )(
-            NS(BufferMem_get_ptr_to_section_data)( begin, GARBAGE_ID, slot_size ) );
+            NS(ManagedBuffer_get_ptr_to_section_data)(
+                begin, GARBAGE_ID, slot_size ) );
 
         buf_size_t const num_garbage_ranges =
-            NS(BufferMem_get_section_num_entities)(
+            NS(ManagedBuffer_get_section_num_entities)(
                 begin, GARBAGE_ID, slot_size );
 
-        buf_size_t const garbage_ranges_size = NS(BufferMem_get_section_size)(
-                begin, GARBAGE_ID, slot_size );
+        buf_size_t const garbage_ranges_size =
+            NS(ManagedBuffer_get_section_size)( begin, GARBAGE_ID, slot_size );
 
         buf_size_t const max_garbage_range_size =
-            NS(BufferMem_get_section_max_size)( begin, GARBAGE_ID, slot_size );
+            NS(ManagedBuffer_get_section_max_size)(
+                begin, GARBAGE_ID, slot_size );
 
         success = ( ( ptr_section_begin != SIXTRL_NULLPTR ) &&
                     ( max_garbage_range_size >= garbage_ranges_size  ) )
@@ -667,11 +683,11 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_garbage)(
             addr_diff_t const slots_addr_offset = offsets[ 1 ];
 
             address_t const slots_section_begin_addr = ( address_t )(
-                NS(BufferMem_get_ptr_to_section_data)(
+                NS(ManagedBuffer_get_ptr_to_section_data)(
                     begin, SLOTS_ID, slot_size ) );
 
             address_t const slots_section_end_addr = ( address_t )(
-                NS(BufferMem_get_ptr_to_section_end)(
+                NS(ManagedBuffer_get_ptr_to_section_end)(
                     begin, SLOTS_ID, slot_size ) );
 
             ptr_to_garbage_t it  = ( ptr_to_garbage_t )ptr_section_begin;
@@ -685,7 +701,7 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_garbage)(
                     NS(BufferGarbage_get_begin_addr)( it );
 
                 address_t const remap_slot_addr =
-                    NS(BufferMem_perform_addr_shift)( garbage_begin_addr,
+                    NS(ManagedBuffer_perform_addr_shift)( garbage_begin_addr,
                         slots_addr_offset, slot_size );
 
                 if( ( remap_slot_addr >= slots_section_begin_addr ) &&
@@ -707,7 +723,7 @@ SIXTRL_INLINE int NS(BufferMem_remap_section_garbage)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE int NS(BufferMem_remap)(
+SIXTRL_INLINE int NS(ManagedBuffer_remap)(
     SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size )
 {
@@ -717,7 +733,7 @@ SIXTRL_INLINE int NS(BufferMem_remap)(
 
     addr_diff_t base_addr_offset = ZERO_OFFSET;
 
-    int success = NS(BufferMem_get_addr_offset)(
+    int success = NS(ManagedBuffer_get_addr_offset)(
         &base_addr_offset, begin, slot_size );
 
     if( ( success == 0 ) && ( base_addr_offset != ZERO_OFFSET ) )
@@ -728,18 +744,18 @@ SIXTRL_INLINE int NS(BufferMem_remap)(
             base_addr_offset, base_addr_offset
         };
 
-        success  = NS(BufferMem_remap_header)( begin, offsets, slot_size );
+        success  = NS(ManagedBuffer_remap_header)( begin, offsets, slot_size );
 
-        success |= NS(BufferMem_remap_section_slots)(
+        success |= NS(ManagedBuffer_remap_section_slots)(
             begin, offsets, slot_size );
 
-        success |= NS(BufferMem_remap_section_objects)(
+        success |= NS(ManagedBuffer_remap_section_objects)(
             begin, offsets, slot_size );
 
-        success |= NS(BufferMem_remap_section_dataptrs)(
+        success |= NS(ManagedBuffer_remap_section_dataptrs)(
             begin, offsets, slot_size );
 
-        success |= NS(BufferMem_remap_section_garbage)(
+        success |= NS(ManagedBuffer_remap_section_garbage)(
             begin, offsets, slot_size );
     }
 
@@ -750,6 +766,6 @@ SIXTRL_INLINE int NS(BufferMem_remap)(
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRL_COMMON_IMPL_BUFFER_REMAP_H__ */
+#endif /* SIXTRL_COMMON_IMPL_MANAGED_BUFFER_REMAP_H__ */
 
-/*end: sixtracklib/common/impl/buffer_mem_remap.h */
+/*end: sixtracklib/common/impl/managed_buffer_remap.h */
