@@ -27,6 +27,7 @@ set( SIXTRACKLIB_COMMON_HEADERS
 #      beam_elements.h
 #      blocks.h
      buffer.h
+     buffer.hpp
      compute_arch.h
      mem_pool.h
      particles.h

@@ -6,6 +6,7 @@
     #include <cstdint>
     #include <cstdlib>
     #include <limits>
+    #include <utility>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
@@ -17,8 +18,10 @@
 
 namespace SIXTRL_NAMESPACE
 {
-    struct Buffer : public ::NS(Buffer)
+    class Buffer : private ::NS(Buffer)
     {
+        public:
+
         using size_type     = ::NS(buffer_size_t);
         using flags_t       = ::NS(buffer_flags_t);
         using address_t     = ::NS(buffer_addr_t);
@@ -27,33 +30,51 @@ namespace SIXTRL_NAMESPACE
         using c_api_t       = ::NS(Buffer);
         using type_id_t     = ::NS(object_type_id_t);
 
-        SIXTRL_FN Buffer() = default;
+        SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST size_type
+            DEFAULT_BUFFER_CAPACITY = size_type{ 256 };
 
-        SIXTRL_FN Buffer( Buffer const& other ) = default;
-        SIXTRL_FN Buffer( Buffer&& other ) = default;
+        SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST flags_t
+            DEFAULT_DATASTORE_FLAGS = ::NS(BUFFER_DATASTORE_MEMPOOL);
 
-        SIXTRL_FN Buffer& operator=( Buffer const& rhs ) = default;
-        SIXTRL_FN Buffer& operator=( Buffer&& rhs ) = default;
+        SIXTRL_FN SIXTRL_STATIC size_type CalculateBufferSize(
+            size_type max_num_objects, size_type max_num_slots,
+            size_type max_num_dataptrs, size_type max_num_garbage_ranges,
+            size_type slot_size = ::NS(BUFFER_DEFAULT_SLOT_SIZE)
+        ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN ~Buffer() = default;
 
-        /* ----------------------------------------------------------------- */
+        SIXTRL_FN explicit Buffer(
+            size_type const buffer_capacity = DEFAULT_BUFFER_CAPACITY,
+            flags_t const buffer_flags = DEFAULT_DATASTORE_FLAGS );
 
-        SIXTRL_FN SIXTRL_STATIC Buffer* Make(
-            size_type buffer_capacity,
-            flags_t const buffer_flags = flags_t{} );
-
-        template< typename Ptr >
-        SIXTRL_FN SIXTRL_STATIC Buffer* Make(
-            Ptr SIXTRL_RESTRICT data_buffer_begin,
-            size_type const max_data_buffer_size );
-
-        SIXTRL_FN SIXTRL_STATIC Buffer* Make(
+        SIXTRL_FN Buffer(
             size_type max_num_objects,
             size_type max_num_slots,
             size_type max_num_dataptrs,
             size_type max_num_garbage_ranges,
-            flags_t const buffer_flags = flags_t{} );
+            flags_t buffer_flags = DEFAULT_DATASTORE_FLAGS );
+
+        template< typename Ptr >
+        SIXTRL_FN Buffer( Ptr SIXTRL_RESTRICT data_buffer_begin,
+                          size_type max_buffer_size ) SIXTRL_NOEXCEPT;
+
+        template< typename Ptr >
+        SIXTRL_FN Buffer(
+            Ptr SIXTRL_RESTRICT begin,
+            size_type max_num_objects,
+            size_type max_num_slots,
+            size_type max_num_dataptrs,
+            size_type max_num_garbage_ranges,
+            size_type buffer_capacity ) SIXTRL_NOEXCEPT;
+
+        /* TODO: Implement Copy & Move semantics for Buffer */
+        SIXTRL_FN Buffer( Buffer const& other ) = delete;
+        SIXTRL_FN Buffer( Buffer&& other ) = delete;
+
+        SIXTRL_FN Buffer& operator=( Buffer const& rhs ) = delete;
+        SIXTRL_FN Buffer& operator=( Buffer&& rhs ) = delete;
+
+        SIXTRL_FN virtual ~Buffer();
 
         /* ----------------------------------------------------------------- */
 
@@ -63,7 +84,7 @@ namespace SIXTRL_NAMESPACE
         /* ----------------------------------------------------------------- */
 
         SIXTRL_FN void preset()   SIXTRL_NOEXCEPT;
-        SIXTRL_FN void clear()    SIXTRL_NOEXCEPT;
+        SIXTRL_FN void clear( bool set_data_to_zero = false ) SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -107,7 +128,6 @@ namespace SIXTRL_NAMESPACE
 
         SIXTRL_FN size_type getSize()               const SIXTRL_NOEXCEPT;
         SIXTRL_FN size_type getCapacity()           const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getHeaderSize()         const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN size_type getSlotSize()           const SIXTRL_NOEXCEPT;
         SIXTRL_FN size_type getHeaderSize()         const SIXTRL_NOEXCEPT;
@@ -118,17 +138,14 @@ namespace SIXTRL_NAMESPACE
         SIXTRL_FN size_type getNumSlots()           const SIXTRL_NOEXCEPT;
         SIXTRL_FN size_type getMaxNumSlots()        const SIXTRL_NOEXCEPT;
         SIXTRL_FN size_type getSlotsSize()          const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getMaxSlotsSize()       const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN size_type getNumObjects()         const SIXTRL_NOEXCEPT;
         SIXTRL_FN size_type getMaxNumObjects()      const SIXTRL_NOEXCEPT;
         SIXTRL_FN size_type getObjectsSize()        const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getMaxObjectsSize()     const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN size_type getNumDataptrs()        const SIXTRL_NOEXCEPT;
         SIXTRL_FN size_type getMaxNumDataptrs()     const SIXTRL_NOEXCEPT;
         SIXTRL_FN size_type getDataptrsSize()       const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getMaxDataptrsSize()    const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -173,25 +190,27 @@ namespace SIXTRL_NAMESPACE
         SIXTRL_FN T* createNew( Args&&... args )
         {
             return T::CreateNewOnBuffer(
-                this->getCApiPtr(), std::forward< Args >( args )... );
+                *this->getCApiPtr(), std::forward< Args >( args )... );
         }
 
         template< class T, typename... Args >
         SIXTRL_FN T* add( Args&&... args )
         {
             return T::AddToBuffer(
-                this->getCApiPtr(), std::forward< Args >( args )... );
+                *this->getCApiPtr(), std::forward< Args >( args )... );
         }
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        template< class T, typename Ptr >
+        template< class T, typename CPtr, typename Ptr >
         SIXTRL_FN bool canAddObject(
-            T const& SIXTRL_RESTRICT_REF obj, size_type num_dataptrs,
-            Ptr SIXTRL_RESTRICT sizes, Ptr SIXTRL_RESTRICT counts,
-            size_type& SIXTRL_RESTRICT_REF num_objects,
-            size_type& SIXTRL_RESTRICT_REF num_slots,
-            size_type& SIXTRL_RESTRICT_REF num_dataptrs ) const SIXTRL_NOEXCEPT;
+            T const& SIXTRL_RESTRICT_REF obj,
+            size_type num_dataptrs,
+            CPtr SIXTRL_RESTRICT sizes,
+            CPtr SIXTRL_RESTRICT counts,
+            Ptr  SIXTRL_RESTRICT ptr_requ_num_objects,
+            Ptr  SIXTRL_RESTRICT ptr_requ_num_slots,
+            Ptr  SIXTRL_RESTRICT ptr_requ_num_dataptrs ) const SIXTRL_NOEXCEPT;
 
         template< class T, typename Ptr >
         SIXTRL_FN object_t* addObject(
@@ -201,6 +220,11 @@ namespace SIXTRL_NAMESPACE
             Ptr SIXTRL_RESTRICT offsets,
             Ptr SIXTRL_RESTRICT sizes,
             Ptr SIXTRL_RESTRICT counts );
+
+        private:
+
+        bool allocateDataStore(
+            size_type const buffer_capacity, flags_t const flags );
     };
 }
 
@@ -208,31 +232,127 @@ namespace SIXTRL_NAMESPACE
  * **** Inline method implementation                                         *
  * ************************************************************************* */
 
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/mem_pool.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
 namespace SIXTRL_NAMESPACE
 {
-    SIXTRL_INLINE Buffer* Buffer::Make(
-        Buffer::size_type const buffer_capacity,
-        Buffer::flags_t const buffer_flags )
-    {
-
-    }
-
-    template< typename Ptr >
-    SIXTRL_INLINE Buffer* Buffer::Make(
-        Ptr SIXTRL_RESTRICT data_buffer_begin,
-        Buffer::size_type const max_data_buffer_size )
-    {
-
-    }
-
-    SIXTRL_INLINE Buffer* Buffer::Make(
+    SIXTRL_INLINE Buffer::size_type Buffer::CalculateBufferSize(
         Buffer::size_type const max_num_objects,
         Buffer::size_type const max_num_slots,
         Buffer::size_type const max_num_dataptrs,
         Buffer::size_type const max_num_garbage_ranges,
-        Buffer::flags_t   const buffer_flags  )
+        Buffer::size_type const slot_size ) SIXTRL_NOEXCEPT
     {
+        return NS(ManagedBuffer_calculate_buffer_length)( nullptr,
+            max_num_objects, max_num_slots, max_num_dataptrs,
+                max_num_garbage_ranges, slot_size );
+    }
 
+    SIXTRL_INLINE Buffer::Buffer(
+        Buffer::size_type const buffer_capacity,
+        Buffer::flags_t const buffer_flags ) :
+        ::NS(Buffer)()
+    {
+        using c_api_t = Buffer::c_api_t;
+
+        c_api_t* _buffer = ::NS(Buffer_preset)( this->getCApiPtr() );
+
+        if( !this->allocateDataStore( buffer_capacity, buffer_flags ) )
+        {
+            ::NS(Buffer_free)( _buffer );
+        }
+    }
+
+    SIXTRL_INLINE Buffer::Buffer(
+        Buffer::size_type const max_num_objects,
+        Buffer::size_type const max_num_slots,
+        Buffer::size_type const max_num_dataptrs,
+        Buffer::size_type const max_num_garbage_ranges,
+        Buffer::flags_t   const buffer_flags  ) :
+        ::NS(Buffer)()
+    {
+        using size_t  = Buffer::size_type;
+        using c_api_t = Buffer::c_api_t;
+
+        c_api_t* _buffer = ::NS(Buffer_preset)( this->getCApiPtr() );
+        size_t const slot_size = ::NS(Buffer_get_slot_size)( _buffer );
+
+        size_t const requ_buffer_capacity =
+            ::NS(ManagedBuffer_calculate_buffer_length)( nullptr,
+                max_num_objects, max_num_slots, max_num_dataptrs,
+                    max_num_garbage_ranges, slot_size );
+
+        if( ( this->allocateDataStore(
+                requ_buffer_capacity, buffer_flags ) ) &&
+            ( ( max_num_objects  > size_type{ 0 } ) ||
+              ( max_num_slots    > size_type{ 0 } ) ||
+              ( max_num_dataptrs > size_type{ 0 } ) ||
+              ( max_num_garbage_ranges > size_type{ 0 } ) ) )
+        {
+            this->reserve( max_num_objects, max_num_slots,
+                       max_num_dataptrs, max_num_garbage_ranges );
+        }
+    }
+
+    template< typename Ptr >
+    SIXTRL_INLINE Buffer::Buffer(
+        Ptr SIXTRL_RESTRICT data_buffer_begin,
+        Buffer::size_type max_buffer_size ) SIXTRL_NOEXCEPT :
+        ::NS(Buffer)()
+    {
+        using c_api_t       = Buffer::c_api_t;
+        using ptr_to_raw_t  = SIXTRL_ARGPTR_DEC unsigned char*;
+
+        c_api_t* _buffer = ::NS(Buffer_preset)( this->getCApiPtr() );
+
+        if( 0 != ::NS(Buffer_init)( _buffer, reinterpret_cast< ptr_to_raw_t >(
+            data_buffer_begin ), max_buffer_size ) )
+        {
+            ::NS(Buffer_free)( _buffer );
+        }
+    }
+
+    template< typename Ptr >
+    SIXTRL_INLINE Buffer::Buffer(
+        Ptr SIXTRL_RESTRICT data_buffer_begin,
+        Buffer::size_type const max_num_objects,
+        Buffer::size_type const max_num_slots,
+        Buffer::size_type const max_num_dataptrs,
+        Buffer::size_type const max_num_garbage_ranges,
+        Buffer::size_type const buffer_capacity ) SIXTRL_NOEXCEPT :
+        ::NS(Buffer)()
+    {
+        using c_api_t       = Buffer::c_api_t;
+        using size_t        = Buffer::size_type;
+        using ptr_to_raw_t  = SIXTRL_ARGPTR_DEC unsigned char*;
+
+        c_api_t* _buffer = ::NS(Buffer_preset)( this->getCApiPtr() );
+
+        ptr_to_raw_t begin =
+            reinterpret_cast< ptr_to_raw_t >( data_buffer_begin );
+
+        size_t buffer_size = Buffer::CalculateBufferSize( max_num_objects,
+            max_num_slots, max_num_dataptrs, max_num_garbage_ranges );
+
+        int success = ::NS(Buffer_init)( _buffer, begin, buffer_size );
+
+        if( 0 == success )
+        {
+            success = ::NS(Buffer_reserve)( _buffer, max_num_objects,
+                max_num_slots, max_num_dataptrs, max_num_garbage_ranges );
+        }
+
+        if( 0 == success )
+        {
+            ::NS(Buffer_free)( _buffer );
+        }
+    }
+
+    SIXTRL_INLINE Buffer::~Buffer()
+    {
+        NS(Buffer_free)( this->getCApiPtr() );
     }
 
     /* ----------------------------------------------------------------- */
@@ -255,9 +375,11 @@ namespace SIXTRL_NAMESPACE
         return;
     }
 
-    SIXTRL_INLINE void Buffer::clear() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Buffer::clear(
+        bool const set_data_to_zero) SIXTRL_NOEXCEPT
     {
-        NS(Buffer_clear)( this->getCApiPtr() );
+        ::NS(Buffer_clear)( this->getCApiPtr(), set_data_to_zero );
+        return;
     }
 
     /* ----------------------------------------------------------------- */
@@ -385,7 +507,7 @@ namespace SIXTRL_NAMESPACE
     template< typename Ptr >
     SIXTRL_INLINE Ptr Buffer::dataEnd() SIXTRL_NOEXCEPT
     {
-        return reinterpret_cast< CPtr >( static_cast< uintptr_t >(
+        return reinterpret_cast< Ptr >( static_cast< uintptr_t >(
             NS(Buffer_get_data_end_addr)( this->getCApiPtr() ) ) );
     }
 
@@ -409,7 +531,7 @@ namespace SIXTRL_NAMESPACE
         return NS(Buffer_get_header_size)( this->getCApiPtr() );
     }
 
-    SIXTRL_INLINE Buffer::size_type getSize() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Buffer::size_type Buffer::getSize() const SIXTRL_NOEXCEPT
     {
         return NS(Buffer_get_size)( this->getCApiPtr() );
     }
@@ -420,11 +542,6 @@ namespace SIXTRL_NAMESPACE
         return NS(Buffer_get_capacity)( this->getCApiPtr() );
     }
 
-    SIXTRL_INLINE Buffer::size_type
-    Buffer::getHeaderSize() const SIXTRL_NOEXCEPT
-    {
-        return NS(Buffer_get_size)( this->getCApiPtr() );
-    }
 
     SIXTRL_INLINE Buffer::size_type
     Buffer::getSlotSize() const SIXTRL_NOEXCEPT
@@ -550,7 +667,7 @@ namespace SIXTRL_NAMESPACE
 
     SIXTRL_INLINE bool Buffer::needsRemapping() const SIXTRL_NOEXCEPT
     {
-        return NS(BufferMem_needs_remapping)(
+        return NS(ManagedBuffer_needs_remapping)(
             reinterpret_cast< SIXTRL_ARGPTR_DEC unsigned char const* >(
                 static_cast< uintptr_t >( NS(Buffer_get_data_begin_addr)(
                     this->getCApiPtr() ) ) ),
@@ -606,54 +723,145 @@ namespace SIXTRL_NAMESPACE
 
     /* ----------------------------------------------------------------- */
 
-    template< class T, typename... Args  >
-    SIXTRL_INLINE bool Buffer::canAdd( Args&&... args ) const SIXTRL_NOEXCEPT
-    {
-        return T::CanAddToBuffer(
-            this->getCApiPtr(), std::forward< Args >( args )... );
-    }
-
-    template< class T, typename... Args >
-    SIXTRL_INLINE T* Buffer::createNew( Args&&... args )
-    {
-        return T::CreateNewOnBuffer(
-            this->getCApiPtr(), std::forward< Args >( args )... );
-    }
-
-    template< class T, typename... Args >
-    SIXTRL_INLINE T* Buffer::add( Args&&... args )
-    {
-        return T::AddToBuffer(
-            this->getCApiPtr(), std::forward< Args >( args )... );
-    }
-
-    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-    template< class T, typename Ptr >
+    template< class T, typename CPtr, typename Ptr >
     SIXTRL_INLINE bool Buffer::canAddObject(
         T const& SIXTRL_RESTRICT_REF obj,
         Buffer::size_type const num_dataptrs,
-        Ptr SIXTRL_RESTRICT sizes,
-        Ptr SIXTRL_RESTRICT counts,
-        Buffer::size_type& SIXTRL_RESTRICT_REF num_objects,
-        Buffer::size_type& SIXTRL_RESTRICT_REF num_slots,
-        Buffer::size_type& SIXTRL_RESTRICT_REF num_dataptrs ) const SIXTRL_NOEXCEPT
+        CPtr SIXTRL_RESTRICT sizes,
+        CPtr SIXTRL_RESTRICT counts,
+        Ptr  SIXTRL_RESTRICT ptr_requ_num_objects,
+        Ptr  SIXTRL_RESTRICT ptr_requ_num_slots,
+        Ptr  SIXTRL_RESTRICT ptr_requ_num_dataptrs ) const SIXTRL_NOEXCEPT
     {
-        return NS(Buffer_can_add_object)(
-            this->getCApiPtr(), sizeof( T ), num_dataptrs, sizes, counts,
-                &num_objects, &num_slots, &num_dataptrs );
+        using size_t            = Buffer::size_type;
+        using ptr_const_size_t  = SIXTRL_ARGPTR_DEC size_t const*;
+        using ptr_size_t        = SIXTRL_ARGPTR_DEC size_t*;
+
+        return ::NS(Buffer_can_add_object)(
+            this->getCApiPtr(), sizeof( T ), num_dataptrs,
+            reinterpret_cast< ptr_const_size_t >( sizes  ),
+            reinterpret_cast< ptr_const_size_t >( counts ),
+            reinterpret_cast< ptr_size_t >( ptr_requ_num_objects ),
+            reinterpret_cast< ptr_size_t >( ptr_requ_num_slots ),
+            reinterpret_cast< ptr_size_t >( ptr_requ_num_dataptrs ) );
     }
 
     template< class T, typename Ptr >
     SIXTRL_INLINE Buffer::object_t* Buffer::addObject(
-        T const& SIXTRL_RESTRICT_REF obj, type_id_t const type_id,
-        Buffer::size_type const num_dataptrs, Ptr SIXTRL_RESTRICT offsets,
-        Ptr SIXTRL_RESTRICT sizes, Ptr SIXTRL_RESTRICT counts )
+        T const& SIXTRL_RESTRICT_REF obj,
+        type_id_t const type_id,
+        Buffer::size_type const num_dataptrs,
+        Ptr SIXTRL_RESTRICT offsets,
+        Ptr SIXTRL_RESTRICT sizes,
+        Ptr SIXTRL_RESTRICT counts )
     {
-        return NS(Buffer_add_object)( this->getCApiPtr(), &obj, sizeof( T ),
-            type_id, num_dataptrs, offsets, sizes, counts );
+        using size_t            = Buffer::size_type;
+        using ptr_const_size_t  = SIXTRL_ARGPTR_DEC size_t const*;
+
+        return ::NS(Buffer_add_object)(
+            this->getCApiPtr(), &obj, sizeof( T ),
+            type_id, num_dataptrs,
+            reinterpret_cast< ptr_const_size_t >( offsets ),
+            reinterpret_cast< ptr_const_size_t >( sizes   ),
+            reinterpret_cast< ptr_const_size_t >( counts  ) );
     }
 
+    SIXTRL_INLINE bool Buffer::allocateDataStore(
+        Buffer::size_type const buffer_capacity, Buffer::flags_t const flags )
+    {
+        using _this_t    = Buffer;
+        using c_api_t    = _this_t::c_api_t;
+        using size_t     = _this_t::size_type;
+        using address_t  = _this_t::address_t;
+        using raw_t      = unsigned char;
+
+        int success      = -1;
+
+        c_api_t* _buffer = this->getCApiPtr();
+        size_t const  slot_size = ::NS(Buffer_get_slot_size)( _buffer );
+
+        size_t const min_length = ::NS(ManagedBuffer_calculate_buffer_length)(
+                nullptr, 0u, 0u, 0u, 0u, slot_size );
+
+        if( min_length <= buffer_capacity )
+        {
+            if( ( flags & ::NS(BUFFER_DATASTORE_MEMPOOL) ) ==
+                          ::NS(BUFFER_DATASTORE_MEMPOOL) )
+            {
+                #if !defined( _GPUCODE )
+
+                using mem_pool_t        = ::NS(MemPool);
+                using ptr_to_mem_pool_t = mem_pool_t*;
+
+                ptr_to_mem_pool_t mem_pool = ::NS(MemPool_preset)(
+                    reinterpret_cast< ptr_to_mem_pool_t >( ::malloc(
+                        sizeof( mem_pool_t ) ) ) );
+
+                ::NS(MemPool_set_chunk_size)( mem_pool, slot_size );
+
+                if( ::NS(MemPool_reserve_aligned)(
+                        mem_pool, buffer_capacity, slot_size ) )
+                {
+                    ::NS(AllocResult) result = ::NS(MemPool_append_aligned)(
+                        mem_pool, buffer_capacity, slot_size );
+
+                    if( ::NS(AllocResult_valid)( &result ) )
+                    {
+                        raw_t const z = ( raw_t )0u;
+
+                        SIXTRACKLIB_SET_VALUES( raw_t,
+                            ::NS(AllocResult_get_pointer)( &result ),
+                            ::NS(AllocResult_get_length)(  &result ), z );
+
+                        success = ::NS(Buffer_init_on_flat_memory)( _buffer,
+                            ::NS(AllocResult_get_pointer)( &result ),
+                            ::NS(AllocResult_get_length)(  &result ) );
+
+                        if( success == 0 )
+                        {
+                            _buffer->datastore_addr = static_cast< address_t >(
+                                reinterpret_cast< uintptr_t >( mem_pool ) );
+
+                            _buffer->datastore_flags = flags |
+                                ::NS(BUFFER_USES_DATASTORE) |
+                                ::NS(BUFFER_OWNS_DATASTORE) |
+                                ::NS(BUFFER_DATASTORE_MEMPOOL) |
+                                ::NS(BUFFER_DATASTORE_ALLOW_APPENDS) |
+                                ::NS(BUFFER_DATASTORE_ALLOW_CLEAR)   |
+                                ::NS(BUFFER_DATASTORE_ALLOW_REMAPPING) |
+                                ::NS(BUFFER_DATASTORE_ALLOW_RESIZE);
+                        }
+                    }
+                }
+
+                #endif /* defined( _GPUCODE ) */
+            }
+        }
+
+        if( success != 0 )
+        {
+            if( ( flags & ::NS(BUFFER_DATASTORE_MEMPOOL) ) ==
+                          ::NS(BUFFER_DATASTORE_MEMPOOL) )
+            {
+                #if !defined(_GPUCODE )
+
+                using mem_pool_t     = ::NS(MemPool);
+                using ptr_mem_pool_t = mem_pool_t*;
+
+                ptr_mem_pool_t pool = reinterpret_cast< ptr_mem_pool_t >(
+                    static_cast< uintptr_t >(
+                        ::NS(Buffer_get_datastore_begin_addr)( _buffer ) ) );
+
+                ::NS(MemPool_free)( pool );
+                ::free( pool );
+
+                _buffer->datastore_addr = address_t{ 0u };
+                #endif /* !defined( _GPUCODE ) */
+            }
+        }
+
+        return ( success == 0 );
+    }
 }
 
 #endif /* defined( __cplusplus ) */
