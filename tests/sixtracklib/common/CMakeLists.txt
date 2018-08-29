@@ -96,11 +96,18 @@ if( GTEST_FOUND )
     add_test( CommonMemPoolTests test_mem_pool_common )
 
     # --------------------------------------------------------------------------
-    # test_particles:
+    # test_particles_common_c99:
 
-    add_executable( test_particles_common test_particles.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_particles_common )
-    add_test( CommonParticlesTests test_particles_common )
+    add_executable( test_particles_common_c99 test_particles_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_particles_common_c99 )
+    add_test( C99_CommonParticlesTests test_particles_common_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_particles_common_cxx:
+
+    add_executable( test_particles_common_cxx test_particles_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_particles_common_cxx )
+    add_test( C99_CommonParticlesTests test_particles_common_cxx )
 
     # --------------------------------------------------------------------------
     # test_faddeeva_errf:

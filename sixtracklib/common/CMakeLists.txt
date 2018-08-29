@@ -31,6 +31,7 @@ set( SIXTRACKLIB_COMMON_HEADERS
      compute_arch.h
      mem_pool.h
      particles.h
+     particles.hpp
 #      track.h
 )
 
