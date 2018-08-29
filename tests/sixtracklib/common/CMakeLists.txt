@@ -61,11 +61,11 @@ if( GTEST_FOUND )
 #     add_test( CommonBlocksTests test_blocks_common )
 
     # --------------------------------------------------------------------------
-    # test_buffer_mem:
+    # test_managed_buffer_common_c99:
 
-    add_executable( test_managed_buffer_common test_managed_buffer.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_managed_buffer_common )
-    add_test( CommonBufferTests test_managed_buffer_common )
+    add_executable( test_managed_buffer_common_c99 test_managed_buffer_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_managed_buffer_common_c99 )
+    add_test( CommonBufferTests test_managed_buffer_common_c99 )
 
     # --------------------------------------------------------------------------
     # test_buffer_common_c99:
