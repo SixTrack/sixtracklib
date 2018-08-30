@@ -54,13 +54,6 @@ if( GTEST_FOUND )
     add_test( CommonToolTests test_tools_common )
 
     # --------------------------------------------------------------------------
-    # test_block:
-
-#     add_executable( test_blocks_common test_blocks.cpp )
-#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_blocks_common )
-#     add_test( CommonBlocksTests test_blocks_common )
-
-    # --------------------------------------------------------------------------
     # test_managed_buffer_common_c99:
 
     add_executable( test_managed_buffer_common_c99 test_managed_buffer_c99.cpp )
@@ -107,7 +100,14 @@ if( GTEST_FOUND )
 
     add_executable( test_particles_common_cxx test_particles_cxx.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_particles_common_cxx )
-    add_test( C99_CommonParticlesTests test_particles_common_cxx )
+    add_test( CXX_CommonParticlesTests test_particles_common_cxx )
+
+    # --------------------------------------------------------------------------
+    # test_be_drift_common_c99:
+
+    add_executable( test_be_drift_common_c99 test_be_drift_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_drift_common_c99 )
+    add_test( C99_CommonBeamElementDriftTests test_be_drift_common_c99 )
 
     # --------------------------------------------------------------------------
     # test_faddeeva_errf:
