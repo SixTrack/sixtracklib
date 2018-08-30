@@ -511,13 +511,21 @@ SIXTRL_INLINE int NS(ManagedBuffer_reserve)(
                     ptr_to_const_raw_t source = begin + cur_garbage_offset;
                     ptr_to_raw_t  destination = begin + new_garbage_offset;
 
+                    size_t bytes_to_fill_at_begin =
+                        new_garbage_offset - cur_garbage_offset;
+
                     raw_t const z = ( raw_t )0u;
 
                     SIXTRACKLIB_MOVE_VALUES(
                         raw_t, destination, source, cur_garbage_size );
 
-                    SIXTRACKLIB_SET_VALUES(
-                        raw_t, ( ptr_to_raw_t )source, cur_garbage_size, z );
+                    if( bytes_to_fill_at_begin > cur_garbage_size )
+                    {
+                        bytes_to_fill_at_begin = cur_garbage_size;
+                    }
+
+                    SIXTRACKLIB_SET_VALUES( raw_t,
+                        ( ptr_to_raw_t )source, bytes_to_fill_at_begin, z );
 
                     if( requ_garbage_extent > cur_garbage_size )
                     {
@@ -552,13 +560,21 @@ SIXTRL_INLINE int NS(ManagedBuffer_reserve)(
                     ptr_to_const_raw_t source  = begin + cur_dataptrs_offset;
                     ptr_to_raw_t  destination  = begin + new_dataptrs_offset;
 
+                    size_t bytes_to_fill_at_begin =
+                        new_dataptrs_offset - cur_dataptrs_offset;
+
                     raw_t const z = ( raw_t )0u;
 
                     SIXTRACKLIB_MOVE_VALUES(
                         raw_t, destination, source, cur_dataptrs_size );
 
-                    SIXTRACKLIB_SET_VALUES(
-                        raw_t, ( ptr_to_raw_t )source, cur_dataptrs_size, z );
+                    if( bytes_to_fill_at_begin > cur_dataptrs_size )
+                    {
+                        bytes_to_fill_at_begin = cur_dataptrs_size;
+                    }
+
+                    SIXTRACKLIB_SET_VALUES( raw_t, ( ptr_to_raw_t )source,
+                                            bytes_to_fill_at_begin, z );
 
                     if( requ_dataptrs_extent > cur_dataptrs_size )
                     {
@@ -594,13 +610,21 @@ SIXTRL_INLINE int NS(ManagedBuffer_reserve)(
                     ptr_to_const_raw_t source  = begin + cur_objs_offset;
                     ptr_to_raw_t  destination  = begin + new_objs_offset;
 
+                    size_t bytes_to_fill_at_begin =
+                        new_objs_offset - cur_objs_offset;
+
                     raw_t const z = ( raw_t )0u;
 
                     SIXTRACKLIB_MOVE_VALUES(
                         raw_t, destination, source, cur_objs_size );
 
-                    SIXTRACKLIB_SET_VALUES(
-                        raw_t, ( ptr_to_raw_t )source, cur_objs_size, z );
+                    if( bytes_to_fill_at_begin > cur_objs_size )
+                    {
+                        bytes_to_fill_at_begin = cur_objs_size;
+                    }
+
+                    SIXTRACKLIB_SET_VALUES( raw_t, ( ptr_to_raw_t )source,
+                        bytes_to_fill_at_begin, z );
 
                     if( requ_objs_extent > cur_objs_size )
                     {

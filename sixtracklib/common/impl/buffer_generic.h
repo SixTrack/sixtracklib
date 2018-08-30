@@ -637,10 +637,10 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
                 additional_num_slots_size += slot_size - (
                     additional_num_slots_size % slot_size );
             }
-
-            additional_num_slots += additional_num_slots_size / slot_size;
-            requ_num_slots       += additional_num_slots;
         }
+
+        additional_num_slots += additional_num_slots_size / slot_size;
+        requ_num_slots       += additional_num_slots;
 
         if( ( requ_num_objects  > max_num_objects  ) ||
             ( requ_num_slots    > max_num_slots    ) ||
