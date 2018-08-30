@@ -36,21 +36,43 @@ TEST( C99_CommonBeamElementDriftTests, MinimalAddToBufferCopyRemapRead )
     static double const ZERO = double{ 0.0 };
     static double const EPS  = std::numeric_limits< double >::epsilon();
 
+    double len = ZERO;
+    size_t num_objects = size_t{ 1 };
+
+    elem_t dummy;
+    ::st_Drift_preset( &dummy );
+    ::st_Drift_set_length( &dummy, len );
+
+    object_t* ptr_object = ::st_Buffer_add_object( eb, &dummy, sizeof( dummy ),
+        ::st_OBJECT_TYPE_DRIFT, size_t{ 0 }, nullptr, nullptr, nullptr );
+
+    ASSERT_TRUE( ptr_object != nullptr );
+    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == num_objects++ );
+    ASSERT_TRUE( ::st_Object_get_const_begin_ptr( ptr_object ) != nullptr );
+    ASSERT_TRUE( ::st_Object_get_size( ptr_object ) >= sizeof( dummy ) );
+    ASSERT_TRUE( ::st_Object_get_type_id( ptr_object ) == ::st_OBJECT_TYPE_DRIFT );
+
+    elem_t* ptr_drift0 = reinterpret_cast< elem_t* >(
+        ::st_Object_get_begin_ptr( ptr_object ) );
+
+    ASSERT_TRUE( ptr_drift0 != nullptr );
+    ASSERT_TRUE( std::fabs( ::st_Drift_get_length( ptr_drift0 ) - len ) < EPS );
+
     elem_t* ptr_drift1 = ::st_Drift_new( eb );
 
     ASSERT_TRUE( ptr_drift1 != nullptr );
     ASSERT_TRUE( std::fabs( ::st_Drift_get_length( ptr_drift1 ) - ZERO ) < EPS );
 
-    double len = double{ 1.0 };
+    len += double{ 1.0 };
     ::st_Drift_set_length( ptr_drift1, len );
     ASSERT_TRUE( std::fabs( ::st_Drift_get_length( ptr_drift1 )  - len ) < EPS );
-    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == size_t{ 1 } );
+    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == num_objects++ );
 
-    len = double{ 2.0 };
+    len += double{ 1.0 };
     elem_t* ptr_drift2 = ::st_Drift_add( eb, len );
     ASSERT_TRUE( ptr_drift2 != nullptr );
     ASSERT_TRUE( std::fabs( ::st_Drift_get_length( ptr_drift2 ) - len ) < EPS );
-    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == size_t{ 2 } );
+    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == num_objects++ );
 
     constexpr size_t const NUM_DRIFTS = size_t{ 100u };
 
@@ -59,12 +81,11 @@ TEST( C99_CommonBeamElementDriftTests, MinimalAddToBufferCopyRemapRead )
 
     for( ; ii < NUM_DRIFTS ; ++ii, len += double{ 1.0 } )
     {
-        size_t const jj = ii + size_t{ 1 };
         elem_t* drift = ::st_Drift_add( eb, len );
 
         ASSERT_TRUE( drift != nullptr );
         ASSERT_TRUE( std::fabs( ::st_Drift_get_length( drift ) - len ) < EPS );
-        ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == jj );
+        ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == num_objects++ );
     }
 
     /* --------------------------------------------------------------------- */
@@ -88,7 +109,7 @@ TEST( C99_CommonBeamElementDriftTests, MinimalAddToBufferCopyRemapRead )
     object_t const* obj_end = ::st_Buffer_get_const_objects_end( eb );
     object_t const* cmp_it  = ::st_Buffer_get_const_objects_begin( &cmp_buffer );
 
-    len = double{ 1.0 };
+    len = double{ 0.0 };
 
     SIXTRL_CONSTEXPR_OR_CONST ::st_object_type_id_t
         BEAM_ELEMENT_TYPE_ID = NS(OBJECT_TYPE_DRIFT);
@@ -143,21 +164,43 @@ TEST( C99_CommonBeamElementDriftExactTests, MinimalAddToBufferCopyRemapRead )
     static double const ZERO = double{ 0.0 };
     static double const EPS  = std::numeric_limits< double >::epsilon();
 
+    double len = ZERO;
+    size_t num_objects = size_t{ 1 };
+
+    elem_t dummy;
+    ::st_DriftExact_preset( &dummy );
+    ::st_DriftExact_set_length( &dummy, len );
+
+    object_t* ptr_object = ::st_Buffer_add_object( eb, &dummy, sizeof( dummy ),
+        ::st_OBJECT_TYPE_DRIFT_EXACT, size_t{ 0 }, nullptr, nullptr, nullptr );
+
+    ASSERT_TRUE( ptr_object != nullptr );
+    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == num_objects++ );
+    ASSERT_TRUE( ::st_Object_get_const_begin_ptr( ptr_object ) != nullptr );
+    ASSERT_TRUE( ::st_Object_get_size( ptr_object ) >= sizeof( dummy ) );
+    ASSERT_TRUE( ::st_Object_get_type_id( ptr_object ) == ::st_OBJECT_TYPE_DRIFT_EXACT );
+
+    elem_t* ptr_drift0 = reinterpret_cast< elem_t* >(
+        ::st_Object_get_begin_ptr( ptr_object ) );
+
+    ASSERT_TRUE( ptr_drift0 != nullptr );
+    ASSERT_TRUE( std::fabs( ::st_DriftExact_get_length( ptr_drift0 ) - len ) < EPS );
+
     elem_t* ptr_drift1 = ::st_DriftExact_new( eb );
 
     ASSERT_TRUE( ptr_drift1 != nullptr );
     ASSERT_TRUE( std::fabs( ::st_DriftExact_get_length( ptr_drift1 ) - ZERO ) < EPS );
 
-    double len = double{ 1.0 };
+    len += double{ 1.0 };
     ::st_DriftExact_set_length( ptr_drift1, len );
     ASSERT_TRUE( std::fabs( ::st_DriftExact_get_length( ptr_drift1 )  - len ) < EPS );
-    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == size_t{ 1 } );
+    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == num_objects++ );
 
-    len = double{ 2.0 };
+    len += double{ 1.0 };
     elem_t* ptr_drift2 = ::st_DriftExact_add( eb, len );
     ASSERT_TRUE( ptr_drift2 != nullptr );
     ASSERT_TRUE( std::fabs( ::st_DriftExact_get_length( ptr_drift2 ) - len ) < EPS );
-    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == size_t{ 2 } );
+    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == num_objects++ );
 
     constexpr size_t const NUM_DRIFTS = size_t{ 100u };
 
@@ -166,12 +209,11 @@ TEST( C99_CommonBeamElementDriftExactTests, MinimalAddToBufferCopyRemapRead )
 
     for( ; ii < NUM_DRIFTS ; ++ii, len += double{ 1.0 } )
     {
-        size_t const jj = ii + size_t{ 1 };
         elem_t* drift = ::st_DriftExact_add( eb, len );
 
         ASSERT_TRUE( drift != nullptr );
         ASSERT_TRUE( std::fabs( ::st_DriftExact_get_length( drift ) - len ) < EPS );
-        ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == jj );
+        ASSERT_TRUE( ::st_Buffer_get_num_of_objects( eb ) == num_objects++ );
     }
 
     /* --------------------------------------------------------------------- */
@@ -195,7 +237,7 @@ TEST( C99_CommonBeamElementDriftExactTests, MinimalAddToBufferCopyRemapRead )
     object_t const* obj_end = ::st_Buffer_get_const_objects_end( eb );
     object_t const* cmp_it  = ::st_Buffer_get_const_objects_begin( &cmp_buffer );
 
-    len = double{ 1.0 };
+    len = double{ 0.0 };
 
     SIXTRL_CONSTEXPR_OR_CONST type_id_t
         BEAM_ELEMENT_TYPE_ID = NS(OBJECT_TYPE_DRIFT_EXACT );
