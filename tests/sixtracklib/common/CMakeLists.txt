@@ -110,6 +110,13 @@ if( GTEST_FOUND )
     add_test( C99_CommonBeamElementDriftTests test_be_drift_common_c99 )
 
     # --------------------------------------------------------------------------
+    # test_be_drift_common_cxx:
+
+    add_executable( test_be_drift_common_cxx test_be_drift_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_drift_common_cxx )
+    add_test( CXX_CommonBeamElementDriftTests test_be_drift_common_cxx )
+
+    # --------------------------------------------------------------------------
     # test_faddeeva_errf:
 
 #     add_executable( test_faddeeva_errf test_faddeeva_errf.cpp )
