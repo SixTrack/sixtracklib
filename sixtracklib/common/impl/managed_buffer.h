@@ -45,6 +45,16 @@ SIXTRL_FN SIXTRL_STATIC void NS(ManagedBuffer_set_section_max_size)(
     NS(buffer_size_t) const max_section_size,
     NS(buffer_size_t) const slot_size );
 
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(ManagedBuffer_predict_required_num_slots)(
+    SIXTRL_ARGPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) const obj_handle_size,
+    NS(buffer_size_t) const num_dataptrs,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts,
+    NS(buffer_size_t) const slot_size );
+
+
 /* ========================================================================= */
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
@@ -244,6 +254,75 @@ SIXTRL_INLINE void NS(ManagedBuffer_set_section_max_size)(
     }
 
     return;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_predict_required_num_slots)(
+    SIXTRL_ARGPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) const obj_handle_size,
+    NS(buffer_size_t) const num_dataptrs,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT obj_attr_sizes,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT obj_attr_counts,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO_SIZE = ( buf_size_t )0u;
+
+    buf_size_t requ_num_slots = ZERO_SIZE;
+
+    if( ( slot_size > ZERO_SIZE ) && ( obj_handle_size > ZERO_SIZE ) )
+    {
+        #if defined( NDEBUG )
+        SIXTRL_ASSERT( ( begin != SIXTRL_NULLPTR ) ||
+                       ( ( ( ( uintptr_t )begin ) % slot_size ) == 0u ) );
+
+        #else /* !defined( NDEBUG ) */
+        ( void )begin;
+        #endif /* !defined( NDEBUG ) */
+
+        requ_num_slots = NS(ManagedBuffer_get_slot_based_length)(
+            obj_handle_size, slot_size );
+
+        SIXTRL_ASSERT( ( ( num_dataptrs    >  ZERO_SIZE      ) &&
+                         ( obj_attr_sizes  != SIXTRL_NULLPTR ) &&
+                         ( obj_attr_counts != SIXTRL_NULLPTR ) ) ||
+                       ( ( num_dataptrs    == ZERO_SIZE      ) &&
+                         ( obj_attr_sizes  == SIXTRL_NULLPTR ) &&
+                         ( obj_attr_counts == SIXTRL_NULLPTR ) ) );
+
+        if( num_dataptrs > ZERO_SIZE )
+        {
+            buf_size_t ii = ZERO_SIZE;
+            buf_size_t mod_slot_size = ZERO_SIZE;
+
+            for( ; ii < num_dataptrs ; ++ii )
+            {
+                buf_size_t const attr_size =
+                    NS(ManagedBuffer_get_slot_based_length)(
+                        ( obj_attr_sizes[ ii ] * obj_attr_counts[ ii ] ),
+                            slot_size );
+
+                requ_num_slots += attr_size;
+            }
+
+            mod_slot_size = requ_num_slots % slot_size;
+
+            if( mod_slot_size != ZERO_SIZE )
+            {
+                SIXTRL_ASSERT( mod_slot_size < slot_size );
+                requ_num_slots += ( slot_size - mod_slot_size );
+            }
+        }
+
+        SIXTRL_ASSERT(   requ_num_slots >= slot_size );
+        SIXTRL_ASSERT( ( requ_num_slots %  slot_size ) == ZERO_SIZE );
+
+        requ_num_slots /= slot_size;
+    }
+
+    return requ_num_slots;
 }
 
 /* ========================================================================= */
