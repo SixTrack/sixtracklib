@@ -34,6 +34,9 @@ NS(DriftExact);
 
 /* ========================================================================= */
 
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Drift_get_num_dataptrs)(
+    SIXTRL_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift );
+
 SIXTRL_FN SIXTRL_STATIC NS(Drift)* NS(Drift_preset)(
     NS(Drift)* SIXTRL_RESTRICT drift );
 
@@ -57,6 +60,9 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(Drift)* NS(Drift_add)(
     NS(drift_real_t) const length );
 
 /* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(DriftExact_get_num_dataptrs)(
+    SIXTRL_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift );
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(DriftExact)*
 NS(DriftExact_preset)(
@@ -99,6 +105,13 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(DriftExact)* NS(DriftExact_add)(
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+
+SIXTRL_INLINE NS(buffer_size_t) NS(Drift_get_num_dataptrs)(
+    SIXTRL_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift )
+{
+    ( void )drift;
+    return ( NS(buffer_size_t) )0u;
+}
 
 SIXTRL_INLINE  NS(Drift)* NS(Drift_preset)(
     NS(Drift)* SIXTRL_RESTRICT drift )
@@ -166,6 +179,13 @@ SIXTRL_INLINE SIXTRL_ARGPTR_DEC NS(Drift)* NS(Drift_add)(
 }
 
 /* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE NS(buffer_size_t) NS(DriftExact_get_num_dataptrs)(
+    SIXTRL_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift )
+{
+    ( void )drift;
+    return ( NS(buffer_size_t) )0u;
+}
 
 SIXTRL_INLINE SIXTRL_ARGPTR_DEC NS(DriftExact)* NS(DriftExact_preset)(
     SIXTRL_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift )

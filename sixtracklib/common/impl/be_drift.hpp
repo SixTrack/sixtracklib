@@ -61,10 +61,19 @@ namespace SIXTRL_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN type_id_t getTypeId() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN type_id_t getTypeId()      const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getNumDataPtrs() const SIXTRL_NOEXCEPT;
+
         SIXTRL_FN void preset() SIXTRL_NOEXCEPT;
         SIXTRL_FN value_type getLength() const SIXTRL_NOEXCEPT;
         SIXTRL_FN void setLength( value_type const length ) SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        template< class ParticleT >
+        SIXTRL_FN bool track(
+            ParticleT& SIXTRL_RESTRICT_REF particles,
+            typename ParticleT::num_elements_t const particle_index );
 
         /* ----------------------------------------------------------------- */
 
@@ -133,11 +142,20 @@ namespace SIXTRL_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN type_id_t getTypeId() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN type_id_t getTypeId()      const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getNumDataPtrs() const SIXTRL_NOEXCEPT;
+
         SIXTRL_FN void preset() SIXTRL_NOEXCEPT;
 
         SIXTRL_FN value_type getLength() const SIXTRL_NOEXCEPT;
         SIXTRL_FN void setLength( value_type const length ) SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        template< class ParticleT >
+        SIXTRL_FN bool track(
+            ParticleT& SIXTRL_RESTRICT_REF particles,
+            typename ParticleT::num_elements_t const particle_index );
 
         /* ----------------------------------------------------------------- */
 
@@ -206,7 +224,8 @@ namespace SIXTRL_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN type_id_t getTypeId() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN type_id_t getTypeId()      const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getNumDataPtrs() const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN c_api_t const* getCApiPtr() const SIXTRL_NOEXCEPT;
         SIXTRL_FN c_api_t* getCApiPtr() SIXTRL_NOEXCEPT;
@@ -214,6 +233,15 @@ namespace SIXTRL_NAMESPACE
         SIXTRL_FN void preset() SIXTRL_NOEXCEPT;
         SIXTRL_FN value_type getLength() const SIXTRL_NOEXCEPT;
         SIXTRL_FN void setLength( value_type const length ) SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        template< class ParticleT >
+        SIXTRL_FN bool track(
+            ParticleT& SIXTRL_RESTRICT_REF particles,
+            typename ParticleT::num_elements_t const particle_index );
+
+        /* ----------------------------------------------------------------- */
     };
 
     using Drift = TDrift< NS(drift_real_t) >;
@@ -283,7 +311,8 @@ namespace SIXTRL_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN type_id_t getTypeId() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN type_id_t getTypeId()      const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getNumDataPtrs() const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN c_api_t const* getCApiPtr() const SIXTRL_NOEXCEPT;
         SIXTRL_FN c_api_t* getCApiPtr() SIXTRL_NOEXCEPT;
@@ -293,6 +322,13 @@ namespace SIXTRL_NAMESPACE
         SIXTRL_FN value_type getLength() const SIXTRL_NOEXCEPT;
         SIXTRL_FN void setLength( value_type const length ) SIXTRL_NOEXCEPT;
 
+        /* ----------------------------------------------------------------- */
+
+        template< class ParticleT >
+        SIXTRL_FN bool track( ParticleT& SIXTRL_RESTRICT_REF particles,
+            typename ParticleT::num_elements_t const particle_index );
+
+        /* ----------------------------------------------------------------- */
     };
 
     /* --------------------------------------------------------------------- */
@@ -327,19 +363,28 @@ namespace SIXTRL_NAMESPACE
     template< typename T >
     bool TDrift< T >::CanAddToBuffer(
             typename TDrift< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-            typename TDrift< T >::size_type* SIXTRL_RESTRICT ptr_requ_objects,
-            typename TDrift< T >::size_type* SIXTRL_RESTRICT ptr_requ_slots,
-            typename TDrift< T >::size_type* SIXTRL_RESTRICT ptr_requ_dataptrs
-        ) SIXTRL_NOEXCEPT
+            SIXTRL_ARGPTR_DEC typename TDrift< T >::size_type*
+                SIXTRL_RESTRICT ptr_requ_objects,
+            SIXTRL_ARGPTR_DEC typename TDrift< T >::size_type*
+                SIXTRL_RESTRICT ptr_requ_slots,
+            SIXTRL_ARGPTR_DEC typename TDrift< T >::size_type*
+                SIXTRL_RESTRICT ptr_requ_dataptrs ) SIXTRL_NOEXCEPT
     {
         using _this_t = TDrift< T >;
+        using  size_t = typename _this_t::size_type;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        return ::NS(Buffer_can_add_object)( &buffer, sizeof( _this_t ), 0u,
-            nullptr, nullptr, ptr_requ_objects, ptr_requ_slots,
-                ptr_requ_dataptrs );
+        SIXTRL_ARGPTR_DEC size_t const* sizes  = nullptr;
+        SIXTRL_ARGPTR_DEC size_t const* counts = nullptr;
+
+        _this_t temp;
+        temp.preset();
+
+        return ::NS(Buffer_can_add_object)( &buffer, sizeof( temp ),
+            temp.getNumDataPtrs(), sizes, counts, ptr_requ_objects,
+                ptr_requ_slots, ptr_requ_dataptrs );
     }
 
     template< typename T >
@@ -348,19 +393,23 @@ namespace SIXTRL_NAMESPACE
         typename TDrift< T >::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
         using _this_t = TDrift< T >;
+        using  size_t = typename TDrift< T >::size_type;
         using  ptr_t  = SIXTRL_ARGPTR_DEC _this_t*;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
+        SIXTRL_ARGPTR_DEC size_t const* offsets = nullptr;
+        SIXTRL_ARGPTR_DEC size_t const* sizes   = nullptr;
+        SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
+
         _this_t temp;
         temp.preset();
-        type_id_t const type_id = temp.getTypeId();
 
         return reinterpret_cast< ptr_t >( static_cast< uintptr_t >(
             ::NS(Object_get_begin_addr)( ::NS(Buffer_add_object)(
-                &buffer, &temp, sizeof( _this_t ), type_id, 0u,
-                    nullptr, nullptr, nullptr ) ) ) );
+                &buffer, &temp, sizeof( temp ), temp.getTypeId(),
+                    temp.getNumDataPtrs(), offsets, sizes, counts ) ) ) );
     }
 
     template< typename T >
@@ -370,19 +419,23 @@ namespace SIXTRL_NAMESPACE
         typename TDrift< T >::value_type const length )
     {
         using _this_t = TDrift< T >;
+        using  size_t = typename _this_t::size_type;
         using  ptr_t  = SIXTRL_ARGPTR_DEC _this_t*;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
+        SIXTRL_ARGPTR_DEC size_t const* offsets = nullptr;
+        SIXTRL_ARGPTR_DEC size_t const* sizes   = nullptr;
+        SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
+
         _this_t temp;
         temp.setLength( length );
-        type_id_t const type_id = temp.getTypeId();
 
         return reinterpret_cast< ptr_t >( static_cast< uintptr_t >(
-            ::NS(Object_get_begin_addr)(
-                ::NS(Buffer_add_object)( &buffer, &temp, sizeof( _this_t ),
-                    type_id, 0u, nullptr, nullptr, nullptr ) ) ) );
+            ::NS(Object_get_begin_addr)( ::NS(Buffer_add_object)(
+                &buffer, &temp, sizeof( temp ), temp.getTypeId(),
+                    temp.getNumDataPtrs(), offsets, sizes, counts ) ) ) );
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -393,6 +446,15 @@ namespace SIXTRL_NAMESPACE
     {
         return ::NS(OBJECT_TYPE_DRIFT);
     }
+
+    template< typename T >
+    SIXTRL_INLINE typename TDrift< T >::size_type
+    TDrift< T >::getNumDataPtrs() const SIXTRL_NOEXCEPT
+    {
+        return typename TDrift< T >::size_type{ 0 };
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     template< typename T >
     SIXTRL_INLINE void TDrift< T >::preset() SIXTRL_NOEXCEPT
@@ -462,13 +524,20 @@ namespace SIXTRL_NAMESPACE
                 SIXTRL_RESTRICT ptr_requ_dataptrs ) SIXTRL_NOEXCEPT
     {
         using _this_t = TDriftExact< T >;
+        using  size_t = typename _this_t::size_type;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        return ::NS(Buffer_can_add_object)( &buffer, sizeof( _this_t ), 0u,
-            nullptr, nullptr, ptr_requ_objects, ptr_requ_slots,
-                ptr_requ_dataptrs );
+        SIXTRL_ARGPTR_DEC size_t const* sizes  = nullptr;
+        SIXTRL_ARGPTR_DEC size_t const* counts = nullptr;
+
+        _this_t temp;
+        temp.preset();
+
+        return ::NS(Buffer_can_add_object)( &buffer, sizeof( temp ),
+            temp.getNumDataPtrs(), sizes, counts, ptr_requ_objects,
+                ptr_requ_slots, ptr_requ_dataptrs );
     }
 
     template< typename T >
@@ -477,18 +546,23 @@ namespace SIXTRL_NAMESPACE
         typename TDriftExact< T >::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
         using _this_t = TDriftExact< T >;
+        using  size_t = typename _this_t::size_type;
         using  ptr_t  = SIXTRL_ARGPTR_DEC _this_t*;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
+
+        SIXTRL_ARGPTR_DEC size_t const* offsets = nullptr;
+        SIXTRL_ARGPTR_DEC size_t const* sizes   = nullptr;
+        SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
 
         _this_t temp;
         temp.preset();
 
         return reinterpret_cast< ptr_t >( static_cast< uintptr_t >(
             ::NS(Object_get_begin_addr)( ::NS(Buffer_add_object)(
-                &buffer, &temp, sizeof( _this_t ), temp.getTypeId(), 0u,
-                    nullptr, nullptr, nullptr ) ) ) );
+                &buffer, &temp, sizeof( temp ), temp.getTypeId(),
+                    temp.getNumDataPtrs(), offsets, sizes, counts ) ) ) );
     }
 
     template< typename T >
@@ -498,18 +572,23 @@ namespace SIXTRL_NAMESPACE
         typename TDriftExact< T >::value_type const length )
     {
         using _this_t = TDriftExact< T >;
+        using  size_t = typename _this_t::size_type;
         using  ptr_t  = SIXTRL_ARGPTR_DEC _this_t*;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
+
+        SIXTRL_ARGPTR_DEC size_t const* offsets = nullptr;
+        SIXTRL_ARGPTR_DEC size_t const* sizes   = nullptr;
+        SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
 
         _this_t temp;
         temp.setLength( length );
 
         return reinterpret_cast< ptr_t >( static_cast< uintptr_t >(
             ::NS(Object_get_begin_addr)( ::NS(Buffer_add_object)(
-                &buffer, &temp, sizeof( _this_t ), temp.getTypeId(),
-                    0u, nullptr, nullptr, nullptr ) ) ) );
+                &buffer, &temp, sizeof( temp ), temp.getTypeId(),
+                    temp.getNumDataPtrs(), offsets, sizes, counts ) ) ) );
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -520,6 +599,15 @@ namespace SIXTRL_NAMESPACE
     {
         return ::NS(OBJECT_TYPE_DRIFT_EXACT);
     }
+
+    template< typename T >
+    SIXTRL_INLINE typename TDriftExact< T >::size_type
+    TDriftExact< T >::getNumDataPtrs() const SIXTRL_NOEXCEPT
+    {
+        return typename TDriftExact< T >::size_type{ 0 };
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     template< typename T >
     SIXTRL_INLINE void TDriftExact< T >::preset() SIXTRL_NOEXCEPT
@@ -638,6 +726,14 @@ namespace SIXTRL_NAMESPACE
         return ::NS(OBJECT_TYPE_DRIFT);
     }
 
+    SIXTRL_INLINE TDrift< NS(drift_real_t) >::size_type
+    TDrift< NS(drift_real_t) >::getNumDataPtrs() const SIXTRL_NOEXCEPT
+    {
+        return TDrift< NS(drift_real_t) >::size_type{ 0 };
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
     SIXTRL_INLINE void TDrift< NS(drift_real_t) >::preset() SIXTRL_NOEXCEPT
     {
         ::NS(Drift_preset)( this->getCApiPtr() );
@@ -727,7 +823,8 @@ namespace SIXTRL_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDriftExact< NS(drift_real_t) >::c_api_t const*
+    SIXTRL_INLINE
+    SIXTRL_ARGPTR_DEC TDriftExact< NS(drift_real_t) >::c_api_t const*
     TDriftExact< NS(drift_real_t) >::getCApiPtr() const SIXTRL_NOEXCEPT
     {
         return static_cast< SIXTRL_ARGPTR_DEC c_api_t const* >( this );
@@ -748,6 +845,14 @@ namespace SIXTRL_NAMESPACE
     {
         return ::NS(OBJECT_TYPE_DRIFT_EXACT);
     }
+
+    SIXTRL_INLINE TDriftExact< NS(drift_real_t) >::size_type
+    TDriftExact< NS(drift_real_t) >::getNumDataPtrs() const SIXTRL_NOEXCEPT
+    {
+        return TDriftExact< NS(drift_real_t) >::size_type{ 0 };
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     SIXTRL_INLINE void
     TDriftExact< NS(drift_real_t) >::preset() SIXTRL_NOEXCEPT
