@@ -11,6 +11,16 @@ extern "C" {
 
 /* ************************************************************************ */
 /* ****                                                                **** */
+/* ****                Path to Base Testdata Directory                 **** */
+/* ****                                                                **** */
+/* ************************************************************************ */
+
+static char const NS(PATH_TO_TESTDATA_DIR)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@";
+
+
+/* ************************************************************************ */
+/* ****                                                                **** */
 /* ****        Tabulated values for mathematically functions           **** */
 /* ****                                                                **** */
 /* ************************************************************************ */
@@ -45,6 +55,19 @@ static char const NS(PATH_TO_TEST_TRACKING_CAVITY_DATA)[] =
 
 static char const NS(PATH_TO_TEST_TRACKING_ALIGN_DATA)[] =
     "@SIXTRACKLIB_TESTDATA_DIR@/test_tracking_align_data.bin";
+
+
+/* ************************************************************************ */
+/* ****                                                                **** */
+/* ****                  Real-World Datasets and Testdata              **** */
+/* ****                                                                **** */
+/* ************************************************************************ */
+
+static char const NS(PATH_TO_TEST_LHC_PARTICLE_DATA)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/lhc_particle_dump.bin";
+
+static char const NS(PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/lhc_beam_elements.bin";
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }

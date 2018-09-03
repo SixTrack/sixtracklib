@@ -77,44 +77,72 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_gpu_kernel_tools:
 
-    add_executable( test_gpu_kernel_tools_common test_gpu_kernel_tools.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_gpu_kernel_tools_common )
-    add_test( CommonGpuKernelTools test_gpu_kernel_tools_common )
+    add_executable( test_gpu_kernel_tools_common  test_gpu_kernel_tools.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_gpu_kernel_tools_common )
+    add_test( CommonGpuKernelTools                test_gpu_kernel_tools_common )
 
     # --------------------------------------------------------------------------
     # test_mem_pool:
 
-    add_executable( test_mem_pool_common test_mem_pool.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_mem_pool_common )
-    add_test( CommonMemPoolTests test_mem_pool_common )
+    add_executable( test_mem_pool_common          test_mem_pool.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_mem_pool_common )
+    add_test( CommonMemPoolTests                  test_mem_pool_common )
 
-    # --------------------------------------------------------------------------
+    # ==========================================================================
     # test_particles_common_c99:
 
-    add_executable( test_particles_common_c99 test_particles_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_particles_common_c99 )
-    add_test( C99_CommonParticlesTests test_particles_common_c99 )
+    add_executable( test_particles_common_c99     test_particles_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_particles_common_c99 )
+    add_test( C99_CommonParticlesTests            test_particles_common_c99 )
 
     # --------------------------------------------------------------------------
     # test_particles_common_cxx:
 
-    add_executable( test_particles_common_cxx test_particles_cxx.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_particles_common_cxx )
-    add_test( CXX_CommonParticlesTests test_particles_common_cxx )
+    add_executable( test_particles_common_cxx     test_particles_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_particles_common_cxx )
+    add_test( CXX_CommonParticlesTests            test_particles_common_cxx )
 
-    # --------------------------------------------------------------------------
+    # ==========================================================================
     # test_be_drift_common_c99:
 
-    add_executable( test_be_drift_common_c99 test_be_drift_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_drift_common_c99 )
-    add_test( C99_CommonBeamElementDriftTests test_be_drift_common_c99 )
+    add_executable( test_be_drift_common_c99      test_be_drift_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_drift_common_c99 )
+    add_test( C99_CommonBeamElementDriftTests     test_be_drift_common_c99 )
 
     # --------------------------------------------------------------------------
+    # test_be_multipole_common_c99:
+
+    add_executable( test_be_multipole_common_c99  test_be_multipole_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_multipole_common_c99 )
+    add_test( C99_CommonBeamElementMultiPoleTests test_be_multipole_common_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_be_xy_shift_common_c99:
+
+    add_executable( test_be_xy_shift_common_c99   test_be_xy_shift_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_xy_shift_common_c99 )
+    add_test( C99_CommonBeamElementXYShiftTests   test_be_xy_shift_common_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_be_srotation_common_c99:
+
+    add_executable( test_be_srotation_common_c99  test_be_srotation_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_srotation_common_c99 )
+    add_test( C99_CommonBeamElementSRotationTests test_be_srotation_common_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_be_cavity_common_c99:
+
+    add_executable( test_be_cavity_common_c99     test_be_cavity_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_cavity_common_c99 )
+    add_test( C99_CommonBeamElementCavityTests    test_be_cavity_common_c99 )
+
+    # ==========================================================================
     # test_be_drift_common_cxx:
 
-    add_executable( test_be_drift_common_cxx test_be_drift_cxx.cpp )
+    add_executable( test_be_drift_common_cxx    test_be_drift_cxx.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_drift_common_cxx )
-    add_test( CXX_CommonBeamElementDriftTests test_be_drift_common_cxx )
+    add_test( CXX_CommonBeamElementDriftTests   test_be_drift_common_cxx )
 
     # --------------------------------------------------------------------------
     # test_faddeeva_errf:
@@ -137,12 +165,12 @@ if( GTEST_FOUND )
 #     set(   UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_beam_elements_common )
 #     add_test( CommonBeamElementsTests test_beam_elements_common )
 
-    # --------------------------------------------------------------------------
-    # test_track:
+    # ==========================================================================
+    # test_track_common_c99:
 
-#     add_executable( test_track_common test_track.cpp )
-#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_common )
-#     add_test( CommonTrackTests test_track_common )
+    add_executable( test_track_common_c99 test_track_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_common_c99 )
+    add_test( C99_CommonTrackTests test_track_common_c99 )
 
     # *************************************************************************
     # Set all properties:

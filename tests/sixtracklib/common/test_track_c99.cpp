@@ -1,0 +1,329 @@
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <cstdio>
+#include <cmath>
+#include <fstream>
+#include <iterator>
+#include <limits>
+#include <random>
+#include <vector>
+
+#include <gtest/gtest.h>
+
+#include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/_impl/path.h"
+
+#include "sixtracklib/common/buffer.h"
+#include "sixtracklib/common/beam_elements.h"
+#include "sixtracklib/common/track.h"
+#include "sixtracklib/testlib.h"
+
+TEST( C99_CommonTrackTests, TrackLhcData )
+{
+    using size_t   = ::st_buffer_size_t;
+    using object_t = ::st_Object;
+
+    using ptr_to_cpart_t  = ::st_Particles const*;
+    using ptr_to_part_t   = ::st_Particles*;
+    using num_particles_t = ::st_particle_num_elements_t;
+    using real_t          = ::st_particle_real_t;
+    using index_t         = ::st_particle_index_t;
+
+    static real_t const ABS_TOLERANCE = real_t{ 1e-14 };
+
+    ::st_Buffer* pb = ::st_Buffer_new_from_file(
+        ::st_PATH_TO_TEST_LHC_PARTICLE_DATA );
+
+    ::st_Buffer* eb = ::st_Buffer_new_from_file(
+        ::st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA );
+
+    ::st_Buffer* track_pb   = ::st_Buffer_new( size_t{ 1u << 20u } );
+    ::st_Buffer* compare_pb = ::st_Buffer_new( size_t{ 1u << 20u } );
+    ::st_Buffer* diff_pb    = ::st_Buffer_new( size_t{ 1u << 20u } );
+
+    ASSERT_TRUE( pb != nullptr );
+    ASSERT_TRUE( eb != nullptr );
+
+    index_t const num_beam_elements = ::st_Buffer_get_num_of_objects( eb );
+    index_t const num_particle_sets = ::st_Buffer_get_num_of_objects( pb );
+
+    ASSERT_TRUE( num_beam_elements > index_t{ 0 } );
+    ASSERT_TRUE( num_particle_sets > index_t{ 0 } );
+
+    object_t const* be_begin = ::st_Buffer_get_const_objects_begin( eb );
+    object_t const* be_end   = ::st_Buffer_get_const_objects_end( eb );
+
+    object_t const* pb_begin = ::st_Buffer_get_const_objects_begin( pb );
+    object_t const* pb_end   = ::st_Buffer_get_const_objects_end( pb );
+
+    ASSERT_TRUE( be_begin != nullptr );
+    ASSERT_TRUE( be_end   != nullptr );
+
+    ASSERT_TRUE( pb_begin != nullptr );
+    ASSERT_TRUE( pb_end   != nullptr );
+
+    object_t const* pb_it = pb_begin;
+
+    ASSERT_TRUE( ::st_Object_get_type_id( pb_it ) == ::st_OBJECT_TYPE_PARTICLE );
+
+    ptr_to_cpart_t in_particles = reinterpret_cast< ptr_to_cpart_t >(
+        ::st_Object_get_const_begin_ptr( pb_it ) );
+
+    ASSERT_TRUE( in_particles != nullptr );
+
+    num_particles_t const in_num_particles =
+        ::st_Particles_get_num_of_particles( in_particles );
+
+    ASSERT_TRUE( in_num_particles > num_particles_t{ 0 } );
+
+    ptr_to_part_t particles =
+        ::st_Particles_new( track_pb, in_num_particles );
+
+    ptr_to_part_t cmp_particles =
+        ::st_Particles_new( compare_pb, in_num_particles );
+
+    ptr_to_part_t diff_particles =
+        ::st_Particles_new( diff_pb, in_num_particles );
+
+    ASSERT_TRUE( particles      != nullptr );
+    ASSERT_TRUE( cmp_particles  != nullptr );
+    ASSERT_TRUE( diff_particles != nullptr );
+
+    ASSERT_TRUE( ::st_Particles_get_num_of_particles( particles ) ==
+                 in_num_particles );
+
+    ASSERT_TRUE( ::st_Particles_get_num_of_particles( cmp_particles ) ==
+                 in_num_particles );
+
+    ASSERT_TRUE( ::st_Particles_get_num_of_particles( diff_particles ) ==
+                 in_num_particles );
+
+    object_t const* prev_pb = pb_it++;
+    ptr_to_cpart_t  prev_in_particles = nullptr;
+
+    size_t cnt = size_t{ 0 };
+
+    for( ; pb_it != pb_end ; ++pb_it, ++prev_pb, ++cnt )
+    {
+        ASSERT_TRUE( ::st_Object_get_const_begin_ptr( pb_it ) != nullptr );
+        ASSERT_TRUE( ::st_Object_get_size( pb_it ) >= sizeof( ::st_Particles ) );
+        ASSERT_TRUE( ::st_Object_get_type_id( pb_it ) ==
+                     ::st_OBJECT_TYPE_PARTICLE );
+
+        prev_in_particles = in_particles;
+
+        in_particles = reinterpret_cast< ptr_to_cpart_t >(
+            ::st_Object_get_const_begin_ptr( pb_it ) );
+
+        ASSERT_TRUE( ::st_Particles_get_num_of_particles( in_particles ) ==
+                     in_num_particles );
+
+        ::st_Particles_copy( particles, prev_in_particles );
+        ::st_Particles_copy( cmp_particles,  in_particles );
+
+        for( num_particles_t ii = 0 ; ii < in_num_particles ; ++ii )
+        {
+            ASSERT_TRUE(
+                ( ii == 0 ) ||
+                ( ::st_Particles_get_particle_id_value( particles,  0 ) !=
+                  ::st_Particles_get_particle_id_value( particles, ii ) ) );
+
+            ASSERT_TRUE(
+                ::st_Particles_get_at_element_id_value( particles,  0 ) ==
+                ::st_Particles_get_at_element_id_value( particles, ii ) );
+
+            ASSERT_TRUE(
+                ::st_Particles_get_at_element_id_value( cmp_particles, 0 ) ==
+                ::st_Particles_get_at_element_id_value( cmp_particles, ii ) );
+
+
+            ASSERT_TRUE( ::st_Particles_get_at_turn_value( particles,  0 ) ==
+                         ::st_Particles_get_at_turn_value( particles, ii ) );
+
+            ASSERT_TRUE(
+                ::st_Particles_get_particle_id_value( particles, ii ) ==
+                ::st_Particles_get_particle_id_value( cmp_particles, ii ) );
+
+            ASSERT_TRUE(
+                ::st_Particles_get_at_turn_value( particles, 0 ) ==
+                ::st_Particles_get_at_turn_value( cmp_particles, ii ) );
+
+            ASSERT_TRUE(
+                ::st_Particles_get_at_turn_value( cmp_particles, 0 ) ==
+                ::st_Particles_get_at_turn_value( cmp_particles, ii ) );
+        }
+
+        index_t const begin_elem_id = ::st_Particles_get_at_element_id_value(
+            particles, num_particles_t{ 0 } );
+
+        index_t const end_elem_id   = ::st_Particles_get_at_element_id_value(
+            cmp_particles, num_particles_t{ 0 } );
+
+        object_t const* line_begin = be_begin;
+        std::advance( line_begin, begin_elem_id + index_t{ 1 } );
+
+        object_t const* line_end = be_begin;
+        std::advance( line_end, end_elem_id + index_t{ 1 } );
+
+        object_t const* line_it  = line_begin;
+
+        size_t jj = begin_elem_id + index_t{ 1 };
+
+        for( ; line_it != line_end ; ++line_it, ++jj )
+        {
+            std::cout.precision( 16 );
+            std::cout << std::setw( 6 ) << cnt
+                      << std::setw( 6 ) << jj
+                      << std::setw( 6 ) << line_it->type_id;
+
+            if( line_it->type_id == ::st_OBJECT_TYPE_DRIFT )
+            {
+                ::st_Drift const* drift = reinterpret_cast< ::st_Drift const* >(
+                    ::st_Object_get_const_begin_ptr( line_it ) );
+
+                std::cout << " | drift       | l = "
+                          << ::st_Drift_get_length( drift );
+            }
+            else if( line_it->type_id == ::st_OBJECT_TYPE_DRIFT_EXACT )
+            {
+                ::st_DriftExact const* drift = reinterpret_cast< ::st_DriftExact const* >(
+                    ::st_Object_get_const_begin_ptr( line_it ) );
+
+                std::cout << " | drift exact | l = "
+                          << ::st_DriftExact_get_length( drift )
+                          << ";";
+            }
+            else if( line_it->type_id == ::st_OBJECT_TYPE_MULTIPOLE )
+            {
+                ::st_MultiPole const* mp = reinterpret_cast< ::st_MultiPole const* >(
+                    ::st_Object_get_const_begin_ptr( line_it ) );
+
+                index_t const order = ::st_MultiPole_get_order( mp );
+
+                std::cout << " | multipole   | l = "
+                          << ::st_MultiPole_get_length( mp )
+                          << "; hxl = " << ::st_MultiPole_get_hxl( mp )
+                          << "; hyl = " << ::st_MultiPole_get_hyl( mp )
+                          << "; ord = " << order
+                          << "; knl = [ ";
+
+                for( index_t kk = order ; kk >= 0 ; --kk )
+                {
+                    std::cout << ::st_MultiPole_get_knl_value( mp, kk ) << ", ";
+                }
+
+                std::cout << " ]; ksl = [ ";
+
+                for( index_t kk = order ; kk >= 0 ; --kk )
+                {
+                    std::cout << ::st_MultiPole_get_ksl_value( mp, kk ) << ", ";
+                }
+
+                std::cout << " ]; ";
+            }
+            else if( line_it->type_id == ::st_OBJECT_TYPE_XYSHIFT )
+            {
+                ::st_XYShift const* xyshift = reinterpret_cast< ::st_XYShift const* >(
+                    ::st_Object_get_const_begin_ptr( line_it ) );
+
+                std::cout <<  " | xyshift     | dx = "
+                          << ::st_XYShift_get_dx( xyshift )
+                          << "; dy = " << ::st_XYShift_get_dy( xyshift )
+                          << "; ";
+            }
+            else if( line_it->type_id == ::st_OBJECT_TYPE_SROTATION )
+            {
+                ::st_SRotation const* srot = reinterpret_cast< ::st_SRotation const* >(
+                    ::st_Object_get_const_begin_ptr( line_it ) );
+
+                std::cout << " | srotation   |  angle = "
+                          << ::st_SRotation_get_angle_deg( srot )
+                          << ";";
+            }
+
+            std::cout << std::endl;
+        }
+
+        std::cout << std::endl;
+
+        int success = ::st_Track_beam_elements_particles(
+        particles, line_begin, line_end );
+
+        ASSERT_TRUE( success == 0 );
+
+        ::st_Particles_calculate_difference(
+            cmp_particles, particles, diff_particles );
+
+        for( num_particles_t ii = 0 ; ii < in_num_particles ; ++ii )
+        {
+            if( ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_s_value( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_x_value( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_y_value( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_px_value( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_py_value( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_zeta_value( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_psigma_value( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_delta_value( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_rpp_value( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_rvv_value( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_chi_value( diff_particles, ii ) ) ) )
+            {
+                ::st_Particles_print( stdout, diff_particles );
+                std::cout << std::endl << " --> continue and investigate!"
+                          << std::endl << std::endl;
+                break;
+            }
+        }
+
+        /*
+        for( num_particles_t ii = 0 ; ii < in_num_particles ; ++ii )
+        {
+            ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
+                ::st_Particles_get_s_value( diff_particles, ii ) ) );
+
+            ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
+                ::st_Particles_get_x_value( diff_particles, ii ) ) );
+
+            ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
+                ::st_Particles_get_y_value( diff_particles, ii ) ) );
+
+            ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
+                ::st_Particles_get_px_value( diff_particles, ii ) ) );
+
+            ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
+                ::st_Particles_get_py_value( diff_particles, ii ) ) );
+
+            ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
+                ::st_Particles_get_zeta_value( diff_particles, ii ) ) );
+
+            ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
+                ::st_Particles_get_psigma_value( diff_particles, ii ) ) );
+
+            ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
+                ::st_Particles_get_delta_value( diff_particles, ii ) ) );
+
+            ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
+                ::st_Particles_get_rpp_value( diff_particles, ii ) ) );
+
+            ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
+                ::st_Particles_get_rvv_value( diff_particles, ii ) ) );
+
+            ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
+                ::st_Particles_get_chi_value( diff_particles, ii ) ) );
+
+            ASSERT_TRUE( ::st_Particles_get_particle_id_value(
+                diff_particles, ii ) == index_t{ 0 } );
+        }
+        */
+    }
+
+    ::st_Buffer_delete( pb );
+    ::st_Buffer_delete( eb );
+    ::st_Buffer_delete( diff_pb );
+    ::st_Buffer_delete( track_pb );
+    ::st_Buffer_delete( compare_pb );
+}
+
+/* end: tests/sixtracklib/common/test_track_c99.cpp */
