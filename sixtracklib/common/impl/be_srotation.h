@@ -81,6 +81,10 @@ NS(SRotation_add_detailed)(
 /* *****          Implementation of C inline functions                   *** */
 /* ************************************************************************* */
 
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+    #include <math.h>
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
