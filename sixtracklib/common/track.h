@@ -3,13 +3,13 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-struct NS(Particles);
 struct NS(Drift);
 struct NS(DriftExact);
 struct NS(MultiPole);
@@ -19,13 +19,13 @@ struct NS(SRotation);
 /* struct NS(BeamBeam); */
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_drift)(
-    SIXTRL_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const ii,
     SIXTRL_DATAPTR_DEC const struct NS(Drift)
         *const SIXTRL_RESTRICT drift );
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_drift_exact)(
-    SIXTRL_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t)  const ii,
     SIXTRL_DATAPTR_DEC const struct NS(DriftExact)
         *const SIXTRL_RESTRICT drift );
@@ -126,7 +126,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift)(
     real_t const xp     = NS(Particles_get_px_value )( particles, ii ) * rpp;
     real_t const yp     = NS(Particles_get_py_value )( particles, ii ) * rpp;
     real_t const rvv    = NS(Particles_get_rvv_value)( particles, ii );
-    real_t const dzeta  = rvv - ONE + ONE_HALF * ( xp*xp + yp*yp );
+    real_t const dzeta  = rvv - ( ONE + ONE_HALF * ( xp*xp + yp*yp ) );
 
     real_t zeta  = NS(Particles_get_zeta_value)( particles, ii );
     real_t s     = NS(Particles_get_s_value)(    particles, ii );
@@ -134,6 +134,9 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift)(
     real_t y     = NS(Particles_get_y_value)(    particles, ii );
 
     real_t const length = NS(Drift_get_length)( drift );
+
+    SIXTRL_ASSERT( NS(Particles_get_beta0_value)( particles, ii ) >
+                   ( real_t )0 );
 
     s    += length;
     x    += length * xp;
@@ -165,13 +168,13 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift_exact)(
     real_t const px     = NS(Particles_get_px_value)( particles, ii );
     real_t const py     = NS(Particles_get_py_value)( particles, ii );
     real_t const beta0  = NS(Particles_get_beta0_value)( particles, ii );
-    real_t const psigma = NS(Particles_get_psigma_valule)( particles, ii );
+    real_t const psigma = NS(Particles_get_psigma_value)( particles, ii );
     real_t const rvv    = NS(Particles_get_rvv_value)( particles, ii );
     real_t const length = NS(DriftExact_get_length)( drift );
 
     real_t const lzpi   = length / sqrt( opd * opd - px * px - py * py );
     real_t const dzeta  =
-        rvv * ( length - ( beta0 * beta0 * psigma + ONE ) * lpzi );
+        rvv * ( length - ( beta0 * beta0 * psigma + ONE ) * lzpi );
 
     real_t s            = NS(Particles_get_s_value)( particles, ii );
     real_t x            = NS(Particles_get_x_value)( particles, ii );
@@ -182,8 +185,8 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift_exact)(
 
     s    += length;
     zeta += dzeta;
-    x    += px * lpzi;
-    y    += py * lpzi;
+    x    += px * lzpi;
+    y    += py * lzpi;
 
     NS(Particles_set_s_value)(    particles, ii, s );
     NS(Particles_set_x_value)(    particles, ii, x );
@@ -200,8 +203,8 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_multipole)(
     NS(particle_num_elements_t) const ii,
     SIXTRL_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT mp )
 {
-    typename NS(particle_real_t)  real_t;
-    typename NS(particle_index_t) index_t;
+    typedef NS(particle_real_t)  real_t;
+    typedef NS(particle_index_t) index_t;
 
     SIXTRL_STATIC_VAR index_t const TWO  = ( index_t )2;
     SIXTRL_STATIC_VAR real_t  const ZERO = ( real_t )0.0;
@@ -223,10 +226,16 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_multipole)(
     real_t px   = NS(Particles_get_px_value)( particles, ii );
     real_t py   = NS(Particles_get_py_value)( particles, ii );
 
-    for( ; index_x >= 0 ; index_x -= TWO, index_y -= TWO )
+    while( index_x > 0 )
     {
         real_t const zre = dpx * x - dpy * y;
         real_t const zim = dpx * y + dpy * x;
+
+        SIXTRL_ASSERT( index_x >= TWO );
+        SIXTRL_ASSERT( index_y >= TWO );
+
+        index_x -= TWO;
+        index_y -= TWO;
 
         dpx = NS(MultiPole_get_bal_value)( mp, index_x ) + zre;
         dpy = NS(MultiPole_get_bal_value)( mp, index_y ) + zim;
@@ -238,7 +247,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_multipole)(
     if( ( hxl > ZERO ) || ( hyl > ZERO ) || ( hxl < ZERO ) || ( hyl < ZERO ) )
     {
         real_t const delta  = NS(Particles_get_delta_value)( particles, ii );
-        real_t const length = NS(MulitPole_get_length)( mp );
+        real_t const length = NS(MultiPole_get_length)( mp );
 
         real_t const hxlx   = x * hxl;
         real_t const hyly   = y * hyl;
@@ -247,13 +256,18 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_multipole)(
         zeta -= chi * ( hxlx - hyly );
         NS(Particles_set_zeta_value)( particles, ii, zeta );
 
-        dpx += hxl + hxl * delta;
-        dpy -= hyl + hyl * delta;
-
         if( length > ZERO )
         {
-            dpx -= chi * NS(MultiPole_get_bal_value)( mp, 0 ) * hxlx / length;
-            dpy += chi * NS(MultiPole_get_bal_value)( mp, 1 ) * hyly / length;
+            real_t const b1l = chi * NS(MultiPole_get_bal_value)( mp, 0 );
+            real_t const a1l = chi * NS(MultiPole_get_bal_value)( mp, 1 );
+
+            dpx += hxl + hxl * delta - b1l * hxlx / length;
+            dpy -= hyl + hyl * delta - a1l * hyly / length;
+        }
+        else
+        {
+            dpx += hxl + hxl * delta;
+            dpy -= hyl + hyl * delta;
         }
     }
 
@@ -333,11 +347,12 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_cavity)(
     SIXTRL_STATIC_VAR real_t const PI  =
         ( real_t )3.1415926535897932384626433832795028841971693993751;
 
-    SIXTRL_STATIC_VAR real_t const ZERO     = ( real_t )0.0;
-    SIXTRL_STATIC_VAR real_t const ONE      = ( real_t )1.0;
-    SIXTRL_STATIC_VAR real_t const TWO      = ( real_t )2.0;
-    SIXTRL_STATIC_VAR real_t const DEG2RAD  = ( real_t )180.0 / PI;
-    SIXTRL_STATIC_VAR real_t const K_FACTOR = TWO * PI / ( real_t )299792458.0;
+    SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0.0;
+    SIXTRL_STATIC_VAR real_t const ONE  = ( real_t )1.0;
+    SIXTRL_STATIC_VAR real_t const TWO  = ( real_t )2.0;
+
+    real_t const DEG2RAD  = ( real_t )180.0 / PI;
+    real_t const K_FACTOR = ( TWO * PI ) / ( real_t )299792458.0;
 
     real_t const   beta0  = NS(Particles_get_beta0_value)(  particles, ii );
     real_t const   zeta   = NS(Particles_get_zeta_value)(   particles, ii );
@@ -352,14 +367,13 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_cavity)(
     real_t         beta   = ZERO;
     real_t one_plus_delta = ZERO;
 
+    real_t const   tau    = zeta / ( beta0 * rvv );
+    real_t         ptau   = psigma * beta0;
 
-    real_t const tau    = zeta / ( beta0 * rvv );
-    real_t       ptau   = psigma * beta0;
+    real_t const   phase  = DEG2RAD  * NS(Cavity_get_lag)( cav ) -
+                            K_FACTOR * NS(Cavity_get_frequency)( cav ) * tau;
 
-    real_t const phase  = DEG2RAD  * NS(Cavity_get_lag)( cav ) -
-                          K_FACTOR * NS(Cavity_get_frequency)( cav ) * tau;
-
-    real_t const energy = chi * sin( phase ) * NS(Cavity_get_voltage)( cav );
+    real_t const energy   = chi * sin( phase ) * NS(Cavity_get_voltage)( cav );
 
     SIXTRL_ASSERT( ii    < NS(Particles_get_num_of_particles)( particles ) );
     SIXTRL_ASSERT( rvv   > ZERO );
@@ -711,7 +725,7 @@ NS(Track_beam_element_particles_subset)(
     return ret;
 }
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_element_particles_subsets)(
+SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements_particles_subset)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
     NS(particle_num_elements_t) p_index_begin,
     NS(particle_num_elements_t) const p_index_end,
@@ -720,7 +734,6 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_element_particles_subsets)(
 {
     SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0;
 
-    SIXTRL_ASSERT( begin_addr != ( address_t )0u );
     SIXTRL_ASSERT( ( ( uintptr_t )be_info_end ) >= ( uintptr_t )be_info_it );
 
     SIXTRL_ASSERT( ( be_info_it != SIXTRL_NULLPTR ) ||
@@ -742,7 +755,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_beam_elements_particles)(
 {
     typedef NS(particle_num_elements_t) num_elem_t;
 
-    return NS(Track_beam_element_particles_subsets)( p,
+    return NS(Track_beam_elements_particles_subset)( p,
         ( num_elem_t )0u, NS(Particles_get_num_of_particles)( p ),
         be_info_begin, be_info_end );
 }
