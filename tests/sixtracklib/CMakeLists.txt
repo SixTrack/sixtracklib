@@ -23,15 +23,15 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     set( SIXTRACKL_TEST_LIBRARIES sixtrack_test sixtrack )
 
     add_subdirectory( common )
-    add_custom_target( testdata DEPENDS testdata_common )
+#     add_custom_target( testdata DEPENDS testdata_common )
 
-    if( SIXTRACKL_ENABLE_OPENCL )
-        add_subdirectory( opencl )
-    endif()
+#     if( SIXTRACKL_ENABLE_OPENCL )
+#         add_subdirectory( opencl )
+#     endif()
 
-    if( SIXTRACKL_ENABLE_CUDA )
-        add_subdirectory( cuda )
-    endif()
+#     if( SIXTRACKL_ENABLE_CUDA )
+#         add_subdirectory( cuda )
+#     endif()
 
 endif()
 
