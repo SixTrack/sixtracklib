@@ -96,7 +96,7 @@ TEST( C99_ParticlesTests, RandomInitParticlesCopyAndCompare )
     /* --------------------------------------------------------------------- */
 
     st_Particles_random_init( p );
-    st_Particles_copy_all_unchecked( p_copy, p );
+    st_Particles_copy( p_copy, p );
 
     /* --------------------------------------------------------------------- */
 

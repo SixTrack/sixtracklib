@@ -105,19 +105,14 @@ TEST( CXX_ParticlesTests, RandomInitParticlesCopyAndCompare )
 
     /* --------------------------------------------------------------------- */
 
-    st_Particles_random_init( p->getCApiPtr() );
-    st_Particles_copy_all_unchecked( p_copy->getCApiPtr(), p->getCApiPtr() );
+    st_Particles_random_init( p );
+    st_Particles_copy( p_copy, p );
 
     /* --------------------------------------------------------------------- */
 
-    ASSERT_TRUE( st_Particles_have_same_structure(
-        p_copy->getCApiPtr(), p->getCApiPtr() ) );
-
-    ASSERT_TRUE( !st_Particles_map_to_same_memory(
-        p_copy->getCApiPtr(),  p->getCApiPtr() ) );
-
-    ASSERT_TRUE( 0 == st_Particles_compare_values(
-        p_copy->getCApiPtr(),  p->getCApiPtr() ) );
+    ASSERT_TRUE( st_Particles_have_same_structure( p_copy, p ) );
+    ASSERT_TRUE( !st_Particles_map_to_same_memory( p_copy, p ) );
+    ASSERT_TRUE( 0 == st_Particles_compare_values( p_copy, p ) );
 }
 
 
