@@ -30,37 +30,37 @@ set( SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_common> )
 
 # ------------------------------------------------------------------------------
 
-if( SIXTRACKL_ENABLE_MANUAL_SIMD )
-
-    add_subdirectory( simd )
-
-    set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-         $<TARGET_OBJECTS:sixtrack_simd> )
-
-endif()
+# if( SIXTRACKL_ENABLE_MANUAL_SIMD )
+#
+#     add_subdirectory( simd )
+#
+#     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
+#          $<TARGET_OBJECTS:sixtrack_simd> )
+#
+# endif()
 
 # ------------------------------------------------------------------------------
 
-if( SIXTRACKL_ENABLE_OPENCL )
+# if( SIXTRACKL_ENABLE_OPENCL )
+#
+#     set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES}
+#                                   ${SIXTRACKL_OPENCL_LIBRARY} )
+#     add_subdirectory( opencl )
+#
+#     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
+#          $<TARGET_OBJECTS:sixtrack_opencl> )
+#
+# endif()
 
-    set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES}
-                                  ${SIXTRACKL_OPENCL_LIBRARY} )
-    add_subdirectory( opencl )
-
-    set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-         $<TARGET_OBJECTS:sixtrack_opencl> )
-
-endif()
-
-if( SIXTRACKL_ENABLE_CUDA )
-
-    add_subdirectory( cuda )
-
-    set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-         $<TARGET_OBJECTS:sixtrack_cuda_host>
-         $<TARGET_OBJECTS:sixtrack_cuda_kernel> )
-
-endif()
+# if( SIXTRACKL_ENABLE_CUDA )
+#
+#     add_subdirectory( cuda )
+#
+#     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
+#          $<TARGET_OBJECTS:sixtrack_cuda_host>
+#          $<TARGET_OBJECTS:sixtrack_cuda_kernel> )
+#
+# endif()
 
 # ------------------------------------------------------------------------------
 

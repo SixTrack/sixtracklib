@@ -15,16 +15,15 @@
 
 #include "sixtracklib/common/mem_pool.h"
 #include "sixtracklib/common/compute_arch.h"
-#include "sixtracklib/common/blocks.h"
-
-#include "sixtracklib/common/impl/beam_elements_type.h"
+#include "sixtracklib/common/buffer.h"
+#include "sixtracklib/common/impl/buffer_type.h"
+#include "sixtracklib/common/impl/buffer_object.h"
+#include "sixtracklib/common/impl/buffer_generic.h"
+#include "sixtracklib/common/impl/managed_buffer.h"
+#include "sixtracklib/common/impl/managed_buffer_minimal.h"
+#include "sixtracklib/common/impl/managed_buffer_remap.h"
 #include "sixtracklib/common/beam_elements.h"
-#include "sixtracklib/common/impl/beam_elements_api.h"
-
-#include "sixtracklib/common/impl/particles_type.h"
 #include "sixtracklib/common/particles.h"
-#include "sixtracklib/common/impl/particles_api.h"
-
 #include "sixtracklib/common/track.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -41,7 +40,8 @@
 #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
 
-    #include "sixtracklib/opencl/ocl_environment.h"
+    #include "sixtracklib/opencl/buffer.h"
+//     #include "sixtracklib/opencl/ocl_environment.h"
 
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
 
@@ -50,7 +50,8 @@
 #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
 
-    #include "sixtracklib/cuda/cuda_env.h"
+    #include "sixtracklib/cuda/buffer.h"
+//     #include "sixtracklib/cuda/cuda_env.h"
 
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
 
