@@ -160,7 +160,7 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(MultiPole)* NS(MultiPole_add)(
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(MultiPole_get_num_dataptrs)(
+SIXTRL_INLINE NS(buffer_size_t) NS(MultiPole_get_num_dataptrs)(
     SIXTRL_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole )
 {
     typedef NS(multipole_order_t)   mp_order_t;
@@ -269,7 +269,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(MultiPole_get_bal_size)(
 {
     return ( multipole != SIXTRL_NULLPTR )
         ?  ( ( multipole->order >= ( NS(multipole_order_t ) )0 )
-                ? ( ( NS(buffer_size_t) )( 2 * multipole->order + 1 ) )
+                ? ( ( NS(buffer_size_t) )( 2 * multipole->order + 2 ) )
                 : ( ( NS(buffer_size_t) )0u ) )
         :  ( ( NS(buffer_size_t) )0u );
 }
@@ -594,7 +594,7 @@ SIXTRL_INLINE SIXTRL_ARGPTR_DEC NS(MultiPole)* NS(MultiPole_add)(
 
         SIXTRL_ARGPTR_DEC buf_size_t const counts[] =
         {
-            ( buf_size_t )( 2 * order + 1 )
+            ( buf_size_t )( 2 * order + 2 )
         };
 
         if( ptr_to_bal != SIXTRL_NULLPTR )
