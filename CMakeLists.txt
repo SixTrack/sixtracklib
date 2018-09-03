@@ -125,13 +125,18 @@ elseif( SIXTRACKL_CPU_ARCH MATCHES "native" )
 endif()
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# C Namespace handling:
+# Namespace handling:
+
+set( SIXTRACKLIB_NAMESPACE_FLAGS )
 
 if( SIXTRACKL_C_NAMESPACE_PREFIX )
-    set( SIXTRACKLIB_NAMESPACE_FLAGS
-         "-D__NAMESPACE=${SIXTRACKL_C_NAMESPACE_PREFIX}" )
-else()
-    set( SIXTRACKLIB_NAMESPACE_FLAGS "-D__NAMESPACE=st_" )
+    list( APPEND SIXTRACKLIB_NAMESPACE_FLAGS
+          "__NAMESPACE=${SIXTRACKL_C_NAMESPACE_PREFIX}" )
+endif()
+
+if( SIXTRACKL_CXX_NAMESPACE )
+    list( APPEND SIXTRACKLIB_NAMESPACE_FLAGS
+          "SIXTRL_NAMESPACE=${SIXTRACKL_CXX_NAMESPACE}" )
 endif()
 
 add_subdirectory( sixtracklib )
