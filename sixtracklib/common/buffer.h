@@ -234,6 +234,15 @@ SIXTRL_HOST_FN SIXTRL_STATIC void NS(Buffer_delete)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(Buffer_predict_required_num_slots)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const  SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const  object_size,
+    NS(buffer_size_t)                   const  num_obj_dataptrs,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts );
+
+
 SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_can_add_object)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const  SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const  object_size,
@@ -1023,12 +1032,27 @@ SIXTRL_INLINE void NS(Buffer_free)( NS(Buffer)* SIXTRL_RESTRICT buffer )
     return;
 }
 
+SIXTRL_INLINE NS(buffer_size_t) NS(Buffer_predict_required_num_slots)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const  SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const  object_size,
+    NS(buffer_size_t)                   const  num_obj_dataptrs,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT obj_attr_sizes,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT obj_attr_counts )
+{
+    typedef SIXTRL_ARGPTR_DEC unsigned char* ptr_to_raw_t;
+
+    return NS(ManagedBuffer_predict_required_num_slots)(
+        ( ptr_to_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ),
+        object_size, num_obj_dataptrs, obj_attr_sizes, obj_attr_counts,
+            NS(Buffer_get_slot_size)( buffer ) );
+}
+
 SIXTRL_INLINE bool NS(Buffer_can_add_object)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const  SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const  object_size,
     NS(buffer_size_t)                   const  num_obj_dataptrs,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT obj_attr_sizes,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT obj_attr_counts,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_num_objects,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_num_slots,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_num_dataptrs)
@@ -1075,43 +1099,15 @@ SIXTRL_INLINE bool NS(Buffer_can_add_object)(
         SIXTRL_ASSERT( ptr_requ_num_dataptrs != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( slot_size != ( buf_size_t )0u );
 
-        *ptr_requ_num_objects  = NS(Buffer_get_num_of_objects)( buffer ) + 1u;
-        *ptr_requ_num_dataptrs = NS(Buffer_get_num_of_dataptrs)( buffer );
+        *ptr_requ_num_objects  =
+            NS(Buffer_get_num_of_objects)( buffer ) + ( buf_size_t )1u;
 
-        *ptr_requ_num_slots = NS(Buffer_get_num_of_slots)( buffer );
+        *ptr_requ_num_dataptrs =
+            NS(Buffer_get_num_of_dataptrs)( buffer ) + num_obj_dataptrs;
 
-        *ptr_requ_num_slots += ( NS(ManagedBuffer_get_slot_based_length)(
-            object_size, slot_size ) ) / slot_size;
-
-        if( num_obj_dataptrs > ( buf_size_t )0u )
-        {
-            #if !defined( NDEBUG )
-            typedef NS(buffer_addr_t) address_t;
-            typedef address_t const*  ptr_to_addr_t;
-
-            buf_size_t const ptr_addr_size =
-                NS(ManagedBuffer_get_slot_based_length)(
-                    sizeof( ptr_to_addr_t ), slot_size );
-
-            #endif /* !defined( NDEBUG ) */
-
-            buf_size_t ii = ( buf_size_t )0u;
-
-            SIXTRL_ASSERT( sizes  != SIXTRL_NULLPTR );
-            SIXTRL_ASSERT( counts != SIXTRL_NULLPTR );
-            SIXTRL_ASSERT( ( num_obj_dataptrs * ptr_addr_size ) <= object_size );
-
-            *ptr_requ_num_dataptrs += num_obj_dataptrs;
-
-            for( ; ii < num_obj_dataptrs ; ++ii )
-            {
-                buf_size_t const extent =
-                    NS(ManagedBuffer_get_slot_based_length)(
-                        sizes[ ii ] * counts[ ii ], slot_size );
-
-                *ptr_requ_num_slots += extent / slot_size;
-            }
-        }
+        *ptr_requ_num_slots = NS(Buffer_get_num_of_slots)( buffer ) +
+            NS(Buffer_predict_required_num_slots)( buffer, object_size,
+                num_obj_dataptrs, obj_attr_sizes, obj_attr_counts );
 
         if( ( max_num_objects  >= *ptr_requ_num_objects  ) &&
             ( max_num_slots    >= *ptr_requ_num_slots    ) &&

@@ -532,19 +532,20 @@ SIXTRL_INLINE void NS(Buffer_free_generic)(
 SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
     SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC const void *const SIXTRL_RESTRICT ptr_to_object,
-    NS(buffer_size_t)        const object_size,
-    NS(object_type_id_t)     const type_id,
+    NS(buffer_size_t)    const object_size,
+    NS(object_type_id_t) const type_id,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const num_obj_dataptr,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT dataptr_offsets,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT dataptr_sizes,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT dataptr_counts )
 {
-    typedef NS(Object)                       object_t;
-    typedef NS(buffer_size_t)                buf_size_t;
-    typedef NS(buffer_addr_t)                address_t;
-    typedef SIXTRL_ARGPTR_DEC unsigned char* ptr_to_raw_t;
-    typedef SIXTRL_ARGPTR_DEC address_t*     ptr_to_addr_t;
-    typedef SIXTRL_ARGPTR_DEC object_t*      ptr_to_object_t;
+    typedef NS(Object)                   object_t;
+    typedef NS(buffer_size_t)            buf_size_t;
+    typedef NS(buffer_addr_t)            address_t;
+    typedef unsigned char                raw_t;
+    typedef SIXTRL_ARGPTR_DEC raw_t*     ptr_to_raw_t;
+    typedef SIXTRL_ARGPTR_DEC address_t* ptr_to_addr_t;
+    typedef SIXTRL_ARGPTR_DEC object_t*  ptr_to_object_t;
 
     SIXTRL_STATIC_VAR buf_size_t const ZERO_SIZE = ( buf_size_t )0u;
     SIXTRL_STATIC_VAR address_t  const ZERO_ADDR = ( address_t  )0u;
@@ -602,45 +603,14 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
         buf_size_t const obj_handle_size =
             NS(ManagedBuffer_get_slot_based_length)( object_size, slot_size );
 
-        buf_size_t requ_num_slots            = cur_num_slots;
-        buf_size_t additional_num_slots      = ZERO_SIZE;
-        buf_size_t additional_num_slots_size = obj_handle_size;
+        buf_size_t const additional_num_slots =
+            NS(ManagedBuffer_predict_required_num_slots)( begin, object_size,
+                num_obj_dataptr, dataptr_sizes, dataptr_counts, slot_size );
 
-        if( num_obj_dataptr > ZERO_SIZE )
-        {
-            buf_size_t ii = ZERO_SIZE;
+        buf_size_t const additional_num_slots_size =
+            additional_num_slots * slot_size;
 
-            SIXTRL_ASSERT( dataptr_offsets != SIXTRL_NULLPTR );
-            SIXTRL_ASSERT( dataptr_sizes   != SIXTRL_NULLPTR );
-            SIXTRL_ASSERT( dataptr_counts  != SIXTRL_NULLPTR );
-
-            for( ; ii < num_obj_dataptr ; ++ii )
-            {
-                buf_size_t const elem_size = dataptr_sizes[ ii ];
-                buf_size_t const attr_cnt  = dataptr_counts[ ii ];
-                buf_size_t const attr_size =
-                    NS(ManagedBuffer_get_slot_based_length)(
-                        elem_size * attr_cnt, slot_size );
-
-                SIXTRL_ASSERT( ( dataptr_offsets[ ii ] % slot_size ) == 0u );
-                SIXTRL_ASSERT(   dataptr_offsets[ ii ] < object_size );
-
-                SIXTRL_ASSERT( elem_size > ZERO_SIZE );
-                SIXTRL_ASSERT( attr_cnt  > ZERO_SIZE );
-                SIXTRL_ASSERT( ( attr_size % slot_size ) == 0u );
-
-                additional_num_slots_size += attr_size;
-            }
-
-            if( ( additional_num_slots_size % slot_size ) != 0u )
-            {
-                additional_num_slots_size += slot_size - (
-                    additional_num_slots_size % slot_size );
-            }
-        }
-
-        additional_num_slots += additional_num_slots_size / slot_size;
-        requ_num_slots       += additional_num_slots;
+        buf_size_t const requ_num_slots = cur_num_slots + additional_num_slots;
 
         if( ( requ_num_objects  > max_num_objects  ) ||
             ( requ_num_slots    > max_num_slots    ) ||
@@ -751,22 +721,22 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
                     current_dataptrs_size;
 
                 ptr_to_addr_t out_it = ( ptr_to_addr_t )dest_dataptrs;
+                raw_t const  z_value = ( raw_t )0u;
 
                 SIXTRL_ASSERT( ( ( ( uintptr_t )dest_dataptrs )
                     % slot_size ) == ZERO_SIZE );
 
                 for( ; ii < num_obj_dataptr ; ++ii, ++out_it )
                 {
-                    buf_size_t const offset    = dataptr_offsets[ ii ];
-                    buf_size_t const attr_cnt  = dataptr_counts[ ii ];
-                    buf_size_t const elem_size = dataptr_sizes[ ii ];
-                    buf_size_t const attr_size = attr_cnt * elem_size;
+                    buf_size_t const attr_size =
+                        dataptr_counts[ ii ] * dataptr_sizes[ ii ];
 
                     buf_size_t const attr_extent =
                         NS(ManagedBuffer_get_slot_based_length)(
                             attr_size, slot_size );
 
-                    ptr_to_raw_t ptr_attr_slot = stored_obj_begin + offset;
+                    ptr_to_raw_t ptr_attr_slot =
+                        stored_obj_begin + dataptr_offsets[ ii ];
 
                     address_t const attr_slot_addr =
                         ( address_t )( uintptr_t )ptr_attr_slot;
@@ -774,30 +744,32 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
                     address_t const source_addr = ( attr_slot_addr != ZERO_ADDR )
                         ? *( ( ptr_to_addr_t )ptr_attr_slot ) : ZERO_ADDR;
 
-                    ptr_to_raw_t ptr_attr_data_begin_dest = dest_slots;
-
-                    address_t const attr_data_begin_dest_addr =
-                        ( address_t )( uintptr_t )ptr_attr_data_begin_dest;
-
                     if( source_addr != ZERO_ADDR )
                     {
-                        SIXTRACKLIB_COPY_VALUES( unsigned char,
-                            ptr_attr_data_begin_dest, ( ptr_to_raw_t )(
-                                uintptr_t )source_addr,  attr_size );
+                        ptr_to_raw_t ptr_attr_src =
+                            ( ptr_to_raw_t )( uintptr_t )source_addr;
+
+                        SIXTRACKLIB_COPY_VALUES(
+                            raw_t, dest_slots, ptr_attr_src, attr_size );
+
+                        if( attr_extent > attr_size )
+                        {
+                            buf_size_t const to_fill = attr_extent - attr_size;
+
+                            SIXTRACKLIB_SET_VALUES( raw_t,
+                                dest_slots + attr_size, to_fill, z_value );
+                        }
                     }
                     else
                     {
-                        SIXTRL_UINT8_T const z_value = ( SIXTRL_UINT8_T )0;
-
-                        SIXTRACKLIB_SET_VALUES( unsigned char,
-                            ptr_attr_data_begin_dest, attr_extent, z_value );
+                        SIXTRACKLIB_SET_VALUES(
+                            raw_t, dest_slots, attr_extent, z_value );
                     }
 
                     *( ( ptr_to_addr_t )ptr_attr_slot ) =
-                        attr_data_begin_dest_addr;
+                        ( address_t )( uintptr_t )dest_slots;
 
-                    *out_it = attr_slot_addr;
-
+                    *out_it    = attr_slot_addr;
                     dest_slots = dest_slots + attr_extent;
                 }
 
