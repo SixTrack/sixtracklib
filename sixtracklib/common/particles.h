@@ -125,19 +125,19 @@ NS(BufferIndex_get_particles)( SIXTRL_ARGPTR_DEC const
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_FN SIXTRL_STATIC void NS(Particles_copy_single_unchecked)(
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_copy_single)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     NS(particle_num_elements_t) const destination_index,
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
     NS(particle_num_elements_t) const source_index );
 
-SIXTRL_FN SIXTRL_STATIC void NS(Particles_copy_range_unchecked)(
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_copy_range)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
     NS(particle_num_elements_t) const start_index,
     NS(particle_num_elements_t) const end_index );
 
-SIXTRL_FN SIXTRL_STATIC void NS(Particles_copy_all_unchecked)(
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_copy)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source );
 
@@ -1094,7 +1094,7 @@ NS(BufferIndex_get_particles)( SIXTRL_ARGPTR_DEC const
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE void NS(Particles_copy_single_unchecked)(
+SIXTRL_INLINE void NS(Particles_copy_single)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     NS(particle_num_elements_t) const destination_idx,
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
@@ -1168,7 +1168,7 @@ SIXTRL_INLINE void NS(Particles_copy_single_unchecked)(
     return;
 }
 
-SIXTRL_INLINE void NS(Particles_copy_range_unchecked)(
+SIXTRL_INLINE void NS(Particles_copy_range)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
     NS(particle_num_elements_t) const start_index,
@@ -1308,7 +1308,7 @@ SIXTRL_INLINE void NS(Particles_copy_range_unchecked)(
     return;
 }
 
-SIXTRL_INLINE void NS(Particles_copy_all_unchecked)(
+SIXTRL_INLINE void NS(Particles_copy)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source )
 {
@@ -1322,7 +1322,7 @@ SIXTRL_INLINE void NS(Particles_copy_all_unchecked)(
         ( num >  ( num_elem_t )0u ) &&
         ( num == ( NS(Particles_get_num_of_particles)( destination ) ) ) );
 
-    NS(Particles_copy_range_unchecked)( destination, source, 0, num );
+    NS(Particles_copy_range)( destination, source, 0, num );
     return;
 }
 
