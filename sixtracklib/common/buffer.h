@@ -186,6 +186,16 @@ NS(Buffer_get_max_num_of_garbage_ranges)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(Buffer_calculate_required_buffer_length)(
+    NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_objects,
+    NS(buffer_size_t) const num_slots,
+    NS(buffer_size_t) const num_dataptrs,
+    NS(buffer_size_t) const num_garbage_ranges );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reserve)(
     NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const new_max_num_objects,
@@ -845,6 +855,23 @@ SIXTRL_INLINE NS(buffer_size_t) NS(Buffer_get_max_num_of_garbage_ranges)(
     return NS(ManagedBuffer_get_section_max_num_entities)( ( ptr_to_raw_t )(
         uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ), SECTION_ID,
             NS(Buffer_get_slot_size)( buffer ) );
+}
+
+/* ========================================================================= */
+
+SIXTRL_INLINE NS(buffer_size_t) NS(Buffer_calculate_required_buffer_length)(
+    NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_objects,
+    NS(buffer_size_t) const num_slots,
+    NS(buffer_size_t) const num_dataptrs,
+    NS(buffer_size_t) const num_garbage_ranges )
+{
+    NS(buffer_size_t) const slot_size = ( buffer != SIXTRL_NULLPTR )
+        ? NS(Buffer_get_slot_size)( buffer )
+        : NS(BUFFER_DEFAULT_SLOT_SIZE);
+
+    return NS(ManagedBuffer_calculate_buffer_length)( SIXTRL_NULLPTR,
+        num_objects, num_slots, num_dataptrs, num_garbage_ranges, slot_size );
 }
 
 /* ========================================================================= */
