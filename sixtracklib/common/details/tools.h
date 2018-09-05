@@ -13,47 +13,54 @@
 #if defined( __cplusplus )
 extern "C" {
 #endif /* defined( __cplusplus ) */
-    
+
 #endif /* _GPUCODE */
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS(greatest_common_divisor)( 
+SIXTRL_STATIC SIXTRL_UINT64_T NS(greatest_common_divisor)(
     SIXTRL_UINT64_T a, SIXTRL_UINT64_T b );
 
-SIXTRL_STATIC SIXTRL_UINT64_T NS(least_common_multiple)( 
+SIXTRL_STATIC SIXTRL_UINT64_T NS(least_common_multiple)(
     SIXTRL_UINT64_T a, SIXTRL_UINT64_T b );
+
+SIXTRL_STATIC SIXTRL_INT64_T NS(sign_int64)( SIXTRL_INT64_T const a );
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_UINT64_T NS(greatest_common_divisor)( 
+SIXTRL_INLINE SIXTRL_UINT64_T NS(greatest_common_divisor)(
     SIXTRL_UINT64_T a, SIXTRL_UINT64_T b )
 {
     static SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
-    
+
     while( ( a != ZERO ) && ( b != ZERO ) )
     {
         if( a == ZERO ) return b;
         b %= a;
-        
+
         if( b == ZERO ) return a;
         a %= b;
     }
-    
+
     return ( a > b ) ? a : b;
 }
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_UINT64_T NS(least_common_multiple)( 
+SIXTRL_INLINE SIXTRL_UINT64_T NS(least_common_multiple)(
     SIXTRL_UINT64_T a, SIXTRL_UINT64_T b )
 {
     static SIXTRL_UINT64_T const ZERO = ( SIXTRL_UINT64_T )0u;
     SIXTRL_UINT64_T const gcd = NS(greatest_common_divisor)( a, b );
-    
+
     return ( gcd != ZERO ) ? ( ( a * b ) / gcd ) : ( ZERO );
 }
 
 /* ------------------------------------------------------------------------- */
-    
+
+SIXTRL_INLINE SIXTRL_INT64_T NS(sign_int64)( SIXTRL_INT64_T const x )
+{
+    return ( x > 0 ) - ( x < 0 );
+}
+
 #if !defined( _GPUCODE )
 
 #if defined( __cplusplus )
