@@ -1,3 +1,5 @@
+#include "sixtracklib/testlib/test_beam_elements_tools.h"
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
