@@ -70,9 +70,17 @@ NS(Particles);
 
 /* ========================================================================= */
 
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Particles_get_required_num_slots)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_particles );
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Particles_get_required_num_dataptrs)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_particles );
+
 SIXTRL_FN SIXTRL_STATIC bool NS(Particles_can_be_added)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const num_particles,
+    NS(buffer_size_t) const num_particles,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs );
@@ -708,6 +716,59 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_state)(
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+
+SIXTRL_INLINE NS(buffer_size_t) NS(Particles_get_required_num_slots)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_particles )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+
+    buf_size_t const num_dataptrs = NS(PARTICLES_NUM_DATAPTRS);
+
+    SIXTRL_STATIC_VAR buf_size_t const real_size =
+        sizeof( NS(particle_real_t) );
+
+    SIXTRL_STATIC_VAR buf_size_t const index_size =
+        sizeof( NS(particle_index_t) );
+
+    buf_size_t const sizes[] =
+    {
+        real_size,  real_size,  real_size,  real_size,  real_size,
+        real_size,  real_size,  real_size,  real_size,  real_size,  real_size,
+        real_size,  real_size,  real_size,  real_size,  real_size,
+        index_size, index_size, index_size, index_size
+    };
+
+    buf_size_t const counts[] =
+    {
+        num_particles, num_particles, num_particles, num_particles, num_particles,
+        num_particles, num_particles, num_particles,
+        num_particles, num_particles, num_particles,
+        num_particles, num_particles, num_particles, num_particles, num_particles,
+        num_particles, num_particles, num_particles, num_particles
+    };
+
+    buf_size_t const slot_size = ( buffer != SIXTRL_NULLPTR )
+        ? NS(Buffer_get_slot_size)( buffer )
+        : NS(BUFFER_DEFAULT_SLOT_SIZE);
+
+    buf_size_t requ_num_slots = NS(ManagedBuffer_predict_required_num_slots)(
+        SIXTRL_NULLPTR, sizeof( NS(Particles) ), num_dataptrs,
+            sizes, counts, slot_size );
+
+    return requ_num_slots;
+}
+
+SIXTRL_INLINE NS(buffer_size_t) NS(Particles_get_required_num_dataptrs)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_particles )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+
+    ( void )buffer;
+    buf_size_t const num_dataptrs = NS(PARTICLES_NUM_DATAPTRS);
+    return num_particles * num_dataptrs;
+}
 
 SIXTRL_INLINE bool NS(Particles_can_be_added)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
