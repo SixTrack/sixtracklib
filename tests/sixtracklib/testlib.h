@@ -14,6 +14,7 @@
 #include "sixtracklib/testlib/gpu_kernel_tools.h"
 #include "sixtracklib/testlib/random.h"
 #include "sixtracklib/testlib/test_particles_tools.h"
+#include "sixtracklib/testlib/test_beam_elements_tools.h"
 // #include "sixtracklib/testlib/test_track_tools.h"
 
 #include "sixtracklib/testlib/testdata_files.h"

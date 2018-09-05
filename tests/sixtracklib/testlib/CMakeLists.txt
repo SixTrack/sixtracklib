@@ -37,6 +37,7 @@ set( SIXTRACKL_TESTLIB_HEADERS
      gpu_kernel_tools.h
      random.h
      test_particles_tools.h
+     test_beam_elements_tools.h
 #      test_track_tools.h
 )
 
@@ -44,6 +45,7 @@ set( SIXTRACKL_TESTLIB_SOURCES
      details/gpu_kernel_tools.c
      details/random.c
      details/test_particles_tools.c
+     details/test_beam_elements_tools.c
 #      details/test_track_tools.c
 )
 
