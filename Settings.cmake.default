@@ -30,6 +30,9 @@ option( SIXTRACKL_ENABLE_PROGRAMM_TESTS
 # ------------------------------------------------------------------------------
 # ----  Namespace:
 
+set( SIXTRACKL_CXX_NAMESPACE "sixtrack" CACHE STRING
+     "SixTrackLib C++ namespace (default: sixtrack)" )
+
 set( SIXTRACKL_C_NAMESPACE_PREFIX "st_" CACHE STRING
      "SixTrackLib C-Namespace prefix (default: st_)" )
 
