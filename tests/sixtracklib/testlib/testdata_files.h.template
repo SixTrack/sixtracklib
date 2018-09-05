@@ -63,11 +63,15 @@ static char const NS(PATH_TO_TEST_TRACKING_ALIGN_DATA)[] =
 /* ****                                                                **** */
 /* ************************************************************************ */
 
-static char const NS(PATH_TO_TEST_LHC_PARTICLE_DATA)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/lhc_particle_dump.bin";
+/* ------------------------------------------------------------------------ */
+/* ----     LHC, Single Turn, Two Particles, No BeamBeam elements      ---- */
+/* ------------------------------------------------------------------------ */
 
-static char const NS(PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/lhc_beam_elements.bin";
+static char const NS(PATH_TO_TEST_LHC_PARTICLES_DATA_T1_P2_NO_BEAM_BEAM)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/lhc_particles_turn1_p2_nobeambeam.bin";
+
+static char const NS(PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/lhc_beam_elements_nobeambeam.bin";
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }

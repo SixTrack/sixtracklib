@@ -20,7 +20,7 @@
 #include "sixtracklib/common/track.h"
 #include "sixtracklib/testlib.h"
 
-TEST( C99_CommonTrackTests, TrackLhcData )
+TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
 {
     using size_t   = ::st_buffer_size_t;
     using object_t = ::st_Object;
@@ -31,13 +31,13 @@ TEST( C99_CommonTrackTests, TrackLhcData )
     using real_t          = ::st_particle_real_t;
     using index_t         = ::st_particle_index_t;
 
-    static real_t const ABS_TOLERANCE = real_t{ 1e-14 };
+    static real_t const ABS_TOLERANCE = real_t{ 1e-13 };
 
     ::st_Buffer* pb = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_TEST_LHC_PARTICLE_DATA );
+        ::st_PATH_TO_TEST_LHC_PARTICLES_DATA_T1_P2_NO_BEAM_BEAM );
 
     ::st_Buffer* eb = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA );
+        ::st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM );
 
     ::st_Buffer* track_pb   = ::st_Buffer_new( size_t{ 1u << 20u } );
     ::st_Buffer* compare_pb = ::st_Buffer_new( size_t{ 1u << 20u } );
@@ -167,87 +167,6 @@ TEST( C99_CommonTrackTests, TrackLhcData )
         object_t const* line_end = be_begin;
         std::advance( line_end, end_elem_id + index_t{ 1 } );
 
-        object_t const* line_it  = line_begin;
-
-        size_t jj = begin_elem_id + index_t{ 1 };
-
-        for( ; line_it != line_end ; ++line_it, ++jj )
-        {
-            std::cout.precision( 16 );
-            std::cout << std::setw( 6 ) << cnt
-                      << std::setw( 6 ) << jj
-                      << std::setw( 6 ) << line_it->type_id;
-
-            if( line_it->type_id == ::st_OBJECT_TYPE_DRIFT )
-            {
-                ::st_Drift const* drift = reinterpret_cast< ::st_Drift const* >(
-                    ::st_Object_get_const_begin_ptr( line_it ) );
-
-                std::cout << " | drift       | l = "
-                          << ::st_Drift_get_length( drift );
-            }
-            else if( line_it->type_id == ::st_OBJECT_TYPE_DRIFT_EXACT )
-            {
-                ::st_DriftExact const* drift = reinterpret_cast< ::st_DriftExact const* >(
-                    ::st_Object_get_const_begin_ptr( line_it ) );
-
-                std::cout << " | drift exact | l = "
-                          << ::st_DriftExact_get_length( drift )
-                          << ";";
-            }
-            else if( line_it->type_id == ::st_OBJECT_TYPE_MULTIPOLE )
-            {
-                ::st_MultiPole const* mp = reinterpret_cast< ::st_MultiPole const* >(
-                    ::st_Object_get_const_begin_ptr( line_it ) );
-
-                index_t const order = ::st_MultiPole_get_order( mp );
-
-                std::cout << " | multipole   | l = "
-                          << ::st_MultiPole_get_length( mp )
-                          << "; hxl = " << ::st_MultiPole_get_hxl( mp )
-                          << "; hyl = " << ::st_MultiPole_get_hyl( mp )
-                          << "; ord = " << order
-                          << "; knl = [ ";
-
-                for( index_t kk = order ; kk >= 0 ; --kk )
-                {
-                    std::cout << ::st_MultiPole_get_knl_value( mp, kk ) << ", ";
-                }
-
-                std::cout << " ]; ksl = [ ";
-
-                for( index_t kk = order ; kk >= 0 ; --kk )
-                {
-                    std::cout << ::st_MultiPole_get_ksl_value( mp, kk ) << ", ";
-                }
-
-                std::cout << " ]; ";
-            }
-            else if( line_it->type_id == ::st_OBJECT_TYPE_XYSHIFT )
-            {
-                ::st_XYShift const* xyshift = reinterpret_cast< ::st_XYShift const* >(
-                    ::st_Object_get_const_begin_ptr( line_it ) );
-
-                std::cout <<  " | xyshift     | dx = "
-                          << ::st_XYShift_get_dx( xyshift )
-                          << "; dy = " << ::st_XYShift_get_dy( xyshift )
-                          << "; ";
-            }
-            else if( line_it->type_id == ::st_OBJECT_TYPE_SROTATION )
-            {
-                ::st_SRotation const* srot = reinterpret_cast< ::st_SRotation const* >(
-                    ::st_Object_get_const_begin_ptr( line_it ) );
-
-                std::cout << " | srotation   |  angle = "
-                          << ::st_SRotation_get_angle_deg( srot )
-                          << ";";
-            }
-
-            std::cout << std::endl;
-        }
-
-        std::cout << std::endl;
-
         int success = ::st_Track_beam_elements_particles(
         particles, line_begin, line_end );
 
@@ -255,6 +174,8 @@ TEST( C99_CommonTrackTests, TrackLhcData )
 
         ::st_Particles_calculate_difference(
             cmp_particles, particles, diff_particles );
+
+        bool is_equal = true;
 
         for( num_particles_t ii = 0 ; ii < in_num_particles ; ++ii )
         {
@@ -270,14 +191,40 @@ TEST( C99_CommonTrackTests, TrackLhcData )
                 ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_rvv_value( diff_particles, ii ) ) ) ||
                 ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_chi_value( diff_particles, ii ) ) ) )
             {
-                ::st_Particles_print( stdout, diff_particles );
-                std::cout << std::endl << " --> continue and investigate!"
-                          << std::endl << std::endl;
+                is_equal = false;
                 break;
             }
         }
 
-        /*
+        if( !is_equal )
+        {
+            std::cout << "Difference between tracked particles and "
+                         "reference particle data detected: \r\n"
+                      << "at beam-element block #" << cnt
+                      << ", concerning beam-elements [ "
+                      << std::setw( 6 ) << begin_elem_id + 1 << " - "
+                      << std::setw( 6 ) << end_elem_id + 1 << " ):\r\n"
+                      << "absolute tolerance : " << ABS_TOLERANCE << "\r\n"
+                      << "\r\n"
+                      << "beam-elements: \r\n";
+
+            object_t const* line_it  = line_begin;
+            size_t jj = begin_elem_id + index_t{ 1 };
+
+            for( ; line_it != line_end ; ++line_it )
+            {
+                std::cout << "be id = " << std::setw( 6 ) << jj ;
+                NS(BeamElement_print)( line_it );
+            }
+
+            std::cout << "\r\n"
+                      << "diff_particles = |cmp_particles - particles| :\r\n";
+
+            NS(Particles_print)( stdout, diff_particles );
+
+            std::cout << std::endl;
+        }
+
         for( num_particles_t ii = 0 ; ii < in_num_particles ; ++ii )
         {
             ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
@@ -316,7 +263,6 @@ TEST( C99_CommonTrackTests, TrackLhcData )
             ASSERT_TRUE( ::st_Particles_get_particle_id_value(
                 diff_particles, ii ) == index_t{ 0 } );
         }
-        */
     }
 
     ::st_Buffer_delete( pb );
