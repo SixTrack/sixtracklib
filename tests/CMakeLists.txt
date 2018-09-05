@@ -4,6 +4,6 @@
 add_subdirectory( sixtracklib )
 
 # Enable benchmarking tests
-# if( SIXTRACKL_ENABLE_TIMING_TESTS )
-    add_subdirectory( benchmark/ )
-# endif()
+if( SIXTRACKL_ENABLE_TIMING_TESTS )
+    add_subdirectory( benchmark )
+endif()
