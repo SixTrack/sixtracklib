@@ -1150,7 +1150,9 @@ SIXTRL_INLINE bool NS(Buffer_can_add_object)(
         buf_size_t const max_num_dataptrs =
             NS(Buffer_get_max_num_of_dataptrs)( buffer );
 
+        #if !defined( NDEBUG )
         buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+        #endif /* !defined( NDEBUG ) */
 
         if( ptr_requ_num_objects == SIXTRL_NULLPTR )
         {

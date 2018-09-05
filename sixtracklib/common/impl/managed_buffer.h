@@ -212,7 +212,6 @@ SIXTRL_INLINE void NS(ManagedBuffer_set_section_num_entities)(
     NS(buffer_size_t) const section_id, NS(buffer_size_t) const num_entities,
     NS(buffer_size_t) const slot_size )
 {
-    typedef NS(buffer_size_t)             buf_size_t;
     typedef NS(buffer_addr_t)             address_t;
     typedef SIXTRL_DATAPTR_DEC address_t* ptr_to_addr_t;
 
@@ -220,7 +219,7 @@ SIXTRL_INLINE void NS(ManagedBuffer_set_section_num_entities)(
         )NS(ManagedBuffer_get_ptr_to_section)( begin, section_id, slot_size );
 
     SIXTRL_ASSERT( NS(ManagedBuffer_get_section_entity_size)(
-        begin, section_id, slot_size ) > ( buf_size_t )0u );
+        begin, section_id, slot_size ) > ( NS(buffer_size_t) )0u );
 
     if( ptr_to_section != SIXTRL_NULLPTR )
     {
@@ -238,7 +237,6 @@ SIXTRL_INLINE void NS(ManagedBuffer_set_section_max_size)(
     NS(buffer_size_t) const max_section_size,
     NS(buffer_size_t) const slot_size )
 {
-    typedef NS(buffer_size_t)             buf_size_t;
     typedef NS(buffer_addr_t)             address_t;
     typedef SIXTRL_DATAPTR_DEC address_t* ptr_to_addr_t;
 
@@ -246,7 +244,7 @@ SIXTRL_INLINE void NS(ManagedBuffer_set_section_max_size)(
         )NS(ManagedBuffer_get_ptr_to_section)( begin, section_id, slot_size );
 
     SIXTRL_ASSERT( NS(ManagedBuffer_get_section_entity_size)(
-        begin, section_id, slot_size ) > ( buf_size_t )0u );
+        begin, section_id, slot_size ) > ( NS(buffer_size_t) )0u );
 
     if( ptr_to_section != SIXTRL_NULLPTR )
     {

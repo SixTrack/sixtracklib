@@ -132,6 +132,7 @@ SIXTRL_INLINE NS(buffer_addr_t) NS(Object_get_begin_addr)(
 SIXTRL_INLINE void NS(Object_set_begin_addr)(
     NS(Object)* SIXTRL_RESTRICT object, NS(buffer_addr_t) const begin_addr )
 {
+    #if !defined( NDEBUG )
     typedef unsigned char const*    ptr_to_raw_t;
     typedef NS(buffer_addr_t)       address_t;
 
@@ -141,6 +142,7 @@ SIXTRL_INLINE void NS(Object_set_begin_addr)(
           ( sizeof( address_t    ) == 8u ) &&
           ( ( address_t )NS(ManagedBuffer_get_limit_offset_max)() >
               begin_addr ) ) );
+    #endif /* !defined( NDEBUG ) */
 
     if( object != SIXTRL_NULLPTR ) object->begin_addr = begin_addr;
 }

@@ -385,8 +385,10 @@ SIXTRL_INLINE int NS(Buffer_reserve_generic)(
                 ptr_to_mem_pool_t mem_pool = ( ptr_to_mem_pool_t )(
                     uintptr_t )datastore_addr;
 
+                #if !defined( NDEBUG )
                 address_t const old_base_addr = ( address_t )( uintptr_t
                     )NS(MemPool_get_begin_pos)( mem_pool );
+                #endif /* !defined( NDEBUG ) */
 
                 buf_size_t bytes_missing = requ_buffer_capacity;
 
@@ -872,8 +874,10 @@ SIXTRL_INLINE int NS(Buffer_init_from_data)(
                 ( NS(Buffer_owns_datastore)( buffer ) ) &&
                 ( NS(Buffer_allow_resize)( buffer ) ) )
             {
+                #if !defined( NDEBUG )
                 address_t const datastore_addr =
                     NS(Buffer_get_datastore_begin_addr)( buffer );
+                #endif /* !defined( NDEBUG ) */
 
                 SIXTRL_ASSERT( datastore_addr != ( address_t )0u );
 

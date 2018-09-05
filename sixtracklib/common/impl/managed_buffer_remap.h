@@ -320,9 +320,7 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap_header)(
             if( ( remap_base_addr != ( address_t )0u ) &&
                 ( remap_base_addr == ( address_t )( uintptr_t )begin ) )
             {
-                #if !defined( NDEBUG )
                 SIXTRL_STATIC_VAR address_t const ZERO_ADDR = ( address_t )0u;
-                #endif /* !defined( NDEBUG ) */
 
                 address_t const remap_slots_begin_addr =
                     NS(ManagedBuffer_perform_addr_shift)( header[ SLOTS_ID ],
@@ -444,7 +442,10 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap_section_objects)(
     int success = -1;
 
     SIXTRL_STATIC_VAR buf_size_t const ZERO_SIZE = ( buf_size_t )0u;
+
+    #if !defined( NDEBUG )
     SIXTRL_STATIC_VAR buf_size_t const ZERO_ADDR = ( address_t  )0u;
+    #endif /* !defined( NDEBUG ) */
 
     if( ( begin != SIXTRL_NULLPTR ) &&
         ( offsets != SIXTRL_NULLPTR ) && ( slot_size != ZERO_SIZE ) )
@@ -510,11 +511,13 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap_section_objects)(
                     NS(ManagedBuffer_perform_addr_shift)(
                         obj_begin_addr, slots_addr_offset, slot_size );
 
+                #if !defined( NDEBUG )
                 SIXTRL_ASSERT( ( min_valid_obj_addr % slot_size ) == 0u );
                 SIXTRL_ASSERT(   min_valid_obj_addr <= slots_section_end_addr );
 
                 SIXTRL_ASSERT(   remapped_obj_begin_addr != ZERO_ADDR );
                 SIXTRL_ASSERT( ( remapped_obj_begin_addr % slot_size ) == 0u );
+                #endif /* !defined( NDEBUG ) */
 
                 if( ( remapped_obj_begin_addr < slots_section_begin_addr ) ||
                     ( remapped_obj_begin_addr > slots_section_end_addr   ) ||
