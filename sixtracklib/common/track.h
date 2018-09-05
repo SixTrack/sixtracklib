@@ -256,18 +256,16 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_multipole)(
         zeta -= chi * ( hxlx - hyly );
         NS(Particles_set_zeta_value)( particles, ii, zeta );
 
+        dpx += hxl + hxl * delta;
+        dpy -= hyl + hyl * delta;
+
         if( length > ZERO )
         {
             real_t const b1l = chi * NS(MultiPole_get_bal_value)( mp, 0 );
             real_t const a1l = chi * NS(MultiPole_get_bal_value)( mp, 1 );
 
-            dpx += hxl + hxl * delta - b1l * hxlx / length;
-            dpy -= hyl + hyl * delta - a1l * hyly / length;
-        }
-        else
-        {
-            dpx += hxl + hxl * delta;
-            dpy -= hyl + hyl * delta;
+            dpx -= b1l * hxlx / length;
+            dpy += a1l * hyly / length;
         }
     }
 
@@ -318,7 +316,7 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_srotation)(
     real_t const x  = NS(Particles_get_x_value)(  particles, ii );
     real_t const y  = NS(Particles_get_y_value)(  particles, ii );
     real_t const px = NS(Particles_get_px_value)( particles, ii );
-    real_t const py = NS(Particles_get_px_value)( particles, ii );
+    real_t const py = NS(Particles_get_py_value)( particles, ii );
 
     real_t const x_hat  =  cos_z * x  + sin_z * y;
     real_t const y_hat  = -sin_z * x  + cos_z * y;
@@ -351,7 +349,7 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_cavity)(
     SIXTRL_STATIC_VAR real_t const ONE  = ( real_t )1.0;
     SIXTRL_STATIC_VAR real_t const TWO  = ( real_t )2.0;
 
-    real_t const DEG2RAD  = ( real_t )180.0 / PI;
+    real_t const DEG2RAD  = PI / ( real_t )180.0;
     real_t const K_FACTOR = ( TWO * PI ) / ( real_t )299792458.0;
 
     real_t const   beta0  = NS(Particles_get_beta0_value)(  particles, ii );
