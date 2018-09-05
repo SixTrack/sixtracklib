@@ -20,6 +20,10 @@ int main( int argc, char* argv[] )
     {
         st_Drift* drift = st_Drift_add( eb, length );
         assert( drift != SIXTRL_NULLPTR );
+
+        #if defined( NDEBUG )
+        ( void )drift;
+        #endif /* !defined( NDEBUG ) */
     }
 
     /* --------------------------------------------------------------------- */
