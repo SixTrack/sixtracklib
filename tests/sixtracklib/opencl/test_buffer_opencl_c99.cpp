@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <fstream>
+#include <iterator>
 #include <sstream>
 #include <vector>
 
@@ -18,7 +20,7 @@
 #include "sixtracklib/_impl/path.h"
 #include "sixtracklib/common/buffer.h"
 
-TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
+TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThread )
 {
     using buffer_t      = ::st_Buffer;
     using size_t        = ::st_buffer_size_t;
@@ -31,8 +33,11 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
     size_t const orig_buffer_size = ::st_Buffer_get_size( orig_buffer );
     ASSERT_TRUE( orig_buffer_size > size_t{ 0 } );
 
-    buffer_t* copy_buffer = ::st_Buffer_new( orig_buffer_size );
+    buffer_t* copy_buffer = ::st_Buffer_new( 4096u );
     ASSERT_TRUE( copy_buffer != nullptr );
+    ASSERT_TRUE( copy_buffer != orig_buffer );
+    ASSERT_TRUE( st_Buffer_get_data_begin_addr( orig_buffer ) !=
+                 st_Buffer_get_data_begin_addr( copy_buffer ) );
 
     int success = ::st_Buffer_reserve( copy_buffer,
         ::st_Buffer_get_max_num_of_objects( orig_buffer ),
@@ -51,6 +56,7 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
         ::st_Buffer_get_data_begin( copy_buffer );
 
     ASSERT_TRUE( copy_buffer_begin != nullptr );
+    ASSERT_TRUE( copy_buffer_begin != orig_buffer_begin );
 
     /* --------------------------------------------------------------------- */
 
@@ -70,6 +76,38 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
 
     for( auto const& p : platforms )
     {
+        /* prepare copy buffer */
+
+        ::st_Buffer_clear( copy_buffer, true );
+
+        auto obj_it  = st_Buffer_get_const_objects_begin( orig_buffer );
+        auto obj_end = st_Buffer_get_const_objects_end( orig_buffer );
+
+        for( ; obj_it != obj_end ; ++obj_it )
+        {
+            ::st_GenericObj const* orig_obj = reinterpret_cast<
+                ::st_GenericObj const* >( static_cast< uintptr_t >(
+                    ::st_Object_get_begin_addr( obj_it ) ) );
+
+            ASSERT_TRUE( orig_obj != nullptr );
+            ASSERT_TRUE( orig_obj->type_id ==
+                         ::st_Object_get_type_id( obj_it ) );
+
+            ::st_GenericObj* copy_obj = ::st_GenericObj_new( copy_buffer,
+                orig_obj->type_id, orig_obj->num_d, orig_obj->num_e );
+
+            ASSERT_TRUE( copy_obj != nullptr );
+            ASSERT_TRUE( orig_obj->type_id == copy_obj->type_id );
+            ASSERT_TRUE( orig_obj->num_d   == copy_obj->num_d );
+            ASSERT_TRUE( orig_obj->num_e   == copy_obj->num_e );
+            ASSERT_TRUE( copy_obj->d != nullptr );
+            ASSERT_TRUE( copy_obj->e != nullptr );
+        }
+
+        ASSERT_TRUE( ::st_Buffer_get_num_of_objects( copy_buffer ) ==
+                     ::st_Buffer_get_num_of_objects( orig_buffer ) );
+
+        /* ----------------------------------------------------------------- */
         std::vector< cl::Device > temp_devices;
 
         p.getDevices( CL_DEVICE_TYPE_ALL, &temp_devices );
@@ -92,20 +130,30 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
 
     std::ostringstream a2str;
 
-    std::string const PROGRAM_SOURCE_CODE =
-        "#include \"test_buffer_generic_obj_kernel.cl\"\r\n";
-
     std::string const PATH_TO_BASE_DIR = ::st_PATH_TO_BASE_DIR;
 
     a2str.str( "" );
     a2str << " -D_GPUCODE=1"
           << " -D__NAMESPACE=st_"
+          << " -w"
+          << " -Werror"
           << " -DSIXTRL_DATAPTR_DEC=__global"
           << " -I" << PATH_TO_BASE_DIR
-          << " -I" << PATH_TO_BASE_DIR << "tests/sixtracklib/opencl"
           << " -I" << PATH_TO_BASE_DIR << "tests";
 
     std::string const COMPILE_OPTIONS = a2str.str();
+
+
+    std::string path_to_kernel_source = PATH_TO_BASE_DIR;
+    path_to_kernel_source += "tests/sixtracklib/opencl/test_buffer_generic_obj_kernel.cl";
+
+    std::ifstream kernel_file( path_to_kernel_source, std::ios::in );
+
+    std::string const PROGRAM_SOURCE_CODE(
+        ( std::istreambuf_iterator< char >( kernel_file ) ),
+          std::istreambuf_iterator< char >() );
+
+    kernel_file.close();
 
     for( auto& device : devices )
     {
@@ -136,19 +184,64 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
         cl::Buffer cl_err_flag( context, CL_MEM_READ_WRITE, sizeof( int64_t ) );
         cl::Buffer cl_copy_buf( context, CL_MEM_READ_WRITE, orig_buffer_size );
 
-        cl_ret = queue.enqueueWriteBuffer(
-            cl_orig_buf, CL_TRUE, 0, orig_buffer_size, orig_buffer_begin );
+        try
+        {
+            cl_ret = queue.enqueueWriteBuffer(
+                cl_orig_buf, CL_TRUE, 0, orig_buffer_size, orig_buffer_begin );
+        }
+        catch( cl::Error const& e )
+        {
+            std::cout << "enqueueWriteBuffer( orig_buffer_begin ) :: line = "
+                      << __LINE__
+                      << " :: ERROR : " << e.what() << std::endl
+                      << e.err() << std::endl;
+
+            cl_ret = CL_FALSE;
+            throw;
+        }
+
+        ASSERT_TRUE( cl_ret == CL_SUCCESS );
+
+        try
+        {
+            cl_ret = queue.enqueueWriteBuffer(
+                cl_copy_buf, CL_TRUE, 0, orig_buffer_size, copy_buffer_begin );
+        }
+        catch( cl::Error const& e )
+        {
+            std::cout << "enqueueWriteBuffer( copy_buffer_begin ) :: line = "
+                      << __LINE__
+                      << " :: ERROR : " << e.what() << std::endl
+                      << e.err() << std::endl;
+
+            cl_ret = CL_FALSE;
+            throw;
+        }
 
         ASSERT_TRUE( cl_ret == CL_SUCCESS );
 
         int64_t error_flag = -1;
-        cl_ret = queue.enqueueWriteBuffer(
-            cl_err_flag, CL_TRUE, 0, sizeof( error_flag ), &error_flag );
+
+        try
+        {
+            cl_ret = queue.enqueueWriteBuffer(
+                cl_err_flag, CL_TRUE, 0, sizeof( error_flag ), &error_flag );
+        }
+        catch( cl::Error const& e )
+        {
+            std::cout << "enqueueWriteBuffer( error_flag ) :: line = "
+                      << __LINE__
+                      << " :: ERROR : " << e.what() << std::endl
+                      << e.err() << std::endl;
+
+            cl_ret = CL_FALSE;
+            throw;
+        }
+
+        ASSERT_TRUE( cl_ret == CL_SUCCESS );
 
         int num_threads = ( int )1;
         int block_size  = ( int )1;
-
-        uint64_t n = orig_buffer_size;
 
         cl::Kernel remap_kernel;
 
@@ -156,30 +249,48 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
         {
             remap_kernel = cl::Kernel( program, "st_remap_orig_buffer" );
         }
-        catch( cl::Error const& err )
+        catch( cl::Error const& e )
         {
-            std::cout << "ERROR: " << err.what() << std::endl
-                      << err.err() << std::endl;
-
+            std::cout << "kernel remap_kernel :: line = " << __LINE__
+                      << " :: ERROR : " << e.what() << std::endl
+                      << e.err() << std::endl;
             throw;
         }
 
+        auto num_remap_kernel_args = remap_kernel.getInfo< CL_KERNEL_NUM_ARGS >();
+
+        ASSERT_TRUE( num_remap_kernel_args == 3u );
+
         remap_kernel.setArg( 0, cl_orig_buf );
-        remap_kernel.setArg( 1, n );
+        remap_kernel.setArg( 1, cl_copy_buf );
         remap_kernel.setArg( 2, cl_err_flag );
 
-        cl_ret = queue.enqueueNDRangeKernel( remap_kernel, cl::NullRange,
-            cl::NDRange( num_threads ), cl::NDRange( block_size ) );
+
+        try
+        {
+            cl_ret = queue.enqueueNDRangeKernel( remap_kernel, cl::NullRange,
+                cl::NDRange( num_threads ), cl::NDRange( block_size ) );
+        }
+        catch( cl::Error const& e )
+        {
+            std::cout << "enqueueNDRangeKernel( remap_kernel) :: line = "
+                      << __LINE__
+                      << " :: ERROR : " << e.what() << std::endl
+                      << e.err() << std::endl;
+
+            throw;
+        }
 
         try
         {
             cl_ret = queue.enqueueReadBuffer(
                 cl_err_flag, CL_TRUE, 0, sizeof( error_flag ), &error_flag );
         }
-        catch( cl::Error const& err )
+        catch( cl::Error const& e )
         {
-            std::cout << "ERROR: " << err.what() << std::endl
-                      << err.err() << std::endl;
+            std::cout << "enqueueReadBuffer( error_flag ) :: line = "
+                      << __LINE__ << " :: ERROR : " << e.what() << std::endl
+                      << e.err() << std::endl;
 
             cl_ret = CL_FALSE;
             throw;
@@ -194,21 +305,21 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
         {
             copy_kernel = cl::Kernel( program, "st_copy_orig_buffer" );
         }
-        catch( cl::Error const& err )
+        catch( cl::Error const& e )
         {
-            std::cout << "ERROR: " << err.what() << std::endl
-                      << err.err() << std::endl;
+            std::cout << "kernel copy_kernel :: line = " << __LINE__
+                      << " :: ERROR : " << e.what() << std::endl
+                      << e.err() << std::endl;
 
             throw;
         }
 
         copy_kernel.setArg( 0, cl_orig_buf );
         copy_kernel.setArg( 1, cl_copy_buf );
-        copy_kernel.setArg( 2, n );
-        copy_kernel.setArg( 3, cl_err_flag );
+        copy_kernel.setArg( 2, cl_err_flag );
 
-        num_threads = ( int )1;
         block_size  = ( int )1;
+        num_threads = ( int )1;
 
         cl_ret = queue.enqueueNDRangeKernel( copy_kernel, cl::NullRange,
             cl::NDRange( num_threads ), cl::NDRange( block_size ) );
@@ -220,10 +331,12 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
             cl_ret = queue.enqueueReadBuffer(
                 cl_err_flag, CL_TRUE, 0, sizeof( error_flag ), &error_flag );
         }
-        catch( cl::Error const& err )
+        catch( cl::Error const& e )
         {
-            std::cout << "ERROR: " << err.what() << std::endl
-                      << err.err() << std::endl;
+            std::cout << "enqueueReadBuffer( error_flag ) :: line = "
+                      << __LINE__
+                      << " :: ERROR : " << e.what() << std::endl
+                      << e.err() << std::endl;
 
             cl_ret = CL_FALSE;
             throw;
@@ -236,10 +349,12 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
             cl_ret = queue.enqueueReadBuffer(
                 cl_copy_buf, CL_TRUE, 0, orig_buffer_size, copy_buffer_begin );
         }
-        catch( cl::Error const& err )
+        catch( cl::Error const& e )
         {
-            std::cout << "ERROR: " << err.what() << std::endl
-                      << err.err() << std::endl;
+            std::cout << "enqueueReadBuffer( copy_buffer_begin ) :: line = "
+                      << __LINE__
+                      << " :: ERROR : " << e.what() << std::endl
+                      << e.err() << std::endl;
 
             cl_ret = CL_FALSE;
             throw;
@@ -249,13 +364,64 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
 
         /* ----------------------------------------------------------------- */
 
-//         success = ::st_Buffer_remap( copy_buffer );
-//         ASSERT_TRUE( success == 0 );
-//         ASSERT_TRUE( ::NS(st_Buffer_get_num_of_objects)( copy_buffer ) ==
-//                      ::NS(st_Buffer_get_num_of_objects)( orig_buffer ) );
+        success = ::st_Buffer_remap( copy_buffer );
+        ASSERT_TRUE( success == 0 );
 
-        ::st_Buffer_delete( copy_buffer );
+        ASSERT_TRUE( ::st_Buffer_get_num_of_objects( copy_buffer ) ==
+                     ::st_Buffer_get_num_of_objects( orig_buffer ) );
+
+        auto obj_it  = st_Buffer_get_const_objects_begin( orig_buffer );
+        auto obj_end = st_Buffer_get_const_objects_end( orig_buffer );
+        auto cmp_it  = st_Buffer_get_const_objects_begin( copy_buffer );
+
+        for( ; obj_it != obj_end ; ++obj_it, ++cmp_it )
+        {
+            ::st_GenericObj const* orig_obj = reinterpret_cast<
+                ::st_GenericObj const* >( static_cast< uintptr_t >(
+                    ::st_Object_get_begin_addr( obj_it ) ) );
+
+            ::st_GenericObj const* cmp_obj = reinterpret_cast<
+                ::st_GenericObj const* >( static_cast< uintptr_t >(
+                    ::st_Object_get_begin_addr( cmp_it ) ) );
+
+            ASSERT_TRUE( orig_obj != nullptr );
+            ASSERT_TRUE( cmp_obj  != nullptr );
+            ASSERT_TRUE( cmp_obj  != orig_obj );
+
+            ASSERT_TRUE( orig_obj->type_id == cmp_obj->type_id );
+            ASSERT_TRUE( orig_obj->num_d   == cmp_obj->num_d );
+            ASSERT_TRUE( orig_obj->num_e   == cmp_obj->num_e );
+            ASSERT_TRUE( orig_obj->a       == cmp_obj->a );
+
+            ASSERT_TRUE( std::fabs( orig_obj->a - cmp_obj->a ) <
+                std::numeric_limits< double >::epsilon() );
+
+            for( std::size_t ii = 0 ; ii < 4u ; ++ii )
+            {
+                ASSERT_TRUE( std::fabs( orig_obj->c[ ii ] - cmp_obj->c[ ii ] ) <
+                    std::numeric_limits< double >::epsilon() );
+            }
+
+            if( orig_obj->num_d > 0u )
+            {
+                for( std::size_t ii = 0u ; ii < orig_obj->num_d ; ++ii )
+                {
+                    ASSERT_TRUE( orig_obj->d[ ii ] == cmp_obj->d[ ii ] );
+                }
+            }
+
+            if( orig_obj->num_e > 0u )
+            {
+                for( std::size_t ii = 0u ; ii < orig_obj->num_e ; ++ii )
+                {
+                    ASSERT_TRUE( std::fabs( orig_obj->e[ ii ] - cmp_obj->e[ ii ] )
+                        < std::numeric_limits< double >::epsilon() );
+                }
+            }
+        }
+
         ::st_Buffer_delete( orig_buffer );
+        ::st_Buffer_delete( copy_buffer );
     }
 
 

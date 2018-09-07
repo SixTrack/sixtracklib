@@ -1,3 +1,6 @@
+#ifndef SIXTRL_TESTS_SIXTRACKLIB_OPENCL_TEST_BUFFER_GENERIC_OBJ_KERNEL_CL__
+#define SIXTRL_TESTS_SIXTRACKLIB_OPENCL_TEST_BUFFER_GENERIC_OBJ_KERNEL_CL__
+
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
     #include "sixtracklib/common/impl/managed_buffer_minimal.h"
@@ -7,7 +10,7 @@
 
 __kernel void NS(remap_orig_buffer)(
     __global unsigned char* SIXTRL_RESTRICT orig_begin,
-    SIXTRL_UINT64_T const orig_buffer_length,
+    __global unsigned char* SIXTRL_RESTRICT copy_begin,
     __global SIXTRL_INT64_T* SIXTRL_RESTRICT ptr_err_flag )
 {
     size_t const global_id = get_global_id( 0 );
@@ -15,14 +18,23 @@ __kernel void NS(remap_orig_buffer)(
 
     if( gid_to_remap_buffer == global_id )
     {
-        long int error_flag = -1;
+        long int error_flag = 0;
+
         NS(buffer_size_t) const slot_size = ( NS(buffer_size_t) )8u;
         int success = NS(ManagedBuffer_remap)( orig_begin, slot_size );
 
-        if( ( success == 0 ) &&
-            ( !NS(ManagedBuffer_needs_remapping)( orig_begin, slot_size ) ) )
+        if( ( success != 0 ) ||
+            ( NS(ManagedBuffer_needs_remapping)( orig_begin, slot_size ) ) )
         {
-            error_flag = 0;
+            error_flag |= -1;
+        }
+
+        success = NS(ManagedBuffer_remap)( copy_begin, slot_size );
+
+        if( ( success != 0 ) ||
+            ( NS(ManagedBuffer_needs_remapping)( copy_begin, slot_size ) ) )
+        {
+            error_flag |= -2;
         }
 
         if( ptr_err_flag != SIXTRL_NULLPTR )
@@ -37,8 +49,7 @@ __kernel void NS(remap_orig_buffer)(
 
 __kernel void NS(copy_orig_buffer)(
     __global unsigned char const* SIXTRL_RESTRICT orig_begin,
-    __global unsigned char* SIXTRL_RESTRICT copy_begin,
-    SIXTRL_UINT64_T const buffer_length,
+    __global unsigned char*  SIXTRL_RESTRICT copy_begin,
     __global SIXTRL_INT64_T* SIXTRL_RESTRICT ptr_err_flag )
 {
     size_t const global_id   = get_global_id( 0 );
@@ -47,12 +58,19 @@ __kernel void NS(copy_orig_buffer)(
     if( gid_to_copy == global_id )
     {
         typedef __global NS(Object) const* in_index_ptr_t;
+        typedef __global NS(Object)*      out_index_ptr_t;
 
-        long int error_flag = -1;
+        typedef __global NS(GenericObj) const* in_obj_ptr_t;
+        typedef __global NS(GenericObj)*      out_obj_ptr_t;
+
+        long int error_flag = 0;
         NS(buffer_size_t) const slot_size = ( NS(buffer_size_t) )8u;
 
-        if( !NS(ManagedBuffer_needs_remapping)( copy_begin, slot_size ) )
+        if( ( !NS(ManagedBuffer_needs_remapping)( orig_begin, slot_size ) ) &&
+            ( !NS(ManagedBuffer_needs_remapping)( copy_begin, slot_size ) ) )
         {
+            unsigned int obj_index = ( unsigned int )0u;
+
             in_index_ptr_t in_it = ( in_index_ptr_t )( uintptr_t
                 )NS(ManagedBuffer_get_const_objects_index_begin)(
                     orig_begin, slot_size );
@@ -61,64 +79,57 @@ __kernel void NS(copy_orig_buffer)(
                 )NS(ManagedBuffer_get_const_objects_index_end)(
                     orig_begin, slot_size );
 
-            for( ; in_it != in_end ; ++in_it )
+            out_index_ptr_t out_it = ( out_index_ptr_t )( uintptr_t
+               )NS(ManagedBuffer_get_objects_index_begin)( copy_begin, slot_size );
+
+            for( ; in_it != in_end ; ++in_it, ++out_it, ++obj_index )
             {
-                NS(Object) info = *in_it;
-                __global NS(GenericObj)* ptr_obj = ( __global NS(GenericObj)* )(
-                    uintptr_t )NS(Object_get_begin_ptr)( &info );
+                NS(Object) const in_info = *in_it;
+                NS(Object) out_info      = *out_it;
 
-                printf( "type_id: %6d\r\n", NS(Object_get_type_id)( &info ) );
-                printf( "size   : %6d\r\n", NS(Object_get_size)( &info ) );
-                printf( "\r\n" );
-                printf( "object_info: \r\n" );
-                printf( "obj->type_id:   %8d\r\n", ( int )ptr_obj->type_id );
-                printf( "obj->a      :   %8d\r\n", ( int )ptr_obj->a );
-                printf( "obj->b      :   %8.2f\r\n", ( int )ptr_obj->b );
-                printf( "obj->c      :  [ %8.2f , %8.2f , %8.2f , %8.2f  ]\r\n",
-                        ptr_obj->c[ 0 ], ptr_obj->c[ 1 ],
-                        ptr_obj->c[ 2 ], ptr_obj->c[ 3 ] );
+                in_obj_ptr_t in_obj = ( in_obj_ptr_t )( uintptr_t
+                    )NS(Object_get_const_begin_ptr)( &in_info );
 
-                printf( "obj->num_d  :  %8d\r\n", ( int )ptr_obj->num_d );
-                printf( "obj->num_e  :  %8d\r\n", ( int )ptr_obj->num_e );
+                out_obj_ptr_t out_obj = ( out_obj_ptr_t )( uintptr_t
+                    )NS(Object_get_begin_ptr)( &out_info );
 
-                if( ptr_obj->num_d < 10 )
+                if( ( out_obj != SIXTRL_NULLPTR ) &&
+                    ( in_obj  != SIXTRL_NULLPTR ) &&
+                    ( out_obj != in_obj ) &&
+                    ( out_obj->type_id == in_obj->type_id ) &&
+                    ( out_obj->num_d   == in_obj->num_d   ) &&
+                    ( out_obj->num_e   == in_obj->num_e   ) &&
+                    ( out_obj->d != in_obj->d ) &&
+                    ( out_obj->d != SIXTRL_NULLPTR ) &&
+                    ( in_obj->d  != SIXTRL_NULLPTR ) &&
+                    ( out_obj->e != SIXTRL_NULLPTR ) &&
+                    ( in_obj->e  != SIXTRL_NULLPTR ) )
                 {
-                    int ii = 0;
+                    out_obj->a = in_obj->a;
+                    out_obj->b = in_obj->b;
 
-                    printf( "obj->d      : [ " );
+                    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T,
+                         &out_obj->c[ 0 ], &in_obj->c[ 0 ], ( size_t )4u );
 
-                    for( ; ii < ( int )ptr_obj->num_d ; ++ii )
-                    {
-                        printf( "%4d, ", ( int )ptr_obj->d[ ii ] );
-                    }
+                    SIXTRACKLIB_COPY_VALUES( SIXTRL_UINT8_T,
+                         out_obj->d, in_obj->d, in_obj->num_d );
 
-                    printf( " ]\r\n" );
+                    SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T,
+                         out_obj->e, in_obj->e, in_obj->num_e );
                 }
-
-                if( ptr_obj->num_e < 10 )
+                else
                 {
-                    int ii = 0;
+                    printf( "missmatch between %u th input/output object\r\n",
+                            obj_index );
 
-                    printf( "obj->e      : [ " );
-
-                    for( ; ii < ( int )ptr_obj->num_d ; ++ii )
-                    {
-                        printf( "%8.2f, ", ( int )ptr_obj->e[ ii ] );
-                    }
-
-                    printf( "] \r\n" );
+                    error_flag |= -( int )( obj_index << 2 );
                 }
-
-                printf( "\r\n" );
-
             }
-
-            error_flag = 0;
         }
-
-        /*
-        error_flag |= ( 0 == NS(ManagedBuffer_remap)(
-            copy_begin, slot_size ) ) ? 0 : -1; */
+        else
+        {
+            error_flag |= -1;
+        }
 
         if( ptr_err_flag != SIXTRL_NULLPTR )
         {
@@ -128,5 +139,7 @@ __kernel void NS(copy_orig_buffer)(
 
     return;
 }
+
+#endif /* SIXTRL_TESTS_SIXTRACKLIB_OPENCL_TEST_BUFFER_GENERIC_OBJ_KERNEL_CL__ */
 
 /* end: tests/sixtracklib/opencl/test_buffer_generic_obj_kernel.cl */
