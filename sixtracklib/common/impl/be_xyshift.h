@@ -47,6 +47,8 @@ SIXTRL_FN SIXTRL_STATIC void NS(XYShift_set_dy)(
     SIXTRL_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift,
     NS(xyshift_real_t) const dy );
 
+#if !defined( _GPUCODE )
+
 SIXTRL_FN SIXTRL_STATIC bool NS(XYShift_can_be_added)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
@@ -61,6 +63,8 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(XYShift)* NS(XYShift_add)(
     NS(xyshift_real_t)  const dx,
     NS(xyshift_real_t)  const dy );
 
+#endif /* !defined( _GPUCODE )*/
+
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
@@ -70,7 +74,9 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(XYShift)* NS(XYShift_add)(
 /* ************************************************************************* */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/buffer.h"
+    #if !defined( _GPUCODE )
+        #include "sixtracklib/common/buffer.h"
+    #endif /* !defined( _GPUCODE ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -128,6 +134,8 @@ SIXTRL_INLINE void NS(XYShift_set_dy)(
     return;
 }
 
+#if !defined( _GPUCODE )
+
 SIXTRL_INLINE bool NS(XYShift_can_be_added)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
@@ -169,6 +177,8 @@ SIXTRL_INLINE SIXTRL_ARGPTR_DEC NS(XYShift)* NS(XYShift_add)(
             NS(OBJECT_TYPE_XYSHIFT), 0u, SIXTRL_NULLPTR, SIXTRL_NULLPTR,
                 SIXTRL_NULLPTR ) );
 }
+
+#endif /* #if !defined( _GPUCODE ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }

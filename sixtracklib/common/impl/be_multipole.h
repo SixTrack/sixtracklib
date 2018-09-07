@@ -123,6 +123,8 @@ SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_set_ksl_value)(
     NS(multipole_real_t) const ksl_i );
 
 
+#if !defined( _GPUCODE )
+
 SIXTRL_FN SIXTRL_STATIC bool NS(MultiPole_can_be_added)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     NS(multipole_order_t) const order,
@@ -142,6 +144,8 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(MultiPole)* NS(MultiPole_add)(
     NS(multipole_real_t)  const hxl,
     NS(multipole_real_t)  const hyl );
 
+#endif /* !defined( _GPUCODE ) */
+
 /* ========================================================================= */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -153,7 +157,9 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(MultiPole)* NS(MultiPole_add)(
 /* ************************************************************************* */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #if !defined( _GPUCODE )
     #include "sixtracklib/common/buffer.h"
+    #endif /* !defined( _GPUCODE ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -482,6 +488,8 @@ SIXTRL_INLINE void NS(MultiPole_set_ksl_value)(
     return;
 }
 
+#if !defined( _GPUCODE )
+
 SIXTRL_INLINE bool NS(MultiPole_can_be_added)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     NS(multipole_order_t) const order,
@@ -629,6 +637,8 @@ SIXTRL_INLINE SIXTRL_ARGPTR_DEC NS(MultiPole)* NS(MultiPole_add)(
 
     return ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)( ptr_obj );
 }
+
+#endif /* !defined( _GPUCODE ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }

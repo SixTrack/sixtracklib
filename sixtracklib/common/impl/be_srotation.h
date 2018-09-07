@@ -53,6 +53,8 @@ SIXTRL_FN SIXTRL_STATIC void NS(SRotation_set_angle_deg)(
     SIXTRL_ARGPTR_DEC NS(SRotation)* SIXTRL_RESTRICT srotation,
     SIXTRL_REAL_T const angle_deg );
 
+#if !defined( _GPUCODE )
+
 SIXTRL_FN SIXTRL_STATIC bool NS(SRotation_can_be_added)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
@@ -71,6 +73,8 @@ NS(SRotation_add_detailed)(
     SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_REAL_T const cos_z, SIXTRL_REAL_T const sin_z );
 
+#endif /* !defined( _GPUCODE ) */
+
 /* ========================================================================= */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -86,7 +90,9 @@ NS(SRotation_add_detailed)(
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/buffer.h"
+    #if !defined( _GPUCODE )
+        #include "sixtracklib/common/buffer.h"
+    #endif /* !defined( _GPUCODE ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -183,6 +189,8 @@ SIXTRL_INLINE void NS(SRotation_set_angle_deg)(
     return;
 }
 
+#if !defined( _GPUCODE )
+
 SIXTRL_INLINE bool NS(SRotation_can_be_added)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
@@ -248,6 +256,8 @@ SIXTRL_INLINE SIXTRL_ARGPTR_DEC NS(SRotation)* NS(SRotation_add_detailed)(
             NS(OBJECT_TYPE_SROTATION), num_dataptrs,
                 SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
 }
+
+#endif /* !defined( _GPUCODE ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
