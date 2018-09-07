@@ -617,7 +617,6 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN
 NS(Track_particle_beam_element)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
     NS(particle_num_elements_t) index,
-    NS(particle_num_elements_t) const index_end,
     SIXTRL_DATAPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_info )
 {
     typedef NS(object_type_id_t)    type_id_t;
@@ -629,8 +628,8 @@ NS(Track_particle_beam_element)(
     address_t const begin_addr = NS(Object_get_begin_addr)( be_info );
 
     SIXTRL_ASSERT( begin_addr != ( address_t )0u );
-    SIXTRL_ASSERT( ii >= ( NS(particle_num_elements_t) )0 );
-    SIXTRL_ASSERT( ii <  NS(Particles_get_num_of_particles)( p ) );
+    SIXTRL_ASSERT( index >= ( NS(particle_num_elements_t) )0 );
+    SIXTRL_ASSERT( index <  NS(Particles_get_num_of_particles)( p ) );
 
     switch( type_id )
     {
