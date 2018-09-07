@@ -34,6 +34,7 @@ set( SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS
      ../testlib.h )
 
 set( SIXTRACKL_TESTLIB_HEADERS
+     generic_buffer_obj.h
      gpu_kernel_tools.h
      random.h
      time_tools.h
