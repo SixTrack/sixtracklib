@@ -21,14 +21,14 @@ extern "C" {
 
 typedef struct NS(GenericObj)
 {
-    NS(object_type_id_t) type_id  SIXTRL_ALIGN( 8u );
-    SIXTRL_INT32_T a SIXTRL_ALIGN( 8u );
-    SIXTRL_REAL_T b SIXTRL_ALIGN( 8u );
-    SIXTRL_REAL_T c[ 4 ] SIXTRL_ALIGN( 8u );
-    SIXTRL_UINT64_T num_d SIXTRL_ALIGN( 8u );
+    NS(object_type_id_t) type_id                         SIXTRL_ALIGN( 8u );
+    SIXTRL_INT32_T a                                     SIXTRL_ALIGN( 8u );
+    SIXTRL_REAL_T b                                      SIXTRL_ALIGN( 8u );
+    SIXTRL_REAL_T c[ 4 ]                                 SIXTRL_ALIGN( 8u );
+    SIXTRL_UINT64_T num_d                                SIXTRL_ALIGN( 8u );
     SIXTRL_DATAPTR_DEC SIXTRL_UINT8_T* SIXTRL_RESTRICT d SIXTRL_ALIGN( 8u );
-    SIXTRL_UINT64_T num_e SIXTRL_ALIGN( 8u );
-    SIXTRL_DATAPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT e SIXTRL_ALIGN( 8u );
+    SIXTRL_UINT64_T num_e                                SIXTRL_ALIGN( 8u );
+    SIXTRL_DATAPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT e  SIXTRL_ALIGN( 8u );
 }
 NS(GenericObj);
 

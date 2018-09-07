@@ -77,7 +77,7 @@ int main()
         obj4_a_value, obj4_b_value,
         &obj4_c_value[ 0 ], &obj4_d_value[ 0 ], &obj4_e_value[ 0 ] );
 
-    type_id_t  const obj5_type_id   = ( type_id_t )4;
+    type_id_t  const obj5_type_id   = ( type_id_t )5;
     buf_size_t const obj5_num_d_values = 100;
     buf_size_t const obj5_num_e_values = 256;
 
