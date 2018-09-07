@@ -117,6 +117,16 @@ NS(ManagedBuffer_get_const_objects_index_end)(
     SIXTRL_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT end,
     NS(buffer_size_t) const slot_size );
 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_DATAPTR_DEC NS(Object)*
+NS(ManagedBuffer_get_objects_index_begin)(
+    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) slot_size );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_DATAPTR_DEC NS(Object)*
+NS(ManagedBuffer_get_objects_index_end)(
+    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT end,
+    NS(buffer_size_t) const slot_size );
+
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(ManagedBuffer_get_num_objects)(
     SIXTRL_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) slot_size );
@@ -643,6 +653,26 @@ NS(ManagedBuffer_get_const_objects_index_end)(
 
     return end_ptr + NS(ManagedBuffer_get_section_num_entities)(
         begin, OBJECTS_ID, slot_size );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE SIXTRL_DATAPTR_DEC NS(Object)*
+NS(ManagedBuffer_get_objects_index_begin)(
+    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) slot_size )
+{
+    return ( SIXTRL_DATAPTR_DEC NS(Object)*
+        )NS(ManagedBuffer_get_const_objects_index_begin)( begin, slot_size );
+}
+
+SIXTRL_INLINE SIXTRL_DATAPTR_DEC NS(Object)*
+NS(ManagedBuffer_get_objects_index_end)(
+    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) const slot_size )
+{
+    return ( SIXTRL_DATAPTR_DEC NS(Object)*
+        )NS(ManagedBuffer_get_const_objects_index_end)( begin, slot_size );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
