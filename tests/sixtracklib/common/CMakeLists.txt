@@ -172,6 +172,20 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_common_c99 )
     add_test( C99_CommonTrackTests test_track_common_c99 )
 
+    # --------------------------------------------------------------------------
+
+    if( SIXTRACKL_ENABLE_AUTOVECTORIZATION )
+        add_executable( test_track_common_autovec_c99 test_track_c99.cpp )
+        set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_common_autovec_c99 )
+
+        target_compile_options( test_track_common_autovec_c99 BEFORE PRIVATE
+            -ftree-vectorize -ftree-vectorizer-verbose=6 -fopt-info-loop
+            -fno-fast-math --param vect-max-version-for-alias-checks=150 )
+
+        add_test( C99_CommonTrackTestsAutoVec test_track_common_autovec_c99 )
+
+    endif()
+
     # *************************************************************************
     # Set all properties:
 
