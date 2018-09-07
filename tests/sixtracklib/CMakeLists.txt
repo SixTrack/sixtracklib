@@ -26,7 +26,7 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
 #     add_custom_target( testdata DEPENDS testdata_common )
 
 #     if( SIXTRACKL_ENABLE_OPENCL )
-#         add_subdirectory( opencl )
+        add_subdirectory( opencl )
 #     endif()
 
 #     if( SIXTRACKL_ENABLE_CUDA )

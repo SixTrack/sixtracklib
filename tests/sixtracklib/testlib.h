@@ -10,7 +10,7 @@
 
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/_impl/namespace_begin.h"
-
+#include "sixtracklib/testlib/generic_buffer_obj.h"
 #include "sixtracklib/testlib/gpu_kernel_tools.h"
 #include "sixtracklib/testlib/random.h"
 #include "sixtracklib/testlib/time_tools.h"

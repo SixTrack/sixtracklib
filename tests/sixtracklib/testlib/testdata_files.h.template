@@ -31,6 +31,15 @@ static char const NS(PATH_TO_TEST_FADDEEVA_ERRFN_DATA)[] =
 
 /* ************************************************************************ */
 /* ****                                                                **** */
+/* ****     Testdata for NS(Buffer) and NS(ManagedBuffer) operation    **** */
+/* ****                                                                **** */
+/* ************************************************************************ */
+
+static char const NS(PATH_TO_TEST_GENERIC_OBJ_BUFFER_DATA)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/test_buffer_generic_obj.bin";
+
+/* ************************************************************************ */
+/* ****                                                                **** */
 /* ****        Randomly Generated Tracking Test-Data Files             **** */
 /* ****                                                                **** */
 /* ************************************************************************ */
