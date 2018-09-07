@@ -28,19 +28,23 @@
     #define NS(name) NS_CONCAT( __NAMESPACE, name )
 #endif /* !defined( NS ) */
 
+#if !defined( _GPUCODE )
 #if !defined( NSVAR )
     #define NSVAR(name, ...) \
         NS_CONCAT( __NAMESPACE, NS_CONCAT( #name, ##__VA_ARGS__ ) )
 #endif /* !defined( NSVAR ) */
+#endif /* !defined( _GPUCODE ) */
 
 #if !defined( NSEXT )
     #define NSEXT( ns, name ) NS_CONCAT( #ns, #name )
 #endif /* !defined( NS_EXT ) */
 
+#if !defined( _GPUCODE )
 #if !defined( NSEXTVAR )
     #define NSEXTVAR( ns, name, ... ) \
         NS_CONCAT( NS_CONCAT( #ns, "_" ), NS_CONCAT( #name, ##__VA_ARGS__ ) )
 #endif /* !defined( NSEXTVAR ) */
+#endif /* !defined( _GPUCODE ) */
 
 #endif /* SIXTRACKLIB__IMPL_NAMESPACE_BEGIN_H__ */
 
