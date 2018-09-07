@@ -41,36 +41,36 @@ SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(ManagedBuffer_perform_addr_shift)(
 SIXTRL_FN SIXTRL_STATIC int
 NS(ManagedBuffer_get_addr_offset)( SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t)*
         SIXTRL_RESTRICT ptr_to_addr_offset,
-    SIXTRL_ARGPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap_header)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap_section_slots)(
-    SIXTRL_ARGPTR_DEC unsigned char*  SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char*  SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap_section_objects)(
-    SIXTRL_ARGPTR_DEC unsigned char*      SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char*      SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap_section_dataptrs)(
-    SIXTRL_ARGPTR_DEC unsigned char*      SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char*      SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap_section_garbage)(
-    SIXTRL_ARGPTR_DEC unsigned char*      SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char*      SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -93,21 +93,21 @@ extern "C" {
 SIXTRL_INLINE NS(buffer_addr_diff_t) NS(ManagedBuffer_get_limit_offset_max)()
 {
     #if defined( _GPUCODE )
-         #if defined( __OPENCL_VERSION__ ) &&
-             defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) &&
-             ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
+        #if defined( __OPENCL_VERSION__ )
 
             SIXTRL_ASSERT( sizeof( NS(buffer_addr_diff_t) >=
-                           sizeof( ptr_to_raw_t ) );
+                           sizeof( ptr_to_raw_t ) ) );
 
-            SIXTRL_STATIC_VAR addr_diff_t const LIMIT_OFFSET_MAX = LONG_MAX;
+            SIXTRL_STATIC_VAR NS(buffer_addr_diff_t) const
+                LIMIT_OFFSET_MAX = LONG_MAX;
 
-        #elif defined( __CUDACC__ ) &&
-              defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) &&
-              ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
+        #elif defined( __CUDACC__ )
 
-            SIXTRL_ASSERT( sizeof( addr_diff_t ) >= sizeof( long long int ) );
-            SIXTRL_STATIC_VAR addr_diff_t const LIMIT_OFFSET_MAX = NPP_MAX_64S;
+            SIXTRL_ASSERT( sizeof( NS(buffer_addr_diff_t) ) >=
+                           sizeof( long long int ) );
+
+            SIXTRL_STATIC_VAR NS(buffer_addr_diff_t) const
+                LIMIT_OFFSET_MAX = NPP_MAX_64S;
 
         #endif /* defined( __OPENCL_VERSION__ ) */
     #elif defined( __cplusplus )
@@ -138,21 +138,25 @@ SIXTRL_INLINE NS(buffer_addr_diff_t)
     NS(ManagedBuffer_get_limit_offset_min)( void )
 {
     #if defined( _GPUCODE )
-         #if defined( __OPENCL_VERSION__ ) &&
-             defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) &&
-             ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
+         #if defined( __OPENCL_VERSION__ ) /* && \
+             defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
+             ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 ) */
 
             SIXTRL_ASSERT( sizeof( NS(buffer_addr_diff_t) >=
-                           sizeof( ptr_to_raw_t ) );
+                           sizeof( ptr_to_raw_t ) ) );
 
-            SIXTRL_STATIC_VAR addr_diff_t const LIMIT_OFFSET_MIN = LONG_MIN;
+            SIXTRL_STATIC_VAR NS(buffer_addr_diff_t) const
+                LIMIT_OFFSET_MIN = LONG_MIN;
 
-        #elif defined( __CUDACC__ ) &&
-              defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) &&
-              ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
+        #elif defined( __CUDACC__ ) /* && \
+              defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
+              ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 ) */
 
-            SIXTRL_ASSERT( sizeof( addr_diff_t ) >= sizeof( long long int ) );
-            SIXTRL_STATIC_VAR addr_diff_t const LIMIT_OFFSET_MIN = NPP_MIN_64S;
+            SIXTRL_ASSERT( sizeof( NS(buffer_addr_diff_t) ) >=
+                           sizeof( long long int ) );
+
+            SIXTRL_STATIC_VAR NS(buffer_addr_diff_t) const
+                LIMIT_OFFSET_MIN = NPP_MIN_64S;
 
         #endif /* defined( __OPENCL_VERSION__ ) */
     #elif defined( __cplusplus )
@@ -223,13 +227,13 @@ SIXTRL_INLINE NS(buffer_addr_t) NS(ManagedBuffer_perform_addr_shift)(
 
 SIXTRL_INLINE int NS(ManagedBuffer_get_addr_offset)(
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t)* SIXTRL_RESTRICT ptr_addr_offset,
-    SIXTRL_ARGPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size )
 {
     typedef NS(buffer_size_t)       buf_size_t;
     typedef NS(buffer_addr_t)       address_t;
     typedef NS(buffer_addr_diff_t)  addr_diff_t;
-    typedef address_t*              ptr_to_addr_t;
+    typedef SIXTRL_DATAPTR_DEC address_t* ptr_to_addr_t;
 
     int success = -1;
 
@@ -263,14 +267,14 @@ SIXTRL_INLINE int NS(ManagedBuffer_get_addr_offset)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE int NS(ManagedBuffer_remap_header)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size )
 {
     typedef NS(buffer_size_t)                   buf_size_t;
     typedef NS(buffer_addr_diff_t)              addr_diff_t;
     typedef NS(buffer_addr_t)                   address_t;
-    typedef SIXTRL_ARGPTR_DEC address_t*        ptr_to_addr_t;
+    typedef SIXTRL_DATAPTR_DEC address_t*       ptr_to_addr_t;
 
     int success = -1;
 
@@ -387,13 +391,13 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap_header)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE int NS(ManagedBuffer_remap_section_slots)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size )
 {
     typedef NS(buffer_size_t)               buf_size_t;
     typedef NS(buffer_addr_t)               address_t;
-    typedef SIXTRL_ARGPTR_DEC address_t*    ptr_to_addr_t;
+    typedef SIXTRL_DATAPTR_DEC address_t*   ptr_to_addr_t;
 
     int success = -1;
 
@@ -428,16 +432,16 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap_section_slots)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE int NS(ManagedBuffer_remap_section_objects)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size )
 {
     typedef NS(buffer_size_t)               buf_size_t;
     typedef NS(buffer_addr_t)               address_t;
     typedef NS(buffer_addr_diff_t)          addr_diff_t;
-    typedef SIXTRL_ARGPTR_DEC address_t*    ptr_to_addr_t;
+    typedef SIXTRL_DATAPTR_DEC address_t*   ptr_to_addr_t;
     typedef struct NS(Object)               object_t;
-    typedef SIXTRL_ARGPTR_DEC object_t*     ptr_to_object_t;
+    typedef SIXTRL_DATAPTR_DEC object_t*    ptr_to_object_t;
 
     int success = -1;
 
@@ -498,14 +502,15 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap_section_objects)(
 
             for( ; obj_it != obj_end ; ++obj_it )
             {
-                buf_size_t const obj_size = NS(Object_get_size)( obj_it );
+                object_t obj_info = *obj_it;
+                buf_size_t const obj_size = NS(Object_get_size)( &obj_info );
 
                 buf_size_t const obj_offset =
                     NS(ManagedBuffer_get_slot_based_length)(
                         obj_size, slot_size );
 
                 address_t const obj_begin_addr =
-                    NS(Object_get_begin_addr)( obj_it );
+                    NS(Object_get_begin_addr)( &obj_info );
 
                 address_t const remapped_obj_begin_addr =
                     NS(ManagedBuffer_perform_addr_shift)(
@@ -528,7 +533,8 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap_section_objects)(
                 }
 
                 min_valid_obj_addr = remapped_obj_begin_addr + obj_offset;
-                NS(Object_set_begin_addr)( obj_it, remapped_obj_begin_addr );
+                NS(Object_set_begin_addr)( &obj_info, remapped_obj_begin_addr );
+                *obj_it = obj_info;
             }
         }
     }
@@ -539,14 +545,14 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap_section_objects)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE int NS(ManagedBuffer_remap_section_dataptrs)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size )
 {
-    typedef NS(buffer_size_t)            buf_size_t;
-    typedef NS(buffer_addr_t)            address_t;
-    typedef NS(buffer_addr_diff_t)       addr_diff_t;
-    typedef SIXTRL_ARGPTR_DEC address_t* ptr_to_addr_t;
+    typedef NS(buffer_size_t)             buf_size_t;
+    typedef NS(buffer_addr_t)             address_t;
+    typedef NS(buffer_addr_diff_t)        addr_diff_t;
+    typedef SIXTRL_DATAPTR_DEC address_t* ptr_to_addr_t;
 
     int success = -1;
 
@@ -640,16 +646,16 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap_section_dataptrs)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE int NS(ManagedBuffer_remap_section_garbage)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     SIXTRL_ARGPTR_DEC NS(buffer_addr_diff_t) const* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const slot_size )
 {
     typedef NS(buffer_size_t)                   buf_size_t;
     typedef NS(buffer_addr_t)                   address_t;
     typedef NS(buffer_addr_diff_t)              addr_diff_t;
-    typedef SIXTRL_ARGPTR_DEC  address_t*       ptr_to_addr_t;
+    typedef SIXTRL_DATAPTR_DEC  address_t*      ptr_to_addr_t;
     typedef NS(BufferGarbage)                   garbage_range_t;
-    typedef SIXTRL_ARGPTR_DEC garbage_range_t*  ptr_to_garbage_t;
+    typedef SIXTRL_DATAPTR_DEC garbage_range_t* ptr_to_garbage_t;
 
     int success = -1;
 
@@ -700,6 +706,7 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap_section_garbage)(
 
             for( ; it != end ; ++it )
             {
+                #if !defined( _GPUCODE )
                 address_t const garbage_begin_addr =
                     NS(BufferGarbage_get_begin_addr)( it );
 
@@ -717,6 +724,7 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap_section_garbage)(
                     success = -1;
                     break;
                 }
+                #endif /* !defined( _GPUCODE ) */
             }
         }
     }
@@ -727,7 +735,7 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap_section_garbage)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE int NS(ManagedBuffer_remap)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size )
 {
     typedef NS(buffer_addr_diff_t) addr_diff_t;
