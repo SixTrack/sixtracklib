@@ -15,9 +15,10 @@
 #include "sixtracklib/testlib.h"
 
 #include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/_impl/path.h"
 #include "sixtracklib/common/buffer.h"
 
-TEST( C99_OpenCLBuffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
+TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
 {
     using buffer_t      = ::st_Buffer;
     using size_t        = ::st_buffer_size_t;
@@ -94,7 +95,7 @@ TEST( C99_OpenCLBuffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
     std::string const PROGRAM_SOURCE_CODE =
         "#include \"test_buffer_generic_obj_kernel.cl\"\r\n";
 
-    std::string const PATH_TO_BASE_DIR( "/home/martin/git/sixtracklib/" );
+    std::string const PATH_TO_BASE_DIR = ::st_PATH_TO_BASE_DIR;
 
     a2str.str( "" );
     a2str << " -D_GPUCODE=1"
@@ -170,8 +171,19 @@ TEST( C99_OpenCLBuffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
         cl_ret = queue.enqueueNDRangeKernel( remap_kernel, cl::NullRange,
             cl::NDRange( num_threads ), cl::NDRange( block_size ) );
 
-        cl_ret = queue.enqueueReadBuffer(
-            cl_err_flag, CL_TRUE, 0, sizeof( error_flag ), &error_flag );
+        try
+        {
+            cl_ret = queue.enqueueReadBuffer(
+                cl_err_flag, CL_TRUE, 0, sizeof( error_flag ), &error_flag );
+        }
+        catch( cl::Error const& err )
+        {
+            std::cout << "ERROR: " << err.what() << std::endl
+                      << err.err() << std::endl;
+
+            cl_ret = CL_FALSE;
+            throw;
+        }
 
         ASSERT_TRUE( cl_ret == CL_SUCCESS );
         ASSERT_TRUE( error_flag == int64_t{ 0 } );
@@ -203,13 +215,35 @@ TEST( C99_OpenCLBuffer, InitWithGenericObjDataCopyToDeviceCopyBackCmp )
 
         ASSERT_TRUE( cl_ret == CL_SUCCESS );
 
-        cl_ret = queue.enqueueReadBuffer(
-            cl_err_flag, CL_TRUE, 0, sizeof( error_flag ), &error_flag );
+        try
+        {
+            cl_ret = queue.enqueueReadBuffer(
+                cl_err_flag, CL_TRUE, 0, sizeof( error_flag ), &error_flag );
+        }
+        catch( cl::Error const& err )
+        {
+            std::cout << "ERROR: " << err.what() << std::endl
+                      << err.err() << std::endl;
+
+            cl_ret = CL_FALSE;
+            throw;
+        }
 
         ASSERT_TRUE( cl_ret == CL_SUCCESS );
 
-        cl_ret = queue.enqueueReadBuffer(
-            cl_copy_buf, CL_TRUE, 0, orig_buffer_size, copy_buffer_begin );
+        try
+        {
+            cl_ret = queue.enqueueReadBuffer(
+                cl_copy_buf, CL_TRUE, 0, orig_buffer_size, copy_buffer_begin );
+        }
+        catch( cl::Error const& err )
+        {
+            std::cout << "ERROR: " << err.what() << std::endl
+                      << err.err() << std::endl;
+
+            cl_ret = CL_FALSE;
+            throw;
+        }
 
         ASSERT_TRUE( cl_ret == CL_SUCCESS );
 
