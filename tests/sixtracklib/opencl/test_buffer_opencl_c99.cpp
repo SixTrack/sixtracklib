@@ -76,38 +76,6 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThre
 
     for( auto const& p : platforms )
     {
-        /* prepare copy buffer */
-
-        ::st_Buffer_clear( copy_buffer, true );
-
-        auto obj_it  = st_Buffer_get_const_objects_begin( orig_buffer );
-        auto obj_end = st_Buffer_get_const_objects_end( orig_buffer );
-
-        for( ; obj_it != obj_end ; ++obj_it )
-        {
-            ::st_GenericObj const* orig_obj = reinterpret_cast<
-                ::st_GenericObj const* >( static_cast< uintptr_t >(
-                    ::st_Object_get_begin_addr( obj_it ) ) );
-
-            ASSERT_TRUE( orig_obj != nullptr );
-            ASSERT_TRUE( orig_obj->type_id ==
-                         ::st_Object_get_type_id( obj_it ) );
-
-            ::st_GenericObj* copy_obj = ::st_GenericObj_new( copy_buffer,
-                orig_obj->type_id, orig_obj->num_d, orig_obj->num_e );
-
-            ASSERT_TRUE( copy_obj != nullptr );
-            ASSERT_TRUE( orig_obj->type_id == copy_obj->type_id );
-            ASSERT_TRUE( orig_obj->num_d   == copy_obj->num_d );
-            ASSERT_TRUE( orig_obj->num_e   == copy_obj->num_e );
-            ASSERT_TRUE( copy_obj->d != nullptr );
-            ASSERT_TRUE( copy_obj->e != nullptr );
-        }
-
-        ASSERT_TRUE( ::st_Buffer_get_num_of_objects( copy_buffer ) ==
-                     ::st_Buffer_get_num_of_objects( orig_buffer ) );
-
-        /* ----------------------------------------------------------------- */
         std::vector< cl::Device > temp_devices;
 
         p.getDevices( CL_DEVICE_TYPE_ALL, &temp_devices );
@@ -157,6 +125,46 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThre
 
     for( auto& device : devices )
     {
+        std::cout << "Perform test for device : "
+                  << device.getInfo< CL_DEVICE_NAME >() << "\r\n"
+                  << "Platform                : "
+                  << device.getInfo< CL_DEVICE_PLATFORM >()
+                  << std::endl;
+
+        /* ---------------------------------------------------------------- */
+        /* prepare copy buffer */
+
+        ::st_Buffer_clear( copy_buffer, true );
+
+        auto obj_it  = st_Buffer_get_const_objects_begin( orig_buffer );
+        auto obj_end = st_Buffer_get_const_objects_end( orig_buffer );
+
+        for( ; obj_it != obj_end ; ++obj_it )
+        {
+            ::st_GenericObj const* orig_obj = reinterpret_cast<
+                ::st_GenericObj const* >( static_cast< uintptr_t >(
+                    ::st_Object_get_begin_addr( obj_it ) ) );
+
+            ASSERT_TRUE( orig_obj != nullptr );
+            ASSERT_TRUE( orig_obj->type_id ==
+                         ::st_Object_get_type_id( obj_it ) );
+
+            ::st_GenericObj* copy_obj = ::st_GenericObj_new( copy_buffer,
+                orig_obj->type_id, orig_obj->num_d, orig_obj->num_e );
+
+            ASSERT_TRUE( copy_obj != nullptr );
+            ASSERT_TRUE( orig_obj->type_id == copy_obj->type_id );
+            ASSERT_TRUE( orig_obj->num_d   == copy_obj->num_d );
+            ASSERT_TRUE( orig_obj->num_e   == copy_obj->num_e );
+            ASSERT_TRUE( copy_obj->d != nullptr );
+            ASSERT_TRUE( copy_obj->e != nullptr );
+        }
+
+        ASSERT_TRUE( ::st_Buffer_get_num_of_objects( copy_buffer ) ==
+                     ::st_Buffer_get_num_of_objects( orig_buffer ) );
+
+        /* ---------------------------------------------------------------- */
+
         cl_int cl_ret = CL_SUCCESS;
 
         cl::Context context( device );
@@ -370,8 +378,8 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThre
         ASSERT_TRUE( ::st_Buffer_get_num_of_objects( copy_buffer ) ==
                      ::st_Buffer_get_num_of_objects( orig_buffer ) );
 
-        auto obj_it  = st_Buffer_get_const_objects_begin( orig_buffer );
-        auto obj_end = st_Buffer_get_const_objects_end( orig_buffer );
+        obj_it       = st_Buffer_get_const_objects_begin( orig_buffer );
+        obj_end      = st_Buffer_get_const_objects_end( orig_buffer );
         auto cmp_it  = st_Buffer_get_const_objects_begin( copy_buffer );
 
         for( ; obj_it != obj_end ; ++obj_it, ++cmp_it )
@@ -419,13 +427,10 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThre
                 }
             }
         }
-
-        ::st_Buffer_delete( orig_buffer );
-        ::st_Buffer_delete( copy_buffer );
     }
 
-
-
+    ::st_Buffer_delete( orig_buffer );
+    ::st_Buffer_delete( copy_buffer );
 }
 
 /* end: tests/sixtracklib/opencl/test_managed_buffer_opencl_c99.cpp */
