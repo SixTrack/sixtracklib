@@ -3,42 +3,6 @@
 # -----------------------------------------------------------------------------
 # ---- Generate testdata:
 
-set( SIXTRACKL_COMMON_GENERATE_TESTDATA_TRACKING_HEADERS )
-
-set( SIXTRACKL_COMMON_GENERATE_TESTDATA_TRACKING_SOURCES
-     generate_testdata_tracking.cpp
-)
-
-# add_executable( generate_testdata_tracking_common
-# #                 ${SIXTRACKL_COMMON_GENERATE_TESTDATA_TRACKING_HEADERS}
-#                 ${SIXTRACKL_COMMON_GENERATE_TESTDATA_TRACKING_SOURCES} )
-
-# target_link_libraries(  generate_testdata_tracking_common
-#                         sixtrack_test sixtrack )
-
-# set_property( TARGET generate_testdata_tracking_common
-#               PROPERTY LINKER_LANGUAGE CXX )
-
-# set_property( TARGET generate_testdata_tracking_common
-#               PROPERTY CXX_STANDARD 11 )
-
-# set_property( TARGET generate_testdata_tracking_common
-#               PROPERTY CXX_STANDARD_REQUIRED ON )
-
-# set_property( TARGET generate_testdata_tracking_common
-#     PROPERTY COMPILE_OPTIONS ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic )
-
-# add_custom_command(
-#     OUTPUT  "${SIXTRACKLIB_TESTDATA_DIR}/test_tracking.generated"
-#     DEPENDS generate_testdata_tracking_common
-#     COMMAND generate_testdata_tracking_common
-#     COMMENT "Generating testdata for tracking from common .... "
-#     VERBATIM )
-
-# add_custom_target( testdata_common
-#     DEPENDS "${SIXTRACKLIB_TESTDATA_DIR}/test_tracking.generated" )
-
-
 if( GTEST_FOUND )
     set( SIXTRACKL_COMMON_TESTS_DEPEND_ON_TRACKING_TESTDATA )
 

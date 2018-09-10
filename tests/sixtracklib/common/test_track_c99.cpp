@@ -161,7 +161,7 @@ namespace sixtrack
 }
 
 
-TEST( C99_CommonTrackTests, TrackParticlesOverDrifts )
+TEST( C99_CommonTrackTests, TrackParticlesOverDriftBeamElements )
 {
     using real_t = SIXTRL_REAL_T;
 
@@ -182,9 +182,69 @@ TEST( C99_CommonTrackTests, TrackParticlesOverDrifts )
     }
     else
     {
-        std::cerr << "Error : tracking dataset "
+        std::cerr << "!!! --> Warning :: tracking dataset "
                   << path_to_datafile << " not available -> "
-                  << "skipping tracking unit-test (!!!!!)"
+                  << "skipping tracking unit-test <-- !!!"
+                  << std::endl;
+    }
+}
+
+/* ========================================================================= */
+
+TEST( C99_CommonTrackTests, TrackParticlesOverDriftExactBeamElements )
+{
+    using real_t = SIXTRL_REAL_T;
+
+    static real_t const EPS  = std::numeric_limits< real_t >::epsilon();
+
+    std::string const path_to_datafile =
+        ::st_PATH_TO_TEST_TRACKING_BE_DRIFTEXACT_DATA;
+
+    ::FILE* fp = fopen( path_to_datafile.c_str(), "rb" );
+
+    if( fp != nullptr )
+    {
+        fclose( fp );
+        fp = nullptr;
+
+        ASSERT_TRUE( sixtrack::tests::perform_tracking_test_from_data_file(
+            path_to_datafile, EPS ) );
+    }
+    else
+    {
+        std::cerr << "!!! --> Warning :: tracking dataset "
+                  << path_to_datafile << " not available -> "
+                  << "skipping tracking unit-test <-- !!!"
+                  << std::endl;
+    }
+}
+
+/* ========================================================================= */
+
+TEST( C99_CommonTrackTests, TrackParticlesOverMultiPoleBeamElements )
+{
+    using real_t = SIXTRL_REAL_T;
+
+    static real_t const EPS  = std::numeric_limits< real_t >::epsilon();
+
+    std::string const path_to_datafile =
+        ::st_PATH_TO_TEST_TRACKING_BE_MULTIPOLE_DATA;
+
+    ::FILE* fp = fopen( path_to_datafile.c_str(), "rb" );
+
+    if( fp != nullptr )
+    {
+        fclose( fp );
+        fp = nullptr;
+
+        ASSERT_TRUE( sixtrack::tests::perform_tracking_test_from_data_file(
+            path_to_datafile, EPS ) );
+    }
+    else
+    {
+        std::cerr << "!!! --> Warning :: tracking dataset "
+                  << path_to_datafile << " not available -> "
+                  << "skipping tracking unit-test <-- !!!"
                   << std::endl;
     }
 }
