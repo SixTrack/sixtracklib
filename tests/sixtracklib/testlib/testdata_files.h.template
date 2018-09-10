@@ -44,26 +44,23 @@ static char const NS(PATH_TO_TEST_GENERIC_OBJ_BUFFER_DATA)[] =
 /* ****                                                                **** */
 /* ************************************************************************ */
 
-static char const NS(PATH_TO_TEST_TRACKING_STAMP_FILE)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/test_tracking.generated";
+static char const NS(PATH_TO_TEST_TRACKING_BE_DRIFT_DATA)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/test_track_be_drift_data.bin";
 
-static char const NS(PATH_TO_TEST_TRACKING_DRIFT_DATA)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/test_tracking_drift_data.bin";
+static char const NS(PATH_TO_TEST_TRACKING_BE_DRIFTEXACT_DATA)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/test_track_be_driftexact_data.bin";
 
-static char const NS(PATH_TO_TEST_TRACKING_DRIFT_EXACT_DATA)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/test_tracking_drift_exact_data.bin";
+static char const NS(PATH_TO_TEST_TRACKING_BE_MULTIPOLE_DATA)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/test_track_be_multipole_data.bin";
 
-static char const NS(PATH_TO_TEST_TRACKING_MULTIPOLE_DATA)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/test_tracking_multipole_data.bin";
+static char const NS(PATH_TO_TEST_TRACKING_BE_XYSHIFT_DATA)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/test_track_be_xyshift_data.bin";
 
-static char const NS(PATH_TO_TEST_TRACKING_BEAM_BEAM_DATA)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/test_tracking_beam_beam_data.bin";
+static char const NS(PATH_TO_TEST_TRACKING_BE_SROTATION_DATA)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/test_track_be_srotation_data.bin";
 
-static char const NS(PATH_TO_TEST_TRACKING_CAVITY_DATA)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/test_tracking_cavity_data.bin";
-
-static char const NS(PATH_TO_TEST_TRACKING_ALIGN_DATA)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/test_tracking_align_data.bin";
+static char const NS(PATH_TO_TEST_TRACKING_BE_CAVITY_DATA)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/test_track_be_cavity_data.bin";
 
 
 /* ************************************************************************ */
