@@ -9,12 +9,14 @@
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __kernel void NS(remap_orig_buffer)(
-    __global unsigned char* SIXTRL_RESTRICT orig_begin,
-    __global unsigned char* SIXTRL_RESTRICT copy_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT orig_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT copy_begin,
     __global SIXTRL_INT64_T* SIXTRL_RESTRICT ptr_err_flag )
 {
-    size_t const global_id = get_global_id( 0 );
-    size_t const gid_to_remap_buffer = ( size_t )0u;
+    typedef NS(buffer_size_t) buf_size_t;
+
+    buf_size_t const global_id           = get_global_id( 0 );
+    buf_size_t const gid_to_remap_buffer = ( buf_size_t )0u;
 
     if( gid_to_remap_buffer == global_id )
     {
@@ -48,8 +50,8 @@ __kernel void NS(remap_orig_buffer)(
 
 
 __kernel void NS(copy_orig_buffer)(
-    __global unsigned char const* SIXTRL_RESTRICT orig_begin,
-    __global unsigned char*  SIXTRL_RESTRICT copy_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT orig_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char*  SIXTRL_RESTRICT copy_begin,
     __global SIXTRL_INT64_T* SIXTRL_RESTRICT ptr_err_flag )
 {
     size_t const global_id   = get_global_id( 0 );
@@ -57,11 +59,11 @@ __kernel void NS(copy_orig_buffer)(
 
     if( gid_to_copy == global_id )
     {
-        typedef __global NS(Object) const* in_index_ptr_t;
-        typedef __global NS(Object)*      out_index_ptr_t;
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*      in_index_ptr_t;
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*            out_index_ptr_t;
 
-        typedef __global NS(GenericObj) const* in_obj_ptr_t;
-        typedef __global NS(GenericObj)*      out_obj_ptr_t;
+        typedef SIXTRL_BUFFER_OBJ_DATAPTR_DEC NS(GenericObj) const* in_obj_ptr_t;
+        typedef SIXTRL_BUFFER_OBJ_DATAPTR_DEC NS(GenericObj)*       out_obj_ptr_t;
 
         long int error_flag = 0;
         NS(buffer_size_t) const slot_size = ( NS(buffer_size_t) )8u;
@@ -84,14 +86,11 @@ __kernel void NS(copy_orig_buffer)(
 
             for( ; in_it != in_end ; ++in_it, ++out_it, ++obj_index )
             {
-                NS(Object) const in_info = *in_it;
-                NS(Object) out_info      = *out_it;
-
                 in_obj_ptr_t in_obj = ( in_obj_ptr_t )( uintptr_t
-                    )NS(Object_get_const_begin_ptr)( &in_info );
+                    )NS(Object_get_const_begin_ptr)( in_it );
 
                 out_obj_ptr_t out_obj = ( out_obj_ptr_t )( uintptr_t
-                    )NS(Object_get_begin_ptr)( &out_info );
+                    )NS(Object_get_begin_ptr)( out_it );
 
                 if( ( out_obj != SIXTRL_NULLPTR ) &&
                     ( in_obj  != SIXTRL_NULLPTR ) &&
