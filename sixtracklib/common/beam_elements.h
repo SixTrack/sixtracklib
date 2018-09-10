@@ -2,6 +2,8 @@
 #define SIXTRACKLIB_COMMON_BEAM_ELEMENTS_H__
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/impl/beam_elements_defines.h"
     #include "sixtracklib/common/impl/be_drift.h"
     #include "sixtracklib/common/impl/be_multipole.h"
     #include "sixtracklib/common/impl/be_xyshift.h"
