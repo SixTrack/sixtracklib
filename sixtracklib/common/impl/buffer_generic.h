@@ -11,12 +11,11 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/buffer.h"
+    #include "sixtracklib/common/impl/buffer_defines.h"
+    #include "sixtracklib/common/impl/buffer_object.h"
     #include "sixtracklib/common/impl/buffer_type.h"
+    #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
-
-struct NS(Object);
-struct NS(Buffer);
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
@@ -26,33 +25,33 @@ extern "C" {
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_DATAPTR_DEC unsigned char const*
 NS(Buffer_get_const_data_begin)(
-    SIXTRL_ARGPTR_DEC const struct NS(Buffer) *const SIXTRL_RESTRICT buffer );
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_DATAPTR_DEC unsigned char const*
 NS(Buffer_get_const_data_end)(
-    SIXTRL_ARGPTR_DEC const struct NS(Buffer) *const SIXTRL_RESTRICT buffer );
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
 SIXTRL_FN SIXTRL_STATIC  SIXTRL_DATAPTR_DEC unsigned char*
 NS(Buffer_get_data_begin)(
-    SIXTRL_ARGPTR_DEC struct NS(Buffer)* SIXTRL_RESTRICT buffer );
+    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 SIXTRL_FN SIXTRL_STATIC  SIXTRL_DATAPTR_DEC unsigned char*
 NS(Buffer_get_data_end)(
-    SIXTRL_ARGPTR_DEC struct NS(Buffer)* SIXTRL_RESTRICT buffer );
+    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 /* ========================================================================= */
 
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_clear_generic)(
-    SIXTRL_ARGPTR_DEC struct NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     bool const set_data_to_zero );
 
 /* ========================================================================= */
 
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reset_generic)(
-    SIXTRL_ARGPTR_DEC struct NS(Buffer)* SIXTRL_RESTRICT buffer );
+    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reset_detailed_generic)(
-    SIXTRL_ARGPTR_DEC struct NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const initial_max_num_objects,
     NS(buffer_size_t) const initial_max_num_slots,
     NS(buffer_size_t) const initial_max_num_dataptrs,
@@ -61,7 +60,7 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reset_detailed_generic)(
 /* ========================================================================= */
 
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_remap_generic)(
-    SIXTRL_ARGPTR_DEC struct NS(Buffer)* SIXTRL_RESTRICT buffer );
+    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 /* ========================================================================= */
 
@@ -111,6 +110,28 @@ SIXTRL_FN SIXTRL_STATIC  int NS(Buffer_init_on_flat_memory_detailed)(
     NS(buffer_size_t) const initial_max_num_dataptrs,
     NS(buffer_size_t) const initial_max_num_garbage_elems );
 
+/* ========================================================================= */
+
+#if !defined( _GPUCODE )
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const*
+NS(Buffer_get_const_objects_begin)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const*
+NS(Buffer_get_const_objects_end)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object)*
+NS(Buffer_get_objects_begin)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object)*
+NS(Buffer_get_objects_end)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
+
+#endif /* !defined( _GPUCODE ) */
+
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
@@ -124,7 +145,6 @@ SIXTRL_FN SIXTRL_STATIC  int NS(Buffer_init_on_flat_memory_detailed)(
     #include "sixtracklib/common/impl/managed_buffer.h"
     #include "sixtracklib/common/impl/managed_buffer_minimal.h"
     #include "sixtracklib/common/impl/managed_buffer_remap.h"
-    #include "sixtracklib/common/impl/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -1017,6 +1037,47 @@ SIXTRL_INLINE int NS(Buffer_init_on_flat_memory_detailed)(
 
     return success;
 }
+
+/* ========================================================================= */
+
+#if !defined( _GPUCODE )
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const*
+NS(Buffer_get_const_objects_begin)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buf )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const* ptr_to_obj_t;
+    typedef uintptr_t                                   uptr_t;
+    return ( ptr_to_obj_t )( uptr_t )NS(Buffer_get_objects_begin_addr)( buf );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const*
+NS(Buffer_get_const_objects_end)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buf )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const* ptr_to_obj_t;
+    return ( ptr_to_obj_t )( uintptr_t )NS(Buffer_get_objects_end_addr)( buf );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Object)*
+NS(Buffer_get_objects_begin)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Object)* ptr_to_obj_t;
+    return ( ptr_to_obj_t )NS(Buffer_get_const_objects_begin)( buffer);
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Object)*
+NS(Buffer_get_objects_end)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Object)* ptr_to_obj_t;
+    return ( ptr_to_obj_t )NS(Buffer_get_const_objects_end)( buffer);
+}
+
+#endif /* !defined( _GPUCODE ) */
+
+/* ========================================================================= */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
