@@ -213,7 +213,7 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_remap)(
 SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new)(
     NS(buffer_size_t) const buffer_capacity );
 
-SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_from_file)(
+SIXTRL_HOST_FN SIXTRL_STATIC NS(Buffer)* NS(Buffer_new_from_file)(
     SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
 
 SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_detailed)(
