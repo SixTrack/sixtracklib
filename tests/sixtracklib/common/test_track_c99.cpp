@@ -20,6 +20,177 @@
 #include "sixtracklib/common/track.h"
 #include "sixtracklib/testlib.h"
 
+namespace sixtrack
+{
+    namespace tests
+    {
+        bool perform_tracking_test_from_data_file(
+            std::string const& path_to_datafile,
+            SIXTRL_REAL_T const treshold = SIXTRL_REAL_T{ 0.0 } )
+        {
+            using real_t          = SIXTRL_REAL_T;
+            using buffer_t        = ::st_Buffer;
+            using particles_t     = ::st_Particles;
+            using object_t        = ::st_Object;
+            using size_t          = ::st_buffer_size_t;
+            using num_particles_t = ::st_particle_num_elements_t;
+
+            bool success = false;
+
+            buffer_t* buffer =
+                ::st_Buffer_new_from_file( path_to_datafile.c_str() );
+
+            size_t const buffer_size = ::st_Buffer_get_size( buffer );
+            size_t const num_objs = ::st_Buffer_get_num_of_objects( buffer );
+
+            success  = ( buffer != nullptr );
+            success &= ( buffer_size > size_t{ 0 } );
+            success &= ( num_objs    > size_t{ 2 } );
+
+            size_t const num_beam_elements = ( num_objs > size_t{ 2 }  )
+                ? ( num_objs - size_t{ 2 } ) : size_t{ 0 };
+
+            if( success )
+            {
+                object_t* obj_it  = ::st_Buffer_get_objects_begin( buffer );
+                object_t* obj_end = ::st_Buffer_get_objects_end( buffer );
+
+                success  = ( obj_it  != nullptr );
+                success &= ( obj_end != nullptr );
+                success &= ( std::distance( obj_it, obj_end ) ==
+                             static_cast< std::ptrdiff_t >( num_objs ) );
+
+                particles_t* particles = nullptr;
+                num_particles_t num_particles = num_particles_t{ 0 };
+
+                if( success )
+                {
+                    object_t* init_particle_obj = nullptr;
+
+                    init_particle_obj = obj_it++;
+
+                    success = ( ::st_Object_get_type_id( init_particle_obj ) ==
+                                 ::st_OBJECT_TYPE_PARTICLE );
+
+                    success &= ( ::st_Object_get_begin_addr(
+                        init_particle_obj ) != uintptr_t{ 0 } );
+
+                    if( success )
+                    {
+                        particles = reinterpret_cast< particles_t* >(
+                            static_cast< uintptr_t >( ::st_Object_get_begin_addr(
+                                init_particle_obj ) ) );
+
+                        success = ( particles != nullptr );
+
+                        num_particles = ::st_Particles_get_num_of_particles(
+                            particles );
+
+                        success &= ( num_particles > num_particles_t{ 0 } );
+                    }
+                }
+
+                object_t const*  be_begin = nullptr;
+                object_t const*  be_end   = nullptr;
+
+                if( success )
+                {
+                    be_begin = obj_it;
+                    std::advance( obj_it, num_beam_elements );
+
+                    be_end = obj_it;
+                }
+
+                particles_t const* cmp_particles = nullptr;
+
+                if( success )
+                {
+                    object_t const* cmp_particles_obj = obj_it;
+
+                    success = ( ::st_Object_get_type_id( cmp_particles_obj ) ==
+                                 ::st_OBJECT_TYPE_PARTICLE );
+
+                    success &= ( ::st_Object_get_begin_addr(
+                        cmp_particles_obj ) != uintptr_t{ 0 } );
+
+                    if( success )
+                    {
+                        cmp_particles = reinterpret_cast< particles_t const* >(
+                            static_cast< uintptr_t >( ::st_Object_get_begin_addr(
+                                cmp_particles_obj ) ) );
+
+                        success  = ( cmp_particles != nullptr );
+                        success &= ( num_particles ==
+                            ::st_Particles_get_num_of_particles(
+                                cmp_particles ) );
+                    }
+                }
+
+                if( success )
+                {
+                    success = ::st_Particles_have_same_structure(
+                        cmp_particles, particles );
+
+                    success &= !( ::st_Particles_map_to_same_memory(
+                        cmp_particles, particles ) );
+                }
+
+                if( success )
+                {
+                    success = ( 0 == ::st_Track_beam_elements_particles(
+                        particles, be_begin, be_end ) );
+                }
+
+                if( success )
+                {
+                    success =
+                    ( ( ::st_Particles_compare_values( cmp_particles,
+                                                       particles ) == 0 ) ||
+                      ( ( treshold > ( real_t )0.0 ) &&
+                        ( ::st_Particles_compare_values_with_treshold(
+                            cmp_particles, particles, treshold ) ) ) );
+                }
+            }
+
+            ::st_Buffer_delete( buffer );
+
+            return success;
+
+        }
+    }
+}
+
+
+TEST( C99_CommonTrackTests, TrackParticlesOverDrifts )
+{
+    using real_t = SIXTRL_REAL_T;
+
+    static real_t const EPS  = std::numeric_limits< real_t >::epsilon();
+
+    std::string const path_to_datafile =
+        ::st_PATH_TO_TEST_TRACKING_BE_DRIFT_DATA;
+
+    ::FILE* fp = fopen( path_to_datafile.c_str(), "rb" );
+
+    if( fp != nullptr )
+    {
+        fclose( fp );
+        fp = nullptr;
+
+        ASSERT_TRUE( sixtrack::tests::perform_tracking_test_from_data_file(
+            path_to_datafile, EPS ) );
+    }
+    else
+    {
+        std::cerr << "Error : tracking dataset "
+                  << path_to_datafile << " not available -> "
+                  << "skipping tracking unit-test (!!!!!)"
+                  << std::endl;
+    }
+}
+
+/* ========================================================================= */
+
 TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
 {
     using size_t   = ::st_buffer_size_t;
