@@ -22,13 +22,6 @@
 
 /* ------------------------------------------------------------------------- */
 
-#if defined( __SIXTRACKLIB_TESTS_SIXTRACKLIB_UNDEF_NAMESPACE )
-    #include "sixtracklib/_impl/namespace_end.h"
-
-    #undef __NAMESPACE
-    #undef __SIXTRACKLIB_TESTS_SIXTRACKLIB_UNDEF_NAMESPACE
-#endif /* defined( __SIXTRACKLIB_TESTS_SIXTRACKLIB_UNDEF_NAMESPACE ) */
-
 #endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_H__ */
 
 /* end: tests/sixtracklib/testlib.h */
