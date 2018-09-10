@@ -12,43 +12,15 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
     #include "sixtracklib/_impl/modules.h"
+    #include "sixtracklib/common/impl/buffer_defines.h"
     #include "sixtracklib/common/impl/buffer_type.h"
+    #include "sixtracklib/common/impl/buffer_object.h"
+    #include "sixtracklib/common/impl/buffer_garbage.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
-
-#if !defined( SIXTRL_ARGPTR_DEC )
-    #define SIXTRL_UNDEF_ARGPTR_DEC
-    #define SIXTRL_ARGPTR_DEC
-#endif /* defined( SIXTRL_ARGPTR_DEC ) */
-
-#if !defined( SIXTRL_DATAPTR_DEC )
-    #define SIXTRL_UNDEF_DATAPTR_DEC
-    #define SIXTRL_DATAPTR_DEC
-#endif /* defined( SIXTRL_ARGPTR_DEC ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
-
-/* ------------------------------------------------------------------------- */
-
-struct NS(BufferGarbage);
-
-SIXTRL_FN SIXTRL_STATIC struct NS(BufferGarbage)* NS(BufferGarbage_preset)(
-    struct NS(BufferGarbage)* SIXTRL_RESTRICT garbage_range );
-
-SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(BufferGarbage_get_begin_addr)(
-    const struct NS(BufferGarbage) *const SIXTRL_RESTRICT garbage_range );
-
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(BufferGarbage_get_size)(
-    const struct NS(BufferGarbage) *const SIXTRL_RESTRICT garbage_range );
-
-SIXTRL_FN SIXTRL_STATIC void NS(BufferGarbage_set_begin_addr)(
-    struct NS(BufferGarbage)* SIXTRL_RESTRICT garbage_range,
-    NS(buffer_addr_t) const begin_addr );
-
-SIXTRL_FN SIXTRL_STATIC void NS(BufferGarbage_set_size)(
-    struct NS(BufferGarbage)* SIXTRL_RESTRICT garbage_range,
-    NS(buffer_size_t) const range_size );
 
 /* ------------------------------------------------------------------------- */
 
@@ -214,7 +186,7 @@ SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new)(
     NS(buffer_size_t) const buffer_capacity );
 
 SIXTRL_HOST_FN SIXTRL_STATIC NS(Buffer)* NS(Buffer_new_from_file)(
-    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+    SIXTRL_BUFFER_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
 
 SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_detailed)(
     NS(buffer_size_t)  const initial_max_num_objects,
@@ -226,8 +198,8 @@ SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_detailed)(
 #endif /* !defined( _GPUCODE ) */
 
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_init)(
-    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const data_buffer_capacity );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -249,33 +221,34 @@ SIXTRL_HOST_FN SIXTRL_STATIC void NS(Buffer_delete)(
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(Buffer_predict_required_num_slots)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const  SIXTRL_RESTRICT buffer,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const  object_size,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const  SIXTRL_RESTRICT buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const  object_size,
     NS(buffer_size_t)                   const  num_obj_dataptrs,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts );
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts );
 
 
 SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_can_add_object)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const  SIXTRL_RESTRICT buffer,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const  object_size,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const  SIXTRL_RESTRICT buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const  object_size,
     NS(buffer_size_t)                   const  num_obj_dataptrs,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_num_objects,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_num_slots,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_num_dataptrs );
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_num_objects,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_num_slots,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_num_dataptrs );
 
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(Object)* NS(Buffer_add_object)(
-    SIXTRL_ARGPTR_DEC NS(Buffer)*       SIXTRL_RESTRICT buffer,
-    SIXTRL_ARGPTR_DEC const void *const SIXTRL_RESTRICT object_handle,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const  object_size,
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object)*
+    NS(Buffer_add_object)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*       SIXTRL_RESTRICT buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const void *const SIXTRL_RESTRICT object_handle,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const  object_size,
     NS(object_type_id_t)                const  type_id,
     NS(buffer_size_t)                   const  num_obj_dataptrs,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT offsets,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts );
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT offsets,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
@@ -292,10 +265,11 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(Object)* NS(Buffer_add_object)(
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES)
-    #include "sixtracklib/common/impl/buffer_type.h"
+    #include "sixtracklib/common/impl/buffer_defines.h"
     #include "sixtracklib/common/impl/managed_buffer_minimal.h"
     #include "sixtracklib/common/impl/managed_buffer_remap.h"
     #include "sixtracklib/common/impl/managed_buffer.h"
+    #include "sixtracklib/common/impl/buffer_type.h"
     #include "sixtracklib/common/impl/buffer_object.h"
     #include "sixtracklib/common/impl/buffer_generic.h"
 
@@ -314,63 +288,6 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(Object)* NS(Buffer_add_object)(
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
-
-SIXTRL_INLINE NS(BufferGarbage)* NS(BufferGarbage_preset)(
-    struct NS(BufferGarbage)* SIXTRL_RESTRICT garbage_range )
-{
-    NS(BufferGarbage_set_begin_addr)( garbage_range, 0 );
-    NS(BufferGarbage_set_size)( garbage_range, 0u );
-
-    return garbage_range;
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-SIXTRL_INLINE NS(buffer_addr_t) NS(BufferGarbage_get_begin_addr)(
-    const struct NS(BufferGarbage) *const SIXTRL_RESTRICT garbage_range )
-{
-    return ( garbage_range != SIXTRL_NULLPTR )
-        ? garbage_range->begin_addr : ( NS(buffer_addr_t) )0u;
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-SIXTRL_INLINE NS(buffer_size_t) NS(BufferGarbage_get_size)(
-    const struct NS(BufferGarbage) *const SIXTRL_RESTRICT garbage_range )
-{
-    return ( garbage_range != SIXTRL_NULLPTR )
-        ? garbage_range->size : ( NS(buffer_size_t) )0u;
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-SIXTRL_INLINE void NS(BufferGarbage_set_begin_addr)(
-    struct NS(BufferGarbage)* SIXTRL_RESTRICT garbage_range,
-    NS(buffer_addr_t) const begin_addr )
-{
-    if( garbage_range != SIXTRL_NULLPTR )
-    {
-        garbage_range->begin_addr = begin_addr;
-    }
-
-    return;
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-SIXTRL_INLINE void NS(BufferGarbage_set_size)(
-    struct NS(BufferGarbage)* SIXTRL_RESTRICT garbage_range,
-    NS(buffer_size_t) const range_size )
-{
-    if( garbage_range != SIXTRL_NULLPTR )
-    {
-        garbage_range->size = range_size;
-    }
-
-    return;
-}
-
-/* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(Buffer)* NS(Buffer_preset)( NS(Buffer)* SIXTRL_RESTRICT buf )
 {

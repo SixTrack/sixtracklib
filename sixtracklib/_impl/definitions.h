@@ -23,6 +23,16 @@
     #include "sixtracklib/_impl/namespace_begin.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
+#if !defined( SIXTRL_ARGPTR_DEC )
+    #define SIXTRL_ARGPTR_DEC_UNDEF
+    #define SIXTRL_ARGPTR_DEC
+#endif /* defined( SIXTRL_ARGPTR_DEC ) */
+
+#if !defined( SIXTRL_DATAPTR_DEC )
+    #define SIXTRL_DATAPTR_DEC_UNDEF
+    #define SIXTRL_DATAPTR_DEC
+#endif /* defined( SIXTRL_DATAPTR_DEC ) */
+
 #if !defined( SIXTRL_TRACK_RETURN )
     #define SIXTRL_TRACK_RETURN int
 #endif /* !defined( SIXTRL_TRACK_RETURN ) */

@@ -11,6 +11,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/impl/buffer_defines.h"
     #include "sixtracklib/common/impl/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -22,36 +23,36 @@ extern "C" {
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(ManagedBuffer_calculate_section_size)(
-    SIXTRL_ARGPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const header_section_id,
     NS(buffer_size_t) const num_entities,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(ManagedBuffer_get_section_offset)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const header_section_id,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC void NS(ManagedBuffer_set_section_num_entities)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const section_id,
     NS(buffer_size_t) const num_entities,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC void NS(ManagedBuffer_set_section_max_size)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const section_id,
     NS(buffer_size_t) const max_section_size,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(ManagedBuffer_predict_required_num_slots)(
-    SIXTRL_ARGPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const obj_handle_size,
     NS(buffer_size_t) const num_dataptrs,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts,
     NS(buffer_size_t) const slot_size );
 
 
@@ -59,7 +60,7 @@ NS(ManagedBuffer_predict_required_num_slots)(
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(ManagedBuffer_calculate_buffer_length)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const max_num_objects,
     NS(buffer_size_t) const max_num_slots,
     NS(buffer_size_t) const max_num_dataptrs,
@@ -67,8 +68,9 @@ NS(ManagedBuffer_calculate_buffer_length)(
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC bool NS(ManagedBuffer_can_reserve)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_buffer_len,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)*
+        SIXTRL_RESTRICT ptr_requ_buffer_len,
     NS(buffer_size_t) const max_buffer_length,
     NS(buffer_size_t) const max_num_objects,
     NS(buffer_size_t) const max_num_slots,
@@ -77,8 +79,9 @@ SIXTRL_FN SIXTRL_STATIC bool NS(ManagedBuffer_can_reserve)(
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_reserve)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_new_buffer_length,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)*
+        SIXTRL_RESTRICT ptr_new_buffer_length,
     NS(buffer_size_t) const max_num_objects,
     NS(buffer_size_t) const max_num_slots,
     NS(buffer_size_t) const max_num_dataptrs,
@@ -89,8 +92,9 @@ SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_reserve)(
 /* ========================================================================= */
 
 SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_init)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_buffer_length,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)*
+        SIXTRL_RESTRICT ptr_buffer_length,
     NS(buffer_size_t) const max_num_objects,
     NS(buffer_size_t) const max_num_slots,
     NS(buffer_size_t) const max_num_dataptrs,
@@ -101,7 +105,7 @@ SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_init)(
 /* ========================================================================= */
 
 SIXTRL_FN SIXTRL_STATIC void NS(ManagedBuffer_clear)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     bool const set_data_to_zero, NS(buffer_size_t) const slot_size );
 
 /* ========================================================================= */
@@ -109,15 +113,6 @@ SIXTRL_FN SIXTRL_STATIC void NS(ManagedBuffer_clear)(
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
-
-#if defined( __cplusplus )
-
-namespace SIXTRL_NAMESPACE
-{
-
-}
-
-#endif /* defined( __cplusplus ) */
 
 /* ========================================================================= *
  * ======== INLINE IMPLEMENTATION                                            *
@@ -133,7 +128,7 @@ extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
 SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_calculate_section_size)(
-    SIXTRL_ARGPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const header_section_id,
     NS(buffer_size_t) const num_entities,
     NS(buffer_size_t) const slot_size )
@@ -168,12 +163,12 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_calculate_section_size)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_get_section_offset)(
-    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const section_id, NS(buffer_size_t) const slot_size )
 {
-    typedef NS(buffer_size_t)                       buf_size_t;
-    typedef NS(buffer_addr_t)                       address_t;
-    typedef SIXTRL_DATAPTR_DEC address_t const*     ptr_to_addr_t;
+    typedef NS(buffer_size_t)                               buf_size_t;
+    typedef NS(buffer_addr_t)                               address_t;
+    typedef SIXTRL_BUFFER_ARGPTR_DEC address_t const*       ptr_to_addr_t;
 
     SIXTRL_STATIC_VAR buf_size_t const ZERO_SIZE = ( buf_size_t )0u;
 
@@ -208,12 +203,12 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_get_section_offset)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE void NS(ManagedBuffer_set_section_num_entities)(
-    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const section_id, NS(buffer_size_t) const num_entities,
     NS(buffer_size_t) const slot_size )
 {
-    typedef NS(buffer_addr_t)             address_t;
-    typedef SIXTRL_DATAPTR_DEC address_t* ptr_to_addr_t;
+    typedef NS(buffer_addr_t)                    address_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC address_t* ptr_to_addr_t;
 
     ptr_to_addr_t ptr_to_section = ( ptr_to_addr_t
         )NS(ManagedBuffer_get_ptr_to_section)( begin, section_id, slot_size );
@@ -232,13 +227,13 @@ SIXTRL_INLINE void NS(ManagedBuffer_set_section_num_entities)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE void NS(ManagedBuffer_set_section_max_size)(
-    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const section_id,
     NS(buffer_size_t) const max_section_size,
     NS(buffer_size_t) const slot_size )
 {
-    typedef NS(buffer_addr_t)             address_t;
-    typedef SIXTRL_DATAPTR_DEC address_t* ptr_to_addr_t;
+    typedef NS(buffer_addr_t)                    address_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC address_t* ptr_to_addr_t;
 
     ptr_to_addr_t ptr_to_section = ( ptr_to_addr_t
         )NS(ManagedBuffer_get_ptr_to_section)( begin, section_id, slot_size );
@@ -257,11 +252,13 @@ SIXTRL_INLINE void NS(ManagedBuffer_set_section_max_size)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_predict_required_num_slots)(
-    SIXTRL_ARGPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const obj_handle_size,
     NS(buffer_size_t) const num_dataptrs,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT obj_attr_sizes,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT obj_attr_counts,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const*
+        SIXTRL_RESTRICT obj_attr_sizes,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t) const*
+        SIXTRL_RESTRICT obj_attr_counts,
     NS(buffer_size_t) const slot_size )
 {
     typedef NS(buffer_size_t) buf_size_t;
@@ -326,7 +323,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_predict_required_num_slots)(
 /* ========================================================================= */
 
 SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_calculate_buffer_length)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const max_num_objects,
     NS(buffer_size_t) const max_num_slots,
     NS(buffer_size_t) const max_num_dataptrs,
@@ -366,8 +363,9 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_calculate_buffer_length)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE bool NS(ManagedBuffer_can_reserve)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_buffer_len,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)*
+        SIXTRL_RESTRICT ptr_requ_buffer_len,
     NS(buffer_size_t) const max_num_objects,
     NS(buffer_size_t) const max_num_slots,
     NS(buffer_size_t) const max_num_dataptrs,
@@ -407,8 +405,9 @@ SIXTRL_INLINE bool NS(ManagedBuffer_can_reserve)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE int NS(ManagedBuffer_reserve)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_new_buffer_length,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)*
+        SIXTRL_RESTRICT ptr_new_buffer_length,
     NS(buffer_size_t) const max_num_objects,
     NS(buffer_size_t) const max_num_slots,
     NS(buffer_size_t) const max_num_dataptrs,
@@ -416,13 +415,13 @@ SIXTRL_INLINE int NS(ManagedBuffer_reserve)(
     NS(buffer_size_t) const max_data_buffer_length,
     NS(buffer_size_t) const slot_size )
 {
-    typedef NS(buffer_size_t)                       buf_size_t;
-    typedef unsigned char                           raw_t;
-    typedef SIXTRL_ARGPTR_DEC unsigned char*        ptr_to_raw_t;
-    typedef SIXTRL_ARGPTR_DEC unsigned char const*  ptr_to_const_raw_t;
+    typedef NS(buffer_size_t)                               buf_size_t;
+    typedef unsigned char                                   raw_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char*        ptr_to_raw_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char const*  ptr_to_const_raw_t;
 
-    typedef NS(buffer_addr_t)                       address_t;
-    typedef SIXTRL_ARGPTR_DEC address_t*            ptr_to_addr_t;
+    typedef NS(buffer_addr_t)                               address_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC address_t*            ptr_to_addr_t;
 
     SIXTRL_STATIC_VAR buf_size_t const SLOTS_ID     = ( buf_size_t )3u;
     SIXTRL_STATIC_VAR buf_size_t const OBJECTS_ID   = ( buf_size_t )4u;
@@ -829,8 +828,9 @@ SIXTRL_INLINE int NS(ManagedBuffer_reserve)(
 /* ========================================================================= */
 
 SIXTRL_INLINE int NS(ManagedBuffer_init)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_buffer_length,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)*
+        SIXTRL_RESTRICT ptr_buffer_length,
     NS(buffer_size_t) const max_num_objects,
     NS(buffer_size_t) const max_num_slots,
     NS(buffer_size_t) const max_num_dataptrs,
@@ -838,10 +838,10 @@ SIXTRL_INLINE int NS(ManagedBuffer_init)(
     NS(buffer_size_t) const max_data_buffer_length,
     NS(buffer_size_t) const slot_size )
 {
-    typedef NS(buffer_size_t)               buf_size_t;
-    typedef NS(buffer_addr_t)               address_t;
-    typedef SIXTRL_ARGPTR_DEC address_t*    ptr_to_addr_t;
-    typedef unsigned char                   raw_t;
+    typedef NS(buffer_size_t)                       buf_size_t;
+    typedef NS(buffer_addr_t)                       address_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC address_t*    ptr_to_addr_t;
+    typedef unsigned char                           raw_t;
 
     int success = -1;
 
@@ -956,12 +956,12 @@ SIXTRL_INLINE int NS(ManagedBuffer_init)(
 /* ========================================================================= */
 
 SIXTRL_INLINE void NS(ManagedBuffer_clear)(
-    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     bool const set_data_to_zero, NS(buffer_size_t) const slot_size )
 {
-    typedef NS(buffer_size_t)            buf_size_t;
-    typedef NS(buffer_addr_t)            address_t;
-    typedef SIXTRL_ARGPTR_DEC address_t* ptr_to_addr_t;
+    typedef NS(buffer_size_t)                    buf_size_t;
+    typedef NS(buffer_addr_t)                    address_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC address_t* ptr_to_addr_t;
 
     SIXTRL_STATIC_VAR buf_size_t const SLOTS_ID    = ( buf_size_t )3u;
     SIXTRL_STATIC_VAR buf_size_t const OBJECTS_ID  = ( buf_size_t )4u;
@@ -1005,8 +1005,8 @@ SIXTRL_INLINE void NS(ManagedBuffer_clear)(
         {
             if( num_objects > ZERO_SIZE )
             {
-                typedef NS(Object)                      object_t;
-                typedef SIXTRL_ARGPTR_DEC object_t*     ptr_to_object_t;
+                typedef NS(Object)                            object_t;
+                typedef SIXTRL_BUFFER_DATAPTR_DEC object_t*   ptr_to_object_t;
 
                 ptr_to_object_t obj_it = ( ptr_to_object_t
                     )NS(ManagedBuffer_get_ptr_to_section_data)(
@@ -1024,8 +1024,8 @@ SIXTRL_INLINE void NS(ManagedBuffer_clear)(
 
             if( num_garbage_ranges > ZERO_SIZE )
             {
-                typedef NS(BufferGarbage)               garbage_t;
-                typedef SIXTRL_ARGPTR_DEC garbage_t*    ptr_to_garbage_t;
+                typedef NS(BufferGarbage)                    garbage_t;
+                typedef SIXTRL_BUFFER_DATAPTR_DEC garbage_t* ptr_to_garbage_t;
 
                 ptr_to_garbage_t it  = ( ptr_to_garbage_t
                     )NS(ManagedBuffer_get_ptr_to_section_data)(

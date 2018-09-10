@@ -2,7 +2,11 @@
 
 set( SIXTRACKLIB_COMMON_IMPL_HEADERS
      impl/alignment_impl.h
+     impl/beam_elements_defines.h
+     impl/beam_elements_undef.h
      impl/be_drift.h
+     impl/be_drift_defines.h
+     impl/be_drift_undef.h
      impl/be_drift.hpp
      impl/be_multipole.h
      impl/be_multipole.hpp
@@ -15,7 +19,13 @@ set( SIXTRACKLIB_COMMON_IMPL_HEADERS
 #    impl/be_beam_beam.h
 #    impl/be_beam_beam.hpp
      impl/buffer_type.h
+     impl/buffer_defines.h
+     impl/buffer_garbage.h
+     impl/buffer_garbage_defines.h
+     impl/buffer_garbage_undef.h
      impl/buffer_object.h
+     impl/buffer_object_defines.h
+     impl/buffer_object_undef.h
      impl/buffer_generic.h
      impl/managed_buffer_minimal.h
      impl/managed_buffer_remap.h

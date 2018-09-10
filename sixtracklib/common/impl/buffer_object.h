@@ -11,78 +11,62 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
-    #if !defined( _GPUCODE )
-        #include "sixtracklib/common/buffer.h"
-    #endif /* !defined( _GPUCODE ) */
+    #include "sixtracklib/common/impl/buffer_defines.h"
+    #include "sixtracklib/common/impl/buffer_object_defines.h"
     #include "sixtracklib/common/impl/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
-
-struct NS(Object);
-struct NS(Buffer);
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
+typedef struct NS(Object)
+{
+    NS(buffer_addr_t)    begin_addr       SIXTRL_ALIGN( 8u );
+    NS(object_type_id_t) type_id          SIXTRL_ALIGN( 8u );
+    NS(buffer_size_t)    size             SIXTRL_ALIGN( 8u );
+}
+NS(Object);
+
 /* ========================================================================= */
 
-SIXTRL_FN SIXTRL_STATIC  NS(Object)* NS(Object_preset)(
-    SIXTRL_ARGPTR_DEC struct NS(Object)* SIXTRL_RESTRICT object );
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
+NS(Object_preset)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob );
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(Object_get_begin_addr)(
-    SIXTRL_ARGPTR_DEC const struct NS(Object) *const SIXTRL_RESTRICT object );
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT ob );
 
 SIXTRL_FN SIXTRL_STATIC void NS(Object_set_begin_addr)(
-    SIXTRL_ARGPTR_DEC struct NS(Object)* SIXTRL_RESTRICT object,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
     NS(buffer_addr_t) const begin_addr );
 
 SIXTRL_FN SIXTRL_STATIC  NS(object_type_id_t) NS(Object_get_type_id)(
-    SIXTRL_ARGPTR_DEC const struct NS(Object) *const SIXTRL_RESTRICT object );
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT ob );
 
 SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_type_id)(
-    SIXTRL_ARGPTR_DEC struct NS(Object)* SIXTRL_RESTRICT object,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
     NS(object_type_id_t) const type_id );
 
 SIXTRL_FN SIXTRL_STATIC  NS(buffer_size_t) NS(Object_get_size)(
-    SIXTRL_ARGPTR_DEC const struct NS(Object) *const SIXTRL_RESTRICT object );
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT ob );
 
 SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_size)(
-    SIXTRL_ARGPTR_DEC struct NS(Object)* SIXTRL_RESTRICT object,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob,
     NS(buffer_size_t) const size );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_DATAPTR_DEC unsigned char const*
-NS(Object_get_const_begin_ptr)(
-    SIXTRL_ARGPTR_DEC  const struct NS(Object) *const SIXTRL_RESTRICT object );
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char const*
+NS(Object_get_const_begin_ptr)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC const
+    NS(Object) *const SIXTRL_RESTRICT ob );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_DATAPTR_DEC unsigned char*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char*
 NS(Object_get_begin_ptr)(
-    SIXTRL_ARGPTR_DEC  struct NS(Object)* SIXTRL_RESTRICT object );
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob );
 
-SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_begin_ptr)(
-    SIXTRL_ARGPTR_DEC  struct NS(Object)* SIXTRL_RESTRICT object,
-    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin_ptr );
+SIXTRL_FN SIXTRL_STATIC void NS(Object_set_begin_ptr)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob,
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin_ptr );
 
 /* ========================================================================= */
-
-#if !defined( _GPUCODE )
-
-SIXTRL_FN SIXTRL_STATIC SIXTRL_DATAPTR_DEC NS(Object) const*
-NS(Buffer_get_const_objects_begin)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
-
-SIXTRL_FN SIXTRL_STATIC SIXTRL_DATAPTR_DEC NS(Object) const*
-NS(Buffer_get_const_objects_end)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
-
-SIXTRL_FN SIXTRL_STATIC SIXTRL_DATAPTR_DEC NS(Object)*
-NS(Buffer_get_objects_begin)(
-    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
-
-SIXTRL_FN SIXTRL_STATIC SIXTRL_DATAPTR_DEC NS(Object)*
-NS(Buffer_get_objects_end)(
-    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
-
-#endif /* !defined( _GPUCODE ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
@@ -92,14 +76,18 @@ NS(Buffer_get_objects_end)(
  * *****         Implementation of inline functions and methods        ***** *
  * ************************************************************************* */
 
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/impl/managed_buffer_minimal.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
 /* ========================================================================= */
 
-SIXTRL_INLINE NS(Object)* NS(Object_preset)(
-    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object )
+SIXTRL_INLINE SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* NS(Object_preset)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object )
 {
     if( object != SIXTRL_NULLPTR )
     {
@@ -114,7 +102,7 @@ SIXTRL_INLINE NS(Object)* NS(Object_preset)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE NS(buffer_addr_t) NS(Object_get_begin_addr)(
-    SIXTRL_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT object )
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT object )
 {
     #if !defined( NDEBUG )
     typedef unsigned char const*    ptr_to_raw_t;
@@ -137,7 +125,8 @@ SIXTRL_INLINE NS(buffer_addr_t) NS(Object_get_begin_addr)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE void NS(Object_set_begin_addr)(
-    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object, NS(buffer_addr_t) const begin_addr )
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
+    NS(buffer_addr_t) const begin_addr )
 {
     #if !defined( NDEBUG )
     typedef unsigned char const*    ptr_to_raw_t;
@@ -157,7 +146,7 @@ SIXTRL_INLINE void NS(Object_set_begin_addr)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE NS(object_type_id_t) NS(Object_get_type_id)(
-    SIXTRL_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT object )
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT object )
 {
     return ( object != SIXTRL_NULLPTR )
         ? object->type_id : ( NS(object_type_id_t ) )0;
@@ -166,7 +155,7 @@ SIXTRL_INLINE NS(object_type_id_t) NS(Object_get_type_id)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE void NS(Object_set_type_id)(
-    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
     NS(object_type_id_t) const type_id )
 {
     if( object != SIXTRL_NULLPTR ) object->type_id = type_id;
@@ -176,7 +165,7 @@ SIXTRL_INLINE void NS(Object_set_type_id)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE NS(buffer_size_t) NS(Object_get_size)(
-    SIXTRL_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT object )
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT object )
 {
     return ( object != SIXTRL_NULLPTR )
         ? object->size : ( NS(buffer_size_t) )0u;
@@ -185,7 +174,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(Object_get_size)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE void NS(Object_set_size)(
-    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
     NS(buffer_size_t) const size )
 {
     if( object != SIXTRL_NULLPTR )
@@ -196,68 +185,30 @@ SIXTRL_INLINE void NS(Object_set_size)(
     return;
 }
 
-SIXTRL_INLINE SIXTRL_DATAPTR_DEC unsigned char const*
-NS(Object_get_const_begin_ptr)(
-    SIXTRL_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT object )
+SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char const*
+NS(Object_get_const_begin_ptr)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC const
+    NS(Object) *const SIXTRL_RESTRICT object )
 {
     typedef SIXTRL_DATAPTR_DEC unsigned char const* ptr_to_raw_t;
     return ( ptr_to_raw_t )( uintptr_t )NS(Object_get_begin_addr)( object );
 }
 
-SIXTRL_INLINE SIXTRL_DATAPTR_DEC unsigned char* NS(Object_get_begin_ptr)(
-    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object )
+SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char*
+NS(Object_get_begin_ptr)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC
+    NS(Object)* SIXTRL_RESTRICT object )
 {
     return ( SIXTRL_DATAPTR_DEC unsigned char*
         )NS(Object_get_const_begin_ptr)( object );
 }
 
 SIXTRL_INLINE void NS(Object_set_begin_ptr)(
-    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
-    SIXTRL_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin_ptr )
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin_ptr )
 {
     typedef NS(buffer_addr_t) address_t;
     NS(Object_set_begin_addr)( object, ( address_t )( uintptr_t )begin_ptr );
     return;
 }
-
-/* ========================================================================= */
-
-#if !defined( _GPUCODE )
-
-SIXTRL_INLINE SIXTRL_DATAPTR_DEC NS(Object) const*
-NS(Buffer_get_const_objects_begin)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buf )
-{
-    typedef SIXTRL_DATAPTR_DEC NS(Object) const*     ptr_to_obj_t;
-    typedef uintptr_t                               uptr_t;
-    return ( ptr_to_obj_t )( uptr_t )NS(Buffer_get_objects_begin_addr)( buf );
-}
-
-SIXTRL_INLINE SIXTRL_DATAPTR_DEC NS(Object) const*
-NS(Buffer_get_const_objects_end)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buf )
-{
-    typedef NS(Object) const* ptr_to_obj_t;
-    return ( ptr_to_obj_t )( uintptr_t )NS(Buffer_get_objects_end_addr)( buf );
-}
-
-SIXTRL_INLINE SIXTRL_DATAPTR_DEC NS(Object)* NS(Buffer_get_objects_begin)(
-    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
-{
-    typedef SIXTRL_DATAPTR_DEC NS(Object)* ptr_to_obj_t;
-    return ( ptr_to_obj_t )NS(Buffer_get_const_objects_begin)( buffer);
-}
-
-SIXTRL_INLINE SIXTRL_DATAPTR_DEC NS(Object)* NS(Buffer_get_objects_end)(
-    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
-{
-    typedef SIXTRL_DATAPTR_DEC NS(Object)* ptr_to_obj_t;
-    return ( ptr_to_obj_t )NS(Buffer_get_const_objects_end)( buffer);
-}
-
-#endif /* !defined( _GPUCODE ) */
-
-/* ========================================================================= */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }

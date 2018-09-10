@@ -112,25 +112,6 @@ extern "C" {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-typedef struct NS(Object)
-{
-    NS(buffer_addr_t)    begin_addr       SIXTRL_ALIGN( 8u );
-    NS(object_type_id_t) type_id          SIXTRL_ALIGN( 8u );
-    NS(buffer_size_t)    size             SIXTRL_ALIGN( 8u );
-}
-NS(Object);
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-typedef struct NS(BufferGarbage)
-{
-    NS(buffer_addr_t)    begin_addr       SIXTRL_ALIGN( 8u );
-    NS(buffer_addr_t)    size             SIXTRL_ALIGN( 8u );
-}
-NS(BufferGarbage);
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
 typedef struct NS(Buffer)
 {
     NS(buffer_addr_t)    data_addr        SIXTRL_ALIGN( 8u );
