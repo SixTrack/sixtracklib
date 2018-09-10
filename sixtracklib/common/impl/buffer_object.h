@@ -189,15 +189,15 @@ SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char const*
 NS(Object_get_const_begin_ptr)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC const
     NS(Object) *const SIXTRL_RESTRICT object )
 {
-    typedef SIXTRL_DATAPTR_DEC unsigned char const* ptr_to_raw_t;
+    typedef SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char const* ptr_to_raw_t;
     return ( ptr_to_raw_t )( uintptr_t )NS(Object_get_begin_addr)( object );
 }
 
 SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char*
-NS(Object_get_begin_ptr)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC
-    NS(Object)* SIXTRL_RESTRICT object )
+NS(Object_get_begin_ptr)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object )
 {
-    return ( SIXTRL_DATAPTR_DEC unsigned char*
+    return ( SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char*
         )NS(Object_get_const_begin_ptr)( object );
 }
 
