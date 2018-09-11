@@ -11,7 +11,6 @@
     #include "sixtracklib/_impl/definitions.h"
     #include "sixtracklib/common/impl/buffer_defines.h"
     #include "sixtracklib/common/impl/beam_elements_defines.h"
-    #include "sixtracklib/common/impl/be_drift_defines.h"
     #include "sixtracklib/common/impl/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -32,16 +31,16 @@ NS(Drift);
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Drift_get_num_dataptrs)(
-    SIXTRL_BE_DRIFT_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift );
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_DRIFT_ARGPTR_DEC NS(Drift)* NS(Drift_preset)(
-    SIXTRL_BE_DRIFT_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift );
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC NS(Drift)* NS(Drift_preset)(
+    SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift );
 
 SIXTRL_FN SIXTRL_STATIC NS(drift_real_t) NS(Drift_get_length)(
-    SIXTRL_BE_DRIFT_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift );
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift );
 
 SIXTRL_FN SIXTRL_STATIC void NS(Drift_set_length)(
-    SIXTRL_BE_DRIFT_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift,
+    SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift,
     NS(drift_real_t) const length );
 
 /* ------------------------------------------------------------------------- */
@@ -74,19 +73,17 @@ NS(DriftExact);
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(DriftExact_get_num_dataptrs)(
-    SIXTRL_BE_DRIFTEXACT_ARGPTR_DEC const NS(DriftExact)
-        *const SIXTRL_RESTRICT drift );
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_DRIFTEXACT_ARGPTR_DEC NS(DriftExact)*
-NS(DriftExact_preset)( SIXTRL_BE_DRIFTEXACT_ARGPTR_DEC
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC NS(DriftExact)*
+NS(DriftExact_preset)( SIXTRL_BE_ARGPTR_DEC
     NS(DriftExact)* SIXTRL_RESTRICT drift );
 
 SIXTRL_FN SIXTRL_STATIC NS(drift_real_t) NS(DriftExact_get_length)(
-    SIXTRL_BE_DRIFTEXACT_ARGPTR_DEC const NS(DriftExact)
-        *const SIXTRL_RESTRICT drift );
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift );
 
 SIXTRL_FN SIXTRL_STATIC void NS(DriftExact_set_length)(
-    SIXTRL_BE_DRIFTEXACT_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift,
+    SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift,
     NS(drift_real_t) const length );
 
 #if !defined( _GPUCODE )
@@ -128,14 +125,14 @@ extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 SIXTRL_INLINE NS(buffer_size_t) NS(Drift_get_num_dataptrs)(
-    SIXTRL_BE_DRIFT_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift )
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift )
 {
     ( void )drift;
     return ( NS(buffer_size_t) )0u;
 }
 
 SIXTRL_INLINE  NS(Drift)* NS(Drift_preset)(
-    SIXTRL_BE_DRIFT_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift )
+    SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift )
 {
     if( drift != SIXTRL_NULLPTR )
     {
@@ -146,13 +143,13 @@ SIXTRL_INLINE  NS(Drift)* NS(Drift_preset)(
 }
 
 SIXTRL_INLINE  NS(drift_real_t) NS(Drift_get_length)(
-    SIXTRL_BE_DRIFT_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift )
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift )
 {
     return ( drift != SIXTRL_NULLPTR ) ? drift->length : ( NS(drift_real_t) )0;
 }
 
 SIXTRL_INLINE void NS(Drift_set_length)(
-    SIXTRL_BE_DRIFT_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift,
+    SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift,
     NS(drift_real_t) const length )
 {
     if( drift != SIXTRL_NULLPTR ) drift->length = length;
@@ -236,15 +233,14 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Drift)* NS(Drift_add)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(buffer_size_t) NS(DriftExact_get_num_dataptrs)(
-    SIXTRL_BE_DRIFTEXACT_ARGPTR_DEC  const NS(DriftExact)
-        *const SIXTRL_RESTRICT drift )
+    SIXTRL_BE_ARGPTR_DEC  const NS(DriftExact) *const SIXTRL_RESTRICT drift )
 {
     ( void )drift;
     return ( NS(buffer_size_t) )0u;
 }
 
-SIXTRL_INLINE SIXTRL_BE_DRIFT_ARGPTR_DEC  NS(DriftExact)* NS(DriftExact_preset)(
-    SIXTRL_BE_DRIFTEXACT_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift )
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC  NS(DriftExact)* NS(DriftExact_preset)(
+    SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift )
 {
     if( drift != SIXTRL_NULLPTR )
     {
@@ -255,13 +251,13 @@ SIXTRL_INLINE SIXTRL_BE_DRIFT_ARGPTR_DEC  NS(DriftExact)* NS(DriftExact_preset)(
 }
 
 SIXTRL_INLINE  NS(drift_real_t) NS(DriftExact_get_length)(
-    SIXTRL_BE_DRIFTEXACT_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift )
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift )
 {
     return ( drift != SIXTRL_NULLPTR ) ? drift->length : ( NS(drift_real_t) )0;
 }
 
 SIXTRL_INLINE void NS(DriftExact_set_length)(
-    SIXTRL_BE_DRIFTEXACT_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift,
+    SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift,
     NS(drift_real_t) const length )
 {
     SIXTRL_ASSERT( drift != SIXTRL_NULLPTR );
@@ -318,9 +314,9 @@ NS(DriftExact_new)( SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
 }
 
 SIXTRL_INLINE  SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact)*
-    NS(DriftExact_add)(
-        SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-        NS(drift_real_t) const length )
+NS(DriftExact_add)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(drift_real_t) const length )
 {
     typedef NS(DriftExact)                      elem_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC elem_t*   ptr_to_elem_t;

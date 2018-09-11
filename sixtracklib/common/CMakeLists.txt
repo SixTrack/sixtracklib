@@ -5,8 +5,6 @@ set( SIXTRACKLIB_COMMON_IMPL_HEADERS
      impl/beam_elements_defines.h
      impl/beam_elements_undef.h
      impl/be_drift.h
-     impl/be_drift_defines.h
-     impl/be_drift_undef.h
      impl/be_drift.hpp
      impl/be_multipole.h
      impl/be_multipole.hpp
