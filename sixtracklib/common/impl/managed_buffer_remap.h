@@ -69,6 +69,12 @@ SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size );
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC void NS(ManagedBuffer_print_header)(
+    SIXTRL_BUFFER_DATAPTR_DEC const unsigned char *const SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) const slot_size );
+
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
@@ -672,6 +678,46 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap)(
 
     return success;
 }
+
+#if defined( _GPUCODE )
+SIXTRL_INLINE void NS(ManagedBuffer_print_header)(
+    __global const unsigned char *const SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) const slot_size )
+#else
+SIXTRL_INLINE void NS(ManagedBuffer_print_header)(
+    const unsigned char *const SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) const slot_size )
+#endif /* defined( _GPUCODE ) */
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(buffer_addr_t) address_t;
+
+    if( ( begin != SIXTRL_NULLPTR ) && ( slot_size != ( buf_size_t )0u ) &&
+        ( ( ( ( uintptr_t )begin ) % slot_size ) == ( buf_size_t )0u ) )
+    {
+        #if defined( _GPUCODE )
+        __global address_t const* ptr_header =
+            ( __global address_t const* )begin;
+        #else
+        address_t const* ptr_header = ( address_t const* )begin;
+        #endif /* defined( _GPUCODE ) */
+
+        int ii = 0;
+
+        for( ; ii < 8 ; ++ii )
+        {
+            printf( "header[ %d ] @ 0x%016lu : 0x%016lu \r\n",
+                ii, ( unsigned long int )&ptr_header[ ii ],
+                    ( unsigned long int )ptr_header[ ii ] );
+        }
+
+        return;
+    }
+
+    return;
+}
+
+
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }

@@ -21,13 +21,12 @@
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/_impl/path.h"
 #include "sixtracklib/common/buffer.h"
-#include "sixtracklib/common/beam_elements.h"
 
 /* ========================================================================= */
 /* =====  track drifts of constant length                                    */
 /* ========================================================================= */
 
-namespace sixtrack
+namespace sixtracklib
 {
     bool read_testdata_and_run_tracking_test_on_node(
         std::string const& path_to_testdata,

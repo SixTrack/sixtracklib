@@ -16,6 +16,7 @@
 #include "sixtracklib/testlib/time_tools.h"
 #include "sixtracklib/testlib/test_particles_tools.h"
 #include "sixtracklib/testlib/test_beam_elements_tools.h"
+#include "sixtracklib/testlib/track_testdata_tools.h"
 // #include "sixtracklib/testlib/test_track_tools.h"
 
 #include "sixtracklib/testlib/testdata_files.h"

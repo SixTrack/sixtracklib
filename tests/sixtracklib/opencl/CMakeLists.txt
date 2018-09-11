@@ -15,6 +15,22 @@ if( GTEST_FOUND )
     add_test( C99_OpenCL_BufferTests test_buffer_opencl_c99 )
 
     # --------------------------------------------------------------------------
+    # test_particles_opencl_c99:
+
+    add_executable( test_particles_opencl_c99 test_particles_opencl_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_particles_opencl_c99 )
+    target_link_libraries( test_particles_opencl_c99 PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
+    #     add_test( C99_OpenCL_BufferTests test_particles_opencl_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_be_drift_opencl_c99:
+
+    add_executable( test_be_drift_opencl_c99 test_be_drift_opencl_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_drift_opencl_c99 )
+    target_link_libraries( test_be_drift_opencl_c99 PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
+#     add_test( C99_OpenCL_BufferTests test_be_drift_opencl_c99 )
+
+    # --------------------------------------------------------------------------
     # test_track_opencl:
 
 #     add_executable( test_track_opencl test_track.cpp )

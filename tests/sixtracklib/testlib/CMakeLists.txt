@@ -40,6 +40,7 @@ set( SIXTRACKL_TESTLIB_HEADERS
      time_tools.h
      test_particles_tools.h
      test_beam_elements_tools.h
+     track_testdata_tools.h
 #      test_track_tools.h
 )
 
@@ -49,6 +50,7 @@ set( SIXTRACKL_TESTLIB_SOURCES
      details/time_tools.c
      details/test_particles_tools.c
      details/test_beam_elements_tools.c
+     details/track_testdata_tools.c
 #      details/test_track_tools.c
 )
 
