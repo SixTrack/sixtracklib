@@ -17,11 +17,11 @@ __kernel void NS(Particles_copy_buffer_opencl)(
     SIXTRL_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag )
 {
     typedef NS(buffer_size_t) buf_size_t;
-    typedef __global NS(Object)*       obj_iter_t;
-    typedef __global NS(Object) const* obj_const_iter_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*       obj_iter_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* obj_const_iter_t;
 
-    typedef __global NS(Particles) const* ptr_const_particles_t;
-    typedef __global NS(Particles)*       ptr_particles_t;
+    typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const* ptr_const_particles_t;
+    typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*       ptr_particles_t;
 
     int success_flag = ( int )0u;
     buf_size_t const slot_size = ( buf_size_t )8u;
