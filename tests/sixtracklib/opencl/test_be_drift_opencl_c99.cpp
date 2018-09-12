@@ -612,7 +612,7 @@ TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
                         ASSERT_TRUE( orig_belem != nullptr );
                         ASSERT_TRUE( copy_belem != nullptr );
 
-                        ASSERT_TRUE( ::st_Drift_compare(
+                        ASSERT_TRUE( ::st_Drift_compare_values(
                             orig_belem, copy_belem ) == 0 );
 
                         break;
@@ -632,7 +632,7 @@ TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
                         ASSERT_TRUE( orig_belem != nullptr );
                         ASSERT_TRUE( copy_belem != nullptr );
 
-                        ASSERT_TRUE( ::st_DriftExact_compare(
+                        ASSERT_TRUE( ::st_DriftExact_compare_values(
                             orig_belem, copy_belem ) == 0 );
 
                         break;
