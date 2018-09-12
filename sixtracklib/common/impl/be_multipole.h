@@ -40,6 +40,10 @@ NS(MultiPole);
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(MultiPole_get_num_dataptrs)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
 
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(MultiPole_get_num_slots)(
+    SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole,
+    NS(buffer_size_t) const slot_size );
+
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* NS(MultiPole_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT multipole );
 
@@ -124,6 +128,10 @@ SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_set_ksl_value)(
     NS(buffer_size_t) const index,
     NS(multipole_real_t) const ksl_i );
 
+SIXTRL_FN SIXTRL_STATIC int NS(MultiPole_copy)(
+    SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT destination,
+    SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT src );
+
 SIXTRL_FN SIXTRL_STATIC int NS(MultiPole_compare_values)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT rhs );
@@ -191,6 +199,80 @@ SIXTRL_INLINE NS(buffer_size_t) NS(MultiPole_get_num_dataptrs)(
              ( multipole->order >= ( mp_order_t )0 ) )
         ? ( buf_size_t )1u : ( buf_size_t )0u;
 }
+
+SIXTRL_INLINE NS(buffer_size_t) NS(MultiPole_get_num_slots)(
+    SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT mp,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t)       buf_size_t;
+    typedef NS(multipole_order_t)   mp_order_t;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
+
+    buf_size_t requ_num_slots =  NS(ManagedBuffer_get_slot_based_length)(
+            sizeof( NS(MultiPole) ), slot_size );
+
+    if( ( requ_num_slots > ZERO ) && ( slot_size > ZERO ) )
+    {
+        buf_size_t const bal_size = NS(MultiPole_get_bal_size)( mp );
+
+        SIXTRL_ASSERT(
+            ( NS(MultiPole_get_num_dataptrs)( mp ) == ( buf_size_t )1u ) ||
+            ( ( NS(MultiPole_get_num_dataptrs)( mp ) == ZERO ) &&
+              ( NS(MultiPole_get_order)( mp ) < ( mp_order_t )0 ) ) );
+
+        SIXTRL_ASSERT( ( requ_num_slots % slot_size ) == ZERO );
+        SIXTRL_ASSERT( ( bal_size % 2u ) == ZERO );
+
+        if( bal_size > ZERO )
+        {
+            requ_num_slots += NS(ManagedBuffer_get_slot_based_length)(
+                bal_size * sizeof( SIXTRL_REAL_T ), slot_size );
+        }
+
+        SIXTRL_ASSERT( ZERO == ( requ_num_slots % slot_size ) );
+        SIXTRL_ASSERT( requ_num_slots >= slot_size );
+
+        requ_num_slots /= slot_size;
+    }
+
+    return requ_num_slots;
+}
+
+SIXTRL_INLINE int NS(MultiPole_copy)(
+    SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT dest,
+    SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT src )
+{
+    int success = -1;
+
+    NS(multipole_order_t) const order = NS(MultiPole_get_order)( src );
+
+    if( ( dest != SIXTRL_NULLPTR ) && ( src != SIXTRL_NULLPTR ) &&
+        ( NS(MultiPole_get_order)( dest ) == order ) )
+    {
+        NS(MultiPole_set_length)( dest, NS(MultiPole_get_length)( src ) );
+        NS(MultiPole_set_hxl)( dest, NS(MultiPole_get_hxl)( src ) );
+        NS(MultiPole_set_hyl)( dest, NS(MultiPole_get_hyl)( src ) );
+
+        if( order >= ( NS(multipole_order_t) )0u )
+        {
+            SIXTRL_ASSERT( NS(MultiPole_get_bal)( dest )     != SIXTRL_NULLPTR );
+            SIXTRL_ASSERT( NS(MultiPole_get_const_bal)( src) != SIXTRL_NULLPTR );
+            SIXTRL_ASSERT( NS(MultiPole_get_bal_size)( dest ) ==
+                           NS(MultiPole_get_bal_size)( src  ) );
+
+            SIXTRACKLIB_COPY_VALUES( SIXTRL_REAL_T,
+                 NS(MultiPole_get_bal)( dest ),
+                 NS(MultiPole_get_const_bal)( src ),
+                 NS(MultiPole_get_bal_size)( src ) );
+        }
+
+        success = 0;
+    }
+
+    return success;
+}
+
 
 SIXTRL_FN SIXTRL_STATIC NS(multipole_order_t) NS(_calculate_factorial)(
     NS(multipole_order_t) const n )

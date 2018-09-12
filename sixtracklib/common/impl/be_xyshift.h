@@ -32,6 +32,10 @@ NS(XYShift);
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(XYShift_get_num_dataptrs)(
     SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xy_shift );
 
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(XYShift_get_num_slots)(
+    SIXTRL_BE_ARGPTR_DEC  const NS(XYShift) *const SIXTRL_RESTRICT xy_shift,
+    NS(buffer_size_t) const slot_size );
+
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC NS(XYShift)* NS(XYShift_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift );
 
@@ -49,7 +53,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(XYShift_set_dy)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift,
     NS(xyshift_real_t) const dy );
 
-SIXTRL_FN SIXTRL_STATIC void NS(XYShift_copy)(
+SIXTRL_FN SIXTRL_STATIC int NS(XYShift_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT source );
 
@@ -110,6 +114,24 @@ SIXTRL_INLINE NS(buffer_size_t) NS(XYShift_get_num_dataptrs)(
     return ( NS(buffer_size_t) )0u;
 }
 
+SIXTRL_INLINE NS(buffer_size_t) NS(XYShift_get_num_slots)(
+    SIXTRL_BE_ARGPTR_DEC  const NS(XYShift) *const SIXTRL_RESTRICT xyshift,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(XYShift)     beam_element_t;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
+
+    ( void )xyshift;
+
+    buf_size_t extent = NS(ManagedBuffer_get_slot_based_length)(
+        sizeof( beam_element_t ), slot_size );
+
+    SIXTRL_ASSERT( ( slot_size == ZERO ) || ( ( extent % slot_size ) == ZERO ) );
+    return ( slot_size > ZERO ) ? ( extent / slot_size ) : ( ZERO );
+}
+
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(XYShift)* NS(XYShift_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift )
 {
@@ -155,17 +177,20 @@ SIXTRL_INLINE void NS(XYShift_set_dy)(
 }
 
 
-SIXTRL_INLINE void NS(XYShift_copy)(
+SIXTRL_INLINE int NS(XYShift_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT source )
 {
+    int success = -1;
+
     if( ( destination != SIXTRL_NULLPTR ) && ( source != SIXTRL_NULLPTR ) )
     {
         NS(XYShift_set_dx)( destination, NS(XYShift_get_dx)( source ) );
         NS(XYShift_set_dx)( destination, NS(XYShift_get_dy)( source ) );
+        success = 0;
     }
 
-    return;
+    return success;
 }
 
 SIXTRL_INLINE int NS(XYShift_compare_values)(

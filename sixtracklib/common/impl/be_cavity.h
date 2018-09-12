@@ -33,6 +33,10 @@ NS(Cavity);
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Cavity_get_num_dataptrs)(
     SIXTRL_BE_ARGPTR_DEC  const NS(Cavity) *const SIXTRL_RESTRICT cavity );
 
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Cavity_get_num_slots)(
+    SIXTRL_BE_ARGPTR_DEC  const NS(Cavity) *const SIXTRL_RESTRICT cavity,
+    NS(buffer_size_t) const slot_size );
+
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC NS(Cavity)* NS(Cavity_preset)(
     SIXTRL_BE_ARGPTR_DEC  NS(Cavity)* SIXTRL_RESTRICT cavity );
 
@@ -57,7 +61,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(Cavity_set_lag)(
     SIXTRL_BE_ARGPTR_DEC  NS(Cavity)* SIXTRL_RESTRICT cavity,
     SIXTRL_REAL_T const lag );
 
-SIXTRL_FN SIXTRL_STATIC void NS(Cavity_copy)(
+SIXTRL_FN SIXTRL_STATIC int NS(Cavity_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT source );
 
@@ -116,6 +120,24 @@ SIXTRL_INLINE NS(buffer_size_t) NS(Cavity_get_num_dataptrs)(
     SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cavity )
 {
     return ( NS(buffer_size_t) )0u;
+}
+
+SIXTRL_INLINE NS(buffer_size_t) NS(Cavity_get_num_slots)(
+    SIXTRL_BE_ARGPTR_DEC  const NS(Cavity) *const SIXTRL_RESTRICT cavity,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(Cavity)        beam_element_t;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
+
+    ( void )cavity;
+
+    buf_size_t extent = NS(ManagedBuffer_get_slot_based_length)(
+        sizeof( beam_element_t ), slot_size );
+
+    SIXTRL_ASSERT( ( slot_size == ZERO ) || ( ( extent % slot_size ) == ZERO ) );
+    return ( slot_size > ZERO ) ? ( extent / slot_size ) : ( ZERO );
 }
 
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Cavity)* NS(Cavity_preset)(
@@ -177,10 +199,12 @@ SIXTRL_INLINE void NS(Cavity_set_lag)(
     return;
 }
 
-SIXTRL_INLINE void NS(Cavity_copy)(
+SIXTRL_INLINE int NS(Cavity_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT source )
 {
+    int success = -1;
+
     if( ( destination != SIXTRL_NULLPTR ) && ( source != SIXTRL_NULLPTR ) )
     {
         NS(Cavity_set_voltage)(
@@ -190,9 +214,11 @@ SIXTRL_INLINE void NS(Cavity_copy)(
             destination, NS(Cavity_get_frequency)( source ) );
 
         NS(Cavity_set_lag)( destination, NS(Cavity_get_lag)( source ) );
+
+        success = 0;
     }
 
-    return;
+    return success;
 }
 
 SIXTRL_INLINE int NS(Cavity_compare_values)(

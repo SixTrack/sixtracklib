@@ -32,6 +32,10 @@ NS(SRotation);
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(SRotation_get_num_dataptrs)(
     SIXTRL_BE_ARGPTR_DEC const NS(SRotation) *const SIXTRL_RESTRICT srotation );
 
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(SRotation_get_num_slots)(
+    SIXTRL_BE_ARGPTR_DEC  const NS(SRotation) *const SIXTRL_RESTRICT srot,
+    NS(buffer_size_t) const slot_size );
+
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC NS(SRotation)* NS(SRotation_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(SRotation)* SIXTRL_RESTRICT srotation );
 
@@ -55,7 +59,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(SRotation_set_angle_deg)(
     SIXTRL_BE_ARGPTR_DEC NS(SRotation)* SIXTRL_RESTRICT srotation,
     SIXTRL_REAL_T const angle_deg );
 
-SIXTRL_FN SIXTRL_STATIC void NS(SRotation_copy)(
+SIXTRL_FN SIXTRL_STATIC int NS(SRotation_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(SRotation)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(SRotation) *const SIXTRL_RESTRICT source );
 
@@ -122,7 +126,26 @@ extern "C" {
 SIXTRL_INLINE NS(buffer_size_t) NS(SRotation_get_num_dataptrs)(
     SIXTRL_BE_ARGPTR_DEC const NS(SRotation) *const SIXTRL_RESTRICT srotation )
 {
+    ( void )srotation;
     return ( NS(buffer_size_t) )0u;
+}
+
+SIXTRL_INLINE NS(buffer_size_t) NS(SRotation_get_num_slots)(
+    SIXTRL_BE_ARGPTR_DEC  const NS(SRotation) *const SIXTRL_RESTRICT srot,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(SRotation)     beam_element_t;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
+
+    ( void )srot;
+
+    buf_size_t extent = NS(ManagedBuffer_get_slot_based_length)(
+        sizeof( beam_element_t ), slot_size );
+
+    SIXTRL_ASSERT( ( slot_size == ZERO ) || ( ( extent % slot_size ) == ZERO ) );
+    return ( slot_size > ZERO ) ? ( extent / slot_size ) : ( ZERO );
 }
 
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(SRotation)* NS(SRotation_preset)(
@@ -209,17 +232,20 @@ SIXTRL_INLINE void NS(SRotation_set_angle_deg)(
     return;
 }
 
-SIXTRL_INLINE void NS(SRotation_copy)(
+SIXTRL_INLINE int NS(SRotation_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(SRotation)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(SRotation) *const SIXTRL_RESTRICT source )
 {
+    int success = -1;
+
     if( ( destination != SIXTRL_NULLPTR ) && ( source != SIXTRL_NULLPTR ) )
     {
         destination->cos_z = NS(SRotation_get_cos_angle)( source );
         destination->sin_z = NS(SRotation_get_sin_angle)( source );
+        success = 0;
     }
 
-    return;
+    return success;
 }
 
 SIXTRL_INLINE int NS(SRotation_compare_values)(
