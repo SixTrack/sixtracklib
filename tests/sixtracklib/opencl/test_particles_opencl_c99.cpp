@@ -123,7 +123,7 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
         /* ----------------------------------------------------------------- */
 
         path_to_source  = PATH_TO_BASE_DIR;
-        path_to_source += "tests/sixtracklib/opencl/test_particles_kernel.cl";
+        path_to_source += "tests/sixtracklib/opencl/opencl_particles_kernel.cl";
 
         kernel_file.open( path_to_source, std::ios::in );
 
@@ -609,4 +609,4 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
 }
 
 
-/* end: tests/sixtracklib/opencl/test_be_drift_opencl_c99.cpp */
+/* end: tests/sixtracklib/opencl/test_particles_opencl_c99.cpp */

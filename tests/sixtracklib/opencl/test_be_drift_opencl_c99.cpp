@@ -116,7 +116,7 @@ TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
 
         path_to_source  = PATH_TO_BASE_DIR;
         path_to_source += "tests/sixtracklib/opencl/";
-        path_to_source += "test_beam_elements_opencl_kernel.cl";
+        path_to_source += "opencl_beam_elements_opencl_kernel.cl";
 
         kernel_file.open( path_to_source, std::ios::in );
 
