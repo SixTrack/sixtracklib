@@ -24,63 +24,37 @@
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/impl/be_drift.h"
 
-
-TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
+TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
 {
     using buffer_t    = ::st_Buffer;
-    using particles_t = ::st_Particles;
     using size_t      = ::st_buffer_size_t;
 
     std::string const path_to_data( ::st_PATH_TO_TEST_TRACKING_BE_DRIFT_DATA );
 
     /* --------------------------------------------------------------------- */
 
-    buffer_t* init_particles_buffer =
-        ::st_TrackTestdata_extract_initial_particles_buffer(
+    buffer_t* orig_buffer = ::st_TrackTestdata_extract_beam_elements_buffer(
             path_to_data.c_str() );
 
-    buffer_t* beam_elements_buffer =
-        ::st_TrackTestdata_extract_beam_elements_buffer(
-            path_to_data.c_str() );
+    size_t const slot_size = ::st_Buffer_get_slot_size( orig_buffer );
+    ASSERT_TRUE( slot_size == size_t{ 8 } );
 
-    buffer_t* result_particles_buffer =
-        ::st_TrackTestdata_extract_result_particles_buffer(
-            path_to_data.c_str() );
 
-    ASSERT_TRUE( init_particles_buffer   != nullptr );
-    ASSERT_TRUE( result_particles_buffer != nullptr );
-    ASSERT_TRUE( beam_elements_buffer    != nullptr );
+    ASSERT_TRUE( orig_buffer != nullptr );
 
-    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( init_particles_buffer ) ==
-                 ::st_Buffer_get_num_of_objects( result_particles_buffer ) );
+    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( orig_buffer ) > size_t{ 0 } );
+    size_t const buffer_size = ::st_Buffer_get_size( orig_buffer );
+    ASSERT_TRUE( buffer_size > size_t{ 0 } );
 
-    ASSERT_TRUE( ::st_Particles_buffers_have_same_structure(
-        init_particles_buffer, result_particles_buffer ) );
 
-    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( init_particles_buffer ) >
-                 static_cast< size_t >( 0 ) );
+    buffer_t* copy_buffer = ::st_Buffer_new( buffer_size );
+    ASSERT_TRUE( copy_buffer != nullptr );
 
-    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( beam_elements_buffer ) >
-                 static_cast< size_t >( 0 ) );
-
-    size_t const particle_buffer_size =
-        ::st_Buffer_get_size( init_particles_buffer );
-
-    size_t const beam_elements_buffer_size =
-        ::st_Buffer_get_size( beam_elements_buffer );
-
-    ASSERT_TRUE( particle_buffer_size > size_t{ 0 } );
-    ASSERT_TRUE( beam_elements_buffer_size > size_t{ 0 } );
-
-    buffer_t* particles_buffer = ::st_Buffer_new( particle_buffer_size );
-
-    ASSERT_TRUE( particles_buffer != nullptr );
-
-    int success = ::st_Buffer_reserve( particles_buffer,
-        ::st_Buffer_get_num_of_objects( init_particles_buffer ),
-        ::st_Buffer_get_num_of_slots( init_particles_buffer ),
-        ::st_Buffer_get_num_of_dataptrs( init_particles_buffer ),
-        ::st_Buffer_get_num_of_garbage_ranges( init_particles_buffer ) );
+    int success = ::st_Buffer_reserve( copy_buffer,
+        ::st_Buffer_get_num_of_objects( orig_buffer ),
+        ::st_Buffer_get_num_of_slots( orig_buffer ),
+        ::st_Buffer_get_num_of_dataptrs( orig_buffer ),
+        ::st_Buffer_get_num_of_garbage_ranges( orig_buffer ) );
 
     ASSERT_TRUE( success == 0 );
 
@@ -110,26 +84,53 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
 
         std::string const PATH_TO_BASE_DIR = ::st_PATH_TO_BASE_DIR;
 
+        /* ----------------------------------------------------------------- */
+
         a2str.str( "" );
         a2str << " -D_GPUCODE=1"
               << " -D__NAMESPACE=st_"
+              << " -DSIXTRL_DATAPTR_DEC=__global"
               << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
+              << " -DSIXTRL_BUFFER_OBJ_ARGPTR_DEC=__global"
+              << " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global"
+              << " -DSIXTRL_BE_ARGPTR_DEC=__global"
+              << " -DSIXTRL_BE_DATAPTR_DEC=__global"
               << " -w"
               << " -Werror"
               << " -I" << PATH_TO_BASE_DIR;
 
-        std::string const COMPILE_OPTIONS = a2str.str();
+        std::string const REMAP_COMPILE_OPTIONS = a2str.str();
 
         std::string path_to_source = PATH_TO_BASE_DIR + std::string(
-            "sixtracklib/opencl/impl/track_particles_kernel.cl" );
+            "sixtracklib/opencl/impl/managed_buffer_remap_kernel.cl" );
 
         std::ifstream kernel_file( path_to_source, std::ios::in );
 
-        std::string const PROGRAM_SOURCE_CODE(
+        std::string const REMAP_PROGRAM_SOURCE_CODE(
             ( std::istreambuf_iterator< char >( kernel_file ) ),
               std::istreambuf_iterator< char >() );
 
         kernel_file.close();
+
+        /* ----------------------------------------------------------------- */
+
+        path_to_source  = PATH_TO_BASE_DIR;
+        path_to_source += "tests/sixtracklib/opencl/";
+        path_to_source += "test_beam_elements_opencl_kernel.cl";
+
+        kernel_file.open( path_to_source, std::ios::in );
+
+        std::string const COPY_PROGRAM_SOURCE_CODE(
+            ( std::istreambuf_iterator< char >( kernel_file ) ),
+              std::istreambuf_iterator< char >() );
+
+        a2str << " -I" << PATH_TO_BASE_DIR << "tests";
+
+        std::string const COPY_COMPILE_OPTIONS = a2str.str();
+
+        kernel_file.close();
+
+        /* ----------------------------------------------------------------- */
 
         for( auto& device : devices )
         {
@@ -152,26 +153,24 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
                 case CL_DEVICE_TYPE_CPU:
                 {
                     std::cout << "CPU";
+                    break;
                 }
 
                 case CL_DEVICE_TYPE_GPU:
                 {
                     std::cout << "GPU";
+                    break;
                 }
 
                 case CL_DEVICE_TYPE_ACCELERATOR:
                 {
                     std::cout << "Accelerator";
+                    break;
                 }
 
                 case CL_DEVICE_TYPE_CUSTOM:
                 {
                     std::cout << "Custom";
-                }
-
-                case CL_DEVICE_TYPE_DEFAULT:
-                {
-                    std::cout << " [DEFAULT]";
                     break;
                 }
 
@@ -181,64 +180,66 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
                 }
             };
 
+            size_t const device_max_compute_units =
+                device.getInfo< CL_DEVICE_MAX_COMPUTE_UNITS >();
+
             std::cout << "\r\n"
                       << "INFO  :: Max work-group size           : "
                       << device.getInfo< CL_DEVICE_MAX_WORK_GROUP_SIZE >()
                       << "\r\n"
                       << "INFO  :: Max num compute units         : "
-                      << device.getInfo< CL_DEVICE_MAX_COMPUTE_UNITS >()
-                      << "\r\n";
-
-            size_t const device_max_compute_units =
-                device.getInfo< CL_DEVICE_MAX_COMPUTE_UNITS >();
+                      << device_max_compute_units << "\r\n";
 
             /* ------------------------------------------------------------- */
-            /* reset particle data: */
+            /* reset copy_buffer structure and re-init:            */
             /* ------------------------------------------------------------- */
 
-            ::st_Buffer_clear( particles_buffer, true );
+            ::st_Buffer_clear( copy_buffer, true );
 
-            size_t total_num_particles = size_t{ 0 };
+            auto in_obj_it  = ::st_Buffer_get_const_objects_begin( orig_buffer );
+            auto in_obj_end = ::st_Buffer_get_const_objects_end( orig_buffer );
 
-            auto init_obj_it  = ::st_Buffer_get_const_objects_begin(
-                init_particles_buffer );
-
-            auto init_obj_end = ::st_Buffer_get_const_objects_end(
-                init_particles_buffer );
-
-            for( ; init_obj_it != init_obj_end ; ++init_obj_it )
+            for( ; in_obj_it != in_obj_end ; ++in_obj_it )
             {
-                particles_t const* orig = ( particles_t const* )( uintptr_t
-                    )::st_Object_get_begin_addr( init_obj_it );
+                ::st_object_type_id_t const type_id =
+                    NS(Object_get_type_id)( in_obj_it );
 
-                particles_t* copied_particle = ::st_Particles_add_copy(
-                    particles_buffer, orig );
+                switch( type_id )
+                {
+                    case NS(OBJECT_TYPE_DRIFT):
+                    {
+                        typedef NS(Drift) belem_t;
+                        typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
 
-                total_num_particles +=
-                    ::st_Particles_get_num_of_particles( orig );
+                        ptr_belem_t new_belem = NS(Drift_new)( copy_buffer );
+                        ASSERT_TRUE( new_belem != nullptr );
+                        break;
+                    }
 
-                ASSERT_TRUE( copied_particle != nullptr );
+                    case NS(OBJECT_TYPE_DRIFT_EXACT):
+                    {
+                        typedef NS(DriftExact)   belem_t;
+                        typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
 
-                ASSERT_TRUE( ::st_Particles_have_same_structure(
-                    orig, copied_particle ) );
+                        ptr_belem_t new_belem = NS(DriftExact_new)( copy_buffer );
+                        ASSERT_TRUE( new_belem != nullptr );
+                        break;
+                    }
 
-                ASSERT_TRUE( !::st_Particles_map_to_same_memory(
-                    orig, copied_particle ) );
-
-                ASSERT_TRUE( ::st_Particles_compare_values(
-                    orig, copied_particle ) == 0 );
+                    default:
+                    {
+                        success = -1;
+                    }
+                };
             }
 
-            ASSERT_TRUE( total_num_particles > size_t{ 0 } );
+            ASSERT_TRUE( success == 0 );
 
-            ASSERT_TRUE( ::st_Buffer_get_num_of_objects( particles_buffer ) ==
-                ::st_Buffer_get_num_of_objects( init_particles_buffer ) );
+            size_t const total_num_beam_elements =
+                ::st_Buffer_get_num_of_objects( orig_buffer );
 
-            ASSERT_TRUE( ::st_Particles_buffers_have_same_structure(
-                init_particles_buffer, particles_buffer ) );
-
-            ASSERT_TRUE( 0 == ::st_Particles_buffer_compare_values(
-                init_particles_buffer, particles_buffer ) );
+            ASSERT_TRUE( total_num_beam_elements ==
+                         ::st_Buffer_get_num_of_objects( copy_buffer ) );
 
             /* ------------------------------------------------------------- */
 
@@ -246,16 +247,19 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
 
             cl::Context context( device );
             cl::CommandQueue queue( context, device, CL_QUEUE_PROFILING_ENABLE );
-            cl::Program program( context, PROGRAM_SOURCE_CODE );
+            cl::Program remap_program( context, REMAP_PROGRAM_SOURCE_CODE );
+            cl::Program copy_program(  context, COPY_PROGRAM_SOURCE_CODE );
 
             try
             {
-                cl_ret = program.build( COMPILE_OPTIONS.c_str() );
+                cl_ret = remap_program.build( REMAP_COMPILE_OPTIONS.c_str() );
             }
             catch( cl::Error const& e )
             {
-                std::cerr << "OpenCL Compilation Error -> Stopping Unit-Test \r\n"
-                      << program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( device )
+                std::cerr
+                      << "ERROR :: remap_program :: "
+                      << "OpenCL Compilation Error -> Stopping Unit-Test \r\n"
+                      << remap_program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( device )
                       << "\r\n"
                       << std::endl;
 
@@ -265,24 +269,38 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
 
             ASSERT_TRUE( cl_ret == CL_SUCCESS );
 
-            cl::Buffer cl_particles( context, CL_MEM_READ_WRITE,
-                                     particle_buffer_size );
-
-            cl::Buffer cl_beam_elements( context, CL_MEM_READ_WRITE,
-                                         beam_elements_buffer_size );
-
-            cl::Buffer cl_success_flag( context, CL_MEM_READ_WRITE,
-                                        sizeof( int64_t ) );
-
             try
             {
-                cl_ret = queue.enqueueWriteBuffer( cl_particles, CL_TRUE, 0,
-                    ::st_Buffer_get_size( particles_buffer ),
-                    ::st_Buffer_get_const_data_begin( particles_buffer ) );
+                cl_ret = copy_program.build( COPY_COMPILE_OPTIONS.c_str() );
             }
             catch( cl::Error const& e )
             {
-                std::cout << "enqueueWriteBuffer( particles_buffer ) :: "
+                std::cerr
+                      << "ERROR :: copy_program :: "
+                      << "OpenCL Compilation Error -> Stopping Unit-Test \r\n"
+                      << copy_program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( device )
+                      << "\r\n"
+                      << std::endl;
+
+                cl_ret = CL_FALSE;
+                throw;
+            }
+
+            ASSERT_TRUE( cl_ret == CL_SUCCESS );
+
+            cl::Buffer cl_orig_buffer( context, CL_MEM_READ_WRITE, buffer_size );
+            cl::Buffer cl_copy_buffer( context, CL_MEM_READ_WRITE, buffer_size );
+            cl::Buffer cl_success_flag( context, CL_MEM_READ_WRITE, sizeof( int32_t ) );
+
+            try
+            {
+                cl_ret = queue.enqueueWriteBuffer( cl_orig_buffer, CL_TRUE, 0,
+                    ::st_Buffer_get_size( orig_buffer ),
+                    ::st_Buffer_get_const_data_begin( orig_buffer ) );
+            }
+            catch( cl::Error const& e )
+            {
+                std::cout << "enqueueWriteBuffer( orig_buffer ) :: "
                           << "line = " << __LINE__
                           << " :: ERROR : " << e.what() << std::endl
                           << e.err() << std::endl;
@@ -295,13 +313,13 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
 
             try
             {
-                cl_ret = queue.enqueueWriteBuffer(
-                    cl_beam_elements, CL_TRUE, 0, beam_elements_buffer_size,
-                    ::st_Buffer_get_const_data_begin( beam_elements_buffer ) );
+                cl_ret = queue.enqueueWriteBuffer( cl_copy_buffer, CL_TRUE, 0,
+                   ::st_Buffer_get_size( copy_buffer ),
+                   ::st_Buffer_get_const_data_begin( copy_buffer ) );
             }
             catch( cl::Error const& e )
             {
-                std::cout << "enqueueWriteBuffer( beam_elements_buffer ) :: "
+                std::cout << "enqueueWriteBuffer( copy_buffer ) :: "
                           << "line = " << __LINE__
                           << " :: ERROR : " << e.what() << std::endl
                           << e.err() << std::endl;
@@ -312,12 +330,12 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
 
             ASSERT_TRUE( cl_ret == CL_SUCCESS );
 
-            int64_t success_flag = int64_t{ 0 };
+            int32_t success_flag = int32_t{ 0 };
 
             try
             {
                 cl_ret = queue.enqueueWriteBuffer( cl_success_flag, CL_TRUE, 0,
-                    sizeof( int64_t ), &success_flag );
+                    sizeof( int32_t ), &success_flag );
             }
             catch( cl::Error const& e )
             {
@@ -341,13 +359,15 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
             try
             {
                 remap_kernel = cl::Kernel(
-                    program, "st_Remap_particles_beam_elements_buffers_opencl" );
+                    remap_program, "st_ManagedBuffer_remap_io_buffers_opencl" );
             }
             catch( cl::Error const& e )
             {
-                std::cout << "kernel remap_kernel :: line = " << __LINE__
-                          << " :: ERROR : " << e.what() << std::endl
+                std::cout << "kernel remap_kernel :: "
+                          << "line  = " << __LINE__ << " :: "
+                          << "ERROR : " << e.what() << "\r\n"
                           << e.err() << std::endl;
+
                 cl_ret = CL_FALSE;
                 throw;
             }
@@ -377,8 +397,8 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
             ASSERT_TRUE( ( remap_num_threads % remap_work_group_size ) ==
                 size_t{ 0 } );
 
-            remap_kernel.setArg( 0, cl_particles );
-            remap_kernel.setArg( 1, cl_beam_elements );
+            remap_kernel.setArg( 0, cl_orig_buffer );
+            remap_kernel.setArg( 1, cl_copy_buffer );
             remap_kernel.setArg( 2, cl_success_flag );
 
             try
@@ -390,7 +410,7 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
             }
             catch( cl::Error const& e )
             {
-                std::cout << "enqueueNDRangeKernel( remap_kernel) :: "
+                std::cout << "enqueueNDRangeKernel( remap_kernel ) :: "
                           << "line = " << __LINE__
                           << " :: ERROR : " << e.what() << std::endl
                           << e.err() << std::endl;
@@ -419,29 +439,29 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
 
             ASSERT_TRUE( cl_ret == CL_SUCCESS );
 
-            if( success_flag != int64_t{ 0 } )
+            if( success_flag != int32_t{ 0 } )
             {
                 std::cout << "ERROR :: remap kernel success flag     : "
                           << success_flag
                           << std::endl;
             }
 
-            ASSERT_TRUE( success_flag == int64_t{ 0 } );
+            ASSERT_TRUE( success_flag == int32_t{ 0 } );
 
             /* ============================================================= *
              * TRACKING KERNEL *
              * ============================================================= */
 
-            cl::Kernel tracking_kernel;
+            cl::Kernel copy_kernel;
 
             try
             {
-                tracking_kernel = cl::Kernel(
-                    program, "st_Track_particles_beam_elements_opencl" );
+                copy_kernel = cl::Kernel( copy_program,
+                    "st_BeamElements_copy_beam_elements_opencl" );
             }
             catch( cl::Error const& e )
             {
-                std::cout << "kernel tracking_kernel :: "
+                std::cout << "kernel copy_kernel :: "
                           << "line = " << __LINE__
                           << " :: ERROR : " << e.what() << std::endl
                           << e.err() << std::endl;
@@ -449,51 +469,55 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
                 throw;
             }
 
-            ASSERT_TRUE( tracking_kernel.getInfo< CL_KERNEL_NUM_ARGS >() == 4u );
+            ASSERT_TRUE( copy_kernel.getInfo< CL_KERNEL_NUM_ARGS >() == 3u );
 
-            size_t tracking_work_group_size = tracking_kernel.getWorkGroupInfo<
+            size_t copy_work_group_size = copy_kernel.getWorkGroupInfo<
                 CL_KERNEL_WORK_GROUP_SIZE >( device );
 
-            size_t const tracking_work_group_size_prefered_multiple =
-                tracking_kernel.getWorkGroupInfo<
+            size_t const copy_work_group_size_prefered_multiple =
+                copy_kernel.getWorkGroupInfo<
                     CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE >( device );
 
-            size_t tracking_num_threads =
-                device_max_compute_units * tracking_work_group_size;
+            ASSERT_TRUE( copy_work_group_size_prefered_multiple > size_t{ 0 } );
+            ASSERT_TRUE( copy_work_group_size > size_t{ 0 } );
 
-            std::cout << "INFO  :: tracking kernel wg size       : "
-                      << tracking_work_group_size << "\r\n"
-                      << "INFO  :: tracking kernel wg size multi : "
-                      << tracking_work_group_size_prefered_multiple << "\r\n"
-                      << "INFO  :: tracking kernel launch with   : "
-                      << tracking_num_threads << " threads \r\n"
-                      << "INFO  :: total num of particles        : "
-                      << total_num_particles << "\r\n"
+            size_t copy_num_threads = total_num_beam_elements / copy_work_group_size;
+
+            copy_num_threads *= copy_work_group_size;
+
+            if( total_num_beam_elements > copy_num_threads )
+            {
+                copy_num_threads += copy_work_group_size;
+            }
+
+            std::cout << "INFO  :: copy     kernel wg size       : "
+                      << copy_work_group_size << "\r\n"
+                      << "INFO  :: copy     kernel wg size multi : "
+                      << copy_work_group_size_prefered_multiple << "\r\n"
+                      << "INFO  :: copy     kernel launch with   : "
+                      << copy_num_threads << " threads \r\n"
+                      << "INFO  :: total num of beam_elements    : "
+                      << total_num_beam_elements << "\r\n"
                       << std::endl;
 
-            ASSERT_TRUE( tracking_work_group_size_prefered_multiple > size_t{ 0 } );
-            ASSERT_TRUE( tracking_work_group_size > size_t{ 0 } );
-            ASSERT_TRUE( tracking_num_threads > size_t{ 0 } );
-            ASSERT_TRUE( ( tracking_num_threads % tracking_work_group_size ) ==
-                         size_t{ 0 } );
 
-            SIXTRL_UINT64_T num_turns = SIXTRL_UINT64_T{ 1 };
+            ASSERT_TRUE( copy_num_threads > size_t{ 0 } );
+            ASSERT_TRUE( ( copy_num_threads % copy_work_group_size ) == size_t{ 0 } );
 
-            tracking_kernel.setArg( 0, cl_particles );
-            tracking_kernel.setArg( 1, cl_beam_elements );
-            tracking_kernel.setArg( 2, num_turns );
-            tracking_kernel.setArg( 3, cl_success_flag );
+            copy_kernel.setArg( 0, cl_orig_buffer );
+            copy_kernel.setArg( 1, cl_copy_buffer );
+            copy_kernel.setArg( 2, cl_success_flag );
 
             try
             {
                 cl_ret = queue.enqueueNDRangeKernel(
-                    tracking_kernel, cl::NullRange,
-                    cl::NDRange( tracking_num_threads ),
-                    cl::NDRange( tracking_work_group_size  ) );
+                    copy_kernel, cl::NullRange,
+                    cl::NDRange( copy_num_threads ),
+                    cl::NDRange( copy_work_group_size  ) );
             }
             catch( cl::Error const& e )
             {
-                std::cout << "enqueueNDRangeKernel( tracking_kernel ) :: "
+                std::cout << "enqueueNDRangeKernel( copy_kernel ) :: "
                           << "line = " << __LINE__
                           << " :: ERROR : " << e.what() << std::endl
                           << e.err() << std::endl;
@@ -520,24 +544,24 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
 
             ASSERT_TRUE( cl_ret == CL_SUCCESS );
 
-            if( success_flag != int64_t{ 0 } )
+            if( success_flag != int32_t{ 0 } )
             {
                 std::cout << "ERROR :: tracking kernel success flag  : "
                           << success_flag
                           << std::endl;
             }
 
-            ASSERT_TRUE( success_flag == int64_t{ 0 } );
+            ASSERT_TRUE( success_flag == int32_t{ 0 } );
 
             try
             {
-                cl_ret = queue.enqueueReadBuffer( cl_particles, CL_TRUE, 0,
-                    ::st_Buffer_get_size( particles_buffer ),
-                    ::st_Buffer_get_data_begin( particles_buffer ) );
+                cl_ret = queue.enqueueReadBuffer( cl_copy_buffer, CL_TRUE, 0,
+                    ::st_Buffer_get_size( copy_buffer ),
+                    ::st_Buffer_get_data_begin( copy_buffer ) );
             }
             catch( cl::Error const& e )
             {
-                std::cout << "enqueueReadBuffer( particles_buffer ) :: "
+                std::cout << "enqueueReadBuffer( copy_buffer ) :: "
                           << "line = " << __LINE__
                           << " :: ERROR : " << e.what() << std::endl
                           << e.err() << std::endl;
@@ -548,48 +572,80 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
 
             ASSERT_TRUE( cl_ret == CL_SUCCESS );
 
-            success = ::st_Buffer_remap( particles_buffer );
+            /* ============================================================= */
+            /* COMPARE COPIED DATA TO ORIGINAL DATA                          */
+            /* ============================================================= */
+
+            success = ::st_Buffer_remap( copy_buffer );
 
             ASSERT_TRUE( success == 0 );
 
-            ASSERT_TRUE( ::st_Buffer_get_num_of_objects( particles_buffer ) ==
-                ::st_Buffer_get_num_of_objects( result_particles_buffer ) );
+            ASSERT_TRUE(
+                ::st_Buffer_get_num_of_objects( copy_buffer ) ==
+                ::st_Buffer_get_num_of_objects( orig_buffer ) );
 
-            ASSERT_TRUE( ::st_Particles_buffers_have_same_structure(
-                result_particles_buffer, particles_buffer ) );
+            in_obj_it  = ::st_Buffer_get_const_objects_begin( orig_buffer );
+            in_obj_end = ::st_Buffer_get_const_objects_end( orig_buffer );
 
-            /* ============================================================= */
-            /* COMPARE TRACKING RESULTS WITH STORED RESULT DATA              */
-            /* ============================================================= */
+            auto out_obj_it = ::st_Buffer_get_const_objects_begin( copy_buffer );
 
-            double const COMPARE_TRESHOLD = double{ 1e-13 };
-
-            int compare_result = ::st_Particles_buffer_compare_values(
-                    result_particles_buffer, particles_buffer );
-
-            if( 0 == compare_result )
+            for( ; in_obj_it != in_obj_end ; ++in_obj_it, ++out_obj_it )
             {
-                std::cout << "INFO  :: "
-                          << "tracking kernel reproduced the results exactly!!!"
-                          << std::endl;
-            }
-            else
-            {
-                compare_result =
-                    ::st_Particles_buffer_compare_values_with_treshold(
-                        result_particles_buffer, particles_buffer,
-                            COMPARE_TRESHOLD );
+                ::st_object_type_id_t const type_id =
+                    ::st_Object_get_type_id( in_obj_it );
 
-                if( compare_result == 0 )
+                ASSERT_TRUE( ::st_Object_get_type_id( out_obj_it ) == type_id );
+
+                switch( type_id )
                 {
-                    std::cout << "INFO  :: "
-                          << "tracking kernel reproduced the results within "
-                          << "a tolerance of " << COMPARE_TRESHOLD
-                          << std::endl;
-                }
-            }
+                    case NS(OBJECT_TYPE_DRIFT):
+                    {
+                        typedef NS(Drift) belem_t;
+                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
 
-            ASSERT_TRUE( compare_result == 0 );
+                        ptr_belem_t orig_belem = ( ptr_belem_t )( uintptr_t
+                            )NS(Object_get_begin_addr)( in_obj_it );
+
+                        ptr_belem_t copy_belem = ( ptr_belem_t )( uintptr_t
+                            )NS(Object_get_begin_addr)( out_obj_it );
+
+                        ASSERT_TRUE( orig_belem != nullptr );
+                        ASSERT_TRUE( copy_belem != nullptr );
+
+                        ASSERT_TRUE( ::st_Drift_compare(
+                            orig_belem, copy_belem ) == 0 );
+
+                        break;
+                    }
+
+                    case NS(OBJECT_TYPE_DRIFT_EXACT):
+                    {
+                        typedef NS(DriftExact) belem_t;
+                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
+
+                        ptr_belem_t orig_belem = ( ptr_belem_t )( uintptr_t
+                            )NS(Object_get_begin_addr)( in_obj_it );
+
+                        ptr_belem_t copy_belem = ( ptr_belem_t )( uintptr_t
+                            )NS(Object_get_begin_addr)( out_obj_it );
+
+                        ASSERT_TRUE( orig_belem != nullptr );
+                        ASSERT_TRUE( copy_belem != nullptr );
+
+                        ASSERT_TRUE( ::st_DriftExact_compare(
+                            orig_belem, copy_belem ) == 0 );
+
+                        break;
+                    }
+
+                    default:
+                    {
+                        success = -1;
+                    }
+                };
+
+                ASSERT_TRUE( success == 0 );
+            }
         }
     }
     else
@@ -599,14 +655,8 @@ TEST( C99_OpenCL_BeamElementsTests, TrackDriftsFromTestsDataSet )
                   << "this unit-test <-- !!!" << std::endl;
     }
 
-    ASSERT_TRUE( !devices.empty() );
-
-
-    /* --------------------------------------------------------------------- */
-
-    ::st_Buffer_delete( init_particles_buffer   );
-    ::st_Buffer_delete( result_particles_buffer );
-    ::st_Buffer_delete( beam_elements_buffer    );
+    ::st_Buffer_delete( orig_buffer );
+    ::st_Buffer_delete( copy_buffer );
 }
 
 
