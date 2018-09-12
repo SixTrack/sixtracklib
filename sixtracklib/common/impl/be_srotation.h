@@ -428,7 +428,6 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(SRotation)* NS(SRotation_add_detailed
     SIXTRL_REAL_T const cos_z, SIXTRL_REAL_T const sin_z )
 {
     typedef NS(buffer_size_t)  buf_size_t;
-    typedef SIXTRL_REAL_T                           real_t;
     typedef NS(SRotation)                           elem_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC   elem_t*     ptr_to_elem_t;
 
@@ -440,6 +439,8 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(SRotation)* NS(SRotation_add_detailed
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
 
     #if !defined( NDEBUG )
+    typedef SIXTRL_REAL_T  real_t;
+
     real_t temp = ( real_t )1 - ( cos_z * cos_z + sin_z * sin_z );
     if( temp < ( real_t )0.0 ) temp = -temp;
     SIXTRL_ASSERT( temp < ( real_t )1e-12 );

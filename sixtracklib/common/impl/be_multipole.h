@@ -204,8 +204,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(MultiPole_get_num_slots)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT mp,
     NS(buffer_size_t) const slot_size )
 {
-    typedef NS(buffer_size_t)       buf_size_t;
-    typedef NS(multipole_order_t)   mp_order_t;
+    typedef NS(buffer_size_t) buf_size_t;
 
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
 
@@ -219,7 +218,8 @@ SIXTRL_INLINE NS(buffer_size_t) NS(MultiPole_get_num_slots)(
         SIXTRL_ASSERT(
             ( NS(MultiPole_get_num_dataptrs)( mp ) == ( buf_size_t )1u ) ||
             ( ( NS(MultiPole_get_num_dataptrs)( mp ) == ZERO ) &&
-              ( NS(MultiPole_get_order)( mp ) < ( mp_order_t )0 ) ) );
+              ( NS(MultiPole_get_order)( mp ) <
+              ( NS(multipole_order_t) )0u ) ) );
 
         SIXTRL_ASSERT( ( requ_num_slots % slot_size ) == ZERO );
         SIXTRL_ASSERT( ( bal_size % 2u ) == ZERO );
