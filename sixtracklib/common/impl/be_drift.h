@@ -43,6 +43,19 @@ SIXTRL_FN SIXTRL_STATIC void NS(Drift_set_length)(
     SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift,
     NS(drift_real_t) const length );
 
+SIXTRL_FN SIXTRL_STATIC void NS(Drift_copy)(
+    SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT destination,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT source );
+
+SIXTRL_FN SIXTRL_STATIC int NS(Drift_compare)(
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_FN SIXTRL_STATIC int NS(Drift_compare_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT rhs,
+    NS(drift_real_t) const treshold );
+
 /* ------------------------------------------------------------------------- */
 
 #if !defined( _GPUCODE )
@@ -59,6 +72,11 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Drift)* NS(Drift_new)(
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Drift)* NS(Drift_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(drift_real_t) const length );
+
+SIXTRL_FN SIXTRL_STATIC
+SIXTRL_BUFFER_DATAPTR_DEC NS(Drift)* NS(Drift_add_copy)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift );
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -86,6 +104,19 @@ SIXTRL_FN SIXTRL_STATIC void NS(DriftExact_set_length)(
     SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift,
     NS(drift_real_t) const length );
 
+SIXTRL_FN SIXTRL_STATIC void NS(DriftExact_copy)(
+    SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT destination,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT source );
+
+SIXTRL_FN SIXTRL_STATIC int NS(DriftExact_compare)(
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_FN SIXTRL_STATIC int NS(DriftExact_compare_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT rhs,
+    NS(drift_real_t) const treshold );
+
 #if !defined( _GPUCODE )
 
 SIXTRL_FN SIXTRL_STATIC bool NS(DriftExact_can_be_added)(
@@ -101,6 +132,12 @@ NS(DriftExact_new)( SIXTRL_BUFFER_ARGPTR_DEC
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact)*
 NS(DriftExact_add)( SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
     SIXTRL_RESTRICT buffer, NS(drift_real_t) const length );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact)*
+NS(DriftExact_add_copy)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift );
+
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -131,7 +168,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(Drift_get_num_dataptrs)(
     return ( NS(buffer_size_t) )0u;
 }
 
-SIXTRL_INLINE  NS(Drift)* NS(Drift_preset)(
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Drift)* NS(Drift_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift )
 {
     if( drift != SIXTRL_NULLPTR )
@@ -154,6 +191,83 @@ SIXTRL_INLINE void NS(Drift_set_length)(
 {
     if( drift != SIXTRL_NULLPTR ) drift->length = length;
     return;
+}
+
+SIXTRL_INLINE void NS(Drift_copy)(
+    SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT destination,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT source )
+{
+    NS(Drift_set_length)( destination, NS(Drift_get_length)( source ) );
+    return;
+}
+
+SIXTRL_INLINE int NS(Drift_compare)(
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT rhs )
+{
+    int compare_value = -1;
+
+    if( ( lhs != SIXTRL_NULLPTR ) &&
+        ( rhs != SIXTRL_NULLPTR ) )
+    {
+        if( NS(Drift_get_length)( lhs ) > NS(Drift_get_length)( rhs ) )
+        {
+            compare_value = +1;
+        }
+        else if( NS(Drift_get_length)( lhs ) < NS(Drift_get_length)( rhs ) )
+        {
+            compare_value = -1;
+        }
+        else
+        {
+            compare_value = 0;
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        compare_value = +1;
+    }
+
+    return compare_value;
+}
+
+SIXTRL_INLINE int NS(Drift_compare_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT rhs,
+    NS(drift_real_t) const treshold )
+{
+    int compare_value = -1;
+
+    if( ( lhs != SIXTRL_NULLPTR ) &&
+        ( rhs != SIXTRL_NULLPTR ) )
+    {
+        SIXTRL_ASSERT( treshold >= ( NS(drift_real_t) )0.0 );
+
+        NS(drift_real_t) const diff =
+            NS(Drift_get_length)( lhs ) - NS(Drift_get_length)( rhs );
+
+        NS(drift_real_t) const abs_diff =
+            ( diff > ( NS(drift_real_t) )0.0 ) ? diff : -diff;
+
+        if( abs_diff < treshold )
+        {
+            compare_value = 0;
+        }
+        else if( diff > ( NS(drift_real_t) )0.0 )
+        {
+            compare_value = +1;
+        }
+        else
+        {
+            compare_value = -1;
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        compare_value = +1;
+    }
+
+    return compare_value;
 }
 
 #if !defined( _GPUCODE )
@@ -228,6 +342,13 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Drift)* NS(Drift_add)(
             NS(OBJECT_TYPE_DRIFT), num_dataptrs, offsets, sizes, counts ) );
 }
 
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Drift)* NS(Drift_add_copy)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift )
+{
+    return NS(Drift_add)( buffer, NS(Drift_get_length)( drift ) );
+}
+
 #endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
@@ -239,7 +360,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(DriftExact_get_num_dataptrs)(
     return ( NS(buffer_size_t) )0u;
 }
 
-SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC  NS(DriftExact)* NS(DriftExact_preset)(
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* NS(DriftExact_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift )
 {
     if( drift != SIXTRL_NULLPTR )
@@ -263,6 +384,91 @@ SIXTRL_INLINE void NS(DriftExact_set_length)(
     SIXTRL_ASSERT( drift != SIXTRL_NULLPTR );
     drift->length = length;
     return;
+}
+
+
+SIXTRL_INLINE void NS(DriftExact_copy)(
+    SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT destination,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT source )
+{
+    NS(DriftExact_set_length)(
+        destination, NS(DriftExact_get_length)( source ) );
+
+    return;
+}
+
+SIXTRL_INLINE int NS(DriftExact_compare)(
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT rhs )
+{
+    int compare_value = -1;
+
+    if( ( lhs != SIXTRL_NULLPTR ) &&
+        ( rhs != SIXTRL_NULLPTR ) )
+    {
+        if( NS(DriftExact_get_length)( lhs ) >
+            NS(DriftExact_get_length)( rhs ) )
+        {
+            compare_value = +1;
+        }
+        else if( NS(DriftExact_get_length)( lhs ) <
+                 NS(DriftExact_get_length)( rhs ) )
+        {
+            compare_value = -1;
+        }
+        else
+        {
+            compare_value = 0;
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        compare_value = +1;
+    }
+
+    return compare_value;
+}
+
+SIXTRL_INLINE int NS(DriftExact_compare_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT rhs,
+    NS(drift_real_t) const treshold )
+{
+    int compare_value = -1;
+
+    typedef NS(drift_real_t) real_t;
+
+    SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0.0;
+
+    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) &&
+        ( treshold > ZERO ) )
+    {
+        SIXTRL_ASSERT( treshold >= ZERO );
+
+        NS(drift_real_t) const diff =
+            NS(DriftExact_get_length)( lhs ) - NS(DriftExact_get_length)( rhs );
+
+        NS(drift_real_t) const abs_diff = ( diff > ZERO ) ? diff : -diff;
+
+        if( abs_diff < treshold )
+        {
+            compare_value = 0;
+        }
+        else if( diff > ZERO )
+        {
+            compare_value = +1;
+        }
+        else
+        {
+            compare_value = -1;
+        }
+    }
+    else if( ( rhs != SIXTRL_NULLPTR ) && ( treshold > ZERO ) )
+    {
+        compare_value = +1;
+    }
+
+    return compare_value;
 }
 
 #if !defined( _GPUCODE )
@@ -337,6 +543,13 @@ NS(DriftExact_add)(
     return ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
         NS(Buffer_add_object)( buffer, &temp_obj, sizeof( elem_t ),
             NS(OBJECT_TYPE_DRIFT_EXACT), num_dataptrs, offsets, sizes, counts ) );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact)* NS(DriftExact_add_copy)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift )
+{
+    return NS(DriftExact_add)( buffer, NS(DriftExact_get_length)( drift ) );
 }
 
 #endif /* !defined( _GPUCODE ) */
