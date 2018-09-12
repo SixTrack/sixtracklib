@@ -12,9 +12,9 @@
 #pragma OPENCL_EXTENSION cl_khr_int32_extended_atomics
 
 __kernel void NS(Particles_copy_buffer_opencl)(
-    __global unsigned char const* SIXTRL_RESTRICT in_buffer_begin,
-    __global unsigned char* SIXTRL_RESTRICT out_buffer_begin,
-    __global int* SIXTRL_RESTRICT ptr_success_flag )
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT in_buffer_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer_begin,
+    SIXTRL_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag )
 {
     typedef NS(buffer_size_t) buf_size_t;
     typedef __global NS(Object)*       obj_iter_t;
@@ -44,16 +44,6 @@ __kernel void NS(Particles_copy_buffer_opencl)(
 
         size_t const global_id = get_global_id( 0 );
 
-        if( global_id == 0u )
-        {
-            printf( "\r\nDEVICE: copy_kernel :: in_buffer\r\n" );
-            NS(ManagedBuffer_print_header)( in_buffer_begin, slot_size );
-
-            printf( "\r\nDEVICE: copy_kernel :: out_buffer\r\n" );
-            NS(ManagedBuffer_print_header)( out_buffer_begin, slot_size );
-            printf( "\r\n" );
-        }
-
         for( ; in_obj_it != in_obj_end ; ++in_obj_it, ++out_obj_it )
         {
             ptr_const_particles_t in_particles = ( ptr_const_particles_t )(
@@ -67,20 +57,6 @@ __kernel void NS(Particles_copy_buffer_opencl)(
 
             buf_size_t const obj_end_index = obj_begin_index + nn;
 
-            if( global_id == 0u )
-            {
-                printf( " particle_id: %8lu | "
-                    "in_particles addr: 0x%016lu | "
-                    "in_particles->s addr: 0x%016lu || "
-                    "out_particles addr: 0x%016lu | "
-                    "out_particles->s addr: 0x%016lu\r\n",
-                    ( unsigned long )global_id,
-                    ( unsigned long )in_particles,
-                    ( unsigned long )in_particles->s,
-                    ( unsigned long )out_particles,
-                    ( unsigned long )out_particles->s );
-            }
-
             if( nn == NS(Particles_get_num_of_particles)( out_particles ) )
             {
                 if( ( global_id >= obj_begin_index ) &&
@@ -90,8 +66,8 @@ __kernel void NS(Particles_copy_buffer_opencl)(
 
                     if( particle_id < nn )
                     {
-                        SIXTRL_REAL_T const s = in_particles->s[ particle_id ];
-                        out_particles->s[ particle_id ] = s;
+                        NS(Particles_copy_single)( out_particles, particle_id,
+                            in_particles, particle_id );
                     }
                     else
                     {

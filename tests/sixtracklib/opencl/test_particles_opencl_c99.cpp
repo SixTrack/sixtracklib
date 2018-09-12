@@ -40,6 +40,8 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
             path_to_data.c_str() );
 
     size_t const slot_size = ::st_Buffer_get_slot_size( orig_particles_buffer );
+    ASSERT_TRUE( slot_size == size_t{ 8 } );
+
 
     ASSERT_TRUE( orig_particles_buffer != nullptr );
 
@@ -63,16 +65,6 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
         ::st_Buffer_get_num_of_garbage_ranges( orig_particles_buffer ) );
 
     ASSERT_TRUE( success == 0 );
-
-    std::cout << "HOST: orig_particles_buffer: \r\n";
-    ::st_ManagedBuffer_print_header(
-        ::st_Buffer_get_const_data_begin( orig_particles_buffer ), slot_size );
-    std::cout << std::endl;
-
-    std::cout << "HOST: copy_particles_buffer: \r\n";
-    ::st_ManagedBuffer_print_header(
-        ::st_Buffer_get_const_data_begin( copy_particles_buffer ), slot_size );
-    std::cout << std::endl;
 
     /* --------------------------------------------------------------------- */
 
@@ -105,7 +97,12 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
         a2str.str( "" );
         a2str << " -D_GPUCODE=1"
               << " -D__NAMESPACE=st_"
+              << " -DSIXTRL_DATAPTR_DEC=__global"
               << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
+              << " -DSIXTRL_PARTICLE_ARGPTR_DEC=__global"
+              << " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global"
+              << " -DSIXTRL_BUFFER_OBJ_ARGPTR_DEC=__global"
+              << " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global"
               << " -w"
               << " -Werror"
               << " -I" << PATH_TO_BASE_DIR;
@@ -163,26 +160,24 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
                 case CL_DEVICE_TYPE_CPU:
                 {
                     std::cout << "CPU";
+                    break;
                 }
 
                 case CL_DEVICE_TYPE_GPU:
                 {
                     std::cout << "GPU";
+                    break;
                 }
 
                 case CL_DEVICE_TYPE_ACCELERATOR:
                 {
                     std::cout << "Accelerator";
+                    break;
                 }
 
                 case CL_DEVICE_TYPE_CUSTOM:
                 {
                     std::cout << "Custom";
-                }
-
-                case CL_DEVICE_TYPE_DEFAULT:
-                {
-                    std::cout << " [DEFAULT]";
                     break;
                 }
 
@@ -234,23 +229,6 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
                 ASSERT_TRUE( !::st_Particles_map_to_same_memory( orig, new_particle ) );
             }
 
-            auto out_obj_it = ::st_Buffer_get_const_objects_begin(
-                copy_particles_buffer );
-
-            in_obj_it = ::st_Buffer_get_const_objects_begin(
-                orig_particles_buffer );
-
-            for( ; in_obj_it != in_obj_end ; ++in_obj_it, ++out_obj_it )
-            {
-                std::cout << "printout orig_particle : " << std::endl;
-                ::st_Object_print_slots( in_obj_it, 25u );
-                std::cout << std::endl;
-
-                std::cout << "printout new_particle  : " << std::endl;
-                ::st_Object_print_slots( out_obj_it, 25u );
-                std::cout << std::endl;
-            }
-
             ASSERT_TRUE( total_num_particles > size_t{ 0 } );
 
             ASSERT_TRUE(
@@ -259,6 +237,9 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
 
             ASSERT_TRUE( ::st_Particles_buffers_have_same_structure(
                 orig_particles_buffer, copy_particles_buffer ) );
+
+            ASSERT_TRUE( ::st_Particles_buffer_compare_values(
+                orig_particles_buffer, copy_particles_buffer ) != 0 );
 
             /* ------------------------------------------------------------- */
 
@@ -472,13 +453,9 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
 
             ASSERT_TRUE( success_flag == int32_t{ 0 } );
 
-            break;
-
             /* ============================================================= *
              * TRACKING KERNEL *
              * ============================================================= */
-
-            /*
 
             cl::Kernel copy_kernel;
 
@@ -600,13 +577,10 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
 
             ASSERT_TRUE( cl_ret == CL_SUCCESS );
 
-            */
-
             /* ============================================================= */
             /* COMPARE COPIED DATA TO ORIGINAL DATA                          */
             /* ============================================================= */
 
-            /*
             success = ::st_Buffer_remap( copy_particles_buffer );
 
             ASSERT_TRUE( success == 0 );
@@ -621,8 +595,6 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
 
             ASSERT_TRUE( ::st_Particles_buffer_compare_values(
                 orig_particles_buffer, copy_particles_buffer ) == 0 );
-
-            */
         }
     }
     else
