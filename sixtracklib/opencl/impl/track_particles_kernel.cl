@@ -10,6 +10,8 @@
     #include "sixtracklib/common/track.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
+#pragma OPENCL_EXTENSION cl_khr_int32_extended_atomics
+
 __kernel void NS(Remap_particles_beam_elements_buffers_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
@@ -63,9 +65,10 @@ __kernel void NS(Remap_particles_beam_elements_buffers_opencl)(
             }
         }
 
-        if(  ptr_success_flag != SIXTRL_NULLPTR )
+        if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )
         {
-            *ptr_success_flag  = success_flag;
+
+            atomic_or( ptr_success_flag, success_flag );
         }
     }
 
@@ -119,7 +122,8 @@ __kernel void NS(Track_particles_beam_elements_opencl)(
             SIXTRL_ASSERT( NS(Object_get_type_id)( part_block_it ) ==
                            NS(OBJECT_TYPE_PARTICLE) );
 
-            if( global_particle_id >= object_begin_particle_id )
+            if( ( global_particle_id <  object_end_particle_id   ) &&
+                ( global_particle_id >= object_begin_particle_id ) )
             {
                 size_t const particle_id =
                     global_particle_id - object_begin_particle_id;
@@ -152,9 +156,10 @@ __kernel void NS(Track_particles_beam_elements_opencl)(
         }
     }
 
-    if(  ptr_success_flag != SIXTRL_NULLPTR )
+    if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )
     {
-        *ptr_success_flag |= success_flag;
+
+        atomic_or( ptr_success_flag, success_flag );
     }
 
     return;
