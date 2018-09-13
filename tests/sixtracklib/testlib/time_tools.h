@@ -5,13 +5,13 @@
     #include "sixtracklib/_impl/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( _GPUCODE ) && defined( __cplusplus )
+#if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* defined( _GPUCODE ) && defined( __cplusplus ) */
 
 SIXTRL_HOST_FN double NS(Time_get_seconds_since_epoch)( void );
 
-#if defined( _GPUCODE ) && defined( __cplusplus )
+#if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* defined( _GPUCODE ) && defined( __cplusplus ) */
 
