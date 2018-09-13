@@ -15,7 +15,7 @@
 __kernel void NS(Remap_particles_beam_elements_buffers_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT ptr_success_flag )
+    SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag )
 {
     typedef NS(buffer_size_t) buf_size_t;
 
@@ -30,7 +30,7 @@ __kernel void NS(Remap_particles_beam_elements_buffers_opencl)(
     if( global_id <= gid_to_remap_beam_elements_buffer )
     {
         buf_size_t const slot_size = ( buf_size_t )8u;
-        long int success_flag = ( long int )0u;
+        int success_flag = ( int )0u;
 
         if( global_id == gid_to_remap_particles_buffer )
         {
@@ -80,14 +80,14 @@ __kernel void NS(Track_particles_beam_elements_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
     SIXTRL_UINT64_T const num_turns,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT ptr_success_flag )
+    SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag )
 {
     typedef NS(buffer_size_t) buf_size_t;
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object)*        obj_iter_t;
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object) const*  obj_const_iter_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC     NS(Particles)*     ptr_particles_t;
 
-    long int success_flag      = ( long int )0u;
+    int success_flag = ( int )0u;
     buf_size_t const slot_size = ( buf_size_t )8u;
 
     if( ( !NS(ManagedBuffer_needs_remapping( particles_buf,     slot_size ) ) ) &&
