@@ -63,7 +63,7 @@ int main()
 
     double begin_time = ::st_Time_get_seconds_since_epoch();
 
-    std::vector< size_t > const num_particles_list =
+    std::vector< size_t > num_particles_list =
     {
         20000u
     };
@@ -469,12 +469,12 @@ int main()
                     throw;
                 }
 
-                int32_t success_flag = int32_t{ 0 };
+                success_flag = int32_t{ 0 };
 
                 try
                 {
                     cl_ret = queue.enqueueWriteBuffer( cl_success_flag, CL_TRUE, 0,
-                        sizeof( success_flag ), success_flag,
+                        sizeof( success_flag ), &success_flag,
                         nullptr, &write_xfer_events[ 2 ] );
 
                     cl_ret |= write_xfer_events[ 2 ].getProfilingInfo< cl_ulong >(
@@ -574,7 +574,7 @@ int main()
                 try
                 {
                     cl_ret = queue.enqueueReadBuffer( cl_success_flag, CL_TRUE, 0,
-                        sizeof( success_flag ), success_flag,
+                        sizeof( success_flag ), &success_flag,
                         nullptr, &xfer_after_remap_events );
 
 
@@ -783,13 +783,13 @@ int main()
                 else
                 {
                     std::cout << std::setw( 20 ) << std::fixed
-                              << time_run_tracking_normalized * 1e6 << "[usec]\r\n"
+                              << time_run_tracking_normalized * 1e6 << "[usec]\r\n";
                 }
 
                 std::cout << "\r\n"
                           << "------------------------------------------------"
                           << "------------------------------------------------"
-                          << "--------------------------------------------\r\n";
+                          << "--------------------------------------------\r\n"
                           << "\r\n"
                           << std::endl;
             }
