@@ -334,7 +334,7 @@ int main()
             for( auto const NUM_PARTICLES : num_particles_list )
             {
                 size_t tracking_num_threads = size_t{ 0 };
-                size_t tracking_group_size  = size_t{ 0 };
+                size_t tracking_group_size  = track_work_group_size;
 
                 tracking_num_threads  = NUM_PARTICLES / track_work_group_size;
                 tracking_num_threads *= track_work_group_size;
@@ -633,19 +633,6 @@ int main()
                         cl::NullRange, cl::NDRange( tracking_num_threads ),
                         cl::NDRange( tracking_group_size ), nullptr,
                         &run_tracking_kernel_event );
-
-
-                    cl_ret = run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
-                        CL_PROFILING_COMMAND_QUEUED, &run_tracking_kernel_when_queued );
-
-                    cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
-                        CL_PROFILING_COMMAND_SUBMIT, &run_tracking_kernel_when_submitted );
-
-                    cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
-                        CL_PROFILING_COMMAND_START, &run_tracking_kernel_when_started );
-
-                    cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
-                        CL_PROFILING_COMMAND_END, &run_tracking_kernel_when_ended );
                 }
                 catch( cl::Error const& e )
                 {
@@ -658,10 +645,37 @@ int main()
                     throw;
                 }
 
+                cl_ret = queue.flush();
+                run_tracking_kernel_event.wait();
+
+                cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
+                    CL_PROFILING_COMMAND_QUEUED, &run_tracking_kernel_when_queued );
+
+                cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
+                    CL_PROFILING_COMMAND_SUBMIT, &run_tracking_kernel_when_submitted );
+
+                cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
+                    CL_PROFILING_COMMAND_START, &run_tracking_kernel_when_started );
+
+                cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
+                    CL_PROFILING_COMMAND_END, &run_tracking_kernel_when_ended );
+
                 now = ::st_Time_get_seconds_since_epoch();
 
                 double const time_run_tracking_kernel = ( now >= begin_time )
                     ? ( now - begin_time ) : double{ 0 };
+
+                double const time_tracking_until_submitted =
+                    static_cast< double >( run_tracking_kernel_when_submitted -
+                                           run_tracking_kernel_when_queued ) * 1e-9;
+
+                double const time_tracking_until_start =
+                    static_cast< double >( run_tracking_kernel_when_started -
+                                           run_tracking_kernel_when_submitted ) * 1e-9;
+
+                double const time_tracking_device_execution =
+                    static_cast< double >( run_tracking_kernel_when_ended -
+                                           run_tracking_kernel_when_started ) * 1e-9;
 
                 /* ========================================================== */
 
@@ -767,8 +781,8 @@ int main()
                           << "      :: Tracking time                 : "
                           << std::setw( 20 ) << std::fixed
                           << time_run_tracking_kernel << " [sec] \r\n"
-                          << std::endl
                           << "      :: Tracking time/particle/turn   : ";
+
 
                 if( time_run_tracking_normalized >= 200e-3 )
                 {
@@ -786,13 +800,24 @@ int main()
                               << time_run_tracking_normalized * 1e6 << "[usec]\r\n";
                 }
 
-                std::cout << "\r\n"
+                std::cout << "      :: device_run_time               : "
+                          << std::setw( 20 ) << std::fixed
+                          << time_tracking_device_execution << "\r\n"
+                          << "      :: device overhead               : "
+                          << std::setw( 20 ) << std::fixed
+                          << time_tracking_until_start << " + "
+                          << time_tracking_until_submitted << "\r\n"
                           << "------------------------------------------------"
                           << "------------------------------------------------"
                           << "--------------------------------------------\r\n"
                           << "\r\n"
                           << std::endl;
             }
+
+            int success = ::st_Buffer_remap( particles_buffer );
+            SIXTRL_ASSERT( success == 0 );
+
+            ::st_Buffer_reset( particles_buffer );
         }
     }
 
