@@ -108,13 +108,6 @@ __kernel void NS(Track_particles_beam_elements_opencl)(
             NS(ManagedBuffer_get_const_objects_index_end)(
                 beam_elements_buf, slot_size );
 
-        if( global_particle_id == 0u )
-        {
-            printf( "part_block_it->type_id     : %16d\r\n", ( int )part_block_it->type_id );
-            printf( "part_block_it->size        : %16d\r\n", ( int )part_block_it->size );
-            printf( "part_block_it->begin_addr  : %16x\r\n", ( unsigned long )part_block_it->begin_addr );
-        }
-
         for( ; part_block_it != part_block_end ; ++part_block_it )
         {
             ptr_particles_t particles = ( ptr_particles_t )(
@@ -123,13 +116,14 @@ __kernel void NS(Track_particles_beam_elements_opencl)(
             size_t const object_end_particle_id = object_begin_particle_id +
                 NS(Particles_get_num_of_particles)( particles );
 
-            size_t particle_id = global_particle_id - object_begin_particle_id;
+            SIXTRL_ASSERT( NS(Object_get_type_id)( part_block_it ) ==
+                           NS(OBJECT_TYPE_PARTICLE) );
 
-            SIXTRL_ASSERT( global_particle_id >= object_begin_particle_id );
-
-            for( ; global_particle_id < object_end_particle_id ;
-                   particle_id += stride, global_particle_id += stride )
+            if( global_particle_id >= object_begin_particle_id )
             {
+                size_t const particle_id =
+                    global_particle_id - object_begin_particle_id;
+
                 SIXTRL_UINT64_T turn = ( SIXTRL_UINT64_T )0u;
 
                 SIXTRL_ASSERT( particle_id <
@@ -137,11 +131,8 @@ __kernel void NS(Track_particles_beam_elements_opencl)(
 
                 for( ; turn < num_turns ; ++turn )
                 {
-                    double const s = NS(Particles_get_s_value)( particles, particle_id );
-                    NS(Particles_set_s_value)( particles, particle_id, s + 0.1 );
-
-//                     success_flag |= NS(Track_particle_beam_elements)(
-//                         particles, particle_id, be_begin, be_end );
+                    success_flag |= NS(Track_particle_beam_elements)(
+                        particles, particle_id, be_begin, be_end );
                 }
             }
 
