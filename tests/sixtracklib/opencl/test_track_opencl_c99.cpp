@@ -291,7 +291,7 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
 
             std::cout << "INFO  :: tracking kernel wg size       : "
                       << tracking_work_group_size << "\r\n"
-                      << "INFO  :: copy     kernel wg size multi : "
+                      << "INFO  :: tracking kernel wg size multi : "
                       << tracking_work_group_size_prefered_multiple << "\r\n"
                       << std::endl;
 
@@ -366,13 +366,9 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
                 std::advance( line_begin, begin_elem_id + index_t{ 1 } );
                 std::advance( line_end,   end_elem_id   + index_t{ 1 } );
 
-                ::st_Buffer_clear( beam_elements_buffer, true );
+                ::st_Buffer_reset( beam_elements_buffer );
                 ::st_BeamElements_copy_to_buffer(
                     beam_elements_buffer, line_begin, line_end );
-
-                std::cout << "num_elements = " << ::st_Buffer_get_num_of_objects( beam_elements_buffer ) << std::endl
-                          << "distance     = " << std::distance( line_begin, line_end ) << std::endl
-                          << std::endl;
 
                 ASSERT_TRUE( static_cast< std::ptrdiff_t >(
                     ::st_Buffer_get_num_of_objects( beam_elements_buffer ) ) ==
@@ -522,9 +518,11 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
 
                 if( prev_tracking_num_threads != tracking_num_threads )
                 {
-                    std::cout << "INFO  :: tracking_num_threads       : "
+                    std::cout << "INFO  :: num_particles                 : "
+                              << num_particles << "\r\n"
+                              << "INFO  :: tracking_num_threads          : "
                               << tracking_num_threads << "\r\n"
-                              << "INFO  :: tracking_group_size        : "
+                              << "INFO  :: tracking_group_size           : "
                               << tracking_group_size << "\r\n"
                               << std::endl;
 
@@ -716,8 +714,6 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
                         diff_particles, ii ) == index_t{ 0 } );
                 }
             }
-
-            break;
         }
     }
 
