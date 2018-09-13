@@ -206,6 +206,7 @@ SIXTRL_INLINE int NS(Buffer_clear_generic)(
             )NS(Buffer_get_data_begin_addr)( buffer );
 
         NS(ManagedBuffer_clear)( begin, set_data_to_zero, slot_size );
+        buffer->num_objects = ( buf_size_t )0u;
         success = 0;
     }
 

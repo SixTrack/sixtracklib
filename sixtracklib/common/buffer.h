@@ -168,12 +168,22 @@ NS(Buffer_calculate_required_buffer_length)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reset)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
+
+SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reset_detailed)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const max_num_objects,
+    NS(buffer_size_t) const max_num_slots,
+    NS(buffer_size_t) const max_num_dataptrs,
+    NS(buffer_size_t) const max_num_garbage_ranges );
+
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reserve)(
     NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const new_max_num_objects,
     NS(buffer_size_t) const new_max_num_slots,
     NS(buffer_size_t) const new_max_num_dataptrs,
-    NS(buffer_size_t) const new_max_num_garbage_elems );
+    NS(buffer_size_t) const new_max_num_garbage_ranges );
 
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_remap)(
     NS(Buffer)* SIXTRL_RESTRICT buffer );
@@ -793,12 +803,60 @@ SIXTRL_INLINE NS(buffer_size_t) NS(Buffer_calculate_required_buffer_length)(
 
 /* ========================================================================= */
 
+SIXTRL_INLINE int NS(Buffer_reset)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    SIXTRL_STATIC_VAR NS(buffer_size_t) const ZERO = ( NS(buffer_size_t) )0u;
+    return NS(Buffer_reset_detailed)( buffer, ZERO, ZERO, ZERO, ZERO );
+}
+
+SIXTRL_INLINE int NS(Buffer_reset_detailed)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const max_num_objects,
+    NS(buffer_size_t) const max_num_slots,
+    NS(buffer_size_t) const max_num_dataptrs,
+    NS(buffer_size_t) const max_num_garbage_ranges )
+{
+    int success = -1;
+
+    if( NS(Buffer_uses_datastore)( buffer ) )
+    {
+        #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
+             SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1
+
+        if( NS(Buffer_uses_special_opencl_datastore)( buffer ) )
+        {
+            success = -1;
+        }
+        else
+        #endif /* SIXTRACKLIB_ENABLE_MODULE_OPENCL */
+
+        #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
+             SIXTRACKLIB_ENABLE_MODULE_CUDA == 1
+
+        if( NS(Buffer_uses_special_cuda_datastore)( buffer ) )
+        {
+            success = -1;
+        }
+        else
+        #endif /* SIXTRACKLIB_ENABLE_MODULE_CUDA */
+
+        {
+            success = NS(Buffer_reset_detailed_generic)( buffer, max_num_objects,
+                max_num_slots, max_num_dataptrs, max_num_garbage_ranges );
+        }
+    }
+
+    return success;
+}
+
+
 SIXTRL_INLINE int NS(Buffer_reserve)(
     NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const max_num_objects,
     NS(buffer_size_t) const max_num_slots,
     NS(buffer_size_t) const max_num_dataptrs,
-    NS(buffer_size_t) const max_num_garbage_elems )
+    NS(buffer_size_t) const max_num_garbage_ranges )
 {
     int success = -1;
 
@@ -810,7 +868,7 @@ SIXTRL_INLINE int NS(Buffer_reserve)(
         if( NS(Buffer_uses_special_opencl_datastore)( buffer ) )
         {
             success = NS(Buffer_reserve_opencl)( buffer, max_num_objects,
-                max_num_slots, max_num_dataptrs, max_num_garbage_elems );
+                max_num_slots, max_num_dataptrs, max_num_garbage_ranges );
         }
         else
         #endif /* SIXTRACKLIB_ENABLE_MODULE_OPENCL */
@@ -821,14 +879,14 @@ SIXTRL_INLINE int NS(Buffer_reserve)(
         if( NS(Buffer_uses_special_cuda_datastore)( buffer ) )
         {
             success = NS(Buffer_reserve_cuda)( buffer, max_num_objects,
-                max_num_slots, max_num_dataptrs, max_num_garbage_elems );
+                max_num_slots, max_num_dataptrs, max_num_garbage_ranges );
         }
         else
         #endif /* SIXTRACKLIB_ENABLE_MODULE_CUDA */
 
         {
             success = NS(Buffer_reserve_generic)( buffer, max_num_objects,
-                max_num_slots, max_num_dataptrs, max_num_garbage_elems );
+                max_num_slots, max_num_dataptrs, max_num_garbage_ranges );
         }
     }
 
@@ -1238,3 +1296,4 @@ SIXTRL_INLINE void NS(Buffer_delete)( NS(Buffer)* SIXTRL_RESTRICT buffer )
 #endif /* SIXTRACKLIB_COMMON_BUFFER_H__ */
 
 /* end: sixtracklib/common/buffer.h */
+
