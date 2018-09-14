@@ -810,7 +810,6 @@ SIXTRL_INLINE int NS(Particles_from_generic_addr_data)(
         num_elements_t jj = ( num_elements_t )0u;
         num_elements_t ii = offset;
 
-        num_elements_t const in_num_particles  = in->num_particles;
         num_elements_t const out_num_particles =
             NS(Particles_get_num_of_particles)( p );
 
@@ -835,8 +834,8 @@ SIXTRL_INLINE int NS(Particles_from_generic_addr_data)(
         ptr_in_index_t in_turn        = ( ptr_in_index_t )in->at_turn_addr;
         ptr_in_index_t in_state       = ( ptr_in_index_t )in->state_addr;
 
-        SIXTRL_ASSERT( in_num_particles > ( num_elements_t )offset );
-        SIXTRL_ASSERT( in_num_particles >= ( out_num_particles + ii ) );
+        SIXTRL_ASSERT( in->num_particles > ( num_elements_t )offset );
+        SIXTRL_ASSERT( in->num_particles >= ( out_num_particles + ii ) );
 
         SIXTRL_ASSERT( NS(Particles_get_q0)( p )            != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( NS(Particles_get_mass0)( p )         != SIXTRL_NULLPTR );
@@ -926,8 +925,6 @@ SIXTRL_INLINE int NS(Particles_back_to_generic_addr_data)(
         num_elements_t ii = offset;
         num_elements_t jj = ( num_elements_t )0u;
 
-        num_elements_t const out_num_particles = out->num_particles;
-
         num_elements_t const in_num_particles =
             NS(Particles_get_num_of_particles)( p );
 
@@ -952,8 +949,8 @@ SIXTRL_INLINE int NS(Particles_back_to_generic_addr_data)(
         ptr_out_index_t out_turn        = ( ptr_out_index_t )out->at_turn_addr;
         ptr_out_index_t out_state       = ( ptr_out_index_t )out->state_addr;
 
-        SIXTRL_ASSERT( ( num_elements_t )offset <= out_num_particles );
-        SIXTRL_ASSERT( ( in_num_particles + jj ) <= out_num_particles );
+        SIXTRL_ASSERT( ( num_elements_t )offset  <= out->num_particles );
+        SIXTRL_ASSERT( ( in_num_particles + jj ) <= out->num_particles );
 
         SIXTRL_ASSERT( NS(Particles_get_const_q0)( p )            != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( NS(Particles_get_const_mass0)( p )         != SIXTRL_NULLPTR );
