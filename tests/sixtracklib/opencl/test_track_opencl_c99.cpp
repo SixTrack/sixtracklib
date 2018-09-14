@@ -104,8 +104,6 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
               << " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global"
               << " -DSIXTRL_BE_ARGPTR_DEC=__global"
               << " -DSIXTRL_BE_DATAPTR_DEC=__global"
-              << " -w"
-              << " -Werror"
               << " -I" << PATH_TO_BASE_DIR;
 
         std::string const COMPILE_OPTIONS = a2str.str();

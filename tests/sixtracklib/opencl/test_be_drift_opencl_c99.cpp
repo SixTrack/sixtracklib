@@ -95,8 +95,6 @@ TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
               << " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global"
               << " -DSIXTRL_BE_ARGPTR_DEC=__global"
               << " -DSIXTRL_BE_DATAPTR_DEC=__global"
-              << " -w"
-              << " -Werror"
               << " -I" << PATH_TO_BASE_DIR;
 
         std::string const REMAP_COMPILE_OPTIONS = a2str.str();

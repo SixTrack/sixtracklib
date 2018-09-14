@@ -105,9 +105,7 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThre
           << " -D__NAMESPACE=st_"
           << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
           << " -I" << PATH_TO_BASE_DIR
-          << " -I" << PATH_TO_BASE_DIR << "tests"
-          << " -w"
-          << " -Werror" ;
+          << " -I" << PATH_TO_BASE_DIR << "tests" ;
 
     std::string const COMPILE_OPTIONS = a2str.str();
 
