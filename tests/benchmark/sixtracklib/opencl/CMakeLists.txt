@@ -13,6 +13,15 @@ add_executable( benchmark_lhc_no_bb_opencl_c99
 set( BENCHMARK_CXX_PROGRAMS ${BENCHMARK_CXX_PROGRAMS}
      benchmark_lhc_no_bb_opencl_c99 )
 
+# ------------------------------------------------------------------------------
+# benchmark_lhc_no_bb_priv_particles_optimized_opencl_c99:
+
+add_executable( benchmark_lhc_no_bb_priv_particles_optimized_opencl_c99
+                benchmark_lhc_no_bb_priv_particles_optimized_opencl_c99.cpp )
+
+set( BENCHMARK_CXX_PROGRAMS ${BENCHMARK_CXX_PROGRAMS}
+     benchmark_lhc_no_bb_priv_particles_optimized_opencl_c99 )
+
 # ==============================================================================
 # Set properties
 

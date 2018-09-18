@@ -103,8 +103,6 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
               << " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global"
               << " -DSIXTRL_BUFFER_OBJ_ARGPTR_DEC=__global"
               << " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global"
-              << " -w"
-              << " -Werror"
               << " -I" << PATH_TO_BASE_DIR;
 
         std::string const REMAP_COMPILE_OPTIONS = a2str.str();

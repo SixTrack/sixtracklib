@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_OPENCL_IMPL_MANAGED_TRACK_PARTICLES_KERNEL_OPENCL_CL__
-#define SIXTRACKLIB_OPENCL_IMPL_MANAGED_TRACK_PARTICLES_KERNEL_OPENCL_CL__
+#ifndef SIXTRACKLIB_OPENCL_IMPL_TRACK_PARTICLES_KERNEL_CL__
+#define SIXTRACKLIB_OPENCL_IMPL_TRACK_PARTICLES_KERNEL_CL__
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
@@ -165,5 +165,6 @@ __kernel void NS(Track_particles_beam_elements_opencl)(
     return;
 }
 
-#endif /* SIXTRACKLIB_OPENCL_IMPL_MANAGED_TRACK_PARTICLES_KERNEL_OPENCL_CL__ */
+#endif /* SIXTRACKLIB_OPENCL_IMPL_TRACK_PARTICLES_KERNEL_CL__ */
+
 /* end: sixtracklib/opencl/impl/track_particles_kernel.cl */

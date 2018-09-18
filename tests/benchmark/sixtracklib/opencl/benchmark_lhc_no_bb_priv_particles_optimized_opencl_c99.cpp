@@ -164,6 +164,8 @@ int main()
               << " -DSIXTRL_BE_DATAPTR_DEC=__global"
               << " -I" << PATH_TO_BASE_DIR;
 
+        std::string const REMAP_COMPILE_OPTIONS = a2str.str();
+
         /* ----------------------------------------------------------------- */
 
         std::string path_to_source = PATH_TO_BASE_DIR;
@@ -171,20 +173,39 @@ int main()
 
         std::ifstream kernel_file( path_to_source, std::ios::in );
 
-        std::string const PROGRAM_SOURCE_CODE(
+        std::string const REMAP_PROGRAM_SOURCE_CODE(
             ( std::istreambuf_iterator< char >( kernel_file ) ),
               std::istreambuf_iterator< char >() );
 
         kernel_file.close();
 
-        std::string const COMPILER_OPTIONS = a2str.str();
+        path_to_source  = PATH_TO_BASE_DIR;
+        path_to_source += "sixtracklib/opencl/impl/";
+        path_to_source += "track_particles_priv_particles_optimized_kernel.cl";
+
+        kernel_file.open( path_to_source, std::ios::in );
+
+        std::string const TRACKING_PRORGRAM_SOURCE_CODE(
+            ( std::istreambuf_iterator< char >( kernel_file ) ),
+              std::istreambuf_iterator< char >() );
+
+        a2str.str( "" );
+
+        a2str << " -D_GPUCODE=1"
+              << " -D__NAMESPACE=st_"
+              << " -DSIXTRL_DATAPTR_DEC=__global"
+              << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
+              << " -DSIXTRL_BUFFER_OBJ_ARGPTR_DEC=__global"
+              << " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global"
+              << " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private"
+              << " -DSIXTRL_PARTICLE_DATAPTR_DEC=__private"
+              << " -DSIXTRL_BE_ARGPTR_DEC=__global"
+              << " -DSIXTRL_BE_DATAPTR_DEC=__global"
+              << " -I" << PATH_TO_BASE_DIR;
+
+        std::string const TRACKING_COMPILE_OPTIONS = a2str.str();
 
         /* ----------------------------------------------------------------- */
-
-        now = ::st_Time_get_seconds_since_epoch();
-
-        double const time_prepare_source_code = ( now >= begin_time )
-            ? ( now - begin_time ) : double{ 0 };
 
         for( auto& device : devices )
         {
@@ -234,8 +255,6 @@ int main()
                 }
             };
 
-            begin_time = ::st_Time_get_seconds_since_epoch();
-
             size_t const device_max_compute_units =
                 device.getInfo< CL_DEVICE_MAX_COMPUTE_UNITS >();
 
@@ -246,22 +265,25 @@ int main()
                       << "INFO  :: Max num compute units         : "
                       << device_max_compute_units << "\r\n";
 
+            /* ------------------------------------------------------------- */
+
             cl_int cl_ret = CL_SUCCESS;
 
             cl::Context context( device );
             cl::CommandQueue queue( context, device, CL_QUEUE_PROFILING_ENABLE );
-            cl::Program program( context, PROGRAM_SOURCE_CODE );
+            cl::Program remap_program( context, REMAP_PROGRAM_SOURCE_CODE );
+            cl::Program tracking_program( context, TRACKING_PRORGRAM_SOURCE_CODE );
 
             try
             {
-                cl_ret = program.build( COMPILER_OPTIONS.c_str() );
+                cl_ret = remap_program.build( REMAP_COMPILE_OPTIONS.c_str() );
             }
             catch( cl::Error const& e )
             {
                 std::cerr
-                      << "ERROR :: program :: "
+                      << "ERROR :: remap_program :: "
                       << "OpenCL Compilation Error -> Stopping Unit-Test \r\n"
-                      << program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( device )
+                      << remap_program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( device )
                       << "\r\n"
                       << std::endl;
 
@@ -269,19 +291,39 @@ int main()
                 throw;
             }
 
-            cl::Kernel remapping_kernel;
-
             try
             {
-                remapping_kernel = cl::Kernel( program,
-                    "st_Remap_particles_beam_elements_buffers_opencl" );
+                cl_ret = tracking_program.build( TRACKING_COMPILE_OPTIONS.c_str() );
             }
             catch( cl::Error const& e )
             {
-                std::cout << "kernel remapping_kernel :: "
-                          << "line = " << __LINE__
-                          << " :: ERROR : " << e.what() << std::endl
+                std::cerr
+                      << "ERROR :: tracking_program :: "
+                      << "OpenCL Compilation Error -> Stopping Unit-Test \r\n"
+                      << tracking_program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( device )
+                      << "\r\n"
+                      << std::endl;
+
+                cl_ret = CL_FALSE;
+                throw;
+            }
+
+            /* ------------------------------------------------------------- */
+
+             cl::Kernel remapping_kernel;
+
+            try
+            {
+                remapping_kernel =
+                    cl::Kernel( remap_program, "st_Remap_particles_beam_elements_buffers_opencl" );
+            }
+            catch( cl::Error const& e )
+            {
+                std::cout << "kernel remap_kernel :: "
+                          << "line  = " << __LINE__ << " :: "
+                          << "ERROR : " << e.what() << "\r\n"
                           << e.err() << std::endl;
+
                 cl_ret = CL_FALSE;
                 throw;
             }
@@ -302,8 +344,8 @@ int main()
 
             try
             {
-                tracking_kernel = cl::Kernel( program,
-                    "st_Track_particles_beam_elements_opencl" );
+                tracking_kernel = cl::Kernel( tracking_program,
+                    "st_Track_particles_beam_elements_priv_particles_optimized_opencl" );
             }
             catch( cl::Error const& e )
             {
@@ -826,4 +868,4 @@ int main()
     return 0;
 }
 
-/* end: tests/benchmark/sixtracklib/opencl/benchmark_lhc_no_bb_opencl_c99.c */
+/* end: tests/benchmark/sixtracklib/opencl/benchmark_lhc_no_bb_priv_particles_optimized_opencl_c99.cpp.c */
