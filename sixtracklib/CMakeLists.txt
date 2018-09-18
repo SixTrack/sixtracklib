@@ -53,9 +53,9 @@ if( SIXTRACKL_ENABLE_OPENCL )
 endif()
 
 # if( SIXTRACKL_ENABLE_CUDA )
-#
+
 #     add_subdirectory( cuda )
-#
+
 #     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
 #          $<TARGET_OBJECTS:sixtrack_cuda_host>
 #          $<TARGET_OBJECTS:sixtrack_cuda_kernel> )

@@ -10,6 +10,7 @@ if( SIXTRACKL_CUDA_COMPUTE_ARCH_LIST )
 endif()
 
 string( APPEND CMAKE_CUDA_FLAGS " -D_FORCE_INLINES" )
+string( APPEND CMAKE_CUDA_DEBUG_FLAGS " -G" )
 
 set( SIXTRACKL_CUDA_HOST_DEFINITIONS )
 list( APPEND SIXTRACKL_CUDA_HOST_DEFINITIONS
@@ -23,15 +24,15 @@ set( SIXTRACKLIB_CUDA_PART_HOST_SOURCES
      details/cuda_env.cu
 )
 
-add_library( sixtrack_cuda_host OBJECT
-             ${SIXTRACKLIB_CUDA_PART_HOST_HEADERS}
-             ${SIXTRACKLIB_CUDA_PART_HOST_SOURCES}
+# add_library( sixtrack_cuda_host OBJECT
+#              ${SIXTRACKLIB_CUDA_PART_HOST_HEADERS}
+#              ${SIXTRACKLIB_CUDA_PART_HOST_SOURCES}
 )
 
-target_compile_definitions( sixtrack_cuda_host
-    PUBLIC ${SIXTRACKL_CUDA_HOST_DEFINITIONS} )
+# target_compile_definitions( sixtrack_cuda_host
+#     PUBLIC ${SIXTRACKL_CUDA_HOST_DEFINITIONS} )
 
-target_include_directories( sixtrack_cuda_host PUBLIC ${CMAKE_SOURCE_DIR} )
+# target_include_directories( sixtrack_cuda_host PUBLIC ${CMAKE_SOURCE_DIR} )
 
 # ------------------------------------------------------------------------------
 # --- CUDA Kernel object library:
