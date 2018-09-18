@@ -110,7 +110,11 @@ endif()
 
 set( SIXTRACKLIB_CPU_FLAGS )
 
-if( SIXTRACKL_CPU_ARCH MATCHES "avx" )
+if( SIXTRACKL_CPU_ARCH MATCHES "avx2" )
+    message( STATUS "---- Optimizing for AVX2 architecture" )
+    set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -mavx2 )
+
+elseif( SIXTRACKL_CPU_ARCH MATCHES "avx" )
     message( STATUS "---- Optimizing for AVX architecture" )
     set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -mavx )
 

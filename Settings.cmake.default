@@ -40,7 +40,7 @@ set( SIXTRACKL_C_NAMESPACE_PREFIX "st_" CACHE STRING
 # CPU/System architecture settings:
 
 set( SIXTRACKL_CPU_ARCH "sse2" CACHE STRING "CPU/System architecture" )
-set_property( CACHE SIXTRACKL_CPU_ARCH PROPERTY STRINGS sse2 avx native )
+set_property( CACHE SIXTRACKL_CPU_ARCH PROPERTY STRINGS sse2 avx avx2 native )
 
 
 
