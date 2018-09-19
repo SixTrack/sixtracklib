@@ -1,25 +1,22 @@
-#ifndef SIXTRACKLIB_CUDA_TRACK_PARTICLES_KERNEL_CUH__
-#define SIXTRACKLIB_CUDA_TRACK_PARTICLES_KERNEL_CUH__
+#ifndef SIXTRACKLIB_CUDA_IMPL_TRACK_PARTICLES_KERNEL_CUDA_HEADER_CUH__
+#define SIXTRACKLIB_CUDA_IMPL_TRACK_PARTICLES_KERNEL_CUDA_HEADER_CUH__
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/blocks.h"
+    #include "sixtracklib/common/impl/buffer_defines.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-__global__ void Track_remap_serialized_blocks_buffer(
-    unsigned char* __restrict__ particles_data_buffer,
-    unsigned char* __restrict__ beam_elements_data_buffer,
-    unsigned char* __restrict__ elem_by_elem_data_buffer,
-    int64_t*       __restrict__ success_flag );
+extern __global__ void NS(Remap_particles_beam_elements_buffers_cuda)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elem_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag );
 
-__global__ void Track_particles_kernel_cuda(
-    SIXTRL_UINT64_T const num_of_turns,
-    unsigned char* __restrict__ particles_data_buffer,
-    unsigned char* __restrict__ beam_elements_data_buffer,
-    unsigned char* __restrict__ elem_by_elem_data_buffer,
-    int64_t*       __restrict__ success_flag );
+extern __global__ void NS(Track_particles_beam_elements_cuda)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elem_buf,
+    SIXTRL_UINT64_T const num_turns,
+    SIXTRL_BUFFER_DATAPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag );
 
-#endif /* SIXTRACKLIB_CUDA_TRACK_PARTICLES_KERNEL_CUH__ */
+#endif /* SIXTRACKLIB_CUDA_IMPL_TRACK_PARTICLES_KERNEL_CUDA_HEADER_CUH__ */
 
-/* end sixtracklib/cuda/track_particles_kernel.cuh */
-
+/* end sixtracklib/cuda/impl/track_particles_kernel.cuh */
