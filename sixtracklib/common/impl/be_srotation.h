@@ -173,9 +173,9 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(SRotation_get_angle)(
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ZERO = ( SIXTRL_REAL_T )0.0;
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE  = ( SIXTRL_REAL_T )1.0;
 
-    #if !defined( NDEBUG )
+    #if !defined( NDEBUG ) && !defined( _GPUCODE )
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const EPS  = ( SIXTRL_REAL_T )1e-6;
-    #endif /* !defined( NDEBUG ) */
+    #endif /* !defined( NDEBUG ) && !defined( _GPUCODE )*/
 
     SIXTRL_REAL_T const sin_z = ( srotation != SIXTRL_NULLPTR )
         ? srotation->sin_z : ZERO;
@@ -186,11 +186,11 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(SRotation_get_angle)(
     SIXTRL_REAL_T const angle = ( sin_z >= ZERO )
         ? acos( cos_z ) : -acos( cos_z );
 
-    #if !defined( NDEBUG )
+    #if !defined( NDEBUG ) && !defined( _GPUCODE )
     SIXTRL_REAL_T const temp_sin_z = sin( angle );
     SIXTRL_REAL_T const delta      = temp_sin_z - srotation->sin_z;
     SIXTRL_ASSERT( fabs( delta ) < EPS );
-    #endif /* !defined( NDEBUG ) */
+    #endif /* !defined( NDEBUG ) && !defined( _GPUCODE ) */
 
     return angle;
 }
@@ -226,7 +226,9 @@ SIXTRL_INLINE void NS(SRotation_set_angle_deg)(
     SIXTRL_BE_ARGPTR_DEC NS(SRotation)* SIXTRL_RESTRICT srotation,
     SIXTRL_REAL_T const angle_deg )
 {
-    SIXTRL_STATIC SIXTRL_REAL_T const DEG2RAD = M_PI / ( SIXTRL_REAL_T )180.0;
+    SIXTRL_STATIC_VAR SIXTRL_REAL_T const DEG2RAD =
+        M_PI / ( SIXTRL_REAL_T )180.0;
+
     NS(SRotation_set_angle)( srotation, DEG2RAD * angle_deg );
 
     return;

@@ -196,6 +196,8 @@ namespace SIXTRL_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
+    #if !defined( _GPUCODE )
+
     static SIXTRL_CONSTEXPR_OR_CONST buffer_flags_t
         BUFFER_FLAGS_NONE = NS(BUFFER_FLAGS_NONE);
 
@@ -248,6 +250,8 @@ namespace SIXTRL_NAMESPACE
 
     static SIXTRL_CONSTEXPR_OR_CONST buffer_size_t
         BUFFER_DEFAULT_HEADER_SIZE = NS(BUFFER_DEFAULT_HEADER_SIZE);
+
+    #endif /* !defined( _GPUCODE ) */
 }
 
 #endif /* defined( __cplusplus ) */

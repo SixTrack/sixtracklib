@@ -59,6 +59,9 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reset_detailed_generic)(
 
 /* ========================================================================= */
 
+SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_needs_remapping_generic)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_remap_generic)(
     SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
@@ -280,6 +283,17 @@ SIXTRL_INLINE int NS(Buffer_reset_detailed_generic)(
 }
 
 /* ========================================================================= */
+
+SIXTRL_INLINE bool NS(Buffer_needs_remapping_generic)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    SIXTRL_ASSERT( NS(Buffer_has_datastore)( buffer ) );
+    SIXTRL_ASSERT( NS(Buffer_allow_remapping)( buffer ) );
+
+    return NS(ManagedBuffer_needs_remapping)(
+            NS(Buffer_get_const_data_begin)( buffer ),
+            NS(Buffer_get_slot_size)( buffer ) );
+}
 
 SIXTRL_INLINE int NS(Buffer_remap_generic)(
     SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )

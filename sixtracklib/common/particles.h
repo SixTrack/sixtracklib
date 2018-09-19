@@ -236,6 +236,14 @@ SIXTRL_FN SIXTRL_STATIC void NS( Particles_get_max_value)(
 
 #if !defined( _GPUCODE )
 
+SIXTRL_FN SIXTRL_STATIC NS(particle_num_elements_t)
+NS(Particles_buffer_get_total_num_of_particles)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
+SIXTRL_FN SIXTRL_STATIC bool NS(Particles_buffers_have_same_structure)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs );
+
 SIXTRL_FN SIXTRL_STATIC void NS( Particles_buffer_calculate_difference)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs,
@@ -1967,23 +1975,130 @@ SIXTRL_INLINE void NS(Particles_get_max_value)(
 
 #if !defined( _GPUCODE )
 
+SIXTRL_INLINE NS(particle_num_elements_t)
+NS(Particles_buffer_get_total_num_of_particles)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object) const* obj_ptr_t;
+    typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const* ptr_particles_t;
+
+    NS(particle_num_elements_t) total_num_particles =
+        ( NS(particle_num_elements_t) )0u;
+
+    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( buffer ) );
+
+    if( NS(Buffer_get_num_of_objects)( buffer ) > ( NS(buffer_size_t) )0u )
+    {
+        obj_ptr_t it  = ( obj_ptr_t )( uintptr_t
+            )NS(Buffer_get_objects_begin_addr)( buffer );
+
+        obj_ptr_t end = ( obj_ptr_t )( uintptr_t
+            )NS(Buffer_get_objects_end_addr)( buffer );
+
+        SIXTRL_ASSERT( it  != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( end != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( ( end - it ) > ( ptrdiff_t )0 );
+
+        for( ; it != end ; ++it )
+        {
+            if( NS(Object_get_type_id)( it ) == NS(OBJECT_TYPE_PARTICLE ) )
+            {
+                ptr_particles_t particles = ( ptr_particles_t )( uintptr_t
+                    )NS(Object_get_begin_addr)( it );
+
+                SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+
+                total_num_particles +=
+                    NS(Particles_get_num_of_particles)( particles );
+            }
+        }
+    }
+
+    return total_num_particles;
+}
+
+SIXTRL_INLINE bool NS(Particles_buffers_have_same_structure)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs )
+{
+    bool have_same_structure = false;
+
+    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( lhs ) );
+    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( rhs ) );
+
+    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) &&
+        ( NS(Buffer_get_num_of_objects)( lhs ) ==
+          NS(Buffer_get_num_of_objects)( rhs ) ) )
+    {
+        typedef NS(Object)                                      object_t;
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC object_t const*    ptr_object_t;
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const* ptr_particles_t;
+
+        ptr_object_t lhs_it = ( ptr_object_t )( uintptr_t
+            )NS(Buffer_get_objects_begin_addr)( lhs );
+
+        ptr_object_t lhs_end = ( ptr_object_t )( uintptr_t
+            )NS(Buffer_get_objects_end_addr)( lhs );
+
+        ptr_object_t rhs_it  = ( ptr_object_t )( uintptr_t
+            )NS(Buffer_get_objects_begin_addr)( rhs );
+
+        if( ( ( lhs_it != SIXTRL_NULLPTR ) && ( lhs_end != SIXTRL_NULLPTR ) &&
+              ( rhs_it != SIXTRL_NULLPTR ) ) ||
+            ( ( lhs_it == SIXTRL_NULLPTR ) && ( lhs_end == SIXTRL_NULLPTR ) &&
+              ( rhs_it == SIXTRL_NULLPTR ) ) )
+        {
+            have_same_structure = true;
+
+            for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it )
+            {
+                ptr_particles_t lhs_particles = SIXTRL_NULLPTR;
+                ptr_particles_t rhs_particles = SIXTRL_NULLPTR;
+
+                if( ( NS(Object_get_type_id)( lhs_it ) !=
+                      NS(OBJECT_TYPE_PARTICLE) ) ||
+                    ( NS(Object_get_type_id)( rhs_it ) !=
+                      NS(OBJECT_TYPE_PARTICLE) ) )
+                {
+                    have_same_structure = false;
+                    break;
+                }
+
+                lhs_particles = ( ptr_particles_t )( uintptr_t
+                    )NS(BufferIndex_get_const_particles)( lhs_it );
+
+                rhs_particles = ( ptr_particles_t )( uintptr_t
+                    )NS(BufferIndex_get_const_particles)( rhs_it );
+
+                if( NS(Particles_get_num_of_particles)( lhs_particles ) !=
+                    NS(Particles_get_num_of_particles)( rhs_particles ) )
+                {
+                    have_same_structure = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    return have_same_structure;
+}
+
 SIXTRL_INLINE void NS(Particles_buffer_calculate_difference)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs,
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT diff )
 {
-    typedef NS(particle_num_elements_t) num_elem_t;
-
-    num_elem_t const lhs_num_objects  = NS(Buffer_get_num_of_objects)( lhs );
-    num_elem_t const rhs_num_objects  = NS(Buffer_get_num_of_objects)( rhs );
-    num_elem_t const diff_num_objects = NS(Buffer_get_num_of_objects)( diff );
-
-    if( ( lhs_num_objects == rhs_num_objects  ) &&
-        ( lhs_num_objects == diff_num_objects ) &&
-        ( lhs_num_objects >  ( num_elem_t )0u ) )
+    if( ( NS(Particles_buffers_have_same_structure)( lhs, diff ) ) &&
+        ( NS(Particles_buffers_have_same_structure)( rhs, diff ) ) )
     {
-        typedef SIXTRL_DATAPTR_DEC NS(Object) const* obj_const_ptr_t;
-        typedef SIXTRL_DATAPTR_DEC NS(Object)*       obj_ptr_t;
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* obj_const_ptr_t;
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*       obj_ptr_t;
+
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+                ptr_const_particles_t;
+
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+                ptr_particles_t;
 
         obj_const_ptr_t lhs_it  = ( obj_const_ptr_t )( uintptr_t
             )NS(Buffer_get_objects_begin_addr)( lhs );
@@ -1999,13 +2114,13 @@ SIXTRL_INLINE void NS(Particles_buffer_calculate_difference)(
 
         for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it, ++diff_it )
         {
-            SIXTRL_ARGPTR_DEC NS(Particles) const* lhs_particles =
+            ptr_const_particles_t lhs_particles =
                 NS(BufferIndex_get_const_particles)( lhs_it );
 
-            SIXTRL_ARGPTR_DEC NS(Particles) const* rhs_particles =
+            ptr_const_particles_t rhs_particles =
                 NS(BufferIndex_get_const_particles)( rhs_it );
 
-            SIXTRL_ARGPTR_DEC NS(Particles)* diff_particles =
+            ptr_particles_t diff_particles =
                 NS(BufferIndex_get_particles)( diff_it );
 
             NS(Particles_calculate_difference)(

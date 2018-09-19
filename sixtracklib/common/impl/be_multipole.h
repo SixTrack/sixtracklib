@@ -432,12 +432,12 @@ SIXTRL_INLINE void NS(MultiPole_set_order)(
     SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT multipole,
     NS(multipole_order_t) const order )
 {
-    #if !defined( NDEBUG )
+    #if !defined( NDEBUG ) && !defined( _GPUCODE )
     SIXTRL_STATIC_VAR NS(multipole_order_t) const
         INV_ORDER = ( NS(multipole_order_t) )-1;
 
     SIXTRL_ASSERT( ( multipole != SIXTRL_NULLPTR ) && ( order >= INV_ORDER ) );
-    #endif /* !defined( NDEBUG ) */
+    #endif /* !defined( NDEBUG ) && !defined( _GPUCODE ) */
 
     multipole->order = order;
     return;

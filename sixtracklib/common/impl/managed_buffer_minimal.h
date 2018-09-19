@@ -2,18 +2,25 @@
 #define SIXTRL_COMMON_IMPL_BUFFER_MINIMAL_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #include <stdbool.h>
-    #include <stddef.h>
-    #include <stdint.h>
-    #include <stdlib.h>
-    #include <limits.h>
+    #if !defined( __cplusplus )
+        #include <stdbool.h>
+        #include <stddef.h>
+        #include <stdint.h>
+        #include <stdlib.h>
+        #include <limits.h>
+    #else
+        #include <cstdbool>
+        #include <cstddef>
+        #include <cstdint>
+        #include <cstdlib>
+        #include <limits>
+    #endif /* !defined( __cplusplus ) */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
     #include "sixtracklib/common/impl/buffer_defines.h"
     #include "sixtracklib/common/impl/buffer_type.h"
-    #include "sixtracklib/common/impl/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -119,22 +126,24 @@ NS(ManagedBuffer_get_section_num_entities)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const*
+struct NS(Object);
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC struct NS(Object) const*
 NS(ManagedBuffer_get_const_objects_index_begin)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) slot_size );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC struct NS(Object) const*
 NS(ManagedBuffer_get_const_objects_index_end)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT end,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object)*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC struct NS(Object)*
 NS(ManagedBuffer_get_objects_index_begin)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) slot_size );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object)*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC struct NS(Object)*
 NS(ManagedBuffer_get_objects_index_end)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size );
@@ -156,6 +165,7 @@ SIXTRL_FN SIXTRL_STATIC bool NS(ManagedBuffer_needs_remapping)(
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/impl/buffer_object.h"
     #include "sixtracklib/common/impl/buffer_garbage.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -167,7 +177,8 @@ SIXTRL_FN SIXTRL_STATIC bool NS(ManagedBuffer_needs_remapping)(
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_INLINE NS(buffer_addr_diff_t) NS(ManagedBuffer_get_limit_offset_max)()
+SIXTRL_INLINE NS(buffer_addr_diff_t)
+    NS(ManagedBuffer_get_limit_offset_max)( void )
 {
     #if defined( _GPUCODE )
         #if defined( __OPENCL_VERSION__ )
@@ -175,16 +186,16 @@ SIXTRL_INLINE NS(buffer_addr_diff_t) NS(ManagedBuffer_get_limit_offset_max)()
             SIXTRL_ASSERT( sizeof( NS(buffer_addr_diff_t) >=
                            sizeof( ptr_to_raw_t ) ) );
 
-            SIXTRL_STATIC_VAR NS(buffer_addr_diff_t) const
-                LIMIT_OFFSET_MAX = LONG_MAX;
+            return ( NS(buffer_addr_diff_t) )LONG_MAX;
 
         #elif defined( __CUDACC__ )
 
             SIXTRL_ASSERT( sizeof( NS(buffer_addr_diff_t) ) >=
                            sizeof( long long int ) );
 
-            SIXTRL_STATIC_VAR NS(buffer_addr_diff_t) const
-                LIMIT_OFFSET_MAX = NPP_MAX_64S;
+            return ( NS(buffer_addr_diff_t) )9223372036854775807L;
+        #else
+            return ( NS(buffer_addr_diff_t) )9223372036854775807L;
 
         #endif /* defined( __OPENCL_VERSION__ ) */
     #elif defined( __cplusplus )
@@ -194,19 +205,23 @@ SIXTRL_INLINE NS(buffer_addr_diff_t) NS(ManagedBuffer_get_limit_offset_max)()
         SIXTRL_ASSERT( std::numeric_limits< addr_diff_t >::is_signed  );
         SIXTRL_ASSERT( std::numeric_limits< addr_diff_t >::is_integer );
 
-        SIXTRL_STATIC_VAR addr_diff_t const LIMIT_OFFSET_MAX =
-             std::numeric_limits< addr_diff_t >::max();
+        #if defined( __CUDA_ARCH__ )
+
+        return ( NS(buffer_addr_diff_t) )9223372036854775807L;
+
+        #else  /* defined( __CUDA_ARCH__ ) */
+
+        return std::numeric_limits< addr_diff_t >::max();
+
+        #endif /* defined( __CUDA_ARCH__ ) */
 
     #else
         SIXTRL_ASSERT( sizeof( NS(buffer_addr_diff_t) ) >=
                        sizeof( long long int ) );
 
-        SIXTRL_STATIC_VAR NS(buffer_addr_diff_t) const
-            LIMIT_OFFSET_MAX = ( NS(buffer_addr_diff_t) )LLONG_MAX;
+        return ( NS(buffer_addr_diff_t) )LLONG_MAX;
 
     #endif /* defined( _GPUCODE ) */
-
-    return LIMIT_OFFSET_MAX;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -215,25 +230,26 @@ SIXTRL_INLINE NS(buffer_addr_diff_t)
     NS(ManagedBuffer_get_limit_offset_min)( void )
 {
     #if defined( _GPUCODE )
-         #if defined( __OPENCL_VERSION__ ) /* && \
+         #if defined( __OPENCL_VERSION__ )  && \
              defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
-             ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 ) */
+             ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
 
             SIXTRL_ASSERT( sizeof( NS(buffer_addr_diff_t) >=
                            sizeof( ptr_to_raw_t ) ) );
 
-            SIXTRL_STATIC_VAR NS(buffer_addr_diff_t) const
-                LIMIT_OFFSET_MIN = LONG_MIN;
+            return ( NS(buffer_addr_diff_t ) )LONG_MIN;
 
-        #elif defined( __CUDACC__ ) /* && \
+        #elif defined( __CUDACC__ )  && \
               defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
-              ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 ) */
+              ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
 
             SIXTRL_ASSERT( sizeof( NS(buffer_addr_diff_t) ) >=
                            sizeof( long long int ) );
 
-            SIXTRL_STATIC_VAR NS(buffer_addr_diff_t) const
-                LIMIT_OFFSET_MIN = NPP_MIN_64S;
+            return ( NS(buffer_addr_diff_t) )-9223372036854775807L;
+        #else
+
+            return ( NS(buffer_addr_diff_t) )-9223372036854775807L;
 
         #endif /* defined( __OPENCL_VERSION__ ) */
     #elif defined( __cplusplus )
@@ -243,19 +259,23 @@ SIXTRL_INLINE NS(buffer_addr_diff_t)
         SIXTRL_ASSERT( std::numeric_limits< addr_diff_t >::is_signed  );
         SIXTRL_ASSERT( std::numeric_limits< addr_diff_t >::is_integer );
 
-        SIXTRL_STATIC_VAR addr_diff_t const LIMIT_OFFSET_MIN =
-             std::numeric_limits< addr_diff_t >::min();
+        #if defined( __CUDA_ARCH__ )
+
+        return ( NS(buffer_addr_diff_t) )-9223372036854775807L;
+
+        #else /* defined( __CUDA_ARCH__ ) */
+
+        return std::numeric_limits< addr_diff_t >::min();
+
+        #endif /* defined( __CUDA_ARCH__ ) */
 
     #else
         SIXTRL_ASSERT( sizeof( NS(buffer_addr_diff_t) ) >=
                        sizeof( long long int ) );
 
-        SIXTRL_STATIC_VAR NS(buffer_addr_diff_t) const
-            LIMIT_OFFSET_MIN = ( NS(buffer_addr_diff_t) )LLONG_MIN;
+        return ( NS(buffer_addr_diff_t) )LLONG_MIN;
 
     #endif /* defined( _GPUCODE ) */
-
-    return LIMIT_OFFSET_MIN;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -630,14 +650,14 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_get_section_size)(
 
     SIXTRL_ASSERT( entity_size > ( buf_size_t )0u );
 
-    #if !defined( NDEBUG )
+    #if !defined( NDEBUG ) && !defined( _GPUCODE )
     buf_size_t const max_section_size = ( ptr_to_section != SIXTRL_NULLPTR )
         ? ( buf_size_t )( ( ( ptr_to_addr_t )ptr_to_section )[ 0 ] )
         : ( buf_size_t )0u;
 
     SIXTRL_ASSERT( section_header_length <= max_section_size );
     SIXTRL_ASSERT( max_section_size >= section_size );
-    #endif /* !defined( NDEBUG ) */
+    #endif /* !defined( NDEBUG ) && !defined( _GPUCODE ) */
 
     return section_size;
 }
@@ -698,7 +718,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_get_section_num_entities)(
         ? ( buf_size_t )( ( ( ptr_to_addr_t )ptr_to_section )[ 1 ] )
         : ( buf_size_t )0u;
 
-    #if !defined( NDEBUG )
+    #if !defined( NDEBUG ) && !defined( _GPUCODE )
 
     buf_size_t const max_section_size = ( ptr_to_section != SIXTRL_NULLPTR )
         ? ( buf_size_t )( ( ( ptr_to_addr_t )ptr_to_section )[ 0 ] )
@@ -712,7 +732,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_get_section_num_entities)(
         NS(ManagedBuffer_get_section_header_length)( begin, slot_size ) )
             <= max_section_size );
 
-    #endif /* !defined( NDEBUG ) */
+    #endif /* !defined( NDEBUG ) && !defined( _GPUCODE ) */
 
     return num_elements;
 }

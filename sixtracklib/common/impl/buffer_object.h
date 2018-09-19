@@ -5,6 +5,7 @@
     #include <stdbool.h>
     #include <stddef.h>
     #include <stdint.h>
+    #include <stdio.h>
     #include <stdlib.h>
     #include <limits.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */

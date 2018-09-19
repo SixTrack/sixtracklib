@@ -185,6 +185,9 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reserve)(
     NS(buffer_size_t) const new_max_num_dataptrs,
     NS(buffer_size_t) const new_max_num_garbage_ranges );
 
+SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_needs_remapping)(
+    const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_remap)(
     NS(Buffer)* SIXTRL_RESTRICT buffer );
 
@@ -891,6 +894,47 @@ SIXTRL_INLINE int NS(Buffer_reserve)(
     }
 
     return success;
+}
+
+SIXTRL_INLINE bool NS(Buffer_needs_remapping)(
+    const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    bool needs_remapping = false;
+
+    if( ( NS(Buffer_has_datastore)( buffer ) ) &&
+        ( NS(Buffer_allow_remapping)( buffer ) ) )
+    {
+        #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
+             SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1
+
+        /*
+        if( NS(Buffer_uses_special_opencl_datastore)( buffer ) )
+        {
+            success = NS(Buffer_remap_opencl)( buffer );
+        }
+        else
+        */
+        #endif /* SIXTRACKLIB_ENABLE_MODULE_OPENCL */
+
+        #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
+             SIXTRACKLIB_ENABLE_MODULE_CUDA == 1
+
+        /*
+        if( NS(Buffer_uses_special_cuda_datastore)( buffer ) )
+        {
+            success = NS(Buffer_remap_cuda)( buffer );
+        }
+        else
+        */
+        #endif /* SIXTRACKLIB_ENABLE_MODULE_CUDA */
+
+        {
+            needs_remapping = NS(Buffer_needs_remapping_generic)( buffer );
+        }
+
+    }
+
+    return needs_remapping;
 }
 
 SIXTRL_INLINE int NS(Buffer_remap)( NS(Buffer)* SIXTRL_RESTRICT buffer )
