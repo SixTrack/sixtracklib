@@ -100,11 +100,12 @@ SIXTRL_STATIC_VAR NS(buffer_size_t) const
 
 /* ------------------------------------------------------------------------- */
 
+#endif /* !defined( _GPUCODE ) */
+
 #if defined( __cplusplus )
 }
 #endif /* defined( __cplusplus ) */
 
-#endif /* !defined( _GPUCODE ) */
 
 #if defined( __cplusplus )
 extern "C" {
