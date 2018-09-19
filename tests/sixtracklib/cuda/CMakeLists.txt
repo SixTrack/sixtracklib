@@ -43,7 +43,7 @@ if( GTEST_FOUND )
     endif()
 
     set( TESTS_SIXTRACKLIB_CUDA_TESTLIB_HEADERS
-         impl/cuda_test_grid_dimensions.cuh
+         impl/cuda_grid_dimensions_kernel.cuh
          impl/cuda_buffer_generic_obj_kernel.cuh
     )
 
