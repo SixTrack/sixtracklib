@@ -6,7 +6,6 @@
     #include "sixtracklib/common/impl/buffer_defines.h"
     #include "sixtracklib/common/impl/managed_buffer_minimal.h"
     #include "sixtracklib/common/impl/managed_buffer_remap.h"
-    #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #pragma OPENCL_EXTENSION cl_khr_int32_extended_atomics
