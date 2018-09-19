@@ -178,7 +178,7 @@ extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
 SIXTRL_INLINE NS(buffer_addr_diff_t)
-    NS(ManagedBuffer_get_limit_offset_max)( void )
+    NS(ManagedBuffer_get_limit_offset_max)()
 {
     #if defined( _GPUCODE )
         #if defined( __OPENCL_VERSION__ )
@@ -227,7 +227,7 @@ SIXTRL_INLINE NS(buffer_addr_diff_t)
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE NS(buffer_addr_diff_t)
-    NS(ManagedBuffer_get_limit_offset_min)( void )
+    NS(ManagedBuffer_get_limit_offset_min)()
 {
     #if defined( _GPUCODE )
          #if defined( __OPENCL_VERSION__ )  && \
