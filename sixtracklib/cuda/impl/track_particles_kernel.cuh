@@ -6,12 +6,12 @@
     #include "sixtracklib/common/impl/buffer_defines.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-extern __global__ void NS(Remap_particles_beam_elements_buffers_cuda)(
+__global__ void NS(Remap_particles_beam_elements_buffers_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elem_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag );
 
-extern __global__ void NS(Track_particles_beam_elements_cuda)(
+__global__ void NS(Track_particles_beam_elements_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elem_buf,
     SIXTRL_UINT64_T const num_turns,

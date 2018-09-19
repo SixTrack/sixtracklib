@@ -6,11 +6,11 @@
     #include "sixtracklib/common/impl/buffer_defines.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-__global__ void NS(ManagedBuffer_remap_cuda)(
+__global__ void NS(ManagedBuffer_remap_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
     SIXTRL_BUFFER_DATAPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag );
 
-__global__ void NS(ManagedBuffer_remap_io_buffers_cuda)(
+__global__ void NS(ManagedBuffer_remap_io_buffers_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT in_buffer_begin,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer_begin,
     SIXTRL_BUFFER_DATAPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag );

@@ -20,26 +20,35 @@
     #include "sixtracklib/cuda/impl/cuda_tools.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-__global__ void NS(ManagedBuffer_remap_cuda)(
+extern __global__ void NS(ManagedBuffer_remap_kernel_cuda)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag );
+
+extern __global__ void NS(ManagedBuffer_remap_io_buffers_kernel_cuda)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT in_buffer_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag );
+
+
+__global__ void NS(ManagedBuffer_remap_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
     SIXTRL_BUFFER_DATAPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag )
 {
     typedef NS(buffer_size_t) buf_size_t;
 
-    size_t const thread_id = NS(Cuda_get_1d_thread_id)(
-        threadIdx, blockIdx, gridDim, blockDim );
+    size_t const thread_id = NS(Cuda_get_1d_thread_id_in_kernel)();
 
     size_t const thread_id_to_remap_buffers = ( size_t )0u;
 
-    SIXTRL_ASSERT( NS(Cuda_get_total_num_threads)(
-        gridDim, blockDim ) > ( buf_size_t )0u );
+    SIXTRL_ASSERT( NS(Cuda_get_total_num_threads_in_kernel)() >
+        ( buf_size_t )0u );
 
     if( thread_id_to_remap_buffers == thread_id )
     {
         buf_size_t const slot_size = ( buf_size_t )8u;
         int32_t success_flag       = ( int32_t )0u;
 
-        if( ( buffer_begin != SIXTRL_NULLPTR ) ) &&
+        if( ( buffer_begin != SIXTRL_NULLPTR ) &&
             ( 0 != NS(ManagedBuffer_remap)( buffer_begin, slot_size ) ) )
         {
             success_flag |= -2;
@@ -63,18 +72,15 @@ __global__ void NS(ManagedBuffer_remap_cuda)(
     return;
 }
 
-__global__ void NS(ManagedBuffer_remap_io_buffers_cuda)(
+__global__ void NS(ManagedBuffer_remap_io_buffers_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT in_buffer_begin,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer_begin,
     SIXTRL_BUFFER_DATAPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag )
 {
     typedef NS(buffer_size_t) buf_size_t;
 
-    size_t const thread_id = NS(Cuda_get_1d_thread_id)(
-        threadIdx, blockIdx, gridDim, blockDim );
-
-    size_t const total_num_threads =
-        NS(Cuda_get_total_num_threads)( gridDim, blockDim );
+    size_t const thread_id = NS(Cuda_get_1d_thread_id_in_kernel)();
+    size_t const total_num_threads = NS(Cuda_get_total_num_threads_in_kernel)();
 
     size_t const thread_id_to_remap_in_buffers = ( size_t )0u;
 

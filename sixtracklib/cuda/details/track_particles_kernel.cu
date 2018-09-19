@@ -22,18 +22,16 @@
     #include "sixtracklib/cuda/impl/cuda_tools.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-__global__ void NS(Remap_particles_beam_elements_buffers_cuda)(
+
+__global__ void NS(Remap_particles_beam_elements_buffers_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elem_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag )
 {
     typedef NS(buffer_size_t) buf_size_t;
 
-    size_t const thread_id = NS(Cuda_get_1d_thread_id)(
-        threadIdx, blockIdx, gridDim, blockDim );
-
-    size_t const total_num_threads =
-        NS(Cuda_get_total_num_threads)( gridDim, blockDim );
+    size_t const thread_id = NS(Cuda_get_1d_thread_id_in_kernel)();
+    size_t const total_num_threads = NS(Cuda_get_total_num_threads_in_kernel)();
 
     size_t const thread_id_to_remap_particles_buffers = ( size_t )0u;
 
@@ -94,7 +92,7 @@ __global__ void NS(Remap_particles_beam_elements_buffers_cuda)(
 }
 
 
-__global__ void NS(Track_particles_beam_elements_cuda)(
+__global__ void NS(Track_particles_beam_elements_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT beam_elem_buffer,
     SIXTRL_UINT64_T const num_turns,
@@ -111,11 +109,8 @@ __global__ void NS(Track_particles_beam_elements_cuda)(
     if( ( !NS(ManagedBuffer_needs_remapping( particles_buffer, slot_size ) ) ) &&
         ( !NS(ManagedBuffer_needs_remapping( beam_elem_buffer, slot_size ) ) ) )
     {
-        size_t global_particle_id = NS(Cuda_get_1d_thread_id)(
-            threadIdx, blockIdx, gridDim, blockDim );
-
-        size_t const stride =
-            NS(Cuda_get_1d_thread_stride)( gridDim, blockDim );
+        size_t global_particle_id = NS(Cuda_get_1d_thread_id_in_kernel)();
+        size_t const stride = NS(Cuda_get_1d_thread_stride_in_kernel)();
 
         size_t object_begin_particle_id = ( size_t )0u;
 

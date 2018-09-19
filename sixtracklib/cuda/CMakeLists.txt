@@ -2,12 +2,12 @@
 # Cuda pre-defined kernels
 
 set( SIXTRACKLIB_CUDA_KERNEL_HEADERS
-#      impl/managed_buffer_remap_kernel.cuh
+     impl/managed_buffer_remap_kernel.cuh
      impl/track_particles_kernel.cuh
 )
 
 set( SIXTRACKLIB_CUDA_KERNEL_SOURCES
-#      details/managed_buffer_remap_kernel.cu
+     details/managed_buffer_remap_kernel.cu
      details/track_particles_kernel.cu
 )
 
@@ -29,26 +29,24 @@ set( SIXTRACKL_CUDA_HOST_DEFINITIONS )
 list( APPEND SIXTRACKL_CUDA_HOST_DEFINITIONS
       "__NAMESPACE=${SIXTRACKL_C_NAMESPACE_PREFIX}" )
 
-set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
-     impl/cuda_tools.h
-     impl/track_particles_kernel_c_wrapper.h
-)
+# set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
+#      impl/cuda_tools.h
+#      impl/track_particles_kernel_c_wrapper.h
+# )
 
-set( SIXTRACKLIB_CUDA_PART_HOST_SOURCES
-     details/track_particles_kernel_c_wrapper.cu
-)
+# set( SIXTRACKLIB_CUDA_PART_HOST_SOURCES
+#      details/track_particles_kernel_c_wrapper.cu
+# )
 
-add_library( sixtrack_cuda_host OBJECT
-             ${SIXTRACKLIB_CUDA_KERNEL_HEADERS}
-             ${SIXTRACKLIB_CUDA_KERNEL_SOURCES}
-             ${SIXTRACKLIB_CUDA_PART_HOST_HEADERS}
-             ${SIXTRACKLIB_CUDA_PART_HOST_SOURCES}
-)
+# add_library( sixtrack_cuda_host OBJECT
+#              ${SIXTRACKLIB_CUDA_PART_HOST_HEADERS}
+#              ${SIXTRACKLIB_CUDA_PART_HOST_SOURCES}
+# )
 
-target_compile_definitions( sixtrack_cuda_host
-    PUBLIC ${SIXTRACKL_CUDA_HOST_DEFINITIONS} )
+# target_compile_definitions( sixtrack_cuda_host
+#     PUBLIC ${SIXTRACKL_CUDA_HOST_DEFINITIONS} )
 
-target_include_directories( sixtrack_cuda_host PUBLIC ${CMAKE_SOURCE_DIR} )
+# target_include_directories( sixtrack_cuda_host PUBLIC ${CMAKE_SOURCE_DIR} )
 
 # ------------------------------------------------------------------------------
 # --- CUDA Kernel object library:
@@ -61,9 +59,11 @@ list( APPEND SIXTRACKL_CUDA_DEVICE_DEFINITIONS
 
 set( SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS
      impl/cuda_tools.h
+     impl/track_particles_kernel_c_wrapper.h
 )
 
 set( SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES
+     details/track_particles_kernel_c_wrapper.cu
 )
 
 add_library( sixtrack_cuda_device OBJECT
@@ -80,7 +80,10 @@ target_include_directories( sixtrack_cuda_device PUBLIC ${CMAKE_SOURCE_DIR} )
 
 # ------------------------------------------------------------------------------
 
-set( SIXTRACKL_CUDA_OBJECT_LIBS sixtrack_cuda_host sixtrack_cuda_device )
+set( SIXTRACKL_CUDA_OBJECT_LIBS )
+# set( SIXTRACKL_CUDA_OBJECT_LIBS ${SIXTRACKL_CUDA_OBJECT_LIBS} sixtrack_cuda_host   )
+set( SIXTRACKL_CUDA_OBJECT_LIBS ${SIXTRACKL_CUDA_OBJECT_LIBS} sixtrack_cuda_device )
+
 
 set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
               PROPERTY POSITION_INDEPENDENT_CODE ON )
@@ -111,8 +114,8 @@ set_property( TARGET ${SIXTRACKL_CUDA_OBJECT_LIBS}
 
 set( SIXTRACKLIB_CUDA_INSTALL_PATH include/sixtracklib/cuda )
 
-install( FILES ${SIXTRACKLIB_CUDA_PART_HOST_HEADERS}
-         DESTINATION ${SIXTRACKLIB_CUDA_INSTALL_PATH} )
+# install( FILES ${SIXTRACKLIB_CUDA_PART_HOST_HEADERS}
+#          DESTINATION ${SIXTRACKLIB_CUDA_INSTALL_PATH} )
 
 install( FILES ${SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS}
          DESTINATION "${SIXTRACKLIB_CUDA_INSTALL_PATH}/impl" )

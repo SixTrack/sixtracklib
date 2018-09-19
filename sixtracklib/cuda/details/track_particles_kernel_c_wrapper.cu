@@ -14,7 +14,9 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/buffer.h"
+    #include "sixtracklib/common/impl/buffer_defines.h"
+    #include "sixtracklib/common/impl/managed_buffer_minimal.h"
+    #include "sixtracklib/common/impl/managed_buffer_remap.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/track.h"
 
@@ -156,7 +158,7 @@ __host__ int NS(Track_particles_on_cuda_grid)(
                 block_dim.y = 1;
                 block_dim.z = 1;
 
-                NS(Remap_particles_beam_elements_buffers_cuda)<<<
+                NS(Remap_particles_beam_elements_buffers_kernel_cuda)<<<
                     grid_dim, block_dim >>>( cuda_particles_buffer,
                         cuda_beam_elements_buffer, cuda_succes_flag_buffer );
 
@@ -184,7 +186,7 @@ __host__ int NS(Track_particles_on_cuda_grid)(
                 block_dim.y = 1;
                 block_dim.z = 1;
 
-                NS(Track_particles_beam_elements_cuda)<<<
+                NS(Track_particles_beam_elements_kernel_cuda)<<<
                     grid_dim, block_dim >>>( cuda_particles_buffer,
                     cuda_beam_elements_buffer, num_turns,
                         cuda_succes_flag_buffer );
@@ -276,7 +278,7 @@ __host__ int NS(Track_particles_on_cuda)(
         NS(Particles_buffer_get_total_num_of_particles)( in_particles );
 
     if( cudaSuccess == cudaOccupancyMaxPotentialBlockSize( &min_grid_size,
-            &block_size, NS(Track_particles_beam_elements_cuda), 0u, 0u ) )
+            &block_size, NS(Track_particles_beam_elements_kernel_cuda), 0u, 0u ) )
     {
         success = 0;
     }
@@ -291,7 +293,7 @@ __host__ int NS(Track_particles_on_cuda)(
 
     if( ( success == 0 ) && ( cudaSuccess !=
           cudaOccupancyMaxActiveBlocksPerMultiprocessor( &max_active_blocks,
-            NS(Track_particles_beam_elements_cuda), block_size, 0u ) ) )
+            NS(Track_particles_beam_elements_kernel_cuda), block_size, 0u ) ) )
     {
         success |= -16384;
     }
@@ -309,7 +311,7 @@ __host__ int NS(Track_particles_on_cuda)(
                 ( double )( device_info.maxThreadsPerMultiProcessor *
                             device_info.warpSize );
 
-            printf( "DEBUG :: Launch kernel NS(Track_particles_beam_elements_cuda) "
+            printf( "DEBUG :: Launch kernel NS(Track_particles_beam_elements_kernel_cuda) "
                     "with a block_size of %d; Theoretical occupancy = %f\r\n",
                     block_size, occupancy );
         }
