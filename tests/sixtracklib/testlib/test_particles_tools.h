@@ -57,10 +57,6 @@ void NS(Particles_print_max_diff)(
 
 /* ------------------------------------------------------------------------- */
 
-int NS(Particles_buffers_have_same_structure)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer );
-
 int NS(Particles_buffers_map_to_same_memory)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer );
