@@ -44,10 +44,12 @@ if( GTEST_FOUND )
 
     set( TESTS_SIXTRACKLIB_CUDA_TESTLIB_HEADERS
          impl/cuda_test_grid_dimensions.cuh
+         impl/cuda_buffer_generic_obj_kernel.cuh
     )
 
     set( TESTS_SIXTRACKLIB_CUDA_TESTLIB_SOURCES
          details/cuda_grid_dimensions_kernel.cu
+         details/cuda_buffer_generic_obj_kernel.cu
     )
 
     add_library( sixtrack_cuda_testlib_kernels OBJECT
@@ -58,8 +60,11 @@ if( GTEST_FOUND )
     target_compile_definitions( sixtrack_cuda_testlib_kernels
         PUBLIC ${SIXTRACKL_CUDA_KERNEL_DEFINITIONS} )
 
-    target_include_directories(
-        sixtrack_cuda_testlib_kernels PUBLIC ${CMAKE_SOURCE_DIR} )
+    set_property( TARGET sixtrack_cuda_testlib_kernels
+                  APPEND PROPERTY INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR} )
+
+    set_property( TARGET sixtrack_cuda_testlib_kernels
+                  APPEND PROPERTY INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/tests" )
 
     set_target_properties(  sixtrack_cuda_testlib_kernels PROPERTIES POSITION_INDEPENDENT_CODE ON )
     set_target_properties(  sixtrack_cuda_testlib_kernels PROPERTIES LINKER_LANGUAGE C )
@@ -85,6 +90,17 @@ if( GTEST_FOUND )
 
     add_test( CXX_Cuda_SingleFileCompilation test_single_file_compilation_cuda_cxx )
 
+    # --------------------------------------------------------------------------
+    # test_buffer_cuda_c99:
+
+    add_executable( test_buffer_cuda_c99 test_buffer_cuda_c99.cpp
+                    $<TARGET_OBJECTS:sixtrack_cuda_testlib_kernels> )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_buffer_cuda_c99 )
+
+    target_link_libraries( test_buffer_cuda_c99 PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
+    add_test( C99_Cuda_BufferTests test_buffer_cuda_c99 )
+
      # --------------------------------------------------------------------------
     # test_single_file_compilation_cuda_cxx:
 
@@ -100,6 +116,10 @@ if( GTEST_FOUND )
 
     # ==========================================================================
     # ====  set all properties:
+
+    set_property(
+        TARGET ${UNIT_TEST_TARGETS}
+        APPEND PROPERTY INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/tests" )
 
     set_property(
         TARGET ${UNIT_TEST_TARGETS}
