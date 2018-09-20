@@ -9,6 +9,8 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/impl/buffer_defines.h"
+    #include "sixtracklib/common/impl/buffer_type.h"
     #include "sixtracklib/common/impl/managed_buffer_minimal.h"
     #include "sixtracklib/common/impl/managed_buffer_remap.h"
     #include "sixtracklib/common/particles.h"
@@ -17,13 +19,13 @@
 
 __global__ void NS(Particles_copy_buffer_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT in_buffer_begin,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer_begin,
     SIXTRL_ARGPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag );
 
 
 __global__ void NS(Particles_copy_buffer_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT in_buffer_begin,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer_begin,
     SIXTRL_ARGPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag )
 {
     typedef NS(buffer_size_t)                               buf_size_t;
@@ -37,13 +39,13 @@ __global__ void NS(Particles_copy_buffer_kernel_cuda)(
 
     int32_t success_flag = ( int32_t )-1;
 
-    buf_size_t const slot_size = NS(BUFFER_DEFAULT_SLOT_SIZE);
+    buf_size_t const slot_size = SIXTRL_BUFFER_DEFAULT_SLOT_SIZE;
 
     buf_size_t const num_objects =
         NS(ManagedBuffer_get_num_objects)( in_buffer_begin, slot_size );
 
-    if( ( !NS(ManagedBuffer_needs_remapping(  in_buffer_begin,  slot_size ) ) ) &&
-        ( !NS(ManagedBuffer_needs_remapping( out_buffer_begin,  slot_size ) ) ) &&
+    if( ( !NS(ManagedBuffer_needs_remapping)(  in_buffer_begin,  slot_size ) ) &&
+        ( !NS(ManagedBuffer_needs_remapping)( out_buffer_begin,  slot_size ) ) &&
         (  NS(ManagedBuffer_get_num_objects)( out_buffer_begin, slot_size ) ==
            num_objects ) )
     {
@@ -52,7 +54,7 @@ __global__ void NS(Particles_copy_buffer_kernel_cuda)(
         num_elem_t block_begin_index  = ( num_elem_t )0u;
 
         obj_const_iter_t in_begin = ( obj_const_iter_t
-            )NS(ManagedBuffer_get_const_objects_index_begin(
+            )NS(ManagedBuffer_get_const_objects_index_begin)(
                 in_buffer_begin, slot_size );
 
         obj_const_iter_t in_end   = ( obj_const_iter_t
@@ -65,7 +67,7 @@ __global__ void NS(Particles_copy_buffer_kernel_cuda)(
 
         obj_const_iter_t idx =
             NS(BufferIndex_get_index_object_by_global_index_from_range)(
-                global_particle_id, 0u, in_begin, end, &block_begin_index );
+                global_particle_id, 0u, in_begin, in_end, &block_begin_index );
 
         if( ( in_begin != SIXTRL_NULLPTR ) && ( in_end != SIXTRL_NULLPTR ) &&
             ( out_begin != SIXTRL_NULLPTR ) )
@@ -73,7 +75,7 @@ __global__ void NS(Particles_copy_buffer_kernel_cuda)(
             success_flag = 0;
         }
 
-        while( ( idx != SIXTRL_NULLPTR ) && ( idx != end ) )
+        while( ( idx != SIXTRL_NULLPTR ) && ( idx != in_end ) )
         {
             num_elem_t const block_offset = ( idx - in_begin );
 
@@ -84,7 +86,7 @@ __global__ void NS(Particles_copy_buffer_kernel_cuda)(
             ptr_const_particles_t in_particle = ( ptr_const_particles_t )(
                 uintptr_t )NS(Object_get_begin_addr)( idx );
 
-            ptr_particles_t out_particle = ( ptr_particle_t )( uintptr_t
+            ptr_particles_t out_particle = ( ptr_particles_t )( uintptr_t
                 )NS(Object_get_begin_addr)( out_begin + block_offset );
 
             if( ( in_particle  != SIXTRL_NULLPTR ) &&
@@ -114,22 +116,22 @@ __global__ void NS(Particles_copy_buffer_kernel_cuda)(
 
             idx = NS(BufferIndex_get_index_object_by_global_index_from_range)(
                 global_particle_id, block_begin_index,
-                    idx, end, &block_begin_index );
+                    idx, in_end, &block_begin_index );
         }
 
-        if( idx != end )
+        if( idx != in_end )
         {
             success_flag |= -4;
         }
     }
     else
     {
-        if( NS(ManagedBuffer_needs_remapping(  in_buffer_begin, slot_size ) ) )
+        if( NS(ManagedBuffer_needs_remapping)(  in_buffer_begin, slot_size ) )
         {
             success_flag |= -8;
         }
 
-        if( NS(ManagedBuffer_needs_remapping( out_buffer_begin, slot_size ) ) )
+        if( NS(ManagedBuffer_needs_remapping)( out_buffer_begin, slot_size ) )
         {
             success_flag |= -8;
         }

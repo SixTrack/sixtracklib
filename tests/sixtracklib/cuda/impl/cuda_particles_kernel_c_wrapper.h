@@ -14,8 +14,7 @@
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-
-SXTRL_HOST_FN int NS(Run_test_particles_copy_buffer_kernel_on_cuda_grid)(
+SIXTRL_HOST_FN int NS(Run_test_particles_copy_buffer_kernel_on_cuda_grid)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT in_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
     NS(buffer_size_t) const num_blocks,
@@ -23,7 +22,7 @@ SXTRL_HOST_FN int NS(Run_test_particles_copy_buffer_kernel_on_cuda_grid)(
 
 #if defined( CUDART_VERSION ) && ( CUDART_VERSION >= 6050 )
 
-SXTRL_HOST_FN int NS(Run_test_particles_copy_buffer_kernel_on_cuda)(
+SIXTRL_HOST_FN int NS(Run_test_particles_copy_buffer_kernel_on_cuda)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT in_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer );
 

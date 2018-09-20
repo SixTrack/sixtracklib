@@ -61,13 +61,13 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda_grid)(
         if( ( in_buffer_begin  != SIXTRL_NULLPTR ) &&
             ( out_buffer_begin != SIXTRL_NULLPTR ) &&
             ( in_buffer_size    > ZERO_SIZE ) &&
-            ( in_buffer_size   <= out_buffer_capcity ) )
+            ( in_buffer_size   <= out_buffer_capacity ) )
         {
             int32_t success_flag = ( int32_t )0u;
 
             unsigned char* cuda_in_buffer   = SIXTRL_NULLPTR;
             unsigned char* cuda_out_buffer  = SIXTRL_NULLPTR;
-            int32_t*       cuda_succes_flag = SIXTRL_NULLPTR;
+            int32_t*       cuda_success_flag = SIXTRL_NULLPTR;
 
             if( cudaSuccess == cudaMalloc( ( void** )&cuda_in_buffer, in_buffer_size ) )
             {
@@ -138,19 +138,19 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda_grid)(
 
             if( ( success == 0 ) &&
                 ( cudaSuccess != cudaMemcpy( cuda_out_buffer, out_buffer_begin,
-                    in_buffer_begin, cudaMemcpyHostToDevice ) ) )
+                    in_buffer_size, cudaMemcpyHostToDevice ) ) )
             {
                 success |= -512;
             }
 
             if( ( success == 0 ) && ( cudaSuccess != cudaMalloc( (
-                void** )&cuda_succes_flag, sizeof( success_flag ) ) ) )
+                void** )&cuda_success_flag, sizeof( success_flag ) ) ) )
             {
                 success |= -1024;
             }
 
             if( ( success == 0 ) && ( cudaSuccess != cudaMemcpy(
-                cuda_succes_flag, &success_flag, sizeof( success_flag ),
+                cuda_success_flag, &success_flag, sizeof( success_flag ),
                     cudaMemcpyHostToDevice ) ) )
             {
                 success |= -2048;
@@ -172,11 +172,11 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda_grid)(
                 block_dim.z = 1;
 
                 NS(ManagedBuffer_remap_io_buffers_kernel_cuda)<<<
-                    grid_dim, block_dim >>>(
-                        cuda_in_buffer, cuda_out_buffer, cuda_success_flag );
+                    grid_dim, block_dim >>>( cuda_in_buffer,
+                        cuda_out_buffer, cuda_success_flag );
 
                 if( ( cudaSuccess == cudaDeviceSynchronize() ) &&
-                    ( cudaSuccess == cudaMemcpy( &success_flag, cuda_succes_flag,
+                    ( cudaSuccess == cudaMemcpy( &success_flag, cuda_success_flag,
                         sizeof( success_flag ), cudaMemcpyDeviceToHost ) ) )
                 {
                     success = success_flag;
@@ -202,7 +202,7 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda_grid)(
                     cuda_in_buffer, cuda_out_buffer, cuda_success_flag );
 
                 if( ( cudaSuccess == cudaDeviceSynchronize() ) &&
-                    ( cudaSuccess == cudaMemcpy( &success_flag, cuda_succes_flag,
+                    ( cudaSuccess == cudaMemcpy( &success_flag, cuda_success_flag,
                         sizeof( success_flag ), cudaMemcpyDeviceToHost ) ) )
                 {
                     if( ( success_flag == 0 ) && ( cudaSuccess == cudaMemcpy(
@@ -261,7 +261,7 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda)(
     SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( out_buffer ) );
 
     total_num_particles =
-        NS(Particles_buffer_get_total_num_of_particles)( in_particles );
+        NS(Particles_buffer_get_total_num_of_particles)( in_buffer );
 
     if( cudaSuccess == cudaOccupancyMaxPotentialBlockSize( &min_grid_size,
             &block_size, NS(Particles_copy_buffer_kernel_cuda), 0u, 0u ) )
@@ -279,7 +279,7 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda)(
 
     if( ( success == 0 ) && ( cudaSuccess !=
           cudaOccupancyMaxActiveBlocksPerMultiprocessor( &max_active_blocks,
-            NS(Track_particles_beam_elements_kernel_cuda), block_size, 0u ) ) )
+            NS(Particles_copy_buffer_kernel_cuda), block_size, 0u ) ) )
     {
         success |= -131071;
     }
