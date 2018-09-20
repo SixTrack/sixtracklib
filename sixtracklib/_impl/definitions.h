@@ -538,16 +538,25 @@
 
 #if !defined( SIXTRACKLIB_COPY_VALUES )
     #if defined( _GPUCODE )
-        #define SIXTRACKLIB_COPY_VALUES( T, destination, source, n ) \
-        do \
-        {  \
-           SIXTRL_INT64_T ii = ( SIXTRL_INT64_T )0; \
-           for( ; ii < ( n ) ; ++ii ) \
-           {   \
-               *( ( destination ) + ii ) = *( ( source ) + ii );\
-           }   \
-        }  \
-        while( 0 )
+        #if defined( __CUDA_ARCH__ )
+            #define SIXTRACKLIB_COPY_VALUES( T, destination, source, n ) \
+            memcpy( ( destination ), ( source ), sizeof( T ) * ( n ) )
+        #elif defined( __CUDACC__ ) || defined( __NVCC__ )
+            #define SIXTRACKLIB_COPY_VALUES( T, destination, source, n ) \
+            memcpy( ( destination ), ( source ), sizeof( T ) * ( n ) )
+        #else
+            #define SIXTRACKLIB_COPY_VALUES( T, destination, source, n ) \
+            do \
+            {  \
+                SIXTRL_INT64_T ii = ( SIXTRL_INT64_T )0; \
+                for( ; ii < ( n ) ; ++ii ) \
+                {   \
+                    *( ( destination ) + ii ) = *( ( source ) + ii );\
+                }   \
+            }  \
+            while( 0 )
+
+        #endif /* defined( __CUDA_ARCH__ ) */
 
     #else /* defined( _GPUCODE ) */
         #define SIXTRACKLIB_COPY_VALUES( T, destination, source, n ) \
