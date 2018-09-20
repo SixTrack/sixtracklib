@@ -18,7 +18,7 @@ if( GTEST_FOUND )
     endif()
 
     string( APPEND CMAKE_CUDA_FLAGS " -D_FORCE_INLINES" )
-    string( APPEND CMAKE_CUDA_FLAGS " -G -g" )
+    string( APPEND CMAKE_CUDA_FLAGS " -G" )
 
     # --------------------------------------------------------------------------
     # tests/sixtracklib/cuda: cuda_testlib OBJECT library
@@ -45,11 +45,13 @@ if( GTEST_FOUND )
     set( TESTS_SIXTRACKLIB_CUDA_TESTLIB_HEADERS
          impl/cuda_grid_dimensions_kernel.cuh
          impl/cuda_buffer_generic_obj_kernel.cuh
+         impl/cuda_particles_kernel.cuh
     )
 
     set( TESTS_SIXTRACKLIB_CUDA_TESTLIB_SOURCES
          details/cuda_grid_dimensions_kernel.cu
          details/cuda_buffer_generic_obj_kernel.cu
+         details/cuda_particles_kernel.cu
     )
 
     add_library( sixtrack_cuda_testlib_kernels OBJECT
@@ -100,6 +102,19 @@ if( GTEST_FOUND )
 
     target_link_libraries( test_buffer_cuda_c99 PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
     add_test( C99_Cuda_BufferTests test_buffer_cuda_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_particles_cuda_c99:
+
+#     add_executable( test_particles_cuda_c99 test_particles_cuda_c99.cpp
+#                     impl/cuda_particles_kernel_c_wrapper.h
+#                     details/cuda_particles_kernel_c_wrapper.cu
+#                     $<TARGET_OBJECTS:sixtrack_cuda_testlib_kernels> )
+
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_particles_cuda_c99 )
+
+#     target_link_libraries( test_particles_cuda_c99 PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
+#     add_test( C99_Cuda_ParticlesBufferTests test_particles_cuda_c99 )
 
      # --------------------------------------------------------------------------
     # test_single_file_compilation_cuda_cxx:
