@@ -1,3 +1,7 @@
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/cuda/impl/track_particles_kernel_c_wrapper.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stddef.h>
     #include <stdint.h>
