@@ -14,9 +14,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/managed_buffer_minimal.h"
-    #include "sixtracklib/common/impl/managed_buffer_remap.h"
+    #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/track.h"
 

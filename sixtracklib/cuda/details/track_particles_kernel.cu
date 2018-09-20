@@ -22,7 +22,6 @@
     #include "sixtracklib/cuda/impl/cuda_tools.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-
 __global__ void NS(Remap_particles_beam_elements_buffers_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elem_buffer,
