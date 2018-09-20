@@ -26,8 +26,8 @@ __kernel void NS(Particles_copy_buffer_opencl)(
     int success_flag = ( int )0u;
     buf_size_t const slot_size = ( buf_size_t )8u;
 
-    if( ( !NS(ManagedBuffer_needs_remapping(  in_buffer_begin,  slot_size ) ) ) &&
-        ( !NS(ManagedBuffer_needs_remapping( out_buffer_begin,  slot_size ) ) ) &&
+    if( ( !NS(ManagedBuffer_needs_remapping)(  in_buffer_begin,  slot_size ) ) ) &&
+        ( !NS(ManagedBuffer_needs_remapping)( out_buffer_begin,  slot_size ) ) ) &&
         (  NS(ManagedBuffer_get_num_objects)( out_buffer_begin, slot_size ) ==
            NS(ManagedBuffer_get_num_objects)(  in_buffer_begin, slot_size ) ) )
     {
@@ -85,12 +85,12 @@ __kernel void NS(Particles_copy_buffer_opencl)(
     }
     else
     {
-        if( NS(ManagedBuffer_needs_remapping(  in_buffer_begin, slot_size ) ) )
+        if( NS(ManagedBuffer_needs_remapping)(  in_buffer_begin, slot_size ) ) )
         {
             success_flag |= -4;
         }
 
-        if( NS(ManagedBuffer_needs_remapping( out_buffer_begin, slot_size ) ) )
+        if( NS(ManagedBuffer_needs_remapping)( out_buffer_begin, slot_size ) ) )
         {
             success_flag |= -8;
         }
