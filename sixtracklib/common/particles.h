@@ -835,9 +835,9 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_state)(
 /* ========================================================================= */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #if !defined( _GPUCODE )
+    #if !defined( _GPUCODE ) || defined( __CUDACC__ )
     #include "sixtracklib/common/buffer.h"
-    #endif /* !defined( _GPUCODE ) */
+    #endif /* !defined( _GPUCODE ) || defined( __CUDACC__ ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -1550,7 +1550,7 @@ NS(BufferIndex_get_particles)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC const
 }
 
 
-SIXTRL_FN SIXTRL_STATIC NS(particle_num_elements_t)
+SIXTRL_INLINE NS(particle_num_elements_t)
 NS(BufferIndex_get_total_num_of_particles_in_range)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT it,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end )
@@ -1579,9 +1579,9 @@ NS(BufferIndex_get_total_num_of_particles_in_range)(
 }
 
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+SIXTRL_INLINE NS(buffer_size_t)
 NS(BufferIndex_get_total_num_of_particle_blocks_in_range)(
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT it,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end )
 {
     typedef NS(buffer_size_t) buf_size_t;
@@ -1612,7 +1612,7 @@ NS(BufferIndex_get_total_num_of_particle_blocks_in_range)(
 }
 
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*
+SIXTRL_INLINE SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*
 NS(BufferIndex_get_index_object_by_global_index_from_range)(
     NS(particle_num_elements_t) const global_index,
     NS(particle_num_elements_t) const begin_index_offset,
@@ -1622,13 +1622,8 @@ NS(BufferIndex_get_index_object_by_global_index_from_range)(
         SIXTRL_RESTRICT ptr_result_index_offset )
 {
     typedef NS(particle_num_elements_t)                     num_elem_t;
-    typedef NS(buffer_size_t)                               buf_size_t;
-
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)  const* obj_iter_t;
     typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const* ptr_particles_t;
-    typedef SIXTRL_BUFFER_ARGPTR_DEC num_elem_t*            ptr_num_elem_t;
-
-    SIXTRL_STATIC_VAR num_elem_t const ZERO = ( num_elem_t )0u;
 
     obj_iter_t ptr_index = SIXTRL_NULLPTR;
     num_elem_t block_begin_index = begin_index_offset;
@@ -1637,13 +1632,13 @@ NS(BufferIndex_get_index_object_by_global_index_from_range)(
     SIXTRL_ASSERT( ( ( uintptr_t )it ) <= ( ( uintptr_t )end ) );
 
     SIXTRL_ASSERT( global_index >= begin_index_offset );
-    SIXTRL_ASSERT( begin_index_offset >= ZERO );
+    SIXTRL_ASSERT( begin_index_offset >= ( num_elem_t )0u );
 
     for( ; it != end ; ++it )
     {
         if( NS(Object_get_type_id)( it ) == NS(OBJECT_TYPE_PARTICLE ) )
         {
-            ptr_particle_t particles = ( ptr_particles_t )( uintptr_t
+            ptr_particles_t particles = ( ptr_particles_t )( uintptr_t
                 )NS(Object_get_begin_addr)( it );
 
             num_elem_t const num_particles =
@@ -2291,31 +2286,31 @@ SIXTRL_INLINE void NS(Particles_clear_range)(
         /* ----------------------------------------------------------------- */
 
         index_begin = NS(Particles_get_particle_id)( p );
-        SIXTRL_ASSERT( index_begni != SIXTRL_NULLPTR );
-        SIXTRLACKLIB_SET_VALUES( index_t, index_begin + start_index,
-                                 len, ZERO_INDEX );
+        SIXTRL_ASSERT( index_begin != SIXTRL_NULLPTR );
+        SIXTRACKLIB_SET_VALUES( index_t, index_begin + start_index,
+                                len, ZERO_INDEX );
 
         index_begin = NS(Particles_get_at_element_id)( p );
-        SIXTRL_ASSERT( index_begni != SIXTRL_NULLPTR );
-        SIXTRLACKLIB_SET_VALUES( index_t, index_begin + start_index,
-                                 len, ZERO_INDEX );
+        SIXTRL_ASSERT( index_begin != SIXTRL_NULLPTR );
+        SIXTRACKLIB_SET_VALUES( index_t, index_begin + start_index,
+                                len, ZERO_INDEX );
 
         index_begin = NS(Particles_get_at_turn)( p );
-        SIXTRL_ASSERT( index_begni != SIXTRL_NULLPTR );
-        SIXTRLACKLIB_SET_VALUES( index_t, index_begin + start_index,
-                                 len, ZERO_INDEX );
+        SIXTRL_ASSERT( index_begin != SIXTRL_NULLPTR );
+        SIXTRACKLIB_SET_VALUES( index_t, index_begin + start_index,
+                                len, ZERO_INDEX );
 
         index_begin = NS(Particles_get_state)( p );
-        SIXTRL_ASSERT( index_begni != SIXTRL_NULLPTR );
-        SIXTRLACKLIB_SET_VALUES( index_t, index_begin + start_index,
-                                 len,  ZERO_INDEX );
+        SIXTRL_ASSERT( index_begin != SIXTRL_NULLPTR );
+        SIXTRACKLIB_SET_VALUES( index_t, index_begin + start_index,
+                                len,  ZERO_INDEX );
     }
 
     return;
 }
 
 SIXTRL_INLINE void NS(Particles_clear)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT praticles )
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles )
 {
     NS(Particles_clear_range)(
         particles, 0, NS(Particles_get_num_of_particles)( particles ) );
@@ -2418,8 +2413,9 @@ NS(Particles_buffer_get_num_of_particle_blocks)(
                     )NS(Object_get_begin_addr)( it );
 
                 SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
-//
-                if( ( particles != SIXTRL_NULLPTR ) && ( ZERO_SIZE <
+
+                if( ( particles != SIXTRL_NULLPTR ) &&
+                    ( ( NS(particle_num_elements_t) )0u <
                       NS(Particles_get_num_of_particles)( particles ) ) )
                 {
                     ++num_particle_blocks;
