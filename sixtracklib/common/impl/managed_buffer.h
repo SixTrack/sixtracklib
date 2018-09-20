@@ -178,7 +178,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_get_section_offset)(
     {
         ptr_to_addr_t ptr_header = ( ptr_to_addr_t )begin;
 
-        #if !defined( NDEBUG )
+        #if !defined( NDEBUG ) && !defined( _GPUCODE )
         buf_size_t const addr_size = NS(ManagedBuffer_get_slot_based_length)(
             sizeof( address_t ), slot_size );
 
@@ -190,7 +190,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_get_section_offset)(
         SIXTRL_ASSERT( ( section_id >= 3u ) && ( section_id <= 6u ) );
         SIXTRL_ASSERT( ( ( ( uintptr_t )begin ) % slot_size ) == 0u );
 
-        #endif /* !defined( NDEBUG ) */
+        #endif /* !defined( NDEBUG ) && !defined( _GPUCODE ) */
 
         section_offset = (    ptr_header[ section_id ] >= ptr_header[ 0 ] )
             ? ( buf_size_t )( ptr_header[ section_id ] -  ptr_header[ 0 ] )

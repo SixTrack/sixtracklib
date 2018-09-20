@@ -890,10 +890,10 @@ SIXTRL_INLINE int NS(Buffer_init_from_data)(
                 begin, OBJECTS_ID, slot_size );
 
             buffer->datastore_flags =
-                NS(BUFFER_USES_DATASTORE) |
-                NS(BUFFER_DATASTORE_ALLOW_APPENDS) |
-                NS(BUFFER_DATASTORE_ALLOW_CLEAR)   |
-                NS(BUFFER_DATASTORE_ALLOW_REMAPPING);
+                SIXTRL_BUFFER_USES_DATASTORE |
+                SIXTRL_BUFFER_DATASTORE_ALLOW_APPENDS |
+                SIXTRL_BUFFER_DATASTORE_ALLOW_CLEAR   |
+                SIXTRL_BUFFER_DATASTORE_ALLOW_REMAPPING;
 
             success = 0;
         }
@@ -918,7 +918,7 @@ SIXTRL_INLINE int NS(Buffer_init_from_data)(
 
                 if( NS(Buffer_uses_mempool_datastore)( buffer ) )
                 {
-                    #if defined( _GPUCODE )
+                    #if !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
                     typedef NS(MemPool)                   mem_pool_t;
                     typedef NS(AllocResult)               alloc_result_t;
@@ -952,7 +952,7 @@ SIXTRL_INLINE int NS(Buffer_init_from_data)(
                         }
                     }
 
-                    #endif /* defined( _GPUCODE ) */
+                    #endif /* !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ ) */
                 }
             }
 
@@ -982,8 +982,8 @@ SIXTRL_INLINE int NS(Buffer_init_from_data)(
                             begin, OBJECTS_ID, slot_size );
 
                     buffer->datastore_flags |=
-                        NS(BUFFER_DATASTORE_ALLOW_APPENDS) |
-                        NS(BUFFER_DATASTORE_ALLOW_REMAPPING);
+                        SIXTRL_BUFFER_DATASTORE_ALLOW_APPENDS |
+                        SIXTRL_BUFFER_DATASTORE_ALLOW_REMAPPING;
                 }
 
                 success = 0;
@@ -1043,11 +1043,11 @@ SIXTRL_INLINE int NS(Buffer_init_on_flat_memory_detailed)(
 
         buffer->datastore_addr  = buffer->data_addr;
         buffer->datastore_flags =
-            NS(BUFFER_DATASTORE_ALLOW_APPENDS) |
-            NS(BUFFER_USES_DATASTORE) |
-            NS(BUFFER_DATASTORE_ALLOW_CLEAR) |
-            NS(BUFFER_DATASTORE_ALLOW_DELETES) |
-            NS(BUFFER_DATASTORE_ALLOW_REMAPPING);
+            SIXTRL_BUFFER_DATASTORE_ALLOW_APPENDS |
+            SIXTRL_BUFFER_USES_DATASTORE |
+            SIXTRL_BUFFER_DATASTORE_ALLOW_CLEAR |
+            SIXTRL_BUFFER_DATASTORE_ALLOW_DELETES |
+            SIXTRL_BUFFER_DATASTORE_ALLOW_REMAPPING;
     }
 
     return success;
