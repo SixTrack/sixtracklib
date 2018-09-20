@@ -62,22 +62,23 @@ SIXTRL_FN SIXTRL_STATIC NS(multipole_order_t) NS(MultiPole_get_order)(
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(MultiPole_get_bal_size)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
 
-SIXTRL_FN SIXTRL_BE_DATAPTR_DEC NS(multipole_real_t) const*
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_DATAPTR_DEC NS(multipole_real_t) const*
 NS(MultiPole_get_const_bal)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole );
 
-SIXTRL_FN SIXTRL_BE_DATAPTR_DEC NS(multipole_real_t)* NS(MultiPole_get_bal)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_DATAPTR_DEC NS(multipole_real_t)*
+NS(MultiPole_get_bal)(
     SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT multipole );
 
-SIXTRL_FN NS(multipole_real_t) NS(MultiPole_get_bal_value)(
+SIXTRL_FN SIXTRL_STATIC NS(multipole_real_t) NS(MultiPole_get_bal_value)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole,
     NS(buffer_size_t) const index );
 
-SIXTRL_FN NS(multipole_real_t) NS(MultiPole_get_knl_value)(
+SIXTRL_FN SIXTRL_STATIC NS(multipole_real_t) NS(MultiPole_get_knl_value)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole,
     NS(buffer_size_t) const index );
 
-SIXTRL_FN NS(multipole_real_t) NS(MultiPole_get_ksl_value)(
+SIXTRL_FN SIXTRL_STATIC NS(multipole_real_t) NS(MultiPole_get_ksl_value)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole,
     NS(buffer_size_t) const index );
 
