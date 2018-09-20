@@ -135,12 +135,12 @@ TEST( C99_Cuda_BufferTests,
                       << "Name   : " << std::setw( 20 )
                       << properties.name << "\r\n" << std::endl;
 
+            /* ------------------------------------------------------------- */
+
             int success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda(
-                dim3{ num_objects }, dim3{ 1 }, orig_buffer_begin, copy_buffer_begin );
+                dim3{ 1 }, dim3{ 1 }, orig_buffer_begin, copy_buffer_begin );
 
             ASSERT_TRUE( success == 0 );
-
-            /* ------------------------------------------------------------- */
 
             ASSERT_TRUE( !::st_Buffer_needs_remapping( copy_buffer ) );
             ASSERT_TRUE( !::st_Buffer_needs_remapping( orig_buffer ) );
@@ -151,6 +151,326 @@ TEST( C99_Cuda_BufferTests,
             obj_it      = ::st_Buffer_get_const_objects_begin( orig_buffer );
             obj_end     = ::st_Buffer_get_const_objects_end( orig_buffer );
             auto cmp_it = ::st_Buffer_get_const_objects_begin( copy_buffer );
+
+            for( ; obj_it != obj_end ; ++obj_it, ++cmp_it )
+            {
+                ::st_GenericObj const* orig_obj = reinterpret_cast<
+                    ::st_GenericObj const* >( static_cast< uintptr_t >(
+                        ::st_Object_get_begin_addr( obj_it ) ) );
+
+                ::st_GenericObj const* cmp_obj = reinterpret_cast<
+                    ::st_GenericObj const* >( static_cast< uintptr_t >(
+                        ::st_Object_get_begin_addr( cmp_it ) ) );
+
+                ASSERT_TRUE( orig_obj != nullptr );
+                ASSERT_TRUE( cmp_obj  != nullptr );
+                ASSERT_TRUE( cmp_obj  != orig_obj );
+
+                ASSERT_TRUE( orig_obj->type_id == cmp_obj->type_id );
+                ASSERT_TRUE( orig_obj->num_d   == cmp_obj->num_d );
+                ASSERT_TRUE( orig_obj->num_e   == cmp_obj->num_e );
+                ASSERT_TRUE( orig_obj->a       == cmp_obj->a );
+
+                ASSERT_TRUE( std::fabs( orig_obj->a - cmp_obj->a ) <
+                    std::numeric_limits< double >::epsilon() );
+
+                for( std::size_t ii = 0 ; ii < 4u ; ++ii )
+                {
+                    ASSERT_TRUE( std::fabs( orig_obj->c[ ii ] - cmp_obj->c[ ii ] ) <
+                        std::numeric_limits< double >::epsilon() );
+                }
+
+                if( orig_obj->num_d > 0u )
+                {
+                    for( std::size_t ii = 0u ; ii < orig_obj->num_d ; ++ii )
+                    {
+                        ASSERT_TRUE( orig_obj->d[ ii ] == cmp_obj->d[ ii ] );
+                    }
+                }
+
+                if( orig_obj->num_e > 0u )
+                {
+                    for( std::size_t ii = 0u ; ii < orig_obj->num_e ; ++ii )
+                    {
+                        ASSERT_TRUE( std::fabs( orig_obj->e[ ii ] - cmp_obj->e[ ii ] )
+                            < std::numeric_limits< double >::epsilon() );
+                    }
+                }
+            }
+
+            /* ------------------------------------------------------------- */
+
+            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda(
+                dim3{ num_objects }, dim3{ 1 }, orig_buffer_begin,
+                    copy_buffer_begin );
+
+            ASSERT_TRUE( success == 0 );
+
+            ASSERT_TRUE( !::st_Buffer_needs_remapping( copy_buffer ) );
+            ASSERT_TRUE( !::st_Buffer_needs_remapping( orig_buffer ) );
+
+            ASSERT_TRUE( ::st_Buffer_get_num_of_objects( copy_buffer ) ==
+                         ::st_Buffer_get_num_of_objects( orig_buffer ) );
+
+            obj_it  = ::st_Buffer_get_const_objects_begin( orig_buffer );
+            obj_end = ::st_Buffer_get_const_objects_end( orig_buffer );
+            cmp_it  = ::st_Buffer_get_const_objects_begin( copy_buffer );
+
+            for( ; obj_it != obj_end ; ++obj_it, ++cmp_it )
+            {
+                ::st_GenericObj const* orig_obj = reinterpret_cast<
+                    ::st_GenericObj const* >( static_cast< uintptr_t >(
+                        ::st_Object_get_begin_addr( obj_it ) ) );
+
+                ::st_GenericObj const* cmp_obj = reinterpret_cast<
+                    ::st_GenericObj const* >( static_cast< uintptr_t >(
+                        ::st_Object_get_begin_addr( cmp_it ) ) );
+
+                ASSERT_TRUE( orig_obj != nullptr );
+                ASSERT_TRUE( cmp_obj  != nullptr );
+                ASSERT_TRUE( cmp_obj  != orig_obj );
+
+                ASSERT_TRUE( orig_obj->type_id == cmp_obj->type_id );
+                ASSERT_TRUE( orig_obj->num_d   == cmp_obj->num_d );
+                ASSERT_TRUE( orig_obj->num_e   == cmp_obj->num_e );
+                ASSERT_TRUE( orig_obj->a       == cmp_obj->a );
+
+                ASSERT_TRUE( std::fabs( orig_obj->a - cmp_obj->a ) <
+                    std::numeric_limits< double >::epsilon() );
+
+                for( std::size_t ii = 0 ; ii < 4u ; ++ii )
+                {
+                    ASSERT_TRUE( std::fabs( orig_obj->c[ ii ] - cmp_obj->c[ ii ] ) <
+                        std::numeric_limits< double >::epsilon() );
+                }
+
+                if( orig_obj->num_d > 0u )
+                {
+                    for( std::size_t ii = 0u ; ii < orig_obj->num_d ; ++ii )
+                    {
+                        ASSERT_TRUE( orig_obj->d[ ii ] == cmp_obj->d[ ii ] );
+                    }
+                }
+
+                if( orig_obj->num_e > 0u )
+                {
+                    for( std::size_t ii = 0u ; ii < orig_obj->num_e ; ++ii )
+                    {
+                        ASSERT_TRUE( std::fabs( orig_obj->e[ ii ] - cmp_obj->e[ ii ] )
+                            < std::numeric_limits< double >::epsilon() );
+                    }
+                }
+            }
+
+            /* ------------------------------------------------------------- */
+
+            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda(
+                dim3{ 128 }, dim3{ 1 }, orig_buffer_begin,
+                    copy_buffer_begin );
+
+            ASSERT_TRUE( success == 0 );
+
+            ASSERT_TRUE( !::st_Buffer_needs_remapping( copy_buffer ) );
+            ASSERT_TRUE( !::st_Buffer_needs_remapping( orig_buffer ) );
+
+            ASSERT_TRUE( ::st_Buffer_get_num_of_objects( copy_buffer ) ==
+                         ::st_Buffer_get_num_of_objects( orig_buffer ) );
+
+            obj_it  = ::st_Buffer_get_const_objects_begin( orig_buffer );
+            obj_end = ::st_Buffer_get_const_objects_end( orig_buffer );
+            cmp_it  = ::st_Buffer_get_const_objects_begin( copy_buffer );
+
+            for( ; obj_it != obj_end ; ++obj_it, ++cmp_it )
+            {
+                ::st_GenericObj const* orig_obj = reinterpret_cast<
+                    ::st_GenericObj const* >( static_cast< uintptr_t >(
+                        ::st_Object_get_begin_addr( obj_it ) ) );
+
+                ::st_GenericObj const* cmp_obj = reinterpret_cast<
+                    ::st_GenericObj const* >( static_cast< uintptr_t >(
+                        ::st_Object_get_begin_addr( cmp_it ) ) );
+
+                ASSERT_TRUE( orig_obj != nullptr );
+                ASSERT_TRUE( cmp_obj  != nullptr );
+                ASSERT_TRUE( cmp_obj  != orig_obj );
+
+                ASSERT_TRUE( orig_obj->type_id == cmp_obj->type_id );
+                ASSERT_TRUE( orig_obj->num_d   == cmp_obj->num_d );
+                ASSERT_TRUE( orig_obj->num_e   == cmp_obj->num_e );
+                ASSERT_TRUE( orig_obj->a       == cmp_obj->a );
+
+                ASSERT_TRUE( std::fabs( orig_obj->a - cmp_obj->a ) <
+                    std::numeric_limits< double >::epsilon() );
+
+                for( std::size_t ii = 0 ; ii < 4u ; ++ii )
+                {
+                    ASSERT_TRUE( std::fabs( orig_obj->c[ ii ] - cmp_obj->c[ ii ] ) <
+                        std::numeric_limits< double >::epsilon() );
+                }
+
+                if( orig_obj->num_d > 0u )
+                {
+                    for( std::size_t ii = 0u ; ii < orig_obj->num_d ; ++ii )
+                    {
+                        ASSERT_TRUE( orig_obj->d[ ii ] == cmp_obj->d[ ii ] );
+                    }
+                }
+
+                if( orig_obj->num_e > 0u )
+                {
+                    for( std::size_t ii = 0u ; ii < orig_obj->num_e ; ++ii )
+                    {
+                        ASSERT_TRUE( std::fabs( orig_obj->e[ ii ] - cmp_obj->e[ ii ] )
+                            < std::numeric_limits< double >::epsilon() );
+                    }
+                }
+            }
+
+            /* ------------------------------------------------------------- */
+
+            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda(
+                dim3{ 1 }, dim3{ num_objects }, orig_buffer_begin,
+                    copy_buffer_begin );
+
+            ASSERT_TRUE( success == 0 );
+
+            ASSERT_TRUE( !::st_Buffer_needs_remapping( copy_buffer ) );
+            ASSERT_TRUE( !::st_Buffer_needs_remapping( orig_buffer ) );
+
+            ASSERT_TRUE( ::st_Buffer_get_num_of_objects( copy_buffer ) ==
+                         ::st_Buffer_get_num_of_objects( orig_buffer ) );
+
+            obj_it  = ::st_Buffer_get_const_objects_begin( orig_buffer );
+            obj_end = ::st_Buffer_get_const_objects_end( orig_buffer );
+            cmp_it  = ::st_Buffer_get_const_objects_begin( copy_buffer );
+
+            for( ; obj_it != obj_end ; ++obj_it, ++cmp_it )
+            {
+                ::st_GenericObj const* orig_obj = reinterpret_cast<
+                    ::st_GenericObj const* >( static_cast< uintptr_t >(
+                        ::st_Object_get_begin_addr( obj_it ) ) );
+
+                ::st_GenericObj const* cmp_obj = reinterpret_cast<
+                    ::st_GenericObj const* >( static_cast< uintptr_t >(
+                        ::st_Object_get_begin_addr( cmp_it ) ) );
+
+                ASSERT_TRUE( orig_obj != nullptr );
+                ASSERT_TRUE( cmp_obj  != nullptr );
+                ASSERT_TRUE( cmp_obj  != orig_obj );
+
+                ASSERT_TRUE( orig_obj->type_id == cmp_obj->type_id );
+                ASSERT_TRUE( orig_obj->num_d   == cmp_obj->num_d );
+                ASSERT_TRUE( orig_obj->num_e   == cmp_obj->num_e );
+                ASSERT_TRUE( orig_obj->a       == cmp_obj->a );
+
+                ASSERT_TRUE( std::fabs( orig_obj->a - cmp_obj->a ) <
+                    std::numeric_limits< double >::epsilon() );
+
+                for( std::size_t ii = 0 ; ii < 4u ; ++ii )
+                {
+                    ASSERT_TRUE( std::fabs( orig_obj->c[ ii ] - cmp_obj->c[ ii ] ) <
+                        std::numeric_limits< double >::epsilon() );
+                }
+
+                if( orig_obj->num_d > 0u )
+                {
+                    for( std::size_t ii = 0u ; ii < orig_obj->num_d ; ++ii )
+                    {
+                        ASSERT_TRUE( orig_obj->d[ ii ] == cmp_obj->d[ ii ] );
+                    }
+                }
+
+                if( orig_obj->num_e > 0u )
+                {
+                    for( std::size_t ii = 0u ; ii < orig_obj->num_e ; ++ii )
+                    {
+                        ASSERT_TRUE( std::fabs( orig_obj->e[ ii ] - cmp_obj->e[ ii ] )
+                            < std::numeric_limits< double >::epsilon() );
+                    }
+                }
+            }
+
+            /* ------------------------------------------------------------- */
+
+            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda(
+                dim3{ 1 }, dim3{ 128 }, orig_buffer_begin,
+                    copy_buffer_begin );
+
+            ASSERT_TRUE( success == 0 );
+
+            ASSERT_TRUE( !::st_Buffer_needs_remapping( copy_buffer ) );
+            ASSERT_TRUE( !::st_Buffer_needs_remapping( orig_buffer ) );
+
+            ASSERT_TRUE( ::st_Buffer_get_num_of_objects( copy_buffer ) ==
+                         ::st_Buffer_get_num_of_objects( orig_buffer ) );
+
+            obj_it  = ::st_Buffer_get_const_objects_begin( orig_buffer );
+            obj_end = ::st_Buffer_get_const_objects_end( orig_buffer );
+            cmp_it  = ::st_Buffer_get_const_objects_begin( copy_buffer );
+
+            for( ; obj_it != obj_end ; ++obj_it, ++cmp_it )
+            {
+                ::st_GenericObj const* orig_obj = reinterpret_cast<
+                    ::st_GenericObj const* >( static_cast< uintptr_t >(
+                        ::st_Object_get_begin_addr( obj_it ) ) );
+
+                ::st_GenericObj const* cmp_obj = reinterpret_cast<
+                    ::st_GenericObj const* >( static_cast< uintptr_t >(
+                        ::st_Object_get_begin_addr( cmp_it ) ) );
+
+                ASSERT_TRUE( orig_obj != nullptr );
+                ASSERT_TRUE( cmp_obj  != nullptr );
+                ASSERT_TRUE( cmp_obj  != orig_obj );
+
+                ASSERT_TRUE( orig_obj->type_id == cmp_obj->type_id );
+                ASSERT_TRUE( orig_obj->num_d   == cmp_obj->num_d );
+                ASSERT_TRUE( orig_obj->num_e   == cmp_obj->num_e );
+                ASSERT_TRUE( orig_obj->a       == cmp_obj->a );
+
+                ASSERT_TRUE( std::fabs( orig_obj->a - cmp_obj->a ) <
+                    std::numeric_limits< double >::epsilon() );
+
+                for( std::size_t ii = 0 ; ii < 4u ; ++ii )
+                {
+                    ASSERT_TRUE( std::fabs( orig_obj->c[ ii ] - cmp_obj->c[ ii ] ) <
+                        std::numeric_limits< double >::epsilon() );
+                }
+
+                if( orig_obj->num_d > 0u )
+                {
+                    for( std::size_t ii = 0u ; ii < orig_obj->num_d ; ++ii )
+                    {
+                        ASSERT_TRUE( orig_obj->d[ ii ] == cmp_obj->d[ ii ] );
+                    }
+                }
+
+                if( orig_obj->num_e > 0u )
+                {
+                    for( std::size_t ii = 0u ; ii < orig_obj->num_e ; ++ii )
+                    {
+                        ASSERT_TRUE( std::fabs( orig_obj->e[ ii ] - cmp_obj->e[ ii ] )
+                            < std::numeric_limits< double >::epsilon() );
+                    }
+                }
+            }
+
+            /* ------------------------------------------------------------- */
+
+            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda(
+                dim3{ 128 }, dim3{ 128 }, orig_buffer_begin,
+                    copy_buffer_begin );
+
+            ASSERT_TRUE( success == 0 );
+
+            ASSERT_TRUE( !::st_Buffer_needs_remapping( copy_buffer ) );
+            ASSERT_TRUE( !::st_Buffer_needs_remapping( orig_buffer ) );
+
+            ASSERT_TRUE( ::st_Buffer_get_num_of_objects( copy_buffer ) ==
+                         ::st_Buffer_get_num_of_objects( orig_buffer ) );
+
+            obj_it  = ::st_Buffer_get_const_objects_begin( orig_buffer );
+            obj_end = ::st_Buffer_get_const_objects_end( orig_buffer );
+            cmp_it  = ::st_Buffer_get_const_objects_begin( copy_buffer );
 
             for( ; obj_it != obj_end ; ++obj_it, ++cmp_it )
             {

@@ -112,11 +112,14 @@ __global__ void NS(Copy_original_buffer_kernel_cuda)(
 {
     typedef NS(buffer_size_t) buf_size_t;
 
-    buf_size_t const thread_id =
+    buf_size_t work_item_id =
         NS(Cuda_get_1d_thread_id_in_kernel)();
 
     buf_size_t const total_num_threads =
         NS(Cuda_get_total_num_threads_in_kernel)();
+
+    buf_size_t const stride =
+        NS(Cuda_get_1d_thread_stride_in_kernel)();
 
     buf_size_t const slot_size = ( buf_size_t )8u;
 
@@ -137,7 +140,9 @@ __global__ void NS(Copy_original_buffer_kernel_cuda)(
         buf_size_t const num_obj = NS(ManagedBuffer_get_num_objects)(
             orig_buffer, slot_size );
 
-        if( thread_id < num_obj )
+        success_flag = 0;
+
+        while( ( work_item_id < num_obj ) && ( success_flag == 0 ) )
         {
             in_index_ptr_t ptr_in_info = ( in_index_ptr_t )( uintptr_t
                 )NS(ManagedBuffer_get_const_objects_index_begin)(
@@ -153,8 +158,9 @@ __global__ void NS(Copy_original_buffer_kernel_cuda)(
             success_flag = ( ( ptr_in_info  != SIXTRL_NULLPTR ) &&
                              ( ptr_out_info != SIXTRL_NULLPTR ) ) ? 0 : -2;
 
-            ptr_in_info  = ptr_in_info  + thread_id;
-            ptr_out_info = ptr_out_info + thread_id;
+            ptr_in_info   = ptr_in_info  + work_item_id;
+            ptr_out_info  = ptr_out_info + work_item_id;
+            work_item_id += stride;
 
             in_obj  = ( in_obj_ptr_t  )( uintptr_t
                 )NS(Object_get_const_begin_ptr)( ptr_in_info );
@@ -189,10 +195,6 @@ __global__ void NS(Copy_original_buffer_kernel_cuda)(
             {
                success_flag |= -4;
             }
-        }
-        else if( num_obj > ( buf_size_t )0u )
-        {
-             success_flag = 0;
         }
     }
 
