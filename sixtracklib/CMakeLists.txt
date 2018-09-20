@@ -26,7 +26,8 @@ add_subdirectory( _impl )
 # ------------------------------------------------------------------------------
 
 add_subdirectory( common )
-set( SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_common> )
+set( SIXTRACKL_LIBRARY_MODULES )
+list( APPEND SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_common> )
 
 # ------------------------------------------------------------------------------
 
@@ -56,9 +57,8 @@ if( SIXTRACKL_ENABLE_CUDA )
 
     add_subdirectory( cuda )
 
-    set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-         $<TARGET_OBJECTS:sixtrack_cuda_host>
-         $<TARGET_OBJECTS:sixtrack_cuda_device> )
+    list( APPEND SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_cuda_device> )
+    list( APPEND SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_cuda_host> )
 
 endif()
 
@@ -68,7 +68,8 @@ set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} m )
 set( SIXTRACKL_HEADERS ${SIXTRACKL_HEADERS} ${SIXTRACKL_TOP_LEVEL_HEADERS} )
 
 add_library( sixtrack SHARED
-             ${SIXTRACKL_HEADERS} ${SIXTRACKL_SOURCES}
+             ${SIXTRACKL_HEADERS}
+             ${SIXTRACKL_SOURCES}
              ${SIXTRACKL_LIBRARY_MODULES}
 )
 
