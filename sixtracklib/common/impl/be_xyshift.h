@@ -53,6 +53,9 @@ SIXTRL_FN SIXTRL_STATIC void NS(XYShift_set_dy)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift,
     NS(xyshift_real_t) const dy );
 
+SIXTRL_FN SIXTRL_STATIC void NS(XYShift_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift );
+
 SIXTRL_FN SIXTRL_STATIC int NS(XYShift_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT source );
@@ -135,12 +138,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(XYShift_get_num_slots)(
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(XYShift)* NS(XYShift_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift )
 {
-    if( xy_shift != SIXTRL_NULLPTR )
-    {
-        NS(XYShift_set_dx)( xy_shift, ( NS(xyshift_real_t) )0 );
-        NS(XYShift_set_dy)( xy_shift, ( NS(xyshift_real_t) )0 );
-    }
-
+    NS(XYShift_clear)( xy_shift );
     return xy_shift;
 }
 
@@ -162,8 +160,7 @@ SIXTRL_INLINE void NS(XYShift_set_dx)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift,
     NS(xyshift_real_t) const dx )
 {
-    SIXTRL_ASSERT( xy_shift != SIXTRL_NULLPTR );
-    xy_shift->dx = dx;
+    if( xy_shift != SIXTRL_NULLPTR ) xy_shift->dx = dx;
     return;
 }
 
@@ -171,11 +168,18 @@ SIXTRL_INLINE void NS(XYShift_set_dy)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift,
     NS(xyshift_real_t) const dy )
 {
-    SIXTRL_ASSERT( xy_shift != SIXTRL_NULLPTR );
-    xy_shift->dy = dy;
+    if( xy_shift != SIXTRL_NULLPTR ) xy_shift->dy = dy;
     return;
 }
 
+SIXTRL_INLINE void NS(XYShift_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift )
+{
+    NS(XYShift_set_dx)( xy_shift, ( NS(xyshift_real_t) )0 );
+    NS(XYShift_set_dy)( xy_shift, ( NS(xyshift_real_t) )0 );
+
+    return;
+}
 
 SIXTRL_INLINE int NS(XYShift_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT destination,

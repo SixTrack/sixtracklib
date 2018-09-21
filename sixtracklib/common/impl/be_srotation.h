@@ -59,6 +59,9 @@ SIXTRL_FN SIXTRL_STATIC void NS(SRotation_set_angle_deg)(
     SIXTRL_BE_ARGPTR_DEC NS(SRotation)* SIXTRL_RESTRICT srotation,
     SIXTRL_REAL_T const angle_deg );
 
+SIXTRL_FN SIXTRL_STATIC void NS(SRotation_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(SRotation)* SIXTRL_RESTRICT srotation );
+
 SIXTRL_FN SIXTRL_STATIC int NS(SRotation_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(SRotation)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(SRotation) *const SIXTRL_RESTRICT source );
@@ -151,12 +154,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(SRotation_get_num_slots)(
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(SRotation)* NS(SRotation_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(SRotation)* SIXTRL_RESTRICT srotation )
 {
-    if( srotation != SIXTRL_NULLPTR )
-    {
-        srotation->cos_z = ( SIXTRL_REAL_T )1;
-        srotation->sin_z = ( SIXTRL_REAL_T )0;
-    }
-
+    NS(SRotation_clear)( srotation );
     return srotation;
 }
 
@@ -230,6 +228,18 @@ SIXTRL_INLINE void NS(SRotation_set_angle_deg)(
         M_PI / ( SIXTRL_REAL_T )180.0;
 
     NS(SRotation_set_angle)( srotation, DEG2RAD * angle_deg );
+
+    return;
+}
+
+SIXTRL_INLINE void NS(SRotation_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(SRotation)* SIXTRL_RESTRICT srotation )
+{
+    if( srotation != SIXTRL_NULLPTR )
+    {
+        srotation->cos_z = ( SIXTRL_REAL_T )1;
+        srotation->sin_z = ( SIXTRL_REAL_T )0;
+    }
 
     return;
 }

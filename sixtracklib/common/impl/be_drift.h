@@ -47,6 +47,9 @@ SIXTRL_FN SIXTRL_STATIC void NS(Drift_set_length)(
     SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift,
     NS(drift_real_t) const length );
 
+SIXTRL_FN SIXTRL_STATIC void NS(Drift_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift );
+
 SIXTRL_FN SIXTRL_STATIC int NS(Drift_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT source );
@@ -111,6 +114,9 @@ SIXTRL_FN SIXTRL_STATIC NS(drift_real_t) NS(DriftExact_get_length)(
 SIXTRL_FN SIXTRL_STATIC void NS(DriftExact_set_length)(
     SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift,
     NS(drift_real_t) const length );
+
+SIXTRL_FN SIXTRL_STATIC void NS(DriftExact_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift );
 
 SIXTRL_FN SIXTRL_STATIC int NS(DriftExact_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT destination,
@@ -198,11 +204,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(Drift_get_num_slots)(
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Drift)* NS(Drift_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift )
 {
-    if( drift != SIXTRL_NULLPTR )
-    {
-        NS(Drift_set_length)( drift, ( NS(drift_real_t) )0 );
-    }
-
+    NS(Drift_clear)( drift );
     return drift;
 }
 
@@ -217,6 +219,13 @@ SIXTRL_INLINE void NS(Drift_set_length)(
     NS(drift_real_t) const length )
 {
     if( drift != SIXTRL_NULLPTR ) drift->length = length;
+    return;
+}
+
+SIXTRL_INLINE void NS(Drift_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift )
+{
+    NS(Drift_set_length)( drift, 0.0 );
     return;
 }
 
@@ -412,11 +421,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(DriftExact_get_num_slots)(
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* NS(DriftExact_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift )
 {
-    if( drift != SIXTRL_NULLPTR )
-    {
-        drift->length = ( NS(drift_real_t) )0;
-    }
-
+    NS(DriftExact_clear)( drift );
     return drift;
 }
 
@@ -432,6 +437,13 @@ SIXTRL_INLINE void NS(DriftExact_set_length)(
 {
     SIXTRL_ASSERT( drift != SIXTRL_NULLPTR );
     drift->length = length;
+    return;
+}
+
+SIXTRL_INLINE void NS(DriftExact_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift )
+{
+    NS(DriftExact_set_length)( drift, 0.0 );
     return;
 }
 

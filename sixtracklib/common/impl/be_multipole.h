@@ -98,6 +98,9 @@ SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_set_order)(
     SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT multipole,
     NS(multipole_order_t) const order );
 
+SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT multipole );
+
 SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_set_bal)(
     SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT multipole,
     SIXTRL_BE_ARGPTR_DEC NS(multipole_real_t) const* SIXTRL_RESTRICT bal );
@@ -292,16 +295,11 @@ SIXTRL_FN SIXTRL_STATIC NS(multipole_order_t) NS(_calculate_factorial)(
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* NS(MultiPole_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT multipole )
 {
-    if( multipole != SIXTRL_NULLPTR )
-    {
-        typedef NS(multipole_order_t) mp_order_t;
-        SIXTRL_STATIC_VAR mp_order_t DEFAULT_ORDER = ( mp_order_t )-1;
+    typedef NS(multipole_order_t) mp_order_t;
+    SIXTRL_STATIC_VAR mp_order_t DEFAULT_ORDER = ( mp_order_t )-1;
 
-        NS(MultiPole_set_length)( multipole, ( NS(multipole_real_t) )0 );
-        NS(MultiPole_set_hxl)(    multipole, ( NS(multipole_real_t) )0 );
-        NS(MultiPole_set_hyl)(    multipole, ( NS(multipole_real_t) )0 );
-        NS(MultiPole_assign_bal)( multipole, DEFAULT_ORDER, SIXTRL_NULLPTR );
-    }
+    NS(MultiPole_assign_bal)( multipole, DEFAULT_ORDER, SIXTRL_NULLPTR );
+    NS(MultiPole_clear)( multipole );
 
     return multipole;
 }
@@ -406,8 +404,7 @@ SIXTRL_INLINE void NS(MultiPole_set_length)(
     SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT multipole,
     NS(multipole_real_t) const length )
 {
-    SIXTRL_ASSERT( multipole != SIXTRL_NULLPTR );
-    multipole->length = length;
+    if( multipole != SIXTRL_NULLPTR ) multipole->length = length;
     return;
 }
 
@@ -415,8 +412,7 @@ SIXTRL_INLINE void NS(MultiPole_set_hxl)(
     SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT multipole,
     NS(multipole_real_t) const hxl )
 {
-    SIXTRL_ASSERT( multipole != SIXTRL_NULLPTR );
-    multipole->hxl = hxl;
+    if( multipole != SIXTRL_NULLPTR ) multipole->hxl = hxl;
     return;
 }
 
@@ -424,8 +420,7 @@ SIXTRL_INLINE void NS(MultiPole_set_hyl)(
     SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT multipole,
     NS(multipole_real_t) const hyl )
 {
-    SIXTRL_ASSERT( multipole != SIXTRL_NULLPTR );
-    multipole->hyl = hyl;
+    if( multipole != SIXTRL_NULLPTR ) multipole->hyl = hyl;
     return;
 }
 
@@ -437,10 +432,35 @@ SIXTRL_INLINE void NS(MultiPole_set_order)(
     SIXTRL_STATIC_VAR NS(multipole_order_t) const
         INV_ORDER = ( NS(multipole_order_t) )-1;
 
-    SIXTRL_ASSERT( ( multipole != SIXTRL_NULLPTR ) && ( order >= INV_ORDER ) );
+    SIXTRL_ASSERT( order >= INV_ORDER );
     #endif /* !defined( NDEBUG ) && !defined( _GPUCODE ) */
 
-    multipole->order = order;
+    if( multipole != SIXTRL_NULLPTR ) multipole->order = order;
+    return;
+}
+
+SIXTRL_INLINE void NS(MultiPole_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* SIXTRL_RESTRICT multipole )
+{
+    typedef NS(buffer_size_t)    buf_size_t;
+    typedef NS(multipole_real_t) mp_real_t;
+
+    buf_size_t const bal_size = NS(MultiPole_get_bal_size)( multipole );
+
+    NS(MultiPole_set_length)( multipole, ( mp_real_t )0 );
+    NS(MultiPole_set_hxl)( multipole,    ( mp_real_t )0 );
+    NS(MultiPole_set_hyl)( multipole,    ( mp_real_t )0 );
+
+    if( bal_size > ( buf_size_t )0 )
+    {
+        SIXTRL_STATIC_VAR mp_real_t const ZERO = ( mp_real_t )0;
+
+        SIXTRL_BE_DATAPTR_DEC mp_real_t* bal_begin =
+            NS(MultiPole_get_bal)( multipole );
+
+        SIXTRACKLIB_SET_VALUES( mp_real_t, bal_begin, bal_size, ZERO );
+    }
+
     return;
 }
 

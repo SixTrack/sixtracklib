@@ -40,6 +40,9 @@ SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_compare_objects_with_treshold)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT rhs,
     SIXTRL_REAL_T const treshold );
 
+SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_object)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT obj );
+
 /* ------------------------------------------------------------------------ */
 
 SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_calc_buffer_parameters_for_line)(
@@ -58,12 +61,12 @@ SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_copy_line)(
 SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_compare_lines)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT rhs_begin );
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT rhs_begin );
 
 SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_compare_lines_with_treshold)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT rhs_begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT rhs_begin,
     SIXTRL_REAL_T const treshold );
 
 /* ========================================================================= */
@@ -87,6 +90,9 @@ SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_copy_to_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -629,6 +635,78 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
     return compare_value;
 }
 
+SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_object)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT obj )
+{
+    if( obj != SIXTRL_NULLPTR )
+    {
+        typedef NS(buffer_addr_t)       address_t;
+        typedef NS(object_type_id_t)    type_id_t;
+
+        type_id_t const type_id = NS(Object_get_type_id)( obj );
+        address_t const obj_addr = NS(Object_get_begin_addr)( obj );
+
+        if( obj_addr != ( address_t)0u )
+        {
+            switch( type_id )
+            {
+                case NS(OBJECT_TYPE_DRIFT):
+                {
+                    typedef NS(Drift)                      belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t*  ptr_belem_t;
+                    NS(Drift_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_DRIFT_EXACT):
+                {
+                    typedef NS(DriftExact)                belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(DriftExact_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_MULTIPOLE):
+                {
+                    typedef NS(MultiPole)                 belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(MultiPole_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_XYSHIFT):
+                {
+                    typedef NS(XYShift)                   belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(XYShift_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_SROTATION):
+                {
+                    typedef NS(SRotation)                 belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(SRotation_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_CAVITY):
+                {
+                    typedef NS(Cavity)                    belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(Cavity_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
+                default: {} /* To satisfy compilers that complain if no
+                               default section is available */
+            };
+        }
+    }
+
+    return;
+}
+
 /* ------------------------------------------------------------------------ */
 
 SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_line)(
@@ -693,7 +771,7 @@ SIXTRL_INLINE int NS(BeamElements_copy_line)(
 SIXTRL_INLINE int NS(BeamElements_compare_lines)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT lhs_it,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT lhs_end,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT rhs_it )
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT rhs_it )
 {
     int compare_value = -1;
 
@@ -719,7 +797,7 @@ SIXTRL_INLINE int NS(BeamElements_compare_lines)(
 SIXTRL_INLINE int NS(BeamElements_compare_lines_with_treshold)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT lhs_it,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT lhs_end,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT rhs_it,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT rhs_it,
     SIXTRL_REAL_T const treshold )
 {
     int compare_value = -1;
@@ -981,6 +1059,27 @@ SIXTRL_INLINE int NS(BeamElements_copy_to_buffer)(
     }
 
     return success;
+}
+
+SIXTRL_INLINE void NS(BeamElements_clear_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* obj_iter_t;
+
+    obj_iter_t it  = NS(Buffer_get_objects_begin)( buffer );
+    obj_iter_t end = NS(Buffer_get_objects_end)( buffer );
+
+    if( it != end )
+    {
+        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( buffer ) );
+
+        for( ; it != end ; ++it )
+        {
+           NS(BeamElements_clear_object)( it );
+        }
+    }
+
+    return;
 }
 
 #endif /* !defined( _GPUCODE ) */

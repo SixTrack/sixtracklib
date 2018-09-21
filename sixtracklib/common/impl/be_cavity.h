@@ -61,6 +61,9 @@ SIXTRL_FN SIXTRL_STATIC void NS(Cavity_set_lag)(
     SIXTRL_BE_ARGPTR_DEC  NS(Cavity)* SIXTRL_RESTRICT cavity,
     SIXTRL_REAL_T const lag );
 
+SIXTRL_FN SIXTRL_STATIC void NS(Cavity_clear)(
+    SIXTRL_BE_ARGPTR_DEC  NS(Cavity)* SIXTRL_RESTRICT cavity );
+
 SIXTRL_FN SIXTRL_STATIC int NS(Cavity_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT source );
@@ -143,13 +146,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(Cavity_get_num_slots)(
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Cavity)* NS(Cavity_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity )
 {
-    if( cavity != SIXTRL_NULLPTR )
-    {
-        NS(Cavity_set_voltage)(   cavity, ( SIXTRL_REAL_T )0 );
-        NS(Cavity_set_frequency)( cavity, ( SIXTRL_REAL_T )0 );
-        NS(Cavity_set_lag)( cavity, ( SIXTRL_REAL_T )0 );
-    }
-
+    NS(Cavity_clear)( cavity );
     return cavity;
 }
 
@@ -176,8 +173,7 @@ SIXTRL_INLINE void NS(Cavity_set_voltage)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity,
     SIXTRL_REAL_T const voltage )
 {
-    SIXTRL_ASSERT( cavity != SIXTRL_NULLPTR );
-    cavity->voltage = voltage;
+    if( cavity != SIXTRL_NULLPTR ) cavity->voltage = voltage;
     return;
 }
 
@@ -185,8 +181,7 @@ SIXTRL_INLINE void NS(Cavity_set_frequency)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity,
     SIXTRL_REAL_T const frequency )
 {
-    SIXTRL_ASSERT( cavity != SIXTRL_NULLPTR );
-    cavity->frequency = frequency;
+    if( cavity != SIXTRL_NULLPTR ) cavity->frequency = frequency;
     return;
 }
 
@@ -194,8 +189,17 @@ SIXTRL_INLINE void NS(Cavity_set_lag)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity,
     SIXTRL_REAL_T const lag )
 {
-    SIXTRL_ASSERT( cavity != SIXTRL_NULLPTR );
-    cavity->lag = lag;
+    if( cavity != SIXTRL_NULLPTR ) cavity->lag = lag;
+    return;
+}
+
+SIXTRL_INLINE void NS(Cavity_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity )
+{
+    NS(Cavity_set_voltage)(   cavity, ( SIXTRL_REAL_T )0 );
+    NS(Cavity_set_frequency)( cavity, ( SIXTRL_REAL_T )0 );
+    NS(Cavity_set_lag)(       cavity, ( SIXTRL_REAL_T )0 );
+
     return;
 }
 
