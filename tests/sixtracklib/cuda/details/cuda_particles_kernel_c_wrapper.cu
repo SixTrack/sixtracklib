@@ -93,24 +93,7 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda_grid)(
 
                 if( 0 == NS(Buffer_remap)( out_buffer ) )
                 {
-                    obj_iter_t block_it  = ( obj_iter_t )( uintptr_t
-                        )NS(Buffer_get_objects_begin_addr)( out_buffer );
-
-                    obj_iter_t block_end = ( obj_iter_t )( uintptr_t
-                        )NS(Buffer_get_objects_end_addr)( out_buffer );
-
-                    for( ; block_it != block_end ; ++block_it )
-                    {
-                        if( NS(Object_get_type_id)( block_it ) !=
-                            NS(OBJECT_TYPE_PARTICLE) )
-                        {
-                            success |= -128;
-                            break;;
-                        }
-
-                        NS(Particles_clear)( ( ptr_particles_t )( uintptr_t
-                                    )NS(Object_get_begin_addr)( block_it ) );
-                    }
+                    NS(Particles_buffer_clear_particles)( out_buffer );
                 }
                 else
                 {
@@ -205,16 +188,27 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda_grid)(
                     ( cudaSuccess == cudaMemcpy( &success_flag, cuda_success_flag,
                         sizeof( success_flag ), cudaMemcpyDeviceToHost ) ) )
                 {
+                    success |= ( int )success_flag;
+
                     if( ( success_flag == 0 ) && ( cudaSuccess == cudaMemcpy(
                         out_buffer_begin, cuda_out_buffer, in_buffer_size,
                             cudaMemcpyDeviceToHost ) ) )
                     {
-                        if( 0 != NS(Buffer_remap)( out_buffer ) )
+                        if( 0 == NS(Buffer_remap)( out_buffer ) )
+                        {
+                            success = 0;
+                        }
+                        else
                         {
                             success |= -16384;
                         }
                     }
                 }
+            }
+
+            if( ( success == 0 ) && ( 0 != NS(Buffer_remap)( out_buffer ) ) )
+            {
+                success |= -32768;
             }
 
             if( ( ( cuda_out_buffer != SIXTRL_NULLPTR ) &&
@@ -224,7 +218,7 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda_grid)(
                 ( ( cuda_success_flag != SIXTRL_NULLPTR ) &&
                   ( cudaSuccess != cudaFree( cuda_success_flag ) ) ) )
             {
-                success |= -32768;
+                success |= -65536;
             }
         }
     }
@@ -238,7 +232,7 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT in_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer )
 {
-    int success = -65536;
+    int success = -131072;
 
     typedef NS(buffer_size_t) buf_size_t;
 
@@ -281,7 +275,7 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda)(
           cudaOccupancyMaxActiveBlocksPerMultiprocessor( &max_active_blocks,
             NS(Particles_copy_buffer_kernel_cuda), block_size, 0u ) ) )
     {
-        success |= -131071;
+        success |= -262144;
     }
 
     if( success == 0 )
@@ -303,7 +297,7 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda)(
         }
         else
         {
-            success |= -131071;
+            success |= -524288;
         }
     }
 
