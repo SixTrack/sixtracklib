@@ -286,16 +286,19 @@ SIXTRL_FN SIXTRL_STATIC bool NS(Particles_buffers_have_same_structure)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs );
 
-SIXTRL_FN SIXTRL_STATIC void NS( Particles_buffer_calculate_difference)(
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_buffers_calculate_difference)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT diff );
 
-SIXTRL_FN SIXTRL_STATIC void NS( Particles_buffer_get_max_value )(
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_buffer_get_max_value )(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT destination,
     SIXTRL_BUFFER_ARGPTR_DEC NS(particle_num_elements_t)*
         SIXTRL_RESTRICT max_value_index,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT source );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_buffer_clear_particles)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 #endif /* !defined( _GPUCODE ) || defined( __CUDACC__ ) */
 
@@ -1630,7 +1633,6 @@ NS(BufferIndex_get_index_object_by_global_index_from_range)(
     num_elem_t block_end_index   = begin_index_offset;
 
     SIXTRL_ASSERT( ( ( uintptr_t )it ) <= ( ( uintptr_t )end ) );
-
     SIXTRL_ASSERT( global_index >= begin_index_offset );
     SIXTRL_ASSERT( begin_index_offset >= ( num_elem_t )0u );
 
@@ -1643,6 +1645,9 @@ NS(BufferIndex_get_index_object_by_global_index_from_range)(
 
             num_elem_t const num_particles =
                 NS(Particles_get_num_of_particles)( particles );
+
+            SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+            SIXTRL_ASSERT( num_particles > ( num_elem_t )0u );
 
             block_end_index += num_particles;
 
@@ -1667,9 +1672,9 @@ NS(BufferIndex_get_index_object_by_global_index_from_range)(
             *ptr_result_index_offset  = block_begin_index;
         }
     }
-    else if( ( block_begin_index > global_index ) ||
-             ( block_end_index   < global_index ) )
+    else if( it == end )
     {
+        SIXTRL_ASSERT( block_end_index == block_begin_index );
         ptr_index = end;
 
         if(  ptr_result_index_offset != SIXTRL_NULLPTR )
@@ -1679,6 +1684,10 @@ NS(BufferIndex_get_index_object_by_global_index_from_range)(
     }
     else
     {
+        /* Never should get here -> we'll return SIXTRL_NULLPTR and
+         * set the offset to -1 for good measure, in case somebody is
+         * not checking on the return value :-) */
+
         if(  ptr_result_index_offset != SIXTRL_NULLPTR )
         {
             *ptr_result_index_offset  = -1;
@@ -2495,7 +2504,7 @@ SIXTRL_INLINE bool NS(Particles_buffers_have_same_structure)(
     return have_same_structure;
 }
 
-SIXTRL_INLINE void NS(Particles_buffer_calculate_difference)(
+SIXTRL_INLINE void NS(Particles_buffers_calculate_difference)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs,
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT diff )
@@ -2586,6 +2595,43 @@ SIXTRL_INLINE void NS(Particles_buffer_get_max_value)(
             if( max_value_index != SIXTRL_NULLPTR )
             {
                 max_value_index = max_value_index + NS(PARTICLES_NUM_DATAPTRS);
+            }
+        }
+    }
+
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_buffer_clear_particles)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object)* obj_ptr_t;
+    typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* ptr_particles_t;
+
+    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( buffer ) );
+
+    if( NS(Buffer_get_num_of_objects)( buffer ) > ( NS(buffer_size_t) )0u )
+    {
+        obj_ptr_t it  = ( obj_ptr_t )( uintptr_t
+            )NS(Buffer_get_objects_begin_addr)( buffer );
+
+        obj_ptr_t end = ( obj_ptr_t )( uintptr_t
+            )NS(Buffer_get_objects_end_addr)( buffer );
+
+        SIXTRL_ASSERT( it  != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( end != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( ( end - it ) > ( ptrdiff_t )0 );
+
+        for( ; it != end ; ++it )
+        {
+            if( NS(Object_get_type_id)( it ) == NS(OBJECT_TYPE_PARTICLE ) )
+            {
+                ptr_particles_t particles = ( ptr_particles_t )( uintptr_t
+                    )NS(Object_get_begin_addr)( it );
+
+                SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+
+                NS(Particles_clear)( particles );
             }
         }
     }
