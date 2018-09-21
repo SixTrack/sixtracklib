@@ -18,7 +18,6 @@
     #include "sixtracklib/_impl/definitions.h"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/particles.h"
-    #include "sixtracklib/common/track.h"
 
     #include "sixtracklib/cuda/impl/cuda_particles_kernel.cuh"
     #include "sixtracklib/cuda/impl/managed_buffer_remap_kernel.cuh"

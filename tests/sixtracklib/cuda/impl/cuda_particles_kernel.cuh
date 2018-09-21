@@ -17,7 +17,7 @@ extern "C" {
 
 __global__ void NS(Particles_copy_buffer_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT in_buffer_begin,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer_begin,
     SIXTRL_ARGPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag );
 
 #if defined( __cplusplus )

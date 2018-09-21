@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_CUDA_IMPL_CUDA_PARTICLES_KERNEL_C_WRAPPER_H__
-#define SIXTRACKLIB_CUDA_IMPL_CUDA_PARTICLES_KERNEL_C_WRAPPER_H__
+#ifndef TESTS_SIXTRACKLIB_CUDA_IMPL_CUDA_PARTICLES_KERNEL_C_WRAPPER_H__
+#define TESTS_SIXTRACKLIB_CUDA_IMPL_CUDA_PARTICLES_KERNEL_C_WRAPPER_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdint.h>
@@ -33,6 +33,6 @@ SIXTRL_HOST_FN int NS(Run_test_particles_copy_buffer_kernel_on_cuda)(
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_CUDA_IMPL_CUDA_PARTICLES_KERNEL_C_WRAPPER_H__ */
+#endif /* TESTS_SIXTRACKLIB_CUDA_IMPL_CUDA_PARTICLES_KERNEL_C_WRAPPER_H__ */
 
 /* end: tests/sixtracklib/cuda/impl/cuda_particles_kernel_c_wrapper.h */
