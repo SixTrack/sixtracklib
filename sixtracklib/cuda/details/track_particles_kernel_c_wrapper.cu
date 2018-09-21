@@ -198,11 +198,17 @@ __host__ int NS(Track_particles_on_cuda_grid)(
                         cuda_succes_flag_buffer, sizeof( success_flag ),
                             cudaMemcpyDeviceToHost ) ) )
                 {
+                    success |= ( int )success_flag;
+
                     if( ( success_flag == 0 ) && ( cudaSuccess == cudaMemcpy(
                         result_particles_begin, cuda_particles_buffer,
                             particles_buffer_size, cudaMemcpyDeviceToHost ) ) )
                     {
-                        if( 0 != NS(Buffer_remap)( result_particles ) )
+                        if( 0 == NS(Buffer_remap)( result_particles ) )
+                        {
+                            success = 0;
+                        }
+                        else
                         {
                             success |= -512;
                         }
