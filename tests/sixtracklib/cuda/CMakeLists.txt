@@ -32,12 +32,14 @@ if( GTEST_FOUND )
     list( APPEND SIXTRACKL_CUDA_KERNEL_DEFINITIONS ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
     set( TESTS_SIXTRACKLIB_CUDA_TESTLIB_HEADERS
-         impl/cuda_grid_dimensions_kernel.cuh
+         impl/cuda_beam_elements_kernel.cuh
          impl/cuda_buffer_generic_obj_kernel.cuh
+         impl/cuda_grid_dimensions_kernel.cuh
          impl/cuda_particles_kernel.cuh
     )
 
     set( TESTS_SIXTRACKLIB_CUDA_TESTLIB_SOURCES
+         details/cuda_beam_elements_kernel.cu
          details/cuda_grid_dimensions_kernel.cu
          details/cuda_buffer_generic_obj_kernel.cu
          details/cuda_particles_kernel.cu
@@ -105,7 +107,20 @@ if( GTEST_FOUND )
     target_link_libraries( test_particles_cuda_c99 PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
     add_test( C99_Cuda_ParticlesBufferTests test_particles_cuda_c99 )
 
-     # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # test_be_drift_cuda_c99:
+
+    add_executable( test_be_drift_cuda_c99 test_be_drift_cuda_c99.cpp
+                    impl/cuda_beam_elements_kernel_c_wrapper.h
+                    details/cuda_beam_elements_kernel_c_wrapper.cu
+                    $<TARGET_OBJECTS:sixtrack_cuda_testlib_kernels> )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_drift_cuda_c99 )
+
+    target_link_libraries( test_be_drift_cuda_c99 PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
+    add_test( C99_Cuda_BeamElementsDriftTests test_be_drift_cuda_c99 )
+
+    # --------------------------------------------------------------------------
     # test_single_file_compilation_cuda_cxx:
 
     add_executable( test_runtime_compilation_cuda_cxx
