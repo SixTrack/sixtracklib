@@ -60,6 +60,7 @@ if( SIXTRACKL_ENABLE_CUDA )
     list( APPEND SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_cuda_device> )
     list( APPEND SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_cuda_host> )
 
+    set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} cudart )
 endif()
 
 # ------------------------------------------------------------------------------
