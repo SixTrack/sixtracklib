@@ -909,16 +909,20 @@ SIXTRL_INLINE int NS(Buffer_init_from_data)(
                 ( NS(Buffer_owns_datastore)( buffer ) ) &&
                 ( NS(Buffer_allow_resize)( buffer ) ) )
             {
-                #if !defined( NDEBUG )
+                #if !defined( NDEBUG ) || \
+                    ( !defined( _GPUCODE ) && !defined( __CUDACC__ ) )
+
                 address_t const datastore_addr =
                     NS(Buffer_get_datastore_begin_addr)( buffer );
-                #endif /* !defined( NDEBUG ) */
 
                 SIXTRL_ASSERT( datastore_addr != ( address_t )0u );
 
+                #endif /* !defined( NDEBUG ) ||
+                        ( !defined( _GPUCODE ) && !defined( __CUDACC__ ) ) */
+
                 if( NS(Buffer_uses_mempool_datastore)( buffer ) )
                 {
-                    #if !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+                    #if !defined( _GPUCODE ) && !defined( __CUDACC__ )
 
                     typedef NS(MemPool)                   mem_pool_t;
                     typedef NS(AllocResult)               alloc_result_t;
@@ -952,7 +956,7 @@ SIXTRL_INLINE int NS(Buffer_init_from_data)(
                         }
                     }
 
-                    #endif /* !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ ) */
+                    #endif /* !defined( _GPUCODE ) && !defined( __CUDACC__ ) */
                 }
             }
 
