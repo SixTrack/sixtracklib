@@ -88,11 +88,11 @@ extern int NS(Particles_buffers_map_to_same_memory)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer );
 
-extern int NS(Particles_buffer_compare_values)(
+extern int NS(Particles_buffers_compare_values)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer );
 
-extern int NS(Particles_buffer_compare_values_with_treshold)(
+extern int NS(Particles_buffers_compare_values_with_treshold)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer,
     NS(particle_real_t) const treshold );
@@ -1333,7 +1333,7 @@ int NS(Particles_buffers_map_to_same_memory)(
     return maps_to_same_memory;
 }
 
-int NS(Particles_buffer_compare_values)(
+int NS(Particles_buffers_compare_values)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer )
 {
@@ -1383,7 +1383,7 @@ int NS(Particles_buffer_compare_values)(
     return cmp_result;
 }
 
-int NS(Particles_buffer_compare_values_with_treshold)(
+int NS(Particles_buffers_compare_values_with_treshold)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer,
     NS(particle_real_t) const treshold )
@@ -1434,7 +1434,7 @@ int NS(Particles_buffer_compare_values_with_treshold)(
     return cmp_result;
 }
 
-void NS(Particles_buffer_get_max_difference)(
+void NS(Particles_buffers_get_max_difference)(
     SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT max_diff_buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT max_diff_indices,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
