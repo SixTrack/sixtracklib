@@ -236,7 +236,7 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
             ASSERT_TRUE( ::st_Particles_buffers_have_same_structure(
                 orig_particles_buffer, copy_particles_buffer ) );
 
-            ASSERT_TRUE( ::st_Particles_buffer_compare_values(
+            ASSERT_TRUE( ::st_Particles_buffers_compare_values(
                 orig_particles_buffer, copy_particles_buffer ) != 0 );
 
             /* ------------------------------------------------------------- */
@@ -452,7 +452,7 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
             ASSERT_TRUE( success_flag == int32_t{ 0 } );
 
             /* ============================================================= *
-             * TRACKING KERNEL *
+             * COPY KERNEL *
              * ============================================================= */
 
             cl::Kernel copy_kernel;
@@ -591,7 +591,7 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
                 ::st_Particles_buffers_have_same_structure(
                 orig_particles_buffer, copy_particles_buffer ) );
 
-            ASSERT_TRUE( ::st_Particles_buffer_compare_values(
+            ASSERT_TRUE( ::st_Particles_buffers_compare_values(
                 orig_particles_buffer, copy_particles_buffer ) == 0 );
         }
     }
