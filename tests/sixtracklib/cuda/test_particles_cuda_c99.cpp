@@ -223,6 +223,13 @@ TEST( C99_Cuda_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
 
         }
     }
+    else
+    {
+        std::cout << "Skipping unit-test because no "
+                  << "CUDA platforms have been found --> "
+                  << "NEITHER PASSED NOR FAILED!"
+                  << std::endl;
+    }
 
     ::st_Buffer_delete( orig_particles_buffer );
     ::st_Buffer_delete( copy_particles_buffer );

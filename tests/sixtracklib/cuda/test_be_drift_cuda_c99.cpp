@@ -227,6 +227,13 @@ TEST( C99_Cuda_BeamElementsDriftTests,
                 ::st_Buffer_get_const_objects_begin( copy_buffer ) ) );
         }
     }
+    else
+    {
+        std::cout << "Skipping unit-test because no "
+                  << "CUDA platforms have been found --> "
+                  << "NEITHER PASSED NOR FAILED!"
+                  << std::endl;
+    }
 
     ::st_Buffer_delete( copy_buffer );
     ::st_Buffer_delete( orig_buffer );

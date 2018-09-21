@@ -112,48 +112,58 @@ TEST( CXX_Cuda_RunTimeCompilation,
     cu_err = cuDeviceGetCount ( &num_devices );
     ASSERT_TRUE( cu_err == CUDA_SUCCESS );
 
-    for( int device_id = 0 ; device_id < num_devices ; ++device_id )
+    if( num_devices > 0 )
     {
-        CUdevice    device;
-        CUcontext   context;
-        CUmodule    module;
-        CUfunction  kernel;
+        for( int device_id = 0 ; device_id < num_devices ; ++device_id )
+        {
+            CUdevice    device;
+            CUcontext   context;
+            CUmodule    module;
+            CUfunction  kernel;
 
-        cu_err = cuDeviceGet( &device, device_id );
-        ASSERT_TRUE( cu_err == CUDA_SUCCESS );
+            cu_err = cuDeviceGet( &device, device_id );
+            ASSERT_TRUE( cu_err == CUDA_SUCCESS );
 
-        cu_err = cuCtxCreate( &context, 0, device );
-        ASSERT_TRUE( cu_err == CUDA_SUCCESS );
+            cu_err = cuCtxCreate( &context, 0, device );
+            ASSERT_TRUE( cu_err == CUDA_SUCCESS );
 
-        cu_err = cuModuleLoadDataEx(
-            &module, ptx_bin_store.data(), 0, nullptr, nullptr );
-        ASSERT_TRUE( cu_err == CUDA_SUCCESS );
+            cu_err = cuModuleLoadDataEx(
+                &module, ptx_bin_store.data(), 0, nullptr, nullptr );
+            ASSERT_TRUE( cu_err == CUDA_SUCCESS );
 
-        cu_err = cuModuleGetFunction( &kernel, module, mangled_fn_name );
-        ASSERT_TRUE( cu_err == CUDA_SUCCESS );
+            cu_err = cuModuleGetFunction( &kernel, module, mangled_fn_name );
+            ASSERT_TRUE( cu_err == CUDA_SUCCESS );
 
-        dim3 const grid_dim( 8, 8 );
-        dim3 const block_dim( 4 );
+            dim3 const grid_dim( 8, 8 );
+            dim3 const block_dim( 4 );
 
-        cu_err = cuLaunchKernel( kernel,
-                                 grid_dim.x, grid_dim.y, grid_dim.z,
-                                 block_dim.x, block_dim.y, block_dim.z,
-                                 0, nullptr, nullptr, nullptr );
+            cu_err = cuLaunchKernel( kernel,
+                                     grid_dim.x, grid_dim.y, grid_dim.z,
+                                     block_dim.x, block_dim.y, block_dim.z,
+                                     0, nullptr, nullptr, nullptr );
 
-        ASSERT_TRUE( cu_err == CUDA_SUCCESS );
+            ASSERT_TRUE( cu_err == CUDA_SUCCESS );
 
-        cu_err = cuCtxSynchronize();
-        ASSERT_TRUE( cu_err == CUDA_SUCCESS );
+            cu_err = cuCtxSynchronize();
+            ASSERT_TRUE( cu_err == CUDA_SUCCESS );
 
-        cu_err = cuModuleUnload( module );
-        ASSERT_TRUE( cu_err == CUDA_SUCCESS );
+            cu_err = cuModuleUnload( module );
+            ASSERT_TRUE( cu_err == CUDA_SUCCESS );
 
-        cu_err = cuCtxDestroy( context );
-        ASSERT_TRUE( cu_err == CUDA_SUCCESS );
+            cu_err = cuCtxDestroy( context );
+            ASSERT_TRUE( cu_err == CUDA_SUCCESS );
+        }
+
+        err = nvrtcDestroyProgram( &test_program );
+        ASSERT_TRUE( err == NVRTC_SUCCESS );
     }
-
-    err = nvrtcDestroyProgram( &test_program );
-    ASSERT_TRUE( err == NVRTC_SUCCESS );
+    else
+    {
+        std::cout << "Skipping unit-test because no "
+                  << "CUDA platforms have been found --> "
+                  << "NEITHER PASSED NOR FAILED!"
+                  << std::endl;
+    }
 }
 
 /* end: tests/sixtracklib/cuda/test_runtime_compilation_cuda_cxx.cpp */

@@ -28,41 +28,51 @@ TEST( CXX_Cuda_SingleFileCompilation,
     cudaError_t err = cudaGetDeviceCount( &num_devices );
     ASSERT_TRUE( err == cudaSuccess );
 
-    for( int device = 0 ; device < num_devices ; ++device )
+    if( num_devices > 0 )
     {
-        cudaDeviceProp deviceProp;
-        err = cudaGetDeviceProperties( &deviceProp, device);
-        ASSERT_TRUE( err == cudaSuccess );
+        for( int device = 0 ; device < num_devices ; ++device )
+        {
+            cudaDeviceProp deviceProp;
+            err = cudaGetDeviceProperties( &deviceProp, device);
+            ASSERT_TRUE( err == cudaSuccess );
 
-        std::cout << deviceProp.major << "."
-                  << deviceProp.minor << std::endl;
+            std::cout << deviceProp.major << "."
+                      << deviceProp.minor << std::endl;
 
-        err = cudaSetDevice( device );
-        ASSERT_TRUE( err == cudaSuccess );
+            err = cudaSetDevice( device );
+            ASSERT_TRUE( err == cudaSuccess );
 
-        runTestDimensions( grid_dimensions, block_dimensions );
-        cudaDeviceSynchronize();
+            runTestDimensions( grid_dimensions, block_dimensions );
+            cudaDeviceSynchronize();
 
-        err = cudaGetLastError();
-        ASSERT_TRUE( err == cudaSuccess );
+            err = cudaGetLastError();
+            ASSERT_TRUE( err == cudaSuccess );
 
-        cudaStream_t stream;
-        err = cudaStreamCreate( &stream );
-        ASSERT_TRUE( err == cudaSuccess );
+            cudaStream_t stream;
+            err = cudaStreamCreate( &stream );
+            ASSERT_TRUE( err == cudaSuccess );
 
 
-        const void* ptr_kernel = reinterpret_cast< void* >( &TestDimensions );
+            const void* ptr_kernel = reinterpret_cast< void* >( &TestDimensions );
 
-        err = cudaLaunchKernel( ptr_kernel, grid_dimensions, block_dimensions,
-                nullptr, ::size_t{ 0 }, stream );
+            err = cudaLaunchKernel( ptr_kernel, grid_dimensions, block_dimensions,
+                    nullptr, ::size_t{ 0 }, stream );
 
-        ASSERT_TRUE( err == cudaSuccess );
+            ASSERT_TRUE( err == cudaSuccess );
 
-        err = cudaStreamSynchronize( stream );
-        ASSERT_TRUE( err == cudaSuccess );
+            err = cudaStreamSynchronize( stream );
+            ASSERT_TRUE( err == cudaSuccess );
 
-        err = cudaStreamDestroy( stream );
-        ASSERT_TRUE( err == cudaSuccess );
+            err = cudaStreamDestroy( stream );
+            ASSERT_TRUE( err == cudaSuccess );
+        }
+    }
+    else
+    {
+        std::cout << "Skipping unit-test because no "
+                  << "CUDA platforms have been found --> "
+                  << "NEITHER PASSED NOR FAILED!"
+                  << std::endl;
     }
 }
 

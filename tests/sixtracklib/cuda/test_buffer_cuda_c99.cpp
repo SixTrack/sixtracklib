@@ -521,8 +521,10 @@ TEST( C99_Cuda_BufferTests,
     }
     else
     {
-        std::cout << "Unable to perform unit-test as no Cuda "
-                  << "platforms have been found" << std::endl;
+        std::cout << "Skipping unit-test because no "
+                  << "CUDA platforms have been found --> "
+                  << "NEITHER PASSED NOR FAILED!"
+                  << std::endl;
     }
 
     ::st_Buffer_delete( orig_buffer );
