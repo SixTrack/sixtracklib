@@ -10,6 +10,7 @@ if( SIXTRACKL_CUDA_COMPUTE_ARCH_LIST )
 endif()
 
 string( APPEND CMAKE_CUDA_FLAGS " -D_FORCE_INLINES" )
+string( APPEND CMAKE_CUDA_FLAGS " -cudart shared" )
 
 if( CMAKE_BUILD_TYPE MATCHES "Debug" )
     string( APPEND CMAKE_CUDA_FLAGS " -g -G" )
