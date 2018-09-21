@@ -595,8 +595,38 @@
         while( 0 )
 
     #else /* defined( _GPUCODE ) */
-        #define SIXTRACKLIB_MOVE_VALUES( T, destination, source, n ) \
-            memmove( ( destination ), ( source ), sizeof( T ) * ( n ) )
+
+        #if defined( __CUDACC__ )
+            #define SIXTRACKLIB_MOVE_VALUES( T, destination, source, n ) \
+            do \
+            {  \
+               if( ( ( uintptr_t )( source ) ) < ( ( uintptr_t )( destination ) ) ) \
+               {    \
+                    SIXTRL_INT64_T const end_idx = ( SIXTRL_INT64_T )-1; \
+                    SIXTRL_INT64_T ii = ( SIXTRL_INT64_T )( n ) - end_idx; \
+                    \
+                    for( ; ii > end_idx ; --ii ) \
+                    {   \
+                        *( ( destination ) + ii ) = *( ( source ) + ii ); \
+                    }   \
+               }    \
+               else \
+               {    \
+                    SIXTRL_INT64_T ii = ( SIXTRL_INT64_T )0; \
+                    \
+                    for( ; ii < ( n ) ; ++ii ) \
+                    {   \
+                        *( ( destination ) + ii ) = *( ( source ) + ii ); \
+                    }   \
+               }    \
+            }  \
+            while( 0 )
+
+        #else
+            #define SIXTRACKLIB_MOVE_VALUES( T, destination, source, n ) \
+                memmove( ( destination ), ( source ), sizeof( T ) * ( n ) )
+
+        #endif /* CUDA Host side code */
 
     #endif /* defined( _GPUCODE ) */
 
