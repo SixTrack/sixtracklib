@@ -9,17 +9,17 @@ set( EXAMPLE_LINK_LIBRARIES sixtrack_test sixtrack m dl )
 add_executable( simple_drift_buffer_c99 simple_drift_buffer.c )
 set( EXAMPLE_PROGRAMS ${EXAMPLE_PROGRAMS} simple_drift_buffer_c99 )
 
-target_compile_options( simple_drift_buffer_c99 PRIVATE
-    -fno-fast-math -fno-tree-vectorize )
-
 # -----------------------------------------------------------------------------
 # simple_particles_buffer:
 
 add_executable( simple_particles_buffer_c99 simple_particles_buffer.c )
 set( EXAMPLE_PROGRAMS ${EXAMPLE_PROGRAMS} simple_particles_buffer_c99 )
 
-target_compile_options( simple_particles_buffer_c99 PRIVATE
-    -fno-fast-math -fno-tree-vectorize )
+# -----------------------------------------------------------------------------
+# simple_particles_buffer:
+
+add_executable( track_lhc_no_bb_c99 track_lhc_no_bb.c )
+set( EXAMPLE_PROGRAMS ${EXAMPLE_PROGRAMS} track_lhc_no_bb_c99 )
 
 # -----------------------------------------------------------------------------
 # simple_drift_autovec:
