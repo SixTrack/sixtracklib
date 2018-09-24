@@ -105,56 +105,37 @@ __global__ void NS(Track_particles_beam_elements_kernel_cuda)(
     int32_t success_flag = ( int32_t )0u;
     buf_size_t const slot_size = ( buf_size_t )8u;
 
+    size_t particle_index = NS(Cuda_get_1d_thread_id_in_kernel)();
+    size_t const stride   = NS(Cuda_get_1d_thread_stride_in_kernel)();
+
     if( ( !NS(ManagedBuffer_needs_remapping( particles_buffer, slot_size ) ) ) &&
-        ( !NS(ManagedBuffer_needs_remapping( beam_elem_buffer, slot_size ) ) ) )
+        ( !NS(ManagedBuffer_needs_remapping( beam_elem_buffer, slot_size ) ) ) &&
+        (  NS(ManagedBuffer_get_num_objects)( particles_buffer, slot_size ) == 1u ) )
     {
-        size_t global_particle_id = NS(Cuda_get_1d_thread_id_in_kernel)();
-        size_t const stride = NS(Cuda_get_1d_thread_stride_in_kernel)();
-
-        size_t object_begin_particle_id = ( size_t )0u;
-
-        obj_iter_t part_block_it  = NS(ManagedBuffer_get_objects_index_begin)(
-                particles_buffer, slot_size );
-
-        obj_iter_t part_block_end = NS(ManagedBuffer_get_objects_index_end)(
-                particles_buffer, slot_size );
-
         obj_const_iter_t be_begin = NS(ManagedBuffer_get_const_objects_index_begin)(
                 beam_elem_buffer, slot_size );
 
         obj_const_iter_t be_end = NS(ManagedBuffer_get_const_objects_index_end)(
                 beam_elem_buffer, slot_size );
 
-        for( ; part_block_it != part_block_end ; ++part_block_it )
+        ptr_particles_t particles = NS(BufferIndex_get_particles)(
+            NS(ManagedBuffer_get_objects_index_begin)(
+                particles_buffer, slot_size ) );
+
+        size_t num_particles  = NS(Particles_get_num_of_particles)( particles );
+
+        while( particle_index < num_particles )
         {
-            ptr_particles_t particles = ( ptr_particles_t )(
-                uintptr_t )NS(Object_get_begin_addr)( part_block_it );
+            SIXTRL_UINT64_T turn = 0;
 
-            size_t const object_end_particle_id = object_begin_particle_id +
-                NS(Particles_get_num_of_particles)( particles );
-
-            SIXTRL_ASSERT( NS(Object_get_type_id)( part_block_it ) ==
-                           NS(OBJECT_TYPE_PARTICLE) );
-
-            if( ( global_particle_id <  object_end_particle_id   ) &&
-                ( global_particle_id >= object_begin_particle_id ) )
+            for( ; turn < num_turns ; ++turn )
             {
-                size_t const particle_id =
-                    global_particle_id - object_begin_particle_id;
-
-                SIXTRL_UINT64_T turn = ( SIXTRL_UINT64_T )0u;
-
-                SIXTRL_ASSERT( particle_id <
-                    NS(Particles_get_num_of_particles)( particles ) );
-
-                for( ; turn < num_turns ; ++turn )
-                {
-                    success_flag |= NS(Track_particle_beam_elements)(
-                        particles, particle_id, be_begin, be_end );
-                }
+                success_flag |= NS(Track_particle_beam_elements)(
+                    particles, particle_index, be_begin, be_end );
             }
 
-            object_begin_particle_id = object_end_particle_id;
+            NS(Particles_set_state_value)( particles, particle_index, 137 );
+            particle_index += stride;
         }
     }
     else
@@ -167,6 +148,12 @@ __global__ void NS(Track_particles_beam_elements_kernel_cuda)(
         if( NS(ManagedBuffer_needs_remapping( beam_elem_buffer, slot_size ) ) )
         {
             success_flag |= -4;
+        }
+
+        if( NS(ManagedBuffer_get_num_objects)( particles_buffer, slot_size )
+            != 1u )
+        {
+            success_flag |= -8;
         }
     }
 

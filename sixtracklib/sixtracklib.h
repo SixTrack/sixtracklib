@@ -51,7 +51,7 @@
            ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
 
 //     #include "sixtracklib/cuda/buffer.h"
-//     #include "sixtracklib/cuda/impl/track_particles_kernel_c_wrapper.h"
+    #include "sixtracklib/cuda/impl/track_particles_kernel_c_wrapper.h"
 
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
 
