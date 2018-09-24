@@ -1,56 +1,33 @@
 # examples/c99/CMakeLists.txt
 
-set( EXAMPLE_PROGRAMS )
+set( C99_EXAMPLE_PROGRAMS )
 set( EXAMPLE_LINK_LIBRARIES sixtrack_test sixtrack m dl )
 
 # -----------------------------------------------------------------------------
 # simple_drift_buffer:
 
 add_executable( simple_drift_buffer_c99 simple_drift_buffer.c )
-set( EXAMPLE_PROGRAMS ${EXAMPLE_PROGRAMS} simple_drift_buffer_c99 )
+set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} simple_drift_buffer_c99 )
 
 # -----------------------------------------------------------------------------
 # simple_particles_buffer:
 
 add_executable( simple_particles_buffer_c99 simple_particles_buffer.c )
-set( EXAMPLE_PROGRAMS ${EXAMPLE_PROGRAMS} simple_particles_buffer_c99 )
+set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} simple_particles_buffer_c99 )
 
 # -----------------------------------------------------------------------------
-# simple_particles_buffer:
+# track_lhc_no_bb_c99:
 
 add_executable( track_lhc_no_bb_c99 track_lhc_no_bb.c )
-set( EXAMPLE_PROGRAMS ${EXAMPLE_PROGRAMS} track_lhc_no_bb_c99 )
+set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_lhc_no_bb_c99 )
 
 # -----------------------------------------------------------------------------
-# simple_drift_autovec:
+# track_lhc_no_bb_cuda_c99:
 
-# if( SIXTRACKL_ENABLE_AUTOVECTORIZATION )
-#     add_executable( simple_drift_autovec simple_drift.c )
-#     set( EXAMPLE_PROGRAMS ${EXAMPLE_PROGRAMS} simple_drift_autovec )
-#
-#     target_compile_options( simple_drift_autovec PRIVATE
-#         -ftree-vectorize -ftree-vectorizer-verbose=6 -fopt-info-loop
-#         -fno-fast-math --param vect-max-version-for-alias-checks=50 )
-# endif()
-
-# -----------------------------------------------------------------------------
-# simple_drift_opencl:
-
-# # if( SIXTRACKL_ENABLE_OPENCL )
-#     add_executable( simple_drift_opencl simple_drift_opencl.c )
-#     set( EXAMPLE_PROGRAMS ${EXAMPLE_PROGRAMS} simple_drift_opencl )
-#
-# endif()
-
-# -----------------------------------------------------------------------------
-# simple_drift_cuda:
-
-# if( SIXTRACKL_ENABLE_CUDA )
-#     add_executable( simple_drift_cuda simple_drift_cuda.c )
-#     set( EXAMPLE_PROGRAMS ${EXAMPLE_PROGRAMS} simple_drift_cuda )
-#
-# endif()
-
+if( SIXTRACKL_ENABLE_CUDA )
+    add_executable( track_lhc_no_bb_cuda_c99 track_lhc_no_bb_cuda.c )
+    set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_lhc_no_bb_cuda_c99 )
+endif()
 
 # ==============================================================================
 # Common settings for all programs:
@@ -60,13 +37,13 @@ list( APPEND EXAMPLE_COMPILE_OPTIONS -Wall )
 list( APPEND EXAMPLE_COMPILE_OPTIONS -Werror )
 list( APPEND EXAMPLE_COMPILE_OPTIONS -pedantic )
 
-set_property( TARGET ${EXAMPLE_PROGRAMS} PROPERTY LINKER_LANGUAGE C )
-set_property( TARGET ${EXAMPLE_PROGRAMS} PROPERTY C_STANDARD 99 )
-set_property( TARGET ${EXAMPLE_PROGRAMS} PROPERTY C_STANDARD_REQUIRED ON )
-set_property( TARGET ${EXAMPLE_PROGRAMS}
+set_property( TARGET ${C99_EXAMPLE_PROGRAMS} PROPERTY LINKER_LANGUAGE C )
+set_property( TARGET ${C99_EXAMPLE_PROGRAMS} PROPERTY C_STANDARD 99 )
+set_property( TARGET ${C99_EXAMPLE_PROGRAMS} PROPERTY C_STANDARD_REQUIRED ON )
+set_property( TARGET ${C99_EXAMPLE_PROGRAMS}
               APPEND PROPERTY COMPILE_OPTIONS ${EXAMPLE_COMPILE_OPTIONS} )
 
-set_property( TARGET ${EXAMPLE_PROGRAMS}
+set_property( TARGET ${C99_EXAMPLE_PROGRAMS}
               PROPERTY LINK_LIBRARIES ${EXAMPLE_LINK_LIBRARIES} )
 
 # end: examples/c99/CMakeLists.txt
