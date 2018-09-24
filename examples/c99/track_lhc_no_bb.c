@@ -90,7 +90,7 @@ int main( int argc, char* argv[] )
     }
 
     /* ********************************************************************** */
-    /* ****   Building Particles Data from LHC Particle Dump Data        **** */
+    /* ****                         Clean-up                             **** */
     /* ********************************************************************** */
 
     st_Buffer_delete( pb );
