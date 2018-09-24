@@ -158,6 +158,8 @@ int main( int argc, char* argv[] )
         free( copy_buffer );
     }
 
+    st_Buffer_delete( pb );
+
     return 0;
 }
 
