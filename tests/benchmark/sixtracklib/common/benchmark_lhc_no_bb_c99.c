@@ -24,9 +24,6 @@ int main()
     st_Buffer* be_buffer = st_Buffer_new_from_file(
         st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM );
 
-    st_Object const* be_begin = st_Buffer_get_const_objects_begin( be_buffer );
-    st_Object const* be_end   = st_Buffer_get_const_objects_end( be_buffer );
-
     /* --------------------------------------------------------------------- */
 
     st_Buffer* lhc_particles_buffer = st_Buffer_new_from_file(
@@ -70,7 +67,7 @@ int main()
 
     for( ; ii < NUM_TURNS ; ++ii )
     {
-        st_Track_beam_elements_particles( particles, be_begin, be_end );
+        st_Track_particles_beam_elements( particles, be_buffer );
     }
 
     track_end = NS(Time_get_seconds_since_epoch)();
