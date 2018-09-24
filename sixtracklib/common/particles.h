@@ -282,6 +282,16 @@ SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(Particles_buffer_get_num_of_particle_blocks)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+NS(Particles_buffer_get_particles)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const particle_obj_index  );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+NS(Particles_buffer_get_const_particles)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const particle_obj_index );
+
 SIXTRL_FN SIXTRL_STATIC bool NS(Particles_buffers_have_same_structure)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs );
@@ -2436,6 +2446,36 @@ NS(Particles_buffer_get_num_of_particle_blocks)(
     SIXTRL_ASSERT( num_particle_blocks <= total_num_blocks );
 
     return num_particle_blocks;
+}
+
+SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+NS(Particles_buffer_get_particles)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const particle_block_index )
+{
+    typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* ptr_particles_t;
+    return ( ptr_particles_t )NS(Particles_buffer_get_const_particles)(
+        buffer, particle_block_index );
+}
+
+SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+NS(Particles_buffer_get_const_particles)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const particle_block_index )
+{
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
+
+    ptr_obj_t ptr_particle_obj = ( ptr_obj_t )( uintptr_t
+        )NS(Buffer_get_objects_begin_addr)( buffer );
+
+    SIXTRL_ASSERT( ptr_particle_obj != SIXTRL_NULLPTR );
+
+    SIXTRL_ASSERT( particle_block_index <
+        NS(Buffer_get_num_of_objects)( buffer ) );
+
+    ptr_particle_obj = ptr_particle_obj + particle_block_index;
+
+    return NS(BufferIndex_get_const_particles)( ptr_particle_obj );
 }
 
 SIXTRL_INLINE bool NS(Particles_buffers_have_same_structure)(
