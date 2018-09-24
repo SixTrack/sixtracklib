@@ -137,7 +137,7 @@ namespace sixtrack
 
                 if( success )
                 {
-                    success = ( 0 == ::st_Track_beam_elements_particles(
+                    success = ( 0 == ::st_Track_particles_beam_element_objs(
                         particles, be_begin, be_end ) );
                 }
 
@@ -398,8 +398,8 @@ TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
         object_t const* line_end = be_begin;
         std::advance( line_end, end_elem_id + index_t{ 1 } );
 
-        int success = ::st_Track_beam_elements_particles(
-        particles, line_begin, line_end );
+        int success = ::st_Track_particles_beam_element_objs(
+            particles, line_begin, line_end );
 
         ASSERT_TRUE( success == 0 );
 
