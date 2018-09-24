@@ -121,7 +121,7 @@ int main()
         SIXTRL_ASSERT( NS(Object_get_begin_addr)( be_end ) ==
                        ( uintptr_t )cmp_particles );
 
-        success = NS(Track_beam_elements_particles)(
+        success = NS(Track_particles_beam_element_objs)(
             cmp_particles, be_begin, be_end );
     }
 

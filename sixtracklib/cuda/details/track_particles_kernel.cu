@@ -130,7 +130,7 @@ __global__ void NS(Track_particles_beam_elements_kernel_cuda)(
 
             for( ; turn < num_turns ; ++turn )
             {
-                success_flag |= NS(Track_particle_beam_elements)(
+                success_flag |= NS(Track_particle_beam_element_objs)(
                     particles, particle_index, be_begin, be_end );
             }
 
