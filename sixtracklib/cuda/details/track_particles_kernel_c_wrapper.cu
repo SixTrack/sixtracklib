@@ -175,6 +175,9 @@ __host__ int NS(Track_particles_on_cuda_grid)(
 
             if( success == 0 )
             {
+                cudaEvent_t start_tracking;
+                cudaEvent_t stop_tracking;
+
                 dim3 grid_dim;
                 dim3 block_dim;
 
@@ -188,29 +191,47 @@ __host__ int NS(Track_particles_on_cuda_grid)(
                 block_dim.y = 1;
                 block_dim.z = 1;
 
-                NS(Track_particles_beam_elements_kernel_cuda)<<<
-                    grid_dim, block_dim >>>( cuda_particles_buffer,
-                    cuda_beam_elements_buffer, num_turns,
-                        cuda_succes_flag_buffer );
-
-                if( ( cudaSuccess == cudaDeviceSynchronize() ) &&
-                    ( cudaSuccess == cudaMemcpy( &success_flag,
-                        cuda_succes_flag_buffer, sizeof( success_flag ),
-                            cudaMemcpyDeviceToHost ) ) )
+                if( ( cudaEventCreate( &start_tracking ) == cudaSuccess ) &&
+                    ( cudaEventCreate( &stop_tracking  ) == cudaSuccess ) )
                 {
-                    success |= ( int )success_flag;
+                    cudaEventRecord( start_tracking );
 
-                    if( ( success_flag == 0 ) && ( cudaSuccess == cudaMemcpy(
-                        result_particles_begin, cuda_particles_buffer,
-                            particles_buffer_size, cudaMemcpyDeviceToHost ) ) )
+                    NS(Track_particles_beam_elements_kernel_cuda)<<<
+                        grid_dim, block_dim >>>( cuda_particles_buffer,
+                            cuda_beam_elements_buffer, num_turns,
+                                cuda_succes_flag_buffer );
+
+                    cudaEventRecord( stop_tracking );
+                    cudaEventSynchronize( stop_tracking );
+
+                    float milliseconds = 0;
+                    cudaEventElapsedTime(&milliseconds, start_tracking, stop_tracking );
+                    milliseconds *= 1e-3;
+
+                    printf( "INFO :: Tracking elapsed time %16.8f seconds\r\n", milliseconds );
+
+                    cudaEventDestroy( start_tracking );
+                    cudaEventDestroy( stop_tracking  );
+
+                    if( ( cudaSuccess == cudaDeviceSynchronize() ) &&
+                        ( cudaSuccess == cudaMemcpy( &success_flag,
+                            cuda_succes_flag_buffer, sizeof( success_flag ),
+                                cudaMemcpyDeviceToHost ) ) )
                     {
-                        if( 0 == NS(Buffer_remap)( result_particles ) )
+                        success |= ( int )success_flag;
+
+                        if( ( success_flag == 0 ) && ( cudaSuccess == cudaMemcpy(
+                            result_particles_begin, cuda_particles_buffer,
+                                particles_buffer_size, cudaMemcpyDeviceToHost ) ) )
                         {
-                            success = 0;
-                        }
-                        else
-                        {
-                            success |= -512;
+                            if( 0 == NS(Buffer_remap)( result_particles ) )
+                            {
+                                success = 0;
+                            }
+                            else
+                            {
+                                success |= -512;
+                            }
                         }
                     }
                 }

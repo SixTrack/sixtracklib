@@ -198,6 +198,9 @@ int main( int argc, char* argv[] )
         }
     }
 
+    cu_err = cudaSetDevice( SELECTED_DEVICE_ID );
+    SIXTRL_ASSERT( cu_err == cudaSuccess );
+
     printf( "Selected Device ID     = %4s ( %s )\r\n"
             "Selected NUM_PARTICLES = %10lu\r\n"
             "Selected NUM_TURNS     = %10lu\r\n"
@@ -232,7 +235,7 @@ int main( int argc, char* argv[] )
 
     double const end_time = st_Time_get_seconds_since_epoch();
 
-    SIXTRL_ASSERT( ( NUM_TURNS * NUM_PARTICLES ) > 0u );
+//     SIXTRL_ASSERT( ( NUM_TURNS * NUM_PARTICLES ) > 0u );
 
     if( success == 0 )
     {
