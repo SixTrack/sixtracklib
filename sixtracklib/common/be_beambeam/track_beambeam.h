@@ -58,7 +58,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_4d)(
 
     typedef NS(beambeam4d_real_const_ptr_t)  bb_data_ptr_t;
 
-    SIXTRL_UINT64_T const data_length = NS(BeamBeam6D_get_data_length)( bb );
+    SIXTRL_UINT64_T const data_size = NS(BeamBeam6D_get_data_size)( bb );
     bb_data_ptr_t data = NS(BeamBeam6D_get_const_data)( bb );
 
     SIXTRL_REAL_T x = NS(Particles_get_x_value)( particles, particle_index );
@@ -78,7 +78,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
 
     SIXTRL_TRACK_RETURN ret = 0;
 
-    SIXTRL_UINT64_T const data_length = NS(BeamBeam6D_get_data_length)( bb );
+    SIXTRL_UINT64_T const data_size = NS(BeamBeam6D_get_data_size)( bb );
     bb_data_ptr_t data = NS(BeamBeam6D_get_const_data)( bb );
 
     SIXTRL_REAL_T x = NS(Particles_get_x_value)( particles, particle_index );
