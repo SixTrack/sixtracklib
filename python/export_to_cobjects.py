@@ -3,24 +3,24 @@
 
 import sixtracktools
 import pysixtrack
+
+from math import pi
+from math import sin, cos
+import numpy as np
+
 from cobjects import CBuffer, CObject, CField
 
 from beam_elements import Drift, DriftExact, MultiPole, Cavity, XYShift, SRotation
 from beam_elements import BeamBeam4D, BeamBeam6D
 from particles     import Particles as IOParticles
 
-if  __name__ == '__main__':
-    from math import pi
-    from math import sin, cos
-    import numpy as np
-    import pdb
-
+def sixinput2cobject( input_folder, outfile_name ):
     deg2rad = pi / 180.0
 
     # -------------------------------------------------------------------------
     # Dump beam elements:
 
-    six = sixtracktools.SixInput('.')
+    six = sixtracktools.SixInput(input_folder)
     line, rest, iconv = six.expand_struct(convert=pysixtrack.element_types)
 
     beam_elements = CBuffer()
@@ -51,18 +51,23 @@ if  __name__ == '__main__':
 
         else:
             print( "Unknown/unhandled element type: {0}".format( elem_type, ) )
-            pdb.set_trace()
 
-    beam_elements.to_file( './lhc_beam_elements.bin' )
-
+    beam_elements.to_file( outfile_name )
+    
+    
+def sixdump2cobject( input_folder, st_dump_file , outfile_name ):
     # -------------------------------------------------------------------------
     # Dump particles (element by element)
+    
+    six = sixtracktools.SixInput(input_folder)
+    line, rest, iconv = six.expand_struct(convert=pysixtrack.element_types)
 
-    sixdump = sixtracktools.SixDump101('res/dump3.dat')
+    sixdump = sixtracktools.SixDump101( st_dump_file )
+    
 
     num_iconv = int( len( iconv ) )
     num_belem = int( len( line  ) )
-    num_dumps = int( len( sixdump ) )
+    num_dumps = int( len( sixdump.particles ) )
 
     assert(   num_iconv >  0 )
     assert(   num_belem >  iconv[ num_iconv - 1 ]  )
@@ -109,7 +114,14 @@ if  __name__ == '__main__':
             p.at_turn[ jj ]    = 0
             p.state[ jj ]      = inp.state
 
-    particles_buffer.to_file( './lhc_particle_dump.bin' )
+    particles_buffer.to_file( outfile_name )
 
 
-
+if  __name__ == '__main__':
+    # Test on pysixtrack example
+    pyst_path = pysixtrack.__file__
+    input_folder = '/'.join(pyst_path.split('/')[:-2]+['examples', 'lhc'])
+    
+    
+    sixinput2cobject( input_folder, 'lhc_st_input.bin')
+    sixdump2cobject( input_folder, input_folder+'/res/dump3.dat', 'lhc_st_dump.bin')
