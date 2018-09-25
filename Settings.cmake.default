@@ -1,0 +1,89 @@
+# sixtracklib/Settings.cmake.default: default settings file
+#
+# Usage: if you want to deviate from the provided default values, create a copy
+#        of this file named Settings.cmake in the same directory and perform the
+#        modifications therein.
+
+# ==============================================================================
+# ====  Top Level Settings and Options:
+
+# ------------------------------------------------------------------------------
+# ---- Backends and computing architectures:
+
+option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"       OFF )
+option( SIXTRACKL_ENABLE_MANUAL_SIMD       "Enable manual SIMD backend"     OFF )
+option( SIXTRACKL_ENABLE_OPENMP            "Enable OpenMP backend"          OFF )
+option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL backend"          OFF )
+option( SIXTRACKL_ENABLE_CUDA              "Enable CUDA backend"            OFF )
+option( SIXTRACKL_ENABLE_MPFR4             "Enable GMP/MPFR4 backend"       OFF )
+
+# ------------------------------------------------------------------------------
+# ---- Program logistic options:
+
+option( SIXTRACKL_BUILD_EXAMPLES
+        "Build sixtracklib examples" OFF )
+
+option( SIXTRACKL_ENABLE_PROGRAMM_TESTS
+        "Enable programmatic unit-tests" OFF )
+
+
+# ------------------------------------------------------------------------------
+# ----  Namespace:
+
+set( SIXTRACKL_CXX_NAMESPACE "sixtrack" CACHE STRING
+     "SixTrackLib C++ namespace (default: sixtrack)" )
+
+set( SIXTRACKL_C_NAMESPACE_PREFIX "st_" CACHE STRING
+     "SixTrackLib C-Namespace prefix (default: st_)" )
+
+# ------------------------------------------------------------------------------
+# CPU/System architecture settings:
+
+set( SIXTRACKL_CPU_ARCH "sse2" CACHE STRING "CPU/System architecture" )
+set_property( CACHE SIXTRACKL_CPU_ARCH PROPERTY STRINGS sse2 avx avx2 native )
+
+
+
+
+# ==============================================================================
+# ====  Detailed settings:
+
+# ------------------------------------------------------------------------------
+# Unit-testing related settings:
+
+if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
+
+    option( SIXTRACKL_ENABLE_PROGRAM_MEMTESTS
+            "Enable programming mem tests"   OFF )
+
+    option( SIXTRACKL_ENABLE_TIMING_TESTS
+            "Enable timing/benchmarking tests (requires C++11 support)" OFF )
+
+    option( SIXTRACKL_ENABLE_MPFR_ACCURACY_TESTS
+            "Enable GMP/MPFR based accuracy tests" OFF )
+
+    set( SIXTRACKL_GOOGLETEST_ROOT "" CACHE PATH
+         "Path to include/gtest/gtest.h (for non-standard installations)" )
+
+    set( SIXTRACKL_MEMCHECK_COMMAND "valgrind" CACHE STRING
+         "name of the memory check tool (i.e. valgrind)" )
+
+    set( SIXTRACKL_MEMCHECK_COMMAND_OPTIONS
+         "--trace-children=yes --leak-check=full"
+         CACHE STRING "Command line options for the memcheck tool" )
+
+    set( SIXTRACKL_MEMCHECK_SUPPRESSIONS_FILE "" CACHE PATH
+         "Path to the memory check tool suppression file (optional, leave empty)" )
+
+endif()
+
+# ------------------------------------------------------------------------------
+# CUDA related settings:
+
+set(  SIXTRACKL_CUDA_COMPUTE_ARCH_LIST )
+
+if( SIXTRACKL_ENABLE_CUDA )
+    list( APPEND SIXTRACKL_CUDA_COMPUTE_ARCH_LIST "30" )
+endif()
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

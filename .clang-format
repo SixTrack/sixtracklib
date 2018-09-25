@@ -1,0 +1,28 @@
+---
+BasedOnStyle: LLVM
+IndentWidth: 4
+SpaceBeforeParens: Never
+SpacesInParentheses: true
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterEnum: true
+  AfterStruct: true
+  AfterClass: true
+  AfterControlStatement: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+---
+Language: Cpp
+DerivePointerAlignment: false
+PointerAlignment: Left
+AllowShortFunctionsOnASingleLine: true
+BreakBeforeTernaryOperators: true
+AlwaysBreakAfterDefinitionReturnType: None
+AllowShortBlocksOnASingleLine: true
+ContinuationIndentWidth: 4
+BinPackArguments: false
+BinPackParameters: false
+ExperimentalAutoDetectBinPacking: false
+AllowAllParametersOfDeclarationOnNextLine: true

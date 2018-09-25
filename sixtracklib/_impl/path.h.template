@@ -1,0 +1,30 @@
+#ifndef SIXTRACKLIB__IMPL_PATH_H__
+#define SIXTRACKLIB__IMPL_PATH_H__
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/_impl/definitions.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+extern "C" {
+#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
+
+/* The NS(PATH_TO_BASE_DIR) variable is to be set by CMake to the proper
+   value during the creation of ${SIXTRACKLIB_BASE_DIR}/_impl/path.h from
+   the ${SIXTRACKLIB_BASE_DIR}/_impl/path.h.template template.
+
+   Cf. ${SIXTRACKLIB_BASE_DIR}/CMakeLists.txt file for further reference!
+   Please remember to not check in the path.h file as it is specific to your
+   system into git, i.e. not to propagate your local values to all other uses
+   of this library. Thank you!
+*/
+
+static char const NS(PATH_TO_BASE_DIR)[] = "@SIXTRACKLIB_BASE_DIR@";
+
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+}
+#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
+
+#endif /* SIXTRACKLIB__IMPL_PATH_H__ */
+
+/* end: sixtracklib/_impl/path.h */
