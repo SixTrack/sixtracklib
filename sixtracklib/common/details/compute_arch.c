@@ -1,10 +1,31 @@
-#include "sixtracklib/common/compute_arch.h"
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/compute_arch.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdlib.h>
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+    #include <stddef.h>
+    #include <stdint.h>
+    #include <stdlib.h>
+    #include <stdio.h>
+    #include <string.h>
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
-#include "sixtracklib/_impl/definitions.h"
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/_impl/definitions.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
+#if !defined( GPUCODE )
+
+extern SIXTRL_HOST_FN int NS(ComputeNodeId_to_string)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT id,
+    char* SIXTRL_RESTRICT str_buffer,
+    SIXTRL_UINT64_T const str_buffer_capacity );
+
+extern SIXTRL_HOST_FN int NS(ComputeNodeId_from_string)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT id,
+    char const* SIXTRL_RESTRICT str_buffer );
+
+#endif /* !defined( _GPUCODE ) */
 
 extern SIXTRL_HOST_FN NS(ComputeNodeId)* NS(ComputeNodeId_preset)(
     NS(ComputeNodeId)* SIXTRL_RESTRICT id );
@@ -31,6 +52,66 @@ extern SIXTRL_HOST_FN int NS(ComputeNodeInfo_make)(
     const char *const SIXTRL_RESTRICT description_str );
 
 
+#if !defined( GPUCODE )
+
+int NS(ComputeNodeId_to_string)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT id,
+    char* SIXTRL_RESTRICT str_buffer,
+    SIXTRL_UINT64_T const str_buffer_capacity )
+{
+    int success = -1;
+
+    char temp[ 64 ];
+    memset( &temp[ 0 ], ( int )'\0', 64 );
+
+    if( ( str_buffer != SIXTRL_NULLPTR ) &&
+        ( str_buffer_capacity > 0u ) &&
+        ( id != SIXTRL_NULLPTR ) &&
+        ( NS(ComputeNodeId_get_platform_id)( id ) >= 0 ) &&
+        ( NS(ComputeNodeId_get_device_id)( id )   >= 0 ) )
+    {
+        memset( str_buffer, ( int )'\0', str_buffer_capacity );
+
+        sprintf( &temp[ 0 ], "%d.%d",
+                 ( int )NS(ComputeNodeId_get_platform_id)( id ),
+                 ( int )NS(ComputeNodeId_get_device_id)( id ) );
+
+        strncpy( str_buffer, &temp[ 0 ], str_buffer_capacity - 1 );
+        success = ( strlen( str_buffer ) > 0 ) ? 0 : -1;
+    }
+
+    return success;
+}
+
+int NS(ComputeNodeId_from_string)( NS(ComputeNodeId)* SIXTRL_RESTRICT id,
+    char const* SIXTRL_RESTRICT str_buffer )
+{
+    int success = -1;
+
+    if( ( str_buffer != SIXTRL_NULLPTR ) &&
+        ( strlen( str_buffer ) > 0u ) &&
+        ( id != SIXTRL_NULLPTR ) )
+    {
+        int temp_platform_idx = -1;
+        int temp_device_idx   = -1;
+
+        int const ret = sscanf( str_buffer, "%d.%d",
+                                &temp_platform_idx, &temp_device_idx );
+
+        if( ( ret == 2 ) && ( temp_platform_idx >= 0 ) &&
+            ( temp_device_idx >= 0 ) )
+        {
+            NS(ComputeNodeId_set_platform_id)( id, temp_platform_idx );
+            NS(ComputeNodeId_set_device_id)( id, temp_device_idx );
+
+            success = 0;
+        }
+    }
+
+    return success;
+}
+
+#endif /* !defined( _GPUCODE ) */
 
 NS(ComputeNodeId)* NS(ComputeNodeId_preset)(
     NS(ComputeNodeId)* SIXTRL_RESTRICT id )

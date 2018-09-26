@@ -250,6 +250,14 @@ NS(CLContextBase_get_available_node_info_by_node_id)(
     const NS(CLContextBase) *const SIXTRL_RESTRICT context,
     const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
 
+SIXTRL_HOST_FN bool NS(CLContextBase_is_node_id_str_available)(
+    const NS(CLContextBase) *const SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT node_id_str );
+
+SIXTRL_HOST_FN bool NS(CLContextBase_is_node_id_available)(
+    const NS(CLContextBase) *const SIXTRL_RESTRICT ctx,
+    const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
+
 SIXTRL_HOST_FN bool NS(CLContextBase_has_selected_node)(
     const NS(CLContextBase) *const SIXTRL_RESTRICT ctx );
 

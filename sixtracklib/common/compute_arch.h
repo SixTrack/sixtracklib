@@ -67,6 +67,20 @@ SIXTRL_HOST_FN SIXTRL_STATIC void NS(ComputeNodeId_set_device_id)(
 SIXTRL_HOST_FN SIXTRL_STATIC int NS(ComputeNodeId_is_valid)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id );
 
+#if !defined( GPUCODE )
+
+SIXTRL_HOST_FN int NS(ComputeNodeId_to_string)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT id,
+    char* SIXTRL_RESTRICT str_buffer,
+    SIXTRL_UINT64_T const str_buffer_capacity );
+
+SIXTRL_HOST_FN int NS(ComputeNodeId_from_string)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT id,
+    char const* SIXTRL_RESTRICT str_buffer );
+
+#endif /* !defined( _GPUCODE ) */
+
+
 
 typedef struct NS(ComputeNodeInfo)
 {

@@ -47,7 +47,15 @@ namespace SIXTRL_NAMESPACE
 
     CLContextBase::~CLContextBase() SIXTRL_NOEXCEPT
     {
+        if( !this->m_available_nodes_info.empty() )
+        {
+            for( auto& nodes_info : this->m_available_nodes_info )
+            {
+                NS(ComputeNodeInfo_free)( &nodes_info );
+            }
 
+            this->m_available_nodes_info.clear();
+        }
     }
 
     CLContextBase::size_type
@@ -657,9 +665,9 @@ namespace SIXTRL_NAMESPACE
             {
                 ++platform_index;
             }
-
-            return;
         }
+
+        return;
     }
 }
 
@@ -713,6 +721,22 @@ NS(CLContextBase_get_available_node_info_by_node_id)(
 {
     return ( ( ctx != nullptr ) && ( node_id != nullptr ) )
         ? ctx->ptrAvailableNodesInfo( *node_id ) : nullptr;
+}
+
+SIXTRL_HOST_FN bool NS(CLContextBase_is_node_id_available)(
+    const NS(CLContextBase) *const SIXTRL_RESTRICT ctx,
+    const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id )
+{
+    return ( ( ctx != nullptr ) && ( node_id != nullptr ) &&
+             ( ctx->isNodeIdAvailable( *node_id ) ) );
+}
+
+SIXTRL_HOST_FN bool NS(CLContextBase_is_node_id_str_available)(
+    const NS(CLContextBase) *const SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT node_id_str )
+{
+    return ( ( ctx != nullptr ) && ( node_id_str != nullptr ) &&
+             ( ctx->isNodeIdAvailable( node_id_str ) ) );
 }
 
 SIXTRL_HOST_FN bool NS(CLContextBase_has_selected_node)(
