@@ -23,7 +23,7 @@ typedef SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const*  NS(beambeam6d_real_const_ptr
 
 typedef struct NS(BeamBeam6D)
 {
-    SIXTRL_UINT64_T                           length    SIXTRL_ALIGN( 8 );
+    SIXTRL_UINT64_T                           size      SIXTRL_ALIGN( 8 );
     NS(beambeam6d_real_ptr_t) SIXTRL_RESTRICT data      SIXTRL_ALIGN( 8 );
 }
 NS(BeamBeam6D);
@@ -36,15 +36,15 @@ NS(BeamBeam6D_preset)( NS(BeamBeam6D)* SIXTRL_RESTRICT beam_beam );
 SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam6D)*
 NS(BeamBeam6D_new)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_UINT64_T const data_length );
+    SIXTRL_UINT64_T const data_size );
 
-SIXTRL_HOST_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam6D)*
+SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam6D)*
 NS(BeamBeam6D_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_UINT64_T const  data_length,
+    SIXTRL_UINT64_T const  data_size,
     NS(beambeam6d_real_ptr_t) SIXTRL_RESTRICT input_data );
 
-SIXTRL_HOST_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam6D)*
+SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam6D)*
 NS(BeamBeam6D_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT orig );
@@ -55,11 +55,10 @@ SIXTRL_FN SIXTRL_STATIC NS(beambeam6d_real_const_ptr_t)
 NS(BeamBeam6D_get_const_data)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT beam_beam );
 
-SIXTRL_FN SIXTRL_STATIC NS(beambeam6d_real_ptr_t)
-NS(BeamBeam6D_get_data)(
+SIXTRL_FN SIXTRL_STATIC NS(beambeam6d_real_ptr_t) NS(BeamBeam6D_get_data)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* SIXTRL_RESTRICT beam_beam );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(BeamBeam6D_get_data_length)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_UINT64_T NS(BeamBeam6D_get_data_size)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT beam_beam );
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -85,7 +84,7 @@ NS(BeamBeam6D_preset)( NS(BeamBeam6D)* SIXTRL_RESTRICT beam_beam )
 {
     if( beam_beam != SIXTRL_NULLPTR )
     {
-        beam_beam->length = ( SIXTRL_UINT64_T )0u;
+        beam_beam->size = ( SIXTRL_UINT64_T )0u;
         beam_beam->data   = SIXTRL_NULLPTR;
     }
 
@@ -107,11 +106,11 @@ NS(BeamBeam6D_get_data)(
     return ( NS(beambeam6d_real_ptr_t) )NS(BeamBeam6D_get_const_data)( beam_beam );
 }
 
-SIXTRL_INLINE SIXTRL_UINT64_T NS(BeamBeam6D_get_data_length)(
+SIXTRL_INLINE SIXTRL_UINT64_T NS(BeamBeam6D_get_data_size)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT beam_beam )
 {
     SIXTRL_ASSERT( beam_beam != SIXTRL_NULLPTR );
-    return beam_beam->length;
+    return beam_beam->size;
 }
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -120,4 +119,4 @@ SIXTRL_INLINE SIXTRL_UINT64_T NS(BeamBeam6D_get_data_length)(
 
 #endif /* SIXTRL_COMMON_BE_BEAMBEAM_BE_BEAMBEAM6D_H__ */
 
-/* sixtracklib/common/be_beambeam/be_beambeam4d.h */
+/* sixtracklib/common/be_beambeam/be_beambeam6d.h */

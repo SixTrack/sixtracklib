@@ -28,6 +28,9 @@ set( SIXTRACKLIB_COMMON_IMPL_HEADERS
      impl/managed_buffer_minimal.h
      impl/managed_buffer_remap.h
      impl/managed_buffer.h
+     be_beambeam/be_beambeam4d.h
+     be_beambeam/be_beambeam6d.h
+     be_beambeam/track_beambeam.h
 #    impl/faddeeva.h
 #    impl/faddeeva_mit.h
 )
@@ -55,6 +58,8 @@ set( SIXTRACKLIB_COMMON_SOURCES
      details/compute_arch.c
 #    details/faddeeva_mit.c
      details/mem_pool.c
+     be_beambeam/be_beambeam4d.c
+     be_beambeam/be_beambeam6d.c
 )
 
 add_library( sixtrack_common OBJECT
