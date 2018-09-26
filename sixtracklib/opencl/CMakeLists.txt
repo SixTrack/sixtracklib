@@ -1,5 +1,6 @@
 set( SIXTRACKLIB_OPENCL_HEADERS
      private/base_context.h
+     argument.h
 )
 
 set( SIXTRACKLIB_OPENCL_KERNEL_HEADERS
@@ -8,6 +9,7 @@ set( SIXTRACKLIB_OPENCL_KERNEL_HEADERS
 
 set( SIXTRACKLIB_OPENCL_SOURCES
      code/base_context.cpp
+     code/argument.cpp
 )
 
 add_library( sixtrack_opencl OBJECT
