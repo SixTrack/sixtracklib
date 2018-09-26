@@ -31,13 +31,9 @@ NS(ComputeNodeId);
 
 #if defined( __cplusplus )
 
-bool operator<( NS(ComputeNodeId) const& lhs,
-                NS(ComputeNodeId) const& rhs ) noexcept
-{
-    return ( ( lhs.platform_id < rhs.platform_id ) ||
-             ( ( lhs.platform_id == rhs.platform_id ) &&
-               ( lhs.device_id   <  rhs.device_id   ) ) );
-}
+SIXTRL_FN SIXTRL_STATIC bool operator<(
+    NS(ComputeNodeId) const& lhs,
+    NS(ComputeNodeId) const& rhs ) SIXTRL_NOEXCEPT;
 
 #endif /* !defined( __cplusplus ) */
 
@@ -140,11 +136,31 @@ SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_name)(
 SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_description)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
 
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+}
+#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+
 /* ************************************************************************** */
 /* ******                                                               ***** */
 /* ******             Inline functions implementation                   ***** */
 /* ******                                                               ***** */
 /* ************************************************************************** */
+
+#if defined( __cplusplus )
+
+SIXTRL_INLINE bool operator<( NS(ComputeNodeId) const& lhs,
+    NS(ComputeNodeId) const& rhs ) SIXTRL_NOEXCEPT
+{
+    return ( ( lhs.platform_id < rhs.platform_id ) ||
+             ( ( lhs.platform_id == rhs.platform_id ) &&
+               ( lhs.device_id   <  rhs.device_id   ) ) );
+}
+
+#endif /* defined( __cplusplus ) */
+
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+extern "C" {
+#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeId_get_platform_id)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id )
