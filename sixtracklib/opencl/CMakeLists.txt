@@ -1,5 +1,5 @@
 set( SIXTRACKLIB_OPENCL_HEADERS
-     ocl_environment.h
+     private/base_context.h
 )
 
 set( SIXTRACKLIB_OPENCL_KERNEL_HEADERS
@@ -7,7 +7,7 @@ set( SIXTRACKLIB_OPENCL_KERNEL_HEADERS
 )
 
 set( SIXTRACKLIB_OPENCL_SOURCES
-     details/ocl_environment.cpp
+     code/base_context.cpp
 )
 
 add_library( sixtrack_opencl OBJECT
@@ -19,7 +19,7 @@ target_include_directories( sixtrack_opencl PUBLIC
     ${CMAKE_SOURCE_DIR}
     ${SIXTRACKL_OPENCL_INCLUDE_DIR} )
 
-set_target_properties( sixtrack_opencl PROPERTIES LINKER_LANGUAGE CXX )
+set_target_properties( sixtrack_opencl PROPERTIES LINKER_LANGUAGE C )
 set_target_properties( sixtrack_opencl PROPERTIES POSITION_INDEPENDENT_CODE True )
 set_target_properties( sixtrack_opencl PROPERTIES CXX_STANDARD 11 )
 set_target_properties( sixtrack_opencl PROPERTIES CXX_STANDARD_REQUIRED ON   )
