@@ -262,6 +262,7 @@ namespace SIXTRL_NAMESPACE
         };
 
         virtual bool doInitDefaultPrograms();
+        virtual bool doInitDefaultKernels();
 
         virtual bool doCompileProgram(
             cl::Program& cl_program, program_data_t& program_data );
@@ -284,6 +285,8 @@ namespace SIXTRL_NAMESPACE
             const char *const filter_str = nullptr );
 
         bool doInitDefaultProgramsBaseImpl();
+        bool doInitDefaultKernelsBaseImpl();
+
         bool doCompileProgramBaseImpl( size_type const node_index );
         bool doSelectNodeBaseImpl( size_type const node_index );
 

@@ -377,30 +377,62 @@ namespace SIXTRL_NAMESPACE
             this->m_selected_node_index ) );
     }
 
+    bool ClContextBase::selectNode( size_type const node_index )
+    {
+        bool success = false;
+
+        if( this->doSelectNode( node_index ) )
+        {
+            success = this->doInitDefaultKernels();
+        }
+
+        return success
+    }
+
     bool ClContextBase::selectNode( node_id_t const node_id )
     {
+        bool success = false;
+
         platform_id_t const platform_idx =
             NS(ComputeNodeId_get_platform_id)( &node_id );
 
         device_id_t const device_idx =
             NS(ComputeNodeId_get_device_id)( &node_id );
 
-        return this->doSelectNode( this->findAvailableNodesIndex(
-                                     platform_idx, device_idx ) );
+        if( this->doSelectNode( this->findAvailableNodesIndex(
+                platform_idx, device_idx ) ) )
+        {
+            success = this->doInitDefaultKernels();
+        }
+
+        return success;
     }
 
     bool ClContextBase::selectNode(
          ClContextBase::platform_id_t const platform_idx,
          ClContextBase::device_id_t   const device_idx )
     {
-        return this->doSelectNode(
-            this->findAvailableNodesIndex( platform_idx, device_idx ) );
+        bool success = false;
+
+        if( this->doSelectNode( this->findAvailableNodesIndex(
+                platform_idx, device_idx ) ) )
+        {
+            success = this->doInitDefaultKernels();
+        }
+
+        return success;
     }
 
     bool ClContextBase::selectNode( char const* node_id_str )
     {
-        return this->doSelectNode(
-            this->findAvailableNodesIndex( node_id_str ) );
+        bool success = false;
+
+        if( this->doSelectNode( this->findAvailableNodesIndex( node_id_str ) ) )
+        {
+            success = this->doInitDefaultKernels();
+        }
+
+        return success;
     }
 
     bool ClContextBase::doSelectNode( size_type const node_index )
@@ -902,9 +934,17 @@ namespace SIXTRL_NAMESPACE
         if( ( this->hasSelectedNode() ) &&
             ( kernel_id >= kernel_id_t{ 0 } ) &&
             ( static_cast< size_type >( kernel_id ) <
-              this->m_cl_kernels.size() ) )
+              this->m_cl_kernels.size() ) &&
+            ( this->m_kernel_data[ kernel_id ].m_program_id >=
+              program_id_t{ 0 } ) &&
+            ( static_cast< size_type >(
+                this->m_kernel_data[ kernel_id ].m_program_id ) <
+                this->numAvailablePrograms() ) )
         {
             this->m_remap_kernel_id = kernel_id;
+            this->m_remap_program_id =
+                this->m_kernel_data[ kernel_id ].m_program_id;
+
             success = true;
         }
 
@@ -914,6 +954,9 @@ namespace SIXTRL_NAMESPACE
     ClContextBase::size_type
     ClContextBase::numAvailableKernels() const SIXTRL_NOEXCEPT
     {
+        SIXTRL_ASSERT( this->m_cl_kernels.size() ==
+                       this->m_kernel_data.size() );
+
         return this->m_cl_kernels.size();
     }
 
@@ -1026,6 +1069,35 @@ namespace SIXTRL_NAMESPACE
         {
             this->m_remap_prorgam_id = remap_program_id;
             success = true;
+        }
+
+        return success;
+    }
+
+    bool ClContextBase::doInitDefaultKernels()
+    {
+        return this->doInitDefaultKernelsBaseImpl();
+    }
+
+    bool ClContextBase::doInitDefaultKernelsBaseImpl()
+    {
+        bool success = false;
+
+        if( this->hasSelectedNode() )
+        {
+            if( ( this->m_remap_program_id >= program_id_t{ 0 } ) &&
+                ( static_cast< size_type >( this->m_remap_program_id ) <
+                  this->numAvailablePrograms() ) )
+            {
+                kernel_id_t const remap_kernel_id =
+                    this->enableKernel( "st_ManagedBuffer_remap_opencl",
+                                        this->m_remap_program_id );
+
+                if( remap_kernel_id >= kernel_id_t{ 0 } )
+                {
+                    success = this->setRemappingKernelId( remap_kernel_id );
+                }
+            }
         }
 
         return success;
