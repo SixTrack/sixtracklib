@@ -24,8 +24,8 @@ set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_lhc_no_bb_c99 )
 # -----------------------------------------------------------------------------
 # track_lhc_no_bb_from_python:
 
-add_executable( track_lhc_no_bb_from_python_c99 track_lhc_no_bb_from_python.c )
-set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_lhc_no_bb_from_python_c99 )
+add_executable( track_simple_bb_from_python_c_c99 track_simple_bb_from_python.c )
+set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_simple_bb_from_python_c_c99 )
 
 # -----------------------------------------------------------------------------
 # track_lhc_no_bb_cuda_c99:
