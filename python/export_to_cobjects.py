@@ -48,7 +48,9 @@ def sixinput2cobject( input_folder, outfile_name ):
         elif elem_type == 'Cavity':
             e = Cavity( cbuffer=beam_elements, voltage=elem.voltage,
                         frequency=elem.frequency, lag=elem.lag )
-
+        elif elem_type=='BeamBeam6D':
+            data = np.array([elem.phi, elem.sigmaz])
+            e = BeamBeam6D( cbuffer=beam_elements, data=data)
         else:
             print( "Unknown/unhandled element type: {0}".format( elem_type, ) )
 

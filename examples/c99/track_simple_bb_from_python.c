@@ -15,11 +15,11 @@ int main( int argc, char* argv[] )
     
     memset( path2particle_file, (int)'\0', 256 );
     strncpy( path2particle_file, st_PATH_TO_BASE_DIR, 256 );
-    strcat( path2particle_file, "python/lhc_st_dump.bin" );
+    strcat( path2particle_file, "python/bbsimple_st_dump.bin" );
 
     memset( path2beam_elements_file, (int)'\0', 256 );
     strncpy( path2beam_elements_file, st_PATH_TO_BASE_DIR, 256 );
-    strcat( path2beam_elements_file, "python/lhc_st_input.bin" );
+    strcat( path2beam_elements_file, "python/bbsimple_st_input.bin" );
 
     st_Buffer* lhc_particle_dump = st_Buffer_new_from_file( path2particle_file );
 
