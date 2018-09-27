@@ -58,11 +58,12 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_4d)(
 
     typedef NS(beambeam4d_real_const_ptr_t)  bb_data_ptr_t;
 
-    SIXTRL_UINT64_T const data_size = NS(BeamBeam6D_get_data_size)( bb );
-    bb_data_ptr_t data = NS(BeamBeam6D_get_const_data)( bb );
+    SIXTRL_UINT64_T const data_size = NS(BeamBeam4D_get_data_size)( bb );
+    bb_data_ptr_t data = NS(BeamBeam4D_get_const_data)( bb );
+    (void) data_size; // just to avoid error: unused variable
 
     SIXTRL_REAL_T x = NS(Particles_get_x_value)( particles, particle_index );
-    x += ( SIXTRL_REAL_T )0.0;
+    x += ( SIXTRL_REAL_T )0.0 + data[0];
 
     NS(Particles_set_x_value)( particles, particle_index, x );
 
@@ -78,12 +79,13 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
 
     SIXTRL_TRACK_RETURN ret = 0;
 
-    SIXTRL_UINT64_T const data_size = NS(BeamBeam6D_get_data_size)( bb );
+    SIXTRL_UINT64_T const data_size = NS(BeamBeam6D_get_data_size)( bb ); 
+    (void) data_size; // just to avoid error: unused variable
     bb_data_ptr_t data = NS(BeamBeam6D_get_const_data)( bb );
 
     SIXTRL_REAL_T x = NS(Particles_get_x_value)( particles, particle_index );
-    x += ( SIXTRL_REAL_T )0.0;
-
+    x += ( SIXTRL_REAL_T )1.0 + 0.*data[0];
+    printf("I just added 1!\n");
     NS(Particles_set_x_value)( particles, particle_index, x );
 
     return ret;
@@ -92,5 +94,5 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
-
+#endif 
 /* end: sixtracklib/common/be_beambeam/track_beambeam.h */
