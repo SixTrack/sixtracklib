@@ -33,6 +33,8 @@ namespace SIXTRL_NAMESPACE
         m_default_compile_options(),
         m_cl_context(),
         m_cl_queue(),
+        m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
+        m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } )
     {
         using _this_t = ClContextBase;
@@ -43,6 +45,8 @@ namespace SIXTRL_NAMESPACE
 
         SIXTRL_ASSERT( this->m_available_nodes_id.size() ==
                        this->m_available_nodes_info.size() );
+
+        this->doInitDefaultProgramsBaseImpl();
     }
 
     ClContextBase::ClContextBase( ClContextBase::size_type const node_index ) :
@@ -57,6 +61,8 @@ namespace SIXTRL_NAMESPACE
         m_default_compile_options(),
         m_cl_context(),
         m_cl_queue(),
+        m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
+        m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } )
     {
         using _this_t = ClContextBase;
@@ -71,9 +77,11 @@ namespace SIXTRL_NAMESPACE
         SIXTRL_ASSERT( this->m_available_devices.size() ==
                        this->m_available_nodes_id.size() );
 
+        this->doInitDefaultProgramsBaseImpl();
+
         if( node_index < this->numAvailableNodes() )
         {
-            this->selectNode( node_index );
+            this->doSelectNodeBaseImpl( node_index );
         }
     }
 
@@ -89,6 +97,8 @@ namespace SIXTRL_NAMESPACE
         m_default_compile_options(),
         m_cl_context(),
         m_cl_queue(),
+        m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
+        m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } )
     {
         using _this_t = ClContextBase;
@@ -103,13 +113,15 @@ namespace SIXTRL_NAMESPACE
         SIXTRL_ASSERT( this->m_available_devices.size() ==
                        this->m_available_nodes_id.size() );
 
+        this->doInitDefaultProgramsBaseImpl();
+
         size_type const node_index = this->findAvailableNodesIndex(
             NS(ComputeNodeId_get_platform_id)( &node_id ),
             NS(ComputeNodeId_get_device_id)( &node_id ) );
 
         if( node_index < this->numAvailableNodes() )
         {
-            this->selectNode( node_id );
+            this->doSelectNodeBaseImpl( node_id );
         }
     }
 
@@ -125,6 +137,8 @@ namespace SIXTRL_NAMESPACE
         m_default_compile_options(),
         m_cl_context(),
         m_cl_queue(),
+        m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
+        m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } )
     {
         using _this_t = ClContextBase;
@@ -139,12 +153,14 @@ namespace SIXTRL_NAMESPACE
         SIXTRL_ASSERT( this->m_available_devices.size() ==
                        this->m_available_nodes_id.size() );
 
+        this->doInitDefaultProgramsBaseImpl();
+
         size_type const node_index =
             this->findAvailableNodesIndex( node_id_str );
 
         if( node_index < this->numAvailableNodes() )
         {
-            this->selectNode( node_id_str );
+            this->doSelectNodeBaseImpl( node_id_str );
         }
     }
 
@@ -162,6 +178,8 @@ namespace SIXTRL_NAMESPACE
         m_default_compile_options(),
         m_cl_context(),
         m_cl_queue(),
+        m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
+        m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } )
     {
         using _this_t = ClContextBase;
@@ -176,12 +194,14 @@ namespace SIXTRL_NAMESPACE
         SIXTRL_ASSERT( this->m_available_devices.size() ==
                        this->m_available_nodes_id.size() );
 
+        this->doInitDefaultProgramsBaseImpl();
+
         size_type const node_index =
             this->findAvailableNodesIndex( platform_idx, device_idx );
 
         if( node_index < this->numAvailableNodes() )
         {
-            this->selectNode( node_index );
+            this->doSelectNodeBaseImpl( node_index );
         }
     }
 
@@ -365,16 +385,30 @@ namespace SIXTRL_NAMESPACE
         device_id_t const device_idx =
             NS(ComputeNodeId_get_device_id)( &node_id );
 
-        return this->selectNode( this->findAvailableNodesIndex(
+        return this->doSelectNode( this->findAvailableNodesIndex(
                                      platform_idx, device_idx ) );
+    }
+
+    bool ClContextBase::selectNode(
+         ClContextBase::platform_id_t const platform_idx,
+         ClContextBase::device_id_t   const device_idx )
+    {
+        return this->doSelectNode(
+            this->findAvailableNodesIndex( platform_idx, device_idx ) );
     }
 
     bool ClContextBase::selectNode( char const* node_id_str )
     {
-        return this->selectNode( this->findAvailableNodesIndex( node_id_str ) );
+        return this->doSelectNode(
+            this->findAvailableNodesIndex( node_id_str ) );
     }
 
-    bool ClContextBase::selectNode( size_type const index )
+    bool ClContextBase::doSelectNode( size_type const node_index )
+    {
+        return this->doSelectNodeBaseImpl( node_index );
+    }
+
+    bool ClContextBase::doSelectNodeBaseImpl( size_type const index )
     {
         bool success = false;
 
@@ -417,7 +451,7 @@ namespace SIXTRL_NAMESPACE
 
                     SIXTRL_ASSERT( this->m_cl_programs.size() <= num_programs );
 
-                    success &= this->doCompileProgram(
+                    success &= this->doCompileProgramBaseImpl(
                         this->m_cl_programs.back(), program_data );
                 }
             }
@@ -965,7 +999,45 @@ namespace SIXTRL_NAMESPACE
         return this->numAvailableNodes();
     }
 
+    bool ClContextBase::doInitDefaultPrograms()
+    {
+        return this->doInitDefaultProgramsBaseImpl();
+    }
+
+    bool ClContextBase::doInitDefaultProgramsBaseImpl()
+    {
+        bool success = false;
+
+        std::string path_to_remap_kernel_program( NS(PATH_TO_BASE_DIR) );
+        path_to_remap_kernel_program += "sixtracklib/opencl/";
+        path_to_remap_kernel_program += "managed_buffer_remap_kernel.cl";
+
+        std::string remap_program_compile_options = "-D_GPUCODE=1";
+        remap_program_compile_options += " -D__NAMESPACE=st_";
+        remap_program_compile_options += " -DSIXTRL_DATAPTR_DEC=__global";
+        remap_program_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
+        remap_program_compile_options += " -DSIXTRL_BUFFER_OBJ_ARGPTR_DEC=__global";
+        remap_program_compile_options += " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global";
+
+        program_id_t const remap_program_id = this->addProgramFile(
+            path_to_remap_kernel_program, remap_program_compile_options );
+
+        if( remap_program_id >= program_id{ 0 } )
+        {
+            this->m_remap_prorgam_id = remap_program_id;
+            success = true;
+        }
+
+        return success;
+    }
+
     bool ClContextBase::doCompileProgram(
+         cl::Program& cl_program, ClContextBase::program_data_t& program_data )
+    {
+        return this->doCompileProgramBaseImpl( cl_program, program_data );
+    }
+
+    bool ClContextBase::doCompileProgramBaseImpl(
          cl::Program& cl_program, ClContextBase::program_data_t& program_data )
     {
         bool success = false;

@@ -113,6 +113,9 @@ namespace SIXTRL_NAMESPACE
         node_info_t const*  ptrSelectedNodeInfo()   const SIXTRL_NOEXCEPT;
 
         bool selectNode( node_id_t const node_id );
+        bool selectNode( platform_id_t const platform_idx,
+                         device_id_t const device_idx );
+
         bool selectNode( char const* node_id_str );
         bool selectNode( size_type const index );
 
@@ -258,8 +261,12 @@ namespace SIXTRL_NAMESPACE
             size_type     m_local_mem_size;
         };
 
-        bool doCompileProgram(
+        virtual bool doInitDefaultPrograms();
+
+        virtual bool doCompileProgram(
             cl::Program& cl_program, program_data_t& program_data );
+
+        virtual bool doSelectNode( size_type node_index );
 
         size_type findAvailableNodesIndex( platform_id_t const platform_index,
             device_id_t const device_index ) const SIXTRL_NOEXCEPT;
@@ -276,6 +283,10 @@ namespace SIXTRL_NAMESPACE
             std::vector< cl::Device  >&  available_devices,
             const char *const filter_str = nullptr );
 
+        bool doInitDefaultProgramsBaseImpl();
+        bool doCompileProgramBaseImpl( size_type const node_index );
+        bool doSelectNodeBaseImpl( size_type const node_index );
+
         std::vector< cl::Program >      m_cl_programs;
         std::vector< cl::Kernel  >      m_cl_kernels;
         std::vector< cl::Buffer  >      m_cl_buffers;
@@ -291,6 +302,7 @@ namespace SIXTRL_NAMESPACE
         cl::Context                     m_cl_context;
         cl::CommandQueue                m_cl_queue;
 
+        program_id_t                    m_remap_program_id;
         kernel_id_t                     m_remap_kernel_id;
         int64_t                         m_selected_node_index;
     };
