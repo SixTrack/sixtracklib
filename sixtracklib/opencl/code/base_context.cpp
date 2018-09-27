@@ -79,9 +79,10 @@ namespace SIXTRL_NAMESPACE
 
         this->doInitDefaultProgramsBaseImpl();
 
-        if( node_index < this->numAvailableNodes() )
+        if( ( node_index < this->numAvailableNodes() ) &&
+            ( this->doSelectNodeBaseImpl( node_index ) ) )
         {
-            this->doSelectNodeBaseImpl( node_index );
+            this->doInitDefaultKernels();
         }
     }
 
@@ -119,9 +120,10 @@ namespace SIXTRL_NAMESPACE
             NS(ComputeNodeId_get_platform_id)( &node_id ),
             NS(ComputeNodeId_get_device_id)( &node_id ) );
 
-        if( node_index < this->numAvailableNodes() )
+        if( ( node_index < this->numAvailableNodes() ) && &&
+            ( this->doSelectNodeBaseImpl( node_index ) ) )
         {
-            this->doSelectNodeBaseImpl( node_id );
+            this->doInitDefaultKernels();
         }
     }
 
@@ -158,9 +160,10 @@ namespace SIXTRL_NAMESPACE
         size_type const node_index =
             this->findAvailableNodesIndex( node_id_str );
 
-        if( node_index < this->numAvailableNodes() )
+        if( ( node_index < this->numAvailableNodes() ) &&
+            ( this->doSelectNodeBaseImpl( node_index ) ) )
         {
-            this->doSelectNodeBaseImpl( node_id_str );
+            this->doInitDefaultKernels();
         }
     }
 
@@ -199,9 +202,10 @@ namespace SIXTRL_NAMESPACE
         size_type const node_index =
             this->findAvailableNodesIndex( platform_idx, device_idx );
 
-        if( node_index < this->numAvailableNodes() )
+        if( ( node_index < this->numAvailableNodes() ) &&
+            ( this->doSelectNodeBaseImpl( node_index ) ) )
         {
-            this->doSelectNodeBaseImpl( node_index );
+            this->doInitDefaultKernels();
         }
     }
 
@@ -987,6 +991,17 @@ namespace SIXTRL_NAMESPACE
         return &this->m_cl_context;
     }
 
+    ClContextBase::kernel_data_list_t const& kernelData() const SIXTRL_NOEXCEPT
+    {
+        return this->m_kernel_data;
+    }
+
+    ClContextBase::program_data_list_t const&
+    ClContextBase::programData() const SIXTRL_NOEXCEPT
+    {
+        return this->m_program_data;
+    }
+
     ClContextBase::size_type
     ClContextBase::findAvailableNodesIndex(
         ClContextBase::platform_id_t const platform_index,
@@ -1061,11 +1076,13 @@ namespace SIXTRL_NAMESPACE
         remap_program_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
         remap_program_compile_options += " -DSIXTRL_BUFFER_OBJ_ARGPTR_DEC=__global";
         remap_program_compile_options += " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global";
+        remap_program_compile_options += " -I";
+        remap_program_compile_options += NS(PATH_TO_BASE_DIR);
 
         program_id_t const remap_program_id = this->addProgramFile(
             path_to_remap_kernel_program, remap_program_compile_options );
 
-        if( remap_program_id >= program_id{ 0 } )
+        if( remap_program_id >= program_id_t{ 0 } )
         {
             this->m_remap_prorgam_id = remap_program_id;
             success = true;

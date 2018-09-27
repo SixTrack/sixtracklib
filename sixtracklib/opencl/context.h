@@ -28,6 +28,15 @@ namespace SIXTRL_NAMESPACE
         using _base_context_t   = ClContextBase;
         using  num_turns_t      = SIXTRL_INT64_T;
 
+        /*
+        using  kernel_id_t      = _base_context_t::kernel_id_t;
+        using  program_id_t     = _base_context_t::program_id_t;
+        using  size_type        = _base_context_t::size_type;
+        using  node_id_t        = _base_context_t::node_id_t;
+        using  platform_id_t    = _base_context_t::platform_id_t;
+        using  device_id_t      = _base_context_t::device_id_t;
+        */
+
         public:
 
         ClContext();
@@ -62,11 +71,13 @@ namespace SIXTRL_NAMESPACE
 
         protected:
 
-        virtual bool doInitDefaultPrograms();
+        virtual bool doInitDefaultPrograms() override;
+        virtual bool doInitDefaultKernels()  override;
 
         private:
 
         bool doInitDefaultProgramsPrivImpl();
+        bool doInitDefaultKernelsPrivImpl();
 
         program_id_t    m_tracking_program_id;
         kernel_id_t     m_tracking_kernel_id;
@@ -101,9 +112,6 @@ SIXTRL_HOST_FN void NS(ClContext_delete)( NS(ClContext)* SIXTRL_RESTRICT ctx );
 SIXTRL_HOST_FN bool NS(ClContext_has_tracking_kernel)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN bool NS(ClContext_has_tracking_kernel)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx );
-
 SIXTRL_HOST_FN int NS(ClContext_get_tracking_kernel_id)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
@@ -113,20 +121,24 @@ SIXTRL_HOST_FN bool NS(ClContext_set_tracking_kernel_id)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_HOST_FN int NS(ClContext_track)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
     NS(ClArgument)* SIXTRL_RESTRICT particles_arg,
     NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg );
 
 SIXTRL_HOST_FN int NS(ClContext_track_num_turns)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
     NS(ClArgument)* SIXTRL_RESTRICT particles_arg,
     NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg,
     NS(context_num_turns_t) const num_turns );
 
 SIXTRL_HOST_FN int NS(ClContext_execute_tracking_kernel)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
     int const tracking_kernel_id,
     NS(ClArgument)* SIXTRL_RESTRICT particles_arg,
     NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg );
 
 SIXTRL_HOST_FN int NS(ClContext_execute_tracking_kernel_num_turns)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
     int const tracking_kernel_id,
     NS(ClArgument)* SIXTRL_RESTRICT particles_arg,
     NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg,

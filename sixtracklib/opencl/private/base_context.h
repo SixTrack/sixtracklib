@@ -261,6 +261,9 @@ namespace SIXTRL_NAMESPACE
             size_type     m_local_mem_size;
         };
 
+        using program_data_list_t = std::vector< prorgam_data_t >;
+        using kernel_data_list_t  = std::vector< kernel_data_t >;
+
         virtual bool doInitDefaultPrograms();
         virtual bool doInitDefaultKernels();
 
@@ -269,12 +272,14 @@ namespace SIXTRL_NAMESPACE
 
         virtual bool doSelectNode( size_type node_index );
 
+        kernel_data_list_t  const& kernelData()  const SIXTRL_NOEXCEPT;
+        program_data_list_t const& programData() const SIXTRL_NOEXCEPT;
+
         size_type findAvailableNodesIndex( platform_id_t const platform_index,
             device_id_t const device_index ) const SIXTRL_NOEXCEPT;
 
         size_type findAvailableNodesIndex( char const* node_id_str
             ) const SIXTRL_NOEXCEPT;
-
 
         private:
 

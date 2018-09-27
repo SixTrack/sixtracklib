@@ -190,6 +190,16 @@ namespace SIXTRL_NAMESPACE
         return ( 0 == this->doReadAndRemapCObjBuffer( buffer ) );
     }
 
+    bool ClArgument::isCObjectBufferArgument() const SIXTRL_NOEXCEPT
+    {
+        return ( this->m_ptr_cobj_buffer != nullptr );
+    }
+
+    Buffer* ClArgument::ptrCObjectBuffer() const SIXTRL_NOEXCEPT
+    {
+        return this->m_ptr_cobj_buffer;
+    }
+
 
     ClArgument::context_base_t*
     ClArgument::context() SIXTRL_NOEXCEPT
@@ -216,6 +226,26 @@ namespace SIXTRL_NAMESPACE
         }
 
         return success;
+    }
+
+    cl::Buffer&  ClArgument::openClBuffer() SIXTRL_NOEXCEPT
+    {
+        return this->m_cl_buffer;
+    }
+
+    cl::Buffer const& ClArgument::openClBuffer() const SIXTRL_NOEXCEPT
+    {
+        return this->m_cl_buffer;
+    }
+
+    cl::Buffer const& ClArgument::internalSuccessFlagBuffer() const SIXTRL_NOEXCEPT
+    {
+        return this->m_cl_success_flag;
+    }
+
+    cl::Buffer& ClArgument::internalSuccessFlagBuffer() SIXTRL_NOEXCEPT
+    {
+        return this->m_cl_success_flag;
     }
 
     int ClArgument::doWriteAndRemapCObjBuffer( NS(Buffer) const& buffer )
@@ -332,6 +362,11 @@ namespace SIXTRL_NAMESPACE
                 {
                     ptr_queue->flush();
                 }
+
+                if( success == 0 )
+                {
+                    this->doSetCObjBuffer( buffer );
+                }
             }
         }
 
@@ -363,9 +398,20 @@ namespace SIXTRL_NAMESPACE
             {
                 success = NS(Buffer_remap)( &buffer );
             }
+
+            if( success == 0 )
+            {
+                this->doSetCObjBuffer( buffer );
+            }
         }
 
         return success;
+    }
+
+    void ClArgument::doSetCObjBuffer( Buffer& buffer ) NOEXCEPT
+    {
+        this->m_ptr_cobj_buffer = &buffer;
+        return;
     }
 }
 
