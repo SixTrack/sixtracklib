@@ -99,6 +99,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
 
     int N_slices = (int)(bb6ddata->N_slices);
 
+    /*
     // Check data transfer
     printf("sphi=%e\n",(bb6ddata->parboost).sphi);
     printf("calpha=%e\n",(bb6ddata->parboost).calpha);
@@ -112,14 +113,32 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     printf("y_slices_star[1]=%e\n",y_slices_star[1]);         
     printf("sigma_slices_star[0]=%e\n",sigma_slices_star[0]); 
     printf("sigma_slices_star[1]=%e\n",sigma_slices_star[1]); 
-
-
-
-
-
-
+    */
 
     SIXTRL_REAL_T x = NS(Particles_get_x_value)( particles, particle_index );
+    SIXTRL_REAL_T px = NS(Particles_get_px_value)( particles, particle_index );
+    SIXTRL_REAL_T y = NS(Particles_get_y_value)( particles, particle_index );
+    SIXTRL_REAL_T py = NS(Particles_get_py_value)( particles, particle_index );
+    SIXTRL_REAL_T zeta = NS(Particles_get_zeta_value)( particles, particle_index );
+    SIXTRL_REAL_T delta = NS(Particles_get_delta_value)( particles, particle_index );
+
+
+
+    // Change reference frame
+    double x_star =     x     - bb6ddata->x_CO    - bb6ddata->delta_x;
+    double px_star =    px    - bb6ddata->px_CO;
+    double y_star =     y     - bb6ddata->y_CO    - bb6ddata->delta_y;
+    double py_star =    py    - bb6ddata->py_CO;
+    double sigma_star = zeta  - bb6ddata->sigma_CO;
+    double delta_star = delta - bb6ddata->delta_CO;
+
+    // Boost coordinates of the weak beam
+    BB6D_boost(&(bb6ddata->parboost), &x_star, &px_star, &y_star, &py_star, 
+                &sigma_star, &delta_star);
+
+
+
+
     x += ( SIXTRL_REAL_T )0.0 + 0.*data[0];
     printf("BB6D data[0]%.2e\n", data[0]);
     NS(Particles_set_x_value)( particles, particle_index, x );
@@ -130,6 +149,12 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     (void) x_slices_star;
     (void) y_slices_star;   
     (void) sigma_slices_star;
+    (void) x_star;
+    (void) px_star;
+    (void) y_star;
+    (void) py_star;
+    (void) sigma_star;
+    (void) delta_star;
     // End Gianni's part
 
     return ret;
