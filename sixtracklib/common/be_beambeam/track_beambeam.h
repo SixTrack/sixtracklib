@@ -209,6 +209,11 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
 
     }
 
+    // Inverse boost on the coordinates of the weak beam
+    BB6D_inv_boost(&(bb6ddata->parboost), &x_star, &px_star, &y_star, &py_star, 
+                &sigma_star, &delta_star);
+                
+
 
 
 
