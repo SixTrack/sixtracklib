@@ -122,6 +122,9 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     SIXTRL_REAL_T zeta = NS(Particles_get_zeta_value)( particles, particle_index );
     SIXTRL_REAL_T delta = NS(Particles_get_delta_value)( particles, particle_index );
 
+    SIXTRL_REAL_T q0 = NS(Particles_get_q0_value)( particles, particle_index );
+    SIXTRL_REAL_T P0 = NS(Particles_get_P0_value)( particles, particle_index );
+
 
 
     // Change reference frame
@@ -135,6 +138,76 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     // Boost coordinates of the weak beam
     BB6D_boost(&(bb6ddata->parboost), &x_star, &px_star, &y_star, &py_star, 
                 &sigma_star, &delta_star);
+
+
+    // Synchro beam
+    for (i_slice=0; i_slice<N_slices; i_slice++)
+    {
+        double sigma_slice_star = sigma_slices_star[i_slice];
+        double x_slice_star = x_slices_star[i_slice];
+        double y_slice_star = y_slices_star[i_slice];
+        
+        //Compute force scaling factor
+        double Ksl = N_part_per_slice[i_slice]*bb6ddata->q_part*q0/(P0*C_LIGHT);
+
+        //Identify the Collision Point (CP)
+        double S = 0.5*(sigma_star - sigma_slice_star);
+        
+        // Propagate sigma matrix
+        double Sig_11_hat_star, Sig_33_hat_star, costheta, sintheta;
+        double dS_Sig_11_hat_star, dS_Sig_33_hat_star, dS_costheta, dS_sintheta;
+        
+        // Get strong beam shape at the CP
+        BB6D_propagate_Sigma_matrix(&(bb6ddata->Sigmas_0_star),
+            S, bb6ddata->threshold_singular, 1,
+            &Sig_11_hat_star, &Sig_33_hat_star, 
+            &costheta, &sintheta,
+            &dS_Sig_11_hat_star, &dS_Sig_33_hat_star, 
+            &dS_costheta, &dS_sintheta);
+            
+        // Evaluate transverse coordinates of the weake baem w.r.t. the strong beam centroid
+        double x_bar_star = x_star + px_star*S - x_slice_star;
+        double y_bar_star = y_star + py_star*S - y_slice_star;
+        
+        // Move to the uncoupled reference frame
+        double x_bar_hat_star = x_bar_star*costheta +y_bar_star*sintheta;
+        double y_bar_hat_star = -x_bar_star*sintheta +y_bar_star*costheta;
+        
+        // Compute derivatives of the transformation
+        double dS_x_bar_hat_star = x_bar_star*dS_costheta +y_bar_star*dS_sintheta;
+        double dS_y_bar_hat_star = -x_bar_star*dS_sintheta +y_bar_star*dS_costheta;
+        
+        // Get transverse fieds
+        double Ex, Ey, Gx, Gy;
+        get_Ex_Ey_Gx_Gy_gauss(x_bar_hat_star, y_bar_hat_star, 
+            sqrt(Sig_11_hat_star), sqrt(Sig_33_hat_star), bb6ddata->min_sigma_diff,
+            &Ex, &Ey, &Gx, &Gy);
+            
+        // Compute kicks
+        double Fx_hat_star = Ksl*Ex;
+        double Fy_hat_star = Ksl*Ey;
+        double Gx_hat_star = Ksl*Gx;
+        double Gy_hat_star = Ksl*Gy;
+        
+        // Move kisks to coupled reference frame
+        double Fx_star = Fx_hat_star*costheta - Fy_hat_star*sintheta;
+        double Fy_star = Fx_hat_star*sintheta + Fy_hat_star*costheta;
+        
+        // Compute longitudinal kick
+        double Fz_star = 0.5*(Fx_hat_star*dS_x_bar_hat_star  + Fy_hat_star*dS_y_bar_hat_star+
+                       Gx_hat_star*dS_Sig_11_hat_star + Gy_hat_star*dS_Sig_33_hat_star);
+                       
+        // Apply the kicks (Hirata's synchro-beam)
+        delta_star = delta_star + Fz_star+0.5*(
+                    Fx_star*(px_star+0.5*Fx_star)+
+                    Fy_star*(py_star+0.5*Fy_star));
+        x_star = x_star - S*Fx_star;
+        px_star = px_star + Fx_star;
+        y_star = y_star - S*Fy_star;
+        py_star = py_star + Fy_star;
+        
+
+    }
 
 
 
