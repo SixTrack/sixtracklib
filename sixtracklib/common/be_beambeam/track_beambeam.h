@@ -219,26 +219,17 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     px =    px_star    + bb6ddata->px_CO                       - bb6ddata->Dpx_sub;
     y =     y_star     + bb6ddata->y_CO   + bb6ddata->delta_y  - bb6ddata->Dy_sub;
     py =    py_star    + bb6ddata->py_CO                       - bb6ddata->Dpy_sub;
-    zeta = sigma_star + bb6ddata->sigma_CO                    - bb6ddata->Dsigma_sub;
+    zeta =  sigma_star + bb6ddata->sigma_CO                    - bb6ddata->Dsigma_sub;
     delta = delta_star + bb6ddata->delta_CO                    - bb6ddata->Ddelta_sub;
 
 
-    x += ( SIXTRL_REAL_T )0.0 + 0.*data[0];
-    printf("BB6D data[0]%.2e\n", data[0]);
     NS(Particles_set_x_value)( particles, particle_index, x );
+    NS(Particles_set_px_value)( particles, particle_index, px );
+    NS(Particles_set_y_value)( particles, particle_index, y );
+    NS(Particles_set_py_value)( particles, particle_index, py );
+    NS(Particles_set_zeta_value)( particles, particle_index, zeta );
+    NS(Particles_set_delta_value)( particles, particle_index,delta );
 
-    // Debug
-    (void) N_slices;
-    (void) N_part_per_slice;
-    (void) x_slices_star;
-    (void) y_slices_star;   
-    (void) sigma_slices_star;
-    (void) x_star;
-    (void) px_star;
-    (void) y_star;
-    (void) py_star;
-    (void) sigma_star;
-    (void) delta_star;
     // End Gianni's part
 
     return ret;
