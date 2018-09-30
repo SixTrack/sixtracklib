@@ -214,7 +214,13 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
                 &sigma_star, &delta_star);
                 
 
-
+    // Go back to original reference frame and remove dipolar effect
+    x =     x_star     + bb6ddata->x_CO   + bb6ddata->delta_x  - bb6ddata->Dx_sub;
+    px =    px_star    + bb6ddata->px_CO                       - bb6ddata->Dpx_sub;
+    y =     y_star     + bb6ddata->y_CO   + bb6ddata->delta_y  - bb6ddata->Dy_sub;
+    py =    py_star    + bb6ddata->py_CO                       - bb6ddata->Dpy_sub;
+    zeta = sigma_star + bb6ddata->sigma_CO                    - bb6ddata->Dsigma_sub;
+    delta = delta_star + bb6ddata->delta_CO                    - bb6ddata->Ddelta_sub;
 
 
     x += ( SIXTRL_REAL_T )0.0 + 0.*data[0];
