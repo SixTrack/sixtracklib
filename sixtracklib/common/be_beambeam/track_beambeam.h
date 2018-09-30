@@ -84,7 +84,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     (void) data_size; // just to avoid error: unused variable
     bb_data_ptr_t data = NS(BeamBeam6D_get_const_data)( bb );
 
-    
+    int i_slice;
 
     // Start Gianni's part
     BB6D_data* bb6ddata = (BB6D_data*) data;
@@ -123,9 +123,9 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     SIXTRL_REAL_T delta = NS(Particles_get_delta_value)( particles, particle_index );
 
     SIXTRL_REAL_T q0 = NS(Particles_get_q0_value)( particles, particle_index );
-    SIXTRL_REAL_T P0 = NS(Particles_get_P0_value)( particles, particle_index );
+    SIXTRL_REAL_T P0 = NS(Particles_get_p0c_value)( particles, particle_index ); // eV
 
-
+    P0 = P0/C_LIGHT*QELEM;
 
     // Change reference frame
     double x_star =     x     - bb6ddata->x_CO    - bb6ddata->delta_x;
