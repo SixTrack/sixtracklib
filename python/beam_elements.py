@@ -94,6 +94,12 @@ class SRotation( CObject ):
 
 class BeamBeam4D( CObject ):
     _typeid = 8
+    size     = CField( 0, 'uint64', default=0,  alignment=8 )
+    data     = CField( 1, 'real',   default=0.0,
+                      length='size', pointer=True, alignment=8 )
+                      
+    def __init__(self, data, **kwargs):
+        CObject.__init__( self, size=len(data), data=data, **kwargs)
 
 class BeamBeam6D( CObject ):
     _typeid = 9

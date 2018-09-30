@@ -178,6 +178,7 @@ NS(Track_particles_beam_element_objs)(
     #include "sixtracklib/common/beam_elements.h"
     #include "sixtracklib/common/impl/buffer_type.h"
     #include "sixtracklib/common/be_beambeam/be_beambeam6d.h"
+    #include "sixtracklib/common/be_beambeam/be_beambeam4d.h"
     #include "sixtracklib/common/be_beambeam/track_beambeam.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -555,6 +556,16 @@ NS(Track_particle_beam_element_obj)(
             break;
         }
         
+        case NS(OBJECT_TYPE_BEAM_BEAM_4D):
+        {
+            typedef NS(BeamBeam4D)   belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_beam_beam_4d)( p, index, belem );
+            break;
+        }
+        
         case NS(OBJECT_TYPE_BEAM_BEAM_6D):
         {
             typedef NS(BeamBeam6D)   belem_t;
@@ -703,6 +714,19 @@ NS(Track_particle_subset_beam_element_obj)(
                 ret |= NS(Track_particle_srotation)( p, index, belem );
             }
 
+            break;
+        }
+
+        case NS(OBJECT_TYPE_BEAM_BEAM_4D):
+        {
+            typedef NS(BeamBeam4D)   belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            for( ; index < index_end ; ++index )
+            {
+                ret |= NS(Track_particle_beam_beam_4d)( p, index, belem );
+            }
             break;
         }
 

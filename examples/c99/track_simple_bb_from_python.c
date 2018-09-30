@@ -6,6 +6,12 @@
 #include "sixtracklib/testlib.h"
 #include "sixtracklib/sixtracklib.h"
 
+//~ #define PARTFILE "python/bbsimple_st_dump.bin"
+//~ #define ELEMFILE "python/bbsimple_st_input.bin"
+
+#define PARTFILE "python/beambeam_st_dump.bin"
+#define ELEMFILE "python/beambeam_st_input.bin"
+
 int main( int argc, char* argv[] )
 {
     typedef st_buffer_size_t buf_size_t;
@@ -15,11 +21,11 @@ int main( int argc, char* argv[] )
     
     memset( path2particle_file, (int)'\0', 256 );
     strncpy( path2particle_file, st_PATH_TO_BASE_DIR, 256 );
-    strcat( path2particle_file, "python/bbsimple_st_dump.bin" );
+    strcat( path2particle_file,  PARTFILE);
 
     memset( path2beam_elements_file, (int)'\0', 256 );
     strncpy( path2beam_elements_file, st_PATH_TO_BASE_DIR, 256 );
-    strcat( path2beam_elements_file, "python/bbsimple_st_input.bin" );
+    strcat( path2beam_elements_file, ELEMFILE );
 
     st_Buffer* lhc_particle_dump = st_Buffer_new_from_file( path2particle_file );
 
@@ -27,7 +33,7 @@ int main( int argc, char* argv[] )
 
     st_Buffer* pb = st_Buffer_new( ( buf_size_t )( 1u << 24u ) );
 
-    buf_size_t NUM_PARTICLES                = 20000;
+    buf_size_t NUM_PARTICLES                = 3;
     buf_size_t NUM_TURNS                    = 20;
 
     st_Particles*       particles           = SIXTRL_NULLPTR;

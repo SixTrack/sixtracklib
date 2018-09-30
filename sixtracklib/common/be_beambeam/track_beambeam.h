@@ -63,7 +63,8 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_4d)(
     (void) data_size; // just to avoid error: unused variable
 
     SIXTRL_REAL_T x = NS(Particles_get_x_value)( particles, particle_index );
-    x += ( SIXTRL_REAL_T )0.0 + data[0];
+    x += ( SIXTRL_REAL_T )0.0 + 0.*data[0];
+    printf("BB4D data[0]%.2e\n", data[0]);
 
     NS(Particles_set_x_value)( particles, particle_index, x );
 
@@ -84,8 +85,8 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     bb_data_ptr_t data = NS(BeamBeam6D_get_const_data)( bb );
 
     SIXTRL_REAL_T x = NS(Particles_get_x_value)( particles, particle_index );
-    x += ( SIXTRL_REAL_T )1.0 + 0.*data[0];
-    printf("I just added 1!\n");
+    x += ( SIXTRL_REAL_T )0.0 + 0.*data[0];
+    printf("BB6D data[0]%.2e\n", data[0]);
     NS(Particles_set_x_value)( particles, particle_index, x );
 
     return ret;
