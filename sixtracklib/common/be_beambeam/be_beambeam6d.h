@@ -117,6 +117,45 @@ SIXTRL_INLINE SIXTRL_UINT64_T NS(BeamBeam6D_get_data_size)(
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
+
+// GIANNI: to be moved around
+typedef struct{
+    double sphi;
+    double cphi;
+    double tphi;
+    double salpha;
+    double calpha;
+}BB6D_boost_data;
+
+typedef struct{
+    double Sig_11_0;
+    double Sig_12_0;
+    double Sig_13_0;
+    double Sig_14_0;
+    double Sig_22_0;
+    double Sig_23_0;
+    double Sig_24_0;
+    double Sig_33_0;
+    double Sig_34_0;
+    double Sig_44_0;
+}BB6D_Sigmas;
+
+typedef struct{
+    double q_part;
+    BB6D_boost_data parboost;
+    BB6D_Sigmas Sigmas_0_star;
+    double min_sigma_diff;
+    double threshold_singular;
+    long int N_slices;
+    double* N_part_per_slice;
+    double* x_slices_star;
+    double* y_slices_star;
+    double* sigma_slices_star;
+}BB6D_data;
+
+
+
+
 #endif /* SIXTRL_COMMON_BE_BEAMBEAM_BE_BEAMBEAM6D_H__ */
 
 /* sixtracklib/common/be_beambeam/be_beambeam6d.h */

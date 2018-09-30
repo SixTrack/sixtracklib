@@ -84,10 +84,53 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     (void) data_size; // just to avoid error: unused variable
     bb_data_ptr_t data = NS(BeamBeam6D_get_const_data)( bb );
 
+    
+
+    // Start Gianni's part
+    BB6D_data* bb6ddata = (BB6D_data*) data;
+
+    // Get pointers
+    double* N_part_per_slice = (double*)(((uint64_t*) (&(bb6ddata->N_part_per_slice))) + ((uint64_t) bb6ddata->N_part_per_slice) + 1);
+    double* x_slices_star = (double*)(((uint64_t*) (&(bb6ddata->x_slices_star))) + ((uint64_t) bb6ddata->x_slices_star) + 1);
+    double* y_slices_star = (double*)(((uint64_t*) (&(bb6ddata->y_slices_star))) + ((uint64_t) bb6ddata->y_slices_star) + 1);
+    double* sigma_slices_star = (double*)(((uint64_t*) (&(bb6ddata->sigma_slices_star))) + ((uint64_t) bb6ddata->sigma_slices_star) + 1);
+    
+
+
+    int N_slices = (int)(bb6ddata->N_slices);
+
+    // Check data transfer
+    printf("sphi=%e\n",(bb6ddata->parboost).sphi);
+    printf("calpha=%e\n",(bb6ddata->parboost).calpha);
+    printf("S33=%e\n",(bb6ddata->Sigmas_0_star).Sig_33_0);
+    printf("N_slices=%d\n",N_slices);
+    printf("N_part_per_slice[0]=%e\n",N_part_per_slice[0]); 
+    printf("N_part_per_slice[1]=%e\n",N_part_per_slice[1]); 
+    printf("x_slices_star[0]=%e\n",x_slices_star[0]); 
+    printf("x_slices_star[1]=%e\n",x_slices_star[1]); 
+    printf("y_slices_star[0]=%e\n",y_slices_star[0]); 
+    printf("y_slices_star[1]=%e\n",y_slices_star[1]);         
+    printf("sigma_slices_star[0]=%e\n",sigma_slices_star[0]); 
+    printf("sigma_slices_star[1]=%e\n",sigma_slices_star[1]); 
+
+
+
+
+
+
+
     SIXTRL_REAL_T x = NS(Particles_get_x_value)( particles, particle_index );
     x += ( SIXTRL_REAL_T )0.0 + 0.*data[0];
     printf("BB6D data[0]%.2e\n", data[0]);
     NS(Particles_set_x_value)( particles, particle_index, x );
+
+    // Debug
+    (void) N_slices;
+    (void) N_part_per_slice;
+    (void) x_slices_star;
+    (void) y_slices_star;   
+    (void) sigma_slices_star;
+    // End Gianni's part
 
     return ret;
 }
