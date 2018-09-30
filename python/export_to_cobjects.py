@@ -55,7 +55,7 @@ def sixinput2cobject( input_folder, outfile_name ):
             
         elif elem_type=='BeamBeam6D':
 
-            bb6data = pysixtrack.BB6Ddata.BB6D_init(
+            bb6ddata = pysixtrack.BB6Ddata.BB6D_init(
                 elem.q_part, elem.N_part_tot, elem.sigmaz, elem.N_slices, elem.min_sigma_diff, elem.threshold_singular,
                 elem.phi, elem.alpha,
                 elem.Sig_11_0, elem.Sig_12_0, elem.Sig_13_0,
@@ -66,8 +66,21 @@ def sixinput2cobject( input_folder, outfile_name ):
                 elem.Dx_sub, elem.Dpx_sub, elem.Dy_sub, elem.Dpy_sub, elem.Dsigma_sub, elem.Ddelta_sub,
                 elem.enabled)
 
+            print("sphi=%e"%bb6ddata.parboost.sphi);
+            print("calpha=%e"%bb6ddata.parboost.calpha);
+            print("S33=%e"%bb6ddata.Sigmas_0_star.Sig_33_0);
+            print("N_slices=%d"%bb6ddata.N_slices);
+            print("N_part_per_slice[0]=%e"%bb6ddata.N_part_per_slice[0]); 
+            print("N_part_per_slice[1]=%e"%bb6ddata.N_part_per_slice[1]); 
+            print("x_slices_star[0]=%e"%bb6ddata.x_slices_star[0]); 
+            print("x_slices_star[1]=%e"%bb6ddata.x_slices_star[1]); 
+            print("y_slices_star[0]=%e"%bb6ddata.y_slices_star[0]); 
+            print("y_slices_star[1]=%e"%bb6ddata.y_slices_star[1]);         
+            print("sigma_slices_star[0]=%e"%bb6ddata.sigma_slices_star[0]); 
+            print("sigma_slices_star[1]=%e"%bb6ddata.sigma_slices_star[1]); 
 
-            data = bb6data.tobuffer()
+
+            data = bb6ddata.tobuffer()
             e = BeamBeam6D( cbuffer=beam_elements, data=data)
             
         else:
