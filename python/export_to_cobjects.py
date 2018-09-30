@@ -54,7 +54,20 @@ def sixinput2cobject( input_folder, outfile_name ):
             e = BeamBeam4D( cbuffer=beam_elements, data=data)
             
         elif elem_type=='BeamBeam6D':
-            data = np.array([12., elem.phi, elem.sigmaz])
+
+            bb6data = pysixtrack.BB6Ddata.BB6D_init(
+                elem.q_part, elem.N_part_tot, elem.sigmaz, elem.N_slices, elem.min_sigma_diff, elem.threshold_singular,
+                elem.phi, elem.alpha,
+                elem.Sig_11_0, elem.Sig_12_0, elem.Sig_13_0,
+                elem.Sig_14_0, elem.Sig_22_0, elem.Sig_23_0,
+                elem.Sig_24_0, elem.Sig_33_0, elem.Sig_34_0, elem.Sig_44_0,
+                elem.delta_x, elem.delta_y,
+                elem.x_CO, elem.px_CO, elem.y_CO, elem.py_CO, elem.sigma_CO, elem.delta_CO,
+                elem.Dx_sub, elem.Dpx_sub, elem.Dy_sub, elem.Dpy_sub, elem.Dsigma_sub, elem.Ddelta_sub,
+                elem.enabled)
+
+
+            data = bb6data.tobuffer()
             e = BeamBeam6D( cbuffer=beam_elements, data=data)
             
         else:

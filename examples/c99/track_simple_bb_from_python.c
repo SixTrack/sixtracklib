@@ -6,11 +6,11 @@
 #include "sixtracklib/testlib.h"
 #include "sixtracklib/sixtracklib.h"
 
-//~ #define PARTFILE "python/bbsimple_st_dump.bin"
-//~ #define ELEMFILE "python/bbsimple_st_input.bin"
+#define PARTFILE "python/bbsimple_st_dump.bin"
+#define ELEMFILE "python/bbsimple_st_input.bin"
 
-#define PARTFILE "python/beambeam_st_dump.bin"
-#define ELEMFILE "python/beambeam_st_input.bin"
+//#define PARTFILE "python/beambeam_st_dump.bin"
+//#define ELEMFILE "python/beambeam_st_input.bin"
 
 int main( int argc, char* argv[] )
 {
@@ -33,8 +33,8 @@ int main( int argc, char* argv[] )
 
     st_Buffer* pb = st_Buffer_new( ( buf_size_t )( 1u << 24u ) );
 
-    buf_size_t NUM_PARTICLES                = 3;
-    buf_size_t NUM_TURNS                    = 20;
+    buf_size_t NUM_PARTICLES                = 2;
+    buf_size_t NUM_TURNS                    = 1.;
 
     st_Particles*       particles           = SIXTRL_NULLPTR;
     st_Particles const* input_particles     = SIXTRL_NULLPTR;

@@ -2,8 +2,8 @@ import pysixtrack
 
 import export_to_cobjects as etc
 
-# ~ pyst_example = 'bbsimple'
-pyst_example = 'beambeam'
+pyst_example = 'bbsimple'
+#pyst_example = 'beambeam'
 
 # Test on pysixtrack example
 pyst_path = pysixtrack.__file__
