@@ -147,6 +147,23 @@ typedef struct{
     double min_sigma_diff;
     double threshold_singular;
     long int N_slices;
+
+    double delta_x; 
+    double delta_y; 
+    double x_CO; 
+    double px_CO; 
+    double y_CO; 
+    double py_CO; 
+    double sigma_CO; 
+    double delta_CO; 
+    double Dx_sub; 
+    double Dpx_sub; 
+    double Dy_sub; 
+    double Dpy_sub; 
+    double Dsigma_sub; 
+    double Ddelta_sub;         
+    long int enabled;
+
     double* N_part_per_slice;
     double* x_slices_star;
     double* y_slices_star;
