@@ -15,13 +15,16 @@ from beam_elements import BeamBeam4D, BeamBeam6D
 from particles     import Particles as IOParticles
 
 def sixinput2cobject( input_folder, outfile_name ):
+    six = sixtracktools.SixInput(input_folder)
+    line, rest, iconv = six.expand_struct(convert=pysixtrack.element_types)
+    return line2cobject( line, outfile_name )
+
+
+def line2cobject( line, outfile_name ):
     deg2rad = pi / 180.0
 
     # -------------------------------------------------------------------------
     # Dump beam elements:
-
-    six = sixtracktools.SixInput(input_folder)
-    line, rest, iconv = six.expand_struct(convert=pysixtrack.element_types)
 
     beam_elements = CBuffer()
 
@@ -78,6 +81,7 @@ def sixinput2cobject( input_folder, outfile_name ):
             print("y_slices_star[1]=%e"%bb6ddata.y_slices_star[1]);         
             print("sigma_slices_star[0]=%e"%bb6ddata.sigma_slices_star[0]); 
             print("sigma_slices_star[1]=%e"%bb6ddata.sigma_slices_star[1]); 
+            print("y_CO=%e"%bb6ddata.y_CO);
 
 
             data = bb6ddata.tobuffer()
