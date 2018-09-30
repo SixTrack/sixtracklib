@@ -122,7 +122,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     SIXTRL_REAL_T zeta = NS(Particles_get_zeta_value)( particles, particle_index );
     SIXTRL_REAL_T delta = NS(Particles_get_delta_value)( particles, particle_index );
 
-    SIXTRL_REAL_T q0 = NS(Particles_get_q0_value)( particles, particle_index );
+    SIXTRL_REAL_T q0 = QELEM*NS(Particles_get_q0_value)( particles, particle_index );
     SIXTRL_REAL_T P0 = NS(Particles_get_p0c_value)( particles, particle_index ); // eV
 
     P0 = P0/C_LIGHT*QELEM;
