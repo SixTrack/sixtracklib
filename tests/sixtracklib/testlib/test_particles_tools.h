@@ -76,6 +76,9 @@ void NS(Particles_buffers_get_max_difference)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs );
 
+void NS(Particles_buffer_print_stdout)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particles );
+
 void NS(Particles_buffer_print)(
     FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particles );
