@@ -29,7 +29,8 @@ typedef struct NS(BeamBeam4D)
 NS(BeamBeam4D);
 
 SIXTRL_FN SIXTRL_STATIC  SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)*
-NS(BeamBeam4D_preset)( NS(BeamBeam4D)* SIXTRL_RESTRICT beam_beam );
+NS(BeamBeam4D_preset)(
+    SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* SIXTRL_RESTRICT beam_beam );
 
 #if !defined( _GPUCODE )
 
@@ -80,7 +81,8 @@ extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)*
-NS(BeamBeam4D_preset)( NS(BeamBeam4D)* SIXTRL_RESTRICT beam_beam )
+NS(BeamBeam4D_preset)(
+    SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* SIXTRL_RESTRICT beam_beam )
 {
     if( beam_beam != SIXTRL_NULLPTR )
     {

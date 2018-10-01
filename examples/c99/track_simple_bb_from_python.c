@@ -111,9 +111,9 @@ int main( int argc, char* argv[] )
         st_Object* elem = st_Buffer_get_objects_begin( lhc_beam_elements_buffer );
         for( int i_ele=0; i_ele<N_elem; i_ele++)
         {
-            st_Track_particle_subset_beam_element_obj( particles, 0, NUM_PARTICLES, elem);
             st_Particles* pdump = st_Particles_add_copy(dump, particles);
             assert(pdump != 0);
+            st_Track_particle_subset_beam_element_obj( particles, 0, NUM_PARTICLES, elem);
             elem++;
             
             //st_Particles_print(stdout, pdump);

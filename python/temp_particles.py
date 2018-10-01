@@ -1,11 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from cobjects import CBuffer, CObject, CField
 
 class Particles( CObject ):
     _typeid       = 1
-    num_particles = CField(  0, 'uint64', alignment=8 )
+    num_particles = CField(  0, 'int64',  const=True )
     q0            = CField(  1, 'real',  length='num_particles', default=0.0, pointer=True, alignment=8 )
     mass0         = CField(  2, 'real',  length='num_particles', default=0.0, pointer=True, alignment=8 )
     beta0         = CField(  3, 'real',  length='num_particles', default=0.0, pointer=True, alignment=8 )
@@ -26,5 +23,3 @@ class Particles( CObject ):
     at_element    = CField( 18, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
     at_turn       = CField( 19, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
     state         = CField( 20, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
-
-#end:
