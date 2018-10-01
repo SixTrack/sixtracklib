@@ -254,14 +254,8 @@ namespace SIXTRL_NAMESPACE
 
         std::string track_compile_options = "-D_GPUCODE=1";
         track_compile_options += " -D__NAMESPACE=st_";
-        track_compile_options += " -DSIXTRL_DATAPTR_DEC=__global";
-        track_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
-        track_compile_options += " -DSIXTRL_BUFFER_OBJ_ARGPTR_DEC=__global";
-        track_compile_options += " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global";
         track_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private";
         track_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__private";
-        track_compile_options += " -DSIXTRL_BE_ARGPTR_DEC=__global";
-        track_compile_options += " -DSIXTRL_BE_DATAPTR_DEC=__global";
         track_compile_options += " -I";
         track_compile_options += NS(PATH_TO_BASE_DIR);
 

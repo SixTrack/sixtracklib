@@ -4,6 +4,7 @@ set( SIXTRACKLIB_OPENCL_HEADERS
 )
 
 set( SIXTRACKLIB_OPENCL_INTERNAL_HEADERS
+     internal/default_compile_options.h
      internal/base_context.h
 )
 

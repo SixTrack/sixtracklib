@@ -73,6 +73,8 @@ namespace sixtrack
 
         node_info_t const*  availableNodesInfoBegin() const SIXTRL_NOEXCEPT;
         node_info_t const*  availableNodesInfoEnd()   const SIXTRL_NOEXCEPT;
+        node_info_t const*  defaultNodeInfo()         const SIXTRL_NOEXCEPT;
+        node_id_t defaultNodeId() const SIXTRL_NOEXCEPT;
 
         bool isNodeIdAvailable(
             node_id_t const node_id ) const SIXTRL_NOEXCEPT;
@@ -118,6 +120,8 @@ namespace sixtrack
 
         bool selectNode( char const* node_id_str );
         bool selectNode( size_type const index );
+
+        void printNodesInfo() const SIXTRL_NOEXCEPT;
 
         void clear();
 
@@ -362,6 +366,14 @@ NS(ClContextBase_get_available_node_info_by_index)(
     NS(context_size_t) const node_index );
 
 SIXTRL_HOST_FN NS(context_node_info_t) const*
+NS(ClContextBase_get_default_node_info)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT context );
+
+SIXTRL_HOST_FN NS(context_node_id_t)
+NS(ClContextBase_get_default_node_id)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT context );
+
+SIXTRL_HOST_FN NS(context_node_info_t) const*
 NS(ClContextBase_get_available_node_info_by_node_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT context,
     const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
@@ -380,10 +392,15 @@ SIXTRL_HOST_FN bool NS(ClContextBase_has_selected_node)(
 SIXTRL_HOST_FN cl_device_id NS(ClContextBase_get_selected_node_device)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_node_info_t) const* NS(ClContextBase_get_node_info)(
+SIXTRL_HOST_FN NS(context_node_info_t) const*
+NS(ClContextBase_get_selected_node_info)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_node_id_t) const* NS(ClContextBase_get_node_id)(
+SIXTRL_HOST_FN NS(context_node_id_t) const*
+NS(ClContextBase_get_selected_node_id)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
+
+SIXTRL_HOST_FN void NS(ClContextBase_print_nodes_info)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
 SIXTRL_HOST_FN void NS(ClContextBase_clear)(
@@ -395,7 +412,7 @@ SIXTRL_HOST_FN bool NS(ClContextBase_select_node)(
 
 SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_node_id)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
-    NS(context_node_id_t) const node_id );
+    const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
 
 SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_index)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
@@ -479,7 +496,14 @@ SIXTRL_HOST_FN cl_context NS(ClContextBase_get_opencl_context)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
 SIXTRL_HOST_FN NS(ClContextBase)*
-NS(ClContextBase_new)( char const* SIXTRL_RESTRICT node_id_str );
+NS(ClContextBase_new_on_selected_node_id_str)(
+    char const* SIXTRL_RESTRICT node_id_str );
+
+SIXTRL_HOST_FN NS(ClContextBase)*
+NS(ClContextBase_new_on_selected_node_id)(
+    const NS(context_node_id_t) *const node_id );
+
+SIXTRL_HOST_FN NS(ClContextBase)* NS(ClContextBase_new)( void );
 
 SIXTRL_HOST_FN void NS(ClContextBase_free)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );

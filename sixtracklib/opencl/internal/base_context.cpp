@@ -252,6 +252,30 @@ namespace SIXTRL_NAMESPACE
         return ptr_end;
     }
 
+    ClContextBase::node_info_t const*
+    ClContextBase::defaultNodeInfo() const SIXTRL_NOEXCEPT
+    {
+        return this->availableNodesInfoBegin();
+    }
+
+    ClContextBase::node_id_t
+    ClContextBase::defaultNodeId() const SIXTRL_NOEXCEPT
+    {
+        NS(ComputeNodeId) default_node_id;
+
+        ClContextBase::node_info_t const*
+            default_node_info = this->defaultNodeInfo();
+
+        NS(ComputeNodeId_preset)( &default_node_id );
+
+        if( default_node_info != nullptr )
+        {
+            default_node_id = default_node_info->id;
+        }
+
+        return default_node_id;
+    }
+
     bool ClContextBase::isNodeIdAvailable(
         ClContextBase::node_id_t const node_id ) const SIXTRL_NOEXCEPT
     {
@@ -495,6 +519,52 @@ namespace SIXTRL_NAMESPACE
         }
 
         return success;
+    }
+
+    void ClContextBase::printNodesInfo() const SIXTRL_NOEXCEPT
+    {
+        if( this->numAvailableNodes() > size_type{ 0 } )
+        {
+            node_id_t const default_node_id = this->defaultNodeId();
+
+            auto node_it  = this->availableNodesInfoBegin();
+            auto node_end = this->availableNodesInfoEnd();
+
+            for( ; node_it != node_end ; ++node_it )
+            {
+                node_id_t const current_node_id = node_it->id;
+
+                char default_str[ 16 ] =
+                {
+                    '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+                    '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
+                };
+
+                char id_str[ 16 ] =
+                {
+                    '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+                    '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
+                };
+
+                NS(ComputeNodeId_to_string)( &current_node_id, &id_str[ 0 ], 16 );
+
+                if( NS(ComputeNodeId_are_equal)(
+                        &current_node_id, &default_node_id ) )
+                {
+                    strcpy( &default_str[ 0 ], "[DEFAULT] " );
+                }
+
+                std::printf( "%-10s      :: %s %s\r\n" "                :: %s\r\n"
+                        "\r\n", id_str, default_str,
+                        node_it->name, node_it->platform );
+            }
+        }
+        else
+        {
+            printf( "No OpenCL Devices found\r\n" );
+        }
+
+        return;
     }
 
     void ClContextBase::clear()
@@ -1113,10 +1183,6 @@ namespace SIXTRL_NAMESPACE
 
         std::string remap_program_compile_options = "-D_GPUCODE=1";
         remap_program_compile_options += " -D__NAMESPACE=st_";
-        remap_program_compile_options += " -DSIXTRL_DATAPTR_DEC=__global";
-        remap_program_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
-        remap_program_compile_options += " -DSIXTRL_BUFFER_OBJ_ARGPTR_DEC=__global";
-        remap_program_compile_options += " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global";
         remap_program_compile_options += " -I";
         remap_program_compile_options += NS(PATH_TO_BASE_DIR);
 
@@ -1325,6 +1391,31 @@ NS(ClContextBase_get_available_nodes_info_end)(
 }
 
 SIXTRL_HOST_FN NS(context_node_info_t) const*
+NS(ClContextBase_get_default_node_info)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT context )
+{
+    return ( context != nullptr ) ? context->defaultNodeInfo() : nullptr;
+}
+
+SIXTRL_HOST_FN NS(context_node_id_t)
+NS(ClContextBase_get_default_node_id)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT context )
+{
+    SIXTRL_NAMESPACE::ClContextBase::node_id_t default_node_id;
+    NS(ComputeNodeId_preset)( &default_node_id );
+
+    NS(context_node_info_t) const* default_node_info =
+        NS(ClContextBase_get_default_node_info)( context );
+
+    if( default_node_info != nullptr )
+    {
+        default_node_id = default_node_info->id;
+    }
+
+    return default_node_id;
+}
+
+SIXTRL_HOST_FN NS(context_node_info_t) const*
 NS(ClContextBase_get_available_node_info_by_index)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     NS(context_size_t) const node_index )
@@ -1378,16 +1469,27 @@ SIXTRL_HOST_FN cl_device_id NS(ClContextBase_get_selected_node_device)(
     return cl_device_id{};
 }
 
-SIXTRL_HOST_FN NS(context_node_info_t) const* NS(ClContextBase_selected_get_node_info)(
+SIXTRL_HOST_FN NS(context_node_info_t) const* NS(ClContextBase_get_selected_node_info)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr ) ? ctx->ptrSelectedNodeInfo() : nullptr;
 }
 
-SIXTRL_HOST_FN NS(context_node_id_t) const* NS(ClContextBase_selected_get_node_id)(
+SIXTRL_HOST_FN NS(context_node_id_t) const* NS(ClContextBase_get_selected_node_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr ) ? ctx->ptrSelectedNodeId() : nullptr;
+}
+
+SIXTRL_HOST_FN void NS(ClContextBase_print_nodes_info)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
+{
+    if( ctx != nullptr )
+    {
+        ctx->printNodesInfo();
+    }
+
+    return;
 }
 
 SIXTRL_HOST_FN void NS(ClContextBase_clear)(
@@ -1406,9 +1508,9 @@ SIXTRL_HOST_FN bool NS(ClContextBase_select_node)(
 
 SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_node_id)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
-    NS(context_node_id_t) const node_id )
+    const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id )
 {
-    return ( ctx != nullptr ) ? ctx->selectNode( node_id ) : false;
+    return ( ctx != nullptr ) ? ctx->selectNode( *node_id ) : false;
 }
 
 SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_index)(
@@ -1419,7 +1521,8 @@ SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_index)(
 }
 
 SIXTRL_HOST_FN NS(ClContextBase)*
-NS(ClContextBase_new)( char const* SIXTRL_RESTRICT node_id_str )
+NS(ClContextBase_new_on_selected_node_id_str)(
+    char const* SIXTRL_RESTRICT node_id_str )
 {
     NS(ClContextBase)* ctx = NS(ClContextBase_create)();
 
@@ -1436,6 +1539,49 @@ NS(ClContextBase_new)( char const* SIXTRL_RESTRICT node_id_str )
     }
 
     return ctx;
+}
+
+SIXTRL_HOST_FN NS(ClContextBase)*
+NS(ClContextBase_new_on_selected_node_id)(
+    const NS(context_node_id_t) *const node_id )
+{
+    NS(ClContextBase)* ctx = nullptr;
+
+    if( ( node_id != nullptr ) &&
+        ( NS(ComputeNodeId_is_valid)( node_id ) ) )
+    {
+        ctx = new SIXTRL_NAMESPACE::ClContextBase( *node_id );
+
+        if( ( ctx != nullptr ) && ( !ctx->hasSelectedNode() ) )
+        {
+           delete ctx;
+           ctx = nullptr;
+        }
+    }
+    else
+    {
+        ctx = NS(ClContextBase_create)();
+
+        if( ctx != nullptr )
+        {
+            NS(context_node_id_t) const default_node =
+                NS(ClContextBase_get_default_node_id)( ctx );
+
+            if( 0 != NS(ClContextBase_select_node_by_node_id)(
+                    ctx, &default_node ) )
+            {
+                delete ctx;
+                ctx = nullptr;
+            }
+        }
+    }
+
+    return ctx;
+}
+
+SIXTRL_HOST_FN NS(ClContextBase)* NS(ClContextBase_new)()
+{
+    return NS(ClContextBase_new_on_selected_node_id)( nullptr );
 }
 
 SIXTRL_HOST_FN int NS(ClContextBase_add_program_file)(
