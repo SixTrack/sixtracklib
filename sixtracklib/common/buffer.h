@@ -6,6 +6,7 @@
     #include <stddef.h>
     #include <stdint.h>
     #include <stdlib.h>
+    #include <stdio.h>
     #include <limits.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
@@ -198,9 +199,16 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_remap)(
 SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new)(
     NS(buffer_size_t) const buffer_capacity );
 
-SIXTRL_HOST_FN SIXTRL_STATIC SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
-NS(Buffer_new_from_file)(
+SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_from_file)(
     SIXTRL_BUFFER_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+
+SIXTRL_HOST_FN bool NS(Buffer_write_to_file)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+
+SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    FILE* SIXTRL_RESTRICT fp );
 
 SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_detailed)(
     NS(buffer_size_t)  const initial_max_num_objects,
@@ -1018,72 +1026,6 @@ SIXTRL_INLINE int NS(Buffer_init)(
 
     return success;
 }
-
-#if !defined( _GPUCODE )
-
-SIXTRL_INLINE NS(Buffer)* NS(Buffer_new_from_file)(
-    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file )
-{
-    typedef NS(buffer_size_t) buf_size_t;
-
-    NS(Buffer)*  ptr_buffer = SIXTRL_NULLPTR;
-    buf_size_t size_of_file = ( buf_size_t )0u;
-
-    if( path_to_file != SIXTRL_NULLPTR )
-    {
-        FILE* fp = fopen( path_to_file, "rb" );
-
-        if( fp != 0 )
-        {
-            long length = ( long )0u;
-
-            fseek( fp, 0, SEEK_END );
-            length = ftell( fp );
-            fclose( fp );
-            fp = 0;
-
-            if( length > 0 )
-            {
-                size_of_file = ( buf_size_t )length;
-            }
-        }
-    }
-
-    if( size_of_file > ( buf_size_t )0u )
-    {
-        ptr_buffer = NS(Buffer_new)( size_of_file );
-
-        if( ptr_buffer != SIXTRL_NULLPTR )
-        {
-            int success = -1;
-            FILE* fp = fopen( path_to_file, "rb" );
-
-            if( fp != SIXTRL_NULLPTR )
-            {
-                buf_size_t const cnt = fread(
-                    ( SIXTRL_ARGPTR_DEC char* )( uintptr_t
-                        )NS(Buffer_get_data_begin_addr)( ptr_buffer ),
-                    size_of_file, ( buf_size_t )1u, fp );
-
-                if( ( cnt == ( buf_size_t )1u ) &&
-                    ( 0   == NS(Buffer_remap)( ptr_buffer ) ) )
-                {
-                    success = 0;
-                }
-            }
-
-            if( success != 0 )
-            {
-                NS(Buffer_delete)( ptr_buffer );
-                ptr_buffer = SIXTRL_NULLPTR;
-            }
-        }
-    }
-
-    return ptr_buffer;
-}
-
-#endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
