@@ -1,53 +1,98 @@
 #ifndef _GAUSS_FIELDS_
 #define _GAUSS_FIELDS_
 
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/_impl/definitions.h"
+#endif
+
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+extern "C" {
+#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
+
+SIXTRL_FN SIXTRL_STATIC void get_transv_field_gauss_round(
+    SIXTRL_REAL_T sigma,
+    SIXTRL_REAL_T Delta_x,
+    SIXTRL_REAL_T Delta_y, SIXTRL_REAL_T x, SIXTRL_REAL_T y,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ex,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ey);
+
+SIXTRL_FN SIXTRL_STATIC void get_transv_field_gauss_ellip(
+    SIXTRL_REAL_T sigma_x, SIXTRL_REAL_T sigma_y,
+    SIXTRL_REAL_T Delta_x, SIXTRL_REAL_T Delta_y,
+    SIXTRL_REAL_T x, SIXTRL_REAL_T y,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ex_out,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ey_out);
+
+SIXTRL_FN SIXTRL_STATIC void get_Ex_Ey_Gx_Gy_gauss(
+    SIXTRL_REAL_T x, SIXTRL_REAL_T  y,
+    SIXTRL_REAL_T sigma_x, SIXTRL_REAL_T sigma_y,
+    SIXTRL_REAL_T min_sigma_diff,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ex_ptr,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ey_ptr,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Gx_ptr,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Gy_ptr);
+
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+}
+#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
+
+/* ------------------------------------------------------------------------- */
+/* Inline functions implementation */
+/* ------------------------------------------------------------------------- */
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <math.h>
 #endif
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/_impl/definitions.h"
     #include "sixtracklib/common/be_beambeam/constants.h"
     #include "sixtracklib/common/be_beambeam/faddeeva_cern.h"
 #endif
 
-#if !defined( REAL_T )
-    #define REAL_T SIXTRL_REAL_T
-  #define REAL_T_UNDEF
-#endif
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+extern "C" {
+#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_FN void get_transv_field_gauss_round(REAL_T sigma, REAL_T Delta_x, REAL_T Delta_y, 
-                                  REAL_T x, REAL_T y, SIXTRL_ARGPTR_DEC REAL_T* Ex, SIXTRL_ARGPTR_DEC REAL_T* Ey){    
-  REAL_T r2, temp;
-  
+SIXTRL_INLINE void get_transv_field_gauss_round(
+    SIXTRL_REAL_T sigma, SIXTRL_REAL_T Delta_x, SIXTRL_REAL_T Delta_y,
+    SIXTRL_REAL_T x, SIXTRL_REAL_T y,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ex,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ey)
+{
+  SIXTRL_REAL_T r2, temp;
+
   r2 = (x-Delta_x)*(x-Delta_x)+(y-Delta_y)*(y-Delta_y);
   if (r2<1e-20) temp = sqrt(r2)/(2.*MYPI*EPSILON_0*sigma); //linearised
   else          temp = (1-exp(-0.5*r2/(sigma*sigma)))/(2.*MYPI*EPSILON_0*r2);
-  
+
   (*Ex) = temp * (x-Delta_x);
   (*Ey) = temp * (y-Delta_y);
 }
 
+SIXTRL_INLINE void get_transv_field_gauss_ellip(
+        SIXTRL_REAL_T sigma_x,  SIXTRL_REAL_T sigma_y,
+        SIXTRL_REAL_T Delta_x,  SIXTRL_REAL_T Delta_y,
+        SIXTRL_REAL_T x, SIXTRL_REAL_T y,
+        SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ex_out,
+        SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ey_out)
+{
+  SIXTRL_REAL_T sigmax = sigma_x;
+  SIXTRL_REAL_T sigmay = sigma_y;
 
-
-SIXTRL_FN void get_transv_field_gauss_ellip(REAL_T sigma_x, REAL_T sigma_y, REAL_T Delta_x,  REAL_T Delta_y,
-                                  REAL_T x, REAL_T y, SIXTRL_ARGPTR_DEC REAL_T* Ex_out, SIXTRL_ARGPTR_DEC REAL_T* Ey_out){
-    
-  REAL_T sigmax = sigma_x;
-  REAL_T sigmay = sigma_y;
-  
   // I always go to the first quadrant and then apply the signs a posteriori
   // numerically more stable (see http://inspirehep.net/record/316705/files/slac-pub-5582.pdf)
 
-  REAL_T abx = fabs(x - Delta_x);
-  REAL_T aby = fabs(y - Delta_y);
-  
+  SIXTRL_REAL_T abx = fabs(x - Delta_x);
+  SIXTRL_REAL_T aby = fabs(y - Delta_y);
+
   //printf("x = %.2e y = %.2e abx = %.2e aby = %.2e", xx, yy, abx, aby);
-  
-  REAL_T S, factBE, Ex, Ey;
-  REAL_T etaBE_re, etaBE_im, zetaBE_re, zetaBE_im;
-  REAL_T w_etaBE_re, w_etaBE_im, w_zetaBE_re, w_zetaBE_im;
-  REAL_T expBE;
-  
+
+  SIXTRL_REAL_T S, factBE, Ex, Ey;
+  SIXTRL_REAL_T etaBE_re, etaBE_im, zetaBE_re, zetaBE_im;
+  SIXTRL_REAL_T w_etaBE_re, w_etaBE_im, w_zetaBE_re, w_zetaBE_im;
+  SIXTRL_REAL_T expBE;
+
   if (sigmax>sigmay){
     S = sqrt(2.*(sigmax*sigmax-sigmay*sigmay));
     factBE = 1./(2.*EPSILON_0*SQRT_PI*S);
@@ -96,24 +141,28 @@ SIXTRL_FN void get_transv_field_gauss_ellip(REAL_T sigma_x, REAL_T sigma_y, REAL
 
   if((x - Delta_x)<0) Ex=-Ex;
   if((y - Delta_y)<0) Ey=-Ey;
-  
+
   (*Ex_out) = Ex;
   (*Ey_out) = Ey;
 }
 
 
 
-SIXTRL_FN void get_Ex_Ey_Gx_Gy_gauss(REAL_T x, REAL_T  y, 
-    REAL_T sigma_x, REAL_T sigma_y, REAL_T min_sigma_diff,
-    SIXTRL_ARGPTR_DEC REAL_T* Ex_ptr, SIXTRL_ARGPTR_DEC REAL_T* Ey_ptr, 
-    SIXTRL_ARGPTR_DEC REAL_T* Gx_ptr, SIXTRL_ARGPTR_DEC REAL_T* Gy_ptr){
-        
-    REAL_T Ex, Ey, Gx, Gy;
-    
+SIXTRL_INLINE void get_Ex_Ey_Gx_Gy_gauss(
+    SIXTRL_REAL_T x, SIXTRL_REAL_T  y,
+    SIXTRL_REAL_T sigma_x, SIXTRL_REAL_T sigma_y,
+    SIXTRL_REAL_T min_sigma_diff,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ex_ptr,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ey_ptr,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Gx_ptr,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Gy_ptr){
+
+    SIXTRL_REAL_T Ex, Ey, Gx, Gy;
+
     if (fabs(sigma_x-sigma_y)< min_sigma_diff){
 
-        REAL_T sigma = 0.5*(sigma_x+sigma_y);
-                
+        SIXTRL_REAL_T sigma = 0.5*(sigma_x+sigma_y);
+
         get_transv_field_gauss_round(sigma, 0., 0., x, y, &Ex, &Ey);
 
         Gx = 1/(2.*(x*x+y*y))*(y*Ey-x*Ex+1./(2*MYPI*EPSILON_0*sigma*sigma)
@@ -122,28 +171,26 @@ SIXTRL_FN void get_Ex_Ey_Gx_Gy_gauss(REAL_T x, REAL_T  y,
                             *y*y*exp(-(x*x+y*y)/(2.*sigma*sigma)));
     }
     else{
-        
+
         get_transv_field_gauss_ellip(sigma_x, sigma_y, 0., 0., x, y, &Ex, &Ey);
 
-        REAL_T Sig_11 = sigma_x*sigma_x;
-        REAL_T Sig_33 = sigma_y*sigma_y;
-        
+        SIXTRL_REAL_T Sig_11 = sigma_x*sigma_x;
+        SIXTRL_REAL_T Sig_33 = sigma_y*sigma_y;
+
         Gx =-1./(2*(Sig_11-Sig_33))*(x*Ex+y*Ey+1./(2*MYPI*EPSILON_0)*\
                     (sigma_y/sigma_x*exp(-x*x/(2*Sig_11)-y*y/(2*Sig_33))-1.));
         Gy =1./(2*(Sig_11-Sig_33))*(x*Ex+y*Ey+1./(2*MYPI*EPSILON_0)*\
                     (sigma_x/sigma_y*exp(-x*x/(2*Sig_11)-y*y/(2*Sig_33))-1.));
     }
-                    
+
     *Ex_ptr = Ex;
     *Ey_ptr = Ey;
     *Gx_ptr = Gx;
-    *Gy_ptr = Gy;    
-
+    *Gy_ptr = Gy;
 }
 
-#if defined(REAL_T_UNDEF)
-  #undef REAL_T
-  #undef REAL_T_UNDEF
-#endif
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+}
+#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
 #endif

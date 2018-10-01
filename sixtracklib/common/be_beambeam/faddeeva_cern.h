@@ -16,32 +16,49 @@
 #ifndef _FADDCERN_
 #define _FADDCERN_
 
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/_impl/definitions.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* !defined( __cplusplus ) && !defined( _GPUCODE ) */
+
+SIXTRL_FN SIXTRL_STATIC void cerrf(
+    SIXTRL_REAL_T in_real, SIXTRL_REAL_T in_imag,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* out_real,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* out_imag );
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* !defined( __cplusplus ) && !defined( _GPUCODE ) */
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
 	#include <math.h>
 #endif
 
-#if !defined( REAL_T )
-    #define REAL_T SIXTRL_REAL_T
-	#define REAL_T_UNDEF
-#endif
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* !defined( __cplusplus ) && !defined( _GPUCODE ) */
 
-
-SIXTRL_FN void cerrf(REAL_T in_real, REAL_T in_imag, SIXTRL_ARGPTR_DEC REAL_T* out_real, SIXTRL_ARGPTR_DEC REAL_T* out_imag)
+SIXTRL_INLINE void cerrf( SIXTRL_REAL_T in_real, SIXTRL_REAL_T in_imag,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* out_real,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* out_imag )
 {
 	/**
-	this function calculates the REAL_T precision complex error function based on the
+	this function calculates the SIXTRL_REAL_T precision complex error function based on the
 	algorithm of the FORTRAN function written at CERN by K. Koelbig, Program C335, 1970.
-	See also M. Bassetti and G.A. Erskine, "Closed expression for the electric field of a 
+	See also M. Bassetti and G.A. Erskine, "Closed expression for the electric field of a
 	two-dimensional Gaussian charge density", CERN-ISR-TH/80-06;
 	*/
 
 	int n, nc, nu;
-	REAL_T a_constant = 1.12837916709551;
-	REAL_T xLim = 5.33;
-	REAL_T yLim = 4.29;
-	REAL_T h, q, Saux, Sx, Sy, Tn, Tx, Ty, Wx, Wy, xh, xl, x, yh, y;
-	REAL_T Rx [33];
-	REAL_T Ry [33];
+	SIXTRL_REAL_T a_constant = 1.12837916709551;
+	SIXTRL_REAL_T xLim = 5.33;
+	SIXTRL_REAL_T yLim = 4.29;
+	SIXTRL_REAL_T h, q, Saux, Sx, Sy, Tn, Tx, Ty, Wx, Wy, xh, xl, x, yh, y;
+	SIXTRL_REAL_T Rx [33];
+	SIXTRL_REAL_T Ry [33];
 
 	x = fabs(in_real);
 	y = fabs(in_imag);
@@ -50,7 +67,7 @@ SIXTRL_FN void cerrf(REAL_T in_real, REAL_T in_imag, SIXTRL_ARGPTR_DEC REAL_T* o
 		q = (1.0 - y / yLim) * sqrt(1.0 - (x / xLim) * (x / xLim));
 		h  = 1.0 / (3.2 * q);
 		nc = 7 + (int) (23.0 * q);
-		xl = pow(h, (REAL_T) (1 - nc));
+		xl = pow(h, (SIXTRL_REAL_T) (1 - nc));
 		xh = y + 0.5 / h;
 		yh = x;
 		nu = 10 + (int) (21.0 * q);
@@ -101,9 +118,8 @@ SIXTRL_FN void cerrf(REAL_T in_real, REAL_T in_imag, SIXTRL_ARGPTR_DEC REAL_T* o
 	*out_imag = Wy;
 }
 
-#if defined(REAL_T_UNDEF)
-	#undef REAL_T
-	#undef REAL_T_UNDEF
-#endif
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* !defined( __cplusplus ) && !defined( _GPUCODE ) */
 
 #endif
