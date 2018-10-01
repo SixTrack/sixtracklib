@@ -54,7 +54,7 @@ set( SIXTRACKL_TESTLIB_SOURCES
 #      details/test_track_tools.c
 )
 
-add_library( sixtrack_test STATIC
+add_library( sixtrack_test SHARED
              ${SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS}
              ${SIXTRACKL_TESTLIB_HEADERS}
              ${SIXTRACKL_TESTLIB_SOURCES}

@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/common/mem_pool.h"
@@ -34,6 +35,17 @@ extern SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_detailed)(
     NS(buffer_size_t)  const initial_max_num_dataptrs,
     NS(buffer_size_t)  const initial_max_num_garbage_elements,
     NS(buffer_flags_t) const buffer_flags );
+
+extern SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_from_file)(
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+
+extern SIXTRL_HOST_FN bool NS(Buffer_write_to_file)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+
+extern SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp );
 
 SIXTRL_HOST_FN static NS(Buffer)* NS(Buffer_allocate_generic)(
     NS(buffer_size_t) const buffer_capacity,
@@ -210,6 +222,114 @@ NS(Buffer)* NS(Buffer_new_detailed)(
     }
 
     return ptr_buffer;
+}
+
+SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_from_file)(
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+
+    NS(Buffer)*  ptr_buffer = SIXTRL_NULLPTR;
+    buf_size_t size_of_file = ( buf_size_t )0u;
+
+    if( path_to_file != SIXTRL_NULLPTR )
+    {
+        FILE* fp = fopen( path_to_file, "rb" );
+
+        if( fp != 0 )
+        {
+            long length = ( long )0u;
+
+            fseek( fp, 0, SEEK_END );
+            length = ftell( fp );
+            fclose( fp );
+            fp = 0;
+
+            if( length > 0 )
+            {
+                size_of_file = ( buf_size_t )length;
+            }
+        }
+    }
+
+    if( size_of_file > ( buf_size_t )0u )
+    {
+        ptr_buffer = NS(Buffer_new)( size_of_file );
+
+        if( ptr_buffer != SIXTRL_NULLPTR )
+        {
+            int success = -1;
+            FILE* fp = fopen( path_to_file, "rb" );
+
+            if( fp != SIXTRL_NULLPTR )
+            {
+                buf_size_t const cnt = fread(
+                    ( SIXTRL_BUFFER_DATAPTR_DEC char* )( uintptr_t
+                        )NS(Buffer_get_data_begin_addr)( ptr_buffer ),
+                    size_of_file, ( buf_size_t )1u, fp );
+
+                if( ( cnt == ( buf_size_t )1u ) &&
+                    ( 0   == NS(Buffer_remap)( ptr_buffer ) ) )
+                {
+                    success = 0;
+                }
+            }
+
+            if( success != 0 )
+            {
+                NS(Buffer_delete)( ptr_buffer );
+                ptr_buffer = SIXTRL_NULLPTR;
+            }
+        }
+    }
+
+    return ptr_buffer;
+}
+
+SIXTRL_HOST_FN bool NS(Buffer_write_to_file)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file )
+{
+    bool success = false;
+
+    SIXTRL_ARGPTR_DEC FILE* fp = SIXTRL_NULLPTR;
+
+    if( ( path_to_file != SIXTRL_NULLPTR ) &&
+        ( strlen( path_to_file ) > 0 ) )
+    {
+        fp = fopen( path_to_file, "wb" );
+    }
+
+    success = NS(Buffer_write_to_fp)( buffer, fp );
+
+    if( fp != SIXTRL_NULLPTR )
+    {
+        fclose( fp );
+        fp = SIXTRL_NULLPTR;
+    }
+
+    return success;
+}
+
+SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC FILE* fp )
+{
+    bool success = false;
+
+    if( ( fp != SIXTRL_NULLPTR ) && ( buffer != SIXTRL_NULLPTR ) &&
+        ( NS(Buffer_get_data_begin_addr)( buffer ) != ( NS(buffer_addr_t) )0 ) &&
+        ( NS(Buffer_get_size)( buffer ) > ( NS(buffer_size_t) )0u ) )
+    {
+        size_t const cnt = fwrite( ( SIXTRL_BUFFER_DATAPTR_DEC char* )( uintptr_t
+            )NS(Buffer_get_data_begin_addr)( buffer ),
+            NS(Buffer_get_size)( buffer ), 1u, fp );
+
+        success = ( cnt == 1u );
+
+    }
+
+    return success;
 }
 
 

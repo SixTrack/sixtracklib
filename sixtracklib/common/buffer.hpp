@@ -2,11 +2,13 @@
 #define CXX_SIXTRACKLIB_COMMON_BUFFER_HPP__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #include <cstddef>
-    #include <cstdint>
-    #include <cstdlib>
-    #include <limits>
-    #include <utility>
+    #if defined( __cplusplus )
+        #include <cstddef>
+        #include <cstdint>
+        #include <cstdlib>
+        #include <limits>
+        #include <utility>
+    #endif /* defined( __cplusplus ) */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
@@ -18,7 +20,7 @@
 
 namespace SIXTRL_NAMESPACE
 {
-    class Buffer : private ::NS(Buffer)
+    class Buffer : public ::NS(Buffer)
     {
         public:
 

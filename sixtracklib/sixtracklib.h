@@ -40,6 +40,9 @@
 #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
 
+    #include "sixtracklib/opencl/argument.h"
+    #include "sixtracklib/opencl/context.h"
+
 //     #include "sixtracklib/opencl/buffer.h"
 //     #include "sixtracklib/opencl/ocl_environment.h"
 

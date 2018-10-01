@@ -46,10 +46,10 @@ if( SIXTRACKL_ENABLE_OPENCL )
 
     set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES}
                                   ${SIXTRACKL_OPENCL_LIBRARY} )
-#     add_subdirectory( opencl )
-#
-#     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-#          $<TARGET_OBJECTS:sixtrack_opencl> )
+    add_subdirectory( opencl )
+
+    set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
+         $<TARGET_OBJECTS:sixtrack_opencl> )
 
 endif()
 

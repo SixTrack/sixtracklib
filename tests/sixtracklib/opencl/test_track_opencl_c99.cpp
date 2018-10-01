@@ -96,14 +96,8 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
 
         a2str << " -D_GPUCODE=1"
               << " -D__NAMESPACE=st_"
-              << " -DSIXTRL_DATAPTR_DEC=__global"
+              << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
               << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
-              << " -DSIXTRL_BUFFER_OBJ_ARGPTR_DEC=__global"
-              << " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global"
-              << " -DSIXTRL_PARTICLE_ARGPTR_DEC=__global"
-              << " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global"
-              << " -DSIXTRL_BE_ARGPTR_DEC=__global"
-              << " -DSIXTRL_BE_DATAPTR_DEC=__global"
               << " -I" << PATH_TO_BASE_DIR;
 
         std::string const COMPILE_OPTIONS = a2str.str();
@@ -111,7 +105,7 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
         /* ----------------------------------------------------------------- */
 
         std::string const path_to_source( PATH_TO_BASE_DIR +
-            std::string( "sixtracklib/opencl/impl/track_particles_kernel.cl" ) );
+            std::string( "sixtracklib/opencl/kernels/track_particles_kernel.cl" ) );
 
         std::ifstream kernel_file( path_to_source, std::ios::in );
 
@@ -798,14 +792,8 @@ TEST( C99_OpenCL_TrackParticlesTests,
 
         a2str << " -D_GPUCODE=1"
               << " -D__NAMESPACE=st_"
-              << " -DSIXTRL_DATAPTR_DEC=__global"
+              << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
               << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
-              << " -DSIXTRL_BUFFER_OBJ_ARGPTR_DEC=__global"
-              << " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global"
-              << " -DSIXTRL_PARTICLE_ARGPTR_DEC=__global"
-              << " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global"
-              << " -DSIXTRL_BE_ARGPTR_DEC=__global"
-              << " -DSIXTRL_BE_DATAPTR_DEC=__global"
               << " -I" << PATH_TO_BASE_DIR;
 
         std::string const REMAP_COMPILE_OPTIONS = a2str.str();
@@ -813,7 +801,7 @@ TEST( C99_OpenCL_TrackParticlesTests,
         /* ----------------------------------------------------------------- */
 
         std::string path_to_source = PATH_TO_BASE_DIR;
-        path_to_source += "sixtracklib/opencl/impl/track_particles_kernel.cl";
+        path_to_source += "sixtracklib/opencl/kernels/track_particles_kernel.cl";
 
         std::ifstream kernel_file( path_to_source, std::ios::in );
 
@@ -824,7 +812,7 @@ TEST( C99_OpenCL_TrackParticlesTests,
         kernel_file.close();
 
         path_to_source  = PATH_TO_BASE_DIR;
-        path_to_source += "sixtracklib/opencl/impl/";
+        path_to_source += "sixtracklib/opencl/kernels/";
         path_to_source += "track_particles_priv_particles_optimized_kernel.cl";
 
         kernel_file.open( path_to_source, std::ios::in );
@@ -837,14 +825,10 @@ TEST( C99_OpenCL_TrackParticlesTests,
 
         a2str << " -D_GPUCODE=1"
               << " -D__NAMESPACE=st_"
-              << " -DSIXTRL_DATAPTR_DEC=__global"
+              << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
               << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
-              << " -DSIXTRL_BUFFER_OBJ_ARGPTR_DEC=__global"
-              << " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global"
               << " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private"
               << " -DSIXTRL_PARTICLE_DATAPTR_DEC=__private"
-              << " -DSIXTRL_BE_ARGPTR_DEC=__global"
-              << " -DSIXTRL_BE_DATAPTR_DEC=__global"
               << " -I" << PATH_TO_BASE_DIR;
 
         std::string const TRACKING_COMPILE_OPTIONS = a2str.str();

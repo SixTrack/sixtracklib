@@ -24,8 +24,8 @@ set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_lhc_no_bb_c99 )
 # -----------------------------------------------------------------------------
 # track_lhc_no_bb_from_python:
 
-add_executable( track_lhc_no_bb_from_python_c99 track_lhc_no_bb_from_python.c )
-set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_lhc_no_bb_from_python_c99 )
+add_executable( track_simple_bb_from_python_c_c99 track_simple_bb_from_python.c )
+set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_simple_bb_from_python_c_c99 )
 
 # -----------------------------------------------------------------------------
 # track_lhc_no_bb_cuda_c99:
@@ -33,6 +33,14 @@ set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_lhc_no_bb_from_python_c9
 if( SIXTRACKL_ENABLE_CUDA )
     add_executable( track_lhc_no_bb_cuda_c99 track_lhc_no_bb_cuda.c )
     set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_lhc_no_bb_cuda_c99 )
+endif()
+
+# -----------------------------------------------------------------------------
+# track_lhc_no_bb_opencl_c99:
+
+if( SIXTRACKL_ENABLE_OPENCL )
+    add_executable( track_lhc_no_bb_opencl_c99 track_lhc_no_bb_opencl.c )
+    set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_lhc_no_bb_opencl_c99 )
 endif()
 
 # ==============================================================================
