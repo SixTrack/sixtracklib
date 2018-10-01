@@ -2,7 +2,7 @@ from cobjects import CBuffer, CObject, CField
 
 class Particles( CObject ):
     _typeid       = 1
-    num_particles = CField(  0, 'uint64', alignment=8 )
+    num_particles = CField(  0, 'int64',  const=True )
     q0            = CField(  1, 'real',  length='num_particles', default=0.0, pointer=True, alignment=8 )
     mass0         = CField(  2, 'real',  length='num_particles', default=0.0, pointer=True, alignment=8 )
     beta0         = CField(  3, 'real',  length='num_particles', default=0.0, pointer=True, alignment=8 )
