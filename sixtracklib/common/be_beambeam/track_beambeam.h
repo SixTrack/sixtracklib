@@ -130,9 +130,9 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
         real_t delta = NS(Particles_get_delta_value)( particles, particle_index );
 
         real_t q0 = QELEM*NS(Particles_get_q0_value)( particles, particle_index );
-        real_t P0 = NS(Particles_get_p0c_value)( particles, particle_index ); // eV
+        real_t p0c = NS(Particles_get_p0c_value)( particles, particle_index ); // eV
 
-        P0 = P0/C_LIGHT*QELEM;
+        real_t P0 = p0c/C_LIGHT*QELEM;
 
         // Change reference frame
         real_t x_star =     x     - bb6ddata->x_CO    - bb6ddata->delta_x;
@@ -236,6 +236,25 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
         NS(Particles_set_py_value)( particles, particle_index, py );
         NS(Particles_set_zeta_value)( particles, particle_index, zeta );
         NS(Particles_set_delta_value)( particles, particle_index,delta );
+
+        /////// To be reaplced with update delta
+        real_t rpp = 1./(delta+1.);
+        real_t pc_eV = p0c/rpp;
+        real_t mass0 = NS(Particles_get_mass0_value)( particles, particle_index );
+        real_t beta0 = NS(Particles_get_beta0_value)( particles, particle_index );
+        real_t gamma0 = NS(Particles_get_gamma0_value)( particles, particle_index );
+        real_t gamma = sqrt(1. + (pc_eV/mass0)*(pc_eV/mass0));
+        real_t beta = sqrt(1.-1./(gamma*gamma));
+        real_t rvv = beta0/beta;
+        real_t psigma = mass0*(gamma-gamma0)/(beta0*p0c);
+        
+        NS(Particles_set_psigma_value)( particles, particle_index, psigma );
+        NS(Particles_set_rpp_value)( particles, particle_index, rpp );
+        NS(Particles_set_rvv_value)( particles, particle_index, rvv );\
+        ////////
+
+        
+
     }
     // End Gianni's part
 
