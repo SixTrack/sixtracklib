@@ -4,7 +4,7 @@
     #if defined( _GPUCODE ) && defined( __OPENCL_VERSION__ )
 
         #if !defined( SIXTRL_ARGPTR_DEC )
-            #define SIXTRL_ARGPTR_DEC __global
+            #define SIXTRL_ARGPTR_DEC __private
         #endif /* !defined( SIXTRL_ARGPTR_DEC ) */
 
         #if !defined( SIXTRL_DATAPTR_DEC )
