@@ -15,10 +15,13 @@
 #include <vector>
 
 #include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/_impl/path.h"
 #include "sixtracklib/common/compute_arch.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
-#include "sixtracklib/opencl/private/base_context.h"
+#include "sixtracklib/opencl/internal/base_context.h"
+
+#if defined( __cplusplus )
 
 namespace SIXTRL_NAMESPACE
 {
@@ -34,9 +37,8 @@ namespace SIXTRL_NAMESPACE
         m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } )
     {
         using base_t = ClContextBase;
-        using size_t = base_t::size_type;
 
-        this->doInitDefaultProgramsPrivImpl()
+        this->doInitDefaultProgramsPrivImpl();
 
         if( ( node_index < this->numAvailableNodes() ) &&
             ( base_t::doSelectNode( node_index ) ) )
@@ -53,7 +55,7 @@ namespace SIXTRL_NAMESPACE
         using base_t = ClContextBase;
         using size_t = base_t::size_type;
 
-        this->doInitDefaultProgramsPrivImpl()
+        this->doInitDefaultProgramsPrivImpl();
 
         size_t const node_index = this->findAvailableNodesIndex(
             NS(ComputeNodeId_get_platform_id)( &node_id ),
@@ -74,7 +76,7 @@ namespace SIXTRL_NAMESPACE
         using base_t = ClContextBase;
         using size_t = base_t::size_type;
 
-        this->doInitDefaultProgramsPrivImpl()
+        this->doInitDefaultProgramsPrivImpl();
 
         size_t const node_index = this->findAvailableNodesIndex( node_id_str );
 
@@ -95,7 +97,7 @@ namespace SIXTRL_NAMESPACE
         using base_t = ClContextBase;
         using size_t = base_t::size_type;
 
-        this->doInitDefaultProgramsPrivImpl()
+        this->doInitDefaultProgramsPrivImpl();
 
         size_t const node_index =
             this->findAvailableNodesIndex( platform_idx, device_idx );
@@ -155,7 +157,6 @@ namespace SIXTRL_NAMESPACE
     }
 
     int ClContext::track(
-        ClContext::kernel_id_t const tracking_kernel_id,
         ClArgument& particles_arg, ClArgument& beam_elements_arg,
         ClContext::num_turns_t num_turns  )
     {
@@ -166,31 +167,31 @@ namespace SIXTRL_NAMESPACE
     int ClContext::track( kernel_id_t const tracking_kernel_id,
                NS(ClArgument)& particles_arg,
                NS(ClArgument)& beam_elements_arg,
-               num_turns_t const num_turns = num_turns_t{ 1 } )
+               num_turns_t const num_turns )
     {
         int success = -1;
 
         SIXTRL_ASSERT( particles_arg.context() == this );
-        SIXTRL_ASSERT( particles_arg.isCObjectBufferArgument() );
+        SIXTRL_ASSERT( particles_arg.usesCObjectBuffer() );
 
         NS(Buffer)* particles_buffer = particles_arg.ptrCObjectBuffer();
         SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( particles_buffer ) );
 
-        SIXTRL_ASSERT( beam_elements_arg.contex() == this );
-        SIXTRL_ASSERT( beam_elements_arg.isCObjectBufferArgument() );
+        SIXTRL_ASSERT( beam_elements_arg.context() == this );
+        SIXTRL_ASSERT( beam_elements_arg.usesCObjectBuffer() );
 
         NS(Buffer)* beam_elements_buffer = beam_elements_arg.ptrCObjectBuffer();
         SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( beam_elements_buffer ) );
 
         SIXTRL_ASSERT( this->kernelNumArgs( tracking_kernel_id ) == 4u );
 
-        cl::Kernel* ptr_tracking_kernel = this->openClKernel( kernel_id );
+        cl::Kernel* ptr_tracking_kernel = this->openClKernel( tracking_kernel_id );
         SIXTRL_ASSERT( ptr_tracking_kernel != nullptr );
 
         cl::CommandQueue* ptr_queue = this->openClQueue();
 
         size_type const work_group_size =
-            this->kernelWorkGroupSize( kernel_id );
+            this->kernelWorkGroupSize( tracking_kernel_id );
 
         size_type const total_num_particles =
             NS(Particles_buffer_get_total_num_of_particles)( particles_buffer);
@@ -211,7 +212,7 @@ namespace SIXTRL_NAMESPACE
         ptr_tracking_kernel->setArg( 2, static_cast< uint64_t >( num_turns ) );
         ptr_tracking_kernel->setArg( 3, cl_success_flag );
 
-        cl_ret = ptr_queue->enqueueNDRangeKernel( *ptr_tracking_kernel,
+        cl_int cl_ret = ptr_queue->enqueueNDRangeKernel( *ptr_tracking_kernel,
             cl::NullRange, cl::NDRange( total_num_threads ),
                 cl::NDRange( work_group_size ) );
 
@@ -247,7 +248,7 @@ namespace SIXTRL_NAMESPACE
         bool success = false;
 
         std::string path_to_track_kernel_program( NS(PATH_TO_BASE_DIR) );
-        path_to_track_kernel_program += "sixtracklib/opencl/";
+        path_to_track_kernel_program += "sixtracklib/opencl/kernels/";
         path_to_track_kernel_program +=
              "track_particles_priv_particles_optimized_kernel.cl";
 
@@ -301,6 +302,8 @@ namespace SIXTRL_NAMESPACE
         return success;
     }
 }
+
+#endif /* defined( __cplusplus ) */
 
 /* ========================================================================= */
 
@@ -371,7 +374,7 @@ SIXTRL_HOST_FN int NS(ClContext_execute_tracking_kernel)(
 {
     return ( ( ctx != nullptr ) && ( particles_arg != nullptr ) &&
              ( beam_elements_arg != nullptr ) )
-        ? ctx->track( kernel_id, *particles_arg, *beam_elements_arg, num_turns )
+        ? ctx->track( kernel_id, *particles_arg, *beam_elements_arg )
         : -1;
 }
 
@@ -389,4 +392,4 @@ SIXTRL_HOST_FN int NS(ClContext_execute_tracking_kernel_num_turns)(
 
 #endif /* !defined( __CUDACC__ ) */
 
-/* end: sixtracklib/opencl/code/context.cpp */
+/* end: sixtracklib/opencl/internal/context.cpp */

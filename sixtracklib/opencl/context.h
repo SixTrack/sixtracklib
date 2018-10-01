@@ -13,11 +13,11 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/opencl/private/base_context.h"
+    #include "sixtracklib/opencl/internal/base_context.h"
     #include "sixtracklib/opencl/argument.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#ifndef __cplusplus
+#if defined( __cplusplus )
 
 namespace SIXTRL_NAMESPACE
 {
@@ -26,18 +26,10 @@ namespace SIXTRL_NAMESPACE
         private:
 
         using _base_context_t   = ClContextBase;
-        using  num_turns_t      = SIXTRL_INT64_T;
-
-        /*
-        using  kernel_id_t      = _base_context_t::kernel_id_t;
-        using  program_id_t     = _base_context_t::program_id_t;
-        using  size_type        = _base_context_t::size_type;
-        using  node_id_t        = _base_context_t::node_id_t;
-        using  platform_id_t    = _base_context_t::platform_id_t;
-        using  device_id_t      = _base_context_t::device_id_t;
-        */
 
         public:
+
+        using  num_turns_t      = SIXTRL_INT64_T;
 
         ClContext();
 
@@ -84,22 +76,23 @@ namespace SIXTRL_NAMESPACE
     };
 }
 
+#if !defined( _GPUCODE )
+extern "C" {
+#endif /* !defined( _GPUCODE ) */
+
+typedef SIXTRL_NAMESPACE::ClContext              NS(ClContext);
 typedef SIXTRL_NAMESPACE::ClContext::num_turns_t NS(context_num_turns_t);
 
-#else /* __cplusplus  */
+#if !defined( _GPUCODE )
+}
+#endif /* !defined( _GPUCODE ) */
 
-#if !defined( _GPUCODE ) && defined( __cplusplus )
-extern "C" {
-#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
+#else /* !defined( __cplusplus ) */
 
 typedef void NS(ClContext);
+typedef SIXTRL_INT64_T NS(context_num_turns_t);
 
-
-#if !defined( _GPUCODE ) && defined( __cplusplus )
-}
-#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
-
-#endif /* __cplusplus  */
+#endif /* defined( __cplusplus ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {

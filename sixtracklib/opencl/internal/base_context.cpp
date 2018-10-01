@@ -1,4 +1,4 @@
-#include "sixtracklib/opencl/private/base_context.h"
+#include "sixtracklib/opencl/internal/base_context.h"
 
 #if !defined( __CUDACC__ )
 
@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/_impl/path.h"
 #include "sixtracklib/common/compute_arch.h"
 
 #include <CL/cl.hpp>
@@ -120,7 +121,7 @@ namespace SIXTRL_NAMESPACE
             NS(ComputeNodeId_get_platform_id)( &node_id ),
             NS(ComputeNodeId_get_device_id)( &node_id ) );
 
-        if( ( node_index < this->numAvailableNodes() ) && &&
+        if( ( node_index < this->numAvailableNodes() ) &&
             ( this->doSelectNodeBaseImpl( node_index ) ) )
         {
             this->doInitDefaultKernels();
@@ -390,7 +391,7 @@ namespace SIXTRL_NAMESPACE
             success = this->doInitDefaultKernels();
         }
 
-        return success
+        return success;
     }
 
     bool ClContextBase::selectNode( node_id_t const node_id )
@@ -830,6 +831,45 @@ namespace SIXTRL_NAMESPACE
         return kernel_id;
     }
 
+    ClContextBase::kernel_id_t ClContextBase::findKernelByName(
+        char const* SIXTRL_RESTRICT kernel_name ) const SIXTRL_NOEXCEPT
+    {
+        kernel_id_t kernel_id = kernel_id_t{ -1 };
+
+        SIXTRL_ASSERT( this->m_kernel_data.size() ==
+                       this->m_cl_kernels.size() );
+
+        if( ( !this->m_kernel_data.empty() ) && ( kernel_name != nullptr ) &&
+            ( std::strlen( kernel_name ) > 0u ) )
+        {
+            kernel_id_t const num_kernels = this->m_kernel_data.size();
+            kernel_id_t cmp_kernel_id = kernel_id_t{ 0 };
+
+            for( ; cmp_kernel_id < num_kernels ; ++cmp_kernel_id )
+            {
+                kernel_data_t const& kernel_data =
+                    this->m_kernel_data[ cmp_kernel_id ];
+
+                program_id_t const kernel_program_id =
+                    kernel_data.m_program_id;
+
+                if( ( kernel_program_id < program_id_t{ 0 } ) ||
+                    ( static_cast< size_type >( kernel_program_id ) >=
+                      this->numAvailablePrograms() ) )
+                {
+                    continue;
+                }
+
+                if( 0 == kernel_data.m_kernel_name.compare( kernel_name ) )
+                {
+                    kernel_id = cmp_kernel_id;
+                    break;
+                }
+            }
+        }
+
+        return kernel_id;
+    }
 
     bool ClContextBase::hasRemappingKernel() const SIXTRL_NOEXCEPT
     {
@@ -991,7 +1031,8 @@ namespace SIXTRL_NAMESPACE
         return &this->m_cl_context;
     }
 
-    ClContextBase::kernel_data_list_t const& kernelData() const SIXTRL_NOEXCEPT
+    ClContextBase::kernel_data_list_t const&
+    ClContextBase::kernelData() const SIXTRL_NOEXCEPT
     {
         return this->m_kernel_data;
     }
@@ -1067,7 +1108,7 @@ namespace SIXTRL_NAMESPACE
         bool success = false;
 
         std::string path_to_remap_kernel_program( NS(PATH_TO_BASE_DIR) );
-        path_to_remap_kernel_program += "sixtracklib/opencl/";
+        path_to_remap_kernel_program += "sixtracklib/opencl/kernels/";
         path_to_remap_kernel_program += "managed_buffer_remap_kernel.cl";
 
         std::string remap_program_compile_options = "-D_GPUCODE=1";
@@ -1084,7 +1125,7 @@ namespace SIXTRL_NAMESPACE
 
         if( remap_program_id >= program_id_t{ 0 } )
         {
-            this->m_remap_prorgam_id = remap_program_id;
+            this->m_remap_program_id = remap_program_id;
             success = true;
         }
 
@@ -1460,6 +1501,14 @@ SIXTRL_HOST_FN int NS(ClContextBase_enable_kernel)(
         ? ctx->enableKernel( kernel_name, program_id ) : -1;
 }
 
+SIXTRL_HOST_FN int NS(ClContextBase_find_kernel_id_by_name)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT kernel_name )
+{
+    return ( ctx != nullptr ) ? ctx->findKernelByName( kernel_name ) : -1;
+}
+
+
 SIXTRL_HOST_FN char const* NS(ClContextBase_get_kernel_function_name)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id )
 {
@@ -1589,6 +1638,6 @@ SIXTRL_HOST_FN void NS(ClContextBase_delete)(
 
 #endif /* !defined( __CUDACC__ )  */
 
-/* end: sixtracklib/opencl/code/cl_context_base.cpp */
+/* end: sixtracklib/opencl/internal/cl_context_base.cpp */
 
 

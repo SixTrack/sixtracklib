@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_OPENCL_PRIVATE_BASE_CONTEXT_H__
-#define SIXTRACKLIB_OPENCL_PRIVATE_BASE_CONTEXT_H__
+#ifndef SIXTRACKLIB_OPENCL_INTERNAL_BASE_CONTEXT_H__
+#define SIXTRACKLIB_OPENCL_INTERNAL_BASE_CONTEXT_H__
 
 #if !defined( __CUDACC__ )
 
@@ -32,7 +32,7 @@
 
 using NS(context_size_t) = std::size_t;
 
-namespace SIXTRL_NAMESPACE
+namespace sixtrack
 {
     using node_id_t     = NS(ComputeNodeId);
     using node_info_t   = NS(ComputeNodeInfo);
@@ -172,6 +172,9 @@ namespace SIXTRL_NAMESPACE
         kernel_id_t  enableKernel( char const* kernel_name,
                                    program_id_t const program_id );
 
+        kernel_id_t findKernelByName(
+            const char* SIXTRL_RESTRICT kernel_name ) const SIXTRL_NOEXCEPT;
+
         char const* kernelFunctionName(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
@@ -261,7 +264,7 @@ namespace SIXTRL_NAMESPACE
             size_type     m_local_mem_size;
         };
 
-        using program_data_list_t = std::vector< prorgam_data_t >;
+        using program_data_list_t = std::vector< program_data_t >;
         using kernel_data_list_t  = std::vector< kernel_data_t >;
 
         virtual bool doInitDefaultPrograms();
@@ -292,7 +295,9 @@ namespace SIXTRL_NAMESPACE
         bool doInitDefaultProgramsBaseImpl();
         bool doInitDefaultKernelsBaseImpl();
 
-        bool doCompileProgramBaseImpl( size_type const node_index );
+        bool doCompileProgramBaseImpl(
+            cl::Program& cl_program, program_data_t& program_data );
+
         bool doSelectNodeBaseImpl( size_type const node_index );
 
         std::vector< cl::Program >      m_cl_programs;
@@ -427,6 +432,10 @@ SIXTRL_HOST_FN int NS(ClContextBase_enable_kernel)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* kernel_name, int const program_id );
 
+SIXTRL_HOST_FN int NS(ClContextBase_find_kernel_id_by_name)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT kernel_name );
+
 SIXTRL_HOST_FN char const* NS(ClContextBase_get_kernel_function_name)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
@@ -485,6 +494,6 @@ SIXTRL_HOST_FN void NS(ClContextBase_delete)(
 
 #endif /* !defined( __CUDACC__ ) */
 
-#endif /* SIXTRACKLIB_OPENCL_PRIVATE_BASE_CONTEXT_H__ */
+#endif /* SIXTRACKLIB_OPENCL_INTERNAL_BASE_CONTEXT_H__ */
 
-/* end: sixtracklib/opencl/private/base_context.h */
+/* end: sixtracklib/opencl/internal/base_context.h */

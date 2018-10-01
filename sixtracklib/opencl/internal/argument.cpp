@@ -19,19 +19,65 @@
 
 #include "sixtracklib/_impl/definitions.h"
 #include "sixtracklib/common/buffer.h"
-#include "sixtracklib/opencl/private/base_context.h"
+#include "sixtracklib/opencl/context.h"
 
 namespace SIXTRL_NAMESPACE
 {
     ClArgument::ClArgument(
-        NS(Buffer) const& buffer,
-        ClArgument::context_base_t* ptr_context ) :
+        ClArgument::context_base_t* SIXTRL_RESTRICT ptr_context ) :
         m_cl_buffer(),
         m_cl_success_flag(),
-        m_arg_size( ClArgument::size_type{ 0 } ),
-        m_ptr_context( ptr_context )
+        m_ptr_cobj_buffer( nullptr ),
+        m_ptr_context( ptr_context ),
+        m_arg_size( ClArgument::size_type{ 0 } )
     {
-        size_type const arg_size = NS(Buffer_get_size)( &buffer );
+
+    }
+
+    ClArgument::ClArgument(
+        ClArgument::cxx_cobj_buffer_t& SIXTRL_RESTRICT_REF buffer,
+        ClArgument::context_base_t* SIXTRL_RESTRICT ptr_context ) :
+        m_cl_buffer(),
+        m_cl_success_flag(),
+        m_ptr_cobj_buffer( nullptr ),
+        m_ptr_context( ptr_context ),
+        m_arg_size( ClArgument::size_type{ 0 } )
+    {
+        size_type const arg_size = NS(Buffer_get_size)( buffer.getCApiPtr() );
+
+        cl::Context* ptr_ocl_ctx = ( ptr_context != nullptr )
+            ? ptr_context->openClContext() : nullptr;
+
+        if( ( arg_size > size_type{ 0 } ) &&
+            ( ptr_ocl_ctx != nullptr ) && ( ptr_context != nullptr ) &&
+            ( ptr_context->openClQueue() != nullptr ) &&
+            ( ptr_context->hasSelectedNode() ) &&
+            ( ptr_context->hasRemappingKernel() ) )
+        {
+            this->m_cl_buffer = cl::Buffer(
+                *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
+
+            this->m_cl_success_flag = cl::Buffer(
+                *ptr_ocl_ctx, CL_MEM_READ_WRITE, sizeof( int32_t ), nullptr );
+
+            int const ret = this->doWriteAndRemapCObjBufferBaseImpl(
+                buffer.getCApiPtr() );
+
+            SIXTRL_ASSERT( ret == 0 );
+            ( void )ret;
+        }
+    }
+
+    ClArgument::ClArgument(
+        ClArgument::cobj_buffer_t* SIXTRL_RESTRICT buffer,
+        ClArgument::context_base_t* SIXTRL_RESTRICT ptr_context ) :
+        m_cl_buffer(),
+        m_cl_success_flag(),
+        m_ptr_cobj_buffer( nullptr ),
+        m_ptr_context( ptr_context ),
+        m_arg_size( ClArgument::size_type{ 0 } )
+    {
+        size_type const arg_size = NS(Buffer_get_size)( buffer );
 
         cl::Context* ptr_ocl_ctx = ( ptr_context != nullptr )
             ? ptr_context->openClContext() : nullptr;
@@ -57,11 +103,12 @@ namespace SIXTRL_NAMESPACE
 
     ClArgument::ClArgument(
         ClArgument::size_type const arg_size,
-        ClArgument::context_base_t* ptr_context ) :
+        ClArgument::context_base_t* SIXTRL_RESTRICT ptr_context ) :
         m_cl_buffer(),
         m_cl_success_flag(),
-        m_arg_size( ClArgument::size_type{ 0 } ),
-        m_ptr_context( ptr_context )
+        m_ptr_cobj_buffer( nullptr ),
+        m_ptr_context( ptr_context ),
+        m_arg_size( ClArgument::size_type{ 0 } )
     {
         cl::Context* ptr_ocl_ctx = ( ptr_context != nullptr )
             ? ptr_context->openClContext() : nullptr;
@@ -86,13 +133,14 @@ namespace SIXTRL_NAMESPACE
     }
 
     ClArgument::ClArgument(
-        void const* arg_buffer_begin,
+        void const* SIXTRL_RESTRICT arg_buffer_begin,
         ClArgument::size_type const arg_size,
-        ClArgument::context_base_t* ptr_context ) :
+        ClArgument::context_base_t* SIXTRL_RESTRICT ptr_context ) :
         m_cl_buffer(),
         m_cl_success_flag(),
-        m_arg_size( ClArgument::size_type{ 0 } ),
-        m_ptr_context( ptr_context )
+        m_ptr_cobj_buffer( nullptr ),
+        m_ptr_context( ptr_context ),
+        m_arg_size( ClArgument::size_type{ 0 } )
     {
         cl::Context* ptr_ocl_ctx = ( ptr_context != nullptr )
             ? ptr_context->openClContext() : nullptr;
@@ -132,12 +180,19 @@ namespace SIXTRL_NAMESPACE
         return this->m_arg_size;
     }
 
-    bool ClArgument::write( NS(Buffer) const& buffer )
+    bool ClArgument::write(
+         ClArgument::cxx_cobj_buffer_t& SIXTRL_RESTRICT_REF buffer )
+    {
+        return ( 0 == this->doWriteAndRemapCObjBuffer( buffer.getCApiPtr() ) );
+    }
+
+
+    bool ClArgument::write( ClArgument::cobj_buffer_t* SIXTRL_RESTRICT buffer )
     {
         return ( 0 == this->doWriteAndRemapCObjBuffer( buffer ) );
     }
 
-    bool ClArgument::write( void const* arg_buffer_begin,
+    bool ClArgument::write( void const* SIXTRL_RESTRICT arg_buffer_begin,
                             ClArgument::size_type const arg_length )
     {
         bool success = false;
@@ -161,8 +216,8 @@ namespace SIXTRL_NAMESPACE
         return success;
     }
 
-    bool ClArgument::read( void* arg_buffer_begin,
-                           ClArgument::size_type const arg_length )
+    bool ClArgument::read(
+        void* arg_buffer_begin, ClArgument::size_type const arg_length )
     {
         bool success = false;
 
@@ -185,35 +240,38 @@ namespace SIXTRL_NAMESPACE
         return success;
     }
 
-    bool ClArgument::read( NS(Buffer)& buffer )
+    bool ClArgument::read(
+        ClArgument::cxx_cobj_buffer_t& SIXTRL_RESTRICT_REF buffer )
+    {
+        return ( 0 == this->doReadAndRemapCObjBuffer( buffer.getCApiPtr() ) );
+    }
+
+    bool ClArgument::read(
+        ClArgument::cobj_buffer_t* SIXTRL_RESTRICT buffer )
     {
         return ( 0 == this->doReadAndRemapCObjBuffer( buffer ) );
     }
 
-    bool ClArgument::isCObjectBufferArgument() const SIXTRL_NOEXCEPT
+    bool ClArgument::usesCObjectBuffer() const SIXTRL_NOEXCEPT
     {
         return ( this->m_ptr_cobj_buffer != nullptr );
     }
 
-    Buffer* ClArgument::ptrCObjectBuffer() const SIXTRL_NOEXCEPT
+    ClArgument::cobj_buffer_t*
+    ClArgument::ptrCObjectBuffer() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_cobj_buffer;
     }
 
 
     ClArgument::context_base_t*
-    ClArgument::context() SIXTRL_NOEXCEPT
-    {
-        return this->m_ptr_context;
-    }
-
-    ClArgument::context_base_t const*
     ClArgument::context() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_context;
     }
 
-    bool ClArgument::attachTo( ClContextBase* ptr_context )
+    bool ClArgument::attachTo(
+         ClArgument::context_base_t* SIXTRL_RESTRICT ptr_context )
     {
         bool success = false;
 
@@ -248,28 +306,30 @@ namespace SIXTRL_NAMESPACE
         return this->m_cl_success_flag;
     }
 
-    int ClArgument::doWriteAndRemapCObjBuffer( NS(Buffer) const& buffer )
+    int ClArgument::doWriteAndRemapCObjBuffer(
+        ClArgument::cobj_buffer_t* SIXTRL_RESTRICT buffer )
     {
         return this->doWriteAndRemapCObjBufferBaseImpl( buffer );
     }
 
-    int ClArgument::doReadAndRemapCObjBuffer( NS(Buffer)& buffer )
+    int ClArgument::doReadAndRemapCObjBuffer(
+        ClArgument::cobj_buffer_t* SIXTRL_RESTRICT buffer )
     {
         return this->doReadAndRemapCObjBufferBaseImpl( buffer );
     }
 
     int ClArgument::doWriteAndRemapCObjBufferBaseImpl(
-        NS(Buffer) const& buffer )
+        ClArgument::cobj_buffer_t* SIXTRL_RESTRICT buffer )
     {
         int success = -1;
 
-        size_type const buffer_size = NS(Buffer_get_size)( &buffer );
+        size_type const buffer_size = NS(Buffer_get_size)( buffer );
 
         cl::CommandQueue* ptr_queue = ( this->m_ptr_context != nullptr )
             ? this->m_ptr_context->openClQueue() : nullptr;
 
         if( ( this->m_ptr_context != nullptr ) &&
-            ( ptr_queue != nullptr ) &&
+            ( buffer != nullptr ) && ( ptr_queue != nullptr ) &&
             ( this->m_ptr_context->hasSelectedNode() ) &&
             ( this->m_ptr_context->hasRemappingKernel() ) &&
             ( buffer_size > size_type{ 0 } ) &&
@@ -324,7 +384,7 @@ namespace SIXTRL_NAMESPACE
 
                 ret = ptr_queue->enqueueWriteBuffer(
                     this->m_cl_buffer, CL_TRUE, 0, buffer_size,
-                    NS(Buffer_get_const_data_begin)( &buffer ) );
+                    NS(Buffer_get_const_data_begin)( buffer ) );
 
                 success = ( ret == CL_SUCCESS ) ? 0 : -2;
 
@@ -373,30 +433,31 @@ namespace SIXTRL_NAMESPACE
         return success;
     }
 
-    int ClArgument::doReadAndRemapCObjBufferBaseImpl( NS(Buffer)& buffer )
+    int ClArgument::doReadAndRemapCObjBufferBaseImpl(
+        ClArgument::cobj_buffer_t * SIXTRL_RESTRICT buffer )
     {
         int success = -1;
 
-        size_type const buffer_capacity = NS(Buffer_get_capacity)( &buffer );
+        size_type const buffer_capacity = NS(Buffer_get_capacity)( buffer );
 
         cl::CommandQueue* ptr_queue = ( this->m_ptr_context != nullptr )
             ? this->m_ptr_context->openClQueue() : nullptr;
 
         if( ( this->m_ptr_context != nullptr ) &&
-            ( ptr_queue != nullptr ) &&
+            ( buffer != nullptr ) && ( ptr_queue != nullptr ) &&
             ( this->m_ptr_context->hasSelectedNode() ) &&
             ( this->m_arg_size >  size_type{ 0 } ) &&
             ( buffer_capacity >=  this->m_arg_size ) )
         {
             cl_int ret = ptr_queue->enqueueReadBuffer(
                 this->m_cl_buffer, CL_TRUE, 0, this->m_arg_size,
-                NS(Buffer_get_data_begin)( &buffer ) );
+                NS(Buffer_get_data_begin)( buffer ) );
 
             success = ( ret == CL_SUCCESS ) ? 0 : -1;
 
             if( success == 0 )
             {
-                success = NS(Buffer_remap)( &buffer );
+                success = NS(Buffer_remap)( buffer );
             }
 
             if( success == 0 )
@@ -408,11 +469,151 @@ namespace SIXTRL_NAMESPACE
         return success;
     }
 
-    void ClArgument::doSetCObjBuffer( Buffer& buffer ) NOEXCEPT
+    void ClArgument::doSetCObjBuffer(
+         ClArgument::cobj_buffer_t* SIXTRL_RESTRICT buffer ) const SIXTRL_NOEXCEPT
     {
-        this->m_ptr_cobj_buffer = &buffer;
+        this->m_ptr_cobj_buffer = buffer;
         return;
     }
+}
+
+/* ========================================================================= */
+
+SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ptr_context )
+{
+    return new SIXTRL_NAMESPACE::ClArgument( ptr_context );
+}
+
+SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_buffer)(
+    NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(ClContextBase)* SIXTRL_RESTRICT ptr_context )
+{
+    return ( buffer != nullptr )
+        ? new SIXTRL_NAMESPACE::ClArgument( buffer, ptr_context )
+        : new SIXTRL_NAMESPACE::ClArgument( ptr_context );
+}
+
+SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_size)(
+    NS(context_size_t) const arg_size,
+    NS(ClContextBase)* SIXTRL_RESTRICT ptr_context )
+{
+    return new SIXTRL_NAMESPACE::ClArgument( arg_size, ptr_context );
+}
+
+SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_memory)(
+    void const* SIXTRL_RESTRICT arg_buffer_begin,
+    NS(context_size_t) const arg_size,
+    NS(ClContextBase)* SIXTRL_RESTRICT ptr_context )
+{
+    return new SIXTRL_NAMESPACE::ClArgument(
+        arg_buffer_begin, arg_size, ptr_context );
+}
+
+SIXTRL_HOST_FN void NS(ClArgument_delete)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument )
+{
+    delete argument;
+}
+
+SIXTRL_HOST_FN NS(context_size_t) NS(ClArgument_get_argument_size)(
+    const NS(ClArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr )
+        ? argument->size() : NS(context_size_t){ 0 };
+}
+
+SIXTRL_HOST_FN bool NS(ClArgument_write)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument,
+    NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    return ( ( argument != nullptr ) && ( buffer != nullptr ) )
+        ? argument->write( buffer ) : false;
+}
+
+SIXTRL_HOST_FN bool NS(ClArgument_write_memory)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument,
+    void const* SIXTRL_RESTRICT arg_buffer_begin,
+    NS(context_size_t) const arg_length )
+{
+    return ( argument != nullptr )
+        ? argument->write( arg_buffer_begin, arg_length ) : false;
+}
+
+SIXTRL_HOST_FN bool NS(ClArgument_read)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument,
+    NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    return ( ( argument != nullptr ) && ( buffer != nullptr ) )
+        ? argument->read( buffer ) : false;
+}
+
+SIXTRL_HOST_FN bool NS(ClArgument_read_memory)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument,
+    void* SIXTRL_RESTRICT arg_buffer_begin,
+    NS(context_size_t) const arg_length )
+{
+    return ( argument != nullptr )
+        ? argument->read( arg_buffer_begin, arg_length ) : false;
+}
+
+SIXTRL_HOST_FN bool NS(ClArgument_uses_cobj_buffer)(
+    const NS(ClArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr ) ? argument->usesCObjectBuffer() : false;
+}
+
+SIXTRL_HOST_FN NS(Buffer) const* NS(ClArgument_get_const_ptr_cobj_buffer)(
+    const NS(ClArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr ) ? argument->ptrCObjectBuffer() : nullptr;
+}
+
+SIXTRL_HOST_FN NS(Buffer)* NS(ClArgument_get_ptr_cobj_buffer)(
+    const NS(ClArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr ) ? argument->ptrCObjectBuffer() : nullptr;
+}
+
+SIXTRL_HOST_FN NS(ClContextBase)* NS(ClArgument_get_ptr_to_context)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr ) ? argument->context() : nullptr;
+}
+
+SIXTRL_HOST_FN bool NS(ClArgument_attach_to_context)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument,
+    NS(ClContextBase)* SIXTRL_RESTRICT ptr_context )
+{
+    return ( argument != nullptr ) ? argument->attachTo( ptr_context ) : false;
+}
+
+SIXTRL_HOST_FN cl_mem NS(ClArgument_get_opencl_buffer)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument )
+{
+    cl::Buffer* ptr_arg_buffer = ( argument != nullptr )
+        ? &argument->openClBuffer() : nullptr;
+
+    if( ptr_arg_buffer != nullptr )
+    {
+        return ptr_arg_buffer->operator()();
+    }
+
+    return cl_mem{};
+}
+
+SIXTRL_HOST_FN cl_mem NS(ClArgument_get_internal_opencl_success_flag_buffer)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument )
+{
+    cl::Buffer* ptr_success_flag = ( argument != nullptr ) ?
+        &argument->internalSuccessFlagBuffer() : nullptr;
+
+    if( ptr_success_flag != nullptr )
+    {
+        return ptr_success_flag->operator()();
+    }
+
+    return cl_mem{};
 }
 
 #endif /* !defined( __CUDACC__ ) */
