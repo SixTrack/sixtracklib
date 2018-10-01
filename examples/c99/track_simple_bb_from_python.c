@@ -115,15 +115,20 @@ int main( int argc, char* argv[] )
             st_Particles* pdump = st_Particles_add_copy(dump, particles);
             assert(pdump != 0);
             elem++;
+            
+            //st_Particles_print(stdout, pdump);
         }
         
     }
 
     printf("N objects in dump %d\n", (int)st_Buffer_get_num_of_objects(dump));
 
-    FILE* fp = fopen("stlib_dump.bin", "wb");
-    fwrite(st_Buffer_get_data_begin(dump), st_Buffer_get_size(dump), 1, fp);
-    fclose(fp);
+    // Write to file
+    st_Buffer_write_to_file(dump, "stlib_dump.bin");
+    
+    st_Buffer* test = st_Buffer_new_from_file("stlib_dump.bin");
+    st_Particles_buffer_print(stdout, test);
+
 
     /* ********************************************************************** */
     /* ****                         Clean-up                             **** */
