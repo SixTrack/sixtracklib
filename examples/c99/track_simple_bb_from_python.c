@@ -42,6 +42,7 @@ int main( int argc, char* argv[] )
 
     buf_size_t ii = 0;
 
+
     /* ********************************************************************** */
     /* ****   Handling of command line parameters                             */
     /* ********************************************************************** */
@@ -90,6 +91,8 @@ int main( int argc, char* argv[] )
     /* ****   Building Particles Data from LHC Particle Dump Data        **** */
     /* ********************************************************************** */
 
+    st_Buffer* dump = st_Buffer_new(1<<24);//16MB
+
     particles = st_Particles_new( pb, NUM_PARTICLES );
     input_particles = st_Particles_buffer_get_const_particles( lhc_particle_dump, 0u );
     num_input_particles = st_Particles_get_num_of_particles( input_particles );
@@ -100,11 +103,27 @@ int main( int argc, char* argv[] )
         st_Particles_copy_single( particles, ii, input_particles, jj );
     }
 
+    int N_elem = st_Buffer_get_num_of_objects(lhc_beam_elements_buffer);
+    printf("N_elem= %d \n",N_elem);
+
     for( ii = 0 ; ii < NUM_TURNS ; ++ii )
     {
-        st_Track_particles_beam_elements( particles, lhc_beam_elements_buffer );
-	printf("turn %d x[0]=%.5e\n", (int)ii, st_Particles_get_x_value(particles, 0)); 
+        st_Object* elem = st_Buffer_get_objects_begin( lhc_beam_elements_buffer );
+        for( int i_ele=0; i_ele<N_elem; i_ele++)
+        {
+            st_Track_particle_subset_beam_element_obj( particles, 0, NUM_PARTICLES, elem);
+            st_Particles* pdump = st_Particles_add_copy(dump, particles);
+            assert(pdump != 0);
+            elem++;
+        }
+        
     }
+
+    printf("N objects in dump %d\n", (int)st_Buffer_get_num_of_objects(dump));
+
+    FILE* fp = fopen("stlib_dump.bin", "wb");
+    fwrite(st_Buffer_get_data_begin(dump), st_Buffer_get_size(dump), 1, fp);
+    fclose(fp);
 
     /* ********************************************************************** */
     /* ****                         Clean-up                             **** */
@@ -113,6 +132,7 @@ int main( int argc, char* argv[] )
     st_Buffer_delete( pb );
     st_Buffer_delete( lhc_particle_dump );
     st_Buffer_delete( lhc_beam_elements_buffer );
+    st_Buffer_delete( dump );
 }
 
 /* end: examples/c99/track_lhc_no_bb.c */
