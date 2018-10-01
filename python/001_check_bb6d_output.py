@@ -19,25 +19,24 @@ ebe = []
 for iob in range(buf.n_objects):
     ebe.append(buf.get_object(tp.Particles, iob))
 
-i_part = 1
+i_part = 0
 for ii, elem in enumerate(line):
 
-	
-	ptest = pysixtrack.Particles()
+    ptest = pysixtrack.Particles()
 
-	before = ebe[ii]
-	for ff in before.get_fields():
-		name = ff[0]
-		try:
-			setattr(ptest, name, getattr(before, name)[i_part])
-		except Exception as err:
-			pass
+    before = ebe[ii]
+    for ff in before.get_fields():
+        name = ff[0]
+        try:
+            setattr(ptest, name, getattr(before, name)[i_part])
+        except Exception as err:
+            pass
 
-	elem[2].track(ptest)
+    elem[2].track(ptest)
 
-	print(elem[0])
-	print(ptest.x, ebe[ii+1].x[i_part])
+    print(elem[0])
 
-
-
-	
+    for nn in 'x px y py zeta delta'.split():
+        ref = getattr(ptest, nn)
+        ttt = getattr(ebe[ii+1], nn)[i_part]
+        print(nn, ref, ttt)	
