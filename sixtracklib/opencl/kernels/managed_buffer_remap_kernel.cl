@@ -1,7 +1,9 @@
-#ifndef SIXTRACKLIB_OPENCL_IMPL_MANAGED_BUFFER_REMAP_KERNEL_OPENCL_CL__
-#define SIXTRACKLIB_OPENCL_IMPL_MANAGED_BUFFER_REMAP_KERNEL_OPENCL_CL__
+#ifndef SIXTRACKLIB_OPENCL_INTERNAL_MANAGED_BUFFER_REMAP_KERNEL_OPENCL_CL__
+#define SIXTRACKLIB_OPENCL_INTERNAL_MANAGED_BUFFER_REMAP_KERNEL_OPENCL_CL__
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/opencl/internal/default_compile_options.h"
+
     #include "sixtracklib/_impl/definitions.h"
     #include "sixtracklib/common/impl/buffer_defines.h"
     #include "sixtracklib/common/impl/managed_buffer_minimal.h"
@@ -99,6 +101,6 @@ __kernel void NS(ManagedBuffer_remap_io_buffers_opencl)(
     return;
 }
 
-#endif /* SIXTRACKLIB_OPENCL_IMPL_MANAGED_BUFFER_REMAP_KERNEL_OPENCL_CL__ */
+#endif /* SIXTRACKLIB_OPENCL_INTERNAL_MANAGED_BUFFER_REMAP_KERNEL_OPENCL_CL__ */
 
-/* end: sixtracklib/opencl/impl/managed_buffer_remap_kernel.cl */
+/* end: sixtracklib/opencl/private/managed_buffer_remap_kernel.cl */

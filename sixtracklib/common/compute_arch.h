@@ -2,6 +2,7 @@
 #define SIXTRACKLIB_COMMON_COMPUTE_ARCH_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+    #include <stdbool.h>
     #include <stddef.h>
     #include <stdint.h>
     #include <stdlib.h>
@@ -31,13 +32,9 @@ NS(ComputeNodeId);
 
 #if defined( __cplusplus )
 
-bool operator<( NS(ComputeNodeId) const& lhs,
-                NS(ComputeNodeId) const& rhs ) noexcept
-{
-    return ( ( lhs.platform_id < rhs.platform_id ) ||
-             ( ( lhs.platform_id == rhs.platform_id ) &&
-               ( lhs.device_id   <  rhs.device_id   ) ) );
-}
+SIXTRL_FN SIXTRL_STATIC bool operator<(
+    NS(ComputeNodeId) const& lhs,
+    NS(ComputeNodeId) const& rhs ) SIXTRL_NOEXCEPT;
 
 #endif /* !defined( __cplusplus ) */
 
@@ -66,6 +63,28 @@ SIXTRL_HOST_FN SIXTRL_STATIC void NS(ComputeNodeId_set_device_id)(
 
 SIXTRL_HOST_FN SIXTRL_STATIC int NS(ComputeNodeId_is_valid)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id );
+
+SIXTRL_HOST_FN SIXTRL_STATIC int NS(ComputeNodeId_compare)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT lhs,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_HOST_FN SIXTRL_STATIC bool NS(ComputeNodeId_are_equal)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT lhs,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT rhs );
+
+#if !defined( GPUCODE )
+
+SIXTRL_HOST_FN int NS(ComputeNodeId_to_string)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT id,
+    char* SIXTRL_RESTRICT str_buffer,
+    SIXTRL_UINT64_T const str_buffer_capacity );
+
+SIXTRL_HOST_FN int NS(ComputeNodeId_from_string)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT id,
+    char const* SIXTRL_RESTRICT str_buffer );
+
+#endif /* !defined( _GPUCODE ) */
+
 
 
 typedef struct NS(ComputeNodeInfo)
@@ -126,11 +145,31 @@ SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_name)(
 SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_description)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
 
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+}
+#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+
 /* ************************************************************************** */
 /* ******                                                               ***** */
 /* ******             Inline functions implementation                   ***** */
 /* ******                                                               ***** */
 /* ************************************************************************** */
+
+#if defined( __cplusplus )
+
+SIXTRL_INLINE bool operator<( NS(ComputeNodeId) const& lhs,
+    NS(ComputeNodeId) const& rhs ) SIXTRL_NOEXCEPT
+{
+    return ( ( lhs.platform_id < rhs.platform_id ) ||
+             ( ( lhs.platform_id == rhs.platform_id ) &&
+               ( lhs.device_id   <  rhs.device_id   ) ) );
+}
+
+#endif /* defined( __cplusplus ) */
+
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+extern "C" {
+#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeId_get_platform_id)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id )
@@ -168,6 +207,59 @@ SIXTRL_INLINE int NS(ComputeNodeId_is_valid)(
     return ( ( id != 0 ) &&
              ( id->platform_id != -1 ) &&
              ( id->device_id   != -1 ) );
+}
+
+SIXTRL_INLINE int NS(ComputeNodeId_compare)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT lhs,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT rhs )
+{
+    int compare_result = -1;
+
+    bool const lhs_is_valid = NS(ComputeNodeId_is_valid)( lhs );
+
+    if( ( lhs_is_valid ) && ( NS(ComputeNodeId_is_valid)( rhs ) ) )
+    {
+        NS(comp_node_id_num_t) const lhs_platform_idx =
+            NS(ComputeNodeId_get_platform_id)( lhs );
+
+        NS(comp_node_id_num_t) const rhs_platform_idx =
+            NS(ComputeNodeId_get_platform_id)( rhs );
+
+        if( lhs_platform_idx == rhs_platform_idx )
+        {
+            NS(comp_node_id_num_t) const lhs_device_idx =
+                NS(ComputeNodeId_get_device_id)( lhs );
+
+            NS(comp_node_id_num_t) const rhs_device_idx =
+                NS(ComputeNodeId_get_device_id)( rhs );
+
+            if( lhs_device_idx == rhs_device_idx )
+            {
+                compare_result = 0;
+            }
+            else if( lhs_device_idx > rhs_device_idx )
+            {
+                compare_result = +1;
+            }
+        }
+        else if( lhs_platform_idx > rhs_platform_idx )
+        {
+            compare_result = +1;
+        }
+    }
+    else if( lhs_is_valid )
+    {
+        compare_result = +1;
+    }
+
+    return compare_result;
+}
+
+SIXTRL_INLINE bool NS(ComputeNodeId_are_equal)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT lhs,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT rhs )
+{
+    return ( NS(ComputeNodeId_compare)( lhs, rhs ) == 0 );
 }
 
 

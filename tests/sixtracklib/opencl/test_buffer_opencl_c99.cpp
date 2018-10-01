@@ -103,6 +103,7 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThre
     a2str.str( "" );
     a2str << " -D_GPUCODE=1"
           << " -D__NAMESPACE=st_"
+          << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
           << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
           << " -I" << PATH_TO_BASE_DIR
           << " -I" << PATH_TO_BASE_DIR << "tests" ;

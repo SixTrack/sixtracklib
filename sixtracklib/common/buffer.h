@@ -6,6 +6,7 @@
     #include <stddef.h>
     #include <stdint.h>
     #include <stdlib.h>
+    #include <stdio.h>
     #include <limits.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
@@ -198,9 +199,16 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_remap)(
 SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new)(
     NS(buffer_size_t) const buffer_capacity );
 
-SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
-NS(Buffer_new_from_file)(
+SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_from_file)(
     SIXTRL_BUFFER_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+
+SIXTRL_HOST_FN bool NS(Buffer_write_to_file)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+
+SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    FILE* SIXTRL_RESTRICT fp );
 
 SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_detailed)(
     NS(buffer_size_t)  const initial_max_num_objects,
@@ -1018,6 +1026,7 @@ SIXTRL_INLINE int NS(Buffer_init)(
 
     return success;
 }
+
 
 /* ------------------------------------------------------------------------- */
 

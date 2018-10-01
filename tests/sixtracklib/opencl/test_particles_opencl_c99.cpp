@@ -97,18 +97,14 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
         a2str.str( "" );
         a2str << " -D_GPUCODE=1"
               << " -D__NAMESPACE=st_"
-              << " -DSIXTRL_DATAPTR_DEC=__global"
+              << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
               << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
-              << " -DSIXTRL_PARTICLE_ARGPTR_DEC=__global"
-              << " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global"
-              << " -DSIXTRL_BUFFER_OBJ_ARGPTR_DEC=__global"
-              << " -DISXTRL_BUFFER_OBJ_DATAPTR_DEC=__global"
               << " -I" << PATH_TO_BASE_DIR;
 
         std::string const REMAP_COMPILE_OPTIONS = a2str.str();
 
         std::string path_to_source = PATH_TO_BASE_DIR + std::string(
-            "sixtracklib/opencl/impl/managed_buffer_remap_kernel.cl" );
+            "sixtracklib/opencl/kernels/managed_buffer_remap_kernel.cl" );
 
         std::ifstream kernel_file( path_to_source, std::ios::in );
 

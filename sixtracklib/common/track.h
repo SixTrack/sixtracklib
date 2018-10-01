@@ -421,8 +421,6 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_cavity)(
     SIXTRL_STATIC_VAR real_t const PI  =
         ( real_t )3.1415926535897932384626433832795028841971693993751;
 
-    SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0.0;
-    SIXTRL_STATIC_VAR real_t const ONE  = ( real_t )1.0;
     SIXTRL_STATIC_VAR real_t const TWO  = ( real_t )2.0;
 
     real_t const DEG2RAD  = PI / ( real_t )180.0;
@@ -430,47 +428,16 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_cavity)(
 
     real_t const   beta0  = NS(Particles_get_beta0_value)(  particles, ii );
     real_t const   zeta   = NS(Particles_get_zeta_value)(   particles, ii );
-    real_t const   p0c    = NS(Particles_get_p0c_value)(    particles, ii );
     real_t const   chi    = NS(Particles_get_chi_value)(    particles, ii );
-
-    real_t         psigma = NS(Particles_get_psigma_value)( particles, ii );
     real_t         rvv    = NS(Particles_get_rvv_value)(    particles, ii );
-
-    real_t         delta  = ZERO;
-    real_t          rpp   = ZERO;
-    real_t         beta   = ZERO;
-    real_t one_plus_delta = ZERO;
-
     real_t const   tau    = zeta / ( beta0 * rvv );
-    real_t         ptau   = psigma * beta0;
 
     real_t const   phase  = DEG2RAD  * NS(Cavity_get_lag)( cav ) -
                             K_FACTOR * NS(Cavity_get_frequency)( cav ) * tau;
 
     real_t const energy   = chi * sin( phase ) * NS(Cavity_get_voltage)( cav );
 
-    SIXTRL_ASSERT( ii    < NS(Particles_get_num_of_particles)( particles ) );
-    SIXTRL_ASSERT( rvv   > ZERO );
-    SIXTRL_ASSERT( beta0 > ZERO );
-
-    ptau  += energy / p0c;
-    psigma = ptau / beta0;
-
-    SIXTRL_ASSERT( ( ptau * ptau + TWO * psigma + ONE ) > ZERO );
-    one_plus_delta = sqrt( ptau * ptau + TWO * psigma + ONE );
-    delta          = one_plus_delta - ONE;
-
-    SIXTRL_ASSERT( one_plus_delta > ZERO );
-    rpp    = ONE / one_plus_delta;
-
-    SIXTRL_ASSERT( ( ONE / beta0 + ptau ) > ZERO );
-    beta   = ( ONE + delta ) / ( ONE / beta0 + ptau );
-    rvv    = beta / beta0;
-
-    NS(Particles_set_psigma_value)( particles, ii, psigma );
-    NS(Particles_set_delta_value)(  particles, ii, delta );
-    NS(Particles_set_rpp_value)(    particles, ii, rpp );
-    NS(Particles_set_rvv_value)(    particles, ii, rvv );
+    NS(Particles_add_to_energy_value)( particles, ii, energy );
 
     return 0;
 }

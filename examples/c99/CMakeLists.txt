@@ -35,6 +35,14 @@ if( SIXTRACKL_ENABLE_CUDA )
     set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_lhc_no_bb_cuda_c99 )
 endif()
 
+# -----------------------------------------------------------------------------
+# track_lhc_no_bb_opencl_c99:
+
+if( SIXTRACKL_ENABLE_OPENCL )
+    add_executable( track_lhc_no_bb_opencl_c99 track_lhc_no_bb_opencl.c )
+    set( C99_EXAMPLE_PROGRAMS ${C99_EXAMPLE_PROGRAMS} track_lhc_no_bb_opencl_c99 )
+endif()
+
 # ==============================================================================
 # Common settings for all programs:
 
