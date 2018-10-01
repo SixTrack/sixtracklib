@@ -2,6 +2,8 @@
 #define TESTS_SIXTRACKLIB_OPENCL_TEST_PARTICLES_KERNEL_OPENCL_CL__
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/opencl/internal/default_compile_options.h"
+
     #include "sixtracklib/_impl/definitions.h"
     #include "sixtracklib/common/impl/buffer_defines.h"
     #include "sixtracklib/common/impl/managed_buffer_minimal.h"
@@ -14,7 +16,7 @@
 __kernel void NS(Particles_copy_buffer_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT in_buffer_begin,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer_begin,
-    SIXTRL_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag )
+    SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag )
 {
     typedef NS(buffer_size_t) buf_size_t;
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*       obj_iter_t;
