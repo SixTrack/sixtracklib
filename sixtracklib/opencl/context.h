@@ -13,10 +13,11 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/opencl/private/base_context.h"
+    #include "sixtracklib/opencl/internal/base_context.h"
+    #include "sixtracklib/opencl/argument.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#ifndef __cplusplus
+#if defined( __cplusplus )
 
 namespace SIXTRL_NAMESPACE
 {
@@ -28,78 +29,113 @@ namespace SIXTRL_NAMESPACE
 
         public:
 
-        CLContext();
+        using  num_turns_t      = SIXTRL_INT64_T;
 
-        explicit CLContext( size_type const node_index );
-        explicit CLContext( node_id_t const node_id );
-        explicit CLContext( char const* node_id_str );
+        ClContext();
 
-        CLContext( platform_id_t const platform_idx,
+        explicit ClContext( size_type const node_index );
+        explicit ClContext( node_id_t const node_id );
+        explicit ClContext( char const* node_id_str );
+
+        ClContext( platform_id_t const platform_idx,
                    device_id_t const device_idx );
 
-        CLContext( CLContext const& other ) = delete;
-        CLContext( CLContext&& other ) = delete;
+        ClContext( ClContext const& other ) = delete;
+        ClContext( ClContext&& other ) = delete;
 
-        CLContext& operator=( CLContext const& other ) = delete;
-        CLContext& operator=( CLContext&& other ) = delete;
+        ClContext& operator=( ClContext const& other ) = delete;
+        ClContext& operator=( ClContext&& other ) = delete;
 
-        virtual ~CLContext() SIXTRL_NOEXCEPT;
+        virtual ~ClContext() SIXTRL_NOEXCEPT;
+
+        bool hasTrackingKernel() const SIXTRL_NOEXCEPT;
+        kernel_id_t trackingKernelId() const SIXTRL_NOEXCEPT;
+        bool setTrackingKernelId( kernel_id_t const kernel_id );
+
+        int track( ClArgument& particles_arg,
+                   ClArgument& beam_elements_arg,
+                   num_turns_t num_turns = num_turns_t{ 1 } );
+
+        int track( kernel_id_t const tracking_kernel_id,
+                   ClArgument& particles_arg,
+                   ClArgument& beam_elements_arg,
+                   num_turns_t const num_turns = num_turns_t{ 1 } );
+
+        protected:
+
+        virtual bool doInitDefaultPrograms() override;
+        virtual bool doInitDefaultKernels()  override;
+
+        private:
+
+        bool doInitDefaultProgramsPrivImpl();
+        bool doInitDefaultKernelsPrivImpl();
+
+        program_id_t    m_tracking_program_id;
+        kernel_id_t     m_tracking_kernel_id;
     };
 }
 
-#endif /* __cplusplus  */
+#if !defined( _GPUCODE )
+extern "C" {
+#endif /* !defined( _GPUCODE ) */
+
+typedef SIXTRL_NAMESPACE::ClContext              NS(ClContext);
+typedef SIXTRL_NAMESPACE::ClContext::num_turns_t NS(context_num_turns_t);
+
+#if !defined( _GPUCODE )
+}
+#endif /* !defined( _GPUCODE ) */
+
+#else /* !defined( __cplusplus ) */
+
+typedef void NS(ClContext);
+typedef SIXTRL_INT64_T NS(context_num_turns_t);
+
+#endif /* defined( __cplusplus ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_HOST_FN NS(CLBaseContext)* NS(CLBaseContext_create)();
+SIXTRL_HOST_FN NS(ClContext)* NS(ClContext_create)();
+SIXTRL_HOST_FN NS(ClContext)* NS(ClContext_new)( const char* node_id_str );
+SIXTRL_HOST_FN void NS(ClContext_delete)( NS(ClContext)* SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_size_t) NS(CLBaseContext_get_num_available_nodes)(
-    const NS(CLBaseContext) *const SIXTRL_RESTRICT ctx );
+SIXTRL_HOST_FN bool NS(ClContext_has_tracking_kernel)(
+    const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_node_info_t) const*
-NS(CLBaseContext_get_available_nodes_info_begin)(
-    const NS(CLBaseContext) *const SIXTRL_RESTRICT ctx );
+SIXTRL_HOST_FN int NS(ClContext_get_tracking_kernel_id)(
+    const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_node_info_t) const*
-NS(CLBaseContext_get_available_nodes_info_end)(
-    const NS(CLBaseContext) *const SIXTRL_RESTRICT ctx );
+SIXTRL_HOST_FN bool NS(ClContext_set_tracking_kernel_id)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx, int const tracking_kernel_id );
 
-SIXTRL_HOST_FN NS(context_node_info_t) const*
-NS(CLBaseContext_get_available_node_info_by_index)(
-    const NS(CLBaseContext) *const SIXTRL_RESTRICT context,
-    NS(context_size_t) const node_index );
+/* ------------------------------------------------------------------------- */
 
-SIXTRL_HOST_FN NS(context_node_info_t) const*
-NS(CLBaseContext_get_available_node_info_by_node_id)(
-    const NS(CLBaseContext) *const SIXTRL_RESTRICT context,
-    const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
+SIXTRL_HOST_FN int NS(ClContext_track)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    NS(ClArgument)* SIXTRL_RESTRICT particles_arg,
+    NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg );
 
-SIXTRL_HOST_FN bool NS(CLBaseContext_has_node)(
-    const NS(CLBaseContext) *const SIXTRL_RESTRICT ctx );
+SIXTRL_HOST_FN int NS(ClContext_track_num_turns)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    NS(ClArgument)* SIXTRL_RESTRICT particles_arg,
+    NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg,
+    NS(context_num_turns_t) const num_turns );
 
-SIXTRL_HOST_FN NS(context_node_info_t) const* NS(CLBaseContext_get_node_info)(
-    const NS(CLBaseContext) *const SIXTRL_RESTRICT ctx );
+SIXTRL_HOST_FN int NS(ClContext_execute_tracking_kernel)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    int const tracking_kernel_id,
+    NS(ClArgument)* SIXTRL_RESTRICT particles_arg,
+    NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg );
 
-SIXTRL_HOST_FN NS(context_node_id_t) const* NS(CLBaseContext_get_node_id)(
-    const NS(CLBaseContext) *const SIXTRL_RESTRICT ctx );
-
-SIXTRL_HOST_FN void NS(CLBaseContext_clear)(
-    NS(CLBaseContext)* SIXTRL_RESTRICT ctx );
-
-SIXTRL_HOST_FN bool NS(CLBaseContext_select_node)(
-    NS(CLBaseContext)* SIXTRL_RESTRICT ctx );
-
-SIXTRL_HOST_FN NS(CLBaseContext)*
-NS(CLBaseContext_new)( char const* SIXTRL_RESTRICT node_id_str );
-
-SIXTRL_HOST_FN void NS(CLBaseContext_free)(
-    NS(CLBaseContext)* SIXTRL_RESTRICT ctx );
-
-SIXTRL_HOST_FN void NS(CLBaseContext_delete)(
-    NS(CLBaseContext)* SIXTRL_RESTRICT ctx );
-
+SIXTRL_HOST_FN int NS(ClContext_execute_tracking_kernel_num_turns)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    int const tracking_kernel_id,
+    NS(ClArgument)* SIXTRL_RESTRICT particles_arg,
+    NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg,
+    NS(context_num_turns_t) const num_turns );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }

@@ -1,7 +1,9 @@
-#ifndef SIXTRACKLIB_OPENCL_IMPL_TRACK_PARTICLES_KERNEL_CL__
-#define SIXTRACKLIB_OPENCL_IMPL_TRACK_PARTICLES_KERNEL_CL__
+#ifndef SIXTRACKLIB_OPENCL_INTERNAL_TRACK_PARTICLES_KERNEL_CL__
+#define SIXTRACKLIB_OPENCL_INTERNAL_TRACK_PARTICLES_KERNEL_CL__
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/opencl/internal/default_compile_options.h"
+
     #include "sixtracklib/_impl/definitions.h"
     #include "sixtracklib/common/impl/managed_buffer_minimal.h"
     #include "sixtracklib/common/impl/managed_buffer_remap.h"
@@ -165,6 +167,6 @@ __kernel void NS(Track_particles_beam_elements_opencl)(
     return;
 }
 
-#endif /* SIXTRACKLIB_OPENCL_IMPL_TRACK_PARTICLES_KERNEL_CL__ */
+#endif /* SIXTRACKLIB_OPENCL_INTERNAL_TRACK_PARTICLES_KERNEL_CL__ */
 
-/* end: sixtracklib/opencl/impl/track_particles_kernel.cl */
+/* end: sixtracklib/opencl/private/track_particles_kernel.cl */

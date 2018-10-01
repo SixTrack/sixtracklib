@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_OPENCL_PRIVATE_BASE_CONTEXT_H__
-#define SIXTRACKLIB_OPENCL_PRIVATE_BASE_CONTEXT_H__
+#ifndef SIXTRACKLIB_OPENCL_INTERNAL_BASE_CONTEXT_H__
+#define SIXTRACKLIB_OPENCL_INTERNAL_BASE_CONTEXT_H__
 
 #if !defined( __CUDACC__ )
 
@@ -32,7 +32,7 @@
 
 using NS(context_size_t) = std::size_t;
 
-namespace SIXTRL_NAMESPACE
+namespace sixtrack
 {
     using node_id_t     = NS(ComputeNodeId);
     using node_info_t   = NS(ComputeNodeInfo);
@@ -73,6 +73,8 @@ namespace SIXTRL_NAMESPACE
 
         node_info_t const*  availableNodesInfoBegin() const SIXTRL_NOEXCEPT;
         node_info_t const*  availableNodesInfoEnd()   const SIXTRL_NOEXCEPT;
+        node_info_t const*  defaultNodeInfo()         const SIXTRL_NOEXCEPT;
+        node_id_t defaultNodeId() const SIXTRL_NOEXCEPT;
 
         bool isNodeIdAvailable(
             node_id_t const node_id ) const SIXTRL_NOEXCEPT;
@@ -113,8 +115,13 @@ namespace SIXTRL_NAMESPACE
         node_info_t const*  ptrSelectedNodeInfo()   const SIXTRL_NOEXCEPT;
 
         bool selectNode( node_id_t const node_id );
+        bool selectNode( platform_id_t const platform_idx,
+                         device_id_t const device_idx );
+
         bool selectNode( char const* node_id_str );
         bool selectNode( size_type const index );
+
+        void printNodesInfo() const SIXTRL_NOEXCEPT;
 
         void clear();
 
@@ -168,6 +175,9 @@ namespace SIXTRL_NAMESPACE
 
         kernel_id_t  enableKernel( char const* kernel_name,
                                    program_id_t const program_id );
+
+        kernel_id_t findKernelByName(
+            const char* SIXTRL_RESTRICT kernel_name ) const SIXTRL_NOEXCEPT;
 
         char const* kernelFunctionName(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
@@ -258,15 +268,25 @@ namespace SIXTRL_NAMESPACE
             size_type     m_local_mem_size;
         };
 
-        bool doCompileProgram(
+        using program_data_list_t = std::vector< program_data_t >;
+        using kernel_data_list_t  = std::vector< kernel_data_t >;
+
+        virtual bool doInitDefaultPrograms();
+        virtual bool doInitDefaultKernels();
+
+        virtual bool doCompileProgram(
             cl::Program& cl_program, program_data_t& program_data );
+
+        virtual bool doSelectNode( size_type node_index );
+
+        kernel_data_list_t  const& kernelData()  const SIXTRL_NOEXCEPT;
+        program_data_list_t const& programData() const SIXTRL_NOEXCEPT;
 
         size_type findAvailableNodesIndex( platform_id_t const platform_index,
             device_id_t const device_index ) const SIXTRL_NOEXCEPT;
 
         size_type findAvailableNodesIndex( char const* node_id_str
             ) const SIXTRL_NOEXCEPT;
-
 
         private:
 
@@ -275,6 +295,14 @@ namespace SIXTRL_NAMESPACE
             std::vector< node_info_t >&  available_nodes_info,
             std::vector< cl::Device  >&  available_devices,
             const char *const filter_str = nullptr );
+
+        bool doInitDefaultProgramsBaseImpl();
+        bool doInitDefaultKernelsBaseImpl();
+
+        bool doCompileProgramBaseImpl(
+            cl::Program& cl_program, program_data_t& program_data );
+
+        bool doSelectNodeBaseImpl( size_type const node_index );
 
         std::vector< cl::Program >      m_cl_programs;
         std::vector< cl::Kernel  >      m_cl_kernels;
@@ -291,6 +319,7 @@ namespace SIXTRL_NAMESPACE
         cl::Context                     m_cl_context;
         cl::CommandQueue                m_cl_queue;
 
+        program_id_t                    m_remap_program_id;
         kernel_id_t                     m_remap_kernel_id;
         int64_t                         m_selected_node_index;
     };
@@ -337,6 +366,14 @@ NS(ClContextBase_get_available_node_info_by_index)(
     NS(context_size_t) const node_index );
 
 SIXTRL_HOST_FN NS(context_node_info_t) const*
+NS(ClContextBase_get_default_node_info)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT context );
+
+SIXTRL_HOST_FN NS(context_node_id_t)
+NS(ClContextBase_get_default_node_id)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT context );
+
+SIXTRL_HOST_FN NS(context_node_info_t) const*
 NS(ClContextBase_get_available_node_info_by_node_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT context,
     const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
@@ -355,10 +392,15 @@ SIXTRL_HOST_FN bool NS(ClContextBase_has_selected_node)(
 SIXTRL_HOST_FN cl_device_id NS(ClContextBase_get_selected_node_device)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_node_info_t) const* NS(ClContextBase_get_node_info)(
+SIXTRL_HOST_FN NS(context_node_info_t) const*
+NS(ClContextBase_get_selected_node_info)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_node_id_t) const* NS(ClContextBase_get_node_id)(
+SIXTRL_HOST_FN NS(context_node_id_t) const*
+NS(ClContextBase_get_selected_node_id)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
+
+SIXTRL_HOST_FN void NS(ClContextBase_print_nodes_info)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
 SIXTRL_HOST_FN void NS(ClContextBase_clear)(
@@ -370,7 +412,7 @@ SIXTRL_HOST_FN bool NS(ClContextBase_select_node)(
 
 SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_node_id)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
-    NS(context_node_id_t) const node_id );
+    const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
 
 SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_index)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
@@ -406,6 +448,10 @@ SIXTRL_HOST_FN bool NS(ClContextBase_is_program_compiled)(
 SIXTRL_HOST_FN int NS(ClContextBase_enable_kernel)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* kernel_name, int const program_id );
+
+SIXTRL_HOST_FN int NS(ClContextBase_find_kernel_id_by_name)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT kernel_name );
 
 SIXTRL_HOST_FN char const* NS(ClContextBase_get_kernel_function_name)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
@@ -450,7 +496,14 @@ SIXTRL_HOST_FN cl_context NS(ClContextBase_get_opencl_context)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
 SIXTRL_HOST_FN NS(ClContextBase)*
-NS(ClContextBase_new)( char const* SIXTRL_RESTRICT node_id_str );
+NS(ClContextBase_new_on_selected_node_id_str)(
+    char const* SIXTRL_RESTRICT node_id_str );
+
+SIXTRL_HOST_FN NS(ClContextBase)*
+NS(ClContextBase_new_on_selected_node_id)(
+    const NS(context_node_id_t) *const node_id );
+
+SIXTRL_HOST_FN NS(ClContextBase)* NS(ClContextBase_new)( void );
 
 SIXTRL_HOST_FN void NS(ClContextBase_free)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
@@ -465,6 +518,6 @@ SIXTRL_HOST_FN void NS(ClContextBase_delete)(
 
 #endif /* !defined( __CUDACC__ ) */
 
-#endif /* SIXTRACKLIB_OPENCL_PRIVATE_BASE_CONTEXT_H__ */
+#endif /* SIXTRACKLIB_OPENCL_INTERNAL_BASE_CONTEXT_H__ */
 
-/* end: sixtracklib/opencl/private/base_context.h */
+/* end: sixtracklib/opencl/internal/base_context.h */
