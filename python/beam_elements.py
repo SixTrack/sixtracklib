@@ -73,7 +73,7 @@ class MultiPole( CObject ):
         if  not( bal is None or order is None ):
             CObject.__init__( self, bal=bal, order=order, **kwargs )
         else:
-            COBject.__init__( self, bal=[], order=0, **kwargs )
+            CObject.__init__( self, bal=[], order=0, **kwargs )
 
 
 class Cavity( CObject ):
@@ -93,8 +93,21 @@ class SRotation( CObject ):
     sin_z   = CField( 1, 'real',   default=0.0,  alignment=8 )
 
 class BeamBeam4D( CObject ):
-    pass
+    _typeid = 8
+    size     = CField( 0, 'uint64', default=0,  alignment=8 )
+    data     = CField( 1, 'real',   default=0.0,
+                      length='size', pointer=True, alignment=8 )
+                      
+    def __init__(self, data, **kwargs):
+        CObject.__init__( self, size=len(data), data=data, **kwargs)
 
 class BeamBeam6D( CObject ):
-    pass
+    _typeid = 9
+    size     = CField( 0, 'uint64', default=0,  alignment=8 )
+    data     = CField( 1, 'real',   default=0.0,
+                      length='size', pointer=True, alignment=8 )
+                      
+    def __init__(self, data, **kwargs):
+        CObject.__init__( self, size=len(data), data=data, **kwargs)
+        
 

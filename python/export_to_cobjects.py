@@ -15,13 +15,16 @@ from beam_elements import BeamBeam4D, BeamBeam6D
 from particles     import Particles as IOParticles
 
 def sixinput2cobject( input_folder, outfile_name ):
+    six = sixtracktools.SixInput(input_folder)
+    line, rest, iconv = six.expand_struct(convert=pysixtrack.element_types)
+    return line2cobject( line, outfile_name )
+
+
+def line2cobject( line, outfile_name ):
     deg2rad = pi / 180.0
 
     # -------------------------------------------------------------------------
     # Dump beam elements:
-
-    six = sixtracktools.SixInput(input_folder)
-    line, rest, iconv = six.expand_struct(convert=pysixtrack.element_types)
 
     beam_elements = CBuffer()
 
@@ -48,7 +51,42 @@ def sixinput2cobject( input_folder, outfile_name ):
         elif elem_type == 'Cavity':
             e = Cavity( cbuffer=beam_elements, voltage=elem.voltage,
                         frequency=elem.frequency, lag=elem.lag )
+                        
+        elif elem_type=='BeamBeam4D':
+            data = np.array([23.])
+            e = BeamBeam4D( cbuffer=beam_elements, data=data)
+            
+        elif elem_type=='BeamBeam6D':
 
+            bb6ddata = pysixtrack.BB6Ddata.BB6D_init(
+                elem.q_part, elem.N_part_tot, elem.sigmaz, elem.N_slices, elem.min_sigma_diff, elem.threshold_singular,
+                elem.phi, elem.alpha,
+                elem.Sig_11_0, elem.Sig_12_0, elem.Sig_13_0,
+                elem.Sig_14_0, elem.Sig_22_0, elem.Sig_23_0,
+                elem.Sig_24_0, elem.Sig_33_0, elem.Sig_34_0, elem.Sig_44_0,
+                elem.delta_x, elem.delta_y,
+                elem.x_CO, elem.px_CO, elem.y_CO, elem.py_CO, elem.sigma_CO, elem.delta_CO,
+                elem.Dx_sub, elem.Dpx_sub, elem.Dy_sub, elem.Dpy_sub, elem.Dsigma_sub, elem.Ddelta_sub,
+                elem.enabled)
+
+            print("sphi=%e"%bb6ddata.parboost.sphi);
+            print("calpha=%e"%bb6ddata.parboost.calpha);
+            print("S33=%e"%bb6ddata.Sigmas_0_star.Sig_33_0);
+            print("N_slices=%d"%bb6ddata.N_slices);
+            print("N_part_per_slice[0]=%e"%bb6ddata.N_part_per_slice[0]); 
+            print("N_part_per_slice[1]=%e"%bb6ddata.N_part_per_slice[1]); 
+            print("x_slices_star[0]=%e"%bb6ddata.x_slices_star[0]); 
+            print("x_slices_star[1]=%e"%bb6ddata.x_slices_star[1]); 
+            print("y_slices_star[0]=%e"%bb6ddata.y_slices_star[0]); 
+            print("y_slices_star[1]=%e"%bb6ddata.y_slices_star[1]);         
+            print("sigma_slices_star[0]=%e"%bb6ddata.sigma_slices_star[0]); 
+            print("sigma_slices_star[1]=%e"%bb6ddata.sigma_slices_star[1]); 
+            print("y_CO=%e"%bb6ddata.y_CO);
+
+
+            data = bb6ddata.tobuffer()
+            e = BeamBeam6D( cbuffer=beam_elements, data=data)
+            
         else:
             print( "Unknown/unhandled element type: {0}".format( elem_type, ) )
 

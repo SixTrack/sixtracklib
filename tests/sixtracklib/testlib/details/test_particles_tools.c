@@ -103,6 +103,9 @@ extern void NS(Particles_buffer_get_max_difference)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs );
 
+extern void NS(Particles_buffer_print_stdout)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particle_buffer );
+
 extern void NS(Particles_buffer_print)(
     FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particle_buffer );
@@ -1494,6 +1497,14 @@ void NS(Particles_buffers_get_max_difference)(
         return;
     }
 }
+
+void NS(Particles_buffer_print_stdout)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particle_buffer )
+{
+    NS(Particles_buffer_print)( stdout, particle_buffer );
+    return;
+}
+    
 
 void NS(Particles_buffer_print)(
     FILE* SIXTRL_RESTRICT fp,

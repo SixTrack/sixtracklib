@@ -1027,6 +1027,7 @@ SIXTRL_INLINE int NS(Buffer_init)(
     return success;
 }
 
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE int NS(Buffer_clear)(
