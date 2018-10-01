@@ -2,6 +2,8 @@
 #define SIXTRACKLIB_OPENCL_INTERNAL_TRACK_PARTICLES_KERNEL_CL__
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/opencl/internal/default_compile_options.h"
+
     #include "sixtracklib/_impl/definitions.h"
     #include "sixtracklib/common/impl/managed_buffer_minimal.h"
     #include "sixtracklib/common/impl/managed_buffer_remap.h"
