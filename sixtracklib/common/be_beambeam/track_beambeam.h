@@ -1,6 +1,12 @@
 #ifndef SIXTRACKLIB_COMMON_BE_BEAMBEAM_TRACK_BEAMBEAM_H__
 #define SIXTRACKLIB_COMMON_BE_BEAMBEAM_TRACK_BEAMBEAM_H__
 
+#ifndef SIXTRL_BB6_GET_PTR
+	#define SIXTRL_BB_GET_PTR(dataptr,name) \
+		 (SIXTRL_BE_DATAPTR_DEC real_t*)(((SIXTRL_BE_DATAPTR_DEC u64_t*) (&((dataptr)->name))) \
+		 	+ ((u64_t) (dataptr)->name) + 1)    
+#endif
+
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/_impl/definitions.h"
     #include "sixtracklib/common/impl/beam_elements_defines.h"
@@ -77,26 +83,25 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT bb )
 {
     typedef NS(beambeam6d_real_const_ptr_t)  bb_data_ptr_t;
+    typedef SIXTRL_UINT64_T u64_t;
+    typedef SIXTRL_REAL_T real_t;
+    typedef SIXTRL_BE_DATAPTR_DEC BB6D_data* BB6D_data_ptr_t;
 
     SIXTRL_TRACK_RETURN ret = 0;
-
-    SIXTRL_UINT64_T const data_size = NS(BeamBeam6D_get_data_size)( bb ); 
-    (void) data_size; // just to avoid error: unused variable
-    bb_data_ptr_t data = NS(BeamBeam6D_get_const_data)( bb );
-
     int i_slice;
 
+    bb_data_ptr_t data = NS(BeamBeam6D_get_const_data)( bb );
+
     // Start Gianni's part
-    BB6D_data* bb6ddata = (BB6D_data*) data;
+    BB6D_data_ptr_t bb6ddata = (BB6D_data_ptr_t) data;
 
     if (bb6ddata->enabled) {
 
         // Get pointers
-        double* N_part_per_slice = (double*)(((uint64_t*) (&(bb6ddata->N_part_per_slice))) + ((uint64_t) bb6ddata->N_part_per_slice) + 1);
-        double* x_slices_star = (double*)(((uint64_t*) (&(bb6ddata->x_slices_star))) + ((uint64_t) bb6ddata->x_slices_star) + 1);
-        double* y_slices_star = (double*)(((uint64_t*) (&(bb6ddata->y_slices_star))) + ((uint64_t) bb6ddata->y_slices_star) + 1);
-        double* sigma_slices_star = (double*)(((uint64_t*) (&(bb6ddata->sigma_slices_star))) + ((uint64_t) bb6ddata->sigma_slices_star) + 1);
-        
+        SIXTRL_BE_DATAPTR_DEC real_t* N_part_per_slice = SIXTRL_BB_GET_PTR(bb6ddata, N_part_per_slice);
+		SIXTRL_BE_DATAPTR_DEC real_t* x_slices_star = SIXTRL_BB_GET_PTR(bb6ddata, x_slices_star);
+		SIXTRL_BE_DATAPTR_DEC real_t* y_slices_star = SIXTRL_BB_GET_PTR(bb6ddata, y_slices_star);
+		SIXTRL_BE_DATAPTR_DEC real_t* sigma_slices_star = SIXTRL_BB_GET_PTR(bb6ddata, sigma_slices_star);
 
 
         int N_slices = (int)(bb6ddata->N_slices);
@@ -117,25 +122,25 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
         printf("sigma_slices_star[1]=%e\n",sigma_slices_star[1]); 
         */
 
-        SIXTRL_REAL_T x = NS(Particles_get_x_value)( particles, particle_index );
-        SIXTRL_REAL_T px = NS(Particles_get_px_value)( particles, particle_index );
-        SIXTRL_REAL_T y = NS(Particles_get_y_value)( particles, particle_index );
-        SIXTRL_REAL_T py = NS(Particles_get_py_value)( particles, particle_index );
-        SIXTRL_REAL_T zeta = NS(Particles_get_zeta_value)( particles, particle_index );
-        SIXTRL_REAL_T delta = NS(Particles_get_delta_value)( particles, particle_index );
+        real_t x = NS(Particles_get_x_value)( particles, particle_index );
+        real_t px = NS(Particles_get_px_value)( particles, particle_index );
+        real_t y = NS(Particles_get_y_value)( particles, particle_index );
+        real_t py = NS(Particles_get_py_value)( particles, particle_index );
+        real_t zeta = NS(Particles_get_zeta_value)( particles, particle_index );
+        real_t delta = NS(Particles_get_delta_value)( particles, particle_index );
 
-        SIXTRL_REAL_T q0 = QELEM*NS(Particles_get_q0_value)( particles, particle_index );
-        SIXTRL_REAL_T P0 = NS(Particles_get_p0c_value)( particles, particle_index ); // eV
+        real_t q0 = QELEM*NS(Particles_get_q0_value)( particles, particle_index );
+        real_t P0 = NS(Particles_get_p0c_value)( particles, particle_index ); // eV
 
         P0 = P0/C_LIGHT*QELEM;
 
         // Change reference frame
-        double x_star =     x     - bb6ddata->x_CO    - bb6ddata->delta_x;
-        double px_star =    px    - bb6ddata->px_CO;
-        double y_star =     y     - bb6ddata->y_CO    - bb6ddata->delta_y;
-        double py_star =    py    - bb6ddata->py_CO;
-        double sigma_star = zeta  - bb6ddata->sigma_CO;
-        double delta_star = delta - bb6ddata->delta_CO;
+        real_t x_star =     x     - bb6ddata->x_CO    - bb6ddata->delta_x;
+        real_t px_star =    px    - bb6ddata->px_CO;
+        real_t y_star =     y     - bb6ddata->y_CO    - bb6ddata->delta_y;
+        real_t py_star =    py    - bb6ddata->py_CO;
+        real_t sigma_star = zeta  - bb6ddata->sigma_CO;
+        real_t delta_star = delta - bb6ddata->delta_CO;
 
         // Boost coordinates of the weak beam
         BB6D_boost(&(bb6ddata->parboost), &x_star, &px_star, &y_star, &py_star, 
@@ -145,19 +150,19 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
         // Synchro beam
         for (i_slice=0; i_slice<N_slices; i_slice++)
         {
-            double sigma_slice_star = sigma_slices_star[i_slice];
-            double x_slice_star = x_slices_star[i_slice];
-            double y_slice_star = y_slices_star[i_slice];
+            real_t sigma_slice_star = sigma_slices_star[i_slice];
+            real_t x_slice_star = x_slices_star[i_slice];
+            real_t y_slice_star = y_slices_star[i_slice];
             
             //Compute force scaling factor
-            double Ksl = N_part_per_slice[i_slice]*bb6ddata->q_part*q0/(P0*C_LIGHT);
+            real_t Ksl = N_part_per_slice[i_slice]*bb6ddata->q_part*q0/(P0*C_LIGHT);
 
             //Identify the Collision Point (CP)
-            double S = 0.5*(sigma_star - sigma_slice_star);
+            real_t S = 0.5*(sigma_star - sigma_slice_star);
             
             // Propagate sigma matrix
-            double Sig_11_hat_star, Sig_33_hat_star, costheta, sintheta;
-            double dS_Sig_11_hat_star, dS_Sig_33_hat_star, dS_costheta, dS_sintheta;
+            real_t Sig_11_hat_star, Sig_33_hat_star, costheta, sintheta;
+            real_t dS_Sig_11_hat_star, dS_Sig_33_hat_star, dS_costheta, dS_sintheta;
             
             // Get strong beam shape at the CP
             BB6D_propagate_Sigma_matrix(&(bb6ddata->Sigmas_0_star),
@@ -168,35 +173,35 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
                 &dS_costheta, &dS_sintheta);
                 
             // Evaluate transverse coordinates of the weake baem w.r.t. the strong beam centroid
-            double x_bar_star = x_star + px_star*S - x_slice_star;
-            double y_bar_star = y_star + py_star*S - y_slice_star;
+            real_t x_bar_star = x_star + px_star*S - x_slice_star;
+            real_t y_bar_star = y_star + py_star*S - y_slice_star;
             
             // Move to the uncoupled reference frame
-            double x_bar_hat_star = x_bar_star*costheta +y_bar_star*sintheta;
-            double y_bar_hat_star = -x_bar_star*sintheta +y_bar_star*costheta;
+            real_t x_bar_hat_star = x_bar_star*costheta +y_bar_star*sintheta;
+            real_t y_bar_hat_star = -x_bar_star*sintheta +y_bar_star*costheta;
             
             // Compute derivatives of the transformation
-            double dS_x_bar_hat_star = x_bar_star*dS_costheta +y_bar_star*dS_sintheta;
-            double dS_y_bar_hat_star = -x_bar_star*dS_sintheta +y_bar_star*dS_costheta;
+            real_t dS_x_bar_hat_star = x_bar_star*dS_costheta +y_bar_star*dS_sintheta;
+            real_t dS_y_bar_hat_star = -x_bar_star*dS_sintheta +y_bar_star*dS_costheta;
             
             // Get transverse fieds
-            double Ex, Ey, Gx, Gy;
+            real_t Ex, Ey, Gx, Gy;
             get_Ex_Ey_Gx_Gy_gauss(x_bar_hat_star, y_bar_hat_star, 
                 sqrt(Sig_11_hat_star), sqrt(Sig_33_hat_star), bb6ddata->min_sigma_diff,
                 &Ex, &Ey, &Gx, &Gy);
                 
             // Compute kicks
-            double Fx_hat_star = Ksl*Ex;
-            double Fy_hat_star = Ksl*Ey;
-            double Gx_hat_star = Ksl*Gx;
-            double Gy_hat_star = Ksl*Gy;
+            real_t Fx_hat_star = Ksl*Ex;
+            real_t Fy_hat_star = Ksl*Ey;
+            real_t Gx_hat_star = Ksl*Gx;
+            real_t Gy_hat_star = Ksl*Gy;
             
             // Move kisks to coupled reference frame
-            double Fx_star = Fx_hat_star*costheta - Fy_hat_star*sintheta;
-            double Fy_star = Fx_hat_star*sintheta + Fy_hat_star*costheta;
+            real_t Fx_star = Fx_hat_star*costheta - Fy_hat_star*sintheta;
+            real_t Fy_star = Fx_hat_star*sintheta + Fy_hat_star*costheta;
             
             // Compute longitudinal kick
-            double Fz_star = 0.5*(Fx_hat_star*dS_x_bar_hat_star  + Fy_hat_star*dS_y_bar_hat_star+
+            real_t Fz_star = 0.5*(Fx_hat_star*dS_x_bar_hat_star  + Fy_hat_star*dS_y_bar_hat_star+
                            Gx_hat_star*dS_Sig_11_hat_star + Gy_hat_star*dS_Sig_33_hat_star);
                            
             // Apply the kicks (Hirata's synchro-beam)
