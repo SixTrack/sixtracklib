@@ -2,7 +2,7 @@ import pickle
 import cobjects
 import pysixtrack
 
-import temp_particles as tp
+import particles as tp
 
 
 # Load pysixtrack line
@@ -19,7 +19,7 @@ ebe = []
 for iob in range(buf.n_objects):
     ebe.append(buf.get_object(tp.Particles, iob))
 
-i_part = 0
+i_part = 1
 for ii, elem in enumerate(line):
 
     ptest = pysixtrack.Particles()
@@ -39,4 +39,6 @@ for ii, elem in enumerate(line):
     for nn in 'x px y py zeta delta'.split():
         ref = getattr(ptest, nn)
         ttt = getattr(ebe[ii+1], nn)[i_part]
-        print(nn, ref, ttt)	
+        print(nn, ref, ttt, ref-ttt)
+        
+    #if elem[0]=='bb': break
