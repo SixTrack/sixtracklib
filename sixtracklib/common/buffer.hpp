@@ -124,30 +124,34 @@ namespace SIXTRL_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN size_type size()                  const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type capacity()              const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type headerSize()            const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type size()                   const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type capacity()               const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type headerSize()             const SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN size_type getSize()               const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getCapacity()           const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getSize()                const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getCapacity()            const SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN size_type getSlotSize()           const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getHeaderSize()         const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getSectionHeaderSize()  const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getSlotSize()            const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getHeaderSize()          const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getSectionHeaderSize()   const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN size_type getNumSlots()           const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getMaxNumSlots()        const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getSlotsSize()          const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getNumSlots()            const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getMaxNumSlots()         const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getSlotsSize()           const SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN size_type getNumObjects()         const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getMaxNumObjects()      const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getObjectsSize()        const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getNumObjects()          const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getMaxNumObjects()       const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getObjectsSize()         const SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN size_type getNumDataptrs()        const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getMaxNumDataptrs()     const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getDataptrsSize()       const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getNumDataptrs()         const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getMaxNumDataptrs()      const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getDataptrsSize()        const SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN size_type getNumGarbageRanges()    const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getMaxNumGarbageRanges() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getGarbageRangesSize()   const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -621,6 +625,26 @@ namespace SIXTRL_NAMESPACE
     Buffer::getDataptrsSize() const SIXTRL_NOEXCEPT
     {
         return NS(Buffer_get_dataptrs_size)( this->getCApiPtr() );
+    }
+
+
+
+    SIXTRL_INLINE Buffer::size_type
+    Buffer::getNumGarbageRanges() const SIXTRL_NOEXCEPT
+    {
+        return ::NS(Buffer_get_num_of_garbage_ranges)( this->getCApiPtr() );
+    }
+
+    SIXTRL_INLINE Buffer::size_type
+    Buffer::getMaxNumGarbageRanges() const SIXTRL_NOEXCEPT
+    {
+        return ::NS(Buffer_get_max_num_of_garbage_ranges)( this->getCApiPtr() );
+    }
+
+    SIXTRL_INLINE Buffer::size_type
+    Buffer::getGarbageRangesSize() const SIXTRL_NOEXCEPT
+    {
+        return ::NS(Buffer_get_garbage_size)( this->getCApiPtr() );
     }
 
     /* ----------------------------------------------------------------- */
