@@ -4285,8 +4285,6 @@ SIXTRL_INLINE void NS(Particles_update_delta_value)(
     // rvv = beta / beta0
     real_t const rvv    = beta * inv_beta0;
 
-    // rpp = 1 / ( 1 + delta )
-
     // psigma = ptau / beta0 == ( 1/beta0 ) * sqrt( ... ) - (1/beta0)^2
     real_t const psigma = inv_beta0 * inv_beta0_plus_ptau - inv_beta0_squ;
 
