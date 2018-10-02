@@ -141,7 +141,7 @@ namespace SIXTRL_NAMESPACE
               this->numAvailableKernels() ) )
         {
             program_id_t const tracking_program_id =
-                this->kernelProgramId( kernel_id );
+                this->programIdByKernelId( kernel_id );
 
             if( ( tracking_program_id >= program_id_t{ 0 } ) &&
                 ( static_cast< size_type >( tracking_program_id ) <

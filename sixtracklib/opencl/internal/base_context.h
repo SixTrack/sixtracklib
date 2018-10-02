@@ -76,6 +76,9 @@ namespace sixtrack
         node_info_t const*  defaultNodeInfo()         const SIXTRL_NOEXCEPT;
         node_id_t defaultNodeId() const SIXTRL_NOEXCEPT;
 
+        bool isNodeIndexAvailable(
+            size_type const node_index ) const SIXTRL_RESTRICT;
+
         bool isNodeIdAvailable(
             node_id_t const node_id ) const SIXTRL_NOEXCEPT;
 
@@ -85,6 +88,13 @@ namespace sixtrack
 
         bool isNodeIdAvailable(
             char const* node_id_str ) const SIXTRL_NOEXCEPT;
+
+        bool isDefaultNode( char const* node_id_str    ) const SIXTRL_NOEXCEPT;
+        bool isDefaultNode( node_id_t const node_id    ) const SIXTRL_NOEXCEPT;
+        bool isDefaultNode( size_type const node_index ) const SIXTRL_NOEXCEPT;
+        bool isDefaultNode( platform_id_t const platform_index,
+                            device_id_t const device_index
+                          ) const SIXTRL_NOEXCEPT;
 
         node_id_t const*   ptrAvailableNodesId(
             size_type const index ) const SIXTRL_NOEXCEPT;
@@ -194,10 +204,13 @@ namespace sixtrack
         size_type kernelPreferredWorkGroupSizeMultiple(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        program_id_t kernelProgramId(
+        program_id_t programIdByKernelId(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        bool hasRemappingKernel() const SIXTRL_NOEXCEPT;
+        bool hasRemappingProgram() const SIXTRL_NOEXCEPT;
+        program_id_t remappingProgramId() const SIXTRL_NOEXCEPT;
+
+        bool hasRemappingKernel()  const SIXTRL_NOEXCEPT;
         kernel_id_t remappingKernelId() const SIXTRL_NOEXCEPT;
         bool setRemappingKernelId( kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
 
@@ -271,6 +284,8 @@ namespace sixtrack
         using program_data_list_t = std::vector< program_data_t >;
         using kernel_data_list_t  = std::vector< kernel_data_t >;
 
+        virtual void doClear();
+
         virtual bool doInitDefaultPrograms();
         virtual bool doInitDefaultKernels();
 
@@ -303,6 +318,8 @@ namespace sixtrack
             cl::Program& cl_program, program_data_t& program_data );
 
         bool doSelectNodeBaseImpl( size_type const node_index );
+
+        void doClearBaseImpl() SIXTRL_NOEXCEPT;
 
         std::vector< cl::Program >      m_cl_programs;
         std::vector< cl::Kernel  >      m_cl_kernels;
@@ -386,6 +403,32 @@ SIXTRL_HOST_FN bool NS(ClContextBase_is_node_id_available)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
 
+SIXTRL_HOST_FN bool NS(ClContextBase_is_node_index_available)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(context_size_t) const node_index );
+
+SIXTRL_HOST_FN bool NS(ClContextBase_is_platform_device_tuple_available)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(comp_node_id_num_t) const platform_idx,
+    NS(comp_node_id_num_t) const device_idx );
+
+SIXTRL_HOST_FN bool NS(ClContextBase_is_node_id_default_node)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
+
+SIXTRL_HOST_FN bool NS(ClContextBase_is_node_id_str_default_node)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT node_id_str );
+
+SIXTRL_HOST_FN bool NS(ClContextBase_is_platform_device_tuple_default_node)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(comp_node_id_num_t) const platform_idx,
+    NS(comp_node_id_num_t) const device_idx );
+
+SIXTRL_HOST_FN bool NS(ClContextBase_is_node_index_default_node)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(context_size_t) const node_index );
+
 SIXTRL_HOST_FN bool NS(ClContextBase_has_selected_node)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
@@ -418,11 +461,13 @@ SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_index)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     NS(context_size_t) const index );
 
+SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_num_available_programs)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
+
 SIXTRL_HOST_FN int NS(ClContextBase_add_program_file)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* SIXTRL_RESTRICT path_to_program_file,
     char const* SIXTRL_RESTRICT compile_options );
-
 
 SIXTRL_HOST_FN bool NS(ClContextBase_compile_program)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const program_id );
@@ -449,6 +494,9 @@ SIXTRL_HOST_FN int NS(ClContextBase_enable_kernel)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* kernel_name, int const program_id );
 
+SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_num_available_kernels)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
+
 SIXTRL_HOST_FN int NS(ClContextBase_find_kernel_id_by_name)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* SIXTRL_RESTRICT kernel_name );
@@ -469,8 +517,14 @@ SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN int NS(ClContextBase_get_kernel_get_program_id)(
+SIXTRL_HOST_FN int NS(ClContextBase_get_program_id_by_kernel_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+
+SIXTRL_HOST_FN bool NS(ClContextBase_has_remapping_program)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
+
+SIXTRL_HOST_FN int NS(ClContextBase_get_remapping_program_id)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
 SIXTRL_HOST_FN bool NS(ClContextBase_has_remapping_kernel)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );

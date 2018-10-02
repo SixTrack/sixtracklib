@@ -57,6 +57,8 @@ namespace SIXTRL_NAMESPACE
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
 
+            this->m_arg_size = arg_size;
+
             this->m_cl_success_flag = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, sizeof( int32_t ), nullptr );
 
@@ -90,6 +92,8 @@ namespace SIXTRL_NAMESPACE
         {
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
+
+            this->m_arg_size = arg_size;
 
             this->m_cl_success_flag = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, sizeof( int32_t ), nullptr );
@@ -125,6 +129,8 @@ namespace SIXTRL_NAMESPACE
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
 
+            this->m_arg_size = arg_size;
+
             this->m_cl_success_flag = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, sizeof( int32_t ), nullptr );
 
@@ -156,6 +162,8 @@ namespace SIXTRL_NAMESPACE
         {
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
+
+            this->m_arg_size = arg_size;
 
             this->m_cl_success_flag = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, sizeof( int32_t ), nullptr );
