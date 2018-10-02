@@ -93,7 +93,6 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_4d)(
         real_t py = NS(Particles_get_py_value)( particles, particle_index );
 
         real_t qratio = 1.;// To be generalized for multi-ion!
-
         real_t charge = qratio*NS(Particles_get_q0_value)( particles, particle_index )*QELEM;
         
         real_t x = NS(Particles_get_x_value)( particles, particle_index ) - bb4ddata->Delta_x;
