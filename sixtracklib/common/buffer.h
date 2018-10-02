@@ -6,7 +6,6 @@
     #include <stddef.h>
     #include <stdint.h>
     #include <stdlib.h>
-    #include <stdio.h>
     #include <limits.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
@@ -186,6 +185,10 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reserve)(
     NS(buffer_size_t) const new_max_num_dataptrs,
     NS(buffer_size_t) const new_max_num_garbage_ranges );
 
+SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reserve_capacity)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const new_buffer_capacity );
+
 SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_needs_remapping)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
@@ -200,15 +203,19 @@ SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new)(
     NS(buffer_size_t) const buffer_capacity );
 
 SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_from_file)(
-    SIXTRL_BUFFER_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+
+SIXTRL_HOST_FN bool NS(Buffer_read_from_file)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
 
 SIXTRL_HOST_FN bool NS(Buffer_write_to_file)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
 
 SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    FILE* SIXTRL_RESTRICT fp );
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp );
 
 SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_detailed)(
     NS(buffer_size_t)  const initial_max_num_objects,
@@ -284,7 +291,10 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object)*
 /* For plain C/Cxx */
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #include <stdio.h>
+    #if !defined( _GPUCODE )
+        #include <stdio.h>
+        #include <string.h>
+    #endif /* !defined( _GPUCODE ) */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES)
@@ -901,6 +911,48 @@ SIXTRL_INLINE int NS(Buffer_reserve)(
         {
             success = NS(Buffer_reserve_generic)( buffer, max_num_objects,
                 max_num_slots, max_num_dataptrs, max_num_garbage_ranges );
+        }
+    }
+
+    return success;
+}
+
+SIXTRL_INLINE int NS(Buffer_reserve_capacity)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const new_buffer_capacity )
+{
+    int success = -1;
+
+    if( ( NS(Buffer_uses_datastore)( buffer ) ) &&
+        ( NS(Buffer_allow_resize)( buffer ) ) )
+    {
+        /*
+        #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
+             SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1
+
+        if( NS(Buffer_uses_special_opencl_datastore)( buffer ) )
+        {
+            success = NS(Buffer_reserve_capacity_opencl)(
+                buffer, new_buffer_capacity );
+        }
+        else
+        #endif *//* SIXTRACKLIB_ENABLE_MODULE_OPENCL */
+
+        /*
+        #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
+             SIXTRACKLIB_ENABLE_MODULE_CUDA == 1
+
+        if( NS(Buffer_uses_special_cuda_datastore)( buffer ) )
+        {
+            success = NS(Buffer_reserve_capacity_cuda)(
+                buffer, new_buffer_capacity );
+        }
+        else
+        #endif */ /* SIXTRACKLIB_ENABLE_MODULE_CUDA */
+
+        {
+            success = NS(Buffer_reserve_capacity_generic)(
+                buffer, new_buffer_capacity );
         }
     }
 

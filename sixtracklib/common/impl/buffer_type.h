@@ -107,6 +107,10 @@ NS(object_type_values_t);
     #define   SIXTRL_BUFFER_DEFAULT_HEADER_SIZE             64u
 #endif /* !defined( SIXTRL_BUFFER_DEFAULT_HEADER_SIZE ) */
 
+#if !defined( SIXTRL_BUFFER_MINIMAL_LENGTH)
+    #define SIXTRL_BUFFER_MINIMAL_LENGTH                   128u
+#endif /* !defined( SIXTRL_BUFFER_MINIMAL_LENGTH) */
+
 #if !defined( _GPUCODE )
 
 /* ------------------------------------------------------------------------- */
@@ -157,6 +161,9 @@ SIXTRL_STATIC_VAR NS(buffer_size_t)  const NS(BUFFER_DEFAULT_SLOT_SIZE) =
 
 SIXTRL_STATIC_VAR NS(buffer_size_t) const NS(BUFFER_DEFAULT_HEADER_SIZE) =
     ( NS(buffer_size_t) )SIXTRL_BUFFER_DEFAULT_HEADER_SIZE;
+
+SIXTRL_STATIC_VAR NS(buffer_size_t) const NS(BUFFER_MINIMAL_LENGTH) =
+    ( NS(buffer_size_t) )SIXTRL_BUFFER_MINIMAL_LENGTH;
 
 /* ------------------------------------------------------------------------- */
 
@@ -320,6 +327,10 @@ namespace SIXTRL_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST buffer_size_t
         BUFFER_DEFAULT_HEADER_SIZE = static_cast< buffer_flags_t >(
             SIXTRL_BUFFER_DEFAULT_HEADER_SIZE );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST buffer_size_t
+        BUFFER_MINIMAL_LENGTH = static_cast< buffer_size_t >(
+            SIXTRL_BUFFER_MINIMAL_LENGTH );
 }
 
 #endif /* defined( __cplusplus ) */

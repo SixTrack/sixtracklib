@@ -36,6 +36,10 @@ extern SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_detailed)(
     NS(buffer_size_t)  const initial_max_num_garbage_elements,
     NS(buffer_flags_t) const buffer_flags );
 
+extern SIXTRL_HOST_FN bool NS(Buffer_read_from_file)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+
 extern SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_from_file)(
     SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
 
@@ -222,6 +226,78 @@ NS(Buffer)* NS(Buffer_new_detailed)(
     }
 
     return ptr_buffer;
+}
+
+SIXTRL_HOST_FN bool NS(Buffer_read_from_file)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    bool success = false;
+
+    if( ( NS(Buffer_allow_clear)( buffer ) ) &&
+        ( NS(Buffer_allow_modify_datastore_contents)( buffer ) ) &&
+        ( path_to_file != SIXTRL_NULLPTR ) &&
+        ( strlen( path_to_file ) > ( buf_size_t )0u ) )
+    {
+        buf_size_t size_of_file = ( buf_size_t )0u;
+        FILE* fp = fopen( path_to_file, "rb" );
+
+        if( fp != SIXTRL_NULLPTR )
+        {
+            long length = ( long )0u;
+
+            fseek( fp, 0, SEEK_END );
+            length = ftell( fp );
+            fclose( fp );
+            fp = SIXTRL_NULLPTR;
+
+            if( length > 0 )
+            {
+                size_of_file = ( buf_size_t )length;
+            }
+        }
+
+        if( size_of_file > ( buf_size_t )0u )
+        {
+            buf_size_t buffer_capacity = NS(Buffer_get_capacity)( buffer );
+
+            if( size_of_file <= buffer_capacity )
+            {
+                success = 0;
+            }
+            else
+            {
+                if( NS(Buffer_reserve_capacity)( buffer, size_of_file ) == 0 )
+                {
+                    buffer_capacity = NS(Buffer_get_capacity)( buffer );
+                    success = 0;
+                }
+            }
+
+            if( ( success == 0 ) && ( size_of_file <= buffer_capacity ) )
+            {
+                success = -1;
+                fp = fopen( path_to_file, "rb" );
+
+                if( fp != SIXTRL_NULLPTR )
+                {
+                    typedef SIXTRL_BUFFER_DATAPTR_DEC char* ptr_read_buffer_t;
+
+                    ptr_read_buffer_t read_buffer = ( ptr_read_buffer_t )(
+                        uintptr_t )NS(Buffer_get_data_begin_addr)( buffer );
+
+                    if( ( fread( read_buffer, size_of_file, 1u, fp ) == 1u ) &&
+                        ( 0 == NS(Buffer_remap)( buffer ) ) )
+                    {
+                        success = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    return success;
 }
 
 SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_from_file)(
