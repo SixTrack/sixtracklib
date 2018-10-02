@@ -67,6 +67,10 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_remap_generic)(
 
 /* ========================================================================= */
 
+SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reserve_capacity_generic)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const new_buffer_capacity );
+
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reserve_generic)(
     SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const max_num_objects,
@@ -353,6 +357,121 @@ SIXTRL_INLINE int NS(Buffer_remap_generic)(
 
 /* ========================================================================= */
 
+SIXTRL_INLINE int NS(Buffer_reserve_capacity_generic)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const new_buffer_capacity )
+{
+    int success = -1;
+
+    typedef NS(buffer_addr_t)        address_t;
+    typedef NS(buffer_size_t)        buf_size_t;
+
+    typedef unsigned char            raw_t;
+    typedef SIXTRL_ARGPTR_DEC raw_t* ptr_to_raw_t;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO_SIZE = ( buf_size_t )0u;
+
+    buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+
+    if( ( buffer != SIXTRL_NULLPTR ) && ( slot_size != ZERO_SIZE ) &&
+        ( NS(Buffer_owns_datastore)( buffer ) ) &&
+        ( NS(Buffer_allow_resize)( buffer ) ) )
+    {
+        if( NS(Buffer_get_capacity)( buffer ) < new_buffer_capacity )
+        {
+            address_t const datastore_addr =
+                NS(Buffer_get_datastore_begin_addr)( buffer );
+
+            if( NS(Buffer_uses_mempool_datastore)( buffer ) )
+            {
+                #if !defined( _GPUCODE )
+
+                typedef NS(MemPool)     mem_pool_t;
+                typedef mem_pool_t*     ptr_to_mem_pool_t;
+                typedef NS(AllocResult) alloc_result_t;
+
+                ptr_to_mem_pool_t mem_pool = ( ptr_to_mem_pool_t )(
+                    uintptr_t )datastore_addr;
+
+                #if !defined( NDEBUG )
+                address_t const old_base_addr = ( address_t )( uintptr_t
+                    )NS(MemPool_get_begin_pos)( mem_pool );
+                #endif /* !defined( NDEBUG ) */
+
+                buf_size_t bytes_missing = new_buffer_capacity;
+
+                buf_size_t const current_capacity =
+                    NS(MemPool_get_size)( mem_pool );
+
+                bytes_missing -= ( bytes_missing >= current_capacity )
+                    ? current_capacity : bytes_missing;
+
+                SIXTRL_ASSERT( current_capacity ==
+                    NS(Buffer_get_capacity)( buffer ) );
+
+                SIXTRL_ASSERT( ( old_base_addr % slot_size ) == ZERO_SIZE );
+
+                if( ( bytes_missing > ZERO_SIZE ) &&
+                    ( 0 == NS(MemPool_reserve_aligned)( mem_pool,
+                            new_buffer_capacity, slot_size ) ) )
+                {
+                    alloc_result_t result;
+
+                    SIXTRL_ASSERT( NS(MemPool_get_remaining_bytes)( mem_pool )
+                        >= bytes_missing );
+
+                    result = NS(MemPool_append_aligned)(
+                        mem_pool, bytes_missing, slot_size );
+
+                    if( NS(AllocResult_valid)( &result ) )
+                    {
+                        ptr_to_raw_t new_begin = ( ptr_to_raw_t )( uintptr_t
+                            )NS(MemPool_get_begin_pos)( mem_pool );
+
+                        if( !NS(ManagedBuffer_needs_remapping)(
+                                new_begin, slot_size ) )
+                        {
+                            success = NS(ManagedBuffer_remap)(
+                                new_begin, slot_size );
+                        }
+                        else
+                        {
+                            success = 0;
+                        }
+
+                        if( success == 0 )
+                        {
+                            buffer->data_addr =
+                                ( address_t )( uintptr_t )new_begin;
+
+                            buffer->data_size +=
+                                NS(AllocResult_get_length)( &result );
+
+                            buffer->data_capacity =
+                                NS(MemPool_get_size)( mem_pool );
+                        }
+                    }
+                }
+                else if( bytes_missing == ZERO_SIZE )
+                {
+                    success = 0;
+                }
+
+                #endif /* !defined( _GPUCODE ) */
+            }
+            else
+            {
+                SIXTRL_ASSERT( new_buffer_capacity <=
+                    NS(Buffer_get_capacity)( buffer ) );
+
+                success = 0;
+            }
+        }
+    }
+
+    return success;
+}
+
 SIXTRL_INLINE int NS(Buffer_reserve_generic)(
     NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const max_num_objects,
@@ -403,91 +522,16 @@ SIXTRL_INLINE int NS(Buffer_reserve_generic)(
 
         success = ( !needs_resizing ) ? 0 : -1;
 
-        if( ( needs_resizing ) && ( NS(Buffer_owns_datastore)( buffer ) ) &&
-            ( NS(Buffer_allow_resize)( buffer ) ) )
+        if( needs_resizing )
         {
-            address_t const datastore_addr =
-                NS(Buffer_get_datastore_begin_addr)( buffer );
+            success = NS(Buffer_reserve_capacity_generic)(
+                buffer, requ_buffer_capacity);
 
-            if( NS(Buffer_uses_mempool_datastore)( buffer ) )
+            if( success == 0 )
             {
-                #if !defined( _GPUCODE )
-
-                typedef NS(MemPool)     mem_pool_t;
-                typedef mem_pool_t*     ptr_to_mem_pool_t;
-                typedef NS(AllocResult) alloc_result_t;
-
-                ptr_to_mem_pool_t mem_pool = ( ptr_to_mem_pool_t )(
-                    uintptr_t )datastore_addr;
-
-                #if !defined( NDEBUG )
-                address_t const old_base_addr = ( address_t )( uintptr_t
-                    )NS(MemPool_get_begin_pos)( mem_pool );
-                #endif /* !defined( NDEBUG ) */
-
-                buf_size_t bytes_missing = requ_buffer_capacity;
-
-                current_capacity = NS(MemPool_get_size)( mem_pool );
-
-                bytes_missing -= ( bytes_missing >= current_capacity )
-                    ? current_capacity : bytes_missing;
-
-                SIXTRL_ASSERT( current_capacity ==
-                    NS(Buffer_get_capacity)( buffer ) );
-
-                SIXTRL_ASSERT( ( old_base_addr % slot_size ) == ZERO_SIZE );
-
-                if( ( bytes_missing > ZERO_SIZE ) &&
-                    ( 0 == NS(MemPool_reserve_aligned)( mem_pool,
-                            requ_buffer_capacity, slot_size ) ) )
-                {
-                    alloc_result_t result;
-
-                    SIXTRL_ASSERT( NS(MemPool_get_remaining_bytes)( mem_pool )
-                        >= bytes_missing );
-
-                    result = NS(MemPool_append_aligned)(
-                        mem_pool, bytes_missing, slot_size );
-
-                    if( NS(AllocResult_valid)( &result ) )
-                    {
-                        ptr_to_raw_t new_begin = ( ptr_to_raw_t )( uintptr_t
-                            )NS(MemPool_get_begin_pos)( mem_pool );
-
-                        if( !NS(ManagedBuffer_needs_remapping)(
-                                new_begin, slot_size ) )
-                        {
-                            success = NS(ManagedBuffer_remap)(
-                                new_begin, slot_size );
-                        }
-                        else
-                        {
-                            success = 0;
-                        }
-
-                        if( success == 0 )
-                        {
-                            buffer->data_addr =
-                                ( address_t )( uintptr_t )new_begin;
-
-                            buffer->data_size +=
-                                NS(AllocResult_get_length)( &result );
-
-                            buffer->data_capacity =
-                                NS(MemPool_get_size)( mem_pool );
-                        }
-                    }
-                }
-                else if( bytes_missing == ZERO_SIZE )
-                {
-                    success = 0;
-                }
-
-                #endif /* !defined( _GPUCODE ) */
+                needs_resizing = ( NS(Buffer_get_capacity)(
+                    buffer ) >= requ_buffer_capacity );
             }
-
-            needs_resizing =
-                ( NS(Buffer_get_capacity)( buffer ) >= requ_buffer_capacity );
         }
 
         if( !needs_resizing )
