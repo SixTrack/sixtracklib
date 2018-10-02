@@ -64,13 +64,15 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_4d)(
 
     typedef NS(beambeam4d_real_const_ptr_t)  bb_data_ptr_t;
     //typedef SIXTRL_UINT64_T u64_t;
-    //typedef SIXTRL_REAL_T real_t;
+    typedef SIXTRL_REAL_T real_t;
     typedef SIXTRL_BE_DATAPTR_DEC BB4D_data* BB4D_data_ptr_t;
 
     bb_data_ptr_t data = NS(BeamBeam4D_get_const_data)( bb );
 
     BB4D_data_ptr_t bb4ddata = (BB4D_data_ptr_t) data;
 
+    /*
+    // Test data transfer
     printf("4D: q_part = %e\n",bb4ddata->q_part);
     printf("4D: N_part = %e\n",bb4ddata->N_part);
     printf("4D: sigma_x = %e\n",bb4ddata->sigma_x);
@@ -82,15 +84,44 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_4d)(
     printf("4D: Dpx_sub = %e\n",bb4ddata->Dpx_sub);
     printf("4D: Dpy_sub = %e\n",bb4ddata->Dpy_sub);
     printf("4D: enabled = %ld\n",bb4ddata->enabled);
+    */
 
 
+    if (bb4ddata->enabled) {
+
+        real_t px = NS(Particles_get_px_value)( particles, particle_index );
+        real_t py = NS(Particles_get_py_value)( particles, particle_index );
+
+        real_t qratio = 1.;// To be generalized for multi-ion!
+
+        real_t charge = qratio*NS(Particles_get_q0_value)( particles, particle_index )*QELEM;
+        
+        real_t x = NS(Particles_get_x_value)( particles, particle_index ) - bb4ddata->Delta_x;
+        real_t y = NS(Particles_get_y_value)( particles, particle_index ) - bb4ddata->Delta_y;
+
+        real_t chi = NS(Particles_get_chi_value)( particles, particle_index );
+
+        real_t beta = NS(Particles_get_beta0_value)( particles, particle_index ) \
+                        /NS(Particles_get_rvv_value)( particles, particle_index );
+        real_t p0c = NS(Particles_get_p0c_value)( particles, particle_index )*QELEM;
+
+        real_t Ex, Ey, Gx, Gy;
+        get_Ex_Ey_Gx_Gy_gauss(x, y, bb4ddata->sigma_x, bb4ddata->sigma_y,
+                bb4ddata->min_sigma_diff,
+                &Ex, &Ey, &Gx, &Gy);
+
+        real_t fact_kick = chi * bb4ddata->N_part * bb4ddata->q_part * charge * \
+            (1. + beta * bb4ddata->beta_s)/(p0c*(beta + bb4ddata->beta_s));
+
+        px += (fact_kick*Ex - bb4ddata->Dpx_sub);
+        py += (fact_kick*Ey - bb4ddata->Dpy_sub);
+
+        NS(Particles_set_px_value)( particles, particle_index, px );
+        NS(Particles_set_py_value)( particles, particle_index, py );
 
 
-    SIXTRL_REAL_T x = NS(Particles_get_x_value)( particles, particle_index );
-    x += ( SIXTRL_REAL_T )0.0 + 0.*data[0];
-    printf("BB4D data[0]%.2e\n", data[0]);
+    }
 
-    NS(Particles_set_x_value)( particles, particle_index, x );
 
     return ret;
 }
