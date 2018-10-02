@@ -26,7 +26,7 @@ SIXTRL_FN SIXTRL_STATIC void get_transv_field_gauss_ellip(
 SIXTRL_FN SIXTRL_STATIC void get_Ex_Ey_Gx_Gy_gauss(
     SIXTRL_REAL_T x, SIXTRL_REAL_T  y,
     SIXTRL_REAL_T sigma_x, SIXTRL_REAL_T sigma_y,
-    SIXTRL_REAL_T min_sigma_diff,
+    SIXTRL_REAL_T min_sigma_diff, int skip_Gs,
     SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ex_ptr,
     SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ey_ptr,
     SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Gx_ptr,
@@ -151,7 +151,7 @@ SIXTRL_INLINE void get_transv_field_gauss_ellip(
 SIXTRL_INLINE void get_Ex_Ey_Gx_Gy_gauss(
     SIXTRL_REAL_T x, SIXTRL_REAL_T  y,
     SIXTRL_REAL_T sigma_x, SIXTRL_REAL_T sigma_y,
-    SIXTRL_REAL_T min_sigma_diff,
+    SIXTRL_REAL_T min_sigma_diff, int skip_Gs,
     SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ex_ptr,
     SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Ey_ptr,
     SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* Gx_ptr,
@@ -165,10 +165,17 @@ SIXTRL_INLINE void get_Ex_Ey_Gx_Gy_gauss(
 
         get_transv_field_gauss_round(sigma, 0., 0., x, y, &Ex, &Ey);
 
-        Gx = 1/(2.*(x*x+y*y))*(y*Ey-x*Ex+1./(2*MYPI*EPSILON_0*sigma*sigma)
+        if(skip_Gs){
+          Gx = 0.;
+          Gy = 0.;
+        }
+        else{
+          Gx = 1/(2.*(x*x+y*y))*(y*Ey-x*Ex+1./(2*MYPI*EPSILON_0*sigma*sigma)
                             *x*x*exp(-(x*x+y*y)/(2.*sigma*sigma)));
-        Gy = 1./(2*(x*x+y*y))*(x*Ex-y*Ey+1./(2*MYPI*EPSILON_0*sigma*sigma)
+          Gy = 1./(2*(x*x+y*y))*(x*Ex-y*Ey+1./(2*MYPI*EPSILON_0*sigma*sigma)
                             *y*y*exp(-(x*x+y*y)/(2.*sigma*sigma)));
+        }
+        
     }
     else{
 
@@ -177,10 +184,17 @@ SIXTRL_INLINE void get_Ex_Ey_Gx_Gy_gauss(
         SIXTRL_REAL_T Sig_11 = sigma_x*sigma_x;
         SIXTRL_REAL_T Sig_33 = sigma_y*sigma_y;
 
-        Gx =-1./(2*(Sig_11-Sig_33))*(x*Ex+y*Ey+1./(2*MYPI*EPSILON_0)*\
-                    (sigma_y/sigma_x*exp(-x*x/(2*Sig_11)-y*y/(2*Sig_33))-1.));
-        Gy =1./(2*(Sig_11-Sig_33))*(x*Ex+y*Ey+1./(2*MYPI*EPSILON_0)*\
-                    (sigma_x/sigma_y*exp(-x*x/(2*Sig_11)-y*y/(2*Sig_33))-1.));
+        if(skip_Gs){
+          Gx = 0.;
+          Gy = 0.;
+        }
+        else{
+          Gx =-1./(2*(Sig_11-Sig_33))*(x*Ex+y*Ey+1./(2*MYPI*EPSILON_0)*\
+                      (sigma_y/sigma_x*exp(-x*x/(2*Sig_11)-y*y/(2*Sig_33))-1.));
+          Gy =1./(2*(Sig_11-Sig_33))*(x*Ex+y*Ey+1./(2*MYPI*EPSILON_0)*\
+                      (sigma_x/sigma_y*exp(-x*x/(2*Sig_11)-y*y/(2*Sig_33))-1.));
+        }
+
     }
 
     *Ex_ptr = Ex;

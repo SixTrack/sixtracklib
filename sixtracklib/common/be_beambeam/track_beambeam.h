@@ -107,7 +107,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_4d)(
 
         real_t Ex, Ey, Gx, Gy;
         get_Ex_Ey_Gx_Gy_gauss(x, y, bb4ddata->sigma_x, bb4ddata->sigma_y,
-                bb4ddata->min_sigma_diff,
+                bb4ddata->min_sigma_diff, 1, 
                 &Ex, &Ey, &Gx, &Gy);
 
         real_t fact_kick = chi * bb4ddata->N_part * bb4ddata->q_part * charge * \
@@ -236,7 +236,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
             // Get transverse fieds
             real_t Ex, Ey, Gx, Gy;
             get_Ex_Ey_Gx_Gy_gauss(x_bar_hat_star, y_bar_hat_star, 
-                sqrt(Sig_11_hat_star), sqrt(Sig_33_hat_star), bb6ddata->min_sigma_diff,
+                sqrt(Sig_11_hat_star), sqrt(Sig_33_hat_star), bb6ddata->min_sigma_diff, 0,
                 &Ex, &Ey, &Gx, &Gy);
                 
             // Compute kicks
