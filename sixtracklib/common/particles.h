@@ -4270,36 +4270,33 @@ SIXTRL_INLINE void NS(Particles_update_delta_value)(
 
     SIXTRL_STATIC_VAR real_t const ONE = ( real_t )1;
 
-    real_t const beta0               = NS(Particles_get_beta0_value)( p, index );
-    real_t const inv_beta0           = ONE / beta0;
-    real_t const inv_beta0_squ       = inv_beta0 * inv_beta0;
-    real_t const one_plus_delta      = ONE + new_delta_value;
-    real_t const inv_beta0_plus_ptau = sqrt( new_delta_value * new_delta_value +
-        ( real_t )2 * new_delta_value + inv_beta0_squ );
+    real_t const beta0 = NS(Particles_get_beta0_value)( p, index );
+    real_t const delta_beta0 = new_delta_value * beta0;
+    real_t const ptau_beta0  = sqrt( delta_beta0 * delta_beta0 +
+        ( real_t )2 * delta_beta0 * beta0 + ONE ) - ONE;
 
-    // beta = ( 1 + delta ) / ( 1/beta0 + ptau ) ==
-    //        ( 1 + delta ) / ( sqrt( ... ) - 1/beta0 + 1/beta0 )  ==
-    //        ( 1 + delta ) / sqrt( delta^2 + 2 * delta + (1/beta0)^2 )
-    real_t const beta   = one_plus_delta / inv_beta0_plus_ptau;
+    real_t const one_plus_delta = ONE + new_delta_value;
+    real_t const rvv    = ( one_plus_delta ) / ( ONE + ptau_beta0 );
+    real_t const rpp    = ONE / one_plus_delta;
+    real_t const psigma = ptau_beta0 / ( beta0 * beta0 );
 
-    // rvv = beta / beta0
-    real_t const rvv    = beta * inv_beta0;
+    #if !defined( NDEBUG ) && !defined( _GPUCODE )
+    SIXTRL_STATIC_VAR real_t const EPS  = ( real_t )1e-9;
+    SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0;
 
-    // psigma = ptau / beta0 == ( 1/beta0 ) * sqrt( ... ) - (1/beta0)^2
-    real_t const psigma = inv_beta0 * inv_beta0_plus_ptau - inv_beta0_squ;
+    SIXTRL_ASSERT(   beta0              > ZERO );
+    SIXTRL_ASSERT( ( beta0 * beta0    ) > EPS  );
+    SIXTRL_ASSERT( ( one_plus_delta   ) > EPS  );
+    SIXTRL_ASSERT( ( ONE + ptau_beta0 ) > EPS  );
+    SIXTRL_ASSERT( ( delta_beta0 * delta_beta0 +
+        ( real_t )2 * delta_beta0 * beta0 + ONE ) > ZERO );
 
-    // rpp = 1 / ( 1 + delta )
-    real_t const rpp = 1 / ( 1 + new_delta_value );
-
-    SIXTRL_ASSERT( beta0 > ( real_t )0 );
-    SIXTRL_ASSERT( ( ONE + new_delta_value ) > ( real_t )0 );
-    SIXTRL_ASSERT( ( new_delta_value * new_delta_value + ( real_t )2 *
-        new_delta_value + inv_beta0 * inv_beta0 ) > ( real_t )0 );
+    #endif /* !defined( NDEBUG ) && !defined( _GPUCODE ) */
 
     NS(Particles_set_delta_value)(  p, index, new_delta_value );
-    NS(Particles_set_psigma_value)( p, index, psigma );
-    NS(Particles_set_rpp_value)(    p, index, rpp );
     NS(Particles_set_rvv_value)(    p, index, rvv );
+    NS(Particles_set_rpp_value)(    p, index, rpp );
+    NS(Particles_set_psigma_value)( p, index, psigma );
 
     return;
 }
