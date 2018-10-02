@@ -4046,25 +4046,30 @@ SIXTRL_INLINE void NS(Particles_set_energy_value)(
 {
     typedef NS(particle_real_t) real_t;
 
-    SIXTRL_STATIC_VAR real_t const ONE = ( real_t )1;
+    real_t const beta0       = NS(Particles_get_beta0_value)( p, index );
+    real_t const p0c         = NS(Particles_get_p0c_value)( p, index );
 
-    real_t const beta0          = NS(Particles_get_beta0_value)( p, index );
-    real_t const p0c            = NS(Particles_get_p0c_value)( p, index );
+    real_t const ptau_beta0  = ( beta0 * energy ) / p0c;
+    real_t const beta0_squ   = beta0 * beta0;
+    real_t const beta0_plus_delta_beta0 = sqrt(
+        ptau_beta0 * ptau_beta0 + ( real_t )2 * ptau_beta0 + beta0_squ );
 
-    real_t const ptau           = energy / p0c;
-    real_t const psigma         = ptau / beta0;
-    real_t const one_plus_delta = sqrt( ptau * ptau + ( real_t )2 * psigma + ONE );
-    real_t const delta          = one_plus_delta - ONE;
-    real_t const beta           = one_plus_delta / ( ONE / beta0 + ptau );
-    real_t const rpp            = ONE  / one_plus_delta;
-    real_t const rvv            = beta / beta0;
+    real_t const psigma = ptau_beta0 / beta0_squ;
+    real_t const delta  = ( beta0_plus_delta_beta0 - beta0 ) / beta0;
+    real_t const rpp    = beta0 / beta0_plus_delta_beta0;
+    real_t const rvv    = ( beta0_plus_delta_beta0 ) /
+                          ( beta0 + ptau_beta0 * beta0 );
 
-    SIXTRL_ASSERT( index < NS(Particles_get_num_of_particles)( p ) );
+    SIXTRL_ASSERT( beta0     > ( real_t )0 );
+    SIXTRL_ASSERT( p0c       > ( real_t )0 );
+    SIXTRL_ASSERT( beta0_squ > ( real_t )0 );
+    SIXTRL_ASSERT( ( ptau_beta0 * ptau_beta0 +
+        ( real_t )2 * ptau_beta0 + beta0_squ ) > ( real_t )0 );
 
+    NS(Particles_set_delta_value)(  p, index, delta  );
+    NS(Particles_set_rpp_value)(    p, index, rpp    );
+    NS(Particles_set_rvv_value)(    p, index, rvv    );
     NS(Particles_set_psigma_value)( p, index, psigma );
-    NS(Particles_set_delta_value)(  p, index, delta );
-    NS(Particles_set_rpp_value)( p, index, rpp );
-    NS(Particles_set_rvv_value)( p, index, rvv );
 
     return;
 }
