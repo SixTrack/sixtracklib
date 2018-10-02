@@ -53,7 +53,12 @@ def line2cobject( line, outfile_name ):
                         frequency=elem.frequency, lag=elem.lag )
                         
         elif elem_type=='BeamBeam4D':
-            data = np.array([23.])
+
+            for mm in ['q_part', 'N_part', 'sigma_x', 'sigma_y', 'beta_s',
+                 'min_sigma_diff', 'Delta_x', 'Delta_y', 'Dpx_sub', 'Dpy_sub', 'enabled']:
+                 print('4D: %s, %s'%(mm, repr(getattr(elem,mm))))
+
+            data = elem.tobuffer()
             e = BeamBeam4D( cbuffer=beam_elements, data=data)
             
         elif elem_type=='BeamBeam6D':

@@ -34,7 +34,7 @@ int main( int argc, char* argv[] )
     st_Buffer* pb = st_Buffer_new( ( buf_size_t )( 1u << 24u ) );
 
     buf_size_t NUM_PARTICLES                = 2;
-    buf_size_t NUM_TURNS                    = 1.;
+    buf_size_t NUM_TURNS                    = 2;
 
     st_Particles*       particles           = SIXTRL_NULLPTR;
     st_Particles const* input_particles     = SIXTRL_NULLPTR;
@@ -126,8 +126,8 @@ int main( int argc, char* argv[] )
     // Write to file
     st_Buffer_write_to_file(dump, "stlib_dump.bin");
     
-    st_Buffer* test = st_Buffer_new_from_file("stlib_dump.bin");
-    st_Particles_buffer_print(stdout, test);
+    //st_Buffer* test = st_Buffer_new_from_file("stlib_dump.bin");
+    //st_Particles_buffer_print(stdout, test);
 
 
     /* ********************************************************************** */

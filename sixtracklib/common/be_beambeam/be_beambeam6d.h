@@ -30,6 +30,20 @@ typedef struct NS(BeamBeam6D)
 }
 NS(BeamBeam6D);
 
+typedef struct{
+    SIXTRL_REAL_T q_part;
+    SIXTRL_REAL_T N_part;
+    SIXTRL_REAL_T sigma_x;
+    SIXTRL_REAL_T sigma_y;
+    SIXTRL_REAL_T beta_s;
+    SIXTRL_REAL_T min_sigma_diff;
+    SIXTRL_REAL_T Delta_x;
+    SIXTRL_REAL_T Delta_y;
+    SIXTRL_REAL_T Dpx_sub;
+    SIXTRL_REAL_T Dpy_sub;
+    SIXTRL_INT64_T enabled;
+}BB4D_data;
+
 
 typedef struct{
     SIXTRL_REAL_T sphi;
@@ -81,6 +95,7 @@ typedef struct{
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T* y_slices_star;
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T* sigma_slices_star;
 }BB6D_data;
+
 
 SIXTRL_FN SIXTRL_STATIC  SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)*
 NS(BeamBeam6D_preset)(

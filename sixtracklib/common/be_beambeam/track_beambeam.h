@@ -63,10 +63,28 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_4d)(
     SIXTRL_TRACK_RETURN ret = 0;
 
     typedef NS(beambeam4d_real_const_ptr_t)  bb_data_ptr_t;
+    //typedef SIXTRL_UINT64_T u64_t;
+    //typedef SIXTRL_REAL_T real_t;
+    typedef SIXTRL_BE_DATAPTR_DEC BB4D_data* BB4D_data_ptr_t;
 
-    SIXTRL_UINT64_T const data_size = NS(BeamBeam4D_get_data_size)( bb );
     bb_data_ptr_t data = NS(BeamBeam4D_get_const_data)( bb );
-    (void) data_size; // just to avoid error: unused variable
+
+    BB4D_data_ptr_t bb4ddata = (BB4D_data_ptr_t) data;
+
+    printf("4D: q_part = %e\n",bb4ddata->q_part);
+    printf("4D: N_part = %e\n",bb4ddata->N_part);
+    printf("4D: sigma_x = %e\n",bb4ddata->sigma_x);
+    printf("4D: sigma_y = %e\n",bb4ddata->sigma_y);
+    printf("4D: beta_s = %e\n",bb4ddata->beta_s);
+    printf("4D: min_sigma_diff = %e\n",bb4ddata->min_sigma_diff);
+    printf("4D: Delta_x = %e\n",bb4ddata->Delta_x);
+    printf("4D: Delta_y = %e\n",bb4ddata->Delta_y);
+    printf("4D: Dpx_sub = %e\n",bb4ddata->Dpx_sub);
+    printf("4D: Dpy_sub = %e\n",bb4ddata->Dpy_sub);
+    printf("4D: enabled = %ld\n",bb4ddata->enabled);
+
+
+
 
     SIXTRL_REAL_T x = NS(Particles_get_x_value)( particles, particle_index );
     x += ( SIXTRL_REAL_T )0.0 + 0.*data[0];
