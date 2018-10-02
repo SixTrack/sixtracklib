@@ -24,4 +24,4 @@ class Particles( CObject ):
     at_turn       = CField( 19, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
     state         = CField( 20, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
 
-    _const = {}
+

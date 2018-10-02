@@ -237,26 +237,25 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
         NS(Particles_set_zeta_value)( particles, particle_index, zeta );
         NS(Particles_set_delta_value)( particles, particle_index,delta );
 
-        /////// To be reaplced with update delta
-        real_t rpp = 1./(delta+1.);
-        real_t pc_eV = p0c/rpp;
-        real_t mass0 = NS(Particles_get_mass0_value)( particles, particle_index );
+        /////// To be reaplced with update deltas
         real_t beta0 = NS(Particles_get_beta0_value)( particles, particle_index );
-        real_t gamma0 = NS(Particles_get_gamma0_value)( particles, particle_index );
-        real_t gamma = sqrt(1. + (pc_eV/mass0)*(pc_eV/mass0));
-        real_t beta = sqrt(1.-1./(gamma*gamma));
-        real_t rvv = beta0/beta;
-        real_t psigma = mass0*(gamma-gamma0)/(beta0*p0c);
+
+        real_t deltabeta0 = delta*beta0;
+        real_t ptaubeta0 = sqrt(deltabeta0*deltabeta0+2*deltabeta0*beta0 + 1)-1;
+        real_t rvv  = (1+delta)/(1+ptaubeta0);
+        real_t rpp = 1./(delta+1.);
+        real_t psigma = ptaubeta0/(beta0*beta0);
+
         
         NS(Particles_set_psigma_value)( particles, particle_index, psigma );
         NS(Particles_set_rpp_value)( particles, particle_index, rpp );
-        NS(Particles_set_rvv_value)( particles, particle_index, rvv );\
+        NS(Particles_set_rvv_value)( particles, particle_index, rvv );
         ////////
 
         
 
     }
-    // End Gianni's part
+    
 
     return ret;
 }
