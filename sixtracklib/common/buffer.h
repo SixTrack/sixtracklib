@@ -299,17 +299,17 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object)*
 
 #if !defined( SIXTRL_NO_INCLUDES)
     #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/buffer/buffer_generic.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #include "sixtracklib/common/buffer/managed_buffer_remap.h"
     #include "sixtracklib/common/buffer/managed_buffer.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
-    #include "sixtracklib/common/buffer/buffer_generic.h"
 
     #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
                ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 ) && \
         defined( __OPENCL_VERSION__ )
-        #include "sixtracklib/opencl/buffer.h"
+//         #include "sixtracklib/opencl/buffer.h"
     #endif /* OpenCL */
 
     #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \

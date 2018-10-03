@@ -14,7 +14,6 @@
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
-    #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -163,6 +162,7 @@ NS(Buffer_get_objects_end)(
     #include "sixtracklib/common/buffer/managed_buffer.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #include "sixtracklib/common/buffer/managed_buffer_remap.h"
+    #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
