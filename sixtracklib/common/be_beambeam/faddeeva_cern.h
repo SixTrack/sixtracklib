@@ -17,7 +17,7 @@
 #define _FADDCERN_
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
@@ -26,8 +26,8 @@ extern "C" {
 
 SIXTRL_FN SIXTRL_STATIC void cerrf(
     SIXTRL_REAL_T in_real, SIXTRL_REAL_T in_imag,
-    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* out_real,
-    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* out_imag );
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_imag );
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }
@@ -42,8 +42,8 @@ extern "C" {
 #endif /* !defined( __cplusplus ) && !defined( _GPUCODE ) */
 
 SIXTRL_INLINE void cerrf( SIXTRL_REAL_T in_real, SIXTRL_REAL_T in_imag,
-    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* out_real,
-    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* out_imag )
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_imag )
 {
 	/**
 	this function calculates the SIXTRL_REAL_T precision complex error function based on the
