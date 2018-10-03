@@ -19,10 +19,10 @@
 
 #include "sixtracklib/testlib.h"
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
-#include "sixtracklib/common/impl/be_drift.h"
+#include "sixtracklib/common/be_drift/be_drift.h"
 
 TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
 {
