@@ -1,5 +1,5 @@
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/compute_arch.h"
+    #include "sixtracklib/common/internal/compute_arch.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
@@ -11,7 +11,7 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( GPUCODE )
@@ -297,4 +297,4 @@ SIXTRL_HOST_FN int NS(ComputeNodeInfo_make)(
     return success;
 }
 
-/* end: sixtracklib/common/details/compute_arch.c  */
+/* end: sixtracklib/common/internal/compute_arch.c  */

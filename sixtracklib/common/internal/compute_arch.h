@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_COMPUTE_ARCH_H__
-#define SIXTRACKLIB_COMMON_COMPUTE_ARCH_H__
+#ifndef SIXTRACKLIB_COMMON_INTERNAL_COMPUTE_ARCH_H__
+#define SIXTRACKLIB_COMMON_INTERNAL_COMPUTE_ARCH_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -10,7 +10,7 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -331,6 +331,6 @@ SIXTRL_INLINE char const* NS(ComputeNodeInfo_get_description)(
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_COMMON_COMPUTE_ARCH_H__ */
+#endif /* SIXTRACKLIB_COMMON_INTERNAL_COMPUTE_ARCH_H__ */
 
-/* end: sixtracklib/common/compute_arch.h */
+/* end: sixtracklib/common/internal/compute_arch.h */
