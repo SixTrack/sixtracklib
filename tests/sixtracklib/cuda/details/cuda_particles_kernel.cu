@@ -8,11 +8,11 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
-    #include "sixtracklib/common/impl/managed_buffer_minimal.h"
-    #include "sixtracklib/common/impl/managed_buffer_remap.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
+    #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
+    #include "sixtracklib/common/buffer/managed_buffer_remap.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/cuda/impl/cuda_tools.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */

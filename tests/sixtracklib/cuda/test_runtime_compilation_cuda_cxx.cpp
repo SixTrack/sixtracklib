@@ -13,7 +13,7 @@
 
 #include <gtest/gtest.h>
 
-#include "sixtracklib/_impl/path.h"
+#include "sixtracklib/common/generated/path.h"
 
 #include <nvrtc.h>
 #include <cuda.h>

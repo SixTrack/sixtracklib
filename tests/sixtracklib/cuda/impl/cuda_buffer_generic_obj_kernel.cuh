@@ -7,8 +7,8 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __global__ void NS(Remap_original_buffer_kernel_cuda)(

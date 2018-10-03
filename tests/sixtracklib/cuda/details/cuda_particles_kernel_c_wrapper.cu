@@ -15,7 +15,7 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/particles.h"
 

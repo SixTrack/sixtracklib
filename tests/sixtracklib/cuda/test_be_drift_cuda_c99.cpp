@@ -16,8 +16,8 @@
 
 #include "sixtracklib/testlib.h"
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
 
 #include "sixtracklib/cuda/impl/cuda_beam_elements_kernel_c_wrapper.h"
