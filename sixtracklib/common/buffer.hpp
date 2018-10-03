@@ -14,13 +14,13 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     class Buffer : public ::NS(Buffer)
     {
@@ -261,10 +261,10 @@ namespace SIXTRL_NAMESPACE
  * ************************************************************************* */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/mem_pool.h"
+    #include "sixtracklib/common/buffer/mem_pool.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     SIXTRL_INLINE Buffer::size_type Buffer::CalculateBufferSize(
         Buffer::size_type const max_num_objects,
