@@ -2,8 +2,8 @@
 #define SIXTRACKLIB_COMMON_TRACK_H__
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/beam_elements_defines.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/beam_elements_defines.h"
     #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -182,9 +182,7 @@ NS(Track_particles_beam_element_objs)(
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/beam_elements.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
-    #include "sixtracklib/common/be_beambeam/be_beambeam6d.h"
-    #include "sixtracklib/common/be_beambeam/be_beambeam4d.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/be_beambeam/track_beambeam.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 

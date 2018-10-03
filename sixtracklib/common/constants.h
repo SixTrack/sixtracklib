@@ -29,23 +29,23 @@
 
 /* ------------------------------------------------------------------------- */
 
-#if !defined( _GPUCODE )
+#if !defined( _GPUCODE ) || defined( __CUDACC__ )
 
 #if defined( __cplusplus )
 extern "C" {
 #endif /* defined( __cplusplus ) */
 
-SIXTRL_STATIC_VAR SIXTRL_REAL_T NS(C_LIGHT)   = ( SIXTRL_REAL_T )SIXTRL_C_LIGHT;
-SIXTRL_STATIC_VAR SIXTRL_REAL_T NS(EPSILON_0) = ( SIXTRL_REAL_T )SIXTRL_EPSILON_0;
-SIXTRL_STATIC_VAR SIXTRL_REAL_T NS(PI)        = ( SIXTRL_REAL_T )SIXTRL_PI;
-SIXTRL_STATIC_VAR SIXTRL_REAL_T NS(SQRT_PI)   = ( SIXTRL_REAL_T )SIXTRL_SQRT_PI;
-SIXTRL_STATIC_VAR SIXTRL_REAL_T NS(QELEM)     = ( SIXTRL_REAL_T )SIXTRL_QELEM;
+SIXTRL_STATIC_VAR SIXTRL_REAL_T const NS(C_LIGHT)   = ( SIXTRL_REAL_T )SIXTRL_C_LIGHT;
+SIXTRL_STATIC_VAR SIXTRL_REAL_T const NS(EPSILON_0) = ( SIXTRL_REAL_T )SIXTRL_EPSILON_0;
+SIXTRL_STATIC_VAR SIXTRL_REAL_T const NS(PI)        = ( SIXTRL_REAL_T )SIXTRL_PI;
+SIXTRL_STATIC_VAR SIXTRL_REAL_T const NS(SQRT_PI)   = ( SIXTRL_REAL_T )SIXTRL_SQRT_PI;
+SIXTRL_STATIC_VAR SIXTRL_REAL_T const NS(QELEM)     = ( SIXTRL_REAL_T )SIXTRL_QELEM;
 
 #if defined( __cplusplus )
 }
 #endif /* defined( __cplusplus ) */
 
-#endif /* !defined( _GPUCODE ) */
+#endif /* !defined( _GPUCODE ) || defined( __CUDACC__ ) */
 
 #if defined( __cplusplus )
 

@@ -4,9 +4,6 @@
 set(  SIXTRACKL_LINK_LIBRARIES
     ${SIXTRACKL_LINK_LIBRARIES}  PARENT_SCOPE )
 
-set(  SIXTRACKL_LIBRARY_MODULES
-    ${SIXTRACKL_LIBRARY_MODULES} PARENT_SCOPE )
-
 set( SIXTRACKLIB_COMMON_C99_HEADERS )
 set( SIXTRACKLIB_COMMON_CXX_HEADERS )
 
@@ -20,8 +17,11 @@ add_subdirectory( be_multipole )
 add_subdirectory( be_srotation )
 add_subdirectory( be_xyshift   )
 
+set( SIXTRACKLIB_COMMON_INTERNAL_CXX_HEADERS )
+set( SIXTRACKLIB_COMMON_INTERNAL_CXX_SOURCES )
 
-set(  SIXTRACKLIB_COMMON_C99_LOCAL_HEADERS
+set(  SIXTRACKLIB_C99_HEADERS
+    ${SIXTRACKLIB_C99_HEADERS}
       beam_elements.h
       buffer.h
       constants.h
@@ -30,20 +30,12 @@ set(  SIXTRACKLIB_COMMON_C99_LOCAL_HEADERS
       track.h
 )
 
-set(  SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS
+set(  SIXTRACKLIB_CXX_HEADERS
+    ${SIXTRACKLIB_CXX_HEADERS}
       beam_elements.hpp
       buffer.hpp
       particles.hpp
 )
-
-add_library( sixtrack_common INTERFACE
-             ${SIXTRACKLIB_COMMON_C99_HEADERS}
-             ${SIXTRACKLIB_COMMON_CXX_HEADERS}
-             ${SIXTRACKLIB_COMMON_C99_LOCAL_HEADERS}
-             ${SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS} )
-
-set(  SIXTRACKL_LINK_LIBRARIES
-    ${SIXTRACKL_LINK_LIBRARIES} sixtrack_common PARENT_SCOPE )
 
 # ------------------------------------------------------------------------------
 # install :
@@ -58,12 +50,13 @@ if( SIXTRACKLIB_COMMON_C99_LOCAL_HEADERS )
 endif()
 
 if( SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS )
+    message( STATUS "${SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS}" )
 
     set( SIXTRACKLIB_COMMON_CXX_INSTALL_PATH
          include/sixtracklib/common )
 
     install( FILES ${SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS}
-             DESTINATION ${SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS} )
+             DESTINATION ${SIXTRACKLIB_COMMON_CXX_INSTALL_PATH} )
 endif()
 
 #end sixtracklib/common/CMakeLists.txt
