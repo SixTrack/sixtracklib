@@ -83,6 +83,8 @@ namespace SIXTRL_NAMESPACE
         SIXTRL_FN Buffer& operator=( Buffer const& rhs ) = delete;
         SIXTRL_FN Buffer& operator=( Buffer&& rhs ) = delete;
 
+
+
         SIXTRL_FN virtual ~Buffer();
 
         /* ----------------------------------------------------------------- */
@@ -170,6 +172,12 @@ namespace SIXTRL_NAMESPACE
 
         template< typename Ptr >  SIXTRL_FN Ptr  indexBegin() SIXTRL_NOEXCEPT;
         template< typename Ptr >  SIXTRL_FN Ptr  indexEnd()   SIXTRL_NOEXCEPT;
+
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC object_t const*
+            operator[]( size_type object_index ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC object_t*
+            operator[]( size_type object_index ) SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -745,6 +753,19 @@ namespace SIXTRL_NAMESPACE
     {
         return reinterpret_cast< Ptr >( static_cast< uintptr_t >(
             NS(Buffer_get_objects_end_addr)( this->getCApiPtr() ) ) );
+    }
+
+
+    SIXTRL_INLINE SIXTRL_BUFFER_OBJ_ARGPTR_DEC Buffer::object_t const*
+        Buffer::operator[]( size_type object_index ) const SIXTRL_NOEXCEPT
+    {
+        return NS(Buffer_get_const_object)( this->getCApiPtr(), object_index );
+    }
+
+    SIXTRL_INLINE SIXTRL_BUFFER_OBJ_ARGPTR_DEC Buffer::object_t*
+        Buffer::operator[]( size_type object_index ) SIXTRL_NOEXCEPT
+    {
+        return NS(Buffer_get_object)( this->getCApiPtr(), object_index );
     }
 
     /* ----------------------------------------------------------------- */
