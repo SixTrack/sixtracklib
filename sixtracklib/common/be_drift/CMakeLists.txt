@@ -6,13 +6,8 @@ set( SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS
      be_drift.hpp
 )
 
-add_library( sixtrack_common_be_drift INTERFACE
-             ${SIXTRACKLIB_COMMON_BE_DRIFT_C99_HEADERS}
-             ${SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS}
-)
-
 if( SIXTRACKLIB_COMMON_BE_DRIFT_C99_HEADERS )
-    string( "([^;]+)" "be_drift/\\1" LOCAL_C99_HEADERS
+    string( REGEX REPLACE "([^;]+)" "be_drift/\\1" LOCAL_C99_HEADERS
             "${SIXTRACKLIB_COMMON_BE_DRIFT_C99_HEADERS}" )
 
     set(  SIXTRACKLIB_COMMON_C99_HEADERS
@@ -21,7 +16,7 @@ if( SIXTRACKLIB_COMMON_BE_DRIFT_C99_HEADERS )
 endif()
 
 if( SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS )
-    string( "([^;]+)" "be_drift/\\1" LOCAL_CXX_HEADERS
+    string( REGEX REPLACE "([^;]+)" "be_drift/\\1" LOCAL_CXX_HEADERS
             "${SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS}" )
 
     set(  SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS

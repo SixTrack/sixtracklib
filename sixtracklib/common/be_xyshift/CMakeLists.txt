@@ -7,13 +7,8 @@ set( SIXTRACKLIB_COMMON_BE_XYSHIFT_CXX_HEADERS
      be_xyshift.hpp
 )
 
-add_library( sixtrack_common_be_xyshift INTERFACE
-             ${SIXTRACKLIB_COMMON_BE_XYSHIFT_C99_HEADERS}
-             ${SIXTRACKLIB_COMMON_BE_XYSHIFT_CXX_HEADERS}
-)
-
 if( SIXTRACKLIB_COMMON_BE_XYSHIFT_C99_HEADERS )
-    string( "([^;]+)" "be_xyshift/\\1" LOCAL_C99_HEADERS
+    string( REGEX REPLACE "([^;]+)" "be_xyshift/\\1" LOCAL_C99_HEADERS
             "${SIXTRACKLIB_COMMON_BE_XYSHIFT_C99_HEADERS}" )
 
     set(  SIXTRACKLIB_COMMON_C99_HEADERS
@@ -22,7 +17,7 @@ if( SIXTRACKLIB_COMMON_BE_XYSHIFT_C99_HEADERS )
 endif()
 
 if( SIXTRACKLIB_COMMON_BE_XYSHIFT_CXX_HEADERS )
-    string( "([^;]+)" "be_xyshift/\\1" LOCAL_CXX_HEADERS
+    string( REGEX REPLACE "([^;]+)" "be_xyshift/\\1" LOCAL_CXX_HEADERS
             "${SIXTRACKLIB_COMMON_BE_XYSHIFT_CXX_HEADERS}" )
 
     set(  SIXTRACKLIB_COMMON_BE_XYSHIFT_CXX_HEADERS

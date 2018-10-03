@@ -2,16 +2,17 @@
 #define SIXTRACKLIB_COMMON_BEAM_ELEMENTS_H__
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/beam_elements_defines.h"
-    #include "sixtracklib/common/impl/be_drift.h"
-    #include "sixtracklib/common/impl/be_multipole.h"
-    #include "sixtracklib/common/impl/be_xyshift.h"
-    #include "sixtracklib/common/impl/be_srotation.h"
-    #include "sixtracklib/common/impl/be_cavity.h"
-
-    #include "sixtracklib/common/impl/buffer_object.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/be_drift/be_drift.h"
+    #include "sixtracklib/common/be_cavity/be_cavity.h"
+    #include "sixtracklib/common/be_multipole/be_multipole.h"
+    #include "sixtracklib/common/be_srotation/be_srotation.h"
+    #include "sixtracklib/common/be_xyshift/be_xyshift.h"
+    #include "sixtracklib/common/be_beambeam/be_beambeam6d.h"
+    #include "sixtracklib/common/be_beambeam/be_beambeam4d.h"
+    #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -108,7 +109,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_buffer)(
 /* ========================================================================= */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/impl/managed_buffer_minimal.h"
+    #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
 
     #if !defined( _GPUCODE )
         #include "sixtracklib/common/buffer.h"
