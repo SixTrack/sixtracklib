@@ -1,5 +1,5 @@
-#ifndef SIXTRKL_COMMON_IMPL_BUFFER_GENERIC_H__
-#define SIXTRKL_COMMON_IMPL_BUFFER_GENERIC_H__
+#ifndef SIXTRKL_COMMON_BUFFER_BUFFER_GENERIC_H__
+#define SIXTRKL_COMMON_BUFFER_BUFFER_GENERIC_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -10,10 +10,10 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/buffer_object.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/buffer/buffer_object.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -159,10 +159,10 @@ NS(Buffer_get_objects_end)(
  * ************************************************************************* */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/mem_pool.h"
-    #include "sixtracklib/common/impl/managed_buffer.h"
-    #include "sixtracklib/common/impl/managed_buffer_minimal.h"
-    #include "sixtracklib/common/impl/managed_buffer_remap.h"
+    #include "sixtracklib/common/buffer/mem_pool.h"
+    #include "sixtracklib/common/buffer/managed_buffer.h"
+    #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
+    #include "sixtracklib/common/buffer/managed_buffer_remap.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -1188,5 +1188,5 @@ NS(Buffer_get_objects_end)(
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRKL_COMMON_IMPL_BUFFER_GENERIC_H__ */
-/*end: sixtracklib/sixtracklib/common/impl/buffer_generic.h */
+#endif /* SIXTRKL_COMMON_BUFFER_BUFFER_GENERIC_H__ */
+/*end: sixtracklib/sixtracklib/common/buffer/buffer_generic.h */

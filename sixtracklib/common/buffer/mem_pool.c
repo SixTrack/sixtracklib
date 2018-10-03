@@ -1,5 +1,4 @@
-#include "sixtracklib/common/mem_pool.h"
-#include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/common/buffer/mem_pool.h"
 
 #include <assert.h>
 #include <stdbool.h>
@@ -8,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sixtracklib/common/impl/alignment_impl.h"
-#include "sixtracklib/common/alignment.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/buffer/alignment.h"
 
 /* ========================================================================= */
 
@@ -301,4 +300,4 @@ void NS( MemPool_set_begin_offset )(
 
 /* ========================================================================= */
 
-/* end: sixtracklib/common/details/mem_pool.c */
+/* end: sixtracklib/common/buffer/mem_pool.c */

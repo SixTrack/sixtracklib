@@ -1,5 +1,5 @@
-#ifndef SIXTRACKL_COMMON_IMPL_BUFFER_TYPE_H__
-#define SIXTRACKL_COMMON_IMPL_BUFFER_TYPE_H__
+#ifndef SIXTRACKL_COMMON_BUFFER_BUFFER_TYPE_H__
+#define SIXTRACKL_COMMON_BUFFER_BUFFER_TYPE_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #if defined( __cplusplus )
@@ -15,7 +15,7 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
@@ -335,6 +335,6 @@ namespace SIXTRL_NAMESPACE
 
 #endif /* defined( __cplusplus ) */
 
-#endif /* SIXTRACKL_COMMON_IMPL_BUFFER_TYPE_H__ */
+#endif /* SIXTRACKL_COMMON_BUFFER_BUFFER_TYPE_H__ */
 
-/* end: sixtracklib/common/impl/buffer_type.h */
+/* end: sixtracklib/common/buffer/buffer_type.h */

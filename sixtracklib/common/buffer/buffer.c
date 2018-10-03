@@ -6,15 +6,15 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/common/mem_pool.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/buffer/mem_pool.h"
 
-#include "sixtracklib/common/impl/buffer_generic.h"
-#include "sixtracklib/common/impl/managed_buffer_minimal.h"
-#include "sixtracklib/common/impl/managed_buffer_remap.h"
-#include "sixtracklib/common/impl/managed_buffer.h"
-#include "sixtracklib/common/impl/buffer_object.h"
-#include "sixtracklib/common/impl/buffer_type.h"
+#include "sixtracklib/common/buffer/buffer_generic.h"
+#include "sixtracklib/common/buffer/managed_buffer_minimal.h"
+#include "sixtracklib/common/buffer/managed_buffer_remap.h"
+#include "sixtracklib/common/buffer/managed_buffer.h"
+#include "sixtracklib/common/buffer/buffer_object.h"
+#include "sixtracklib/common/buffer/buffer_type.h"
 
 #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
         ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
@@ -409,4 +409,4 @@ SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
 }
 
 
-/* end: sixtracklib/common/details/buffer.c */
+/* end: sixtracklib/common/buffer/buffer.c */

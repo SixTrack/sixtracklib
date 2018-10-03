@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_IMPL_BUFFER_GARBAGE_RANGE_H__
-#define SIXTRACKLIB_COMMON_IMPL_BUFFER_GARBAGE_RANGE_H__
+#ifndef SIXTRACKLIB_COMMON_BUFFER_BUFFER_GARBAGE_RANGE_H__
+#define SIXTRACKLIB_COMMON_BUFFER_BUFFER_GARBAGE_RANGE_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -10,10 +10,10 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/buffer_garbage_defines.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/buffer_garbage_defines.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -54,6 +54,9 @@ SIXTRL_FN SIXTRL_STATIC void NS(BufferGarbage_set_size)(
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
+/* ************************************************************************* *
+ * *****         Implementation of inline functions and methods        ***** *
+ * ************************************************************************* */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
@@ -124,6 +127,6 @@ SIXTRL_INLINE void NS(BufferGarbage_set_size)(
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_COMMON_IMPL_BUFFER_GARBAGE_RANGE_H__ */
+#endif /* SIXTRACKLIB_COMMON_BUFFER_BUFFER_GARBAGE_RANGE_H__ */
 
-/* end: sixtracklib/common/impl/buffer_garbage.h */
+/* end: sixtracklib/common/buffer/buffer_garbage.h */

@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_IMPL_BUFFER_OBJECT_H__
-#define SIXTRACKLIB_COMMON_IMPL_BUFFER_OBJECT_H__
+#ifndef SIXTRACKLIB_COMMON_BUFFER_BUFFER_OBJECT_H__
+#define SIXTRACKLIB_COMMON_BUFFER_BUFFER_OBJECT_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -11,10 +11,10 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/buffer_object_defines.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/buffer_object_defines.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -82,7 +82,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(Object_print_slots)(
  * ************************************************************************* */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/impl/managed_buffer_minimal.h"
+    #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -272,6 +272,6 @@ SIXTRL_INLINE void NS(Object_print_slots)(
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_COMMON_IMPL_BUFFER_OBJECT_H__ */
+#endif /* SIXTRACKLIB_COMMON_BUFFER_BUFFER_OBJECT_H__ */
 
-/* end: sixtracklib/common/impl/buffer_object.h */
+/* end: sixtracklib/common/buffer/buffer_object.h */
