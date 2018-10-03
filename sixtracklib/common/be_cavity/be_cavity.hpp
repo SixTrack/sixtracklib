@@ -1,5 +1,5 @@
-#ifndef CXX_SIXTRACKLIB_COMMON_IMPL_BE__HPP__
-#define CXX_SIXTRACKLIB_COMMON_IMPL_BE__HPP__
+#ifndef CXX_SIXTRACKLIB_COMMON_BE_CAVITY_BEAM_ELEMENT_BE_CAVITY_HPP__
+#define CXX_SIXTRACKLIB_COMMON_BE_CAVITY_BEAM_ELEMENT_BE_CAVITY_HPP__
 
 #if defined( __cplusplus )
 
@@ -13,17 +13,14 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/buffer.hpp"
-    #include "sixtracklib/common/impl/be_xyshift.h"
+    #include "sixtracklib/common/be_cavity/be_cavity.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
+/* ===================================================================== *
+ * ====  TCavity< T > :
+ * ===================================================================== */
 
-namespace SIXTRL_NAMESPACE
-{
-    /* ===================================================================== *
-     * ====  TCavity< T > :
-     * ===================================================================== */
-
-    namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     template< typename T >
     struct TCavity
@@ -213,7 +210,7 @@ namespace SIXTRL_NAMESPACE
  * *** Implementation of inline and template member functions          ***** *
  * ************************************************************************* */
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     /* ===================================================================== *
      * ====  TXYShift< T > :
@@ -554,6 +551,6 @@ namespace SIXTRL_NAMESPACE
 
 #endif /* defined( __cplusplus ) */
 
-#endif /* CXX_SIXTRACKLIB_COMMON_IMPL_BE__HPP__ */
+#endif /* CXX_SIXTRACKLIB_COMMON_BE_CAVITY_BEAM_ELEMENT_BE_CAVITY_HPP__ */
 
-/* end: /common/impl/be_cavity.hpp */
+/* end: sixtracklib/common/be_cavity/be_cavity.hpp */

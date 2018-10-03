@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_IMPL_BEAM_ELEMENT_CAVITY_H__
-#define SIXTRACKLIB_COMMON_IMPL_BEAM_ELEMENT_CAVITY_H__
+#ifndef SIXTRACKLIB_COMMON_BE_CAVITY_BEAM_ELEMENT_CAVITY_H__
+#define SIXTRACKLIB_COMMON_BE_CAVITY_BEAM_ELEMENT_CAVITY_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -8,10 +8,10 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/beam_elements_defines.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -451,6 +451,6 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)* NS(Cavity_add_copy)(
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_COMMON_IMPL_BEAM_ELEMENT_CAVITY_H__ */
+#endif /* SIXTRACKLIB_COMMON_BE_CAVITY_BEAM_ELEMENT_CAVITY_H__ */
 
-/*end: sixtracklib/common/impl/be_cavity.h */
+/*end: sixtracklib/common/be_cavity/be_cavity.h */
