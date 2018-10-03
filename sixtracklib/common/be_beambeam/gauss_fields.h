@@ -1,5 +1,5 @@
-#ifndef _GAUSS_FIELDS_
-#define _GAUSS_FIELDS_
+#ifndef SIXTRACKL_COMMON_BE_BEAMBEAM_GAUSS_FIELDS_H__
+#define SIXTRACKL_COMMON_BE_BEAMBEAM_GAUSS_FIELDS_H__
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
@@ -206,4 +206,7 @@ SIXTRL_INLINE void get_Ex_Ey_Gx_Gy_gauss(
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-#endif
+#endif /* SIXTRACKL_COMMON_BE_BEAMBEAM_GAUSS_FIELDS_H__ */
+
+/* end: sixtracklib/common/be_beambeam/gauss_fields.h */
+

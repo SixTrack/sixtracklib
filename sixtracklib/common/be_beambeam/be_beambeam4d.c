@@ -1,6 +1,6 @@
 #include "sixtracklib/common/be_beambeam/be_beambeam4d.h"
 
-#include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.h"
 
 #if !defined( _GPUCODE )
