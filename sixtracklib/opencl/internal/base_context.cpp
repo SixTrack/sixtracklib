@@ -11,6 +11,7 @@
 #include <iterator>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -445,6 +446,26 @@ namespace SIXTRL_NAMESPACE
     {
         return this->ptrAvailableNodesInfo( static_cast< size_type >(
             this->m_selected_node_index ) );
+    }
+
+    std::string ClContextBase::selectedNodeIdStr() const SIXTRL_NOEXCEPT
+    {
+        char node_id_str[ 32 ];
+        std::memset( &node_id_str[ 0 ], ( int )'\0', 32 );
+
+        if( this->selectedNodeIdStr( &node_id_str[ 0 ], 32 ) )
+        {
+            return std::string( node_id_str );
+        }
+
+        return std::string{ "" };
+    }
+
+    bool ClContextBase::selectedNodeIdStr( char* SIXTRL_RESTRICT node_id_str,
+        ClContextBase::size_type const max_str_length ) const SIXTRL_NOEXCEPT
+    {
+        return ( 0 == NS(ComputeNodeId_to_string)(
+            this->ptrSelectedNodeId(), node_id_str, max_str_length ) );
     }
 
     bool ClContextBase::selectNode( size_type const node_index )
@@ -1205,8 +1226,7 @@ namespace SIXTRL_NAMESPACE
     ClContextBase::findAvailableNodesIndex(
         char const* node_id_str ) const SIXTRL_NOEXCEPT
     {
-        if( ( node_id_str != nullptr ) &&
-                ( std::strlen( node_id_str ) > 3u ) )
+        if( ( node_id_str != nullptr ) && ( std::strlen( node_id_str ) >= 3u ) )
         {
             int temp_platform_index = -1;
             int temp_device_index   = -1;
@@ -1343,9 +1363,19 @@ namespace SIXTRL_NAMESPACE
                         CL_PROGRAM_BUILD_LOG >( this->m_available_devices.at(
                             this->m_selected_node_index ) );
 
-                std::cout << "error report : "
+                #if defined( NDEBUG )
+
+                std::cout << "compile options : "
+                          << program_data.m_compile_options
+                          << std::endl
+                          << "program_name    : "
+                          << program_data.m_file_path
+                          << std::endl
+                          << "error report : "
                           << program_data.m_compile_report
                           << std::endl;
+
+                #endif /* defined( NDEBUG ) */
             }
         }
 
@@ -1615,6 +1645,14 @@ SIXTRL_HOST_FN NS(context_node_id_t) const* NS(ClContextBase_get_selected_node_i
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr ) ? ctx->ptrSelectedNodeId() : nullptr;
+}
+
+SIXTRL_HOST_FN bool NS(ClContextBase_get_selected_node_id_str)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    char* SIXTRL_RESTRICT node_id_str, NS(context_size_t) const max_length )
+{
+    return ( ctx != nullptr )
+        ? ctx->selectedNodeIdStr( node_id_str, max_length ) : false;
 }
 
 SIXTRL_HOST_FN void NS(ClContextBase_print_nodes_info)(

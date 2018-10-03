@@ -124,6 +124,10 @@ namespace sixtrack
         node_id_t const*    ptrSelectedNodeId()     const SIXTRL_NOEXCEPT;
         node_info_t const*  ptrSelectedNodeInfo()   const SIXTRL_NOEXCEPT;
 
+        std::string selectedNodeIdStr() const SIXTRL_NOEXCEPT;
+        bool selectedNodeIdStr( char* SIXTRL_RESTRICT node_id_str,
+                size_type const max_str_length ) const SIXTRL_NOEXCEPT;
+
         bool selectNode( node_id_t const node_id );
         bool selectNode( platform_id_t const platform_idx,
                          device_id_t const device_idx );
@@ -442,6 +446,11 @@ NS(ClContextBase_get_selected_node_info)(
 SIXTRL_HOST_FN NS(context_node_id_t) const*
 NS(ClContextBase_get_selected_node_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
+
+SIXTRL_HOST_FN bool NS(ClContextBase_get_selected_node_id_str)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    char* SIXTRL_RESTRICT node_id_str,
+    NS(context_size_t) const max_str_length );
 
 SIXTRL_HOST_FN void NS(ClContextBase_print_nodes_info)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
