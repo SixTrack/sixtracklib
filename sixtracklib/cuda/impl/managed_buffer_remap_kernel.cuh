@@ -2,8 +2,8 @@
 #define SIXTRACKLIB_CUDA_IMPL_MANAGED_BUFFER_REMAP_KERNEL_CUDA_HEADER_CUH__
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )

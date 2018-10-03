@@ -46,6 +46,16 @@ set_target_properties( sixtrack_cuda_host PROPERTIES CXX_STANDARD 11 )
 set_target_properties( sixtrack_cuda_host PROPERTIES CXX_STANDARD_REQUIRED ON )
 
 # ------------------------------------------------------------------------------
+# pass on sixtrack_cuda_host as a module for sixtracklib:
+
+set(  SIXTRACKL_LIBRARY_MODULES
+    ${SIXTRACKL_LIBRARY_MODULES}
+    $<TARGET_OBJECTS:sixtrack_cuda_host> CACHE INTERNAL "" FORCE )
+
+set(   SIXTRACKL_LINK_LIBRARIES
+     ${SIXTRACKL_LINK_LIBRARIES} cudart CACHE INTERNAL "" FORCE )
+
+# ------------------------------------------------------------------------------
 # --- CUDA Kernel object library:
 
 set( SIXTRACKL_CUDA_DEVICE_DEFINITIONS )
@@ -81,6 +91,13 @@ set_target_properties( sixtrack_cuda_device PROPERTIES CUDA_STANDARD 11 )
 set_target_properties( sixtrack_cuda_device PROPERTIES CUDA_STANDARD_REQUIRED 11 )
 
 target_include_directories( sixtrack_cuda_device PRIVATE ${CMAKE_SOURCE_DIR} )
+
+# ------------------------------------------------------------------------------
+# pass on sixtrack_cuda_device as a module for sixtracklib:
+
+set(  SIXTRACKL_LIBRARY_MODULES
+    ${SIXTRACKL_LIBRARY_MODULES}
+    $<TARGET_OBJECTS:sixtrack_cuda_device> CACHE INTERNAL "" FORCE )
 
 # ------------------------------------------------------------------------------
 # install:
