@@ -84,6 +84,10 @@ int main( int argc, char* argv[] )
         st_Particles_copy_single( particles, ii, input_particles, jj );
     }
 
+    /* ********************************************************************** */
+    /* ****  Track particles over the beam-elements for NUM_TURNS turns  **** */
+    /* ********************************************************************** */
+
     for( ii = 0 ; ii < NUM_TURNS ; ++ii )
     {
         st_Track_particles_beam_elements( particles, lhc_beam_elements_buffer );
