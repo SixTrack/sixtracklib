@@ -1,5 +1,5 @@
-#ifndef CXX_SIXTRACKLIB_COMMON_IMPL_BE_MULTIPOLE_HPP__
-#define CXX_SIXTRACKLIB_COMMON_IMPL_BE_MULTIPOLE_HPP__
+#ifndef CXX_SIXTRACKLIB_COMMON_BE_MULTIPOLE_BEAM_ELEM_BE_MULTIPOLE_HPP__
+#define CXX_SIXTRACKLIB_COMMON_BE_MULTIPOLE_BEAM_ELEM_BE_MULTIPOLE_HPP__
 
 #if defined( __cplusplus )
 
@@ -14,11 +14,12 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer.hpp"
-    #include "sixtracklib/common/impl/be_multipole.h"
+    #include "sixtracklib/common/be_multipole/be_multipole.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     /* ===================================================================== *
      * ====  TMultiPole< T >:
@@ -366,7 +367,7 @@ namespace SIXTRL_NAMESPACE
  * *** Implementation of inline and template member functions          ***** *
  * ************************************************************************* */
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     /* ===================================================================== *
      * ====  TMultiPole< T >:
@@ -1360,6 +1361,6 @@ namespace SIXTRL_NAMESPACE
 
 #endif /* define( __cplusplus ) */
 
-#endif /* CXX_SIXTRACKLIB_COMMON_IMPL_BE_MULTIPOLE_HPP__ */
+#endif /* CXX_SIXTRACKLIB_COMMON_BE_MULTIPOLE_BEAM_ELEM_BE_MULTIPOLE_HPP__ */
 
-/* end: sixtracklib/common/impl/be_multipole.hpp */
+/* end: sixtracklib/common/be_multipole/be_multipole.hpp */
