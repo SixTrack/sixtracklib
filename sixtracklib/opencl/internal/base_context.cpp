@@ -15,9 +15,9 @@
 #include <string>
 #include <vector>
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
-#include "sixtracklib/common/compute_arch.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
+#include "sixtracklib/common/internal/compute_arch.h"
 
 #include <CL/cl.hpp>
 
@@ -561,8 +561,6 @@ namespace SIXTRL_NAMESPACE
 
             if( !this->m_program_data.empty() )
             {
-                size_type const num_programs = this->m_program_data.size();
-
                 for( auto& program_data : this->m_program_data )
                 {
                     program_data.m_kernels.clear();
@@ -572,7 +570,8 @@ namespace SIXTRL_NAMESPACE
                     this->m_cl_programs.emplace_back(
                         this->m_cl_context, program_data.m_source_code );
 
-                    SIXTRL_ASSERT( this->m_cl_programs.size() <= num_programs );
+                    SIXTRL_ASSERT( this->m_cl_programs.size() <=
+                                   this->m_program_data.size() );
 
                     success &= this->doCompileProgramBaseImpl(
                         this->m_cl_programs.back(), program_data );

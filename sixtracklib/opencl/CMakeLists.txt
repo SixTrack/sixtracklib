@@ -40,6 +40,14 @@ target_compile_definitions( sixtrack_opencl PUBLIC
 target_compile_options( sixtrack_opencl BEFORE PUBLIC
         ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic -ansi )
 
+# ------------------------------------------------------------------------------
+# pass on sixtrack_opencl as a module for sixtracklib:
+
+set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
+     $<TARGET_OBJECTS:sixtrack_opencl> CACHE INTERNAL "" FORCE )
+
+set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES}
+     ${SIXTRACKL_OPENCL_LIBRARY} CACHE INTERNAL "" FORCE )
 
 # ------------------------------------------------------------------------------
 # install :

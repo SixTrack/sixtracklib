@@ -17,7 +17,7 @@
 
 #include <CL/cl.hpp>
 
-#include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/opencl/context.h"
 

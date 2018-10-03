@@ -14,9 +14,9 @@
 #include <string>
 #include <vector>
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
-#include "sixtracklib/common/compute_arch.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
+#include "sixtracklib/common/internal/compute_arch.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/opencl/internal/base_context.h"
@@ -180,8 +180,8 @@ namespace SIXTRL_NAMESPACE
         SIXTRL_ASSERT( beam_elements_arg.context() == this );
         SIXTRL_ASSERT( beam_elements_arg.usesCObjectBuffer() );
 
-        NS(Buffer)* beam_elements_buffer = beam_elements_arg.ptrCObjectBuffer();
-        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( beam_elements_buffer ) );
+        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)(
+            beam_elements_arg.ptrCObjectBuffer() ) );
 
         SIXTRL_ASSERT( this->kernelNumArgs( tracking_kernel_id ) == 4u );
 
