@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/testlib/random.h"
@@ -1504,7 +1504,7 @@ void NS(Particles_buffer_print_stdout)(
     NS(Particles_buffer_print)( stdout, particle_buffer );
     return;
 }
-    
+
 
 void NS(Particles_buffer_print)(
     FILE* SIXTRL_RESTRICT fp,

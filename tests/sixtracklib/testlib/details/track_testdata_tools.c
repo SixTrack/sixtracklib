@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/buffer.h"

@@ -7,12 +7,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/common/blocks.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/track.h"
-#include "sixtracklib/common/impl/track_api.h"
 
 #include "sixtracklib/testlib/random.h"
 #include "sixtracklib/testlib/test_particles_tools.h"

@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/common/definitions.h"
 
 extern SIXTRL_SIZE_T NS(File_get_size)(
     const char *const path_to_file );
