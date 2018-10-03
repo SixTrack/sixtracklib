@@ -23,8 +23,8 @@ add_library( sixtrack_common_buffer OBJECT
     ${SIXTRL_COMMON_BUFFER_SOURCES}
 )
 
-set(  SIXTRACKLIB_MODULES
-    ${SIXTRACKLIB_MODULES} sixtrack_common_buffer PARENT_SCOPE )
+set(  SIXTRACKL_LIBRARY_MODULES
+    ${SIXTRACKL_LIBRARY_MODULES} sixtrack_common_buffer PARENT_SCOPE )
 
 target_include_directories( sixtrack_common_buffer
                             PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )

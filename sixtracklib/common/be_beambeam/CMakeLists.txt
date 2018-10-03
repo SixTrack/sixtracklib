@@ -16,8 +16,8 @@ add_library( sixtrack_common_be_beambeam OBJECT
     ${SIXTRL_COMMON_BE_BEAMBEAM_SOURCES}
 )
 
-set(  SIXTRACKLIB_MODULES
-    ${SIXTRACKLIB_MODULES} sixtrack_common_be_beambeam PARENT_SCOPE )
+set(  SIXTRACKL_LIBRARY_MODULES
+    ${SIXTRACKL_LIBRARY_MODULES} sixtrack_common_be_beambeam PARENT_SCOPE )
 
 target_include_directories( sixtrack_common_be_beambeam
                             PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
