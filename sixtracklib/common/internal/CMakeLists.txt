@@ -12,6 +12,7 @@ set( SIXTRL_COMMON_INTERNAL_C99_HEADERS
     namespace_undef.h
     particles_defines.h
     particles_undef.h
+    tools.h
 )
 
 set( SIXTRL_COMMON_INTERNAL_C99_SOURCES
