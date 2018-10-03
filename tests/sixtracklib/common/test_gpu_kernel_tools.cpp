@@ -19,8 +19,8 @@
 #endif /* defined( __unix__ ) */
 
 #include "sixtracklib/testlib.h"
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
 
 #if defined( _POSIX_VERSION )
 

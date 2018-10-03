@@ -12,11 +12,11 @@
 
 #include <gtest/gtest.h>
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
 
 #include "sixtracklib/common/buffer.h"
-#include "sixtracklib/common/impl/be_srotation.h"
+#include "sixtracklib/common/be_srotation/be_srotation.h"
 
 /* ************************************************************************* *
  * ******  st_SRotation:

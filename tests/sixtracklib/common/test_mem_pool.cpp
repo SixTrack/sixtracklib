@@ -5,8 +5,8 @@
 
 #include <gtest/gtest.h>
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/common/mem_pool.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/buffer/mem_pool.h"
 
 /* ========================================================================== */
 /* ====  Test basic usage of MemPool: init and free operations */
