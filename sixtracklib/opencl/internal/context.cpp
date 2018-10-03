@@ -254,6 +254,8 @@ namespace SIXTRL_NAMESPACE
 
         std::string track_compile_options = "-D_GPUCODE=1";
         track_compile_options += " -D__NAMESPACE=st_";
+        track_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
+        track_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
         track_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private";
         track_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__private";
         track_compile_options += " -I";
