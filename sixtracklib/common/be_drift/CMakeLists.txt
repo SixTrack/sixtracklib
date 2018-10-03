@@ -1,0 +1,31 @@
+set( SIXTRACKLIB_COMMON_BE_DRIFT_C99_HEADERS
+     be_drift.h
+)
+
+set( SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS
+     be_drift.hpp
+)
+
+add_library( sixtrack_common_be_drift INTERFACE
+             ${SIXTRACKLIB_COMMON_BE_DRIFT_C99_HEADERS}
+             ${SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS}
+)
+
+set(  SIXTRACKL_LIBRARY_INTERFACE_SUBLIBRARIES
+    ${SIXTRACKL_LIBRARY_INTERFACE_SUBLIBRARIES}
+    sixtrack_common_be_drift )
+
+
+# ----------------------------------------------------------------------------
+# install :
+
+set( SIXTRACKLIB_COMMON_BE_DRIFT_INSTALL_PATH
+     include/sixtracklib/common/be_drift )
+
+install( FILES ${SIXTRACKLIB_COMMON_BE_DRIFT_C99_HEADERS}
+         DESTINATION ${SIXTRACKLIB_COMMON_BE_BEAMBEAM_INSTALL_PATH} )
+
+install( FILES ${SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS}
+         DESTINATION ${SIXTRACKLIB_COMMON_BE_BEAMBEAM_INSTALL_PATH} )
+
+#end: sixtracklib/common/buffer/CMakeLists.txt

@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_IMPL_BEAM_ELEMENT_DRIFT_H__
-#define SIXTRACKLIB_COMMON_IMPL_BEAM_ELEMENT_DRIFT_H__
+#ifndef SIXTRACKLIB_COMMON_BE_DRIFT_BEAM_ELEMENT_DRIFT_H__
+#define SIXTRACKLIB_COMMON_BE_DRIFT_BEAM_ELEMENT_DRIFT_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -8,10 +8,10 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/beam_elements_defines.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -166,7 +166,7 @@ NS(DriftExact_add_copy)(
 /* ************************************************************************* */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/impl/managed_buffer_minimal.h"
+    #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #if !defined( _GPUCODE )
     #include "sixtracklib/common/buffer.h"
     #endif /* !defined( _GPUCODE ) */
@@ -625,6 +625,6 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact)* NS(DriftExact_add_copy)(
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_COMMON_IMPL_BEAM_ELEMENT_DRIFT_H__ */
+#endif /* SIXTRACKLIB_COMMON_BE_DRIFT_BEAM_ELEMENT_DRIFT_H__ */
 
-/* end: sixtracklib/common/impl/be_drift.h */
+/* end: sixtracklib/common/be_drift/be_drift.h */

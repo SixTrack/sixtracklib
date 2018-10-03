@@ -1,5 +1,5 @@
-#ifndef CXX_SIXTRACKLIB_COMMON_IMPL_BE_DRIFT_HPP__
-#define CXX_SIXTRACKLIB_COMMON_IMPL_BE_DRIFT_HPP__
+#ifndef CXX_SIXTRACKLIB_COMMON_BE_DRIFT_BEAM_ELEMENT_BE_DRIFT_HPP__
+#define CXX_SIXTRACKLIB_COMMON_BE_DRIFT_BEAM_ELEMENT_BE_DRIFT_HPP__
 
 #if defined( __cplusplus )
 
@@ -12,14 +12,14 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/beam_elements_defines.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/beam_elements_defines.h"
     #include "sixtracklib/common/buffer.hpp"
-    #include "sixtracklib/common/impl/be_drift.h"
+    #include "sixtracklib/common/be_drift/be_drift.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     /* ===================================================================== *
      * ====  TDrift< T > :
@@ -1251,6 +1251,6 @@ namespace SIXTRL_NAMESPACE
 
 #endif /* defined( __cplusplus ) */
 
-#endif /* CXX_SIXTRACKLIB_COMMON_IMPL_BE_DRIFT_HPP__ */
+#endif /* CXX_SIXTRACKLIB_COMMON_BE_DRIFT_BEAM_ELEMENT_BE_DRIFT_HPP__ */
 
-/* end: sixtracklib/common/impl/be_drift.hpp */
+/* end: sixtracklib/common/be_drift/be_drift.hpp */
