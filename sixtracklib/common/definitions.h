@@ -21,7 +21,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/generated/namespace.h"
-    #include "sixtracklib/common/internal/namespace_begin.h"
+    #include "sixtracklib/common/internal/namespace_defines.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( SIXTRL_ARGPTR_DEC )
