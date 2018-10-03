@@ -1,5 +1,5 @@
-#ifndef CXX_SIXTRACKLIB_COMMON_IMPL_BE__HPP__
-#define CXX_SIXTRACKLIB_COMMON_IMPL_BE__HPP__
+#ifndef CXX_SIXTRACKLIB_COMMON_BE_SROTATION_BEAM_ELEM_BE_SROTATION_HPP__
+#define CXX_SIXTRACKLIB_COMMON_BE_SROTATION_BEAM_ELEM_BE_SROTATION_HPP__
 
 #if defined( __cplusplus )
 
@@ -13,12 +13,13 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer.hpp"
-    #include "sixtracklib/common/impl/be_srotation.h"
+    #include "sixtracklib/common/be_srotation/be_srotation.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     /* ===================================================================== *
      * ====  TSRotation< T > :
@@ -224,7 +225,7 @@ namespace SIXTRL_NAMESPACE
     #include <cmath>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     /* ===================================================================== *
      * ====  TSRotation< T > :
@@ -606,6 +607,6 @@ namespace SIXTRL_NAMESPACE
 
 #endif /* defined( __cplusplus ) */
 
-#endif /* CXX_SIXTRACKLIB_COMMON_IMPL_BE__HPP__ */
+#endif /* CXX_SIXTRACKLIB_COMMON_BE_SROTATION_BEAM_ELEM_BE_SROTATION_HPP__ */
 
-/* end: sixtracklib/common/impl/be_srotation.hpp */
+/* end: sixtracklib/common/be_srotation/be_srotation.hpp */
