@@ -122,6 +122,17 @@ SIXTRL_FN SIXTRL_STATIC  int NS(Buffer_init_on_flat_memory_detailed)(
 #if !defined( _GPUCODE )
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const*
+NS(Buffer_get_const_object)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const object_index );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object)*
+NS(Buffer_get_object)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const object_index );
+
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const*
 NS(Buffer_get_const_objects_begin)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
@@ -1104,6 +1115,37 @@ SIXTRL_INLINE int NS(Buffer_init_on_flat_memory_detailed)(
 /* ========================================================================= */
 
 #if !defined( _GPUCODE )
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const*
+NS(Buffer_get_const_object)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const object_index )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const* ptr_object_t;
+    typedef NS(buffer_size_t)                           buf_size_t;
+
+    ptr_object_t ptr_obj = NS(Buffer_get_const_objects_begin)( buffer );
+    buf_size_t const num_objects = NS(Buffer_get_num_of_objects)( buffer );
+
+    if( ( ptr_obj != SIXTRL_NULLPTR ) && ( object_index < num_objects ) )
+    {
+        ptr_obj = ptr_obj + object_index;
+    }
+    else if( ptr_obj != SIXTRL_NULLPTR )
+    {
+        ptr_obj = SIXTRL_NULLPTR;
+    }
+
+    return ptr_obj;
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Object)* NS(Buffer_get_object)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const object_index )
+{
+    return ( SIXTRL_BUFFER_DATAPTR_DEC NS(Object)*
+        )NS(Buffer_get_const_object)( buffer, object_index );
+}
 
 SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const*
 NS(Buffer_get_const_objects_begin)(
