@@ -11,21 +11,44 @@ add_library( sixtrack_common_be_drift INTERFACE
              ${SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS}
 )
 
-set(  SIXTRACKL_LIBRARY_INTERFACE_SUBLIBRARIES
-    ${SIXTRACKL_LIBRARY_INTERFACE_SUBLIBRARIES}
-    sixtrack_common_be_drift )
+if( SIXTRACKLIB_COMMON_BE_DRIFT_C99_HEADERS )
+    string( "([^;]+)" "be_drift/\\1" LOCAL_C99_HEADERS
+            "${SIXTRACKLIB_COMMON_BE_DRIFT_C99_HEADERS}" )
 
+    set(  SIXTRACKLIB_COMMON_C99_HEADERS
+        ${SIXTRACKLIB_COMMON_C99_HEADERS}
+        ${LOCAL_C99_HEADERS} PARENT_SCOPE )
+endif()
+
+if( SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS )
+    string( "([^;]+)" "be_drift/\\1" LOCAL_CXX_HEADERS
+            "${SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS}" )
+
+    set(  SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS
+        ${SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS}
+        ${LOCAL_CXX_HEADERS} PARENT_SCOPE )
+endif()
 
 # ----------------------------------------------------------------------------
 # install :
 
-set( SIXTRACKLIB_COMMON_BE_DRIFT_INSTALL_PATH
-     include/sixtracklib/common/be_drift )
+if( SIXTRACKLIB_COMMON_BE_DRIFT_C99_HEADERS )
 
-install( FILES ${SIXTRACKLIB_COMMON_BE_DRIFT_C99_HEADERS}
-         DESTINATION ${SIXTRACKLIB_COMMON_BE_BEAMBEAM_INSTALL_PATH} )
+    set( SIXTRACKLIB_COMMON_BE_DRIFT_C99_INSTALL_PATH
+         include/sixtracklib/common/be_drift )
 
-install( FILES ${SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS}
-         DESTINATION ${SIXTRACKLIB_COMMON_BE_BEAMBEAM_INSTALL_PATH} )
+    install( FILES ${SIXTRACKLIB_COMMON_BE_DRIFT_C99_HEADERS}
+             DESTINATION ${SIXTRACKLIB_COMMON_BE_DRIFT_C99_INSTALL_PATH} )
+endif()
 
-#end: sixtracklib/common/buffer/CMakeLists.txt
+
+if( SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS )
+
+    set( SIXTRACKLIB_COMMON_BE_DRIFT_CXX_INSTALL_PATH
+         include/sixtracklib/common/be_drift )
+
+    install( FILES ${SIXTRACKLIB_COMMON_BE_DRIFT_CXX_HEADERS}
+             DESTINATION ${SIXTRACKLIB_COMMON_BE_DRIFT_CXX_INSTALL_PATH} )
+endif()
+
+#end: sixtracklib/common/be_drift/CMakeLists.txt
