@@ -10,7 +10,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
-    #include "sixtracklib/common/internal/beam_elements_main_defines.h"
+    #include "sixtracklib/common/internal/beam_elements_defines.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 

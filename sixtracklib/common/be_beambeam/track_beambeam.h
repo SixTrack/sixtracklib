@@ -94,7 +94,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_4d)(
         real_t py = NS(Particles_get_py_value)( particles, particle_index );
 
         real_t qratio = 1.;// To be generalized for multi-ion!
-        real_t charge = qratio*NS(Particles_get_q0_value)( particles, particle_index )*NS(QELEM);
+        real_t charge = qratio*NS(Particles_get_q0_value)( particles, particle_index )*SIXTRL_QELEM;
 
         real_t x = NS(Particles_get_x_value)( particles, particle_index ) - bb4ddata->Delta_x;
         real_t y = NS(Particles_get_y_value)( particles, particle_index ) - bb4ddata->Delta_y;
@@ -103,7 +103,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_4d)(
 
         real_t beta = NS(Particles_get_beta0_value)( particles, particle_index ) \
                         /NS(Particles_get_rvv_value)( particles, particle_index );
-        real_t p0c = NS(Particles_get_p0c_value)( particles, particle_index )*NS(QELEM);
+        real_t p0c = NS(Particles_get_p0c_value)( particles, particle_index )*SIXTRL_QELEM;
 
         real_t Ex, Ey, Gx, Gy;
         get_Ex_Ey_Gx_Gy_gauss(x, y, bb4ddata->sigma_x, bb4ddata->sigma_y,
@@ -178,10 +178,10 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
         real_t zeta = NS(Particles_get_zeta_value)( particles, particle_index );
         real_t delta = NS(Particles_get_delta_value)( particles, particle_index );
 
-        real_t q0 = NS(QELEM)*NS(Particles_get_q0_value)( particles, particle_index );
+        real_t q0 = SIXTRL_QELEM*NS(Particles_get_q0_value)( particles, particle_index );
         real_t p0c = NS(Particles_get_p0c_value)( particles, particle_index ); // eV
 
-        real_t P0 = p0c/NS(C_LIGHT)*NS(QELEM);
+        real_t P0 = p0c/SIXTRL_C_LIGHT*SIXTRL_QELEM;
 
         // Change reference frame
         real_t x_star =     x     - bb6ddata->x_CO    - bb6ddata->delta_x;
@@ -204,7 +204,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
             real_t y_slice_star = y_slices_star[i_slice];
 
             //Compute force scaling factor
-            real_t Ksl = N_part_per_slice[i_slice]*bb6ddata->q_part*q0/(P0*NS(C_LIGHT));
+            real_t Ksl = N_part_per_slice[i_slice]*bb6ddata->q_part*q0/(P0* SIXTRL_C_LIGHT);
 
             //Identify the Collision Point (CP)
             real_t S = 0.5*(sigma_star - sigma_slice_star);
