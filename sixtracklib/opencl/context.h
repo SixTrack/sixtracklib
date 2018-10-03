@@ -12,14 +12,14 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/opencl/internal/base_context.h"
     #include "sixtracklib/opencl/argument.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     class ClContext : public ClContextBase
     {
@@ -80,8 +80,8 @@ namespace SIXTRL_NAMESPACE
 extern "C" {
 #endif /* !defined( _GPUCODE ) */
 
-typedef SIXTRL_NAMESPACE::ClContext              NS(ClContext);
-typedef SIXTRL_NAMESPACE::ClContext::num_turns_t NS(context_num_turns_t);
+typedef SIXTRL_CXX_NAMESPACE::ClContext              NS(ClContext);
+typedef SIXTRL_CXX_NAMESPACE::ClContext::num_turns_t NS(context_num_turns_t);
 
 #if !defined( _GPUCODE )
 }

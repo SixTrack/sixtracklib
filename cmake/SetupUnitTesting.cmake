@@ -52,19 +52,74 @@ if(  NOT SETUP_UNIT_TESTING_FINISHED )
                 set( GTEST_ROOT ${SIXTRACKL_GOOGLETEST_ROOT} )
             endif()
 
-            find_package( GTest REQUIRED )
+            find_package( GTest )
 
+            if( GTEST_FOUND )
+
+                set( SIXTRACKL_GTEST_INCLUDE_DIRS ${SIXTRACKL_GTEST_INCLUDE_DIRS}
+                    ${GTEST_INCLUDE_DIRS} )
+
+                set( SIXTRACKL_GTEST_LIBRARIES     ${SIXTRACKL_GTEST_LIBRARIES}
+                    ${GTEST_BOTH_LIBRARIES} )
+
+            elseif( NOT SIXTRACKL_REQUIRE_OFFLINE_BUILD )
+
+                set( EXT_GTEST_IN_DIR "${CMAKE_SOURCE_DIR}/cmake/" )
+                set( EXT_GTEST_TMPL "SetupUnitTestingGTestsCMakeLists.txt.in" )
+
+                set( EXT_GTEST_IN_FILE "${EXT_GTEST_IN_DIR}${EXT_GTEST_TMPL}" )
+                set( EXT_GTEST_EXT_DIR "${CMAKE_BINARY_DIR}/ext_googletest/download/"  )
+                set( EXT_GTEST_OUT     "${EXT_GTEST_EXT_DIR}/CMakeLists.txt"  )
+
+                configure_file( ${EXT_GTEST_IN_FILE} ${EXT_GTEST_OUT} )
+                message( STATUS "Attempt downloading and building GTest ... " )
+
+                execute_process(
+                    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+                    RESULT_VARIABLE result
+                    WORKING_DIRECTORY ${EXT_GTEST_EXT_DIR} )
+
+                if( NOT result )
+                    message( STATUS "Successfully run cmake for external GTest" )
+                else()
+                    message( FATAL_ERROR "Cmake for external GTest failed: ${result}" )
+                endif()
+
+                execute_process(
+                    COMMAND ${CMAKE_COMMAND} --build .
+                    RESULT_VARIABLE result
+                    WORKING_DIRECTORY ${EXT_GTEST_EXT_DIR} )
+
+                if( NOT result )
+                    message( STATUS "Successfully completed building external GTest" )
+                else()
+                    message( FATAL_ERROR "Building for external GTest failed: ${result}" )
+                endif()
+
+                set( gtest_force_shared_crt ON CACHE BOOL "" FORCE )
+
+                add_subdirectory( ${CMAKE_BINARY_DIR}/ext_googletest/src
+                                  ${CMAKE_BINARY_DIR}/ext_googletest/build
+                                  EXCLUDE_FROM_ALL )
+
+                set( SIXTRACKL_GTEST_INCLUDE_DIRS ${SIXTRACKL_GTEST_INCLUDE_DIRS}
+                    "${gtest_SOURCE_DIR}/include" )
+
+                set( SIXTRACKL_GTEST_LIBRARIES ${SIXTRACKL_GTEST_LIBRARIES}
+                     gtest_main )
+
+                set( GTEST_FOUND ON )
+
+            elseif( SIXTRACKL_REQUIRE_OFFLINE_BUILD )
+                message( FATAL_ERROR
+                         "No system-wide googletest installation "
+                         "found and offline installation required\r\n"
+                         "set SIXTRACKL_GOOGLETEST_ROOT in Settings.cmake "
+                         "to pick up googletest at a specific location" )
+            endif()
         endif()
 
-        if( GTEST_FOUND )
-
-            set( SIXTRACKL_GTEST_INCLUDE_DIRS ${SIXTRACKL_GTEST_INCLUDE_DIRS}
-                ${GTEST_INCLUDE_DIRS} )
-
-            set( SIXTRACKL_GTEST_LIBRARIES     ${SIXTRACKL_GTEST_LIBRARIES}
-                ${GTEST_BOTH_LIBRARIES} )
-
-        endif() # GTEST_FOUND
+         # GTEST_FOUND
 
     else()
 

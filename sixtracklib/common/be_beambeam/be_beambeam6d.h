@@ -9,10 +9,10 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/beam_elements_defines.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/be_beambeam/gauss_fields.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 

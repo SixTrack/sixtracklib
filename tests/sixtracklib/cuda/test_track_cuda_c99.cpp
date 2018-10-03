@@ -16,13 +16,13 @@
 
 #include "sixtracklib/testlib.h"
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/beam_elements.h"
 
-#include "sixtracklib/cuda/impl/track_particles_kernel_c_wrapper.h"
+#include "sixtracklib/cuda/track_particles_kernel_c_wrapper.h"
 
 TEST( C99_Cuda_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
 {

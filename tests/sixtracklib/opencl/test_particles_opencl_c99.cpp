@@ -19,10 +19,10 @@
 
 #include "sixtracklib/testlib.h"
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
-#include "sixtracklib/common/impl/be_drift.h"
+#include "sixtracklib/common/be_drift/be_drift.h"
 
 
 TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
@@ -117,7 +117,8 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
         /* ----------------------------------------------------------------- */
 
         path_to_source  = PATH_TO_BASE_DIR;
-        path_to_source += "tests/sixtracklib/opencl/opencl_particles_kernel.cl";
+        path_to_source += "tests/sixtracklib/testlib/opencl/kernels/";
+        path_to_source += "opencl_particles_kernel.cl";
 
         kernel_file.open( path_to_source, std::ios::in );
 

@@ -1,93 +1,71 @@
 # sixtracklib/tests/sixtracklib/testlib/CMakeLists.txt
 
-# ------------------------------------------------------------------------------
-# generate the testdata_files.h header to be used with examples and unit-tests
+set( SIXTRACKL_TESTLIB_LINK_LIBRARIES sixtrack  CACHE INTERNAL "" FORCE )
 
-set( SIXTRACKLIB_TESTLIB_INSTALL_PATH
-     "${CMAKE_INSTALL_PREFIX}/include/sixtracklib/testlib" )
+if( GTEST_FOUND )
+    set(  SIXTRACKL_TESTLIB_LINK_LIBRARIES
+        ${SIXTRACKL_TESTLIB_LINK_LIBRARIES}
+        ${SIXTRACKL_GTEST_LIBRARIES} CACHE INTERNAL "" FORCE )
+endif()
 
-set( SIXTRACKLIB_TESTDATA_DIR "${CMAKE_SOURCE_DIR}/tests/testdata" )
+set( SIXTRACKL_TESTLIB_LIBRARY_MODULES
+     "" CACHE INTERNAL "" FORCE )
 
-set( SIXTRACKLIB_TESTS_TESTDATA_FILES_H_IN_PATH
-     "${CMAKE_CURRENT_SOURCE_DIR}/testdata_files.h.template" )
-
-set( SIXTRACKLIB_TESTS_TESTDATA_FILES_H_OUT_PATH
-     "${CMAKE_CURRENT_SOURCE_DIR}/testdata_files.h" )
-
-set( SIXTRACKLIB_TESTS_TESTDATA_FILES_H_INSTALL_PATH
-     "${SIXTRACKLIB_TESTLIB_INSTALL_PATH}/testdata_files.h" )
-
-configure_file( ${SIXTRACKLIB_TESTS_TESTDATA_FILES_H_IN_PATH}
-                ${SIXTRACKLIB_TESTS_TESTDATA_FILES_H_OUT_PATH}
-                @ONLY )
-
-install( CODE "
-    set( SIXTRACKLIB_TESTDATA_DIR \"${CMAKE_INSTALL_PREFIX}/tests/testdata\" )
-    message( STATUS \"Generating: ${SIXTRACKLIB_TESTS_TESTDATA_FILES_H_INSTALL_PATH}\" )
-    configure_file( \"${SIXTRACKLIB_TESTS_TESTDATA_FILES_H_IN_PATH}\"
-                    \"${SIXTRACKLIB_TESTS_TESTDATA_FILES_H_INSTALL_PATH}\" @ONLY ) " )
+set( SIXTRACKL_TESTLIB_C99_HEADERS )
+set( SIXTRACKL_TESTLIB_CXX_HEADERS )
 
 # -----------------------------------------------------------------------------
-# build sixtrack_test library:
+# Add submodules :
 
-set( SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS
-     ../testlib.h )
+add_subdirectory( testdata )
+add_subdirectory( common   )
 
-set( SIXTRACKL_TESTLIB_HEADERS
-     generic_buffer_obj.h
-     gpu_kernel_tools.h
-     random.h
-     time_tools.h
-     test_particles_tools.h
-     test_beam_elements_tools.h
-     track_testdata_tools.h
-#      test_track_tools.h
-)
+if( SIXTRACKL_ENABLE_OPENCL )
+    add_subdirectory( opencl )
+endif()
 
-set( SIXTRACKL_TESTLIB_SOURCES
-     details/gpu_kernel_tools.c
-     details/random.c
-     details/time_tools.c
-     details/test_particles_tools.c
-     details/test_beam_elements_tools.c
-     details/track_testdata_tools.c
-#      details/test_track_tools.c
-)
+if( SIXTRACKL_ENABLE_CUDA )
+    add_subdirectory( cuda )
+endif()
+
+# -----------------------------------------------------------------------------
+# Handle top-level and general files at this level :
+
+set( SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS ../testlib.h )
+set( SIXTRACKL_TESTLIB_LOCAL_C99_HEADERS )
+set( SIXTRACKL_TESTLIB_LOCAL_CXX_HEADERS )
+
+# -----------------------------------------------------------------------------
+# build testlib from local and submodule contributions:
 
 add_library( sixtrack_test SHARED
-             ${SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS}
-             ${SIXTRACKL_TESTLIB_HEADERS}
-             ${SIXTRACKL_TESTLIB_SOURCES}
+             ${SIXTRACKL_TESTLIB_C99_HEADERS}
+             ${SIXTRACKL_TESTLIB_LOCAL_C99_HEADERS}
+             ${SIXTRACKL_TESTLIB_CXX_HEADERS}
+             ${SIXTRACKL_TESTLIB_LOCAL_CXX_HEADERS}
+             ${SIXTRACKL_TESTLIB_LIBRARY_MODULES}
 )
 
-target_include_directories(
-    sixtrack_test
+target_include_directories( sixtrack_test
     PUBLIC $<INSTALL_INTERFACE:include>
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests> )
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests>
+    PUBLIC $<BUILD_INTERFACE:${SIXTRACKL_GTEST_INCLUDE_DIRS}> )
 
-target_link_libraries( sixtrack_test sixtrack )
+target_link_libraries( sixtrack_test PUBLIC ${SIXTRACKL_TESTLIB_LINK_LIBRARIES} )
 
 set_target_properties( sixtrack_test PROPERTIES LINKER_LANGUAGE C )
 set_target_properties( sixtrack_test PROPERTIES C_STANDARD 99 )
+set_target_properties( sixtrack_test PROPERTIES C_STANDARD_REQUIRED ON )
 set_target_properties( sixtrack_test PROPERTIES DEBUG_POSTFIX d )
-
-target_compile_definitions( sixtrack_test
-                            PUBLIC ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
 target_compile_options( sixtrack_test
                         PRIVATE -Wall -Werror -pedantic -ansi
                         ${SIXTRACKLIB_CPU_FLAGS} )
 
-
 # ------------------------------------------------------------------------------
 # install :
 
-set( SIXTRACKL_TESTLIB_TOP_LEVEL_INSTALL_INCLUDE_PATH include/sixtracklib )
-
-install( FILES ${SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS}
-         DESTINATION ${SIXTRACKL_TESTLIB_TOP_LEVEL_INSTALL_INCLUDE_PATH} )
-
-set( SIXTRACKL_TESTLIB_INSTALL_CONDIG_PATH ${CMAKE_INSTALL_PREFIX}/lib/cmake )
+set( TESTLIB_INSTALL_CONFIG_PATH ${CMAKE_INSTALL_PREFIX}/lib/cmake )
 
 install( TARGETS sixtrack_test
          EXPORT  SixTrackTestlib-targets
@@ -98,12 +76,28 @@ install( TARGETS sixtrack_test
 install( EXPORT SixTrackTestlib-targets
          FILE   SixTrackTestlibTargets.cmake
          NAMESPACE SixTracklib::
-         DESTINATION ${SIXTRACKL_TESTLIB_INSTALL_CONDIG_PATH}
+         DESTINATION ${TESTLIB_INSTALL_CONFIG_PATH}
 )
 
-set( SIXTRACKL_TESTLIB_INSTALL_INCLUDE_PATH include/sixtracklib/testlib )
+if( SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS )
+    set( TESTLIB_TOP_LEVEL_INSTALL_INCLUDE_PATH include/sixtracklib )
 
-install( FILES ${SIXTRACKL_TESTLIB_HEADERS}
-         DESTINATION ${SIXTRACKL_TESTLIB_INSTALL_INCLUDE_PATH} )
+    install( FILES ${SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS}
+             DESTINATION ${TESTLIB_TOP_LEVEL_INSTALL_INCLUDE_PATH} )
+endif()
+
+if( SIXTRACKL_TESTLIB_LOCAL_C99_HEADERS )
+    set( TESTLIB_C99_INSTALL_PATH include/sixtracklib/testlib )
+
+    install( FILES ${SIXTRACKL_TESTLIB_LOCAL_C99_HEADERS}
+             DESTINATION ${TESTLIB_C99_INSTALL_PATH} )
+endif()
+
+if( SIXTRACKL_TESTLIB_LOCAL_CXX_HEADERS )
+    set( TESTLIB_CXX_INSTALL_PATH include/sixtracklib/testlib )
+
+    install( FILES ${SIXTRACKL_TESTLIB_LOCAL_CXX_HEADERS}
+             DESTINATION ${TESTLIB_CXX_INSTALL_PATH} )
+endif()
 
 #end sixtracklib/common/CMakeLists.txt

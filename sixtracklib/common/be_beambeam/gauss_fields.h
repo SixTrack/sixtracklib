@@ -1,8 +1,8 @@
-#ifndef _GAUSS_FIELDS_
-#define _GAUSS_FIELDS_
+#ifndef SIXTRACKL_COMMON_BE_BEAMBEAM_GAUSS_FIELDS_H__
+#define SIXTRACKL_COMMON_BE_BEAMBEAM_GAUSS_FIELDS_H__
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/definitions.h"
 #endif
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -45,8 +45,7 @@ SIXTRL_FN SIXTRL_STATIC void get_Ex_Ey_Gx_Gy_gauss(
 #endif
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/be_beambeam/constants.h"
+    #include "sixtracklib/common/constants.h"
     #include "sixtracklib/common/be_beambeam/faddeeva_cern.h"
 #endif
 
@@ -63,8 +62,8 @@ SIXTRL_INLINE void get_transv_field_gauss_round(
   SIXTRL_REAL_T r2, temp;
 
   r2 = (x-Delta_x)*(x-Delta_x)+(y-Delta_y)*(y-Delta_y);
-  if (r2<1e-20) temp = sqrt(r2)/(2.*MYPI*EPSILON_0*sigma); //linearised
-  else          temp = (1-exp(-0.5*r2/(sigma*sigma)))/(2.*MYPI*EPSILON_0*r2);
+  if (r2<1e-20) temp = sqrt(r2)/(2.*SIXTRL_PI*SIXTRL_EPSILON_0*sigma); //linearised
+  else          temp = (1-exp(-0.5*r2/(sigma*sigma)))/(2.*SIXTRL_PI*SIXTRL_EPSILON_0*r2);
 
   (*Ex) = temp * (x-Delta_x);
   (*Ey) = temp * (y-Delta_y);
@@ -95,7 +94,7 @@ SIXTRL_INLINE void get_transv_field_gauss_ellip(
 
   if (sigmax>sigmay){
     S = sqrt(2.*(sigmax*sigmax-sigmay*sigmay));
-    factBE = 1./(2.*EPSILON_0*SQRT_PI*S);
+    factBE = 1./(2.*SIXTRL_EPSILON_0*SIXTRL_SQRT_PI*S);
 
     etaBE_re = sigmay/sigmax*abx;
     etaBE_im = sigmax/sigmay*aby;
@@ -115,7 +114,7 @@ SIXTRL_INLINE void get_transv_field_gauss_ellip(
   }
   else if (sigmax<sigmay){
     S = sqrt(2.*(sigmay*sigmay-sigmax*sigmax));
-    factBE = 1./(2.*EPSILON_0*SQRT_PI*S);
+    factBE = 1./(2.*SIXTRL_EPSILON_0*SIXTRL_SQRT_PI*S);
 
     etaBE_re = sigmax/sigmay*aby;
     etaBE_im = sigmay/sigmax*abx;
@@ -170,12 +169,12 @@ SIXTRL_INLINE void get_Ex_Ey_Gx_Gy_gauss(
           Gy = 0.;
         }
         else{
-          Gx = 1/(2.*(x*x+y*y))*(y*Ey-x*Ex+1./(2*MYPI*EPSILON_0*sigma*sigma)
+          Gx = 1/(2.*(x*x+y*y))*(y*Ey-x*Ex+1./(2*SIXTRL_PI*SIXTRL_EPSILON_0*sigma*sigma)
                             *x*x*exp(-(x*x+y*y)/(2.*sigma*sigma)));
-          Gy = 1./(2*(x*x+y*y))*(x*Ex-y*Ey+1./(2*MYPI*EPSILON_0*sigma*sigma)
+          Gy = 1./(2*(x*x+y*y))*(x*Ex-y*Ey+1./(2*SIXTRL_PI*SIXTRL_EPSILON_0*sigma*sigma)
                             *y*y*exp(-(x*x+y*y)/(2.*sigma*sigma)));
         }
-        
+
     }
     else{
 
@@ -189,9 +188,9 @@ SIXTRL_INLINE void get_Ex_Ey_Gx_Gy_gauss(
           Gy = 0.;
         }
         else{
-          Gx =-1./(2*(Sig_11-Sig_33))*(x*Ex+y*Ey+1./(2*MYPI*EPSILON_0)*\
+          Gx =-1./(2*(Sig_11-Sig_33))*(x*Ex+y*Ey+1./(2*SIXTRL_PI*SIXTRL_EPSILON_0)*\
                       (sigma_y/sigma_x*exp(-x*x/(2*Sig_11)-y*y/(2*Sig_33))-1.));
-          Gy =1./(2*(Sig_11-Sig_33))*(x*Ex+y*Ey+1./(2*MYPI*EPSILON_0)*\
+          Gy =1./(2*(Sig_11-Sig_33))*(x*Ex+y*Ey+1./(2*SIXTRL_PI*SIXTRL_EPSILON_0)*\
                       (sigma_x/sigma_y*exp(-x*x/(2*Sig_11)-y*y/(2*Sig_33))-1.));
         }
 
@@ -207,4 +206,7 @@ SIXTRL_INLINE void get_Ex_Ey_Gx_Gy_gauss(
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-#endif
+#endif /* SIXTRACKL_COMMON_BE_BEAMBEAM_GAUSS_FIELDS_H__ */
+
+/* end: sixtracklib/common/be_beambeam/gauss_fields.h */
+

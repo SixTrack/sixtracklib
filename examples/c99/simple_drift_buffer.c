@@ -2,134 +2,130 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "sixtracklib/testlib.h"
 #include "sixtracklib/sixtracklib.h"
 
 int main( int argc, char* argv[] )
 {
     typedef st_buffer_size_t  buf_size_t;
 
-    buf_size_t const NUM_BEAM_ELEMENTS = ( buf_size_t)1000u;
+    buf_size_t const NUM_BEAM_ELEMENTS = ( buf_size_t)25u;
     buf_size_t const DATA_CAPACITY     = ( buf_size_t )( 1u << 20u );
 
     st_Buffer* eb = st_Buffer_new( DATA_CAPACITY );
 
     buf_size_t ii = ( buf_size_t )0u;
-    double length = ( double )0.0;
+    double length = ( double )10.0L;
 
-    for( ; ii < NUM_BEAM_ELEMENTS ; ++ii, length += 1.0 )
+    st_Drift* copy_of_drift = 0; /* see below */
+
+    /* add a new drift to the eb buffer using st_Drift_new function ->
+     * the resulting drift will have default values, i.e. length == 0 */
+
+    st_Drift* drift = st_Drift_new( eb );
+    assert( drift  != 0 );
+
+    st_Drift_set_length( drift, length );
+
+    length += ( double )1.0L;
+    ++ii;
+
+    /* add a new drift to the eb buffer using the st_Drift_add function ->
+     * the resulting drift will already have the provided length */
+
+    drift = st_Drift_add( eb, length );
+    assert( drift != 0 );
+
+    length += ( double )1.0L;
+    ++ii;
+
+    /* add a new drift to the eb buffer which is an exact copy of an already
+     * existing st_Drift -> the two instances will have the exact same length */
+
+    copy_of_drift = st_Drift_add_copy( eb, drift );
+
+    assert( copy_of_drift != 0 );
+    assert( copy_of_drift != drift  );
+    assert( memcmp( copy_of_drift, drift, sizeof( st_Drift ) ) == 0 );
+
+    #if defined( NDEBUG )
+    ( void )copy_of_drift;
+    #endif /* if defined( NDEBUG ) */
+
+    length += ( double )1.0L;
+    ++ii;
+
+    for( ; ii < NUM_BEAM_ELEMENTS ; ++ii, length += ( double )1.0L )
     {
-        st_Drift* drift = st_Drift_add( eb, length );
-        assert( drift != SIXTRL_NULLPTR );
-
-        #if defined( NDEBUG )
-        ( void )drift;
-        #endif /* !defined( NDEBUG ) */
+        drift = st_Drift_add( eb, length );
+        assert( drift != 0 );
     }
 
-    /* --------------------------------------------------------------------- */
-    /* Copy to flat buffer and reconstruct the contents of this storage using
-     * a second st_Buffer instance */
+    /* print out all existing beam elements using the convenience
+     * st_BeamElement_print() function from testlib */
 
-    if( st_Buffer_get_size( eb ) > ( buf_size_t )0u )
+    for( ii = 0u ; ii < NUM_BEAM_ELEMENTS ; ++ii )
     {
-        typedef unsigned char raw_t;
-        typedef raw_t*        ptr_raw_t;
+        /* get the ii-th beam element object from the eb buffer */
+        st_Object* be_object = st_Buffer_get_object( eb, ii );
+        assert( be_object != 0 );
 
-        st_Buffer buffer2;
+        /* We are about to modify the length of each drift ->
+         * print the current drift before we change the length to have
+         * something to compare against: */
 
-        int success = -1;
+        printf( "before changing the length of beam belement %d\r\n",
+                ( int )ii );
 
-        ptr_raw_t copy_buffer = ( ptr_raw_t )malloc(
-            st_Buffer_get_size( eb ) * sizeof( raw_t ) );
+        /* Print the be with the generic print helper function */
+        st_BeamElement_print( be_object );
 
-        buf_size_t const buf_size = st_Buffer_get_size( eb );
-        memcpy( copy_buffer, st_Buffer_get_const_data_begin( eb ), buf_size );
+        /* We can get access to actual stored object if we know which type
+         * it represents. In our case, that's easy - all stored objects are
+         * drifts. But let's check that: */
 
-        st_Buffer_preset( &buffer2 );
-        success = st_Buffer_init_from_data( &buffer2, copy_buffer, buf_size );
-
-        if( success == 0 )
+        if( st_Object_get_type_id( be_object ) == st_OBJECT_TYPE_DRIFT )
         {
-            buf_size_t const num_beam_elements =
-                st_Buffer_get_num_of_objects( eb );
+            st_Drift* stored_drift =
+                ( st_Drift* )st_Object_get_begin_ptr( be_object );
 
-            st_Object const* cmp_obj_it  = st_Buffer_get_const_objects_begin( eb );
-            st_Object const* cmp_obj_end = st_Buffer_get_const_objects_end( eb );
-            st_Object const* obj_it      = st_Buffer_get_objects_begin( &buffer2 );
+            /* We could now modify the length of the already stored Drift.
+             * If you want to prevent accidentially doing that, use the
+             * const interface */
 
-            ii = ( buf_size_t )0u;
+            st_Drift const* read_only_drift =
+                ( st_Drift const* )st_Object_get_const_begin_ptr( be_object );
 
-            for( ; cmp_obj_it != cmp_obj_end ; ++cmp_obj_it, ++obj_it, ++ii )
+            /* Modify the length via the rw pointer: */
+            double const new_length =
+                st_Drift_get_length( stored_drift ) + ( double )1.0L;
+
+            st_Drift_set_length( stored_drift, new_length );
+
+            /* Since stored_drift and read_only_drift point to the same
+             * location, read_only_drift yields the new length: */
+
+            if( fabs( st_Drift_get_length( read_only_drift ) - new_length ) >= 1e-12 )
             {
-                st_Drift const* cmp_drift = ( st_Drift const*
-                    )st_Object_get_const_begin_ptr( cmp_obj_it );
-
-                st_Drift const* drift     = ( st_Drift const*
-                    )st_Object_get_const_begin_ptr( obj_it );
-
-                printf( "%6lu / %6lu | cmp_drift : length = %18.12f\r\n"
-                        "                | "
-                        "drift     : length = %18.12f\r\n\r\n",
-                        ii, num_beam_elements,
-                        st_Drift_get_length( cmp_drift ),
-                        st_Drift_get_length( drift ) );
+                printf( "Error!" );
+                break;
             }
         }
 
-        st_Buffer_free( &buffer2 );
-        free( copy_buffer );
+        /* Print the be with the generic print helper function after the change */
+        printf( "after  changing the length of beam belement %d\r\n",
+                ( int )ii );
+
+        st_BeamElement_print( be_object );
+
+        printf( "\r\n" );
     }
 
-    /* --------------------------------------------------------------------- */
-    /* Copy to flat buffer and access the contents of the buffer using
-     * the st_ManagedBuffer_ interface -> that's the least intrusive
-     * way to read data from such a buffer, for example in the context of
-     * Hybrid / GPU computing */
-
-    if( st_Buffer_get_size( eb ) > ( buf_size_t )0u )
-    {
-        typedef unsigned char raw_t;
-        typedef raw_t*        ptr_raw_t;
-
-        buf_size_t const buf_size  = st_Buffer_get_size( eb ) * sizeof( raw_t );
-        buf_size_t const slot_size = st_Buffer_get_slot_size( eb );
-        ptr_raw_t copy_buffer = ( ptr_raw_t )malloc( buf_size );
-
-        int success = -1;
-
-        memcpy( copy_buffer, st_Buffer_get_const_data_begin( eb ), buf_size );
-        success = st_ManagedBuffer_remap( copy_buffer, slot_size );
-
-        if( success == 0 )
-        {
-            buf_size_t const num_beam_elements =
-                st_ManagedBuffer_get_num_objects( copy_buffer, slot_size );
-
-            st_Object const* obj_it  =
-                st_ManagedBuffer_get_const_objects_index_begin(
-                    copy_buffer, slot_size );
-
-            st_Object const* obj_end =
-                st_ManagedBuffer_get_const_objects_index_end(
-                    copy_buffer, slot_size );
-
-            ii = ( buf_size_t )0u;
-
-            for( ; obj_it != obj_end ; ++obj_it, ++ii )
-            {
-                st_Drift const* drift = ( st_Drift const*
-                    )st_Object_get_const_begin_ptr( obj_it );
-
-                printf( "%6lu / %6lu | drift : length = %18.12f\r\n",
-                    ii, num_beam_elements, st_Drift_get_length( drift ) );
-            }
-        }
-
-        free( copy_buffer );
-    }
+    /* Cleaning up */
 
     st_Buffer_delete( eb );
 
     return 0;
 }
+
 /* end:  examples/c99/simple_drift_buffer.c */

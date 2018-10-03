@@ -2,6 +2,7 @@
 
 #if !defined( __CUDACC__ )
 
+#include <chrono>
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
@@ -14,19 +15,20 @@
 #include <string>
 #include <vector>
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
-#include "sixtracklib/common/compute_arch.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
+#include "sixtracklib/common/internal/compute_arch.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/opencl/internal/base_context.h"
 
 #if defined( __cplusplus )
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     ClContext::ClContext() :
         ClContextBase(),
+        m_tracking_program_id( ClContextBase::program_id_t{ -1 } ),
         m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } )
     {
         this->doInitDefaultProgramsPrivImpl();
@@ -34,6 +36,7 @@ namespace SIXTRL_NAMESPACE
 
     ClContext::ClContext( ClContext::size_type const node_index ) :
         ClContextBase(),
+        m_tracking_program_id( ClContextBase::program_id_t{ -1 } ),
         m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } )
     {
         using base_t = ClContextBase;
@@ -50,6 +53,7 @@ namespace SIXTRL_NAMESPACE
 
     ClContext::ClContext( ClContext::node_id_t const node_id ) :
         ClContextBase(),
+        m_tracking_program_id( ClContextBase::program_id_t{ -1 } ),
         m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } )
     {
         using base_t = ClContextBase;
@@ -71,6 +75,7 @@ namespace SIXTRL_NAMESPACE
 
     ClContext::ClContext( char const* node_id_str ) :
         ClContextBase(),
+        m_tracking_program_id( ClContextBase::program_id_t{ -1 } ),
         m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } )
     {
         using base_t = ClContextBase;
@@ -92,6 +97,7 @@ namespace SIXTRL_NAMESPACE
         ClContext::platform_id_t const platform_idx,
         ClContext::device_id_t const device_idx ) :
         ClContextBase(),
+        m_tracking_program_id( ClContextBase::program_id_t{ -1 } ),
         m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } )
     {
         using base_t = ClContextBase;
@@ -141,7 +147,7 @@ namespace SIXTRL_NAMESPACE
               this->numAvailableKernels() ) )
         {
             program_id_t const tracking_program_id =
-                this->kernelProgramId( kernel_id );
+                this->programIdByKernelId( kernel_id );
 
             if( ( tracking_program_id >= program_id_t{ 0 } ) &&
                 ( static_cast< size_type >( tracking_program_id ) <
@@ -180,8 +186,8 @@ namespace SIXTRL_NAMESPACE
         SIXTRL_ASSERT( beam_elements_arg.context() == this );
         SIXTRL_ASSERT( beam_elements_arg.usesCObjectBuffer() );
 
-        NS(Buffer)* beam_elements_buffer = beam_elements_arg.ptrCObjectBuffer();
-        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( beam_elements_buffer ) );
+        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)(
+            beam_elements_arg.ptrCObjectBuffer() ) );
 
         SIXTRL_ASSERT( this->kernelNumArgs( tracking_kernel_id ) == 4u );
 
@@ -212,9 +218,39 @@ namespace SIXTRL_NAMESPACE
         ptr_tracking_kernel->setArg( 2, static_cast< uint64_t >( num_turns ) );
         ptr_tracking_kernel->setArg( 3, cl_success_flag );
 
+        cl::Event run_tracking_kernel_event;
+
+        cl_ulong run_tracking_kernel_when_queued    = cl_ulong{ 0 };
+        cl_ulong run_tracking_kernel_when_submitted = cl_ulong{ 0 };
+        cl_ulong run_tracking_kernel_when_started   = cl_ulong{ 0 };
+        cl_ulong run_tracking_kernel_when_ended     = cl_ulong{ 0 };
+
         cl_int cl_ret = ptr_queue->enqueueNDRangeKernel( *ptr_tracking_kernel,
             cl::NullRange, cl::NDRange( total_num_threads ),
-                cl::NDRange( work_group_size ) );
+                cl::NDRange( work_group_size ), nullptr,
+                        &run_tracking_kernel_event );
+
+        cl_ret |= ptr_queue->flush();
+        run_tracking_kernel_event.wait();
+
+        cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
+            CL_PROFILING_COMMAND_QUEUED, &run_tracking_kernel_when_queued );
+
+        cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
+            CL_PROFILING_COMMAND_SUBMIT, &run_tracking_kernel_when_submitted );
+
+        cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
+            CL_PROFILING_COMMAND_START, &run_tracking_kernel_when_started );
+
+        cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
+            CL_PROFILING_COMMAND_END, &run_tracking_kernel_when_ended );
+
+        double const last_event_time = double{ 1e-9 } * static_cast< double >(
+            run_tracking_kernel_when_ended - run_tracking_kernel_when_started );
+
+        this->addKernelExecTime( last_event_time, tracking_kernel_id );
+        this->setLastWorkGroupSize( work_group_size,   tracking_kernel_id );
+        this->setLastNumWorkItems(  total_num_threads, tracking_kernel_id );
 
         if( cl_ret == CL_SUCCESS )
         {
@@ -226,6 +262,8 @@ namespace SIXTRL_NAMESPACE
             {
                 success = ( int )success_flag;
             }
+
+            ptr_queue->finish();
         }
 
         return success;
@@ -254,6 +292,8 @@ namespace SIXTRL_NAMESPACE
 
         std::string track_compile_options = "-D_GPUCODE=1";
         track_compile_options += " -D__NAMESPACE=st_";
+        track_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
+        track_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
         track_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private";
         track_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__private";
         track_compile_options += " -I";
@@ -303,12 +343,12 @@ namespace SIXTRL_NAMESPACE
 
 SIXTRL_HOST_FN NS(ClContext)* NS(ClContext_create)()
 {
-    return new SIXTRL_NAMESPACE::ClContext;
+    return new SIXTRL_CXX_NAMESPACE::ClContext;
 }
 
 SIXTRL_HOST_FN NS(ClContext)* NS(ClContext_new)( const char* node_id_str )
 {
-    return new SIXTRL_NAMESPACE::ClContext( node_id_str );
+    return new SIXTRL_CXX_NAMESPACE::ClContext( node_id_str );
 }
 
 SIXTRL_HOST_FN void NS(ClContext_delete)( NS(ClContext)* SIXTRL_RESTRICT ctx )

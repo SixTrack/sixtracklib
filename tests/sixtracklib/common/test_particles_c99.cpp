@@ -10,7 +10,7 @@
 
 #include "sixtracklib/testlib.h"
 
-#include "sixtracklib/_impl/definitions.h"
+#include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
 

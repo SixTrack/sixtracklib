@@ -10,10 +10,10 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
-    #include "sixtracklib/common/impl/particles_defines.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/particles_defines.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -237,21 +237,22 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_clear)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_FN SIXTRL_STATIC void NS(Particles_copy_single)(
+SIXTRL_FN SIXTRL_STATIC bool NS(Particles_copy_single)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     NS(particle_num_elements_t) const destination_index,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
     NS(particle_num_elements_t) const source_index );
 
-SIXTRL_FN SIXTRL_STATIC void NS(Particles_copy_range)(
+SIXTRL_FN SIXTRL_STATIC bool NS(Particles_copy_range)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
         SIXTRL_RESTRICT destination,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
         *const SIXTRL_RESTRICT source,
-    NS(particle_num_elements_t) const start_index,
-    NS(particle_num_elements_t) const end_index );
+    NS(particle_num_elements_t) const source_start_index,
+    NS(particle_num_elements_t) const source_end_index,
+    NS(particle_num_elements_t) destination_start_index );
 
-SIXTRL_FN SIXTRL_STATIC void NS(Particles_copy)(
+SIXTRL_FN SIXTRL_STATIC bool NS(Particles_copy)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
         *const SIXTRL_RESTRICT source );
@@ -470,6 +471,21 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_s)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_real_ptr_t) ptr_to_ss );
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_s_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const s_diff_value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_s_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT s_diff_values );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_s)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const s_diff_value );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_real_t) NS(Particles_get_x_value)(
@@ -496,6 +512,21 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_x)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_real_ptr_t) ptr_to_xs );
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_x_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const s_diff_value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_x_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT s_diff_values );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_x)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const s_diff_value );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_real_t) NS(Particles_get_y_value)(
@@ -520,6 +551,21 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_y_value)(
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_y)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_real_ptr_t) ptr_to_ys );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_y_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const y_diff_value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_y_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT y_diff_values );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_y)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const y_diff_value );
 
 /* ------------------------------------------------------------------------- */
 
@@ -547,6 +593,21 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_px)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_real_ptr_t) ptr_to_pxs );
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_px_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const px_diff_value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_px_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT px_diff_values );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_px)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const px_diff_value );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_real_t) NS(Particles_get_py_value)(
@@ -572,6 +633,21 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_py_value)(
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_py)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_real_ptr_t) ptr_to_pys );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_py_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const py_diff_value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_py_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT py_diff_values );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_py)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const py_diff_value );
 
 /* ------------------------------------------------------------------------- */
 
@@ -600,6 +676,21 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_zeta)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_real_ptr_t) ptr_to_zetas );
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_zeta_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const zeta_diff_value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_zeta_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT zeta_diff_values );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_zeta)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const zeta_diff_value );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Particles_get_psigma_value)(
@@ -625,6 +716,21 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_psigma_value)(
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_psigma)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_real_ptr_t) ptr_to_psigmas );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_psigma_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const psigma_diff_value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_psigma_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT psigma_diff_values );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_psigma)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const psigma_diff_value );
 
 /* ------------------------------------------------------------------------- */
 
@@ -679,6 +785,37 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_delta_value)(
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_delta)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_real_ptr_t) ptr_to_deltas );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_delta_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const delta_diff_value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_delta_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT delta_diff_values );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_add_to_delta)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const delta_diff_value );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_update_delta_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const new_delta_value );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_update_delta_value_increment)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const delta_value_diff );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_update_delta)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT ptr_to_deltas );
 
 /* ------------------------------------------------------------------------- */
 
@@ -1737,180 +1874,289 @@ NS(BufferIndex_get_index_object_by_global_index_from_range)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE void NS(Particles_copy_single)(
+SIXTRL_INLINE bool NS(Particles_copy_single)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
-    NS(particle_num_elements_t) const destination_idx,
+    NS(particle_num_elements_t) destination_idx,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
     NS(particle_num_elements_t) const source_idx )
 {
-    SIXTRL_ASSERT(
-        ( destination != 0 ) && ( source != 0 ) &&
-        ( NS(Particles_get_num_of_particles)( destination ) > destination_idx ) &&
-        ( NS(Particles_get_num_of_particles)( source )      > source_idx      ) );
+    bool success = false;
 
-    NS(Particles_set_q0_value)( destination, destination_idx,
-          NS(Particles_get_q0_value)( source, source_idx ) );
+    typedef NS(particle_num_elements_t) num_elem_t;
 
-    NS(Particles_set_mass0_value)( destination, destination_idx,
-        NS(Particles_get_mass0_value)( source, source_idx ) );
+    num_elem_t const dest_num_particles =
+        NS(Particles_get_num_of_particles)( destination );
 
-    NS(Particles_set_beta0_value)( destination, destination_idx,
-        NS(Particles_get_beta0_value)( source, source_idx ) );
+    num_elem_t const source_num_particles =
+        NS(Particles_get_num_of_particles)( source );
 
-    NS(Particles_set_gamma0_value)( destination, destination_idx,
-        NS(Particles_get_gamma0_value)( source, source_idx ) );
+    if( ( destination_idx < ( num_elem_t )0 ) ||
+        ( destination_idx > dest_num_particles ) )
+    {
+        if( source_idx < dest_num_particles )
+        {
+            destination_idx = source_idx;
+        }
+    }
 
-    NS(Particles_set_p0c_value)( destination, destination_idx,
-        NS(Particles_get_p0c_value)( source, source_idx ) );
+    if( ( destination != 0 ) && ( source != 0 ) &&
+        ( destination != source ) &&
+        ( source_idx >= ( num_elem_t )0 ) &&
+        ( source_idx <  source_num_particles ) &&
+        ( destination_idx >= ( num_elem_t )0 ) &&
+        ( destination_idx <  dest_num_particles ) )
+    {
+        NS(Particles_set_q0_value)( destination, destination_idx,
+              NS(Particles_get_q0_value)( source, source_idx ) );
 
-    NS(Particles_set_s_value)( destination, destination_idx,
-        NS(Particles_get_s_value)( source, source_idx ) );
+        NS(Particles_set_mass0_value)( destination, destination_idx,
+            NS(Particles_get_mass0_value)( source, source_idx ) );
 
-    NS(Particles_set_x_value)( destination, destination_idx,
-        NS(Particles_get_x_value)( source, source_idx ) );
+        NS(Particles_set_beta0_value)( destination, destination_idx,
+            NS(Particles_get_beta0_value)( source, source_idx ) );
 
-    NS(Particles_set_y_value)( destination, destination_idx,
-        NS(Particles_get_y_value)( source, source_idx ) );
+        NS(Particles_set_gamma0_value)( destination, destination_idx,
+            NS(Particles_get_gamma0_value)( source, source_idx ) );
 
-    NS(Particles_set_px_value)( destination, destination_idx,
-        NS(Particles_get_px_value)( source, source_idx ) );
+        NS(Particles_set_p0c_value)( destination, destination_idx,
+            NS(Particles_get_p0c_value)( source, source_idx ) );
 
-    NS(Particles_set_py_value)( destination, destination_idx,
-        NS(Particles_get_py_value)( source, source_idx ) );
+        NS(Particles_set_s_value)( destination, destination_idx,
+            NS(Particles_get_s_value)( source, source_idx ) );
 
-    NS(Particles_set_zeta_value)( destination, destination_idx,
-        NS(Particles_get_zeta_value)( source, source_idx ) );
+        NS(Particles_set_x_value)( destination, destination_idx,
+            NS(Particles_get_x_value)( source, source_idx ) );
 
-    NS(Particles_set_psigma_value)( destination, destination_idx,
-        NS(Particles_get_psigma_value)( source, source_idx ) );
+        NS(Particles_set_y_value)( destination, destination_idx,
+            NS(Particles_get_y_value)( source, source_idx ) );
 
-    NS(Particles_set_delta_value)( destination, destination_idx,
-        NS(Particles_get_delta_value)( source, source_idx ) );
+        NS(Particles_set_px_value)( destination, destination_idx,
+            NS(Particles_get_px_value)( source, source_idx ) );
 
-    NS(Particles_set_rpp_value )( destination, destination_idx,
-        NS(Particles_get_rpp_value)( source, source_idx ) );
+        NS(Particles_set_py_value)( destination, destination_idx,
+            NS(Particles_get_py_value)( source, source_idx ) );
 
-    NS(Particles_set_rvv_value)( destination, destination_idx,
-        NS( Particles_get_rvv_value)( source, source_idx ) );
+        NS(Particles_set_zeta_value)( destination, destination_idx,
+            NS(Particles_get_zeta_value)( source, source_idx ) );
 
-    NS(Particles_set_chi_value)( destination, destination_idx,
-        NS(Particles_get_chi_value)( source, source_idx ) );
+        NS(Particles_set_psigma_value)( destination, destination_idx,
+            NS(Particles_get_psigma_value)( source, source_idx ) );
 
-    NS(Particles_set_particle_id_value)( destination, destination_idx,
-        NS(Particles_get_particle_id_value)( source, source_idx ) );
+        NS(Particles_set_delta_value)( destination, destination_idx,
+            NS(Particles_get_delta_value)( source, source_idx ) );
 
-    NS(Particles_set_at_element_id_value)( destination, destination_idx,
-        NS( Particles_get_at_element_id_value)( source, source_idx ) );
+        NS(Particles_set_rpp_value )( destination, destination_idx,
+            NS(Particles_get_rpp_value)( source, source_idx ) );
 
-    NS(Particles_set_at_turn_value)( destination, destination_idx,
-        NS(Particles_get_at_turn_value)( source, source_idx ) );
+        NS(Particles_set_rvv_value)( destination, destination_idx,
+            NS( Particles_get_rvv_value)( source, source_idx ) );
 
-    NS(Particles_set_state_value)( destination, destination_idx,
-        NS(Particles_get_state_value)( source, source_idx ) );
+        NS(Particles_set_chi_value)( destination, destination_idx,
+            NS(Particles_get_chi_value)( source, source_idx ) );
 
-    return;
+        NS(Particles_set_particle_id_value)( destination, destination_idx,
+            NS(Particles_get_particle_id_value)( source, source_idx ) );
+
+        NS(Particles_set_at_element_id_value)( destination, destination_idx,
+            NS( Particles_get_at_element_id_value)( source, source_idx ) );
+
+        NS(Particles_set_at_turn_value)( destination, destination_idx,
+            NS(Particles_get_at_turn_value)( source, source_idx ) );
+
+        NS(Particles_set_state_value)( destination, destination_idx,
+            NS(Particles_get_state_value)( source, source_idx ) );
+
+        success = true;
+    }
+
+    return success;
 }
 
-SIXTRL_INLINE void NS(Particles_copy_range)(
+SIXTRL_INLINE bool NS(Particles_copy_range)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
-    NS(particle_num_elements_t) const start,
-    NS(particle_num_elements_t) const end )
+    NS(particle_num_elements_t) const source_start_index,
+    NS(particle_num_elements_t) const source_end_index,
+    NS(particle_num_elements_t) dest_start_index )
 {
     typedef NS(particle_num_elements_t) num_elem_t;
 
-    num_elem_t const num_to_copy = ( start <= end )
-        ? ( end - start ) : ( num_elem_t )0;
+    bool success = false;
 
-    SIXTRL_ASSERT(
-        ( destination != SIXTRL_NULLPTR ) &&
-        ( source      != SIXTRL_NULLPTR ) && ( start >= 0 ) &&
-        ( NS(Particles_get_num_of_particles)( destination ) >= end ) &&
-        ( NS(Particles_get_num_of_particles)( source )      >= end ) );
+    num_elem_t const num_to_copy = ( source_start_index <= source_end_index )
+        ? ( source_end_index - source_start_index ) : ( num_elem_t )0;
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->q0[ start ],
-                             &source->q0[ start ], num_to_copy );
+    num_elem_t const source_num_particles =
+        NS(Particles_get_num_of_particles)( source );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->beta0[ start ],
-                             &source->beta0[ start ], num_to_copy );
+    num_elem_t const dest_num_particles =
+        NS(Particles_get_num_of_particles)( destination );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->mass0[ start ],
-                             &source->mass0[ start ], num_to_copy );
+    if( ( dest_start_index < ( num_elem_t )0 ) ||
+        ( dest_start_index >= dest_num_particles ) )
+    {
+        if( source_end_index < dest_num_particles )
+        {
+            dest_start_index = source_start_index;
+        }
+    }
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->gamma0[ start ],
-                             &source->gamma0[ start ], num_to_copy );
+    if( ( destination != SIXTRL_NULLPTR ) &&
+        ( source      != SIXTRL_NULLPTR ) &&
+        ( destination != source ) &&
+        ( source_start_index >= 0 ) &&
+        ( source_end_index >= source_start_index ) &&
+        ( source_num_particles >= source_end_index ) &&
+        ( dest_start_index >= 0 ) &&
+        ( dest_num_particles >= ( dest_start_index + num_to_copy ) ) )
+    {
+        success = true;
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->p0c[ start ],
-                             &source->p0c[ start ], num_to_copy );
+        SIXTRL_ASSERT( source->q0                 != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->beta0              != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->mass0              != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->gamma0             != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->p0c                != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->s                  != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->x                  != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->y                  != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->px                 != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->py                 != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->zeta               != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->psigma             != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->delta              != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->rpp                != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->rvv                != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->chi                != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->particle_id        != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->at_element_id      != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->at_turn            != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( source->state              != SIXTRL_NULLPTR );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->s[ start ],
-                             &source->s[ start ], num_to_copy );
+        SIXTRL_ASSERT( destination->q0            != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->beta0         != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->mass0         != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->gamma0        != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->p0c           != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->s             != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->x             != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->y             != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->px            != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->py            != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->zeta          != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->psigma        != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->delta         != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->rpp           != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->rvv           != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->chi           != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->particle_id   != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->at_element_id != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->at_turn       != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( destination->state         != SIXTRL_NULLPTR );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->x[ start ],
-                             &source->x[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->q0[ dest_start_index ],
+            &source->q0[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->y[ start ],
-                             &source->y[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->beta0[ dest_start_index ],
+            &source->beta0[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->px[ start ],
-                             &source->px[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->mass0[ dest_start_index ],
+            &source->mass0[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->py[ start ],
-                             &source->py[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->gamma0[ dest_start_index ],
+            &source->gamma0[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->zeta[ start ],
-                             &source->zeta[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->p0c[ dest_start_index ],
+            &source->p0c[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->psigma[ start ],
-                             &source->psigma[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->s[ dest_start_index ],
+            &source->s[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->delta[ start ],
-                             &source->delta[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->x[ dest_start_index ],
+            &source->x[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->rpp[ start ],
-                             &source->rpp[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->y[ dest_start_index ],
+            &source->y[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->rvv[ start ],
-                             &source->rvv[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->px[ dest_start_index ],
+            &source->px[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_real_t), &destination->chi[ start ],
-                             &source->chi[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->py[ dest_start_index ],
+            &source->py[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_index_t),
-                             &destination->particle_id[ start ],
-                             &source->particle_id[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->zeta[ dest_start_index ],
+            &source->zeta[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_index_t),
-                             &destination->at_element_id[ start ],
-                             &source->at_element_id[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->psigma[ dest_start_index ],
+            &source->psigma[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_index_t),
-                             &destination->at_turn[ start ],
-                             &source->at_turn[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->delta[ dest_start_index ],
+            &source->delta[ source_start_index ], num_to_copy );
 
-    SIXTRACKLIB_COPY_VALUES( NS(particle_index_t),
-                             &destination->state[ start ],
-                             &source->state[ start ], num_to_copy );
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->rpp[ dest_start_index ],
+            &source->rpp[ source_start_index ], num_to_copy );
 
-    return;
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->rvv[ dest_start_index ],
+            &source->rvv[ source_start_index ], num_to_copy );
+
+        SIXTRACKLIB_COPY_VALUES( NS(particle_real_t),
+            &destination->chi[ dest_start_index ],
+            &source->chi[ source_start_index ], num_to_copy );
+
+        SIXTRACKLIB_COPY_VALUES( NS(particle_index_t),
+            &destination->particle_id[ dest_start_index ],
+            &source->particle_id[ source_start_index ], num_to_copy );
+
+        SIXTRACKLIB_COPY_VALUES( NS(particle_index_t),
+            &destination->at_element_id[ dest_start_index ],
+            &source->at_element_id[ source_start_index ], num_to_copy );
+
+        SIXTRACKLIB_COPY_VALUES( NS(particle_index_t),
+            &destination->at_turn[ dest_start_index ],
+            &source->at_turn[ source_start_index ], num_to_copy );
+
+        SIXTRACKLIB_COPY_VALUES( NS(particle_index_t),
+            &destination->state[ dest_start_index ],
+            &source->state[ source_start_index ], num_to_copy );
+    }
+
+    return success;
 }
 
-SIXTRL_INLINE void NS(Particles_copy)(
+SIXTRL_INLINE bool NS(Particles_copy)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source )
 {
     typedef NS(particle_num_elements_t) num_elem_t;
 
+    bool success = false;
+
     num_elem_t const num = NS(Particles_get_num_of_particles)( source );
 
-    SIXTRL_ASSERT(
-        ( destination != SIXTRL_NULLPTR ) &&
+    if( ( destination != SIXTRL_NULLPTR ) &&
         ( source      != SIXTRL_NULLPTR ) &&
         ( num >  ( num_elem_t )0u ) &&
-        ( num == ( NS(Particles_get_num_of_particles)( destination ) ) ) );
+        ( num == ( NS(Particles_get_num_of_particles)( destination ) ) ) )
+    {
+        success = NS(Particles_copy_range)( destination, source, 0, num, 0 );
+    }
 
-    NS(Particles_copy_range)( destination, source, 0, num );
-    return;
+    return success;
 }
 
 SIXTRL_INLINE void NS(Particles_calculate_difference)(
@@ -3111,6 +3357,59 @@ SIXTRL_INLINE void NS(Particles_assign_ptr_to_s)(
     return;
 }
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE void NS(Particles_add_to_s_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const s_diff_value )
+{
+    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( particles->s != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( index < NS(Particles_get_num_of_particles)( particles ) );
+
+    particles->s[ index ] += s_diff_value;
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_s_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT s_diff_values )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    SIXTRL_ASSERT( s_diff_values != SIXTRL_NULLPTR );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_s_value)( particles, ii, s_diff_values[ ii ] );
+    }
+
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_s)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const s_diff_value )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_s_value)( particles, ii, s_diff_value );
+    }
+
+    return;
+}
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(particle_real_t) NS(Particles_get_x_value)(
@@ -3175,6 +3474,59 @@ SIXTRL_INLINE void NS(Particles_assign_ptr_to_x)(
 {
     SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
     particles->x = ptr_to_xs;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE void NS(Particles_add_to_x_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const x_diff_value )
+{
+    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( particles->x != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( index < NS(Particles_get_num_of_particles)( particles ) );
+
+    particles->x[ index ] += x_diff_value;
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_x_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT x_diff_values )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    SIXTRL_ASSERT( x_diff_values != SIXTRL_NULLPTR );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_x_value)( particles, ii, x_diff_values[ ii ] );
+    }
+
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_x)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const x_diff_value )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_x_value)( particles, ii, x_diff_value );
+    }
+
     return;
 }
 
@@ -3245,6 +3597,59 @@ SIXTRL_INLINE void NS(Particles_assign_ptr_to_y)(
     return;
 }
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE void NS(Particles_add_to_y_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const y_diff_value )
+{
+    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( particles->y != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( index < NS(Particles_get_num_of_particles)( particles ) );
+
+    particles->y[ index ] += y_diff_value;
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_y_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT y_diff_values )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    SIXTRL_ASSERT( y_diff_values != SIXTRL_NULLPTR );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_y_value)( particles, ii, y_diff_values[ ii ] );
+    }
+
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_y)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const y_diff_value )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_y_value)( particles, ii, y_diff_value );
+    }
+
+    return;
+}
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(particle_real_t) NS(Particles_get_px_value)(
@@ -3309,6 +3714,59 @@ SIXTRL_INLINE void NS(Particles_assign_ptr_to_px)(
 {
     SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
     particles->px = ptr_to_pxs;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE void NS(Particles_add_to_px_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const px_diff_value )
+{
+    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( particles->px != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( index < NS(Particles_get_num_of_particles)( particles ) );
+
+    particles->px[ index ] += px_diff_value;
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_px_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT px_diff_values )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    SIXTRL_ASSERT( px_diff_values != SIXTRL_NULLPTR );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_px_value)( particles, ii, px_diff_values[ ii ] );
+    }
+
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_px)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const px_diff_value )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_px_value)( particles, ii, px_diff_value );
+    }
+
     return;
 }
 
@@ -3379,6 +3837,59 @@ SIXTRL_INLINE void NS(Particles_assign_ptr_to_py)(
     return;
 }
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE void NS(Particles_add_to_py_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const py_diff_value )
+{
+    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( particles->py != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( index < NS(Particles_get_num_of_particles)( particles ) );
+
+    particles->py[ index ] += py_diff_value;
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_py_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT py_diff_values )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    SIXTRL_ASSERT( py_diff_values != SIXTRL_NULLPTR );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_py_value)( particles, ii, py_diff_values[ ii ] );
+    }
+
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_py)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const py_diff_value )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_py_value)( particles, ii, py_diff_value );
+    }
+
+    return;
+}
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(particle_real_t) NS(Particles_get_zeta_value)(
@@ -3443,6 +3954,60 @@ SIXTRL_INLINE void NS(Particles_assign_ptr_to_zeta)(
 {
     SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
     particles->zeta = ptr_to_zetas;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE void NS(Particles_add_to_zeta_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const zeta_diff_value )
+{
+    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( particles->zeta != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( index < NS(Particles_get_num_of_particles)( particles ) );
+
+    particles->zeta[ index ] += zeta_diff_value;
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_zeta_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT zeta_diff_values )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    SIXTRL_ASSERT( zeta_diff_values != SIXTRL_NULLPTR );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_zeta_value)( particles, ii,
+                                         zeta_diff_values[ ii ] );
+    }
+
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_zeta)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const zeta_diff_value )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_zeta_value)( particles, ii, zeta_diff_value );
+    }
+
     return;
 }
 
@@ -3513,6 +4078,60 @@ SIXTRL_INLINE void NS(Particles_assign_ptr_to_psigma)(
     return;
 }
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE void NS(Particles_add_to_psigma_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const psigma_diff_value )
+{
+    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( particles->psigma != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( index < NS(Particles_get_num_of_particles)( particles ) );
+
+    particles->psigma[ index ] += psigma_diff_value;
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_psigma_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT psigma_diff_values )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    SIXTRL_ASSERT( psigma_diff_values != SIXTRL_NULLPTR );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_psigma_value)(
+            particles, ii, psigma_diff_values[ ii ] );
+    }
+
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_psigma)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const psigma_diff_value )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_psigma_value)( particles, ii, psigma_diff_value );
+    }
+
+    return;
+}
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(particle_real_t) NS(Particles_get_energy_value)(
@@ -3537,25 +4156,30 @@ SIXTRL_INLINE void NS(Particles_set_energy_value)(
 {
     typedef NS(particle_real_t) real_t;
 
-    SIXTRL_STATIC_VAR real_t const ONE = ( real_t )1;
+    real_t const beta0       = NS(Particles_get_beta0_value)( p, index );
+    real_t const p0c         = NS(Particles_get_p0c_value)( p, index );
 
-    real_t const beta0          = NS(Particles_get_beta0_value)( p, index );
-    real_t const p0c            = NS(Particles_get_p0c_value)( p, index );
+    real_t const ptau_beta0  = ( beta0 * energy ) / p0c;
+    real_t const beta0_squ   = beta0 * beta0;
+    real_t const beta0_plus_delta_beta0 = sqrt(
+        ptau_beta0 * ptau_beta0 + ( real_t )2 * ptau_beta0 + beta0_squ );
 
-    real_t const ptau           = energy / p0c;
-    real_t const psigma         = ptau / beta0;
-    real_t const one_plus_delta = sqrt( ptau * ptau + ( real_t )2 * psigma + ONE );
-    real_t const delta          = one_plus_delta - ONE;
-    real_t const beta           = one_plus_delta / ( ONE / beta0 + ptau );
-    real_t const rpp            = ONE  / one_plus_delta;
-    real_t const rvv            = beta / beta0;
+    real_t const psigma = ptau_beta0 / beta0_squ;
+    real_t const delta  = ( beta0_plus_delta_beta0 - beta0 ) / beta0;
+    real_t const rpp    = beta0 / beta0_plus_delta_beta0;
+    real_t const rvv    = ( beta0_plus_delta_beta0 ) /
+                          ( beta0 + ptau_beta0 * beta0 );
 
-    SIXTRL_ASSERT( index < NS(Particles_get_num_of_particles)( p ) );
+    SIXTRL_ASSERT( beta0     > ( real_t )0 );
+    SIXTRL_ASSERT( p0c       > ( real_t )0 );
+    SIXTRL_ASSERT( beta0_squ > ( real_t )0 );
+    SIXTRL_ASSERT( ( ptau_beta0 * ptau_beta0 +
+        ( real_t )2 * ptau_beta0 + beta0_squ ) > ( real_t )0 );
 
+    NS(Particles_set_delta_value)(  p, index, delta  );
+    NS(Particles_set_rpp_value)(    p, index, rpp    );
+    NS(Particles_set_rvv_value)(    p, index, rvv    );
     NS(Particles_set_psigma_value)( p, index, psigma );
-    NS(Particles_set_delta_value)(  p, index, delta );
-    NS(Particles_set_rpp_value)( p, index, rpp );
-    NS(Particles_set_rvv_value)( p, index, rvv );
 
     return;
 }
@@ -3692,6 +4316,136 @@ SIXTRL_INLINE void NS(Particles_assign_ptr_to_delta)(
 {
     SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
     particles->delta = ptr_to_deltas;
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE void NS(Particles_add_to_delta_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const delta_diff_value )
+{
+    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( particles->delta != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( index < NS(Particles_get_num_of_particles)( particles ) );
+
+    particles->delta[ index ] += delta_diff_value;
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_delta_detailed)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT delta_diff_values )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    SIXTRL_ASSERT( delta_diff_values != SIXTRL_NULLPTR );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_delta_value)(
+            particles, ii, delta_diff_values[ ii ] );
+    }
+
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_add_to_delta)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_real_t) const delta_diff_value )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_add_to_delta_value)(
+            particles, ii, delta_diff_value );
+    }
+
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE void NS(Particles_update_delta_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const new_delta_value )
+{
+    typedef NS(particle_real_t) real_t;
+
+    SIXTRL_STATIC_VAR real_t const ONE = ( real_t )1;
+
+    real_t const beta0 = NS(Particles_get_beta0_value)( p, index );
+    real_t const delta_beta0 = new_delta_value * beta0;
+    real_t const ptau_beta0  = sqrt( delta_beta0 * delta_beta0 +
+        ( real_t )2 * delta_beta0 * beta0 + ONE ) - ONE;
+
+    real_t const one_plus_delta = ONE + new_delta_value;
+    real_t const rvv    = ( one_plus_delta ) / ( ONE + ptau_beta0 );
+    real_t const rpp    = ONE / one_plus_delta;
+    real_t const psigma = ptau_beta0 / ( beta0 * beta0 );
+
+    #if !defined( NDEBUG ) && !defined( _GPUCODE )
+    SIXTRL_STATIC_VAR real_t const EPS  = ( real_t )1e-9;
+    SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0;
+
+    SIXTRL_ASSERT(   beta0              > ZERO );
+    SIXTRL_ASSERT( ( beta0 * beta0    ) > EPS  );
+    SIXTRL_ASSERT( ( one_plus_delta   ) > EPS  );
+    SIXTRL_ASSERT( ( ONE + ptau_beta0 ) > EPS  );
+    SIXTRL_ASSERT( ( delta_beta0 * delta_beta0 +
+        ( real_t )2 * delta_beta0 * beta0 + ONE ) > ZERO );
+
+    #endif /* !defined( NDEBUG ) && !defined( _GPUCODE ) */
+
+    NS(Particles_set_delta_value)(  p, index, new_delta_value );
+    NS(Particles_set_rvv_value)(    p, index, rvv );
+    NS(Particles_set_rpp_value)(    p, index, rpp );
+    NS(Particles_set_psigma_value)( p, index, psigma );
+
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_update_delta_value_increment)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
+    NS(particle_num_elements_t) const index,
+    NS(particle_real_t) const delta_value_diff )
+{
+    typedef NS(particle_real_t) real_t;
+
+    real_t const current_delta = NS(Particles_get_delta_value)( p, index );
+    real_t const new_delta     = current_delta + delta_value_diff;
+
+    NS(Particles_update_delta_value)( p, index, new_delta );
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_update_delta)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
+    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT ptr_to_deltas )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0;
+    num_elem_t const num_particles = NS(Particles_get_num_of_particles)( p );
+
+    SIXTRL_ASSERT( ptr_to_deltas != SIXTRL_NULLPTR );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_update_delta_value)( p, ii, ptr_to_deltas[ ii ] );
+    }
+
     return;
 }
 

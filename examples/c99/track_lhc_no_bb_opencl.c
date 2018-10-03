@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <cuda_runtime.h>
-#include <cuda.h>
-
 #include "sixtracklib/testlib.h"
 #include "sixtracklib/sixtracklib.h"
 

@@ -1,96 +1,62 @@
 # sixtracklib/common/CMakeLists.txt
+# -----------------------------------------------------------------------------
 
-set( SIXTRACKLIB_COMMON_IMPL_HEADERS
-     impl/alignment_impl.h
-     impl/beam_elements_defines.h
-     impl/beam_elements_undef.h
-     impl/be_drift.h
-     impl/be_drift.hpp
-     impl/be_multipole.h
-     impl/be_multipole.hpp
-     impl/be_cavity.h
-     impl/be_cavity.hpp
-     impl/be_xyshift.h
-     impl/be_xyshift.hpp
-     impl/be_srotation.h
-     impl/be_srotation.hpp
-#    impl/be_beam_beam.h
-#    impl/be_beam_beam.hpp
-     impl/buffer_type.h
-     impl/buffer_defines.h
-     impl/buffer_garbage.h
-     impl/buffer_garbage_defines.h
-     impl/buffer_garbage_undef.h
-     impl/buffer_object.h
-     impl/buffer_object_defines.h
-     impl/buffer_object_undef.h
-     impl/buffer_generic.h
-     impl/managed_buffer_minimal.h
-     impl/managed_buffer_remap.h
-     impl/managed_buffer.h
-     be_beambeam/be_beambeam4d.h
-     be_beambeam/be_beambeam6d.h
-     be_beambeam/track_beambeam.h
-#    impl/faddeeva.h
-#    impl/faddeeva_mit.h
+set(  SIXTRACKL_LINK_LIBRARIES
+    ${SIXTRACKL_LINK_LIBRARIES}  PARENT_SCOPE )
+
+set( SIXTRACKLIB_COMMON_C99_HEADERS )
+set( SIXTRACKLIB_COMMON_CXX_HEADERS )
+
+add_subdirectory( generated    )
+add_subdirectory( internal     )
+add_subdirectory( buffer       )
+add_subdirectory( be_beambeam  )
+add_subdirectory( be_drift     )
+add_subdirectory( be_cavity    )
+add_subdirectory( be_multipole )
+add_subdirectory( be_srotation )
+add_subdirectory( be_xyshift   )
+
+set( SIXTRACKLIB_COMMON_INTERNAL_CXX_HEADERS )
+set( SIXTRACKLIB_COMMON_INTERNAL_CXX_SOURCES )
+
+set(  SIXTRACKLIB_C99_HEADERS
+    ${SIXTRACKLIB_C99_HEADERS}
+      beam_elements.h
+      buffer.h
+      constants.h
+      definitions.h
+      particles.h
+      track.h
 )
 
-set( SIXTRACKLIB_COMMON_DETAILS_HEADERS
-     details/tools.h
+set(  SIXTRACKLIB_CXX_HEADERS
+    ${SIXTRACKLIB_CXX_HEADERS}
+      beam_elements.hpp
+      buffer.hpp
+      particles.hpp
 )
-
-set( SIXTRACKLIB_COMMON_HEADERS
-     alignment.h
-     beam_elements.h
-     beam_elements.hpp
-     buffer.h
-     buffer.hpp
-     compute_arch.h
-     mem_pool.h
-     particles.h
-     particles.hpp
-     track.h
-)
-
-set( SIXTRACKLIB_COMMON_SOURCES
-     details/alignment.c
-     details/buffer.c
-     details/compute_arch.c
-#    details/faddeeva_mit.c
-     details/mem_pool.c
-     be_beambeam/be_beambeam4d.c
-     be_beambeam/be_beambeam6d.c
-)
-
-add_library( sixtrack_common OBJECT
-             ${SIXTRACKLIB_COMMON_IMPL_HEADERS}
-             ${SIXTRACKLIB_COMMON_DETAILS_HEADERS}
-             ${SIXTRACKLIB_COMMON_HEADERS}
-             ${SIXTRACKLIB_COMMON_SOURCES} )
-
-target_include_directories( sixtrack_common
-                            PUBLIC $<INSTALL_INTERFACE:include>
-                                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
-
-set_target_properties(  sixtrack_common PROPERTIES LINKER_LANGUAGE C )
-set_target_properties(  sixtrack_common PROPERTIES POSITION_INDEPENDENT_CODE True )
-set_target_properties(  sixtrack_common PROPERTIES C_STANDARD 99 )
-
-target_compile_definitions( sixtrack_common PUBLIC
-                            ${SIXTRACKLIB_NAMESPACE_FLAGS} )
-
-target_compile_options( sixtrack_common BEFORE PUBLIC
-                        ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic -ansi )
 
 # ------------------------------------------------------------------------------
 # install :
 
-set( SIXTRACKLIB_COMMON_INSTALL_PATH include/sixtracklib/common )
+if( SIXTRACKLIB_COMMON_C99_LOCAL_HEADERS )
 
-install( FILES ${SIXTRACKLIB_COMMON_HEADERS}
-         DESTINATION ${SIXTRACKLIB_COMMON_INSTALL_PATH} )
+    set( SIXTRACKLIB_COMMON_C99_INSTALL_PATH
+         include/sixtracklib/common )
 
-install( FILES ${SIXTRACKLIB_COMMON_IMPL_HEADERS}
-         DESTINATION "${SIXTRACKLIB_COMMON_INSTALL_PATH}/impl" )
+    install( FILES ${SIXTRACKLIB_COMMON_C99_LOCAL_HEADERS}
+             DESTINATION ${SIXTRACKLIB_COMMON_C99_INSTALL_PATH} )
+endif()
+
+if( SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS )
+    message( STATUS "${SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS}" )
+
+    set( SIXTRACKLIB_COMMON_CXX_INSTALL_PATH
+         include/sixtracklib/common )
+
+    install( FILES ${SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS}
+             DESTINATION ${SIXTRACKLIB_COMMON_CXX_INSTALL_PATH} )
+endif()
 
 #end sixtracklib/common/CMakeLists.txt

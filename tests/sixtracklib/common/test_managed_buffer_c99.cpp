@@ -10,8 +10,8 @@
 
 #include "sixtracklib/testlib.h"
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/common/impl/managed_buffer.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/buffer/managed_buffer.h"
 
 /* ========================================================================= */
 /* ====  Test flat-memory based minimal buffer implementation                */
