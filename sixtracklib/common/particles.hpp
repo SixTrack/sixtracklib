@@ -14,13 +14,13 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/particles_defines.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/buffer.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     template< typename T >
     struct TParticles
@@ -988,7 +988,7 @@ namespace SIXTRL_NAMESPACE
  * *** Implementation of inline and template member functions          ***** *
  * ************************************************************************* */
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     /* ===================================================================== */
     /* TParticles< T >: */
