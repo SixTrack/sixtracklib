@@ -12,6 +12,8 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/impl/beam_elements_defines.h"
     #include "sixtracklib/common/buffer.hpp"
     #include "sixtracklib/common/impl/be_drift.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -43,20 +45,20 @@ namespace SIXTRL_NAMESPACE
 
         SIXTRL_FN static bool CanAddToBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer,
-            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
+            SIXTRL_BUFFER_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_objects  = nullptr,
-            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
+            SIXTRL_BUFFER_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_slots    = nullptr,
-            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
+            SIXTRL_BUFFER_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_dataptrs = nullptr
         ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN SIXTRL_STATIC
-        SIXTRL_ARGPTR_DEC TDrift< T >* CreateNewOnBuffer(
+        SIXTRL_BE_ARGPTR_DEC TDrift< T >* CreateNewOnBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer );
 
         SIXTRL_FN SIXTRL_STATIC
-        SIXTRL_ARGPTR_DEC TDrift< T >* AddToBuffer(
+        SIXTRL_BE_ARGPTR_DEC TDrift< T >* AddToBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer, value_type const length );
 
         /* ----------------------------------------------------------------- */
@@ -81,20 +83,29 @@ namespace SIXTRL_NAMESPACE
     };
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TDrift< T >* TDrift_new( Buffer& buffer );
+    SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_new( Buffer& buffer );
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TDrift< T >* TDrift_new(
-        SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer );
+    SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_new(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer );
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TDrift< T >* TDrift_add(
+    SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_add(
         Buffer& buffer, T const& length );
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TDrift< T >* TDrift_add(
-        SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
+    SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_add(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
         T const& length );
+
+    template< typename T >
+    SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_add_copy( Buffer& buffer,
+        TDrift< T > const& SIXTRL_RESTRICT_REF orig );
+
+    template< typename T >
+    SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_add_copy(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buf,
+        TDrift< T > const& SIXTRL_RESTRICT_REF orig );
 
     /* ===================================================================== *
      * ====  TDriftExact< T > :
@@ -124,19 +135,19 @@ namespace SIXTRL_NAMESPACE
 
         SIXTRL_FN SIXTRL_STATIC bool CanAddToBuffer(
                 buffer_t& SIXTRL_RESTRICT_REF buffer,
-                SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
+                SIXTRL_BUFFER_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                     ptr_requ_objects = nullptr,
-                SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
+                SIXTRL_BUFFER_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                     ptr_requ_slots = nullptr,
-                SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
+                SIXTRL_BUFFER_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                     ptr_requ_dataptrs = nullptr ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN SIXTRL_STATIC
-        SIXTRL_ARGPTR_DEC TDriftExact< T >* CreateNewOnBuffer(
+        SIXTRL_BE_ARGPTR_DEC TDriftExact< T >* CreateNewOnBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer );
 
         SIXTRL_FN SIXTRL_STATIC
-        SIXTRL_ARGPTR_DEC TDriftExact< T >* AddToBuffer(
+        SIXTRL_BE_ARGPTR_DEC TDriftExact< T >* AddToBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer,
             value_type const length );
 
@@ -163,21 +174,34 @@ namespace SIXTRL_NAMESPACE
     };
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TDriftExact< T >*
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< T >*
     TDriftExact_new( Buffer& buffer );
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TDriftExact< T >*
-    TDriftExact_new( SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buf );
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< T >*
+    TDriftExact_new(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buf );
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TDriftExact< T >*
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< T >*
     TDriftExact_add( Buffer& buffer, T const& length );
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TDriftExact< T >*
-    TDriftExact_add( SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buf,
-                     T const& length );
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< T >*
+    TDriftExact_add(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buf,
+        T const& length );
+
+    template< typename T >
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< T >*
+    TDriftExact_add_copy( Buffer& buffer,
+                          TDriftExact< T > const& SIXTRL_RESTRICT_REF orig );
+
+    template< typename T >
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< T >*
+    TDriftExact_add_copy(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buf,
+        TDriftExact< T > const& SIXTRL_RESTRICT_REF orig );
 
     /* ===================================================================== *
      * Specialization TDrift< NS(drift_real_t) >
@@ -205,21 +229,50 @@ namespace SIXTRL_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC
+        TDrift< NS(drift_real_t) > const* FromBuffer(
+            Buffer const& SIXTRL_RESTRICT_REF buffer,
+            size_type const be_index ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC
+        TDrift< NS(drift_real_t) > const* FromBuffer( SIXTRL_BUFFER_ARGPTR_DEC
+            const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+            size_type const be_index ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC TDrift< NS(drift_real_t) >*
+        FromBuffer( Buffer& SIXTRL_RESTRICT_REF buffer,
+                    size_type const be_index ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC TDrift< NS(drift_real_t) >*
+        FromBuffer( SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+                    size_type const be_index ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC
+        TDrift< NS(drift_real_t) > const* FromBufferObject(
+            SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const
+                SIXTRL_RESTRICT be_info ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC TDrift< NS(drift_real_t) >*
+        FromBufferObject( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
+                SIXTRL_RESTRICT be_info ) SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_FN SIXTRL_STATIC bool CanAddToBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer,
-            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
+            SIXTRL_BUFFER_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_objects  = nullptr,
-            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
+            SIXTRL_BUFFER_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_slots    = nullptr,
-            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
+            SIXTRL_BUFFER_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_dataptrs = nullptr ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN SIXTRL_STATIC
-        SIXTRL_ARGPTR_DEC TDrift< NS(drift_real_t) >* CreateNewOnBuffer(
+        SIXTRL_BE_ARGPTR_DEC TDrift< NS(drift_real_t) >* CreateNewOnBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN SIXTRL_STATIC
-        SIXTRL_ARGPTR_DEC TDrift< NS(drift_real_t) >* AddToBuffer(
+        SIXTRL_BE_ARGPTR_DEC TDrift< NS(drift_real_t) >* AddToBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer, value_type const length );
 
         /* ----------------------------------------------------------------- */
@@ -246,19 +299,27 @@ namespace SIXTRL_NAMESPACE
 
     using Drift = TDrift< NS(drift_real_t) >;
 
-    SIXTRL_ARGPTR_DEC Drift* Drift_new(
+    SIXTRL_BE_ARGPTR_DEC Drift* Drift_new(
         Buffer& SIXTRL_RESTRICT_REF buffer );
 
-    SIXTRL_ARGPTR_DEC Drift* Drift_new(
-        SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT ptr_buffer );
+    SIXTRL_BE_ARGPTR_DEC Drift* Drift_new(
+        SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT ptr_buffer );
 
-    SIXTRL_ARGPTR_DEC Drift*
+    SIXTRL_BE_ARGPTR_DEC Drift*
     Drift_add( Buffer& SIXTRL_RESTRICT_REF buffer,
                Drift::value_type const length );
 
-    SIXTRL_ARGPTR_DEC Drift* Drift_add(
-        SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
+    SIXTRL_BE_ARGPTR_DEC Drift* Drift_add(
+        SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
         Drift::value_type const length );
+
+    SIXTRL_BE_ARGPTR_DEC Drift* Drift_add_copy(
+        Buffer& SIXTRL_RESTRICT_REF buffer,
+        Drift const& SIXTRL_RESTRICT_REF orig );
+
+    SIXTRL_BE_ARGPTR_DEC Drift* Drift_add_copy(
+        SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
+        Drift const& SIXTRL_RESTRICT_REF orig );
 
     /* ===================================================================== *
      * Specialization TDriftExact< NS(drift_real_t) >
@@ -290,22 +351,54 @@ namespace SIXTRL_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC
+        TDriftExact< NS(drift_real_t) > const* FromBuffer(
+            Buffer const& SIXTRL_RESTRICT_REF buffer,
+            size_type const be_index ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC
+        TDriftExact< NS(drift_real_t) > const* FromBuffer(
+            SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+            size_type const be_index ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC
+        TDriftExact< NS(drift_real_t) >* FromBuffer(
+            Buffer& SIXTRL_RESTRICT_REF buffer,
+            size_type const be_index ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC
+        TDriftExact< NS(drift_real_t) >* FromBuffer(
+            SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+            size_type const be_index ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC
+        TDriftExact< NS(drift_real_t) > const* FromBufferObject(
+            SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const
+                SIXTRL_RESTRICT be_info ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC
+        TDriftExact< NS(drift_real_t) >* FromBufferObject(
+            SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT
+                be_info ) SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_FN SIXTRL_STATIC bool CanAddToBuffer(
                 buffer_t& SIXTRL_RESTRICT_REF buffer,
-                SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
+                SIXTRL_BUFFER_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                     ptr_requ_objects  = nullptr,
-                SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
+                SIXTRL_BUFFER_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                     ptr_requ_slots    = nullptr,
-                SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
+                SIXTRL_BUFFER_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                     ptr_requ_dataptrs = nullptr
             ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN SIXTRL_STATIC
-        SIXTRL_ARGPTR_DEC TDriftExact< NS(drift_real_t) >*
+        SIXTRL_BE_ARGPTR_DEC TDriftExact< NS(drift_real_t) >*
         CreateNewOnBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer );
 
         SIXTRL_FN SIXTRL_STATIC
-        SIXTRL_ARGPTR_DEC TDriftExact< NS(drift_real_t) >*
+        SIXTRL_BE_ARGPTR_DEC TDriftExact< NS(drift_real_t) >*
         AddToBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
             value_type const length );
 
@@ -335,19 +428,30 @@ namespace SIXTRL_NAMESPACE
 
     using DriftExact = TDriftExact< NS(drift_real_t) >;
 
-    SIXTRL_ARGPTR_DEC DriftExact*
+    SIXTRL_BE_ARGPTR_DEC DriftExact*
     DriftExact_new( Buffer& SIXTRL_RESTRICT_REF buffer );
 
-    SIXTRL_ARGPTR_DEC DriftExact*
-    DriftExact_new( SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT ptr_buffer );
+    SIXTRL_BE_ARGPTR_DEC DriftExact*
+    DriftExact_new(
+        SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT ptr_buffer );
 
-    SIXTRL_ARGPTR_DEC DriftExact*
+    SIXTRL_BE_ARGPTR_DEC DriftExact*
     DriftExact_add( Buffer& SIXTRL_RESTRICT_REF buffer,
                     DriftExact::value_type const length );
 
-    SIXTRL_ARGPTR_DEC DriftExact*
-    DriftExact_add( SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
-                    DriftExact::value_type const length );
+    SIXTRL_BE_ARGPTR_DEC DriftExact*
+    DriftExact_add(
+        SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
+        DriftExact::value_type const length );
+
+    SIXTRL_BE_ARGPTR_DEC DriftExact*
+    DriftExact_add_copy( Buffer& SIXTRL_RESTRICT_REF buffer,
+                    DriftExact const& SIXTRL_RESTRICT_REF orig );
+
+    SIXTRL_BE_ARGPTR_DEC DriftExact*
+    DriftExact_add_copy(
+        SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
+        DriftExact const& SIXTRL_RESTRICT_REF orig );
 }
 
 /* ************************************************************************* *
@@ -363,11 +467,11 @@ namespace SIXTRL_NAMESPACE
     template< typename T >
     bool TDrift< T >::CanAddToBuffer(
             typename TDrift< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-            SIXTRL_ARGPTR_DEC typename TDrift< T >::size_type*
+            SIXTRL_BUFFER_ARGPTR_DEC typename TDrift< T >::size_type*
                 SIXTRL_RESTRICT ptr_requ_objects,
-            SIXTRL_ARGPTR_DEC typename TDrift< T >::size_type*
+            SIXTRL_BUFFER_ARGPTR_DEC typename TDrift< T >::size_type*
                 SIXTRL_RESTRICT ptr_requ_slots,
-            SIXTRL_ARGPTR_DEC typename TDrift< T >::size_type*
+            SIXTRL_BUFFER_ARGPTR_DEC typename TDrift< T >::size_type*
                 SIXTRL_RESTRICT ptr_requ_dataptrs ) SIXTRL_NOEXCEPT
     {
         using _this_t = TDrift< T >;
@@ -376,8 +480,8 @@ namespace SIXTRL_NAMESPACE
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        SIXTRL_ARGPTR_DEC size_t const* sizes  = nullptr;
-        SIXTRL_ARGPTR_DEC size_t const* counts = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* sizes  = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* counts = nullptr;
 
         _this_t temp;
         temp.preset();
@@ -388,20 +492,20 @@ namespace SIXTRL_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDrift< T >*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDrift< T >*
     TDrift< T >::CreateNewOnBuffer(
         typename TDrift< T >::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
         using _this_t = TDrift< T >;
         using  size_t = typename TDrift< T >::size_type;
-        using  ptr_t  = SIXTRL_ARGPTR_DEC _this_t*;
+        using  ptr_t  = SIXTRL_BE_ARGPTR_DEC _this_t*;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        SIXTRL_ARGPTR_DEC size_t const* offsets = nullptr;
-        SIXTRL_ARGPTR_DEC size_t const* sizes   = nullptr;
-        SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* offsets = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* sizes   = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* counts  = nullptr;
 
         _this_t temp;
         temp.preset();
@@ -413,21 +517,21 @@ namespace SIXTRL_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDrift< T >*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDrift< T >*
     TDrift< T >::AddToBuffer(
         typename TDrift< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         typename TDrift< T >::value_type const length )
     {
         using _this_t = TDrift< T >;
         using  size_t = typename _this_t::size_type;
-        using  ptr_t  = SIXTRL_ARGPTR_DEC _this_t*;
+        using  ptr_t  = SIXTRL_BE_ARGPTR_DEC _this_t*;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        SIXTRL_ARGPTR_DEC size_t const* offsets = nullptr;
-        SIXTRL_ARGPTR_DEC size_t const* sizes   = nullptr;
-        SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* offsets = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* sizes   = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* counts  = nullptr;
 
         _this_t temp;
         temp.setLength( length );
@@ -480,13 +584,13 @@ namespace SIXTRL_NAMESPACE
     /* --------------------------------------------------------------------- */
 
     template< typename T >
-    SIXTRL_INLINE TDrift< T >* TDrift_new( Buffer& buffer )
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_new( Buffer& buffer )
     {
         return TDrift< T >::CreateNewOnBuffer( *( buffer.getCApiPtr() ) );
     }
 
     template< typename T >
-    SIXTRL_INLINE TDrift< T >* TDrift_new(
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_new(
         ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer )
     {
         return ( ptr_buffer != nullptr )
@@ -495,18 +599,34 @@ namespace SIXTRL_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE TDrift< T >* TDrift_add( Buffer& buffer, T const& length )
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_add(
+        Buffer& buffer, T const& length )
     {
         return TDrift< T >::AddToBuffer( *( buffer.getCApiPtr() ), length );
     }
 
     template< typename T >
-    SIXTRL_INLINE TDrift< T >* TDrift_add(
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_add(
         ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer, T const& length )
     {
         return ( ptr_buffer != nullptr )
             ? ( TDrift< T >::AddToBuffer( *ptr_buffer, length ) )
             : nullptr;
+    }
+
+    template< typename T >
+    SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_add_copy( Buffer& buffer,
+        TDrift< T > const& SIXTRL_RESTRICT_REF orig )
+    {
+        return TDrift_add( buffer, orig.getLength() );
+    }
+
+    template< typename T >
+    SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_add_copy(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buf,
+        TDrift< T > const& SIXTRL_RESTRICT_REF orig )
+    {
+        return TDrift_add( ptr_buf, orig.getLength() );
     }
 
     /* ===================================================================== *
@@ -529,8 +649,8 @@ namespace SIXTRL_NAMESPACE
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        SIXTRL_ARGPTR_DEC size_t const* sizes  = nullptr;
-        SIXTRL_ARGPTR_DEC size_t const* counts = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* sizes  = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* counts = nullptr;
 
         _this_t temp;
         temp.preset();
@@ -541,20 +661,20 @@ namespace SIXTRL_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDriftExact< T >*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDriftExact< T >*
     TDriftExact< T >::CreateNewOnBuffer(
         typename TDriftExact< T >::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
         using _this_t = TDriftExact< T >;
         using  size_t = typename _this_t::size_type;
-        using  ptr_t  = SIXTRL_ARGPTR_DEC _this_t*;
+        using  ptr_t  = SIXTRL_BE_ARGPTR_DEC _this_t*;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        SIXTRL_ARGPTR_DEC size_t const* offsets = nullptr;
-        SIXTRL_ARGPTR_DEC size_t const* sizes   = nullptr;
-        SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* offsets = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* sizes   = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* counts  = nullptr;
 
         _this_t temp;
         temp.preset();
@@ -566,21 +686,21 @@ namespace SIXTRL_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDriftExact< T >*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDriftExact< T >*
     TDriftExact< T >::AddToBuffer(
         typename TDriftExact< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         typename TDriftExact< T >::value_type const length )
     {
         using _this_t = TDriftExact< T >;
         using  size_t = typename _this_t::size_type;
-        using  ptr_t  = SIXTRL_ARGPTR_DEC _this_t*;
+        using  ptr_t  = SIXTRL_BE_ARGPTR_DEC _this_t*;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        SIXTRL_ARGPTR_DEC size_t const* offsets = nullptr;
-        SIXTRL_ARGPTR_DEC size_t const* sizes   = nullptr;
-        SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* offsets = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* sizes   = nullptr;
+        SIXTRL_BUFFER_ARGPTR_DEC size_t const* counts  = nullptr;
 
         _this_t temp;
         temp.setLength( length );
@@ -634,14 +754,14 @@ namespace SIXTRL_NAMESPACE
     /* --------------------------------------------------------------------- */
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TDriftExact< T >* TDriftExact_new( Buffer& buffer )
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< T >* TDriftExact_new( Buffer& buffer )
     {
         return TDriftExact< T >::CreateNewOnBuffer( *buffer.getCApiPtr() );
     }
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TDriftExact< T >* TDriftExact_new(
-        SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer )
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< T >* TDriftExact_new(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer )
     {
         return ( ptr_buffer != nullptr )
             ? ( TDriftExact< T >::CreateNewOnBuffer( *ptr_buffer ) )
@@ -649,7 +769,7 @@ namespace SIXTRL_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TDriftExact< T >* TDriftExact_add(
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< T >* TDriftExact_add(
         Buffer& buffer, T const& length )
     {
         return TDriftExact< T >::AddToBuffer(
@@ -657,8 +777,8 @@ namespace SIXTRL_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TDriftExact< T >* TDriftExact_add(
-        SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< T >* TDriftExact_add(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
         T const& length )
     {
         return ( ptr_buffer != nullptr )
@@ -666,9 +786,110 @@ namespace SIXTRL_NAMESPACE
             : nullptr;
     }
 
+    template< typename T >
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< T >* TDriftExact_add_copy( Buffer& buffer,
+        TDriftExact< T > const& SIXTRL_RESTRICT_REF orig )
+    {
+        return TDriftExact_add( buffer, orig.getLength() );
+    }
+
+    template< typename T >
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< T >* TDriftExact_add_copy(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buf,
+        TDriftExact< T > const& SIXTRL_RESTRICT_REF orig )
+    {
+        return TDriftExact_add( ptr_buf, orig.getLength() );
+    }
+
     /* ===================================================================== *
      * ====  TDrift< NS(drift_real_t) >:
      * ===================================================================== */
+
+    SIXTRL_INLINE
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC TDrift< NS(drift_real_t) > const*
+    TDrift< NS(drift_real_t) >::FromBuffer(
+        Buffer const& SIXTRL_RESTRICT_REF buffer,
+        TDrift< NS(drift_real_t) >::size_type const be_index ) SIXTRL_NOEXCEPT
+    {
+        using  _this_t = TDrift< NS(drift_real_t) >;
+        return _this_t::FromBufferObject( buffer[ be_index ] );
+    }
+
+    SIXTRL_INLINE
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC TDrift< NS(drift_real_t) >*
+    TDrift< NS(drift_real_t) >::FromBuffer(
+        Buffer& SIXTRL_RESTRICT_REF buffer,
+        TDrift< NS(drift_real_t) >::size_type const be_index ) SIXTRL_NOEXCEPT
+    {
+        using  _this_t = TDrift< NS(drift_real_t) >;
+        return _this_t::FromBufferObject( buffer[ be_index ] );
+    }
+
+    SIXTRL_INLINE
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC TDrift< NS(drift_real_t) > const*
+    TDrift< NS(drift_real_t) >::FromBuffer( SIXTRL_BUFFER_ARGPTR_DEC
+        const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+            size_type const be_index ) SIXTRL_NOEXCEPT
+    {
+        using  _this_t = TDrift< NS(drift_real_t) >;
+        return _this_t::FromBufferObject(
+            NS(Buffer_get_const_object)( buffer, be_index ) );
+    }
+
+    SIXTRL_INLINE
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC TDrift< NS(drift_real_t) >*
+    TDrift< NS(drift_real_t) >::FromBuffer( SIXTRL_BUFFER_ARGPTR_DEC
+        NS(Buffer)* SIXTRL_RESTRICT buffer,
+            size_type const be_index ) SIXTRL_NOEXCEPT
+    {
+        using  _this_t = TDrift< NS(drift_real_t) >;
+
+        return _this_t::FromBufferObject(
+            NS(Buffer_get_object)( buffer, be_index ) );
+    }
+
+    SIXTRL_INLINE
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC TDrift< NS(drift_real_t) > const*
+    TDrift< NS(drift_real_t) >::FromBufferObject(
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const
+            SIXTRL_RESTRICT be_info ) SIXTRL_NOEXCEPT
+    {
+        using  _this_t        = TDrift< NS(drift_real_t) >;
+        using beam_element_t  = _this_t;
+        using ptr_beam_elem_t =
+            SIXTRL_BUFFER_OBJ_DATAPTR_DEC beam_element_t const*;
+
+        if( ( be_info != nullptr ) &&
+            ( NS(Object_get_type_id)( be_info ) == NS(OBJECT_TYPE_DRIFT) ) &&
+            ( NS(Object_get_size)( be_info ) >= sizeof( _this_t ) ) )
+        {
+            return reinterpret_cast< ptr_beam_elem_t >(
+                static_cast< uintptr_t >( NS(Object_get_begin_addr)(
+                    be_info ) ) );
+        }
+
+        return nullptr;
+    }
+
+    SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC TDrift< NS(drift_real_t) >*
+    TDrift< NS(drift_real_t) >::FromBufferObject(
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
+            SIXTRL_RESTRICT be_info ) SIXTRL_NOEXCEPT
+    {
+        using  _this_t        = TDrift< NS(drift_real_t) >;
+        using beam_element_t  = _this_t;
+        using ptr_beam_elem_t = SIXTRL_BUFFER_OBJ_DATAPTR_DEC beam_element_t*;
+
+        using object_t        = NS(Object);
+        using ptr_const_obj_t = SIXTRL_BUFFER_OBJ_ARGPTR_DEC object_t const*;
+
+        ptr_const_obj_t const_be_info = be_info;
+
+        return const_cast< ptr_beam_elem_t >(
+            _this_t::FromBufferObject( const_be_info ) );
+    }
+
+    /* --------------------------------------------------------------------- */
 
     SIXTRL_INLINE bool TDrift< NS(drift_real_t) >::CanAddToBuffer(
             TDrift< NS(drift_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer,
@@ -683,37 +904,38 @@ namespace SIXTRL_NAMESPACE
             &buffer, ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDrift< NS(drift_real_t) >*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDrift< NS(drift_real_t) >*
     TDrift< NS(drift_real_t) >::CreateNewOnBuffer(
         TDrift< NS(drift_real_t) >::buffer_t&
             SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC TDrift< NS(drift_real_t) >*;
+        using ptr_t = SIXTRL_BE_ARGPTR_DEC TDrift< NS(drift_real_t) >*;
         return static_cast< ptr_t >( ::NS(Drift_new)( &buffer ) );
     }
 
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDrift< NS(drift_real_t) >*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDrift< NS(drift_real_t) >*
     TDrift< NS(drift_real_t) >::AddToBuffer(
         TDrift< NS(drift_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         TDrift< NS(drift_real_t) >::value_type const length )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC TDrift< NS(drift_real_t) >*;
+        using ptr_t = SIXTRL_BE_ARGPTR_DEC TDrift< NS(drift_real_t) >*;
         return static_cast< ptr_t >( ::NS(Drift_add)( &buffer, length ) );
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDrift< NS(drift_real_t) >::c_api_t const*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC
+    TDrift< NS(drift_real_t) >::c_api_t const*
     TDrift< NS(drift_real_t) >::getCApiPtr() const SIXTRL_NOEXCEPT
     {
-        return reinterpret_cast< SIXTRL_ARGPTR_DEC c_api_t const* >( this );
+        return reinterpret_cast< SIXTRL_BE_ARGPTR_DEC c_api_t const* >( this );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDrift< NS(drift_real_t) >::c_api_t*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDrift< NS(drift_real_t) >::c_api_t*
     TDrift< NS(drift_real_t) >::getCApiPtr() SIXTRL_NOEXCEPT
     {
-        return const_cast< SIXTRL_ARGPTR_DEC c_api_t* >(
+        return const_cast< SIXTRL_BE_ARGPTR_DEC c_api_t* >(
             static_cast< TDrift< NS(drift_real_t) > const& >(
                 *this ).getCApiPtr() );
     }
@@ -755,43 +977,144 @@ namespace SIXTRL_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC Drift*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC Drift*
     Drift_new( Buffer& SIXTRL_RESTRICT_REF buffer )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC Drift*;
+        using ptr_t = SIXTRL_BE_ARGPTR_DEC Drift*;
         return static_cast< ptr_t >( ::NS(Drift_new)( buffer.getCApiPtr() ) );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC Drift* Drift_new(
-        SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer )
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC Drift* Drift_new(
+        SIXTRL_BE_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC Drift*;
+        using ptr_t = SIXTRL_BE_ARGPTR_DEC Drift*;
         return static_cast< ptr_t >( ::NS(Drift_new)( ptr_buffer ) );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC Drift*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC Drift*
     Drift_add( Buffer& SIXTRL_RESTRICT_REF buffer,
                       Drift::value_type const length )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC Drift*;
+        using ptr_t = SIXTRL_BE_ARGPTR_DEC Drift*;
         return static_cast< ptr_t >(
             ::NS(Drift_add)( buffer.getCApiPtr(), length ) );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC Drift*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC Drift*
     Drift_add( NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
                       Drift::value_type const length )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC Drift*;
+        using ptr_t = SIXTRL_BE_ARGPTR_DEC Drift*;
         return static_cast< ptr_t >( ::NS(Drift_add)( ptr_buffer, length ) );
+    }
+
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC Drift*
+    Drift_add_copy( Buffer& SIXTRL_RESTRICT_REF buffer,
+                    Drift const& SIXTRL_RESTRICT_REF orig )
+    {
+        return Drift_add( buffer.getCApiPtr(), orig.getLength() );
+    }
+
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC Drift*
+    Drift_add_copy( NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
+                    Drift const& SIXTRL_RESTRICT_REF orig )
+    {
+        return Drift_add( ptr_buffer, orig.getLength() );
     }
 
     /* ===================================================================== *
      * ====  TDriftExact< NS(drift_real_t) >:
      * ===================================================================== */
 
+    SIXTRL_INLINE
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC TDriftExact< NS(drift_real_t) > const*
+    TDriftExact< NS(drift_real_t) >::FromBuffer(
+        Buffer const& SIXTRL_RESTRICT_REF buffer,
+        TDriftExact< NS(drift_real_t) >::size_type const be_index ) SIXTRL_NOEXCEPT
+    {
+        using  _this_t = TDriftExact< NS(drift_real_t) >;
+        return _this_t::FromBufferObject( buffer[ be_index ] );
+    }
+
+    SIXTRL_INLINE
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC TDriftExact< NS(drift_real_t) >*
+    TDriftExact< NS(drift_real_t) >::FromBuffer(
+        Buffer& SIXTRL_RESTRICT_REF buffer,
+        TDriftExact< NS(drift_real_t) >::size_type const be_index ) SIXTRL_NOEXCEPT
+    {
+        using  _this_t = TDriftExact< NS(drift_real_t) >;
+        return _this_t::FromBufferObject( buffer[ be_index ] );
+    }
+
+    SIXTRL_INLINE
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC TDriftExact< NS(drift_real_t) > const*
+    TDriftExact< NS(drift_real_t) >::FromBuffer( SIXTRL_BUFFER_ARGPTR_DEC
+        const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+            size_type const be_index ) SIXTRL_NOEXCEPT
+    {
+        using  _this_t = TDriftExact< NS(drift_real_t) >;
+        return _this_t::FromBufferObject(
+            NS(Buffer_get_const_object)( buffer, be_index ) );
+    }
+
+    SIXTRL_INLINE
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC TDriftExact< NS(drift_real_t) >*
+    TDriftExact< NS(drift_real_t) >::FromBuffer( SIXTRL_BUFFER_ARGPTR_DEC
+        NS(Buffer)* SIXTRL_RESTRICT buffer,
+            size_type const be_index ) SIXTRL_NOEXCEPT
+    {
+        using  _this_t = TDriftExact< NS(drift_real_t) >;
+
+        return _this_t::FromBufferObject(
+            NS(Buffer_get_object)( buffer, be_index ) );
+    }
+
+    SIXTRL_INLINE
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC TDriftExact< NS(drift_real_t) > const*
+    TDriftExact< NS(drift_real_t) >::FromBufferObject(
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const
+            SIXTRL_RESTRICT be_info ) SIXTRL_NOEXCEPT
+    {
+        using  _this_t        = TDriftExact< NS(drift_real_t) >;
+        using beam_element_t  = _this_t;
+        using ptr_beam_elem_t =
+            SIXTRL_BUFFER_OBJ_DATAPTR_DEC beam_element_t const*;
+
+        if( ( be_info != nullptr ) &&
+            ( NS(Object_get_type_id)( be_info ) == NS(OBJECT_TYPE_DRIFT_EXACT) ) &&
+            ( NS(Object_get_size)( be_info ) >= sizeof( _this_t ) ) )
+        {
+            return reinterpret_cast< ptr_beam_elem_t >(
+                static_cast< uintptr_t >( NS(Object_get_begin_addr)(
+                    be_info ) ) );
+        }
+
+        return nullptr;
+    }
+
+    SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC TDriftExact< NS(drift_real_t) >*
+    TDriftExact< NS(drift_real_t) >::FromBufferObject(
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
+            SIXTRL_RESTRICT be_info ) SIXTRL_NOEXCEPT
+    {
+        using  _this_t        = TDriftExact< NS(drift_real_t) >;
+        using beam_element_t  = _this_t;
+        using ptr_beam_elem_t = SIXTRL_BUFFER_OBJ_DATAPTR_DEC beam_element_t*;
+
+        using object_t        = NS(Object);
+        using ptr_const_obj_t = SIXTRL_BUFFER_OBJ_ARGPTR_DEC object_t const*;
+
+        ptr_const_obj_t const_be_info = be_info;
+
+        return const_cast< ptr_beam_elem_t >(
+            _this_t::FromBufferObject( const_be_info ) );
+    }
+
+    /* --------------------------------------------------------------------- */
+
     SIXTRL_INLINE bool TDriftExact< NS(drift_real_t) >::CanAddToBuffer(
-            TDriftExact< NS(drift_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+            TDriftExact< NS(drift_real_t) >::buffer_t&
+                SIXTRL_RESTRICT_REF buffer,
             TDriftExact< NS(drift_real_t) >::size_type*
                 SIXTRL_RESTRICT ptr_requ_objects,
             TDriftExact< NS(drift_real_t) >::size_type*
@@ -803,37 +1126,38 @@ namespace SIXTRL_NAMESPACE
             &buffer, ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDriftExact< NS(drift_real_t) >*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDriftExact< NS(drift_real_t) >*
     TDriftExact< NS(drift_real_t) >::CreateNewOnBuffer(
             TDriftExact< NS(drift_real_t) >::buffer_t&
                 SIXTRL_RESTRICT_REF buffer )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC TDriftExact< NS(drift_real_t) >*;
+        using ptr_t = SIXTRL_BE_ARGPTR_DEC TDriftExact< NS(drift_real_t) >*;
         return static_cast< ptr_t >( ::NS(DriftExact_new)( &buffer ) );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDriftExact< NS(drift_real_t) >*
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC TDriftExact< NS(drift_real_t) >*
     TDriftExact< NS(drift_real_t) >::AddToBuffer(
         TDriftExact< NS(drift_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         TDriftExact< NS(drift_real_t) >::value_type const length )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC TDriftExact< NS(drift_real_t) >*;
+        using ptr_t = SIXTRL_BE_ARGPTR_DEC TDriftExact< NS(drift_real_t) >*;
         return static_cast< ptr_t >( ::NS(DriftExact_add)( &buffer, length ) );
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     SIXTRL_INLINE
-    SIXTRL_ARGPTR_DEC TDriftExact< NS(drift_real_t) >::c_api_t const*
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< NS(drift_real_t) >::c_api_t const*
     TDriftExact< NS(drift_real_t) >::getCApiPtr() const SIXTRL_NOEXCEPT
     {
-        return static_cast< SIXTRL_ARGPTR_DEC c_api_t const* >( this );
+        return static_cast< SIXTRL_BE_ARGPTR_DEC c_api_t const* >( this );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDriftExact< NS(drift_real_t) >::c_api_t*
+    SIXTRL_INLINE
+    SIXTRL_BE_ARGPTR_DEC TDriftExact< NS(drift_real_t) >::c_api_t*
     TDriftExact< NS(drift_real_t) >::getCApiPtr() SIXTRL_NOEXCEPT
     {
-        return const_cast< SIXTRL_ARGPTR_DEC c_api_t* >(
+        return const_cast< SIXTRL_BE_ARGPTR_DEC c_api_t* >(
             static_cast< TDriftExact< NS(drift_real_t) > const& >(
                 *this ).getCApiPtr() );
     }
@@ -868,7 +1192,8 @@ namespace SIXTRL_NAMESPACE
     }
 
     SIXTRL_INLINE void TDriftExact< NS(drift_real_t) >::setLength(
-        TDriftExact< NS(drift_real_t) >::value_type const length ) SIXTRL_NOEXCEPT
+        TDriftExact< NS(drift_real_t) >::value_type const
+            length ) SIXTRL_NOEXCEPT
     {
         ::NS(DriftExact_set_length)( this->getCApiPtr(), length );
         return;
@@ -876,37 +1201,51 @@ namespace SIXTRL_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC DriftExact* DriftExact_new(
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC DriftExact* DriftExact_new(
         Buffer& SIXTRL_RESTRICT_REF buffer )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC DriftExact*;
+        using ptr_t = SIXTRL_BE_ARGPTR_DEC DriftExact*;
         return static_cast< ptr_t >(
             ::NS(DriftExact_new)( buffer.getCApiPtr() ) );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC DriftExact* DriftExact_new(
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC DriftExact* DriftExact_new(
         ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC DriftExact*;
+        using ptr_t = SIXTRL_BE_ARGPTR_DEC DriftExact*;
         return static_cast< ptr_t >( ::NS(DriftExact_new)( ptr_buffer ) );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC DriftExact* DriftExact_add(
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC DriftExact* DriftExact_add(
         Buffer& SIXTRL_RESTRICT_REF buffer,
         DriftExact::value_type const length )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC DriftExact*;
+        using ptr_t = SIXTRL_BE_ARGPTR_DEC DriftExact*;
         return static_cast< ptr_t >(
                 ::NS(DriftExact_add)( buffer.getCApiPtr(), length ) );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC DriftExact* DriftExact_add(
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC DriftExact* DriftExact_add(
         NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
         DriftExact::value_type const length )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC DriftExact*;
+        using ptr_t = SIXTRL_BE_ARGPTR_DEC DriftExact*;
         return static_cast< ptr_t >(
             ::NS(DriftExact_add)( ptr_buffer, length ) );
+    }
+
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC DriftExact*
+    DriftExact_add_copy( Buffer& SIXTRL_RESTRICT_REF buffer,
+                    DriftExact const& SIXTRL_RESTRICT_REF orig )
+    {
+        return DriftExact_add( buffer.getCApiPtr(), orig.getLength() );
+    }
+
+    SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC DriftExact*
+    DriftExact_add_copy( NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
+        DriftExact const& SIXTRL_RESTRICT_REF orig )
+    {
+        return DriftExact_add( ptr_buffer, orig.getLength() );
     }
 }
 
