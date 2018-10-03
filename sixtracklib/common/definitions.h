@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB__IMPL_DEFINITIONS_H__
-#define SIXTRACKLIB__IMPL_DEFINITIONS_H__
+#ifndef SIXTRACKLIB_COMMON_DEFINITIONS_H__
+#define SIXTRACKLIB_COMMON_DEFINITIONS_H__
 
 #if !defined( _GPUCODE ) || defined( __CUDACC__ )
     #if defined( __cplusplus )
@@ -20,7 +20,8 @@
 #endif /* !defined( _GPUCODE ) || defined(__CUDACC__ ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/namespace_begin.h"
+    #include "sixtracklib/common/generated/namespace.h"
+    #include "sixtracklib/common/internal/namespace_begin.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( SIXTRL_ARGPTR_DEC )
@@ -775,6 +776,6 @@
 
 /* ------------------------------------------------------------------------- */
 
-#endif /* SIXTRACKLIB__IMPL_DEFINITIONS_H__ */
+#endif /* SIXTRACKLIB_COMMON_DEFINITIONS_H__ */
 
-/* end: sixtracklib/_impl/definitions.h */
+/* end: sixtracklib/common/definitions.h */

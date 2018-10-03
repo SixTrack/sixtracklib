@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_IMPL_BUFFER_OBJECT_DEFINES_H__
-#define SIXTRACKLIB_COMMON_IMPL_BUFFER_OBJECT_DEFINES_H__
+#ifndef SIXTRACKLIB_COMMON_INTERNAL_BUFFER_OBJECT_DEFINES_H__
+#define SIXTRACKLIB_COMMON_INTERNAL_BUFFER_OBJECT_DEFINES_H__
 
 #if !defined( SIXTRL_BUFFER_OBJ_ARGPTR_DEC )
     #define SIXTRL_BUFFER_OBJ_ARGPTR_DEC_UNDEF
@@ -23,6 +23,6 @@
     #endif /* defined( SIXTRL_DATAPTR_DEC ) */
 #endif /* !defined( SIXTRL_BUFFER_OBJ_DATAPTR_DEC ) */
 
-#endif /* SIXTRACKLIB_COMMON_IMPL_BUFFER_OBJECT_DEFINES_H__ */
+#endif /* SIXTRACKLIB_COMMON_INTERNAL_BUFFER_OBJECT_DEFINES_H__ */
 
-/* end: sixtracklib/common/impl/buffer_object_defines.h */
+/* end: sixtracklib/common/internal/buffer_object_defines.h */

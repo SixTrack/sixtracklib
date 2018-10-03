@@ -1,20 +1,11 @@
-#ifndef SIXTRACKLIB__IMPL_NAMESPACE_BEGIN_H__
-#define SIXTRACKLIB__IMPL_NAMESPACE_BEGIN_H__
+#ifndef SIXTRACKLIB_COMMON_INTERNAL_NAMESPACE_DEFINES_HEADER_H__
+#define SIXTRACKLIB_COMMON_INTERNAL_NAMESPACE_DEFINES_HEADER_H__
 
-#if !defined( SIXTRL_NAMESPACE )
-    #define SIXTRL_NAMESPACE
+#include "sixtracklib/common/generated/namespace.h"
 
-    #if !defined( __NAMESPACE )
-        #define __NAMESPACE
-    #endif /* __NAMESPACE */
-
-#else /* defined( SIXTRL_NAMESPACE ) */
-
-    #if !defined( __NAMESPACE )
-        #define __NAMESPACE #SIXTRL_NAMESPACE ## "_"
-    #endif /* !defined( __NAMESPACE ) */
-
-#endif /* defined( SIXTRL_NAMESPACE ) */
+#if !defined( SIXTRL_C99_NAMESPACE )
+    #define   SIXTRL_C99_NAMESPACE  st_
+#endif /* !defined( SIXTRL_C99_NAMESPACE ) */
 
 #if !defined( NS_CONCAT_ )
     #define NS_CONCAT_( A, B ) A##B
@@ -25,13 +16,13 @@
 #endif /* !defined( NS_CONCAT ) */
 
 #if !defined( NS )
-    #define NS(name) NS_CONCAT( __NAMESPACE, name )
+    #define NS(name) NS_CONCAT( SIXTRL_C99_NAMESPACE, name )
 #endif /* !defined( NS ) */
 
 #if !defined( _GPUCODE )
 #if !defined( NSVAR )
     #define NSVAR(name, ...) \
-        NS_CONCAT( __NAMESPACE, NS_CONCAT( #name, ##__VA_ARGS__ ) )
+        NS_CONCAT( SIXTRL_C99_NAMESPACE, NS_CONCAT( #name, ##__VA_ARGS__ ) )
 #endif /* !defined( NSVAR ) */
 #endif /* !defined( _GPUCODE ) */
 
@@ -46,6 +37,6 @@
 #endif /* !defined( NSEXTVAR ) */
 #endif /* !defined( _GPUCODE ) */
 
-#endif /* SIXTRACKLIB__IMPL_NAMESPACE_BEGIN_H__ */
+#endif /* SIXTRACKLIB_COMMON_INTERNAL_NAMESPACE_DEFINES_HEADER_H__ */
 
-/* end: sixtracklib/_impl/namespace_begin.h */
+/* end: sixtracklib/common/internal/namespace_defines.h */

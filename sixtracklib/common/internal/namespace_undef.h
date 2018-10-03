@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB__IMPL_NAMESPACE_END_H__
-#define SIXTRACKLIB__IMPL_NAMESPACE_END_H__
+#ifndef SIXTRACKLIB_COMMON_INTERNAL_NAMESPACE_UNDEF_HEADER_H__
+#define SIXTRACKLIB_COMMON_INTERNAL_NAMESPACE_UNDEF_HEADER_H__
 
 #if defined( NS )
     #undef NS
@@ -25,6 +25,6 @@
     #undef NS_CONCAT_
 #endif /* defined( NS_CONCAT_ ) */
 
-#endif /* SIXTRACKLIB__IMPL_NAMESPACE_END_H__ */
+#endif /* SIXTRACKLIB_COMMON_INTERNAL_NAMESPACE_UNDEF_HEADER_H__ */
 
-/* end: sixtracklib/_impl/namespace_end.h */
+/* end: sixtracklib/common/internal/namespace_undef.h */
