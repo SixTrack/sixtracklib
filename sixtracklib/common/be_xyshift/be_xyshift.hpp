@@ -1,5 +1,5 @@
-#ifndef CXX_SIXTRACKLIB_COMMON_IMPL_BE__HPP__
-#define CXX_SIXTRACKLIB_COMMON_IMPL_BE__HPP__
+#ifndef CXX_SIXTRACKLIB_COMMON_BE_XYSHIFT_BE__HPP__
+#define CXX_SIXTRACKLIB_COMMON_BE_XYSHIFT_BE__HPP__
 
 #if defined( __cplusplus )
 
@@ -12,12 +12,13 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer.hpp"
-    #include "sixtracklib/common/impl/be_xyshift.h"
+    #include "sixtracklib/common/be_xyshift/be_xyshift.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     /* ===================================================================== *
      * ====  TXYShift< T > :
@@ -183,7 +184,7 @@ namespace SIXTRL_NAMESPACE
  * *** Implementation of inline and template member functions          ***** *
  * ************************************************************************* */
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     /* ===================================================================== *
      * ====  TXYShift< T > :
@@ -488,6 +489,6 @@ namespace SIXTRL_NAMESPACE
 
 #endif /* defined( __cplusplus ) */
 
-#endif /* CXX_SIXTRACKLIB_COMMON_IMPL_BE__HPP__ */
+#endif /* CXX_SIXTRACKLIB_COMMON_BE_XYSHIFT_BE__HPP__ */
 
-/* end:  sixtracklib/common/impl/be_xyshift.hpp */
+/* end:  sixtracklib/common/be_xyshift/be_xyshift.hpp */

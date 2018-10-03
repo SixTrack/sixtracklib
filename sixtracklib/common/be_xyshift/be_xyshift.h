@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_IMPL_BEAM_ELEMENT_XYSHIFT_H__
-#define SIXTRACKLIB_COMMON_IMPL_BEAM_ELEMENT_XYSHIFT_H__
+#ifndef SIXTRACKLIB_COMMON_BE_XYSHIFT_BEAM_ELEMENT_XYSHIFT_H__
+#define SIXTRACKLIB_COMMON_BE_XYSHIFT_BEAM_ELEMENT_XYSHIFT_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -8,10 +8,10 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/beam_elements_defines.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -383,6 +383,6 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(XYShift)* NS(XYShift_add_copy)(
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_COMMON_IMPL_BEAM_ELEMENT_XYSHIFT_H__ */
+#endif /* SIXTRACKLIB_COMMON_BE_XYSHIFT_BEAM_ELEMENT_XYSHIFT_H__ */
 
-/*end: sixtracklib/common/impl/be_xyshift.h */
+/*end: sixtracklib/common/be_xyshift/be_xyshift.h */
