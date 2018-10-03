@@ -48,6 +48,10 @@ int main( int argc, char* argv[] )
     assert( copy_of_drift != drift  );
     assert( memcmp( copy_of_drift, drift, sizeof( st_Drift ) ) == 0 );
 
+    #if defined( NDEBUG )
+    ( void )copy_of_drift;
+    #endif /* if defined( NDEBUG ) */
+
     length += ( double )1.0L;
     ++ii;
 

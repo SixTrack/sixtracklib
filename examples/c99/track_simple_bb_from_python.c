@@ -18,7 +18,7 @@ int main( int argc, char* argv[] )
 
     char path2particle_file[ 256 ];
     char path2beam_elements_file[ 256 ];
-    
+
     memset( path2particle_file, (int)'\0', 256 );
     strncpy( path2particle_file, st_PATH_TO_BASE_DIR, 256 );
     strcat( path2particle_file,  PARTFILE);
@@ -113,19 +113,24 @@ int main( int argc, char* argv[] )
         {
             st_Particles* pdump = st_Particles_add_copy(dump, particles);
             assert(pdump != 0);
+
+            #if defined( NDEBUG )
+            ( void )pdump;
+            #endif /* !defined( NDEBUG ) */
+
             st_Track_particle_subset_beam_element_obj( particles, 0, NUM_PARTICLES, elem);
             elem++;
-            
+
             //st_Particles_print(stdout, pdump);
         }
-        
+
     }
 
     printf("N objects in dump %d\n", (int)st_Buffer_get_num_of_objects(dump));
 
     // Write to file
     st_Buffer_write_to_file(dump, "stlib_dump.bin");
-    
+
     //st_Buffer* test = st_Buffer_new_from_file("stlib_dump.bin");
     //st_Particles_buffer_print(stdout, test);
 
