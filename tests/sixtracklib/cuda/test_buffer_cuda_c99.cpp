@@ -20,7 +20,7 @@
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
 
-#include "sixtracklib/cuda/impl/cuda_buffer_generic_obj_kernel.cuh"
+#include "sixtracklib/testlib/cuda/cuda_buffer_generic_obj_kernel_c_wrapper.h"
 
 
 TEST( C99_Cuda_BufferTests,
@@ -50,17 +50,6 @@ TEST( C99_Cuda_BufferTests,
         ::st_Buffer_get_max_num_of_garbage_ranges( orig_buffer ) );
 
     ASSERT_TRUE( success == 0 );
-
-    unsigned char const* orig_buffer_begin =
-        ::st_Buffer_get_const_data_begin( orig_buffer );
-
-    ASSERT_TRUE( orig_buffer_begin != nullptr );
-
-    unsigned char* copy_buffer_begin =
-        ::st_Buffer_get_data_begin( copy_buffer );
-
-    ASSERT_TRUE( copy_buffer_begin != nullptr );
-    ASSERT_TRUE( copy_buffer_begin != orig_buffer_begin );
 
     /* --------------------------------------------------------------------- */
 
@@ -114,12 +103,6 @@ TEST( C99_Cuda_BufferTests,
             ASSERT_TRUE( !::st_Buffer_needs_remapping( copy_buffer ) );
             ASSERT_TRUE( !::st_Buffer_needs_remapping( orig_buffer ) );
 
-            ASSERT_TRUE( !::st_ManagedBuffer_needs_remapping(
-                orig_buffer_begin, ::st_Buffer_get_slot_size( orig_buffer ) ) );
-
-            ASSERT_TRUE( !::st_ManagedBuffer_needs_remapping(
-                copy_buffer_begin, ::st_Buffer_get_slot_size( copy_buffer ) ) );
-
             /* ------------------------------------------------------------- */
 
             cudaDeviceProp properties;
@@ -137,8 +120,8 @@ TEST( C99_Cuda_BufferTests,
 
             /* ------------------------------------------------------------- */
 
-            int success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda(
-                dim3{ 1 }, dim3{ 1 }, orig_buffer_begin, copy_buffer_begin );
+            int success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda_grid(
+                orig_buffer, copy_buffer, 1, 1 );
 
             ASSERT_TRUE( success == 0 );
 
@@ -200,9 +183,8 @@ TEST( C99_Cuda_BufferTests,
 
             /* ------------------------------------------------------------- */
 
-            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda(
-                dim3{ num_objects }, dim3{ 1 }, orig_buffer_begin,
-                    copy_buffer_begin );
+            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda_grid(
+                orig_buffer, copy_buffer, num_objects, 1 );
 
             ASSERT_TRUE( success == 0 );
 
@@ -264,9 +246,8 @@ TEST( C99_Cuda_BufferTests,
 
             /* ------------------------------------------------------------- */
 
-            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda(
-                dim3{ 128 }, dim3{ 1 }, orig_buffer_begin,
-                    copy_buffer_begin );
+            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda_grid(
+                orig_buffer, copy_buffer, 128, 1 );
 
             ASSERT_TRUE( success == 0 );
 
@@ -328,9 +309,8 @@ TEST( C99_Cuda_BufferTests,
 
             /* ------------------------------------------------------------- */
 
-            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda(
-                dim3{ 1 }, dim3{ num_objects }, orig_buffer_begin,
-                    copy_buffer_begin );
+            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda_grid(
+                orig_buffer, copy_buffer, 1, num_objects );
 
             ASSERT_TRUE( success == 0 );
 
@@ -392,9 +372,8 @@ TEST( C99_Cuda_BufferTests,
 
             /* ------------------------------------------------------------- */
 
-            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda(
-                dim3{ 1 }, dim3{ 128 }, orig_buffer_begin,
-                    copy_buffer_begin );
+            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda_grid(
+                orig_buffer, copy_buffer, 1, 128 );
 
             ASSERT_TRUE( success == 0 );
 
@@ -456,9 +435,8 @@ TEST( C99_Cuda_BufferTests,
 
             /* ------------------------------------------------------------- */
 
-            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda(
-                dim3{ 128 }, dim3{ 128 }, orig_buffer_begin,
-                    copy_buffer_begin );
+            success = ::st_Run_test_buffer_generic_obj_kernel_on_cuda_grid(
+                orig_buffer, copy_buffer, 128, 128);
 
             ASSERT_TRUE( success == 0 );
 
