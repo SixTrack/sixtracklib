@@ -7,7 +7,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #include "sixtracklib/common/buffer/managed_buffer_remap.h"
-    #include "sixtracklib/testlib/generic_buffer_obj.h"
+    #include "sixtracklib/testlib/common/generic_buffer_obj.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __kernel void NS(remap_orig_buffer)(
