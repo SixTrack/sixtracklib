@@ -201,7 +201,7 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
                           1023 );
 
             std::strncat( path_to_copy_kernel_program,
-                          "tests/sixtracklib/opencl/",
+                          "tests/sixtracklib/testlib/opencl/kernels/",
                           1023 - std::strlen( path_to_copy_kernel_program ) );
 
             std::strncat( path_to_copy_kernel_program,

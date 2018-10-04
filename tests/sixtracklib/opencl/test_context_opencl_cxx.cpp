@@ -148,7 +148,7 @@ TEST( CXX_OpenCL_Context, BaseOpenCLContextClArgument )
             /* Add copy generic obj buffer program */
 
             std::string path_to_copy_kernel_program( ::st_PATH_TO_BASE_DIR );
-            path_to_copy_kernel_program += "tests/sixtracklib/opencl/";
+            path_to_copy_kernel_program += "tests/sixtracklib/testlib/opencl/kernels/";
             path_to_copy_kernel_program += "opencl_buffer_generic_obj_kernel.cl";
 
             std::string copy_program_compile_options = "-D_GPUCODE=1";
