@@ -81,8 +81,11 @@ NS(Buffer)* NS(Buffer_allocate_generic)(
     buf_size_t const min_required_capacity =
         NS(BUFFER_DEFAULT_HEADER_SIZE) + ( buf_size_t )4u * section_hd_size;
 
-    if( ( ptr_buffer != SIXTRL_NULLPTR ) &&
-        ( min_required_capacity <= buffer_capacity ) )
+    buf_size_t const requ_capacity =
+        ( min_required_capacity <= buffer_capacity )
+            ? buffer_capacity : min_required_capacity;
+
+    if( ptr_buffer != SIXTRL_NULLPTR )
     {
         if( ( buffer_flags & NS(BUFFER_DATASTORE_MEMPOOL) ) ==
             NS(BUFFER_DATASTORE_MEMPOOL) )
@@ -96,10 +99,10 @@ NS(Buffer)* NS(Buffer_allocate_generic)(
             NS(MemPool_set_chunk_size)( ptr_mem_pool, slot_size );
 
             if( NS(MemPool_reserve_aligned)( ptr_mem_pool,
-                    buffer_capacity, slot_size ) )
+                    requ_capacity, slot_size ) )
             {
                 NS(AllocResult) result = NS(MemPool_append_aligned)(
-                    ptr_mem_pool, buffer_capacity, slot_size );
+                    ptr_mem_pool, requ_capacity, slot_size );
 
                 if( NS(AllocResult_valid)( &result ) )
                 {

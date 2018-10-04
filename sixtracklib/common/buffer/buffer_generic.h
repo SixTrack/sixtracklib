@@ -404,10 +404,11 @@ SIXTRL_INLINE int NS(Buffer_reserve_capacity_generic)(
                 ptr_to_mem_pool_t mem_pool = ( ptr_to_mem_pool_t )(
                     uintptr_t )datastore_addr;
 
-                #if !defined( NDEBUG )
-                address_t const old_base_addr = ( address_t )( uintptr_t
-                    )NS(MemPool_get_begin_pos)( mem_pool );
-                #endif /* !defined( NDEBUG ) */
+                ptr_to_raw_t old_begin = ( ptr_to_raw_t )( uintptr_t
+                   )NS(MemPool_get_begin_pos)( mem_pool );
+
+                address_t const old_base_addr =
+                    ( address_t )( uintptr_t )old_begin;
 
                 buf_size_t bytes_missing = new_buffer_capacity;
 
@@ -421,61 +422,83 @@ SIXTRL_INLINE int NS(Buffer_reserve_capacity_generic)(
                     NS(Buffer_get_capacity)( buffer ) );
 
                 SIXTRL_ASSERT( ( old_base_addr % slot_size ) == ZERO_SIZE );
+                SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)(
+                    old_begin, slot_size ) );
 
-                if( ( bytes_missing > ZERO_SIZE ) &&
-                    ( 0 == NS(MemPool_reserve_aligned)( mem_pool,
-                            new_buffer_capacity, slot_size ) ) )
+                if( bytes_missing > ZERO_SIZE )
                 {
-                    alloc_result_t result;
+                    bool const changed_base_addr = NS(MemPool_reserve_aligned)(
+                        mem_pool, new_buffer_capacity, slot_size );
 
-                    SIXTRL_ASSERT( NS(MemPool_get_remaining_bytes)( mem_pool )
-                        >= bytes_missing );
-
-                    result = NS(MemPool_append_aligned)(
-                        mem_pool, bytes_missing, slot_size );
-
-                    if( NS(AllocResult_valid)( &result ) )
+                    if( NS(MemPool_get_remaining_bytes)( mem_pool ) >=
+                        bytes_missing )
                     {
                         ptr_to_raw_t new_begin = ( ptr_to_raw_t )( uintptr_t
-                            )NS(MemPool_get_begin_pos)( mem_pool );
+                                )NS(MemPool_get_begin_pos)( mem_pool );
 
-                        if( !NS(ManagedBuffer_needs_remapping)(
-                                new_begin, slot_size ) )
+                        address_t const new_begin_addr = ( address_t )(
+                            uintptr_t )new_begin;
+
+                        SIXTRL_ASSERT( new_begin_addr != ( address_t )0 );
+
+                        if( ( new_begin_addr == old_base_addr ) &&
+                            ( !changed_base_addr ) )
+                        {
+                            success = 0;
+                        }
+                        else
                         {
                             success = NS(ManagedBuffer_remap)(
                                 new_begin, slot_size );
                         }
-                        else
-                        {
-                            success = 0;
-                        }
+
+                        SIXTRL_ASSERT( ( !NS(ManagedBuffer_needs_remapping)(
+                                new_begin, slot_size ) ) || ( success != 0 ) );
 
                         if( success == 0 )
                         {
-                            buffer->data_addr =
-                                ( address_t )( uintptr_t )new_begin;
+                            alloc_result_t result = NS(MemPool_append_aligned)(
+                                mem_pool, bytes_missing, slot_size );
 
-                            buffer->data_size +=
-                                NS(AllocResult_get_length)( &result );
+                            SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)(
+                                new_begin, slot_size ) );
 
-                            buffer->data_capacity =
-                                NS(MemPool_get_size)( mem_pool );
+                            if( NS(AllocResult_valid)( &result ) )
+                            {
+                                SIXTRL_STATIC_VAR raw_t Z = ( raw_t )0;
+
+                                SIXTRL_STATIC_VAR buf_size_t const
+                                    OBJECTS_ID = ( buf_size_t )4u;
+
+                                buffer->object_addr = ( address_t )( uintptr_t
+                                    )NS(ManagedBuffer_get_const_ptr_to_section)(
+                                        new_begin, OBJECTS_ID, slot_size );
+
+                                buffer->data_capacity =
+                                    NS(MemPool_get_size)( mem_pool );
+
+                                buffer->data_addr = new_begin_addr;
+
+                                SIXTRACKLIB_SET_VALUES( raw_t,
+                                    NS(AllocResult_get_pointer)( &result ),
+                                    NS(AllocResult_get_length)( &result ), Z );
+                            }
                         }
                     }
                 }
-                else if( bytes_missing == ZERO_SIZE )
+                else
+                {
+                    success = 0;
+                }
+
+                #else  /* !defined( _GPUCODE ) */
+
+                if( new_buffer_capacity <= NS(Buffer_get_capacity)( buffer ) )
                 {
                     success = 0;
                 }
 
                 #endif /* !defined( _GPUCODE ) */
-            }
-            else
-            {
-                SIXTRL_ASSERT( new_buffer_capacity <=
-                    NS(Buffer_get_capacity)( buffer ) );
-
-                success = 0;
             }
         }
     }
@@ -540,8 +563,8 @@ SIXTRL_INLINE int NS(Buffer_reserve_generic)(
 
             if( success == 0 )
             {
-                needs_resizing = ( NS(Buffer_get_capacity)(
-                    buffer ) >= requ_buffer_capacity );
+                current_capacity = NS(Buffer_get_capacity)( buffer );
+                needs_resizing   = ( current_capacity  < requ_buffer_capacity );
             }
         }
 
@@ -711,27 +734,30 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
             success = NS(Buffer_reserve_generic)( buffer,
                 requ_num_objects, requ_num_slots,
                     requ_num_dataptrs, max_num_garbage_ranges );
+
+            begin = ( ptr_to_raw_t )( uintptr_t
+                )NS(Buffer_get_data_begin_addr)( buffer );
         }
         else
         {
             success = 0;
         }
 
-        SIXTRL_ASSERT(
-            ( success != 0 ) ||
-            ( ( requ_num_objects <=
+        SIXTRL_ASSERT( ( success != 0 ) || ( requ_num_objects <=
+                        NS(ManagedBuffer_get_section_max_num_entities)(
+                            begin, OBJS_ID, slot_size ) ) );
+
+        SIXTRL_ASSERT( ( success != 0 ) || ( requ_num_slots <=
                 NS(ManagedBuffer_get_section_max_num_entities)(
-                    begin, OBJS_ID, slot_size ) ) &&
-              ( requ_num_slots <=
+                    begin, SLOTS_ID, slot_size ) ) );
+
+        SIXTRL_ASSERT( ( success != 0 ) || ( requ_num_dataptrs <=
                 NS(ManagedBuffer_get_section_max_num_entities)(
-                    begin, SLOTS_ID, slot_size ) ) &&
-              ( requ_num_dataptrs <=
+                    begin, DATAPTRS_ID, slot_size ) ) );
+
+        SIXTRL_ASSERT( ( success != 0 ) || ( max_num_garbage_ranges <=
                 NS(ManagedBuffer_get_section_max_num_entities)(
-                    begin, DATAPTRS_ID, slot_size ) ) &&
-              ( max_num_garbage_ranges <=
-                NS(ManagedBuffer_get_section_max_num_entities)(
-                    begin, GARBAGE_ID, slot_size ) )
-            ) );
+                    begin, GARBAGE_ID, slot_size ) ) );
 
         /* ----------------------------------------------------------------- */
 
