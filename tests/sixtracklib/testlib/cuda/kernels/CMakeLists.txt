@@ -26,11 +26,11 @@ add_library( sixtrack_test_cuda_device OBJECT
 )
 
 target_compile_definitions( sixtrack_test_cuda_device
-                            PUBLIC ${TESTLIB_CUDA_DEVICE_PART_DEFINITIONS} )
+    PUBLIC ${TESTLIB_CUDA_DEVICE_PART_DEFINITIONS} )
 
 target_include_directories( sixtrack_test_cuda_device
     PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
-    PRIVATE $<BUILD_INTERFACE:"${CMAKE_SOURCE_DIR}/tests">
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests>
 )
 
 set_target_properties(  sixtrack_test_cuda_device
@@ -60,8 +60,8 @@ set_target_properties(  sixtrack_test_cuda_device
 # ------------------------------------------------------------------------------
 # pass the submodule library on to sixtracklib:
 
-set(  SIXTRACKL_LIBRARY_MODULES
-    ${SIXTRACKL_LIBRARY_MODULES}
+set(  SIXTRACKL_TESTLIB_LIBRARY_MODULES
+    ${SIXTRACKL_TESTLIB_LIBRARY_MODULES}
     $<TARGET_OBJECTS:sixtrack_test_cuda_device> CACHE INTERNAL "" FORCE )
 
 # ------------------------------------------------------------------------------

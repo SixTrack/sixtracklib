@@ -1,5 +1,5 @@
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/cuda/impl/cuda_buffer_generic_obj_kernel.cuh"
+    #include "sixtracklib/testlib/cuda/kernels/cuda_buffer_generic_obj_kernel.cuh"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
@@ -11,8 +11,8 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #include "sixtracklib/common/buffer/managed_buffer_remap.h"
-    #include "sixtracklib/testlib/generic_buffer_obj.h"
-    #include "sixtracklib/cuda/impl/cuda_tools.h"
+    #include "sixtracklib/testlib/common/generic_buffer_obj.h"
+    #include "sixtracklib/cuda/cuda_tools.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 extern __global__ void Remap_original_buffer_kernel_cuda(
@@ -24,12 +24,6 @@ extern __global__ void NS(Copy_original_buffer_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT orig_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char*       SIXTRL_RESTRICT copy_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC int32_t* SIXTRL_RESTRICT ptr_success_flag );
-
-extern __host__ int NS(Run_test_buffer_generic_obj_kernel_on_cuda)(
-    dim3 const grid_dim, dim3 const block_dim,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT orig_buffer,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT copy_buffer );
-
 
 __global__ void NS(Remap_original_buffer_kernel_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT orig_begin,
@@ -210,162 +204,4 @@ __global__ void NS(Copy_original_buffer_kernel_cuda)(
     return;
 }
 
-__host__ int NS(Run_test_buffer_generic_obj_kernel_on_cuda)(
-    dim3 const grid_dim, dim3 const block_dim,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT orig_buffer_begin,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT copy_buffer_begin )
-{
-    typedef NS(buffer_size_t) buf_size_t;
-
-    int success = -16;
-
-    buf_size_t const slot_size = ( buf_size_t )8u;
-
-    size_t const orig_buffer_size = NS(ManagedBuffer_get_buffer_length)(
-        orig_buffer_begin, slot_size );
-
-    size_t const copy_buffer_size = NS(ManagedBuffer_get_buffer_length)(
-        copy_buffer_begin, slot_size );
-
-    if( ( orig_buffer_begin != SIXTRL_NULLPTR ) &&
-        ( copy_buffer_begin != SIXTRL_NULLPTR ) &&
-        ( orig_buffer_size > slot_size ) &&
-        ( orig_buffer_size == copy_buffer_size ) )
-    {
-        int32_t success_flag = 0;
-
-        unsigned char* cuda_orig_begin = nullptr;
-        unsigned char* cuda_copy_begin = nullptr;
-        int32_t* cuda_success_flag     = nullptr;
-
-        SIXTRL_ASSERT( orig_buffer_size == copy_buffer_size );
-
-        SIXTRL_ASSERT( NS(ManagedBuffer_get_num_objects)( orig_buffer_begin,
-            slot_size ) == NS(ManagedBuffer_get_num_of_objects)(
-                copy_buffer_begin, slot_size ) );
-
-        SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)(
-            orig_buffer_begin, slot_size ) );
-
-        SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)(
-            copy_buffer_begin, slot_size ) );
-
-        if( cudaSuccess == cudaMalloc(
-            ( void** )&cuda_orig_begin, orig_buffer_size ) )
-        {
-            success = 0;
-        }
-
-        if( ( success == 0 ) && ( cudaSuccess != cudaMalloc(
-                ( void** )&cuda_copy_begin, copy_buffer_size ) ) )
-        {
-            success |= -32;
-        }
-
-        if( ( success == 0 ) && ( cudaSuccess != cudaMalloc(
-                ( void** )&cuda_success_flag, sizeof( success_flag ) ) ) )
-        {
-            success |= -64;
-        }
-
-        SIXTRL_ASSERT( ( success != 0 ) ||
-            ( cuda_orig_begin != SIXTRL_NULLPTR ) &&
-            ( cuda_copy_begin != SIXTRL_NULLPTR ) &&
-            ( cuda_success_flag != SIXTRL_NULLPTr ) );
-
-        if( ( success == 0 ) &&
-            ( cudaSuccess != cudaMemcpy( cuda_orig_begin, orig_buffer_begin,
-                orig_buffer_size, cudaMemcpyHostToDevice ) ) )
-        {
-            success |= -128;
-        }
-
-        if( ( success == 0 ) &&
-            ( cudaSuccess != cudaMemcpy( cuda_copy_begin, copy_buffer_begin,
-                copy_buffer_size, cudaMemcpyHostToDevice ) ) )
-        {
-            success |= -256;
-        }
-
-        if( ( success == 0 ) &&
-            ( cudaSuccess != cudaMemcpy( cuda_success_flag, &success_flag,
-                sizeof( success_flag ), cudaMemcpyHostToDevice ) ) )
-        {
-            success |= -512;
-        }
-
-
-        if( success == 0 )
-        {
-            NS(Remap_original_buffer_kernel_cuda)<<< grid_dim, block_dim >>>(
-                cuda_orig_begin, cuda_copy_begin, cuda_success_flag );
-
-            if( cudaSuccess != cudaDeviceSynchronize() )
-            {
-                success |= -1024;
-            }
-        }
-
-        if( ( success == 0 ) &&
-            ( cudaSuccess != cudaMemcpy( &success_flag, cuda_success_flag,
-                sizeof( success_flag ), cudaMemcpyDeviceToHost ) ) )
-        {
-            success |= -2048;
-        }
-
-        if( success == 0 )
-        {
-            success |= ( int )success_flag;
-        }
-
-        if( success == 0 )
-        {
-            NS(Copy_original_buffer_kernel_cuda)<<< grid_dim, block_dim >>>(
-                cuda_orig_begin, cuda_copy_begin, cuda_success_flag );
-
-            if( cudaSuccess != cudaDeviceSynchronize() )
-            {
-                success |= -4096;
-            }
-        }
-
-        if( ( success == 0 ) &&
-            ( cudaSuccess != cudaMemcpy( &success_flag, cuda_success_flag,
-                sizeof( success_flag ), cudaMemcpyDeviceToHost ) ) )
-        {
-            success |= -8192;
-        }
-
-        if( success == 0 )
-        {
-            success |= ( int )success_flag;
-        }
-
-        if( ( success == 0 ) &&
-            ( cudaSuccess != cudaMemcpy( copy_buffer_begin, cuda_copy_begin,
-                copy_buffer_size, cudaMemcpyDeviceToHost ) ) )
-        {
-            success |= -16384;
-        }
-
-        if( ( success == 0 ) &&
-            ( 0 != NS(ManagedBuffer_remap)( copy_buffer_begin, slot_size ) ) )
-        {
-            success |= -32768;
-        }
-
-        if( ( ( cuda_orig_begin != SIXTRL_NULLPTR ) &&
-              ( cudaSuccess != cudaFree( cuda_orig_begin ) ) ) ||
-            ( ( cuda_copy_begin != SIXTRL_NULLPTR ) &&
-              ( cudaSuccess != cudaFree( cuda_copy_begin ) ) ) ||
-            ( ( cuda_success_flag != SIXTRL_NULLPTR ) &&
-              ( cudaSuccess != cudaFree( cuda_success_flag ) ) ) )
-        {
-            success |= -65536;
-        }
-    }
-
-    return success;
-}
-
-/* end: tests/sixtracklib/cuda/details/cuda_buffer_generic_obj_kernel.cu */
+/* end: tests/sixtracklib/testlib/cuda/kernels/cuda_buffer_generic_obj_kernel.cu */

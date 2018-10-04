@@ -1,8 +1,5 @@
-#ifndef SIXTRL_TESTS_SIXTRACKLIB_OPENCL_TEST_TEST_BEAM_ELEMENTS_KERNEL_CL__
-#define SIXTRL_TESTS_SIXTRACKLIB_OPENCL_TEST_TEST_BEAM_ELEMENTS_KERNEL_CL__
-
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/cuda/impl/cuda_beam_elements_kernel.cuh"
+    #include "sixtracklib/testlib/cuda/kernels/cuda_beam_elements_kernel.cuh"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
@@ -17,7 +14,7 @@
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #include "sixtracklib/common/buffer/managed_buffer_remap.h"
     #include "sixtracklib/common/beam_elements.h"
-    #include "sixtracklib/cuda/impl/cuda_tools.h"
+    #include "sixtracklib/cuda/cuda_tools.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __global__ void NS(BeamElements_copy_beam_elements_buffer_kernel_cuda)(
@@ -96,6 +93,4 @@ __global__ void NS(BeamElements_copy_beam_elements_buffer_kernel_cuda)(
     return;
 }
 
-#endif /* SIXTRL_TESTS_SIXTRACKLIB_OPENCL_TEST_TEST_BEAM_ELEMENTS_KERNEL_CL__ */
-
-/* end: tests/sixtracklib/opencl/test_beam_elements_opencl_kernel.cl */
+/* end: tests/sixtracklib/testlib/cuda/kernels/cuda_beam_elements_kernel.cu */

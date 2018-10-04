@@ -1,5 +1,5 @@
-#ifndef SIXTRL_TESTS_SIXTRACKLIB_CUDA_IMPL_CUDA_PARTICLES_KERNEL_HEADER_CUH__
-#define SIXTRL_TESTS_SIXTRACKLIB_CUDA_IMPL_CUDA_PARTICLES_KERNEL_HEADER_CUH__
+#ifndef SIXTRACKLIB_TESTLIB_CUDA_KERNELS_CUDA_PARTICLES_KERNEL_HEADER_CUH__
+#define SIXTRACKLIB_TESTLIB_CUDA_KERNELS_CUDA_PARTICLES_KERNEL_HEADER_CUH__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <cuda_runtime.h>
@@ -24,6 +24,6 @@ __global__ void NS(Particles_copy_buffer_kernel_cuda)(
 }
 #endif /* defined( __cplusplus ) */
 
-#endif /* SIXTRL_TESTS_SIXTRACKLIB_CUDA_IMPL_CUDA_PARTICLES_KERNEL_HEADER_CUH__ */
+#endif /* SIXTRACKLIB_TESTLIB_CUDA_KERNELS_CUDA_PARTICLES_KERNEL_HEADER_CUH__ */
 
-/* end: tests/sixtracklib/cuda/impl/cuda_particles_kernel.cuh */
+/* end: tests/sixtracklib/testlib/cuda/kernels/cuda_particles_kernel.cuh */

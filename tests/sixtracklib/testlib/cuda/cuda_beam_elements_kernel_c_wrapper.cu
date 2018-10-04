@@ -1,4 +1,4 @@
-#include "sixtracklib/cuda/impl/cuda_beam_elements_kernel_c_wrapper.h"
+#include "sixtracklib/testlib/cuda/cuda_beam_elements_kernel_c_wrapper.h"
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stddef.h>
@@ -19,8 +19,8 @@
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/beam_elements.h"
 
-    #include "sixtracklib/cuda/impl/cuda_beam_elements_kernel.cuh"
-    #include "sixtracklib/cuda/impl/managed_buffer_remap_kernel.cuh"
+    #include "sixtracklib/testlib/cuda/kernels/cuda_beam_elements_kernel.cuh"
+    #include "sixtracklib/cuda/kernels/managed_buffer_remap_kernel.cuh"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __host__ int NS(Run_test_copy_beam_elements_buffer_kernel_cuda_grid)(

@@ -1,5 +1,5 @@
-#ifndef TESTS_SIXTRACKLIB_CUDA_IMPL_CUDA_BEAM_ELEMENTS_KERNEL_C_WRAPPER_H__
-#define TESTS_SIXTRACKLIB_CUDA_IMPL_CUDA_BEAM_ELEMENTS_KERNEL_C_WRAPPER_H__
+#ifndef TESTS_SIXTRACKLIB_TESTLIB_CUDA_BUFFER_GENERIC_OBJ_KERNEL_C_WRAPPER_H__
+#define TESTS_SIXTRACKLIB_TESTLIB_CUDA_BUFFER_GENERIC_OBJ_KERNEL_C_WRAPPER_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdint.h>
@@ -14,7 +14,7 @@
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_HOST_FN int NS(Run_test_copy_beam_elements_buffer_kernel_cuda_grid)(
+SIXTRL_HOST_FN int NS(Run_test_buffer_generic_obj_kernel_on_cuda_grid)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT in_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
     NS(buffer_size_t) const num_blocks,
@@ -22,7 +22,7 @@ SIXTRL_HOST_FN int NS(Run_test_copy_beam_elements_buffer_kernel_cuda_grid)(
 
 #if defined( CUDART_VERSION ) && ( CUDART_VERSION >= 6050 )
 
-SIXTRL_HOST_FN int NS(Run_test_copy_beam_elements_buffer_kernel_cuda)(
+SIXTRL_HOST_FN int NS(Run_test_buffer_generic_obj_kernel_on_cuda)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT in_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer );
 
@@ -33,6 +33,6 @@ SIXTRL_HOST_FN int NS(Run_test_copy_beam_elements_buffer_kernel_cuda)(
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* TESTS_SIXTRACKLIB_CUDA_IMPL_CUDA_BEAM_ELEMENTS_KERNEL_C_WRAPPER_H__ */
+#endif /* TESTS_SIXTRACKLIB_TESTLIB_CUDA_BUFFER_GENERIC_OBJ_KERNEL_C_WRAPPER_H__ */
 
-/* end: tests/sixtracklib/testlib/cuda/cuda_particles_kernel_c_wrapper.h */
+/* end: tests/sixtracklib/testlib/cuda/cuda_buffer_generic_obj_kernel_c_wrapper.h */

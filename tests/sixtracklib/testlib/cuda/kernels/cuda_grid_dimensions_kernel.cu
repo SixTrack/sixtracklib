@@ -12,7 +12,7 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "tests/sixtracklib/cuda/impl/cuda_grid_dimensions_kernel.cuh"
+    #include "sixtracklib/testlib/cuda/kernels/cuda_grid_dimensions_kernel.cuh"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 extern __global__ void TestDimensions();
@@ -69,4 +69,4 @@ __host__ void runTestDimensions( dim3 gridDim, dim3 blockDim )
 
 #endif /* !defined( SIXTRL_CUDA_NVRTC ) */
 
-/* end: tests/sixtracklib/cuda/details/cuda_grid_dimensions_kernel.cu */
+/* end: tests/sixtracklib/testlib/cuda/kernels/cuda_grid_dimensions_kernel.cu */

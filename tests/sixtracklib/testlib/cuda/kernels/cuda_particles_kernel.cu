@@ -1,5 +1,5 @@
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/cuda/impl/cuda_particles_kernel.cuh"
+    #include "sixtracklib/testlib/cuda/kernels/cuda_particles_kernel.cuh"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
@@ -14,7 +14,7 @@
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #include "sixtracklib/common/buffer/managed_buffer_remap.h"
     #include "sixtracklib/common/particles.h"
-    #include "sixtracklib/cuda/impl/cuda_tools.h"
+    #include "sixtracklib/cuda/cuda_tools.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __global__ void NS(Particles_copy_buffer_kernel_cuda)(
@@ -149,4 +149,4 @@ __global__ void NS(Particles_copy_buffer_kernel_cuda)(
     return;
 }
 
-/* end: tests/sixtracklib/cuda/details/cuda_particles_kernel.cu */
+/* end: tests/sixtracklib/testlib/cuda/kernels/cuda_particles_kernel.cu */

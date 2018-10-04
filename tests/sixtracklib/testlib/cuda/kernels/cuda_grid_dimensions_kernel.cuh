@@ -1,5 +1,5 @@
-#ifndef SIXTRL_TESTS_SIXTRACKLIB_CUDA_GRID_DIMENSIONS_KERNEL_HEADER_CUH__
-#define SIXTRL_TESTS_SIXTRACKLIB_CUDA_GRID_DIMENSIONS_KERNEL_HEADER_CUH__
+#ifndef SIXTRACKLIB_TESTLIB_CUDA_KERNELS_GRID_DIMENSIONS_KERNEL_HEADER_CUH__
+#define SIXTRACKLIB_TESTLIB_CUDA_KERNELS_GRID_DIMENSIONS_KERNEL_HEADER_CUH__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdio.h>
@@ -16,6 +16,6 @@ __global__ void TestDimensions();
 __host__ void runTestDimensions( dim3 gridDim, dim3 blockDim );
 #endif /* !defined( SIXTRL_CUDA_NVRTC ) */
 
-#endif /* SIXTRL_TESTS_SIXTRACKLIB_CUDA_GRID_DIMENSIONS_KERNEL_HEADER_CUH__ */
+#endif /* SIXTRACKLIB_TESTLIB_CUDA_KERNELS_GRID_DIMENSIONS_KERNEL_HEADER_CUH__ */
 
-/* end: tests/sixtracklib/cuda/impl/cuda_grid_dimensions_kernel.cuh */
+/* end: tests/sixtracklib/testlib/cuda/kernels/cuda_grid_dimensions_kernel.cuh */

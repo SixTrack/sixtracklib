@@ -25,11 +25,13 @@ add_subdirectory( kernels )
 
 set( TESTLIB_CUDA_HOST_PART_HEADERS
      cuda_beam_elements_kernel_c_wrapper.h
+     cuda_buffer_generic_obj_kernel_c_wrapper.h
      cuda_particles_kernel_c_wrapper.h
 )
 
 set( TESTLIB_CUDA_HOST_PART_SOURCES
      cuda_beam_elements_kernel_c_wrapper.cu
+     cuda_buffer_generic_obj_kernel_c_wrapper.cu
      cuda_particles_kernel_c_wrapper.cu
 )
 
@@ -40,7 +42,7 @@ add_library( sixtrack_test_cuda_host OBJECT
 
 target_include_directories( sixtrack_test_cuda_host
     PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
-    PRIVATE $<BUILD_INTERFACE:"${CMAKE_SOURCE_DIR}/tests">
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests>
 )
 
 set_target_properties( sixtrack_test_cuda_host
@@ -58,17 +60,17 @@ set_target_properties( sixtrack_test_cuda_host
 # ------------------------------------------------------------------------------
 # pass the submodule library on to sixtracklib:
 
-set(  SIXTRACKL_LIBRARY_MODULES
-    ${SIXTRACKL_LIBRARY_MODULES}
+set(  SIXTRACKL_TESTLIB_LIBRARY_MODULES
+    ${SIXTRACKL_TESTLIB_LIBRARY_MODULES}
     $<TARGET_OBJECTS:sixtrack_test_cuda_host> CACHE INTERNAL "" FORCE )
 
 if( SIXTRACKL_ENABLE_CUDA_RTC )
-    set(   SIXTRACKL_LINK_LIBRARIES
-           ${SIXTRACKL_LINK_LIBRARIES} nvrtc CACHE INTERNAL "" FORCE )
+    set(   SIXTRACKL_TESTLIB_LINK_LIBRARIES
+           ${SIXTRACKL_TESTLIB_LINK_LIBRARIES} nvrtc CACHE INTERNAL "" FORCE )
 endif()
 
-set(   SIXTRACKL_LINK_LIBRARIES
-     ${SIXTRACKL_LINK_LIBRARIES} cudart CACHE INTERNAL "" FORCE )
+set(   SIXTRACKL_TESTLIB_LINK_LIBRARIES
+     ${SIXTRACKL_TESTLIB_LINK_LIBRARIES} cudart CACHE INTERNAL "" FORCE )
 
 # ------------------------------------------------------------------------------
 # Install :
