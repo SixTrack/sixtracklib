@@ -9,7 +9,7 @@
 #include "sixtracklib/common/internal/tools.h"
 
 
-TEST( CommonToolTests, GreatestCommonDivisor )
+TEST( C99_CommonToolTests, GreatestCommonDivisor )
 {
     ASSERT_TRUE( st_greatest_common_divisor(  1,  1 ) ==  1 );
 
@@ -44,7 +44,7 @@ TEST( CommonToolTests, GreatestCommonDivisor )
 }
 
 
-TEST( CommonToolTests, LeastCommonMultiple )
+TEST( C99_CommonToolTests, LeastCommonMultiple )
 {
     ASSERT_TRUE( st_least_common_multiple(  1,  1 ) ==  1 );
 

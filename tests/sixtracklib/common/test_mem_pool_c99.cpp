@@ -11,7 +11,7 @@
 /* ========================================================================== */
 /* ====  Test basic usage of MemPool: init and free operations */
 
-TEST( CommonMemPoolTests, InitFreeBasic )
+TEST( C99_CommonMemPoolTests, InitFreeBasic )
 {
     st_MemPool mem_pool;
 
@@ -39,7 +39,7 @@ TEST( CommonMemPoolTests, InitFreeBasic )
 /* ========================================================================== */
 /* ====  Test handling of odd-sized but admissible capacities */
 
-TEST( CommonMemPoolTests, InitFreeNonIntegerNumChunks )
+TEST( C99_CommonMemPoolTests, InitFreeNonIntegerNumChunks )
 {
     st_MemPool mem_pool;
 
@@ -69,7 +69,7 @@ TEST( CommonMemPoolTests, InitFreeNonIntegerNumChunks )
 /* ========================================================================== */
 /* ====  Test handling of pathological zero-sized capacities*/
 
-TEST( CommonMemPoolTests, InitFreeZeroCapacityNonZeroChunk )
+TEST( C99_CommonMemPoolTests, InitFreeZeroCapacityNonZeroChunk )
 {
     st_MemPool mem_pool;
 
@@ -94,7 +94,7 @@ TEST( CommonMemPoolTests, InitFreeZeroCapacityNonZeroChunk )
 /* ========================================================================== */
 /* ====  Happy-Path-Testing of adding blocks aligned and non-aligned */
 
-TEST( CommonMemPoolTests, AppendSuccess )
+TEST( C99_CommonMemPoolTests, AppendSuccess )
 {
     st_MemPool mem_pool;
 
@@ -181,7 +181,7 @@ TEST( CommonMemPoolTests, AppendSuccess )
 
 /* ========================================================================== */
 
-TEST( CommonMemPoolTests, AppendAlignedWithPathologicalAlignment )
+TEST( C99_CommonMemPoolTests, AppendAlignedWithPathologicalAlignment )
 {
     st_MemPool mem_pool;
 
@@ -240,7 +240,7 @@ TEST( CommonMemPoolTests, AppendAlignedWithPathologicalAlignment )
 /* ========================================================================== */
 /* ====  Test the failing of adding blocks with problematic properties        */
 
-TEST( CommonMemPoolTests, AppendFailures )
+TEST( C99_CommonMemPoolTests, AppendFailures )
 {
     st_MemPool mem_pool;
 

@@ -18,13 +18,13 @@
 
 #endif /* defined( __unix__ ) */
 
-#include "sixtracklib/testlib.h"
+#include "sixtracklib/testlib/common/gpu_kernel.h"
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
 
 #if defined( _POSIX_VERSION )
 
-TEST( CommonGpuKernelToolsTests, FileExistsAndGetFileSize )
+TEST( C99_CommonGpuKernelToolsTests, FileExistsAndGetFileSize )
 {
     std::string const prefix( st_PATH_TO_BASE_DIR );
 
@@ -127,7 +127,7 @@ TEST( CommonGpuKernelToolsTests, FileExistsAndGetFileSize )
 
 #endif /* defined( _POSIX_VERSION )  */
 
-TEST( CommonGpuKernelToolsTests, BuildSimpleKernelFileList )
+TEST( C99_CommonGpuKernelToolsTests, BuildSimpleKernelFileList )
 {
     SIXTRL_SIZE_T const CMP_NUM_FILES = ( SIXTRL_SIZE_T )5u;
     SIXTRL_SIZE_T num_of_input_files  = ( SIXTRL_SIZE_T )0u;
@@ -159,7 +159,7 @@ TEST( CommonGpuKernelToolsTests, BuildSimpleKernelFileList )
     files = nullptr;
 }
 
-TEST( CommonGpuKernelToolsTests, BuildSimpleKernelFileListWithWhitespaces )
+TEST( C99_CommonGpuKernelToolsTests, BuildSimpleKernelFileListWithWhitespaces )
 {
     SIXTRL_SIZE_T const CMP_NUM_FILES = ( SIXTRL_SIZE_T )5u;
     SIXTRL_SIZE_T num_of_input_files  = ( SIXTRL_SIZE_T )0u;
@@ -194,7 +194,7 @@ TEST( CommonGpuKernelToolsTests, BuildSimpleKernelFileListWithWhitespaces )
     files = nullptr;
 }
 
-TEST( CommonGpuKernelToolsTests, CollectKernelFilesIntoSingleTextFile )
+TEST( C99_CommonGpuKernelToolsTests, CollectKernelFilesIntoSingleTextFile )
 {
     SIXTRL_SIZE_T const CMP_NUM_FILES = ( SIXTRL_SIZE_T )3u;
     SIXTRL_SIZE_T num_of_input_files  = ( SIXTRL_SIZE_T )0u;
@@ -230,7 +230,7 @@ TEST( CommonGpuKernelToolsTests, CollectKernelFilesIntoSingleTextFile )
     files = nullptr;
 }
 
-TEST( CommonGpuKernelToolsTests,
+TEST( C99_CommonGpuKernelToolsTests,
       CollectKernelFilesIntoSingleTextFileWithLinesOffset )
 {
     SIXTRL_SIZE_T const CMP_NUM_FILES = ( SIXTRL_SIZE_T )3u;
@@ -272,7 +272,7 @@ TEST( CommonGpuKernelToolsTests,
     files = nullptr;
 }
 
-TEST( CommonGpuKernelToolsTests,
+TEST( C99_CommonGpuKernelToolsTests,
       CollectKernelFilesIntoSingleTextFileWithLinesOffsetFailDueToLineLength )
 {
     SIXTRL_SIZE_T const CMP_NUM_FILES = ( SIXTRL_SIZE_T )3u;
