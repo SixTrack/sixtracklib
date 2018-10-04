@@ -458,7 +458,7 @@ namespace SIXTRL_CXX_NAMESPACE
  * *** Implementation of inline and template member functions          ***** *
  * ************************************************************************* */
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     /* ===================================================================== *
      * ====  TDrift< T >:
