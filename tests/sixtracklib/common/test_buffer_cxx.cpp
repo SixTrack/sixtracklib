@@ -11,7 +11,9 @@
 
 #include <gtest/gtest.h>
 
-#include "sixtracklib/testlib.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/testlib/common/generic_buffer_obj.h"
+#include "sixtracklib/testlib/testdata/testdata_files.h"
 #include "sixtracklib/common/buffer.hpp"
 
 namespace sixtrack

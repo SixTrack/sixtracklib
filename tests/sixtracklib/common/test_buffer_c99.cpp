@@ -13,7 +13,7 @@
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
-#include "sixtracklib/testlib/generic_buffer_obj.h"
+#include "sixtracklib/testlib/common/generic_buffer_obj.h"
 
 #include "sixtracklib/common/buffer.h"
 
