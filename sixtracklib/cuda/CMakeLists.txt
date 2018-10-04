@@ -22,12 +22,12 @@ set( SIXTRACKL_CUDA_HOST_DEFINITIONS )
 list( APPEND SIXTRACKL_CUDA_HOST_DEFINITIONS ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
 set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
-     impl/cuda_tools.h
-     impl/track_particles_kernel_c_wrapper.h
+     cuda_tools.h
+     track_particles_kernel_c_wrapper.h
 )
 
 set( SIXTRACKLIB_CUDA_PART_HOST_SOURCES
-     details/track_particles_kernel_c_wrapper.cu
+     internal/track_particles_kernel_c_wrapper.cu
 )
 
 add_library( sixtrack_cuda_host OBJECT
@@ -38,7 +38,8 @@ add_library( sixtrack_cuda_host OBJECT
 target_compile_definitions( sixtrack_cuda_host
     PUBLIC ${SIXTRACKL_CUDA_HOST_DEFINITIONS} )
 
-target_include_directories( sixtrack_cuda_host PRIVATE ${CMAKE_SOURCE_DIR} )
+target_include_directories( sixtrack_cuda_host
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
 
 set_target_properties( sixtrack_cuda_host PROPERTIES POSITION_INDEPENDENT_CODE ON )
 set_target_properties( sixtrack_cuda_host PROPERTIES LINKER_LANGUAGE C )
@@ -63,14 +64,14 @@ list( APPEND SIXTRACKL_CUDA_DEVICE_DEFINITIONS "_GPUCODE=1" )
 list( APPEND SIXTRACKL_CUDA_DEVICE_DEFINITIONS ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
 set( SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS
-     impl/cuda_tools.h
-     impl/managed_buffer_remap_kernel.cuh
-     impl/track_particles_kernel.cuh
+     cuda_tools.h
+     kernels/managed_buffer_remap_kernel.cuh
+     kernels/track_particles_kernel.cuh
 )
 
 set( SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES
-     details/managed_buffer_remap_kernel.cu
-     details/track_particles_kernel.cu
+     kernels/managed_buffer_remap_kernel.cu
+     kernels/track_particles_kernel.cu
 )
 
 add_library( sixtrack_cuda_device OBJECT
@@ -102,12 +103,26 @@ set(  SIXTRACKL_LIBRARY_MODULES
 # ------------------------------------------------------------------------------
 # install:
 
-set( SIXTRACKLIB_CUDA_INSTALL_PATH include/sixtracklib/cuda )
+if( SIXTRACKLIB_CUDA_PART_HOST_HEADERS )
+    set( SIXTRACKLIB_CUDA_HOST_INSTALL_PATH include/sixtracklib/cuda )
 
-install( FILES ${SIXTRACKLIB_CUDA_PART_HOST_HEADERS}
-         DESTINATION ${SIXTRACKLIB_CUDA_INSTALL_PATH} )
+    install( FILES ${SIXTRACKLIB_CUDA_PART_HOST_HEADERS}
+             DESTINATION ${SIXTRACKLIB_CUDA_HOST_INSTALL_PATH} )
+endif()
 
+if( SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS OR
+    SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES )
+
+    set( SIXTRACKLIB_CUDA_DEVICE_INSTALL_PATH include/sixtracklib/cuda/kernels )
+
+    install( FILES ${SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS}
+                   ${SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES}
+             DESTINATION ${SIXTRACKLIB_CUDA_DEVICE_INSTALL_PATH} )
+endif()
+
+set( SIXTRACKLIB_CUDA_HOST_INSTALL_PATH include/sixtracklib/cuda )
 install( FILES ${SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS}
-         DESTINATION "${SIXTRACKLIB_CUDA_INSTALL_PATH}/impl" )
+               ${SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES}
+         DESTINATION "${SIXTRACKLIB_CUDA_INSTALL_PATH}/kernels" )
 
 # end: sixtracklib/cuda/CMakeLists.txt
