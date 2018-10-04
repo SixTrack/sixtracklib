@@ -22,7 +22,7 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/beam_elements.h"
 
-#include "sixtracklib/cuda/impl/track_particles_kernel_c_wrapper.h"
+#include "sixtracklib/cuda/track_particles_kernel_c_wrapper.h"
 
 TEST( C99_Cuda_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
 {

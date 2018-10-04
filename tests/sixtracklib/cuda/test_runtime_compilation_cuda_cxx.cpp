@@ -28,7 +28,7 @@ TEST( CXX_Cuda_RunTimeCompilation,
     std::string const PATH_BASE_DIR = ::st_PATH_TO_BASE_DIR;
 
     std::string const path_kernel_file( PATH_BASE_DIR + std::string(
-        "tests/sixtracklib/cuda/details/cuda_grid_dimensions_kernel.cu" ) );
+        "tests/sixtracklib/testlib/cuda/kernels/cuda_grid_dimensions_kernel.cu" ) );
 
     std::ifstream source_file = std::ifstream( path_kernel_file, std::ios::in );
 

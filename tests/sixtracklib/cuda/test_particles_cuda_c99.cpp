@@ -20,7 +20,7 @@
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
 
-#include "sixtracklib/cuda/impl/cuda_particles_kernel_c_wrapper.h"
+#include "sixtracklib/testlib/cuda/cuda_particles_kernel_c_wrapper.h"
 
 TEST( C99_Cuda_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
 {
