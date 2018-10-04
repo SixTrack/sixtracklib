@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_RANDOM_H__
-#define SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_RANDOM_H__
+#ifndef SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_RANDOM_HEADER_H__
+#define SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_RANDOM_HEADER_H__
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
@@ -8,7 +8,6 @@
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
-
 
 /* A C-program for MT19937-64 (2004/9/29 version).
    Coded by Takuji Nishimura and Makoto Matsumoto.
@@ -87,6 +86,6 @@ double NS(Random_genrand64_real3)( void );
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_RANDOM_H__ */
+#endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_RANDOM_HEADER_H__ */
 
-/* end: tests/sixtracklib/testlib/random.h */
+/* end: tests/sixtracklib/testlib/common/random.h */

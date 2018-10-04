@@ -1,4 +1,4 @@
-#include "sixtracklib/testlib/test_beam_elements_tools.h"
+#include "sixtracklib/testlib/common/beam_elements.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -278,4 +278,4 @@ void NS(BeamElement_fprint)( FILE* SIXTRL_RESTRICT fp,
     return;
 }
 
-/* end: tests/sixtracklib/testlib/details/test_beam_elements_tools.c */
+/* end: tests/sixtracklib/testlib/common/test_beam_elements_tools.c */

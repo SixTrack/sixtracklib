@@ -1,7 +1,9 @@
-#include "sixtracklib/testlib/time_tools.h"
+#include "sixtracklib/testlib/common/time.h"
 
 #include <time.h>
 #include <sys/time.h>
+
+#include "sixtracklib/common/definitions.h"
 
 /* TODO: Implement for Win32 where gettimeofday() is (probably) not available! */
 
@@ -22,4 +24,4 @@ double NS(Time_get_seconds_since_epoch)()
     return ( double )tv.tv_sec + ( ( double )1e-6 * ( double )tv.tv_usec );
 }
 
-/* end: tests/sixtracklib/testlib/details/time_tools.c */
+/* end: tests/sixtracklib/testlib/common/time.c */

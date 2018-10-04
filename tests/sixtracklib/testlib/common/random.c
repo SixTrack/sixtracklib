@@ -1,4 +1,5 @@
-#include "sixtracklib/testlib/random.h"
+#include "sixtracklib/testlib/common/random.h"
+#include "sixtracklib/common/definitions.h"
 
 /*
    A C-program for MT19937-64 (2004/9/29 version).
@@ -188,4 +189,4 @@ double NS(Random_genrand64_real3)( void )
     return ((NS(Random_genrand64_int64)() >> 12) + 0.5) * (1.0/4503599627370496.0);
 }
 
-/* end: tests/sixtracklib/testlib/details/random.c */
+/* end: tests/sixtracklib/testlib/common/random.c */

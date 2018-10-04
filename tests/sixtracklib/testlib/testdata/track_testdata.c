@@ -1,4 +1,4 @@
-#include "sixtracklib/testlib/track_testdata_tools.h"
+#include "sixtracklib/testlib/testdata/track_testdata.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -19,7 +19,6 @@ extern SIXTRL_HOST_FN NS(Buffer)*
 
 extern SIXTRL_HOST_FN NS(Buffer)*
     NS(TrackTestdata_extract_beam_elements_buffer)( const char path_to_file[] );
-
 
 /* ************************************************************************ */
 /* ******              Implementation of functions                   ****** */
@@ -529,4 +528,4 @@ SIXTRL_HOST_FN NS(Buffer)*
     return beam_elements_buffer;
 }
 
-/* end: tests/sixtracklib/testlib/details/track_testdata_tools.c */
+/* end: tests/sixtracklib/testlib/testdata/track_testdata.c */

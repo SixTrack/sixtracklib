@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TEST_GPU_KERNELTOOLS_H__
-#define SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TEST_GPU_KERNELTOOLS_H__
+#ifndef SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_GPU_KERNEL_HEADER_H__
+#define SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_GPU_KERNEL_HEADER_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -42,6 +42,6 @@ char* NS(GpuKernel_collect_source_string)(
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TEST_GPU_KERNELTOOLS_H__ */
+#endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_GPU_KERNEL_HEADER_H__ */
 
-/* end: tests/sixtracklib/testlib/gpu_kernel_tools.h */
+/* end: tests/sixtracklib/testlib/common/gpu_kernel.h */

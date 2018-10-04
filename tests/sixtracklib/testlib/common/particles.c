@@ -1,4 +1,4 @@
-#include "sixtracklib/testlib/test_particles_tools.h"
+#include "sixtracklib/testlib/common/particles.h"
 
 #include <assert.h>
 #include <math.h>
@@ -11,7 +11,7 @@
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
-#include "sixtracklib/testlib/random.h"
+#include "sixtracklib/testlib/common/random.h"
 
 extern void NS(Particles_random_init)(
     SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p );
@@ -1601,4 +1601,4 @@ void NS(Particles_buffer_print_max_diff)(
 
 /* ------------------------------------------------------------------------- */
 
-/* end: tests/sixtracklib/testlib/details/test_particles_tools.c */
+/* end: tests/sixtracklib/testlib/common/test_particles_tools.c */

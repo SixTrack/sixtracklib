@@ -17,4 +17,4 @@ SIXTRL_HOST_FN double NS(Time_get_seconds_since_epoch)( void );
 
 #endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TIME_TOOLS_H__ */
 
-/* end: tests/sixtracklib/testlib/time_tools.h */
+/* end: tests/sixtracklib/testlib/common/time.h */

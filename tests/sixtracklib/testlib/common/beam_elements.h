@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TEST_BEAM_ELEMENTS_TOOLS_H__
-#define SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TEST_BEAM_ELEMENTS_TOOLS_H__
+#ifndef SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_HEADER_H__
+#define SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_HEADER_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdio.h>
@@ -339,6 +339,6 @@ SIXTRL_INLINE void NS(BeamElement_print)(
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TEST_BEAM_ELEMENTS_TOOLS_H__ */
+#endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_HEADER_H__ */
 
-/* end: tests/sixtracklib/testlib/test_beam_elements_tools.h */
+/* end: tests/sixtracklib/testlib/common/beam_elements.h */

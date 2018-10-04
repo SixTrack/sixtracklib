@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TRACK_TESTDATA_TOOLS_H__
-#define SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TRACK_TESTDATA_TOOLS_H__
+#ifndef SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TRACK_TESTDATA_HEADER_H__
+#define SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TRACK_TESTDATA_HEADER_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -30,6 +30,6 @@ SIXTRL_HOST_FN NS(Buffer)* NS(TrackTestdata_extract_beam_elements_buffer)(
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TRACK_TESTDATA_TOOLS_H__ */
+#endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TRACK_TESTDATA_HEADER_H__ */
 
-/* end: tests/sixtracklib/testlib/track_testdata_tools.h */
+/* end: tests/sixtracklib/testlib/testdata/track_testdata.h */

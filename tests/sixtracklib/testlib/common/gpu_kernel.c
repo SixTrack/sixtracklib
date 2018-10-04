@@ -1,4 +1,4 @@
-#include "sixtracklib/testlib/gpu_kernel_tools.h"
+#include "sixtracklib/testlib/common/gpu_kernel.h"
 
 #include <assert.h>
 #include <ctype.h>
@@ -530,4 +530,4 @@ char* NS(GpuKernel_collect_source_string)(
     return source;
 }
 
-/* end: tests/sixtracklib/testlib/details/gpu_kernel_tools.c */
+/* end: tests/sixtracklib/testlib/common/gpu_kernel.c */
