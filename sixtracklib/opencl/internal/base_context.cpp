@@ -21,7 +21,7 @@
 
 #include <CL/cl.hpp>
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     ClContextBase::ClContextBase() :
         m_cl_programs(),
@@ -1479,7 +1479,7 @@ namespace SIXTRL_NAMESPACE
 
 SIXTRL_HOST_FN NS(ClContextBase)* NS(ClContextBase_create)()
 {
-    NS(ClContextBase)* ptr_base_ctx = new SIXTRL_NAMESPACE::ClContextBase;
+    NS(ClContextBase)* ptr_base_ctx = new SIXTRL_CXX_NAMESPACE::ClContextBase;
     return ptr_base_ctx;
 }
 
@@ -1518,7 +1518,7 @@ SIXTRL_HOST_FN NS(context_node_id_t)
 NS(ClContextBase_get_default_node_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT context )
 {
-    SIXTRL_NAMESPACE::ClContextBase::node_id_t default_node_id;
+    SIXTRL_CXX_NAMESPACE::ClContextBase::node_id_t default_node_id;
     NS(ComputeNodeId_preset)( &default_node_id );
 
     NS(context_node_info_t) const* default_node_info =
@@ -1723,7 +1723,7 @@ NS(ClContextBase_new_on_selected_node_id)(
     if( ( node_id != nullptr ) &&
         ( NS(ComputeNodeId_is_valid)( node_id ) ) )
     {
-        ctx = new SIXTRL_NAMESPACE::ClContextBase( *node_id );
+        ctx = new SIXTRL_CXX_NAMESPACE::ClContextBase( *node_id );
 
         if( ( ctx != nullptr ) && ( !ctx->hasSelectedNode() ) )
         {

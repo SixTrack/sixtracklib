@@ -23,7 +23,7 @@
 
 #if defined( __cplusplus )
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     ClContext::ClContext() :
         ClContextBase(),
@@ -305,12 +305,12 @@ namespace SIXTRL_NAMESPACE
 
 SIXTRL_HOST_FN NS(ClContext)* NS(ClContext_create)()
 {
-    return new SIXTRL_NAMESPACE::ClContext;
+    return new SIXTRL_CXX_NAMESPACE::ClContext;
 }
 
 SIXTRL_HOST_FN NS(ClContext)* NS(ClContext_new)( const char* node_id_str )
 {
-    return new SIXTRL_NAMESPACE::ClContext( node_id_str );
+    return new SIXTRL_CXX_NAMESPACE::ClContext( node_id_str );
 }
 
 SIXTRL_HOST_FN void NS(ClContext_delete)( NS(ClContext)* SIXTRL_RESTRICT ctx )

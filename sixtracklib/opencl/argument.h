@@ -45,7 +45,7 @@ struct NS(Buffer);
         #include <CL/cl.hpp>
     #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     class ClArgument
     {
@@ -54,7 +54,7 @@ namespace SIXTRL_NAMESPACE
         using context_base_t     = ClContextBase;
         using size_type          = ClContextBase::size_type;
         using cobj_buffer_t      = struct NS(Buffer);
-        using cxx_cobj_buffer_t  = SIXTRL_NAMESPACE::Buffer;
+        using cxx_cobj_buffer_t  = SIXTRL_CXX_NAMESPACE::Buffer;
 
         explicit ClArgument(
             context_base_t* SIXTRL_RESTRICT ptr_context = nullptr );
@@ -137,7 +137,7 @@ namespace SIXTRL_NAMESPACE
     };
 }
 
-typedef SIXTRL_NAMESPACE::ClArgument NS(ClArgument);
+typedef SIXTRL_CXX_NAMESPACE::ClArgument NS(ClArgument);
 
 #else /* !defined( __cplusplus ) */
 

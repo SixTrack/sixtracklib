@@ -32,7 +32,7 @@
 
 using NS(context_size_t) = std::size_t;
 
-namespace sixtrack
+namespace SIXTRL_CXX_NAMESPACE
 {
     using node_id_t     = NS(ComputeNodeId);
     using node_info_t   = NS(ComputeNodeInfo);
@@ -41,8 +41,8 @@ namespace sixtrack
     {
         public:
 
-        using node_id_t         = SIXTRL_NAMESPACE::node_id_t;
-        using node_info_t       = SIXTRL_NAMESPACE::node_info_t;
+        using node_id_t         = SIXTRL_CXX_NAMESPACE::node_id_t;
+        using node_info_t       = SIXTRL_CXX_NAMESPACE::node_info_t;
         using size_type         = std::size_t;
 
         using platform_id_t     = NS(comp_node_id_num_t);
@@ -346,7 +346,7 @@ namespace sixtrack
     };
 }
 
-typedef SIXTRL_NAMESPACE::ClContextBase     NS(ClContextBase);
+typedef SIXTRL_CXX_NAMESPACE::ClContextBase     NS(ClContextBase);
 
 #else /* defined( __cplusplus ) */
 

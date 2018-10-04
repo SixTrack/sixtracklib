@@ -19,7 +19,7 @@
 
 #if defined( __cplusplus )
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     class ClContext : public ClContextBase
     {
@@ -80,8 +80,8 @@ namespace SIXTRL_NAMESPACE
 extern "C" {
 #endif /* !defined( _GPUCODE ) */
 
-typedef SIXTRL_NAMESPACE::ClContext              NS(ClContext);
-typedef SIXTRL_NAMESPACE::ClContext::num_turns_t NS(context_num_turns_t);
+typedef SIXTRL_CXX_NAMESPACE::ClContext              NS(ClContext);
+typedef SIXTRL_CXX_NAMESPACE::ClContext::num_turns_t NS(context_num_turns_t);
 
 #if !defined( _GPUCODE )
 }

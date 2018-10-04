@@ -21,7 +21,7 @@
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/opencl/context.h"
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     ClArgument::ClArgument(
         ClArgument::context_base_t* SIXTRL_RESTRICT ptr_context ) :
@@ -490,7 +490,7 @@ namespace SIXTRL_NAMESPACE
 SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new)(
     NS(ClContextBase)* SIXTRL_RESTRICT ptr_context )
 {
-    return new SIXTRL_NAMESPACE::ClArgument( ptr_context );
+    return new SIXTRL_CXX_NAMESPACE::ClArgument( ptr_context );
 }
 
 SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_buffer)(
@@ -498,15 +498,15 @@ SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_buffer)(
     NS(ClContextBase)* SIXTRL_RESTRICT ptr_context )
 {
     return ( buffer != nullptr )
-        ? new SIXTRL_NAMESPACE::ClArgument( buffer, ptr_context )
-        : new SIXTRL_NAMESPACE::ClArgument( ptr_context );
+        ? new SIXTRL_CXX_NAMESPACE::ClArgument( buffer, ptr_context )
+        : new SIXTRL_CXX_NAMESPACE::ClArgument( ptr_context );
 }
 
 SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_size)(
     NS(context_size_t) const arg_size,
     NS(ClContextBase)* SIXTRL_RESTRICT ptr_context )
 {
-    return new SIXTRL_NAMESPACE::ClArgument( arg_size, ptr_context );
+    return new SIXTRL_CXX_NAMESPACE::ClArgument( arg_size, ptr_context );
 }
 
 SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_memory)(
@@ -514,7 +514,7 @@ SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_memory)(
     NS(context_size_t) const arg_size,
     NS(ClContextBase)* SIXTRL_RESTRICT ptr_context )
 {
-    return new SIXTRL_NAMESPACE::ClArgument(
+    return new SIXTRL_CXX_NAMESPACE::ClArgument(
         arg_buffer_begin, arg_size, ptr_context );
 }
 
