@@ -10,22 +10,19 @@
 # ------------------------------------------------------------------------------
 # ---- Backends and computing architectures:
 
-option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"       OFF )
-option( SIXTRACKL_ENABLE_MANUAL_SIMD       "Enable manual SIMD backend"     OFF )
-option( SIXTRACKL_ENABLE_OPENMP            "Enable OpenMP backend"          OFF )
-option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL backend"          OFF )
-option( SIXTRACKL_ENABLE_CUDA              "Enable CUDA backend"            OFF )
-option( SIXTRACKL_ENABLE_MPFR4             "Enable GMP/MPFR4 backend"       OFF )
+option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"    OFF )
+option( SIXTRACKL_ENABLE_MANUAL_SIMD       "Enable manual SIMD backend"  OFF )
+option( SIXTRACKL_ENABLE_OPENMP            "Enable OpenMP backend"       OFF )
+option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL backend"       OFF )
+option( SIXTRACKL_ENABLE_CUDA              "Enable CUDA backend"         OFF )
+option( SIXTRACKL_ENABLE_MPFR4             "Enable GMP/MPFR4 backend"    OFF )
 
 # ------------------------------------------------------------------------------
 # ---- Program logistic options:
 
-option( SIXTRACKL_BUILD_EXAMPLES
-        "Build sixtracklib examples" OFF )
-
-option( SIXTRACKL_ENABLE_PROGRAMM_TESTS
-        "Enable programmatic unit-tests" OFF )
-
+option( SIXTRACKL_BUILD_EXAMPLES        "Build sixtracklib examples"     ON  )
+option( SIXTRACKL_ENABLE_PROGRAMM_TESTS "Enable programmatic unit-tests" OFF )
+option( SIXTRACKL_REQUIRE_OFFLINE_BUILD "Require offline building"       OFF )
 
 # ------------------------------------------------------------------------------
 # ----  Namespace:
@@ -49,18 +46,29 @@ set_property( CACHE SIXTRACKL_CPU_ARCH PROPERTY STRINGS sse2 avx avx2 native )
 # ====  Detailed settings:
 
 # ------------------------------------------------------------------------------
+# Cuda related detailed settings
+
+if( SIXTRACKL_ENABLE_CUDA )
+    option( SIXTRACKL_ENABLE_CUDA_RTC
+            "Enable CUDA Runtime Compilation (nvrtc)" ON )
+endif()
+
+set(  SIXTRACKL_CUDA_COMPUTE_ARCH_LIST )
+
+if( SIXTRACKL_ENABLE_CUDA )
+    list( APPEND SIXTRACKL_CUDA_COMPUTE_ARCH_LIST "30" )
+endif()
+
+
+
+# ------------------------------------------------------------------------------
 # Unit-testing related settings:
 
 if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
 
-    option( SIXTRACKL_ENABLE_PROGRAM_MEMTESTS
-            "Enable programming mem tests"   OFF )
-
-    option( SIXTRACKL_ENABLE_TIMING_TESTS
-            "Enable timing/benchmarking tests (requires C++11 support)" OFF )
-
-    option( SIXTRACKL_ENABLE_MPFR_ACCURACY_TESTS
-            "Enable GMP/MPFR based accuracy tests" OFF )
+    option( SIXTRACKL_ENABLE_PROGRAM_MEMTESTS "Enable mem-leak tests"      OFF )
+    option( SIXTRACKL_ENABLE_TIMING_TESTS     "Enable benchmarking tests"  OFF )
+    option( SIXTRACKL_ENABLE_ACCURACY_TESTS   "Enable full accuracy tests" OFF )
 
     set( SIXTRACKL_GOOGLETEST_ROOT "" CACHE PATH
          "Path to include/gtest/gtest.h (for non-standard installations)" )
@@ -76,14 +84,3 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
          "Path to the memory check tool suppression file (optional, leave empty)" )
 
 endif()
-
-# ------------------------------------------------------------------------------
-# CUDA related settings:
-
-set(  SIXTRACKL_CUDA_COMPUTE_ARCH_LIST )
-
-if( SIXTRACKL_ENABLE_CUDA )
-    list( APPEND SIXTRACKL_CUDA_COMPUTE_ARCH_LIST "30" )
-endif()
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
