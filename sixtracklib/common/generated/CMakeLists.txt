@@ -162,8 +162,8 @@ install( CODE "
 
 # ------------------------------------------------------------------------------
 
-set(   SIXTRACKLIB_COMMON_HEADERS
-     ${SIXTRACKLIB_COMMON_HEADERS}
+set(   SIXTRACKLIB_COMMON_C99_HEADERS
+     ${SIXTRACKLIB_COMMON_C99_HEADERS}
      ${SIXTRACKL_COMMON_GENERATED_HEADERS} PARENT_SCOPE )
 
 
