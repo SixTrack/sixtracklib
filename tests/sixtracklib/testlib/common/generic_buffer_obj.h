@@ -207,4 +207,4 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj)* NS(GenericObj_add)(
 
 #endif /* SIXTRACKLIB_TESTS_TESTLIB_GENERIC_BUFFER_H__ */
 
-/* end: tests/sixtracklib/testlib/generic_buffer_obj.h */
+/* end: tests/sixtracklib/testlib/common/generic_buffer_obj.h */

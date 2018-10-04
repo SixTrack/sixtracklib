@@ -28,10 +28,9 @@ add_library( sixtrack_test_common OBJECT
             ${TESTLIB_COMMON_CXX_SOURCES}
 )
 
-target_include_directories( sixtrack_common_buffer PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests>
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include/tests> )
+target_include_directories( sixtrack_test_common PRIVATE
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests> )
 
 set_target_properties( sixtrack_test_common PROPERTIES LINKER_LANGUAGE C )
 set_target_properties( sixtrack_test_common PROPERTIES POSITION_INDEPENDENT_CODE ON )
@@ -39,8 +38,7 @@ set_target_properties( sixtrack_test_common PROPERTIES C_STANDARD 99 )
 set_target_properties( sixtrack_test_common PROPERTIES C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_test_common PRIVATE
-                        -Wall -Werror -pedantic -ansi
-                        ${SIXTRACKLIB_CPU_FLAGS} )
+        -Wall -Werror -pedantic -ansi ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_test_common as a module for sixtrack_test:
