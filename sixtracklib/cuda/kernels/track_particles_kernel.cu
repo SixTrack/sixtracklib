@@ -1,5 +1,5 @@
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/cuda/impl/track_particles_kernel.cuh"
+    #include "sixtracklib/cuda/kernels/track_particles_kernel.cuh"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
@@ -19,7 +19,7 @@
     #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/track.h"
-    #include "sixtracklib/cuda/impl/cuda_tools.h"
+    #include "sixtracklib/cuda/cuda_tools.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __global__ void NS(Remap_particles_beam_elements_buffers_kernel_cuda)(
