@@ -29,9 +29,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContext::ClContext() :
         ClContextBase(),
         m_tracking_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_last_wall_time( double{ 0 } ),
-        m_last_event_time( double{ 0 } )
+        m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } )
     {
         this->doInitDefaultProgramsPrivImpl();
     }
@@ -39,9 +37,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContext::ClContext( ClContext::size_type const node_index ) :
         ClContextBase(),
         m_tracking_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_last_wall_time( double{ 0 } ),
-        m_last_event_time( double{ 0 } )
+        m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } )
     {
         using base_t = ClContextBase;
 
@@ -58,9 +54,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContext::ClContext( ClContext::node_id_t const node_id ) :
         ClContextBase(),
         m_tracking_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_last_wall_time( double{ 0 } ),
-        m_last_event_time( double{ 0 } )
+        m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } )
     {
         using base_t = ClContextBase;
         using size_t = base_t::size_type;
@@ -82,9 +76,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContext::ClContext( char const* node_id_str ) :
         ClContextBase(),
         m_tracking_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_last_wall_time( double{ 0 } ),
-        m_last_event_time( double{ 0 } )
+        m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } )
     {
         using base_t = ClContextBase;
         using size_t = base_t::size_type;
@@ -106,9 +98,7 @@ namespace SIXTRL_CXX_NAMESPACE
         ClContext::device_id_t const device_idx ) :
         ClContextBase(),
         m_tracking_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_last_wall_time( double{ 0 } ),
-        m_last_event_time( double{ 0 } )
+        m_tracking_kernel_id( ClContextBase::kernel_id_t{ -1 } )
     {
         using base_t = ClContextBase;
         using size_t = base_t::size_type;
@@ -235,8 +225,6 @@ namespace SIXTRL_CXX_NAMESPACE
         cl_ulong run_tracking_kernel_when_started   = cl_ulong{ 0 };
         cl_ulong run_tracking_kernel_when_ended     = cl_ulong{ 0 };
 
-        auto track_begin = std::chrono::steady_clock::now();
-
         cl_int cl_ret = ptr_queue->enqueueNDRangeKernel( *ptr_tracking_kernel,
             cl::NullRange, cl::NDRange( total_num_threads ),
                 cl::NDRange( work_group_size ), nullptr,
@@ -244,12 +232,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         cl_ret |= ptr_queue->flush();
         run_tracking_kernel_event.wait();
-
-        auto track_end = std::chrono::steady_clock::now();
-        auto wall_time_diff = track_end - track_begin;
-
-        std::chrono::duration< double > wall_time( wall_time_diff );
-        this->m_last_wall_time = wall_time.count();
 
         cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
             CL_PROFILING_COMMAND_QUEUED, &run_tracking_kernel_when_queued );
@@ -263,8 +245,12 @@ namespace SIXTRL_CXX_NAMESPACE
         cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
             CL_PROFILING_COMMAND_END, &run_tracking_kernel_when_ended );
 
-        this->m_last_event_time = double{ 1e-9 } * static_cast< double >(
+        double const last_event_time = double{ 1e-9 } * static_cast< double >(
             run_tracking_kernel_when_ended - run_tracking_kernel_when_started );
+
+        this->addKernelExecTime( last_event_time, tracking_kernel_id );
+        this->setLastWorkGroupSize( work_group_size,   tracking_kernel_id );
+        this->setLastNumWorkItems(  total_num_threads, tracking_kernel_id );
 
         if( cl_ret == CL_SUCCESS )
         {
@@ -281,28 +267,6 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return success;
-    }
-
-    double ClContext::lastEventTiming() const SIXTRL_NOEXCEPT
-    {
-        return this->m_last_event_time;
-    }
-
-    void ClContext::resetEventTiming() SIXTRL_NOEXCEPT
-    {
-        this->m_last_event_time = double{ 0 };
-        return;
-    }
-
-    double ClContext::lastWallTiming() const SIXTRL_NOEXCEPT
-    {
-        return this->m_last_wall_time;
-    }
-
-    void ClContext::resetWallTiming()  SIXTRL_NOEXCEPT
-    {
-        this->m_last_wall_time = double{ 0 };
-        return;
     }
 
     bool ClContext::doInitDefaultPrograms()
@@ -458,32 +422,6 @@ SIXTRL_HOST_FN int NS(ClContext_execute_tracking_kernel_num_turns)(
              ( beam_elements_arg != nullptr ) )
         ? ctx->track( kernel_id, *particles_arg, *beam_elements_arg, num_turns )
         : -1;
-}
-
-SIXTRL_HOST_FN double NS(ClContext_get_last_wall_time)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
-{
-    return ( ctx != nullptr ) ? ctx->lastWallTiming() : double{ -1 };
-}
-
-SIXTRL_HOST_FN double NS(ClContext_get_last_event_time)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
-{
-    return ( ctx != nullptr ) ? ctx->lastEventTiming() : double{ -1 };
-}
-
-SIXTRL_HOST_FN void NS(ClContext_reset_last_wall_time)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx )
-{
-    if ( ctx != nullptr ) ctx->resetWallTiming();
-    return;
-}
-
-SIXTRL_HOST_FN void NS(ClContext_reset_last_event_time)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx )
-{
-    if ( ctx != nullptr ) ctx->resetEventTiming();
-    return;
 }
 
 #endif /* !defined( __CUDACC__ ) */

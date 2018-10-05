@@ -61,12 +61,6 @@ namespace SIXTRL_CXX_NAMESPACE
                    ClArgument& beam_elements_arg,
                    num_turns_t const num_turns = num_turns_t{ 1 } );
 
-        double lastEventTiming() const SIXTRL_NOEXCEPT;
-        void resetEventTiming() SIXTRL_NOEXCEPT;
-
-        double lastWallTiming() const SIXTRL_NOEXCEPT;
-        void resetWallTiming()  SIXTRL_NOEXCEPT;
-
         protected:
 
         virtual bool doInitDefaultPrograms() override;
@@ -79,9 +73,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         program_id_t    m_tracking_program_id;
         kernel_id_t     m_tracking_kernel_id;
-
-        double          m_last_wall_time;
-        double          m_last_event_time;
     };
 }
 
@@ -145,18 +136,6 @@ SIXTRL_HOST_FN int NS(ClContext_execute_tracking_kernel_num_turns)(
     NS(ClArgument)* SIXTRL_RESTRICT particles_arg,
     NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg,
     NS(context_num_turns_t) const num_turns );
-
-SIXTRL_HOST_FN double NS(ClContext_get_last_wall_time)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx );
-
-SIXTRL_HOST_FN double NS(ClContext_get_last_event_time)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx );
-
-SIXTRL_HOST_FN void NS(ClContext_reset_last_wall_time)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx );
-
-SIXTRL_HOST_FN void NS(ClContext_reset_last_event_time)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
