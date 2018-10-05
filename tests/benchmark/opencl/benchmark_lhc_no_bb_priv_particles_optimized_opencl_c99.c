@@ -23,7 +23,7 @@ int main( int argc, char* argv[] )
 
     buf_size_t num_turns_list[] =
     {
-        1000, 1000, 100, 100, 50, 50, 50, 20, 20, 20, 20, 20, 10, 10, 10, 5, 1
+        100, 100, 100, 100, 50, 50, 50, 20, 20, 20, 20, 20, 10, 10, 10, 5, 1
     };
 
     buf_size_t kk = ( buf_size_t )0u;
@@ -126,6 +126,7 @@ int main( int argc, char* argv[] )
 
     strncpy( tracking_program_compile_options,
              " -D_GPUCODE=1 -D__NAMESPACE=st_  -cl-strict-aliasing"
+             " -DSIXTRL_DISABLE_BEAM_BEAM=1"
              " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
              " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
              " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private"
@@ -147,7 +148,8 @@ int main( int argc, char* argv[] )
     }
 
     tracking_kernel_id = st_ClContextBase_enable_kernel( context,
-        "st_Track_particles_beam_elements_opencl", tracking_program_id );
+        "st_Track_particles_beam_elements_priv_particles_optimized_opencl",
+        tracking_program_id );
 
     if( ( tracking_kernel_id < 0 ) || ( tracking_kernel_id >=
           ( int )st_ClContextBase_get_num_available_kernels( context ) ) )
@@ -169,10 +171,10 @@ int main( int argc, char* argv[] )
 
     printf( "                 NUM_PARTICLES"
             "                     NUM_TURNS"
-            "                 wall time [s]"
-            "            norm wall time [s]"
-            "                event time [s]"
-            "           norm event time [s]"
+            "               work group size"
+            "                num_work_items"
+            "             tracking time [s]"
+            "        norm tracking time [s]"
             "\r\n" );
 
     for( ; kk < NUM_CONFIGURATIONS ; ++kk )
@@ -250,23 +252,27 @@ int main( int argc, char* argv[] )
 
         if( success == 0 )
         {
-            double const wall_time =
-                st_ClContext_get_last_wall_time( context );
+            double const tracking_time = st_ClContextBase_get_avg_exec_time(
+                context, tracking_kernel_id );
 
-            double const norm_wall_time =
-                wall_time / ( double )( NUM_TURNS * NUM_PARTICLES );
+            double const norm_tracking_time  =
+                tracking_time  / ( double )( NUM_TURNS * NUM_PARTICLES );
 
-            double const event_time =
-                st_ClContext_get_last_event_time( context );
+            int const work_group_size =
+                st_ClContextBase_get_last_exec_work_group_size(
+                    context, tracking_kernel_id );
 
-            double const norm_event_time =
-                event_time / ( double )( NUM_TURNS * NUM_PARTICLES );
+            int const num_work_items =
+                st_ClContextBase_get_last_exec_num_work_items(
+                    context, tracking_kernel_id );
 
-            printf( "%30d" "%30d" "%30.6f" "%30.6f" "%30.6f" "%30.6f" "\r\n",
+            printf( "%30d" "%30d" "%30d" "%30d" "%30.6f" "%30.6f" "\r\n",
                     ( int )NUM_PARTICLES, ( int )NUM_TURNS,
-                    wall_time, norm_wall_time,
-                    event_time, norm_event_time );
+                    work_group_size, num_work_items,
+                    tracking_time, norm_tracking_time );
         }
+
+        st_ClContextBase_reset_kernel_exec_timing( context, tracking_kernel_id );
 
         /* ----------------------------------------------------------------- */
         /* Clean-up */
