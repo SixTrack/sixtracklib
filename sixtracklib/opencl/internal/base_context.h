@@ -208,6 +208,22 @@ namespace SIXTRL_CXX_NAMESPACE
         size_type kernelPreferredWorkGroupSizeMultiple(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
+        size_type kernelExecCounter(
+            kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        double lastExecTime( kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+        double minExecTime(  kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+        double maxExecTime(  kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+        double avgExecTime(  kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        size_type lastExecWorkGroupSize(
+            kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        size_type lastExecNumWorkItems(
+            kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        void resetKernelExecTiming( kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+
         program_id_t programIdByKernelId(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
@@ -264,7 +280,14 @@ namespace SIXTRL_CXX_NAMESPACE
                 m_num_args( -1 ),
                 m_work_group_size( size_type{ 0 } ),
                 m_preferred_work_group_multiple( size_type{ 0 } ),
-                m_local_mem_size( size_type{ 0 } )
+                m_local_mem_size( size_type{ 0 } ),
+                m_exec_count( size_type{ 0 } ),
+                m_last_work_group_size( size_type{ 0 } ),
+                m_last_num_of_threads( size_type{ 0 } ),
+                m_min_exec_time(  std::numeric_limits< double >::max() ),
+                m_max_exec_time(  std::numeric_limits< double >::min() ),
+                m_last_exec_time( double{ 0 } ),
+                m_sum_exec_time( double{ 0 } )
             {
 
             }
@@ -277,12 +300,57 @@ namespace SIXTRL_CXX_NAMESPACE
 
             ~KernelData() = default;
 
+            void resetTiming() SIXTRL_NOEXCEPT
+            {
+                this->m_min_exec_time  = std::numeric_limits< double >::max();
+                this->m_max_exec_time  = std::numeric_limits< double >::min();
+                this->m_last_exec_time = double{ 0 };
+                this->m_sum_exec_time  = double{ 0 };
+                this->m_exec_count     = size_type{ 0 };
+
+                return;
+            }
+
+            void addExecTime( double const exec_time )
+            {
+                if( exec_time >= double{ 0 } )
+                {
+                    this->m_last_exec_time = exec_time;
+                    this->m_sum_exec_time += exec_time;
+                    ++this->m_exec_count;
+
+                    if( this->m_min_exec_time > exec_time )
+                        this->m_min_exec_time = exec_time;
+
+                    if( this->m_max_exec_time < exec_time )
+                        this->m_max_exec_time = exec_time;
+                }
+
+                return;
+            }
+
+            double avgExecTime() const
+            {
+                return ( this->m_exec_count > size_type{ 0 } )
+                    ? this->m_sum_exec_time /
+                      static_cast< double >( this->m_exec_count ) : double{ 0 };
+            }
+
             std::string   m_kernel_name;
             program_id_t  m_program_id;
             size_type     m_num_args;
             size_type     m_work_group_size;
             size_type     m_preferred_work_group_multiple;
             size_type     m_local_mem_size;
+            size_type     m_exec_count;
+
+            size_type     m_last_work_group_size;
+            size_type     m_last_num_of_threads;
+
+            double        m_min_exec_time;
+            double        m_max_exec_time;
+            double        m_last_exec_time;
+            double        m_sum_exec_time;
         };
 
         using program_data_list_t = std::vector< program_data_t >;
@@ -297,6 +365,15 @@ namespace SIXTRL_CXX_NAMESPACE
             cl::Program& cl_program, program_data_t& program_data );
 
         virtual bool doSelectNode( size_type node_index );
+
+        void addKernelExecTime(
+            double const time, kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+
+        void setLastWorkGroupSize( size_type work_group_size,
+            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+
+        void setLastNumWorkItems( size_type num_work_items,
+            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
 
         kernel_data_list_t  const& kernelData()  const SIXTRL_NOEXCEPT;
         program_data_list_t const& programData() const SIXTRL_NOEXCEPT;
@@ -526,7 +603,33 @@ SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN int NS(ClContextBase_get_program_id_by_kernel_id)(
+SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_exec_counter)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+
+SIXTRL_HOST_FN double NS(ClContextBase_get_last_exec_time)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+
+SIXTRL_HOST_FN double NS(ClContextBase_get_min_exec_time)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+
+SIXTRL_HOST_FN double NS(ClContextBase_get_max_exec_time)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+
+SIXTRL_HOST_FN double NS(ClContextBase_get_avg_exec_time)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+
+SIXTRL_HOST_FN NS(context_size_t)
+NS(ClContextBase_get_last_exec_work_group_size)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+
+SIXTRL_HOST_FN NS(context_size_t)
+NS(ClContextBase_get_last_exec_num_work_items)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+
+SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_exec_timing)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id );
+
+SIXTRL_HOST_FN int  NS(ClContextBase_get_program_id_by_kernel_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
 SIXTRL_HOST_FN bool NS(ClContextBase_has_remapping_program)(

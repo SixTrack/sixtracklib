@@ -1110,6 +1110,98 @@ namespace SIXTRL_CXX_NAMESPACE
             : program_id_t{ -1 };
     }
 
+    ClContextBase::size_type ClContextBase::kernelExecCounter(
+        ClContextBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        return ( ( kernel_id >= kernel_id_t{ 0 } ) &&
+                 ( static_cast< size_type >( kernel_id ) <
+                   this->numAvailableKernels() ) )
+            ? this->m_kernel_data[ kernel_id ].m_exec_count
+            : size_type{ 0 };
+    }
+
+    double ClContextBase::lastExecTime(
+        ClContextBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        return ( ( kernel_id >= kernel_id_t{ 0 } ) &&
+                 ( static_cast< size_type >( kernel_id ) <
+                   this->numAvailableKernels() ) )
+            ? this->m_kernel_data[ kernel_id ].m_last_exec_time : double{ 0 };
+    }
+
+    double ClContextBase::minExecTime(
+        ClContextBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        return ( ( kernel_id >= kernel_id_t{ 0 } ) &&
+                 ( static_cast< size_type >( kernel_id ) <
+                   this->numAvailableKernels() ) )
+            ? this->m_kernel_data[ kernel_id ].m_min_exec_time : double{ 0 };
+    }
+
+    double ClContextBase::maxExecTime(
+        ClContextBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        return ( ( kernel_id >= kernel_id_t{ 0 } ) &&
+                 ( static_cast< size_type >( kernel_id ) <
+                   this->numAvailableKernels() ) )
+            ? this->m_kernel_data[ kernel_id ].m_max_exec_time : double{ 0 };
+    }
+
+    double ClContextBase::avgExecTime(
+        ClContextBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        return ( ( kernel_id >= kernel_id_t{ 0 } ) &&
+                 ( static_cast< size_type >( kernel_id ) <
+                   this->numAvailableKernels() ) )
+            ? this->m_kernel_data[ kernel_id ].avgExecTime() : double{ 0 };
+    }
+
+    ClContextBase::size_type ClContextBase::lastExecWorkGroupSize(
+        ClContextBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        return ( ( kernel_id >= kernel_id_t{ 0 } ) &&
+                 ( static_cast< size_type >( kernel_id ) <
+                   this->numAvailableKernels() ) )
+            ? this->m_kernel_data[ kernel_id ].m_last_work_group_size
+            : size_type{ 0 };
+    }
+
+    ClContextBase::size_type ClContextBase::lastExecNumWorkItems(
+        ClContextBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        return ( ( kernel_id >= kernel_id_t{ 0 } ) &&
+                 ( static_cast< size_type >( kernel_id ) <
+                   this->numAvailableKernels() ) )
+            ? this->m_kernel_data[ kernel_id ].m_last_num_of_threads
+            : size_type{ 0 };
+    }
+
+    void ClContextBase::resetKernelExecTiming(
+         ClContextBase::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
+    {
+        if( ( kernel_id >= kernel_id_t{ 0 } ) &&
+            ( static_cast< size_type >( kernel_id ) <
+              this->numAvailableKernels() ) )
+        {
+            this->m_kernel_data[ kernel_id ].resetTiming();
+        }
+
+        return;
+    }
+
+    void ClContextBase::addKernelExecTime( double const time,
+        ClContextBase::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
+    {
+        if( ( kernel_id >= kernel_id_t{ 0 } ) &&
+            ( static_cast< size_type >( kernel_id ) <
+              this->numAvailableKernels() ) )
+        {
+            this->m_kernel_data[ kernel_id ].addExecTime( time );
+        }
+
+        return;
+    }
+
     ClContextBase::kernel_id_t
     ClContextBase::remappingKernelId() const SIXTRL_NOEXCEPT
     {
@@ -1188,6 +1280,36 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContextBase::programData() const SIXTRL_NOEXCEPT
     {
         return this->m_program_data;
+    }
+
+    void ClContextBase::setLastWorkGroupSize(
+         ClContextBase::size_type const work_group_size,
+         ClContextBase::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
+    {
+        if( ( kernel_id >= kernel_id_t{ 0 } ) &&
+            ( static_cast< size_type >( kernel_id ) <
+              this->numAvailableKernels() ) )
+        {
+            this->m_kernel_data[ kernel_id ].m_last_work_group_size =
+                work_group_size;
+        }
+
+        return;
+    }
+
+    void ClContextBase::setLastNumWorkItems(
+         ClContextBase::size_type const num_work_items,
+         ClContextBase::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
+    {
+        if( ( kernel_id >= kernel_id_t{ 0 } ) &&
+            ( static_cast< size_type >( kernel_id ) <
+              this->numAvailableKernels() ) )
+        {
+            this->m_kernel_data[ kernel_id ].m_last_num_of_threads =
+                num_work_items;
+        }
+
+        return;
     }
 
     ClContextBase::size_type
@@ -1878,6 +2000,58 @@ NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
     return ( ctx != nullptr )
         ? ctx->kernelPreferredWorkGroupSizeMultiple( kernel_id )
         : NS(context_size_t){ 0 };
+}
+
+SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_exec_counter)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id )
+{
+    return ( ctx != nullptr )
+        ? ctx->kernelExecCounter( kernel_id ) : NS(context_size_t){ 0 };
+}
+
+SIXTRL_HOST_FN double NS(ClContextBase_get_last_exec_time)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id )
+{
+    return ( ctx != nullptr ) ? ctx->lastExecTime( kernel_id ) : double{ 0 };
+}
+
+SIXTRL_HOST_FN double NS(ClContextBase_get_min_exec_time)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id )
+{
+    return ( ctx != nullptr ) ? ctx->minExecTime( kernel_id ) : double{ 0 };
+}
+
+SIXTRL_HOST_FN double NS(ClContextBase_get_max_exec_time)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id )
+{
+    return ( ctx != nullptr ) ? ctx->maxExecTime( kernel_id ) : double{ 0 };
+}
+
+SIXTRL_HOST_FN double NS(ClContextBase_get_avg_exec_time)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id )
+{
+    return ( ctx != nullptr ) ? ctx->avgExecTime( kernel_id ) : double{ 0 };
+}
+
+SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_last_exec_work_group_size)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id )
+{
+    return ( ctx != nullptr ) ? ctx->lastExecWorkGroupSize( kernel_id )
+        : NS(context_size_t){ 0 };
+}
+
+SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_last_exec_num_work_items)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id )
+{
+    return ( ctx != nullptr ) ? ctx->lastExecNumWorkItems( kernel_id )
+        : NS(context_size_t){ 0 };
+}
+
+SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_exec_timing)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id )
+{
+    if( ctx != nullptr ) ctx->resetKernelExecTiming( kernel_id );
+    return;
 }
 
 SIXTRL_HOST_FN int NS(ClContextBase_get_program_id_by_kernel_id)(
