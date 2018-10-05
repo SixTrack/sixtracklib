@@ -53,8 +53,19 @@ set(  SIXTRACKL_LIBRARY_MODULES
     ${SIXTRACKL_LIBRARY_MODULES}
     $<TARGET_OBJECTS:sixtrack_cuda_host> CACHE INTERNAL "" FORCE )
 
+find_library( CUDA_LIBRARY cuda ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES} )
+find_library( CUDART_LIBRARY cudart ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES} )
+
+if( SIXTRACKL_ENABLE_CUDA_RTC )
+    find_library( CUDA_NVRTC_LIBRARY nvrtc ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES} )
+else()
+    set( CUDA_NVRTC_LIBRARY )
+endif()
+
 set(   SIXTRACKL_LINK_LIBRARIES
-     ${SIXTRACKL_LINK_LIBRARIES} cudart CACHE INTERNAL "" FORCE )
+     ${SIXTRACKL_LINK_LIBRARIES}
+     ${CUDA_NVRTC_LIBRARY} ${CUDA_LIBRARY} ${CUDART_LIBRARY}
+     CACHE INTERNAL "" FORCE )
 
 # ------------------------------------------------------------------------------
 # --- CUDA Kernel object library:
