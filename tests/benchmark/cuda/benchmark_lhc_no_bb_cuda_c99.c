@@ -15,7 +15,6 @@ int main( int argc, char* argv[] )
     typedef st_buffer_size_t    buf_size_t;
     typedef st_Buffer           buffer_t;
     typedef st_Particles        particles_t;
-    typedef st_Object           object_t;
 
     int        SELECTED_DEVICE_ID = 0;
     uint64_t   NUM_TURNS          = 20;
@@ -47,6 +46,7 @@ int main( int argc, char* argv[] )
     char** device_id_str_list = SIXTRL_NULLPTR;
 
     cudaError_t cu_err = cudaGetDeviceCount( &total_num_devices );
+    ( void )cu_err;
 
     SIXTRL_ASSERT( cu_err == cudaSuccess );
     SIXTRL_ASSERT( lhc_particles_buffer != SIXTRL_NULLPTR );
@@ -94,8 +94,6 @@ int main( int argc, char* argv[] )
 
         if( total_num_devices > 0 )
         {
-            int device_id = 0;
-
             printf( "               %3lu devices found on the system\r\n"
                     "               Default = %4s\r\n"
                     "\r\n", ( unsigned long )total_num_devices,
@@ -214,6 +212,8 @@ int main( int argc, char* argv[] )
 
     particles = st_Particles_new( particles_buffer, NUM_PARTICLES );
     result_particles = st_Particles_new( result_particles_buffer, NUM_PARTICLES );
+    ( void )result_particles;
+
     input_particles = st_BufferIndex_get_const_particles(
         st_Buffer_get_const_objects_begin( lhc_particles_buffer ) );
 
