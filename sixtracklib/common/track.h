@@ -183,7 +183,9 @@ NS(Track_particles_beam_element_objs)(
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/beam_elements.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
-    #include "sixtracklib/common/be_beambeam/track_beambeam.h"
+    #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
+        #include "sixtracklib/common/be_beambeam/track_beambeam.h"
+    #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -484,6 +486,8 @@ NS(Track_particle_beam_element_obj)(
             break;
         }
 
+        #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
+
         case NS(OBJECT_TYPE_BEAM_BEAM_4D):
         {
             typedef NS(BeamBeam4D)   belem_t;
@@ -503,6 +507,8 @@ NS(Track_particle_beam_element_obj)(
             ret = NS(Track_particle_beam_beam_6d)( p, index, belem );
             break;
         }
+
+        #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 
 
         default:
@@ -645,6 +651,8 @@ NS(Track_particle_subset_beam_element_obj)(
             break;
         }
 
+        #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
+
         case NS(OBJECT_TYPE_BEAM_BEAM_4D):
         {
             typedef NS(BeamBeam4D)   belem_t;
@@ -670,6 +678,8 @@ NS(Track_particle_subset_beam_element_obj)(
             }
             break;
         }
+
+        #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 
         default:
         {
