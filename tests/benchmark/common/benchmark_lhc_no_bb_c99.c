@@ -16,7 +16,7 @@ int main()
     /* ===================================================================== */
     /* ==== Prepare Host Buffers                                             */
 
-    buf_size_t const NUM_CONFIGURATIONS = 13;
+    buf_size_t const NUM_CONFIGURATIONS = 17;
 
     buf_size_t num_particles_list[] =
     {
