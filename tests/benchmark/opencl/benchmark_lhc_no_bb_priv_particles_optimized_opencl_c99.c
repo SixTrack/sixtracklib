@@ -177,12 +177,12 @@ int main( int argc, char* argv[] )
              1023 - strlen( tracking_program_compile_options ) );
 
     #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-    printf( "#Info :: beam-beam elements enabled\r\n" );
+    printf( "# Info :: beam-beam elements enabled\r\n" );
     #else /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
-    printf( "#Info :: beam-beam elements disabled\r\n" );
+    printf( "# Info :: beam-beam elements disabled\r\n" );
     #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 
-    printf( "#Tracking kernel compile options: %s\r\n",
+    printf( "# Tracking kernel compile options: %s\r\n",
             tracking_program_compile_options );
 
     tracking_program_id = st_ClContextBase_add_program_file(
@@ -191,7 +191,7 @@ int main( int argc, char* argv[] )
     if( ( tracking_program_id < 0 ) || ( tracking_program_id >=
           ( int )st_ClContextBase_get_num_available_programs( context ) ) )
     {
-        printf( "ERROR BUILDING TRACKING PROGRAM \r\n" );
+        printf( "# ERROR BUILDING TRACKING PROGRAM \r\n" );
         st_ClContextBase_delete( context );
         return 0;
     }
@@ -203,14 +203,14 @@ int main( int argc, char* argv[] )
     if( ( tracking_kernel_id < 0 ) || ( tracking_kernel_id >=
           ( int )st_ClContextBase_get_num_available_kernels( context ) ) )
     {
-        printf( "ERROR ENABLING TRACKING KERNEL\r\n" );
+        printf( "# ERROR ENABLING TRACKING KERNEL\r\n" );
         st_ClContextBase_delete( context );
         return 0;
     }
 
     if( !st_ClContext_set_tracking_kernel_id( context, tracking_kernel_id ) )
     {
-        printf( "ERROR SETTING KERNEL AS TRACKING KERNEL\r\n" );
+        printf( "# ERROR SETTING KERNEL AS TRACKING KERNEL\r\n" );
         st_ClContextBase_delete( context );
         return 0;
     }
@@ -275,7 +275,7 @@ int main( int argc, char* argv[] )
                 ( particles_arg == SIXTRL_NULLPTR ) ||
                 ( beam_elements_arg == SIXTRL_NULLPTR ) )
             {
-                printf( "ERROR ARGUMENT CREATION \r\n" );
+                printf( "# ERROR ARGUMENT CREATION \r\n" );
                 success = -1;
             }
 
@@ -290,7 +290,7 @@ int main( int argc, char* argv[] )
 
                 if( success != 0 )
                 {
-                    printf( "ERROR TRACKING\r\n" );
+                    printf( "# ERROR TRACKING\r\n" );
                 }
             }
 
