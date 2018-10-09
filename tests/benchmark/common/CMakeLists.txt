@@ -12,6 +12,18 @@ set( C99_BENCHMARKS ${C99_BENCHMARKS} benchmark_lhc_no_bb_common_c99 )
 target_compile_options( benchmark_lhc_no_bb_common_c99 BEFORE PUBLIC
     -fno-fast-math -fno-tree-vectorize )
 
+target_compile_definitions( benchmark_lhc_no_bb_common_c99 PRIVATE
+    -DSIXTRL_DISABLE_BEAM_BEAM=1 )
+
+# -----------------------------------------------------------------------------
+# benchmark_lhc_passive_bb_common_c99:
+
+add_executable( benchmark_lhc_passive_bb_common_c99 benchmark_lhc_no_bb_c99.c )
+set( C99_BENCHMARKS ${C99_BENCHMARKS} benchmark_lhc_passive_bb_common_c99 )
+
+target_compile_options( benchmark_lhc_passive_bb_common_c99 BEFORE PUBLIC
+    -fno-fast-math -fno-tree-vectorize )
+
 # -----------------------------------------------------------------------------
 # benchmark_lhc_no_bb_common_autovec_c99:
 
