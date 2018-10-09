@@ -263,7 +263,7 @@ int main( int argc, char* argv[] )
                 st_ClContextBase_get_last_exec_num_work_items(
                     context, tracking_kernel_id );
 
-            printf( "%30d" "%30d" "%30d" "%30d" "%30.6f" "%30.6f" "\r\n",
+            printf( "%30d" "%30d" "%30d" "%30d" "%30.8f" "%30.8f" "\r\n",
                     ( int )NUM_PARTICLES, ( int )NUM_TURNS,
                     work_group_size, num_work_items,
                     tracking_time, norm_tracking_time );

@@ -119,7 +119,7 @@ int main()
             double const norm_wall_time =
                 wall_time / ( double )( NUM_TURNS * NUM_PARTICLES );
 
-            printf( "%30d" "%30d" "%30.6f" "%30.6f\r\n",
+            printf( "%30d" "%30d" "%30.8f" "%30.8f\r\n",
                     ( int )NUM_PARTICLES, ( int )NUM_TURNS,
                     wall_time, norm_wall_time );
         }
