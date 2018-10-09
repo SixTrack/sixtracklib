@@ -1,9 +1,3 @@
-#if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-#pragma message "beam-beam elements enabled"
-#else
-#pragma message "beam-beam elements disabled"
-#endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
-
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -18,6 +12,12 @@ int main()
     typedef  st_buffer_size_t   buf_size_t;
     typedef  st_Buffer          buffer_t;
     typedef  st_Particles       particles_t;
+
+    #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
+    printf( "#Info :: beam-beam elements enabled\r\n" );
+    #else /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+    printf( "#Info :: beam-beam elements disabled\r\n" );
+    #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 
     /* ===================================================================== */
     /* ==== Prepare Host Buffers                                             */
