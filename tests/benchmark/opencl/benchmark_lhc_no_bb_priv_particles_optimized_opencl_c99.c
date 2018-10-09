@@ -1,3 +1,9 @@
+#if !defined( SIXTRL_DISABLE_BEAM_BEAM )
+#pragma message "beam-beam elements enabled"
+#else
+#pragma message "beam-beam elements disabled"
+#endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
