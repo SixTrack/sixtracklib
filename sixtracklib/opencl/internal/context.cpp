@@ -296,6 +296,9 @@ namespace SIXTRL_CXX_NAMESPACE
         track_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
         track_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private";
         track_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__private";
+        #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
+        track_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
+        #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
         track_compile_options += " -I";
         track_compile_options += NS(PATH_TO_BASE_DIR);
 
