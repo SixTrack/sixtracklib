@@ -31,6 +31,19 @@ int NS(Particles_map_to_same_memory)(
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
 
+int NS(Particles_compare_real_values)(
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
+
+int NS(Particles_compare_real_values_with_treshold)(
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs,
+    NS(particle_real_t) const treshold );
+
+int NS(Particles_compare_integer_values)(
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
+
 int NS(Particles_compare_values)(
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
@@ -52,6 +65,13 @@ void NS(Particles_print)(
 
 void NS(Particles_print_max_diff)(
     FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT max_diff,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* max_diff_indices );
+
+void NS(Particles_print_out)(
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles );
+
+void NS(Particles_print_max_diff_out)(
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT max_diff,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* max_diff_indices );
 
@@ -87,6 +107,13 @@ void NS(Particles_buffer_print_max_diff)(
     FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT max_diff,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* max_diff_indices );
+
+void NS(Particles_buffer_print_out)(
+     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particles );
+
+void NS(Particles_buffer_print_max_diff_out)(
+     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT max_diff,
+     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* max_diff_indices );
 
 /* ------------------------------------------------------------------------- */
 
