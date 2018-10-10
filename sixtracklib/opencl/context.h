@@ -101,6 +101,7 @@ extern "C" {
 SIXTRL_HOST_FN NS(ClContext)* NS(ClContext_create)();
 SIXTRL_HOST_FN NS(ClContext)* NS(ClContext_new)( const char* node_id_str );
 SIXTRL_HOST_FN void NS(ClContext_delete)( NS(ClContext)* SIXTRL_RESTRICT ctx );
+SIXTRL_HOST_FN void NS(ClContext_clear)(  NS(ClContext)* SIXTRL_RESTRICT ctx );
 
 SIXTRL_HOST_FN bool NS(ClContext_has_tracking_kernel)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );

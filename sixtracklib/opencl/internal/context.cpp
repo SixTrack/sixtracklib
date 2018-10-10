@@ -359,6 +359,12 @@ SIXTRL_HOST_FN void NS(ClContext_delete)( NS(ClContext)* SIXTRL_RESTRICT ctx )
     delete ctx;
 }
 
+SIXTRL_HOST_FN void NS(ClContext_clear)( NS(ClContext)* SIXTRL_RESTRICT ctx )
+{
+    if( ctx != nullptr ) ctx->clear();
+    return;
+}
+
 SIXTRL_HOST_FN bool NS(ClContext_has_tracking_kernel)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
