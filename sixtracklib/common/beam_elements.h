@@ -115,6 +115,11 @@ SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_buffer)(
         #include "sixtracklib/common/buffer.h"
     #endif /* !defined( _GPUCODE ) */
 
+    #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
+        #include "sixtracklib/common/be_beambeam/be_beambeam/be_beambeam4d.h"
+        #include "sixtracklib/common/be_beambeam/be_beambeam/be_beambeam6d.h"
+    #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM )  */
+
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -244,6 +249,23 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
                     NS(Cavity_get_num_dataptrs)( ptr_begin );
                 break;
             }
+
+            #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
+
+            case NS(OBJECT_TYPE_BEAM_BEAM_4D):
+            {
+                typedef NS(BeamBeam4D) beam_element_t;
+                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                break;
+            }
+
+            case NS(OBJECT_TYPE_BEAM_BEAM_6D):
+            {
+                break;
+            }
+
+            #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 
             default:
             {
