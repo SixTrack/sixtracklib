@@ -302,7 +302,7 @@ SIXTRL_INLINE int NS(BeamBeam4D_compare_values)(
         {
             cmp_value = +1;
         }
-        else if( rhs_size < rhs_size )
+        else if( rhs_size < lhs_size )
         {
             cmp_value = -1;
         }
@@ -362,7 +362,7 @@ SIXTRL_INLINE int NS(BeamBeam4D_compare_values_with_treshold)(
         {
             cmp_value = +1;
         }
-        else if( rhs_size < rhs_size )
+        else if( rhs_size < lhs_size )
         {
             cmp_value = -1;
         }
