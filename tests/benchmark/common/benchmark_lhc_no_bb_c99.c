@@ -151,8 +151,8 @@ int main()
 
                 if( success == 0 )
                 {
-                    if( min_wall_time < exec_time ) min_wall_time = exec_time;
-                    if( max_wall_time > exec_time ) max_wall_time = exec_time;
+                    if( min_wall_time > exec_time ) min_wall_time = exec_time;
+                    if( max_wall_time < exec_time ) max_wall_time = exec_time;
                 }
                 else
                 {
@@ -170,15 +170,15 @@ int main()
         if( ( success == 0 ) && ( NUM_REPETITIONS > ( buf_size_t )0u ) )
         {
             double const norm_denom = ( double )( NUM_PARTICLES * NUM_TURNS );
-            double const avg_wall_time =
-                sum_wall_time / ( norm_denom * NUM_REPETITIONS );
+            double const avg_denom  = ( double )NUM_REPETITIONS;
 
+            double const avg_wall_time      = sum_wall_time / avg_denom;
             double const norm_avg_wall_time = avg_wall_time / norm_denom;
             double const norm_min_wall_time = min_wall_time / norm_denom;
             double const norm_max_wall_time = max_wall_time / norm_denom;
 
             printf( "%20d" "%20d" "%20d"
-                    "%30.8f" "%30.8f" "%30.8f" "%30.8f" "\r\n",
+                    " %29.8f" " %29.8f" " %29.8f" "% 29.8f" "\r\n",
                     ( int )NUM_PARTICLES, ( int )NUM_TURNS,
                     ( int )ll, avg_wall_time, norm_min_wall_time,
                     norm_avg_wall_time, norm_max_wall_time );
