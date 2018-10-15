@@ -83,7 +83,26 @@ namespace SIXTRL_CXX_NAMESPACE
 
         this->doInitDefaultProgramsPrivImpl();
 
-        size_t const node_index = this->findAvailableNodesIndex( node_id_str );
+        size_t node_index = this->numAvailableNodes();
+
+        if( ( node_id_str != nullptr ) ||
+            ( std::strlen( node_id_str ) == size_t{ 0 } ) )
+        {
+            node_index = this->findAvailableNodesIndex( node_id_str );
+        }
+        else
+        {
+            node_id_t const default_node_id = this->defaultNodeId();
+
+            platform_id_t const platform_index =
+                NS(ComputeNodeId_get_platform_id)( &default_node_id );
+
+            device_id_t const device_index =
+                NS(ComputeNodeId_get_device_id)( &default_node_id );
+
+            node_index = this->findAvailableNodesIndex(
+                platform_index, device_index );
+        }
 
         if( ( node_index < this->numAvailableNodes() ) &&
             ( base_t::doSelectNode( node_index ) ) )
