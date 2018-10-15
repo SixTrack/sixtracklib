@@ -54,9 +54,14 @@ int main( int argc, char* argv[] )
                 "                :: Default = %d\r\n", ( int )NUM_TURNS );
     }
 
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    /* Select the node based on the first command line param or
+     * select the default node: */
+
     if( argc >= 2 )
     {
-        context = st_ClContextBase_new_on_selected_node_id_str( argv[ 1 ] );
+        context = st_ClContext_new( argv[ 1 ] );
 
         if( context == SIXTRL_NULLPTR )
         {
@@ -66,6 +71,19 @@ int main( int argc, char* argv[] )
         }
     }
 
+    if( !st_ClContextBase_has_selected_node( context ) )
+    {
+        /* select default node */
+        st_context_node_id_t const default_node_id =
+            st_ClContextBase_get_default_node_id( context );
+
+        st_ClContextBase_select_node_by_node_id( context, &default_node_id );
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    /* take the number of particles from the third command line parameter,
+     * otherwise keep using the default value */
     if( argc >= 3 )
     {
         int const temp = atoi( argv[ 2 ] );
@@ -73,6 +91,8 @@ int main( int argc, char* argv[] )
         if( temp > 0 ) NUM_PARTICLES = temp;
     }
 
+    /* take the number of turns from the fourth command line parameter,
+     * otherwise keep using the default value */
     if( argc >= 4 )
     {
         int const temp = atoi( argv[ 3 ] );
@@ -80,11 +100,9 @@ int main( int argc, char* argv[] )
         if( temp > 0 ) NUM_TURNS = temp;
     }
 
-    if( context == SIXTRL_NULLPTR )
-    {
-        /* new context on default node */
-        context = st_ClContextBase_new();
-    }
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    /* Give a summary of the provided parameters */
 
     if( ( context != SIXTRL_NULLPTR ) &&
         ( st_ClContextBase_has_selected_node( context ) ) &&
@@ -99,7 +117,8 @@ int main( int argc, char* argv[] )
         char id_str[ 16 ];
         st_ComputeNodeId_to_string( node_id, &id_str[ 0 ], 16  );
 
-        printf( "Selected [ID]            = %s (%s/%s)\r\n"
+        printf( "\r\n"
+                "Selected [ID]            = %s (%s/%s)\r\n"
                 "         [NUM_PARTICLES] = %d\r\n"
                 "         [NUM_TURNS]     = %d\r\n"
                 "\r\n", id_str, st_ComputeNodeInfo_get_name( node_info ),
@@ -109,6 +128,9 @@ int main( int argc, char* argv[] )
     }
     else
     {
+        /* If we get here, something went wrong, most likely with the
+         * selection of the device -> bailing out */
+
         return 0;
     }
 
