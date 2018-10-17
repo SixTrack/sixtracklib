@@ -16,8 +16,8 @@
 
 #include "sixtracklib/testlib.h"
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
 
 TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThread )
@@ -103,6 +103,7 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThre
     a2str.str( "" );
     a2str << " -D_GPUCODE=1"
           << " -D__NAMESPACE=st_"
+          << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
           << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
           << " -I" << PATH_TO_BASE_DIR
           << " -I" << PATH_TO_BASE_DIR << "tests" ;
@@ -111,7 +112,8 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThre
 
 
     std::string path_to_kernel_source = PATH_TO_BASE_DIR;
-    path_to_kernel_source += "tests/sixtracklib/opencl/opencl_buffer_generic_obj_kernel.cl";
+    path_to_kernel_source += "tests/sixtracklib/testlib/opencl/kernels/";
+    path_to_kernel_source += "opencl_buffer_generic_obj_kernel.cl";
 
     std::ifstream kernel_file( path_to_kernel_source, std::ios::in );
 

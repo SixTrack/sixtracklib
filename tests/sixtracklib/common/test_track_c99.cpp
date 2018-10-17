@@ -12,8 +12,8 @@
 
 #include <gtest/gtest.h>
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
 
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/beam_elements.h"
@@ -147,13 +147,12 @@ namespace sixtrack
                     ( ( ::st_Particles_compare_values( cmp_particles,
                                                        particles ) == 0 ) ||
                       ( ( treshold > ( real_t )0.0 ) &&
-                        ( ::st_Particles_compare_values_with_treshold(
+                        ( 0 == ::st_Particles_compare_values_with_treshold(
                             cmp_particles, particles, treshold ) ) ) );
                 }
             }
 
             ::st_Buffer_delete( buffer );
-
             return success;
 
         }
@@ -166,6 +165,7 @@ TEST( C99_CommonTrackTests, TrackParticlesOverDriftBeamElements )
     using real_t = SIXTRL_REAL_T;
 
     static real_t const EPS  = std::numeric_limits< real_t >::epsilon();
+
 
     std::string const path_to_datafile =
         ::st_PATH_TO_TEST_TRACKING_BE_DRIFT_DATA;
@@ -195,7 +195,7 @@ TEST( C99_CommonTrackTests, TrackParticlesOverDriftExactBeamElements )
 {
     using real_t = SIXTRL_REAL_T;
 
-    static real_t const EPS  = std::numeric_limits< real_t >::epsilon();
+    static real_t const EPS  = 5e-14; //std::numeric_limits< real_t >::epsilon();
 
     std::string const path_to_datafile =
         ::st_PATH_TO_TEST_TRACKING_BE_DRIFTEXACT_DATA;

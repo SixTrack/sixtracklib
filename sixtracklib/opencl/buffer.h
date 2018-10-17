@@ -10,9 +10,9 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/_impl/modules.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/generated/modules.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -140,8 +140,8 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_remap_opencl)(
 /* ************************************************************************* */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/_impl/modules.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/generated/modules.h"
 //     #include "sixtracklib/opencl/impl/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 

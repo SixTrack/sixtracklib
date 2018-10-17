@@ -10,12 +10,12 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
-    #include "sixtracklib/_impl/modules.h"
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
-    #include "sixtracklib/common/impl/buffer_object.h"
-    #include "sixtracklib/common/impl/buffer_garbage.h"
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/generated/modules.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
+    #include "sixtracklib/common/buffer/buffer_object.h"
+    #include "sixtracklib/common/buffer/buffer_garbage.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -185,6 +185,10 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reserve)(
     NS(buffer_size_t) const new_max_num_dataptrs,
     NS(buffer_size_t) const new_max_num_garbage_ranges );
 
+SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reserve_capacity)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const new_buffer_capacity );
+
 SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_needs_remapping)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
@@ -198,9 +202,20 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_remap)(
 SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new)(
     NS(buffer_size_t) const buffer_capacity );
 
-SIXTRL_HOST_FN SIXTRL_STATIC SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
-NS(Buffer_new_from_file)(
-    SIXTRL_BUFFER_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_from_file)(
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+
+SIXTRL_HOST_FN bool NS(Buffer_read_from_file)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+
+SIXTRL_HOST_FN bool NS(Buffer_write_to_file)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
+
+SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp );
 
 SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_detailed)(
     NS(buffer_size_t)  const initial_max_num_objects,
@@ -276,22 +291,25 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Object)*
 /* For plain C/Cxx */
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #include <stdio.h>
+    #if !defined( _GPUCODE )
+        #include <stdio.h>
+        #include <string.h>
+    #endif /* !defined( _GPUCODE ) */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES)
-    #include "sixtracklib/common/impl/buffer_defines.h"
-    #include "sixtracklib/common/impl/managed_buffer_minimal.h"
-    #include "sixtracklib/common/impl/managed_buffer_remap.h"
-    #include "sixtracklib/common/impl/managed_buffer.h"
-    #include "sixtracklib/common/impl/buffer_type.h"
-    #include "sixtracklib/common/impl/buffer_object.h"
-    #include "sixtracklib/common/impl/buffer_generic.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/buffer/buffer_generic.h"
+    #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
+    #include "sixtracklib/common/buffer/managed_buffer_remap.h"
+    #include "sixtracklib/common/buffer/managed_buffer.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
+    #include "sixtracklib/common/buffer/buffer_object.h"
 
     #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
                ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 ) && \
         defined( __OPENCL_VERSION__ )
-        #include "sixtracklib/opencl/buffer.h"
+//         #include "sixtracklib/opencl/buffer.h"
     #endif /* OpenCL */
 
     #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
@@ -899,6 +917,48 @@ SIXTRL_INLINE int NS(Buffer_reserve)(
     return success;
 }
 
+SIXTRL_INLINE int NS(Buffer_reserve_capacity)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const new_buffer_capacity )
+{
+    int success = -1;
+
+    if( ( NS(Buffer_uses_datastore)( buffer ) ) &&
+        ( NS(Buffer_allow_resize)( buffer ) ) )
+    {
+        /*
+        #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
+             SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1
+
+        if( NS(Buffer_uses_special_opencl_datastore)( buffer ) )
+        {
+            success = NS(Buffer_reserve_capacity_opencl)(
+                buffer, new_buffer_capacity );
+        }
+        else
+        #endif *//* SIXTRACKLIB_ENABLE_MODULE_OPENCL */
+
+        /*
+        #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
+             SIXTRACKLIB_ENABLE_MODULE_CUDA == 1
+
+        if( NS(Buffer_uses_special_cuda_datastore)( buffer ) )
+        {
+            success = NS(Buffer_reserve_capacity_cuda)(
+                buffer, new_buffer_capacity );
+        }
+        else
+        #endif */ /* SIXTRACKLIB_ENABLE_MODULE_CUDA */
+
+        {
+            success = NS(Buffer_reserve_capacity_generic)(
+                buffer, new_buffer_capacity );
+        }
+    }
+
+    return success;
+}
+
 SIXTRL_INLINE bool NS(Buffer_needs_remapping)(
     const NS(Buffer) *const SIXTRL_RESTRICT buffer )
 {
@@ -1019,71 +1079,6 @@ SIXTRL_INLINE int NS(Buffer_init)(
     return success;
 }
 
-#if !defined( _GPUCODE )
-
-SIXTRL_INLINE NS(Buffer)* NS(Buffer_new_from_file)(
-    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file )
-{
-    typedef NS(buffer_size_t) buf_size_t;
-
-    NS(Buffer)*  ptr_buffer = SIXTRL_NULLPTR;
-    buf_size_t size_of_file = ( buf_size_t )0u;
-
-    if( path_to_file != SIXTRL_NULLPTR )
-    {
-        FILE* fp = fopen( path_to_file, "rb" );
-
-        if( fp != 0 )
-        {
-            long length = ( long )0u;
-
-            fseek( fp, 0, SEEK_END );
-            length = ftell( fp );
-            fclose( fp );
-            fp = 0;
-
-            if( length > 0 )
-            {
-                size_of_file = ( buf_size_t )length;
-            }
-        }
-    }
-
-    if( size_of_file > ( buf_size_t )0u )
-    {
-        ptr_buffer = NS(Buffer_new)( size_of_file );
-
-        if( ptr_buffer != SIXTRL_NULLPTR )
-        {
-            int success = -1;
-            FILE* fp = fopen( path_to_file, "rb" );
-
-            if( fp != SIXTRL_NULLPTR )
-            {
-                buf_size_t const cnt = fread(
-                    ( SIXTRL_ARGPTR_DEC char* )( uintptr_t
-                        )NS(Buffer_get_data_begin_addr)( ptr_buffer ),
-                    size_of_file, ( buf_size_t )1u, fp );
-
-                if( ( cnt == ( buf_size_t )1u ) &&
-                    ( 0   == NS(Buffer_remap)( ptr_buffer ) ) )
-                {
-                    success = 0;
-                }
-            }
-
-            if( success != 0 )
-            {
-                NS(Buffer_delete)( ptr_buffer );
-                ptr_buffer = SIXTRL_NULLPTR;
-            }
-        }
-    }
-
-    return ptr_buffer;
-}
-
-#endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 

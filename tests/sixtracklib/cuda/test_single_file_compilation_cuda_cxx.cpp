@@ -16,7 +16,7 @@
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
 
-#include "tests/sixtracklib/cuda/impl/cuda_grid_dimensions_kernel.cuh"
+#include "sixtracklib/testlib/cuda/kernels/cuda_grid_dimensions_kernel.cuh"
 
 TEST( CXX_Cuda_SingleFileCompilation,
       IterateOverAllDevicesTestGridDimensions )

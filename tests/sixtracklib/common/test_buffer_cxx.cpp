@@ -11,6 +11,9 @@
 
 #include <gtest/gtest.h>
 
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/testlib/common/generic_buffer_obj.h"
+#include "sixtracklib/testlib/testdata/testdata_files.h"
 #include "sixtracklib/common/buffer.hpp"
 
 namespace sixtrack
@@ -922,6 +925,115 @@ TEST( CXX_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
     ASSERT_TRUE( buffer.getNumObjects()  == size_t{ 3 } );
     ASSERT_TRUE( buffer.getNumDataptrs() == size_t{ 3 } * NUM_DATAPTRS_PER_OBJ );
     ASSERT_TRUE( buffer.getNumSlots()    >  num_slots_after_obj2 );
+}
+
+TEST( CXX_CommonBufferTests, AddGenericObjectsTestAutoGrowingOfBuffer )
+{
+    namespace st = sixtrack;
+
+    using buf_size_t    = st::Buffer::size_type;
+    using type_id_t     = st::Buffer::type_id_t;
+    using generic_obj_t = ::st_GenericObj;
+    using index_obj_t   = ::st_Object;
+
+    st::Buffer buffer;
+
+    ASSERT_TRUE( buffer.allowResize() );
+    ASSERT_TRUE( buffer.allowAppend() );
+    ASSERT_TRUE( buffer.allowRemap()  );
+
+    buf_size_t prev_capacity     = buffer.capacity();
+    buf_size_t prev_size         = buffer.size();
+    buf_size_t prev_num_objects  = buffer.getNumObjects();
+    buf_size_t prev_num_slots    = buffer.getNumSlots();
+    buf_size_t prev_num_dataptrs = buffer.getNumDataptrs();
+
+    ASSERT_TRUE( prev_size         >  buf_size_t{ 0 } );
+    ASSERT_TRUE( prev_capacity     >= prev_size );
+    ASSERT_TRUE( prev_num_objects  == buf_size_t{ 0 } );
+    ASSERT_TRUE( prev_num_slots    == buf_size_t{ 0 } );
+    ASSERT_TRUE( prev_num_dataptrs == buf_size_t{ 0 } );
+
+    constexpr buf_size_t NUM_OBJECTS_TO_ADD = buf_size_t{ 100 };
+    constexpr buf_size_t NUM_DATAPTRS       = buf_size_t{   2 };
+    constexpr buf_size_t num_d_values       = buf_size_t{  10 };
+    constexpr buf_size_t num_e_values       = buf_size_t{  10 };
+
+    buf_size_t offsets[ NUM_DATAPTRS ] =
+    {
+        offsetof( generic_obj_t, d ), offsetof( generic_obj_t, e )
+    };
+
+    buf_size_t sizes[ NUM_DATAPTRS ] =
+    {
+        sizeof( uint8_t ), sizeof( double )
+    };
+
+    buf_size_t counts[ NUM_DATAPTRS ] =
+    {
+        num_d_values, num_e_values
+    };
+
+    generic_obj_t temp;
+    temp.a       = int32_t{ 0 };
+    temp.b       = double{ 0.0 };
+    temp.num_d   = num_d_values;
+    temp.d       = nullptr;
+    temp.num_e   = num_e_values;
+    temp.e       = nullptr;
+
+    std::fill( &temp.c[ 0 ], &temp.c[ 4 ], double{ 0.0 } );
+
+    for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_OBJECTS_TO_ADD ; ++ii )
+    {
+        temp.type_id = static_cast< type_id_t >( ii );
+
+        index_obj_t* index_obj = buffer.addObject( temp, temp.type_id,
+                NUM_DATAPTRS, offsets, sizes, counts );
+
+        ASSERT_TRUE( index_obj != nullptr );
+        ASSERT_TRUE( ::st_Object_get_type_id( index_obj )   == temp.type_id );
+        ASSERT_TRUE( ::st_Object_get_begin_ptr( index_obj ) != nullptr );
+
+        buf_size_t const capacity = buffer.capacity();
+        buf_size_t const size     = buffer.size();
+
+        ASSERT_TRUE( capacity >= prev_capacity );
+        ASSERT_TRUE( size     >  prev_size     );
+        ASSERT_TRUE( capacity >= size  );
+
+        prev_capacity = capacity;
+        prev_size     = size;
+
+        buf_size_t const num_objects  = buffer.getNumObjects();
+        buf_size_t const num_slots    = buffer.getNumSlots();
+        buf_size_t const num_dataptrs = buffer.getNumDataptrs();
+
+        ASSERT_TRUE( num_objects  == prev_num_objects + buf_size_t{ 1 } );
+        ASSERT_TRUE( num_slots    >= prev_num_slots );
+        ASSERT_TRUE( num_dataptrs >= prev_num_dataptrs );
+
+        prev_num_objects  = num_objects;
+        prev_num_slots    = num_slots;
+        prev_num_dataptrs = num_dataptrs;
+    }
+
+    ASSERT_TRUE( buffer.getNumObjects() == NUM_OBJECTS_TO_ADD );
+}
+
+
+TEST( CXX_CommonBufferTests, ConstractFromBinaryDumpFile )
+{
+    namespace st = sixtrack;
+    using buf_size_t = st::Buffer::size_type;
+
+    st::Buffer buffer( ::st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM );
+
+    ASSERT_TRUE( buffer.size()           >  buf_size_t{ 0 } );
+    ASSERT_TRUE( buffer.capacity()       >= buffer.size() );
+    ASSERT_TRUE( buffer.getNumObjects()  >  buf_size_t{ 0 } );
+    ASSERT_TRUE( buffer.getNumSlots()    >  buf_size_t{ 0 } );
+    ASSERT_TRUE( buffer.getNumDataptrs() >  buf_size_t{ 0 } );
 }
 
 /* ************************************************************************* */

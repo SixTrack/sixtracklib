@@ -1,0 +1,51 @@
+set( SIXTRACKLIB_COMMON_BE_MULTIPOLE_C99_HEADERS
+     be_multipole.h
+)
+
+set( SIXTRACKLIB_COMMON_BE_MULTIPOLE_CXX_HEADERS
+     be_multipole.hpp
+)
+
+if( SIXTRACKLIB_COMMON_BE_MULTIPOLE_C99_HEADERS )
+    string( REGEX REPLACE "([^;]+)" "be_multipole/\\1" LOCAL_C99_HEADERS
+            "${SIXTRACKLIB_COMMON_BE_MULTIPOLE_C99_HEADERS}" )
+
+    set(  SIXTRACKLIB_COMMON_C99_HEADERS
+        ${SIXTRACKLIB_COMMON_C99_HEADERS}
+        ${LOCAL_C99_HEADERS} PARENT_SCOPE )
+endif()
+
+if( SIXTRACKLIB_COMMON_BE_MULTIPOLE_CXX_HEADERS )
+    string( REGEX REPLACE "([^;]+)" "be_multipole/\\1" LOCAL_CXX_HEADERS
+            "${SIXTRACKLIB_COMMON_BE_MULTIPOLE_CXX_HEADERS}" )
+
+    set(  SIXTRACKLIB_COMMON_CXX_HEADERS
+        ${SIXTRACKLIB_COMMON_CXX_HEADERS}
+        ${LOCAL_CXX_HEADERS} PARENT_SCOPE )
+endif()
+
+# ----------------------------------------------------------------------------
+# install :
+
+if( SIXTRACKLIB_COMMON_BE_MULTIPOLE_C99_HEADERS )
+
+    set( SIXTRACKLIB_COMMON_BE_MULTIPOLE_C99_INSTALL_PATH
+         include/sixtracklib/common/be_multipole )
+
+    install( FILES ${SIXTRACKLIB_COMMON_BE_MULTIPOLE_C99_HEADERS}
+             DESTINATION ${SIXTRACKLIB_COMMON_BE_MULTIPOLE_C99_INSTALL_PATH} )
+endif()
+
+
+if( SIXTRACKLIB_COMMON_BE_MULTIPOLE_CXX_HEADERS )
+
+    set( SIXTRACKLIB_COMMON_BE_MULTIPOLE_CXX_INSTALL_PATH
+         include/sixtracklib/common/be_multipole )
+
+    install( FILES ${SIXTRACKLIB_COMMON_BE_MULTIPOLE_CXX_HEADERS}
+             DESTINATION ${SIXTRACKLIB_COMMON_BE_MULTIPOLE_CXX_INSTALL_PATH} )
+endif()
+
+#end: sixtracklib/common/be_multipole/CMakeLists.txt
+
+

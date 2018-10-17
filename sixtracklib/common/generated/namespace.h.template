@@ -1,0 +1,38 @@
+#ifndef SIXTRACKLIB_COMMON_GENERATED_NAMESPACE_HEADER_H__
+#define SIXTRACKLIB_COMMON_GENERATED_NAMESPACE_HEADER_H__
+
+/* ------------------------------------------------------------------------- */
+/* C99 Namespace */
+
+#if !defined( SIXTRL_C99_NAMESPACE )
+    #define SIXTRL_C99_NAMESPACE @SIXTRL_GENERATED_C99_NAMESPACE@
+#endif /* !defined( SIXTRL_C99_NAMESPACE ) */
+
+#if !defined( SIXTRL_C99_NAMESPACE_STR )
+    #define SIXTRL_C99_NAMESPACE_STR "@SIXTRL_GENERATED_C99_NAMESPACE@"
+#endif /* !defined( SIXTRL_C99_NAMESPACE_STR ) */
+
+#if !defined( SIXTRL_C99_NAMESPACE_PREFIX_STR )
+    #define SIXTRL_C99_NAMESPACE_PREFIX_STR "@SIXTRL_GENERATED_C99_NAMESPACE@"
+#endif /* !defined( SIXTRL_C99_NAMESPACE_PREFIX_STR ) */
+
+/* ------------------------------------------------------------------------- */
+/* C++ Namespace */
+
+#if !defined( SIXTRL_CXX_NAMESPACE )
+    #define SIXTRL_CXX_NAMESPACE @SIXTRL_GENERATED_CXX_NAMESPACE@
+#endif /* !defined( SIXTRL_CXX_NAMESPACE ) */
+
+#if !defined( SIXTRL_CXX_NAMESPACE_STR )
+    #define SIXTRL_CXX_NAMESPACE_STR "@SIXTRL_GENERATED_CXX_NAMESPACE@"
+#endif /* !defined( SIXTRL_CXX_NAMESPACE_STR ) */
+
+#if !defined( SIXTRL_CXX_NAMESPACE_PREFIX_STR )
+    #define SIXTRL_CXX_NAMESPACE_PREFIX_STR "@SIXTRL_GENERATED_CXX_NAMESPACE@::"
+#endif /* !defined( SIXTRL_CXX_NAMESPACE_PREFIX_STR ) */
+
+/* ------------------------------------------------------------------------- */
+
+#endif /* SIXTRACKLIB_COMMON_GENERATED_NAMESPACE_HEADER_H__ */
+
+/* end: sixtracklib/common/generated/namespace.h */

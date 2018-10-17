@@ -11,11 +11,11 @@ if( GTEST_FOUND )
          ${SIXTRACKL_GTEST_LIBRARIES} )
 
     # --------------------------------------------------------------------------
-    # test_tools:
+    # test_tools_c99:
 
-    add_executable( test_tools_common test_tools.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_tools_common )
-    add_test( CommonToolTests test_tools_common )
+    add_executable( test_tools_common_c99 test_tools_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_tools_common_c99 )
+    add_test( C99_CommonToolTests test_tools_common_c99 )
 
     # --------------------------------------------------------------------------
     # test_managed_buffer_common_c99:
@@ -39,18 +39,23 @@ if( GTEST_FOUND )
     add_test( CXX_CommonBufferTest test_buffer_common_cxx )
 
     # --------------------------------------------------------------------------
-    # test_gpu_kernel_tools:
+    # test_gpu_kernel_tools_common_c99:
 
-    add_executable( test_gpu_kernel_tools_common  test_gpu_kernel_tools.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_gpu_kernel_tools_common )
-    add_test( CommonGpuKernelTools                test_gpu_kernel_tools_common )
+    add_executable( test_gpu_kernel_tools_common_c99
+                    test_gpu_kernel_tools_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+         test_gpu_kernel_tools_common_c99 )
+
+    add_test( C99_CommonGpuKernelTools
+              test_gpu_kernel_tools_common_c99 )
 
     # --------------------------------------------------------------------------
-    # test_mem_pool:
+    # test_mem_pool_common_c99:
 
-    add_executable( test_mem_pool_common          test_mem_pool.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_mem_pool_common )
-    add_test( CommonMemPoolTests                  test_mem_pool_common )
+    add_executable( test_mem_pool_common_c99      test_mem_pool_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_mem_pool_common_c99 )
+    add_test( C99_CommonMemPoolTests              test_mem_pool_common_c99 )
 
     # ==========================================================================
     # test_particles_common_c99:

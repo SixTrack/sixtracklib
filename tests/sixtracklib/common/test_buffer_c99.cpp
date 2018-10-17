@@ -11,8 +11,9 @@
 
 #include <gtest/gtest.h>
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
+#include "sixtracklib/testlib/common/generic_buffer_obj.h"
 
 #include "sixtracklib/common/buffer.h"
 
@@ -1012,6 +1013,72 @@ TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
 
     st_Buffer_delete( buffer );
     buffer = nullptr;
+}
+
+TEST( C99_CommonBufferTests, AddGenericObjectsTestAutoGrowingOfBuffer )
+{
+    using buf_size_t    = ::st_buffer_size_t;
+    using type_id_t     = ::st_object_type_id_t;
+    using generic_obj_t = ::st_GenericObj;
+
+    ::st_Buffer* buffer = ::st_Buffer_new( buf_size_t{ 0 } );
+
+    ASSERT_TRUE( ::st_Buffer_allow_resize( buffer ) );
+    ASSERT_TRUE( ::st_Buffer_allow_remapping( buffer ) );
+    ASSERT_TRUE( ::st_Buffer_allow_append_objects( buffer ) );
+
+    buf_size_t prev_capacity     = ::st_Buffer_get_capacity( buffer );
+    buf_size_t prev_size         = ::st_Buffer_get_size( buffer );
+    buf_size_t prev_num_objects  = ::st_Buffer_get_num_of_objects( buffer );
+    buf_size_t prev_num_slots    = ::st_Buffer_get_num_of_slots( buffer );
+    buf_size_t prev_num_dataptrs = ::st_Buffer_get_num_of_dataptrs( buffer );
+
+    ASSERT_TRUE( buffer            != nullptr );
+    ASSERT_TRUE( prev_size         >  buf_size_t{ 0 } );
+    ASSERT_TRUE( prev_capacity     >= prev_size );
+    ASSERT_TRUE( prev_num_objects  == buf_size_t{ 0 } );
+    ASSERT_TRUE( prev_num_slots    == buf_size_t{ 0 } );
+    ASSERT_TRUE( prev_num_dataptrs == buf_size_t{ 0 } );
+
+    constexpr buf_size_t NUM_OBJECTS_TO_ADD = 100;
+    constexpr buf_size_t num_d_values = 10;
+    constexpr buf_size_t num_e_values = 10;
+
+    buf_size_t ii = 0;
+
+    for( ; ii < NUM_OBJECTS_TO_ADD ; ++ii )
+    {
+        generic_obj_t* obj = ::st_GenericObj_new(
+            buffer, static_cast< type_id_t >( ii ), num_d_values, num_e_values );
+
+        ASSERT_TRUE( obj != nullptr );
+
+        buf_size_t const capacity = ::st_Buffer_get_capacity( buffer );
+        buf_size_t const size     = ::st_Buffer_get_size( buffer );
+
+        ASSERT_TRUE( capacity >= prev_capacity );
+        ASSERT_TRUE( size     >  prev_size     );
+        ASSERT_TRUE( capacity >= size  );
+
+        prev_capacity = capacity;
+        prev_size     = size;
+
+        buf_size_t const num_objects  = ::st_Buffer_get_num_of_objects( buffer );
+        buf_size_t const num_slots    = ::st_Buffer_get_num_of_slots( buffer );
+        buf_size_t const num_dataptrs = ::st_Buffer_get_num_of_dataptrs( buffer );
+
+        ASSERT_TRUE( num_objects  == prev_num_objects + buf_size_t{ 1 } );
+        ASSERT_TRUE( num_slots    >= prev_num_slots );
+        ASSERT_TRUE( num_dataptrs >= prev_num_dataptrs );
+
+        prev_num_objects  = num_objects;
+        prev_num_slots    = num_slots;
+        prev_num_dataptrs = num_dataptrs;
+    }
+
+    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( buffer ) == NUM_OBJECTS_TO_ADD );
+
+    ::st_Buffer_delete( buffer );
 }
 
 /* end: tests/sixtracklib/common/test_buffer_c99.cpp */

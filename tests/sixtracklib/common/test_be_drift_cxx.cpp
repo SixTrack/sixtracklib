@@ -11,8 +11,9 @@
 
 #include <gtest/gtest.h>
 
+#include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.hpp"
-#include "sixtracklib/common/impl/be_drift.hpp"
+#include "sixtracklib/common/be_drift/be_drift.hpp"
 
 /* ************************************************************************* *
  * ******  sixtrack::Drift:

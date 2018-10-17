@@ -12,22 +12,23 @@
 
 # ------------------------------------------------------------------------------
 
-set( SIXTRACKL_LINK_LIBRARIES )
+set( SIXTRACKL_LINK_LIBRARIES  "" CACHE INTERNAL "" FORCE )
+set( SIXTRACKL_LIBRARY_MODULES "" CACHE INTERNAL "" FORCE )
 
 # ------------------------------------------------------------------------------
 
-set( SIXTRACKL_LIBRARY_MODULES )
-set( SIXTRACKL_TOP_LEVEL_HEADERS sixtracklib.h )
-set( SIXTRACKL_HEADERS )
-set( SIXTRACKL_SOURCES )
+set( SIXTRACKLIB_C99_HEADERS )
+set( SIXTRACKLIB_CXX_HEADERS )
 
-add_subdirectory( _impl )
+set( SIXTRACKL_LOCAL_C99_HEADERS
+     sixtracklib.h
+)
 
-# ------------------------------------------------------------------------------
+set( SIXTRACKL_LOCAL_CXX_HEADERS
+     sixtracklib.hpp
+)
 
 add_subdirectory( common )
-set( SIXTRACKL_LIBRARY_MODULES )
-list( APPEND SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_common> )
 
 # ------------------------------------------------------------------------------
 
@@ -43,34 +44,22 @@ list( APPEND SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_common> )
 # ------------------------------------------------------------------------------
 
 if( SIXTRACKL_ENABLE_OPENCL )
-
-    set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES}
-                                  ${SIXTRACKL_OPENCL_LIBRARY} )
-#     add_subdirectory( opencl )
-#
-#     set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-#          $<TARGET_OBJECTS:sixtrack_opencl> )
-
+    add_subdirectory( opencl )
 endif()
 
 if( SIXTRACKL_ENABLE_CUDA )
-
     add_subdirectory( cuda )
-
-    list( APPEND SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_cuda_device> )
-    list( APPEND SIXTRACKL_LIBRARY_MODULES $<TARGET_OBJECTS:sixtrack_cuda_host> )
-
-    set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} cudart )
 endif()
 
 # ------------------------------------------------------------------------------
 
 set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} m )
-set( SIXTRACKL_HEADERS ${SIXTRACKL_HEADERS} ${SIXTRACKL_TOP_LEVEL_HEADERS} )
 
 add_library( sixtrack SHARED
-             ${SIXTRACKL_HEADERS}
-             ${SIXTRACKL_SOURCES}
+             ${SIXTRACKLIB_C99_HEADERS}
+             ${SIXTRACKL_LOCAL_C99_HEADERS}
+             ${SIXTRACKLIB_CXX_HEADERS}
+             ${SIXTRACKL_LOCAL_CXX_HEADERS}
              ${SIXTRACKL_LIBRARY_MODULES}
 )
 
@@ -86,8 +75,7 @@ set_target_properties( sixtrack PROPERTIES LINKER_LANGUAGE C )
 set_target_properties( sixtrack PROPERTIES POSITION_INDEPENDENT_CODE ON )
 set_target_properties( sixtrack PROPERTIES C_STANDARD 99 )
 set_target_properties( sixtrack PROPERTIES DEBUG_POSTFIX d )
-
-target_compile_definitions( sixtrack PUBLIC ${SIXTRACKLIB_NAMESPACE_FLAGS} )
+set_target_properties( sixtrack PROPERTIES C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack
                         PRIVATE -Wall -Werror -pedantic -ansi
@@ -108,9 +96,20 @@ install( EXPORT SixTracklib-targets
          DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake
 )
 
-set( SIXTRACKLIB_TLD_INSTALL_PATH include/sixtracklib )
+if( SIXTRACKL_LOCAL_C99_HEADERS )
 
-install( FILES ${SIXTRACKL_TOP_LEVEL_HEADERS}
-         DESTINATION ${SIXTRACKLIB_TLD_INSTALL_PATH} )
+    set( SIXTRACKLIB_C99_INSTALL_PATH include/sixtracklib )
+
+    install( FILES ${SIXTRACKL_LOCAL_C99_HEADERS}
+             DESTINATION ${SIXTRACKLIB_C99_INSTALL_PATH} )
+endif()
+
+if( SIXTRACKL_LOCAL_CXX_HEADERS )
+
+    set( SIXTRACKLIB_CXX_INSTALL_PATH include/sixtracklib )
+
+    install( FILES ${SIXTRACKL_LOCAL_CXX_HEADERS}
+             DESTINATION ${SIXTRACKLIB_CXX_INSTALL_PATH} )
+endif()
 
 # ------------------------------------------------------------------------------

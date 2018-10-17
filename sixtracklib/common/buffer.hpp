@@ -2,23 +2,27 @@
 #define CXX_SIXTRACKLIB_COMMON_BUFFER_HPP__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #include <cstddef>
-    #include <cstdint>
-    #include <cstdlib>
-    #include <limits>
-    #include <utility>
+    #if defined( __cplusplus )
+        #include <cstddef>
+        #include <cstdint>
+        #include <cstdlib>
+        #include <cstdio>
+        #include <limits>
+        #include <utility>
+        #include <string>
+    #endif /* defined( __cplusplus ) */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/_impl/definitions.h"
+    #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
-    class Buffer : private ::NS(Buffer)
+    class Buffer : public ::NS(Buffer)
     {
         public:
 
@@ -67,12 +71,19 @@ namespace SIXTRL_NAMESPACE
             size_type max_num_garbage_ranges,
             size_type buffer_capacity ) SIXTRL_NOEXCEPT;
 
+        #if !defined( GPUCODE )
+        SIXTRL_HOST_FN Buffer( char const* path_to_file );
+        SIXTRL_HOST_FN Buffer( std::string const& path_to_file );
+        #endif /* !defined( GPUCODE ) */
+
         /* TODO: Implement Copy & Move semantics for Buffer */
         SIXTRL_FN Buffer( Buffer const& other ) = delete;
         SIXTRL_FN Buffer( Buffer&& other ) = delete;
 
         SIXTRL_FN Buffer& operator=( Buffer const& rhs ) = delete;
         SIXTRL_FN Buffer& operator=( Buffer&& rhs ) = delete;
+
+
 
         SIXTRL_FN virtual ~Buffer();
 
@@ -122,30 +133,34 @@ namespace SIXTRL_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN size_type size()                  const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type capacity()              const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type headerSize()            const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type size()                   const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type capacity()               const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type headerSize()             const SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN size_type getSize()               const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getCapacity()           const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getSize()                const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getCapacity()            const SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN size_type getSlotSize()           const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getHeaderSize()         const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getSectionHeaderSize()  const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getSlotSize()            const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getHeaderSize()          const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getSectionHeaderSize()   const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN size_type getNumSlots()           const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getMaxNumSlots()        const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getSlotsSize()          const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getNumSlots()            const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getMaxNumSlots()         const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getSlotsSize()           const SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN size_type getNumObjects()         const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getMaxNumObjects()      const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getObjectsSize()        const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getNumObjects()          const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getMaxNumObjects()       const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getObjectsSize()         const SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN size_type getNumDataptrs()        const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getMaxNumDataptrs()     const SIXTRL_NOEXCEPT;
-        SIXTRL_FN size_type getDataptrsSize()       const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getNumDataptrs()         const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getMaxNumDataptrs()      const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getDataptrsSize()        const SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN size_type getNumGarbageRanges()    const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getMaxNumGarbageRanges() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN size_type getGarbageRangesSize()   const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -157,6 +172,12 @@ namespace SIXTRL_NAMESPACE
 
         template< typename Ptr >  SIXTRL_FN Ptr  indexBegin() SIXTRL_NOEXCEPT;
         template< typename Ptr >  SIXTRL_FN Ptr  indexEnd()   SIXTRL_NOEXCEPT;
+
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC object_t const*
+            operator[]( size_type object_index ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC object_t*
+            operator[]( size_type object_index ) SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -223,6 +244,13 @@ namespace SIXTRL_NAMESPACE
 
         private:
 
+        #if !defined( _GPUCODE )
+
+        SIXTRL_HOST_FN SIXTRL_STATIC size_type GetBinaryFileSize(
+            char const* path_to_file ) SIXTRL_NOEXCEPT;
+
+        #endif /* !defined( _GPUCODE ) */
+
         bool allocateDataStore(
             size_type const buffer_capacity, flags_t const flags );
     };
@@ -233,10 +261,10 @@ namespace SIXTRL_NAMESPACE
  * ************************************************************************* */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/mem_pool.h"
+    #include "sixtracklib/common/buffer/mem_pool.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     SIXTRL_INLINE Buffer::size_type Buffer::CalculateBufferSize(
         Buffer::size_type const max_num_objects,
@@ -349,6 +377,50 @@ namespace SIXTRL_NAMESPACE
             ::NS(Buffer_free)( _buffer );
         }
     }
+
+    #if !defined( GPUCODE )
+    SIXTRL_INLINE Buffer::Buffer( char const* path_to_file ) : ::NS(Buffer)()
+    {
+        using c_api_t = Buffer::c_api_t;
+        using size_t  = Buffer::size_type;
+
+        size_t const required_buffer_size =
+            Buffer::GetBinaryFileSize( path_to_file );
+
+        c_api_t* _buffer = ::NS(Buffer_preset)( this->getCApiPtr() );
+
+        if( this->allocateDataStore( required_buffer_size,
+                                     Buffer::DEFAULT_DATASTORE_FLAGS ) )
+        {
+            ::NS(Buffer_read_from_file)( _buffer, path_to_file );
+        }
+        else
+        {
+            ::NS(Buffer_free)( _buffer );
+        }
+    }
+
+    SIXTRL_INLINE Buffer::Buffer( std::string const& path_to_file ) : ::NS(Buffer)()
+    {
+        using c_api_t = Buffer::c_api_t;
+        using size_t  = Buffer::size_type;
+
+        size_t const required_buffer_size =
+            Buffer::GetBinaryFileSize( path_to_file.c_str() );
+
+        c_api_t* _buffer = ::NS(Buffer_preset)( this->getCApiPtr() );
+
+        if( this->allocateDataStore( required_buffer_size,
+                                     Buffer::DEFAULT_DATASTORE_FLAGS ) )
+        {
+            ::NS(Buffer_read_from_file)( _buffer, path_to_file.c_str() );
+        }
+        else
+        {
+            ::NS(Buffer_free)( _buffer );
+        }
+    }
+    #endif /* !defined( _GPUCODE ) */
 
     SIXTRL_INLINE Buffer::~Buffer()
     {
@@ -621,6 +693,26 @@ namespace SIXTRL_NAMESPACE
         return NS(Buffer_get_dataptrs_size)( this->getCApiPtr() );
     }
 
+
+
+    SIXTRL_INLINE Buffer::size_type
+    Buffer::getNumGarbageRanges() const SIXTRL_NOEXCEPT
+    {
+        return ::NS(Buffer_get_num_of_garbage_ranges)( this->getCApiPtr() );
+    }
+
+    SIXTRL_INLINE Buffer::size_type
+    Buffer::getMaxNumGarbageRanges() const SIXTRL_NOEXCEPT
+    {
+        return ::NS(Buffer_get_max_num_of_garbage_ranges)( this->getCApiPtr() );
+    }
+
+    SIXTRL_INLINE Buffer::size_type
+    Buffer::getGarbageRangesSize() const SIXTRL_NOEXCEPT
+    {
+        return ::NS(Buffer_get_garbage_size)( this->getCApiPtr() );
+    }
+
     /* ----------------------------------------------------------------- */
 
     SIXTRL_INLINE Buffer::address_t
@@ -661,6 +753,19 @@ namespace SIXTRL_NAMESPACE
     {
         return reinterpret_cast< Ptr >( static_cast< uintptr_t >(
             NS(Buffer_get_objects_end_addr)( this->getCApiPtr() ) ) );
+    }
+
+
+    SIXTRL_INLINE SIXTRL_BUFFER_OBJ_ARGPTR_DEC Buffer::object_t const*
+        Buffer::operator[]( size_type object_index ) const SIXTRL_NOEXCEPT
+    {
+        return NS(Buffer_get_const_object)( this->getCApiPtr(), object_index );
+    }
+
+    SIXTRL_INLINE SIXTRL_BUFFER_OBJ_ARGPTR_DEC Buffer::object_t*
+        Buffer::operator[]( size_type object_index ) SIXTRL_NOEXCEPT
+    {
+        return NS(Buffer_get_object)( this->getCApiPtr(), object_index );
     }
 
     /* ----------------------------------------------------------------- */
@@ -765,6 +870,34 @@ namespace SIXTRL_NAMESPACE
             reinterpret_cast< ptr_const_size_t >( sizes   ),
             reinterpret_cast< ptr_const_size_t >( counts  ) );
     }
+
+    #if !defined( _GPUCODE )
+    SIXTRL_HOST_FN SIXTRL_INLINE Buffer::size_type
+    Buffer::GetBinaryFileSize( char const* path_to_file ) SIXTRL_NOEXCEPT
+    {
+        using size_t = Buffer::size_type;
+
+        size_t file_size = size_t{ 0 };
+        FILE* fp = std::fopen( path_to_file, "rb" );
+
+        if( fp != nullptr )
+        {
+            long length = long{ 0u };
+
+            std::fseek( fp, 0, SEEK_END );
+            length = std::ftell( fp );
+            std::fclose( fp );
+            fp = nullptr;
+
+            if( length > long{ 0 } )
+            {
+                file_size = static_cast< size_t >( length );
+            }
+        }
+
+        return file_size;
+    }
+    #endif /* !defined( _GPUCODE ) */
 
     SIXTRL_INLINE bool Buffer::allocateDataStore(
         Buffer::size_type const buffer_capacity, Buffer::flags_t const flags )

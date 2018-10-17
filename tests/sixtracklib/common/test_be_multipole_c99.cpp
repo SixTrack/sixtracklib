@@ -12,11 +12,11 @@
 
 #include <gtest/gtest.h>
 
-#include "sixtracklib/_impl/definitions.h"
-#include "sixtracklib/_impl/path.h"
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/path.h"
 
 #include "sixtracklib/common/buffer.h"
-#include "sixtracklib/common/impl/be_multipole.h"
+#include "sixtracklib/common/be_multipole/be_multipole.h"
 
 /* ************************************************************************* *
  * ******  st_MultiPole:
