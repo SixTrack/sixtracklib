@@ -25,10 +25,16 @@ option( SIXTRACKL_ENABLE_CXX               "Enable C++ bindings"         ON  )
 option( SIXTRACKL_ENABLE_PYTHON            "Enable Python bindings"      ON  )
 
 # ------------------------------------------------------------------------------
+# ---- SixTrackLib Features:
+
+option( SIXTRACKL_ENABLE_APERATURE_CHECK   "Enable xy - aperature check" ON )
+
+# ------------------------------------------------------------------------------
 # ---- Program logistic options:
 
 option( SIXTRACKL_BUILD_EXAMPLES        "Build sixtracklib examples"     ON  )
-option( SIXTRACKL_ENABLE_PROGRAMM_TESTS "Enable programmatic unit-tests" OFF )
+option( SIXTRACKL_ENABLE_PROGRAMM_TESTS "Enable programmatic unit-tests" ON  )
+option( SIXTRACKL_REQUIRE_OFFLINE_BUILD "Require offline building"       OFF )
 
 # ------------------------------------------------------------------------------
 # CPU/System architecture settings:
@@ -41,6 +47,16 @@ set_property( CACHE SIXTRACKL_CPU_ARCH PROPERTY STRINGS sse2 avx avx2 native )
 
 # ==============================================================================
 # ====  Detailed settings:
+
+# ------------------------------------------------------------------------------
+# ---- SixTrackLib detailed features settings:
+
+set( SIXTRACKL_APERATURE_X_LIMIT_VALUE "1.0"
+     CACHE STRING "Aperature check x limit" FORCE )
+
+set( SIXTRACKL_APERATURE_Y_LIMIT_VALUE "1.0"
+     CACHE STRING "Aperature check x limit" FORCE )
+
 
 # ------------------------------------------------------------------------------
 # Installation detailed setings

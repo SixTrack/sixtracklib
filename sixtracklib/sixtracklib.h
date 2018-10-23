@@ -9,6 +9,7 @@
 /* ------------------------------------------------------------------------- */
 
 #include "sixtracklib/common/generated/namespace.h"
+#include "sixtracklib/common/generated/config.h"
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/generated/modules.h"

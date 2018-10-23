@@ -180,6 +180,7 @@ NS(Track_particles_beam_element_objs)(
 #endif /* #if !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/generated/config.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/beam_elements.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
@@ -208,11 +209,41 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift)(
     real_t const dzeta  = NS(Particles_get_rvv_value)( p, ii ) -
                           ( ( real_t )1 + ( xp*xp + yp*yp ) / ( real_t )2 );
 
+    #if defined( SIXTRL_ENABLE_APERATURE_CHECK ) && \
+        SIXTRL_ENABLE_APERATURE_CHECK == 1
+
+    typedef NS(particle_index_t) index_t;
+
+    SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0;
+
+    real_t const x = NS(Particles_get_x_value)( p, ii ) + length * xp;
+    real_t const y = NS(Particles_get_y_value)( p, ii ) + length * yp;
+
+    real_t const sign_x = ( real_t )( ( ZERO < x ) - ( real_t )( x < ZERO ) );
+    real_t const sign_y = ( real_t )( ( ZERO < y ) - ( real_t )( y < ZERO ) );
+
+    /* state == 1 -> particle is valid
+     *       == 0 -> particle is outside of the aperature limits */
+
+    index_t const state =
+        NS(Particles_get_state_value)( p, ii ) &
+        ( ( index_t )( ( sign_x * x ) < SIXTRL_APERATURE_X_LIMIT ) ) &
+        ( ( index_t )( ( sign_y * y ) < SIXTRL_APERATURE_Y_LIMIT ) );
+
+    NS(Particles_set_x_value)( p, ii, x );
+    NS(Particles_set_y_value)( p, ii, y );
+    NS(Particles_set_state_value)( p, ii, state );
+
+    #else /* SIXTRL_ENABLE_APERATURE_CHECK */
+
+    NS(Particles_add_to_x_value)( p, ii, length * xp );
+    NS(Particles_add_to_y_value)( p, ii, length * yp );
+
+    #endif /* SIXTRL_ENABLE_APERATURE_CHECK */
+
     SIXTRL_ASSERT( NS(Particles_get_beta0_value)( p, ii ) > ( real_t )0 );
 
     NS(Particles_add_to_s_value)(    p, ii, length );
-    NS(Particles_add_to_x_value)(    p, ii, length * xp );
-    NS(Particles_add_to_y_value)(    p, ii, length * yp );
     NS(Particles_add_to_zeta_value)( p, ii, length * dzeta );
 
     return ( SIXTRL_TRACK_RETURN )0;
@@ -237,13 +268,39 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift_exact)(
     real_t const dzeta  = NS(Particles_get_rvv_value)( p, ii ) * length
                         - opd * lpzi;
 
+    #if defined( SIXTRL_ENABLE_APERATURE_CHECK ) && \
+        SIXTRL_ENABLE_APERATURE_CHECK == 1
+
+    typedef NS(particle_index_t) index_t;
+
+    SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0;
+
+    real_t const x = NS(Particles_get_x_value)( p, ii ) + px * lpzi;
+    real_t const y = NS(Particles_get_y_value)( p, ii ) + py * lpzi;
+
+    real_t const sign_x = ( real_t )( ( ZERO < x ) - ( real_t )( x < ZERO ) );
+    real_t const sign_y = ( real_t )( ( ZERO < y ) - ( real_t )( y < ZERO ) );
+
+    index_t const state = NS(Particles_get_state_value)( p, ii ) &
+        ( ( index_t )( ( sign_x * x ) > SIXTRL_APERATURE_X_LIMIT ) ) &
+        ( ( index_t )( ( sign_y * y ) > SIXTRL_APERATURE_Y_LIMIT ) );
+
+    NS(Particles_set_x_value)( p, ii, x );
+    NS(Particles_set_y_value)( p, ii, y );
+    NS(Particles_set_state_value)( p, ii, state );
+
+    #else /* SIXTRL_ENABLE_APERATURE_CHECK */
+
+    NS(Particles_add_to_x_value)( p, ii, px * lpzi );
+    NS(Particles_add_to_y_value)( p, ii, py * lpzi );
+
+    #endif /* SIXTRL_ENABLE_APERATURE_CHECK */
+
     SIXTRL_ASSERT( NS(Particles_get_beta0_value)( p, ii ) > ( real_t )0 );
     SIXTRL_ASSERT( ( opd * opd ) > ( px * px + py * py ) );
     SIXTRL_ASSERT( sqrt( opd * opd - ( px * px + py * py ) ) > ( real_t )0 );
 
     NS(Particles_add_to_s_value)(    p, ii, length );
-    NS(Particles_add_to_x_value)(    p, ii, px * lpzi );
-    NS(Particles_add_to_x_value)(    p, ii, py * lpzi );
     NS(Particles_add_to_zeta_value)( p, ii, dzeta );
 
     return ( SIXTRL_TRACK_RETURN )0;

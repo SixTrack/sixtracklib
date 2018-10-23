@@ -94,6 +94,39 @@ install( CODE "
 
 
 # ------------------------------------------------------------------------------
+# create a header file common/generated/config.h with encoding top-level
+# configuration options from Settings.cmake:
+
+if( SIXTRACKL_ENABLE_APERATURE_CHECK )
+    set( SIXTRACKL_ENABLE_APERATURE_CHECK_FLAG "1" )
+else()
+    set( SIXTRACKL_ENABLE_APERATURE_CHECK_FLAG "0" )
+endif()
+
+message( STATUS "X_LIMIT: ${SIXTRACKL_APERATURE_X_LIMIT_VALUE}" )
+message( STATUS "Y_LIMIT: ${SIXTRACKL_APERATURE_Y_LIMIT_VALUE}" )
+
+set( CONFIG_H_IN_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/config.h.template" )
+set( CONFIG_H_OUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/config.h" )
+
+configure_file( ${CONFIG_H_IN_PATH} ${CONFIG_H_OUT_PATH} @ONLY )
+
+set(  SIXTRACKL_COMMON_GENERATED_HEADERS
+    ${SIXTRACKL_COMMON_GENERATED_HEADERS} "generated/config.h" )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# install:
+
+set( PATH_H_INSTALL_PATH
+     "${CMAKE_INSTALL_PREFIX}/${GENERATED_INSTALL_PATH}/config.h" )
+
+install( CODE "
+         set( SIXTRACKL_ENABLE_APERATURE_CHECK
+              \"${SIXTRACKL_ENABLE_APERATURE_CHECK_FLAG}/\" )
+         message( STATUS \"Generating: ${PATH_H_INSTALL_PATH}\" )
+         configure_file( \"${CONFIG_H_IN_PATH}\" \"${CONFIG_H_OUT_PATH}\" @ONLY ) " )
+
+# ------------------------------------------------------------------------------
 # Create a header file encapsulating the choices for the C and C++
 # namespaces. This moves namespaces away from being passed down via
 # command line flags (altough overriding them via command line defines
