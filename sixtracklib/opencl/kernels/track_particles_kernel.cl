@@ -99,6 +99,11 @@ __kernel void NS(Track_particles_beam_elements_opencl)(
         size_t global_particle_id       = get_global_id( 0 );
         size_t object_begin_particle_id = ( size_t )0u;
 
+        if( global_particle_id == 0 )
+        {
+            printf( "HERE\r\n" );
+        }
+
         obj_iter_t part_block_it  = NS(ManagedBuffer_get_objects_index_begin)(
                 particles_buf, slot_size );
 
@@ -137,8 +142,20 @@ __kernel void NS(Track_particles_beam_elements_opencl)(
 
                 for( ; turn < num_turns ; ++turn )
                 {
+                    if( global_particle_id == 0 )
+                    {
+                        printf( "before charge_ratio %15.7f\r\n",
+                                NS(Particles_get_charge_ratio_value)( particles, 0 ) );
+                    }
+
                     success_flag |= NS(Track_particle_beam_element_objs)(
                         particles, particle_id, be_begin, be_end );
+
+                    if( global_particle_id == 0 )
+                    {
+                        printf( "after  charge_ratio %15.7f\r\n",
+                                NS(Particles_get_charge_ratio_value)( particles, 0 ) );
+                    }
                 }
             }
 

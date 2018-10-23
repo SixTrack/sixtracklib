@@ -56,7 +56,7 @@ int main( int argc, char* argv[] )
 
     if( argc >= 2 )
     {
-        context = st_ClContextBase_new_on_selected_node_id_str( argv[ 1 ] );
+        context = st_ClContext_new( argv[ 1 ] );
 
         if( context == SIXTRL_NULLPTR )
         {
@@ -83,7 +83,7 @@ int main( int argc, char* argv[] )
     if( context == SIXTRL_NULLPTR )
     {
         /* new context on default node */
-        context = st_ClContextBase_new();
+        context = st_ClContext_new( SIXTRL_NULLPTR );
     }
 
     if( ( context != SIXTRL_NULLPTR ) &&

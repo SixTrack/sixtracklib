@@ -63,6 +63,45 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
         ASSERT_TRUE( ::st_ClContextBase_select_node_by_index( context, nn ) );
         ASSERT_TRUE( ::st_ClContextBase_has_selected_node( context ) );
 
+        /* ----------------------------------------------------------------- */
+        /* Add and select optimized tracking kernel: */
+
+        std::string path_to_tracking_program( ::st_PATH_TO_BASE_DIR );
+        path_to_tracking_program += "sixtracklib/opencl/kernels/";
+        path_to_tracking_program += "track_particles_kernel.cl";
+
+        std::string tracking_program_compile_options( "-D_GPUCODE=1" );
+        tracking_program_compile_options += " -cl-strict-aliasing";
+        tracking_program_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
+        tracking_program_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
+        tracking_program_compile_options += " -I";
+        tracking_program_compile_options += ::st_PATH_TO_BASE_DIR;
+
+        int const tracking_program_id = ::st_ClContextBase_add_program_file(
+            context, path_to_tracking_program.c_str(),
+            tracking_program_compile_options.c_str() );
+
+        ASSERT_TRUE( tracking_program_id >= 0 );
+        ASSERT_TRUE( static_cast< std::size_t >( tracking_program_id ) <
+                     ::st_ClContextBase_get_num_available_programs( context ) );
+
+        std::string tracking_kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
+        tracking_kernel_name += "Track_particles_beam_elements_opencl";
+
+        int const tracking_kernel_id = ::st_ClContextBase_enable_kernel(
+            context, tracking_kernel_name.c_str(), tracking_program_id );
+
+        ASSERT_TRUE( tracking_kernel_id >= 0 );
+        ASSERT_TRUE( static_cast< std::size_t >( tracking_kernel_id ) <
+                     ::st_ClContextBase_get_num_available_kernels( context ) );
+
+        ASSERT_TRUE( ::st_ClContext_set_tracking_kernel_id(
+            context, tracking_kernel_id ) );
+
+        ASSERT_TRUE( ::st_ClContext_has_tracking_kernel( context ) );
+        ASSERT_TRUE( ::st_ClContext_get_tracking_kernel_id( context ) ==
+                     tracking_kernel_id );
+
         ::st_context_node_info_t const* node_info =
             ::st_ClContextBase_get_selected_node_info( context );
 
@@ -104,13 +143,6 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
     ::st_Buffer_delete( lhc_beam_elements_buffer );
     ::st_ClContext_delete( context );
 }
-
-// TEST( C99_OpenCL_TrackParticlesTests,
-//       LHCReproduceSixTrackSingleTurnWithBeamBeam )
-// {
-//
-//
-// }
 
 /* ************************************************************************* */
 

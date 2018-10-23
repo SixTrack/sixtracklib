@@ -70,6 +70,82 @@ int main( int argc, char* argv[] )
             "Selected NUM_TURNS     = %10lu\r\n"
             "\r\n", NUM_PARTICLES, NUM_TURNS );
 
+    {
+        int num_drifts       = 0;
+        int num_drift_exacts = 0;
+        int num_multipoles   = 0;
+        int num_cavities     = 0;
+        int num_xyshifts     = 0;
+        int num_srotations   = 0;
+        int num_unknown      = 0;
+
+        int const num_beam_elements =
+            st_Buffer_get_num_of_objects( lhc_beam_elements_buffer );
+
+        int kk = 0;
+
+        for( ; kk < num_beam_elements ; ++kk )
+        {
+            st_Object const* obj = st_Buffer_get_const_object( lhc_beam_elements_buffer, kk );
+
+            switch( st_Object_get_type_id( obj ) )
+            {
+                case st_OBJECT_TYPE_DRIFT:
+                {
+                    num_drifts++;
+                    break;
+                }
+
+                case st_OBJECT_TYPE_DRIFT_EXACT:
+                {
+                    num_drift_exacts++;
+                    break;
+                }
+
+                case st_OBJECT_TYPE_MULTIPOLE:
+                {
+                    num_multipoles++;
+                    break;
+                }
+
+                case st_OBJECT_TYPE_CAVITY:
+                {
+                    num_cavities++;
+                    break;
+                }
+
+                case st_OBJECT_TYPE_XYSHIFT:
+                {
+                    num_xyshifts++;
+                    break;
+                }
+
+                case st_OBJECT_TYPE_SROTATION:
+                {
+                    num_srotations++;
+                    break;
+                }
+
+                default:
+                {
+                    num_unknown++;
+                }
+            };
+        }
+
+        printf( "num_beam_elements : %d\r\n"
+                "drifts            : %d\r\n"
+                "drift exacts      : %d\r\n"
+                "multipoles        : %d\r\n"
+                "cavities          : %d\r\n"
+                "xyshift           : %d\r\n"
+                "srotation         : %d\r\n"
+                "unknown           : %d\r\n\r\n",
+                num_beam_elements, num_drifts, num_drift_exacts, num_multipoles,
+                num_cavities, num_xyshifts, num_srotations, num_unknown );
+
+    }
+
     /* ********************************************************************** */
     /* ****   Building Particles Data from LHC Particle Dump Data        **** */
     /* ********************************************************************** */

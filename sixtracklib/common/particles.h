@@ -1729,25 +1729,25 @@ SIXTRL_INLINE void NS(Particles_preset_values)(
         NS(particle_index_t) const TURN_ID        = ( NS(particle_index_t) )-1;
         NS(particle_index_t) const PARTICLE_STATE = ( NS(particle_index_t) )-1;
 
-        SIXTRL_ASSERT( NS(Particles_get_const_q0)(     p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_beta0)(  p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_mass0)(  p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_gamma0)( p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_p0c)(    p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_q0)(     p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_beta0)(  p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_mass0)(  p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_gamma0)( p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_p0c)(    p ) != SIXTRL_NULLPTR );
 
-        SIXTRL_ASSERT( NS(Particles_get_const_s)(      p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_x)(      p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_y)(      p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_px)(     p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_py)(     p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_zeta)(   p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_s)(      p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_x)(      p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_y)(      p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_px)(     p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_py)(     p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_zeta)(   p ) != SIXTRL_NULLPTR );
 
-        SIXTRL_ASSERT( NS(Particles_get_const_psigma)( p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_delta)(  p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_rpp)(    p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_rvv)(    p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_chi)(    p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_charge_ratio)( p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_psigma)( p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_delta)(  p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_rpp)(    p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_rvv)(    p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_chi)(    p ) != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Particles_get_charge_ratio)( p ) != SIXTRL_NULLPTR );
 
         SIXTRL_ASSERT( SIXTRL_NULLPTR !=
             NS(Particles_get_const_particle_id)( p ) );
@@ -4809,6 +4809,7 @@ SIXTRL_INLINE NS(particle_real_t) NS(Particles_get_charge_ratio_value)(
                    ( ii < NS(Particles_get_num_of_particles)( p ) ) );
 
     return p->charge_ratio[ ii ];
+    return 1.0;
 }
 
 SIXTRL_INLINE NS(particle_real_const_ptr_t)

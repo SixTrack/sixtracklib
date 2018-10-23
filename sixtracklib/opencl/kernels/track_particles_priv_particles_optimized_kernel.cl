@@ -85,6 +85,7 @@ __kernel void NS(Track_particles_beam_elements_priv_particles_optimized_opencl)(
                 NS(particle_real_t) rpp            = ( NS(particle_real_t) )0.0;
                 NS(particle_real_t) rvv            = ( NS(particle_real_t) )0.0;
                 NS(particle_real_t) chi            = ( NS(particle_real_t) )0.0;
+                NS(particle_real_t) charge_ratio   = ( NS(particle_real_t) )0.0;
 
                 NS(particle_index_t) part_id       = ( NS(particle_index_t) )0;
                 NS(particle_index_t) at_element_id = ( NS(particle_index_t) )0;
@@ -118,6 +119,7 @@ __kernel void NS(Track_particles_beam_elements_priv_particles_optimized_opencl)(
                 NS(Particles_assign_ptr_to_rpp)(           &particles, &rpp );
                 NS(Particles_assign_ptr_to_rvv)(           &particles, &rvv );
                 NS(Particles_assign_ptr_to_chi)(           &particles, &chi );
+                NS(Particles_assign_ptr_to_charge_ratio)(  &particles, &charge_ratio );
 
                 NS(Particles_assign_ptr_to_particle_id)(   &particles, &part_id );
                 NS(Particles_assign_ptr_to_at_element_id)( &particles, &at_element_id );
