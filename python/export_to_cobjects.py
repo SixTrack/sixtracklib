@@ -51,7 +51,7 @@ def line2cobject( line, outfile_name ):
         elif elem_type == 'Cavity':
             e = Cavity( cbuffer=beam_elements, voltage=elem.voltage,
                         frequency=elem.frequency, lag=elem.lag )
-                        
+
         elif elem_type=='BeamBeam4D':
 
             for mm in ['q_part', 'N_part', 'sigma_x', 'sigma_y', 'beta_s',
@@ -60,7 +60,7 @@ def line2cobject( line, outfile_name ):
 
             data = elem.tobuffer()
             e = BeamBeam4D( cbuffer=beam_elements, data=data)
-            
+
         elif elem_type=='BeamBeam6D':
 
             bb6ddata = pysixtrack.BB6Ddata.BB6D_init(
@@ -78,35 +78,35 @@ def line2cobject( line, outfile_name ):
             print("calpha=%e"%bb6ddata.parboost.calpha);
             print("S33=%e"%bb6ddata.Sigmas_0_star.Sig_33_0);
             print("N_slices=%d"%bb6ddata.N_slices);
-            print("N_part_per_slice[0]=%e"%bb6ddata.N_part_per_slice[0]); 
-            print("N_part_per_slice[1]=%e"%bb6ddata.N_part_per_slice[1]); 
-            print("x_slices_star[0]=%e"%bb6ddata.x_slices_star[0]); 
-            print("x_slices_star[1]=%e"%bb6ddata.x_slices_star[1]); 
-            print("y_slices_star[0]=%e"%bb6ddata.y_slices_star[0]); 
-            print("y_slices_star[1]=%e"%bb6ddata.y_slices_star[1]);         
-            print("sigma_slices_star[0]=%e"%bb6ddata.sigma_slices_star[0]); 
-            print("sigma_slices_star[1]=%e"%bb6ddata.sigma_slices_star[1]); 
+            print("N_part_per_slice[0]=%e"%bb6ddata.N_part_per_slice[0]);
+            print("N_part_per_slice[1]=%e"%bb6ddata.N_part_per_slice[1]);
+            print("x_slices_star[0]=%e"%bb6ddata.x_slices_star[0]);
+            print("x_slices_star[1]=%e"%bb6ddata.x_slices_star[1]);
+            print("y_slices_star[0]=%e"%bb6ddata.y_slices_star[0]);
+            print("y_slices_star[1]=%e"%bb6ddata.y_slices_star[1]);
+            print("sigma_slices_star[0]=%e"%bb6ddata.sigma_slices_star[0]);
+            print("sigma_slices_star[1]=%e"%bb6ddata.sigma_slices_star[1]);
             print("y_CO=%e"%bb6ddata.y_CO);
 
 
             data = bb6ddata.tobuffer()
             e = BeamBeam6D( cbuffer=beam_elements, data=data)
-            
+
         else:
             print( "Unknown/unhandled element type: {0}".format( elem_type, ) )
 
     beam_elements.to_file( outfile_name )
-    
-    
+
+
 def sixdump2cobject( input_folder, st_dump_file , outfile_name ):
     # -------------------------------------------------------------------------
     # Dump particles (element by element)
-    
+
     six = sixtracktools.SixInput(input_folder)
     line, rest, iconv = six.expand_struct(convert=pysixtrack.element_types)
 
     sixdump = sixtracktools.SixDump101( st_dump_file )
-    
+
 
     num_iconv = int( len( iconv ) )
     num_belem = int( len( line  ) )
@@ -136,26 +136,27 @@ def sixdump2cobject( input_folder, st_dump_file , outfile_name ):
             assert( kk < num_dumps )
 
             inp = pysixtrack.Particles( **sixdump[ kk ].get_minimal_beam() )
-            p.q0[ jj ]         = inp.q0
-            p.mass0[ jj ]      = inp.mass0
-            p.beta0[ jj ]      = inp.beta0
-            p.gamma0[ jj ]     = inp.gamma0
-            p.p0c[ jj ]        = inp.p0c
-            p.s[ jj ]          = inp.s
-            p.x[ jj ]          = inp.x
-            p.y[ jj ]          = inp.y
-            p.px[ jj ]         = inp.px
-            p.py[ jj ]         = inp.py
-            p.zeta[ jj ]       = inp.zeta
-            p.psigma[ jj ]     = inp.psigma
-            p.delta[ jj ]      = inp.delta
-            p.rpp[ jj ]        = inp.rpp
-            p.rvv[ jj ]        = inp.rvv
-            p.chi[ jj ]        = inp.chi
-            p.particle[ jj ]   = inp.partid is not None and inp.partid or jj
-            p.at_element[ jj ] = elem_id
-            p.at_turn[ jj ]    = 0
-            p.state[ jj ]      = inp.state
+            p.q0[ jj ]           = inp.q0
+            p.mass0[ jj ]        = inp.mass0
+            p.beta0[ jj ]        = inp.beta0
+            p.gamma0[ jj ]       = inp.gamma0
+            p.p0c[ jj ]          = inp.p0c
+            p.s[ jj ]            = inp.s
+            p.x[ jj ]            = inp.x
+            p.y[ jj ]            = inp.y
+            p.px[ jj ]           = inp.px
+            p.py[ jj ]           = inp.py
+            p.zeta[ jj ]         = inp.zeta
+            p.psigma[ jj ]       = inp.psigma
+            p.delta[ jj ]        = inp.delta
+            p.rpp[ jj ]          = inp.rpp
+            p.rvv[ jj ]          = inp.rvv
+            p.chi[ jj ]          = inp.chi
+            p.charge_ratio[ jj ] = inp.qratio
+            p.particle[ jj ]     = inp.partid is not None and inp.partid or jj
+            p.at_element[ jj ]   = elem_id
+            p.at_turn[ jj ]      = 0
+            p.state[ jj ]        = inp.state
 
     particles_buffer.to_file( outfile_name )
 
@@ -164,7 +165,7 @@ if  __name__ == '__main__':
     # Test on pysixtrack example
     pyst_path = pysixtrack.__file__
     input_folder = '/'.join(pyst_path.split('/')[:-2]+['examples', 'lhc'])
-    
-    
+
+
     sixinput2cobject( input_folder, 'lhc_st_input.bin')
     sixdump2cobject( input_folder, input_folder+'/res/dump3.dat', 'lhc_st_dump.bin')

@@ -19,9 +19,10 @@ class Particles( CObject ):
     rpp           = CField( 14, 'real',  length='num_particles', default=1.0, pointer=True, alignment=8 )
     rvv           = CField( 15, 'real',  length='num_particles', default=1.0, pointer=True, alignment=8 )
     chi           = CField( 16, 'real',  length='num_particles', default=0.0, pointer=True, alignment=8 )
-    particle      = CField( 17, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
-    at_element    = CField( 18, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
-    at_turn       = CField( 19, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
-    state         = CField( 20, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
+    charge_ratio  = CField( 17, 'real',  length='num_particles', default=1.0, pointer=True, alignment=8 )
+    particle      = CField( 18, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
+    at_element    = CField( 19, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
+    at_turn       = CField( 20, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
+    state         = CField( 21, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
 
 
