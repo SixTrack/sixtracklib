@@ -221,8 +221,6 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift)(
 
     typedef NS(particle_index_t) index_t;
 
-    printf( "enabled\r\n" );
-
     /* state == 1 -> particle is valid
      *       == 0 -> particle is outside of the aperature limits */
 

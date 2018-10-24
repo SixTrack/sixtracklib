@@ -1727,7 +1727,7 @@ SIXTRL_INLINE void NS(Particles_preset_values)(
         NS(particle_index_t) const PARTICLE_ID    = ( NS(particle_index_t) )-1;
         NS(particle_index_t) const ELEMENT_ID     = ( NS(particle_index_t) )-1;
         NS(particle_index_t) const TURN_ID        = ( NS(particle_index_t) )-1;
-        NS(particle_index_t) const PARTICLE_STATE = ( NS(particle_index_t) )-1;
+        NS(particle_index_t) const PARTICLE_STATE = ( NS(particle_index_t) )1;
 
         SIXTRL_ASSERT( NS(Particles_get_q0)(     p ) != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( NS(Particles_get_beta0)(  p ) != SIXTRL_NULLPTR );

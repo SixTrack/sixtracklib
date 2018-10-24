@@ -381,7 +381,7 @@ void NS(Particles_realistic_init)( NS(Particles)* SIXTRL_RESTRICT p )
             NS(Particles_set_particle_id_value)(   p, ii, particle_id );
             NS(Particles_set_at_element_id_value)( p, ii, ( index_t )-1 );
             NS(Particles_set_at_turn_value)(       p, ii, ( index_t )-1 );
-            NS(Particles_set_state_value)(         p, ii, ( index_t )0 );
+            NS(Particles_set_state_value)(         p, ii, ( index_t )1 );
 
             NS(Particles_set_s_value)(             p, ii, S );
             NS(Particles_set_x_value)(             p, ii, X );
@@ -437,7 +437,7 @@ void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
         real_t const CHI          = ( real_t )0.0;
         real_t const CHARGE_RATIO = ( real_t )1.0;
 
-        int64_t const STATE       = ( index_t )0;
+        int64_t const STATE       = ( index_t )1;
 
         size_t ii;
         int64_t particle_id = 0;
