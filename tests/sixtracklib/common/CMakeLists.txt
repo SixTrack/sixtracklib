@@ -89,6 +89,7 @@ if( GTEST_FOUND )
               test_particles_aperature_check_enabled_common_c99 )
 
     # ------------------------------------------------------------------------
+    # test_particles_aperature_check_disabled_common_c99:
 
     add_executable( test_particles_aperature_check_disabled_common_c99
                     test_particles_aperature_c99.cpp )

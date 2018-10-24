@@ -35,7 +35,7 @@ TEST( C99_CommonParticlesAperatureTests,
 {
 
 #endif /* SIXTRL_ENABLE_APERATURE_CHECK */
-    ::st_buffer_size_t const NUM_PARTICLES = ( ::st_buffer_size_t )10000u;
+    ::st_buffer_size_t const NUM_PARTICLES = ( ::st_buffer_size_t )100u;
     ::st_buffer_size_t const NUM_DRIFTS    = ( ::st_buffer_size_t )10000u;
 
     ::st_Buffer* pb = ::st_Buffer_new( ( ::st_buffer_size_t )( 1u << 20u ) );
@@ -116,7 +116,7 @@ TEST( C99_CommonParticlesAperatureTests,
 {
 
 #endif /* SIXTRL_ENABLE_APERATURE_CHECK */
-    ::st_buffer_size_t const NUM_PARTICLES = ( ::st_buffer_size_t )10000u;
+    ::st_buffer_size_t const NUM_PARTICLES = ( ::st_buffer_size_t )100u;
     ::st_buffer_size_t const NUM_DRIFTS    = ( ::st_buffer_size_t )10000u;
 
     ::st_Buffer* pb = ::st_Buffer_new( ( ::st_buffer_size_t )( 1u << 20u ) );
