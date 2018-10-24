@@ -95,6 +95,10 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
         ASSERT_TRUE( static_cast< std::size_t >( tracking_kernel_id ) <
                      ::st_ClContextBase_get_num_available_kernels( context ) );
 
+        ASSERT_TRUE( tracking_kernel_name.compare(
+            ::st_ClContextBase_get_kernel_function_name(
+                context, tracking_kernel_id ) ) == 0 );
+
         ASSERT_TRUE( ::st_ClContext_set_tracking_kernel_id(
             context, tracking_kernel_id ) );
 
