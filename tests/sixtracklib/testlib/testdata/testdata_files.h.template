@@ -79,6 +79,19 @@ static char const NS(PATH_TO_TEST_LHC_PARTICLES_DATA_T1_P2_NO_BEAM_BEAM)[] =
 static char const NS(PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM)[] =
     "@SIXTRACKLIB_TESTDATA_DIR@/lhc_beam_elements_nobeambeam.bin";
 
+/* ------------------------------------------------------------------------ */
+/* ---  Simple BeamBeam Closed Orbit with externally provided Fix-Point --- */
+/* ------------------------------------------------------------------------ */
+
+static char const NS(PATH_TO_BBSIMPLE_PARTICLES_DUMP)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/particles_dump.bin";
+
+static char const NS(PATH_TO_BBSIMPLE_PARTICLES_SIXTRACK_DUMP)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/particles_dump_sixtrack.bin";
+
+static char const NS(PATH_TO_BBSIMPLE_BEAM_ELEMENTS)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/beam_elements.bin";
+
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */

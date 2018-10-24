@@ -157,7 +157,6 @@ if( SIXTRACKL_BUILD_EXAMPLES )
     add_subdirectory( examples )
 endif()
 
-
 # ------------------------------------------------------------------------------
 
 if( SIXTRACKL_ENABLE_PYTHON )
