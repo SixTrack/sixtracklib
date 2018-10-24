@@ -157,6 +157,13 @@ if( SIXTRACKL_BUILD_EXAMPLES )
     add_subdirectory( examples )
 endif()
 
+
+# ------------------------------------------------------------------------------
+
+if( SIXTRACKL_ENABLE_PYTHON )
+    add_subdirectory( python )
+endif()
+
 # ------------------------------------------------------------------------------
 #
 # end: sixtracklib/CMakeLists.txt
