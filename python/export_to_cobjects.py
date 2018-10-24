@@ -17,39 +17,41 @@ from particles     import Particles as IOParticles
 def sixinput2cobject( input_folder, outfile_name ):
     six = sixtracktools.SixInput(input_folder)
     line, rest, iconv = six.expand_struct(convert=pysixtrack.element_types)
-    return line2cobject( line, outfile_name )
+    beam_elements = CBuffer()
+    line2cobject( line, cbuffer=beam_elements )
+    beam_elements.to_file( outfile_name )
 
 
-def line2cobject( line, outfile_name ):
+def line2cobject( line, cbuffer=None ):
     deg2rad = pi / 180.0
 
     # -------------------------------------------------------------------------
     # Dump beam elements:
 
-    beam_elements = CBuffer()
+    if  cbuffer is None: cbuffer = CBuffer()
 
     for label, elem_type, elem in line:
 
         if  elem_type == 'Drift':
-            e = Drift( cbuffer=beam_elements, length=elem.length )
+            e = Drift( cbuffer=cbuffer, length=elem.length )
 
         elif elem_type == 'DriftExact':
-            e = DriftExact( cbuffer=beam_elements, length=elem.length )
+            e = DriftExact( cbuffer=cbuffer, length=elem.length )
 
         elif elem_type == 'Multipole':
-            e = MultiPole( cbuffer=beam_elements, knl=elem.knl, ksl=elem.ksl,
+            e = MultiPole( cbuffer=cbuffer, knl=elem.knl, ksl=elem.ksl,
                            length=elem.length, hxl=elem.hxl, hyl=elem.hyl )
 
         elif elem_type == 'XYShift':
-            e = XYShift( cbuffer=beam_elements, dx=elem.dx, dy=elem.dy )
+            e = XYShift( cbuffer=cbuffer, dx=elem.dx, dy=elem.dy )
 
         elif elem_type == 'SRotation':
             angle_rad = deg2rad * elem.angle
-            e = SRotation( cbuffer=beam_elements,
+            e = SRotation( cbuffer=cbuffer,
                            cos_z=cos( angle_rad ), sin_z=sin( angle_rad ) )
 
         elif elem_type == 'Cavity':
-            e = Cavity( cbuffer=beam_elements, voltage=elem.voltage,
+            e = Cavity( cbuffer=cbuffer, voltage=elem.voltage,
                         frequency=elem.frequency, lag=elem.lag )
 
         elif elem_type=='BeamBeam4D':
@@ -59,7 +61,7 @@ def line2cobject( line, outfile_name ):
                  print('4D: %s, %s'%(mm, repr(getattr(elem,mm))))
 
             data = elem.tobuffer()
-            e = BeamBeam4D( cbuffer=beam_elements, data=data)
+            e = BeamBeam4D( cbuffer=cbuffer, data=data)
 
         elif elem_type=='BeamBeam6D':
 
@@ -90,12 +92,12 @@ def line2cobject( line, outfile_name ):
 
 
             data = bb6ddata.tobuffer()
-            e = BeamBeam6D( cbuffer=beam_elements, data=data)
+            e = BeamBeam6D( cbuffer=cbuffer, data=data)
 
         else:
             print( "Unknown/unhandled element type: {0}".format( elem_type, ) )
 
-    beam_elements.to_file( outfile_name )
+    return cbuffer
 
 
 def sixdump2cobject( input_folder, st_dump_file , outfile_name ):
@@ -134,29 +136,9 @@ def sixdump2cobject( input_folder, st_dump_file , outfile_name ):
         for jj in range( num_particles ):
             kk = num_particles * ii + jj
             assert( kk < num_dumps )
-
-            inp = pysixtrack.Particles( **sixdump[ kk ].get_minimal_beam() )
-            p.q0[ jj ]           = inp.q0
-            p.mass0[ jj ]        = inp.mass0
-            p.beta0[ jj ]        = inp.beta0
-            p.gamma0[ jj ]       = inp.gamma0
-            p.p0c[ jj ]          = inp.p0c
-            p.s[ jj ]            = inp.s
-            p.x[ jj ]            = inp.x
-            p.y[ jj ]            = inp.y
-            p.px[ jj ]           = inp.px
-            p.py[ jj ]           = inp.py
-            p.zeta[ jj ]         = inp.zeta
-            p.psigma[ jj ]       = inp.psigma
-            p.delta[ jj ]        = inp.delta
-            p.rpp[ jj ]          = inp.rpp
-            p.rvv[ jj ]          = inp.rvv
-            p.chi[ jj ]          = inp.chi
-            p.charge_ratio[ jj ] = inp.qratio
-            p.particle[ jj ]     = inp.partid is not None and inp.partid or jj
-            p.at_element[ jj ]   = elem_id
-            p.at_turn[ jj ]      = 0
-            p.state[ jj ]        = inp.state
+            p.fromPySixTrack(
+                pysixtrack.Particles( **sixdump[ kk ].get_minimal_beam() ), jj )
+            p.at_element[ jj ] = elem_id
 
     particles_buffer.to_file( outfile_name )
 

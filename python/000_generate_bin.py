@@ -9,6 +9,7 @@ pyst_example = 'bbsimple'
 # Test on pysixtrack example
 pyst_path = pysixtrack.__file__
 input_folder = '/'.join(pyst_path.split('/')[:-2]+['examples', pyst_example])
+#input_folder = '/home/mschwinz/git/pysixtrack/examples/' + pyst_example
 
 with open(input_folder+'/line.pkl', 'rb') as fid:
 	line = pickle.load(fid)
