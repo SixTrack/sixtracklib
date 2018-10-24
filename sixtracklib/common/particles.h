@@ -4809,7 +4809,6 @@ SIXTRL_INLINE NS(particle_real_t) NS(Particles_get_charge_ratio_value)(
                    ( ii < NS(Particles_get_num_of_particles)( p ) ) );
 
     return p->charge_ratio[ ii ];
-    return 1.0;
 }
 
 SIXTRL_INLINE NS(particle_real_const_ptr_t)
