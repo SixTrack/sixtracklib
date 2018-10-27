@@ -1,0 +1,10 @@
+# Automatically generated CMakeLists.txt file
+# for the make install examples/c99 location
+
+# =============================================================================
+
+@GENERATED_CMAKELISTS_PROGRAMS@
+
+# =============================================================================
+
+# end: examples/c99/CMakeListstxt.txt

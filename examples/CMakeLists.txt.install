@@ -1,0 +1,41 @@
+# ============================================================================
+# Automatically generated CMakeLists.txt file
+# for the make install examples location
+
+cmake_minimum_required( VERSION 3.8 FATAL_ERROR )
+project( sixtracklib_examples LANGUAGES C CXX )
+
+if( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Settings.cmake" )
+    include( Settings )
+endif()
+
+# ============================================================================
+# Find SixTracklib:
+#
+# Assumed location of SixTracklibConfig.cmake:
+# @SIXTRACKLIB_LIB_CONFIG_PATH@
+# --> Set SixTracklib_DIR in Settings.cmake if you need to override this!
+
+find_package( SixTracklib REQUIRED )
+
+if( NOT SixTrackTestlib_FOUND )
+    message( FATAL_ERROR
+             "SixTracklib::sixtrack_test testlib is required for "
+             "examples, but was not found!" )
+endif()
+
+# ============================================================================
+
+add_subdirectory( c99 )
+
+if( SIXTRACKL_ENABLE_CXX )
+    add_subdirectory( cxx )
+endif()
+
+if( SIXTRACKL_ENABLE_PYTHON )
+    add_subdirectory( python )
+endif()
+
+# ============================================================================
+# end: examples/CMakeLists.txt
+#
