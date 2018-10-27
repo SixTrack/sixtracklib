@@ -117,10 +117,10 @@ int main( int argc, char* argv[] )
     /* ---------------------------------------------------------------------- */
 
     lhc_particle_dump = st_Buffer_new_from_file(
-        st_PATH_TO_TEST_LHC_PARTICLES_DATA_T1_P2_NO_BEAM_BEAM );
+        st_PATH_TO_LHC_NO_BB_PARTICLES_DUMP );
 
     lhc_beam_elements_buffer = st_Buffer_new_from_file(
-        st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM );
+        st_PATH_TO_LHC_NO_BB_BEAM_ELEMENTS );
 
     pb = st_Buffer_new( ( st_buffer_size_t )( 1u << 24u ) );
 

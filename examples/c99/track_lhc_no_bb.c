@@ -10,10 +10,10 @@ int main( int argc, char* argv[] )
     typedef st_buffer_size_t buf_size_t;
 
     st_Buffer* lhc_particle_dump = st_Buffer_new_from_file(
-        st_PATH_TO_TEST_LHC_PARTICLES_DATA_T1_P2_NO_BEAM_BEAM );
+        st_PATH_TO_LHC_NO_BB_PARTICLES_DUMP );
 
     st_Buffer* lhc_beam_elements_buffer = st_Buffer_new_from_file(
-        st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM );
+        st_PATH_TO_LHC_NO_BB_BEAM_ELEMENTS );
 
     st_Buffer* pb = st_Buffer_new( ( buf_size_t )( 1u << 24u ) );
 
@@ -86,7 +86,8 @@ int main( int argc, char* argv[] )
 
         for( ; kk < num_beam_elements ; ++kk )
         {
-            st_Object const* obj = st_Buffer_get_const_object( lhc_beam_elements_buffer, kk );
+            st_Object const* obj =
+                st_Buffer_get_const_object( lhc_beam_elements_buffer, kk );
 
             switch( st_Object_get_type_id( obj ) )
             {
