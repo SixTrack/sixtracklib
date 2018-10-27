@@ -109,5 +109,3 @@ class BeamBeam6D( CObject ):
 
     def __init__(self, data, **kwargs):
         CObject.__init__( self, size=len(data), data=data, **kwargs)
-
-

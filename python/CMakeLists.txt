@@ -1,10 +1,16 @@
 # python/CMakeLists.txt
 
-set( SIXTRACKLIB_TESTDATA_DIR "${CMAKE_SOURCE_DIR}/tests/testdata" )
+if( NOT PYTHONINTERP_FOUND )
+    message( FATAL_ERROR "Python interpreter not found -> stopping" )
+endif()
 
-set( TESTDATA_PY_IN_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/testdata.py.template" )
-set( TESTDATA_PY_OUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/testdata.py" )
 
-configure_file( ${TESTDATA_PY_IN_PATH} ${TESTDATA_PY_OUT_PATH} @ONLY )
+add_subdirectory( pysixtracklib )
+
+
+set( SETUP_PY_IN_PATH      "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.template" )
+set( SETUP_PY_OUT_PATH     "${CMAKE_CURRENT_SOURCE_DIR}/setup.py" )
+
+configure_file( ${SETUP_PY_IN_PATH} ${SETUP_PY_OUT_PATH} @ONLY )
 
 # end: python/CMakeLists.txt

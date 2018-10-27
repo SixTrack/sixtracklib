@@ -14,33 +14,33 @@
 # ------------------------------------------------------------------------------
 # ---- Backends and computing architectures:
 
-option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"    OFF )
-option( SIXTRACKL_ENABLE_MANUAL_SIMD       "Enable manual SIMD backend"  OFF )
-option( SIXTRACKL_ENABLE_OPENMP            "Enable OpenMP backend"       OFF )
-option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL backend"       OFF )
-option( SIXTRACKL_ENABLE_CUDA              "Enable CUDA backend"         OFF )
-option( SIXTRACKL_ENABLE_MPFR4             "Enable GMP/MPFR4 backend"    OFF )
+option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"     OFF )
+option( SIXTRACKL_ENABLE_MANUAL_SIMD       "Enable manual SIMD backend"   OFF )
+option( SIXTRACKL_ENABLE_OPENMP            "Enable OpenMP backend"        OFF )
+option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL backend"        OFF )
+option( SIXTRACKL_ENABLE_CUDA              "Enable CUDA backend"          OFF )
+option( SIXTRACKL_ENABLE_MPFR4             "Enable GMP/MPFR4 backend"     OFF )
 
-option( SIXTRACKL_ENABLE_CXX               "Enable C++ bindings"         ON  )
-option( SIXTRACKL_ENABLE_PYTHON            "Enable Python bindings"      ON  )
-
-# ------------------------------------------------------------------------------
-# ---- SixTrackLib Features:
-
-option( SIXTRACKL_ENABLE_APERATURE_CHECK   "Enable xy - aperature check" ON )
+option( SIXTRACKL_ENABLE_CXX               "Enable C++ bindings"          ON  )
+option( SIXTRACKL_ENABLE_PYTHON            "Enable Python bindings"       ON  )
 
 # ------------------------------------------------------------------------------
 # ---- Program logistic options:
 
-option( SIXTRACKL_BUILD_EXAMPLES        "Build sixtracklib examples"     ON  )
-option( SIXTRACKL_ENABLE_PROGRAMM_TESTS "Enable programmatic unit-tests" ON  )
-option( SIXTRACKL_REQUIRE_OFFLINE_BUILD "Require offline building"       OFF )
+option( SIXTRACKL_BUILD_EXAMPLES         "Build sixtracklib examples"     ON  )
+option( SIXTRACKL_ENABLE_PROGRAMM_TESTS  "Enable programmatic unit-tests" OFF )
+option( SIXTRACKL_ENABLE_BENCHMARK_TESTS "Enable benchmark tests"         OFF )
 
 # ------------------------------------------------------------------------------
 # CPU/System architecture settings:
 
 set( SIXTRACKL_CPU_ARCH "sse2" CACHE STRING "CPU/System architecture" )
 set_property( CACHE SIXTRACKL_CPU_ARCH PROPERTY STRINGS sse2 avx avx2 native )
+
+# ------------------------------------------------------------------------------
+# ---- SixTrackLib Features:
+
+option( SIXTRACKL_ENABLE_APERATURE_CHECK   "Enable xy - aperature check" ON )
 
 
 
@@ -63,21 +63,30 @@ set( SIXTRACKL_APERATURE_Y_LIMIT_VALUE "1.0"
 
 option( SIXTRACKL_REQUIRE_OFFLINE_BUILD "Require offline building"       OFF )
 
+if( SIXTRACKL_ENABLE_PYTHON )
+    option( SIXTRACKL_INSTALL_PYSIXTRACKLIB
+            "Handle pysixtracklib during make install step" OFF )
+endif()
+
 if( SIXTRACKL_BUILD_EXAMPLES )
-    option( SIXTRL_INSTALL_EXAMPLES
+    option( SIXTRACKL_INSTALL_EXAMPLES
             "Handle examples during make install"  ON )
 endif()
 
 if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
-    option( SIXTRL_INSTALL_PROGRAM_TESTS
+    option( SIXTRACKL_INSTALL_PROGRAM_TESTS
             "Handle programmatic unit-tests during make install" ON )
 endif()
 
-if( SIXTRACKL_BUILD_EXAMPLES OR SIXTRACKL_ENABLE_PROGRAMM_TESTS )
-    option( SIXTRL_GENERATE_TESTDATA_AFTER_INSTALL
-            "Generate testdata after the make install step" ON )
+if( SIXTRACKL_ENABLE_BENCHMARK_TESTS )
+    option( SIXTRACKL_INSTALL_BENCHMARK_TESTS
+            "Handle benchmark tests during make install" ON )
 endif()
 
+if( SIXTRACKL_ENABLE_PROGRAMM_TESTS OR SIXTRACKL_ENABLE_BENCHMARK_TESTS )
+    option( SIXTRACKL_GENERATE_TESTDATA_AFTER_INSTALL
+            "Generate testdata after the make install step" ON )
+endif()
 
 # ------------------------------------------------------------------------------
 # Cuda related detailed settings
@@ -118,6 +127,12 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
 
 endif()
 
+if( SIXTRACKL_ENABLE_PYTHON AND SIXTRACKL_ENABLE_PROGRAM_TESTS )
+
+    option( SIXTRACKL_ENABLE_PYSIXTRACKLIB_TESTS
+            "Enable pysixtracklib unit-tests (requires pytest)" ON  )
+
+endif()
 
 # ------------------------------------------------------------------------------
 # ----  Namespace:

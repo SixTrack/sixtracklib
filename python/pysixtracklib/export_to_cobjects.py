@@ -10,9 +10,9 @@ import numpy as np
 
 from cobjects import CBuffer, CObject, CField
 
-from beam_elements import Drift, DriftExact, MultiPole, Cavity, XYShift, SRotation
-from beam_elements import BeamBeam4D, BeamBeam6D
-from particles     import Particles as IOParticles
+from .beam_elements import Drift, DriftExact, MultiPole, Cavity, XYShift, SRotation
+from .beam_elements import BeamBeam4D, BeamBeam6D
+from .particles     import Particles as IOParticles
 
 def sixinput2cobject( input_folder, outfile_name ):
     six = sixtracktools.SixInput(input_folder)
@@ -76,18 +76,29 @@ def line2cobject( line, cbuffer=None ):
                 elem.Dx_sub, elem.Dpx_sub, elem.Dy_sub, elem.Dpy_sub, elem.Dsigma_sub, elem.Ddelta_sub,
                 elem.enabled)
 
+            N_slices = bb6ddata.N_slices
+
             print("sphi=%e"%bb6ddata.parboost.sphi);
             print("calpha=%e"%bb6ddata.parboost.calpha);
             print("S33=%e"%bb6ddata.Sigmas_0_star.Sig_33_0);
-            print("N_slices=%d"%bb6ddata.N_slices);
-            print("N_part_per_slice[0]=%e"%bb6ddata.N_part_per_slice[0]);
-            print("N_part_per_slice[1]=%e"%bb6ddata.N_part_per_slice[1]);
-            print("x_slices_star[0]=%e"%bb6ddata.x_slices_star[0]);
-            print("x_slices_star[1]=%e"%bb6ddata.x_slices_star[1]);
-            print("y_slices_star[0]=%e"%bb6ddata.y_slices_star[0]);
-            print("y_slices_star[1]=%e"%bb6ddata.y_slices_star[1]);
-            print("sigma_slices_star[0]=%e"%bb6ddata.sigma_slices_star[0]);
-            print("sigma_slices_star[1]=%e"%bb6ddata.sigma_slices_star[1]);
+            print("N_slices=%d"%N_slices);
+
+            for kk in range( N_slices ):
+                print("N_part_per_slice[{0}]={1}".format(
+                    kk, bb6ddata.N_part_per_slice[kk]) );
+
+            for kk in range( N_slices ):
+                print("x_slices_star[{0}]={1}".format(
+                    kk, bb6ddata.x_slices_star[kk]) );
+
+            for kk in range( N_slices ):
+                print("y_slices_star[{0}]={1}".format(
+                    kk, bb6ddata.y_slices_star[kk]) );
+
+            for kk in range( N_slices ):
+                print("sigma_slices_star[{0}]={1}".format(
+                    kk, bb6ddata.sigma_slices_star[kk]) );
+
             print("y_CO=%e"%bb6ddata.y_CO);
 
 

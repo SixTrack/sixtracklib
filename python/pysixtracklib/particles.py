@@ -167,15 +167,3 @@ def compareParticlesDifference( lhs, rhs, abs_treshold=None ):
                     break
 
     return cmp_result
-
-
-
-
-
-
-
-
-
-
-
-
