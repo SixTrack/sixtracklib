@@ -70,14 +70,20 @@ static char const NS(PATH_TO_TEST_TRACKING_BE_CAVITY_DATA)[] =
 /* ************************************************************************ */
 
 /* ------------------------------------------------------------------------ */
-/* ----     LHC, Single Turn, Two Particles, No BeamBeam elements      ---- */
+/* ----                    LHC, No BeamBeam elements                   ---- */
 /* ------------------------------------------------------------------------ */
 
-static char const NS(PATH_TO_TEST_LHC_PARTICLES_DATA_T1_P2_NO_BEAM_BEAM)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/lhc_particles_turn1_p2_nobeambeam.bin";
+static char const NS(PATH_TO_LHC_NO_BB_PARTICLES_DUMP)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/particles_dump.bin";
 
-static char const NS(PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/lhc_beam_elements_nobeambeam.bin";
+static char const NS(PATH_TO_LHC_NO_BB_BEAM_ELEMENTS)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/beam_elements.bin";
+
+static char const NS(PATH_TO_LHC_NO_BB_PARTICLES_SIXTRACK_DUMP)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/particles_dump_sixtrack.bin";
+
+static char const NS(PATH_TO_LHC_NO_BB_BEAM_ELEMENTS_SIXTRACK)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/beam_elements_sixtrack.bin";
 
 /* ------------------------------------------------------------------------ */
 /* ---  Simple BeamBeam Closed Orbit with externally provided Fix-Point --- */
@@ -86,11 +92,33 @@ static char const NS(PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM)[] =
 static char const NS(PATH_TO_BBSIMPLE_PARTICLES_DUMP)[] =
     "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/particles_dump.bin";
 
+static char const NS(PATH_TO_BBSIMPLE_BEAM_ELEMENTS)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/beam_elements.bin";
+
 static char const NS(PATH_TO_BBSIMPLE_PARTICLES_SIXTRACK_DUMP)[] =
     "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/particles_dump_sixtrack.bin";
 
-static char const NS(PATH_TO_BBSIMPLE_BEAM_ELEMENTS)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/beam_elements.bin";
+static char const NS(PATH_TO_BBSIMPLE_BEAM_ELEMENTS_SIXTRACK)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/beam_elements_sixtrack.bin";
+
+/* ------------------------------------------------------------------------ */
+/* ---   Full BeamBeam Closed Orbit with externally provided Fix-Point  --- */
+/* ------------------------------------------------------------------------ */
+
+static char const NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/beambeam/particles_dump.bin";
+
+static char const NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/beambeam/beam_elements.bin";
+
+static char const NS(PATH_TO_BEAMBEAM_PARTICLES_SIXTRACK_DUMP)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/beambeam/particles_dump_sixtrack.bin";
+
+static char const NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS_SIXTRACK)[] =
+    "@SIXTRACKLIB_TESTDATA_DIR@/beambeam/beam_elements_sixtrack.bin";
+
+
+
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
