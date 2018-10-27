@@ -98,6 +98,8 @@ int main()
         NS(Object) const* be_begin = obj_begin + 1u;
         NS(Object) const* be_end   = be_begin + NUM_BEAM_ELEMENTS;
 
+        ( void )obj_end;
+
         SIXTRL_ASSERT( obj_begin != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( obj_end   != obj_begin );
 
@@ -136,6 +138,8 @@ int main()
                 NS(Buffer_get_size)( buffer ), ( buf_size_t )1u, fp );
 
             SIXTRL_ASSERT( cnt == ( buf_size_t )1u );
+            ( void )cnt;
+
             fclose( fp );
             fp = SIXTRL_NULLPTR;
         }
