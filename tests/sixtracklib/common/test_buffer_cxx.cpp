@@ -1027,7 +1027,7 @@ TEST( CXX_CommonBufferTests, ConstractFromBinaryDumpFile )
     namespace st = sixtrack;
     using buf_size_t = st::Buffer::size_type;
 
-    st::Buffer buffer( ::st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM );
+    st::Buffer buffer( ::st_PATH_TO_BBSIMPLE_BEAM_ELEMENTS_SIXTRACK );
 
     ASSERT_TRUE( buffer.size()           >  buf_size_t{ 0 } );
     ASSERT_TRUE( buffer.capacity()       >= buffer.size() );

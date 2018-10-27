@@ -147,13 +147,12 @@ namespace sixtrack
                     ( ( ::st_Particles_compare_values( cmp_particles,
                                                        particles ) == 0 ) ||
                       ( ( treshold > ( real_t )0.0 ) &&
-                        ( ::st_Particles_compare_values_with_treshold(
+                        ( 0 == ::st_Particles_compare_values_with_treshold(
                             cmp_particles, particles, treshold ) ) ) );
                 }
             }
 
             ::st_Buffer_delete( buffer );
-
             return success;
 
         }
@@ -166,6 +165,7 @@ TEST( C99_CommonTrackTests, TrackParticlesOverDriftBeamElements )
     using real_t = SIXTRL_REAL_T;
 
     static real_t const EPS  = std::numeric_limits< real_t >::epsilon();
+
 
     std::string const path_to_datafile =
         ::st_PATH_TO_TEST_TRACKING_BE_DRIFT_DATA;
@@ -195,7 +195,7 @@ TEST( C99_CommonTrackTests, TrackParticlesOverDriftExactBeamElements )
 {
     using real_t = SIXTRL_REAL_T;
 
-    static real_t const EPS  = std::numeric_limits< real_t >::epsilon();
+    static real_t const EPS  = 5e-14; //std::numeric_limits< real_t >::epsilon();
 
     std::string const path_to_datafile =
         ::st_PATH_TO_TEST_TRACKING_BE_DRIFTEXACT_DATA;
@@ -265,10 +265,10 @@ TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
     static real_t const ABS_TOLERANCE = real_t{ 1e-13 };
 
     ::st_Buffer* pb = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_TEST_LHC_PARTICLES_DATA_T1_P2_NO_BEAM_BEAM );
+        ::st_PATH_TO_BBSIMPLE_PARTICLES_SIXTRACK_DUMP );
 
     ::st_Buffer* eb = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM );
+        ::st_PATH_TO_BBSIMPLE_BEAM_ELEMENTS_SIXTRACK );
 
     ::st_Buffer* track_pb   = ::st_Buffer_new( size_t{ 1u << 20u } );
     ::st_Buffer* compare_pb = ::st_Buffer_new( size_t{ 1u << 20u } );
@@ -501,6 +501,90 @@ TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
     ::st_Buffer_delete( diff_pb );
     ::st_Buffer_delete( track_pb );
     ::st_Buffer_delete( compare_pb );
+}
+
+TEST( C99_CommonTrackTests, LHCReproducePySixTrackSingleTurnBBSimple )
+{
+    using buf_size_t = ::st_buffer_size_t;
+    using real_t     = ::st_particle_real_t;
+
+    static real_t const ABS_TOLERANCE = real_t{ 1e-13 };
+
+    ::st_Buffer* cmp_particles_buffer =
+        ::st_Buffer_new_from_file( ::st_PATH_TO_BBSIMPLE_PARTICLES_DUMP );
+
+    ::st_Buffer* beam_elements_buffer =
+        ::st_Buffer_new_from_file( ::st_PATH_TO_BBSIMPLE_BEAM_ELEMENTS );
+
+    ::st_Buffer* particles_buffer = ::st_Buffer_new( 0u );
+
+    ASSERT_TRUE( cmp_particles_buffer != nullptr );
+    ASSERT_TRUE( beam_elements_buffer != nullptr );
+    ASSERT_TRUE( particles_buffer     != nullptr );
+
+    buf_size_t const num_particle_blocks =
+        ::st_Buffer_get_num_of_objects( cmp_particles_buffer );
+
+    buf_size_t const num_beam_elements =
+        ::st_Buffer_get_num_of_objects( beam_elements_buffer );
+
+    ASSERT_TRUE( num_beam_elements > buf_size_t{ 0 } );
+    ASSERT_TRUE( num_particle_blocks >= ( num_beam_elements + buf_size_t{ 1 } ) );
+
+    ::st_Particles const* input_particles =
+        ::st_Particles_buffer_get_const_particles( cmp_particles_buffer, 0u );
+
+    ASSERT_TRUE( input_particles != nullptr );
+
+    buf_size_t const input_num_particles =
+        ::st_Particles_get_num_of_particles( input_particles );
+
+    ASSERT_TRUE( input_num_particles > buf_size_t{ 0 } );
+
+    ::st_Particles* particles =
+        ::st_Particles_add_copy( particles_buffer, input_particles );
+
+    ASSERT_TRUE( particles != nullptr );
+    ASSERT_TRUE( ::st_Particles_get_num_of_particles( particles ) ==
+                 static_cast< ::st_particle_num_elements_t >(
+                     input_num_particles ) );
+
+    /* --------------------------------------------------------------------- */
+
+    for( buf_size_t ii = buf_size_t{ 0 } ; ii < num_beam_elements ; ++ii )
+    {
+        ::st_Particles const* cmp_particles =
+            ::st_Particles_buffer_get_const_particles( cmp_particles_buffer, ii );
+
+        if( 0 != ::st_Particles_compare_real_values( particles, cmp_particles ) )
+        {
+            ASSERT_TRUE( 0 == ::st_Particles_compare_real_values_with_treshold(
+                particles, cmp_particles, ABS_TOLERANCE ) );
+        }
+
+        int const ret = ::st_Track_particles_beam_element(
+            particles, beam_elements_buffer, ii );
+
+        ASSERT_TRUE( ret == 0 );
+    }
+
+    ::st_Particles const* cmp_particles =
+        ::st_Particles_buffer_get_const_particles(
+            cmp_particles_buffer, num_beam_elements ) );
+
+    ASSERT_TRUE( cmp_particles != nullptr );
+
+    if( 0 != ::st_Particles_compare_real_values( particles, cmp_particles ) )
+    {
+        ASSERT_TRUE( 0 == ::st_Particles_compare_real_values_with_treshold(
+            particles, cmp_particles, ABS_TOLERANCE ) );
+    }
+
+    /* --------------------------------------------------------------------- */
+
+    ::st_Buffer_delete( cmp_particles_buffer );
+    ::st_Buffer_delete( beam_elements_buffer );
+    ::st_Buffer_delete( particles_buffer );
 }
 
 /* end: tests/sixtracklib/common/test_track_c99.cpp */
