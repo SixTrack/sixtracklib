@@ -1,6 +1,0 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-PATH_TO_TESTDATA_DIR = r"@SIXTRACKLIB_TESTDATA_DIR@"
-
-# end python/testdata.py
