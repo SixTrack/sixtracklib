@@ -83,20 +83,20 @@ namespace SIXTRL_CXX_NAMESPACE
 
         this->doInitDefaultProgramsPrivImpl();
 
-        size_t node_index = this->numAvailableNodes();
+        size_t node_index = this->findAvailableNodesIndex( node_id_str );
 
-        if( node_id_str != nullptr )
-        {
-            node_index = this->findAvailableNodesIndex( node_id_str );
-        }
-        else
+        if( node_index >= this->numAvailableNodes() )
         {
             node_id_t const default_node_id = this->defaultNodeId();
-            char default_node_id_str[ 32 ];
-            NS(ComputeNodeId_to_string)(
-                &default_node_id, default_node_id_str, 32 );
 
-            node_index = this->findAvailableNodesIndex( default_node_id_str );
+            platform_id_t const platform_index =
+                NS(ComputeNodeId_get_platform_id)( &default_node_id );
+
+            device_id_t const device_index =
+                NS(ComputeNodeId_get_device_id)( &default_node_id );
+
+            node_index = this->findAvailableNodesIndex(
+                platform_index, device_index );
         }
 
         if( ( node_index < this->numAvailableNodes() ) &&
