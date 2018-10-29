@@ -92,14 +92,14 @@ if __name__ == '__main__':
     for jj in range( npart ):
         last.fromPySixTrack( track_particles[ jj ], jj )
 
-    last.turn[:] = 1
+    last.at_turn[:] = 1
     last.at_element[:] = 0
 
     # -------------------------------------------------------------------------
     # Step 3: Write the element by element I/O buffer to the output file
     #         in the output_folder location:
 
-    assert( len( line ) == ebe_particles_buffer.n_objects )
-    particles_dump    = os.path.join( output_folder, 'particles_dump.bin' )
+    assert( ( len( line ) + 1 ) == ebe_particles_buffer.n_objects )
+    particles_dump = os.path.join( output_folder, 'particles_dump.bin' )
 
     ebe_particles_buffer.to_file( particles_dump )
