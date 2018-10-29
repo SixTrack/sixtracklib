@@ -40,22 +40,22 @@ set(  SIXTRACKLIB_CXX_HEADERS
 # ------------------------------------------------------------------------------
 # install :
 
-if( SIXTRACKLIB_COMMON_C99_LOCAL_HEADERS )
+if( SIXTRACKLIB_C99_HEADERS )
 
     set( SIXTRACKLIB_COMMON_C99_INSTALL_PATH
          include/sixtracklib/common )
 
-    install( FILES ${SIXTRACKLIB_COMMON_C99_LOCAL_HEADERS}
+    install( FILES ${SIXTRACKLIB_C99_HEADERS}
              DESTINATION ${SIXTRACKLIB_COMMON_C99_INSTALL_PATH} )
 endif()
 
-if( SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS )
-    message( STATUS "${SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS}" )
+if( SIXTRACKLIB_CXX_HEADERS )
+    message( STATUS "${SIXTRACKLIB_CXX_HEADERS}" )
 
     set( SIXTRACKLIB_COMMON_CXX_INSTALL_PATH
          include/sixtracklib/common )
 
-    install( FILES ${SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS}
+    install( FILES ${SIXTRACKLIB_CXX_HEADERS}
              DESTINATION ${SIXTRACKLIB_COMMON_CXX_INSTALL_PATH} )
 endif()
 

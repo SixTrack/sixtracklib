@@ -114,14 +114,16 @@ set(  SIXTRACKL_COMMON_GENERATED_HEADERS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install:
 
-set( PATH_H_INSTALL_PATH
+set( CONFIG_H_INSTALL_PATH
      "${CMAKE_INSTALL_PREFIX}/${GENERATED_INSTALL_PATH}/config.h" )
 
 install( CODE "
-         set( SIXTRACKL_ENABLE_APERATURE_CHECK
-              \"${SIXTRACKL_ENABLE_APERATURE_CHECK_FLAG}/\" )
-         message( STATUS \"Generating: ${PATH_H_INSTALL_PATH}\" )
-         configure_file( \"${CONFIG_H_IN_PATH}\" \"${CONFIG_H_OUT_PATH}\" @ONLY ) " )
+         set( SIXTRACKL_ENABLE_APERATURE_CHECK_FLAG
+              \"${SIXTRACKL_ENABLE_APERATURE_CHECK_FLAG}\" )
+         set( SIXTRACKL_APERATURE_X_LIMIT_VALUE ${SIXTRACKL_APERATURE_X_LIMIT_VALUE} )
+         set( SIXTRACKL_APERATURE_Y_LIMIT_VALUE ${SIXTRACKL_APERATURE_Y_LIMIT_VALUE} )
+         message( STATUS \"Generating: ${CONFIG_H_INSTALL_PATH}\" )
+         configure_file( \"${CONFIG_H_IN_PATH}\" \"${CONFIG_H_INSTALL_PATH}\" @ONLY ) " )
 
 # ------------------------------------------------------------------------------
 # Create a header file encapsulating the choices for the C and C++
@@ -158,8 +160,8 @@ set( NAMESPACE_H_INSTALL_PATH
      "${CMAKE_INSTALL_PREFIX}/${GENERATED_INSTALL_PATH}/namespace.h" )
 
 install( CODE "
-         set( SIXTRACKL_C_NAMESPACE_PREFIX \"${SIXTRACKL_C_NAMESPACE_PREFIX}\" )
-         set( SIXTRACKL_CXX_NAMESPACE      \"${SIXTRACKL_CXX_NAMESPACE}\" )
+         set( SIXTRL_GENERATED_C99_NAMESPACE \"${SIXTRL_GENERATED_C99_NAMESPACE}\" )
+         set( SIXTRL_GENERATED_CXX_NAMESPACE \"${SIXTRL_GENERATED_CXX_NAMESPACE}\" )
          message( STATUS \"Generating: ${NAMESPACE_H_INSTALL_PATH}\" )
          configure_file( \"${NAMESPACE_H_IN_PATH}\"
                          \"${NAMESPACE_H_INSTALL_PATH}\" @ONLY ) " )
