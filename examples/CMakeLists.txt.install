@@ -6,7 +6,7 @@ cmake_minimum_required( VERSION 3.8 FATAL_ERROR )
 project( sixtracklib_examples LANGUAGES C CXX )
 
 if( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Settings.cmake" )
-    include( Settings )
+    include( "${CMAKE_CURRENT_SOURCE_DIR}/Settings.cmake" )
 endif()
 
 # ============================================================================
