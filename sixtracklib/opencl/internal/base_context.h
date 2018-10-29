@@ -37,6 +37,8 @@ namespace SIXTRL_CXX_NAMESPACE
     using node_id_t     = NS(ComputeNodeId);
     using node_info_t   = NS(ComputeNodeInfo);
 
+    class ClArgument;
+
     class ClContextBase
     {
         public:
@@ -211,6 +213,17 @@ namespace SIXTRL_CXX_NAMESPACE
         size_type kernelExecCounter(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
+        ClArgument* ptrKernelArgument( kernel_id_t const kernel_id,
+            size_type const arg_index ) SIXTRL_NOEXCEPT;
+
+        ClArgument const* ptrKernelArgument( kernel_id_t const kernel_id,
+            size_type const arg_index ) const SIXTRL_NOEXCEPT;
+
+        void assignKernelArgument( kernel_id_t const kernel_id,
+            size_type const arg_index, ClArgument& SIXTRL_RESTRICT_REF arg );
+
+        void resetKernelArguments( kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+
         double lastExecTime( kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
         double minExecTime(  kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
         double maxExecTime(  kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
@@ -287,7 +300,8 @@ namespace SIXTRL_CXX_NAMESPACE
                 m_min_exec_time(  std::numeric_limits< double >::max() ),
                 m_max_exec_time(  std::numeric_limits< double >::min() ),
                 m_last_exec_time( double{ 0 } ),
-                m_sum_exec_time( double{ 0 } )
+                m_sum_exec_time( double{ 0 } ),
+                m_arguments()
             {
 
             }
@@ -336,6 +350,29 @@ namespace SIXTRL_CXX_NAMESPACE
                       static_cast< double >( this->m_exec_count ) : double{ 0 };
             }
 
+            ClArgument const* argument(
+                size_type const arg_index ) const SIXTRL_NOEXCEPT
+            {
+                SIXTRL_ASSERT( arg_index < this->m_num_args );
+                SIXTRL_ASSERT( this->m_arguments.size() > arg_index );
+                return this->m_arguments[ arg_index ];
+            }
+
+            ClArgument* argument( size_type const arg_index ) SIXTRL_NOEXCEPT
+            {
+                SIXTRL_ASSERT( arg_index < this->m_num_args );
+                SIXTRL_ASSERT( this->m_arguments.size() > arg_index );
+                return this->m_arguments[ arg_index ];
+            }
+
+            void assignArgument( size_type const arg_index,
+                                 ClArgument* ptr_to_arg )
+            {
+                SIXTRL_ASSERT( arg_index < this->m_num_args );
+                SIXTRL_ASSERT( this->m_arguments.size() > arg_index );
+                this->m_arguments[ arg_index ] = ptr_to_arg;
+            }
+
             std::string   m_kernel_name;
             program_id_t  m_program_id;
             size_type     m_num_args;
@@ -351,6 +388,8 @@ namespace SIXTRL_CXX_NAMESPACE
             double        m_max_exec_time;
             double        m_last_exec_time;
             double        m_sum_exec_time;
+
+            std::vector< ClArgument* > m_arguments;
         };
 
         using program_data_list_t = std::vector< program_data_t >;
@@ -420,6 +459,8 @@ namespace SIXTRL_CXX_NAMESPACE
         program_id_t                    m_remap_program_id;
         kernel_id_t                     m_remap_kernel_id;
         int64_t                         m_selected_node_index;
+
+        uint64_t                        m_default_kernel_arg;
     };
 }
 
