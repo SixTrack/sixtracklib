@@ -5,9 +5,9 @@ if( GTEST_FOUND )
     # ==========================================================================
 
     set(   UNIT_TEST_TARGETS )
-    set(   SIXTRACKL_TEST_LIBRARIES
-         sixtrack_test sixtrack ${SIXTRACKL_TEST_LIBRARIES}  )
 
+    set(   SIXTRACKL_TEST_LIBRARIES ${SIXTRACKL_TEST_LIBRARIES}
+         ${SIXTRACKL_GTEST_LIBRARIES} sixtrack_test sixtrack )
 
     if( SIXTRACKL_CUDA_COMPUTE_ARCH_LIST )
         foreach( A IN LISTS SIXTRACKL_CUDA_COMPUTE_ARCH_LIST )
