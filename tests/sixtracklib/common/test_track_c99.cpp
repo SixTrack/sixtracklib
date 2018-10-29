@@ -265,10 +265,10 @@ TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
     static real_t const ABS_TOLERANCE = real_t{ 1e-13 };
 
     ::st_Buffer* pb = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_BBSIMPLE_PARTICLES_SIXTRACK_DUMP );
+        ::st_PATH_TO_LHC_NO_BB_PARTICLES_SIXTRACK_DUMP );
 
     ::st_Buffer* eb = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_BBSIMPLE_BEAM_ELEMENTS_SIXTRACK );
+        ::st_PATH_TO_LHC_NO_BB_BEAM_ELEMENTS_SIXTRACK );
 
     ::st_Buffer* track_pb   = ::st_Buffer_new( size_t{ 1u << 20u } );
     ::st_Buffer* compare_pb = ::st_Buffer_new( size_t{ 1u << 20u } );
@@ -570,7 +570,7 @@ TEST( C99_CommonTrackTests, LHCReproducePySixTrackSingleTurnBBSimple )
 
     ::st_Particles const* cmp_particles =
         ::st_Particles_buffer_get_const_particles(
-            cmp_particles_buffer, num_beam_elements ) );
+            cmp_particles_buffer, num_beam_elements );
 
     ASSERT_TRUE( cmp_particles != nullptr );
 
