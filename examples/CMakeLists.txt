@@ -61,7 +61,7 @@ if( SIXTRACKL_INSTALL_EXAMPLES )
 
             if( MODULE_VALUE STREQUAL "1" )
                 string( APPEND SETTINGS_OPTIONS_AVAILABLE_MODULES
-                        "option( SIXTRACK_ENABLE_${MODULE_NAME} \r\n"
+                        "option( SIXTRACKL_ENABLE_${MODULE_NAME} \r\n"
                         "        \\\"Enable examples using module ${MODULE_NAME}\\\"\r\n"
                         "        On  )\r\n\r\n" )
             endif()
@@ -88,7 +88,7 @@ if( SIXTRACKL_INSTALL_EXAMPLES )
 
             if( BINDINGS_VALUE STREQUAL "1" )
                 string( APPEND SETTINGS_OPTIONS_AVAILABLE_BINDINGS
-                        "option( SIXTRACK_ENABLE_${BINDINGS_NAME} \r\n"
+                        "option( SIXTRACKL_ENABLE_${BINDINGS_NAME} \r\n"
                         "        \\\"Enable examples using module ${BINDINGS_NAME}\\\"\r\n"
                         "        On  )\r\n\r\n" )
             endif()
