@@ -98,9 +98,9 @@ if( SIXTRACKL_INSTALL_EXAMPLES AND ALL_EXAMPLE_TARGETS )
             list( APPEND EXAMPLE_SOURCES_TO_INSTALL ${EXAMPLE_PRG_SOURCES} )
 
             string( APPEND GENERATED_CMAKELISTS_PROGRAMS
-                    "# ${EXAMPLE_PRG}: \r\n"
-                    "add_executable( ${EXAMPLE_PRG} ${EXAMPLE_PRG_SOURCES} )\r\n"
-                    "list( APPEND EXAMPLE_TARGETS ${EXAMPLE_PRG} )\r\n\r\n" )
+                    "    # ${EXAMPLE_PRG}: \r\n"
+                    "    add_executable( ${EXAMPLE_PRG} ${EXAMPLE_PRG_SOURCES} )\r\n"
+                    "    list( APPEND EXAMPLE_TARGETS ${EXAMPLE_PRG} )\r\n\r\n" )
         endforeach()
 
         string( APPEND GENERATED_CMAKELISTS_PROGRAMS "endif()\r\n" )
@@ -111,20 +111,20 @@ if( SIXTRACKL_INSTALL_EXAMPLES AND ALL_EXAMPLE_TARGETS )
         string( APPEND GENERATED_CMAKELISTS_PROGRAMS
                 "if( SIXTRACKL_ENABLE_CUDA ) \r\n" )
 
-        foreach( EXAMPLE_PRG ${EXAMPLE_OPENCL_TARGETS} )
+        foreach( EXAMPLE_PRG ${EXAMPLE_CUDA_TARGETS} )
             get_property( EXAMPLE_PRG_SOURCES TARGET ${EXAMPLE_PRG} PROPERTY SOURCES )
             list( APPEND EXAMPLE_SOURCES_TO_INSTALL ${EXAMPLE_PRG_SOURCES} )
 
             string( APPEND GENERATED_CMAKELISTS_PROGRAMS
-                    "# ${EXAMPLE_PRG}: \r\n"
-                    "add_executable( ${EXAMPLE_PRG} ${EXAMPLE_PRG_SOURCES} )\r\n"
-                    "list( APPEND EXAMPLE_TARGETS ${EXAMPLE_PRG} )\r\n\r\n" )
+                    "    # ${EXAMPLE_PRG}: \r\n"
+                    "    add_executable( ${EXAMPLE_PRG} ${EXAMPLE_PRG_SOURCES} )\r\n"
+                    "    list( APPEND EXAMPLE_TARGETS ${EXAMPLE_PRG} )\r\n\r\n" )
         endforeach()
 
         string( APPEND GENERATED_CMAKELISTS_PROGRAMS "endif()\r\n" )
     endif()
 
-    string( APPEND GENERATED_CMAKELISTS_TARGET_PROPERTIES
+    string( APPEND GENERATED_CMAKELISTS_PROGRAMS
             "set( EXAMPLE_COMPILE_OPTIONS ${SIXTRACKLIB_CPU_FLAGS} )\r\n"
             "list( APPEND EXAMPLE_COMPILE_OPTIONS -Wall )\r\n"
             "list( APPEND EXAMPLE_COMPILE_OPTIONS -Werror )\r\n"

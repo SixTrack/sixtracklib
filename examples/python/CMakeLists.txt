@@ -43,6 +43,11 @@ if( SIXTRACKL_INSTALL_EXAMPLES )
             DESTINATION "${CMAKE_INSTALL_PREFIX}/examples/python" )
     endif()
 
+    install( CODE "
+    configure_file( \"${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt.install\"
+                    \"${CMAKE_INSTALL_PREFIX}/examples/python/CMakeLists.txt\"
+                    @ONLY )" )
+
 endif()
 
 #end: tests/testdata/generators/CMakeLists.txt

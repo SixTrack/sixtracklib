@@ -34,6 +34,11 @@ list( APPEND EXAMPLE_TARGETS track_lhc_no_bb_c99 )
 add_executable( track_bbsimple_c99 track_bbsimple.c )
 list( APPEND EXAMPLE_TARGETS track_bbsimple_c99 )
 
+# -----------------------------------------------------------------------------
+# track_beambeam_c99:
+
+add_executable( track_beambeam_c99 track_beambeam.c )
+list( APPEND EXAMPLE_TARGETS track_beambeam_c99 )
 
 
 if( SIXTRACKL_ENABLE_CUDA )
@@ -116,9 +121,9 @@ if( SIXTRACKL_INSTALL_EXAMPLES AND ALL_EXAMPLE_TARGETS )
             list( APPEND EXAMPLE_SOURCES_TO_INSTALL ${EXAMPLE_PRG_SOURCES} )
 
             string( APPEND GENERATED_CMAKELISTS_PROGRAMS
-                    "# ${EXAMPLE_PRG}: \r\n"
-                    "add_executable( ${EXAMPLE_PRG} ${EXAMPLE_PRG_SOURCES} )\r\n"
-                    "list( APPEND EXAMPLE_TARGETS ${EXAMPLE_PRG} )\r\n\r\n" )
+                    "    # ${EXAMPLE_PRG}: \r\n"
+                    "    add_executable( ${EXAMPLE_PRG} ${EXAMPLE_PRG_SOURCES} )\r\n"
+                    "    list( APPEND EXAMPLE_TARGETS ${EXAMPLE_PRG} )\r\n\r\n" )
         endforeach()
 
         string( APPEND GENERATED_CMAKELISTS_PROGRAMS "endif()\r\n" )
@@ -129,14 +134,14 @@ if( SIXTRACKL_INSTALL_EXAMPLES AND ALL_EXAMPLE_TARGETS )
         string( APPEND GENERATED_CMAKELISTS_PROGRAMS
                 "if( SIXTRACKL_ENABLE_CUDA ) \r\n" )
 
-        foreach( EXAMPLE_PRG ${EXAMPLE_OPENCL_TARGETS} )
+        foreach( EXAMPLE_PRG ${EXAMPLE_CUDA_TARGETS} )
             get_property( EXAMPLE_PRG_SOURCES TARGET ${EXAMPLE_PRG} PROPERTY SOURCES )
             list( APPEND EXAMPLE_SOURCES_TO_INSTALL ${EXAMPLE_PRG_SOURCES} )
 
             string( APPEND GENERATED_CMAKELISTS_PROGRAMS
-                    "# ${EXAMPLE_PRG}: \r\n"
-                    "add_executable( ${EXAMPLE_PRG} ${EXAMPLE_PRG_SOURCES} )\r\n"
-                    "list( APPEND EXAMPLE_TARGETS ${EXAMPLE_PRG} )\r\n\r\n" )
+                    "    # ${EXAMPLE_PRG}: \r\n"
+                    "    add_executable( ${EXAMPLE_PRG} ${EXAMPLE_PRG_SOURCES} )\r\n"
+                    "    list( APPEND EXAMPLE_TARGETS ${EXAMPLE_PRG} )\r\n\r\n" )
         endforeach()
 
         string( APPEND GENERATED_CMAKELISTS_PROGRAMS "endif()\r\n" )

@@ -25,7 +25,6 @@ int main( int argc, char* argv[] )
 
     buf_size_t ii = 0;
 
-
     /* ********************************************************************** */
     /* ****   Handling of command line parameters                             */
     /* ********************************************************************** */
@@ -66,9 +65,8 @@ int main( int argc, char* argv[] )
         }
     }
 
-    printf( "Selected NUM_PARTICLES = %10lu\r\n"
-            "Selected NUM_TURNS     = %10lu\r\n"
-            "\r\n", NUM_PARTICLES, NUM_TURNS );
+    printf( "Use: NUM_PARTICLES = %10lu\r\n"
+            "     NUM_TURNS     = %10lu\r\n\r\n", NUM_PARTICLES, NUM_TURNS );
 
     /* ********************************************************************** */
     /* ****      Building Particles Data from Particle Dump Data         **** */
@@ -112,13 +110,6 @@ int main( int argc, char* argv[] )
 
     printf("N objects in dump %d\n", (int)st_Buffer_get_num_of_objects(dump));
 
-    // Write to file
-    st_Buffer_write_to_file(dump, st_PATH_TO_BBSIMPLE_PARTICLES_DUMP );
-
-    //st_Buffer* test = st_Buffer_new_from_file("stlib_dump.bin");
-    //st_Particles_buffer_print(stdout, test);
-
-
     /* ********************************************************************** */
     /* ****                         Clean-up                             **** */
     /* ********************************************************************** */
@@ -129,4 +120,4 @@ int main( int argc, char* argv[] )
     st_Buffer_delete( dump );
 }
 
-/* end: examples/c99/track_simple_bb_from_python.c */
+/* end: examples/c99/track_bbsimple.c */
