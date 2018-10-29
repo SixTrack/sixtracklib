@@ -74,16 +74,16 @@ static char const NS(PATH_TO_TEST_TRACKING_BE_CAVITY_DATA)[] =
 /* ------------------------------------------------------------------------ */
 
 static char const NS(PATH_TO_LHC_NO_BB_PARTICLES_DUMP)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/particles_dump.bin";
+    "@SIXTRACKLIB_TESTDATA_DIR@/lhc_no_bb/particles_dump.bin";
 
 static char const NS(PATH_TO_LHC_NO_BB_BEAM_ELEMENTS)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/beam_elements.bin";
+    "@SIXTRACKLIB_TESTDATA_DIR@/lhc_no_bb/beam_elements.bin";
 
 static char const NS(PATH_TO_LHC_NO_BB_PARTICLES_SIXTRACK_DUMP)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/particles_dump_sixtrack.bin";
+    "@SIXTRACKLIB_TESTDATA_DIR@/lhc_no_bb/particles_dump_sixtrack.bin";
 
 static char const NS(PATH_TO_LHC_NO_BB_BEAM_ELEMENTS_SIXTRACK)[] =
-    "@SIXTRACKLIB_TESTDATA_DIR@/bbsimple/beam_elements_sixtrack.bin";
+    "@SIXTRACKLIB_TESTDATA_DIR@/lhc_no_bb/beam_elements_sixtrack.bin";
 
 /* ------------------------------------------------------------------------ */
 /* ---  Simple BeamBeam Closed Orbit with externally provided Fix-Point --- */
