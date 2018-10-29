@@ -22,7 +22,7 @@ from pysixtracklib.particles import Particles as IOParticles
 import testdata
 
 if  __name__ == '__main__':
-    py_example   = 'bbsimple'
+    py_example   = 'beambeam'
     input_folder = os.path.join( testdata.PATH_TO_TESTDATA_DIR, py_example )
     path_to_particle_dump = os.path.join( input_folder, 'particles_dump.bin' )
     path_to_line          = os.path.join( input_folder, 'line.pkl' )
