@@ -9,7 +9,7 @@ setuptools.setup(
     url='https://github.com/SixTrack/sixtracklib',
     packages=['pysixtracklib'],
     package_dir= { 'pysixtracklib': '@CMAKE_CURRENT_SOURCE_DIR@/pysixtracklib' },
-    install_requires=['numpy','cobject','pysixtrack','sixtracktools']
+    install_requires=['numpy','cobjects','pysixtrack','sixtracktools']
 )
 
 # end python/setup.py

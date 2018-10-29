@@ -36,10 +36,10 @@ if( SIXTRACKL_INSTALL_EXAMPLES )
     install( CODE
             "set( SIXTRACKLIB_TESTDATA_DIR \"${CMAKE_INSTALL_PREFIX}/tests/testdata\" )
             configure_file( \"${TESTDATA_PY_IN_PATH}\"
-                            \"${TESTDATA_PY_OUT_PATH}\" @ONLY )" )
+                            \"${TESTDATA_PY_INSTALL_PATH}\" @ONLY )" )
 
     if( PYTHON_EXAMPLES )
-        install( FILES PYTHON_EXAMPLES
+        install( FILES ${PYTHON_EXAMPLES}
             DESTINATION "${CMAKE_INSTALL_PREFIX}/examples/python" )
     endif()
 
