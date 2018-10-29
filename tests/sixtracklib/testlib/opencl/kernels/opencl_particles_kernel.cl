@@ -70,6 +70,12 @@ __kernel void NS(Particles_copy_buffer_opencl)(
                     {
                         NS(Particles_copy_single)( out_particles, particle_id,
                             in_particles, particle_id );
+
+                        if( NS(Particles_get_state_value)( out_particles, particle_id ) !=
+                            NS(Particles_get_state_value)( in_particles,  particle_id ) )
+                        {
+                            printf( "ERROR %d\r\n", ( int )particle_id );
+                        }
                     }
                     else
                     {
