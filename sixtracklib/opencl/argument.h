@@ -27,7 +27,6 @@ struct NS(Buffer);
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/buffer.hpp"
-    #include "sixtracklib/opencl/internal/base_context.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
@@ -47,12 +46,14 @@ struct NS(Buffer);
 
 namespace SIXTRL_CXX_NAMESPACE
 {
+    class ClContextBase;
+
     class ClArgument
     {
         public:
 
         using context_base_t     = ClContextBase;
-        using size_type          = ClContextBase::size_type;
+        using size_type          = std::size_t;
         using cobj_buffer_t      = struct NS(Buffer);
         using cxx_cobj_buffer_t  = SIXTRL_CXX_NAMESPACE::Buffer;
 
@@ -160,6 +161,10 @@ typedef void NS(ClArgument);
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
 #endif /* defined( __cplusplus ) */
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/opencl/internal/base_context.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
