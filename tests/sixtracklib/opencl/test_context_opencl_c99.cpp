@@ -194,56 +194,36 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
             /* ------------------------------------------------------------- */
             /* Add copy generic obj buffer program */
 
-            char path_to_copy_kernel_program[ 1024 ];
-            std::memset( path_to_copy_kernel_program, ( int )'\0', 1024 );
+            con_size_t const N = 1024;
+            std::vector< char > path_to_copy_kernel_program( N + 1, '\0' );
 
-            std::strncpy( path_to_copy_kernel_program, ::st_PATH_TO_BASE_DIR,
-                          1023 );
+            std::strncpy( path_to_copy_kernel_program.data(),
+                          ::st_PATH_TO_BASE_DIR, N );
 
-            std::strncat( path_to_copy_kernel_program,
+            std::strncat( path_to_copy_kernel_program.data(),
                           "tests/sixtracklib/testlib/opencl/kernels/",
-                          1023 - std::strlen( path_to_copy_kernel_program ) );
+                          N - std::strlen( path_to_copy_kernel_program.data() ) );
 
             std::strncat( path_to_copy_kernel_program,
                           "opencl_buffer_generic_obj_kernel.cl",
-                          1023 - std::strlen( path_to_copy_kernel_program ) );
+                          N - std::strlen( path_to_copy_kernel_program.data() ) );
 
 
-            char copy_program_compile_options[ 1024 ];
-            std::memset( copy_program_compile_options, ( int )'\0', 1024 );
+            std::vector< char > copy_program_compile_options( N + 1, '\0' );
 
-            std::strncpy( copy_program_compile_options, "-D_GPUCODE=1", 1024 );
+            std::strncat( copy_program_compile_options.data(),
+                          "-D_GPUCODE=1"
+                          " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
+                          " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
+                          " -I", N );
 
-            std::strncat( copy_program_compile_options, " -D__NAMESPACE=st_",
-                          1023 - std::strlen( copy_program_compile_options ) );
-
-            std::strncat( copy_program_compile_options,
-                          " -DSIXTRL_BUFFER_ARGPTR_DEC=__private",
-                          1023 - std::strlen( copy_program_compile_options ) );
-
-            std::strncat( copy_program_compile_options,
-                          " -DSIXTRL_BUFFER_DATAPTR_DEC=__global",
-                          1023 - std::strlen( copy_program_compile_options ) );
-
-            std::strncat( copy_program_compile_options, " -I",
-                          1023 - std::strlen( copy_program_compile_options ) );
-
-            std::strncat( copy_program_compile_options, ::st_PATH_TO_BASE_DIR,
-                          1023 - std::strlen( copy_program_compile_options ) );
-
-            std::strncat( copy_program_compile_options, " -I",
-                          1023 - std::strlen( copy_program_compile_options ) );
-
-            std::strncat( copy_program_compile_options, ::st_PATH_TO_BASE_DIR,
-                          1023 - std::strlen( copy_program_compile_options ) );
-
-            std::strncat( copy_program_compile_options, "tests",
-                          1023 - std::strlen( copy_program_compile_options ) );
-
+            std::strncat( copy_program_compile_options.data(),
+                          ::st_PATH_TO_INCLUDE_DIR, N - std::strlen(
+                              copy_program_compile_options.data() ) );
 
             program_id_t copy_program_id = ::st_ClContextBase_add_program_file(
-                context, path_to_copy_kernel_program,
-                    copy_program_compile_options );
+                context, path_to_copy_kernel_program.data(),
+                    copy_program_compile_options.data() );
 
             ASSERT_TRUE( copy_program_id != program_id_t{ -1 } );
 
@@ -274,8 +254,11 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
             ASSERT_TRUE( ::st_ClContextBase_get_num_available_kernels(
                     context ) == initial_num_kernels );
 
+            std::string kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
+            kernel_name += "copy_orig_buffer";
+
             kernel_id_t const copy_kernel_id = ::st_ClContextBase_enable_kernel(
-                context, "st_copy_orig_buffer", copy_program_id );
+                context, kernel_name.c_str(), copy_program_id );
 
             ASSERT_TRUE( copy_kernel_id != kernel_id_t{ -1 } );
             ASSERT_TRUE( copy_kernel_id != remap_kernel_id );
@@ -286,7 +269,7 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
                 context, copy_kernel_id ) == copy_program_id );
 
             ASSERT_TRUE( ::st_ClContextBase_find_kernel_id_by_name( context,
-                "st_copy_orig_buffer" ) == copy_kernel_id );
+                kernel_data.c_str() ) == copy_kernel_id );
 
             ASSERT_TRUE( ::st_ClContextBase_get_kernel_num_args(
                 context, copy_kernel_id ) == con_size_t{ 3u } );

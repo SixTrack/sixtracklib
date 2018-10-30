@@ -82,16 +82,12 @@ TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
     {
         std::ostringstream a2str;
 
-        std::string const PATH_TO_BASE_DIR = ::st_PATH_TO_BASE_DIR;
-
         /* ----------------------------------------------------------------- */
 
-        a2str.str( "" );
         a2str << " -D_GPUCODE=1"
-              << " -D__NAMESPACE=st_"
               << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
               << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
-              << " -I" << PATH_TO_BASE_DIR;
+              << " -I" << ::st_PATH_TO_INCLUDE_DIR;
 
         std::string const REMAP_COMPILE_OPTIONS = a2str.str();
 
@@ -108,7 +104,7 @@ TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
 
         /* ----------------------------------------------------------------- */
 
-        path_to_source  = PATH_TO_BASE_DIR;
+        path_to_source  = ::st_PATH_TO_BASE_DIR;
         path_to_source += "tests/sixtracklib/testlib/opencl/kernels/";
         path_to_source += "opencl_beam_elements_opencl_kernel.cl";
 
@@ -117,8 +113,6 @@ TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
         std::string const COPY_PROGRAM_SOURCE_CODE(
             ( std::istreambuf_iterator< char >( kernel_file ) ),
               std::istreambuf_iterator< char >() );
-
-        a2str << " -I" << PATH_TO_BASE_DIR << "tests";
 
         std::string const COPY_COMPILE_OPTIONS = a2str.str();
 
@@ -348,12 +342,15 @@ TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
              * REMAP KERNEL *
              * ============================================================= */
 
+            std::string remap_kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
+            remap_kernel_name += "ManagedBuffer_remap_io_buffers_opencl";
+
             cl::Kernel remap_kernel;
 
             try
             {
                 remap_kernel = cl::Kernel(
-                    remap_program, "st_ManagedBuffer_remap_io_buffers_opencl" );
+                    remap_program, remap_kernel_name.c_str() );
             }
             catch( cl::Error const& e )
             {
@@ -446,12 +443,14 @@ TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
              * TRACKING KERNEL *
              * ============================================================= */
 
+            std::string track_kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
+            track_kernel_name += "BeamElements_copy_beam_elements_opencl";
+
             cl::Kernel copy_kernel;
 
             try
             {
-                copy_kernel = cl::Kernel( copy_program,
-                    "st_BeamElements_copy_beam_elements_opencl" );
+                copy_kernel = cl::Kernel( copy_program, track_kernel_name.c_str() );
             }
             catch( cl::Error const& e )
             {

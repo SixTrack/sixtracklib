@@ -99,7 +99,7 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
               << " -D__NAMESPACE=st_"
               << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
               << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
-              << " -I" << PATH_TO_BASE_DIR;
+              << " -I" << ::st_PATH_TO_INCLUDE_DIR;
 
         std::string const REMAP_COMPILE_OPTIONS = a2str.str();
 
