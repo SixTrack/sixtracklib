@@ -162,7 +162,8 @@ endif()
 # ==============================================================================
 # tests: unit-tests, benchmarks, testdata generators:
 
-if( SIXTRACKL_ENABLE_PROGRAMM_TESTS OR SIXTRACKL_ENABLE_BENCHMARK_TESTS )
+if( SIXTRACKL_ENABLE_PROGRAMM_TESTS OR SIXTRACKL_ENABLE_BENCHMARK_TESTS OR
+    SIXTRACKL_BUILD_EXAMPLES )
     add_subdirectory( tests )
 endif()
 
