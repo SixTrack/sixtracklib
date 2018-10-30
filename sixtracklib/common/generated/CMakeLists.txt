@@ -70,7 +70,8 @@ install( CODE "
 #       macro in common/generated/path.h as a prefix for
 #       filename and directory paths!
 
-set( SIXTRACKLIB_BASE_DIR "${CMAKE_SOURCE_DIR}/" )
+set( SIXTRACKLIB_BASE_DIR     "${CMAKE_SOURCE_DIR}/" )
+set( SIXTRACKLIB_INCLUDE_DIR  ${SIXTRACKLIB_BASE_DIR} )
 
 set( PATH_H_IN_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/path.h.template" )
 set( PATH_H_OUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/path.h" )
@@ -88,6 +89,7 @@ set( PATH_H_INSTALL_PATH
 
 install( CODE "
          set( SIXTRACKLIB_BASE_DIR \"${CMAKE_INSTALL_PREFIX}/\" )
+         set( SIXTRACKLIB_INCLUDE_DIR \"${CMAKE_INSTALL_PREFIX}/include\" )
          message( STATUS \"Generating: ${PATH_H_INSTALL_PATH}\" )
          configure_file( \"${PATH_H_IN_PATH}\" \"${PATH_H_INSTALL_PATH}\"
             @ONLY ) " )
