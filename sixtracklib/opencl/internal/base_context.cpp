@@ -949,7 +949,8 @@ namespace SIXTRL_CXX_NAMESPACE
                     kernel.getInfo< CL_KERNEL_NUM_ARGS >();
 
                 this->m_kernel_data.back().m_num_args = num_args;
-                this->m_kernel_data.back().m_arguments.resize( nullptr, num_args );
+                this->m_kernel_data.back().m_arguments.resize(
+                    num_args, nullptr );
 
                 for( size_type ii = size_type{ 0 } ; ii < num_args ; ++ii )
                 {
@@ -959,7 +960,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 cl::Device& selected_device = this->m_available_devices.at(
                     this->m_selected_node_index );
 
-                this->m_kernel_data.back().m_work_group_size =
+                this->m_kernel_data.back().m_work_group_size = size_type{ 0 };
+
+                this->m_kernel_data.back().m_max_work_group_size =
                     kernel.getWorkGroupInfo< CL_KERNEL_WORK_GROUP_SIZE >(
                         selected_device );
 
@@ -1089,12 +1092,55 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( this->m_cl_kernels.size() ==
                        this->m_kernel_data.size() );
 
+        size_type work_group_size = size_type{ 0 };
+
+        if( ( this->hasSelectedNode() ) && ( kernel_id >= kernel_id_t{ 0 } ) &&
+            ( static_cast< size_type >( kernel_id ) < this->m_kernel_data.size() ) )
+        {
+            kernel_data_t const& kernel_data = this->m_kernel_data[ kernel_id ];
+
+            work_group_size = std::min( kernel_data.m_work_group_size,
+                                        kernel_data.m_max_work_group_size );
+        }
+
+        return work_group_size;
+    }
+
+    ClContextBase::size_type ClContextBase::kernelMaxWorkGroupSize(
+        ClContextBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        SIXTRL_ASSERT( this->m_cl_kernels.size() ==
+                       this->m_kernel_data.size() );
+
         return ( ( this->hasSelectedNode() ) &&
                  ( kernel_id >= kernel_id_t{ 0 } ) &&
                  ( static_cast< size_type >( kernel_id ) <
                    this->m_kernel_data.size() ) )
-            ? this->m_kernel_data[ kernel_id ].m_work_group_size
+            ? this->m_kernel_data[ kernel_id ].m_max_work_group_size
             : size_type{ 0 };
+    }
+
+    bool ClContextBase::setKernelWorkGroupSize(
+        ClContextBase::kernel_id_t const kernel_id,
+        ClContextBase::size_type work_group_size ) SIXTRL_NOEXCEPT
+    {
+        bool success = false;
+
+        if( ( this->hasSelectedNode() ) &&
+            ( kernel_id >= kernel_id_t{ 0 } ) &&
+            ( static_cast< size_type >( kernel_id ) < this->m_kernel_data.size() ) )
+        {
+            if( this->m_kernel_data[ kernel_id ].m_max_work_group_size >=
+                work_group_size )
+            {
+                this->m_kernel_data[ kernel_id ].m_work_group_size =
+                    work_group_size;
+
+                success = true;
+            }
+        }
+
+        return success;
     }
 
     ClContextBase::size_type ClContextBase::kernelPreferredWorkGroupSizeMultiple(
@@ -1173,13 +1219,17 @@ namespace SIXTRL_CXX_NAMESPACE
         ClArgument& SIXTRL_RESTRICT_REF arg )
     {
         if( ( kernel_id >= kernel_id_t{ 0 } ) && ( static_cast< size_type >(
-              kernel_id ) < this->numAvailableKernels() ) )
+              kernel_id ) < this->numAvailableKernels() ) &&
+            ( arg.context() == this ) && ( arg.size() > size_type{ 0 } ) )
         {
+            cl::Kernel* kernel = this->openClKernel( kernel_id );
+
             kernel_data_t& kernel_data = this->m_kernel_data[ kernel_id ];
 
-            if( kernel_data.m_num_args > arg_index )
+            if( ( kernel_data.m_num_args > arg_index ) && ( kernel != nullptr ) )
             {
                 kernel_data.m_arguments[ arg_index ] = &arg;
+                kernel->setArg( arg_index, arg.openClBuffer() );
             }
         }
 
@@ -1214,12 +1264,142 @@ namespace SIXTRL_CXX_NAMESPACE
             }
             else
             {
-                kernel_data.m_arguments.resize( nullptr,
-                                                kernel_data.m_num_args );
+                kernel_data.m_arguments.resize(
+                    kernel_data.m_num_args, nullptr );
             }
         }
 
         return;
+    }
+
+    void ClContextBase::resetSingleKernelArgument(
+        ClContextBase::kernel_id_t const kernel_id,
+        ClContextBase::size_type const arg_index ) SIXTRL_NOEXCEPT
+    {
+        if( ( kernel_id >= kernel_id_t{ 0 } ) && ( static_cast< size_type >(
+              kernel_id ) < this->numAvailableKernels() ) )
+        {
+            cl::Kernel* kernel = this->openClKernel( kernel_id );
+
+            kernel_data_t& kernel_data = this->m_kernel_data[ kernel_id ];
+            size_type const nn = kernel_data.m_num_args;
+
+            if( ( kernel != nullptr ) && ( arg_index < nn ) &&
+                ( kernel_data.m_arguments.size() > arg_index ) )
+            {
+                if( kernel_data.m_arguments[ arg_index ] != nullptr )
+                {
+                    kernel->setArg( arg_index, this->m_default_kernel_arg );
+                    kernel_data.m_arguments[ arg_index ] = nullptr;
+                }
+            }
+        }
+
+        return;
+    }
+
+    ClContextBase::size_type ClContextBase::calculateKernelNumWorkItems(
+        ClContextBase::kernel_id_t const kernel_id,
+        ClContextBase::size_type const min_num_work_items ) const SIXTRL_NOEXCEPT
+    {
+        size_type num_threads = min_num_work_items;
+        size_type work_group_size = this->kernelWorkGroupSize( kernel_id );
+
+        if( work_group_size == size_type{ 0 } )
+        {
+            work_group_size =
+                this->kernelPreferredWorkGroupSizeMultiple( kernel_id );
+        }
+
+        if( work_group_size > size_type{ 0 } )
+        {
+            size_type const num_blocks = min_num_work_items / work_group_size;
+            num_threads = num_blocks * work_group_size;
+
+            if( num_threads < min_num_work_items )
+            {
+                num_threads += work_group_size;
+            }
+        }
+
+        return num_threads;
+    }
+
+    bool ClContextBase::runKernel(
+        ClContextBase::kernel_id_t const kernel_id,
+        ClContextBase::size_type min_num_work_items )
+    {
+        return this->runKernel( kernel_id, min_num_work_items,
+                         this->kernelWorkGroupSize( kernel_id ) );
+    }
+
+    bool ClContextBase::runKernel(
+        ClContextBase::kernel_id_t const kernel_id,
+        ClContextBase::size_type const min_num_work_items,
+        ClContextBase::size_type work_group_size )
+    {
+        bool success = false;
+
+        cl::Kernel* kernel = this->openClKernel( kernel_id );
+        cl::CommandQueue* ptr_queue = this->openClQueue();
+
+        if( ( kernel != nullptr ) && ( ptr_queue != nullptr ) )
+        {
+            size_type num_work_items = min_num_work_items;
+            cl::NDRange local_size = cl::NullRange;
+
+            if( work_group_size != size_type{ 0 } )
+            {
+                size_type const num_blocks =
+                    ( min_num_work_items + work_group_size - 1 ) / work_group_size;
+
+                num_work_items = num_blocks * work_group_size;
+                SIXTRL_ASSERT( num_work_items >= min_num_work_items );
+                local_size  = cl::NDRange( work_group_size );
+            }
+
+            cl::Event run_event;
+
+            cl_ulong run_when_queued    = cl_ulong{ 0 };
+            cl_ulong run_when_submitted = cl_ulong{ 0 };
+            cl_ulong run_when_started   = cl_ulong{ 0 };
+            cl_ulong run_when_ended     = cl_ulong{ 0 };
+
+            cl_int cl_ret = ptr_queue->enqueueNDRangeKernel( *kernel,
+                cl::NullRange, cl::NDRange( num_work_items ),
+                    local_size, nullptr, &run_event );
+
+            cl_ret |= ptr_queue->flush();
+            run_event.wait();
+
+            success = ( cl_ret == CL_SUCCESS );
+
+            cl_ret  = run_event.getProfilingInfo< cl_ulong >(
+                CL_PROFILING_COMMAND_QUEUED, &run_when_queued );
+
+            cl_ret |= run_event.getProfilingInfo< cl_ulong >(
+                CL_PROFILING_COMMAND_SUBMIT, &run_when_submitted );
+
+            cl_ret |= run_event.getProfilingInfo< cl_ulong >(
+                CL_PROFILING_COMMAND_START, &run_when_started );
+
+            cl_ret |= run_event.getProfilingInfo< cl_ulong >(
+                CL_PROFILING_COMMAND_END, &run_when_ended );
+
+            if( cl_ret == CL_SUCCESS )
+            {
+                double const last_event_time = ( run_when_ended >= run_when_started )
+                    ? ( double{ 1e-9 } * static_cast< double >(
+                        run_when_ended - run_when_started ) )
+                    : double{ 0 };
+
+                this->addKernelExecTime(    last_event_time, kernel_id );
+                this->setLastWorkGroupSize( work_group_size, kernel_id );
+                this->setLastNumWorkItems(  num_work_items,  kernel_id );
+            }
+        }
+
+        return success;
     }
 
     double ClContextBase::lastExecTime(
@@ -2098,6 +2278,22 @@ SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_work_group_size)(
         ? ctx->kernelWorkGroupSize( kernel_id ) : NS(context_size_t){ 0 };
 }
 
+SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_max_work_group_size)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id )
+{
+    return ( ctx != nullptr )
+        ? ctx->kernelMaxWorkGroupSize( kernel_id ) : NS(context_size_t){ 0 };
+}
+
+SIXTRL_HOST_FN bool NS(ClContextBase_set_kernel_work_group_size)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const work_group_size )
+{
+    return ( ctx != nullptr )
+        ? ctx->setKernelWorkGroupSize( kernel_id, work_group_size )
+        : false;
+}
+
 SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id )
@@ -2125,7 +2321,7 @@ SIXTRL_HOST_FN NS(ClArgument)* NS(ClContextBase_get_ptr_kernel_argument)(
 SIXTRL_HOST_FN NS(ClArgument) const*
 NS(ClContextBase_get_const_ptr_kernel_argument)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id,
-    NS(context_size_t) const arg_index ) const SIXTRL_NOEXCEPT
+    NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT
 {
     return ( ctx != nullptr )
         ? ctx->ptrKernelArgument( kernel_id, arg_index ) : nullptr;
@@ -2149,6 +2345,73 @@ SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_arguments)(
 {
     if( ctx != nullptr ) ctx->resetKernelArguments( kernel_id );
     return;
+}
+
+SIXTRL_HOST_FN void NS(ClContextBase_reset_single_kernel_argument)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT
+{
+    if( ctx != nullptr ) ctx->resetSingleKernelArgument( kernel_id, arg_index );
+    return;
+}
+
+SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_ptr)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index,
+    void* SIXTRL_RESTRICT ptr ) SIXTRL_NOEXCEPT
+{
+    if( ctx != nullptr ) ctx->assignKernelArgumentPtr(
+        kernel_id, arg_index, ptr );
+
+    return;
+}
+
+SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_value)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index, void* SIXTRL_RESTRICT arg_data,
+    NS(context_size_t) const arg_data_size ) SIXTRL_NOEXCEPT
+{
+    if( arg_index < NS(ClContextBase_get_kernel_num_args)( ctx, kernel_id ) )
+    {
+        cl_kernel kernel = NS(ClContextBase_get_kernel)( ctx, kernel_id );
+        cl_int ret = CL_SUCCESS;
+
+        NS(ClContextBase_reset_single_kernel_argument)(
+            ctx, kernel_id, arg_index );
+
+        ret = clSetKernelArg( kernel, arg_index, arg_data_size, arg_data );
+        SIXTRL_ASSERT( ret == CL_SUCCESS );
+    }
+
+    return;
+}
+
+SIXTRL_HOST_FN NS(context_size_t)
+NS(ClContextBase_calculate_kernel_num_work_items)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    int const kernel_id, NS(context_size_t) const min_num_work_items )
+{
+    return ( ctx != nullptr )
+        ? ctx->calculateKernelNumWorkItems( kernel_id, min_num_work_items )
+        : SIXTRL_CXX_NAMESPACE::ClContextBase::size_type{ 0 };
+}
+
+SIXTRL_HOST_FN bool NS(ClContextBase_run_kernel)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    int const kernel_id, NS(context_size_t) num_work_items )
+{
+    return ( ctx != nullptr )
+        ? ctx->runKernel( kernel_id, num_work_items ) : false;
+}
+
+SIXTRL_HOST_FN bool NS(ClContextBase_run_kernel_wgsize)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const num_work_items,
+    NS(context_size_t) const work_group_size )
+{
+    return ( ctx != nullptr )
+        ? ctx->runKernel( kernel_id, num_work_items, work_group_size )
+        : false;
 }
 
 SIXTRL_HOST_FN double NS(ClContextBase_get_last_exec_time)(

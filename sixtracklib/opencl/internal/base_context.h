@@ -207,8 +207,14 @@ namespace SIXTRL_CXX_NAMESPACE
         size_type kernelWorkGroupSize(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
+        size_type kernelMaxWorkGroupSize(
+            kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
         size_type kernelPreferredWorkGroupSizeMultiple(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        bool setKernelWorkGroupSize(
+            kernel_id_t const kernel_id, size_type work_group_size ) SIXTRL_NOEXCEPT;
 
         size_type kernelExecCounter(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
@@ -222,7 +228,72 @@ namespace SIXTRL_CXX_NAMESPACE
         void assignKernelArgument( kernel_id_t const kernel_id,
             size_type const arg_index, ClArgument& SIXTRL_RESTRICT_REF arg );
 
+        void resetSingleKernelArgument( kernel_id_t const kernel_id,
+            size_type const arg_index ) SIXTRL_NOEXCEPT;
+
         void resetKernelArguments( kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+
+        template< typename T >
+        void assignKernelArgumentPtr( kernel_id_t const kernel_id,
+            size_type const arg_index, T* SIXTRL_RESTRICT ptr ) SIXTRL_NOEXCEPT
+        {
+             if( ( kernel_id >= kernel_id_t{ 0 } ) && ( static_cast< size_type >(
+                   kernel_id ) < this->numAvailableKernels() ) )
+            {
+                cl::Kernel* kernel = this->openClKernel( kernel_id );
+
+                kernel_data_t& kernel_data = this->m_kernel_data[ kernel_id ];
+                size_type const nn = kernel_data.m_num_args;
+
+                if( ( kernel != nullptr ) && ( arg_index < nn ) &&
+                    ( kernel_data.m_arguments.size() > arg_index ) )
+                {
+                    if( kernel_data.m_arguments[ arg_index ] != nullptr )
+                    {
+                        kernel_data.m_arguments[ arg_index ] = nullptr;
+                    }
+
+                    kernel->setArg( arg_index, ptr );
+                }
+            }
+
+            return;
+        }
+
+        template< typename T >
+        void assignKernelArgumentValue( kernel_id_t const kernel_id,
+            size_type const arg_index, T& SIXTRL_RESTRICT_REF ref ) SIXTRL_NOEXCEPT
+        {
+             if( ( kernel_id >= kernel_id_t{ 0 } ) && ( static_cast< size_type >(
+                   kernel_id ) < this->numAvailableKernels() ) )
+            {
+                cl::Kernel* kernel = this->openClKernel( kernel_id );
+
+                kernel_data_t& kernel_data = this->m_kernel_data[ kernel_id ];
+                size_type const nn = kernel_data.m_num_args;
+
+                if( ( kernel != nullptr ) && ( arg_index < nn ) &&
+                    ( kernel_data.m_arguments.size() > arg_index ) )
+                {
+                    if( kernel_data.m_arguments[ arg_index ] != nullptr )
+                    {
+                        kernel_data.m_arguments[ arg_index ] = nullptr;
+                    }
+
+                    kernel->setArg( arg_index, ref );
+                }
+            }
+
+            return;
+        }
+
+        size_type calculateKernelNumWorkItems(
+            kernel_id_t const kernel_id,
+            size_type const min_num_work_items ) const SIXTRL_NOEXCEPT;
+
+        bool runKernel( kernel_id_t const kernel_id, size_type min_num_work_items );
+        bool runKernel( kernel_id_t const kernel_id,
+                        size_type min_num_work_items, size_type work_group_size );
 
         double lastExecTime( kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
         double minExecTime(  kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
@@ -292,6 +363,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 m_program_id( -1 ),
                 m_num_args( -1 ),
                 m_work_group_size( size_type{ 0 } ),
+                m_max_work_group_size( size_type{ 0 } ),
                 m_preferred_work_group_multiple( size_type{ 0 } ),
                 m_local_mem_size( size_type{ 0 } ),
                 m_exec_count( size_type{ 0 } ),
@@ -377,6 +449,7 @@ namespace SIXTRL_CXX_NAMESPACE
             program_id_t  m_program_id;
             size_type     m_num_args;
             size_type     m_work_group_size;
+            size_type     m_max_work_group_size;
             size_type     m_preferred_work_group_multiple;
             size_type     m_local_mem_size;
             size_type     m_exec_count;
@@ -466,7 +539,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
 
 using NS(ClContextBase) = SIXTRL_CXX_NAMESPACE::ClContextBase;
-using NS(ClArgument)    = SIXTRL_CXX_NAMESPACE::ClArgument;
 
 #else /* defined( __cplusplus ) */
 
@@ -475,9 +547,12 @@ using NS(ClArgument)    = SIXTRL_CXX_NAMESPACE::ClArgument;
     #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 typedef void NS(ClContextBase);
-typedef void NS(ClArgument);
 
 #endif /* defined( __cplusplus ) */
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/opencl/argument.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
@@ -643,6 +718,13 @@ SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_num_args)(
 SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_work_group_size)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
+SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_max_work_group_size)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+
+SIXTRL_HOST_FN bool NS(ClContextBase_set_kernel_work_group_size)(
+    NS(ClContextBase)* SIXTRL_RESTRICT context,
+    int const kernel_id, NS(context_size_t) const work_group_size );
+
 SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
@@ -657,15 +739,43 @@ SIXTRL_HOST_FN NS(ClArgument)* NS(ClContextBase_get_ptr_kernel_argument)(
 SIXTRL_HOST_FN NS(ClArgument) const*
 NS(ClContextBase_get_const_ptr_kernel_argument)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id,
-    NS(context_size_t) const arg_index ) const SIXTRL_NOEXCEPT;
+    NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
 
 SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument)(
-    kernel_id_t const kernel_id,
-    size_type const arg_index, ClArgument& SIXTRL_RESTRICT_REF arg );
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index, NS(ClArgument)* SIXTRL_RESTRICT arg );
+
+SIXTRL_HOST_FN void NS(ClContextBase_reset_single_kernel_argument)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
+
+SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_ptr)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index,
+    void* SIXTRL_RESTRICT ptr ) SIXTRL_NOEXCEPT;
+
+SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_value)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index, void* SIXTRL_RESTRICT arg_data,
+    NS(context_size_t) const arg_data_size ) SIXTRL_NOEXCEPT;
 
 SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_arguments)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     int const kernel_id ) SIXTRL_NOEXCEPT;
+
+SIXTRL_HOST_FN NS(context_size_t)
+NS(ClContextBase_calculate_kernel_num_work_items)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    int const kernel_id, NS(context_size_t) const min_num_work_items );
+
+SIXTRL_HOST_FN bool NS(ClContextBase_run_kernel)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    int const kernel_id, NS(context_size_t) num_work_items );
+
+SIXTRL_HOST_FN bool NS(ClContextBase_run_kernel_wgsize)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const num_work_items,
+    NS(context_size_t) const work_group_size );
 
 SIXTRL_HOST_FN double NS(ClContextBase_get_last_exec_time)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
