@@ -152,14 +152,18 @@ TEST( CXX_OpenCL_Context, BaseOpenCLContextClArgument )
             path_to_copy_kernel_program += "opencl_buffer_generic_obj_kernel.cl";
 
             std::string copy_program_compile_options = "-D_GPUCODE=1";
-            copy_program_compile_options += " -D__NAMESPACE=st_";
             copy_program_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
             copy_program_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
             copy_program_compile_options += " -I";
-            copy_program_compile_options += NS(PATH_TO_INCLUDE_DIR);
-//             copy_program_compile_options += " -I";
-//             copy_program_compile_options += NS(PATH_TO_BASE_DIR);
-//             copy_program_compile_options += "tests";
+            copy_program_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
+
+            if( std::strcmp( NS(PATH_TO_SIXTRL_INCLUDE_DIR),
+                             NS(PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR) ) != 0 )
+            {
+                copy_program_compile_options += " -I";
+                copy_program_compile_options +=
+                    NS(PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR);
+            }
 
             program_id_t copy_program_id =
                 context.addProgramFile( path_to_copy_kernel_program,

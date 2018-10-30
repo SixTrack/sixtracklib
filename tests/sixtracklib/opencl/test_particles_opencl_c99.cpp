@@ -99,12 +99,13 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
               << " -D__NAMESPACE=st_"
               << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
               << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
-              << " -I" << ::st_PATH_TO_INCLUDE_DIR;
+              << " -I" << ::st_PATH_TO_SIXTRL_INCLUDE_DIR;
 
         std::string const REMAP_COMPILE_OPTIONS = a2str.str();
 
-        std::string path_to_source = PATH_TO_BASE_DIR + std::string(
-            "sixtracklib/opencl/kernels/managed_buffer_remap_kernel.cl" );
+        std::string path_to_source = ::st_PATH_TO_BASE_DIR;
+        path_to_source += "sixtracklib/opencl/kernels/";
+        path_to_source += "managed_buffer_remap_kernel.cl";
 
         std::ifstream kernel_file( path_to_source, std::ios::in );
 
@@ -116,7 +117,7 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
 
         /* ----------------------------------------------------------------- */
 
-        path_to_source  = PATH_TO_BASE_DIR;
+        path_to_source  = ::st_PATH_TO_BASE_DIR;
         path_to_source += "tests/sixtracklib/testlib/opencl/kernels/";
         path_to_source += "opencl_particles_kernel.cl";
 
@@ -126,7 +127,11 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
             ( std::istreambuf_iterator< char >( kernel_file ) ),
               std::istreambuf_iterator< char >() );
 
-        a2str << " -I" << PATH_TO_BASE_DIR << "tests";
+        if( std::strcmp( ::st_PATH_TO_SIXTRL_INCLUDE_DIR,
+                         ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR ) != 0 )
+        {
+            a2str << " -I" << ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR;
+        }
 
         std::string const COPY_COMPILE_OPTIONS = a2str.str();
 

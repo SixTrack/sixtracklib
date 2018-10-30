@@ -952,11 +952,6 @@ namespace SIXTRL_CXX_NAMESPACE
                 this->m_kernel_data.back().m_arguments.resize(
                     num_args, nullptr );
 
-                for( size_type ii = size_type{ 0 } ; ii < num_args ; ++ii )
-                {
-                    kernel.setArg( ii, &this->m_default_kernel_arg );
-                }
-
                 cl::Device& selected_device = this->m_available_devices.at(
                     this->m_selected_node_index );
 
@@ -1715,7 +1710,7 @@ namespace SIXTRL_CXX_NAMESPACE
         remap_program_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
         #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
         remap_program_compile_options += " -I";
-        remap_program_compile_options += NS(PATH_TO_INCLUDE_DIR);
+        remap_program_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
 
         program_id_t const remap_program_id = this->addProgramFile(
             path_to_remap_kernel_program, remap_program_compile_options );
@@ -2404,6 +2399,7 @@ SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_value)(
 
         ret = clSetKernelArg( kernel, arg_index, arg_data_size, arg_data );
         SIXTRL_ASSERT( ret == CL_SUCCESS );
+        ( void )ret;
     }
 
     return;

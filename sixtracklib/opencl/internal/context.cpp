@@ -270,7 +270,7 @@ namespace SIXTRL_CXX_NAMESPACE
         track_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
         #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
         track_compile_options += " -I";
-        track_compile_options += NS(PATH_TO_INCLUDE_DIR);
+        track_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
 
         program_id_t const track_program_id = this->addProgramFile(
             path_to_track_kernel_program, track_compile_options );

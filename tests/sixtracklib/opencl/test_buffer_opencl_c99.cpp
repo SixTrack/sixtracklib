@@ -102,7 +102,14 @@ TEST( C99_OpenCL_Buffer,
     a2str << " -D_GPUCODE=1"
           << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
           << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
-          << " -I" << ::st_PATH_TO_INCLUDE_DIR;
+          << " -I" << ::st_PATH_TO_SIXTRL_INCLUDE_DIR;
+
+    if( std::strcmp( ::st_PATH_TO_SIXTRL_INCLUDE_DIR,
+                     ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR ) != 0 )
+    {
+        a2str << " -I"
+              << ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR;
+    }
 
     std::string const COMPILE_OPTIONS = a2str.str();
 

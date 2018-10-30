@@ -204,7 +204,7 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
                           "tests/sixtracklib/testlib/opencl/kernels/",
                           N - std::strlen( path_to_copy_kernel_program.data() ) );
 
-            std::strncat( path_to_copy_kernel_program,
+            std::strncat( path_to_copy_kernel_program.data(),
                           "opencl_buffer_generic_obj_kernel.cl",
                           N - std::strlen( path_to_copy_kernel_program.data() ) );
 
@@ -218,8 +218,19 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
                           " -I", N );
 
             std::strncat( copy_program_compile_options.data(),
-                          ::st_PATH_TO_INCLUDE_DIR, N - std::strlen(
+                          ::st_PATH_TO_SIXTRL_INCLUDE_DIR, N - std::strlen(
                               copy_program_compile_options.data() ) );
+
+            if( std::strcmp( ::st_PATH_TO_SIXTRL_INCLUDE_DIR,
+                             ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR ) != 0 )
+            {
+                std::strncat( copy_program_compile_options.data(), " -I",
+                    N - std::strlen( copy_program_compile_options.data() ) );
+
+                std::strncat( copy_program_compile_options.data(),
+                    ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR,
+                    N - std::strlen( copy_program_compile_options.data() ) );
+            }
 
             program_id_t copy_program_id = ::st_ClContextBase_add_program_file(
                 context, path_to_copy_kernel_program.data(),
@@ -235,7 +246,7 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
             ASSERT_TRUE( ::st_ClContextBase_has_program_file_path(
                 context, copy_program_id ) );
 
-            ASSERT_TRUE( 0 == std::strcmp( path_to_copy_kernel_program,
+            ASSERT_TRUE( 0 == std::strcmp( path_to_copy_kernel_program.data(),
                 ::st_ClContextBase_get_program_path_to_file(
                     context, copy_program_id ) ) );
 
@@ -269,7 +280,7 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
                 context, copy_kernel_id ) == copy_program_id );
 
             ASSERT_TRUE( ::st_ClContextBase_find_kernel_id_by_name( context,
-                kernel_data.c_str() ) == copy_kernel_id );
+                kernel_name.c_str() ) == copy_kernel_id );
 
             ASSERT_TRUE( ::st_ClContextBase_get_kernel_num_args(
                 context, copy_kernel_id ) == con_size_t{ 3u } );

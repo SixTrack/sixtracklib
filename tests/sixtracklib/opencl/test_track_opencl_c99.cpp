@@ -75,7 +75,15 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
         tracking_program_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
         tracking_program_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
         tracking_program_compile_options += " -I";
-        tracking_program_compile_options += ::st_PATH_TO_INCLUDE_DIR;
+        tracking_program_compile_options += ::st_PATH_TO_SIXTRL_INCLUDE_DIR;
+
+        if( std::strcmp( st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR,
+                         st_PATH_TO_SIXTRL_INCLUDE_DIR ) != 0 )
+        {
+            tracking_program_compile_options += " -I";
+            tracking_program_compile_options +=
+                ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR;
+        }
 
         int const tracking_program_id = ::st_ClContextBase_add_program_file(
             context, path_to_tracking_program.c_str(),
@@ -189,7 +197,15 @@ TEST( C99_OpenCL_TrackParticlesTests,
         tracking_program_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private";
         tracking_program_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__private";
         tracking_program_compile_options += " -I";
-        tracking_program_compile_options += ::st_PATH_TO_INCLUDE_DIR;
+        tracking_program_compile_options += ::st_PATH_TO_SIXTRL_INCLUDE_DIR;
+
+        if( std::strcmp( st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR,
+                         st_PATH_TO_SIXTRL_INCLUDE_DIR ) != 0 )
+        {
+            tracking_program_compile_options += " -I";
+            tracking_program_compile_options +=
+                ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR;
+        }
 
         int const tracking_program_id = ::st_ClContextBase_add_program_file(
             context, path_to_tracking_program.c_str(),
