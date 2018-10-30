@@ -226,6 +226,44 @@ int main( int argc, char* argv[] )
         std::cout << "Error running kernel -> stopping" << std::endl;
     }
 
+    /* Run the same kernel again, but this time with an explicitly provided
+     * work-group size; In this example, we use the maximum available
+     * work-group size for the given kernel */
+
+    if( success )
+    {
+        buf_size_t const max_wg_size =
+            context.kernelMaxWorkGroupSize( add_kernel_id );
+
+        success  = context.runKernel( add_kernel_id, VECTOR_SIZE, max_wg_size );
+        success &= result_arg.read( result.data(), data_size );
+    }
+
+    if( success )
+    {
+        std::cout.precision( 6 );
+        std::cout << std::fixed;
+
+        for( int64_t ii = int64_t{ 0 } ; ii < VECTOR_SIZE ; ++ii )
+        {
+            std::cout << std::setw( 10 ) << ii
+                      << " :: "
+                      << "a = " << std::setw( 12 ) << vector_a[ ii ]
+                      << " , "
+                      << "b = " << std::setw( 12 ) << vector_b[ ii ]
+                      << " , "
+                      << "a + b = "
+                      << std::fixed << std::setw( 12 ) << result[ ii ]
+                      << "\r\n";
+        }
+
+        std::cout << std::endl;
+    }
+    else
+    {
+        std::cout << "Error running kernel -> stopping" << std::endl;
+    }
+
     return 0;
 }
 

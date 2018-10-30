@@ -233,10 +233,46 @@ int main( int argc, char* argv[] )
 
     success &= NS(ClArgument_read_memory)( result_arg, result, data_size );
 
-    for( ii = 0 ; ii < VECTOR_SIZE ; ++ii )
+    if( success )
     {
-        printf( "%10d :: a = %12.6f , b = %12.6f , a + b = %12.6f\r\n",
-                ( int )ii, vector_a[ ii ], vector_b[ ii ], result[ ii ] );
+        for( ii = 0 ; ii < VECTOR_SIZE ; ++ii )
+        {
+            printf( "%10d :: a = %12.6f , b = %12.6f , a + b = %12.6f\r\n",
+                    ( int )ii, vector_a[ ii ], vector_b[ ii ], result[ ii ] );
+        }
+    }
+    else
+    {
+        printf( "Error running kernel -> stopping\r\n" );
+    }
+
+    /* Run the same kernel again, but this time with an explicitly provided
+     * work-group size; In this example, we use the maximum available
+     * work-group size for the given kernel */
+
+    if( success )
+    {
+        size_t const max_wg_size =
+            NS(ClContextBase_get_kernel_max_work_group_size)(
+                    context, add_kernel_id );
+
+        success = NS(ClContextBase_run_kernel_wgsize)(
+            context, add_kernel_id, VECTOR_SIZE, max_wg_size );
+
+        success &= NS(ClArgument_read_memory)( result_arg, result, data_size );
+    }
+
+    if( success )
+    {
+        for( ii = 0 ; ii < VECTOR_SIZE ; ++ii )
+        {
+            printf( "%10d :: a = %12.6f , b = %12.6f , a + b = %12.6f\r\n",
+                    ( int )ii, vector_a[ ii ], vector_b[ ii ], result[ ii ] );
+        }
+    }
+    else
+    {
+        printf( "Error running kernel -> stopping\r\n" );
     }
 
     /* --------------------------------------------------------------------- */
