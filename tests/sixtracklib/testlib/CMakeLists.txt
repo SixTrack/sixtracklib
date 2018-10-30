@@ -1,13 +1,6 @@
 # sixtracklib/tests/sixtracklib/testlib/CMakeLists.txt
 
 set( SIXTRACKL_TESTLIB_LINK_LIBRARIES sixtrack  CACHE INTERNAL "" FORCE )
-
-# if( GTEST_FOUND )
-#     set(  SIXTRACKL_TESTLIB_LINK_LIBRARIES
-#         ${SIXTRACKL_TESTLIB_LINK_LIBRARIES}
-# #         ${SIXTRACKL_GTEST_LIBRARIES} CACHE INTERNAL "" FORCE )
-# endif()
-
 set( SIXTRACKL_TESTLIB_LIBRARY_MODULES
      "" CACHE INTERNAL "" FORCE )
 
