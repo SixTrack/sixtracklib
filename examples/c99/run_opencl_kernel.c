@@ -151,8 +151,9 @@ int main( int argc, char* argv[] )
 
     compile_options = ( char* )malloc( sizeof( char ) * ( N + 1 ) );
     memset(  compile_options, ( int )'\0', N + 1 );
-    strncpy( compile_options, "-D_GPUCODE=1 -I", N + 1 );
-    strncat( compile_options, st_PATH_TO_BASE_DIR, N - strlen( compile_options ) );
+    strncpy( compile_options, "-D_GPUCODE=1 -I", N );
+    strncat( compile_options, st_PATH_TO_INCLUDE_DIR,
+             N - strlen( compile_options ) );
 
     program_id = st_ClContextBase_add_program_file(
         context, path_to_program, compile_options );
