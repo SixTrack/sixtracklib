@@ -240,6 +240,8 @@ int main( int argc, char* argv[] )
             printf( "%10d :: a = %12.6f , b = %12.6f , a + b = %12.6f\r\n",
                     ( int )ii, vector_a[ ii ], vector_b[ ii ], result[ ii ] );
         }
+
+        printf( "\r\n" );
     }
     else
     {
@@ -269,6 +271,8 @@ int main( int argc, char* argv[] )
             printf( "%10d :: a = %12.6f , b = %12.6f , a + b = %12.6f\r\n",
                     ( int )ii, vector_a[ ii ], vector_b[ ii ], result[ ii ] );
         }
+
+        printf( "\r\n" );
     }
     else
     {
