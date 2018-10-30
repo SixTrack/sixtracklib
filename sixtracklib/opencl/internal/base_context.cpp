@@ -2114,6 +2114,43 @@ SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_exec_counter)(
         ? ctx->kernelExecCounter( kernel_id ) : NS(context_size_t){ 0 };
 }
 
+SIXTRL_HOST_FN NS(ClArgument)* NS(ClContextBase_get_ptr_kernel_argument)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT
+{
+    return ( ctx != nullptr )
+        ? ctx->ptrKernelArgument( kernel_id, arg_index ) : nullptr;
+}
+
+SIXTRL_HOST_FN NS(ClArgument) const*
+NS(ClContextBase_get_const_ptr_kernel_argument)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index ) const SIXTRL_NOEXCEPT
+{
+    return ( ctx != nullptr )
+        ? ctx->ptrKernelArgument( kernel_id, arg_index ) : nullptr;
+}
+
+SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index,
+    NS(ClArgument)* SIXTRL_RESTRICT ptr_arg )
+{
+    if( ( ctx != nullptr ) && ( ptr_arg != nullptr ) )
+    {
+        ctx->assignKernelArgument( kernel_id, arg_index, *ptr_arg );
+    }
+
+    return;
+}
+
+SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_arguments)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id ) SIXTRL_NOEXCEPT
+{
+    if( ctx != nullptr ) ctx->resetKernelArguments( kernel_id );
+    return;
+}
+
 SIXTRL_HOST_FN double NS(ClContextBase_get_last_exec_time)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id )
 {

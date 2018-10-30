@@ -464,7 +464,9 @@ namespace SIXTRL_CXX_NAMESPACE
     };
 }
 
-typedef SIXTRL_CXX_NAMESPACE::ClContextBase     NS(ClContextBase);
+
+using NS(ClContextBase) = SIXTRL_CXX_NAMESPACE::ClContextBase;
+using NS(ClArgument)    = SIXTRL_CXX_NAMESPACE::ClArgument;
 
 #else /* defined( __cplusplus ) */
 
@@ -472,7 +474,8 @@ typedef SIXTRL_CXX_NAMESPACE::ClContextBase     NS(ClContextBase);
         #include <CL/cl.h>
     #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
-typedef void                                NS(ClContextBase);
+typedef void NS(ClContextBase);
+typedef void NS(ClArgument);
 
 #endif /* defined( __cplusplus ) */
 
@@ -646,6 +649,23 @@ NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
 
 SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_exec_counter)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+
+SIXTRL_HOST_FN NS(ClArgument)* NS(ClContextBase_get_ptr_kernel_argument)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
+
+SIXTRL_HOST_FN NS(ClArgument) const*
+NS(ClContextBase_get_const_ptr_kernel_argument)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index ) const SIXTRL_NOEXCEPT;
+
+SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument)(
+    kernel_id_t const kernel_id,
+    size_type const arg_index, ClArgument& SIXTRL_RESTRICT_REF arg );
+
+SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_arguments)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    int const kernel_id ) SIXTRL_NOEXCEPT;
 
 SIXTRL_HOST_FN double NS(ClContextBase_get_last_exec_time)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );

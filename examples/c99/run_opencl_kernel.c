@@ -10,22 +10,22 @@ int main( int argc, char* argv[] )
 {
     typedef st_buffer_size_t buf_size_t;
 
-    buf_size_t VECTOR_SIZE    = 1000u;
-    st_buffer_size_t ii       = 0u;
-    st_ClBaseContext* context = SIXTRL_NULLPTR;
+    buf_size_t VECTOR_SIZE      = 1000u;
+    st_buffer_size_t ii         = 0u;
+    st_ClBaseContext* context   = SIXTRL_NULLPTR;
 
-    char* path_to_kernel      = SIXTRL_NULLPTR;
-    char* compile_options     = SIXTRL_NULLPTR;
-    char* kernel_name         = SIXTRL_NULLPTR;
+    char* path_to_kernel        = SIXTRL_NULLPTR;
+    char* compile_options       = SIXTRL_NULLPTR;
+    char* kernel_name           = SIXTRL_NULLPTR;
 
-    double* vector_a          = SIXTRL_NULLPTR;
-    double* vector_b          = SIXTRL_NULLPTR;
-    double* result            = SIXTRL_NULLPTR;
+    double* vector_a            = SIXTRL_NULLPTR;
+    double* vector_b            = SIXTRL_NULLPTR;
+    double* result              = SIXTRL_NULLPTR;
 
-    st_ClArgument* vec_a_arg  = SIXTRL_NULLPTR;
-    st_ClArgument* vec_b_arg  = SIXTRL_NULLPTR;
-    st_ClArgument* result_arg = SIXTRL_NULLPTR;
-    st_ClArgument* vec_size   = SIXTRL_NULLPTR;
+    st_ClArgument* vec_a_arg    = SIXTRL_NULLPTR;
+    st_ClArgument* vec_b_arg    = SIXTRL_NULLPTR;
+    st_ClArgument* result_arg   = SIXTRL_NULLPTR;
+    st_ClArgument* vec_size_arg = SIXTRL_NULLPTR;
 
     size_t const N = 1023;
 
@@ -160,11 +160,17 @@ int main( int argc, char* argv[] )
     add_kernel_id = st_ClContextBase_enable_kernel(
         context, kernel_name, program_id );
 
+    vec_a_arg  = st_ClArgument_new_from_memory( vector_a, VECTOR_SIZE, context );
+    vec_b_arg  = st_ClArgument_new_from_memory( vector_b, VECTOR_SIZE, context );
+    result_arg = st_ClArgument_new_from_memory( result,   VECTOR_SIZE, context );
 
+    vec_size_arg = st_ClArgument_new_from_memory(
+        &VECTOR_SIZE, sizeof( VECTOR_SIZE ), context );
 
-    vec_a_arg = st_ClArgument_new_from_memory( vector_a, VECTOR_SIZE, context );
-    vec_b_arg = st_ClArgument_new_from_memory( vector_b, VECTOR_SIZE, context );
-    result    = st_ClArgument_new_from_memory( result,   VECTOR_SIZE, context );
+    NS(ClContextBase_assign_kernel_argument)( context, add_kernel_id, 0u, vec_a_arg  );
+    NS(ClContextBase_assign_kernel_argument)( context, add_kernel_id, 1u, vec_b_arg  );
+    NS(ClContextBase_assign_kernel_argument)( context, add_kernel_id, 2u, result_arg );
+    NS(ClContextBase_assign_kernel_argument)( context, add_kernel_id, 3u, vec_size_arg );
 
     /* --------------------------------------------------------------------- */
 
@@ -173,7 +179,7 @@ int main( int argc, char* argv[] )
     st_ClArgument_delete( vec_a_arg  );
     st_ClArgument_delete( vec_b_arg  );
     st_ClArgument_delete( result_arg );
-    st_ClArgument_delete( vec_size   );
+    st_ClArgument_delete( vec_size_arg );
 
     free( path_to_kernel );
     free( compile_options );
