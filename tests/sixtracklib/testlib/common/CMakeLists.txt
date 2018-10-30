@@ -49,6 +49,27 @@ set(  SIXTRACKL_TESTLIB_LIBRARY_MODULES
 
 
 # ------------------------------------------------------------------------------
+# path.h :
+
+set( PATH_IN_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/path.h.template" )
+set( PATH_OUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/path.h" )
+
+set( SIXTRACK_TESTLIB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/tests/" )
+
+configure_file( ${PATH_IN_PATH} ${PATH_OUT_PATH} @ONLY )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# install :
+
+set( PATH_INSTALL_PATH
+     "${CMAKE_INSTALL_PREFIX}/include/sixtracklib/testlib/common/path.h" )
+
+install( CODE
+    "set( SIXTRACK_TESTLIB_INCLUDE_DIR \"${CMAKE_INSTALL_PREFIX}/include/\" )
+     message( STATUS \"Generating: ${PATH_INSTALL_PATH}\" )
+     configure_file( \"${PATH_IN_PATH}\" \"${PATH_INSTALL_PATH}\" @ONLY )" )
+
+# ==============================================================================
 # Install :
 
 if( TESTLIB_COMMON_C99_HEADERS )
