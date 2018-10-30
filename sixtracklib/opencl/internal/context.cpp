@@ -184,7 +184,7 @@ namespace SIXTRL_CXX_NAMESPACE
                             particles_arg, beam_elements_arg, num_turns );
     }
 
-    int ClContext::track( kernel_id_t const tracking_kernel_id,
+    int ClContext::track( kernel_id_t const track_kernel_id,
                NS(ClArgument)& particles_arg,
                NS(ClArgument)& beam_elements_arg,
                num_turns_t const num_turns )
@@ -203,73 +203,30 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( !NS(Buffer_needs_remapping)(
             beam_elements_arg.ptrCObjectBuffer() ) );
 
-        SIXTRL_ASSERT( this->kernelNumArgs( tracking_kernel_id ) == 4u );
-
-        cl::Kernel* ptr_tracking_kernel = this->openClKernel( tracking_kernel_id );
-        SIXTRL_ASSERT( ptr_tracking_kernel != nullptr );
-
-        cl::CommandQueue* ptr_queue = this->openClQueue();
-
-        size_type const work_group_size =
-            this->kernelWorkGroupSize( tracking_kernel_id );
+        SIXTRL_ASSERT( this->kernelNumArgs( track_kernel_id ) == 4u );
 
         size_type const total_num_particles =
             NS(Particles_buffer_get_total_num_of_particles)( particles_buffer);
 
-        SIXTRL_ASSERT( work_group_size     > size_type{ 0 } );
+        uint64_t num_turns_arg = static_cast< uint64_t >( num_turns );
+
         SIXTRL_ASSERT( total_num_particles > size_type{ 0 } );
 
-        size_type const num_blocks =
-            ( total_num_particles + work_group_size - size_type{ 1 } ) /
-            ( work_group_size );
+        this->assignKernelArgument( track_kernel_id, 0u, particles_arg );
+        this->assignKernelArgument( track_kernel_id, 1u, beam_elements_arg );
+        this->assignKernelArgumentValue( track_kernel_id, 2u, num_turns_arg );
 
-        size_type const total_num_threads = num_blocks * work_group_size;
+        this->assignKernelArgumentClBuffer(
+            track_kernel_id, 3u, particles_arg.internalSuccessFlagBuffer() );
 
-        cl::Buffer cl_success_flag = particles_arg.internalSuccessFlagBuffer();
-
-        ptr_tracking_kernel->setArg( 0, particles_arg.openClBuffer() );
-        ptr_tracking_kernel->setArg( 1, beam_elements_arg.openClBuffer() );
-        ptr_tracking_kernel->setArg( 2, static_cast< uint64_t >( num_turns ) );
-        ptr_tracking_kernel->setArg( 3, cl_success_flag );
-
-        cl::Event run_tracking_kernel_event;
-
-        cl_ulong run_tracking_kernel_when_queued    = cl_ulong{ 0 };
-        cl_ulong run_tracking_kernel_when_submitted = cl_ulong{ 0 };
-        cl_ulong run_tracking_kernel_when_started   = cl_ulong{ 0 };
-        cl_ulong run_tracking_kernel_when_ended     = cl_ulong{ 0 };
-
-        cl_int cl_ret = ptr_queue->enqueueNDRangeKernel( *ptr_tracking_kernel,
-            cl::NullRange, cl::NDRange( total_num_threads ),
-                cl::NDRange( work_group_size ), nullptr,
-                        &run_tracking_kernel_event );
-
-        cl_ret |= ptr_queue->flush();
-        run_tracking_kernel_event.wait();
-
-        cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
-            CL_PROFILING_COMMAND_QUEUED, &run_tracking_kernel_when_queued );
-
-        cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
-            CL_PROFILING_COMMAND_SUBMIT, &run_tracking_kernel_when_submitted );
-
-        cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
-            CL_PROFILING_COMMAND_START, &run_tracking_kernel_when_started );
-
-        cl_ret |= run_tracking_kernel_event.getProfilingInfo< cl_ulong >(
-            CL_PROFILING_COMMAND_END, &run_tracking_kernel_when_ended );
-
-        double const last_event_time = double{ 1e-9 } * static_cast< double >(
-            run_tracking_kernel_when_ended - run_tracking_kernel_when_started );
-
-        this->addKernelExecTime( last_event_time, tracking_kernel_id );
-        this->setLastWorkGroupSize( work_group_size,   tracking_kernel_id );
-        this->setLastNumWorkItems(  total_num_threads, tracking_kernel_id );
-
-        if( cl_ret == CL_SUCCESS )
+        if( this->runKernel( track_kernel_id, total_num_particles ) )
         {
+            cl::CommandQueue* ptr_queue = this->openClQueue();
+            SIXTRL_ASSERT( ptr_queue != nullptr );
+
             int32_t success_flag = int32_t{ 0 };
-            cl_ret = ptr_queue->enqueueReadBuffer( cl_success_flag, CL_TRUE, 0,
+            cl_int cl_ret = ptr_queue->enqueueReadBuffer(
+                particles_arg.internalSuccessFlagBuffer(), CL_TRUE, 0,
                 sizeof( success_flag ), &success_flag );
 
             if( cl_ret == CL_SUCCESS )
@@ -305,7 +262,6 @@ namespace SIXTRL_CXX_NAMESPACE
              "track_particles_priv_particles_optimized_kernel.cl";
 
         std::string track_compile_options = "-D_GPUCODE=1";
-        track_compile_options += " -D__NAMESPACE=st_";
         track_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
         track_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
         track_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private";
@@ -314,7 +270,7 @@ namespace SIXTRL_CXX_NAMESPACE
         track_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
         #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
         track_compile_options += " -I";
-        track_compile_options += NS(PATH_TO_BASE_DIR);
+        track_compile_options += NS(PATH_TO_INCLUDE_DIR);
 
         program_id_t const track_program_id = this->addProgramFile(
             path_to_track_kernel_program, track_compile_options );
@@ -338,10 +294,12 @@ namespace SIXTRL_CXX_NAMESPACE
                 ( static_cast< size_type >( this->m_tracking_program_id ) <
                   this->numAvailablePrograms() ) )
             {
-                kernel_id_t const tracking_kernel_id =
-                    this->enableKernel(
-                        "st_Track_particles_beam_elements_priv_particles_optimized_opencl",
-                         this->m_tracking_program_id );
+                std::string kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
+                kernel_name += "Track_particles_beam_elements_"
+                               "priv_particles_optimized_opencl";
+
+                kernel_id_t const tracking_kernel_id = this->enableKernel(
+                    kernel_name.c_str(), this->m_tracking_program_id );
 
                 if( tracking_kernel_id >= kernel_id_t{ 0 } )
                 {

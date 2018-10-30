@@ -225,13 +225,13 @@ namespace SIXTRL_CXX_NAMESPACE
         ClArgument const* ptrKernelArgument( kernel_id_t const kernel_id,
             size_type const arg_index ) const SIXTRL_NOEXCEPT;
 
-        void assignKernelArgument( kernel_id_t const kernel_id,
-            size_type const arg_index, ClArgument& SIXTRL_RESTRICT_REF arg );
-
         void resetSingleKernelArgument( kernel_id_t const kernel_id,
             size_type const arg_index ) SIXTRL_NOEXCEPT;
 
         void resetKernelArguments( kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+
+        void assignKernelArgument( kernel_id_t const kernel_id,
+            size_type const arg_index, ClArgument& SIXTRL_RESTRICT_REF arg );
 
         template< typename T >
         void assignKernelArgumentPtr( kernel_id_t const kernel_id,
@@ -286,6 +286,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
             return;
         }
+
+        void assignKernelArgumentClBuffer(
+            kernel_id_t const kernel_id, size_type const arg_index,
+            cl::Buffer& SIXTRL_RESTRICT_REF cl_buffer_arg );
 
         size_type calculateKernelNumWorkItems(
             kernel_id_t const kernel_id,

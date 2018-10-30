@@ -1236,6 +1236,28 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
+    void ClContextBase::assignKernelArgumentClBuffer(
+            ClContextBase::kernel_id_t const kernel_id,
+            ClContextBase::size_type const arg_index,
+            cl::Buffer& SIXTRL_RESTRICT_REF cl_buffer_arg )
+    {
+        if( ( kernel_id >= kernel_id_t{ 0 } ) && ( static_cast< size_type >(
+              kernel_id ) < this->numAvailableKernels() ) )
+        {
+            cl::Kernel* kernel = this->openClKernel( kernel_id );
+
+            kernel_data_t& kernel_data = this->m_kernel_data[ kernel_id ];
+
+            if( ( kernel_data.m_num_args > arg_index ) && ( kernel != nullptr ) )
+            {
+                kernel_data.m_arguments[ arg_index ] = nullptr;
+                kernel->setArg( arg_index, cl_buffer_arg );
+            }
+        }
+
+        return;
+    }
+
     void ClContextBase::resetKernelArguments(
         ClContextBase::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
@@ -1687,14 +1709,13 @@ namespace SIXTRL_CXX_NAMESPACE
         path_to_remap_kernel_program += "managed_buffer_remap_kernel.cl";
 
         std::string remap_program_compile_options = "-D_GPUCODE=1";
-        remap_program_compile_options += " -D__NAMESPACE=st_";
         remap_program_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
         remap_program_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
         #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
         remap_program_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
         #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
         remap_program_compile_options += " -I";
-        remap_program_compile_options += NS(PATH_TO_BASE_DIR);
+        remap_program_compile_options += NS(PATH_TO_INCLUDE_DIR);
 
         program_id_t const remap_program_id = this->addProgramFile(
             path_to_remap_kernel_program, remap_program_compile_options );
@@ -1723,9 +1744,11 @@ namespace SIXTRL_CXX_NAMESPACE
                 ( static_cast< size_type >( this->m_remap_program_id ) <
                   this->numAvailablePrograms() ) )
             {
-                kernel_id_t const remap_kernel_id =
-                    this->enableKernel( "st_ManagedBuffer_remap_opencl",
-                                        this->m_remap_program_id );
+                std::string kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
+                kernel_name += "ManagedBuffer_remap_opencl";
+
+                kernel_id_t const remap_kernel_id = this->enableKernel(
+                    kernel_name.c_str(), this->m_remap_program_id );
 
                 if( remap_kernel_id >= kernel_id_t{ 0 } )
                 {
