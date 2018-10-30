@@ -10,11 +10,11 @@ int main( int argc, char* argv[] )
 {
     typedef st_buffer_size_t buf_size_t;
 
-    buf_size_t VECTOR_SIZE      = 1000u;
-    st_buffer_size_t ii         = 0u;
-    st_ClBaseContext* context   = SIXTRL_NULLPTR;
+    int64_t VECTOR_SIZE         = 1000;
+    int64_t ii                  = 0;
+    st_ClContextBase* context   = SIXTRL_NULLPTR;
 
-    char* path_to_kernel        = SIXTRL_NULLPTR;
+    char* path_to_program        = SIXTRL_NULLPTR;
     char* compile_options       = SIXTRL_NULLPTR;
     char* kernel_name           = SIXTRL_NULLPTR;
 
@@ -25,7 +25,8 @@ int main( int argc, char* argv[] )
     st_ClArgument* vec_a_arg    = SIXTRL_NULLPTR;
     st_ClArgument* vec_b_arg    = SIXTRL_NULLPTR;
     st_ClArgument* result_arg   = SIXTRL_NULLPTR;
-    st_ClArgument* vec_size_arg = SIXTRL_NULLPTR;
+
+    buf_size_t data_size        = ( buf_size_t )0u;
 
     size_t const N = 1023;
 
@@ -89,7 +90,7 @@ int main( int argc, char* argv[] )
 
     if( argc >= 3 )
     {
-        int const temp = atoi( argv[ 2 ] );
+        int64_t const temp = atoi( argv[ 2 ] );
         if( temp > 0 ) VECTOR_SIZE = temp;
     }
 
@@ -127,9 +128,11 @@ int main( int argc, char* argv[] )
 
     /* --------------------------------------------------------------------- */
 
-    vector_a = ( double* )malloc( sizeof( double ) * VECTOR_SIZE );
-    vector_b = ( double* )malloc( sizeof( double ) * VECTOR_SIZE );
-    result   = ( double* )malloc( sizeof( double ) * VECTOR_SIZE );
+    data_size = sizeof( double ) * VECTOR_SIZE;
+
+    vector_a = ( double* )malloc( data_size );
+    vector_b = ( double* )malloc( data_size );
+    result   = ( double* )malloc( data_size );
 
     for( ; ii < VECTOR_SIZE ; ++ii )
     {
@@ -138,56 +141,119 @@ int main( int argc, char* argv[] )
         result[ ii ]   = vector_a[ ii ];
     }
 
-    path_to_kernel  = ( char* )malloc( sizeof( char ) * ( N + 1 ) );
-    memset(  path_to_kernel,  ( int )'\0', N + 1 );
-    strncpy( path_to_kernel, st_PATH_TO_BASE_DIR, N );
-    strncat( path_to_kernel, "examples/c99/run_opencl_kernel.cl",
-             1023 - strlen( path_to_kernel ) );
+    /* Compile program */
+
+    path_to_program  = ( char* )malloc( sizeof( char ) * ( N + 1 ) );
+    memset(  path_to_program,  ( int )'\0', N + 1 );
+    strncpy( path_to_program, st_PATH_TO_BASE_DIR, N );
+    strncat( path_to_program, "examples/c99/run_opencl_kernel.cl",
+             1023 - strlen( path_to_program ) );
 
     compile_options = ( char* )malloc( sizeof( char ) * ( N + 1 ) );
     memset(  compile_options, ( int )'\0', N + 1 );
     strncpy( compile_options, "-D_GPUCODE=1 -I", N + 1 );
     strncat( compile_options, st_PATH_TO_BASE_DIR, N - strlen( compile_options ) );
 
+    program_id = st_ClContextBase_add_program_file(
+        context, path_to_program, compile_options );
+
+    if( program_id < 0 )
+    {
+        printf( "Error: unable to add program -> stopping\r\n" );
+
+        free( vector_a );
+        free( vector_b );
+        free( result );
+
+        free( path_to_program );
+        free( compile_options );
+
+        NS(ClContextBase_delete)( context );
+    }
+
+    /* Enable addition kernel */
+
     kernel_name = ( char* )malloc( sizeof( char ) * ( N + 1 ) );
     memset(  kernel_name, ( int )'\0', N + 1 );
     strncpy( kernel_name, SIXTRL_C99_NAMESPACE_PREFIX_STR, N );
-    strncat( kernel_name, "Add_vectors_kernel" );
-
-    program_id = st_ClContextBase_add_program_file(
-        context, path_to_kernel, compile_options );
+    strncat( kernel_name, "Add_vectors_kernel", N - strlen( kernel_name ) );
 
     add_kernel_id = st_ClContextBase_enable_kernel(
         context, kernel_name, program_id );
 
-    vec_a_arg  = st_ClArgument_new_from_memory( vector_a, VECTOR_SIZE, context );
-    vec_b_arg  = st_ClArgument_new_from_memory( vector_b, VECTOR_SIZE, context );
-    result_arg = st_ClArgument_new_from_memory( result,   VECTOR_SIZE, context );
+    if( add_kernel_id < 0 )
+    {
+        if( NS(ClContextBase_is_program_compiled)( context, program_id ) )
+        {
+            printf( "Error: unknown kernel name %s -> stopping\r\n",
+                    kernel_name );
+        }
+        else
+        {
+            printf( "Error: problems during compilation of program:\r\n\r\n"
+                    "Compile report:\r\n%s\r\n"
+                    "Compile options: %s\r\n"
+                    "-> Stopping"
+                    "\r\n",
+                    NS(ClContextBase_get_program_compile_report)( context, program_id ),
+                    NS(ClContextBase_get_program_compile_options)( context, program_id ) );
+        }
 
-    vec_size_arg = st_ClArgument_new_from_memory(
-        &VECTOR_SIZE, sizeof( VECTOR_SIZE ), context );
+        free( vector_a );
+        free( vector_b );
+        free( result );
+
+        free( path_to_program );
+        free( compile_options );
+        free( kernel_name );
+
+        NS(ClContextBase_delete)( context );
+    }
+
+    /* Init kernel arguments */
+
+    vec_a_arg  = st_ClArgument_new_from_memory( vector_a, data_size, context );
+    vec_b_arg  = st_ClArgument_new_from_memory( vector_b, data_size, context );
+    result_arg = st_ClArgument_new_from_memory( result,   data_size, context );
+
+    /* Assign kernel arguments to addition kernel */
 
     NS(ClContextBase_assign_kernel_argument)( context, add_kernel_id, 0u, vec_a_arg  );
     NS(ClContextBase_assign_kernel_argument)( context, add_kernel_id, 1u, vec_b_arg  );
     NS(ClContextBase_assign_kernel_argument)( context, add_kernel_id, 2u, result_arg );
-    NS(ClContextBase_assign_kernel_argument)( context, add_kernel_id, 3u, vec_size_arg );
+
+    NS(ClContextBase_assign_kernel_argument_value)(
+        context, add_kernel_id, 3u, &VECTOR_SIZE, sizeof( VECTOR_SIZE ) );
+
+    /* run addition kernel */
+
+    bool success = NS(ClContextBase_run_kernel)( context, add_kernel_id, VECTOR_SIZE );
+
+    /* Read-back the result and print it out */
+
+    success &= NS(ClArgument_read_memory)( result_arg, result, data_size );
+
+    for( ii = 0 ; ii < VECTOR_SIZE ; ++ii )
+    {
+        printf( "%10d :: a = %12.6f , b = %12.6f , a + b = %12.6f\r\n",
+                ( int )ii, vector_a[ ii ], vector_b[ ii ], result[ ii ] );
+    }
 
     /* --------------------------------------------------------------------- */
-
-    st_ClContextBase_delete( context );
 
     st_ClArgument_delete( vec_a_arg  );
     st_ClArgument_delete( vec_b_arg  );
     st_ClArgument_delete( result_arg );
-    st_ClArgument_delete( vec_size_arg );
-
-    free( path_to_kernel );
-    free( compile_options );
-    free( kernel_name );
 
     free( vector_a );
     free( vector_b );
     free( result );
+
+    free( path_to_program );
+    free( compile_options );
+    free( kernel_name );
+
+    st_ClContextBase_delete( context );
 
     return 0;
 }

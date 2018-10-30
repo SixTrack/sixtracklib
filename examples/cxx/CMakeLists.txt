@@ -26,6 +26,11 @@ list( APPEND EXAMPLE_TARGETS track_lhc_no_bb_cxx )
 
 if( SIXTRACKL_ENABLE_OPENCL )
     # -------------------------------------------------------------------------
+    # run_opencl_kernel_cxx:
+    add_executable( run_opencl_kernel_cxx run_opencl_kernel.cpp )
+    list( APPEND EXAMPLE_OPENCL_TARGETS run_opencl_kernel_cxx )
+
+    # -------------------------------------------------------------------------
     # track_lhc_no_bb_opencl_cxx:
     add_executable( track_lhc_no_bb_opencl_cxx track_lhc_no_bb_opencl.cpp )
     list( APPEND EXAMPLE_OPENCL_TARGETS track_lhc_no_bb_opencl_cxx )

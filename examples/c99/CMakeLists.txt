@@ -50,6 +50,13 @@ if( SIXTRACKL_ENABLE_CUDA )
 endif()
 
 if( SIXTRACKL_ENABLE_OPENCL )
+    # -----------------------------------------------------------------------------
+    # run_opencl_kernel:
+
+    add_executable( run_opencl_kernel_c99 run_opencl_kernel.c )
+    list( APPEND EXAMPLE_OPENCL_TARGETS run_opencl_kernel_c99 )
+    list( APPEND EXAMPLE_SOURCES_TO_INSTALL run_opencl_kernel.cl )
+
     # -------------------------------------------------------------------------
     # track_lhc_no_bb_cuda_c99:
 
