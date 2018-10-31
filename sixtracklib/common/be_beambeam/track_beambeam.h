@@ -10,6 +10,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
