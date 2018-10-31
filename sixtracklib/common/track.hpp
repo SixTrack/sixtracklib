@@ -24,7 +24,7 @@ struct ::NS(Cavity);
 struct ::NS(XYShift);
 struct ::NS(SRotation);
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     template< class ParticlesT, class DriftT >
     SIXTRL_FN bool Track_particle_drift(
@@ -122,7 +122,7 @@ namespace SIXTRL_NAMESPACE
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     template< class ParticlesT, class DriftT >
     SIXTRL_INLINE bool Track_particle_drift(

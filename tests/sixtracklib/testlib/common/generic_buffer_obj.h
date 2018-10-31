@@ -61,7 +61,7 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj)*
 
 #if defined( __cplusplus )
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     using GenericObj = ::NS(GenericObj);
 }
