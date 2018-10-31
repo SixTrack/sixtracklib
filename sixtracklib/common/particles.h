@@ -274,6 +274,27 @@ SIXTRL_FN SIXTRL_STATIC void NS( Particles_get_max_value)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_FN SIXTRL_STATIC bool NS(Particles_managed_buffer_is_particles_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(Particles_managed_buffer_get_num_of_particle_blocks)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Particles) const*
+NS(Particles_managed_buffer_get_const_particles)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const particle_obj_index,
+    NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)*
+NS(Particles_managed_buffer_get_particles)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const particle_obj_index,
+    NS(buffer_size_t) const slot_size );
+
 #if !defined( _GPUCODE ) || defined( __CUDACC__ )
 
 SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_is_particles_buffer)(
@@ -1089,6 +1110,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_state)(
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/internal/objects_type_id.h"
+    #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
 
     #if !defined( _GPUCODE ) || defined( __CUDACC__ )
     #include "sixtracklib/common/buffer.h"
@@ -2760,6 +2782,102 @@ SIXTRL_INLINE void NS(Particles_clear)(
         particles, 0, NS(Particles_get_num_of_particles)( particles ) );
 
     return;
+}
+
+SIXTRL_INLINE bool NS(Particles_managed_buffer_is_particles_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
+    buf_size_t const num_blocks =
+        NS(ManagedBuffer_get_num_objects)( buffer, slot_size );
+
+    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( buffer, slot_size ) );
+
+    return ( ( num_blocks > ZERO ) && ( num_blocks ==
+        NS(Particles_managed_buffer_get_num_of_particle_blocks)(
+            buffer, slot_size ) ) );
+}
+
+SIXTRL_INLINE NS(buffer_size_t)
+NS(Particles_managed_buffer_get_num_of_particle_blocks)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t)                               buf_size_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object) const* obj_ptr_t;
+    typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const* ptr_particles_t;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
+
+    buf_size_t num_particle_blocks = ZERO;
+
+    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( buffer, slot_size ) );
+
+    if( NS(ManagedBuffer_get_num_objects)( buffer, slot_size ) > ZERO )
+    {
+        obj_ptr_t it = NS(ManagedBuffer_get_const_objects_index_begin)(
+            buffer, slot_size );
+
+        obj_ptr_t end = NS(ManagedBuffer_get_const_objects_index_end)(
+            buffer, slot_size );
+
+        SIXTRL_ASSERT( it  != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( end != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( ( end - it ) > ( ptrdiff_t )0 );
+
+        for( ; it != end ; ++it )
+        {
+            if( NS(Object_get_type_id)( it ) == NS(OBJECT_TYPE_PARTICLE ) )
+            {
+                ptr_particles_t particles = ( ptr_particles_t )( uintptr_t
+                    )NS(Object_get_begin_addr)( it );
+
+                if( ( particles != SIXTRL_NULLPTR ) &&
+                    ( NS(Particles_get_num_of_particles)( particles ) >
+                      ( NS(particle_num_elements_t) )0 ) )
+                {
+                    ++num_particle_blocks;
+                }
+            }
+        }
+    }
+
+    return num_particle_blocks;
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Particles) const*
+NS(Particles_managed_buffer_get_const_particles)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const particle_obj_index,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
+
+    ptr_obj_t ptr_particle_obj =
+        NS(ManagedBuffer_get_const_objects_index_begin)( buffer, slot_size );
+
+    SIXTRL_ASSERT( ptr_particle_obj != SIXTRL_NULLPTR );
+
+    SIXTRL_ASSERT( particle_obj_index <
+                   NS(ManagedBuffer_get_num_objects)( buffer, slot_size ) );
+
+    ptr_particle_obj = ptr_particle_obj + particle_obj_index;
+
+    return NS(BufferIndex_get_const_particles)( ptr_particle_obj );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)*
+NS(Particles_managed_buffer_get_particles)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const particle_obj_index,
+    NS(buffer_size_t) const slot_size )
+{
+    return ( SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)*
+        )NS(Particles_managed_buffer_get_const_particles)(
+            buffer, particle_obj_index, slot_size );
 }
 
 #if !defined( _GPUCODE ) || defined( __CUDACC__ )
