@@ -1787,7 +1787,7 @@ namespace SIXTRL_CXX_NAMESPACE
                         CL_PROGRAM_BUILD_LOG >( this->m_available_devices.at(
                             this->m_selected_node_index ) );
 
-                #if defined( NDEBUG )
+                #if !defined( NDEBUG )
 
                 std::cout << "compile options : "
                           << program_data.m_compile_options
@@ -1799,7 +1799,7 @@ namespace SIXTRL_CXX_NAMESPACE
                           << program_data.m_compile_report
                           << std::endl;
 
-                #endif /* defined( NDEBUG ) */
+                #endif /* !defined( NDEBUG ) */
             }
         }
 
