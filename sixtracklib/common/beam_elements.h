@@ -5,6 +5,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/be_drift/be_drift.h"
     #include "sixtracklib/common/be_cavity/be_cavity.h"
     #include "sixtracklib/common/be_multipole/be_multipole.h"

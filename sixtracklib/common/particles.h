@@ -1088,9 +1088,12 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_state)(
 /* ========================================================================= */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/internal/objects_type_id.h"
+
     #if !defined( _GPUCODE ) || defined( __CUDACC__ )
     #include "sixtracklib/common/buffer.h"
     #endif /* !defined( _GPUCODE ) || defined( __CUDACC__ ) */
+
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
