@@ -154,20 +154,22 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Cavity)* NS(Cavity_preset)(
 SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_get_voltage)(
     SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cavity )
 {
-    return ( cavity != SIXTRL_NULLPTR ) ? cavity->voltage : ( SIXTRL_REAL_T )0;
+    SIXTRL_ASSERT( cavity != SIXTRL_NULLPTR );
+    return cavity->voltage;
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_get_frequency)(
     SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cavity )
 {
-    return ( cavity != SIXTRL_NULLPTR )
-        ? cavity->frequency : ( SIXTRL_REAL_T )0;
+    SIXTRL_ASSERT( cavity != SIXTRL_NULLPTR );
+    return cavity->frequency;
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_get_lag)(
     SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cavity )
 {
-    return ( cavity != SIXTRL_NULLPTR ) ? cavity->lag : ( SIXTRL_REAL_T )0;
+    SIXTRL_ASSERT( cavity != SIXTRL_NULLPTR );
+    return cavity->lag;
 }
 
 SIXTRL_INLINE void NS(Cavity_set_voltage)(

@@ -197,15 +197,15 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(SRotation_get_angle)(
 SIXTRL_INLINE SIXTRL_REAL_T NS(SRotation_get_cos_angle)(
     SIXTRL_BE_ARGPTR_DEC const NS(SRotation) *const SIXTRL_RESTRICT srotation )
 {
-    return ( srotation != SIXTRL_NULLPTR )
-        ? srotation->cos_z : ( SIXTRL_REAL_T )1;
+    SIXTRL_ASSERT( srotation != SIXTRL_NULLPTR );
+    return srotation->cos_z;
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(SRotation_get_sin_angle)(
     SIXTRL_BE_ARGPTR_DEC const NS(SRotation) *const SIXTRL_RESTRICT srotation )
 {
-    return ( srotation != SIXTRL_NULLPTR )
-        ? srotation->sin_z : ( SIXTRL_REAL_T )0;
+    SIXTRL_ASSERT( srotation != SIXTRL_NULLPTR );
+    return srotation->sin_z;
 }
 
 SIXTRL_INLINE void NS(SRotation_set_angle)(

@@ -212,7 +212,8 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Drift)* NS(Drift_preset)(
 SIXTRL_INLINE  NS(drift_real_t) NS(Drift_get_length)(
     SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift )
 {
-    return ( drift != SIXTRL_NULLPTR ) ? drift->length : ( NS(drift_real_t) )0;
+    SIXTRL_ASSERT( drift != SIXTRL_NULLPTR );
+    return drift->length;
 }
 
 SIXTRL_INLINE void NS(Drift_set_length)(
@@ -429,7 +430,8 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* NS(DriftExact_preset)(
 SIXTRL_INLINE  NS(drift_real_t) NS(DriftExact_get_length)(
     SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift )
 {
-    return ( drift != SIXTRL_NULLPTR ) ? drift->length : ( NS(drift_real_t) )0;
+    SIXTRL_ASSERT( drift != SIXTRL_NULLPTR );
+    return drift->length;
 }
 
 SIXTRL_INLINE void NS(DriftExact_set_length)(
