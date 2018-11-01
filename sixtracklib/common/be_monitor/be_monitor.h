@@ -201,7 +201,7 @@ NS(BeamMonitor_preset)(
     {
         NS(BeamMonitor_set_num_stores)( monitor, 0u );
         NS(BeamMonitor_set_start)( monitor, 0u );
-        NS(BeamMonitor_set_skip)(  monitor, 0u );
+        NS(BeamMonitor_set_skip)(  monitor, 1u );
         NS(BeamMonitor_set_is_rolling)( monitor, false );
         NS(BeamMonitor_set_are_attributes_continous)( monitor, true );
 
@@ -260,8 +260,13 @@ SIXTRL_INLINE int NS(BeamMonitor_compare_values)(
 
     if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
     {
-        if( NS(BeamMonitor_get_num_stores)( lhs ) >
+        if( NS(BeamMonitor_get_num_stores)( lhs ) ==
             NS(BeamMonitor_get_num_stores)( rhs ) )
+        {
+            compare_value = 0;
+        }
+        else if( NS(BeamMonitor_get_num_stores)( lhs ) >
+                 NS(BeamMonitor_get_num_stores)( rhs ) )
         {
             compare_value = +1;
         }
@@ -491,6 +496,9 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_new)(
     typedef NS(buffer_size_t)                       buf_size_t;
     typedef NS(BeamMonitor)                         elem_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC   elem_t*     ptr_elem_t;
+    typedef NS(be_monitor_turn_t)                   nturn_t;
+    typedef NS(be_monitor_flag_t)                   flag_t;
+    typedef NS(be_monitor_addr_t)                   addr_t;
 
     buf_size_t const num_dataptrs =
         NS(BeamMonitor_get_num_dataptrs)( SIXTRL_NULLPTR );
@@ -500,12 +508,12 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_new)(
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
 
     elem_t temp_obj;
-    temp_obj.num_stores        = 0;
-    temp_obj.start             = 0;
-    temp_obj.skip              = 0;
-    temp_obj.rolling           = 0;
-    temp_obj.io_address = 0;
-    temp_obj.cont_attributes   = 1;
+    temp_obj.num_stores        = ( nturn_t )0u;
+    temp_obj.start             = ( nturn_t )0u;
+    temp_obj.skip              = ( nturn_t )1u;
+    temp_obj.rolling           = ( flag_t )0u;
+    temp_obj.io_address        = ( addr_t )0u;
+    temp_obj.cont_attributes   = ( flag_t )1;
 
     return ( ptr_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
         NS(Buffer_add_object)( buffer, &temp_obj, sizeof( temp_obj ),
@@ -534,7 +542,7 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_add)(
     temp_obj.start             = start;
     temp_obj.skip              = skip;
     temp_obj.rolling           = ( is_rolling ) ? 1 : 0;
-    temp_obj.io_address = io_address;
+    temp_obj.io_address        = io_address;
     temp_obj.cont_attributes   = ( are_attributes_continous ) ? 1 : 0;
 
     return ( ptr_elem_t )( uintptr_t )NS(Object_get_begin_addr)(

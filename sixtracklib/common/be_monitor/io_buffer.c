@@ -1,5 +1,5 @@
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/be_monitor/be_monitor_io_buffer.h"
+    #include "sixtracklib/common/be_monitor/io_buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
@@ -110,8 +110,9 @@ int NS(BeamMonitor_prepare_io_buffer)(
             num_dataptrs += num_elem_by_elem_blocks * req_num_dataptrs_per_obj;
         }
 
-        if( 0 == NS(Buffer_reset_detailed)(
-            io_buffer, num_objects, num_slots, num_dataptrs, ZERO ) )
+        if( ( 0 == NS(Buffer_reset)( io_buffer ) ) &&
+            ( 0 == NS(Buffer_reserve)( io_buffer,
+                num_objects, num_slots, num_dataptrs, ZERO ) ) )
         {
             buf_size_t ii = ZERO;
 
