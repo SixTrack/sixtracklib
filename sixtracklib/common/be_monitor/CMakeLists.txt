@@ -2,12 +2,12 @@
 
 set( SIXTRACKLIB_COMMON_BE_MONITOR_C99_HEADERS
      be_monitor.h
-     be_monitor_io_buffer.h
-     track_monitor.h
+     io_buffer.h
+     track.h
 )
 
 set( SIXTRACKLIB_COMMON_BE_MONITOR_C99_SOURCES
-     be_monitor_io_buffer.c
+     io_buffer.c
 )
 
 set( SIXTRACKLIB_COMMON_BE_MONITOR_CXX_HEADERS

@@ -80,7 +80,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_monitor)(
     SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN  )0;
 
     typedef NS(be_monitor_turn_t) nturn_t;
-    typedef SIXTRL_PARTICLES_ARGPTR_DEC NS(Particles)* out_particles_t;
+    typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* out_particles_t;
 
     /* Calculate destination index in the io particles object: */
 
@@ -118,7 +118,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_monitor)(
 
                 SIXTRL_ASSERT( out_particles != SIXTRL_NULLPTR );
                 SIXTRL_ASSERT( NS(Particles_get_num_of_particles)(
-                    out_particles ) >= ( NS(buffer_size_t) )num_stores );
+                    out_particles ) >= num_stores );
 
                 NS(Particles_copy_single)( out_particles, out_idx,
                                            in_particles,  in_idx );
@@ -139,7 +139,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particles_range_monitor)(
     SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN  )0;
 
     typedef NS(be_monitor_turn_t) nturn_t;
-    typedef SIXTRL_PARTICLES_ARGPTR_DEC NS(Particles)* out_particles_t;
+    typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* out_particles_t;
 
     /* Calculate destination index in the io particles object: */
 
@@ -185,10 +185,10 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particles_range_monitor)(
 
                     SIXTRL_ASSERT( out_particles != SIXTRL_NULLPTR );
                     SIXTRL_ASSERT( NS(Particles_get_num_of_particles)(
-                        out_particles ) >= ( NS(buffer_size_t) )num_stores );
+                        out_particles ) >= num_stores );
 
                     NS(Particles_copy_single)( out_particles, out_idx,
-                                               in_particles,  in_idx );
+                                               in_particles,  ii );
                 }
             }
         }
