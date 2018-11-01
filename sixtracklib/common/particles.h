@@ -1413,11 +1413,10 @@ SIXTRL_INLINE NS(buffer_size_t) NS(Particles_get_required_num_dataptrs)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const num_particles )
 {
-    typedef NS(buffer_size_t) buf_size_t;
-
     ( void )buffer;
-    buf_size_t const num_dataptrs = NS(PARTICLES_NUM_DATAPTRS);
-    return num_particles * num_dataptrs;
+    ( void )num_particles;
+
+    return NS(PARTICLES_NUM_DATAPTRS);
 }
 
 SIXTRL_INLINE bool NS(Particles_can_be_added)(
