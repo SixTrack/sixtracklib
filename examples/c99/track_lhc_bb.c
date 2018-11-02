@@ -82,8 +82,6 @@ int main( int argc, char* argv[] )
     input_particles = st_Particles_buffer_get_const_particles( particle_dump, 0u );
     num_input_particles = st_Particles_get_num_of_particles( input_particles );
 
-    printf( "nn = %d\r\n", ( int )st_Buffer_get_num_of_objects( beam_elements_buffer ) );
-
     for( ii = 0 ; ii < NUM_PARTICLES ; ++ii )
     {
         buf_size_t const jj = ii % num_input_particles;
