@@ -10,10 +10,10 @@ int main( int argc, char* argv[] )
     typedef st_buffer_size_t buf_size_t;
 
     st_Buffer* particle_dump = st_Buffer_new_from_file(
-        st_PATH_TO_LHC_NO_BB_PARTICLES_DUMP );
+        st_PATH_TO_BEAMBEAM_PARTICLES_DUMP );
 
     st_Buffer* beam_elements_buffer = st_Buffer_new_from_file(
-        st_PATH_TO_LHC_NO_BB_BEAM_ELEMENTS );
+        st_PATH_TO_BEAMBEAM_BEAM_ELEMENTS );
 
     st_Buffer* pb = st_Buffer_new( ( buf_size_t )( 1u << 24u ) );
 

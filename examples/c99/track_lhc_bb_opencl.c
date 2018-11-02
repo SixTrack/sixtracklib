@@ -12,7 +12,7 @@ int main( int argc, char* argv[] )
     st_ClContext* context                   = SIXTRL_NULLPTR;
 
     st_Buffer* particle_dump                = SIXTRL_NULLPTR;
-    st_Buffer* lhc_beam_elements_buffer     = SIXTRL_NULLPTR;
+    st_Buffer* beam_elements_buffer         = SIXTRL_NULLPTR;
     st_Buffer* pb                           = SIXTRL_NULLPTR;
 
     st_buffer_size_t NUM_PARTICLES          = 20000;
@@ -142,10 +142,10 @@ int main( int argc, char* argv[] )
     /* ---------------------------------------------------------------------- */
 
     particle_dump = st_Buffer_new_from_file(
-        st_PATH_TO_LHC_NO_BB_PARTICLES_DUMP );
+        st_PATH_TO_BEAMBEAM_PARTICLES_DUMP );
 
-    lhc_beam_elements_buffer = st_Buffer_new_from_file(
-        st_PATH_TO_LHC_NO_BB_BEAM_ELEMENTS );
+    beam_elements_buffer = st_Buffer_new_from_file(
+        st_PATH_TO_BEAMBEAM_BEAM_ELEMENTS );
 
     pb = st_Buffer_new( ( st_buffer_size_t )( 1u << 24u ) );
 
@@ -163,7 +163,7 @@ int main( int argc, char* argv[] )
         st_ClArgument_new_from_buffer( pb, context );
 
     st_ClArgument* beam_elements_arg =
-        st_ClArgument_new_from_buffer( lhc_beam_elements_buffer, context );
+        st_ClArgument_new_from_buffer( beam_elements_buffer, context );
 
     /* --------------------------------------------------------------------- */
     /* Perform tracking over NUM_TURNS */
@@ -191,7 +191,7 @@ int main( int argc, char* argv[] )
     st_ClArgument_delete( beam_elements_arg );
 
     st_Buffer_delete( particle_dump );
-    st_Buffer_delete( lhc_beam_elements_buffer );
+    st_Buffer_delete( beam_elements_buffer );
     st_Buffer_delete( pb );
 
     return 0;
