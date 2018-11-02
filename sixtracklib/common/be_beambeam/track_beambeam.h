@@ -10,7 +10,6 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
-    #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -21,12 +20,12 @@ extern "C" {
 struct NS(BeamBeam4D);
 struct NS(BeamBeam6D);
 
-SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_beam_4d)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_4d)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam4D) *const SIXTRL_RESTRICT bb );
 
-SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_beam_6d)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t)  const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT bb );
@@ -57,11 +56,13 @@ SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_beam_6d)(
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_INLINE int NS(Track_particle_beam_beam_4d)(
+SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_4d)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam4D) *const SIXTRL_RESTRICT bb )
 {
+    SIXTRL_TRACK_RETURN ret = 0;
+
     typedef NS(beambeam4d_real_const_ptr_t)  bb_data_ptr_t;
     //typedef SIXTRL_UINT64_T u64_t;
     typedef SIXTRL_REAL_T real_t;
@@ -83,10 +84,9 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_4d)(
     printf("4D: Delta_y = %e\n",bb4ddata->Delta_y);
     printf("4D: Dpx_sub = %e\n",bb4ddata->Dpx_sub);
     printf("4D: Dpy_sub = %e\n",bb4ddata->Dpy_sub);
-    printf("4D: enabled = %ld\n",bb4ddata->enabled); */
+    printf("4D: enabled = %ld\n",bb4ddata->enabled);
+    */
 
-    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index )
-        == ( NS(particle_index_t) )1 );
 
     if (bb4ddata->enabled) {
 
@@ -123,10 +123,10 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_4d)(
     }
 
 
-    return 0;
+    return ret;
 }
 
-SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
+SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_beam_6d)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t)  const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT bb )
@@ -136,15 +136,13 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
     typedef SIXTRL_REAL_T real_t;
     typedef SIXTRL_BE_DATAPTR_DEC BB6D_data* BB6D_data_ptr_t;
 
+    SIXTRL_TRACK_RETURN ret = 0;
     int i_slice;
 
     bb_data_ptr_t data = NS(BeamBeam6D_get_const_data)( bb );
 
     // Start Gianni's part
     BB6D_data_ptr_t bb6ddata = (BB6D_data_ptr_t) data;
-
-    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index )
-        == ( NS(particle_index_t) )1 );
 
     if (bb6ddata->enabled) {
 
@@ -290,14 +288,11 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
     }
 
 
-    return 0;
+    return ret;
 }
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
-
-
-#endif /* SIXTRACKLIB_COMMON_BE_BEAMBEAM_TRACK_BEAMBEAM_H__ */
-
+#endif
 /* end: sixtracklib/common/be_beambeam/track_beambeam.h */

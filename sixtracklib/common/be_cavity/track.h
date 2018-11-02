@@ -29,6 +29,7 @@ SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_cavity)(
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/be_cavity/be_cavity.h"
+    #include "sixtracklib/common/constants.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )

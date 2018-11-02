@@ -249,10 +249,8 @@ SIXTRL_INLINE void NS(Track_subset_particles_increment_at_turn)(
     NS(particle_num_elements_t) const particle_end_index,
     NS(particle_num_elements_t) const particle_index_stride )
 {
-    typedef NS(particle_num_elements_t) num_elem_t;
-
-    SIXTRL_ASSERT( particle_index_stride >  ( num_elem_t )0 );
-    SIXTRL_ASSERT( particle_index  >= ( num_elem_t )0 );
+    SIXTRL_ASSERT( particle_index_stride >  ( NS(particle_num_elements_t) )0 );
+    SIXTRL_ASSERT( particle_index  >= ( NS(particle_num_elements_t) )0 );
     SIXTRL_ASSERT( particle_index  <= particle_end_index );
 
     for( ; particle_index < particle_end_index ;

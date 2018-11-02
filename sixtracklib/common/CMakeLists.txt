@@ -52,7 +52,6 @@ if( SIXTRACKLIB_C99_HEADERS )
 endif()
 
 if( SIXTRACKLIB_CXX_HEADERS )
-    message( STATUS "${SIXTRACKLIB_CXX_HEADERS}" )
 
     set( SIXTRACKLIB_COMMON_CXX_INSTALL_PATH
          include/sixtracklib/common )

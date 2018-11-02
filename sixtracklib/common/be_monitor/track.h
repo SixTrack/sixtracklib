@@ -15,12 +15,12 @@ extern "C" {
 struct NS(BeamMonitor);
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
-NS(BeamMonitor_get_const_ptr_particles)(
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
+NS(BeamMonitor_get_const_ptr_particles)( SIXTRL_BE_ARGPTR_DEC const
+    struct NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
-NS(BeamMonitor_get_ptr_particles)(
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
+NS(BeamMonitor_get_ptr_particles)( SIXTRL_BE_ARGPTR_DEC const
+    struct NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
 SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_monitor)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
