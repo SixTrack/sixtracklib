@@ -15,32 +15,15 @@ extern "C" {
 struct NS(Drift);
 struct NS(DriftExact);
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_drift)(
+SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_drift)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(Drift) *const SIXTRL_RESTRICT drift );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particles_range_drift)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) particle_begin_idx,
-    NS(particle_num_elements_t) const particle_end_idx,
-    NS(particle_num_elements_t) const particle_idx_stride,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Drift) *const SIXTRL_RESTRICT drift );
-
-/* ------------------------------------------------------------------------- */
-
-SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_drift_exact)(
+SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_drift_exact)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(DriftExact) *const SIXTRL_RESTRICT drift );
-
-SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particles_range_drift_exact)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) particle_begin_idx,
-    NS(particle_num_elements_t) const particle_end_idx,
-    NS(particle_num_elements_t) const particle_idx_stride,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(DriftExact) *const SIXTRL_RESTRICT drift );
-
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
@@ -58,7 +41,7 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particles_range_drift_exact
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift)(
+SIXTRL_INLINE int NS(Track_particle_drift)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
     NS(particle_num_elements_t) const ii,
     SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift )
@@ -85,16 +68,21 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift)(
     real_t const sign_x = ( real_t )( ( ZERO < x ) - ( real_t )( x < ZERO ) );
     real_t const sign_y = ( real_t )( ( ZERO < y ) - ( real_t )( y < ZERO ) );
 
+    index_t const new_state =
+        ( index_t )( ( ( sign_x * x ) < SIXTRL_APERATURE_X_LIMIT ) &
+                     ( ( sign_y * y ) < SIXTRL_APERATURE_Y_LIMIT ) );
+
+    int const ret = ( int )new_state - 1;
+
     SIXTRL_ASSERT( NS(Particles_get_state_value)( p, ii ) == ( index_t )1 );
 
     NS(Particles_set_x_value)( p, ii, x );
     NS(Particles_set_y_value)( p, ii, y );
-
-    NS(Particles_set_state_value)( p, ii,
-            ( index_t )( ( ( sign_x * x ) < SIXTRL_APERATURE_X_LIMIT ) &
-                         ( ( sign_y * y ) < SIXTRL_APERATURE_Y_LIMIT ) ) );
+    NS(Particles_set_state_value)( p, ii, new_state );
 
     #else /* SIXTRL_ENABLE_APERATURE_CHECK */
+
+    int const ret = 0;
 
     NS(Particles_add_to_x_value)( p, ii, xp * length );
     NS(Particles_add_to_y_value)( p, ii, yp * length );
@@ -106,36 +94,12 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift)(
     NS(Particles_add_to_s_value)( p, ii, length );
     NS(Particles_add_to_zeta_value)( p, ii, length * dzeta );
 
-    return ( SIXTRL_TRACK_RETURN )0;
-}
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particles_range_drift)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
-    NS(particle_num_elements_t) particle_idx,
-    NS(particle_num_elements_t) const particle_end_idx,
-    NS(particle_num_elements_t) const particle_idx_stride,
-    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift )
-{
-    typedef NS(particle_num_elements_t) num_elem_t;
-
-    SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0;
-
-    SIXTRL_ASSERT( particle_idx_stride >  ( num_elem_t )0u );
-    SIXTRL_ASSERT( particle_idx        >= ( num_elem_t )0u );
-    SIXTRL_ASSERT( particle_idx        <= particle_end_idx );
-    SIXTRL_ASSERT( particle_end_idx <= NS(Particles_get_num_of_particles)( p ) );
-
-    for( ; particle_idx < particle_end_idx ; particle_idx += particle_idx_stride )
-    {
-        ret |= NS(Track_particle_drift)( p, particle_idx, drift );
-    }
-
     return ret;
 }
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift_exact)(
+SIXTRL_INLINE int NS(Track_particle_drift_exact)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
     NS(particle_num_elements_t) const ii,
     SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift )
@@ -165,16 +129,21 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift_exact)(
     real_t const sign_x = ( real_t )( ( ZERO < x ) - ( real_t )( x < ZERO ) );
     real_t const sign_y = ( real_t )( ( ZERO < y ) - ( real_t )( y < ZERO ) );
 
+    index_t const new_state =
+        ( index_t )( ( ( sign_x * x ) < SIXTRL_APERATURE_X_LIMIT ) &
+                     ( ( sign_y * y ) < SIXTRL_APERATURE_Y_LIMIT ) );
+
+    int const ret = ( int )new_state - 1;
+
     SIXTRL_ASSERT( NS(Particles_get_state_value)( p, ii ) == ( index_t )1 );
 
     NS(Particles_set_x_value)( p, ii, x );
     NS(Particles_set_y_value)( p, ii, y );
-
-    NS(Particles_set_state_value)( p, ii,
-            ( index_t )( ( ( sign_x * x ) < SIXTRL_APERATURE_X_LIMIT ) &
-                         ( ( sign_y * y ) < SIXTRL_APERATURE_Y_LIMIT ) ) );
+    NS(Particles_set_state_value)( p, ii, new_state );
 
     #else /* SIXTRL_ENABLE_APERATURE_CHECK */
+
+    int const ret = 0;
 
     NS(Particles_add_to_x_value)( p, ii, px * lpzi );
     NS(Particles_add_to_y_value)( p, ii, py * lpzi );
@@ -187,30 +156,6 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_drift_exact)(
 
     NS(Particles_add_to_s_value)(    p, ii, length );
     NS(Particles_add_to_zeta_value)( p, ii, dzeta );
-
-    return ( SIXTRL_TRACK_RETURN )0;
-}
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particles_range_drift_exact)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
-    NS(particle_num_elements_t) particle_idx,
-    NS(particle_num_elements_t) const particle_end_idx,
-    NS(particle_num_elements_t) const particle_idx_stride,
-    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift )
-{
-    typedef NS(particle_num_elements_t) num_elem_t;
-
-    SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0;
-
-    SIXTRL_ASSERT( particle_idx_stride >  ( num_elem_t )0u );
-    SIXTRL_ASSERT( particle_idx        >= ( num_elem_t )0u );
-    SIXTRL_ASSERT( particle_idx        <= particle_end_idx );
-    SIXTRL_ASSERT( particle_end_idx <= NS(Particles_get_num_of_particles)( p ) );
-
-    for( ; particle_idx < particle_end_idx ; particle_idx += particle_idx_stride )
-    {
-        ret |= NS(Track_particle_drift_exact)( p, particle_idx, drift );
-    }
 
     return ret;
 }

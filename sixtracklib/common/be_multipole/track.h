@@ -19,13 +19,6 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_multipole)(
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(MultiPole) *const SIXTRL_RESTRICT mp );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particles_range_multipole)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) particle_begin_idx,
-    NS(particle_num_elements_t) const particle_end_idx,
-    NS(particle_num_elements_t) const particle_idx_stride,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(MultiPole) *const SIXTRL_RESTRICT mp );
-
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
@@ -42,9 +35,9 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particles_range_multipole)(
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_multipole)(
+SIXTRL_INLINE int NS(Track_particle_multipole)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
+    NS(particle_num_elements_t) const index,
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT mp )
 {
     typedef NS(particle_real_t)  real_t;
@@ -60,19 +53,15 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_multipole)(
     real_t dpx = NS(MultiPole_get_bal_value)( mp, index_x );
     real_t dpy = NS(MultiPole_get_bal_value)( mp, index_y );
 
-    real_t const x      = NS(Particles_get_x_value)( particles, ii );
-    real_t const y      = NS(Particles_get_y_value)( particles, ii );
-    real_t const chi    = NS(Particles_get_chi_value)( particles, ii );
+    real_t const x      = NS(Particles_get_x_value)( particles, index );
+    real_t const y      = NS(Particles_get_y_value)( particles, index );
+    real_t const chi    = NS(Particles_get_chi_value)( particles, index );
 
     real_t const hxl    = NS(MultiPole_get_hxl)( mp );
     real_t const hyl    = NS(MultiPole_get_hyl)( mp );
 
-    #if defined( SIXTRL_ENABLE_APERATURE_CHECK      ) && \
-               ( SIXTRL_ENABLE_APERATURE_CHECK == 1 )
-
-    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, ii ) == ( index_t )1 );
-
-    #endif /* SIXTRL_ENABLE_APERATURE_CHECK */
+    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, index ) ==
+                   ( NS(particle_index_t) )1 );
 
     while( index_x > 0 )
     {
@@ -94,13 +83,14 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_multipole)(
 
     if( ( hxl > ZERO ) || ( hyl > ZERO ) || ( hxl < ZERO ) || ( hyl < ZERO ) )
     {
-        real_t const delta  = NS(Particles_get_delta_value)( particles, ii );
+        real_t const delta  = NS(Particles_get_delta_value)( particles, index );
         real_t const length = NS(MultiPole_get_length)( mp );
 
         real_t const hxlx   = x * hxl;
         real_t const hyly   = y * hyl;
 
-        NS(Particles_add_to_zeta_value)( particles, ii, chi * ( hyly - hxlx ) );
+        NS(Particles_add_to_zeta_value)(
+            particles, index, chi * ( hyly - hxlx ) );
 
         dpx += hxl + hxl * delta;
         dpy -= hyl + hyl * delta;
@@ -115,34 +105,10 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_multipole)(
         }
     }
 
-    NS(Particles_add_to_px_value)( particles, ii, dpx );
-    NS(Particles_add_to_py_value)( particles, ii, dpy );
+    NS(Particles_add_to_px_value)( particles, index, dpx );
+    NS(Particles_add_to_py_value)( particles, index, dpy );
 
-    return ( SIXTRL_TRACK_RETURN )0;
-}
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particles_range_multipole)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
-    NS(particle_num_elements_t) particle_idx,
-    NS(particle_num_elements_t) const particle_end_idx,
-    NS(particle_num_elements_t) const particle_idx_stride,
-    SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT mp )
-{
-    typedef NS(particle_num_elements_t) num_elem_t;
-
-    SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0;
-
-    SIXTRL_ASSERT( particle_idx_stride >  ( num_elem_t )0u );
-    SIXTRL_ASSERT( particle_idx        >= ( num_elem_t )0u );
-    SIXTRL_ASSERT( particle_idx        <= particle_end_idx );
-    SIXTRL_ASSERT( particle_end_idx <= NS(Particles_get_num_of_particles)( p ) );
-
-    for( ; particle_idx < particle_end_idx ; particle_idx += particle_idx_stride )
-    {
-        ret |= NS(Track_particle_multipole)( p, particle_idx, mp );
-    }
-
-    return ret;
+    return 0;
 }
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )

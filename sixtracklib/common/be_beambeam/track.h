@@ -90,7 +90,7 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_4d)(
                    particle_idx );
 
     SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_idx ) ==
-                   ( NS(particle_idx_t) )1 );
+                   ( NS(particle_index_t) )1 );
 
 
     if (bb4ddata->enabled) {
@@ -140,7 +140,6 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
     typedef SIXTRL_REAL_T real_t;
     typedef SIXTRL_BE_DATAPTR_DEC BB6D_data* BB6D_data_ptr_t;
 
-    SIXTRL_TRACK_RETURN ret = 0;
     int i_slice;
 
     bb_data_ptr_t data = NS(BeamBeam6D_get_const_data)( bb );
@@ -152,7 +151,7 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
                    particle_idx );
 
     SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_idx ) ==
-                   ( NS(particle_idx_t) )1 );
+                   ( NS(particle_index_t) )1 );
 
     if (bb6ddata->enabled) {
 
@@ -304,5 +303,8 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
-#endif
+
+
+#endif /* SIXTRACKLIB_COMMON_BE_BEAMBEAM_TRACK_BEAMBEAM_H__ */
+
 /* end: sixtracklib/common/be_beambeam/track_beambeam.h */

@@ -12,7 +12,8 @@ extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 SIXTRL_FN SIXTRL_STATIC void NS(Track_particle_increment_at_turn)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles );
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index );
 
 SIXTRL_FN SIXTRL_STATIC void NS(Track_subset_particles_increment_at_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
@@ -51,7 +52,6 @@ SIXTRL_FN SIXTRL_STATIC int NS(Track_all_particles_beam_element_obj)(
 SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_elements_obj)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
-    NS(particle_index_t) const start_beam_element_id,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end );
 
@@ -61,16 +61,38 @@ SIXTRL_FN SIXTRL_STATIC int NS(Track_subset_of_particles_beam_elements_obj)(
     NS(particle_num_elements_t) particle_idx_begin,
     NS(particle_num_elements_t) const particle_idx_end,
     NS(particle_num_elements_t) const particle_idx_stride,
-    NS(particle_index_t) const start_beam_element_id,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end );
 
 
 SIXTRL_FN SIXTRL_STATIC int NS(Track_all_particles_beam_elements_obj)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_index_t) const start_beam_element_id,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_until_turn_obj)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end,
+    NS(particle_index_t) const end_turn );
+
+SIXTRL_FN SIXTRL_STATIC int NS(Track_subset_of_particles_until_turn_obj)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) particle_idx_begin,
+    NS(particle_num_elements_t) const particle_idx_end,
+    NS(particle_num_elements_t) const particle_idx_stride,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end,
+    NS(particle_index_t) const end_turn );
+
+SIXTRL_FN SIXTRL_STATIC int NS(Track_all_particles_until_turn_obj)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end,
+    NS(particle_index_t) const end_turn );
 
 /* ------------------------------------------------------------------------- */
 
@@ -83,7 +105,7 @@ SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_element)(
     NS(particle_num_elements_t) const particle_index,
     NS(particle_index_t) const beam_element_id,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
-    NS(particle_index_t) const beam_index );
+    NS(particle_index_t) const be_idx );
 
 
 SIXTRL_FN SIXTRL_STATIC int NS(Track_subset_of_particles_beam_element)(
@@ -93,66 +115,83 @@ SIXTRL_FN SIXTRL_STATIC int NS(Track_subset_of_particles_beam_element)(
     NS(particle_num_elements_t) const particle_idx_stride,
     NS(particle_index_t) const beam_element_id,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
-    NS(particle_index_t) const beam_index );
+    NS(particle_index_t) const be_idx );
 
 
 SIXTRL_FN SIXTRL_STATIC int NS(Track_all_particles_beam_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_index_t) const beam_element_id,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
-    NS(particle_index_t) const beam_index );
+    NS(particle_index_t) const be_idx );
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_elements_subset)(
+SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_subset_of_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
-    NS(particle_index_t) const start_beam_element_id,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
-    NS(particle_index_t) const beam_index_begin,
-    NS(particle_index_t) const beam_index_end );
+    NS(buffer_size_t) const be_idx_begin,
+    NS(buffer_size_t) const be_idx_end );
 
 
-SIXTRL_FN SIXTRL_STATIC int NS(Track_subset_of_particles_beam_elements_subset)(
+SIXTRL_FN SIXTRL_STATIC int NS(Track_subset_of_particles_subset_of_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) particle_idx_begin,
     NS(particle_num_elements_t) const particle_idx_end,
     NS(particle_num_elements_t) const particle_idx_stride,
-    NS(particle_index_t) const start_beam_element_id,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
-    NS(particle_index_t) const beam_index_begin,
-    NS(particle_index_t) const beam_index_end );
+    NS(buffer_size_t) const be_idx_begin,
+    NS(buffer_size_t) const be_idx_end );
 
 
-SIXTRL_FN SIXTRL_STATIC int NS(Track_all_particles_beam_elements_subset)(
+SIXTRL_FN SIXTRL_STATIC int NS(Track_all_particles_subset_of_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_index_t) const start_beam_element_id,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
-    NS(particle_index_t) const beam_index_begin,
-    NS(particle_index_t) const beam_index_end );
+    NS(buffer_size_t) const be_idx_begin,
+    NS(buffer_size_t) const be_idx_end );
 
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
-    NS(particle_index_t) const start_beam_element_id,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements );
 
 
 SIXTRL_FN SIXTRL_STATIC int NS(Track_subset_of_particles_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) particle_idx_begin,
+    NS(particle_num_elements_t) const particle_idx_begin,
     NS(particle_num_elements_t) const particle_idx_end,
     NS(particle_num_elements_t) const particle_idx_stride,
-    NS(particle_index_t) const start_beam_element_id,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements );
 
 
 SIXTRL_FN SIXTRL_STATIC int NS(Track_all_particles_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_index_t) const start_beam_element_id,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_until_turn)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
+    NS(particle_index_t) const end_turn );
+
+SIXTRL_FN SIXTRL_STATIC int NS(Track_subset_of_particles_until_turn)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_idx_begin,
+    NS(particle_num_elements_t) const particle_idx_end,
+    NS(particle_num_elements_t) const particle_idx_stride,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
+    NS(particle_index_t) const end_turn );
+
+SIXTRL_FN SIXTRL_STATIC int NS(Track_all_particles_until_turn)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
+    NS(particle_index_t) const end_turn );
+
+#endif /* defined( _GPUCODE ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
@@ -180,10 +219,10 @@ SIXTRL_FN SIXTRL_STATIC int NS(Track_all_particles_beam_elements)(
     #include "sixtracklib/common/be_multipole/track.h"
     #include "sixtracklib/common/be_monitor/track.h"
     #include "sixtracklib/common/be_srotation/track.h"
-    #include "sixtracklib/common/be_xy_shift/track.h"
+    #include "sixtracklib/common/be_xyshift/track.h"
 
     #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-        #include "sixtracklib/common/be_beambeam/track_beambeam.h"
+        #include "sixtracklib/common/be_beambeam/track.h"
     #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -192,7 +231,7 @@ extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 
-SIXTRL_FN SIXTRL_STATIC void NS(Track_particle_increment_at_turn)(
+SIXTRL_INLINE void NS(Track_particle_increment_at_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index )
 {
@@ -204,9 +243,9 @@ SIXTRL_FN SIXTRL_STATIC void NS(Track_particle_increment_at_turn)(
     return;
 }
 
-SIXTRL_FN SIXTRL_STATIC void NS(Track_subset_particles_increment_at_turn)(
+SIXTRL_INLINE void NS(Track_subset_particles_increment_at_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
+    NS(particle_num_elements_t) particle_index,
     NS(particle_num_elements_t) const particle_end_index,
     NS(particle_num_elements_t) const particle_index_stride )
 {
@@ -228,14 +267,14 @@ SIXTRL_FN SIXTRL_STATIC void NS(Track_subset_particles_increment_at_turn)(
     return;
 }
 
-SIXTRL_FN SIXTRL_STATIC void NS(Track_all_particles_increment_at_turn)(
+SIXTRL_INLINE void NS(Track_all_particles_increment_at_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles )
 {
     typedef NS(particle_num_elements_t) num_elem_t;
 
     num_elem_t ii = ( num_elem_t )0u;
     num_elem_t const num_particles =
-        NS(Particles_get_num_of_particles)( paricles );
+        NS(Particles_get_num_of_particles)( particles );
 
     for( ; ii < num_particles ; ++ii )
     {
@@ -250,30 +289,29 @@ SIXTRL_FN SIXTRL_STATIC void NS(Track_all_particles_increment_at_turn)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element_obj)(
+SIXTRL_INLINE int NS(Track_particle_beam_element_obj)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
     NS(particle_index_t) const beam_element_id,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_info )
 {
-    typedef NS(object_type_id_t)    type_id_t;
-    typedef NS(buffer_addr_t)       address_t;
+    typedef NS(object_type_id_t) type_id_t;
+    typedef NS(buffer_addr_t)    address_t;
+    typedef NS(particle_index_t) index_t;
 
-    SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0;
+    int ret = 0;
 
     type_id_t const    type_id = NS(Object_get_type_id)( be_info );
     address_t const begin_addr = NS(Object_get_begin_addr)( be_info );
 
     SIXTRL_ASSERT( begin_addr != ( address_t )0u );
-    SIXTRL_ASSERT( index >= ( NS(particle_num_elements_t) )0 );
-    SIXTRL_ASSERT( index <  NS(Particles_get_num_of_particles)( p ) );
+    SIXTRL_ASSERT( particle_index >= ( NS(particle_num_elements_t) )0 );
 
-    #if defined( SIXTRL_ENABLE_APERATURE_CHECK ) && \
-        ( SIXTRL_ENABLE_APERATURE_CHECK == 1 )
+    SIXTRL_ASSERT( particle_index <
+                   NS(Particles_get_num_of_particles)( particles ) );
 
-    SIXTRL_ASSERT( NS(Particles_get_state_value)( p, index ) == 1 );
-
-    #endif /* SIXTRL_ENABLE_APERATURE_CHECK  */
+    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index ) ==
+                   ( index_t )1 );
 
     switch( type_id )
     {
@@ -286,11 +324,11 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element_obj)(
             #if defined( SIXTRL_ENABLE_APERATURE_CHECK ) && \
                        ( SIXTRL_ENABLE_APERATURE_CHECK == 1 )
 
-            NS(Particles_set_at_element_value)( p, index, beam_element_id );
-
+            NS(Particles_set_at_element_id_value)(
+                particles, particle_index, beam_element_id );
             #endif /* SIXTRL_ENABLE_APERATURE_CHECK  */
 
-            ret = NS(Track_particle_drift)( p, index, belem );
+            ret = NS(Track_particle_drift)( particles, particle_index, belem );
             break;
         }
 
@@ -303,11 +341,13 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element_obj)(
             #if defined( SIXTRL_ENABLE_APERATURE_CHECK ) && \
                        ( SIXTRL_ENABLE_APERATURE_CHECK == 1 )
 
-            NS(Particles_set_at_element_value)( p, index, beam_element_id );
-
+            NS(Particles_set_at_element_id_value)(
+                particles, particle_index, beam_element_id );
             #endif /* SIXTRL_ENABLE_APERATURE_CHECK  */
 
-            ret = NS(Track_particle_drift_exact)( p, index, belem );
+            ret = NS(Track_particle_drift_exact)(
+                particles, particle_index, belem );
+
             break;
         }
 
@@ -317,7 +357,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element_obj)(
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
-            ret = NS(Track_particle_multipole)( p, index, belem );
+            ret = NS(Track_particle_multipole)( particles, particle_index, belem );
             break;
         }
 
@@ -327,7 +367,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element_obj)(
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
-            ret = NS(Track_particle_cavity)( p, index, belem );
+            ret = NS(Track_particle_cavity)( particles, particle_index, belem );
             break;
         }
 
@@ -337,7 +377,7 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element_obj)(
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
-            ret = NS(Track_particle_xy_shift)( p, index, belem );
+            ret = NS(Track_particle_xy_shift)( particles, particle_index, belem );
             break;
         }
 
@@ -347,18 +387,22 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element_obj)(
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
-            ret = NS(Track_particle_srotation)( p, index, belem );
+            ret = NS(Track_particle_srotation)( particles, particle_index, belem );
             break;
         }
 
         case NS(OBJECT_TYPE_BEAM_MONITOR):
         {
-            typedef NS(BeamMonitor)   BeamMonitor;
+            typedef NS(BeamMonitor)   belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
-            NS(Particles_set_at_element_value)( p, index, beam_element_id );
-            ret = NS(Track_particle_monitor)( p, index, belem );
+            index_t const next_beam_element_id = beam_element_id + ( index_t )1u;
+
+            NS(Particles_set_at_element_id_value)(
+                particles, particle_index, next_beam_element_id );
+
+            ret = NS(Track_particle_monitor)( particles, particle_index, belem );
             break;
         }
 
@@ -370,7 +414,8 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element_obj)(
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
-            ret = NS(Track_particle_beam_beam_4d)( p, index, belem );
+            ret = NS(Track_particle_beam_beam_4d)(
+                particles, particle_index, belem );
             break;
         }
 
@@ -380,7 +425,8 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element_obj)(
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
-            ret = NS(Track_particle_beam_beam_6d)( p, index, belem );
+            ret = NS(Track_particle_beam_beam_6d)(
+                particles, particle_index, belem );
             break;
         }
 
@@ -388,6 +434,10 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element_obj)(
 
         default:
         {
+            NS(Particles_set_state_value)( particles, particle_index, 0 );
+            NS(Particles_set_at_element_id_value)(
+                particles, particle_index, beam_element_id );
+
             ret = -8;
         }
     };
@@ -396,376 +446,416 @@ SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element_obj)(
 }
 
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_subset_of_particles_beam_element_obj)(
+SIXTRL_INLINE int NS(Track_subset_of_particles_beam_element_obj)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) particle_idx_begin,
+    NS(particle_num_elements_t) particle_idx,
     NS(particle_num_elements_t) const particle_idx_end,
     NS(particle_num_elements_t) const particle_idx_stride,
     NS(particle_index_t) const beam_element_id,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_info )
 {
+    typedef NS(particle_index_t) index_t;
 
+    SIXTRL_ASSERT( particle_idx_stride >  ( NS(particle_num_elements_t) )0 );
+    SIXTRL_ASSERT( particle_idx        >= ( NS(particle_num_elements_t) )0 );
+    SIXTRL_ASSERT( particle_idx_end    >= particle_idx );
+
+    for( ; particle_idx < particle_idx_end ; particle_idx += particle_idx_stride )
+    {
+        if( NS(Particles_get_state_value)( particles, particle_idx ) == ( index_t )1 )
+        {
+            NS(Track_particle_beam_element_obj)(
+                particles, particle_idx, beam_element_id, be_info );
+        }
+    }
+
+    return 0;
 }
 
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_all_particles_beam_element_obj)(
+SIXTRL_INLINE int NS(Track_all_particles_beam_element_obj)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_index_t) const beam_element_id,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_info )
 {
-
+    return NS(Track_subset_of_particles_beam_element_obj)(
+        particles, 0u, NS(Particles_get_num_of_particles)( particles ), 1u,
+            beam_element_id, be_info );
 }
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
-NS(Track_particle_beam_elements_obj)(
+SIXTRL_INLINE int NS(Track_particle_beam_elements_obj)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
-    NS(particle_index_t) const start_beam_element_id,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end );
+    NS(particle_num_elements_t) const particle_idx,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_it,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end )
+{
+    typedef NS(particle_index_t)  index_t;
+
+    SIXTRL_STATIC_VAR index_t const LOST_STATE = ( index_t )0u;
+
+    SIXTRL_ASSERT( be_it  != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( be_end != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( ( uintptr_t )be_it ) <= ( ( uintptr_t )be_end ) );
+
+    if( NS(Particles_get_state_value)( particles, particle_idx ) != LOST_STATE )
+    {
+        int ret = 0;
+
+        NS(particle_index_t) beam_element_id =
+            NS(Particles_get_at_element_id_value)( particles, particle_idx );
+
+        while( ( ret == 0 ) && ( be_it != be_end ) )
+        {
+            ret = NS(Track_particle_beam_element_obj)(
+                particles, particle_idx, beam_element_id++, be_it++ );
+        }
+
+        if( NS(Particles_get_state_value)(
+                particles, particle_idx ) != LOST_STATE )
+        {
+            NS(Particles_set_at_element_id_value)(
+                particles, particle_idx, beam_element_id );
+        }
+
+        SIXTRL_ASSERT( ( ret == 0 ) ||
+            ( NS(Particles_get_state_value)( particles, particle_idx ) !=
+              ( index_t )1 ) );
+    }
+
+    return 0;
+}
 
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
-NS(Track_subset_of_particles_beam_elements_obj)(
+SIXTRL_INLINE int NS(Track_subset_of_particles_beam_elements_obj)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) particle_idx_begin,
+    NS(particle_num_elements_t) index,
     NS(particle_num_elements_t) const particle_idx_end,
     NS(particle_num_elements_t) const particle_idx_stride,
-    NS(particle_index_t) const start_beam_element_id,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end );
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end )
+{
+    SIXTRL_ASSERT( begin != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( end   != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( ( uintptr_t )begin ) <= ( ( uintptr_t )end ) );
+
+    SIXTRL_ASSERT( particle_idx_stride > ( NS(particle_num_elements_t) )0u );
+    SIXTRL_ASSERT( index >= ( NS(particle_num_elements_t) )0u );
+    SIXTRL_ASSERT( index <= particle_idx_end );
+
+    for( ; index < particle_idx_end ; index += particle_idx_stride )
+    {
+        NS(Track_particle_beam_elements_obj)( particles, index, begin, end );
+    }
+
+    return 0;
+}
 
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
-NS(Track_all_particles_beam_elements_obj)(
+SIXTRL_INLINE int NS(Track_all_particles_beam_elements_obj)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_index_t) const start_beam_element_id,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end );
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end )
+{
+    return NS(Track_subset_of_particles_beam_elements_obj)( particles, 0u,
+        NS(Particles_get_num_of_particles)( particles ), 1u, begin, end );
+}
 
 /* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE int NS(Track_particle_until_turn_obj)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end,
+    NS(particle_index_t) const end_turn )
+{
+    typedef NS(particle_index_t) index_t;
+
+    SIXTRL_STATIC_VAR index_t const LOST_STATE = ( index_t )0;
+
+    index_t state = NS(Particles_get_state_value)( particles, index );
+    index_t turn  = NS(Particles_get_at_turn_value)( particles, index );
+
+    index_t const start_beam_element_id =
+        NS(Particles_get_at_element_id_value)( particles, index );
+
+    SIXTRL_ASSERT( be_begin != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( be_end   != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( ( uintptr_t )be_begin ) <= ( ( uintptr_t )be_end ) );
+
+    while( ( state != LOST_STATE ) && ( turn < end_turn ) )
+    {
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* be_it = be_begin;
+        index_t beam_element_id = start_beam_element_id;
+
+        for( ; be_it != be_end ; ++be_it, ++beam_element_id )
+        {
+            int const ret = NS(Track_particle_beam_element_obj)(
+                    particles, index, beam_element_id, be_it );
+
+            if( 0 != ret )
+            {
+                state = NS(Particles_get_state_value)( particles, index );
+                SIXTRL_ASSERT( state == LOST_STATE );
+                break;
+            }
+        }
+
+        if( state != LOST_STATE )
+        {
+            ++turn;
+
+            NS(Particles_set_at_element_id_value)(
+                particles, index, start_beam_element_id );
+
+            NS(Particles_set_at_turn_value)( particles, index, turn );
+        }
+    }
+
+    return 0;
+}
+
+SIXTRL_INLINE int NS(Track_subset_of_particles_until_turn_obj)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) index,
+    NS(particle_num_elements_t) const particle_idx_end,
+    NS(particle_num_elements_t) const particle_idx_stride,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end,
+    NS(particle_index_t) const end_turn )
+{
+    SIXTRL_ASSERT( index >= ( NS(particle_num_elements_t) )0 );
+    SIXTRL_ASSERT( particle_idx_stride > ( NS(particle_num_elements_t) )0 );
+    SIXTRL_ASSERT( index <= particle_idx_end );
+
+    for( ; index < particle_idx_end ; index += particle_idx_stride )
+    {
+        NS(Track_particle_until_turn_obj)(
+            particles, index, be_begin, be_end, end_turn );
+    }
+
+    return 0;
+}
+
+SIXTRL_INLINE int NS(Track_all_particles_until_turn_obj)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end,
+    NS(particle_index_t) const end_turn )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t const end_idx = NS(Particles_get_num_of_particles)( particles );
+    num_elem_t ii = ( num_elem_t )0u;
+
+    for( ; ii < end_idx ; ++ii )
+    {
+        NS(Track_particle_until_turn_obj)(
+            particles, ii, be_begin, be_end, end_turn );
+    }
+
+    return 0;
+}
 
 #if !defined( _GPUCODE )
 
-struct NS(Buffer);
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
-NS(Track_particle_beam_element)(
+SIXTRL_INLINE int NS(Track_particle_beam_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
+    NS(particle_num_elements_t) const particle_idx,
     NS(particle_index_t) const beam_element_id,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
-    NS(particle_index_t) const beam_index );
+    NS(particle_index_t) const be_idx )
+{
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
+    ptr_obj_t ptr_be_obj = NS(Buffer_get_const_objects_begin)( beam_elements );
+
+    SIXTRL_ASSERT( ptr_be_obj != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( NS(buffer_size_t) )be_idx <
+                     NS(Buffer_get_num_of_objects)( beam_elements ) );
+
+    return NS(Track_particle_beam_element_obj)(
+        particles, particle_idx, beam_element_id, ptr_be_obj + be_idx );
+}
 
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
+SIXTRL_INLINE int
 NS(Track_subset_of_particles_beam_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) particle_idx_begin,
+    NS(particle_num_elements_t) particle_idx,
     NS(particle_num_elements_t) const particle_idx_end,
     NS(particle_num_elements_t) const particle_idx_stride,
     NS(particle_index_t) const beam_element_id,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
-    NS(particle_index_t) const beam_index );
+    NS(particle_index_t) const be_idx )
+{
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
+    ptr_obj_t ptr_be_obj = NS(Buffer_get_const_objects_begin)( beam_elements );
+
+    SIXTRL_ASSERT( ptr_be_obj != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( NS(buffer_size_t) )be_idx <
+                   NS(Buffer_get_num_of_objects)( beam_elements ) );
+
+    return NS(Track_subset_of_particles_beam_element_obj)(
+        particles, particle_idx, particle_idx_end, particle_idx_stride,
+            beam_element_id, ptr_be_obj + be_idx );
+}
 
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
+SIXTRL_INLINE int
 NS(Track_all_particles_beam_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_index_t) const beam_element_id,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
-    NS(particle_index_t) const beam_index );
-
-/* ------------------------------------------------------------------------- */
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
-NS(Track_particle_beam_elements_subset)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
-    NS(particle_index_t) const start_beam_element_id,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
-    NS(particle_index_t) const beam_index_begin,
-    NS(particle_index_t) const beam_index_end );
-
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
-NS(Track_subset_of_particles_beam_elements_subset)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) particle_idx_begin,
-    NS(particle_num_elements_t) const particle_idx_end,
-    NS(particle_num_elements_t) const particle_idx_stride,
-    NS(particle_index_t) const start_beam_element_id,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
-    NS(particle_index_t) const beam_index_begin,
-    NS(particle_index_t) const beam_index_end );
-
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
-NS(Track_all_particles_beam_elements_subset)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_index_t) const start_beam_element_id,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
-    NS(particle_index_t) const beam_index_begin,
-    NS(particle_index_t) const beam_index_end );
-
-/* ------------------------------------------------------------------------- */
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
-NS(Track_particle_beam_elements)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
-    NS(particle_index_t) const start_beam_element_id,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements );
-
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
-NS(Track_subset_of_particles_beam_elements)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) particle_idx_begin,
-    NS(particle_num_elements_t) const particle_idx_end,
-    NS(particle_num_elements_t) const particle_idx_stride,
-    NS(particle_index_t) const start_beam_element_id,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements );
-
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
-NS(Track_all_particles_beam_elements)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_index_t) const start_beam_element_id,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements );
-
-
-
-
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
-NS(Track_particle_beam_element_obj)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
-    NS(particle_num_elements_t) index,
-    NS(particle_index_t) const beam_element_index,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_info )
-{
-
-}
-
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN
-NS(Track_particle_beam_element_objs)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const ii,
-    NS(particle_index_t) start_beam_element_index,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_begin,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_end )
-{
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* be_it = be_begin;
-    SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0;
-
-    for( ; be_it != be_end ; ++be_it, ++start_beam_element_index )
-    {
-        ret |= NS(Track_particle_beam_element_obj)(
-            particles, ii, start_beam_element_index, be_it );
-    }
-
-    return ret;
-}
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_subset_beam_element_objs)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
-    NS(particle_num_elements_t) p_index_begin,
-    NS(particle_num_elements_t) const p_index_end,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_info_it,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_info_end )
-{
-    SIXTRL_TRACK_RETURN ret = ( SIXTRL_TRACK_RETURN )0;
-
-    SIXTRL_ASSERT( ( ( uintptr_t )be_info_end ) >= ( uintptr_t )be_info_it );
-
-    SIXTRL_ASSERT( ( be_info_it != SIXTRL_NULLPTR ) ||
-                   ( be_info_it == SIXTRL_NULLPTR ) );
-
-    for( ; be_info_it != be_info_end ; ++be_info_it )
-    {
-        ret |= NS(Track_particle_subset_beam_element_obj)(
-            p, p_index_begin, p_index_end, be_info_it );
-    }
-
-    return ret;
-}
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particles_beam_element_objs)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_info_begin,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_info_end )
-{
-    typedef NS(particle_num_elements_t) num_elem_t;
-
-    return NS(Track_particle_subset_beam_element_objs)( p,
-        ( num_elem_t )0u, NS(Particles_get_num_of_particles)( p ),
-        be_info_begin, be_info_end );
-}
-
-/* ------------------------------------------------------------------------- */
-
-#if !defined( _GPUCODE )
-
-struct NS(Buffer);
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particles_beam_elements)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    SIXTRL_BUFFER_ARGPTR_DEC const struct NS(Buffer) *const beam_elements )
-{
-    return NS(Track_particle_subset_beam_element_objs)(
-        particles, ( NS(particle_num_elements_t) )0u,
-        NS(Particles_get_num_of_particles)( particles ),
-        NS(Buffer_get_const_objects_begin)( beam_elements ),
-        NS(Buffer_get_const_objects_end)( beam_elements ) );
-}
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particles_beam_element)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    SIXTRL_BUFFER_ARGPTR_DEC const struct NS(Buffer) *const beam_elements,
-    NS(buffer_size_t) const beam_element_index )
+    NS(particle_index_t) const be_idx )
 {
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
-
     ptr_obj_t ptr_be_obj = NS(Buffer_get_const_objects_begin)( beam_elements );
 
     SIXTRL_ASSERT( ptr_be_obj != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( beam_element_index <
-        NS(Buffer_get_num_of_objects)( beam_elements ) );
-
-    ptr_be_obj = ptr_be_obj + beam_element_index;
-
-    return NS(Track_particle_subset_beam_element_obj)(
-        particles, ( NS(particle_num_elements_t) )0u,
-        NS(Particles_get_num_of_particles)( particles ), ptr_be_obj );
-}
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BUFFER_ARGPTR_DEC const struct NS(Buffer) *const
-        SIXTRL_RESTRICT beam_elements,
-    NS(buffer_size_t) const beam_element_index )
-{
-    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
-
-    ptr_obj_t ptr_be_obj = NS(Buffer_get_const_objects_begin)( beam_elements );
-
-    SIXTRL_ASSERT( ptr_be_obj != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( beam_element_index <
-        NS(Buffer_get_num_of_objects)( beam_elements ) );
-
-    ptr_be_obj = ptr_be_obj + beam_element_index;
-
-    return NS(Track_particle_beam_element_obj)(
-        particles, particle_index, ptr_be_obj );
-}
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_element_subset)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BUFFER_ARGPTR_DEC const struct NS(Buffer) *const
-        SIXTRL_RESTRICT beam_elements,
-    NS(buffer_size_t) const beam_element_begin_index,
-    NS(buffer_size_t) const beam_element_end_index )
-{
-    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
-
-    ptr_obj_t be_end   = SIXTRL_NULLPTR;
-    ptr_obj_t be_begin = NS(Buffer_get_const_objects_begin)( beam_elements );
-
-    SIXTRL_ASSERT( be_begin != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( beam_element_begin_index <= beam_element_end_index );
-    SIXTRL_ASSERT( beam_element_end_index <=
+    SIXTRL_ASSERT( ( NS(buffer_size_t) )be_idx <
                    NS(Buffer_get_num_of_objects)( beam_elements ) );
 
-    be_end   = be_begin + beam_element_end_index;
-    be_begin = be_begin + beam_element_begin_index;
-
-    return NS(Track_particle_beam_element_objs)(
-        particles, particle_index, be_begin, be_end );
+    return NS(Track_all_particles_beam_element_obj)(
+        particles, beam_element_id, ptr_be_obj + be_idx );
 }
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_beam_elements)(
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE int
+NS(Track_particle_subset_of_beam_elements)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_idx,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
+    NS(buffer_size_t) const be_begin_idx, NS(buffer_size_t) const be_end_idx )
+{
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
+    ptr_obj_t ptr_be_obj = NS(Buffer_get_const_objects_begin)( beam_elements );
+
+    SIXTRL_ASSERT( ptr_be_obj != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( be_begin_idx <= be_end_idx );
+    SIXTRL_ASSERT( be_end_idx < NS(Buffer_get_num_of_objects)( beam_elements ) );
+
+    return NS(Track_particle_beam_elements_obj)( particles, particle_idx,
+        ptr_be_obj + be_begin_idx, ptr_be_obj + be_end_idx );
+}
+
+
+SIXTRL_INLINE int
+NS(Track_subset_of_particles_subset_of_beam_elements)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_idx_begin,
+    NS(particle_num_elements_t) const particle_idx_end,
+    NS(particle_num_elements_t) const particle_idx_stride,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
+    NS(buffer_size_t) const be_begin_idx, NS(buffer_size_t) const be_end_idx )
+{
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
+    ptr_obj_t ptr_be_obj = NS(Buffer_get_const_objects_begin)( beam_elements );
+
+    SIXTRL_ASSERT( ptr_be_obj != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( be_begin_idx <= be_end_idx );
+    SIXTRL_ASSERT( be_end_idx < NS(Buffer_get_num_of_objects)( beam_elements ) );
+
+    return NS(Track_subset_of_particles_beam_elements_obj)(
+        particles, particle_idx_begin, particle_idx_end, particle_idx_stride,
+        ptr_be_obj + be_begin_idx, ptr_be_obj + be_end_idx );
+}
+
+
+SIXTRL_INLINE int
+NS(Track_all_particles_subset_of_beam_elements)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
+    NS(buffer_size_t) const be_begin_idx, NS(buffer_size_t) const be_end_idx )
+{
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
+    ptr_obj_t ptr_be_obj = NS(Buffer_get_const_objects_begin)( beam_elements );
+
+    SIXTRL_ASSERT( ptr_be_obj != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( be_begin_idx <= be_end_idx );
+    SIXTRL_ASSERT( be_end_idx < NS(Buffer_get_num_of_objects)( beam_elements ) );
+
+    return NS(Track_all_particles_beam_elements_obj)( particles,
+        ptr_be_obj + be_begin_idx, ptr_be_obj + be_end_idx );
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE int NS(Track_particle_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BUFFER_ARGPTR_DEC const struct NS(Buffer) *const
-        SIXTRL_RESTRICT beam_elements )
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements )
 {
-    return NS(Track_particle_beam_element_objs)(
+    return NS(Track_particle_beam_elements_obj)(
         particles, particle_index,
         NS(Buffer_get_const_objects_begin)( beam_elements ),
         NS(Buffer_get_const_objects_end)( beam_elements ) );
-
 }
 
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_subset_beam_element)(
+
+SIXTRL_INLINE int NS(Track_subset_of_particles_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_begin_index,
-    NS(particle_num_elements_t) const particle_end_index,
-    SIXTRL_BUFFER_ARGPTR_DEC const struct NS(Buffer) *const
-        SIXTRL_RESTRICT beam_elements,
-    NS(buffer_size_t) const beam_element_index )
+    NS(particle_num_elements_t) const particle_idx_begin,
+    NS(particle_num_elements_t) const particle_idx_end,
+    NS(particle_num_elements_t) const particle_idx_stride,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements )
 {
-    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
-
-    ptr_obj_t ptr_be_obj = NS(Buffer_get_const_objects_begin)( beam_elements );
-
-    SIXTRL_ASSERT( ptr_be_obj != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( beam_element_index <
-        NS(Buffer_get_num_of_objects)( beam_elements ) );
-
-    ptr_be_obj = ptr_be_obj + beam_element_index;
-
-    return NS(Track_particle_subset_beam_element_obj)(
-        particles, particle_begin_index, particle_end_index, ptr_be_obj );
-}
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_subset_beam_element_subset)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_begin_index,
-    NS(particle_num_elements_t) const particle_end_index,
-    SIXTRL_BUFFER_ARGPTR_DEC const struct NS(Buffer) *const
-        SIXTRL_RESTRICT beam_elements,
-    NS(buffer_size_t) const beam_element_begin_index,
-    NS(buffer_size_t) const beam_element_end_index )
-{
-    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
-
-    ptr_obj_t be_end   = SIXTRL_NULLPTR;
-    ptr_obj_t be_begin = NS(Buffer_get_const_objects_begin)( beam_elements );
-
-    SIXTRL_ASSERT( be_begin != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( beam_element_begin_index <= beam_element_end_index );
-    SIXTRL_ASSERT( beam_element_end_index <=
-                   NS(Buffer_get_num_of_objects)( beam_elements ) );
-
-    be_end   = be_begin + beam_element_end_index;
-    be_begin = be_begin + beam_element_begin_index;
-
-    return NS(Track_particle_subset_beam_element_objs)(
-        particles, particle_begin_index, particle_end_index, be_begin, be_end );
-}
-
-SIXTRL_INLINE SIXTRL_TRACK_RETURN NS(Track_particle_subset_beam_elements)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_begin_index,
-    NS(particle_num_elements_t) const particle_end_index,
-    SIXTRL_BUFFER_ARGPTR_DEC const struct NS(Buffer) *const
-        SIXTRL_RESTRICT beam_elements )
-{
-    return NS(Track_particle_subset_beam_element_objs)(
-        particles, particle_begin_index, particle_end_index,
+    return NS(Track_subset_of_particles_beam_elements_obj)(
+        particles, particle_idx_begin, particle_idx_end, particle_idx_stride,
         NS(Buffer_get_const_objects_begin)( beam_elements ),
         NS(Buffer_get_const_objects_end)( beam_elements ) );
 }
 
-#endif /* !defined( _GPUCODE ) */
+
+SIXTRL_INLINE int NS(Track_all_particles_beam_elements)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements )
+{
+    return NS(Track_all_particles_beam_elements_obj)( particles,
+        NS(Buffer_get_const_objects_begin)( beam_elements ),
+        NS(Buffer_get_const_objects_end)( beam_elements ) );
+}
 
 /* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE int NS(Track_particle_until_turn)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
+    NS(particle_index_t) const end_turn )
+{
+    return NS(Track_particle_until_turn_obj)(
+        particles, particle_index,
+        NS(Buffer_get_const_objects_begin)( beam_elements ),
+        NS(Buffer_get_const_objects_end)( beam_elements ), end_turn );
+}
+
+SIXTRL_INLINE int NS(Track_subset_of_particles_until_turn)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_idx_begin,
+    NS(particle_num_elements_t) const particle_idx_end,
+    NS(particle_num_elements_t) const particle_idx_stride,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
+    NS(particle_index_t) const end_turn )
+{
+    return NS(Track_subset_of_particles_until_turn_obj)(
+        particles, particle_idx_begin, particle_idx_end, particle_idx_stride,
+        NS(Buffer_get_const_objects_begin)( beam_elements ),
+        NS(Buffer_get_const_objects_end)( beam_elements ), end_turn );
+}
+
+SIXTRL_INLINE int NS(Track_all_particles_until_turn)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
+    NS(particle_index_t) const end_turn )
+{
+    return NS(Track_all_particles_until_turn_obj)( particles,
+        NS(Buffer_get_const_objects_begin)( beam_elements ),
+        NS(Buffer_get_const_objects_end)( beam_elements ), end_turn );
+}
+
+#endif /* !defined( _GPUCODE ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
