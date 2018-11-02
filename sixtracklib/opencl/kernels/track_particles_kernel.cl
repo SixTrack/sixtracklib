@@ -133,8 +133,8 @@ __kernel void NS(Track_particles_beam_elements_opencl)(
                 SIXTRL_ASSERT( particle_id <
                     NS(Particles_get_num_of_particles)( particles ) );
 
-                success_flag |= NS(Track_particle_until_turn)(
-                    &particles, particle_id, be_begin, be_end, num_turns );
+                success_flag |= NS(Track_particle_until_turn_obj)(
+                    particles, particle_id, be_begin, be_end, num_turns );
             }
 
             object_begin_particle_id = object_end_particle_id;

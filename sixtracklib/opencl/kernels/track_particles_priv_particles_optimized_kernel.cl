@@ -134,7 +134,7 @@ __kernel void NS(Track_particles_beam_elements_priv_particles_optimized_opencl)(
 
                 SIXTRL_ASSERT( success_flag == ( int )0 );
 
-                success_flag |= NS(Track_particle_until_turn)(
+                success_flag |= NS(Track_particle_until_turn_obj)(
                     &particles, 0u, be_begin, be_end, num_turns );
 
                 success_flag |=  NS(Particles_back_to_generic_addr_data)(
