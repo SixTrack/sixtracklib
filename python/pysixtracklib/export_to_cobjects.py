@@ -149,6 +149,7 @@ def sixdump2cobject( input_folder, st_dump_file , outfile_name ):
             assert( kk < num_dumps )
             p.fromPySixTrack(
                 pysixtrack.Particles( **sixdump[ kk ].get_minimal_beam() ), jj )
+            p.state[ jj ] = 1
             p.at_element[ jj ] = elem_id
 
     particles_buffer.to_file( outfile_name )
