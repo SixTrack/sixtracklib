@@ -137,7 +137,7 @@ namespace sixtrack
 
                 if( success )
                 {
-                    success = ( 0 == ::st_Track_particles_beam_element_objs(
+                    success = ( 0 == ::st_Track_all_particles_beam_elements_obj(
                         particles, be_begin, be_end ) );
                 }
 
@@ -220,8 +220,8 @@ namespace sixtrack
 
                         ::st_Particles_copy( particles, cmp_particles );
 
-                        int const ret = ::st_Track_particles_beam_element(
-                            particles, beam_elements_buffer, ii );
+                        int const ret = ::st_Track_all_particles_beam_element(
+                            particles, ii, beam_elements_buffer, ii );
 
                         if( ret != 0 )
                         {
@@ -492,7 +492,7 @@ TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
         object_t const* line_end = be_begin;
         std::advance( line_end, end_elem_id + index_t{ 1 } );
 
-        int success = ::st_Track_particles_beam_element_objs(
+        int success = ::st_Track_all_particles_beam_elements_obj(
             particles, line_begin, line_end );
 
         ASSERT_TRUE( success == 0 );
