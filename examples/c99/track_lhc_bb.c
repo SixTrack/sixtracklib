@@ -9,10 +9,10 @@ int main( int argc, char* argv[] )
 {
     typedef st_buffer_size_t buf_size_t;
 
-    st_Buffer* lhc_particle_dump = st_Buffer_new_from_file(
+    st_Buffer* particle_dump = st_Buffer_new_from_file(
         st_PATH_TO_BEAMBEAM_PARTICLES_DUMP );
 
-    st_Buffer* lhc_beam_elements_buffer = st_Buffer_new_from_file(
+    st_Buffer* beam_elements_buffer = st_Buffer_new_from_file(
         st_PATH_TO_BEAMBEAM_BEAM_ELEMENTS );
 
     st_Buffer* pb = st_Buffer_new( ( buf_size_t )( 1u << 24u ) );
@@ -79,8 +79,10 @@ int main( int argc, char* argv[] )
     /* ********************************************************************** */
 
     particles = st_Particles_new( pb, NUM_PARTICLES );
-    input_particles = st_Particles_buffer_get_const_particles( lhc_particle_dump, 0u );
+    input_particles = st_Particles_buffer_get_const_particles( particle_dump, 0u );
     num_input_particles = st_Particles_get_num_of_particles( input_particles );
+
+    printf( "nn = %d\r\n", ( int )st_Buffer_get_num_of_objects( beam_elements_buffer ) );
 
     for( ii = 0 ; ii < NUM_PARTICLES ; ++ii )
     {
@@ -96,7 +98,7 @@ int main( int argc, char* argv[] )
 
     for( ii = 0 ; ii < NUM_TURNS ; ++ii )
     {
-        st_Track_particles_beam_elements( particles, lhc_beam_elements_buffer );
+        st_Track_particles_beam_elements( particles, beam_elements_buffer );
     }
 
     end_tracking_time = st_Time_get_seconds_since_epoch();
@@ -115,8 +117,8 @@ int main( int argc, char* argv[] )
     /* ********************************************************************** */
 
     st_Buffer_delete( pb );
-    st_Buffer_delete( lhc_particle_dump );
-    st_Buffer_delete( lhc_beam_elements_buffer );
+    st_Buffer_delete( particle_dump );
+    st_Buffer_delete( beam_elements_buffer );
 }
 
 /* end: examples/c99/track_lhc_no_bb.c */

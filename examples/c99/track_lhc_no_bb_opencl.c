@@ -11,7 +11,7 @@ int main( int argc, char* argv[] )
 {
     st_ClContext* context                   = SIXTRL_NULLPTR;
 
-    st_Buffer* lhc_particle_dump            = SIXTRL_NULLPTR;
+    st_Buffer* particle_dump                = SIXTRL_NULLPTR;
     st_Buffer* lhc_beam_elements_buffer     = SIXTRL_NULLPTR;
     st_Buffer* pb                           = SIXTRL_NULLPTR;
 
@@ -23,6 +23,9 @@ int main( int argc, char* argv[] )
     st_buffer_size_t    num_input_particles = 0;
 
     st_buffer_size_t ii                     = 0u;
+
+    int tracking_kernel_id                  = -1;
+    double tracking_time                    = 0.0;
 
     /* --------------------------------------------------------------------- */
     /* Handle command line arguments: */
@@ -138,7 +141,7 @@ int main( int argc, char* argv[] )
     /* Prepare the buffers: */
     /* ---------------------------------------------------------------------- */
 
-    lhc_particle_dump = st_Buffer_new_from_file(
+    particle_dump = st_Buffer_new_from_file(
         st_PATH_TO_LHC_NO_BB_PARTICLES_DUMP );
 
     lhc_beam_elements_buffer = st_Buffer_new_from_file(
@@ -147,7 +150,7 @@ int main( int argc, char* argv[] )
     pb = st_Buffer_new( ( st_buffer_size_t )( 1u << 24u ) );
 
     particles = st_Particles_new( pb, NUM_PARTICLES );
-    input_particles = st_Particles_buffer_get_const_particles( lhc_particle_dump, 0u );
+    input_particles = st_Particles_buffer_get_const_particles( particle_dump, 0u );
     num_input_particles = st_Particles_get_num_of_particles( input_particles );
 
     for( ii = 0 ; ii < NUM_PARTICLES ; ++ii )
@@ -169,6 +172,16 @@ int main( int argc, char* argv[] )
     st_ClContext_track_num_turns(
         context, particles_arg, beam_elements_arg, NUM_TURNS );
 
+    tracking_kernel_id = st_ClContext_get_tracking_kernel_id( context );
+
+    tracking_time = st_ClContextBase_get_last_exec_time( context, tracking_kernel_id );
+
+    printf( "Tracking time : %10.6f \r\n"
+            "              : %10.6f / turn \r\n"
+            "              : %10.6f / turn / particle \r\n\r\n",
+            tracking_time, tracking_time / NUM_TURNS,
+            tracking_time / ( NUM_TURNS * NUM_PARTICLES ) );
+
     /* --------------------------------------------------------------------- */
     /* Clean-up */
     /* --------------------------------------------------------------------- */
@@ -177,7 +190,7 @@ int main( int argc, char* argv[] )
     st_ClArgument_delete( particles_arg );
     st_ClArgument_delete( beam_elements_arg );
 
-    st_Buffer_delete( lhc_particle_dump );
+    st_Buffer_delete( particle_dump );
     st_Buffer_delete( lhc_beam_elements_buffer );
     st_Buffer_delete( pb );
 

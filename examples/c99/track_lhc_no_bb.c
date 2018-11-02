@@ -9,10 +9,10 @@ int main( int argc, char* argv[] )
 {
     typedef st_buffer_size_t buf_size_t;
 
-    st_Buffer* lhc_particle_dump = st_Buffer_new_from_file(
+    st_Buffer* particle_dump = st_Buffer_new_from_file(
         st_PATH_TO_LHC_NO_BB_PARTICLES_DUMP );
 
-    st_Buffer* lhc_beam_elements_buffer = st_Buffer_new_from_file(
+    st_Buffer* beam_elements_buffer = st_Buffer_new_from_file(
         st_PATH_TO_LHC_NO_BB_BEAM_ELEMENTS );
 
     st_Buffer* pb = st_Buffer_new( ( buf_size_t )( 1u << 24u ) );
@@ -25,6 +25,10 @@ int main( int argc, char* argv[] )
     buf_size_t          num_input_particles = 0;
 
     buf_size_t ii = 0;
+
+    double start_tracking_time = 0.0;
+    double end_tracking_time   = 0.0;
+    double tracking_time       = 0.0;
 
     /* ********************************************************************** */
     /* ****   Handling of command line parameters                             */
@@ -70,89 +74,12 @@ int main( int argc, char* argv[] )
             "Selected NUM_TURNS     = %10lu\r\n"
             "\r\n", NUM_PARTICLES, NUM_TURNS );
 
-    {
-        int num_drifts       = 0;
-        int num_drift_exacts = 0;
-        int num_multipoles   = 0;
-        int num_cavities     = 0;
-        int num_xyshifts     = 0;
-        int num_srotations   = 0;
-        int num_unknown      = 0;
-
-        int const num_beam_elements =
-            st_Buffer_get_num_of_objects( lhc_beam_elements_buffer );
-
-        int kk = 0;
-
-        for( ; kk < num_beam_elements ; ++kk )
-        {
-            st_Object const* obj =
-                st_Buffer_get_const_object( lhc_beam_elements_buffer, kk );
-
-            switch( st_Object_get_type_id( obj ) )
-            {
-                case st_OBJECT_TYPE_DRIFT:
-                {
-                    num_drifts++;
-                    break;
-                }
-
-                case st_OBJECT_TYPE_DRIFT_EXACT:
-                {
-                    num_drift_exacts++;
-                    break;
-                }
-
-                case st_OBJECT_TYPE_MULTIPOLE:
-                {
-                    num_multipoles++;
-                    break;
-                }
-
-                case st_OBJECT_TYPE_CAVITY:
-                {
-                    num_cavities++;
-                    break;
-                }
-
-                case st_OBJECT_TYPE_XYSHIFT:
-                {
-                    num_xyshifts++;
-                    break;
-                }
-
-                case st_OBJECT_TYPE_SROTATION:
-                {
-                    num_srotations++;
-                    break;
-                }
-
-                default:
-                {
-                    num_unknown++;
-                }
-            };
-        }
-
-        printf( "num_beam_elements : %d\r\n"
-                "drifts            : %d\r\n"
-                "drift exacts      : %d\r\n"
-                "multipoles        : %d\r\n"
-                "cavities          : %d\r\n"
-                "xyshift           : %d\r\n"
-                "srotation         : %d\r\n"
-                "unknown           : %d\r\n\r\n",
-                num_beam_elements, num_drifts, num_drift_exacts, num_multipoles,
-                num_cavities, num_xyshifts, num_srotations, num_unknown );
-
-    }
-
     /* ********************************************************************** */
     /* ****   Building Particles Data from LHC Particle Dump Data        **** */
     /* ********************************************************************** */
 
     particles = st_Particles_new( pb, NUM_PARTICLES );
-    input_particles = st_Particles_buffer_get_const_particles( lhc_particle_dump, 0u );
+    input_particles = st_Particles_buffer_get_const_particles( particle_dump, 0u );
     num_input_particles = st_Particles_get_num_of_particles( input_particles );
 
     for( ii = 0 ; ii < NUM_PARTICLES ; ++ii )
@@ -165,18 +92,31 @@ int main( int argc, char* argv[] )
     /* ****  Track particles over the beam-elements for NUM_TURNS turns  **** */
     /* ********************************************************************** */
 
+    start_tracking_time = st_Time_get_seconds_since_epoch();
+
     for( ii = 0 ; ii < NUM_TURNS ; ++ii )
     {
-        st_Track_particles_beam_elements( particles, lhc_beam_elements_buffer );
+        st_Track_particles_beam_elements( particles, beam_elements_buffer );
     }
+
+    end_tracking_time = st_Time_get_seconds_since_epoch();
+    tracking_time = ( start_tracking_time <= end_tracking_time )
+        ? ( end_tracking_time - start_tracking_time ) : 0.0;
+
+    printf( "Tracking time : %10.6f \r\n"
+            "              : %10.6f / turn \r\n"
+            "              : %10.6f / turn / particle \r\n\r\n",
+            tracking_time, tracking_time / NUM_TURNS,
+            tracking_time / ( NUM_TURNS * NUM_PARTICLES ) );
+
 
     /* ********************************************************************** */
     /* ****                         Clean-up                             **** */
     /* ********************************************************************** */
 
     st_Buffer_delete( pb );
-    st_Buffer_delete( lhc_particle_dump );
-    st_Buffer_delete( lhc_beam_elements_buffer );
+    st_Buffer_delete( particle_dump );
+    st_Buffer_delete( beam_elements_buffer );
 }
 
 /* end: examples/c99/track_lhc_no_bb.c */
