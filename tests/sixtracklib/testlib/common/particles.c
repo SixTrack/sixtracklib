@@ -368,6 +368,10 @@ void NS(Particles_realistic_init)( NS(Particles)* SIXTRL_RESTRICT p )
         real_t const CHARGE_RATIO = ( real_t )1.0;
         real_t const DELTA_X      = ( real_t )1e-9;
 
+        index_t const AT_ELEMENT  = ( index_t )0;
+        index_t const AT_TURN     = ( index_t )0;
+        index_t const STATE       = ( index_t )1;
+
         for( ii = 0 ; ii < NUM_PARTICLES ; ++ii, ++particle_id )
         {
             NS(particle_real_t) const X = X0 + DELTA_X * ii;
@@ -379,9 +383,9 @@ void NS(Particles_realistic_init)( NS(Particles)* SIXTRL_RESTRICT p )
             NS(Particles_set_p0c_value)(           p, ii, P0C );
 
             NS(Particles_set_particle_id_value)(   p, ii, particle_id );
-            NS(Particles_set_at_element_id_value)( p, ii, ( index_t )-1 );
-            NS(Particles_set_at_turn_value)(       p, ii, ( index_t )-1 );
-            NS(Particles_set_state_value)(         p, ii, ( index_t )1 );
+            NS(Particles_set_at_element_id_value)( p, ii, AT_ELEMENT );
+            NS(Particles_set_at_turn_value)(       p, ii, AT_TURN );
+            NS(Particles_set_state_value)(         p, ii, STATE );
 
             NS(Particles_set_s_value)(             p, ii, S );
             NS(Particles_set_x_value)(             p, ii, X );
@@ -437,7 +441,9 @@ void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
         real_t const CHI          = ( real_t )0.0;
         real_t const CHARGE_RATIO = ( real_t )1.0;
 
-        int64_t const STATE       = ( index_t )1;
+        index_t const AT_ELEMENT  = ( index_t )0;
+        index_t const AT_TURN     = ( index_t )0;
+        index_t const STATE       = ( index_t )1;
 
         size_t ii;
         int64_t particle_id = 0;
@@ -458,8 +464,8 @@ void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
             NS(Particles_set_p0c_value)(           p, ii, P0C );
 
             NS(Particles_set_particle_id_value)(   p, ii, particle_id );
-            NS(Particles_set_at_element_id_value)( p, ii, ( index_t )-1 );
-            NS(Particles_set_at_turn_value)(       p, ii, ( index_t )-1 );
+            NS(Particles_set_at_element_id_value)( p, ii, AT_ELEMENT );
+            NS(Particles_set_at_turn_value)(       p, ii, AT_TURN );
             NS(Particles_set_state_value)(         p, ii, STATE );
 
             NS(Particles_set_s_value)(             p, ii, S );
