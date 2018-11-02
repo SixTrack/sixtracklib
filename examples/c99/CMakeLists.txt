@@ -29,6 +29,12 @@ add_executable( track_lhc_no_bb_c99 track_lhc_no_bb.c )
 list( APPEND EXAMPLE_TARGETS track_lhc_no_bb_c99 )
 
 # -----------------------------------------------------------------------------
+# track_lhc_bb_c99:
+
+add_executable( track_lhc_bb_c99 track_lhc_bb.c )
+list( APPEND EXAMPLE_TARGETS track_lhc_bb_c99 )
+
+# -----------------------------------------------------------------------------
 # track_bbsimple_c99:
 
 add_executable( track_bbsimple_c99 track_bbsimple.c )
@@ -62,6 +68,12 @@ if( SIXTRACKL_ENABLE_OPENCL )
 
     add_executable( track_lhc_no_bb_opencl_c99 track_lhc_no_bb_opencl.c )
     list( APPEND EXAMPLE_OPENCL_TARGETS        track_lhc_no_bb_opencl_c99 )
+
+    # -------------------------------------------------------------------------
+    # track_lhc_bb_cuda_c99:
+
+    add_executable( track_lhc_bb_opencl_c99    track_lhc_bb_opencl.c )
+    list( APPEND EXAMPLE_OPENCL_TARGETS        track_lhc_bb_opencl_c99 )
 endif()
 
 # ==============================================================================
