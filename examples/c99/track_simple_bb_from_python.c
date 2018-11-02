@@ -96,8 +96,8 @@ int main( int argc, char* argv[] )
             st_Particles* pdump = st_Particles_add_copy(dump, particles);
             assert(pdump != 0);
 
-            int const ret = st_Track_particles_beam_element(
-                particles, beam_elements_buffer, jj );
+            int const ret = st_Track_all_particles_beam_element(
+                particles, jj, beam_elements_buffer, jj );
 
             assert( ret == 0 );
 

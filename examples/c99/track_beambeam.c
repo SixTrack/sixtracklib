@@ -24,7 +24,10 @@ int main( int argc, char* argv[] )
     st_buffer_size_t    num_input_particles = 0;
 
     st_buffer_size_t ii = 0;
-    int ret = 0;
+
+    double start_tracking_time = 0.0;
+    double end_tracking_time   = 0.0;
+    double tracking_time       = 0.0;
 
     /* ********************************************************************** */
     /* ****   Handling of command line parameters                             */
@@ -84,18 +87,29 @@ int main( int argc, char* argv[] )
     {
         st_buffer_size_t const jj = ii % num_input_particles;
         st_Particles_copy_single( particles, ii, input_particles, jj );
+        st_Particles_set_at_turn_value( particles, ii, 0 );
+        st_Particles_set_at_element_id_value( particles, ii, 0 );
     }
 
-    for( ii = 0 ; ii < NUM_TURNS ; ++ii )
-    {
-        ret |= st_Track_particles_beam_elements( particles, beam_elements_buffer );
-    }
+    /* ********************************************************************** */
+    /* ****  Track particles over the beam-elements for NUM_TURNS turns  **** */
+    /* ********************************************************************** */
 
-    assert( ret == 0 );
+    start_tracking_time = st_Time_get_seconds_since_epoch();
 
-    #if defined( NDEBUG )
-    ( void )ret;
-    #endif /* defined( NDEBUG ) */
+    st_Track_all_particles_until_turn(
+        particles, beam_elements_buffer, NUM_TURNS );
+
+    end_tracking_time = st_Time_get_seconds_since_epoch();
+
+    tracking_time = ( end_tracking_time >= start_tracking_time )
+        ? ( end_tracking_time - start_tracking_time ) : 0.0;
+
+    printf( "Tracking time : %10.6f \r\n"
+            "              : %10.6f / turn \r\n"
+            "              : %10.6f / turn / particle \r\n\r\n",
+            tracking_time, tracking_time / NUM_TURNS,
+            tracking_time / ( NUM_TURNS * NUM_PARTICLES ) );
 
     /* ********************************************************************** */
     /* ****                         Clean-up                             **** */

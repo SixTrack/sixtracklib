@@ -86,6 +86,8 @@ int main( int argc, char* argv[] )
     {
         buf_size_t const jj = ii % num_input_particles;
         st_Particles_copy_single( particles, ii, input_particles, jj );
+        st_Particles_set_at_turn_value( particles, ii, 0 );
+        st_Particles_set_at_element_id_value( particles, ii, 0 );
     }
 
     /* ********************************************************************** */
@@ -94,12 +96,11 @@ int main( int argc, char* argv[] )
 
     start_tracking_time = st_Time_get_seconds_since_epoch();
 
-    for( ii = 0 ; ii < NUM_TURNS ; ++ii )
-    {
-        st_Track_particles_beam_elements( particles, beam_elements_buffer );
-    }
+    st_Track_all_particles_until_turn(
+        particles, beam_elements_buffer, NUM_TURNS );
 
     end_tracking_time = st_Time_get_seconds_since_epoch();
+
     tracking_time = ( start_tracking_time <= end_tracking_time )
         ? ( end_tracking_time - start_tracking_time ) : 0.0;
 
