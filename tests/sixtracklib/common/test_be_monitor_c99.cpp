@@ -47,6 +47,8 @@ TEST( C99_CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
     addr_t const io_addr_10 = reinterpret_cast< uintptr_t >(
         ::st_Particles_buffer_get_particles( io, 10u ) );
 
+    size_t const io_stride  = ( size_t )0u;
+
     ASSERT_TRUE( nullptr != ::st_Particles_buffer_get_particles( io, 0u ) );
 
     ::st_BeamMonitor* be_monitor = ::st_BeamMonitor_new( eb );
@@ -103,7 +105,7 @@ TEST( C99_CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
                   ::st_BeamMonitor_get_io_address( &cmp_beam_monitors[ 0 ] ) );
 
     be_monitor = ::st_BeamMonitor_add(
-        eb, 10u, 5000u, 1u, io_addr_10, false, true );
+        eb, 10u, 5000u, 1u, io_addr_10, io_stride, false, true );
 
     ASSERT_TRUE( be_monitor != nullptr );
     ASSERT_TRUE(  ::st_BeamMonitor_get_num_stores( be_monitor ) == nturn_t{ 10 } );
@@ -213,11 +215,12 @@ TEST( C99_CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
 
 TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
 {
+    using real_t        = ::st_particle_real_t;
     using size_t        = ::st_buffer_size_t;
     using nturn_t       = ::st_be_monitor_turn_t;
     using addr_t        = ::st_be_monitor_addr_t;
     using turn_dist_t   = std::uniform_int_distribution< nturn_t >;
-    using chance_dist_t = std::uniform_real_distribution< double >;
+    using chance_dist_t = std::uniform_real_distribution< real_t >;
 
     std::mt19937_64::result_type const seed = 20181031u;
 
@@ -245,13 +248,13 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     {
         for( size_t jj = size_t{ 0 } ; jj < DRIFT_SEQU_LEN ; ++jj )
         {
-            ::st_Drift*  drift = ::st_Drift_add( eb, double{ 1.0 } );
+            ::st_Drift*  drift = ::st_Drift_add( eb, real_t{ 1.0 } );
             ASSERT_TRUE( drift != nullptr );
         }
 
         ::st_BeamMonitor* be_monitor = ::st_BeamMonitor_add( eb,
             num_stores_dist( prng ), start_dist( prng ), skip_dist( prng ),
-            addr_t{ 0 }, bool{ rolling_dist( prng ) >= 0.5 }, true );
+            addr_t{ 0 }, size_t{ 0 }, bool{ rolling_dist( prng ) >= 0.5 }, true );
 
         ASSERT_TRUE( be_monitor != nullptr );
 
@@ -468,11 +471,17 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
 
 TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
 {
-    using size_t        = ::st_buffer_size_t;
-    using nturn_t       = ::st_be_monitor_turn_t;
-    using addr_t        = ::st_be_monitor_addr_t;
-    using turn_dist_t   = std::uniform_int_distribution< nturn_t >;
-    using chance_dist_t = std::uniform_real_distribution< double >;
+    using real_t          = ::st_particle_real_t;
+    using index_t         = ::st_particle_index_t;
+    using size_t          = ::st_buffer_size_t;
+    using nturn_t         = ::st_be_monitor_turn_t;
+    using addr_t          = ::st_be_monitor_addr_t;
+    using turn_dist_t     = std::uniform_int_distribution< nturn_t >;
+    using chance_dist_t   = std::uniform_real_distribution< real_t >;
+    using type_id_t       = ::st_object_type_id_t;
+    using beam_monitor_t  = ::st_BeamMonitor;
+    using ptr_const_mon_t = beam_monitor_t const*;
+    using ptr_particles_t = ::st_Particles const*;
 
     std::mt19937_64::result_type const seed = 20181031u;
 
@@ -493,41 +502,54 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
     turn_dist_t start_dist( 0, 4 );
     turn_dist_t skip_dist( 1, 4 );
 
+    static real_t const ABS_TOLERANCE = real_t{ 1e-13 };
+
     chance_dist_t rolling_dist( 0., 1. );
 
     nturn_t max_num_turns  = nturn_t{ 0 };
     nturn_t max_start_turn = nturn_t{ 0 };
+    size_t  required_num_particle_blocks = size_t{ 0 };
 
     for( size_t ii = size_t{ 0 } ; ii < NUM_BEAM_MONITORS ; ++ii )
     {
         ::st_BeamMonitor* be_monitor = ::st_BeamMonitor_add( eb,
             num_stores_dist( prng ), start_dist( prng ), skip_dist( prng ),
-            addr_t{ 0 }, bool{ rolling_dist( prng ) >= 0.5 }, true );
+            addr_t{ 0 }, size_t{ 0 }, bool{ rolling_dist( prng ) >= 0.5 }, true );
 
         ASSERT_TRUE( be_monitor != nullptr );
 
-        nturn_t const n = ::st_BeamMonitor_get_num_stores( be_monitor ) *
-            ::st_BeamMonitor_get_skip( be_monitor );
+        nturn_t const num_stores =
+            ::st_BeamMonitor_get_num_stores( be_monitor );
 
+        nturn_t const skip  = ::st_BeamMonitor_get_skip( be_monitor );
         nturn_t const start = ::st_BeamMonitor_get_start( be_monitor );
+        nturn_t const n     = num_stores * skip;
+
+        required_num_particle_blocks += num_stores;
 
         if( max_num_turns  < n     ) max_num_turns  = n;
         if( max_start_turn < start ) max_start_turn = start;
 
         for( size_t jj = size_t{ 0 } ; jj < DRIFT_SEQU_LEN ; ++jj )
         {
-            ::st_Drift*  drift = ::st_Drift_add( eb, double{ 1.0 } );
+            ::st_Drift*  drift = ::st_Drift_add( eb, real_t{ 1.0 } );
             ASSERT_TRUE( drift != nullptr );
         }
     }
 
+    /* --------------------------------------------------------------------- */
 
     ASSERT_TRUE( max_num_turns > nturn_t{ 0 } );
 
     nturn_t const NUM_TURNS = max_start_turn + 2 * max_num_turns;
 
-    ASSERT_TRUE( 0 == ::st_BeamMonitor_prepare_io_buffer(
-        eb, io, NUM_PARTICLES, false ) );
+    int const ret = ::st_BeamMonitor_prepare_io_buffer(
+        eb, io, NUM_PARTICLES, false );
+
+    ASSERT_TRUE( 0 == ret );
+
+    ASSERT_TRUE( ::st_Particles_buffer_get_num_of_particle_blocks( io ) >=
+                 required_num_particle_blocks );
 
     ::st_Particles* particles = ::st_Particles_new( pb, NUM_PARTICLES );
     ::st_Particles_realistic_init( particles );
@@ -548,16 +570,18 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
         for( ; obj_it != obj_end ; ++obj_it )
         {
             ::st_Particles* cmp_particles = ::st_Particles_add_copy(
-                cmp_particles_buffer, particles );
+                    cmp_particles_buffer, particles );
 
             ASSERT_TRUE( cmp_particles != nullptr );
 
             ::st_Track_all_particles_beam_element_obj(
-                particles, beam_element_id, obj_it );
+                particles, beam_element_id++, obj_it );
         }
 
         ::st_Track_all_particles_increment_at_turn( particles );
     }
+
+    /* --------------------------------------------------------------------- */
 
     ::st_Particles_copy( particles, ::st_Particles_buffer_get_const_particles(
         cmp_particles_buffer, 0u ) );
@@ -565,11 +589,146 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
     ASSERT_TRUE( 0 == ::st_BeamMonitor_assign_io_buffer(
         eb, io, NUM_PARTICLES, false ) );
 
+    ::st_Object const* obj_it = obj_begin;
+
+    size_t io_particle_block_index = size_t{ 0 };
+
+    for( ; obj_it != obj_end ; ++obj_it )
+    {
+        type_id_t const type_id = ::st_Object_get_type_id( obj_it );
+
+        if( type_id == ::st_OBJECT_TYPE_BEAM_MONITOR )
+        {
+            ::st_BeamMonitor const* monitor = reinterpret_cast<
+                ::st_BeamMonitor const* >(
+                    ::st_Object_get_const_begin_ptr( obj_it ) );
+
+            ASSERT_TRUE( monitor != nullptr );
+            nturn_t const num_stores = ::st_BeamMonitor_get_num_stores( monitor );
+
+            ASSERT_TRUE( io_particle_block_index <
+                ::st_Buffer_get_num_of_objects( io ) );
+
+            ::st_Particles const* io_particles =
+                ::st_Particles_buffer_get_const_particles(
+                    io, io_particle_block_index );
+
+
+            ASSERT_TRUE( ::st_BeamMonitor_get_io_address( monitor ) != addr_t{ 0 } );
+            ASSERT_TRUE( ::st_BeamMonitor_get_io_address( monitor ) == static_cast<
+                addr_t >( reinterpret_cast< uintptr_t >( io_particles ) ) );
+
+            for( nturn_t kk = 0; kk < num_stores ; ++kk )
+            {
+                io_particles = ::st_Particles_buffer_get_const_particles(
+                    io, io_particle_block_index + kk );
+
+                ASSERT_TRUE( io_particles != nullptr );
+                ASSERT_TRUE( ::st_Particles_get_num_of_particles(
+                    io_particles ) == NUM_PARTICLES );
+            }
+
+            io_particle_block_index += num_stores;
+        }
+    }
+
+    /* --------------------------------------------------------------------- */
+
     ::st_Track_all_particles_until_turn( particles, eb, NUM_TURNS );
 
+    obj_it = obj_begin;
 
+    for( ; obj_it != obj_end ; ++obj_it )
+    {
+        type_id_t const type_id = ::st_Object_get_type_id( obj_it );
 
+        if( type_id == ::st_OBJECT_TYPE_BEAM_MONITOR )
+        {
+            ptr_const_mon_t beam_monitor = reinterpret_cast< ptr_const_mon_t >(
+                    ::st_Object_get_const_begin_ptr( obj_it ) );
 
+            ASSERT_TRUE( ::st_BeamMonitor_get_io_address( beam_monitor )
+                != addr_t{ 0 } );
+
+            nturn_t const num_stores =
+                ::st_BeamMonitor_get_num_stores( beam_monitor );
+
+            nturn_t const start_turn_value =
+                ::st_BeamMonitor_get_start( beam_monitor );
+
+            nturn_t const skip = ::st_BeamMonitor_get_skip( beam_monitor );
+
+            ASSERT_TRUE( num_stores != nturn_t{ 0 } );
+            ASSERT_TRUE( skip > nturn_t{ 0 } );
+            ASSERT_TRUE( ::st_BeamMonitor_get_io_address( beam_monitor ) !=
+                         addr_t{ 0 } );
+
+            for( nturn_t kk = nturn_t{ 0 } ; kk < num_stores ; ++kk )
+            {
+                ptr_particles_t io_particles =
+                    ::st_BeamMonitor_get_const_ptr_particles(
+                        beam_monitor, kk );
+
+                SIXTRL_ASSERT( io_particles != nullptr );
+                SIXTRL_ASSERT( ::st_Particles_get_num_of_particles(
+                    io_particles ) == NUM_PARTICLES );
+
+                index_t prev_state      = index_t{ -1 };
+                index_t prev_element_id = index_t{ -1 };
+
+                for( size_t jj = size_t{ 0 } ; jj < NUM_PARTICLES ; ++jj )
+                {
+                    index_t const state = ::st_Particles_get_state_value(
+                        io_particles, jj );
+
+                    index_t const turn = ::st_Particles_get_at_turn_value(
+                        io_particles, jj );
+
+                    index_t const elem_id = ::st_Particles_get_at_element_id_value(
+                            io_particles, jj );
+
+                    if( !::st_BeamMonitor_is_rolling( beam_monitor ) )
+                    {
+                        ASSERT_TRUE( ( start_turn_value + ( skip * kk ) ) == turn );
+                        ASSERT_TRUE( turn < ( start_turn_value + ( skip * num_stores ) ) );
+                    }
+                    else
+                    {
+                        ASSERT_TRUE( turn >= start_turn_value );
+                        ASSERT_TRUE( ( ( turn - start_turn_value ) % skip ) == 0 );
+                    }
+
+                    size_t const cmp_particle_index =
+                        turn * ( NUM_DRIFTS + NUM_BEAM_MONITORS ) + elem_id;
+
+                    ASSERT_TRUE( cmp_particle_index <
+                        ::st_Buffer_get_num_of_objects( cmp_particles_buffer ) );
+
+                    ptr_particles_t cmp_particles =
+                        ::st_Particles_buffer_get_const_particles(
+                            cmp_particles_buffer, cmp_particle_index );
+
+                    ASSERT_TRUE( cmp_particles != nullptr );
+
+                    ASSERT_TRUE( state == index_t{ 1 } );
+                    ASSERT_TRUE( ( prev_state == state ) ||
+                                 ( prev_state == index_t{ -1 } ) );
+
+                    ASSERT_TRUE( ( prev_element_id == elem_id ) ||
+                                 ( prev_element_id == index_t{ -1 } ) );
+
+                    ASSERT_TRUE(
+                        ( 0 == ::st_Particles_compare_values(
+                            cmp_particles, io_particles ) )  ||
+                        ( 0 == ::st_Particles_compare_values_with_treshold(
+                            cmp_particles, io_particles, ABS_TOLERANCE ) ) );
+
+                    prev_state = state;
+                    prev_element_id = elem_id;
+                }
+            }
+        }
+    }
 
     ::st_Buffer_delete( eb );
     ::st_Buffer_delete( io );
