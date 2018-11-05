@@ -20,14 +20,14 @@
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 extern SIXTRL_HOST_FN int NS(BeamMonitor_prepare_io_buffer)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT io_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT io_buffer,
     NS(buffer_size_t) const num_particles, bool const enable_elem_by_elem_dump );
 
 
 int NS(BeamMonitor_prepare_io_buffer)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT io_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT io_buffer,
     NS(buffer_size_t) const num_particles, bool const enable_elem_by_elem_dump )
 {
     typedef NS(buffer_size_t) buf_size_t;

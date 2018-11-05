@@ -33,8 +33,8 @@ SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_clear_all)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer );
 
 SIXTRL_HOST_FN int NS(BeamMonitor_prepare_io_buffer)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT io_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT io_buffer,
     NS(buffer_size_t) const num_particles, bool const enable_elem_by_elem_dump );
 
 SIXTRL_FN SIXTRL_STATIC int NS(BeamMonitor_assign_io_buffer)(
@@ -336,11 +336,17 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_managed_io_buffer)(
     {
         buf_size_t num_beam_monitors_assigned = ZERO;
 
+        buf_size_t const io_store_stride =
+            NS(Particles_get_required_num_slots_on_managed_buffer)(
+                num_particles, slot_size ) * slot_size;
+
         ptr_obj_t be_it  = NS(ManagedBuffer_get_objects_index_begin)(
             beam_elements, slot_size );
 
         ptr_obj_t be_end = NS(ManagedBuffer_get_objects_index_end)(
             beam_elements, slot_size );
+
+        SIXTRL_ASSERT( io_store_stride >= sizeof( NS(Particles) ) );
 
         io_it = io_it + io_particles_block_offset;
 
@@ -372,7 +378,19 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_managed_io_buffer)(
                         addr_t const paddr = ( addr_t )( uintptr_t
                             )NS(Object_get_begin_addr)( io_it );
 
+                        #if !defined( NDEBUG )
+                        nturn_t kk = ( nturn_t )0;
+
+                        for( ; kk < nn ; ++kk )
+                        {
+                            SIXTRL_ASSERT( NS(Object_get_begin_addr)(
+                                io_it + kk ) == ( addr_t )(
+                                    paddr + kk * io_store_stride ) );
+                        }
+                        #endif /* !defined( NDEBUG ) */
+
                         NS(BeamMonitor_set_io_address)( monitor, paddr );
+                        monitor->io_store_stride = io_store_stride;
 
                         io_it = io_it + nn;
                         num_io_particle_blocks_assigned += nn;
