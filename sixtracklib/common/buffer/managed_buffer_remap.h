@@ -69,6 +69,11 @@ SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_remap)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size );
 
+SIXTRL_FN SIXTRL_STATIC int NS(ManagedBuffer_apply_addr_offset)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    NS(buffer_addr_diff_t) const addr_offset,
+    NS(buffer_size_t) const slot_size );
+
 /* ------------------------------------------------------------------------- */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -670,6 +675,202 @@ SIXTRL_INLINE int NS(ManagedBuffer_remap)(
 
         success |= NS(ManagedBuffer_remap_section_garbage)(
             begin, offsets, slot_size );
+    }
+
+    return success;
+}
+
+SIXTRL_INLINE int NS(ManagedBuffer_apply_addr_offset)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    NS(buffer_addr_diff_t) const addr_offset,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t)                           buf_size_t;
+    typedef NS(buffer_addr_t)                           address_t;
+    typedef NS(buffer_addr_diff_t)                      addr_diff_t;
+    typedef struct NS(Object)                           object_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC object_t*         ptr_to_object_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC address_t*        ptr_to_addr_t;
+    typedef NS(BufferGarbage)                           garbage_range_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC garbage_range_t*  ptr_to_garbage_t;
+
+    int success = -1;
+
+    SIXTRL_STATIC_VAR address_t  const ZERO_ADDR    = ( address_t  )0u;
+    SIXTRL_STATIC_VAR buf_size_t const ZERO_SIZE    = ( buf_size_t )0u;
+
+    SIXTRL_STATIC_VAR buf_size_t const BASE_ID      = ( buf_size_t )0u;
+    SIXTRL_STATIC_VAR buf_size_t const SLOTS_ID     = ( buf_size_t )3u;
+    SIXTRL_STATIC_VAR buf_size_t const OBJECTS_ID   = ( buf_size_t )4u;
+    SIXTRL_STATIC_VAR buf_size_t const DATAPTRS_ID  = ( buf_size_t )5u;
+    SIXTRL_STATIC_VAR buf_size_t const GARBAGE_ID   = ( buf_size_t )6u;
+
+    if( ( begin != SIXTRL_NULLPTR ) && ( ( slot_size != ZERO_SIZE ) &&
+        ( ( ( ( uintptr_t )begin ) % slot_size ) == 0u ) ) &&
+        ( !NS(ManagedBuffer_needs_remapping)( begin, slot_size ) ) )
+    {
+        if( addr_offset != ( addr_diff_t )0u )
+        {
+            buf_size_t const num_objects =
+                NS(ManagedBuffer_get_section_num_entities)(
+                    begin, OBJECTS_ID, slot_size );
+
+            buf_size_t const num_dataptrs =
+                NS(ManagedBuffer_get_section_num_entities)(
+                    begin, DATAPTRS_ID, slot_size );
+
+            buf_size_t const num_garbage_ranges =
+                NS(ManagedBuffer_get_section_num_entities)(
+                    begin, GARBAGE_ID, slot_size );
+
+            success = 0;
+
+            if( num_garbage_ranges > ZERO_SIZE )
+            {
+                ptr_to_garbage_t it  = ( ptr_to_garbage_t
+                    )NS(ManagedBuffer_get_ptr_to_section)(
+                        begin, GARBAGE_ID, slot_size );
+
+                ptr_to_garbage_t end = it + num_garbage_ranges;
+
+                SIXTRL_ASSERT( it != SIXTRL_NULLPTR );
+
+                for( ; it != end ; ++it )
+                {
+                    address_t const garbage_begin_addr =
+                        NS(BufferGarbage_get_begin_addr)( it );
+
+                    address_t const remap_slot_addr =
+                        NS(ManagedBuffer_perform_addr_shift)( garbage_begin_addr,
+                            addr_offset, slot_size );
+
+                    if( remap_slot_addr != ZERO_ADDR )
+                    {
+                        NS(BufferGarbage_set_begin_addr)( it, remap_slot_addr );
+                    }
+                    else
+                    {
+                       success = -1;
+                       break;
+                    }
+                }
+            }
+
+            if( ( success == 0 ) && ( num_dataptrs > ZERO_SIZE ) )
+            {
+                ptr_to_addr_t dataptr_it  = ( ptr_to_addr_t )(
+                    NS(ManagedBuffer_get_ptr_to_section_data)(
+                        begin, DATAPTRS_ID, slot_size ) );
+
+                ptr_to_addr_t dataptr_end = dataptr_it + num_dataptrs;
+
+                SIXTRL_ASSERT( dataptr_it != SIXTRL_NULLPTR );
+
+                for( ; dataptr_it != dataptr_end ; ++dataptr_it )
+                {
+                    ptr_to_addr_t slot_ptr =
+                        ( ptr_to_addr_t )( uintptr_t )*dataptr_it;
+
+                    address_t const remap_slot_addr =
+                        NS(ManagedBuffer_perform_addr_shift)(
+                            *slot_ptr, addr_offset, slot_size );
+
+                    address_t const remap_slot_ptr_addr =
+                        NS(ManagedBuffer_perform_addr_shift)(
+                            *dataptr_it, addr_offset, slot_size );
+
+                    if( ( remap_slot_addr     != ZERO_ADDR ) &&
+                        ( remap_slot_ptr_addr != ZERO_ADDR ) )
+                    {
+                        *slot_ptr   = remap_slot_addr;
+                        *dataptr_it = remap_slot_ptr_addr;
+                    }
+                    else
+                    {
+                        success = -1;
+                        break;
+                    }
+                }
+            }
+
+            if( ( success == 0 ) && ( num_objects > ZERO_SIZE ) )
+            {
+                ptr_to_object_t obj_it   = (ptr_to_object_t
+                    )NS(ManagedBuffer_get_ptr_to_section_data)(
+                        begin, OBJECTS_ID, slot_size );
+
+                ptr_to_object_t obj_end  = obj_it + num_objects;
+
+                SIXTRL_ASSERT( obj_it != SIXTRL_NULLPTR );
+
+                for( ; obj_it != obj_end ; ++obj_it )
+                {
+                    address_t const obj_begin_addr =
+                        NS(Object_get_begin_addr)( obj_it );
+
+                    address_t const remapped_obj_begin_addr =
+                            NS(ManagedBuffer_perform_addr_shift)(
+                                obj_begin_addr, addr_offset, slot_size );
+
+                    if( remapped_obj_begin_addr != ZERO_ADDR )
+                    {
+                        NS(Object_set_begin_addr)(
+                            obj_it, remapped_obj_begin_addr );
+                    }
+                    else
+                    {
+                        success = -1;
+                        break;
+                    }
+                }
+            }
+
+            if( success == 0 )
+            {
+                ptr_to_addr_t header = ( ptr_to_addr_t )( uintptr_t )begin;
+
+                address_t const remapped_base_addr =
+                    NS(ManagedBuffer_perform_addr_shift)(
+                        header[ BASE_ID ], addr_offset, slot_size );
+
+                address_t const remapped_slots_addr =
+                    NS(ManagedBuffer_perform_addr_shift)(
+                        header[ SLOTS_ID ], addr_offset, slot_size );
+
+                address_t const remapped_objects_addr =
+                    NS(ManagedBuffer_perform_addr_shift)(
+                        header[ OBJECTS_ID ], addr_offset, slot_size );
+
+                address_t const remapped_dataptrs_addr =
+                    NS(ManagedBuffer_perform_addr_shift)(
+                        header[ DATAPTRS_ID ], addr_offset, slot_size );
+
+                address_t const remapped_garbage_addr =
+                    NS(ManagedBuffer_perform_addr_shift)(
+                        header[ GARBAGE_ID ], addr_offset, slot_size );
+
+                if( ( remapped_base_addr     != ZERO_ADDR ) &&
+                    ( remapped_slots_addr    != ZERO_ADDR ) &&
+                    ( remapped_objects_addr  != ZERO_ADDR ) &&
+                    ( remapped_dataptrs_addr != ZERO_ADDR ) &&
+                    ( remapped_garbage_addr  != ZERO_ADDR ) )
+                {
+                    header[ BASE_ID     ] = remapped_base_addr;
+                    header[ SLOTS_ID    ] = remapped_slots_addr;
+                    header[ OBJECTS_ID  ] = remapped_objects_addr;
+                    header[ DATAPTRS_ID ] = remapped_dataptrs_addr;
+                    header[ GARBAGE_ID  ] = remapped_garbage_addr;
+                }
+                else
+                {
+                    success = -1;
+                }
+            }
+        }
+        else
+        {
+            success = 0;
+        }
     }
 
     return success;
