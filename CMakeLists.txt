@@ -146,6 +146,11 @@ endif()
 add_subdirectory( sixtracklib )
 
 # ------------------------------------------------------------------------------
+# Add tools
+
+add_subdirectory( tools )
+
+# ------------------------------------------------------------------------------
 # Add pysixtracklib Python 3.x bindings
 
 if( SIXTRACKL_ENABLE_PYTHON )
