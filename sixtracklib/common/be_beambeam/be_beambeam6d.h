@@ -17,6 +17,12 @@
     #include "sixtracklib/common/be_beambeam/gauss_fields.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
+#ifndef SIXTRL_BB_GET_PTR
+    #define SIXTRL_BB_GET_PTR(dataptr,name) \
+        (SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T*)(((SIXTRL_BE_DATAPTR_DEC SIXTRL_UINT64_T*) \
+        (&((dataptr)->name))) + ((SIXTRL_UINT64_T) (dataptr)->name) + 1)
+#endif /* defined( SIXTRL_BB_GET_PTR ) */
+
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */

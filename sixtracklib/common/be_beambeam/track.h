@@ -1,12 +1,6 @@
 #ifndef SIXTRACKLIB_COMMON_BE_BEAMBEAM_TRACK_BEAMBEAM_H__
 #define SIXTRACKLIB_COMMON_BE_BEAMBEAM_TRACK_BEAMBEAM_H__
 
-#ifndef SIXTRL_BB6_GET_PTR
-	#define SIXTRL_BB_GET_PTR(dataptr,name) \
-		 (SIXTRL_BE_DATAPTR_DEC real_t*)(((SIXTRL_BE_DATAPTR_DEC u64_t*) (&((dataptr)->name))) \
-		 	+ ((u64_t) (dataptr)->name) + 1)
-#endif
-
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
@@ -131,9 +125,8 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
     NS(particle_num_elements_t)  const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT bb )
 {
-    typedef NS(beambeam6d_real_const_ptr_t)  bb_data_ptr_t;
-    typedef SIXTRL_UINT64_T u64_t;
     typedef SIXTRL_REAL_T real_t;
+    typedef NS(beambeam6d_real_const_ptr_t)  bb_data_ptr_t;
     typedef SIXTRL_BE_DATAPTR_DEC BB6D_data* BB6D_data_ptr_t;
 
     int i_slice;
