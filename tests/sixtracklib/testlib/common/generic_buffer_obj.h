@@ -38,6 +38,15 @@ typedef struct NS(GenericObj)
 }
 NS(GenericObj);
 
+SIXTRL_FN SIXTRL_STATIC int NS(GenericObj_compare_values)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj) const* SIXTRL_RESTRICT lhs,
+    SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj) const* SIXTRL_RESTRICT rhs );
+
+SIXTRL_FN SIXTRL_STATIC int NS(GenericObj_compare_values_with_treshold)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj) const* SIXTRL_RESTRICT lhs,
+    SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj) const* SIXTRL_RESTRICT rhs,
+    SIXTRL_REAL_T const treshold );
+
 #if !defined( _GPUCODE )
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj)*
@@ -57,6 +66,18 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj)*
     SIXTRL_ARGPTR_DEC  SIXTRL_REAL_T const* SIXTRL_RESTRICT c_values,
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_UINT8_T* SIXTRL_RESTRICT d_values,
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T*  SIXTRL_RESTRICT e_values );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj)*
+    NS(GenericObj_add_copy)(
+        SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+        SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj) const* original );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_HOST_FN void NS(GenericObj_init_random)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj)* obj );
+
+#endif /* !defined( _GPUCODE ) */
 
 
 #if defined( __cplusplus )
@@ -198,12 +219,316 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj)* NS(GenericObj_add)(
     return ptr_gen_obj;
 }
 
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj)* NS(GenericObj_add_copy)(
+        SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+        SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj) const* original )
+{
+    if( original != SIXTRL_NULLPTR )
+    {
+        return NS(GenericObj_add)( buffer,
+            original->type_id, original->num_d, original->num_e,
+            original->a, original->b, &original->c[ 0 ],
+            original->d, original->e );
+    }
+
+    return SIXTRL_NULLPTR;
+}
+
 #endif /* !defined( _GPUCODE ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
+SIXTRL_INLINE int NS(GenericObj_compare_values)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj) const* SIXTRL_RESTRICT lhs,
+    SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj) const* SIXTRL_RESTRICT rhs )
+{
+    int cmp_result = -1;
+
+    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
+    {
+        if( lhs->type_id == rhs->type_id )
+        {
+            cmp_result = 0;
+        }
+        else if( lhs->type_id > rhs->type_id )
+        {
+            return -1;
+        }
+        else
+        {
+            return +1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->num_d != rhs->num_d ) )
+        {
+            if( lhs->num_d > rhs->num_d )
+            {
+                cmp_result = -1;
+            }
+            else if( lhs->num_d < rhs->num_d )
+            {
+                cmp_result = +1;
+            }
+
+            SIXTRL_ASSERT( ( cmp_result != 0 ) ||
+                ( ( lhs->d != SIXTRL_NULLPTR ) &&
+                  ( rhs->d != SIXTRL_NULLPTR ) ) );
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->num_e != rhs->num_e ) )
+        {
+            if( lhs->num_e > rhs->num_e )
+            {
+                cmp_result = -1;
+            }
+            else if( lhs->num_e < rhs->num_e )
+            {
+                cmp_result = +1;
+            }
+
+            SIXTRL_ASSERT( ( cmp_result != 0 ) ||
+                ( ( lhs->e != SIXTRL_NULLPTR ) &&
+                  ( rhs->e != SIXTRL_NULLPTR ) ) );
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->a != rhs->a ) )
+        {
+            if( lhs->a > rhs->a ) cmp_result = -1;
+            else if( lhs->a < rhs->a ) cmp_result = +1;
+        }
+
+        if( cmp_result == 0 )
+        {
+            if( lhs->b > rhs->b )
+            {
+                cmp_result = -1;
+            }
+            else if( lhs->b > rhs->b )
+            {
+                cmp_result = +1;
+            }
+        }
+
+        if( cmp_result == 0 )
+        {
+            int ii = 0;
+
+            for( ; ii < 4 ; ++ii )
+            {
+                if( lhs->c[ ii ] > rhs->c[ ii ] )
+                {
+                    cmp_result = -1;
+                }
+                else if( lhs->c[ ii ] < rhs->c[ ii ] )
+                {
+                    cmp_result = +1;
+                }
+
+                if( cmp_result != 0 ) break;
+            }
+        }
+
+        if( cmp_result == 0 )
+        {
+            SIXTRL_UINT64_T ii = 0;
+
+            SIXTRL_ASSERT( ( lhs->num_d == rhs->num_d ) &&
+                ( lhs->d != SIXTRL_NULLPTR ) &&
+                ( rhs->d != SIXTRL_NULLPTR ) );
+
+            for( ; ii < lhs->num_d ; ++ii )
+            {
+                if( lhs->d[ ii ] != rhs->d[ ii ] )
+                {
+                    if( lhs->d[ ii ] > rhs->d[ ii ] ) cmp_result = -1;
+                    else if( lhs->d[ ii ] < rhs->d[ ii ] ) cmp_result = +1;
+
+                    break;
+                }
+            }
+        }
+
+        if( cmp_result == 0 )
+        {
+            SIXTRL_UINT64_T ii = 0;
+
+            SIXTRL_ASSERT( ( lhs->num_e == rhs->num_e ) &&
+                ( lhs->e != SIXTRL_NULLPTR ) &&
+                ( rhs->e != SIXTRL_NULLPTR ) );
+
+            for( ; ii < lhs->num_e ; ++ii )
+            {
+                if( lhs->e[ ii ] > rhs->e[ ii ] )
+                {
+                    cmp_result = -1;
+                }
+                else if( lhs->e[ ii ] < rhs->e[ ii ] )
+                {
+                    cmp_result = +1;
+                }
+
+                if( cmp_result != 0 ) break;
+            }
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        cmp_result = +1;
+    }
+
+    return cmp_result;
+}
+
+SIXTRL_INLINE int NS(GenericObj_compare_values_with_treshold)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj) const* SIXTRL_RESTRICT lhs,
+    SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj) const* SIXTRL_RESTRICT rhs,
+    SIXTRL_REAL_T const treshold )
+{
+    int cmp_result = -1;
+
+    SIXTRL_ASSERT( treshold >= ( SIXTRL_REAL_T )0.0 );
+
+    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
+    {
+        if( lhs->type_id == rhs->type_id )
+        {
+            cmp_result = 0;
+        }
+        else if( lhs->type_id > rhs->type_id )
+        {
+            return -1;
+        }
+        else
+        {
+            return +1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->num_d != rhs->num_d ) )
+        {
+            if( lhs->num_d > rhs->num_d )
+            {
+                cmp_result = -1;
+            }
+            else if( lhs->num_d < rhs->num_d )
+            {
+                cmp_result = +1;
+            }
+
+            SIXTRL_ASSERT( ( cmp_result != 0 ) ||
+                ( ( lhs->d != SIXTRL_NULLPTR ) &&
+                  ( rhs->d != SIXTRL_NULLPTR ) ) );
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->num_e != rhs->num_e ) )
+        {
+            if( lhs->num_e > rhs->num_e )
+            {
+                cmp_result = -1;
+            }
+            else if( lhs->num_e < rhs->num_e )
+            {
+                cmp_result = +1;
+            }
+
+            SIXTRL_ASSERT( ( cmp_result != 0 ) ||
+                ( ( lhs->e != SIXTRL_NULLPTR ) &&
+                  ( rhs->e != SIXTRL_NULLPTR ) ) );
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->a != rhs->a ) )
+        {
+            if( lhs->a > rhs->a )
+            {
+                cmp_result = -1;
+            }
+            else if( lhs->a < rhs->a )
+            {
+                cmp_result = +1;
+            }
+        }
+
+        if( cmp_result == 0 )
+        {
+            SIXTRL_REAL_T const diff = ( lhs->b >= rhs->b )
+                ? ( lhs->b - rhs->b ) : ( rhs->b - lhs->b );
+
+            if( diff > treshold )
+            {
+                cmp_result = ( lhs->b > rhs->b ) ? -1 : +1;
+            }
+        }
+
+        if( cmp_result == 0 )
+        {
+            int ii = 0;
+
+            for( ; ii < 4 ; ++ii )
+            {
+                SIXTRL_REAL_T const diff = ( lhs->c[ ii ] >= rhs->c[ ii ] )
+                    ? ( lhs->c[ ii ] - rhs->c[ ii ] )
+                    : ( rhs->c[ ii ] - lhs->c[ ii ] );
+
+                if( diff > treshold )
+                {
+                    cmp_result = ( lhs->c[ ii ] > rhs->c[ ii ] ) ? -1 : +1;
+                }
+
+                if( cmp_result != 0 ) break;
+            }
+        }
+
+        if( cmp_result == 0 )
+        {
+            SIXTRL_UINT64_T ii = 0;
+
+            SIXTRL_ASSERT( ( lhs->num_d == rhs->num_d ) &&
+                ( lhs->d != SIXTRL_NULLPTR ) &&
+                ( rhs->d != SIXTRL_NULLPTR ) );
+
+            for( ; ii < lhs->num_d ; ++ii )
+            {
+                if( lhs->d[ ii ] != rhs->d[ ii ] )
+                {
+                    if( lhs->d[ ii ] > rhs->d[ ii ] ) cmp_result = -1;
+                    else if( lhs->d[ ii ] < rhs->d[ ii ] ) cmp_result = +1;
+
+                    break;
+                }
+            }
+        }
+
+        if( cmp_result == 0 )
+        {
+            SIXTRL_UINT64_T ii = 0;
+
+            SIXTRL_ASSERT( ( lhs->num_e == rhs->num_e ) &&
+                ( lhs->e != SIXTRL_NULLPTR ) &&
+                ( rhs->e != SIXTRL_NULLPTR ) );
+
+            for( ; ii < lhs->num_e ; ++ii )
+            {
+                SIXTRL_REAL_T const diff = ( lhs->e[ ii ] >= rhs->e[ ii ] )
+                    ? ( lhs->e[ ii ] - rhs->e[ ii ] )
+                    : ( rhs->e[ ii ] - lhs->e[ ii ] );
+
+                if( diff > treshold )
+                {
+                    cmp_result = ( lhs->c[ ii ] > rhs->c[ ii ] ) ? -1 : +1;
+                }
+
+                if( cmp_result != 0 ) break;
+            }
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        cmp_result = +1;
+    }
+
+    return cmp_result;
+}
 
 #endif /* SIXTRACKLIB_TESTS_TESTLIB_GENERIC_BUFFER_H__ */
 

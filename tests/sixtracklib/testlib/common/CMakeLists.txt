@@ -11,6 +11,7 @@ set( TESTLIB_COMMON_C99_HEADERS
 
 set( TESTLIB_COMMON_C99_SOURCES
      beam_elements.c
+     generic_buffer_obj.c
      gpu_kernel.c
      particles.c
      random.c
