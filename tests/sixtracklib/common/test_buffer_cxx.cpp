@@ -16,6 +16,8 @@
 #include "sixtracklib/testlib/testdata/testdata_files.h"
 #include "sixtracklib/common/buffer.hpp"
 
+#include "sixtracklib/testlib.h"
+
 namespace sixtrack
 {
     struct MyObj
@@ -1021,19 +1023,238 @@ TEST( CXX_CommonBufferTests, AddGenericObjectsTestAutoGrowingOfBuffer )
     ASSERT_TRUE( buffer.getNumObjects() == NUM_OBJECTS_TO_ADD );
 }
 
-
-TEST( CXX_CommonBufferTests, ConstractFromBinaryDumpFile )
+TEST( CXX_CommonBufferTests, DumpToFileConstructFromDumpCompare)
 {
     namespace st = sixtrack;
-    using buf_size_t = st::Buffer::size_type;
 
-    st::Buffer buffer( ::st_PATH_TO_BBSIMPLE_BEAM_ELEMENTS_SIXTRACK );
+    using buf_size_t  = st::Buffer::size_type;
+    using prng_seed_t = unsigned long long;
+
+    prng_seed_t const seed = prng_seed_t{ 20181105 };
+    ::st_Random_init_genrand64( seed );
+
+    st::Buffer buffer;
+
+    buf_size_t const NUM_OBJECTS  = buf_size_t{ 100 };
+    buf_size_t const num_d_values = buf_size_t{ 10  };
+    buf_size_t const num_e_values = buf_size_t{ 10  };
+
+    for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_OBJECTS ; ++ii )
+    {
+        ::st_object_type_id_t const type_id =
+            static_cast< ::st_object_type_id_t >( ii );
+
+        ::st_GenericObj* obj = ::st_GenericObj_new(
+                &buffer, type_id, num_d_values, num_e_values );
+
+        ASSERT_TRUE( obj != nullptr );
+        ::st_GenericObj_init_random( obj );
+    }
 
     ASSERT_TRUE( buffer.size()           >  buf_size_t{ 0 } );
     ASSERT_TRUE( buffer.capacity()       >= buffer.size() );
-    ASSERT_TRUE( buffer.getNumObjects()  >  buf_size_t{ 0 } );
-    ASSERT_TRUE( buffer.getNumSlots()    >  buf_size_t{ 0 } );
-    ASSERT_TRUE( buffer.getNumDataptrs() >  buf_size_t{ 0 } );
+    ASSERT_TRUE( buffer.getNumObjects()  == NUM_OBJECTS );
+
+    std::string const temp_dump_file( "./temp_binary_dump.bin" );
+    double const ABS_TRESHOLD = std::numeric_limits< double >::epsilon();
+
+    ASSERT_TRUE( buffer.writeToFile( temp_dump_file ) );
+
+    st::Buffer cmp_buffer( temp_dump_file );
+    ASSERT_TRUE( cmp_buffer.getNumObjects() == NUM_OBJECTS );
+
+    for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_OBJECTS ; ++ii )
+    {
+        auto orig_ptr     = buffer[ ii ];
+        auto restored_ptr = cmp_buffer[ ii ];
+
+        ASSERT_TRUE( orig_ptr != nullptr );
+        ASSERT_TRUE( restored_ptr != nullptr );
+        ASSERT_TRUE( restored_ptr != orig_ptr );
+
+        ::st_GenericObj const* orig_obj = reinterpret_cast<
+            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( orig_ptr ) );
+
+        ::st_GenericObj const* restored_obj = reinterpret_cast<
+            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr(
+                restored_ptr ) );
+
+        ASSERT_TRUE( orig_obj != nullptr );
+        ASSERT_TRUE( restored_obj != nullptr );
+        ASSERT_TRUE( restored_obj != orig_obj );
+
+        ASSERT_TRUE(
+            ( 0 == ::st_GenericObj_compare_values( orig_obj, restored_obj ) ) ||
+            ( 0 == ::st_GenericObj_compare_values_with_treshold(
+                orig_obj, restored_obj, ABS_TRESHOLD ) ) );
+    }
+
+    std::remove( temp_dump_file.c_str() );
+}
+
+
+TEST( CXX_CommonBufferTests, WriteBufferNormalizedAddrRestoreVerify )
+{
+    namespace st = sixtrack;
+
+    using buf_size_t  = st::Buffer::size_type;
+    using address_t   = st::Buffer::address_t;
+    using prng_seed_t = unsigned long long;
+
+    prng_seed_t const seed = prng_seed_t{ 20181105 };
+    ::st_Random_init_genrand64( seed );
+
+    st::Buffer cmp_buffer;
+    st::Buffer temp_buffer;
+
+    buf_size_t const NUM_OBJECTS  = buf_size_t{ 100 };
+    buf_size_t const num_d_values = buf_size_t{ 10  };
+    buf_size_t const num_e_values = buf_size_t{ 10  };
+
+    for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_OBJECTS ; ++ii )
+    {
+        ::st_object_type_id_t const type_id =
+            static_cast< ::st_object_type_id_t >( ii );
+
+        ::st_GenericObj* obj = ::st_GenericObj_new(
+                &cmp_buffer, type_id, num_d_values, num_e_values );
+
+        ASSERT_TRUE( obj != nullptr );
+        ::st_GenericObj_init_random( obj );
+
+        ::st_GenericObj* copy_obj = ::st_GenericObj_add_copy(
+                &temp_buffer, obj );
+
+        ASSERT_TRUE( copy_obj != nullptr );
+        ASSERT_TRUE( copy_obj != obj );
+    }
+
+    double const ABS_TRESHOLD = std::numeric_limits< double >::epsilon();
+
+    ASSERT_TRUE( cmp_buffer.getNumObjects()  == NUM_OBJECTS );
+    ASSERT_TRUE( temp_buffer.getNumObjects() == NUM_OBJECTS );
+    ASSERT_TRUE( temp_buffer.size() == cmp_buffer.size() );
+
+    for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_OBJECTS ; ++ii )
+    {
+        auto orig_ptr = cmp_buffer[ ii ];
+        auto copy_ptr = temp_buffer[ ii ];
+
+        ASSERT_TRUE( orig_ptr != nullptr );
+        ASSERT_TRUE( copy_ptr != nullptr );
+        ASSERT_TRUE( copy_ptr != orig_ptr );
+
+        ::st_GenericObj const* orig_obj = reinterpret_cast<
+            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( orig_ptr ) );
+
+        ::st_GenericObj const* copy_obj = reinterpret_cast<
+            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( copy_ptr ) );
+
+        ASSERT_TRUE( orig_obj != nullptr );
+        ASSERT_TRUE( copy_obj != nullptr );
+        ASSERT_TRUE( copy_obj != orig_obj );
+
+        ASSERT_TRUE(
+            ( 0 == ::st_GenericObj_compare_values( orig_obj, copy_obj ) ) ||
+            ( 0 == ::st_GenericObj_compare_values_with_treshold(
+                orig_obj, copy_obj, ABS_TRESHOLD ) ) );
+    }
+
+    /* Write file and remap the contents to a normalized base address: */
+
+    address_t const base_addr = temp_buffer.getDataBeginAddr();
+
+    address_t const target_addr = ( base_addr != address_t { 0x1000 } )
+        ? address_t { 0x1000 } : address_t { 0x2000 };
+
+    std::string const path_to_temp_file( "./temp_norm_addr_cxx.bin" );
+
+    ASSERT_TRUE( temp_buffer.writeToFileNormalizedAddr(
+        path_to_temp_file, target_addr ) );
+
+    /* repeat the previous checks to verify that the normaliezd write to a
+     * file has not changed temp_buffer */
+
+    ASSERT_TRUE( base_addr == temp_buffer.getDataBeginAddr() );
+    ASSERT_TRUE( temp_buffer.getNumObjects() == NUM_OBJECTS );
+    ASSERT_TRUE( cmp_buffer.size() == temp_buffer.size() );
+
+    for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_OBJECTS ; ++ii )
+    {
+        auto orig_ptr = cmp_buffer[ ii ];
+        auto copy_ptr = temp_buffer[ ii ];
+
+        ASSERT_TRUE( orig_ptr != nullptr );
+        ASSERT_TRUE( copy_ptr != nullptr );
+        ASSERT_TRUE( copy_ptr != orig_ptr );
+
+        ::st_GenericObj const* orig_obj = reinterpret_cast<
+            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( orig_ptr ) );
+
+        ::st_GenericObj const* copy_obj = reinterpret_cast<
+            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( copy_ptr ) );
+
+        ASSERT_TRUE( orig_obj != nullptr );
+        ASSERT_TRUE( copy_obj != nullptr );
+        ASSERT_TRUE( copy_obj != orig_obj );
+
+        ASSERT_TRUE(
+            ( 0 == ::st_GenericObj_compare_values( orig_obj, copy_obj ) ) ||
+            ( 0 == ::st_GenericObj_compare_values_with_treshold(
+                orig_obj, copy_obj, ABS_TRESHOLD ) ) );
+    }
+
+    /* First open the binary file and verify that the base address has been
+     * changed to the target address successfully */
+
+    FILE* fp = std::fopen( path_to_temp_file.c_str(), "rb" );
+    ASSERT_TRUE( fp != nullptr );
+
+    address_t stored_base_address = address_t{ 0 };
+
+    std::size_t const cnt = std::fread(
+        &stored_base_address, sizeof( address_t ), 1u, fp );
+
+    ASSERT_TRUE( cnt == std::size_t{ 1 } );
+    ASSERT_TRUE( stored_base_address == target_addr );
+
+    std::fclose( fp );
+    fp = nullptr;
+
+    /* Then restore from the normalized dump and verify that the restored
+     * buffer content is equal to the original cmp_buffer objects */
+
+    st::Buffer restored_buffer( path_to_temp_file );
+    std::remove( path_to_temp_file.c_str() );
+
+    ASSERT_TRUE( !restored_buffer.needsRemapping() );
+    ASSERT_TRUE(  restored_buffer.getNumObjects() == NUM_OBJECTS );
+    ASSERT_TRUE(  restored_buffer.size() == cmp_buffer.size() );
+
+    for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_OBJECTS ; ++ii )
+    {
+        auto orig_ptr = cmp_buffer[ ii ];
+        auto rest_ptr = restored_buffer[ ii ];
+
+        ASSERT_TRUE( orig_ptr != nullptr );
+        ASSERT_TRUE( rest_ptr != nullptr );
+        ASSERT_TRUE( rest_ptr != orig_ptr );
+
+        ::st_GenericObj const* orig_obj = reinterpret_cast<
+            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( orig_ptr ) );
+
+        ::st_GenericObj const* rest_obj = reinterpret_cast<
+            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( rest_ptr ) );
+
+        ASSERT_TRUE( orig_obj != nullptr );
+        ASSERT_TRUE( rest_obj != nullptr );
+        ASSERT_TRUE( rest_obj != orig_obj );
+
+        ASSERT_TRUE(
+            ( 0 == ::st_GenericObj_compare_values( orig_obj, rest_obj ) ) ||
+            ( 0 == ::st_GenericObj_compare_values_with_treshold(
+                orig_obj, rest_obj, ABS_TRESHOLD ) ) );
+    }
 }
 
 /* ************************************************************************* */
