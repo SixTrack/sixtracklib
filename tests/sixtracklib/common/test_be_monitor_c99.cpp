@@ -559,24 +559,11 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
 
     for( nturn_t ii = nturn_t{ 0 } ; ii < NUM_TURNS ; ++ii )
     {
-        size_t beam_element_id = size_t{ 0 };
-        ::st_Object const* obj_it = obj_begin;
+        std::fill( ::st_Particles_get_at_element_id( particles ),
+            ::st_Particles_get_at_element_id( particles ) + NUM_PARTICLES, 0u );
 
-        for( size_t jj = size_t{ 0 } ; jj < NUM_PARTICLES ; ++jj )
-        {
-            ::st_Particles_set_at_element_id_value( particles, jj, 0 );
-        }
-
-        for( ; obj_it != obj_end ; ++obj_it )
-        {
-            ::st_Particles* cmp_particles = ::st_Particles_add_copy(
-                    cmp_particles_buffer, particles );
-
-            ASSERT_TRUE( cmp_particles != nullptr );
-
-            ::st_Track_all_particles_beam_element_obj(
-                particles, beam_element_id++, obj_it );
-        }
+        ASSERT_TRUE( 0 == ::st_Track_all_particles_append_element_by_element(
+            particles, 0u, eb, cmp_particles_buffer ) );
 
         ::st_Track_all_particles_increment_at_turn( particles );
     }
