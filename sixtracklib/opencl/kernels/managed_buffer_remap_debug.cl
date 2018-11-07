@@ -12,7 +12,18 @@
 
 #pragma OPENCL_EXTENSION cl_khr_int32_extended_atomics
 
-__kernel void NS(ManagedBuffer_remap_opencl)(
+__kernel void NS(ManagedBuffer_remap_debug_opencl)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag );
+
+__kernel void NS(ManagedBuffer_remap_io_buffers_debug_opencl)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT in_buffer_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag );
+
+/* ========================================================================= */
+
+__kernel void NS(ManagedBuffer_remap_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
     SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag )
 {
@@ -41,7 +52,7 @@ __kernel void NS(ManagedBuffer_remap_opencl)(
     return;
 }
 
-__kernel void NS(ManagedBuffer_remap_io_buffers_opencl)(
+__kernel void NS(ManagedBuffer_remap_io_buffers_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT in_buffer_begin,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer_begin,
     SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag )
@@ -103,4 +114,4 @@ __kernel void NS(ManagedBuffer_remap_io_buffers_opencl)(
 
 #endif /* SIXTRACKLIB_OPENCL_INTERNAL_MANAGED_BUFFER_REMAP_KERNEL_OPENCL_CL__ */
 
-/* end: sixtracklib/opencl/private/managed_buffer_remap_kernel.cl */
+/* end: sixtracklib/opencl/kernels/managed_buffer_remap_debug.cl */

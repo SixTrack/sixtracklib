@@ -105,7 +105,7 @@ TEST( C99_OpenCL_ParticlesTests, CopyParticlesHostToDeviceThenBackCompare )
 
         std::string path_to_source = ::st_PATH_TO_BASE_DIR;
         path_to_source += "sixtracklib/opencl/kernels/";
-        path_to_source += "managed_buffer_remap_kernel.cl";
+        path_to_source += "managed_buffer_remap.cl";
 
         std::ifstream kernel_file( path_to_source, std::ios::in );
 
