@@ -107,9 +107,6 @@ namespace SIXTRL_CXX_NAMESPACE
         cl::Buffer&         openClBuffer()       SIXTRL_NOEXCEPT;
         cl::Buffer const&   openClBuffer() const SIXTRL_NOEXCEPT;
 
-        cl::Buffer const& internalSuccessFlagBuffer() const SIXTRL_NOEXCEPT;
-        cl::Buffer& internalSuccessFlagBuffer() SIXTRL_NOEXCEPT;
-
         protected:
 
         virtual int doWriteAndRemapCObjBuffer(
@@ -130,7 +127,6 @@ namespace SIXTRL_CXX_NAMESPACE
             cobj_buffer_t* SIXTRL_RESTRICT buffer );
 
         cl::Buffer                      m_cl_buffer;
-        cl::Buffer                      m_cl_success_flag;
 
         mutable cobj_buffer_t*          m_ptr_cobj_buffer;
         mutable context_base_t*         m_ptr_context;
@@ -227,10 +223,6 @@ SIXTRL_HOST_FN bool NS(ClArgument_attach_to_context)(
 
 SIXTRL_HOST_FN cl_mem NS(ClArgument_get_opencl_buffer)(
     NS(ClArgument)* SIXTRL_RESTRICT argument );
-
-SIXTRL_HOST_FN cl_mem NS(ClArgument_get_internal_opencl_success_flag_buffer)(
-    NS(ClArgument)* SIXTRL_RESTRICT argument );
-
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }

@@ -17,34 +17,41 @@
 __kernel void NS(BeamMonitor_assign_io_buffer_from_offset_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT io_buffer,
-    unsigned long const num_particles,
-    unsigned long const io_particles_block_offset,
-    SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag );
+    SIXTRL_UINT64_T const num_particles,
+    SIXTRL_UINT64_T const io_particles_block_offset,
+    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag );
 
 /* ========================================================================= */
 
 __kernel void NS(BeamMonitor_assign_io_buffer_from_offset_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT io_buffer,
-    unsigned long const num_particles,
-    unsigned long const io_particles_block_offset,
-    SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag )
+    SIXTRL_UINT64_T const num_particles,
+    SIXTRL_UINT64_T const io_particles_block_offset,
+    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag )
 {
     typedef NS(buffer_size_t) buf_size_t;
+    buf_size_t const slot_size = ( size_t )8u;
 
-    size_t const global_id   = get_global_id( 0 );
-    size_t const global_size = get_global_size( 0 );
-    size_t const slot_size   = ( size_t )8u;
+    SIXTRL_INT32_T success_flag = ( SIXTRL_INT32_T )-1;
 
-    size_t const gid_to_assign_io_buffer = ( size_t )0u;
-
-    int success_flag = 0;
-
-    if( global_id == gid_to_assign_io_buffer )
+    if( ( num_particles > ( SIXTRL_UINT64_t )0u ) &&
+        ( !NS(ManagedBuffer_needs_remapping)( beam_elements_buf, slot_size ) ) &&
+        ( !NS(ManagedBuffer_needs_remapping)( io_buffer, slot_size ) ) &&
+        (  NS(ManagedBuffer_get_num_objects)( io_buffer, slot_size ) >=
+            io_particles_block_offset ) )
     {
-        success_flag = NS(BeamMonitor_assign_io_buffer_from_offset)(
-            beam_elements_buf, io_buffer, num_particles,
-                io_particles_block_offset );
+        size_t const gid_to_assign_io_buffer = ( size_t )0u;
+        size_t const global_id = get_global_id( 0 );
+
+        success_flag = ( SIXTRL_INT32_T )0u;
+
+        if( global_id == gid_to_assign_io_buffer )
+        {
+            success_flag = NS(BeamMonitor_assign_managed_io_buffer)(
+                beam_elements_buf, io_buffer, num_particles,
+                    io_particles_block_offset );
+        }
     }
 
     if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )

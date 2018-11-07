@@ -14,77 +14,84 @@
 
 #pragma OPENCL_EXTENSION cl_khr_int32_extended_atomics
 
-__kernel void NS(Remap_particles_beam_elements_buffers_debug_opencl)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag );
+__kernel void NS(Track_particles_single_turn_opencl)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char*  SIXTRL_RESTRICT particles_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char*  SIXTRL_RESTRICT belem_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag );
 
-__kernel void NS(Track_particles_beam_elements_debug_opencl)(
+__kernel void NS(Track_particles_until_turn_opencl)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT  particles_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT  belem_buf,
+    SIXTRL_INT64_T const turn,
+    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag );
+
+__kernel void NS(Track_particles_elem_by_elem_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
-    SIXTRL_UINT64_T const num_turns,
-    SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag );
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT elem_by_elem_buf,
+    SIXTRL_UINT64_T const io_particle_blocks_offset,
+    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag );
 
 /* ========================================================================= */
 
-__kernel void NS(Remap_particles_beam_elements_buffers_debug_opencl)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag )
+__kernel void NS(Track_particles_single_turn_opencl)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char*  SIXTRL_RESTRICT particles_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char*  SIXTRL_RESTRICT belem_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag )
 {
-    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(buffer_size_t)                                buf_size_t;
+    typedef NS(particle_num_elements_t)                      num_element_t;
+    typedef NS(particle_index_t)                             index_t;
 
-    size_t const global_id                     = get_global_id( 0 );
-    size_t const global_size                   = get_global_size( 0 );
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object)*        obj_iter_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object) const*  obj_const_iter_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC     NS(Particles)*     ptr_particles_t;
 
-    size_t const gid_to_remap_particles_buffer     = ( size_t )0u;
-    size_t const gid_to_remap_beam_elements_buffer = ( global_size > 1u )
-        ? ( gid_to_remap_particles_buffer + 1u )
-        : ( gid_to_remap_particles_buffer );
+    buf_size_t const  slot_size = ( buf_size_t )8u;
+    SIXTRL_INT32_T success_flag = ( SIXTRL_INT32_T )-1;
 
-    if( global_id <= gid_to_remap_beam_elements_buffer )
+    if( ( !NS(ManagedBuffer_needs_remapping)( particles_buf, slot_size) ) &&
+        (  NS(ManagedBuffer_get_num_objects)(
+                particles_buf, slot_size ) == ( buf_size_t )1u ) &&
+        ( !NS(ManagedBuffer_needs_remapping)( belem_buf, slot_size ) ) )
     {
-        buf_size_t const slot_size = ( buf_size_t )8u;
-        int success_flag = ( int )0u;
+        num_element_t particle_id   = ( num_element_t )get_global_id( 0 );
+        num_element_t const stride  = ( num_element_t )get_local_size( 0 );
 
-        if( global_id == gid_to_remap_particles_buffer )
+        obj_const_iter_t be_begin = NS(ManagedBuffer_get_const_objects_index_begin)(
+            belem_buf, slot_size );
+
+        obj_const_iter_t be_end = NS(ManagedBuffer_get_const_objects_index_end)(
+            belem_buf, slot_size );
+
+        ptr_particles_t particles = NS(Particles_managed_buffer_get_particles)(
+        particles_buf, 0u, slot_size );
+
+        num_element_t const num_particles =
+            NS(Particles_get_num_of_particles)( particles );
+
+        SIXTRL_ASSERT( NS(ManagedBuffer_get_num_objects)(
+            belem_buf, slot_size ) > ( buf_size_t )0u );
+
+        SIXTRL_ASSERT( NS(Particles_managed_buffer_is_particles_buffer)(
+            particles_buffer, slot_size ) );
+
+        SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+
+        success_flag = ( SIXTRL_INT32_T )0u;
+
+        for( ; particle_id < num_particles ; particle_id += stride )
         {
-            if( ( particles_buf != SIXTRL_NULLPTR ) &&
-                ( beam_elements_buf != particles_buf ) )
-            {
-                if( 0 != NS(ManagedBuffer_remap)( particles_buf, slot_size ) )
-                {
-                    success_flag |= -2;
-                }
-            }
-            else
-            {
-                success_flag |= -1;
-            }
-        }
+            success_flag |= NS(Track_particle_beam_elements_obj)(
+                particles, particle_id, be_begin, be_end );
 
-        if( global_id == gid_to_remap_beam_elements_buffer )
-        {
-            if( ( beam_elements_buf != SIXTRL_NULLPTR ) &&
-                ( particles_buf != beam_elements_buf ) )
-            {
-                if( 0 != NS(ManagedBuffer_remap)(
-                        beam_elements_buf, slot_size ) )
-                {
-                    success_flag |= -4;
-                }
-            }
-            else
-            {
-                success_flag |= -1;
-            }
+            NS(Track_particle_increment_at_turn)( particles, particle_id );
         }
+    }
 
-        if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )
-        {
-
-            atomic_or( ptr_success_flag, success_flag );
-        }
+    if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )
+    {
+        atomic_or( ptr_success_flag, success_flag );
     }
 
     return;
@@ -92,84 +99,159 @@ __kernel void NS(Remap_particles_beam_elements_buffers_debug_opencl)(
 
 /* ------------------------------------------------------------------------- */
 
-__kernel void NS(Track_particles_beam_elements_debug_opencl)(
+__kernel void NS(Track_particles_until_turn_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
-    SIXTRL_UINT64_T const num_turns,
-    SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag )
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buf,
+    SIXTRL_INT64_T const turn,
+    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag )
 {
-    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(buffer_size_t)                                buf_size_t;
+    typedef NS(particle_num_elements_t)                      num_element_t;
+
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object)*        obj_iter_t;
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object) const*  obj_const_iter_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC     NS(Particles)*     ptr_particles_t;
 
-    int success_flag = ( int )0u;
-    buf_size_t const slot_size = ( buf_size_t )8u;
+    buf_size_t const  slot_size = ( buf_size_t )8u;
+    SIXTRL_INT32_T success_flag = ( SIXTRL_INT32_T )-1;
 
-    if( ( !NS(ManagedBuffer_needs_remapping( particles_buf, slot_size ) ) ) &&
-        ( !NS(ManagedBuffer_needs_remapping( beam_elements_buf, slot_size ) ) ) )
+    if( ( !NS(ManagedBuffer_needs_remapping)( particles_buf, slot_size) ) &&
+        (  NS(ManagedBuffer_get_num_objects)(
+                particles_buf, slot_size ) == ( buf_size_t )1u ) &&
+        ( !NS(ManagedBuffer_needs_remapping)( belem_buf, slot_size ) ) )
     {
-        size_t const stride             = get_local_size( 0 );
-        size_t global_particle_id       = get_global_id( 0 );
-        size_t object_begin_particle_id = ( size_t )0u;
-
-        obj_iter_t part_block_it  = NS(ManagedBuffer_get_objects_index_begin)(
-            particles_buf, slot_size );
-
-        obj_iter_t part_block_end = NS(ManagedBuffer_get_objects_index_end)(
-            particles_buf, slot_size );
+        num_element_t particle_id  = ( num_element_t )get_global_id( 0 );
+        num_element_t const stride = ( num_element_t )get_local_size( 0 );
 
         obj_const_iter_t be_begin =
             NS(ManagedBuffer_get_const_objects_index_begin)(
-                beam_elements_buf, slot_size );
+                belem_buf, slot_size );
 
-        obj_const_iter_t be_end   =
-            NS(ManagedBuffer_get_const_objects_index_end)(
-                beam_elements_buf, slot_size );
+        obj_const_iter_t be_end = NS(ManagedBuffer_get_const_objects_index_end)(
+            belem_buf, slot_size );
 
-        for( ; part_block_it != part_block_end ; ++part_block_it )
+        ptr_particles_t particles = NS(Particles_managed_buffer_get_particles)(
+        particles_buf, 0u, slot_size );
+
+        num_element_t const num_particles =
+            NS(Particles_get_num_of_particles)( particles );
+
+        SIXTRL_ASSERT( NS(ManagedBuffer_get_num_objects)(
+            belem_buf, slot_size ) > ( buf_size_t )0u );
+
+        SIXTRL_ASSERT( NS(Particles_managed_buffer_is_particles_buffer)(
+            particles_buffer, slot_size ) );
+
+        SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+
+        success_flag = ( SIXTRL_INT32_T )0u;
+
+        for( ; particle_id < num_particles ; particle_id += stride )
         {
-            ptr_particles_t particles = ( ptr_particles_t )(
-                uintptr_t )NS(Object_get_begin_addr)( part_block_it );
-
-            size_t const object_end_particle_id = object_begin_particle_id +
-                NS(Particles_get_num_of_particles)( particles );
-
-            SIXTRL_ASSERT( NS(Object_get_type_id)( part_block_it ) ==
-                           NS(OBJECT_TYPE_PARTICLE) );
-
-            if( ( global_particle_id <  object_end_particle_id   ) &&
-                ( global_particle_id >= object_begin_particle_id ) )
-            {
-                size_t const particle_id =
-                    global_particle_id - object_begin_particle_id;
-
-                SIXTRL_ASSERT( particle_id <
-                    NS(Particles_get_num_of_particles)( particles ) );
-
-                success_flag |= NS(Track_particle_until_turn_obj)(
-                    particles, particle_id, be_begin, be_end, num_turns );
-            }
-
-            object_begin_particle_id = object_end_particle_id;
-        }
-    }
-    else
-    {
-        if( NS(ManagedBuffer_needs_remapping( particles_buf, slot_size ) ) )
-        {
-            success_flag |= -2;
-        }
-
-        if( NS(ManagedBuffer_needs_remapping( beam_elements_buf, slot_size ) ) )
-        {
-            success_flag |= -4;
+            success_flag |= NS(Track_particle_until_turn_obj)(
+                particles, particle_id, be_begin, be_end, turn );
         }
     }
 
     if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )
     {
+        atomic_or( ptr_success_flag, success_flag );
+    }
 
+    return;
+}
+
+/* ------------------------------------------------------------------------- */
+
+__kernel void NS(Track_particles_elem_by_elem_opencl)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT elem_by_elem_buf,
+    SIXTRL_UINT64_T const io_particle_blocks_offset,
+    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag )
+{
+    typedef NS(buffer_size_t)                                buf_size_t;
+    typedef NS(particle_num_elements_t)                      num_element_t;
+    typedef NS(particle_index_t)                             index_t;
+
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object)*        obj_iter_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object) const*  obj_const_iter_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC     NS(Particles)*     ptr_particles_t;
+
+
+    buf_size_t const  slot_size = ( buf_size_t )8u;
+    SIXTRL_INT32_T success_flag = ( SIXTRL_INT32_T )-1;
+
+    if( ( !NS(ManagedBuffer_needs_remapping)( elem_by_elem_buf, slot_size ) ) &&
+        ( !NS(ManagedBuffer_needs_remapping)( particles_buf, slot_size) ) &&
+        (  NS(ManagedBuffer_get_num_objects)(
+                particles_buf, slot_size ) == ( buf_size_t )1u ) &&
+        ( !NS(ManagedBuffer_needs_remapping)( belem_buf, slot_size ) ) &&
+        ( ( NS(ManagedBuffer_get_num_objects)( belem_buf, slot_size ) +
+            io_particle_blocks_offset ) <= NS(ManagedBuffer_get_num_objects)(
+                elem_by_elem_buf, slot_size ) ) )
+    {
+        buf_size_t const slot_size = ( buf_size_t )8u;
+        num_element_t particle_id  = ( num_element_t )get_global_id( 0 );
+        num_element_t const stride = ( num_element_t )get_local_size( 0 );
+
+        obj_const_iter_t be_begin =
+            NS(ManagedBuffer_get_const_objects_index_begin)(
+                belem_buf, slot_size );
+
+        obj_const_iter_t be_end = NS(ManagedBuffer_get_const_objects_index_end)(
+            belem_buf, slot_size );
+
+        ptr_particles_t particles = NS(Particles_managed_buffer_get_particles)(
+        particles_buf, 0u, slot_size );
+
+        obj_iter_t io_obj_begin = NS(ManagedBuffer_get_objects_index_begin)(
+            elem_by_elem_buf, slot_size );
+
+        num_element_t const num_particles =
+            NS(Particles_get_num_of_particles)( particles );
+
+        SIXTRL_ASSERT( be_begin     != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( be_end       != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( io_obj_begin != SIXTRL_NULLPTR );
+
+        SIXTRL_ASSERT( NS(Particles_managed_buffer_is_particles_buffer)(
+            elem_by_elem_buf, slot_size ) );
+
+        SIXTRL_ASSERT( NS(ManagedBuffer_get_num_objects)(
+            belem_buf, slot_size ) > ( buf_size_t )0u );
+
+        SIXTRL_ASSERT( NS(Particles_managed_buffer_is_particles_buffer)(
+            particles_buffer, slot_size ) );
+
+        SIXTRL_ASSERT( NS(Particles_managed_buffer_is_particles_buffer)(
+            elem_by_elem_buf, slot_size ) );
+
+        SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+
+        io_obj_begin = io_obj_begin + io_particle_blocks_offset;
+
+        SIXTRL_ASSERT( NS(Object_get_type_id)( io_obj_begin ) ==
+                       NS(OBJECT_TYPE_PARTICLE) );
+
+        SIXTRL_ASSERT( NS(Object_get_begin_addr)( io_obj_begin ) != 0u );
+        SIXTRL_ASSERT( NS(Particles_get_num_of_particles)(
+            ( ptr_particles_t )( uintptr_t )NS(Object_get_begin_addr)(
+                io_obj_begin ) ) >= num_particles );
+
+        success_flag = ( SIXTRL_INT32_T )0u;
+
+        for( ; particle_id < num_particles ; particle_id += stride )
+        {
+            success_flag |= NS(Track_particle_element_by_element_obj)(
+                particles, particle_id,
+                NS(Particles_get_at_element_id_value)( particles, particle_id ),
+                be_begin, be_end, io_obj_begin );
+        }
+    }
+
+    if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )
+    {
         atomic_or( ptr_success_flag, success_flag );
     }
 

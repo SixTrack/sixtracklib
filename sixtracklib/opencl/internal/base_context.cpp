@@ -36,6 +36,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_default_compile_options(),
         m_cl_context(),
         m_cl_queue(),
+        m_cl_success_flag(),
         m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
         m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } ),
@@ -65,6 +66,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_default_compile_options(),
         m_cl_context(),
         m_cl_queue(),
+        m_cl_success_flag(),
         m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
         m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } ),
@@ -103,6 +105,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_default_compile_options(),
         m_cl_context(),
         m_cl_queue(),
+        m_cl_success_flag(),
         m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
         m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } ),
@@ -145,6 +148,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_default_compile_options(),
         m_cl_context(),
         m_cl_queue(),
+        m_cl_success_flag(),
         m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
         m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } ),
@@ -188,6 +192,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_default_compile_options(),
         m_cl_context(),
         m_cl_queue(),
+        m_cl_success_flag(),
         m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
         m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } ),
@@ -228,6 +233,16 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->m_available_nodes_info.clear();
         }
+    }
+
+    cl::Buffer const& ClContextBase::internalSuccessFlagBuffer() const SIXTRL_NOEXCEPT
+    {
+        return this->m_cl_success_flag;
+    }
+
+    cl::Buffer& ClContextBase::internalSuccessFlagBuffer() SIXTRL_NOEXCEPT
+    {
+        return this->m_cl_success_flag;
     }
 
     ClContextBase::size_type
@@ -553,6 +568,9 @@ namespace SIXTRL_CXX_NAMESPACE
             cl::Context context( device );
             cl::CommandQueue queue( context, device,
                                     CL_QUEUE_PROFILING_ENABLE );
+
+            this->m_cl_success_flag = cl::Buffer(
+                context, CL_MEM_READ_WRITE, sizeof( int32_t ), nullptr );
 
             this->m_cl_context = context;
             this->m_cl_queue   = queue;
@@ -1675,6 +1693,7 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         cl::CommandQueue dummy_queue;
         cl::Context dummy_context;
+        cl::Buffer  dummy_success_flag;
 
         this->m_cl_programs.clear();
         this->m_program_data.clear();
@@ -1682,10 +1701,11 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_cl_kernels.clear();
         this->m_kernel_data.clear();
 
-        this->m_cl_queue   = dummy_queue;
-        this->m_cl_context = dummy_context;
+        this->m_cl_queue            = dummy_queue;
+        this->m_cl_context          = dummy_context;
+        this->m_cl_success_flag     = dummy_success_flag;
         this->m_selected_node_index = int64_t{ -1 };
-        this->m_remap_kernel_id = kernel_id_t{ -1 };
+        this->m_remap_kernel_id     = kernel_id_t{ -1 };
 
         return;
     }
@@ -1701,7 +1721,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         std::string path_to_remap_kernel_program( NS(PATH_TO_BASE_DIR) );
         path_to_remap_kernel_program += "sixtracklib/opencl/kernels/";
-        path_to_remap_kernel_program += "managed_buffer_remap_kernel.cl";
+        path_to_remap_kernel_program += "managed_buffer_remap.cl";
 
         std::string remap_program_compile_options = "-D_GPUCODE=1";
         remap_program_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";

@@ -329,6 +329,9 @@ namespace SIXTRL_CXX_NAMESPACE
         cl::CommandQueue* openClQueue() SIXTRL_NOEXCEPT;
         cl::Context* openClContext() SIXTRL_NOEXCEPT;
 
+        cl::Buffer const& internalSuccessFlagBuffer() const SIXTRL_NOEXCEPT;
+        cl::Buffer& internalSuccessFlagBuffer() SIXTRL_NOEXCEPT;
+
         protected:
 
         using program_data_t = struct ProgramData
@@ -532,11 +535,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
         cl::Context                     m_cl_context;
         cl::CommandQueue                m_cl_queue;
+        cl::Buffer                      m_cl_success_flag;
 
         program_id_t                    m_remap_program_id;
         kernel_id_t                     m_remap_kernel_id;
         int64_t                         m_selected_node_index;
-
         uint64_t                        m_default_kernel_arg;
     };
 }
@@ -852,6 +855,8 @@ SIXTRL_HOST_FN void NS(ClContextBase_free)(
 SIXTRL_HOST_FN void NS(ClContextBase_delete)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
+SIXTRL_HOST_FN cl_mem NS(ClContextBase_get_internal_opencl_success_flag_buffer)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }

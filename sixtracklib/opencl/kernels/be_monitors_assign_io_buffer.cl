@@ -15,16 +15,16 @@
 __kernel void NS(BeamMonitor_assign_io_buffer_from_offset_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT io_buffer,
-    unsigned long const num_particles,
-    unsigned long const io_particles_block_offset );
+    SIXTRL_UINT64_T const num_particles,
+    SIXTRL_UINT64_T const io_particles_block_offset );
 
 /* ========================================================================= */
 
 __kernel void NS(BeamMonitor_assign_io_buffer_from_offset_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT io_buffer,
-    unsigned long const num_particles,
-    unsigned long const io_particles_block_offset )
+    SIXTRL_UINT64_T const num_particles,
+    SIXTRL_UINT64_T const io_particles_block_offset )
 {
     typedef NS(buffer_size_t) buf_size_t;
 
@@ -34,11 +34,9 @@ __kernel void NS(BeamMonitor_assign_io_buffer_from_offset_opencl)(
 
     if( global_id == gid_to_assign_io_buffer )
     {
-        size_t const slot_size = ( size_t )8u;
-
-        NS(BeamMonitor_assign_io_buffer_from_offset)(
-            beam_elements_buffer, io_buffer, num_particles,
-                io_particles_block_offset );
+        NS(BeamMonitor_assign_managed_io_buffer)(
+            beam_elements_buf, io_buffer, num_particles,
+                io_particles_block_offset, ( size_t )8u );
     }
 
     return;
