@@ -68,7 +68,7 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
 
         std::string path_to_tracking_program( ::st_PATH_TO_BASE_DIR );
         path_to_tracking_program += "sixtracklib/opencl/kernels/";
-        path_to_tracking_program += "track_particles_kernel.cl";
+        path_to_tracking_program += "track_particles.cl";
 
         std::string tracking_program_compile_options( "-D_GPUCODE=1" );
         tracking_program_compile_options += " -cl-strict-aliasing";
@@ -188,7 +188,7 @@ TEST( C99_OpenCL_TrackParticlesTests,
 
         std::string path_to_tracking_program( ::st_PATH_TO_BASE_DIR );
         path_to_tracking_program += "sixtracklib/opencl/kernels/";
-        path_to_tracking_program += "track_particles_priv_particles_optimized_kernel.cl";
+        path_to_tracking_program += "track_particles_priv_particles_optimized.cl";
 
         std::string tracking_program_compile_options( "-D_GPUCODE=1" );
         tracking_program_compile_options += " -cl-strict-aliasing";
