@@ -59,16 +59,15 @@ NS(BeamMonitor_get_ptr_particles)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
     NS(buffer_size_t) const store_idx )
 {
-    typedef NS(be_monitor_addr_t)   addr_t;
     typedef NS(be_monitor_stride_t) stride_t;
 
-    addr_t   const base_addr = NS(BeamMonitor_get_io_address)( monitor );
     stride_t const stride    = NS(BeamMonitor_get_io_store_stride)( monitor );
 
     /* Currently, only consequentive attribte storage is implemented */
     SIXTRL_ASSERT( NS(BeamMonitor_are_attributes_continous)( monitor ) );
 
-    SIXTRL_ASSERT( base_addr != ( addr_t )0 );
+    SIXTRL_ASSERT( NS(BeamMonitor_get_io_address)( monitor ) !=
+                  ( NS(be_monitor_addr_t) )0 );
     SIXTRL_ASSERT( stride > ( stride_t )0u );
     SIXTRL_ASSERT( store_idx < ( NS(buffer_size_t)
         )NS(BeamMonitor_get_num_stores)( monitor ) );

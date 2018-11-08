@@ -214,6 +214,34 @@ namespace sixtrack
                             ( 0 != ::st_Particles_compare_real_values_with_treshold(
                                 particles, cmp_particles, abs_tolerance ) ) )
                         {
+                            ::st_Buffer* diff_buffer = ::st_Buffer_new( 0u );
+                            ::st_Particles* diff = ::st_Particles_new( diff_buffer,
+                                ::st_Particles_get_num_of_particles( particles ) );
+
+                            ::st_Particles_calculate_difference(
+                                particles, cmp_particles, diff );
+
+                            ::st_Object const* ptr_obj = ::st_Buffer_get_const_object(
+                                beam_elements_buffer, ii - 1 );
+
+                            std::cout << "ii = " << ii - 1 << std::endl;
+                            std::cout << "type_id = " << ::st_Object_get_type_id( ptr_obj ) << std::endl;
+
+
+                            std::cout << "particles: " << std::endl;
+                            ::st_Particles_print_out( particles );
+                            std::cout << std::endl;
+
+                            std::cout << "cmp_particles: " << std::endl;
+                            ::st_Particles_print_out( cmp_particles );
+                            std::cout << std::endl;
+
+                            std::cout << "diff = " << std::endl;
+                            ::st_Particles_print_out( diff );
+                            std::cout << std::endl;
+
+                            ::st_Buffer_delete( diff_buffer );
+
                             success = false;
                             break;
                         }
