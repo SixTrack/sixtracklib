@@ -138,11 +138,11 @@ SIXTRL_FN SIXTRL_STATIC int NS(Particles_back_to_generic_addr_data)(
 
 /* ========================================================================= */
 
-#if !defined( _GPUCODE )
-
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(Particles_get_required_num_slots_on_managed_buffer)(
     NS(buffer_size_t) const num_particles, NS(buffer_size_t) const slot_size );
+
+#if !defined( _GPUCODE )
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Particles_get_required_num_slots)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
@@ -1372,7 +1372,43 @@ SIXTRL_INLINE int NS(Particles_back_to_generic_addr_data)(
     return success;
 }
 
-#if !defined( _GPUCODE )
+#if defined( _GPUCODE )
+
+SIXTRL_INLINE NS(buffer_size_t)
+NS(Particles_get_required_num_slots_on_managed_buffer)(
+    NS(buffer_size_t) const num_particles, NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+
+    buf_size_t required_num_slots = ( buf_size_t )0u;
+
+    if( ( slot_size > ( buf_size_t )0u ) &&
+        ( num_particles > ( buf_size_t )0u ) )
+    {
+        buf_size_t required_num_bytes = NS(ManagedBuffer_get_slot_based_length)(
+            sizeof( NS(Particles) ), slot_size );
+
+        buf_size_t temp = NS(ManagedBuffer_get_slot_based_length)(
+            sizeof( NS(particle_real_t) ) * num_particles, slot_size );
+
+        required_num_bytes +=
+            ( buf_size_t )( NS(PARTICLES_NUM_REAL_DATAPTRS ) ) * temp;
+
+        temp = NS(ManagedBuffer_get_slot_based_length)(
+            sizeof( NS(particle_index_t ) ) * num_particles, slot_size );
+
+        required_num_bytes +=
+            ( buf_size_t )( NS(PARTICLES_NUM_INDEX_DATAPTRS ) ) * temp;
+
+        SIXTRL_ASSERT( ( required_num_bytes % slot_size ) == ( buf_size_t )0u );
+
+        required_num_slots = required_num_bytes / slot_size;
+    }
+
+    return required_num_slots;
+}
+
+#else /* !defined( _GPUCODE ) */
 
 SIXTRL_INLINE NS(buffer_size_t)
 NS(Particles_get_required_num_slots_on_managed_buffer)(
