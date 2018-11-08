@@ -332,6 +332,10 @@ namespace SIXTRL_CXX_NAMESPACE
         cl::Buffer const& internalSuccessFlagBuffer() const SIXTRL_NOEXCEPT;
         cl::Buffer& internalSuccessFlagBuffer() SIXTRL_NOEXCEPT;
 
+        bool debugMode() const  SIXTRL_NOEXCEPT;
+        void enableDebugMode()  SIXTRL_NOEXCEPT;
+        void disableDebugMode() SIXTRL_NOEXCEPT;
+
         protected:
 
         using program_data_t = struct ProgramData
@@ -503,6 +507,8 @@ namespace SIXTRL_CXX_NAMESPACE
         size_type findAvailableNodesIndex( char const* node_id_str
             ) const SIXTRL_NOEXCEPT;
 
+//         int32_t handleKernelSuccessFlag();
+
         private:
 
         static void UpdateAvailableNodes(
@@ -541,6 +547,8 @@ namespace SIXTRL_CXX_NAMESPACE
         kernel_id_t                     m_remap_kernel_id;
         int64_t                         m_selected_node_index;
         uint64_t                        m_default_kernel_arg;
+
+        bool                            m_debug_mode;
     };
 }
 
@@ -856,6 +864,15 @@ SIXTRL_HOST_FN void NS(ClContextBase_delete)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
 SIXTRL_HOST_FN cl_mem NS(ClContextBase_get_internal_opencl_success_flag_buffer)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx );
+
+SIXTRL_HOST_FN bool NS(ClContextBase_is_debug_mode_enabled)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
+
+SIXTRL_HOST_FN void NS(ClContextBase_enable_debug_mode)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx );
+
+SIXTRL_HOST_FN void NS(ClContextBase_disable_debug_mode)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )

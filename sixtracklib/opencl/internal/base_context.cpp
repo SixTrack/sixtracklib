@@ -40,7 +40,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
         m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } ),
-        m_default_kernel_arg( uint64_t{ 0 } )
+        m_default_kernel_arg( uint64_t{ 0 } ),
+        m_debug_mode( false )
     {
         using _this_t = ClContextBase;
 
@@ -70,7 +71,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
         m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } ),
-        m_default_kernel_arg( uint64_t{ 0 } )
+        m_default_kernel_arg( uint64_t{ 0 } ),
+        m_debug_mode( false )
     {
         using _this_t = ClContextBase;
 
@@ -109,7 +111,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
         m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } ),
-        m_default_kernel_arg( uint64_t{ 0 } )
+        m_default_kernel_arg( uint64_t{ 0 } ),
+        m_debug_mode( false )
     {
         using _this_t = ClContextBase;
 
@@ -152,7 +155,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
         m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } ),
-        m_default_kernel_arg( uint64_t{ 0 } )
+        m_default_kernel_arg( uint64_t{ 0 } ),
+        m_debug_mode( false )
     {
         using _this_t = ClContextBase;
 
@@ -196,7 +200,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_remap_program_id( ClContextBase::program_id_t{ -1 } ),
         m_remap_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_selected_node_index( int64_t{ -1 } ),
-        m_default_kernel_arg( uint64_t{ 0 } )
+        m_default_kernel_arg( uint64_t{ 0 } ),
+        m_debug_mode( false )
     {
         using _this_t = ClContextBase;
 
@@ -1587,6 +1592,36 @@ namespace SIXTRL_CXX_NAMESPACE
         return &this->m_cl_context;
     }
 
+    bool ClContextBase::debugMode() const  SIXTRL_NOEXCEPT
+    {
+        return this->m_debug_mode;
+    }
+
+    void ClContextBase::enableDebugMode()  SIXTRL_NOEXCEPT
+    {
+        if( ( !this->debugMode() ) && ( !this->hasSelectedNode() ) )
+        {
+            this->m_debug_mode = true;
+            this->clear();
+            this->doInitDefaultPrograms();
+        }
+
+        return;
+    }
+
+    void ClContextBase::disableDebugMode() SIXTRL_NOEXCEPT
+    {
+        if( ( this->debugMode() ) && ( !this->hasSelectedNode() ) )
+        {
+            this->m_debug_mode = false;
+            this->clear();
+            this->doInitDefaultPrograms();
+        }
+
+        return;
+    }
+
+
     ClContextBase::kernel_data_list_t const&
     ClContextBase::kernelData() const SIXTRL_NOEXCEPT
     {
@@ -1721,7 +1756,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         std::string path_to_remap_kernel_program( NS(PATH_TO_BASE_DIR) );
         path_to_remap_kernel_program += "sixtracklib/opencl/kernels/";
-        path_to_remap_kernel_program += "managed_buffer_remap.cl";
+
+        if( !this->debugMode() )
+        {
+            path_to_remap_kernel_program += "managed_buffer_remap.cl";
+        }
+        else
+        {
+            path_to_remap_kernel_program += "managed_buffer_remap_debug.cl";
+        }
 
         std::string remap_program_compile_options = "-D_GPUCODE=1";
         remap_program_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
@@ -1760,7 +1803,15 @@ namespace SIXTRL_CXX_NAMESPACE
                   this->numAvailablePrograms() ) )
             {
                 std::string kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
-                kernel_name += "ManagedBuffer_remap_opencl";
+
+                if( !this->debugMode() )
+                {
+                    kernel_name += "ManagedBuffer_remap_opencl";
+                }
+                else
+                {
+                    kernel_name += "ManagedBuffer_remap_debug_opencl";
+                }
 
                 kernel_id_t const remap_kernel_id = this->enableKernel(
                     kernel_name.c_str(), this->m_remap_program_id );
@@ -2598,6 +2649,26 @@ SIXTRL_HOST_FN void NS(ClContextBase_delete)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx )
 {
     delete ctx;
+    return;
+}
+
+SIXTRL_HOST_FN bool NS(ClContextBase_is_debug_mode_enabled)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
+{
+    return ( ctx != nullptr ) ? ctx->debugMode() : false;
+}
+
+SIXTRL_HOST_FN void NS(ClContextBase_enable_debug_mode)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx )
+{
+    if( ctx != nullptr ) ctx->enableDebugMode();
+    return;
+}
+
+SIXTRL_HOST_FN void NS(ClContextBase_disable_debug_mode)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx )
+{
+    if( ctx != nullptr ) ctx->disableDebugMode();
     return;
 }
 

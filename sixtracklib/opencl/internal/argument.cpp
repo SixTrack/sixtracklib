@@ -344,7 +344,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
                     if( success == 0 )
                     {
-                        this->m_ptr_context->assignKernelArgument(
+                        this->m_ptr_context->assignKernelArgumentClBuffer(
                             remap_kernel_id, 1u,
                             this->m_ptr_context->internalSuccessFlagBuffer() );
                     }
@@ -358,7 +358,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
                     if( ret == CL_SUCCESS )
                     {
-                        this->m_ptr_context->assignKernelArgument(
+                        this->m_ptr_context->assignKernelArgumentClBuffer(
                             remap_kernel_id, 0u,
                             this->m_ptr_context->internalSuccessFlagBuffer() );
                     }
@@ -375,7 +375,7 @@ namespace SIXTRL_CXX_NAMESPACE
                             remap_kernel_id );
 
                     success = ( this->m_ptr_context->runKernel(
-                        remap_kernel_id, num_worker_items ) ? 0 : -8;
+                        remap_kernel_id, num_worker_items ) ) ? 0 : -8;
                 }
 
                 if( ( success == 0 ) && ( num_args > size_type{ 1 } ) )
