@@ -437,7 +437,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     /* ------------------------------------------------- */
                     /* Perform tracking of particles over line: */
 
-                    success &= ( 0 == ::st_ClContext_track(
+                    success &= ( 0 == ::st_ClContext_track_single_turn(
                         context, particles_arg, beam_elements_arg ) );
 
                     if( !success )  break;

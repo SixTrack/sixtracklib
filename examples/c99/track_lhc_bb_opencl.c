@@ -167,14 +167,13 @@ int main( int argc, char* argv[] )
     st_ClArgument* beam_elements_arg =
         st_ClArgument_new_from_buffer( beam_elements_buffer, context );
 
+    tracking_kernel_id = st_ClContext_get_tracking_kernel_id( context );
+
     /* --------------------------------------------------------------------- */
     /* Perform tracking over NUM_TURNS */
     /* --------------------------------------------------------------------- */
 
-    st_ClContext_track_num_turns(
-        context, particles_arg, beam_elements_arg, NUM_TURNS );
-
-    tracking_kernel_id = st_ClContext_get_tracking_kernel_id( context );
+    st_ClContext_track( context, particles_arg, beam_elements_arg, NUM_TURNS );
 
     tracking_time = st_ClContextBase_get_last_exec_time( context, tracking_kernel_id );
 
