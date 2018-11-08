@@ -9,7 +9,8 @@
     #include "sixtracklib/common/buffer/managed_buffer_remap.h"
     #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/particles.h"
-    #include "sixtracklib/common/track.h"
+    #include "sixtracklib/common/be_monitor/be_monitor.h"
+    #include "sixtracklib/common/be_monitor/io_buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #pragma OPENCL_EXTENSION cl_khr_int32_extended_atomics
@@ -35,7 +36,7 @@ __kernel void NS(BeamMonitor_assign_io_buffer_from_offset_debug_opencl)(
 
     SIXTRL_INT32_T success_flag = ( SIXTRL_INT32_T )-1;
 
-    if( ( num_particles > ( SIXTRL_UINT64_t )0u ) &&
+    if( ( num_particles > ( SIXTRL_UINT64_T )0u ) &&
         ( !NS(ManagedBuffer_needs_remapping)( beam_elements_buf, slot_size ) ) &&
         ( !NS(ManagedBuffer_needs_remapping)( io_buffer, slot_size ) ) &&
         (  NS(ManagedBuffer_get_num_objects)( io_buffer, slot_size ) >=
@@ -50,7 +51,7 @@ __kernel void NS(BeamMonitor_assign_io_buffer_from_offset_debug_opencl)(
         {
             success_flag = NS(BeamMonitor_assign_managed_io_buffer)(
                 beam_elements_buf, io_buffer, num_particles,
-                    io_particles_block_offset );
+                    io_particles_block_offset, slot_size );
         }
     }
 

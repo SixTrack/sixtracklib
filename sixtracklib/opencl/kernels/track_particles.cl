@@ -31,7 +31,7 @@ __kernel void NS(Track_particles_elem_by_elem_opencl)(
 
 __kernel void NS(Track_particles_single_turn_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buf )
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buf )
 {
     typedef NS(buffer_size_t)                                buf_size_t;
     typedef NS(particle_num_elements_t)                      num_element_t;
@@ -43,7 +43,7 @@ __kernel void NS(Track_particles_single_turn_opencl)(
 
     buf_size_t const slot_size = ( buf_size_t )8u;
     num_element_t particle_id  = ( num_element_t )get_global_id( 0 );
-    num_element_t const stride = ( num_element_t )get_local_size( 0 );
+    num_element_t const stride = ( num_element_t )get_global_size( 0 );
 
     obj_const_iter_t be_begin = NS(ManagedBuffer_get_const_objects_index_begin)(
         belem_buf, slot_size );
@@ -57,8 +57,8 @@ __kernel void NS(Track_particles_single_turn_opencl)(
     num_element_t const num_particles =
         NS(Particles_get_num_of_particles)( particles );
 
-    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping( particles_buf, slot_size ) );
-    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping( belem_buf, slot_size ) );
+    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( particles_buf, slot_size ) );
+    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( belem_buf, slot_size ) );
 
     SIXTRL_ASSERT( NS(ManagedBuffer_get_num_objects)(
         particles_buffer, slot_size ) == ( buf_size_t )1u );
@@ -86,7 +86,7 @@ __kernel void NS(Track_particles_single_turn_opencl)(
 
 __kernel void NS(Track_particles_until_turn_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buf,
     SIXTRL_INT64_T const turn )
 {
     typedef NS(buffer_size_t)                                buf_size_t;
@@ -98,7 +98,7 @@ __kernel void NS(Track_particles_until_turn_opencl)(
 
     buf_size_t const slot_size = ( buf_size_t )8u;
     num_element_t particle_id  = ( num_element_t )get_global_id( 0 );
-    num_element_t const stride = ( num_element_t )get_local_size( 0 );
+    num_element_t const stride = ( num_element_t )get_global_size( 0 );
 
     obj_const_iter_t be_begin = NS(ManagedBuffer_get_const_objects_index_begin)(
         belem_buf, slot_size );
@@ -112,8 +112,8 @@ __kernel void NS(Track_particles_until_turn_opencl)(
     num_element_t const num_particles =
         NS(Particles_get_num_of_particles)( particles );
 
-    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping( particles_buf, slot_size ) );
-    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping( belem_buf, slot_size ) );
+    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( particles_buf, slot_size ) );
+    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( belem_buf, slot_size ) );
 
     SIXTRL_ASSERT( NS(ManagedBuffer_get_num_objects)(
         particles_buffer, slot_size ) == ( buf_size_t )1u );
@@ -139,7 +139,7 @@ __kernel void NS(Track_particles_until_turn_opencl)(
 
 __kernel void NS(Track_particles_elem_by_elem_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT elem_by_elem_buf,
     SIXTRL_UINT64_T const io_particle_blocks_offset )
 {
@@ -153,7 +153,7 @@ __kernel void NS(Track_particles_elem_by_elem_opencl)(
 
     buf_size_t const slot_size = ( buf_size_t )8u;
     num_element_t particle_id  = ( num_element_t )get_global_id( 0 );
-    num_element_t const stride = ( num_element_t )get_local_size( 0 );
+    num_element_t const stride = ( num_element_t )get_global_size( 0 );
 
     obj_const_iter_t be_begin = NS(ManagedBuffer_get_const_objects_index_begin)(
         belem_buf, slot_size );
@@ -200,9 +200,26 @@ __kernel void NS(Track_particles_elem_by_elem_opencl)(
 
     for( ; particle_id < num_particles ; particle_id += stride )
     {
-        NS(Track_particle_element_by_element_obj)( particles, particle_id,
-            NS(Particles_get_at_element_id_value)( particles, particle_id ),
-            be_begin, be_end, io_obj_begin );
+        obj_iter_t    io_obj_it = io_obj_begin;
+        obj_const_iter_t  be_it = be_begin;
+
+        index_t beam_element_id = NS(Particles_get_at_element_id_value)(
+            particles, particle_id );
+
+        for( ; be_it != be_end ; ++be_it, ++io_obj_it )
+        {
+            ptr_particles_t io_particles =
+                NS(BufferIndex_get_particles)( io_obj_it );
+
+            NS(Particles_copy_single)( io_particles, particle_id,
+                                       particles, particle_id );
+
+            if( 0 != NS(Track_particle_beam_element_obj)(
+                    particles, particle_id, beam_element_id++, be_it ) )
+            {
+                break;
+            }
+        }
     }
 
     return;
