@@ -14,11 +14,11 @@
 
 __kernel void NS(Track_particles_single_turn_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buf );
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buf );
 
 __kernel void NS(Track_particles_until_turn_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buf,
     SIXTRL_INT64_T const turn );
 
 __kernel void NS(Track_particles_elem_by_elem_opencl)(

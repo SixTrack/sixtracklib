@@ -14,18 +14,18 @@
 
 #pragma OPENCL_EXTENSION cl_khr_int32_extended_atomics
 
-__kernel void NS(Track_particles_single_turn_opencl)(
+__kernel void NS(Track_particles_single_turn_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char*  SIXTRL_RESTRICT particles_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char*  SIXTRL_RESTRICT belem_buf,
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag );
 
-__kernel void NS(Track_particles_until_turn_opencl)(
+__kernel void NS(Track_particles_until_turn_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT  particles_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT  belem_buf,
     SIXTRL_INT64_T const turn,
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag );
 
-__kernel void NS(Track_particles_elem_by_elem_opencl)(
+__kernel void NS(Track_particles_elem_by_elem_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT elem_by_elem_buf,
@@ -34,7 +34,7 @@ __kernel void NS(Track_particles_elem_by_elem_opencl)(
 
 /* ========================================================================= */
 
-__kernel void NS(Track_particles_single_turn_opencl)(
+__kernel void NS(Track_particles_single_turn_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char*  SIXTRL_RESTRICT particles_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char*  SIXTRL_RESTRICT belem_buf,
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag )
@@ -99,7 +99,7 @@ __kernel void NS(Track_particles_single_turn_opencl)(
 
 /* ------------------------------------------------------------------------- */
 
-__kernel void NS(Track_particles_until_turn_opencl)(
+__kernel void NS(Track_particles_until_turn_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buf,
     SIXTRL_INT64_T const turn,
@@ -163,7 +163,7 @@ __kernel void NS(Track_particles_until_turn_opencl)(
 
 /* ------------------------------------------------------------------------- */
 
-__kernel void NS(Track_particles_elem_by_elem_opencl)(
+__kernel void NS(Track_particles_elem_by_elem_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT elem_by_elem_buf,
