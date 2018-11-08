@@ -315,10 +315,8 @@ namespace SIXTRL_CXX_NAMESPACE
             ClContextBase::kernel_id_t remap_kernel_id =
                 this->m_ptr_context->remappingKernelId();
 
-            cl::Kernel* ptr_remapping_kernel =
-                this->m_ptr_context->openClKernel( remap_kernel_id );
-
-            SIXTRL_ASSERT( ptr_remapping_kernel != nullptr );
+            SIXTRL_ASSERT( this->m_ptr_context->openClKernel( remap_kernel_id )
+                != nullptr );
 
             size_type const num_args =
                 this->m_ptr_context->kernelNumArgs( remap_kernel_id );
@@ -354,13 +352,12 @@ namespace SIXTRL_CXX_NAMESPACE
                 {
                     ret = ptr_queue->enqueueWriteBuffer(
                         this->m_cl_buffer, CL_TRUE, 0, buffer_size,
-                        NS(Buffer_get_const_data_begin)( buffer ) );
+                            NS(Buffer_get_const_data_begin)( buffer ) );
 
                     if( ret == CL_SUCCESS )
                     {
                         this->m_ptr_context->assignKernelArgumentClBuffer(
-                            remap_kernel_id, 0u,
-                            this->m_ptr_context->internalSuccessFlagBuffer() );
+                            remap_kernel_id, 0u, this->m_cl_buffer );
                     }
                     else
                     {
@@ -393,7 +390,8 @@ namespace SIXTRL_CXX_NAMESPACE
                         success |= success_flag;
                     }
                 }
-                else if( success == 0 )
+
+                if( success == 0 )
                 {
                     ptr_queue->flush();
                 }

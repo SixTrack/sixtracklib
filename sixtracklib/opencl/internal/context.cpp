@@ -268,8 +268,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( particles_buffer ) );
 
         SIXTRL_ASSERT( beam_elements_arg.usesCObjectBuffer() );
-        NS(Buffer) const* beam_elements = beam_elements_arg.ptrCObjectBuffer();
-        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( beam_elements ) );
+        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)(
+            beam_elements_arg.ptrCObjectBuffer() ) );
 
         size_type const num_kernel_args = this->kernelNumArgs( track_kernel_id );
         SIXTRL_ASSERT(  num_kernel_args >= 3u );
@@ -402,8 +402,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( particles_buffer ) );
 
         SIXTRL_ASSERT( beam_elements_arg.usesCObjectBuffer() );
-        NS(Buffer) const* beam_elements = beam_elements_arg.ptrCObjectBuffer();
-        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( beam_elements ) );
+        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)(
+            beam_elements_arg.ptrCObjectBuffer() ) );
 
         size_type const num_kernel_args = this->kernelNumArgs( track_kernel_id );
         SIXTRL_ASSERT(  num_kernel_args >= 2u );
@@ -422,10 +422,8 @@ namespace SIXTRL_CXX_NAMESPACE
                 track_kernel_id, 2u, this->internalSuccessFlagBuffer() );
         }
 
-        if( !this->runKernel( track_kernel_id, total_num_particles ) )
-        {
-            success = -1;
-        }
+        success = ( this->runKernel(
+            track_kernel_id, total_num_particles ) ) ? 0 : -1;
 
         if( ( success == 0 ) && ( num_kernel_args > 2u ) )
         {
@@ -550,13 +548,12 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( particles_buffer ) );
 
         SIXTRL_ASSERT( beam_elements_arg.usesCObjectBuffer() );
-        NS(Buffer) const* beam_elements = beam_elements_arg.ptrCObjectBuffer();
-        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( beam_elements ) );
+        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)(
+            beam_elements_arg.ptrCObjectBuffer() ) );
 
         SIXTRL_ASSERT( elem_by_elem_buffer_arg.usesCObjectBuffer() );
-        NS(Buffer)* elem_by_elem_buffer =
-            elem_by_elem_buffer_arg.ptrCObjectBuffer();
-        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( elem_by_elem_buffer ) );
+        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)(
+            elem_by_elem_buffer_arg.ptrCObjectBuffer() ) );
 
         size_type const num_kernel_args = this->kernelNumArgs( track_kernel_id );
         SIXTRL_ASSERT(  num_kernel_args >= 4u );
@@ -579,10 +576,8 @@ namespace SIXTRL_CXX_NAMESPACE
                 track_kernel_id, 4u, this->internalSuccessFlagBuffer() );
         }
 
-        if( !this->runKernel( track_kernel_id, total_num_particles ) )
-        {
-            success = -1;
-        }
+        success = ( !this->runKernel( track_kernel_id, total_num_particles ) )
+             ? 0 : -1;
 
         if( ( success == 0 ) && ( num_kernel_args > 3u ) )
         {
@@ -676,12 +671,12 @@ namespace SIXTRL_CXX_NAMESPACE
               this->numAvailableKernels() ) );
 
         SIXTRL_ASSERT( beam_elements_arg.usesCObjectBuffer() );
-        NS(Buffer)* beam_elements = beam_elements_arg.ptrCObjectBuffer();
-        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( beam_elements ) );
+        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)(
+            beam_elements_arg.ptrCObjectBuffer() ) );
 
         SIXTRL_ASSERT( io_buffer_arg.usesCObjectBuffer() );
-        NS(Buffer)* io_buffer = io_buffer_arg.ptrCObjectBuffer();
-        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( io_buffer ) );
+        SIXTRL_ASSERT( !NS(Buffer_needs_remapping)(
+            io_buffer_arg.ptrCObjectBuffer() ) );
 
         size_type const num_kernel_args = this->kernelNumArgs( assign_kernel_id );
         SIXTRL_ASSERT(  num_kernel_args >= 4u );
@@ -699,11 +694,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 assign_kernel_id, 4u, this->internalSuccessFlagBuffer() );
         }
 
-        if( !this->runKernel( assign_kernel_id,
+        success = ( this->runKernel( assign_kernel_id,
                 this->kernelPreferredWorkGroupSizeMultiple( assign_kernel_id ) ) )
-        {
-            success = -1;
-        }
+            ? 0 : -1;
 
         if( ( success == 0 ) && ( num_kernel_args > 3u ) )
         {
@@ -828,6 +821,10 @@ namespace SIXTRL_CXX_NAMESPACE
         track_optimized_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
 
         std::string assign_io_buffer_compile_options = " -D_GPUCODE=1";
+        assign_io_buffer_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
+        assign_io_buffer_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
+        assign_io_buffer_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__global";
+        assign_io_buffer_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global";
         assign_io_buffer_compile_options += " -I";
         assign_io_buffer_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
 
@@ -844,7 +841,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( track_optimized_program_id  >= program_id_t{ 0 } ) &&
             ( assign_io_buffer_program_id >= program_id_t{ 0 } ) )
         {
-            if( this->useOptimizedTrackingByDefault() )
+            if( !this->useOptimizedTrackingByDefault() )
             {
                 this->m_track_until_turn_program_id   = track_program_id;
                 this->m_track_single_turn_program_id  = track_program_id;
@@ -1111,7 +1108,10 @@ SIXTRL_HOST_FN int NS(ClContext_track_single_turn)(
     NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg )
 {
-    return ( ctx != nullptr ) ? ctx->trackSingleTurn() : -1;
+    return ( ( ctx != nullptr ) && ( ptr_particles_arg != nullptr ) &&
+             ( ptr_beam_elements_arg != nullptr ) )
+        ? ctx->trackSingleTurn( *ptr_particles_arg, *ptr_beam_elements_arg )
+        : -1;
 }
 
 SIXTRL_HOST_FN int NS(ClContext_track_single_turn_with_kernel_id)(
@@ -1123,7 +1123,7 @@ SIXTRL_HOST_FN int NS(ClContext_track_single_turn_with_kernel_id)(
     return ( ( ctx != nullptr ) && ( ptr_particles_arg != nullptr ) &&
              ( ptr_beam_elements_arg != nullptr ) )
         ? ctx->trackSingleTurn( *ptr_particles_arg, *ptr_beam_elements_arg,
-                                  tracking_kernel_id ) : -1;
+                                 tracking_kernel_id ) : -1;
 }
 
 /* ------------------------------------------------------------------------- */
