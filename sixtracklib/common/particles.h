@@ -125,16 +125,18 @@ typedef struct NS(ParticlesGenericAddr)
 NS(ParticlesGenericAddr);
 
 
-SIXTRL_FN SIXTRL_STATIC int NS(Particles_from_generic_addr_data)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+SIXTRL_FN SIXTRL_STATIC int NS(Particles_copy_from_generic_addr_data)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
+    NS(particle_num_elements_t) const destination_index,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(ParticlesGenericAddr)
-        *const SIXTRL_RESTRICT input_data,
-    NS(buffer_size_t) const index_offset );
+        *const SIXTRL_RESTRICT source,
+    NS(particle_num_elements_t) const source_index );
 
-SIXTRL_FN SIXTRL_STATIC int NS(Particles_back_to_generic_addr_data)(
-    SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT output_data,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
-    NS(buffer_size_t) const index_offset );
+SIXTRL_FN SIXTRL_STATIC int NS(Particles_copy_to_generic_addr_data)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT destination,
+    NS(particle_num_elements_t) const destination_index,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
+    NS(particle_num_elements_t) const source_index );
 
 /* ========================================================================= */
 
@@ -1134,239 +1136,222 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_state)(
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_INLINE int NS(Particles_from_generic_addr_data)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(ParticlesGenericAddr) *const SIXTRL_RESTRICT in,
-    NS(buffer_size_t) const offset )
+SIXTRL_INLINE int NS(Particles_copy_from_generic_addr_data)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT dest,
+    NS(particle_num_elements_t) const dest_idx,
+    SIXTRL_BUFFER_DATAPTR_DEC const
+        NS(ParticlesGenericAddr) *const SIXTRL_RESTRICT src,
+    NS(particle_num_elements_t) const src_idx )
 {
+    typedef NS(particle_real_t)  real_t;
+    typedef NS(particle_index_t) index_t;
+
+    typedef SIXTRL_BUFFER_DATAPTR_DEC real_t  const* ptr_src_real_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC index_t const* ptr_src_index_t;
+
     int success = -1;
 
-    if( ( in != SIXTRL_NULLPTR ) && ( p != SIXTRL_NULLPTR ) )
+    if( ( src != SIXTRL_NULLPTR  ) && ( src->num_particles > src_idx ) &&
+        ( dest != SIXTRL_NULLPTR ) && ( dest->num_particles > dest_idx ) )
     {
-        typedef NS(particle_num_elements_t)   num_elements_t;
-        typedef SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T  const* ptr_in_real_t;
-        typedef SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT64_T const* ptr_in_index_t;
+        SIXTRL_ASSERT( src != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( src->num_particles      > src_idx );
+        SIXTRL_ASSERT( src->q0_addr            != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->mass0_addr         != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->beta0_addr         != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->gamma0_addr        != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->p0c_addr           != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->s_addr             != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->x_addr             != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->y_addr             != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->px_addr            != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->py_addr            != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->zeta_addr          != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->psigma_addr        != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->delta_addr         != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->rpp_addr           != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->rvv_addr           != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->chi_addr           != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->charge_ratio_addr  != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->particle_id_addr   != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->at_element_id_addr != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->at_turn_addr       != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( src->state_addr         != ( NS(buffer_addr_t) )0u );
 
-        num_elements_t jj = ( num_elements_t )0u;
-        num_elements_t ii = offset;
+        NS(Particles_set_q0_value)( dest, dest_idx,
+           ( ( ptr_src_real_t )src->q0_addr )[ src_idx ] );
 
-        num_elements_t const out_num_particles =
-            NS(Particles_get_num_of_particles)( p );
+        NS(Particles_set_mass0_value)( dest, dest_idx,
+           ( ( ptr_src_real_t )src->mass0_addr )[ src_idx ] );
 
-        ptr_in_real_t  in_q0           = ( ptr_in_real_t  )in->q0_addr;
-        ptr_in_real_t  in_mass0        = ( ptr_in_real_t  )in->mass0_addr;
-        ptr_in_real_t  in_beta0        = ( ptr_in_real_t  )in->beta0_addr;
-        ptr_in_real_t  in_gamma0       = ( ptr_in_real_t  )in->mass0_addr;
-        ptr_in_real_t  in_p0c          = ( ptr_in_real_t  )in->p0c_addr;
-        ptr_in_real_t  in_s            = ( ptr_in_real_t  )in->s_addr;
-        ptr_in_real_t  in_x            = ( ptr_in_real_t  )in->x_addr;
-        ptr_in_real_t  in_y            = ( ptr_in_real_t  )in->y_addr;
-        ptr_in_real_t  in_px           = ( ptr_in_real_t  )in->px_addr;
-        ptr_in_real_t  in_py           = ( ptr_in_real_t  )in->py_addr;
-        ptr_in_real_t  in_zeta         = ( ptr_in_real_t  )in->zeta_addr;
-        ptr_in_real_t  in_psigma       = ( ptr_in_real_t  )in->psigma_addr;
-        ptr_in_real_t  in_delta        = ( ptr_in_real_t  )in->delta_addr;
-        ptr_in_real_t  in_rpp          = ( ptr_in_real_t  )in->rpp_addr;
-        ptr_in_real_t  in_rvv          = ( ptr_in_real_t  )in->rvv_addr;
-        ptr_in_real_t  in_chi          = ( ptr_in_real_t  )in->chi_addr;
-        ptr_in_real_t  in_charge_ratio = ( ptr_in_real_t  )in->charge_ratio_addr;
-        ptr_in_index_t in_particle_id  = ( ptr_in_index_t )in->particle_id_addr;
-        ptr_in_index_t in_element_id   = ( ptr_in_index_t )in->at_element_id_addr;
-        ptr_in_index_t in_turn         = ( ptr_in_index_t )in->at_turn_addr;
-        ptr_in_index_t in_state        = ( ptr_in_index_t )in->state_addr;
+        NS(Particles_set_beta0_value)( dest, dest_idx,
+           ( ( ptr_src_real_t )src->beta0_addr )[ src_idx ] );
 
-        SIXTRL_ASSERT( in->num_particles > ( num_elements_t )offset );
-        SIXTRL_ASSERT( in->num_particles >= ( out_num_particles + ii ) );
+        NS(Particles_set_gamma0_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->gamma0_addr )[ src_idx ] );
 
-        SIXTRL_ASSERT( NS(Particles_get_q0)( p )            != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_mass0)( p )         != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_beta0)( p )         != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_gamma0)( p )        != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_p0c)( p )           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_s)( p )             != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_x)( p )             != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_y)( p )             != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_px)( p )            != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_py)( p )            != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_zeta)( p )          != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_psigma)( p )        != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_delta)( p )         != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_rpp)( p )           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_rvv)( p )           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_chi)( p )           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_charge_ratio)( p )  != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_particle_id)( p )   != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_at_element_id)( p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_at_turn)( p )       != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_state)( p )         != SIXTRL_NULLPTR );
+        NS(Particles_set_p0c_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->p0c_addr )[ src_idx ] );
 
-        SIXTRL_ASSERT( in_q0           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_mass0        != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_beta0        != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_gamma0       != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_p0c          != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_s            != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_x            != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_y            != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_px           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_py           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_zeta         != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_psigma       != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_delta        != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_rpp          != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_rvv          != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_chi          != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_charge_ratio != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_particle_id  != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_element_id   != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_turn         != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( in_state        != SIXTRL_NULLPTR );
+        NS(Particles_set_s_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->s_addr )[ src_idx ] );
+
+        NS(Particles_set_x_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->x_addr )[ src_idx ] );
+
+        NS(Particles_set_y_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->y_addr )[ src_idx ] );
+
+        NS(Particles_set_px_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->px_addr )[ src_idx ] );
+
+        NS(Particles_set_py_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->py_addr )[ src_idx ] );
+
+        NS(Particles_set_zeta_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->zeta_addr )[ src_idx ] );
+
+        NS(Particles_set_psigma_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->psigma_addr )[ src_idx ] );
+
+        NS(Particles_set_delta_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->delta_addr )[ src_idx ] );
+
+        NS(Particles_set_rpp_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->rpp_addr )[ src_idx ] );
+
+        NS(Particles_set_rvv_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->rvv_addr)[ src_idx ] );
+
+        NS(Particles_set_chi_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->chi_addr )[ src_idx ] );
+
+        NS(Particles_set_charge_ratio_value)( dest, dest_idx,
+            ( ( ptr_src_real_t )src->charge_ratio_addr )[ src_idx ] );
+
+        NS(Particles_set_particle_id_value)( dest, dest_idx,
+            ( ( ptr_src_index_t )src->particle_id_addr )[ src_idx ] );
+
+        NS(Particles_set_at_element_id_value)( dest, dest_idx,
+            ( ( ptr_src_index_t )src->at_element_id_addr )[ src_idx ] );
+
+        NS(Particles_set_at_turn_value)( dest, dest_idx,
+            ( ( ptr_src_index_t )src->at_turn_addr )[ src_idx ] );
+
+        NS(Particles_set_state_value)( dest, dest_idx,
+            ( ( ptr_src_index_t )src->state_addr )[ src_idx ] );
 
         success = 0;
-
-        for( ; jj < out_num_particles ; ++jj, ++ii )
-        {
-            NS(Particles_set_q0_value)(            p, jj, in_q0[ ii ] );
-            NS(Particles_set_mass0_value)(         p, jj, in_mass0[ ii ] );
-            NS(Particles_set_beta0_value)(         p, jj, in_beta0[ ii ] );
-            NS(Particles_set_gamma0_value)(        p, jj, in_gamma0[ ii ] );
-            NS(Particles_set_p0c_value)(           p, jj, in_p0c[ ii ] );
-            NS(Particles_set_s_value)(             p, jj, in_s[ ii ] );
-            NS(Particles_set_x_value)(             p, jj, in_x[ ii ] );
-            NS(Particles_set_y_value)(             p, jj, in_y[ ii ] );
-            NS(Particles_set_px_value)(            p, jj, in_px[ ii ] );
-            NS(Particles_set_py_value)(            p, jj, in_py[ ii ] );
-            NS(Particles_set_zeta_value)(          p, jj, in_zeta[ ii ] );
-            NS(Particles_set_psigma_value)(        p, jj, in_psigma[ ii ] );
-            NS(Particles_set_delta_value)(         p, jj, in_delta[ ii ] );
-            NS(Particles_set_rpp_value)(           p, jj, in_rpp[ ii ] );
-            NS(Particles_set_rvv_value)(           p, jj, in_rvv[ ii ] );
-            NS(Particles_set_chi_value)(           p, jj, in_chi[ ii ] );
-            NS(Particles_set_charge_ratio_value)(  p, jj, in_charge_ratio[ ii ] );
-            NS(Particles_set_particle_id_value)(   p, jj, in_particle_id[ ii ] );
-            NS(Particles_set_at_element_id_value)( p, jj, in_element_id[ ii ] );
-            NS(Particles_set_at_turn_value)(       p, jj, in_turn[ ii ] );
-            NS(Particles_set_state_value)(         p, jj, in_state[ ii ] );
-        }
     }
 
     return success;
 }
 
-SIXTRL_INLINE int NS(Particles_back_to_generic_addr_data)(
-    SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT out,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
-    NS(buffer_size_t) const offset )
+SIXTRL_INLINE int NS(Particles_copy_to_generic_addr_data)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT dest,
+    NS(particle_num_elements_t) const dest_idx,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT src,
+    NS(particle_num_elements_t) const src_idx )
 {
+    typedef NS(particle_real_t)     real_t;
+    typedef NS(particle_index_t)    index_t;
+
+    typedef SIXTRL_BUFFER_DATAPTR_DEC real_t*  ptr_dest_real_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC index_t* ptr_dest_index_t;
+
     int success = -1;
 
-    if( ( out != SIXTRL_NULLPTR ) && ( p != SIXTRL_NULLPTR ) )
+    if( ( src  != SIXTRL_NULLPTR ) && ( src->num_particles  > src_idx ) &&
+        ( dest != SIXTRL_NULLPTR ) && ( dest->num_particles > dest_idx ) )
     {
-        typedef NS(particle_num_elements_t)   num_elements_t;
-        typedef SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T*  ptr_out_real_t;
-        typedef SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT64_T* ptr_out_index_t;
+        SIXTRL_ASSERT( dest != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( dest->num_particles      > src_idx );
+        SIXTRL_ASSERT( dest->q0_addr            != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->mass0_addr         != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->beta0_addr         != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->gamma0_addr        != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->p0c_addr           != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->s_addr             != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->x_addr             != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->y_addr             != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->px_addr            != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->py_addr            != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->zeta_addr          != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->psigma_addr        != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->delta_addr         != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->rpp_addr           != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->rvv_addr           != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->chi_addr           != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->charge_ratio_addr  != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->particle_id_addr   != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->at_element_id_addr != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->at_turn_addr       != ( NS(buffer_addr_t) )0u );
+        SIXTRL_ASSERT( dest->state_addr         != ( NS(buffer_addr_t) )0u );
 
-        num_elements_t ii = offset;
-        num_elements_t jj = ( num_elements_t )0u;
+        ( ( ptr_dest_real_t )dest->q0_addr )[ dest_idx ] =
+            NS(Particles_get_q0_value)( src, src_idx );
 
-        num_elements_t const in_num_particles =
-            NS(Particles_get_num_of_particles)( p );
+        ( ( ptr_dest_real_t )dest->mass0_addr )[ dest_idx ] =
+            NS(Particles_get_mass0_value)( src, src_idx );
 
-        ptr_out_real_t  out_q0           = ( ptr_out_real_t  )out->q0_addr;
-        ptr_out_real_t  out_mass0        = ( ptr_out_real_t  )out->mass0_addr;
-        ptr_out_real_t  out_beta0        = ( ptr_out_real_t  )out->beta0_addr;
-        ptr_out_real_t  out_gamma0       = ( ptr_out_real_t  )out->mass0_addr;
-        ptr_out_real_t  out_p0c          = ( ptr_out_real_t  )out->p0c_addr;
-        ptr_out_real_t  out_s            = ( ptr_out_real_t  )out->s_addr;
-        ptr_out_real_t  out_x            = ( ptr_out_real_t  )out->x_addr;
-        ptr_out_real_t  out_y            = ( ptr_out_real_t  )out->y_addr;
-        ptr_out_real_t  out_px           = ( ptr_out_real_t  )out->px_addr;
-        ptr_out_real_t  out_py           = ( ptr_out_real_t  )out->py_addr;
-        ptr_out_real_t  out_zeta         = ( ptr_out_real_t  )out->zeta_addr;
-        ptr_out_real_t  out_psigma       = ( ptr_out_real_t  )out->psigma_addr;
-        ptr_out_real_t  out_delta        = ( ptr_out_real_t  )out->delta_addr;
-        ptr_out_real_t  out_rpp          = ( ptr_out_real_t  )out->rpp_addr;
-        ptr_out_real_t  out_rvv          = ( ptr_out_real_t  )out->rvv_addr;
-        ptr_out_real_t  out_chi          = ( ptr_out_real_t  )out->chi_addr;
-        ptr_out_real_t  out_charge_ratio = ( ptr_out_real_t  )out->charge_ratio_addr;
-        ptr_out_index_t out_particle_id  = ( ptr_out_index_t )out->particle_id_addr;
-        ptr_out_index_t out_element_id   = ( ptr_out_index_t )out->at_element_id_addr;
-        ptr_out_index_t out_turn         = ( ptr_out_index_t )out->at_turn_addr;
-        ptr_out_index_t out_state        = ( ptr_out_index_t )out->state_addr;
+        ( ( ptr_dest_real_t )dest->beta0_addr )[ dest_idx ] =
+            NS(Particles_get_beta0_value)( src, src_idx );
 
-        SIXTRL_ASSERT( ( num_elements_t )offset  <= out->num_particles );
-        SIXTRL_ASSERT( ( in_num_particles + jj ) <= out->num_particles );
+        ( ( ptr_dest_real_t )dest->gamma0_addr )[ dest_idx ] =
+            NS(Particles_get_gamma0_value)( src, src_idx );
 
-        SIXTRL_ASSERT( NS(Particles_get_const_q0)( p )            != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_mass0)( p )         != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_beta0)( p )         != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_gamma0)( p )        != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_p0c)( p )           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_s)( p )             != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_x)( p )             != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_y)( p )             != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_px)( p )            != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_py)( p )            != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_zeta)( p )          != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_psigma)( p )        != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_delta)( p )         != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_rpp)( p )           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_rvv)( p )           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_chi)( p )           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_charge_ratio)( p )  != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_particle_id)( p )   != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_at_element_id)( p ) != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_at_turn)( p )       != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Particles_get_const_state)( p )         != SIXTRL_NULLPTR );
+        ( ( ptr_dest_real_t )dest->p0c_addr )[ dest_idx ] =
+            NS(Particles_get_p0c_value)( src, src_idx );
 
-        SIXTRL_ASSERT( out_q0           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_mass0        != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_beta0        != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_gamma0       != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_p0c          != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_s            != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_x            != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_y            != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_px           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_py           != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_zeta         != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_psigma       != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_delta        != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_rpp          != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_rvv          != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_chi          != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_charge_ratio != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_particle_id  != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_element_id   != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_turn         != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( out_state        != SIXTRL_NULLPTR );
+        ( ( ptr_dest_real_t )dest->s_addr )[ dest_idx ] =
+            NS(Particles_get_s_value)( src, src_idx );
+
+        ( ( ptr_dest_real_t )dest->x_addr )[ dest_idx ] =
+            NS(Particles_get_x_value)( src, src_idx );
+
+        ( ( ptr_dest_real_t )dest->y_addr )[ dest_idx ] =
+            NS(Particles_get_y_value)( src, src_idx );
+
+        ( ( ptr_dest_real_t )dest->px_addr )[ dest_idx ] =
+            NS(Particles_get_px_value)( src, src_idx );
+
+        ( ( ptr_dest_real_t )dest->py_addr )[ dest_idx ] =
+            NS(Particles_get_py_value)( src, src_idx );
+
+        ( ( ptr_dest_real_t )dest->zeta_addr )[ dest_idx ] =
+            NS(Particles_get_zeta_value)( src, src_idx );
+
+        ( ( ptr_dest_real_t )dest->psigma_addr )[ dest_idx ] =
+            NS(Particles_get_psigma_value)( src, src_idx );
+
+        ( ( ptr_dest_real_t )dest->delta_addr )[ dest_idx ] =
+            NS(Particles_get_delta_value)( src, src_idx );
+
+        ( ( ptr_dest_real_t )dest->rpp_addr )[ dest_idx ] =
+            NS(Particles_get_rpp_value)( src, src_idx );
+
+        ( ( ptr_dest_real_t )dest->rvv_addr )[ dest_idx ] =
+            NS(Particles_get_rvv_value)( src, src_idx );
+
+        ( ( ptr_dest_real_t )dest->chi_addr )[ dest_idx ] =
+            NS(Particles_get_chi_value)( src, src_idx );
+
+        ( ( ptr_dest_real_t )dest->charge_ratio_addr )[ dest_idx ] =
+            NS(Particles_get_charge_ratio_value)( src, src_idx );
+
+        ( ( ptr_dest_index_t )dest->particle_id_addr )[ dest_idx ] =
+            NS(Particles_get_particle_id_value)( src, src_idx );
+
+        ( ( ptr_dest_index_t )dest->at_element_id_addr )[ dest_idx ] =
+            NS(Particles_get_at_element_id_value)( src, src_idx );
+
+        ( ( ptr_dest_index_t )dest->at_turn_addr )[ dest_idx ] =
+            NS(Particles_get_at_turn_value)( src, src_idx );
+
+        ( ( ptr_dest_index_t )dest->state_addr )[ dest_idx ] =
+            NS(Particles_get_state_value)( src, src_idx );
 
         success = 0;
-
-        for( ; jj < in_num_particles ; ++jj, ++ii )
-        {
-            out_q0[ ii ]           = NS(Particles_get_q0_value)(            p, jj );
-            out_mass0[ ii ]        = NS(Particles_get_mass0_value)(         p, jj );
-            out_beta0[ ii ]        = NS(Particles_get_beta0_value)(         p, jj );
-            out_gamma0[ ii ]       = NS(Particles_get_gamma0_value)(        p, jj );
-            out_p0c[ ii ]          = NS(Particles_get_p0c_value)(           p, jj );
-            out_s[ ii ]            = NS(Particles_get_s_value)(             p, jj );
-            out_x[ ii ]            = NS(Particles_get_x_value)(             p, jj );
-            out_y[ ii ]            = NS(Particles_get_y_value)(             p, jj );
-            out_px[ ii ]           = NS(Particles_get_px_value)(            p, jj );
-            out_py[ ii ]           = NS(Particles_get_py_value)(            p, jj );
-            out_zeta[ ii ]         = NS(Particles_get_zeta_value)(          p, jj );
-            out_psigma[ ii ]       = NS(Particles_get_psigma_value)(        p, jj );
-            out_delta[ ii ]        = NS(Particles_get_delta_value)(         p, jj );
-            out_rpp[ ii ]          = NS(Particles_get_rpp_value)(           p, jj );
-            out_rvv[ ii ]          = NS(Particles_get_rvv_value)(           p, jj );
-            out_chi[ ii ]          = NS(Particles_get_chi_value)(           p, jj );
-            out_charge_ratio[ ii ] = NS(Particles_get_charge_ratio_value)(  p, jj );
-            out_particle_id[ ii ]  = NS(Particles_get_particle_id_value)(   p, jj );
-            out_element_id[ ii ]   = NS(Particles_get_at_element_id_value)( p, jj );
-            out_turn[ ii ]         = NS(Particles_get_at_turn_value)(       p, jj );
-            out_state[ ii ]        = NS(Particles_get_state_value)(         p, jj );
-        }
     }
 
     return success;
