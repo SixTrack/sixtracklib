@@ -56,8 +56,8 @@ __kernel void NS(Track_particles_single_turn_opt_pp_debug_opencl)(
                 particles_buf, slot_size ) == ( buf_size_t )1u ) &&
         ( !NS(ManagedBuffer_needs_remapping)( belem_buf, slot_size ) ) )
     {
-        num_element_t particle_id  = ( num_element_t )get_global_id( 0 );
-        num_element_t const stride = ( num_element_t )get_global_size( 0 );
+        num_element_t particle_index = ( num_element_t )get_global_id( 0 );
+        num_element_t const stride   = ( num_element_t )get_global_size( 0 );
 
         obj_const_iter_t be_begin = NS(ManagedBuffer_get_const_objects_index_begin)(
             belem_buf, slot_size );
@@ -138,10 +138,10 @@ __kernel void NS(Track_particles_single_turn_opt_pp_debug_opencl)(
 
         success_flag = ( SIXTRL_INT32_T )0u;
 
-        for( ; particle_id < num_particles ; particle_id += stride )
+        for( ; particle_index < num_particles ; particle_index += stride )
         {
-            success_flag |= NS(Particles_from_generic_addr_data)(
-                &particles, in_particles, particle_id );
+            success_flag |= NS(Particles_copy_from_generic_addr_data)(
+                &particles, 0, in_particles, particle_index );
 
             success_flag |= NS(Track_particle_beam_elements_obj)(
                 &particles, 0u, be_begin, be_end );
@@ -151,8 +151,8 @@ __kernel void NS(Track_particles_single_turn_opt_pp_debug_opencl)(
                 NS(Track_particle_increment_at_turn)( &particles, 0u );
             }
 
-            success_flag |= NS(Particles_back_to_generic_addr_data)(
-                in_particles, &particles, particle_id );
+            success_flag |= NS(Particles_copy_to_generic_addr_data)(
+                in_particles, particle_index, &particles, 0 );
 
             if( success_flag != 0 ) break;
         }
@@ -191,9 +191,9 @@ __kernel void NS(Track_particles_until_turn_opt_pp_debug_opencl)(
                 particles_buf, slot_size ) == ( buf_size_t )1u ) &&
         ( !NS(ManagedBuffer_needs_remapping)( belem_buf, slot_size ) ) )
     {
-        buf_size_t const slot_size = ( buf_size_t )8u;
-        num_element_t particle_id  = ( num_element_t )get_global_id( 0 );
-        num_element_t const stride = ( num_element_t )get_global_size( 0 );
+        buf_size_t const slot_size    = ( buf_size_t )8u;
+        num_element_t particle_index  = ( num_element_t )get_global_id( 0 );
+        num_element_t const stride    = ( num_element_t )get_global_size( 0 );
 
         obj_const_iter_t be_begin = NS(ManagedBuffer_get_const_objects_index_begin)(
             belem_buf, slot_size );
@@ -274,16 +274,16 @@ __kernel void NS(Track_particles_until_turn_opt_pp_debug_opencl)(
 
         success_flag = 0;
 
-        for( ; particle_id < num_particles ; particle_id += stride )
+        for( ; particle_index < num_particles ; particle_index += stride )
         {
-            success_flag |= NS(Particles_from_generic_addr_data)(
-                &particles, in_particles, particle_id );
+            success_flag |= NS(Particles_copy_from_generic_addr_data)(
+                &particles, 0, in_particles, particle_index );
 
             success_flag |= NS(Track_particle_until_turn_obj)(
                 &particles, 0u, be_begin, be_end, turn );
 
-            success_flag |= NS(Particles_back_to_generic_addr_data)(
-                in_particles, &particles, particle_id );
+            success_flag |= NS(Particles_copy_to_generic_addr_data)(
+                in_particles, particle_index, &particles, 0 );
 
             if( success_flag != 0 ) break;
         }
@@ -323,8 +323,8 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_debug_opencl)(
                 particles_buf, slot_size ) == ( buf_size_t )1u ) &&
         ( !NS(ManagedBuffer_needs_remapping)( belem_buf, slot_size ) ) )
     {
-        num_element_t particle_id  = ( num_element_t )get_global_id( 0 );
-        num_element_t const stride = ( num_element_t )get_global_size( 0 );
+        num_element_t particle_index = ( num_element_t )get_global_id( 0 );
+        num_element_t const stride   = ( num_element_t )get_global_size( 0 );
 
         obj_const_iter_t be_begin = NS(ManagedBuffer_get_const_objects_index_begin)(
             belem_buf, slot_size );
@@ -421,16 +421,19 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_debug_opencl)(
         io_obj_begin = io_obj_begin + io_particle_blocks_offset;
         success_flag = ( SIXTRL_INT32_T )0;
 
-        for( ; particle_id < num_particles ; particle_id += stride )
+        for( ; particle_index < num_particles ; particle_index += stride )
         {
             obj_iter_t       io_obj_it = io_obj_begin;
             obj_const_iter_t be_it     = be_begin;
 
-            success_flag |= NS(Particles_from_generic_addr_data)(
-                &particles, in_particles, particle_id );
+            success_flag |= NS(Particles_copy_from_generic_addr_data)(
+                &particles, 0, in_particles, particle_index );
 
             index_t beam_element_id =
                 NS(Particles_get_at_element_id_value)( &particles, 0u );
+
+            index_t const particle_id =
+                NS(Particles_get_particle_id_value)( &particles, 0u );
 
             for( ; be_it != be_end ; ++be_it, ++io_obj_it )
             {
@@ -441,8 +444,8 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_debug_opencl)(
                 SIXTRL_ASSERT( NS(Object_get_type_id)( io_obj_it ) ==
                                NS(OBJECT_TYPE_PARTICLES) );
 
-                success_flag |= NS(Particles_back_to_generic_addr_data)(
-                    dump_particles, &particles, particle_id );
+                success_flag |= NS(Particles_copy_to_generic_addr_data)(
+                    dump_particles, particle_id, &particles, 0 );
 
                 if( ( success_flag != 0 ) &&
                     ( 0 != NS(Track_particle_beam_element_obj)(
@@ -458,8 +461,8 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_debug_opencl)(
                     &particles, 0u, beam_element_id );
             }
 
-            success_flag |= NS(Particles_back_to_generic_addr_data)(
-                in_particles, &particles, particle_id );
+            success_flag |= NS(Particles_copy_to_generic_addr_data)(
+                in_particles, particle_index, &particles, 0 );
 
             if( success_flag != 0 )
             {
