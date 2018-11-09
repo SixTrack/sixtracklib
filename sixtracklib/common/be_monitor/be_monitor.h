@@ -10,9 +10,11 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/buffer_object_defines.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
     #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
+    #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -54,6 +56,10 @@ NS(BeamMonitor_preset)(
 
 SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_clear)(
     SIXTRL_BE_ARGPTR_DEC  NS(BeamMonitor)* SIXTRL_RESTRICT monitor );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_clear_all_line_obj)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* be_begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* be_end );
 
 SIXTRL_FN SIXTRL_STATIC int NS(BeamMonitor_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT destination,
@@ -230,6 +236,34 @@ SIXTRL_INLINE void NS(BeamMonitor_clear)(
     NS(BeamMonitor_set_io_address)( monitor, ( NS(buffer_addr_t) )0 );
     //NS(BeamMonitor_set_io_store_stride)( monitor, ( NS(buffer_size_t) )0 );
     if( monitor != SIXTRL_NULLPTR ) monitor->io_store_stride = 0u;
+
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamMonitor_clear_all_line_obj)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* be_it,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* be_end )
+{
+    SIXTRL_ASSERT( be_it  != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( be_end != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( ( ( uintptr_t )be_it ) <= ( ( uintptr_t )be_end ) ) );
+
+    for( ; be_it != be_end ; ++be_it )
+    {
+        if( NS(Object_get_type_id)( be_it ) == NS(OBJECT_TYPE_BEAM_MONITOR) )
+        {
+            SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* beam_monitor =
+                ( SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* )( uintptr_t
+                    )NS(Object_get_begin_addr)( be_it );
+
+            SIXTRL_ASSERT( NS(Object_get_size)( be_it ) >=
+                           sizeof( NS(BeamMonitor ) ) );
+
+            SIXTRL_ASSERT( beam_monitor != SIXTRL_NULLPTR );
+
+            NS(BeamMonitor_clear)( beam_monitor );
+        }
+    }
 
     return;
 }

@@ -24,6 +24,11 @@ NS(BeamMonitor_get_ptr_particles)( SIXTRL_BE_ARGPTR_DEC const
     struct NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
     NS(buffer_size_t) const store_idx );
 
+SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t)
+NS(BeamMonitor_get_particles_begin_addr)( SIXTRL_BE_ARGPTR_DEC const
+    struct NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
+    NS(buffer_size_t) const store_idx );
+
 SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_monitor)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
@@ -45,23 +50,31 @@ SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_monitor)(
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
-NS(BeamMonitor_get_const_ptr_particles)(
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
-    NS(buffer_size_t) const store_idx )
-{
-    return ( SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const* )( uintptr_t
-        )NS(BeamMonitor_get_ptr_particles)( monitor, store_idx );
-}
-
 SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
 NS(BeamMonitor_get_ptr_particles)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
     NS(buffer_size_t) const store_idx )
 {
+    return ( SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+        )NS(BeamMonitor_get_particles_begin_addr)( monitor, store_idx );
+}
+
+SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+NS(BeamMonitor_get_const_ptr_particles)(
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
+    NS(buffer_size_t) const store_idx )
+{
+    return ( SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+        )NS(BeamMonitor_get_particles_begin_addr)( monitor, store_idx );
+}
+
+SIXTRL_INLINE NS(buffer_addr_t) NS(BeamMonitor_get_particles_begin_addr)(
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
+    NS(buffer_size_t) const store_idx )
+{
     typedef NS(be_monitor_stride_t) stride_t;
 
-    stride_t const stride    = NS(BeamMonitor_get_io_store_stride)( monitor );
+    stride_t const stride = NS(BeamMonitor_get_io_store_stride)( monitor );
 
     /* Currently, only consequentive attribte storage is implemented */
     SIXTRL_ASSERT( NS(BeamMonitor_are_attributes_continous)( monitor ) );
@@ -72,8 +85,8 @@ NS(BeamMonitor_get_ptr_particles)(
     SIXTRL_ASSERT( store_idx < ( NS(buffer_size_t)
         )NS(BeamMonitor_get_num_stores)( monitor ) );
 
-    return ( SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* )( uintptr_t
-        )( NS(BeamMonitor_get_io_address)( monitor ) + store_idx * stride );
+    return ( NS(buffer_addr_t ) )(
+            NS(BeamMonitor_get_io_address)( monitor ) + store_idx * stride );
 }
 
 SIXTRL_INLINE int NS(Track_particle_beam_monitor)(
@@ -81,9 +94,14 @@ SIXTRL_INLINE int NS(Track_particle_beam_monitor)(
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamMonitor) *const monitor )
 {
-    typedef NS(be_monitor_turn_t) nturn_t;
-    typedef NS(be_monitor_addr_t) addr_t;
-    typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* out_particles_t;
+    typedef NS(be_monitor_turn_t)                       nturn_t;
+    typedef NS(be_monitor_addr_t)                       addr_t;
+    typedef NS(particle_num_elements_t)                 num_elements_t;
+    typedef NS(ParticlesGenericAddr)                    out_particle_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC out_particle_t*   ptr_out_particles_t;
+    typedef NS(particle_index_t)                        index_t;
+
+    int success = 0;
 
     /* Calculate destination index in the io particles object: */
 
@@ -118,26 +136,29 @@ SIXTRL_INLINE int NS(Track_particle_beam_monitor)(
         {
             nturn_t store_idx = turns_since_start / skip;
 
+            index_t const out_particle_id = NS(Particles_get_particle_id_value)(
+                in_particles, particle_index );
+
             if( ( store_idx >= num_stores ) &&
                 ( NS(BeamMonitor_is_rolling)( monitor ) ) )
             {
                 store_idx = store_idx % num_stores;
             }
 
-            if( store_idx < num_stores )
+            if( ( store_idx < num_stores ) &&
+                ( out_particle_id >= ( index_t )0u ) )
             {
-                out_particles_t out_particles =
-                    NS(BeamMonitor_get_ptr_particles)( monitor, store_idx );
-
-                SIXTRL_ASSERT( out_particles != SIXTRL_NULLPTR );
-
-                NS(Particles_copy_single)( out_particles, particle_index,
-                                           in_particles, particle_index );
+                success = NS(Particles_copy_to_generic_addr_data)(
+                    ( ptr_out_particles_t )( uintptr_t
+                        )NS(BeamMonitor_get_particles_begin_addr)(
+                            monitor, store_idx ),
+                    ( num_elements_t )out_particle_id,
+                    in_particles, particle_index );
             }
         }
     }
 
-    return 0;
+    return success;
 }
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
