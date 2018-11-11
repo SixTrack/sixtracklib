@@ -23,6 +23,12 @@ add_executable( simple_particles_buffer_c99 simple_particles_buffer.c )
 list( APPEND EXAMPLE_TARGETS simple_particles_buffer_c99 )
 
 # -----------------------------------------------------------------------------
+# track_io_c99:
+
+add_executable( track_io_c99 track_io.c )
+list( APPEND EXAMPLE_TARGETS track_io_c99 )
+
+# -----------------------------------------------------------------------------
 # track_lhc_no_bb_c99:
 
 add_executable( track_lhc_no_bb_c99 track_lhc_no_bb.c )
