@@ -37,7 +37,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_assign_be_mon_io_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_default_optimized_tracking( true )
+        m_use_optimized_tracking( true ),
+        m_enable_beam_beam( true )
     {
         this->doInitDefaultProgramsPrivImpl();
     }
@@ -53,7 +54,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_assign_be_mon_io_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_default_optimized_tracking( true )
+        m_use_optimized_tracking( true ),
+        m_enable_beam_beam( true )
     {
         using base_t = ClContextBase;
 
@@ -78,7 +80,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_assign_be_mon_io_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_default_optimized_tracking( true )
+        m_use_optimized_tracking( true ),
+        m_enable_beam_beam( true )
     {
         using base_t = ClContextBase;
         using size_t = base_t::size_type;
@@ -108,7 +111,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_assign_be_mon_io_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_default_optimized_tracking( true )
+        m_use_optimized_tracking( true ),
+        m_enable_beam_beam( true )
     {
         using base_t = ClContextBase;
         using size_t = base_t::size_type;
@@ -152,7 +156,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_assign_be_mon_io_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
         m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_default_optimized_tracking( true )
+        m_use_optimized_tracking( true ),
+        m_enable_beam_beam( true )
     {
         using base_t = ClContextBase;
         using size_t = base_t::size_type;
@@ -845,7 +850,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     bool ClContext::useOptimizedTrackingByDefault() const SIXTRL_NOEXCEPT
     {
-        return this->m_default_optimized_tracking;
+        return this->m_use_optimized_tracking;
     }
 
     void ClContext::enableOptimizedtrackingByDefault()
@@ -854,7 +859,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( !this->hasSelectedNode() ) )
         {
             this->clear();
-            this->m_default_optimized_tracking = true;
+            this->m_use_optimized_tracking = true;
             this->doInitDefaultPrograms();
             this->doInitDefaultKernels();
         }
@@ -868,13 +873,50 @@ namespace SIXTRL_CXX_NAMESPACE
             ( !this->hasSelectedNode() ) )
         {
             this->clear();
-            this->m_default_optimized_tracking = false;
+
+            this->m_use_optimized_tracking = false;
             this->doInitDefaultPrograms();
             this->doInitDefaultKernels();
         }
 
         return;
     }
+
+    bool ClContext::isBeamBeamTrackingEnabled() const SIXTRL_NOEXCEPT
+    {
+        return this->m_enable_beam_beam;
+    }
+
+    void ClContext::enableBeamBeamTracking()
+    {
+        if( ( !this->isBeamBeamTrackingEnabled() ) &&
+            ( !this->hasSelectedNode() ) )
+        {
+            this->clear();
+
+            this->m_enable_beam_beam = true;
+            this->doInitDefaultPrograms();
+            this->doInitDefaultKernels();
+        }
+
+        return;
+    }
+
+    void ClContext::disableBeamBeamTracking()
+    {
+        if( (  this->isBeamBeamTrackingEnabled() ) &&
+            ( !this->hasSelectedNode() ) )
+        {
+            this->clear();
+
+             this->m_enable_beam_beam = false;
+            this->doInitDefaultPrograms();
+            this->doInitDefaultKernels();
+        }
+
+        return;
+    }
+
 
     bool ClContext::doInitDefaultPrograms()
     {
@@ -927,9 +969,12 @@ namespace SIXTRL_CXX_NAMESPACE
         track_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
         track_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__global";
         track_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global";
-        #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-        track_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
-        #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+
+        if( !this->isBeamBeamTrackingEnabled() )
+        {
+            track_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
+        }
+
         track_compile_options += " -I";
         track_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
 
@@ -938,9 +983,12 @@ namespace SIXTRL_CXX_NAMESPACE
         track_optimized_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
         track_optimized_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private";
         track_optimized_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__private";
-        #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-        track_optimized_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
-        #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+
+        if( !this->isBeamBeamTrackingEnabled() )
+        {
+            track_optimized_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
+        }
+
         track_optimized_compile_options += " -I";
         track_optimized_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
 
@@ -1475,6 +1523,37 @@ SIXTRL_HOST_FN void NS(ClContext_disable_optimized_tracking_by_default)(
     NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     if( ctx != nullptr ) ctx->disableOptimizedTrackingByDefault();
+    return;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_HOST_FN bool NS(ClContext_is_beam_beam_tracking_enabled)(
+    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+{
+    return ( ctx != nullptr ) ? ctx->isBeamBeamTrackingEnabled() : false;
+}
+
+
+SIXTRL_HOST_FN void NS(ClContext_enable_beam_beam_tracking)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx )
+{
+    if( ctx != nullptr )
+    {
+        ctx->enableBeamBeamTracking();
+    }
+
+    return;
+}
+
+SIXTRL_HOST_FN void NS(ClContext_disable_beam_beam_tracking)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx )
+{
+    if( ctx != nullptr )
+    {
+        ctx->disableBeamBeamTracking();
+    }
+
     return;
 }
 
