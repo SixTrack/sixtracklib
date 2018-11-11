@@ -22,13 +22,14 @@
 extern SIXTRL_HOST_FN int NS(BeamMonitor_prepare_io_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT io_buffer,
-    NS(buffer_size_t) const num_particles, bool const enable_elem_by_elem_dump );
-
+    NS(buffer_size_t) const num_particles,
+    NS(buffer_size_t) const num_elem_by_elem_turns );
 
 int NS(BeamMonitor_prepare_io_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT io_buffer,
-    NS(buffer_size_t) const num_particles, bool const enable_elem_by_elem_dump )
+    NS(buffer_size_t) const num_particles,
+    NS(buffer_size_t) const num_elem_by_elem_turns )
 {
     typedef NS(buffer_size_t) buf_size_t;
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*  ptr_obj_t;
@@ -83,14 +84,12 @@ int NS(BeamMonitor_prepare_io_buffer)(
 
                 SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
 
-                if( num_stores > ZERO )
-                {
-                    num_objects  += num_stores;
-                    num_slots    += num_stores * req_num_slots_per_obj;
-                    num_dataptrs += num_stores * req_num_dataptrs_per_obj;
+                num_objects  += num_stores;
+                num_slots    += num_stores * req_num_slots_per_obj;
+                num_dataptrs += num_stores * req_num_dataptrs_per_obj;
 
-                    ++num_beam_monitors;
-                }
+                ++num_beam_monitors;
+                ++num_elem_by_elem_blocks;
             }
             else if( ( type_id != NS(OBJECT_TYPE_PARTICLE) ) &&
                      ( type_id != NS(OBJECT_TYPE_NONE)     ) &&
@@ -101,13 +100,14 @@ int NS(BeamMonitor_prepare_io_buffer)(
             }
         }
 
-        if( enable_elem_by_elem_dump )
+        if( num_elem_by_elem_turns > ( buf_size_t )0u )
         {
-            ++num_elem_by_elem_blocks;
+            buf_size_t const elem_by_elem_objects =
+                num_elem_by_elem_turns * num_elem_by_elem_blocks;
 
-            num_objects  += num_elem_by_elem_blocks;
-            num_slots    += num_elem_by_elem_blocks * req_num_slots_per_obj;
-            num_dataptrs += num_elem_by_elem_blocks * req_num_dataptrs_per_obj;
+            num_objects  += elem_by_elem_objects;
+            num_slots    += elem_by_elem_objects * req_num_slots_per_obj;
+            num_dataptrs += elem_by_elem_objects * req_num_dataptrs_per_obj;
         }
 
         if( ( 0 == NS(Buffer_reset)( io_buffer ) ) &&
