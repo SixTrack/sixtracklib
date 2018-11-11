@@ -145,6 +145,12 @@ namespace SIXTRL_CXX_NAMESPACE
         void enableOptimizedtrackingByDefault();
         void disableOptimizedTrackingByDefault();
 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        bool isBeamBeamTrackingEnabled() const SIXTRL_NOEXCEPT;
+        void enableBeamBeamTracking();
+        void disableBeamBeamTracking();
+
         protected:
 
         virtual bool doInitDefaultPrograms() override;
@@ -167,7 +173,8 @@ namespace SIXTRL_CXX_NAMESPACE
         kernel_id_t  m_assign_be_mon_io_buffer_kernel_id;
         kernel_id_t  m_clear_be_mon_kernel_id;
 
-        bool         m_default_optimized_tracking;
+        bool         m_use_optimized_tracking;
+        bool         m_enable_beam_beam;
     };
 }
 
@@ -357,6 +364,19 @@ SIXTRL_HOST_FN void NS(ClContext_enable_optimized_tracking_by_default)(
 
 SIXTRL_HOST_FN void NS(ClContext_disable_optimized_tracking_by_default)(
     NS(ClContext)* SIXTRL_RESTRICT ctx );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_HOST_FN bool NS(ClContext_is_beam_beam_tracking_enabled)(
+    const NS(ClContext) *const SIXTRL_RESTRICT ctx );
+
+
+SIXTRL_HOST_FN void NS(ClContext_enable_beam_beam_tracking)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx );
+
+SIXTRL_HOST_FN void NS(ClContext_disable_beam_beam_tracking)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx );
+
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
