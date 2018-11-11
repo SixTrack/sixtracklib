@@ -388,6 +388,8 @@ SIXTRL_INLINE int NS(Track_particle_beam_element_obj)(
     SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index ) ==
                    ( index_t )1 );
 
+    ( void )index_t;
+
     switch( type_id )
     {
         case NS(OBJECT_TYPE_DRIFT):
