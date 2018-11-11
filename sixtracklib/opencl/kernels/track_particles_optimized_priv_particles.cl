@@ -134,7 +134,7 @@ __kernel void NS(Track_particles_single_turn_opt_pp_opencl)(
         NS(Track_particle_beam_elements_obj)(
             &particles, 0u, be_begin, be_end );
 
-        NS(Track_particle_increment_at_turn)( &particles, 0u );
+        NS(Track_particle_increment_at_turn)( &particles, 0u, 0u );
 
         NS(Particles_copy_to_generic_addr_data)(
             in_particles, particle_index, &particles, 0 );

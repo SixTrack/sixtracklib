@@ -148,7 +148,7 @@ __kernel void NS(Track_particles_single_turn_opt_pp_debug_opencl)(
 
             if( success_flag == 0 )
             {
-                NS(Track_particle_increment_at_turn)( &particles, 0u );
+                NS(Track_particle_increment_at_turn)( &particles, 0u, 0u );
             }
 
             success_flag |= NS(Particles_copy_to_generic_addr_data)(

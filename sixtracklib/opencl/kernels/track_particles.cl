@@ -76,7 +76,8 @@ __kernel void NS(Track_particles_single_turn_opencl)(
         NS(Track_particle_beam_elements_obj)(
             particles, particle_id, be_begin, be_end );
 
-        NS(Track_particle_increment_at_turn)( particles, particle_id );
+        NS(Track_particle_increment_at_turn)(
+            particles, particle_id, 0u );
     }
 
     return;
