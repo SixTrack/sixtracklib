@@ -156,11 +156,11 @@ TEST( C99_CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
     }
 
     ASSERT_TRUE( ::st_BeamMonitor_get_num_elem_by_elem_objects( eb ) ==
-                 size_t{ 0 } );
+                 cmp_beam_monitors.size() );
 
     ASSERT_TRUE( ::st_BeamMonitor_get_num_elem_by_elem_objects_from_managed_buffer(
         ::st_Buffer_get_const_data_begin( eb ), ::st_Buffer_get_slot_size( eb ) )
-            == size_t{ 0 } );
+            == cmp_beam_monitors.size() );
 
     ASSERT_TRUE( ::st_BeamMonitor_get_num_of_beam_monitor_objects( eb ) ==
                  cmp_beam_monitors.size() );
@@ -263,7 +263,7 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     }
 
     ASSERT_TRUE( ::st_BeamMonitor_get_num_elem_by_elem_objects( eb ) ==
-                 NUM_DRIFTS );
+                 ( NUM_DRIFTS + NUM_BEAM_MONITORS ) );
 
     ASSERT_TRUE( ::st_BeamMonitor_get_num_of_beam_monitor_objects( eb ) ==
                  NUM_BEAM_MONITORS );
@@ -272,7 +272,7 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     /* reserve io buffer without element by element buffer */
 
     ASSERT_TRUE( 0 == ::st_BeamMonitor_prepare_io_buffer(
-        eb, io, NUM_PARTICLES, false ) );
+        eb, io, NUM_PARTICLES, 0u ) );
 
     ASSERT_TRUE( sum_num_of_stores ==
         ::st_Particles_buffer_get_num_of_particle_blocks( io ) );
@@ -335,19 +335,19 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     /* reserve io buffer with element by element buffer */
 
     ASSERT_TRUE( 0 == ::st_BeamMonitor_prepare_io_buffer(
-        eb, io, NUM_PARTICLES, true ) );
+        eb, io, NUM_PARTICLES, 1u ) );
 
     size_t num_io_particles_block =
         ::st_Particles_buffer_get_num_of_particle_blocks( io );
 
     ASSERT_TRUE(  num_io_particles_block ==
-        ( sum_num_of_stores + NUM_DRIFTS + size_t{ 1 } ) );
+        ( sum_num_of_stores + NUM_DRIFTS + NUM_BEAM_MONITORS ) );
 
     ASSERT_TRUE( 0 == ::st_BeamMonitor_assign_io_buffer(
         eb, io, NUM_PARTICLES, true ) );
 
     eb_it = eb_begin;
-    io_particles_offset = NUM_DRIFTS + size_t{ 1 };
+    io_particles_offset = NUM_DRIFTS + NUM_BEAM_MONITORS;
 
     for( size_t jj = size_t{ 0 } ; eb_it != eb_end ; ++eb_it )
     {
@@ -544,7 +544,7 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
     nturn_t const NUM_TURNS = max_start_turn + 2 * max_num_turns;
 
     int const ret = ::st_BeamMonitor_prepare_io_buffer(
-        eb, io, NUM_PARTICLES, false );
+        eb, io, NUM_PARTICLES, 0u );
 
     ASSERT_TRUE( 0 == ret );
 
@@ -559,13 +559,10 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
 
     for( nturn_t ii = nturn_t{ 0 } ; ii < NUM_TURNS ; ++ii )
     {
-        std::fill( ::st_Particles_get_at_element_id( particles ),
-            ::st_Particles_get_at_element_id( particles ) + NUM_PARTICLES, 0u );
-
         ASSERT_TRUE( 0 == ::st_Track_all_particles_append_element_by_element(
             particles, 0u, eb, cmp_particles_buffer ) );
 
-        ::st_Track_all_particles_increment_at_turn( particles );
+        ::st_Track_all_particles_increment_at_turn( particles, 0u );
     }
 
     /* --------------------------------------------------------------------- */
@@ -705,9 +702,9 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
                                  ( prev_element_id == index_t{ -1 } ) );
 
                     ASSERT_TRUE(
-                        ( 0 == ::st_Particles_compare_values(
+                        ( 0 == ::st_Particles_compare_real_values(
                             cmp_particles, io_particles ) )  ||
-                        ( 0 == ::st_Particles_compare_values_with_treshold(
+                        ( 0 == ::st_Particles_compare_real_values_with_treshold(
                             cmp_particles, io_particles, ABS_TOLERANCE ) ) );
 
                     prev_state = state;
