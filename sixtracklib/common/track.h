@@ -372,7 +372,6 @@ SIXTRL_INLINE int NS(Track_particle_beam_element_obj)(
 {
     typedef NS(object_type_id_t) type_id_t;
     typedef NS(buffer_addr_t)    address_t;
-    typedef NS(particle_index_t) index_t;
 
     int ret = 0;
 
@@ -386,9 +385,7 @@ SIXTRL_INLINE int NS(Track_particle_beam_element_obj)(
                    NS(Particles_get_num_of_particles)( particles ) );
 
     SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index ) ==
-                   ( index_t )1 );
-
-    ( void )index_t;
+                   ( NS(particle_index_t) )1 );
 
     switch( type_id )
     {
