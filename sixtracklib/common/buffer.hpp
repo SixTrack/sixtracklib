@@ -146,6 +146,22 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
+        SIXTRL_HOST_FN bool writeToFile(
+            std::string const& SIXTRL_RESTRICT_REF path_to_file );
+
+        SIXTRL_HOST_FN bool writeToFile(
+            const char *const SIXTRL_RESTRICT path_to_file );
+
+        SIXTRL_HOST_FN bool writeToFileNormalizedAddr(
+            std::string const& SIXTRL_RESTRICT_REF path_to_file,
+            address_t const target_base_addr );
+
+        SIXTRL_HOST_FN bool writeToFileNormalizedAddr(
+            const char *const SIXTRL_RESTRICT path_to_file,
+            address_t const target_base_addr );
+
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_FN size_type getNumSlots()            const SIXTRL_NOEXCEPT;
         SIXTRL_FN size_type getMaxNumSlots()         const SIXTRL_NOEXCEPT;
         SIXTRL_FN size_type getSlotsSize()           const SIXTRL_NOEXCEPT;
@@ -634,7 +650,40 @@ namespace SIXTRL_CXX_NAMESPACE
         return NS(Buffer_get_section_header_size)( this->getCApiPtr() );
     }
 
-    /* ----------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+
+    SIXTRL_INLINE SIXTRL_HOST_FN bool Buffer::writeToFile(
+        std::string const& SIXTRL_RESTRICT_REF path_to_file )
+    {
+        return NS(Buffer_write_to_file)(
+            this->getCApiPtr(), path_to_file.c_str() );
+    }
+
+    SIXTRL_INLINE SIXTRL_HOST_FN bool Buffer::writeToFile(
+            const char *const SIXTRL_RESTRICT path_to_file )
+    {
+        return NS(Buffer_write_to_file)( this->getCApiPtr(), path_to_file );
+    }
+
+    SIXTRL_INLINE SIXTRL_HOST_FN bool Buffer::writeToFileNormalizedAddr(
+            std::string const& SIXTRL_RESTRICT_REF path_to_file,
+            address_t const target_base_addr )
+    {
+        return NS(Buffer_write_to_file_normalized_addr)(
+            this->getCApiPtr(), path_to_file.c_str(), target_base_addr );
+
+    }
+
+    SIXTRL_INLINE SIXTRL_HOST_FN bool Buffer::writeToFileNormalizedAddr(
+            const char *const SIXTRL_RESTRICT path_to_file,
+            address_t const target_base_addr )
+    {
+        return NS(Buffer_write_to_file_normalized_addr)(
+            this->getCApiPtr(), path_to_file, target_base_addr );
+
+    }
+
+    /* --------------------------------------------------------------------- */
 
     SIXTRL_INLINE Buffer::size_type
     Buffer::getNumSlots() const SIXTRL_NOEXCEPT

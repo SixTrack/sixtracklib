@@ -1,0 +1,19 @@
+# ==============================================================================
+# Automatically generated SixTrackLib Settings.cmake file for examples_program
+
+# ------------------------------------------------------------------------------
+# Path to SixTrackLib installation
+
+set( SixTracklib_DIR "@SIXTRACKLIB_LIB_CONFIG_PATH@" )
+
+# ------------------------------------------------------------------------------
+# Enable/disable examples corresponding to specific modules of SixTrackLib:
+
+@SETTINGS_OPTIONS_AVAILABLE_MODULES@
+
+# ------------------------------------------------------------------------------
+# Enable/disable examples corresponding to specific bindings of SixTrackLib:
+
+@SETTINGS_OPTIONS_AVAILABLE_BINDINGS@
+
+#end: examples/Settings.cmake

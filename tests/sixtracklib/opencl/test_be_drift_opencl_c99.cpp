@@ -14,9 +14,6 @@
 
 #include <gtest/gtest.h>
 
-#define __CL_ENABLE_EXCEPTIONS
-#include <CL/cl.hpp>
-
 #include "sixtracklib/testlib.h"
 
 #include "sixtracklib/common/definitions.h"
@@ -24,634 +21,402 @@
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/be_drift/be_drift.h"
 
-TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
+#include "sixtracklib/opencl/internal/base_context.h"
+#include "sixtracklib/opencl/argument.h"
+
+namespace sixtrack
 {
-    using buffer_t    = ::st_Buffer;
-    using size_t      = ::st_buffer_size_t;
-
-    std::string const path_to_data( ::st_PATH_TO_TEST_TRACKING_BE_DRIFT_DATA );
-
-    /* --------------------------------------------------------------------- */
-
-    buffer_t* orig_buffer = ::st_TrackTestdata_extract_beam_elements_buffer(
-            path_to_data.c_str() );
-
-    size_t const slot_size = ::st_Buffer_get_slot_size( orig_buffer );
-    ASSERT_TRUE( slot_size == size_t{ 8 } );
-
-
-    ASSERT_TRUE( orig_buffer != nullptr );
-
-    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( orig_buffer ) > size_t{ 0 } );
-    size_t const buffer_size = ::st_Buffer_get_size( orig_buffer );
-    ASSERT_TRUE( buffer_size > size_t{ 0 } );
-
-
-    buffer_t* copy_buffer = ::st_Buffer_new( buffer_size );
-    ASSERT_TRUE( copy_buffer != nullptr );
-
-    int success = ::st_Buffer_reserve( copy_buffer,
-        ::st_Buffer_get_num_of_objects( orig_buffer ),
-        ::st_Buffer_get_num_of_slots( orig_buffer ),
-        ::st_Buffer_get_num_of_dataptrs( orig_buffer ),
-        ::st_Buffer_get_num_of_garbage_ranges( orig_buffer ) );
-
-    ASSERT_TRUE( success == 0 );
-
-    /* --------------------------------------------------------------------- */
-
-    std::vector< cl::Platform > platforms;
-    cl::Platform::get( &platforms );
-
-    std::vector< cl::Device > devices;
-
-    for( auto const& p : platforms )
+    namespace tests
     {
-        std::vector< cl::Device > temp_devices;
-
-        p.getDevices( CL_DEVICE_TYPE_ALL, &temp_devices );
-
-        for( auto const& d : temp_devices )
-        {
-            if( !d.getInfo< CL_DEVICE_AVAILABLE >() ) continue;
-            devices.push_back( d );
-        }
+        bool performBeamElementCopyTest(
+            ::st_ClContextBase* SIXTRL_RESTRICT context,
+            int const program_id, int const kernel_id,
+            ::st_Buffer* SIXTRL_RESTRICT in_buffer,
+            double const abs_tolerance );
     }
-
-    if( !devices.empty() )
-    {
-        std::ostringstream a2str;
-
-        std::string const PATH_TO_BASE_DIR = ::st_PATH_TO_BASE_DIR;
-
-        /* ----------------------------------------------------------------- */
-
-        a2str.str( "" );
-        a2str << " -D_GPUCODE=1"
-              << " -D__NAMESPACE=st_"
-              << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
-              << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
-              << " -I" << PATH_TO_BASE_DIR;
-
-        std::string const REMAP_COMPILE_OPTIONS = a2str.str();
-
-        std::string path_to_source = PATH_TO_BASE_DIR + std::string(
-            "sixtracklib/opencl/kernels/managed_buffer_remap_kernel.cl" );
-
-        std::ifstream kernel_file( path_to_source, std::ios::in );
-
-        std::string const REMAP_PROGRAM_SOURCE_CODE(
-            ( std::istreambuf_iterator< char >( kernel_file ) ),
-              std::istreambuf_iterator< char >() );
-
-        kernel_file.close();
-
-        /* ----------------------------------------------------------------- */
-
-        path_to_source  = PATH_TO_BASE_DIR;
-        path_to_source += "tests/sixtracklib/testlib/opencl/kernels/";
-        path_to_source += "opencl_beam_elements_opencl_kernel.cl";
-
-        kernel_file.open( path_to_source, std::ios::in );
-
-        std::string const COPY_PROGRAM_SOURCE_CODE(
-            ( std::istreambuf_iterator< char >( kernel_file ) ),
-              std::istreambuf_iterator< char >() );
-
-        a2str << " -I" << PATH_TO_BASE_DIR << "tests";
-
-        std::string const COPY_COMPILE_OPTIONS = a2str.str();
-
-        kernel_file.close();
-
-        /* ----------------------------------------------------------------- */
-
-        for( auto& device : devices )
-        {
-            cl::Platform platform( device.getInfo< CL_DEVICE_PLATFORM >() );
-
-            std::cout << "--------------------------------------------------"
-                      << "----------------------------------------------\r\n"
-                      << "INFO  :: Perform test for device       : "
-                      << device.getInfo< CL_DEVICE_NAME >() << "\r\n"
-                      << "INFO  :: Platform                      : "
-                      << platform.getInfo< CL_PLATFORM_NAME >() << "\r\n"
-                      << "INFO  :: Platform Vendor               : "
-                      << platform.getInfo< CL_PLATFORM_VENDOR >() << "\r\n"
-                      << "INFO  :: Device Type                   : ";
-
-            auto const device_type = device.getInfo< CL_DEVICE_TYPE >();
-
-            switch( device_type )
-            {
-                case CL_DEVICE_TYPE_CPU:
-                {
-                    std::cout << "CPU";
-                    break;
-                }
-
-                case CL_DEVICE_TYPE_GPU:
-                {
-                    std::cout << "GPU";
-                    break;
-                }
-
-                case CL_DEVICE_TYPE_ACCELERATOR:
-                {
-                    std::cout << "Accelerator";
-                    break;
-                }
-
-                case CL_DEVICE_TYPE_CUSTOM:
-                {
-                    std::cout << "Custom";
-                    break;
-                }
-
-                default:
-                {
-                    std::cout << "Unknown";
-                }
-            };
-
-            size_t const device_max_compute_units =
-                device.getInfo< CL_DEVICE_MAX_COMPUTE_UNITS >();
-
-            std::cout << "\r\n"
-                      << "INFO  :: Max work-group size           : "
-                      << device.getInfo< CL_DEVICE_MAX_WORK_GROUP_SIZE >()
-                      << "\r\n"
-                      << "INFO  :: Max num compute units         : "
-                      << device_max_compute_units << "\r\n";
-
-            /* ------------------------------------------------------------- */
-            /* reset copy_buffer structure and re-init:            */
-            /* ------------------------------------------------------------- */
-
-            ::st_Buffer_clear( copy_buffer, true );
-
-            auto in_obj_it  = ::st_Buffer_get_const_objects_begin( orig_buffer );
-            auto in_obj_end = ::st_Buffer_get_const_objects_end( orig_buffer );
-
-            for( ; in_obj_it != in_obj_end ; ++in_obj_it )
-            {
-                ::st_object_type_id_t const type_id =
-                    NS(Object_get_type_id)( in_obj_it );
-
-                switch( type_id )
-                {
-                    case NS(OBJECT_TYPE_DRIFT):
-                    {
-                        typedef NS(Drift) belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
-
-                        ptr_belem_t new_belem = NS(Drift_new)( copy_buffer );
-                        ASSERT_TRUE( new_belem != nullptr );
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_DRIFT_EXACT):
-                    {
-                        typedef NS(DriftExact)   belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
-
-                        ptr_belem_t new_belem = NS(DriftExact_new)( copy_buffer );
-                        ASSERT_TRUE( new_belem != nullptr );
-                        break;
-                    }
-
-                    default:
-                    {
-                        success = -1;
-                    }
-                };
-            }
-
-            ASSERT_TRUE( success == 0 );
-
-            size_t const total_num_beam_elements =
-                ::st_Buffer_get_num_of_objects( orig_buffer );
-
-            ASSERT_TRUE( total_num_beam_elements ==
-                         ::st_Buffer_get_num_of_objects( copy_buffer ) );
-
-            /* ------------------------------------------------------------- */
-
-            cl_int cl_ret = CL_SUCCESS;
-
-            cl::Context context( device );
-            cl::CommandQueue queue( context, device, CL_QUEUE_PROFILING_ENABLE );
-            cl::Program remap_program( context, REMAP_PROGRAM_SOURCE_CODE );
-            cl::Program copy_program(  context, COPY_PROGRAM_SOURCE_CODE );
-
-            try
-            {
-                cl_ret = remap_program.build( REMAP_COMPILE_OPTIONS.c_str() );
-            }
-            catch( cl::Error const& e )
-            {
-                std::cerr
-                      << "ERROR :: remap_program :: "
-                      << "OpenCL Compilation Error -> Stopping Unit-Test \r\n"
-                      << remap_program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( device )
-                      << "\r\n"
-                      << std::endl;
-
-                cl_ret = CL_FALSE;
-                throw;
-            }
-
-            ASSERT_TRUE( cl_ret == CL_SUCCESS );
-
-            try
-            {
-                cl_ret = copy_program.build( COPY_COMPILE_OPTIONS.c_str() );
-            }
-            catch( cl::Error const& e )
-            {
-                std::cerr
-                      << "ERROR :: copy_program :: "
-                      << "OpenCL Compilation Error -> Stopping Unit-Test \r\n"
-                      << copy_program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( device )
-                      << "\r\n"
-                      << std::endl;
-
-                cl_ret = CL_FALSE;
-                throw;
-            }
-
-            ASSERT_TRUE( cl_ret == CL_SUCCESS );
-
-            cl::Buffer cl_orig_buffer( context, CL_MEM_READ_WRITE, buffer_size );
-            cl::Buffer cl_copy_buffer( context, CL_MEM_READ_WRITE, buffer_size );
-            cl::Buffer cl_success_flag( context, CL_MEM_READ_WRITE, sizeof( int32_t ) );
-
-            try
-            {
-                cl_ret = queue.enqueueWriteBuffer( cl_orig_buffer, CL_TRUE, 0,
-                    ::st_Buffer_get_size( orig_buffer ),
-                    ::st_Buffer_get_const_data_begin( orig_buffer ) );
-            }
-            catch( cl::Error const& e )
-            {
-                std::cout << "enqueueWriteBuffer( orig_buffer ) :: "
-                          << "line = " << __LINE__
-                          << " :: ERROR : " << e.what() << std::endl
-                          << e.err() << std::endl;
-
-                cl_ret = CL_FALSE;
-                throw;
-            }
-
-            ASSERT_TRUE( cl_ret == CL_SUCCESS );
-
-            try
-            {
-                cl_ret = queue.enqueueWriteBuffer( cl_copy_buffer, CL_TRUE, 0,
-                   ::st_Buffer_get_size( copy_buffer ),
-                   ::st_Buffer_get_const_data_begin( copy_buffer ) );
-            }
-            catch( cl::Error const& e )
-            {
-                std::cout << "enqueueWriteBuffer( copy_buffer ) :: "
-                          << "line = " << __LINE__
-                          << " :: ERROR : " << e.what() << std::endl
-                          << e.err() << std::endl;
-
-                cl_ret = CL_FALSE;
-                throw;
-            }
-
-            ASSERT_TRUE( cl_ret == CL_SUCCESS );
-
-            int32_t success_flag = int32_t{ 0 };
-
-            try
-            {
-                cl_ret = queue.enqueueWriteBuffer( cl_success_flag, CL_TRUE, 0,
-                    sizeof( int32_t ), &success_flag );
-            }
-            catch( cl::Error const& e )
-            {
-                std::cout << "enqueueWriteBuffer( success_flag ) :: "
-                          << "line = " << __LINE__
-                          << " :: ERROR : " << e.what() << std::endl
-                          << e.err() << std::endl;
-
-                cl_ret = CL_FALSE;
-                throw;
-            }
-
-            ASSERT_TRUE( cl_ret == CL_SUCCESS );
-
-            /* ============================================================= *
-             * REMAP KERNEL *
-             * ============================================================= */
-
-            cl::Kernel remap_kernel;
-
-            try
-            {
-                remap_kernel = cl::Kernel(
-                    remap_program, "st_ManagedBuffer_remap_io_buffers_opencl" );
-            }
-            catch( cl::Error const& e )
-            {
-                std::cout << "kernel remap_kernel :: "
-                          << "line  = " << __LINE__ << " :: "
-                          << "ERROR : " << e.what() << "\r\n"
-                          << e.err() << std::endl;
-
-                cl_ret = CL_FALSE;
-                throw;
-            }
-
-            ASSERT_TRUE( remap_kernel.getInfo< CL_KERNEL_NUM_ARGS >() == 3u );
-
-            size_t remap_work_group_size = remap_kernel.getWorkGroupInfo<
-                CL_KERNEL_WORK_GROUP_SIZE >( device );
-
-            size_t const remap_work_group_size_prefered_multiple =
-                remap_kernel.getWorkGroupInfo<
-                    CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE >( device );
-
-            size_t remap_num_threads = remap_work_group_size;
-
-            std::cout << "INFO  :: remap kernel wg size          : "
-                      << remap_work_group_size << "\r\n"
-                      << "INFO  :: remap kernel wg size multi    : "
-                      << remap_work_group_size_prefered_multiple << "\r\n"
-                      << "INFO  :: remap kernel launch with      : "
-                      << remap_num_threads << " threads \r\n"
-                      << std::endl;
-
-            ASSERT_TRUE( remap_work_group_size_prefered_multiple > size_t{ 0 } );
-            ASSERT_TRUE( remap_work_group_size > size_t{ 0 } );
-            ASSERT_TRUE( remap_num_threads > size_t{ 0 } );
-            ASSERT_TRUE( ( remap_num_threads % remap_work_group_size ) ==
-                size_t{ 0 } );
-
-            remap_kernel.setArg( 0, cl_orig_buffer );
-            remap_kernel.setArg( 1, cl_copy_buffer );
-            remap_kernel.setArg( 2, cl_success_flag );
-
-            try
-            {
-                cl_ret = queue.enqueueNDRangeKernel(
-                    remap_kernel, cl::NullRange,
-                    cl::NDRange( remap_num_threads ),
-                    cl::NDRange( remap_work_group_size ) );
-            }
-            catch( cl::Error const& e )
-            {
-                std::cout << "enqueueNDRangeKernel( remap_kernel ) :: "
-                          << "line = " << __LINE__
-                          << " :: ERROR : " << e.what() << std::endl
-                          << e.err() << std::endl;
-
-                cl_ret = CL_FALSE;
-                throw;
-            }
-
-            ASSERT_TRUE( cl_ret == CL_SUCCESS );
-
-            try
-            {
-                cl_ret = queue.enqueueReadBuffer( cl_success_flag, CL_TRUE, 0,
-                    sizeof( success_flag ), &success_flag );
-            }
-            catch( cl::Error const& e )
-            {
-                std::cout << "enqueueReadBuffer( success_flag ) :: "
-                          << "line = " << __LINE__
-                          << " :: ERROR : " << e.what() << std::endl
-                          << e.err() << std::endl;
-
-                cl_ret = CL_FALSE;
-                throw;
-            }
-
-            ASSERT_TRUE( cl_ret == CL_SUCCESS );
-
-            if( success_flag != int32_t{ 0 } )
-            {
-                std::cout << "ERROR :: remap kernel success flag     : "
-                          << success_flag
-                          << std::endl;
-            }
-
-            ASSERT_TRUE( success_flag == int32_t{ 0 } );
-
-            /* ============================================================= *
-             * TRACKING KERNEL *
-             * ============================================================= */
-
-            cl::Kernel copy_kernel;
-
-            try
-            {
-                copy_kernel = cl::Kernel( copy_program,
-                    "st_BeamElements_copy_beam_elements_opencl" );
-            }
-            catch( cl::Error const& e )
-            {
-                std::cout << "kernel copy_kernel :: "
-                          << "line = " << __LINE__
-                          << " :: ERROR : " << e.what() << std::endl
-                          << e.err() << std::endl;
-                cl_ret = CL_FALSE;
-                throw;
-            }
-
-            ASSERT_TRUE( copy_kernel.getInfo< CL_KERNEL_NUM_ARGS >() == 3u );
-
-            size_t copy_work_group_size = copy_kernel.getWorkGroupInfo<
-                CL_KERNEL_WORK_GROUP_SIZE >( device );
-
-            size_t const copy_work_group_size_prefered_multiple =
-                copy_kernel.getWorkGroupInfo<
-                    CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE >( device );
-
-            ASSERT_TRUE( copy_work_group_size_prefered_multiple > size_t{ 0 } );
-            ASSERT_TRUE( copy_work_group_size > size_t{ 0 } );
-
-            size_t copy_num_threads = total_num_beam_elements / copy_work_group_size;
-
-            copy_num_threads *= copy_work_group_size;
-
-            if( total_num_beam_elements > copy_num_threads )
-            {
-                copy_num_threads += copy_work_group_size;
-            }
-
-            std::cout << "INFO  :: copy     kernel wg size       : "
-                      << copy_work_group_size << "\r\n"
-                      << "INFO  :: copy     kernel wg size multi : "
-                      << copy_work_group_size_prefered_multiple << "\r\n"
-                      << "INFO  :: copy     kernel launch with   : "
-                      << copy_num_threads << " threads \r\n"
-                      << "INFO  :: total num of beam_elements    : "
-                      << total_num_beam_elements << "\r\n"
-                      << std::endl;
-
-
-            ASSERT_TRUE( copy_num_threads > size_t{ 0 } );
-            ASSERT_TRUE( ( copy_num_threads % copy_work_group_size ) == size_t{ 0 } );
-
-            copy_kernel.setArg( 0, cl_orig_buffer );
-            copy_kernel.setArg( 1, cl_copy_buffer );
-            copy_kernel.setArg( 2, cl_success_flag );
-
-            try
-            {
-                cl_ret = queue.enqueueNDRangeKernel(
-                    copy_kernel, cl::NullRange,
-                    cl::NDRange( copy_num_threads ),
-                    cl::NDRange( copy_work_group_size  ) );
-            }
-            catch( cl::Error const& e )
-            {
-                std::cout << "enqueueNDRangeKernel( copy_kernel ) :: "
-                          << "line = " << __LINE__
-                          << " :: ERROR : " << e.what() << std::endl
-                          << e.err() << std::endl;
-
-                cl_ret = CL_FALSE;
-                throw;
-            }
-
-            try
-            {
-                cl_ret = queue.enqueueReadBuffer( cl_success_flag, CL_TRUE, 0,
-                    sizeof( success_flag ), &success_flag );
-            }
-            catch( cl::Error const& e )
-            {
-                std::cout << "enqueueReadBuffer( success_flag ) :: "
-                          << "line = " << __LINE__
-                          << " :: ERROR : " << e.what() << std::endl
-                          << e.err() << std::endl;
-
-                cl_ret = CL_FALSE;
-                throw;
-            }
-
-            ASSERT_TRUE( cl_ret == CL_SUCCESS );
-
-            if( success_flag != int32_t{ 0 } )
-            {
-                std::cout << "ERROR :: tracking kernel success flag  : "
-                          << success_flag
-                          << std::endl;
-            }
-
-            ASSERT_TRUE( success_flag == int32_t{ 0 } );
-
-            try
-            {
-                cl_ret = queue.enqueueReadBuffer( cl_copy_buffer, CL_TRUE, 0,
-                    ::st_Buffer_get_size( copy_buffer ),
-                    ::st_Buffer_get_data_begin( copy_buffer ) );
-            }
-            catch( cl::Error const& e )
-            {
-                std::cout << "enqueueReadBuffer( copy_buffer ) :: "
-                          << "line = " << __LINE__
-                          << " :: ERROR : " << e.what() << std::endl
-                          << e.err() << std::endl;
-
-                cl_ret = CL_FALSE;
-                throw;
-            }
-
-            ASSERT_TRUE( cl_ret == CL_SUCCESS );
-
-            /* ============================================================= */
-            /* COMPARE COPIED DATA TO ORIGINAL DATA                          */
-            /* ============================================================= */
-
-            success = ::st_Buffer_remap( copy_buffer );
-
-            ASSERT_TRUE( success == 0 );
-
-            ASSERT_TRUE(
-                ::st_Buffer_get_num_of_objects( copy_buffer ) ==
-                ::st_Buffer_get_num_of_objects( orig_buffer ) );
-
-            in_obj_it  = ::st_Buffer_get_const_objects_begin( orig_buffer );
-            in_obj_end = ::st_Buffer_get_const_objects_end( orig_buffer );
-
-            auto out_obj_it = ::st_Buffer_get_const_objects_begin( copy_buffer );
-
-            for( ; in_obj_it != in_obj_end ; ++in_obj_it, ++out_obj_it )
-            {
-                ::st_object_type_id_t const type_id =
-                    ::st_Object_get_type_id( in_obj_it );
-
-                ASSERT_TRUE( ::st_Object_get_type_id( out_obj_it ) == type_id );
-
-                switch( type_id )
-                {
-                    case NS(OBJECT_TYPE_DRIFT):
-                    {
-                        typedef NS(Drift) belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        ptr_belem_t orig_belem = ( ptr_belem_t )( uintptr_t
-                            )NS(Object_get_begin_addr)( in_obj_it );
-
-                        ptr_belem_t copy_belem = ( ptr_belem_t )( uintptr_t
-                            )NS(Object_get_begin_addr)( out_obj_it );
-
-                        ASSERT_TRUE( orig_belem != nullptr );
-                        ASSERT_TRUE( copy_belem != nullptr );
-
-                        ASSERT_TRUE( ::st_Drift_compare_values(
-                            orig_belem, copy_belem ) == 0 );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_DRIFT_EXACT):
-                    {
-                        typedef NS(DriftExact) belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        ptr_belem_t orig_belem = ( ptr_belem_t )( uintptr_t
-                            )NS(Object_get_begin_addr)( in_obj_it );
-
-                        ptr_belem_t copy_belem = ( ptr_belem_t )( uintptr_t
-                            )NS(Object_get_begin_addr)( out_obj_it );
-
-                        ASSERT_TRUE( orig_belem != nullptr );
-                        ASSERT_TRUE( copy_belem != nullptr );
-
-                        ASSERT_TRUE( ::st_DriftExact_compare_values(
-                            orig_belem, copy_belem ) == 0 );
-
-                        break;
-                    }
-
-                    default:
-                    {
-                        success = -1;
-                    }
-                };
-
-                ASSERT_TRUE( success == 0 );
-            }
-        }
-    }
-    else
-    {
-        std::cerr << "!!! --> WARNING :: Unable to perform unit-test as "
-                  << "no valid OpenCL nodes have been found. -> skipping "
-                  << "this unit-test <-- !!!" << std::endl;
-    }
-
-    ::st_Buffer_delete( orig_buffer );
-    ::st_Buffer_delete( copy_buffer );
 }
 
+TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftsHostToDeviceThenBackCompare )
+{
+    using size_t = ::st_buffer_size_t;
+
+    ::st_Buffer* in_buffer   = ::st_Buffer_new( 0u );
+
+    size_t const NUM_OBJECTS = size_t{ 1000 };
+
+    for( size_t ii = size_t{ 0 } ; ii < NUM_OBJECTS ; ++ii )
+    {
+        ::st_Drift* drift = ::st_Drift_add(
+            in_buffer, static_cast< double >( ii ) );
+
+        ASSERT_TRUE( drift != nullptr );
+    }
+
+    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( in_buffer  ) == NUM_OBJECTS );
+
+    /* ---------------------------------------------------------------------- */
+    /* Prepare path to test GPU kernel program file and compile options */
+
+    std::ostringstream a2str;
+
+    a2str <<  ::st_PATH_TO_BASE_DIR
+          << "tests/sixtracklib/testlib/opencl/kernels/"
+          << "opencl_beam_elements_opencl_kernel.cl";
+
+    std::string const path_to_program = a2str.str();
+    a2str.str( "" );
+
+    a2str << " -D_GPUCODE=1"
+          << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
+          << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
+          << " -I" << ::st_PATH_TO_SIXTRL_INCLUDE_DIR;
+
+    if( std::strcmp( ::st_PATH_TO_SIXTRL_INCLUDE_DIR,
+                     ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR ) != 0 )
+    {
+        a2str << " -I" << ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR;
+    }
+
+    std::string const program_compile_options( a2str.str() );
+    a2str.str( "" );
+
+    a2str << SIXTRL_C99_NAMESPACE_PREFIX_STR
+          << "BeamElements_copy_beam_elements_opencl";
+
+    std::string const kernel_name( a2str.str() );
+    a2str.str( "" );
+
+    /* ---------------------------------------------------------------------- */
+    /* Get number of available devices */
+
+
+    ::st_ClContextBase* context = ::st_ClContextBase_create();
+
+    ASSERT_TRUE( context != nullptr );
+
+    size_t const num_available_nodes =
+        ::st_ClContextBase_get_num_available_nodes( context );
+
+    ::st_ClContextBase_delete( context );
+    context = nullptr;
+
+    for( size_t ii = size_t{ 0 } ; ii < num_available_nodes ; ++ii )
+    {
+        context = ::st_ClContextBase_create();
+        ::st_ClContextBase_enable_debug_mode( context );
+
+        ASSERT_TRUE(  ::st_ClContextBase_is_debug_mode_enabled( context ) );
+        ASSERT_TRUE(  ::st_ClContextBase_select_node_by_index( context, ii ) );
+        ASSERT_TRUE(  ::st_ClContextBase_has_selected_node( context ) );
+
+        ::st_context_node_info_t const* node_info =
+            ::st_ClContextBase_get_selected_node_info( context );
+
+        ASSERT_TRUE( node_info != nullptr );
+        ASSERT_TRUE( ::st_ClContextBase_has_remapping_kernel( context ) );
+
+        char id_str[ 32 ];
+        ::st_ClContextBase_get_selected_node_id_str( context, id_str, 32 );
+
+        int program_id = ::st_ClContextBase_add_program_file(
+            context, path_to_program.c_str(), program_compile_options.c_str() );
+
+        ASSERT_TRUE( program_id >= 0 );
+
+        std::cout << "# ------------------------------------------------------"
+                  << "--------------------------------------------------------"
+                  << "\r\n"
+                  << "# Run Test on :: \r\n"
+                  << "# ID          :: " << id_str << "\r\n"
+                  << "# NAME        :: "
+                  << ::st_ComputeNodeInfo_get_name( node_info ) << "\r\n"
+                  << "# PLATFORM    :: "
+                  << ::st_ComputeNodeInfo_get_platform( node_info ) << "\r\n"
+                  << "# "
+                  << std::endl;
+
+        ASSERT_TRUE( ::st_ClContextBase_is_program_compiled(
+            context, program_id ) );
+
+        int const kernel_id = ::st_ClContextBase_enable_kernel(
+            context, kernel_name.c_str(), program_id );
+
+        ASSERT_TRUE( kernel_id >= 0 );
+
+        ASSERT_TRUE( sixtrack::tests::performBeamElementCopyTest(
+            context, program_id, kernel_id, in_buffer,
+                std::numeric_limits< double >::epsilon() ) );
+
+        ::st_ClContextBase_delete( context );
+        context = nullptr;
+    }
+
+    ::st_Buffer_delete( in_buffer );
+}
+
+
+TEST( C99_OpenCL_BeamElementsDriftTests, CopyDriftExactsHostToDeviceThenBackCompare )
+{
+    using size_t = ::st_buffer_size_t;
+
+    ::st_Buffer* in_buffer   = ::st_Buffer_new( 0u );
+
+    size_t const NUM_OBJECTS = size_t{ 1000 };
+
+    for( size_t ii = size_t{ 0 } ; ii < NUM_OBJECTS ; ++ii )
+    {
+        ::st_DriftExact* drift = ::st_DriftExact_add(
+            in_buffer, static_cast< double >( ii ) );
+
+        ASSERT_TRUE( drift != nullptr );
+    }
+
+    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( in_buffer  ) == NUM_OBJECTS );
+
+    /* ---------------------------------------------------------------------- */
+    /* Prepare path to test GPU kernel program file and compile options */
+
+    std::ostringstream a2str;
+
+    a2str <<  ::st_PATH_TO_BASE_DIR
+          << "tests/sixtracklib/testlib/opencl/kernels/"
+          << "opencl_beam_elements_opencl_kernel.cl";
+
+    std::string const path_to_program = a2str.str();
+    a2str.str( "" );
+
+    a2str << " -D_GPUCODE=1"
+          << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
+          << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
+          << " -I" << ::st_PATH_TO_SIXTRL_INCLUDE_DIR;
+
+    if( std::strcmp( ::st_PATH_TO_SIXTRL_INCLUDE_DIR,
+                     ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR ) != 0 )
+    {
+        a2str << " -I" << ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR;
+    }
+
+    std::string const program_compile_options( a2str.str() );
+    a2str.str( "" );
+
+    a2str << SIXTRL_C99_NAMESPACE_PREFIX_STR
+          << "BeamElements_copy_beam_elements_opencl";
+
+    std::string const kernel_name( a2str.str() );
+    a2str.str( "" );
+
+    /* ---------------------------------------------------------------------- */
+    /* Get number of available devices */
+
+
+    ::st_ClContextBase* context = ::st_ClContextBase_create();
+
+    ASSERT_TRUE( context != nullptr );
+
+    size_t const num_available_nodes =
+        ::st_ClContextBase_get_num_available_nodes( context );
+
+    ::st_ClContextBase_delete( context );
+    context = nullptr;
+
+    for( size_t ii = size_t{ 0 } ; ii < num_available_nodes ; ++ii )
+    {
+        context = ::st_ClContextBase_create();
+        ::st_ClContextBase_enable_debug_mode( context );
+
+        ASSERT_TRUE(  ::st_ClContextBase_is_debug_mode_enabled( context ) );
+        ASSERT_TRUE(  ::st_ClContextBase_select_node_by_index( context, ii ) );
+        ASSERT_TRUE(  ::st_ClContextBase_has_selected_node( context ) );
+
+        ::st_context_node_info_t const* node_info =
+            ::st_ClContextBase_get_selected_node_info( context );
+
+        ASSERT_TRUE( node_info != nullptr );
+        ASSERT_TRUE( ::st_ClContextBase_has_remapping_kernel( context ) );
+
+        char id_str[ 32 ];
+        ::st_ClContextBase_get_selected_node_id_str( context, id_str, 32 );
+
+        int program_id = ::st_ClContextBase_add_program_file(
+            context, path_to_program.c_str(), program_compile_options.c_str() );
+
+        ASSERT_TRUE( program_id >= 0 );
+
+        std::cout << "# ------------------------------------------------------"
+                  << "--------------------------------------------------------"
+                  << "\r\n"
+                  << "# Run Test on :: \r\n"
+                  << "# ID          :: " << id_str << "\r\n"
+                  << "# NAME        :: "
+                  << ::st_ComputeNodeInfo_get_name( node_info ) << "\r\n"
+                  << "# PLATFORM    :: "
+                  << ::st_ComputeNodeInfo_get_platform( node_info ) << "\r\n"
+                  << "# "
+                  << std::endl;
+
+        ASSERT_TRUE( ::st_ClContextBase_is_program_compiled(
+            context, program_id ) );
+
+        int const kernel_id = ::st_ClContextBase_enable_kernel(
+            context, kernel_name.c_str(), program_id );
+
+        ASSERT_TRUE( kernel_id >= 0 );
+
+        ASSERT_TRUE( sixtrack::tests::performBeamElementCopyTest(
+            context, program_id, kernel_id, in_buffer,
+                std::numeric_limits< double >::epsilon() ) );
+
+        ::st_ClContextBase_delete( context );
+        context = nullptr;
+    }
+
+    ::st_Buffer_delete( in_buffer );
+}
+
+namespace sixtrack
+{
+    namespace tests
+    {
+        bool performBeamElementCopyTest(
+            ::st_ClContextBase* SIXTRL_RESTRICT context,
+            int const program_id, int const kernel_id,
+            ::st_Buffer* SIXTRL_RESTRICT in_buffer,
+            double const abs_tolerance )
+        {
+            bool success = false;
+
+            if( ( in_buffer != nullptr ) && ( context != nullptr ) &&
+                ( ::st_ClContextBase_has_selected_node( context ) ) &&
+                ( ::st_ClContextBase_has_remapping_kernel( context ) ) &&
+                ( program_id >= 0 ) &&
+                ( static_cast< std::size_t >( program_id ) <
+                    ::st_ClContextBase_get_num_available_programs( context ) ) &&
+                ( kernel_id >= 0 ) &&
+                ( static_cast< std::size_t >( kernel_id ) <
+                     ::st_ClContextBase_get_num_available_kernels( context ) ) )
+            {
+                std::size_t const NUM_OBJECTS = ::st_Buffer_get_num_of_objects( in_buffer );
+
+                ::st_Buffer* out_buffer = ::st_Buffer_new( 0u );
+
+                success = ( 0 == ::st_BeamElements_copy_to_buffer( out_buffer,
+                    ::st_Buffer_get_const_objects_begin( in_buffer ),
+                    ::st_Buffer_get_const_objects_end( in_buffer ) ) );
+
+                if( !success )
+                {
+                    ::st_Buffer_delete( out_buffer );
+                    return success;
+                }
+
+                ::st_BeamElements_clear_buffer( out_buffer );
+
+                ::st_ClArgument* in_buffer_arg =
+                    ::st_ClArgument_new_from_buffer( in_buffer, context );
+
+                success = ( ( in_buffer_arg != nullptr ) &&
+                            ( ::st_ClArgument_get_argument_size( in_buffer_arg ) ==
+                              ::st_Buffer_get_size( in_buffer ) ) &&
+                            ( ::st_ClArgument_uses_cobj_buffer( in_buffer_arg ) ) &&
+                            ( ::st_ClArgument_get_ptr_cobj_buffer( in_buffer_arg ) ==
+                              in_buffer ) );
+
+                if( !success )
+                {
+                    ::st_Buffer_delete( out_buffer );
+                    return success;
+                }
+
+                ::st_ClArgument* out_buffer_arg =
+                    ::st_ClArgument_new_from_buffer( out_buffer, context );
+
+                success = ( ( out_buffer_arg != nullptr ) &&
+                            ( ::st_ClArgument_get_argument_size( out_buffer_arg ) ==
+                              ::st_Buffer_get_size( out_buffer ) ) &&
+                            ( ::st_ClArgument_uses_cobj_buffer( out_buffer_arg ) ) &&
+                            ( ::st_ClArgument_get_ptr_cobj_buffer( out_buffer_arg ) ==
+                              out_buffer ) );
+
+                if( !success )
+                {
+                    ::st_ClArgument_delete( in_buffer_arg );
+
+                    if( out_buffer_arg != nullptr )
+                    {
+                        ::st_ClArgument_delete( out_buffer_arg );
+                    }
+
+                    ::st_Buffer_delete( out_buffer );
+
+                    return success;
+                }
+
+                int32_t success_flag = int32_t{ 0 };
+
+                ::st_ClArgument* success_flag_arg = ::st_ClArgument_new_from_memory(
+                    &success_flag, sizeof( success_flag ), context );
+
+                success = ( ( success_flag_arg != nullptr ) &&
+                            ( ::st_ClArgument_get_argument_size( success_flag_arg ) ==
+                                 sizeof( success_flag ) ) &&
+                            ( !::st_ClArgument_uses_cobj_buffer( success_flag_arg ) ) );
+
+                if( !success )
+                {
+                    ::st_ClArgument_delete( in_buffer_arg );
+                    ::st_ClArgument_delete( out_buffer_arg );
+
+                    if( success_flag_arg != nullptr )
+                    {
+                        ::st_ClArgument_delete( success_flag_arg );
+                    }
+
+                    ::st_Buffer_delete( out_buffer );
+                }
+
+                ::st_ClContextBase_assign_kernel_argument(
+                    context, kernel_id, 0u, in_buffer_arg );
+
+                ::st_ClContextBase_assign_kernel_argument(
+                    context, kernel_id, 1u, out_buffer_arg );
+
+                ::st_ClContextBase_assign_kernel_argument(
+                    context, kernel_id, 2u, success_flag_arg );
+
+                success = ::st_ClContextBase_run_kernel(
+                    context, kernel_id, NUM_OBJECTS );
+
+                if( success )
+                {
+                    success = ::st_ClArgument_read( out_buffer_arg, out_buffer );
+                }
+
+                if( success )
+                {
+                    success = ::st_ClArgument_read_memory( success_flag_arg,
+                        &success_flag, sizeof( success_flag ) );
+                }
+
+                success &= ( success_flag == 0 );
+                success &= ( ::st_Buffer_get_num_of_objects( out_buffer ) == NUM_OBJECTS );
+
+                if( success )
+                {
+                    success = ( 0 == ::st_BeamElements_compare_lines_with_treshold(
+                    ::st_Buffer_get_const_objects_begin( in_buffer ),
+                    ::st_Buffer_get_const_objects_end( in_buffer ),
+                    ::st_Buffer_get_const_objects_begin( out_buffer ), abs_tolerance ) );
+                }
+
+                ::st_ClArgument_delete( in_buffer_arg );
+                ::st_ClArgument_delete( out_buffer_arg );
+                ::st_ClArgument_delete( success_flag_arg );
+                ::st_Buffer_delete( out_buffer );
+            }
+
+            return success;
+        }
+    }
+}
 
 /* end: tests/sixtracklib/opencl/test_be_drift_opencl_c99.cpp */

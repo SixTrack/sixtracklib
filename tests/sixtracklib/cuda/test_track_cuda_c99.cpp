@@ -38,10 +38,10 @@ TEST( C99_Cuda_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
     static real_t const ABS_TOLERANCE = real_t{ 1e-13 };
 
     ::st_Buffer* lhc_particles_buffer = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_TEST_LHC_PARTICLES_DATA_T1_P2_NO_BEAM_BEAM );
+        ::st_PATH_TO_BBSIMPLE_PARTICLES_SIXTRACK_DUMP );
 
     ::st_Buffer* lhc_beam_elements_buffer = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM );
+        ::st_PATH_TO_BBSIMPLE_BEAM_ELEMENTS_SIXTRACK );
 
     ::st_Buffer* particles_buffer      = ::st_Buffer_new( size_t{ 1u << 20u } );
     ::st_Buffer* diff_particles_buffer = ::st_Buffer_new( size_t{ 1u << 20u } );

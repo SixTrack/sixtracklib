@@ -26,7 +26,6 @@ namespace SIXTRL_CXX_NAMESPACE
     ClArgument::ClArgument(
         ClArgument::context_base_t* SIXTRL_RESTRICT ptr_context ) :
         m_cl_buffer(),
-        m_cl_success_flag(),
         m_ptr_cobj_buffer( nullptr ),
         m_ptr_context( ptr_context ),
         m_arg_size( ClArgument::size_type{ 0 } )
@@ -38,7 +37,6 @@ namespace SIXTRL_CXX_NAMESPACE
         ClArgument::cxx_cobj_buffer_t& SIXTRL_RESTRICT_REF buffer,
         ClArgument::context_base_t* SIXTRL_RESTRICT ptr_context ) :
         m_cl_buffer(),
-        m_cl_success_flag(),
         m_ptr_cobj_buffer( nullptr ),
         m_ptr_context( ptr_context ),
         m_arg_size( ClArgument::size_type{ 0 } )
@@ -59,9 +57,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->m_arg_size = arg_size;
 
-            this->m_cl_success_flag = cl::Buffer(
-                *ptr_ocl_ctx, CL_MEM_READ_WRITE, sizeof( int32_t ), nullptr );
-
             int const ret = this->doWriteAndRemapCObjBufferBaseImpl(
                 buffer.getCApiPtr() );
 
@@ -74,7 +69,6 @@ namespace SIXTRL_CXX_NAMESPACE
         ClArgument::cobj_buffer_t* SIXTRL_RESTRICT buffer,
         ClArgument::context_base_t* SIXTRL_RESTRICT ptr_context ) :
         m_cl_buffer(),
-        m_cl_success_flag(),
         m_ptr_cobj_buffer( nullptr ),
         m_ptr_context( ptr_context ),
         m_arg_size( ClArgument::size_type{ 0 } )
@@ -95,9 +89,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->m_arg_size = arg_size;
 
-            this->m_cl_success_flag = cl::Buffer(
-                *ptr_ocl_ctx, CL_MEM_READ_WRITE, sizeof( int32_t ), nullptr );
-
             int const ret = this->doWriteAndRemapCObjBufferBaseImpl( buffer );
 
             SIXTRL_ASSERT( ret == 0 );
@@ -109,7 +100,6 @@ namespace SIXTRL_CXX_NAMESPACE
         ClArgument::size_type const arg_size,
         ClArgument::context_base_t* SIXTRL_RESTRICT ptr_context ) :
         m_cl_buffer(),
-        m_cl_success_flag(),
         m_ptr_cobj_buffer( nullptr ),
         m_ptr_context( ptr_context ),
         m_arg_size( ClArgument::size_type{ 0 } )
@@ -130,11 +120,6 @@ namespace SIXTRL_CXX_NAMESPACE
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
 
             this->m_arg_size = arg_size;
-
-            this->m_cl_success_flag = cl::Buffer(
-                *ptr_ocl_ctx, CL_MEM_READ_WRITE, sizeof( int32_t ), nullptr );
-
-            this->m_arg_size = arg_size;
         }
     }
 
@@ -143,7 +128,6 @@ namespace SIXTRL_CXX_NAMESPACE
         ClArgument::size_type const arg_size,
         ClArgument::context_base_t* SIXTRL_RESTRICT ptr_context ) :
         m_cl_buffer(),
-        m_cl_success_flag(),
         m_ptr_cobj_buffer( nullptr ),
         m_ptr_context( ptr_context ),
         m_arg_size( ClArgument::size_type{ 0 } )
@@ -162,11 +146,6 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
-
-            this->m_arg_size = arg_size;
-
-            this->m_cl_success_flag = cl::Buffer(
-                *ptr_ocl_ctx, CL_MEM_READ_WRITE, sizeof( int32_t ), nullptr );
 
             this->m_arg_size = arg_size;
 
@@ -304,16 +283,6 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_cl_buffer;
     }
 
-    cl::Buffer const& ClArgument::internalSuccessFlagBuffer() const SIXTRL_NOEXCEPT
-    {
-        return this->m_cl_success_flag;
-    }
-
-    cl::Buffer& ClArgument::internalSuccessFlagBuffer() SIXTRL_NOEXCEPT
-    {
-        return this->m_cl_success_flag;
-    }
-
     int ClArgument::doWriteAndRemapCObjBuffer(
         ClArgument::cobj_buffer_t* SIXTRL_RESTRICT buffer )
     {
@@ -346,21 +315,15 @@ namespace SIXTRL_CXX_NAMESPACE
             ClContextBase::kernel_id_t remap_kernel_id =
                 this->m_ptr_context->remappingKernelId();
 
-            cl::Kernel* ptr_remapping_kernel =
-                this->m_ptr_context->openClKernel( remap_kernel_id );
-
-            SIXTRL_ASSERT( ptr_remapping_kernel != nullptr );
+            SIXTRL_ASSERT( this->m_ptr_context->openClKernel( remap_kernel_id )
+                != nullptr );
 
             size_type const num_args =
                 this->m_ptr_context->kernelNumArgs( remap_kernel_id );
 
-            size_type const work_group_prefered_multiple =
-                this->m_ptr_context->kernelPreferredWorkGroupSizeMultiple(
-                    remap_kernel_id );
-
-            if( ( work_group_prefered_multiple > size_type{ 0 } ) &&
-                ( num_args > size_type{ 0 } ) )
+            if( num_args > size_type{ 0 } )
             {
+                success    = 0;
                 cl_int ret = CL_SUCCESS ;
 
                 if( num_args > size_type{ 1 } )
@@ -371,52 +334,53 @@ namespace SIXTRL_CXX_NAMESPACE
                     if( success == 0 )
                     {
                         ret = ptr_queue->enqueueWriteBuffer(
-                            this->m_cl_success_flag, CL_TRUE, 0,
-                            sizeof( success_flag ), &success_flag );
+                            this->m_ptr_context->internalSuccessFlagBuffer(),
+                            CL_TRUE, 0, sizeof( success_flag ), &success_flag );
 
                         success = ( ret == CL_SUCCESS ) ? 0 : -2;
                     }
 
                     if( success == 0 )
                     {
-                        ret = ptr_remapping_kernel->setArg(
-                            1, this->m_cl_success_flag );
-
-                        success = ( CL_SUCCESS == ret ) ? 0 : -4;
+                        this->m_ptr_context->assignKernelArgumentClBuffer(
+                            remap_kernel_id, 1u,
+                            this->m_ptr_context->internalSuccessFlagBuffer() );
                     }
                 }
-                else
+
+                if( ( success == 0 ) && ( num_args > size_type{ 0 } ) )
                 {
-                    success = 0;
+                    ret = ptr_queue->enqueueWriteBuffer(
+                        this->m_cl_buffer, CL_TRUE, 0, buffer_size,
+                            NS(Buffer_get_const_data_begin)( buffer ) );
+
+                    if( ret == CL_SUCCESS )
+                    {
+                        this->m_ptr_context->assignKernelArgumentClBuffer(
+                            remap_kernel_id, 0u, this->m_cl_buffer );
+                    }
+                    else
+                    {
+                        success = -4;
+                    }
                 }
-
-                ret = ptr_queue->enqueueWriteBuffer(
-                    this->m_cl_buffer, CL_TRUE, 0, buffer_size,
-                    NS(Buffer_get_const_data_begin)( buffer ) );
-
-                success = ( ret == CL_SUCCESS ) ? 0 : -2;
 
                 if( success == 0 )
                 {
-                    ret = ptr_remapping_kernel->setArg( 0, this->m_cl_buffer );
-                    success = ( CL_SUCCESS == ret ) ? 0 : -4;
-                }
+                    size_type const num_worker_items =
+                        this->m_ptr_context->kernelPreferredWorkGroupSizeMultiple(
+                            remap_kernel_id );
 
-                if( success == 0 )
-                {
-                    ret = ptr_queue->enqueueNDRangeKernel(
-                        *ptr_remapping_kernel, cl::NullRange,
-                        cl::NDRange( work_group_prefered_multiple ),
-                        cl::NDRange( work_group_prefered_multiple ) );
-
-                    success = ( ret == CL_SUCCESS ) ? 0 : -8;
+                    success = ( this->m_ptr_context->runKernel(
+                        remap_kernel_id, num_worker_items ) ) ? 0 : -8;
                 }
 
                 if( ( success == 0 ) && ( num_args > size_type{ 1 } ) )
                 {
                     int32_t success_flag = int32_t{ 0 };
 
-                    ret = ptr_queue->enqueueReadBuffer( this->m_cl_success_flag,
+                    ret = ptr_queue->enqueueReadBuffer(
+                        this->m_ptr_context->internalSuccessFlagBuffer(),
                         CL_TRUE, 0, sizeof( success_flag ), &success_flag );
 
                     success = ( ret == CL_SUCCESS ) ? 0 : -2;
@@ -426,7 +390,8 @@ namespace SIXTRL_CXX_NAMESPACE
                         success |= success_flag;
                     }
                 }
-                else if( success == 0 )
+
+                if( success == 0 )
                 {
                     ptr_queue->flush();
                 }
@@ -605,20 +570,6 @@ SIXTRL_HOST_FN cl_mem NS(ClArgument_get_opencl_buffer)(
     if( ptr_arg_buffer != nullptr )
     {
         return ptr_arg_buffer->operator()();
-    }
-
-    return cl_mem{};
-}
-
-SIXTRL_HOST_FN cl_mem NS(ClArgument_get_internal_opencl_success_flag_buffer)(
-    NS(ClArgument)* SIXTRL_RESTRICT argument )
-{
-    cl::Buffer* ptr_success_flag = ( argument != nullptr ) ?
-        &argument->internalSuccessFlagBuffer() : nullptr;
-
-    if( ptr_success_flag != nullptr )
-    {
-        return ptr_success_flag->operator()();
     }
 
     return cl_mem{};

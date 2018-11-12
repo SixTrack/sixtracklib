@@ -11,6 +11,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -145,15 +146,15 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(XYShift)* NS(XYShift_preset)(
 SIXTRL_INLINE NS(xyshift_real_t) NS(XYShift_get_dx)(
     SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xy_shift )
 {
-    return ( xy_shift != SIXTRL_NULLPTR )
-        ? xy_shift->dx : ( NS(xyshift_real_t) )0;
+    SIXTRL_ASSERT( xy_shift != SIXTRL_NULLPTR );
+    return xy_shift->dx;
 }
 
 SIXTRL_INLINE NS(xyshift_real_t) NS(XYShift_get_dy)(
     SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xy_shift )
 {
-    return ( xy_shift != SIXTRL_NULLPTR )
-        ? xy_shift->dy : ( NS(xyshift_real_t) )0;
+    SIXTRL_ASSERT( xy_shift != SIXTRL_NULLPTR );
+    return xy_shift->dy;
 }
 
 SIXTRL_INLINE void NS(XYShift_set_dx)(

@@ -5,11 +5,13 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/be_drift/be_drift.h"
     #include "sixtracklib/common/be_cavity/be_cavity.h"
     #include "sixtracklib/common/be_multipole/be_multipole.h"
     #include "sixtracklib/common/be_srotation/be_srotation.h"
     #include "sixtracklib/common/be_xyshift/be_xyshift.h"
+    #include "sixtracklib/common/be_monitor/be_monitor.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -284,6 +286,24 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
 
             #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 
+            case NS(OBJECT_TYPE_BEAM_MONITOR):
+            {
+                typedef NS(BeamMonitor) beam_element_t;
+                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                ++requ_num_objects;
+
+                requ_num_slots = NS(BeamMonitor_get_num_slots)(
+                    ptr_begin, slot_size );
+
+                requ_num_dataptrs = NS(BeamMonitor_get_num_dataptrs)(
+                    ptr_begin );
+
+                break;
+            }
+
             default:
             {
                 success = -1;
@@ -432,7 +452,7 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
 
                 case NS(OBJECT_TYPE_BEAM_BEAM_6D):
                 {
-                     typedef NS(BeamBeam6D)                     belem_t;
+                    typedef NS(BeamBeam6D)                     belem_t;
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t*       ptr_dest_t;
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_src_t;
 
@@ -444,6 +464,19 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
                 }
 
                 #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+
+                case NS(OBJECT_TYPE_BEAM_MONITOR):
+                {
+                    typedef NS(BeamMonitor)                     belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t*       ptr_dest_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_src_t;
+
+                    success = NS(BeamMonitor_copy)(
+                        ( ptr_dest_t )( uintptr_t )dest_addr,
+                        ( ptr_src_t  )( uintptr_t )src_addr );
+
+                    break;
+                }
 
                 default:
                 {
@@ -580,6 +613,18 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects)(
                     }
 
                     #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+
+                    case NS(OBJECT_TYPE_BEAM_MONITOR):
+                    {
+                        typedef NS(BeamMonitor)                      belem_t;
+                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const*  ptr_belem_t;
+
+                        compare_value = NS(BeamMonitor_compare_values)(
+                            ( ptr_belem_t )( uintptr_t )lhs_addr,
+                            ( ptr_belem_t )( uintptr_t )rhs_addr );
+
+                        break;
+                    }
 
                     default:
                     {
@@ -737,6 +782,19 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
 
                     #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 
+                    case NS(OBJECT_TYPE_BEAM_MONITOR):
+                    {
+                        typedef NS(BeamMonitor)                          belem_t;
+                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
+
+                        compare_value = NS(BeamMonitor_compare_values_with_treshold)(
+                            ( ptr_belem_t )( uintptr_t )lhs_addr,
+                            ( ptr_belem_t )( uintptr_t )rhs_addr,
+                            treshold  );
+
+                        break;
+                    }
+
                     default:
                     {
                         compare_value = -1;
@@ -845,6 +903,14 @@ SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_object)(
                 }
 
                 #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+
+                case NS(OBJECT_TYPE_BEAM_MONITOR):
+                {
+                    typedef NS(BeamMonitor)                    belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(BeamMonitor_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
 
                 default: {} /* To satisfy compilers that complain if no
                                default section is available */
@@ -1087,6 +1153,12 @@ SIXTRL_INLINE int NS(BeamElements_add_single_new_to_buffer)(
 
             #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 
+            case NS(OBJECT_TYPE_BEAM_MONITOR):
+            {
+                success = ( SIXTRL_NULLPTR != NS(BeamMonitor_new)( buffer ) );
+                break;
+            }
+
             default:
             {
                 success = -1;
@@ -1219,6 +1291,19 @@ SIXTRL_INLINE int NS(BeamElements_copy_single_to_buffer)(
             }
 
             #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+
+            case NS(OBJECT_TYPE_BEAM_MONITOR):
+            {
+                typedef  NS(BeamMonitor)       beam_element_t;
+                typedef  SIXTRL_BE_ARGPTR_DEC  beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t orig = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(BeamMonitor_add_copy)( buffer, orig ) ) ? 0 : -1;
+
+                break;
+            }
 
             default:
             {

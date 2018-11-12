@@ -114,12 +114,8 @@ int main( int argc, char* argv[] )
     /* Prepare the buffers: */
     /* ---------------------------------------------------------------------- */
 
-    st::Buffer lhc_particle_dump(
-        ::st_PATH_TO_TEST_LHC_PARTICLES_DATA_T1_P2_NO_BEAM_BEAM );
-
-    st::Buffer lhc_beam_elements_buffer(
-        ::st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM );
-
+    st::Buffer lhc_particle_dump( ::st_PATH_TO_BBSIMPLE_PARTICLES_DUMP );
+    st::Buffer lhc_beam_elements_buffer( ::st_PATH_TO_BBSIMPLE_BEAM_ELEMENTS );
     st::Buffer pb( buf_size_t{ 1u << 24u } );
 
     st::Particles* particles = pb.createNew< st::Particles >( NUM_PARTICLES );

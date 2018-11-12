@@ -1,13 +1,6 @@
 # sixtracklib/tests/sixtracklib/testlib/CMakeLists.txt
 
 set( SIXTRACKL_TESTLIB_LINK_LIBRARIES sixtrack  CACHE INTERNAL "" FORCE )
-
-if( GTEST_FOUND )
-    set(  SIXTRACKL_TESTLIB_LINK_LIBRARIES
-        ${SIXTRACKL_TESTLIB_LINK_LIBRARIES}
-        ${SIXTRACKL_GTEST_LIBRARIES} CACHE INTERNAL "" FORCE )
-endif()
-
 set( SIXTRACKL_TESTLIB_LIBRARY_MODULES
      "" CACHE INTERNAL "" FORCE )
 
@@ -48,8 +41,7 @@ add_library( sixtrack_test SHARED
 
 target_include_directories( sixtrack_test
     PUBLIC $<INSTALL_INTERFACE:include>
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests>
-    PUBLIC $<BUILD_INTERFACE:${SIXTRACKL_GTEST_INCLUDE_DIRS}> )
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests> )
 
 target_link_libraries( sixtrack_test PUBLIC ${SIXTRACKL_TESTLIB_LINK_LIBRARIES} )
 

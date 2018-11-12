@@ -20,7 +20,8 @@
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
 
-TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThread )
+TEST( C99_OpenCL_Buffer,
+      InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThread )
 {
     using buffer_t      = ::st_Buffer;
     using size_t        = ::st_buffer_size_t;
@@ -98,20 +99,21 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThre
 
     std::ostringstream a2str;
 
-    std::string const PATH_TO_BASE_DIR = ::st_PATH_TO_BASE_DIR;
-
-    a2str.str( "" );
     a2str << " -D_GPUCODE=1"
-          << " -D__NAMESPACE=st_"
           << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
           << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
-          << " -I" << PATH_TO_BASE_DIR
-          << " -I" << PATH_TO_BASE_DIR << "tests" ;
+          << " -I" << ::st_PATH_TO_SIXTRL_INCLUDE_DIR;
+
+    if( std::strcmp( ::st_PATH_TO_SIXTRL_INCLUDE_DIR,
+                     ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR ) != 0 )
+    {
+        a2str << " -I"
+              << ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR;
+    }
 
     std::string const COMPILE_OPTIONS = a2str.str();
 
-
-    std::string path_to_kernel_source = PATH_TO_BASE_DIR;
+    std::string path_to_kernel_source = ::st_PATH_TO_BASE_DIR;
     path_to_kernel_source += "tests/sixtracklib/testlib/opencl/kernels/";
     path_to_kernel_source += "opencl_buffer_generic_obj_kernel.cl";
 
@@ -251,11 +253,14 @@ TEST( C99_OpenCL_Buffer, InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThre
         int num_threads = ( int )1;
         int block_size  = ( int )1;
 
+        std::string kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
+        kernel_name += "remap_orig_buffer";
+
         cl::Kernel remap_kernel;
 
         try
         {
-            remap_kernel = cl::Kernel( program, "st_remap_orig_buffer" );
+            remap_kernel = cl::Kernel( program, kernel_name.c_str() );
         }
         catch( cl::Error const& e )
         {

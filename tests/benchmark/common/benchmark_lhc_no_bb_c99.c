@@ -7,7 +7,7 @@
 #include "sixtracklib/sixtracklib.h"
 #include "sixtracklib/testlib.h"
 
-int main()
+int main( int argc, char* argv[] )
 {
     typedef  st_buffer_size_t   buf_size_t;
     typedef  st_Buffer          buffer_t;
@@ -31,8 +31,35 @@ int main()
     buf_size_t const num_input_particles =
             st_Particles_get_num_of_particles( input_particles );
 
+    buf_size_t  NUM_CONFIGURATIONS   = 0;
+    buf_size_t* num_particles_list   = SIXTRL_NULLPTR;
+    buf_size_t* num_turns_list       = SIXTRL_NULLPTR;
+    buf_size_t* num_repetitions_list = SIXTRL_NULLPTR;
+
     /* ===================================================================== */
     /* ==== Prepare Host Buffers                                             */
+
+    if( argc == 1 )
+    {
+        printf( "# Usage %s [path_to_param_file] | \r\n"
+                "#          [NUM_PARTICLES] [NUM_TURNS] [NUM_REPETITIONS]\r\n",
+                argv[ 0 ] );
+
+        printf( "# \r\n"
+                "# path_to_param_file :: path to a text file containing \r\n"
+                "#                       lines with NUM_PARTICLES NUM_TURNS "
+                                        "NUM_REPETITIONS tripples\r\n"
+                "#            default :: %s\r\n"
+                "# \r\n", st_PATH_TO_DEFAULT_BENCHMARKS_PARAM_FILE );
+
+        printf( "# \r\n"
+                "# path_to_param_file :: path to a text file containing \r\n"
+                "#                       lines with NUM_PARTICLES NUM_TURNS "
+                                        "NUM_REPETITIONS tripples\r\n"
+                "#            default :: %s\r\n"
+                "# \r\n", st_PATH_TO_DEFAULT_BENCHMARKS_PARAM_FILE );
+
+    }
 
     buf_size_t const NUM_CONFIGURATIONS = 22;
 

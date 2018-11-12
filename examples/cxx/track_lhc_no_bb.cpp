@@ -11,12 +11,8 @@ int main( int argc, char* argv[] )
 
     using buf_size_t = st::Buffer::size_type;
 
-    st::Buffer lhc_particle_dump(
-        ::st_PATH_TO_TEST_LHC_PARTICLES_DATA_T1_P2_NO_BEAM_BEAM );
-
-    st::Buffer lhc_beam_elements_buffer(
-        ::st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM );
-
+    st::Buffer particles_dump( ::st_PATH_TO_BBSIMPLE_PARTICLES_DUMP );
+    st::Buffer beam_elements_buffer( ::st_PATH_TO_BBSIMPLE_BEAM_ELEMENTS );
     st::Buffer pb( buf_size_t{ 1u << 24u } );
 
     buf_size_t NUM_PARTICLES = buf_size_t{ 20000 };
@@ -65,7 +61,7 @@ int main( int argc, char* argv[] )
         pb.createNew< st::Particles >( NUM_PARTICLES );
 
     st::Particles const* input_particles =
-        st::Particles::FromBuffer( lhc_particle_dump, 0u );
+        st::Particles::FromBuffer( particles_dump, 0u );
 
     buf_size_t const num_input_particles = input_particles->getNumParticles();
 
@@ -73,17 +69,17 @@ int main( int argc, char* argv[] )
     {
         buf_size_t const jj = ii % num_input_particles;
         particles->copySingle( input_particles, jj, ii );
+        particles->setAtElementIdValue(  ii, 0 );
+        particles->setAtTurnValue( ii, 0 );
     }
 
     /* ********************************************************************** */
     /* ****  Track particles over the beam-elements for NUM_TURNS turns  **** */
     /* ********************************************************************** */
 
-    for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_TURNS ; ++ii )
-    {
-        // Still C99 API call:
-        ::st_Track_particles_beam_elements( particles, &lhc_beam_elements_buffer );
-    }
+    ::st_Track_all_particles_until_turn(
+        particles, &beam_elements_buffer, NUM_TURNS );
+
 }
 
 /* end: examples/c99/track_lhc_no_bb.cpp */

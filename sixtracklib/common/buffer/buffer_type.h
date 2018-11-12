@@ -30,23 +30,6 @@ typedef SIXTRL_UINT64_T NS(buffer_size_t);
 typedef SIXTRL_UINT64_T NS(buffer_flags_t);
 typedef SIXTRL_UINT64_T NS(object_type_id_t);
 
-typedef enum NS(object_type_values_e)
-{
-    NS(OBJECT_TYPE_NONE)         = 0x00000000,
-    NS(OBJECT_TYPE_PARTICLE)     = 0x00000001,
-    NS(OBJECT_TYPE_DRIFT)        = 0x00000002,
-    NS(OBJECT_TYPE_DRIFT_EXACT)  = 0x00000003,
-    NS(OBJECT_TYPE_MULTIPOLE)    = 0x00000004,
-    NS(OBJECT_TYPE_CAVITY)       = 0x00000005,
-    NS(OBJECT_TYPE_XYSHIFT)      = 0x00000006,
-    NS(OBJECT_TYPE_SROTATION)    = 0x00000007,
-    NS(OBJECT_TYPE_BEAM_BEAM_4D) = 0x00000008,
-    NS(OBJECT_TYPE_BEAM_BEAM_6D) = 0x00000009,
-    NS(OBJECT_TYPE_LINE)         = 0x00000100,
-    NS(OBJECT_TYPE_INVALID)      = 0x7fffffff
-}
-NS(object_type_values_t);
-
 #if !defined( SIXTRL_BUFFER_FLAGS_NONE )
     #define   SIXTRL_BUFFER_FLAGS_NONE                      0x00000000
 #endif /* !defined( SIXTRL_BUFFER_FLAGS_NONE ) */
@@ -205,62 +188,12 @@ NS(Buffer);
 
 #if defined( __cplusplus )
 
-namespace SIXTRL_NAMESPACE
+namespace SIXTRL_CXX_NAMESPACE
 {
     using object_type_id_t = NS(object_type_id_t);
     using buffer_addr_t    = NS(buffer_addr_t);
     using buffer_size_t    = NS(buffer_size_t);
     using buffer_flags_t   = NS(buffer_flags_t);
-
-    /* --------------------------------------------------------------------- */
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_NONE = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_NONE) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_PARTICLE     = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_PARTICLE) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_DRIFT        = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_DRIFT) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_DRIFT_EXACT  = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_DRIFT_EXACT) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_MULTIPOLE    = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_MULTIPOLE) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_CAVITY       = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_CAVITY) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_XYSHIFT      = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_XYSHIFT) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_SROTATION    = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_SROTATION) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_BEAM_BEAM_4D = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_BEAM_BEAM_4D) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_BEAM_BEAM_6D = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_BEAM_BEAM_6D) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_LINE         = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_LINE) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_INVALID      = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_INVALID) );
 
     /* --------------------------------------------------------------------- */
 

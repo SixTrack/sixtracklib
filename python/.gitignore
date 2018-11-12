@@ -1,0 +1,8 @@
+setup.py
+__pycache__/
+dist/
+build/
+*.egg-info/
+
+pysixtracklib/__pycache__/
+

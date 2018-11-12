@@ -15,6 +15,12 @@ else()
     string( APPEND CMAKE_CUDA_FLAGS " -lineinfo" )
 endif()
 
+if( SIXTRACKL_ENABLE_APERATURE_CHECK )
+    string( APPEND CMAKE_CUDA_FLAGS " -DSIXTRL_ENABLE_APERATURE_CHECK=1" )
+else()
+    string( APPEND CMAKE_CUDA_FLAGS " -DSIXTRL_ENABLE_APERATURE_CHECK=0" )
+endif()
+
 # -----------------------------------------------------------------------------
 # build device part of the submodule library in kernels subdirectory:
 
@@ -79,7 +85,7 @@ if( TESTLIB_CUDA_HOST_PART_HEADERS )
 
     set( TESTLIB_CUDA_INSTALL_PATH include/sixtracklib/testlib/cuda )
 
-    install( FILES ${TESTLIB_CUDA_INSTALL_PATH}
+    install( FILES ${TESTLIB_CUDA_HOST_PART_HEADERS}
              DESTINATION ${TESTLIB_CUDA_INSTALL_PATH} )
 
 endif()

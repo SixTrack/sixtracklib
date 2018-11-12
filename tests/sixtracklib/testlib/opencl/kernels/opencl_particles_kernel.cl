@@ -16,7 +16,7 @@
 __kernel void NS(Particles_copy_buffer_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT in_buffer_begin,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer_begin,
-    SIXTRL_BUFFER_DATAPTR_DEC int* SIXTRL_RESTRICT ptr_success_flag )
+    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag )
 {
     typedef NS(buffer_size_t) buf_size_t;
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*       obj_iter_t;
@@ -25,8 +25,8 @@ __kernel void NS(Particles_copy_buffer_opencl)(
     typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const* ptr_const_particles_t;
     typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*       ptr_particles_t;
 
-    int success_flag = ( int )0u;
-    buf_size_t const slot_size = ( buf_size_t )8u;
+    SIXTRL_INT32_T success_flag = ( SIXTRL_INT32_T )0u;
+    buf_size_t const  slot_size = ( buf_size_t )8u;
 
     if( ( !NS(ManagedBuffer_needs_remapping)(  in_buffer_begin,  slot_size ) ) &&
         ( !NS(ManagedBuffer_needs_remapping)( out_buffer_begin,  slot_size ) ) &&
@@ -70,6 +70,12 @@ __kernel void NS(Particles_copy_buffer_opencl)(
                     {
                         NS(Particles_copy_single)( out_particles, particle_id,
                             in_particles, particle_id );
+
+                        if( NS(Particles_get_state_value)( out_particles, particle_id ) !=
+                            NS(Particles_get_state_value)( in_particles,  particle_id ) )
+                        {
+                            printf( "ERROR %d\r\n", ( int )particle_id );
+                        }
                     }
                     else
                     {
@@ -83,6 +89,8 @@ __kernel void NS(Particles_copy_buffer_opencl)(
             {
                 success_flag |= -2;
             }
+
+            obj_begin_index = obj_end_index;
         }
     }
     else
@@ -104,7 +112,8 @@ __kernel void NS(Particles_copy_buffer_opencl)(
         }
     }
 
-    if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )
+    if( ( success_flag     != ( SIXTRL_INT32_T )0 ) &&
+        ( ptr_success_flag != SIXTRL_NULLPTR ) )
     {
         atomic_or( ptr_success_flag, success_flag );
     }
