@@ -72,11 +72,11 @@ int main( int argc, char* argv[] )
                 "IO_SKIP ................ After NTURNS_IO_ELEM_BY_ELEM and "
                 "NTURNS_IO_EVERY_TURN, dump particles every IO_SKIP turn\r\n"
                 "                         Default: 1\r\n"
-                "NPARTICLES ............. number of particles to simulate\r\n"
-                "                         Default: same as in PATH_TO_PARTICLES\r\n"
                 "PATH_TO_OUTPUT_PARTICLES Path to output file for dumping "
                 "the final particle state\r\n"
                 "                         Default: ./output_particles.bin\r\n"
+                "NPARTICLES ............. number of particles to simulate\r\n"
+                "                         Default: same as in PATH_TO_PARTICLES\r\n"
                 "\r\n" );
 
         return 0;
@@ -206,16 +206,9 @@ int main( int argc, char* argv[] )
         }
     }
 
-    if( ( argc >= 9 ) &&
-        ( argv[ 8 ] != SIXTRL_NULLPTR ) && ( strlen( argv[ 8 ] ) > 0u ) )
+    if( ( argc >= 9 ) && ( argv[ 8 ] != SIXTRL_NULLPTR ) )
     {
-        int const temp = atoi( argv[ 8 ] );
-        if( temp >= 0 ) NUM_PARTICLES = temp;
-    }
-
-    if( ( argc >= 10 ) && ( argv[ 9 ] != SIXTRL_NULLPTR ) )
-    {
-        size_t const output_path_len = strlen( argv[ 9 ] );
+        size_t const output_path_len = strlen( argv[ 8 ] );
 
         if( output_path_len > 0u )
         {
@@ -227,10 +220,17 @@ int main( int argc, char* argv[] )
                 memset(  path_output_particles, ( int )'\0',
                          output_path_len );
 
-                strncpy( path_output_particles, argv[ 9 ],
+                strncpy( path_output_particles, argv[ 8 ],
                          output_path_len );
             }
         }
+    }
+
+    if( ( argc >= 10 ) &&
+        ( argv[ 9 ] != SIXTRL_NULLPTR ) && ( strlen( argv[ 9 ] ) > 0u ) )
+    {
+        int const temp = atoi( argv[ 9 ] );
+        if( temp >= 0 ) NUM_PARTICLES = temp;
     }
 
     /* --------------------------------------------------------------------- */
