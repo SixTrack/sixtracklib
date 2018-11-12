@@ -80,6 +80,12 @@ if( SIXTRACKL_ENABLE_OPENCL )
 
     add_executable( track_lhc_bb_opencl_c99    track_lhc_bb_opencl.c )
     list( APPEND EXAMPLE_OPENCL_TARGETS        track_lhc_bb_opencl_c99 )
+
+    # -------------------------------------------------------------------------
+    # track_io_opencl_c99:
+
+    add_executable( track_io_opencl_c99 track_io_opencl.c )
+    list( APPEND EXAMPLE_OPENCL_TARGETS track_io_opencl_c99 )
 endif()
 
 # ==============================================================================
