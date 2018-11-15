@@ -1,0 +1,15 @@
+import setuptools
+
+setuptools.setup(
+    name='pysixtracklib',
+    version='@SIXTRACKL_VERSION_STR@',
+    description='Python bindings for SixTrackLib (6D-Tracking Code)',
+    author='SixTrack',
+    author_email='sixtrack.contact@cern.ch',
+    url='https://github.com/SixTrack/sixtracklib',
+    packages=['pysixtracklib'],
+    package_dir= { 'pysixtracklib': '@CMAKE_CURRENT_SOURCE_DIR@/pysixtracklib' },
+    install_requires=['numpy','cobjects','pysixtrack','sixtracktools']
+)
+
+# end python/setup.py

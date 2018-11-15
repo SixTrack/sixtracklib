@@ -11,6 +11,17 @@ add_executable( benchmark_lhc_no_bb_opencl_c99
 
 set( C99_BENCHMARKS ${C99_BENCHMARKS} benchmark_lhc_no_bb_opencl_c99 )
 
+target_compile_definitions( benchmark_lhc_no_bb_opencl_c99
+			    PRIVATE -DSIXTRL_DISABLE_BEAM_BEAM=1 )
+
+# ------------------------------------------------------------------------------
+# benchmark_lhc_passive_bb_opencl_c99:
+
+add_executable( benchmark_lhc_passive_bb_opencl_c99
+                benchmark_lhc_no_bb_opencl_c99.c )
+
+set( C99_BENCHMARKS ${C99_BENCHMARKS} benchmark_lhc_passive_bb_opencl_c99 )
+
 # ------------------------------------------------------------------------------
 # benchmark_lhc_no_bb_priv_particles_optimized_opencl_c99:
 
@@ -19,6 +30,19 @@ add_executable( benchmark_lhc_no_bb_priv_particles_optimized_opencl_c99
 
 set( C99_BENCHMARKS ${C99_BENCHMARKS}
      benchmark_lhc_no_bb_priv_particles_optimized_opencl_c99 )
+
+target_compile_definitions(
+    benchmark_lhc_no_bb_priv_particles_optimized_opencl_c99
+	PRIVATE -DSIXTRL_DISABLE_BEAM_BEAM=1 )
+
+# ------------------------------------------------------------------------------
+# benchmark_lhc_passive_bb_priv_particles_optimized_opencl_c99:
+
+add_executable( benchmark_lhc_passive_bb_priv_particles_optimized_opencl_c99
+                benchmark_lhc_no_bb_priv_particles_optimized_opencl_c99.c )
+
+set( C99_BENCHMARKS ${C99_BENCHMARKS}
+     benchmark_lhc_passive_bb_priv_particles_optimized_opencl_c99 )
 
 # ==============================================================================
 # Set properties

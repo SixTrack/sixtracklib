@@ -1,7 +1,7 @@
 if(  NOT SETUP_UNIT_TESTING_FINISHED )
     set( SETUP_UNIT_TESTING_FINISHED 1 )
 
-    message( STATUS "---- Processing sixtracklib/cmake/SetupUnitTesting.cmake" )
+    message( STATUS "---- Processing cmake/SetupUnitTesting.cmake" )
 
     if( NOT  SIXTRACKL_GTEST_INCLUDE_DIRS )
         set( SIXTRACKL_GTEST_INCLUDE_DIRS )

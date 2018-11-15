@@ -9,11 +9,11 @@
 #endif /* !defined( SIXTRL_C99_NAMESPACE ) */
 
 #if !defined( SIXTRL_C99_NAMESPACE_STR )
-    #define SIXTRL_C99_NAMESPACE_STR #SIXTRL_C99_NAMESPACE
+    #define SIXTRL_C99_NAMESPACE_STR "@SIXTRL_GENERATED_C99_NAMESPACE@"
 #endif /* !defined( SIXTRL_C99_NAMESPACE_STR ) */
 
 #if !defined( SIXTRL_C99_NAMESPACE_PREFIX_STR )
-    #define SIXTRL_C99_NAMESPACE_PREFIX_STR #SIXTRL_C99_NAMESPACE_STR
+    #define SIXTRL_C99_NAMESPACE_PREFIX_STR "@SIXTRL_GENERATED_C99_NAMESPACE@"
 #endif /* !defined( SIXTRL_C99_NAMESPACE_PREFIX_STR ) */
 
 /* ------------------------------------------------------------------------- */
@@ -24,11 +24,11 @@
 #endif /* !defined( SIXTRL_CXX_NAMESPACE ) */
 
 #if !defined( SIXTRL_CXX_NAMESPACE_STR )
-    #define SIXTRL_CXX_NAMESPACE_STR #SIXTRL_CXX_NAMESPACE
+    #define SIXTRL_CXX_NAMESPACE_STR "@SIXTRL_GENERATED_CXX_NAMESPACE@"
 #endif /* !defined( SIXTRL_CXX_NAMESPACE_STR ) */
 
 #if !defined( SIXTRL_CXX_NAMESPACE_PREFIX_STR )
-    #define SIXTRL_CXX_NAMESPACE_PREFIX_STR #SIXTRL_CXX_NAMESPACE_STR ## "::"
+    #define SIXTRL_CXX_NAMESPACE_PREFIX_STR "@SIXTRL_GENERATED_CXX_NAMESPACE@::"
 #endif /* !defined( SIXTRL_CXX_NAMESPACE_PREFIX_STR ) */
 
 /* ------------------------------------------------------------------------- */

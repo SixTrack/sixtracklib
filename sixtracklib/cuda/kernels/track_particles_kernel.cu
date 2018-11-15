@@ -124,19 +124,9 @@ __global__ void NS(Track_particles_beam_elements_kernel_cuda)(
 
         size_t num_particles  = NS(Particles_get_num_of_particles)( particles );
 
-        while( particle_index < num_particles )
-        {
-            SIXTRL_UINT64_T turn = 0;
-
-            for( ; turn < num_turns ; ++turn )
-            {
-                success_flag |= NS(Track_particle_beam_element_objs)(
-                    particles, particle_index, be_begin, be_end );
-            }
-
-            NS(Particles_set_state_value)( particles, particle_index, 137 );
-            particle_index += stride;
-        }
+        success_flag |= NS(Track_subset_of_particles_until_turn_obj)(
+            particles, particle_index, num_particles, stride,
+                be_begin, be_end, num_turns );
     }
     else
     {

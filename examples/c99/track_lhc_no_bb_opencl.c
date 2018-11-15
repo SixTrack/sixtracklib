@@ -11,7 +11,7 @@ int main( int argc, char* argv[] )
 {
     st_ClContext* context                   = SIXTRL_NULLPTR;
 
-    st_Buffer* lhc_particle_dump            = SIXTRL_NULLPTR;
+    st_Buffer* particle_dump                = SIXTRL_NULLPTR;
     st_Buffer* lhc_beam_elements_buffer     = SIXTRL_NULLPTR;
     st_Buffer* pb                           = SIXTRL_NULLPTR;
 
@@ -23,6 +23,9 @@ int main( int argc, char* argv[] )
     st_buffer_size_t    num_input_particles = 0;
 
     st_buffer_size_t ii                     = 0u;
+
+    int tracking_kernel_id                  = -1;
+    double tracking_time                    = 0.0;
 
     /* --------------------------------------------------------------------- */
     /* Handle command line arguments: */
@@ -54,9 +57,14 @@ int main( int argc, char* argv[] )
                 "                :: Default = %d\r\n", ( int )NUM_TURNS );
     }
 
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    /* Select the node based on the first command line param or
+     * select the default node: */
+
     if( argc >= 2 )
     {
-        context = st_ClContextBase_new_on_selected_node_id_str( argv[ 1 ] );
+        context = st_ClContext_new( argv[ 1 ] );
 
         if( context == SIXTRL_NULLPTR )
         {
@@ -66,6 +74,19 @@ int main( int argc, char* argv[] )
         }
     }
 
+    if( !st_ClContextBase_has_selected_node( context ) )
+    {
+        /* select default node */
+        st_context_node_id_t const default_node_id =
+            st_ClContextBase_get_default_node_id( context );
+
+        st_ClContextBase_select_node_by_node_id( context, &default_node_id );
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    /* take the number of particles from the third command line parameter,
+     * otherwise keep using the default value */
     if( argc >= 3 )
     {
         int const temp = atoi( argv[ 2 ] );
@@ -73,6 +94,8 @@ int main( int argc, char* argv[] )
         if( temp > 0 ) NUM_PARTICLES = temp;
     }
 
+    /* take the number of turns from the fourth command line parameter,
+     * otherwise keep using the default value */
     if( argc >= 4 )
     {
         int const temp = atoi( argv[ 3 ] );
@@ -80,11 +103,9 @@ int main( int argc, char* argv[] )
         if( temp > 0 ) NUM_TURNS = temp;
     }
 
-    if( context == SIXTRL_NULLPTR )
-    {
-        /* new context on default node */
-        context = st_ClContextBase_new();
-    }
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    /* Give a summary of the provided parameters */
 
     if( ( context != SIXTRL_NULLPTR ) &&
         ( st_ClContextBase_has_selected_node( context ) ) &&
@@ -99,7 +120,8 @@ int main( int argc, char* argv[] )
         char id_str[ 16 ];
         st_ComputeNodeId_to_string( node_id, &id_str[ 0 ], 16  );
 
-        printf( "Selected [ID]            = %s (%s/%s)\r\n"
+        printf( "\r\n"
+                "Selected [ID]            = %s (%s/%s)\r\n"
                 "         [NUM_PARTICLES] = %d\r\n"
                 "         [NUM_TURNS]     = %d\r\n"
                 "\r\n", id_str, st_ComputeNodeInfo_get_name( node_info ),
@@ -109,6 +131,9 @@ int main( int argc, char* argv[] )
     }
     else
     {
+        /* If we get here, something went wrong, most likely with the
+         * selection of the device -> bailing out */
+
         return 0;
     }
 
@@ -116,16 +141,16 @@ int main( int argc, char* argv[] )
     /* Prepare the buffers: */
     /* ---------------------------------------------------------------------- */
 
-    lhc_particle_dump = st_Buffer_new_from_file(
-        st_PATH_TO_TEST_LHC_PARTICLES_DATA_T1_P2_NO_BEAM_BEAM );
+    particle_dump = st_Buffer_new_from_file(
+        st_PATH_TO_LHC_NO_BB_PARTICLES_DUMP );
 
     lhc_beam_elements_buffer = st_Buffer_new_from_file(
-        st_PATH_TO_TEST_LHC_BEAM_ELEMENTS_DATA_NO_BEAM_BEAM );
+        st_PATH_TO_LHC_NO_BB_BEAM_ELEMENTS );
 
     pb = st_Buffer_new( ( st_buffer_size_t )( 1u << 24u ) );
 
     particles = st_Particles_new( pb, NUM_PARTICLES );
-    input_particles = st_Particles_buffer_get_const_particles( lhc_particle_dump, 0u );
+    input_particles = st_Particles_buffer_get_const_particles( particle_dump, 0u );
     num_input_particles = st_Particles_get_num_of_particles( input_particles );
 
     for( ii = 0 ; ii < NUM_PARTICLES ; ++ii )
@@ -140,12 +165,21 @@ int main( int argc, char* argv[] )
     st_ClArgument* beam_elements_arg =
         st_ClArgument_new_from_buffer( lhc_beam_elements_buffer, context );
 
+    tracking_kernel_id = st_ClContext_get_tracking_kernel_id( context );
+
     /* --------------------------------------------------------------------- */
     /* Perform tracking over NUM_TURNS */
     /* --------------------------------------------------------------------- */
 
-    st_ClContext_track_num_turns(
-        context, particles_arg, beam_elements_arg, NUM_TURNS );
+    st_ClContext_track( context, particles_arg, beam_elements_arg, NUM_TURNS );
+
+    tracking_time = st_ClContextBase_get_last_exec_time( context, tracking_kernel_id );
+
+    printf( "Tracking time : %10.6f \r\n"
+            "              : %10.6f / turn \r\n"
+            "              : %10.6f / turn / particle \r\n\r\n",
+            tracking_time, tracking_time / NUM_TURNS,
+            tracking_time / ( NUM_TURNS * NUM_PARTICLES ) );
 
     /* --------------------------------------------------------------------- */
     /* Clean-up */
@@ -155,7 +189,7 @@ int main( int argc, char* argv[] )
     st_ClArgument_delete( particles_arg );
     st_ClArgument_delete( beam_elements_arg );
 
-    st_Buffer_delete( lhc_particle_dump );
+    st_Buffer_delete( particle_dump );
     st_Buffer_delete( lhc_beam_elements_buffer );
     st_Buffer_delete( pb );
 

@@ -11,6 +11,7 @@
 #include "sixtracklib/testlib/common/time.h"
 #include "sixtracklib/testlib/common/particles.h"
 #include "sixtracklib/testlib/common/beam_elements.h"
+#include "sixtracklib/testlib/common/path.h"
 #include "sixtracklib/testlib/testdata/track_testdata.h"
 #include "sixtracklib/testlib/testdata/testdata_files.h"
 

@@ -44,6 +44,13 @@ if( GTEST_FOUND )
     add_test( C99_OpenCL_BeamElementsDriftTests test_be_drift_opencl_c99 )
 
     # --------------------------------------------------------------------------
+    # test_be_monitor_opencl_c99:
+
+    add_executable( test_be_monitor_opencl_c99 test_be_monitor_opencl_c99.cpp )
+    set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS} test_be_monitor_opencl_c99 )
+    add_test( C99_OpenCL_BeamElementsMonitorTests test_be_monitor_opencl_c99 )
+
+    # --------------------------------------------------------------------------
     # test_track_opencl_c99:
 
     add_executable( test_track_opencl_c99 test_track_opencl_c99.cpp )

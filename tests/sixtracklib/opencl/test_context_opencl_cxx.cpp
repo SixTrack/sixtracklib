@@ -152,14 +152,18 @@ TEST( CXX_OpenCL_Context, BaseOpenCLContextClArgument )
             path_to_copy_kernel_program += "opencl_buffer_generic_obj_kernel.cl";
 
             std::string copy_program_compile_options = "-D_GPUCODE=1";
-            copy_program_compile_options += " -D__NAMESPACE=st_";
             copy_program_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
             copy_program_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
             copy_program_compile_options += " -I";
-            copy_program_compile_options += NS(PATH_TO_BASE_DIR);
-            copy_program_compile_options += " -I";
-            copy_program_compile_options += NS(PATH_TO_BASE_DIR);
-            copy_program_compile_options += "tests";
+            copy_program_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
+
+            if( std::strcmp( NS(PATH_TO_SIXTRL_INCLUDE_DIR),
+                             NS(PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR) ) != 0 )
+            {
+                copy_program_compile_options += " -I";
+                copy_program_compile_options +=
+                    NS(PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR);
+            }
 
             program_id_t copy_program_id =
                 context.addProgramFile( path_to_copy_kernel_program,
@@ -185,8 +189,11 @@ TEST( CXX_OpenCL_Context, BaseOpenCLContextClArgument )
             ASSERT_TRUE( context.isProgramCompiled( copy_program_id ) );
             ASSERT_TRUE( context.numAvailableKernels() == initial_num_kernels );
 
+            std::string kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
+            kernel_name += "copy_orig_buffer";
+
             kernel_id_t const copy_kernel_id = context.enableKernel(
-                "st_copy_orig_buffer", copy_program_id );
+                kernel_name.c_str(), copy_program_id );
 
             ASSERT_TRUE( copy_kernel_id != kernel_id_t{ -1 } );
             ASSERT_TRUE( copy_kernel_id != context.remappingKernelId() );
@@ -196,7 +203,7 @@ TEST( CXX_OpenCL_Context, BaseOpenCLContextClArgument )
             ASSERT_TRUE( context.programIdByKernelId( copy_kernel_id ) ==
                          copy_program_id );
 
-            ASSERT_TRUE( context.findKernelByName( "st_copy_orig_buffer" ) ==
+            ASSERT_TRUE( context.findKernelByName( kernel_name.c_str() ) ==
                          copy_kernel_id );
 
             ASSERT_TRUE( context.kernelNumArgs( copy_kernel_id ) ==

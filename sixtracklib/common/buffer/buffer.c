@@ -47,9 +47,19 @@ extern SIXTRL_HOST_FN bool NS(Buffer_write_to_file)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
 
+extern SIXTRL_HOST_FN bool NS(Buffer_write_to_file_normalized_addr)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file,
+    NS(buffer_addr_t) const norm_base_addr );
+
 extern SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp );
+
+extern SIXTRL_HOST_FN bool NS(Buffer_write_to_fp_normalized_addr)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    NS(buffer_addr_t) const norm_base_addr );
 
 SIXTRL_HOST_FN static NS(Buffer)* NS(Buffer_allocate_generic)(
     NS(buffer_size_t) const buffer_capacity,
@@ -390,6 +400,33 @@ SIXTRL_HOST_FN bool NS(Buffer_write_to_file)(
     return success;
 }
 
+SIXTRL_HOST_FN bool NS(Buffer_write_to_file_normalized_addr)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file,
+    NS(buffer_addr_t) const norm_base_addr )
+{
+    bool success = false;
+
+    SIXTRL_ARGPTR_DEC FILE* fp = SIXTRL_NULLPTR;
+
+    if( ( path_to_file != SIXTRL_NULLPTR ) &&
+        ( strlen( path_to_file ) > 0 ) )
+    {
+        fp = fopen( path_to_file, "wb" );
+    }
+
+    success = NS(Buffer_write_to_fp_normalized_addr)(
+        buffer, fp, norm_base_addr );
+
+    if( fp != SIXTRL_NULLPTR )
+    {
+        fclose( fp );
+        fp = SIXTRL_NULLPTR;
+    }
+
+    return success;
+}
+
 SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC FILE* fp )
@@ -406,6 +443,59 @@ SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
 
         success = ( cnt == 1u );
 
+    }
+
+    return success;
+}
+
+SIXTRL_HOST_FN bool NS(Buffer_write_to_fp_normalized_addr)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC FILE* fp, NS(buffer_addr_t) const norm_base_addr )
+{
+    bool success = false;
+
+    typedef NS(buffer_size_t)       buf_size_t;
+    typedef NS(buffer_size_t)       address_t;
+    typedef NS(buffer_addr_diff_t)  addr_diff_t;
+
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char* ptr_data_t;
+
+    address_t  const cur_base_addr = NS(Buffer_get_data_begin_addr)( buffer );
+    buf_size_t const data_size     = NS(Buffer_get_size)( buffer );
+
+    if( ( fp != SIXTRL_NULLPTR ) && ( buffer != SIXTRL_NULLPTR ) &&
+        ( cur_base_addr != ( address_t )0u ) && ( data_size > ( buf_size_t )0u ) )
+    {
+        buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+        ptr_data_t begin = ( ptr_data_t )( uintptr_t )cur_base_addr;
+
+        if( cur_base_addr != norm_base_addr )
+        {
+            /* TODO: Check for integer overflow in a generic fashion, i.e.
+             *       depending on the type NS(buffer_addr_t) is implemented as! */
+            addr_diff_t const base_offset = ( norm_base_addr >= cur_base_addr )
+                ?  ( addr_diff_t )( norm_base_addr - cur_base_addr )
+                : -( addr_diff_t )( cur_base_addr - norm_base_addr );
+
+            success = ( NS(ManagedBuffer_apply_addr_offset)(
+                begin, base_offset, slot_size ) == 0 );
+        }
+        else
+        {
+            success = true;
+        }
+
+        if( success )
+        {
+            size_t const cnt = fwrite( begin, data_size, 1u, fp );
+            success = ( cnt == 1u );
+
+            if( NS(Buffer_needs_remapping)( buffer ) )
+            {
+                int const ret = NS(Buffer_remap)( buffer );
+                success &= ( 0 == ret );
+            }
+        }
     }
 
     return success;

@@ -10,6 +10,7 @@ set( SIXTRL_COMMON_INTERNAL_C99_HEADERS
     buffer_object_undef.h
     namespace_defines.h
     namespace_undef.h
+    objects_type_id.h
     particles_defines.h
     particles_undef.h
     tools.h

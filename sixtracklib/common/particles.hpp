@@ -86,6 +86,7 @@ namespace SIXTRL_CXX_NAMESPACE
             real_pointer_t  rpp_ptr           = nullptr,
             real_pointer_t  rvv_ptr           = nullptr,
             real_pointer_t  chi_ptr           = nullptr,
+            real_pointer_t  charge_ratio_ptr  = nullptr,
             index_pointer_t particle_id_ptr   = nullptr,
             index_pointer_t at_element_id_ptr = nullptr,
             index_pointer_t at_turn_ptr       = nullptr,
@@ -383,6 +384,27 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+        SIXTRL_FN const_real_pointer_t getChargeRatio() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN real_pointer_t getChargeRatio() SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN real_t getChargeRatioValue(
+            index_t const index ) const SIXTRL_NOEXCEPT;
+
+        template< typename Iter >
+        SIXTRL_FN void setChargeRatio( Iter begin, Iter end ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN void setChargeRatioValue(
+            index_t const index, real_t const value ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN void assignChargeRatioPtr( real_pointer_t ptr ) SIXTRL_NOEXCEPT;
+
+
+        SIXTRL_FN real_t getChargeValue( index_t const index ) const SIXTRL_NOEXCEPT;
+        SIXTRL_FN real_t getMassValue(   index_t const index ) const SIXTRL_NOEXCEPT;
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
         SIXTRL_FN const_index_pointer_t getParticleId() const SIXTRL_NOEXCEPT;
         SIXTRL_FN index_pointer_t getParticleId() SIXTRL_NOEXCEPT;
 
@@ -483,6 +505,7 @@ namespace SIXTRL_CXX_NAMESPACE
         real_pointer_t  rpp              SIXTRL_ALIGN( 8 );
         real_pointer_t  rvv              SIXTRL_ALIGN( 8 );
         real_pointer_t  chi              SIXTRL_ALIGN( 8 );
+        real_pointer_t  charge_ratio     SIXTRL_ALIGN( 8 );
         index_pointer_t particle_id      SIXTRL_ALIGN( 8 );
         index_pointer_t at_element_id    SIXTRL_ALIGN( 8 );
         index_pointer_t at_turn          SIXTRL_ALIGN( 8 );
@@ -566,6 +589,7 @@ namespace SIXTRL_CXX_NAMESPACE
             real_pointer_t  rpp_ptr           = nullptr,
             real_pointer_t  rvv_ptr           = nullptr,
             real_pointer_t  chi_ptr           = nullptr,
+            real_pointer_t  charge_ratio_ptr  = nullptr,
             index_pointer_t particle_id_ptr   = nullptr,
             index_pointer_t at_element_id_ptr = nullptr,
             index_pointer_t at_turn_ptr       = nullptr,
@@ -901,6 +925,26 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+        SIXTRL_FN const_real_pointer_t getChargeRatio() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN real_pointer_t getChargeRatio() SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN real_t getChargeRatioValue(
+            index_t const index ) const SIXTRL_NOEXCEPT;
+
+        template< typename Iter >
+        SIXTRL_FN void setChargeRatio( Iter begin, Iter end ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN void setChargeRatioValue(
+            index_t const index, real_t const value ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN void assignChargeRatioPtr( real_pointer_t ptr ) SIXTRL_NOEXCEPT;
+
+
+        SIXTRL_FN real_t getChargeValue( index_t const index ) const SIXTRL_NOEXCEPT;
+        SIXTRL_FN real_t getMassValue(   index_t const index ) const SIXTRL_NOEXCEPT;
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
         SIXTRL_FN const_index_pointer_t getParticleId() const SIXTRL_NOEXCEPT;
         SIXTRL_FN index_pointer_t getParticleId() SIXTRL_NOEXCEPT;
 
@@ -1065,6 +1109,7 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ASSERT( other.rpp            != nullptr );
             SIXTRL_ASSERT( other.rvv            != nullptr );
             SIXTRL_ASSERT( other.chi            != nullptr );
+            SIXTRL_ASSERT( other.charge_ratio   != nullptr );
             SIXTRL_ASSERT( other.particle_id    != nullptr );
             SIXTRL_ASSERT( other.at_element_id  != nullptr );
             SIXTRL_ASSERT( other.at_turn        != nullptr );
@@ -1086,6 +1131,7 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ASSERT( this->rpp            != nullptr );
             SIXTRL_ASSERT( this->rvv            != nullptr );
             SIXTRL_ASSERT( this->chi            != nullptr );
+            SIXTRL_ASSERT( this->charge_ratio   != nullptr );
             SIXTRL_ASSERT( this->particle_id    != nullptr );
             SIXTRL_ASSERT( this->at_element_id  != nullptr );
             SIXTRL_ASSERT( this->at_turn        != nullptr );
@@ -1138,6 +1184,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
             std::copy( &other.chi[ src_start_idx ],
                 &other.chi[ src_end_idx ], &this->chi[ dst_start_idx ] );
+
+            std::copy( &other.charge_ratio[ src_start_idx ],
+                       &other.charge_ratio[ src_end_idx ],
+                       &this->charge_ratio[ dst_start_idx ] );
 
             std::copy( &other.particle_id[ src_start_idx ],
                        &other.particle_id[ src_end_idx ],
@@ -1205,6 +1255,7 @@ namespace SIXTRL_CXX_NAMESPACE
             this->setRppValue(    dst_idx, other.getRppValue(    src_idx ) );
             this->setRvvValue(    dst_idx, other.getRvvValue(    src_idx ) );
             this->setChiValue(    dst_idx, other.getChiValue(    src_idx ) );
+            this->setChargeRatioValue( dst_idx, other.getChargeRatioValue( src_idx ) );
 
             this->setParticleIdValue(  dst_idx,
                                        other.getParticleIdValue( src_idx ) );
@@ -1300,6 +1351,7 @@ namespace SIXTRL_CXX_NAMESPACE
             offsetof( _this_t, rpp ),
             offsetof( _this_t, rvv ),
             offsetof( _this_t, chi ),
+            offsetof( _this_t, charge_ratio ),
 
             offsetof( _this_t, particle_id ),
             offsetof( _this_t, at_element_id ),
@@ -1310,9 +1362,13 @@ namespace SIXTRL_CXX_NAMESPACE
         size_t const sizes[] =
         {
             real_size,  real_size,  real_size,  real_size,  real_size,
+
             real_size,  real_size,  real_size,
             real_size,  real_size,  real_size,
-            real_size,  real_size,  real_size,  real_size,  real_size,
+
+            real_size,  real_size,  real_size,
+            real_size,  real_size,  real_size,
+
             index_size, index_size, index_size, index_size
         };
 
@@ -1325,7 +1381,7 @@ namespace SIXTRL_CXX_NAMESPACE
             num_particles, num_particles, num_particles,
 
             num_particles, num_particles, num_particles,
-            num_particles, num_particles,
+            num_particles, num_particles, num_particles,
 
             num_particles, num_particles, num_particles, num_particles
         };
@@ -1361,6 +1417,7 @@ namespace SIXTRL_CXX_NAMESPACE
         typename TParticles< T >::real_pointer_t  rpp_ptr,
         typename TParticles< T >::real_pointer_t  rvv_ptr,
         typename TParticles< T >::real_pointer_t  chi_ptr,
+        typename TParticles< T >::real_pointer_t  charge_ratio_ptr,
         typename TParticles< T >::index_pointer_t particle_id_ptr  ,
         typename TParticles< T >::index_pointer_t at_element_id_ptr,
         typename TParticles< T >::index_pointer_t at_turn_ptr,
@@ -1395,6 +1452,7 @@ namespace SIXTRL_CXX_NAMESPACE
             offsetof( _this_t, rpp ),
             offsetof( _this_t, rvv ),
             offsetof( _this_t, chi ),
+            offsetof( _this_t, charge_ratio ),
 
             offsetof( _this_t, particle_id ),
             offsetof( _this_t, at_element_id ),
@@ -1420,7 +1478,7 @@ namespace SIXTRL_CXX_NAMESPACE
             num_particles, num_particles, num_particles,
 
             num_particles, num_particles, num_particles,
-            num_particles, num_particles,
+            num_particles, num_particles, num_particles,
 
             num_particles, num_particles, num_particles, num_particles
         };
@@ -1443,6 +1501,7 @@ namespace SIXTRL_CXX_NAMESPACE
         temp.assignRppPtr( rpp_ptr );
         temp.assignRvvPtr( rvv_ptr );
         temp.assignChiPtr( chi_ptr );
+        temp.assignChargeRatioPtr( charge_ratio_ptr );
         temp.assignParticleIdPtr( particle_id_ptr );
         temp.assignAtElementIdPtr( at_element_id_ptr );
         temp.assignAtTurnPtr( at_turn_ptr );
@@ -1497,6 +1556,7 @@ namespace SIXTRL_CXX_NAMESPACE
         this->assignRppPtr( nullptr );
         this->assignRvvPtr( nullptr );
         this->assignChiPtr( nullptr );
+        this->assignChargeRatioPtr( nullptr );
 
         this->assignParticleIdPtr( nullptr );
         this->assignAtElementIdPtr( nullptr );
@@ -2421,6 +2481,89 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     template< typename T >
+    SIXTRL_INLINE typename TParticles< T >::const_real_pointer_t
+    TParticles< T >::getChargeRatio() const SIXTRL_NOEXCEPT
+    {
+        return this->charge_ratio;
+    }
+
+    template< typename T >
+    SIXTRL_INLINE typename TParticles< T >::real_pointer_t
+    TParticles< T >::getChargeRatio() SIXTRL_NOEXCEPT
+    {
+        return this->charge_ratio;
+    }
+
+    template< typename T >
+    SIXTRL_INLINE typename TParticles< T >::real_t
+    TParticles< T >::getChargeRatioValue(
+        typename TParticles< T >::index_t const index ) const SIXTRL_NOEXCEPT
+    {
+        return this->realValueGetterFn( this->charge_ratio, index );
+    }
+
+    template< typename T >
+    template< typename Iter >
+    SIXTRL_INLINE void TParticles< T >::setChargeRatio(
+        Iter begin, Iter end ) SIXTRL_NOEXCEPT
+    {
+        using elem_t = typename TParticles< T >::num_elements_t;
+        elem_t const in_num_particles = std::distance( begin, end );
+
+        if( in_num_particles <= this->getNumParticles() )
+        {
+            std::copy( begin, end, this->getCargeRatio() );
+        }
+
+        return;
+    }
+
+    template< typename T >
+    SIXTRL_INLINE void TParticles< T >::setChargeRatioValue(
+        typename TParticles< T >::index_t const index,
+        typename TParticles< T >::real_t const value ) SIXTRL_NOEXCEPT
+    {
+        this->realValueSetterFn( this->charge_ratio, index, value );
+        return;
+    }
+
+    template< typename T >
+    SIXTRL_INLINE  void TParticles< T >::assignChargeRatioPtr(
+        typename TParticles< T >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    {
+        this->charge_ratio = ptr;
+        return;
+    }
+
+
+    template< typename T >
+    SIXTRL_INLINE typename TParticles< T >::real_t
+    TParticles< T >::getChargeValue(
+        typename TParticles< T >::index_t const index ) const SIXTRL_NOEXCEPT
+    {
+        return this->getQ0Value( index ) * this->getChargeRatioValue( index );
+    }
+
+    template< typename T >
+    SIXTRL_INLINE typename TParticles< T >::real_t
+    TParticles< T >::getMassValue(
+        typename TParticles< T >::index_t const index )  const SIXTRL_NOEXCEPT
+    {
+        using real_t = TParticles< T >::real_t;
+
+        real_t const chi    = this->getChiValue( index );
+        real_t const qratio = this->getChargeRatioValue( index );
+
+        SIXTRL_ASSERT( chi    > ( real_t )0 );
+        SIXTRL_ASSERT( qratio > ( real_t )0 );
+
+        return ( this->getMass0Value( index ) * qratio ) / chi;
+    }
+
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    template< typename T >
     SIXTRL_INLINE typename TParticles< T >::const_index_pointer_t
     TParticles< T >::getParticleId() const SIXTRL_NOEXCEPT
     {
@@ -2741,6 +2884,7 @@ namespace SIXTRL_CXX_NAMESPACE
         TParticles< NS(particle_real_t) >::real_pointer_t  rpp_ptr,
         TParticles< NS(particle_real_t) >::real_pointer_t  rvv_ptr,
         TParticles< NS(particle_real_t) >::real_pointer_t  chi_ptr,
+        TParticles< NS(particle_real_t) >::real_pointer_t  charge_ratio_ptr,
         TParticles< NS(particle_real_t) >::index_pointer_t particle_id_ptr  ,
         TParticles< NS(particle_real_t) >::index_pointer_t at_element_id_ptr,
         TParticles< NS(particle_real_t) >::index_pointer_t at_turn_ptr,
@@ -2749,10 +2893,9 @@ namespace SIXTRL_CXX_NAMESPACE
         return reinterpret_cast< TParticles< NS(particle_real_t) >* >(
             ::NS(Particles_add)( &buffer, num_particles,
                 q0_ptr, mass0_ptr, beta0_ptr, gamma0_ptr, p0c_ptr,
-                    s_ptr, x_ptr, y_ptr, px_ptr, py_ptr, zeta_ptr,
-                        psigma_ptr, delta_ptr, rpp_ptr, rvv_ptr, chi_ptr,
-                            particle_id_ptr, at_element_id_ptr, at_turn_ptr,
-                                state_ptr ) );
+                s_ptr, x_ptr, y_ptr, px_ptr, py_ptr, zeta_ptr,
+                psigma_ptr, delta_ptr, rpp_ptr, rvv_ptr, chi_ptr, charge_ratio_ptr,
+                particle_id_ptr, at_element_id_ptr, at_turn_ptr, state_ptr ) );
     }
 
     /* ----------------------------------------------------------------- */
@@ -3821,7 +3964,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-
     SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
     TParticles< NS(particle_real_t) >::getChi() const SIXTRL_NOEXCEPT
     {
@@ -3874,6 +4016,77 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         ::NS(Particles_assign_ptr_to_chi)( this->getCApiPtr(), ptr );
         return;
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
+    TParticles< NS(particle_real_t) >::getChargeRatio() const SIXTRL_NOEXCEPT
+    {
+        return ::NS(Particles_get_const_charge_ratio)( this->getCApiPtr() );
+    }
+
+
+    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
+    TParticles< NS(particle_real_t) >::getChargeRatio() SIXTRL_NOEXCEPT
+    {
+        return ::NS(Particles_get_charge_ratio)( this->getCApiPtr() );
+    }
+
+
+    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
+    TParticles< NS(particle_real_t) >::getChargeRatioValue(
+        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    {
+        return ::NS(Particles_get_charge_ratio_value)( this->getCApiPtr(), index );
+    }
+
+
+    template< typename Iter >
+    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setChargeRatio(
+        Iter begin, Iter end ) SIXTRL_NOEXCEPT
+    {
+        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        elem_t const in_num_particles = std::distance( begin, end );
+
+        if( in_num_particles <= this->getNumParticles() )
+        {
+            std::copy( begin, end, this->getChargeRatio() );
+        }
+
+        return;
+    }
+
+
+    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setChargeRatioValue(
+        TParticles< NS(particle_real_t) >::index_t const index,
+        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    {
+        ::NS(Particles_set_charge_ratio_value)( this->getCApiPtr(), index, value );
+        return;
+    }
+
+
+    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignChargeRatioPtr(
+        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    {
+        ::NS(Particles_assign_ptr_to_charge_ratio)( this->getCApiPtr(), ptr );
+        return;
+    }
+
+
+    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
+    TParticles< NS(particle_real_t) >::getChargeValue(
+        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    {
+        return ::NS(Particles_get_q_value)( this->getCApiPtr(), index );
+    }
+
+    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
+    TParticles< NS(particle_real_t) >::getMassValue(
+        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    {
+        return ::NS(Particles_get_m_value)( this->getCApiPtr(), index );
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

@@ -1,0 +1,22 @@
+#ifndef SIXTRACKLIB_COMMON_GENERATED_CONFIGURATION_HEADER_H__
+#define SIXTRACKLIB_COMMON_GENERATED_CONFIGURATION_HEADER_H__
+
+/* ************************************************************************** *
+ * ******             SixTrackLib Feature configuration                ****** *
+ * ************************************************************************** */
+
+#if !defined( SIXTRL_ENABLE_APERATURE_CHECK )
+    #define SIXTRL_ENABLE_APERATURE_CHECK @SIXTRACKL_ENABLE_APERATURE_CHECK_FLAG@
+#endif /* !defined( SIXTRL_ENABLE_APERATURE_CHECK ) */
+
+#if !defined( SIXTRL_APERATURE_X_LIMIT )
+    #define SIXTRL_APERATURE_X_LIMIT @SIXTRACKL_APERATURE_X_LIMIT_VALUE@
+#endif /* !defined( SIXTRL_APERATURE_X_LIMIT ) */
+
+#if !defined( SIXTRL_APERATURE_Y_LIMIT )
+    #define SIXTRL_APERATURE_Y_LIMIT @SIXTRACKL_APERATURE_Y_LIMIT_VALUE@
+#endif /* SIXTRL_APERATURE_Y_LIMIT */
+
+#endif /* SIXTRACKLIB_COMMON_GENERATED_CONFIGURATION_HEADER_H__ */
+
+/* end: sixtracklib/common/generated/config.h */

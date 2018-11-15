@@ -29,13 +29,26 @@ extern int NS(Particles_map_to_same_memory)(
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
 
+extern int NS(Particles_compare_real_values)(
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
+
+extern int NS(Particles_compare_real_values_with_treshold)(
+    SIXTRL_ARGPTR_DEC   const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_ARGPTR_DEC   const NS(Particles) *const SIXTRL_RESTRICT rhs,
+    NS(particle_real_t) const treshold );
+
+extern int NS(Particles_compare_integer_values)(
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
+
 extern int NS(Particles_compare_values)(
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
 
 extern int NS(Particles_compare_values_with_treshold)(
-    SIXTRL_ARGPTR_DEC   const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_ARGPTR_DEC   const NS(Particles) *const SIXTRL_RESTRICT rhs,
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs,
     NS(particle_real_t) const treshold );
 
 static int NS(compare_sequences_exact)(
@@ -82,6 +95,14 @@ extern void NS(Particles_print_max_diff)(
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT max_diff,
     NS(buffer_size_t) const* max_diff_indices );
 
+
+extern void NS(Particles_print_out)(
+    const NS(Particles) *const SIXTRL_RESTRICT particles );
+
+extern void NS(Particles_print_max_diff_out)(
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT max_diff,
+    NS(buffer_size_t) const* max_diff_indices );
+
 /* ------------------------------------------------------------------------- */
 
 extern int NS(Particles_buffers_map_to_same_memory)(
@@ -103,9 +124,6 @@ extern void NS(Particles_buffer_get_max_difference)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs );
 
-extern void NS(Particles_buffer_print_stdout)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particle_buffer );
-
 extern void NS(Particles_buffer_print)(
     FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particle_buffer );
@@ -115,6 +133,12 @@ extern void NS(Particles_buffer_print_max_diff)(
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT max_diff_buffer,
     NS(buffer_size_t) const* max_diff_indices );
 
+extern void NS(Particles_buffer_print_out)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particle_buffer );
+
+extern void NS(Particles_buffer_print_max_diff_out)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT max_diff_buffer,
+    NS(buffer_size_t) const* max_diff_indices );
 
 /* ------------------------------------------------------------------------- */
 
@@ -319,28 +343,34 @@ void NS(Particles_realistic_init)( NS(Particles)* SIXTRL_RESTRICT p )
 
     if( ( p != 0 ) && ( NUM_PARTICLES > ( SIXTRL_SIZE_T )0u ) )
     {
+        typedef NS(particle_real_t)    real_t;
+        typedef NS(particle_index_t)   index_t;
+
         SIXTRL_SIZE_T ii;
         SIXTRL_INT64_T particle_id = 0;
 
-        NS(particle_real_t) const Q0     = ( NS(particle_real_t) )1.0;
-        NS(particle_real_t) const MASS0  = ( NS(particle_real_t) )938272013.0;
-        NS(particle_real_t) const BETA0  = ( NS(particle_real_t) )0.9999999895816052;
-        NS(particle_real_t) const GAMMA0 = ( NS(particle_real_t) )6927.628566067013;
-        NS(particle_real_t) const P0C    = ( NS(particle_real_t) )6499999932280.434;
+        real_t const Q0           = ( real_t )1.0;
+        real_t const MASS0        = ( real_t )938272013.0;
+        real_t const BETA0        = ( real_t )0.9999999895816052;
+        real_t const GAMMA0       = ( real_t )6927.628566067013;
+        real_t const P0C          = ( real_t )6499999932280.434;
+        real_t const S            = ( real_t )0.0;
+        real_t const X0           = ( real_t )0.0007145746958428162;
+        real_t const Y            = ( real_t )0.0006720936794100408;
+        real_t const PX           = ( real_t )-1.7993573732749124e-05;
+        real_t const PY           = ( real_t )7.738322282156584e-06;
+        real_t const ZETA         = ( real_t )1.70026098624819983075e-05;
+        real_t const PSIGMA       = ( real_t )0.00027626172996313825;
+        real_t const DELTA        = ( real_t )0.00027626172996228097;
+        real_t const RPP          = ( real_t )0.9997238145695025;
+        real_t const RVV          = ( real_t )0.999999999994246;
+        real_t const CHI          = ( real_t )1.0;
+        real_t const CHARGE_RATIO = ( real_t )1.0;
+        real_t const DELTA_X      = ( real_t )1e-9;
 
-        NS(particle_real_t) const S      = ( NS(particle_real_t) )0.0;
-        NS(particle_real_t) const X0     = ( NS(particle_real_t) )0.0007145746958428162;
-        NS(particle_real_t) const Y      = ( NS(particle_real_t) )0.0006720936794100408;
-        NS(particle_real_t) const PX     = ( NS(particle_real_t) )-1.7993573732749124e-05;
-        NS(particle_real_t) const PY     = ( NS(particle_real_t) )7.738322282156584e-06;
-        NS(particle_real_t) const ZETA   = ( NS(particle_real_t) )1.70026098624819983075e-05;
-        NS(particle_real_t) const PSIGMA = ( NS(particle_real_t) )0.00027626172996313825;
-        NS(particle_real_t) const DELTA  = ( NS(particle_real_t) )0.00027626172996228097;
-        NS(particle_real_t) const RPP    = ( NS(particle_real_t) )0.9997238145695025;
-        NS(particle_real_t) const RVV    = ( NS(particle_real_t) )0.999999999994246;
-        NS(particle_real_t) const CHI    = ( NS(particle_real_t) )1.0;
-
-        NS(particle_real_t) const DELTA_X = ( NS(particle_real_t) )1e-9;
+        index_t const AT_ELEMENT  = ( index_t )0;
+        index_t const AT_TURN     = ( index_t )0;
+        index_t const STATE       = ( index_t )1;
 
         for( ii = 0 ; ii < NUM_PARTICLES ; ++ii, ++particle_id )
         {
@@ -353,9 +383,9 @@ void NS(Particles_realistic_init)( NS(Particles)* SIXTRL_RESTRICT p )
             NS(Particles_set_p0c_value)(           p, ii, P0C );
 
             NS(Particles_set_particle_id_value)(   p, ii, particle_id );
-            NS(Particles_set_at_element_id_value)( p, ii, -1 );
-            NS(Particles_set_at_turn_value)(       p, ii, -1 );
-            NS(Particles_set_state_value)(         p, ii,  0 );
+            NS(Particles_set_at_element_id_value)( p, ii, AT_ELEMENT );
+            NS(Particles_set_at_turn_value)(       p, ii, AT_TURN );
+            NS(Particles_set_state_value)(         p, ii, STATE );
 
             NS(Particles_set_s_value)(             p, ii, S );
             NS(Particles_set_x_value)(             p, ii, X );
@@ -369,6 +399,7 @@ void NS(Particles_realistic_init)( NS(Particles)* SIXTRL_RESTRICT p )
             NS(Particles_set_rpp_value)(           p, ii, RPP );
             NS(Particles_set_rvv_value)(           p, ii, RVV );
             NS(Particles_set_chi_value)(           p, ii, CHI );
+            NS(Particles_set_charge_ratio_value)(  p, ii, CHARGE_RATIO );
         }
     }
 
@@ -377,36 +408,42 @@ void NS(Particles_realistic_init)( NS(Particles)* SIXTRL_RESTRICT p )
 
 void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
 {
+    typedef NS(particle_real_t)    real_t;
+    typedef NS(particle_index_t)   index_t;
+
     SIXTRL_SIZE_T const NUM_PARTICLES = NS(Particles_get_num_of_particles)( p );
 
     if( ( p != 0 ) && ( NUM_PARTICLES > ( SIXTRL_SIZE_T )0u ) )
     {
-        NS(particle_real_t) const TWO_PI  = 2.0 * M_PI;
-        NS(particle_real_t) const Q0      = 1.0;
-        NS(particle_real_t) const MASS0   = 1.0;
-        NS(particle_real_t) const BETA0   = 1.0;
-        NS(particle_real_t) const GAMMA0  = 1.0;
-        NS(particle_real_t) const P0C     = 1.0;
+        real_t const TWO_PI       = ( real_t )2.0 * M_PI;
+        real_t const Q0           = ( real_t )1.0;
+        real_t const MASS0        = ( real_t )1.0;
+        real_t const BETA0        = ( real_t )1.0;
+        real_t const GAMMA0       = ( real_t )1.0;
+        real_t const P0C          = ( real_t )1.0;
 
-        NS(particle_real_t) const S       = 0.0;
-        NS(particle_real_t) const MIN_X   = 0.0;
-        NS(particle_real_t) const MAX_X   = 0.2;
-        NS(particle_real_t) const DELTA_X = ( MAX_X - MIN_X );
+        real_t const S            = ( real_t )0.0;
+        real_t const MIN_X        = ( real_t )0.0;
+        real_t const MAX_X        = ( real_t )0.2;
+        real_t const DELTA_X      = ( real_t )( MAX_X - MIN_X );
 
-        NS(particle_real_t) const MIN_Y   = 0.0;
-        NS(particle_real_t) const MAX_Y   = 0.3;
-        NS(particle_real_t) const DELTA_Y = ( MAX_Y - MIN_Y );
+        real_t const MIN_Y        = ( real_t )0.0;
+        real_t const MAX_Y        = ( real_t )0.3;
+        real_t const DELTA_Y      = ( real_t )( MAX_Y - MIN_Y );
 
-        NS(particle_real_t) const P       = 0.1;
-        NS(particle_real_t) const ZETA    = 0.0;
+        real_t const P            = ( real_t )0.1;
+        real_t const ZETA         = ( real_t )0.0;
 
-        NS(particle_real_t) const PSIGMA  = 0.0;
-        NS(particle_real_t) const RPP     = 1.0;
-        NS(particle_real_t) const RVV     = 1.0;
-        NS(particle_real_t) const DELTA   = 0.5;
-        NS(particle_real_t) const CHI     = 0.0;
+        real_t const PSIGMA       = ( real_t )0.0;
+        real_t const RPP          = ( real_t )1.0;
+        real_t const RVV          = ( real_t )1.0;
+        real_t const DELTA        = ( real_t )0.5;
+        real_t const CHI          = ( real_t )0.0;
+        real_t const CHARGE_RATIO = ( real_t )1.0;
 
-        int64_t const STATE  = INT64_C( 0 );
+        index_t const AT_ELEMENT  = ( index_t )0;
+        index_t const AT_TURN     = ( index_t )0;
+        index_t const STATE       = ( index_t )1;
 
         size_t ii;
         int64_t particle_id = 0;
@@ -427,8 +464,8 @@ void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
             NS(Particles_set_p0c_value)(           p, ii, P0C );
 
             NS(Particles_set_particle_id_value)(   p, ii, particle_id );
-            NS(Particles_set_at_element_id_value)( p, ii, -1 );
-            NS(Particles_set_at_turn_value)(       p, ii, -1 );
+            NS(Particles_set_at_element_id_value)( p, ii, AT_ELEMENT );
+            NS(Particles_set_at_turn_value)(       p, ii, AT_TURN );
             NS(Particles_set_state_value)(         p, ii, STATE );
 
             NS(Particles_set_s_value)(             p, ii, S );
@@ -443,6 +480,7 @@ void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
             NS(Particles_set_rpp_value)(           p, ii, RPP );
             NS(Particles_set_rvv_value)(           p, ii, RVV );
             NS(Particles_set_chi_value)(           p, ii, CHI );
+            NS(Particles_set_charge_ratio_value)(  p, ii, CHARGE_RATIO );
         }
     }
 
@@ -502,6 +540,8 @@ int NS(Particles_map_to_same_memory)(
               NS(Particles_get_const_rvv)( rhs ) ) &&
             ( NS(Particles_get_const_chi)( lhs ) ==
               NS(Particles_get_const_chi)( rhs ) ) &&
+            ( NS(Particles_get_const_charge_ratio)( lhs ) ==
+              NS(Particles_get_const_charge_ratio)( rhs ) ) &&
             ( NS(Particles_get_const_particle_id)( lhs ) ==
               NS(Particles_get_const_particle_id)( rhs ) ) &&
             ( NS(Particles_get_const_at_element_id)( lhs ) ==
@@ -517,7 +557,7 @@ int NS(Particles_map_to_same_memory)(
 }
 
 
-int NS(Particles_compare_values)(
+int NS(Particles_compare_real_values)(
     const st_Particles *const SIXTRL_RESTRICT lhs,
     const st_Particles *const SIXTRL_RESTRICT rhs )
 {
@@ -675,6 +715,37 @@ int NS(Particles_compare_values)(
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         cmp_result = NS(compare_sequences_exact)(
+            NS(Particles_get_const_charge_ratio)( lhs ),
+            NS(Particles_get_const_charge_ratio)( rhs ),
+            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
+    }
+    else if( ( lhs != 0 ) && ( rhs == 0 ) )
+    {
+        cmp_result = 1;
+    }
+    else
+    {
+        cmp_result = -1;
+    }
+
+    return cmp_result;
+}
+
+
+int NS(Particles_compare_integer_values)(
+    const st_Particles *const SIXTRL_RESTRICT lhs,
+    const st_Particles *const SIXTRL_RESTRICT rhs )
+{
+    int cmp_result = -1;
+
+    if( NS(Particles_have_same_structure)( lhs, rhs ) )
+    {
+        NS(buffer_size_t) const NUM_PARTICLES =
+            NS(Particles_get_num_of_particles)( lhs );
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        cmp_result = NS(compare_sequences_exact)(
             NS(Particles_get_const_particle_id)( lhs ),
             NS(Particles_get_const_particle_id)( rhs ),
             NUM_PARTICLES, sizeof( SIXTRL_INT64_T ) );
@@ -717,7 +788,7 @@ int NS(Particles_compare_values)(
     return cmp_result;
 }
 
-int NS(Particles_compare_values_with_treshold)(
+int NS(Particles_compare_real_values_with_treshold)(
     const NS(Particles) *const SIXTRL_RESTRICT lhs,
     const NS(Particles) *const SIXTRL_RESTRICT rhs,
     NS(particle_real_t) const treshold )
@@ -859,36 +930,10 @@ int NS(Particles_compare_values_with_treshold)(
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_particle_id)( lhs ),
-            NS(Particles_get_const_particle_id)( rhs ),
-            NUM_PARTICLES, sizeof( SIXTRL_INT64_T ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_at_element_id)( lhs ),
-            NS(Particles_get_const_at_element_id)( rhs ),
-            NUM_PARTICLES, sizeof( SIXTRL_INT64_T ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_at_turn)( lhs ),
-            NS(Particles_get_const_at_turn)( rhs ),
-            NUM_PARTICLES, sizeof( SIXTRL_INT64_T ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_state)( lhs ),
-            NS(Particles_get_const_state)( rhs ),
-            NUM_PARTICLES, sizeof( SIXTRL_INT64_T ) );
+        cmp_result = NS(compare_real_sequences_with_treshold)(
+            NS(Particles_get_const_charge_ratio)( lhs ),
+            NS(Particles_get_const_charge_ratio)( rhs ), 0,
+                NUM_PARTICLES, treshold );
     }
     else if( ( lhs != 0 ) && ( rhs == 0 ) )
     {
@@ -897,6 +942,37 @@ int NS(Particles_compare_values_with_treshold)(
     else
     {
         cmp_result = -1;
+    }
+
+    return cmp_result;
+}
+
+int NS(Particles_compare_values)(
+    const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    const NS(Particles) *const SIXTRL_RESTRICT rhs )
+{
+    int cmp_result = NS(Particles_compare_real_values)( lhs, rhs );
+
+    if( cmp_result == 0 )
+    {
+        cmp_result = NS(Particles_compare_integer_values)( lhs, rhs );
+    }
+
+    return cmp_result;
+}
+
+
+int NS(Particles_compare_values_with_treshold)(
+    const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    const NS(Particles) *const SIXTRL_RESTRICT rhs,
+    NS(particle_real_t) const treshold )
+{
+    int cmp_result = NS(Particles_compare_real_values_with_treshold)(
+        lhs, rhs, treshold );
+
+    if( cmp_result == 0 )
+    {
+        cmp_result = NS(Particles_compare_integer_values)( lhs, rhs );
     }
 
     return cmp_result;
@@ -913,10 +989,10 @@ void NS(Particles_get_max_difference)(
         ( NS(Particles_get_num_of_particles)( lhs ) > 0u ) &&
         ( NS(Particles_get_num_of_particles)( max_diff ) >= 1u ) )
     {
-        NS(buffer_size_t) dummy_max_diff_indices[ 20 ] =
+        NS(buffer_size_t) dummy_max_diff_indices[ 21 ] =
         {
             0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
-            0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u
+            0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u
         };
 
         NS(buffer_size_t) const NUM_PARTICLES =
@@ -1041,15 +1117,22 @@ void NS(Particles_get_max_difference)(
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+        NS(compare_real_sequences_and_get_max_difference)(
+            NS(Particles_get_charge_ratio)( max_diff ), &max_diff_indices[ 16 ],
+            NS(Particles_get_const_charge_ratio)( lhs ),
+            NS(Particles_get_const_charge_ratio)( rhs ), NUM_PARTICLES );
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
         NS(compare_int64_sequences_and_get_max_difference)(
-            NS(Particles_get_particle_id)( max_diff ), &max_diff_indices[ 16 ],
+            NS(Particles_get_particle_id)( max_diff ), &max_diff_indices[ 17 ],
             NS(Particles_get_const_particle_id)( lhs ),
             NS(Particles_get_const_particle_id)( rhs ), NUM_PARTICLES );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         NS(compare_int64_sequences_and_get_max_difference)(
             NS(Particles_get_at_element_id)( max_diff ),
-            &max_diff_indices[ 17 ],
+            &max_diff_indices[ 18 ],
             NS(Particles_get_const_at_element_id)( lhs ),
             NS(Particles_get_const_at_element_id)( rhs ), NUM_PARTICLES );
 
@@ -1057,14 +1140,14 @@ void NS(Particles_get_max_difference)(
 
         NS(compare_int64_sequences_and_get_max_difference)(
             NS(Particles_get_at_turn)( max_diff ),
-            &max_diff_indices[ 18 ],
+            &max_diff_indices[ 19 ],
             NS(Particles_get_const_at_turn)( lhs ),
             NS(Particles_get_const_at_turn)( rhs ), NUM_PARTICLES );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         NS(compare_int64_sequences_and_get_max_difference)(
-            NS(Particles_get_state)( max_diff ), &max_diff_indices[ 19 ],
+            NS(Particles_get_state)( max_diff ), &max_diff_indices[ 20 ],
             NS(Particles_get_const_state)( lhs ),
             NS(Particles_get_const_state)( rhs ), NUM_PARTICLES );
     }
@@ -1138,6 +1221,9 @@ void NS(Particles_print)(
             fprintf( fp, "chi            = %.16f\r\n",
                      NS(Particles_get_chi_value)( particles, ii ) );
 
+            fprintf( fp, "charge_ratio   = %.16f\r\n",
+                     NS(Particles_get_charge_ratio_value)( particles, ii ) );
+
             fprintf( fp, "particle_id    = %18ld\r\n",
                      NS(Particles_get_particle_id_value)( particles, ii ) );
 
@@ -1155,6 +1241,13 @@ void NS(Particles_print)(
     return;
 }
 
+void NS(Particles_print_out)(
+    const NS(Particles) *const SIXTRL_RESTRICT particles )
+{
+    NS(Particles_print)( stdout, particles );
+    return;
+}
+
 void NS(Particles_print_max_diff)(
     FILE* SIXTRL_RESTRICT fp,
     const NS(Particles) *const SIXTRL_RESTRICT max_diff,
@@ -1163,10 +1256,10 @@ void NS(Particles_print_max_diff)(
     NS(buffer_size_t) const num_particles =
         NS(Particles_get_num_of_particles)( max_diff );
 
-    NS(buffer_size_t) const dummy_max_diff_indices[ 20 ] =
+    NS(buffer_size_t) const dummy_max_diff_indices[ 21 ] =
     {
         0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
-        0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u
+        0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u
     };
 
     if( max_diff_indices == 0 )
@@ -1256,6 +1349,11 @@ void NS(Particles_print_max_diff)(
                     NS(Particles_get_chi_value)( max_diff, 0 ),
                     max_diff_indices[ 15 ]  );
 
+        fprintf( fp, "Delta |charge_ratio|   = %.16e  "
+                     "max diff at index = %8lu\r\n",
+                    NS(Particles_get_charge_ratio_value)( max_diff, 0 ),
+                    max_diff_indices[ 15 ]  );
+
         fprintf( fp, "Delta |particle_id|    = %22ld  "
                      "max diff at index = %8lu\r\n",
                     NS(Particles_get_particle_id_value)( max_diff, 0 ),
@@ -1277,6 +1375,14 @@ void NS(Particles_print_max_diff)(
                     max_diff_indices[ 19 ]  );
     }
 
+    return;
+}
+
+void NS(Particles_print_max_diff_out )(
+    const NS(Particles) *const SIXTRL_RESTRICT max_diff,
+    NS(buffer_size_t) const* max_diff_indices )
+{
+    NS(Particles_print_max_diff)( stdout, max_diff, max_diff_indices );
     return;
 }
 
@@ -1498,14 +1604,6 @@ void NS(Particles_buffers_get_max_difference)(
     }
 }
 
-void NS(Particles_buffer_print_stdout)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particle_buffer )
-{
-    NS(Particles_buffer_print)( stdout, particle_buffer );
-    return;
-}
-
-
 void NS(Particles_buffer_print)(
     FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particles_buffer )
@@ -1595,6 +1693,23 @@ void NS(Particles_buffer_print_max_diff)(
             }
         }
     }
+
+    return;
+}
+
+void NS(Particles_buffer_print_out)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particles_buffer )
+{
+    NS(Particles_buffer_print)( stdout, particles_buffer );
+    return;
+}
+
+void NS(Particles_buffer_print_max_diff_out)(
+    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT max_diff_buffer,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* max_diff_indices )
+{
+    NS(Particles_buffer_print_max_diff)(
+        stdout, max_diff_buffer, max_diff_indices );
 
     return;
 }
