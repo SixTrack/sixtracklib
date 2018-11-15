@@ -69,10 +69,10 @@ int main( int argc, char* argv[] )
         SIXTRL_ASSERT( input_pb != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( st_Buffer_is_particles_buffer( input_pb ) );
         SIXTRL_ASSERT( st_Particles_buffer_get_num_of_particle_blocks(
-            input_pb ) == 1u );
+            input_pb ) > 0u );
 
-        NUM_PARTICLES = st_Particles_buffer_get_total_num_of_particles(
-            input_pb );
+        NUM_PARTICLES = st_Particles_get_num_of_particles(
+            st_Particles_buffer_get_const_particles( input_pb, 0u ) );
 
         SIXTRL_ASSERT( NUM_PARTICLES > 0 );
     }
