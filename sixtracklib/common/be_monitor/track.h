@@ -179,15 +179,21 @@ SIXTRL_INLINE int NS(Track_particle_beam_monitor)(
         if( ( store_idx >= ( nturn_t )0 ) &&
             ( out_particle_id >= ( index_t )0u ) )
         {
+            ptr_out_particles_t out_particles = ( ptr_out_particles_t )(
+                uintptr_t )NS(BeamMonitor_get_particles_begin_addr)(
+                        monitor, store_idx );
+
             SIXTRL_ASSERT( store_idx <
                 NS(BeamMonitor_get_num_stores)( monitor ) );
 
-            success = NS(Particles_copy_to_generic_addr_data)(
-                ( ptr_out_particles_t )( uintptr_t
-                    )NS(BeamMonitor_get_particles_begin_addr)(
-                        monitor, store_idx ),
-                ( num_elements_t )out_particle_id,
-                    in_particles, particle_index );
+            success = NS(Particles_copy_to_generic_addr_data)( out_particles,
+                ( num_elements_t )out_particle_id, in_particles, particle_index );
+
+            if( success != 0 )
+            {
+                NS(Particles_set_state_value)(
+                    in_particles, particle_index, 0 );
+            }
         }
     }
 
