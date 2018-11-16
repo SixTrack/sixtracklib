@@ -167,3 +167,24 @@ def compareParticlesDifference( lhs, rhs, abs_treshold=None ):
                     break
 
     return cmp_result
+
+
+class ParticlesSet(object):
+    def __init__(self):
+        self.cbuffer=CBuffer()
+        self.particles=[]
+    def Particles(self,**nargs):
+        particles=Particles(cbuffer=self.cbuffer,**nargs)
+        self.particles.append(particles)
+        return particles
+
+    @classmethod
+    def fromfile(cls, filename):
+        cbuffer = CBuffer.fromfile(filename)
+        return cls(cbuffer=cbuffer)
+
+    def tofile(self, filename):
+        self.cbuffer.tofile(filename)
+
+
+
