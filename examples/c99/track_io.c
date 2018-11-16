@@ -69,10 +69,10 @@ int main( int argc, char* argv[] )
         SIXTRL_ASSERT( input_pb != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( st_Buffer_is_particles_buffer( input_pb ) );
         SIXTRL_ASSERT( st_Particles_buffer_get_num_of_particle_blocks(
-            input_pb ) == 1u );
+            input_pb ) > 0u );
 
-        NUM_PARTICLES = st_Particles_buffer_get_total_num_of_particles(
-            input_pb );
+        NUM_PARTICLES = st_Particles_get_num_of_particles(
+            st_Particles_buffer_get_const_particles( input_pb, 0u ) );
 
         SIXTRL_ASSERT( NUM_PARTICLES > 0 );
     }
@@ -168,6 +168,17 @@ int main( int argc, char* argv[] )
         {
             particles = st_Particles_add_copy(
                 track_pb, in_particles );
+
+            int ii = 0;
+
+            SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+            SIXTRL_ASSERT( ( int )st_Particles_get_num_of_particles(
+                particles ) == NUM_PARTICLES );
+
+            for( ; ii < NUM_PARTICLES ; ++ii )
+            {
+                st_Particles_set_particle_id_value( particles, ii, ii );
+            }
         }
         else
         {
@@ -179,6 +190,8 @@ int main( int argc, char* argv[] )
                 int const jj = ii % in_num_particles;
                 st_Particles_copy_single( particles, ii,
                                           in_particles, jj );
+
+                st_Particles_set_particle_id_value( particles, ii, ii );
             }
         }
 
@@ -251,8 +264,7 @@ int main( int argc, char* argv[] )
                 particles, 0u );
         }
 
-        NS(Track_all_particles_until_turn)(
-            particles, eb, NUM_TURNS );
+        st_Track_all_particles_until_turn( particles, eb, NUM_TURNS );
 
         st_Particles_add_copy( io_buffer, particles );
 
