@@ -15,7 +15,7 @@ class DriftExact(CObject):
     length = CField(0, 'real', default=0.0, alignment=8)
 
 
-class MultiPole(CObject):
+class Multipole(CObject):
     _typeid = 4
     order = CField(0, 'int64',   default=0,    alignment=8)
     length = CField(1, 'real',    default=0.0,  alignment=8)
@@ -98,22 +98,99 @@ class SRotation(CObject):
     cos_z = CField(0, 'real',   default=1.0,  alignment=8)
     sin_z = CField(1, 'real',   default=0.0,  alignment=8)
 
+    def __init__(self, angle=0, **nargs):
+        anglerad = angle/180*np.pi
+        cos_z = np.cos(anglerad)
+        sin_z = np.sin(anglerad)
+        CObject.__init__(self,
+                         cos_z=cos_z, sin_z=sin_z, **nargs)
+
 
 class BeamBeam4D(CObject):
     _typeid = 8
-    size = CField(0, 'uint64', default=0,  alignment=8)
-    data = CField(1, 'real',   default=0.0,
-                  length='size', pointer=True, alignment=8)
+    size = CField(0, 'uint64', const=True, default=0)
+    data = CField(1, 'float64',   default=0.0,
+                  length='size', pointer=True)
 
-    def __init__(self, data, **kwargs):
-        CObject.__init__(self, size=len(data), data=data, **kwargs)
+    def __init__(self, data=None, **kwargs):
+        if data is None:
+            slots = ('q_part', 'N_part', 'sigma_x', 'sigma_y', 'beta_s',
+                     'min_sigma_diff', 'Delta_x', 'Delta_y', 'Dpx_sub', 'Dpy_sub', 'enabled')
+            data = [kwargs[ss] for ss in slots]
+            CObject.__init__(self, size=len(data), data=data, **kwargs)
+        else:
+            CObject.__init__(self, **kwargs)
 
 
 class BeamBeam6D(CObject):
     _typeid = 9
-    size = CField(0, 'uint64', default=0,  alignment=8)
-    data = CField(1, 'real',   default=0.0,
-                  length='size', pointer=True, alignment=8)
+    size = CField(0, 'uint64', const=True, default=0)
+    data = CField(1, 'float64',   default=0.0,
+                  length='size', pointer=True)
 
-    def __init__(self, data, **kwargs):
-        CObject.__init__(self, size=len(data), data=data, **kwargs)
+    def __init__(self, data=None, **kwargs):
+        if data is None:
+            import pysixtrack
+            data = pysixtrack.BB6Ddata.BB6D_init(
+                **{kk: kwargs[kk] for kk in kwargs.keys() if kk != 'cbuffer'}).tobuffer()
+            CObject.__init__(self, size=len(data), data=data, **kwargs)
+        else:
+            CObject.__init__(self, **kwargs)
+
+
+class Elements(object):
+    element_types = {'Cavity': Cavity,
+                     'Drift': Drift,
+                     'DriftExact': DriftExact,
+                     'Multipole': Multipole,
+                     #                     'RFMultipole': RFMultipole,
+                     'SRotation': SRotation,
+                     'XYShift': XYShift,
+                     'BeamBeam6D': BeamBeam6D,
+                     'BeamBeam4D': BeamBeam4D,
+                     #                     'Line': Line,
+                     #                     'Monitor': Monitor,
+                     }
+
+    def _mk_fun(self, buff, cls):
+        def fun(*args, **nargs):
+            # print(cls.__name__,nargs)
+            return cls(cbuffer=buff, **nargs)
+        return fun
+
+    @classmethod
+    def fromfile(cls, filename):
+        cbuffer = CBuffer.fromfile(filename)
+        return cls(cbuffer=cbuffer)
+
+    @classmethod
+    def fromline(cls, line):
+        self = cls()
+        for label, element_name, element in line:
+            getattr(self, element_name)(**element._asdict())
+        return self
+
+    def tofile(self, filename):
+        self.cbuffer.tofile(filename)
+
+    def __init__(self, cbuffer=None):
+        if cbuffer is None:
+            self.cbuffer = CBuffer()
+        else:
+            self.cbuffer = cbuffer
+        for name, cls in self.element_types.items():
+            setattr(self, name, self._mk_fun(self.cbuffer, cls))
+            self.cbuffer.typeids[cls._typeid] = cls
+
+    def gen_builder(self):
+        out = {}
+        for name, cls in self.element_types.items():
+            out[name] = getattr(self, name)
+        return out
+
+    def get_elements(self):
+        n = self.cbuffer.n_objects
+        return [self.cbuffer.get_object(i) for i in range(n)]
+
+    def get(self, objid):
+        return self.cbuffer.get_object(objid)

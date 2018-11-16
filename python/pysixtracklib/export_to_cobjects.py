@@ -10,7 +10,7 @@ import numpy as np
 
 from cobjects import CBuffer, CObject, CField
 
-from .beam_elements import Drift, DriftExact, MultiPole, Cavity, XYShift, SRotation
+from .beam_elements import Drift, DriftExact, Multipole, Cavity, XYShift, SRotation
 from .beam_elements import BeamBeam4D, BeamBeam6D
 from .particles     import Particles as IOParticles
 
@@ -39,7 +39,7 @@ def line2cobject( line, cbuffer=None ):
             e = DriftExact( cbuffer=cbuffer, length=elem.length )
 
         elif elem_type == 'Multipole':
-            e = MultiPole( cbuffer=cbuffer, knl=elem.knl, ksl=elem.ksl,
+            e = Multipole( cbuffer=cbuffer, knl=elem.knl, ksl=elem.ksl,
                            length=elem.length, hxl=elem.hxl, hyl=elem.hyl )
 
         elif elem_type == 'XYShift':
