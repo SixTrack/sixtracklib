@@ -21,7 +21,7 @@ class Particles( CObject ):
     rvv           = CField( 15, 'real',  length='num_particles', default=1.0, pointer=True, alignment=8 )
     chi           = CField( 16, 'real',  length='num_particles', default=0.0, pointer=True, alignment=8 )
     charge_ratio  = CField( 17, 'real',  length='num_particles', default=1.0, pointer=True, alignment=8 )
-    particle      = CField( 18, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
+    particle_id   = CField( 18, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
     at_element    = CField( 19, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
     at_turn       = CField( 20, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
     state         = CField( 21, 'int64', length='num_particles', default=0,   pointer=True, alignment=8 )
@@ -170,10 +170,17 @@ def compareParticlesDifference( lhs, rhs, abs_treshold=None ):
 
 
 class ParticlesSet(object):
-    def __init__(self):
-        self.cbuffer=CBuffer()
-        self.particles=[]
-    def Particles(self,**nargs):
+    element_types={'Particles':Particles}
+    def __init__(self,cbuffer=None):
+        if cbuffer is None:
+            self.cbuffer=CBuffer()
+            self.particles=[]
+        else:
+            self.cbuffer=cbuffer
+            self.particles=[cbuffer.get_object(i) for i in range(cbuffer.n_objects)]
+        for   name, cls in self.element_types.items():
+            self.cbuffer.typeids[cls._typeid]=cls
+    def Particles(self, **nargs):
         particles=Particles(cbuffer=self.cbuffer,**nargs)
         self.particles.append(particles)
         return particles
@@ -185,6 +192,3 @@ class ParticlesSet(object):
 
     def tofile(self, filename):
         self.cbuffer.tofile(filename)
-
-
-
