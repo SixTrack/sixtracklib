@@ -171,18 +171,18 @@ def compareParticlesDifference( lhs, rhs, abs_treshold=None ):
 
 class ParticlesSet(object):
     element_types={'Particles':Particles}
+    @property
+    def particles(self):
+        return self.cbuffer.get_objects()
     def __init__(self,cbuffer=None):
         if cbuffer is None:
             self.cbuffer=CBuffer()
-            self.particles=[]
         else:
             self.cbuffer=cbuffer
-            self.particles=[cbuffer.get_object(i) for i in range(cbuffer.n_objects)]
         for   name, cls in self.element_types.items():
             self.cbuffer.typeids[cls._typeid]=cls
     def Particles(self, **nargs):
         particles=Particles(cbuffer=self.cbuffer,**nargs)
-        self.particles.append(particles)
         return particles
 
     @classmethod
