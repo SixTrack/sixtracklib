@@ -148,6 +148,13 @@ int main( int argc, char* argv[] )
     /* --------------------------------------------------------------------- */
     /* Prepare input and tracking data from run-time parameters: */
 
+
+    printf("%-30s = %10d\n","NUM_PARTICLES",NUM_PARTICLES);
+    printf("%-30s = %10d\n","NUM_TURNS",NUM_TURNS);
+    printf("%-30s = %10d\n","NUM_TURNS_IO_ELEM_BY_ELEM",NUM_TURNS_IO_ELEM_BY_ELEM);
+    printf("%-30s = %10d\n","NUM_TURNS_IO_TURN_BY_TURN",NUM_TURNS_IO_TURN_BY_TURN);
+    printf("%-30s = %10d\n","NUM_IO_SKIP",NUM_IO_SKIP);
+
     if( ( NUM_PARTICLES >= 0 ) && ( input_pb != SIXTRL_NULLPTR ) )
     {
         st_Particles const* in_particles =
@@ -248,6 +255,7 @@ int main( int argc, char* argv[] )
     /* ********************************************************************* */
     /* ****            PERFORM TRACKING AND IO OPERATIONS            ******* */
     /* ********************************************************************* */
+
 
     if( ( particles != SIXTRL_NULLPTR ) &&
         ( NUM_PARTICLES > 0 ) && ( NUM_TURNS > 0 ) )

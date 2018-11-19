@@ -24,10 +24,19 @@ class Particles( CObject ):
     particle_id   = CField( 18, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
     at_element    = CField( 19, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
     at_turn       = CField( 20, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
-    state         = CField( 21, 'int64', length='num_particles', default=0,   pointer=True, alignment=8 )
+    state         = CField( 21, 'int64', length='num_particles', default=1,   pointer=True, alignment=8 )
 
     def __init__(self, **kwargs):
         CObject.__init__( self, **kwargs)
+
+    def set_reference(self,p0c=7e12,mass0=938.272046e6,q0=1):
+        self.q0=1
+        self.mass0=mass0
+        energy0=np.sqrt(p0c**2+mass0**2)
+        self.beta0=p0c/energy0
+        self.gamma0=energy0/mass0
+        self.p0c=p0c
+        self.particle_id = np.arange(self.num_particles)
 
     def fromPySixTrack( self, inp, particle_index ):
         assert( particle_index < self.num_particles )
