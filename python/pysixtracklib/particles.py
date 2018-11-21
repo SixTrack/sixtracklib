@@ -57,7 +57,7 @@ class Particles( CObject ):
         self.rvv[ particle_index ]          = inp.rvv
         self.chi[ particle_index ]          = inp.chi
         self.charge_ratio[ particle_index ] = inp.qratio
-        self.particle[ particle_index ]     = \
+        self.particle_id[ particle_index ]     = \
             inp.partid is not None and inp.partid or particle_index
         self.at_element[ particle_index ]   = -1
         self.at_turn[ particle_index ]      = 0
@@ -83,7 +83,7 @@ class Particles( CObject ):
         other.delta  = self.delta[ particle_index ]
         other.chi    = self.chi[ particle_index ]
         other.qratio = self.charge_ratio[ particle_index ]
-        other.partid = self.particle[ particle_index ]
+        other.partid = self.particle_id[ particle_index ]
         other.turn   = self.at_turn[ particle_index ]
         other.state  = self.state[ particle_index ]
         other._update_coordinates = True
@@ -96,7 +96,7 @@ def makeCopy( orig, cbuffer=None ):
          p0c=orig.p0c, s=orig.s, x=orig.x, y=orig.y, px=orig.px, py=orig.py,
          zeta=orig.zeta, delta=orig.delta, psigma=orig.psigma, rpp=orig.rpp,
          rvv=orig.rvv, chi=orig.chi, charge_ratio=orig.charge_ratio,
-         particle=orig.particle, at_element=orig.at_element,
+         particle_id=orig.particle_id, at_element=orig.at_element,
          at_turn=orig.at_turn, state=orig.state)
 
     return p
@@ -107,7 +107,7 @@ def calcParticlesDifference( lhs, rhs, cbuffer=None ):
     diff = Particles( num_particles=lhs.num_particles, cbuffer=cbuffer )
     keys = [ 'q0', 'mass0', 'beta0', 'gamma0', 'p0c', 's', 'x', 'y', 'px', 'py',
              'zeta', 'psigma', 'delta', 'rpp', 'rvv', 'chi', 'charge_ratio',
-             'particle', 'at_element', 'at_turn', 'state' ]
+             'particle_id', 'at_element', 'at_turn', 'state' ]
 
     for k in keys:
         try:
@@ -155,7 +155,7 @@ def compareParticlesDifference( lhs, rhs, abs_treshold=None ):
                 break
 
         if  cmp_result == 0:
-            int_keys = [ 'particle', 'at_element', 'at_turn', 'state' ]
+            int_keys = [ 'particle_id', 'at_element', 'at_turn', 'state' ]
 
             for k in int_keys:
                 lhs_arg = getattr( lhs, k )
