@@ -21,13 +21,29 @@ class Particles( CObject ):
     rvv           = CField( 15, 'real',  length='num_particles', default=1.0, pointer=True, alignment=8 )
     chi           = CField( 16, 'real',  length='num_particles', default=0.0, pointer=True, alignment=8 )
     charge_ratio  = CField( 17, 'real',  length='num_particles', default=1.0, pointer=True, alignment=8 )
-    particle      = CField( 18, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
+    particle_id   = CField( 18, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
     at_element    = CField( 19, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
     at_turn       = CField( 20, 'int64', length='num_particles', default=-1,  pointer=True, alignment=8 )
-    state         = CField( 21, 'int64', length='num_particles', default=0,   pointer=True, alignment=8 )
+    state         = CField( 21, 'int64', length='num_particles', default=1,   pointer=True, alignment=8 )
 
     def __init__(self, **kwargs):
         CObject.__init__( self, **kwargs)
+
+    sigma = property(lambda self: (self.beta0/self.beta)*self.zeta)
+    beta = property(lambda p:  (1+p.delta)/(1/p.beta0+p.ptau))
+
+    @property
+    def ptau(self):
+        return np.sqrt(self.delta**2+2*self.delta + 1/self.beta0**2)-1/self.beta0
+
+    def set_reference(self,p0c=7e12,mass0=938.272046e6,q0=1):
+        self.q0=1
+        self.mass0=mass0
+        energy0=np.sqrt(p0c**2+mass0**2)
+        self.beta0=p0c/energy0
+        self.gamma0=energy0/mass0
+        self.p0c=p0c
+        self.particle_id = np.arange(self.num_particles)
 
     def fromPySixTrack( self, inp, particle_index ):
         assert( particle_index < self.num_particles )
@@ -48,7 +64,7 @@ class Particles( CObject ):
         self.rvv[ particle_index ]          = inp.rvv
         self.chi[ particle_index ]          = inp.chi
         self.charge_ratio[ particle_index ] = inp.qratio
-        self.particle[ particle_index ]     = \
+        self.particle_id[ particle_index ]     = \
             inp.partid is not None and inp.partid or particle_index
         self.at_element[ particle_index ]   = -1
         self.at_turn[ particle_index ]      = 0
@@ -74,7 +90,7 @@ class Particles( CObject ):
         other.delta  = self.delta[ particle_index ]
         other.chi    = self.chi[ particle_index ]
         other.qratio = self.charge_ratio[ particle_index ]
-        other.partid = self.particle[ particle_index ]
+        other.partid = self.particle_id[ particle_index ]
         other.turn   = self.at_turn[ particle_index ]
         other.state  = self.state[ particle_index ]
         other._update_coordinates = True
@@ -87,7 +103,7 @@ def makeCopy( orig, cbuffer=None ):
          p0c=orig.p0c, s=orig.s, x=orig.x, y=orig.y, px=orig.px, py=orig.py,
          zeta=orig.zeta, delta=orig.delta, psigma=orig.psigma, rpp=orig.rpp,
          rvv=orig.rvv, chi=orig.chi, charge_ratio=orig.charge_ratio,
-         particle=orig.particle, at_element=orig.at_element,
+         particle_id=orig.particle_id, at_element=orig.at_element,
          at_turn=orig.at_turn, state=orig.state)
 
     return p
@@ -98,7 +114,7 @@ def calcParticlesDifference( lhs, rhs, cbuffer=None ):
     diff = Particles( num_particles=lhs.num_particles, cbuffer=cbuffer )
     keys = [ 'q0', 'mass0', 'beta0', 'gamma0', 'p0c', 's', 'x', 'y', 'px', 'py',
              'zeta', 'psigma', 'delta', 'rpp', 'rvv', 'chi', 'charge_ratio',
-             'particle', 'at_element', 'at_turn', 'state' ]
+             'particle_id', 'at_element', 'at_turn', 'state' ]
 
     for k in keys:
         try:
@@ -146,7 +162,7 @@ def compareParticlesDifference( lhs, rhs, abs_treshold=None ):
                 break
 
         if  cmp_result == 0:
-            int_keys = [ 'particle', 'at_element', 'at_turn', 'state' ]
+            int_keys = [ 'particle_id', 'at_element', 'at_turn', 'state' ]
 
             for k in int_keys:
                 lhs_arg = getattr( lhs, k )
@@ -167,3 +183,28 @@ def compareParticlesDifference( lhs, rhs, abs_treshold=None ):
                     break
 
     return cmp_result
+
+
+class ParticlesSet(object):
+    element_types={'Particles':Particles}
+    @property
+    def particles(self):
+        return self.cbuffer.get_objects()
+    def __init__(self,cbuffer=None):
+        if cbuffer is None:
+            self.cbuffer=CBuffer()
+        else:
+            self.cbuffer=cbuffer
+        for   name, cls in self.element_types.items():
+            self.cbuffer.typeids[cls._typeid]=cls
+    def Particles(self, **nargs):
+        particles=Particles(cbuffer=self.cbuffer,**nargs)
+        return particles
+
+    @classmethod
+    def fromfile(cls, filename):
+        cbuffer = CBuffer.fromfile(filename)
+        return cls(cbuffer=cbuffer)
+
+    def tofile(self, filename):
+        self.cbuffer.tofile(filename)

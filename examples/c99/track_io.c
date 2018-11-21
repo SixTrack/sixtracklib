@@ -148,6 +148,13 @@ int main( int argc, char* argv[] )
     /* --------------------------------------------------------------------- */
     /* Prepare input and tracking data from run-time parameters: */
 
+
+    printf("%-30s = %10d\n","NUM_PARTICLES",NUM_PARTICLES);
+    printf("%-30s = %10d\n","NUM_TURNS",NUM_TURNS);
+    printf("%-30s = %10d\n","NUM_TURNS_IO_ELEM_BY_ELEM",NUM_TURNS_IO_ELEM_BY_ELEM);
+    printf("%-30s = %10d\n","NUM_TURNS_IO_TURN_BY_TURN",NUM_TURNS_IO_TURN_BY_TURN);
+    printf("%-30s = %10d\n","NUM_IO_SKIP",NUM_IO_SKIP);
+
     if( ( NUM_PARTICLES >= 0 ) && ( input_pb != SIXTRL_NULLPTR ) )
     {
         st_Particles const* in_particles =
@@ -249,6 +256,7 @@ int main( int argc, char* argv[] )
     /* ****            PERFORM TRACKING AND IO OPERATIONS            ******* */
     /* ********************************************************************* */
 
+
     if( ( particles != SIXTRL_NULLPTR ) &&
         ( NUM_PARTICLES > 0 ) && ( NUM_TURNS > 0 ) )
     {
@@ -268,13 +276,15 @@ int main( int argc, char* argv[] )
 
         st_Particles_add_copy( io_buffer, particles );
 
-        st_Buffer_write_to_file( track_pb, path_output_particles );
+        //st_Buffer_write_to_file( track_pb, path_output_particles );
+        st_Buffer_write_to_file( io_buffer, path_output_particles );
     }
 
     /* ********************************************************************* */
     /* ****            SEQUENTIALLY PRINT ALL PARTICLES              ******* */
     /* ********************************************************************* */
 
+    /*
     if( st_Buffer_get_num_of_objects( io_buffer ) ==
         ( ( NUM_TURNS_IO_ELEM_BY_ELEM * st_Buffer_get_num_of_objects( eb ) ) +
           ( NUM_TURNS_IO_TURN_BY_TURN ) +
@@ -367,6 +377,7 @@ int main( int argc, char* argv[] )
          st_Particles_print_out( st_Particles_buffer_get_const_particles(
              io_buffer, ii ) );
     }
+    */
 
     /* ********************************************************************* */
     /* ********                       CLEANUP                        ******* */
