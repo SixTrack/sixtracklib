@@ -29,6 +29,13 @@ class Particles( CObject ):
     def __init__(self, **kwargs):
         CObject.__init__( self, **kwargs)
 
+    sigma = property(lambda self: (self.beta0/self.beta)*self.zeta)
+    beta = property(lambda p:  (1+p.delta)/(1/p.beta0+p.ptau))
+
+    @property
+    def ptau(self):
+        return np.sqrt(self.delta**2+2*self.delta + 1/self.beta0**2)-1/self.beta0
+
     def set_reference(self,p0c=7e12,mass0=938.272046e6,q0=1):
         self.q0=1
         self.mass0=mass0
