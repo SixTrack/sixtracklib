@@ -368,19 +368,21 @@ void NS(BeamMonitor_fprint)(
     int const attr_cont =
         NS(BeamMonitor_are_attributes_continous)( monitor ) ? 1 : 0;
 
+    SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
+
     fprintf( fp,
-            "|beam-monitor     | num stores      = %20d \r\n"
-            "                  | start turn      = %20d;\r\n"
-            "                  | skip turns      = %20d;\r\n"
-            "                  | io_address      = %20lu;\r\n"
-            "                  | io store stride = %20lu;\r\n"
-            "                  | rolling         = %20d;\r\n"
-            "                  | cont attributes = %20d;\r\n",
+            "|beam-monitor     | num stores       = %20d \r\n"
+            "                  | start turn       = %20d;\r\n"
+            "                  | skip turns       = %20d;\r\n"
+            "                  | out_address      = %20lu;\r\n"
+            "                  | out store stride = %20lu;\r\n"
+            "                  | rolling          = %20d;\r\n"
+            "                  | cont attributes  = %20d;\r\n",
             ( int )NS(BeamMonitor_get_num_stores)( monitor ),
             ( int )NS(BeamMonitor_get_start)( monitor ),
             ( int )NS(BeamMonitor_get_skip)( monitor ),
-            ( unsigned long )NS(BeamMonitor_get_io_address)( monitor ),
-            ( unsigned long )NS(BeamMonitor_get_io_store_stride)( monitor ),
+            ( unsigned long )NS(BeamMonitor_get_out_address)( monitor ),
+            ( unsigned long )monitor->out_store_stride,
             is_rolling, attr_cont );
 
     return;

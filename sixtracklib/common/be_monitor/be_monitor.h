@@ -33,8 +33,8 @@ typedef struct NS(BeamMonitor)
     NS(be_monitor_turn_t)   num_stores        SIXTRL_ALIGN( 8 );
     NS(be_monitor_turn_t)   start             SIXTRL_ALIGN( 8 );
     NS(be_monitor_turn_t)   skip              SIXTRL_ALIGN( 8 );
-    NS(be_monitor_addr_t)   io_address        SIXTRL_ALIGN( 8 );
-    NS(be_monitor_stride_t) io_store_stride   SIXTRL_ALIGN( 8 );
+    NS(be_monitor_addr_t)   out_address        SIXTRL_ALIGN( 8 );
+    NS(be_monitor_stride_t) out_store_stride   SIXTRL_ALIGN( 8 );
     NS(be_monitor_flag_t)   rolling           SIXTRL_ALIGN( 8 );
     NS(be_monitor_flag_t)   cont_attributes   SIXTRL_ALIGN( 8 );
 }
@@ -99,11 +99,11 @@ SIXTRL_FN SIXTRL_STATIC bool NS(BeamMonitor_are_particles_continous)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
 SIXTRL_FN SIXTRL_STATIC NS(be_monitor_addr_t)
-NS(BeamMonitor_get_io_address)(
+NS(BeamMonitor_get_out_address)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
 SIXTRL_FN SIXTRL_STATIC NS(be_monitor_stride_t)
-NS(BeamMonitor_get_io_store_stride)(
+NS(BeamMonitor_get_out_store_stride)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -129,12 +129,12 @@ SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_are_attributes_continous)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
     bool const are_attributes_continous );
 
-SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_io_address)(
+SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_out_address)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
-    NS(be_monitor_addr_t) const io_address );
+    NS(be_monitor_addr_t) const out_address );
 
 /*
-SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_io_store_stride)(
+SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_out_store_stride)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
     NS(be_monitor_stride_t) const stride );
 */
@@ -156,8 +156,8 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonito
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(be_monitor_turn_t) const num_stores, NS(be_monitor_turn_t) const start,
-    NS(be_monitor_turn_t) const skip,  NS(be_monitor_addr_t) const io_address,
-    NS(be_monitor_stride_t) const io_store_stride,
+    NS(be_monitor_turn_t) const skip,  NS(be_monitor_addr_t) const out_address,
+    NS(be_monitor_stride_t) const out_store_stride,
     bool const is_rolling, bool const are_attributes_continous );
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)*
@@ -233,9 +233,9 @@ NS(BeamMonitor_preset)(
 SIXTRL_INLINE void NS(BeamMonitor_clear)(
     SIXTRL_BE_ARGPTR_DEC  NS(BeamMonitor)* SIXTRL_RESTRICT monitor )
 {
-    NS(BeamMonitor_set_io_address)( monitor, ( NS(buffer_addr_t) )0 );
-    //NS(BeamMonitor_set_io_store_stride)( monitor, ( NS(buffer_size_t) )0 );
-    if( monitor != SIXTRL_NULLPTR ) monitor->io_store_stride = 0u;
+    NS(BeamMonitor_set_out_address)( monitor, ( NS(buffer_addr_t) )0 );
+    //NS(BeamMonitor_set_out_store_stride)( monitor, ( NS(buffer_size_t) )0 );
+    if( monitor != SIXTRL_NULLPTR ) monitor->out_store_stride = 0u;
 
     return;
 }
@@ -292,11 +292,11 @@ SIXTRL_INLINE int NS(BeamMonitor_copy)(
         NS(BeamMonitor_set_are_attributes_continous)( destination,
              NS(BeamMonitor_are_attributes_continous)( source ) );
 
-        NS(BeamMonitor_set_io_address)( destination,
-            NS(BeamMonitor_get_io_address)( source ) );
+        NS(BeamMonitor_set_out_address)( destination,
+            NS(BeamMonitor_get_out_address)( source ) );
 
-        destination->io_store_stride =
-            NS(BeamMonitor_get_io_store_stride)( source );
+        destination->out_store_stride =
+            NS(BeamMonitor_get_out_store_stride)( source );
 
         success = 0;
     }
@@ -371,13 +371,13 @@ SIXTRL_INLINE int NS(BeamMonitor_compare_values)(
 
         if( compare_value == 0 )
         {
-            if( NS(BeamMonitor_get_io_address)( lhs ) >
-                NS(BeamMonitor_get_io_address)( rhs ) )
+            if( NS(BeamMonitor_get_out_address)( lhs ) >
+                NS(BeamMonitor_get_out_address)( rhs ) )
             {
                 compare_value = +1;
             }
-            else if( NS(BeamMonitor_get_io_address)( lhs ) <
-                     NS(BeamMonitor_get_io_address)( rhs ) )
+            else if( NS(BeamMonitor_get_out_address)( lhs ) <
+                     NS(BeamMonitor_get_out_address)( rhs ) )
             {
                 compare_value = -1;
             }
@@ -385,13 +385,13 @@ SIXTRL_INLINE int NS(BeamMonitor_compare_values)(
 
         if( compare_value == 0 )
         {
-            if( NS(BeamMonitor_get_io_store_stride)( lhs ) >
-                NS(BeamMonitor_get_io_store_stride)( rhs ) )
+            if( NS(BeamMonitor_get_out_store_stride)( lhs ) >
+                NS(BeamMonitor_get_out_store_stride)( rhs ) )
             {
                 compare_value = +1;
             }
-            else if( NS(BeamMonitor_get_io_store_stride)( lhs ) <
-                     NS(BeamMonitor_get_io_store_stride)( rhs ) )
+            else if( NS(BeamMonitor_get_out_store_stride)( lhs ) <
+                     NS(BeamMonitor_get_out_store_stride)( rhs ) )
             {
                 compare_value = -1;
             }
@@ -474,19 +474,19 @@ SIXTRL_INLINE bool NS(BeamMonitor_are_particles_continous)(
 }
 
 SIXTRL_INLINE NS(be_monitor_addr_t)
-NS(BeamMonitor_get_io_address)(
+NS(BeamMonitor_get_out_address)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
 {
     SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
-    return monitor->io_address;
+    return monitor->out_address;
 }
 
 SIXTRL_INLINE NS(be_monitor_stride_t)
-NS(BeamMonitor_get_io_store_stride)(
+NS(BeamMonitor_get_out_store_stride)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
 {
     SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
-    return monitor->io_store_stride;
+    return monitor->out_store_stride;
 }
 
 
@@ -535,20 +535,20 @@ SIXTRL_INLINE void NS(BeamMonitor_set_are_attributes_continous)(
     return;
 }
 
-SIXTRL_INLINE void NS(BeamMonitor_set_io_address)(
+SIXTRL_INLINE void NS(BeamMonitor_set_out_address)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
-    NS(be_monitor_addr_t) const io_address )
+    NS(be_monitor_addr_t) const out_address )
 {
-    if( monitor != SIXTRL_NULLPTR ) monitor->io_address = io_address;
+    if( monitor != SIXTRL_NULLPTR ) monitor->out_address = out_address;
     return;
 }
 
 /*
-SIXTRL_INLINE void NS(BeamMonitor_set_io_store_stride)(
+SIXTRL_INLINE void NS(BeamMonitor_set_out_store_stride)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
-    NS(be_monitor_stride_t) const io_store_stride )
+    NS(be_monitor_stride_t) const out_store_stride )
 {
-    if( monitor != SIXTRL_NULLPTR ) monitor->io_store_stride = io_store_stride;
+    if( monitor != SIXTRL_NULLPTR ) monitor->out_store_stride = out_store_stride;
     return;
 }
 */
@@ -598,8 +598,8 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_new)(
     temp_obj.start             = ( nturn_t )0u;
     temp_obj.skip              = ( nturn_t )1u;
     temp_obj.rolling           = ( flag_t )0u;
-    temp_obj.io_address        = ( addr_t )0u;
-    temp_obj.io_store_stride   = ( NS(be_monitor_stride_t) )0u;
+    temp_obj.out_address       = ( addr_t )0u;
+    temp_obj.out_store_stride  = ( NS(be_monitor_stride_t) )0u;
     temp_obj.cont_attributes   = ( flag_t )1;
 
     return ( ptr_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
@@ -610,8 +610,8 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_new)(
 SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(be_monitor_turn_t) const num_stores, NS(be_monitor_turn_t) const start,
-    NS(be_monitor_turn_t) const skip,  NS(be_monitor_addr_t) const io_address,
-    NS(be_monitor_stride_t) const io_store_stride,
+    NS(be_monitor_turn_t) const skip,  NS(be_monitor_addr_t) const out_address,
+    NS(be_monitor_stride_t) const out_store_stride,
     bool const is_rolling, bool const are_attributes_continous )
 {
     typedef NS(buffer_size_t)                       buf_size_t;
@@ -625,15 +625,15 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_add)(
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
 
-    SIXTRL_ASSERT( io_store_stride == ( NS(be_monitor_stride_t) )0u );
+    SIXTRL_ASSERT( out_store_stride == ( NS(be_monitor_stride_t) )0u );
 
     elem_t temp_obj;
     temp_obj.num_stores        = num_stores;
     temp_obj.start             = start;
     temp_obj.skip              = skip;
     temp_obj.rolling           = ( is_rolling ) ? 1 : 0;
-    temp_obj.io_address        = io_address;
-    temp_obj.io_store_stride   = io_store_stride;
+    temp_obj.out_address       = out_address;
+    temp_obj.out_store_stride  = out_store_stride;
     temp_obj.cont_attributes   = ( are_attributes_continous ) ? 1 : 0;
 
     return ( ptr_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
@@ -650,8 +650,8 @@ NS(BeamMonitor_add_copy)(
         NS(BeamMonitor_get_num_stores)( monitor ),
         NS(BeamMonitor_get_start)( monitor ),
         NS(BeamMonitor_get_skip)( monitor ),
-        NS(BeamMonitor_get_io_address)( monitor ),
-        NS(BeamMonitor_get_io_store_stride)( monitor ),
+        NS(BeamMonitor_get_out_address)( monitor ),
+        NS(BeamMonitor_get_out_store_stride)( monitor ),
         NS(BeamMonitor_is_rolling)( monitor ),
         NS(BeamMonitor_are_attributes_continous)( monitor ) );
 }

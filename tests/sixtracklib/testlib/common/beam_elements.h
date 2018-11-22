@@ -341,18 +341,20 @@ SIXTRL_INLINE void NS(BeamMonitor_print)(
     int const attr_cont =
         NS(BeamMonitor_are_attributes_continous)( monitor ) ? 1 : 0;
 
-    printf( "|beam-monitor     | num stores      = %20d \r\n"
-            "                  | start turn      = %20d;\r\n"
-            "                  | skip turns      = %20d;\r\n"
-            "                  | io_address      = %20lu;\r\n"
-            "                  | io store stride = %20lu;\r\n"
-            "                  | rolling         = %20d;\r\n"
-            "                  | cont attributes = %20d;\r\n",
+    SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
+
+    printf( "|beam-monitor     | num stores       = %20d \r\n"
+            "                  | start turn       = %20d;\r\n"
+            "                  | skip turns       = %20d;\r\n"
+            "                  | out address      = %20lu;\r\n"
+            "                  | out store stride = %20lu;\r\n"
+            "                  | rolling          = %20d;\r\n"
+            "                  | cont attributes  = %20d;\r\n",
             ( int )NS(BeamMonitor_get_num_stores)( monitor ),
             ( int )NS(BeamMonitor_get_start)( monitor ),
             ( int )NS(BeamMonitor_get_skip)( monitor ),
-            ( unsigned long )NS(BeamMonitor_get_io_address)( monitor ),
-            ( unsigned long )NS(BeamMonitor_get_io_store_stride)( monitor ),
+            ( unsigned long )NS(BeamMonitor_get_out_address)( monitor ),
+            ( unsigned long )monitor->out_store_stride,
             is_rolling, attr_cont );
 
     return;

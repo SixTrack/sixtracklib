@@ -117,19 +117,19 @@ SIXTRL_INLINE NS(buffer_addr_t) NS(BeamMonitor_get_particles_begin_addr)(
 {
     typedef NS(be_monitor_stride_t) stride_t;
 
-    stride_t const stride = NS(BeamMonitor_get_io_store_stride)( monitor );
+    stride_t const stride = NS(BeamMonitor_get_out_store_stride)( monitor );
 
     /* Currently, only consequentive attribte storage is implemented */
     SIXTRL_ASSERT( NS(BeamMonitor_are_attributes_continous)( monitor ) );
 
-    SIXTRL_ASSERT( NS(BeamMonitor_get_io_address)( monitor ) !=
+    SIXTRL_ASSERT( NS(BeamMonitor_get_out_address)( monitor ) !=
                   ( NS(be_monitor_addr_t) )0 );
     SIXTRL_ASSERT( stride > ( stride_t )0u );
     SIXTRL_ASSERT( store_idx < ( NS(buffer_size_t)
         )NS(BeamMonitor_get_num_stores)( monitor ) );
 
     return ( NS(buffer_addr_t ) )(
-            NS(BeamMonitor_get_io_address)( monitor ) + store_idx * stride );
+            NS(BeamMonitor_get_out_address)( monitor ) + store_idx * stride );
 }
 
 SIXTRL_INLINE int NS(Track_particle_beam_monitor)(
@@ -167,7 +167,7 @@ SIXTRL_INLINE int NS(Track_particle_beam_monitor)(
     SIXTRL_ASSERT( NS(Particles_get_state_value)(
         in_particles, particle_index ) == ( NS(particle_index_t) )1 );
 
-    if( ( NS(BeamMonitor_get_io_address)( monitor ) != ( addr_t )0 ) &&
+    if( ( NS(BeamMonitor_get_out_address)( monitor ) != ( addr_t )0 ) &&
         ( turn >= monitor_start ) )
     {
         nturn_t const store_idx =
