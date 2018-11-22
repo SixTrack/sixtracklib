@@ -5,6 +5,9 @@
 #include <cstring>
 #include <iostream>
 #include <numeric>
+#include <random>
+#include <set>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -258,5 +261,171 @@ TEST( C99_ParticlesTests, ParticlesBufferAddressByGlobalParticleIndex )
     ::st_Buffer_delete( pb );
 }
 
+TEST( C99_ParticlesTests, InitRandomParticleIdsCheckDuplicatesMinMaxParticleIds )
+{
+    using prng_t      = std::mt19937_64;
+    using prng_seed_t = prng_t::result_type;
+    using buf_size_t  = ::st_buffer_size_t;
+    using num_elem_t  = ::st_particle_num_elements_t;
+    using index_t     = ::st_particle_index_t;
+
+    prng_seed_t const seed = prng_seed_t{ 20181120 };
+    std::mt19937_64 prng( seed );
+
+    std::vector< buf_size_t > num_particles_list = {
+        buf_size_t{      1 },
+        buf_size_t{      2 },
+        buf_size_t{      3 },
+        buf_size_t{     10 },
+        buf_size_t{     32 },
+        buf_size_t{    100 },
+        buf_size_t{    509 },
+        buf_size_t{   4297 },
+        buf_size_t{  10000 },
+        buf_size_t{  65535 },
+        buf_size_t{ 100000 } };
+
+    for( auto const num_particles : num_particles_list )
+    {
+        ASSERT_TRUE( num_particles > buf_size_t{ 0 } );
+
+        ::st_Buffer* pb = ::st_Buffer_new( 0u );
+        ::st_Particles* particles = ::st_Particles_new( pb, num_particles );
+
+        ASSERT_TRUE( particles != nullptr );
+        ASSERT_TRUE( static_cast< num_elem_t >( num_particles ) ==
+                     ::st_Particles_get_num_of_particles( particles ) );
+
+        std::vector< index_t > in_index( num_particles, index_t{ 0 } );
+        std::iota( in_index.begin(), in_index.end(), index_t{ 0 } );
+
+        ASSERT_TRUE( in_index.front() == index_t{ 0 } );
+        ASSERT_TRUE( in_index.back()  == static_cast< index_t >(
+            num_particles - buf_size_t{ 1 } ) );
+
+        std::shuffle( in_index.begin(), in_index.end(), prng );
+
+        ::st_Particles_set_particle_id( particles, in_index.data() );
+
+        ASSERT_TRUE( 0 == std::memcmp( in_index.data(),
+            ::st_Particles_get_const_particle_id( particles ), num_particles ) );
+
+        index_t min_particle_id = std::numeric_limits< index_t >::max();
+        index_t max_particle_id = std::numeric_limits< index_t >::min();
+
+        ASSERT_TRUE( 0 == ::st_Particles_get_min_max_particle_id(
+            particles, &min_particle_id, &max_particle_id ) );
+
+        ASSERT_TRUE( static_cast< buf_size_t >( min_particle_id ) ==
+                     index_t{ 0 } );
+
+        ASSERT_TRUE( static_cast< buf_size_t >( max_particle_id ) ==
+                     ( num_particles - buf_size_t{ 1 } ) );
+
+        /* ----------------------------------------------------------------- */
+
+        std::uniform_real_distribution< double > sign_dist(
+            double{ 0 }, double{ 1 } );
+
+        for( auto& particle_id : in_index )
+        {
+            if( sign_dist( prng ) > double{ 0.5 } )
+            {
+                particle_id = -particle_id;
+            }
+        }
+
+        std::shuffle( in_index.begin(), in_index.end(), prng );
+
+        ::st_Particles_set_particle_id( particles, in_index.data() );
+
+        min_particle_id = std::numeric_limits< index_t >::max();
+        max_particle_id = std::numeric_limits< index_t >::min();
+
+        ASSERT_TRUE( 0 == ::st_Particles_get_min_max_particle_id(
+            particles, &min_particle_id, &max_particle_id ) );
+
+        ASSERT_TRUE( static_cast< buf_size_t >( min_particle_id ) ==
+                     index_t{ 0 } );
+
+        ASSERT_TRUE( static_cast< buf_size_t >( max_particle_id ) ==
+                     ( num_particles - buf_size_t{ 1 } ) );
+
+        /* ----------------------------------------------------------------- */
+
+        index_t const MIN_DIST_VALUE = index_t{ 1000u };
+        index_t const MAX_DIST_VALUE = MIN_DIST_VALUE + static_cast< index_t >(
+            num_particles ) * index_t{ 64 };
+
+        std::uniform_int_distribution< index_t >
+            index_dist( MIN_DIST_VALUE, MAX_DIST_VALUE );
+
+        std::set< index_t > temp_particle_ids;
+
+        while( temp_particle_ids.size() < num_particles )
+        {
+            temp_particle_ids.insert( index_dist( prng ) );
+        }
+
+        ASSERT_TRUE( temp_particle_ids.size() > buf_size_t{ 0 } );
+
+        index_t const min_assigned_particle_id = *temp_particle_ids.begin();
+        index_t const max_assigned_particle_id = *temp_particle_ids.rbegin();
+
+        ASSERT_TRUE( min_assigned_particle_id <= max_assigned_particle_id );
+
+        in_index.assign( temp_particle_ids.begin(), temp_particle_ids.end() );
+        std::shuffle( in_index.begin(), in_index.end(), prng );
+
+        ::st_Particles_set_particle_id( particles, in_index.data() );
+
+        min_particle_id = std::numeric_limits< index_t >::max();
+        max_particle_id = std::numeric_limits< index_t >::min();
+
+        ASSERT_TRUE( 0 == ::st_Particles_get_min_max_particle_id(
+            particles, &min_particle_id, &max_particle_id ) );
+
+        ASSERT_TRUE( min_particle_id == min_assigned_particle_id );
+        ASSERT_TRUE( max_particle_id == max_assigned_particle_id );
+
+        /* ----------------------------------------------------------------- */
+
+        if( num_particles > buf_size_t{ 2 } )
+        {
+            std::uniform_int_distribution< num_elem_t > dupl_index_dist(
+                num_elem_t{ 0 }, static_cast< num_elem_t >( num_particles - 1 ) );
+
+            num_elem_t const dest_id = dupl_index_dist( prng );
+            num_elem_t source_id = dupl_index_dist( prng );
+
+            while( source_id == dest_id )
+            {
+                source_id = dupl_index_dist( prng );
+            }
+
+            ::st_Particles_set_particle_id_value( particles, dest_id,
+                ::st_Particles_get_particle_id_value( particles, source_id ) );
+
+            std::shuffle( ::st_Particles_get_particle_id( particles ),
+                ::st_Particles_get_particle_id( particles ) + num_particles, prng );
+
+            min_particle_id = std::numeric_limits< index_t >::max();
+            max_particle_id = std::numeric_limits< index_t >::min();
+
+            ASSERT_TRUE( 0 != ::st_Particles_get_min_max_particle_id(
+                particles, &min_particle_id, &max_particle_id ) );
+
+            ASSERT_TRUE( min_particle_id == std::numeric_limits< index_t >::max() );
+            ASSERT_TRUE( max_particle_id == std::numeric_limits< index_t >::min() );
+        }
+
+        /* ----------------------------------------------------------------- */
+
+        ::st_Buffer_delete( pb );
+
+        particles = nullptr;
+        pb = nullptr;
+    }
+}
 
 /* end: tests/sixtracklib/common/test_particles_c99.cpp */
