@@ -38,8 +38,7 @@ __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_debug_opencl)(
 
     SIXTRL_INT32_T success_flag = ( SIXTRL_INT32_T )-1;
 
-    if( ( num_particles > ( SIXTRL_UINT64_T )0u ) &&
-        ( !NS(ManagedBuffer_needs_remapping)( beam_elements_buf, slot_size ) ) &&
+    if( ( !NS(ManagedBuffer_needs_remapping)( beam_elements_buf, slot_size ) ) &&
         ( !NS(ManagedBuffer_needs_remapping)( out_buffer, slot_size ) ) &&
         (  NS(ManagedBuffer_get_num_objects)( out_buffer, slot_size ) >=
             out_particles_block_offset ) )
@@ -51,7 +50,7 @@ __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_debug_opencl)(
 
         if( global_id == gid_to_assign_out_buffer )
         {
-            success_flag = NS(BeamMonitor_assign_managed_out_buffer)(
+            success_flag = NS(BeamMonitor_assign_managed_particles_out_buffer)(
                 beam_elements_buf, out_buffer, out_particles_block_offset, slot_size );
         }
     }
