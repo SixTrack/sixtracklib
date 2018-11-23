@@ -34,7 +34,7 @@ __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_opencl)(
     size_t const global_size = get_global_size( 0 );
     size_t const gid_to_assign_out_buffer = ( size_t )0u;
 
-    if( global_id == gid_to_assign_io_buffer )
+    if( global_id == gid_to_assign_out_buffer )
     {
         buf_size_t const slot_size = ( buf_size_t )8u;
 
