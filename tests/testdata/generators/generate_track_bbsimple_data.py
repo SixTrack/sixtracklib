@@ -16,7 +16,7 @@ from cobjects import CBuffer
 # pysixtracklib provides the CObject based beam elements and particle types
 import pysixtracklib as pystlib
 from pysixtracklib import export_to_cobjects as etc
-from pysixtracklib.particles import Particles as IOParticles
+from pysixtracklib.particles import Particles
 
 # the path to the input and output folders are provided by the local testdata.py
 import testdata
@@ -33,37 +33,36 @@ if __name__ == '__main__':
     st_beam_elem_dump = os.path.join( output_folder, 'beam_elements_sixtrack.bin' )
     beam_elem_dump    = os.path.join( output_folder, 'beam_elements.bin' )
 
-    # Dump the unmodified SixTrack machine description line and the
-    # modified version using the fix-point information to CBuffer to data files:
-
+    # Dump the unmodified SixTrack machine description to CBuffer data file
     six = sixtracktools.SixInput(input_folder)
     st_line, rest, iconv = six.expand_struct(convert=pysixtrack.element_types)
+    st_elements = pystlib.Elements.fromline(st_line)
+    st_elements.tofile(st_beam_elem_dump)
 
-    st_beam_elem_buffer = CBuffer()
-    etc.line2cobject( st_line, cbuffer=st_beam_elem_buffer )
-    st_beam_elem_buffer.to_file( st_beam_elem_dump )
-
-    with open( os.path.join( input_folder, 'line.pkl' ), 'rb' ) as fid:
+    # Dump the pysixtrack machine description to CBuffer data file
+    with open(os.path.join(input_folder, 'line.pkl'), 'rb') as fid:
         line = pickle.load(fid)
-        beam_elem_buffer = CBuffer()
-        etc.line2cobject( line, cbuffer=beam_elem_buffer )
-        beam_elem_buffer.to_file( beam_elem_dump )
-
-    st_particles_dump = os.path.join( output_folder, 'particles_dump_sixtrack.bin' )
-
-    etc.sixdump2cobject( input_folder,
-        os.path.join( input_folder, 'dump3.dat' ), st_particles_dump )
+        elements = pystlib.Elements.fromline(st_line)
+        elements.tofile(st_beam_elem_dump)
 
     # -------------------------------------------------------------------------
     # Step 2: Dump particle state into an element by element I/O buffer
     #         before tracking happens at each beam element:
 
-    input_particles_buffer = CBuffer.from_file( st_particles_dump )
-    assert( input_particles_buffer.n_objects > 0 )
+    # Dump the unmodified SixTrack element-by-element data to CBuffer data file
+    st_particles_dump = os.path.join(output_folder, 'particles_dump_sixtrack.bin')
+    st_particles = pystlib.ParticlesSet.fromSixDump101(input_folder,
+        os.path.join(input_folder, 'dump3.dat'))
+    st_particles.tofile(st_particles_dump)
+
+
+    # Reload from file
+    input_particles_buffer = pystlib.CBuffer.fromfile(st_particles_dump)
+    assert(input_particles_buffer.n_objects > 0)
 
     ebe_particles_buffer = CBuffer()
 
-    input_particles = input_particles_buffer.get_object( IOParticles, 0 )
+    input_particles = input_particles_buffer.get_object(0, cls=Particles)
     npart = input_particles.num_particles
 
     pystlib_particles = pystlib.particles.makeCopy( input_particles )
@@ -79,7 +78,7 @@ if __name__ == '__main__':
 
     for ii, elem in enumerate( line ):
         label, be_type, beam_element = elem
-        before = IOParticles( num_particles=npart, cbuffer=ebe_particles_buffer )
+        before = Particles( num_particles=npart, cbuffer=ebe_particles_buffer )
 
         for jj in range( 0, npart ):
             before.fromPySixTrack( track_particles[ jj ], jj )
@@ -87,7 +86,7 @@ if __name__ == '__main__':
 
         before.at_element[:] = ii
 
-    last = IOParticles( num_particles=npart, cbuffer=ebe_particles_buffer )
+    last = Particles( num_particles=npart, cbuffer=ebe_particles_buffer )
 
     for jj in range( npart ):
         last.fromPySixTrack( track_particles[ jj ], jj )
@@ -102,4 +101,4 @@ if __name__ == '__main__':
     assert( ( len( line ) + 1 ) == ebe_particles_buffer.n_objects )
     particles_dump = os.path.join( output_folder, 'particles_dump.bin' )
 
-    ebe_particles_buffer.to_file( particles_dump )
+    ebe_particles_buffer.tofile( particles_dump )

@@ -90,7 +90,7 @@ class Particles( CObject ):
         other.delta  = self.delta[ particle_index ]
         other.chi    = self.chi[ particle_index ]
         other.qratio = self.charge_ratio[ particle_index ]
-        other.partid = self.particle[ particle_index ]
+        other.partid = self.particle_id[ particle_index ]
         other.turn   = self.at_turn[ particle_index ]
         other.state  = self.state[ particle_index ]
         other._update_coordinates = True
@@ -103,7 +103,7 @@ def makeCopy( orig, cbuffer=None ):
          p0c=orig.p0c, s=orig.s, x=orig.x, y=orig.y, px=orig.px, py=orig.py,
          zeta=orig.zeta, delta=orig.delta, psigma=orig.psigma, rpp=orig.rpp,
          rvv=orig.rvv, chi=orig.chi, charge_ratio=orig.charge_ratio,
-         particle=orig.particle, at_element=orig.at_element,
+         particle_id=orig.particle_id, at_element=orig.at_element,
          at_turn=orig.at_turn, state=orig.state)
 
     return p
@@ -123,6 +123,9 @@ def calcParticlesDifference( lhs, rhs, cbuffer=None ):
             pass
 
     return diff
+
+
+
 
 def compareParticlesDifference( lhs, rhs, abs_treshold=None ):
     cmp_result = -1
@@ -187,24 +190,70 @@ def compareParticlesDifference( lhs, rhs, abs_treshold=None ):
 
 class ParticlesSet(object):
     element_types={'Particles':Particles}
+
     @property
     def particles(self):
         return self.cbuffer.get_objects()
+
     def __init__(self,cbuffer=None):
+
         if cbuffer is None:
-            self.cbuffer=CBuffer()
+            self.cbuffer = CBuffer()
         else:
             self.cbuffer=cbuffer
-        for   name, cls in self.element_types.items():
-            self.cbuffer.typeids[cls._typeid]=cls
+        for name, cls in self.element_types.items():
+            self.cbuffer.typeids[cls._typeid] = cls
+
     def Particles(self, **nargs):
-        particles=Particles(cbuffer=self.cbuffer,**nargs)
+        particles = Particles(cbuffer=self.cbuffer, **nargs)
         return particles
 
     @classmethod
     def fromfile(cls, filename):
         cbuffer = CBuffer.fromfile(filename)
         return cls(cbuffer=cbuffer)
+
+    @classmethod
+    def fromSixDump101(cls, input_folder, st_dump_file, **kwargs):
+
+        import sixtracktools
+        import pysixtrack
+        six = sixtracktools.SixInput(input_folder)
+        line, rest, iconv = six.expand_struct(convert=pysixtrack.element_types)
+
+        sixdump = sixtracktools.SixDump101(st_dump_file)
+
+        num_iconv = int(len(iconv))
+        num_belem = int(len(line))
+        num_dumps = int(len(sixdump.particles))
+
+        assert(num_iconv > 0)
+        assert(num_belem > iconv[num_iconv - 1])
+        assert(num_dumps >= num_iconv)
+        assert((num_dumps % num_iconv) == 0)
+
+        num_particles = int(num_dumps / num_iconv)
+
+        self = cls(**kwargs)
+
+        for ii in range(num_iconv):
+            elem_id = iconv[ii]
+            assert(elem_id < num_belem)
+
+            p = self.Particles(num_particles=num_particles)
+
+            assert(p.num_particles == num_particles)
+            assert(len(p.q0) == num_particles)
+
+            for jj in range(num_particles):
+                kk = num_particles * ii + jj
+                assert(kk < num_dumps)
+                p.fromPySixTrack(
+                    pysixtrack.Particles(**sixdump[kk].get_minimal_beam()), jj)
+                p.state[jj] = 1
+                p.at_element[jj] = elem_id
+
+        return self
 
     def tofile(self, filename):
         self.cbuffer.tofile(filename)
