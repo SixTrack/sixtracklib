@@ -247,7 +247,7 @@ def track_particle_sixtracklib(
 
     ps.tofile('particles.buffer')
 
-    os.system('../sixtracklib/build/examples/c99/track_io_c99 particles.buffer elements.buffer %d 0 %d 0'%(n_turns, n_turns))
+    os.system('../../../build/examples/c99/track_io_c99 particles.buffer elements.buffer %d 0 %d 0'%(n_turns, n_turns))
 
     print("Done tracking. Loading data")
     # res = pysixtracklib.ParticlesSet.fromfile('particles.buffer')
