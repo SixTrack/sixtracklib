@@ -3,5 +3,4 @@
 
 from .particles     import *
 from .beam_elements import *
-from .export_to_cobjects import *
 

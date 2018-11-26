@@ -15,7 +15,6 @@ from cobjects import CBuffer
 
 # pysixtracklib provides the CObject based beam elements and particle types
 import pysixtracklib as pystlib
-from pysixtracklib import export_to_cobjects as etc
 from pysixtracklib.particles import Particles
 
 # the path to the input and output folders are provided by the local testdata.py
