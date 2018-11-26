@@ -25,18 +25,19 @@ extern "C" {
 
 typedef SIXTRL_INT64_T      NS(be_monitor_turn_t);
 typedef SIXTRL_INT64_T      NS(be_monitor_flag_t);
+typedef SIXTRL_INT64_T      NS(be_monitor_index_t);
 typedef NS(buffer_addr_t)   NS(be_monitor_addr_t);
-typedef SIXTRL_UINT64_T     NS(be_monitor_stride_t);
 
 typedef struct NS(BeamMonitor)
 {
     NS(be_monitor_turn_t)   num_stores        SIXTRL_ALIGN( 8 );
     NS(be_monitor_turn_t)   start             SIXTRL_ALIGN( 8 );
     NS(be_monitor_turn_t)   skip              SIXTRL_ALIGN( 8 );
-    NS(be_monitor_addr_t)   out_address        SIXTRL_ALIGN( 8 );
-    NS(be_monitor_stride_t) out_store_stride   SIXTRL_ALIGN( 8 );
-    NS(be_monitor_flag_t)   rolling           SIXTRL_ALIGN( 8 );
-    NS(be_monitor_flag_t)   cont_attributes   SIXTRL_ALIGN( 8 );
+    NS(be_monitor_addr_t)   out_address       SIXTRL_ALIGN( 8 );
+    NS(be_monitor_index_t)  min_particle_id   SIXTRL_ALIGN( 8 );
+    NS(be_monitor_index_t)  max_particle_id   SIXTRL_ALIGN( 8 );
+    NS(be_monitor_flag_t)   is_rolling        SIXTRL_ALIGN( 8 );
+    NS(be_monitor_flag_t)   is_turn_ordered   SIXTRL_ALIGN( 8 );
 }
 NS(BeamMonitor);
 
@@ -102,9 +103,32 @@ SIXTRL_FN SIXTRL_STATIC NS(be_monitor_addr_t)
 NS(BeamMonitor_get_out_address)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
-SIXTRL_FN SIXTRL_STATIC NS(be_monitor_stride_t)
-NS(BeamMonitor_get_out_store_stride)(
+SIXTRL_FN SIXTRL_STATIC NS(be_monitor_index_t)
+NS(BeamMonitor_get_min_particle_id)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
+
+SIXTRL_FN SIXTRL_STATIC NS(be_monitor_index_t)
+NS(BeamMonitor_get_max_particle_id)(
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* accessor functions for retrieving already dumped data */
+
+SIXTRL_FN SIXTRL_STATIC bool NS(BeamMonitor_is_turn_stored)(
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
+    NS(be_monitor_index_t) const turn_id );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_HOST_FN NS(be_monitor_turn_t) NS(BeamMonitor_get_max_stored_turn)(
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
+
+SIXTRL_HOST_FN NS(be_monitor_index_t) NS(BeamMonitor_get_stored_values_index)(
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
+    NS(be_monitor_turn_t) const turn_id,
+    NS(be_monitor_index_t) const particle_id );
+
+#endif /* !defined( _GPUCODE ) */
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* setter accessor functions: */
