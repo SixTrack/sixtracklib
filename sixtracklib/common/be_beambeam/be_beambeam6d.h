@@ -12,9 +12,16 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/be_beambeam/gauss_fields.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
+#ifndef SIXTRL_BB_GET_PTR
+    #define SIXTRL_BB_GET_PTR(dataptr,name) \
+        (SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T*)(((SIXTRL_BE_DATAPTR_DEC SIXTRL_UINT64_T*) \
+        (&((dataptr)->name))) + ((SIXTRL_UINT64_T) (dataptr)->name) + 1)
+#endif /* defined( SIXTRL_BB_GET_PTR ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 extern "C" {

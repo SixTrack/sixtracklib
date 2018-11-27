@@ -1,0 +1,21 @@
+#ifndef TESTS_SIXTRACKLIB_TESTLIB_COMMON_PATH_H__
+#define TESTS_SIXTRACKLIB_TESTLIB_COMMON_PATH_H__
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/definitions.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+extern "C" {
+#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
+
+static char const NS(PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR)[] =
+    "@SIXTRACK_TESTLIB_INCLUDE_DIR@";
+
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+}
+#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
+
+#endif /* TESTS_SIXTRACKLIB_TESTLIB_COMMON_PATH_H__ */
+
+/* end: tests/sixtracklib/testlib/common/path.h */

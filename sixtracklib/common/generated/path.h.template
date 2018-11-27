@@ -20,7 +20,8 @@ extern "C" {
    of this library. Thank you!
 */
 
-static char const NS(PATH_TO_BASE_DIR)[] = "@SIXTRACKLIB_BASE_DIR@";
+static char const NS(PATH_TO_BASE_DIR)[]           = "@SIXTRACKLIB_BASE_DIR@";
+static char const NS(PATH_TO_SIXTRL_INCLUDE_DIR)[] = "@SIXTRACKLIB_INCLUDE_DIR@";
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }

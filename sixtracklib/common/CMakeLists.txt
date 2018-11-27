@@ -7,15 +7,17 @@ set(  SIXTRACKL_LINK_LIBRARIES
 set( SIXTRACKLIB_COMMON_C99_HEADERS )
 set( SIXTRACKLIB_COMMON_CXX_HEADERS )
 
-add_subdirectory( generated    )
-add_subdirectory( internal     )
-add_subdirectory( buffer       )
-add_subdirectory( be_beambeam  )
-add_subdirectory( be_drift     )
-add_subdirectory( be_cavity    )
-add_subdirectory( be_multipole )
-add_subdirectory( be_srotation )
-add_subdirectory( be_xyshift   )
+add_subdirectory( generated      )
+add_subdirectory( internal       )
+add_subdirectory( buffer         )
+add_subdirectory( be_beambeam    )
+add_subdirectory( be_drift       )
+add_subdirectory( be_cavity      )
+add_subdirectory( be_multipole   )
+add_subdirectory( be_rfmultipole )
+add_subdirectory( be_srotation   )
+add_subdirectory( be_xyshift     )
+add_subdirectory( be_monitor     )
 
 set( SIXTRACKLIB_COMMON_INTERNAL_CXX_HEADERS )
 set( SIXTRACKLIB_COMMON_INTERNAL_CXX_SOURCES )
@@ -40,22 +42,21 @@ set(  SIXTRACKLIB_CXX_HEADERS
 # ------------------------------------------------------------------------------
 # install :
 
-if( SIXTRACKLIB_COMMON_C99_LOCAL_HEADERS )
+if( SIXTRACKLIB_C99_HEADERS )
 
     set( SIXTRACKLIB_COMMON_C99_INSTALL_PATH
          include/sixtracklib/common )
 
-    install( FILES ${SIXTRACKLIB_COMMON_C99_LOCAL_HEADERS}
+    install( FILES ${SIXTRACKLIB_C99_HEADERS}
              DESTINATION ${SIXTRACKLIB_COMMON_C99_INSTALL_PATH} )
 endif()
 
-if( SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS )
-    message( STATUS "${SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS}" )
+if( SIXTRACKLIB_CXX_HEADERS )
 
     set( SIXTRACKLIB_COMMON_CXX_INSTALL_PATH
          include/sixtracklib/common )
 
-    install( FILES ${SIXTRACKLIB_COMMON_CXX_LOCAL_HEADERS}
+    install( FILES ${SIXTRACKLIB_CXX_HEADERS}
              DESTINATION ${SIXTRACKLIB_COMMON_CXX_INSTALL_PATH} )
 endif()
 

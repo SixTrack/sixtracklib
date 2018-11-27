@@ -11,6 +11,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -307,43 +308,44 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(MultiPole)* NS(MultiPole_preset)(
 SIXTRL_INLINE NS(multipole_real_t) NS(MultiPole_get_length)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole )
 {
-    return ( multipole != SIXTRL_NULLPTR )
-        ? multipole->length : ( NS(multipole_real_t) )0;
+    SIXTRL_ASSERT( multipole != SIXTRL_NULLPTR );
+    return multipole->length;
 }
 
 SIXTRL_INLINE NS(multipole_real_t) NS(MultiPole_get_hxl)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole )
 {
-    return ( multipole != SIXTRL_NULLPTR )
-        ? multipole->hxl : ( NS(multipole_real_t) )0;
+    SIXTRL_ASSERT( multipole != SIXTRL_NULLPTR );
+    return multipole->hxl;
 }
 
 SIXTRL_INLINE NS(multipole_real_t) NS(MultiPole_get_hyl)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole )
 {
-    return ( multipole != SIXTRL_NULLPTR )
-        ? multipole->hyl : ( NS(multipole_real_t) )0;
+    SIXTRL_ASSERT( multipole != SIXTRL_NULLPTR );
+    return multipole->hyl;
 }
 
 SIXTRL_INLINE NS(multipole_order_t) NS(MultiPole_get_order)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole )
 {
-    return ( multipole != SIXTRL_NULLPTR )
-        ? multipole->order : ( SIXTRL_UINT64_T )0u;
+    SIXTRL_ASSERT( multipole != SIXTRL_NULLPTR );
+    return multipole->order;
 }
 
 SIXTRL_INLINE SIXTRL_BE_DATAPTR_DEC NS(multipole_real_t) const*
 NS(MultiPole_get_const_bal)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole )
 {
+    SIXTRL_ASSERT( multipole != SIXTRL_NULLPTR );
+
     SIXTRL_ASSERT(
-        ( multipole == SIXTRL_NULLPTR ) ||
-        ( ( ( NS(MultiPole_get_order)( multipole ) >= 0 ) &&
+        ( ( NS(MultiPole_get_order)( multipole ) >= 0 ) &&
             ( multipole->bal != SIXTRL_NULLPTR ) ) ||
           ( ( NS(MultiPole_get_order)( multipole ) < 0 ) &&
-            ( multipole->bal == SIXTRL_NULLPTR ) ) ) );
+            ( multipole->bal == SIXTRL_NULLPTR ) ) );
 
-    return ( multipole != SIXTRL_NULLPTR ) ? multipole->bal : SIXTRL_NULLPTR;
+    return multipole->bal;
 }
 
 SIXTRL_INLINE SIXTRL_BE_DATAPTR_DEC NS(multipole_real_t)* NS(MultiPole_get_bal)(
@@ -357,14 +359,14 @@ SIXTRL_INLINE NS(multipole_real_t) NS(MultiPole_get_bal_value)(
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT multipole,
     NS(buffer_size_t) const index )
 {
-    typedef NS(buffer_size_t) buf_size_t;
     typedef SIXTRL_BE_DATAPTR_DEC NS(multipole_real_t) const* ptr_to_bal_t;
 
-    buf_size_t const bal_size = NS(MultiPole_get_bal_size)( multipole );
     ptr_to_bal_t bal = NS(MultiPole_get_const_bal)( multipole );
 
-    return ( ( bal != SIXTRL_NULLPTR ) && ( bal_size > index ) )
-        ? bal[ index ] : ( NS(multipole_real_t) )0.0;
+    SIXTRL_ASSERT( bal != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( index < NS(MultiPole_get_bal_size)( multipole ) );
+
+    return bal[ index ];
 }
 
 SIXTRL_INLINE NS(buffer_size_t) NS(MultiPole_get_bal_size)(

@@ -27,7 +27,6 @@ struct NS(Buffer);
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/buffer.hpp"
-    #include "sixtracklib/opencl/internal/base_context.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
@@ -47,12 +46,14 @@ struct NS(Buffer);
 
 namespace SIXTRL_CXX_NAMESPACE
 {
+    class ClContextBase;
+
     class ClArgument
     {
         public:
 
         using context_base_t     = ClContextBase;
-        using size_type          = ClContextBase::size_type;
+        using size_type          = std::size_t;
         using cobj_buffer_t      = struct NS(Buffer);
         using cxx_cobj_buffer_t  = SIXTRL_CXX_NAMESPACE::Buffer;
 
@@ -106,9 +107,6 @@ namespace SIXTRL_CXX_NAMESPACE
         cl::Buffer&         openClBuffer()       SIXTRL_NOEXCEPT;
         cl::Buffer const&   openClBuffer() const SIXTRL_NOEXCEPT;
 
-        cl::Buffer const& internalSuccessFlagBuffer() const SIXTRL_NOEXCEPT;
-        cl::Buffer& internalSuccessFlagBuffer() SIXTRL_NOEXCEPT;
-
         protected:
 
         virtual int doWriteAndRemapCObjBuffer(
@@ -129,7 +127,6 @@ namespace SIXTRL_CXX_NAMESPACE
             cobj_buffer_t* SIXTRL_RESTRICT buffer );
 
         cl::Buffer                      m_cl_buffer;
-        cl::Buffer                      m_cl_success_flag;
 
         mutable cobj_buffer_t*          m_ptr_cobj_buffer;
         mutable context_base_t*         m_ptr_context;
@@ -160,6 +157,10 @@ typedef void NS(ClArgument);
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
 #endif /* defined( __cplusplus ) */
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/opencl/internal/base_context.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
@@ -222,10 +223,6 @@ SIXTRL_HOST_FN bool NS(ClArgument_attach_to_context)(
 
 SIXTRL_HOST_FN cl_mem NS(ClArgument_get_opencl_buffer)(
     NS(ClArgument)* SIXTRL_RESTRICT argument );
-
-SIXTRL_HOST_FN cl_mem NS(ClArgument_get_internal_opencl_success_flag_buffer)(
-    NS(ClArgument)* SIXTRL_RESTRICT argument );
-
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }

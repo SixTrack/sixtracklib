@@ -1,6 +1,10 @@
 #ifndef SIXTRACKLIB_OPENCL_INTERNAL_DEFAULT_COMPILE_OPTIONS_H__
 #define SIXTRACKLIB_OPENCL_INTERNAL_DEFAULT_COMPILE_OPTIONS_H__
 
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/generated/config.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
     #if defined( _GPUCODE ) && defined( __OPENCL_VERSION__ )
 
         #if !defined( SIXTRL_ARGPTR_DEC )

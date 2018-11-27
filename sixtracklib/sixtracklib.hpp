@@ -1,11 +1,11 @@
 #ifndef SIXTRACKLIB_SIXTRACKLIB_HPP__
 #define SIXTRACKLIB_SIXTRACKLIB_HPP__
 
-#if !defined( SIXTRL_NAMESPACE )
-    #define SIXTRL_NAMESPACE sixtrack
-#endif /* !defined( SIXTRL_NAMESPACE ) */
-
 /* ------------------------------------------------------------------------- */
+
+#include "sixtracklib/common/generated/namespace.h"
+#include "sixtracklib/common/generated/config.h"
+#include "sixtracklib/common/definitions.h"
 
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/be_drift/be_drift.hpp"

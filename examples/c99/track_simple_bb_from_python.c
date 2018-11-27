@@ -6,32 +6,15 @@
 #include "sixtracklib/testlib.h"
 #include "sixtracklib/sixtracklib.h"
 
-#define PARTFILE "python/bbsimple_st_dump.bin"
-#define ELEMFILE "python/bbsimple_st_input.bin"
-
-//#define PARTFILE "python/beambeam_st_dump.bin"
-//#define ELEMFILE "python/beambeam_st_input.bin"
-
 int main( int argc, char* argv[] )
 {
-    typedef st_buffer_size_t buf_size_t;
+    st_Buffer* particle_dump = st_Buffer_new_from_file(
+        st_PATH_TO_BBSIMPLE_PARTICLES_SIXTRACK_DUMP );
 
-    char path2particle_file[ 256 ];
-    char path2beam_elements_file[ 256 ];
+    st_Buffer* beam_elements_buffer = st_Buffer_new_from_file(
+        st_PATH_TO_BBSIMPLE_BEAM_ELEMENTS );
 
-    memset( path2particle_file, (int)'\0', 256 );
-    strncpy( path2particle_file, st_PATH_TO_BASE_DIR, 256 );
-    strcat( path2particle_file,  PARTFILE);
-
-    memset( path2beam_elements_file, (int)'\0', 256 );
-    strncpy( path2beam_elements_file, st_PATH_TO_BASE_DIR, 256 );
-    strcat( path2beam_elements_file, ELEMFILE );
-
-    st_Buffer* lhc_particle_dump = st_Buffer_new_from_file( path2particle_file );
-
-    st_Buffer* lhc_beam_elements_buffer = st_Buffer_new_from_file( path2beam_elements_file );
-
-    st_Buffer* pb = st_Buffer_new( ( buf_size_t )( 1u << 24u ) );
+    st_Buffer* pb = st_Buffer_new( 0u );
 
     buf_size_t NUM_PARTICLES                = 2;
     buf_size_t NUM_TURNS                    = 2;
@@ -41,7 +24,6 @@ int main( int argc, char* argv[] )
     buf_size_t          num_input_particles = 0;
 
     buf_size_t ii = 0;
-
 
     /* ********************************************************************** */
     /* ****   Handling of command line parameters                             */
@@ -83,18 +65,17 @@ int main( int argc, char* argv[] )
         }
     }
 
-    printf( "Selected NUM_PARTICLES = %10lu\r\n"
-            "Selected NUM_TURNS     = %10lu\r\n"
-            "\r\n", NUM_PARTICLES, NUM_TURNS );
+    printf( "Use: NUM_PARTICLES = %10lu\r\n"
+            "     NUM_TURNS     = %10lu\r\n\r\n", NUM_PARTICLES, NUM_TURNS );
 
     /* ********************************************************************** */
-    /* ****   Building Particles Data from LHC Particle Dump Data        **** */
+    /* ****      Building Particles Data from Particle Dump Data         **** */
     /* ********************************************************************** */
 
-    st_Buffer* dump = st_Buffer_new(1<<24);//16MB
+    st_Buffer* dump = st_Buffer_new( 0u );
 
     particles = st_Particles_new( pb, NUM_PARTICLES );
-    input_particles = st_Particles_buffer_get_const_particles( lhc_particle_dump, 0u );
+    input_particles = st_Particles_buffer_get_const_particles( particle_dump, 0u );
     num_input_particles = st_Particles_get_num_of_particles( input_particles );
 
     for( ii = 0 ; ii < NUM_PARTICLES ; ++ii )
@@ -103,46 +84,40 @@ int main( int argc, char* argv[] )
         st_Particles_copy_single( particles, ii, input_particles, jj );
     }
 
-    int N_elem = st_Buffer_get_num_of_objects(lhc_beam_elements_buffer);
+    int const N_elem = st_Buffer_get_num_of_objects( beam_elements_buffer );
     printf("N_elem= %d \n",N_elem);
 
     for( ii = 0 ; ii < NUM_TURNS ; ++ii )
     {
-        st_Object* elem = st_Buffer_get_objects_begin( lhc_beam_elements_buffer );
-        for( int i_ele=0; i_ele<N_elem; i_ele++)
+        int jj = 0;
+
+        for( ; jj < N_elem; ++jj )
         {
             st_Particles* pdump = st_Particles_add_copy(dump, particles);
             assert(pdump != 0);
 
+            int const ret = st_Track_all_particles_beam_element(
+                particles, jj, beam_elements_buffer, jj );
+
+            assert( ret == 0 );
+
             #if defined( NDEBUG )
             ( void )pdump;
+            ( void )ret;
             #endif /* !defined( NDEBUG ) */
-
-            st_Track_particle_subset_beam_element_obj( particles, 0, NUM_PARTICLES, elem);
-            elem++;
-
-            //st_Particles_print(stdout, pdump);
         }
-
     }
 
     printf("N objects in dump %d\n", (int)st_Buffer_get_num_of_objects(dump));
-
-    // Write to file
-    st_Buffer_write_to_file(dump, "stlib_dump.bin");
-
-    //st_Buffer* test = st_Buffer_new_from_file("stlib_dump.bin");
-    //st_Particles_buffer_print(stdout, test);
-
 
     /* ********************************************************************** */
     /* ****                         Clean-up                             **** */
     /* ********************************************************************** */
 
     st_Buffer_delete( pb );
-    st_Buffer_delete( lhc_particle_dump );
-    st_Buffer_delete( lhc_beam_elements_buffer );
+    st_Buffer_delete( particle_dump );
+    st_Buffer_delete( beam_elements_buffer );
     st_Buffer_delete( dump );
 }
 
-/* end: examples/c99/track_lhc_no_bb.c */
+/* end: examples/c99/track_bbsimple.c */

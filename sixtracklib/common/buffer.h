@@ -213,9 +213,19 @@ SIXTRL_HOST_FN bool NS(Buffer_write_to_file)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
 
+SIXTRL_HOST_FN bool NS(Buffer_write_to_file_normalized_addr)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file,
+    NS(buffer_addr_t) const norm_base_addr );
+
 SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp );
+
+SIXTRL_HOST_FN bool NS(Buffer_write_to_fp_normalized_addr)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    NS(buffer_addr_t) const norm_base_addr );
 
 SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_detailed)(
     NS(buffer_size_t)  const initial_max_num_objects,

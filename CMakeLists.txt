@@ -50,20 +50,45 @@ endif()
 if( NOT STATUS_INCLUDE_LOCAL_SETTINGS_FILE AND
     NOT STATUS_INCLUDE_DEFAULT_SETTINGS_FILE )
 
-    message( WARNING "No settings file (i.e. neither settings.cmake nor "
-             "settings.cmake.default) included" )
+    message( WARNING "---- -> No settings file (i.e. neither Settings.cmake nor"
+             " Settings.cmake.default) included" )
 
 endif()
 
+set( SIXTRACKL_VERSION_STR "0.1.0" )
+
 # ==============================================================================
 # handle dependencies and external libraries/toolkits:
+
+# ------------------------------------------------------------------------------
+# These two abstract lists contain the name of the modules that are know to
+# SixTrackLib and "1" and "0" for representing the enabled and disabled state
+# of these modules. This is used to generate headers, list, install files, etc.
+
+set( SIXTRACKLIB_SUPPORTED_MODULES        )
+set( SIXTRACKLIB_SUPPORTED_MODULES_VALUES )
+
+set( SIXTRACKLIB_SUPPORTED_BINDINGS        )
+set( SIXTRACKLIB_SUPPORTED_BINDINGS_VALUES )
+
+set( SIXTRACKLIB_TESTDATA_DIR
+     "${CMAKE_SOURCE_DIR}/tests/testdata" CACHE STRING "" FORCE )
+
+set( SIXTRACKLIB_CPU_FLAGS )
 
 # ------------------------------------------------------------------------------
 # place all contributed cmake modules and snipplets into the cmake subdirectory
 # of the project's root folder:
 
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake" )
-message( STATUS "cmake_module_path: ${CMAKE_MODULE_PATH}" )
+message( STATUS "---- cmake_module_path: ${CMAKE_MODULE_PATH}" )
+
+# ------------------------------------------------------------------------------
+# Setup language bindings - we have to be first to pull in python (if needed)
+# to prevent any module picking a python version we do not wish to support:
+
+include( SetupCxx )
+include( SetupPython )
 
 # ------------------------------------------------------------------------------
 # Unit-testing:
@@ -73,62 +98,34 @@ include( SetupUnitTesting )
 # ------------------------------------------------------------------------------
 # MPFR4:
 
-if( SIXTRACKL_ENABLE_MPFR4 OR SIXTRACKL_ENABLE_MPFR_ACCURACY_TESTS )
-    include( SetupMultiPrecision )
-endif()
-
+include( SetupMultiPrecision )
 
 # ------------------------------------------------------------------------------
-# OpenCL:
+# Autovectorization and SIMD:
 
-if( SIXTRACKL_ENABLE_OPENCL )
-    include( SetupOpenCL )
-endif()
-
-# ------------------------------------------------------------------------------
-# CUDA:
-
-if( SIXTRACKL_ENABLE_CUDA )
-    enable_language( CUDA )
-endif()
+include( SetupAutoVecSIMD )
 
 # ------------------------------------------------------------------------------
 # OpenMP:
 
-if( SIXTRACKL_ENABLE_OPENMP )
-    include( SetupOpenMP )
-endif()
-
-# ==============================================================================
-# build libraries and modules:
+include( SetupOpenMP )
 
 # ------------------------------------------------------------------------------
-# sixtracklib: C/C++ library
+# OpenCL:
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# CPU/System architecture settings:
+include( SetupOpenCL )
 
-set( SIXTRACKLIB_CPU_FLAGS )
+# ------------------------------------------------------------------------------
+# Cuda:
 
-if( SIXTRACKL_CPU_ARCH MATCHES "avx2" )
-    message( STATUS "---- Optimizing for AVX2 architecture" )
-    set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -mavx2 )
-
-elseif( SIXTRACKL_CPU_ARCH MATCHES "avx" )
-    message( STATUS "---- Optimizing for AVX architecture" )
-    set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -mavx )
-
-elseif( SIXTRACKL_CPU_ARCH MATCHES "sse2" )
-    message( STATUS "---- Optimizing for SSE2 architecture" )
-    set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -msse2  )
-
-elseif( SIXTRACKL_CPU_ARCH MATCHES "native" )
-    message( STATUS "---- Optimizing for native environment of the CPU" )
-    set( SIXTRACKLIB_CPU_FLAGS ${SIXTRACKLIB_CPU_FLAGS} -march=native  )
-
+if( SIXTRACKL_ENABLE_CUDA )
+    message( STATUS "---- Enabling CUDA languagecmake/SetupCuda.cmake" )
+    enable_language( CUDA )
 endif()
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+include( SetupCuda )
+
+# ------------------------------------------------------------------------------
 # Namespace handling:
 
 set( SIXTRACKLIB_NAMESPACE_FLAGS )
@@ -143,18 +140,36 @@ if( SIXTRACKL_CXX_NAMESPACE )
           "SIXTRL_NAMESPACE=${SIXTRACKL_CXX_NAMESPACE}" )
 endif()
 
+# ==============================================================================
+# sixtracklib: C/C++ library ; pysixtracklib python bindings
+
 add_subdirectory( sixtracklib )
 
 # ------------------------------------------------------------------------------
+# Add tools
 
-if( SIXTRACKL_ENABLE_PROGRAMM_TESTS OR SIXTRACKL_BUILD_EXAMPLES )
-    add_subdirectory( tests )
-endif()
+add_subdirectory( tools )
 
 # ------------------------------------------------------------------------------
+# Add pysixtracklib Python 3.x bindings
+
+if( SIXTRACKL_ENABLE_PYTHON )
+    add_subdirectory( python )
+endif()
+
+# ==============================================================================
+# examples: c99, cxx, python
 
 if( SIXTRACKL_BUILD_EXAMPLES )
     add_subdirectory( examples )
+endif()
+
+# ==============================================================================
+# tests: unit-tests, benchmarks, testdata generators:
+
+if( SIXTRACKL_ENABLE_PROGRAMM_TESTS OR SIXTRACKL_ENABLE_BENCHMARK_TESTS OR
+    SIXTRACKL_BUILD_EXAMPLES )
+    add_subdirectory( tests )
 endif()
 
 # ------------------------------------------------------------------------------

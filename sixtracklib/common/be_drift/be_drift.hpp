@@ -72,6 +72,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
+
+        /* ----------------------------------------------------------------- */
+
         template< class ParticleT >
         SIXTRL_FN bool track(
             ParticleT& SIXTRL_RESTRICT_REF particles,
