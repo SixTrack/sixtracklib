@@ -363,27 +363,30 @@ void NS(BeamMonitor_fprint)(
     FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
 {
-    int const is_rolling = NS(BeamMonitor_is_rolling)( monitor ) ? 1 : 0;
+    int const is_rolling =
+        NS(BeamMonitor_is_rolling)( monitor ) ? 1 : 0;
 
-    int const attr_cont =
-        NS(BeamMonitor_are_attributes_continous)( monitor ) ? 1 : 0;
+    int const is_turn_ordered =
+        NS(BeamMonitor_is_turn_ordered)( monitor ) ? 1 : 0;
 
     SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
 
     fprintf( fp,
             "|beam-monitor     | num stores       = %20d \r\n"
-            "                  | start turn       = %20d;\r\n"
-            "                  | skip turns       = %20d;\r\n"
+            "                  | start turn       = %20d\r\n"
+            "                  | skip turns       = %20d\r\n"
             "                  | out_address      = %20lu;\r\n"
-            "                  | out store stride = %20lu;\r\n"
-            "                  | rolling          = %20d;\r\n"
-            "                  | cont attributes  = %20d;\r\n",
+            "                  | min_particle_id  = %20d\r\n"
+            "                  | max_particle_id  = %20d\r\n"
+            "                  | is_rolling       = %20d\r\n"
+            "                  | is_turn_ordered  = %20d\r\n",
             ( int )NS(BeamMonitor_get_num_stores)( monitor ),
             ( int )NS(BeamMonitor_get_start)( monitor ),
             ( int )NS(BeamMonitor_get_skip)( monitor ),
             ( unsigned long )NS(BeamMonitor_get_out_address)( monitor ),
-            ( unsigned long )monitor->out_store_stride,
-            is_rolling, attr_cont );
+            ( int )NS(BeamMonitor_get_min_particle_id)( monitor ),
+            ( int )NS(BeamMonitor_get_max_particle_id)( monitor ),
+            is_rolling, is_turn_ordered );
 
     return;
 }
@@ -514,9 +517,9 @@ void NS(BeamElement_fprint)( FILE* SIXTRL_RESTRICT fp,
 
             default:
             {
-                printf( "|unknown          | type_id  = %3d;\r\n"
-                        "                  | size     = %8lu bytes;\r\n"
-                        "                  | addr     = %16p;\r\n",
+                printf( "|unknown          | type_id  = %3d\r\n"
+                        "                  | size     = %8lu bytes\r\n"
+                        "                  | addr     = %16p\r\n",
                         ( int )type_id, NS(Object_get_size)( be_info ),
                         ( void* )( uintptr_t )addr );
             }

@@ -336,26 +336,29 @@ SIXTRL_INLINE void NS(BeamBeam6D_print)(
 SIXTRL_INLINE void NS(BeamMonitor_print)(
     SIXTRL_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
 {
-    int const is_rolling = NS(BeamMonitor_is_rolling)( monitor ) ? 1 : 0;
+    int const is_rolling =
+        NS(BeamMonitor_is_rolling)( monitor ) ? 1 : 0;
 
-    int const attr_cont =
-        NS(BeamMonitor_are_attributes_continous)( monitor ) ? 1 : 0;
+    int const is_turn_ordered =
+        NS(BeamMonitor_is_turn_ordered)( monitor ) ? 1 : 0;
 
     SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
 
-    printf( "|beam-monitor     | num stores       = %20d \r\n"
-            "                  | start turn       = %20d;\r\n"
-            "                  | skip turns       = %20d;\r\n"
-            "                  | out address      = %20lu;\r\n"
-            "                  | out store stride = %20lu;\r\n"
-            "                  | rolling          = %20d;\r\n"
-            "                  | cont attributes  = %20d;\r\n",
+    printf( "|beam-monitor     | num stores       = %20d\r\n"
+            "                  | start turn       = %20d\r\n"
+            "                  | skip turns       = %20d\r\n"
+            "                  | out_address      = %20lu\r\n"
+            "                  | min_particle_id  = %20d\r\n"
+            "                  | max_particle_id  = %20d\r\n"
+            "                  | is_rolling       = %20d\r\n"
+            "                  | is_turn_ordered  = %20d\r\n",
             ( int )NS(BeamMonitor_get_num_stores)( monitor ),
             ( int )NS(BeamMonitor_get_start)( monitor ),
             ( int )NS(BeamMonitor_get_skip)( monitor ),
             ( unsigned long )NS(BeamMonitor_get_out_address)( monitor ),
-            ( unsigned long )monitor->out_store_stride,
-            is_rolling, attr_cont );
+            ( int )NS(BeamMonitor_get_min_particle_id)( monitor ),
+            ( int )NS(BeamMonitor_get_max_particle_id)( monitor ),
+            is_rolling, is_turn_ordered );
 
     return;
 }

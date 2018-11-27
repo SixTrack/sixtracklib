@@ -93,10 +93,10 @@ NS(BeamMonitor_get_skip)( SIXTRL_BE_ARGPTR_DEC const
 SIXTRL_FN SIXTRL_STATIC bool NS(BeamMonitor_is_rolling)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(BeamMonitor_are_attributes_continous)(
+SIXTRL_FN SIXTRL_STATIC bool NS(BeamMonitor_is_turn_ordered)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(BeamMonitor_are_particles_continous)(
+SIXTRL_FN SIXTRL_STATIC bool NS(BeamMonitor_is_particle_ordered)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
 SIXTRL_FN SIXTRL_STATIC NS(be_monitor_addr_t)
@@ -114,20 +114,25 @@ NS(BeamMonitor_get_max_particle_id)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* accessor functions for retrieving already dumped data */
 
-SIXTRL_FN SIXTRL_STATIC bool NS(BeamMonitor_is_turn_stored)(
+SIXTRL_FN SIXTRL_STATIC bool NS(BeamMonitor_has_turn_stored)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
-    NS(be_monitor_index_t) const turn_id );
+    NS(be_monitor_turn_t) const turn_id,
+    NS(be_monitor_turn_t) const max_num_turns );
 
 #if !defined( _GPUCODE )
-
+/*
 SIXTRL_HOST_FN NS(be_monitor_turn_t) NS(BeamMonitor_get_max_stored_turn)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
+
+SIXTRL_HOST_FN bool NS(BeamMonitor_copy_and_append_particle_data)(
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 SIXTRL_HOST_FN NS(be_monitor_index_t) NS(BeamMonitor_get_stored_values_index)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
     NS(be_monitor_turn_t) const turn_id,
     NS(be_monitor_index_t) const particle_id );
-
+*/
 #endif /* !defined( _GPUCODE ) */
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -149,19 +154,25 @@ SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_is_rolling)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
     bool const is_rolling );
 
-SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_are_attributes_continous)(
+SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_is_turn_ordered)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
-    bool const are_attributes_continous );
+    bool const is_turn_ordered );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_is_particle_ordered)(
+    SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
+    bool const is_particle_ordered );
 
 SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_out_address)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
     NS(be_monitor_addr_t) const out_address );
 
-/*
-SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_out_store_stride)(
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
-    NS(be_monitor_stride_t) const stride );
-*/
+SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_min_particle_id)(
+    SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
+    NS(be_monitor_index_t) const min_particle_id );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_max_particle_id)(
+    SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
+    NS(be_monitor_index_t) const min_particle_id );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Buffer management functions: */
@@ -181,8 +192,9 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonito
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(be_monitor_turn_t) const num_stores, NS(be_monitor_turn_t) const start,
     NS(be_monitor_turn_t) const skip,  NS(be_monitor_addr_t) const out_address,
-    NS(be_monitor_stride_t) const out_store_stride,
-    bool const is_rolling, bool const are_attributes_continous );
+    NS(be_monitor_index_t) const min_particle_id,
+    NS(be_monitor_index_t) const max_particle_id,
+    bool const is_rolling, bool const is_turn_ordered );
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)*
 NS(BeamMonitor_add_copy)(
@@ -246,8 +258,7 @@ NS(BeamMonitor_preset)(
         NS(BeamMonitor_set_start)( monitor, 0u );
         NS(BeamMonitor_set_skip)(  monitor, 1u );
         NS(BeamMonitor_set_is_rolling)( monitor, false );
-        NS(BeamMonitor_set_are_attributes_continous)( monitor, true );
-
+        NS(BeamMonitor_set_is_turn_ordered)( monitor, true );
         NS(BeamMonitor_clear)( monitor );
     }
 
@@ -258,8 +269,8 @@ SIXTRL_INLINE void NS(BeamMonitor_clear)(
     SIXTRL_BE_ARGPTR_DEC  NS(BeamMonitor)* SIXTRL_RESTRICT monitor )
 {
     NS(BeamMonitor_set_out_address)( monitor, ( NS(buffer_addr_t) )0 );
-    //NS(BeamMonitor_set_out_store_stride)( monitor, ( NS(buffer_size_t) )0 );
-    if( monitor != SIXTRL_NULLPTR ) monitor->out_store_stride = 0u;
+    NS(BeamMonitor_set_min_particle_id)( monitor, ( NS(be_monitor_index_t) )0 );
+    NS(BeamMonitor_set_max_particle_id)( monitor, ( NS(be_monitor_index_t) )0 );
 
     return;
 }
@@ -310,17 +321,20 @@ SIXTRL_INLINE int NS(BeamMonitor_copy)(
         NS(BeamMonitor_set_skip)( destination,
              NS(BeamMonitor_get_skip)(  source ) );
 
-        NS(BeamMonitor_set_is_rolling)( destination,
-             NS(BeamMonitor_is_rolling)( source ) );
-
-        NS(BeamMonitor_set_are_attributes_continous)( destination,
-             NS(BeamMonitor_are_attributes_continous)( source ) );
-
         NS(BeamMonitor_set_out_address)( destination,
             NS(BeamMonitor_get_out_address)( source ) );
 
-        destination->out_store_stride =
-            NS(BeamMonitor_get_out_store_stride)( source );
+        NS(BeamMonitor_set_is_rolling)( destination,
+             NS(BeamMonitor_is_rolling)( source ) );
+
+        NS(BeamMonitor_set_is_turn_ordered)( destination,
+            NS(BeamMonitor_is_turn_ordered)( source ) );
+
+        NS(BeamMonitor_set_min_particle_id)( destination,
+            NS(BeamMonitor_get_min_particle_id)( source ) );
+
+        NS(BeamMonitor_set_max_particle_id)( destination,
+            NS(BeamMonitor_get_max_particle_id)( source ) );
 
         success = 0;
     }
@@ -333,6 +347,10 @@ SIXTRL_INLINE int NS(BeamMonitor_compare_values)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT rhs )
 {
+    typedef NS(be_monitor_turn_t)   nturn_t;
+    typedef NS(be_monitor_index_t)  index_t;
+    typedef NS(be_monitor_addr_t)   addr_t;
+
     int compare_value = -1;
 
     if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
@@ -355,81 +373,121 @@ SIXTRL_INLINE int NS(BeamMonitor_compare_values)(
 
         if( compare_value == 0 )
         {
-            if( NS(BeamMonitor_get_start)( lhs ) >
-                NS(BeamMonitor_get_start)( rhs ) )
+            nturn_t const lhs_value = NS(BeamMonitor_get_start)( lhs );
+            nturn_t const rhs_value = NS(BeamMonitor_get_start)( rhs );
+
+            if( lhs_value != rhs_value )
             {
-                compare_value = +1;
-            }
-            else if( NS(BeamMonitor_get_start)( lhs ) <
-                     NS(BeamMonitor_get_start)( rhs ) )
-            {
-                compare_value = -1;
+                if( lhs_value > rhs_value )
+                {
+                    compare_value = +1;
+                }
+                else if( lhs_value < rhs_value )
+                {
+                    compare_value = -1;
+                }
             }
         }
 
         if( compare_value == 0 )
         {
-            if( NS(BeamMonitor_get_skip)( lhs ) >
-                NS(BeamMonitor_get_skip)( rhs ) )
+            nturn_t const lhs_value = NS(BeamMonitor_get_skip)( lhs );
+            nturn_t const rhs_value = NS(BeamMonitor_get_skip)( rhs );
+
+            if( lhs_value != rhs_value )
             {
-                compare_value = +1;
-            }
-            else if( NS(BeamMonitor_get_skip)( lhs ) <
-                     NS(BeamMonitor_get_skip)( rhs ) )
-            {
-                compare_value = -1;
+                if( lhs_value > rhs_value )
+                {
+                    compare_value = +1;
+                }
+                else if( lhs_value < rhs_value )
+                {
+                    compare_value = -1;
+                }
             }
         }
 
         if( compare_value == 0 )
         {
-            if( lhs->rolling > rhs->rolling )
+            addr_t const lhs_addr = NS(BeamMonitor_get_out_address)( lhs );
+            addr_t const rhs_addr = NS(BeamMonitor_get_out_address)( rhs );
+
+            if( lhs_addr != rhs_addr )
             {
-                compare_value = +1;
-            }
-            else if( lhs->rolling < rhs->rolling )
-            {
-                compare_value = -1;
+                if( lhs_addr > rhs_addr )
+                {
+                    compare_value = +1;
+                }
+                else if( lhs_addr < rhs_addr )
+                {
+                    compare_value = -1;
+                }
             }
         }
 
         if( compare_value == 0 )
         {
-            if( NS(BeamMonitor_get_out_address)( lhs ) >
-                NS(BeamMonitor_get_out_address)( rhs ) )
+            index_t const lhs_value = NS(BeamMonitor_get_min_particle_id)( lhs );
+            index_t const rhs_value = NS(BeamMonitor_get_min_particle_id)( rhs );
+
+            if( lhs_value != rhs_value )
             {
-                compare_value = +1;
-            }
-            else if( NS(BeamMonitor_get_out_address)( lhs ) <
-                     NS(BeamMonitor_get_out_address)( rhs ) )
-            {
-                compare_value = -1;
+                if( lhs_value > rhs_value )
+                {
+                    compare_value = +1;
+                }
+                else if( lhs_value < rhs_value )
+                {
+                    compare_value = -1;
+                }
             }
         }
 
         if( compare_value == 0 )
         {
-            if( NS(BeamMonitor_get_out_store_stride)( lhs ) >
-                NS(BeamMonitor_get_out_store_stride)( rhs ) )
+            index_t const lhs_value = NS(BeamMonitor_get_max_particle_id)( lhs );
+            index_t const rhs_value = NS(BeamMonitor_get_max_particle_id)( rhs );
+
+            if( lhs_value != rhs_value )
             {
-                compare_value = +1;
-            }
-            else if( NS(BeamMonitor_get_out_store_stride)( lhs ) <
-                     NS(BeamMonitor_get_out_store_stride)( rhs ) )
-            {
-                compare_value = -1;
+                if( lhs_value > rhs_value )
+                {
+                    compare_value = +1;
+                }
+                else if( lhs_value < rhs_value )
+                {
+                    compare_value = -1;
+                }
             }
         }
 
         if( compare_value == 0 )
         {
-            if( lhs->cont_attributes > rhs->cont_attributes )
+            if( lhs->is_rolling != rhs->is_rolling )
             {
-                compare_value = +1;
+                if( lhs->is_rolling > rhs->is_rolling )
+                {
+                    compare_value = +1;
+                }
+                else if( lhs->is_rolling < rhs->is_rolling )
+                {
+                    compare_value = -1;
+                }
             }
-            else if( lhs->cont_attributes < rhs->cont_attributes )
+        }
+
+        if( compare_value == 0 )
+        {
+            if( lhs->is_turn_ordered != rhs->is_turn_ordered )
             {
-                compare_value = -1;
+                if( lhs->is_turn_ordered > rhs->is_turn_ordered )
+                {
+                    compare_value = +1;
+                }
+                else if( lhs->is_turn_ordered < rhs->is_turn_ordered )
+                {
+                    compare_value = -1;
+                }
             }
         }
     }
@@ -481,20 +539,20 @@ SIXTRL_INLINE bool NS(BeamMonitor_is_rolling)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
 {
     SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
-    return ( monitor->rolling == 1 );
+    return ( monitor->is_rolling == 1 );
 }
 
-SIXTRL_INLINE bool NS(BeamMonitor_are_attributes_continous)(
+SIXTRL_INLINE bool NS(BeamMonitor_is_turn_ordered)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
 {
     SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
-    return ( monitor->cont_attributes == 1 );
+    return ( monitor->is_turn_ordered == 1 );
 }
 
-SIXTRL_INLINE bool NS(BeamMonitor_are_particles_continous)(
+SIXTRL_INLINE bool NS(BeamMonitor_is_particle_ordered)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
 {
-    return !NS(BeamMonitor_are_attributes_continous)( monitor );
+    return !NS(BeamMonitor_is_turn_ordered)( monitor );
 }
 
 SIXTRL_INLINE NS(be_monitor_addr_t)
@@ -505,14 +563,77 @@ NS(BeamMonitor_get_out_address)(
     return monitor->out_address;
 }
 
-SIXTRL_INLINE NS(be_monitor_stride_t)
-NS(BeamMonitor_get_out_store_stride)(
+SIXTRL_INLINE NS(be_monitor_index_t)
+NS(BeamMonitor_get_min_particle_id)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
 {
     SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
-    return monitor->out_store_stride;
+    return monitor->min_particle_id;
 }
 
+SIXTRL_INLINE NS(be_monitor_index_t)
+NS(BeamMonitor_get_max_particle_id)(
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
+{
+    SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( monitor->max_particle_id >= monitor->min_particle_id );
+    return monitor->max_particle_id;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* accessor functions for retrieving already dumped data */
+
+SIXTRL_INLINE bool NS(BeamMonitor_has_turn_stored)(
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
+    NS(be_monitor_turn_t) const turn_id,
+    NS(be_monitor_turn_t) const max_num_turns )
+{
+    bool is_stored = false;
+
+    typedef NS(be_monitor_turn_t) nturn_t;
+
+    nturn_t const num_stores = NS(BeamMonitor_get_num_stores)( monitor );
+    nturn_t const start_turn = NS(BeamMonitor_get_start)( monitor );
+    nturn_t const skip_turns = NS(BeamMonitor_get_skip)( monitor );
+
+    if( ( monitor != SIXTRL_NULLPTR ) && ( start_turn >= ( nturn_t )0u ) &&
+        ( start_turn <= turn_id ) && ( num_stores > ( nturn_t )0u ) &&
+        ( skip_turns > ( nturn_t )0u ) &&
+        ( ( max_num_turns >= turn_id ) || ( max_num_turns < ( nturn_t )0u ) ) )
+    {
+        if( turn_id >= start_turn )
+        {
+            nturn_t turns_since_start = turn_id - start_turn;
+
+            if( ( turns_since_start % skip_turns ) == ( nturn_t )0u )
+            {
+                nturn_t store_idx = turns_since_start / skip_turns;
+
+                if( !NS(BeamMonitor_is_rolling)( monitor ) )
+                {
+                    if( store_idx < num_stores ) is_stored = true;
+                }
+                else if( max_num_turns > start_turn )
+                {
+                    nturn_t const max_turn = max_num_turns - start_turn;
+                    nturn_t max_num_stores = max_turn / skip_turns;
+
+                    if( ( max_turn % skip_turns ) != ( nturn_t )0u )
+                    {
+                        ++max_num_stores;
+                    }
+
+                    if( max_num_stores <= ( store_idx + num_stores ) )
+                    {
+                        is_stored = true;
+                    }
+                }
+            }
+        }
+    }
+
+    return is_stored;
+}
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* setter accessor functions: */
@@ -545,16 +666,27 @@ SIXTRL_INLINE void NS(BeamMonitor_set_is_rolling)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
     bool const is_rolling )
 {
-    if( monitor != SIXTRL_NULLPTR ) monitor->rolling = ( is_rolling ) ? 1 : 0;
+    if( monitor != SIXTRL_NULLPTR )
+        monitor->is_rolling = ( is_rolling ) ? 1 : 0;
     return;
 }
 
-SIXTRL_INLINE void NS(BeamMonitor_set_are_attributes_continous)(
+SIXTRL_INLINE void NS(BeamMonitor_set_is_turn_ordered)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
-    bool const are_attributes_continous )
+    bool const is_turn_ordered )
 {
-    if( monitor != SIXTRL_NULLPTR ) monitor->cont_attributes =
-            ( are_attributes_continous ) ? 1 : 0;
+    if( monitor != SIXTRL_NULLPTR )
+        monitor->is_turn_ordered = ( is_turn_ordered ) ? 1 : 0;
+
+    return;
+}
+
+SIXTRL_INLINE void NS(BeamMonitor_set_is_particle_ordered)(
+    SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
+    bool const is_particle_ordered )
+{
+    if( monitor != SIXTRL_NULLPTR )
+        monitor->is_turn_ordered = ( is_particle_ordered ) ? 0 : 1;
 
     return;
 }
@@ -567,15 +699,19 @@ SIXTRL_INLINE void NS(BeamMonitor_set_out_address)(
     return;
 }
 
-/*
-SIXTRL_INLINE void NS(BeamMonitor_set_out_store_stride)(
+SIXTRL_INLINE void NS(BeamMonitor_set_min_particle_id)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
-    NS(be_monitor_stride_t) const out_store_stride )
+    NS(be_monitor_index_t) const min_particle_id )
 {
-    if( monitor != SIXTRL_NULLPTR ) monitor->out_store_stride = out_store_stride;
-    return;
+    if( monitor != SIXTRL_NULLPTR ) monitor->min_particle_id = min_particle_id;
 }
-*/
+
+SIXTRL_INLINE void NS(BeamMonitor_set_max_particle_id)(
+    SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
+    NS(be_monitor_index_t) const max_particle_id )
+{
+    if( monitor != SIXTRL_NULLPTR ) monitor->max_particle_id = max_particle_id;
+}
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Buffer management functions: */
@@ -621,10 +757,11 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_new)(
     temp_obj.num_stores        = ( nturn_t )0u;
     temp_obj.start             = ( nturn_t )0u;
     temp_obj.skip              = ( nturn_t )1u;
-    temp_obj.rolling           = ( flag_t )0u;
     temp_obj.out_address       = ( addr_t )0u;
-    temp_obj.out_store_stride  = ( NS(be_monitor_stride_t) )0u;
-    temp_obj.cont_attributes   = ( flag_t )1;
+    temp_obj.min_particle_id   = ( NS(be_monitor_index_t) )0u;
+    temp_obj.max_particle_id   = ( NS(be_monitor_index_t) )0u;
+    temp_obj.is_rolling        = ( flag_t )0;
+    temp_obj.is_turn_ordered   = ( flag_t )1;
 
     return ( ptr_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
         NS(Buffer_add_object)( buffer, &temp_obj, sizeof( temp_obj ),
@@ -635,8 +772,9 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(be_monitor_turn_t) const num_stores, NS(be_monitor_turn_t) const start,
     NS(be_monitor_turn_t) const skip,  NS(be_monitor_addr_t) const out_address,
-    NS(be_monitor_stride_t) const out_store_stride,
-    bool const is_rolling, bool const are_attributes_continous )
+    NS(be_monitor_index_t) const min_particle_id,
+    NS(be_monitor_index_t) const max_particle_id,
+    bool const is_rolling, bool const is_turn_ordered )
 {
     typedef NS(buffer_size_t)                       buf_size_t;
     typedef NS(BeamMonitor)                         elem_t;
@@ -649,16 +787,15 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_add)(
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
 
-    SIXTRL_ASSERT( out_store_stride == ( NS(be_monitor_stride_t) )0u );
-
     elem_t temp_obj;
     temp_obj.num_stores        = num_stores;
     temp_obj.start             = start;
     temp_obj.skip              = skip;
-    temp_obj.rolling           = ( is_rolling ) ? 1 : 0;
     temp_obj.out_address       = out_address;
-    temp_obj.out_store_stride  = out_store_stride;
-    temp_obj.cont_attributes   = ( are_attributes_continous ) ? 1 : 0;
+    temp_obj.min_particle_id   = min_particle_id;
+    temp_obj.max_particle_id   = max_particle_id;
+    temp_obj.is_rolling        = ( is_rolling      ) ? 1 : 0;
+    temp_obj.is_turn_ordered   = ( is_turn_ordered ) ? 1 : 0;
 
     return ( ptr_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
         NS(Buffer_add_object)( buffer, &temp_obj, sizeof( temp_obj ),
@@ -675,9 +812,10 @@ NS(BeamMonitor_add_copy)(
         NS(BeamMonitor_get_start)( monitor ),
         NS(BeamMonitor_get_skip)( monitor ),
         NS(BeamMonitor_get_out_address)( monitor ),
-        NS(BeamMonitor_get_out_store_stride)( monitor ),
+        NS(BeamMonitor_get_min_particle_id)( monitor ),
+        NS(BeamMonitor_get_max_particle_id)( monitor ),
         NS(BeamMonitor_is_rolling)( monitor ),
-        NS(BeamMonitor_are_attributes_continous)( monitor ) );
+        NS(BeamMonitor_is_turn_ordered)( monitor ) );
 }
 
 #endif /* !defined( _GPUCODE ) */
