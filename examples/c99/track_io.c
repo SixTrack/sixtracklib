@@ -263,10 +263,21 @@ int main( int argc, char* argv[] )
                 particles, 0u );
         }
 
+        double start_tracking_time = st_Time_get_seconds_since_epoch();
+
         st_Track_all_particles_until_turn( particles, eb, NUM_TURNS );
 
-        st_Particles_add_copy( out_buffer, particles );
-        st_Buffer_write_to_file( out_buffer, path_output_particles );
+      	double end_tracking_time = st_Time_get_seconds_since_epoch();
+
+        printf( "time / particle / turn: %.3e\r\n"
+                "time total            : %.3e\r\n",
+                ( end_tracking_time - start_tracking_time ) / ( double )( NUM_TURNS * NUM_PARTICLES ),
+                ( end_tracking_time - start_tracking_time ) );
+
+        st_Particles_add_copy( io_buffer, particles );
+
+        //st_Buffer_write_to_file( track_pb, path_output_particles );
+        st_Buffer_write_to_file( io_buffer, path_output_particles );
     }
 
     /* ********************************************************************* */

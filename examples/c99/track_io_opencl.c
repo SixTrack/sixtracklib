@@ -353,22 +353,33 @@ int main( int argc, char* argv[] )
                 out_buffer_arg, ii * NUM_BEAM_ELEMENTS );
         }
 
+	double start_tracking_time = st_Time_get_seconds_since_epoch();
+
         st_ClContext_track( context, particle_buffer_arg,
             beam_elements_arg, NUM_TURNS );
+
+	double end_tracking_time = st_Time_get_seconds_since_epoch();
+
+	printf( "time / particle / turn: %.3e\r\n"
+                "time total            : %.3e\r\n",
+                ( end_tracking_time - start_tracking_time ) / ( double )( NUM_TURNS * NUM_PARTICLES ),
+                ( end_tracking_time - start_tracking_time ) );
 
         st_ClArgument_read( particle_buffer_arg, track_pb );
         st_ClArgument_read( out_buffer_arg, out_buffer );
         st_Particles_add_copy( out_buffer,
             st_Particles_buffer_get_const_particles( track_pb, 0u ) );
 
-        st_Buffer_write_to_file( track_pb, path_output_particles );
+        //st_Buffer_write_to_file( track_pb, path_output_particles );
+        st_Buffer_write_to_file( io_buffer, path_output_particles );
     }
 
     /* ********************************************************************* */
     /* ****            SEQUENTIALLY PRINT ALL PARTICLES              ******* */
     /* ********************************************************************* */
 
-    if( st_Buffer_get_num_of_objects( out_buffer ) ==
+    /*
+    if( st_Buffer_get_num_of_objects( io_buffer ) ==
         ( ( NUM_TURNS_IO_ELEM_BY_ELEM * st_Buffer_get_num_of_objects( eb ) ) +
           ( NUM_TURNS_IO_TURN_BY_TURN ) +
           ( ( NUM_TURNS - (
@@ -460,6 +471,7 @@ int main( int argc, char* argv[] )
          st_Particles_print_out( st_Particles_buffer_get_const_particles(
              out_buffer, ii ) );
     }
+    */
 
     /* ********************************************************************* */
     /* ********                       CLEANUP                        ******* */
