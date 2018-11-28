@@ -25,7 +25,7 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT elem_by_elem_buf,
-    SIXTRL_UINT64_T const io_particle_blocks_offset );
+    SIXTRL_UINT64_T const out_particle_blocks_offset );
 
 /* ========================================================================= */
 
@@ -264,7 +264,7 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT elem_by_elem_buf,
-    SIXTRL_UINT64_T const io_particle_blocks_offset )
+    SIXTRL_UINT64_T const out_particle_blocks_offset )
 {
     typedef NS(buffer_size_t)                                   buf_size_t;
     typedef NS(particle_num_elements_t)                         num_element_t;
@@ -285,7 +285,7 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
     obj_const_iter_t be_end = NS(ManagedBuffer_get_const_objects_index_end)(
         belem_buf, slot_size );
 
-    obj_iter_t io_obj_begin = NS(ManagedBuffer_get_objects_index_begin)(
+    obj_iter_t out_obj_begin = NS(ManagedBuffer_get_objects_index_begin)(
         elem_by_elem_buf, slot_size );
 
     obj_iter_t pb_it = NS(ManagedBuffer_get_objects_index_begin)(
@@ -346,7 +346,7 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
 
     SIXTRL_ASSERT( be_begin     != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( be_end       != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( io_obj_begin != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( out_obj_begin != SIXTRL_NULLPTR );
 
     SIXTRL_ASSERT( pb_it != SIXTRL_NULLPTR );
 
@@ -363,7 +363,7 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
         belem_buf, slot_size ) > ( buf_size_t )0u );
 
     SIXTRL_ASSERT( NS(ManagedBuffer_get_num_objects)( elem_by_elem_buf ) >=
-        ( io_particle_blocks_offset + NS(ManagedBuffer_get_num_objects)(
+        ( out_particle_blocks_offset + NS(ManagedBuffer_get_num_objects)(
             belem_buf, slot_size ) ) );
 
     SIXTRL_ASSERT( NS(Particles_managed_buffer_is_particles_buffer)(
@@ -375,11 +375,11 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
     SIXTRL_ASSERT( in_particles != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( in_particles->at_element_id != SIXTRL_NULLPTR );
 
-    io_obj_begin = io_obj_begin + io_particle_blocks_offset;
+    out_obj_begin = out_obj_begin + out_particle_blocks_offset;
 
     for( ; particle_index < num_particles ; particle_index += stride )
     {
-        obj_iter_t       io_obj_it = io_obj_begin;
+        obj_iter_t       out_obj_it = out_obj_begin;
         obj_const_iter_t be_it     = be_begin;
 
         NS(Particles_copy_from_generic_addr_data)(
@@ -391,13 +391,13 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
         index_t const particle_id =
             NS(Particles_get_particle_id_value)( &particles, 0u );
 
-        for( ; be_it != be_end ; ++be_it, ++io_obj_it )
+        for( ; be_it != be_end ; ++be_it, ++out_obj_it )
         {
             ptr_particles_t dump_particles = ( ptr_particles_t
-                )NS(Object_get_begin_ptr)( io_obj_it );
+                )NS(Object_get_begin_ptr)( out_obj_it );
 
             SIXTRL_ASSERT( dump_particles != SIXTRL_NULLPTR );
-            SIXTRL_ASSERT( NS(Object_get_type_id)( io_obj_it ) ==
+            SIXTRL_ASSERT( NS(Object_get_type_id)( out_obj_it ) ==
                            NS(OBJECT_TYPE_PARTICLES) );
 
             NS(Particles_copy_to_generic_addr_data)(

@@ -114,7 +114,7 @@ def calcParticlesDifference( lhs, rhs, cbuffer=None ):
     diff = Particles( num_particles=lhs.num_particles, cbuffer=cbuffer )
     keys = [ 'q0', 'mass0', 'beta0', 'gamma0', 'p0c', 's', 'x', 'y', 'px', 'py',
              'zeta', 'psigma', 'delta', 'rpp', 'rvv', 'chi', 'charge_ratio',
-             'particle', 'at_element', 'at_turn', 'state' ]
+             'particle_id', 'at_element', 'at_turn', 'state' ]
 
     for k in keys:
         try:
@@ -165,7 +165,7 @@ def compareParticlesDifference( lhs, rhs, abs_treshold=None ):
                 break
 
         if  cmp_result == 0:
-            int_keys = [ 'particle', 'at_element', 'at_turn', 'state' ]
+            int_keys = [ 'particle_id', 'at_element', 'at_turn', 'state' ]
 
             for k in int_keys:
                 lhs_arg = getattr( lhs, k )

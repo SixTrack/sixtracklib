@@ -19,8 +19,8 @@ set( SIXTRACKLIB_OPENCL_KERNEL_SOURCES
      kernels/track_particles_debug.cl
      kernels/track_particles_optimized_priv_particles.cl
      kernels/track_particles_optimized_priv_particles_debug.cl
-     kernels/be_monitors_assign_io_buffer.cl
-     kernels/be_monitors_assign_io_buffer_debug.cl
+     kernels/be_monitors_assign_out_buffer.cl
+     kernels/be_monitors_assign_out_buffer_debug.cl
 )
 
 add_library( sixtrack_opencl OBJECT
