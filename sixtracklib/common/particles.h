@@ -187,6 +187,11 @@ NS(Particles_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
 
+SIXTRL_HOST_FN int NS(Particles_get_min_max_particle_id)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    SIXTRL_ARGPTR_DEC NS(particle_num_elements_t)* SIXTRL_RESTRICT ptr_min_id,
+    SIXTRL_ARGPTR_DEC NS(particle_num_elements_t)* SIXTRL_RESTRICT ptr_max_id );
+
 #endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
@@ -995,6 +1000,9 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_particle_id_value)(
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_particle_id)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_index_ptr_t) ptr_to_particle_ids );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_init_particle_ids)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles );
 
 /* ------------------------------------------------------------------------- */
 
@@ -5111,6 +5119,25 @@ SIXTRL_INLINE void NS(Particles_assign_ptr_to_particle_id)(
 {
     SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
     particles->particle_id = ptr_to_particle_ids;
+    return;
+}
+
+SIXTRL_INLINE void NS(Particles_init_particle_ids)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+    typedef NS(particle_index_t)        index_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const num_particles = NS(Particles_get_num_of_particles)( particles );
+
+    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+
+    for( ; ii < num_particles ; ++ii )
+    {
+        NS(Particles_set_particle_id_value)( particles, ii, ( index_t )ii );
+    }
+
     return;
 }
 

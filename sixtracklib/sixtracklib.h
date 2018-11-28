@@ -32,7 +32,7 @@
 #include "sixtracklib/common/be_drift/be_drift.h"
 #include "sixtracklib/common/be_drift/track.h"
 #include "sixtracklib/common/be_monitor/be_monitor.h"
-#include "sixtracklib/common/be_monitor/io_buffer.h"
+#include "sixtracklib/common/be_monitor/output_buffer.h"
 #include "sixtracklib/common/be_monitor/track.h"
 #include "sixtracklib/common/be_multipole/be_multipole.h"
 #include "sixtracklib/common/be_multipole/track.h"

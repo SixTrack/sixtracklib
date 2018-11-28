@@ -8,9 +8,11 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
-#include <iterator>
+#include <cctype>
 #include <fstream>
+#include <iterator>
 #include <iostream>
+#include <locale>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -1842,35 +1844,87 @@ namespace SIXTRL_CXX_NAMESPACE
             (  program_data.m_kernels.empty() ) &&
             ( !program_data.m_compile_options.empty() ) )
         {
+            auto& build_device =
+                this->m_available_devices.at( this->m_selected_node_index );
+
             cl_int ret = cl_program.build( program_data.m_compile_options.c_str() );
 
-            if( ret == CL_SUCCESS )
+            cl_build_status const build_status =
+                cl_program.getBuildInfo< CL_PROGRAM_BUILD_STATUS >( build_device );
+
+            if( ( build_status != CL_BUILD_NONE ) || ( ret == CL_SUCCESS ) )
+            {
+                program_data.m_compile_report =
+                    cl_program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( build_device );
+
+                if( !program_data.m_compile_report.empty() )
+                {
+                    program_data.m_compile_report.erase(
+                        std::find_if(
+                            program_data.m_compile_report.rbegin(),
+                            program_data.m_compile_report.rend(),
+                            []( int ch ){ return !std::isspace( ch ); } ).base(),
+                            program_data.m_compile_report.end() );
+                }
+
+                if( !program_data.m_compile_report.empty() )
+                {
+                    program_data.m_compile_report.erase(
+                        program_data.m_compile_report.begin(),
+                        std::find_if(
+                            program_data.m_compile_report.begin(),
+                            program_data.m_compile_report.end(),
+                            []( int ch ){ return !std::isspace( ch ); } ) );
+                }
+
+                if( ( !program_data.m_compile_report.empty() ) &&
+                    (  program_data.m_compile_report.size() == size_type{ 1 } ) &&
+                    (  program_data.m_compile_report[ 0 ] == '\0' ) )
+                {
+                    program_data.m_compile_report.clear();
+                }
+            }
+
+            if( build_status == CL_BUILD_SUCCESS )
             {
                 success = program_data.m_compiled = true;
             }
-            else
+            else if( build_status == CL_BUILD_ERROR )
             {
                 SIXTRL_ASSERT( this->m_selected_node_index >= 0 );
                 SIXTRL_ASSERT( this->m_available_devices.size() ==
                                this->numAvailableNodes() );
 
-                program_data.m_compile_report = cl_program.getBuildInfo<
-                        CL_PROGRAM_BUILD_LOG >( this->m_available_devices.at(
-                            this->m_selected_node_index ) );
+                program_data.m_compiled = false;
+            }
+            else
+            {
+                SIXTRL_ASSERT( build_status == CL_BUILD_NONE );
+                program_data.m_compiled = false;
+                program_data.m_compile_report.clear();
+            }
 
-                #if !defined( NDEBUG )
+            #if !defined( NDEBUG )
 
-                std::cout << "compile options : "
-                          << program_data.m_compile_options
-                          << std::endl
-                          << "program_name    : "
-                          << program_data.m_file_path
-                          << std::endl
-                          << "error report : "
+            if( ( !program_data.m_compile_report.empty() ) ||
+                ( !program_data.m_compiled ) )
+            #else /* defined( NDEBUG ) */
+
+            if( ( this->debugMode() ) &&
+                ( ( !program_data.m_compile_report.empty() ) ||
+                  ( !program_data.m_compiled ) ) )
+            #endif /* !defined( NDEBUG ) */
+            {
+                std::cout << "program_name    : "
+                          << program_data.m_file_path << "\r\n"
+                          << "compiled        : "
+                          << std::boolalpha   << program_data.m_compiled
+                          << std::noboolalpha << "\r\n"
+                          << "compile options : "
+                          << program_data.m_compile_options << "\r\n"
+                          << "compile report  : " << "\r\n"
                           << program_data.m_compile_report
                           << std::endl;
-
-                #endif /* !defined( NDEBUG ) */
             }
         }
 

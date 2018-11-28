@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_OPENCL_KERNELS_BE_MONITORS_ASSIGN_IO_BUFFER_CL__
-#define SIXTRACKLIB_OPENCL_KERNELS_BE_MONITORS_ASSIGN_IO_BUFFER_CL__
+#ifndef SIXTRACKLIB_OPENCL_KERNELS_BE_MONITORS_ASSIGN_OUT_BUFFER_CL__
+#define SIXTRACKLIB_OPENCL_KERNELS_BE_MONITORS_ASSIGN_OUT_BUFFER_CL__
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/opencl/internal/default_compile_options.h"
@@ -10,33 +10,31 @@
     #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/be_monitor/be_monitor.h"
-    #include "sixtracklib/common/be_monitor/io_buffer.h"
+    #include "sixtracklib/common/be_monitor/output_buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-__kernel void NS(BeamMonitor_assign_io_buffer_from_offset_opencl)(
+__kernel void NS(BeamMonitor_assign_out_buffer_from_offset_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT io_buffer,
-    SIXTRL_UINT64_T const num_particles,
-    SIXTRL_UINT64_T const io_particles_block_offset );
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
+    SIXTRL_UINT64_T const out_particles_block_offset );
 
 __kernel void NS(BeamMonitor_clear_all_line_obj_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf );
 
 /* ========================================================================= */
 
-__kernel void NS(BeamMonitor_assign_io_buffer_from_offset_opencl)(
+__kernel void NS(BeamMonitor_assign_out_buffer_from_offset_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT io_buffer,
-    SIXTRL_UINT64_T const num_particles,
-    SIXTRL_UINT64_T const io_particles_block_offset )
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
+    SIXTRL_UINT64_T const out_particles_block_offset )
 {
     typedef NS(buffer_size_t) buf_size_t;
 
-    size_t const global_id               = get_global_id( 0 );
-    size_t const global_size             = get_global_size( 0 );
-    size_t const gid_to_assign_io_buffer = ( size_t )0u;
+    size_t const global_id   = get_global_id( 0 );
+    size_t const global_size = get_global_size( 0 );
+    size_t const gid_to_assign_out_buffer = ( size_t )0u;
 
-    if( global_id == gid_to_assign_io_buffer )
+    if( global_id == gid_to_assign_out_buffer )
     {
         buf_size_t const slot_size = ( buf_size_t )8u;
 
@@ -44,11 +42,10 @@ __kernel void NS(BeamMonitor_assign_io_buffer_from_offset_opencl)(
             beam_elements_buf, slot_size ) );
 
         SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)(
-            io_buffer, slot_size ) );
+            out_buffer, slot_size ) );
 
-        NS(BeamMonitor_assign_managed_io_buffer)(
-            beam_elements_buf, io_buffer, num_particles,
-                io_particles_block_offset, slot_size );
+        NS(BeamMonitor_assign_managed_particles_out_buffer)(
+            beam_elements_buf, out_buffer, out_particles_block_offset, slot_size );
     }
 
     return;
@@ -100,6 +97,6 @@ __kernel void NS(BeamMonitor_clear_all_line_obj_opencl)(
     return;
 }
 
-#endif /* SIXTRACKLIB_OPENCL_KERNELS_BE_MONITORS_ASSIGN_IO_BUFFER_CL__ */
+#endif /* SIXTRACKLIB_OPENCL_KERNELS_BE_MONITORS_ASSIGN_OUT_BUFFER_CL__ */
 
-/* end: sixtracklib/opencl/kernels/be_monitors_assign_io_buffer.cl */
+/* end: sixtracklib/opencl/kernels/be_monitors_assign_out_buffer.cl */
