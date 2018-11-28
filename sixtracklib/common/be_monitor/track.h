@@ -50,7 +50,6 @@ NS(BeamMonitor_get_store_particle_index)(
     NS(particle_index_t)  const in_particle_id )
 {
     typedef NS(be_monitor_turn_t)       nturn_t;
-    typedef NS(be_monitor_index_t)      index_t;
     typedef NS(particle_num_elements_t) num_elements_t;
 
     SIXTRL_STATIC_VAR nturn_t const ZERO_TURNS = ( nturn_t )0u;
@@ -66,10 +65,10 @@ NS(BeamMonitor_get_store_particle_index)(
     SIXTRL_ASSERT( num_stores > ZERO_TURNS );
     SIXTRL_ASSERT( skip >= ( nturn_t )1u );
 
-    SIXTRL_ASSERT( in_particle_id >= ( index_t
+    SIXTRL_ASSERT( in_particle_id >= ( NS(be_monitor_index_t)
         )NS(BeamMonitor_get_min_particle_id)( monitor ) );
 
-    SIXTRL_ASSERT( in_particle_id <= ( index_t
+    SIXTRL_ASSERT( in_particle_id <= ( NS(be_monitor_index_t)
         )NS(BeamMonitor_get_max_particle_id)( monitor ) );
 
     turns_since_start = at_turn_number - monitor_start;
