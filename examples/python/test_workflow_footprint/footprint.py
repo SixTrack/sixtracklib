@@ -11,7 +11,7 @@ def initial_xy_cartesian(x_min, x_max, x_N, y_min, y_max, y_N):
     return np.array([[(x,y) for x in np.linspace(x_min,x_max,x_N)] for y in np.linspace(y_min,y_max,y_N)])
 
 
-def draw_footprint(A, axis_object=None, figure_object=None, axis=0):
+def draw_footprint(A, axis_object=None, figure_object=None, axis=0, linewidth=4):
     '''
     Input A should be a 3-D numpy array with shape (Nx,Ny,2)
     representing a 2-D array of (x,y) points. This function
@@ -43,7 +43,7 @@ def draw_footprint(A, axis_object=None, figure_object=None, axis=0):
     patch_colors[(sx-1)*sy:] = [(0,1,0)]*sy
     patch_colors[(sy-1)::sy] = [(0,0,1)]*sx
 
-    p_collection = matplotlib.collections.PatchCollection(patches,facecolors=[],linewidth=4,edgecolor=patch_colors)
+    p_collection = matplotlib.collections.PatchCollection(patches,facecolors=[],linewidth=linewidth,edgecolor=patch_colors)
 
     if axis_object is None:
         if figure_object:
