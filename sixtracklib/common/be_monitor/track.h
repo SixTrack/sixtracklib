@@ -139,12 +139,6 @@ SIXTRL_INLINE int NS(Track_particle_beam_monitor)(
     SIXTRL_ASSERT( NS(BeamMonitor_get_min_particle_id)( monitor ) <=
                    NS(BeamMonitor_get_max_particle_id)( monitor ) );
 
-    SIXTRL_ASSERT( NS(Particles_get_particle_id_value)( in_particles, idx ) >=
-                   NS(BeamMonitor_get_min_particle_id)( monitor ) );
-
-    SIXTRL_ASSERT( NS(Particles_get_particle_id_value)( in_particles, idx ) <=
-                   NS(BeamMonitor_get_max_particle_id)( monitor ) );
-
     SIXTRL_ASSERT( NS(Particles_get_state_value)( in_particles, idx ) ==
                    ( NS(particle_index_t) )1u );
 
