@@ -12,7 +12,7 @@ int main( int argc, char* argv[] )
     st_Buffer* input_pb       = SIXTRL_NULLPTR;
     st_Buffer* track_pb       = SIXTRL_NULLPTR;
     st_Buffer* eb             = SIXTRL_NULLPTR;
-    st_Buffer* io_buffer      = SIXTRL_NULLPTR;
+    st_Buffer* out_buffer     = SIXTRL_NULLPTR;
 
     st_Particles*   particles = SIXTRL_NULLPTR;
 
@@ -176,16 +176,9 @@ int main( int argc, char* argv[] )
             particles = st_Particles_add_copy(
                 track_pb, in_particles );
 
-            int ii = 0;
-
             SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
             SIXTRL_ASSERT( ( int )st_Particles_get_num_of_particles(
                 particles ) == NUM_PARTICLES );
-
-            for( ; ii < NUM_PARTICLES ; ++ii )
-            {
-                st_Particles_set_particle_id_value( particles, ii, ii );
-            }
         }
         else
         {
@@ -197,8 +190,6 @@ int main( int argc, char* argv[] )
                 int const jj = ii % in_num_particles;
                 st_Particles_copy_single( particles, ii,
                                           in_particles, jj );
-
-                st_Particles_set_particle_id_value( particles, ii, ii );
             }
         }
 
@@ -243,13 +234,13 @@ int main( int argc, char* argv[] )
             st_BeamMonitor_set_is_rolling( beam_monitor, true );
         }
 
-        io_buffer = st_Buffer_new( 0u );
+        out_buffer = st_Buffer_new( 0u );
 
-        st_BeamMonitor_prepare_io_buffer( eb, io_buffer,
-            NUM_PARTICLES, NUM_TURNS_IO_ELEM_BY_ELEM );
+        st_BeamMonitor_prepare_particles_out_buffer( eb, out_buffer,
+            particles, NUM_TURNS_IO_ELEM_BY_ELEM );
 
-        st_BeamMonitor_assign_io_buffer( eb, io_buffer,
-            NUM_PARTICLES, NUM_TURNS_IO_ELEM_BY_ELEM );
+        st_BeamMonitor_assign_particles_out_buffer( eb, out_buffer,
+            NUM_TURNS_IO_ELEM_BY_ELEM );
     }
 
     /* ********************************************************************* */
@@ -266,118 +257,26 @@ int main( int argc, char* argv[] )
         for( ; ii < NUM_TURNS_IO_ELEM_BY_ELEM ; ++ii )
         {
             st_Track_all_particles_element_by_element(
-                particles, 0u, eb, io_buffer, ii * NUM_BEAM_ELEMENTS );
+                particles, 0u, eb, out_buffer, ii * NUM_BEAM_ELEMENTS );
 
             st_Track_all_particles_increment_at_turn(
                 particles, 0u );
         }
 
+        double start_tracking_time = st_Time_get_seconds_since_epoch();
+
         st_Track_all_particles_until_turn( particles, eb, NUM_TURNS );
 
-        st_Particles_add_copy( io_buffer, particles );
+      	double end_tracking_time = st_Time_get_seconds_since_epoch();
 
-        //st_Buffer_write_to_file( track_pb, path_output_particles );
-        st_Buffer_write_to_file( io_buffer, path_output_particles );
+        printf( "time / particle / turn: %.3e\r\n"
+                "time total            : %.3e\r\n",
+                ( end_tracking_time - start_tracking_time ) / ( double )( NUM_TURNS * NUM_PARTICLES ),
+                ( end_tracking_time - start_tracking_time ) );
+
+        st_Particles_add_copy( out_buffer, particles );
+        st_Buffer_write_to_file( out_buffer, path_output_particles );
     }
-
-    /* ********************************************************************* */
-    /* ****            SEQUENTIALLY PRINT ALL PARTICLES              ******* */
-    /* ********************************************************************* */
-
-    /*
-    if( st_Buffer_get_num_of_objects( io_buffer ) ==
-        ( ( NUM_TURNS_IO_ELEM_BY_ELEM * st_Buffer_get_num_of_objects( eb ) ) +
-          ( NUM_TURNS_IO_TURN_BY_TURN ) +
-          ( ( NUM_TURNS - (
-            NUM_TURNS_IO_ELEM_BY_ELEM + NUM_TURNS_IO_TURN_BY_TURN ) )
-            / NUM_IO_SKIP ) + 1 ) )
-    {
-        int ii = 0;
-        printf( "Sequentially print out particles stored in io buffer: \r\n" );
-
-        if( NUM_TURNS_IO_ELEM_BY_ELEM > 0 )
-        {
-            int jj = 0;
-            int const NUM_BEAM_ELEMENTS = st_Buffer_get_num_of_objects( eb );
-            st_Object const* eb_begin = st_Buffer_get_const_objects_begin( eb );
-            st_Object const* eb_end   = st_Buffer_get_const_objects_end( eb );
-
-            printf( "----------------------------------------------------------"
-                    "----------------------------------------------------\r\n" );
-            printf( " - %3d turns element - by element (%6d elements per line)\r\n",
-                    NUM_TURNS_IO_ELEM_BY_ELEM, NUM_BEAM_ELEMENTS );
-
-            for( ; jj < NUM_TURNS_IO_ELEM_BY_ELEM ; ++jj )
-            {
-                int kk = 0;
-                st_Object const* eb_it = eb_begin;
-
-                for( ; eb_it != eb_end ; ++eb_it, ++ii, ++kk )
-                {
-                    st_Particles const* io_particles =
-                        st_Particles_buffer_get_const_particles( io_buffer, ii );
-
-                    printf( "io particles | at turn = %6d | "
-                            "beam_element_id = %6d | "
-                            "object_type_id = %2d ::\n",
-                            jj, kk, ( int )st_Object_get_type_id( eb_it ) );
-
-                    st_Particles_print_out( io_particles );
-                    printf( "\r\n" );
-                }
-            }
-        }
-
-        if( NUM_TURNS_IO_TURN_BY_TURN > 0 )
-        {
-            printf( "----------------------------------------------------------"
-                    "----------------------------------------------------\r\n" );
-            printf( " - %3d turns every turn \r\n", NUM_TURNS_IO_TURN_BY_TURN );
-
-            int jj = 0;
-            for( ; jj < NUM_TURNS_IO_TURN_BY_TURN ; ++jj, ++ii )
-            {
-                st_Particles const* io_particles =
-                    st_Particles_buffer_get_const_particles( io_buffer, ii );
-
-                printf( "io particles | at turn = %6d ::\n",
-                        jj + NUM_TURNS_IO_ELEM_BY_ELEM );
-
-                st_Particles_print_out( io_particles );
-                printf( "\r\n" );
-            }
-        }
-
-        if( NUM_TURNS > ( NUM_TURNS_IO_ELEM_BY_ELEM + NUM_TURNS_IO_TURN_BY_TURN ) )
-        {
-            int const remaining_turns = NUM_TURNS -
-                ( NUM_TURNS_IO_ELEM_BY_ELEM + NUM_TURNS_IO_TURN_BY_TURN );
-
-            printf( "----------------------------------------------------------"
-                    "----------------------------------------------------\r\n" );
-            printf( " - %3d remaining turns, dump every %3d th turn \r\n",
-                    remaining_turns, NUM_IO_SKIP );
-
-            int jj = NUM_TURNS_IO_ELEM_BY_ELEM + NUM_TURNS_IO_TURN_BY_TURN;
-            for( ; jj < NUM_TURNS ; jj += NUM_IO_SKIP, ++ii )
-            {
-                st_Particles const* io_particles =
-                    st_Particles_buffer_get_const_particles( io_buffer, ii );
-
-                printf( "io particles | at turn = %6d ::\n", jj );
-
-                st_Particles_print_out( io_particles );
-                printf( "\r\n" );
-            }
-        }
-
-         printf( "Print final particle state after tracking %6d turns: \r\n",
-                 NUM_TURNS );
-
-         st_Particles_print_out( st_Particles_buffer_get_const_particles(
-             io_buffer, ii ) );
-    }
-    */
 
     /* ********************************************************************* */
     /* ********                       CLEANUP                        ******* */
@@ -385,11 +284,11 @@ int main( int argc, char* argv[] )
 
     st_Buffer_delete( eb );
     st_Buffer_delete( track_pb );
-    st_Buffer_delete( io_buffer );
+    st_Buffer_delete( out_buffer );
 
     free( path_output_particles );
 
     return 0;
 }
 
-/* end: examples/c99/track_io.c */
+/* end: examples/c99/track_out.c */

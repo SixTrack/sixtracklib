@@ -1099,34 +1099,28 @@ SIXTRL_INLINE int NS(Track_all_particles_append_element_by_element)(
 
     for( ; obj_it != obj_end ; ++obj_it, ++beam_element_id )
     {
+        num_elements_t const NUM_PARTICLES =
+            NS(Particles_get_num_of_particles)( particles );
+
+        num_elements_t ii = ( num_elements_t )0u;
+
+        for( ; ii < NUM_PARTICLES ; ++ii )
+        {
+            if( NS(Particles_get_state_value)( particles, ii ) == ( index_t )1 )
+            {
+                NS(Particles_set_at_element_id_value)(
+                    particles, ii, beam_element_id );
+            }
+        }
+
         NS(Particles)* elem_by_elem_dump = NS(Particles_add_copy)(
                 io_particle_buffer, particles );
 
-        if( elem_by_elem_dump != SIXTRL_NULLPTR )
-        {
-            num_elements_t const NUM_PARTICLES =
-                NS(Particles_get_num_of_particles)( particles );
-
-            num_elements_t ii = ( num_elements_t )0u;
-
-            for( ; ii < NUM_PARTICLES ; ++ii )
-            {
-                if( NS(Particles_get_state_value)( particles, ii ) == ( index_t )1 )
-                {
-                    NS(Particles_set_at_element_id_value)(
-                        particles, ii, beam_element_id );
-                }
-            }
-        }
-        else
+        if( ( elem_by_elem_dump == SIXTRL_NULLPTR ) ||
+            ( 0 != NS(Track_all_particles_beam_element_obj)(
+                particles, beam_element_id, obj_it ) ) )
         {
             ret = -1;
-            break;
-        }
-
-        if( 0 != NS(Track_all_particles_beam_element_obj)(
-                particles, beam_element_id, obj_it ) )
-        {
             break;
         }
     }

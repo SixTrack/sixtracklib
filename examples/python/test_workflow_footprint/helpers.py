@@ -204,8 +204,8 @@ def track_particle_pysixtrack(line, part, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
 def track_particle_sixtracklib(
                             line, partCO, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
                             Dy_wrt_CO_m, Dpy_wrt_CO_rad,
-                            Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns
-                            ):
+                            Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns,
+                            device_opencl=None):
 
 
     Dx_wrt_CO_m, Dpx_wrt_CO_rad,\
@@ -246,8 +246,14 @@ def track_particle_sixtracklib(
         p.fromPySixTrack(part, i_part)
 
     ps.tofile('particles.buffer')
+    if device_opencl is None:
+       command = '../../../build/examples/c99/track_io_c99 particles.buffer elements.buffer %d 0 %d 0'%(n_turns, n_turns)
+    else:
+       command = '../../../build/examples/c99/track_io_opencl_c99 %s particles.buffer elements.buffer %d 0 %d 0'%(device_opencl, n_turns, n_turns)
+    print("Start tracking using:")
+    print(command)
 
-    os.system('../../../build/examples/c99/track_io_c99 particles.buffer elements.buffer %d 0 %d 0'%(n_turns, n_turns))
+    os.system(command)
 
     print("Done tracking. Loading data")
     # res = pysixtracklib.ParticlesSet.fromfile('particles.buffer')
