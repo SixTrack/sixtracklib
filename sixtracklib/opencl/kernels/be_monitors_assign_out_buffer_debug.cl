@@ -54,6 +54,19 @@ __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_debug_opencl)(
                 beam_elements_buf, out_buffer, out_particles_block_offset, slot_size );
         }
     }
+    else if( NS(ManagedBuffer_needs_remapping)( beam_elements_buf, slot_size ) )
+    {
+        success_flag = ( SIXTRL_INT32_T )-2;
+    }
+    else if( NS(ManagedBuffer_needs_remapping)( out_buffer, slot_size ) )
+    {
+        success_flag = ( SIXTRL_INT32_T )-4;
+    }
+    else if( NS(ManagedBuffer_get_num_objects)( out_buffer, slot_size ) >=
+            out_particles_block_offset )
+    {
+        success_flag = ( SIXTRL_INT32_T )-8;
+    }
 
     if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )
     {
@@ -113,13 +126,27 @@ __kernel void NS(BeamMonitor_clear_all_line_obj_debug_opencl)(
                 }
                 else
                 {
-                    success_flag = -1;
+                    success_flag = -2;
                 }
             }
         }
     }
+    else if( NS(ManagedBuffer_needs_remapping)( beam_elements_buf, slot_size ) )
+    {
+        success_flag = -4;
+    }
+    else if( NS(ManagedBuffer_get_objects_index_begin)(
+                beam_elements_buf, slot_size ) != SIXTRL_NULLPTR )
+    {
+        success_flag = -8;
+    }
+    else if( NS(ManagedBuffer_get_num_objects)( beam_elements_buf, slot_size ) >
+            ( buf_size_t )0u )
+    {
+        success_flag = -16;
+    }
 
-    if( ( success_flag != ( SIXTRL_INT32_T )0 ) &&
+    if( ( success_flag     != ( SIXTRL_INT32_T )0 ) &&
         ( ptr_success_flag != SIXTRL_NULLPTR ) )
     {
         atomic_or( ptr_success_flag, success_flag );

@@ -89,6 +89,19 @@ __kernel void NS(Track_particles_single_turn_debug_opencl)(
                 particles, particle_id, 0u );
         }
     }
+    else if( NS(ManagedBuffer_needs_remapping)( particles_buf, slot_size) )
+    {
+        success_flag |= ( SIXTRL_INT32_T )-2;
+    }
+    else if( NS(ManagedBuffer_get_num_objects)(
+                particles_buf, slot_size ) != ( buf_size_t )1u )
+    {
+        success_flag |= ( SIXTRL_INT32_T )-4;
+    }
+    else if( NS(ManagedBuffer_needs_remapping)( belem_buf, slot_size ) )
+    {
+        success_flag |= ( SIXTRL_INT32_T )-8;
+    }
 
     if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )
     {
@@ -152,6 +165,19 @@ __kernel void NS(Track_particles_until_turn_debug_opencl)(
             success_flag |= NS(Track_particle_until_turn_obj)(
                 particles, particle_id, be_begin, be_end, turn );
         }
+    }
+    else if( NS(ManagedBuffer_needs_remapping)( particles_buf, slot_size) )
+    {
+        success_flag |= ( SIXTRL_INT32_T )-2;
+    }
+    else if( NS(ManagedBuffer_get_num_objects)(
+                particles_buf, slot_size ) != ( buf_size_t )1u )
+    {
+        success_flag |= ( SIXTRL_INT32_T )-4;
+    }
+    else if( NS(ManagedBuffer_needs_remapping)( belem_buf, slot_size ) )
+    {
+        success_flag |= ( SIXTRL_INT32_T )-8;
     }
 
     if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )
@@ -265,6 +291,29 @@ __kernel void NS(Track_particles_elem_by_elem_debug_opencl)(
                 }
             }
         }
+    }
+    else if( NS(ManagedBuffer_needs_remapping)( particles_buf, slot_size) )
+    {
+        success_flag |= ( SIXTRL_INT32_T )-2;
+    }
+    else if( NS(ManagedBuffer_get_num_objects)(
+                particles_buf, slot_size ) != ( buf_size_t )1u )
+    {
+        success_flag |= ( SIXTRL_INT32_T )-4;
+    }
+    else if( NS(ManagedBuffer_needs_remapping)( belem_buf, slot_size ) )
+    {
+        success_flag |= ( SIXTRL_INT32_T )-8;
+    }
+    else if( NS(ManagedBuffer_needs_remapping)( elem_by_elem_buf, slot_size ) )
+    {
+        success_flag |= ( SIXTRL_INT32_T )-16;
+    }
+    else if( ( NS(ManagedBuffer_get_num_objects)( belem_buf, slot_size ) +
+        out_particle_blocks_offset ) > NS(ManagedBuffer_get_num_objects)(
+                elem_by_elem_buf, slot_size ) )
+    {
+        success_flag |= ( SIXTRL_INT32_T )-32;
     }
 
     if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )
