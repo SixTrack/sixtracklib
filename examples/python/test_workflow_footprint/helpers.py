@@ -259,26 +259,14 @@ def track_particle_sixtracklib(
     # res = pysixtracklib.ParticlesSet.fromfile('particles.buffer')
     res = pysixtracklib.ParticlesSet.fromfile('output_particles.bin')
 
-    x_tbt = []
-    px_tbt = []
-    y_tbt = []
-    py_tbt = []
-    sigma_tbt = []
-    delta_tbt = []
-    for i_turn in range(n_turns):
-        x_tbt.append(res.particles[i_turn].x.copy())
-        px_tbt.append(res.particles[i_turn].px.copy())
-        y_tbt.append(res.particles[i_turn].y.copy())
-        py_tbt.append(res.particles[i_turn].py.copy())
-        sigma_tbt.append(res.particles[i_turn].sigma.copy())
-        delta_tbt.append(res.particles[i_turn].delta.copy())
-
-    x_tbt = np.array(x_tbt)
-    px_tbt = np.array(px_tbt)
-    y_tbt = np.array(y_tbt)
-    py_tbt = np.array(py_tbt)
-    sigma_tbt = np.array(sigma_tbt)
-    delta_tbt = np.array(delta_tbt)
+    x_tbt = res.particles[0].x.reshape(n_turns, n_part)
+    px_tbt = res.particles[0].px.reshape(n_turns, n_part)
+    y_tbt = res.particles[0].y.reshape(n_turns, n_part)
+    py_tbt = res.particles[0].py.reshape(n_turns, n_part)
+    sigma_tbt = res.particles[0].sigma.reshape(n_turns, n_part)
+    delta_tbt = res.particles[0].delta.reshape(n_turns, n_part)
+   
+    print('Done loading!')
 
     return x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt
 
