@@ -279,20 +279,12 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_particles_out_buffer)(
     buf_size_t out_particles_block_offset = ( buf_size_t )0u;
     SIXTRL_ASSERT( slot_size == NS(Buffer_get_slot_size)( out_buffer ) );
 
-    if( num_elem_by_elem_turns > ( buf_size_t )0u )
-    {
-        buf_size_t const num_elem_by_elem_blocks =
-            NS(BeamMonitor_get_num_elem_by_elem_objects_from_managed_buffer)(
+    if( ( num_elem_by_elem_turns > ( buf_size_t )0u ) &&
+        (  NS(BeamMonitor_get_num_elem_by_elem_objects_from_managed_buffer)(
                 NS(Buffer_get_const_data_begin)( beam_elements_buffer ),
-                    slot_size );
-
-        buf_size_t const requ_num_elem_by_elem_blocks =
-            num_elem_by_elem_turns * num_elem_by_elem_blocks;
-
-        if( requ_num_elem_by_elem_blocks <= max_num_available_out_blocks )
-        {
-            out_particles_block_offset = requ_num_elem_by_elem_blocks;
-        }
+                    slot_size ) > ( buf_size_t )0u ) )
+    {
+        out_particles_block_offset = ( buf_size_t )1u;
     }
 
     return NS(BeamMonitor_assign_managed_particles_out_buffer)(
@@ -500,7 +492,7 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_managed_particles_out_buffer)(
 
                 buf_size_t const stored_particles_per_turn =
                     ( max_particle_id >= min_particle_id )
-                        ? ( buf_size_t )( max_particle_id - min_particle_id )
+                        ? ( buf_size_t )( max_particle_id - min_particle_id  + 1u )
                         : ZERO;
 
                 if( ( nn > 0 ) && ( stored_particles_per_turn > ZERO ) &&

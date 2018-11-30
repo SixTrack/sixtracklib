@@ -1044,6 +1044,12 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_range_at_element_id_value)(
     NS(particle_num_elements_t) const end_index,
     NS(particle_index_t) const at_element_id_value );
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_increment_at_element_id_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
