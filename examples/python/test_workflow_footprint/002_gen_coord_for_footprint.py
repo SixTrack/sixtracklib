@@ -8,7 +8,7 @@ import footprint
 
 epsn_x = 3.5e-6
 epsn_y = 3.5e-6
-r_max_sigma = 5.
+r_max_sigma = 6.
 N_r_footp = 10.
 N_theta_footp = 10.
 n_turns_beta = 150
