@@ -265,7 +265,7 @@ def track_particle_sixtracklib(
     py_tbt = res.particles[0].py.reshape(n_turns, n_part)
     sigma_tbt = res.particles[0].sigma.reshape(n_turns, n_part)
     delta_tbt = res.particles[0].delta.reshape(n_turns, n_part)
-   
+
     print('Done loading!')
 
     return x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt
