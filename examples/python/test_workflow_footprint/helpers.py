@@ -266,6 +266,20 @@ def track_particle_sixtracklib(
     sigma_tbt = res.particles[0].sigma.reshape(n_turns, n_part)
     delta_tbt = res.particles[0].delta.reshape(n_turns, n_part)
 
+    # For now data are saved at the end of the turn by STlib and at the beginning by the others
+    x_tbt[1:, :] = x_tbt[:-1, :]
+    px_tbt[1:, :] = px_tbt[:-1, :]
+    y_tbt[1:, :] = y_tbt[:-1, :]
+    py_tbt[1:, :] = py_tbt[:-1, :]
+    sigma_tbt[1:, :] = sigma_tbt[:-1, :]
+    delta_tbt[1:, :] = delta_tbt[:-1, :]
+    x_tbt[0, :] = p.x
+    px_tbt[0, :] = p.px
+    y_tbt[0, :] = p.y
+    py_tbt[0, :] = p.py
+    sigma_tbt[0, :] = p.sigma
+    delta_tbt[0, :] = p.delta
+
     print('Done loading!')
 
     return x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt
