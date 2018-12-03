@@ -64,7 +64,9 @@ TEST( C99_CommonParticlesAperatureTests,
 
     for( ::st_buffer_size_t ii = ::st_buffer_size_t{ 0 } ; ii < NUM_DRIFTS ; ++ii )
     {
-        int ret = ::st_Track_all_particles_beam_element( particles, eb, ii );
+        int ret = ::st_Track_all_particles_beam_element_obj(
+            particles, ::st_Buffer_get_const_object( eb, ii ) );
+
         ASSERT_TRUE( ret == 0 );
 
         for( ::st_buffer_size_t jj = ::st_buffer_size_t{ 0 } ; jj < NUM_PARTICLES ; ++jj )
@@ -145,7 +147,9 @@ TEST( C99_CommonParticlesAperatureTests,
 
     for( ::st_buffer_size_t ii = ::st_buffer_size_t{ 0 } ; ii < NUM_DRIFTS ; ++ii )
     {
-        int ret = ::st_Track_all_particles_beam_element( particles, eb, ii );
+        int ret = ::st_Track_all_particles_beam_element_obj(
+            particles, ::st_Buffer_get_const_object( eb, ii ) );
+
         ASSERT_TRUE( ret == 0 );
 
         for( ::st_buffer_size_t jj = ::st_buffer_size_t{ 0 } ; jj < NUM_PARTICLES ; ++jj )
