@@ -272,10 +272,6 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_particles_out_buffer)(
     buf_size_t const slot_size = NS(Buffer_get_slot_size)(
         beam_elements_buffer );
 
-    buf_size_t const max_num_available_out_blocks =
-        NS(Particles_managed_buffer_get_num_of_particle_blocks)(
-            NS(Buffer_get_const_data_begin)( out_buffer ), slot_size );
-
     buf_size_t out_particles_block_offset = ( buf_size_t )0u;
     SIXTRL_ASSERT( slot_size == NS(Buffer_get_slot_size)( out_buffer ) );
 

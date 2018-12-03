@@ -15,6 +15,18 @@ class DriftExact(CObject):
     length = CField(0, 'real', default=0.0, alignment=8)
 
 
+class BeamMonitor(CObject):
+    _typeid = 10
+    num_stores      = CField( 0, 'int64',  default=0, alignment=8 )
+    start           = CField( 1, 'int64',  default=0, alignment=8 )
+    skip            = CField( 2, 'int64',  default=1, alignment=8 )
+    out_address     = CField( 3, 'uint64', default=0, alignment=8 )
+    max_particle_id = CField( 4, 'int64',  default=0, alignment=8 )
+    min_particle_id = CField( 5, 'int64',  default=0, alignment=8 )
+    is_rolling      = CField( 6, 'int64',  default=0, alignment=8 )
+    is_turn_ordered = CField( 7, 'int64',  default=1, alignment=8 )
+
+
 class Multipole(CObject):
     _typeid = 4
     order = CField(0, 'int64',   default=0,    alignment=8)
@@ -149,7 +161,7 @@ class Elements(object):
                      'BeamBeam6D': BeamBeam6D,
                      'BeamBeam4D': BeamBeam4D,
                      #                     'Line': Line,
-                     #                     'Monitor': Monitor,
+                     #                     'Monitor': BeamMonitor,
                      }
 
     def _mk_fun(self, buff, cls):
