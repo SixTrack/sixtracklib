@@ -205,6 +205,12 @@ SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new)(
 SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_from_file)(
     SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
 
+SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_on_memory)(
+    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT data_buffer_begin,
+    NS(buffer_size_t) const buffer_capacity );
+
+
 SIXTRL_HOST_FN bool NS(Buffer_read_from_file)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
