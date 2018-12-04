@@ -14,6 +14,14 @@ set( SIXTRACKLIB_OPENCL_SOURCES
      internal/context.cpp
 )
 
+set( SIXTRACKLIB_OPENCL_C99_HEADERS
+     track.h
+)
+
+set( SIXTRACKLIB_OPENCL_C99_SOURCES
+     internal/track.c
+)
+
 set( SIXTRACKLIB_OPENCL_KERNEL_SOURCES
      kernels/track_particles.cl
      kernels/track_particles_debug.cl
@@ -43,11 +51,32 @@ target_compile_definitions( sixtrack_opencl PUBLIC
 target_compile_options( sixtrack_opencl BEFORE PUBLIC
         ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic -ansi )
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+add_library(
+    sixtrack_opencl_c99 OBJECT
+    ${SIXTRACKLIB_OPENCL_C99_HEADERS}
+    ${SIXTRACKLIB_OPENCL_C99_SOURCES}
+)
+
+target_include_directories( sixtrack_opencl_c99 PUBLIC
+    ${CMAKE_SOURCE_DIR}
+    ${SIXTRACKL_OPENCL_INCLUDE_DIR} )
+
+set_target_properties( sixtrack_opencl_c99 PROPERTIES LINKER_LANGUAGE C )
+set_target_properties( sixtrack_opencl_c99 PROPERTIES POSITION_INDEPENDENT_CODE True )
+set_target_properties( sixtrack_opencl_c99 PROPERTIES C_STANDARD 99 )
+set_target_properties( sixtrack_opencl_c99 PROPERTIES C_STANDARD_REQUIRED ON   )
+
+target_compile_options( sixtrack_opencl_c99 BEFORE PUBLIC
+        ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic -ansi )
+
 # ------------------------------------------------------------------------------
 # pass on sixtrack_opencl as a module for sixtracklib:
 
 set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-     $<TARGET_OBJECTS:sixtrack_opencl> CACHE INTERNAL "" FORCE )
+     $<TARGET_OBJECTS:sixtrack_opencl>
+     $<TARGET_OBJECTS:sixtrack_opencl_c99> CACHE INTERNAL "" FORCE )
 
 set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES}
      ${SIXTRACKL_OPENCL_LIBRARY} CACHE INTERNAL "" FORCE )
@@ -65,5 +94,8 @@ install( FILES ${SIXTRACKLIB_OPENCL_INTERNAL_HEADERS}
 
 install( FILES ${SIXTRACKLIB_OPENCL_KERNEL_SOURCES}
          DESTINATION "${SIXTRACKLIB_OPENCL_INSTALL_PATH}/kernels" )
+
+install( FILES ${SIXTRACKLIB_OPENCL_C99_HEADERS}
+         DESTINATION ${SIXTRACKLIB_OPENCL_INSTALL_PATH} )
 
 # end: sixtracklib/opencl/CMakeLists.txt

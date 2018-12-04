@@ -42,26 +42,26 @@ int NS(BeamMonitor_prepare_particles_out_buffer)(
     typedef NS(be_monitor_turn_t)                    nturn_t;
     typedef NS(particle_index_t)                     index_t;
 
+    SIXTRL_STATIC_VAR buf_size_t const ZERO       = ( buf_size_t )0u;
+    SIXTRL_STATIC_VAR index_t    const ZERO_INDEX = ( index_t )0u;
+
     buf_size_t const num_beam_elements =
         NS(Buffer_get_num_of_objects)( belements );
 
-    index_t max_particle_id = ( index_t )0u;
-    index_t min_particle_id = ( index_t )0u;
+    index_t max_particle_id = ZERO_INDEX;
+    index_t min_particle_id = ZERO_INDEX;
 
     int success = NS(Particles_get_min_max_particle_id)(
         particles, &min_particle_id, &max_particle_id );
 
-    if( ( success == 0 ) && ( min_particle_id > ( index_t )0u ) )
+    if( ( success == 0 ) && ( min_particle_id > ZERO_INDEX ) )
     {
-        min_particle_id = ( index_t )0u;
+        min_particle_id = ZERO_INDEX;
     }
-
-    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
 
     if( ( out_buffer != SIXTRL_NULLPTR ) && ( belements != SIXTRL_NULLPTR ) &&
         ( success == 0 ) && ( max_particle_id >= min_particle_id ) &&
-        ( min_particle_id >= ( index_t )0u ) &&
-        ( num_beam_elements > ZERO ) )
+        ( min_particle_id >= ZERO_INDEX ) && ( num_beam_elements > ZERO ) )
     {
         buf_size_t const stored_num_particles =
             NS(Particles_get_num_of_particles)( particles );
@@ -73,6 +73,8 @@ int NS(BeamMonitor_prepare_particles_out_buffer)(
         buf_size_t const num_particles =
             ( stored_num_particles < requ_num_particles )
                 ? requ_num_particles : stored_num_particles;
+
+        buf_size_t total_num_elem_by_elem_objects = ZERO;
 
         buf_size_t num_slots               = ZERO;
         buf_size_t num_objects             = ZERO;
@@ -102,10 +104,9 @@ int NS(BeamMonitor_prepare_particles_out_buffer)(
                     : ( nturn_t )0u;
 
                 buf_size_t const num_particles_to_store = ( num_stores > 0 )
-                    ? num_particles * ( ( buf_size_t )num_stores )
-                    : ( buf_size_t )0u;
+                    ? num_particles * ( ( buf_size_t )num_stores ) : ZERO;
 
-                if( num_particles_to_store > ( buf_size_t )0u )
+                if( num_particles_to_store > ZERO )
                 {
                     SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
 
@@ -132,21 +133,21 @@ int NS(BeamMonitor_prepare_particles_out_buffer)(
             }
         }
 
-        if( ( num_elem_by_elem_turns  > ( buf_size_t )0u ) &&
-            ( num_elem_by_elem_blocks > ( buf_size_t )0u ) )
+        if( ( num_elem_by_elem_turns > ZERO ) && ( num_elem_by_elem_blocks > ZERO ) )
         {
-            buf_size_t const elem_by_elem_objects =
-                num_elem_by_elem_turns * num_elem_by_elem_blocks;
+            buf_size_t num_particles_to_store =
+                num_elem_by_elem_blocks * num_elem_by_elem_turns;
 
-            num_objects  += elem_by_elem_objects;
+            total_num_elem_by_elem_objects = num_particles_to_store;
+            num_particles_to_store *= num_particles;
 
-            num_slots += elem_by_elem_objects *
-                NS(Particles_get_required_num_slots)(
-                    out_buffer, num_particles );
+            ++num_objects;
 
-            num_dataptrs += elem_by_elem_objects *
-                NS(Particles_get_required_num_dataptrs)(
-                    out_buffer, num_particles );
+            num_slots += NS(Particles_get_required_num_slots)(
+                    out_buffer, num_particles_to_store );
+
+            num_dataptrs += NS(Particles_get_required_num_dataptrs)(
+                    out_buffer, num_particles_to_store );
         }
 
         if( ( 0 == NS(Buffer_reset)( out_buffer ) ) &&
@@ -154,33 +155,23 @@ int NS(BeamMonitor_prepare_particles_out_buffer)(
                 num_objects, num_slots, num_dataptrs, ZERO ) ) )
         {
             SIXTRL_ASSERT( NS(Buffer_get_num_of_objects)( out_buffer ) == ZERO );
-            SIXTRL_ASSERT( NS(Buffer_get_num_of_slots)(   out_buffer ) == ZERO );
+            SIXTRL_ASSERT( NS(Buffer_get_num_of_slots)( out_buffer ) == ZERO );
             SIXTRL_ASSERT( NS(Buffer_get_num_of_dataptrs )( out_buffer ) == ZERO );
 
             success = 0;
 
-            if( ( num_elem_by_elem_turns  > ( buf_size_t )0u ) &&
-                ( num_elem_by_elem_blocks > ( buf_size_t )0u ) )
+            if( total_num_elem_by_elem_objects > ZERO )
             {
-                buf_size_t const elem_by_elem_objects =
-                    num_elem_by_elem_turns * num_elem_by_elem_blocks;
+                ptr_particles_t elem_by_elem_particles = NS(Particles_new)(
+                    out_buffer, num_particles * total_num_elem_by_elem_objects );
 
-                buf_size_t ii = ZERO;
-
-                for(; ii < elem_by_elem_objects ; ++ii )
+                if( elem_by_elem_particles == SIXTRL_NULLPTR )
                 {
-                    ptr_particles_t particles = NS(Particles_new)(
-                        out_buffer, num_particles );
-
-                    if( particles == SIXTRL_NULLPTR )
-                    {
-                        success = -1;
-                        break;
-                    }
+                    success = -1;
                 }
             }
 
-            if( ( success == 0 ) && ( num_beam_elements > ( buf_size_t )0u ) &&
+            if( ( success == 0 ) && ( num_beam_elements > ZERO ) &&
                 ( last_beam_monitor != be_end ) )
             {
                 buf_size_t num_beam_monitors_prepared = ZERO;

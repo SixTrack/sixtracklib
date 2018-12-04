@@ -249,7 +249,7 @@ namespace sixtrack
                         ::st_Particles_copy( particles, cmp_particles );
 
                         int const ret = ::st_Track_all_particles_beam_element(
-                            particles, ii, beam_elements_buffer, ii );
+                            particles, beam_elements_buffer, ii );
 
                         if( ret != 0 )
                         {

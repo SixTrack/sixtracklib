@@ -34,8 +34,8 @@ typedef struct NS(BeamMonitor)
     NS(be_monitor_turn_t)   start             SIXTRL_ALIGN( 8 );
     NS(be_monitor_turn_t)   skip              SIXTRL_ALIGN( 8 );
     NS(be_monitor_addr_t)   out_address       SIXTRL_ALIGN( 8 );
-    NS(be_monitor_index_t)  min_particle_id   SIXTRL_ALIGN( 8 );
     NS(be_monitor_index_t)  max_particle_id   SIXTRL_ALIGN( 8 );
+    NS(be_monitor_index_t)  min_particle_id   SIXTRL_ALIGN( 8 );
     NS(be_monitor_flag_t)   is_rolling        SIXTRL_ALIGN( 8 );
     NS(be_monitor_flag_t)   is_turn_ordered   SIXTRL_ALIGN( 8 );
 }

@@ -49,7 +49,7 @@ TEST( C99_CommonParticlesAperatureTests,
 
     for( ::st_buffer_size_t ii = ::st_buffer_size_t{ 0 } ; ii < NUM_PARTICLES ; ++ii )
     {
-        ASSERT_TRUE( ::st_Particles_get_state_value( particles, ii ) == 1 );
+        ASSERT_TRUE( ::st_Particles_is_not_lost_value( particles, ii ) );
     }
 
     ::st_Buffer* eb = ::st_Buffer_new( ( ::st_buffer_size_t )( 1u << 20u ) );
@@ -64,13 +64,13 @@ TEST( C99_CommonParticlesAperatureTests,
 
     for( ::st_buffer_size_t ii = ::st_buffer_size_t{ 0 } ; ii < NUM_DRIFTS ; ++ii )
     {
-        int ret = ::st_Track_all_particles_beam_element( particles, ii, eb, ii );
+        int ret = ::st_Track_all_particles_beam_element_obj(
+            particles, ::st_Buffer_get_const_object( eb, ii ) );
+
         ASSERT_TRUE( ret == 0 );
 
         for( ::st_buffer_size_t jj = ::st_buffer_size_t{ 0 } ; jj < NUM_PARTICLES ; ++jj )
         {
-            int const state = ::st_Particles_get_state_value( particles, jj );
-
             #if defined( SIXTRL_ENABLE_APERATURE_CHECK ) && \
                 SIXTRL_ENABLE_APERATURE_CHECK == 1
 
@@ -80,16 +80,16 @@ TEST( C99_CommonParticlesAperatureTests,
             if( ( fabs( x ) > SIXTRL_APERATURE_X_LIMIT ) ||
                 ( fabs( y ) > SIXTRL_APERATURE_Y_LIMIT ) )
             {
-                ASSERT_TRUE( state == 0 );
+                ASSERT_TRUE( ::st_Particles_is_lost_value( particles, jj ) );
             }
             else
             {
-                ASSERT_TRUE( state == 1 );
+                ASSERT_TRUE( ::st_Particles_is_not_lost_value( particles, jj ) );
             }
 
             #else
 
-            ASSERT_TRUE( state == 1 );
+            ASSERT_TRUE( ::st_Particles_is_not_lost_value( particles, jj ) );
 
             #endif /* SIXTRL_ENABLE_APERATURE_CHECK */
         }
@@ -130,7 +130,7 @@ TEST( C99_CommonParticlesAperatureTests,
 
     for( ::st_buffer_size_t ii = ::st_buffer_size_t{ 0 } ; ii < NUM_PARTICLES ; ++ii )
     {
-        ASSERT_TRUE( ::st_Particles_get_state_value( particles, ii ) == 1 );
+        ASSERT_TRUE( ::st_Particles_is_not_lost_value( particles, ii ) );
     }
 
     ::st_Buffer* eb = ::st_Buffer_new( ( ::st_buffer_size_t )( 1u << 20u ) );
@@ -145,13 +145,13 @@ TEST( C99_CommonParticlesAperatureTests,
 
     for( ::st_buffer_size_t ii = ::st_buffer_size_t{ 0 } ; ii < NUM_DRIFTS ; ++ii )
     {
-        int ret = ::st_Track_all_particles_beam_element( particles, ii, eb, ii );
+        int ret = ::st_Track_all_particles_beam_element_obj(
+            particles, ::st_Buffer_get_const_object( eb, ii ) );
+
         ASSERT_TRUE( ret == 0 );
 
         for( ::st_buffer_size_t jj = ::st_buffer_size_t{ 0 } ; jj < NUM_PARTICLES ; ++jj )
         {
-            int const state = ::st_Particles_get_state_value( particles, jj );
-
             #if defined( SIXTRL_ENABLE_APERATURE_CHECK ) && \
                 SIXTRL_ENABLE_APERATURE_CHECK == 1
 
@@ -161,16 +161,16 @@ TEST( C99_CommonParticlesAperatureTests,
             if( ( fabs( x ) > SIXTRL_APERATURE_X_LIMIT ) ||
                 ( fabs( y ) > SIXTRL_APERATURE_Y_LIMIT ) )
             {
-                ASSERT_TRUE( state == 0 );
+                ASSERT_TRUE( ::st_Particles_is_lost_value( particles, jj ) );
             }
             else
             {
-                ASSERT_TRUE( state == 1 );
+                ASSERT_TRUE( ::st_Particles_is_not_lost_value( particles, jj ) );
             }
 
             #else
 
-            ASSERT_TRUE( state == 1 );
+            ASSERT_TRUE( ::st_Particles_is_not_lost_value( particles, jj ) );
 
             #endif /* SIXTRL_ENABLE_APERATURE_CHECK */
         }

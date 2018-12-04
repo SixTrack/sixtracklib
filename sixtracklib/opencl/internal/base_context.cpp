@@ -579,18 +579,27 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_cl_success_flag = cl::Buffer(
                 context, CL_MEM_READ_WRITE, sizeof( int32_t ), nullptr );
 
-            this->m_cl_context = context;
-            this->m_cl_queue   = queue;
+            int32_t init_success_flag = int32_t{ 0 };
 
-            this->m_cl_programs.clear();
-            this->m_cl_kernels.clear();
-            this->m_kernel_data.clear();
+            cl_int cl_ret = queue.enqueueWriteBuffer(
+                this->m_cl_success_flag, true, size_type{ 0 },
+                sizeof( init_success_flag ), &init_success_flag );
 
-            this->m_selected_node_index = index;
+            success = ( cl_ret == CL_SUCCESS );
 
-            success = true;
+            if( success )
+            {
+                this->m_cl_context = context;
+                this->m_cl_queue   = queue;
 
-            if( !this->m_program_data.empty() )
+                this->m_cl_programs.clear();
+                this->m_cl_kernels.clear();
+                this->m_kernel_data.clear();
+
+                this->m_selected_node_index = index;
+            }
+
+            if( ( success ) && ( !this->m_program_data.empty() ) )
             {
                 for( auto& program_data : this->m_program_data )
                 {

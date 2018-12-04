@@ -38,14 +38,15 @@ __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_debug_opencl)(
 
     SIXTRL_INT32_T success_flag = ( SIXTRL_INT32_T )-1;
 
+    size_t const global_id   = get_global_id( 0 );
+    size_t const global_size = get_global_size( 0 );
+
     if( ( !NS(ManagedBuffer_needs_remapping)( beam_elements_buf, slot_size ) ) &&
         ( !NS(ManagedBuffer_needs_remapping)( out_buffer, slot_size ) ) &&
         (  NS(ManagedBuffer_get_num_objects)( out_buffer, slot_size ) >=
             out_particles_block_offset ) )
     {
         size_t const gid_to_assign_out_buffer = ( size_t )0u;
-        size_t const global_id = get_global_id( 0 );
-
         success_flag = ( SIXTRL_INT32_T )0u;
 
         if( global_id == gid_to_assign_out_buffer )

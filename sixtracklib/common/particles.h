@@ -1044,6 +1044,12 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_range_at_element_id_value)(
     NS(particle_num_elements_t) const end_index,
     NS(particle_index_t) const at_element_id_value );
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_increment_at_element_id_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
@@ -1121,6 +1127,16 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_state_value)(
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_state)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_index_ptr_t) ptr_to_states );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC bool NS(Particles_is_lost_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index );
+
+SIXTRL_FN SIXTRL_STATIC bool NS(Particles_is_not_lost_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
@@ -5247,6 +5263,17 @@ SIXTRL_INLINE void NS(Particles_set_range_at_element_id_value)(
     return;
 }
 
+SIXTRL_INLINE void NS(Particles_increment_at_element_id_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii )
+{
+    SIXTRL_ASSERT( ( particles != SIXTRL_NULLPTR ) &&
+                   ( ii < NS(Particles_get_num_of_particles)( particles ) ) );
+
+    ++particles->at_element_id[ ii ];
+    return;
+}
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(particle_index_t) NS(Particles_get_at_turn_value)(
@@ -5457,6 +5484,25 @@ SIXTRL_INLINE void NS(Particles_assign_ptr_to_state)(
     SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
     particles->state = ptr_to_states;
     return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE bool NS(Particles_is_lost_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index )
+{
+    return !NS(Particles_is_not_lost_value)( particles, particle_index );
+}
+
+SIXTRL_INLINE bool NS(Particles_is_not_lost_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index )
+{
+    SIXTRL_ASSERT( ( particles != SIXTRL_NULLPTR ) &&
+        ( particle_index < NS(Particles_get_num_of_particles)( particles ) ) );
+
+    return ( particles->state[ particle_index ] == ( NS(particle_index_t) )1u );
 }
 
 /* ------------------------------------------------------------------------- */

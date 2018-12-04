@@ -36,6 +36,12 @@ extern SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_detailed)(
     NS(buffer_size_t)  const initial_max_num_garbage_elements,
     NS(buffer_flags_t) const buffer_flags );
 
+extern SIXTRL_HOST_FN
+SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_on_flat_memory)(
+    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT data_buffer_begin,
+    NS(buffer_size_t) const buffer_capacity );
+
 extern SIXTRL_HOST_FN bool NS(Buffer_read_from_file)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
@@ -235,6 +241,36 @@ NS(Buffer)* NS(Buffer_new_detailed)(
         {
             NS(Buffer_delete)( ptr_buffer );
             ptr_buffer = SIXTRL_NULLPTR;
+        }
+    }
+
+    return ptr_buffer;
+}
+
+SIXTRL_HOST_FN
+SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_on_flat_memory)(
+    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT data_buffer_begin,
+    NS(buffer_size_t) const buffer_capacity )
+{
+    typedef SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* ptr_buffer_t;
+
+    ptr_buffer_t ptr_buffer = SIXTRL_NULLPTR;
+
+    if( ( data_buffer_begin != SIXTRL_NULLPTR ) &&
+        ( buffer_capacity > ( NS(buffer_size_t) )0u ) )
+    {
+        ptr_buffer = NS(Buffer_preset)(
+            ( ptr_buffer_t )malloc( sizeof( NS(Buffer) ) ) );
+
+        if( ptr_buffer != SIXTRL_NULLPTR )
+        {
+            if( 0 != NS(Buffer_init_on_flat_memory)(
+                    ptr_buffer, data_buffer_begin, buffer_capacity ) )
+            {
+                NS(Buffer_delete)( ptr_buffer );
+                ptr_buffer = SIXTRL_NULLPTR;
+            }
         }
     }
 

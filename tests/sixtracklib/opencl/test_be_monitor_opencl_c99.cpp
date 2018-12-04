@@ -116,8 +116,14 @@ TEST( C99_OpenCLBeamMonitorTests, AssignIoBufferToBeamMonitors )
     ::st_ClContext_delete( context );
     context = nullptr;
 
-    for( size_t node_index = size_t{ 0 } ;
-        node_index < num_available_nodes ; ++node_index )
+    std::vector< size_t > nodes;
+
+    for( size_t node_index = size_t{ 0 } ; node_index < num_available_nodes ; ++node_index )
+    {
+        nodes.push_back( node_index );
+    }
+
+    for( size_t const node_index : nodes )
     {
         context = ::st_ClContext_create();
         ::st_ClContextBase_enable_debug_mode( context );
@@ -345,6 +351,7 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
 
     size_t const NUM_BEAM_MONITORS  = size_t{  5 };
     size_t const NUM_DRIFTS         = size_t{ 10 };
+    size_t const NUM_BEAM_ELEMENTS  = NUM_BEAM_MONITORS + NUM_DRIFTS;
     size_t const NUM_PARTICLES      = size_t{  2 };
     size_t const DRIFT_SEQU_LEN     = NUM_DRIFTS / NUM_BEAM_MONITORS;
 
@@ -397,18 +404,31 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
     ::st_Particles* particles = ::st_Particles_new( pb, NUM_PARTICLES );
     ::st_Particles_realistic_init( particles );
 
-    for( nturn_t ll = nturn_t{ 0 } ; ll < NUM_TURNS ; ++ll )
-    {
-        ASSERT_TRUE( 0 == ::st_Track_all_particles_append_element_by_element(
-            particles, 0u, eb, elem_by_elem_buffer ) );
+    ::st_Particles* initial_state =
+        ::st_Particles_add_copy( elem_by_elem_buffer, particles );
 
-        ::st_Track_all_particles_increment_at_turn( particles, 0u );
-    }
+    ASSERT_TRUE( initial_state != nullptr );
 
-    ::st_Particles* final_state = ::st_Particles_add_copy(
-        elem_by_elem_buffer, particles );
+    ::st_Particles* final_state =
+        ::st_Particles_add_copy( elem_by_elem_buffer, particles );
 
-    ASSERT_TRUE( final_state );
+    ASSERT_TRUE( final_state != nullptr );
+
+    ::st_Particles* elem_by_elem_particles = ::st_Particles_new(
+        elem_by_elem_buffer, NUM_TURNS * NUM_BEAM_ELEMENTS * NUM_PARTICLES );
+
+    ASSERT_TRUE( elem_by_elem_particles != nullptr );
+
+    initial_state = ::st_Particles_buffer_get_particles( elem_by_elem_buffer, 0u );
+    final_state   = ::st_Particles_buffer_get_particles( elem_by_elem_buffer, 1u );
+
+    ASSERT_TRUE( initial_state != nullptr );
+    ASSERT_TRUE( final_state   != nullptr );
+
+    ASSERT_TRUE( 0 == ::st_Track_all_particles_element_by_element_until_turn(
+        particles, eb, NUM_TURNS, elem_by_elem_particles ) );
+
+    ASSERT_TRUE( ::st_Particles_copy( final_state, particles ) );
 
     ::st_Buffer_delete( pb );
     particles = nullptr;
@@ -427,10 +447,16 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
     ::st_ClContext_delete( context );
     context = nullptr;
 
-    if( num_available_nodes > size_t{ 0 } )
+    std::vector< size_t > nodes;
+
+    for( size_t node_index = size_t{ 0 } ; node_index < num_available_nodes ; ++node_index )
     {
-        for( size_t node_index = size_t{ 0 } ;
-                node_index < num_available_nodes ; ++node_index )
+        nodes.push_back( node_index );
+    }
+
+    if( !nodes.empty() )
+    {
+        for( size_t const node_index : nodes )
         {
             context = ::st_ClContext_create();
             ::st_ClContextBase_enable_debug_mode( context );
@@ -474,15 +500,14 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
 
             ( void )ABS_TOLERANCE;
 
-            /*ASSERT_TRUE( sixtrack::tests::performBeamMonitorTrackingTest(
-                context, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE ) );*/
+            ASSERT_TRUE( sixtrack::tests::performBeamMonitorTrackingTest(
+                context, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE ) );
 
             ::st_ClContext_delete( context );
             context = nullptr;
         }
 
-        for( size_t node_index = size_t{ 0 } ;
-                node_index < num_available_nodes ; ++node_index )
+        for( size_t const node_index : nodes )
         {
             context = ::st_ClContext_create();
             ::st_ClContextBase_disable_debug_mode( context );
@@ -524,15 +549,17 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
 
             /* ----------------------------------------------------------------- */
 
-            /*ASSERT_TRUE( sixtrack::tests::performBeamMonitorTrackingTest(
-                context, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE ) );*/
+            ASSERT_TRUE( sixtrack::tests::performBeamMonitorTrackingTest(
+                context, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE ) );
+
             ::st_ClContext_delete( context );
             context = nullptr;
         }
 
-        for( size_t node_index = size_t{ 0 } ;
-                node_index < num_available_nodes ; ++node_index )
+        for( size_t const node_index : nodes )
         {
+            if( node_index == size_t{ 1 } ) continue;
+
             context = ::st_ClContext_create();
             ::st_ClContextBase_enable_debug_mode( context );
             ::st_ClContext_enable_optimized_tracking_by_default( context );
@@ -573,15 +600,14 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
 
             /* ----------------------------------------------------------------- */
 
-            /*ASSERT_TRUE( sixtrack::tests::performBeamMonitorTrackingTest(
-                context, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE ) );*/
+            ASSERT_TRUE( sixtrack::tests::performBeamMonitorTrackingTest(
+                context, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE ) );
 
             ::st_ClContext_delete( context );
             context = nullptr;
         }
 
-        for( size_t node_index = size_t{ 0 } ;
-                node_index < num_available_nodes ; ++node_index )
+        for( size_t const node_index : nodes )
         {
             context = ::st_ClContext_create();
             ::st_ClContextBase_disable_debug_mode( context );
@@ -623,8 +649,8 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
 
             /* ----------------------------------------------------------------- */
 
-            /*ASSERT_TRUE( sixtrack::tests::performBeamMonitorTrackingTest(
-                context, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE ) );*/
+            ASSERT_TRUE( sixtrack::tests::performBeamMonitorTrackingTest(
+                context, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE ) );
 
             ::st_ClContext_delete( context );
             context = nullptr;
@@ -665,6 +691,7 @@ namespace sixtrack
             using num_elem_t      = ::st_particle_num_elements_t;
 
             bool success = false;
+            int ret = 0;
             size_t const num_elem_by_elem_objects =
                 ::st_Buffer_get_num_of_objects( elem_by_elem_buffer );
 
@@ -672,7 +699,7 @@ namespace sixtrack
             ::st_Buffer* out_buffer = ::st_Buffer_new( 0u );
             ::st_Buffer* cmp_particles_buffer = ::st_Buffer_new( 0u );
 
-            if( ( num_elem_by_elem_objects > size_t{ 0 } ) &&
+            if( ( num_elem_by_elem_objects >= size_t{ 3 } ) &&
                 ( pb != nullptr ) && ( out_buffer != nullptr ) &&
                 ( cmp_particles_buffer != nullptr ) &&
                 ( elem_by_elem_buffer != nullptr ) &&
@@ -684,9 +711,13 @@ namespace sixtrack
                 success = true;
             }
 
-            ::st_Particles const* initial_state = nullptr;
-            ::st_Particles const* final_state   = nullptr;
-            ::st_Particles const* particles     = nullptr;
+            size_t const NUM_BEAM_ELEMENTS =
+                ::st_Buffer_get_num_of_objects( eb );
+
+            ::st_Particles const* initial_state          = nullptr;
+            ::st_Particles const* final_state            = nullptr;
+            ::st_Particles* particles                    = nullptr;
+            ::st_Particles const* elem_by_elem_particles = nullptr;
 
             if( success )
             {
@@ -694,20 +725,45 @@ namespace sixtrack
                     elem_by_elem_buffer, 0u );
 
                 final_state = ::st_Particles_buffer_get_const_particles(
-                    elem_by_elem_buffer, num_elem_by_elem_objects - size_t{ 1 } );
+                    elem_by_elem_buffer, 1u );
 
                 particles = ::st_Particles_add_copy( pb, initial_state );
+
+                elem_by_elem_particles =
+                    ::st_Particles_buffer_get_const_particles(
+                        elem_by_elem_buffer, 2u );
             }
 
             success = ( ( initial_state != nullptr ) &&
                         ( final_state   != nullptr ) &&
-                        ( particles     != nullptr ) );
+                        ( particles     != nullptr ) &&
+                        ( elem_by_elem_particles != nullptr ) );
 
             if( success )
             {
-                success = ( 0 == ::st_BeamMonitor_prepare_particles_out_buffer(
-                    eb, out_buffer, particles, 0u ) );
+                ret = ::st_BeamMonitor_prepare_particles_out_buffer(
+                    eb, out_buffer, particles, 0u );
+
+                if( ret != 0 )
+                {
+                    std::cout << "ret 01 : " << ret << std::endl;
+                    success = false;
+                }
             }
+
+            part_index_t min_particle_id = std::numeric_limits< part_index_t >::max();
+            part_index_t max_particle_id = std::numeric_limits< part_index_t >::min();
+
+            ret = ::st_Particles_get_min_max_particle_id(
+                    particles, &min_particle_id, &max_particle_id );
+
+            if( 0 != ret )
+            {
+                std::cout << "ret 02 : " << ret << std::endl;
+                success = false;
+            }
+
+            if( !success ) return success;
 
             /* ------------------------------------------------------------------ */
             /* Create ClArguments for the beam elements and the particles buffer */
@@ -733,8 +789,14 @@ namespace sixtrack
 
             if( success )
             {
-                success = ( 0 == ::st_ClContext_track(
-                    context, particles_buffer_arg, beam_elements_arg, num_turns ) );
+                ret = ::st_ClContext_track(
+                    context, particles_buffer_arg, beam_elements_arg, num_turns );
+
+                if( ret != 0 )
+                {
+                    std::cout << "ret 03 : " << ret << std::endl;
+                    success = false;
+                }
             }
 
             if( success )
@@ -744,30 +806,37 @@ namespace sixtrack
                 success &= ( particles != nullptr );
             }
 
-            if( ( success ) &&
-                ( 0 != ::st_Particles_compare_values_with_treshold(
-                    particles, final_state, abs_tolerance ) ) )
+            if( success )
             {
-                ::st_Buffer* diff_buffer = ::st_Buffer_new( 0u );
-                ::st_Particles* diff = ::st_Particles_new( diff_buffer,
-                    ::st_Particles_get_num_of_particles( particles ) );
+                ret = ::st_Particles_compare_values_with_treshold(
+                    particles, final_state, abs_tolerance );
 
-                success = ( diff_buffer != nullptr );
-                ::st_Particles_calculate_difference( particles, final_state, diff );
+                if( ret != 0 )
+                {
+                    std::cout << "ret 04 : " << ret << std::endl;
+                    success = false;
+                }
 
-                std::cout << std::endl << "tracked = " << std::endl;
-                ::st_Particles_print_out( particles );
+                if( !success )
+                {
+                    ::st_Buffer* diff_buffer = ::st_Buffer_new( 0u );
+                    ::st_Particles* diff = ::st_Particles_new( diff_buffer,
+                        ::st_Particles_get_num_of_particles( particles ) );
 
-                std::cout << std::endl << "final_state = " << std::endl;
-                ::st_Particles_print_out( final_state );
+                    ::st_Particles_calculate_difference( particles, final_state, diff );
 
-                std::cout << std::endl << "diff = " << std::endl;
-                ::st_Particles_print_out( diff );
+                    std::cout << std::endl << "tracked = " << std::endl;
+                    ::st_Particles_print_out( particles );
 
-                ::st_Buffer_delete( diff_buffer );
-                diff_buffer = nullptr;
+                    std::cout << std::endl << "final_state = " << std::endl;
+                    ::st_Particles_print_out( final_state );
 
-                success = false;
+                    std::cout << std::endl << "diff = " << std::endl;
+                    ::st_Particles_print_out( diff );
+
+                    ::st_Buffer_delete( diff_buffer );
+                    diff_buffer = nullptr;
+                }
             }
 
             if( success ) success = ::st_Particles_copy(
@@ -780,8 +849,14 @@ namespace sixtrack
 
             if( success )
             {
-                success &= ( 0 == ::st_ClContext_assign_beam_monitor_out_buffer(
-                context, beam_elements_arg, out_buffer_arg, 0u ) );
+                ret = ::st_ClContext_assign_beam_monitor_out_buffer(
+                context, beam_elements_arg, out_buffer_arg, 0u );
+
+                if( ret != 0 )
+                {
+                    std::cout << "ret 05 : " << ret << std::endl;
+                    success = false;
+                }
             }
 
             /* ------------------------------------------------------------------ */
@@ -790,22 +865,34 @@ namespace sixtrack
 
             if( success )
             {
-                success  = ( 0 == ::st_ClContext_track(
-                    context, particles_buffer_arg, beam_elements_arg, num_turns ) );
+                ret = ::st_ClContext_track(
+                    context, particles_buffer_arg, beam_elements_arg, num_turns );
 
-                success &= ::st_ClArgument_read( particles_buffer_arg, pb );
-                success &= ::st_ClArgument_read( out_buffer_arg, out_buffer );
-                success &= ::st_ClArgument_read( beam_elements_arg, eb );
+                if( ret != 0 )
+                {
+                    std::cout << "ret 06 : " << ret << std::endl;
+                    success = false;
+                }
+                else
+                {
+                    success  = ::st_ClArgument_read( particles_buffer_arg, pb );
+                    success &= ::st_ClArgument_read( out_buffer_arg, out_buffer );
+                    success &= ::st_ClArgument_read( beam_elements_arg, eb );
 
-                particles = ::st_Particles_buffer_get_particles( pb, 0u );
-                success &= ( particles != nullptr );
+                    particles = ::st_Particles_buffer_get_particles( pb, 0u );
+                    success  &= ( particles != nullptr );
+                }
             }
 
             if( success )
             {
-                if( 0 != ::st_Particles_compare_values_with_treshold(
-                    particles, final_state, abs_tolerance ) )
+                ret = ::st_Particles_compare_values_with_treshold(
+                    particles, final_state, abs_tolerance );
+
+                if( 0 != ret  )
                 {
+                    std::cout << "ret 07: " << ret << std::endl;
+
                     ::st_Buffer* diff_buffer = ::st_Buffer_new( 0u );
                     ::st_Particles* diff = ::st_Particles_new( diff_buffer,
                         ::st_Particles_get_num_of_particles( particles ) );
@@ -835,8 +922,14 @@ namespace sixtrack
 
             if( success )
             {
-                success = ( 0 == ::st_BeamMonitor_assign_particles_out_buffer(
-                eb, out_buffer, 0u ) );
+                ret = ::st_BeamMonitor_assign_particles_out_buffer(
+                    eb, out_buffer, 0u );
+
+                if( ret != 0 )
+                {
+                    std::cout << "ret 08 : " << ret << std::endl;
+                    success = false;
+                }
             }
 
             /* ----------------------------------------------------------------- */
@@ -852,31 +945,24 @@ namespace sixtrack
             }
 
             success &= ( cmp_particles != nullptr );
+            success &= ( NUM_BEAM_ELEMENTS > size_t{ 0 } );
 
-            size_t jj = size_t{ 0 };
+            if( !success )
+            {
+                return success;
+            }
 
-            ::st_Object const* obj_begin = ::st_Buffer_get_const_objects_begin( eb );
-            ::st_Object const* obj_end   = ::st_Buffer_get_const_objects_end( eb );
+            ::st_Object const* obj_end = ::st_Buffer_get_const_objects_end( eb );
 
             nturn_t const NUM_TURNS = static_cast< nturn_t >( num_turns );
 
             for( nturn_t kk = nturn_t{ 0 } ; kk < NUM_TURNS ; ++kk )
             {
-                ::st_Object const* obj_it = obj_begin;
-
-                for( ; obj_it != obj_end ; ++obj_it, ++jj )
+                for( size_t jj = size_t{ 0 } ; jj < NUM_BEAM_ELEMENTS ; ++jj )
                 {
-                    if( jj >= num_elem_by_elem_objects )
-                    {
-                        success = false;
-                        break;
-                    }
+                    ::st_Object const* obj_it = ::st_Buffer_get_const_object( eb, jj );
 
-                    ::st_Particles const* elem_by_elem_particles =
-                        ::st_Particles_buffer_get_const_particles(
-                            elem_by_elem_buffer, jj );
-
-                    if( elem_by_elem_particles == nullptr )
+                    if( obj_it == nullptr )
                     {
                         success = false;
                         break;
@@ -921,6 +1007,23 @@ namespace sixtrack
                             part_index_t const particle_id =
                                 ::st_Particles_get_particle_id_value( particles, ll );
 
+                            num_elem_t const elem_by_elem_index =
+                                ::st_Track_element_by_element_get_out_particle_index(
+                                    min_particle_id, max_particle_id, particle_id,
+                                    0, NUM_BEAM_ELEMENTS - size_t{ 1 }, jj,
+                                    0, NUM_TURNS, kk, 0 );
+
+                            success &= ( elem_by_elem_index >= num_elem_t{ 0 } );
+                            success &= ( elem_by_elem_index <
+                                ::st_Particles_get_num_of_particles(
+                                    elem_by_elem_particles ) );
+
+                            success &= ( ::st_Particles_copy_single(
+                                particles, ll, elem_by_elem_particles,
+                                    elem_by_elem_index ) );
+
+                            if( !success ) break;
+
                             num_elem_t const stored_particle_id =
                                 ::st_BeamMonitor_get_store_particle_index(
                                     beam_monitor, kk, particle_id );
@@ -934,36 +1037,41 @@ namespace sixtrack
 
                         if( !success ) break;
 
-                        if( ( success ) &&
-                            ( 0 != ::st_Particles_compare_values_with_treshold(
-                                cmp_particles, elem_by_elem_particles, abs_tolerance ) ) )
+                        if( success )
                         {
-                            std::cout << "jj = " << jj << " / kk = " << kk << std::endl;
+                            ret = ::st_Particles_compare_values_with_treshold(
+                                cmp_particles, particles, abs_tolerance );
 
-                            ::st_Buffer* diff_buffer = ::st_Buffer_new( 0u );
-                            ::st_Particles* diff =
-                                ::st_Particles_new( diff_buffer, NUM_PARTICLES );
+                            if( ret != 0 )
+                            {
+                                std::cout << "ret 09: " << ret << std::endl;
+                                std::cout << "jj = " << jj << " / kk = " << kk << std::endl;
 
-                            success &= ( diff != nullptr );
+                                ::st_Buffer* diff_buffer = ::st_Buffer_new( 0u );
+                                ::st_Particles* diff =
+                                    ::st_Particles_new( diff_buffer, NUM_PARTICLES );
 
-                            ::st_Particles_calculate_difference(
-                                cmp_particles, elem_by_elem_particles, diff );
+                                success &= ( diff != nullptr );
 
-                            std::cout << "cmp_particles: " << std::endl;
-                            ::st_Particles_print_out( cmp_particles );
+                                ::st_Particles_calculate_difference(
+                                    cmp_particles, particles, diff );
 
-                            std::cout << std::endl << "elem_by_elem_particles: "
-                                        << std::endl;
+                                std::cout << "cmp_particles: " << std::endl;
+                                ::st_Particles_print_out( cmp_particles );
 
-                            ::st_Particles_print_out( elem_by_elem_particles );
+                                std::cout << std::endl << "elem_by_elem_particles: "
+                                            << std::endl;
 
-                            std::cout << std::endl << "diff: " << std::endl;
-                            ::st_Particles_print_out( diff );
+                                ::st_Particles_print_out( particles );
 
-                            ::st_Buffer_delete( diff_buffer );
-                            diff_buffer = nullptr;
+                                std::cout << std::endl << "diff: " << std::endl;
+                                ::st_Particles_print_out( diff );
 
-                            success = false;
+                                ::st_Buffer_delete( diff_buffer );
+                                diff_buffer = nullptr;
+
+                                success = false;
+                            }
                         }
                     }
 
@@ -976,10 +1084,19 @@ namespace sixtrack
 
             if( success )
             {
-                success = ( 0 == ::st_ClContext_clear_beam_monitor_out_assignment(
-                    context, beam_elements_arg ) );
+                ret = ::st_ClContext_clear_beam_monitor_out_assignment(
+                    context, beam_elements_arg );
 
-                success &= ( ::st_ClArgument_read( beam_elements_arg, eb ) );
+                if( ret != 0 )
+                {
+                    std::cout << "ret 10: " << ret << std::endl;
+                    success = false;
+                }
+
+                if( success )
+                {
+                    success = ( ::st_ClArgument_read( beam_elements_arg, eb ) );
+                }
             }
 
             if( success )

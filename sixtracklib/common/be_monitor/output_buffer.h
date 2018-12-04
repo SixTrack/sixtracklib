@@ -30,6 +30,10 @@ SIXTRL_FN SIXTRL_STATIC int NS(BeamMonitor_setup_managed_buffer_for_particles_al
 
 #if !defined( _GPUCODE )
 
+SIXTRL_FN SIXTRL_STATIC bool
+NS(BeamMonitor_are_present_in_buffer)( SIXTRL_BUFFER_ARGPTR_DEC const
+        NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer );
+
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(BeamMonitor_get_num_elem_by_elem_objects)( SIXTRL_BUFFER_ARGPTR_DEC const
         NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer );
@@ -102,6 +106,42 @@ extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 #if !defined( _GPUCODE )
+
+SIXTRL_INLINE bool NS(BeamMonitor_are_present_in_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT
+        beam_elements_buffer )
+{
+    bool beam_monitors_are_present = false;
+
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* obj_it =
+        NS(Buffer_get_const_objects_begin)( beam_elements_buffer );
+
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* obj_end =
+        NS(Buffer_get_const_objects_end)( beam_elements_buffer );
+
+    for( ; obj_it != obj_end ; ++obj_it )
+    {
+        if( ( NS(Object_get_type_id)( obj_it ) == NS(OBJECT_TYPE_BEAM_MONITOR ) ) &&
+            ( ( uintptr_t )NS(Object_get_begin_addr)( obj_it ) !=
+              ( uintptr_t )0u ) )
+        {
+            typedef SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor) const* ptr_monitor_t;
+            typedef NS(be_monitor_turn_t) nturn_t;
+
+            ptr_monitor_t monitor = ( ptr_monitor_t
+                )( uintptr_t )NS(BeamMonitor_get_out_address)( monitor );
+
+            if( ( monitor != SIXTRL_NULLPTR ) &&
+                ( NS(BeamMonitor_get_num_stores)( monitor ) > ( nturn_t )0u ) )
+            {
+                beam_monitors_are_present = true;
+                break;
+            }
+        }
+    }
+
+    return beam_monitors_are_present;
+}
 
 SIXTRL_INLINE NS(buffer_size_t)
 NS(BeamMonitor_get_num_elem_by_elem_objects)( SIXTRL_BUFFER_ARGPTR_DEC const
@@ -272,27 +312,15 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_particles_out_buffer)(
     buf_size_t const slot_size = NS(Buffer_get_slot_size)(
         beam_elements_buffer );
 
-    buf_size_t const max_num_available_out_blocks =
-        NS(Particles_managed_buffer_get_num_of_particle_blocks)(
-            NS(Buffer_get_const_data_begin)( out_buffer ), slot_size );
-
     buf_size_t out_particles_block_offset = ( buf_size_t )0u;
     SIXTRL_ASSERT( slot_size == NS(Buffer_get_slot_size)( out_buffer ) );
 
-    if( num_elem_by_elem_turns > ( buf_size_t )0u )
-    {
-        buf_size_t const num_elem_by_elem_blocks =
-            NS(BeamMonitor_get_num_elem_by_elem_objects_from_managed_buffer)(
+    if( ( num_elem_by_elem_turns > ( buf_size_t )0u ) &&
+        (  NS(BeamMonitor_get_num_elem_by_elem_objects_from_managed_buffer)(
                 NS(Buffer_get_const_data_begin)( beam_elements_buffer ),
-                    slot_size );
-
-        buf_size_t const requ_num_elem_by_elem_blocks =
-            num_elem_by_elem_turns * num_elem_by_elem_blocks;
-
-        if( requ_num_elem_by_elem_blocks <= max_num_available_out_blocks )
-        {
-            out_particles_block_offset = requ_num_elem_by_elem_blocks;
-        }
+                    slot_size ) > ( buf_size_t )0u ) )
+    {
+        out_particles_block_offset = ( buf_size_t )1u;
     }
 
     return NS(BeamMonitor_assign_managed_particles_out_buffer)(
@@ -500,7 +528,7 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_managed_particles_out_buffer)(
 
                 buf_size_t const stored_particles_per_turn =
                     ( max_particle_id >= min_particle_id )
-                        ? ( buf_size_t )( max_particle_id - min_particle_id )
+                        ? ( buf_size_t )( max_particle_id - min_particle_id  + 1u )
                         : ZERO;
 
                 if( ( nn > 0 ) && ( stored_particles_per_turn > ZERO ) &&

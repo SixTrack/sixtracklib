@@ -19,6 +19,7 @@ set( SIXTRL_COMMON_INTERNAL_C99_HEADERS
 set( SIXTRL_COMMON_INTERNAL_C99_SOURCES
     compute_arch.c
     particles.c
+    track.c
 )
 
 add_library( sixtrack_common_internal OBJECT

@@ -247,32 +247,42 @@ int main( int argc, char* argv[] )
     /* ****            PERFORM TRACKING AND IO OPERATIONS            ******* */
     /* ********************************************************************* */
 
-
     if( ( particles != SIXTRL_NULLPTR ) &&
         ( NUM_PARTICLES > 0 ) && ( NUM_TURNS > 0 ) )
     {
-        int ii = 0;
-        int const NUM_BEAM_ELEMENTS = st_Buffer_get_num_of_objects( eb );
+        st_Particles* elem_by_elem_particles =
+            st_Particles_buffer_get_particles( out_buffer, 0u );
 
-        for( ; ii < NUM_TURNS_IO_ELEM_BY_ELEM ; ++ii )
+        st_Track_all_particles_element_by_element_until_turn(
+            particles, eb, NUM_TURNS_IO_ELEM_BY_ELEM, elem_by_elem_particles );
+
+        if( NUM_TURNS_IO_ELEM_BY_ELEM < NUM_TURNS )
         {
-            st_Track_all_particles_element_by_element(
-                particles, 0u, eb, out_buffer, ii * NUM_BEAM_ELEMENTS );
+            double const denom_turns =
+                ( double )( NUM_TURNS - NUM_TURNS_IO_ELEM_BY_ELEM );
 
-            st_Track_all_particles_increment_at_turn(
-                particles, 0u );
+            double const denom_turns_particles =
+                denom_turns * NUM_PARTICLES;
+
+            double tracking_time = ( double )0.0;
+            double end_tracking_time = ( double )0.0;
+
+            double const start_tracking_time = st_Time_get_seconds_since_epoch();
+
+            st_Track_all_particles_until_turn( particles, eb, NUM_TURNS );
+
+            end_tracking_time = st_Time_get_seconds_since_epoch();
+
+            tracking_time = ( start_tracking_time < end_tracking_time )
+                ? end_tracking_time - start_tracking_time
+                : ( double )0.0;
+
+            printf( "time / turn / particle : %.3e\r\n"
+                    "time / turn            : %.3e\r\n"
+                    "time total             : %.3e\r\n",
+                    tracking_time / denom_turns_particles,
+                    tracking_time / denom_turns, tracking_time );
         }
-
-        double start_tracking_time = st_Time_get_seconds_since_epoch();
-
-        st_Track_all_particles_until_turn( particles, eb, NUM_TURNS );
-
-      	double end_tracking_time = st_Time_get_seconds_since_epoch();
-
-        printf( "time / particle / turn: %.3e\r\n"
-                "time total            : %.3e\r\n",
-                ( end_tracking_time - start_tracking_time ) / ( double )( NUM_TURNS * NUM_PARTICLES ),
-                ( end_tracking_time - start_tracking_time ) );
 
         st_Particles_add_copy( out_buffer, particles );
         st_Buffer_write_to_file( out_buffer, path_output_particles );
