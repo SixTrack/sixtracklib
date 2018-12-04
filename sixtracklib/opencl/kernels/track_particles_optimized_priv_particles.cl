@@ -40,7 +40,7 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
 
 __kernel void NS(Track_particles_single_turn_opt_pp_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buffer,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
     SIXTRL_INT64_T const increment_turn )
 {
     typedef NS(buffer_size_t)                                   buf_size_t;
@@ -303,9 +303,9 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object) const*     obj_const_iter_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* ptr_particles_t;
 
-    buf_size_t const slot_size   = ( buf_size_t )8u;
-    num_element_t particle_index = ( num_element_t )get_global_id( 0 );
-    num_element_t const stride   = ( num_element_t )get_global_size( 0 );
+    buf_size_t const slot_size = ( buf_size_t )8u;
+    num_element_t particle_idx = ( num_element_t )get_global_id( 0 );
+    num_element_t const stride = ( num_element_t )get_global_size( 0 );
 
     obj_const_iter_t be_begin = NS(ManagedBuffer_get_const_objects_index_begin)(
         belem_buffer, slot_size );
@@ -408,7 +408,7 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
     elem_by_elem_particles = ( ptr_particles_t )( uintptr_t
         )NS(Object_get_begin_addr)( elem_by_elem_it );
 
-    for( ; particle_index < num_particles ; particle_index += stride )
+    for( ; particle_idx < num_particles ; particle_idx += stride )
     {
         index_t particle_id      = ( index_t )0u;
         index_t start_element_id = ( index_t )0u;
@@ -417,7 +417,7 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
         int success = NS(Particles_copy_from_generic_addr_data)(
             &particles, 0, in_particles, particle_idx );
 
-        start_element_id = NS(Particles_get_at_element_id_value)( &particls, 0 );
+        start_element_id = NS(Particles_get_at_element_id_value)( &particles, 0 );
         particle_id = NS(Particles_get_particle_id_value)( &particles, 0 );
         at_turn = NS(Particles_get_at_turn_value)( &particles, 0 );
 
@@ -432,7 +432,7 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
                         min_particle_id, max_particle_id, particle_id,
                         min_element_id,  max_element_id,
                         NS(Particles_get_at_element_id_value)( &particles, 0 ),
-                        min_turn, max_turn, at_turn, elem_by_elem_index_ordering );
+                        min_turn_id, max_turn_id, at_turn, elem_by_elem_index_ordering );
 
                 SIXTRL_ASSERT( elem_by_elem_idx >= ( num_element_t )0 );
                 SIXTRL_ASSERT( elem_by_elem_idx <

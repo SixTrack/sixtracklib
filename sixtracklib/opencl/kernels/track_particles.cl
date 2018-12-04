@@ -193,14 +193,14 @@ __kernel void NS(Track_particles_elem_by_elem_opencl)(
 
     ptr_particles_t elem_by_elem_particles =
         NS(Particles_managed_buffer_get_particles)(
-            out_buffer, out_particle_blocks_offset );
+            elem_by_elem_buffer, out_particle_blocks_offset, slot_size );
 
     num_element_t const num_particles =
         NS(Particles_get_num_of_particles)( particles );
 
     SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( particles_buffer, slot_size ) );
     SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( belem_bufffer, slot_size ) );
-    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( out_buffer, slot_size ) );
+    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( elem_by_elem_buffer, slot_size ) );
 
     SIXTRL_ASSERT( be_begin != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( be_end != SIXTRL_NULLPTR );
