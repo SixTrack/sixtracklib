@@ -339,31 +339,41 @@ int main( int argc, char* argv[] )
         ( beam_elements_arg   != SIXTRL_NULLPTR ) &&
         ( out_buffer_arg       != SIXTRL_NULLPTR ) )
     {
-        int ii = 0;
-        int const NUM_BEAM_ELEMENTS = st_Buffer_get_num_of_objects( eb );
-
         st_ClContext_assign_beam_monitor_out_buffer( context,
-            beam_elements_arg, out_buffer_arg, NUM_TURNS_IO_ELEM_BY_ELEM * NUM_BEAM_ELEMENTS );
+            beam_elements_arg, out_buffer_arg, NUM_TURNS_IO_ELEM_BY_ELEM );
 
+        st_ClContext_track_element_by_element(
+            context, particle_buffer_arg, beam_elements_arg,
+            out_buffer_arg, NUM_TURNS_IO_ELEM_BY_ELEM, 0u );
 
-        for( ; ii < NUM_TURNS_IO_ELEM_BY_ELEM ; ++ii )
+        if( NUM_TURNS > NUM_TURNS_IO_ELEM_BY_ELEM )
         {
-            st_ClContext_track_element_by_element(
-                context, particle_buffer_arg, beam_elements_arg,
-                out_buffer_arg, ii * NUM_BEAM_ELEMENTS );
+            double end_tracking_time = ( double )0.0;
+            double tracking_time     = ( double )0.0;
+
+            double const denom_turns = ( double )( NUM_TURNS );
+
+            double const denom_turns_particles =
+                ( double )( NUM_TURNS * NUM_PARTICLES );
+
+            double const start_tracking_time =
+                st_Time_get_seconds_since_epoch();
+
+            st_ClContext_track( context, particle_buffer_arg,
+                beam_elements_arg, NUM_TURNS );
+
+            end_tracking_time = st_Time_get_seconds_since_epoch();
+
+            tracking_time = ( end_tracking_time >= start_tracking_time )
+                ? ( end_tracking_time - start_tracking_time ) : ( double )0.0;
+
+            printf( "time / turn / particle : %.3e s\r\n"
+                    "time / turn            : %.3e s\r\n"
+                    "time total             : %.3e s\r\n",
+                    tracking_time / denom_turns_particles,
+                    tracking_time / denom_turns,
+                    tracking_time );
         }
-
-	double start_tracking_time = st_Time_get_seconds_since_epoch();
-
-        st_ClContext_track( context, particle_buffer_arg,
-            beam_elements_arg, NUM_TURNS );
-
-	double end_tracking_time = st_Time_get_seconds_since_epoch();
-
-	printf( "time / particle / turn: %.3e\r\n"
-            "time total            : %.3e\r\n",
-            ( end_tracking_time - start_tracking_time ) / ( double )( NUM_TURNS * NUM_PARTICLES ),
-            ( end_tracking_time - start_tracking_time ) );
 
         st_ClArgument_read( particle_buffer_arg, track_pb );
         st_ClArgument_read( out_buffer_arg, out_buffer );
