@@ -10,6 +10,7 @@
 #include <cstring>
 #include <cstdio>
 #include <iterator>
+#include <iomanip>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -989,13 +990,11 @@ namespace SIXTRL_CXX_NAMESPACE
             path_to_particles_track_opt_prog +=
                 "track_particles_optimized_priv_particles.cl";
 
-            path_to_assign_out_buffer_prog    +=
-                "be_monitors_assign_out_buffer_debug.cl";
+//             path_to_assign_out_buffer_prog    +=
+//                 "be_monitors_assign_out_buffer_debug.cl";
 
-            /*
             path_to_assign_out_buffer_prog    +=
                 "be_monitors_assign_out_buffer.cl";
-            */
         }
         else
         {
@@ -1038,7 +1037,6 @@ namespace SIXTRL_CXX_NAMESPACE
         track_optimized_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
 
         std::string assign_out_buffer_compile_options = " -D_GPUCODE=1";
-//         assign_out_buffer_compile_options += " -w -Werror";
         assign_out_buffer_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
         assign_out_buffer_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
         assign_out_buffer_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__global";
@@ -1180,10 +1178,10 @@ namespace SIXTRL_CXX_NAMESPACE
                 std::string kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
                 kernel_name += "BeamMonitor_assign_out_buffer_from_offset";
 
-//                 if( this->debugMode() )
-//                 {
+                if( this->debugMode() )
+                {
                     kernel_name += "_debug";
-//                 }
+                }
 
                 kernel_name += "_opencl";
 
@@ -1203,10 +1201,10 @@ namespace SIXTRL_CXX_NAMESPACE
                 std::string kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
                 kernel_name += "BeamMonitor_clear_all_line_obj";
 
-//                 if( this->debugMode() )
-//                 {
+                if( this->debugMode() )
+                {
                     kernel_name += "_debug";
-//                 }
+                }
 
                 kernel_name += "_opencl";
 
