@@ -15,6 +15,21 @@ project( sixtracklib LANGUAGES C CXX )
 message( STATUS "---- Project sixtracklib" )
 message( STATUS "---- Inside main CMakeLists.txt" )
 
+# Set a default build type if none was specified
+set( SIXTRL_DEFAULT_BUILD_TYPE "Release" )
+
+if( NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES )
+
+  message( STATUS "---- Setting build type to '${SIXTRL_DEFAULT_BUILD_TYPE}' as none was specified." )
+  set( CMAKE_BUILD_TYPE "${SIXTRL_DEFAULT_BUILD_TYPE}"
+       CACHE STRING "Choose the type of build." FORCE)
+
+  # Set the possible values of build type for cmake-gui
+  set_property( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+    "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
+
+endif()
+
 # ------------------------------------------------------------------------------
 # load local settings file -> this is optional, if not loaded then the default
 # settings file will be loaded:
