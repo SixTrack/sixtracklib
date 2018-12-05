@@ -13,15 +13,15 @@ class TrackJobCL(object):
         st.st_ClContextBase_select_node(self.context, device.encode("utf-8"))
         self.o_buff=st.st_NullBuffer
         self.particles_buffer=st.STBuffer(self.particles._buffer)
+        self.elements_buffer=st.STBuffer(self.elements.cbuffer)
 
     def track(self,until_turn,elem_by_elem_turns=0):
-        p_buff=st.STBuffer(self.particles._buffer)
-        e_buff=st.STBuffer(self.elements.cbuffer)
-
+        self.particles_buffer.cbuffer.info()
         self.o_buff=st.st_TrackCL(self.context,
-                                  p_buff.stbuffer,
-                                  e_buff.stbuffer,
+                                  self.particles_buffer.stbuffer,
+                                  self.elements_buffer.stbuffer,
                                   self.o_buff,
                 until_turn,elem_by_elem_turns)
+        self.particles_buffer.cbuffer.info()
 
 
