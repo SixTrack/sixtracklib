@@ -17,9 +17,9 @@ if( SIXTRACKL_ENABLE_CXX )
     add_subdirectory( cxx )
 endif()
 
-if( SIXTRACKL_ENABLE_PYTHON )
-    add_subdirectory( python )
-endif()
+#if( SIXTRACKL_ENABLE_PYTHON )
+#    add_subdirectory( python )
+#endif()
 
 # =============================================================================
 # Install:

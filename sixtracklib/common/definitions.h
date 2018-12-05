@@ -1,6 +1,14 @@
 #ifndef SIXTRACKLIB_COMMON_DEFINITIONS_H__
 #define SIXTRACKLIB_COMMON_DEFINITIONS_H__
 
+#if !defined(SIXTRL_EXTERN)
+    #if !defined( __cplusplus ) && !defined(_GPUCODE)
+        #define SIXTRL_EXTERN extern
+    #else
+        #define SIXTRL_EXTERN
+    #endif
+#endif
+
 #if !defined( _GPUCODE ) || defined( __CUDACC__ )
     #if defined( __cplusplus )
         #include <cassert>

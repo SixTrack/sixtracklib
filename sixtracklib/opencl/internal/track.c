@@ -10,25 +10,26 @@
 #include "sixtracklib/opencl/argument.h"
 #include "sixtracklib/opencl/context.h"
 
-extern SIXTRL_HOST_FN NS(Buffer)* NS(TrackCL)(
-    char const* SIXTRL_RESTRICT device_id_str,
-    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
-    NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
-    NS(Buffer)* SIXTRL_RESTRICT out_buffer,
-    int const until_turn, int const elem_by_elem_turns );
-
-
 NS(Buffer)* NS(TrackCL)(
     char const* SIXTRL_RESTRICT device_id_str,
     struct NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     struct NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     struct NS(Buffer)* SIXTRL_RESTRICT out_buffer,
-    int const until_turn, int const elem_by_elem_turns )
+    int const until_turn,
+    int const elem_by_elem_turns )
 {
     typedef NS(buffer_size_t) buf_size_t;
 
     NS(Buffer)* ptr_out_buffer = SIXTRL_NULLPTR;
-    NS(ClContext)* context   = NS(ClContext_new)( device_id_str );
+    NS(ClContext)* context   = NS(ClContext_create)();
+    if (device_id_str==NULL){
+        NS(ClContextBase_print_nodes_info)( context );
+        NS(ClContextBase_delete)( context );
+        return ptr_out_buffer;
+    } else {
+        NS(ClContextBase_select_node)(context, device_id_str);
+    };
+
     NS(Particles)* particles =
         NS(Particles_buffer_get_particles)( particles_buffer, 0u );
 
@@ -98,6 +99,8 @@ NS(Buffer)* NS(TrackCL)(
         particles = NS(Particles_buffer_get_particles)( particles_buffer, 0u );
         NS(Particles_add_copy)( ptr_out_buffer, particles );
     }
+
+    NS(ClContextBase_delete)( context );
 
     return ptr_out_buffer;
 }

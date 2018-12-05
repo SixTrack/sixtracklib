@@ -44,6 +44,7 @@ class Particles( CObject ):
         self.gamma0=energy0/mass0
         self.p0c=p0c
         self.particle_id = np.arange(self.num_particles)
+        return self
 
     def fromPySixTrack( self, inp, particle_index ):
         assert( particle_index < self.num_particles )

@@ -13,12 +13,13 @@ extern "C" {
 
 struct NS(Buffer);
 
-SIXTRL_HOST_FN struct NS(Buffer)* NS(TrackCL)(
+SIXTRL_EXTERN SIXTRL_HOST_FN struct NS(Buffer)* NS(TrackCL)(
     char const* SIXTRL_RESTRICT device_id_str,
     struct NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     struct NS(Buffer)* SIXTRL_RESTRICT beam_elements,
     struct NS(Buffer)* SIXTRL_RESTRICT out_buffer,
-    int const until_turn, int const elem_by_elem_turns );
+    int const until_turn,
+    int const elem_by_elem_turns );
 
 #endif /* !defined( _GPUCODE ) */
 

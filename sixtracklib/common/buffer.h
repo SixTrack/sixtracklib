@@ -205,8 +205,7 @@ SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new)(
 SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_from_file)(
     SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
 
-SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_on_memory)(
-    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+extern SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_on_memory)(
     SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT data_buffer_begin,
     NS(buffer_size_t) const buffer_capacity );
 
@@ -258,7 +257,7 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_clear)(
 
 #if !defined( _GPUCODE )
 
-SIXTRL_HOST_FN SIXTRL_STATIC void NS(Buffer_delete)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Buffer_delete)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 #endif /* !defined( _GPUCODE ) */
@@ -1329,19 +1328,6 @@ SIXTRL_INLINE SIXTRL_ARGPTR_DEC NS(Object)* NS(Buffer_add_object)(
 
     return ptr_added_object;
 }
-
-#if !defined( _GPUCODE )
-
-SIXTRL_INLINE void NS(Buffer_delete)( NS(Buffer)* SIXTRL_RESTRICT buffer )
-{
-    NS(Buffer_free)( buffer );
-    free( buffer );
-    buffer = SIXTRL_NULLPTR;
-
-    return;
-}
-
-#endif /* !defined( _GPUCODE ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }

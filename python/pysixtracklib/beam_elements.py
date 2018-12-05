@@ -161,7 +161,7 @@ class Elements(object):
                      'BeamBeam6D': BeamBeam6D,
                      'BeamBeam4D': BeamBeam4D,
                      #                     'Line': Line,
-                     #                     'Monitor': BeamMonitor,
+                     'BeamMonitor': BeamMonitor,
                      }
 
     def _mk_fun(self, buff, cls):
