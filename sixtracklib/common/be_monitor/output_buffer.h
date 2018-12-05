@@ -129,7 +129,7 @@ SIXTRL_INLINE bool NS(BeamMonitor_are_present_in_buffer)(
             typedef NS(be_monitor_turn_t) nturn_t;
 
             ptr_monitor_t monitor = ( ptr_monitor_t
-                )( uintptr_t )NS(BeamMonitor_get_out_address)( monitor );
+                )( uintptr_t )NS(Object_get_begin_addr)( obj_it );
 
             if( ( monitor != SIXTRL_NULLPTR ) &&
                 ( NS(BeamMonitor_get_num_stores)( monitor ) > ( nturn_t )0u ) )
