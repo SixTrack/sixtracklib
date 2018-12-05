@@ -10,6 +10,9 @@
 
 #include "sixtracklib/opencl/track.h"
 
+#include "sixtracklib/testlib.h"
+
+
 NS(Buffer)* NS(TrackCL)(
     NS(ClContext)* context,
     struct NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
@@ -52,6 +55,9 @@ NS(Buffer)* NS(TrackCL)(
                 beam_elements_buffer, ptr_out_buffer,
                     particles, elem_by_elem_turns );
         }
+
+        NS(Particles_print_out)(particles);
+
 
         particles_arg =
             NS(ClArgument_new_from_buffer)( particles_buffer, context );
