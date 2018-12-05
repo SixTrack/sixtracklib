@@ -3,6 +3,8 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/opencl/context.h"
+    #include "sixtracklib/opencl/argument.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
@@ -14,7 +16,7 @@ extern "C" {
 struct NS(Buffer);
 
 SIXTRL_EXTERN SIXTRL_HOST_FN struct NS(Buffer)* NS(TrackCL)(
-    char const* SIXTRL_RESTRICT device_id_str,
+    NS(ClContext)* context,
     struct NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     struct NS(Buffer)* SIXTRL_RESTRICT beam_elements,
     struct NS(Buffer)* SIXTRL_RESTRICT out_buffer,
