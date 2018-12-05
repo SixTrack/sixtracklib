@@ -48,10 +48,6 @@ NS(Buffer)* NS(TrackCL)(
         else
         {
             ptr_out_buffer = NS(Buffer_new)( 0u );
-        }
-
-        if( prepare_out_buffer )
-        {
             NS(BeamMonitor_prepare_particles_out_buffer)(
                 beam_elements_buffer, ptr_out_buffer,
                     particles, elem_by_elem_turns );
