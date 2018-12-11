@@ -32,17 +32,17 @@ NS(elem_by_elem_order_t);
 
 typedef struct NS(ElemByElemConfig)
 {
-    NS(elem_by_elem_order_int_t)    order                   SIXTRL_ALIGN( 8 );
-    NS(particle_num_elements_t)     num_particles_to_store  SIXTRL_ALIGN( 8 );
-    NS(particle_num_elements_t)     num_elements_to_store   SIXTRL_ALIGN( 8 );
-    NS(particle_num_elements_t)     num_turns_to_store      SIXTRL_ALIGN( 8 );
-    NS(particle_index_t)            min_particle_id         SIXTRL_ALIGN( 8 );
-    NS(particle_index_t)            min_element_id          SIXTRL_ALIGN( 8 );
-    NS(particle_index_t)            min_turn                SIXTRL_ALIGN( 8 );
-    NS(particle_index_t)            max_particle_id         SIXTRL_ALIGN( 8 );
-    NS(particle_index_t)            max_element_id          SIXTRL_ALIGN( 8 );
-    NS(particle_index_t)            max_turn                SIXTRL_ALIGN( 8 );
-    NS(elem_by_elem_out_addr_t)     out_store_addr          SIXTRL_ALIGN( 8 );
+    NS(elem_by_elem_order_int_t) order                   SIXTRL_ALIGN( 8 );
+    NS(particle_num_elements_t)  num_particles_to_store  SIXTRL_ALIGN( 8 );
+    NS(particle_num_elements_t)  num_elements_to_store   SIXTRL_ALIGN( 8 );
+    NS(particle_num_elements_t)  num_turns_to_store      SIXTRL_ALIGN( 8 );
+    NS(particle_index_t)         min_particle_id         SIXTRL_ALIGN( 8 );
+    NS(particle_index_t)         min_element_id          SIXTRL_ALIGN( 8 );
+    NS(particle_index_t)         min_turn                SIXTRL_ALIGN( 8 );
+    NS(particle_index_t)         max_particle_id         SIXTRL_ALIGN( 8 );
+    NS(particle_index_t)         max_element_id          SIXTRL_ALIGN( 8 );
+    NS(particle_index_t)         max_turn                SIXTRL_ALIGN( 8 );
+    NS(elem_by_elem_out_addr_t)  out_store_addr          SIXTRL_ALIGN( 8 );
 }
 NS(ElemByElemConfig);
 
@@ -52,7 +52,6 @@ SIXTRL_FN SIXTRL_STATIC NS(particle_num_elements_t)
 NS(ElemByElemConfig_get_out_store_num_particles)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config );
-
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_num_elements_t)
 NS(ElemByElemConfig_get_num_particles_to_store)(
@@ -766,7 +765,9 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_preset)(
     if( config != SIXTRL_NULLPTR )
     {
         NS(ElemByELemConfig_clear)( config );
-        config->order = ( NS(elem_by_elem_order_t ) )0u;
+
+        NS(ElemByElemConfig_set_order)(
+            config, NS(ELEM_BY_ELEM_ORDER_TURN_INVALID) );
     }
 
     return config;
@@ -795,9 +796,6 @@ SIXTRL_INLINE void NS(ElemByElemConfig_clear)(
 
         NS(ElemByElemConfig_set_output_store_address)(
             config, ( out_addr_t )0u );
-
-        NS(ElemByElemConfig_set_order)(
-            config, NS(ELEM_BY_ELEM_ORDER_TURN_INVALID) );
     }
 
     return;

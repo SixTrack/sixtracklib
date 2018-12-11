@@ -19,20 +19,11 @@
     #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-extern SIXTRL_HOST_FN int NS(BeamMonitor_setup_for_particles_all)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles );
-
-extern SIXTRL_HOST_FN int NS(BeamMonitor_prepare_particles_out_buffer)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
-    NS(buffer_size_t) const num_elem_by_elem_turns );
-
 int NS(BeamMonitor_prepare_particles_out_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const
+        SIXTRL_RESTRICT particles,
     NS(buffer_size_t) const num_elem_by_elem_turns )
 {
     typedef NS(buffer_size_t)                        buf_size_t;
@@ -133,7 +124,8 @@ int NS(BeamMonitor_prepare_particles_out_buffer)(
             }
         }
 
-        if( ( num_elem_by_elem_turns > ZERO ) && ( num_elem_by_elem_blocks > ZERO ) )
+        if( ( num_elem_by_elem_turns  > ZERO ) &&
+            ( num_elem_by_elem_blocks > ZERO ) )
         {
             buf_size_t num_particles_to_store =
                 num_elem_by_elem_blocks * num_elem_by_elem_turns;
@@ -154,16 +146,22 @@ int NS(BeamMonitor_prepare_particles_out_buffer)(
             ( 0 == NS(Buffer_reserve)( out_buffer,
                 num_objects, num_slots, num_dataptrs, ZERO ) ) )
         {
-            SIXTRL_ASSERT( NS(Buffer_get_num_of_objects)( out_buffer ) == ZERO );
-            SIXTRL_ASSERT( NS(Buffer_get_num_of_slots)( out_buffer ) == ZERO );
-            SIXTRL_ASSERT( NS(Buffer_get_num_of_dataptrs )( out_buffer ) == ZERO );
+            SIXTRL_ASSERT( NS(Buffer_get_num_of_objects)(
+                out_buffer ) == ZERO );
+
+            SIXTRL_ASSERT( NS(Buffer_get_num_of_slots)(
+                out_buffer ) == ZERO );
+
+            SIXTRL_ASSERT( NS(Buffer_get_num_of_dataptrs )(
+                out_buffer ) == ZERO );
 
             success = 0;
 
             if( total_num_elem_by_elem_objects > ZERO )
             {
                 ptr_particles_t elem_by_elem_particles = NS(Particles_new)(
-                    out_buffer, num_particles * total_num_elem_by_elem_objects );
+                    out_buffer, num_particles *
+                        total_num_elem_by_elem_objects );
 
                 if( elem_by_elem_particles == SIXTRL_NULLPTR )
                 {
@@ -242,7 +240,8 @@ int NS(BeamMonitor_prepare_particles_out_buffer)(
 
 int NS(BeamMonitor_setup_for_particles_all)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles )
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
+        *const SIXTRL_RESTRICT particles )
 {
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* ptr_obj_t;
     typedef SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)*    ptr_beam_monitor_t;
@@ -270,7 +269,8 @@ int NS(BeamMonitor_setup_for_particles_all)(
 
         for( ; be_it != be_end ; ++be_it )
         {
-            if( NS(Object_get_type_id)( be_it ) == NS(OBJECT_TYPE_BEAM_MONITOR) )
+            if( NS(Object_get_type_id)( be_it ) ==
+                NS(OBJECT_TYPE_BEAM_MONITOR) )
             {
                 ptr_beam_monitor_t monitor = ( ptr_beam_monitor_t
                     )NS(Object_get_begin_ptr)( be_it );

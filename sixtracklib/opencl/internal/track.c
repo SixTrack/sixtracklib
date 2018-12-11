@@ -3,7 +3,7 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/track.h"
 #include "sixtracklib/common/be_monitor/be_monitor.h"
-#include "sixtracklib/common/be_monitor/output_buffer.h"
+#include "sixtracklib/common/output/output_buffer.h"
 
 #include "sixtracklib/opencl/argument.h"
 #include "sixtracklib/opencl/context.h"
