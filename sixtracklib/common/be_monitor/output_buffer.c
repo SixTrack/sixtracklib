@@ -1,11 +1,11 @@
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/be_monitor/output_buffer.h"
+    #include "sixtracklib/common/output/output_buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
     #include <stdint.h>
-        #include <stdlib.h>
+    #include <stdlib.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
@@ -287,4 +287,4 @@ int NS(BeamMonitor_setup_for_particles_all)(
     return success;
 }
 
-/* end: sixtracklib/common/be_monitor/be_monitor.c */
+/* end: sixtracklib/common/output/be_monitor.c */
