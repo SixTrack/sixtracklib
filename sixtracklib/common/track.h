@@ -3,10 +3,10 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/internal/buffer_defines.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
-    #include "sixtracklib/common/internal/elem_by_elem_config.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
+    #include "sixtracklib/common/output/elem_by_elem_config.h"
     #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
