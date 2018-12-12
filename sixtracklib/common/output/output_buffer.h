@@ -12,6 +12,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/be_monitor/be_monitor.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
+    #include "sixtracklib/common/internal/elem_by_elem_config_defines.h"
     #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -19,37 +20,40 @@
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
+/* ------------------------------------------------------------------------- */
+/* BeamMonitor based Output: */
+
+struct NS(BeamMonitor);
+
 SIXTRL_FN SIXTRL_STATIC int NS(BeamMonitor_setup_for_particles)(
-    SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT beam_monitor,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
-        *const SIXTRL_RESTRICT particles );
+    SIXTRL_BE_ARGPTR_DEC struct NS(BeamMonitor)* SIXTRL_RESTRICT beam_monitor,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
 
 SIXTRL_FN SIXTRL_STATIC int
 NS(BeamMonitor_setup_managed_buffer_for_particles_all)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char*
-        SIXTRL_RESTRICT beam_elements_buffer,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
-        *const SIXTRL_RESTRICT particles, NS(buffer_size_t) const slot_size );
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belements_buffer,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(buffer_size_t) const slot_size );
 
 #if !defined( _GPUCODE )
 
 SIXTRL_FN SIXTRL_STATIC bool
 NS(BeamMonitor_are_present_in_buffer)( SIXTRL_BUFFER_ARGPTR_DEC const
-        NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer );
+        NS(Buffer) *const SIXTRL_RESTRICT belements_buffer );
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(BeamMonitor_get_num_elem_by_elem_objects)( SIXTRL_BUFFER_ARGPTR_DEC const
-        NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer );
+        NS(Buffer) *const SIXTRL_RESTRICT belements_buffer );
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(BeamMonitor_get_num_of_beam_monitor_objects)( SIXTRL_BUFFER_ARGPTR_DEC const
-        NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer );
+        NS(Buffer) *const SIXTRL_RESTRICT belements_buffer );
 
 SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_clear_all)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer );
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(BeamMonitor_setup_for_particles_all)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(BeamMonitor_prepare_particles_out_buffer)(
@@ -59,13 +63,13 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(BeamMonitor_prepare_particles_out_buffer)(
     NS(buffer_size_t) const num_elem_by_elem_turns );
 
 SIXTRL_FN SIXTRL_STATIC int NS(BeamMonitor_assign_particles_out_buffer)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
     NS(buffer_size_t) const num_elem_by_elem_turns  );
 
 SIXTRL_FN SIXTRL_STATIC int
 NS(BeamMonitor_assign_particles_out_buffer_from_offset)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
     NS(buffer_size_t) const out_particles_block_offset );
 
@@ -73,23 +77,54 @@ NS(BeamMonitor_assign_particles_out_buffer_from_offset)(
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(BeamMonitor_get_num_elem_by_elem_objects_from_managed_buffer)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belements,
-    NS(buffer_size_t) const slot_size );
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT
+        belements_buffer, NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(BeamMonitor_get_num_of_beam_monitor_objects_from_managed_buffer)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT blements,
-    NS(buffer_size_t) const slot_size );
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT
+        blements_buffer, NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_clear_all_on_managed_buffer)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements,
-    NS(buffer_size_t) const slot_size );
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT
+        beam_elements_buffer, NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamMonitor_assign_managed_particles_out_buffer)(
+SIXTRL_FN SIXTRL_STATIC int
+NS(BeamMonitor_assign_managed_particles_out_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
-    NS(buffer_size_t) const out_particles_block_offset,
-    NS(buffer_size_t) const slot_size );
+    NS(buffer_size_t) const out_index, NS(buffer_size_t) const slot_size );
+
+/* ------------------------------------------------------------------------- */
+/* Element - by - Element Output: */
+
+struct NS(ElemByElemConfig);
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int
+NS(ElemByElemConfig_prepare_particles_out_buffer_detailed)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+        struct NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT
+        ptr_out_buffer_index_offset );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int
+NS(ElemByElemConfig_prepare_particles_out_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(buffer_size_t) const num_elem_by_elem_turns );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int
+NS(ElemByElemConfig_assign_particles_out_buffer)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+        struct NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
+    NS(buffer_size_t) const out_buffer_index_offset );
+
+#endif /* !defined( _GPUCODE ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
@@ -103,11 +138,17 @@ SIXTRL_FN SIXTRL_STATIC int NS(BeamMonitor_assign_managed_particles_out_buffer)(
     #if !defined( _GPUCODE )
         #include "sixtracklib/common/buffer.h"
     #endif /* !defined( _GPUCODE ) */
+
+    #include "sixtracklib/common/be_monitor/be_monitor.h"
+    #include "sixtracklib/common/output/elem_by_elem_config.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+
+/* ------------------------------------------------------------------------- */
+/* BeamMonitor based Output */
 
 #if !defined( _GPUCODE )
 
@@ -190,7 +231,8 @@ SIXTRL_INLINE int NS(BeamMonitor_setup_for_particles)(
     num_elements_t const num_particles = NS(Particles_get_num_of_particles)(
         particles );
 
-    if( ( beam_monitor != SIXTRL_NULLPTR ) && ( particles != SIXTRL_NULLPTR ) &&
+    if( ( beam_monitor != SIXTRL_NULLPTR ) &&
+        ( particles != SIXTRL_NULLPTR ) &&
         ( num_particles > ( num_elements_t )0u ) )
     {
         SIXTRL_STATIC_VAR index_t const ZERO = ( index_t )0u;
@@ -566,6 +608,11 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_managed_particles_out_buffer)(
 
     return success;
 }
+
+/* ------------------------------------------------------------------------- */
+/* Element - by - Element Output: */
+
+
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }

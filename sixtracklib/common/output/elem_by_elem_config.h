@@ -10,10 +10,11 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/particles.h"
-    #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
+    #include "sixtracklib/common/buffer/buffer_object.h"
     #include "sixtracklib/common/internal/elem_by_elem_config_defines.h"
+    #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -23,10 +24,11 @@ extern "C" {
 typedef SIXTRL_INT64_T  NS(elem_by_elem_order_int_t);
 typedef SIXTRL_UINT64_T NS(elem_by_elem_out_addr_t);
 
-typedef enum NS(ElemByElemStoreOrder)
+typedef enum NS(elem_by_elem_order_t)
 {
+    NS(ELEM_BY_ELEM_ORDER_INVALID)              = -1,
     NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES)  =  0,
-    NS(ELEM_BY_ELEM_ORDER_TURN_INVALID)         = -1
+    NS(ELEM_BY_ELEM_ORDER_DEFAULT)              =  0
 }
 NS(elem_by_elem_order_t);
 
@@ -111,12 +113,20 @@ NS(ElemByElemConfig_get_output_store_address)(
 /* -------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_num_elements_t)
-NS(ElemByElemConfig_get_particles_store_index)(
+NS(ElemByElemConfig_get_particles_store_index_details)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
     NS(particle_index_t) const particle_id,
     NS(particle_index_t) const at_element_id,
     NS(particle_index_t) const at_turn );
+
+SIXTRL_FN SIXTRL_STATIC NS(particle_num_elements_t)
+NS(ElemByElemConfig_get_particles_store_index)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
+        NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
+        *const SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index );
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_index_t) const
 NS(ElemByElemConfig_get_particle_id_from_store_index)(
@@ -149,13 +159,16 @@ SIXTRL_FN SIXTRL_STATIC int NS(ElemByElemConfig_init_detailed)(
     NS(particle_index_t) const min_turn,
     NS(particle_index_t) const max_turn );
 
+
+
+
 SIXTRL_FN SIXTRL_STATIC int
 NS(ElemByElemConfig_assign_managed_particles_out_buffer)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const out_buffer_index_offset );
-
+    NS(buffer_size_t) const out_buffer_index_offset,
+    NS(buffer_size_t) const slot_size );
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
 NS(ElemByElemConfig)* NS(ElemByElemConfig_preset)(
@@ -169,12 +182,12 @@ SIXTRL_FN SIXTRL_STATIC void NS(ElemByElemConfig_clear)(
 SIXTRL_FN SIXTRL_STATIC void NS(ElemByElemConfig_set_order)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
-    elem_by_elem_order_t const order );
+    NS(elem_by_elem_order_t) const order );
 
 SIXTRL_FN SIXTRL_STATIC void NS(ElemByElemConfig_set_output_store_address)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
-    NS(particle_num_elements_t) const out_buffer_index_offset );
+    NS(elem_by_elem_out_addr_t) const out_address );
 
 #if !defined( _GPUCODE )
 
@@ -188,14 +201,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ElemByElemConfig_init)(
         const NS(Particles) *const SIXTRL_RESTRICT particles,
     NS(particle_index_t) const min_turn,
     NS(particle_index_t) const max_turn );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN int
-NS(ElemByElemConfig_assign_particles_out_buffer)(
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
-        NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const out_buffer_index_offset );
-
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(ElemByElemConfig_get_required_num_slots)(
@@ -231,8 +236,7 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add)(
     NS(particle_index_t) const min_element_id,
     NS(particle_index_t) const max_element_id,
     NS(particle_index_t) const min_turn,
-    NS(particle_index_t) const max_turn,
-    NS(particle_num_elements_t) const out_buffer_index_offset );
+    NS(particle_index_t) const max_turn );
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
 NS(ElemByElemConfig)* NS(ElemByElemConfig_add_copy)(
@@ -339,13 +343,12 @@ NS(ElemByElemConfig_get_max_turn)(
     return config->max_turn;
 }
 
-SIXTRL_INLINE NS(elem_by_elem_order_t)
-NS(ElemByElemConfig_get_order)(
+SIXTRL_INLINE NS(elem_by_elem_order_t) NS(ElemByElemConfig_get_order)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config )
 {
     SIXTRL_ASSERT( config != SIXTRL_NULLPTR );
-    return config->order;
+    return ( NS(elem_by_elem_order_t) )config->order;
 }
 
 SIXTRL_INLINE NS(elem_by_elem_out_addr_t)
@@ -360,21 +363,19 @@ NS(ElemByElemConfig_get_output_store_address)(
 /* -------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(particle_num_elements_t)
-NS(ElemByElemConfig_get_particles_store_index)(
+NS(ElemByElemConfig_get_particles_store_index_details)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
     NS(particle_index_t) const particle_id,
     NS(particle_index_t) const at_element, NS(particle_index_t) const at_turn )
 {
     typedef NS(particle_num_elements_t) num_elem_t;
-    typedef NS(particle_index_t)        index_t;
-
     num_elem_t out_store_index = ( num_elem_t )-1;
 
     SIXTRL_ASSERT( config != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( particle_id >= ( index_t )0u );
-    SIXTRL_ASSERT( at_element  >= ( index_t )0u );
-    SIXTRL_ASSERT( at_turn     >= ( index_t )0u );
+    SIXTRL_ASSERT( particle_id >= ( NS(particle_index_t) )0u );
+    SIXTRL_ASSERT( at_element  >= ( NS(particle_index_t) )0u );
+    SIXTRL_ASSERT( at_turn     >= ( NS(particle_index_t) )0u );
 
     SIXTRL_ASSERT( NS(ElemByElemConfig_get_min_particle_id)( config ) <=
                    NS(ElemByElemConfig_get_max_particle_id)( config ) );
@@ -408,7 +409,7 @@ NS(ElemByElemConfig_get_particles_store_index)(
             NS(ElemByElemConfig_get_num_elements_to_store)( config );
 
         num_elem_t const num_turns_to_store =
-            NS(ElemByElemConfig_get_num_elements_to_store)( config );
+            NS(ElemByElemConfig_get_num_turns_to_store)( config );
 
         SIXTRL_ASSERT( num_particles_to_store > ( num_elem_t )0u );
         SIXTRL_ASSERT( num_elements_to_store  > ( num_elem_t )0u );
@@ -418,6 +419,8 @@ NS(ElemByElemConfig_get_particles_store_index)(
         {
             case NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES):
             {
+                ( void )num_turns_to_store;
+
                 out_store_index  = turn_offset *
                     num_particles_to_store * num_elements_to_store;
 
@@ -433,7 +436,7 @@ NS(ElemByElemConfig_get_particles_store_index)(
             }
         };
 
-        ASSERT_TRUE(
+        SIXTRL_ASSERT(
             ( ( out_store_index >= ( num_elem_t )0u ) && ( out_store_index <
                 NS(ElemByElemConfig_get_out_store_num_particles)( config ) )
             ) || ( out_store_index < ( num_elem_t )0u ) );
@@ -441,6 +444,29 @@ NS(ElemByElemConfig_get_particles_store_index)(
 
     return out_store_index;
 }
+
+
+SIXTRL_INLINE NS(particle_num_elements_t)
+NS(ElemByElemConfig_get_particles_store_index)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
+        NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
+        *const SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const index )
+{
+    typedef NS(particle_index_t) index_t;
+
+    index_t const temp_particle_id =
+        NS(Particles_get_particle_id_value)( particles, index );
+
+    index_t const particle_id = ( temp_particle_id >= ( index_t )0u )
+        ? temp_particle_id : -temp_particle_id;
+
+    return NS(ElemByElemConfig_get_particles_store_index_details)( config,
+        particle_id, NS(Particles_get_at_element_id_value)( particles, index ),
+        NS(Particles_get_at_turn_value)( particles, index ) );
+}
+
 
 SIXTRL_INLINE NS(particle_index_t) const
 NS(ElemByElemConfig_get_particle_id_from_store_index)(
@@ -483,7 +509,7 @@ NS(ElemByElemConfig_get_particle_id_from_store_index)(
                    NS(ElemByElemConfig_get_out_store_num_particles)( config ) );
 
     if( ( out_store_index >= ( num_elem_t )0u ) && ( out_store_index <
-        ( NS(ElemByElemConfig_get_out_store_num_particles)( config ) ) )
+        ( NS(ElemByElemConfig_get_out_store_num_particles)( config ) ) ) )
     {
         num_elem_t const num_particles_to_store =
             NS(ElemByElemConfig_get_num_particles_to_store)( config );
@@ -493,6 +519,8 @@ NS(ElemByElemConfig_get_particle_id_from_store_index)(
 
         num_elem_t const num_turns_to_store =
             NS(ElemByElemConfig_get_num_turns_to_store)( config );
+
+        ( void )num_turns_to_store;
 
         SIXTRL_ASSERT( num_particles_to_store > ( num_elem_t )0u );
         SIXTRL_ASSERT( num_elements_to_store  > ( num_elem_t )0u );
@@ -514,7 +542,7 @@ NS(ElemByElemConfig_get_particle_id_from_store_index)(
 
             default:
             {
-                out_store_index = ( num_elem_t )-1;
+                particle_id = ( num_elem_t )-1;
             }
         };
 
@@ -568,7 +596,7 @@ NS(ElemByElemConfig_get_at_element_id_from_store_index)(
                    NS(ElemByElemConfig_get_out_store_num_particles)( config ) );
 
     if( ( out_store_index >= ( num_elem_t )0u ) && ( out_store_index <
-        ( NS(ElemByElemConfig_get_out_store_num_particles)( config ) ) )
+        ( NS(ElemByElemConfig_get_out_store_num_particles)( config ) ) ) )
     {
         num_elem_t const num_particles_to_store =
             NS(ElemByElemConfig_get_num_particles_to_store)( config );
@@ -583,9 +611,11 @@ NS(ElemByElemConfig_get_at_element_id_from_store_index)(
         SIXTRL_ASSERT( num_elements_to_store  > ( num_elem_t )0u );
         SIXTRL_ASSERT( num_turns_to_store     > ( num_elem_t )0u );
 
+        ( void )num_turns_to_store;
+
         switch( NS(ElemByElemConfig_get_order)( config ) )
         {
-            case NS(SIXTRL_ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES):
+            case NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES):
             {
                 num_elem_t const stored_particles_per_turn =
                     num_particles_to_store * num_elements_to_store;
@@ -599,7 +629,7 @@ NS(ElemByElemConfig_get_at_element_id_from_store_index)(
 
             default:
             {
-                out_store_index = ( num_elem_t )-1;
+                at_element_id = ( num_elem_t )-1;
             }
         };
 
@@ -653,7 +683,7 @@ NS(ElemByElemConfig_get_at_turn_from_store_index)(
                    NS(ElemByElemConfig_get_out_store_num_particles)( config ) );
 
     if( ( out_store_index >= ( num_elem_t )0u ) && ( out_store_index <
-        ( NS(ElemByElemConfig_get_out_store_num_particles)( config ) ) )
+        ( NS(ElemByElemConfig_get_out_store_num_particles)( config ) ) ) )
     {
         num_elem_t const num_particles_to_store =
             NS(ElemByElemConfig_get_num_particles_to_store)( config );
@@ -664,13 +694,15 @@ NS(ElemByElemConfig_get_at_turn_from_store_index)(
         num_elem_t const num_turns_to_store =
             NS(ElemByElemConfig_get_num_turns_to_store)( config );
 
+        ( void )num_turns_to_store;
+
         SIXTRL_ASSERT( num_particles_to_store > ( num_elem_t )0u );
         SIXTRL_ASSERT( num_elements_to_store  > ( num_elem_t )0u );
         SIXTRL_ASSERT( num_turns_to_store     > ( num_elem_t )0u );
 
         switch( NS(ElemByElemConfig_get_order)( config ) )
         {
-            case NS(SIXTRL_ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES):
+            case NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES):
             {
                 num_elem_t const stored_particles_per_turn =
                     num_particles_to_store * num_elements_to_store;
@@ -683,7 +715,7 @@ NS(ElemByElemConfig_get_at_turn_from_store_index)(
 
             default:
             {
-                out_store_index = ( num_elem_t )-1;
+                at_turn = ( num_elem_t )-1;
             }
         };
 
@@ -712,28 +744,26 @@ SIXTRL_INLINE int NS(ElemByElemConfig_init_detailed)(
     int success = -1;
 
     typedef NS(particle_num_elements_t)     num_elem_t;
-    typedef NS(elem_by_elem_order_int_t)    order_int_t;
     typedef NS(particle_index_t)            index_t;
 
+    SIXTRL_STATIC_VAR index_t const ZERO = ( index_t )0u;
+
     if( ( config != SIXTRL_NULLPTR ) &&
-        ( ( NS(order_int_t ) )order >= ( NS(order_int_t ) )0u ) &&
-        ( ( NS(order_int_t ) )order <= ( NS(order_int_t ) )1u ) &&
-        ( min_particle_id >= ( index_t )0u ) &&
-        ( max_particle_id >= min_particle_id ) &&
-        ( min_element_id  >= ( index_t )0u ) &&
-        ( max_element_id  >= min_element_id ) &&
-        ( min_turn        >= ( index_t )0u ) &&
-        ( max_turn        >= min_turn ) &&
-        ( out_buffer_index_offset >= ( num_elem_t )0u ) )
+        ( order  != NS(ELEM_BY_ELEM_ORDER_INVALID) ) &&
+        ( min_particle_id >= ZERO ) && ( max_particle_id >= min_particle_id ) &&
+        ( min_element_id  >= ZERO ) && ( max_element_id  >= min_element_id ) &&
+        ( min_turn        >= ZERO ) && ( max_turn        >= min_turn ) )
     {
-        num_elem_t const num_particles_to_store = ( num_elem_t )(
-            max_particle_id - min_particle_id + ( num_elem_t )1u );
+        SIXTRL_STATIC_VAR num_elem_t const ONE = ( num_elem_t )1u;
 
-        num_elem_t const num_elements_to_store  = ( num_elem_t )(
-            max_element_id  - min_element_id  + ( num_elem_t )1u );
+        num_elem_t const num_particles_to_store =
+            ( num_elem_t )( max_particle_id - min_particle_id + ONE );
 
-        num_elem_t const num_turns_to_store = ( num_elem_t )(
-            max_turn - min_turn + ( num_elem_t )1u );
+        num_elem_t const num_elements_to_store  =
+            ( num_elem_t )( max_element_id  - min_element_id  + ONE );
+
+        num_elem_t const num_turns_to_store =
+            ( num_elem_t )( max_turn - min_turn + ONE );
 
         NS(ElemByElemConfig_set_order)( config, order );
         NS(ElemByElemConfig_clear)( config );
@@ -757,20 +787,66 @@ SIXTRL_INLINE int NS(ElemByElemConfig_init_detailed)(
     return success;
 }
 
+SIXTRL_INLINE int NS(ElemByElemConfig_assign_managed_particles_out_buffer)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+        NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
+    NS(buffer_size_t) const out_buffer_index_offset,
+    NS(buffer_size_t) const slot_size )
+{
+    int success = -1;
+
+    typedef NS(buffer_size_t) buf_size_t;
+
+    if( ( config != SIXTRL_NULLPTR ) && ( output_buffer != SIXTRL_NULLPTR ) &&
+        ( slot_size > ( buf_size_t )0u ) )
+    {
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* ptr_particles_t;
+        typedef NS(elem_by_elem_out_addr_t)               address_t;
+
+        ptr_particles_t particles = SIXTRL_NULLPTR;
+
+        SIXTRL_ASSERT( NS(ElemByElemConfig_get_order)( config ) !=
+            NS(ELEM_BY_ELEM_ORDER_INVALID) );
+
+        SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)(
+            output_buffer, slot_size ) );
+
+        SIXTRL_ASSERT( NS(ManagedBuffer_get_num_objects)( output_buffer,
+            slot_size ) > out_buffer_index_offset );
+
+        particles = NS(Particles_managed_buffer_get_particles)(
+            output_buffer, out_buffer_index_offset, slot_size );
+
+        if( particles != SIXTRL_NULLPTR )
+        {
+            SIXTRL_ASSERT( ( NS(Particles_get_num_of_particles)( particles ) >=
+                NS(ElemByElemConfig_get_out_store_num_particles)( config ) ) ||
+                ( NS(ElemByElemConfig_get_out_store_num_particles)( config ) ==
+                    ( NS(buffer_size_t) )0u ) );
+
+            NS(ElemByElemConfig_set_output_store_address)( config,
+                ( address_t )( uintptr_t )particles );
+
+            success = 0;
+        }
+    }
+
+    return success;
+}
+
 SIXTRL_INLINE SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
 NS(ElemByElemConfig)* NS(ElemByElemConfig_preset)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
-        NS(ElemByElemConfig)* SIXTRL_RESTRICT config )
+        NS(ElemByElemConfig)* SIXTRL_RESTRICT conf )
 {
-    if( config != SIXTRL_NULLPTR )
+    if( conf != SIXTRL_NULLPTR )
     {
-        NS(ElemByELemConfig_clear)( config );
-
-        NS(ElemByElemConfig_set_order)(
-            config, NS(ELEM_BY_ELEM_ORDER_TURN_INVALID) );
+        NS(ElemByElemConfig_clear)( conf );
+        NS(ElemByElemConfig_set_order)( conf, NS(ELEM_BY_ELEM_ORDER_INVALID) );
     }
 
-    return config;
+    return conf;
 }
 
 SIXTRL_INLINE void NS(ElemByElemConfig_clear)(
@@ -808,8 +884,7 @@ SIXTRL_INLINE void NS(ElemByElemConfig_set_order)(
 {
     if( config != SIXTRL_NULLPTR )
     {
-        config->out_buffer_index_offset =
-            ( NS(elem_by_elem_order_int_t ) )order;
+        config->order = ( NS(elem_by_elem_order_int_t ) )order;
     }
 
     return;
@@ -820,8 +895,8 @@ SIXTRL_INLINE void NS(ElemByElemConfig_set_output_store_address)(
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
     NS(elem_by_elem_out_addr_t) const out_address )
 {
-    if( config != SIXTRL_NULPTR ) config->out_store_addr = out_address;
-   return;
+    if( config != SIXTRL_NULLPTR ) config->out_store_addr = out_address;
+    return;
 }
 
 #if !defined( _GPUCODE )
@@ -835,7 +910,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ElemByElemConfig_get_required_num_slots)(
 
     buf_size_t num_required_slots = ( buf_size_t )0u;
 
-    if( ( buffer != SIXTRL_NULLPTR ) && ( slot_size != ( buf_size_t )0u ) )
+    if( ( config != SIXTRL_NULLPTR ) && ( slot_size != ( buf_size_t )0u ) )
     {
         num_required_slots = NS(ManagedBuffer_get_slot_based_length)(
             sizeof( NS(ElemByElemConfig) ), slot_size );
@@ -868,7 +943,6 @@ SIXTRL_INLINE bool NS(ElemByElemConfig_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_slots,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_dataptrs )
 {
-    typedef NS(buffer_size_t)    buf_size_t;
     typedef NS(ElemByElemConfig) config_t;
 
     config_t config;
@@ -892,7 +966,7 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_new)(
     SIXTRL_ASSERT( NS(Buffer_allow_append_objects)( buffer ) );
 
     NS(ElemByElemConfig) config;
-    NS(Particles_preset)( &config );
+    NS(ElemByElemConfig_preset)( &config );
 
     return ( ptr_to_config_t )( uintptr_t )NS(Object_get_begin_addr)(
         NS(Buffer_add_object)( buffer, &config, sizeof( config_t ),
@@ -912,8 +986,7 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add)(
     NS(particle_index_t) const min_turn,
     NS(particle_index_t) const max_turn )
 {
-    typedef NS(ElemByElemConfig)                    config_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC config_t*     ptr_to_config_t;
+    typedef NS(ElemByElemConfig) config_t;
     typedef SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
             ptr_new_config_t;
 
@@ -948,7 +1021,6 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add_copy)(
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config )
 {
     typedef NS(ElemByElemConfig)                    config_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC config_t*     ptr_to_config_t;
     typedef SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
             ptr_new_config_t;
 
@@ -957,9 +1029,6 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add_copy)(
     SIXTRL_ASSERT( buffer != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( NS(Buffer_has_datastore)( buffer ) );
     SIXTRL_ASSERT( NS(Buffer_allow_append_objects)( buffer ) );
-
-    config_t config;
-    NS(ElemByElemConfig_preset)( &config );
 
     if( config != SIXTRL_NULLPTR )
     {
