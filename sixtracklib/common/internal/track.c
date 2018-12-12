@@ -215,11 +215,10 @@ SIXTRL_HOST_FN int NS(Track_particle_element_by_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const index,
     NS(particle_index_t) const max_turn,
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT beam_elements,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT out_particles )
 {
     typedef NS(particle_index_t)        index_t;
-    typedef NS(buffer_size_t)           buf_size_t;
     typedef NS(particle_num_elements_t) num_elem_t;
 
     index_t min_particle_id   = ( index_t )0;
@@ -290,7 +289,6 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT out_particles )
 {
     typedef NS(particle_index_t)        index_t;
-    typedef NS(buffer_size_t)           buf_size_t;
     typedef NS(particle_num_elements_t) num_elem_t;
 
     index_t min_particle_id   = ( index_t )0;
@@ -460,8 +458,6 @@ SIXTRL_HOST_FN int
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     NS(particle_index_t) const until_turn )
 {
-    typedef NS(particle_num_elements_t) num_elem_t;
-
     return NS(Track_all_particles_element_by_element_until_turn_objs)(
         particles, config, NS(Buffer_get_const_objects_begin)( belements ),
         NS(Buffer_get_const_objects_end)( belements ), until_turn );
@@ -477,7 +473,6 @@ SIXTRL_HOST_FN int NS(Track_particle_element_by_element_until_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT out_particles )
 {
     typedef NS(particle_index_t)        index_t;
-    typedef NS(buffer_size_t)           buf_size_t;
     typedef NS(particle_num_elements_t) num_elem_t;
 
     index_t min_particle_id   = ( index_t )0;
@@ -548,7 +543,6 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element_until_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT out_particles )
 {
     typedef NS(particle_index_t)        index_t;
-    typedef NS(buffer_size_t)           buf_size_t;
     typedef NS(particle_num_elements_t) num_elem_t;
 
     index_t min_particle_id   = ( index_t )0;
