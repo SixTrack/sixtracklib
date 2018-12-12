@@ -212,11 +212,12 @@ int NS(BeamMonitor_prepare_particles_out_buffer)(
                 {
                     success = -1;
                 }
+
+                SIXTRL_ASSERT( ( success != 0 ) ||
+                    ( NS(Buffer_get_num_of_objects)( out_buffer )
+                        == num_objects ) );
             }
         }
-
-        SIXTRL_ASSERT( ( success != 0 ) ||
-            ( NS(Buffer_get_num_of_objects)( out_buffer ) == num_objects ) );
 
         if( success != 0 )
         {
@@ -343,10 +344,10 @@ SIXTRL_HOST_FN int NS(ElemByElemConfig_prepare_particles_out_buffer)(
         NS(Buffer_get_num_of_objects)( belements );
 
     SIXTRL_ASSERT( ( out_buffer == SIXTRL_NULLPTR ) ||
-                   ( NS(Buffer_needs_remapping)( out_buffer ) ) );
+                   ( !NS(Buffer_needs_remapping)( out_buffer ) ) );
 
     SIXTRL_ASSERT( ( belements == SIXTRL_NULLPTR ) ||
-                   ( NS(Buffer_needs_remapping)( belements ) ) );
+                   ( !NS(Buffer_needs_remapping)( belements ) ) );
 
     if( ( num_elem_by_elem_turns > ZERO ) && ( num_beam_elements > ZERO ) &&
         ( particles != SIXTRL_NULLPTR ) && ( out_buffer != SIXTRL_NULLPTR ) )
