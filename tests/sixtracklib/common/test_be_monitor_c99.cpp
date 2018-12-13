@@ -416,6 +416,8 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     /* --------------------------------------------------------------------- */
     /* reserve out_buffer buffer with element by element buffer */
 
+    ::st_Buffer_reset( out_buffer );
+
     ASSERT_TRUE( 0 == ::st_BeamMonitor_prepare_particles_out_buffer(
         eb, out_buffer, particles, 1u ) );
 
@@ -757,6 +759,9 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
     ::st_Particles_copy( particles, initial_state );
 
     /* --------------------------------------------------------------------- */
+
+    ASSERT_TRUE( 0 == ::st_BeamMonitor_prepare_particles_out_buffer(
+        eb, out_buffer, particles, 0u ) );
 
     ASSERT_TRUE( 0 == ::st_BeamMonitor_assign_particles_out_buffer(
         eb, out_buffer, 0u ) );
