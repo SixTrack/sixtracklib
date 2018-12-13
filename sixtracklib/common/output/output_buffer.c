@@ -304,7 +304,7 @@ SIXTRL_HOST_FN int NS(ElemByElemConfig_prepare_particles_out_buffer_detailed)(
         ptr_particles_t particles = NS(Particles_new)(
             out_buffer, out_store_num_particles );
 
-        if( particles != SIXTRL_NULLPTR );
+        if( particles != SIXTRL_NULLPTR )
         {
             SIXTRL_ASSERT( NS(Particles_get_num_of_particles)( particles ) ==
                 out_store_num_particles );

@@ -128,19 +128,19 @@ NS(ElemByElemConfig_get_particles_store_index)(
         *const SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index );
 
-SIXTRL_FN SIXTRL_STATIC NS(particle_index_t) const
+SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
 NS(ElemByElemConfig_get_particle_id_from_store_index)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
     NS(particle_num_elements_t) const out_store_index );
 
-SIXTRL_FN SIXTRL_STATIC NS(particle_index_t) const
+SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
 NS(ElemByElemConfig_get_at_element_id_from_store_index)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
     NS(particle_num_elements_t) const out_store_index );
 
-SIXTRL_FN SIXTRL_STATIC NS(particle_index_t) const
+SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
 NS(ElemByElemConfig_get_at_turn_from_store_index)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
@@ -199,8 +199,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ElemByElemConfig_init)(
         const NS(Buffer) *const beam_elements_buffer,
     SIXTRL_PARTICLE_ARGPTR_DEC
         const NS(Particles) *const SIXTRL_RESTRICT particles,
-    NS(particle_index_t) const min_turn,
-    NS(particle_index_t) const max_turn );
+    NS(particle_index_t) min_turn, NS(particle_index_t) max_turn );
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(ElemByElemConfig_get_required_num_slots)(
@@ -468,7 +467,7 @@ NS(ElemByElemConfig_get_particles_store_index)(
 }
 
 
-SIXTRL_INLINE NS(particle_index_t) const
+SIXTRL_INLINE NS(particle_index_t)
 NS(ElemByElemConfig_get_particle_id_from_store_index)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
@@ -555,7 +554,7 @@ NS(ElemByElemConfig_get_particle_id_from_store_index)(
     return particle_id;
 }
 
-SIXTRL_INLINE NS(particle_index_t) const
+SIXTRL_INLINE NS(particle_index_t)
 NS(ElemByElemConfig_get_at_element_id_from_store_index)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
@@ -642,7 +641,7 @@ NS(ElemByElemConfig_get_at_element_id_from_store_index)(
     return at_element_id;
 }
 
-SIXTRL_INLINE NS(particle_index_t) const
+SIXTRL_INLINE NS(particle_index_t)
 NS(ElemByElemConfig_get_at_turn_from_store_index)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
