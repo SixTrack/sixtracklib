@@ -39,7 +39,7 @@ __kernel void NS(Track_particles_elem_by_elem_debug_opencl)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
         SIXTRL_RESTRICT elem_by_elem_config,
     SIXTRL_INT64_T const until_turn,
-    SIXTRL_UINT64_T const out_particle_blocks_offset,
+    SIXTRL_UINT64_T const out_buffer_index_offset,
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T*
         SIXTRL_RESTRICT ptr_success_flag );
 

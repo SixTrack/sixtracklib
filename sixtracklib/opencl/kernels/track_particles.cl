@@ -33,7 +33,7 @@ __kernel void NS(Track_particles_elem_by_elem_opencl)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
         SIXTRL_RESTRICT elem_by_elem_config,
     SIXTRL_INT64_T const until_turn,
-    SIXTRL_UINT64_T const out_particle_blocks_offset );
+    SIXTRL_UINT64_T const out_buffer_index_offset );
 
 /* ========================================================================= */
 
