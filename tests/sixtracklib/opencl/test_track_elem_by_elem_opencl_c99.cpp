@@ -40,8 +40,7 @@ namespace sixtrack
     }
 }
 
-TEST( C99_OpenCLTrackElemByElemTests,
-      TrackElemByElemHostAndDeviceCompareLhcNoBB )
+TEST( C99_OpenCLTrackElemByElemTests, TrackElemByElemHostAndDeviceCompareDrifts)
 {
     using real_t       = ::st_particle_real_t;
     using part_index_t = ::st_particle_index_t;

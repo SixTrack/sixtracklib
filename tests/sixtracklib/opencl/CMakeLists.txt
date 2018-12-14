@@ -52,7 +52,7 @@ if( GTEST_FOUND )
     set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS}
          test_track_elem_by_elem_opencl_c99 )
 
-    add_test( C99_OpenCL_BeamElementsMonitorTests
+    add_test( C99_OpenCL_TrackElemByElemTests
               test_track_elem_by_elem_opencl_c99 )
 
     # --------------------------------------------------------------------------
