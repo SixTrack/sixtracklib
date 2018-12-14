@@ -659,6 +659,9 @@ SIXTRL_HOST_FN NS(context_node_id_t) const*
 NS(ClContextBase_get_selected_node_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
+SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_selected_node_index)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
+
 SIXTRL_HOST_FN bool NS(ClContextBase_get_selected_node_id_str)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     char* SIXTRL_RESTRICT node_id_str,
