@@ -428,8 +428,20 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
     ::st_ElemByElemConfig elem_by_elem_config;
     ::st_ElemByElemConfig_preset( &elem_by_elem_config );
 
-    ASSERT_TRUE( 0 == ::st_ElemByElemConfig_prepare_particles_out_buffer(
-        eb, elem_by_elem_buffer, particles, NUM_TURNS ) );
+    ASSERT_TRUE( 0 == ::st_ElemByElemConfig_init( &elem_by_elem_config,
+        ::st_ELEM_BY_ELEM_ORDER_DEFAULT, eb, particles,
+                part_index_t{ 0 }, NUM_TURNS ) );
+
+    size_t elem_by_elem_index_offset = size_t{ 0 };
+
+    int ret = ::st_ElemByElemConfig_prepare_particles_out_buffer_detailed(
+        &elem_by_elem_config, elem_by_elem_buffer,
+            &elem_by_elem_index_offset );
+
+    ASSERT_TRUE( ret == 0 );
+    ASSERT_TRUE( elem_by_elem_index_offset == size_t{ 2 } );
+    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( elem_by_elem_buffer ) ==
+                 size_t{ 3 } );
 
     initial_state = ::st_Particles_buffer_get_particles( elem_by_elem_buffer, 0u );
     final_state   = ::st_Particles_buffer_get_particles( elem_by_elem_buffer, 1u );
@@ -444,7 +456,7 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
     ASSERT_TRUE( 0 == ::st_ElemByElemConfig_assign_particles_out_buffer(
         &elem_by_elem_config, elem_by_elem_buffer, 2u ) );
 
-    int ret = ::st_Track_all_particles_element_by_element_until_turn_details(
+    ret = ::st_Track_all_particles_element_by_element_until_turn_details(
             particles, &elem_by_elem_config, eb, NUM_TURNS );
 
     ASSERT_TRUE( ret == 0 );
