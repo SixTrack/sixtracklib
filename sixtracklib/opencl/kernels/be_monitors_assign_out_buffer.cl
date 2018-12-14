@@ -10,7 +10,7 @@
     #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/be_monitor/be_monitor.h"
-    #include "sixtracklib/common/be_monitor/output_buffer.h"
+    #include "sixtracklib/common/output/output_buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_opencl)(

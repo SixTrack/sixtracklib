@@ -28,8 +28,8 @@ static int NS(Particles_particle_id_merge_and_check_for_duplicate)(
 
 extern SIXTRL_HOST_FN int NS(Particles_get_min_max_particle_id)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
-    SIXTRL_ARGPTR_DEC NS(particle_num_elements_t)* SIXTRL_RESTRICT ptr_min_id,
-    SIXTRL_ARGPTR_DEC NS(particle_num_elements_t)* SIXTRL_RESTRICT ptr_max_id );
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_id );
 
 /* ------------------------------------------------------------------------- */
 
@@ -162,8 +162,8 @@ int NS(Particles_particle_id_recursive_merge_sort)(
 
 int NS(Particles_get_min_max_particle_id)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
-    SIXTRL_ARGPTR_DEC NS(particle_num_elements_t)* SIXTRL_RESTRICT ptr_min_id,
-    SIXTRL_ARGPTR_DEC NS(particle_num_elements_t)* SIXTRL_RESTRICT ptr_max_id )
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_id )
 {
     typedef NS(particle_num_elements_t) num_elem_t;
     typedef NS(particle_index_t)        index_t;
@@ -227,12 +227,13 @@ int NS(Particles_get_min_max_particle_id)(
         {
             if( ptr_max_id != SIXTRL_NULLPTR )
             {
-                *ptr_max_id = particle_id_array[ num_particles - ( num_elem_t )1u ];
+                *ptr_max_id = ( index_t )particle_id_array[
+                    num_particles - ( num_elem_t )1u ];
             }
 
             if( ptr_min_id != SIXTRL_NULLPTR )
             {
-                *ptr_min_id = particle_id_array[ 0 ];
+                *ptr_min_id = ( index_t )particle_id_array[ 0 ];
             }
         }
 

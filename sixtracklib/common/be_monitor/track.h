@@ -173,4 +173,4 @@ SIXTRL_INLINE int NS(Track_particle_beam_monitor)(
 
 #endif /* SIXTRACKLIB_COMMON_BE_MONITOR_TRACK_MONITOR_C99_HEADER_H__ */
 
-/* end: sixtracklib/common/be_monitor/track_monitor.h */
+/* end: sixtracklib/common/be_monitor/track.h */

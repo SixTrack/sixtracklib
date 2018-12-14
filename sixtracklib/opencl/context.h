@@ -9,6 +9,11 @@
     #include <stdint.h>
     #include <stdlib.h>
     #include <limits.h>
+
+    #if defined( __cplusplus )
+        #include <CL/cl.hpp>
+    #endif /* !defined( __cplusplus ) */
+
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
@@ -157,13 +162,20 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
+        virtual void doClear() override;
         virtual bool doInitDefaultPrograms() override;
         virtual bool doInitDefaultKernels()  override;
+        virtual bool doSelectNode( size_type const node_index ) override;
 
         private:
 
+        bool doSelectNodePrivImpl( size_type const node_index );
+        void doClearPrivImpl();
+
         bool doInitDefaultProgramsPrivImpl();
         bool doInitDefaultKernelsPrivImpl();
+
+        cl::Buffer   m_elem_by_elem_config_buffer;
 
         program_id_t m_track_until_turn_program_id;
         program_id_t m_track_single_turn_program_id;
