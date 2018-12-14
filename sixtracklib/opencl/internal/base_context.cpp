@@ -476,6 +476,16 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_selected_node_index ) );
     }
 
+    ClContextBase::size_type
+    ClContextBase::selectedNodeIndex() const SIXTRL_NOEXCEPT
+    {
+        using size_t = ClContextBase::size_type;
+
+        return ( this->hasSelectedNode() )
+            ? static_cast< size_t >( this->m_selected_node_index )
+            : this->numAvailableNodes();
+    }
+
     std::string ClContextBase::selectedNodeIdStr() const SIXTRL_NOEXCEPT
     {
         char node_id_str[ 32 ];

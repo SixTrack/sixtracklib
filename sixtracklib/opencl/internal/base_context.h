@@ -125,6 +125,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         node_id_t const*    ptrSelectedNodeId()     const SIXTRL_NOEXCEPT;
         node_info_t const*  ptrSelectedNodeInfo()   const SIXTRL_NOEXCEPT;
+        size_type           selectedNodeIndex()     const SIXTRL_NOEXCEPT;
 
         std::string selectedNodeIdStr() const SIXTRL_NOEXCEPT;
         bool selectedNodeIdStr( char* SIXTRL_RESTRICT node_id_str,
