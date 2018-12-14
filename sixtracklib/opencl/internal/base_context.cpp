@@ -2218,8 +2218,10 @@ SIXTRL_HOST_FN NS(context_node_id_t) const* NS(ClContextBase_get_selected_node_i
 SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_selected_node_index)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->selectedNodeIndex()
-        : std::numeric_limits< context_size_t >::max();
+    using size_type = NS(context_size_t);
+    using limits_t  = std::numeric_limits< size_type >;
+
+    return ( ctx != nullptr ) ? ctx->selectedNodeIndex() : limits_t::max();
 }
 
 SIXTRL_HOST_FN bool NS(ClContextBase_get_selected_node_id_str)(
