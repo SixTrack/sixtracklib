@@ -387,11 +387,6 @@ SIXTRL_HOST_FN int NS(ElemByElemConfig_prepare_particles_out_buffer)(
             index_t const end_turn_id = min_turn_id + num_elem_by_elem_turns;
             index_t const end_element_id = min_element_id + num_beam_elements;
 
-//             if( min_particle_id > ZERO_INDEX )
-//             {
-//                 min_particle_id = ZERO_INDEX;
-//             }
-
             if( ( max_turn_id + ONE_INDEX ) < end_turn_id )
             {
                 max_turn_id = end_turn_id - ONE_INDEX;
