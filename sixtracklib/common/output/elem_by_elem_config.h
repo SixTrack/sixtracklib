@@ -800,7 +800,7 @@ SIXTRL_INLINE int NS(ElemByElemConfig_assign_managed_particles_out_buffer)(
     if( ( config != SIXTRL_NULLPTR ) && ( output_buffer != SIXTRL_NULLPTR ) &&
         ( slot_size > ( buf_size_t )0u ) )
     {
-        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* ptr_particles_t;
+        typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)*  ptr_particles_t;
         typedef NS(elem_by_elem_out_addr_t)               address_t;
 
         ptr_particles_t particles = SIXTRL_NULLPTR;
