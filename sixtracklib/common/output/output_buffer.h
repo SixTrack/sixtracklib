@@ -302,12 +302,8 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_managed_output_buffer)(
     typedef SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)*           ptr_beam_monitor_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Particles) const*  ptr_particles_t;
     typedef NS(be_monitor_index_t)                          mon_index_t;
-    typedef NS(particle_index_t)                            part_index_t;
 
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
-
-    buf_size_t const num_blocks = NS(ManagedBuffer_get_num_objects)(
-        out_buffer, slot_size );
 
     ptr_obj_t out_it = NS(ManagedBuffer_get_objects_index_begin)(
         out_buffer, slot_size );
@@ -329,7 +325,8 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_managed_output_buffer)(
     SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)(
         beam_elements, slot_size ) );
 
-    SIXTRL_ASSERT( out_buffer_index_offset < num_blocks );
+    SIXTRL_ASSERT( out_buffer_index_offset <
+        NS(ManagedBuffer_get_num_objects)( out_buffer, slot_size ) );
 
     SIXTRL_ASSERT( be_it  != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( be_end != SIXTRL_NULLPTR );
@@ -337,7 +334,7 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_managed_output_buffer)(
     SIXTRL_ASSERT( out_it  != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( out_end != SIXTRL_NULLPTR );
 
-    SIXTRL_ASSERT( min_turn_id >= ( part_index_t )0u );
+    SIXTRL_ASSERT( min_turn_id >= ( NS(particle_index_t) )0u );
 
     out_it = out_it + out_buffer_index_offset;
 
