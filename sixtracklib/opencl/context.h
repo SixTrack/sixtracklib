@@ -9,6 +9,11 @@
     #include <stdint.h>
     #include <stdlib.h>
     #include <limits.h>
+
+    #if defined( __cplusplus )
+        #include <CL/cl.hpp>
+    #endif /* !defined( __cplusplus ) */
+
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
@@ -119,13 +124,13 @@ namespace SIXTRL_CXX_NAMESPACE
         int assignBeamMonitorIoBuffer(
             ClArgument& SIXTRL_RESTRICT_REF beam_elements_arg,
             ClArgument& SIXTRL_RESTRICT_REF out_buffer_arg,
-            size_type const num_particles,
+            size_type const min_turn_id,
             size_type const out_particle_block_offset = size_type{ 0 } );
 
         int assignBeamMonitorIoBuffer(
             ClArgument& SIXTRL_RESTRICT_REF beam_elements_arg,
             ClArgument& SIXTRL_RESTRICT_REF out_buffer_arg,
-            size_type const num_particles,
+            size_type const min_turn_id,
             size_type const out_particle_block_offset,
             kernel_id_t const assign_kernel_id );
 
@@ -157,13 +162,20 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
+        virtual void doClear() override;
         virtual bool doInitDefaultPrograms() override;
         virtual bool doInitDefaultKernels()  override;
+        virtual bool doSelectNode( size_type const node_index ) override;
 
         private:
 
+        bool doSelectNodePrivImpl( size_type const node_index );
+        void doClearPrivImpl();
+
         bool doInitDefaultProgramsPrivImpl();
         bool doInitDefaultKernelsPrivImpl();
+
+        cl::Buffer   m_elem_by_elem_config_buffer;
 
         program_id_t m_track_until_turn_program_id;
         program_id_t m_track_single_turn_program_id;
@@ -329,12 +341,14 @@ SIXTRL_HOST_FN int NS(ClContext_assign_beam_monitor_out_buffer)(
     NS(ClContext)*  SIXTRL_RESTRICT ctx,
     NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg,
     NS(ClArgument)* SIXTRL_RESTRICT out_buffer,
+    NS(buffer_size_t) const min_turn_id,
     NS(buffer_size_t) const out_particle_block_offset );
 
 SIXTRL_HOST_FN int NS(ClContext_assign_beam_monitor_out_buffer_with_kernel_id)(
     NS(ClContext)*  SIXTRL_RESTRICT ctx,
     NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg,
     NS(ClArgument)* SIXTRL_RESTRICT out_buffer,
+    NS(buffer_size_t) const min_turn_id,
     NS(buffer_size_t) const out_particle_block_offset,
     int const assign_kernel_id );
 

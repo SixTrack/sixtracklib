@@ -125,6 +125,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         node_id_t const*    ptrSelectedNodeId()     const SIXTRL_NOEXCEPT;
         node_info_t const*  ptrSelectedNodeInfo()   const SIXTRL_NOEXCEPT;
+        size_type           selectedNodeIndex()     const SIXTRL_NOEXCEPT;
 
         std::string selectedNodeIdStr() const SIXTRL_NOEXCEPT;
         bool selectedNodeIdStr( char* SIXTRL_RESTRICT node_id_str,
@@ -656,6 +657,9 @@ NS(ClContextBase_get_selected_node_info)(
 
 SIXTRL_HOST_FN NS(context_node_id_t) const*
 NS(ClContextBase_get_selected_node_id)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
+
+SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_selected_node_index)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
 SIXTRL_HOST_FN bool NS(ClContextBase_get_selected_node_id_str)(

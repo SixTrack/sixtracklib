@@ -140,6 +140,23 @@ if( GTEST_FOUND )
     add_test( C99_CommonBeamElementCavityTests    test_be_cavity_common_c99 )
 
     # --------------------------------------------------------------------------
+    # test_track_job_cpu_c99:
+
+    add_executable( test_track_job_cpu_c99 test_track_job_cpu_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_cpu_c99 )
+    add_test( C99_TrackJobCpuTests   test_track_job_cpu_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_elem_by_elem_config_c99:
+
+    add_executable( test_elem_by_elem_config_c99
+                    test_elem_by_elem_config_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_elem_by_elem_config_c99 )
+    add_test( C99_CommonElemByElemConfigTests   test_elem_by_elem_config_c99 )
+
+    # --------------------------------------------------------------------------
     # test_be_monitor_common_c99:
 
     add_executable( test_be_monitor_common_c99    test_be_monitor_c99.cpp )

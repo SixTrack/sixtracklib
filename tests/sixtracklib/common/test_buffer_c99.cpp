@@ -53,6 +53,21 @@ TEST( C99_CommonBufferTests, InitOnExistingFlatMemory)
     ASSERT_TRUE( success == 0 );
 }
 
+TEST( C99_CommonBufferTests, NewOnExistingFlatMemory)
+{
+    std::vector< unsigned char > raw_buffer( 1u << 20u );
+
+    ::st_Buffer* buffer = ::st_Buffer_new_on_memory(
+        raw_buffer.data(), raw_buffer.size() * sizeof( unsigned char ) );
+
+    ASSERT_TRUE(  buffer != nullptr );
+    ASSERT_TRUE(  ::st_Buffer_get_num_of_objects( buffer ) == 0u );
+    ASSERT_TRUE( !::st_Buffer_owns_datastore( buffer ) );
+    ASSERT_TRUE(  ::st_Buffer_get_num_of_dataptrs( buffer ) == 0u );
+    ASSERT_TRUE(  ::st_Buffer_get_num_of_garbage_ranges( buffer ) == 0u );
+    ASSERT_TRUE(  ::st_Buffer_get_size( buffer ) > ::st_buffer_size_t{ 0 } );
+}
+
 /* ************************************************************************* */
 
 TEST( C99_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )

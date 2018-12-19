@@ -46,6 +46,8 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type slot_size = ::NS(BUFFER_DEFAULT_SLOT_SIZE)
         ) SIXTRL_NOEXCEPT;
 
+        SIXTRL_FN explicit Buffer(
+            ::NS(Buffer) const& SIXTRL_RESTRICT_REF c_buffer ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN explicit Buffer(
             size_type const buffer_capacity = DEFAULT_BUFFER_CAPACITY,
@@ -83,7 +85,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_FN Buffer& operator=( Buffer const& rhs ) = delete;
         SIXTRL_FN Buffer& operator=( Buffer&& rhs ) = delete;
 
-
+        SIXTRL_FN Buffer& operator=( ::NS(Buffer) const& rhs ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN virtual ~Buffer();
 
@@ -294,6 +296,13 @@ namespace SIXTRL_CXX_NAMESPACE
                 max_num_garbage_ranges, slot_size );
     }
 
+    SIXTRL_INLINE Buffer::Buffer( ::NS(Buffer) const&
+        SIXTRL_RESTRICT_REF c_buffer ) SIXTRL_NOEXCEPT :
+        ::NS(Buffer)( c_buffer )
+    {
+
+    }
+
     SIXTRL_INLINE Buffer::Buffer(
         Buffer::size_type const buffer_capacity,
         Buffer::flags_t const buffer_flags ) :
@@ -437,6 +446,29 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
     #endif /* !defined( _GPUCODE ) */
+
+    SIXTRL_INLINE Buffer& Buffer::operator=(
+        ::NS(Buffer) const& rhs ) SIXTRL_NOEXCEPT
+    {
+        SIXTRL_ASSERT( this->getCApiPtr() != nullptr );
+
+        if( &rhs != this->getCApiPtr() )
+        {
+            ::NS(Buffer_free)( this->getCApiPtr() );
+            *( this->getCApiPtr() ) = rhs;
+
+            auto flags = ::NS(Buffer_get_datastore_special_flags)(
+                this->getCApiPtr() );
+
+            flags &= ~( SIXTRL_BUFFER_USES_DATASTORE );
+            flags &= ~( SIXTRL_BUFFER_OWNS_DATASTORE );
+
+            ::NS(Buffer_set_datastore_special_flags)(
+                this->getCApiPtr(), flags );
+        }
+
+        return *this;
+    }
 
     SIXTRL_INLINE Buffer::~Buffer()
     {
