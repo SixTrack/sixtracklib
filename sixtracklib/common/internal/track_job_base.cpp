@@ -20,7 +20,6 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #if defined( __cplusplus )
         #include "sixtracklib/common/buffer.hpp"
-        #include "sixtracklib/common/particles.hpp"
     #endif /* defined( __cplusplus ) */
 
     #include "sixtracklib/common/buffer.h"
@@ -88,32 +87,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* ---------------------------------------------------------------- */
 
-    bool TrackJobBase::track( TrackJobBase::size_type const until_turn )
-    {
-        return this->track( until_turn, this->doGetPtrOutputBuffer() );
-    }
-
-    bool TrackJobBase::track(
-        TrackJobBase::size_type const until_turn,
-        TrackJobBase::c_buffer_t* SIXTRL_RESTRICT_REF output_buffer )
-    {
-        using status_t = TrackJobBase::track_status_t;
-
-        bool success = false;
-
-        status_t const status =
-            this->doTrackUntilTurn( until_turn, output_buffer );
-
-        if( this->doSetLastTrackStatus( status ) )
-        {
-            success = this->doCollectOutputBuffer( output_buffer );
-        }
-
-        return success;
-    }
-
-    /* ---------------------------------------------------------------- */
-
     TrackJobBase::track_status_t
     TrackJobBase::lastTrackStatus() const SIXTRL_NOEXCEPT
     {
@@ -122,6 +95,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
     TrackJobBase::c_buffer_t const*
     TrackJobBase::ptrOutputBuffer() const SIXTRL_NOEXCEPT
+    {
+        return this->doGetPtrOutputBuffer();
+    }
+
+    TrackJobBase::c_buffer_t* TrackJobBase::ptrOutputBuffer() SIXTRL_NOEXCEPT
     {
         return this->doGetPtrOutputBuffer();
     }
@@ -138,6 +116,11 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->doGetPtrParticlesBuffer();
     }
 
+    TrackJobBase::c_buffer_t* TrackJobBase::ptrParticlesBuffer() SIXTRL_NOEXCEPT
+    {
+        return this->doGetPtrParticlesBuffer();
+    }
+
     TrackJobBase::buffer_t const&
     TrackJobBase::particlesBuffer() const SIXTRL_NOEXCEPT
     {
@@ -146,6 +129,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
     TrackJobBase::c_buffer_t const*
     TrackJobBase::ptrBeamElementsBuffer() const SIXTRL_NOEXCEPT
+    {
+        return this->doGetPtrBeamElementsBuffer();
+    }
+
+    TrackJobBase::c_buffer_t* TrackJobBase::ptrBeamElementsBuffer() SIXTRL_NOEXCEPT
     {
         return this->doGetPtrBeamElementsBuffer();
     }

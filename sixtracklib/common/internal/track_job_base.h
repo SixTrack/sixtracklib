@@ -21,7 +21,6 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #if defined( __cplusplus )
         #include "sixtracklib/common/buffer.hpp"
-        #include "sixtracklib/common/particles.hpp"
     #endif /* defined( __cplusplus ) */
 
     #include "sixtracklib/common/buffer.h"
@@ -70,25 +69,18 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ---------------------------------------------------------------- */
 
-        bool track( size_type const until_turn );
-
-        bool track( size_type const until_turn,
-                              buffer_t& SIXTRL_RESTRICT_REF output_buffer );
-
-        bool track( size_type const until_turn,
-                              c_buffer_t* SIXTRL_RESTRICT_REF output_buffer );
-
-        /* ---------------------------------------------------------------- */
-
         track_status_t      lastTrackStatus()       const SIXTRL_NOEXCEPT;
 
         c_buffer_t const*   ptrOutputBuffer()       const SIXTRL_NOEXCEPT;
+        c_buffer_t*   ptrOutputBuffer()                   SIXTRL_NOEXCEPT;
         buffer_t const&     outputBuffer()          const SIXTRL_NOEXCEPT;
 
         c_buffer_t const*   ptrParticlesBuffer()    const SIXTRL_NOEXCEPT;
+        c_buffer_t*         ptrParticlesBuffer()          SIXTRL_NOEXCEPT;
         buffer_t const&     particlesBuffer()       const SIXTRL_NOEXCEPT;
 
         c_buffer_t const*   ptrBeamElementsBuffer() const SIXTRL_NOEXCEPT;
+        c_buffer_t*         ptrBeamElementsBuffer()       SIXTRL_NOEXCEPT;
         buffer_t const&     beamElementsBuffer()    const SIXTRL_NOEXCEPT;
 
         /* ---------------------------------------------------------------- */
@@ -277,13 +269,6 @@ namespace SIXTRL_CXX_NAMESPACE
     /* Implementation of public, private and protected inline functions:     */
     /* --------------------------------------------------------------------- */
 
-    SIXTRL_INLINE bool TrackJobBase::track(
-        TrackJobBase::size_type const until_turn,
-        TrackJobBase::buffer_t& SIXTRL_RESTRICT_REF output_buffer )
-    {
-        return this->track( until_turn, output_buffer.getCApiPtr() );
-    }
-
     SIXTRL_INLINE TrackJobBase::particle_index_iterator
     TrackJobBase::particleIndexBegin() SIXTRL_NOEXCEPT
     {
@@ -401,18 +386,6 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBase::c_buffer_t* SIXTRL_RESTRICT buffer )
     {
         this->m_ptr_particles_buffer = buffer;
-
-        if( buffer != nullptr )
-        {
-            this->m_particles_buffer_wrapper = *buffer;
-            SIXTRL_ASSERT( this->m_particles_buffer_wrapper.getCApiPtr() ==
-                           this->m_ptr_particles_buffer );
-        }
-        else
-        {
-            this->m_particles_buffer_wrapper.clear( false );
-        }
-
         return;
     }
 
@@ -450,18 +423,6 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBase::c_buffer_t* SIXTRL_RESTRICT buffer )
     {
         this->m_ptr_beam_elements_buffer = buffer;
-
-        if( buffer != nullptr )
-        {
-            this->m_beam_elements_buffer_wrapper = *buffer;
-            SIXTRL_ASSERT( this->m_beam_elements_buffer_wrapper.getCApiPtr() ==
-                           this->m_ptr_beam_elements_buffer );
-        }
-        else
-        {
-            this->m_beam_elements_buffer_wrapper.clear( false );
-        }
-
         return;
     }
 
@@ -499,18 +460,6 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBase::c_buffer_t* SIXTRL_RESTRICT buffer )
     {
         this->m_ptr_output_buffer = buffer;
-
-        if( buffer != nullptr )
-        {
-            this->m_output_buffer_wrapper = *buffer;
-            SIXTRL_ASSERT( this->m_output_buffer_wrapper.getCApiPtr() ==
-                           this->m_ptr_output_buffer );
-        }
-        else
-        {
-            this->m_output_buffer_wrapper.clear( false );
-        }
-
         return;
     }
 
