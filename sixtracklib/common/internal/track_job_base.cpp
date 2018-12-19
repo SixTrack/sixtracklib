@@ -7,6 +7,7 @@
         #include <cstdlib>
         #include <memory>
         #include <string>
+        #include <vector>
     #else /* !defined( __cplusplus ) */
         #include <stdbool.h>
         #include <stddef.h>
