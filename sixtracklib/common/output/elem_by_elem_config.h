@@ -128,19 +128,19 @@ NS(ElemByElemConfig_get_particles_store_index)(
         *const SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index );
 
-SIXTRL_FN SIXTRL_STATIC NS(particle_index_t) const
+SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
 NS(ElemByElemConfig_get_particle_id_from_store_index)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
     NS(particle_num_elements_t) const out_store_index );
 
-SIXTRL_FN SIXTRL_STATIC NS(particle_index_t) const
+SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
 NS(ElemByElemConfig_get_at_element_id_from_store_index)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
     NS(particle_num_elements_t) const out_store_index );
 
-SIXTRL_FN SIXTRL_STATIC NS(particle_index_t) const
+SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
 NS(ElemByElemConfig_get_at_turn_from_store_index)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
@@ -488,7 +488,7 @@ NS(ElemByElemConfig_get_particles_store_index)(
 }
 
 
-SIXTRL_INLINE NS(particle_index_t) const
+SIXTRL_INLINE NS(particle_index_t)
 NS(ElemByElemConfig_get_particle_id_from_store_index)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
@@ -575,7 +575,7 @@ NS(ElemByElemConfig_get_particle_id_from_store_index)(
     return particle_id;
 }
 
-SIXTRL_INLINE NS(particle_index_t) const
+SIXTRL_INLINE NS(particle_index_t)
 NS(ElemByElemConfig_get_at_element_id_from_store_index)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
@@ -662,7 +662,7 @@ NS(ElemByElemConfig_get_at_element_id_from_store_index)(
     return at_element_id;
 }
 
-SIXTRL_INLINE NS(particle_index_t) const
+SIXTRL_INLINE NS(particle_index_t)
 NS(ElemByElemConfig_get_at_turn_from_store_index)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
@@ -821,7 +821,7 @@ SIXTRL_INLINE int NS(ElemByElemConfig_assign_managed_output_buffer)(
     if( ( config != SIXTRL_NULLPTR ) && ( output_buffer != SIXTRL_NULLPTR ) &&
         ( slot_size > ( buf_size_t )0u ) )
     {
-        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* ptr_particles_t;
+        typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)*  ptr_particles_t;
         typedef NS(elem_by_elem_out_addr_t)               address_t;
 
         ptr_particles_t particles = SIXTRL_NULLPTR;

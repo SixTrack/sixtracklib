@@ -17,7 +17,7 @@ SIXTRL_HOST_FN int NS(ElemByElemConfig_init)(
         *const SIXTRL_RESTRICT beam_elements_buffer,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
         *const SIXTRL_RESTRICT particles,
-    NS(particle_index_t) const min_turn, NS(particle_index_t) const max_turn )
+    NS(particle_index_t) min_turn, NS(particle_index_t) max_turn )
 {
     typedef NS(particle_index_t) index_t;
     typedef NS(buffer_size_t)    buf_size_t;
@@ -34,6 +34,20 @@ SIXTRL_HOST_FN int NS(ElemByElemConfig_init)(
     int success = NS(Particles_find_min_max_attributes)(
         particles, &min_particle_id, &max_particle_id, &min_at_element_id,
         &max_at_element_id, &temp_min_at_turn_id, &temp_max_at_turn_id );
+
+    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( beam_elements_buffer ) );
+
+    SIXTRL_ASSERT( ( success != 0 ) ||
+                   ( ( min_particle_id >= ( index_t )0u ) &&
+                     ( min_particle_id <= max_particle_id ) ) );
+
+    SIXTRL_ASSERT( ( success != 0 ) ||
+                   ( ( min_at_element_id >= ( index_t )0u ) &&
+                     ( min_at_element_id <= max_at_element_id ) ) );
+
+    SIXTRL_ASSERT( ( success != 0 ) ||
+                   ( ( temp_min_at_turn_id >= ( index_t )0u ) &&
+                     ( temp_min_at_turn_id <= temp_min_at_turn_id ) ) );
 
     if( success == 0 )
     {
