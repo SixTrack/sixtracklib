@@ -263,9 +263,8 @@ __kernel void NS(Track_particles_elem_by_elem_debug_opencl)(
         num_element_t const num_particles =
             NS(Particles_get_num_of_particles)( particles );
 
-        NS(ElemByElemConfig_assign_managed_particles_out_buffer)(
-            elem_by_elem_config, elem_by_elem_buffer,
-                out_buffer_index_offset, slot_size );
+        NS(ElemByElemConfig_assign_managed_output_buffer)( elem_by_elem_config,
+            elem_by_elem_buffer, out_buffer_index_offset, slot_size );
 
         SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( be_begin  != SIXTRL_NULLPTR );
