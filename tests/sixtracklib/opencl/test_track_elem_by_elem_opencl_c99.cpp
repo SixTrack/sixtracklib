@@ -89,7 +89,7 @@ TEST( C99_OpenCLTrackElemByElemTests, TrackElemByElemHostAndDeviceCompareDrifts)
 
     size_t elem_by_elem_index_offset = size_t{ 0 };
 
-    ASSERT_TRUE( ::st_ElemByElemConfig_prepare_particles_out_buffer_detailed(
+    ASSERT_TRUE( ::st_ElemByElemConfig_prepare_output_buffer_from_conf(
         &elem_by_elem_config, elem_by_elem_buffer,
             &elem_by_elem_index_offset ) == 0 );
 

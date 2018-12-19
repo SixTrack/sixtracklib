@@ -18,7 +18,8 @@ NS(Buffer)* NS(TrackCL)(
     int const until_turn,
     int const elem_by_elem_turns )
 {
-    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(buffer_size_t)       buf_size_t;
+    typedef NS(particle_index_t)    index_t;
 
     NS(Buffer)* ptr_out_buffer = NULL;
 
@@ -38,19 +39,31 @@ NS(Buffer)* NS(TrackCL)(
         bool const prepare_out_buffer =
             ( ( elem_by_elem_turns > 0 ) || ( has_beam_monitors ) );
 
-        buf_size_t const out_buffer_offset = ( elem_by_elem_turns > 0 )
-                ? ( buf_size_t )1u : ( buf_size_t )0u;
+        buf_size_t elem_by_elem_index_offset = ( buf_size_t )0u;
+        buf_size_t beam_monitor_index_offset = ( buf_size_t )0u;
+        index_t min_turn_id                  = ( index_t )0;
 
         if( out_buffer != SIXTRL_NULLPTR )
         {
+            index_t max_turn_id = ( index_t )-1;
             ptr_out_buffer = out_buffer;
+
+            NS(Particles_get_min_max_at_turn_value)(
+                particles, &min_turn_id, &max_turn_id );
+
+            if( prepare_out_buffer )
+            {
+                beam_monitor_index_offset = ( buf_size_t )1u;
+            }
         }
         else
         {
             ptr_out_buffer = NS(Buffer_new)( 0u );
-            NS(BeamMonitor_prepare_particles_out_buffer)(
-                beam_elements_buffer, ptr_out_buffer,
-                    particles, elem_by_elem_turns );
+
+            NS(OutputBuffer_prepare)( beam_elements_buffer, ptr_out_buffer,
+                particles, elem_by_elem_turns,
+                &elem_by_elem_index_offset, &beam_monitor_index_offset,
+                &min_turn_id );
         }
 
         particles_arg =
@@ -65,14 +78,15 @@ NS(Buffer)* NS(TrackCL)(
         if( prepare_out_buffer )
         {
             NS(ClContext_assign_beam_monitor_out_buffer)(
-                context, beam_elements_arg, out_buffer, out_buffer_offset );
+                context, beam_elements_arg, out_buffer, min_turn_id,
+                beam_monitor_index_offset );
         }
 
         if( elem_by_elem_turns > 0 )
         {
             NS(ClContext_track_element_by_element)( context, particles_arg,
                 beam_elements_arg, output_arg, elem_by_elem_turns,
-                    out_buffer_offset );
+                    elem_by_elem_index_offset );
         }
 
         if( until_turn > elem_by_elem_turns )

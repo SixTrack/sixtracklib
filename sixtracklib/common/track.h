@@ -1030,8 +1030,7 @@ SIXTRL_INLINE  int NS(Track_particle_element_by_element_objs)(
 
         index_t const particle_id = ( temp >= ( index_t )0u ) ? temp : -temp;
 
-        success = ( NS(Particles_is_not_lost_value)( particles, idx ) )
-            ? 0 : -1;
+        success = ( NS(Particles_is_not_lost_value)( particles, idx ) ) ? 0 : -1;
 
         while( ( success == 0 ) && ( be_it != be_end ) )
         {

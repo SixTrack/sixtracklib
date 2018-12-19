@@ -30,6 +30,10 @@ int main( int argc, char* argv[] )
 
     st_ClContext* context = st_ClContext_create();
 
+    st_buffer_size_t elem_by_elem_index_offset = ( st_buffer_size_t )0u;
+    st_buffer_size_t beam_monitor_index_offset = ( st_buffer_size_t )0u;
+    st_particle_index_t min_turn_id            = ( st_particle_index_t )0u;
+
     unsigned int num_devices = 0u;
     num_devices = st_ClContextBase_get_num_available_nodes( context );
 
@@ -321,12 +325,14 @@ int main( int argc, char* argv[] )
 
         out_buffer = st_Buffer_new( 0u );
 
-        st_BeamMonitor_prepare_particles_out_buffer( eb, out_buffer,
-            particles, NUM_TURNS_IO_ELEM_BY_ELEM );
+        st_OutputBuffer_prepare(
+            eb, out_buffer, particles, NUM_TURNS_IO_ELEM_BY_ELEM,
+            &elem_by_elem_index_offset, &beam_monitor_index_offset,
+            &min_turn_id );
 
         particle_buffer_arg = st_ClArgument_new_from_buffer( track_pb, context );
-        beam_elements_arg   = st_ClArgument_new_from_buffer( eb, context );
-        out_buffer_arg       = st_ClArgument_new_from_buffer( out_buffer, context );
+        beam_elements_arg = st_ClArgument_new_from_buffer( eb, context );
+        out_buffer_arg  = st_ClArgument_new_from_buffer( out_buffer, context );
     }
 
     /* ********************************************************************* */
@@ -339,8 +345,15 @@ int main( int argc, char* argv[] )
         ( beam_elements_arg   != SIXTRL_NULLPTR ) &&
         ( out_buffer_arg       != SIXTRL_NULLPTR ) )
     {
+        st_particle_index_t min_turn_id = ( st_particle_index_t )0;
+        st_particle_index_t max_turn_id = ( st_particle_index_t )-1;
+
+        st_Particles_get_min_max_at_turn_value(
+            particles, &min_turn_id, &max_turn_id );
+
         st_ClContext_assign_beam_monitor_out_buffer( context,
-            beam_elements_arg, out_buffer_arg, NUM_TURNS_IO_ELEM_BY_ELEM );
+            beam_elements_arg, out_buffer_arg,
+            min_turn_id, beam_monitor_index_offset );
 
         st_ClContext_track_element_by_element(
             context, particle_buffer_arg, beam_elements_arg,

@@ -97,7 +97,7 @@ TEST( C99_OpenCLBeamMonitorTests, AssignIoBufferToBeamMonitors )
         cmp_beam_monitors.push_back( *be_monitor );
     }
 
-    ASSERT_TRUE( ::st_BeamMonitor_get_num_elem_by_elem_objects( eb ) ==
+    ASSERT_TRUE( ::st_ElemByElemConfig_get_num_elem_by_elem_objects( eb ) ==
                  NUM_BEAM_ELEMENTS );
 
     ASSERT_TRUE( ::st_BeamMonitor_get_num_of_beam_monitor_objects( eb ) ==
@@ -181,8 +181,19 @@ TEST( C99_OpenCLBeamMonitorTests, AssignIoBufferToBeamMonitors )
         /* ----------------------------------------------------------------- */
         /* reserve out_buffer buffer without element by element buffer */
 
-        ASSERT_TRUE( 0 == ::st_BeamMonitor_prepare_particles_out_buffer(
-            eb, out_buffer, particles, 0u ) );
+        size_t  num_elem_by_elem_turns    = size_t{ 0 };
+        size_t  elem_by_elem_index_offset = size_t{ 0 };
+        size_t  beam_monitor_index_offset = size_t{ 0 };
+        part_index_t min_turn_id          = part_index_t{ -1 };
+
+        ASSERT_TRUE( 0 == ::st_OutputBuffer_prepare(
+            eb, out_buffer, particles, num_elem_by_elem_turns,
+            &elem_by_elem_index_offset, &beam_monitor_index_offset,
+            &min_turn_id ) );
+
+        ASSERT_TRUE( elem_by_elem_index_offset == size_t{ 0 } );
+        ASSERT_TRUE( beam_monitor_index_offset == size_t{ 0 } );
+        ASSERT_TRUE( min_turn_id == part_index_t{ 0 } );
 
         ASSERT_TRUE( NUM_BEAM_MONITORS ==
             ::st_Particles_buffer_get_num_of_particle_blocks( out_buffer ) );
@@ -250,7 +261,8 @@ TEST( C99_OpenCLBeamMonitorTests, AssignIoBufferToBeamMonitors )
         ASSERT_TRUE( out_buffer_arg    != nullptr );
 
         ASSERT_TRUE( 0 == ::st_ClContext_assign_beam_monitor_out_buffer(
-            context, beam_elements_arg, out_buffer_arg, 0u ) );
+            context, beam_elements_arg, out_buffer_arg,
+                min_turn_id, beam_monitor_index_offset ) );
 
         ASSERT_TRUE( ::st_ClArgument_read( beam_elements_arg, eb ) );
 
@@ -428,35 +440,33 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
     ::st_ElemByElemConfig elem_by_elem_config;
     ::st_ElemByElemConfig_preset( &elem_by_elem_config );
 
-    ASSERT_TRUE( 0 == ::st_ElemByElemConfig_init( &elem_by_elem_config,
-        ::st_ELEM_BY_ELEM_ORDER_DEFAULT, eb, particles,
-                part_index_t{ 0 }, NUM_TURNS ) );
-
     size_t elem_by_elem_index_offset = size_t{ 0 };
 
-    int ret = ::st_ElemByElemConfig_prepare_particles_out_buffer_detailed(
-        &elem_by_elem_config, elem_by_elem_buffer,
-            &elem_by_elem_index_offset );
+    ASSERT_TRUE( 0 == ::st_ElemByElemConfig_init( &elem_by_elem_config,
+        NS(ELEM_BY_ELEM_ORDER_DEFAULT), eb, initial_state, part_index_t{ 0 },
+            static_cast< part_index_t >( NUM_TURNS - size_t{ 1 } ) ) );
 
-    ASSERT_TRUE( ret == 0 );
+    ASSERT_TRUE( 0 == ::st_ElemByElemConfig_prepare_output_buffer(
+        eb, elem_by_elem_buffer, particles, NUM_TURNS,
+            &elem_by_elem_index_offset ) );
+
     ASSERT_TRUE( elem_by_elem_index_offset == size_t{ 2 } );
-    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( elem_by_elem_buffer ) ==
-                 size_t{ 3 } );
 
     initial_state = ::st_Particles_buffer_get_particles( elem_by_elem_buffer, 0u );
     final_state   = ::st_Particles_buffer_get_particles( elem_by_elem_buffer, 1u );
 
     ::st_Particles* elem_by_elem_particles =
-        ::st_Particles_buffer_get_particles( elem_by_elem_buffer, 2u );
+        ::st_Particles_buffer_get_particles(
+            elem_by_elem_buffer, elem_by_elem_index_offset );
 
     ASSERT_TRUE( initial_state != nullptr );
     ASSERT_TRUE( final_state   != nullptr );
     ASSERT_TRUE( elem_by_elem_particles != nullptr );
 
-    ASSERT_TRUE( 0 == ::st_ElemByElemConfig_assign_particles_out_buffer(
-        &elem_by_elem_config, elem_by_elem_buffer, 2u ) );
+    ASSERT_TRUE( 0 == ::st_ElemByElemConfig_assign_output_buffer(
+        &elem_by_elem_config, elem_by_elem_buffer, elem_by_elem_index_offset ) );
 
-    ret = ::st_Track_all_particles_element_by_element_until_turn_details(
+    int ret = ::st_Track_all_particles_element_by_element_until_turn_details(
             particles, &elem_by_elem_config, eb, NUM_TURNS );
 
     ASSERT_TRUE( ret == 0 );
@@ -783,12 +793,22 @@ namespace sixtrack
                         ( particles     != nullptr ) &&
                         ( elem_by_elem_particles != nullptr ) );
 
+            size_t num_elem_by_elem_turns    = size_t{ 0 };
+            size_t elem_by_elem_index_offset = size_t{ 0 };
+            size_t beam_monitor_index_offset = size_t{ 0 };
+            part_index_t min_turn_id         = part_index_t{ -1 };
+
             if( success )
             {
-                ret = ::st_BeamMonitor_prepare_particles_out_buffer(
-                    eb, out_buffer, particles, 0u );
+                ret = ::st_OutputBuffer_prepare(
+                    eb, out_buffer, particles, num_elem_by_elem_turns,
+                    &elem_by_elem_index_offset, &beam_monitor_index_offset,
+                    &min_turn_id );
 
-                if( ret != 0 )
+                if( ( ret != 0 ) ||
+                    ( elem_by_elem_index_offset != size_t{ 0 } ) ||
+                    ( beam_monitor_index_offset != size_t{ 0 } ) ||
+                    ( min_turn_id < part_index_t{ 0 } ) )
                 {
                     std::cout << "ret 01 : " << ret << std::endl;
                     success = false;
@@ -906,7 +926,8 @@ namespace sixtrack
             if( success )
             {
                 ret = ::st_ClContext_assign_beam_monitor_out_buffer(
-                context, beam_elements_arg, out_buffer_arg, 0u );
+                context, beam_elements_arg, out_buffer_arg,
+                    min_turn_id, beam_monitor_index_offset );
 
                 if( ret != 0 )
                 {
@@ -983,8 +1004,8 @@ namespace sixtrack
 
             if( success )
             {
-                ret = ::st_BeamMonitor_assign_particles_out_buffer(
-                    eb, out_buffer, 0u );
+                ret = ::st_BeamMonitor_assign_output_buffer(
+                    eb, out_buffer, min_turn_id, num_elem_by_elem_turns );
 
                 if( ret != 0 )
                 {

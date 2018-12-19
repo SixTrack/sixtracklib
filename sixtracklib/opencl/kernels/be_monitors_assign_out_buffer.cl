@@ -16,6 +16,7 @@
 __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
+    SIXTRL_INT64_T  const min_turn_id,
     SIXTRL_UINT64_T const out_particles_block_offset );
 
 __kernel void NS(BeamMonitor_clear_all_line_obj_opencl)(
@@ -26,6 +27,7 @@ __kernel void NS(BeamMonitor_clear_all_line_obj_opencl)(
 __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
+    SIXTRL_INT64_T  const min_turn_id,
     SIXTRL_UINT64_T const out_particles_block_offset )
 {
     typedef NS(buffer_size_t) buf_size_t;
@@ -44,8 +46,8 @@ __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_opencl)(
         SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)(
             out_buffer, slot_size ) );
 
-        NS(BeamMonitor_assign_managed_particles_out_buffer)(
-            beam_elements_buf, out_buffer, out_particles_block_offset, slot_size );
+        NS(BeamMonitor_assign_managed_output_buffer)( beam_elements_buf,
+            out_buffer, min_turn_id, out_particles_block_offset, slot_size );
     }
 
     return;

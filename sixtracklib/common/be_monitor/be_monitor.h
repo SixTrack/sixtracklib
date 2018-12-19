@@ -119,22 +119,6 @@ SIXTRL_FN SIXTRL_STATIC bool NS(BeamMonitor_has_turn_stored)(
     NS(be_monitor_turn_t) const turn_id,
     NS(be_monitor_turn_t) const max_num_turns );
 
-#if !defined( _GPUCODE )
-/*
-SIXTRL_HOST_FN NS(be_monitor_turn_t) NS(BeamMonitor_get_max_stored_turn)(
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
-
-SIXTRL_HOST_FN bool NS(BeamMonitor_copy_and_append_particle_data)(
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
-
-SIXTRL_HOST_FN NS(be_monitor_index_t) NS(BeamMonitor_get_stored_values_index)(
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor,
-    NS(be_monitor_turn_t) const turn_id,
-    NS(be_monitor_index_t) const particle_id );
-*/
-#endif /* !defined( _GPUCODE ) */
-
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* setter accessor functions: */
 
@@ -179,16 +163,29 @@ SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_set_max_particle_id)(
 
 #if !defined( _GPUCODE )
 
+SIXTRL_FN SIXTRL_STATIC bool
+NS(BeamMonitor_are_present_in_buffer)( SIXTRL_BUFFER_ARGPTR_DEC const
+        NS(Buffer) *const SIXTRL_RESTRICT belements_buffer );
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(BeamMonitor_get_num_of_beam_monitor_objects)( SIXTRL_BUFFER_ARGPTR_DEC const
+        NS(Buffer) *const SIXTRL_RESTRICT belements_buffer );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_clear_all)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer );
+
 SIXTRL_FN SIXTRL_STATIC bool NS(BeamMonitor_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_objects,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_slots,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_dataptrs );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_new)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)*
+NS(BeamMonitor_new)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)* NS(BeamMonitor_add)(
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)*
+NS(BeamMonitor_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(be_monitor_turn_t) const num_stores, NS(be_monitor_turn_t) const start,
     NS(be_monitor_turn_t) const skip,  NS(be_monitor_addr_t) const out_address,
@@ -202,6 +199,17 @@ NS(BeamMonitor_add_copy)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
 #endif /* !defined( _GPUCODE ) */
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(BeamMonitor_get_num_of_beam_monitor_objects_from_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT
+        blements_buffer, NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_clear_all_on_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT
+        beam_elements_buffer, NS(buffer_size_t) const slot_size );
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
@@ -718,6 +726,63 @@ SIXTRL_INLINE void NS(BeamMonitor_set_max_particle_id)(
 
 #if !defined( _GPUCODE )
 
+SIXTRL_INLINE bool NS(BeamMonitor_are_present_in_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT
+        beam_elements_buffer )
+{
+    bool beam_monitors_are_present = false;
+
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* obj_it =
+        NS(Buffer_get_const_objects_begin)( beam_elements_buffer );
+
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* obj_end =
+        NS(Buffer_get_const_objects_end)( beam_elements_buffer );
+
+    for( ; obj_it != obj_end ; ++obj_it )
+    {
+        if( ( NS(Object_get_type_id)( obj_it ) ==
+                NS(OBJECT_TYPE_BEAM_MONITOR ) ) &&
+            ( ( uintptr_t )NS(Object_get_begin_addr)( obj_it ) !=
+              ( uintptr_t )0u ) )
+        {
+            typedef SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor) const* ptr_monitor_t;
+            typedef NS(be_monitor_turn_t) nturn_t;
+
+            ptr_monitor_t monitor = ( ptr_monitor_t
+                )( uintptr_t )NS(Object_get_begin_addr)( obj_it );
+
+            if( ( monitor != SIXTRL_NULLPTR ) &&
+                ( NS(BeamMonitor_get_num_stores)( monitor ) > ( nturn_t )0u ) )
+            {
+                beam_monitors_are_present = true;
+                break;
+            }
+        }
+    }
+
+    return beam_monitors_are_present;
+}
+
+SIXTRL_INLINE NS(buffer_size_t)
+NS(BeamMonitor_get_num_of_beam_monitor_objects)( SIXTRL_BUFFER_ARGPTR_DEC const
+        NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer )
+{
+    return NS(BeamMonitor_get_num_of_beam_monitor_objects_from_managed_buffer)(
+        NS(Buffer_get_const_data_begin)( beam_elements_buffer ),
+        NS(Buffer_get_slot_size)( beam_elements_buffer ) );
+}
+
+SIXTRL_INLINE void NS(BeamMonitor_clear_all)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer )
+{
+    NS(BeamMonitor_clear_all_on_managed_buffer)(
+        NS(Buffer_get_data_begin)( beam_elements_buffer),
+        NS(Buffer_get_slot_size)( beam_elements_buffer ) );
+
+    return;
+}
+
+
 SIXTRL_INLINE bool NS(BeamMonitor_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_objects,
@@ -819,6 +884,88 @@ NS(BeamMonitor_add_copy)(
 }
 
 #endif /* !defined( _GPUCODE ) */
+
+SIXTRL_INLINE NS(buffer_size_t)
+NS(BeamMonitor_get_num_of_beam_monitor_objects_from_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const*
+        SIXTRL_RESTRICT beam_elements, NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
+    buf_size_t num_beam_monitors = ZERO;
+
+    if( ( beam_elements != SIXTRL_NULLPTR ) && ( slot_size > ZERO ) &&
+        ( NS(ManagedBuffer_get_num_objects)(
+            beam_elements, slot_size ) ) > ZERO )
+    {
+        ptr_obj_t be_it  = NS(ManagedBuffer_get_const_objects_index_begin)(
+            beam_elements, slot_size );
+
+        ptr_obj_t be_end = NS(ManagedBuffer_get_const_objects_index_end)(
+            beam_elements, slot_size );
+
+        for( ; be_it != be_end ; ++be_it )
+        {
+            NS(object_type_id_t) const type_id =
+                NS(Object_get_type_id)( be_it );
+
+            if( ( type_id == NS(OBJECT_TYPE_BEAM_MONITOR) ) &&
+                ( NS(Object_get_const_begin_ptr)( be_it ) !=
+                    SIXTRL_NULLPTR ) &&
+                ( NS(Object_get_size)( be_it ) >= sizeof( NS(BeamMonitor) ) ) )
+            {
+                ++num_beam_monitors;
+            }
+        }
+    }
+
+    return num_beam_monitors;
+}
+
+
+
+SIXTRL_INLINE void NS(BeamMonitor_clear_all_on_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* ptr_obj_t;
+    typedef SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* ptr_beam_monitor_t;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
+
+    if( ( beam_elements != SIXTRL_NULLPTR ) && ( slot_size > ZERO ) &&
+        ( NS(ManagedBuffer_get_num_objects)(
+            beam_elements, slot_size ) ) > ZERO )
+    {
+        ptr_obj_t be_it  = NS(ManagedBuffer_get_objects_index_begin)(
+            beam_elements, slot_size );
+
+        ptr_obj_t be_end = NS(ManagedBuffer_get_objects_index_end)(
+            beam_elements, slot_size );
+
+        for( ; be_it != be_end ; ++be_it )
+        {
+            NS(object_type_id_t) const type_id =
+                NS(Object_get_type_id)( be_it );
+
+            if( type_id == NS(OBJECT_TYPE_BEAM_MONITOR) )
+            {
+                ptr_beam_monitor_t monitor = ( ptr_beam_monitor_t
+                    )NS(Object_get_begin_ptr)( be_it );
+
+                if( monitor != SIXTRL_NULLPTR )
+                {
+                    NS(BeamMonitor_clear)( monitor );
+                }
+            }
+        }
+    }
+
+    return;
+}
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }

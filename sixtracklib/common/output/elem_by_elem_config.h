@@ -159,11 +159,8 @@ SIXTRL_FN SIXTRL_STATIC int NS(ElemByElemConfig_init_detailed)(
     NS(particle_index_t) const min_turn,
     NS(particle_index_t) const max_turn );
 
-
-
-
 SIXTRL_FN SIXTRL_STATIC int
-NS(ElemByElemConfig_assign_managed_particles_out_buffer)(
+NS(ElemByElemConfig_assign_managed_output_buffer)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
@@ -195,11 +192,23 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ElemByElemConfig_init)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
     NS(elem_by_elem_order_t) const order,
-    SIXTRL_BUFFER_ARGPTR_DEC
-        const NS(Buffer) *const beam_elements_buffer,
-    SIXTRL_PARTICLE_ARGPTR_DEC
-        const NS(Particles) *const SIXTRL_RESTRICT particles,
-    NS(particle_index_t) min_turn, NS(particle_index_t) max_turn );
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const beam_elements_buffer,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(particle_index_t) const min_turn, NS(particle_index_t) const max_turn );
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(ElemByElemConfig_get_num_elem_by_elem_objects)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT belements );
+
+SIXTRL_FN SIXTRL_STATIC int
+NS(ElemByElemConfig_get_min_max_element_id_from_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_element_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_element_id,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)*
+        SIXTRL_RESTRICT ptr_num_elem_by_elem_objects,
+    NS(particle_index_t) const element_id_offset );
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(ElemByElemConfig_get_required_num_slots)(
@@ -243,7 +252,19 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add_copy)(
      SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ElemByElemConfig_assign_output_buffer)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+        NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* output_buffer,
+    NS(buffer_size_t) const out_buffer_index_offset );
+
 #endif /* !defined( _GPUCODE ) */
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(ElemByElemConfig_get_num_elem_by_elem_objects_from_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const*
+        SIXTRL_RESTRICT belements_buffer,
+    NS(buffer_size_t) const slot_size );
 
  /* ------------------------------------------------------------------------ */
  /*  Implementation of inline functions: */
@@ -786,7 +807,7 @@ SIXTRL_INLINE int NS(ElemByElemConfig_init_detailed)(
     return success;
 }
 
-SIXTRL_INLINE int NS(ElemByElemConfig_assign_managed_particles_out_buffer)(
+SIXTRL_INLINE int NS(ElemByElemConfig_assign_managed_output_buffer)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
@@ -899,6 +920,118 @@ SIXTRL_INLINE void NS(ElemByElemConfig_set_output_store_address)(
 }
 
 #if !defined( _GPUCODE )
+
+SIXTRL_INLINE NS(buffer_size_t)
+NS(ElemByElemConfig_get_num_elem_by_elem_objects)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT belements )
+{
+    return NS(ElemByElemConfig_get_num_elem_by_elem_objects_from_managed_buffer)(
+        NS(Buffer_get_const_data_begin)( belements ),
+        NS(Buffer_get_slot_size)( belements ) );
+}
+
+SIXTRL_INLINE int NS(ElemByElemConfig_get_min_max_element_id_from_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_element_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_element_id,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)*
+        SIXTRL_RESTRICT ptr_num_elem_by_elem_objects,
+    NS(particle_index_t) const element_id_offset )
+{
+    int success = -1;
+
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(particle_index_t) index_t;
+    typedef NS(object_type_id_t) type_id_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* obj_iter_t;
+
+    buf_size_t const num_objects = NS(Buffer_get_num_of_objects)( belements );
+
+    SIXTRL_ASSERT( belements != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( belements ) );
+
+    if( ( num_objects > ( buf_size_t )0u ) &&
+        ( element_id_offset >= ( index_t )0u ) )
+    {
+        index_t min_element_id = element_id_offset;
+        index_t max_element_id = element_id_offset;
+        buf_size_t num_elem_by_elem_objects = ( buf_size_t )0u;
+
+        obj_iter_t obj_it  = NS(Buffer_get_const_objects_begin)( belements );
+        obj_iter_t obj_end = NS(Buffer_get_const_objects_end)( belements );
+
+        for( ; obj_it != obj_end ; ++obj_it )
+        {
+            type_id_t const type_id = NS(Object_get_type_id)( obj_it );
+
+            if( ( type_id != NS(OBJECT_TYPE_NONE) ) &&
+                ( type_id != NS(OBJECT_TYPE_PARTICLE) ) &&
+                ( type_id != NS(OBJECT_TYPE_INVALID) ) &&
+                ( type_id != NS(OBJECT_TYPE_LINE) ) &&
+                ( type_id != NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) ) )
+            {
+                ++num_elem_by_elem_objects;
+                ++obj_it;
+//
+                break;
+            }
+
+            ++min_element_id;
+        }
+
+        max_element_id = min_element_id;
+
+        for( ; obj_it != obj_end ; ++obj_it )
+        {
+            type_id_t const type_id = NS(Object_get_type_id)( obj_it );
+
+            if( ( type_id != NS(OBJECT_TYPE_NONE) ) &&
+                ( type_id != NS(OBJECT_TYPE_PARTICLE) ) &&
+                ( type_id != NS(OBJECT_TYPE_INVALID) ) &&
+                ( type_id != NS(OBJECT_TYPE_LINE) ) &&
+                ( type_id != NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) ) )
+            {
+                ++num_elem_by_elem_objects;
+                ++max_element_id;
+            }
+        }
+
+        SIXTRL_ASSERT( num_elem_by_elem_objects <= num_objects );
+
+        if( num_elem_by_elem_objects == ( buf_size_t )0u )
+        {
+            min_element_id = max_element_id = element_id_offset;
+        }
+
+        SIXTRL_ASSERT( min_element_id <= max_element_id );
+
+        if( ( min_element_id >= element_id_offset ) &&
+            ( max_element_id >= min_element_id ) &&
+            ( max_element_id <  ( index_t )(
+                min_element_id + num_elem_by_elem_objects ) ) )
+        {
+            if(  ptr_min_element_id != SIXTRL_NULLPTR )
+            {
+                *ptr_min_element_id = min_element_id;
+            }
+
+            if(  ptr_max_element_id != SIXTRL_NULLPTR )
+            {
+                *ptr_max_element_id = max_element_id;
+            }
+
+            if(  ptr_num_elem_by_elem_objects != SIXTRL_NULLPTR )
+            {
+                *ptr_num_elem_by_elem_objects = num_elem_by_elem_objects;
+            }
+
+            success = 0;
+        }
+    }
+
+    return success;
+}
 
 SIXTRL_INLINE NS(buffer_size_t) NS(ElemByElemConfig_get_required_num_slots)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
@@ -1043,6 +1176,50 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add_copy)(
 }
 
 #endif /* !defined( _GPUCODE ) */
+
+SIXTRL_INLINE NS(buffer_size_t)
+NS(ElemByElemConfig_get_num_elem_by_elem_objects_from_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const*
+        SIXTRL_RESTRICT belements_buffer, NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(object_type_id_t) type_id_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* obj_iter_t;
+
+    buf_size_t num_elem_by_elem_objects = ( buf_size_t )0u;
+
+    obj_iter_t it = NS(ManagedBuffer_get_const_objects_index_begin)(
+        belements_buffer, slot_size );
+
+    obj_iter_t end = NS(ManagedBuffer_get_const_objects_index_end)(
+        belements_buffer, slot_size );
+
+    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)(
+        belements_buffer, slot_size ) );
+
+    SIXTRL_ASSERT( ( ( uintptr_t )it ) <= ( uintptr_t )end );
+
+    if( ( belements_buffer != SIXTRL_NULLPTR ) &&
+        ( slot_size > ( buf_size_t )0u ) &&
+        ( it != SIXTRL_NULLPTR ) && ( end != SIXTRL_NULLPTR ) )
+    {
+        for( ; it != end ; ++it )
+        {
+            type_id_t const type_id = NS(Object_get_type_id)( it );
+
+            if( ( type_id != NS(OBJECT_TYPE_NONE) ) &&
+                ( type_id != NS(OBJECT_TYPE_PARTICLE) ) &&
+                ( type_id != NS(OBJECT_TYPE_INVALID) ) &&
+                ( type_id != NS(OBJECT_TYPE_LINE) ) &&
+                ( type_id != NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) ) )
+            {
+                ++num_elem_by_elem_objects;
+            }
+        }
+    }
+
+    return num_elem_by_elem_objects;
+}
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
