@@ -209,6 +209,10 @@ int main( int argc, char* argv[] )
     if( ( eb != SIXTRL_NULLPTR ) &&
         ( st_Buffer_get_num_of_objects( eb ) > 0 ) )
     {
+        st_buffer_size_t elem_by_elem_index_offset = ( st_buffer_size_t )0u;
+        st_buffer_size_t beam_monitor_index_offset = ( st_buffer_size_t )0u;
+        st_particle_index_t min_turn_id            = ( st_particle_index_t )0;
+
         if( NUM_TURNS_IO_TURN_BY_TURN > 0 )
         {
             st_BeamMonitor* beam_monitor = st_BeamMonitor_new( eb );
@@ -236,11 +240,13 @@ int main( int argc, char* argv[] )
 
         out_buffer = st_Buffer_new( 0u );
 
-        st_BeamMonitor_prepare_particles_out_buffer( eb, out_buffer,
-            particles, NUM_TURNS_IO_ELEM_BY_ELEM );
+        st_OutputBuffer_prepare(
+            eb, out_buffer, particles, NUM_TURNS_IO_ELEM_BY_ELEM,
+            &elem_by_elem_index_offset, &beam_monitor_index_offset,
+            &min_turn_id );
 
-        st_BeamMonitor_assign_particles_out_buffer( eb, out_buffer,
-            NUM_TURNS_IO_ELEM_BY_ELEM );
+        st_BeamMonitor_assign_output_buffer_from_offset(
+            eb, out_buffer, min_turn_id, beam_monitor_index_offset );
     }
 
     /* ********************************************************************* */
