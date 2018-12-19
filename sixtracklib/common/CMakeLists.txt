@@ -8,8 +8,10 @@ set( SIXTRACKLIB_COMMON_C99_HEADERS )
 set( SIXTRACKLIB_COMMON_CXX_HEADERS )
 
 add_subdirectory( generated      )
-add_subdirectory( internal       )
+
 add_subdirectory( buffer         )
+add_subdirectory( context        )
+add_subdirectory( internal       )
 add_subdirectory( be_beambeam    )
 add_subdirectory( be_drift       )
 add_subdirectory( be_cavity      )
