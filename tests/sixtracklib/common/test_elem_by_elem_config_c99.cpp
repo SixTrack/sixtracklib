@@ -114,7 +114,7 @@ TEST( C99_CommonElemByElemConfigTests, MinimalExampleInit )
 
         buf_size_t out_buffer_index_offset = buf_size_t{ 1 };
 
-        int ret = ::st_ElemByElemConfig_prepare_particles_out_buffer_detailed(
+        int ret = ::st_ElemByElemConfig_prepare_output_buffer_from_conf(
             &config, elem_by_elem_buffer, &out_buffer_index_offset );
 
         ASSERT_TRUE( ret == 0 );
@@ -181,16 +181,22 @@ TEST( C99_CommonElemByElemConfigTests, MinimalExampleInit )
         buf_size_t const num_elem_by_elem_turns = static_cast< buf_size_t >(
             max_turn + part_index_t{ 1 } - min_turn );
 
-        int ret = ::st_ElemByElemConfig_prepare_particles_out_buffer(
-            eb, elem_by_elem_buffer, particles, num_elem_by_elem_turns );
+        buf_size_t elem_by_elem_index_offset = buf_size_t{ 0 };
+
+        int ret = ::st_ElemByElemConfig_prepare_output_buffer(
+            eb, elem_by_elem_buffer, particles, num_elem_by_elem_turns,
+            &elem_by_elem_index_offset );
 
         ASSERT_TRUE( ret == 0 );
 
         ASSERT_TRUE( ::st_Buffer_get_num_of_objects(
             elem_by_elem_buffer ) == buf_size_t{ 1 } );
 
+        ASSERT_TRUE( elem_by_elem_index_offset == buf_size_t{ 0 } );
+
         particles_t* elem_by_elem_particles =
-            ::st_Particles_buffer_get_particles( elem_by_elem_buffer, 0u );
+            ::st_Particles_buffer_get_particles(
+                elem_by_elem_buffer, elem_by_elem_index_offset );
 
         ASSERT_TRUE( elem_by_elem_particles != nullptr );
         ASSERT_TRUE( ::st_Particles_get_num_of_particles(
