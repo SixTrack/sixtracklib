@@ -14,75 +14,84 @@
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
 
+
 SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(TrackCpu)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     int const until_turn, int const elem_by_elem_turns )
 {
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* ptr_out_buffer = SIXTRL_NULLPTR;
-
     NS(Buffer)* ptr_output = SIXTRL_NULLPTR;
 
-    if( ( particles_buffer != SIXTRL_NULLPTR ) &&
-        ( beam_elements_buffer != SIXTRL_NULLPTR ) &&
+    typedef NS(buffer_size_t)       buf_size_t;
+    typedef NS(particle_index_t)    index_t;
+
+    if( ( particles != SIXTRL_NULLPTR ) &&
+        ( beam_elements != SIXTRL_NULLPTR ) &&
         ( until_turn >= 0 ) && ( elem_by_elem_turns >= 0 ) &&
         ( elem_by_elem_turns <= until_turn ) )
     {
-        SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* particles =
-            NS(Particles_buffer_get_particles)( particles_buffer, 0u );
-
-        bool const has_beam_monitors =
-            NS(BeamMonitor_are_present_in_buffer)( beam_elements_buffer );
-
-        bool const prepare_out_buffer =
-            ( ( elem_by_elem_turns > 0 ) || ( has_beam_monitors ) );
-
-        int success = ( prepare_out_buffer ) ? -1 : 0;
+        int success = -1;
 
         if( output_buffer != SIXTRL_NULLPTR )
         {
-            ptr_out_buffer = output_buffer;
-            success = 0;
+            ptr_output = output_buffer;
         }
         else
         {
-            ptr_out_buffer = NS(Buffer_new)( 0u );
-
-            success = NS(BeamMonitor_prepare_particles_out_buffer)(
-                beam_elements_buffer, ptr_out_buffer,
-                    particles, elem_by_elem_turns );
+            ptr_output = NS(Buffer_new)( 0u );
         }
 
-        if( ( success == 0 ) && ( prepare_out_buffer ) )
+        if( ptr_output != SIXTRL_NULLPTR )
         {
-            success = NS(BeamMonitor_assign_particles_out_buffer)(
-                beam_elements_buffer, ptr_output, elem_by_elem_turns );
-        }
+            buf_size_t elem_by_elem_index_offset = ( buf_size_t )0u;
+            buf_size_t beam_monitor_index_offset = ( buf_size_t )0u;
+            index_t min_turn_id                  = ( index_t )0u;
 
-        if( ( success == 0 ) && ( elem_by_elem_turns > 0 ) )
-        {
-            SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* elem_by_elem_particles =
-                NS(Particles_buffer_get_particles)( ptr_output, 0u );
+            success  = NS(OutputBuffer_prepare)(
+                    beam_elements, ptr_output, particles, elem_by_elem_turns,
+                    &elem_by_elem_index_offset, &beam_monitor_index_offset,
+                    &min_turn_id );
 
-            SIXTRL_ASSERT( elem_by_elem_particles != SIXTRL_NULLPTR );
-            SIXTRL_ASSERT( NS(Buffer_get_num_of_objects)( ptr_output ) >
-                       ( NS(buffer_size_t) )0u );
+            if( success == 0 )
+            {
+                success = NS(BeamMonitor_assign_output_buffer_from_offset)(
+                    beam_elements, ptr_output, min_turn_id,
+                        beam_monitor_index_offset );
+            }
 
-            success = NS(Track_all_particles_element_by_element_until_turn)(
-                particles, beam_elements_buffer, elem_by_elem_turns,
-                    elem_by_elem_particles );
-        }
+            if( ( success == 0 ) && ( elem_by_elem_turns > 0 ) )
+            {
+                SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+                elem_by_elem_particles = NS(Particles_buffer_get_particles)(
+                    ptr_output, elem_by_elem_index_offset );
 
-        if( ( success == 0 ) && ( elem_by_elem_turns < until_turn ) )
-        {
-            success = NS(Track_all_particles_until_turn)(
-                particles, beam_elements_buffer, until_turn );
+                SIXTRL_ASSERT( elem_by_elem_particles != SIXTRL_NULLPTR );
+                SIXTRL_ASSERT( NS(Buffer_get_num_of_objects)( ptr_output ) >
+                           ( NS(buffer_size_t) )0u );
+
+                success = NS(Track_all_particles_element_by_element_until_turn)(
+                    particles, beam_elements, elem_by_elem_turns,
+                        elem_by_elem_particles );
+            }
+
+            if( ( success == 0 ) && ( elem_by_elem_turns < until_turn ) )
+            {
+                success = NS(Track_all_particles_until_turn)(
+                    particles, beam_elements, until_turn );
+            }
+
+            if( success != 0 )
+            {
+                NS(Buffer_delete)( ptr_output );
+                ptr_output = SIXTRL_NULLPTR;
+            }
         }
     }
 
     return ptr_output;
 }
+
 
 /* ------------------------------------------------------------------------- */
 
@@ -681,85 +690,6 @@ SIXTRL_HOST_FN int NS(Track_all_particles_element_by_element_until_turn)(
     return NS(Track_subset_of_particles_element_by_element_until_turn)(
         particles, 0, NS(Particles_get_num_of_particles)( particles ), 1,
             belements, until_turn, out_particles );
-}
-
-/* ------------------------------------------------------------------------- */
-
-SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(TrackCpu)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    int const until_turn, int const elem_by_elem_turns )
-{
-    NS(Buffer)* ptr_output = SIXTRL_NULLPTR;
-
-    typedef NS(buffer_size_t)       buf_size_t;
-    typedef NS(particle_index_t)    index_t;
-
-    if( ( particles != SIXTRL_NULLPTR ) &&
-        ( beam_elements != SIXTRL_NULLPTR ) &&
-        ( until_turn >= 0 ) && ( elem_by_elem_turns >= 0 ) &&
-        ( elem_by_elem_turns <= until_turn ) )
-    {
-        int success = -1;
-
-        if( output_buffer != SIXTRL_NULLPTR )
-        {
-            ptr_output = output_buffer;
-        }
-        else
-        {
-            ptr_output = NS(Buffer_new)( 0u );
-        }
-
-        if( ptr_output != SIXTRL_NULLPTR )
-        {
-            buf_size_t elem_by_elem_index_offset = ( buf_size_t )0u;
-            buf_size_t beam_monitor_index_offset = ( buf_size_t )0u;
-            index_t min_turn_id                  = ( index_t )0u;
-
-            success  = NS(OutputBuffer_prepare)(
-                    beam_elements, ptr_output, particles, elem_by_elem_turns,
-                    &elem_by_elem_index_offset, &beam_monitor_index_offset,
-                    &min_turn_id );
-
-            if( success == 0 )
-            {
-                success = NS(BeamMonitor_assign_output_buffer_from_offset)(
-                    beam_elements, ptr_output, min_turn_id,
-                        beam_monitor_index_offset );
-            }
-
-            if( ( success == 0 ) && ( elem_by_elem_turns > 0 ) )
-            {
-                SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
-                elem_by_elem_particles = NS(Particles_buffer_get_particles)(
-                    ptr_output, elem_by_elem_index_offset );
-
-                SIXTRL_ASSERT( elem_by_elem_particles != SIXTRL_NULLPTR );
-                SIXTRL_ASSERT( NS(Buffer_get_num_of_objects)( ptr_output ) >
-                           ( NS(buffer_size_t) )0u );
-
-                success = NS(Track_all_particles_element_by_element_until_turn)(
-                    particles, beam_elements, elem_by_elem_turns,
-                        elem_by_elem_particles );
-            }
-
-            if( ( success == 0 ) && ( elem_by_elem_turns < until_turn ) )
-            {
-                success = NS(Track_all_particles_until_turn)(
-                    particles, beam_elements, until_turn );
-            }
-
-            if( success != 0 )
-            {
-                NS(Buffer_delete)( ptr_output );
-                ptr_output = SIXTRL_NULLPTR;
-            }
-        }
-    }
-
-    return ptr_output;
 }
 
 /* end: /common/internal/track.c */
