@@ -48,6 +48,7 @@ set( SIXTRL_COMMON_INTERNAL_CXX_HEADERS
 
 set( SIXTRL_COMMON_INTERNAL_CXX_SOURCES
      track_job_base.cpp
+     track_job_cpu.cpp
 )
 
 add_library( sixtrack_common_internal_cxx OBJECT

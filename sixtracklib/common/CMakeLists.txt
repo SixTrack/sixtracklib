@@ -33,6 +33,7 @@ set(  SIXTRACKLIB_C99_HEADERS
       definitions.h
       particles.h
       track.h
+      track_job_cpu.h
 )
 
 set(  SIXTRACKLIB_CXX_HEADERS
