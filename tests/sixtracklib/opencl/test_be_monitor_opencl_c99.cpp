@@ -442,6 +442,10 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
 
     size_t elem_by_elem_index_offset = size_t{ 0 };
 
+    ASSERT_TRUE( 0 == ::st_ElemByElemConfig_init( &elem_by_elem_config,
+        NS(ELEM_BY_ELEM_ORDER_DEFAULT), eb, initial_state, part_index_t{ 0 },
+            static_cast< part_index_t >( NUM_TURNS - size_t{ 1 } ) ) );
+
     ASSERT_TRUE( 0 == ::st_ElemByElemConfig_prepare_output_buffer(
         eb, elem_by_elem_buffer, particles, NUM_TURNS,
             &elem_by_elem_index_offset ) );
@@ -462,7 +466,7 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
     ASSERT_TRUE( 0 == ::st_ElemByElemConfig_assign_output_buffer(
         &elem_by_elem_config, elem_by_elem_buffer, elem_by_elem_index_offset ) );
 
-    ret = ::st_Track_all_particles_element_by_element_until_turn_details(
+    int ret = ::st_Track_all_particles_element_by_element_until_turn_details(
             particles, &elem_by_elem_config, eb, NUM_TURNS );
 
     ASSERT_TRUE( ret == 0 );
