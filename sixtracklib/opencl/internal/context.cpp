@@ -702,7 +702,7 @@ namespace SIXTRL_CXX_NAMESPACE
     int ClContext::assignBeamMonitorIoBuffer(
         ClArgument& SIXTRL_RESTRICT_REF beam_elements_arg,
         ClArgument& SIXTRL_RESTRICT_REF out_buffer_arg,
-        ClContext::size_type const num_particles,
+        ClContext::size_type const min_turn_id,
         ClContext::size_type const out_particle_block_offset  )
     {
         int success = -1;
@@ -713,7 +713,7 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( kernel_id >= kernel_id_t{ 0 } ) && ( kernel_id <  max_kernel_id ) )
         {
             success = this->assignBeamMonitorIoBuffer( beam_elements_arg,
-                out_buffer_arg, num_particles, out_particle_block_offset, kernel_id );
+                out_buffer_arg, min_turn_id, out_particle_block_offset, kernel_id );
         }
 
         return success;
@@ -722,7 +722,7 @@ namespace SIXTRL_CXX_NAMESPACE
     int ClContext::assignBeamMonitorIoBuffer(
         ClArgument& SIXTRL_RESTRICT_REF beam_elements_arg,
         ClArgument& SIXTRL_RESTRICT_REF out_buffer_arg,
-        ClContext::size_type const num_particles,
+        ClContext::size_type const min_turn_id,
         ClContext::size_type const out_particle_block_offset,
         ClContext::kernel_id_t const assign_kernel_id )
     {
@@ -742,18 +742,23 @@ namespace SIXTRL_CXX_NAMESPACE
             out_buffer_arg.ptrCObjectBuffer() ) );
 
         size_type const num_kernel_args = this->kernelNumArgs( assign_kernel_id );
-        SIXTRL_ASSERT(  num_kernel_args >= 3u );
+        SIXTRL_ASSERT(  num_kernel_args >= 4u );
+
+        int64_t const min_turn_id_arg = static_cast< int64_t >( min_turn_id );
 
         this->assignKernelArgument( assign_kernel_id, 0u, beam_elements_arg );
         this->assignKernelArgument( assign_kernel_id, 1u, out_buffer_arg );
 
         this->assignKernelArgumentValue(
-            assign_kernel_id, 2u, out_particle_block_offset );
+            assign_kernel_id, 2u, min_turn_id_arg );
 
-        if( num_kernel_args > 3u )
+        this->assignKernelArgumentValue(
+            assign_kernel_id, 3u, out_particle_block_offset );
+
+        if( num_kernel_args > 4u )
         {
             this->assignKernelArgumentClBuffer(
-                assign_kernel_id, 3u, this->internalSuccessFlagBuffer() );
+                assign_kernel_id, 4u, this->internalSuccessFlagBuffer() );
         }
 
         success = ( this->runKernel( assign_kernel_id,
@@ -989,9 +994,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
             path_to_particles_track_opt_prog +=
                 "track_particles_optimized_priv_particles.cl";
-
-//             path_to_assign_out_buffer_prog    +=
-//                 "be_monitors_assign_out_buffer_debug.cl";
 
             path_to_assign_out_buffer_prog    +=
                 "be_monitors_assign_out_buffer.cl";
@@ -1477,12 +1479,13 @@ SIXTRL_HOST_FN int NS(ClContext_assign_beam_monitor_out_buffer)(
     NS(ClContext)*  SIXTRL_RESTRICT ctx,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_out_buffer_arg,
+    NS(buffer_size_t) const min_turn_id,
     NS(buffer_size_t) const out_particle_block_offset )
 {
     return ( ( ctx != nullptr ) && ( ptr_beam_elements_arg != nullptr ) &&
              ( ptr_out_buffer_arg != nullptr ) )
-        ? ctx->assignBeamMonitorIoBuffer(
-            *ptr_beam_elements_arg, *ptr_out_buffer_arg, out_particle_block_offset )
+        ? ctx->assignBeamMonitorIoBuffer( *ptr_beam_elements_arg,
+            *ptr_out_buffer_arg, min_turn_id, out_particle_block_offset )
         : -1;
 }
 
@@ -1490,14 +1493,15 @@ SIXTRL_HOST_FN int NS(ClContext_assign_beam_monitor_out_buffer_with_kernel_id)(
     NS(ClContext)*  SIXTRL_RESTRICT ctx,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_out_buffer_arg,
+    NS(buffer_size_t) const min_turn_id,
     NS(buffer_size_t) const out_particle_block_offset,
     int const assign_kernel_id )
 {
     return ( ( ctx != nullptr ) && ( ptr_beam_elements_arg != nullptr ) &&
              ( ptr_out_buffer_arg != nullptr ) )
-        ? ctx->assignBeamMonitorIoBuffer(
-            *ptr_beam_elements_arg, *ptr_out_buffer_arg,
-            out_particle_block_offset, assign_kernel_id )
+        ? ctx->assignBeamMonitorIoBuffer( *ptr_beam_elements_arg,
+            *ptr_out_buffer_arg, min_turn_id, out_particle_block_offset,
+                assign_kernel_id )
         : -1;
 }
 
