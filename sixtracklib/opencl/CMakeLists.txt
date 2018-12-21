@@ -1,6 +1,7 @@
 set( SIXTRACKLIB_OPENCL_HEADERS
      argument.h
      context.h
+     track_job_cl.h
 )
 
 set( SIXTRACKLIB_OPENCL_INTERNAL_HEADERS
@@ -12,6 +13,7 @@ set( SIXTRACKLIB_OPENCL_SOURCES
      internal/argument.cpp
      internal/base_context.cpp
      internal/context.cpp
+     internal/track_job_cl.cpp
 )
 
 set( SIXTRACKLIB_OPENCL_C99_HEADERS
