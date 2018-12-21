@@ -155,6 +155,12 @@ namespace SIXTRL_CXX_NAMESPACE
         return ( ret == 0 );
     }
 
+    bool TrackJobCpu::trackElemByElem( TrackJobCpu::size_type const until_turn )
+    {
+        ( void )until_turn;
+        return false;
+    }
+
     void TrackJobCpu::collect()
     {
         return;
@@ -207,6 +213,14 @@ SIXTRL_HOST_FN bool NS(TrackJobCpu_track)(
     NS(buffer_size_t) const until_turn )
 {
     return ( track_job != nullptr ) ? track_job->track( until_turn ) : false;
+}
+
+SIXTRL_HOST_FN bool NS(TrackJobCpu_track_elem_by_elem)(
+    NS(TrackJobCpu)* SIXTRL_RESTRICT track_job,
+    NS(buffer_size_t) const until_turn )
+{
+    return ( track_job != nullptr )
+        ? track_job->trackElemByElem( until_turn ) : false;
 }
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobCpu_collect)(
