@@ -45,6 +45,7 @@
 #include "sixtracklib/common/constants.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/track_job_cpu.h"
 #include "sixtracklib/common/track.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -63,6 +64,7 @@
 
     #include "sixtracklib/opencl/argument.h"
     #include "sixtracklib/opencl/context.h"
+    #include "sixtracklib/opencl/track_job_cl.h"
 
 //     #include "sixtracklib/opencl/buffer.h"
 //     #include "sixtracklib/opencl/ocl_environment.h"
