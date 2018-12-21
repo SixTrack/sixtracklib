@@ -63,7 +63,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         virtual ~TrackJobCl();
 
-        c_buffer_t* track( size_type const until_turn );
+        bool track( size_type const until_turn );
 
         void collect();
 
@@ -149,7 +149,7 @@ NS(TrackJobCl_new_using_output_buffer)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobCl_delete)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)* NS(TrackJobCl_track)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_track)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
     NS(buffer_size_t) const until_turn );
 
@@ -165,30 +165,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)* NS(TrackJobCl_get_output_buffer)(
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)*
 NS(TrackJobCl_get_beam_elements_buffer)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobCl)* NS(TrackJobCl_new)(
-    char const* SIXTRL_RESTRICT device_id_str,
-    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
-    NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
-    NS(buffer_size_t) const num_elem_by_elem_turns,
-    NS(buffer_size_t) const until_turn );
-
-
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobCl)*
-NS(TrackJobCl_new_using_output_buffer)(
-    char const* SIXTRL_RESTRICT device_id_str,
-    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
-    NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
-    NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const num_elem_by_elem_turns,
-    NS(buffer_size_t) const until_turn );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobCl_delete)(
-    NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)* NS(TrackJobCl_track)(
-    NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
-    NS(buffer_size_t) const until_turn );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClContext)*
 NS(TrackJobCl_get_context)( NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
