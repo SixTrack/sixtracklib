@@ -97,6 +97,9 @@ int main( int argc, char* argv[] )
 
         track_job = st_TrackJobCl_new( argv[ 0 ], pb, eb, 0, NUM_TURNS_ELEM_BY_ELEM );
 
+        st_ClContext const* context = st_TrackJobCl_get_const_context( track_job );
+        st_ClContextBase_print_nodes_info( context );
+
         /* Track until NUM_TURNS_ELEM_BY_ELEM + 3: */
         int const TRACK_UNTIL_T2 = NUM_TURNS_ELEM_BY_ELEM + 3;
         st_Buffer const* output_buffer =
