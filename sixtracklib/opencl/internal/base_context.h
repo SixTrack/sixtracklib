@@ -14,6 +14,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/compute_arch.h"
+    #include "sixtracklib/common/context/context_abs_base.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
@@ -574,7 +575,6 @@ typedef void NS(ClContextBase);
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-typedef size_t              NS(context_size_t);
 typedef NS(ComputeNodeId)   NS(context_node_id_t);
 typedef NS(ComputeNodeInfo) NS(context_node_info_t);
 typedef SIXTRL_INT64_T      NS(context_kernel_id_t);

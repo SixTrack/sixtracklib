@@ -23,39 +23,33 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCpu::c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
         TrackJobCpu::size_type const until_turn,
         TrackJobCpu::size_type const num_elem_by_elem_turns  ) :
-        TrackJobBase(),
+        TrackJobCpu::_base_t(),
         m_elem_by_elem_index_offset( TrackJobCpu::size_type{ 0 } ),
         m_beam_monitor_index_offset( TrackJobCpu::size_type{ 0 } ),
         m_particle_block_idx( TrackJobCpu::size_type{ 0 } ),
         m_owns_output_buffer( false )
-
     {
-        using size_t  = TrackJobCpu::size_type;
-        using index_t = NS(particle_index_t);
-
-        TrackJobCpu::c_buffer_t* output_buffer =
-            ::NS(Buffer_new)( size_t{ 0 } );
+        using _this_t       = TrackJobCpu;
+        using _base_t       = _this_t::_base_t;
+        using c_buffer_t    = _this_t::c_buffer_t;
+        using size_t        = _this_t::size_type;
+        using index_t       = _this_t::particle_index_t;
 
         index_t min_turn_id = index_t{ -1 };
+
+        c_buffer_t* output_buffer  = ::NS(Buffer_new)( size_t{ 0 } );
+        this->m_owns_output_buffer = ( output_buffer != nullptr );
+
+        bool success = _base_t::doInitBuffers( particles_buffer,
+            beam_elements_buffer, output_buffer, num_elem_by_elem_turns,
+            until_turn, &this->m_particle_block_idx, size_t{ 1 },
+            &this->m_elem_by_elem_index_offset,
+            &this->m_beam_monitor_index_offset, &min_turn_id );
 
         ::NS(Particles)* particles = ::NS(Particles_buffer_get_particles)(
             particles_buffer, this->m_particle_block_idx );
 
-        SIXTRL_ASSERT( particles != nullptr );
-
-        int ret = NS(OutputBuffer_prepare)( beam_elements_buffer,
-            output_buffer, particles, num_elem_by_elem_turns,
-            &this->m_elem_by_elem_index_offset,
-            &this->m_beam_monitor_index_offset,
-            &min_turn_id );
-
-        SIXTRL_ASSERT( ret == 0 );
-
-        ret = NS(BeamMonitor_assign_output_buffer_from_offset)(
-            beam_elements_buffer, output_buffer, min_turn_id,
-            this->m_beam_monitor_index_offset );
-
-        SIXTRL_ASSERT( ret == 0 );
+        success &= ( particles != nullptr );
 
         if( num_elem_by_elem_turns > ( size_t{ 0 } ) )
         {
@@ -63,30 +57,23 @@ namespace SIXTRL_CXX_NAMESPACE
                 NS(Particles_buffer_get_particles)(
                     output_buffer, this->m_elem_by_elem_index_offset );
 
-            SIXTRL_ASSERT( elem_by_elem_particles != nullptr );
+            success &= ( elem_by_elem_particles != nullptr );
 
-            ret = NS(Track_all_particles_element_by_element_until_turn)(
-                particles, beam_elements_buffer,
-                min_turn_id + num_elem_by_elem_turns, elem_by_elem_particles );
-
-            SIXTRL_ASSERT( ret == 0 );
+            success &= ( 0 ==
+                ::NS(Track_all_particles_element_by_element_until_turn)(
+                    particles, beam_elements_buffer,
+                    min_turn_id + num_elem_by_elem_turns,
+                    elem_by_elem_particles ) );
         }
 
         if( until_turn > size_t{ 0 } )
         {
-            ret = NS(Track_all_particles_until_turn)(
-                particles, beam_elements_buffer, until_turn );
-
-            SIXTRL_ASSERT( ret == 0 );
+            success &= ( 0 == ::NS(Track_all_particles_until_turn)(
+                particles, beam_elements_buffer, until_turn ) );
         }
 
-        this->doSetPtrToParticlesBuffer( particles_buffer );
-        this->doSetPtrToBeamElementsBuffer( beam_elements_buffer );
-        this->doSetPtrToOutputBuffer( output_buffer );
-
-        this->m_owns_output_buffer = true;
-
-        ( void )ret;
+        SIXTRL_ASSERT( success );
+        ( void )success;
     }
 
     TrackJobCpu::TrackJobCpu(
@@ -95,36 +82,27 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCpu::c_buffer_t* SIXTRL_RESTRICT output_buffer,
         TrackJobCpu::size_type const until_turn,
         TrackJobCpu::size_type const num_elem_by_elem_turns  ) :
-        TrackJobBase(),
+        TrackJobCpu::_base_t(),
         m_elem_by_elem_index_offset( TrackJobCpu::size_type{ 0 } ),
         m_beam_monitor_index_offset( TrackJobCpu::size_type{ 0 } ),
         m_particle_block_idx( TrackJobCpu::size_type{ 0 } ),
         m_owns_output_buffer( false )
-
     {
-        using size_t  = TrackJobCpu::size_type;
-        using index_t = NS(particle_index_t);
+        using _this_t       = TrackJobCpu;
+        using _base_t       = _this_t::_base_t;
+        using size_t        = _this_t::size_type;
+        using index_t       = _this_t::particle_index_t;
 
         index_t min_turn_id = index_t{ -1 };
 
+        bool success = _base_t::doInitBuffers( particles_buffer,
+            beam_elements_buffer, output_buffer, num_elem_by_elem_turns,
+            until_turn, &this->m_particle_block_idx, size_t{ 1 },
+            &this->m_elem_by_elem_index_offset,
+            &this->m_beam_monitor_index_offset, &min_turn_id );
+
         ::NS(Particles)* particles = ::NS(Particles_buffer_get_particles)(
             particles_buffer, this->m_particle_block_idx );
-
-        SIXTRL_ASSERT( particles != nullptr );
-
-        int ret = NS(OutputBuffer_prepare)( beam_elements_buffer,
-            output_buffer, particles, num_elem_by_elem_turns,
-            &this->m_elem_by_elem_index_offset,
-            &this->m_beam_monitor_index_offset,
-            &min_turn_id );
-
-        SIXTRL_ASSERT( ret == 0 );
-
-        ret = NS(BeamMonitor_assign_output_buffer_from_offset)(
-            beam_elements_buffer, output_buffer, min_turn_id,
-            this->m_beam_monitor_index_offset );
-
-        SIXTRL_ASSERT( ret == 0 );
 
         if( num_elem_by_elem_turns > ( size_t{ 0 } ) )
         {
@@ -132,28 +110,23 @@ namespace SIXTRL_CXX_NAMESPACE
                 NS(Particles_buffer_get_particles)(
                     output_buffer, this->m_elem_by_elem_index_offset );
 
-            SIXTRL_ASSERT( elem_by_elem_particles != nullptr );
+            success &= ( elem_by_elem_particles != nullptr );
 
-            ret = NS(Track_all_particles_element_by_element_until_turn)(
-                particles, beam_elements_buffer,
-                min_turn_id + num_elem_by_elem_turns, elem_by_elem_particles );
-
-            SIXTRL_ASSERT( ret == 0 );
+            success &= ( 0 ==
+                ::NS(Track_all_particles_element_by_element_until_turn)(
+                    particles, beam_elements_buffer,
+                    min_turn_id + num_elem_by_elem_turns,
+                    elem_by_elem_particles ) );
         }
 
         if( until_turn > size_t{ 0 } )
         {
-            ret = NS(Track_all_particles_until_turn)(
-                particles, beam_elements_buffer, until_turn );
-
-            SIXTRL_ASSERT( ret == 0 );
+            success &= ( 0 == ::NS(Track_all_particles_until_turn)(
+                particles, beam_elements_buffer, until_turn ) );
         }
 
-        this->doSetPtrToParticlesBuffer( particles_buffer );
-        this->doSetPtrToBeamElementsBuffer( beam_elements_buffer );
-        this->doSetPtrToOutputBuffer( output_buffer );
-
-        ( void )ret;
+        SIXTRL_ASSERT( success );
+        ( void )success;
     }
 
     TrackJobCpu::~TrackJobCpu() SIXTRL_NOEXCEPT
