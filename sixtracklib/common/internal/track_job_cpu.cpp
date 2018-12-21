@@ -138,8 +138,7 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    TrackJobCpu::c_buffer_t*
-    TrackJobCpu::track( TrackJobCpu::size_type const until_turn )
+    bool TrackJobCpu::track( TrackJobCpu::size_type const until_turn )
     {
         SIXTRL_ASSERT( this->doGetPtrParticlesBuffer()    != nullptr );
         SIXTRL_ASSERT( this->doGetPtrBeamElementsBuffer() != nullptr );
@@ -153,9 +152,7 @@ namespace SIXTRL_CXX_NAMESPACE
         int ret = NS(Track_all_particles_until_turn)(
             particles, this->doGetPtrBeamElementsBuffer(), until_turn );
 
-        ( void )ret;
-
-        return this->doGetPtrOutputBuffer();
+        return ( ret == 0 );
     }
 
     void TrackJobCpu::collect()
@@ -205,11 +202,11 @@ SIXTRL_HOST_FN void NS(TrackJobCpu_delete)(
     return;
 }
 
-SIXTRL_HOST_FN NS(Buffer)* NS(TrackJobCpu_track)(
+SIXTRL_HOST_FN bool NS(TrackJobCpu_track)(
     NS(TrackJobCpu)* SIXTRL_RESTRICT track_job,
     NS(buffer_size_t) const until_turn )
 {
-    return ( track_job != nullptr ) ? track_job->track( until_turn ) : nullptr;
+    return ( track_job != nullptr ) ? track_job->track( until_turn ) : false;
 }
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobCpu_collect)(

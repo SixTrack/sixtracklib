@@ -100,10 +100,12 @@ int main( int argc, char* argv[] )
         st_ClContext const* context = st_TrackJobCl_get_const_context( track_job );
         st_ClContextBase_print_nodes_info( context );
 
+        st_Buffer const* output_buffer =
+            st_TrackJobCl_get_output_buffer( track_job );
+
         /* Track until NUM_TURNS_ELEM_BY_ELEM + 3: */
         int const TRACK_UNTIL_T2 = NUM_TURNS_ELEM_BY_ELEM + 3;
-        st_Buffer const* output_buffer =
-            st_TrackJobCl_track( track_job ,TRACK_UNTIL_T2 );
+        st_TrackJobCl_track( track_job ,TRACK_UNTIL_T2 );
 
         /* if we want to get the intermediate results for the particle_buffer
          * itself, we have to call NS(TrackJobCpu_collec)() */
@@ -115,7 +117,7 @@ int main( int argc, char* argv[] )
         st_Particles_buffer_print_out( temp_particles_buffer );
 
         /* Track until NUM_TURNS: */
-        output_buffer = st_TrackJobCl_track( track_job, NUM_TURNS );
+        st_TrackJobCl_track( track_job, NUM_TURNS );
 
         st_Particles_buffer_print_out( output_buffer );
 

@@ -75,8 +75,7 @@ TEST( C99_TrackJobClTests, MinimalExample )
 
     for( ; ii < NUM_TURNS_TOTAL ; ++ii )
     {
-        ::st_Buffer* output_buffer = ::st_TrackJobCl_track( track_job, ii );
-        ASSERT_TRUE( output_buffer != nullptr );
+        ASSERT_TRUE( ::st_TrackJobCl_track( track_job, ii ) );
     }
 
     ::st_TrackJobCl_collect( track_job );

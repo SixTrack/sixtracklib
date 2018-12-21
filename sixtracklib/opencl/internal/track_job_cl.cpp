@@ -199,8 +199,7 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    TrackJobCl::c_buffer_t* TrackJobCl::track(
-        TrackJobCl::size_type const until_turn )
+    bool TrackJobCl::track( TrackJobCl::size_type const until_turn )
     {
         using size_t = TrackJobCl::size_type;
 
@@ -216,19 +215,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 this->m_ptr_beam_elements_buffer_arg.get(),
                 until_turn ) );
 
-        if( success )
-        {
-            this->m_ptr_output_buffer_arg->read(
-                this->doGetPtrOutputBuffer() );
-
-            unsigned char* output_buffer_data_begin =
-                ::NS(Buffer_get_data_begin)( this->doGetPtrOutputBuffer() );
-
-            success &= ( 0 == ::NS(ManagedBuffer_remap)(
-                output_buffer_data_begin, slot_size ) );
-        }
-
-        return ( success ) ? this->doGetPtrOutputBuffer() : nullptr;
+        return success;
     }
 
     void TrackJobCl::collect()
@@ -471,12 +458,12 @@ SIXTRL_HOST_FN void NS(TrackJobCl_delete)(
     delete track_job;
 }
 
-SIXTRL_HOST_FN NS(Buffer)* NS(TrackJobCl_track)(
+SIXTRL_HOST_FN bool NS(TrackJobCl_track)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
     NS(buffer_size_t) const until_turn )
 {
     return ( track_job != nullptr )
-        ? track_job->track( until_turn ) : nullptr;
+        ? track_job->track( until_turn ) : false;
 }
 
 SIXTRL_HOST_FN NS(ClContext)*
