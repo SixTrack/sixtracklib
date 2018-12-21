@@ -109,13 +109,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
         virtual bool doPerformConfig( char const* SIXTRL_RESTRICT config_str );
 
-        virtual bool doInitOutputBuffer(
-            c_buffer_t* SIXTRL_RESTRICT output_buffer,
-            const c_buffer_t *const SIXTRL_RESTRICT particles_buffer,
+        virtual bool doInitBuffers(
+            c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             c_buffer_t* SIXTRL_RESTRICT belements_buffer,
-            size_type const until_turn,
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
             size_type const num_elem_by_elem_turns,
-            size_type const out_buffer_index_offset );
+            size_type const until_turn,
+            size_type const* SIXTRL_RESTRICT particle_blkidx_begin,
+            size_type const  particle_blk_idx_length,
+            size_type* SIXTRL_RESTRICT ptr_elem_by_elem_index_offset,
+            size_type* SIXTRL_RESTRICT ptr_beam_monitor_index_offset,
+            particle_index_t* SIXTRL_RESTRICT ptr_min_turn_id );
 
         virtual track_status_t doTrackUntilTurn(
             size_type const until_turn,
@@ -200,13 +204,17 @@ namespace SIXTRL_CXX_NAMESPACE
         bool doPerformConfigBaseImpl(
             char const* SIXTRL_RESTRICT config_str );
 
-        bool doInitOutputBufferBaseImpl(
-            c_buffer_t* SIXTRL_RESTRICT output_buffer,
-            const c_buffer_t *const SIXTRL_RESTRICT particles_buffer,
+        bool doInitBuffersBaseImpl(
+            c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             c_buffer_t* SIXTRL_RESTRICT belements_buffer,
-            size_type const until_turn,
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
             size_type const num_elem_by_elem_turns,
-            size_type const out_buffer_index_offset );
+            size_type const until_turn,
+            size_type const* SIXTRL_RESTRICT particle_blkidx_begin,
+            size_type const  particle_blk_idx_length,
+            size_type* SIXTRL_RESTRICT ptr_elem_by_elem_index_offset,
+            size_type* SIXTRL_RESTRICT ptr_beam_monitor_index_offset,
+            particle_index_t* SIXTRL_RESTRICT ptr_min_turn_id );
 
         bool doCollectParticlesBufferBaseImpl(
             c_buffer_t* SIXTRL_RESTRICT buffer );
