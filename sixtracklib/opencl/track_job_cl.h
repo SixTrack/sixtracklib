@@ -64,6 +64,7 @@ namespace SIXTRL_CXX_NAMESPACE
         virtual ~TrackJobCl();
 
         bool track( size_type const until_turn );
+        bool trackElemByElem( size_type const until_turn );
 
         void collect();
 
@@ -150,6 +151,10 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobCl_delete)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_track)(
+    NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
+    NS(buffer_size_t) const until_turn );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_track_elem_by_elem)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
     NS(buffer_size_t) const until_turn );
 

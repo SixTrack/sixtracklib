@@ -50,6 +50,7 @@ namespace SIXTRL_CXX_NAMESPACE
         virtual ~TrackJobCpu() SIXTRL_NOEXCEPT;
 
         bool track( size_type const until_turn );
+        bool trackElemByElem( size_type const until_turn );
 
         void collect();
 
@@ -94,6 +95,10 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobCpu_delete)(
     NS(TrackJobCpu)* SIXTRL_RESTRICT track_job );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCpu_track)(
+    NS(TrackJobCpu)* SIXTRL_RESTRICT track_job,
+    NS(buffer_size_t) const until_turn );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCpu_track_elem_by_elem)(
     NS(TrackJobCpu)* SIXTRL_RESTRICT track_job,
     NS(buffer_size_t) const until_turn );
 
