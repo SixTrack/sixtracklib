@@ -75,23 +75,23 @@ TEST( C99_TrackJobCpuTests, MinimalExample )
 
     for( ; ii < NUM_TURNS_TOTAL ; ++ii )
     {
-        ASSERT_TRUE( ::st_TrackJobCpu_track( track_job, ii ) );
+        ASSERT_TRUE( ::st_TrackJobCpu_track_until_turn( track_job, ii ) );
     }
 
     ::st_TrackJobCpu_collect( track_job );
 
     ::st_Buffer const* cmp_output_buffer =
-        ::st_TrackJobCpu_get_output_buffer( track_job );
+        ::st_TrackJob_get_output_buffer( track_job );
 
     ::st_Buffer const* particle_buffer =
-        ::st_TrackJobCpu_get_particle_buffer( track_job );
+        ::st_TrackJob_get_particles_buffer( track_job );
 
     ASSERT_TRUE( cmp_output_buffer != nullptr );
     ASSERT_TRUE( particle_buffer   != nullptr );
 
     ASSERT_TRUE( cmp_output_buffer != nullptr );
     ASSERT_TRUE( particle_buffer == pb );
-    ASSERT_TRUE( eb = ::st_TrackJobCpu_get_beam_elements_buffer( track_job ) );
+    ASSERT_TRUE( eb = ::st_TrackJob_get_beam_elements_buffer( track_job ) );
 
     ::st_TrackJobCpu_delete( track_job );
     ::st_Buffer_delete( in_particle_buffer );
