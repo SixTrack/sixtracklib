@@ -72,7 +72,7 @@ TEST( C99_CommonElemByElemConfigTests, MinimalExampleInit )
 
         ASSERT_TRUE( 0 == ::st_ElemByElemConfig_init_detailed(
             &config, order, min_particle_id, max_particle_id,
-                min_element_id, max_element_id, min_turn, max_turn ) );
+                min_element_id, max_element_id, min_turn, max_turn, false ) );
 
         ASSERT_TRUE( ::st_ElemByElemConfig_get_order( &config ) == order );
 

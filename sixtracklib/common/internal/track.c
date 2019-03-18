@@ -340,7 +340,7 @@ SIXTRL_HOST_FN int NS(Track_particle_element_by_element)(
         success = NS(ElemByElemConfig_init_detailed)(
             &config, NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES),
             min_particle_id, max_particle_id, min_at_element_id,
-            max_at_element_id, min_at_turn, max_at_turn );
+            max_at_element_id, min_at_turn, max_at_turn, true );
 
         if( success == 0 )
         {
@@ -410,7 +410,7 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element)(
         success = NS(ElemByElemConfig_init_detailed)(
             &config, NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES),
             min_particle_id, max_particle_id, min_at_element_id,
-            max_at_element_id, min_at_turn, max_at_turn );
+            max_at_element_id, min_at_turn, max_at_turn, true );
 
         if( success == 0 )
         {
@@ -594,7 +594,7 @@ SIXTRL_HOST_FN int NS(Track_particle_element_by_element_until_turn)(
         success = NS(ElemByElemConfig_init_detailed)(
             &config, NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES),
             min_particle_id, max_particle_id, min_at_element_id,
-            max_at_element_id, min_at_turn, max_at_turn );
+            max_at_element_id, min_at_turn, max_at_turn, true );
 
         if( success == 0 )
         {
@@ -664,7 +664,7 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element_until_turn)(
         success = NS(ElemByElemConfig_init_detailed)(
             &config, NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES),
             min_particle_id, max_particle_id, min_at_element_id,
-            max_at_element_id, min_at_turn, max_at_turn );
+            max_at_element_id, min_at_turn, max_at_turn, true );
 
         if( success == 0 )
         {
