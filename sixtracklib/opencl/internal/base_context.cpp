@@ -26,7 +26,8 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    ClContextBase::ClContextBase() :
+    ClContextBase::ClContextBase(
+        const char *const SIXTRL_RESTRICT config_str ) :
         m_cl_programs(),
         m_cl_kernels(),
         m_cl_buffers(),
@@ -36,6 +37,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_program_data(),
         m_kernel_data(),
         m_default_compile_options(),
+        m_config_str(),
         m_cl_context(),
         m_cl_queue(),
         m_cl_success_flag(),
@@ -55,9 +57,18 @@ namespace SIXTRL_CXX_NAMESPACE
                        this->m_available_nodes_info.size() );
 
         this->doInitDefaultProgramsBaseImpl();
+
+        this->doSetConfigStr( config_str );
+
+        if( this->configStr() != nullptr )
+        {
+            this->doParseConfigStringBaseImpl( this->configStr() );
+        }
     }
 
-    ClContextBase::ClContextBase( ClContextBase::size_type const node_index ) :
+    ClContextBase::ClContextBase(
+        ClContextBase::size_type const node_index,
+        const char *const SIXTRL_RESTRICT config_str ) :
         m_cl_programs(),
         m_cl_kernels(),
         m_cl_buffers(),
@@ -67,6 +78,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_program_data(),
         m_kernel_data(),
         m_default_compile_options(),
+        m_config_str(),
         m_cl_context(),
         m_cl_queue(),
         m_cl_success_flag(),
@@ -81,6 +93,13 @@ namespace SIXTRL_CXX_NAMESPACE
         _this_t::UpdateAvailableNodes(
             this->m_available_nodes_id, this->m_available_nodes_info,
             this->m_available_devices );
+
+        this->doSetConfigStr( config_str );
+
+        if( this->configStr() != nullptr )
+        {
+            this->doParseConfigStringBaseImpl( this->configStr() );
+        }
 
         SIXTRL_ASSERT( this->m_available_nodes_id.size() ==
                        this->m_available_nodes_info.size() );
@@ -97,7 +116,9 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    ClContextBase::ClContextBase( ClContextBase::node_id_t const node_id ) :
+    ClContextBase::ClContextBase(
+        ClContextBase::node_id_t const node_id,
+        const char *const SIXTRL_RESTRICT config_str ) :
         m_cl_programs(),
         m_cl_kernels(),
         m_cl_buffers(),
@@ -107,6 +128,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_program_data(),
         m_kernel_data(),
         m_default_compile_options(),
+        m_config_str(),
         m_cl_context(),
         m_cl_queue(),
         m_cl_success_flag(),
@@ -127,6 +149,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_ASSERT( this->m_available_devices.size() ==
                        this->m_available_nodes_id.size() );
+
+        this->doSetConfigStr( config_str );
+
+        if( this->configStr() != nullptr )
+        {
+            this->doParseConfigStringBaseImpl( this->configStr() );
+        }
 
         this->doInitDefaultProgramsBaseImpl();
 
@@ -141,7 +170,9 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    ClContextBase::ClContextBase( char const* node_id_str ) :
+    ClContextBase::ClContextBase(
+        char const* node_id_str,
+        const char *const SIXTRL_RESTRICT config_str ) :
         m_cl_programs(),
         m_cl_kernels(),
         m_cl_buffers(),
@@ -151,6 +182,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_program_data(),
         m_kernel_data(),
         m_default_compile_options(),
+        m_config_str(),
         m_cl_context(),
         m_cl_queue(),
         m_cl_success_flag(),
@@ -171,6 +203,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_ASSERT( this->m_available_devices.size() ==
                        this->m_available_nodes_id.size() );
+
+        this->doSetConfigStr( config_str );
+
+        if( this->configStr() != nullptr )
+        {
+            this->doParseConfigStringBaseImpl( this->configStr() );
+        }
 
         this->doInitDefaultProgramsBaseImpl();
 
@@ -186,7 +225,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ClContextBase::ClContextBase(
         ClContextBase::platform_id_t const platform_idx,
-        ClContextBase::device_id_t const device_idx ) :
+        ClContextBase::device_id_t const device_idx,
+        const char *const SIXTRL_RESTRICT config_str ) :
         m_cl_programs(),
         m_cl_kernels(),
         m_cl_buffers(),
@@ -196,6 +236,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_program_data(),
         m_kernel_data(),
         m_default_compile_options(),
+        m_config_str(),
         m_cl_context(),
         m_cl_queue(),
         m_cl_success_flag(),
@@ -216,6 +257,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_ASSERT( this->m_available_devices.size() ==
                        this->m_available_nodes_id.size() );
+
+        this->doSetConfigStr( config_str );
+
+        if( this->configStr() != nullptr )
+        {
+            this->doParseConfigStringBaseImpl( this->configStr() );
+        }
 
         this->doInitDefaultProgramsBaseImpl();
 
@@ -569,6 +617,22 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->doSelectNodeBaseImpl( node_index );
     }
 
+    void ClContextBase::doSetConfigStr(
+        const char *const SIXTRL_RESTRICT config_str )
+    {
+        if( ( config_str != nullptr ) &&
+            ( std::strlen( config_str ) > ClContextBase::size_type{ 0 } ) )
+        {
+            this->m_config_str = std::string{ config_str };
+        }
+        else
+        {
+            this->m_config_str.clear();
+        }
+
+        return;
+    }
+
     bool ClContextBase::doSelectNodeBaseImpl( size_type const index )
     {
         bool success = false;
@@ -676,6 +740,11 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return;
+    }
+
+    char const* ClContextBase::configStr() const SIXTRL_NOEXCEPT
+    {
+        return this->m_config_str.c_str();
     }
 
     void ClContextBase::clear()
@@ -1737,6 +1806,20 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return this->numAvailableNodes();
+    }
+
+    void ClContextBase::doParseConfigString(
+        const char *const SIXTRL_RESTRICT config_str )
+    {
+        this->doParseConfigStringBaseImpl( config_str );
+        return;
+    }
+
+    void ClContextBase::doParseConfigStringBaseImpl(
+        const char *const SIXTRL_RESTRICT config_str )
+    {
+        ( void )config_str;
+        return;
     }
 
     void ClContextBase::doClear()

@@ -55,14 +55,23 @@ namespace SIXTRL_CXX_NAMESPACE
         using program_id_t      = int64_t;
         using kernel_arg_id_t   = int64_t;
 
-        ClContextBase();
+        explicit ClContextBase(
+            const char *const SIXTRL_RESTRICT config_str = nullptr );
 
-        explicit ClContextBase( size_type const node_index );
-        explicit ClContextBase( node_id_t const node_id );
-        explicit ClContextBase( char const* node_id_str );
+        explicit ClContextBase(
+            size_type const node_index,
+            const char *const SIXTRL_RESTRICT config_str = nullptr  );
 
-        ClContextBase( platform_id_t const platform_idx,
-                       device_id_t const device_idx );
+        explicit ClContextBase( node_id_t const node_id,
+            const char *const SIXTRL_RESTRICT config_str = nullptr   );
+
+        ClContextBase( char const* node_id_str,
+            const char *const SIXTRL_RESTRICT config_str  );
+
+        ClContextBase(
+            platform_id_t const platform_idx,
+            device_id_t const device_idx,
+            const char *const SIXTRL_RESTRICT config_str = nullptr   );
 
         ClContextBase( ClContextBase const& other ) = delete;
         ClContextBase( ClContextBase&& other ) = delete;
@@ -142,6 +151,8 @@ namespace SIXTRL_CXX_NAMESPACE
         void printNodesInfo() const SIXTRL_NOEXCEPT;
 
         void clear();
+
+        char const* configStr() const SIXTRL_NOEXCEPT;
 
         void setDefaultCompileOptions( std::string const& compile_options_str );
         void setDefaultCompileOptions( char const* compile_options_str );
@@ -481,6 +492,9 @@ namespace SIXTRL_CXX_NAMESPACE
         using program_data_list_t = std::vector< program_data_t >;
         using kernel_data_list_t  = std::vector< kernel_data_t >;
 
+        virtual void doParseConfigString(
+            const char *const SIXTRL_RESTRICT config_str );
+
         virtual void doClear();
 
         virtual bool doInitDefaultPrograms();
@@ -490,6 +504,8 @@ namespace SIXTRL_CXX_NAMESPACE
             cl::Program& cl_program, program_data_t& program_data );
 
         virtual bool doSelectNode( size_type node_index );
+
+        void doSetConfigStr( const char *const SIXTRL_RESTRICT config_str );
 
         void addKernelExecTime(
             double const time, kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
@@ -519,6 +535,9 @@ namespace SIXTRL_CXX_NAMESPACE
             std::vector< cl::Device  >&  available_devices,
             const char *const filter_str = nullptr );
 
+        void doParseConfigStringBaseImpl(
+            const char *const SIXTRL_RESTRICT config_str );
+
         bool doInitDefaultProgramsBaseImpl();
         bool doInitDefaultKernelsBaseImpl();
 
@@ -540,6 +559,7 @@ namespace SIXTRL_CXX_NAMESPACE
         std::vector< kernel_data_t  >   m_kernel_data;
 
         std::string                     m_default_compile_options;
+        std::string                     m_config_str;
 
         cl::Context                     m_cl_context;
         cl::CommandQueue                m_cl_queue;
