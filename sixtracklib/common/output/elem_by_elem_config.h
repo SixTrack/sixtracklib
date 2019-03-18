@@ -23,6 +23,7 @@ extern "C" {
 
 typedef SIXTRL_INT64_T  NS(elem_by_elem_order_int_t);
 typedef SIXTRL_UINT64_T NS(elem_by_elem_out_addr_t);
+typedef SIXTRL_INT64_T  NS(elem_by_elem_flag_t);
 
 typedef enum NS(elem_by_elem_order_t)
 {
@@ -44,11 +45,16 @@ typedef struct NS(ElemByElemConfig)
     NS(particle_index_t)         max_particle_id         SIXTRL_ALIGN( 8 );
     NS(particle_index_t)         max_element_id          SIXTRL_ALIGN( 8 );
     NS(particle_index_t)         max_turn                SIXTRL_ALIGN( 8 );
+    NS(elem_by_elem_flag_t)      is_rolling              SIXTRL_ALIGN( 8 );
     NS(elem_by_elem_out_addr_t)  out_store_addr          SIXTRL_ALIGN( 8 );
 }
 NS(ElemByElemConfig);
 
 /* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC bool NS(ElemByElemConfig_is_active)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
+        NS(ElemByElemConfig) *const SIXTRL_RESTRICT config );
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_num_elements_t)
 NS(ElemByElemConfig_get_out_store_num_particles)(
@@ -97,6 +103,11 @@ NS(ElemByElemConfig_get_min_turn)(
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
 NS(ElemByElemConfig_get_max_turn)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
+        NS(ElemByElemConfig) *const SIXTRL_RESTRICT config );
+
+SIXTRL_FN SIXTRL_STATIC bool
+NS(ElemByElemConfig_is_rolling)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config );
 
@@ -157,7 +168,8 @@ SIXTRL_FN SIXTRL_STATIC int NS(ElemByElemConfig_init_detailed)(
     NS(particle_index_t) const min_element_id,
     NS(particle_index_t) const max_element_id,
     NS(particle_index_t) const min_turn,
-    NS(particle_index_t) const max_turn );
+    NS(particle_index_t) const max_turn,
+    bool const is_rolling_flag );
 
 SIXTRL_FN SIXTRL_STATIC int
 NS(ElemByElemConfig_assign_managed_output_buffer)(
@@ -180,6 +192,11 @@ SIXTRL_FN SIXTRL_STATIC void NS(ElemByElemConfig_set_order)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
     NS(elem_by_elem_order_t) const order );
+
+SIXTRL_FN SIXTRL_STATIC void NS(ElemByElemConfig_set_is_rolling)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+        NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
+    bool const is_rolling_flag );
 
 SIXTRL_FN SIXTRL_STATIC void NS(ElemByElemConfig_set_output_store_address)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
@@ -244,7 +261,8 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add)(
     NS(particle_index_t) const min_element_id,
     NS(particle_index_t) const max_element_id,
     NS(particle_index_t) const min_turn,
-    NS(particle_index_t) const max_turn );
+    NS(particle_index_t) const max_turn,
+    bool const is_rolling_flag );
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
 NS(ElemByElemConfig)* NS(ElemByElemConfig_add_copy)(
@@ -269,6 +287,20 @@ NS(ElemByElemConfig_get_num_elem_by_elem_objects_from_managed_buffer)(
  /* ------------------------------------------------------------------------ */
  /*  Implementation of inline functions: */
  /* ------------------------------------------------------------------------ */
+
+SIXTRL_INLINE bool NS(ElemByElemConfig_is_active)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
+        NS(ElemByElemConfig) *const SIXTRL_RESTRICT config )
+{
+    SIXTRL_STATIC_VAR NS(particle_num_elements_t) const ZERO =
+        ( NS(particle_num_elements_t) )0u;
+
+    return ( ( config != SIXTRL_NULLPTR ) &&
+             ( config->num_particles_to_store > ZERO ) &&
+             ( config->num_elements_to_store  > ZERO ) &&
+             ( config->num_turns_to_store     > ZERO ) &&
+             ( config->order != NS(ELEM_BY_ELEM_ORDER_INVALID) ) );
+}
 
 SIXTRL_INLINE NS(particle_num_elements_t)
 NS(ElemByElemConfig_get_out_store_num_particles)(
@@ -363,6 +395,14 @@ NS(ElemByElemConfig_get_max_turn)(
     return config->max_turn;
 }
 
+SIXTRL_FN SIXTRL_STATIC bool NS(ElemByElemConfig_is_rolling)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
+        NS(ElemByElemConfig) *const SIXTRL_RESTRICT config )
+{
+    SIXTRL_ASSERT( config != SIXTRL_NULLPTR );
+    return ( config->is_rolling != 0 );
+}
+
 SIXTRL_INLINE NS(elem_by_elem_order_t) NS(ElemByElemConfig_get_order)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config )
@@ -431,6 +471,8 @@ NS(ElemByElemConfig_get_particles_store_index_details)(
         num_elem_t const num_turns_to_store =
             NS(ElemByElemConfig_get_num_turns_to_store)( config );
 
+        num_elem_t store_capacity = ( num_elem_t )0u;
+
         SIXTRL_ASSERT( num_particles_to_store > ( num_elem_t )0u );
         SIXTRL_ASSERT( num_elements_to_store  > ( num_elem_t )0u );
         SIXTRL_ASSERT( num_turns_to_store     > ( num_elem_t )0u );
@@ -447,6 +489,9 @@ NS(ElemByElemConfig_get_particles_store_index_details)(
                 out_store_index += element_id_offset * num_particles_to_store;
                 out_store_index += particle_id_offset;
 
+                store_capacity = num_particles_to_store *
+                    num_elements_to_store * num_turns_to_store;
+
                 break;
             }
 
@@ -457,9 +502,19 @@ NS(ElemByElemConfig_get_particles_store_index_details)(
         };
 
         SIXTRL_ASSERT(
-            ( ( out_store_index >= ( num_elem_t )0u ) && ( out_store_index <
-                NS(ElemByElemConfig_get_out_store_num_particles)( config ) )
-            ) || ( out_store_index < ( num_elem_t )0u ) );
+            ( ( out_store_index >= ( num_elem_t )0u ) &&
+              ( out_store_index < store_capacity ) ) ||
+            ( ( out_store_index >= ( num_elem_t )0u ) &&
+              ( store_capacity  >  ( num_elem_t )0u ) &&
+              ( NS(ElemByElemConfig_is_rolling)( config ) ) ) ||
+            ( out_store_index < ( num_elem_t )0u ) );
+
+        if( ( out_store_index >= store_capacity ) &&
+            ( store_capacity  > ( num_elem_t )0u ) &&
+            ( NS(ElemByElemConfig_is_rolling)( config ) ) )
+        {
+            out_store_index = out_store_index % store_capacity;
+        }
     }
 
     return out_store_index;
@@ -759,7 +814,8 @@ SIXTRL_INLINE int NS(ElemByElemConfig_init_detailed)(
     NS(particle_index_t) const min_element_id,
     NS(particle_index_t) const max_element_id,
     NS(particle_index_t) const min_turn,
-    NS(particle_index_t) const max_turn )
+    NS(particle_index_t) const max_turn,
+    bool const is_rolling_flag )
 {
     int success = -1;
 
@@ -787,6 +843,7 @@ SIXTRL_INLINE int NS(ElemByElemConfig_init_detailed)(
 
         NS(ElemByElemConfig_set_order)( config, order );
         NS(ElemByElemConfig_clear)( config );
+        NS(ElemByElemConfig_set_is_rolling)( config, is_rolling_flag );
 
         config->num_particles_to_store  = num_particles_to_store;
         config->num_elements_to_store   = num_elements_to_store;
@@ -864,6 +921,7 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_preset)(
     {
         NS(ElemByElemConfig_clear)( conf );
         NS(ElemByElemConfig_set_order)( conf, NS(ELEM_BY_ELEM_ORDER_INVALID) );
+        NS(ElemByElemConfig_set_is_rolling)( conf, true );
     }
 
     return conf;
@@ -892,6 +950,19 @@ SIXTRL_INLINE void NS(ElemByElemConfig_clear)(
 
         NS(ElemByElemConfig_set_output_store_address)(
             config, ( out_addr_t )0u );
+    }
+
+    return;
+}
+
+SIXTRL_INLINE void NS(ElemByElemConfig_set_is_rolling)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+        NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
+    bool const is_rolling_flag )
+{
+    if( config != SIXTRL_NULLPTR )
+    {
+        config->is_rolling = ( is_rolling_flag ) ? 1 : 0;
     }
 
     return;
@@ -1116,7 +1187,8 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add)(
     NS(particle_index_t) const min_element_id,
     NS(particle_index_t) const max_element_id,
     NS(particle_index_t) const min_turn,
-    NS(particle_index_t) const max_turn )
+    NS(particle_index_t) const max_turn,
+    bool const is_rolling_flag )
 {
     typedef NS(ElemByElemConfig) config_t;
     typedef SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
@@ -1133,7 +1205,7 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add)(
 
     if( 0 == NS(ElemByElemConfig_init_detailed)( &config, order,
             min_particle_id, max_particle_id, min_element_id, max_element_id,
-            min_turn, max_turn ) )
+            min_turn, max_turn, is_rolling_flag ) )
     {
         ptr_new_config = ( ptr_new_config_t )( uintptr_t
             )NS(Object_get_begin_addr)( NS(Buffer_add_object)(

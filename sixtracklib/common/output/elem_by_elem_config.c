@@ -82,7 +82,7 @@ SIXTRL_HOST_FN int NS(ElemByElemConfig_init)(
         success = NS(ElemByElemConfig_init_detailed)( config, order,
             min_particle_id, max_particle_id,
             min_at_element_id, max_at_element_id,
-            min_turn, max_turn );
+            min_turn, max_turn, true );
     }
 
     return success;
