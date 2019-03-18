@@ -35,15 +35,24 @@ namespace SIXTRL_CXX_NAMESPACE
         public:
 
         using  num_turns_t      = SIXTRL_INT64_T;
+        using  program_id_t     = _base_context_t::program_id_t;
+        using  kernel_id_t      = _base_context_t::kernel_id_t;
 
-        ClContext();
+        explicit ClContext(
+            const char *const SIXTRL_RESTRICT config_str = nullptr );
 
-        explicit ClContext( size_type const node_index );
-        explicit ClContext( node_id_t const node_id );
-        explicit ClContext( char const* node_id_str );
+        explicit ClContext( size_type const node_index,
+            const char *const SIXTRL_RESTRICT config_str = nullptr );
+
+        explicit ClContext( node_id_t const node_id,
+            const char *const SIXTRL_RESTRICT config_str = nullptr );
+
+        explicit ClContext( char const* node_id_str,
+            const char *const SIXTRL_RESTRICT config_str = nullptr );
 
         ClContext( platform_id_t const platform_idx,
-                   device_id_t const device_idx );
+                   device_id_t const device_idx,
+                   const char *const SIXTRL_RESTRICT config_str = nullptr );
 
         ClContext( ClContext const& other ) = delete;
         ClContext( ClContext&& other ) = delete;

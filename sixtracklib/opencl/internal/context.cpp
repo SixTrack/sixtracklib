@@ -28,64 +28,70 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    ClContext::ClContext() :
-        ClContextBase(),
+    ClContext::ClContext( const char *const SIXTRL_RESTRICT config_str ) :
+        ClContextBase( config_str ),
         m_elem_by_elem_config_buffer(),
-        m_track_until_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
+        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
+        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
         this->doInitDefaultProgramsPrivImpl();
     }
 
-    ClContext::ClContext( ClContext::size_type const node_index ) :
-        ClContextBase(),
+    ClContext::ClContext( ClContext::size_type const node_index,
+                          const char *const SIXTRL_RESTRICT config_str ) :
+        ClContextBase( config_str ),
         m_elem_by_elem_config_buffer(),
-        m_track_until_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
+        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
+        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
-        using base_t = ClContextBase;
+        if( config_str != nullptr )
+        {
+            this->doSetConfigStr( config_str );
+            ClContextBase::doParseConfigString( this->configStr() );
+        }
 
         this->doInitDefaultProgramsPrivImpl();
 
         if( ( node_index < this->numAvailableNodes() ) &&
-            ( base_t::doSelectNode( node_index ) ) &&
+            ( ClContextBase::doSelectNode( node_index ) ) &&
             ( this->doSelectNodePrivImpl( node_index ) ) )
         {
-            base_t::doInitDefaultKernels();
+            ClContextBase::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
         }
     }
 
-    ClContext::ClContext( ClContext::node_id_t const node_id ) :
-        ClContextBase(),
+    ClContext::ClContext( ClContext::node_id_t const node_id,
+                          const char *const SIXTRL_RESTRICT config_str ) :
+        ClContextBase( config_str ),
         m_elem_by_elem_config_buffer(),
-        m_track_until_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
+        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
+        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
@@ -107,18 +113,19 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    ClContext::ClContext( char const* node_id_str ) :
-        ClContextBase(),
+    ClContext::ClContext( char const* node_id_str,
+                          const char *const SIXTRL_RESTRICT config_str ) :
+        ClContextBase( config_str ),
         m_elem_by_elem_config_buffer(),
-        m_track_until_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
+        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
+        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
@@ -154,18 +161,19 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ClContext::ClContext(
         ClContext::platform_id_t const platform_idx,
-        ClContext::device_id_t const device_idx ) :
-        ClContextBase(),
+        ClContext::device_id_t const device_idx,
+        const char *const SIXTRL_RESTRICT config_str ) :
+        ClContextBase( config_str ),
         m_elem_by_elem_config_buffer(),
-        m_track_until_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
+        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
+        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
@@ -635,7 +643,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         success |= NS(ElemByElemConfig_init_detailed)( &elem_by_elem_config,
             NS(ELEM_BY_ELEM_ORDER_DEFAULT), min_particle_id, max_particle_id,
-            min_element_id, max_element_id, min_turn, max_turn );
+            min_element_id, max_element_id, min_turn, max_turn, true );
 
         if( success != 0 ) return success;
 
@@ -1315,7 +1323,7 @@ SIXTRL_HOST_FN NS(ClContext)* NS(ClContext_create)()
 
 SIXTRL_HOST_FN NS(ClContext)* NS(ClContext_new)( const char* node_id_str )
 {
-    return new SIXTRL_CXX_NAMESPACE::ClContext( node_id_str );
+    return new SIXTRL_CXX_NAMESPACE::ClContext( node_id_str, nullptr );
 }
 
 SIXTRL_HOST_FN void NS(ClContext_delete)( NS(ClContext)* SIXTRL_RESTRICT ctx )
