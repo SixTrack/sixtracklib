@@ -214,8 +214,8 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Particles_get_min_max_attributes)(
 SIXTRL_EXTERN SIXTRL_HOST_FN int
 NS(Particles_buffer_get_min_max_attributes_of_particles_set)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* obj_index_range_begin,
-    NS(buffer_size_t) const  obj_index_range_size,
+    NS(buffer_size_t) const  num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* particle_set_indices_begin,
     SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
     SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
     SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_element_id,
