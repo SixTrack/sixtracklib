@@ -180,8 +180,8 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT output_buffer ) override;
 
         SIXTRL_HOST_FN virtual bool doReset(
-            c_buffer_t const* SIXTRL_RESTRICT particles_buffer,
-            c_buffer_t const* SIXTRL_RESTRICT beam_elem_buffer,
+            c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+            c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
             size_type const target_num_output_turns,
             size_type const num_elem_by_elem_turns ) override;
@@ -248,8 +248,8 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT output_buffer );
 
         SIXTRL_HOST_FN bool doResetOclImp(
-            c_buffer_t const* SIXTRL_RESTRICT particles_buffer,
-            c_buffer_t const* SIXTRL_RESTRICT beam_elem_buffer,
+            c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+            c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
             size_type const target_num_output_turns,
             size_type const num_elem_by_elem_turns );

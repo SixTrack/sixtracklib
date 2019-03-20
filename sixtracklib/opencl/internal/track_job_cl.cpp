@@ -325,8 +325,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     SIXTRL_HOST_FN bool TrackJobCl::doReset(
-        TrackJobCl::c_buffer_t const* SIXTRL_RESTRICT particles_buffer,
-        TrackJobCl::c_buffer_t const* SIXTRL_RESTRICT beam_elem_buffer,
+        TrackJobCl::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+        TrackJobCl::c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         TrackJobCl::size_type const target_num_output_turns,
         TrackJobCl::size_type const num_elem_by_elem_turns )
@@ -556,8 +556,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     SIXTRL_HOST_FN bool TrackJobCl::doResetOclImp(
-        TrackJobCl::c_buffer_t const* SIXTRL_RESTRICT particles_buffer,
-        TrackJobCl::c_buffer_t const* SIXTRL_RESTRICT beam_elem_buffer,
+        TrackJobCl::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+        TrackJobCl::c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         TrackJobCl::size_type const target_num_output_turns,
         TrackJobCl::size_type const num_elem_by_elem_turns )
