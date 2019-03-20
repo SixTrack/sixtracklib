@@ -187,7 +187,7 @@ TEST( C99_OpenCLBeamMonitorTests, AssignIoBufferToBeamMonitors )
         part_index_t min_turn_id          = part_index_t{ -1 };
 
         ASSERT_TRUE( 0 == ::st_OutputBuffer_prepare(
-            eb, out_buffer, particles, num_elem_by_elem_turns,
+            eb, out_buffer, particles, size_t{ 0 }, num_elem_by_elem_turns,
             &elem_by_elem_index_offset, &beam_monitor_index_offset,
             &min_turn_id ) );
 
@@ -801,7 +801,7 @@ namespace sixtrack
             if( success )
             {
                 ret = ::st_OutputBuffer_prepare(
-                    eb, out_buffer, particles, num_elem_by_elem_turns,
+                    eb, out_buffer, particles, size_t{ 0 }, num_elem_by_elem_turns,
                     &elem_by_elem_index_offset, &beam_monitor_index_offset,
                     &min_turn_id );
 
