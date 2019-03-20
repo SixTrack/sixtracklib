@@ -352,7 +352,7 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     ASSERT_TRUE( min_particle_id >= part_index_t{ 0 } );
 
     ASSERT_TRUE( 0 == ::st_OutputBuffer_prepare(
-        eb, out_buffer, particles, num_elem_by_elem_turns,
+        eb, out_buffer, particles, size_t{ 0 }, num_elem_by_elem_turns,
         &elem_by_elem_index_offset, &beam_monitor_index_offset,
         &min_turn_id ) );
 
@@ -436,7 +436,7 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     min_turn_id = index_t{ 0 };
 
     ASSERT_TRUE( 0 == ::st_OutputBuffer_prepare(
-        eb, out_buffer, particles, num_elem_by_elem_turns,
+        eb, out_buffer, particles, size_t{ 0 }, num_elem_by_elem_turns,
         &elem_by_elem_index_offset, &beam_monitor_index_offset,
         &min_turn_id ) );
 
@@ -805,7 +805,7 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
     min_turn_id         = part_index_t{ -1 };
 
     ASSERT_TRUE( 0 == ::st_OutputBuffer_prepare(
-        eb, out_buffer, particles, num_elem_by_elem_turns,
+        eb, out_buffer, particles, size_t{ 0 }, num_elem_by_elem_turns,
         nullptr, &beam_monitor_index_offset, &min_turn_id ) );
 
     ::st_Object const* obj = ::st_Buffer_get_const_object( eb, 10 );
