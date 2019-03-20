@@ -52,6 +52,9 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBase( SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_STR,
                       SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_ID )
     {
+        TrackJobBase::doInitDefaultParticleSetIndices();
+        TrackJobBase::doInitDefaultBeamMonitorIndices();
+
         if( TrackJobBase::doReset(
             particles_buffer, beam_elements_buffer, ptr_output_buffer,
             target_num_output_turns, num_elem_by_elem_turns ) )
@@ -82,7 +85,8 @@ namespace SIXTRL_CXX_NAMESPACE
                       SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_ID )
     {
         if( ( num_particle_sets > TrackJobCpu::size_type{ 0 } ) &&
-            ( pset_indices_begin != nullptr ) )
+            ( num_particle_sets <= ::NS(Buffer_get_num_of_objects)(
+                particles_buffer ) ) && ( pset_indices_begin != nullptr ) )
         {
             TrackJobCpu::size_type const*
                 pset_indices_end = pset_indices_begin;
@@ -90,7 +94,11 @@ namespace SIXTRL_CXX_NAMESPACE
             std::advance( pset_indices_end, num_particle_sets );
 
             this->doSetParticleSetIndices(
-                pset_indices_begin, pset_indices_end );
+                pset_indices_begin, pset_indices_end, particles_buffer );
+        }
+        else
+        {
+            TrackJobBase::doInitDefaultParticleSetIndices();
         }
 
         if( TrackJobBase::doReset(
@@ -119,6 +127,8 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBase( SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_STR,
                       SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_ID )
     {
+        TrackJobBase::doInitDefaultParticleSetIndices();
+
         if( TrackJobBase::doReset( particles_buffer.getCApiPtr(),
             beam_elements_buffer.getCApiPtr(), ( ptr_output_buffer != nullptr )
                 ? ptr_output_buffer->getCApiPtr() : nullptr,
@@ -138,6 +148,65 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             TrackJobBase::doSetConfigStr( config_str.c_str() );
             TrackJobBase::doParseConfigStr( config_str.c_str() );
+        }
+    }
+
+    SIXTRL_HOST_FN TrackJobCpu::TrackJobCpu(
+        TrackJobCpu::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+        TrackJobCpu::size_type const num_particle_sets,
+        TrackJobCpu::size_type const* SIXTRL_RESTRICT particle_set_indices_begin,
+        TrackJobCpu::buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
+        TrackJobCpu::size_type const target_num_output_turns,
+        TrackJobCpu::size_type const target_num_elem_by_elem_turns,
+        TrackJobCpu::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        std::string const& config_str ) :
+        TrackJobBase( SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_STR,
+                      SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_ID )
+    {
+        using size_t = TrackJobCpu::size_type;
+
+        size_t const* particle_set_indices_end = particle_set_indices_begin;
+
+        if( ( particle_set_indices_end != nullptr ) &&
+            ( num_particle_sets > size_t{ 0 } ) )
+        {
+            std::advance( particle_set_indices_end, num_particle_sets );
+        }
+
+        if( ( particle_set_indices_begin != particle_set_indices_end ) &&
+            ( particle_set_indices_begin != nullptr ) &&
+            ( num_particle_sets > size_t{ 0 } ) )
+        {
+            this->doSetParticleSetIndices(
+                particle_set_indices_begin, particle_set_indices_end,
+                particles_buffer.getCApiPtr() );
+        }
+        else
+        {
+            TrackJobBase::doInitDefaultParticleSetIndices();
+        }
+
+        if( TrackJobBase::doReset(
+                particles_buffer.getCApiPtr(),
+                beam_elements_buffer.getCApiPtr(),
+                ( ptr_output_buffer != nullptr )
+                    ? ptr_output_buffer->getCApiPtr() : nullptr,
+                target_num_output_turns, target_num_elem_by_elem_turns ) )
+        {
+            this->doSetPtrParticleBuffer( &particles_buffer );
+            this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
+
+            if( ( this->hasOutputBuffer() ) &&
+                ( ptr_output_buffer != nullptr ) )
+            {
+                this->doSetPtrOutputBuffer( ptr_output_buffer );
+            }
+        }
+
+        if( !config_str.empty() )
+        {
+            TrackJobBase::doSetConfigStr( config_str.c_str() );
+            TrackJobBase::doParseConfigStr( this->ptrConfigStr() );
         }
     }
 
