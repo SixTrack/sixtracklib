@@ -197,6 +197,14 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_BUFFER_OBJ_ARGPTR_DEC object_t*
             operator[]( size_type object_index ) SIXTRL_NOEXCEPT;
 
+        template< typename Elem >
+        SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC Elem const*
+        get( size_type const object_index ) const SIXTRL_NOEXCEPT;
+
+        template< typename Elem >
+        SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC Elem*
+        get( size_type const object_index ) SIXTRL_NOEXCEPT;
+
         /* ----------------------------------------------------------------- */
 
         SIXTRL_FN bool needsRemapping() const SIXTRL_NOEXCEPT;
@@ -280,6 +288,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/buffer/mem_pool.h"
+    #include "sixtracklib/common/internal/objects_type_id.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 namespace SIXTRL_CXX_NAMESPACE
@@ -834,6 +843,43 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         return reinterpret_cast< Ptr >( static_cast< uintptr_t >(
             NS(Buffer_get_objects_end_addr)( this->getCApiPtr() ) ) );
+    }
+
+    template< typename Elem >
+    SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC Elem const*
+    Buffer::get( Buffer::size_type const object_index ) const SIXTRL_NOEXCEPT
+    {
+        using address_t = Buffer::address_t;
+        using type_id_t = ::NS(object_type_id_t);
+
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC ::NS(Object) const* obj_info =
+            ::NS(Buffer_get_const_object)( this->getCApiPtr(), object_index );
+
+        address_t const addr = ::NS(Object_get_begin_addr)( obj_info );
+        type_id_t const type = ::NS(Object_get_type_id)( obj_info );
+
+        if( ( addr != address_t{ 0 } ) &&
+            ( type != ::NS(OBJECT_TYPE_NONE    ) ) &&
+            ( type != ::NS(OBJECT_TYPE_INVALID ) ) &&
+            ( ::NS(Object_get_size)( obj_info ) >= sizeof( Elem ) ) )
+        {
+            if( ObjectTypeTraits< Elem >::Type() == type )
+            {
+                return static_cast< SIXTRL_BUFFER_DATAPTR_DEC Elem const* >(
+                    reinterpret_cast< SIXTRL_BUFFER_DATAPTR_DEC void const* >(
+                        static_cast< uintptr_t >( addr ) ) );
+            }
+        }
+
+        return nullptr;
+    }
+
+    template< typename Elem >
+    SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC Elem*
+    Buffer::get( Buffer::size_type const obj_index ) SIXTRL_NOEXCEPT
+    {
+        return const_cast< SIXTRL_BUFFER_DATAPTR_DEC Elem* >(
+            static_cast< Buffer const& >( *this ).get< Elem >( obj_index ) );
     }
 
 
