@@ -28,7 +28,8 @@ SIXTRL_HOST_FN int NS(OutputBuffer_prepare)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
-    NS(buffer_size_t) const num_elem_by_elem_turns,
+    NS(buffer_size_t) const target_num_output_turns,
+    NS(buffer_size_t) const target_num_elem_by_elem_turns,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT
         ptr_elem_by_elem_out_index_offset,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT
@@ -94,9 +95,9 @@ SIXTRL_HOST_FN int NS(OutputBuffer_prepare)(
                 success = NS(OutputBuffer_prepare_detailed)(
                     belements, output_buffer, min_particle_id, max_particle_id,
                     min_element_id, max_element_id, min_turn_id, max_turn_id,
-                    num_elem_by_elem_turns,
+                    target_num_output_turns, target_num_elem_by_elem_turns,
                     ptr_elem_by_elem_out_index_offset,
-                    ptr_beam_monitor_out_index_offset );
+                    ptr_beam_monitor_out_index_offset, SIXTRL_NULLPTR );
 
                 if( ( success == 0 ) && ( ptr_min_turn_id != SIXTRL_NULLPTR ) )
                 {
@@ -115,9 +116,10 @@ int NS(OutputBuffer_prepare_for_particle_set)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* obj_idx_range_begin,
-    NS(buffer_size_t) const obj_idx_range_size,
-    NS(buffer_size_t) const num_elem_by_elem_turns,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* particle_set_indices_begin,
+    NS(buffer_size_t) const target_num_output_turns,
+    NS(buffer_size_t) const target_num_elem_by_elem_turns,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT
         ptr_elem_by_elem_out_index_offset,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT
@@ -146,7 +148,7 @@ int NS(OutputBuffer_prepare_for_particle_set)(
     SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( output_buffer ) );
 
     if( 0 == NS(Particles_buffer_get_min_max_attributes_of_particles_set)(
-        pb, obj_idx_range_begin, obj_idx_range_size, &min_particle_id,
+        pb, num_particle_sets, particle_set_indices_begin, &min_particle_id,
         &max_particle_id, &min_element_id, &max_element_id,
         &min_turn_id, &max_turn_id ) )
     {
@@ -184,9 +186,9 @@ int NS(OutputBuffer_prepare_for_particle_set)(
             success = NS(OutputBuffer_prepare_detailed)(
                 belements, output_buffer, min_particle_id, max_particle_id,
                 min_element_id, max_element_id, min_turn_id, max_turn_id,
-                num_elem_by_elem_turns,
+                target_num_output_turns, target_num_elem_by_elem_turns,
                 ptr_elem_by_elem_out_index_offset,
-                ptr_beam_monitor_out_index_offset );
+                ptr_beam_monitor_out_index_offset, SIXTRL_NULLPTR );
 
             if( ( success == 0 ) && ( ptr_min_turn_id != SIXTRL_NULLPTR ) )
             {
@@ -209,11 +211,14 @@ int NS(OutputBuffer_prepare_detailed)(
     NS(particle_index_t)     const max_element_id,
     NS(particle_index_t)     const min_turn_id,
     NS(particle_index_t)     const max_turn_id,
-    NS(buffer_size_t)        const num_elem_by_elem_turns,
+    NS(buffer_size_t)              target_num_output_turns,
+    NS(buffer_size_t)        const target_num_elem_by_elem_turns,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT
         ptr_elem_by_elem_out_index_offset,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT
-        ptr_beam_monitor_out_index_offset )
+        ptr_beam_monitor_out_index_offset,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT
+        ptr_max_elem_by_elem_turn_id )
 {
     int success = -1;
 
@@ -222,6 +227,7 @@ int NS(OutputBuffer_prepare_detailed)(
 
     buf_size_t elem_by_elem_index_offset = ( buf_size_t )0u;
     buf_size_t beam_monitor_index_offset = ( buf_size_t )0u;
+    index_t    max_elem_by_elem_turn_id  = min_turn_id;
 
     SIXTRL_ASSERT( belements     != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( output_buffer != SIXTRL_NULLPTR );
@@ -229,10 +235,19 @@ int NS(OutputBuffer_prepare_detailed)(
     SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( belements ) );
     SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( output_buffer ) );
 
-    if( num_elem_by_elem_turns > ( buf_size_t )0u )
+    if( target_num_output_turns < target_num_elem_by_elem_turns )
     {
-        index_t const max_elem_by_elem_turn_id =
-            max_turn_id + num_elem_by_elem_turns;
+        target_num_output_turns = target_num_elem_by_elem_turns;
+    }
+
+    if( target_num_elem_by_elem_turns > ( buf_size_t )0u )
+    {
+        max_elem_by_elem_turn_id += target_num_elem_by_elem_turns;
+
+        if( max_elem_by_elem_turn_id < max_turn_id )
+        {
+            max_elem_by_elem_turn_id = max_turn_id;
+        }
 
         success = NS(ElemByElemConfig_prepare_output_buffer_detailed)(
             output_buffer, min_particle_id, max_particle_id,
@@ -251,16 +266,22 @@ int NS(OutputBuffer_prepare_detailed)(
             min_turn_id, &beam_monitor_index_offset );
     }
 
-    if( ( success == 0 ) &&
-        ( ptr_elem_by_elem_out_index_offset != SIXTRL_NULLPTR ) )
+    if( success == 0 )
     {
-        *ptr_elem_by_elem_out_index_offset = elem_by_elem_index_offset;
-    }
+        if( ptr_elem_by_elem_out_index_offset != SIXTRL_NULLPTR )
+        {
+            *ptr_elem_by_elem_out_index_offset = elem_by_elem_index_offset;
+        }
 
-    if( ( success == 0 ) &&
-        ( ptr_beam_monitor_out_index_offset != SIXTRL_NULLPTR ) )
-    {
-        *ptr_beam_monitor_out_index_offset = beam_monitor_index_offset;
+        if( ptr_beam_monitor_out_index_offset != SIXTRL_NULLPTR )
+        {
+            *ptr_beam_monitor_out_index_offset = beam_monitor_index_offset;
+        }
+
+        if( ptr_max_elem_by_elem_turn_id != SIXTRL_NULLPTR )
+        {
+            *ptr_max_elem_by_elem_turn_id = max_elem_by_elem_turn_id;
+        }
     }
 
     return success;
@@ -359,9 +380,9 @@ int NS(ElemByElemConfig_prepare_output_buffer_for_particle_set)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* obj_idx_range_begin,
-    NS(buffer_size_t) const obj_idx_range_size,
-    NS(buffer_size_t) const num_elem_by_elem_turns,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* particle_set_indices_begin,
+    NS(buffer_size_t) const target_num_elem_by_elem_turns,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_index_offset )
 {
     int success = -1;
@@ -386,9 +407,9 @@ int NS(ElemByElemConfig_prepare_output_buffer_for_particle_set)(
     SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( output_buffer ) );
     SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( pb ) );
 
-    if( ( num_elem_by_elem_turns > ( buf_size_t )0u ) &&
+    if( ( target_num_elem_by_elem_turns > ( buf_size_t )0u ) &&
         ( 0 == NS(Particles_buffer_get_min_max_attributes_of_particles_set)(
-            pb, obj_idx_range_begin, obj_idx_range_size,
+            pb, num_particle_sets, particle_set_indices_begin,
             &min_particle_id, &max_particle_id, &min_element_id,
             &max_element_id, &min_turn_id, &max_turn_id ) ) )
     {
@@ -428,8 +449,13 @@ int NS(ElemByElemConfig_prepare_output_buffer_for_particle_set)(
 
         if( success == 0 )
         {
-            index_t const max_elem_by_elem_turn_id =
-                max_turn_id + num_elem_by_elem_turns;
+            index_t max_elem_by_elem_turn_id =
+                min_turn_id + target_num_elem_by_elem_turns;
+
+            if( max_elem_by_elem_turn_id < max_turn_id )
+            {
+                max_elem_by_elem_turn_id = max_turn_id;
+            }
 
             success = NS(ElemByElemConfig_prepare_output_buffer_detailed)(
                 output_buffer, min_particle_id, max_particle_id, min_element_id,
@@ -603,8 +629,9 @@ int NS(BeamMonitor_prepare_output_buffer_for_particle_set)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT range_begin,
-    NS(buffer_size_t) const range_size,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)
+        const* SIXTRL_RESTRICT particle_set_indices_begin,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_index_offset )
 {
     int success = -1;
@@ -634,8 +661,9 @@ int NS(BeamMonitor_prepare_output_buffer_for_particle_set)(
     SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( output_buffer ) );
 
     success = NS(Particles_buffer_get_min_max_attributes_of_particles_set)( pb,
-        range_begin, range_size, &min_particle_id, &max_particle_id,
-        &min_element_id, &max_element_id, &min_turn_id, &max_turn_id );
+        num_particle_sets, particle_set_indices_begin,
+        &min_particle_id, &max_particle_id, &min_element_id, &max_element_id,
+        &min_turn_id, &max_turn_id );
 
     if( ( success == 0 ) && ( min_element_id >= ( index_t )0u ) &&
         ( min_element_id <= max_element_id ) && ( num_beam_elements >=
