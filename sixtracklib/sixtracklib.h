@@ -45,6 +45,7 @@
 #include "sixtracklib/common/constants.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/internal/track_job_base.h"
 #include "sixtracklib/common/track_job_cpu.h"
 #include "sixtracklib/common/track.h"
 

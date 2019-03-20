@@ -12,8 +12,8 @@ int main( int argc, char* argv[] )
     st_Buffer* input_pb       = SIXTRL_NULLPTR;
     st_Buffer* track_pb       = SIXTRL_NULLPTR;
     st_Buffer* eb             = SIXTRL_NULLPTR;
-    st_Buffer* out_buffer     = SIXTRL_NULLPTR;
 
+    st_TrackJobCpu* job       = SIXTRL_NULLPTR;
     st_Particles*   particles = SIXTRL_NULLPTR;
 
     char* path_output_particles = SIXTRL_NULLPTR;
@@ -148,7 +148,6 @@ int main( int argc, char* argv[] )
     /* --------------------------------------------------------------------- */
     /* Prepare input and tracking data from run-time parameters: */
 
-
     printf("%-30s = %10d\n","NUM_PARTICLES",NUM_PARTICLES);
     printf("%-30s = %10d\n","NUM_TURNS",NUM_TURNS);
     printf("%-30s = %10d\n","NUM_TURNS_IO_ELEM_BY_ELEM",NUM_TURNS_IO_ELEM_BY_ELEM);
@@ -209,10 +208,6 @@ int main( int argc, char* argv[] )
     if( ( eb != SIXTRL_NULLPTR ) &&
         ( st_Buffer_get_num_of_objects( eb ) > 0 ) )
     {
-        st_buffer_size_t elem_by_elem_index_offset = ( st_buffer_size_t )0u;
-        st_buffer_size_t beam_monitor_index_offset = ( st_buffer_size_t )0u;
-        st_particle_index_t min_turn_id            = ( st_particle_index_t )0;
-
         if( NUM_TURNS_IO_TURN_BY_TURN > 0 )
         {
             st_BeamMonitor* beam_monitor = st_BeamMonitor_new( eb );
@@ -238,60 +233,60 @@ int main( int argc, char* argv[] )
             st_BeamMonitor_set_is_rolling( beam_monitor, true );
         }
 
-        out_buffer = st_Buffer_new( 0u );
-
-        st_OutputBuffer_prepare(
-            eb, out_buffer, particles, NUM_TURNS_IO_ELEM_BY_ELEM,
-            &elem_by_elem_index_offset, &beam_monitor_index_offset,
-            &min_turn_id );
-
-        st_BeamMonitor_assign_output_buffer_from_offset(
-            eb, out_buffer, min_turn_id, beam_monitor_index_offset );
+        job = st_TrackJobCpu_new(
+            track_pb, eb, NUM_TURNS, NUM_TURNS_IO_ELEM_BY_ELEM );
     }
 
     /* ********************************************************************* */
     /* ****            PERFORM TRACKING AND IO OPERATIONS            ******* */
     /* ********************************************************************* */
 
-    if( ( particles != SIXTRL_NULLPTR ) &&
-        ( NUM_PARTICLES > 0 ) && ( NUM_TURNS > 0 ) )
+    if( NUM_TURNS_IO_ELEM_BY_ELEM > 0u )
     {
-        st_Particles* elem_by_elem_particles =
-            st_Particles_buffer_get_particles( out_buffer, 0u );
+        st_TrackJobCpu_track_elem_by_elem( job, NUM_TURNS_IO_ELEM_BY_ELEM );
+    }
 
-        st_Track_all_particles_element_by_element_until_turn(
-            particles, eb, NUM_TURNS_IO_ELEM_BY_ELEM, elem_by_elem_particles );
+    if( NUM_TURNS_IO_ELEM_BY_ELEM > NUM_TURNS )
+    {
+        double const denom_turns =
+            ( double )( NUM_TURNS - NUM_TURNS_IO_ELEM_BY_ELEM );
 
-        if( NUM_TURNS_IO_ELEM_BY_ELEM < NUM_TURNS )
+        double const denom_turns_particles =
+            denom_turns * NUM_PARTICLES;
+
+        double tracking_time     = ( double )0.0;
+        double end_tracking_time = ( double )0.0;
+
+        double const start_tracking_time = st_Time_get_seconds_since_epoch();
+
+        st_TrackJobCpu_track_until_turn( job, NUM_TURNS );
+
+        end_tracking_time = st_Time_get_seconds_since_epoch();
+
+        tracking_time = ( start_tracking_time < end_tracking_time )
+            ? end_tracking_time - start_tracking_time : ( double )0.0;
+
+        printf( "time / turn / particle : %.3e\r\n"
+                "time / turn            : %.3e\r\n"
+                "time total             : %.3e\r\n",
+                tracking_time / denom_turns_particles,
+                tracking_time / denom_turns, tracking_time );
+
+        if( path_output_particles != SIXTRL_NULLPTR )
         {
-            double const denom_turns =
-                ( double )( NUM_TURNS - NUM_TURNS_IO_ELEM_BY_ELEM );
+            st_Buffer* out_buffer      = SIXTRL_NULLPTR;
+            st_Buffer const* result_pb = SIXTRL_NULLPTR;
 
-            double const denom_turns_particles =
-                denom_turns * NUM_PARTICLES;
+            st_TrackJobCpu_collect( job );
 
-            double tracking_time = ( double )0.0;
-            double end_tracking_time = ( double )0.0;
+            out_buffer = st_TrackJobCpu_get_output_buffer( job );
+            result_pb  = st_TrackJobCpu_get_const_particles_buffer( job );
 
-            double const start_tracking_time = st_Time_get_seconds_since_epoch();
+            st_Particles_add_copy( out_buffer,
+                st_Particles_buffer_get_const_particles( result_pb, 0u ) );
 
-            st_Track_all_particles_until_turn( particles, eb, NUM_TURNS );
-
-            end_tracking_time = st_Time_get_seconds_since_epoch();
-
-            tracking_time = ( start_tracking_time < end_tracking_time )
-                ? end_tracking_time - start_tracking_time
-                : ( double )0.0;
-
-            printf( "time / turn / particle : %.3e\r\n"
-                    "time / turn            : %.3e\r\n"
-                    "time total             : %.3e\r\n",
-                    tracking_time / denom_turns_particles,
-                    tracking_time / denom_turns, tracking_time );
+            st_Buffer_write_to_file( out_buffer, path_output_particles );
         }
-
-        st_Particles_add_copy( out_buffer, particles );
-        st_Buffer_write_to_file( out_buffer, path_output_particles );
     }
 
     /* ********************************************************************* */
@@ -300,11 +295,11 @@ int main( int argc, char* argv[] )
 
     st_Buffer_delete( eb );
     st_Buffer_delete( track_pb );
-    st_Buffer_delete( out_buffer );
+    st_TrackJobCpu_delete( job );
 
     free( path_output_particles );
 
     return 0;
 }
 
-/* end: examples/c99/track_out.c */
+/* end: examples/c99/track_io.c */
