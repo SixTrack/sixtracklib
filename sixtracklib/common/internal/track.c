@@ -50,7 +50,8 @@ SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(TrackCpu)(
             index_t min_turn_id                  = ( index_t )0u;
 
             success  = NS(OutputBuffer_prepare)(
-                    beam_elements, ptr_output, particles, elem_by_elem_turns,
+                    beam_elements, ptr_output, particles,
+                    until_turn, elem_by_elem_turns,
                     &elem_by_elem_index_offset, &beam_monitor_index_offset,
                     &min_turn_id );
 
