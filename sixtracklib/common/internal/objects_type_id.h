@@ -40,7 +40,7 @@ NS(object_type_values_t);
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-      SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_NONE = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_NONE) );
 
@@ -91,6 +91,15 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_INVALID      = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_INVALID) );
+
+    template< class Elem >
+    struct ObjectTypeTraits
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_INVALID);
+        }
+    };
 }
 
 #endif /* defined( __cplusplus ) */
