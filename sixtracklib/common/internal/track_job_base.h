@@ -225,6 +225,9 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN elem_by_elem_config_t const*
         ptrElemByElemConfig() const SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN elem_by_elem_config_t*
+        ptrElemByElemConfig() SIXTRL_NOEXCEPT;
+
         SIXTRL_HOST_FN bool elemByElemRolling() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN bool defaultElemByElemRolling() const SIXTRL_NOEXCEPT;
 
@@ -264,9 +267,6 @@ namespace SIXTRL_CXX_NAMESPACE
             TrackJobBase&& rhs ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN virtual ~TrackJobBase() = default;
-
-        SIXTRL_HOST_FN elem_by_elem_config_t*
-        ptrElemByElemConfig() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN virtual void doClear();
 
