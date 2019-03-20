@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstdio>
+#include <cstring>
 #include <cmath>
 #include <fstream>
 #include <iterator>
@@ -17,86 +18,1016 @@
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
-#include "sixtracklib/common/be_drift/be_drift.h"
 #include "sixtracklib/common/be_monitor/be_monitor.h"
 #include "sixtracklib/common/track.h"
 #include "sixtracklib/common/track_job_cpu.h"
-#include "sixtracklib/common/output/output_buffer.h"
 
 #include "sixtracklib/testlib/common/particles.h"
 #include "sixtracklib/testlib/testdata/testdata_files.h"
 
-TEST( C99_TrackJobCpuTests, MinimalExample )
+namespace SIXTRL_CXX_NAMESPACE
 {
-    ::st_Buffer* in_particle_buffer = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_BEAMBEAM_PARTICLES_DUMP );
-
-    ::st_Buffer* eb = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_BEAMBEAM_BEAM_ELEMENTS );
-
-    ::st_Particles* cpy_particles = ::st_Particles_buffer_get_particles(
-        in_particle_buffer, 0u );
-
-    ::st_Buffer* pb = ::st_Buffer_new( 0 );
-    ::st_Particles* particles = ::st_Particles_add_copy( pb, cpy_particles );
-    ASSERT_TRUE( particles != nullptr );
-
-    ::st_buffer_size_t const NUM_ELEM_BY_ELEM_TURNS    = 5u;
-    ::st_buffer_size_t const NUM_TURNS_DUMP_EVERY_TURN = 10u;
-    ::st_buffer_size_t const NUM_TURNS_TOTAL           = 50u;
-    ::st_buffer_size_t const SKIP_TURNS                = 5u;
-
-    ::st_BeamMonitor* monitor_every_turn = ::st_BeamMonitor_new( eb );
-
-    ::st_BeamMonitor_set_start( monitor_every_turn, NUM_ELEM_BY_ELEM_TURNS );
-    ::st_BeamMonitor_set_skip(  monitor_every_turn, 1 );
-    ::st_BeamMonitor_set_num_stores( monitor_every_turn, NUM_TURNS_DUMP_EVERY_TURN );
-    ::st_BeamMonitor_set_is_rolling( monitor_every_turn, false );
-    ::st_BeamMonitor_setup_for_particles( monitor_every_turn, particles );
-
-    ::st_BeamMonitor* monitor_skip_turns = ::st_BeamMonitor_new( eb );
-
-    ::st_BeamMonitor_set_start( monitor_skip_turns,
-        NUM_ELEM_BY_ELEM_TURNS + NUM_TURNS_DUMP_EVERY_TURN );
-
-    ::st_BeamMonitor_set_num_stores( monitor_skip_turns, 3 );
-    ::st_BeamMonitor_set_skip( monitor_skip_turns, SKIP_TURNS );
-    ::st_BeamMonitor_set_is_rolling( monitor_skip_turns, true );
-    ::st_BeamMonitor_setup_for_particles( monitor_skip_turns, particles );
-
-
-    ::st_TrackJobCpu* track_job = ::st_TrackJobCpu_new( pb, eb,
-        NUM_ELEM_BY_ELEM_TURNS, NUM_TURNS_DUMP_EVERY_TURN );
-
-    ASSERT_TRUE( track_job != nullptr );
-
-    ::st_buffer_size_t ii = NUM_TURNS_DUMP_EVERY_TURN;
-    ++ii;
-
-    for( ; ii < NUM_TURNS_TOTAL ; ++ii )
+    namespace tests
     {
-        ASSERT_TRUE( ::st_TrackJobCpu_track_until_turn( track_job, ii ) );
+        bool test1_CreateTrackJobNoOutputDelete(
+            const ::NS(TrackJobCpu) *const SIXTRL_RESTRICT job,
+            const ::NS(Buffer) *const SIXTRL_RESTRICT particles_buffer,
+            const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
+            const ::NS(Buffer) *const SIXTRL_RESTRICT ext_output_buffer );
+
+        bool test2_CreateTrackJobElemByElemOutputDelete(
+            const ::NS(TrackJobCpu) *const SIXTRL_RESTRICT job,
+            const ::NS(Buffer) *const SIXTRL_RESTRICT particles_buffer,
+            const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
+            const ::NS(Buffer) *const SIXTRL_RESTRICT ext_output_buffer,
+            ::NS(buffer_size_t) const target_num_elem_by_elem_turns );
+
+        bool test3_CreateTrackJobFullOutput(
+            const ::NS(TrackJobCpu) *const SIXTRL_RESTRICT job,
+            const ::NS(Buffer) *const SIXTRL_RESTRICT particles_buffer,
+            const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
+            const ::NS(Buffer) *const SIXTRL_RESTRICT ext_output_buffer,
+            ::NS(buffer_size_t) const num_beam_monitors,
+            ::NS(buffer_size_t) const target_num_output_turns,
+            ::NS(buffer_size_t) const target_num_elem_by_elem_turns );
+    }
+}
+
+TEST( C99_TrackJobCpuTests, CreateTrackJobNoOutputDelete )
+{
+    using track_job_t   = ::st_TrackJobCpu;
+    using size_t        = ::st_buffer_size_t;
+    using buffer_t      = ::st_Buffer;
+    using particles_t   = ::st_Particles;
+
+    namespace st_test = SIXTRL_CXX_NAMESPACE::tests;
+
+    buffer_t* eb = ::NS(Buffer_new_from_file)(
+        ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
+
+    buffer_t* in_particle_buffer = ::NS(Buffer_new_from_file)(
+        ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
+
+    buffer_t* pb = ::NS(Buffer_new)( size_t{ 0 } );
+    buffer_t* my_output_buffer = ::NS(Buffer_new)( size_t{ 0 } );
+
+    particles_t* particles = ::NS(Particles_add_copy)( pb,
+        ::NS(Particles_buffer_get_particles)(
+            in_particle_buffer, size_t{ 0 } ) );
+
+    SIXTRL_ASSERT( eb != nullptr );
+    SIXTRL_ASSERT( pb != nullptr );
+    SIXTRL_ASSERT( particles          != nullptr );
+    SIXTRL_ASSERT( in_particle_buffer != nullptr );
+    SIXTRL_ASSERT( my_output_buffer   != nullptr );
+
+    size_t const NUM_TURNS_TOTAL = size_t{ 50u };
+
+    /* ===================================================================== *
+     * First set of tests:
+     * No Beam Monitors
+     * No Elem by Elem config
+     * --------------------------------------------------------------------- */
+
+    track_job_t* job = ::NS(TrackJobCpu_create)();
+    ASSERT_TRUE( job != nullptr );
+
+    ASSERT_TRUE( ::NS(TrackJob_get_type_id)( job ) == ::NS(TRACK_JOB_CPU_ID) );
+
+    ASSERT_TRUE( std::strcmp( ::NS(TrackJob_get_type_str)( job ),
+                              ::NS(TRACK_JOB_CPU_STR) ) == 0 );
+
+    bool success = ::NS(TrackJobCpu_reset)(
+        job, pb, eb, NUM_TURNS_TOTAL, size_t{ 0 } );
+
+    ASSERT_TRUE( success );
+    ASSERT_TRUE( st_test::test1_CreateTrackJobNoOutputDelete(
+        job, pb, eb, nullptr ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    job = ::NS(TrackJobCpu_new)( pb, eb, NUM_TURNS_TOTAL, size_t{ 0 } );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( ::NS(TrackJob_get_type_id)( job ) == ::NS(TRACK_JOB_CPU_ID) );
+
+    ASSERT_TRUE( std::strcmp( ::NS(TrackJob_get_type_str)( job ),
+                              ::NS(TRACK_JOB_CPU_STR) ) == 0 );
+
+    ASSERT_TRUE( st_test::test1_CreateTrackJobNoOutputDelete(
+        job, pb, eb, nullptr ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    size_t const good_particle_sets[] = { size_t{ 0 } };
+
+    job = ::NS(TrackJobCpu_new_for_particle_sets)( pb, size_t{ 1 },
+        &good_particle_sets[ 0 ], eb, NUM_TURNS_TOTAL, size_t{ 0 } );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( ::NS(TrackJob_get_type_id)( job ) == ::NS(TRACK_JOB_CPU_ID) );
+
+    ASSERT_TRUE( std::strcmp( ::NS(TrackJob_get_type_str)( job ),
+                              ::NS(TRACK_JOB_CPU_STR) ) == 0 );
+
+    ASSERT_TRUE( st_test::test1_CreateTrackJobNoOutputDelete(
+        job, pb, eb, nullptr ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    size_t const wrong_particle_sets[] =
+    {
+        size_t{ 0 }, size_t{ 1 }, size_t{ 2 }
+    };
+
+    job = ::NS(TrackJobCpu_new_for_particle_sets)(
+        pb, size_t{ 3 }, &wrong_particle_sets[ 0 ], eb,
+        NUM_TURNS_TOTAL, size_t{ 0 } );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( ::NS(TrackJob_get_type_id)( job ) == ::NS(TRACK_JOB_CPU_ID) );
+
+    ASSERT_TRUE( std::strcmp( ::NS(TrackJob_get_type_str)( job ),
+                              ::NS(TRACK_JOB_CPU_STR) ) == 0 );
+
+    ASSERT_TRUE( st_test::test1_CreateTrackJobNoOutputDelete(
+        job, pb, eb, nullptr ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    job = ::NS(TrackJobCpu_new_detailed)( pb, size_t{ 1 },
+        &good_particle_sets[ 0 ], eb, my_output_buffer,
+        NUM_TURNS_TOTAL, size_t{ 0 }, nullptr );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( ::NS(TrackJob_get_type_id)( job ) == ::NS(TRACK_JOB_CPU_ID) );
+
+    ASSERT_TRUE( std::strcmp( ::NS(TrackJob_get_type_str)( job ),
+                              ::NS(TRACK_JOB_CPU_STR) ) == 0 );
+
+    ASSERT_TRUE( st_test::test1_CreateTrackJobNoOutputDelete(
+        job, pb, eb, my_output_buffer ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* ===================================================================== */
+
+    ::NS(Buffer_delete)( pb );
+    ::NS(Buffer_delete)( eb );
+    ::NS(Buffer_delete)( in_particle_buffer );
+    ::NS(Buffer_delete)( my_output_buffer );
+}
+
+TEST( C99_TrackJobCpuTests, CreateTrackJobElemByElemOutputDelete )
+{
+    using track_job_t         = ::st_TrackJobCpu;
+    using size_t              = ::st_buffer_size_t;
+    using buffer_t            = ::st_Buffer;
+    using particles_t         = ::st_Particles;
+
+    namespace st_test         = SIXTRL_CXX_NAMESPACE::tests;
+
+    buffer_t* eb = ::NS(Buffer_new_from_file)(
+        ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
+
+    buffer_t* pb = ::NS(Buffer_new)( size_t{ 0 } );
+
+    buffer_t* in_particle_buffer = ::NS(Buffer_new_from_file)(
+        ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
+
+    SIXTRL_ASSERT( pb != nullptr );
+    SIXTRL_ASSERT( eb != nullptr );
+    SIXTRL_ASSERT( in_particle_buffer != nullptr );
+
+    buffer_t* my_output_buffer = ::NS(Buffer_new)( size_t{ 0 } );
+
+    particles_t* particles = ::NS(Particles_add_copy)( pb,
+        ::NS(Particles_buffer_get_particles)(
+            in_particle_buffer, size_t{ 0 } ) );
+
+    SIXTRL_ASSERT( particles != nullptr );
+    SIXTRL_ASSERT( my_output_buffer != nullptr );
+
+    size_t const NUM_BEAM_ELEMENTS = ::NS(Buffer_get_num_of_objects)( eb );
+
+    size_t const NUM_PARTICLES =
+        ::NS(Particles_get_num_of_particles)( particles );
+
+    size_t const NUM_ELEM_BY_ELEM_TURNS = size_t{  5u };
+
+    SIXTRL_ASSERT( NUM_PARTICLES > size_t{ 0 } );
+    SIXTRL_ASSERT( NUM_BEAM_ELEMENTS > size_t{ 0 } );
+
+    /* ===================================================================== *
+     * Second set of tests:
+     * No Beam Monitors
+     * Elem by Elem config
+     * Output Buffer has to be present
+     * --------------------------------------------------------------------- */
+
+    track_job_t* job = ::NS(TrackJobCpu_create)();
+    ASSERT_TRUE( job != nullptr );
+
+    bool success = ::NS(TrackJobCpu_reset)(
+        job, pb, eb, size_t{ 0 }, NUM_ELEM_BY_ELEM_TURNS );
+
+    ASSERT_TRUE( success );
+    ASSERT_TRUE( st_test::test2_CreateTrackJobElemByElemOutputDelete(
+        job, pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    job = ::NS(TrackJobCpu_new)( pb, eb, size_t{ 0 }, NUM_ELEM_BY_ELEM_TURNS );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( st_test::test2_CreateTrackJobElemByElemOutputDelete(
+        job, pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    size_t const good_particle_sets[] = { size_t{ 0 } };
+
+    job = ::NS(TrackJobCpu_new_for_particle_sets)( pb, size_t{ 1 },
+        &good_particle_sets[ 0 ], eb, size_t{ 0 }, NUM_ELEM_BY_ELEM_TURNS );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( st_test::test2_CreateTrackJobElemByElemOutputDelete(
+        job, pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    size_t const wrong_particle_sets[] =
+    {
+        size_t{ 0 }, size_t{ 1 }, size_t{ 2 }
+    };
+
+    job = ::NS(TrackJobCpu_new_for_particle_sets)( pb, size_t{ 3 },
+        &wrong_particle_sets[ 0 ], eb, size_t{ 0 }, NUM_ELEM_BY_ELEM_TURNS );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( st_test::test2_CreateTrackJobElemByElemOutputDelete(
+        job, pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    job = ::NS(TrackJobCpu_new_detailed)( pb, size_t{ 1 },
+        &good_particle_sets[ 0 ], eb, my_output_buffer, size_t{ 0 },
+            NUM_ELEM_BY_ELEM_TURNS, nullptr );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( st_test::test2_CreateTrackJobElemByElemOutputDelete(
+        job, pb, eb, my_output_buffer, NUM_ELEM_BY_ELEM_TURNS ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* ===================================================================== */
+
+    ::NS(Buffer_delete)( pb );
+    ::NS(Buffer_delete)( eb );
+    ::NS(Buffer_delete)( in_particle_buffer );
+    ::NS(Buffer_delete)( my_output_buffer );
+}
+
+TEST( C99_TrackJobCpuTests, CreateTrackJobBeamMonitorOutputDelete )
+{
+    using track_job_t  = ::NS(TrackJobCpu);
+    using size_t       = ::NS(buffer_size_t);
+    using buffer_t     = ::NS(Buffer);
+    using particles_t  = ::NS(Particles);
+    using be_monitor_t = ::NS(BeamMonitor);
+
+    namespace st_test  = SIXTRL_CXX_NAMESPACE::tests;
+
+    buffer_t* eb = ::NS(Buffer_new_from_file)(
+        ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
+
+    buffer_t* pb = ::NS(Buffer_new)( size_t{ 0 } );
+
+    buffer_t* in_particle_buffer = ::NS(Buffer_new_from_file)(
+        ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
+
+    SIXTRL_ASSERT( pb != nullptr );
+    SIXTRL_ASSERT( eb != nullptr );
+    SIXTRL_ASSERT( in_particle_buffer != nullptr );
+
+    buffer_t* my_output_buffer = ::NS(Buffer_new)( size_t{ 0 } );
+
+    particles_t* particles = ::NS(Particles_add_copy)( pb,
+        ::NS(Particles_buffer_get_particles)(
+            in_particle_buffer, size_t{ 0 } ) );
+
+    SIXTRL_ASSERT( particles != nullptr );
+    SIXTRL_ASSERT( my_output_buffer != nullptr );
+
+    size_t const NUM_TURNS               = size_t{ 1000 };
+    size_t const SKIP_TURNS              = size_t{ 10 };
+    size_t const NUM_TURN_BY_TURN_TURNS  = size_t{ 10 };
+    size_t const NUM_BEAM_MONITORS       = size_t{ 2 };
+
+    size_t NUM_PARTICLES = ::NS(Particles_get_num_of_particles)( particles );
+    size_t NUM_BEAM_ELEMENTS = ::NS(Buffer_get_num_of_objects)( eb );
+
+    be_monitor_t* turn_by_turn_monitor = ::NS(BeamMonitor_new)( eb );
+    SIXTRL_ASSERT( turn_by_turn_monitor != nullptr );
+
+    ::NS(BeamMonitor_set_is_rolling)( turn_by_turn_monitor, false );
+    ::NS(BeamMonitor_set_start)( turn_by_turn_monitor, size_t{ 0 } );
+    ::NS(BeamMonitor_set_num_stores)(
+        turn_by_turn_monitor, NUM_TURN_BY_TURN_TURNS );
+
+    be_monitor_t* eot_monitor = ::NS(BeamMonitor_new)( eb );
+    SIXTRL_ASSERT( eot_monitor != nullptr );
+
+    ::NS(BeamMonitor_set_skip)( eot_monitor, true );
+    ::NS(BeamMonitor_set_is_rolling)( eot_monitor, SKIP_TURNS );
+    ::NS(BeamMonitor_set_start)( eot_monitor, NUM_TURN_BY_TURN_TURNS );
+    ::NS(BeamMonitor_set_num_stores)( eot_monitor,
+        ( NUM_TURNS - NUM_TURN_BY_TURN_TURNS ) / SKIP_TURNS );
+
+    ASSERT_TRUE( NUM_PARTICLES == static_cast< size_t >(
+        ::NS(Particles_get_num_of_particles)( particles ) ) );
+
+    ASSERT_TRUE( NUM_BEAM_ELEMENTS + NUM_BEAM_MONITORS ==
+        static_cast< size_t >( ::NS(Buffer_get_num_of_objects)( eb ) ) );
+
+    /* ===================================================================== *
+     * Third set of tests:
+     * Two Beam Monitors at end of lattice
+     * No Elem by Elem config
+     * Output Buffer has to be present
+     * --------------------------------------------------------------------- */
+
+    track_job_t* job = ::NS(TrackJobCpu_create)();
+    ASSERT_TRUE( job != nullptr );
+
+    bool success = ::NS(TrackJobCpu_reset)(
+        job, pb, eb, NUM_TURNS, size_t{ 0 } );
+
+    ASSERT_TRUE( success );
+    ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
+        job, pb, eb, nullptr, NUM_BEAM_MONITORS, NUM_TURNS, size_t{ 0 } ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    job = ::NS(TrackJobCpu_new)( pb, eb, NUM_TURNS, size_t{ 0 } );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
+        job, pb, eb, nullptr, NUM_BEAM_MONITORS, NUM_TURNS, size_t{ 0 } ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    size_t const good_particle_sets[] = { size_t{ 0 } };
+
+    job = ::NS(TrackJobCpu_new_for_particle_sets)( pb, size_t{ 1 },
+        &good_particle_sets[ 0 ], eb, NUM_TURNS, size_t{ 0 } );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
+        job, pb, eb, nullptr, NUM_BEAM_MONITORS, NUM_TURNS, size_t{ 0 } ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    size_t const wrong_particle_sets[] =
+    {
+        size_t{ 0 }, size_t{ 1 }, size_t{ 2 }
+    };
+
+    job = ::NS(TrackJobCpu_new_for_particle_sets)( pb, size_t{ 3 },
+        &wrong_particle_sets[ 0 ], eb, NUM_TURNS, size_t{ 0 } );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
+        job, pb, eb, nullptr, NUM_BEAM_MONITORS, NUM_TURNS, size_t{ 0 } ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    job = ::NS(TrackJobCpu_new_detailed)( pb, size_t{ 1 },
+        &good_particle_sets[ 0 ], eb, my_output_buffer,
+            NUM_TURNS, size_t{ 0 }, nullptr );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
+        job, pb, eb, my_output_buffer, NUM_BEAM_MONITORS,
+        NUM_TURNS, size_t{ 0 } ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* ===================================================================== */
+
+    ::NS(Buffer_delete)( pb );
+    ::NS(Buffer_delete)( eb );
+    ::NS(Buffer_delete)( in_particle_buffer );
+    ::NS(Buffer_delete)( my_output_buffer );
+}
+
+TEST( C99_TrackJobCpuTests, CreateTrackJobFullDelete )
+{
+    using track_job_t  = ::NS(TrackJobCpu);
+    using size_t       = ::NS(buffer_size_t);
+    using buffer_t     = ::NS(Buffer);
+    using particles_t  = ::NS(Particles);
+    using be_monitor_t = ::NS(BeamMonitor);
+
+    namespace st_test  = SIXTRL_CXX_NAMESPACE::tests;
+
+    buffer_t* eb = ::NS(Buffer_new_from_file)(
+        ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
+
+    buffer_t* pb = ::NS(Buffer_new)( size_t{ 0 } );
+
+    buffer_t* in_particle_buffer = ::NS(Buffer_new_from_file)(
+        ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
+
+    SIXTRL_ASSERT( pb != nullptr );
+    SIXTRL_ASSERT( eb != nullptr );
+    SIXTRL_ASSERT( in_particle_buffer != nullptr );
+
+    buffer_t* my_output_buffer = ::NS(Buffer_new)( size_t{ 0 } );
+
+    particles_t* particles = ::NS(Particles_add_copy)( pb,
+        ::NS(Particles_buffer_get_particles)(
+            in_particle_buffer, size_t{ 0 } ) );
+
+    SIXTRL_ASSERT( particles != nullptr );
+    SIXTRL_ASSERT( my_output_buffer != nullptr );
+
+    size_t const NUM_ELEM_BY_ELEM_TURNS  = size_t{ 5 };
+    size_t const NUM_TURNS               = size_t{ 1000 };
+    size_t const SKIP_TURNS              = size_t{ 10 };
+    size_t const NUM_TURN_BY_TURN_TURNS  = size_t{ 10 };
+    size_t const NUM_BEAM_MONITORS       = size_t{ 2 };
+
+    size_t NUM_PARTICLES = ::NS(Particles_get_num_of_particles)( particles );
+    size_t NUM_BEAM_ELEMENTS = ::NS(Buffer_get_num_of_objects)( eb );
+
+    be_monitor_t* turn_by_turn_monitor = ::NS(BeamMonitor_new)( eb );
+    SIXTRL_ASSERT( turn_by_turn_monitor != nullptr );
+
+    ::NS(BeamMonitor_set_is_rolling)( turn_by_turn_monitor, false );
+
+    ::NS(BeamMonitor_set_start)(
+        turn_by_turn_monitor, NUM_ELEM_BY_ELEM_TURNS );
+
+    ::NS(BeamMonitor_set_num_stores)(
+        turn_by_turn_monitor, NUM_TURN_BY_TURN_TURNS );
+
+    be_monitor_t* eot_monitor = ::NS(BeamMonitor_new)( eb );
+    SIXTRL_ASSERT( eot_monitor != nullptr );
+
+    ::NS(BeamMonitor_set_skip)( eot_monitor, true );
+
+    ::NS(BeamMonitor_set_is_rolling)( eot_monitor, SKIP_TURNS );
+
+    ::NS(BeamMonitor_set_start)( eot_monitor,
+            NUM_ELEM_BY_ELEM_TURNS + NUM_TURN_BY_TURN_TURNS );
+
+    ::NS(BeamMonitor_set_num_stores)( eot_monitor,
+        ( NUM_TURNS - ( NUM_ELEM_BY_ELEM_TURNS + NUM_TURN_BY_TURN_TURNS ) ) /
+            SKIP_TURNS );
+
+    ASSERT_TRUE( NUM_PARTICLES == static_cast< size_t >(
+        ::NS(Particles_get_num_of_particles)( particles ) ) );
+
+    ASSERT_TRUE( NUM_BEAM_ELEMENTS + NUM_BEAM_MONITORS ==
+        static_cast< size_t >( ::NS(Buffer_get_num_of_objects)( eb ) ) );
+
+    /* ===================================================================== *
+     * Fourth set of tests:
+     * Two Beam Monitors at end of lattice
+     * Elem by Elem config
+     * Output Buffer has to be present
+     * --------------------------------------------------------------------- */
+
+    track_job_t* job = ::NS(TrackJobCpu_create)();
+    ASSERT_TRUE( job != nullptr );
+
+    bool success = ::NS(TrackJobCpu_reset)(
+        job, pb, eb, NUM_TURNS, NUM_ELEM_BY_ELEM_TURNS );
+
+    ASSERT_TRUE( success );
+    ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
+        job, pb, eb, nullptr, NUM_BEAM_MONITORS, NUM_TURNS,
+            NUM_ELEM_BY_ELEM_TURNS ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    job = ::NS(TrackJobCpu_new)( pb, eb, NUM_TURNS, NUM_ELEM_BY_ELEM_TURNS );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
+        job, pb, eb, nullptr, NUM_BEAM_MONITORS, NUM_TURNS,
+            NUM_ELEM_BY_ELEM_TURNS ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    size_t const good_particle_sets[] = { size_t{ 0 } };
+
+    job = ::NS(TrackJobCpu_new_for_particle_sets)( pb, size_t{ 1 },
+        &good_particle_sets[ 0 ], eb, NUM_TURNS, NUM_ELEM_BY_ELEM_TURNS );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput( job, pb, eb, nullptr,
+        NUM_BEAM_MONITORS, NUM_TURNS, NUM_ELEM_BY_ELEM_TURNS ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    size_t const wrong_particle_sets[] =
+    {
+        size_t{ 0 }, size_t{ 1 }, size_t{ 2 }
+    };
+
+    job = ::NS(TrackJobCpu_new_for_particle_sets)( pb, size_t{ 3 },
+        &wrong_particle_sets[ 0 ], eb, NUM_TURNS, NUM_ELEM_BY_ELEM_TURNS );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput( job, pb, eb, nullptr,
+        NUM_BEAM_MONITORS, NUM_TURNS, NUM_ELEM_BY_ELEM_TURNS ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* --------------------------------------------------------------------- */
+
+    job = ::NS(TrackJobCpu_new_detailed)( pb, size_t{ 1 },
+        &good_particle_sets[ 0 ], eb, my_output_buffer,
+            NUM_TURNS, NUM_ELEM_BY_ELEM_TURNS, nullptr );
+
+    ASSERT_TRUE( job != nullptr );
+    ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
+        job, pb, eb, my_output_buffer, NUM_BEAM_MONITORS,
+        NUM_TURNS, NUM_ELEM_BY_ELEM_TURNS ) );
+
+    ::NS(TrackJobCpu_delete)( job );
+    job = nullptr;
+
+    /* ===================================================================== */
+
+    ::NS(Buffer_delete)( pb );
+    ::NS(Buffer_delete)( eb );
+    ::NS(Buffer_delete)( in_particle_buffer );
+    ::NS(Buffer_delete)( my_output_buffer );
+}
+
+namespace SIXTRL_CXX_NAMESPACE
+{
+namespace tests
+{
+    bool test1_CreateTrackJobNoOutputDelete(
+         const ::NS(TrackJobCpu) *const SIXTRL_RESTRICT job,
+         const ::NS(Buffer) *const SIXTRL_RESTRICT particles_buffer,
+         const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
+         const ::NS(Buffer) *const SIXTRL_RESTRICT ext_output_buffer )
+    {
+        using size_t = ::NS(buffer_size_t);
+
+        bool success = (
+            ( job != nullptr ) &&
+            ( ( ( ext_output_buffer == nullptr ) &&
+                ( !::NS(TrackJob_has_output_buffer)(  job ) ) &&
+                ( !::NS(TrackJob_owns_output_buffer)( job ) ) ) ||
+              ( ( ext_output_buffer != nullptr ) &&
+                (  ::NS(TrackJob_has_output_buffer)( job ) ) &&
+                ( !::NS(TrackJob_owns_output_buffer)( job ) ) ) ) &&
+            ( !::NS(TrackJob_has_beam_monitor_output)( job ) ) &&
+            (  ::NS(TrackJob_get_num_beam_monitors)( job ) == size_t{ 0 } ) );
+
+        if( success )
+        {
+            success = (
+                ( ::NS(TrackJob_get_beam_monitor_indices_begin)(
+                    job ) == nullptr ) &&
+                ( ::NS(TrackJob_get_beam_monitor_indices_end)(
+                    job ) == nullptr ) );
+        }
+
+        if( success )
+        {
+            success = (
+                ( ::NS(TrackJob_get_num_particle_sets)(
+                    job ) == size_t{ 1 } ) &&
+                ( ::NS(TrackJob_get_particle_set_indices_begin)(
+                    job ) != nullptr ) &&
+                ( ::NS(TrackJob_get_particle_set_indices_end)(
+                    job ) != nullptr ) &&
+                ( *( ::NS(TrackJob_get_particle_set_indices_begin)( job ) ) ==
+                    size_t{ 0 } ) &&
+                ( ::NS(TrackJob_get_particle_set_indices_end)( job ) !=
+                  ::NS(TrackJob_get_particle_set_indices_begin)( job ) ) &&
+                ( ::NS(TrackJob_get_particle_set_index)( job, size_t{ 0 } ) ==
+                    size_t{ 0 } ) );
+        }
+
+        if( success )
+        {
+            success = (
+                ( !::NS(TrackJob_has_elem_by_elem_output)( job ) ) &&
+                ( !::NS(TrackJob_has_elem_by_elem_config)( job ) ) &&
+                (  ::NS(TrackJob_get_elem_by_elem_config)(
+                    job ) == nullptr ) );
+        }
+
+        if( success )
+        {
+            if( ext_output_buffer != nullptr )
+            {
+                success = (
+                    (  ::NS(TrackJob_get_const_output_buffer)(
+                        job ) == ext_output_buffer ) &&
+                    (  ::NS(TrackJob_has_output_buffer)( job ) ) &&
+                    ( !::NS(TrackJob_owns_output_buffer)( job ) ) );
+            }
+            else
+            {
+                success = (
+                    ( ::NS(TrackJob_get_const_output_buffer)(
+                        job ) == nullptr ) &&
+                    ( !::NS(TrackJob_has_output_buffer)( job ) ) &&
+                    ( !::NS(TrackJob_owns_output_buffer)( job ) ) );
+            }
+        }
+
+        if( success )
+        {
+            success = ( ( ::NS(TrackJob_get_const_particles_buffer)(
+                            job ) == particles_buffer ) &&
+                        ( ::NS(TrackJob_get_const_beam_elements_buffer)(
+                            job ) == beam_elements_buffer ) );
+        }
+
+        return success;
     }
 
-    ::st_TrackJobCpu_collect( track_job );
+    bool test2_CreateTrackJobElemByElemOutputDelete(
+            const ::NS(TrackJobCpu) *const SIXTRL_RESTRICT job,
+            const ::NS(Buffer) *const SIXTRL_RESTRICT particles_buffer,
+            const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
+            const ::NS(Buffer) *const SIXTRL_RESTRICT ext_output_buffer,
+            ::NS(buffer_size_t) const target_num_elem_by_elem_turns )
+    {
+        bool success = false;
 
-    ::st_Buffer const* cmp_output_buffer =
-        ::st_TrackJob_get_output_buffer( track_job );
+        using size_t              = ::st_buffer_size_t;
+        using buffer_t            = ::st_Buffer;
+        using particles_t         = ::st_Particles;
+        using elem_by_elem_conf_t = ::NS(ElemByElemConfig);
 
-    ::st_Buffer const* particle_buffer =
-        ::st_TrackJob_get_particles_buffer( track_job );
+        buffer_t const* output_buffer = nullptr;
+        elem_by_elem_conf_t const* elem_by_elem_conf = nullptr;
 
-    ASSERT_TRUE( cmp_output_buffer != nullptr );
-    ASSERT_TRUE( particle_buffer   != nullptr );
+        SIXTRL_ASSERT( target_num_elem_by_elem_turns > size_t{ 0 } );
+        SIXTRL_ASSERT( particles_buffer != nullptr );
+        SIXTRL_ASSERT( beam_elements_buffer != nullptr );
 
-    ASSERT_TRUE( cmp_output_buffer != nullptr );
-    ASSERT_TRUE( particle_buffer == pb );
-    ASSERT_TRUE( eb = ::st_TrackJob_get_beam_elements_buffer( track_job ) );
+        particles_t const* particles =
+        ::NS(Particles_buffer_get_const_particles)(
+                particles_buffer, size_t{ 0 } );
 
-    ::st_TrackJobCpu_delete( track_job );
-    ::st_Buffer_delete( in_particle_buffer );
-    ::st_Buffer_delete( eb );
-    ::st_Buffer_delete( pb );
+        SIXTRL_ASSERT( particles != nullptr );
+
+        size_t const NUM_BEAM_ELEMENTS =
+            ::NS(Buffer_get_num_of_objects)( beam_elements_buffer );
+
+        size_t const NUM_PARTICLES =
+            ::NS(Particles_get_num_of_particles)( particles );
+
+        success = ( ( job != nullptr ) &&
+            ( NUM_BEAM_ELEMENTS > size_t{ 0 } ) &&
+            ( NUM_PARTICLES > size_t{ 0 } ) &&
+            (  ::NS(TrackJob_has_output_buffer)(  job ) ) &&
+            ( !::NS(TrackJob_has_beam_monitor_output)( job ) ) &&
+            (  ::NS(TrackJob_get_num_beam_monitors)( job ) == size_t{ 0 } ) &&
+            (  ::NS(TrackJob_get_beam_monitor_indices_begin)(
+                job ) == nullptr ) &&
+            (  ::NS(TrackJob_get_beam_monitor_indices_end)(
+                job ) == nullptr ) );
+
+        if( success )
+        {
+            success = (
+                ( ::NS(TrackJob_get_num_particle_sets)(
+                    job ) == size_t{ 1 } ) &&
+                ( ::NS(TrackJob_get_particle_set_indices_begin)(
+                    job ) != nullptr ) &&
+                (  ::NS(TrackJob_get_particle_set_indices_end)(
+                    job ) != nullptr ) &&
+                ( *( ::NS(TrackJob_get_particle_set_indices_begin)( job ) ) ==
+                        size_t{ 0 } ) &&
+                ( ::NS(TrackJob_get_particle_set_indices_end)( job ) !=
+                ::NS(TrackJob_get_particle_set_indices_begin)( job ) ) &&
+                (  ::NS(TrackJob_get_particle_set_index)( job, size_t{ 0 } ) ==
+                        size_t{ 0 } ) &&
+                (  ::NS(TrackJob_has_elem_by_elem_output)( job ) ) &&
+                (  ::NS(TrackJob_has_elem_by_elem_config)( job ) ) &&
+                (  ::NS(TrackJob_get_elem_by_elem_output_buffer_offset)(
+                    job ) == size_t{ 0 } ) );
+        }
+
+        if( success )
+        {
+            elem_by_elem_conf = ::NS(TrackJob_get_elem_by_elem_config)( job );
+
+            success = ( ( elem_by_elem_conf != nullptr ) &&
+                ( ::NS(ElemByElemConfig_is_active)( elem_by_elem_conf ) ) &&
+                ( static_cast< size_t >(
+                    ::NS(ElemByElemConfig_get_out_store_num_particles)(
+                        elem_by_elem_conf ) ) >=
+                    ( NUM_PARTICLES * NUM_BEAM_ELEMENTS
+                        * target_num_elem_by_elem_turns ) ) &&
+                ( ::NS(ElemByElemConfig_is_rolling)( elem_by_elem_conf ) ==
+                  ::NS(TrackJob_get_default_elem_by_elem_config_rolling_flag)(
+                        job ) ) );
+        }
+
+        if( success )
+        {
+            output_buffer = ::NS(TrackJob_get_const_output_buffer)( job );
+
+            success = ( ( output_buffer != nullptr ) &&
+                ( ::NS(Buffer_get_num_of_objects)(
+                    output_buffer ) == size_t{ 1 } ) &&
+                ( ::NS(Buffer_is_particles_buffer)( output_buffer ) ) &&
+                ( ::NS(Particles_get_num_of_particles)(
+                    ::NS(Particles_buffer_get_const_particles)(
+                        output_buffer, size_t{ 0 } ) ) >=
+                  ::NS(ElemByElemConfig_get_out_store_num_particles)(
+                    elem_by_elem_conf ) ) &&
+                (  ::NS(TrackJob_get_beam_monitor_output_buffer_offset)(
+                    job ) == size_t{ 1 } ) &&
+                (  ::NS(TrackJob_get_beam_monitor_output_buffer_offset)(
+                    job ) >= ::NS(Buffer_get_num_of_objects)( output_buffer )
+                ) );
+        }
+
+        if( success )
+        {
+            if( ext_output_buffer != nullptr )
+            {
+                success = (
+                    ( !::NS(TrackJob_owns_output_buffer)( job ) ) &&
+                    (  ::NS(TrackJob_get_const_output_buffer)(
+                        job ) == ext_output_buffer ) &&
+                    (  ::NS(TrackJob_has_output_buffer)( job ) ) &&
+                    ( !::NS(TrackJob_owns_output_buffer)( job ) ) );
+            }
+            else
+            {
+                success = (
+                    ( ::NS(TrackJob_owns_output_buffer)( job ) ) &&
+                    ( ::NS(TrackJob_get_const_output_buffer)(
+                        job ) != nullptr ) &&
+                    (  ::NS(TrackJob_has_output_buffer)( job ) ) &&
+                    (  ::NS(TrackJob_owns_output_buffer)( job ) ) );
+            }
+        }
+
+        if( success )
+        {
+            success = ( ( ::NS(TrackJob_get_const_particles_buffer)(
+                            job ) == particles_buffer ) &&
+                        ( ::NS(TrackJob_get_const_beam_elements_buffer)(
+                            job ) == beam_elements_buffer ) );
+        }
+
+        return success;
+    }
+
+    bool test3_CreateTrackJobFullOutput(
+        const ::NS(TrackJobCpu) *const SIXTRL_RESTRICT job,
+        const ::NS(Buffer) *const SIXTRL_RESTRICT particles_buffer,
+        const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
+        const ::NS(Buffer) *const SIXTRL_RESTRICT ext_output_buffer,
+        ::NS(buffer_size_t) const num_beam_monitors,
+        ::NS(buffer_size_t) const target_num_output_turns,
+        ::NS(buffer_size_t) const target_num_elem_by_elem_turns )
+    {
+        bool success = false;
+
+        using size_t              = ::st_buffer_size_t;
+        using buffer_t            = ::st_Buffer;
+        using particles_t         = ::st_Particles;
+        using elem_by_elem_conf_t = ::NS(ElemByElemConfig);
+
+        buffer_t const* output_buffer = nullptr;
+        elem_by_elem_conf_t const* elem_by_elem_conf = nullptr;
+
+        SIXTRL_ASSERT( particles_buffer != nullptr );
+        SIXTRL_ASSERT( beam_elements_buffer != nullptr );
+
+        particles_t const* particles =
+        ::NS(Particles_buffer_get_const_particles)(
+                particles_buffer, size_t{ 0 } );
+
+        SIXTRL_ASSERT( particles != nullptr );
+
+        size_t const NUM_BEAM_ELEMENTS =
+            ::NS(Buffer_get_num_of_objects)( beam_elements_buffer );
+
+        size_t const NUM_PARTICLES =
+            ::NS(Particles_get_num_of_particles)( particles );
+
+        success = ( ( job != nullptr ) &&
+            ( NUM_BEAM_ELEMENTS > size_t{ 0 } ) &&
+            ( NUM_PARTICLES > size_t{ 0 } ) &&
+            (  ::NS(TrackJob_has_output_buffer)(  job ) ) &&
+            (  ::NS(TrackJob_has_beam_monitor_output)( job ) ) &&
+            (  ::NS(TrackJob_get_num_beam_monitors)( job ) ==
+                num_beam_monitors ) );
+
+        if( success )
+        {
+            success = (
+                ( ::NS(TrackJob_get_num_particle_sets)(
+                    job ) == size_t{ 1 } ) &&
+                ( ::NS(TrackJob_get_particle_set_indices_begin)(
+                    job ) != nullptr ) &&
+                (  ::NS(TrackJob_get_particle_set_indices_end)(
+                    job ) != nullptr ) &&
+                ( *( ::NS(TrackJob_get_particle_set_indices_begin)( job ) ) ==
+                        size_t{ 0 } ) &&
+                ( ::NS(TrackJob_get_particle_set_indices_end)( job ) !=
+                ::NS(TrackJob_get_particle_set_indices_begin)( job ) ) &&
+                (  ::NS(TrackJob_get_particle_set_index)( job, size_t{ 0 } ) ==
+                        size_t{ 0 } ) );
+        }
+
+        if( ( success ) && ( num_beam_monitors > size_t{ 0 } ) )
+        {
+            size_t const* be_mon_idx_it  =
+                ::NS(TrackJob_get_beam_monitor_indices_begin)( job );
+
+            size_t const* be_mon_idx_end =
+                ::NS(TrackJob_get_beam_monitor_indices_end)( job );
+
+            success = ( ( job != nullptr ) && ( be_mon_idx_it  != nullptr ) &&
+                ( be_mon_idx_end != nullptr ) &&
+                ( ::NS(TrackJob_get_beam_monitor_output_buffer_offset)( job )
+                    >= ::NS(TrackJob_get_elem_by_elem_output_buffer_offset)(
+                    job ) ) &&
+                ( std::ptrdiff_t{ 0 } < std::distance(
+                    be_mon_idx_it, be_mon_idx_end ) ) &&
+                ( static_cast< size_t >( std::distance(
+                    be_mon_idx_it, be_mon_idx_end ) ) == num_beam_monitors ) );
+
+            if( success )
+            {
+                for( ; be_mon_idx_it != be_mon_idx_end ; ++be_mon_idx_it )
+                {
+                    success &= ( ::NS(OBJECT_TYPE_BEAM_MONITOR) ==
+                        NS(Object_get_type_id)( NS(Buffer_get_const_object)(
+                            beam_elements_buffer, *be_mon_idx_it ) ) );
+                }
+            }
+        }
+
+        if( ( success ) && ( target_num_elem_by_elem_turns > size_t{ 0 } ) )
+        {
+            elem_by_elem_conf = ::NS(TrackJob_get_elem_by_elem_config)( job );
+
+            success = (
+                (  ::NS(TrackJob_has_elem_by_elem_output)( job ) ) &&
+                (  ::NS(TrackJob_has_elem_by_elem_config)( job ) ) &&
+                (  ::NS(TrackJob_get_elem_by_elem_output_buffer_offset)(
+                    job ) == size_t{ 0 } ) &&
+                ( elem_by_elem_conf != nullptr ) &&
+                ( ::NS(ElemByElemConfig_is_active)( elem_by_elem_conf ) ) &&
+                ( static_cast< size_t >(
+                    ::NS(ElemByElemConfig_get_out_store_num_particles)(
+                        elem_by_elem_conf ) ) >=
+                    ( NUM_PARTICLES * NUM_BEAM_ELEMENTS
+                        * target_num_elem_by_elem_turns ) ) &&
+                ( ::NS(ElemByElemConfig_is_rolling)( elem_by_elem_conf ) ==
+                  ::NS(TrackJob_get_default_elem_by_elem_config_rolling_flag)(
+                        job ) ) );
+        }
+
+        if( ( success ) &&
+            ( ( target_num_elem_by_elem_turns > size_t{ 0 } ) ||
+              ( target_num_output_turns > size_t{ 0 } ) ||
+              ( num_beam_monitors > size_t{ 0 } ) ) )
+        {
+            output_buffer = ::NS(TrackJob_get_const_output_buffer)( job );
+
+            size_t requ_num_output_elems = num_beam_monitors;
+
+            if( ::NS(TrackJob_has_elem_by_elem_output)( job ) )
+            {
+                requ_num_output_elems += size_t{ 1 };
+            }
+
+            success = ( ( output_buffer != nullptr ) &&
+                ( ::NS(Buffer_get_num_of_objects)(
+                    output_buffer ) == requ_num_output_elems ) &&
+                ( ::NS(Buffer_is_particles_buffer)( output_buffer ) ) );
+        }
+
+        if( ( success ) && ( target_num_elem_by_elem_turns > size_t{ 0 } ) &&
+            ( elem_by_elem_conf != nullptr ) )
+        {
+            success = (
+                ( ::NS(Particles_get_num_of_particles)(
+                    ::NS(Particles_buffer_get_const_particles)( output_buffer,
+                    ::NS(TrackJob_get_elem_by_elem_output_buffer_offset)(
+                        job ) ) ) >=
+                  ::NS(ElemByElemConfig_get_out_store_num_particles)(
+                    elem_by_elem_conf ) ) );
+        }
+
+
+        if( ( success ) && ( target_num_output_turns > size_t{ 0 } ) &&
+            ( num_beam_monitors > size_t{ 0 } ) )
+        {
+            success = (
+                (  ::NS(TrackJob_get_beam_monitor_output_buffer_offset)(
+                        job ) >=
+                    ::NS(TrackJob_get_elem_by_elem_output_buffer_offset)(
+                        job ) ) &&
+                (  ::NS(TrackJob_get_beam_monitor_output_buffer_offset)(
+                    job ) < ::NS(Buffer_get_num_of_objects)( output_buffer )
+                ) );
+        }
+
+        if( success )
+        {
+            if( ext_output_buffer != nullptr )
+            {
+                success = (
+                    ( !::NS(TrackJob_owns_output_buffer)( job ) ) &&
+                    (  ::NS(TrackJob_get_const_output_buffer)(
+                        job ) == ext_output_buffer ) &&
+                    (  ::NS(TrackJob_has_output_buffer)( job ) ) &&
+                    ( !::NS(TrackJob_owns_output_buffer)( job ) ) );
+            }
+            else
+            {
+                success = (
+                    ( ::NS(TrackJob_owns_output_buffer)( job ) ) &&
+                    ( ::NS(TrackJob_get_const_output_buffer)(
+                        job ) != nullptr ) &&
+                    (  ::NS(TrackJob_has_output_buffer)( job ) ) &&
+                    (  ::NS(TrackJob_owns_output_buffer)( job ) ) );
+            }
+        }
+
+        if( success )
+        {
+            success = ( ( ::NS(TrackJob_get_const_particles_buffer)(
+                            job ) == particles_buffer ) &&
+                        ( ::NS(TrackJob_get_const_beam_elements_buffer)(
+                            job ) == beam_elements_buffer ) );
+        }
+
+        return success;
+    }
+}
 }
 
 /* end: tests/sixtracklib/common/test_track_job_cpu_c99.cpp */
