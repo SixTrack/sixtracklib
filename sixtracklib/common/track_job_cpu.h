@@ -326,6 +326,13 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCpu_assign_output_buffer)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobCpu_collect)(
     NS(TrackJobCpu)* SIXTRL_RESTRICT job );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)* NS(TrackJobCpu_get_output_buffer)(
+    NS(TrackJobCpu)* SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer) const*
+NS(TrackJobCpu_get_const_particles_buffer)(
+    const NS(TrackJobCpu) *const SIXTRL_RESTRICT job );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t)
 NS(TrackJobCpu_track_until_turn)( NS(TrackJobCpu)* SIXTRL_RESTRICT job,
     NS(buffer_size_t) const until_turn );
