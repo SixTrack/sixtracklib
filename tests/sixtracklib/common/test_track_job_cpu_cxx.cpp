@@ -22,6 +22,8 @@
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/particles.hpp"
 #include "sixtracklib/common/be_monitor/be_monitor.hpp"
+#include "sixtracklib/common/output/output_buffer.h"
+#include "sixtracklib/common/output/elem_by_elem_config.h"
 
 #include "sixtracklib/testlib/common/particles.h"
 #include "sixtracklib/testlib/testdata/testdata_files.h"
@@ -445,6 +447,202 @@ TEST( CXX_TrackJobCpuTests, CreateTrackJobFullDelete )
     ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
         job4, pb, eb, &my_output_buffer, NUM_BEAM_MONITORS,
         NUM_TURNS, NUM_ELEM_BY_ELEM_TURNS ) );
+}
+
+TEST( CXX_TrackJobCpuTests, TrackParticles )
+{
+    namespace st        = SIXTRL_CXX_NAMESPACE;
+
+    using track_job_t   = st::TrackJobCpu;
+    using size_t        = st::TrackJobCpu::size_type;
+    using buffer_t      = st::Buffer;
+    using particles_t   = st::Particles;
+    using be_monitor_t  = st::BeamMonitor;
+    using part_index_t  = ::NS(particle_index_t);
+
+    buffer_t eb( ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
+    buffer_t in_particle_buffer( ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
+
+    buffer_t pb;
+    buffer_t my_output_buffer;
+
+    particles_t const* orig_particles =
+        st::Particles::FromBuffer( in_particle_buffer, size_t{ 0u } );
+
+    SIXTRL_ASSERT( orig_particles != nullptr );
+
+    particles_t* particles = pb.createNew< particles_t >(
+        orig_particles->getNumParticles() );
+
+    SIXTRL_ASSERT( particles != nullptr );
+    particles->copy( *orig_particles );
+
+    buffer_t cmp_pb;
+    buffer_t cmp_output_buffer;
+
+    particles_t* cmp_particles = cmp_pb.createNew< particles_t >(
+        orig_particles->getNumParticles() );
+
+    SIXTRL_ASSERT( cmp_particles != nullptr );
+    cmp_particles->copy( *orig_particles );
+
+    size_t const NUM_BEAM_ELEMENTS = eb.getNumObjects();
+    size_t const NUM_PARTICLES     = particles->getNumParticles();
+
+    SIXTRL_ASSERT( NUM_PARTICLES         > size_t{ 0 } );
+    SIXTRL_ASSERT( NUM_BEAM_ELEMENTS     > size_t{ 0 } );
+
+    size_t const NUM_ELEM_BY_ELEM_TURNS  = size_t{ 5 };
+    size_t const NUM_TURNS               = size_t{ 100 };
+    size_t const SKIP_TURNS              = size_t{ 10 };
+    size_t const NUM_TURN_BY_TURN_TURNS  = size_t{ 10 };
+    size_t const NUM_BEAM_MONITORS       = size_t{ 2 };
+
+    /* --------------------------------------------------------------------- */
+
+    be_monitor_t* turn_by_turn_monitor = eb.createNew< be_monitor_t >();
+    SIXTRL_ASSERT( turn_by_turn_monitor != nullptr );
+
+    turn_by_turn_monitor->setIsRolling( false );
+    turn_by_turn_monitor->setStart( NUM_ELEM_BY_ELEM_TURNS );
+    turn_by_turn_monitor->setNumStores( NUM_TURN_BY_TURN_TURNS );
+
+    be_monitor_t* eot_monitor = eb.createNew< be_monitor_t >();
+    SIXTRL_ASSERT( eot_monitor != nullptr );
+
+    eot_monitor->setIsRolling( true );
+    eot_monitor->setStart( NUM_ELEM_BY_ELEM_TURNS + NUM_TURN_BY_TURN_TURNS );
+    eot_monitor->setSkip( SKIP_TURNS );
+    eot_monitor->setNumStores(
+        ( NUM_TURNS - ( NUM_ELEM_BY_ELEM_TURNS + NUM_TURN_BY_TURN_TURNS ) )
+            / SKIP_TURNS );
+
+    ASSERT_TRUE( NUM_BEAM_ELEMENTS + NUM_BEAM_MONITORS == eb.getNumObjects() );
+
+    /* -------------------------------------------------------------------- */
+    /* create cmp particle and output data to verify track job performance  */
+
+    size_t elem_by_elem_offset = size_t{ 0 };
+    size_t beam_monitor_offset = size_t{ 0 };
+    part_index_t min_turn_id   = part_index_t{ 0 };
+
+    int ret = ::NS(OutputBuffer_prepare)( eb.getCApiPtr(),
+        cmp_output_buffer.getCApiPtr(), cmp_particles,
+        NUM_TURNS, NUM_ELEM_BY_ELEM_TURNS, &elem_by_elem_offset,
+        &beam_monitor_offset, &min_turn_id );
+
+    SIXTRL_ASSERT( ret == 0 );
+
+    ret = ::NS(BeamMonitor_assign_output_buffer_from_offset)(
+        eb.getCApiPtr(), cmp_output_buffer.getCApiPtr(),
+        min_turn_id, beam_monitor_offset );
+
+    SIXTRL_ASSERT( ret == 0 );
+
+    particles_t* elem_by_elem_out =
+        particles_t::FromBuffer( cmp_output_buffer, elem_by_elem_offset );
+
+    SIXTRL_ASSERT( elem_by_elem_out != nullptr );
+
+    ret = ::NS(Track_all_particles_element_by_element_until_turn)(
+        cmp_particles->getCApiPtr(), eb.getCApiPtr(),
+        NUM_ELEM_BY_ELEM_TURNS, elem_by_elem_out );
+
+    SIXTRL_ASSERT( ret == 0 );
+
+    ret = ::NS(Track_all_particles_until_turn)(
+        cmp_particles->getCApiPtr(), eb.getCApiPtr(), NUM_TURNS );
+
+    SIXTRL_ASSERT( ret == 0 );
+
+    st::BeamMonitor::clearAll( eb );
+
+    /* -------------------------------------------------------------------- */
+    /* perform tracking using a track_job: */
+
+    track_job_t job( pb, eb, NUM_TURNS, NUM_ELEM_BY_ELEM_TURNS );
+
+    ASSERT_TRUE( job.hasOutputBuffer() );
+    ASSERT_TRUE( job.ownsOutputBuffer() );
+    ASSERT_TRUE( job.ptrOutputBuffer() != nullptr );
+    ASSERT_TRUE( job.hasBeamMonitorOutput() );
+    ASSERT_TRUE( job.numBeamMonitors() == NUM_BEAM_MONITORS );
+
+    ASSERT_TRUE( job.hasElemByElemOutput() );
+    ASSERT_TRUE( job.ptrElemByElemConfig() != nullptr );
+
+    ret = st::trackElemByElem( job, NUM_ELEM_BY_ELEM_TURNS );
+    ASSERT_TRUE( ret == 0 );
+
+    ret = st::track( job, NUM_TURNS );
+    ASSERT_TRUE( ret == 0 );
+
+    st::collect( job );
+
+    /* --------------------------------------------------------------------- */
+    /* compare */
+
+    buffer_t const* ptr_output_buffer = job.ptrOutputBuffer();
+
+    ASSERT_TRUE( ptr_output_buffer != nullptr );
+    ASSERT_TRUE( ptr_output_buffer->getNumObjects() ==
+                 cmp_output_buffer.getNumObjects() );
+
+    double const ABS_ERR = double{ 1e-14 };
+
+    if( ::NS(Particles_buffers_compare_values)( ptr_output_buffer->getCApiPtr(),
+            cmp_output_buffer.getCApiPtr() ) != 0 )
+    {
+        if( ::NS(Particles_buffers_compare_values_with_treshold)(
+            ptr_output_buffer->getCApiPtr(), cmp_output_buffer.getCApiPtr(),
+                ABS_ERR ) != 0 )
+        {
+            size_t const nn = cmp_output_buffer.getNumObjects();
+
+            buffer_t diff_buffer;
+
+            for( size_t ii =  size_t{ 0 } ; ii < nn ; ++ii )
+            {
+                particles_t const* cmp = particles_t::FromBuffer(
+                    cmp_output_buffer, ii );
+
+                particles_t const* trk_particles = particles_t::FromBuffer(
+                    *ptr_output_buffer, ii );
+
+                ASSERT_TRUE( trk_particles != nullptr );
+                ASSERT_TRUE( cmp != nullptr );
+                ASSERT_TRUE( cmp->getNumParticles() > 0 );
+
+                ASSERT_TRUE( trk_particles->getNumParticles() ==
+                             cmp->getNumParticles() );
+
+                if( 0 != ::NS(Particles_compare_values_with_treshold)(
+                        cmp->getCApiPtr(), trk_particles->getCApiPtr(),
+                            ABS_ERR ) )
+                {
+                    particles_t* diff = diff_buffer.createNew< particles_t >(
+                        cmp->getNumParticles() );
+
+                    SIXTRL_ASSERT( diff != nullptr );
+
+                    ::NS(Particles_calculate_difference)(
+                        cmp->getCApiPtr(), trk_particles->getCApiPtr(),
+                        diff->getCApiPtr() );
+
+                    std::cout << "ii = " << ii << std::endl;
+                    ::NS(Particles_print_out)( diff->getCApiPtr() );
+                    std::cout << std::endl;
+                }
+            }
+        }
+    }
+
+    ASSERT_TRUE( ( ::NS(Particles_buffers_compare_values)(
+                        ptr_output_buffer->getCApiPtr(),
+                        cmp_output_buffer.getCApiPtr() ) == 0 ) ||
+                 ( ::NS(Particles_buffers_compare_values_with_treshold)(
+                        ptr_output_buffer->getCApiPtr(),
+                        cmp_output_buffer.getCApiPtr(), ABS_ERR ) == 0 ) );
 }
 
 namespace SIXTRL_CXX_NAMESPACE
