@@ -7,6 +7,7 @@
     #include "sixtracklib/common/be_multipole/be_multipole.hpp"
     #include "sixtracklib/common/be_srotation/be_srotation.hpp"
     #include "sixtracklib/common/be_xyshift/be_xyshift.hpp"
+    #include "sixtracklib/common/be_monitor/be_monitor.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #endif /* CXX_SIXTRACKLIB_COMMON_BEAM_ELEMENTS_HPP__ */
