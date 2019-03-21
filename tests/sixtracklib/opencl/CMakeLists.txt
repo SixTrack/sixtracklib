@@ -18,9 +18,12 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_track_job_opencl_c99:
 
-    add_executable( test_track_job_opencl_c99 test_track_job_opencl_c99.cpp )
-    set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS} test_track_job_opencl_c99 )
-    add_test( C99_OpenCL_TrackJobClTests test_track_job_opencl_c99 )
+    add_executable( test_track_job_cl_opencl_c99
+                    test_track_job_cl_opencl_c99.cpp )
+
+    set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS}
+         test_track_job_cl_opencl_c99 )
+    add_test( C99_OpenCL_TrackJobClTests test_track_job_cl_opencl_c99 )
 
     # --------------------------------------------------------------------------
     # test_context_opencl_cxx:
