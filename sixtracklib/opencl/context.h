@@ -37,6 +37,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using  num_turns_t      = SIXTRL_INT64_T;
         using  program_id_t     = _base_context_t::program_id_t;
         using  kernel_id_t      = _base_context_t::kernel_id_t;
+        using  cl_buffer_t      = cl::Buffer;
 
         explicit ClContext(
             const char *const SIXTRL_RESTRICT config_str = nullptr );
@@ -61,6 +62,21 @@ namespace SIXTRL_CXX_NAMESPACE
         ClContext& operator=( ClContext&& other ) = delete;
 
         virtual ~ClContext() SIXTRL_NOEXCEPT;
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        bool assignParticleArg( ClArgument& SIXTRL_RESTRICT_REF arg );
+        bool assignBeamElementsArg( ClArgument& SIXTRL_RESTRICT_REF arg );
+        bool assignOutputBufferArg( ClArgument& SIXTRL_RESTRICT_REF arg );
+
+        bool assignElemByElemConfigBuffer(
+            cl_buffer_t& SIXTRL_RESTRICT_REF cl_elem_by_elem_config_buffer );
+
+        bool assignElemByElemBufferOffset(
+            size_type const elem_by_elem_out_offset );
+
+        bool assignSuccessFlagBuffer(
+            cl_buffer_t& SIXTRL_RESTRICT_REF cl_success_flag_buffer );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 

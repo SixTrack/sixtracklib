@@ -199,6 +199,262 @@ namespace SIXTRL_CXX_NAMESPACE
 
     }
 
+    bool ClContext::assignParticleArg(
+        ClArgument& SIXTRL_RESTRICT_REF particles_arg )
+    {
+        bool success = false;
+
+        using size_t      = ClContext::size_type;
+        using kernel_id_t = ClContext::kernel_id_t;
+
+        ::NS(Buffer)* part_buffer = particles_arg.ptrCObjectBuffer();
+
+        size_t const total_num_particles =
+            ::NS(Particles_buffer_get_total_num_of_particles)( part_buffer );
+
+        if( ( particles_arg.usesCObjectBuffer() ) &&
+            ( part_buffer != nullptr ) &&
+            ( !NS(Buffer_needs_remapping)( part_buffer ) ) &&
+            ( total_num_particles > size_t{ 0 } ) )
+        {
+            success = true;
+
+            if( this->hasTrackingKernel() )
+            {
+                kernel_id_t const kernel_id = this->trackingKernelId();
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{3u} );
+                this->assignKernelArgument( kernel_id, 0u, particles_arg );
+            }
+
+            if( this->hasElementByElementTrackingKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->elementByElementTrackingKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{6u} );
+                this->assignKernelArgument( kernel_id, 0u, particles_arg );
+            }
+
+            if( this->hasSingleTurnTrackingKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->singleTurnTackingKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{3u} );
+                this->assignKernelArgument( kernel_id, 0u, particles_arg );
+            }
+        }
+
+        return success;
+    }
+
+    bool ClContext::assignBeamElementsArg(
+        ClArgument& SIXTRL_RESTRICT_REF beam_elem_arg )
+    {
+        bool success = false;
+
+        using size_t      = ClContext::size_type;
+        using kernel_id_t = ClContext::kernel_id_t;
+
+        ::NS(Buffer)* beam_elem_buffer = beam_elem_arg.ptrCObjectBuffer();
+
+        if( ( beam_elem_arg.usesCObjectBuffer() ) &&
+            ( beam_elem_buffer != nullptr ) &&
+            ( !NS(Buffer_needs_remapping)( beam_elem_buffer ) ) )
+        {
+            success = true;
+
+            if( this->hasTrackingKernel() )
+            {
+                kernel_id_t const kernel_id = this->trackingKernelId();
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{3u} );
+                this->assignKernelArgument( kernel_id, 1u, beam_elem_arg );
+            }
+
+            if( this->hasElementByElementTrackingKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->elementByElementTrackingKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{6u} );
+                this->assignKernelArgument( kernel_id, 1u, beam_elem_arg );
+            }
+
+            if( this->hasSingleTurnTrackingKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->singleTurnTackingKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{3u} );
+                this->assignKernelArgument( kernel_id, 1u, beam_elem_arg );
+            }
+
+            if( this->hasAssignBeamMonitorIoBufferKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->assignBeamMonitorIoBufferKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{4u} );
+
+                this->assignKernelArgument( kernel_id, 0u, beam_elem_arg );
+            }
+        }
+
+        return success;
+    }
+
+    bool ClContext::assignOutputBufferArg(
+        ClArgument& SIXTRL_RESTRICT_REF out_buffer_arg )
+    {
+        bool success = false;
+
+        using size_t      = ClContext::size_type;
+        using kernel_id_t = ClContext::kernel_id_t;
+
+        ::NS(Buffer)* out_buffer = out_buffer_arg.ptrCObjectBuffer();
+
+        if( ( out_buffer_arg.usesCObjectBuffer() ) &&
+            ( out_buffer != nullptr ) &&
+            ( !NS(Buffer_needs_remapping)( out_buffer ) ) )
+        {
+            success = true;
+
+            if( this->hasElementByElementTrackingKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->elementByElementTrackingKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{6u} );
+                this->assignKernelArgument( kernel_id, 3u, out_buffer_arg );
+            }
+
+            if( this->hasAssignBeamMonitorIoBufferKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->assignBeamMonitorIoBufferKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{4u} );
+
+                this->assignKernelArgument( kernel_id, 1u, out_buffer_arg );
+            }
+        }
+
+        return success;
+    }
+
+    bool ClContext::assignElemByElemConfigBuffer( ClContext::cl_buffer_t&
+        SIXTRL_RESTRICT_REF cl_elem_by_elem_config_buffer )
+    {
+        bool success = true;
+
+        using size_t      = ClContext::size_type;
+        using kernel_id_t = ClContext::kernel_id_t;
+
+        if( this->hasElementByElementTrackingKernel() )
+        {
+            kernel_id_t const kernel_id =
+                this->elementByElementTrackingKernelId();
+
+            success = ( this->kernelNumArgs( kernel_id ) >= size_t{ 6u } );
+            this->assignKernelArgumentClBuffer( kernel_id, 3u,
+                cl_elem_by_elem_config_buffer );
+        }
+
+        return success;
+    }
+
+    bool ClContext::assignElemByElemBufferOffset(
+        ClContext::size_type const elem_by_elem_out_offset )
+    {
+        bool success = true;
+
+        using size_t      = ClContext::size_type;
+        using kernel_id_t = ClContext::kernel_id_t;
+
+        if( this->hasElementByElementTrackingKernel() )
+        {
+            kernel_id_t const kernel_id =
+                this->elementByElementTrackingKernelId();
+
+            success = ( this->kernelNumArgs( kernel_id ) >= size_t{ 6u } );
+            this->assignKernelArgumentValue(
+                kernel_id, 5u, elem_by_elem_out_offset );
+        }
+
+        return success;
+    }
+
+    bool ClContext::assignSuccessFlagBuffer(
+        ClContext::cl_buffer_t& SIXTRL_RESTRICT_REF cl_success_flag_buffer )
+    {
+        bool success = true;
+
+        using size_t      = ClContext::size_type;
+        using kernel_id_t = ClContext::kernel_id_t;
+
+        if( this->hasTrackingKernel() )
+        {
+            kernel_id_t const kernel_id  = this->trackingKernelId();
+            size_t const num_kernel_args = this->kernelNumArgs( kernel_id );
+            success &= ( num_kernel_args >= size_t{ 3u } );
+
+            if( num_kernel_args > 3u )
+            {
+                this->assignKernelArgumentClBuffer(
+                    kernel_id, 3u, cl_success_flag_buffer );
+            }
+        }
+
+        if( this->hasElementByElementTrackingKernel() )
+        {
+            kernel_id_t const kernel_id =
+                this->elementByElementTrackingKernelId();
+
+            size_t const num_kernel_args = this->kernelNumArgs( kernel_id );
+            success &= ( num_kernel_args >= size_t{ 6u } );
+
+            if( num_kernel_args > 6u )
+            {
+                this->assignKernelArgumentClBuffer(
+                    kernel_id, 6u, cl_success_flag_buffer );
+            }
+        }
+
+        if( this->hasSingleTurnTrackingKernel() )
+        {
+            kernel_id_t const kernel_id =
+                this->singleTurnTackingKernelId();
+
+            size_t const num_kernel_args = this->kernelNumArgs( kernel_id );
+            success &= ( num_kernel_args >= size_t{ 3u } );
+
+            if( num_kernel_args > 3u )
+            {
+                this->assignKernelArgumentClBuffer(
+                    kernel_id, 3u, cl_success_flag_buffer );
+            }
+        }
+
+        if( this->hasAssignBeamMonitorIoBufferKernel() )
+        {
+            kernel_id_t const kernel_id =
+                this->assignBeamMonitorIoBufferKernelId();
+
+            size_t const num_kernel_args = this->kernelNumArgs( kernel_id );
+            success &= ( num_kernel_args >= size_t{ 4u } );
+
+            if( num_kernel_args > 4u )
+            {
+                this->assignKernelArgumentClBuffer(
+                    kernel_id, 4u, cl_success_flag_buffer );
+            }
+        }
+
+        return success;
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
     bool ClContext::hasTrackingKernel() const SIXTRL_NOEXCEPT
     {
         return ( ( this->hasSelectedNode() ) &&
