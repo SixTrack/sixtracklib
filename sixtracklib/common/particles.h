@@ -364,6 +364,12 @@ SIXTRL_FN SIXTRL_STATIC NS(particle_num_elements_t)
 NS(Particles_buffer_get_total_num_of_particles)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
+SIXTRL_HOST_FN SIXTRL_EXTERN NS(buffer_size_t)
+NS(Particles_buffer_get_total_num_of_particles_on_particle_sets)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const  num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* particle_set_indices_begin );
+
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(Particles_buffer_get_num_of_particle_blocks)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );

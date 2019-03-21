@@ -664,4 +664,47 @@ int NS(Particles_buffer_get_min_max_attributes)(
     return success;
 }
 
+NS(buffer_size_t)
+NS(Particles_buffer_get_total_num_of_particles_on_particle_sets)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const  num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* pset_begin )
+{
+    NS(buffer_size_t) total_num_particles = ( NS(buffer_size_t) )0u;
+
+    if( ( buffer != SIXTRL_NULLPTR ) &&
+        ( NS(Buffer_is_particles_buffer)( buffer ) ) &&
+        ( num_particle_sets > ( NS(buffer_size_t) )0u ) &&
+        ( pset_begin != SIXTRL_NULLPTR ) )
+    {
+        SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* it = pset_begin;
+
+        SIXTRL_ARGPTR_DEC NS(buffer_size_t) const*
+            pset_end = it + num_particle_sets;
+
+        SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* prev = pset_end;
+
+        for( ; it != pset_end ; prev = it++ )
+        {
+            NS(buffer_size_t) const index = *it;
+            SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const* particles =
+                NS(Particles_buffer_get_const_particles)( buffer, index );
+
+            if( ( ( prev == pset_end ) || ( *prev < index ) ) &&
+                ( particles != SIXTRL_NULLPTR ) )
+            {
+                total_num_particles +=
+                    NS(Particles_get_num_of_particles)( particles );
+            }
+            else
+            {
+                total_num_particles =  ( NS(buffer_size_t) )0u;
+                break;
+            }
+        }
+    }
+
+    return total_num_particles;
+}
+
 /* end: sixtracklib/common/internal/particles.c */
