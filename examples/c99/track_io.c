@@ -20,8 +20,8 @@ int main( int argc, char* argv[] )
 
     int NUM_PARTICLES                  = 0;
     int NUM_TURNS                      = 1;
-    int NUM_TURNS_IO_ELEM_BY_ELEM      = 0;
-    int NUM_TURNS_IO_TURN_BY_TURN      = 0;
+    int DUMP_ELEM_BY_ELEM_TURNS      = 0;
+    int DUMP_TURN_BY_TURN_TURNS      = 0;
     int NUM_IO_SKIP                    = 1;
 
     /* -------------------------------------------------------------------- */
@@ -91,7 +91,7 @@ int main( int argc, char* argv[] )
 
         if( ( temp >= 0 ) && ( temp <= NUM_TURNS ) )
         {
-            NUM_TURNS_IO_ELEM_BY_ELEM = temp;
+            DUMP_ELEM_BY_ELEM_TURNS = temp;
         }
     }
 
@@ -100,9 +100,9 @@ int main( int argc, char* argv[] )
     {
         int const temp = atoi( argv[ 5 ] );
 
-        if( ( temp > 0 ) && ( NUM_TURNS >= ( NUM_TURNS_IO_ELEM_BY_ELEM + temp ) ) )
+        if( ( temp > 0 ) && ( NUM_TURNS >= ( DUMP_ELEM_BY_ELEM_TURNS + temp ) ) )
         {
-            NUM_TURNS_IO_TURN_BY_TURN = temp;
+            DUMP_TURN_BY_TURN_TURNS = temp;
         }
     }
 
@@ -112,7 +112,7 @@ int main( int argc, char* argv[] )
         int const temp = atoi( argv[ 6 ] );
 
         if( ( temp > 0 )  && ( NUM_TURNS >
-                ( NUM_TURNS_IO_ELEM_BY_ELEM + NUM_TURNS_IO_TURN_BY_TURN ) ) )
+                ( DUMP_ELEM_BY_ELEM_TURNS + DUMP_TURN_BY_TURN_TURNS ) ) )
         {
             NUM_IO_SKIP = temp;
         }
@@ -150,8 +150,8 @@ int main( int argc, char* argv[] )
 
     printf("%-30s = %10d\n","NUM_PARTICLES",NUM_PARTICLES);
     printf("%-30s = %10d\n","NUM_TURNS",NUM_TURNS);
-    printf("%-30s = %10d\n","NUM_TURNS_IO_ELEM_BY_ELEM",NUM_TURNS_IO_ELEM_BY_ELEM);
-    printf("%-30s = %10d\n","NUM_TURNS_IO_TURN_BY_TURN",NUM_TURNS_IO_TURN_BY_TURN);
+    printf("%-30s = %10d\n","DUMP_ELEM_BY_ELEM_TURNS",DUMP_ELEM_BY_ELEM_TURNS);
+    printf("%-30s = %10d\n","DUMP_TURN_BY_TURN_TURNS",DUMP_TURN_BY_TURN_TURNS);
     printf("%-30s = %10d\n","NUM_IO_SKIP",NUM_IO_SKIP);
 
     if( ( NUM_PARTICLES >= 0 ) && ( input_pb != SIXTRL_NULLPTR ) )
@@ -208,48 +208,57 @@ int main( int argc, char* argv[] )
     if( ( eb != SIXTRL_NULLPTR ) &&
         ( st_Buffer_get_num_of_objects( eb ) > 0 ) )
     {
-        if( NUM_TURNS_IO_TURN_BY_TURN > 0 )
+        if( DUMP_TURN_BY_TURN_TURNS > 0 )
         {
             st_BeamMonitor* beam_monitor = st_BeamMonitor_new( eb );
-            st_BeamMonitor_set_num_stores( beam_monitor, NUM_TURNS_IO_TURN_BY_TURN );
-            st_BeamMonitor_set_start( beam_monitor, NUM_TURNS_IO_ELEM_BY_ELEM );
+            st_BeamMonitor_set_num_stores( beam_monitor, DUMP_TURN_BY_TURN_TURNS );
+            st_BeamMonitor_set_start( beam_monitor, DUMP_ELEM_BY_ELEM_TURNS );
             st_BeamMonitor_set_skip( beam_monitor, 1 );
             st_BeamMonitor_set_is_rolling( beam_monitor, false );
         }
 
         if( ( NUM_IO_SKIP > 0 ) && ( NUM_TURNS > (
-                NUM_TURNS_IO_ELEM_BY_ELEM + NUM_TURNS_IO_TURN_BY_TURN ) ) )
+                DUMP_ELEM_BY_ELEM_TURNS + DUMP_TURN_BY_TURN_TURNS ) ) )
         {
             int const remaining_turns = NUM_TURNS - (
-                NUM_TURNS_IO_ELEM_BY_ELEM + NUM_TURNS_IO_TURN_BY_TURN );
+                DUMP_ELEM_BY_ELEM_TURNS + DUMP_TURN_BY_TURN_TURNS );
 
             int const num_stores = remaining_turns / NUM_IO_SKIP;
 
             st_BeamMonitor* beam_monitor = st_BeamMonitor_new( eb );
             st_BeamMonitor_set_num_stores( beam_monitor, num_stores );
             st_BeamMonitor_set_start( beam_monitor,
-                    NUM_TURNS_IO_ELEM_BY_ELEM + NUM_TURNS_IO_TURN_BY_TURN );
+                    DUMP_ELEM_BY_ELEM_TURNS + DUMP_TURN_BY_TURN_TURNS );
             st_BeamMonitor_set_skip( beam_monitor, NUM_IO_SKIP );
             st_BeamMonitor_set_is_rolling( beam_monitor, true );
         }
 
-        job = st_TrackJobCpu_new(
-            track_pb, eb, NUM_TURNS, NUM_TURNS_IO_ELEM_BY_ELEM );
+        if( DUMP_ELEM_BY_ELEM_TURNS > 0u )
+        {
+            job = st_TrackJobCpu_new_with_output(
+                track_pb, eb, SIXTRL_NULLPTR, DUMP_ELEM_BY_ELEM_TURNS );
+        }
+        else
+        {
+            job = st_TrackJobCpu_new( track_pb, eb );
+        }
+
+
     }
 
     /* ********************************************************************* */
     /* ****            PERFORM TRACKING AND IO OPERATIONS            ******* */
     /* ********************************************************************* */
 
-    if( NUM_TURNS_IO_ELEM_BY_ELEM > 0u )
+    if( DUMP_ELEM_BY_ELEM_TURNS > 0u )
     {
-        st_TrackJobCpu_track_elem_by_elem( job, NUM_TURNS_IO_ELEM_BY_ELEM );
+        st_TrackJobCpu_track_elem_by_elem( job, DUMP_ELEM_BY_ELEM_TURNS );
     }
 
-    if( NUM_TURNS_IO_ELEM_BY_ELEM > NUM_TURNS )
+    if( DUMP_ELEM_BY_ELEM_TURNS > NUM_TURNS )
     {
         double const denom_turns =
-            ( double )( NUM_TURNS - NUM_TURNS_IO_ELEM_BY_ELEM );
+            ( double )( NUM_TURNS - DUMP_ELEM_BY_ELEM_TURNS );
 
         double const denom_turns_particles =
             denom_turns * NUM_PARTICLES;
@@ -279,8 +288,8 @@ int main( int argc, char* argv[] )
 
             st_TrackJobCpu_collect( job );
 
-            out_buffer = st_TrackJobCpu_get_output_buffer( job );
-            result_pb  = st_TrackJobCpu_get_const_particles_buffer( job );
+            out_buffer = st_TrackJob_get_output_buffer( job );
+            result_pb  = st_TrackJob_get_const_particles_buffer( job );
 
             st_Particles_add_copy( out_buffer,
                 st_Particles_buffer_get_const_particles( result_pb, 0u ) );

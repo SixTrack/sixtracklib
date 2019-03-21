@@ -24,8 +24,8 @@ int main( int argc, char* argv[] )
 
     int NUM_PARTICLES                  = 0;
     int NUM_TURNS                      = 1;
-    int NUM_TURNS_IO_ELEM_BY_ELEM      = 0;
-    int NUM_TURNS_IO_TURN_BY_TURN      = 0;
+    int DUMP_ELEM_BY_ELEM_TURNS      = 0;
+    int DUMP_TURN_BY_TURN_TURNS      = 0;
     int NUM_IO_SKIP                    = 1;
 
     st_ClContext* context = st_ClContext_create();
@@ -183,7 +183,7 @@ int main( int argc, char* argv[] )
 
         if( ( temp >= 0 ) && ( temp <= NUM_TURNS ) )
         {
-            NUM_TURNS_IO_ELEM_BY_ELEM = temp;
+            DUMP_ELEM_BY_ELEM_TURNS = temp;
         }
     }
 
@@ -192,9 +192,9 @@ int main( int argc, char* argv[] )
     {
         int const temp = atoi( argv[ 6 ] );
 
-        if( ( temp > 0 ) && ( NUM_TURNS >= ( NUM_TURNS_IO_ELEM_BY_ELEM + temp ) ) )
+        if( ( temp > 0 ) && ( NUM_TURNS >= ( DUMP_ELEM_BY_ELEM_TURNS + temp ) ) )
         {
-            NUM_TURNS_IO_TURN_BY_TURN = temp;
+            DUMP_TURN_BY_TURN_TURNS = temp;
         }
     }
 
@@ -204,7 +204,7 @@ int main( int argc, char* argv[] )
         int const temp = atoi( argv[ 7 ] );
 
         if( ( temp > 0 )  && ( NUM_TURNS >
-                ( NUM_TURNS_IO_ELEM_BY_ELEM + NUM_TURNS_IO_TURN_BY_TURN ) ) )
+                ( DUMP_ELEM_BY_ELEM_TURNS + DUMP_TURN_BY_TURN_TURNS ) ) )
         {
             NUM_IO_SKIP = temp;
         }
@@ -250,11 +250,11 @@ int main( int argc, char* argv[] )
             st_Particles_get_num_of_particles( in_particles );
 
         printf( "NUM_TURNS                 = %6d\r\n"
-                "NUM_TURNS_IO_ELEM_BY_ELEM = %6d\r\n"
-                "NUM_TURNS_IO_TURN_BY_TURN = %6d\r\n"
+                "DUMP_ELEM_BY_ELEM_TURNS = %6d\r\n"
+                "DUMP_TURN_BY_TURN_TURNS = %6d\r\n"
                 "NUM_IO_SKIP               = %6d\r\n",
-                NUM_TURNS, NUM_TURNS_IO_ELEM_BY_ELEM,
-                NUM_TURNS_IO_TURN_BY_TURN, NUM_IO_SKIP );
+                NUM_TURNS, DUMP_ELEM_BY_ELEM_TURNS,
+                DUMP_TURN_BY_TURN_TURNS, NUM_IO_SKIP );
 
         if( ( NUM_PARTICLES == INT32_MAX ) || ( NUM_PARTICLES == 0 ) )
         {
@@ -298,37 +298,36 @@ int main( int argc, char* argv[] )
     if( ( eb != SIXTRL_NULLPTR ) &&
         ( st_Buffer_get_num_of_objects( eb ) > 0 ) )
     {
-        if( NUM_TURNS_IO_TURN_BY_TURN > 0 )
+        if( DUMP_TURN_BY_TURN_TURNS > 0 )
         {
             st_BeamMonitor* beam_monitor = st_BeamMonitor_new( eb );
-            st_BeamMonitor_set_num_stores( beam_monitor, NUM_TURNS_IO_TURN_BY_TURN );
-            st_BeamMonitor_set_start( beam_monitor, NUM_TURNS_IO_ELEM_BY_ELEM );
+            st_BeamMonitor_set_num_stores( beam_monitor, DUMP_TURN_BY_TURN_TURNS );
+            st_BeamMonitor_set_start( beam_monitor, DUMP_ELEM_BY_ELEM_TURNS );
             st_BeamMonitor_set_skip( beam_monitor, 1 );
             st_BeamMonitor_set_is_rolling( beam_monitor, false );
         }
 
         if( ( NUM_IO_SKIP > 0 ) && ( NUM_TURNS > (
-                NUM_TURNS_IO_ELEM_BY_ELEM + NUM_TURNS_IO_TURN_BY_TURN ) ) )
+                DUMP_ELEM_BY_ELEM_TURNS + DUMP_TURN_BY_TURN_TURNS ) ) )
         {
             int const remaining_turns = NUM_TURNS - (
-                NUM_TURNS_IO_ELEM_BY_ELEM + NUM_TURNS_IO_TURN_BY_TURN );
+                DUMP_ELEM_BY_ELEM_TURNS + DUMP_TURN_BY_TURN_TURNS );
 
             int const num_stores = remaining_turns / NUM_IO_SKIP;
 
             st_BeamMonitor* beam_monitor = st_BeamMonitor_new( eb );
             st_BeamMonitor_set_num_stores( beam_monitor, num_stores );
             st_BeamMonitor_set_start( beam_monitor,
-                    NUM_TURNS_IO_ELEM_BY_ELEM + NUM_TURNS_IO_TURN_BY_TURN );
+                    DUMP_ELEM_BY_ELEM_TURNS + DUMP_TURN_BY_TURN_TURNS );
             st_BeamMonitor_set_skip( beam_monitor, NUM_IO_SKIP );
             st_BeamMonitor_set_is_rolling( beam_monitor, true );
         }
 
         out_buffer = st_Buffer_new( 0u );
 
-        st_OutputBuffer_prepare(
-            eb, out_buffer, particles, NUM_TURNS_IO_ELEM_BY_ELEM,
-            &elem_by_elem_index_offset, &beam_monitor_index_offset,
-            &min_turn_id );
+        st_OutputBuffer_prepare( eb, out_buffer, particles,
+            DUMP_ELEM_BY_ELEM_TURNS, &elem_by_elem_index_offset,
+                &beam_monitor_index_offset, &min_turn_id );
 
         particle_buffer_arg = st_ClArgument_new_from_buffer( track_pb, context );
         beam_elements_arg = st_ClArgument_new_from_buffer( eb, context );
@@ -357,9 +356,9 @@ int main( int argc, char* argv[] )
 
         st_ClContext_track_element_by_element(
             context, particle_buffer_arg, beam_elements_arg,
-            out_buffer_arg, NUM_TURNS_IO_ELEM_BY_ELEM, 0u );
+            out_buffer_arg, DUMP_ELEM_BY_ELEM_TURNS, 0u );
 
-        if( NUM_TURNS > NUM_TURNS_IO_ELEM_BY_ELEM )
+        if( NUM_TURNS > DUMP_ELEM_BY_ELEM_TURNS )
         {
             double end_tracking_time = ( double )0.0;
             double tracking_time     = ( double )0.0;
