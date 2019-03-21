@@ -1287,15 +1287,14 @@ namespace SIXTRL_CXX_NAMESPACE
             }
 
             if( ( success ) && ( this->hasOutputBuffer() ) &&
-                ( ( needs_output & ::NS(TRACK_JOB_OUTPUT_BEAM_MONITORS) ) ==
-                  ::NS(TRACK_JOB_OUTPUT_BEAM_MONITORS) ) )
+                ( needs_output != ::NS(TRACK_JOB_OUTPUT_NONE ) ) )
             {
                 success = this->doAssignOutputBufferToBeamMonitors(
                     beam_elem_buffer, this->ptrCOutputBuffer() );
             }
-            else if( ( success ) &&
-                ( needs_output != ::NS(TRACK_JOB_OUTPUT_NONE) ) &&
-                ( output_buffer != nullptr ) && ( !this->ownsOutputBuffer() ) )
+
+            if( ( success ) && ( output_buffer != nullptr ) &&
+                ( !this->ownsOutputBuffer() ) )
             {
                 this->doSetPtrCOutputBuffer( output_buffer );
             }
