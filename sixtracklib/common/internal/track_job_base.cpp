@@ -2028,7 +2028,7 @@ SIXTRL_HOST_FN ::NS(track_job_output_flag_t) NS(TrackJob_needs_output_buffer)(
         flags |= ::NS(TRACK_JOB_OUTPUT_ELEM_BY_ELEM);
     }
 
-    if( ( be_it != nullptr ) && ( num_belems > size_t{ 0 } ) );
+    if( ( be_it != nullptr ) && ( num_belems > size_t{ 0 } ) )
     {
         obj_iter_t be_end = be_it;
         std::advance( be_end, std::ptrdiff_t{ -1 } );
