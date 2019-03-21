@@ -61,9 +61,8 @@ NS(Buffer)* NS(TrackCL)(
             ptr_out_buffer = NS(Buffer_new)( 0u );
 
             NS(OutputBuffer_prepare)( beam_elements_buffer, ptr_out_buffer,
-                particles, until_turn, elem_by_elem_turns,
-                &elem_by_elem_index_offset, &beam_monitor_index_offset,
-                &min_turn_id );
+                particles, elem_by_elem_turns, &elem_by_elem_index_offset,
+                &beam_monitor_index_offset, &min_turn_id );
         }
 
         particles_arg =
