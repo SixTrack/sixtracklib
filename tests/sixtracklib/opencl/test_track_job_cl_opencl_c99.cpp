@@ -91,7 +91,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobNoOutputDelete )
      * No Elem by Elem config
      * --------------------------------------------------------------------- */
 
-    track_job_t* job = ::NS(TrackJobCl_create)( "0.0" );
+    track_job_t* job = ::NS(TrackJobCl_create)( "0.1" );
     ASSERT_TRUE( job != nullptr );
 
     ASSERT_TRUE( ::NS(TrackJob_get_type_id)( job ) == ::NS(TRACK_JOB_CL_ID) );
@@ -111,7 +111,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobNoOutputDelete )
 
     /* --------------------------------------------------------------------- */
 
-    job = ::NS(TrackJobCl_new_with_output)( "0.0", pb, eb, nullptr, size_t{ 0 } );
+    job = ::NS(TrackJobCl_new_with_output)( "0.1", pb, eb, nullptr, size_t{ 0 } );
 
     ASSERT_TRUE( job != nullptr );
     ASSERT_TRUE( ::NS(TrackJob_get_type_id)( job ) == ::NS(TRACK_JOB_CL_ID) );
@@ -129,7 +129,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobNoOutputDelete )
 
     size_t const good_particle_sets[] = { size_t{ 0 } };
 
-    job = ::NS(TrackJobCl_new_detailed)( "0.0", pb, size_t{ 1 },
+    job = ::NS(TrackJobCl_new_detailed)( "0.1", pb, size_t{ 1 },
         &good_particle_sets[ 0 ], eb, nullptr, size_t{ 0 }, nullptr );
 
     ASSERT_TRUE( job != nullptr );
@@ -151,7 +151,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobNoOutputDelete )
         size_t{ 0 }, size_t{ 1 }, size_t{ 2 }
     };
 
-    job = ::NS(TrackJobCl_new_detailed)( "0.0", pb, size_t{ 3 },
+    job = ::NS(TrackJobCl_new_detailed)( "0.1", pb, size_t{ 3 },
         &wrong_particle_sets[ 0 ], eb, nullptr, size_t{ 0 }, nullptr );
 
     ASSERT_TRUE( job != nullptr );
@@ -168,7 +168,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobNoOutputDelete )
 
     /* --------------------------------------------------------------------- */
 
-    job = ::NS(TrackJobCl_new_detailed)( "0.0", pb, size_t{ 1 },
+    job = ::NS(TrackJobCl_new_detailed)( "0.1", pb, size_t{ 1 },
         &good_particle_sets[ 0 ], eb, my_output_buffer, size_t{ 0 }, nullptr );
 
     ASSERT_TRUE( job != nullptr );
@@ -238,7 +238,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
      * Output Buffer has to be present
      * --------------------------------------------------------------------- */
 
-    track_job_t* job = ::NS(TrackJobCl_create)( "0.0" );
+    track_job_t* job = ::NS(TrackJobCl_create)( "0.1" );
     ASSERT_TRUE( job != nullptr );
 
     bool success = ::NS(TrackJobCl_reset_with_output)(
@@ -254,7 +254,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
     /* --------------------------------------------------------------------- */
 
     job = ::NS(TrackJobCl_new_with_output)(
-        "0.0", pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
+        "0.1", pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
 
     ASSERT_TRUE( job != nullptr );
     ASSERT_TRUE( st_test::test2_CreateTrackJobElemByElemOutputDelete(
@@ -267,7 +267,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
 
     size_t const good_particle_sets[] = { size_t{ 0 } };
 
-    job = ::NS(TrackJobCl_new_detailed)( "0.0", pb, size_t{ 1 },
+    job = ::NS(TrackJobCl_new_detailed)( "0.1", pb, size_t{ 1 },
         &good_particle_sets[ 0 ], eb, nullptr,
         DUMP_ELEM_BY_ELEM_TURNS, nullptr );
 
@@ -285,7 +285,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
         size_t{ 0 }, size_t{ 1 }, size_t{ 2 }
     };
 
-    job = ::NS(TrackJobCl_new_detailed)( "0.0", pb, size_t{ 3 },
+    job = ::NS(TrackJobCl_new_detailed)( "0.1", pb, size_t{ 3 },
         &wrong_particle_sets[ 0 ], eb, nullptr,
         DUMP_ELEM_BY_ELEM_TURNS, nullptr );
 
@@ -298,7 +298,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
 
     /* --------------------------------------------------------------------- */
 
-    job = ::NS(TrackJobCl_new_detailed)( "0.0", pb, size_t{ 1 },
+    job = ::NS(TrackJobCl_new_detailed)( "0.1", pb, size_t{ 1 },
         &good_particle_sets[ 0 ], eb, my_output_buffer,
             DUMP_ELEM_BY_ELEM_TURNS, nullptr );
 
@@ -386,7 +386,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
      * Output Buffer has to be present
      * --------------------------------------------------------------------- */
 
-    track_job_t* job = ::NS(TrackJobCl_create)( "0.0" );
+    track_job_t* job = ::NS(TrackJobCl_create)( "0.1" );
     ASSERT_TRUE( job != nullptr );
 
     bool success = ::NS(TrackJobCl_reset)( job, pb, eb, nullptr );
@@ -400,7 +400,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
 
     /* --------------------------------------------------------------------- */
 
-    job = ::NS(TrackJobCl_new)( "0.0", pb, eb );
+    job = ::NS(TrackJobCl_new)( "0.1", pb, eb );
 
     ASSERT_TRUE( job != nullptr );
     ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
@@ -413,7 +413,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
 
     size_t const good_particle_sets[] = { size_t{ 0 } };
 
-    job = ::NS(TrackJobCl_new_detailed)( "0.0", pb, size_t{ 1 },
+    job = ::NS(TrackJobCl_new_detailed)( "0.1", pb, size_t{ 1 },
         &good_particle_sets[ 0 ], eb, nullptr, size_t{ 0 }, nullptr );
 
     ASSERT_TRUE( job != nullptr );
@@ -430,7 +430,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
         size_t{ 0 }, size_t{ 1 }, size_t{ 2 }
     };
 
-    job = ::NS(TrackJobCl_new_detailed)( "0.0", pb, size_t{ 3 },
+    job = ::NS(TrackJobCl_new_detailed)( "0.1", pb, size_t{ 3 },
         &wrong_particle_sets[ 0 ], eb, nullptr, size_t{ 0 }, nullptr );
 
     ASSERT_TRUE( job != nullptr );
@@ -442,7 +442,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
 
     /* --------------------------------------------------------------------- */
 
-    job = ::NS(TrackJobCl_new_detailed)( "0.0", pb, size_t{ 1 },
+    job = ::NS(TrackJobCl_new_detailed)( "0.1", pb, size_t{ 1 },
         &good_particle_sets[ 0 ], eb, my_output_buffer, size_t{ 0 }, nullptr );
 
     ASSERT_TRUE( job != nullptr );
@@ -539,7 +539,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobFullDelete )
      * Output Buffer has to be present
      * --------------------------------------------------------------------- */
 
-    track_job_t* job = ::NS(TrackJobCl_create)( "0.0" );
+    track_job_t* job = ::NS(TrackJobCl_create)( "0.1" );
     ASSERT_TRUE( job != nullptr );
 
     bool success = ::NS(TrackJobCl_reset_with_output)(
@@ -556,7 +556,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobFullDelete )
     /* --------------------------------------------------------------------- */
 
     job = ::NS(TrackJobCl_new_with_output)(
-        "0.0", pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
+        "0.1", pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
 
     ASSERT_TRUE( job != nullptr );
     ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
@@ -570,7 +570,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobFullDelete )
 
     size_t const good_particle_sets[] = { size_t{ 0 } };
 
-    job = ::NS(TrackJobCl_new_detailed)( "0.0", pb, size_t{ 1 },
+    job = ::NS(TrackJobCl_new_detailed)( "0.1", pb, size_t{ 1 },
         &good_particle_sets[ 0 ], eb, nullptr,
         DUMP_ELEM_BY_ELEM_TURNS, nullptr );
 
@@ -588,7 +588,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobFullDelete )
         size_t{ 0 }, size_t{ 1 }, size_t{ 2 }
     };
 
-    job = ::NS(TrackJobCl_new_detailed)( "0.0", pb, size_t{ 3 },
+    job = ::NS(TrackJobCl_new_detailed)( "0.1", pb, size_t{ 3 },
         &wrong_particle_sets[ 0 ], eb, nullptr,
         DUMP_ELEM_BY_ELEM_TURNS, nullptr );
 
@@ -601,7 +601,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobFullDelete )
 
     /* --------------------------------------------------------------------- */
 
-    job = ::NS(TrackJobCl_new_detailed)( "0.0", pb, size_t{ 1 },
+    job = ::NS(TrackJobCl_new_detailed)( "0.1", pb, size_t{ 1 },
         &good_particle_sets[ 0 ], eb, my_output_buffer,
             DUMP_ELEM_BY_ELEM_TURNS, nullptr );
 
@@ -737,7 +737,7 @@ TEST( C99_TrackJobClTests, TrackParticles )
     /* perform tracking using a track_job: */
 
     track_job_t* job = ::NS(TrackJobCl_new_with_output)(
-        "0.0", pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
+        "0.1", pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
 
     ASSERT_TRUE( job != nullptr );
     ASSERT_TRUE( ::NS(TrackJob_has_output_buffer)( job ) );

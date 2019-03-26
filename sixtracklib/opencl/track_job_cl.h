@@ -406,6 +406,8 @@ namespace SIXTRL_CXX_NAMESPACE
         const char *const SIXTRL_RESTRICT config_str )
     {
         using _base_t = TrackJobBase;
+        using flag_t  = TrackJobBase::track_job_output_flag_t;
+
         bool success  = false;
 
         if( config_str != nullptr )
@@ -426,6 +428,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             _base_t::doPrepareParticlesStructures( particles_buffer );
             this->doPrepareParticlesStructuresOclImp( particles_buffer );
+            this->doSetPtrCParticleBuffer( particles_buffer );
 
             if( ( pset_begin != nullptr ) && ( pset_end != nullptr ) &&
                 ( pset_begin != pset_end ) &&
@@ -437,20 +440,38 @@ namespace SIXTRL_CXX_NAMESPACE
 
             _base_t::doPrepareBeamElementsStructures( belements_buffer );
             this->doPrepareBeamElementsStructuresOclImp( belements_buffer );
+            this->doSetPtrCBeamElementsBuffer( belements_buffer );
 
-            _base_t::doPrepareOutputStructures( particles_buffer,
-                belements_buffer, output_buffer, dump_elem_by_elem_turns );
+            flag_t const needs_output = ::NS(TrackJob_needs_output_buffer)(
+                particles_buffer, belements_buffer, dump_elem_by_elem_turns );
 
-            if( this->ptrOutputBuffer() != nullptr )
+            if( ( needs_output  != ::NS(TRACK_JOB_OUTPUT_NONE) ) ||
+                ( output_buffer != nullptr ) )
             {
-                this->doPrepareOutputStructuresOclImpl( particles_buffer,
+                success = _base_t::doPrepareOutputStructures( particles_buffer,
                     belements_buffer, output_buffer, dump_elem_by_elem_turns );
 
-                _base_t::doAssignOutputBufferToBeamMonitors(
-                    belements_buffer, output_buffer );
+                if( success )
+                {
+                    success = this->doPrepareOutputStructuresOclImpl(
+                    particles_buffer, belements_buffer,
+                    this->ptrCOutputBuffer(), dump_elem_by_elem_turns );
+                }
+            }
 
-                this->doAssignOutputBufferToBeamMonitorsOclImp(
-                    belements_buffer, output_buffer );
+            if( ( success ) && ( this->hasOutputBuffer() ) &&
+                ( needs_output != ::NS(TRACK_JOB_OUTPUT_NONE) ) )
+            {
+                success = _base_t::doAssignOutputBufferToBeamMonitors(
+                    belements_buffer, this->ptrCOutputBuffer() );
+
+                if( ( success ) && ( this->hasOutputBuffer() ) &&
+                    ( ( needs_output & ::NS(TRACK_JOB_OUTPUT_BEAM_MONITORS) ) ==
+                        ::NS(TRACK_JOB_OUTPUT_BEAM_MONITORS) ) )
+                {
+                    this->doAssignOutputBufferToBeamMonitorsOclImp(
+                        belements_buffer, this->ptrCOutputBuffer() );
+                }
             }
         }
 

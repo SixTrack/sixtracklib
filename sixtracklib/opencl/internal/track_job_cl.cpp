@@ -312,23 +312,35 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT output_buffer,
         TrackJobCl::size_type const dump_elem_by_elem_turns )
     {
-        return ( ( TrackJobBase::doPrepareOutputStructures( part_buffer,
-                belem_buffer, output_buffer, dump_elem_by_elem_turns ) ) &&
-            ( this->doPrepareOutputStructuresOclImpl( part_buffer,
-                belem_buffer, output_buffer, dump_elem_by_elem_turns ) ) );
+        bool success = TrackJobBase::doPrepareOutputStructures( part_buffer,
+                belem_buffer, output_buffer, dump_elem_by_elem_turns );
+
+        if( ( success ) && ( this->hasOutputBuffer() ) )
+        {
+            success = this->doPrepareOutputStructuresOclImpl(
+                part_buffer, belem_buffer, this->ptrCOutputBuffer(),
+                dump_elem_by_elem_turns );
+        }
+
+        return success;
     }
 
     SIXTRL_HOST_FN bool TrackJobCl::doAssignOutputBufferToBeamMonitors(
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT belem_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT out_buffer )
     {
-        return ( ( TrackJobBase::doAssignOutputBufferToBeamMonitors(
-                belem_buffer, out_buffer ) ) &&
-            ( this->doAssignOutputBufferToBeamMonitorsOclImp(
-                belem_buffer, out_buffer ) ) );
+        bool success = TrackJobBase::doAssignOutputBufferToBeamMonitors(
+                belem_buffer, out_buffer );
 
+        if( ( success ) &&
+            ( ( this->hasElemByElemOutput() ) ||
+              ( this->hasBeamMonitorOutput() ) ) )
+        {
+            success = this->doAssignOutputBufferToBeamMonitorsOclImp(
+                belem_buffer, out_buffer );
+        }
 
-        return false;
+        return success;
     }
 
     SIXTRL_HOST_FN bool TrackJobCl::doReset(
@@ -546,9 +558,7 @@ namespace SIXTRL_CXX_NAMESPACE
         bool success = true;
         ( void )dump_elem_by_elem_turns;
 
-        if( ( ptr_out_buffer != nullptr ) && ( pb != nullptr ) &&
-            ( ( this->hasBeamMonitorOutput() ) ||
-              ( this->hasElemByElemOutput() ) ) )
+        if( ( ptr_out_buffer != nullptr ) && ( pb != nullptr ) )
         {
             cl::CommandQueue* ptr_queue = ( this->ptrContext() != nullptr )
                 ? this->context().openClQueue() : nullptr;
@@ -565,11 +575,15 @@ namespace SIXTRL_CXX_NAMESPACE
                     this->outputBufferArg() );
             }
 
-            if( ( success ) && ( this->ptrContext() != nullptr ) &&
-                ( ptr_queue != nullptr ) && ( this->hasElemByElemOutput() ) &&
+            if( ( success ) && ( this->ptrContext()   != nullptr ) &&
+                ( this->ptrContext()->openClContext() != nullptr ) &&
+                ( ptr_queue != nullptr ) &&
                 ( this->ptrElemByElemConfig() != nullptr ) )
             {
-                ptr_buffer_t ptr_buffer( new cl_buffer_t );
+                ptr_buffer_t ptr_buffer( new cl_buffer_t(
+                    *( this->ptrContext()->openClContext() ), CL_MEM_READ_WRITE,
+                    sizeof( elem_config_t ), nullptr ) );
+
                 this->doUpdateStoredClElemByElemConfigBuffer(
                     std::move( ptr_buffer ) );
 
@@ -591,10 +605,6 @@ namespace SIXTRL_CXX_NAMESPACE
                                 this->elemByElemOutputBufferOffset() ) ) ) ) );
                 }
             }
-        }
-        else if( ( ptr_out_buffer != nullptr ) || ( pb != nullptr ) )
-        {
-            success = false;
         }
 
         return success;
@@ -647,26 +657,30 @@ namespace SIXTRL_CXX_NAMESPACE
             flag_t const needs_output = ::NS(TrackJob_needs_output_buffer)(
                 part_buffer, belem_buffer, dump_elem_by_elem_turns );
 
-            if( needs_output != ::NS(TRACK_JOB_OUTPUT_NONE) )
+            this->doSetPtrCParticleBuffer( part_buffer );
+            this->doSetPtrCBeamElementsBuffer( belem_buffer );
+
+            if( ( needs_output != ::NS(TRACK_JOB_OUTPUT_NONE) ) ||
+                ( out_buffer   != nullptr ) )
             {
                 success = ( this->doPrepareOutputStructures( part_buffer,
                     belem_buffer, out_buffer, dump_elem_by_elem_turns ) );
-            }
 
-            if( ( success ) && ( this->hasOutputBuffer() ) &&
-                ( ( needs_output & ::NS(TRACK_JOB_OUTPUT_BEAM_MONITORS) ) ==
-                  ::NS(TRACK_JOB_OUTPUT_BEAM_MONITORS) ) )
-            {
-                success = ( ( _base_t::doAssignOutputBufferToBeamMonitors(
-                        belem_buffer, out_buffer ) ) &&
-                    ( this->doAssignOutputBufferToBeamMonitorsOclImp(
-                        belem_buffer, out_buffer ) ) );
+                if( ( success ) && ( this->hasOutputBuffer() ) &&
+                    ( needs_output != ::NS(TRACK_JOB_OUTPUT_NONE) ) )
+                {
+                    success = _base_t::doAssignOutputBufferToBeamMonitors(
+                            belem_buffer, this->ptrCOutputBuffer() );
+                }
+                else if( ( success ) &&
+                    ( out_buffer != nullptr ) && ( !this->ownsOutputBuffer() ) )
+                {
+                    this->doSetPtrCOutputBuffer( out_buffer );
+                }
             }
-            else if( ( success ) &&
-                ( needs_output != ::NS(TRACK_JOB_OUTPUT_NONE) ) &&
-                ( out_buffer != nullptr ) && ( !this->ownsOutputBuffer() ) )
+            else
             {
-                this->doSetPtrCOutputBuffer( out_buffer );
+                success = true;
             }
         }
 

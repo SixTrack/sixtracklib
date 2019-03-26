@@ -13,29 +13,22 @@ int main( int argc, char* argv[] )
     st_Buffer* track_pb       = SIXTRL_NULLPTR;
     st_Buffer* eb             = SIXTRL_NULLPTR;
     st_Buffer* out_buffer     = SIXTRL_NULLPTR;
+    st_TrackJobCl* job        = SIXTRL_NULLPTR;
 
-    st_Particles*   particles = SIXTRL_NULLPTR;
-
-    st_ClArgument* particle_buffer_arg = SIXTRL_NULLPTR;
-    st_ClArgument* beam_elements_arg   = SIXTRL_NULLPTR;
-    st_ClArgument* out_buffer_arg       = SIXTRL_NULLPTR;
+    char id_str[ 16 ];
 
     char* path_output_particles = SIXTRL_NULLPTR;
 
-    int NUM_PARTICLES                  = 0;
-    int NUM_TURNS                      = 1;
-    int DUMP_ELEM_BY_ELEM_TURNS      = 0;
-    int DUMP_TURN_BY_TURN_TURNS      = 0;
-    int NUM_IO_SKIP                    = 1;
+    int NUM_PARTICLES            = 0;
+    int NUM_TURNS                = 1;
+    int DUMP_ELEM_BY_ELEM_TURNS  = 0;
+    int DUMP_TURN_BY_TURN_TURNS  = 0;
+    int NUM_IO_SKIP              = 1;
 
     st_ClContext* context = st_ClContext_create();
 
-    st_buffer_size_t elem_by_elem_index_offset = ( st_buffer_size_t )0u;
-    st_buffer_size_t beam_monitor_index_offset = ( st_buffer_size_t )0u;
-    st_particle_index_t min_turn_id            = ( st_particle_index_t )0u;
-
-    unsigned int num_devices = 0u;
-    num_devices = st_ClContextBase_get_num_available_nodes( context );
+    unsigned int const num_devices =
+        st_ClContextBase_get_num_available_nodes( context );
 
     /* -------------------------------------------------------------------- */
     /* Read command line parameters */
@@ -160,13 +153,16 @@ int main( int argc, char* argv[] )
         st_context_node_info_t const* node_info =
             st_ClContextBase_get_selected_node_info( context );
 
-        char id_str[ 16 ];
+
         st_ComputeNodeId_to_string( node_id, &id_str[ 0 ], 16  );
 
         printf( "\r\n"
                 "Selected DEVICE_ID_STR   = %s (%s/%s)\r\n"
                 "\r\n", id_str, st_ComputeNodeInfo_get_name( node_info ),
                 st_ComputeNodeInfo_get_platform( node_info ) );
+
+        st_ClContext_delete( context );
+        context = SIXTRL_NULLPTR;
     }
 
     if( ( argc >= 5 ) &&
@@ -240,8 +236,7 @@ int main( int argc, char* argv[] )
     /* --------------------------------------------------------------------- */
     /* Prepare input and tracking data from run-time parameters: */
 
-    if( ( NUM_PARTICLES >= 0 ) && ( input_pb != SIXTRL_NULLPTR ) &&
-        ( st_ClContextBase_has_selected_node( context ) ) )
+    if( ( NUM_PARTICLES >= 0 ) && ( input_pb != SIXTRL_NULLPTR ) )
     {
         st_Particles const* in_particles =
             st_Particles_buffer_get_const_particles( input_pb, 0u );
@@ -266,13 +261,13 @@ int main( int argc, char* argv[] )
 
         if( NUM_PARTICLES == in_num_particles )
         {
-            particles = st_Particles_add_copy(
-                track_pb, in_particles );
+            st_Particles_add_copy( track_pb, in_particles );
         }
         else
         {
             int ii = 0;
-            particles = st_Particles_new( track_pb, NUM_PARTICLES );
+            st_Particles* particles =
+                st_Particles_new( track_pb, NUM_PARTICLES );
 
             for( ; ii < NUM_PARTICLES ; ++ii )
             {
@@ -322,41 +317,24 @@ int main( int argc, char* argv[] )
             st_BeamMonitor_set_skip( beam_monitor, NUM_IO_SKIP );
             st_BeamMonitor_set_is_rolling( beam_monitor, true );
         }
-
-        out_buffer = st_Buffer_new( 0u );
-
-        st_OutputBuffer_prepare( eb, out_buffer, particles,
-            DUMP_ELEM_BY_ELEM_TURNS, &elem_by_elem_index_offset,
-                &beam_monitor_index_offset, &min_turn_id );
-
-        particle_buffer_arg = st_ClArgument_new_from_buffer( track_pb, context );
-        beam_elements_arg = st_ClArgument_new_from_buffer( eb, context );
-        out_buffer_arg  = st_ClArgument_new_from_buffer( out_buffer, context );
     }
+
+    /* --------------------------------------------------------------------- */
+    /* Prepare trackjob */
+
+    job = st_TrackJobCl_new_with_output(
+        id_str, track_pb, eb, SIXTRL_NULLPTR, DUMP_ELEM_BY_ELEM_TURNS );
 
     /* ********************************************************************* */
     /* ****            PERFORM TRACKING AND IO OPERATIONS            ******* */
     /* ********************************************************************* */
 
-    if( ( particles != SIXTRL_NULLPTR ) &&
-        ( NUM_PARTICLES > 0 ) && ( NUM_TURNS > 0 ) &&
-        ( particle_buffer_arg != SIXTRL_NULLPTR ) &&
-        ( beam_elements_arg   != SIXTRL_NULLPTR ) &&
-        ( out_buffer_arg       != SIXTRL_NULLPTR ) )
+    if( ( NUM_PARTICLES > 0 ) && ( NUM_TURNS > 0 ) )
     {
-        st_particle_index_t min_turn_id = ( st_particle_index_t )0;
-        st_particle_index_t max_turn_id = ( st_particle_index_t )-1;
-
-        st_Particles_get_min_max_at_turn_value(
-            particles, &min_turn_id, &max_turn_id );
-
-        st_ClContext_assign_beam_monitor_out_buffer( context,
-            beam_elements_arg, out_buffer_arg,
-            min_turn_id, beam_monitor_index_offset );
-
-        st_ClContext_track_element_by_element(
-            context, particle_buffer_arg, beam_elements_arg,
-            out_buffer_arg, DUMP_ELEM_BY_ELEM_TURNS, 0u );
+        if( DUMP_ELEM_BY_ELEM_TURNS > 0u )
+        {
+            st_TrackJobCl_track_elem_by_elem( job, DUMP_ELEM_BY_ELEM_TURNS );
+        }
 
         if( NUM_TURNS > DUMP_ELEM_BY_ELEM_TURNS )
         {
@@ -371,8 +349,7 @@ int main( int argc, char* argv[] )
             double const start_tracking_time =
                 st_Time_get_seconds_since_epoch();
 
-            st_ClContext_track( context, particle_buffer_arg,
-                beam_elements_arg, NUM_TURNS );
+            st_TrackJobCl_track_until_turn( job, NUM_TURNS );
 
             end_tracking_time = st_Time_get_seconds_since_epoch();
 
@@ -387,25 +364,23 @@ int main( int argc, char* argv[] )
                     tracking_time );
         }
 
-        st_ClArgument_read( particle_buffer_arg, track_pb );
-        st_ClArgument_read( out_buffer_arg, out_buffer );
-        st_Particles_add_copy( out_buffer,
-            st_Particles_buffer_get_const_particles( track_pb, 0u ) );
+        st_TrackJobCl_collect( job );
+        out_buffer = st_TrackJob_get_output_buffer( job );
 
-        st_Buffer_write_to_file( out_buffer, path_output_particles );
+        if( ( out_buffer != SIXTRL_NULLPTR ) &&
+            ( path_output_particles != SIXTRL_NULLPTR ) )
+        {
+            st_Buffer_write_to_file( out_buffer, path_output_particles );
+        }
     }
 
     /* ********************************************************************* */
     /* ********                       CLEANUP                        ******* */
     /* ********************************************************************* */
 
-    st_ClArgument_delete( particle_buffer_arg );
-    st_ClArgument_delete( beam_elements_arg );
-    st_ClArgument_delete( out_buffer_arg );
-
     st_Buffer_delete( eb );
     st_Buffer_delete( track_pb );
-    st_Buffer_delete( out_buffer );
+    st_TrackJobCl_delete( job );
 
     free( path_output_particles );
 
