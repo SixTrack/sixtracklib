@@ -54,6 +54,12 @@ namespace SIXTRL_CXX_NAMESPACE
         using kernel_id_t       = int64_t;
         using program_id_t      = int64_t;
         using kernel_arg_id_t   = int64_t;
+        using kernel_arg_type_t = uint32_t;
+
+        static kernel_arg_type_t const ARG_TYPE_NONE;
+        static kernel_arg_type_t const ARG_TYPE_VALUE;
+        static kernel_arg_type_t const ARG_TYPE_RAW_PTR;
+        static kernel_arg_type_t const ARG_TYPE_INVALID;
 
         explicit ClContextBase(
             const char *const SIXTRL_RESTRICT config_str = nullptr );
@@ -235,6 +241,9 @@ namespace SIXTRL_CXX_NAMESPACE
         ClArgument* ptrKernelArgument( kernel_id_t const kernel_id,
             size_type const arg_index ) SIXTRL_NOEXCEPT;
 
+        kernel_arg_type_t kernelArgumentType( kernel_id_t const kernel_id,
+            size_type const arg_index) const SIXTRL_NOEXCEPT;
+
         ClArgument const* ptrKernelArgument( kernel_id_t const kernel_id,
             size_type const arg_index ) const SIXTRL_NOEXCEPT;
 
@@ -250,54 +259,36 @@ namespace SIXTRL_CXX_NAMESPACE
         void assignKernelArgumentPtr( kernel_id_t const kernel_id,
             size_type const arg_index, T* SIXTRL_RESTRICT ptr ) SIXTRL_NOEXCEPT
         {
-             if( ( kernel_id >= kernel_id_t{ 0 } ) && ( static_cast< size_type >(
-                   kernel_id ) < this->numAvailableKernels() ) )
-            {
-                cl::Kernel* kernel = this->openClKernel( kernel_id );
+            using _this_t = ClContextBase;
+            using size_t  = _this_t::size_type;
 
-                kernel_data_t& kernel_data = this->m_kernel_data[ kernel_id ];
-                size_type const nn = kernel_data.m_num_args;
+            SIXTRL_ASSERT( kernel_id >= kernel_id_t{ 0 } );
+            SIXTRL_ASSERT( static_cast< size_t >( kernel_id ) <
+                           this->numAvailableKernels() );
 
-                if( ( kernel != nullptr ) && ( arg_index < nn ) &&
-                    ( kernel_data.m_arguments.size() > arg_index ) )
-                {
-                    if( kernel_data.m_arguments[ arg_index ] != nullptr )
-                    {
-                        kernel_data.m_arguments[ arg_index ] = nullptr;
-                    }
+            this->m_kernel_data[ kernel_id ].setKernelArg(
+                    _this_t::ARG_TYPE_RAW_PTR, arg_index, nullptr );
 
-                    kernel->setArg( arg_index, ptr );
-                }
-            }
-
-            return;
+            cl::Kernel* kernel = this->openClKernel( kernel_id );
+            if( kernel != nullptr ) kernel->setArg( arg_index, ptr );
         }
 
         template< typename T >
         void assignKernelArgumentValue( kernel_id_t const kernel_id,
             size_type const arg_index, T& SIXTRL_RESTRICT_REF ref ) SIXTRL_NOEXCEPT
         {
-             if( ( kernel_id >= kernel_id_t{ 0 } ) && ( static_cast< size_type >(
-                   kernel_id ) < this->numAvailableKernels() ) )
-            {
-                cl::Kernel* kernel = this->openClKernel( kernel_id );
+            using _this_t = ClContextBase;
+            using size_t  = _this_t::size_type;
 
-                kernel_data_t& kernel_data = this->m_kernel_data[ kernel_id ];
-                size_type const nn = kernel_data.m_num_args;
+            SIXTRL_ASSERT( kernel_id >= kernel_id_t{ 0 } );
+            SIXTRL_ASSERT( static_cast< size_t >( kernel_id ) <
+                           this->numAvailableKernels() );
 
-                if( ( kernel != nullptr ) && ( arg_index < nn ) &&
-                    ( kernel_data.m_arguments.size() > arg_index ) )
-                {
-                    if( kernel_data.m_arguments[ arg_index ] != nullptr )
-                    {
-                        kernel_data.m_arguments[ arg_index ] = nullptr;
-                    }
+            this->m_kernel_data[ kernel_id ].setKernelArg(
+                _this_t::ARG_TYPE_VALUE, arg_index, nullptr );
 
-                    kernel->setArg( arg_index, ref );
-                }
-            }
-
-            return;
+            cl::Kernel* kernel = this->openClKernel( kernel_id );
+            if( kernel != nullptr ) kernel->setArg( arg_index, ref );
         }
 
         void assignKernelArgumentClBuffer(
@@ -382,6 +373,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         using kernel_data_t = struct KernelData
         {
+            using arg_type_t = kernel_arg_type_t;
+
+            static const arg_type_t
+                ARG_TYPE_CL_ARGUMENT = arg_type_t{ 0x00000010 };
+
+            static const arg_type_t
+                ARG_TYPE_CL_BUFFER   = arg_type_t{ 0x00000020 };
+
+
             KernelData() :
                 m_kernel_name(),
                 m_program_id( -1 ),
@@ -397,7 +397,8 @@ namespace SIXTRL_CXX_NAMESPACE
                 m_max_exec_time(  std::numeric_limits< double >::min() ),
                 m_last_exec_time( double{ 0 } ),
                 m_sum_exec_time( double{ 0 } ),
-                m_arguments()
+                m_arguments(),
+                m_arg_types()
             {
 
             }
@@ -409,6 +410,36 @@ namespace SIXTRL_CXX_NAMESPACE
             KernelData& operator=( KernelData&& rhs ) = default;
 
             ~KernelData() = default;
+
+            void resetArguments( size_type const nargs )
+            {
+                using _this_t = ClContextBase;
+
+                this->m_arguments.clear();
+                this->m_arg_types.clear();
+
+                if( nargs > size_type{ 0 }  )
+                {
+                    this->m_arguments.resize( nargs, nullptr );
+                    this->m_arg_types.resize( nargs, _this_t::ARG_TYPE_NONE );
+                }
+
+                this->m_num_args = nargs;
+            }
+
+            void setKernelArg( arg_type_t const type, size_type const index,
+                               void* SIXTRL_RESTRICT ptr = nullptr )
+            {
+                SIXTRL_ASSERT( this->m_arguments.size() ==
+                               this->m_arg_types.size() );
+
+                if( index < this->m_arguments.size() )
+                {
+                    this->m_arg_types[ index ] = type;
+                    this->m_arguments[ index ] =
+                        reinterpret_cast< ClArgument* >( ptr );
+                }
+            }
 
             void resetTiming() SIXTRL_NOEXCEPT
             {
@@ -466,7 +497,21 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 SIXTRL_ASSERT( arg_index < this->m_num_args );
                 SIXTRL_ASSERT( this->m_arguments.size() > arg_index );
+                SIXTRL_ASSERT( this->m_arg_types.size() ==
+                               this->m_arguments.size() );
+
                 this->m_arguments[ arg_index ] = ptr_to_arg;
+            }
+
+            void setArgumentType( size_type const arg_index,
+                                  kernel_arg_type_t const type )
+            {
+                SIXTRL_ASSERT( arg_index < this->m_num_args );
+                SIXTRL_ASSERT( this->m_arg_types.size() > arg_index );
+                SIXTRL_ASSERT( this->m_arg_types.size() ==
+                               this->m_arguments.size() );
+
+                this->m_arg_types[ arg_index ] = type;
             }
 
             std::string   m_kernel_name;
@@ -486,7 +531,8 @@ namespace SIXTRL_CXX_NAMESPACE
             double        m_last_exec_time;
             double        m_sum_exec_time;
 
-            std::vector< ClArgument* > m_arguments;
+            std::vector< ClArgument* >       m_arguments;
+            std::vector< kernel_arg_type_t > m_arg_types;
         };
 
         using program_data_list_t = std::vector< program_data_t >;
@@ -574,8 +620,10 @@ namespace SIXTRL_CXX_NAMESPACE
     };
 }
 
-
 using NS(ClContextBase) = SIXTRL_CXX_NAMESPACE::ClContextBase;
+
+using NS(kernel_arg_type_t) =
+    SIXTRL_CXX_NAMESPACE::ClContextBase::kernel_arg_type_t;
 
 #else /* defined( __cplusplus ) */
 
@@ -584,6 +632,7 @@ using NS(ClContextBase) = SIXTRL_CXX_NAMESPACE::ClContextBase;
     #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 typedef void NS(ClContextBase);
+typedef uint32_t NS(kernel_arg_type_t);
 
 #endif /* defined( __cplusplus ) */
 
@@ -772,6 +821,11 @@ SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_exec_counter)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
 SIXTRL_HOST_FN NS(ClArgument)* NS(ClContextBase_get_ptr_kernel_argument)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
+
+SIXTRL_HOST_FN NS(kernel_arg_type_t)
+NS(ClContextBase_get_kernel_argument_type)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
     NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
 

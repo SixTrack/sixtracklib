@@ -26,6 +26,18 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
+    ClContextBase::kernel_arg_type_t const ClContextBase::ARG_TYPE_NONE =
+        ClContextBase::kernel_arg_type_t{ 0x00000000 };
+
+    ClContextBase::kernel_arg_type_t const ClContextBase::ARG_TYPE_VALUE =
+        ClContextBase::kernel_arg_type_t{ 0x00000001 };
+
+    ClContextBase::kernel_arg_type_t const ClContextBase::ARG_TYPE_RAW_PTR =
+        ClContextBase::kernel_arg_type_t{ 0x00000002 };
+
+    ClContextBase::kernel_arg_type_t const ClContextBase::ARG_TYPE_INVALID =
+        ClContextBase::kernel_arg_type_t{ 0xffffffff };
+
     ClContextBase::ClContextBase(
         const char *const SIXTRL_RESTRICT config_str ) :
         m_cl_programs(),
@@ -1058,12 +1070,8 @@ namespace SIXTRL_CXX_NAMESPACE
                 this->m_kernel_data.back().m_kernel_name = kernel_name;
                 this->m_kernel_data.back().m_program_id  = program_id;
 
-                size_type const num_args =
-                    kernel.getInfo< CL_KERNEL_NUM_ARGS >();
-
-                this->m_kernel_data.back().m_num_args = num_args;
-                this->m_kernel_data.back().m_arguments.resize(
-                    num_args, nullptr );
+                this->m_kernel_data.back().resetArguments(
+                    kernel.getInfo< CL_KERNEL_NUM_ARGS >() );
 
                 cl::Device& selected_device = this->m_available_devices.at(
                     this->m_selected_node_index );
@@ -1321,27 +1329,31 @@ namespace SIXTRL_CXX_NAMESPACE
         return ptr_arg;
     }
 
+    ClContextBase::kernel_arg_type_t ClContextBase::kernelArgumentType(
+        ClContextBase::kernel_id_t const kernel_id,
+        ClContextBase::size_type const arg_index) const SIXTRL_NOEXCEPT
+    {
+        return ( ( static_cast< size_t >( kernel_id ) <
+                   this->m_kernel_data.size() ) &&
+                 ( arg_index < this->m_kernel_data[ kernel_id ].m_num_args ) )
+            ? this->m_kernel_data[ kernel_id ].m_arg_types[ arg_index ]
+            : SIXTRL_CXX_NAMESPACE::ClContextBase::ARG_TYPE_INVALID;
+    }
+
     void ClContextBase::assignKernelArgument(
         ClContextBase::kernel_id_t const kernel_id,
-        ClContextBase::size_type const arg_index,
+        ClContextBase::size_type const index,
         ClArgument& SIXTRL_RESTRICT_REF arg )
     {
-        if( ( kernel_id >= kernel_id_t{ 0 } ) && ( static_cast< size_type >(
-              kernel_id ) < this->numAvailableKernels() ) &&
-            ( arg.context() == this ) && ( arg.size() > size_type{ 0 } ) )
-        {
-            cl::Kernel* kernel = this->openClKernel( kernel_id );
+        SIXTRL_ASSERT( arg.context() == this );
+        SIXTRL_ASSERT( arg.size() > ClContextBase::size_type{ 0 } );
 
-            kernel_data_t& kernel_data = this->m_kernel_data[ kernel_id ];
+        this->m_kernel_data.at( kernel_id ).setKernelArg(
+            ClContextBase::kernel_data_t::ARG_TYPE_CL_ARGUMENT, index, &arg );
 
-            if( ( kernel_data.m_num_args > arg_index ) && ( kernel != nullptr ) )
-            {
-                kernel_data.m_arguments[ arg_index ] = &arg;
-                kernel->setArg( arg_index, arg.openClBuffer() );
-            }
-        }
+        cl::Kernel* kernel = this->openClKernel( kernel_id );
+        if( kernel != nullptr ) kernel->setArg( index, arg.openClBuffer() );
 
-        return;
     }
 
     void ClContextBase::assignKernelArgumentClBuffer(
@@ -1349,21 +1361,12 @@ namespace SIXTRL_CXX_NAMESPACE
             ClContextBase::size_type const arg_index,
             cl::Buffer& SIXTRL_RESTRICT_REF cl_buffer_arg )
     {
-        if( ( kernel_id >= kernel_id_t{ 0 } ) && ( static_cast< size_type >(
-              kernel_id ) < this->numAvailableKernels() ) )
-        {
-            cl::Kernel* kernel = this->openClKernel( kernel_id );
+        using _this_t = ClContextBase;
+        this->m_kernel_data.at( kernel_id ).setKernelArg(
+            _this_t::kernel_data_t::ARG_TYPE_CL_BUFFER, arg_index, nullptr );
 
-            kernel_data_t& kernel_data = this->m_kernel_data[ kernel_id ];
-
-            if( ( kernel_data.m_num_args > arg_index ) && ( kernel != nullptr ) )
-            {
-                kernel_data.m_arguments[ arg_index ] = nullptr;
-                kernel->setArg( arg_index, cl_buffer_arg );
-            }
-        }
-
-        return;
+        cl::Kernel* kernel = this->openClKernel( kernel_id );
+        if( kernel != nullptr ) kernel->setArg( arg_index, cl_buffer_arg );
     }
 
     void ClContextBase::resetKernelArguments(
@@ -1388,15 +1391,11 @@ namespace SIXTRL_CXX_NAMESPACE
                     if( kernel_data.m_arguments[ ii ] != nullptr )
                     {
                         kernel->setArg( ii, this->m_default_kernel_arg );
-                        kernel_data.m_arguments[ ii ] = nullptr;
                     }
                 }
             }
-            else
-            {
-                kernel_data.m_arguments.resize(
-                    kernel_data.m_num_args, nullptr );
-            }
+
+            kernel_data.resetArguments( nn );
         }
 
         return;
@@ -1406,26 +1405,14 @@ namespace SIXTRL_CXX_NAMESPACE
         ClContextBase::kernel_id_t const kernel_id,
         ClContextBase::size_type const arg_index ) SIXTRL_NOEXCEPT
     {
-        if( ( kernel_id >= kernel_id_t{ 0 } ) && ( static_cast< size_type >(
-              kernel_id ) < this->numAvailableKernels() ) )
-        {
-            cl::Kernel* kernel = this->openClKernel( kernel_id );
+        using _this_t = ClContextBase;
 
-            kernel_data_t& kernel_data = this->m_kernel_data[ kernel_id ];
-            size_type const nn = kernel_data.m_num_args;
+        cl::Kernel* kernel = this->openClKernel( kernel_id );
+        if( kernel != nullptr ) kernel->setArg(
+                arg_index, this->m_default_kernel_arg );
 
-            if( ( kernel != nullptr ) && ( arg_index < nn ) &&
-                ( kernel_data.m_arguments.size() > arg_index ) )
-            {
-                if( kernel_data.m_arguments[ arg_index ] != nullptr )
-                {
-                    kernel->setArg( arg_index, this->m_default_kernel_arg );
-                    kernel_data.m_arguments[ arg_index ] = nullptr;
-                }
-            }
-        }
-
-        return;
+        this->m_kernel_data.at( kernel_id ).setKernelArg(
+            _this_t::ARG_TYPE_NONE, arg_index, nullptr );
     }
 
     ClContextBase::size_type ClContextBase::calculateKernelNumWorkItems(
@@ -2570,6 +2557,14 @@ SIXTRL_HOST_FN NS(ClArgument)* NS(ClContextBase_get_ptr_kernel_argument)(
 {
     return ( ctx != nullptr )
         ? ctx->ptrKernelArgument( kernel_id, arg_index ) : nullptr;
+}
+
+SIXTRL_HOST_FN NS(kernel_arg_type_t) NS(ClContextBase_get_kernel_argument_type)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT
+{
+    return ( ctx != nullptr ) ? ctx->kernelArgumentType( kernel_id, arg_index )
+        : SIXTRL_CXX_NAMESPACE::ClContextBase::ARG_TYPE_INVALID;
 }
 
 SIXTRL_HOST_FN NS(ClArgument) const*
