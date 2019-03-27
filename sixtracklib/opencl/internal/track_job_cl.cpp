@@ -532,9 +532,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 ( this->beamElementsArg().usesCObjectBuffer() ) &&
                 ( this->beamElementsArg().context() == this->ptrContext() ) &&
                 ( this->beamElementsArg().ptrCObjectBuffer() == belems ) &&
-                ( ( this->context().hasSelectedNode() ) ||
-                  ( this->context().assignBeamElementsArg(
-                        this->beamElementsArg() ) ) ) );
+                ( ( !this->context().hasSelectedNode() ) ||
+                  (  this->context().assignBeamElementsArg(
+                         this->beamElementsArg() ) ) ) );
         }
 
         return success;
@@ -873,21 +873,20 @@ SIXTRL_HOST_FN void NS(TrackJobCl_delete)(
     delete track_job;
 }
 
-SIXTRL_HOST_FN bool NS(TrackJobCl_track_until_turn)(
+SIXTRL_HOST_FN NS(track_status_t) NS(TrackJobCl_track_until_turn)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
     NS(buffer_size_t) const until_turn )
 {
     SIXTRL_ASSERT( track_job != nullptr );
-    return ( 0 == SIXTRL_CXX_NAMESPACE::track( *track_job, until_turn ) );
+    return SIXTRL_CXX_NAMESPACE::track( *track_job, until_turn );
 }
 
-SIXTRL_HOST_FN bool NS(TrackJobCl_track_elem_by_elem)(
+SIXTRL_HOST_FN NS(track_status_t) NS(TrackJobCl_track_elem_by_elem)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
     NS(buffer_size_t) const until_turn )
 {
     SIXTRL_ASSERT( track_job != nullptr );
-    return ( 0 == SIXTRL_CXX_NAMESPACE::trackElemByElem(
-        *track_job, until_turn ) );
+    return SIXTRL_CXX_NAMESPACE::trackElemByElem( *track_job, until_turn );
 }
 
 SIXTRL_HOST_FN void NS(TrackJobCl_collect)(
@@ -908,6 +907,53 @@ SIXTRL_HOST_FN NS(ClContext) const* NS(TrackJobCl_get_const_context)(
     const NS(TrackJobCl) *const SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr ) ? track_job->ptrContext() : nullptr;
+}
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
+NS(TrackJobCl_get_particles_buffer_arg)(
+    NS(TrackJobCl)* SIXTRL_RESTRICT track_job )
+{
+    return ( track_job != nullptr ) ? track_job->ptrParticlesArg() : nullptr;
+}
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
+NS(TrackJobCl_get_const_particles_buffer_arg)(
+    const NS(TrackJobCl) *const SIXTRL_RESTRICT track_job )
+{
+    return ( track_job != nullptr ) ? track_job->ptrParticlesArg() : nullptr;
+}
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
+NS(TrackJobCl_get_beam_elements_buffer_arg)(
+    NS(TrackJobCl)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->ptrBeamElementsArg() : nullptr;
+}
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
+NS(TrackJobCl_get_const_beam_elements_buffer_arg)(
+    const NS(TrackJobCl) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->ptrBeamElementsArg() : nullptr;
+}
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_has_output_buffer_arg)(
+    const NS(TrackJobCl) *const SIXTRL_RESTRICT job )
+{
+    return ( ( job != nullptr ) && ( job->ptrOutputBufferArg() != nullptr ) );
+}
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
+NS(TrackJobCl_get_output_buffer_arg)( NS(TrackJobCl)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->ptrOutputBufferArg() : nullptr;
+}
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
+NS(TrackJobCl_get_const_output_buffer_arg)(
+    const NS(TrackJobCl) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->ptrOutputBufferArg() : nullptr;
 }
 
 /* end: /opencl/internal/track_job_cl.cpp */

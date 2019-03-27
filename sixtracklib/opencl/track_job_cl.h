@@ -365,11 +365,13 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_reset_detailed)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobCl_delete)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_track_until_turn)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t)
+NS(TrackJobCl_track_until_turn)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
     NS(buffer_size_t) const until_turn );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_track_elem_by_elem)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t)
+NS(TrackJobCl_track_elem_by_elem)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
     NS(buffer_size_t) const until_turn );
 
@@ -381,6 +383,33 @@ NS(TrackJobCl_get_context)( NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClContext) const*
 NS(TrackJobCl_get_const_context)(
+    const NS(TrackJobCl) *const SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
+NS(TrackJobCl_get_particles_buffer_arg)(
+    NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
+NS(TrackJobCl_get_const_particles_buffer_arg)(
+    const NS(TrackJobCl) *const SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
+NS(TrackJobCl_get_beam_elements_buffer_arg)(
+    NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
+NS(TrackJobCl_get_const_beam_elements_buffer_arg)(
+    const NS(TrackJobCl) *const SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_has_output_buffer_arg)(
+    const NS(TrackJobCl) *const SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
+NS(TrackJobCl_get_output_buffer_arg)(
+    NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
+NS(TrackJobCl_get_const_output_buffer_arg)(
     const NS(TrackJobCl) *const SIXTRL_RESTRICT track_job );
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
