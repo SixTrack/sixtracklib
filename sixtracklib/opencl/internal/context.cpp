@@ -325,7 +325,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     this->elementByElementTrackingKernelId();
 
                 success &= ( this->kernelNumArgs( kernel_id ) >= size_t{6u} );
-                this->assignKernelArgument( kernel_id, 3u, out_buffer_arg );
+                this->assignKernelArgument( kernel_id, 2u, out_buffer_arg );
             }
 
             if( this->hasAssignBeamMonitorIoBufferKernel() )
