@@ -13,7 +13,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/internal/compute_arch.h"
+    #include "sixtracklib/common/context/compute_arch.h"
     #include "sixtracklib/common/context/context_abs_base.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 

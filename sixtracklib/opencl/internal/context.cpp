@@ -18,7 +18,7 @@
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
-#include "sixtracklib/common/internal/compute_arch.h"
+#include "sixtracklib/common/context/compute_arch.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/output/elem_by_elem_config.h"
