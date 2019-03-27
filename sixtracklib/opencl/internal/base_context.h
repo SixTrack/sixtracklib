@@ -260,10 +260,9 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const arg_index, T* SIXTRL_RESTRICT ptr ) SIXTRL_NOEXCEPT
         {
             using _this_t = ClContextBase;
-            using size_t  = _this_t::size_type;
 
             SIXTRL_ASSERT( kernel_id >= kernel_id_t{ 0 } );
-            SIXTRL_ASSERT( static_cast< size_t >( kernel_id ) <
+            SIXTRL_ASSERT( static_cast< _this_t::size_type >( kernel_id ) <
                            this->numAvailableKernels() );
 
             this->m_kernel_data[ kernel_id ].setKernelArg(
@@ -278,10 +277,9 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const arg_index, T& SIXTRL_RESTRICT_REF ref ) SIXTRL_NOEXCEPT
         {
             using _this_t = ClContextBase;
-            using size_t  = _this_t::size_type;
 
             SIXTRL_ASSERT( kernel_id >= kernel_id_t{ 0 } );
-            SIXTRL_ASSERT( static_cast< size_t >( kernel_id ) <
+            SIXTRL_ASSERT( static_cast< _this_t::size_type >( kernel_id ) <
                            this->numAvailableKernels() );
 
             this->m_kernel_data[ kernel_id ].setKernelArg(
