@@ -1,7 +1,6 @@
 set( SIXTRL_COMMON_INTERNAL_C99_HEADERS
     beam_elements_defines.h
     beam_elements_undef.h
-#     compute_arch.h
     buffer_garbage_defines.h
     buffer_garbage_undef.h
     buffer_main_defines.h
@@ -17,7 +16,6 @@ set( SIXTRL_COMMON_INTERNAL_C99_HEADERS
 )
 
 set( SIXTRL_COMMON_INTERNAL_C99_SOURCES
-#     compute_arch.c
     particles.c
     track.c
 )
