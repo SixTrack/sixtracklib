@@ -719,31 +719,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             for( ; node_it != node_end ; ++node_it )
             {
-                node_id_t const current_node_id = node_it->id;
-
-                char default_str[ 16 ] =
-                {
-                    '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
-                    '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
-                };
-
-                char id_str[ 16 ] =
-                {
-                    '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
-                    '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
-                };
-
-                NS(ComputeNodeId_to_string)( &current_node_id, &id_str[ 0 ], 16 );
-
-                if( NS(ComputeNodeId_are_equal)(
-                        &current_node_id, &default_node_id ) )
-                {
-                    strcpy( &default_str[ 0 ], "[DEFAULT] " );
-                }
-
-                std::printf( "%-10s      :: %s %s\r\n" "                :: %s\r\n"
-                        "\r\n", id_str, default_str,
-                        node_it->name, node_it->platform );
+                ::NS(ComputeNodeInfo_print_out)( node_it, &default_node_id );
             }
         }
         else
