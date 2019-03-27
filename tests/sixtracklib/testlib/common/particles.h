@@ -59,6 +59,15 @@ void NS(Particles_get_max_difference)(
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
 
+void NS(Particles_print_single)(
+    FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    NS(buffer_size_t) const index );
+
+void NS(Particles_print_out_single)(
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    NS(buffer_size_t) const index );
+
 void NS(Particles_print)(
     FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles );

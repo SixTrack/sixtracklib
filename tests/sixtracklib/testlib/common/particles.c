@@ -1155,6 +1155,84 @@ void NS(Particles_get_max_difference)(
     return;
 }
 
+void NS(Particles_print_single)(
+    FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    NS(buffer_size_t) const index )
+{
+    NS(buffer_size_t) const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    if( ( fp != SIXTRL_NULLPTR ) && ( particles != SIXTRL_NULLPTR ) &&
+        ( index < num_particles ) )
+    {
+        fprintf( fp, "q0             = %.16f\r\n",
+                 NS(Particles_get_q0_value)( particles, index ) );
+
+        fprintf( fp, "mass0          = %.16f\r\n",
+                 NS(Particles_get_mass0_value)( particles, index ) );
+
+        fprintf( fp, "beta0          = %.16f\r\n",
+                 NS(Particles_get_beta0_value)( particles, index ) );
+
+        fprintf( fp, "gamma0         = %.16f\r\n",
+                 NS(Particles_get_gamma0_value)( particles, index ) );
+
+        fprintf( fp, "p0c            = %.16f\r\n",
+                 NS(Particles_get_p0c_value)( particles, index ) );
+
+        fprintf( fp, "s              = %.16f\r\n",
+                 NS(Particles_get_s_value)( particles, index ) );
+
+        fprintf( fp, "x              = %.16f\r\n",
+                 NS(Particles_get_x_value)( particles, index ) );
+
+        fprintf( fp, "y              = %.16f\r\n",
+                 NS(Particles_get_y_value)( particles, index ) );
+
+        fprintf( fp, "px             = %.16f\r\n",
+                 NS(Particles_get_px_value)( particles, index ) );
+
+        fprintf( fp, "py             = %.16f\r\n",
+                 NS(Particles_get_py_value)( particles, index ) );
+
+        fprintf( fp, "zeta           = %.16f\r\n",
+                 NS(Particles_get_zeta_value)( particles, index ) );
+
+        fprintf( fp, "psigma         = %.16f\r\n",
+                 NS(Particles_get_psigma_value)( particles, index ) );
+
+        fprintf( fp, "delta          = %.16f\r\n",
+                 NS(Particles_get_delta_value)( particles, index ) );
+
+        fprintf( fp, "rpp            = %.16f\r\n",
+                 NS(Particles_get_rpp_value)( particles, index ) );
+
+        fprintf( fp, "rvv            = %.16f\r\n",
+                 NS(Particles_get_rvv_value)( particles, index ) );
+
+        fprintf( fp, "chi            = %.16f\r\n",
+                 NS(Particles_get_chi_value)( particles, index ) );
+
+        fprintf( fp, "charge_ratio   = %.16f\r\n",
+                 NS(Particles_get_charge_ratio_value)( particles, index ) );
+
+        fprintf( fp, "particle_id    = %18ld\r\n",
+                 NS(Particles_get_particle_id_value)( particles, index ) );
+
+        fprintf( fp, "at_elem_id     = %18ld\r\n",
+                 NS(Particles_get_at_element_id_value)( particles, index ) );
+
+        fprintf( fp, "at_turn        = %18ld\r\n",
+                 NS(Particles_get_at_turn_value)( particles, index ) );
+
+        fprintf( fp, "state          = %18ld\r\n\r\n",
+                 NS(Particles_get_state_value)( particles, index ) );
+    }
+
+    return;
+}
+
 void NS(Particles_print)(
     FILE* SIXTRL_RESTRICT fp,
     const NS(Particles) *const SIXTRL_RESTRICT particles )
@@ -1173,71 +1251,18 @@ void NS(Particles_print)(
                 fprintf( fp, "particle id    = %8lu\r\n", ii );
             }
 
-            fprintf( fp, "q0             = %.16f\r\n",
-                     NS(Particles_get_q0_value)( particles, ii ) );
-
-            fprintf( fp, "mass0          = %.16f\r\n",
-                     NS(Particles_get_mass0_value)( particles, ii ) );
-
-            fprintf( fp, "beta0          = %.16f\r\n",
-                     NS(Particles_get_beta0_value)( particles, ii ) );
-
-            fprintf( fp, "gamma0         = %.16f\r\n",
-                     NS(Particles_get_gamma0_value)( particles, ii ) );
-
-            fprintf( fp, "p0c            = %.16f\r\n",
-                     NS(Particles_get_p0c_value)( particles, ii ) );
-
-            fprintf( fp, "s              = %.16f\r\n",
-                     NS(Particles_get_s_value)( particles, ii ) );
-
-            fprintf( fp, "x              = %.16f\r\n",
-                     NS(Particles_get_x_value)( particles, ii ) );
-
-            fprintf( fp, "y              = %.16f\r\n",
-                     NS(Particles_get_y_value)( particles, ii ) );
-
-            fprintf( fp, "px             = %.16f\r\n",
-                     NS(Particles_get_px_value)( particles, ii ) );
-
-            fprintf( fp, "py             = %.16f\r\n",
-                     NS(Particles_get_py_value)( particles, ii ) );
-
-            fprintf( fp, "zeta           = %.16f\r\n",
-                     NS(Particles_get_zeta_value)( particles, ii ) );
-
-            fprintf( fp, "psigma         = %.16f\r\n",
-                     NS(Particles_get_psigma_value)( particles, ii ) );
-
-            fprintf( fp, "delta          = %.16f\r\n",
-                     NS(Particles_get_delta_value)( particles, ii ) );
-
-            fprintf( fp, "rpp            = %.16f\r\n",
-                     NS(Particles_get_rpp_value)( particles, ii ) );
-
-            fprintf( fp, "rvv            = %.16f\r\n",
-                     NS(Particles_get_rvv_value)( particles, ii ) );
-
-            fprintf( fp, "chi            = %.16f\r\n",
-                     NS(Particles_get_chi_value)( particles, ii ) );
-
-            fprintf( fp, "charge_ratio   = %.16f\r\n",
-                     NS(Particles_get_charge_ratio_value)( particles, ii ) );
-
-            fprintf( fp, "particle_id    = %18ld\r\n",
-                     NS(Particles_get_particle_id_value)( particles, ii ) );
-
-            fprintf( fp, "at_elem_id     = %18ld\r\n",
-                     NS(Particles_get_at_element_id_value)( particles, ii ) );
-
-            fprintf( fp, "at_turn        = %18ld\r\n",
-                     NS(Particles_get_at_turn_value)( particles, ii ) );
-
-            fprintf( fp, "state          = %18ld\r\n\r\n",
-                     NS(Particles_get_state_value)( particles, ii ) );
+            NS(Particles_print_single)( fp, particles, ii );
         }
     }
 
+    return;
+}
+
+void NS(Particles_print_out_single)(
+    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    NS(buffer_size_t) const index )
+{
+    NS(Particles_print_single)( stdout, particles, index );
     return;
 }
 
