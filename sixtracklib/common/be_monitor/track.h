@@ -147,7 +147,8 @@ SIXTRL_INLINE int NS(Track_particle_beam_monitor)(
             in_particles, idx );
 
         num_elements_t const out_particle_id =
-            NS(BeamMonitor_get_store_particle_index)( monitor, turn, particle_id );
+            NS(BeamMonitor_get_store_particle_index)(
+                monitor, turn, particle_id );
 
         if( out_particle_id >= ( num_elements_t )0u )
         {
