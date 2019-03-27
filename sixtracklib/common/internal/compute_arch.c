@@ -16,44 +16,6 @@
 
 #if !defined( GPUCODE )
 
-extern SIXTRL_HOST_FN int NS(ComputeNodeId_to_string)(
-    const NS(ComputeNodeId) *const SIXTRL_RESTRICT id,
-    char* SIXTRL_RESTRICT str_buffer,
-    SIXTRL_UINT64_T const str_buffer_capacity );
-
-extern SIXTRL_HOST_FN int NS(ComputeNodeId_from_string)(
-    NS(ComputeNodeId)* SIXTRL_RESTRICT id,
-    char const* SIXTRL_RESTRICT str_buffer );
-
-#endif /* !defined( _GPUCODE ) */
-
-extern SIXTRL_HOST_FN NS(ComputeNodeId)* NS(ComputeNodeId_preset)(
-    NS(ComputeNodeId)* SIXTRL_RESTRICT id );
-
-extern SIXTRL_HOST_FN NS(ComputeNodeInfo)* NS(ComputeNodeInfo_preset)(
-    NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info );
-
-extern SIXTRL_HOST_FN void NS(ComputeNodeInfo_free)(
-    NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info );
-
-extern SIXTRL_HOST_FN NS(ComputeNodeInfo)* NS(ComputeNodeInfo_reserve)(
-    NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info,
-    SIXTRL_SIZE_T const arch_str_len,
-    SIXTRL_SIZE_T const platform_str_len,
-    SIXTRL_SIZE_T const name_str_len,
-    SIXTRL_SIZE_T const description_str_len );
-
-extern SIXTRL_HOST_FN int NS(ComputeNodeInfo_make)(
-    NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info,
-    NS(ComputeNodeId) const id,
-    const char *const SIXTRL_RESTRICT arch_str,
-    const char *const SIXTRL_RESTRICT platform_str,
-    const char *const SIXTRL_RESTRICT name_str,
-    const char *const SIXTRL_RESTRICT description_str );
-
-
-#if !defined( GPUCODE )
-
 int NS(ComputeNodeId_to_string)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id,
     char* SIXTRL_RESTRICT str_buffer,
@@ -296,5 +258,142 @@ SIXTRL_HOST_FN int NS(ComputeNodeInfo_make)(
 
     return success;
 }
+
+
+#if !defined( GPUCODE )
+
+SIXTRL_HOST_FN void NS(ComputeNodeInfo_print)(
+    FILE* SIXTRL_RESTRICT fp,
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId)   *const SIXTRL_RESTRICT default_node_id )
+{
+    if( ( fp != SIXTRL_NULLPTR ) && ( node_info != SIXTRL_NULLPTR ) )
+    {
+        NS(ComputeNodeId)const nid = NS(ComputeNodeInfo_get_id)( node_info );
+
+        char id_str[ 16 ] =
+        {
+            '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+            '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
+        };
+
+        NS(ComputeNodeId_to_string)( &nid, &id_str[ 0 ], 16 );
+
+        fprintf( fp, "Device ID Str  : %-10s", id_str );
+
+        if( ( default_node_id != SIXTRL_NULLPTR ) &&
+            ( NS(ComputeNodeId_are_equal)( &nid, default_node_id ) ) )
+        {
+            fprintf( fp, " [DEFAULT]" );
+        }
+
+        fprintf( fp, "\r\nArchitecture   : " );
+
+        if( NS(ComputeNodeInfo_get_arch)( node_info ) != SIXTRL_NULLPTR )
+        {
+             fprintf( fp, "%-10s", NS(ComputeNodeInfo_get_arch)( node_info ) );
+        }
+        else
+        {
+            fprintf( fp, "n/a" );
+        }
+
+        fprintf( fp, "\r\nPlatform       : " );
+
+        if( NS(ComputeNodeInfo_get_platform)( node_info ) != SIXTRL_NULLPTR )
+        {
+            fprintf( fp, "%-10s", NS(ComputeNodeInfo_get_platform)( node_info ) );
+        }
+        else
+        {
+            fprintf( fp, "n/a" );
+        }
+
+        fprintf( fp, "\r\nName           : " );
+
+        if( NS(ComputeNodeInfo_get_name)( node_info ) != SIXTRL_NULLPTR )
+        {
+            fprintf( fp, "%-10s", NS(ComputeNodeInfo_get_name)( node_info ) );
+        }
+        else
+        {
+            fprintf( fp, "n/a" );
+        }
+
+        fprintf( fp, "\r\n" );
+    }
+
+    return;
+}
+
+SIXTRL_HOST_FN void NS(ComputeNodeInfo_print_out)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId)   *const SIXTRL_RESTRICT default_node_id )
+{
+    NS(ComputeNodeInfo_print)( stdout, node_info, default_node_id );
+    return;
+}
+
+#else /* !defined( GPUCODE ) */
+
+SIXTRL_HOST_FN void NS(ComputeNodeInfo_print_out)(
+    SIXTRL_ARGPTR_DEC const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    SIXTRL_ARGPTR_DEC const NS(ComputeNodeId) *const
+        SIXTRL_RESTRICT default_node_id )
+{
+     if( node_info != SIXTRL_NULLPTR )
+    {
+        NS(ComputeNodeId)const nid = NS(ComputeNodeInfo_get_id)( node_info );
+
+        printf( "Device ID Str  : %d.%d",
+                ( int )NS(ComputeNodeId_get_platform_id)( &nid ),
+                ( int )NS(ComputeNodeId_get_device_id)( &nid ) );
+
+        if( ( default_node_id != SIXTRL_NULLPTR ) &&
+            ( NS(ComputeNodeId_are_equal)( &nid, default_node_id ) ) )
+        {
+            printf( " [DEFAULT]" );
+        }
+
+        printf( "\r\nArchitecture   : " );
+
+        if( NS(ComputeNodeInfo_get_arch)( node_info ) != SIXTRL_NULLPTR )
+        {
+            printf( "%-10s", NS(ComputeNodeInfo_get_arch)( node_info ) );
+        }
+        else
+        {
+            printf( "n/a" );
+        }
+
+        printf( "\r\nPlatform       : " );
+
+        if( NS(ComputeNodeInfo_get_platform)( node_info ) != SIXTRL_NULLPTR )
+        {
+            printf( "%-10s", NS(ComputeNodeInfo_get_platform)( node_info ) );
+        }
+        else
+        {
+            printf( "n/a" );
+        }
+
+        printf( "\r\nName           : " );
+
+        if( NS(ComputeNodeInfo_get_name)( node_info ) != SIXTRL_NULLPTR )
+        {
+            printf( "%-10s", NS(ComputeNodeInfo_get_name)( node_info ) );
+        }
+        else
+        {
+            fprintf( "n/a" );
+        }
+
+        printf( "\r\n" );
+    }
+
+    return;
+}
+
+#endif /* !defined( GPUCODE ) */
 
 /* end: sixtracklib/common/internal/compute_arch.c  */

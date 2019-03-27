@@ -5,6 +5,7 @@
     #include <stdbool.h>
     #include <stddef.h>
     #include <stdint.h>
+    #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
@@ -144,6 +145,25 @@ SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_name)(
 
 SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_description)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_HOST_FN SIXTRL_EXTERN void NS(ComputeNodeInfo_print)(
+    FILE* SIXTRL_RESTRICT fp,
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
+SIXTRL_HOST_FN SIXTRL_EXTERN void NS(ComputeNodeInfo_print_out)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
+#else /* !defined( _GPUCODE ) */
+
+SIXTRL_HOST_FN SIXTRL_EXTERN void NS(ComputeNodeInfo_print_out)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
+#endif /* !defined( _GPUCODE ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
