@@ -967,11 +967,13 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         bool success = false;
 
-        using size_t      = TrackJobBase::size_type;
-        using p_index_t   = TrackJobBase::particle_index_t;
-        using buf_size_t  = ::NS(buffer_size_t);
-        using obj_type_id = ::NS(object_type_id_t);
-        using obj_it      = SIXTRL_BUFFER_OBJ_ARGPTR_DEC ::NS(Object) const*;
+        using size_t        = TrackJobBase::size_type;
+        using p_index_t     = TrackJobBase::particle_index_t;
+        using buf_size_t    = ::NS(buffer_size_t);
+        using obj_type_id   = ::NS(object_type_id_t);
+        using obj_it        = SIXTRL_BUFFER_OBJ_ARGPTR_DEC ::NS(Object) const*;
+        using p_idx_limit_t = std::numeric_limits< p_index_t >;
+        using addr_t        = ::NS(buffer_addr_t);
 
         SIXTRL_STATIC_VAR size_t const ZERO = size_t{ 0 };
 
@@ -981,7 +983,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( ::NS(BeamElements_is_beam_elements_buffer)( be_buffer ) ) )
         {
             p_index_t min_element_id = p_index_t{ 0 };
-            p_index_t max_element_id = std::numeric_limits< p_index_t >::max();
+            p_index_t max_element_id = p_idx_limit_t::max();
 
             buf_size_t num_elem_by_elem_objects = buf_size_t{ 0 };
 
@@ -1040,6 +1042,44 @@ namespace SIXTRL_CXX_NAMESPACE
             }
 
             success = ( ret == 0 );
+
+            if( ( success ) && ( this->numBeamMonitors() > size_t{ 0 } ) &&
+                ( this->ptrCParticlesBuffer() != nullptr ) &&
+                ( this->minParticleId() <= this->maxParticleId() ) )
+            {
+                auto it  = this->beamMonitorIndicesBegin();
+                auto end = this->beamMonitorIndicesEnd();
+
+                for( ; it != end ; ++it )
+                {
+                    ::NS(Object)* obj = ::NS(Buffer_get_object)(
+                        be_buffer, *it );
+
+                    obj_type_id const type_id =
+                        ::NS(Object_get_type_id)( obj );
+
+                    addr_t const addr = ::NS(Object_get_begin_addr)( obj );
+
+                    success = ( ( obj != nullptr ) &&
+                        ( type_id == ::NS(OBJECT_TYPE_BEAM_MONITOR) ) &&
+                        ( addr    != addr_t{ 0 } ) );
+
+                    if( success )
+                    {
+                        using ptr_t = SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)*;
+
+                        ptr_t monitor =  static_cast< ptr_t >(
+                            reinterpret_cast< void* >(
+                                static_cast< uintptr_t >( addr ) ) );
+
+                        ::NS(BeamMonitor_set_min_particle_id)(
+                            monitor, this->minParticleId() );
+
+                        ::NS(BeamMonitor_set_max_particle_id)(
+                            monitor, this->maxParticleId() );
+                    }
+                }
+            }
         }
 
         return success;
