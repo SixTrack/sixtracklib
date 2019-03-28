@@ -1105,20 +1105,41 @@ TEST( C99_TrackJobClTests, TrackParticles )
                     if( 0 != ::NS(Particles_compare_values_with_treshold)(
                             cmp, trk_particles, ABS_ERR ) )
                     {
+                        size_t const diff_index =
+                                ::NS(Buffer_get_num_of_objects)( diff_buffer );
+
                         particles_t* diff = ::NS(Particles_new)(
                             diff_buffer, mm );
+
+                        std::vector< ::NS(buffer_size_t) > max_diff_indices(
+                            30, ::NS(buffer_size_t){ 0 } );
 
                         SIXTRL_ASSERT( diff != nullptr );
 
                         ::NS(Particles_calculate_difference)(
                             cmp, trk_particles, diff );
 
+                        particles_t* max_diff = ::NS(Particles_new)(
+                            diff_buffer, mm );
+
+                        SIXTRL_ASSERT( max_diff != nullptr );
+
+                        ::NS(Particles_get_max_difference)( max_diff,
+                            max_diff_indices.data(), cmp, trk_particles );
+
                         std::cout <<
                                 "-------------------------------------------"
                                 "-------------------------------------------"
                                 "-------------------------------------------"
-                                "\r\n"
-                                "particle set ii = " << ii << "\r\n";
+                                "\r\nparticle set ii = " << ii <<
+                                "\r\nmax_diff : \r\n";
+
+                        ::NS(Particles_print_max_diff_out)(
+                            max_diff, max_diff_indices.data() );
+
+                        diff = ::NS(Particles_buffer_get_particles)(
+                            diff_buffer, diff_index );
+
 
                         for( size_t jj = size_t{ 0 } ; jj < mm ; ++jj )
                         {
