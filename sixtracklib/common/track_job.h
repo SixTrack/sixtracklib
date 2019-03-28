@@ -15,6 +15,54 @@ extern "C" {
 
 #if !defined( _GPUCODE )
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_create)(
+    const char *const SIXTRL_RESTRICT arch,
+    const char *const SIXTRL_RESTRICT config_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_new)(
+    const char *const SIXTRL_RESTRICT arch,
+    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+    NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
+    const char *const SIXTRL_RESTRICT config_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_new_with_output)(
+    const char *const SIXTRL_RESTRICT arch,
+    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+    NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
+    NS(Buffer)* SIXTRL_RESTRICT output_buffer,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    const char *const SIXTRL_RESTRICT config_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_new_detailed)(
+    const char *const SIXTRL_RESTRICT arch,
+    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+    NS(buffer_size_t) const num_particle_sets,
+    NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,
+    NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
+    NS(Buffer)* SIXTRL_RESTRICT output_buffer,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    const char *const SIXTRL_RESTRICT config_str );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_delete)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t) NS(TrackJob_track_until)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const until_turn );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t)
+NS(TrackJob_track_elem_by_elem)( NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const until_turn );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_collect)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job );
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_clear)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job );
 
