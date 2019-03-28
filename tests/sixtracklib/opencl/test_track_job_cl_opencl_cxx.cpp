@@ -91,6 +91,9 @@ TEST( CXX_TrackJobClTests, CreateTrackJobNoOutputDelete )
 
     SIXTRL_ASSERT( particles != nullptr );
 
+    bool success = particles->copy( *orig_particles );
+    SIXTRL_ASSERT( success );
+
     /* ---------------------------------------------------------------------- */
     /* Prepare device index to device_id_str map */
 
@@ -131,7 +134,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobNoOutputDelete )
         ASSERT_TRUE( job0.type() == ::NS(TRACK_JOB_CL_ID) );
         ASSERT_TRUE( job0.typeStr().compare( ::NS(TRACK_JOB_CL_STR) ) == 0 );
 
-        bool success = job0.reset( pb, eb, nullptr, size_t{ 0 } );
+        success = job0.reset( pb, eb, nullptr, size_t{ 0 } );
 
         ASSERT_TRUE( success );
         ASSERT_TRUE( st_test::test1_CreateTrackJobNoOutputDelete(
@@ -152,7 +155,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobNoOutputDelete )
         size_t const good_particle_sets[] = { size_t{ 0 } };
 
         track_job_t job2( device_id_str, pb, &good_particle_sets[ 0 ],
-            &good_particle_sets[ 1 ], eb, nullptr, size_t{ 0 }, nullptr );
+            &good_particle_sets[ 1 ], eb, nullptr, size_t{ 0 } );
 
         ASSERT_TRUE( job2.type() == ::NS(TRACK_JOB_CL_ID) );
         ASSERT_TRUE( job2.typeStr().compare( ::NS(TRACK_JOB_CL_STR) ) == 0 );
@@ -168,7 +171,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobNoOutputDelete )
         };
 
         track_job_t job3( device_id_str, pb, &wrong_particle_sets[ 0 ],
-            &wrong_particle_sets[ 3 ], eb, nullptr, size_t{ 0 }, nullptr );
+            &wrong_particle_sets[ 3 ], eb, nullptr, size_t{ 0 } );
 
         ASSERT_TRUE( job3.type() == ::NS(TRACK_JOB_CL_ID) );
         ASSERT_TRUE( job3.typeStr().compare( ::NS(TRACK_JOB_CL_STR) ) == 0 );
@@ -181,8 +184,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobNoOutputDelete )
         buffer_t my_output_buffer;
 
         track_job_t job4( device_id_str, pb, &good_particle_sets[ 0 ],
-            &good_particle_sets[ 1 ], eb, &my_output_buffer, size_t{ 0 },
-                nullptr );
+            &good_particle_sets[ 1 ], eb, &my_output_buffer, size_t{ 0 } );
 
         ASSERT_TRUE( job4.type() == ::NS(TRACK_JOB_CL_ID) );
         ASSERT_TRUE( job4.typeStr().compare( ::NS(TRACK_JOB_CL_STR) ) == 0 );
@@ -229,6 +231,9 @@ TEST( CXX_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
 
     SIXTRL_ASSERT( particles != nullptr );
 
+    bool success = particles->copy( *orig_particles );
+    SIXTRL_ASSERT( success );
+
     size_t const NUM_BEAM_ELEMENTS       = eb.getNumObjects();
     size_t const NUM_PARTICLES           = particles->getNumParticles();
     size_t const DUMP_ELEM_BY_ELEM_TURNS = size_t{ 5u };
@@ -274,7 +279,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
         ::NS(ComputeNodeInfo_print_out)( node_it, &default_node_id );
 
         track_job_t job0( device_id_str );
-        bool success = job0.reset( pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
+        success = job0.reset( pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
 
         ASSERT_TRUE( success );
         ASSERT_TRUE( st_test::test2_CreateTrackJobElemByElemOutputDelete(
@@ -292,8 +297,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
 
         size_t const good_particle_sets[] = { size_t{ 0 } };
         track_job_t job2( device_id_str, pb, &good_particle_sets[ 0 ],
-            &good_particle_sets[ 1 ], eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS,
-                nullptr );
+            &good_particle_sets[ 1 ], eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
 
         ASSERT_TRUE( st_test::test2_CreateTrackJobElemByElemOutputDelete(
             job2, pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS ) );
@@ -306,8 +310,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
         };
 
         track_job_t job3( device_id_str, pb, &wrong_particle_sets[ 0 ],
-            &wrong_particle_sets[ 3 ], eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS,
-                nullptr );
+            &wrong_particle_sets[ 3 ], eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
 
         ASSERT_TRUE( st_test::test2_CreateTrackJobElemByElemOutputDelete(
             job3, pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS ) );
@@ -318,7 +321,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
 
         track_job_t job4( device_id_str, pb, &good_particle_sets[ 0 ],
             &good_particle_sets[ 1 ], eb, &my_output_buffer,
-                DUMP_ELEM_BY_ELEM_TURNS, nullptr );
+                DUMP_ELEM_BY_ELEM_TURNS );
 
         ASSERT_TRUE( st_test::test2_CreateTrackJobElemByElemOutputDelete(
             job4, pb, eb, &my_output_buffer, DUMP_ELEM_BY_ELEM_TURNS ) );
@@ -360,6 +363,9 @@ TEST( CXX_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
         orig_particles->getNumParticles() );
 
     SIXTRL_ASSERT( particles != nullptr );
+
+    bool success = particles->copy( *orig_particles );
+    SIXTRL_ASSERT( success );
 
     size_t const NUM_BEAM_ELEMENTS       = eb.getNumObjects();
     size_t const NUM_PARTICLES           = particles->getNumParticles();
@@ -431,7 +437,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
 
         track_job_t job0( device_id_str );
 
-        bool success = job0.reset( pb, eb, nullptr );
+        success = job0.reset( pb, eb, nullptr );
 
         ASSERT_TRUE( success );
         ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
@@ -449,7 +455,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
         size_t const good_particle_sets[] = { size_t{ 0 } };
 
         track_job_t job2( device_id_str, pb, &good_particle_sets[ 0 ],
-            &good_particle_sets[ 1 ], eb, nullptr, size_t{ 0 }, nullptr );
+            &good_particle_sets[ 1 ], eb, nullptr, size_t{ 0 } );
 
         ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
             job2, pb, eb, nullptr, NUM_BEAM_MONITORS, NUM_TURNS, size_t{ 0 } ) );
@@ -462,7 +468,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
         };
 
         track_job_t job3( device_id_str, pb, &wrong_particle_sets[ 0 ],
-            &wrong_particle_sets[ 3 ], eb, nullptr, size_t{ 0 }, nullptr );
+            &wrong_particle_sets[ 3 ], eb, nullptr, size_t{ 0 } );
 
         ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
             job3, pb, eb, nullptr, NUM_BEAM_MONITORS, NUM_TURNS, size_t{ 0 } ) );
@@ -472,8 +478,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
         buffer_t my_output_buffer;
 
         track_job_t job4( device_id_str, pb, &good_particle_sets[ 0 ],
-            &good_particle_sets[ 1 ], eb, &my_output_buffer, size_t{ 0 },
-                nullptr );
+            &good_particle_sets[ 1 ], eb, &my_output_buffer, size_t{ 0 } );
 
         ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
             job4, pb, eb, &my_output_buffer, NUM_BEAM_MONITORS,
@@ -516,6 +521,9 @@ TEST( CXX_TrackJobClTests, CreateTrackJobFullDelete )
         orig_particles->getNumParticles() );
 
     SIXTRL_ASSERT( particles != nullptr );
+
+    bool success = particles->copy( *orig_particles );
+    SIXTRL_ASSERT( success );
 
     size_t const NUM_BEAM_ELEMENTS       = eb.getNumObjects();
     size_t const NUM_PARTICLES           = particles->getNumParticles();
@@ -588,7 +596,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobFullDelete )
         ::NS(ComputeNodeInfo_print_out)( node_it, &default_node_id );
 
         track_job_t job0( device_id_str );
-        bool success = job0.reset( pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
+        success = job0.reset( pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
         ASSERT_TRUE( success );
 
         ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
@@ -609,8 +617,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobFullDelete )
         size_t const good_particle_sets[] = { size_t{ 0 } };
 
         track_job_t job2( device_id_str, pb, &good_particle_sets[ 0 ],
-            &good_particle_sets[ 1 ], eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS,
-                nullptr );
+            &good_particle_sets[ 1 ], eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
 
         ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput( job2, pb, eb,
             nullptr, NUM_BEAM_MONITORS, NUM_TURNS, DUMP_ELEM_BY_ELEM_TURNS ) );
@@ -623,8 +630,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobFullDelete )
         };
 
         track_job_t job3( device_id_str, pb, &wrong_particle_sets[ 0 ],
-            &wrong_particle_sets[ 0 ], eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS,
-                nullptr );
+            &wrong_particle_sets[ 0 ], eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
 
         ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput( job3, pb, eb,
             nullptr, NUM_BEAM_MONITORS, NUM_TURNS, DUMP_ELEM_BY_ELEM_TURNS ) );
@@ -635,7 +641,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobFullDelete )
 
         track_job_t job4( device_id_str, pb, &good_particle_sets[ 0 ],
             &good_particle_sets[ 1 ], eb, &my_output_buffer,
-                DUMP_ELEM_BY_ELEM_TURNS, nullptr );
+                DUMP_ELEM_BY_ELEM_TURNS );
 
         ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput( job4, pb, eb,
             &my_output_buffer, NUM_BEAM_MONITORS, NUM_TURNS,
@@ -684,10 +690,16 @@ TEST( CXX_TrackJobClTests, TrackParticles )
 
     SIXTRL_ASSERT( particles != nullptr );
 
+    bool success = particles->copy( *orig_particles );
+    SIXTRL_ASSERT( success );
+
     particles_t* cmp_particles = cmp_pb.createNew< particles_t >(
         orig_particles->getNumParticles() );
 
-    SIXTRL_ASSERT( particles != nullptr );
+    SIXTRL_ASSERT( cmp_particles != nullptr );
+
+    success = cmp_particles->copy( *orig_particles );
+    SIXTRL_ASSERT( success );
 
     size_t const NUM_BEAM_ELEMENTS       = eb.getNumObjects();
     size_t const NUM_PARTICLES           = particles->getNumParticles();
@@ -992,7 +1004,7 @@ TEST( CXX_TrackJobClTests, TrackParticles )
 
     std::cout << std::endl;
 }
-
+//
 
 namespace SIXTRL_CXX_NAMESPACE
 {
