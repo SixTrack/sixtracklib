@@ -10,6 +10,7 @@
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/internal/track_job_base.h"
+    #include "sixtracklib/common/track_job.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE )
