@@ -140,22 +140,6 @@ if( GTEST_FOUND )
     add_test( C99_CommonBeamElementCavityTests    test_be_cavity_common_c99 )
 
     # --------------------------------------------------------------------------
-    # test_track_job_cpu_c99:
-
-    add_executable( test_track_job_cpu_c99 test_track_job_cpu_c99.cpp )
-
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_cpu_c99 )
-    add_test( C99_TrackJobCpuTests   test_track_job_cpu_c99 )
-
-    # --------------------------------------------------------------------------
-    # test_track_job_cpu_cxx:
-
-    add_executable( test_track_job_cpu_cxx test_track_job_cpu_cxx.cpp )
-
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_cpu_cxx )
-    add_test( CXX_TrackJobCpuTests   test_track_job_cpu_cxx )
-
-    # --------------------------------------------------------------------------
     # test_elem_by_elem_config_c99:
 
     add_executable( test_elem_by_elem_config_c99
@@ -205,6 +189,22 @@ if( GTEST_FOUND )
     add_executable( test_track_common_c99 test_track_c99.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_common_c99 )
     add_test( C99_CommonTrackTests test_track_common_c99 )
+
+    # ==========================================================================
+    # test_track_job_cpu_common_c99:
+
+    add_executable( test_track_job_cpu_common_c99 test_track_job_cpu_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_cpu_common_c99 )
+    add_test( C99_CommonTrackJobCpuTests test_track_job_cpu_common_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_track_job_cpu_cxx:
+
+    add_executable( test_track_job_cpu_common_cxx test_track_job_cpu_cxx.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_cpu_common_cxx )
+    add_test( CXX_CommonTrackJobCpuTests test_track_job_cpu_common_cxx )
 
     # --------------------------------------------------------------------------
 
