@@ -16,6 +16,7 @@
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/internal/track_job_base.h"
+    #include "sixtracklib/common/track_job.h"
 
     #include "sixtracklib/opencl/context.h"
     #include "sixtracklib/opencl/argument.h"
