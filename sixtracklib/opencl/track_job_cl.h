@@ -551,10 +551,21 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCl::c_buffer_t* out_buffer = ( ptr_output_buffer != nullptr )
             ? ptr_output_buffer->getCApiPtr() : nullptr;
 
-        this->doInitTrackJobCl( device_id_str.c_str(),
+        bool const success = this->doInitTrackJobCl( device_id_str.c_str(),
             particles_buffer.getCApiPtr(), pset_begin, pset_end,
             belements_buffer.getCApiPtr(), out_buffer, dump_elem_by_elem_turns,
             config_str.c_str() );
+
+        if( success )
+        {
+            this->doSetPtrParticleBuffer( &particles_buffer );
+            this->doSetPtrBeamElementsBuffer( &belements_buffer );
+
+            if( ( out_buffer != nullptr ) && ( this->hasOutputBuffer() ) )
+            {
+                this->doSetPtrOutputBuffer( ptr_output_buffer );
+            }
+        }
     }
 }
 
