@@ -1071,7 +1071,7 @@ TEST( C99_TrackJobClTests, TrackParticles )
         ASSERT_TRUE( ::NS(Buffer_get_num_of_objects)( ptr_output_buffer ) ==
                      ::NS(Buffer_get_num_of_objects)( cmp_output_buffer ) );
 
-        double const ABS_ERR = double{ 1e-14 };
+        double const ABS_ERR = double{ 2e-14 };
 
         if( ::NS(Particles_buffers_compare_values)(
                 ptr_output_buffer, cmp_output_buffer ) != 0 )
