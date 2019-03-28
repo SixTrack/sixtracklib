@@ -691,7 +691,7 @@ TEST( CXX_TrackJobClTests, TrackParticles )
     SIXTRL_ASSERT( particles != nullptr );
 
     bool success = particles->copy( *orig_particles );
-    SIXTRL_ASSERT( success );
+    ASSERT_TRUE( success );
 
     particles_t* cmp_particles = cmp_pb.createNew< particles_t >(
         orig_particles->getNumParticles() );
