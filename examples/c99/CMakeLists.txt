@@ -61,8 +61,8 @@ list( APPEND EXAMPLE_TARGETS track_job_cpu_c99 )
 # -----------------------------------------------------------------------------
 # track_job_opencl_c99:
 
-add_executable( track_job_opencl_c99 track_job_opencl.c )
-list( APPEND EXAMPLE_TARGETS track_job_opencl_c99 )
+add_executable( track_job_cl_c99 track_job_cl.c )
+list( APPEND EXAMPLE_TARGETS track_job_cl_c99 )
 
 
 if( SIXTRACKL_ENABLE_CUDA )

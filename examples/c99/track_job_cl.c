@@ -16,7 +16,7 @@ int main( int argc, char* argv[] )
     st_Buffer* eb           = SIXTRL_NULLPTR;
     st_Particles* particles = SIXTRL_NULLPTR;
 
-    st_TrackJobCpu* job     = SIXTRL_NULLPTR;
+    st_TrackJobCl*  job     = SIXTRL_NULLPTR;
 
     int NUM_PARTICLES                  = 0;
     int NUM_TURNS                      = 10;
@@ -28,20 +28,21 @@ int main( int argc, char* argv[] )
     /* -------------------------------------------------------------------- */
     /* Read command line parameters */
 
-    if( argc < 3 )
+    if( argc < 4 )
     {
-        printf( "Usage: %s PATH_TO_PARTICLES PATH_TO_BEAM_ELEMENTS\r\n",
-                argv[ 0 ] );
+        printf( "Usage: %s DEVICE_ID_STR PATH_TO_PARTICLES "
+                "PATH_TO_BEAM_ELEMENTS\r\n", argv[ 0 ] );
 
         return 0;
     }
 
-    if( ( argc >= 3 ) &&
+    if( ( argc >= 4 ) &&
         ( argv[ 1 ] != SIXTRL_NULLPTR ) && ( strlen( argv[ 1 ] ) > 0u ) &&
-        ( argv[ 2 ] != SIXTRL_NULLPTR ) && ( strlen( argv[ 2 ] ) > 0u ) )
+        ( argv[ 2 ] != SIXTRL_NULLPTR ) && ( strlen( argv[ 2 ] ) > 0u ) &&
+        ( argv[ 3 ] != SIXTRL_NULLPTR ) && ( strlen( argv[ 3 ] ) > 0u ) )
     {
-        input_pb = st_Buffer_new_from_file( argv[ 1 ] );
-        eb = st_Buffer_new_from_file( argv[ 2 ] );
+        input_pb = st_Buffer_new_from_file( argv[ 2 ] );
+        eb = st_Buffer_new_from_file( argv[ 3 ] );
 
         SIXTRL_ASSERT( input_pb != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( st_Buffer_is_particles_buffer( input_pb ) );
@@ -98,39 +99,33 @@ int main( int argc, char* argv[] )
          * If the number of element by element turns is 0, then we can
          * use the simplier API.
          *
-         * NOTE: calling st_TrackJobCpu_new_with_output() for 0 elem by elem
+         * NOTE: calling st_TrackJobCl_new_with_output() for 0 elem by elem
          * turns would work just as well!
          */
 
         if( NUM_TURNS_ELEM_BY_ELEM <= 0 )
         {
-            job = st_TrackJobCpu_new( pb, eb );
+            job = st_TrackJobCl_new( argv[ 1 ], pb, eb );
         }
         else
         {
-            job = st_TrackJobCpu_new_with_output(
-                pb, eb, SIXTRL_NULLPTR, NUM_TURNS_ELEM_BY_ELEM );
+            job = st_TrackJobCl_new_with_output(
+                argv[ 1 ], pb, eb, SIXTRL_NULLPTR, NUM_TURNS_ELEM_BY_ELEM );
 
-            track_status |= st_TrackJobCpu_track_elem_by_elem(
+            track_status |= st_TrackJobCl_track_elem_by_elem(
                 job, NUM_TURNS_ELEM_BY_ELEM );
         }
 
         if( NUM_TURNS > NUM_TURNS_ELEM_BY_ELEM )
         {
-            track_status |= st_TrackJobCpu_track_until_turn( job, NUM_TURNS );
+            track_status |= st_TrackJobCl_track_until_turn( job, NUM_TURNS );
         }
 
         /* ****************************************************************** */
         /* ****               PERFORM OUTPUT OPERATIONS                ****** */
         /* ****************************************************************** */
 
-        /* NOTE: for the CPU Track Job, collect (currently) performs no
-         * operations. Since this *might* change in the future, it's
-         * mandated to always call NS(TrackJobCpu_collect)() before
-         * accessing the particles, the beam elements or the
-         * output buffer */
-
-        st_TrackJobCpu_collect( job );
+        st_TrackJobCl_collect( job );
 
         if( track_status == 0 )
         {
@@ -196,7 +191,7 @@ int main( int argc, char* argv[] )
     /* ****                   CLEANUP OPERATIONS                   ****** */
     /* ****************************************************************** */
 
-    st_TrackJobCpu_delete( job );
+    st_TrackJobCl_delete( job );
 
     st_Buffer_delete( pb );
     st_Buffer_delete( eb );
@@ -205,4 +200,4 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
-/* end: examples/c99/track_job_cpu.c */
+/* end: examples/c99/track_job_opencl.c */
