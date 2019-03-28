@@ -59,7 +59,7 @@ int main( int argc, char* argv[] )
 
     if( argc >= 2 )
     {
-        ptr_context.reset( new st::ClContext( argv[ 1 ] ) );
+        ptr_context.reset( new st::ClContext( argv[ 1 ], nullptr ) );
 
         if( !ptr_context->hasSelectedNode() )
         {

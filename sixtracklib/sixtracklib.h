@@ -14,7 +14,6 @@
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/generated/modules.h"
 #include "sixtracklib/common/buffer/mem_pool.h"
-#include "sixtracklib/common/internal/compute_arch.h"
 #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
 #include "sixtracklib/common/buffer/managed_buffer_remap.h"
 #include "sixtracklib/common/buffer/managed_buffer.h"
@@ -32,7 +31,6 @@
 #include "sixtracklib/common/be_drift/be_drift.h"
 #include "sixtracklib/common/be_drift/track.h"
 #include "sixtracklib/common/be_monitor/be_monitor.h"
-#include "sixtracklib/common/be_monitor/output_buffer.h"
 #include "sixtracklib/common/be_monitor/track.h"
 #include "sixtracklib/common/be_multipole/be_multipole.h"
 #include "sixtracklib/common/be_multipole/track.h"
@@ -40,10 +38,16 @@
 #include "sixtracklib/common/be_srotation/track.h"
 #include "sixtracklib/common/be_xyshift/be_xyshift.h"
 #include "sixtracklib/common/be_xyshift/track.h"
+#include "sixtracklib/common/context/compute_arch.h"
+#include "sixtracklib/common/internal/track_job_base.h"
+#include "sixtracklib/common/output/elem_by_elem_config.h"
+#include "sixtracklib/common/output/output_buffer.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/constants.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/track_job.h"
+#include "sixtracklib/common/track_job_cpu.h"
 #include "sixtracklib/common/track.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -62,6 +66,7 @@
 
     #include "sixtracklib/opencl/argument.h"
     #include "sixtracklib/opencl/context.h"
+    #include "sixtracklib/opencl/track_job_cl.h"
 
 //     #include "sixtracklib/opencl/buffer.h"
 //     #include "sixtracklib/opencl/ocl_environment.h"

@@ -1,6 +1,10 @@
 #ifndef SIXTRACKLIB_COMMON_BEAM_ELEMENTS_H__
 #define SIXTRACKLIB_COMMON_BEAM_ELEMENTS_H__
 
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+    #include <stdbool.h>
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
@@ -20,6 +24,9 @@ extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
 /* ========================================================================= */
+
+SIXTRL_FN SIXTRL_STATIC bool NS(BeamElements_is_beam_element_obj)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj );
 
 SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_calc_buffer_parameters_for_object)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj,
@@ -95,6 +102,9 @@ SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_copy_to_buffer)(
 SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
+SIXTRL_FN SIXTRL_STATIC bool NS(BeamElements_is_beam_elements_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
 #endif /* !defined( _GPUCODE ) */
 
 
@@ -125,6 +135,51 @@ SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_buffer)(
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
+
+SIXTRL_INLINE bool NS(BeamElements_is_beam_element_obj)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj )
+{
+    bool is_beam_element = false;
+
+    if( obj!= SIXTRL_NULLPTR )
+    {
+        typedef NS(object_type_id_t) type_id_t;
+        type_id_t const type_id = NS(Object_get_type_id)( obj );
+
+        switch( type_id )
+        {
+            case NS(OBJECT_TYPE_DRIFT):
+            case NS(OBJECT_TYPE_DRIFT_EXACT):
+            case NS(OBJECT_TYPE_MULTIPOLE):
+            case NS(OBJECT_TYPE_XYSHIFT):
+            case NS(OBJECT_TYPE_SROTATION):
+            case NS(OBJECT_TYPE_CAVITY):
+            case NS(OBJECT_TYPE_BEAM_MONITOR):
+            {
+                is_beam_element = true;
+                break;
+            }
+
+            #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
+
+            case NS(OBJECT_TYPE_BEAM_BEAM_4D):
+            case NS(OBJECT_TYPE_BEAM_BEAM_6D):
+            {
+                is_beam_element = true;
+                break;
+            }
+
+            #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+
+            default:
+            {
+                is_beam_element = false;
+            }
+        };
+    }
+
+    return is_beam_element;
+}
 
 SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj,
@@ -1386,6 +1441,36 @@ SIXTRL_INLINE void NS(BeamElements_clear_buffer)(
     }
 
     return;
+}
+
+SIXTRL_INLINE bool NS(BeamElements_is_beam_elements_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    typedef NS(buffer_size_t) size_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* obj_iter_t;
+
+    bool is_beam_elements_buffer = (
+        ( buffer != SIXTRL_NULLPTR ) &&
+        ( NS(Buffer_get_num_of_objects)( buffer ) > ( size_t )0u ) );
+
+    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( buffer ) );
+
+    if( is_beam_elements_buffer )
+    {
+        obj_iter_t it  = NS(Buffer_get_const_objects_begin)( buffer );
+        obj_iter_t end = NS(Buffer_get_const_objects_end)( buffer );
+
+        for( ; it != end ; ++it )
+        {
+            if( !NS(BeamElements_is_beam_element_obj)( it ) )
+            {
+                is_beam_elements_buffer = false;
+                break;
+            }
+        }
+    }
+
+    return is_beam_elements_buffer;
 }
 
 #endif /* !defined( _GPUCODE ) */

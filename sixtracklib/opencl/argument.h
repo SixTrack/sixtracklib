@@ -209,10 +209,10 @@ SIXTRL_HOST_FN bool NS(ClArgument_uses_cobj_buffer)(
     const NS(ClArgument) *const SIXTRL_RESTRICT argument );
 
 SIXTRL_HOST_FN NS(Buffer) const* NS(ClArgument_get_const_ptr_cobj_buffer)(
-    NS(ClArgument)* SIXTRL_RESTRICT argument );
+    const NS(ClArgument) *const SIXTRL_RESTRICT argument );
 
 SIXTRL_HOST_FN NS(Buffer)* NS(ClArgument_get_ptr_cobj_buffer)(
-    const NS(ClArgument) *const SIXTRL_RESTRICT argument );
+    NS(ClArgument)* SIXTRL_RESTRICT argument );
 
 SIXTRL_HOST_FN NS(ClContextBase)* NS(ClArgument_get_ptr_to_context)(
     NS(ClArgument)* SIXTRL_RESTRICT argument );

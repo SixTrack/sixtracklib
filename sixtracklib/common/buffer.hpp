@@ -46,6 +46,8 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type slot_size = ::NS(BUFFER_DEFAULT_SLOT_SIZE)
         ) SIXTRL_NOEXCEPT;
 
+        SIXTRL_FN explicit Buffer(
+            ::NS(Buffer) const& SIXTRL_RESTRICT_REF c_buffer ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN explicit Buffer(
             size_type const buffer_capacity = DEFAULT_BUFFER_CAPACITY,
@@ -83,7 +85,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_FN Buffer& operator=( Buffer const& rhs ) = delete;
         SIXTRL_FN Buffer& operator=( Buffer&& rhs ) = delete;
 
-
+        SIXTRL_FN Buffer& operator=( ::NS(Buffer) const& rhs ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN virtual ~Buffer();
 
@@ -162,6 +164,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
+        SIXTRL_HOST_FN bool readFromFile(
+            std::string const& SIXTRL_RESTRICT_REF path_to_file );
+
+        SIXTRL_HOST_FN bool readFromFile(
+            const char *const SIXTRL_RESTRICT path_to_file );
+
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_FN size_type getNumSlots()            const SIXTRL_NOEXCEPT;
         SIXTRL_FN size_type getMaxNumSlots()         const SIXTRL_NOEXCEPT;
         SIXTRL_FN size_type getSlotsSize()           const SIXTRL_NOEXCEPT;
@@ -194,6 +204,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_BUFFER_OBJ_ARGPTR_DEC object_t*
             operator[]( size_type object_index ) SIXTRL_NOEXCEPT;
+
+        template< typename Elem >
+        SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC Elem const*
+        get( size_type const object_index ) const SIXTRL_NOEXCEPT;
+
+        template< typename Elem >
+        SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC Elem*
+        get( size_type const object_index ) SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -278,6 +296,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/buffer/mem_pool.h"
+    #include "sixtracklib/common/internal/objects_type_id.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 namespace SIXTRL_CXX_NAMESPACE
@@ -292,6 +311,13 @@ namespace SIXTRL_CXX_NAMESPACE
         return NS(ManagedBuffer_calculate_buffer_length)( nullptr,
             max_num_objects, max_num_slots, max_num_dataptrs,
                 max_num_garbage_ranges, slot_size );
+    }
+
+    SIXTRL_INLINE Buffer::Buffer( ::NS(Buffer) const&
+        SIXTRL_RESTRICT_REF c_buffer ) SIXTRL_NOEXCEPT :
+        ::NS(Buffer)( c_buffer )
+    {
+
     }
 
     SIXTRL_INLINE Buffer::Buffer(
@@ -437,6 +463,29 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
     #endif /* !defined( _GPUCODE ) */
+
+    SIXTRL_INLINE Buffer& Buffer::operator=(
+        ::NS(Buffer) const& rhs ) SIXTRL_NOEXCEPT
+    {
+        SIXTRL_ASSERT( this->getCApiPtr() != nullptr );
+
+        if( &rhs != this->getCApiPtr() )
+        {
+            ::NS(Buffer_free)( this->getCApiPtr() );
+            *( this->getCApiPtr() ) = rhs;
+
+            auto flags = ::NS(Buffer_get_datastore_special_flags)(
+                this->getCApiPtr() );
+
+            flags &= ~( SIXTRL_BUFFER_USES_DATASTORE );
+            flags &= ~( SIXTRL_BUFFER_OWNS_DATASTORE );
+
+            ::NS(Buffer_set_datastore_special_flags)(
+                this->getCApiPtr(), flags );
+        }
+
+        return *this;
+    }
 
     SIXTRL_INLINE Buffer::~Buffer()
     {
@@ -685,6 +734,21 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
+    SIXTRL_INLINE SIXTRL_HOST_FN bool Buffer::readFromFile(
+        std::string const& SIXTRL_RESTRICT_REF path_to_file )
+    {
+        return ::NS(Buffer_read_from_file)(
+            this->getCApiPtr(), path_to_file.c_str() );
+    }
+
+    SIXTRL_INLINE SIXTRL_HOST_FN bool Buffer::readFromFile(
+        const char *const SIXTRL_RESTRICT path_to_file )
+    {
+        return ::NS(Buffer_read_from_file)( this->getCApiPtr(), path_to_file );
+    }
+
+    /* --------------------------------------------------------------------- */
+
     SIXTRL_INLINE Buffer::size_type
     Buffer::getNumSlots() const SIXTRL_NOEXCEPT
     {
@@ -802,6 +866,43 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         return reinterpret_cast< Ptr >( static_cast< uintptr_t >(
             NS(Buffer_get_objects_end_addr)( this->getCApiPtr() ) ) );
+    }
+
+    template< typename Elem >
+    SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC Elem const*
+    Buffer::get( Buffer::size_type const object_index ) const SIXTRL_NOEXCEPT
+    {
+        using address_t = Buffer::address_t;
+        using type_id_t = ::NS(object_type_id_t);
+
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC ::NS(Object) const* obj_info =
+            ::NS(Buffer_get_const_object)( this->getCApiPtr(), object_index );
+
+        address_t const addr = ::NS(Object_get_begin_addr)( obj_info );
+        type_id_t const type = ::NS(Object_get_type_id)( obj_info );
+
+        if( ( addr != address_t{ 0 } ) &&
+            ( type != ::NS(OBJECT_TYPE_NONE    ) ) &&
+            ( type != ::NS(OBJECT_TYPE_INVALID ) ) &&
+            ( ::NS(Object_get_size)( obj_info ) >= sizeof( Elem ) ) )
+        {
+            if( ObjectTypeTraits< Elem >::Type() == type )
+            {
+                return static_cast< SIXTRL_BUFFER_DATAPTR_DEC Elem const* >(
+                    reinterpret_cast< SIXTRL_BUFFER_DATAPTR_DEC void const* >(
+                        static_cast< uintptr_t >( addr ) ) );
+            }
+        }
+
+        return nullptr;
+    }
+
+    template< typename Elem >
+    SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC Elem*
+    Buffer::get( Buffer::size_type const obj_index ) SIXTRL_NOEXCEPT
+    {
+        return const_cast< SIXTRL_BUFFER_DATAPTR_DEC Elem* >(
+            static_cast< Buffer const& >( *this ).get< Elem >( obj_index ) );
     }
 
 

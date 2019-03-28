@@ -5,6 +5,7 @@
     #include <stdbool.h>
     #include <stddef.h>
     #include <stdint.h>
+    #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
@@ -42,7 +43,7 @@ SIXTRL_FN SIXTRL_STATIC bool operator<(
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_HOST_FN NS(ComputeNodeId)* NS(ComputeNodeId_preset)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ComputeNodeId)* NS(ComputeNodeId_preset)(
     NS(ComputeNodeId)* SIXTRL_RESTRICT id );
 
 SIXTRL_HOST_FN SIXTRL_STATIC NS(comp_node_id_num_t)
@@ -97,20 +98,20 @@ typedef struct NS(ComputeNodeInfo)
 }
 NS(ComputeNodeInfo);
 
-SIXTRL_HOST_FN NS(ComputeNodeInfo)* NS(ComputeNodeInfo_preset)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ComputeNodeInfo)* NS(ComputeNodeInfo_preset)(
     NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info );
 
-SIXTRL_HOST_FN void NS(ComputeNodeInfo_free)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_free)(
     NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info );
 
-SIXTRL_HOST_FN NS(ComputeNodeInfo)* NS(ComputeNodeInfo_reserve)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ComputeNodeInfo)* NS(ComputeNodeInfo_reserve)(
     NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info,
     SIXTRL_SIZE_T const arch_str_len,
     SIXTRL_SIZE_T const platform_str_len,
     SIXTRL_SIZE_T const name_str_len,
     SIXTRL_SIZE_T const description_str_len );
 
-SIXTRL_HOST_FN int NS(ComputeNodeInfo_make)(
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ComputeNodeInfo_make)(
     NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info,
     NS(ComputeNodeId) const id,
     const char *const SIXTRL_RESTRICT arch_str,
@@ -144,6 +145,26 @@ SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_name)(
 
 SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_description)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
+
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_print)(
+    FILE* SIXTRL_RESTRICT fp,
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_print_out)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
+#else /* !defined( _GPUCODE ) */
+
+SIXTRL_FN SIXTRL_STATIC void NS(ComputeNodeInfo_print_out)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
+#endif /* !defined( _GPUCODE ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
@@ -333,4 +354,4 @@ SIXTRL_INLINE char const* NS(ComputeNodeInfo_get_description)(
 
 #endif /* SIXTRACKLIB_COMMON_INTERNAL_COMPUTE_ARCH_H__ */
 
-/* end: sixtracklib/common/internal/compute_arch.h */
+/* end: sixtracklib/common/context/compute_arch.h */

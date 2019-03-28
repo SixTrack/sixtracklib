@@ -512,6 +512,14 @@ namespace SIXTRL_CXX_NAMESPACE
         index_pointer_t state            SIXTRL_ALIGN( 8 );
     };
 
+    template< typename T > struct ObjectTypeTraits< TParticles< T > >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_PARTICLE);
+        }
+    };
+
     /* ===================================================================== */
     /* Specialization for T = SIXTRL_REAL_T: */
     /* ===================================================================== */
@@ -1015,6 +1023,22 @@ namespace SIXTRL_CXX_NAMESPACE
     };
 
     using Particles = TParticles< NS(particle_real_t) >;
+
+    template<> struct ObjectTypeTraits< ::NS(Particles) >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_PARTICLE);
+        }
+    };
+
+    template<> struct ObjectTypeTraits< Particles >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_PARTICLE);
+        }
+    };
 
     SIXTRL_FN SIXTRL_STATIC bool Buffer_is_particles_buffer(
         Buffer const& SIXTRL_RESTRICT_REF buffer );

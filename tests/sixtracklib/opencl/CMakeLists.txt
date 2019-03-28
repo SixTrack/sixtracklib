@@ -44,6 +44,18 @@ if( GTEST_FOUND )
     add_test( C99_OpenCL_BeamElementsDriftTests test_be_drift_opencl_c99 )
 
     # --------------------------------------------------------------------------
+    # test_track_elem_by_elem_opencl_c99:
+
+    add_executable( test_track_elem_by_elem_opencl_c99
+                    test_track_elem_by_elem_opencl_c99.cpp )
+
+    set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS}
+         test_track_elem_by_elem_opencl_c99 )
+
+    add_test( C99_OpenCL_TrackElemByElemTests
+              test_track_elem_by_elem_opencl_c99 )
+
+    # --------------------------------------------------------------------------
     # test_be_monitor_opencl_c99:
 
     add_executable( test_be_monitor_opencl_c99 test_be_monitor_opencl_c99.cpp )
@@ -56,6 +68,26 @@ if( GTEST_FOUND )
     add_executable( test_track_opencl_c99 test_track_opencl_c99.cpp )
     set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS} test_track_opencl_c99 )
     add_test( C99_OpenCL_TrackParticlesTests test_track_opencl_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_track_job_opencl_c99:
+
+    add_executable( test_track_job_cl_opencl_c99
+                    test_track_job_cl_opencl_c99.cpp )
+
+    set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS}
+         test_track_job_cl_opencl_c99 )
+    add_test( C99_OpenCL_TrackJobClTests test_track_job_cl_opencl_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_track_job_opencl_cxx:
+
+    add_executable( test_track_job_cl_opencl_cxx
+                    test_track_job_cl_opencl_cxx.cpp )
+
+    set( CXX_UNIT_TEST_TARGETS ${CXX_UNIT_TEST_TARGETS}
+         test_track_job_cl_opencl_cxx )
+    add_test( CXX_OpenCL_TrackJobClTests test_track_job_cl_opencl_cxx )
 
     # *************************************************************************
     # Set all properties:

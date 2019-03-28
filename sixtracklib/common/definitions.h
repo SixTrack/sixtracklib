@@ -49,9 +49,14 @@
 #if defined( _GPUCODE )
 
     #if defined( __OPENCL_C_VERSION__ )
-        #if __OPENCL_VERSION__ < 120 || defined( cl_khr_fp64 )
+
+        #if __OPENCL_VERSION__ <= CL_VERSION_1_1
             #pragma OPENCL EXTENSION cl_khr_fp64 : enable
         #endif
+
+//         #if __OPENCL_VERSION__ < 120 || defined( cl_khr_fp64 )
+//             #pragma OPENCL EXTENSION cl_khr_fp64 : enable
+//         #endif
 
         #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
             #define  SIXTRL_NO_SYSTEM_INCLUDES  1

@@ -18,69 +18,80 @@
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
-#include "sixtracklib/common/internal/compute_arch.h"
+#include "sixtracklib/common/context/compute_arch.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/output/elem_by_elem_config.h"
 #include "sixtracklib/opencl/internal/base_context.h"
 
 #if defined( __cplusplus )
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    ClContext::ClContext() :
-        ClContextBase(),
-        m_track_until_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
+    ClContext::ClContext( const char *const SIXTRL_RESTRICT config_str ) :
+        ClContextBase( config_str ),
+        m_elem_by_elem_config_buffer(),
+        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
+        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
         this->doInitDefaultProgramsPrivImpl();
     }
 
-    ClContext::ClContext( ClContext::size_type const node_index ) :
-        ClContextBase(),
-        m_track_until_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
+    ClContext::ClContext( ClContext::size_type const node_index,
+                          const char *const SIXTRL_RESTRICT config_str ) :
+        ClContextBase( config_str ),
+        m_elem_by_elem_config_buffer(),
+        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
+        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
-        using base_t = ClContextBase;
+        if( config_str != nullptr )
+        {
+            this->doSetConfigStr( config_str );
+            ClContextBase::doParseConfigString( this->configStr() );
+        }
 
         this->doInitDefaultProgramsPrivImpl();
 
         if( ( node_index < this->numAvailableNodes() ) &&
-            ( base_t::doSelectNode( node_index ) ) )
+            ( ClContextBase::doSelectNode( node_index ) ) &&
+            ( this->doSelectNodePrivImpl( node_index ) ) )
         {
-            base_t::doInitDefaultKernels();
+            ClContextBase::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
         }
     }
 
-    ClContext::ClContext( ClContext::node_id_t const node_id ) :
-        ClContextBase(),
-        m_track_until_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
+    ClContext::ClContext( ClContext::node_id_t const node_id,
+                          const char *const SIXTRL_RESTRICT config_str ) :
+        ClContextBase( config_str ),
+        m_elem_by_elem_config_buffer(),
+        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
+        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
@@ -94,24 +105,27 @@ namespace SIXTRL_CXX_NAMESPACE
             NS(ComputeNodeId_get_device_id)( &node_id ) );
 
         if( ( node_index < this->numAvailableNodes() ) &&
-            ( base_t::doSelectNode( node_index ) ) )
+            ( base_t::doSelectNode( node_index ) ) &&
+            ( this->doSelectNodePrivImpl( node_index ) ) )
         {
             base_t::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
         }
     }
 
-    ClContext::ClContext( char const* node_id_str ) :
-        ClContextBase(),
-        m_track_until_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
+    ClContext::ClContext( char const* node_id_str,
+                          const char *const SIXTRL_RESTRICT config_str ) :
+        ClContextBase( config_str ),
+        m_elem_by_elem_config_buffer(),
+        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
+        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
@@ -137,7 +151,8 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         if( ( node_index < this->numAvailableNodes() ) &&
-            ( base_t::doSelectNode( node_index ) ) )
+            ( base_t::doSelectNode( node_index ) ) &&
+            ( this->doSelectNodePrivImpl( node_index ) ) )
         {
             base_t::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
@@ -146,17 +161,19 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ClContext::ClContext(
         ClContext::platform_id_t const platform_idx,
-        ClContext::device_id_t const device_idx ) :
-        ClContextBase(),
-        m_track_until_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContextBase::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContextBase::kernel_id_t{ -1 } ),
+        ClContext::device_id_t const device_idx,
+        const char *const SIXTRL_RESTRICT config_str ) :
+        ClContextBase( config_str ),
+        m_elem_by_elem_config_buffer(),
+        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
+        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
+        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
@@ -169,7 +186,8 @@ namespace SIXTRL_CXX_NAMESPACE
             this->findAvailableNodesIndex( platform_idx, device_idx );
 
         if( ( node_index < this->numAvailableNodes() ) &&
-            ( base_t::doSelectNode( node_index ) ) )
+            ( base_t::doSelectNode( node_index ) ) &&
+            ( this->doSelectNodePrivImpl( node_index ) ) )
         {
             base_t::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
@@ -180,6 +198,262 @@ namespace SIXTRL_CXX_NAMESPACE
     {
 
     }
+
+    bool ClContext::assignParticleArg(
+        ClArgument& SIXTRL_RESTRICT_REF particles_arg )
+    {
+        bool success = false;
+
+        using size_t      = ClContext::size_type;
+        using kernel_id_t = ClContext::kernel_id_t;
+
+        ::NS(Buffer)* part_buffer = particles_arg.ptrCObjectBuffer();
+
+        size_t const total_num_particles =
+            ::NS(Particles_buffer_get_total_num_of_particles)( part_buffer );
+
+        if( ( particles_arg.usesCObjectBuffer() ) &&
+            ( part_buffer != nullptr ) &&
+            ( !NS(Buffer_needs_remapping)( part_buffer ) ) &&
+            ( total_num_particles > size_t{ 0 } ) )
+        {
+            success = true;
+
+            if( this->hasTrackingKernel() )
+            {
+                kernel_id_t const kernel_id = this->trackingKernelId();
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{3u} );
+                this->assignKernelArgument( kernel_id, 0u, particles_arg );
+            }
+
+            if( this->hasElementByElementTrackingKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->elementByElementTrackingKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{6u} );
+                this->assignKernelArgument( kernel_id, 0u, particles_arg );
+            }
+
+            if( this->hasSingleTurnTrackingKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->singleTurnTackingKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{3u} );
+                this->assignKernelArgument( kernel_id, 0u, particles_arg );
+            }
+        }
+
+        return success;
+    }
+
+    bool ClContext::assignBeamElementsArg(
+        ClArgument& SIXTRL_RESTRICT_REF beam_elem_arg )
+    {
+        bool success = false;
+
+        using size_t      = ClContext::size_type;
+        using kernel_id_t = ClContext::kernel_id_t;
+
+        ::NS(Buffer)* beam_elem_buffer = beam_elem_arg.ptrCObjectBuffer();
+
+        if( ( beam_elem_arg.usesCObjectBuffer() ) &&
+            ( beam_elem_buffer != nullptr ) &&
+            ( !NS(Buffer_needs_remapping)( beam_elem_buffer ) ) )
+        {
+            success = true;
+
+            if( this->hasTrackingKernel() )
+            {
+                kernel_id_t const kernel_id = this->trackingKernelId();
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{3u} );
+                this->assignKernelArgument( kernel_id, 1u, beam_elem_arg );
+            }
+
+            if( this->hasElementByElementTrackingKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->elementByElementTrackingKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{6u} );
+                this->assignKernelArgument( kernel_id, 1u, beam_elem_arg );
+            }
+
+            if( this->hasSingleTurnTrackingKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->singleTurnTackingKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{3u} );
+                this->assignKernelArgument( kernel_id, 1u, beam_elem_arg );
+            }
+
+            if( this->hasAssignBeamMonitorIoBufferKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->assignBeamMonitorIoBufferKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{4u} );
+
+                this->assignKernelArgument( kernel_id, 0u, beam_elem_arg );
+            }
+        }
+
+        return success;
+    }
+
+    bool ClContext::assignOutputBufferArg(
+        ClArgument& SIXTRL_RESTRICT_REF out_buffer_arg )
+    {
+        bool success = false;
+
+        using size_t      = ClContext::size_type;
+        using kernel_id_t = ClContext::kernel_id_t;
+
+        ::NS(Buffer)* out_buffer = out_buffer_arg.ptrCObjectBuffer();
+
+        if( ( out_buffer_arg.usesCObjectBuffer() ) &&
+            ( out_buffer != nullptr ) &&
+            ( !NS(Buffer_needs_remapping)( out_buffer ) ) )
+        {
+            success = true;
+
+            if( this->hasElementByElementTrackingKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->elementByElementTrackingKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{6u} );
+                this->assignKernelArgument( kernel_id, 2u, out_buffer_arg );
+            }
+
+            if( this->hasAssignBeamMonitorIoBufferKernel() )
+            {
+                kernel_id_t const kernel_id =
+                    this->assignBeamMonitorIoBufferKernelId();
+
+                success &= ( this->kernelNumArgs( kernel_id ) >= size_t{4u} );
+
+                this->assignKernelArgument( kernel_id, 1u, out_buffer_arg );
+            }
+        }
+
+        return success;
+    }
+
+    bool ClContext::assignElemByElemConfigBuffer( ClContext::cl_buffer_t&
+        SIXTRL_RESTRICT_REF cl_elem_by_elem_config_buffer )
+    {
+        bool success = true;
+
+        using size_t      = ClContext::size_type;
+        using kernel_id_t = ClContext::kernel_id_t;
+
+        if( this->hasElementByElementTrackingKernel() )
+        {
+            kernel_id_t const kernel_id =
+                this->elementByElementTrackingKernelId();
+
+            success = ( this->kernelNumArgs( kernel_id ) >= size_t{ 6u } );
+            this->assignKernelArgumentClBuffer( kernel_id, 3u,
+                cl_elem_by_elem_config_buffer );
+        }
+
+        return success;
+    }
+
+    bool ClContext::assignElemByElemBufferOffset(
+        ClContext::size_type const elem_by_elem_out_offset )
+    {
+        bool success = true;
+
+        using size_t      = ClContext::size_type;
+        using kernel_id_t = ClContext::kernel_id_t;
+
+        if( this->hasElementByElementTrackingKernel() )
+        {
+            kernel_id_t const kernel_id =
+                this->elementByElementTrackingKernelId();
+
+            success = ( this->kernelNumArgs( kernel_id ) >= size_t{ 6u } );
+            this->assignKernelArgumentValue(
+                kernel_id, 5u, elem_by_elem_out_offset );
+        }
+
+        return success;
+    }
+
+    bool ClContext::assignSuccessFlagBuffer(
+        ClContext::cl_buffer_t& SIXTRL_RESTRICT_REF cl_success_flag_buffer )
+    {
+        bool success = true;
+
+        using size_t      = ClContext::size_type;
+        using kernel_id_t = ClContext::kernel_id_t;
+
+        if( this->hasTrackingKernel() )
+        {
+            kernel_id_t const kernel_id  = this->trackingKernelId();
+            size_t const num_kernel_args = this->kernelNumArgs( kernel_id );
+            success &= ( num_kernel_args >= size_t{ 3u } );
+
+            if( num_kernel_args > 3u )
+            {
+                this->assignKernelArgumentClBuffer(
+                    kernel_id, 3u, cl_success_flag_buffer );
+            }
+        }
+
+        if( this->hasElementByElementTrackingKernel() )
+        {
+            kernel_id_t const kernel_id =
+                this->elementByElementTrackingKernelId();
+
+            size_t const num_kernel_args = this->kernelNumArgs( kernel_id );
+            success &= ( num_kernel_args >= size_t{ 6u } );
+
+            if( num_kernel_args > 6u )
+            {
+                this->assignKernelArgumentClBuffer(
+                    kernel_id, 6u, cl_success_flag_buffer );
+            }
+        }
+
+        if( this->hasSingleTurnTrackingKernel() )
+        {
+            kernel_id_t const kernel_id =
+                this->singleTurnTackingKernelId();
+
+            size_t const num_kernel_args = this->kernelNumArgs( kernel_id );
+            success &= ( num_kernel_args >= size_t{ 3u } );
+
+            if( num_kernel_args > 3u )
+            {
+                this->assignKernelArgumentClBuffer(
+                    kernel_id, 3u, cl_success_flag_buffer );
+            }
+        }
+
+        if( this->hasAssignBeamMonitorIoBufferKernel() )
+        {
+            kernel_id_t const kernel_id =
+                this->assignBeamMonitorIoBufferKernelId();
+
+            size_t const num_kernel_args = this->kernelNumArgs( kernel_id );
+            success &= ( num_kernel_args >= size_t{ 4u } );
+
+            if( num_kernel_args > 4u )
+            {
+                this->assignKernelArgumentClBuffer(
+                    kernel_id, 4u, cl_success_flag_buffer );
+            }
+        }
+
+        return success;
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     bool ClContext::hasTrackingKernel() const SIXTRL_NOEXCEPT
     {
@@ -509,22 +783,22 @@ namespace SIXTRL_CXX_NAMESPACE
 
     int ClContext::trackElementByElement(
         ClContext::size_type const until_turn,
-        ClContext::size_type const out_particle_block_offset )
+        ClContext::size_type const out_buffer_index_offset )
     {
         return ( this->hasElementByElementTrackingKernel() )
-            ? this->trackElementByElement( until_turn, out_particle_block_offset,
+            ? this->trackElementByElement( until_turn, out_buffer_index_offset,
                 this->elementByElementTrackingKernelId() ) : -1;
     }
 
     int ClContext::trackElementByElement(
         ClContext::size_type const until_turn,
-        ClContext::size_type const out_particle_block_offset,
+        ClContext::size_type const out_buffer_index_offset,
         ClContext::kernel_id_t const track_kernel_id )
     {
         if( this->hasElementByElementTrackingKernel() )
         {
             this->assignKernelArgumentValue(
-                track_kernel_id, 3u, out_particle_block_offset );
+                track_kernel_id, 3u, out_buffer_index_offset );
 
             if( this->runKernel( track_kernel_id,
                 this->lastExecNumWorkItems( track_kernel_id ),
@@ -542,10 +816,10 @@ namespace SIXTRL_CXX_NAMESPACE
         ClArgument& SIXTRL_RESTRICT_REF beam_elements_arg,
         ClArgument& SIXTRL_RESTRICT_REF elem_by_elem_buffer,
         ClContext::size_type const until_turn,
-        ClContext::size_type out_particle_block_offset )
+        ClContext::size_type out_buffer_index_offset )
     {
         return this->trackElementByElement( particles_arg, beam_elements_arg,
-            elem_by_elem_buffer, until_turn, out_particle_block_offset,
+            elem_by_elem_buffer, until_turn, out_buffer_index_offset,
                 this->elementByElementTrackingKernelId() );
     }
 
@@ -554,16 +828,16 @@ namespace SIXTRL_CXX_NAMESPACE
         ClArgument& SIXTRL_RESTRICT_REF beam_elements_arg,
         ClArgument& SIXTRL_RESTRICT_REF elem_by_elem_buffer_arg,
         ClContext::size_type const until_turn,
-        ClContext::size_type const out_particle_block_offset,
-        ClContext::kernel_id_t const track_kernel_id )
+        ClContext::size_type const out_buffer_index_offset,
+        ClContext::kernel_id_t const kernel_id )
     {
         int success = -1;
 
         typedef NS(particle_index_t) index_t;
 
         SIXTRL_ASSERT( this->hasSelectedNode() );
-        SIXTRL_ASSERT( ( track_kernel_id >= kernel_id_t{ 0 } ) &&
-            ( static_cast< size_type >( track_kernel_id ) <
+        SIXTRL_ASSERT( ( kernel_id >= kernel_id_t{ 0 } ) &&
+            ( static_cast< size_type >( kernel_id ) <
               this->numAvailableKernels() ) );
 
         SIXTRL_ASSERT( particles_arg.usesCObjectBuffer() );
@@ -578,8 +852,11 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( !NS(Buffer_needs_remapping)(
             elem_by_elem_buffer_arg.ptrCObjectBuffer() ) );
 
-        size_type const num_kernel_args = this->kernelNumArgs( track_kernel_id );
-        SIXTRL_ASSERT(  num_kernel_args >= 12u );
+        cl::CommandQueue* ptr_queue = this->openClQueue();
+        SIXTRL_ASSERT( ptr_queue != nullptr );
+
+        size_type const num_kernel_args = this->kernelNumArgs( kernel_id );
+        SIXTRL_ASSERT(  num_kernel_args >= 6u );
 
         size_type const total_num_particles =
             NS(Particles_buffer_get_total_num_of_particles)( particles_buffer);
@@ -594,10 +871,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         index_t min_element_id  = index_t{ 0 };
         index_t max_element_id  = NS(Buffer_get_num_of_objects)(
-            elem_by_elem_buffer_arg.ptrCObjectBuffer() );
+            beam_elements_arg.ptrCObjectBuffer() );
 
         index_t min_turn = index_t{ 0 };
-        index_t max_turn = until_turn;
+        index_t max_turn = index_t{ 0 };
 
         if( ( max_element_id > min_element_id ) &&
             ( max_element_id > index_t{ 0 } ) )
@@ -608,37 +885,57 @@ namespace SIXTRL_CXX_NAMESPACE
         success = NS(Particles_get_min_max_particle_id)(
             particles, &min_particle_id, &max_particle_id );
 
-        if( success != 0 ) return success;
+        success |= NS(Particles_get_min_max_at_turn_value)(
+            particles, &min_turn, &max_turn );
 
-        int64_t elem_by_elem_order = int64_t{ 0 };
-
-        this->assignKernelArgument(      track_kernel_id,  0u, particles_arg );
-        this->assignKernelArgument(      track_kernel_id,  1u, beam_elements_arg );
-        this->assignKernelArgument(      track_kernel_id,  2u, elem_by_elem_buffer_arg );
-        this->assignKernelArgumentValue( track_kernel_id,  3u, until_turn );
-        this->assignKernelArgumentValue( track_kernel_id,  4u, out_particle_block_offset );
-        this->assignKernelArgumentValue( track_kernel_id,  5u, min_particle_id );
-        this->assignKernelArgumentValue( track_kernel_id,  6u, max_particle_id );
-        this->assignKernelArgumentValue( track_kernel_id,  7u, min_element_id );
-        this->assignKernelArgumentValue( track_kernel_id,  8u, max_element_id );
-        this->assignKernelArgumentValue( track_kernel_id,  9u, min_turn );
-        this->assignKernelArgumentValue( track_kernel_id, 10u, max_turn );
-        this->assignKernelArgumentValue( track_kernel_id, 11u, elem_by_elem_order );
-
-        if( num_kernel_args > 11u )
+        if( static_cast< index_t >( until_turn ) >
+                ( max_turn + index_t{ 1 } ) )
         {
-            this->assignKernelArgumentClBuffer(
-                track_kernel_id, 12u, this->internalSuccessFlagBuffer() );
+            max_turn = static_cast< index_t >( until_turn ) - index_t{ 1 };
         }
 
-        success = ( !this->runKernel( track_kernel_id, total_num_particles ) )
-             ? 0 : -1;
+        NS(ElemByElemConfig) elem_by_elem_config;
+        NS(ElemByElemConfig_preset)( &elem_by_elem_config );
 
-        if( ( success == 0 ) && ( num_kernel_args > 12u ) )
+        success |= NS(ElemByElemConfig_init_detailed)( &elem_by_elem_config,
+            NS(ELEM_BY_ELEM_ORDER_DEFAULT), min_particle_id, max_particle_id,
+            min_element_id, max_element_id, min_turn, max_turn, true );
+
+        if( success != 0 ) return success;
+
+        cl_int ret = ptr_queue->enqueueWriteBuffer(
+            this->m_elem_by_elem_config_buffer, CL_TRUE, size_type{ 0 },
+            sizeof( elem_by_elem_config ), &elem_by_elem_config );
+
+        if( ret != CL_SUCCESS )
         {
-            cl::CommandQueue* ptr_queue = this->openClQueue();
-            SIXTRL_ASSERT( ptr_queue != nullptr );
+            success = -2;
+            return success;
+        }
 
+        this->assignKernelArgument( kernel_id, 0u, particles_arg );
+        this->assignKernelArgument( kernel_id, 1u, beam_elements_arg );
+
+        this->assignKernelArgument( kernel_id, 2u, elem_by_elem_buffer_arg );
+
+        this->assignKernelArgumentClBuffer(
+            kernel_id, 3u, this->m_elem_by_elem_config_buffer );
+
+        this->assignKernelArgumentValue( kernel_id, 4u, until_turn );
+
+        this->assignKernelArgumentValue(
+            kernel_id, 5u, out_buffer_index_offset );
+
+        if( num_kernel_args > 6u )
+        {
+            this->assignKernelArgumentClBuffer(
+                kernel_id, 6u, this->internalSuccessFlagBuffer() );
+        }
+
+        success = ( this->runKernel( kernel_id, total_num_particles ) ) ? 0 : -1;
+
+        if( ( success == 0 ) && ( num_kernel_args > 6u ) )
+        {
             int32_t success_flag = int32_t{ -1 };
             cl_int cl_ret = ptr_queue->enqueueReadBuffer(
                 this->internalSuccessFlagBuffer(), CL_TRUE, 0,
@@ -702,7 +999,7 @@ namespace SIXTRL_CXX_NAMESPACE
     int ClContext::assignBeamMonitorIoBuffer(
         ClArgument& SIXTRL_RESTRICT_REF beam_elements_arg,
         ClArgument& SIXTRL_RESTRICT_REF out_buffer_arg,
-        ClContext::size_type const num_particles,
+        ClContext::size_type const min_turn_id,
         ClContext::size_type const out_particle_block_offset  )
     {
         int success = -1;
@@ -713,7 +1010,7 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( kernel_id >= kernel_id_t{ 0 } ) && ( kernel_id <  max_kernel_id ) )
         {
             success = this->assignBeamMonitorIoBuffer( beam_elements_arg,
-                out_buffer_arg, num_particles, out_particle_block_offset, kernel_id );
+                out_buffer_arg, min_turn_id, out_particle_block_offset, kernel_id );
         }
 
         return success;
@@ -722,7 +1019,7 @@ namespace SIXTRL_CXX_NAMESPACE
     int ClContext::assignBeamMonitorIoBuffer(
         ClArgument& SIXTRL_RESTRICT_REF beam_elements_arg,
         ClArgument& SIXTRL_RESTRICT_REF out_buffer_arg,
-        ClContext::size_type const num_particles,
+        ClContext::size_type const min_turn_id,
         ClContext::size_type const out_particle_block_offset,
         ClContext::kernel_id_t const assign_kernel_id )
     {
@@ -742,18 +1039,23 @@ namespace SIXTRL_CXX_NAMESPACE
             out_buffer_arg.ptrCObjectBuffer() ) );
 
         size_type const num_kernel_args = this->kernelNumArgs( assign_kernel_id );
-        SIXTRL_ASSERT(  num_kernel_args >= 3u );
+        SIXTRL_ASSERT(  num_kernel_args >= 4u );
+
+        int64_t const min_turn_id_arg = static_cast< int64_t >( min_turn_id );
 
         this->assignKernelArgument( assign_kernel_id, 0u, beam_elements_arg );
         this->assignKernelArgument( assign_kernel_id, 1u, out_buffer_arg );
 
         this->assignKernelArgumentValue(
-            assign_kernel_id, 2u, out_particle_block_offset );
+            assign_kernel_id, 2u, min_turn_id_arg );
 
-        if( num_kernel_args > 3u )
+        this->assignKernelArgumentValue(
+            assign_kernel_id, 3u, out_particle_block_offset );
+
+        if( num_kernel_args > 4u )
         {
             this->assignKernelArgumentClBuffer(
-                assign_kernel_id, 3u, this->internalSuccessFlagBuffer() );
+                assign_kernel_id, 4u, this->internalSuccessFlagBuffer() );
         }
 
         success = ( this->runKernel( assign_kernel_id,
@@ -971,6 +1273,20 @@ namespace SIXTRL_CXX_NAMESPACE
                  ( this->doInitDefaultKernelsPrivImpl() ) );
     }
 
+    bool ClContext::doSelectNode( ClContext::size_type const node_index )
+    {
+        return ( ( ClContextBase::doSelectNode( node_index ) ) &&
+                 ( this->doSelectNodePrivImpl( node_index ) ) );
+    }
+
+    void ClContext::doClear()
+    {
+        ClContextBase::doClear();
+        this->doClearPrivImpl();
+
+        return;
+    }
+
     bool ClContext::doInitDefaultProgramsPrivImpl()
     {
         bool success = false;
@@ -989,9 +1305,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
             path_to_particles_track_opt_prog +=
                 "track_particles_optimized_priv_particles.cl";
-
-//             path_to_assign_out_buffer_prog    +=
-//                 "be_monitors_assign_out_buffer_debug.cl";
 
             path_to_assign_out_buffer_prog    +=
                 "be_monitors_assign_out_buffer.cl";
@@ -1221,6 +1534,38 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return success;
     }
+
+    bool ClContext::doSelectNodePrivImpl(
+         ClContext::size_type const node_index )
+    {
+        bool success = false;
+
+        using config_t = ::NS(ElemByElemConfig);
+
+        if( ( this->hasSelectedNode() ) &&
+            ( this->selectedNodeIndex() == node_index ) )
+        {
+            cl::Context* ptr_context = this->openClContext();
+
+            if( ptr_context != nullptr )
+            {
+                this->m_elem_by_elem_config_buffer = cl::Buffer( *ptr_context,
+                     CL_MEM_READ_WRITE, sizeof( config_t ), nullptr );
+
+                success = true;
+            }
+        }
+
+        return success;
+    }
+
+    void ClContext::doClearPrivImpl()
+    {
+        cl::Buffer dummy_buffer;
+        this->m_elem_by_elem_config_buffer = dummy_buffer;
+
+        return;
+    }
 }
 
 #endif /* defined( __cplusplus ) */
@@ -1234,7 +1579,7 @@ SIXTRL_HOST_FN NS(ClContext)* NS(ClContext_create)()
 
 SIXTRL_HOST_FN NS(ClContext)* NS(ClContext_new)( const char* node_id_str )
 {
-    return new SIXTRL_CXX_NAMESPACE::ClContext( node_id_str );
+    return new SIXTRL_CXX_NAMESPACE::ClContext( node_id_str, nullptr );
 }
 
 SIXTRL_HOST_FN void NS(ClContext_delete)( NS(ClContext)* SIXTRL_RESTRICT ctx )
@@ -1394,22 +1739,22 @@ SIXTRL_HOST_FN bool NS(ClContext_set_element_by_element_tracking_kernel_id)(
 SIXTRL_HOST_FN int NS(ClContext_continue_tracking_element_by_element)(
     NS(ClContext)* SIXTRL_RESTRICT ctx,
     NS(buffer_size_t) const until_turn,
-    NS(buffer_size_t) const out_particle_block_offset )
+    NS(buffer_size_t) const out_buffer_index_offset )
 {
     return ( ctx != nullptr )
-        ? ctx->trackElementByElement( until_turn, out_particle_block_offset )
+        ? ctx->trackElementByElement( until_turn, out_buffer_index_offset )
         : -1;
 }
 
 SIXTRL_HOST_FN int NS(ClContext_continue_tracking_element_by_element_with_kernel_id)(
     NS(ClContext)* SIXTRL_RESTRICT ctx,
     NS(buffer_size_t) const until_turn,
-    NS(buffer_size_t) const out_particle_block_offset,
+    NS(buffer_size_t) const out_buffer_index_offset,
     int const kernel_id )
 {
     return ( ctx != nullptr )
         ? ctx->trackElementByElement(
-            until_turn, out_particle_block_offset, kernel_id )
+            until_turn, out_buffer_index_offset, kernel_id )
         : -1;
 }
 
@@ -1419,14 +1764,14 @@ SIXTRL_HOST_FN int NS(ClContext_track_element_by_element)(
     NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_elem_by_elem_buffer_arg,
     NS(buffer_size_t) const until_turn,
-    NS(buffer_size_t) const out_particle_block_offset )
+    NS(buffer_size_t) const out_buffer_index_offset )
 {
     return ( ( ctx != nullptr ) && ( ptr_particles_arg != nullptr ) &&
              ( ptr_beam_elements_arg != nullptr ) &&
              ( ptr_elem_by_elem_buffer_arg != nullptr ) )
         ? ctx->trackElementByElement( *ptr_particles_arg, *ptr_beam_elements_arg,
                                       *ptr_elem_by_elem_buffer_arg,
-                                      until_turn, out_particle_block_offset )
+                                      until_turn, out_buffer_index_offset )
         : -1;
 }
 
@@ -1435,7 +1780,7 @@ SIXTRL_HOST_FN int NS(ClContext_track_element_by_element_with_kernel_id)(
     NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_elem_by_elem_buffer_arg,
-    NS(buffer_size_t) const out_particle_block_offset,
+    NS(buffer_size_t) const out_buffer_index_offset,
     NS(buffer_size_t) const until_turn,
     int const tracking_kernel_id )
 {
@@ -1444,7 +1789,7 @@ SIXTRL_HOST_FN int NS(ClContext_track_element_by_element_with_kernel_id)(
              ( ptr_elem_by_elem_buffer_arg != nullptr ) )
         ? ctx->trackElementByElement( *ptr_particles_arg, *ptr_beam_elements_arg,
                                       *ptr_elem_by_elem_buffer_arg,
-                                      until_turn, out_particle_block_offset,
+                                      until_turn, out_buffer_index_offset,
                                       tracking_kernel_id )
         : -1;
 }
@@ -1477,12 +1822,13 @@ SIXTRL_HOST_FN int NS(ClContext_assign_beam_monitor_out_buffer)(
     NS(ClContext)*  SIXTRL_RESTRICT ctx,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_out_buffer_arg,
+    NS(buffer_size_t) const min_turn_id,
     NS(buffer_size_t) const out_particle_block_offset )
 {
     return ( ( ctx != nullptr ) && ( ptr_beam_elements_arg != nullptr ) &&
              ( ptr_out_buffer_arg != nullptr ) )
-        ? ctx->assignBeamMonitorIoBuffer(
-            *ptr_beam_elements_arg, *ptr_out_buffer_arg, out_particle_block_offset )
+        ? ctx->assignBeamMonitorIoBuffer( *ptr_beam_elements_arg,
+            *ptr_out_buffer_arg, min_turn_id, out_particle_block_offset )
         : -1;
 }
 
@@ -1490,14 +1836,15 @@ SIXTRL_HOST_FN int NS(ClContext_assign_beam_monitor_out_buffer_with_kernel_id)(
     NS(ClContext)*  SIXTRL_RESTRICT ctx,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_out_buffer_arg,
+    NS(buffer_size_t) const min_turn_id,
     NS(buffer_size_t) const out_particle_block_offset,
     int const assign_kernel_id )
 {
     return ( ( ctx != nullptr ) && ( ptr_beam_elements_arg != nullptr ) &&
              ( ptr_out_buffer_arg != nullptr ) )
-        ? ctx->assignBeamMonitorIoBuffer(
-            *ptr_beam_elements_arg, *ptr_out_buffer_arg,
-            out_particle_block_offset, assign_kernel_id )
+        ? ctx->assignBeamMonitorIoBuffer( *ptr_beam_elements_arg,
+            *ptr_out_buffer_arg, min_turn_id, out_particle_block_offset,
+                assign_kernel_id )
         : -1;
 }
 

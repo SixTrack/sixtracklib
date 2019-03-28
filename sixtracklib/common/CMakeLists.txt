@@ -8,8 +8,10 @@ set( SIXTRACKLIB_COMMON_C99_HEADERS )
 set( SIXTRACKLIB_COMMON_CXX_HEADERS )
 
 add_subdirectory( generated      )
-add_subdirectory( internal       )
+
 add_subdirectory( buffer         )
+add_subdirectory( context        )
+add_subdirectory( internal       )
 add_subdirectory( be_beambeam    )
 add_subdirectory( be_drift       )
 add_subdirectory( be_cavity      )
@@ -18,6 +20,7 @@ add_subdirectory( be_rfmultipole )
 add_subdirectory( be_srotation   )
 add_subdirectory( be_xyshift     )
 add_subdirectory( be_monitor     )
+add_subdirectory( output         )
 
 set( SIXTRACKLIB_COMMON_INTERNAL_CXX_HEADERS )
 set( SIXTRACKLIB_COMMON_INTERNAL_CXX_SOURCES )
@@ -30,6 +33,8 @@ set(  SIXTRACKLIB_C99_HEADERS
       definitions.h
       particles.h
       track.h
+      track_job.h
+      track_job_cpu.h
 )
 
 set(  SIXTRACKLIB_CXX_HEADERS
