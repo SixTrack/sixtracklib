@@ -9,6 +9,7 @@
         #include <memory>
         #include <string>
         #include <vector>
+    #endif /* defined( __cplusplus ) */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
@@ -33,30 +34,243 @@
 
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if !defined( _GPUCODE ) && ( defined( __cplusplus ) )
+#if !defined( _GPUCODE )
+#if defined( __cplusplus )
 
-SIXTRL_HOST_FN SIXTRL_STATIC void
-NS(TrackJob_extract_device_id_str_from_config_str)(
-    const char *const SIXTRL_RESTRICT config_str,
-    char* SIXTRL_RESTRICT device_id_str,
-    NS(buffer_size_t) const max_device_id_str_len );
+namespace SIXTRL_CXX_NAMESPACE
+{
+    SIXTRL_INLINE SIXTRL_HOST_FN TrackJobBase* TrackJob_create(
+        const char *const SIXTRL_RESTRICT arch_str,
+        const char *const SIXTRL_RESTRICT config_str )
+    {
+        TrackJobBase* ptr_job = nullptr;
 
-SIXTRL_HOST_FN SIXTRL_STATIC void
-NS(TrackJob_sanitize_architecture_str)(
-    const char *const SIXTRL_RESTRICT arch_str,
-    char* SIXTRL_RESTRICT sanitized_arch_str,
-    NS(buffer_size_t) const max_sanitized_arch_str_len );
+        std::string const sanitized_str =
+            TrackJob_sanitize_arch_str( arch_str );
+
+        if( !sanitized_str.empty() )
+        {
+            #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
+                ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
+            if( 0 == sanitized_str.compare( TRACK_JOB_CL_STR ) )
+            {
+                using track_job_t = SIXTRL_CXX_NAMESPACE::TrackJobCl;
+
+                std::string const device_id_str =
+                    TrackJob_extract_device_id_str( config_str );
+
+                char const* device_id_cstr = ( !device_id_str.empty() )
+                    ? device_id_str.c_str() : nullptr;
+
+                ptr_job = new track_job_t( device_id_cstr, config_str );
+            }
+            else
+            #endif /* OpenCL 1.x */
+            if( 0 == sanitized_str.compare( TRACK_JOB_CPU_STR ) )
+            {
+                using track_job_t = SIXTRL_CXX_NAMESPACE::TrackJobCpu;
+                ptr_job = new track_job_t( config_str );
+            }
+        }
+
+        return ptr_job;
+    }
+
+    SIXTRL_INLINE SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        const char *const SIXTRL_RESTRICT arch_str,
+        ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+        ::NS(Buffer)* SIXTRL_RESTRICT beam_elemements_buffer,
+        const char *const SIXTRL_RESTRICT config_str )
+    {
+        using size_t = ::NS(buffer_size_t);
+        size_t const pset_indices[] = { size_t{ 0 } };
+
+        return TrackJob_new( arch_str, particles_buffer, size_t{ 1 },
+            &pset_indices[ 0 ], beam_elemements_buffer, nullptr, size_t{ 0 },
+                config_str );
+    }
+
+    SIXTRL_INLINE SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        const char *const SIXTRL_RESTRICT arch_str,
+        ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+        ::NS(Buffer)* SIXTRL_RESTRICT beam_elemements_buffer,
+        ::NS(Buffer)* SIXTRL_RESTRICT output_buffer,
+        ::NS(buffer_size_t) const dump_elem_by_elem_turns,
+        const char *const SIXTRL_RESTRICT config_str )
+    {
+        using size_t = ::NS(buffer_size_t);
+        size_t const pset_indices[] = { size_t{ 0 } };
+
+        return TrackJob_new( arch_str, particles_buffer, size_t{ 1 },
+            &pset_indices[ 0 ], beam_elemements_buffer, output_buffer,
+                dump_elem_by_elem_turns, config_str );
+    }
+
+    SIXTRL_INLINE SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        const char *const SIXTRL_RESTRICT arch_str,
+        ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+        ::NS(buffer_size_t) const num_particle_sets,
+        ::NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
+        ::NS(Buffer)* SIXTRL_RESTRICT belemements_buffer,
+        ::NS(Buffer)* SIXTRL_RESTRICT output_buffer,
+        ::NS(buffer_size_t) const dump_elem_by_elem_turns,
+        const char *const SIXTRL_RESTRICT config_str )
+    {
+        TrackJobBase* ptr_job = nullptr;
+
+        std::string const sanitized_str =
+            TrackJob_sanitize_arch_str( arch_str );
+
+        if( !sanitized_str.empty() )
+        {
+            #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
+                ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
+            if( sanitized_str.compare( TRACK_JOB_CL_STR ) == 0 )
+            {
+                std::string const device_id_str =
+                    TrackJob_extract_device_id_str( config_str );
+
+                char const* device_id_cstr = ( !device_id_str.empty() )
+                    ? device_id_str.c_str() : nullptr;
+
+                ptr_job = new TrackJobCl( device_id_cstr, particles_buffer,
+                    num_particle_sets, pset_indices_begin, belemements_buffer,
+                        output_buffer, dump_elem_by_elem_turns, config_str );
+            }
+            else
+            #endif /* OpenCL 1.x */
+            if( sanitized_str.compare( TRACK_JOB_CPU_STR ) == 0 )
+            {
+                ptr_job = new TrackJobCpu( particles_buffer,
+                    num_particle_sets, pset_indices_begin, belemements_buffer,
+                        output_buffer, dump_elem_by_elem_turns, config_str );
+            }
+        }
+
+        return ptr_job;
+    }
+
+
+    SIXTRL_INLINE SIXTRL_HOST_FN TrackJobBase* TrackJob_create(
+        std::string const& SIXTRL_RESTRICT_REF arch_str,
+        std::string const& SIXTRL_RESTRICT_REF config_str )
+    {
+        TrackJobBase* ptr_job = nullptr;
+
+        std::string const sanitized_str =
+            TrackJob_sanitize_arch_str( arch_str.c_str() );
+
+        if( !sanitized_str.empty() )
+        {
+            #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
+                ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
+            if( sanitized_str.compare( TRACK_JOB_CL_STR ) == 0 )
+            {
+                std::string const device_id_str =
+                    TrackJob_extract_device_id_str( config_str.c_str() );
+
+                ptr_job = new TrackJobCl( device_id_str, config_str );
+            }
+            else
+            #endif /* OpenCL 1.x */
+            if( sanitized_str.compare( TRACK_JOB_CPU_STR ) == 0 )
+            {
+                ptr_job = new TrackJobCpu( config_str );
+            }
+        }
+
+        return ptr_job;
+    }
+
+    SIXTRL_INLINE SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        std::string const& SIXTRL_RESTRICT_REF arch_str,
+        Buffer& SIXTRL_RESTRICT_REF particles_buffer,
+        Buffer& SIXTRL_RESTRICT_REF beam_elemements_buffer,
+        std::string const& SIXTRL_RESTRICT_REF config_str )
+    {
+        using size_t = Buffer::size_type;
+        size_t const pset_indices[] = { size_t{ 0 } };
+
+        return TrackJob_new( arch_str, particles_buffer, size_t{ 1 },
+            &pset_indices[ 0 ], beam_elemements_buffer, nullptr, size_t{ 0 },
+                config_str );
+    }
+
+    SIXTRL_INLINE SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        std::string const& SIXTRL_RESTRICT_REF arch_str,
+        Buffer& SIXTRL_RESTRICT_REF particles_buffer,
+        Buffer& SIXTRL_RESTRICT_REF beam_elemements_buffer,
+        Buffer* SIXTRL_RESTRICT output_buffer,
+        Buffer::size_type const dump_elem_by_elem_turns,
+        std::string const& SIXTRL_RESTRICT_REF config_str )
+    {
+        using size_t = Buffer::size_type;
+        size_t const pset_indices[] = { size_t{ 0 } };
+
+        return TrackJob_new( arch_str, particles_buffer, size_t{ 1 },
+            &pset_indices[ 0 ], beam_elemements_buffer, output_buffer,
+                dump_elem_by_elem_turns, config_str );
+    }
+
+    SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        std::string const& SIXTRL_RESTRICT_REF arch_str,
+        Buffer& SIXTRL_RESTRICT_REF particles_buffer,
+        Buffer::size_type const num_particle_sets,
+        Buffer::size_type const* SIXTRL_RESTRICT particle_set_indices_begin,
+        Buffer& SIXTRL_RESTRICT_REF beam_elemements_buffer,
+        Buffer* SIXTRL_RESTRICT output_buffer,
+        Buffer::size_type const dump_elem_by_elem_turns,
+        std::string const& SIXTRL_RESTRICT_REF config_str )
+    {
+        TrackJobBase* ptr_job = nullptr;
+
+        std::string const sanitized_str =
+            TrackJob_sanitize_arch_str( arch_str.c_str() );
+
+        Buffer::size_type const* particle_set_indices_end =
+            particle_set_indices_begin;
+
+        if( ( particle_set_indices_begin != nullptr ) &&
+            ( num_particle_sets > Buffer::size_type{ 0 } ) )
+        {
+            std::advance( particle_set_indices_end, num_particle_sets );
+        }
+
+        if( !sanitized_str.empty() )
+        {
+            #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
+                ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
+            if( sanitized_str.compare( TRACK_JOB_CL_STR ) == 0 )
+            {
+                std::string const device_id_str =
+                    TrackJob_extract_device_id_str( config_str.c_str() );
+
+                ptr_job = new TrackJobCl( device_id_str, particles_buffer,
+                    particle_set_indices_begin, particle_set_indices_end,
+                        beam_elemements_buffer, output_buffer,
+                            dump_elem_by_elem_turns, config_str );
+            }
+            else
+            #endif /* OpenCL 1.x */
+            if( sanitized_str.compare( TRACK_JOB_CPU_STR ) == 0 )
+            {
+                ptr_job = new TrackJobCpu( particles_buffer,
+                    particle_set_indices_begin, particle_set_indices_end,
+                        beam_elemements_buffer, output_buffer,
+                            dump_elem_by_elem_turns, config_str );
+            }
+        }
+
+        return ptr_job;
+    }
+}
+
 
 SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_create)(
     const char *const SIXTRL_RESTRICT arch,
     const char *const SIXTRL_RESTRICT config_str )
 {
-    using size_t = NS(buffer_size_t);
-    size_t const pset_indices[] = { size_t{ 0 } };
-
-    return NS(TrackJob_new_detailed)(
-        arch, nullptr, size_t{ 1 }, &pset_indices[ 0 ],
-        nullptr, nullptr, size_t{ 0 }, config_str );
+    return SIXTRL_CXX_NAMESPACE::TrackJob_create( arch, config_str );
 }
 
 SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_new)(
@@ -65,12 +279,8 @@ SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_new)(
     NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
     const char *const SIXTRL_RESTRICT config_str )
 {
-    using size_t = NS(buffer_size_t);
-    size_t const pset_indices[] = { size_t{ 0 } };
-
-    return NS(TrackJob_new_detailed)(
-        arch, particles_buffer, size_t{ 1 }, &pset_indices[ 0 ],
-        beam_elem_buffer, nullptr, size_t{ 0 }, config_str );
+    return SIXTRL_CXX_NAMESPACE::TrackJob_new(
+        arch, particles_buffer, beam_elem_buffer, config_str );
 }
 
 SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_new_with_output)(
@@ -81,12 +291,9 @@ SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_new_with_output)(
     NS(buffer_size_t) const dump_elem_by_elem_turns,
     const char *const SIXTRL_RESTRICT config_str )
 {
-    using size_t = NS(buffer_size_t);
-    size_t const pset_indices[] = { size_t{ 0 } };
-
-    return NS(TrackJob_new_detailed)(
-        arch, particles_buffer, size_t{ 1 }, &pset_indices[ 0 ],
-        beam_elem_buffer, output_buffer, dump_elem_by_elem_turns, config_str );
+    return SIXTRL_CXX_NAMESPACE::TrackJob_new(
+        arch, particles_buffer, beam_elem_buffer, output_buffer,
+            dump_elem_by_elem_turns, config_str );
 }
 
 SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_new_detailed)(
@@ -99,65 +306,9 @@ SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_new_detailed)(
     NS(buffer_size_t) const dump_elem_by_elem_turns,
     const char *const SIXTRL_RESTRICT config_str )
 {
-    using ptr_track_job_t = NS(TrackJobBase)*;
-    using size_t          = NS(buffer_size_t);
-
-    ptr_track_job_t ptr_track_job = nullptr;
-
-    char device_id_str[ 16 ] =
-    {
-        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
-        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
-    };
-
-    char arch_sanitized[ 32 ] =
-    {
-        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
-        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
-        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
-        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
-    };
-
-    size_t arch_len = size_t{ 0u };
-
-    if( arch != nullptr )
-    {
-        NS(TrackJob_sanitize_architecture_str)(
-            arch, &sanitized_arch_str[ 0 ], 32u );
-
-        arch_len = std::strlen( &sanitized_arch_str[ 0 ] );
-    }
-
-    if( ( config_str != nullptr ) && ( arch_len > size_t{ 0 } ) )
-    {
-        if( std::strcmp( &sanitized_arch_str[ 0 ],
-                SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_STR ) == 0 )
-        {
-            ptr_track_job = new SIXTRL_CXX_NAMESPACE::TrackJobCpu(
-                particles_buffer, num_particle_sets, pset_indices_begin,
-                beam_elem_buffer, output_buffer, dump_elem_by_elem_turns,
-                config_str );
-        }
-        #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
-            ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
-        else if( std::strcmp( &sanitized_arch_str[ 0 ],
-                SIXTRL_CXX_NAMESPACE::TRACK_JOB_CL_STR ) == 0 )
-        {
-            NS(TrackJob_extract_device_id_str_from_config_str)(
-                config_str, &device_id_str[ 0 ], 16 );
-
-            if( std::strlen( device_id_str ) > size_t{ 0 } )
-            {
-                ptr_track_job = new SIXTRL_CXX_NAMESPACE::TrackJobCl(
-                    device_id_str, particles_buffer, num_particle_sets,
-                    pset_indices_begin, beam_elem_buffer, output_buffer,
-                    dump_elem_by_elem_turns, config_str );
-            }
-        }
-        #endif /* OpenCL 1.x */
-    }
-
-    return ptr_track_job;
+    return SIXTRL_CXX_NAMESPACE::TrackJob_new( arch, particles_buffer,
+        num_particle_sets, pset_indices_begin, beam_elem_buffer, output_buffer,
+            dump_elem_by_elem_turns, config_str );
 }
 
 /* ------------------------------------------------------------------------- */
@@ -195,11 +346,6 @@ SIXTRL_HOST_FN void NS(TrackJob_collect)(
 SIXTRL_HOST_FN void NS(TrackJob_clear)( NS(TrackJobBase)* SIXTRL_RESTRICT job )
 {
     if( job != nullptr ) job->clear();
-}
-
-SIXTRL_HOST_FN void NS(TrackJob_collect)( NS(TrackJobBase)* SIXTRL_RESTRICT j )
-{
-    if( j != nullptr ) j->collect();
 }
 
 SIXTRL_HOST_FN bool NS(TrackJob_reset)( NS(TrackJobBase)* SIXTRL_RESTRICT job,
@@ -558,105 +704,7 @@ NS(TrackJob_set_default_elem_by_elem_config_order)(
     return;
 }
 
-SIXTRL_HOST_FN void NS(TrackJob_extract_device_id_str_from_config_str)(
-    const char *const SIXTRL_RESTRICT config_str,
-    char* SIXTRL_RESTRICT device_id_str,
-    NS(buffer_size_t) const max_device_id_str_len )
-{
-    using size_t = NS(buffer_size_t);
-
-    if( ( device_id_str != nullptr ) &&
-        ( std::strlen( config_str ) > size_t{ 0 } ) )
-    {
-        std::fill( &device_id_str[ 0 ],
-                   &device_id_str[ max_device_id_str_len ], '\0' );
-    }
-
-    if( ( config_str != nullptr ) &&
-        ( device_id_str != nullptr ) &&
-        ( max_device_id_str_len > size_t{ 0 } ) &&
-        ( std::strlen( config_str ) > size_t{ 0 } ) )
-    {
-        char const* begin_pos = config_str;
-        char const* end_pos   = std::strchr( config_str, ';' );
-
-        if( end_pos == nullptr )
-        {
-            end_pos = std::strchr( config_str, '\0' );
-        }
-
-        if( end_pos != nullptr )
-        {
-            while( begin_pos != end_pos )
-            {
-                if( (  std::isblank( *begin_pos ) ) ||
-                    ( !std::isprint( *begin_pos ) ) ||
-                    (  std::iscntrl( *begin_pos ) ) )
-                {
-                    ++begin_pos;
-                }
-                else
-                {
-                    break;
-                }
-            };
-
-            std::ptrdiff_t const temp_dist =
-                std::distance( begin_pos, end_pos );
-
-            if(  temp_dist > std::ptrdiff_t{ 0 } )
-            {
-                size_t const len = std::min(
-                    static_cast< size_t >( temp_dist ),
-                        max_device_id_str_len - size_t{ 1 } );
-
-                end_pos = begin_pos;
-                std::advance( end_pos, len );
-
-                std::copy( begin_pos, end_pos, &device_id_str[ 0 ] );
-            }
-        }
-    }
-
-    return;
-}
-
-SIXTRL_HOST_FN void NS(TrackJob_sanitize_architecture_str)(
-    const char *const SIXTRL_RESTRICT arch_str,
-    char* SIXTRL_RESTRICT sanitized_arch_str,
-    NS(buffer_size_t) const max_sanitized_arch_str_len )
-{
-    using size_t = ::NS(buffer_size_t);
-
-    if( ( arch_str != nullptr ) && ( sanitized_arch_str != nullptr ) &&
-        ( max_sanitized_arch_str_len > size_t{ 0 } ) )
-    {
-        std::fill( &sanitized_arch_str[ 0 ],
-                   &sanitized_arch_str[ max_sanitized_arch_str_len ], '\0' );
-
-        size_t const in_len = std::strlen( arch_str );
-
-        if( in_len > size_t{ 0 } )
-        {
-            size_t const len = std::min(
-                in_len, max_sanitized_arch_str_len - size_t{ 1 }  );
-
-            char* out_it = sanitized_arch_str;
-
-            char const* in_it  = arch_str;
-            char const* in_end = in_it;
-            std::advance( in_end, len );
-
-            for( ; in_it != in_end ; ++in_it, ++out_it )
-            {
-                *out_it = std::tolower( *in_it );
-            }
-        }
-    }
-
-    return;
-}
-
-#endif /* !defined( _GPUCODE ) && ( defined( __cplusplus ) ) */
+#endif /* defined( __cplusplus ) */
+#endif /* !defined( _GPUCODE ) */
 
 /* end: sixtracklib/common/internal/track_job.cpp */
