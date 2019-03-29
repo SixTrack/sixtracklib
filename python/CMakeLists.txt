@@ -4,7 +4,6 @@ if( NOT PYTHONINTERP_FOUND )
     message( FATAL_ERROR "Python interpreter not found -> stopping" )
 endif()
 
-
 add_subdirectory( pysixtracklib )
 
 set( SETUP_PY_IN_PATH      "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.template" )
