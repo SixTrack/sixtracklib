@@ -87,6 +87,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
+        SIXTRL_HOST_FN virtual ~TrackJobBase() = default;
+
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_HOST_FN bool reset(
             buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
             buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
@@ -277,8 +281,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN TrackJobBase& operator=(
             TrackJobBase&& rhs ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN virtual ~TrackJobBase() = default;
 
         SIXTRL_HOST_FN virtual void doClear();
 
