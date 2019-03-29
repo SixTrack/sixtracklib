@@ -82,6 +82,47 @@ target_compile_options( sixtrack
                         ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------
+# provide a copy of the library to the python module if it is defined!
+
+if( SIXTRACKL_ENABLE_PYTHON )
+    get_target_property( OUT_SIXTRL_PREFIX  sixtrack PREFIX )
+    get_target_property( OUT_SIXTRL_POSTFIX sixtrack RELEASE_POSTFIX )
+    get_target_property( OUT_SIXTRL_NAME    sixtrack OUTPUT_NAME )
+
+    set( LIB_NAME )
+
+    if( OUT_SIXTRL_PREFIX )
+        string( APPEND LIB_NAME  ${OUT_SIXTRL_PREFIX} )
+    else()
+        string( APPEND LIB_NAME  "lib" )
+    endif()
+
+    if( OUT_SIXTRL_NAME )
+        string( APPEND LIB_NAME ${OUT_SIXTRL_NAME} )
+    else()
+        string( APPEND LIB_NAME "sixtrack" )
+    endif()
+
+    if( OUT_SIXTRL_POSTFIX )
+        string( APPEND LIB_NAME ${OUT_SIXTRL_POSTFIX} )
+    endif()
+
+    string( APPEND LIB_NAME ${CMAKE_SHARED_LIBRARY_SUFFIX} )
+
+    if( EXISTS ${CMAKE_SOURCE_DIR}/python/pysixtracklib )
+        set(  PY_SIXTRACKLIB_SHARED_LIB ${LIB_NAME} CACHE INTERNAL "" FORCE )
+        set( IN_PATH    $<TARGET_FILE:sixtrack> )
+        set( DEST_PATH "${CMAKE_SOURCE_DIR}/python/pysixtracklib/${LIB_NAME}" )
+
+        message( STATUS "---- Providing a copy of sixtracklib to pysixtacklib "
+                        "directory: ${DEST_PATH}" )
+
+        add_custom_command( TARGET sixtrack POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy ${IN_PATH} ${DEST_PATH} )
+    endif()
+endif()
+
+# ------------------------------------------------------------------------------
 # install :
 
 install( TARGETS sixtrack

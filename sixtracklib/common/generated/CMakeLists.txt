@@ -42,6 +42,32 @@ set(   SIXTRACKL_COMMON_GENERATED_HEADERS
      ${SIXTRACKL_COMMON_GENERATED_HEADERS} "generated/modules.h" )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# prepare python related module list
+
+if( SIXTRACKL_ENABLE_PYTHON )
+    set( SIXTRACKLIB_MODULES_STR "SIXTRACKLIB_MODULES = {}\r\n" )
+
+    string( APPEND SIXTRACKLIB_MODULES_STR "SIXTRACKLIB_MODULES[\"simd\"]   " )
+    string( APPEND SIXTRACKLIB_MODULES_STR
+            "= ${SIXTRACKL_ENABLE_MODULE_SIMD}\r\n" )
+
+    string( APPEND SIXTRACKLIB_MODULES_STR "SIXTRACKLIB_MODULES[\"opencl\"] " )
+    string( APPEND SIXTRACKLIB_MODULES_STR
+            "= ${SIXTRACKL_ENABLE_MODULE_OPENCL}\r\n" )
+
+    string( APPEND SIXTRACKLIB_MODULES_STR "SIXTRACKLIB_MODULES[\"cuda\"]   " )
+    string( APPEND SIXTRACKLIB_MODULES_STR
+            "= ${SIXTRACKL_ENABLE_MODULE_CUDA}\r\n" )
+
+    string( APPEND SIXTRACKLIB_MODULES_STR "SIXTRACKLIB_MODULES[\"mpfr4\"]  " )
+    string( APPEND SIXTRACKLIB_MODULES_STR
+            "= ${SIXTRACKL_ENABLE_MODULE_MPFR4}\r\n" )
+
+    set( PY_SIXTRACKLIB_MODULES_STR ${SIXTRACKLIB_MODULES_STR}
+         CACHE INTERNAL "" FORCE )
+endif()
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install:
 
 set( MODULES_H_INSTALL_PATH
