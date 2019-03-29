@@ -1,6 +1,7 @@
 import ctypes as ct
+from .pysixtracklib import SHARED_LIB as st_SHARED_LIB
 
-sixtracklib = ct.CDLL( SIXTRACKLIB_SHARED_LIB )
+sixtracklib = ct.CDLL( st_SHARED_LIB )
 
 # C-API Types
 
