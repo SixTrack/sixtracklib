@@ -207,6 +207,38 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT buffer,
         BeamMonitor const& SIXTRL_RESTRICT_REF orig );
 
+    bool BeamMonitor_insert_end_of_turn_monitors(
+        Buffer& SIXTRL_RESTRICT_REF beam_elements_buffer,
+        BeamMonitor::turn_t const turn_by_turn_start,
+        BeamMonitor::turn_t const num_turn_by_turn_turns,
+        BeamMonitor::turn_t const target_num_turns,
+        BeamMonitor::turn_t const skip_turns,
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC Buffer::object_t* prev_node );
+
+    bool BeamMonitor_insert_end_of_turn_monitors(
+        Buffer& SIXTRL_RESTRICT_REF beam_elements_buffer,
+        BeamMonitor::turn_t const turn_by_turn_start,
+        BeamMonitor::turn_t const num_turn_by_turn_turns,
+        BeamMonitor::turn_t const target_num_turns,
+        BeamMonitor::turn_t const skip_turns,
+        Buffer::size_type const insert_at_index );
+
+    bool BeamMonitor_insert_end_of_turn_monitors(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
+        ::NS(be_monitor_turn_t) const turn_by_turn_start,
+        ::NS(be_monitor_turn_t) const num_turn_by_turn_turns,
+        ::NS(be_monitor_turn_t) const target_num_turns,
+        ::NS(be_monitor_turn_t) const skip_turns,
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC ::NS(Object)* prev_node );
+
+    bool BeamMonitor_insert_end_of_turn_monitors(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
+        ::NS(be_monitor_turn_t) const turn_by_turn_start,
+        ::NS(be_monitor_turn_t) const num_turn_by_turn_turns,
+        ::NS(be_monitor_turn_t) const target_num_turns,
+        ::NS(be_monitor_turn_t) const skip_turns,
+        ::NS(buffer_size_t) const insert_at_index );
+
     #endif /* !defined( _GPUCODE ) */
 }
 
@@ -583,6 +615,60 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         return static_cast< SIXTRL_BE_ARGPTR_DEC BeamMonitor* >(
             ::NS(BeamMonitor_add_copy)( buffer, orig.getCApiPtr() ) );
+    }
+
+
+    SIXTRL_INLINE bool BeamMonitor_insert_end_of_turn_monitors(
+        Buffer& SIXTRL_RESTRICT_REF beam_elements_buffer,
+        BeamMonitor::turn_t const turn_by_turn_start,
+        BeamMonitor::turn_t const num_turn_by_turn_turns,
+        BeamMonitor::turn_t const target_num_turns,
+        BeamMonitor::turn_t const skip_turns,
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC Buffer::object_t* prev_node )
+    {
+        return ::NS(BeamMonitor_insert_end_of_turn_monitors)(
+            beam_elements_buffer.getCApiPtr(), turn_by_turn_start,
+            num_turn_by_turn_turns, target_num_turns, skip_turns, prev_node );
+    }
+
+    SIXTRL_INLINE bool BeamMonitor_insert_end_of_turn_monitors(
+        Buffer& SIXTRL_RESTRICT_REF beam_elements_buffer,
+        BeamMonitor::turn_t const turn_by_turn_start,
+        BeamMonitor::turn_t const num_turn_by_turn_turns,
+        BeamMonitor::turn_t const target_num_turns,
+        BeamMonitor::turn_t const skip_turns,
+        Buffer::size_type   const insert_at_index )
+    {
+        return ::NS(BeamMonitor_insert_end_of_turn_monitors_at_pos)(
+            beam_elements_buffer.getCApiPtr(), turn_by_turn_start,
+            num_turn_by_turn_turns, target_num_turns, skip_turns,
+                insert_at_index );
+    }
+
+    SIXTRL_INLINE bool BeamMonitor_insert_end_of_turn_monitors(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
+        ::NS(be_monitor_turn_t) const turn_by_turn_start,
+        ::NS(be_monitor_turn_t) const num_turn_by_turn_turns,
+        ::NS(be_monitor_turn_t) const target_num_turns,
+        ::NS(be_monitor_turn_t) const skip_turns,
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC ::NS(Object)* prev_node )
+    {
+        return ::NS(BeamMonitor_insert_end_of_turn_monitors)(
+            belements_buffer, turn_by_turn_start, num_turn_by_turn_turns,
+            target_num_turns, skip_turns, prev_node );
+    }
+
+    SIXTRL_INLINE bool BeamMonitor_insert_end_of_turn_monitors(
+        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
+        ::NS(be_monitor_turn_t) const turn_by_turn_start,
+        ::NS(be_monitor_turn_t) const num_turn_by_turn_turns,
+        ::NS(be_monitor_turn_t) const target_num_turns,
+        ::NS(be_monitor_turn_t) const skip_turns,
+        ::NS(buffer_size_t)     const insert_at_index )
+    {
+        return ::NS(BeamMonitor_insert_end_of_turn_monitors_at_pos)(
+            belements_buffer, turn_by_turn_start, num_turn_by_turn_turns,
+            target_num_turns, skip_turns, insert_at_index );
     }
 
     #endif /* !defined( _GPUCODE ) */

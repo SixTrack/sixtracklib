@@ -111,6 +111,10 @@ SIXTRL_FN SIXTRL_STATIC NS(be_monitor_index_t)
 NS(BeamMonitor_get_max_particle_id)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(BeamMonitor_get_required_num_of_store_particles)(
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* accessor functions for retrieving already dumped data */
 
@@ -197,6 +201,23 @@ SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)*
 NS(BeamMonitor_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(BeamMonitor_insert_end_of_turn_monitors)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
+    NS(be_monitor_turn_t) const turn_by_turn_start,
+    NS(be_monitor_turn_t) const num_turn_by_turn_turns,
+    NS(be_monitor_turn_t) const target_num_turns,
+    NS(be_monitor_turn_t) const skip_turns,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT prev_node );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(BeamMonitor_insert_end_of_turn_monitors_at_pos)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
+    NS(be_monitor_turn_t) const turn_by_turn_start,
+    NS(be_monitor_turn_t) const num_turn_by_turn_turns,
+    NS(be_monitor_turn_t) const target_num_turns,
+    NS(be_monitor_turn_t) const skip_turns,
+    NS(buffer_size_t) const insert_at_index );
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -586,6 +607,33 @@ NS(BeamMonitor_get_max_particle_id)(
     SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( monitor->max_particle_id >= monitor->min_particle_id );
     return monitor->max_particle_id;
+}
+
+SIXTRL_INLINE NS(buffer_size_t)
+NS(BeamMonitor_get_required_num_of_store_particles)(
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
+{
+    typedef NS(buffer_size_t)       size_t;
+    typedef NS(be_monitor_index_t)  index_t;
+
+    size_t required_num_particles = ( size_t )0u;
+
+    index_t const min_particle_id =
+        NS(BeamMonitor_get_min_particle_id)( monitor );
+
+    index_t const max_particle_id =
+        NS(BeamMonitor_get_max_particle_id)( monitor );
+
+    if( ( min_particle_id >= ( index_t )0u ) &&
+        ( max_particle_id >= min_particle_id ) )
+    {
+        required_num_particles = ( size_t )(
+            max_particle_id - min_particle_id + ( size_t )1u );
+
+        required_num_particles *= NS(BeamMonitor_get_num_stores)( monitor );
+    }
+
+    return required_num_particles;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
