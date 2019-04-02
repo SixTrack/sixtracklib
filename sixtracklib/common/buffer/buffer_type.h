@@ -62,6 +62,10 @@ typedef SIXTRL_UINT64_T NS(object_type_id_t);
     #define   SIXTRL_BUFFER_DATASTORE_ALLOW_RESIZE          0x00000040
 #endif /* !defined( SIXTRL_BUFFER_DATASTORE_ALLOW_RESIZE ) */
 
+#if !defined( SIXTRL_BUFFER_DATASTORE_ALLOW_RESIZE )
+    #define   SIXTRL_BUFFER_DATASTORE_ALLOW_RESIZE          0x00000040
+#endif /* !defined( SIXTRL_BUFFER_DATASTORE_ALLOW_RESIZE ) */
+
 #if !defined( SIXTRL_BUFFER_DATASTORE_MEMPOOL )
     #define   SIXTRL_BUFFER_DATASTORE_MEMPOOL               0x00010000
 #endif /* !defined( SIXTRL_BUFFER_DATASTORE_MEMPOOL ) */
@@ -77,6 +81,14 @@ typedef SIXTRL_UINT64_T NS(object_type_id_t);
 #if !defined( SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_MASK )
     #define   SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_MASK    0xff000000
 #endif /* !defined( SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_MASK ) */
+
+/* --------------------------------------------------------------------- */
+
+#if !defined( SIXTRL_BUFFER_DEVELOPMENT_DEBUG_MODE )
+    #define   SIXTRL_BUFFER_DEVELOPMENT_DEBUG_MODE 0x8000000000000000
+#endif /* !defined( SIXTRL_BUFFER_DEVELOPMENT_DEBUG_MODE ) */
+
+/* --------------------------------------------------------------------- */
 
 #if !defined( SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_BITS )
     #define   SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_BITS    24u
@@ -136,6 +148,11 @@ SIXTRL_STATIC_VAR NS(buffer_flags_t) const NS(BUFFER_DATASTORE_SPECIAL_FLAGS_MAS
 
 SIXTRL_STATIC_VAR NS(buffer_flags_t) const NS(BUFFER_DATASTORE_SPECIAL_FLAGS_BITS) =
     ( NS(buffer_flags_t) )SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_BITS;
+
+/* --------------------------------------------------------------------- */
+
+SIXTRL_STATIC_VAR NS(buffer_flags_t) const NS(BUFFER_DEVELOPMENT_DEBUG_MDOE) =
+    ( NS(buffer_flags_t) )SIXTRL_BUFFER_DEVELOPMENT_DEBUG_MODE;
 
 /* ------------------------------------------------------------------------- */
 
@@ -250,6 +267,12 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST buffer_flags_t
         BUFFER_DATASTORE_SPECIAL_FLAGS_BITS = static_cast< buffer_flags_t >(
             SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_BITS );
+
+    /* --------------------------------------------------------------------- */
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST buffer_flags_t
+        BUFFER_DEVELOPMENT_DEBUG_MDOE = static_cast< buffer_flags_t >(
+            SIXTRL_BUFFER_DEVELOPMENT_DEBUG_MODE );
 
     /* --------------------------------------------------------------------- */
 
