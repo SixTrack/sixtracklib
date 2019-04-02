@@ -6,8 +6,9 @@ endif()
 
 add_subdirectory( pysixtracklib )
 
-set( SETUP_PY_IN_PATH      "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.template" )
-set( SETUP_PY_OUT_PATH     "${CMAKE_CURRENT_SOURCE_DIR}/setup.py" )
+set( PYTHON_SIXTRACKLIB_SHARED_LIB  ${PY_SIXTRACKLIB_SHARED_LIB}  )
+set( SETUP_PY_IN_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.template" )
+set( SETUP_PY_OUT_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/setup.py" )
 
 configure_file( ${SETUP_PY_IN_PATH} ${SETUP_PY_OUT_PATH} @ONLY )
 
