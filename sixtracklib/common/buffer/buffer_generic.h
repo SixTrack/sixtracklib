@@ -64,6 +64,9 @@ SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_needs_remapping_generic)(
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_remap_generic)(
     SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
+SIXTRL_FN SIXTRL_STATIC int NS(Buffer_refresh_generic)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
+
 /* ========================================================================= */
 
 SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reserve_capacity_generic)(
@@ -360,6 +363,66 @@ SIXTRL_INLINE int NS(Buffer_remap_generic)(
                     NS(ManagedBuffer_get_section_num_entities)(
                         begin, OBJS_ID, slot_size );
             }
+        }
+    }
+
+    return success;
+}
+
+SIXTRL_INLINE int NS(Buffer_refresh_generic)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char* ptr_to_raw_t;
+
+    int success = -1;
+    SIXTRL_STATIC_VAR buf_size_t const ZERO_SIZE  = ( buf_size_t )0u;
+
+    buf_size_t const slot_s = NS(Buffer_get_slot_size)( buffer );
+
+    ptr_to_raw_t ptr = ( ptr_to_raw_t )( uintptr_t
+        )NS(Buffer_get_data_begin_addr)( buffer );
+
+    if( ( buffer != SIXTRL_NULLPTR ) && ( ptr != SIXTRL_NULLPTR ) &&
+        ( slot_s > ZERO_SIZE ) &&
+        ( ZERO_SIZE == ( ( ( uintptr_t )ptr ) % slot_s ) ) )
+    {
+        success = 0;
+
+        if( NS(ManagedBuffer_needs_remapping)( ptr, slot_s ) )
+        {
+            if( NS(Buffer_allow_remapping)( buffer ) )
+            {
+                success = NS(ManagedBuffer_remap)( ptr, slot_s );
+            }
+            else
+            {
+                success = -1;
+            }
+        }
+
+        if( success == 0 )
+        {
+            SIXTRL_STATIC_VAR buf_size_t const OBJECTS_ID = ( buf_size_t )4u;
+
+            SIXTRL_ASSERT( ( uintptr_t )ptr ==
+                           ( uintptr_t )buffer->data_addr );
+            SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( ptr, slot_s ) );
+
+            buffer->data_size =
+                NS(ManagedBuffer_get_buffer_length)( ptr, slot_s );
+
+            if( buffer->data_capacity < buffer->data_size )
+            {
+                buffer->data_capacity = buffer->data_size;
+            }
+
+            buffer->object_addr = ( NS(buffer_addr_t) )( uintptr_t
+                )NS(ManagedBuffer_get_const_objects_index_begin)(
+                    ptr, slot_s );
+
+            buffer->num_objects = NS(ManagedBuffer_get_section_num_entities)(
+                ptr, OBJECTS_ID, slot_s );
         }
     }
 
@@ -673,7 +736,6 @@ SIXTRL_INLINE NS(Object)* NS(Buffer_add_object_generic)(
     if( ( slot_size     != ZERO_SIZE      ) &&
         ( object_size   >  ZERO_SIZE      ) &&
         ( ptr_to_object != SIXTRL_NULLPTR ) &&
-        ( NS(Buffer_uses_datastore)( buffer ) ) &&
         ( NS(Buffer_allow_append_objects)( buffer ) ) )
     {
         SIXTRL_STATIC_VAR buf_size_t const SLOTS_ID     = ( buf_size_t )3u;
