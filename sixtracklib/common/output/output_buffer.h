@@ -36,7 +36,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(OutputBuffer_prepare)(
         ptr_beam_monitor_out_index_offset,
     SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn_id);
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(OutputBuffer_prepare_for_particle_set)(
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(OutputBuffer_prepare_for_particle_sets)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
@@ -66,6 +66,48 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(OutputBuffer_prepare_detailed)(
     SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT
         ptr_max_elem_by_elem_turn_id );
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN  SIXTRL_HOST_FN int
+NS(OutputBuffer_calculate_output_buffer_params)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size );
+
+SIXTRL_EXTERN  SIXTRL_HOST_FN int
+NS(OutputBuffer_calculate_output_buffer_params_for_particles_sets)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* particle_set_indicies_begin,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int
+NS(OutputBuffer_calculate_output_buffer_params_detailed)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    NS(particle_index_t) const min_particle_id,
+    NS(particle_index_t) const max_particle_id,
+    NS(particle_index_t) const min_element_id,
+    NS(particle_index_t) const max_element_id,
+    NS(particle_index_t) const min_turn_id,
+    NS(particle_index_t) const max_turn_id,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size );
+
 #endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
@@ -75,6 +117,40 @@ struct NS(BeamMonitor);
 
 #if !defined( _GPUCODE )
 
+SIXTRL_EXTERN SIXTRL_HOST_FN int
+NS(BeamMonitor_calculate_output_buffer_params)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int
+NS(BeamMonitor_calculate_output_buffer_params_for_particle_sets)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* particle_set_indicies_begin,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int
+NS(BeamMonitor_calculate_output_buffer_params_detailed)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    NS(particle_index_t) const min_particle_id,
+    NS(particle_index_t) const max_particle_id,
+    NS(particle_index_t) const min_turn_id,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(BeamMonitor_prepare_output_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
@@ -82,7 +158,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(BeamMonitor_prepare_output_buffer)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_index_offset );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int
-NS(BeamMonitor_prepare_output_buffer_for_particle_set)(
+NS(BeamMonitor_prepare_output_buffer_for_particle_sets)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
@@ -143,6 +219,45 @@ struct NS(ElemByElemConfig);
 
 #if !defined( _GPUCODE )
 
+SIXTRL_EXTERN SIXTRL_HOST_FN int
+NS(ElemByElemConfig_calculate_output_buffer_params)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int
+NS(ElemByElemConfig_calculate_output_buffer_params_for_particle_sets)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* particle_set_indicies_begin,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int
+NS(ElemByElemConfig_calculate_output_buffer_params_detailed)(
+    NS(particle_index_t) const min_particle_id,
+    NS(particle_index_t) const max_particle_id,
+    NS(particle_index_t) const min_element_id,
+    NS(particle_index_t) const max_element_id,
+    NS(particle_index_t) const min_turn_id,
+    NS(particle_index_t) const max_turn_id,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ElemByElemConfig_prepare_output_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
@@ -151,7 +266,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ElemByElemConfig_prepare_output_buffer)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_index_offset );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int
-NS(ElemByElemConfig_prepare_output_buffer_for_particle_set)(
+NS(ElemByElemConfig_prepare_output_buffer_for_particle_sets)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,

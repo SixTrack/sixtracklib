@@ -110,7 +110,7 @@ SIXTRL_HOST_FN int NS(OutputBuffer_prepare)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-int NS(OutputBuffer_prepare_for_particle_set)(
+int NS(OutputBuffer_prepare_for_particle_sets)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
@@ -159,7 +159,7 @@ int NS(OutputBuffer_prepare_for_particle_set)(
         SIXTRL_ASSERT( min_element_id  <= max_element_id );
 
         SIXTRL_ASSERT( min_particle_id >= ( index_t )0u );
-        SIXTRL_ASSERT( max_particle_id <= ( index_t )0u );
+        SIXTRL_ASSERT( max_particle_id >= min_particle_id );
 
         success = NS(ElemByElemConfig_get_min_max_element_id_from_buffer)(
             belements, &temp_min_element_id, &temp_max_element_id,
@@ -281,6 +281,244 @@ int NS(OutputBuffer_prepare_detailed)(
 /* NS(ElemByElemConfig) based prepare output functions: */
 /* ------------------------------------------------------------------------- */
 
+int NS(ElemByElemConfig_calculate_output_buffer_params)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size )
+{
+    typedef NS(particle_index_t) index_t;
+
+    index_t min_particle_id = ( index_t )0u;
+    index_t max_particle_id = ( index_t )0u;
+    index_t min_element_id  = ( index_t )0u;
+    index_t max_element_id  = ( index_t )0u;
+    index_t min_turn_id     = ( index_t )0u;
+    index_t max_turn_id     = ( index_t )0u;
+
+    int success = NS(Particles_get_min_max_attributes)(
+        p, &min_particle_id, &max_particle_id, &min_element_id,
+        &max_element_id, &min_turn_id, &max_turn_id );
+
+    if( success == 0 )
+    {
+        index_t temp_min_element_id = min_element_id;
+        index_t temp_max_element_id = max_element_id;
+
+        SIXTRL_ASSERT( min_turn_id     >= ( index_t )0u );
+        SIXTRL_ASSERT( min_turn_id     <= max_turn_id );
+
+        SIXTRL_ASSERT( min_element_id  >= ( index_t )0u );
+        SIXTRL_ASSERT( min_element_id  <= max_element_id );
+
+        SIXTRL_ASSERT( min_particle_id >= ( index_t )0u );
+        SIXTRL_ASSERT( max_particle_id >= min_particle_id );
+
+        success = NS(ElemByElemConfig_get_min_max_element_id_from_buffer)(
+            belements, &temp_min_element_id, &temp_max_element_id,
+                SIXTRL_NULLPTR, 0 );
+
+        if( success == 0 )
+        {
+            if( min_element_id > temp_min_element_id )
+            {
+                min_element_id = temp_min_element_id;
+            }
+
+            if( max_element_id < temp_max_element_id )
+            {
+                max_element_id = temp_max_element_id;
+            }
+        }
+    }
+
+    if( success == 0 )
+    {
+        success = NS(ElemByElemConfig_calculate_output_buffer_params_detailed)(
+            min_particle_id, max_particle_id, min_element_id, max_element_id,
+            min_turn_id, max_turn_id, dump_elem_by_elem_turns, ptr_num_objects,
+            ptr_num_slots, ptr_num_data_ptrs, ptr_num_garbage,
+            output_buffer_slot_size );
+    }
+
+    return success;
+}
+
+int NS(ElemByElemConfig_calculate_output_buffer_param_for_particle_sets)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* particle_set_indices_begin,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size )
+{
+    typedef NS(particle_index_t) index_t;
+
+    index_t min_particle_id = ( index_t )0u;
+    index_t max_particle_id = ( index_t )0u;
+    index_t min_element_id  = ( index_t )0u;
+    index_t max_element_id  = ( index_t )0u;
+    index_t min_turn_id     = ( index_t )0u;
+    index_t max_turn_id     = ( index_t )0u;
+
+    int success = NS(Particles_buffer_get_min_max_attributes_of_particles_set)(
+        pb, num_particle_sets, particle_set_indices_begin, &min_particle_id,
+        &max_particle_id, &min_element_id, &max_element_id, &min_turn_id,
+        &max_turn_id );
+
+    if( success == 0 )
+    {
+        index_t temp_min_element_id = min_element_id;
+        index_t temp_max_element_id = max_element_id;
+
+        SIXTRL_ASSERT( min_turn_id     >= ( index_t )0u );
+        SIXTRL_ASSERT( min_turn_id     <= max_turn_id );
+
+        SIXTRL_ASSERT( min_element_id  >= ( index_t )0u );
+        SIXTRL_ASSERT( min_element_id  <= max_element_id );
+
+        SIXTRL_ASSERT( min_particle_id >= ( index_t )0u );
+        SIXTRL_ASSERT( max_particle_id >= min_particle_id );
+
+        success = NS(ElemByElemConfig_get_min_max_element_id_from_buffer)(
+            belements, &temp_min_element_id, &temp_max_element_id,
+                SIXTRL_NULLPTR, 0 );
+
+        if( success == 0 )
+        {
+            if( min_element_id > temp_min_element_id )
+            {
+                min_element_id = temp_min_element_id;
+            }
+
+            if( max_element_id < temp_max_element_id )
+            {
+                max_element_id = temp_max_element_id;
+            }
+        }
+    }
+
+    if( success == 0 )
+    {
+        success = NS(ElemByElemConfig_calculate_output_buffer_params_detailed)(
+            min_particle_id, max_particle_id, min_element_id, max_element_id,
+            min_turn_id, max_turn_id, dump_elem_by_elem_turns, ptr_num_objects,
+            ptr_num_slots, ptr_num_data_ptrs, ptr_num_garbage,
+            output_buffer_slot_size );
+    }
+
+    return success;
+}
+
+int NS(ElemByElemConfig_calculate_output_buffer_params_detailed)(
+    NS(particle_index_t) const min_particle_id,
+    NS(particle_index_t) const max_particle_id,
+    NS(particle_index_t) const min_element_id,
+    NS(particle_index_t) const max_element_id,
+    NS(particle_index_t) const min_turn_id,
+    NS(particle_index_t) const max_turn_id,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size )
+{
+    typedef NS(buffer_size_t)       buf_size_t;
+    typedef NS(particle_index_t)    index_t;
+
+    int success = -1;
+
+    SIXTRL_STATIC_VAR buf_size_t const   ZERO = ( buf_size_t )0u;
+    SIXTRL_STATIC_VAR buf_size_t const    ONE = ( buf_size_t )1u;
+    SIXTRL_STATIC_VAR index_t const INV_INDEX = ( index_t )-1;
+
+    buf_size_t num_objects  = ZERO;
+    buf_size_t num_slots    = ZERO;
+    buf_size_t num_dataptrs = ZERO;
+    buf_size_t num_garbage  = ZERO;
+
+    bool const input_param_valid = ( ( min_particle_id <= max_particle_id ) &&
+        ( min_turn_id  <= max_turn_id ) && ( min_particle_id > INV_INDEX ) &&
+        ( min_turn_id  > INV_INDEX ) );
+
+    if( ( dump_elem_by_elem_turns > ZERO ) && ( input_param_valid ) )
+    {
+        index_t max_elem_by_elem_turn_id =
+            min_turn_id + dump_elem_by_elem_turns;
+
+        if( max_elem_by_elem_turn_id < max_turn_id )
+        {
+            max_elem_by_elem_turn_id = max_turn_id;
+        }
+
+        if( min_turn_id < max_elem_by_elem_turn_id )
+        {
+            buf_size_t const num_particles_to_store = ( buf_size_t )(
+                max_particle_id - min_particle_id + ONE );
+
+            buf_size_t const num_elements_to_store = ( buf_size_t )(
+                max_element_id - min_element_id + ONE );
+
+            buf_size_t const num_turns_to_store = ( buf_size_t )(
+                max_elem_by_elem_turn_id - min_turn_id );
+
+            buf_size_t const required_store_particles =
+                num_particles_to_store * num_elements_to_store *
+                    num_turns_to_store;
+
+            if( required_store_particles > ZERO )
+            {
+                num_objects  = ONE;
+
+                num_dataptrs =
+                    NS(Particles_get_num_dataptrs)( SIXTRL_NULLPTR );
+
+                num_slots =
+                    NS(Particles_get_required_num_slots_on_managed_buffer)(
+                        required_store_particles, output_buffer_slot_size  );
+            }
+        }
+    }
+    else if( input_param_valid )
+    {
+        success = 0;
+    }
+
+    if( success == 0 )
+    {
+        if(  ptr_num_objects != SIXTRL_NULLPTR )
+        {
+            *ptr_num_objects  = num_objects;
+        }
+
+        if(  ptr_num_slots != SIXTRL_NULLPTR )
+        {
+            *ptr_num_slots  = num_slots;
+        }
+
+        if(  ptr_num_data_ptrs != SIXTRL_NULLPTR )
+        {
+            *ptr_num_data_ptrs = num_dataptrs;
+        }
+
+        if(  ptr_num_garbage != SIXTRL_NULLPTR )
+        {
+            *ptr_num_garbage  = num_garbage;
+        }
+    }
+
+    return success;
+}
+
 int NS(ElemByElemConfig_prepare_output_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
@@ -366,7 +604,7 @@ int NS(ElemByElemConfig_prepare_output_buffer)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-int NS(ElemByElemConfig_prepare_output_buffer_for_particle_set)(
+int NS(ElemByElemConfig_prepare_output_buffer_for_particle_sets)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
@@ -418,7 +656,7 @@ int NS(ElemByElemConfig_prepare_output_buffer_for_particle_set)(
         SIXTRL_ASSERT( min_element_id  <= max_element_id );
 
         SIXTRL_ASSERT( min_particle_id >= ( index_t )0u );
-        SIXTRL_ASSERT( max_particle_id <= ( index_t )0u );
+        SIXTRL_ASSERT( max_particle_id >= min_particle_id );
 
         if( ( success == 0 ) &&
             ( num_elem_by_elem_objects > ( buf_size_t )0u ) )
@@ -568,6 +806,194 @@ int NS(ElemByElemConfig_prepare_output_buffer_from_conf)(
 /* NS(BeamMonitor) based prepare output functions: */
 /* ------------------------------------------------------------------------- */
 
+int NS(BeamMonitor_calculate_output_buffer_params)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size )
+{
+    typedef NS(particle_index_t) index_t;
+
+    index_t min_particle_id = ( index_t )0u;
+    index_t max_particle_id = ( index_t )0u;
+    index_t min_turn_id     = ( index_t )0u;
+
+    int success = NS(Particles_get_min_max_attributes)( p, &min_particle_id,
+        &max_particle_id, SIXTRL_NULLPTR, SIXTRL_NULLPTR, &min_turn_id,
+        SIXTRL_NULLPTR );
+
+    if( success == 0 )
+    {
+        success = NS(BeamMonitor_calculate_output_buffer_params_detailed)(
+            belements, min_particle_id, max_particle_id, min_turn_id,
+            ptr_num_objects, ptr_num_slots, ptr_num_data_ptrs, ptr_num_garbage,
+            output_buffer_slot_size );
+    }
+
+    return success;
+}
+
+int NS(BeamMonitor_calculate_output_buffer_params_for_particle_sets)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)
+        const* SIXTRL_RESTRICT particle_set_indices_begin,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size )
+{
+    typedef NS(particle_index_t) index_t;
+
+    index_t min_particle_id = ( index_t )0u;
+    index_t max_particle_id = ( index_t )0u;
+    index_t min_turn_id     = ( index_t )0u;
+
+    int success = NS(Particles_buffer_get_min_max_attributes_of_particles_set)(
+        pb, num_particle_sets, particle_set_indices_begin, &min_particle_id,
+        &max_particle_id, SIXTRL_NULLPTR, SIXTRL_NULLPTR, &min_turn_id,
+        SIXTRL_NULLPTR );
+
+    if( success == 0 )
+    {
+        success = NS(BeamMonitor_calculate_output_buffer_params_detailed)(
+            belements, min_particle_id, max_particle_id, min_turn_id,
+            ptr_num_objects, ptr_num_slots, ptr_num_data_ptrs, ptr_num_garbage,
+            output_buffer_slot_size );
+    }
+
+    return success;
+}
+
+int NS(BeamMonitor_calculate_output_buffer_params_detailed)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    NS(particle_index_t) const min_particle_id,
+    NS(particle_index_t) const max_particle_id,
+    NS(particle_index_t) const min_turn_id,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size )
+{
+    typedef NS(buffer_size_t)                               buf_size_t;
+    typedef NS(particle_index_t)                            index_t;
+    typedef NS(be_monitor_turn_t)                           nturn_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*  ptr_obj_t;
+    typedef SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)*           ptr_beam_monitor_t;
+    typedef NS(buffer_addr_t)                               address_t;
+    typedef NS(object_type_id_t)                            type_id_t;
+
+    int success = -1;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO      = ( buf_size_t )0u;
+    SIXTRL_STATIC_VAR index_t    const IZERO     = ( index_t )0u;
+    SIXTRL_STATIC_VAR address_t  const ADDR_ZERO = ( address_t )0u;
+    SIXTRL_STATIC_VAR nturn_t    const ONE_TURN  = ( nturn_t )1u;
+
+    buf_size_t num_objects  = ZERO;
+    buf_size_t num_slots    = ZERO;
+    buf_size_t num_dataptrs = ZERO;
+    buf_size_t num_garbage  = ZERO;
+
+    nturn_t const first_turn_id = ( nturn_t )min_turn_id;
+
+    SIXTRL_ASSERT( belements != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( belements ) );
+
+    if( ( min_turn_id >= IZERO ) && ( min_particle_id >= IZERO ) &&
+        ( min_particle_id <= max_particle_id ) )
+    {
+        ptr_obj_t be_it  = NS(Buffer_get_const_objects_begin)( belements );
+        ptr_obj_t be_end = NS(Buffer_get_const_objects_end)( belements );
+
+        buf_size_t const num_particles_to_store = ( buf_size_t )(
+            max_particle_id - min_particle_id + ( buf_size_t )1u );
+
+        success = 0;
+
+        for( ; be_it != be_end ; ++be_it )
+        {
+            type_id_t const type_id = NS(Object_get_type_id)( be_it );
+
+            if( ( type_id == NS(OBJECT_TYPE_BEAM_MONITOR) ) &&
+                ( NS(Object_get_begin_addr)( be_it ) > ADDR_ZERO ) )
+            {
+                ptr_beam_monitor_t monitor = ( ptr_beam_monitor_t )( uintptr_t
+                    )NS(Object_get_begin_addr)( be_it );
+
+                buf_size_t required_store_particles = ZERO;
+
+                nturn_t const skip  = NS(BeamMonitor_get_skip)( monitor );
+                nturn_t const start = NS(BeamMonitor_get_start)( monitor );
+                nturn_t const num_stores =
+                    NS(BeamMonitor_get_num_stores)( monitor );
+
+                if( ( start >= first_turn_id ) ||
+                    ( NS(BeamMonitor_is_rolling)( monitor ) ) )
+                {
+                    required_store_particles = num_particles_to_store *
+                        ( buf_size_t )num_stores;
+                }
+                else if( ( start < first_turn_id ) && ( skip >= ONE_TURN ) )
+                {
+                    nturn_t const already_tracked = first_turn_id - start;
+                    nturn_t const already_stored  =
+                        ONE_TURN + already_tracked / skip;
+
+                    if( num_stores > already_stored )
+                    {
+                        required_store_particles = num_particles_to_store *
+                            ( buf_size_t)( num_stores - already_stored );
+                    }
+                }
+
+                if( required_store_particles > ZERO )
+                {
+                    ++num_objects;
+
+                    num_dataptrs += NS(Particles_get_num_dataptrs)(
+                        SIXTRL_NULLPTR );
+
+                    num_slots +=
+                        NS(Particles_get_required_num_slots_on_managed_buffer)(
+                            required_store_particles, output_buffer_slot_size );
+                }
+            }
+        }
+    }
+
+    if( success == 0 )
+    {
+        if(  ptr_num_objects != SIXTRL_NULLPTR )
+        {
+            *ptr_num_objects  = num_objects;
+        }
+
+        if(  ptr_num_slots != SIXTRL_NULLPTR )
+        {
+            *ptr_num_slots = num_slots;
+        }
+
+        if(  ptr_num_data_ptrs != SIXTRL_NULLPTR )
+        {
+            *ptr_num_data_ptrs  = num_dataptrs;
+        }
+
+        if(  ptr_num_garbage != SIXTRL_NULLPTR )
+        {
+            *ptr_num_garbage  = num_garbage;
+        }
+    }
+
+    return success;
+}
+
 int NS(BeamMonitor_prepare_output_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
@@ -615,7 +1041,7 @@ int NS(BeamMonitor_prepare_output_buffer)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-int NS(BeamMonitor_prepare_output_buffer_for_particle_set)(
+int NS(BeamMonitor_prepare_output_buffer_for_particle_sets)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
@@ -773,6 +1199,218 @@ int NS(BeamMonitor_prepare_output_buffer_detailed)(
     if( ( ptr_index_offset != SIXTRL_NULLPTR ) && ( success == 0 ) )
     {
         *ptr_index_offset = out_buffer_index_offset;
+    }
+
+    return success;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_HOST_FN int NS(OutputBuffer_calculate_output_buffer_params)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size )
+{
+    int success = -1;
+
+    typedef NS(particle_index_t) index_t;
+    typedef NS(buffer_size_t)    buf_size_t;
+
+    index_t min_particle_id = ( index_t )0;
+    index_t max_particle_id = ( index_t )-1;
+
+    index_t min_element_id  = ( index_t )0;
+    index_t max_element_id  = ( index_t )-1;
+
+    index_t min_turn_id     = ( index_t )0;
+    index_t max_turn_id     = ( index_t )-1;
+
+    buf_size_t const num_beam_elements =
+        NS(Buffer_get_num_of_objects)( belements );
+
+    SIXTRL_ASSERT( belements != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( belements ) );
+
+    success = NS(Particles_get_min_max_attributes)( p, &min_particle_id,
+        &max_particle_id, &min_element_id, &max_element_id,
+            &min_turn_id, &max_turn_id );
+
+    if( ( success == 0 ) && ( min_element_id >= ( index_t )0u ) &&
+        ( min_element_id <= max_element_id ) && ( num_beam_elements >=
+            ( buf_size_t )( max_element_id - min_element_id ) ) )
+    {
+        success = NS(OutputBuffer_calculate_output_buffer_params_detailed)(
+            belements, min_particle_id, max_particle_id, min_element_id,
+            max_element_id, min_turn_id, max_turn_id,
+            dump_elem_by_elem_turns, ptr_num_objects, ptr_num_slots,
+            ptr_num_data_ptrs, ptr_num_garbage, output_buffer_slot_size );
+    }
+
+    return success;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_HOST_FN int
+NS(OutputBuffer_calculate_output_buffer_params_for_particles_sets)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* particle_set_indicies_begin,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size )
+{
+    int success = -1;
+
+    typedef NS(particle_index_t) index_t;
+
+    index_t min_particle_id = ( index_t )0;
+    index_t max_particle_id = ( index_t )-1;
+
+    index_t min_element_id  = ( index_t )0;
+    index_t max_element_id  = ( index_t )-1;
+
+    index_t min_turn_id     = ( index_t )0;
+    index_t max_turn_id     = ( index_t )-1;
+
+    SIXTRL_ASSERT( pb            != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( belements     != SIXTRL_NULLPTR );
+
+    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( pb ) );
+    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( belements ) );
+
+    if( 0 == NS(Particles_buffer_get_min_max_attributes_of_particles_set)(
+        pb, num_particle_sets, particle_set_indicies_begin, &min_particle_id,
+        &max_particle_id, &min_element_id, &max_element_id,
+        &min_turn_id, &max_turn_id ) )
+    {
+        index_t temp_min_element_id = min_element_id;
+        index_t temp_max_element_id = max_element_id;
+
+        SIXTRL_ASSERT( min_turn_id     >= ( index_t )0u );
+        SIXTRL_ASSERT( min_turn_id     <= max_turn_id );
+
+        SIXTRL_ASSERT( min_element_id  >= ( index_t )0u );
+        SIXTRL_ASSERT( min_element_id  <= max_element_id );
+
+        SIXTRL_ASSERT( min_particle_id >= ( index_t )0u );
+        SIXTRL_ASSERT( max_particle_id >= min_particle_id );
+
+        success = NS(ElemByElemConfig_get_min_max_element_id_from_buffer)(
+            belements, &temp_min_element_id, &temp_max_element_id,
+                SIXTRL_NULLPTR, 0 );
+
+        if( success == 0 )
+        {
+            if( min_element_id > temp_min_element_id )
+            {
+                min_element_id = temp_min_element_id;
+            }
+
+            if( max_element_id < temp_max_element_id )
+            {
+                max_element_id = temp_max_element_id;
+            }
+        }
+
+        if( success == 0 )
+        {
+            success = NS(OutputBuffer_calculate_output_buffer_params_detailed)(
+                belements, min_particle_id, max_particle_id, min_element_id,
+                max_element_id, min_turn_id, max_turn_id,
+                dump_elem_by_elem_turns, ptr_num_objects, ptr_num_slots,
+                ptr_num_data_ptrs, ptr_num_garbage, output_buffer_slot_size );
+        }
+    }
+
+    return success;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_HOST_FN int NS(OutputBuffer_calculate_output_buffer_params_detailed)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    NS(particle_index_t) const min_particle_id,
+    NS(particle_index_t) const max_particle_id,
+    NS(particle_index_t) const min_element_id,
+    NS(particle_index_t) const max_element_id,
+    NS(particle_index_t) const min_turn_id,
+    NS(particle_index_t) const max_turn_id,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
+    NS(buffer_size_t) const output_buffer_slot_size )
+{
+    int success = -1;
+
+    typedef NS(buffer_size_t) buf_size_t;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
+
+    buf_size_t elem_by_elem_num_slots     = ZERO;
+    buf_size_t elem_by_elem_num_objects   = ZERO;
+    buf_size_t elem_by_elem_num_data_ptrs = ZERO;
+    buf_size_t elem_by_elem_num_garbage   = ZERO;
+
+    buf_size_t beam_monitor_num_slots     = ZERO;
+    buf_size_t beam_monitor_num_objects   = ZERO;
+    buf_size_t beam_monitor_num_data_ptrs = ZERO;
+    buf_size_t beam_monitor_num_garbage   = ZERO;
+
+    SIXTRL_ASSERT( belements != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( belements ) );
+
+    success = NS(ElemByElemConfig_calculate_output_buffer_params_detailed)(
+        min_particle_id, max_particle_id, min_element_id, max_element_id,
+        min_turn_id, max_turn_id, dump_elem_by_elem_turns,
+        &elem_by_elem_num_objects, &elem_by_elem_num_slots,
+        &elem_by_elem_num_data_ptrs, &elem_by_elem_num_garbage,
+            output_buffer_slot_size );
+
+    if( success == 0 )
+    {
+        success = NS(BeamMonitor_calculate_output_buffer_params_detailed)(
+            belements, min_particle_id, max_particle_id, min_turn_id,
+            &beam_monitor_num_objects,   &beam_monitor_num_slots,
+            &beam_monitor_num_data_ptrs, &beam_monitor_num_garbage,
+            output_buffer_slot_size );
+    }
+
+    if( success == 0 )
+    {
+        if( ptr_num_objects != SIXTRL_NULLPTR )
+        {
+            *ptr_num_objects = elem_by_elem_num_objects +
+                               beam_monitor_num_objects;
+        }
+
+        if( ptr_num_slots != SIXTRL_NULLPTR )
+        {
+            *ptr_num_slots = elem_by_elem_num_slots + beam_monitor_num_slots;
+        }
+
+        if( ptr_num_data_ptrs != SIXTRL_NULLPTR )
+        {
+            *ptr_num_data_ptrs = elem_by_elem_num_data_ptrs +
+                                 beam_monitor_num_data_ptrs;
+        }
+
+        if( ptr_num_garbage != SIXTRL_NULLPTR )
+        {
+            *ptr_num_garbage = elem_by_elem_num_garbage +
+                               beam_monitor_num_garbage;
+        }
     }
 
     return success;
