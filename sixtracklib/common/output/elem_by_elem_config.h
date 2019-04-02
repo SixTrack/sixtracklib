@@ -1165,8 +1165,6 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_new)(
     typedef SIXTRL_BUFFER_DATAPTR_DEC config_t*     ptr_to_config_t;
 
     SIXTRL_ASSERT( buffer != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( NS(Buffer_has_datastore)( buffer ) );
-    SIXTRL_ASSERT( NS(Buffer_allow_append_objects)( buffer ) );
 
     NS(ElemByElemConfig) config;
     NS(ElemByElemConfig_preset)( &config );
@@ -1197,8 +1195,6 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add)(
     ptr_new_config_t ptr_new_config = SIXTRL_NULLPTR;
 
     SIXTRL_ASSERT( buffer != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( NS(Buffer_has_datastore)( buffer ) );
-    SIXTRL_ASSERT( NS(Buffer_allow_append_objects)( buffer ) );
 
     config_t config;
     NS(ElemByElemConfig_preset)( &config );
@@ -1231,8 +1227,6 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add_copy)(
     ptr_new_config_t ptr_new_config = SIXTRL_NULLPTR;
 
     SIXTRL_ASSERT( buffer != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( NS(Buffer_has_datastore)( buffer ) );
-    SIXTRL_ASSERT( NS(Buffer_allow_append_objects)( buffer ) );
 
     if( config != SIXTRL_NULLPTR )
     {

@@ -1670,8 +1670,6 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)* NS(Particles_new)(
     };
 
     SIXTRL_ASSERT( buffer != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( NS(Buffer_has_datastore)( buffer ) );
-    SIXTRL_ASSERT( NS(Buffer_allow_append_objects)( buffer ) );
     SIXTRL_ASSERT( NS(PARTICLES_NUM_DATAPTRS) == 21u );
 
     NS(Particles) particles;
@@ -1767,8 +1765,6 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)* NS(Particles_add)(
     };
 
     SIXTRL_ASSERT( buffer != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( NS(Buffer_has_datastore)( buffer ) );
-    SIXTRL_ASSERT( NS(Buffer_allow_append_objects)( buffer ) );
     SIXTRL_ASSERT( NS(PARTICLES_NUM_DATAPTRS) == 21u );
 
     NS(Particles) particles;
