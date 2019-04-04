@@ -10,6 +10,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #if defined( __cplusplus )
         #include "sixtracklib/common/buffer.hpp"
+        #include "sixtracklib/common/particles.hpp"
     #endif /* defined( __cplusplus ) */
 
     #include "sixtracklib/common/definitions.h"
@@ -421,6 +422,10 @@ NS(TrackJobCl_get_const_output_buffer_arg)(
 /* ******   Implementation of inline and template methods / functions  ****** */
 /* ************************************************************************** */
 
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/output/output_buffer.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 
 namespace SIXTRL_CXX_NAMESPACE
@@ -436,7 +441,7 @@ namespace SIXTRL_CXX_NAMESPACE
         const char *const SIXTRL_RESTRICT config_str )
     {
         using _base_t = TrackJobBase;
-        using flag_t  = TrackJobBase::track_job_output_flag_t;
+        using flags_t = ::NS(output_buffer_flag_t);
 
         bool success  = false;
 
@@ -472,11 +477,13 @@ namespace SIXTRL_CXX_NAMESPACE
             this->doPrepareBeamElementsStructuresOclImp( belements_buffer );
             this->doSetPtrCBeamElementsBuffer( belements_buffer );
 
-            flag_t const needs_output = ::NS(TrackJob_needs_output_buffer)(
+            flags_t const flags = ::NS(OutputBuffer_required_for_tracking)(
                 particles_buffer, belements_buffer, dump_elem_by_elem_turns );
 
-            if( ( needs_output  != ::NS(TRACK_JOB_OUTPUT_NONE) ) ||
-                ( output_buffer != nullptr ) )
+            bool const requires_output_buffer =
+                ::NS(OutputBuffer_requires_output_buffer)( flags );
+
+            if( ( requires_output_buffer ) || ( output_buffer != nullptr ) )
             {
                 success = _base_t::doPrepareOutputStructures( particles_buffer,
                     belements_buffer, output_buffer, dump_elem_by_elem_turns );
@@ -490,14 +497,14 @@ namespace SIXTRL_CXX_NAMESPACE
             }
 
             if( ( success ) && ( this->hasOutputBuffer() ) &&
-                ( needs_output != ::NS(TRACK_JOB_OUTPUT_NONE) ) )
+                ( requires_output_buffer ) )
             {
                 success = _base_t::doAssignOutputBufferToBeamMonitors(
                     belements_buffer, this->ptrCOutputBuffer() );
 
                 if( ( success ) && ( this->hasOutputBuffer() ) &&
-                    ( ( needs_output & ::NS(TRACK_JOB_OUTPUT_BEAM_MONITORS) ) ==
-                        ::NS(TRACK_JOB_OUTPUT_BEAM_MONITORS) ) )
+                    ( ::NS(OutputBuffer_requires_beam_monitor_output)(
+                        flags ) ) )
                 {
                     this->doAssignOutputBufferToBeamMonitorsOclImp(
                         belements_buffer, this->ptrCOutputBuffer() );
