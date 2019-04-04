@@ -21,6 +21,7 @@
 #include "sixtracklib/common/particles.hpp"
 #include "sixtracklib/common/context/compute_arch.h"
 #include "sixtracklib/common/be_monitor/be_monitor.hpp"
+#include "sixtracklib/common/be_monitor/output_buffer.h"
 #include "sixtracklib/common/output/output_buffer.h"
 #include "sixtracklib/common/output/elem_by_elem_config.h"
 #include "sixtracklib/common/track.h"

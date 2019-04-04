@@ -85,7 +85,7 @@ TEST( C99_OpenCLTrackElemByElemTests, TrackElemByElemHostAndDeviceCompareDrifts)
 
     ASSERT_TRUE( 0 == ::NS(ElemByElemConfig_init)( &elem_by_elem_config,
         NS(ELEM_BY_ELEM_ORDER_DEFAULT), eb, particles,
-        part_index_t{ 0 }, NUM_TURNS - part_index_t{ 1 } ) );
+        part_index_t{ 0 }, NUM_TURNS ) );
 
     size_t elem_by_elem_index_offset = size_t{ 0 };
 
@@ -560,14 +560,14 @@ namespace SIXTRL_CXX_NAMESPACE
                     ::NS(Particles_calculate_difference)(
                         particles, final_state, diff );
 
-//                     std::cout << std::endl << "cmp_elem_by_elem_buffer = " << std::endl;
-//                     ::NS(Particles_print_out)( cmp_elem_by_elem_particles );
+                    std::cout << std::endl << "cmp_elem_by_elem_buffer = " << std::endl;
+                    ::NS(Particles_print_out)( cmp_elem_by_elem_particles );
 
-//                     std::cout << std::endl << "elem_by_elem_particles = " << std::endl;
-//                     ::NS(Particles_print_out)( elem_by_elem_particles );
+                    std::cout << std::endl << "elem_by_elem_particles = " << std::endl;
+                    ::NS(Particles_print_out)( elem_by_elem_particles );
 
-//                     std::cout << std::endl << "diff = " << std::endl;
-//                     ::NS(Particles_print_out)( diff );
+                    std::cout << std::endl << "diff = " << std::endl;
+                    ::NS(Particles_print_out)( diff );
 
                     ::NS(Buffer_delete)( diff_buffer );
                     diff_buffer = nullptr;
