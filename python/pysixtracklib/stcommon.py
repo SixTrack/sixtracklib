@@ -106,7 +106,7 @@ st_BeamMonitor_insert_end_of_turn_monitors = \
 st_BeamMonitor_insert_end_of_turn_monitors.argtypes = [ st_Buffer_p,
     ct.c_int64, ct.c_int64, ct.c_int64, ct.c_int64, ct.c_uint64, ]
 
-st_BeamMonitor_insert_end_of_turn_monitors.restype = ct.c_bool
+st_BeamMonitor_insert_end_of_turn_monitors.restype = ct.c_int32
 
 # -----------------------------------------------------------------------------
 # OutputBuffer bindings
