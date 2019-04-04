@@ -72,7 +72,6 @@ class TrackJob(object):
             num_elem_by_elem_turns = ct.c_uint64( dump_elem_by_elem_turns )
 
             slot_size    = st.st_Buffer_get_slot_size( self._ptr_c_particles_buffer )
-            pdb.set_trace()
             ret = st.st_OutputBuffer_calculate_output_buffer_params(
                 self._ptr_c_beam_elements_buffer, self._ptr_c_particles_buffer,
                 ct.c_uint64( 1 ), ct.byref( pset_index ),
@@ -152,6 +151,17 @@ class TrackJob(object):
             st.st_Buffer_delete( self._ptr_c_output_buffer )
             self._ptr_c_output_buffer  = st.st_Null
 
+    @property
+    def output_buffer( self ):
+        return self._output_buffer
+
+    @property
+    def particles_buffer( self ):
+        return self._particles_buffer
+
+    @property
+    def beam_elements_buffer( self ):
+        return self._beam_elements_buffer
 
     def track( self, until_turn ):
         return st.st_TrackJob_track_elem_by_elem(
@@ -168,13 +178,17 @@ class TrackJob(object):
         return st.st_TrackJob_get_type_id( self.ptr_st_track_job )
 
     def type_str( self ):
-        return st.st_TrackJob_get_type_str( self.ptr_st_track_job )
+        str = st.st_TrackJob_get_type_str( self.ptr_st_track_job )
+        return str.decode( 'utf-8' )
 
     def num_beam_monitors( self ):
         return st.st_TrackJob_get_num_beam_monitors( self.ptr_st_track_job )
 
     def has_elem_by_elem_outupt( self ):
         return st.st_TrackJob_has_elem_by_elem_output( self.ptr_st_track_job )
+
+    def has_beam_monitor_output( self ):
+        return st.st_TrackJob_has_beam_monitor_output( self.ptr_st_track_job )
 
     def elem_by_elem_output_offset( self ):
         return st.st_TrackJob_get_elem_by_elem_output_buffer_offset(
@@ -183,5 +197,11 @@ class TrackJob(object):
     def beam_monitor_output_offset( self ):
         return st.st_TrackJob_get_beam_monitor_output_buffer_offset(
             self.ptr_st_track_job )
+
+    def has_output_buffer( self ):
+        return st.st_TrackJob_has_output_buffer( self.ptr_st_track_job ) and \
+               bool( self._output_buffer is not None )
+
+
 
 # end: python/pysixtracklib/trackjob.py
