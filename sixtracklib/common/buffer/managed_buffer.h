@@ -163,12 +163,12 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_calculate_section_size)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_get_section_offset)(
-    SIXTRL_BUFFER_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const section_id, NS(buffer_size_t) const slot_size )
 {
     typedef NS(buffer_size_t)                               buf_size_t;
     typedef NS(buffer_addr_t)                               address_t;
-    typedef SIXTRL_BUFFER_ARGPTR_DEC address_t const*       ptr_to_addr_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC address_t const*      ptr_to_addr_t;
 
     SIXTRL_STATIC_VAR buf_size_t const ZERO_SIZE = ( buf_size_t )0u;
 
