@@ -19,6 +19,7 @@
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/be_drift/be_drift.h"
 #include "sixtracklib/common/be_monitor/be_monitor.h"
+#include "sixtracklib/common/be_monitor/output_buffer.h"
 #include "sixtracklib/common/be_monitor/track.h"
 #include "sixtracklib/common/output/elem_by_elem_config.h"
 #include "sixtracklib/common/output/output_buffer.h"

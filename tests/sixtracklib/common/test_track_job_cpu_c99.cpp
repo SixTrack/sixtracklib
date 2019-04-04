@@ -19,6 +19,7 @@
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/be_monitor/be_monitor.h"
+#include "sixtracklib/common/be_monitor/output_buffer.h"
 #include "sixtracklib/common/output/output_buffer.h"
 #include "sixtracklib/common/output/elem_by_elem_config.h"
 #include "sixtracklib/common/track.h"
@@ -627,7 +628,6 @@ TEST( C99_TrackJobCpuTests, TrackParticles )
     using size_t       = ::NS(buffer_size_t);
     using buffer_t     = ::NS(Buffer);
     using particles_t  = ::NS(Particles);
-    using be_monitor_t = ::NS(BeamMonitor);
     using part_index_t = ::NS(particle_index_t);
 
     namespace st_test  = SIXTRL_CXX_NAMESPACE::tests;
@@ -659,7 +659,7 @@ TEST( C99_TrackJobCpuTests, TrackParticles )
 
     SIXTRL_ASSERT( cmp_particles != nullptr );
 
-    size_t const DUMP_ELEM_BY_ELEM_TURNS  = size_t{   5 };
+    size_t const DUMP_ELEM_BY_ELEM_TURNS = size_t{   5 };
     size_t const NUM_TURNS               = size_t{ 100 };
     size_t const SKIP_TURNS              = size_t{  10 };
     size_t const NUM_TURN_BY_TURN_TURNS  = size_t{  10 };
@@ -668,30 +668,11 @@ TEST( C99_TrackJobCpuTests, TrackParticles )
     size_t NUM_PARTICLES = ::NS(Particles_get_num_of_particles)( particles );
     size_t NUM_BEAM_ELEMENTS = ::NS(Buffer_get_num_of_objects)( eb );
 
-    be_monitor_t* turn_by_turn_monitor = ::NS(BeamMonitor_new)( eb );
-    SIXTRL_ASSERT( turn_by_turn_monitor != nullptr );
+    int ret = ::NS(BeamMonitor_insert_end_of_turn_monitors)(
+        eb, DUMP_ELEM_BY_ELEM_TURNS, NUM_TURN_BY_TURN_TURNS,
+            NUM_TURNS, SKIP_TURNS, NS(Buffer_get_objects_end)( eb ) );
 
-    ::NS(BeamMonitor_set_is_rolling)( turn_by_turn_monitor, false );
-
-    ::NS(BeamMonitor_set_start)(
-        turn_by_turn_monitor, DUMP_ELEM_BY_ELEM_TURNS );
-
-    ::NS(BeamMonitor_set_num_stores)(
-        turn_by_turn_monitor, NUM_TURN_BY_TURN_TURNS );
-
-    be_monitor_t* eot_monitor = ::NS(BeamMonitor_new)( eb );
-    SIXTRL_ASSERT( eot_monitor != nullptr );
-
-    ::NS(BeamMonitor_set_skip)( eot_monitor, true );
-
-    ::NS(BeamMonitor_set_is_rolling)( eot_monitor, SKIP_TURNS );
-
-    ::NS(BeamMonitor_set_start)( eot_monitor,
-            DUMP_ELEM_BY_ELEM_TURNS + NUM_TURN_BY_TURN_TURNS );
-
-    ::NS(BeamMonitor_set_num_stores)( eot_monitor,
-        ( NUM_TURNS - ( DUMP_ELEM_BY_ELEM_TURNS + NUM_TURN_BY_TURN_TURNS ) ) /
-            SKIP_TURNS );
+    SIXTRL_ASSERT( ret == 0 );
 
     ASSERT_TRUE( NUM_PARTICLES == static_cast< size_t >(
         ::NS(Particles_get_num_of_particles)( particles ) ) );
@@ -706,7 +687,7 @@ TEST( C99_TrackJobCpuTests, TrackParticles )
     size_t beam_monitor_offset = size_t{ 0 };
     part_index_t min_turn_id   = part_index_t{ 0 };
 
-    int ret = ::NS(OutputBuffer_prepare)( eb, cmp_output_buffer, cmp_particles,
+    ret = ::NS(OutputBuffer_prepare)( eb, cmp_output_buffer, cmp_particles,
         DUMP_ELEM_BY_ELEM_TURNS, &elem_by_elem_offset, &beam_monitor_offset,
         &min_turn_id );
 
@@ -807,8 +788,27 @@ TEST( C99_TrackJobCpuTests, TrackParticles )
                     ::NS(Particles_calculate_difference)(
                         cmp, trk_particles, diff );
 
+                    size_t const mm = ::NS(Particles_get_num_of_particles)(
+                        cmp );
+
                     std::cout << "ii = " << ii << std::endl;
-                    ::NS(Particles_print_out)( diff );
+
+                    for( size_t ll = size_t{ 0 } ; ll < mm ; ++ll )
+                    {
+                        std::cout << "trk_particles:\r\n";
+                        ::NS(Particles_print_out_single)( trk_particles, ll );
+
+                        std::cout << "cmp:\r\n";
+                        ::NS(Particles_print_out_single)( cmp, ll );
+
+                        std::cout << "diff:\r\n";
+                        ::NS(Particles_print_out_single)( diff, ll );
+                        std::cout << "\r\n"
+                                  << "---------------------------------------"
+                                  << "---------------------------------------"
+                                  << "\r\n";
+                    }
+
                     std::cout << std::endl;
                 }
             }
