@@ -215,14 +215,6 @@ NS(Track_all_particles_element_by_element_until_turn_objs)(
 
 struct NS(Buffer);
 
-SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(TrackCpu)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    int const until_turn, int const elem_by_elem_turns );
-
-/* ------------------------------------------------------------------------- */
-
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Track_particle_beam_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_idx,
