@@ -10,6 +10,7 @@
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/be_drift/be_drift.hpp"
 #include "sixtracklib/common/be_monitor/be_monitor.hpp"
+#include "sixtracklib/common/output/output_buffer.hpp"
 #include "sixtracklib/common/particles.hpp"
 
 #include "sixtracklib/sixtracklib.h"
