@@ -1,7 +1,11 @@
 # sixtracklib/common/be_monitor/CMakeLists.txt
 
-set( SIXTRACKLIB_COMMON_BE_MONITOR_C99_HEADERS be_monitor.h track.h )
-set( SIXTRACKLIB_COMMON_BE_MONITOR_C99_SOURCES be_monitor.c )
+set( SIXTRACKLIB_COMMON_BE_MONITOR_C99_HEADERS
+     be_monitor.h output_buffer.h track.h )
+
+set( SIXTRACKLIB_COMMON_BE_MONITOR_C99_SOURCES
+     be_monitor.c output_buffer.c )
+
 set( SIXTRACKLIB_COMMON_BE_MONITOR_CXX_HEADERS be_monitor.hpp )
 
 add_library( sixtrack_common_be_monitor OBJECT

@@ -112,7 +112,7 @@ NS(BeamMonitor_get_max_particle_id)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
-NS(BeamMonitor_get_required_num_of_store_particles)(
+NS(BeamMonitor_get_stored_num_particles)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -202,7 +202,7 @@ NS(BeamMonitor_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(BeamMonitor_insert_end_of_turn_monitors)(
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(BeamMonitor_insert_end_of_turn_monitors)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(be_monitor_turn_t) const turn_by_turn_start,
     NS(be_monitor_turn_t) const num_turn_by_turn_turns,
@@ -210,7 +210,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(BeamMonitor_insert_end_of_turn_monitors)(
     NS(be_monitor_turn_t) const skip_turns,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT prev_node );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool
+SIXTRL_EXTERN SIXTRL_HOST_FN int
 NS(BeamMonitor_insert_end_of_turn_monitors_at_pos)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(be_monitor_turn_t) const turn_by_turn_start,
@@ -610,7 +610,7 @@ NS(BeamMonitor_get_max_particle_id)(
 }
 
 SIXTRL_INLINE NS(buffer_size_t)
-NS(BeamMonitor_get_required_num_of_store_particles)(
+NS(BeamMonitor_get_stored_num_particles)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
 {
     typedef NS(buffer_size_t)       size_t;

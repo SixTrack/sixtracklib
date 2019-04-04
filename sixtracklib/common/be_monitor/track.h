@@ -37,6 +37,7 @@ SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_monitor)(
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/be_monitor/be_monitor.h"
+    #include "sixtracklib/common/be_monitor/output_buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )

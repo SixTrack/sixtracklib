@@ -13,8 +13,7 @@
     #include "sixtracklib/common/internal/objects_type_id.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool
-NS(BeamMonitor_insert_end_of_turn_monitors_at_pos)(
+int NS(BeamMonitor_insert_end_of_turn_monitors_at_pos)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements,
     NS(be_monitor_turn_t) const turn_by_turn_start,
     NS(be_monitor_turn_t) const num_turn_by_turn_turns,
@@ -41,10 +40,10 @@ NS(BeamMonitor_insert_end_of_turn_monitors_at_pos)(
             target_num_turns, skip_turns, prev_node );
     }
 
-    return false;
+    return -1;
 }
 
-bool NS(BeamMonitor_insert_end_of_turn_monitors)(
+int NS(BeamMonitor_insert_end_of_turn_monitors)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements,
     NS(be_monitor_turn_t) const turn_by_turn_start,
     NS(be_monitor_turn_t) const num_turn_by_turn_turns,
@@ -56,7 +55,7 @@ bool NS(BeamMonitor_insert_end_of_turn_monitors)(
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(BeamMonitor)*  ptr_beam_monitor_t;
     typedef NS(be_monitor_turn_t)                       nturn_t;
 
-    bool success = false;
+    int success = -1;
 
     ptr_obj_t idx_begin = NS(Buffer_get_objects_begin)( belements );
     ptr_obj_t idx_end   = NS(Buffer_get_objects_end)( belements );
@@ -84,8 +83,7 @@ bool NS(BeamMonitor_insert_end_of_turn_monitors)(
         nturn_t const output_turn_start =
             turn_by_turn_start + num_turn_by_turn_turns;
 
-        bool turn_by_turn_success = false;
-        bool end_of_turn_success  = false;
+        success = 0;
 
         if( num_turn_by_turn_turns > ZERO )
         {
@@ -109,8 +107,10 @@ bool NS(BeamMonitor_insert_end_of_turn_monitors)(
                 idx_begin = NS(Buffer_get_objects_begin)( belements );
                 idx_end   = NS(Buffer_get_objects_end)( belements );
                 prev_node = idx_begin + ( offset + ( uintptr_t )1u );
-
-                turn_by_turn_success = true;
+            }
+            else
+            {
+                success = -1;
             }
         }
 
@@ -146,17 +146,12 @@ bool NS(BeamMonitor_insert_end_of_turn_monitors)(
                 NS(BeamMonitor_set_start)( mon, output_turn_start );
                 NS(BeamMonitor_set_skip)( mon, skip );
                 NS(BeamMonitor_set_is_rolling)( mon, true );
-
-                end_of_turn_success = true;
+            }
+            else
+            {
+                success = -1;
             }
         }
-
-        success = ( ( ( turn_by_turn_success ) ||
-                      ( end_of_turn_success ) ) &&
-                    ( ( num_turn_by_turn_turns == ZERO ) ||
-                      ( turn_by_turn_success ) ) &&
-                    ( ( target_num_turns <= ( output_turn_start ) ) ||
-                      ( end_of_turn_success ) ) );
     }
 
     return success;

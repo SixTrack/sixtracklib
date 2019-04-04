@@ -218,15 +218,6 @@ NS(ElemByElemConfig_get_num_elem_by_elem_objects)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
         SIXTRL_RESTRICT belements );
 
-SIXTRL_FN SIXTRL_STATIC int
-NS(ElemByElemConfig_get_min_max_element_id_from_buffer)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
-    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_element_id,
-    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_element_id,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)*
-        SIXTRL_RESTRICT ptr_num_elem_by_elem_objects,
-    NS(particle_index_t) const element_id_offset );
-
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(ElemByElemConfig_get_required_num_slots)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
@@ -283,6 +274,20 @@ NS(ElemByElemConfig_get_num_elem_by_elem_objects_from_managed_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const*
         SIXTRL_RESTRICT belements_buffer,
     NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(ElemByElemConfig_get_stored_num_particles)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig)
+        *const SIXTRL_RESTRICT config );
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(ElemByElemConfig_get_stored_num_particles_detailed)(
+    NS(particle_index_t) const min_particle_id,
+    NS(particle_index_t) const max_particle_id,
+    NS(particle_index_t) const min_element_id,
+    NS(particle_index_t) const max_element_id,
+    NS(particle_index_t) const min_turn_id,
+    NS(particle_index_t) const max_elem_by_elem_turn_id );
 
  /* ------------------------------------------------------------------------ */
  /*  Implementation of inline functions: */
@@ -456,7 +461,7 @@ NS(ElemByElemConfig_get_particles_store_index_details)(
         num_elem_t const particle_id_offset = ( num_elem_t )( particle_id -
             NS(ElemByElemConfig_get_min_particle_id)( config ) );
 
-        num_elem_t const element_id_offset = ( num_elem_t )( at_element -
+        num_elem_t const start_elem_id = ( num_elem_t )( at_element -
             NS(ElemByElemConfig_get_min_element_id)( config ) );
 
         num_elem_t const turn_offset = ( num_elem_t )( at_turn -
@@ -486,7 +491,7 @@ NS(ElemByElemConfig_get_particles_store_index_details)(
                 out_store_index  = turn_offset *
                     num_particles_to_store * num_elements_to_store;
 
-                out_store_index += element_id_offset * num_particles_to_store;
+                out_store_index += start_elem_id * num_particles_to_store;
                 out_store_index += particle_id_offset;
 
                 store_capacity = num_particles_to_store *
@@ -1002,108 +1007,6 @@ NS(ElemByElemConfig_get_num_elem_by_elem_objects)(
         NS(Buffer_get_slot_size)( belements ) );
 }
 
-SIXTRL_INLINE int NS(ElemByElemConfig_get_min_max_element_id_from_buffer)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
-    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_element_id,
-    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_element_id,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)*
-        SIXTRL_RESTRICT ptr_num_elem_by_elem_objects,
-    NS(particle_index_t) const element_id_offset )
-{
-    int success = -1;
-
-    typedef NS(buffer_size_t) buf_size_t;
-    typedef NS(particle_index_t) index_t;
-    typedef NS(object_type_id_t) type_id_t;
-    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* obj_iter_t;
-
-    buf_size_t const num_objects = NS(Buffer_get_num_of_objects)( belements );
-
-    SIXTRL_ASSERT( belements != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( belements ) );
-
-    if( ( num_objects > ( buf_size_t )0u ) &&
-        ( element_id_offset >= ( index_t )0u ) )
-    {
-        index_t min_element_id = element_id_offset;
-        index_t max_element_id = element_id_offset;
-        buf_size_t num_elem_by_elem_objects = ( buf_size_t )0u;
-
-        obj_iter_t obj_it  = NS(Buffer_get_const_objects_begin)( belements );
-        obj_iter_t obj_end = NS(Buffer_get_const_objects_end)( belements );
-
-        for( ; obj_it != obj_end ; ++obj_it )
-        {
-            type_id_t const type_id = NS(Object_get_type_id)( obj_it );
-
-            if( ( type_id != NS(OBJECT_TYPE_NONE) ) &&
-                ( type_id != NS(OBJECT_TYPE_PARTICLE) ) &&
-                ( type_id != NS(OBJECT_TYPE_INVALID) ) &&
-                ( type_id != NS(OBJECT_TYPE_LINE) ) &&
-                ( type_id != NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) ) )
-            {
-                ++num_elem_by_elem_objects;
-                ++obj_it;
-//
-                break;
-            }
-
-            ++min_element_id;
-        }
-
-        max_element_id = min_element_id;
-
-        for( ; obj_it != obj_end ; ++obj_it )
-        {
-            type_id_t const type_id = NS(Object_get_type_id)( obj_it );
-
-            if( ( type_id != NS(OBJECT_TYPE_NONE) ) &&
-                ( type_id != NS(OBJECT_TYPE_PARTICLE) ) &&
-                ( type_id != NS(OBJECT_TYPE_INVALID) ) &&
-                ( type_id != NS(OBJECT_TYPE_LINE) ) &&
-                ( type_id != NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) ) )
-            {
-                ++num_elem_by_elem_objects;
-                ++max_element_id;
-            }
-        }
-
-        SIXTRL_ASSERT( num_elem_by_elem_objects <= num_objects );
-
-        if( num_elem_by_elem_objects == ( buf_size_t )0u )
-        {
-            min_element_id = max_element_id = element_id_offset;
-        }
-
-        SIXTRL_ASSERT( min_element_id <= max_element_id );
-
-        if( ( min_element_id >= element_id_offset ) &&
-            ( max_element_id >= min_element_id ) &&
-            ( max_element_id <  ( index_t )(
-                min_element_id + num_elem_by_elem_objects ) ) )
-        {
-            if(  ptr_min_element_id != SIXTRL_NULLPTR )
-            {
-                *ptr_min_element_id = min_element_id;
-            }
-
-            if(  ptr_max_element_id != SIXTRL_NULLPTR )
-            {
-                *ptr_max_element_id = max_element_id;
-            }
-
-            if(  ptr_num_elem_by_elem_objects != SIXTRL_NULLPTR )
-            {
-                *ptr_num_elem_by_elem_objects = num_elem_by_elem_objects;
-            }
-
-            success = 0;
-        }
-    }
-
-    return success;
-}
-
 SIXTRL_INLINE NS(buffer_size_t) NS(ElemByElemConfig_get_required_num_slots)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         const NS(ElemByElemConfig) *const SIXTRL_RESTRICT config,
@@ -1285,6 +1188,64 @@ NS(ElemByElemConfig_get_num_elem_by_elem_objects_from_managed_buffer)(
     }
 
     return num_elem_by_elem_objects;
+}
+
+SIXTRL_INLINE NS(buffer_size_t) NS(ElemByElemConfig_get_stored_num_particles)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig)
+        *const SIXTRL_RESTRICT config )
+{
+    if( NS(ElemByElemConfig_get_order)( config ) !=
+        NS(ELEM_BY_ELEM_ORDER_INVALID) )
+    {
+        return NS(ElemByElemConfig_get_stored_num_particles_detailed)(
+            NS(ElemByElemConfig_get_min_particle_id)( config ),
+            NS(ElemByElemConfig_get_max_particle_id)( config ),
+            NS(ElemByElemConfig_get_min_element_id)( config ),
+            NS(ElemByElemConfig_get_max_element_id)( config ),
+            NS(ElemByElemConfig_get_min_turn)( config ),
+            NS(ElemByElemConfig_get_max_turn)( config ) );
+    }
+
+    return ( NS(buffer_size_t) )0u;
+}
+
+SIXTRL_INLINE NS(buffer_size_t)
+NS(ElemByElemConfig_get_stored_num_particles_detailed)(
+    NS(particle_index_t) const min_part_id,
+    NS(particle_index_t) const max_part_id,
+    NS(particle_index_t) const min_elem_id,
+    NS(particle_index_t) const max_elem_id,
+    NS(particle_index_t) const min_turn_id,
+    NS(particle_index_t) const max_elem_by_elem_turn_id )
+{
+    typedef NS(particle_index_t) index_t;
+    typedef NS(buffer_size_t) buf_size_t;
+
+    SIXTRL_STATIC_VAR index_t const ZERO = ( index_t )0u;
+    SIXTRL_STATIC_VAR index_t const ONE  = ( index_t )1u;
+
+    buf_size_t num_stored_particles = ( buf_size_t )0u;
+
+    if( ( min_part_id >= ZERO ) && ( max_part_id >= min_part_id ) &&
+        ( min_elem_id >= ZERO ) && ( max_elem_id >= min_elem_id ) &&
+        ( min_turn_id >= ZERO ) &&
+        ( max_elem_by_elem_turn_id >= min_turn_id ) )
+    {
+        buf_size_t const num_particles_per_elem = ( buf_size_t )(
+            ONE + max_part_id - min_part_id );
+
+        buf_size_t const num_elems_per_turn = ( buf_size_t )(
+            ONE + max_elem_id - min_elem_id );
+
+        buf_size_t const num_turns_to_store = ( buf_size_t )(
+            ONE + max_elem_by_elem_turn_id - min_turn_id );
+
+        num_stored_particles = num_particles_per_elem *
+                               num_elems_per_turn *
+                               num_turns_to_store;
+    }
+
+    return num_stored_particles;
 }
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
