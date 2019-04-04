@@ -29,7 +29,9 @@ int NS(BeamMonitor_calculate_output_buffer_params)(
     NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
     NS(buffer_size_t) const out_buffer_slot_size )
 {
-    NS(particle_index_t) min_part_id, max_part_id, min_turn_id;
+    NS(particle_index_t) min_part_id = ( NS(particle_index_t) )0u;
+    NS(particle_index_t) max_part_id = ( NS(particle_index_t) )0u;
+    NS(particle_index_t) min_turn_id = ( NS(particle_index_t) )0u;
 
     int success = NS(Particles_find_min_max_attributes)( p, &min_part_id,
         &max_part_id, SIXTRL_NULLPTR, SIXTRL_NULLPTR, &min_turn_id,
@@ -57,7 +59,9 @@ int NS(BeamMonitor_calculate_output_buffer_params_for_particle_sets)(
     NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
     NS(buffer_size_t) const out_buffer_slot_size )
 {
-    NS(particle_index_t) min_part_id, max_part_id, min_turn_id;
+    NS(particle_index_t) min_part_id = ( NS(particle_index_t) )0u;
+    NS(particle_index_t) max_part_id = ( NS(particle_index_t) )0u;
+    NS(particle_index_t) min_turn_id = ( NS(particle_index_t) )0u;
 
     int success = NS(Particles_buffer_get_min_max_attributes_of_particles_set)(
         pb, num_particle_sets, indices_begin, &min_part_id, &max_part_id,
@@ -204,7 +208,9 @@ int NS(BeamMonitor_prepare_output_buffer)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_index_offset )
 {
-    NS(particle_index_t) min_part_id, max_part_id, min_turn_id;
+    NS(particle_index_t) min_part_id = ( NS(particle_index_t) )0u;
+    NS(particle_index_t) max_part_id = ( NS(particle_index_t) )0u;
+    NS(particle_index_t) min_turn_id = ( NS(particle_index_t) )0u;
 
     int success = NS(Particles_get_min_max_attributes)( p, &min_part_id,
         &max_part_id, SIXTRL_NULLPTR, SIXTRL_NULLPTR, &min_turn_id,
@@ -230,7 +236,9 @@ int NS(BeamMonitor_prepare_output_buffer_for_particle_sets)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT indices_begin,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_index_offset )
 {
-    NS(particle_index_t) min_part_id, max_part_id, min_turn_id;
+    NS(particle_index_t) min_part_id = ( NS(particle_index_t) )0u;
+    NS(particle_index_t) max_part_id = ( NS(particle_index_t) )0u;
+    NS(particle_index_t) min_turn_id = ( NS(particle_index_t) )0u;
 
     int success = NS(Particles_buffer_get_min_max_attributes_of_particles_set)(
         pbuffer, num_particle_sets, indices_begin, &min_part_id, &max_part_id,
