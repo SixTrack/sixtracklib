@@ -184,6 +184,13 @@ if( GTEST_FOUND )
 #     add_test( CommonBeamElementsTests test_beam_elements_common )
 
     # ==========================================================================
+    # test_output_buffer_common_c99:
+
+    add_executable( test_output_buffer_common_c99 test_output_buffer_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_output_buffer_common_c99 )
+    add_test( C99_CommonOutputBufferTests test_output_buffer_common_c99 )
+
+    # ==========================================================================
     # test_track_common_c99:
 
     add_executable( test_track_common_c99 test_track_c99.cpp )
