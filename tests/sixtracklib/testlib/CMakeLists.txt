@@ -1,5 +1,7 @@
 # sixtracklib/tests/sixtracklib/testlib/CMakeLists.txt
 
+message( STATUS "------ processing tests/sixtracklib/testlib/CMakeLists.txt" )
+
 set( SIXTRACKL_TESTLIB_LINK_LIBRARIES sixtrack  CACHE INTERNAL "" FORCE )
 set( SIXTRACKL_TESTLIB_LIBRARY_MODULES
      "" CACHE INTERNAL "" FORCE )
@@ -53,6 +55,49 @@ set_target_properties( sixtrack_test PROPERTIES DEBUG_POSTFIX d )
 target_compile_options( sixtrack_test
                         PRIVATE -Wall -Werror -pedantic -ansi
                         ${SIXTRACKLIB_CPU_FLAGS} )
+
+# ------------------------------------------------------------------------------
+# provide a copy of the library to the python module if it is defined!
+
+if( SIXTRACKL_ENABLE_PYTHON )
+
+    set( DEST_PATH "${CMAKE_SOURCE_DIR}/python/pysixtracklib_test" )
+
+    if( EXISTS ${DEST_PATH} )
+
+        get_target_property( OUT_LIB_NAME_PREFIX  sixtrack_test PREFIX )
+        get_target_property( OUT_LIB_NAME sixtrack_test LIBRARY_OUTPUT_NAME )
+        get_target_property( OUT_LIB_NAME_POSTFIX sixtrack_test RELEASE_POSTFIX )
+
+        if(  NOT OUT_LIB_NAME_PREFIX )
+            set( OUT_LIB_NAME_PREFIX "lib" )
+        endif()
+
+
+        if(  NOT OUT_LIB_NAME_POSTFIX )
+            set( OUT_LIB_NAME_POSTFIX ".so" )
+        endif()
+
+        if(  NOT OUT_LIB_NAME )
+            set( OUT_LIB_NAME "sixtrack_test" )
+        endif()
+
+        set( LIB_NAME
+             "${OUT_LIB_NAME_PREFIX}${OUT_LIB_NAME}${OUT_LIB_NAME_POSTFIX}" )
+
+        set( IN_PATH   $<TARGET_FILE:sixtrack_test> )
+        set( DEST_PATH "${DEST_PATH}/${LIB_NAME}" )
+
+        message( STATUS "------ python: providing a copy of testlib "
+                        "library to ${DEST_PATH}" )
+
+        set( PY_SIXTRACKLIB_TEST_SHARED_LIB ${LIB_NAME}
+             CACHE INTERNAL "" FORCE )
+
+        add_custom_command( TARGET sixtrack_test POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy ${IN_PATH} ${DEST_PATH} )
+    endif()
+endif()
 
 # ------------------------------------------------------------------------------
 # install :
