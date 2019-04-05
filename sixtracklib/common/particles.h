@@ -457,8 +457,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Particles_calculate_difference_ext)(
 
 /* ------------------------------------------------------------------------- */
 
-#if !defined( _GPUCODE ) || defined( __CUDACC__ )
-
 SIXTRL_FN SIXTRL_STATIC bool NS(Particles_managed_buffer_is_particles_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const slot_size );
@@ -479,6 +477,8 @@ NS(Particles_managed_buffer_get_particles)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const particle_obj_index,
     NS(buffer_size_t) const slot_size );
+
+#if !defined( _GPUCODE ) || defined( __CUDACC__ )
 
 SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_is_particles_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const buffer );
