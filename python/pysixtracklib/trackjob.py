@@ -3,10 +3,9 @@
 
 import ctypes as ct
 from cobjects import CBuffer
-import pdb
 
 from . import stcommon as st
-from . import sixtracklibconf as stconf
+from . import config as stconf
 
 class TrackJob(object):
     @staticmethod
@@ -62,8 +61,10 @@ class TrackJob(object):
         if success and self._ptr_c_particles_buffer != st.st_Null and \
             self._ptr_c_beam_elements_buffer != st.st_Null:
 
-            num_particle_sets = ct.c_uint64( 1 )
-            pset_index   = ct.c_uint64( 0 )
+            particles = st.st_Particles_buffer_get_particles(
+                self._ptr_c_particles_buffer, 0 )
+
+            success = bool( particles != st.st_NullParticles )
 
             num_objects  = ct.c_uint64( 0 )
             num_slots    = ct.c_uint64( 0 )
@@ -73,13 +74,13 @@ class TrackJob(object):
 
             slot_size    = st.st_Buffer_get_slot_size( self._ptr_c_particles_buffer )
             ret = st.st_OutputBuffer_calculate_output_buffer_params(
-                self._ptr_c_beam_elements_buffer, self._ptr_c_particles_buffer,
-                ct.c_uint64( 1 ), ct.byref( pset_index ),
+                self._ptr_c_beam_elements_buffer, particles,
                 num_elem_by_elem_turns, ct.byref( num_objects ),
                 ct.byref( num_slots ), ct.byref( num_dataptrs ),
-                ct.byref( num_garbage ), ct.c_uint64( slot_size ) )
+                ct.byref( num_garbage ), slot_size )
 
-            if ret == 0 and num_objects.value > 0 and num_slots.value > 0 and \
+            if  success and ret == 0 and \
+                num_objects.value > 0 and num_slots.value > 0 and \
                 num_dataptrs.value > 0 and num_garbage.value >= 0:
                 if  output_buffer is None:
                     output_buffer = CBuffer( max_slots=num_slots.value,
@@ -97,7 +98,7 @@ class TrackJob(object):
                 ptr = ct.cast( output_buffer.base, base_addr_t )
                 nn  = ct.c_uint64( output_buffer.size )
                 self._ptr_c_output_buffer = st.st_Buffer_new_on_data( ptr, nn )
-                success = bool( self._ptr_c_output_buffer != st.st_Null )
+                success = bool( self._ptr_c_output_buffer != st.st_NullBuffer )
             elif ret != 0:
                 success = False
 

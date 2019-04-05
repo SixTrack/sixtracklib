@@ -8,24 +8,24 @@ import os
 SHARED_LIB = os.path.join( os.path.dirname( os.path.realpath( __file__ ) ),
                            "@PYTHON_SIXTRACKLIB_SHARED_LIB@" )
 
-# Namespace constants for C99 and C++
+# Namespace constants for C99
 C99_NAMESPACE_STR = "@PYTHON_SIXTRL_C99_NAMESPACE_STR@"
 C99_NAMESPACE_PREFIX_STR = "@PYTHON_SIXTRL_C99_NAMESPACE_PREFIX_STR@"
 
+# Namespace constants for C++
 CXX_NAMESPACE_STR = "@PYTHON_SIXTRL_CXX_NAMESPACE_STR@"
 CXX_NAMESPACE_PREFIX_STR = "@PYTHON_SIXTRL_CXX_NAMESPACE_PREFIX_STR@"
-
 
 # Config options
 ENABLE_APERATURE_CHECK = @PYTHON_SIXTRL_ENABLE_APERATURE_CHECK@
 APERATURE_X_LIMIT = @PYTHON_SIXTRL_APERATURE_X_LIMIT@
 APERATURE_Y_LIMIT = @PYTHON_SIXTRL_APERATURE_Y_LIMIT@
 
-
 # List of modules for sixtracklib:
 @PYTHON_SIXTRACKLIB_MODULES_STR@
 
+# Testdata directory
+@PYTHON_HAS_TESTDATA_DIR@PATH_TO_TESTDATA_DIR = os.path.abspath( os.path.join( os.path.dirname(
+@PYTHON_HAS_TESTDATA_DIR@   os.path.realpath( __file__ ) ), "..", "..", "tests", "testdata", ) )
 
-
-# end: sixtracklibconf.py
-
+# end: config.py

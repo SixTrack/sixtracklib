@@ -1,5 +1,5 @@
 import ctypes as ct
-from . import sixtracklibconf as stconf
+from . import config as stconf
 from .particles import Particles as st_Particles
 
 sixtracklib = ct.CDLL( stconf.SHARED_LIB )
@@ -13,6 +13,9 @@ st_Context_p  = ct.c_void_p
 st_TrackJob_p = ct.c_void_p
 st_uint64_p   = ct.POINTER( ct.c_uint64 )
 st_uchar_p    = ct.POINTER( ct.c_ubyte )
+
+st_double_p   = ct.POINTER( ct.c_double)
+st_int64_p    = ct.POINTER( ct.c_int64 )
 
 # ------------------------------------------------------------------------------
 # st_Buffer C-API functions
@@ -97,6 +100,85 @@ class BufferAdapter(object):
         print(f"De-allocate STBuffer {self.stbuffer}")
         st_Buffer_delete(self.stbuffer)
 
+# ------------------------------------------------------------------------------
+# st_Particles C-API functions
+
+class st_Particles( ct.Structure ):
+    _fields_ = [ ("num_particles", ct.c_int64), ("q0",st_double_p),
+                 ("mass0",st_double_p), ("beta0",st_double_p),
+                 ("gamma0",st_double_p), ("p0C",st_double_p),
+                 ("s",st_double_p), ("x",st_double_p), ("y",st_double_p),
+                 ("px",st_double_p), ("py",st_double_p), ("zeta",st_double_p),
+                 ("psigma",st_double_p), ("delta",st_double_p),
+                 ("rpp",st_double_p), ("rvv",st_double_p), ("chi",st_double_p),
+                 ("charge_ratio",st_double_p), ("particle_id", st_int64_p),
+                 ("at_element",  st_int64_p), ("at_turn", st_int64_p),
+                 ("state", st_int64_p) ]
+
+st_Particles_p = ct.POINTER( st_Particles )
+st_NullParticles = ct.cast( 0, st_Particles_p )
+
+st_Particles_preset = sixtracklib.st_Particles_preset_ext
+st_Particles_preset.argtypes = [ st_Particles_p ]
+st_Particles_preset.restype  = st_Particles_p
+
+st_Particles_get_num_of_particles = \
+    sixtracklib.st_Particles_get_num_of_particles_ext
+st_Particles_get_num_of_particles.argtpyes = [ st_Particles_p ]
+st_Particles_get_num_of_particles.restype  = ct.c_int64
+
+st_Particles_copy_single = sixtracklib.st_Particles_copy_single_ext
+st_Particles_copy_single.restype   = ct.c_bool
+st_Particles_copy_single.argptypes = [
+        st_Particles_p, ct.c_int64, st_Particles_p, ct.c_int64 ]
+
+st_Particles_copy_range  = sixtracklib.st_Particles_copy_range_ext
+st_Particles_copy_range.restype  = ct.c_bool
+st_Particles_copy_range.argtypes = [
+        st_Particles_p, st_Particles_p, ct.c_int64, ct.c_int64, ct.c_int64 ]
+
+st_Particles_copy = sixtracklib.st_Particles_copy_ext
+st_Particles_copy.argtypes = [ st_Particles_p, st_Particles_p ]
+st_Particles_copy.restype  = ct.c_bool
+
+st_Particles_calculate_difference = \
+    sixtracklib.st_Particles_calculate_difference_ext
+st_Particles_calculate_difference.restype  = None
+st_Particles_calculate_difference.argtypes = [
+        st_Particles_p, st_Particles_p, st_Particles_p ]
+
+st_Particles_buffer_get_total_num_of_particles = \
+    sixtracklib.st_Particles_buffer_get_total_num_of_particles_ext
+st_Particles_buffer_get_total_num_of_particles.restype  = ct.c_int64
+st_Particles_buffer_get_total_num_of_particles.argtypes = [ st_Buffer_p ]
+
+st_Particles_buffer_get_num_of_particle_blocks = \
+    sixtracklib.st_Particles_buffer_get_num_of_particle_blocks_ext
+st_Particles_buffer_get_num_of_particle_blocks.restype  = ct.c_uint64
+st_Particles_buffer_get_num_of_particle_blocks.argtypes = [ st_Buffer_p ]
+
+st_Particles_buffer_get_particles = \
+    sixtracklib.st_Particles_buffer_get_particles_ext
+st_Particles_buffer_get_particles.restype  = st_Particles_p
+st_Particles_buffer_get_particles.argtypes = [ st_Buffer_p, ct.c_uint64 ]
+
+st_Particles_buffers_have_same_structure = \
+    sixtracklib.st_Particles_buffers_have_same_structure_ext
+st_Particles_buffers_have_same_structure.restype  = ct.c_bool
+st_Particles_buffers_have_same_structure.argtypes = [
+        st_Particles_p, st_Particles_p ]
+
+st_Particles_buffers_calculate_difference = \
+    sixtracklib.st_Particles_buffers_calculate_difference_ext
+st_Particles_buffers_calculate_difference.restype  = None
+st_Particles_buffers_calculate_difference.argtypes = [
+        st_Buffer_p, st_Buffer_p, st_Buffer_p ]
+
+st_Particles_buffer_clear_particles = \
+        sixtracklib.st_Particles_buffer_clear_particles_ext
+st_Particles_buffer_clear_particles.restype  = None
+st_Particles_buffer_clear_particles.argtypes = [ st_Buffer_p ]
+
 # -----------------------------------------------------------------------------
 # BeamMonitor objects
 
@@ -111,13 +193,33 @@ st_BeamMonitor_insert_end_of_turn_monitors.restype = ct.c_int32
 # -----------------------------------------------------------------------------
 # OutputBuffer bindings
 
+st_OutputBuffer_prepare  = sixtracklib.st_OutputBuffer_prepare
+st_OutputBuffer_prepare.restype  = ct.c_int32
+st_OutputBuffer_prepare.argtypes = [ st_Buffer_p, st_Buffer_p, st_Particles_p,
+        ct.c_uint64, st_uint64_p, st_uint64_p, st_int64_p ]
+
+
+st_OutputBuffer_prepare_for_particle_sets = \
+    sixtracklib.st_OutputBuffer_prepare_for_particle_sets
+st_OutputBuffer_prepare_for_particle_sets.restype  = ct.c_int32
+st_OutputBuffer_prepare_for_particle_sets.argtypes = [ st_Buffer_p,
+    st_Buffer_p, st_Buffer_p, ct.c_uint64, st_uint64_p, ct.c_uint64,
+    st_uint64_p, st_uint64_p, st_uint64_p ]
+
+
 st_OutputBuffer_calculate_output_buffer_params = \
-    sixtracklib.st_OutputBuffer_calculate_output_buffer_params_for_particles_sets
-
+    sixtracklib.st_OutputBuffer_calculate_output_buffer_params
+st_OutputBuffer_calculate_output_buffer_params.restype  = ct.c_int32
 st_OutputBuffer_calculate_output_buffer_params.argtypes = [ st_Buffer_p,
-    st_Buffer_p, ct.c_uint64, st_uint64_p, ct.c_uint64, st_uint64_p,
-    st_uint64_p, st_uint64_p, st_uint64_p, ct.c_uint64 ]
+    st_Particles_p, ct.c_uint64, st_uint64_p, st_uint64_p, st_uint64_p,
+    st_uint64_p, ct.c_uint64 ]
 
+
+st_OutputBuffer_calculate_output_buffer_params_for_particles_sets = \
+    sixtracklib.st_OutputBuffer_calculate_output_buffer_params_for_particles_sets
+st_OutputBuffer_calculate_output_buffer_params_for_particles_sets.argtypes = [
+    st_Buffer_p, st_Buffer_p, ct.c_uint64, st_uint64_p, ct.c_uint64,
+    st_uint64_p, st_uint64_p, st_uint64_p, st_uint64_p, ct.c_uint64 ]
 st_OutputBuffer_calculate_output_buffer_params.restype  = ct.c_int32
 
 # -----------------------------------------------------------------------------
