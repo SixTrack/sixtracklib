@@ -5,8 +5,10 @@ if( NOT PYTHONINTERP_FOUND )
 endif()
 
 add_subdirectory( pysixtracklib )
+add_subdirectory( pysixtracklib_test )
 
-set( PYTHON_SIXTRACKLIB_SHARED_LIB  ${PY_SIXTRACKLIB_SHARED_LIB}  )
+set( PYTHON_SIXTRACKLIB_SHARED_LIB      ${PY_SIXTRACKLIB_SHARED_LIB}  )
+set( PYTHON_SIXTRACKLIB_TEST_SHARED_LIB ${PY_SIXTRACKLIB_TEST_SHARED_LIB} )
 set( SETUP_PY_IN_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.template" )
 set( SETUP_PY_OUT_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/setup.py" )
 

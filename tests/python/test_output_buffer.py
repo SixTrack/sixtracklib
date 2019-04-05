@@ -64,13 +64,7 @@ if  __name__ == '__main__':
     assert( saved_max_num_dataptrs >= num_dataptrs.value )
     assert( saved_max_num_garbage  >= num_garbage.value  )
 
-    ptr_output_buffer_data = ct.cast(
-            output_buffer.base, ct.POINTER( ct.c_ubyte ) )
-
-    size_output_buffer_data = ct.c_uint64( output_buffer_size )
-
-    mapped_output_buffer = st.st_Buffer_new_on_data(
-        ptr_output_buffer_data, size_output_buffer_data )
+    mapped_output_buffer = st.st_Buffer_new_mapped_on_cbuffer( output_buffer )
 
     assert( mapped_output_buffer != st.st_NullBuffer )
     assert( st.st_Buffer_get_num_of_objects( mapped_output_buffer ) ==
@@ -106,9 +100,11 @@ if  __name__ == '__main__':
     # Cleanup
     st.st_Buffer_delete( pb )
     st.st_Buffer_delete( eb )
+    st.st_Buffer_delete( mapped_output_buffer )
 
     pb = st.st_NullBuffer
     eb = st.st_NullBuffer
+    mapped_output_buffer = st.st_NullBuffer
 
     sys.exit( 0 )
 

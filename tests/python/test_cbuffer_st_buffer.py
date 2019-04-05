@@ -42,12 +42,13 @@ if  __name__ == '__main__':
     assert( cmp_particles.num_particles == num_particles )
 
 
-    # Provide a pyst.Particles instance for calculating the difference
-    diff_buffer = CBuffer
-    diff = pyst.Particles( cbuffer=diff_buffer, num_particles=cmp_num_particles )
-    assert( num_particles == diff.num_particles )
-    ptr_diff = ct.cast( diff_buffer.get_object_addr( 0 ), st.st_Particles_p )
-    assert( st.st_Particles_get_num_of_particles( ptr_diff ) == num_particles )
+    # Provide a buffer for calculating the difference
+    diff_buffer = st.st_Buffer_new( 0 )
+    assert( diff_buffer != st.st_NullBuffer )
+
+    diff = st.st_Particles_add( diff_buffer, num_particles )
+    assert( diff != st.st_NullParticles )
+    assert( num_particles == st.st_Particles_get_num_of_particles( diff ) )
 
 
     # Calculate the difference between the particles stored on the NS(Buffer)
