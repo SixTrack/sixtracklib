@@ -28,6 +28,131 @@ static int NS(Particles_particle_id_merge_and_check_for_duplicate)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* NS(Particles_preset_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles )
+{
+    return NS(Particles_preset)( particles );
+}
+
+NS(particle_num_elements_t) NS(Particles_get_num_of_particles_ext)( const
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) *const SIXTRL_RESTRICT particles )
+{
+    return NS(Particles_get_num_of_particles)( particles );
+}
+
+/* ------------------------------------------------------------------------- */
+
+NS(particle_num_elements_t)
+NS(BufferIndex_get_total_num_of_particles_in_range_ext)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end )
+{
+    return NS(BufferIndex_get_total_num_of_particles_in_range_ext)(
+        begin, end );
+}
+
+NS(buffer_size_t)
+NS(BufferIndex_get_total_num_of_particle_blocks_in_range_ext)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end )
+{
+    return NS(BufferIndex_get_total_num_of_particle_blocks_in_range_ext)(
+        begin, end );
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool NS(Particles_copy_single_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT dest,
+    NS(particle_num_elements_t) const dest_idx,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT src,
+    NS(particle_num_elements_t) const src_idx )
+{
+    return NS(Particles_copy_single)( dest, dest_idx, src, src_idx );
+}
+
+bool NS(Particles_copy_range_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT dest,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT src,
+    NS(particle_num_elements_t) const src_start_index,
+    NS(particle_num_elements_t) const src_end_index,
+    NS(particle_num_elements_t) dest_start_index )
+{
+    return NS(Particles_copy_range)(
+        dest, src, src_start_index, src_end_index, dest_start_index );
+}
+
+bool NS(Particles_copy_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT dest,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT src )
+{
+    return NS(Particles_copy)( dest, src );
+}
+
+void NS(Particles_calculate_difference_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT diff )
+{
+    NS(Particles_calculate_difference)( lhs, rhs, diff );
+    return;
+}
+
+/* ------------------------------------------------------------------------- */
+
+NS(particle_num_elements_t)
+NS(Particles_buffer_get_total_num_of_particles_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Particles_buffer_get_total_num_of_particles)( buffer );
+}
+
+NS(buffer_size_t) NS(Particles_buffer_get_num_of_particle_blocks_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Particles_buffer_get_num_of_particle_blocks)( buffer );
+}
+
+SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+NS(Particles_buffer_get_particles_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const part_obj_idx  )
+{
+    return NS(Particles_buffer_get_particles)( buffer, part_obj_idx );
+}
+
+SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+NS(Particles_buffer_get_const_particles_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const part_obj_idx )
+{
+    return NS(Particles_buffer_get_const_particles)( buffer, part_obj_idx );
+}
+
+bool NS(Particles_buffers_have_same_structure_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs )
+{
+    return NS(Particles_buffers_have_same_structure)( lhs, rhs );
+}
+
+void NS(Particles_buffers_calculate_difference_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT diff )
+{
+    NS(Particles_buffers_calculate_difference_ext)( lhs, rhs, diff );
+    return;
+}
+
+void NS(Particles_buffer_clear_particles_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    NS(Particles_buffer_clear_particles_ext)( buffer );
+}
+
+/* ------------------------------------------------------------------------- */
+
 int NS(Particles_particle_id_merge_and_check_for_duplicate)(
     NS(particle_index_t)* SIXTRL_RESTRICT particle_id_array,
     NS(particle_index_t)* SIXTRL_RESTRICT lhs_temp_array,

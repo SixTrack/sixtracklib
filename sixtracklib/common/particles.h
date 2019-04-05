@@ -313,7 +313,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_preset_values)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles );
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_num_elements_t)
-NS(Particles_get_num_of_particles)( const SIXTRL_PARTICLE_ARGPTR_DEC
+NS(Particles_get_num_of_particles)( SIXTRL_PARTICLE_ARGPTR_DEC const
     NS(Particles) *const SIXTRL_RESTRICT particles );
 
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_num_of_particles)(
@@ -322,6 +322,18 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_num_of_particles)(
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Particles_get_num_dataptrs)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+NS(Particles_preset_ext)( SIXTRL_PARTICLE_ARGPTR_DEC
+    NS(Particles)* SIXTRL_RESTRICT particles );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(particle_num_elements_t)
+NS(Particles_get_num_of_particles_ext)( SIXTRL_PARTICLE_ARGPTR_DEC const
+    NS(Particles) *const SIXTRL_RESTRICT particles );
+
+#endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
@@ -351,6 +363,20 @@ NS(BufferIndex_get_index_object_by_global_index_from_range)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(particle_num_elements_t)*
         SIXTRL_RESTRICT ptr_result_index_offset );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(particle_num_elements_t)
+NS(BufferIndex_get_total_num_of_particles_in_range_ext)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(BufferIndex_get_total_num_of_particle_blocks_in_range_ext)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end );
+
+#endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
@@ -400,7 +426,38 @@ SIXTRL_FN SIXTRL_STATIC void NS( Particles_get_max_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
         *const SIXTRL_RESTRICT source );
 
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_copy_single_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
+    NS(particle_num_elements_t) const destination_index,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
+    NS(particle_num_elements_t) const source_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_copy_range_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+        SIXTRL_RESTRICT destination,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
+        *const SIXTRL_RESTRICT source,
+    NS(particle_num_elements_t) const source_start_index,
+    NS(particle_num_elements_t) const source_end_index,
+    NS(particle_num_elements_t) destination_start_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_copy_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
+        *const SIXTRL_RESTRICT source );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Particles_calculate_difference_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT diff );
+
+#endif /* !defined( _GPUCODE ) */
+
 /* ------------------------------------------------------------------------- */
+
+#if !defined( _GPUCODE ) || defined( __CUDACC__ )
 
 SIXTRL_FN SIXTRL_STATIC bool NS(Particles_managed_buffer_is_particles_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
@@ -422,8 +479,6 @@ NS(Particles_managed_buffer_get_particles)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const particle_obj_index,
     NS(buffer_size_t) const slot_size );
-
-#if !defined( _GPUCODE ) || defined( __CUDACC__ )
 
 SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_is_particles_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const buffer );
@@ -471,6 +526,41 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_buffer_clear_particles)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 #endif /* !defined( _GPUCODE ) || defined( __CUDACC__ ) */
+
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(particle_num_elements_t)
+NS(Particles_buffer_get_total_num_of_particles_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(Particles_buffer_get_num_of_particle_blocks_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+NS(Particles_buffer_get_particles_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const particle_obj_index  );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+NS(Particles_buffer_get_const_particles_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const particle_obj_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_buffers_have_same_structure_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Particles_buffers_calculate_difference_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT diff );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Particles_buffer_clear_particles_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
+
+#endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
