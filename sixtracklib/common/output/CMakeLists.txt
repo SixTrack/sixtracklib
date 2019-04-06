@@ -2,15 +2,20 @@
 
 set( SIXTRACKLIB_COMMON_OUTPUT_C99_HEADERS
      elem_by_elem_config.h
+     elem_by_elem_output_buffer.h
      output_buffer.h
 )
 
 set( SIXTRACKLIB_COMMON_OUTPUT_C99_SOURCES
      elem_by_elem_config.c
+     elem_by_elem_output_buffer.c
      output_buffer.c
 )
 
-set( SIXTRACKLIB_COMMON_OUTPUT_CXX_HEADERS )
+set( SIXTRACKLIB_COMMON_OUTPUT_CXX_HEADERS
+     output_buffer.hpp
+)
+
 set( SIXTRACKLIB_COMMON_OUTPUT_CXX_SOURCES )
 
 # ------------------------------------------------------------------------------

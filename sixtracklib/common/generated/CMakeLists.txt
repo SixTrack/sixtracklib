@@ -9,28 +9,36 @@ set( SIXTRACKL_COMMON_GENERATED_HEADERS )
 
 if( SIXTRACKL_ENABLE_MANUAL_SIMD )
     set( SIXTRACKL_ENABLE_MODULE_SIMD 1 )
+    set( PY_SIXTRACKL_MODULE_SIMD "True" )
 else()
     set( SIXTRACKL_ENABLE_MODULE_SIMD 0 )
+    set( PY_SIXTRACKL_MODULE_SIMD "False" )
 endif()
 
 if( SIXTRACKL_ENABLE_OPENCL )
     set( SIXTRACKL_ENABLE_MODULE_OPENCL 1 )
+    set( PY_SIXTRACKL_MODULE_OPENCL "True" )
 else()
     set( SIXTRACKL_ENABLE_MODULE_OPENCL 0 )
+    set( PY_SIXTRACKL_MODULE_OPENCL "False" )
 endif()
 
 
 if( SIXTRACKL_ENABLE_CUDA )
     set( SIXTRACKL_ENABLE_MODULE_CUDA 1 )
+    set( PY_SIXTRACKL_MODULE_CUDA "True" )
 else()
     set( SIXTRACKL_ENABLE_MODULE_CUDA 0 )
+    set( PY_SIXTRACKL_MODULE_CUDA "False" )
 endif()
 
 
 if( SIXTRACKL_ENABLE_MPFR4 )
     set( SIXTRACKL_ENABLE_MODULE_MPFR4 1 )
+    set( PY_SIXTRACKL_MODULE_MPFRA "True" )
 else()
     set( SIXTRACKL_ENABLE_MODULE_MPFR4 0 )
+    set( PY_SIXTRACKL_MODULE_MPFRA "False" )
 endif()
 
 
@@ -40,6 +48,19 @@ set( MODULES_H_OUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules.h" )
 configure_file( ${MODULES_H_IN_PATH} ${MODULES_H_OUT_PATH} @ONLY )
 set(   SIXTRACKL_COMMON_GENERATED_HEADERS
      ${SIXTRACKL_COMMON_GENERATED_HEADERS} "generated/modules.h" )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# prepare python related module list
+
+if( SIXTRACKL_ENABLE_PYTHON )
+    set( PY_SIXTRACKLIB_MODULES_STR
+        "SIXTRACKLIB_MODULES = {}"
+        "SIXTRACKLIB_MODULES[\"simd\"]   = ${PY_SIXTRACKL_MODULE_SIMD}"
+        "SIXTRACKLIB_MODULES[\"opencl\"] = ${PY_SIXTRACKL_MODULE_OPENCL}"
+        "SIXTRACKLIB_MODULES[\"cuda\"]   = ${PY_SIXTRACKL_MODULE_CUDA}"
+        "SIXTRACKLIB_MODULES[\"mpfr4\"]  = ${PY_SIXTRACKL_MODULE_MPFRA}"
+         CACHE INTERNAL "" FORCE )
+endif()
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install:
@@ -113,6 +134,21 @@ configure_file( ${CONFIG_H_IN_PATH} ${CONFIG_H_OUT_PATH} @ONLY )
 set(  SIXTRACKL_COMMON_GENERATED_HEADERS
     ${SIXTRACKL_COMMON_GENERATED_HEADERS} "generated/config.h" )
 
+
+if( SIXTRACKL_ENABLE_PYTHON )
+    if( SIXTRACKL_ENABLE_APERATURE_CHECK )
+        set( PY_SIXTRL_ENABLE_APERATURE_CHECK "True" CACHE INTERNAL "" FORCE )
+    else()
+        set( PY_SIXTRL_ENABLE_APERATURE_CHECK "False" CACHE INTERNAL "" FORCE )
+    endif()
+
+    set( PY_SIXTRL_APERATURE_X_LIMIT "${SIXTRACKL_APERATURE_X_LIMIT_VALUE}"
+         CACHE INTERNAL "" FORCE )
+
+    set( PY_SIXTRL_APERATURE_Y_LIMIT "${SIXTRACKL_APERATURE_Y_LIMIT_VALUE}"
+         CACHE INTERNAL "" FORCE )
+endif()
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install:
 
@@ -154,6 +190,23 @@ configure_file( ${NAMESPACE_H_IN_PATH} ${NAMESPACE_H_OUT_PATH} @ONLY )
 
 set(  SIXTRACKL_COMMON_GENERATED_HEADERS
     ${SIXTRACKL_COMMON_GENERATED_HEADERS} "generated/namespace.h" )
+
+
+if( SIXTRACKL_ENABLE_PYTHON )
+
+    set( PY_SIXTRL_C99_NAMESPACE_STR "${SIXTRL_GENERATED_C99_NAMESPACE}"
+         CACHE INTERNAL "" FORCE )
+
+    set( PY_SIXTRL_C99_NAMESPACE_PREFIX_STR "${SIXTRL_GENERATED_C99_NAMESPACE}"
+         CACHE INTERNAL "" FORCE )
+
+    set( PY_SIXTRL_CXX_NAMESPACE_STR "${SIXTRL_GENERATED_CXX_NAMESPACE}"
+         CACHE INTERNAL "" FORCE )
+
+    set( PY_SIXTRL_CXX_NAMESPACE_PREFIX_STR
+         "${SIXTRL_GENERATED_CXX_NAMESPACE}::" CACHE INTERNAL "" FORCE )
+
+endif()
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install:

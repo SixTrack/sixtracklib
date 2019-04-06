@@ -128,11 +128,11 @@ namespace sixtrack
 
                 if( success )
                 {
-                    success = ::st_Particles_have_same_structure(
-                        cmp_particles, particles );
+                    success = ( ::st_Particles_have_same_structure(
+                        cmp_particles, particles ) ) ? 1 : 0;
 
-                    success &= !( ::st_Particles_map_to_same_memory(
-                        cmp_particles, particles ) );
+                    success &= ( ::st_Particles_map_to_same_memory(
+                        cmp_particles, particles ) ) ? 0 : 1;
                 }
 
                 if( success )

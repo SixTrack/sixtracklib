@@ -1,19 +1,163 @@
-#ifndef SIXTRACKLIB_SIXTRACKLIB_COMMON_TRACK_JOB_H__
-#define SIXTRACKLIB_SIXTRACKLIB_COMMON_TRACK_JOB_H__
+#ifndef SIXTRL_SIXTRACKLIB_COMMON_TRACK_JOB_H__
+#define SIXTRL_SIXTRACKLIB_COMMON_TRACK_JOB_H__
+
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+    #if defined( __cplusplus )
+        #include <algorithm>
+        #include <cstddef>
+        #include <cstdint>
+        #include <cstdlib>
+        #include <cstring>
+        #include <iostream>
+        #include <memory>
+        #include <regex>
+        #include <string>
+        #include <utility>
+    #endif /* defined( __cplusplus ) */
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/internal/track_job_base.h"
+
+    #if defined( __cplusplus )
+        #include "sixtracklib/common/buffer.hpp"
+    #endif /* defined( __cplusplus ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 struct NS(ElemByElemConfig);
 
-#if defined( __cplusplus ) && !defined( _GPUCODE )
-extern "C" {
-#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
-
 #if !defined( _GPUCODE )
+
+#if defined( __cplusplus )
+
+namespace SIXTRL_CXX_NAMESPACE
+{
+    SIXTRL_HOST_FN SIXTRL_STATIC std::string TrackJob_extract_device_id_str(
+        const char *const SIXTRL_RESTRICT config_str );
+
+    SIXTRL_HOST_FN SIXTRL_STATIC std::string TrackJob_sanitize_arch_str(
+        const char *const SIXTRL_RESTRICT arch_str );
+
+    SIXTRL_HOST_FN TrackJobBase* TrackJob_create(
+        const char *const SIXTRL_RESTRICT arch_str,
+        const char *const SIXTRL_RESTRICT config_str );
+
+    SIXTRL_HOST_FN TrackJobBase* TrackJob_create(
+        std::string const& SIXTRL_RESTRICT_REF arch_str,
+        std::string const& SIXTRL_RESTRICT_REF config_str );
+
+    SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        const char *const SIXTRL_RESTRICT arch_str,
+        ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+        ::NS(Buffer)* SIXTRL_RESTRICT beam_elemements_buffer,
+        const char *const SIXTRL_RESTRICT config_str );
+
+    SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        const char *const SIXTRL_RESTRICT arch_str,
+        ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+        ::NS(Buffer)* SIXTRL_RESTRICT beam_elemements_buffer,
+        ::NS(Buffer)* SIXTRL_RESTRICT output_buffer,
+        ::NS(buffer_size_t) const dump_elem_by_elem_turns,
+        const char *const SIXTRL_RESTRICT config_str );
+
+    SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        const char *const SIXTRL_RESTRICT arch_str,
+        ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+        ::NS(buffer_size_t) const num_particle_sets,
+        ::NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,
+        ::NS(Buffer)* SIXTRL_RESTRICT beam_elemements_buffer,
+        ::NS(Buffer)* SIXTRL_RESTRICT output_buffer,
+        ::NS(buffer_size_t) const dump_elem_by_elem_turns,
+        const char *const SIXTRL_RESTRICT config_str );
+
+    SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        std::string const& SIXTRL_RESTRICT_REF arch_str,
+        Buffer& SIXTRL_RESTRICT_REF particles_buffer,
+        Buffer& SIXTRL_RESTRICT_REF beam_elemements_buffer,
+        std::string const& SIXTRL_RESTRICT_REF config_str );
+
+    SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        std::string const& SIXTRL_RESTRICT_REF arch_str,
+        Buffer& SIXTRL_RESTRICT_REF particles_buffer,
+        Buffer& SIXTRL_RESTRICT_REF beam_elemements_buffer,
+        Buffer* SIXTRL_RESTRICT output_buffer,
+        Buffer::size_type const dump_elem_by_elem_turns,
+        std::string const& SIXTRL_RESTRICT_REF config_str );
+
+    SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        std::string const& SIXTRL_RESTRICT_REF arch_str,
+        Buffer& SIXTRL_RESTRICT_REF particles_buffer,
+        Buffer::size_type const num_particle_sets,
+        Buffer::size_type const* SIXTRL_RESTRICT particle_set_indices_begin,
+        Buffer& SIXTRL_RESTRICT_REF beam_elemements_buffer,
+        Buffer* SIXTRL_RESTRICT output_buffer,
+        Buffer::size_type const dump_elem_by_elem_turns,
+        std::string const& SIXTRL_RESTRICT_REF config_str );
+
+    template< typename Iter >
+    SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        std::string const& SIXTRL_RESTRICT_REF arch_str,
+        Buffer& SIXTRL_RESTRICT_REF particles_buffer,
+        Iter particle_set_indices_begin, Iter particle_set_indices_end,
+        Buffer& SIXTRL_RESTRICT_REF beam_elemements_buffer,
+        Buffer* SIXTRL_RESTRICT output_buffer,
+        Buffer::size_type const dump_elem_by_elem_turns,
+        std::string const& SIXTRL_RESTRICT_REF config_str );
+}
+
+extern "C" {
+
+#endif /* defined( __cplusplus ) */
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_create)(
+    const char *const SIXTRL_RESTRICT arch,
+    const char *const SIXTRL_RESTRICT config_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_new)(
+    const char *const SIXTRL_RESTRICT arch,
+    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+    NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
+    const char *const SIXTRL_RESTRICT config_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_new_with_output)(
+    const char *const SIXTRL_RESTRICT arch,
+    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+    NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
+    NS(Buffer)* SIXTRL_RESTRICT output_buffer,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    const char *const SIXTRL_RESTRICT config_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_new_detailed)(
+    const char *const SIXTRL_RESTRICT arch,
+    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+    NS(buffer_size_t) const num_particle_sets,
+    NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,
+    NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
+    NS(Buffer)* SIXTRL_RESTRICT output_buffer,
+    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    const char *const SIXTRL_RESTRICT config_str );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_delete)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t) NS(TrackJob_track_until)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const until_turn );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t)
+NS(TrackJob_track_elem_by_elem)( NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const until_turn );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_collect)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job );
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_clear)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job );
@@ -217,12 +361,99 @@ NS(TrackJob_set_default_elem_by_elem_config_order)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job,
     NS(elem_by_elem_order_t) const order );
 
+
+#if defined( __cplusplus )
+} /* extern "C" { */
+#endif /* defined( __cplusplus ) */
+
+/* ************************************************************************* */
+/* *****              Implementation of Inline Functions               ***** */
+/* ************************************************************************* */
+
+#if defined( __cplusplus )
+
+namespace SIXTRL_CXX_NAMESPACE
+{
+    SIXTRL_INLINE SIXTRL_HOST_FN std::string TrackJob_extract_device_id_str(
+        const char *const SIXTRL_RESTRICT config_str )
+    {
+        if( ( config_str != nullptr ) &&
+            ( std::strlen( config_str ) > std::size_t{ 0 } ) )
+        {
+            std::regex re(
+                        "device_id_str[:blank:]*=[:blank:]*"
+                              "([:digit:]+.[:digit:]+)[A-Za-z0-9_-#=:;., \t]*|"
+                        "^[A-Za-z0-9_-#=;.:, \t]*([:digit:]+.[:digit:]+);|"
+                        "([:digit:]+.[:digit:]+)" );
+
+            std::cmatch matches;
+
+            std::regex_match( config_str, matches, re );
+
+            if( ( matches.ready() ) && ( !matches.empty() ) )
+            {
+                std::size_t const n = matches.size();
+                std::cout << n << "\r\n";
+                std::cout << matches[ 0 ] << std::endl;
+
+                return std::string{ matches[ 0 ] };
+            }
+        }
+
+        return std::string{ "" };
+    }
+
+    SIXTRL_INLINE SIXTRL_HOST_FN std::string TrackJob_sanitize_arch_str(
+        const char *const SIXTRL_RESTRICT arch_str )
+    {
+        std::size_t const arch_str_len = ( arch_str != nullptr )
+            ? std::strlen( arch_str ) : std::size_t{ 0 };
+
+        std::string result_str;
+
+        if( arch_str_len > std::size_t{ 0 } )
+        {
+            char const* it  = arch_str;
+            char const* end = arch_str;
+            std::advance( end, arch_str_len );
+
+            result_str.resize( arch_str_len );
+            std::transform( it, end, result_str.begin(), ::tolower );
+
+        }
+
+        return result_str;
+    }
+
+    template< typename Iter >
+    SIXTRL_INLINE SIXTRL_HOST_FN TrackJobBase* TrackJob_new(
+        std::string const& SIXTRL_RESTRICT_REF arch_str,
+        Buffer& SIXTRL_RESTRICT_REF particles_buffer,
+        Iter particle_set_indices_begin, Iter particle_set_indices_end,
+        Buffer& SIXTRL_RESTRICT_REF beam_elemements_buffer,
+        Buffer* SIXTRL_RESTRICT output_buffer,
+        Buffer::size_type const dump_elem_by_elem_turns,
+        std::string const& SIXTRL_RESTRICT_REF config_str )
+    {
+        TrackJobBase* ptr_job = TrackJob_create( arch_str, config_str );
+
+        if( ( ptr_job != nullptr ) && ( !ptr_job->reset( particles_buffer,
+                particle_set_indices_begin, particle_set_indices_end,
+                    beam_elemements_buffer, output_buffer,
+                        dump_elem_by_elem_turns ) ) )
+        {
+            delete ptr_job;
+            ptr_job = nullptr;
+        }
+
+        return ptr_job;
+    }
+}
+
+#endif /* defined( __cplusplus ) */
+
 #endif /* !defined( _GPUCODE ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE )
-}
-#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
-
-#endif /* SIXTRACKLIB_SIXTRACKLIB_COMMON_TRACK_JOB_H__ */
+#endif /* SIXTRL_SIXTRACKLIB_COMMON_TRACK_JOB_H__ */
 
 /* end: sixtracklib/common/track_job.h */

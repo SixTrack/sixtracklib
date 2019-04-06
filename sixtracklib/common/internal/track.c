@@ -15,85 +15,6 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/context/context_abs_base.h"
 
-
-SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(TrackCpu)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT beam_elements,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    int const until_turn, int const elem_by_elem_turns )
-{
-    NS(Buffer)* ptr_output = SIXTRL_NULLPTR;
-
-    typedef NS(buffer_size_t)       buf_size_t;
-    typedef NS(particle_index_t)    index_t;
-
-    if( ( particles != SIXTRL_NULLPTR ) &&
-        ( beam_elements != SIXTRL_NULLPTR ) &&
-        ( until_turn >= 0 ) && ( elem_by_elem_turns >= 0 ) &&
-        ( elem_by_elem_turns <= until_turn ) )
-    {
-        int success = -1;
-
-        if( output_buffer != SIXTRL_NULLPTR )
-        {
-            ptr_output = output_buffer;
-        }
-        else
-        {
-            ptr_output = NS(Buffer_new)( 0u );
-        }
-
-        if( ptr_output != SIXTRL_NULLPTR )
-        {
-            buf_size_t elem_by_elem_index_offset = ( buf_size_t )0u;
-            buf_size_t beam_monitor_index_offset = ( buf_size_t )0u;
-            index_t min_turn_id                  = ( index_t )0u;
-
-            success  = NS(OutputBuffer_prepare)(
-                    beam_elements, ptr_output, particles,
-                    elem_by_elem_turns, &elem_by_elem_index_offset,
-                    &beam_monitor_index_offset, &min_turn_id );
-
-            if( success == 0 )
-            {
-                success = NS(BeamMonitor_assign_output_buffer_from_offset)(
-                    beam_elements, ptr_output, min_turn_id,
-                        beam_monitor_index_offset );
-            }
-
-            if( ( success == 0 ) && ( elem_by_elem_turns > 0 ) )
-            {
-                SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
-                elem_by_elem_particles = NS(Particles_buffer_get_particles)(
-                    ptr_output, elem_by_elem_index_offset );
-
-                SIXTRL_ASSERT( elem_by_elem_particles != SIXTRL_NULLPTR );
-                SIXTRL_ASSERT( NS(Buffer_get_num_of_objects)( ptr_output ) >
-                           ( NS(buffer_size_t) )0u );
-
-                success = NS(Track_all_particles_element_by_element_until_turn)(
-                    particles, beam_elements, elem_by_elem_turns,
-                        elem_by_elem_particles );
-            }
-
-            if( ( success == 0 ) && ( elem_by_elem_turns < until_turn ) )
-            {
-                success = NS(Track_all_particles_until_turn)(
-                    particles, beam_elements, until_turn );
-            }
-
-            if( success != 0 )
-            {
-                NS(Buffer_delete)( ptr_output );
-                ptr_output = SIXTRL_NULLPTR;
-            }
-        }
-    }
-
-    return ptr_output;
-}
-
-
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_HOST_FN int NS(Track_particle_beam_element)(
@@ -622,49 +543,38 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element_until_turn)(
 {
     typedef NS(particle_index_t)        index_t;
     typedef NS(particle_num_elements_t) num_elem_t;
+    typedef NS(buffer_size_t)           buf_size_t;
 
-    index_t min_particle_id   = ( index_t )0;
-    index_t max_particle_id   = ( index_t )0;
+    SIXTRL_STATIC_VAR buf_size_t ZERO = ( buf_size_t )0u;
 
-    index_t min_at_element_id = ( index_t )0;
-    index_t max_at_element_id = ( index_t )0;
+    num_elem_t const available_num_out_particles =
+        NS(Particles_get_num_of_particles)( out_particles );
 
-    index_t min_at_turn       = ( index_t )0;
-    index_t max_at_turn       = ( index_t )0;
+    buf_size_t num_elem_by_elem_objs = ZERO;
 
-    int success = NS(Particles_find_min_max_attributes)( particles,
-        &min_particle_id, &max_particle_id,
-        &min_at_element_id, &max_at_element_id,
-        &min_at_turn, &max_at_turn );
+    index_t const start_elem = ( index_t )0u;
+    index_t min_part_id, max_part_id, min_elem_id, max_elem_id,
+            min_turn_id, max_turn_id;
 
-    NS(ElemByElemConfig) config;
-    NS(ElemByElemConfig_preset)( &config );
+    int success = NS(OutputBuffer_get_min_max_attributes)( particles,
+        belements, &min_part_id, &max_part_id, &min_elem_id, &max_elem_id,
+            &min_turn_id, &max_turn_id, &num_elem_by_elem_objs, start_elem );
 
-    if( success == 0 )
+    num_elem_t const requ_num_output_particles = ( num_elem_t
+        )NS(ElemByElemConfig_get_stored_num_particles_detailed)( min_part_id,
+            max_part_id, min_elem_id, max_elem_id, min_turn_id, until_turn );
+
+    if( ( 0 == success ) && ( min_turn_id < until_turn ) &&
+        ( num_elem_by_elem_objs > ZERO ) &&
+        ( requ_num_output_particles <= available_num_out_particles ) )
     {
-        num_elem_t const num_beam_elements =
-            NS(Buffer_get_num_of_objects)( belements );
+        NS(ElemByElemConfig) config;
+        NS(ElemByElemConfig_preset)( &config );
 
-        if( ( num_beam_elements >= ( num_elem_t )0u ) &&
-            ( num_beam_elements >  ( num_elem_t )(
-                max_at_element_id + ( index_t )1u ) ) )
-        {
-            max_at_element_id = ( index_t )(
-                num_beam_elements - ( num_elem_t )1u );
-        }
-
-        SIXTRL_ASSERT( min_at_turn >= ( index_t )0u );
-        SIXTRL_ASSERT( max_at_turn >= min_at_turn );
-
-        if( max_at_turn < until_turn )
-        {
-            max_at_turn = until_turn;
-        }
-
-        success = NS(ElemByElemConfig_init_detailed)(
-            &config, NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES),
-            min_particle_id, max_particle_id, min_at_element_id,
-            max_at_element_id, min_at_turn, max_at_turn, true );
+        success = NS(ElemByElemConfig_init_detailed)( &config,
+            NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES), min_part_id,
+                max_part_id, min_elem_id, max_elem_id,
+                    min_turn_id, until_turn, true );
 
         if( success == 0 )
         {
@@ -674,9 +584,13 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element_until_turn)(
             success =
             NS(Track_subset_of_particles_element_by_element_until_turn_objs)(
                 particles, idx, idx_end, stride, &config,
-                NS(Buffer_get_const_objects_begin)( belements ),
-                NS(Buffer_get_const_objects_end)( belements ), until_turn );
+                    NS(Buffer_get_const_objects_begin)( belements ),
+                    NS(Buffer_get_const_objects_end)( belements ), until_turn );
         }
+    }
+    else if( ( success == 0 ) && ( min_turn_id < until_turn ) )
+    {
+        success = -1;
     }
 
     return success;

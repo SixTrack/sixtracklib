@@ -27,38 +27,19 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/context/context_abs_base.h"
+    #include "sixtracklib/common/output/output_buffer.h"
     #include "sixtracklib/common/output/elem_by_elem_config.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 typedef SIXTRL_INT64_T  NS(track_job_type_t);
 typedef SIXTRL_INT32_T  NS(track_status_t);
-typedef SIXTRL_UINT32_T NS(track_job_output_flag_t);
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
-
-SIXTRL_STATIC_VAR NS(track_job_output_flag_t) const
-    NS(TRACK_JOB_OUTPUT_NONE) = ( NS(track_job_output_flag_t ) )0x00;
-
-SIXTRL_STATIC_VAR NS(track_job_output_flag_t) const
-    NS(TRACK_JOB_OUTPUT_ELEM_BY_ELEM) = ( NS(track_job_output_flag_t ) )0x01;
-
-SIXTRL_STATIC_VAR NS(track_job_output_flag_t) const
-    NS(TRACK_JOB_OUTPUT_BEAM_MONITORS) = ( NS(track_job_output_flag_t ) )0x02;
 
 namespace SIXTRL_CXX_NAMESPACE
 {
     using track_job_type_t        = ::NS(track_job_type_t);
     using track_status_t          = ::NS(track_status_t);
-    using track_job_output_flag_t = ::NS(track_job_output_flag_t);
-
-    static track_job_output_flag_t const TRACK_JOB_OUTPUT_NONE =
-        track_job_output_flag_t{ 0x00 };
-
-    static track_job_output_flag_t const TRACK_JOB_OUTPUT_ELEM_BY_ELEM =
-        track_job_output_flag_t{ 0x01 };
-
-    static track_job_output_flag_t const TRACK_JOB_OUTPUT_BEAM_MONITORS =
-        track_job_output_flag_t{ 0x02 };
 
     class TrackJobBase
     {
@@ -72,9 +53,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using size_type               = Buffer::size_type;
         using type_t                  = SIXTRL_CXX_NAMESPACE::track_job_type_t;
         using track_status_t          = SIXTRL_CXX_NAMESPACE::track_status_t;
-
-        using track_job_output_flag_t =
-            SIXTRL_CXX_NAMESPACE::track_job_output_flag_t;
+        using output_buffer_flag_t    = ::NS(output_buffer_flag_t);
 
         SIXTRL_HOST_FN void clear();
         SIXTRL_HOST_FN void collect();
@@ -84,6 +63,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN track_status_t trackElemByElem(
             size_type const dump_elem_by_elem_turns );
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN virtual ~TrackJobBase() = default;
 
         /* ----------------------------------------------------------------- */
 
@@ -278,8 +261,6 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN TrackJobBase& operator=(
             TrackJobBase&& rhs ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN virtual ~TrackJobBase() = default;
-
         SIXTRL_HOST_FN virtual void doClear();
 
         SIXTRL_HOST_FN virtual void doCollect();
@@ -444,12 +425,6 @@ namespace SIXTRL_CXX_NAMESPACE
         bool                            m_has_beam_monitor_output;
         bool                            m_has_elem_by_elem_output;
     };
-
-    SIXTRL_EXTERN SIXTRL_HOST_FN track_job_output_flag_t
-    TrackJob_needs_output_buffer(
-        Buffer const& SIXTRL_RESTRICT_REF particles_buffer,
-        Buffer const& SIXTRL_RESTRICT_REF beam_elements_buffer,
-        Buffer::size_type const dump_elem_by_elem_turns ) SIXTRL_NOEXCEPT;
 }
 
 typedef SIXTRL_CXX_NAMESPACE::TrackJobBase NS(TrackJobBase);
@@ -461,25 +436,6 @@ typedef void NS(TrackJobBase);
 #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
 
 #if !defined( _GPUCODE )
-
-/* ------------------------------------------------------------------------- */
-/* ----  Declaration of C99 API bindings / functions                    ---- */
-/* ------------------------------------------------------------------------- */
-
-#if defined( __cplusplus ) && !defined( _GPUCODE )
-extern "C" {
-#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
-
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_job_output_flag_t)
-NS(TrackJob_needs_output_buffer)(
-    const NS(Buffer) *const SIXTRL_RESTRICT particles_buffer,
-    const NS(Buffer) *const SIXTRL_RESTRICT beam_elem_buffer,
-    NS(buffer_size_t) const dump_elem_by_elem_turns );
-
-#if defined( __cplusplus ) && !defined( _GPUCODE )
-}
-#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
-
 #if defined( __cplusplus )
 
 /* ------------------------------------------------------------------------- */

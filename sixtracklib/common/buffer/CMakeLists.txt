@@ -1,5 +1,6 @@
 set( SIXTRL_COMMON_BUFFER_HEADERS
      alignment.h
+     buffer_dev_debug.h
      buffer_garbage.h
      buffer_generic.h
      buffer_object.h
