@@ -4,6 +4,7 @@
 import sys
 import os
 import pysixtracklib as pyst
+import pysixtracklib_test as pysixtrl_testlib
 import pysixtracklib.stcommon as st
 import ctypes as ct
 from   cobjects import CBuffer
@@ -12,7 +13,7 @@ from   cobjects import CBuffer
 if  __name__ == '__main__':
     # Load the beambeam testcase particle data dump into a sixtracklib
     # NS(Buffer) instance
-    path_to_testdir = pyst.config.PATH_TO_TESTDATA_DIR
+    path_to_testdir = pysixtrl_testlib.config.PATH_TO_TESTDATA_DIR
     assert( path_to_testdir is not None )
     assert( os.path.exists( path_to_testdir ) )
     assert( os.path.isdir( path_to_testdir ) )
@@ -46,25 +47,41 @@ if  __name__ == '__main__':
     diff_buffer = st.st_Buffer_new( 0 )
     assert( diff_buffer != st.st_NullBuffer )
 
-    diff = st.st_Particles_add( diff_buffer, num_particles )
+    diff = st.st_Particles_new( diff_buffer, num_particles )
     assert( diff != st.st_NullParticles )
     assert( num_particles == st.st_Particles_get_num_of_particles( diff ) )
-
 
     # Calculate the difference between the particles stored on the NS(Buffer)
     # and cmp_particles object, i.e. the CObjects based representation.
     # the difference should be zero
-    ptr_cmp_particles = ct.cast( cobj_pb.get_object_addr( 0 ), st.st_Particles_p )
+    ptr_cmp_particles = st.st_Particles_cbuffer_get_particles( cobj_pb, 0 )
     assert( ptr_cmp_particles != st.st_NullParticles )
     assert( ptr_cmp_particles != particles );
-    assert( st.st_Particles_get_num_of_particles( ptr_cmp_particles ) == num_particles )
-    st.st_st_Particles_calculate_difference( particles, ptr_cmp_particles, ptr_diff )
+    assert( st.st_Particles_get_num_of_particles(
+            ptr_cmp_particles ) == num_particles )
+
+    ABS_ERR = ct.c_double( 1e-14 )
+
+    assert( 0 == pysixtrl_testlib.stcommon.st_Particles_compare_values(
+            ptr_cmp_particles, particles )
+        or  0 == pysixtrl_testlib.stcommon.st_Particles_compare_values_with_treshold(
+            ptr_cmp_particles, particles ) )
+
+
+    st.st_Particles_calculate_difference( particles, ptr_cmp_particles, diff )
+    pysixtrl_testlib.stcommon.st_Particles_print_out( diff )
 
 
     # Cleanup
+    ptr_cmp_particles = st.st_NullParticles
+    particles = st.st_NullParticles
+    diff = st.st_NullParticles
+
     st.st_Buffer_delete( pb )
     pb = st.st_NullBuffer
-    particles = st.st_NullParticles
+
+    st.st_Buffer_delete( diff_buffer )
+    diff_buffer = st.st_NullBuffer
 
     sys.exit( 0 )
 

@@ -4,6 +4,7 @@
 import sys
 import os
 import pysixtracklib as pyst
+import pysixtracklib_test as pysixtrl_testlib
 import pysixtracklib.stcommon as st
 import ctypes as ct
 from   cobjects import CBuffer
@@ -11,7 +12,7 @@ from   cobjects import CBuffer
 if  __name__ == '__main__':
     # Load the beambeam testcase particle data dump into a sixtracklib
     # NS(Buffer) instance
-    path_to_testdir = pyst.config.PATH_TO_TESTDATA_DIR
+    path_to_testdir = pysixtrl_testlib.config.PATH_TO_TESTDATA_DIR
     assert( path_to_testdir is not None )
     assert( os.path.exists( path_to_testdir ) )
     assert( os.path.isdir( path_to_testdir ) )

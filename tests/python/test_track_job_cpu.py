@@ -5,12 +5,13 @@ import sys
 import os
 import pysixtrack
 import pysixtracklib as pyst
+import pysixtracklib_test as pysixtrl_testlib
 import pysixtracklib.stcommon as st
 import ctypes as ct
 from   cobjects import CBuffer
 
 if  __name__ == '__main__':
-    path_to_testdir = pyst.config.PATH_TO_TESTDATA_DIR
+    path_to_testdir = pysixtrl_testlib.config.PATH_TO_TESTDATA_DIR
     assert( path_to_testdir is not None )
     assert( os.path.exists( path_to_testdir ) )
     assert( os.path.isdir( path_to_testdir ) )
@@ -29,8 +30,8 @@ if  __name__ == '__main__':
     eb = CBuffer.fromfile( path_to_beam_elements_data )
 
     test_particles = pb.get_object( 0, cls=pyst.Particles )
-
-    #
+    ptr_test_particles = st.st_Particles_cbuffer_get_particles( pb, 0 )
+    assert( ptr_test_particles != st.st_NullParticles )
 
     sys.exit( 0 )
 
