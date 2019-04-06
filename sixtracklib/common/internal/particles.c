@@ -203,10 +203,10 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)* NS(Particles_add_ext)(
     NS(particle_index_ptr_t) state_ptr )
 {
     return NS(Particles_add)( buffer, num_particles, q0_ptr, mass0_ptr,
-        q0_ptr, mass0_ptr, beta0_ptr, gamma0_ptr, p0c_ptr, s_ptr,
-            x_ptr, y_ptr, px_ptr, py_ptr, zeta_ptr, psigma_ptr, delta_ptr,
-                rpp_ptr, rvv_ptr, chi_ptr, charge_ratio_ptr, particle_id_ptr,
-                    at_element_id_ptr, at_turn_ptr, state_ptr );
+        beta0_ptr, gamma0_ptr, p0c_ptr, s_ptr, x_ptr, y_ptr, px_ptr, py_ptr,
+            zeta_ptr, psigma_ptr, delta_ptr, rpp_ptr, rvv_ptr, chi_ptr,
+                charge_ratio_ptr, particle_id_ptr, at_element_id_ptr,
+                    at_turn_ptr, state_ptr );
 }
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)* NS(Particles_add_copy_ext)(
