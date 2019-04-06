@@ -122,9 +122,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Particles_buffers_get_max_difference)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Particles_buffer_print_stdout)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT p );
-
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Particles_buffer_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT p );

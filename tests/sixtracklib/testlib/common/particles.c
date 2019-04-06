@@ -14,8 +14,8 @@
 #include "sixtracklib/testlib/common/random.h"
 
 static int NS(compare_sequences_exact)(
-    SIXTRL_PARTICLES_DATAPTR_DEC void const* SIXTRL_RESTRICT lhs_values,
-    SIXTRL_PARTICLES_DATAPTR_DEC void const* SIXTRL_RESTRICT rhs_values,
+    SIXTRL_PARTICLE_DATAPTR_DEC void const* SIXTRL_RESTRICT lhs_values,
+    SIXTRL_PARTICLE_DATAPTR_DEC void const* SIXTRL_RESTRICT rhs_values,
     NS(buffer_size_t) const num_values,
     NS(buffer_size_t) const element_size );
 
@@ -44,8 +44,8 @@ static void NS(compare_int64_sequences_and_get_max_difference)(
 /* ------------------------------------------------------------------------- */
 
 int NS(compare_sequences_exact)(
-    SIXTRL_PARTICLES_DATAPTR_DEC void const* SIXTRL_RESTRICT lhs_values,
-    SIXTRL_PARTICLES_DATAPTR_DEC void const* SIXTRL_RESTRICT rhs_values,
+    SIXTRL_PARTICLE_DATAPTR_DEC void const* SIXTRL_RESTRICT lhs_values,
+    SIXTRL_PARTICLE_DATAPTR_DEC void const* SIXTRL_RESTRICT rhs_values,
     NS(buffer_size_t) const num_values,
     NS(buffer_size_t) const element_size )
 {
@@ -1325,12 +1325,12 @@ void NS(Particles_print_max_diff_out )(
 
 /* ------------------------------------------------------------------------- */
 
-int NS(Particles_buffers_map_to_same_memory)(
+bool NS(Particles_buffer_have_same_structure)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer
     )
 {
-    int maps_to_same_memory = 0;
+    bool have_same_structure = false;
 
     if( ( lhs_buffer != SIXTRL_NULLPTR ) &&
         ( rhs_buffer != SIXTRL_NULLPTR ) &&
@@ -1355,7 +1355,63 @@ int NS(Particles_buffers_map_to_same_memory)(
             ( ( lhs_it == SIXTRL_NULLPTR ) && ( lhs_end == SIXTRL_NULLPTR ) &&
               ( rhs_it == SIXTRL_NULLPTR ) ) )
         {
-            maps_to_same_memory = 1;
+            have_same_structure = true;
+
+            for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it )
+            {
+                ptr_to_particles_t lhs_particles = ( ptr_to_particles_t )(
+                    uintptr_t )NS(BufferIndex_get_const_particles)( lhs_it );
+
+                ptr_to_particles_t rhs_particles = ( ptr_to_particles_t )(
+                    uintptr_t )NS(BufferIndex_get_const_particles)( rhs_it );
+
+                if( ( lhs_particles == SIXTRL_NULLPTR ) ||
+                    ( rhs_particles == SIXTRL_NULLPTR ) ||
+                    ( !NS(Particles_have_same_structure)(
+                        lhs_particles, rhs_particles ) ) )
+                {
+                    have_same_structure = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    return have_same_structure;
+}
+
+
+bool NS(Particles_buffers_map_to_same_memory)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer
+    )
+{
+    bool maps_to_same_memory = false;
+
+    if( ( lhs_buffer != SIXTRL_NULLPTR ) &&
+        ( rhs_buffer != SIXTRL_NULLPTR ) &&
+        ( NS(Buffer_get_num_of_objects)( lhs_buffer ) ==
+          NS(Buffer_get_num_of_objects)( rhs_buffer ) ) )
+    {
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*  ptr_to_info_t;
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+                ptr_to_particles_t;
+
+        ptr_to_info_t lhs_it = ( ptr_to_info_t )( uintptr_t
+            )NS(Buffer_get_objects_begin_addr)( lhs_buffer );
+
+        ptr_to_info_t lhs_end = ( ptr_to_info_t )( uintptr_t
+            )NS(Buffer_get_objects_end_addr)( lhs_buffer );
+
+        ptr_to_info_t rhs_it  = ( ptr_to_info_t )( uintptr_t
+            )NS(Buffer_get_objects_begin_addr)( rhs_buffer );
+
+        if( ( ( lhs_it != SIXTRL_NULLPTR ) && ( lhs_end != SIXTRL_NULLPTR ) &&
+              ( rhs_it != SIXTRL_NULLPTR ) ) ||
+            ( ( lhs_it == SIXTRL_NULLPTR ) && ( lhs_end == SIXTRL_NULLPTR ) &&
+              ( rhs_it == SIXTRL_NULLPTR ) ) )
+        {
+            maps_to_same_memory = true;
 
             for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it )
             {
@@ -1370,7 +1426,7 @@ int NS(Particles_buffers_map_to_same_memory)(
                     ( !NS(Particles_map_to_same_memory)(
                         lhs_particles, rhs_particles ) ) )
                 {
-                    maps_to_same_memory = 0;
+                    maps_to_same_memory = false;
                     break;
                 }
             }
@@ -1557,6 +1613,8 @@ void NS(Particles_buffer_print)(
         typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_to_info_t;
         typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
                 ptr_to_particles_t;
+
+        typedef NS(buffer_size_t) buf_size_t;
 
         buf_size_t const nn = NS(Buffer_get_num_of_objects)( particles_buffer );
 
