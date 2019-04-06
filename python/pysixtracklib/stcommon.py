@@ -86,9 +86,9 @@ st_Buffer_delete.restype  = None
 
 def st_Buffer_new_mapped_on_cbuffer( cbuffer ):
     data_ptr = ct.POINTER( ct.c_ubyte )
-    ptr_data = ct.cast( cubffer.base, data_ptr )
+    ptr_data = ct.cast( cbuffer.base, data_ptr )
     size     = ct.c_uint64( cbuffer.size )
-    return st.st_Buffer_new_on_data( ptr_data, size )
+    return st_Buffer_new_on_data( ptr_data, size )
 
 # ------------------------------------------------------------------------------
 # st_Particles C-API functions
@@ -107,6 +107,9 @@ class st_Particles( ct.Structure ):
 
 st_Particles_p = ct.POINTER( st_Particles )
 st_NullParticles = ct.cast( 0, st_Particles_p )
+
+def st_Particles_cbuffer_get_particles( cbuffer, obj_index ):
+    return ct.cast( cbuffer.get_object_address( obj_index ), st_Particles_p )
 
 st_Particles_preset = sixtracklib.st_Particles_preset_ext
 st_Particles_preset.argtypes = [ st_Particles_p ]
@@ -172,23 +175,23 @@ st_Particles_buffer_clear_particles.argtypes = [ st_Buffer_p ]
 st_Particles_get_required_num_slots = \
     sixtracklib.st_Particles_get_required_num_slots_ext
 st_Particles_get_required_num_slots.restype  = ct.c_uint64
-st_Particles_get_required_num_slots.argtypes = [ st_Buffer_p, ct.c_unit64 ]
+st_Particles_get_required_num_slots.argtypes = [ st_Buffer_p, ct.c_uint64 ]
 
 st_Particles_get_required_num_dataptrs = \
     sixtracklib.st_Particles_get_required_num_dataptrs_ext
 st_Particles_get_required_num_dataptrs.restype  = ct.c_uint64
 st_Particles_get_required_num_dataptrs.argtypes = [ st_Buffer_p, ct.c_uint64 ]
 
-st_Particles_can_be_added = sixtracklib.Particles_can_be_added_ext
+st_Particles_can_be_added = sixtracklib.st_Particles_can_be_added_ext
 st_Particles_can_be_added.restype  = ct.c_bool
 st_Particles_can_be_added.argtypes = [
         st_Buffer_p, ct.c_uint64, st_uint64_p, st_uint64_p, st_uint64_p ]
 
-st_Particles_new = sixtracklib.Particles_new_ext
+st_Particles_new = sixtracklib.st_Particles_new_ext
 st_Particles_new.argtypes = [ st_Buffer_p, ct.c_uint64 ]
 st_Particles_new.restype  = st_Particles_p
 
-st_Particles_add = sixtracklib.Particles_add
+st_Particles_add = sixtracklib.st_Particles_add_ext
 st_Particles_add.restype  = st_Particles_p
 st_Particles_add.argtypes = [ st_Buffer_p, ct.c_uint64,
     st_double_p, st_double_p, st_double_p, st_double_p, st_double_p,
@@ -197,7 +200,7 @@ st_Particles_add.argtypes = [ st_Buffer_p, ct.c_uint64,
     st_double_p, st_double_p, st_int64_p,  st_int64_p,  st_int64_p,
     st_int64_p ]
 
-st_Particles_add_copy = sixtracklib.Particles_add_copy_ext
+st_Particles_add_copy = sixtracklib.st_Particles_add_copy_ext
 st_Particles_add_copy.restype  = st_Particles_p
 st_Particles_add_copy.argtypes = [ st_Buffer_p, st_Particles_p ]
 

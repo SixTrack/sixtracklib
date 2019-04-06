@@ -24,8 +24,4 @@ APERATURE_Y_LIMIT = @PYTHON_SIXTRL_APERATURE_Y_LIMIT@
 # List of modules for sixtracklib:
 @PYTHON_SIXTRACKLIB_MODULES_STR@
 
-# Testdata directory
-@PYTHON_HAS_TESTDATA_DIR@PATH_TO_TESTDATA_DIR = os.path.abspath( os.path.join( os.path.dirname(
-@PYTHON_HAS_TESTDATA_DIR@   os.path.realpath( __file__ ) ), "..", "..", "tests", "testdata", ) )
-
 # end: config.py
