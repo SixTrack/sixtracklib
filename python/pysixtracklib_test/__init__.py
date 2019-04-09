@@ -3,5 +3,6 @@
 
 from . import stcommon
 from . import config
+from .testdata import *
 
 

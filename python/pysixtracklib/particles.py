@@ -46,7 +46,7 @@ class Particles( CObject ):
         self.particle_id = np.arange(self.num_particles)
         return self
 
-    def fromPySixTrack( self, inp, particle_index ):
+    def from_pysixtrack( self, inp, particle_index ):
         assert( particle_index < self.num_particles )
         self.q0[ particle_index ]           = inp.q0
         self.mass0[ particle_index ]        = inp.mass0
@@ -67,13 +67,15 @@ class Particles( CObject ):
         self.charge_ratio[ particle_index ] = inp.qratio
         self.particle_id[ particle_index ]     = \
             inp.partid is not None and inp.partid or particle_index
-        self.at_element[ particle_index ]   = -1
-        self.at_turn[ particle_index ]      = 0
+        self.at_element[ particle_index ]   = inp.turn
+        self.at_turn[ particle_index ]      = inp.elemid
         self.state[ particle_index ]        = inp.state
-
         return
 
-    def toPySixTrack( self, other, particle_index ):
+    def fromPySixTrack( self, inp, particle_index ):
+        return self.from_pysixtrack( inp, particle_index )
+
+    def to_pysixtrack( self, other, particle_index ):
         assert( particle_index < self.num_particles )
         other._update_coordinates = False
         other.q0     = self.q0[ particle_index ]
@@ -93,10 +95,14 @@ class Particles( CObject ):
         other.qratio = self.charge_ratio[ particle_index ]
         other.partid = self.particle_id[ particle_index ]
         other.turn   = self.at_turn[ particle_index ]
+        other.elemid = self.at_element[ particle_index ]
         other.state  = self.state[ particle_index ]
         other._update_coordinates = True
 
         return
+
+    def toPySixTrack( self, other, particle_index ):
+        self.to_pysixtrack( other, particle_index )
 
 def makeCopy( orig, cbuffer=None ):
     p = Particles( cbuffer=cbuffer, num_particles=orig.num_particles,
