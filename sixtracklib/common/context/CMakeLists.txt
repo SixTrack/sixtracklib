@@ -21,17 +21,19 @@ set_target_properties( sixtrack_common_context PROPERTIES C_STANDARD 99 )
 set_target_properties( sixtrack_common_context PROPERTIES C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_common_context PRIVATE
-                        -Wall -Werror -pedantic -ansi
-                        ${SIXTRACKLIB_CPU_FLAGS} )
+    -Wall -Werror -pedantic -ansi ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------
 
 set( SIXTRL_COMMON_CONTEXT_CXX_HEADERS
-     context_abs_base.h
+     context_base.h
+     context_base_with_nodes.h
 )
 
 set( SIXTRL_COMMON_CONTEXT_CXX_SOURCES
-     context_abs_base.cpp
+     context_base.cpp
+     context_base_with_nodes.cpp
+     context.cpp
 )
 
 add_library( sixtrack_common_context_cxx OBJECT
