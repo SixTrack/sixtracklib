@@ -141,8 +141,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN node_info_t const*
             ptrSelectedNodeInfo() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN std::string const&
-        selectedNodeIdStr() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN std::string selectedNodeIdStr() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN char const*
         ptrSelectedNodeIdStr() const SIXTRL_NOEXCEPT;
@@ -163,10 +162,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        SIXTRL_HOST_FN void printNodesInfo();
+        SIXTRL_HOST_FN void printNodesInfo() const;
 
         SIXTRL_HOST_FN void printNodesInfo(
-            std::ofstream& SIXTRL_RESTRICT_REF os );
+            std::ostream& SIXTRL_RESTRICT_REF os ) const;
 
         SIXTRL_HOST_FN void printNodesInfo(
             size_type const index ) const;
@@ -180,6 +179,15 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void printNodesInfo(
             std::ostream& SIXTRL_RESTRICT_REF os,
             node_id_t const node_id ) const;
+
+        SIXTRL_HOST_FN void printNodesInfo(
+            platform_id_t const platform_idx,
+            device_id_t const device_idx ) const;
+
+        SIXTRL_HOST_FN void printNodesInfo(
+            std::ostream& SIXTRL_RESTRICT_REF os,
+            platform_id_t const platform_idx,
+            device_id_t const device_idx ) const;
 
         SIXTRL_HOST_FN void printNodesInfo(
             char const* SIXTRL_RESTRICT node_id_str ) const;
@@ -221,7 +229,7 @@ namespace SIXTRL_CXX_NAMESPACE
         virtual size_type doGetDefaultNodeIndex() const;
 
         virtual void doPrintNodesInfo( std::ostream& ostream,
-            node_info_t const& SIXTRL_RESTRICT_REF node_index );
+            node_info_t const& SIXTRL_RESTRICT_REF node_index ) const;
 
         size_type doFindAvailableNodesIndex(
             platform_id_t const platform_idx,
@@ -242,7 +250,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         private:
 
-        void doClearOnNodesBaseImpl() SIXTRL_NOEXECPT;
+        void doClearOnNodesBaseImpl() SIXTRL_NOEXCEPT;
 
         size_type doGetDefaultNodeIndexOnNodesBaseImpl() const SIXTRL_NOEXCEPT;
 
@@ -305,7 +313,7 @@ namespace SIXTRL_CXX_NAMESPACE
     template< typename IdIter, typename InfoIter >
     ContextOnNodesBase::size_type
     ContextOnNodesBase::doAppendAvailableNodeRange(
-        IdIter id_begin, IdIter id_end, InfoIter info_begin )
+        IdIter id_begin, IdIter id_end, InfoIter info_it )
     {
         using _this_t = ContextOnNodesBase;
         using  size_t = _this_t::size_type;
@@ -325,7 +333,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 size_t const next_node_index = this->numAvailableNodes();
 
                 if( next_node_idx ==
-                    this->appendAvailableNode( *it, *info_it ) )
+                    this->doAppendAvailableNode( *it, *info_it ) )
                 {
                     ++num_additional_nodes;
                 }
