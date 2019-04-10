@@ -30,7 +30,7 @@ class BeamMonitor(CObject):
 
 class Multipole(CObject):
     _typeid = 4
-    order  = CField(0, 'int64', default=0,    alignment=8)
+    order  = CField(0, 'int64', default=0, const=True, alignment=8)
     length = CField(1, 'real',  default=0.0,  alignment=8)
     hxl    = CField(2, 'real',  default=0.0,  alignment=8)
     hyl    = CField(3, 'real',  default=0.0,  alignment=8)
@@ -43,69 +43,61 @@ class Multipole(CObject):
             return 0
         return (x > 0) and (x * Multipole._factorial(x - 1)) or 1
 
-    #def __init__(self, order=None, knl=None, ksl=None, bal=None, **kwargs):
-        #if bal is None and \
-            #(knl is not None or ksl is not None or order is not None):
-            #if knl is None:
-                #knl = []
-            #if ksl is None:
-                #ksl = []
-            #if order is None:
-                #order = 0
+    def __init__(self, order=None, knl=None, ksl=None, bal=None, **kwargs):
+        if bal is None and \
+            (knl is not None or ksl is not None or order is not None):
+            if knl is None:
+                knl = []
+            if ksl is None:
+                ksl = []
+            if order is None:
+                order = 0
 
-            #n = max((order + 1), max(len(knl), len(ksl)))
-            #assert(n > 0)
+            n = max((order + 1), max(len(knl), len(ksl)))
+            assert(n > 0)
 
-            #_knl = np.array(knl)
-            #nknl = np.zeros(n, dtype=_knl.dtype)
-            #nknl[:len(knl)] = knl
-            #knl = nknl
-            #del(_knl)
-            #assert(len(knl) == n )
+            _knl = np.array(knl)
+            nknl = np.zeros(n, dtype=_knl.dtype)
+            nknl[:len(knl)] = knl
+            knl = nknl
+            del(_knl)
+            assert(len(knl) == n )
 
-            #_ksl = np.array(ksl)
-            #nksl = np.zeros(n, dtype=_ksl.dtype)
-            #nksl[:len(ksl)] = ksl
-            #ksl = nksl
-            #del(_ksl)
-            #assert(len(ksl) == n)
+            _ksl = np.array(ksl)
+            nksl = np.zeros(n, dtype=_ksl.dtype)
+            nksl[:len(ksl)] = ksl
+            ksl = nksl
+            del(_ksl)
+            assert(len(ksl) == n)
 
-            #order = n-1
-            #bal = np.zeros(2 * order + 2)
+            order = n-1
+            bal = np.zeros(2 * order + 2)
 
-            #for ii in range(0, len(knl)):
-                #inv_factorial = 1.0 / float(Multipole._factorial(ii))
-                #jj = 2 * ii
-                #bal[jj] = knl[ii] * inv_factorial
-                #bal[jj + 1] = ksl[ii] * inv_factorial
+            for ii in range(0, len(knl)):
+                inv_factorial = 1.0 / float(Multipole._factorial(ii))
+                jj = 2 * ii
+                bal[jj] = knl[ii] * inv_factorial
+                bal[jj + 1] = ksl[ii] * inv_factorial
 
-            #kwargs[ "bal" ] = bal
-            #kwargs[ "order" ] = order
+            kwargs[ "bal" ] = bal
+            kwargs[ "order" ] = order
 
-        #elif bal is not None and bal and len(bal) > 2 and ((len(bal) % 2) == 0):
-            #kwargs[ "bal" ] = bal
-            #kwargs[ "order" ] = (len(bal) - 2) / 2
+        elif bal is not None and bal and len(bal) > 2 and ((len(bal) % 2) == 0):
+            kwargs[ "bal" ] = bal
+            kwargs[ "order" ] = (len(bal) - 2) / 2
 
-        #CObject.__init__( self, **kwargs )
+        CObject.__init__( self, **kwargs )
 
 
     @property
     def knl( self ):
-        _knl = [ self.bal[ ii ] * Multipole._factorial( int( ii / 2 ) )
+        return [ self.bal[ ii ] * Multipole._factorial( int( ii / 2 ) )
                   for ii in range( 0, len( self.bal ), 2 ) ]
-
-        print( "bal: {0}".format( self.bal ) )
-        print( "knl: {0}".format( _knl ) )
-        return _knl
 
     @property
     def ksl( self ):
-        _ksl = [ self.bal[ ii + 1 ] * Multipole._factorial( int( ii / 2 ) + 1 )
+        return [ self.bal[ ii + 1 ] * Multipole._factorial( int( ii / 2 ) + 1 )
                     for ii in range( 0, len( self.bal ), 2 ) ]
-
-        print( "bal: {0}".format( self.bal ) )
-        print( "ksl: {0}".format( _ksl ) )
-        return _ksl
 
 
 
