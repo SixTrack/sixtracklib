@@ -33,7 +33,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     bool ContextBase::hasConfigStr() const SIXTRL_NOEXCEPT
     {
-        return ( !this->m_comfig_str.empty() );
+        return ( !this->m_config_str.empty() );
     }
 
     std::string const& ContextBase::configStr() const SIXTRL_NOEXCEPT
@@ -49,7 +49,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     bool ContextBase::usesNodes() const SIXTRL_NOEXCEPT
     {
-        return ( return this->m_uses_nodes );
+        return this->m_uses_nodes;
     }
 
     void ContextBase::clear()
@@ -63,9 +63,9 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     ContextBase::ContextBase( const char *const SIXTRL_RESTRICT type_str,
-        ContextBase::type_id_t const type_id ) SIXTRL_NOEXCEPT
-        : m_config_str(), m_type_id_str(), m_type_id( type_id ),
-          m_uses_nodes( false )
+        ContextBase::type_id_t const type_id ) :
+            m_config_str(), m_type_id_str(), m_type_id( type_id ),
+            m_uses_nodes( false )
     {
         if( type_str != nullptr )
         {

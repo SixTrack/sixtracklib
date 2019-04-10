@@ -279,7 +279,7 @@ typedef SIXTRL_CXX_NAMESPACE::ContextOnNodesBase::node_id_t
         NS(context_node_id_t);
 
 typedef SIXTRL_CXX_NAMESPACE::ContextOnNodesBase::node_info_t
-        NS(context_info_t);
+        NS(context_node_info_t);
 
 typedef SIXTRL_CXX_NAMESPACE::ContextOnNodesBase::platform_id_t
         NS(context_platform_id_t);
@@ -292,7 +292,7 @@ typedef SIXTRL_CXX_NAMESPACE::ContextOnNodesBase::device_id_t
 typedef void NS(ContextNodeBase);
 
 typedef NS(ComputeNodeId)       NS(context_node_id_t);
-typedef NS(ComputeNodeInfo)     NS(context_info_t);
+typedef NS(ComputeNodeInfo)     NS(context_node_info_t);
 typedef NS(comp_node_id_num_t)  NS(context_platform_id_t);
 typedef NS(comp_node_id_num_t)  NS(context_device_id_t);
 

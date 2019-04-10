@@ -628,9 +628,6 @@ namespace SIXTRL_CXX_NAMESPACE
         using node_info_t = _this_t::node_info_t;
         using size_t      = _this_t::size_type;
 
-        node_id_t new_node_id;
-        node_info_t new_node_info;
-
         size_t const arch_str_len =
             ( ::NS(ComputeNodeInfo_get_arch)( &node_info ) != nullptr )
                 ? std::strlen( ::NS(ComputeNodeInfo_get_arch)( &node_info ) )
@@ -701,8 +698,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 SIXTRL_ASSERT( ::NS(ComputeNodeInfo_get_name)(
                     &node_info ) != nullptr );
 
-                std::strncpy( new_node_info.name, ::NS(ComputeNodeInfo_get_name)(
-                    &node_info ), name_str_len );
+                std::strncpy( new_node_info.name,
+                    ::NS(ComputeNodeInfo_get_name)( &node_info ),
+                    name_str_len );
             }
 
             if( descr_str_len > size_t{ 0 } )
@@ -714,8 +712,8 @@ namespace SIXTRL_CXX_NAMESPACE
                     &node_info ) != nullptr );
 
                 std::strncpy( new_node_info.description,
-                              ::NS(ComputeNodeInfo_get_description)( &node_info ),
-                              desrc_str_len );
+                    ::NS(ComputeNodeInfo_get_description)( &node_info ),
+                    descr_str_len );
             }
         }
 
@@ -753,8 +751,8 @@ namespace SIXTRL_CXX_NAMESPACE
             std::fill( this->m_selected_node_id_str.begin(),
                        this->m_selected_node_id_str.end(), char{ '\0' } );
 
-            if( NS(ComputeNodeId_to_string)(
-                &this->m_available_nodes_info[ node_index ],
+            if( ::NS(ComputeNodeId_to_string)(
+                &this->m_available_nodes_id[ node_index ],
                 this->m_selected_node_id_str.data(),
                 this->m_selected_node_id_str.size() ) == 0 )
             {
@@ -767,11 +765,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    std::ostream& operator<<( std::ostream& SIXTRL_RESTRICT ostream,
+    std::ostream& operator<<( std::ostream& SIXTRL_RESTRICT os,
         ContextOnNodesBase const& SIXTRL_RESTRICT_REF context )
     {
-        context.printNodesInfo( ofstream );
-        return ofstream;
+        context.printNodesInfo( os );
+        return os;
     }
 }
 

@@ -57,8 +57,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
-        using type_id_t = context_type_int_t;
-
         SIXTRL_HOST_FN explicit ContextBase(
             const char *const SIXTRL_RESTRICT type_str,
             type_id_t const type_id );
