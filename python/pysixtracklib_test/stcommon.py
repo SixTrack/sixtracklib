@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import ctypes as ct
 from . import config as stconf
 from pysixtracklib.particles import Particles as st_Particles
