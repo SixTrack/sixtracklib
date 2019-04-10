@@ -28,7 +28,6 @@
     #include "sixtracklib/common/beam_elements.h"
     #include "sixtracklib/common/be_monitor/be_monitor.h"
     #include "sixtracklib/common/be_monitor/output_buffer.h"
-    #include "sixtracklib/common/context/context_abs_base.h"
     #include "sixtracklib/common/output/elem_by_elem_config.h"
     #include "sixtracklib/common/output/output_buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */

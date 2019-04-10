@@ -26,7 +26,6 @@
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/particles.h"
-    #include "sixtracklib/common/context/context_abs_base.h"
     #include "sixtracklib/common/output/output_buffer.h"
     #include "sixtracklib/common/output/elem_by_elem_config.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
