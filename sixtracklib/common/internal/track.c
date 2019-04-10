@@ -13,7 +13,6 @@
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
-#include "sixtracklib/common/context/context_abs_base.h"
 
 /* ------------------------------------------------------------------------- */
 
