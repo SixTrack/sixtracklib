@@ -75,7 +75,7 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
-        TrackJobCl::size_type const dump_elem_by_elem_turns,
+        TrackJobCl::size_type const until_turn_elem_by_elem,
         const char *const SIXTRL_RESTRICT config_str ) :
         TrackJobBase( SIXTRL_CXX_NAMESPACE::TRACK_JOB_CL_STR,
                       SIXTRL_CXX_NAMESPACE::TRACK_JOB_CL_ID ),
@@ -88,7 +88,7 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         this->doInitTrackJobCl( device_id_str, particles_buffer,
             this->particleSetIndicesBegin(), this->particleSetIndicesEnd(),
-            beam_elements_buffer, ptr_output_buffer, dump_elem_by_elem_turns,
+            beam_elements_buffer, ptr_output_buffer, until_turn_elem_by_elem,
             config_str );
     }
 
@@ -99,7 +99,7 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCl::size_type const* SIXTRL_RESTRICT pset_begin,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT belements_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
-        TrackJobCl::size_type const dump_elem_by_elem_turns,
+        TrackJobCl::size_type const until_turn_elem_by_elem,
         const char *const SIXTRL_RESTRICT config_str ) :
         TrackJobBase( SIXTRL_CXX_NAMESPACE::TRACK_JOB_CL_STR,
                       SIXTRL_CXX_NAMESPACE::TRACK_JOB_CL_ID ),
@@ -120,7 +120,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         this->doInitTrackJobCl( device_id_str, particles_buffer,
             pset_begin, pset_end, belements_buffer, ptr_output_buffer,
-            dump_elem_by_elem_turns, config_str );
+            until_turn_elem_by_elem, config_str );
     }
 
     SIXTRL_HOST_FN TrackJobCl::TrackJobCl(
@@ -128,7 +128,7 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCl::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
         TrackJobCl::buffer_t& SIXTRL_RESTRICT_REF belements_buffer,
         TrackJobCl::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
-        TrackJobCl::size_type const dump_elem_by_elem_turns,
+        TrackJobCl::size_type const until_turn_elem_by_elem,
         std::string const& config_str ) :
         TrackJobBase( SIXTRL_CXX_NAMESPACE::TRACK_JOB_CL_STR,
                       SIXTRL_CXX_NAMESPACE::TRACK_JOB_CL_ID ),
@@ -149,7 +149,7 @@ namespace SIXTRL_CXX_NAMESPACE
         bool const success = this->doInitTrackJobCl(
             device_id_str.c_str(), ptr_part_buffer,
             this->particleSetIndicesBegin(), this->particleSetIndicesEnd(),
-            ptr_belem_buffer, ptr_out_buffer, dump_elem_by_elem_turns,
+            ptr_belem_buffer, ptr_out_buffer, until_turn_elem_by_elem,
                 config_str.c_str() );
 
         if( success )
@@ -322,16 +322,16 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT part_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT belem_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT output_buffer,
-        TrackJobCl::size_type const dump_elem_by_elem_turns )
+        TrackJobCl::size_type const until_turn_elem_by_elem )
     {
         bool success = TrackJobBase::doPrepareOutputStructures( part_buffer,
-                belem_buffer, output_buffer, dump_elem_by_elem_turns );
+                belem_buffer, output_buffer, until_turn_elem_by_elem );
 
         if( ( success ) && ( this->hasOutputBuffer() ) )
         {
             success = this->doPrepareOutputStructuresOclImpl(
                 part_buffer, belem_buffer, this->ptrCOutputBuffer(),
-                dump_elem_by_elem_turns );
+                until_turn_elem_by_elem );
         }
 
         return success;
@@ -359,10 +359,10 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
-        TrackJobCl::size_type const dump_elem_by_elem_turns )
+        TrackJobCl::size_type const until_turn_elem_by_elem )
     {
         return this->doResetOclImp( particles_buffer, beam_elem_buffer,
-                ptr_output_buffer, dump_elem_by_elem_turns );
+                ptr_output_buffer, until_turn_elem_by_elem );
     }
 
     SIXTRL_HOST_FN TrackJobCl::track_status_t TrackJobCl::doTrackUntilTurn(
@@ -556,7 +556,7 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT pb,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT belems,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT ptr_out_buffer,
-        TrackJobCl::size_type const dump_elem_by_elem_turns )
+        TrackJobCl::size_type const until_turn_elem_by_elem )
     {
         using _this_t = TrackJobCl;
 
@@ -568,7 +568,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using elem_config_t = _this_t::elem_by_elem_config_t;
 
         bool success = true;
-        ( void )dump_elem_by_elem_turns;
+        ( void )until_turn_elem_by_elem;
 
         if( ( ptr_out_buffer != nullptr ) && ( pb != nullptr ) )
         {
@@ -653,32 +653,34 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     SIXTRL_HOST_FN bool TrackJobCl::doResetOclImp(
-        TrackJobCl::c_buffer_t* SIXTRL_RESTRICT part_buffer,
+        TrackJobCl::c_buffer_t* SIXTRL_RESTRICT pb,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT belem_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT out_buffer,
-        TrackJobCl::size_type const dump_elem_by_elem_turns )
+        TrackJobCl::size_type const until_turn_elem_by_elem )
     {
         bool success = false;
         using flags_t = ::NS(output_buffer_flag_t);
 
-        if( ( _base_t::doPrepareParticlesStructures( part_buffer ) ) &&
+        if( ( _base_t::doPrepareParticlesStructures( pb ) ) &&
             ( _base_t::doPrepareBeamElementsStructures( belem_buffer ) ) &&
-            ( this->doPrepareParticlesStructuresOclImp( part_buffer ) ) &&
+            ( this->doPrepareParticlesStructuresOclImp( pb ) ) &&
             ( this->doPrepareBeamElementsStructuresOclImp( belem_buffer ) ) )
         {
-            flags_t const flags = ::NS(OutputBuffer_required_for_tracking)(
-                part_buffer, belem_buffer, dump_elem_by_elem_turns );
+            flags_t const flags =
+            ::NS(OutputBuffer_required_for_tracking_of_particle_sets)( pb,
+                this->numParticleSets(), this->particleSetIndicesBegin(),
+                    belem_buffer, until_turn_elem_by_elem );
 
             bool const requires_output_buffer =
                 ::NS(OutputBuffer_requires_output_buffer)( flags );
 
-            this->doSetPtrCParticleBuffer( part_buffer );
+            this->doSetPtrCParticleBuffer( pb );
             this->doSetPtrCBeamElementsBuffer( belem_buffer );
 
             if( ( requires_output_buffer ) || ( out_buffer != nullptr ) )
             {
-                success = ( this->doPrepareOutputStructures( part_buffer,
-                    belem_buffer, out_buffer, dump_elem_by_elem_turns ) );
+                success = ( this->doPrepareOutputStructures( pb,
+                    belem_buffer, out_buffer, until_turn_elem_by_elem ) );
 
                 if( ( success ) && ( this->hasOutputBuffer() ) &&
                     ( requires_output_buffer ) )
@@ -807,7 +809,7 @@ SIXTRL_HOST_FN NS(TrackJobCl)* NS(TrackJobCl_new_with_output)(
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const dump_elem_by_elem_turns )
+    NS(buffer_size_t) const until_turn_elem_by_elem )
 {
     using size_t = SIXTRL_CXX_NAMESPACE::TrackJobCl::size_type;
 
@@ -815,7 +817,7 @@ SIXTRL_HOST_FN NS(TrackJobCl)* NS(TrackJobCl_new_with_output)(
 
     return new SIXTRL_CXX_NAMESPACE::TrackJobCl( device_id_str,
         particles_buffer, size_t{ 1 }, &particle_set_indices[ 0 ],
-        beam_elements_buffer, output_buffer, dump_elem_by_elem_turns );
+        beam_elements_buffer, output_buffer, until_turn_elem_by_elem );
 }
 
 SIXTRL_HOST_FN NS(TrackJobCl)* NS(TrackJobCl_new_detailed)(
@@ -825,12 +827,12 @@ SIXTRL_HOST_FN NS(TrackJobCl)* NS(TrackJobCl_new_detailed)(
     NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t) const until_turn_elem_by_elem,
     const char *const SIXTRL_RESTRICT config_str )
 {
     return new SIXTRL_CXX_NAMESPACE::TrackJobCl( device_id_str,
         particles_buffer, num_particle_sets, particle_set_indices_begin,
-        beam_elements_buffer, output_buffer, dump_elem_by_elem_turns,
+        beam_elements_buffer, output_buffer, until_turn_elem_by_elem,
         config_str );
 }
 
@@ -843,10 +845,10 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_reset)(
     if( job != nullptr )
     {
         SIXTRL_CXX_NAMESPACE::TrackJobCl::size_type const
-            dump_elem_by_elem_turns = job->numElemByElemTurns();
+            until_turn_elem_by_elem = job->numElemByElemTurns();
 
         return job->reset( particles_buffer, beam_elements_buffer,
-                           output_buffer, dump_elem_by_elem_turns );
+                           output_buffer, until_turn_elem_by_elem );
     }
 
     return false;
@@ -857,11 +859,11 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_reset_with_output)(
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const dump_elem_by_elem_turns )
+    NS(buffer_size_t) const until_turn_elem_by_elem )
 {
     return ( job != nullptr )
         ? job->reset( particles_buffer, beam_elements_buffer, output_buffer,
-                      dump_elem_by_elem_turns )
+                      until_turn_elem_by_elem )
         : false;
 }
 
@@ -872,12 +874,12 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_reset_detailed)(
     NS(buffer_size_t) const* SIXTRL_RESTRICT pset_begin,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const dump_elem_by_elem_turns )
+    NS(buffer_size_t) const until_turn_elem_by_elem )
 {
     return ( job != nullptr )
         ? job->reset( particles_buffer, num_particle_sets, pset_begin,
                       beam_elements_buffer, output_buffer,
-                      dump_elem_by_elem_turns )
+                      until_turn_elem_by_elem )
         : false;
 }
 
