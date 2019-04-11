@@ -67,11 +67,11 @@ if  __name__ == '__main__':
     track_pb = CBuffer()
     track_particles = pyst.makeCopy( initial_particles, cbuffer=track_pb )
 
-    job = pyst.TrackJob( "cpu",
+    job = pyst.TrackJob( "opencl", device_id_str="0.0",
         particles_buffer=track_pb, beam_elements_buffer=eb,
         until_turn_elem_by_elem=until_turn_elem_by_elem )
 
-    assert( job.type_str() == 'cpu' )
+    assert( job.type_str() == 'opencl' )
     assert( job.has_output_buffer() )
     assert( job.num_beam_monitors() > 0 )
     assert( job.has_elem_by_elem_outupt() )
