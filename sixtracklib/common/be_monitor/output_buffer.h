@@ -86,7 +86,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(BeamMonitor_assign_output_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
     NS(particle_index_t) const min_turn_id,
-    NS(buffer_size_t) const num_elem_by_elem_turns );
+    NS(buffer_size_t) const until_turn_elem_by_elem );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int
 NS(BeamMonitor_assign_output_buffer_from_offset)(
