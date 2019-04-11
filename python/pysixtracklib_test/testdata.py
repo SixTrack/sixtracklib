@@ -20,7 +20,8 @@ def line_from_beam_elem_buffer_pysixtrack( beam_elements_buffer,
         type_id = beam_elements_buffer.get_object_typeid( ii )
         cls = st_BeamElement.get_elemtype( type_id )
         if  cls is not None:
-            line.append( beam_elements_buffer.get_object( ii, cls ) )
+            belem = beam_elements_buffer.get_object( ii, cls )
+            line.append( st_BeamElement.to_pysixtrack( belem ) )
         elif skip_unknown is False:
             line.clear()
             break
@@ -75,9 +76,9 @@ def track_particles_pysixtrack( input_particles, line, until_turn_elem_by_elem,
     num_particles = input_particles.num_particles
     num_beam_elements = len( line )
 
-    initial_at_turn = sys.maxint
-    min_particle_id = sys.maxint
-    max_particle_id = -min_particle_id
+    initial_at_turn = sys.maxsize
+    min_particle_id = sys.maxsize
+    max_particle_id = -( sys.maxsize ) - 1
 
     for ii in range( num_particles ):
         if input_particles.at_turn[ ii ] < initial_at_turn:
@@ -97,7 +98,8 @@ def track_particles_pysixtrack( input_particles, line, until_turn_elem_by_elem,
         num_particles_to_store = num_particles_per_turn * (
             until_turn_elem_by_elem - initial_at_turn )
 
-        out = st_Particles( num_particles_to_store, cbuffer=output_buffer )
+        out = st_Particles( num_particles=num_particles_to_store,
+                            cbuffer=output_buffer )
 
         for ii in range( num_particles ):
             particle = pysix_Particle()
@@ -109,12 +111,12 @@ def track_particles_pysixtrack( input_particles, line, until_turn_elem_by_elem,
             assert( particle.turn <  until_turn_elem_by_elem )
             delta_part_id = particle.partid - min_particle_id
 
-            while particle.at_turn < until_turn_elem_by_elem:
+            while particle.turn < until_turn_elem_by_elem:
                 assert( particle.elemid == 0 )
                 offset = num_beam_elements * nn * (
                         particle.turn - initial_at_turn )
                 for elem in line:
-                    out.from_pysixtrack( out,
+                    out.from_pysixtrack( particle,
                         offset + particle.elemid * nn + delta_part_id )
                     elem.track( particle )
                     particle.elemid += 1
@@ -127,7 +129,8 @@ def track_particles_pysixtrack( input_particles, line, until_turn_elem_by_elem,
     if start_turn_by_turn < until_turn_turn_by_turn:
         max_num_turns_to_store = until_turn_turn_by_turn - start_turn_by_turn
         num_particles_to_store = nn * max_num_turns_to_store
-        out = st_Particles( num_particles_to_store, cbuffer=output_buffer )
+        out = st_Particles( num_particles=num_particles_to_store,
+                            cbuffer=output_buffer )
 
         for ii in range( num_particles ):
             particle = pysix_Particle()
@@ -135,8 +138,7 @@ def track_particles_pysixtrack( input_particles, line, until_turn_elem_by_elem,
 
             assert( particle.partid >= min_particle_id )
             assert( particle.partid <= max_particle_id )
-            assert( particle.turn >= initial_at_turn )
-            assert( particle.turn <  until_turn_elem_by_elem )
+            assert( particle.turn >= start_turn_by_turn )
             delta_part_id = particle.partid - min_particle_id
             turns_tracked = particle.turn - start_turn_by_turn
 
@@ -146,7 +148,8 @@ def track_particles_pysixtrack( input_particles, line, until_turn_elem_by_elem,
                     elem.track( particle )
                     particle.elemid += 1
 
-                out.from_pysixtrack( out, nn * turns_tracked + delta_part_id )
+                out.from_pysixtrack( particle,
+                    nn * turns_tracked + delta_part_id )
                 turns_tracked += 1
                 particle.turn += 1
                 particle.elemid = 0
@@ -162,14 +165,13 @@ def track_particles_pysixtrack( input_particles, line, until_turn_elem_by_elem,
             skip_turns = 1
 
         remainder = max_num_turns_to_store % skip_turns
+        max_num_turns_to_store = max_num_turns_to_store // skip_turns
         if  remainder != 0:
-            max_num_turns_to_store += ( skip_turns - remainder )
-            assert( max_num_turns_to_store % skip_turns == 0 )
+            max_num_turns_to_store += 1
 
-        max_num_turns_to_store /= skip_turns
-
-        num_particles_to_store = nn * max_num_turns_to_store
-        out = st_Particles( num_particles_to_store, cbuffer=output_buffer )
+        num_particles_to_store = int( nn * max_num_turns_to_store )
+        out = st_Particles( num_particles=num_particles_to_store,
+                            cbuffer=output_buffer )
 
         for ii in range( num_particles ):
             particle = pysix_Particle()
@@ -177,19 +179,18 @@ def track_particles_pysixtrack( input_particles, line, until_turn_elem_by_elem,
 
             assert( particle.partid >= min_particle_id )
             assert( particle.partid <= max_particle_id )
-            assert( particle.turn >= initial_at_turn )
-            assert( particle.turn <  until_turn_elem_by_elem )
+            assert( particle.turn >= start_out_turns_turn )
             delta_part_id = particle.partid - min_particle_id
             turns_tracked = particle.turn - start_turn_by_turn
 
-            while particle.at_turn < until_turn:
+            while particle.turn < until_turn:
                 assert( particle.elemid == 0 )
                 for elem in line:
                     elem.track( particle )
                     particle.elemid += 1
 
                 if turns_tracked % skip_turns == 0:
-                   jj = nn * ( turns_tracked / skip_turns ) + delta_part_id
+                   jj = nn * ( turns_tracked // skip_turns ) + delta_part_id
                    if  jj > out.num_particles:
                        jj = jj % out.num_particles
                    out.from_pysixtrack( particle, jj )
