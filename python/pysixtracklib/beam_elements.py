@@ -28,6 +28,43 @@ class BeamMonitor(CObject):
     is_turn_ordered = CField( 7, 'int64',  default=1, alignment=8 )
 
 
+def append_beam_monitors_to_lattice(
+    beam_elements_buffer, until_turn_elem_by_elem, until_turn_turn_by_turn,
+    until_turn, skip_turns=1, min_particle_id=0, max_particle_id=0,
+    initial_at_turn=0 ):
+    num_beam_monitors_added = 0
+    start_turn_by_turn = max( initial_at_turn, until_turn_elem_by_elem )
+
+    if until_turn_turn_by_turn > start_turn_by_turn:
+        bm_turn_by_turn = BeamMonitor( start=start_turn_by_turn,
+            num_stores=(until_turn_turn_by_turn - start_turn_by_turn ),
+            skip=1, out_address=0, min_particle_id=min_particle_id,
+            max_particle_id=max_particle_id, is_rolling=False,
+            is_turn_ordered=True, cbuffer=beam_elements_buffer )
+        num_beam_monitors_added += 1
+
+    start_output_turn = max( start_turn_by_turn, until_turn_turn_by_turn )
+
+    if until_turn > start_output_turn:
+        if skip_turns <= 0:
+            skip_turns = 1
+
+        num_stores  = until_turn - start_output_turn
+        remainder   = num_stores %  skip_turns
+        num_stores  = num_stores // skip_turns
+
+        if remainder > 0:
+            num_stores += 1
+
+        bm_output = BeamMonitor( start=start_output_turn,
+            num_stores=num_stores, skip=skip_turns, out_address=0,
+            min_particle_id=min_particle_id,
+            max_particle_id=max_particle_id, is_rolling=True,
+            is_turn_ordered=True, cbuffer=beam_elements_buffer )
+        num_beam_monitors_added += 1
+
+    return num_beam_monitors_added
+
 class Multipole(CObject):
     _typeid = 4
     order  = CField(0, 'int64', default=0, const=True, alignment=8)
@@ -91,12 +128,12 @@ class Multipole(CObject):
 
     @property
     def knl( self ):
-        return [ self.bal[ ii ] * Multipole._factorial( int( ii / 2 ) )
+        return [ self.bal[ ii ] * Multipole._factorial( ii // 2 )
                   for ii in range( 0, len( self.bal ), 2 ) ]
 
     @property
     def ksl( self ):
-        return [ self.bal[ ii + 1 ] * Multipole._factorial( int( ii / 2 ) + 1 )
+        return [ self.bal[ ii + 1 ] * Multipole._factorial( ii // 2 + 1 )
                     for ii in range( 0, len( self.bal ), 2 ) ]
 
 
@@ -196,9 +233,10 @@ class BeamElement(object):
         except AttributeError:
             type_id = None
 
-        if type_id is None or \
-            BeamElement._type_id_to_elem_map.get( type_id, None ) is None:
+        cls = type_id is not None and \
+              BeamElement._type_id_to_elem_map.get( type_id, None ) or None
 
+        if cls is not None:
             if type_id == 2:
                 pysixtrack_elem = pysixelem.Drift( length=elem.length )
             elif type_id == 3:

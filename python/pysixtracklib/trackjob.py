@@ -32,7 +32,7 @@ class TrackJob(object):
 
     def __init__( self, arch_str, device_id_str=None, particles_buffer=None,
                   beam_elements_buffer=None, output_buffer=None,
-                  dump_elem_by_elem_turns=0, config_str=None ):
+                  until_turn_elem_by_elem=0, config_str=None ):
         self.ptr_st_track_job            = st.st_Null
         self._particles_buffer           = None
         self._ptr_c_particles_buffer     = st.st_Null
@@ -70,9 +70,11 @@ class TrackJob(object):
             num_slots    = ct.c_uint64( 0 )
             num_dataptrs = ct.c_uint64( 0 )
             num_garbage  = ct.c_uint64( 0 )
-            num_elem_by_elem_turns = ct.c_uint64( dump_elem_by_elem_turns )
+            num_elem_by_elem_turns = ct.c_uint64( until_turn_elem_by_elem )
 
-            slot_size    = st.st_Buffer_get_slot_size( self._ptr_c_particles_buffer )
+            slot_size = st.st_Buffer_get_slot_size(
+                self._ptr_c_particles_buffer )
+
             ret = st.st_OutputBuffer_calculate_output_buffer_params(
                 self._ptr_c_beam_elements_buffer, particles,
                 num_elem_by_elem_turns, ct.byref( num_objects ),

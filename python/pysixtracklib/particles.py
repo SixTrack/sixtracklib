@@ -67,8 +67,8 @@ class Particles( CObject ):
         self.charge_ratio[ particle_index ] = inp.qratio
         self.particle_id[ particle_index ]     = \
             inp.partid is not None and inp.partid or particle_index
-        self.at_element[ particle_index ]   = inp.turn
-        self.at_turn[ particle_index ]      = inp.elemid
+        self.at_element[ particle_index ]   = inp.elemid
+        self.at_turn[ particle_index ]      = inp.turn
         self.state[ particle_index ]        = inp.state
         return
 
