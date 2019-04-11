@@ -19,6 +19,23 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
         COMMAND ${PYTHON_EXECUTABLE}
                 ${CMAKE_CURRENT_SOURCE_DIR}/test_output_buffer.py
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
+
+    # -------------------------------------------------------------------------
+    # test_track_job_cpu:
+
+    add_test( NAME Python_TrackJobCpuTests
+        COMMAND ${PYTHON_EXECUTABLE}
+                ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cpu.py
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
+
+    # -------------------------------------------------------------------------
+    # test_track_job_opencl:
+
+#     add_test( NAME Python_TrackJobOpenClTests
+#         COMMAND ${PYTHON_EXECUTABLE}
+#                 ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_opencl.py
+#         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
+
 endif()
 
 
