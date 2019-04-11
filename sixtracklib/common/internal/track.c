@@ -559,9 +559,13 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element_until_turn)(
         belements, &min_part_id, &max_part_id, &min_elem_id, &max_elem_id,
             &min_turn_id, &max_turn_id, &num_elem_by_elem_objs, start_elem );
 
+    index_t const max_elem_by_elem_turn_id = ( ( until_turn > min_turn_id ) &&
+        ( min_turn_id >= ( index_t )0u ) ) ? ( until_turn - 1 ) : min_turn_id;
+
     num_elem_t const requ_num_output_particles = ( num_elem_t
         )NS(ElemByElemConfig_get_stored_num_particles_detailed)( min_part_id,
-            max_part_id, min_elem_id, max_elem_id, min_turn_id, until_turn );
+            max_part_id, min_elem_id, max_elem_id, min_turn_id,
+                max_elem_by_elem_turn_id );
 
     if( ( 0 == success ) && ( min_turn_id < until_turn ) &&
         ( num_elem_by_elem_objs > ZERO ) &&
@@ -573,7 +577,7 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element_until_turn)(
         success = NS(ElemByElemConfig_init_detailed)( &config,
             NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES), min_part_id,
                 max_part_id, min_elem_id, max_elem_id,
-                    min_turn_id, until_turn, true );
+                    min_turn_id, max_elem_by_elem_turn_id, true );
 
         if( success == 0 )
         {
