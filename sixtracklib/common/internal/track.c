@@ -16,7 +16,65 @@
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_HOST_FN int NS(Track_particle_beam_element)(
+void NS(Track_particle_increment_at_element_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index )
+{
+    NS(Track_particle_increment_at_element)( particles, particle_index );
+}
+
+void NS(Track_subset_particles_increment_at_element_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_begin_index,
+    NS(particle_num_elements_t) const particle_end_index,
+    NS(particle_num_elements_t) const particle_index_stride )
+{
+    NS(Track_subset_particles_increment_at_element)(
+        particles, particle_begin_index, particle_end_index,
+            particle_index_stride );
+}
+
+void NS(Track_all_particles_increment_at_element_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)*
+        SIXTRL_RESTRICT particles )
+{
+    NS(Track_all_particles_increment_at_element)( particles );
+}
+
+/* ------------------------------------------------------------------------- */
+
+void NS(Track_particle_increment_at_turn_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index,
+    NS(particle_index_t) const start_beam_element_id )
+{
+    NS(Track_particle_increment_at_turn)(
+        particles, particle_index, start_beam_element_id );
+}
+
+void NS(Track_subset_particles_increment_at_turn_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_begin_index,
+    NS(particle_num_elements_t) const particle_end_index,
+    NS(particle_num_elements_t) const particle_index_stride,
+    NS(particle_index_t) const start_beam_element_id )
+{
+    NS(Track_subset_particles_increment_at_turn)(
+        particles, particle_begin_index, particle_end_index,
+            particle_index_stride, start_beam_element_id );
+}
+
+void NS(Track_all_particles_increment_at_turn_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_index_t) const start_beam_element_id )
+{
+    NS(Track_all_particles_increment_at_turn)(
+        particles, start_beam_element_id );
+}
+
+/* ------------------------------------------------------------------------- */
+
+int NS(Track_particle_beam_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_idx,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
@@ -27,7 +85,7 @@ SIXTRL_HOST_FN int NS(Track_particle_beam_element)(
             beam_elements, be_index ) );
 }
 
-SIXTRL_HOST_FN int NS(Track_subset_of_particles_beam_element)(
+int NS(Track_subset_of_particles_beam_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) particle_idx_begin,
     NS(particle_num_elements_t) const particle_idx_end,
@@ -41,7 +99,7 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_beam_element)(
 }
 
 
-SIXTRL_HOST_FN int NS(Track_all_particles_beam_element)(
+int NS(Track_all_particles_beam_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
     NS(buffer_size_t) const be_index )
@@ -53,7 +111,7 @@ SIXTRL_HOST_FN int NS(Track_all_particles_beam_element)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_HOST_FN int NS(Track_particle_subset_of_beam_elements)(
+int NS(Track_particle_subset_of_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_idx,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
@@ -66,7 +124,7 @@ SIXTRL_HOST_FN int NS(Track_particle_subset_of_beam_elements)(
         NS(Buffer_get_const_object)( beam_elements, be_index_end ) );
 }
 
-SIXTRL_HOST_FN int NS(Track_subset_of_particles_subset_of_beam_elements)(
+int NS(Track_subset_of_particles_subset_of_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_idx_begin,
     NS(particle_num_elements_t) const particle_idx_end,
@@ -81,7 +139,7 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_subset_of_beam_elements)(
         NS(Buffer_get_const_object)( beam_elements, be_index_end ) );
 }
 
-SIXTRL_HOST_FN int NS(Track_all_particles_subset_of_beam_elements)(
+int NS(Track_all_particles_subset_of_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
     NS(buffer_size_t) const be_begin_idx, NS(buffer_size_t) const be_end_idx )
@@ -94,7 +152,7 @@ SIXTRL_HOST_FN int NS(Track_all_particles_subset_of_beam_elements)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_HOST_FN int NS(Track_particle_beam_elements)(
+int NS(Track_particle_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_idx,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements )
@@ -105,7 +163,7 @@ SIXTRL_HOST_FN int NS(Track_particle_beam_elements)(
 }
 
 
-SIXTRL_HOST_FN int NS(Track_subset_of_particles_beam_elements)(
+int NS(Track_subset_of_particles_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_idx_begin,
     NS(particle_num_elements_t) const particle_idx_end,
@@ -119,7 +177,7 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_beam_elements)(
 }
 
 
-SIXTRL_HOST_FN int NS(Track_all_particles_beam_elements)(
+int NS(Track_all_particles_beam_elements)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements )
 {
@@ -131,7 +189,7 @@ SIXTRL_HOST_FN int NS(Track_all_particles_beam_elements)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_HOST_FN int NS(Track_particle_until_turn)(
+int NS(Track_particle_until_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
@@ -142,7 +200,7 @@ SIXTRL_HOST_FN int NS(Track_particle_until_turn)(
         NS(Buffer_get_const_objects_end)( beam_elements ), until_turn );
 }
 
-SIXTRL_HOST_FN int NS(Track_subset_of_particles_until_turn)(
+int NS(Track_subset_of_particles_until_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_idx_begin,
     NS(particle_num_elements_t) const particle_idx_end,
@@ -156,7 +214,7 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_until_turn)(
         NS(Buffer_get_const_objects_end)( beam_elements ), until_turn );
 }
 
-SIXTRL_HOST_FN int NS(Track_all_particles_until_turn)(
+int NS(Track_all_particles_until_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer) const* SIXTRL_RESTRICT beam_elements,
     NS(particle_index_t) const until_turn )
@@ -169,7 +227,7 @@ SIXTRL_HOST_FN int NS(Track_all_particles_until_turn)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_HOST_FN int NS(Track_particle_element_by_element_details)(
+int NS(Track_particle_element_by_element_details)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const idx,
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig)
@@ -181,7 +239,7 @@ SIXTRL_HOST_FN int NS(Track_particle_element_by_element_details)(
         NS(Buffer_get_const_object)( belements, be_index ) );
 }
 
-SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element_details)(
+int NS(Track_subset_of_particles_element_by_element_details)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) idx,
     NS(particle_num_elements_t) const particle_idx_end,
@@ -196,7 +254,7 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element_details)(
         NS(Buffer_get_const_object)( belements, be_index ) );
 }
 
-SIXTRL_HOST_FN int NS(Track_all_particles_element_by_element_details)(
+int NS(Track_all_particles_element_by_element_details)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig)
         *const SIXTRL_RESTRICT config,
@@ -209,7 +267,7 @@ SIXTRL_HOST_FN int NS(Track_all_particles_element_by_element_details)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_HOST_FN int NS(Track_particle_element_by_element)(
+int NS(Track_particle_element_by_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const index,
     NS(particle_index_t) const max_turn,
@@ -228,7 +286,7 @@ SIXTRL_HOST_FN int NS(Track_particle_element_by_element)(
     index_t min_at_turn       = ( index_t )0;
     index_t max_at_turn       = ( index_t )0;
 
-    int success = NS(Particles_find_min_max_attributes)( particles,
+    int success = NS(Particles_get_min_max_attributes)( particles,
         &min_particle_id, &max_particle_id,
         &min_at_element_id, &max_at_element_id,
         &min_at_turn, &max_at_turn );
@@ -277,7 +335,7 @@ SIXTRL_HOST_FN int NS(Track_particle_element_by_element)(
     return success;
 }
 
-SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element)(
+int NS(Track_subset_of_particles_element_by_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const idx,
     NS(particle_num_elements_t) const idx_end,
@@ -298,7 +356,7 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element)(
     index_t min_at_turn       = ( index_t )0;
     index_t max_at_turn       = ( index_t )0;
 
-    int success = NS(Particles_find_min_max_attributes)( particles,
+    int success = NS(Particles_get_min_max_attributes)( particles,
         &min_particle_id, &max_particle_id,
         &min_at_element_id, &max_at_element_id,
         &min_at_turn, &max_at_turn );
@@ -348,7 +406,7 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element)(
     return success;
 }
 
-SIXTRL_HOST_FN int NS(Track_all_particles_element_by_element)(
+int NS(Track_all_particles_element_by_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_index_t) const max_turn,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
@@ -363,7 +421,7 @@ SIXTRL_HOST_FN int NS(Track_all_particles_element_by_element)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_HOST_FN int NS(Track_particle_element_by_elements_details)(
+int NS(Track_particle_element_by_elements_details)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const idx,
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig)
@@ -380,7 +438,7 @@ SIXTRL_HOST_FN int NS(Track_particle_element_by_elements_details)(
         NS(Buffer_get_const_object)( belements, be_end_idx ) );
 }
 
-SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_elements_details)(
+int NS(Track_subset_of_particles_element_by_elements_details)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) idx,
     NS(particle_num_elements_t) const idx_end,
@@ -399,7 +457,7 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_elements_details)(
         NS(Buffer_get_const_object)( belements, be_end_idx ) );
 }
 
-SIXTRL_HOST_FN int NS(Track_all_particles_element_by_elements_details)(
+int NS(Track_all_particles_element_by_elements_details)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig)
         *const SIXTRL_RESTRICT config,
@@ -416,7 +474,7 @@ SIXTRL_HOST_FN int NS(Track_all_particles_element_by_elements_details)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_HOST_FN int NS(Track_particle_element_by_element_until_turn_details)(
+int NS(Track_particle_element_by_element_until_turn_details)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_index_t) const index,
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig)
@@ -430,8 +488,7 @@ SIXTRL_HOST_FN int NS(Track_particle_element_by_element_until_turn_details)(
         NS(Buffer_get_const_objects_end)( belements ), until_turn );
 }
 
-SIXTRL_HOST_FN int
-    NS(Track_subset_of_particles_element_by_element_until_turn_details)(
+int NS(Track_subset_of_particles_element_by_element_until_turn_details)(
         SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
         NS(particle_num_elements_t) idx,
         NS(particle_num_elements_t) const idx_end,
@@ -448,8 +505,7 @@ SIXTRL_HOST_FN int
         NS(Buffer_get_const_objects_end)( belements ), until_turn );
 }
 
-SIXTRL_HOST_FN int
-    NS(Track_all_particles_element_by_element_until_turn_details)(
+int NS(Track_all_particles_element_by_element_until_turn_details)(
         SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig)
             *const SIXTRL_RESTRICT config,
@@ -463,7 +519,7 @@ SIXTRL_HOST_FN int
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_HOST_FN int NS(Track_particle_element_by_element_until_turn)(
+int NS(Track_particle_element_by_element_until_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const index,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
@@ -482,7 +538,7 @@ SIXTRL_HOST_FN int NS(Track_particle_element_by_element_until_turn)(
     index_t min_at_turn       = ( index_t )0;
     index_t max_at_turn       = ( index_t )0;
 
-    int success = NS(Particles_find_min_max_attributes)( particles,
+    int success = NS(Particles_get_min_max_attributes)( particles,
         &min_particle_id, &max_particle_id,
         &min_at_element_id, &max_at_element_id,
         &min_at_turn, &max_at_turn );
@@ -531,7 +587,7 @@ SIXTRL_HOST_FN int NS(Track_particle_element_by_element_until_turn)(
     return success;
 }
 
-SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element_until_turn)(
+int NS(Track_subset_of_particles_element_by_element_until_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) idx,
     NS(particle_num_elements_t) const idx_end,
@@ -599,7 +655,7 @@ SIXTRL_HOST_FN int NS(Track_subset_of_particles_element_by_element_until_turn)(
     return success;
 }
 
-SIXTRL_HOST_FN int NS(Track_all_particles_element_by_element_until_turn)(
+int NS(Track_all_particles_element_by_element_until_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     NS(particle_index_t) const until_turn,
