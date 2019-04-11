@@ -1,6 +1,7 @@
 import ctypes as ct
 from . import config as stconf
 from .particles import Particles as st_Particles
+from cobjects import CBuffer
 
 sixtracklib = ct.CDLL( stconf.SHARED_LIB )
 
@@ -209,11 +210,38 @@ st_Particles_add_copy.argtypes = [ st_Buffer_p, st_Particles_p ]
 
 st_BeamMonitor_insert_end_of_turn_monitors = \
     sixtracklib.st_BeamMonitor_insert_end_of_turn_monitors_at_pos
-
+st_BeamMonitor_insert_end_of_turn_monitors.restype = ct.c_int32
 st_BeamMonitor_insert_end_of_turn_monitors.argtypes = [ st_Buffer_p,
     ct.c_int64, ct.c_int64, ct.c_int64, ct.c_int64, ct.c_uint64, ]
 
-st_BeamMonitor_insert_end_of_turn_monitors.restype = ct.c_int32
+st_BeamMonitor_assign_output_buffer = \
+    sixtracklib.st_BeamMonitor_assign_output_buffer
+st_BeamMonitor_assign_output_buffer.restype = ct.c_int32
+st_BeamMonitor_assign_output_buffer.argtypes = [
+    st_Buffer_p, st_Buffer_p, ct.c_int64, ct.c_uint64 ]
+
+def st_BeamMonitor_assign_output_cbuffer(
+    beam_elements_buffer, output_buffer, min_turn_id, until_turn_elem_by_elem ):
+    ptr_belem_buffer  = st_Buffer_new_mapped_on_cbuffer( beam_elements_buffer )
+    ptr_output_buffer = st_Buffer_new_mapped_on_cbuffer( output_buffer )
+
+    min_turn_id = ct.c_int64( min_turn_id )
+    until_turn_elem_by_elem = ct.c_uint64( until_turn_elem_by_elem )
+
+    ret = st_BeamMonitor_assign_output_buffer(
+        ptr_belem_buffer, ptr_output_buffer,
+            min_turn_id, until_turn_elem_by_elem )
+
+    st_Buffer_delete( ptr_belem_buffer )
+    st_Buffer_delete( ptr_output_buffer )
+
+    return ret
+
+st_BeamMonitor_assign_output_buffer_from_offset = \
+    sixtracklib.st_BeamMonitor_assign_output_buffer_from_offset
+st_BeamMonitor_assign_output_buffer_from_offset.restype = ct.c_int32
+st_BeamMonitor_assign_output_buffer_from_offset.argtypes = [
+    st_Buffer_p, st_Buffer_p, ct.c_int64, ct.c_uint64 ]
 
 # -----------------------------------------------------------------------------
 # OutputBuffer bindings
@@ -222,7 +250,6 @@ st_OutputBuffer_prepare  = sixtracklib.st_OutputBuffer_prepare
 st_OutputBuffer_prepare.restype  = ct.c_int32
 st_OutputBuffer_prepare.argtypes = [ st_Buffer_p, st_Buffer_p, st_Particles_p,
         ct.c_uint64, st_uint64_p, st_uint64_p, st_int64_p ]
-
 
 st_OutputBuffer_prepare_for_particle_sets = \
     sixtracklib.st_OutputBuffer_prepare_for_particle_sets
@@ -246,6 +273,64 @@ st_OutputBuffer_calculate_output_buffer_params_for_particles_sets.argtypes = [
     st_Buffer_p, st_Buffer_p, ct.c_uint64, st_uint64_p, ct.c_uint64,
     st_uint64_p, st_uint64_p, st_uint64_p, st_uint64_p, ct.c_uint64 ]
 st_OutputBuffer_calculate_output_buffer_params.restype  = ct.c_int32
+
+
+def st_OutputBuffer_create_output_cbuffer( beam_elements_buffer,
+    particles_buffer, num_particle_sets=1, indices=None,
+    until_turn_elem_by_elem=0 ):
+
+    ptr_particles_buffer = st_Buffer_new_mapped_on_cbuffer( particles_buffer )
+    particles = st_Particles_buffer_get_particles( ptr_particles_buffer, 0 )
+
+    ptr_beam_elements_buffer = \
+        st_Buffer_new_mapped_on_cbuffer( beam_elements_buffer )
+
+    num_objects  = ct.c_uint64( 0 )
+    num_slots    = ct.c_uint64( 0 )
+    num_dataptrs = ct.c_uint64( 0 )
+    num_garbage  = ct.c_uint64( 0 )
+    slot_size    = st_Buffer_get_slot_size( ptr_particles_buffer )
+    until_turn_elem_by_elem = ct.c_uint64( until_turn_elem_by_elem )
+
+    ret = st_OutputBuffer_calculate_output_buffer_params(
+        ptr_beam_elements_buffer, particles,
+        until_turn_elem_by_elem, ct.byref( num_objects ),
+        ct.byref( num_slots ), ct.byref( num_dataptrs ),
+        ct.byref( num_garbage ), slot_size )
+
+    output_buffer = None
+    elem_by_elem_output_offset = -1
+    beam_monitor_output_offset = -1
+    min_turn_id = -1
+
+    if  ret == 0 and num_objects.value > 0 and num_slots.value > 0 and \
+        num_dataptrs.value > 0 and num_garbage.value >= 0:
+        if  output_buffer is None:
+            output_buffer = CBuffer( max_slots=num_slots.value,
+                max_objects=num_objects.value,
+                max_pointers=num_dataptrs.value,
+                max_garbage=num_garbage.value )
+
+        ptr_out_buffer_view = st_Buffer_new_mapped_on_cbuffer( output_buffer )
+
+        elem_by_elem_output_offset = ct.c_uint64( 0 )
+        beam_monitor_output_offset = ct.c_uint64( 0 )
+        min_turn_id = ct.c_int64( 0 )
+
+        if  ptr_out_buffer_view != st_NullBuffer:
+            ret = st_OutputBuffer_prepare( ptr_beam_elements_buffer,
+                ptr_out_buffer_view, particles, until_turn_elem_by_elem,
+                    ct.byref( elem_by_elem_output_offset ),
+                    ct.byref( beam_monitor_output_offset ),
+                    ct.byref( min_turn_id ) )
+
+        st_Buffer_delete( ptr_out_buffer_view )
+
+    st_Buffer_delete( ptr_beam_elements_buffer )
+    st_Buffer_delete( ptr_particles_buffer )
+
+    return ( output_buffer, elem_by_elem_output_offset.value,
+                beam_monitor_output_offset.value, min_turn_id.value )
 
 # -----------------------------------------------------------------------------
 # TrackJob objects
@@ -343,6 +428,7 @@ st_TrackJob_get_beam_monitor_output_buffer_offset.restype  = ct.c_uint64
 
 
 # -----------------------------------------------------------------------------
+# Cl-Context methods
 
 st_ClContext_create = sixtracklib.st_ClContext_create
 st_ClContext_create.restype = st_Context_p
@@ -359,3 +445,18 @@ st_ClContextBase_delete = sixtracklib.st_ClContextBase_delete
 st_ClContextBase_delete.argtypes = [ st_Context_p ]
 st_ClContextBase_delete.restype  = None
 
+
+# ------------------------------------------------------------------------------
+# Stand-alone tracking functions (CPU only)
+
+st_Track_all_particles_until_turn = \
+    sixtracklib.st_Track_all_particles_until_turn
+st_Track_all_particles_until_turn.restype  = ct.c_int32
+st_Track_all_particles_until_turn.argtypes = [
+        st_Particles_p, st_Buffer_p, ct.c_int64 ]
+
+st_Track_all_particles_element_by_element_until_turn = \
+    sixtracklib.st_Track_all_particles_element_by_element_until_turn
+st_Track_all_particles_element_by_element_until_turn.restype  = ct.c_int32
+st_Track_all_particles_element_by_element_until_turn.argtypes = [
+    st_Particles_p, st_Buffer_p, ct.c_int64, st_Particles_p ]

@@ -70,14 +70,14 @@ class TrackJob(object):
             num_slots    = ct.c_uint64( 0 )
             num_dataptrs = ct.c_uint64( 0 )
             num_garbage  = ct.c_uint64( 0 )
-            num_elem_by_elem_turns = ct.c_uint64( until_turn_elem_by_elem )
+            until_turn_elem_by_elem = ct.c_uint64( until_turn_elem_by_elem )
 
             slot_size = st.st_Buffer_get_slot_size(
                 self._ptr_c_particles_buffer )
 
             ret = st.st_OutputBuffer_calculate_output_buffer_params(
                 self._ptr_c_beam_elements_buffer, particles,
-                num_elem_by_elem_turns, ct.byref( num_objects ),
+                until_turn_elem_by_elem, ct.byref( num_objects ),
                 ct.byref( num_slots ), ct.byref( num_dataptrs ),
                 ct.byref( num_garbage ), slot_size )
 
@@ -124,7 +124,7 @@ class TrackJob(object):
             self.ptr_st_track_job = st.st_TrackJob_new_with_output(
                 ct.c_char_p( arch_str ), self._ptr_c_particles_buffer,
                 self._ptr_c_beam_elements_buffer, self._ptr_c_output_buffer,
-                num_elem_by_elem_turns, ct.c_char_p( config_str ) )
+                until_turn_elem_by_elem, ct.c_char_p( config_str ) )
 
         if not success or self.ptr_st_track_job == st.st_Null:
             raise ValueError( 'unable to construct TrackJob from arguments' )
@@ -167,11 +167,12 @@ class TrackJob(object):
         return self._beam_elements_buffer
 
     def track( self, until_turn ):
-        return st.st_TrackJob_track_elem_by_elem(
-                self.ptr_st_track_job, until_turn )
+        return st.st_TrackJob_track_until(
+            self.ptr_st_track_job, ct.c_uint64( until_turn ) )
 
     def track_elem_by_elem( self, until_turn ):
-        return st.st_TrackJob_track_until( self.ptr_st_track_job, until_turn )
+        return st.st_TrackJob_track_elem_by_elem(
+            self.ptr_st_track_job, ct.c_uint64( until_turn ) )
 
     def collect( self ):
         st.st_TrackJob_collect( self.ptr_st_track_job )
