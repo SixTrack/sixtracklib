@@ -13,8 +13,8 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/context/compute_arch.h"
-    #include "sixtracklib/common/context/context_abs_base.h"
+    #include "sixtracklib/common/context/context_base.h"
+    #include "sixtracklib/common/context/context_base_with_nodes.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
@@ -35,21 +35,21 @@ using NS(context_size_t) = std::size_t;
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    using node_id_t     = NS(ComputeNodeId);
-    using node_info_t   = NS(ComputeNodeInfo);
-
     class ClArgument;
 
     class ClContextBase
     {
+        private:
+
+        using _base_context_t   = SIXTRL_CXX_NAMESPACE::ContextOnNodesBase;
+
         public:
 
-        using node_id_t         = SIXTRL_CXX_NAMESPACE::node_id_t;
-        using node_info_t       = SIXTRL_CXX_NAMESPACE::node_info_t;
-        using size_type         = std::size_t;
-
-        using platform_id_t     = NS(comp_node_id_num_t);
-        using device_id_t       = NS(comp_node_id_num_t);
+        using node_id_t         = _base_context_t::node_id_t;
+        using node_info_t       = _base_context_t::node_info_t;
+        using size_type         = _base_context_t::size_type;
+        using platform_id_t     = _base_context_t::platform_id_t;
+        using device_id_t       = _base_context_t::device_id_t;
 
         using kernel_id_t       = int64_t;
         using program_id_t      = int64_t;
@@ -642,8 +642,6 @@ typedef uint32_t NS(kernel_arg_type_t);
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-typedef NS(ComputeNodeId)   NS(context_node_id_t);
-typedef NS(ComputeNodeInfo) NS(context_node_info_t);
 typedef SIXTRL_INT64_T      NS(context_kernel_id_t);
 typedef SIXTRL_INT64_T      NS(context_buffer_id_t);
 

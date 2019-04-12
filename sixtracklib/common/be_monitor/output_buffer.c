@@ -372,7 +372,7 @@ int NS(BeamMonitor_assign_output_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
     NS(particle_index_t) const min_turn_id,
-    NS(buffer_size_t) const num_elem_by_elem_turns  )
+    NS(buffer_size_t) const until_turn_elem_by_elem  )
 {
     int success = -1;
 
@@ -381,13 +381,16 @@ int NS(BeamMonitor_assign_output_buffer)(
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
     SIXTRL_STATIC_VAR buf_size_t const ONE  = ( buf_size_t )1u;
 
-    if( ( num_elem_by_elem_turns > ZERO ) &&
+    if( ( min_turn_id >= ( NS(particle_index_t) )0u ) &&
+        ( until_turn_elem_by_elem > ( buf_size_t )min_turn_id ) &&
         ( NS(Buffer_get_num_of_objects)( belements_buffer ) > ONE ) )
     {
         success = NS(BeamMonitor_assign_output_buffer_from_offset)(
             belements_buffer, out_buffer, min_turn_id, ONE );
     }
-    else if( num_elem_by_elem_turns == ZERO )
+    else if( ( min_turn_id >= ( NS(particle_index_t) )0u ) &&
+             ( ( until_turn_elem_by_elem == ZERO ) ||
+               ( until_turn_elem_by_elem <= ( buf_size_t )min_turn_id ) ) )
     {
         success = NS(BeamMonitor_assign_output_buffer_from_offset)(
             belements_buffer, out_buffer, min_turn_id, ZERO );

@@ -29,6 +29,25 @@ SIXTRL_FN SIXTRL_STATIC void NS(Track_subset_particles_increment_at_element)(
 SIXTRL_FN SIXTRL_STATIC void NS(Track_all_particles_increment_at_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles );
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN
+void NS(Track_particle_increment_at_element_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN
+void NS(Track_subset_particles_increment_at_element_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_begin_index,
+    NS(particle_num_elements_t) const particle_end_index,
+    NS(particle_num_elements_t) const particle_index_stride );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN
+void NS(Track_all_particles_increment_at_element_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)*
+        SIXTRL_RESTRICT particles );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC void NS(Track_particle_increment_at_turn)(
@@ -44,6 +63,27 @@ SIXTRL_FN SIXTRL_STATIC void NS(Track_subset_particles_increment_at_turn)(
     NS(particle_index_t) const start_beam_element_id );
 
 SIXTRL_FN SIXTRL_STATIC void NS(Track_all_particles_increment_at_turn)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_index_t) const start_beam_element_id );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN
+void NS(Track_particle_increment_at_turn_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index,
+    NS(particle_index_t) const start_beam_element_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN
+void NS(Track_subset_particles_increment_at_turn_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_begin_index,
+    NS(particle_num_elements_t) const particle_end_index,
+    NS(particle_num_elements_t) const particle_index_stride,
+    NS(particle_index_t) const start_beam_element_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void
+NS(Track_all_particles_increment_at_turn_ext)(
     SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_index_t) const start_beam_element_id );
 

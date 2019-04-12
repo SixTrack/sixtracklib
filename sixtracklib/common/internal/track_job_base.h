@@ -26,7 +26,6 @@
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/particles.h"
-    #include "sixtracklib/common/context/context_abs_base.h"
     #include "sixtracklib/common/output/output_buffer.h"
     #include "sixtracklib/common/output/elem_by_elem_config.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -62,7 +61,12 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const until_turn );
 
         SIXTRL_HOST_FN track_status_t trackElemByElem(
-            size_type const dump_elem_by_elem_turns );
+            size_type const until_turn_elem_by_elem );
+
+        SIXTRL_HOST_FN track_status_t trackLine(
+            size_type const beam_elements_begin_index,
+            size_type const beam_elements_end_index,
+            bool const finish_turn = false );
 
         /* ----------------------------------------------------------------- */
 
@@ -74,7 +78,7 @@ namespace SIXTRL_CXX_NAMESPACE
             buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
             buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
             buffer_t* SIXTRL_RESTRICT ptr_output_buffer   = nullptr,
-            size_type const dump_elem_by_elem_turns = size_type{ 0 } );
+            size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
 
         template< typename ParSetIndexIter  >
@@ -84,13 +88,13 @@ namespace SIXTRL_CXX_NAMESPACE
             ParSetIndexIter  particle_set_indices_end,
             buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
             buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
-            size_type const dump_elem_by_elem_turns = size_type{ 0 } );
+            size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
         SIXTRL_HOST_FN bool reset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
-            size_type const dump_elem_by_elem_turns = size_type{ 0 } );
+            size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
         SIXTRL_HOST_FN bool reset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
@@ -98,7 +102,7 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const* SIXTRL_RESTRICT particle_set_indices_begin,
             c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
-            size_type const dump_elem_by_elem_turns = size_type{ 0 } );
+            size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
         template< typename ParSetIndexIter  >
         SIXTRL_HOST_FN bool reset(
@@ -107,7 +111,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ParSetIndexIter  particle_set_indices_end,
             c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
-            size_type const dump_elem_by_elem_turns = size_type{ 0 } );
+            size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
         SIXTRL_HOST_FN bool assignOutputBuffer(
             buffer_t& SIXTRL_RESTRICT_REF output_buffer );
@@ -190,8 +194,11 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN size_type
         elemByElemOutputBufferOffset() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN size_type numElemByElemTurns() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN particle_index_t
+        untilTurnElemByElem() const SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN size_type numElemByElemTurns()  const SIXTRL_NOEXCEPT;
+//
         SIXTRL_HOST_FN buffer_t* ptrOutputBuffer() SIXTRL_RESTRICT;
         SIXTRL_HOST_FN buffer_t* ptrOutputBuffer() const SIXTRL_RESTRICT;
 
@@ -277,7 +284,7 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
-            size_type const dump_elem_by_elem_turns );
+            size_type const until_turn_elem_by_elem );
 
         SIXTRL_HOST_FN virtual bool doAssignOutputBufferToBeamMonitors(
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
@@ -287,7 +294,7 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
-            size_type const dump_elem_by_elem_turns );
+            size_type const until_turn_elem_by_elem );
 
         SIXTRL_HOST_FN virtual bool doAssignNewOutputBuffer(
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer );
@@ -298,7 +305,11 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const until_turn );
 
         SIXTRL_HOST_FN virtual track_status_t doTrackElemByElem(
-            size_type const dump_elem_by_elem_turns );
+            size_type const until_turn_elem_by_elem );
+
+        SIXTRL_HOST_FN virtual track_status_t doTrackLine(
+            size_type const beam_elements_begin_index,
+            size_type const beam_elements_end_index, bool const finish_turn );
 
         /* ----------------------------------------------------------------- */
 
@@ -335,8 +346,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doSetElemByElemOutputIndexOffset(
             size_type const target_num_output_turns ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void doSetNumElemByElemOutputTurns(
-            size_type const dump_elem_by_elem_turns ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void doSetUntilTurnElemByElem(
+            particle_index_t const until_turn_elem_by_elem ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void doSetBeamMonitorOutputEnabledFlag(
             bool const beam_monitor_flag ) SIXTRL_NOEXCEPT;
@@ -407,7 +418,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         size_type                       m_be_mon_output_buffer_offset;
         size_type                       m_elem_by_elem_output_offset;
-        size_type                       m_dump_elem_by_elem_turns;
 
         type_t                          m_type_id;
         elem_by_elem_order_t            m_default_elem_by_elem_order;
@@ -420,6 +430,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         particle_index_t                m_min_initial_turn_id;
         particle_index_t                m_max_initial_turn_id;
+        particle_index_t                m_until_turn_elem_by_elem;
 
         bool                            m_default_elem_by_elem_rolling;
         bool                            m_has_beam_monitor_output;
@@ -451,7 +462,7 @@ namespace SIXTRL_CXX_NAMESPACE
         ParSetIndexIter  particle_set_indices_end,
         TrackJobBase::buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
         buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
-        size_type const dump_elem_by_elem_turns )
+        size_type const until_turn_elem_by_elem )
     {
         using c_buffer_t = TrackJobBase::c_buffer_t;
 
@@ -478,7 +489,7 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         success = this->doReset(
-            ptr_pb, ptr_eb, ptr_out, dump_elem_by_elem_turns );
+            ptr_pb, ptr_eb, ptr_out, until_turn_elem_by_elem );
 
         if( success )
         {
@@ -501,7 +512,7 @@ namespace SIXTRL_CXX_NAMESPACE
         ParSetIndexIter  particle_set_indices_end,
         TrackJobBase::c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
         TrackJobBase::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
-        TrackJobBase::size_type const dump_elem_by_elem_turns )
+        TrackJobBase::size_type const until_turn_elem_by_elem )
     {
         this->doClear();
 
@@ -519,7 +530,7 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         bool success = this->doReset( particles_buffer, beam_elements_buffer,
-            ptr_output_buffer, dump_elem_by_elem_turns );
+            ptr_output_buffer, until_turn_elem_by_elem );
 
         /*
         if( success )

@@ -30,6 +30,7 @@ set(  SIXTRACKLIB_C99_HEADERS
       beam_elements.h
       buffer.h
       constants.h
+      context.h
       definitions.h
       particles.h
       track.h

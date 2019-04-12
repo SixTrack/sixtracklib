@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import sys
 import os
 import pysixtracklib as pyst
 import pysixtracklib_test as testlib
+import pdb
 
 from pysixtracklib.stcommon import \
     st_Buffer_new_mapped_on_cbuffer, st_Buffer_delete, \
@@ -96,16 +96,22 @@ if __name__ == '__main__':
     st_Buffer_delete(ptr_belem_buffer)
     ptr_belem_buffer = pyst.stcommon.st_NullBuffer
 
+    print("cmp_output_buffer tracking finished")
+
     # -------------------------------------------------------------------------
+    track_pb = CBuffer()
+    track_particles = pyst.makeCopy(initial_particles, cbuffer=track_pb)
 
     track_pb = CBuffer()
     track_particles = pyst.makeCopy(initial_particles, cbuffer=track_pb)
 
-    job = pyst.TrackJob("cpu",
+    job = pyst.TrackJob("opencl", device_id_str="0.0",
                         particles_buffer=track_pb, beam_elements_buffer=eb,
                         until_turn_elem_by_elem=until_turn_elem_by_elem)
 
-    assert(job.type_str() == 'cpu')
+    print("job setup complete")
+
+    assert(job.type_str() == 'opencl')
     assert(job.has_output_buffer())
     assert(job.num_beam_monitors() > 0)
     assert(job.has_elem_by_elem_outupt())
@@ -114,38 +120,35 @@ if __name__ == '__main__':
     status = job.track_elem_by_elem(until_turn_elem_by_elem)
     assert(status == 0)
 
+    print("elem by elem tracking finished")
+
     status = job.track(until_turn)
     assert(status == 0)
 
+    print("tracking finished")
+
     job.collect()
+
+    print("collect finished")
 
     output_buffer = job.output_buffer
     particles_buffer = job.particles_buffer
 
-    assert(output_buffer.n_objects == 3)
+    assert(output_buffer.size > 0)
+    assert(output_buffer.n_objects > 0)
 
-    ptr_output_buffer = st_Buffer_new_mapped_on_cbuffer(output_buffer)
-    ptr_cmp_output_buffer = st_Buffer_new_mapped_on_cbuffer(cmp_output_buffer)
-    ABS_DIFF = ct.c_double(2e-14)
+    assert(cmp_output_buffer.n_objects == output_buffer.n_objects)
+    assert(cmp_output_buffer.base != output_buffer.base)
 
-    if(0 != st_Particles_buffers_compare_values_with_treshold(
-            ptr_output_buffer, ptr_cmp_output_buffer, ABS_DIFF)):
+    nn = cmp_output_buffer.n_objects
+    ABS_DIFF = 2e-14
 
-        nn = output_buffer.n_objects
+    for ii in range(nn):
+        cmp_particles = cmp_output_buffer.get_object(ii, pyst.Particles)
+        particles = output_buffer.get_object(ii, pyst.Particles)
+        assert(0 == pyst.particles.compareParticlesDifference(
+            cmp_particles, particles, abs_treshold=ABS_DIFF))
 
-        for ii in range(nn):
-            assert(0 == st_Particles_compare_values_with_treshold(
-                st_Particles_cbuffer_get_particles(output_buffer, 0),
-                st_Particles_cbuffer_get_particles(cmp_output_buffer, 0),
-                ABS_DIFF))
-
-    assert(0 == st_Particles_buffers_compare_values_with_treshold(
-        ptr_output_buffer, ptr_cmp_output_buffer, ABS_DIFF))
-
-    st_Buffer_delete(ptr_output_buffer)
-    st_Buffer_delete(ptr_cmp_output_buffer)
-
-    ptr_output_buffer = pyst.stcommon.st_NullBuffer
-    ptr_cmp_output_buffer = pyst.stcommon.st_NullBuffer
+    print("compare finished")
 
     sys.exit(0)

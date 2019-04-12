@@ -35,7 +35,13 @@ struct NS(ElemByElemConfig);
 namespace SIXTRL_CXX_NAMESPACE
 {
     SIXTRL_HOST_FN SIXTRL_STATIC std::string TrackJob_extract_device_id_str(
+        std::string const& SIXTRL_RESTRICT_REF config_str );
+
+    SIXTRL_HOST_FN SIXTRL_STATIC std::string TrackJob_extract_device_id_str(
         const char *const SIXTRL_RESTRICT config_str );
+
+    SIXTRL_HOST_FN SIXTRL_STATIC std::string TrackJob_sanitize_arch_str(
+        std::string const& SIXTRL_RESTRICT_REF arch_str );
 
     SIXTRL_HOST_FN SIXTRL_STATIC std::string TrackJob_sanitize_arch_str(
         const char *const SIXTRL_RESTRICT arch_str );
@@ -113,6 +119,22 @@ extern "C" {
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(TrackJob_extract_device_id_str)(
+        const char *const SIXTRL_RESTRICT config_str,
+        char* SIXTRL_RESTRICT device_id_str,
+        NS(buffer_size_t) const max_device_id_str_len );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(TrackJob_sanitize_arch_str_inplace)(
+        char* SIXTRL_RESTRICT arch_str,
+        NS(buffer_size_t) const max_arch_str_len );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(TrackJob_sanitize_arch_str)(
+        const char *const SIXTRL_RESTRICT arch_str,
+        char* SIXTRL_RESTRICT sanitized_arch_str,
+        NS(buffer_size_t) const max_arch_str_len );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBase)* NS(TrackJob_create)(
     const char *const SIXTRL_RESTRICT arch,
     const char *const SIXTRL_RESTRICT config_str );
@@ -153,6 +175,12 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t) NS(TrackJob_track_until)(
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t)
 NS(TrackJob_track_elem_by_elem)( NS(TrackJobBase)* SIXTRL_RESTRICT job,
     NS(buffer_size_t) const until_turn );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t)
+NS(TrackJob_track_line)( NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const beam_elem_begin_index,
+    NS(buffer_size_t) const beam_elem_end_index,
+    bool const finish_turn );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_collect)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job );
@@ -375,32 +403,44 @@ NS(TrackJob_set_default_elem_by_elem_config_order)(
 namespace SIXTRL_CXX_NAMESPACE
 {
     SIXTRL_INLINE SIXTRL_HOST_FN std::string TrackJob_extract_device_id_str(
+        std::string const& SIXTRL_RESTRICT_REF config_str )
+    {
+        return SIXTRL_CXX_NAMESPACE::TrackJob_extract_device_id_str(
+            config_str.c_str() );
+    }
+
+    SIXTRL_INLINE SIXTRL_HOST_FN std::string TrackJob_extract_device_id_str(
         const char *const SIXTRL_RESTRICT config_str )
     {
         if( ( config_str != nullptr ) &&
             ( std::strlen( config_str ) > std::size_t{ 0 } ) )
         {
+            /*
             std::regex re(
                         "device_id_str[:blank:]*=[:blank:]*"
-                              "([:digit:]+.[:digit:]+)[A-Za-z0-9_-#=:;., \t]*|"
-                        "^[A-Za-z0-9_-#=;.:, \t]*([:digit:]+.[:digit:]+);|"
-                        "([:digit:]+.[:digit:]+)" );
+                              "([:digit:]+.[:digit:]+)[A-Za-z0-9_\\-#=:;., \t]*|"
+                        "^[A-Za-z0-9_\\-#=;.:, \t]*([:digit:]+.[:digit:]+);|"
+                        "([:digit:]+.[:digit:]+)" );*/
 
+            std::regex re( "\\s*([0-9]+\\.[0-9]+)[\\sA-Za-z0-9#\\;]*" );
             std::cmatch matches;
 
             std::regex_match( config_str, matches, re );
 
             if( ( matches.ready() ) && ( !matches.empty() ) )
             {
-                std::size_t const n = matches.size();
-                std::cout << n << "\r\n";
-                std::cout << matches[ 0 ] << std::endl;
-
-                return std::string{ matches[ 0 ] };
+                return std::string{ matches[ matches.size() - 1 ] };
             }
         }
 
         return std::string{ "" };
+    }
+
+    SIXTRL_INLINE std::string TrackJob_sanitize_arch_str(
+        std::string const& SIXTRL_RESTRICT_REF arch_str )
+    {
+        return SIXTRL_CXX_NAMESPACE::TrackJob_sanitize_arch_str(
+            arch_str.c_str() );
     }
 
     SIXTRL_INLINE SIXTRL_HOST_FN std::string TrackJob_sanitize_arch_str(

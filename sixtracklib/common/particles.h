@@ -1300,7 +1300,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_all_at_element_id_value)(
 
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_range_at_element_id_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const begin_index,
+    NS(particle_num_elements_t) begin_index,
     NS(particle_num_elements_t) const end_index,
     NS(particle_index_t) const at_element_id_value );
 
@@ -1362,7 +1362,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_all_at_turn_value)(
 
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_range_at_turn_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const begin_index,
+    NS(particle_num_elements_t) begin_index,
     NS(particle_num_elements_t) const end_index,
     NS(particle_index_t) const at_turn_value );
 
@@ -5919,24 +5919,19 @@ SIXTRL_INLINE void NS(Particles_set_all_at_element_id_value)(
 
 SIXTRL_INLINE void NS(Particles_set_range_at_element_id_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const begin_index,
+    NS(particle_num_elements_t) ii,
     NS(particle_num_elements_t) const end_index,
     NS(particle_index_t) const at_element_id_value )
 {
-    NS(particle_index_t) num_elements = end_index;
+    SIXTRL_ASSERT( ii <= end_index );
+    SIXTRL_ASSERT( NS(Particles_get_num_of_particles)(
+        particles ) >= end_index );
 
-    NS(particle_index_ptr_t) begin_ptr =
-        NS(Particles_get_at_element_id)( particles );
-
-    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( begin_ptr != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( begin_index < end_index );
-    SIXTRL_ASSERT( NS(Particles_get_num_of_particles)( particles ) >= end_index );
-
-    num_elements -= begin_index;
-
-    SIXTRACKLIB_SET_VALUES( NS(particle_index_t), &begin_ptr[ begin_index ],
-                            num_elements, at_element_id_value );
+    for( ; ii < end_index ; ++ii )
+    {
+        NS(Particles_set_at_element_id_value)(
+            particles, ii, at_element_id_value );
+    }
 
     return;
 }
@@ -6136,23 +6131,18 @@ SIXTRL_INLINE void NS(Particles_set_all_at_turn_value)(
 
 SIXTRL_INLINE void NS(Particles_set_range_at_turn_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const begin_index,
+    NS(particle_num_elements_t) ii,
     NS(particle_num_elements_t) const end_index,
     NS(particle_index_t) const at_turn_value )
 {
-    NS(particle_index_t) num_elements = end_index;
+    SIXTRL_ASSERT( ii <= end_index );
+    SIXTRL_ASSERT( NS(Particles_get_num_of_particles)(
+        particles ) >= end_index );
 
-    NS(particle_index_ptr_t) begin_ptr = NS(Particles_get_at_turn)( particles );
-
-    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( begin_ptr != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( begin_index < end_index );
-    SIXTRL_ASSERT( NS(Particles_get_num_of_particles)( particles ) >= end_index );
-
-    num_elements -= begin_index;
-
-    SIXTRACKLIB_SET_VALUES( NS(particle_index_t), &begin_ptr[ begin_index ],
-                            num_elements, at_turn_value );
+    for( ; ii < end_index ; ++ii )
+    {
+        NS(Particles_set_at_turn_value)( particles, ii, at_turn_value );
+    }
 
     return;
 }

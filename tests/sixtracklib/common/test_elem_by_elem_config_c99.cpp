@@ -169,22 +169,20 @@ TEST( C99_CommonElemByElemConfigTests, MinimalExampleInit )
     if( ( NUM_PARTICLES     > num_elem_t{ 0 } ) &&
         ( NUM_BEAM_ELEMENTS > num_elem_t{ 0 } ) )
     {
-        buf_size_t const cmp_num_turns_to_store = static_cast< buf_size_t >(
-            max_turn - min_turn ) + buf_size_t{ 1 };
+        buf_size_t const until_turn_elem_by_elem = max_turn + buf_size_t{ 1 };
+        SIXTRL_ASSERT( until_turn_elem_by_elem >
+                       static_cast< buf_size_t >( min_turn ) );
+
+        buf_size_t const cmp_num_turns_to_store =
+            until_turn_elem_by_elem - static_cast< buf_size_t >( min_turn );
 
         ::st_Buffer* elem_by_elem_buffer = ::st_Buffer_new( 0u );
-        for( num_elem_t ii = num_elem_t{ 0 } ; ii < NUM_PARTICLES ; ++ii )
-        {
-            ::st_Particles_set_at_turn_value( particles, ii, min_turn );
-        }
-
-        buf_size_t const num_elem_by_elem_turns = static_cast< buf_size_t >(
-            max_turn + part_index_t{ 1 } - min_turn );
+        ::NS(Particles_set_all_at_turn_value)( particles, min_turn );
 
         buf_size_t elem_by_elem_index_offset = buf_size_t{ 0 };
 
         int ret = ::st_ElemByElemConfig_prepare_output_buffer(
-            eb, elem_by_elem_buffer, particles, num_elem_by_elem_turns,
+            eb, elem_by_elem_buffer, particles, until_turn_elem_by_elem,
             &elem_by_elem_index_offset );
 
         ASSERT_TRUE( ret == 0 );

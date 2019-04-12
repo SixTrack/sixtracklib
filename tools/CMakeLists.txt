@@ -21,6 +21,18 @@ add_executable( normalize_cobject_dump
 
 list( APPEND TOOLS_C99_TARGETS normalize_cobject_dump )
 
+
+# ----------------------------------------------------------------------------
+# dump_cbuffer:
+
+set( TOOLS_DUMP_CBUFFER_HEADERS )
+set( TOOLS_DUMP_CBUFFER_SOURCES dump_cbuffer.c )
+
+add_executable(
+    dump_cbuffer ${TOOLS_DUMP_CBUFFER_HEADERS} ${TOOLS_DUMP_CBUFFER_SOURCES} )
+
+list( APPEND TOOLS_C99_TARGETS dump_cbuffer )
+
 # ============================================================================
 # set properties for all tools:
 

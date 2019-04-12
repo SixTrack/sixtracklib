@@ -23,7 +23,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int
 NS(ElemByElemConfig_calculate_output_buffer_params)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
-    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t) const until_turn_elem_by_elem,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
@@ -36,7 +36,7 @@ NS(ElemByElemConfig_calculate_output_buffer_params_for_particle_sets)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
     NS(buffer_size_t) const num_particle_sets,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT indices_begin,
-    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t) const until_turn_elem_by_elem,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
@@ -51,7 +51,7 @@ NS(ElemByElemConfig_calculate_output_buffer_params_detailed)(
     NS(particle_index_t) const max_element_id,
     NS(particle_index_t) const min_turn_id,
     NS(particle_index_t) const max_turn_id,
-    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t) const until_turn_elem_by_elem,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
@@ -72,7 +72,7 @@ NS(ElemByElemConfig_prepare_output_buffer_for_particle_sets)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
     NS(buffer_size_t) const num_particle_sets,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT indices_begin,
-    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t) const until_turn_elem_by_elem,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_index_offset );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int
