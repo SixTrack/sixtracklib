@@ -47,6 +47,19 @@ SIXTRL_STATIC SIXTRL_FN bool NS(OutputBuffer_requires_beam_monitor_output)(
 
 #if !defined( _GPUCODE )
 
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(OutputBuffer_requires_output_buffer_ext)(
+    NS(output_buffer_flag_t) const flags );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(OutputBuffer_requires_elem_by_elem_output_ext)(
+    NS(output_buffer_flag_t) const flags );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(OutputBuffer_requires_beam_monitor_output_ext)(
+    NS(output_buffer_flag_t) const flags );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 SIXTRL_STATIC_VAR NS(output_buffer_flag_t) const NS(OUTPUT_BUFFER_NONE) =
         ( NS(output_buffer_flag_t) )SIXTRL_OUTPUT_BUFFER_NONE;
 

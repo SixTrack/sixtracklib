@@ -23,9 +23,25 @@
     #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
+bool NS(OutputBuffer_requires_output_buffer_ext)(
+    NS(output_buffer_flag_t) const flags )
+{
+    return NS(OutputBuffer_requires_output_buffer)( flags );
+}
 
-SIXTRL_HOST_FN NS(output_buffer_flag_t)
-NS(OutputBuffer_required_for_tracking)(
+bool NS(OutputBuffer_requires_elem_by_elem_output_ext)(
+    NS(output_buffer_flag_t) const flags )
+{
+    return NS(OutputBuffer_requires_elem_by_elem_output)( flags );
+}
+
+bool NS(OutputBuffer_requires_beam_monitor_output_ext)(
+    NS(output_buffer_flag_t) const flags )
+{
+    return NS(OutputBuffer_requires_beam_monitor_output)( flags );
+}
+
+NS(output_buffer_flag_t) NS(OutputBuffer_required_for_tracking)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
         SIXTRL_RESTRICT belem_buffer,
@@ -190,7 +206,7 @@ NS(output_buffer_flag_t) NS(OutputBuffer_required_for_tracking_detailed)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_HOST_FN int NS(OutputBuffer_prepare)(
+int NS(OutputBuffer_prepare)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
@@ -346,7 +362,7 @@ int NS(OutputBuffer_prepare_detailed)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_HOST_FN int NS(OutputBuffer_calculate_output_buffer_params)(
+int NS(OutputBuffer_calculate_output_buffer_params)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
     NS(buffer_size_t) const until_turn_elem_by_elem,
@@ -378,7 +394,7 @@ SIXTRL_HOST_FN int NS(OutputBuffer_calculate_output_buffer_params)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_HOST_FN int
+int
 NS(OutputBuffer_calculate_output_buffer_params_for_particles_sets)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pbuffer,
@@ -414,7 +430,7 @@ NS(OutputBuffer_calculate_output_buffer_params_for_particles_sets)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_HOST_FN int NS(OutputBuffer_calculate_output_buffer_params_detailed)(
+int NS(OutputBuffer_calculate_output_buffer_params_detailed)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     NS(particle_index_t) const min_part_id,
     NS(particle_index_t) const max_part_id,
