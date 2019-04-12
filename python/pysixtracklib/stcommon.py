@@ -11,7 +11,6 @@ st_Null = ct.cast(0, ct.c_void_p)
 st_NullChar = ct.cast(0, ct.c_char_p)
 
 st_Context_p = ct.c_void_p
-st_TrackJob_p = ct.c_void_p
 st_uint64_p = ct.POINTER(ct.c_uint64)
 st_uchar_p = ct.POINTER(ct.c_ubyte)
 
@@ -276,6 +275,39 @@ st_BeamMonitor_assign_output_buffer_from_offset.argtypes = [
 # -----------------------------------------------------------------------------
 # OutputBuffer bindings
 
+st_OutputBuffer_requires_output_buffer = \
+    sixtracklib.st_OutputBuffer_requires_output_buffer_ext
+st_OutputBuffer_requires_output_buffer.restype = ct.c_bool
+st_OutputBuffer_requires_output_buffer.argtypes = [ct.c_int32]
+
+st_OutputBuffer_requires_beam_monitor_output = \
+    sixtracklib.st_OutputBuffer_requires_beam_monitor_output_ext
+st_OutputBuffer_requires_beam_monitor_output.restype = ct.c_bool
+st_OutputBuffer_requires_beam_monitor_output.argtypes = [ct.c_int32]
+
+st_OutputBuffer_requires_elem_by_elem_output = \
+    sixtracklib.st_OutputBuffer_requires_elem_by_elem_output_ext
+st_OutputBuffer_requires_elem_by_elem_output.restype = ct.c_bool
+st_OutputBuffer_requires_elem_by_elem_output.argtypes = [ct.c_int32]
+
+st_OutputBuffer_required_for_tracking = \
+    sixtracklib.st_OutputBuffer_required_for_tracking
+st_OutputBuffer_required_for_tracking.restype = ct.c_int32
+st_OutputBuffer_required_for_tracking.argptypes = [
+    st_Particles_p,
+    st_Buffer_p,
+    ct.c_uint64]
+
+st_OutputBuffer_required_for_tracking_of_particle_sets = \
+    sixtracklib.st_OutputBuffer_required_for_tracking_of_particle_sets_ext
+st_OutputBuffer_required_for_tracking_of_particle_sets.restype = ct.c_int32
+st_OutputBuffer_required_for_tracking_of_particle_sets.argptypes = [
+    st_Buffer_p,
+    ct.c_uint64,
+    st_uint64_p,
+    st_Buffer_p,
+    ct.c_uint64]
+
 st_OutputBuffer_prepare = sixtracklib.st_OutputBuffer_prepare
 st_OutputBuffer_prepare.restype = ct.c_int32
 st_OutputBuffer_prepare.argtypes = [
@@ -391,6 +423,9 @@ def st_OutputBuffer_create_output_cbuffer(
 # TrackJob objects
 
 
+st_TrackJob_p = ct.c_void_p
+st_NullTrackJob = ct.cast(0, st_TrackJob_p)
+
 st_TrackJob_create = sixtracklib.st_TrackJobCpu_create
 st_TrackJob_create.argtypes = [ct.c_char_p, ct.c_char_p]
 st_TrackJob_create.restype = st_TrackJob_p
@@ -421,6 +456,15 @@ st_TrackJob_track_until.restype = ct.c_int32
 st_TrackJob_track_elem_by_elem = sixtracklib.st_TrackJob_track_elem_by_elem
 st_TrackJob_track_elem_by_elem.argtypes = [st_TrackJob_p, ct.c_uint64]
 st_TrackJob_track_elem_by_elem.restype = ct.c_int32
+
+
+st_TrackJob_track_line = sixtracklib.st_TrackJob_track_line
+st_TrackJob_track_line.restype = ct.c_int32
+st_TrackJob_track_line.argtypes = [
+    st_TrackJob_p,
+    ct.c_uint64,
+    ct.c_uint64,
+    ct.c_bool]
 
 
 st_TrackJob_collect = sixtracklib.st_TrackJob_collect
