@@ -31,9 +31,14 @@ class TrackJob(object):
         else:
             print("architecture {0} is not enabled/known".format(arch_str))
 
-    def __init__(self, arch_str, device_id_str=None, particles_buffer=None,
-                 beam_elements_buffer=None, output_buffer=None,
-                 until_turn_elem_by_elem=0, config_str=None):
+    def __init__(self,
+                beam_elements_buffer,
+                particles_buffer,
+                until_turn_elem_by_elem=0,
+                arch_str='cpu',
+                device_id_str=None,
+                output_buffer=None,
+                config_str=None):
         self.ptr_st_track_job = st.st_Null
         self._particles_buffer = None
         self._ptr_c_particles_buffer = st.st_Null
