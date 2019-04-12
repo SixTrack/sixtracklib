@@ -176,6 +176,12 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t)
 NS(TrackJob_track_elem_by_elem)( NS(TrackJobBase)* SIXTRL_RESTRICT job,
     NS(buffer_size_t) const until_turn );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t)
+NS(TrackJob_track_line)( NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const beam_elem_begin_index,
+    NS(buffer_size_t) const beam_elem_end_index,
+    bool const finish_turn );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_collect)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job );
 

@@ -33,6 +33,18 @@ add_executable(
 
 list( APPEND TOOLS_C99_TARGETS dump_cbuffer )
 
+# ----------------------------------------------------------------------------
+# dump_cbuffer_generic_objs:
+
+set( TOOLS_DUMP_CBUFFER_GENERIC_OBJ_HEADERS )
+set( TOOLS_DUMP_CBUFFER_GENERIC_OBJ_SOURCES dump_cbuffer_generic_objs.c )
+
+add_executable( dump_cbuffer_generic_objs
+    ${TOOLS_DUMP_CBUFFER_GENERIC_OBJ_HEADERS}
+    ${TOOLS_DUMP_CBUFFER_GENERIC_OBJ_SOURCES} )
+
+list( APPEND TOOLS_C99_TARGETS dump_cbuffer_generic_objs )
+
 # ============================================================================
 # set properties for all tools:
 

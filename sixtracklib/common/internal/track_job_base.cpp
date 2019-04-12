@@ -60,6 +60,15 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->doTrackElemByElem( until_turn );
     }
 
+    SIXTRL_HOST_FN TrackJobBase::track_status_t TrackJobBase::trackLine(
+        TrackJobBase::size_type const beam_elements_begin_index,
+        TrackJobBase::size_type const beam_elements_end_index,
+        bool const finish_turn )
+    {
+        return this->doTrackLine(
+            beam_elements_begin_index, beam_elements_end_index, finish_turn );
+    }
+
     SIXTRL_HOST_FN bool TrackJobBase::reset(
         TrackJobBase::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
         TrackJobBase::buffer_t& SIXTRL_RESTRICT_REF be_buffer,
@@ -907,6 +916,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_HOST_FN TrackJobBase::track_status_t
     TrackJobBase::doTrackElemByElem( size_type const )
+    {
+        return TrackJobBase::track_status_t{ -1 };
+    }
+
+    SIXTRL_HOST_FN TrackJobBase::track_status_t
+    TrackJobBase::doTrackLine( size_type const, size_type const, bool const )
     {
         return TrackJobBase::track_status_t{ -1 };
     }

@@ -63,6 +63,11 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN track_status_t trackElemByElem(
             size_type const until_turn_elem_by_elem );
 
+        SIXTRL_HOST_FN track_status_t trackLine(
+            size_type const beam_elements_begin_index,
+            size_type const beam_elements_end_index,
+            bool const finish_turn = false );
+
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN virtual ~TrackJobBase() = default;
@@ -301,6 +306,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual track_status_t doTrackElemByElem(
             size_type const until_turn_elem_by_elem );
+
+        SIXTRL_HOST_FN virtual track_status_t doTrackLine(
+            size_type const beam_elements_begin_index,
+            size_type const beam_elements_end_index, bool const finish_turn );
 
         /* ----------------------------------------------------------------- */
 
