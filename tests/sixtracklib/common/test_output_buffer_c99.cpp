@@ -109,14 +109,13 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     buf_size_t num_slots    = buf_size_t{ 0 };
     buf_size_t num_dataptrs = buf_size_t{ 0 };
     buf_size_t num_garbage  = buf_size_t{ 0 };
-
-    buf_size_t num_elem_by_elem_turns = buf_size_t{ 0 };
+    buf_size_t until_turn_elem_by_elem = buf_size_t{ 0 };
 
     ASSERT_TRUE( buf_size_t{ 0 } ==
         ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) );
 
     ret = NS(OutputBuffer_calculate_output_buffer_params)( eb, particles,
-        num_elem_by_elem_turns, &num_objects, &num_slots, &num_dataptrs,
+        until_turn_elem_by_elem, &num_objects, &num_slots, &num_dataptrs,
             &num_garbage, slot_size );
 
     ASSERT_TRUE( ret == 0 );
@@ -126,7 +125,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     ASSERT_TRUE( num_garbage  == buf_size_t{ 0 } );
 
     ret = NS(OutputBuffer_calculate_output_buffer_params_for_particles_sets)(
-        eb, pb, buf_size_t{ 1 }, &pset_indices[ 0 ], num_elem_by_elem_turns,
+        eb, pb, buf_size_t{ 1 }, &pset_indices[ 0 ], until_turn_elem_by_elem,
             &num_objects, &num_slots, &num_dataptrs, &num_garbage, slot_size );
 
     ASSERT_TRUE( ret == 0 );
@@ -137,7 +136,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
     ret = NS(OutputBuffer_calculate_output_buffer_params_detailed)( eb,
         min_part_id, max_part_id, min_elem_id, max_elem_id, min_turn_id,
-            max_turn_id, num_elem_by_elem_turns, &num_objects, &num_slots,
+            max_turn_id, until_turn_elem_by_elem, &num_objects, &num_slots,
                 &num_dataptrs, &num_garbage, slot_size );
 
     ASSERT_TRUE( ret == 0 );
@@ -149,10 +148,14 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     /* ===================================================================== */
     /* Test case 2: only element by element output */
 
-    num_elem_by_elem_turns = buf_size_t{ 5 };
+    until_turn_elem_by_elem = buf_size_t{ 5 };
 
-    part_index_t max_elem_by_elem_turn_id =
-        min_turn_id + num_elem_by_elem_turns;
+    part_index_t max_elem_by_elem_turn_id = static_cast< part_index_t >(
+        until_turn_elem_by_elem - buf_size_t{ 1 } );
+
+    SIXTRL_ASSERT( min_turn_id >= part_index_t{ 0 } );
+    SIXTRL_ASSERT( until_turn_elem_by_elem >
+        static_cast< buf_size_t >( min_turn_id ) );
 
     if( max_elem_by_elem_turn_id < max_turn_id )
     {
@@ -174,7 +177,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     buf_size_t out_buffer_size = buf_size_t{ 0 };
 
     ret = ::NS(OutputBuffer_calculate_output_buffer_params)( eb, particles,
-        num_elem_by_elem_turns, &num_objects, &num_slots, &num_dataptrs,
+        until_turn_elem_by_elem, &num_objects, &num_slots, &num_dataptrs,
             &num_garbage, slot_size );
 
     ASSERT_TRUE( ret == 0 );
@@ -192,7 +195,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     out_buffer_size = ::NS(Buffer_get_size)( out_buffer );
 
     ret = ::NS(OutputBuffer_prepare)( eb, out_buffer, particles,
-        num_elem_by_elem_turns, &elem_by_elem_output_offset,
+        until_turn_elem_by_elem, &elem_by_elem_output_offset,
             &beam_monitor_output_offset, &out_min_turn_id );
 
     ASSERT_TRUE( ret == 0 );
@@ -225,7 +228,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     out_min_turn_id = part_index_t{ 0 };
 
     ret = ::NS(OutputBuffer_calculate_output_buffer_params_for_particles_sets)(
-        eb, pb, buf_size_t{ 1 }, &pset_indices[ 0 ], num_elem_by_elem_turns,
+        eb, pb, buf_size_t{ 1 }, &pset_indices[ 0 ], until_turn_elem_by_elem,
             &num_objects, &num_slots, &num_dataptrs, &num_garbage, slot_size );
 
     ASSERT_TRUE( ret == 0 );
@@ -244,7 +247,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     out_buffer_size = ::NS(Buffer_get_size)( out_buffer );
 
     ret = ::NS(OutputBuffer_prepare_for_particle_sets)( eb, out_buffer,
-        pb, buf_size_t{ 1 }, &pset_indices[ 0 ], num_elem_by_elem_turns,
+        pb, buf_size_t{ 1 }, &pset_indices[ 0 ], until_turn_elem_by_elem,
             &elem_by_elem_output_offset, &beam_monitor_output_offset,
                 &out_min_turn_id );
 
@@ -279,7 +282,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
     ret = ::NS(OutputBuffer_calculate_output_buffer_params_detailed)(
         eb, min_part_id, max_part_id, min_elem_id, max_elem_id, min_turn_id,
-            max_turn_id, num_elem_by_elem_turns, &num_objects, &num_slots,
+            max_turn_id, until_turn_elem_by_elem, &num_objects, &num_slots,
                 &num_dataptrs, &num_garbage, slot_size );
 
     ASSERT_TRUE( ret == 0 );
@@ -301,7 +304,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
     ret = ::NS(OutputBuffer_prepare_detailed)( eb, out_buffer, min_part_id,
         max_part_id, min_elem_id, max_elem_id, min_turn_id, max_turn_id,
-            num_elem_by_elem_turns, &elem_by_elem_output_offset,
+            until_turn_elem_by_elem, &elem_by_elem_output_offset,
                 &beam_monitor_output_offset, &cmp_max_elem_by_elem_turn_id );
 
     ASSERT_TRUE( ret == 0 );
@@ -332,7 +335,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     /* ===================================================================== */
     /* Test case 3: only beam monitor output */
 
-    num_elem_by_elem_turns   = buf_size_t{ 0 };
+    until_turn_elem_by_elem  = buf_size_t{ 0 };
     max_elem_by_elem_turn_id = part_index_t{ 0 };
 
     buf_size_t num_turn_by_turn_turns = 10;
@@ -342,8 +345,8 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     buf_size_t beam_monitor_index = ::NS(Buffer_get_num_of_objects)( eb );
 
     ret = ::NS(BeamMonitor_insert_end_of_turn_monitors)( eb,
-        buf_size_t{ 0 }, num_turn_by_turn_turns, target_num_turns, skip_turns,
-            ::NS(Buffer_get_objects_end)( eb ) );
+        until_turn_elem_by_elem, num_turn_by_turn_turns, target_num_turns,
+            skip_turns, ::NS(Buffer_get_objects_end)( eb ) );
 
     SIXTRL_ASSERT( ret == 0 );
     SIXTRL_ASSERT( ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) ==
@@ -360,7 +363,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     out_buffer_size = buf_size_t{ 0 };
 
     ret = ::NS(OutputBuffer_calculate_output_buffer_params)( eb, particles,
-        num_elem_by_elem_turns, &num_objects, &num_slots, &num_dataptrs,
+        until_turn_elem_by_elem, &num_objects, &num_slots, &num_dataptrs,
             &num_garbage, slot_size );
 
     ASSERT_TRUE( ret == 0 );
@@ -380,7 +383,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     out_buffer_size = ::NS(Buffer_get_size)( out_buffer );
 
     ret = ::NS(OutputBuffer_prepare)( eb, out_buffer, particles,
-        num_elem_by_elem_turns, &elem_by_elem_output_offset,
+        until_turn_elem_by_elem, &elem_by_elem_output_offset,
             &beam_monitor_output_offset, &out_min_turn_id );
 
     ASSERT_TRUE( ret == 0 );
@@ -435,7 +438,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     out_min_turn_id = part_index_t{ 0 };
 
     ret = ::NS(OutputBuffer_calculate_output_buffer_params_for_particles_sets)(
-        eb, pb, buf_size_t{ 1 }, &pset_indices[ 0 ], num_elem_by_elem_turns,
+        eb, pb, buf_size_t{ 1 }, &pset_indices[ 0 ], until_turn_elem_by_elem,
             &num_objects, &num_slots, &num_dataptrs, &num_garbage, slot_size );
 
     ASSERT_TRUE( ret == 0 );
@@ -454,7 +457,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     out_buffer_size = ::NS(Buffer_get_size)( out_buffer );
 
     ret = ::NS(OutputBuffer_prepare_for_particle_sets)( eb, out_buffer,
-        pb, buf_size_t{ 1 }, &pset_indices[ 0 ], num_elem_by_elem_turns,
+        pb, buf_size_t{ 1 }, &pset_indices[ 0 ], until_turn_elem_by_elem,
             &elem_by_elem_output_offset, &beam_monitor_output_offset,
                 &out_min_turn_id );
 
@@ -511,7 +514,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
     ret = ::NS(OutputBuffer_calculate_output_buffer_params_detailed)(
         eb, min_part_id, max_part_id, min_elem_id, max_elem_id, min_turn_id,
-            max_turn_id, num_elem_by_elem_turns, &num_objects, &num_slots,
+            max_turn_id, until_turn_elem_by_elem, &num_objects, &num_slots,
                 &num_dataptrs, &num_garbage, slot_size );
 
     ASSERT_TRUE( ret == 0 );
@@ -533,7 +536,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
     ret = ::NS(OutputBuffer_prepare_detailed)( eb, out_buffer, min_part_id,
         max_part_id, min_elem_id, max_elem_id, min_turn_id, max_turn_id,
-            num_elem_by_elem_turns, &elem_by_elem_output_offset,
+            until_turn_elem_by_elem, &elem_by_elem_output_offset,
                 &beam_monitor_output_offset, &cmp_max_elem_by_elem_turn_id );
 
     ASSERT_TRUE( ret == 0 );
@@ -586,9 +589,10 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     /* ===================================================================== */
     /* Test case 4: Both elem by elem output and beam monitors */
 
-    num_elem_by_elem_turns = buf_size_t{ 5 };
+    until_turn_elem_by_elem = buf_size_t{ 5 };
 
-    max_elem_by_elem_turn_id = min_turn_id + num_elem_by_elem_turns;
+    max_elem_by_elem_turn_id = static_cast< part_index_t >(
+        until_turn_elem_by_elem - buf_size_t{ 1 } );
 
     if( max_elem_by_elem_turn_id < max_turn_id )
     {
@@ -611,7 +615,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     beam_monitor_index = ::NS(Buffer_get_num_of_objects)( eb );
 
     ret = ::NS(BeamMonitor_insert_end_of_turn_monitors)( eb,
-        num_elem_by_elem_turns, num_turn_by_turn_turns,
+        until_turn_elem_by_elem, num_turn_by_turn_turns,
         target_num_turns, skip_turns, ::NS(Buffer_get_objects_end)( eb ) );
 
     SIXTRL_ASSERT( ret == 0 );
@@ -629,7 +633,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     out_buffer_size = buf_size_t{ 0 };
 
     ret = ::NS(OutputBuffer_calculate_output_buffer_params)( eb, particles,
-        num_elem_by_elem_turns, &num_objects, &num_slots, &num_dataptrs,
+        until_turn_elem_by_elem, &num_objects, &num_slots, &num_dataptrs,
             &num_garbage, slot_size );
 
     ASSERT_TRUE( ret == 0 );
@@ -649,7 +653,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     out_buffer_size = ::NS(Buffer_get_size)( out_buffer );
 
     ret = ::NS(OutputBuffer_prepare)( eb, out_buffer, particles,
-        num_elem_by_elem_turns, &elem_by_elem_output_offset,
+        until_turn_elem_by_elem, &elem_by_elem_output_offset,
             &beam_monitor_output_offset, &out_min_turn_id );
 
     ASSERT_TRUE( ret == 0 );
@@ -711,7 +715,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     out_min_turn_id = part_index_t{ 0 };
 
     ret = ::NS(OutputBuffer_calculate_output_buffer_params_for_particles_sets)(
-        eb, pb, buf_size_t{ 1 }, &pset_indices[ 0 ], num_elem_by_elem_turns,
+        eb, pb, buf_size_t{ 1 }, &pset_indices[ 0 ], until_turn_elem_by_elem,
             &num_objects, &num_slots, &num_dataptrs, &num_garbage, slot_size );
 
     ASSERT_TRUE( ret == 0 );
@@ -730,7 +734,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     out_buffer_size = ::NS(Buffer_get_size)( out_buffer );
 
     ret = ::NS(OutputBuffer_prepare_for_particle_sets)( eb, out_buffer,
-        pb, buf_size_t{ 1 }, &pset_indices[ 0 ], num_elem_by_elem_turns,
+        pb, buf_size_t{ 1 }, &pset_indices[ 0 ], until_turn_elem_by_elem,
             &elem_by_elem_output_offset, &beam_monitor_output_offset,
                 &out_min_turn_id );
 
@@ -794,7 +798,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
     ret = ::NS(OutputBuffer_calculate_output_buffer_params_detailed)(
         eb, min_part_id, max_part_id, min_elem_id, max_elem_id, min_turn_id,
-            max_turn_id, num_elem_by_elem_turns, &num_objects, &num_slots,
+            max_turn_id, until_turn_elem_by_elem, &num_objects, &num_slots,
                 &num_dataptrs, &num_garbage, slot_size );
 
     ASSERT_TRUE( ret == 0 );
@@ -816,7 +820,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
     ret = ::NS(OutputBuffer_prepare_detailed)( eb, out_buffer, min_part_id,
         max_part_id, min_elem_id, max_elem_id, min_turn_id, max_turn_id,
-            num_elem_by_elem_turns, &elem_by_elem_output_offset,
+            until_turn_elem_by_elem, &elem_by_elem_output_offset,
                 &beam_monitor_output_offset, &cmp_max_elem_by_elem_turn_id );
 
     ASSERT_TRUE( ret == 0 );
