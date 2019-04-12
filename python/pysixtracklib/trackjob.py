@@ -45,7 +45,7 @@ class TrackJob(object):
         self._beam_elements_buffer = None
         self._ptr_c_beam_elements_buffer = st.st_Null
         self._output_buffer = None
-        self._ptr_c_output_buffer = st.st_Null
+        self._ptr_c_output_buffer = st.st_NullBuffer
 
         base_addr_t = ct.POINTER(ct.c_ubyte)
         success = False
@@ -88,28 +88,29 @@ class TrackJob(object):
                 ct.byref(num_slots), ct.byref(num_dataptrs),
                 ct.byref(num_garbage), slot_size)
 
-            if success and ret == 0 and \
-                    num_objects.value > 0 and num_slots.value > 0 and \
-                    num_dataptrs.value > 0 and num_garbage.value >= 0:
-                if output_buffer is None:
-                    output_buffer = CBuffer(max_slots=num_slots.value,
-                                            max_objects=num_objects.value,
-                                            max_pointers=num_dataptrs.value,
-                                            max_garbage=num_garbage.value)
-                else:
-                    output_buffer.allocate(max_slots=num_slots.value,
-                                           max_objects=num_objects.value,
-                                           max_pointers=num_dataptrs.value,
-                                           max_garbage=num_garbage.value)
+            if num_objects.value>0: #no outbuffer needed
+               if success and ret == 0 and \
+                       num_objects.value > 0 and num_slots.value > 0 and \
+                       num_dataptrs.value > 0 and num_garbage.value >= 0:
+                   if output_buffer is None:
+                       output_buffer = CBuffer(max_slots=num_slots.value,
+                                               max_objects=num_objects.value,
+                                               max_pointers=num_dataptrs.value,
+                                               max_garbage=num_garbage.value)
+                   else:
+                       output_buffer.allocate(max_slots=num_slots.value,
+                                              max_objects=num_objects.value,
+                                              max_pointers=num_dataptrs.value,
+                                              max_garbage=num_garbage.value)
 
-                assert(output_buffer is not None)
-                self._output_buffer = output_buffer
-                ptr = ct.cast(output_buffer.base, base_addr_t)
-                nn = ct.c_uint64(output_buffer.size)
-                self._ptr_c_output_buffer = st.st_Buffer_new_on_data(ptr, nn)
-                success = bool(self._ptr_c_output_buffer != st.st_NullBuffer)
-            elif ret != 0:
-                success = False
+                   assert(output_buffer is not None)
+                   self._output_buffer = output_buffer
+                   ptr = ct.cast(output_buffer.base, base_addr_t)
+                   nn = ct.c_uint64(output_buffer.size)
+                   self._ptr_c_output_buffer = st.st_Buffer_new_on_data(ptr, nn)
+                   success = bool(self._ptr_c_output_buffer != st.st_NullBuffer)
+               elif ret != 0:
+                   success = False
 
         if success:
             arch_str = arch_str.strip().lower()
