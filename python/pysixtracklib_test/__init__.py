@@ -5,5 +5,3 @@ from . import config
 from . import generic_obj
 from . import stcommon
 from .testdata import *
-
-
