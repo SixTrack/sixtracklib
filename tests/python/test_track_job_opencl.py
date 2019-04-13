@@ -111,7 +111,7 @@ if __name__ == '__main__':
     assert(job.type_str() == 'opencl')
     assert(job.has_output_buffer())
     assert(job.num_beam_monitors() > 0)
-    assert(job.has_elem_by_elem_outupt())
+    assert(job.has_elem_by_elem_output())
     assert(job.has_beam_monitor_output())
 
     status = job.track_elem_by_elem(until_turn_elem_by_elem)
