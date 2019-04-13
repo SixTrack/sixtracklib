@@ -4,66 +4,67 @@ import numpy as np
 
 class Particles(CObject):
     _typeid = 1
-    num_particles = CField(0, 'int64',  const=True)
-    q0 = CField(1, 'real',  length='num_particles',
+    num_particles = CField(0, 'int64', const=True)
+    q0 = CField(1, 'real', length='num_particles',
                 default=0.0, pointer=True, alignment=8)
-    mass0 = CField(2, 'real',  length='num_particles',
+    mass0 = CField(2, 'real', length='num_particles',
                    default=0.0, pointer=True, alignment=8)
-    beta0 = CField(3, 'real',  length='num_particles',
+    beta0 = CField(3, 'real', length='num_particles',
                    default=0.0, pointer=True, alignment=8)
-    gamma0 = CField(4, 'real',  length='num_particles',
+    gamma0 = CField(4, 'real', length='num_particles',
                     default=0.0, pointer=True, alignment=8)
-    p0c = CField(5, 'real',  length='num_particles',
+    p0c = CField(5, 'real', length='num_particles',
                  default=0.0, pointer=True, alignment=8)
-    s = CField(6, 'real',  length='num_particles',
+    s = CField(6, 'real', length='num_particles',
                default=0.0, pointer=True, alignment=8)
-    x = CField(7, 'real',  length='num_particles',
+    x = CField(7, 'real', length='num_particles',
                default=0.0, pointer=True, alignment=8)
-    y = CField(8, 'real',  length='num_particles',
+    y = CField(8, 'real', length='num_particles',
                default=0.0, pointer=True, alignment=8)
-    px = CField(9, 'real',  length='num_particles',
+    px = CField(9, 'real', length='num_particles',
                 default=0.0, pointer=True, alignment=8)
-    py = CField(10, 'real',  length='num_particles',
+    py = CField(10, 'real', length='num_particles',
                 default=0.0, pointer=True, alignment=8)
-    zeta = CField(11, 'real',  length='num_particles',
+    zeta = CField(11, 'real', length='num_particles',
                   default=0.0, pointer=True, alignment=8)
-    psigma = CField(12, 'real',  length='num_particles',
+    psigma = CField(12, 'real', length='num_particles',
                     default=0.0, pointer=True, alignment=8)
-    delta = CField(13, 'real',  length='num_particles',
+    delta = CField(13, 'real', length='num_particles',
                    default=0.0, pointer=True, alignment=8)
-    rpp = CField(14, 'real',  length='num_particles',
+    rpp = CField(14, 'real', length='num_particles',
                  default=1.0, pointer=True, alignment=8)
-    rvv = CField(15, 'real',  length='num_particles',
+    rvv = CField(15, 'real', length='num_particles',
                  default=1.0, pointer=True, alignment=8)
-    chi = CField(16, 'real',  length='num_particles',
+    chi = CField(16, 'real', length='num_particles',
                  default=0.0, pointer=True, alignment=8)
-    charge_ratio = CField(17, 'real',  length='num_particles',
+    charge_ratio = CField(17, 'real', length='num_particles',
                           default=1.0, pointer=True, alignment=8)
     particle_id = CField(18, 'int64', length='num_particles',
-                         default=-1,  pointer=True, alignment=8)
+                         default=-1, pointer=True, alignment=8)
     at_element = CField(19, 'int64', length='num_particles',
-                        default=-1,  pointer=True, alignment=8)
+                        default=-1, pointer=True, alignment=8)
     at_turn = CField(20, 'int64', length='num_particles',
-                     default=-1,  pointer=True, alignment=8)
+                     default=-1, pointer=True, alignment=8)
     state = CField(21, 'int64', length='num_particles',
-                   default=1,   pointer=True, alignment=8)
+                   default=1, pointer=True, alignment=8)
 
     def __init__(self, **kwargs):
         CObject.__init__(self, **kwargs)
 
-    sigma = property(lambda self: (self.beta0/self.beta)*self.zeta)
-    beta = property(lambda p:  (1+p.delta)/(1/p.beta0+p.ptau))
+    sigma = property(lambda self: (self.beta0 / self.beta) * self.zeta)
+    beta = property(lambda p: (1 + p.delta) / (1 / p.beta0 + p.ptau))
 
     @property
     def ptau(self):
-        return np.sqrt(self.delta**2+2*self.delta + 1/self.beta0**2)-1/self.beta0
+        return np.sqrt(self.delta**2 + 2 * self.delta +
+                       1 / self.beta0**2) - 1 / self.beta0
 
     def set_reference(self, p0c=7e12, mass0=938.272046e6, q0=1):
         self.q0 = 1
         self.mass0 = mass0
-        energy0 = np.sqrt(p0c**2+mass0**2)
-        self.beta0 = p0c/energy0
-        self.gamma0 = energy0/mass0
+        energy0 = np.sqrt(p0c**2 + mass0**2)
+        self.beta0 = p0c / energy0
+        self.gamma0 = energy0 / mass0
         self.p0c = p0c
         self.particle_id = np.arange(self.num_particles)
         return self
@@ -128,13 +129,30 @@ class Particles(CObject):
 
 
 def makeCopy(orig, cbuffer=None):
-    p = Particles(cbuffer=cbuffer, num_particles=orig.num_particles,
-                  q0=orig.q0, mass0=orig.mass0, beta0=orig.beta0, gamma0=orig.gamma0,
-                  p0c=orig.p0c, s=orig.s, x=orig.x, y=orig.y, px=orig.px, py=orig.py,
-                  zeta=orig.zeta, delta=orig.delta, psigma=orig.psigma, rpp=orig.rpp,
-                  rvv=orig.rvv, chi=orig.chi, charge_ratio=orig.charge_ratio,
-                  particle_id=orig.particle_id, at_element=orig.at_element,
-                  at_turn=orig.at_turn, state=orig.state)
+    p = Particles(
+        cbuffer=cbuffer,
+        num_particles=orig.num_particles,
+        q0=orig.q0,
+        mass0=orig.mass0,
+        beta0=orig.beta0,
+        gamma0=orig.gamma0,
+        p0c=orig.p0c,
+        s=orig.s,
+        x=orig.x,
+        y=orig.y,
+        px=orig.px,
+        py=orig.py,
+        zeta=orig.zeta,
+        delta=orig.delta,
+        psigma=orig.psigma,
+        rpp=orig.rpp,
+        rvv=orig.rvv,
+        chi=orig.chi,
+        charge_ratio=orig.charge_ratio,
+        particle_id=orig.particle_id,
+        at_element=orig.at_element,
+        at_turn=orig.at_turn,
+        state=orig.state)
 
     return p
 
