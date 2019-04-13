@@ -13,7 +13,7 @@ class TrackJob(object):
     def enabled_archs():
         enabled_archs = [arch_str for arch_str, flag in
                          stconf.SIXTRACKLIB_MODULES.items() if flag]
-        if not stconf.SIXTRACKLIB_MODULES.get('cpu', False):
+        if 'cpu' not in stconf.SIXTRACKLIB_MODULES:
             enabled_archs.append("cpu")
         return enabled_archs
 
@@ -35,8 +35,8 @@ class TrackJob(object):
                 beam_elements_buffer,
                 particles_buffer,
                 until_turn_elem_by_elem=0,
-                arch_str='cpu',
-                device_id_str=None,
+                arch='cpu',
+                device_id=None,
                 output_buffer=None,
                 config_str=None):
         self.ptr_st_track_job = st.st_NullTrackJob
@@ -61,8 +61,8 @@ class TrackJob(object):
             self._beam_elements_buffer = beam_elements_buffer
             self._ptr_c_beam_elements_buffer = \
                 st.st_Buffer_new_mapped_on_cbuffer(beam_elements_buffer)
-           if self._ptr_c_beam_elements_buffer == st.st_NullBuffer:
-               raise ValueError( "Issues with input beam elements buffer" )
+            if self._ptr_c_beam_elements_buffer == st.st_NullBuffer:
+                raise ValueError( "Issues with input beam elements buffer" )
 
         particles = st.st_Particles_buffer_get_particles(
             self._ptr_c_particles_buffer,0)
@@ -89,7 +89,7 @@ class TrackJob(object):
                 ct.byref(num_slots), ct.byref(num_dataptrs),
                 ct.byref(num_garbage), slot_size)
 
-            if ret == 0
+            if ret == 0:
                 if num_objects.value > 0 and num_slots.value > 0 and \
                     num_dataptrs.value > 0 and num_garbage.value >= 0:
                     if output_buffer is None:
@@ -114,7 +114,7 @@ class TrackJob(object):
                 if self._ptr_c_output_buffer == st.st_NullBuffer:
                     raise ValueError( "Unable to map (optional) output buffer" )
             else:
-                raise ValueError( "Error precalculating output buffer params" )
+                raise ValueError( "Error pre-calculating out buffer params" )
         elif output_buffer is not None:
             self._output_buffer = output_buffer
             self._ptr_c_output_buffer = \
@@ -122,28 +122,28 @@ class TrackJob(object):
             if self._ptr_c_output_buffer == st.st_NullBuffer:
                 raise ValueError( "Unable to map (optional) output buffer" )
 
-        assert((requires_output_buffer and
+        assert((needs_output_buffer and
                 self._ptr_c_output_buffer != st.st_NullBuffer ) or
-               ( not requires_output_buffer ))
+               ( not needs_output_buffer ))
 
-        arch_str = arch_str.strip().lower()
-        if not( stconf.SIXTRACKLIB_MODULES.get( arch_str, False) or
-               arch_str == 'cpu' ):
-            raise ValueError( "Unknown architecture" )
+        arch = arch.strip().lower()
+        if not( stconf.SIXTRACKLIB_MODULES.get( arch, False) is not False
+                or arch == 'cpu' ):
+            raise ValueError( "Unknown architecture {0}".format( arch, ) )
 
-        if device_id_str is not None:
+        if device_id is not None:
             if config_str is None:
-                config_str = device_id_str
+                config_str = device_id
             else:
-                config_str = device_id_str + ";" + config_str
+                config_str = device_id + ";" + config_str
         else:
             config_str = ""
 
-        arch_str = arch_str.encode('utf-8')
+        arch = arch.encode('utf-8')
         config_str = config_str.encode('utf-8')
 
         self.ptr_st_track_job = st.st_TrackJob_new_with_output(
-            ct.c_char_p(arch_str), self._ptr_c_particles_buffer,
+            ct.c_char_p(arch), self._ptr_c_particles_buffer,
             self._ptr_c_beam_elements_buffer, self._ptr_c_output_buffer,
             until_turn_elem_by_elem, ct.c_char_p(config_str))
 
@@ -152,28 +152,28 @@ class TrackJob(object):
 
 
     def __del__(self):
-        if self.ptr_st_track_job != st.st_Null:
+        if self.ptr_st_track_job != st.st_NullTrackJob:
             job_owns_output_buffer = st.st_TrackJob_owns_output_buffer(
                 self.ptr_st_track_job)
 
             st.st_TrackJob_delete(self.ptr_st_track_job)
-            self.ptr_st_track_job = st.st_Null
+            self.ptr_st_track_job = st.st_NullTrackJob
 
             if job_owns_output_buffer and \
-                    self._ptr_c_output_buffer != st.st_Null:
-                self._ptr_c_output_buffer = st.st_Null
+                self._ptr_c_output_buffer != st.st_NullBuffer:
+                self._ptr_c_output_buffer  = st.st_NullBuffer
 
-        if self._ptr_c_particles_buffer != st.st_Null:
+        if self._ptr_c_particles_buffer != st.st_NullBuffer:
             st.st_Buffer_delete(self._ptr_c_particles_buffer)
-            self._ptr_c_particles_buffer = st.st_Null
+            self._ptr_c_particles_buffer = st.st_NullBuffer
 
-        if self._ptr_c_beam_elements_buffer != st.st_Null:
+        if self._ptr_c_beam_elements_buffer != st.st_NullBuffer:
             st.st_Buffer_delete(self._ptr_c_beam_elements_buffer)
-            self._ptr_c_beam_elements_buffer = st.st_Null
+            self._ptr_c_beam_elements_buffer = st.st_NullBuffer
 
-        if self._ptr_c_output_buffer != st.st_Null:
+        if self._ptr_c_output_buffer != st.st_NullBuffer:
             st.st_Buffer_delete(self._ptr_c_output_buffer)
-            self._ptr_c_output_buffer = st.st_Null
+            self._ptr_c_output_buffer = st.st_NullBuffer
 
     @property
     def output_buffer(self):
@@ -216,7 +216,7 @@ class TrackJob(object):
     def num_beam_monitors(self):
         return st.st_TrackJob_get_num_beam_monitors(self.ptr_st_track_job)
 
-    def has_elem_by_elem_outupt(self):
+    def has_elem_by_elem_output(self):
         return st.st_TrackJob_has_elem_by_elem_output(self.ptr_st_track_job)
 
     def has_beam_monitor_output(self):
