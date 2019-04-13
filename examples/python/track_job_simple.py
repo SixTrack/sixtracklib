@@ -18,7 +18,7 @@ if __name__ == '__main__':
     # Print enabled architectures; pass any of these values as arch=
     # to the construction of the track job; default == cpu
     print("enabled archs: {0}".format(
-        pyst.TrackJob.enabled_archs().join(', ')))
+        ', '.join(pyst.TrackJob.enabled_archs())))
 
     # =========================================================================
     # CPU based Track Job:
