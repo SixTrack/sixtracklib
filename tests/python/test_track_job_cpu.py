@@ -101,7 +101,7 @@ if __name__ == '__main__':
     track_pb = CBuffer()
     track_particles = pyst.makeCopy(initial_particles, cbuffer=track_pb)
 
-    job = pyst.TrackJob( eb, track_pb, until_turn_elem_by_elem )
+    job = pyst.TrackJob(eb, track_pb, until_turn_elem_by_elem)
 
     assert(job.type_str() == 'cpu')
     assert(job.has_output_buffer())
