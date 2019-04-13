@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
     cmp_output_buffer, elem_by_elem_offset, output_offset, min_turn_id = \
         st_OutputBuffer_create_output_cbuffer(eb, cmp_track_pb,
-            until_turn_elem_by_elem=until_turn_elem_by_elem)
+                                              until_turn_elem_by_elem=until_turn_elem_by_elem)
 
     assert(cmp_output_buffer.n_objects == 3)
     assert(elem_by_elem_offset == 0)
@@ -104,7 +104,7 @@ if __name__ == '__main__':
 
     arch = "opencl"
     device = "0.0"
-    job = pyst.TrackJob( eb, track_pb, until_turn_elem_by_elem, arch, device )
+    job = pyst.TrackJob(eb, track_pb, until_turn_elem_by_elem, arch, device)
 
     print("job setup complete")
 
