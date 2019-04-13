@@ -299,7 +299,7 @@ st_OutputBuffer_required_for_tracking.argptypes = [
     ct.c_uint64]
 
 st_OutputBuffer_required_for_tracking_of_particle_sets = \
-    sixtracklib.st_OutputBuffer_required_for_tracking_of_particle_sets_ext
+    sixtracklib.st_OutputBuffer_required_for_tracking_of_particle_sets
 st_OutputBuffer_required_for_tracking_of_particle_sets.restype = ct.c_int32
 st_OutputBuffer_required_for_tracking_of_particle_sets.argptypes = [
     st_Buffer_p,
