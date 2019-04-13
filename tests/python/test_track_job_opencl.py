@@ -66,8 +66,8 @@ if __name__ == '__main__':
     cmp_particles = pyst.makeCopy(initial_particles, cbuffer=cmp_track_pb)
 
     cmp_output_buffer, elem_by_elem_offset, output_offset, min_turn_id = \
-        st_OutputBuffer_create_output_cbuffer(eb,
-                                              cmp_track_pb, until_turn_elem_by_elem=until_turn_elem_by_elem)
+        st_OutputBuffer_create_output_cbuffer(eb, cmp_track_pb,
+                                              until_turn_elem_by_elem=until_turn_elem_by_elem)
 
     assert(cmp_output_buffer.n_objects == 3)
     assert(elem_by_elem_offset == 0)
@@ -102,19 +102,16 @@ if __name__ == '__main__':
     track_pb = CBuffer()
     track_particles = pyst.makeCopy(initial_particles, cbuffer=track_pb)
 
-    track_pb = CBuffer()
-    track_particles = pyst.makeCopy(initial_particles, cbuffer=track_pb)
-
-    job = pyst.TrackJob("opencl", device_id_str="0.0",
-                        particles_buffer=track_pb, beam_elements_buffer=eb,
-                        until_turn_elem_by_elem=until_turn_elem_by_elem)
+    arch = "opencl"
+    device = "0.0"
+    job = pyst.TrackJob(eb, track_pb, until_turn_elem_by_elem, arch, device)
 
     print("job setup complete")
 
     assert(job.type_str() == 'opencl')
     assert(job.has_output_buffer())
     assert(job.num_beam_monitors() > 0)
-    assert(job.has_elem_by_elem_outupt())
+    assert(job.has_elem_by_elem_output())
     assert(job.has_beam_monitor_output())
 
     status = job.track_elem_by_elem(until_turn_elem_by_elem)
@@ -148,7 +145,5 @@ if __name__ == '__main__':
         particles = output_buffer.get_object(ii, pyst.Particles)
         assert(0 == pyst.particles.compareParticlesDifference(
             cmp_particles, particles, abs_treshold=ABS_DIFF))
-
-    print("compare finished")
 
     sys.exit(0)
