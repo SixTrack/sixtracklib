@@ -30,6 +30,7 @@ list( APPEND SIXTRACKL_CUDA_HOST_DEFINITIONS ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
      wrappers/argument_operations.h
      wrappers/context_operations.h
+     wrappers/extract_particles_address.h
      cuda_tools.h
      track_particles_kernel_c_wrapper.h
 )
@@ -37,6 +38,7 @@ set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
 set( SIXTRACKLIB_CUDA_PART_HOST_SOURCES
      wrappers/argument_operations.cu
      wrappers/context_operations.cu
+     wrappers/extract_particles_address.cu
      internal/track_particles_kernel_c_wrapper.cu
 )
 
@@ -130,12 +132,14 @@ set( SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS
      kernels/managed_buffer_remap.cuh
      kernels/managed_buffer_remap_kernel.cuh
      kernels/track_particles_kernel.cuh
+     kernels/extract_particles_address.cuh
 )
 
 set( SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES
      kernels/managed_buffer_remap.cu
      kernels/managed_buffer_remap_kernel.cu
      kernels/track_particles_kernel.cu
+     kernels/extract_particles_address.cu
 )
 
 add_library( sixtrack_cuda_device OBJECT
