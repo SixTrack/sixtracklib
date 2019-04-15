@@ -134,6 +134,17 @@ typedef struct NS(ParticlesGenericAddr)
 }
 NS(ParticlesGenericAddr);
 
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC
+NS(ParticlesGenericAddr)* NS(ParticlesAddr_preset)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT paddr );
+
+#endif /* !defined( _GPUCODE ) */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_store_addresses)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT paddr,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
 
 SIXTRL_FN SIXTRL_STATIC int NS(Particles_copy_from_generic_addr_data)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
@@ -1462,6 +1473,41 @@ SIXTRL_FN SIXTRL_STATIC bool NS(Particles_is_not_lost_value)(
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+
+SIXTRL_INLINE void NS(Particles_store_addresses)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT paddr,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p )
+{
+    typedef NS(buffer_addr_t) addr_t;
+
+    if( ( paddr != SIXTRL_NULLPTR ) && ( p != SIXTRL_NULLPTR ) )
+    {
+        paddr->num_particles      = p->num_particles;
+        paddr->q0_addr            = ( addr_t )( uintptr_t )p->q0;
+        paddr->mass0_addr         = ( addr_t )( uintptr_t )p->mass0;
+        paddr->beta0_addr         = ( addr_t )( uintptr_t )p->beta0;
+        paddr->gamma0_addr        = ( addr_t )( uintptr_t )p->gamma0;
+        paddr->p0c_addr           = ( addr_t )( uintptr_t )p->p0c;
+        paddr->s_addr             = ( addr_t )( uintptr_t )p->s;
+        paddr->x_addr             = ( addr_t )( uintptr_t )p->x;
+        paddr->y_addr             = ( addr_t )( uintptr_t )p->y;
+        paddr->px_addr            = ( addr_t )( uintptr_t )p->px;
+        paddr->py_addr            = ( addr_t )( uintptr_t )p->py;
+        paddr->zeta_addr          = ( addr_t )( uintptr_t )p->zeta;
+        paddr->psigma_addr        = ( addr_t )( uintptr_t )p->psigma;
+        paddr->delta_addr         = ( addr_t )( uintptr_t )p->delta;
+        paddr->rpp_addr           = ( addr_t )( uintptr_t )p->rpp;
+        paddr->rvv_addr           = ( addr_t )( uintptr_t )p->rvv;
+        paddr->chi_addr           = ( addr_t )( uintptr_t )p->chi;
+        paddr->charge_ratio_addr  = ( addr_t )( uintptr_t )p->charge_ratio;
+        paddr->particle_id_addr   = ( addr_t )( uintptr_t )p->particle_id;
+        paddr->at_element_id_addr = ( addr_t )( uintptr_t )p->at_element_id;
+        paddr->at_turn_addr       = ( addr_t )( uintptr_t )p->at_turn;
+        paddr->state_addr         = ( addr_t )( uintptr_t )p->state;
+    }
+
+    return;
+}
 
 SIXTRL_INLINE int NS(Particles_copy_from_generic_addr_data)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT dest,

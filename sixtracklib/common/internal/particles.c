@@ -28,6 +28,33 @@ static int NS(Particles_particle_id_merge_and_check_for_duplicate)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* NS(ParticlesAddr_preset)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT paddr )
+{
+    SIXTRL_STATIC_VAR NS(buffer_addr_t) const ZERO = ( NS(buffer_addr_t) )0u;
+
+    if( paddr != SIXTRL_NULLPTR )
+    {
+        paddr->num_particles = ( NS(particle_num_elements_t) )0u;
+
+        paddr->q0_addr = paddr->mass0_addr = paddr->beta0_addr = ZERO;
+        paddr->gamma0_addr = paddr->p0c_addr = ZERO;
+
+        paddr->s_addr  = paddr->x_addr  = paddr->y_addr =
+        paddr->px_addr = paddr->py_addr = ZERO;
+
+        paddr->psigma_addr = paddr->delta_addr = paddr->rpp_addr =
+        paddr->rvv_addr = paddr->chi_addr = paddr->charge_ratio_addr = ZERO;
+
+        paddr->particle_id_addr = paddr->at_element_id_addr =
+        paddr->at_turn_addr     = paddr->state_addr = ZERO;
+    }
+
+    return paddr;
+}
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* NS(Particles_preset_ext)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles )
 {
