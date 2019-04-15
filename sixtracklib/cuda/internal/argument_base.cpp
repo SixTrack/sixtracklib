@@ -134,6 +134,11 @@ namespace SIXTRL_CXX_NAMESPACE
             success = true;
         }
 
+        if( ( success ) && ( !this->hasArgumentBuffer() ) )
+        {
+            this->doSetHasArgumentBufferFlag( true );
+        }
+
         return success;
     }
 

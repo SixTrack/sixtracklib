@@ -110,17 +110,20 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     CudaContextBase::status_t CudaContextBase::doRemapSentCObjectsBuffer(
-        CudaContextBase::ptr_arg_base_t SIXTRL_RESTRICT arg )
+        CudaContextBase::ptr_arg_base_t SIXTRL_RESTRICT arg,
+        CudaContextBase::size_type const arg_size )
     {
         using  _this_t = CudaContextBase;
         using status_t = _this_t::status_t;
         using   size_t = _this_t::size_type;
 
+        SIXTRL_ASSERT( arg != nullptr );
+
         status_t status = status_t{ -1 };
+        size_t len = ( arg->size() > arg_size ) ? arg->size() : arg_size;
 
         SIXTRL_ASSERT( this->readyForRemap() );
-        SIXTRL_ASSERT( arg != nullptr );
-        SIXTRL_ASSERT( arg->size() > size_t{ 0 } );
+        SIXTRL_ASSERT( len > size_t{ 0 } );
 
         if( ( arg->hasArgumentBuffer() ) && ( this->type() == arg->type() ) &&
             ( arg->usesCObjectsBuffer() ) )

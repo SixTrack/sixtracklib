@@ -170,6 +170,68 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return ptr_ctx;
     }
+}
+
+::NS(CudaArgument)* NS(CudaArgument_new)(
+    ::NS(CudaContext)* SIXTRL_RESTRICT ctx )
+{
+    return new SIXTRL_CXX_NAMESPACE::CudaArgument( ctx );
+}
+
+::NS(CudaArgument)*
+NS(CudaArgument_new_from_buffer)( ::NS(Buffer)* SIXTRL_RESTRICT buffer,
+    ::NS(CudaContext)* SIXTRL_RESTRICT ctx )
+{
+    return new SIXTRL_CXX_NAMESPACE::CudaArgument( buffer, ctx );
+}
+
+::NS(CudaArgument)* NS(CudaArgument_new_from_size)(
+    ::NS(context_size_t) const capacity,
+    ::NS(CudaContext)* SIXTRL_RESTRICT ctx )
+{
+    return new SIXTRL_CXX_NAMESPACE::CudaArgument( capacity, ctx );
+}
+
+::NS(CudaArgument)* NS(CudaArgument_new_from_memory)(
+    void const* SIXTRL_RESTRICT raw_arg_begin,
+    ::NS(context_size_t) const raw_arg_length,
+    ::NS(CudaContext)* SIXTRL_RESTRICT ctx )
+{
+    return new SIXTRL_CXX_NAMESPACE::CudaArgument(
+        raw_arg_begin, raw_arg_length, ctx );
+}
+
+void NS(CudaArgument_delete)( ::NS(CudaArgument)* SIXTRL_RESTRICT argument )
+{
+    delete argument;
+}
+
+bool NS(CudaArgument_send_buffer)( ::NS(CudaArgument)* SIXTRL_RESTRICT arg,
+    const NS(Buffer) *const SIXTRL_RESTRICT source_buffer )
+{
+    return ( arg != nullptr ) ? arg->send( source_buffer ) : false;
+}
+
+bool NS(CudaArgument_send_memory)( ::NS(CudaArgument)* SIXTRL_RESTRICT arg,
+    const void *const SIXTRL_RESTRICT source_arg_begin,
+    ::NS(context_size_t) const source_arg_length )
+{
+    return ( arg != nullptr )
+        ? arg->send( source_arg_begin, source_arg_length ) : false;
+}
+
+bool NS(CudaArgument_receive_buffer)( ::NS(CudaArgument)* SIXTRL_RESTRICT arg,
+    ::NS(Buffer)* SIXTRL_RESTRICT destination_buffer )
+{
+    return ( arg != nullptr ) ? arg->receive( destination_buffer ) : false;
+}
+
+bool NS(CudaArgument_receive_memory)( ::NS(CudaArgument)* SIXTRL_RESTRICT arg,
+    void* SIXTRL_RESTRICT destination_buffer,
+    ::NS(context_size_t) const destination_capacity )
+{
+    return ( arg != nullptr )
+        ? arg->receive( destination_buffer, arg->size() ) : false;
 
 }
 

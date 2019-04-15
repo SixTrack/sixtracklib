@@ -20,7 +20,7 @@
     #include "sixtracklib/cuda/cuda_tools.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-__global__ void NS(ManagedBuffer_remap_kernel_cuda)(
+__global__ void NS(ManagedBuffer_remap_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
     uint64_t const slot_size )
 {

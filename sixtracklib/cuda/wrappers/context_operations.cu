@@ -9,14 +9,15 @@
 #include "sixtracklib/cuda/wrappers/context_operations.h"
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/context/definitions.h"
+#include "sixtracklib/common/buffer.h"
 
 
-#include "sixtracklib/cuda/internal/argument_base.h"
-// #include "sixtracklib/cuda/kernels/managed_buffer_remap.cuh"
+// #include "sixtracklib/cuda/internal/argument_base.h"
+#include "sixtracklib/cuda/kernels/managed_buffer_remap.cuh"
 
 
 NS(context_status_t) NS(CudaContext_perform_send)(
-    NS(cuda_arg_buffer_t) SIXTRL_RESTRICT destination,
+    void* SIXTRL_RESTRICT destination,
     const void *const SIXTRL_RESTRICT source_begin,
     NS(context_size_t) const source_length )
 {
@@ -44,7 +45,7 @@ NS(context_status_t) NS(CudaContext_perform_send)(
 NS(context_status_t) NS(CudaContext_perform_receive)(
     void* SIXTRL_RESTRICT destination,
     NS(context_size_t) const destination_capacity,
-    NS(cuda_arg_buffer_t) SIXTRL_RESTRICT source_begin,
+    void* SIXTRL_RESTRICT source_begin,
     NS(context_size_t) const source_length )
 {
     typedef NS(context_status_t) status_t;
@@ -70,8 +71,8 @@ NS(context_status_t) NS(CudaContext_perform_receive)(
 }
 
 NS(context_status_t) NS(CudaContext_perform_remap_send_cobject_buffer_on_grid)(
-    NS(cuda_arg_buffer_t) SIXTRL_RESTRICT arg_buffer,
-    NS(buffer_size_t) const slot_size,
+    void* SIXTRL_RESTRICT arg_buffer,
+    NS(context_size_t) const slot_size,
     NS(context_size_t) const grid_num_blocks,
     NS(context_size_t) const threads_per_block )
 {
@@ -94,10 +95,9 @@ NS(context_status_t) NS(CudaContext_perform_remap_send_cobject_buffer_on_grid)(
         block_dim.y = 1;
         block_dim.z = 1;
 
-//         NS(ManagedBuffer_remap_cuda)<<< grid_dim, block_dim >>>(
-//             ( unsigned char* )arg_buffer, slot_size );
-        ( void )grid_dim;
-        ( void )block_dim;
+        NS(ManagedBuffer_remap_cuda)<<< grid_dim, block_dim >>>(
+            ( unsigned char* )arg_buffer, slot_size );
+
         status = status_t{ 0 };
     }
 
@@ -105,7 +105,7 @@ NS(context_status_t) NS(CudaContext_perform_remap_send_cobject_buffer_on_grid)(
 }
 
 NS(context_status_t) NS(CudaContext_perform_remap_send_cobject_buffer)(
-    NS(cuda_arg_buffer_t) SIXTRL_RESTRICT arg_buffer,
+    void* SIXTRL_RESTRICT arg_buffer,
     NS(buffer_size_t) const slot_size )
 {
     return NS(CudaContext_perform_remap_send_cobject_buffer_on_grid)(

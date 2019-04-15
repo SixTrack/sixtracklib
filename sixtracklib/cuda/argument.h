@@ -83,7 +83,55 @@ namespace SIXTRL_CXX_NAMESPACE
     };
 }
 
+typedef SIXTRL_CXX_NAMESPACE::CudaArgument NS(CudaArgument);
+
+#else /* !defined( __cplusplus ) */
+
+typedef void NS(CudaArgument);
+
 #endif /* defined( __cplusplus ) */
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/cuda/context.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)* NS(CudaArgument_new)(
+    NS(CudaContext)* SIXTRL_RESTRICT context );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
+NS(CudaArgument_new_from_buffer)(
+    NS(Buffer)* SIXTRL_RESTRICT buffer, NS(CudaContext)* SIXTRL_RESTRICT ctx );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
+NS(CudaArgument_new_from_size)(
+    NS(context_size_t) const capacity, NS(CudaContext)* SIXTRL_RESTRICT ctx );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
+NS(CudaArgument_new_from_memory)(
+    void const* SIXTRL_RESTRICT raw_arg_begin,
+    NS(context_size_t) const raw_arg_length,
+    NS(CudaContext)* SIXTRL_RESTRICT ctx );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(CudaArgument_delete)(
+    NS(CudaArgument)* SIXTRL_RESTRICT argument );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_send_buffer)(
+    NS(CudaArgument)* SIXTRL_RESTRICT argument,
+    const NS(Buffer) *const SIXTRL_RESTRICT source_buffer );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_send_memory)(
+    NS(CudaArgument)* SIXTRL_RESTRICT argument,
+    const void *const SIXTRL_RESTRICT source_arg_begin,
+    NS(context_size_t) const source_arg_length );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_receive_buffer)(
+    NS(CudaArgument)* SIXTRL_RESTRICT argument,
+    NS(Buffer)* SIXTRL_RESTRICT destination_buffer );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_receive_memory)(
+    NS(CudaArgument)* SIXTRL_RESTRICT argument,
+    void* SIXTRL_RESTRICT destination_buffer,
+    NS(context_size_t) const destination_capacity );
 
 #endif /* SIXTRACKLIB_CUDA_ARGUMENT_H__ */
 

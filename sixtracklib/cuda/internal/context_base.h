@@ -52,7 +52,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using c_buffer_t     = ::NS(Buffer);
         using status_t       = int32_t;
 
-        SIXTRL_HOST_FN virtual ~CudaContextBase();
+        SIXTRL_HOST_FN virtual ~CudaContextBase() = default;
 
         protected:
 
@@ -79,7 +79,8 @@ namespace SIXTRL_CXX_NAMESPACE
             ptr_arg_base_t SIXTRL_RESTRICT source ) override;
 
         SIXTRL_HOST_FN virtual status_t doRemapSentCObjectsBuffer(
-            ptr_arg_base_t SIXTRL_RESTRICT arg ) override;
+            ptr_arg_base_t SIXTRL_RESTRICT arg,
+            size_type const arg_size ) override;
     };
 }
 

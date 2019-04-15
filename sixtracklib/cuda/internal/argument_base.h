@@ -25,6 +25,7 @@
     #include "sixtracklib/common/context/argument_base.h"
     #include "sixtracklib/common/context/context_base.h"
     #include "sixtracklib/common/context/context_base_with_nodes.h"
+    #include "sixtracklib/cuda/definitions.h"
 
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -51,7 +52,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using ptr_base_context_t       = _base_arg_t::ptr_base_context_t;
         using ptr_const_base_context_t = _base_arg_t::ptr_const_base_context_t;
 
-        using cuda_arg_buffer_t   = void*;
+        using cuda_arg_buffer_t        = ::NS(cuda_arg_buffer_t);
 
         SIXTRL_HOST_FN virtual ~CudaArgumentBase() SIXTRL_NOEXCEPT;
 
@@ -111,16 +112,11 @@ extern "C" {
 
 #if defined( __cplusplus )
 
-typedef SIXTRL_CXX_NAMESPACE::CudaArgumentBase
-        NS(CudaArgumentBase);
-
-typedef SIXTRL_CXX_NAMESPACE::CudaArgumentBase::cuda_arg_buffer_t
-        NS(cuda_arg_buffer_t);
+typedef SIXTRL_CXX_NAMESPACE::CudaArgumentBase NS(CudaArgumentBase);
 
 #else /* !defined( __cplusplus ) */
 
 typedef void  NS(CudaArgumentBase);
-typedef void* NS(cuda_arg_buffer_t);
 
 #endif /* defined( __cplusplus ) */
 

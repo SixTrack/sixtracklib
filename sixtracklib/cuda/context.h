@@ -60,7 +60,18 @@ namespace SIXTRL_CXX_NAMESPACE
     };
 }
 
+typedef SIXTRL_CXX_NAMESPACE::CudaContext     NS(CudaContext);
+
+#else /* !defined( __cplusplus ) */
+
+typedef void NS(CudaContext);
+
 #endif /* defined( __cplusplus ) */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaContext)* NS(CudaContext_create)( void );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(CudaContext_delete)(
+    NS(CudaContext)* SIXTRL_RESTRICT context );
 
 #endif /* SIXTRACKLIB_CUDA_CONTEXT_H__ */
 
