@@ -30,11 +30,20 @@ TEST( C99_CudaArgumentTests, ArgumentCObjectBufferTest )
     using buf_size_t  = ::NS(buffer_size_t);
     using ctx_size_t  = ::NS(context_size_t);
 
-    buf_size_t const NUM_PARTICLES = 100;
+    buf_size_t const NUM_PARTICLES = 1000;
     buffer_t* pb = ::NS(Buffer_new)( 0u );
+
+    buffer_t* cmp_pb = ::NS(Buffer_new)( 0u );
 
     particles_t* particles = ::NS(Particles_new)( pb, NUM_PARTICLES );
     SIXTRL_ASSERT( particles != nullptr );
+
+    ::NS(Particles_realistic_init)( particles );
+
+    particles_t* cmp_particles = ::NS(Particles_add_copy)( cmp_pb, particles );
+    SIXTRL_ASSERT( cmp_particles != nullptr );
+    SIXTRL_ASSERT( ::NS(Particles_compare_values)(
+        particles, cmp_particles ) == 0 );
 
     context_t*  context = ::NS(CudaContext_create)();
     ASSERT_TRUE( context != nullptr );
@@ -45,13 +54,26 @@ TEST( C99_CudaArgumentTests, ArgumentCObjectBufferTest )
     bool success = ::NS(CudaArgument_send_buffer)( particles_arg, pb );
     ASSERT_TRUE( success );
 
+    success = ::NS(CudaArgument_receive_buffer)( particles_arg, pb );
+    ASSERT_TRUE( success );
+
+    particles = ::NS(Particles_buffer_get_particles)( pb, 00 );
+    ASSERT_TRUE( particles != nullptr );
+
+    ASSERT_TRUE( ::NS(Particles_compare_values)(
+        particles, cmp_particles ) == 0 );
+
     ::NS(CudaArgument_delete)( particles_arg );
     ::NS(CudaContext_delete)( context );
     ::NS(Buffer_delete)( pb );
+    ::NS(Buffer_delete)( cmp_pb );
+
+    cmp_particles = nullptr;
+    particles = nullptr;
 
     context = nullptr;
     particles_arg = nullptr;
-    particles = nullptr;
+    cmp_pb = nullptr;
     pb = nullptr;
 }
 
