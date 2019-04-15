@@ -76,7 +76,7 @@ __global__ void NS(ManagedBuffer_remap_cuda_debug)(
                     success_flag |= ( uint32_t )0x10000000;
                 }
             }
-            else if( buffer_begin != SIXTRL_NULLPTR )
+            else if( buffer != SIXTRL_NULLPTR )
             {
                 success_flag = ( uint32_t )0x20000000;
             }
