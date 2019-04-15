@@ -68,10 +68,18 @@ typedef void NS(CudaContext);
 
 #endif /* defined( __cplusplus ) */
 
+#if defined( __cplusplus ) && ( !defined( _GPUCODE ) )
+extern "C" {
+#endif /* defined( __cplusplus ) && ( !defined( _GPUCODE ) */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaContext)* NS(CudaContext_create)( void );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(CudaContext_delete)(
     NS(CudaContext)* SIXTRL_RESTRICT context );
+
+#if defined( __cplusplus ) && ( !defined( _GPUCODE ) )
+}
+#endif /* defined( __cplusplus ) && ( !defined( _GPUCODE ) */
 
 #endif /* SIXTRACKLIB_CUDA_CONTEXT_H__ */
 

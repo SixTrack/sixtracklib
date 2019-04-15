@@ -95,6 +95,10 @@ typedef void NS(CudaArgument);
     #include "sixtracklib/cuda/context.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
+#if defined( __cplusplus ) && ( !defined( _GPUCODE ) )
+extern "C" {
+#endif /* defined( __cplusplus ) && ( !defined( _GPUCODE ) */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)* NS(CudaArgument_new)(
     NS(CudaContext)* SIXTRL_RESTRICT context );
 
@@ -132,6 +136,10 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_receive_memory)(
     NS(CudaArgument)* SIXTRL_RESTRICT argument,
     void* SIXTRL_RESTRICT destination_buffer,
     NS(context_size_t) const destination_capacity );
+
+#if defined( __cplusplus ) && ( !defined( _GPUCODE ) )
+}
+#endif /* defined( __cplusplus ) && ( !defined( _GPUCODE ) */
 
 #endif /* SIXTRACKLIB_CUDA_ARGUMENT_H__ */
 
