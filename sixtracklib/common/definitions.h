@@ -291,7 +291,7 @@
         #endif /* !defined( SIXTRL_STATIC_VAR ) */
 
         #if !defined( SIXTRL_INLINE )
-            #define SIXTRL_INLINE
+            #define SIXTRL_INLINE inline
         #endif /* !defined( SIXTRL_INLINE ) */
 
         /* ---------------------------------------------------------------- */
