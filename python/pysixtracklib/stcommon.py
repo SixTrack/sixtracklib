@@ -1,6 +1,7 @@
 import ctypes as ct
 from . import config as stconf
 from .particles import Particles as st_Particles
+from .config import SIXTRACKLIB_MODULES
 from cobjects import CBuffer
 
 sixtracklib = ct.CDLL(stconf.SHARED_LIB)
@@ -526,6 +527,64 @@ st_TrackJob_get_beam_monitor_output_buffer_offset = \
 st_TrackJob_get_beam_monitor_output_buffer_offset.argtypes = [st_TrackJob_p]
 st_TrackJob_get_beam_monitor_output_buffer_offset.restype = ct.c_uint64
 
+# -----------------------------------------------------------------------------
+# Cuda-Context methods
+
+if SIXTRACKLIB_MODULES.get( 'cuda', False ):
+
+    st_CudaContext_p    = ct.c_void_p
+    st_NullCudaContext  = ct.cast( 0, st_CudaContext_p )
+
+    st_CudaArgument_p   = ct.c_void_p
+    st_NullCudaArgument = ct.cast( 0, st_CudaArgument_p )
+
+    st_CudaContext_create = sixtracklib.st_CudaContext_create
+    st_CudaContext_create.argtypes = None
+    st_CudaContext_create.restype = st_CudaContext_p
+
+    st_CudaContext_delete = sixtracklib.st_CudaContext_delete
+    st_CudaContext_delete.argtypes = [ st_CudaContext_p ]
+    st_CudaContext_delete.restype  = None
+
+    st_CudaArgument_new = sixtracklib.st_CudaArgument_new
+    st_CudaArgument_new.argtypes = [ st_CudaContext_p ]
+    st_CudaArgument_new.restype  = st_CudaArgument_p
+
+    st_CudaArgument_new_from_buffer = \
+        sixtracklib.st_CudaArgument_new_from_buffer
+    st_CudaArgument_new_from_buffer.restype = st_CudaArgument_p
+    st_CudaArgument_new_from_buffer.argtypes = [ st_Buffer_p, st_CudaContext_p ]
+
+    st_CudaArgument_new_from_size = sixtracklib.st_CudaArgument_new_from_size
+    st_CudaArgument_new_from_size.restype = st_CudaArgument_p
+    st_CudaArgument_new_from_size.argtypes = [ ct.c_uint64, st_CudaContext_p ]
+
+    st_CudaArgument_new_from_memory = sixtracklib.st_CudaArgument_new_from_memory
+    st_CudaArgument_new_from_memory.restype = st_CudaArgument_p
+    st_CudaArgument_new_from_memory.argtypes = [
+        ct.c_void_p, ct.c_uint64, st_CudaContext_p ]
+
+    st_CudaArgument_delete = sixtracklib.st_CudaArgument_delete
+    st_CudaArgument_delete.restype = None
+    st_CudaArgument_delete.argtypes = [ st_CudaArgument_p ]
+
+    st_CudaArgument_send_buffer = sixtracklib.st_CudaArgument_send_buffer
+    st_CudaArgument_send_buffer.restype = ct.c_bool
+    st_CudaArgument_send_buffer.argtypes = [ st_CudaArgument_p, st_Buffer_p ]
+
+    st_CudaArgument_send_memory = sixtracklib.st_CudaArgument_send_memory
+    st_CudaArgument_send_memory.restype = ct.c_bool
+    st_CudaArgument_send_memory.argtypes = [
+            st_CudaArgument_p, ct.c_void_p, ct.c_uint64 ]
+
+    st_CudaArgument_receive_buffer = sixtracklib.st_CudaArgument_receive_buffer
+    st_CudaArgument_receive_buffer.restype = ct.c_bool
+    st_CudaArgument_receive_buffer.argtypes = [ st_CudaArgument_p, st_Buffer_p ]
+
+    st_CudaArgument_receive_memory = sixtracklib.st_CudaArgument_receive_memory
+    st_CudaArgument_receive_memory.restype = ct.c_bool
+    st_CudaArgument_receive_memory.argtypes = [
+            st_CudaArgument_p, ct.c_void_p, ct.c_uint64 ]
 
 # -----------------------------------------------------------------------------
 # Cl-Context methods
