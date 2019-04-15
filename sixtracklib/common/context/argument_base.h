@@ -64,7 +64,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN bool receive(
             void* SIXTRL_RESTRICT arg_begin,
-            size_type const arg_size );
+            size_type const arg_capacity );
 
         SIXTRL_HOST_FN bool usesCObjectsCxxBuffer() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN buffer_t* ptrCObjectsCxxBuffer() const SIXTRL_NOEXCEPT;

@@ -78,7 +78,8 @@ namespace SIXTRL_CXX_NAMESPACE
             ptr_arg_base_t SIXTRL_RESTRICT source );
 
         SIXTRL_HOST_FN status_t remapSentCObjectsBuffer(
-            ptr_arg_base_t SIXTRL_RESTRICT arg );
+            ptr_arg_base_t SIXTRL_RESTRICT arg,
+            size_type const arg_size = size_type{ 0 } );
 
         SIXTRL_HOST_FN bool isInDebugMode() const SIXTRL_NOEXCEPT;
 
@@ -114,7 +115,8 @@ namespace SIXTRL_CXX_NAMESPACE
             ptr_arg_base_t SIXTRL_RESTRICT source );
 
         SIXTRL_HOST_FN virtual status_t doRemapSentCObjectsBuffer(
-            ptr_arg_base_t SIXTRL_RESTRICT arg );
+            ptr_arg_base_t SIXTRL_RESTRICT arg,
+            size_type arg_size );
 
         SIXTRL_HOST_FN void doSetTypeId(
             type_id_t const type_id ) SIXTRL_NOEXCEPT;

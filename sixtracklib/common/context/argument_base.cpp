@@ -282,7 +282,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     bool ArgumentBase::receive( void* SIXTRL_RESTRICT raw_arg_begin,
-        ArgumentBase::size_type const raw_arg_length )
+        ArgumentBase::size_type const raw_arg_capacity )
     {
         bool success = false;
 
@@ -291,11 +291,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
         ptr_base_context_t ptr_context = this->ptrBaseContext();
 
-        if( ptr_context != nullptr )
+        if( ( ptr_context != nullptr ) &&
+            ( raw_arg_capacity >= this->size() ) )
         {
             SIXTRL_STATIC_VAR status_t const RECV_OK = status_t{ 0 };
             success = ( RECV_OK == ptr_context->receive(
-                raw_arg_begin, raw_arg_length, this ) );
+                raw_arg_begin, this->size(), this ) );
         }
 
         return success;

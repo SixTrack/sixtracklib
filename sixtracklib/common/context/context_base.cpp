@@ -116,7 +116,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( status == status_t{ 0 } )
             {
-                status = this->doRemapSentCObjectsBuffer( arg );
+                status = this->doRemapSentCObjectsBuffer( arg, src_size );
             }
         }
 
@@ -146,7 +146,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( status == status_t{ 0 } )
             {
-                status = this->doRemapSentCObjectsBuffer( arg );
+                status = this->doRemapSentCObjectsBuffer( arg, src_size );
             }
         }
 
@@ -246,13 +246,14 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     ContextBase::status_t ContextBase::remapSentCObjectsBuffer(
-        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT arg )
+        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT arg,
+        ContextBase::size_type const arg_size )
     {
         ContextBase::status_t status = ContextBase::status_t{ -1 };
 
         if( ( arg != nullptr ) && ( this->readyForRemap() ) )
         {
-            status = this->doRemapSentCObjectsBuffer( arg );
+            status = this->doRemapSentCObjectsBuffer( arg, arg_size );
         }
 
         return status;
@@ -308,7 +309,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     ContextBase::status_t ContextBase::doRemapSentCObjectsBuffer(
-        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT )
+        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT,
+        ContextBase::size_type const )
     {
         return ContextBase::status_t{ -1 };
     }
