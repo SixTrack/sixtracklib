@@ -1,32 +1,26 @@
-#if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/context/context_base_with_nodes.h"
-#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+#include "sixtracklib/common/context/context_base_with_nodes.h"
 
-#if defined( __cplusplus )
-    #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-        #include <algorithm>
-        #include <cstddef>
-        #include <cstdint>
-        #include <cstdlib>
-        #include <string>
-        #include <iostream>
-        #include <iomanip>
-        #include <vector>
-    #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
-#endif /* defined( __cplusplus ) */
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <vector>
 
-#if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/context/compute_arch.h"
-    #include "sixtracklib/common/context/context_base.h"
-#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/context/compute_arch.h"
+#include "sixtracklib/common/context/context_base.h"
 
 namespace SIXTRL_CXX_NAMESPACE
 {
     ContextOnNodesBase::ContextOnNodesBase(
-        const char *const SIXTRL_RESTRICT config_str,
-        ContextOnNodesBase::type_id_t const type_id ) :
-        ContextBase( config_str, type_id ),
+        ContextOnNodesBase::type_id_t const type_id,
+        const char *const SIXTRL_RESTRICT type_id_str,
+        const char *const SIXTRL_RESTRICT config_str ) :
+        ContextBase( type_id, type_id_str, config_str ),
         m_available_nodes_id(),
         m_available_nodes_info(),
         m_selected_node_id_str( 32u, char{ '\0' } ),

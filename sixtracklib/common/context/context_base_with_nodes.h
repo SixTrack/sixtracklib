@@ -4,7 +4,6 @@
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #if defined( __cplusplus )
         #include <cstddef>
-        #include <cstdint>
         #include <cstdlib>
         #include <string>
         #include <iostream>
@@ -12,10 +11,11 @@
     #else  /* defined( __cplusplus ) */
         #include <stdbool.h>
         #include <stddef.h>
-        #include <stdint.h>
         #include <stdlib.h>
         #include <string.h>
     #endif /* defined( __cplusplus ) */
+
+    #include <stdint.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
@@ -214,8 +214,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
-        ContextOnNodesBase( const char *const SIXTRL_RESTRICT config_str,
-            type_id_t const type_id );
+        ContextOnNodesBase(
+            type_id_t const type_id, const char *const type_id_str,
+            const char *const SIXTRL_RESTRICT config_str = nullptr );
 
         ContextOnNodesBase( ContextOnNodesBase const& other ) = default;
         ContextOnNodesBase( ContextOnNodesBase&& other ) = default;

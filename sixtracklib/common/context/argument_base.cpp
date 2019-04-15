@@ -1,9 +1,10 @@
-#include "sixtracklib/common/context/argument_base.cpp"
+#include "sixtracklib/common/context/argument_base.h"
 
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <memory>
 #include <stdexcept>
 #include <utility>
@@ -16,194 +17,285 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    bool ArgumentBase::write()
+    bool ArgumentBase::send()
     {
         bool success = false;
 
         if( this->usesCObjectsCxxBuffer() )
         {
-            success = this->write( this->cobjectsCxxBuffer() );
+            success = this->send( this->cobjectsCxxBuffer() );
         }
         else if( this->usesCObjectsBuffer() )
         {
-            success = this->write( this->ptrCObjectsBuffer() );
+            success = this->send( this->ptrCObjectsBuffer() );
         }
         else if( this->usesRawArgument() )
         {
-            success = this->write( this->ptrRawArgument(), this->size() );
+            success = this->send( this->ptrRawArgument(), this->size() );
         }
 
         return success;
     }
 
-    bool ArgumentBase::write(
-        ArgumentBase::buffer_t& SIXTRL_RESTRICT_REF buffer )
+    bool ArgumentBase::send(
+        ArgumentBase::buffer_t const& SIXTRL_RESTRICT_REF buffer )
     {
         bool success = false;
 
-        if( this->doWriteAndRemapCObjectBuffer( buffer.getCApiPtr() ) )
+        using status_t           = ArgumentBase::status_t;
+        using size_t             = ArgumentBase::size_type;
+        using ptr_base_context_t = ArgumentBase::ptr_base_context_t;
+
+        ptr_base_context_t ptr_context = this->ptrBaseContext();
+
+        if( ptr_context != nullptr )
         {
-            if( !this->usesCObjectsBuffer() )
-            {
-                this->doSetPtrC99Buffer( buffer.getCApiPtr() );
-
-                if( !this->usesCObjectsCxxBuffer() )
-                {
-                    this->doSetPtrCxxBuffer( &buffer );
-                }
-            }
-
             success = true;
-        }
 
-        return success;
-    }
-
-    bool ArgumentBase::write(
-        ArgumentBase::c_buffer_t* SIXTRL_RESTRICT ptr_c_buffer )
-    {
-        bool success = false;
-
-        if( this->doWriteAndRemapCObjectBuffer( ptr_cbuffer ) )
-        {
-            if( !this->usesCObjectsBuffer() )
+            if( this->usesRawArgument() )
             {
-                this->doSetPtrC99Buffer( ptr_cbuffer );
+                this->doSetPtrRawArgument( nullptr );
             }
 
-            success = true;
-        }
-
-        return success;
-    }
-
-    bool ArgumentBase::write( void const* SIXTRL_RESTRICT arg_begin,
-        ArgumentBase::size_type const arg_size )
-    {
-        using size_t = ArgumentBase::size_type;
-
-        bool success = false;
-
-        if( ( arg_begin != nullptr ) && ( arg_size > size_t{ 0 } ) )
-        {
-            if( this->usesCObjectsCxxBuffer() )
-            {
-                this->doSetPtrCxxBuffer( nullptr );
-            }
-
-            if( this->usesCObjectsBuffer() )
-            {
-                this->doSetPtrC99Buffer( nullptr );
-            }
-
-            success = true;
+            bool updated_argument_buffer = false;
 
             if( this->requiresArgumentBuffer() )
             {
-                if( ( !this->hasArgumentBuffer() ) ||
-                    ( this->capacity() < arg_size ) )
+                size_t const requ_capacity = buffer.size();
+
+                if( requ_capacity > this->capacity() )
                 {
-                    success = ( 0 == this->doReserveArgumentBuffer(
-                        arg_size ) );
+                    success = this->doReserveArgumentBuffer( requ_capacity );
+                    updated_argument_buffer = success;
                 }
 
-                success &= ( ( this->hasArgumentBuffer() ) &&
-                             ( this->capacity() >= arg_size ) );
+                SIXTRL_ASSERT( requ_capacity <= this->capacity() );
+            }
+
+            if( ( success ) &&
+                ( ( updated_argument_buffer ) ||
+                  ( !this->usesCObjectsCxxBuffer() ) ||
+                  ( !this->usesCObjectsBuffer() ) ) )
+            {
+                this->doSetBufferRef( buffer );
             }
 
             if( success )
             {
-                success = ( 0 == this->doTransferBufferToDevice(
-                    arg_begin, arg_size ) );
+                SIXTRL_STATIC_VAR status_t const SEND_OK = status_t{ 0 };
+                success = ( SEND_OK == ptr_context->send( this, buffer ) );
+
+                if( success )
+                {
+                    this->doSetArgSize( buffer.size() );
+                }
             }
 
-            if( success )
-            {
-                this->doSetPtrRawArgument( arg_begin );
-            }
+            SIXTRL_ASSERT( ( !success ) || ( buffer.size() == this->size() ) );
         }
 
         return success;
     }
 
-    bool ArgumentBase::read()
+    bool ArgumentBase::send( const ArgumentBase::c_buffer_t *const
+        SIXTRL_RESTRICT buffer )
+    {
+        bool success = false;
+
+        using status_t           = ArgumentBase::status_t;
+        using size_t             = ArgumentBase::size_type;
+        using ptr_base_context_t = ArgumentBase::ptr_base_context_t;
+
+        ptr_base_context_t ptr_context = this->ptrBaseContext();
+
+        if( ptr_context != nullptr )
+        {
+            success = true;
+
+            if( this->usesRawArgument() )
+            {
+                this->doSetPtrRawArgument( nullptr );
+            }
+
+            bool updated_argument_buffer = false;
+
+            if( this->requiresArgumentBuffer() )
+            {
+                size_t const requ_capacity = ::NS(Buffer_get_size)( buffer );
+
+                if( requ_capacity > this->capacity() )
+                {
+                    success = this->doReserveArgumentBuffer( requ_capacity );
+                    updated_argument_buffer = success;
+                }
+
+                SIXTRL_ASSERT( requ_capacity <= this->capacity() );
+            }
+
+            if( ( success ) &&
+                ( ( updated_argument_buffer ) ||
+                  ( !this->usesCObjectsBuffer() ) ) )
+            {
+                this->doSetPtrCBuffer( buffer );
+            }
+
+            if( success )
+            {
+                SIXTRL_STATIC_VAR status_t const SEND_OK = status_t{ 0 };
+                success = ( SEND_OK == ptr_context->send( this, buffer ) );
+
+                if( success )
+                {
+                    this->doSetArgSize( ::NS(Buffer_get_size)( buffer ) );
+                }
+            }
+
+            SIXTRL_ASSERT( ( !success ) ||
+                ( ::NS(Buffer_get_size)( buffer ) == this->size() ) );
+        }
+
+        return success;
+    }
+
+    bool ArgumentBase::send( void const* SIXTRL_RESTRICT raw_arg_begin,
+        ArgumentBase::size_type const raw_arg_len )
+    {
+        bool success = false;
+
+        using status_t           = ArgumentBase::status_t;
+        using size_t             = ArgumentBase::size_type;
+        using ptr_base_context_t = ArgumentBase::ptr_base_context_t;
+
+        ptr_base_context_t ptr_context = this->ptrBaseContext();
+
+        if( ( ptr_context != nullptr ) && ( raw_arg_begin != nullptr ) &&
+            ( raw_arg_len > size_t{ 0 } ) )
+        {
+            success = true;
+
+            bool updated_argument_buffer = false;
+
+            if( this->usesCObjectsCxxBuffer() )
+            {
+                this->doResetPtrCxxBuffer();
+            }
+            else if( this->usesCObjectsBuffer() )
+            {
+                this->doSetPtrCBuffer( nullptr );
+            }
+
+            if( this->requiresArgumentBuffer() )
+            {
+                if( raw_arg_len > this->capacity() )
+                {
+                    success = this->doReserveArgumentBuffer( raw_arg_len );
+                    updated_argument_buffer = success;
+                }
+
+                SIXTRL_ASSERT( raw_arg_len <= this->capacity() );
+            }
+
+            if( ( success ) &&
+                ( ( updated_argument_buffer ) ||
+                  ( !this->usesRawArgument() ) ) )
+            {
+                this->doSetPtrRawArgument( raw_arg_begin );
+            }
+
+            if( success )
+            {
+                SIXTRL_ASSERT( ( !this->usesCObjectsBuffer() ) &&
+                               ( !this->usesCObjectsCxxBuffer() ) );
+
+                SIXTRL_STATIC_VAR status_t const SEND_OK = status_t{ 0 };
+                success = ( SEND_OK == ptr_context->send(
+                    this, raw_arg_begin, raw_arg_len ) );
+
+                if( success )
+                {
+                    this->doSetArgSize( raw_arg_len );
+                }
+            }
+
+            SIXTRL_ASSERT( ( !success ) || ( this->size() == raw_arg_len ) );
+
+        }
+
+        return success;
+    }
+
+    bool ArgumentBase::receive()
     {
         bool success = false;
 
         if( this->usesCObjectsCxxBuffer() )
         {
-            success = this->read( this->cobjectsCxxBuffer() );
+            success = this->receive( this->cobjectsCxxBuffer() );
         }
         else if( this->usesCObjectsBuffer() )
         {
-            success = this->read( this->ptrCObjectsBuffer() );
+            success = this->receive( this->ptrCObjectsBuffer() );
         }
         else if( this->usesRawArgument() )
         {
-            success = this->read( this->ptrRawArgument(), this->size() );
+            success = this->receive( this->ptrRawArgument(), this->size() );
         }
 
         return success;
     }
 
-    bool ArgumentBase::read(
+    bool ArgumentBase::receive(
         ArgumentBase::buffer_t& SIXTRL_RESTRICT_REF buffer )
-    {
-        bool succcess = false;
-
-        if( this->doReadAndRemapCObjectBuffer( buffer.getCApiPtr() ) )
-        {
-            if( !this->usesCObjectsBuffer() )
-            {
-                this->doSetPtrC99Buffer( buffer.getCApiPtr() );
-
-                if( !this->usesCObjectsCxxBuffer() )
-                {
-                    this->doSetPtrCxxBuffer( &buffer );
-                }
-            }
-
-            success = true;
-        }
-
-        return success;
-    }
-
-    bool ArgumentBase::read( ArgumentBase::c_buffer_t*
-        SIXTRL_RESTRICT ptr_c_buffer )
-    {
-        bool succcess = false;
-
-        if( this->doReadAndRemapCObjectBuffer( ptr_c_buffer ) )
-        {
-            if( !this->usesCObjectsBuffer() )
-            {
-                this->doSetPtrC99Buffer( buffer.getCApiPtr() );
-            }
-
-            success = true;
-        }
-
-        return success;
-    }
-
-    bool ArgumentBase::read( void* SIXTRL_RESTRICT arg_begin,
-        ArgumentBase::size_type const arg_size )
     {
         bool success = false;
 
-        using size_t = ArgumentBase::size_type;
+        using status_t = ArgumentBase::status_t;
+        using ptr_base_context_t = ArgumentBase::ptr_base_context_t;
 
-        if( ( arg_begin != nullptr ) && ( arg_size >= this->size() ) &&
-            ( !this->usesCObjectsBuffer() ) )
+        ptr_base_context_t ptr_context = this->ptrBaseContext();
+
+        if( ( ptr_context != nullptr ) && ( this->usesCObjectsBuffer() ) )
         {
-            success = ( 0 == this->doTransferBufferFromDevice(
-                arg_begin, this->size() ) );
+            SIXTRL_STATIC_VAR status_t const RECV_OK = status_t{ 0 };
+            success = ( RECV_OK == ptr_context->receive( buffer, this ) );
+        }
 
-            if( ( success ) && ( !this->usesRawArgument() ) )
-            {
-                this->doSetPtrRawArgument( arg_begin );
-            }
+        return success;
+    }
+
+    bool ArgumentBase::receive( ArgumentBase::c_buffer_t* SIXTRL_RESTRICT buf )
+    {
+        bool success = false;
+
+        using status_t = ArgumentBase::status_t;
+        using ptr_base_context_t = ArgumentBase::ptr_base_context_t;
+
+        ptr_base_context_t ptr_context = this->ptrBaseContext();
+
+        if( ( ptr_context != nullptr ) && ( this->usesCObjectsBuffer() ) )
+        {
+            SIXTRL_STATIC_VAR status_t const RECV_OK = status_t{ 0 };
+            success = ( RECV_OK == ptr_context->receive( buf, this ) );
+        }
+
+        return success;
+    }
+
+    bool ArgumentBase::receive( void* SIXTRL_RESTRICT raw_arg_begin,
+        ArgumentBase::size_type const raw_arg_length )
+    {
+        bool success = false;
+
+        using status_t = ArgumentBase::status_t;
+        using ptr_base_context_t = ArgumentBase::ptr_base_context_t;
+
+        ptr_base_context_t ptr_context = this->ptrBaseContext();
+
+        if( ptr_context != nullptr )
+        {
+            SIXTRL_STATIC_VAR status_t const RECV_OK = status_t{ 0 };
+            success = ( RECV_OK == ptr_context->receive(
+                raw_arg_begin, raw_arg_length, this ) );
         }
 
         return success;
@@ -281,57 +373,81 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_needs_arg_buffer;
     }
 
-    ArgumentBase::ptr_context_t ArgumentBase::ptrBaseContext() SIXTRL_NOEXCEPT
+    ArgumentBase::ptr_base_context_t
+    ArgumentBase::ptrBaseContext() SIXTRL_NOEXCEPT
     {
         return this->m_ptr_base_context;
     }
 
-    ArgumentBase::ptr_const_context_t
+    ArgumentBase::ptr_const_base_context_t
     ArgumentBase::ptrBaseContext() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_base_context;
     }
 
+    ArgumentBase::type_id_t ArgumentBase::type() const SIXTRL_NOEXCEPT
+    {
+        return this->m_type_id;
+    }
+
+    std::string const& ArgumentBase::typeStr() const SIXTRL_NOEXCEPT
+    {
+        return this->m_type_id_str;
+    }
+
+    char const* ArgumentBase::ptrTypeStr() const SIXTRL_NOEXCEPT
+    {
+        return this->m_type_id_str.c_str();
+    }
+
     ArgumentBase::ArgumentBase(
+        ArgumentBase::type_id_t const type_id,
+        const char *const SIXTRL_RESTRICT type_id_str,
         bool const needs_argument_buffer,
-        ArgumentBase::ptr_context_t SIXTRL_RESTRICT context ) SIXTRL_NOEXCEPT :
+        ArgumentBase::ptr_base_context_t SIXTRL_RESTRICT context ) :
+        m_type_id_str(),
         m_ptr_raw_arg_begin( nullptr ),
         m_ptr_cobj_cxx_buffer( nullptr ),
         m_ptr_cobj_c99_buffer( nullptr ),
         m_ptr_base_context( context ),
         m_arg_size( ArgumentBase::size_type{ 0 } ),
         m_arg_capacity( ArgumentBase::size_type{ 0 } ),
+        m_type_id( type_id ),
         m_needs_arg_buffer( needs_argument_buffer ),
         m_has_arg_buffer( false )
     {
-
+        this->doSetTypeIdStr( type_id_str );
     }
 
     /* --------------------------------------------------------------------- */
 
-    int ArgumentBase::doReserveArgumentBuffer( ArgumentBase::size_type const )
+    bool ArgumentBase::doReserveArgumentBuffer(
+        ArgumentBase::size_type const required_arg_buffer_capacity )
     {
-        return int{ -1 };
-    }
-
-    int ArgumentBase::doTransferBufferToDevice(
-        void const* SIXTRL_RESTRICT, ArgumentBase::size_type const )
-    {
-        return int{ -1 };
-    }
-
-    int ArgumentBase::doTransferBufferFromDevice(
-        void* SIXTRL_RESTRICT, ArgumentBase::size_type const )
-    {
-        return int{ -1 };
-    }
-
-    int ArgumentBase::doRemapCObjectBufferAtDevice()
-    {
-        return int{ -1 };
+        return ( this->capacity() >= required_arg_buffer_capacity );
     }
 
     /* ----------------------------------------------------------------- */
+
+    void ArgumentBase::doSetTypeId(
+        ArgumentBase::type_id_t const type_id ) SIXTRL_NOEXCEPT
+    {
+        this->m_type_id = type_id;
+    }
+
+    void ArgumentBase::doSetTypeIdStr(
+        const char *const SIXTRL_RESTRICT type_id_str ) SIXTRL_NOEXCEPT
+    {
+        if( ( type_id_str != nullptr ) &&
+            ( std::strlen( type_id_str ) > std::size_t{ 0 } ) )
+        {
+            this->m_type_id_str = std::string{ type_id_str };
+        }
+        else
+        {
+            this->m_type_id_str.clear();
+        }
+    }
 
     void ArgumentBase::doSetArgSize(
         ArgumentBase::size_type const arg_size ) SIXTRL_NOEXCEPT
@@ -345,28 +461,68 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_arg_capacity = arg_capacity;
     }
 
-    void ArgumentBase::doSetPtrContext( ArgumentBase::ptr_context_t
+    void ArgumentBase::doSetPtrContext( ArgumentBase::ptr_base_context_t
         SIXTRL_RESTRICT ptr_context ) SIXTRL_NOEXCEPT
     {
         this->m_ptr_base_context = ptr_context;
     }
 
-    void ArgumentBase::doSetPtrCxxBuffer( ArgumentBase::buffer_t*
-        SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT
+    void ArgumentBase::doSetBufferRef( ArgumentBase::buffer_t const&
+        SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT
     {
-        this->m_ptr_cobj_cxx_buffer = ptr_buffer;
+        using c_buffer_t = ArgumentBase::c_buffer_t;
+        using buffer_t   = ArgumentBase::buffer_t;
+
+        c_buffer_t* new_ptr_cobj_c99_buffer = const_cast< c_buffer_t* >(
+            buffer.getCApiPtr() );
+
+        if( new_ptr_cobj_c99_buffer != this->m_ptr_cobj_c99_buffer )
+        {
+            this->m_ptr_cobj_c99_buffer = new_ptr_cobj_c99_buffer;
+        }
+
+        this->m_ptr_cobj_cxx_buffer = const_cast< buffer_t* >( &buffer );
     }
 
-    void ArgumentBase::doSetPtrC99Buffer( ArgumentBase::c_buffer_t*
+    void ArgumentBase::doResetPtrCxxBuffer() SIXTRL_NOEXCEPT
+    {
+        this->m_ptr_cobj_cxx_buffer =  nullptr;
+    }
+
+    void ArgumentBase::doSetPtrCBuffer(
+        const ArgumentBase::c_buffer_t *const
         SIXTRL_RESTRICT ptr_c_buffer ) SIXTRL_NOEXCEPT
     {
-        this->m_ptr_cobj_c99_buffer = ptr_c_buffer;
+        using c_buffer_t = ArgumentBase::c_buffer_t;
+
+        c_buffer_t* non_const_new_ptr =
+            const_cast< c_buffer_t* >( ptr_c_buffer );
+
+        if( this->m_ptr_cobj_cxx_buffer != nullptr )
+        {
+            SIXTRL_ASSERT( this->m_ptr_cobj_cxx_buffer->getCApiPtr() ==
+                           this->m_ptr_cobj_c99_buffer );
+
+            if( this->m_ptr_cobj_cxx_buffer->getCApiPtr() !=
+                non_const_new_ptr )
+            {
+                this->doResetPtrCxxBuffer();
+            }
+        }
+
+        SIXTRL_ASSERT( ( this->m_ptr_cobj_cxx_buffer == nullptr ) ||
+            ( ( this->m_ptr_cobj_cxx_buffer->getCApiPtr() ==
+                non_const_new_ptr ) &&
+              ( this->m_ptr_cobj_c99_buffer ==
+                this->m_ptr_cobj_cxx_buffer->getCApiPtr() ) ) );
+
+        this->m_ptr_cobj_c99_buffer = non_const_new_ptr;
     }
 
     void ArgumentBase::doSetPtrRawArgument(
-        void* SIXTRL_RESTRICT raw_arg_begin ) SIXTRL_NOEXCEPT
+        const void *const SIXTRL_RESTRICT raw_arg_begin ) SIXTRL_NOEXCEPT
     {
-        this->m_ptr_raw_arg_begin = raw_arg_begin;
+        this->m_ptr_raw_arg_begin = const_cast< void* >( raw_arg_begin );
     }
 
     void ArgumentBase::doSetHasArgumentBufferFlag(
@@ -379,88 +535,6 @@ namespace SIXTRL_CXX_NAMESPACE
         bool const needs_argument_buffer ) SIXTRL_NOEXCEPT
     {
         this->m_needs_arg_buffer = needs_argument_buffer;
-    }
-
-    /* ===================================================================== */
-
-    bool ArgumentBase::doWriteAndRemapCObjectBuffer(
-            ArgumentBase::c_buffer_t* SIXTRL_RESTRICT ptr_buffer )
-    {
-        using size_t = ArgumentBase::size_type;
-        using source_ptr_t = unsigned char const*;
-
-        bool success = false;
-
-        size_t const buf_size = buffer.size();
-        source_ptr_t source_begin = buffer.dataBegin< source_ptr_t >();
-
-        if( ( source_begin != nullptr ) && ( buf_size > size_t{ 0 } ) )
-        {
-            if( this->usesRawArgument() )
-            {
-                this->doSetPtrRawArgument( nullptr );
-            }
-
-            success = true;
-
-            if( this->requiresArgumentBuffer() )
-            {
-                if( ( !this->hasArgumentBuffer() ) ||
-                    ( this->capacity() < buf_size ) )
-                {
-                    success = (
-                        0 == this->doReserveArgumentBuffer( buf_size ) );
-                }
-
-                success &= ( ( this->hasArgumentBuffer() ) &&
-                             ( this->capacity() >= buf_size ) );
-            }
-
-            if( success )
-            {
-                success = ( 0 == this->doTransferBufferToDevice(
-                    source_begin, buf_size ) );
-            }
-
-            if( success )
-            {
-                success = ( 0 == this->doRemapCObjectBufferAtDevice() );
-            }
-        }
-
-        return success;
-    }
-
-    bool ArgumentBase::doReadAndRemapCObjectBuffer(
-            ArgumentBase::c_buffer_t* SIXTRL_RESTRICT ptr_buffer )
-    {
-        using size_t = ArgumentBase::size_type;
-        using dest_ptr_t = unsigned char*;
-
-        bool success = false;
-
-        size_t const buf_capacity = ::NS(Buffer_get_capacity)( ptr_buffer );
-        dest_ptr_t dest_begin = ::NS(Buffer_get_data_begin)( ptr_buffer );
-
-        if( ( dest_begin != nullptr ) && ( buf_capcity >= this->size() ) )
-        {
-            if( this->usesRawArgument() )
-            {
-                this->doSetPtrRawArgument( nullptr );
-            }
-
-            success = ( 0 == this->doTransferBufferFromDevice(
-                dest_begin, this->size() ) );
-
-            if( ( success ) &&
-                ( ::NS(ManagedBuffer_needs_remapping)(
-                    dest_begin, ::NS(Buffer_get_slot_size)( ptr_buffer ) ) ) )
-            {
-                success = ( 0 == ::NS(Buffer_remap)( ptr_buffer ) );
-            }
-        }
-
-        return success;
     }
 }
 

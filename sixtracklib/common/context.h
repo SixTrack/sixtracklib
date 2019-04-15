@@ -13,6 +13,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/context/context_base.h"
     #include "sixtracklib/common/context/context_base_with_nodes.h"
+    #include "sixtracklib/common/context/argument_base.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
@@ -50,6 +51,48 @@ SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(Context_get_config_str)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Context_uses_nodes)(
     NS(ContextBase)* SIXTRL_RESTRICT ctx );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_status_t) NS(Context_send_detailed)(
+    NS(ContextBase)* SIXTRL_RESTRICT ctx,
+    NS(ArgumentBase)* SIXTRL_RESTRICT destination,
+    void const* SIXTRL_RESTRICT source, NS(context_size_t) const src_len );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_status_t) NS(Context_send_buffer)(
+    NS(ContextBase)* SIXTRL_RESTRICT ctx,
+    NS(ArgumentBase)* SIXTRL_RESTRICT destination,
+    NS(Buffer) const* SIXTRL_RESTRICT source );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_status_t) NS(Context_receive_detailed)(
+    NS(ContextBase)* SIXTRL_RESTRICT ctx,
+    void* SIXTRL_RESTRICT destination,
+    NS(context_size_t) const destination_capacity,
+    NS(ArgumentBase)* SIXTRL_RESTRICT source );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_status_t) NS(Context_receive_buffer)(
+    NS(ContextBase)* SIXTRL_RESTRICT ctx,
+    NS(Buffer)* SIXTRL_RESTRICT destination,
+    NS(ArgumentBase)* SIXTRL_RESTRICT source );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_status_t)
+NS(Context_remap_sent_cobjects_buffer)(
+    NS(ContextBase)* SIXTRL_RESTRICT ctx,
+    NS(ArgumentBase)* SIXTRL_RESTRICT source );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Context_is_ready_to_remap)(
+    const NS(ContextBase) *const SIXTRL_RESTRICT context );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Context_is_ready_to_send)(
+    const NS(ContextBase) *const SIXTRL_RESTRICT context );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Context_is_ready_to_receive)(
+    const NS(ContextBase) *const SIXTRL_RESTRICT context );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Context_is_in_debug_mode)(
+    const NS(ContextBase) *const SIXTRL_RESTRICT context );
 
 /* ------------------------------------------------------------------------- */
 /* NS(ContextOnNodesBase) related public API */

@@ -1,18 +1,17 @@
-#if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/context/context_base.h"
-#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+#include "sixtracklib/common/context/context_base.h"
 
-#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #include <cstddef>
-    #include <cstdint>
-    #include <cstdlib>
-    #include <limits>
-#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <limits>
 
-#if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/generated/namespace.h"
-#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/generated/namespace.h"
+#include "sixtracklib/common/context/argument_base.h"
+#include "sixtracklib/common/buffer/managed_buffer_remap.h"
+#include "sixtracklib/common/buffer.hpp"
+#include "sixtracklib/common/buffer.h"
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -57,34 +56,323 @@ namespace SIXTRL_CXX_NAMESPACE
         this->doClear();
     }
 
-    void ContextBase::doClear()
+    bool ContextBase::readyForSend() const SIXTRL_NOEXCEPT
     {
-        return;
+        return this->m_ready_for_send;
     }
 
-    ContextBase::ContextBase( const char *const SIXTRL_RESTRICT type_str,
-        ContextBase::type_id_t const type_id ) :
-            m_config_str(), m_type_id_str(), m_type_id( type_id ),
-            m_uses_nodes( false )
+    bool ContextBase::readyForReceive() const SIXTRL_NOEXCEPT
     {
-        if( type_str != nullptr )
+        return this->m_ready_for_receive;
+    }
+
+    bool ContextBase::readyForRemap() const SIXTRL_NOEXCEPT
+    {
+        return this->m_ready_for_remap;
+    }
+
+    ContextBase::status_t ContextBase::send(
+        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT arg,
+        const void *const SIXTRL_RESTRICT src_begin,
+        ContextBase::size_type const src_size )
+    {
+        using size_t     = ContextBase::size_type;
+        using status_t   = ContextBase::status_t;
+
+        status_t status = status_t{ -1 };
+
+        if( ( arg != nullptr ) &&
+            ( this->readyForSend() ) && ( this->readyForRemap() ) &&
+            ( arg->usesRawArgument() ) &&
+            ( arg->capacity() > size_t{ 0 } ) && ( src_begin != nullptr ) &&
+            ( src_size > size_t{ 0 } ) && ( src_size <= arg->capacity() ) )
         {
-            this->m_type_id_str = std::string( type_str );
+            status = this->doSend( arg, src_begin, src_size );
         }
+
+        return status;
+    }
+
+    ContextBase::status_t ContextBase::send(
+        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT arg,
+        const ContextBase::c_buffer_t *const SIXTRL_RESTRICT source )
+    {
+        using size_t     = ContextBase::size_type;
+        using status_t   = ContextBase::status_t;
+        using data_ptr_t = void const*;
+
+        status_t status = status_t{ -1 };
+
+        data_ptr_t   src_begin = ::NS(Buffer_get_const_data_begin)( source );
+        size_t const src_size  = ::NS(Buffer_get_size)( source );
+
+        if( ( arg != nullptr ) &&
+            ( this->readyForSend() ) && ( this->readyForRemap() ) &&
+            ( arg->usesCObjectsBuffer() ) &&
+            ( arg->capacity() > size_t{ 0 } ) && ( src_begin != nullptr ) &&
+            ( src_size > size_t{ 0 } ) && ( src_size <= arg->capacity() ) )
+        {
+            status = this->doSend( arg, src_begin, src_size );
+
+            if( status == status_t{ 0 } )
+            {
+                status = this->doRemapSentCObjectsBuffer( arg );
+            }
+        }
+
+        return status;
+    }
+
+    ContextBase::status_t ContextBase::send(
+        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT arg,
+        ContextBase::buffer_t const& SIXTRL_RESTRICT_REF source )
+    {
+        using size_t     = ContextBase::size_type;
+        using status_t   = ContextBase::status_t;
+        using data_ptr_t = void const*;
+
+        status_t status = status_t{ -1 };
+
+        data_ptr_t   src_begin = source.dataBegin< data_ptr_t >();
+        size_t const src_size  = source.size();
+
+        if( ( arg != nullptr ) &&
+            ( this->readyForSend() ) && ( this->readyForRemap() ) &&
+            ( arg->usesCObjectsBuffer() ) &&
+            ( arg->capacity() > size_t{ 0 } ) && ( src_begin != nullptr ) &&
+            ( src_size > size_t{ 0 } ) && ( src_size <= arg->capacity() ) )
+        {
+            status = this->doSend( arg, src_begin, src_size );
+
+            if( status == status_t{ 0 } )
+            {
+                status = this->doRemapSentCObjectsBuffer( arg );
+            }
+        }
+
+        return status;
+    }
+
+    ContextBase::status_t ContextBase::receive(
+        void* SIXTRL_RESTRICT dest_begin,
+        ContextBase::size_type const dest_capacity,
+        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT src_arg )
+    {
+        using size_t     = ContextBase::size_type;
+        using status_t   = ContextBase::status_t;
+
+        status_t status = status_t{ -1 };
+
+        if( ( src_arg != nullptr ) && ( this->readyForReceive() ) &&
+            ( src_arg->size() > size_t{ 0 } ) &&
+            ( dest_capacity >= src_arg->size() ) && ( dest_begin != nullptr ) )
+        {
+            status = this->doReceive( dest_begin, dest_capacity, src_arg );
+
+            if( ( status == status_t{ 0 } ) &&
+                ( src_arg->usesCObjectsBuffer() ) )
+            {
+                unsigned char* managed_buffer_begin =
+                    reinterpret_cast< unsigned char* >( dest_begin );
+
+                size_t const slot_size = SIXTRL_BUFFER_DEFAULT_SLOT_SIZE;
+                if( ::NS(ManagedBuffer_remap)( managed_buffer_begin,
+                        slot_size ) != 0 )
+                {
+                    status = status_t{ -1 };
+                }
+            }
+        }
+
+        return status;
+
+    }
+
+    ContextBase::status_t ContextBase::receive(
+        ContextBase::c_buffer_t* SIXTRL_RESTRICT destination,
+        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT src_arg )
+    {
+        using size_t     = ContextBase::size_type;
+        using status_t   = ContextBase::status_t;
+        using data_ptr_t = void*;
+
+        status_t status = status_t{ -1 };
+        data_ptr_t dest_begin = ::NS(Buffer_get_data_begin)( destination );
+        size_t const dest_capacity = ::NS(Buffer_get_capacity)( destination );
+
+        if( ( src_arg != nullptr ) && ( this->readyForReceive() ) &&
+            ( src_arg->usesCObjectsBuffer() ) &&
+            ( src_arg->size() > size_t{ 0 } ) &&
+            ( dest_capacity >= src_arg->size() ) && ( dest_begin != nullptr ) )
+        {
+            status = this->doReceive( dest_begin, dest_capacity, src_arg );
+
+            if( status == status_t{ 0 } )
+            {
+                status = ::NS(Buffer_remap)( destination );
+            }
+        }
+
+        return status;
+    }
+
+    ContextBase::status_t ContextBase::receive(
+        ContextBase::buffer_t& SIXTRL_RESTRICT_REF destination,
+        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT src_arg )
+    {
+        using size_t     = ContextBase::size_type;
+        using status_t   = ContextBase::status_t;
+        using data_ptr_t = void*;
+
+        status_t status = status_t{ -1 };
+
+        if( ( src_arg != nullptr ) && ( this->readyForReceive() ) &&
+            ( src_arg->usesCObjectsBuffer() ) &&
+            ( src_arg->size() > size_t{ 0 } ) &&
+            ( destination.capacity() >= src_arg->size() ) &&
+            ( destination.dataBegin< data_ptr_t >() != nullptr ) )
+        {
+            status = this->doReceive( destination.dataBegin< data_ptr_t >(),
+                                      destination.capacity(), src_arg );
+
+            if( status == status_t{ 0 } )
+            {
+                status = ( destination.remap() )
+                    ? status_t{ 0 } : status_t{ -1 };
+            }
+        }
+
+        return status;
+    }
+
+    ContextBase::status_t ContextBase::remapSentCObjectsBuffer(
+        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT arg )
+    {
+        ContextBase::status_t status = ContextBase::status_t{ -1 };
+
+        if( ( arg != nullptr ) && ( this->readyForRemap() ) )
+        {
+            status = this->doRemapSentCObjectsBuffer( arg );
+        }
+
+        return status;
+    }
+
+    bool ContextBase::isInDebugMode() const SIXTRL_NOEXCEPT
+    {
+        return this->m_debug_mode;
+    }
+
+    ContextBase::ContextBase(
+        ContextBase::type_id_t const type_id,
+        const char *const SIXTRL_RESTRICT type_id_str,
+        const char *const SIXTRL_RESTRICT config_str ) :
+            m_config_str(), m_type_id_str(), m_type_id( type_id ),
+            m_uses_nodes( false ),
+            m_ready_for_remap( false ),
+            m_ready_for_send( false ),
+            m_ready_for_receive( false ),
+            m_debug_mode( false )
+    {
+        this->doSetTypeIdStr( type_id_str );
+        this->doParseConfigStrBaseImpl( config_str );
+    }
+
+    void ContextBase::doClear()
+    {
+        this->m_ready_for_receive = false;
+        this->m_ready_for_send    = false;
+        this->m_ready_for_remap   = false;
+
+        return;
     }
 
     void ContextBase::doParseConfigStr(
         const char *const SIXTRL_RESTRICT config_str )
     {
-        if( config_str != nullptr )
+        this->doParseConfigStrBaseImpl( config_str );
+    }
+
+    ContextBase::status_t ContextBase::doSend(
+        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT,
+        const void *const SIXTRL_RESTRICT, size_type const )
+    {
+        return ContextBase::status_t{ -1 };
+    }
+
+    ContextBase::status_t ContextBase::doReceive( void* SIXTRL_RESTRICT,
+        ContextBase::size_type const,
+        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT )
+    {
+        return ContextBase::status_t{ -1 };
+    }
+
+    ContextBase::status_t ContextBase::doRemapSentCObjectsBuffer(
+        ContextBase::ptr_arg_base_t SIXTRL_RESTRICT )
+    {
+        return ContextBase::status_t{ -1 };
+    }
+
+    void ContextBase::doSetTypeId(
+        ContextBase::type_id_t const type_id ) SIXTRL_NOEXCEPT
+    {
+        this->m_type_id = type_id;
+    }
+
+    void ContextBase::doSetTypeIdStr(
+        const char *const SIXTRL_RESTRICT type_id_str ) SIXTRL_NOEXCEPT
+    {
+        if( ( type_id_str != nullptr ) &&
+            ( std::strlen( type_id_str ) > std::size_t{ 0 } ) )
         {
-            this->m_config_str = std::string( config_str );
+            this->m_type_id_str = std::string{ type_id_str };
+        }
+        else
+        {
+            this->m_type_id_str.clear();
         }
     }
 
     void ContextBase::doSetUsesNodesFlag( bool const flag ) SIXTRL_NOEXCEPT
     {
         this->m_uses_nodes = flag;
+    }
+
+    void ContextBase::doSetReadyForSendFlag( bool const flag ) SIXTRL_NOEXCEPT
+    {
+        this->m_ready_for_send = flag;
+    }
+
+    void ContextBase::doSetReadyForReceiveFlag(
+        bool const flag ) SIXTRL_NOEXCEPT
+    {
+        this->m_ready_for_receive = flag;
+    }
+
+    void ContextBase::doSetReadyForRemapFlag( bool const flag ) SIXTRL_NOEXCEPT
+    {
+        this->m_ready_for_remap = flag;
+    }
+
+    void ContextBase::doSetDebugModeFlag( bool const flag ) SIXTRL_NOEXCEPT
+    {
+        this->m_debug_mode = flag;
+    }
+
+    void ContextBase::doParseConfigStrBaseImpl(
+            const char *const SIXTRL_RESTRICT config_str )
+    {
+        if( ( config_str != nullptr ) &&
+            ( std::strlen( config_str ) > std::size_t{ 0 } ) )
+        {
+            this->m_config_str = std::string{ config_str };
+        }
+        else if( !this->m_config_str.empty() )
+        {
+            this->m_config_str.clear();
+        }
+
+        return;
     }
 }
 
