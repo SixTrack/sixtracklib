@@ -110,9 +110,23 @@ class st_Particles(ct.Structure):
                 ("at_element", st_int64_p), ("at_turn", st_int64_p),
                 ("state", st_int64_p)]
 
+class st_ParticlesAddr( ct.Structure ):
+    _fields_ = [("num_particles", ct.c_int64),("q0", ct.c_uint64),
+                ("mass0", ct.c_uint64), ("beta0", ct.c_uint64),
+                ("gamma0", ct.c_uint64), ("p0C", ct.c_uint64),
+                ("s", ct.c_uint64), ("x", ct.c_uint64), ("y", ct.c_uint64),
+                ("px", ct.c_uint64), ("py", ct.c_uint64), ("zeta", ct.c_uint64),
+                ("psigma", ct.c_uint64), ("delta", ct.c_uint64),
+                ("rpp", ct.c_uint64), ("rvv", ct.c_uint64), ("chi", ct.c_uint64),
+                ("charge_ratio", ct.c_uint64), ("particle_id", ct.c_uint64),
+                ("at_element", ct.c_uint64), ("at_turn", ct.c_uint64),
+                ("state", ct.c_uint64)]
 
 st_Particles_p = ct.POINTER(st_Particles)
 st_NullParticles = ct.cast(0, st_Particles_p)
+
+st_ParticlesAddr_p = ct.POINTER( st_ParticlesAddr )
+st_NullParticlesAddr = ct.cast( 0, st_ParticlesAddr_p )
 
 
 def st_Particles_cbuffer_get_particles(cbuffer, obj_index):
@@ -229,6 +243,10 @@ st_Particles_add.argtypes = [
 st_Particles_add_copy = sixtracklib.st_Particles_add_copy_ext
 st_Particles_add_copy.restype = st_Particles_p
 st_Particles_add_copy.argtypes = [st_Buffer_p, st_Particles_p]
+
+st_ParticlesAddr_preset = sixtracklib.st_ParticlesAddr_preset
+st_ParticlesAddr_preset.argtypes = [ st_ParticlesAddr_p ]
+st_ParticlesAddr_preset.restype  = st_ParticlesAddr_p
 
 # -----------------------------------------------------------------------------
 # BeamMonitor objects
@@ -586,6 +604,11 @@ if SIXTRACKLIB_MODULES.get( 'cuda', False ):
     st_CudaArgument_receive_memory.argtypes = [
             st_CudaArgument_p, ct.c_void_p, ct.c_uint64 ]
 
+    st_CudaArgument_get_arg_buffer = \
+        sixtracklib.st_CudaArgument_get_cuda_arg_buffer
+    st_CudaArgument_get_arg_buffer.argtypes = [ st_CudaArgument_p ]
+    st_CudaArgument_get_arg_buffer.restype = ct.c_void_p
+
 # -----------------------------------------------------------------------------
 # Cl-Context methods
 
@@ -619,3 +642,12 @@ st_Track_all_particles_element_by_element_until_turn = \
 st_Track_all_particles_element_by_element_until_turn.restype = ct.c_int32
 st_Track_all_particles_element_by_element_until_turn.argtypes = [
     st_Particles_p, st_Buffer_p, ct.c_int64, st_Particles_p]
+
+
+# ------------------------------------------------------------------------------
+# Extract particle addresses:
+
+st_Particles_extract_addresses_cuda = \
+    sixtracklib.st_Particles_extract_addresses_cuda
+st_Particles_extract_addresses_cuda.argtypes = [ ct.c_void_p, ct.c_void_p ]
+st_Particles_extract_addresses_cuda.restype = ct.c_int32
