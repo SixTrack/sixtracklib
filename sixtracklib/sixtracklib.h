@@ -39,6 +39,8 @@
 #include "sixtracklib/common/be_srotation/track.h"
 #include "sixtracklib/common/be_xyshift/be_xyshift.h"
 #include "sixtracklib/common/be_xyshift/track.h"
+#include "sixtracklib/common/context/definitions.h"
+#include "sixtracklib/common/context/argument_base.h"
 #include "sixtracklib/common/context/compute_arch.h"
 #include "sixtracklib/common/context/context_base.h"
 #include "sixtracklib/common/context/context_base_with_nodes.h"
@@ -83,7 +85,9 @@
 #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
 
-//     #include "sixtracklib/cuda/buffer.h"
+    #include "sixtracklib/cuda/definitions.h"
+    #include "sixtracklib/cuda/argument.h"
+    #include "sixtracklib/cuda/context.h"
     #include "sixtracklib/cuda/track_particles_kernel_c_wrapper.h"
 
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */

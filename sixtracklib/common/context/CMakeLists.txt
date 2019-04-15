@@ -26,14 +26,17 @@ target_compile_options( sixtrack_common_context PRIVATE
 # ------------------------------------------------------------------------------
 
 set( SIXTRL_COMMON_CONTEXT_CXX_HEADERS
+     definitions.h
      context_base.h
      context_base_with_nodes.h
+     argument_base.h
 )
 
 set( SIXTRL_COMMON_CONTEXT_CXX_SOURCES
      context_base.cpp
      context_base_with_nodes.cpp
      context.cpp
+     argument_base.cpp
 )
 
 add_library( sixtrack_common_context_cxx OBJECT

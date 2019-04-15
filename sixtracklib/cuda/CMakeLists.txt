@@ -28,11 +28,17 @@ set( SIXTRACKL_CUDA_HOST_DEFINITIONS )
 list( APPEND SIXTRACKL_CUDA_HOST_DEFINITIONS ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
 set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
+     wrappers/argument_operations.h
+     wrappers/context_operations.h
+     wrappers/extract_particles_address.h
      cuda_tools.h
      track_particles_kernel_c_wrapper.h
 )
 
 set( SIXTRACKLIB_CUDA_PART_HOST_SOURCES
+     wrappers/argument_operations.cu
+     wrappers/context_operations.cu
+     wrappers/extract_particles_address.cu
      internal/track_particles_kernel_c_wrapper.cu
 )
 
@@ -74,6 +80,47 @@ set(   SIXTRACKL_LINK_LIBRARIES
      CACHE INTERNAL "" FORCE )
 
 # ------------------------------------------------------------------------------
+# --- CUDA Host C++ object library
+
+set( SIXTRACKL_CUDA_CXX_HEADERS
+     internal/argument_base.h
+     argument.h
+     internal/context_base.h
+     context.h
+)
+
+set( SIXTRACKL_CUDA_CXX_SOURCES
+     internal/argument_base.cpp
+     internal/context_base.cpp
+     internal/argument.cpp
+     internal/context.cpp
+)
+
+
+add_library( sixtrack_cuda_cxx OBJECT
+             ${SIXTRACKL_CUDA_CXX_HEADERS}
+             ${SIXTRACKL_CUDA_CXX_SOURCES}
+)
+
+target_compile_definitions( sixtrack_cuda_cxx
+    PUBLIC ${SIXTRACKLIB_NAMESPACE_FLAGS} )
+
+target_include_directories( sixtrack_cuda_cxx
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
+
+set_target_properties( sixtrack_cuda_cxx PROPERTIES POSITION_INDEPENDENT_CODE ON )
+set_target_properties( sixtrack_cuda_cxx PROPERTIES LINKER_LANGUAGE C )
+set_target_properties( sixtrack_cuda_cxx PROPERTIES CXX_STANDARD 11 )
+set_target_properties( sixtrack_cuda_cxx PROPERTIES CXX_STANDARD_REQUIRED ON )
+
+# ------------------------------------------------------------------------------
+# pass on sixtrack_cuda_cxx as a module for sixtracklib:
+
+set(  SIXTRACKL_LIBRARY_MODULES
+    ${SIXTRACKL_LIBRARY_MODULES}
+    $<TARGET_OBJECTS:sixtrack_cuda_cxx> CACHE INTERNAL "" FORCE )
+
+# ------------------------------------------------------------------------------
 # --- CUDA Kernel object library:
 
 set( SIXTRACKL_CUDA_DEVICE_DEFINITIONS )
@@ -82,13 +129,17 @@ list( APPEND SIXTRACKL_CUDA_DEVICE_DEFINITIONS ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
 set( SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS
      cuda_tools.h
+     kernels/managed_buffer_remap.cuh
      kernels/managed_buffer_remap_kernel.cuh
      kernels/track_particles_kernel.cuh
+     kernels/extract_particles_address.cuh
 )
 
 set( SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES
+     kernels/managed_buffer_remap.cu
      kernels/managed_buffer_remap_kernel.cu
      kernels/track_particles_kernel.cu
+     kernels/extract_particles_address.cu
 )
 
 add_library( sixtrack_cuda_device OBJECT

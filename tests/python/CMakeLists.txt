@@ -44,6 +44,19 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
                  ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_opencl.py
          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
 
+
+    if( SIXTRACKL_ENABLE_CUDA )
+
+        # -------------------------------------------------------------------------
+        # test_track_job_opencl:
+
+         add_test( NAME Python_CudaContextTests
+             COMMAND ${PYTHON_EXECUTABLE}
+                     ${CMAKE_CURRENT_SOURCE_DIR}/test_context_cuda.py
+             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
+
+    endif()
+
 endif()
 
 #end: tests/python/CMakeLists.txt
