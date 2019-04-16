@@ -251,6 +251,31 @@ NS(Track_all_particles_element_by_element_until_turn_objs)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_STATIC SIXTRL_FN int NS(Track_particle_line)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_idx,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT line_begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT line_end,
+    bool const finish_turn );
+
+SIXTRL_STATIC SIXTRL_FN int NS(Track_subset_of_particles_line)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) particle_idx_begin,
+    NS(particle_num_elements_t) const particle_idx_end,
+    NS(particle_num_elements_t) const particle_idx_stride,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT line_begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT line_end,
+    bool const finish_turn );
+
+SIXTRL_STATIC SIXTRL_FN int NS(Track_all_particles_line)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT line_begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT line_end,
+    bool const finish_turn );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
 #if !defined( _GPUCODE )
 
 struct NS(Buffer);
@@ -488,6 +513,31 @@ NS(Track_all_particles_element_by_element_until_turn)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT out_particles );
 
 /* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Track_particle_line_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_idx,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    NS(buffer_size_t) const line_begin_idx,
+    NS(buffer_size_t) const line_end_idx,
+    bool const finish_turn );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Track_subset_of_particles_line_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) particle_idx_begin,
+    NS(particle_num_elements_t) const particle_idx_end,
+    NS(particle_num_elements_t) const particle_idx_stride,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    NS(buffer_size_t) const line_begin_idx,
+    NS(buffer_size_t) const line_end_idx,
+    bool const finish_turn );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Track_all_particles_line_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    NS(buffer_size_t) const line_begin_idx,
+    NS(buffer_size_t) const line_end_idx,
+    bool const finish_turn );
 
 #endif /* defined( _GPUCODE ) */
 
@@ -1266,6 +1316,86 @@ SIXTRL_INLINE int NS(Track_all_particles_element_by_element_until_turn_objs)(
 }
 
 /* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE int NS(Track_particle_line)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_idx,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT line_it,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT line_end,
+    bool const finish_turn )
+{
+    SIXTRL_ASSERT( line_it  != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( line_end != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( uintptr_t )line_end >= ( ( uintptr_t )line_it ) );
+
+    int status = 0;
+
+    for( ; line_it != line_end ; ++line_it )
+    {
+        status |= NS(Track_particle_beam_element_obj)(
+            particles, particle_idx, line_it );
+    }
+
+    if( finish_turn )
+    {
+        NS(Particles_set_at_element_id_value)( particles, particle_idx, 0 );
+        NS(Particles_increment_at_turn_value)( particles, particle_idx );
+    }
+
+    return status;
+}
+
+SIXTRL_INLINE int NS(Track_subset_of_particles_line)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) particle_idx_begin,
+    NS(particle_num_elements_t) const particle_idx_end,
+    NS(particle_num_elements_t) const particle_idx_stride,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT line_it,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT line_end,
+    bool const finish_turn )
+{
+    SIXTRL_ASSERT( line_it  != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( line_end != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( uintptr_t )line_end >= ( ( uintptr_t )line_it ) );
+
+    int status = 0;
+
+    for( ; line_it != line_end ; ++line_it )
+    {
+        status |= NS(Track_subset_of_particles_beam_element_obj)(
+            particles, particle_idx_begin, particle_idx_end,
+                particle_idx_stride, line_it );
+    }
+
+    if( finish_turn )
+    {
+        NS(particle_num_elements_t) idx = particle_idx_begin;
+
+        for( ; idx < particle_idx_end ; idx += particle_idx_stride )
+        {
+            NS(Particles_set_at_element_id_value)( particles, idx, 0 );
+            NS(Particles_increment_at_turn_value)( particles, idx );
+        }
+    }
+
+    return status;
+}
+
+SIXTRL_INLINE int NS(Track_all_particles_line)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT line_begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT line_end,
+    bool const finish_turn )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t const begin_idx = ( num_elem_t )0u;
+    num_elem_t const stride = ( num_elem_t )1u;
+
+    return NS(Track_subset_of_particles_line)( particles, begin_idx,
+        NS(Particles_get_num_of_particles)( particles ), stride, line_begin,
+            line_end, finish_turn );
+}
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
