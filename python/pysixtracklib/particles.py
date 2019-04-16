@@ -3,18 +3,32 @@ import numpy as np
 
 
 class Particles(CObject):
+    pmass= 938.2720813e6
+
+    def _set_p0c(self):
+        energy0=np.sqrt(self.p0c**2+self.mass0**2)
+        self.beta0=self.p0c/energy0
+        self.gamma0 = energy0 / self.mass0
+
+    def _set_delta(self):
+        rep=np.sqrt(self.delta**2+2*self.delta+1/self.beta0**2)
+        irpp=1+self.delta
+        self.rpp=1/irpp
+        beta=irpp/rep
+        self.rvv=beta/self.beta0
+
     _typeid = 1
     num_particles = CField(0, 'int64', const=True)
     q0 = CField(1, 'real', length='num_particles',
                 default=0.0, pointer=True, alignment=8)
     mass0 = CField(2, 'real', length='num_particles',
-                   default=0.0, pointer=True, alignment=8)
+                   default=pmass, pointer=True, alignment=8)
     beta0 = CField(3, 'real', length='num_particles',
-                   default=0.0, pointer=True, alignment=8)
+                   default=1.0, pointer=True, alignment=8)
     gamma0 = CField(4, 'real', length='num_particles',
-                    default=0.0, pointer=True, alignment=8)
+                    default=1.0, pointer=True, alignment=8)
     p0c = CField(5, 'real', length='num_particles',
-                 default=0.0, pointer=True, alignment=8)
+                 default=1.0, pointer=True, alignment=8, setter=_set_p0c)
     s = CField(6, 'real', length='num_particles',
                default=0.0, pointer=True, alignment=8)
     x = CField(7, 'real', length='num_particles',
@@ -30,26 +44,30 @@ class Particles(CObject):
     psigma = CField(12, 'real', length='num_particles',
                     default=0.0, pointer=True, alignment=8)
     delta = CField(13, 'real', length='num_particles',
-                   default=0.0, pointer=True, alignment=8)
+                   default=0.0, pointer=True, alignment=8, setter=_set_delta)
     rpp = CField(14, 'real', length='num_particles',
                  default=1.0, pointer=True, alignment=8)
     rvv = CField(15, 'real', length='num_particles',
                  default=1.0, pointer=True, alignment=8)
     chi = CField(16, 'real', length='num_particles',
-                 default=0.0, pointer=True, alignment=8)
+                 default=1.0, pointer=True, alignment=8)
     charge_ratio = CField(17, 'real', length='num_particles',
                           default=1.0, pointer=True, alignment=8)
     particle_id = CField(18, 'int64', length='num_particles',
-                         default=-1, pointer=True, alignment=8)
+                         default=0, pointer=True, alignment=8)
     at_element = CField(19, 'int64', length='num_particles',
-                        default=-1, pointer=True, alignment=8)
+                        default=0, pointer=True, alignment=8)
     at_turn = CField(20, 'int64', length='num_particles',
-                     default=-1, pointer=True, alignment=8)
+                     default=0, pointer=True, alignment=8)
     state = CField(21, 'int64', length='num_particles',
                    default=1, pointer=True, alignment=8)
 
-    def __init__(self, **kwargs):
-        CObject.__init__(self, **kwargs)
+    @classmethod
+    def from_ref(cls,num_particles=1,mass0=938272081.3,
+                     p0c=1e9, q0=1,**kwargs):
+        return cls(num_particles=num_particles,
+                   particle_id=np.arange(num_particles),
+                   ).set_reference()
 
     sigma = property(lambda self: (self.beta0 / self.beta) * self.zeta)
     beta = property(lambda p: (1 + p.delta) / (1 / p.beta0 + p.ptau))
@@ -59,14 +77,10 @@ class Particles(CObject):
         return np.sqrt(self.delta**2 + 2 * self.delta +
                        1 / self.beta0**2) - 1 / self.beta0
 
-    def set_reference(self, p0c=7e12, mass0=938.272046e6, q0=1):
+    def set_reference(self, p0c=7e12, mass0=938.27208136e6, q0=1):
         self.q0 = 1
         self.mass0 = mass0
-        energy0 = np.sqrt(p0c**2 + mass0**2)
-        self.beta0 = p0c / energy0
-        self.gamma0 = energy0 / mass0
         self.p0c = p0c
-        self.particle_id = np.arange(self.num_particles)
         return self
 
     def from_pysixtrack(self, inp, particle_index):
