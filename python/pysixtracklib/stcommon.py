@@ -651,3 +651,14 @@ st_Particles_extract_addresses_cuda = \
     sixtracklib.st_Particles_extract_addresses_cuda
 st_Particles_extract_addresses_cuda.argtypes = [ ct.c_void_p, ct.c_void_p ]
 st_Particles_extract_addresses_cuda.restype = ct.c_int32
+
+st_Track_particles_line_cuda_on_grid = \
+    sixtracklib.st_Track_particles_line_cuda_on_grid
+st_Track_particles_line_cuda_on_grid.restype = ct.c_int32
+st_Track_particles_line_cuda_on_grid.argtypes = [ ct.c_void_p, ct.c_void_p,
+    ct.c_uint64, ct.c_uint64, ct.c_bool, ct.c_uint64, ct.c_uint64 ]
+
+st_Track_particles_line_cuda = sixtracklib.st_Track_particles_line_cuda
+st_Track_particles_line_cuda.restype = ct.c_int32
+st_Track_particles_line_cuda.argtypes = [ ct.c_void_p, ct.c_void_p,
+    ct.c_uint64, ct.c_uint64, ct.c_bool ]
