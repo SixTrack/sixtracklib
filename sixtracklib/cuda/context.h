@@ -19,6 +19,7 @@
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/context/definitions.h"
     #include "sixtracklib/cuda/internal/context_base.h"
+    #include "sixtracklib/cuda/internal/argument_base.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
@@ -45,6 +46,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using c_buffer_t     = _base_context_t::c_buffer_t;
         using status_t       = _base_context_t::status_t;
 
+
         SIXTRL_HOST_FN explicit CudaContext(
             char const* config_str = nullptr );
 
@@ -57,6 +59,22 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN CudaContext& operator=( CudaContext&& other) = default;
 
         SIXTRL_HOST_FN virtual ~CudaContext() = default;
+
+        protected:
+
+        using success_flag_arg_t = SIXTRL_CXX_NAMESPACE::CudaArgumentBase;
+        using cuda_arg_buffer_t  = ::NS(cuda_arg_buffer_t);
+
+        SIXTRL_HOST_FN virtual success_flag_t
+            doGetSuccessFlagValueFromArg() override;
+
+        SIXTRL_HOST_FN virtual void doSetSuccessFlagValueFromArg(
+            success_flag_t const success_flag ) override;
+
+        SIXTRL_HOST_FN success_flag_arg_t* doGetPtrToDerivedSuccessFlagArg();
+
+        SIXTRL_HOST_FN success_flag_arg_t const*
+        doGetPtrToDerivedSuccessFlagArg() const;
     };
 }
 

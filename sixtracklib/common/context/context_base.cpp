@@ -259,6 +259,43 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
+    bool ContextBase::hasSuccessFlagArgument() const SIXTRL_NOEXCEPT
+    {
+        return ( this->m_ptr_success_flag_arg.get() != nullptr );
+    }
+
+    ContextBase::ptr_arg_base_t
+    ContextBase::ptrSuccessFlagArgument() SIXTRL_NOEXCEPT
+    {
+        using _this_t = ContextBase;
+        using ptr_t   = ContextBase::ptr_arg_base_t;
+
+        return const_cast< ptr_t >( static_cast< _this_t const& >(
+            *this ).ptrSuccessFlagArgument() );
+    }
+
+    ContextBase::success_flag_t ContextBase::lastSuccessFlagValue() const
+    {
+        return this->doGetSuccessFlagValueFromArg();
+    }
+
+    ContextBase::ptr_const_arg_base_t
+    ContextBase::ptrSuccessFlagArgument() const SIXTRL_NOEXCEPT
+    {
+        using flag_t = ContextBase::success_flag_t;
+
+        return ( ( this->m_ptr_success_flag_arg.get() != nullptr ) &&
+                 ( this->m_ptr_success_flag_arg->usesRawArgument() ) &&
+                 ( this->m_ptr_success_flag_arg->size() == sizeof( flag_t ) ) )
+            ? this->m_ptr_success_flag_arg.get() : nullptr;
+    }
+
+    ContextBase::success_flag_t
+    ContextBase::lastSuccessFlagValue() const SIXTRL_NOEXCEPT
+    {
+
+    }
+
     bool ContextBase::isInDebugMode() const SIXTRL_NOEXCEPT
     {
         return this->m_debug_mode;
@@ -269,6 +306,7 @@ namespace SIXTRL_CXX_NAMESPACE
         const char *const SIXTRL_RESTRICT type_id_str,
         const char *const SIXTRL_RESTRICT config_str ) :
             m_config_str(), m_type_id_str(), m_type_id( type_id ),
+            m_ptr_success_flag_arg( nullptr ),
             m_uses_nodes( false ),
             m_ready_for_remap( false ),
             m_ready_for_send( false ),
@@ -315,6 +353,18 @@ namespace SIXTRL_CXX_NAMESPACE
         return ContextBase::status_t{ -1 };
     }
 
+    ContextBase::success_flag_t ContextBase::doGetSuccessFlagValueFromArg()
+    {
+        using  success_flag_t = ContextBase::success_flag_t;
+        return success_flag_t{ 0 };
+    }
+
+    void ContextBase::doSetSuccessFlagValueFromArg(
+        ContextBase::success_flag_t const success_flag )
+    {
+        return;
+    }
+
     void ContextBase::doSetTypeId(
         ContextBase::type_id_t const type_id ) SIXTRL_NOEXCEPT
     {
@@ -359,6 +409,13 @@ namespace SIXTRL_CXX_NAMESPACE
     void ContextBase::doSetDebugModeFlag( bool const flag ) SIXTRL_NOEXCEPT
     {
         this->m_debug_mode = flag;
+    }
+
+    void ContextBase::doUpdateStoredSuccessFlagArgument(
+        ContextBase::ptr_stored_base_argument_t&&
+            ptr_stored_arg ) SIXTRL_NOEXCEPT
+    {
+        this->m_ptr_success_flag_arg = std::move( ptr_stored_arg );
     }
 
     void ContextBase::doParseConfigStrBaseImpl(
