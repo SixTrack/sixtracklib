@@ -198,6 +198,13 @@ if( GTEST_FOUND )
     add_test( C99_CommonTrackTests test_track_common_c99 )
 
     # ==========================================================================
+    # test_track_line_common_c99:
+
+    add_executable( test_track_line_common_c99 test_track_line_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_line_common_c99 )
+    add_test( C99_CommonTrackLineTests test_track_line_common_c99 )
+
+    # ==========================================================================
     # test_track_job_common_c99:
 
     add_executable( test_track_job_common_c99 test_track_job_c99.cpp )
