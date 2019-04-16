@@ -63,7 +63,7 @@ if __name__ == '__main__':
     assert(0 == pysixtrl_testlib.stcommon.st_Particles_compare_values(
         ptr_cmp_particles, particles)
         or 0 == pysixtrl_testlib.stcommon.st_Particles_compare_values_with_treshold(
-        ptr_cmp_particles, particles))
+        ptr_cmp_particles, particles, ABS_ERR))
 
     st.st_Particles_calculate_difference(particles, ptr_cmp_particles, diff)
     pysixtrl_testlib.stcommon.st_Particles_print_out(diff)
