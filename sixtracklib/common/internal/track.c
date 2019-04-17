@@ -666,4 +666,55 @@ int NS(Track_all_particles_element_by_element_until_turn)(
             belements, until_turn, out_particles );
 }
 
+
+
+
+int NS(Track_particle_line_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_idx,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    NS(buffer_size_t) const line_begin_idx,
+    NS(buffer_size_t) const line_end_idx,
+    bool const finish_turn )
+{
+    return NS(Track_particle_line)( particles, particle_idx,
+        NS(Buffer_get_const_object)( belements, line_begin_idx ),
+        NS(Buffer_get_const_object)( belements, line_end_idx ),
+        finish_turn );
+}
+
+int NS(Track_subset_of_particles_line_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) particle_idx_begin,
+    NS(particle_num_elements_t) const particle_idx_end,
+    NS(particle_num_elements_t) const particle_idx_stride,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    NS(buffer_size_t) const line_begin_idx,
+    NS(buffer_size_t) const line_end_idx,
+    bool const finish_turn )
+{
+    return NS(Track_subset_of_particles_line)( particles,
+        particle_idx_begin, particle_idx_end, particle_idx_stride,
+        NS(Buffer_get_const_object)( belements, line_begin_idx ),
+        NS(Buffer_get_const_object)( belements, line_end_idx ), finish_turn );
+}
+
+int NS(Track_all_particles_line_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    NS(buffer_size_t) const line_begin_idx,
+    NS(buffer_size_t) const line_end_idx,
+    bool const finish_turn )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+    num_elem_t const begin  = ( num_elem_t )0u;
+    num_elem_t const stride = ( num_elem_t )1u;
+
+    return NS(Track_subset_of_particles_line)( particles,
+        begin, NS(Particles_get_num_of_particles)( particles ), stride,
+        NS(Buffer_get_const_object)( belements, line_begin_idx ),
+        NS(Buffer_get_const_object)( belements, line_end_idx ), finish_turn );
+}
+
+
 /* end: /common/internal/track.c */

@@ -31,6 +31,7 @@ set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
      wrappers/argument_operations.h
      wrappers/context_operations.h
      wrappers/extract_particles_address.h
+     wrappers/track_particles.h
      cuda_tools.h
      track_particles_kernel_c_wrapper.h
 )
@@ -39,6 +40,7 @@ set( SIXTRACKLIB_CUDA_PART_HOST_SOURCES
      wrappers/argument_operations.cu
      wrappers/context_operations.cu
      wrappers/extract_particles_address.cu
+     wrappers/track_particles.cu
      internal/track_particles_kernel_c_wrapper.cu
 )
 
@@ -132,6 +134,7 @@ set( SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS
      kernels/managed_buffer_remap.cuh
      kernels/managed_buffer_remap_kernel.cuh
      kernels/track_particles_kernel.cuh
+     kernels/track_particles.cuh
      kernels/extract_particles_address.cuh
 )
 
@@ -139,6 +142,7 @@ set( SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES
      kernels/managed_buffer_remap.cu
      kernels/managed_buffer_remap_kernel.cu
      kernels/track_particles_kernel.cu
+     kernels/track_particles.cu
      kernels/extract_particles_address.cu
 )
 

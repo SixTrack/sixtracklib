@@ -40,6 +40,12 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_arg_buffer;
     }
 
+    CudaArgumentBase::cuda_const_arg_buffer_t
+    CudaArgumentBase::cudaArgBuffer() const SIXTRL_NOEXCEPT
+    {
+        return this->m_arg_buffer;
+    }
+
     CudaArgumentBase::CudaArgumentBase(
         CudaArgumentBase::size_type const arg_buffer_capacity,
         ContextOnNodesBase* SIXTRL_RESTRICT ctx ) :

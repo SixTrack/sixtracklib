@@ -11,12 +11,14 @@ extern "C" {
 #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
 
 typedef void* NS(cuda_arg_buffer_t);
+typedef void const* NS(cuda_const_arg_buffer_t);
 
 #if defined( __cplusplus )
 
 namespace SIXTRL_CXX_NAMESPACE
 {
     using cuda_arg_buffer_t = ::NS(cuda_arg_buffer_t);
+    using cuda_const_arg_buffer_t = ::NS(cuda_const_arg_buffer_t);
 }
 
 #endif /* defined( __cplusplus ) */

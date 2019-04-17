@@ -308,7 +308,7 @@ SIXTRL_INLINE int NS(Buffer_reset_detailed_generic)(
 SIXTRL_INLINE bool NS(Buffer_needs_remapping_generic)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
 {
-    SIXTRL_ASSERT( NS(Buffer_has_datastore)( buffer ) );
+//     SIXTRL_ASSERT( NS(Buffer_has_datastore)( buffer ) );
     SIXTRL_ASSERT( NS(Buffer_allow_remapping)( buffer ) );
 
     return NS(ManagedBuffer_needs_remapping)(
@@ -326,7 +326,7 @@ SIXTRL_INLINE int NS(Buffer_remap_generic)(
     typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char* ptr_to_raw_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC address_t*     ptr_to_addr_t;
 
-    if( NS(Buffer_has_datastore)( buffer ) )
+    if( NS(Buffer_allow_remapping)( buffer ) )
     {
         ptr_to_raw_t begin = ( ptr_to_raw_t )( uintptr_t
             )NS(Buffer_get_data_begin_addr)( buffer );
@@ -1243,7 +1243,7 @@ NS(Buffer_get_const_object)(
     ptr_object_t ptr_obj = NS(Buffer_get_const_objects_begin)( buffer );
     buf_size_t const num_objects = NS(Buffer_get_num_of_objects)( buffer );
 
-    if( ( ptr_obj != SIXTRL_NULLPTR ) && ( object_index < num_objects ) )
+    if( ( ptr_obj != SIXTRL_NULLPTR ) && ( object_index <= num_objects ) )
     {
         ptr_obj = ptr_obj + object_index;
     }

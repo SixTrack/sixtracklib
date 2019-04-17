@@ -12,6 +12,7 @@ extern "C" {
 typedef SIXTRL_UINT64_T  NS(context_type_id_t);
 typedef SIXTRL_INT32_T   NS(context_status_t);
 typedef SIXTRL_UINT64_T  NS(context_size_t);
+typedef SIXTRL_UINT64_T  NS(context_success_flag_t);
 
 /* Predefined  context type id's: limit them to 0x0000 - 0x01FF */
 /* For userdefined type id's, the range 0x0200 - 0x03FF is reserved */
@@ -112,9 +113,10 @@ SIXTRL_STATIC_VAR NS(context_type_id_t) const NS(CONTEXT_TYPE_CUDA) =
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    using context_type_id_t = SIXTRL_UINT64_T;
-    using context_status_t  = SIXTRL_INT32_T;
-    using context_size_t    = SIXTRL_UINT64_T;
+    using context_type_id_t      = SIXTRL_UINT64_T;
+    using context_status_t       = SIXTRL_INT32_T;
+    using context_success_flag_t = SIXTRL_UINT64_T;
+    using context_size_t         = SIXTRL_UINT64_T;
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST context_type_id_t
         CONTEXT_TYPE_ID_BITMASK = static_cast< context_type_id_t >(
