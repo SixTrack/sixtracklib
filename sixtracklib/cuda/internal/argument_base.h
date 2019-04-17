@@ -52,11 +52,13 @@ namespace SIXTRL_CXX_NAMESPACE
         using ptr_base_context_t       = _base_arg_t::ptr_base_context_t;
         using ptr_const_base_context_t = _base_arg_t::ptr_const_base_context_t;
         using cuda_arg_buffer_t        = ::NS(cuda_arg_buffer_t);
+        using cuda_const_arg_buffer_t  = ::NS(cuda_const_arg_buffer_t);
 
         SIXTRL_HOST_FN virtual ~CudaArgumentBase() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool hasCudaArgBuffer() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN cuda_arg_buffer_t cudaArgBuffer() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cuda_const_arg_buffer_t cudaArgBuffer() const SIXTRL_NOEXCEPT;
 
         protected:
 

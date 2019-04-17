@@ -64,9 +64,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         using success_flag_arg_t = SIXTRL_CXX_NAMESPACE::CudaArgumentBase;
         using cuda_arg_buffer_t  = ::NS(cuda_arg_buffer_t);
+        using cuda_const_arg_buffer_t = ::NS(cuda_const_arg_buffer_t);
 
         SIXTRL_HOST_FN virtual success_flag_t
-            doGetSuccessFlagValueFromArg() override;
+            doGetSuccessFlagValueFromArg() const override;
 
         SIXTRL_HOST_FN virtual void doSetSuccessFlagValueFromArg(
             success_flag_t const success_flag ) override;
