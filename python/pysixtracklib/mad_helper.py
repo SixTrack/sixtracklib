@@ -44,4 +44,5 @@ def madseq_to_line(seq, convert=classes):
         if length > 0:
             yield "drift", "Drift", Drift(length)
         el=dispatch(el,convert)
+        oldpos=pos
         yield name,el.__class__.__name__,el

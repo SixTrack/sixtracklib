@@ -205,10 +205,6 @@ class TrackJob(object):
         return self._particles_buffer
 
     @property
-    def particles_buffer(self):
-        return self._particles_buffer
-
-    @property
     def beam_elements_buffer(self):
         return self._beam_elements_buffer
 
