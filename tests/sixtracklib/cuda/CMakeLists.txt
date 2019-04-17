@@ -110,6 +110,15 @@ if( GTEST_FOUND )
     target_link_libraries( test_be_drift_cuda_c99 PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
     add_test( C99_Cuda_BeamElementsDriftTests test_be_drift_cuda_c99 )
 
+    # ==========================================================================
+    # test_track_line_cuda_c99:
+
+    add_executable( test_track_line_cuda_c99 test_track_line_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_line_cuda_c99 )
+
+    target_link_libraries( test_track_line_cuda_c99 PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
+    add_test( C99_CudaTrackLineTests test_track_line_cuda_c99 )
+
     # --------------------------------------------------------------------------
     # test_single_file_compilation_cuda_cxx:
 
