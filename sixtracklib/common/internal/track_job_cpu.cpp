@@ -321,12 +321,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_HOST_FN TrackJobCpu::track_status_t trackLine(
         TrackJobCpu& SIXTRL_RESTRICT_REF job,
-        TrackJobCpu::size_type const belem_begin_index,
-        TrackJobCpu::size_type const belem_end_index,
+        TrackJobCpu::size_type const begin_index,
+        TrackJobCpu::size_type const end_index,
         bool const finish_turn ) SIXTRL_NOEXCEPT
     {
         using size_t                = TrackJobCpu::size_type;
-        using ptr_particles_t       = SIXTRL_PARTICLE_ARGPTR_DEC ::NS(Particles)*;
         using ptr_part_buffer_t     = SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)*;
         using ptr_belem_buffer_t    = SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)*;
         using track_status_t        = TrackJobCpu::track_status_t;
@@ -339,51 +338,20 @@ namespace SIXTRL_CXX_NAMESPACE
         size_t const num_beam_elements =
             ::NS(Buffer_get_num_of_objects)( belem_buffer );
 
-        if( ( belem_begin_index < belem_end_index ) &&
-            ( belem_end_index <= num_beam_elements ) )
+        if( ( begin_index < end_index ) && ( end_index  <= num_beam_elements ) )
         {
-            if( job.numParticleSets() == size_t{ 1 } )
+            ret = track_status_t{ 0 };
+
+            size_t const* it    = job.particleSetIndicesBegin();
+            size_t const* end   = job.particleSetIndicesEnd();
+
+            for( ; it != end ; ++it )
             {
-                SIXTRL_ASSERT( job.particleSetIndicesBegin() != nullptr );
-
-                ptr_particles_t p = ::NS(Particles_buffer_get_particles)(
-                    pbuffer, *job.particleSetIndicesBegin() );
-
-                ret = ::NS(Track_all_particles_subset_of_beam_elements)( p,
-                    belem_buffer, belem_begin_index, belem_end_index );
-
-                if( ( finish_turn ) && ( ret == track_status_t{ 0 } ) )
-                {
-                    ::NS(Particles_increment_all_at_turn_values)( p );
-                    ::NS(Particles_set_all_at_element_id_value)( p,
-                        job.minElementId() );
-                }
-            }
-            else if( job.numParticleSets() > size_t{ 1 }  )
-            {
-                size_t const* it    = job.particleSetIndicesBegin();
-                size_t const* end   = job.particleSetIndicesEnd();
-
-                SIXTRL_ASSERT( it  != nullptr );
-                SIXTRL_ASSERT( end != nullptr );
-
-                ret = track_status_t{ 0 };
-
-                for( ; it != end ; ++it )
-                {
-                    ptr_particles_t p =
-                        ::NS(Particles_buffer_get_particles)( pbuffer, *it );
-
-                    ret |= ::NS(Track_all_particles_subset_of_beam_elements)(
-                        p, belem_buffer, belem_begin_index, belem_end_index );
-
-                    if( ( finish_turn ) && ( ret == track_status_t{ 0 } ) )
-                    {
-                        ::NS(Particles_increment_all_at_turn_values)( p );
-                        ::NS(Particles_set_all_at_element_id_value)( p,
-                            job.minElementId() );
-                    }
-                }
+                ret |= ::NS(Track_all_particles_line)(
+                    ::NS(Particles_buffer_get_particles)( pbuffer, *it ),
+                    ::NS(Buffer_get_const_object)( belem_buffer, begin_index ),
+                    ::NS(Buffer_get_const_object)( belem_buffer, end_index ),
+                    finish_turn );
             }
         }
 
@@ -521,6 +489,15 @@ SIXTRL_HOST_FN ::NS(track_status_t) NS(TrackJobCpu_track_elem_by_elem)(
 {
     SIXTRL_ASSERT( job != nullptr );
     return SIXTRL_CXX_NAMESPACE::trackElemByElem( *job, turn );
+}
+
+NS(track_status_t) NS(TrackJobCpu_track_line)(
+    NS(TrackJobCpu)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const begin_index, NS(buffer_size_t) const end_index,
+    bool const finish_turn )
+{
+    SIXTRL_ASSERT( job != nullptr );
+    return job->trackLine( begin_index, end_index, finish_turn );
 }
 
 /* end: sixtracklib/common/internal/track_job_cpu.cpp */
