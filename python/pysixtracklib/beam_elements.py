@@ -354,6 +354,7 @@ class Elements(object):
         for name, cls in self.element_types.items():
             setattr(self, name, self._mk_fun(self.cbuffer, cls))
             self.cbuffer.typeids[cls._typeid] = cls
+        self._builder=self.gen_builder()
 
     def gen_builder(self):
         out = {}
@@ -372,3 +373,9 @@ class Elements(object):
     def from_mad(cls, seq):
         line=madseq_to_line(seq)
         return cls.fromline(line)
+
+    #@classmethod
+    #def from_mad2(cls, seq):
+    #    self=cls()
+    #    list(madseq_to_line(seq,self._builder))
+    #    return self

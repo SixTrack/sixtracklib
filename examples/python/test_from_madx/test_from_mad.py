@@ -34,7 +34,5 @@ x=job.output.particles[0].x[1::10]
 xf=abs(np.fft.rfft(x))
 plot(ff,xf)
 q1st=ff[xf.argmax()]
-(q1mad-20)-q1st
+print((q1mad-20)-q1st)
 
-
-job.output.particles[0].x

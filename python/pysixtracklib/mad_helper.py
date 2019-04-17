@@ -33,7 +33,7 @@ def dispatch(el,classes):
     return el
 
 def madseq_to_line(seq, convert=classes):
-    Drift=classes['Drift']
+    Drift=convert['Drift']
     oldpos = 0
     poss=seq.element_positions()
     names=seq.element_names()
