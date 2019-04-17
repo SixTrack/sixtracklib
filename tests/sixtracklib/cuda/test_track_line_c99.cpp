@@ -22,6 +22,7 @@
 #include "sixtracklib/cuda/context.h"
 #include "sixtracklib/cuda/argument.h"
 #include "sixtracklib/cuda/wrappers/track_particles.h"
+#include "sixtracklib/common/track.h"
 
 
 TEST( C99_CudaTrackLineTests, SendDataTrackSingleLineRecvDataCompare )
@@ -55,10 +56,6 @@ TEST( C99_CudaTrackLineTests, SendDataTrackSingleLineRecvDataCompare )
 
     SIXTRL_ASSERT( status == 0 );
 
-    buf_size_t const until_turn = 10;
-    int status = ::NS(Track_all_particles_until_turn)(
-        cmp_particles, eb, until_turn );
-
     ::NS(CudaContext)* ctx = ::NS(CudaContext_create)();
     ASSERT_TRUE( ctx != nullptr );
 
@@ -71,7 +68,7 @@ TEST( C99_CudaTrackLineTests, SendDataTrackSingleLineRecvDataCompare )
     ::NS(CudaArgument)* particles_arg = ::NS(CudaArgument_new)( ctx );
     ASSERT_TRUE( particles_arg != nullptr );
 
-    success = ::NS(CudaArgument_send_buffer)( track_pb, ctx );
+    success = ::NS(CudaArgument_send_buffer)( particles_arg, track_pb );
     ASSERT_TRUE( success );
 
     buf_size_t const num_beam_elements = ::NS(Buffer_get_num_of_objects)( eb );
@@ -96,10 +93,10 @@ TEST( C99_CudaTrackLineTests, SendDataTrackSingleLineRecvDataCompare )
         }
     }
 
-    success = NS(CudaArgument_receive_buffer)( track_pb, ctx );
+    success = NS(CudaArgument_receive_buffer)( particles_arg, track_pb );
     ASSERT_TRUE( success );
 
-    particles = ::NS(Particles_buffer_get_const_particles)( track_pb, 0 );
+    particles = ::NS(Particles_buffer_get_particles)( track_pb, 0 );
 
     double const ABS_DIFF = double{ 2e-14 };
 
