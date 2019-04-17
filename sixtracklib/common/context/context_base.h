@@ -85,14 +85,14 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const arg_size = size_type{ 0 } );
 
         bool hasSuccessFlagArgument() const SIXTRL_NOEXCEPT;
-        ptr_arg_base ptrSuccessFlagArgument() SIXTRL_NOEXCEPT;
+        ptr_arg_base_t ptrSuccessFlagArgument() SIXTRL_NOEXCEPT;
         ptr_const_arg_base_t ptrSuccessFlagArgument() const SIXTRL_NOEXCEPT;
 
         success_flag_t lastSuccessFlagValue() const;
 
         SIXTRL_HOST_FN bool isInDebugMode() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN virtual ~ContextBase() = default;
+        SIXTRL_HOST_FN virtual ~ContextBase() SIXTRL_NOEXCEPT;
 
         protected:
 

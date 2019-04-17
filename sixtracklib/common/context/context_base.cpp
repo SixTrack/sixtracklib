@@ -290,15 +290,14 @@ namespace SIXTRL_CXX_NAMESPACE
             ? this->m_ptr_success_flag_arg.get() : nullptr;
     }
 
-    ContextBase::success_flag_t
-    ContextBase::lastSuccessFlagValue() const SIXTRL_NOEXCEPT
-    {
-
-    }
-
     bool ContextBase::isInDebugMode() const SIXTRL_NOEXCEPT
     {
         return this->m_debug_mode;
+    }
+
+    ContextBase::~ContextBase() SIXTRL_NOEXCEPT
+    {
+
     }
 
     ContextBase::ContextBase(
@@ -353,7 +352,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return ContextBase::status_t{ -1 };
     }
 
-    ContextBase::success_flag_t ContextBase::doGetSuccessFlagValueFromArg()
+    ContextBase::success_flag_t ContextBase::doGetSuccessFlagValueFromArg() const
     {
         using  success_flag_t = ContextBase::success_flag_t;
         return success_flag_t{ 0 };
