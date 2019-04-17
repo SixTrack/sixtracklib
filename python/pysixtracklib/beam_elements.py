@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from cobjects import CBuffer, CObject, CField
 import itertools
+from collections import namedtuple
+
 import numpy as np
+from cobjects import CBuffer, CObject, CField
 from pysixtrack import track as pysixelem
 
+from .mad_helper import madseq_to_line
 
 class Drift(CObject):
     _typeid = 2
@@ -351,6 +354,7 @@ class Elements(object):
         for name, cls in self.element_types.items():
             setattr(self, name, self._mk_fun(self.cbuffer, cls))
             self.cbuffer.typeids[cls._typeid] = cls
+        self._builder=self.gen_builder()
 
     def gen_builder(self):
         out = {}
@@ -364,3 +368,14 @@ class Elements(object):
 
     def get(self, objid):
         return self.cbuffer.get_object(objid)
+
+    @classmethod
+    def from_mad(cls, seq):
+        line=madseq_to_line(seq)
+        return cls.fromline(line)
+
+    #@classmethod
+    #def from_mad2(cls, seq):
+    #    self=cls()
+    #    list(madseq_to_line(seq,self._builder))
+    #    return self
