@@ -48,11 +48,27 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     if( SIXTRACKL_ENABLE_CUDA )
 
         # -------------------------------------------------------------------------
-        # test_track_job_opencl:
+        # test_context_cuda:
 
          add_test( NAME Python_CudaContextTests
              COMMAND ${PYTHON_EXECUTABLE}
                      ${CMAKE_CURRENT_SOURCE_DIR}/test_context_cuda.py
+             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
+
+        # -------------------------------------------------------------------------
+        # test_argument_cuda:
+
+         add_test( NAME Python_CudaArgumentTests
+             COMMAND ${PYTHON_EXECUTABLE}
+                     ${CMAKE_CURRENT_SOURCE_DIR}/test_argument_cuda.py
+             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
+
+        # -------------------------------------------------------------------------
+        # test_track_line_cuda:
+
+         add_test( NAME Python_CudaTrackLineTests
+             COMMAND ${PYTHON_EXECUTABLE}
+                     ${CMAKE_CURRENT_SOURCE_DIR}/test_track_line_cuda.py
              WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
 
     endif()
