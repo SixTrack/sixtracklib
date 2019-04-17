@@ -6,6 +6,7 @@ from cobjects import CBuffer,CObject
 
 from . import stcommon as st
 from . import config as stconf
+from .particles import ParticlesSet
 
 
 def _get_buffer(obj):
@@ -194,6 +195,14 @@ class TrackJob(object):
     @property
     def output_buffer(self):
         return self._output_buffer
+
+    @property
+    def output(self):
+        return ParticlesSet(self._output_buffer)
+
+    @property
+    def particles_buffer(self):
+        return self._particles_buffer
 
     @property
     def particles_buffer(self):
