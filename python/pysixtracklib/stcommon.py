@@ -609,6 +609,48 @@ if SIXTRACKLIB_MODULES.get( 'cuda', False ):
     st_CudaArgument_get_arg_buffer.argtypes = [ st_CudaArgument_p ]
     st_CudaArgument_get_arg_buffer.restype = ct.c_void_p
 
+    st_CudaArgument_uses_cobjects_buffer = \
+        sixtracklib.st_CudaArgument_uses_cobjects_buffer
+    st_CudaArgument_uses_cobjects_buffer.restype = ct.c_bool
+    st_CudaArgument_uses_cobjects_buffer.argtypes = [ st_CudaArgument_p ]
+
+    st_CudaArgument_get_cobjects_buffer =  \
+        sixtracklib.st_CudaArgument_get_cobjects_buffer
+    st_CudaArgument_get_cobjects_buffer.restype = st_Buffer_p
+    st_CudaArgument_get_cobjects_buffer.argtypes = [ st_CudaArgument_p ]
+
+    st_CudaArgument_uses_raw_argument = \
+        sixtracklib.st_CudaArgument_uses_raw_argument
+    st_CudaArgument_uses_raw_argument.restype = ct.c_bool
+    st_CudaArgument_uses_raw_argument.argtypes = [ st_CudaArgument_p ]
+
+    st_CudaArgument_get_ptr_raw_argument = \
+        sixtracklib.st_CudaArgument_get_ptr_raw_argument
+    st_CudaArgument_get_ptr_raw_argument.restype = ct.c_void_p
+    st_CudaArgument_get_ptr_raw_argument.argtypes = [ st_CudaArgument_p ]
+
+    st_CudaArgument_get_size = sixtracklib.st_CudaArgument_get_size
+    st_CudaArgument_get_size.restype = ct.c_uint64
+    st_CudaArgument_get_size.argtypes = [ st_CudaArgument_p ]
+
+    st_CudaArgument_get_capacity = sixtracklib.st_CudaArgument_get_capacity
+    st_CudaArgument_get_capacity.restype = ct.c_uint64
+    st_CudaArgument_get_capacity.argtypes = [ st_CudaArgument_p ]
+
+    st_CudaArgument_has_argument_buffer = \
+        sixtracklib.st_CudaArgument_has_argument_buffer
+    st_CudaArgument_has_argument_buffer.restype = ct.c_bool
+    st_CudaArgument_has_argument_buffer.argtypes = [ st_CudaArgument_p ]
+
+    st_CudaArgument_requires_argument_buffer = \
+        sixtracklib.st_CudaArgument_requires_argument_buffer
+    st_CudaArgument_requires_argument_buffer.restype = ct.c_bool
+    st_CudaArgument_requires_argument_buffer.argtypes = [ st_CudaArgument_p ]
+
+    st_CudaArgument_get_type_id = sixtracklib.st_CudaArgument_get_type_id
+    st_CudaArgument_get_type_id.restype = ct.c_uint64
+    st_CudaArgument_get_type_id.argtypes = [ st_CudaArgument_p ]
+
 # -----------------------------------------------------------------------------
 # Cl-Context methods
 
