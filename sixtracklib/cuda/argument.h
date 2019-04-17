@@ -137,6 +137,37 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_receive_memory)(
     void* SIXTRL_RESTRICT destination_buffer,
     NS(context_size_t) const destination_capacity );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_uses_cobjects_buffer)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)* NS(CudaArgument_get_cobjects_buffer)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_uses_raw_argument)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_get_ptr_raw_argument)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t) NS(CudaArgument_get_size)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t) NS(CudaArgument_get_capacity)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_has_argument_buffer)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_requires_argument_buffer)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_type_id_t)
+NS(CudaArgument_get_type_id)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(CudaArgument_get_type_id_str)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
+
 #if defined( __cplusplus ) && ( !defined( _GPUCODE ) )
 }
 #endif /* defined( __cplusplus ) && ( !defined( _GPUCODE ) */

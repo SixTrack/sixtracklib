@@ -1137,8 +1137,7 @@ SIXTRL_INLINE int NS(Buffer_remap)(
 {
     int success = -1;
 
-    if( ( NS(Buffer_has_datastore)( buffer ) ) &&
-        ( NS(Buffer_allow_remapping)( buffer ) ) )
+    if( NS(Buffer_allow_remapping)( buffer ) )
     {
         /*
         #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \

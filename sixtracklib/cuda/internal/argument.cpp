@@ -232,7 +232,70 @@ bool NS(CudaArgument_receive_memory)( ::NS(CudaArgument)* SIXTRL_RESTRICT arg,
 {
     return ( arg != nullptr )
         ? arg->receive( destination_buffer, arg->size() ) : false;
+}
 
+
+bool NS(CudaArgument_uses_cobjects_buffer)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr ) ? argument->usesCObjectsBuffer() : false;
+}
+
+NS(Buffer)* NS(CudaArgument_get_cobjects_buffer)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr ) ? argument->ptrCObjectsBuffer() : nullptr;
+}
+
+bool NS(CudaArgument_uses_raw_argument)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr ) ? argument->usesRawArgument() : false;
+}
+
+bool NS(CudaArgument_get_ptr_raw_argument)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr ) ? argument->ptrRawArgument() : nullptr;
+}
+
+NS(context_size_t) NS(CudaArgument_get_size)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr )
+        ? argument->size() : ::NS(context_size_t){ 0 };
+}
+
+NS(context_size_t) NS(CudaArgument_get_capacity)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr )
+        ? argument->capacity() : ::NS(context_size_t){ 0 };
+}
+
+bool NS(CudaArgument_has_argument_buffer)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr ) ? argument->hasArgumentBuffer() : false;
+}
+
+bool NS(CudaArgument_requires_argument_buffer)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr ) ? argument->requiresArgumentBuffer() : false;
+}
+
+NS(context_type_id_t) NS(CudaArgument_get_type_id)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr ) ? argument->type()
+        : SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_INVALID;
+}
+
+char const* NS(CudaArgument_get_type_id_str)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+{
+    return ( argument != nullptr ) ? argument->ptrTypeStr() : nullptr;
 }
 
 /* end: sixtracklib/cuda/internal/argument.cu */

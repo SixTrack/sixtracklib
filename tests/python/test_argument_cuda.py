@@ -9,8 +9,6 @@ from   pysixtracklib import stcommon as st
 import pysixtracklib_test as testlib
 import ctypes as ct
 
-import pdb
-
 if __name__ == '__main__':
     num_particles = ct.c_uint64( 100 )
     pbuffer = st.st_Buffer_new( ct.c_uint64( 0 ) )

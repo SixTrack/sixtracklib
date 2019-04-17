@@ -6,6 +6,7 @@
         #include <cstddef>
         #include <cstdlib>
         #include <string>
+        #include <memory>
     #else /* !defined( __cplusplus ) */
         #include <stdbool.h>
         #include <stddef.h>
@@ -35,12 +36,14 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         public:
 
-        using type_id_t      = SIXTRL_CXX_NAMESPACE::context_type_id_t;
-        using status_t       = SIXTRL_CXX_NAMESPACE::context_status_t;
-        using buffer_t       = SIXTRL_CXX_NAMESPACE::Buffer;
-        using c_buffer_t     = ::NS(Buffer);
-        using size_type      = ::NS(context_size_t);
-        using ptr_arg_base_t = ArgumentBase*;
+        using type_id_t            = SIXTRL_CXX_NAMESPACE::context_type_id_t;
+        using status_t             = SIXTRL_CXX_NAMESPACE::context_status_t;
+        using buffer_t             = SIXTRL_CXX_NAMESPACE::Buffer;
+        using c_buffer_t           = ::NS(Buffer);
+        using size_type            = ::NS(context_size_t);
+        using ptr_arg_base_t       = ArgumentBase*;
+        using ptr_const_arg_base_t = ArgumentBase const*;
+        using success_flag_t       = ::NS(context_success_flag_t);
 
         SIXTRL_HOST_FN type_id_t type() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN std::string const& typeStr() const SIXTRL_NOEXCEPT;
@@ -81,11 +84,19 @@ namespace SIXTRL_CXX_NAMESPACE
             ptr_arg_base_t SIXTRL_RESTRICT arg,
             size_type const arg_size = size_type{ 0 } );
 
+        bool hasSuccessFlagArgument() const SIXTRL_NOEXCEPT;
+        ptr_arg_base_t ptrSuccessFlagArgument() SIXTRL_NOEXCEPT;
+        ptr_const_arg_base_t ptrSuccessFlagArgument() const SIXTRL_NOEXCEPT;
+
+        success_flag_t lastSuccessFlagValue() const;
+
         SIXTRL_HOST_FN bool isInDebugMode() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN virtual ~ContextBase() = default;
+        SIXTRL_HOST_FN virtual ~ContextBase() SIXTRL_NOEXCEPT;
 
         protected:
+
+        using ptr_stored_base_argument_t = std::unique_ptr< ArgumentBase >;
 
         SIXTRL_HOST_FN explicit ContextBase( type_id_t const type_id,
             const char *const SIXTRL_RESTRICT type_str,
@@ -118,6 +129,12 @@ namespace SIXTRL_CXX_NAMESPACE
             ptr_arg_base_t SIXTRL_RESTRICT arg,
             size_type arg_size );
 
+        SIXTRL_HOST_FN virtual success_flag_t
+            doGetSuccessFlagValueFromArg() const;
+
+        SIXTRL_HOST_FN virtual void doSetSuccessFlagValueFromArg(
+            success_flag_t const success_flag );
+
         SIXTRL_HOST_FN void doSetTypeId(
             type_id_t const type_id ) SIXTRL_NOEXCEPT;
 
@@ -139,6 +156,9 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doSetDebugModeFlag(
             bool const flag ) SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN void doUpdateStoredSuccessFlagArgument(
+            ptr_stored_base_argument_t&& ptr_stored_arg ) SIXTRL_NOEXCEPT;
+
         private:
 
         SIXTRL_HOST_FN void doParseConfigStrBaseImpl(
@@ -147,6 +167,8 @@ namespace SIXTRL_CXX_NAMESPACE
         std::string m_config_str;
         std::string m_type_id_str;
         type_id_t   m_type_id;
+
+        ptr_stored_base_argument_t m_ptr_success_flag_arg;
 
         bool        m_uses_nodes;
         bool        m_ready_for_remap;
