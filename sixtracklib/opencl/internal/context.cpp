@@ -648,18 +648,16 @@ namespace SIXTRL_CXX_NAMESPACE
     bool ClContext::hasLineTrackingKernel() const SIXTRL_NOEXCEPT
     {
         return ( ( this->hasSelectedNode() ) &&
-                 ( this->m_track_single_turn_kernel_id >= kernel_id_t{ 0 } ) &&
-                 ( static_cast< size_type >(
-                     this->m_track_single_turn_kernel_id ) <
-                         this->numAvailableKernels() ) );
+            ( this->m_track_line_kernel_id >= kernel_id_t{ 0 } ) &&
+                ( static_cast< size_type >( this->m_track_line_kernel_id ) <
+                    this->numAvailableKernels() ) );
     }
 
     ClContext::kernel_id_t
     ClContext::lineTrackingKernelId() const SIXTRL_NOEXCEPT
     {
         return ( this->hasTrackingKernel() )
-            ? this->m_track_until_turn_kernel_id
-            : ClContext::kernel_id_t{ -1 };
+            ? this->m_track_line_kernel_id : ClContext::kernel_id_t{ -1 };
     }
 
     bool ClContext::setTrackLineKernelId(
@@ -679,8 +677,8 @@ namespace SIXTRL_CXX_NAMESPACE
                 ( static_cast< size_type >( program_id ) <
                     this->numAvailablePrograms() ) )
             {
-                this->m_track_single_turn_kernel_id  = kernel_id;
-                this->m_track_single_turn_program_id = program_id;
+                this->m_track_line_kernel_id  = kernel_id;
+                this->m_track_line_program_id = program_id;
                 success = true;
             }
         }
@@ -693,7 +691,7 @@ namespace SIXTRL_CXX_NAMESPACE
         ClContext::size_type const line_end_idx, bool const finish_turn )
     {
         return this->trackLine( line_begin_idx, line_end_idx,
-            finish_turn, this->m_track_single_turn_kernel_id );
+            finish_turn, this->m_track_line_kernel_id );
     }
 
     int ClContext::trackLine(
@@ -731,7 +729,7 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         return this->trackLine( particles_arg, particle_set_index,
             beam_elements_arg, line_begin_idx, line_end_idx, finish_turn,
-                this->m_track_single_turn_kernel_id );
+                this->m_track_line_kernel_id );
     }
 
     int ClContext::trackLine(
