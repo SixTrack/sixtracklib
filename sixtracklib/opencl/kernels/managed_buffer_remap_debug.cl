@@ -3,14 +3,13 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/opencl/internal/default_compile_options.h"
+    #include "sixtracklib/opencl/internal/success_flag.h"
 
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #include "sixtracklib/common/buffer/managed_buffer_remap.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
-
-#pragma OPENCL_EXTENSION cl_khr_int32_extended_atomics
 
 __kernel void NS(ManagedBuffer_remap_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
@@ -29,26 +28,23 @@ __kernel void NS(ManagedBuffer_remap_debug_opencl)(
 {
     typedef NS(buffer_size_t) buf_size_t;
 
-    size_t const global_id           = get_global_id( 0 );
+    size_t const global_id = get_global_id( 0 );
     size_t const gid_to_remap_buffer = ( size_t )0u;
+
+    NS(opencl_success_flag_t) success_flag =
+        ( buffer_begin != SIXTRL_NULLPTR ) ? 0 : -1;
 
     if( gid_to_remap_buffer == global_id )
     {
-        long int success_flag = ( buffer_begin != SIXTRL_NULLPTR ) ? 0 : -1;
-
         buf_size_t const slot_size = ( buf_size_t )8u;
 
         if( 0 != NS(ManagedBuffer_remap)( buffer_begin, slot_size ) )
         {
-            success_flag |= -2;
-        }
-
-        if( ptr_success_flag != SIXTRL_NULLPTR )
-        {
-            atomic_or( ptr_success_flag, success_flag );
+            success_flag = ( NS(opencl_success_flag_t) )-2;
         }
     }
 
+    NS(OpenCl1x_collect_success_flag_value)( ptr_success_flag, success_flag );
     return;
 }
 
@@ -59,6 +55,10 @@ __kernel void NS(ManagedBuffer_remap_io_buffers_debug_opencl)(
 {
     typedef NS(buffer_size_t) buf_size_t;
 
+    NS(opencl_success_flag_t) success_flag =
+        ( ( in_buffer_begin  != SIXTRL_NULLPTR ) &&
+          ( out_buffer_begin != SIXTRL_NULLPTR ) ) ? 0 : -1;
+
     size_t const global_id = get_global_id( 0 );
     size_t const gid_to_remap_input_buffer  = ( size_t )0u;
     size_t const gid_to_remap_output_buffer = ( get_global_size( 0 ) > 1u )
@@ -67,9 +67,7 @@ __kernel void NS(ManagedBuffer_remap_io_buffers_debug_opencl)(
 
     if( global_id <= gid_to_remap_output_buffer )
     {
-        long int success_flag = ( long int )0;
         buf_size_t const slot_size = ( buf_size_t )8u;
-
         if( global_id == gid_to_remap_input_buffer )
         {
             if( ( in_buffer_begin != SIXTRL_NULLPTR ) &&
@@ -77,12 +75,12 @@ __kernel void NS(ManagedBuffer_remap_io_buffers_debug_opencl)(
             {
                 if( 0 != NS(ManagedBuffer_remap)( in_buffer_begin, slot_size ) )
                 {
-                    success_flag |= -2;
+                    success_flag |= ( NS(opencl_success_flag_t) )-4;
                 }
             }
             else
             {
-                success_flag |= -1;
+                success_flag |= ( NS(opencl_success_flag_t) )-2;
             }
         }
 
@@ -94,21 +92,17 @@ __kernel void NS(ManagedBuffer_remap_io_buffers_debug_opencl)(
                 if( 0 != NS(ManagedBuffer_remap)(
                         out_buffer_begin, slot_size ) )
                 {
-                    success_flag |= -4;
+                    success_flag |= ( NS(opencl_success_flag_t) )-16;
                 }
             }
             else
             {
-                success_flag |= -1;
+                success_flag |= ( NS(opencl_success_flag_t) )-8;
             }
-        }
-
-        if( ptr_success_flag != SIXTRL_NULLPTR )
-        {
-            atomic_or( ptr_success_flag, success_flag );
         }
     }
 
+    NS(OpenCl1x_collect_success_flag_value)( ptr_success_flag, success_flag );
     return;
 }
 
