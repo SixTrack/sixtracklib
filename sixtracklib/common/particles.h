@@ -22,8 +22,10 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/buffer_object_defines.h"
     #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
+    #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
