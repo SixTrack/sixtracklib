@@ -412,6 +412,7 @@ namespace SIXTRL_CXX_NAMESPACE
             void resetArguments( size_type const nargs )
             {
                 using _this_t = ClContextBase;
+                SIXTRL_ASSERT( nargs <= size_type{ 64 } );
 
                 this->m_arguments.clear();
                 this->m_arg_types.clear();

@@ -1046,27 +1046,39 @@ namespace SIXTRL_CXX_NAMESPACE
                 this->m_kernel_data.back().m_kernel_name = kernel_name;
                 this->m_kernel_data.back().m_program_id  = program_id;
 
-                this->m_kernel_data.back().resetArguments(
-                    kernel.getInfo< CL_KERNEL_NUM_ARGS >() );
-
                 cl::Device& selected_device = this->m_available_devices.at(
                     this->m_selected_node_index );
+
+                size_type const num_kernel_args =
+                    kernel.getInfo< CL_KERNEL_NUM_ARGS >();
+
+                size_type const max_work_group_size = kernel.getWorkGroupInfo<
+                    CL_KERNEL_WORK_GROUP_SIZE >( selected_device );
+
+                size_type const pref_work_group_size = kernel.getWorkGroupInfo<
+                    CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE >(
+                        selected_device );
+
+                size_type const loc_mem_size = kernel.getWorkGroupInfo<
+                    CL_KERNEL_LOCAL_MEM_SIZE >( selected_device );
+
+                SIXTRL_ASSERT( num_kernel_args  >= size_type{  0 } );
+                SIXTRL_ASSERT( num_kernel_args  <  size_type{ 32 } );
+                SIXTRL_ASSERT( pref_work_group_size > size_type{ 0 } );
+                SIXTRL_ASSERT( max_work_group_size  >= pref_work_group_size );
+                SIXTRL_ASSERT( max_work_group_size  <= size_type{ 65535 } );
+
+                this->m_kernel_data.back().resetArguments( num_kernel_args );
 
                 this->m_kernel_data.back().m_work_group_size = size_type{ 0 };
 
                 this->m_kernel_data.back().m_max_work_group_size =
-                    kernel.getWorkGroupInfo< CL_KERNEL_WORK_GROUP_SIZE >(
-                        selected_device );
+                    max_work_group_size;
 
                 this->m_kernel_data.back().m_preferred_work_group_multiple =
-                    kernel.getWorkGroupInfo<
-                         CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE >(
-                             selected_device );
+                    pref_work_group_size;
 
-                this->m_kernel_data.back().m_local_mem_size =
-                    kernel.getWorkGroupInfo< CL_KERNEL_LOCAL_MEM_SIZE >(
-                        selected_device );
-
+                this->m_kernel_data.back().m_local_mem_size = loc_mem_size;
                 program_data.m_kernels.push_back( kernel_id );
             }
         }
