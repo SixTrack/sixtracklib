@@ -25,35 +25,45 @@ extern "C" {
 
 /* ========================================================================= */
 
-SIXTRL_FN SIXTRL_STATIC bool NS(BeamElements_is_beam_element_obj)(
+SIXTRL_STATIC SIXTRL_FN bool NS(BeamElements_is_beam_element_obj)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_calc_buffer_parameters_for_object)(
+SIXTRL_STATIC SIXTRL_FN bool
+NS(BeamElements_objects_range_are_all_beam_elements)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT obj_it,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT obj_end );
+
+SIXTRL_STATIC SIXTRL_FN bool
+NS(BeamElements_managed_buffer_is_beam_elements_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const slot_size );
+
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_calc_buffer_parameters_for_object)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT num_objects,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT num_slots,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT num_dataptrs,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_copy_object)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_copy_object)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT destination,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT src );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_compare_objects)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_compare_objects)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT rhs );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_compare_objects_with_treshold)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_compare_objects_with_treshold)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT rhs,
     SIXTRL_REAL_T const treshold );
 
-SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_object)(
+SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_object)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT obj );
 
 /* ------------------------------------------------------------------------ */
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_calc_buffer_parameters_for_line)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_calc_buffer_parameters_for_line)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT num_objects,
@@ -61,17 +71,17 @@ SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_calc_buffer_parameters_for_line)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT num_dataptrs,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_copy_line)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_copy_line)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT destination_begin );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_compare_lines)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_compare_lines)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT rhs_begin );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_compare_lines_with_treshold)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_compare_lines_with_treshold)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT rhs_begin,
@@ -81,28 +91,28 @@ SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_compare_lines_with_treshold)(
 
 #if !defined( _GPUCODE )
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_add_single_new_to_buffer)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_add_single_new_to_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_copy_single_to_buffer)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_copy_single_to_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_add_new_to_buffer)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_add_new_to_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_copy_to_buffer)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_copy_to_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end );
 
-SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_buffer)(
+SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(BeamElements_is_beam_elements_buffer)(
+SIXTRL_STATIC SIXTRL_FN bool NS(BeamElements_is_beam_elements_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
 #endif /* !defined( _GPUCODE ) */
@@ -179,6 +189,31 @@ SIXTRL_INLINE bool NS(BeamElements_is_beam_element_obj)(
     }
 
     return is_beam_element;
+}
+
+SIXTRL_INLINE bool NS(BeamElements_objects_range_are_all_beam_elements)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT obj_it,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT obj_end )
+{
+    bool are_all_beam_elements = false;
+
+    if( ( obj_it != SIXTRL_NULLPTR ) && ( obj_end != SIXTRL_NULLPTR ) &&
+        ( ( ( uintptr_t )obj_it ) <= ( uintptr_t )obj_end ) )
+    {
+        /* NOTE: An empty range evaluates as true, this is to allow use
+         * in context of NS(Track_*particle*_line*) to finish empty/zero
+         * length lines*/
+
+        are_all_beam_elements = true;
+
+        while( ( are_all_beam_elements ) && ( obj_it != obj_end ) )
+        {
+            are_all_beam_elements = NS(BeamElements_is_beam_element_obj)(
+                obj_it++ );
+        }
+    }
+
+    return are_all_beam_elements;
 }
 
 SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
@@ -874,7 +909,7 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
     return compare_value;
 }
 
-SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_object)(
+SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_object)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT obj )
 {
     if( obj != SIXTRL_NULLPTR )
@@ -1446,31 +1481,22 @@ SIXTRL_INLINE void NS(BeamElements_clear_buffer)(
 SIXTRL_INLINE bool NS(BeamElements_is_beam_elements_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
 {
-    typedef NS(buffer_size_t) size_t;
-    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* obj_iter_t;
+    return NS(BeamElements_managed_buffer_is_beam_elements_buffer)(
+        ( unsigned char const* )( uintptr_t )NS(Buffer_get_data_begin_addr)(
+            buffer ), NS(Buffer_get_slot_size)( buffer ) );
+}
 
-    bool is_beam_elements_buffer = (
-        ( buffer != SIXTRL_NULLPTR ) &&
-        ( NS(Buffer_get_num_of_objects)( buffer ) > ( size_t )0u ) );
+SIXTRL_INLINE bool NS(BeamElements_managed_buffer_is_beam_elements_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const slot_size )
+{
+    SIXTRL_ASSERT( buffer != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( slot_size > ( NS(buffer_size_t) )0u );
+    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( buffer, slot_size ) );
 
-    SIXTRL_ASSERT( !NS(Buffer_needs_remapping)( buffer ) );
-
-    if( is_beam_elements_buffer )
-    {
-        obj_iter_t it  = NS(Buffer_get_const_objects_begin)( buffer );
-        obj_iter_t end = NS(Buffer_get_const_objects_end)( buffer );
-
-        for( ; it != end ; ++it )
-        {
-            if( !NS(BeamElements_is_beam_element_obj)( it ) )
-            {
-                is_beam_elements_buffer = false;
-                break;
-            }
-        }
-    }
-
-    return is_beam_elements_buffer;
+    return NS(BeamElements_objects_range_are_all_beam_elements)(
+        NS(ManagedBuffer_get_const_objects_index_begin)( buffer, slot_size ),
+        NS(ManagedBuffer_get_const_objects_index_end)( buffer, slot_size ) );
 }
 
 #endif /* !defined( _GPUCODE ) */
