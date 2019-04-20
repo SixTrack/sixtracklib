@@ -377,6 +377,15 @@ namespace SIXTRL_CXX_NAMESPACE
         return SIXTRL_CXX_NAMESPACE::trackElemByElem( *this, until_turn );
     }
 
+    TrackJobCl::track_status_t TrackJobCl::doTrackLine(
+        TrackJobCl::size_type const line_begin_idx,
+        TrackJobCl::size_type const line_end_idx,
+        bool const finish_turn )
+    {
+        return SIXTRL_CXX_NAMESPACE::trackLine(
+            *this, line_begin_idx, line_end_idx, finish_turn );
+    }
+
 
     SIXTRL_HOST_FN void TrackJobCl::doCollect()
     {
@@ -779,6 +788,28 @@ namespace SIXTRL_CXX_NAMESPACE
         return ( job.context().runKernel( kid, job.totalNumParticles() ) )
             ? status_t{ 0 } : status_t{ -1 };
     }
+
+    SIXTRL_HOST_FN TrackJobCl::track_status_t trackLine(
+        TrackJobCl& SIXTRL_RESTRICT_REF job,
+        TrackJobCl::size_type const line_begin_idx,
+        TrackJobCl::size_type const line_end_idx,
+        bool const finish_turn ) SIXTRL_NOEXCEPT
+    {
+        SIXTRL_ASSERT( job.ptrContext() != nullptr );
+        SIXTRL_ASSERT( job.ptrParticlesArg() != nullptr );
+        SIXTRL_ASSERT( job.ptrBeamElementsArg() != nullptr );
+        SIXTRL_ASSERT( job.hasOutputBuffer() );
+        SIXTRL_ASSERT( job.ptrOutputBufferArg() != nullptr );
+        SIXTRL_ASSERT( job.hasElemByElemOutput() );
+        SIXTRL_ASSERT( job.ptrElemByElemConfig() != nullptr );
+        SIXTRL_ASSERT( job.totalNumParticles() > TrackJobCl::size_type{ 0 } );
+
+        ClContext& ctx = job.context();
+        SIXTRL_ASSERT( ctx.hasSelectedNode() );
+        SIXTRL_ASSERT( ctx.hasLineTrackingKernel() );
+
+        return ctx.trackLine( line_begin_idx, line_end_idx, finish_turn );
+    }
 }
 
 SIXTRL_HOST_FN NS(TrackJobCl)* NS(TrackJobCl_create)(
@@ -903,6 +934,17 @@ SIXTRL_HOST_FN NS(track_status_t) NS(TrackJobCl_track_elem_by_elem)(
 {
     SIXTRL_ASSERT( track_job != nullptr );
     return SIXTRL_CXX_NAMESPACE::trackElemByElem( *track_job, until_turn );
+}
+
+NS(track_status_t) NS(TrackJobCl_track_line)(
+    NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
+    NS(buffer_size_t) const line_begin_idx,
+    NS(buffer_size_t) const line_end_idx,
+    bool const finish_turn )
+{
+    SIXTRL_ASSERT( track_job != nullptr );
+    return SIXTRL_CXX_NAMESPACE::trackLine(
+        *track_job, line_begin_idx, line_end_idx, finish_turn );
 }
 
 SIXTRL_HOST_FN void NS(TrackJobCl_collect)(
