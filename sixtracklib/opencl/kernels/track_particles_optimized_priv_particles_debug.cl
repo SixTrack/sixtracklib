@@ -16,7 +16,7 @@
     #include "sixtracklib/common/track.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-__kernel void NS(Track_particle_line_opt_pp_debug_opencl)(
+__kernel void NS(Track_particles_line_opt_pp_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
     SIXTRL_UINT64_T const particle_set_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
@@ -58,7 +58,7 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_debug_opencl)(
 
 /* ========================================================================= */
 
-__kernel void NS(Track_particle_line_opt_pp_debug_opencl)(
+__kernel void NS(Track_particles_line_opt_pp_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
     SIXTRL_UINT64_T const particle_set_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,

@@ -16,7 +16,7 @@
     #include "sixtracklib/common/track.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-__kernel void NS(Track_particle_line_opt_pp_opencl)(
+__kernel void NS(Track_particles_line_opt_pp_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
     SIXTRL_UINT64_T const particle_set_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
@@ -51,7 +51,7 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
 
 /* ========================================================================= */
 
-__kernel void NS(Track_particle_line_opt_pp_opencl)(
+__kernel void NS(Track_particles_line_opt_pp_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
     SIXTRL_UINT64_T const particle_set_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
@@ -136,7 +136,9 @@ __kernel void NS(Track_particle_line_opt_pp_opencl)(
     SIXTRL_ASSERT( in_particles != SIXTRL_NULLPTR );
     num_particles = in_particles->num_particles;
 
-    NS(OpenCl1x_init_optimized_priv_particle)( &particles, reals, indexes );
+    NS(OpenCl1x_init_optimized_priv_particle)(
+        &particles, &reals[ 0 ], &indexes[ 0 ] );
+
     SIXTRL_ASSERT( particles.num_particles == ( num_element_t )1u );
 
     for( ; particle_id < num_particles ; particle_id += stride )
@@ -205,7 +207,8 @@ __kernel void NS(Track_particles_single_turn_opt_pp_opencl)(
 
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) particles;
 
-    NS(OpenCl1x_init_optimized_priv_particle)( &particles, reals, indexes );
+    NS(OpenCl1x_init_optimized_priv_particle)(
+        &particles, &reals[ 0 ], &indexes[ 0 ] );
 
     SIXTRL_ASSERT( be_begin != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( be_end   != SIXTRL_NULLPTR );
@@ -317,7 +320,8 @@ __kernel void NS(Track_particles_until_turn_opt_pp_opencl)(
     };
 
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) particles;
-    NS(OpenCl1x_init_optimized_priv_particle)( &particles, reals, indexes );
+    NS(OpenCl1x_init_optimized_priv_particle)(
+        &particles, &reals[ 0 ], &indexes[ 0 ] );
 
     SIXTRL_ASSERT( be_begin != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( be_end   != SIXTRL_NULLPTR );
@@ -385,15 +389,17 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)*
             ptr_particles_t;
 
-    SIXTRL_STATIC_VAR NS(opencl_success_flag_t) const ZERO_FLAG = ( NS(opencl_success_flag_t) )0u;
+    SIXTRL_STATIC_VAR NS(opencl_success_flag_t) const ZERO_FLAG =
+        ( NS(opencl_success_flag_t) )0u;
 
     num_element_t idx = ( num_element_t )get_global_id( 0 );
     num_element_t num_particles = ( num_element_t )0u;
     num_element_t const stride  = ( num_element_t )get_global_size( 0 );
     buf_size_t const slot_size  = ( buf_size_t )8u;
 
-    obj_const_iter_t be_begin = NS(ManagedBuffer_get_const_objects_index_begin)(
-        belem_buffer, slot_size );
+    obj_const_iter_t be_begin =
+        NS(ManagedBuffer_get_const_objects_index_begin)(
+            belem_buffer, slot_size );
 
     obj_const_iter_t be_end = NS(ManagedBuffer_get_const_objects_index_end)(
         belem_buffer, slot_size );
@@ -423,7 +429,9 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
     };
 
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) particles;
-    NS(OpenCl1x_init_optimized_priv_particle)( &particles, reals, indexes );
+
+    NS(OpenCl1x_init_optimized_priv_particle)(
+        &particles, &reals[ 0 ], &indexes[ 0 ] );
 
     SIXTRL_ASSERT( be_begin != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( be_end   != SIXTRL_NULLPTR );
@@ -484,8 +492,9 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
         index_t particle_id   = ( index_t )0u;
         index_t turn          = ( index_t )0u;
 
-        NS(opencl_success_flag_t) success = NS(Particles_copy_from_generic_addr_data)(
-            &particles, 0, in_particles, idx );
+        NS(opencl_success_flag_t) success =
+            NS(Particles_copy_from_generic_addr_data)(
+                &particles, 0, in_particles, idx );
 
         start_elem_id = NS(Particles_get_at_element_id_value)( &particles, 0 );
         particle_id = NS(Particles_get_particle_id_value)( &particles, 0 );
