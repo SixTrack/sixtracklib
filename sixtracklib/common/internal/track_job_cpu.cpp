@@ -83,17 +83,14 @@ namespace SIXTRL_CXX_NAMESPACE
                       SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_ID )
     {
         using size_t = TrackJobCpu::size_type;
-        size_t const* pset_indices_end = pset_indices_begin;
-
         this->doSetRequiresCollectFlag( false );
 
-        if( ( num_particle_sets > size_t{ 0 } ) &&
-            ( pset_indices_end != nullptr ) )
-        {
-            std::advance( pset_indices_end, num_particle_sets );
-            this->doSetParticleSetIndices( pset_indices_begin,
-                pset_indices_end, particles_buffer );
-        }
+        size_t particle_set_indices[ 2 ] = { size_t{ 0 }, size_t{ 0 } };
+
+        particle_set_indices[ 0 ] =
+        particle_set_indices[ 1 ] = particle_set_index;
+        this->doSetParticleSetIndices(
+            &particle_set_indices[ 0 ], &particle_set_indices[ 1 ] );
 
         if( TrackJobBase::doReset( particles_buffer, beam_elements_buffer,
                 ptr_output_buffer, until_turn_elem_by_elem ) )
@@ -186,6 +183,52 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
     }
+
+    TrackJobCpu::TrackJobCpu(
+        buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+        size_type const particle_set_index,
+        buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
+        buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        size_type const until_turn_elem_by_elem,
+        std::string const& config_str ) :
+        TrackJobBase( SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_STR,
+                      SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_ID )
+    {
+        using size_t = TrackJobCpu::size_type;
+        using c_buffer_t = TrackJobCpu::c_buffer_t;
+
+        c_buffer_t* ptr_part_buffer  = particles_buffer.getCApiPtr();
+        c_buffer_t* ptr_belem_buffer = beam_elements_buffer.getCApiPtr();
+        c_buffer_t* ptr_out_buffer   = ( ptr_output_buffer != nullptr )
+            ? ptr_output_buffer->getCApiPtr() : nullptr;
+
+        this->doSetRequiresCollectFlag( false );
+        size_t particle_set_indices[ 2 ] = { size_t{ 0 }, size_t{ 0 } };
+        particle_set_indices[ 0 ] = particle_set_indices[ 1 ] =
+            particle_set_index;
+
+        this->doSetParticleSetIndices(
+            &particle_set_indices[ 0 ], &particle_set_indices[ 1 ] );
+
+        if( TrackJobBase::doReset( ptr_part_buffer, ptr_belem_buffer,
+                ptr_out_buffer, until_turn_elem_by_elem ) )
+        {
+            this->doSetPtrParticleBuffer( &particles_buffer );
+            this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
+
+            if( ( this->hasOutputBuffer() ) && ( ptr_out_buffer != nullptr ) )
+            {
+                this->doSetPtrOutputBuffer( ptr_output_buffer );
+            }
+        }
+
+        if( !config_str.empty() )
+        {
+            TrackJobBase::doSetConfigStr( config_str.c_str() );
+            TrackJobBase::doParseConfigStr( this->ptrConfigStr() );
+        }
+    }
+
 
     TrackJobCpu::TrackJobCpu(
         TrackJobCpu::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
