@@ -19,43 +19,86 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/track/definitions.h"
+
     #if defined( __cplusplus )
         #include "sixtracklib/common/buffer.hpp"
     #endif /* defined( __cplusplus ) */
 
     #include "sixtracklib/common/buffer.h"
-    #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/output/output_buffer.h"
     #include "sixtracklib/common/output/elem_by_elem_config.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-typedef SIXTRL_INT64_T  NS(track_job_type_t);
-typedef SIXTRL_INT32_T  NS(track_status_t);
-
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    using track_job_type_t        = ::NS(track_job_type_t);
-    using track_status_t          = ::NS(track_status_t);
-
     class TrackJobBase
     {
         public:
 
-        using buffer_t                = Buffer;
-        using c_buffer_t              = ::NS(Buffer);
-        using elem_by_elem_config_t   = ::NS(ElemByElemConfig);
-        using elem_by_elem_order_t    = ::NS(elem_by_elem_order_t);
-        using particle_index_t        = ::NS(particle_index_t);
-        using size_type               = Buffer::size_type;
-        using type_t                  = SIXTRL_CXX_NAMESPACE::track_job_type_t;
-        using track_status_t          = SIXTRL_CXX_NAMESPACE::track_status_t;
-        using output_buffer_flag_t    = ::NS(output_buffer_flag_t);
+        using buffer_t              = Buffer;
+        using c_buffer_t            = ::NS(Buffer);
+        using elem_by_elem_config_t = ::NS(ElemByElemConfig);
+        using elem_by_elem_order_t  = ::NS(elem_by_elem_order_t);
+        using particle_index_t      = ::NS(particle_index_t);
+        using size_type             = SIXTRL_CXX_NAMESPACE::track_job_size_t;
+        using type_t                = SIXTRL_CXX_NAMESPACE::track_job_type_t;
+        using track_status_t        = SIXTRL_CXX_NAMESPACE::track_status_t;
+        using output_buffer_flag_t  = ::NS(output_buffer_flag_t);
+
+        using collect_flag_t = SIXTRL_CXX_NAMESPACE::track_job_collect_flag_t;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN static bool IsCollectFlagSet(
+            collect_flag_t const haystack,
+            collect_flag_t const needle ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN static size_type
+        DefaultNumParticleSetIndices() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN static size_type const*
+        DefaultParticleSetIndicesBegin() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN static size_type const*
+        DefaultParticleSetIndicesEnd() SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN void clear();
+
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_HOST_FN void collect();
+        SIXTRL_HOST_FN void collect( collect_flag_t const flags );
+
+        SIXTRL_HOST_FN void collectParticles();
+        SIXTRL_HOST_FN void collectBeamElements();
+        SIXTRL_HOST_FN void collectOutput();
+
+        SIXTRL_HOST_FN void enableCollectParticles()  SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void disableCollectParticles() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool isCollectingParticles() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void enableCollectBeamElements()  SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void disableCollectBeamElements() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool isCollectingBeamElements() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void enableCollectOutput()  SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void disableCollectOutput() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool isCollectingOutput() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN collect_flag_t collectFlags() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void setCollectFlags(
+            collect_flag_t const flag ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN bool requiresCollecting() const SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN track_status_t track(
             size_type const until_turn );
@@ -80,6 +123,12 @@ namespace SIXTRL_CXX_NAMESPACE
             buffer_t* SIXTRL_RESTRICT ptr_output_buffer   = nullptr,
             size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
+        SIXTRL_HOST_FN bool reset(
+            buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+            size_type const particle_set_index,
+            buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
+            buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
+            size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
         template< typename ParSetIndexIter  >
         SIXTRL_HOST_FN bool reset(
@@ -92,6 +141,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN bool reset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+            c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
+            c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
+            size_type const until_turn_elem_by_elem = size_type{ 0 } );
+
+        SIXTRL_HOST_FN bool reset(
+            c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+            size_type const particle_set_index,
             c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
             size_type const until_turn_elem_by_elem = size_type{ 0 } );
@@ -112,6 +168,9 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
             size_type const until_turn_elem_by_elem = size_type{ 0 } );
+
+        SIXTRL_HOST_FN bool selectParticleSet(
+            size_type const particle_set_index );
 
         SIXTRL_HOST_FN bool assignOutputBuffer(
             buffer_t& SIXTRL_RESTRICT_REF output_buffer );
@@ -197,8 +256,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN particle_index_t
         untilTurnElemByElem() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN size_type numElemByElemTurns()  const SIXTRL_NOEXCEPT;
-//
+        SIXTRL_HOST_FN size_type numElemByElemTurns() const SIXTRL_NOEXCEPT;
+
         SIXTRL_HOST_FN buffer_t* ptrOutputBuffer() SIXTRL_RESTRICT;
         SIXTRL_HOST_FN buffer_t* ptrOutputBuffer() const SIXTRL_RESTRICT;
 
@@ -255,6 +314,10 @@ namespace SIXTRL_CXX_NAMESPACE
         using ptr_elem_by_elem_config_t =
             std::unique_ptr< elem_by_elem_config_t >;
 
+        SIXTRL_HOST_FN static collect_flag_t UnsetCollectFlag(
+            collect_flag_t const haystack,
+            collect_flag_t const needle ) SIXTRL_NOEXCEPT;
+
         SIXTRL_HOST_FN TrackJobBase(
             const char *const SIXTRL_RESTRICT type_str,
             track_job_type_t const type_id );
@@ -270,7 +333,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual void doClear();
 
-        SIXTRL_HOST_FN virtual void doCollect();
+        SIXTRL_HOST_FN virtual void doCollect( collect_flag_t const flags );
 
         /* ----------------------------------------------------------------- */
 
@@ -348,6 +411,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN void doSetUntilTurnElemByElem(
             particle_index_t const until_turn_elem_by_elem ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void doSetRequiresCollectFlag(
+            bool const requires_collect_flag ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void doSetBeamMonitorOutputEnabledFlag(
             bool const beam_monitor_flag ) SIXTRL_NOEXCEPT;
@@ -432,6 +498,8 @@ namespace SIXTRL_CXX_NAMESPACE
         particle_index_t                m_max_initial_turn_id;
         particle_index_t                m_until_turn_elem_by_elem;
 
+        collect_flag_t                  m_collect_flags;
+        bool                            m_requires_collect;
         bool                            m_default_elem_by_elem_rolling;
         bool                            m_has_beam_monitor_output;
         bool                            m_has_elem_by_elem_output;
@@ -632,6 +700,23 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return;
+    }
+
+    /* --------------------------------------------------------------------- */
+
+    SIXTRL_INLINE bool TrackJobBase::IsCollectFlagSet(
+        TrackJobBase::collect_flag_t const flag_set,
+        TrackJobBase::collect_flag_t const flag ) SIXTRL_NOEXCEPT
+    {
+        return ( ( flag_set & flag ) == flag );
+    }
+
+    SIXTRL_INLINE TrackJobBase::collect_flag_t
+    TrackJobBase::UnsetCollectFlag(
+        TrackJobBase::collect_flag_t const flag_set,
+        TrackJobBase::collect_flag_t const flag ) SIXTRL_NOEXCEPT
+    {
+        return flag_set & ~flag;
     }
 }
 
