@@ -22,7 +22,7 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    SIXTRL_HOST_FN TrackJobCl::TrackJobCl(
+    TrackJobCl::TrackJobCl(
         std::string const& SIXTRL_RESTRICT_REF device_id_str,
         std::string const& SIXTRL_RESTRICT_REF config_str ) :
         TrackJobBase( SIXTRL_CXX_NAMESPACE::TRACK_JOB_CL_STR,
@@ -47,7 +47,7 @@ namespace SIXTRL_CXX_NAMESPACE
             device_id_str.c_str(), this->ptrConfigStr() );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::TrackJobCl(
+    TrackJobCl::TrackJobCl(
         const char *const SIXTRL_RESTRICT device_id_str,
         const char *const SIXTRL_RESTRICT config_str ) :
         TrackJobBase( SIXTRL_CXX_NAMESPACE::TRACK_JOB_CL_STR,
@@ -70,7 +70,7 @@ namespace SIXTRL_CXX_NAMESPACE
         this->doPrepareContextOclImpl( device_id_str, this->ptrConfigStr() );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::TrackJobCl(
+    TrackJobCl::TrackJobCl(
         const char *const SIXTRL_RESTRICT device_id_str,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
@@ -92,7 +92,7 @@ namespace SIXTRL_CXX_NAMESPACE
             config_str );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::TrackJobCl(
+    TrackJobCl::TrackJobCl(
         const char *const SIXTRL_RESTRICT device_id_str,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         TrackJobCl::size_type const num_particle_sets,
@@ -123,7 +123,7 @@ namespace SIXTRL_CXX_NAMESPACE
             until_turn_elem_by_elem, config_str );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::TrackJobCl(
+    TrackJobCl::TrackJobCl(
         std::string const& SIXTRL_RESTRICT_REF device_id_str,
         TrackJobCl::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
         TrackJobCl::buffer_t& SIXTRL_RESTRICT_REF belements_buffer,
@@ -164,9 +164,9 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    SIXTRL_HOST_FN TrackJobCl::~TrackJobCl() SIXTRL_NOEXCEPT {}
+    TrackJobCl::~TrackJobCl() SIXTRL_NOEXCEPT {}
 
-    SIXTRL_HOST_FN TrackJobCl::cl_context_t&
+    TrackJobCl::cl_context_t&
     TrackJobCl::context() SIXTRL_RESTRICT
     {
         return const_cast< TrackJobCl::cl_context_t& >(
@@ -174,114 +174,114 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_HOST_FN TrackJobCl::cl_context_t const&
+    TrackJobCl::cl_context_t const&
     TrackJobCl::context() const SIXTRL_RESTRICT
     {
         SIXTRL_ASSERT( this->ptrContext() != nullptr );
         return *( this->ptrContext() );
     }
 
-    SIXTRL_HOST_FN ::NS(ClContext)* TrackJobCl::ptrContext() SIXTRL_RESTRICT
+    ::NS(ClContext)* TrackJobCl::ptrContext() SIXTRL_RESTRICT
     {
         return this->m_ptr_context.get();
     }
 
-    SIXTRL_HOST_FN ::NS(ClContext) const*
+    ::NS(ClContext) const*
     TrackJobCl::ptrContext() const SIXTRL_RESTRICT
     {
         return this->m_ptr_context.get();
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_arg_t&
+    TrackJobCl::cl_arg_t&
     TrackJobCl::particlesArg() SIXTRL_NOEXCEPT
     {
         return const_cast< TrackJobCl::cl_arg_t& >(
             static_cast< TrackJobCl const& >( *this ).particlesArg() );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_arg_t const&
+    TrackJobCl::cl_arg_t const&
     TrackJobCl::particlesArg() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT( this->ptrParticlesArg() != nullptr );
         return *(this->ptrParticlesArg() );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_arg_t*
+    TrackJobCl::cl_arg_t*
     TrackJobCl::ptrParticlesArg() SIXTRL_NOEXCEPT
     {
         return const_cast< TrackJobCl::cl_arg_t* >( static_cast<
             TrackJobCl const& >( *this ).ptrParticlesArg() );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_arg_t const*
+    TrackJobCl::cl_arg_t const*
     TrackJobCl::ptrParticlesArg() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_particles_buffer_arg.get();
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_arg_t&
+    TrackJobCl::cl_arg_t&
     TrackJobCl::beamElementsArg() SIXTRL_NOEXCEPT
     {
         return const_cast< TrackJobCl::cl_arg_t& >( static_cast<
             TrackJobCl const& >( *this ).beamElementsArg() );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_arg_t const&
+    TrackJobCl::cl_arg_t const&
     TrackJobCl::beamElementsArg() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT( this->ptrBeamElementsArg() != nullptr );
         return *( this->ptrBeamElementsArg() );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_arg_t*
+    TrackJobCl::cl_arg_t*
     TrackJobCl::ptrBeamElementsArg() SIXTRL_NOEXCEPT
     {
         return const_cast< TrackJobCl::cl_arg_t* >( static_cast<
             TrackJobCl const& >( *this ).ptrBeamElementsArg() );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_arg_t const*
+    TrackJobCl::cl_arg_t const*
     TrackJobCl::ptrBeamElementsArg() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_beam_elements_buffer_arg.get();
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_arg_t&
+    TrackJobCl::cl_arg_t&
     TrackJobCl::outputBufferArg() SIXTRL_NOEXCEPT
     {
         return const_cast< TrackJobCl::cl_arg_t& >( static_cast<
             TrackJobCl const& >( *this ).outputBufferArg() );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_arg_t const&
+    TrackJobCl::cl_arg_t const&
     TrackJobCl::outputBufferArg() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT( this->ptrOutputBufferArg() != nullptr );
         return *( this->m_ptr_output_buffer_arg );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_arg_t*
+    TrackJobCl::cl_arg_t*
     TrackJobCl::ptrOutputBufferArg() SIXTRL_NOEXCEPT
     {
         return const_cast< TrackJobCl::cl_arg_t* >( static_cast<
             TrackJobCl const& >( *this ).ptrOutputBufferArg() );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_arg_t const*
+    TrackJobCl::cl_arg_t const*
     TrackJobCl::ptrOutputBufferArg() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_output_buffer_arg.get();
     }
 
 
-    SIXTRL_HOST_FN TrackJobCl::cl_buffer_t const&
+    TrackJobCl::cl_buffer_t const&
     TrackJobCl::clElemByElemConfigBuffer() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT( this->ptrClElemByElemConfigBuffer() != nullptr );
         return *( this->ptrClElemByElemConfigBuffer() );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_buffer_t&
+    TrackJobCl::cl_buffer_t&
     TrackJobCl::clElemByElemConfigBuffer() SIXTRL_NOEXCEPT
     {
         using _this_t = TrackJobCl;
@@ -291,34 +291,34 @@ namespace SIXTRL_CXX_NAMESPACE
                 *this ).clElemByElemConfigBuffer() );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_buffer_t const*
+    TrackJobCl::cl_buffer_t const*
     TrackJobCl::ptrClElemByElemConfigBuffer() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_cl_elem_by_elem_config_buffer.get();
     }
 
-    SIXTRL_HOST_FN TrackJobCl::cl_buffer_t*
+    TrackJobCl::cl_buffer_t*
     TrackJobCl::ptrClElemByElemConfigBuffer() SIXTRL_NOEXCEPT
     {
         return this->m_ptr_cl_elem_by_elem_config_buffer.get();
     }
 
 
-    SIXTRL_HOST_FN bool TrackJobCl::doPrepareParticlesStructures(
+    bool TrackJobCl::doPrepareParticlesStructures(
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT pb )
     {
         return ( ( TrackJobBase::doPrepareParticlesStructures( pb ) ) &&
                  ( this->doPrepareParticlesStructuresOclImp( pb ) ) );
     }
 
-    SIXTRL_HOST_FN bool TrackJobCl::doPrepareBeamElementsStructures(
+    bool TrackJobCl::doPrepareBeamElementsStructures(
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT belems )
     {
         return ( ( TrackJobBase::doPrepareBeamElementsStructures( belems ) ) &&
             ( this->doPrepareBeamElementsStructuresOclImp( belems ) ) );
     }
 
-    SIXTRL_HOST_FN bool TrackJobCl::doPrepareOutputStructures(
+    bool TrackJobCl::doPrepareOutputStructures(
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT part_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT belem_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT output_buffer,
@@ -337,7 +337,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    SIXTRL_HOST_FN bool TrackJobCl::doAssignOutputBufferToBeamMonitors(
+    bool TrackJobCl::doAssignOutputBufferToBeamMonitors(
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT belem_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT out_buffer )
     {
@@ -355,7 +355,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    SIXTRL_HOST_FN bool TrackJobCl::doReset(
+    bool TrackJobCl::doReset(
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
@@ -365,13 +365,13 @@ namespace SIXTRL_CXX_NAMESPACE
                 ptr_output_buffer, until_turn_elem_by_elem );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::track_status_t TrackJobCl::doTrackUntilTurn(
+    TrackJobCl::track_status_t TrackJobCl::doTrackUntilTurn(
         TrackJobCl::size_type const until_turn )
     {
         return SIXTRL_CXX_NAMESPACE::track( *this, until_turn );
     }
 
-    SIXTRL_HOST_FN TrackJobCl::track_status_t TrackJobCl::doTrackElemByElem(
+    TrackJobCl::track_status_t TrackJobCl::doTrackElemByElem(
         TrackJobCl::size_type const until_turn )
     {
         return SIXTRL_CXX_NAMESPACE::trackElemByElem( *this, until_turn );
@@ -387,47 +387,45 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_HOST_FN void TrackJobCl::doCollect()
+    void TrackJobCl::doCollect( TrackJobCl::collect_flag_t const flags )
     {
-        SIXTRL_CXX_NAMESPACE::collect( *this );
-        return;
+        SIXTRL_CXX_NAMESPACE::collect( *this, flags );
     }
 
-    SIXTRL_HOST_FN void TrackJobCl::doParseConfigStr(
-        const char *const SIXTRL_RESTRICT  )
+    void TrackJobCl::doParseConfigStr( const char *const SIXTRL_RESTRICT  )
     {
         return;
     }
 
-    SIXTRL_HOST_FN void TrackJobCl::doUpdateStoredContext(
+    void TrackJobCl::doUpdateStoredContext(
         TrackJobCl::ptr_cl_context_t&& context )
     {
         this->m_ptr_context = std::move( context );
         return;
     }
 
-    SIXTRL_HOST_FN void TrackJobCl::doUpdateStoredParticlesArg(
+    void TrackJobCl::doUpdateStoredParticlesArg(
         TrackJobCl::ptr_cl_arg_t&& particle_arg )
     {
         this->m_ptr_particles_buffer_arg = std::move( particle_arg );
         return;
     }
 
-    SIXTRL_HOST_FN void TrackJobCl::doUpdateStoredBeamElementsArg(
+    void TrackJobCl::doUpdateStoredBeamElementsArg(
         TrackJobCl::ptr_cl_arg_t&& beam_elements_arg )
     {
         this->m_ptr_beam_elements_buffer_arg = std::move( beam_elements_arg );
         return;
     }
 
-    SIXTRL_HOST_FN void TrackJobCl::doUpdateStoredOutputArg(
+    void TrackJobCl::doUpdateStoredOutputArg(
         TrackJobCl::ptr_cl_arg_t&& output_arg )
     {
         this->m_ptr_output_buffer_arg = std::move( output_arg );
         return;
     }
 
-    SIXTRL_HOST_FN void TrackJobCl::doUpdateStoredClElemByElemConfigBuffer(
+    void TrackJobCl::doUpdateStoredClElemByElemConfigBuffer(
             TrackJobCl::ptr_cl_buffer_t&& cl_elem_by_elem_config_buffer )
     {
         this->m_ptr_cl_elem_by_elem_config_buffer =
@@ -436,27 +434,26 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    SIXTRL_HOST_FN TrackJobCl::size_type
-    TrackJobCl::totalNumParticles() const SIXTRL_NOEXCEPT
+    TrackJobCl::size_type TrackJobCl::totalNumParticles() const SIXTRL_NOEXCEPT
     {
         return this->m_total_num_particles;
     }
 
-    SIXTRL_HOST_FN void TrackJobCl::doSetTotalNumParticles(
+    void TrackJobCl::doSetTotalNumParticles(
         TrackJobCl::size_type const total_num_particles ) SIXTRL_NOEXCEPT
     {
         this->m_total_num_particles = total_num_particles;
         return;
     }
 
-    SIXTRL_HOST_FN bool TrackJobCl::doPrepareContext(
+    bool TrackJobCl::doPrepareContext(
         char const* SIXTRL_RESTRICT device_id_str,
         char const* SIXTRL_RESTRICT ptr_config_str )
     {
         return this->doPrepareContextOclImpl( device_id_str, ptr_config_str );
     }
 
-    SIXTRL_HOST_FN bool TrackJobCl::doPrepareContextOclImpl(
+    bool TrackJobCl::doPrepareContextOclImpl(
         const char *const SIXTRL_RESTRICT device_id_str,
         const char *const SIXTRL_RESTRICT ptr_config_str )
     {
@@ -489,13 +486,13 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    SIXTRL_HOST_FN void TrackJobCl::doParseConfigStrOclImpl(
+    void TrackJobCl::doParseConfigStrOclImpl(
         const char *const SIXTRL_RESTRICT )
     {
         return;
     }
 
-    SIXTRL_HOST_FN bool TrackJobCl::doPrepareParticlesStructuresOclImp(
+    bool TrackJobCl::doPrepareParticlesStructuresOclImp(
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT pb )
     {
         using _this_t = TrackJobCl;
@@ -508,6 +505,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ( this->ptrContext() != nullptr ) && ( pb != nullptr ) )
         {
+            SIXTRL_ASSERT( this->particleSetIndicesBegin() != nullptr );
+            SIXTRL_ASSERT( this->numParticleSets() == size_t{ 1 } );
+
+            size_t const particle_set_index =
+                *( this->particleSetIndicesBegin() );
+
             size_t const total_num_particles =
             ::NS(Particles_buffer_get_total_num_of_particles_on_particle_sets)(
                 pb, this->numParticleSets(), this->particleSetIndicesBegin() );
@@ -524,7 +527,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 ( this->particlesArg().ptrCObjectBuffer() == pb ) &&
                 ( ( !this->context().hasSelectedNode() ) ||
                   (  this->context().assignParticleArg(
-                        this->particlesArg() ) ) ) )
+                        this->particlesArg(), particle_set_index ) ) ) )
             {
                 success = true;
             }
@@ -533,7 +536,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    SIXTRL_HOST_FN bool TrackJobCl::doPrepareBeamElementsStructuresOclImp(
+    bool TrackJobCl::doPrepareBeamElementsStructuresOclImp(
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT belems )
     {
         using _this_t = TrackJobCl;
@@ -561,7 +564,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    SIXTRL_HOST_FN bool TrackJobCl::doPrepareOutputStructuresOclImpl(
+    bool TrackJobCl::doPrepareOutputStructuresOclImpl(
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT pb,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT belems,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT ptr_out_buffer,
@@ -631,7 +634,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    SIXTRL_HOST_FN bool TrackJobCl::doAssignOutputBufferToBeamMonitorsOclImp(
+    bool TrackJobCl::doAssignOutputBufferToBeamMonitorsOclImp(
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT belem_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT output_buffer )
     {
@@ -661,7 +664,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return false;
     }
 
-    SIXTRL_HOST_FN bool TrackJobCl::doResetOclImp(
+    bool TrackJobCl::doResetOclImp(
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT pb,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT belem_buffer,
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT out_buffer,
@@ -712,22 +715,36 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    SIXTRL_HOST_FN void collect(
+    void collect(
         TrackJobCl& SIXTRL_RESTRICT_REF job ) SIXTRL_NOEXCEPT
     {
-        if( ( job.ptrParticlesArg()       != nullptr ) &&
-            ( job.ptrCParticlesBuffer()   != nullptr ) )
+        SIXTRL_CXX_NAMESPACE::collect( job, job.collectFlags() );
+        return;
+    }
+
+    void collect( TrackJobCl& SIXTRL_RESTRICT_REF job,
+            SIXTRL_CXX_NAMESPACE::track_job_collect_flag_t const flags
+        ) SIXTRL_NOEXCEPT
+    {
+        if( ( TrackJobCl::IsCollectFlagSet(
+                flags, TRACK_JOB_COLLECT_PARTICLES ) ) &&
+            ( job.ptrParticlesArg() != nullptr ) &&
+            ( job.ptrCParticlesBuffer() != nullptr ) )
         {
             job.particlesArg().read( job.ptrCParticlesBuffer() );
         }
 
-        if( ( job.ptrOutputBufferArg() != nullptr ) &&
-            ( job.ptrCOutputBuffer()   != nullptr ) )
+        if( ( TrackJobCl::IsCollectFlagSet(
+                flags, TRACK_JOB_COLLECT_OUTPUT ) ) &&
+            ( job.ptrOutputBufferArg() != nullptr ) &&
+            ( job.ptrCOutputBuffer() != nullptr ) )
         {
             job.outputBufferArg().read( job.ptrCOutputBuffer() );
         }
 
-        if( ( job.ptrBeamElementsArg() != nullptr ) &&
+        if( ( TrackJobCl::IsCollectFlagSet(
+                flags, TRACK_JOB_COLLECT_BEAM_ELEMENTS ) ) &&
+            ( job.ptrBeamElementsArg() != nullptr ) &&
             ( job.ptrCBeamElementsBuffer() != nullptr ) )
         {
             job.beamElementsArg().read( job.ptrCBeamElementsBuffer() );
@@ -736,7 +753,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    SIXTRL_HOST_FN TrackJobCl::track_status_t track(
+    TrackJobCl::track_status_t track(
         TrackJobCl& SIXTRL_RESTRICT_REF job,
         TrackJobCl::size_type const until_turn ) SIXTRL_NOEXCEPT
     {
@@ -759,7 +776,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ? status_t{ 0 } : status_t{ -1 };
     }
 
-    SIXTRL_HOST_FN TrackJobCl::track_status_t trackElemByElem(
+    TrackJobCl::track_status_t trackElemByElem(
         TrackJobCl& SIXTRL_RESTRICT_REF job,
         TrackJobCl::size_type const until_turn ) SIXTRL_NOEXCEPT
     {
@@ -789,7 +806,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ? status_t{ 0 } : status_t{ -1 };
     }
 
-    SIXTRL_HOST_FN TrackJobCl::track_status_t trackLine(
+    TrackJobCl::track_status_t trackLine(
         TrackJobCl& SIXTRL_RESTRICT_REF job,
         TrackJobCl::size_type const line_begin_idx,
         TrackJobCl::size_type const line_end_idx,
@@ -812,13 +829,13 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 }
 
-SIXTRL_HOST_FN NS(TrackJobCl)* NS(TrackJobCl_create)(
+NS(TrackJobCl)* NS(TrackJobCl_create)(
     const char *const SIXTRL_RESTRICT device_id_str )
 {
     return new SIXTRL_CXX_NAMESPACE::TrackJobCl( device_id_str, nullptr );
 }
 
-SIXTRL_HOST_FN NS(TrackJobCl)*
+NS(TrackJobCl)*
 NS(TrackJobCl_create_from_config_str)(
     const char *const SIXTRL_RESTRICT device_id_str,
     const char *const SIXTRL_RESTRICT config_str )
@@ -826,7 +843,7 @@ NS(TrackJobCl_create_from_config_str)(
     return new SIXTRL_CXX_NAMESPACE::TrackJobCl( device_id_str, config_str );
 }
 
-SIXTRL_HOST_FN NS(TrackJobCl)* NS(TrackJobCl_new)(
+NS(TrackJobCl)* NS(TrackJobCl_new)(
     const char *const SIXTRL_RESTRICT device_id_str,
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer )
@@ -835,23 +852,21 @@ SIXTRL_HOST_FN NS(TrackJobCl)* NS(TrackJobCl_new)(
         particles_buffer, beam_elements_buffer );
 }
 
-SIXTRL_HOST_FN NS(TrackJobCl)* NS(TrackJobCl_new_with_output)(
+NS(TrackJobCl)* NS(TrackJobCl_new_with_output)(
     const char *const SIXTRL_RESTRICT device_id_str,
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const until_turn_elem_by_elem )
 {
-    using size_t = SIXTRL_CXX_NAMESPACE::TrackJobCl::size_type;
-
-    size_t const particle_set_indices[] = { size_t{ 0 }, size_t{ 0 } };
-
-    return new SIXTRL_CXX_NAMESPACE::TrackJobCl( device_id_str,
-        particles_buffer, size_t{ 1 }, &particle_set_indices[ 0 ],
+    using _this_t = SIXTRL_CXX_NAMESPACE::TrackJobCl;
+    return new _this_t( device_id_str, particles_buffer,
+        _this_t::DefaultNumParticleSetIndices(),
+        _this_t::DefaultParticleSetIndicesBegin(),
         beam_elements_buffer, output_buffer, until_turn_elem_by_elem );
 }
 
-SIXTRL_HOST_FN NS(TrackJobCl)* NS(TrackJobCl_new_detailed)(
+NS(TrackJobCl)* NS(TrackJobCl_new_detailed)(
     const char *const SIXTRL_RESTRICT device_id_str,
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(buffer_size_t) const num_particle_sets,
@@ -867,7 +882,7 @@ SIXTRL_HOST_FN NS(TrackJobCl)* NS(TrackJobCl_new_detailed)(
         config_str );
 }
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_reset)(
+SIXTRL_EXTERN bool NS(TrackJobCl_reset)(
     NS(TrackJobCl)* SIXTRL_RESTRICT job,
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
@@ -885,7 +900,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_reset)(
     return false;
 }
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_reset_with_output)(
+SIXTRL_EXTERN bool NS(TrackJobCl_reset_with_output)(
     NS(TrackJobCl)* SIXTRL_RESTRICT job,
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
@@ -898,7 +913,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_reset_with_output)(
         : false;
 }
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_reset_detailed)(
+SIXTRL_EXTERN bool NS(TrackJobCl_reset_detailed)(
     NS(TrackJobCl)* SIXTRL_RESTRICT job,
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(buffer_size_t) const num_particle_sets,
@@ -914,13 +929,13 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_reset_detailed)(
         : false;
 }
 
-SIXTRL_HOST_FN void NS(TrackJobCl_delete)(
+void NS(TrackJobCl_delete)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job )
 {
     delete track_job;
 }
 
-SIXTRL_HOST_FN NS(track_status_t) NS(TrackJobCl_track_until_turn)(
+NS(track_status_t) NS(TrackJobCl_track_until_turn)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
     NS(buffer_size_t) const until_turn )
 {
@@ -928,7 +943,7 @@ SIXTRL_HOST_FN NS(track_status_t) NS(TrackJobCl_track_until_turn)(
     return SIXTRL_CXX_NAMESPACE::track( *track_job, until_turn );
 }
 
-SIXTRL_HOST_FN NS(track_status_t) NS(TrackJobCl_track_elem_by_elem)(
+NS(track_status_t) NS(TrackJobCl_track_elem_by_elem)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
     NS(buffer_size_t) const until_turn )
 {
@@ -947,7 +962,7 @@ NS(track_status_t) NS(TrackJobCl_track_line)(
         *track_job, line_begin_idx, line_end_idx, finish_turn );
 }
 
-SIXTRL_HOST_FN void NS(TrackJobCl_collect)(
+void NS(TrackJobCl_collect)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job )
 {
     SIXTRL_ASSERT( track_job != nullptr );
@@ -955,59 +970,59 @@ SIXTRL_HOST_FN void NS(TrackJobCl_collect)(
     return;
 }
 
-SIXTRL_HOST_FN NS(ClContext)* NS(TrackJobCl_get_context)(
+NS(ClContext)* NS(TrackJobCl_get_context)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr ) ? track_job->ptrContext() : nullptr;
 }
 
-SIXTRL_HOST_FN NS(ClContext) const* NS(TrackJobCl_get_const_context)(
+NS(ClContext) const* NS(TrackJobCl_get_const_context)(
     const NS(TrackJobCl) *const SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr ) ? track_job->ptrContext() : nullptr;
 }
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
+SIXTRL_EXTERN NS(ClArgument)*
 NS(TrackJobCl_get_particles_buffer_arg)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr ) ? track_job->ptrParticlesArg() : nullptr;
 }
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
+SIXTRL_EXTERN NS(ClArgument) const*
 NS(TrackJobCl_get_const_particles_buffer_arg)(
     const NS(TrackJobCl) *const SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr ) ? track_job->ptrParticlesArg() : nullptr;
 }
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
+SIXTRL_EXTERN NS(ClArgument)*
 NS(TrackJobCl_get_beam_elements_buffer_arg)(
     NS(TrackJobCl)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->ptrBeamElementsArg() : nullptr;
 }
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
+SIXTRL_EXTERN NS(ClArgument) const*
 NS(TrackJobCl_get_const_beam_elements_buffer_arg)(
     const NS(TrackJobCl) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->ptrBeamElementsArg() : nullptr;
 }
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_has_output_buffer_arg)(
+SIXTRL_EXTERN bool NS(TrackJobCl_has_output_buffer_arg)(
     const NS(TrackJobCl) *const SIXTRL_RESTRICT job )
 {
     return ( ( job != nullptr ) && ( job->ptrOutputBufferArg() != nullptr ) );
 }
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
+SIXTRL_EXTERN NS(ClArgument)*
 NS(TrackJobCl_get_output_buffer_arg)( NS(TrackJobCl)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->ptrOutputBufferArg() : nullptr;
 }
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
+SIXTRL_EXTERN NS(ClArgument) const*
 NS(TrackJobCl_get_const_output_buffer_arg)(
     const NS(TrackJobCl) *const SIXTRL_RESTRICT job )
 {
