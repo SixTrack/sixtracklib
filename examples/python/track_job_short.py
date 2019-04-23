@@ -9,8 +9,8 @@ elements = pyst.Elements()
 elements.Drift(length=1.2)
 elements.Multipole(knl=[0, 0.001])
 
-particles = pyst.Particles.from_ref(num_particles=10,p0c=1e9)
-particles.px += np.linspace(0,1e-2,10)
+particles = pyst.Particles.from_ref(num_particles=10, p0c=1e9)
+particles.px += np.linspace(0, 1e-2, 10)
 
 job = pyst.TrackJob(elements, particles)
 status = job.track(1)

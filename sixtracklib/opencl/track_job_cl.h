@@ -58,6 +58,8 @@ namespace SIXTRL_CXX_NAMESPACE
         using elem_by_elem_config_t = _base_t::elem_by_elem_config_t;
         using track_status_t        = _base_t::track_status_t;
         using type_t                = _base_t::type_t;
+        using output_buffer_flag_t  = _base_t::output_buffer_flag_t;
+        using collect_flag_t        = _base_t::collect_flag_t;
 
         using cl_arg_t              = SIXTRL_CXX_NAMESPACE::ClArgument;
         using cl_context_t          = SIXTRL_CXX_NAMESPACE::ClContext;
@@ -204,7 +206,12 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual track_status_t doTrackElemByElem(
             size_type const until_turn ) override;
 
-        SIXTRL_HOST_FN virtual void doCollect() override;
+        SIXTRL_HOST_FN virtual track_status_t doTrackLine(
+            size_type const line_begin_idx, size_type const line_end_idx,
+            bool const finish_turn ) override;
+
+        SIXTRL_HOST_FN virtual void doCollect(
+            collect_flag_t const flags ) override;
 
         SIXTRL_HOST_FN virtual void doParseConfigStr(
             const char *const SIXTRL_RESTRICT config_str ) override;
@@ -278,6 +285,9 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_HOST_FN void collect(
         TrackJobCl& SIXTRL_RESTRICT_REF track_job ) SIXTRL_NOEXCEPT;
 
+    SIXTRL_HOST_FN void collect( TrackJobCl& SIXTRL_RESTRICT_REF track_job,
+        track_job_collect_flag_t const flags ) SIXTRL_NOEXCEPT;
+
     SIXTRL_HOST_FN TrackJobCl::track_status_t track(
         TrackJobCl& SIXTRL_RESTRICT_REF job,
         TrackJobCl::size_type const until_turn ) SIXTRL_NOEXCEPT;
@@ -285,6 +295,12 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_HOST_FN TrackJobCl::track_status_t trackElemByElem(
         TrackJobCl& SIXTRL_RESTRICT_REF job,
         TrackJobCl::size_type const until_turn_elem_by_elem ) SIXTRL_NOEXCEPT;
+
+    SIXTRL_HOST_FN TrackJobCl::track_status_t trackLine(
+        TrackJobCl& SIXTRL_RESTRICT_REF job,
+        TrackJobCl::size_type const line_begin_idx,
+        TrackJobCl::size_type const line_end_idx,
+        bool const finish_turn = false ) SIXTRL_NOEXCEPT;
 }
 
 typedef SIXTRL_CXX_NAMESPACE::TrackJobCl    NS(TrackJobCl);
@@ -377,8 +393,19 @@ NS(TrackJobCl_track_elem_by_elem)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
     NS(buffer_size_t) const until_turn );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t)
+NS(TrackJobCl_track_line)(
+    NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
+    NS(buffer_size_t) const line_begin_idx,
+    NS(buffer_size_t) const line_end_idx,
+    bool const finish_turn );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobCl_collect)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobCl_collect_detailed)(
+    NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
+    NS(track_job_collect_flag_t) const flags );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClContext)*
 NS(TrackJobCl_get_context)( NS(TrackJobCl)* SIXTRL_RESTRICT track_job );

@@ -3,19 +3,19 @@ import numpy as np
 
 
 class Particles(CObject):
-    pmass= 938.2720813e6
+    pmass = 938.2720813e6
 
     def _set_p0c(self):
-        energy0=np.sqrt(self.p0c**2+self.mass0**2)
-        self.beta0=self.p0c/energy0
+        energy0 = np.sqrt(self.p0c**2 + self.mass0**2)
+        self.beta0 = self.p0c / energy0
         self.gamma0 = energy0 / self.mass0
 
     def _set_delta(self):
-        rep=np.sqrt(self.delta**2+2*self.delta+1/self.beta0**2)
-        irpp=1+self.delta
-        self.rpp=1/irpp
-        beta=irpp/rep
-        self.rvv=beta/self.beta0
+        rep = np.sqrt(self.delta**2 + 2 * self.delta + 1 / self.beta0**2)
+        irpp = 1 + self.delta
+        self.rpp = 1 / irpp
+        beta = irpp / rep
+        self.rvv = beta / self.beta0
 
     _typeid = 1
     num_particles = CField(0, 'int64', const=True)
@@ -63,8 +63,8 @@ class Particles(CObject):
                    default=1, pointer=True, alignment=8)
 
     @classmethod
-    def from_ref(cls,num_particles=1,mass0=938272081.3,
-                     p0c=1e9, q0=1,**kwargs):
+    def from_ref(cls, num_particles=1, mass0=938272081.3,
+                 p0c=1e9, q0=1, **kwargs):
         return cls(num_particles=num_particles,
                    particle_id=np.arange(num_particles),
                    ).set_reference()

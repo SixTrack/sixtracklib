@@ -657,6 +657,143 @@ TEST( CXX_TrackJobClTests, CreateTrackJobFullDelete )
     std::cout << std::endl;
 }
 
+TEST( CXX_TrackJobClTests, CreateTrackJobTrackLineCompare )
+{
+    namespace st = SIXTRL_CXX_NAMESPACE;
+
+    using buffer_t         = st::Buffer;
+    using particles_t      = st::Particles;
+    using buf_size_t       = buffer_t::size_type;
+    using track_job_t      = st::TrackJobCl;
+    using cl_context_t     = st::ClContext;
+    using node_info_t      = cl_context_t::node_info_t;
+    using node_id_t        = cl_context_t::node_id_t;
+    using node_info_iter_t = node_info_t const*;
+
+    buffer_t pb( ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
+    buffer_t eb( ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
+
+
+    particles_t* orig_particles =
+        st::Particles::FromBuffer( pb, buf_size_t{ 0 } );
+
+    SIXTRL_ASSERT( orig_particles != nullptr );
+
+    buf_size_t const num_particles = orig_particles->getNumParticles();
+
+    buffer_t cmp_track_pb;
+    particles_t* cmp_particles  =
+        cmp_track_pb.createNew< particles_t >( num_particles );
+
+    SIXTRL_ASSERT( cmp_particles != nullptr );
+    cmp_particles->copy( *orig_particles );
+
+    buf_size_t const until_turn = 10;
+    int status = ::NS(Track_all_particles_until_turn)(
+        cmp_particles->getCApiPtr(), eb.getCApiPtr(), until_turn );
+
+    SIXTRL_ASSERT( status == 0 );
+
+    buf_size_t const num_beam_elements = eb.getNumObjects();
+    buf_size_t const num_lattice_parts = buf_size_t{ 10 };
+    buf_size_t const num_elem_per_part = num_beam_elements / num_lattice_parts;
+
+    /* ---------------------------------------------------------------------- */
+    /* Prepare device index to device_id_str map */
+
+    cl_context_t context;
+    buf_size_t const num_nodes = context.numAvailableNodes();
+
+    /* -------------------------------------------------------------------- */
+    /* perform tracking using a track_job: */
+
+    node_info_iter_t node_it  = context.availableNodesInfoBegin();
+    node_info_iter_t node_end = context.availableNodesInfoEnd();
+    node_id_t default_node_id = context.defaultNodeId();
+
+    for( size_t kk = size_t{ 0 } ; node_it != node_end ; ++node_it, ++kk )
+    {
+        buffer_t track_pb;
+        particles_t* particles =
+            track_pb.createNew< particles_t >( num_particles );
+
+        SIXTRL_ASSERT( particles != nullptr );
+        particles->copy( *orig_particles );
+        ::NS(BeamMonitor_clear_all)( eb.getCApiPtr() );
+
+        std::cout << "node " << ( kk + size_t{ 1 } )
+                  << " / " << num_nodes << "\r\n";
+
+        node_id_t const node_id = ::NS(ComputeNodeInfo_get_id)( node_it );
+
+        char tmp_device_id_str[] =
+        {
+            '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+            '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
+        };
+
+        ASSERT_TRUE( 0 == ::NS(ComputeNodeId_to_string)(
+            &node_id, tmp_device_id_str, 16u ) );
+
+        std::string const device_id_str( tmp_device_id_str );
+        ::NS(ComputeNodeInfo_print_out)( node_it, &default_node_id );
+
+        track_job_t job( device_id_str, track_pb, eb );
+
+        for( buf_size_t ii = buf_size_t{ 0 } ; ii < until_turn ; ++ii )
+        {
+            buf_size_t jj = buf_size_t{ 0 };
+
+            for( ; jj < num_lattice_parts ; ++jj )
+            {
+                bool const is_last_in_turn = ( jj == ( num_lattice_parts - 1 ) );
+                buf_size_t const begin_idx =  jj * num_elem_per_part;
+                buf_size_t const end_idx   = ( !is_last_in_turn ) ?
+                    begin_idx + num_elem_per_part : num_beam_elements;
+
+                status = st::trackLine(
+                    job, begin_idx, end_idx, is_last_in_turn );
+
+                 ASSERT_TRUE( status == 0 );
+            }
+        }
+
+        job.collect();
+
+        double const ABS_DIFF = double{ 2e-14 };
+
+        if( ( 0 != ::NS(Particles_compare_values)(
+                cmp_particles->getCApiPtr(), particles->getCApiPtr() ) ) &&
+            ( 0 != ::NS(Particles_compare_values_with_treshold)(
+                cmp_particles->getCApiPtr(), particles->getCApiPtr(), ABS_DIFF ) ) )
+        {
+            buffer_t diff_buffer;
+
+            particles_t* diff =
+                diff_buffer.createNew< particles_t >( num_particles );
+
+            SIXTRL_ASSERT( diff != nullptr );
+
+            ::NS(Particles_calculate_difference)( particles->getCApiPtr(),
+                cmp_particles->getCApiPtr(), diff->getCApiPtr() );
+
+            printf( "particles: \r\n" );
+            ::NS(Particles_print_out)( particles->getCApiPtr() );
+
+            printf( "cmp_particles: \r\n" );
+            ::NS(Particles_print_out)( cmp_particles->getCApiPtr() );
+
+            printf( "diff: \r\n" );
+            ::NS(Particles_print_out)( diff->getCApiPtr() );
+        }
+
+        ASSERT_TRUE(
+            ( 0 == ::NS(Particles_compare_values)(
+                cmp_particles->getCApiPtr(), particles->getCApiPtr() ) ) ||
+            ( 0 == ::NS(Particles_compare_values_with_treshold)(
+                cmp_particles->getCApiPtr(), particles->getCApiPtr(), ABS_DIFF ) ) );
+    }
+}
 
 TEST( CXX_TrackJobClTests, TrackParticles )
 {

@@ -10,6 +10,7 @@ from pysixtrack import track as pysixelem
 
 from .mad_helper import madseq_to_line
 
+
 class Drift(CObject):
     _typeid = 2
     length = CField(0, 'real', default=0.0, alignment=8)
@@ -354,7 +355,7 @@ class Elements(object):
         for name, cls in self.element_types.items():
             setattr(self, name, self._mk_fun(self.cbuffer, cls))
             self.cbuffer.typeids[cls._typeid] = cls
-        self._builder=self.gen_builder()
+        self._builder = self.gen_builder()
 
     def gen_builder(self):
         out = {}
@@ -371,11 +372,11 @@ class Elements(object):
 
     @classmethod
     def from_mad(cls, seq):
-        line=madseq_to_line(seq)
+        line = madseq_to_line(seq)
         return cls.fromline(line)
 
-    #@classmethod
-    #def from_mad2(cls, seq):
+    # @classmethod
+    # def from_mad2(cls, seq):
     #    self=cls()
     #    list(madseq_to_line(seq,self._builder))
     #    return self
