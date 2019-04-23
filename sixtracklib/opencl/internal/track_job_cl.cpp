@@ -508,9 +508,6 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ASSERT( this->particleSetIndicesBegin() != nullptr );
             SIXTRL_ASSERT( this->numParticleSets() == size_t{ 1 } );
 
-            size_t const particle_set_index =
-                *( this->particleSetIndicesBegin() );
-
             size_t const total_num_particles =
             ::NS(Particles_buffer_get_total_num_of_particles_on_particle_sets)(
                 pb, this->numParticleSets(), this->particleSetIndicesBegin() );
@@ -527,7 +524,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 ( this->particlesArg().ptrCObjectBuffer() == pb ) &&
                 ( ( !this->context().hasSelectedNode() ) ||
                   (  this->context().assignParticleArg(
-                        this->particlesArg(), particle_set_index ) ) ) )
+                        this->particlesArg(),
+                        this->particleSetIndicesBegin(),
+                        this->particleSetIndicesEnd() ) ) ) )
             {
                 success = true;
             }
@@ -815,10 +814,6 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( job.ptrContext() != nullptr );
         SIXTRL_ASSERT( job.ptrParticlesArg() != nullptr );
         SIXTRL_ASSERT( job.ptrBeamElementsArg() != nullptr );
-        SIXTRL_ASSERT( job.hasOutputBuffer() );
-        SIXTRL_ASSERT( job.ptrOutputBufferArg() != nullptr );
-        SIXTRL_ASSERT( job.hasElemByElemOutput() );
-        SIXTRL_ASSERT( job.ptrElemByElemConfig() != nullptr );
         SIXTRL_ASSERT( job.totalNumParticles() > TrackJobCl::size_type{ 0 } );
 
         ClContext& ctx = job.context();
