@@ -12,9 +12,10 @@ from pysixtracklib.stcommon import \
     st_OutputBuffer_prepare, st_Track_all_particles_until_turn, \
     st_OutputBuffer_create_output_cbuffer, \
     st_BeamMonitor_assign_output_cbuffer, \
-    st_Track_all_particles_element_by_element_until_turn, \
+    st_Track_all_particles_element_by_element_until_turn, st_NullBuffer, \
     st_BeamMonitor_assign_output_buffer, st_Buffer_new_mapped_on_cbuffer, \
-    st_Particles_cbuffer_get_particles
+    st_Particles_cbuffer_get_particles, \
+    st_Particles_buffer_get_particles
 
 from pysixtracklib_test.stcommon import st_Particles_print_out, \
     st_Particles_compare_values_with_treshold,\
@@ -145,5 +146,57 @@ if __name__ == '__main__':
         particles = output_buffer.get_object(ii, pyst.Particles)
         assert(0 == pyst.particles.compareParticlesDifference(
             cmp_particles, particles, abs_treshold=ABS_DIFF))
+
+    del job
+    del track_pb
+    del cmp_track_pb
+    del particles
+    del cmp_particles
+
+    # -------------------------------------------------------------------------
+    # track line:
+
+    track_pb = CBuffer()
+    track_particles = pyst.makeCopy(initial_particles, cbuffer=track_pb)
+
+    cmp_pb = CBuffer()
+    cmp_particles = pyst.makeCopy(initial_particles, cbuffer=cmp_pb)
+    cmp_pbuffer = st_Buffer_new_mapped_on_cbuffer(cmp_pb)
+    assert(cmp_pbuffer != st_NullBuffer)
+
+    lattice = st_Buffer_new_mapped_on_cbuffer(eb)
+    assert(lattice != st_NullBuffer)
+
+    until_turn = 10
+
+    st_Track_all_particles_until_turn(st_Particles_buffer_get_particles(
+        cmp_pbuffer, 0), lattice, ct.c_int64(until_turn))
+
+    st_Buffer_delete(lattice)
+    lattice = st_NullBuffer
+
+    job = pyst.TrackJob(eb, track_pb, int(0), arch, device)
+
+    num_beam_elements = eb.n_objects
+    num_lattice_parts = 10
+    num_elem_per_part = num_beam_elements // num_lattice_parts
+
+    for ii in range(until_turn):
+        for jj in range(num_lattice_parts):
+            is_last_in_turn = bool(jj == (num_lattice_parts - 1))
+            begin_idx = jj * num_elem_per_part
+            end_idx = (not is_last_in_turn) \
+                and begin_idx + num_elem_per_part \
+                or num_beam_elements
+
+            status = job.track_line(begin_idx, end_idx, is_last_in_turn)
+
+    job.collect()
+
+    particles_buffer = job.particles_buffer
+    track_particles = particles_buffer.get_object(0, cls=pyst.Particles)
+
+    assert(0 == pyst.particles.compareParticlesDifference(
+        cmp_particles, track_particles, abs_treshold=ABS_DIFF))
 
     sys.exit(0)
