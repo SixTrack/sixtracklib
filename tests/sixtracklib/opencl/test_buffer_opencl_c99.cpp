@@ -79,7 +79,17 @@ TEST( C99_OpenCL_Buffer,
     {
         std::vector< cl::Device > temp_devices;
 
-        p.getDevices( CL_DEVICE_TYPE_ALL, &temp_devices );
+        try
+        {
+            p.getDevices( CL_DEVICE_TYPE_ALL, &temp_devices );
+        }
+        catch( cl::Error const& e )
+        {
+            std::cout << "Error :: " << e.what()  << std::endl;
+            std::cout << "Skipping plattform -> " << std::endl;
+
+            temp_devices.clear();
+        }
 
         for( auto const& d : temp_devices )
         {
