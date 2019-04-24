@@ -29,6 +29,7 @@ TEST( C99_CudaTrackLineTests, SendDataTrackSingleLineRecvDataCompare )
     using buffer_t    = ::NS(Buffer)*;
     using particles_t = ::NS(Particles)*;
     using buf_size_t  = ::NS(buffer_size_t);
+    using status_t    = ::NS(context_status_t);
 
     buffer_t pb = ::NS(Buffer_new_from_file)(
         ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
@@ -61,14 +62,14 @@ TEST( C99_CudaTrackLineTests, SendDataTrackSingleLineRecvDataCompare )
     ::NS(CudaArgument)* lattice_arg = ::NS(CudaArgument_new)( ctx );
     ASSERT_TRUE( lattice_arg != nullptr );
 
-    bool success = ::NS(CudaArgument_send_buffer)( lattice_arg, eb );
-    ASSERT_TRUE( success );
+    status_t success = ::NS(CudaArgument_send_buffer)( lattice_arg, eb );
+    ASSERT_TRUE( success == ::NS(CONTEXT_STATUS_SUCCESS) );
 
     ::NS(CudaArgument)* particles_arg = ::NS(CudaArgument_new)( ctx );
     ASSERT_TRUE( particles_arg != nullptr );
 
     success = ::NS(CudaArgument_send_buffer)( particles_arg, track_pb );
-    ASSERT_TRUE( success );
+    ASSERT_TRUE( success == ::NS(CONTEXT_STATUS_SUCCESS) );
 
     buf_size_t const num_beam_elements = ::NS(Buffer_get_num_of_objects)( eb );
     buf_size_t const num_lattice_parts = buf_size_t{ 10 };
@@ -93,7 +94,7 @@ TEST( C99_CudaTrackLineTests, SendDataTrackSingleLineRecvDataCompare )
     }
 
     success = NS(CudaArgument_receive_buffer)( particles_arg, track_pb );
-    ASSERT_TRUE( success );
+    ASSERT_TRUE( success == ::NS(CONTEXT_STATUS_SUCCESS) );
 
     particles = ::NS(Particles_buffer_get_particles)( track_pb, 0 );
 

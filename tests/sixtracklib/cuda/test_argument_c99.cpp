@@ -29,6 +29,7 @@ TEST( C99_CudaArgumentTests, ArgumentCObjectBufferTest )
     using buffer_t    = ::NS(Buffer);
     using buf_size_t  = ::NS(buffer_size_t);
     using ctx_size_t  = ::NS(context_size_t);
+    using status_t    = ::NS(context_status_t);
 
     buf_size_t const NUM_PARTICLES = 1000;
     buffer_t* pb = ::NS(Buffer_new)( 0u );
@@ -51,11 +52,11 @@ TEST( C99_CudaArgumentTests, ArgumentCObjectBufferTest )
     argument_t* particles_arg = ::NS(CudaArgument_new)( context );
     ASSERT_TRUE( particles_arg != nullptr );
 
-    bool success = ::NS(CudaArgument_send_buffer)( particles_arg, pb );
-    ASSERT_TRUE( success );
+    status_t success = ::NS(CudaArgument_send_buffer)( particles_arg, pb );
+    ASSERT_TRUE( success == ::NS(CONTEXT_STATUS_SUCCESS) );
 
     success = ::NS(CudaArgument_receive_buffer)( particles_arg, pb );
-    ASSERT_TRUE( success );
+    ASSERT_TRUE( success == ::NS(CONTEXT_STATUS_SUCCESS) );
 
     particles = ::NS(Particles_buffer_get_particles)( pb, 00 );
     ASSERT_TRUE( particles != nullptr );
