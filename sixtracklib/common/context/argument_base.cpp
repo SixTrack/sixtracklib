@@ -1,4 +1,6 @@
-#include "sixtracklib/common/context/argument_base.h"
+#include "sixtracklib/common/context/argument_base.hpp"
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
 #include <algorithm>
 #include <cstddef>
@@ -17,9 +19,11 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    bool ArgumentBase::send()
+    namespace st = SIXTRL_CXX_NAMESPACE;
+
+    ArgumentBase::status_t ArgumentBase::send()
     {
-        bool success = false;
+        ArgumentBase::status_t success = st::CONTEXT_STATUS_GENERAL_FAILURE;
 
         if( this->usesCObjectsCxxBuffer() )
         {
@@ -37,20 +41,19 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    bool ArgumentBase::send(
+    ArgumentBase::status_t ArgumentBase::send(
         ArgumentBase::buffer_t const& SIXTRL_RESTRICT_REF buffer )
     {
-        bool success = false;
-
         using status_t           = ArgumentBase::status_t;
         using size_t             = ArgumentBase::size_type;
         using ptr_base_context_t = ArgumentBase::ptr_base_context_t;
 
+        status_t success = st::CONTEXT_STATUS_GENERAL_FAILURE;
         ptr_base_context_t ptr_context = this->ptrBaseContext();
 
         if( ptr_context != nullptr )
         {
-            success = true;
+            success = st::CONTEXT_STATUS_SUCCESS;
 
             if( this->usesRawArgument() )
             {
@@ -65,14 +68,21 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( requ_capacity > this->capacity() )
                 {
-                    success = this->doReserveArgumentBuffer( requ_capacity );
-                    updated_argument_buffer = success;
+                    bool const reserved_success =
+                        this->doReserveArgumentBuffer( requ_capacity );
+
+                    updated_argument_buffer = reserved_success;
+
+                    if( !reserved_success )
+                    {
+                        success = st::CONTEXT_STATUS_GENERAL_FAILURE;
+                    }
                 }
 
                 SIXTRL_ASSERT( requ_capacity <= this->capacity() );
             }
 
-            if( ( success ) &&
+            if( ( success == st::CONTEXT_STATUS_SUCCESS ) &&
                 ( ( updated_argument_buffer ) ||
                   ( !this->usesCObjectsCxxBuffer() ) ||
                   ( !this->usesCObjectsBuffer() ) ) )
@@ -80,37 +90,36 @@ namespace SIXTRL_CXX_NAMESPACE
                 this->doSetBufferRef( buffer );
             }
 
-            if( success )
+            if( success == st::CONTEXT_STATUS_SUCCESS )
             {
-                SIXTRL_STATIC_VAR status_t const SEND_OK = status_t{ 0 };
-                success = ( SEND_OK == ptr_context->send( this, buffer ) );
+                success = ptr_context->send( this, buffer );
 
-                if( success )
+                if( success == st::CONTEXT_STATUS_SUCCESS )
                 {
                     this->doSetArgSize( buffer.size() );
                 }
             }
 
-            SIXTRL_ASSERT( ( !success ) || ( buffer.size() == this->size() ) );
+            SIXTRL_ASSERT( ( success != st::CONTEXT_STATUS_SUCCESS ) ||
+                           ( buffer.size() == this->size() ) );
         }
 
         return success;
     }
 
-    bool ArgumentBase::send( const ArgumentBase::c_buffer_t *const
-        SIXTRL_RESTRICT buffer )
+    ArgumentBase::status_t ArgumentBase::send(
+        const ArgumentBase::c_buffer_t *const SIXTRL_RESTRICT buffer )
     {
-        bool success = false;
-
         using status_t           = ArgumentBase::status_t;
         using size_t             = ArgumentBase::size_type;
         using ptr_base_context_t = ArgumentBase::ptr_base_context_t;
 
+        status_t success = st::CONTEXT_STATUS_GENERAL_FAILURE;
         ptr_base_context_t ptr_context = this->ptrBaseContext();
 
         if( ptr_context != nullptr )
         {
-            success = true;
+            success = st::CONTEXT_STATUS_SUCCESS;
 
             if( this->usesRawArgument() )
             {
@@ -125,47 +134,54 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( requ_capacity > this->capacity() )
                 {
-                    success = this->doReserveArgumentBuffer( requ_capacity );
-                    updated_argument_buffer = success;
+                    bool const reserved_success =
+                        this->doReserveArgumentBuffer( requ_capacity );
+
+                    updated_argument_buffer = reserved_success;
+
+                    if( !reserved_success )
+                    {
+                        success = st::CONTEXT_STATUS_GENERAL_FAILURE;
+                    }
                 }
 
                 SIXTRL_ASSERT( requ_capacity <= this->capacity() );
             }
 
-            if( ( success ) &&
+            if( ( success == st::CONTEXT_STATUS_SUCCESS ) &&
                 ( ( updated_argument_buffer ) ||
                   ( !this->usesCObjectsBuffer() ) ) )
             {
                 this->doSetPtrCBuffer( buffer );
             }
 
-            if( success )
+            if( success == st::CONTEXT_STATUS_SUCCESS )
             {
-                SIXTRL_STATIC_VAR status_t const SEND_OK = status_t{ 0 };
-                success = ( SEND_OK == ptr_context->send( this, buffer ) );
+                success = ptr_context->send( this, buffer );
 
-                if( success )
+                if( success == st::CONTEXT_STATUS_SUCCESS )
                 {
                     this->doSetArgSize( ::NS(Buffer_get_size)( buffer ) );
                 }
             }
 
-            SIXTRL_ASSERT( ( !success ) ||
+            SIXTRL_ASSERT(
+                ( success != st::CONTEXT_STATUS_SUCCESS ) ||
                 ( ::NS(Buffer_get_size)( buffer ) == this->size() ) );
         }
 
         return success;
     }
 
-    bool ArgumentBase::send( void const* SIXTRL_RESTRICT raw_arg_begin,
+    ArgumentBase::status_t ArgumentBase::send(
+        void const* SIXTRL_RESTRICT raw_arg_begin,
         ArgumentBase::size_type const raw_arg_len )
     {
-        bool success = false;
-
         using status_t           = ArgumentBase::status_t;
         using size_t             = ArgumentBase::size_type;
         using ptr_base_context_t = ArgumentBase::ptr_base_context_t;
 
+        status_t success = st::CONTEXT_STATUS_GENERAL_FAILURE;
         ptr_base_context_t ptr_context = this->ptrBaseContext();
 
         if( ( ptr_context != nullptr ) && ( raw_arg_begin != nullptr ) &&
@@ -188,45 +204,51 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 if( raw_arg_len > this->capacity() )
                 {
-                    success = this->doReserveArgumentBuffer( raw_arg_len );
-                    updated_argument_buffer = success;
+                    bool const reserved_success =
+                        this->doReserveArgumentBuffer( raw_arg_len );
+
+                    updated_argument_buffer = reserved_success;
+
+                    if( !reserved_success )
+                    {
+                        success = st::CONTEXT_STATUS_GENERAL_FAILURE;
+                    }
                 }
 
                 SIXTRL_ASSERT( raw_arg_len <= this->capacity() );
             }
 
-            if( ( success ) &&
+            if( ( success == st::CONTEXT_STATUS_SUCCESS ) &&
                 ( ( updated_argument_buffer ) ||
                   ( !this->usesRawArgument() ) ) )
             {
                 this->doSetPtrRawArgument( raw_arg_begin );
             }
 
-            if( success )
+            if( success == st::CONTEXT_STATUS_SUCCESS )
             {
                 SIXTRL_ASSERT( ( !this->usesCObjectsBuffer() ) &&
                                ( !this->usesCObjectsCxxBuffer() ) );
 
-                SIXTRL_STATIC_VAR status_t const SEND_OK = status_t{ 0 };
-                success = ( SEND_OK == ptr_context->send(
-                    this, raw_arg_begin, raw_arg_len ) );
+                success = ptr_context->send( this, raw_arg_begin, raw_arg_len );
 
-                if( success )
+                if( success == st::CONTEXT_STATUS_SUCCESS )
                 {
                     this->doSetArgSize( raw_arg_len );
                 }
             }
 
-            SIXTRL_ASSERT( ( !success ) || ( this->size() == raw_arg_len ) );
+            SIXTRL_ASSERT( ( success != st::CONTEXT_STATUS_SUCCESS ) ||
+                           ( this->size() == raw_arg_len ) );
 
         }
 
         return success;
     }
 
-    bool ArgumentBase::receive()
+    ArgumentBase::status_t ArgumentBase::receive()
     {
-        bool success = false;
+        ArgumentBase::status_t success = st::CONTEXT_STATUS_GENERAL_FAILURE;
 
         if( this->usesCObjectsCxxBuffer() )
         {
@@ -244,59 +266,55 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    bool ArgumentBase::receive(
+    ArgumentBase::status_t ArgumentBase::receive(
         ArgumentBase::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
-        bool success = false;
 
         using status_t = ArgumentBase::status_t;
         using ptr_base_context_t = ArgumentBase::ptr_base_context_t;
 
+        status_t success = st::CONTEXT_STATUS_GENERAL_FAILURE;
         ptr_base_context_t ptr_context = this->ptrBaseContext();
 
         if( ( ptr_context != nullptr ) && ( this->usesCObjectsBuffer() ) )
         {
-            SIXTRL_STATIC_VAR status_t const RECV_OK = status_t{ 0 };
-            success = ( RECV_OK == ptr_context->receive( buffer, this ) );
+            success = ptr_context->receive( buffer, this );
         }
 
         return success;
     }
 
-    bool ArgumentBase::receive( ArgumentBase::c_buffer_t* SIXTRL_RESTRICT buf )
+    ArgumentBase::status_t ArgumentBase::receive(
+        ArgumentBase::c_buffer_t* SIXTRL_RESTRICT buf )
     {
-        bool success = false;
 
         using status_t = ArgumentBase::status_t;
         using ptr_base_context_t = ArgumentBase::ptr_base_context_t;
 
+        status_t success = st::CONTEXT_STATUS_GENERAL_FAILURE;
         ptr_base_context_t ptr_context = this->ptrBaseContext();
 
         if( ( ptr_context != nullptr ) && ( this->usesCObjectsBuffer() ) )
         {
-            SIXTRL_STATIC_VAR status_t const RECV_OK = status_t{ 0 };
-            success = ( RECV_OK == ptr_context->receive( buf, this ) );
+            success = ptr_context->receive( buf, this );
         }
 
         return success;
     }
 
-    bool ArgumentBase::receive( void* SIXTRL_RESTRICT raw_arg_begin,
+    ArgumentBase::status_t ArgumentBase::receive( void* SIXTRL_RESTRICT raw_arg_begin,
         ArgumentBase::size_type const raw_arg_capacity )
     {
-        bool success = false;
-
         using status_t = ArgumentBase::status_t;
         using ptr_base_context_t = ArgumentBase::ptr_base_context_t;
 
+        status_t success = st::CONTEXT_STATUS_GENERAL_FAILURE;
         ptr_base_context_t ptr_context = this->ptrBaseContext();
 
         if( ( ptr_context != nullptr ) &&
             ( raw_arg_capacity >= this->size() ) )
         {
-            SIXTRL_STATIC_VAR status_t const RECV_OK = status_t{ 0 };
-            success = ( RECV_OK == ptr_context->receive(
-                raw_arg_begin, this->size(), this ) );
+            success = ptr_context->receive( raw_arg_begin, this->size(), this );
         }
 
         return success;
@@ -538,5 +556,7 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_needs_arg_buffer = needs_argument_buffer;
     }
 }
+
+#endif /* C++, Host */
 
 /* end: sixtracklib/common/context/argument_base.cpp */

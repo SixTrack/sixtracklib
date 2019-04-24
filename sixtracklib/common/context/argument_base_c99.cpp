@@ -1,6 +1,6 @@
 #include "sixtracklib/common/context/argument_base.h"
 
-#if !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
 #include <cstddef>
 #include <cstdlib>
@@ -27,7 +27,8 @@ char const* NS(Argument_get_ptr_type_strt)(
 ::NS(context_status_t) NS(Argument_send_again)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg )
 {
-    return ( arg != nullptr ) ? arg->send() : ::NS(context_status_t){ -1 };
+    return ( arg != nullptr )
+        ? arg->send() : ::NS(CONTEXT_STATUS_GENERAL_FAILURE);
 }
 
 ::NS(context_status_t) NS(Argument_send_buffer)(
@@ -35,7 +36,7 @@ char const* NS(Argument_get_ptr_type_strt)(
     const ::NS(Buffer) *const SIXTRL_RESTRICT_REF buffer )
 {
     return ( arg != nullptr )
-        ? arg->send( buffer ) : ::NS(context_status_t){ -1 };
+        ? arg->send( buffer ) : ::NS(CONTEXT_STATUS_GENERAL_FAILURE);
 }
 
 ::NS(context_status_t) NS(Argument_send_memory)(
@@ -43,14 +44,15 @@ char const* NS(Argument_get_ptr_type_strt)(
     void const* SIXTRL_RESTRICT arg_begin,
     ::NS(context_size_t) const arg_size )
 {
-    return ( arg != nullptr )
-        ? arg->send( arg_begin, arg_size ) : ::NS(context_status_t){ -1 };
+    return ( arg != nullptr ) ? arg->send( arg_begin, arg_size )
+        : ::NS(CONTEXT_STATUS_GENERAL_FAILURE);
 }
 
 ::NS(context_status_t) NS(Argument_receive_again)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg )
 {
-    return ( arg != nullptr ) ? arg->receive() : ::NS(context_status_t){ -1 };
+    return ( arg != nullptr ) ? arg->receive()
+        : ::NS(CONTEXT_STATUS_GENERAL_FAILURE);
 }
 
 ::NS(context_status_t) NS(Argument_receive_buffer)(
@@ -58,7 +60,7 @@ char const* NS(Argument_get_ptr_type_strt)(
     ::NS(Buffer)* SIXTRL_RESTRICT buf )
 {
     return ( arg != nullptr )
-        ? arg->receive( buf ) : ::NS(context_status_t){ -1 };
+        ? arg->receive( buf ) : ::NS(CONTEXT_STATUS_GENERAL_FAILURE);
 }
 
 ::NS(context_status_t) NS(Argument_receive_memory)(
@@ -67,7 +69,7 @@ char const* NS(Argument_get_ptr_type_strt)(
 {
     return ( arg != nullptr )
         ? arg->receive( arg_begin, arg_capacity )
-        : ::NS(context_status_t){ -1 };
+        : ::NS(CONTEXT_STATUS_GENERAL_FAILURE);
 }
 
 bool NS(Argument_uses_cobjects_buffer)(
@@ -132,17 +134,17 @@ bool NS(Argument_requires_argument_buffer)(
 }
 
 ::NS(ContextBase) const* NS(Argument_get_ptr_base_context)(
-    ::NS(Argument)* SIXTRL_RESTRICT arg )
+    ::NS(ArgumentBase)* SIXTRL_RESTRICT arg )
 {
     return ( arg != nullptr ) ? arg->ptrBaseContext() : nullptr;
 }
 
 ::NS(ContextBase) const* NS(Argument_get_const_ptr_base_context)(
-    const ::NS(Argument) *const SIXTRL_RESTRICT arg )
+    const ::NS(ArgumentBase) *const SIXTRL_RESTRICT arg )
 {
     return ( arg != nullptr ) ? arg->ptrBaseContext() : nullptr;
 }
 
-#endif /* !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ ) */
+#endif /* C++, Host */
 
 /* end: sixtracklib/common/context/argument_base_c99.cpp */
