@@ -443,6 +443,7 @@ def st_OutputBuffer_create_output_cbuffer(
 # -----------------------------------------------------------------------------
 # TrackJob objects
 
+
 st_TrackJob_p = ct.c_void_p
 st_NullTrackJob = ct.cast(0, st_TrackJob_p)
 
@@ -675,8 +676,8 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
 
     st_Track_particles_line_cuda = sixtracklib.st_Track_particles_line_cuda
     st_Track_particles_line_cuda.restype = ct.c_int32
-    st_Track_particles_line_cuda.argtypes = [ct.c_void_p, ct.c_void_p,
-                                             ct.c_uint64, ct.c_uint64, ct.c_bool]
+    st_Track_particles_line_cuda.argtypes = [
+        ct.c_void_p, ct.c_void_p, ct.c_uint64, ct.c_uint64, ct.c_bool]
 
 # -----------------------------------------------------------------------------
 # Cl-Context methods
@@ -713,4 +714,3 @@ st_Track_all_particles_element_by_element_until_turn = \
 st_Track_all_particles_element_by_element_until_turn.restype = ct.c_int32
 st_Track_all_particles_element_by_element_until_turn.argtypes = [
     st_Particles_p, st_Buffer_p, ct.c_int64, st_Particles_p]
-
