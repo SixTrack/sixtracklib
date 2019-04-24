@@ -1,4 +1,4 @@
-import itertools
+import importlib
 
 if importlib.util.find_spec('pysixtrack') is not None:
     from pysixtrack import track as pysixelem
