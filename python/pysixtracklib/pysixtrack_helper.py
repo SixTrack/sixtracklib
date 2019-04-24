@@ -4,6 +4,9 @@ if importlib.util.find_spec('pysixtrack') is not None:
     from pysixtrack import track as pysixelem
     import numpy as np
     from cobjects import CBuffer, CObject, CField
+    from .beam_elements import \
+        Drift, DriftExact, Multipole, Cavity, XYShift, SRotation, \
+        BeamBeam4D, BeamMonitor
 
     class BeamElementConverter(object):
         _type_id_to_elem_map = {
