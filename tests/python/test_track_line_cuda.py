@@ -48,10 +48,13 @@ if __name__ == '__main__':
     assert success == 0
     assert st.st_CudaArgument_uses_cobjects_buffer(lattice_arg)
     assert not st.st_CudaArgument_uses_raw_argument(lattice_arg)
-    assert st.st_CudaArgument_get_size(lattice_arg) ==
+
+    assert st.st_CudaArgument_get_size(lattice_arg) == \
            st.st_Buffer_get_size(lattice)
-    assert(st.st_CudaArgument_get_capacity(lattice_arg) ==
+
+    assert st.st_CudaArgument_get_capacity(lattice_arg) == \
            st.st_Buffer_get_capacity(lattice)
+
     assert st.st_CudaArgument_has_argument_buffer(lattice_arg)
     assert st.st_CudaArgument_requires_argument_buffer(lattice_arg)
 
@@ -109,7 +112,7 @@ if __name__ == '__main__':
         cmp_pb.get_object(0, cls=pyst.Particles),
         abs_treshold=2e-14) == 0
 
-    st.st_CudaArgument_delete(particles_arg
+    st.st_CudaArgument_delete(particles_arg)
     st.st_CudaArgument_delete(lattice_arg)
     st.st_CudaContext_delete(ctx)
 
