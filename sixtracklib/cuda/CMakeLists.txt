@@ -32,6 +32,7 @@ set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
      wrappers/context_operations.h
      wrappers/extract_particles_address.h
      wrappers/track_particles.h
+     internal/context_base.h
      cuda_tools.h
      track_particles_kernel_c_wrapper.h
 )
@@ -87,13 +88,14 @@ set(   SIXTRACKL_LINK_LIBRARIES
 set( SIXTRACKL_CUDA_CXX_HEADERS
      internal/argument_base.h
      argument.h
-     internal/context_base.h
+     internal/context_base.hpp
      context.h
 )
 
 set( SIXTRACKL_CUDA_CXX_SOURCES
      internal/argument_base.cpp
      internal/context_base.cpp
+     internal/context_base_c99.cpp
      internal/argument.cpp
      internal/context.cpp
 )
