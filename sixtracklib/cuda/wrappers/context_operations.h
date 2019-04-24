@@ -12,9 +12,9 @@
     #include "sixtracklib/cuda/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if !defined( _GPUCODE ) && defined( __cplusplus )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 extern "C" {
-#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+#endif /* C++, Host */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_status_t)
 NS(CudaContext_perform_send)(
@@ -41,7 +41,7 @@ NS(CudaContext_perform_remap_send_cobject_buffer)(
     NS(cuda_arg_buffer_t) SIXTRL_RESTRICT arg_buffer,
     NS(buffer_size_t) const slot_size );
 
-#if !defined( _GPUCODE ) && defined( __cplusplus )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 

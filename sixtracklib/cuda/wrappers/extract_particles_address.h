@@ -11,9 +11,9 @@
     #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if !defined( _GPUCODE ) && defined( __cplusplus )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 extern "C" {
-#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+#endif /* C++, Host */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_status_t)
 NS(Particles_extract_addresses_cuda_on_grid)(
@@ -27,9 +27,9 @@ NS(Particles_extract_addresses_cuda)(
     void* SIXTRL_RESTRICT addr_arg_buffer,
     void* SIXTRL_RESTRICT pbuffer_arg_buffer );
 
-#if !defined( _GPUCODE ) && defined( __cplusplus )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 }
-#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+#endif /* C++, Host */
 
 #endif /* SIXTRACKLIB_CUDA_WRAPPERS_EXTRACT_PARTICLES_ADDRESSES_H__ */
 

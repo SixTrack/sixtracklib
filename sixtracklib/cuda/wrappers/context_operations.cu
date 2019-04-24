@@ -1,3 +1,4 @@
+#include "sixtracklib/cuda/wrappers/context_operations.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -6,13 +7,10 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#include "sixtracklib/cuda/wrappers/context_operations.h"
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/context/definitions.h"
 #include "sixtracklib/common/buffer.h"
 
-
-// #include "sixtracklib/cuda/internal/argument_base.h"
 #include "sixtracklib/cuda/kernels/managed_buffer_remap.cuh"
 
 
@@ -24,7 +22,7 @@ NS(context_status_t) NS(CudaContext_perform_send)(
     typedef NS(context_status_t) status_t;
     typedef NS(context_size_t)   ctx_size_t;
 
-    status_t status = ( status_t )-1;
+    status_t status = NS(CONTEXT_STATUS_GENERAL_FAILURE);
 
     if( ( destination != SIXTRL_NULLPTR ) &&
         ( source_begin != SIXTRL_NULLPTR ) &&
@@ -35,7 +33,7 @@ NS(context_status_t) NS(CudaContext_perform_send)(
 
         if( ret == cudaSuccess )
         {
-            status = ( status_t )0u;
+            status = NS(CONTEXT_STATUS_SUCCESS);
         }
     }
 
@@ -51,7 +49,7 @@ NS(context_status_t) NS(CudaContext_perform_receive)(
     typedef NS(context_status_t) status_t;
     typedef NS(context_size_t)   ctx_size_t;
 
-    status_t status = ( status_t )-1;
+    status_t status = NS(CONTEXT_STATUS_GENERAL_FAILURE);
 
     if( ( source_begin  != SIXTRL_NULLPTR ) &&
         ( source_length > ( ctx_size_t )0u ) &&
@@ -63,7 +61,7 @@ NS(context_status_t) NS(CudaContext_perform_receive)(
 
         if( ret == cudaSuccess )
         {
-            status = ( status_t )0u;
+            status = NS(CONTEXT_STATUS_SUCCESS);
         }
     }
 
@@ -80,7 +78,7 @@ NS(context_status_t) NS(CudaContext_perform_remap_send_cobject_buffer_on_grid)(
     typedef NS(context_size_t)   ctx_size_t;
     typedef NS(buffer_size_t)    buf_size_t;
 
-    status_t status = ( status_t )-1;
+    status_t status = NS(CONTEXT_STATUS_GENERAL_FAILURE);
 
     if( ( arg_buffer != SIXTRL_NULLPTR ) && ( slot_size > ( buf_size_t )0u ) )
     {
@@ -98,7 +96,7 @@ NS(context_status_t) NS(CudaContext_perform_remap_send_cobject_buffer_on_grid)(
         NS(ManagedBuffer_remap_cuda)<<< grid_dim, block_dim >>>(
             ( unsigned char* )arg_buffer, slot_size );
 
-        status = status_t{ 0 };
+        status = ::NS(CONTEXT_STATUS_SUCCESS);
     }
 
     return status;
