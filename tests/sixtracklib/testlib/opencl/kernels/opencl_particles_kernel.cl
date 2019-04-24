@@ -74,7 +74,9 @@ __kernel void NS(Particles_copy_buffer_opencl)(
                         if( NS(Particles_get_state_value)( out_particles, particle_id ) !=
                             NS(Particles_get_state_value)( in_particles,  particle_id ) )
                         {
+                            #if __OPENCL_VERSION__ > 110
                             printf( "ERROR %d\r\n", ( int )particle_id );
+                            #endif /* __OPENCL_VERSION__ > 110 */
                         }
                     }
                     else
