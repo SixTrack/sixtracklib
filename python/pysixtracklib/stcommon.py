@@ -588,20 +588,20 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     st_CudaArgument_delete.argtypes = [st_CudaArgument_p]
 
     st_CudaArgument_send_buffer = sixtracklib.st_CudaArgument_send_buffer
-    st_CudaArgument_send_buffer.restype = ct.c_bool
+    st_CudaArgument_send_buffer.restype = ct.c_int32
     st_CudaArgument_send_buffer.argtypes = [st_CudaArgument_p, st_Buffer_p]
 
     st_CudaArgument_send_memory = sixtracklib.st_CudaArgument_send_memory
-    st_CudaArgument_send_memory.restype = ct.c_bool
+    st_CudaArgument_send_memory.restype = ct.c_int32
     st_CudaArgument_send_memory.argtypes = [
         st_CudaArgument_p, ct.c_void_p, ct.c_uint64]
 
     st_CudaArgument_receive_buffer = sixtracklib.st_CudaArgument_receive_buffer
-    st_CudaArgument_receive_buffer.restype = ct.c_bool
+    st_CudaArgument_receive_buffer.restype = ct.c_int32
     st_CudaArgument_receive_buffer.argtypes = [st_CudaArgument_p, st_Buffer_p]
 
     st_CudaArgument_receive_memory = sixtracklib.st_CudaArgument_receive_memory
-    st_CudaArgument_receive_memory.restype = ct.c_bool
+    st_CudaArgument_receive_memory.restype = ct.c_int32
     st_CudaArgument_receive_memory.argtypes = [
         st_CudaArgument_p, ct.c_void_p, ct.c_uint64]
 
