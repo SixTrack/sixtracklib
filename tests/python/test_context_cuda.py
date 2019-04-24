@@ -8,8 +8,11 @@ from pysixtracklib import stcommon as st
 import pysixtracklib_test as testlib
 
 if __name__ == '__main__':
+    if not pyst.supports('cuda'):
+        raise SystemExit("cuda support required for this test")
+
     ptr_context = st.st_CudaContext_create()
-    assert(ptr_context != st.st_NullCudaContext)
+    assert ptr_context != st.st_NullCudaContext
 
     st.st_CudaContext_delete(ptr_context)
     ptr_context = st.st_NullCudaContext
