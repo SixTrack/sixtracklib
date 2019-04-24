@@ -5,9 +5,9 @@
     #include "sixtracklib/common/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 extern "C" {
-#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+#endif /* C++, Host */
 
 typedef SIXTRL_UINT64_T  NS(context_type_id_t);
 typedef SIXTRL_INT32_T   NS(context_status_t);
@@ -72,7 +72,7 @@ typedef SIXTRL_UINT64_T  NS(context_success_flag_t);
 
 /* ------------------------------------------------------------------------- */
 
-#if !defined( _GPUCODE )
+#if !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
 SIXTRL_STATIC_VAR NS(context_type_id_t) const NS(CONTEXT_TYPE_ID_BITMASK) =
     ( NS(context_type_id_t) )SIXTRL_CONTEXT_TYPE_ID_BITMASK;
@@ -103,13 +103,10 @@ SIXTRL_STATIC_VAR NS(context_type_id_t) const NS(CONTEXT_TYPE_OPENCL) =
 SIXTRL_STATIC_VAR NS(context_type_id_t) const NS(CONTEXT_TYPE_CUDA) =
     ( NS(context_type_id_t) )SIXTRL_CONTEXT_TYPE_CUDA;
 
-#endif /* !defined( _GPUCODE ) */
+#endif /* !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 }
-#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
-
-#if defined( __cplusplus ) && !defined( __CUDACC__ )
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -155,7 +152,8 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_CONTEXT_TYPE_CUDA );
 }
 
-#endif /* defined( __cplusplus ) */
+#endif /* C++, Host */
 
 #endif /* SIXTRACKLIB_COMMON_CONTEXT_DEFINITIONS_H__ */
+
 /* end: sixtracklib/common/context/definitions.h */
