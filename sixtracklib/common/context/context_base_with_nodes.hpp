@@ -209,7 +209,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
-        SIXTRL_HOST ContextOnNodesBase(
+        SIXTRL_HOST_FN ContextOnNodesBase(
             type_id_t const type_id, const char *const type_id_str,
             const char *const SIXTRL_RESTRICT config_str = nullptr );
 
