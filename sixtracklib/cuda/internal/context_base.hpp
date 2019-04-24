@@ -6,11 +6,7 @@
        !defined( __CUDA_ARCH__ )
         #include <cstddef>
         #include <cstdlib>
-        #include <iterator>
-        #include <string>
-        #include <map>
-        #include <vector>
-    #endif /* defined( __cplusplus ) */
+    #endif /* C++, Host */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
@@ -20,10 +16,10 @@
     #include "sixtracklib/common/context/context_base_with_nodes.hpp"
     #include "sixtracklib/common/buffer.h"
 
-    #if defineddefined( __cplusplus ) && !defined( _GPUCODE ) && \
+    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
        !defined( __CUDA_ARCH__ )
         #include "sixtracklib/common/buffer.hpp"
-    #endif /* defined( __cplusplus ) */
+    #endif /* C++, Host */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
@@ -45,7 +41,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using device_id_t    = _base_context_t::device_id_t;
         using type_id_t      = _base_context_t::type_id_t;
         using ptr_arg_base_t = _base_context_t::ptr_arg_base_t;
-        using status_t       = _base_context_t::context_status_t;
+        using status_t       = _base_context_t::status_t;
 
         using buffer_t       = SIXTRL_CXX_NAMESPACE::Buffer;
         using c_buffer_t     = ::NS(Buffer);

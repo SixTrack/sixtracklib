@@ -7,6 +7,8 @@
 #include <memory>
 
 #include "sixtracklib/common/definitions.h"
+#include "sixtracklib/cuda/definitions.h"
+#include "sixtracklib/cuda/internal/context_base.hpp"
 
 void NS(CudaContext_delete)( NS(CudaContextBase)* SIXTRL_RESTRICT context )
 {

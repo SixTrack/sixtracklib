@@ -11,10 +11,8 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/context/definitions.h"
-    #include "sixtracklib/common/context/argument_base.hpp"
-    #include "sixtracklib/common/context/context_base.hpp"
-    #include "sixtracklib/common/context/context_base_with_nodes.hpp"
-    #include "sixtracklib/common/buffer.h"
+    #include "sixtracklib/cuda/definitions.h"
+    #include "sixtracklib/cuda/internal/context_base.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )

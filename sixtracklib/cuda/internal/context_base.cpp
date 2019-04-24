@@ -1,4 +1,4 @@
-#include "sixtracklib/cuda/internal/context_base.h"
+#include "sixtracklib/cuda/internal/context_base.hpp"
 
 #if defined( __cplusplus ) && !defined( __CUDA_ARCH__ ) && !defined( _GPUCODE )
 
