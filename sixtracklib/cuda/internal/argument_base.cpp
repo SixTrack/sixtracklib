@@ -1,4 +1,6 @@
-#include "sixtracklib/cuda/internal/argument_base.h"
+#include "sixtracklib/cuda/internal/argument_base.hpp"
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
 #include <algorithm>
 #include <cstddef>
@@ -8,17 +10,14 @@
 #include <stdexcept>
 #include <utility>
 
-#include <cuda_runtime.h>
-#include <cuda_occupancy.h>
-#include <cuda.h>
-
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/buffer.h"
-#include "sixtracklib/common/context/argument_base.h"
-#include "sixtracklib/common/context/context_base.h"
+#include "sixtracklib/common/context/definitions.h"
+#include "sixtracklib/common/context/argument_base.hpp"
+#include "sixtracklib/common/context/context_base.hpp"
 
-#include "sixtracklib/cuda/internal/context_base.h"
+#include "sixtracklib/cuda/internal/context_base.hpp"
 #include "sixtracklib/cuda/wrappers/argument_operations.h"
 
 namespace SIXTRL_CXX_NAMESPACE
@@ -151,16 +150,6 @@ namespace SIXTRL_CXX_NAMESPACE
     /* ----------------------------------------------------------------- */
 }
 
-bool NS(CudaArgument_has_cuda_arg_buffer)(
-    const ::NS(CudaArgumentBase) *const SIXTRL_RESTRICT arg )
-{
-    return ( arg != nullptr ) ? arg->hasCudaArgBuffer() : false;
-}
+#endif /* c++, host */
 
-::NS(cuda_arg_buffer_t) NS(CudaArgument_get_cuda_arg_buffer)(
-    ::NS(CudaArgumentBase)* SIXTRL_RESTRICT arg )
-{
-    return ( arg != nullptr ) ? arg->cudaArgBuffer() : nullptr;
-}
-
-/* end: sixtracklib/cuda/internal/argument_base.cu */
+/* end: sixtracklib/cuda/internal/argument_base.cpp */
