@@ -4,7 +4,6 @@
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #if !defined( __cplusplus )
         #include <stdbool.h>
-        #include <stdint.h>
         #include <stdio.h>
         #include <stdlib.h>
         #include <limits.h>
@@ -12,11 +11,11 @@
     #else /* defined( __cplusplus ) */
         #include <cstddef>
         #include <cstdlib>
-        #include <cstdint>
         #include <cstdio>
         #include <limits>
         #include <cmath>
     #endif /* !defined( __cplusplus ) */
+    #include <stdint.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )

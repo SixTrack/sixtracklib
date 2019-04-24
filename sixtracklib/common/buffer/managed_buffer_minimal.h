@@ -5,13 +5,10 @@
     #if !defined( __cplusplus )
         #include <stdbool.h>
         #include <stddef.h>
-        #include <stdint.h>
         #include <stdlib.h>
         #include <limits.h>
     #else
-        #include <cstdbool>
         #include <cstddef>
-        #include <cstdint>
         #include <cstdlib>
         #include <limits>
     #endif /* !defined( __cplusplus ) */
@@ -199,7 +196,7 @@ SIXTRL_INLINE NS(buffer_addr_diff_t)
 
         #endif /* defined( __OPENCL_VERSION__ ) */
     #elif defined( __cplusplus )
-        using addr_diff_t = NS(buffer_addr_diff_t);
+        typedef NS(buffer_addr_diff_t) addr_diff_t;
 
         SIXTRL_ASSERT( std::numeric_limits< addr_diff_t >::digits >= 63u );
         SIXTRL_ASSERT( std::numeric_limits< addr_diff_t >::is_signed  );
@@ -253,7 +250,7 @@ SIXTRL_INLINE NS(buffer_addr_diff_t)
 
         #endif /* defined( __OPENCL_VERSION__ ) */
     #elif defined( __cplusplus )
-        using addr_diff_t = NS(buffer_addr_diff_t);
+        typedef NS(buffer_addr_diff_t) addr_diff_t;
 
         SIXTRL_ASSERT( std::numeric_limits< addr_diff_t >::digits >= 63u );
         SIXTRL_ASSERT( std::numeric_limits< addr_diff_t >::is_signed  );
