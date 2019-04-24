@@ -20,7 +20,6 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/context/definitions.h"
 #include "sixtracklib/cuda/context.h"
-#include "sixtracklib/cuda/argument.h"
 #include "sixtracklib/cuda/wrappers/track_particles.h"
 #include "sixtracklib/common/track.h"
 

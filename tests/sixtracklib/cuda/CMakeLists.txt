@@ -122,7 +122,7 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_single_file_compilation_cuda_cxx:
 
-    if( SIXTRACKL_ENABLE_CUDA_RTC )
+    if( SIXTRACKL_ENABLE_CUDA_RTC AND CUDA_VERSION_MAJOR VERSION_GREATER 7 )
 
         add_executable( test_runtime_compilation_cuda_cxx
                         test_runtime_compilation_cuda_cxx.cpp )
