@@ -1,4 +1,6 @@
-#include "sixtracklib/common/context/context_base.h"
+#include "sixtracklib/common/context/context_base.hpp"
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
 #include <cstddef>
 #include <cstdlib>
@@ -11,8 +13,6 @@
 #include "sixtracklib/common/buffer/managed_buffer_remap.h"
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/buffer.h"
-
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
 namespace SIXTRL_CXX_NAMESPACE
 {
