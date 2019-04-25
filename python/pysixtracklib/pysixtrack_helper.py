@@ -1,4 +1,5 @@
 import importlib
+from importlib import util
 
 if importlib.util.find_spec('pysixtrack') is not None:
     from pysixtrack import track as pysixelem
