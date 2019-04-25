@@ -2040,7 +2040,27 @@ namespace SIXTRL_CXX_NAMESPACE
             device_index = 0;
 
             std::string platform_name = platform.getInfo< CL_PLATFORM_NAME >();
+
+            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
+                SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+            try
+            {
+            #endif /* OpenCL 1.x C++ Host Exceptions enabled */
+
             platform.getDevices( CL_DEVICE_TYPE_ALL, &devices );
+
+            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
+                SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+            }
+            catch( cl::Error const& e )
+            {
+                #if !defined( NDEBUG )
+                std::cerr << "Error while probing devices for platform "
+                          << platform_name << " --> skipping"
+                          << std::endl;
+                #endif /* !defined( NDEBUG ) */
+            }
+            #endif /* OpenCL 1.x C++ Host Exceptions enabled */
 
             bool added_at_least_one_device = false;
 

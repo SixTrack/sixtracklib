@@ -9,7 +9,8 @@ set( CXX_HEADERS_INSTALL_PATH ${C99_HEADERS_INSTALL_PATH}  )
 #-------------------------------------------------------------------------------
 # Prepare the internal cl.h header according to entries from Settings
 
-set( SIXTRL_OPENCL_ENABLE_HOST_EXCEPTIONS "" )
+set( SIXTRL_OPENCL_ENABLE_EXCEPTION_STR "" )
+set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG 0 )
 
 if( SIXTRACKL_USE_LEGACY_CL_HPP )
     set( SIXTRL_OPENCL_CL_HPP "CL/cl.hpp" )
@@ -17,11 +18,12 @@ if( SIXTRACKL_USE_LEGACY_CL_HPP )
     set( SIXTRL_USES_CL_HPP  1 )
 
     if( SIXTRL_OPENCL_ENABLE_HOST_EXCEPTIONS )
-        string( APPEND SIXTRL_OPENCL_ENABLE_HOST_EXCEPTIONS
+        set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG 1 )
+        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
                 "    #if !defined( __CL_ENABLE_EXCEPTIONS )\r\n" )
-        string( APPEND SIXTRL_OPENCL_ENABLE_HOST_EXCEPTIONS
+        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
                 "        #define __CL_ENABLE_EXCEPTIONS  \r\n" )
-        string( APPEND SIXTRL_OPENCL_ENABLE_HOST_EXCEPTIONS
+        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
                 "    #endif /* !defined( __CL_ENABLE_EXCEPTIONS ) */ \r\n" )
     endif()
 else()
@@ -30,11 +32,12 @@ else()
     set( SIXTRL_USES_CL_HPP  0 )
 
     if( SIXTRACKL_OPENCL_CXX_ENABLE_EXCEPTIONS )
-        string( APPEND SIXTRL_OPENCL_ENABLE_HOST_EXCEPTIONS
+        set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG 1 )
+        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
                 "    #if !defined( CL_HPP_ENABLE_EXCEPTIONS )\r\n" )
-        string( APPEND SIXTRL_OPENCL_ENABLE_HOST_EXCEPTIONS
+        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
                 "        #define CL_HPP_ENABLE_EXCEPTIONS \r\n" )
-        string( APPEND SIXTRL_OPENCL_ENABLE_HOST_EXCEPTIONS
+        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
                 "    #endif /* !defined( CL_HPP_ENABLE_EXCEPTIONS ) */ \r\n" )
     endif()
 endif()
@@ -56,8 +59,10 @@ set( CL_H_INSTALL_INFO
      set( SIXTRL_OPENCL_CL_HPP ${SIXTRL_OPENCL_CL_HPP} )
      set( SIXTRL_USES_CL2_HPP  ${SIXTRL_USES_CL2_HPP}  )
      set( SIXTRL_USES_CL_HPP   ${SIXTRL_USES_CL_HPP}   )
-     set( SIXTRL_OPENCL_ENABLE_HOST_EXCEPTIONS
-          ${SIXTRL_OPENCL_ENABLE_HOST_EXCEPTIONS} ) " )
+     set( SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
+          ${SIXTRL_OPENCL_ENABLE_EXCEPTION_STR} )
+     set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG
+          ${SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG} ) " )
 
 install( CODE "
          ${CL_H_INSTALL_INFO}
