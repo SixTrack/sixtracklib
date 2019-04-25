@@ -10,7 +10,7 @@
 #include "sixtracklib/cuda/definitions.h"
 #include "sixtracklib/cuda/internal/context_base.hpp"
 
-void NS(CudaContext_delete)( NS(CudaContextBase)* SIXTRL_RESTRICT context )
+void NS(CudaContextBase_delete)( NS(CudaContextBase)* SIXTRL_RESTRICT context )
 {
     delete context;
     return;

@@ -21,7 +21,7 @@ extern "C" {
 
 #if !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(CudaContext_delete)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(CudaContextBase_delete)(
     NS(CudaContextBase)* SIXTRL_RESTRICT context );
 
 #endif /* !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ ) */
