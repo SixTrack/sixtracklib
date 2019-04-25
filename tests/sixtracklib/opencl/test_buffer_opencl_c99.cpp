@@ -11,14 +11,11 @@
 
 #include <gtest/gtest.h>
 
-#define __CL_ENABLE_EXCEPTIONS
-#include <CL/cl.hpp>
-
 #include "sixtracklib/testlib.h"
-
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
+#include "sixtracklib/opencl/cl.h"
 
 TEST( C99_OpenCL_Buffer,
       InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThread )
