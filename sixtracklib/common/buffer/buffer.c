@@ -18,12 +18,10 @@
 
 #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
         ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
-    #include "sixtracklib/opencl/buffer.h"
 #endif /* OpenCL */
 
 #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
         ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
-    #include "sixtracklib/cuda/buffer.h"
 #endif /* Cuda */
 
 #if !defined( _GPUCODE )
