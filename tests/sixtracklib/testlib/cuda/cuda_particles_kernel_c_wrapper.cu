@@ -154,12 +154,18 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda_grid)(
                 block_dim.z = 1;
 
                 NS(ManagedBuffer_remap_io_buffers_kernel_cuda)<<<
-                    grid_dim, block_dim >>>( cuda_in_buffer,
-                        cuda_out_buffer, cuda_success_flag );
+                    grid_dim, block_dim >>>( cuda_in_buffer, cuda_out_buffer,
+                        cuda_success_flag );
 
-                if( ( cudaSuccess == cudaDeviceSynchronize() ) &&
-                    ( cudaSuccess == cudaMemcpy( &success_flag, cuda_success_flag,
-                        sizeof( success_flag ), cudaMemcpyDeviceToHost ) ) )
+                cudaError_t ret = cudaDeviceSynchronize();
+
+                if( ret == cudaSuccess )
+                {
+                    ret = cudaMemcpy( &success_flag, cuda_success_flag,
+                        sizeof( success_flag ), cudaMemcpyDeviceToHost );
+                }
+
+                if( cudaSuccess ==  ret )
                 {
                     success = success_flag;
                 }
@@ -183,9 +189,15 @@ __host__ int NS(Run_test_particles_copy_buffer_kernel_on_cuda_grid)(
                 NS(Particles_copy_buffer_kernel_cuda)<<< grid_dim, block_dim >>>(
                     cuda_in_buffer, cuda_out_buffer, cuda_success_flag );
 
-                if( ( cudaSuccess == cudaDeviceSynchronize() ) &&
-                    ( cudaSuccess == cudaMemcpy( &success_flag, cuda_success_flag,
-                        sizeof( success_flag ), cudaMemcpyDeviceToHost ) ) )
+                cudaError_t ret = cudaDeviceSynchronize();
+
+                if( ret == cudaSuccess )
+                {
+                    ret = cudaMemcpy( &success_flag, cuda_success_flag,
+                        sizeof( success_flag ), cudaMemcpyDeviceToHost );
+                }
+
+                if( cudaSuccess ==  ret )
                 {
                     success |= ( int )success_flag;
 
