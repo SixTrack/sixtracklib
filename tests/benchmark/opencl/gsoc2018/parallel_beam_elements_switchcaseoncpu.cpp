@@ -18,9 +18,7 @@
 #include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/particles.h"
-
-#define __CL_ENABLE_EXCEPTIONS
-#include <CL/cl.hpp>
+#include "sixtracklib/opencl/cl.h"
 
 
 int main(int argc, char** argv)
@@ -419,9 +417,9 @@ queue.enqueueWriteBuffer( B, CL_TRUE, 0, st_Blocks_get_total_num_bytes( &beam_el
             track_align_particle.setArg(4,NUM_TURNS);
 
 
-#if 1   
+#if 1
     // SIXTRL_UINT64_T beam_index = 500;
-		clkbegin = rtclock();    
+		clkbegin = rtclock();
 
     for(size_t nt=0; nt < NUM_TURNS; ++nt) {
     st_block_size_t beam_index = 0;

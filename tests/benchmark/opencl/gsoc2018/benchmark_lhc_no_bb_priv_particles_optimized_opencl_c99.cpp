@@ -13,9 +13,6 @@
 #include <sstream>
 #include <vector>
 
-#define __CL_ENABLE_EXCEPTIONS
-#include <CL/cl.hpp>
-
 #include "sixtracklib/sixtracklib.h"
 #include "sixtracklib/testlib.h"
 
