@@ -1,4 +1,5 @@
-# sitracklib/common/generated/CMakeLists.txt
+# ==============================================================================
+# common/generated sixtracklib submodule
 
 set( GENERATED_INSTALL_PATH "include/sixtracklib/common/generated" )
 set( SIXTRACKL_COMMON_GENERATED_HEADERS )
