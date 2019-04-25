@@ -1,5 +1,7 @@
-# ------------------------------------------------------------------------------
-# --- CUDA Kernel host library:
+# ==============================================================================
+# CUDA sixtracklib submodule
+
+message( STATUS "---- processing sixtracklib/cuda/CMakeLists.txt" )
 
 if( SIXTRACKL_CUDA_COMPUTE_ARCH_LIST )
 
