@@ -20,9 +20,9 @@
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/context/compute_arch.h"
-#include "sixtracklib/opencl/argument.h"
 
-#include <CL/cl.hpp>
+#include "sixtracklib/opencl/cl.h"
+#include "sixtracklib/opencl/argument.h"
 
 namespace SIXTRL_CXX_NAMESPACE
 {
