@@ -55,7 +55,7 @@ TEST( CXX_CudaArgumentTests, ArgumentCObjectBufferTest )
 
     bool success = particles_arg.send( pb );
 
-    ASSERT_TRUE( success );
+    ASSERT_TRUE( success == st::CONTEXT_STATUS_SUCCESS );
     ASSERT_TRUE( particles_arg.hasArgumentBuffer() );
     ASSERT_TRUE( particles_arg.hasCudaArgBuffer() );
     ASSERT_TRUE( particles_arg.cudaArgBuffer() != nullptr );
@@ -69,8 +69,6 @@ TEST( CXX_CudaArgumentTests, ArgumentCObjectBufferTest )
     ASSERT_TRUE( !particles_arg.usesRawArgument() );
     ASSERT_TRUE(  particles_arg.ptrRawArgument() == nullptr );
     ASSERT_TRUE( particles_arg.cudaContext() == &context );
-
-
 }
 
 /* end: tests/sixtracklib/cuda/test_context_cxx.cpp */

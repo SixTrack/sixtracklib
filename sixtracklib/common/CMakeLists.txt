@@ -1,5 +1,7 @@
-# sixtracklib/common/CMakeLists.txt
-# -----------------------------------------------------------------------------
+# ==============================================================================
+# common sixtracklib submodule
+
+message( STATUS "---- processing sixtracklib/common/CMakeLists.txt" )
 
 set(  SIXTRACKL_LINK_LIBRARIES
     ${SIXTRACKL_LINK_LIBRARIES}  PARENT_SCOPE )

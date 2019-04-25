@@ -50,9 +50,9 @@ __host__ int NS(Run_test_buffer_generic_obj_kernel_on_cuda_grid)(
     {
         int32_t success_flag = 0;
 
-        unsigned char* cuda_orig_begin = nullptr;
-        unsigned char* cuda_copy_begin = nullptr;
-        int32_t* cuda_success_flag     = nullptr;
+        unsigned char* cuda_orig_begin = SIXTRL_NULLPTR;
+        unsigned char* cuda_copy_begin = SIXTRL_NULLPTR;
+        int32_t* cuda_success_flag     = SIXTRL_NULLPTR;
 
         SIXTRL_ASSERT( orig_buffer_size == copy_buffer_size );
 
@@ -81,9 +81,9 @@ __host__ int NS(Run_test_buffer_generic_obj_kernel_on_cuda_grid)(
         }
 
         SIXTRL_ASSERT( ( success != 0 ) ||
-                       ( cuda_orig_begin   != nullptr ) &&
-                       ( cuda_copy_begin   != nullptr ) &&
-                       ( cuda_success_flag != nullptr ) );
+                       ( cuda_orig_begin   != SIXTRL_NULLPTR ) &&
+                       ( cuda_copy_begin   != SIXTRL_NULLPTR ) &&
+                       ( cuda_success_flag != SIXTRL_NULLPTR ) );
 
         if( ( success == 0 ) &&
             ( cudaSuccess != cudaMemcpy( cuda_orig_begin, orig_buffer_begin,

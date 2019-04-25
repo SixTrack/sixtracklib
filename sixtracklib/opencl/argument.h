@@ -30,7 +30,6 @@ struct NS(Buffer);
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
-
     #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
         #include <cstddef>
         #include <cstdint>
@@ -40,10 +39,14 @@ struct NS(Buffer);
         #include <string>
         #include <map>
         #include <vector>
-
-        #include <CL/cl.hpp>
     #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+#endif /* defined( __cplusplus ) */
 
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/opencl/cl.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
+#if defined( __cplusplus )
 namespace SIXTRL_CXX_NAMESPACE
 {
     class ClContextBase;
@@ -137,10 +140,6 @@ namespace SIXTRL_CXX_NAMESPACE
 typedef SIXTRL_CXX_NAMESPACE::ClArgument NS(ClArgument);
 
 #else /* !defined( __cplusplus ) */
-
-    #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-        #include <CL/cl.h>
-    #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
     #if !defined( SIXTRL_NO_INCLUDES )
         #include "sixtracklib/common/buffer.h"

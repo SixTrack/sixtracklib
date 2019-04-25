@@ -4,11 +4,9 @@
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #if defined( __cplusplus )
         #include <cstddef>
-        #include <cstdint>
         #include <cstdlib>
     #else /* defined( __cplusplus ) */
         #include <stddef.h>
-        #include <stdint.h>
         #include <stdlib.h>
         #include <limits.h>
     #endif /* defined( __cplusplus ) */
@@ -207,10 +205,10 @@ NS(Buffer);
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    using object_type_id_t = NS(object_type_id_t);
-    using buffer_addr_t    = NS(buffer_addr_t);
-    using buffer_size_t    = NS(buffer_size_t);
-    using buffer_flags_t   = NS(buffer_flags_t);
+    typedef NS(object_type_id_t) object_type_id_t;
+    typedef NS(buffer_size_t)    buffer_size_t;
+    typedef NS(buffer_addr_t)    buffer_addr_t;
+    typedef NS(buffer_flags_t)   buffer_flags_t;
 
     /* --------------------------------------------------------------------- */
 

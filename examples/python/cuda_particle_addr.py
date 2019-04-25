@@ -1,18 +1,32 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import importlib
+
 import sys
 import ctypes as ct
 import pysixtracklib as pyst
 from pysixtracklib import stcommon as st
-import pycuda
-
-import pycuda.gpuarray
-import pycuda.driver
-import pycuda.autoinit
 import numpy as np
 
+pycuda_spec = importlib.util.find_spec('pycuda')
+
+if pycuda_spec is not None:
+    import pycuda
+    import pycuda.gpuarray
+    import pycuda.driver
+    import pycuda.autoinit
+
+if numpy_spec is not None:
+
+
 if __name__ == '__main__':
+    if not pyst.supports('cuda'):
+        raise SystemExit("Example requires cuda support in pysixtracklib")
+
+    if pycuda_spec is None:
+        raise SystemExit("Example requires pycuda installation")
+
     num_particles = 42
     partset = pyst.ParticlesSet()
     particles = partset.Particles(num_particles=num_particles)
@@ -57,8 +71,8 @@ if __name__ == '__main__':
 
     cmp_particles = pset.cbuffer.get_object(0, pyst.Particles)
 
-    assert(pyst.compareParticlesDifference(
-        cmp_particles, particles, abs_treshold=2e-14) == 0)
+    assert pyst.compareParticlesDifference(
+        cmp_particles, particles, abs_treshold=2e-14) == 0
 
     st.st_CudaContext_delete(ctx)
     st.st_CudaArgument_delete(particles_arg)

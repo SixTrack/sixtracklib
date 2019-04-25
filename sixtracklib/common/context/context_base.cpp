@@ -1,14 +1,15 @@
-#include "sixtracklib/common/context/context_base.h"
+#include "sixtracklib/common/context/context_base.hpp"
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
 #include <cstddef>
-#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/namespace.h"
-#include "sixtracklib/common/context/argument_base.h"
+#include "sixtracklib/common/context/argument_base.hpp"
 #include "sixtracklib/common/buffer/managed_buffer_remap.h"
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/buffer.h"
@@ -433,5 +434,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 }
+
+#endif /* C++, host */
 
 /* end: sixtracklib/common/context/context_base.cpp */

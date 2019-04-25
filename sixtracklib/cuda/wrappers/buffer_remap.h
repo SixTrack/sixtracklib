@@ -10,9 +10,9 @@
     #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if !defined( _GPUCODE ) && defined( __cplusplus )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 extern "C" {
-#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+#endif /* C++, Host */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Buffer_remap_cuda)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
@@ -40,9 +40,10 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ManagedBuffer_remap_debug_cuda)(
     NS(buffer_size_t) const num_blocks,
     NS(buffer_size_t) const num_threads_per_block );
 
-#if !defined( _GPUCODE ) && defined( __cplusplus )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 }
-#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+#endif /* C++, Host */
 
 #endif /* SIXTRACKLIB_CUDA_WRAPPERS_BUFFER_REMAP_H__ */
+
 /* end: sixtracklib/cuda/wrappers/buffer_remap.h */

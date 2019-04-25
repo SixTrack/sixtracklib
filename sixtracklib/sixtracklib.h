@@ -71,12 +71,10 @@
 #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
 
+    #include "sixtracklib/opencl/cl.h"
     #include "sixtracklib/opencl/argument.h"
     #include "sixtracklib/opencl/context.h"
     #include "sixtracklib/opencl/track_job_cl.h"
-
-//     #include "sixtracklib/opencl/buffer.h"
-//     #include "sixtracklib/opencl/ocl_environment.h"
 
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
 
@@ -86,7 +84,9 @@
            ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
 
     #include "sixtracklib/cuda/definitions.h"
+    #include "sixtracklib/cuda/internal/argument_base.h"
     #include "sixtracklib/cuda/argument.h"
+    #include "sixtracklib/cuda/internal/context_base.h"
     #include "sixtracklib/cuda/context.h"
     #include "sixtracklib/cuda/track_particles_kernel_c_wrapper.h"
 

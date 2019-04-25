@@ -15,6 +15,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/context/context_base.h"
     #include "sixtracklib/common/context/context_base_with_nodes.h"
+    #include "sixtracklib/opencl/cl.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
@@ -27,8 +28,6 @@
         #include <string>
         #include <map>
         #include <vector>
-
-        #include <CL/cl.hpp>
     #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 using NS(context_size_t) = std::size_t;

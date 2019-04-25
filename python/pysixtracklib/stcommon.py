@@ -551,7 +551,6 @@ st_TrackJob_get_beam_monitor_output_buffer_offset.restype = ct.c_uint64
 # Cuda-Context methods
 
 if SIXTRACKLIB_MODULES.get('cuda', False):
-
     st_CudaContext_p = ct.c_void_p
     st_NullCudaContext = ct.cast(0, st_CudaContext_p)
 
@@ -590,20 +589,20 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     st_CudaArgument_delete.argtypes = [st_CudaArgument_p]
 
     st_CudaArgument_send_buffer = sixtracklib.st_CudaArgument_send_buffer
-    st_CudaArgument_send_buffer.restype = ct.c_bool
+    st_CudaArgument_send_buffer.restype = ct.c_int32
     st_CudaArgument_send_buffer.argtypes = [st_CudaArgument_p, st_Buffer_p]
 
     st_CudaArgument_send_memory = sixtracklib.st_CudaArgument_send_memory
-    st_CudaArgument_send_memory.restype = ct.c_bool
+    st_CudaArgument_send_memory.restype = ct.c_int32
     st_CudaArgument_send_memory.argtypes = [
         st_CudaArgument_p, ct.c_void_p, ct.c_uint64]
 
     st_CudaArgument_receive_buffer = sixtracklib.st_CudaArgument_receive_buffer
-    st_CudaArgument_receive_buffer.restype = ct.c_bool
+    st_CudaArgument_receive_buffer.restype = ct.c_int32
     st_CudaArgument_receive_buffer.argtypes = [st_CudaArgument_p, st_Buffer_p]
 
     st_CudaArgument_receive_memory = sixtracklib.st_CudaArgument_receive_memory
-    st_CudaArgument_receive_memory.restype = ct.c_bool
+    st_CudaArgument_receive_memory.restype = ct.c_int32
     st_CudaArgument_receive_memory.argtypes = [
         st_CudaArgument_p, ct.c_void_p, ct.c_uint64]
 
@@ -654,25 +653,52 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     st_CudaArgument_get_type_id.restype = ct.c_uint64
     st_CudaArgument_get_type_id.argtypes = [st_CudaArgument_p]
 
+    # Extract particles API for CUDA
+
+    st_Particles_extract_addresses_cuda = \
+        sixtracklib.st_Particles_extract_addresses_cuda
+    st_Particles_extract_addresses_cuda.argtypes = [ct.c_void_p, ct.c_void_p]
+    st_Particles_extract_addresses_cuda.restype = ct.c_int32
+
+    # Stand-alone tracking functions for CUDA
+
+    st_Track_particles_line_cuda_on_grid = \
+        sixtracklib.st_Track_particles_line_cuda_on_grid
+    st_Track_particles_line_cuda_on_grid.restype = ct.c_int32
+    st_Track_particles_line_cuda_on_grid.argtypes = [
+        ct.c_void_p,
+        ct.c_void_p,
+        ct.c_uint64,
+        ct.c_uint64,
+        ct.c_bool,
+        ct.c_uint64,
+        ct.c_uint64]
+
+    st_Track_particles_line_cuda = sixtracklib.st_Track_particles_line_cuda
+    st_Track_particles_line_cuda.restype = ct.c_int32
+    st_Track_particles_line_cuda.argtypes = [
+        ct.c_void_p, ct.c_void_p, ct.c_uint64, ct.c_uint64, ct.c_bool]
+
 # -----------------------------------------------------------------------------
 # Cl-Context methods
 
-st_ClContext_create = sixtracklib.st_ClContext_create
-st_ClContext_create.restype = st_Context_p
+if SIXTRACKLIB_MODULES.get('opencl', False):
 
-st_ClContextBase_select_node = sixtracklib.st_ClContextBase_select_node
-st_ClContextBase_select_node.argtypes = [st_Context_p, ct.c_char_p]
-st_ClContextBase_select_node.restype = None
+    st_ClContext_create = sixtracklib.st_ClContext_create
+    st_ClContext_create.restype = st_Context_p
 
-st_ClContextBase_print_nodes_info = \
-    sixtracklib.st_ClContextBase_print_nodes_info
-st_ClContextBase_print_nodes_info.argtypes = [st_Context_p]
-st_ClContextBase_print_nodes_info.restype = None
+    st_ClContextBase_select_node = sixtracklib.st_ClContextBase_select_node
+    st_ClContextBase_select_node.argtypes = [st_Context_p, ct.c_char_p]
+    st_ClContextBase_select_node.restype = None
 
-st_ClContextBase_delete = sixtracklib.st_ClContextBase_delete
-st_ClContextBase_delete.argtypes = [st_Context_p]
-st_ClContextBase_delete.restype = None
+    st_ClContextBase_print_nodes_info = \
+        sixtracklib.st_ClContextBase_print_nodes_info
+    st_ClContextBase_print_nodes_info.argtypes = [st_Context_p]
+    st_ClContextBase_print_nodes_info.restype = None
 
+    st_ClContextBase_delete = sixtracklib.st_ClContextBase_delete
+    st_ClContextBase_delete.argtypes = [st_Context_p]
+    st_ClContextBase_delete.restype = None
 
 # ------------------------------------------------------------------------------
 # Stand-alone tracking functions (CPU only)
@@ -688,29 +714,3 @@ st_Track_all_particles_element_by_element_until_turn = \
 st_Track_all_particles_element_by_element_until_turn.restype = ct.c_int32
 st_Track_all_particles_element_by_element_until_turn.argtypes = [
     st_Particles_p, st_Buffer_p, ct.c_int64, st_Particles_p]
-
-
-# ------------------------------------------------------------------------------
-# Extract particle addresses:
-
-st_Particles_extract_addresses_cuda = \
-    sixtracklib.st_Particles_extract_addresses_cuda
-st_Particles_extract_addresses_cuda.argtypes = [ct.c_void_p, ct.c_void_p]
-st_Particles_extract_addresses_cuda.restype = ct.c_int32
-
-st_Track_particles_line_cuda_on_grid = \
-    sixtracklib.st_Track_particles_line_cuda_on_grid
-st_Track_particles_line_cuda_on_grid.restype = ct.c_int32
-st_Track_particles_line_cuda_on_grid.argtypes = [
-    ct.c_void_p,
-    ct.c_void_p,
-    ct.c_uint64,
-    ct.c_uint64,
-    ct.c_bool,
-    ct.c_uint64,
-    ct.c_uint64]
-
-st_Track_particles_line_cuda = sixtracklib.st_Track_particles_line_cuda
-st_Track_particles_line_cuda.restype = ct.c_int32
-st_Track_particles_line_cuda.argtypes = [ct.c_void_p, ct.c_void_p,
-                                         ct.c_uint64, ct.c_uint64, ct.c_bool]

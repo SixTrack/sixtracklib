@@ -12,7 +12,6 @@
 
     #if defined( __cplusplus )
         #include <algorithm>
-        #include <CL/cl.hpp>
     #endif /* !defined( __cplusplus ) */
 
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
@@ -21,6 +20,8 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/particles.h"
+
+    #include "sixtracklib/opencl/cl.h"
     #include "sixtracklib/opencl/internal/base_context.h"
     #include "sixtracklib/opencl/argument.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
