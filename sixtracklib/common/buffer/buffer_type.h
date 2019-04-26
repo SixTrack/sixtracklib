@@ -28,6 +28,10 @@ typedef SIXTRL_UINT64_T NS(buffer_size_t);
 typedef SIXTRL_UINT64_T NS(buffer_flags_t);
 typedef SIXTRL_UINT64_T NS(object_type_id_t);
 
+#if !defined( SIXTRL_OBJECT_TYPE_UNDEFINED )
+    #define SIXTRL_OBJECT_TYPE_UNDEFINED 0
+#endif /* !defined( SIXTRL_OBJECT_TYPE_UNDEFINED ) */
+
 #if !defined( SIXTRL_BUFFER_FLAGS_NONE )
     #define   SIXTRL_BUFFER_FLAGS_NONE                      0x00000000
 #endif /* !defined( SIXTRL_BUFFER_FLAGS_NONE ) */
@@ -105,6 +109,21 @@ typedef SIXTRL_UINT64_T NS(object_type_id_t);
 #endif /* !defined( SIXTRL_BUFFER_MINIMAL_LENGTH) */
 
 #if !defined( _GPUCODE )
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const NS(OBJECT_TYPE_UNDEFINED) =
+    ( NS(object_type_id_t) )SIXTRL_OBJECT_TYPE_UNDEFINED;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_FIRST_RESERVED_ID) = ( NS(object_type_id_t) )0x40000000;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_MANAGED_BUFFER_HANDLE) = ( NS(object_type_id_t) )0x40000000;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_CSTRING) = ( NS(object_type_id_t) )0x40000001;
+
+SIXTRL_STATIC_VAR NS(object_type_id_t) const
+    NS(OBJECT_TYPE_ARRAY) = ( NS(object_type_id_t) )0x40000002;
 
 /* ------------------------------------------------------------------------- */
 
@@ -209,6 +228,26 @@ namespace SIXTRL_CXX_NAMESPACE
     typedef NS(buffer_size_t)    buffer_size_t;
     typedef NS(buffer_addr_t)    buffer_addr_t;
     typedef NS(buffer_flags_t)   buffer_flags_t;
+
+    /* --------------------------------------------------------------------- */
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_UNDEFINED = static_cast< object_type_id_t >(
+            SIXTRL_OBJECT_TYPE_UNDEFINED );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_FIRST_RESERVED_ID =
+            static_cast< object_type_id_t >( 0x40000000 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_MANAGED_BUFFER_HANDLE =
+            static_cast< object_type_id_t >( 0x40000000 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_CSTRING = static_cast< object_type_id_t >( 0x40000001 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_ARRAY = static_cast< object_type_id_t >( 0x40000002 );
 
     /* --------------------------------------------------------------------- */
 
