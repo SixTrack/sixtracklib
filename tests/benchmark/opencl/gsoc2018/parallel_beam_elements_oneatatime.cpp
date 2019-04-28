@@ -18,9 +18,7 @@
 #include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/particles.h"
-
-#define __CL_ENABLE_EXCEPTIONS
-#include <CL/cl.hpp>
+#include "sixtracklib/opencl/cl.h"
 
 
 int main(int argc, char** argv)

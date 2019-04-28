@@ -6,26 +6,26 @@
     #include "sixtracklib/common/context/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 extern "C" {
-#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+#endif /* C++, Host */
 
 typedef void* NS(cuda_arg_buffer_t);
 typedef void const* NS(cuda_const_arg_buffer_t);
 
-#if defined( __cplusplus )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    using cuda_arg_buffer_t = ::NS(cuda_arg_buffer_t);
-    using cuda_const_arg_buffer_t = ::NS(cuda_const_arg_buffer_t);
+    typedef ::NS(cuda_arg_buffer_t)       cuda_arg_buffer_t;
+    typedef ::NS(cuda_const_arg_buffer_t) cuda_const_arg_buffer_t;
 }
 
-#endif /* defined( __cplusplus ) */
+#endif /* C++, Host */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 }
-#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+#endif /* C++, Host */
 
 #endif /* SIXTRACKLIB_CUDA_DEFINITIONS_H__ */
 

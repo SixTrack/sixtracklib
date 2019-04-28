@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import ctypes as ct
-from cobjects import CBuffer,CObject
+from cobjects import CBuffer, CObject
 
 from . import stcommon as st
 from . import config as stconf
@@ -10,14 +10,15 @@ from .particles import ParticlesSet
 
 
 def _get_buffer(obj):
-    if isinstance(obj,CBuffer):
+    if isinstance(obj, CBuffer):
         return obj
-    elif isinstance(obj,CObject):
+    elif isinstance(obj, CObject):
         return obj._buffer
-    elif hasattr(obj,'cbuffer'):
+    elif hasattr(obj, 'cbuffer'):
         return obj.cbuffer
     else:
         raise ValueError("Object {obj} is not or has not a CBuffer")
+
 
 class TrackJob(object):
     @staticmethod
@@ -63,7 +64,7 @@ class TrackJob(object):
         success = False
 
         if particles_buffer is not None:
-            particles_buffer=_get_buffer(particles_buffer)
+            particles_buffer = _get_buffer(particles_buffer)
             self._particles_buffer = particles_buffer
             self._ptr_c_particles_buffer = \
                 st.st_Buffer_new_mapped_on_cbuffer(particles_buffer)
@@ -71,7 +72,7 @@ class TrackJob(object):
                 raise ValueError("Issues with input particles buffer")
 
         if beam_elements_buffer is not None:
-            beam_elements_buffer=_get_buffer(beam_elements_buffer)
+            beam_elements_buffer = _get_buffer(beam_elements_buffer)
             self._beam_elements_buffer = beam_elements_buffer
             self._ptr_c_beam_elements_buffer = \
                 st.st_Buffer_new_mapped_on_cbuffer(beam_elements_buffer)
@@ -142,7 +143,7 @@ class TrackJob(object):
                (not needs_output_buffer))
 
         if device is not None:
-            arch,device_id=device.split(':')
+            arch, device_id = device.split(':')
 
         arch = arch.strip().lower()
         if not(stconf.SIXTRACKLIB_MODULES.get(arch, False) is not False

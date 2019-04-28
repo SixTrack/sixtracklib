@@ -14,17 +14,16 @@
         #include <cassert>
         #include <cmath>
         #include <cstddef>
-        #include <cstdint>
         #include <cstdlib>
         #include <cstring>
     #else
         #include <assert.h>
         #include <stddef.h>
-        #include <stdint.h>
         #include <stdio.h>
         #include <stdlib.h>
         #include <string.h>
     #endif /* __cplusplus */
+    #include <stdint.h>
 #endif /* !defined( _GPUCODE ) || defined(__CUDACC__ ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )

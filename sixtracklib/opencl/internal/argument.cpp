@@ -15,10 +15,9 @@
 #include <sstream>
 #include <vector>
 
-#include <CL/cl.hpp>
-
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.h"
+#include "sixtracklib/opencl/cl.h"
 #include "sixtracklib/opencl/context.h"
 
 namespace SIXTRL_CXX_NAMESPACE

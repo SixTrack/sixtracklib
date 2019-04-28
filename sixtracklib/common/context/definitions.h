@@ -7,7 +7,7 @@
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
-#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+#endif /* C++, Host */
 
 typedef SIXTRL_UINT64_T  NS(context_type_id_t);
 typedef SIXTRL_INT32_T   NS(context_status_t);
@@ -72,6 +72,14 @@ typedef SIXTRL_UINT64_T  NS(context_success_flag_t);
 
 /* ------------------------------------------------------------------------- */
 
+#if !defined(SIXTRL_CONTEXT_STATUS_SUCCESS)
+    #define SIXTRL_CONTEXT_STATUS_SUCCESS 0
+#endif /* !defined(SIXTRL_CONTEXT_STATUS_SUCCESS) */
+
+#if !defined(SIXTRL_CONTEXT_STATUS_GENERAL_FAILURE)
+    #define SIXTRL_CONTEXT_STATUS_GENERAL_FAILURE -1
+#endif /* !defined(SIXTRL_CONTEXT_STATUS_GENERAL_FAILURE) */
+
 #if !defined( _GPUCODE )
 
 SIXTRL_STATIC_VAR NS(context_type_id_t) const NS(CONTEXT_TYPE_ID_BITMASK) =
@@ -103,20 +111,26 @@ SIXTRL_STATIC_VAR NS(context_type_id_t) const NS(CONTEXT_TYPE_OPENCL) =
 SIXTRL_STATIC_VAR NS(context_type_id_t) const NS(CONTEXT_TYPE_CUDA) =
     ( NS(context_type_id_t) )SIXTRL_CONTEXT_TYPE_CUDA;
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_STATIC_VAR NS(context_status_t) const NS(CONTEXT_STATUS_SUCCESS) =
+    ( NS(context_status_t) )SIXTRL_CONTEXT_STATUS_SUCCESS;
+
+SIXTRL_STATIC_VAR NS(context_status_t) const
+    NS(CONTEXT_STATUS_GENERAL_FAILURE) =
+        ( NS(context_status_t) )SIXTRL_CONTEXT_STATUS_GENERAL_FAILURE;
+
 #endif /* !defined( _GPUCODE ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }
-#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
-
-#if defined( __cplusplus ) && !defined( __CUDACC__ )
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    using context_type_id_t      = SIXTRL_UINT64_T;
-    using context_status_t       = SIXTRL_INT32_T;
-    using context_success_flag_t = SIXTRL_UINT64_T;
-    using context_size_t         = SIXTRL_UINT64_T;
+    typedef ::NS(context_type_id_t)         context_type_id_t;
+    typedef ::NS(context_status_t)          context_status_t;
+    typedef ::NS(context_success_flag_t)    context_success_flag_t;
+    typedef ::NS(context_size_t)            context_size_t;
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST context_type_id_t
         CONTEXT_TYPE_ID_BITMASK = static_cast< context_type_id_t >(
@@ -153,9 +167,20 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST context_type_id_t
         CONTEXT_TYPE_CUDA = static_cast< context_type_id_t >(
             SIXTRL_CONTEXT_TYPE_CUDA );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST context_status_t
+        CONTEXT_STATUS_SUCCESS = static_cast< context_status_t >(
+            SIXTRL_CONTEXT_STATUS_SUCCESS );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST context_status_t
+        CONTEXT_STATUS_GENERAL_FAILURE = static_cast< context_status_t >(
+            SIXTRL_CONTEXT_STATUS_GENERAL_FAILURE );
 }
 
-#endif /* defined( __cplusplus ) */
+#endif /* C++, Host */
 
 #endif /* SIXTRACKLIB_COMMON_CONTEXT_DEFINITIONS_H__ */
+
 /* end: sixtracklib/common/context/definitions.h */

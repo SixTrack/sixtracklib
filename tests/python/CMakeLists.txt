@@ -36,18 +36,19 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
                 ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cpu.py
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
 
-    # -------------------------------------------------------------------------
-    # test_track_job_opencl:
+    if( SIXTRACKL_ENABLE_OPENCL )
+        # ---------------------------------------------------------------------
+        # test_track_job_opencl:
 
-     add_test( NAME Python_TrackJobOpenClTests
-         COMMAND ${PYTHON_EXECUTABLE}
-                 ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_opencl.py
-         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
+         add_test( NAME Python_TrackJobOpenClTests
+             COMMAND ${PYTHON_EXECUTABLE}
+                     ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_opencl.py
+             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
+    endif()
 
 
     if( SIXTRACKL_ENABLE_CUDA )
-
-        # -------------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # test_context_cuda:
 
          add_test( NAME Python_CudaContextTests
@@ -55,7 +56,7 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
                      ${CMAKE_CURRENT_SOURCE_DIR}/test_context_cuda.py
              WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
 
-        # -------------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # test_argument_cuda:
 
          add_test( NAME Python_CudaArgumentTests
@@ -63,14 +64,13 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
                      ${CMAKE_CURRENT_SOURCE_DIR}/test_argument_cuda.py
              WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
 
-        # -------------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # test_track_line_cuda:
 
          add_test( NAME Python_CudaTrackLineTests
              COMMAND ${PYTHON_EXECUTABLE}
                      ${CMAKE_CURRENT_SOURCE_DIR}/test_track_line_cuda.py
              WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
-
     endif()
 
 endif()

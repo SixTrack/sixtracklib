@@ -5,7 +5,7 @@ import sys
 from cobjects import CBuffer
 import pysixtracklib as st
 from pysixtracklib.particles import Particles as st_Particles
-from pysixtracklib.beam_elements import BeamElement as st_BeamElement
+from pysixtracklib.pysixtrack_helper import BeamElementConverter
 import pysixtrack as pysix
 from pysixtrack.particles import Particles as pysix_Particle
 
@@ -19,10 +19,10 @@ def line_from_beam_elem_buffer_pysixtrack(beam_elements_buffer,
     num_elements = beam_elements_buffer.n_objects
     for ii in range(num_elements):
         type_id = beam_elements_buffer.get_object_typeid(ii)
-        cls = st_BeamElement.get_elemtype(type_id)
+        cls = BeamElementConverter.get_elemtype(type_id)
         if cls is not None:
             belem = beam_elements_buffer.get_object(ii, cls)
-            line.append(st_BeamElement.to_pysixtrack(belem))
+            line.append(BeamElementConverter.to_pysixtrack(belem))
         elif skip_unknown is False:
             line.clear()
             break

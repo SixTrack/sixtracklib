@@ -1,5 +1,7 @@
-# ------------------------------------------------------------------------------
-# --- CUDA Kernel host library:
+# ==============================================================================
+# CUDA sixtracklib submodule
+
+message( STATUS "---- processing sixtracklib/cuda/CMakeLists.txt" )
 
 if( SIXTRACKL_CUDA_COMPUTE_ARCH_LIST )
 
@@ -84,23 +86,36 @@ set(   SIXTRACKL_LINK_LIBRARIES
 # ------------------------------------------------------------------------------
 # --- CUDA Host C++ object library
 
-set( SIXTRACKL_CUDA_CXX_HEADERS
+set( SIXTRACKL_CUDA_C99_HEADERS
+     definitions.h
      internal/argument_base.h
-     argument.h
      internal/context_base.h
+     argument.h
      context.h
+)
+
+set( SIXTRACKL_CUDA_CXX_HEADERS
+     internal/argument_base.hpp
+     internal/context_base.hpp
+     argument.hpp
+     context.hpp
 )
 
 set( SIXTRACKL_CUDA_CXX_SOURCES
      internal/argument_base.cpp
-     internal/context_base.cpp
+     internal/argument_base_c99.cpp
      internal/argument.cpp
+     internal/argument_c99.cpp
+     internal/context_base.cpp
+     internal/context_base_c99.cpp
      internal/context.cpp
+     internal/context_c99.cpp
 )
 
 
 add_library( sixtrack_cuda_cxx OBJECT
              ${SIXTRACKL_CUDA_CXX_HEADERS}
+             ${SIXTRACKL_CUDA_C99_HEADERS}
              ${SIXTRACKL_CUDA_CXX_SOURCES}
 )
 
@@ -175,29 +190,35 @@ set(  SIXTRACKL_LIBRARY_MODULES
 # ------------------------------------------------------------------------------
 # install:
 
-if( SIXTRACKLIB_CUDA_PART_HOST_HEADERS )
-    set( SIXTRACKLIB_CUDA_HOST_INSTALL_PATH include/sixtracklib/cuda )
+set( SIXTRACKLIB_CUDA_INSTALL_PATH
+     "${CMAKE_INSTALL_PREFIX}/include/sixtracklib/cuda" )
 
+if( SIXTRACKLIB_CUDA_PART_HOST_HEADERS )
     install( FILES ${SIXTRACKLIB_CUDA_PART_HOST_HEADERS}
-             DESTINATION ${SIXTRACKLIB_CUDA_HOST_INSTALL_PATH} )
+             DESTINATION ${SIXTRACKLIB_CUDA_INSTALL_PATH} )
 endif()
 
 if( SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS OR
     SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES )
 
-    set( SIXTRACKLIB_CUDA_DEVICE_INSTALL_PATH include/sixtracklib/cuda/kernels )
+    set( SIXTRACKLIB_CUDA_DEVICE_INSTALL_PATH
+         "${SIXTRACKLIB_CUDA_INSTALL_PATH}/kernels" )
 
     install( FILES ${SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS}
                    ${SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES}
              DESTINATION ${SIXTRACKLIB_CUDA_DEVICE_INSTALL_PATH} )
 endif()
 
-set( SIXTRACKLIB_CUDA_INSTALL_PATH
-     "${CMAKE_INSTALL_PREFIX}/sixtracklib/cuda/kernels" )
+if( SIXTRACKL_CUDA_C99_HEADERS )
+    install( FILES ${SIXTRACKL_CUDA_C99_HEADERS}
+             DESTINATION ${SIXTRACKLIB_CUDA_INSTALL_PATH} )
+endif()
 
-set( SIXTRACKLIB_CUDA_HOST_INSTALL_PATH include/sixtracklib/cuda )
-install( FILES ${SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS}
-               ${SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES}
-         DESTINATION "${SIXTRACKLIB_CUDA_INSTALL_PATH}/kernels" )
+if( SIXTRACKL_ENABLE_CXX )
+    if( SIXTRACKL_CUDA_CXX_HEADERS )
+        install( FILES ${SIXTRACKL_CUDA_CXX_HEADERS}
+                 DESTINATION ${SIXTRACKLIB_CUDA_INSTALL_PATH} )
+    endif()
+endif()
 
 # end: sixtracklib/cuda/CMakeLists.txt

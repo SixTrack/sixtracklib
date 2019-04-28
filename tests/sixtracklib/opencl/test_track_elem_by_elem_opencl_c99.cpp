@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstdio>
+#include <chrono>
 #include <cmath>
 #include <fstream>
 #include <iterator>
@@ -157,33 +158,73 @@ TEST( C99_OpenCLTrackElemByElemTests, TrackElemByElemHostAndDeviceCompareDrifts)
 
     if( !nodes.empty() )
     {
+        bool const debug_mode[] = { true, false, true, false };
+        bool const optimized[]  = { false, false, true, true };
+        size_t jj = size_t{ 0 };
+
         for( size_t const node_index : nodes )
         {
-            ctx = ::NS(ClContext_create)();
+            std::cout << "jj = " << jj << std::endl;
 
-            ::NS(ClContextBase_enable_debug_mode)( ctx );
-            ::NS(ClContext_disable_optimized_tracking_by_default)( ctx );
+            for( size_t ii = size_t{ 0 } ; ii < size_t{ 4 } ; ++ii )
+            {
+                auto start_create = std::chrono::system_clock::now();
+                ctx = ::NS(ClContext_create)();
+                auto end_create = std::chrono::system_clock::now();
 
-            ASSERT_TRUE(  ::NS(ClContextBase_is_debug_mode_enabled)( ctx ) );
-            ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking_by_default)(
-                ctx ) );
-            ASSERT_TRUE(  ::NS(ClContextBase_select_node_by_index)(
-                ctx, node_index ) );
+                auto create_duration = std::chrono::duration_cast<
+                    std::chrono::seconds >( end_create - start_create );
 
-            ASSERT_TRUE( ::NS(ClContextBase_has_selected_node)( ctx ) );
+                if( debug_mode[ ii ] )
+                {
+                    ::NS(ClContextBase_enable_debug_mode)( ctx );
+                }
+                else
+                {
+                    ::NS(ClContextBase_disable_debug_mode)( ctx );
+                }
 
-            ::NS(context_node_info_t) const* node_info =
-                ::NS(ClContextBase_get_selected_node_info)( ctx );
+                if( optimized[ ii ] )
+                {
+                    ::NS(ClContext_enable_optimized_tracking_by_default)( ctx );
+                }
+                else
+                {
+                    ::NS(ClContext_disable_optimized_tracking_by_default)( ctx );
+                }
 
-            ASSERT_TRUE( node_info != nullptr );
-            ASSERT_TRUE( ::NS(ClContextBase_has_remapping_kernel)( ctx ) );
-            ASSERT_TRUE( ::NS(ClContext_has_element_by_element_tracking_kernel)(
-                ctx ) );
+                ASSERT_TRUE( debug_mode[ ii ] ==
+                    ::NS(ClContextBase_is_debug_mode_enabled)( ctx ) );
 
-            char id_str[ 32 ];
-            ::NS(ClContextBase_get_selected_node_id_str)( ctx, id_str, 32 );
+                ASSERT_TRUE( optimized[ ii ] ==
+                    ::NS(ClContext_uses_optimized_tracking_by_default)( ctx ) );
 
-            std::cout << "# --------------------------------------------------"
+                auto start_select = std::chrono::system_clock::now();
+                bool success = ::NS(ClContextBase_select_node_by_index)(
+                    ctx, node_index );
+                auto end_select = std::chrono::system_clock::now();
+
+                auto select_duration = std::chrono::duration_cast<
+                    std::chrono::seconds >( end_select - start_select );
+
+                ASSERT_TRUE( success );
+                ASSERT_TRUE( ::NS(ClContextBase_has_selected_node)( ctx ) );
+
+                ::NS(context_node_info_t) const* node_info =
+                    ::NS(ClContextBase_get_selected_node_info)( ctx );
+
+                ASSERT_TRUE( node_info != nullptr );
+                ASSERT_TRUE( ::NS(ClContextBase_has_remapping_kernel)( ctx ) );
+                ASSERT_TRUE( ::NS(ClContext_has_element_by_element_tracking_kernel)(
+                    ctx ) );
+
+                char id_str[ 32 ];
+
+                ::NS(ClContextBase_get_selected_node_id_str)(
+                    ctx, id_str, 32 );
+
+                std::cout
+                      << "# --------------------------------------------------"
                       << "----------------------------------------------------"
                       << "\r\n"
                       << "# Run Test on :: \r\n"
@@ -192,194 +233,35 @@ TEST( C99_OpenCLTrackElemByElemTests, TrackElemByElemHostAndDeviceCompareDrifts)
                       << ::NS(ComputeNodeInfo_get_name)( node_info )
                       << "\r\n" << "# PLATFORM    :: "
                       << ::NS(ComputeNodeInfo_get_platform)( node_info )
-                      << "\r\n" << "# Debug mode  :: "
-                      << std::boolalpha
+                      << "\r\n" << "# Debug mode  :: " << std::boolalpha
                       << ::NS(ClContextBase_is_debug_mode_enabled)( ctx )
                       << "\r\n" << "# Optimized   :: "
                       << ::NS(ClContext_uses_optimized_tracking_by_default)(
-                        ctx ) << "\r\n"
-                      << std::noboolalpha
-                      << "# "
+                        ctx ) << "\r\n" << std::noboolalpha << "# "
                       << std::endl;
 
-            /* ------------------------------------------------------------ */
+                std::cout << "NS(ClContext_create)() : "
+                          << create_duration.count() << " sec\r\n";
 
-            bool const success = sixtrack::tests::performElemByElemTrackTest(
-                ctx, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE );
+                std::cout << "NS(ClContextBase_select_node_by_index)() : "
+                          << select_duration.count() << " sec\r\n";
 
-            ::NS(ClContext_delete)( ctx );
-            ctx = nullptr;
+                auto run_start = std::chrono::system_clock::now();
+                success = sixtrack::tests::performElemByElemTrackTest(
+                    ctx, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE );
+                auto run_end   = std::chrono::system_clock::now();
 
-            ASSERT_TRUE( success );
-        }
+                auto run_duration = std::chrono::duration_cast<
+                    std::chrono::seconds >( run_end - run_start );
+                ASSERT_TRUE( success );
 
-        for( size_t const node_index : nodes )
-        {
-            ctx = ::NS(ClContext_create)();
+                std::cout << "performElemByElemTrackTest : "
+                          << run_duration.count() << " sec"
+                          << std::endl;
 
-            ::NS(ClContextBase_disable_debug_mode)( ctx );
-            ::NS(ClContext_disable_optimized_tracking_by_default)( ctx );
-
-            ASSERT_TRUE( !::NS(ClContextBase_is_debug_mode_enabled)( ctx ) );
-            ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking_by_default)(
-                ctx ) );
-            ASSERT_TRUE(  ::NS(ClContextBase_select_node_by_index)(
-                ctx, node_index ) );
-
-            ASSERT_TRUE( ::NS(ClContextBase_has_selected_node)( ctx ) );
-
-            ::NS(context_node_info_t) const* node_info =
-                ::NS(ClContextBase_get_selected_node_info)( ctx );
-
-            ASSERT_TRUE( node_info != nullptr );
-            ASSERT_TRUE( ::NS(ClContextBase_has_remapping_kernel)( ctx ) );
-            ASSERT_TRUE( ::NS(ClContext_has_element_by_element_tracking_kernel)(
-                ctx ) );
-
-            char id_str[ 32 ];
-            ::NS(ClContextBase_get_selected_node_id_str)( ctx, id_str, 32 );
-
-            std::cout << "# --------------------------------------------------"
-                      << "----------------------------------------------------"
-                      << "\r\n"
-                      << "# Run Test on :: \r\n"
-                      << "# ID          :: " << id_str << "\r\n"
-                      << "# NAME        :: "
-                      << ::NS(ComputeNodeInfo_get_name)( node_info )
-                      << "\r\n" << "# PLATFORM    :: "
-                      << ::NS(ComputeNodeInfo_get_platform)( node_info )
-                      << "\r\n" << "# Debug mode  :: "
-                      << std::boolalpha
-                      << ::NS(ClContextBase_is_debug_mode_enabled)( ctx )
-                      << "\r\n" << "# Optimized   :: "
-                      << ::NS(ClContext_uses_optimized_tracking_by_default)(
-                        ctx ) << "\r\n"
-                      << std::noboolalpha
-                      << "# "
-                      << std::endl;
-
-            /* ------------------------------------------------------------- */
-
-            bool const success = sixtrack::tests::performElemByElemTrackTest(
-                ctx, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE );
-
-            ::NS(ClContext_delete)( ctx );
-            ctx = nullptr;
-
-            ASSERT_TRUE( success );
-        }
-
-        for( size_t const node_index : nodes )
-        {
-            ctx = ::NS(ClContext_create)();
-
-            ::NS(ClContextBase_enable_debug_mode)( ctx );
-            ::NS(ClContext_enable_optimized_tracking_by_default)( ctx );
-
-            ASSERT_TRUE( ::NS(ClContextBase_is_debug_mode_enabled)( ctx ) );
-            ASSERT_TRUE( ::NS(ClContext_uses_optimized_tracking_by_default)(
-                ctx ) );
-            ASSERT_TRUE(  ::NS(ClContextBase_select_node_by_index)(
-                ctx, node_index ) );
-
-            ASSERT_TRUE( ::NS(ClContextBase_has_selected_node)( ctx ) );
-
-            ::NS(context_node_info_t) const* node_info =
-                ::NS(ClContextBase_get_selected_node_info)( ctx );
-
-            ASSERT_TRUE( node_info != nullptr );
-            ASSERT_TRUE( ::NS(ClContextBase_has_remapping_kernel)( ctx ) );
-            ASSERT_TRUE( ::NS(ClContext_has_element_by_element_tracking_kernel)(
-                ctx ) );
-
-            char id_str[ 32 ];
-            ::NS(ClContextBase_get_selected_node_id_str)( ctx, id_str, 32 );
-
-            std::cout << "# --------------------------------------------------"
-                      << "----------------------------------------------------"
-                      << "\r\n"
-                      << "# Run Test on :: \r\n"
-                      << "# ID          :: " << id_str << "\r\n"
-                      << "# NAME        :: "
-                      << ::NS(ComputeNodeInfo_get_name)( node_info )
-                      << "\r\n" << "# PLATFORM    :: "
-                      << ::NS(ComputeNodeInfo_get_platform)( node_info )
-                      << "\r\n" << "# Debug mode  :: "
-                      << std::boolalpha
-                      << ::NS(ClContextBase_is_debug_mode_enabled)( ctx )
-                      << "\r\n" << "# Optimized   :: "
-                      << ::NS(ClContext_uses_optimized_tracking_by_default)(
-                        ctx ) << "\r\n"
-                      << std::noboolalpha
-                      << "# "
-                      << std::endl;
-
-            /* ------------------------------------------------------------- */
-
-            bool const success = sixtrack::tests::performElemByElemTrackTest(
-                ctx, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE );
-
-            ::NS(ClContext_delete)( ctx );
-            ctx = nullptr;
-
-            ASSERT_TRUE( success );
-        }
-
-        for( size_t const node_index : nodes )
-        {
-            ctx = ::NS(ClContext_create)();
-
-            ::NS(ClContextBase_disable_debug_mode)( ctx );
-            ::NS(ClContext_enable_optimized_tracking_by_default)( ctx );
-
-            ASSERT_TRUE( !::NS(ClContextBase_is_debug_mode_enabled)( ctx ) );
-            ASSERT_TRUE(  ::NS(ClContext_uses_optimized_tracking_by_default)(
-                ctx ) );
-            ASSERT_TRUE(  ::NS(ClContextBase_select_node_by_index)(
-                ctx, node_index ) );
-
-            ASSERT_TRUE( ::NS(ClContextBase_has_selected_node)( ctx ) );
-
-            ::NS(context_node_info_t) const* node_info =
-                ::NS(ClContextBase_get_selected_node_info)( ctx );
-
-            ASSERT_TRUE( node_info != nullptr );
-            ASSERT_TRUE( ::NS(ClContextBase_has_remapping_kernel)( ctx ) );
-            ASSERT_TRUE( ::NS(ClContext_has_element_by_element_tracking_kernel)(
-                ctx ) );
-
-            char id_str[ 32 ];
-            ::NS(ClContextBase_get_selected_node_id_str)( ctx, id_str, 32 );
-
-            std::cout << "# --------------------------------------------------"
-                      << "----------------------------------------------------"
-                      << "\r\n"
-                      << "# Run Test on :: \r\n"
-                      << "# ID          :: " << id_str << "\r\n"
-                      << "# NAME        :: "
-                      << ::NS(ComputeNodeInfo_get_name)( node_info )
-                      << "\r\n" << "# PLATFORM    :: "
-                      << ::NS(ComputeNodeInfo_get_platform)( node_info )
-                      << "\r\n" << "# Debug mode  :: "
-                      << std::boolalpha
-                      << ::NS(ClContextBase_is_debug_mode_enabled)( ctx )
-                      << "\r\n" << "# Optimized   :: "
-                      << ::NS(ClContext_uses_optimized_tracking_by_default)(
-                        ctx ) << "\r\n"
-                      << std::noboolalpha
-                      << "# "
-                      << std::endl;
-
-            /* ------------------------------------------------------------- */
-
-            bool const success =
-            SIXTRL_CXX_NAMESPACE::tests::performElemByElemTrackTest(
-                ctx, eb, elem_by_elem_buffer, NUM_TURNS, ABS_TOLERANCE );
-
-            ::NS(ClContext_delete)( ctx );
-            ctx = nullptr;
-
-            ASSERT_TRUE( success );
+                ::NS(ClContext_delete)( ctx );
+                ctx = nullptr;
+            }
         }
     }
     else

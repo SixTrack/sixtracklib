@@ -20,9 +20,9 @@
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/context/compute_arch.h"
-#include "sixtracklib/opencl/argument.h"
 
-#include <CL/cl.hpp>
+#include "sixtracklib/opencl/cl.h"
+#include "sixtracklib/opencl/argument.h"
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -1046,27 +1046,39 @@ namespace SIXTRL_CXX_NAMESPACE
                 this->m_kernel_data.back().m_kernel_name = kernel_name;
                 this->m_kernel_data.back().m_program_id  = program_id;
 
-                this->m_kernel_data.back().resetArguments(
-                    kernel.getInfo< CL_KERNEL_NUM_ARGS >() );
-
                 cl::Device& selected_device = this->m_available_devices.at(
                     this->m_selected_node_index );
+
+                size_type const num_kernel_args =
+                    kernel.getInfo< CL_KERNEL_NUM_ARGS >();
+
+                size_type const max_work_group_size = kernel.getWorkGroupInfo<
+                    CL_KERNEL_WORK_GROUP_SIZE >( selected_device );
+
+                size_type const pref_work_group_size = kernel.getWorkGroupInfo<
+                    CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE >(
+                        selected_device );
+
+                size_type const loc_mem_size = kernel.getWorkGroupInfo<
+                    CL_KERNEL_LOCAL_MEM_SIZE >( selected_device );
+
+                SIXTRL_ASSERT( num_kernel_args  >= size_type{  0 } );
+                SIXTRL_ASSERT( num_kernel_args  <  size_type{ 32 } );
+                SIXTRL_ASSERT( pref_work_group_size > size_type{ 0 } );
+                SIXTRL_ASSERT( max_work_group_size  >= pref_work_group_size );
+                SIXTRL_ASSERT( max_work_group_size  <= size_type{ 65535 } );
+
+                this->m_kernel_data.back().resetArguments( num_kernel_args );
 
                 this->m_kernel_data.back().m_work_group_size = size_type{ 0 };
 
                 this->m_kernel_data.back().m_max_work_group_size =
-                    kernel.getWorkGroupInfo< CL_KERNEL_WORK_GROUP_SIZE >(
-                        selected_device );
+                    max_work_group_size;
 
                 this->m_kernel_data.back().m_preferred_work_group_multiple =
-                    kernel.getWorkGroupInfo<
-                         CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE >(
-                             selected_device );
+                    pref_work_group_size;
 
-                this->m_kernel_data.back().m_local_mem_size =
-                    kernel.getWorkGroupInfo< CL_KERNEL_LOCAL_MEM_SIZE >(
-                        selected_device );
-
+                this->m_kernel_data.back().m_local_mem_size = loc_mem_size;
                 program_data.m_kernels.push_back( kernel_id );
             }
         }
@@ -2028,7 +2040,27 @@ namespace SIXTRL_CXX_NAMESPACE
             device_index = 0;
 
             std::string platform_name = platform.getInfo< CL_PLATFORM_NAME >();
+
+            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
+                SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+            try
+            {
+            #endif /* OpenCL 1.x C++ Host Exceptions enabled */
+
             platform.getDevices( CL_DEVICE_TYPE_ALL, &devices );
+
+            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
+                SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+            }
+            catch( cl::Error const& e )
+            {
+                #if !defined( NDEBUG )
+                std::cerr << "Error while probing devices for platform "
+                          << platform_name << " --> skipping"
+                          << std::endl;
+                #endif /* !defined( NDEBUG ) */
+            }
+            #endif /* OpenCL 1.x C++ Host Exceptions enabled */
 
             bool added_at_least_one_device = false;
 

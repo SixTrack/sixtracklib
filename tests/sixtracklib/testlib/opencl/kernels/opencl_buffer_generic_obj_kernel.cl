@@ -120,9 +120,10 @@ __kernel void NS(copy_orig_buffer)(
                 }
                 else
                 {
+                    #if __OPENCL_VERSION__ > 110
                     printf( "missmatch between %u th input/output object\r\n",
                             obj_index );
-
+                    #endif /* __OPENCL_VERSION__ > 110 */
                     error_flag |= -( int )( obj_index << 2 );
                 }
             }

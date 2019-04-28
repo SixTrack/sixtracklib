@@ -18,10 +18,7 @@
 #include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/particles.h"
-
-#define __CL_ENABLE_EXCEPTIONS
-#include <CL/cl.hpp>
-
+#include "sixtracklib/opencl/cl.h"
 
 int main(int argc, char** argv)
 {
@@ -33,7 +30,7 @@ int main(int argc, char** argv)
     	double num_of_turns = 0.0; // for timing
     	double average_execution_time = 0.0;
 
-      std::vector<double> exec_time; // to store the exact execution times in each of the repetitions 
+      std::vector<double> exec_time; // to store the exact execution times in each of the repetitions
 			for(int ll = 0; ll < NUM_REPETITIONS; ++ll) {
     /* We will use 9+ beam element blocks in this example and do not
      * care to be memory efficient yet; thus we make the blocks for
@@ -389,7 +386,7 @@ queue.enqueueWriteBuffer( B, CL_TRUE, 0, st_Blocks_get_total_num_bytes( &beam_el
 
 
 
-    SIXTRL_UINT64_T const NUM_TURNS = atoi(argv[2]); 
+    SIXTRL_UINT64_T const NUM_TURNS = atoi(argv[2]);
 
     cl::Kernel track_beam_particle(program, "track_beam_particle");
     blockSize = track_beam_particle.getWorkGroupInfo< CL_KERNEL_WORK_GROUP_SIZE >( *ptr_selected_device);// determine the work-group size
@@ -430,7 +427,7 @@ queue.enqueueWriteBuffer( B, CL_TRUE, 0, st_Blocks_get_total_num_bytes( &beam_el
         assert( ret == CL_SUCCESS ); // all ret's should be 1
 
         double const kernel_time_elapsed = when_kernel_ended - when_kernel_started;
-        exec_time.push_back(kernel_time_elapsed); 
+        exec_time.push_back(kernel_time_elapsed);
         if( ll > 5 ) { // ignoring the time values for the first 5 repetitions
           num_of_turns += 1.0;
           average_execution_time += (kernel_time_elapsed - average_execution_time)/num_of_turns;
@@ -485,7 +482,7 @@ queue.enqueueWriteBuffer( B, CL_TRUE, 0, st_Blocks_get_total_num_bytes( &beam_el
     st_Blocks_free( &particles_buffer );
     st_Blocks_free( &copy_particles_buffer );
   } // end of the NUM_REPETITIONS 'for' loop
-    
+
     // printing the exec_time vector
     for(std::vector<double>::iterator it = exec_time.begin(); it != exec_time.end(); ++it)
       printf("%.3f s%c",(*it)*1.0e-9, ",\n"[it+1 == exec_time.end()]);

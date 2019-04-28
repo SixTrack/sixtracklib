@@ -1,12 +1,14 @@
-#include "sixtracklib/cuda/context.h"
+#include "sixtracklib/cuda/context.hpp"
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
 #include <cstddef>
-#include <cstdint>
 #include <cstdlib>
 
 #include "sixtracklib/common/definitions.h"
-#include "sixtracklib/cuda/internal/context_base.h"
-#include "sixtracklib/cuda/argument.h"
+#include "sixtracklib/common/context/definitions.h"
+#include "sixtracklib/cuda/internal/context_base.hpp"
+#include "sixtracklib/cuda/argument.hpp"
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -121,15 +123,6 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 }
 
-NS(CudaContext)* NS(CudaContext_create)( void )
-{
-    return new SIXTRL_CXX_NAMESPACE::CudaContext( "" );
-}
+#endif /* C++, Host */
 
-void NS(CudaContext_delete)( NS(CudaContext)* SIXTRL_RESTRICT context )
-{
-    delete context;
-    return;
-}
-
-/* end: sixtracklib/cuda/internal/context.cu */
+/* end: sixtracklib/cuda/internal/context.cpp */
