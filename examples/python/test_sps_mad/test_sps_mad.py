@@ -12,6 +12,7 @@ mad.use(sequence='sps')
 twiss=mad.twiss()
 q1mad=twiss.summary['q1']
 q2mad=twiss.summary['q2']
+print(q1mad,q2mad)
 
 # Build elements for SixTrackLib
 elements=pyst.Elements.from_mad(mad.sequence.sps)
@@ -49,6 +50,7 @@ particles.x += np.linspace(0,1e-1,npart)
 job = pyst.TrackJob(elements, particles,device="opencl:0.0")
 job.track(nturns)
 job.collect()
+
 
 x=job.output.particles[0].x.copy()
 x=x.reshape(nturns,npart)
