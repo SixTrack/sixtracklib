@@ -151,6 +151,15 @@ SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(ManagedBuffer_get_num_objects)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_STATIC SIXTRL_FN NS(buffer_addr_t)
+NS(ManagedBuffer_get_object_begin_addr_by_index_filter_by_type_id)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) const index,
+    NS(object_type_id_t) const required_type_id,
+    NS(buffer_size_t) const slot_size );
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_FN SIXTRL_STATIC bool NS(ManagedBuffer_needs_remapping)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size );
@@ -803,6 +812,34 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_get_num_objects)(
     SIXTRL_STATIC_VAR buf_size_t const OBJS_ID = ( buf_size_t )4u;
     return NS(ManagedBuffer_get_section_num_entities)(
         begin, OBJS_ID, slot_size );
+}
+
+/* ========================================================================= */
+
+SIXTRL_INLINE NS(buffer_addr_t)
+NS(ManagedBuffer_get_object_begin_addr_by_index_filter_by_type_id)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) const index, NS(object_type_id_t) const required_type_id,
+    NS(buffer_size_t) const slot_size )
+{
+    NS(buffer_addr_t) begin_addr = ( NS(buffer_addr_t) )0u;
+
+    SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const* obj =
+        NS(ManagedBuffer_get_const_objects_index_begin)( begin, slot_size );
+
+    if( ( obj != SIXTRL_NULLPTR ) &&
+        ( required_type_id != SIXTRL_OBJECT_TYPE_UNDEFINED ) &&
+        ( index < NS(ManagedBuffer_get_num_objects)( begin, slot_size ) ) )
+    {
+        obj = obj + index;
+
+        if( NS(Object_get_type_id)( obj ) == required_type_id )
+        {
+            begin_addr = NS(Object_get_begin_addr)( obj );
+        }
+    }
+
+    return begin_addr;
 }
 
 /* ========================================================================= */

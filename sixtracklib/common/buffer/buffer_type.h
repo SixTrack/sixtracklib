@@ -32,6 +32,10 @@ typedef SIXTRL_UINT64_T NS(object_type_id_t);
     #define SIXTRL_OBJECT_TYPE_UNDEFINED 0
 #endif /* !defined( SIXTRL_OBJECT_TYPE_UNDEFINED ) */
 
+#if !defined( SIXTRL_OBJECT_TYPE_FIRST_RESERVED_ID )
+    #define SIXTRL_OBJECT_TYPE_FIRST_RESERVED_ID 0x40000000
+#endif /* !defined( SIXTRL_OBJECT_TYPE_FIRST_RESERVED_ID ) */
+
 #if !defined( SIXTRL_BUFFER_FLAGS_NONE )
     #define   SIXTRL_BUFFER_FLAGS_NONE                      0x00000000
 #endif /* !defined( SIXTRL_BUFFER_FLAGS_NONE ) */
