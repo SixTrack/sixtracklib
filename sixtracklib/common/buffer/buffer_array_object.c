@@ -225,9 +225,11 @@ bool NS(BufferArrayObject_can_be_added_ext)(
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(BufferArrayObject)* NS(BufferArrayObject_new_ext)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(buffer_size_t) const max_nelements, NS(buffer_size_t) const capacity )
+    NS(buffer_size_t) const max_nelements, NS(buffer_size_t) const capacity,
+    NS(object_type_id_t) const base_type_id )
 {
-    return NS(BufferArrayObject_new)( buffer, max_nelements, capacity );
+    return NS(BufferArrayObject_new)(
+        buffer, max_nelements, capacity, base_type_id );
 }
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(BufferArrayObject)* NS(BufferArrayObject_add_ext)(
