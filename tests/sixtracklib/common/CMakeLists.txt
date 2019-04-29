@@ -38,7 +38,31 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_buffer_common_cxx )
     add_test( CXX_CommonBufferTest test_buffer_common_cxx )
 
-    # --------------------------------------------------------------------------
+    # ==========================================================================
+    # test_buffer_string_object_common_c99:
+
+    add_executable( test_buffer_string_object_common_c99
+                    test_buffer_string_object_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+         test_buffer_string_object_common_c99 )
+
+    add_test( C99_CommonBufferStringObjectTests
+              test_buffer_string_object_common_c99 )
+
+    # -------------------------------------------------------------------------
+    # test_buffer_string_object_common_cxx:
+
+    add_executable( test_buffer_string_object_common_cxx
+                    test_buffer_string_object_cxx.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+         test_buffer_string_object_common_cxx )
+
+    add_test( CXX_CommonBufferStringObjectTests
+              test_buffer_string_object_common_cxx )
+
+    # ==========================================================================
     # test_gpu_kernel_tools_common_c99:
 
     add_executable( test_gpu_kernel_tools_common_c99
