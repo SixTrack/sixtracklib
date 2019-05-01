@@ -12,13 +12,19 @@
 #include "sixtracklib/common/context/context_base.hpp"
 
 
-::NS(context_type_id_t) NS(Argument_get_type)(
+::NS(arch_id_t) NS(Argument_get_arch_id)(
     const ::NS(ArgumentBase) *const SIXTRL_RESTRICT arg )
 {
-    return ( arg != nullptr ) ? arg->type() : ::NS(CONTEXT_TYPE_INVALID);
+    return ( arg != nullptr ) ? arg->archId() : ::NS(CONTEXT_TYPE_INVALID);
 }
 
-char const* NS(Argument_get_ptr_type_strt)(
+bool NS(Argument_has_arch_string)(
+    const ::NS(ArgumentBase) *const SIXTRL_RESTRICT arg )
+{
+    return ( ( arg != nullptr ) && ( arg->hasArchStr() ) );
+}
+
+char const* NS(Argument_get_arch_string)(
     const ::NS(ArgumentBase) *const SIXTRL_RESTRICT arg )
 {
     return ( arg != nullptr ) ? arg->ptrTypeStr() : nullptr;

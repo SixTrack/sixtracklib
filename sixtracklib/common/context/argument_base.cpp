@@ -404,21 +404,6 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_ptr_base_context;
     }
 
-    ArgumentBase::type_id_t ArgumentBase::type() const SIXTRL_NOEXCEPT
-    {
-        return this->m_type_id;
-    }
-
-    std::string const& ArgumentBase::typeStr() const SIXTRL_NOEXCEPT
-    {
-        return this->m_type_id_str;
-    }
-
-    char const* ArgumentBase::ptrTypeStr() const SIXTRL_NOEXCEPT
-    {
-        return this->m_type_id_str.c_str();
-    }
-
     ArgumentBase::ArgumentBase(
         ArgumentBase::type_id_t const type_id,
         const char *const SIXTRL_RESTRICT type_id_str,
@@ -447,26 +432,6 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* ----------------------------------------------------------------- */
-
-    void ArgumentBase::doSetTypeId(
-        ArgumentBase::type_id_t const type_id ) SIXTRL_NOEXCEPT
-    {
-        this->m_type_id = type_id;
-    }
-
-    void ArgumentBase::doSetTypeIdStr(
-        const char *const SIXTRL_RESTRICT type_id_str ) SIXTRL_NOEXCEPT
-    {
-        if( ( type_id_str != nullptr ) &&
-            ( std::strlen( type_id_str ) > std::size_t{ 0 } ) )
-        {
-            this->m_type_id_str = std::string{ type_id_str };
-        }
-        else
-        {
-            this->m_type_id_str.clear();
-        }
-    }
 
     void ArgumentBase::doSetArgSize(
         ArgumentBase::size_type const arg_size ) SIXTRL_NOEXCEPT

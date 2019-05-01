@@ -16,6 +16,7 @@
     #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
         !defined( __CUDA_ARCH__ )
         #include "sixtracklib/common/buffer.hpp"
+        #include "sixtracklib/common/arch_base.hpp"
     #endif /* C++, host */
 
     #include "sixtracklib/common/buffer.h"
@@ -27,14 +28,17 @@ namespace SIXTRL_CXX_NAMESPACE
 {
     class ContextBase;
 
-    class ArgumentBase
+    class ArgumentBase : public SIXTRL_CXX_NAMESPACE::ArchBase
     {
+        private:
+        using _arch_base_t  = SIXTRL_CXX_NAMESPACE::ArchBase;
+
         public:
 
-        using type_id_t   = SIXTRL_CXX_NAMESPACE::context_type_id_t;
+        using arch_id_t   = _arch_base_t::arch_id_t;
         using status_t    = SIXTRL_CXX_NAMESPACE::context_status_t;
         using buffer_t    = SIXTRL_CXX_NAMESPACE::Buffer;
-        using c_buffer_t  = ::NS(Buffer);
+        using c_buffer_t  = buffer_t::c_api_t;
         using size_type   = buffer_t::size_type;
 
         using ptr_base_context_t       = ContextBase*;
@@ -88,14 +92,19 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN ptr_const_base_context_t
         ptrBaseContext() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN type_id_t type() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN std::string const& typeStr() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN char const* ptrTypeStr() const SIXTRL_NOEXCEPT;
+        template< class Derived > SIXTRL_HOST_FN Derived const*
+        asDerivedArgument( arch_id_t const required_arch_id,
+            bool requires_exact_match = false ) const SIXTRL_NOEXCEPT;
+
+        template< class Derived > SIXTRL_HOST_FN Derived* asDerivedArgument(
+            arch_id_t const required_arch_id,
+            bool requires_exact_match = false ) SIXTRL_NOEXCEPT;
 
         protected:
 
         SIXTRL_HOST_FN ArgumentBase(
-            type_id_t const type_id, const char *const type_id_str,
+            arch_id_t const type_id, const char *const arch_str,
+            const char *const SIXTRL_RESTRICT config_str = nullptr,
             bool const needs_argument_buffer = true,
             ptr_base_context_t SIXTRL_RESTRICT context = nullptr );
 
@@ -114,12 +123,6 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const required_buffer_size );
 
         /* ----------------------------------------------------------------- */
-
-        SIXTRL_HOST_FN void doSetTypeId(
-            type_id_t const type_id ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN void doSetTypeIdStr(
-            const char *const SIXTRL_RESTRICT type_id_str ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void doSetArgSize(
             size_type const arg_size ) SIXTRL_NOEXCEPT;
@@ -149,16 +152,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
         private:
 
-        std::string             m_type_id_str;
         mutable void*           m_ptr_raw_arg_begin;
         mutable buffer_t*       m_ptr_cobj_cxx_buffer;
         mutable c_buffer_t*     m_ptr_cobj_c99_buffer;
 
-        ptr_base_context_t           m_ptr_base_context;
+        ptr_base_context_t      m_ptr_base_context;
 
         size_type               m_arg_size;
         size_type               m_arg_capacity;
-        type_id_t               m_type_id;
 
         bool                    m_needs_arg_buffer;
         bool                    m_has_arg_buffer;
@@ -177,6 +178,49 @@ extern "C" { typedef SIXTRL_CXX_NAMESPACE::ArgumentBase  NS(ArgumentBase); }
 typedef void NS(ArgumentBase);
 
 #endif /* C++, host */
+
+
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+    #include <type_traits>
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
+namespace SIXTRL_CXX_NAMESPACE
+{
+    template< class Derived > Derived const* ArgumentBase::asDerivedArgument(
+        ArgumentBase::arch_id_t const required_arch_id,
+        bool requires_exact_match ) const SIXTRL_NOEXCEPT
+    {
+        Derived const* ptr_derived = nullptr;
+
+        static_assert( std::is_base_of< ArgumentBase, Derived >::value,
+                       "asDerivedArgument< Derived > requires Dervied to be "
+                       "derived from SIXTRL_CXX_NAMESPACE::ArgumentBase" );
+
+        if( ( ( !requires_exact_match ) &&
+              ( this->isCompatibleWith( required_arch_id ) ) ) ||
+            ( this->isIdenticalTo( required_arch_id ) ) )
+        {
+            ptr_derived = static_cast< Derived const* >( this );
+        }
+
+        return ptr_derived;
+    }
+
+    template< class Derived > Derived* ArgumentBase::asDerivedArgument(
+        ArgumentBase::arch_id_t const required_arch_id,
+        bool requires_exact_match ) SIXTRL_NOEXCEPT
+    {
+        return const_cast< Derived* >( static_cast< ArgumentBase const& >(
+            *this ).asDerivedArgument< Derived >(
+                required_arch_id, requires_exact_match );
+    }
+}
+
+#endif /* C++, Host */
+
 
 #endif /* SIXTRACKLIB_COMMON_CONTEXT_ARGUMENT_BASE_HPP__ */
 /* end: sixtracklib/common/context/argument_base.hpp */

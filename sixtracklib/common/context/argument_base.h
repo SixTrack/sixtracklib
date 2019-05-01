@@ -19,10 +19,13 @@ extern "C" {
 
 #if defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_type_id_t) NS(Argument_get_type)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_id_t) NS(Argument_get_arch_id)(
     const NS(ArgumentBase) *const SIXTRL_RESTRICT arg );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(Argument_get_ptr_type_strt)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Argument_has_arch_string)(
+    const NS(ArgumentBase) *const SIXTRL_RESTRICT arg );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(Argument_get_arch_string)(
     const NS(ArgumentBase) *const SIXTRL_RESTRICT arg );
 
 
