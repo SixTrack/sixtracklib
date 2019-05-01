@@ -15,6 +15,8 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/context/definitions.h"
+    #include "sixtracklib/common/context/node_id.h"
+    #include "sixtracklib/common/context/node_info.h"
     #include "sixtracklib/common/context/compute_arch.h"
     #include "sixtracklib/common/context/context_base.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -32,29 +34,26 @@ namespace SIXTRL_CXX_NAMESPACE
         public:
 
         using size_type         = _context_base_t::size_type;
-        using type_id_t         = _context_base_t::type_id_t;
+        using arch_id_t         = _context_base_t::arch_id_t;
 
-        using node_id_t         = ::NS(ComputeNodeId);
-        using node_info_t       = ::NS(ComputeNodeInfo);
-        using platform_id_t     = ::NS(comp_node_id_num_t);
-        using device_id_t       = ::NS(comp_node_id_num_t);
+        using node_id_t         = SIXTRL_CXX_NAMESPACE::NodeId;
+        using node_info_base_t  = SIXTRL_CXX_NAMESPACE::NodeInfoBase;
+        using platform_id_t     = node_id_t::platform_id_t;
+        using device_id_t       = node_id_t::device_id_t;
 
         SIXTRL_HOST_FN size_type numAvailableNodes() const SIXTRL_NOEXCEPT;
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        SIXTRL_HOST_FN node_info_t const*
-        availableNodesInfoBegin() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool hasDefaultNode() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_info_t const*
-        availableNodesInfoEnd() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN node_id_t const*
+        ptrDefaultNodeId() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_info_t const*
-        defaultNodeInfo() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN node_info_base_t const*
+        defaultNodeInfoBase() const SIXTRL_NOEXCEPT;
 
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        SIXTRL_HOST_FN node_id_t defaultNodeId() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN size_type defaultNodeIndex() const SIXTRL_NOEXCEPT;
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -62,7 +61,7 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const node_index ) const SIXTRL_RESTRICT;
 
         SIXTRL_HOST_FN bool isNodeAvailable(
-            node_id_t const node_id ) const SIXTRL_NOEXCEPT;
+            node_id_t const& node_id ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool isNodeAvailable(
             platform_id_t const platform_index,
@@ -83,7 +82,7 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_RESTRICT_REF node_id_str ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool isDefaultNode(
-            node_id_t const node_id ) const SIXTRL_NOEXCEPT;
+            node_id_t const& node_id ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool isDefaultNode( platform_id_t const platform_index,
             device_id_t const device_index ) const SIXTRL_NOEXCEPT;
@@ -93,48 +92,48 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        SIXTRL_HOST_FN node_id_t const* ptrAvailableNodesId(
+        SIXTRL_HOST_FN node_id_t const* ptrNodeId(
             char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_id_t const* ptrAvailableNodesId(
-            std::string const& SIXTRL_RESTRICT_REF
-                node_id_str ) const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN node_id_t const* ptrNodeId( std::string const&
+            SIXTRL_RESTRICT_REF node_id_str ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_id_t const* ptrAvailableNodesId(
+        SIXTRL_HOST_FN node_id_t const* ptrNodeId(
             platform_id_t const platform_index,
             device_id_t const device_index ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_id_t const* ptrAvailableNodesId(
+        SIXTRL_HOST_FN node_id_t const* ptrNodeId(
             size_type const index ) const SIXTRL_NOEXCEPT;
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        SIXTRL_HOST_FN node_info_t const* ptrAvailableNodesInfo(
+        SIXTRL_HOST_FN node_info_base_t const* ptrNodesInfoBase(
             size_type const index ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_info_t const* ptrAvailableNodesInfo(
+        SIXTRL_HOST_FN node_info_base_t const* ptrNodesInfoBase(
             platform_id_t const platform_idx,
             device_id_t const device_idx ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_info_t const* ptrAvailableNodesInfo(
-            node_id_t const node_id ) const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN node_info_base_t const* ptrNodesInfoBase(
+            node_id_t const& node_id ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_info_t const* ptrAvailableNodesInfo(
+        SIXTRL_HOST_FN node_info_base_t const* ptrNodesInfoBase(
             char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_info_t const* ptrAvailableNodesInfo(
+        SIXTRL_HOST_FN node_info_base_t const* ptrNodesInfoBase(
             std::string const& SIXTRL_RESTRICT_REF node_id_str
             ) const SIXTRL_NOEXCEPT;
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN bool hasSelectedNode() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN size_type selectedNodeIndex() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_id_t const*
-            ptrSelectedNodeId() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN node_id_t const* ptrSelectedNodeId()
+            const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN node_info_t const*
-            ptrSelectedNodeInfo() const SIXTRL_NOEXCEPT;
+        ptrSelectedNodeInfoBase() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN std::string selectedNodeIdStr() const SIXTRL_NOEXCEPT;
 
@@ -147,7 +146,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        SIXTRL_HOST_FN bool selectNode( node_id_t const node_id );
+        SIXTRL_HOST_FN bool selectNode( node_id_t const& node_id );
         SIXTRL_HOST_FN bool selectNode( platform_id_t const platform_idx,
                          device_id_t const device_idx );
 
@@ -157,60 +156,24 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        SIXTRL_HOST_FN void printNodesInfo() const;
+        SIXTRL_HOST_FN void printAvailableNodesInfo() const;
 
-        SIXTRL_HOST_FN void printNodesInfo(
+        SIXTRL_HOST_FN void printAvailableNodesInfo(
             std::ostream& SIXTRL_RESTRICT_REF os ) const;
 
-        SIXTRL_HOST_FN void printNodesInfo(
-            size_type const index ) const;
+        SIXTRL_HOST_FN void printAvailableNodesInfo(
+            ::FILE* SIXTRL_RESTRICT output ) const;
 
-        SIXTRL_HOST_FN void printNodesInfo(
-            std::ostream& SIXTRL_RESTRICT_REF os, size_type const idx ) const;
-
-        SIXTRL_HOST_FN void printNodesInfo(
-            node_id_t const node_id ) const;
-
-        SIXTRL_HOST_FN void printNodesInfo(
-            std::ostream& SIXTRL_RESTRICT_REF os,
-            node_id_t const node_id ) const;
-
-        SIXTRL_HOST_FN void printNodesInfo(
-            platform_id_t const platform_idx,
-            device_id_t const device_idx ) const;
-
-        SIXTRL_HOST_FN void printNodesInfo(
-            std::ostream& SIXTRL_RESTRICT_REF os,
-            platform_id_t const platform_idx,
-            device_id_t const device_idx ) const;
-
-        SIXTRL_HOST_FN void printNodesInfo(
-            char const* SIXTRL_RESTRICT node_id_str ) const;
-
-        SIXTRL_HOST_FN void printNodesInfo(
-            std::ostream& SIXTRL_RESTRICT_REF os,
-            char const* SIXTRL_RESTRICT node_id_str ) const;
-
-        SIXTRL_HOST_FN void printNodesInfo(
-            std::string const& SIXTRL_RESTRICT_REF node_id_str ) const;
-
-        SIXTRL_HOST_FN void printNodesInfo(
-            std::ostream& SIXTRL_RESTRICT_REF os,
-            std::string const& SIXTRL_RESTRICT_REF node_id_str ) const;
-
-        SIXTRL_HOST_FN void printSelectedNodesInfo() const;
-        SIXTRL_HOST_FN void printSelectedNodesInfo( std::ostream& os ) const;
-
-        SIXTRL_HOST_FN friend std::ostream& operator<<(
-            std::ostream& SIXTRL_RESTRICT ostream,
-            ContextOnNodesBase const& SIXTRL_RESTRICT_REF context );
+        SIXTRL_HOST_FN std::string availableNodesInfoToString() const;
 
         SIXTRL_HOST_FN virtual ~ContextOnNodesBase() SIXTRL_NOEXCEPT;
 
         protected:
 
+        using std::unique_ptr< node_info_base_t > ptr_node_info_base_t;
+
         SIXTRL_HOST_FN ContextOnNodesBase(
-            type_id_t const type_id, const char *const type_id_str,
+            arch_id_t const arch_id, const char *const arch_str,
             const char *const SIXTRL_RESTRICT config_str = nullptr );
 
         SIXTRL_HOST_FN ContextOnNodesBase(
@@ -230,9 +193,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual size_type doGetDefaultNodeIndex() const;
 
-        SIXTRL_HOST_FN virtual void doPrintNodesInfo( std::ostream& ostream,
-            node_info_t const& SIXTRL_RESTRICT_REF node_index ) const;
-
         SIXTRL_HOST_FN size_type doFindAvailableNodesIndex(
             platform_id_t const platform_idx,
             device_id_t const device_idx ) const SIXTRL_NOEXCEPT;
@@ -242,13 +202,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN void doClearAvailableNodes() SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN size_type doAppendAvailableNode(
-            node_id_t const& SIXTRL_RESTRICT_REF node_id,
-            node_info_t const& SIXTRL_RESTRICT_REF node_info );
-
-        template< typename IdIter, typename InfoIter >
-        SIXTRL_HOST_FN size_type doAppendAvailableNodeRange(
-            IdIter id_begin, IdIter id_end, InfoIter info_begin );
+        SIXTRL_HOST_FN size_type doAppendAvailableNodeInfoBase(
+            ptr_node_info_base_t&& SIXTRL_RESTRICT_REF ptr_node_info_base );
 
         private:
 
@@ -260,11 +215,13 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN bool doSelectNodeOnNodesBaseImpl(
             size_type const node_index ) SIXTRL_NOEXCEPT;
 
-        std::vector< node_id_t >    m_available_nodes_id;
-        std::vector< node_info_t >  m_available_nodes_info;
+        std::vector< ptr_node_info_base_t > m_available_nodes;
+        std::vector< char > m_selected_node_id_str;
 
-        std::vector< char >         m_selected_node_id_str;
-        int64_t                     m_selected_node_index;
+        node_id_t const* m_ptr_default_node_id;
+        node_id_t const* m_ptr_selected_node_id;
+
+        int64_t m_selected_node_index;
     };
 }
 
@@ -276,27 +233,17 @@ extern "C" {
 
 typedef SIXTRL_CXX_NAMESPACE::ContextOnNodesBase NS(ContextOnNodesBase);
 
-typedef SIXTRL_CXX_NAMESPACE::ContextOnNodesBase::node_id_t
-        NS(context_node_id_t);
+typedef SIXTRL_CXX_NAMESPACE::ContextOnNodesBase::node_id_t NS(node_id_t);
 
-typedef SIXTRL_CXX_NAMESPACE::ContextOnNodesBase::node_info_t
-        NS(context_node_info_t);
-
-typedef SIXTRL_CXX_NAMESPACE::ContextOnNodesBase::platform_id_t
-        NS(context_platform_id_t);
-
-typedef SIXTRL_CXX_NAMESPACE::ContextOnNodesBase::device_id_t
-        NS(context_device_id_t);
-}
+typedef SIXTRL_CXX_NAMESPACE::ContextOnNodesBase::node_info_base_t
+        NS(node_info_base_t);
 
 #else /* C++, Host */
 
 typedef void NS(ContextNodeBase);
 
-typedef NS(ComputeNodeId)       NS(context_node_id_t);
-typedef NS(ComputeNodeInfo)     NS(context_node_info_t);
-typedef NS(comp_node_id_num_t)  NS(context_platform_id_t);
-typedef NS(comp_node_id_num_t)  NS(context_device_id_t);
+typedef NS(NodeId)              NS(node_id_t);
+typedef NS(ComputeNodeInfo)     NS(node_info_base_t);
 
 #endif /* C++, Host */
 

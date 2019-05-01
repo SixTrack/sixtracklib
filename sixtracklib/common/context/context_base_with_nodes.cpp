@@ -16,6 +16,420 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
+    ContextOnNodesBase::size_type
+    ContextOnNodesBase::numAvailableNodes() const SIXTRL_NOEXCEPT
+    {
+        return this->m_available_nodes.size();
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    bool ContextOnNodesBase::hasDefaultNode() const SIXTRL_NOEXCEPT
+    {
+         bool const has_default_node = (
+             ( this->m_ptr_default_node_id != nullptr ) &&
+             ( this->m_ptr_default_node_id->hasIndex() ) &&
+             ( this->m_ptr_default_node_id->index() <
+               this->numAvailableNodes() ) );
+
+         SIXTRL_ASSERT( ( !has_default_node ) ||
+             ( this->m_ptr_default_node_id != nullptr ) &&
+             ( this->numAvailableNodes() >
+               this->m_ptr_default_node_id->index() ) &&
+             ( this->m_available_nodes[
+                 this->m_ptr_default_node_id->index() ].get() != nullptr ) &&
+             ( this->m_available_nodes[
+                 this->m_ptr_default_node_id->index() ].get()->ptrNodeId() ==
+                 this->m_ptr_default_node_id ) );
+    }
+
+    ContextOnNodesBase::node_id_t const*
+    ContextOnNodesBase::ptrDefaultNodeId() const SIXTRL_NOEXCEPT
+    {
+        return this->m_ptr_default_node_id;
+    }
+
+    ContextOnNodesBase::size_type
+    ContextOnNodesBase::defaultNodeIndex() const SIXTRL_NOEXCEPT
+    {
+        using size_t = ContextOnNodesBase::size_type;
+
+        size_t const default_node_id =
+            SIXTRL_CXX_NAMESPACE::NODE_UNDEFINED_INDEX;
+
+        if( ( this->ptrDefaultNodeId() != nullptr ) &&
+            ( this->ptrDefaultNodeId()->hasIndex() ) &&
+            ( this->ptrDefaultNodeId()->index() <
+              this->numAvailableNodes() ) )
+        {
+            default_node_id = this->ptrDefaultNodeId()->index();
+        }
+
+        return default_node_id;
+    }
+
+    ContextOnNodesBase::node_info_base_t const*
+    ContextOnNodesBase::defaultNodeInfoBase() const SIXTRL_NOEXCEPT
+    {
+        using size_t = ContextOnNodesBase::size_type;
+        using ptr_node_info_t = ContextOnNodesBase::node_info_base_t const*;
+
+        size_t const default_node_idx = this->defaultNodeIndex();
+        ptr_node_info_t ptr_node_info_base = nullptr;
+
+        if( default_node_idx < this->numAvailableNodes() )
+        {
+            ptr_node_info_base =
+                this->m_available_nodes[ default_node_idx ].get();
+
+            if( ptr_node_info_base != nullptr )
+            {
+                if( ptr_node_info_base->ptrNodeId() !=
+                    this->ptrDefaultNodeId() )
+                {
+                    ptr_node_info_base = nullptr;
+                }
+            }
+        }
+
+        return ptr_node_info_base;
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    bool ContextOnNodesBase::isNodeAvailable(
+        ContextOnNodesBase::size_type const node_index ) const SIXTRL_RESTRICT
+    {
+        return (
+            ( node_index != SIXTRL_CXX_NAMESPACE::NODE_UNDEFINED_INDEX ) &&
+            ( node_index <  this->numAvailableNodes() ) &&
+            ( this->m_available_nodes[ node_index ].get() != nullptr ) );
+
+    }
+
+        bool ContextOnNodesBase::isNodeAvailable(
+            node_id_t const& node_id ) const SIXTRL_NOEXCEPT
+        {
+            return this->isNodeAvailable( this->doFindAvailableNodesIndex(
+                node_id.platformId(), node_id.deviceId() ) );
+        }
+
+        bool ContextOnNodesBase::isNodeAvailable(
+            ContextOnNodesBase::platform_id_t const platform_index,
+            ContextOnNodesBase::device_id_t const device_index
+            ) const SIXTRL_NOEXCEPT
+        {
+            return this->isNodeAvailable( this->doFindAvailableNodesIndex(
+                platform_index, device_index ) );
+        }
+
+        bool ContextOnNodesBase::isNodeAvailable(
+            char const* node_id_str ) const SIXTRL_NOEXCEPT
+        {
+            return this->isNodeAvailable( this->doFindAvailableNodesIndex(
+                node_id_str ) );
+        }
+
+        bool ContextOnNodesBase::isNodeAvailable(
+            std::string const& node_id_str ) const SIXTRL_NOEXCEPT
+        {
+            return this->isNodeAvailable( this->doFindAvailableNodesIndex(
+                node_id_str.c_str() ) );
+        }
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        bool ContextOnNodesBase::isDefaultNode(
+            char const* node_id_str ) const SIXTRL_NOEXCEPT
+        {
+            return ( ( this->hasDefaultNode() ) &&
+                ( this->defaultNodeIndex() == this->doFindAvailableNodesIndex(
+                    node_id_str ) ) );
+        }
+
+        bool ContextOnNodesBase::isDefaultNode( std::string const&
+            SIXTRL_RESTRICT_REF node_id_str ) const SIXTRL_NOEXCEPT
+        {
+            return ( ( this->hasDefaultNode() ) &&
+                ( this->defaultNodeIndex() == this->doFindAvailableNodesIndex(
+                    node_id_str.c_str() ) ) );
+        }
+
+        bool ContextOnNodesBase::isDefaultNode( ContextOnNodesBase::node_id_t
+            const& node_id ) const SIXTRL_NOEXCEPT
+        {
+            return ( ( this->hasDefaultNode() ) &&
+                ( this->defaultNodeIndex() == this->doFindAvailableNodesIndex(
+                    node_id.platformId(), node_id.deviceId() ) ) );
+        }
+
+        bool ContextOnNodesBase::isDefaultNode(
+            ContextOnNodesBase::platform_id_t const platform_index,
+            ContextOnNodesBase::device_id_t const device_index
+            ) const SIXTRL_NOEXCEPT
+        {
+            return ( ( this->hasDefaultNode() ) &&
+                ( this->defaultNodeIndex() == this->doFindAvailableNodesIndex(
+                    platform_index, device_index ) ) );
+        }
+
+        bool ContextOnNodesBase::isDefaultNode( ContextOnNodesBase::size_type
+            const node_index ) const SIXTRL_NOEXCEPT
+        {
+            return ( ( this->hasDefaultNode() ) &&
+                     ( this->defaultNodeIndex() == node_index ) );
+        }
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        ContextOnNodesBase::node_id_t const* ContextOnNodesBase::ptrNodeId(
+            char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT
+        {
+            return this->ptrNodeId( this->doFindAvailableNodesIndex(
+                node_id_str ) );
+        }
+
+        ContextOnNodesBase::node_id_t const*
+        ContextOnNodesBase::ptrNodeId( std::string const&
+            SIXTRL_RESTRICT_REF node_id_str ) const SIXTRL_NOEXCEPT
+        {
+            return this->ptrNodeId( this->doFindAvailableNodesIndex(
+                node_id_str.c_str() ) );
+        }
+
+        ContextOnNodesBase::node_id_t const* ContextOnNodesBase::ptrNodeId(
+            ContextOnNodesBase::platform_id_t const platform_idx,
+            ContextOnNodesBase::device_id_t const device_idx
+        ) const SIXTRL_NOEXCEPT
+        {
+            return this->ptrNodeId( this->doFindAvailableNodesIndex(
+                platform_idx, device_idx ) );
+        }
+
+        ContextOnNodesBase::node_id_t const* ContextOnNodesBase::ptrNodeId(
+            ContextOnNodesBase::size_type const index ) const SIXTRL_NOEXCEPT
+        {
+            ContextOnNodesBase::node_id_t const* ptr_node_id = nullptr;
+
+            if( ( index < this->numAvailableNodes() ) &&
+                ( this->m_available_nodes[ index ].get() != nullptr ) )
+            {
+                ptr_node_id = this->m_available_nodes[
+                    index ].get()->ptrNodeId();
+            }
+
+            return ptr_node_id;
+        }
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        ContextOnNodesBase::node_info_base_t const*
+        ContextOnNodesBase::ptrNodesInfoBase(
+            ContextOnNodesBase::size_type const index ) const SIXTRL_NOEXCEPT
+        {
+            ContextOnNodesBase::node_info_base_t const*
+                ptr_node_info_base = nullptr;
+
+            if( ( index < this->numAvailableNodes() ) &&
+                ( this->m_available_nodes.get() != nullptr ) )
+            {
+                ptr_node_info_base = this->m_available_nodes[ index ].get();
+            }
+
+            return ptr_node_info_base;
+        }
+
+        ContextOnNodesBase::node_info_base_t const*
+        ContextOnNodesBase::ptrNodesInfoBase(
+            ContextOnNodesBase::platform_id_t const platform_idx,
+            ContextOnNodesBase::device_id_t const device_idx
+            ) const SIXTRL_NOEXCEPT
+         {
+            return this->ptrNodesInfoBase( this->doFindAvailableNodesIndex(
+                platform_idx, device_idx ) );
+         }
+
+        ContextOnNodesBase::node_info_base_t const*
+        ContextOnNodesBase::ptrNodesInfoBase(
+            ContextOnNodesBase::node_id_t const& nodeid ) const SIXTRL_NOEXCEPT
+        {
+            return this->ptrNodesInfoBase( this->doFindAvailableNodesIndex(
+                node_id.platformId(), node_id.deviceId() ) );
+        }
+
+        ContextOnNodesBase::node_info_base_t const*
+        ContextOnNodesBase::ptrNodesInfoBase(
+            char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT
+        {
+            return this->ptrNodesInfoBase( this->doFindAvailableNodesIndex(
+                node_id_str ) );
+        }
+
+        ContextOnNodesBase::node_info_base_t const*
+        ContextOnNodesBase::ptrNodesInfoBase( std::string const&
+            SIXTRL_RESTRICT_REF node_id_str ) const SIXTRL_NOEXCEPT
+        {
+            return this->ptrNodesInfoBase( this->doFindAvailableNodesIndex(
+                node_id_str.c_str() ) );
+        }
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        bool ContextOnNodesBase::hasSelectedNode() const SIXTRL_NOEXCEPT
+        {
+            using size_t = ContextOnNodesBase::size_type;
+
+            bool const has_selected_node = (
+                ( this->m_ptr_selected_noded_id != nullptr ) &&
+                ( this->numAvailableNodes() > this->selectedNodeIndex() ) );
+
+            SIXTRL_ASSERT( ( !has_selected_node ) ||
+                ( this->m_ptr_selected_noded_id != nullptr ) &&
+                ( this->selectedNodeIndex() !=
+                    SIXTRL_CXX_NAMESPACE::NODE_UNDEFINED_INDEX ) &&
+                ( this->m_ptr_selected_noded_id ==
+                    this->ptrNodeId( this->selectedNodeIndex() ) ) );
+
+            return has_selected_node;
+        }
+
+        ContextOnNodesBase::size_type
+        ContextOnNodesBase::selectedNodeIndex() const SIXTRL_NOEXCEPT
+        {
+            return this->m_selected_node_index;
+        }
+
+        ContextOnNodesBase::node_id_t const*
+        ContextOnNodesBase::ptrSelectedNodeId() const SIXTRL_NOEXCEPT
+        {
+            return this->m_ptr_selected_noded_id;
+        }
+
+        ContextOnNodesBase::node_info_t const*
+        ContextOnNodesBase::ptrSelectedNodeInfoBase() const SIXTRL_NOEXCEPT
+        {
+            return ( this->hasSelectedNode() )
+                ? this->m_available_nodes[ this->selectedNodeIndex() ].get()
+                : nullptr;
+        }
+
+        std::string ContextOnNodesBase::selectedNodeIdStr()
+            const SIXTRL_NOEXCEPT
+        {
+            return std::string{ this->m_selected_node_id_str.data() };
+        }
+
+        char const* ContextOnNodesBase::ptrSelectedNodeIdStr()
+            const SIXTRL_NOEXCEPT
+        {
+            return ( this->hasSelectedNode() )
+                ? this->m_selected_node_id_str.data() : nullptr;
+        }
+
+        bool ContextOnNodesBase::selectedNodeIdStr(
+            char* SIXTRL_RESTRICT node_id_str,
+            ContextOnNodesBase::size_type const max_str_length ) const SIXTRL_NOEXCEPT
+        {
+            bool success = false;
+
+            using size_t = ContextOnNodesBase::size_type;
+
+            if( this->hasSelectedNode() )
+            {
+                SIXTRL_ASSERT( this->ptrSelectedNodeId() != nullptr );
+                success = this->ptrSelectedNodeId()->toString(
+                    node_id_str, max_str_length );
+            }
+            else if( ( node_id_str != nullptr ) &&
+                     ( max_str_length > size_t{ 0 } ) )
+            {
+                std::memset( node_id_str, max_str_length, ( int )'\0' );
+            }
+
+            return success;
+        }
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        bool selectNode( node_id_t const& node_id );
+        bool selectNode( platform_id_t const platform_idx,
+                         device_id_t const device_idx );
+
+        bool selectNode( char const* node_id_str );
+        bool selectNode( std::string const& node_id_str );
+        bool selectNode( size_type const index );
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        void printAvailableNodesInfo() const;
+
+        void printAvailableNodesInfo(
+            std::ostream& SIXTRL_RESTRICT_REF os ) const;
+
+        void printAvailableNodesInfo(
+            ::FILE* SIXTRL_RESTRICT output ) const;
+
+        std::string availableNodesInfoToString() const;
+
+        virtual ~ContextOnNodesBase() SIXTRL_NOEXCEPT;
+
+        protected:
+
+        using std::unique_ptr< node_info_base_t > ptr_node_info_base_t;
+
+        ContextOnNodesBase(
+            arch_id_t const arch_id, const char *const arch_str,
+            const char *const SIXTRL_RESTRICT config_str = nullptr );
+
+        ContextOnNodesBase(
+            ContextOnNodesBase const& other ) = default;
+
+        ContextOnNodesBase(
+            ContextOnNodesBase&& other ) = default;
+
+        ContextOnNodesBase& operator=(
+            ContextOnNodesBase const& rhs ) = default;
+
+        ContextOnNodesBase& operator=(
+            ContextOnNodesBase&& rhs ) = default;
+
+        virtual void doClear() override;
+        virtual bool doSelectNode( size_type node_index );
+
+        virtual size_type doGetDefaultNodeIndex() const;
+
+        size_type doFindAvailableNodesIndex(
+            platform_id_t const platform_idx,
+            device_id_t const device_idx ) const SIXTRL_NOEXCEPT;
+
+        size_type doFindAvailableNodesIndex(
+            char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT;
+
+        void doClearAvailableNodes() SIXTRL_NOEXCEPT;
+
+        size_type doAppendAvailableNodeInfoBase(
+            ptr_node_info_base_t&& SIXTRL_RESTRICT_REF ptr_node_info_base );
+
+        private:
+
+        void doClearOnNodesBaseImpl() SIXTRL_NOEXCEPT;
+
+        size_type
+        doGetDefaultNodeIndexOnNodesBaseImpl() const SIXTRL_NOEXCEPT;
+
+        bool doSelectNodeOnNodesBaseImpl(
+            size_type const node_index ) SIXTRL_NOEXCEPT;
+
+
+
+
+
+
+
+
+
+
+
     ContextOnNodesBase::ContextOnNodesBase(
         ContextOnNodesBase::type_id_t const type_id,
         const char *const SIXTRL_RESTRICT type_id_str,
@@ -38,17 +452,17 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_available_nodes_id.size();
     }
 
-    ContextOnNodesBase::node_info_t const*
-    ContextOnNodesBase::availableNodesInfoBegin() const SIXTRL_NOEXCEPT
+    ContextOnNodesBase::node_info_base_t const*
+    ContextOnNodesBase::availableNodesInfoBaseBegin() const SIXTRL_NOEXCEPT
     {
         return this->m_available_nodes_info.data();
     }
 
-    ContextOnNodesBase::node_info_t const*
-    ContextOnNodesBase::availableNodesInfoEnd() const SIXTRL_NOEXCEPT
+    ContextOnNodesBase::node_info_base_t const*
+    ContextOnNodesBase::availableNodesInfoBaseEnd() const SIXTRL_NOEXCEPT
     {
-        using node_info_ptr_t = ContextOnNodesBase::node_info_t const*;
-        node_info_ptr_t end_ptr = this->availableNodesInfoBegin();
+        using node_info_ptr_t = ContextOnNodesBase::node_info_base_t const*;
+        node_info_ptr_t end_ptr = this->availableNodesInfoBaseBegin();
 
         if( end_ptr != nullptr )
         {
@@ -58,10 +472,10 @@ namespace SIXTRL_CXX_NAMESPACE
         return end_ptr;
     }
 
-    ContextOnNodesBase::node_info_t const*
-    ContextOnNodesBase::defaultNodeInfo() const SIXTRL_NOEXCEPT
+    ContextOnNodesBase::node_info_base_t const*
+    ContextOnNodesBase::defaultNodeInfoBase() const SIXTRL_NOEXCEPT
     {
-        using node_info_ptr_t = ContextOnNodesBase::node_info_t const*;
+        using node_info_ptr_t = ContextOnNodesBase::node_info_base_t const*;
         using size_t = ContextOnNodesBase::size_type;
 
         node_info_ptr_t   ptr_node_info = nullptr;
@@ -69,7 +483,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( default_node_index < this->numAvailableNodes() )
         {
-            ptr_node_info = this->availableNodesInfoBegin();
+            ptr_node_info = this->availableNodesInfoBaseBegin();
 
             if( ptr_node_info != nullptr )
             {
@@ -108,16 +522,10 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     bool ContextOnNodesBase::isNodeAvailable(
-        ContextOnNodesBase::node_id_t const node_id ) const SIXTRL_NOEXCEPT
+        ContextOnNodesBase::node_id_t const& node_id ) const SIXTRL_NOEXCEPT
     {
-        ContextOnNodesBase::platform_id_t const platform_idx =
-            ::NS(ComputeNodeId_get_platform_id)( &node_id );
-
-        ContextOnNodesBase::device_id_t const device_idx =
-            ::NS(ComputeNodeId_get_device_id)( &node_id );
-
-        return ( this->doFindAvailableNodesIndex( platform_idx, device_idx ) <
-                 this->numAvailableNodes() );
+        return ( this->doFindAvailableNodesIndex( node_id.platformId(),
+            node_id.deviceId() ) < this->numAvailableNodes() );
     }
 
     bool ContextOnNodesBase::isNodeAvailable(
@@ -160,11 +568,9 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     bool ContextOnNodesBase::isDefaultNode(
-        ContextOnNodesBase::node_id_t const node_id ) const SIXTRL_NOEXCEPT
+        ContextOnNodesBase::node_id_t const& node_id ) const SIXTRL_NOEXCEPT
     {
-        return this->isDefaultNode(
-            ::NS(ComputeNodeId_get_platform_id)( &node_id ),
-            ::NS(ComputeNodeId_get_device_id)( &node_id ) );
+        return this->isDefaultNode( node_id.platformId(), node_id.deviceId() );
     }
 
     bool ContextOnNodesBase::isDefaultNode(
@@ -220,46 +626,45 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    ContextOnNodesBase::node_info_t const*
-    ContextOnNodesBase::ptrAvailableNodesInfo(
+    ContextOnNodesBase::node_info_base_t const*
+    ContextOnNodesBase::ptrAvailableNodesInfoBase(
         ContextOnNodesBase::size_type const index ) const SIXTRL_NOEXCEPT
     {
         return ( index < this->numAvailableNodes() )
-            ? &this->m_available_nodes_info[ index ] : nullptr;
+            ? &this->m_available_nodes_info[ index ].get() : nullptr;
     }
 
-    ContextOnNodesBase::node_info_t const*
-    ContextOnNodesBase::ptrAvailableNodesInfo(
+    ContextOnNodesBase::node_info_base_t const*
+    ContextOnNodesBase::ptrAvailableNodesInfoBase(
             ContextOnNodesBase::platform_id_t const platform_idx,
             ContextOnNodesBase::device_id_t const device_idx
         ) const SIXTRL_NOEXCEPT
     {
-        return this->ptrAvailableNodesInfo( this->doFindAvailableNodesIndex(
-            platform_idx, device_idx ) );
+        return this->ptrAvailableNodesInfoBase(
+            this->doFindAvailableNodesIndex( platform_idx, device_idx ) );
     }
 
-    ContextOnNodesBase::node_info_t const*
-    ContextOnNodesBase::ptrAvailableNodesInfo(
-        ContextOnNodesBase::node_id_t const node_id ) const SIXTRL_NOEXCEPT
+    ContextOnNodesBase::node_info_base_t const*
+    ContextOnNodesBase::ptrAvailableNodesInfoBase(
+        ContextOnNodesBase::node_id_t const& node_id ) const SIXTRL_NOEXCEPT
     {
-        return this->ptrAvailableNodesInfo(
-            ::NS(ComputeNodeId_get_platform_id)( &node_id ),
-            ::NS(ComputeNodeId_get_device_id)( &node_id ) );
+        return this->ptrAvailableNodesInfoBase(
+            node_id.platformId(), node_id.deviceId() );
     }
 
-    ContextOnNodesBase::node_info_t const*
-    ContextOnNodesBase::ptrAvailableNodesInfo(
+    ContextOnNodesBase::node_info_base_t const*
+    ContextOnNodesBase::ptrAvailableNodesInfoBase(
         char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT
     {
-        return this->ptrAvailableNodesInfo(
+        return this->ptrAvailableNodesInfoBase(
             this->doFindAvailableNodesIndex( node_id_str ) );
     }
 
-    ContextOnNodesBase::node_info_t const*
-    ContextOnNodesBase::ptrAvailableNodesInfo( std::string const&
+    ContextOnNodesBase::node_info_base_t const*
+    ContextOnNodesBase::ptrAvailableNodesInfoBase( std::string const&
         SIXTRL_RESTRICT_REF node_id_str ) const SIXTRL_NOEXCEPT
     {
-        return this->ptrAvailableNodesInfo( node_id_str.c_str() );
+        return this->ptrAvailableNodesInfoBase( node_id_str.c_str() );
     }
 
     bool ContextOnNodesBase::hasSelectedNode() const SIXTRL_NOEXCEPT
@@ -278,12 +683,12 @@ namespace SIXTRL_CXX_NAMESPACE
             : nullptr;
     }
 
-    ContextOnNodesBase::node_info_t const*
-    ContextOnNodesBase::ptrSelectedNodeInfo() const SIXTRL_NOEXCEPT
+    ContextOnNodesBase::node_info_base_t const*
+    ContextOnNodesBase::ptrSelectedNodeInfoBase() const SIXTRL_NOEXCEPT
     {
         return ( this->hasSelectedNode() )
-            ? this->ptrAvailableNodesInfo( this->m_selected_node_index )
-            : nullptr;
+            ? this->ptrAvailableNodesInfoBase(
+                this->m_selected_node_index ) : nullptr;
     }
 
     std::string ContextOnNodesBase::selectedNodeIdStr() const SIXTRL_NOEXCEPT
@@ -321,11 +726,10 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     bool ContextOnNodesBase::selectNode(
-        ContextOnNodesBase::node_id_t const node_id )
+        ContextOnNodesBase::node_id_t& const node_id )
     {
-        return this->selectNode(
-            ::NS(ComputeNodeId_get_platform_id)( &node_id ),
-            ::NS(ComputeNodeId_get_device_id)( &node_id ) );
+        return this->selectNode( this->doFindAvailableNodesIndex(
+            node_id.platformId(), node_id.deviceId() ) );
     }
 
     bool ContextOnNodesBase::selectNode(
@@ -354,120 +758,50 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->doSelectNode( index );
     }
 
-    void ContextOnNodesBase::printNodesInfo() const
+    void ContextOnNodesBase::printAvailableNodesInfo() const
     {
-        this->printNodesInfo( std::cout );
+        this->printAvailableNodesInfo( std::cout );
     }
 
-    void ContextOnNodesBase::printNodesInfo(
+    void ContextOnNodesBase::printAvailableNodesInfo(
             std::ostream& SIXTRL_RESTRICT_REF os ) const
     {
-        using ptr_t = ContextOnNodesBase::node_info_t const*;
-        ptr_t info_it  = this->availableNodesInfoBegin();
-        ptr_t info_end = this->availableNodesInfoEnd();
+        using _this_t = SIXTRL_CXX_NAMESPACE::ContextOnNodesBase;
+        using size_t  = _this_t::size_type;
+        using ptr_t   = _this_t::node_info_base_t const*;
 
-        if( info_it != nullptr )
+        size_t const num_avail_nodes = this->numAvailableNodes();
+
+        for( size_t ii = size_t{ 0 } ; ii < num_avail_nodes ; ++ii )
         {
-            for( ; info_it != info_end ; ++info_it )
+            ptr_t ptr_node_info = this->ptrAvailableNodesInfoBase( ii );
+
+            if( ptr_node_info != nullptr )
             {
-                this->doPrintNodesInfo( os, *info_it );
+                os << *ptr_node_info << "\r\n";
             }
         }
     }
 
-    void ContextOnNodesBase::printNodesInfo(
-        ContextOnNodesBase::size_type const index ) const
+    std::string ContextOnNodesBase::availableNodesInfoToString() const
     {
-        this->printNodesInfo( std::cout, index );
+        std::ostringstream a2str;
+        this->printAvailableNodesInfo( a2str );
+        return a2str.str();
     }
 
-    void ContextOnNodesBase::printNodesInfo(
-        std::ostream& SIXTRL_RESTRICT_REF os,
-        ContextOnNodesBase::size_type const index ) const
+    void ContextOnNodesBase::printAvailableNodesInfo(
+        ::FILE* SIXTRL_RESTRICT output ) const
     {
-        ContextOnNodesBase::node_info_t const* ptr_info =
-            this->ptrAvailableNodesInfo( index );
-
-        if( ptr_info != nullptr )
+        if( output != nullptr )
         {
-            this->doPrintNodesInfo( os, *ptr_info );
-        }
-    }
+            std::string const avail_nodes_str =
+                this->availableNodesInfoToString();
 
-    void ContextOnNodesBase::printNodesInfo(
-        ContextOnNodesBase::node_id_t const node_id ) const
-    {
-        this->printNodesInfo( std::cout, this->doFindAvailableNodesIndex(
-            ::NS(ComputeNodeId_get_platform_id)( &node_id ),
-            ::NS(ComputeNodeId_get_device_id)( &node_id ) ) );
-    }
-
-    void ContextOnNodesBase::printNodesInfo(
-        std::ostream& SIXTRL_RESTRICT_REF os,
-        ContextOnNodesBase::node_id_t const node_id ) const
-    {
-        this->printNodesInfo( os, this->doFindAvailableNodesIndex(
-            ::NS(ComputeNodeId_get_platform_id)( &node_id ),
-            ::NS(ComputeNodeId_get_device_id)( &node_id ) ) );
-    }
-
-    void ContextOnNodesBase::printNodesInfo(
-        ContextOnNodesBase::platform_id_t const platform_idx,
-        ContextOnNodesBase::device_id_t const device_idx ) const
-    {
-        this->printNodesInfo( std::cout, this->doFindAvailableNodesIndex(
-            platform_idx, device_idx ) );
-    }
-
-    void ContextOnNodesBase::printNodesInfo(
-        std::ostream& SIXTRL_RESTRICT_REF os,
-        ContextOnNodesBase::platform_id_t const platform_idx,
-        ContextOnNodesBase::device_id_t const device_idx ) const
-    {
-        this->printNodesInfo( os, this->doFindAvailableNodesIndex(
-            platform_idx, device_idx ) );
-    }
-
-    void ContextOnNodesBase::printNodesInfo(
-        char const* SIXTRL_RESTRICT node_id_str ) const
-    {
-        this->printNodesInfo( std::cout, this->doFindAvailableNodesIndex(
-                node_id_str ) );
-    }
-
-    void ContextOnNodesBase::printNodesInfo(
-        std::ostream& SIXTRL_RESTRICT_REF os,
-        char const* SIXTRL_RESTRICT node_id_str ) const
-    {
-        this->printNodesInfo( os, this->doFindAvailableNodesIndex(
-            node_id_str ) );
-    }
-
-    void ContextOnNodesBase::printNodesInfo(
-        std::string const& SIXTRL_RESTRICT_REF node_id_str ) const
-    {
-        this->printNodesInfo( std::cout, this->doFindAvailableNodesIndex(
-            node_id_str.c_str() ) );
-    }
-
-    void ContextOnNodesBase::printNodesInfo(
-        std::ostream& SIXTRL_RESTRICT_REF os,
-        std::string const& SIXTRL_RESTRICT_REF node_id_str ) const
-    {
-        this->printNodesInfo( os, this->doFindAvailableNodesIndex(
-            node_id_str.c_str() ) );
-    }
-
-    void ContextOnNodesBase::printSelectedNodesInfo() const
-    {
-        this->printSelectedNodesInfo( std::cout );
-    }
-
-    void ContextOnNodesBase::printSelectedNodesInfo( std::ostream& os ) const
-    {
-        if( this->hasSelectedNode() )
-        {
-            this->printNodesInfo( os, this->m_selected_node_index );
+            if( !avail_nodes_str.empty() )
+            {
+                std::fprintf( output, "%s", avail_nodes_str.c_str() );
+            }
         }
     }
 
@@ -496,82 +830,24 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->doGetDefaultNodeIndexOnNodesBaseImpl();
     }
 
-    void ContextOnNodesBase::doPrintNodesInfo(
-        std::ostream& SIXTRL_RESTRICT_REF os,
-        ContextOnNodesBase::node_info_t const&
-            SIXTRL_RESTRICT_REF node_info ) const
-    {
-        ContextOnNodesBase::node_id_t const node_id =
-            ::NS(ComputeNodeInfo_get_id)( &node_info );
-
-        os << "Device ID   : "
-            << ::NS(ComputeNodeId_get_platform_id)( &node_id )
-            << "."
-            << ::NS(ComputeNodeId_get_device_id)( &node_id );
-
-        if( !this->isDefaultNode( node_id ) )
-        {
-            os << "\r\n";
-        }
-        else
-        {
-            os << " [DEFAULT]\r\n";
-        }
-
-        if( nullptr != ::NS(ComputeNodeInfo_get_arch)( &node_info ) )
-        {
-            os << "Architecture: "
-               << ::NS(ComputeNodeInfo_get_arch)( &node_info ) << "\r\n";
-        }
-
-        if( nullptr != ::NS(ComputeNodeInfo_get_platform)( &node_info ) )
-        {
-            os << "Platform    : "
-               << ::NS(ComputeNodeInfo_get_platform)( &node_info ) << "\r\n";
-        }
-
-        if( nullptr != ::NS(ComputeNodeInfo_get_name)( &node_info ) )
-        {
-            os << "Name        : "
-               << ::NS(ComputeNodeInfo_get_name)( &node_info ) << "\r\n";
-        }
-
-        if( nullptr != ::NS(ComputeNodeInfo_get_description)( &node_info ) )
-        {
-            os << "Description : "
-               << ::NS(ComputeNodeInfo_get_description)( &node_info )
-               << "\r\n";
-        }
-
-        return;
-    }
-
     ContextOnNodesBase::size_type
     ContextOnNodesBase::doFindAvailableNodesIndex(
         ContextOnNodesBase::platform_id_t const platform_idx,
         ContextOnNodesBase::device_id_t const device_idx ) const SIXTRL_NOEXCEPT
     {
-        using size_t        = ContextOnNodesBase::size_type;
-        using platform_id_t = ContextOnNodesBase::platform_id_t;
-        using device_id_t   = ContextOnNodesBase::device_id_t;
-
+        using size_t = ContextOnNodesBase::size_type;
         size_t index = this->numAvailableNodes();
 
-        if( ( platform_idx >= platform_id_t{ 0 } ) &&
-            ( device_idx   >= device_id_t{ 0 } ) )
+        if( ( platform_idx !=
+                SIXTRL_CXX_NAMESPACE::NODE_ILLEGAL_PLATFORM_ID ) &&
+            ( device_idx   != SIXTRL_CXX_NAMESPACE::NODE_ILLEGAL_DEVICE_ID ) )
         {
             index = size_t{ 0 };
 
             for( auto const& cmp_node_id : this->m_available_nodes_id )
             {
-                platform_id_t const cmp_platform_idx =
-                    ::NS(ComputeNodeId_get_platform_id)( &cmp_node_id );
-
-                device_id_t const cmp_device_idx =
-                    ::NS(ComputeNodeId_get_device_id)( &cmp_node_id );
-
-                if( ( platform_idx == cmp_platform_idx ) &&
-                    ( device_idx   == cmp_device_idx   ) )
+                if( ( platform_idx == cmp_node_id.platformId() ) &&
+                    ( device_idx == cmp_node_id.deviceId() ) )
                 {
                     break;
                 }
@@ -593,12 +869,10 @@ namespace SIXTRL_CXX_NAMESPACE
         size_t index = this->numAvailableNodes();
         ContextOnNodesBase::node_id_t node_id;
 
-        if( ( index > size_t{ 0 } ) && ( 0 == NS(ComputeNodeId_from_string)(
-                &node_id, node_id_str ) ) )
+        if( ( index > size_t{ 0 } ) && ( node_id.fromString( node_id_str ) ) )
         {
             index = this->doFindAvailableNodesIndex(
-                ::NS(ComputeNodeId_get_platform_id)( &node_id ),
-                ::NS(ComputeNodeId_get_device_id)( &node_id ) );
+                node_id.platformId(), node_id.deviceId() );
         }
 
         return index;
@@ -615,11 +889,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ContextOnNodesBase::size_type ContextOnNodesBase::doAppendAvailableNode(
         ContextOnNodesBase::node_id_t const& SIXTRL_RESTRICT_REF node_id,
-        ContextOnNodesBase::node_info_t const& SIXTRL_RESTRICT_REF node_info )
+        ContextOnNodesBase::node_info_base_t const& SIXTRL_RESTRICT_REF node_info )
     {
         using _this_t     = ContextOnNodesBase;
         using node_id_t   = _this_t::node_id_t;
-        using node_info_t = _this_t::node_info_t;
+        using node_info_base_t = _this_t::node_info_base_t;
         using size_t      = _this_t::size_type;
 
         size_t const arch_str_len =
@@ -645,10 +919,10 @@ namespace SIXTRL_CXX_NAMESPACE
         size_t new_node_index = this->numAvailableNodes();
 
         this->m_available_nodes_id.push_back( node_id_t{} );
-        this->m_available_nodes_info.push_back( node_info_t{} );
+        this->m_available_nodes_info.push_back( node_info_base_t{} );
 
         node_id_t& new_node_id = this->m_available_nodes_id.back();
-        node_info_t& new_node_info = this->m_available_nodes_info.back();
+        node_info_base_t& new_node_info = this->m_available_nodes_info.back();
 
         ::NS(ComputeNodeId_preset)( &new_node_id );
         ::NS(ComputeNodeInfo_preset)( &new_node_info );

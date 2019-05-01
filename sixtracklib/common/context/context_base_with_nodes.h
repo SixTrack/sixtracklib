@@ -11,7 +11,9 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/context/compute_arch.h"
+    #include "sixtracklib/common/context/definitions.h"
+    #include "sixtracklib/common/context/node_id.h"
+    #include "sixtracklib/common/context/node_info.h"
     #include "sixtracklib/common/context/context_base.h"
     #include "sixtracklib/common/context/context_base_with_nodes.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
