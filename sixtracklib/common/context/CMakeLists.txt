@@ -1,5 +1,9 @@
 set( SIXTRL_COMMON_CONTEXT_C99_HEADERS
      compute_arch.h
+     arch_info.h
+     arch_base.h
+     node_id.h
+     node_info.h
      context_base.h
      argument_base.h
 )
@@ -29,12 +33,24 @@ target_compile_options( sixtrack_common_context PRIVATE
 
 set( SIXTRL_COMMON_CONTEXT_CXX_HEADERS
      definitions.h
+     arch_info.hpp
+     arch_base.hpp
+     node_id.hpp
+     node_info.hpp
      context_base.hpp
      context_base_with_nodes.hpp
      argument_base.hpp
 )
 
 set( SIXTRL_COMMON_CONTEXT_CXX_SOURCES
+     arch_info.cpp
+     arch_info_c99.cpp
+     arch_base.cpp
+     arch_base_c99.cpp
+     node_id.cpp
+     node_id_c99.cpp
+     node_info.cpp
+     node_info_c99.cpp
      context_base.cpp
      context_base_c99.cpp
      context_base_with_nodes.cpp
