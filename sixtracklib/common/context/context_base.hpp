@@ -18,8 +18,10 @@
     #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
        !defined( __CUDA_ARCH__ )
         #include "sixtracklib/common/buffer.hpp"
+        #include "sixtracklib/common/arch_base.hpp"
     #endif /* C++, host code */
 
+    #include "sixtracklib/common/context/arch_base.h"
     #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -29,26 +31,22 @@ namespace SIXTRL_CXX_NAMESPACE
 {
     class ArgumentBase;
 
-    class ContextBase
+    class ContextBase : public SIXTRL_CXX_NAMESPACE ArchBase
     {
+        private:
+
+        using _base_arch_obj_t     = SIXTRL_CXX_NAMESPACE::ArchBase;
+
         public:
 
-        using type_id_t            = SIXTRL_CXX_NAMESPACE::context_type_id_t;
+        using arch_id_t            = _base_arch_obj_t::arch_id_t;
         using status_t             = SIXTRL_CXX_NAMESPACE::context_status_t;
         using buffer_t             = SIXTRL_CXX_NAMESPACE::Buffer;
-        using c_buffer_t           = ::NS(Buffer);
-        using size_type            = ::NS(context_size_t);
+        using c_buffer_t           = buffer_t::c_api_t;
+        using size_type            = buffer_t::size_type;
         using ptr_arg_base_t       = ArgumentBase*;
         using ptr_const_arg_base_t = ArgumentBase const*;
         using success_flag_t       = ::NS(context_success_flag_t);
-
-        SIXTRL_HOST_FN type_id_t type() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN std::string const& typeStr() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN char const* ptrTypeStr() const SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN bool hasConfigStr()            const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN std::string const& configStr() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN char const* ptrConfigStr()     const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool usesNodes() const SIXTRL_NOEXCEPT;
 
@@ -92,11 +90,20 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual ~ContextBase() SIXTRL_NOEXCEPT;
 
+        template< class Derived > Derived const* asDerivedContext(
+            arch_id_t const requ_arch_id,
+            bool const exact_match_required = false ) const SIXTRL_NOEXCEPT;
+
+        template< class Derived > Derived* asDerivedContext(
+            arch_id_t const requ_arch_id,
+            bool const exact_match_required = false ) SIXTRL_NOEXCEPT;
+
         protected:
 
         using ptr_stored_base_argument_t = std::unique_ptr< ArgumentBase >;
 
-        SIXTRL_HOST_FN explicit ContextBase( type_id_t const type_id,
+        SIXTRL_HOST_FN explicit ContextBase(
+            arch_id_t const arch_id,
             const char *const SIXTRL_RESTRICT type_str,
             const char *const SIXTRL_RESTRICT config_str = nullptr );
 
@@ -110,9 +117,6 @@ namespace SIXTRL_CXX_NAMESPACE
         operator=( ContextBase&& rhs ) = default;
 
         SIXTRL_HOST_FN virtual void doClear();
-
-        SIXTRL_HOST_FN virtual void doParseConfigStr(
-            const char *const SIXTRL_RESTRICT config_str );
 
         SIXTRL_HOST_FN virtual status_t doSend(
             ptr_arg_base_t SIXTRL_RESTRICT destination,
@@ -132,12 +136,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual void doSetSuccessFlagValueFromArg(
             success_flag_t const success_flag );
-
-        SIXTRL_HOST_FN void doSetTypeId(
-            type_id_t const type_id ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN void doSetTypeIdStr(
-            const char *const SIXTRL_RESTRICT type_id_str ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void doSetUsesNodesFlag(
             bool const flag ) SIXTRL_NOEXCEPT;
@@ -159,13 +157,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         private:
 
-        SIXTRL_HOST_FN void doParseConfigStrBaseImpl(
-            const char *const SIXTRL_RESTRICT config_str );
-
-        std::string m_config_str;
-        std::string m_type_id_str;
-        type_id_t   m_type_id;
-
         ptr_stored_base_argument_t m_ptr_success_flag_arg;
 
         bool        m_uses_nodes;
@@ -186,6 +177,51 @@ extern "C" { typedef SIXTRL_CXX_NAMESPACE::ContextBase  NS(ContextBase); }
 typedef void NS(ContextBase);
 
 #endif /* C++, host */
+
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+    #include <type_traits>
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
+namespace SIXTRL_CXX_NAMESPACE
+{
+    template< class Derived > Derived const* ContextBase::asDerivedContext(
+        ContextBase::arch_id_t const requ_arch_id,
+        bool const exact_match_required ) const SIXTRL_NOEXCEPT
+    {
+        Derived const* ptr_derived = nullptr;
+
+        using _this_t = SIXTRL_CXX_NAMESPACE::ContextBase;
+
+        static_assert( std::is_base_of< _this_t, Derived >::value,
+                       "asDerivedContext< Derived > requires Dervied to be "
+                       "derived from SIXTRL_CXX_NAMESPACE::ContextBase" );
+
+        if( ( ( !exact_match_required ) &&
+              ( this->isCompatibleWith( requ_arch_id ) ) ) ||
+            ( this->isIdenticalTo( requ_arch_id ) ) )
+        {
+            ptr_derived = static_cast< Derived const* >( this );
+        }
+
+        return ptr_derived;
+    }
+
+    template< class Derived > Derived* ContextBase::asDerivedContext(
+        ContextBase::arch_id_t const requ_arch_id,
+        bool const exact_match_required ) SIXTRL_NOEXCEPT
+    {
+        using _this_t = SIXTRL_CXX_NAMESPACE::ContextBase;
+
+        return const_cast< Derived* >( static_cast< _this_t const& >(
+            *this ).asDerivedContext< Derived >(
+                requ_arch_id, exact_match_required ) );
+    }
+}
+
+#endif /* C++, Host */
 
 #endif /* SIXTRACKLIB_COMMON_CONTEXT_CONTEXT_BASE_HPP__ */
 

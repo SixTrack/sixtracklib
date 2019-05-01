@@ -16,37 +16,6 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    ContextBase::type_id_t ContextBase::type() const SIXTRL_NOEXCEPT
-    {
-        return this->m_type_id;
-    }
-
-    std::string const& ContextBase::typeStr() const SIXTRL_NOEXCEPT
-    {
-        return this->m_type_id_str;
-    }
-
-    char const* ContextBase::ptrTypeStr() const SIXTRL_NOEXCEPT
-    {
-        return this->m_type_id_str.c_str();
-    }
-
-    bool ContextBase::hasConfigStr() const SIXTRL_NOEXCEPT
-    {
-        return ( !this->m_config_str.empty() );
-    }
-
-    std::string const& ContextBase::configStr() const SIXTRL_NOEXCEPT
-    {
-        return this->m_config_str;
-    }
-
-    char const* ContextBase::ptrConfigStr() const SIXTRL_NOEXCEPT
-    {
-        return ( !this->m_config_str.empty() )
-            ? this->m_config_str.c_str() : nullptr;
-    }
-
     bool ContextBase::usesNodes() const SIXTRL_NOEXCEPT
     {
         return this->m_uses_nodes;
@@ -302,10 +271,10 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     ContextBase::ContextBase(
-        ContextBase::type_id_t const type_id,
-        const char *const SIXTRL_RESTRICT type_id_str,
+        ContextBase::arch_id_t const arch_id,
+        const char *const SIXTRL_RESTRICT arch_str,
         const char *const SIXTRL_RESTRICT config_str ) :
-            m_config_str(), m_type_id_str(), m_type_id( type_id ),
+        ArchBase( arch_id, arch_str, config_str ),
             m_ptr_success_flag_arg( nullptr ),
             m_uses_nodes( false ),
             m_ready_for_remap( false ),
@@ -313,8 +282,7 @@ namespace SIXTRL_CXX_NAMESPACE
             m_ready_for_receive( false ),
             m_debug_mode( false )
     {
-        this->doSetTypeIdStr( type_id_str );
-        this->doParseConfigStrBaseImpl( config_str );
+
     }
 
     void ContextBase::doClear()
@@ -324,12 +292,6 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_ready_for_remap   = false;
 
         return;
-    }
-
-    void ContextBase::doParseConfigStr(
-        const char *const SIXTRL_RESTRICT config_str )
-    {
-        this->doParseConfigStrBaseImpl( config_str );
     }
 
     ContextBase::status_t ContextBase::doSend(
@@ -353,7 +315,8 @@ namespace SIXTRL_CXX_NAMESPACE
         return ContextBase::status_t{ -1 };
     }
 
-    ContextBase::success_flag_t ContextBase::doGetSuccessFlagValueFromArg() const
+    ContextBase::success_flag_t
+    ContextBase::doGetSuccessFlagValueFromArg() const
     {
         using  success_flag_t = ContextBase::success_flag_t;
         return success_flag_t{ 0 };
@@ -363,26 +326,6 @@ namespace SIXTRL_CXX_NAMESPACE
         ContextBase::success_flag_t const success_flag )
     {
         return;
-    }
-
-    void ContextBase::doSetTypeId(
-        ContextBase::type_id_t const type_id ) SIXTRL_NOEXCEPT
-    {
-        this->m_type_id = type_id;
-    }
-
-    void ContextBase::doSetTypeIdStr(
-        const char *const SIXTRL_RESTRICT type_id_str ) SIXTRL_NOEXCEPT
-    {
-        if( ( type_id_str != nullptr ) &&
-            ( std::strlen( type_id_str ) > std::size_t{ 0 } ) )
-        {
-            this->m_type_id_str = std::string{ type_id_str };
-        }
-        else
-        {
-            this->m_type_id_str.clear();
-        }
     }
 
     void ContextBase::doSetUsesNodesFlag( bool const flag ) SIXTRL_NOEXCEPT
@@ -418,21 +361,6 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_ptr_success_flag_arg = std::move( ptr_stored_arg );
     }
 
-    void ContextBase::doParseConfigStrBaseImpl(
-            const char *const SIXTRL_RESTRICT config_str )
-    {
-        if( ( config_str != nullptr ) &&
-            ( std::strlen( config_str ) > std::size_t{ 0 } ) )
-        {
-            this->m_config_str = std::string{ config_str };
-        }
-        else if( !this->m_config_str.empty() )
-        {
-            this->m_config_str.clear();
-        }
-
-        return;
-    }
 }
 
 #endif /* C++, host */

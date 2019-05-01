@@ -23,36 +23,45 @@ void NS(Context_clear)( ::NS(ContextBase)* SIXTRL_RESTRICT ctx )
     return;
 }
 
-::NS(context_type_id_t) NS(Context_get_type_id)(
-    ::NS(ContextBase)* SIXTRL_RESTRICT ctx )
+::NS(arch_id_t) NS(Context_get_arch_id)(
+    const ::NS(ContextBase) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->type()
-        : SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_INVALID;
+    return ( ctx != nullptr )
+        ? ctx->archId() : SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_INVALID;
 }
 
-char const* NS(Context_get_type_str)( ::NS(ContextBase)* SIXTRL_RESTRICT ctx )
+bool NS(Context_has_arch_string)(
+    const ::NS(ContextBase) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->ptrTypeStr() : nullptr;
+    return ( ( ctx != nullptr ) && ( ctx->hasArchStr() ) );
+}
+
+char const* NS(Context_get_arch_string)(
+    const ::NS(ContextBase) *const SIXTRL_RESTRICT ctx )
+{
+    return ( ctx != nullptr ) ? ctx->ptrArchStr() : nullptr;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-bool NS(Context_has_config_str)( ::NS(ContextBase)* SIXTRL_RESTRICT ctx )
+bool NS(Context_has_config_string)(
+    const ::NS(ContextBase) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr ) ? ctx->hasConfigStr() : false;
 }
 
-char const* NS(Context_get_config_str)(
-    ::NS(ContextBase)* SIXTRL_RESTRICT ctx )
+char const* NS(Context_get_config_string)(
+    const ::NS(ContextBase) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr ) ? ctx->ptrConfigStr() : nullptr;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-bool NS(Context_uses_nodes)( ::NS(ContextBase)* SIXTRL_RESTRICT ctx )
+bool NS(Context_uses_nodes)(
+    const ::NS(ContextBase) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->usesNodes() : false;
+    return ( ( ctx != nullptr ) && ( ctx->usesNodes() ) );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

@@ -29,24 +29,27 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Context_clear)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_type_id_t) NS(Context_get_type_id)(
-    NS(ContextBase)* SIXTRL_RESTRICT ctx );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_id_t) NS(Context_get_arch_id)(
+    const NS(ContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(Context_get_type_str)(
-    NS(ContextBase)* SIXTRL_RESTRICT ctx );
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Context_has_arch_string)(
+    const NS(ContextBase) *const SIXTRL_RESTRICT ctx );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(Context_get_arch_string)(
+    const NS(ContextBase) *const SIXTRL_RESTRICT ctx );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Context_has_config_str)(
-    NS(ContextBase)* SIXTRL_RESTRICT ctx );
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Context_has_config_string)(
+    const NS(ContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(Context_get_config_str)(
-    NS(ContextBase)* SIXTRL_RESTRICT ctx );
+SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(Context_get_config_string)(
+    const NS(ContextBase) *const SIXTRL_RESTRICT ctx );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Context_uses_nodes)(
-    NS(ContextBase)* SIXTRL_RESTRICT ctx );
+    const NS(ContextBase) *const SIXTRL_RESTRICT ctx );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
