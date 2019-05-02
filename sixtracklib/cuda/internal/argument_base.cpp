@@ -13,11 +13,11 @@
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/buffer.h"
-#include "sixtracklib/common/context/definitions.h"
-#include "sixtracklib/common/context/argument_base.hpp"
-#include "sixtracklib/common/context/context_base.hpp"
+#include "sixtracklib/common/control/definitions.h"
+#include "sixtracklib/common/control/argument_base.hpp"
+#include "sixtracklib/common/control/controller_base.hpp"
 
-#include "sixtracklib/cuda/internal/context_base.hpp"
+#include "sixtracklib/cuda/internal/controller_base.hpp"
 #include "sixtracklib/cuda/wrappers/argument_operations.h"
 
 namespace SIXTRL_CXX_NAMESPACE

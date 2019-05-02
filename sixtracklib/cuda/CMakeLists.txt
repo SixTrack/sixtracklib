@@ -89,27 +89,29 @@ set(   SIXTRACKL_LINK_LIBRARIES
 set( SIXTRACKL_CUDA_C99_HEADERS
      definitions.h
      internal/argument_base.h
-     internal/context_base.h
+     internal/controller_base.h
      argument.h
-     context.h
+     controller.h
 )
 
 set( SIXTRACKL_CUDA_CXX_HEADERS
+     node_info.hpp
      internal/argument_base.hpp
-     internal/context_base.hpp
+     internal/controller_base.hpp
      argument.hpp
-     context.hpp
+     controller.hpp
 )
 
 set( SIXTRACKL_CUDA_CXX_SOURCES
+     internal/node_info.cpp
      internal/argument_base.cpp
      internal/argument_base_c99.cpp
      internal/argument.cpp
      internal/argument_c99.cpp
-     internal/context_base.cpp
-     internal/context_base_c99.cpp
-     internal/context.cpp
-     internal/context_c99.cpp
+     internal/controller_base.cpp
+     internal/controller_base_c99.cpp
+     internal/controller.cpp
+     internal/controller_c99.cpp
 )
 
 

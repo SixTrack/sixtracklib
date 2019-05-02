@@ -13,14 +13,14 @@
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/buffer.h"
-#include "sixtracklib/common/context/definitions.h"
-#include "sixtracklib/common/context/argument_base.hpp"
-#include "sixtracklib/common/context/context_base.hpp"
+#include "sixtracklib/common/control/definitions.h"
+#include "sixtracklib/common/control/argument_base.hpp"
+#include "sixtracklib/common/control/controller_base.hpp"
 
 #include "sixtracklib/cuda/definitions.h"
-#include "sixtracklib/cuda/internal/context_base.hpp"
+#include "sixtracklib/cuda/internal/controller_base.hpp"
 #include "sixtracklib/cuda/internal/argument_base.hpp"
-#include "sixtracklib/cuda/context.hpp"
+#include "sixtracklib/cuda/controller.hpp"
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -144,33 +144,25 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    CudaArgument::ptr_cuda_context_t
+    CudaArgument::ptr_cuda_controller_t
     CudaArgument::cudaContext() SIXTRL_NOEXCEPT
     {
         using _this_t   = CudaArgument;
-        using ptr_ctx_t = _this_t::ptr_cuda_context_t;
+        using ptr_ctx_t = _this_t::ptr_cuda_controller_t;
 
         return const_cast< ptr_ctx_t >( static_cast< _this_t const& >(
             *this ).cudaContext() );
     }
 
-    CudaArgument::ptr_const_cuda_context_t
+    CudaArgument::ptr_const_cuda_controller_t
     CudaArgument::cudaContext() const SIXTRL_NOEXCEPT
     {
-        using ptr_ctx_t = CudaArgument::ptr_const_cuda_context_t;
-        ptr_ctx_t ptr_ctx = nullptr;
+        using cuda_controller_t = CudaArgument::base_controller_t;
 
-        if( ( this->ptrBaseContext() != nullptr ) &&
-            ( this->ptrBaseContext()->type() == this->type() ) )
-        {
-            /* WARNING: * This down-casting is potentially dangerous (ub!) as
-             * it relies on consistency of type() in both the argument and the
-             * context! */
-
-            ptr_ctx = static_cast< ptr_ctx_t >( this->ptrBaseContext() );
-        }
-
-        return ptr_ctx;
+        return ( this->ptrBaseController() != nullptr )
+            ? this->ptrBaseController->asDerivedController< cuda_controller_t >(
+                SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_CUDA )
+            : nullptr;
     }
 }
 
