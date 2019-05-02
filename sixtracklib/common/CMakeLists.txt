@@ -12,7 +12,7 @@ set( SIXTRACKLIB_COMMON_CXX_HEADERS )
 add_subdirectory( generated      )
 
 add_subdirectory( buffer         )
-add_subdirectory( context        )
+add_subdirectory( control        )
 add_subdirectory( internal       )
 add_subdirectory( be_beambeam    )
 add_subdirectory( be_drift       )
@@ -32,7 +32,7 @@ set(  SIXTRACKLIB_C99_HEADERS
       beam_elements.h
       buffer.h
       constants.h
-      context.h
+      controller.h
       definitions.h
       particles.h
       track.h
