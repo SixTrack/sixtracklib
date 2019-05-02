@@ -1191,7 +1191,8 @@ NS(BufferArrayObj_add)(
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
     SIXTRL_STATIC_VAR addr_t    const ZADDR = ( addr_t )0u;
 
-    ptr_array_t a = NS(BufferArrayObj_new)( buffer, max_nelem, capacity );
+    ptr_array_t a = NS(BufferArrayObj_new)(
+        buffer, max_nelem, capacity, base_type_id );
 
     if( a != SIXTRL_NULLPTR )
     {
