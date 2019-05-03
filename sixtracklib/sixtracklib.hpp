@@ -37,8 +37,8 @@
 #include "sixtracklib/cuda/internal/argument_base.hpp"
 #include "sixtracklib/cuda/argument.hpp"
 
-#include "sixtracklib/cuda/internal/context_base.hpp"
-#include "sixtracklib/cuda/context.hpp"
+#include "sixtracklib/cuda/internal/controller_base.hpp"
+#include "sixtracklib/cuda/controller.hpp"
 
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
 
