@@ -96,15 +96,15 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     bool NodeId::toString( char* SIXTRL_RESTRICT node_id_str,
-        NodeId::size_type const max_str_length ) const SIXTRL_NOEXCEPT
+        NodeId::size_type const node_id_str_capacity ) const SIXTRL_NOEXCEPT
     {
         bool success = false;
 
         if( ( node_id_str != nullptr ) &&
-            ( max_str_length > NodeId::size_type{ 0 } ) )
+            ( node_id_str_capacity > NodeId::size_type{ 0 } ) )
         {
-            std::memset( node_id_str, max_str_length,
-                         static_cast< int >( '\0' ) );
+            std::memset( node_id_str, static_cast< int >( '\0' ),
+                         node_id_str_capacity );
         }
 
         if( this->valid() )
@@ -114,7 +114,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             std::string const str( a2str.str() );
 
-            if( str.size() < max_str_length )
+            if( str.size() < node_id_str_capacity )
             {
                 std::copy( str.begin(), str.end(), node_id_str );
                 success = true;
@@ -151,7 +151,6 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 this->setPlatformId( temp_platform_id );
                 this->setDeviceId( temp_device_id );
-                this->setIndex( NodeId::UNDEFINED_INDEX );
                 success = true;
             }
         }

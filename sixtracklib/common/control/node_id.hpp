@@ -83,7 +83,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_FN std::string toString() const;
 
         SIXTRL_FN bool toString( char* SIXTRL_RESTRICT node_id_str,
-            size_type const max_str_length ) const SIXTRL_NOEXCEPT;
+            size_type const node_id_str_capacity ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN bool operator<(
             NodeId const& SIXTRL_RESTRICT_REF rhs ) const SIXTRL_NOEXCEPT;
