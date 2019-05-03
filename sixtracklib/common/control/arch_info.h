@@ -22,10 +22,24 @@ extern "C" {
 
 #if !defined( _GPUCODE )
 
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_ARGPTR_DEC NS(ArchInfo)*
+NS(ArchInfo_preset)(
+    SIXTRL_ARGPTR_DEC NS(ArchInfo)* SIXTRL_RESTRICT arch_info );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_ARGPTR_DEC NS(ArchInfo)*
+NS(ArchInfo_create)( void );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_ARGPTR_DEC NS(ArchInfo)* NS(ArchInfo_new)(
+    NS(arch_id_t) const arch_id, char const* SIXTRL_RESTRICT arch_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ArchInfo_delete)(
+    SIXTRL_ARGPTR_DEC NS(ArchInfo)* SIXTRL_RESTRICT arch_info );
+
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_id_t) NS(ArchInfo_get_arch_id)(
     SIXTRL_ARGPTR_DEC const NS(ArchInfo) *const SIXTRL_RESTRICT arch_info );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ArchInfo_has_arch_str)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ArchInfo_has_arch_string)(
     SIXTRL_ARGPTR_DEC const NS(ArchInfo) *const SIXTRL_RESTRICT arch_info );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(ArchInfo_get_arch_string)(
@@ -49,7 +63,10 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ArchInfo_is_identical_to_arch_id)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ArchInfo_reset)(
     SIXTRL_ARGPTR_DEC NS(ArchInfo)* SIXTRL_RESTRICT arch_info,
-    NS(arch_id_t) const arch_id, const char *const SIXTRL_RESTRICT arch_str );
+    NS(arch_id_t) const arch_id, char const* SIXTRL_RESTRICT arch_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ArchInfo_reset_to_initial_values)(
+    SIXTRL_ARGPTR_DEC NS(ArchInfo)* SIXTRL_RESTRICT arch_info );
 
 #endif /* !defined( _GPUCODE ) */
 

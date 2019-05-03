@@ -63,6 +63,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void reset( arch_id_t const arch_id,
             const char *const SIXTRL_RESTRICT arch_str = nullptr );
 
+        SIXTRL_HOST_FN void reset() SIXTRL_NOEXCEPT;
+
         protected:
 
         SIXTRL_HOST_FN void doSetArchId(
