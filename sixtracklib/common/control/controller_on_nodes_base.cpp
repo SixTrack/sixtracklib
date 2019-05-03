@@ -339,7 +339,8 @@ namespace SIXTRL_CXX_NAMESPACE
         else if( ( node_id_str != nullptr ) &&
                     ( max_str_length > size_t{ 0 } ) )
         {
-            std::memset( node_id_str, max_str_length, ( int )'\0' );
+            std::memset( node_id_str, static_cast< int >( '\0' ),
+                         max_str_length );
         }
 
         return success;
@@ -478,8 +479,8 @@ namespace SIXTRL_CXX_NAMESPACE
             auto info_str_end = info_str_begin;
             std::advance( info_str_end, chars_to_copy );
 
-            std::memset( nodes_info_str, nodes_info_str_capacity,
-                            ( int )'\0' );
+            std::memset( nodes_info_str, static_cast< int >( '\0' ),
+                         nodes_info_str_capacity );
 
             std::copy( info_str_begin, info_str_end, nodes_info_str );
         }
@@ -608,25 +609,64 @@ namespace SIXTRL_CXX_NAMESPACE
         using node_index_t = ControllerOnNodesBase::node_index_t;
         using node_id_t = ControllerOnNodesBase::node_id_t;
 
-        node_index_t new_index = NodeId::UNDEFINED_INDEX;
+        node_index_t new_index = node_id_t::UNDEFINED_INDEX;
 
         if( ( ptr_node_info_base.get() != nullptr ) &&
-            ( ptr_node_info_base->ptrNodeId() != nullptr ) &&
-            ( ptr_node_info_base->ptrNodeId()->valid() ) )
+            ( ptr_node_info_base->ptrNodeId() != nullptr ) )
         {
+            using platform_id_t = node_id_t::platform_id_t;
+            using device_id_t = node_id_t::device_id_t;
+
             node_id_t const* ptr_node_id = ptr_node_info_base->ptrNodeId();
+            bool const node_id_valid = ptr_node_id->valid();
 
-            SIXTRL_ASSERT( ptr_node_id != nullptr );
-            SIXTRL_ASSERT( ptr_node_id->valid() );
-            SIXTRL_ASSERT( this->doFindAvailableNodesIndex(
-                ptr_node_id->platformId(), ptr_node_id->deviceId() ) ==
-                    NodeId::UNDEFINED_INDEX );
+            platform_id_t platform_id = ptr_node_id->platformId();
+            device_id_t dev_id = ptr_node_id->deviceId();
 
-            new_index = this->numAvailableNodes();
-            ptr_node_info_base->setNodeIndex( new_index );
+            if( ( node_id_valid ) && ( node_id_t::UNDEFINED_INDEX ==
+                    this->doFindAvailableNodesIndex( platform_id, dev_id ) ) )
+            {
+                new_index = this->numAvailableNodes();
+            }
+            else if( !ptr_node_id->valid() )
+            {
+                if( ptr_node_info_base->hasPlatformName() )
+                {
+                    platform_id = this->doGetPlatformIdByPlatformName(
+                        ptr_node_info_base->platformName().c_str() );
 
-            this->m_available_nodes.push_back(
-                std::move( ptr_node_info_base ) );
+                    SIXTRL_ASSERT(
+                        ( platform_id == node_id_t::ILLEGAL_PLATFORM_ID ) ||
+                        ( platform_id == ptr_node_id->platformId() ) );
+
+                    if( platform_id != node_id_t::ILLEGAL_PLATFORM_ID )
+                    {
+                        dev_id = this->doGetNextDeviceIdForPlatform(
+                            platform_id );
+                    }
+                }
+
+                if( platform_id == node_id_t::ILLEGAL_PLATFORM_ID )
+                {
+                    platform_id = this->doGetNextPlatformId();
+                    dev_id = device_id_t{ 0 };
+                }
+
+                if( ( platform_id != node_id_t::ILLEGAL_PLATFORM_ID ) &&
+                    ( dev_id != node_id_t::ILLEGAL_DEVICE_ID ) )
+                {
+                    ptr_node_info_base->setPlatformId( platform_id );
+                    ptr_node_info_base->setDeviceId( dev_id );
+                    new_index = this->numAvailableNodes();
+                }
+            }
+
+            if( new_index != node_id_t::UNDEFINED_INDEX )
+            {
+                ptr_node_info_base->setNodeIndex( new_index );
+                this->m_available_nodes.push_back(
+                    std::move( ptr_node_info_base ) );
+            }
         }
 
         return new_index;
@@ -674,6 +714,117 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return;
+    }
+
+    ControllerOnNodesBase::platform_id_t
+    ControllerOnNodesBase::doGetNextPlatformId() const SIXTRL_NOEXCEPT
+    {
+        using node_info_base_t = ControllerOnNodesBase::node_info_base_t;
+        using platform_id_t = ControllerOnNodesBase::platform_id_t;
+        using node_index_t = ControllerOnNodesBase::node_index_t;
+
+        platform_id_t next_platform_id = platform_id_t{ 0 };
+        node_index_t const num_avail_nodes = this->numAvailableNodes();
+
+        if( num_avail_nodes > node_index_t{ 0 } )
+        {
+            node_index_t ii = node_index_t{ 0 };
+
+            for( ; ii < num_avail_nodes ; ++ii )
+            {
+                node_info_base_t const* nodeinfo = this->ptrNodeInfoBase( ii );
+
+                if( ( nodeinfo != nullptr ) &&
+                    ( nodeinfo->ptrNodeId() != nullptr ) &&
+                    ( nodeinfo->ptrNodeId()->valid() ) &&
+                    ( nodeinfo->platformId() >= next_platform_id ) )
+                {
+                    next_platform_id = nodeinfo->platformId();
+                    ++next_platform_id;
+                }
+            }
+        }
+
+        return next_platform_id;
+    }
+
+    ControllerOnNodesBase::device_id_t
+    ControllerOnNodesBase::doGetNextDeviceIdForPlatform(
+        ControllerOnNodesBase::platform_id_t const platform_id
+        ) const SIXTRL_NOEXCEPT
+    {
+        using node_info_base_t = ControllerOnNodesBase::node_info_base_t;
+        using node_index_t = ControllerOnNodesBase::node_index_t;
+        using device_id_t = ControllerOnNodesBase::device_id_t;
+        using node_id_t = ControllerOnNodesBase::node_id_t;
+
+        device_id_t next_device_id = node_id_t::ILLEGAL_DEVICE_ID;
+
+        node_index_t const num_avail_nodes = this->numAvailableNodes();
+
+        if( num_avail_nodes > node_index_t{ 0 } )
+        {
+            node_index_t ii  = node_index_t{ 0 };
+
+            for( ; ii < num_avail_nodes ; ++ii )
+            {
+                node_info_base_t const* nodeinfo = this->ptrNodeInfoBase( ii );
+
+                if( ( nodeinfo != nullptr ) &&
+                    ( nodeinfo->ptrNodeId() != nullptr ) &&
+                    ( nodeinfo->ptrNodeId()->valid() ) &&
+                    ( nodeinfo->platformId() == platform_id ) )
+                {
+                    if( ( next_device_id == node_id_t::ILLEGAL_DEVICE_ID ) ||
+                        ( next_device_id <= nodeinfo->deviceId() ) )
+                    {
+                        next_device_id = nodeinfo->deviceId();
+                        ++next_device_id;
+                    }
+                }
+            }
+        }
+
+        return next_device_id;
+    }
+
+    ControllerOnNodesBase::platform_id_t
+    ControllerOnNodesBase::doGetPlatformIdByPlatformName(
+        char const* SIXTRL_RESTRICT platform_name ) const SIXTRL_NOEXCEPT
+    {
+        using node_info_base_t = ControllerOnNodesBase::node_info_base_t;
+        using platform_id_t = ControllerOnNodesBase::platform_id_t;
+        using node_index_t = ControllerOnNodesBase::node_index_t;
+        using node_id_t = ControllerOnNodesBase::node_id_t;
+
+        platform_id_t platform_id = node_id_t::ILLEGAL_PLATFORM_ID;
+
+        node_index_t const num_avail_nodes = this->numAvailableNodes();
+
+        if( ( num_avail_nodes > node_index_t{ 0 } ) &&
+            ( platform_name != nullptr ) &&
+            ( std::strlen( platform_name ) > std::size_t{ 0 } ) )
+        {
+            node_index_t ii = node_index_t{ 0 };
+
+            for( ; ii < num_avail_nodes ; ++ii )
+            {
+                node_info_base_t const* nodeinfo = this->ptrNodeInfoBase( ii );
+
+                if( ( nodeinfo != nullptr ) &&
+                    ( nodeinfo->ptrNodeId() != nullptr ) &&
+                    ( nodeinfo->ptrNodeId()->valid() ) &&
+                    ( nodeinfo->hasPlatformName() ) &&
+                    ( 0 == nodeinfo->platformName().compare(
+                        platform_name ) ) )
+                {
+                    platform_id = nodeinfo->platformId();
+                    break;
+                }
+            }
+        }
+
+        return platform_id;
     }
 
     void ControllerOnNodesBase::doClearOnNodesBaseImpl() SIXTRL_NOEXCEPT

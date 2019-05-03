@@ -222,6 +222,15 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doSetDefaultNodeIndex(
             node_index_t const node_index ) SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN platform_id_t doGetNextPlatformId(
+            ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN device_id_t doGetNextDeviceIdForPlatform(
+            platform_id_t const platform_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN platform_id_t doGetPlatformIdByPlatformName(
+            char const* SIXTRL_RESTRICT platform_name ) const SIXTRL_NOEXCEPT;
+
         private:
 
         SIXTRL_HOST_FN void doClearOnNodesBaseImpl() SIXTRL_NOEXCEPT;
