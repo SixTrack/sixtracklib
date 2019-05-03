@@ -18,18 +18,18 @@
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
-#include "sixtracklib/common/context/definitions.h"
-#include "sixtracklib/cuda/context.h"
+#include "sixtracklib/common/control/definitions.h"
+#include "sixtracklib/cuda/controller.h"
 
 TEST( C99_CudaArgumentTests, ArgumentCObjectBufferTest )
 {
-    using argument_t  = ::NS(CudaArgument);
-    using context_t   = ::NS(CudaContext);
-    using particles_t = ::NS(Particles);
-    using buffer_t    = ::NS(Buffer);
-    using buf_size_t  = ::NS(buffer_size_t);
-    using ctx_size_t  = ::NS(context_size_t);
-    using status_t    = ::NS(context_status_t);
+    using argument_t   = ::NS(CudaArgument);
+    using controller_t = ::NS(CudaController);
+    using particles_t  = ::NS(Particles);
+    using buffer_t     = ::NS(Buffer);
+    using buf_size_t   = ::NS(buffer_size_t);
+    using ctrl_size_t  = ::NS(controller_size_t);
+    using status_t     = ::NS(controller_status_t);
 
     buf_size_t const NUM_PARTICLES = 1000;
     buffer_t* pb = ::NS(Buffer_new)( 0u );
@@ -46,17 +46,17 @@ TEST( C99_CudaArgumentTests, ArgumentCObjectBufferTest )
     SIXTRL_ASSERT( ::NS(Particles_compare_values)(
         particles, cmp_particles ) == 0 );
 
-    context_t*  context = ::NS(CudaContext_create)();
-    ASSERT_TRUE( context != nullptr );
+    controller_t* controller = ::NS(CudaController_create)();
+    ASSERT_TRUE( controller != nullptr );
 
-    argument_t* particles_arg = ::NS(CudaArgument_new)( context );
+    argument_t* particles_arg = ::NS(CudaArgument_new)( controller );
     ASSERT_TRUE( particles_arg != nullptr );
 
     status_t success = ::NS(CudaArgument_send_buffer)( particles_arg, pb );
-    ASSERT_TRUE( success == ::NS(CONTEXT_STATUS_SUCCESS) );
+    ASSERT_TRUE( success == ::NS(CONTROLLER_STATUS_SUCCESS) );
 
     success = ::NS(CudaArgument_receive_buffer)( particles_arg, pb );
-    ASSERT_TRUE( success == ::NS(CONTEXT_STATUS_SUCCESS) );
+    ASSERT_TRUE( success == ::NS(CONTROLLER_STATUS_SUCCESS) );
 
     particles = ::NS(Particles_buffer_get_particles)( pb, 00 );
     ASSERT_TRUE( particles != nullptr );
@@ -65,17 +65,17 @@ TEST( C99_CudaArgumentTests, ArgumentCObjectBufferTest )
         particles, cmp_particles ) == 0 );
 
     ::NS(CudaArgument_delete)( particles_arg );
-    ::NS(CudaContext_delete)( context );
+    ::NS(CudaController_delete)( controller );
     ::NS(Buffer_delete)( pb );
     ::NS(Buffer_delete)( cmp_pb );
 
     cmp_particles = nullptr;
     particles = nullptr;
 
-    context = nullptr;
+    controller = nullptr;
     particles_arg = nullptr;
     cmp_pb = nullptr;
     pb = nullptr;
 }
 
-/* end: tests/sixtracklib/cuda/test_context_cxx.cpp */
+/* end: tests/sixtracklib/cuda/test_controller_cxx.cpp */

@@ -25,26 +25,26 @@ if( GTEST_FOUND )
     endif()
 
     # ==========================================================================
-    # test_context_cuda_c99
+    # test_controller_cuda_c99
 
-    add_executable( test_context_cuda_c99 test_context_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_context_cuda_c99 )
+    add_executable( test_controller_cuda_c99 test_controller_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_controller_cuda_c99 )
 
-    target_link_libraries( test_context_cuda_c99
+    target_link_libraries( test_controller_cuda_c99
         PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
 
-    add_test( C99_CudaContextTests test_context_cuda_c99 )
+    add_test( C99_CudaControllerTests test_controller_cuda_c99 )
 
     # --------------------------------------------------------------------------
-    # test_context_cuda_cxx
+    # test_controller_cuda_cxx
 
-    add_executable( test_context_cuda_cxx test_context_cxx.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_context_cuda_cxx )
+    add_executable( test_controller_cuda_cxx test_controller_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_controller_cuda_cxx )
 
-    target_link_libraries( test_context_cuda_cxx
+    target_link_libraries( test_controller_cuda_cxx
         PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
 
-    add_test( CXX_CudaContextTests test_context_cuda_cxx )
+    add_test( CXX_CudaControllerTests test_controller_cuda_cxx )
 
     # ==========================================================================
     # test_argument_cuda_c99
