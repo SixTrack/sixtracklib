@@ -8,21 +8,21 @@
 #include <cuda_runtime.h>
 
 #include "sixtracklib/common/definitions.h"
-#include "sixtracklib/common/context/definitions.h"
+#include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/buffer.h"
 
 #include "sixtracklib/cuda/kernels/managed_buffer_remap.cuh"
 
 
-NS(context_status_t) NS(CudaContext_perform_send)(
+NS(controller_status_t) NS(CudaContext_perform_send)(
     void* SIXTRL_RESTRICT destination,
     const void *const SIXTRL_RESTRICT source_begin,
-    NS(context_size_t) const source_length )
+    NS(controller_size_t) const source_length )
 {
-    typedef NS(context_status_t) status_t;
-    typedef NS(context_size_t)   ctx_size_t;
+    typedef NS(controller_status_t) status_t;
+    typedef NS(controller_size_t)   ctx_size_t;
 
-    status_t status = NS(CONTEXT_STATUS_GENERAL_FAILURE);
+    status_t status = NS(CONTROLLER_STATUS_GENERAL_FAILURE);
 
     if( ( destination != SIXTRL_NULLPTR ) &&
         ( source_begin != SIXTRL_NULLPTR ) &&
@@ -33,23 +33,23 @@ NS(context_status_t) NS(CudaContext_perform_send)(
 
         if( ret == cudaSuccess )
         {
-            status = NS(CONTEXT_STATUS_SUCCESS);
+            status = NS(CONTROLLER_STATUS_SUCCESS);
         }
     }
 
     return status;
 }
 
-NS(context_status_t) NS(CudaContext_perform_receive)(
+NS(controller_status_t) NS(CudaContext_perform_receive)(
     void* SIXTRL_RESTRICT destination,
-    NS(context_size_t) const destination_capacity,
+    NS(controller_size_t) const destination_capacity,
     void* SIXTRL_RESTRICT source_begin,
-    NS(context_size_t) const source_length )
+    NS(controller_size_t) const source_length )
 {
-    typedef NS(context_status_t) status_t;
-    typedef NS(context_size_t)   ctx_size_t;
+    typedef NS(controller_status_t) status_t;
+    typedef NS(controller_size_t)   ctx_size_t;
 
-    status_t status = NS(CONTEXT_STATUS_GENERAL_FAILURE);
+    status_t status = NS(CONTROLLER_STATUS_GENERAL_FAILURE);
 
     if( ( source_begin  != SIXTRL_NULLPTR ) &&
         ( source_length > ( ctx_size_t )0u ) &&
@@ -61,24 +61,25 @@ NS(context_status_t) NS(CudaContext_perform_receive)(
 
         if( ret == cudaSuccess )
         {
-            status = NS(CONTEXT_STATUS_SUCCESS);
+            status = NS(CONTROLLER_STATUS_SUCCESS);
         }
     }
 
     return status;
 }
 
-NS(context_status_t) NS(CudaContext_perform_remap_send_cobject_buffer_on_grid)(
+NS(controller_status_t)
+NS(CudaContext_perform_remap_send_cobject_buffer_on_grid)(
     void* SIXTRL_RESTRICT arg_buffer,
-    NS(context_size_t) const slot_size,
-    NS(context_size_t) const grid_num_blocks,
-    NS(context_size_t) const threads_per_block )
+    NS(controller_size_t) const slot_size,
+    NS(controller_size_t) const grid_num_blocks,
+    NS(controller_size_t) const threads_per_block )
 {
-    typedef NS(context_status_t) status_t;
-    typedef NS(context_size_t)   ctx_size_t;
+    typedef NS(controller_status_t) status_t;
+    typedef NS(controller_size_t)   ctx_size_t;
     typedef NS(buffer_size_t)    buf_size_t;
 
-    status_t status = NS(CONTEXT_STATUS_GENERAL_FAILURE);
+    status_t status = NS(CONTROLLER_STATUS_GENERAL_FAILURE);
 
     if( ( arg_buffer != SIXTRL_NULLPTR ) && ( slot_size > ( buf_size_t )0u ) )
     {
@@ -96,13 +97,13 @@ NS(context_status_t) NS(CudaContext_perform_remap_send_cobject_buffer_on_grid)(
         NS(ManagedBuffer_remap_cuda)<<< grid_dim, block_dim >>>(
             ( unsigned char* )arg_buffer, slot_size );
 
-        status = ::NS(CONTEXT_STATUS_SUCCESS);
+        status = ::NS(CONTROLLER_STATUS_SUCCESS);
     }
 
     return status;
 }
 
-NS(context_status_t) NS(CudaContext_perform_remap_send_cobject_buffer)(
+NS(controller_status_t) NS(CudaContext_perform_remap_send_cobject_buffer)(
     void* SIXTRL_RESTRICT arg_buffer,
     NS(buffer_size_t) const slot_size )
 {

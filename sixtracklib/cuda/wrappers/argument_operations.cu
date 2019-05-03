@@ -4,15 +4,15 @@
 #include <cuda_runtime.h>
 
 #include "sixtracklib/common/definitions.h"
-#include "sixtracklib/common/context/definitions.h"
+#include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/cuda/definitions.h"
 
 NS(cuda_arg_buffer_t) NS(CudaArgument_alloc_arg_buffer)(
-    NS(context_size_t) const capacity )
+    NS(controller_size_t) const capacity )
 {
     NS(cuda_arg_buffer_t) arg_buffer = SIXTRL_NULLPTR;
 
-    if( capacity > ( NS(context_size_t) )0u )
+    if( capacity > ( NS(controller_size_t) )0u )
     {
         cudaError_t const ret = cudaMalloc( ( void** )&arg_buffer, capacity );
 

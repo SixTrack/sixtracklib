@@ -16,7 +16,7 @@
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/cuda/kernels/track_particles.cuh"
 
-NS(context_status_t) NS(Track_particles_line_cuda_on_grid)(
+NS(controller_status_t) NS(Track_particles_line_cuda_on_grid)(
     void* SIXTRL_RESTRICT particles_buffer_arg,
     void* SIXTRL_RESTRICT beam_elements_buffer_arg,
     NS(buffer_size_t) const line_begin_idx,
@@ -25,7 +25,7 @@ NS(context_status_t) NS(Track_particles_line_cuda_on_grid)(
     NS(buffer_size_t) const num_blocks,
     NS(buffer_size_t) const num_threads_per_block )
 {
-    NS(context_status_t) status = -1;
+    NS(controller_status_t) status = NS(CONTROLLER_STATUS_GENERAL_FAILURE);
 
     dim3 grid_dim;
     dim3 block_dim;
@@ -38,7 +38,7 @@ NS(context_status_t) NS(Track_particles_line_cuda_on_grid)(
     block_dim.y = 1;
     block_dim.z = 1;
 
-    status = ( NS(context_status_t) )0u;
+    status = NS(CONTROLLER_STATUS_SUCCESS);
 
     NS(Track_particles_line)<<< grid_dim, block_dim >>>(
         reinterpret_cast< unsigned char* >( particles_buffer_arg ),
@@ -48,7 +48,7 @@ NS(context_status_t) NS(Track_particles_line_cuda_on_grid)(
     return status;
 }
 
-NS(context_status_t) NS(Track_particles_line_cuda)(
+NS(controller_status_t) NS(Track_particles_line_cuda)(
     void* SIXTRL_RESTRICT particles_buffer_arg,
     void* SIXTRL_RESTRICT beam_elements_buffer_arg,
     NS(buffer_size_t) const line_begin_idx,
