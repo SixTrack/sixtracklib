@@ -8,6 +8,8 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/common/controller.h"
     #include "sixtracklib/cuda/definitions.h"
     #include "sixtracklib/cuda/controller.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
