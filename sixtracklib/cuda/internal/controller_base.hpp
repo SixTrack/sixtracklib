@@ -55,20 +55,20 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ---------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN node_info_t const* ptrNodesInfo(
+        SIXTRL_HOST_FN node_info_t const* ptrNodeInfo(
             size_type const index ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_info_t const* ptrNodesInfo(
+        SIXTRL_HOST_FN node_info_t const* ptrNodeInfo(
             platform_id_t const platform_idx,
             device_id_t const device_idx ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_info_t const* ptrNodesInfo(
+        SIXTRL_HOST_FN node_info_t const* ptrNodeInfo(
             node_id_t const& node_id ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_info_t const* ptrNodesInfo(
+        SIXTRL_HOST_FN node_info_t const* ptrNodeInfo(
             char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN node_info_t const* ptrNodesInfo(
+        SIXTRL_HOST_FN node_info_t const* ptrNodeInfo(
             std::string const& SIXTRL_RESTRICT_REF node_id_str
             ) const SIXTRL_NOEXCEPT;
 
@@ -118,6 +118,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual bool
             doSelectNode( node_index_t const node_index ) override;
+
+        SIXTRL_HOST_FN node_index_t doFindAvailableNodesByCudaDeviceIndex(
+            cuda_device_index_t const cuda_device_index ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN node_index_t doFindAvailableNodesByPciBusId(
+            char const* SIXTRL_RESTRICT pci_bus_id_str ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool doInitAllCudaNodes();
     };

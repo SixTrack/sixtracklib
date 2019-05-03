@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <string>
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/control/definitions.h"
@@ -17,7 +18,7 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    CudaControllerBase::node_info_t const* CudaControllerBase::ptrNodesInfo(
+    CudaControllerBase::node_info_t const* CudaControllerBase::ptrNodeInfo(
         CudaControllerBase::size_type const index ) const SIXTRL_NOEXCEPT
     {
         using node_info_t = CudaControllerBase::node_info_t;
@@ -29,34 +30,57 @@ namespace SIXTRL_CXX_NAMESPACE
             : nullptr;
     }
 
-    CudaControllerBase::node_info_t const* CudaControllerBase::ptrNodesInfo(
+    CudaControllerBase::node_info_t const* CudaControllerBase::ptrNodeInfo(
         CudaControllerBase::platform_id_t const platform_idx,
         CudaControllerBase::device_id_t const device_idx ) const SIXTRL_NOEXCEPT
     {
-        return this->ptrNodesInfo( this->doFindAvailableNodesIndex(
+        return this->ptrNodeInfo( this->doFindAvailableNodesIndex(
             platform_idx, device_idx ) );
     }
 
-    CudaControllerBase::node_info_t const* CudaControllerBase::ptrNodesInfo(
+    CudaControllerBase::node_info_t const* CudaControllerBase::ptrNodeInfo(
         CudaControllerBase::node_id_t const& node_id ) const SIXTRL_NOEXCEPT
     {
-        return this->ptrNodesInfo( this->doFindAvailableNodesIndex(
+        return this->ptrNodeInfo( this->doFindAvailableNodesIndex(
             node_id.platformId(), node_id.deviceId() ) );
     }
 
-    CudaControllerBase::node_info_t const* CudaControllerBase::ptrNodesInfo(
+    CudaControllerBase::node_info_t const* CudaControllerBase::ptrNodeInfo(
         char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT
     {
-        return this->ptrNodesInfo( this->doFindAvailableNodesIndex(
+        return this->ptrNodeInfo( this->doFindAvailableNodesIndex(
             node_id_str ) );
     }
 
-    CudaControllerBase::node_info_t const* CudaControllerBase::ptrNodesInfo(
+    CudaControllerBase::node_info_t const* CudaControllerBase::ptrNodeInfo(
         std::string const& SIXTRL_RESTRICT_REF
             node_id_str ) const SIXTRL_NOEXCEPT
     {
-        return this->ptrNodesInfo( this->doFindAvailableNodesIndex(
+        return this->ptrNodeInfo( this->doFindAvailableNodesIndex(
             node_id_str.c_str() ) );
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    bool CudaControllerBase::selectNodeByCudaIndex(
+        CudaControllerBase::cuda_device_index_t const cuda_device_index )
+    {
+        return this->doSelectNode(
+            this->doFindAvailableNodesByCudaDeviceIndex( cuda_device_index ) );
+    }
+
+    bool CudaControllerBase::selectNodeByPciBusId(
+        std::string const& SIXTRL_RESTRICT_REF pci_bus_id )
+    {
+        return this->doSelectNode(
+            this->doFindAvailableNodesByPciBusId( pci_bus_id.c_str() ) );
+    }
+
+    bool CudaControllerBase::selectNodeByPciBusId(
+        char const* SIXTRL_RESTRICT pci_bus_id )
+    {
+        return this->doSelectNode(
+            this->doFindAvailableNodesByPciBusId( pci_bus_id ) );
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -194,22 +218,20 @@ namespace SIXTRL_CXX_NAMESPACE
 
         bool success = false;
 
-        node_info_base_t* ptr_node_info_base =
-            this->doGetPtrNodeInfoBase( node_index );
+        node_info_base_t* node_base = this->doGetPtrNodeInfoBase( node_index );
 
-        if( ptr_node_info_base != nullptr )
+        node_info_t* ptr_node_info = ( node_base != nullptr )
+            ? node_base->asDerivedNodeInfo< node_info_t >(
+                SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA ) : nullptr;
+
+        if( ( ptr_node_info != nullptr ) &&
+            ( ptr_node_info->hasCudaDeviceIndex() ) )
         {
-            node_info_t* ptr_node_info = ptr_node_info_base->asDerivedNodeInfo<
-                SIXTRL_CXX_NAMESPACE::CudaNodeInfo >(
-                    SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA );
+            cuda_dev_index_t cuda_dev_index = ptr_node_info->cudaDeviceIndex();
 
-            if( ( ptr_node_info != nullptr ) &&
-                ( ptr_node_info->hasCudaDeviceIndex() ) )
+            if( cuda_dev_index != node_info_t::ILLEGAL_DEV_INDEX )
             {
-                cuda_dev_index_t cuda_dev_index =
-                    ptr_node_info->cudaDeviceIndex();
-
-                ::cudaError_t err = ::cudaSetDevice( cuda_dev_index );
+                ::cudaError_t const err = ::cudaSetDevice( cuda_dev_index );
 
                 if( err == ::cudaSuccess )
                 {
@@ -217,6 +239,92 @@ namespace SIXTRL_CXX_NAMESPACE
                 }
             }
         }
+
+        return success;
+    }
+
+    CudaControllerBase::node_index_t
+    CudaControllerBase::doFindAvailableNodesByCudaDeviceIndex(
+        CudaControllerBase::cuda_device_index_t const idx ) const SIXTRL_NOEXCEPT
+    {
+        using _this_t          = SIXTRL_CXX_NAMESPACE::CudaControllerBase;
+        using node_id_t        = _this_t::node_id_t;
+        using node_info_base_t = _this_t::node_info_base_t;
+        using node_info_t      = _this_t::node_info_t;
+        using node_index_t     = _this_t::node_index_t;
+
+        node_index_t found_node_index = node_id_t::UNDEFINED_INDEX;
+        node_index_t const num_avail_nodes = this->numAvailableNodes();
+
+        if( ( num_avail_nodes > node_index_t{ 0 } ) &&
+            ( idx != node_info_t::ILLEGAL_DEV_INDEX ) )
+        {
+            node_index_t ii = node_index_t{ 0 };
+
+            for( ; ii < num_avail_nodes ; ++ii )
+            {
+                node_info_base_t const* ptr_base = this->ptrNodeInfoBase( ii );
+
+                node_info_t const* ptr_node_info = ( ptr_base != nullptr )
+                    ? ptr_base->asDerivedNodeInfo< node_info_t >(
+                        SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA ) : nullptr;
+
+                if( ( ptr_node_info != nullptr ) &&
+                    ( ptr_node_info->hasCudaDeviceIndex() ) &&
+                    ( ptr_node_info->cudaDeviceIndex() == idx ) )
+                {
+                    SIXTRL_ASSERT( ( !ptr_node_info->hasNodeIndex() ) ||
+                        ( ptr_node_info->nodeIndex() == ii ) );
+
+                    found_node_index = ii;
+                    break;
+                }
+            }
+        }
+
+        return found_node_index;
+    }
+
+    CudaControllerBase::node_index_t
+    CudaControllerBase::doFindAvailableNodesByPciBusId(
+        char const* SIXTRL_RESTRICT pci_bus_id_str ) const SIXTRL_NOEXCEPT
+    {
+        using _this_t          = SIXTRL_CXX_NAMESPACE::CudaControllerBase;
+        using node_id_t        = _this_t::node_id_t;
+        using node_info_base_t = _this_t::node_info_base_t;
+        using node_info_t      = _this_t::node_info_t;
+        using node_index_t     = _this_t::node_index_t;
+
+        node_index_t found_node_index = node_id_t::UNDEFINED_INDEX;
+        node_index_t const num_avail_nodes = this->numAvailableNodes();
+
+        if( ( num_avail_nodes > node_index_t{ 0 } ) &&
+            ( pci_bus_id_str != nullptr ) &&
+            ( std::strlen( pci_bus_id_str ) > std::size_t{ 0 } ) )
+        {
+            node_index_t ii = node_index_t{ 0 };
+
+            for( ; ii < num_avail_nodes ; ++ii )
+            {
+                node_info_base_t const* ptr_base = this->ptrNodeInfoBase( ii );
+
+                node_info_t const* nodeinfo = ( ptr_base != nullptr )
+                    ? ptr_base->asDerivedNodeInfo< node_info_t >(
+                        SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA ) : nullptr;
+
+                if( ( nodeinfo != nullptr ) && ( nodeinfo->hasPciBusId() ) &&
+                    ( nodeinfo->pciBusId().compare( pci_bus_id_str ) == 0 ) )
+                {
+                    SIXTRL_ASSERT( ( !nodeinfo->hasNodeIndex() ) ||
+                                   (  nodeinfo->nodeIndex() == ii ) );
+
+                    found_node_index = ii;
+                    break;
+                }
+            }
+        }
+
+        return found_node_index;
     }
 
     bool CudaControllerBase::doInitAllCudaNodes()
@@ -224,45 +332,79 @@ namespace SIXTRL_CXX_NAMESPACE
         bool success = false;
 
         using _this_t = CudaControllerBase;
-        using node_index_t = _this_t::node_index_t;
-        using node_info_t  = _this_t::node_info_t;
+        using node_index_t     = _this_t::node_index_t;
+        using node_info_base_t = _this_t::node_info_base_t;
+        using node_info_t      = _this_t::node_info_t;
 
-        if( this->numAvailableNodes() == node_index_t{ 0 } )
+        node_index_t const initial_num_avail_nodes = this->numAvailableNodes();
+
+        bool first = true;
+
+        int num_devices = int{ -1 };
+        ::cudaError_t err = ::cudaGetDeviceCount( &num_devices );
+
+        if( ( err == ::cudaSuccess ) && ( num_devices > int{ 0 } ) )
         {
-            bool first = true;
-
-            int num_devices = int{ 0 };
-            ::cudaError_t err = ::cudaGetDeviceCount( &num_devices );
-
-            if( err == ::cudaSuccess )
+            for( int cu_idx = int{ 0 } ; cu_idx < num_devices ; ++cu_idx )
             {
-                for( int cu_idx = int{ 0 } ; cu_idx < num_devices ; ++cu_idx )
+                ::cudaDeviceProp cu_properties;
+                err = ::cudaGetDeviceProperties( &cu_properties, cu_idx );
+
+                if( err != ::cudaSuccess )
                 {
-                    ::cudaDeviceProp cu_properties;
-                    err = ::cudaGetDeviceProperties( &cu_properties, cu_idx );
-
-                    if( err != ::cudaSuccess )
-                    {
-                        continue;
-                    }
-
-                    std::unique_ptr< node_info_t > ptr_node_info(
-                        new node_info_t( cu_idx, cu_properties ) );
-
-                    node_index_t const node_index =
-                        this->doAppendAvailableNodeInfoBase( std::move(
-                            ptr_node_info ) );
-
-                    if( ( node_index != _this_t::UNDEFINED_INDEX ) &&
-                        ( first ) )
-                    {
-                        this->doSetDefaultNodeIndex( node_index );
-                        first = false;
-                    }
+                    continue;
                 }
 
-                success = ( this->numAvailableNodes() > node_index_t{ 0 } );
+                std::unique_ptr< node_info_t > ptr_node_info(
+                    new node_info_t( cu_idx, cu_properties ) );
+
+                if( ptr_node_info.get() == nullptr )
+                {
+                    continue;
+                }
+
+                SIXTRL_ASSERT( ptr_node_info->platformId() ==
+                    _this_t::node_id_t::ILLEGAL_PLATFORM_ID );
+
+                SIXTRL_ASSERT( ptr_node_info->deviceId() ==
+                    _this_t::node_id_t::ILLEGAL_DEVICE_ID );
+
+                /* Check if this node is already present -> use first the
+                 * cuda device index and then the the PCI Bus ID for
+                 * eliminating duplicates
+                 *
+                 * WARNING: This searches linearily (!) over all existing
+                 * nodes. If the number of nodes gets high, this can impose
+                 * some performance problems -> replace with a hash-table
+                 * or something O(log(N)) / O(1) in such a case */
+
+                if( _this_t::node_id_t::UNDEFINED_INDEX !=
+                    this->doFindAvailableNodesByCudaDeviceIndex( cu_idx ) )
+                {
+                    continue;
+                }
+
+                if( ( ptr_node_info->hasPciBusId() ) &&
+                    ( _this_t::node_id_t::UNDEFINED_INDEX !=
+                        this->doFindAvailableNodesByPciBusId(
+                          ptr_node_info->pciBusId().c_str() ) ) )
+                {
+                    continue;
+                }
+
+                ptr_node_info->setCudaDeviceIndex( cu_idx );
+
+                node_index_t node_index = this->doAppendAvailableNodeInfoBase(
+                    std::move( ptr_node_info ) );
+
+                if( ( node_index != _this_t::UNDEFINED_INDEX ) && ( first ) )
+                {
+                    this->doSetDefaultNodeIndex( node_index );
+                    first = false;
+                }
             }
+
+            success = ( this->numAvailableNodes() > initial_num_avail_nodes );
         }
 
         return success;
