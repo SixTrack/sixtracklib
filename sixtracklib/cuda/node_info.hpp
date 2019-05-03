@@ -62,6 +62,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual ~CudaNodeInfo() = default;
 
+        SIXTRL_HOST_FN bool hasPciBusId() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN std::string const& pciBusId() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN char const* ptrPciBusIdStr() const SIXTRL_NOEXCEPT;
 

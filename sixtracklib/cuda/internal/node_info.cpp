@@ -73,7 +73,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( err == ::cudaSuccess )
             {
-                a2str << ":: Driver version " << cuda_driver_version / 1000
+                a2str << " :: Driver v" << cuda_driver_version / 1000
                       << "." << ( cuda_driver_version % 1000 ) / 10;
             }
 
@@ -81,16 +81,19 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( err == ::cudaSuccess )
             {
-                a2str << ":: Runtime version " << cuda_runtime_version / 1000
+                a2str << " :: Runtime v" << cuda_runtime_version / 1000
                       << "." << ( cuda_runtime_version % 1000 ) / 10;
             }
 
             this->setPlatformName( a2str.str() );
 
             a2str.str( "" );
-            a2str << "compute capability: "
+            a2str << "compute_capability="
                   << cuda_device_properties.major << "."
-                  << cuda_device_properties.minor;
+                  << cuda_device_properties.minor << "; "
+                  << "multiprocessor_count="
+                  << this->m_cu_device_properties.multiProcessorCount
+                  << ";";
 
             this->setDescription( a2str.str() );
 
@@ -112,8 +115,17 @@ namespace SIXTRL_CXX_NAMESPACE
                     a2str << " [" << pci_bus_id << "]";
                     this->m_cu_device_pci_bus_id = &pci_bus_id[ 0 ];
                 }
+
+                this->setDeviceName( a2str.str() );
             }
         }
+    }
+
+    bool CudaNodeInfo::hasPciBusId() const SIXTRL_NOEXCEPT
+    {
+        return ( ( !this->m_cu_device_pci_bus_id.empty() ) &&
+                 (  this->m_cu_device_pci_bus_id.compare(
+                     "0000:00:00.0" ) != 0 ) );
     }
 
     std::string const& CudaNodeInfo::pciBusId() const SIXTRL_NOEXCEPT
@@ -159,13 +171,8 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         SIXTRL_CXX_NAMESPACE::NodeInfoBase::doPrintToOutputStream( output );
 
-        output << "Cuda device index     : "
-               << this->m_cu_device_index << "\r\n"
-               << "Compute capability    : "
-               << this->m_cu_device_properties.major << "."
-               << this->m_cu_device_properties.minor << "\r\n"
-               << "Multiprocessor count  : "
-               << this->m_cu_device_properties.multiProcessorCount << "\r\n";
+        output << "cuda device index     : "
+               << this->m_cu_device_index << "\r\n";
     }
 }
 
