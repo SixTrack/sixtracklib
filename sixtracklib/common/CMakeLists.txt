@@ -13,6 +13,7 @@ add_subdirectory( generated      )
 
 add_subdirectory( buffer         )
 add_subdirectory( control        )
+add_subdirectory( context        )
 add_subdirectory( internal       )
 add_subdirectory( be_beambeam    )
 add_subdirectory( be_drift       )
