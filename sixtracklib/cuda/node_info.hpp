@@ -16,8 +16,8 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/context/definitions.h"
-    #include "sixtracklib/common/context/node_info.hpp"
+    #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/common/control/node_info.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
@@ -76,12 +76,10 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void setCudaDeviceIndex(
             cuda_dev_index_t const index ) SIXTRL_NOEXCEPT;
 
-
-
         protected:
 
         SIXTRL_HOST_FN virtual void doPrintToOutputStream(
-            std::ostream& SIXTRL_RESTRICT_REF output ) override;
+            std::ostream& SIXTRL_RESTRICT_REF output ) const override;
 
         private:
         ::cudaDeviceProp    m_cu_device_properties;

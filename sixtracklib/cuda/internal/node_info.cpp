@@ -10,18 +10,18 @@
 #include <cuda_runtime.h>
 
 #include "sixtracklib/common/definitions.h"
-#include "sixtracklib/common/context/definitions.h"
-#include "sixtracklib/common/context/node_id.hpp"
-#include "sixtracklib/common/context/node_info.hpp"
-#include "sixtracklib/common/context/arch_info.hpp"
+#include "sixtracklib/common/control/definitions.h"
+#include "sixtracklib/common/control/node_id.hpp"
+#include "sixtracklib/common/control/node_info.hpp"
+#include "sixtracklib/common/control/arch_info.hpp"
 
 namespace SIXTRL_CXX_NAMESPACE
 {
     CudaNodeInfo::CudaNodeInfo(
         CudaNodeInfo::cuda_dev_index_t const cuda_dev_index ) :
         SIXTRL_CXX_NAMESPACE::NodeInfoBase(
-            SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_CUDA,
-            SIXTRL_CONTEXT_TYPE_CUDA_STR ),
+            SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA,
+            SIXTRL_ARCHITECTURE_CUDA_STR ),
         m_cu_device_properties(),
         m_cu_device_index( cuda_dev_index ),
         m_cu_device_pci_bus_id( "0000:00:00.0" )
@@ -33,8 +33,8 @@ namespace SIXTRL_CXX_NAMESPACE
         CudaNodeInfo::cuda_dev_index_t const cuda_dev_index,
         ::cudaDeviceProp const& cuda_device_properties ) :
         SIXTRL_CXX_NAMESPACE::NodeInfoBase(
-            SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_CUDA,
-            SIXTRL_CONTEXT_TYPE_CUDA_STR ),
+            SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA,
+            SIXTRL_ARCHITECTURE_CUDA_STR ),
         m_cu_device_properties( cuda_device_properties ),
         m_cu_device_index( cuda_dev_index ),
         m_cu_device_pci_bus_id( "0000:00:00.0" )
@@ -151,11 +151,11 @@ namespace SIXTRL_CXX_NAMESPACE
     void CudaNodeInfo::setCudaDeviceIndex(
         CudaNodeInfo::cuda_dev_index_t const index ) SIXTRL_NOEXCEPT
     {
-        return this->m_cu_dev_index = index;
+        this->m_cu_device_index = index;
     }
 
     void CudaNodeInfo::doPrintToOutputStream(
-        std::ostream& SIXTRL_RESTRICT_REF output )
+        std::ostream& SIXTRL_RESTRICT_REF output ) const
     {
         SIXTRL_CXX_NAMESPACE::NodeInfoBase::doPrintToOutputStream( output );
 
