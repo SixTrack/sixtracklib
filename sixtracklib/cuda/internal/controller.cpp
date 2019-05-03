@@ -1,4 +1,4 @@
-#include "sixtracklib/cuda/context.hpp"
+#include "sixtracklib/cuda/controller.hpp"
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
@@ -7,7 +7,7 @@
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/control/definitions.h"
-#include "sixtracklib/cuda/internal/context_base.hpp"
+#include "sixtracklib/cuda/internal/controller_base.hpp"
 #include "sixtracklib/cuda/argument.hpp"
 
 namespace SIXTRL_CXX_NAMESPACE
@@ -40,7 +40,7 @@ namespace SIXTRL_CXX_NAMESPACE
         success_flag_t success_flag = success_flag_t{ 0 };
 
         if( ( this->hasSuccessFlagArgument() ) &&
-            ( this->type() == this->ptrSuccessFlagArgument()->type() ) &&
+            ( this->isArchCompatibleWith( *this->ptrSuccessFlagArgument() ) ) &&
             ( this->ptrSuccessFlagArgument()->hasArgumentBuffer() ) &&
             ( this->ptrSuccessFlagArgument()->usesRawArgument() ) &&
             ( this->ptrSuccessFlagArgument()->size() >=
@@ -79,7 +79,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using arg_buffer_t       = CudaController::cuda_arg_buffer_t;
 
         if( ( this->hasSuccessFlagArgument() ) &&
-            ( this->type() == this->ptrSuccessFlagArgument()->type() ) &&
+            ( this->isArchCompatibleWith( *this->ptrSuccessFlagArgument() ) ) &&
             ( this->ptrSuccessFlagArgument()->hasArgumentBuffer() ) &&
             ( this->ptrSuccessFlagArgument()->usesRawArgument() ) &&
             ( this->ptrSuccessFlagArgument()->size() >=

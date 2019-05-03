@@ -35,7 +35,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         public:
 
-        using type_id_t  = _base_arg_t::type_id_t;
+        using arch_id_t  = _base_arg_t::arch_id_t;
         using status_t   = _base_arg_t::status_t;
         using buffer_t   = _base_arg_t::buffer_t;
         using c_buffer_t = _base_arg_t::c_buffer_t;
@@ -80,7 +80,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN ptr_cuda_controller_t cudaController() SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN ptr_cuda_controller_t
+        SIXTRL_HOST_FN ptr_const_cuda_controller_t
         cudaController() const SIXTRL_NOEXCEPT;
     };
 }

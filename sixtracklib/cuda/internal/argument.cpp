@@ -24,17 +24,15 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    namespace st = SIXTRL_CXX_NAMESPACE;
-
-    CudaArgument::CudaArgument( CudaContext* SIXTRL_RESTRICT ctx ) :
-        SIXTRL_CXX_NAMESPACE::CudaArgumentBase( ctx )
+    CudaArgument::CudaArgument( CudaController* SIXTRL_RESTRICT ctrl ) :
+        SIXTRL_CXX_NAMESPACE::CudaArgumentBase( ctrl )
     {
 
     }
 
     CudaArgument::CudaArgument(
         CudaArgument::buffer_t const& SIXTRL_RESTRICT_REF buffer,
-        CudaContext* SIXTRL_RESTRICT ctx )
+        CudaController* SIXTRL_RESTRICT ctrl )
     {
         using status_t = CudaArgument::status_t;
         using size_t   = CudaArgument::size_type;
@@ -44,23 +42,23 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ( buffer_size > size_t{ 0 } ) &&
             ( this->capacity() >= buffer_size ) &&
-            ( this->cudaContext() == ctx ) &&
-            ( ctx != nullptr ) && ( ctx->readyForSend() ) &&
-            ( ctx->readyForRemap() ) )
+            ( this->cudaController() == ctrl ) &&
+            ( ctrl != nullptr ) && ( ctrl->readyForSend() ) &&
+            ( ctrl->readyForRemap() ) )
         {
             SIXTRL_ASSERT( this->hasCudaArgBuffer() );
             SIXTRL_ASSERT( this->cudaArgBuffer() != nullptr );
             SIXTRL_ASSERT( this->size() == size_t{ 0 } );
 
-            status_t status = this->cudaContext()->send(
+            status_t status = this->cudaController()->send(
                 this, buffer_data_begin, buffer_size );
 
-            if( status == st::CONTEXT_STATUS_SUCCESS )
+            if( status == ::NS(CONTROLLER_STATUS_SUCCESS) )
             {
-                status = ctx->remapSentCObjectsBuffer( this );
+                status = ctrl->remapSentCObjectsBuffer( this );
             }
 
-            if( status == st::CONTEXT_STATUS_SUCCESS )
+            if( status == ::NS(CONTROLLER_STATUS_SUCCESS) )
             {
                 this->doSetArgSize( buffer_size );
                 this->doSetBufferRef( buffer );
@@ -70,9 +68,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
     CudaArgument::CudaArgument(
         const CudaArgument::c_buffer_t *const SIXTRL_RESTRICT ptr_c_buffer,
-        CudaContext* SIXTRL_RESTRICT ctx ) :
+        CudaController* SIXTRL_RESTRICT ctrl ) :
         SIXTRL_CXX_NAMESPACE::CudaArgumentBase(
-            ::NS(Buffer_get_size)( ptr_c_buffer ), ctx )
+            ::NS(Buffer_get_size)( ptr_c_buffer ), ctrl )
     {
         using status_t = CudaArgument::status_t;
         using size_t   = CudaArgument::size_type;
@@ -84,23 +82,23 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ( buffer_size > size_t{ 0 } ) &&
             ( this->capacity() >= buffer_size ) &&
-            ( this->cudaContext() == ctx ) &&
-            ( ctx != nullptr ) && ( ctx->readyForSend() ) &&
-            ( ctx->readyForRemap() ) )
+            ( this->cudaController() == ctrl ) &&
+            ( ctrl != nullptr ) && ( ctrl->readyForSend() ) &&
+            ( ctrl->readyForRemap() ) )
         {
             SIXTRL_ASSERT( this->hasCudaArgBuffer() );
             SIXTRL_ASSERT( this->cudaArgBuffer() != nullptr );
             SIXTRL_ASSERT( this->size() == size_t{ 0 } );
 
-            status_t status = this->cudaContext()->send(
+            status_t status = this->cudaController()->send(
                 this, buffer_data_begin, buffer_size );
 
-            if( status == st::CONTEXT_STATUS_SUCCESS )
+            if( status == ::NS(CONTROLLER_STATUS_SUCCESS) )
             {
-                status = ctx->remapSentCObjectsBuffer( this );
+                status = ctrl->remapSentCObjectsBuffer( this );
             }
 
-            if( status == st::CONTEXT_STATUS_SUCCESS )
+            if( status == ::NS(CONTROLLER_STATUS_SUCCESS) )
             {
                 this->doSetArgSize( buffer_size );
                 this->doSetPtrCBuffer( ptr_c_buffer );
@@ -109,8 +107,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     CudaArgument::CudaArgument( CudaArgument::size_type const capacity,
-        CudaContext* SIXTRL_RESTRICT ctx ) :
-        SIXTRL_CXX_NAMESPACE::CudaArgumentBase( capacity, ctx )
+        CudaController* SIXTRL_RESTRICT ctrl ) :
+        SIXTRL_CXX_NAMESPACE::CudaArgumentBase( capacity, ctrl )
     {
 
     }
@@ -118,25 +116,25 @@ namespace SIXTRL_CXX_NAMESPACE
    CudaArgument::CudaArgument(
         const void *const SIXTRL_RESTRICT raw_arg_begin,
         CudaArgument::size_type const raw_arg_length,
-        CudaContext* SIXTRL_RESTRICT ctx ) :
-        SIXTRL_CXX_NAMESPACE::CudaArgumentBase( raw_arg_length, ctx )
+        CudaController* SIXTRL_RESTRICT ctrl ) :
+        SIXTRL_CXX_NAMESPACE::CudaArgumentBase( raw_arg_length, ctrl )
     {
         using status_t = CudaArgument::status_t;
         using size_t   = CudaArgument::size_type;
 
         if( ( raw_arg_length > size_t{ 0 } ) &&
-            ( this->cudaContext() != nullptr ) &&
-            ( this->cudaContext() == ctx ) && ( ctx->readyForSend() ) )
+            ( this->cudaController() != nullptr ) &&
+            ( this->cudaController() == ctrl ) && ( ctrl->readyForSend() ) )
         {
             SIXTRL_ASSERT( this->hasCudaArgBuffer() );
             SIXTRL_ASSERT( this->cudaArgBuffer() != nullptr );
             SIXTRL_ASSERT( this->size() == size_t{ 0 } );
             SIXTRL_ASSERT( this->capacity() >= raw_arg_length );
 
-            status_t status = this->cudaContext()->send(
+            status_t status = this->cudaController()->send(
                 this, raw_arg_begin, raw_arg_length );
 
-            if( status == st::CONTEXT_STATUS_SUCCESS )
+            if( status == ::NS(CONTROLLER_STATUS_SUCCESS) )
             {
                 this->doSetArgSize( raw_arg_length );
                 this->doSetPtrRawArgument( raw_arg_begin );
@@ -145,24 +143,23 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     CudaArgument::ptr_cuda_controller_t
-    CudaArgument::cudaContext() SIXTRL_NOEXCEPT
+    CudaArgument::cudaController() SIXTRL_NOEXCEPT
     {
         using _this_t   = CudaArgument;
-        using ptr_ctx_t = _this_t::ptr_cuda_controller_t;
+        using ptr_ctrl_t = _this_t::ptr_cuda_controller_t;
 
-        return const_cast< ptr_ctx_t >( static_cast< _this_t const& >(
-            *this ).cudaContext() );
+        return const_cast< ptr_ctrl_t >( static_cast< _this_t const& >(
+            *this ).cudaController() );
     }
 
     CudaArgument::ptr_const_cuda_controller_t
-    CudaArgument::cudaContext() const SIXTRL_NOEXCEPT
+    CudaArgument::cudaController() const SIXTRL_NOEXCEPT
     {
-        using cuda_controller_t = CudaArgument::base_controller_t;
+        using cuda_ctrl_t = SIXTRL_CXX_NAMESPACE::CudaController;
 
         return ( this->ptrBaseController() != nullptr )
-            ? this->ptrBaseController->asDerivedController< cuda_controller_t >(
-                SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_CUDA )
-            : nullptr;
+            ? this->ptrBaseController()->asDerivedController< cuda_ctrl_t >(
+                    SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA ) : nullptr;
     }
 }
 

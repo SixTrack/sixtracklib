@@ -62,14 +62,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
         using base_controller_t = SIXTRL_CXX_NAMESPACE::CudaControllerBase;
         using ptr_cuda_base_controller_t = base_controller_t*;
-        using ptr_cuda_base_const_context_t = base_controller_t const*;
+        using ptr_cuda_base_const_controller_t = base_controller_t const*;
 
         SIXTRL_HOST_FN explicit CudaArgumentBase(
-            ContextOnNodesBase* SIXTRL_RESTRICT ptr_context = nullptr );
+            ControllerOnNodesBase* SIXTRL_RESTRICT ptr_controller = nullptr );
 
         SIXTRL_HOST_FN explicit CudaArgumentBase(
             size_type const arg_buffer_capacity,
-            ContextOnNodesBase* SIXTRL_RESTRICT ptr_context = nullptr );
+            ControllerOnNodesBase* SIXTRL_RESTRICT ptr_controller = nullptr );
 
         SIXTRL_HOST_FN CudaArgumentBase(
             CudaArgumentBase const& other ) = delete;

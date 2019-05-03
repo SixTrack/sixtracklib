@@ -47,18 +47,18 @@ namespace SIXTRL_CXX_NAMESPACE
 
     CudaArgumentBase::CudaArgumentBase(
         CudaArgumentBase::size_type const arg_buffer_capacity,
-        ContextOnNodesBase* SIXTRL_RESTRICT ctx ) :
-        ArgumentBase( SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_CUDA,
-            SIXTRL_CONTEXT_TYPE_CUDA_STR, true, ctx ),
+        ControllerOnNodesBase* SIXTRL_RESTRICT ctx ) :
+        ArgumentBase( SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA,
+            SIXTRL_ARCHITECTURE_CUDA_STR, nullptr, true, ctx ),
         m_arg_buffer( nullptr )
     {
         this->doReserveArgumentBufferCudaBaseImpl( arg_buffer_capacity );
     }
 
     CudaArgumentBase::CudaArgumentBase(
-        ContextOnNodesBase* SIXTRL_RESTRICT ctx ) :
-        ArgumentBase( SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_CUDA,
-            SIXTRL_CONTEXT_TYPE_CUDA_STR, true, ctx ),
+        ControllerOnNodesBase* SIXTRL_RESTRICT ctx ) :
+        ArgumentBase( SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA,
+            SIXTRL_ARCHITECTURE_CUDA_STR, nullptr, true, ctx ),
         m_arg_buffer( nullptr )
     {
 

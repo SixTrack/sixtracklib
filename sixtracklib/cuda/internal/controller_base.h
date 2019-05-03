@@ -10,7 +10,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/context/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/cuda/definitions.h"
     #include "sixtracklib/cuda/internal/controller_base.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */

@@ -25,7 +25,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return ( node_info_base != nullptr )
             ? node_info_base->asDerivedNodeInfo< node_info_t >(
-                SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_CUDA )
+                SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA )
             : nullptr;
     }
 
@@ -62,8 +62,8 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     CudaControllerBase::CudaControllerBase( char const* config_str ) :
-        ContextOnNodesBase( SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_CUDA,
-            SIXTRL_CONTEXT_TYPE_CUDA_STR, config_str )
+        ControllerOnNodesBase( SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA,
+            SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
     {
         bool const success = this->doInitAllCudaNodes();
         ( void )success;
@@ -88,11 +88,10 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( source_length > size_t{ 0 } );
         SIXTRL_ASSERT( dest_arg->capacity() >= source_length );
 
-        if( ( dest_arg->hasArgumentBuffer() ) &&
-            ( this->type() == dest_arg->type() ) )
+        if( dest_arg->hasArgumentBuffer() )
         {
             cuda_arg_t* cuda_arg = dest_arg->asDerivedArgument< cuda_arg_t >(
-                SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_CUDA );
+                SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA );
 
             if( ( cuda_arg != nullptr ) && ( cuda_arg->hasCudaArgBuffer() ) )
             {
@@ -126,11 +125,10 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( src_arg->size() > size_t{ 0 } );
         SIXTRL_ASSERT( dest_capacity >= src_arg->size() );
 
-        if( ( src_arg->hasArgumentBuffer() ) &&
-            ( this->type() == src_arg->type() ) )
+        if( src_arg->hasArgumentBuffer() )
         {
             cuda_arg_t* cuda_arg = src_arg->asDerivedArgument< cuda_arg_t >(
-                SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_CUDA );
+                SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA );
 
             if( ( cuda_arg != nullptr ) && ( cuda_arg->hasCudaArgBuffer() ) )
             {
@@ -164,12 +162,10 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( this->readyForRemap() );
         SIXTRL_ASSERT( len > size_t{ 0 } );
 
-        if( ( arg->hasArgumentBuffer() ) &&
-            ( this->isArchCompatibleWith( arg->archId() ) ) &&
-            ( arg->usesCObjectsBuffer() ) )
+        if( ( arg->hasArgumentBuffer() ) && ( arg->usesCObjectsBuffer() ) )
         {
             cuda_arg_t* cuda_arg = arg->asDerivedArgument< cuda_arg_t >(
-                SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_CUDA );
+                SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA );
 
             if( ( cuda_arg != nullptr ) && ( cuda_arg->hasCudaArgBuffer() ) )
             {
@@ -189,9 +185,9 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     bool CudaControllerBase::doSelectNode(
-        CudaControllerBase::size_type const node_index )
+        CudaControllerBase::node_index_t const node_index )
     {
-        using _base_ctx_t = SIXTRL_CXX_NAMESPACE::ContextOnNodesBase;
+        using _base_ctrl_t = SIXTRL_CXX_NAMESPACE::ControllerOnNodesBase;
         using node_info_base_t = CudaControllerBase::node_info_base_t;
         using node_info_t = CudaControllerBase::node_info_t;
         using cuda_dev_index_t = node_info_t::cuda_dev_index_t;
@@ -199,13 +195,13 @@ namespace SIXTRL_CXX_NAMESPACE
         bool success = false;
 
         node_info_base_t* ptr_node_info_base =
-            this->ptrNodeInfoBase( node_index );
+            this->doGetPtrNodeInfoBase( node_index );
 
         if( ptr_node_info_base != nullptr )
         {
             node_info_t* ptr_node_info = ptr_node_info_base->asDerivedNodeInfo<
-                SIXTRL_CXX_NAMESPACE::CudaNodeinfo >(
-                    SIXTRL_CXX_NAMESPACE::CONTEXT_TYPE_CUDA );
+                SIXTRL_CXX_NAMESPACE::CudaNodeInfo >(
+                    SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA );
 
             if( ( ptr_node_info != nullptr ) &&
                 ( ptr_node_info->hasCudaDeviceIndex() ) )
@@ -217,7 +213,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( err == ::cudaSuccess )
                 {
-                    success = _base_ctx_t::doSelectNode( node_index );
+                    success = _base_ctrl_t::doSelectNode( node_index );
                 }
             }
         }
@@ -228,10 +224,10 @@ namespace SIXTRL_CXX_NAMESPACE
         bool success = false;
 
         using _this_t = CudaControllerBase;
-        using size_t = _this_t::size_type;
-        using node_info_t = _this_t::node_info_t;
+        using node_index_t = _this_t::node_index_t;
+        using node_info_t  = _this_t::node_info_t;
 
-        if( this->numAvailableNodes() == size_t{ 0 } )
+        if( this->numAvailableNodes() == node_index_t{ 0 } )
         {
             bool first = true;
 
@@ -253,7 +249,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     std::unique_ptr< node_info_t > ptr_node_info(
                         new node_info_t( cu_idx, cu_properties ) );
 
-                    size_t const node_index =
+                    node_index_t const node_index =
                         this->doAppendAvailableNodeInfoBase( std::move(
                             ptr_node_info ) );
 
@@ -265,7 +261,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     }
                 }
 
-                success = ( this->numAvailableNodes() > size_t{ 0 } );
+                success = ( this->numAvailableNodes() > node_index_t{ 0 } );
             }
         }
 

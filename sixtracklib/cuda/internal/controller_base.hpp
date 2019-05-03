@@ -12,8 +12,8 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
-    #include "sixtracklib/common/control/context_base.hpp"
-    #include "sixtracklib/common/control/context_base_with_nodes.hpp"
+    #include "sixtracklib/common/control/controller_base.hpp"
+    #include "sixtracklib/common/control/controller_on_nodes_base.hpp"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/cuda/node_info.hpp"
 
@@ -37,7 +37,7 @@ namespace SIXTRL_CXX_NAMESPACE
         public:
 
         using node_info_t         = SIXTRL_CXX_NAMESPACE::CudaNodeInfo;
-        using cuda_device_index_t = node_info_t::cuda_device_index_t;
+        using cuda_device_index_t = node_info_t::cuda_dev_index_t;
 
         using arch_id_t           = _base_controller_t::arch_id_t;
         using node_id_t           = _base_controller_t::node_id_t;
@@ -45,6 +45,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using size_type           = _base_controller_t::size_type;
         using platform_id_t       = _base_controller_t::platform_id_t;
         using device_id_t         = _base_controller_t::device_id_t;
+        using node_index_t        = _base_controller_t::node_index_t;
         using ptr_arg_base_t      = _base_controller_t::ptr_arg_base_t;
         using status_t            = _base_controller_t::status_t;
         using buffer_t            = _base_controller_t::buffer_t;
@@ -116,7 +117,7 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const arg_size ) override;
 
         SIXTRL_HOST_FN virtual bool
-            doSelectNode( size_type node_index ) override;
+            doSelectNode( node_index_t const node_index ) override;
 
         SIXTRL_HOST_FN bool doInitAllCudaNodes();
     };

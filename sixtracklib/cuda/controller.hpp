@@ -38,7 +38,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using size_type      = _base_controller_t::size_type;
         using platform_id_t  = _base_controller_t::platform_id_t;
         using device_id_t    = _base_controller_t::device_id_t;
-        using type_id_t      = _base_controller_t::type_id_t;
+        using arch_id_t      = _base_controller_t::arch_id_t;
         using ptr_arg_base_t = _base_controller_t::ptr_arg_base_t;
 
         using buffer_t       = _base_controller_t::buffer_t;
