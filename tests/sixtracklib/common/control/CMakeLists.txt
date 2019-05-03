@@ -23,7 +23,21 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_node_id_common_cxx )
     add_test( CXX_CommonControlNodeIdTests test_node_id_common_cxx )
 
+    # ==========================================================================
+    # test_arch_info_common_c99:
 
+    add_executable( test_arch_info_common_c99 test_arch_info_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_arch_info_common_c99 )
+    add_test( C99_CommonControlArchInfoTests test_arch_info_common_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_arch_info_common_cxx:
+
+    add_executable( test_arch_info_common_cxx test_arch_info_cxx.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_arch_info_common_cxx )
+    add_test( CXX_CommonControlArchInfoTests test_arch_info_common_cxx )
 
 
 
