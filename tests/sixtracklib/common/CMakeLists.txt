@@ -1,5 +1,7 @@
 # sixtracklib/tests/sixtracklib/common/CMakeLists.txt
 
+add_subdirectory( control )
+
 # -----------------------------------------------------------------------------
 # ---- Generate testdata:
 
