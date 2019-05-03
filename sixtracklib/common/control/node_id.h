@@ -25,6 +25,29 @@ extern "C" {
 
 #if !defined( _GPUCODE )
 
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_ARGPTR_DEC NS(NodeId)*
+NS(NodeId_create)( void );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(NodeId_delete)(
+    SIXTRL_ARGPTR_DEC NS(NodeId)* SIXTRL_RESTRICT node_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_ARGPTR_DEC NS(NodeId)*
+NS(NodeId_new)( NS(node_platform_id_t) const platform_id,
+                NS(node_device_id_t) const device_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_ARGPTR_DEC NS(NodeId)*
+NS(NodeId_new_from_string)( char const* SIXTRL_RESTRICT node_id_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_ARGPTR_DEC NS(NodeId)*
+NS(NodeId_new_detailed)( NS(node_platform_id_t) const platform_id,
+    NS(node_device_id_t) const device_id, NS(node_index_t) const node_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_ARGPTR_DEC NS(NodeId)*
+NS(NodeId_preset)( SIXTRL_ARGPTR_DEC NS(NodeId)* SIXTRL_RESTRICT node_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(NodeId_is_valid)(
+    SIXTRL_ARGPTR_DEC const NS(NodeId) *const SIXTRL_RESTRICT node );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_platform_id_t) NS(NodeId_get_platform_id)(
     SIXTRL_ARGPTR_DEC const NS(NodeId) *const SIXTRL_RESTRICT node );
 
