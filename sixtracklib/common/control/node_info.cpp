@@ -144,6 +144,22 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_node_id.setDeviceId( device_id );
     }
 
+    bool NodeInfoBase::hasNodeIndex() const SIXTRL_NOEXCEPT
+    {
+        return this->m_node_id.hasIndex();
+    }
+
+    NodeInfoBase::node_index_t NodeInfoBase::nodeIndex() const SIXTRL_NOEXCEPT
+    {
+        return this->m_node_id.index();
+    }
+
+    void NodeInfoBase::setNodeIndex(
+        NodeInfoBase::node_index_t const node_index ) SIXTRL_NOEXCEPT
+    {
+        this->m_node_id.setIndex( node_index );
+    }
+
     bool NodeInfoBase::isDefaultNode() const SIXTRL_NOEXCEPT
     {
         return this->m_is_default_node;
