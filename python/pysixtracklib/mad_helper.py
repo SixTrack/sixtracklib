@@ -18,9 +18,14 @@ def dispatch(el, classes):
 
     key = el.base_type.name
     if key == 'multipole':
+        # workaround for missing ksl
+        try:
+            ksl = el.ksl
+        except AttributeError:
+            ksl = [0] * len(el.knl)
         el = Multipole(
             knl=el.knl,
-            ksl=el.ksl,
+            ksl=ksl,
             hxl=el.knl[0],
             hyl=0,
             length=el.lrad)
