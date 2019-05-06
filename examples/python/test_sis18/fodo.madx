@@ -1,0 +1,22 @@
+! Element definitions:
+! ------------------- horizontal quadrupole ----------------------------
+QS1F: QUADRUPOLE, L=1.04, K1=0.282632;
+QS2D: QUADRUPOLE, L=1.04, K1=-0.492;
+QS3T: QUADRUPOLE, L = 0.4804, K1 = 0.656;
+!---------------------  DRIFT SPACES DEFINITION  ---------------------
+DR1: DRIFT, L=0.6450000;
+DR2: DRIFT, L=0.9700000;
+DR3: DRIFT, L=6.8390117;
+DR4: DRIFT, L=0.6000000;
+DR5: DRIFT, L=0.7098000;
+DR6: DRIFT, L=0.4998000;
+!--------------------------  BENDING MAGNET ---------------------------
+ALPHA  := 15 * 1/57.2958;
+LL  := 150 * 1/57.2958;
+RB: SBEND, L=2.6175, ANGLE=ALPHA;
+
+! ---------------------------  LINE DEFINITION --------------------------
+! Sections without injection devices, steeres and position monitors
+CELLA: LINE=(DR1, RB, DR2, RB, DR3, QS1F, DR4, QS2D, DR5, QS3T, DR6);
+
+FODO: LINE = (12*CELLA);
