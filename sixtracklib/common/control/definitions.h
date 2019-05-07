@@ -12,6 +12,7 @@ extern "C" {
 typedef SIXTRL_INT32_T   NS(controller_status_t);
 typedef SIXTRL_UINT64_T  NS(controller_size_t);
 typedef SIXTRL_UINT64_T  NS(controller_success_flag_t);
+typedef SIXTRL_UINT32_T  NS(controller_kernel_id_t);
 
 typedef SIXTRL_UINT64_T  NS(arch_id_t);
 typedef SIXTRL_UINT64_T  NS(arch_size_t);
@@ -19,6 +20,7 @@ typedef SIXTRL_UINT64_T  NS(arch_size_t);
 typedef SIXTRL_INT64_T   NS(node_platform_id_t);
 typedef SIXTRL_INT64_T   NS(node_device_id_t);
 typedef SIXTRL_UINT32_T  NS(node_index_t);
+
 
 /* Predefined  context type id's: limit them to 0x0000 - 0x01FF */
 /* For userdefined type id's, the range 0x0200 - 0x03FF is reserved */
@@ -126,6 +128,9 @@ SIXTRL_STATIC_VAR NS(controller_status_t) const
     NS(CONTROLLER_STATUS_GENERAL_FAILURE) =
         ( NS(controller_status_t) )SIXTRL_CONTROLLER_STATUS_GENERAL_FAILURE;
 
+SIXTRL_STATIC_VAR NS(controller_kernel_id_t) const
+    NS(CONTROLER_ILLEGAL_KERNEL_ID) = ( NS(controller_kernel_id_t) )0xFFFFFFFF;
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC_VAR NS(node_platform_id_t) const NS(NODE_ILLEGAL_PATFORM_ID) =
@@ -149,6 +154,7 @@ namespace SIXTRL_CXX_NAMESPACE
     typedef ::NS(controller_status_t)       controller_status_t;
     typedef ::NS(controller_success_flag_t) controller_success_flag_t;
     typedef ::NS(controller_size_t)         controller_size_t;
+    typedef ::NS(controller_kernel_id_t)    controller_kernel_id_t;
 
     typedef ::NS(arch_id_t)                 arch_id_t;
     typedef ::NS(arch_size_t)               arch_size_t;
@@ -202,6 +208,11 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST controller_status_t
         CONTROLLER_STATUS_GENERAL_FAILURE = static_cast< controller_status_t >(
             SIXTRL_CONTROLLER_STATUS_GENERAL_FAILURE );
+
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST controller_kernel_id_t
+        CONTROLER_ILLEGAL_KERNEL_ID =
+            static_cast< controller_kernel_id_t >( 0xFFFFFFFF );
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
