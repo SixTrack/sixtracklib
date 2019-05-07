@@ -101,15 +101,24 @@ namespace SIXTRL_CXX_NAMESPACE
         node_index_t  m_node_index;
     };
 
-    void printNodeId( ::FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_HOST_FN void printNodeId( ::FILE* SIXTRL_RESTRICT fp,
         SIXTRL_CXX_NAMESPACE::NodeId const& SIXTRL_RESTRICT_REF node_id );
 
-    std::ostream& operator<<( std::ostream& SIXTRL_RESTRICT_REF output,
+    SIXTRL_HOST_FN std::ostream& operator<<(
+        std::ostream& SIXTRL_RESTRICT_REF output,
         SIXTRL_CXX_NAMESPACE::NodeId const& SIXTRL_RESTRICT_REF node_id );
 
-    int compareNodeIds(
+    SIXTRL_HOST_FN int compareNodeIds(
         SIXTRL_CXX_NAMESPACE::NodeId const& SIXTRL_RESTRICT_REF lhs,
         SIXTRL_CXX_NAMESPACE::NodeId const& SIXTRL_RESTRICT_REF rhs );
+
+    SIXTRL_STATIC SIXTRL_HOST_FN std::string
+    NodeId_extract_node_id_str_from_config_str(
+        std::string const& SIXTRL_RESTRICT_REF config_str );
+
+    SIXTRL_STATIC SIXTRL_HOST_FN std::string
+    NodeId_extract_node_id_str_from_config_str(
+        char const* SIXTRL_RESTRICT config_str );
 }
 
 typedef SIXTRL_CXX_NAMESPACE::NodeId    NS(NodeId);
@@ -117,6 +126,58 @@ typedef SIXTRL_CXX_NAMESPACE::NodeId    NS(NodeId);
 #else  /* !C++, Host */
 
 typedef void NS(NodeId);
+
+#endif /* C++, Host */
+
+/* ************************************************************************* */
+/* ******  Implementation of inline and template member functions    ******* */
+/* ************************************************************************* */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+    #include <algorithm>
+    #include <cstring>
+    #include <regex>
+    #include <utility>
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
+namespace SIXTRL_CXX_NAMESPACE
+{
+    SIXTRL_INLINE std::string NodeId_extract_node_id_str_from_config_str(
+        std::string const& SIXTRL_RESTRICT_REF config_str )
+    {
+        using SIXTRL_CXX_NAMESPACE::NodeId_extract_node_id_str_from_config_str;
+        return NodeId_extract_node_id_str_from_config_str( config_str.c_str());
+    }
+
+    SIXTRL_INLINE std::string NodeId_extract_node_id_str_from_config_str(
+        char const* SIXTRL_RESTRICT config_str )
+    {
+        if( ( config_str != nullptr ) &&
+            ( std::strlen( config_str ) > std::size_t{ 0 } ) )
+        {
+            /*
+            std::regex re(
+                        "device_id_str[:blank:]*=[:blank:]*"
+                              "([:digit:]+.[:digit:]+)[A-Za-z0-9_\\-#=:;., \t]*|"
+                        "^[A-Za-z0-9_\\-#=;.:, \t]*([:digit:]+.[:digit:]+);|"
+                        "([:digit:]+.[:digit:]+)" );*/
+
+            std::regex re( "\\s*([0-9]+\\.[0-9]+)[\\sA-Za-z0-9#\\;]*" );
+            std::cmatch matches;
+
+            std::regex_match( config_str, matches, re );
+
+            if( ( matches.ready() ) && ( !matches.empty() ) )
+            {
+                return std::string{ matches[ matches.size() - 1 ] };
+            }
+        }
+
+        return std::string{ "" };
+    }
+}
 
 #endif /* C++, Host */
 

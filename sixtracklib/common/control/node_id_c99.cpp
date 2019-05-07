@@ -1,6 +1,8 @@
 #include "sixtracklib/common/control/node_id.h"
 #include "sixtracklib/common/control/node_id.hpp"
 
+namespace st = SIXTRL_CXX_NAMESPACE;
+
 SIXTRL_ARGPTR_DEC ::NS(NodeId)*
 NS(NodeId_preset)( SIXTRL_ARGPTR_DEC ::NS(NodeId)* SIXTRL_RESTRICT node_id )
 {
@@ -14,7 +16,7 @@ NS(NodeId_preset)( SIXTRL_ARGPTR_DEC ::NS(NodeId)* SIXTRL_RESTRICT node_id )
 
 SIXTRL_ARGPTR_DEC ::NS(NodeId)* NS(NodeId_create)( void )
 {
-    return new SIXTRL_CXX_NAMESPACE::NodeId;
+    return new st::NodeId;
 }
 
 void NS(NodeId_delete)( SIXTRL_ARGPTR_DEC NS(NodeId)* SIXTRL_RESTRICT node_id )
@@ -27,7 +29,7 @@ SIXTRL_ARGPTR_DEC ::NS(NodeId)* NS(NodeId_new)(
     ::NS(node_platform_id_t) const platform_id,
     ::NS(node_device_id_t) const device_id )
 {
-    return new SIXTRL_CXX_NAMESPACE::NodeId( platform_id, device_id );
+    return new st::NodeId( platform_id, device_id );
 }
 
 SIXTRL_ARGPTR_DEC ::NS(NodeId)* NS(NodeId_new_from_string)(
@@ -35,8 +37,7 @@ SIXTRL_ARGPTR_DEC ::NS(NodeId)* NS(NodeId_new_from_string)(
 {
     return ( ( node_id_str != nullptr ) &&
              ( std::strlen( node_id_str ) > std::size_t{ 0 } ) )
-        ? new SIXTRL_CXX_NAMESPACE::NodeId( node_id_str )
-        : nullptr;
+        ? new st::NodeId( node_id_str ) : nullptr;
 }
 
 SIXTRL_ARGPTR_DEC ::NS(NodeId)* NS(NodeId_new_detailed)(
@@ -44,8 +45,7 @@ SIXTRL_ARGPTR_DEC ::NS(NodeId)* NS(NodeId_new_detailed)(
     ::NS(node_device_id_t) const device_id,
     ::NS(node_index_t) const node_index )
 {
-    return new SIXTRL_CXX_NAMESPACE::NodeId(
-        platform_id, device_id, node_index );
+    return new st::NodeId( platform_id, device_id, node_index );
 }
 
 bool NS(NodeId_is_valid)( SIXTRL_ARGPTR_DEC
@@ -145,7 +145,7 @@ int NS(NodeId_compare)(
 
     if( ( lhs != nullptr ) && ( rhs != nullptr ) )
     {
-        cmp_result = SIXTRL_CXX_NAMESPACE::compareNodeIds( *lhs, *rhs );
+        cmp_result = st::compareNodeIds( *lhs, *rhs );
     }
     else if( rhs != nullptr )
     {
@@ -162,10 +162,12 @@ bool NS(NodeId_are_equal)(
     return ( ::NS(NodeId_compare)( lhs, rhs ) == 0 );
 }
 
+/* ------------------------------------------------------------------------- */
+
 void NS(NodeId_print_out)(
     SIXTRL_ARGPTR_DEC const ::NS(NodeId) *const SIXTRL_RESTRICT node_id )
 {
-    NS(NodeId_print)( stdout, node_id );
+    ::NS(NodeId_print)( stdout, node_id );
 }
 
 void NS(NodeId_print)( ::FILE* SIXTRL_RESTRICT output,
@@ -173,8 +175,51 @@ void NS(NodeId_print)( ::FILE* SIXTRL_RESTRICT output,
 {
     if( node_id != nullptr )
     {
-        SIXTRL_CXX_NAMESPACE::printNodeId( output, *node_id );
+        st::printNodeId( output, *node_id );
     }
+}
+
+::NS(controller_status_t) NS(NodeId_extract_node_id_str_from_config_str)(
+    char const* SIXTRL_RESTRICT config_str, char* SIXTRL_RESTRICT node_id_str,
+    ::NS(buffer_size_t) const node_id_str_capacity )
+{
+    int success = ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+    using buf_size_t = ::NS(buffer_size_t);
+
+    if( ( config_str != nullptr ) && ( node_id_str != nullptr ) &&
+        ( std::strlen( config_str ) > buf_size_t{ 0 } ) &&
+        ( node_id_str_capacity > buf_size_t{ 1 } ) )
+    {
+        std::memset( node_id_str, ( int )'\0', node_id_str_capacity );
+        std::string const str = st::NodeId_extract_node_id_str_from_config_str(
+            config_str );
+
+        if( !str.empty() )
+        {
+            if( str.size() < node_id_str_capacity )
+            {
+                std::strncpy( node_id_str, str.c_str(), str.size() );
+                success = ::NS(CONTROLLER_STATUS_SUCCESS);
+            }
+        }
+        else
+        {
+            success = ::NS(CONTROLLER_STATUS_SUCCESS);
+        }
+    }
+    else if( ( config_str != nullptr ) &&
+             ( std::strlen( config_str ) == buf_size_t{ 0 } ) )
+    {
+        if( ( node_id_str != nullptr ) &&
+            ( node_id_str_capacity > buf_size_t{ 1 } ) )
+        {
+            std::memset( node_id_str, ( int )'\0', node_id_str_capacity );
+        }
+
+        success = ::NS(CONTROLLER_STATUS_SUCCESS);
+    }
+
+    return success;
 }
 
 /* end: sixtracklib/common/control/node_id_c99.cpp */
