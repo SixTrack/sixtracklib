@@ -84,9 +84,9 @@
            ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
 
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/internal/argument_base.h"
+    #include "sixtracklib/cuda/control/argument_base.h"
     #include "sixtracklib/cuda/argument.h"
-    #include "sixtracklib/cuda/internal/controller_base.h"
+    #include "sixtracklib/cuda/control/controller_base.h"
     #include "sixtracklib/cuda/controller.h"
     #include "sixtracklib/cuda/track_particles_kernel_c_wrapper.h"
 
