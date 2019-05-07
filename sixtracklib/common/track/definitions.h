@@ -28,6 +28,9 @@ typedef SIXTRL_INT64_T      NS(track_job_type_t);
 SIXTRL_STATIC_VAR NS(track_status_t) const
     NS(TRACK_SUCCESS) = ( NS(track_status_t) )0u;
 
+SIXTRL_STATIC_VAR NS(track_status_t) const
+    NS(TRACK_STATUS_GENERAL_FAILURE) = ( NS(track_status_t) )-1;
+
 SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
     NS(TRACK_JOB_COLLECT_NONE) = ( NS(track_job_collect_flag_t) )0x00;
 
@@ -41,7 +44,10 @@ SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
     NS(TRACK_JOB_COLLECT_OUTPUT) = ( NS(track_job_collect_flag_t) )0x04;
 
 SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
-    NS(TRACK_JOB_COLLECT_ALL) = ( NS(track_job_collect_flag_t) )0x07;
+    NS(TRACK_JOB_COLLECT_SUCCSS_FLAG) = ( NS(track_job_collect_flag_t) )0x08;
+
+SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
+    NS(TRACK_JOB_COLLECT_ALL) = ( NS(track_job_collect_flag_t) )0x0F;
 
 SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
     NS(TRACK_JOB_COLLECT_DEFAULT_FLAGS) = ( NS(track_job_collect_flag_t) )0x05;
@@ -63,6 +69,10 @@ namespace SIXTRL_CXX_NAMESPACE
 {
     using track_status_t = ::NS(track_status_t);
     SIXTRL_STATIC_VAR track_status_t const TRACK_SUCCESS = track_status_t{ 0 };
+
+    SIXTRL_STATIC_VAR track_status_t const
+        TRACK_STATUS_GENERAL_FAILURE = track_status_t{ -1 };
+
 }
 #endif /* defined( __cplusplus )  */
 
@@ -87,7 +97,10 @@ namespace SIXTRL_CXX_NAMESPACE
         TRACK_JOB_COLLECT_OUTPUT = track_job_collect_flag_t{ 0x0004 };
 
     SIXTRL_STATIC_VAR track_job_collect_flag_t const
-        TRACK_JOB_COLLECT_ALL = track_job_collect_flag_t{ 0x0007 };
+        TRACK_JOB_COLLECT_SUCCESS_FLAG = track_job_collect_flag_t{ 0x0008 };
+
+    SIXTRL_STATIC_VAR track_job_collect_flag_t const
+        TRACK_JOB_COLLECT_ALL = track_job_collect_flag_t{ 0x000F };
 
     SIXTRL_STATIC_VAR track_job_collect_flag_t const
         TRACK_JOB_COLLECT_DEFAULT_FLAGS = track_job_collect_flag_t{ 0x0005 };
