@@ -3,10 +3,12 @@
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #if defined( __cplusplus )
+        #include <algorithm>
         #include <cstddef>
         #include <cstdint>
         #include <cstdlib>
         #include <cstdio>
+        #include <stdexcept>
         #include <limits>
         #include <utility>
         #include <string>
@@ -76,21 +78,42 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type max_num_garbage_ranges,
             size_type buffer_capacity ) SIXTRL_NOEXCEPT;
 
-        #if !defined( GPUCODE )
+        #if !defined( _GPUCODE )
+
         SIXTRL_HOST_FN Buffer( char const* path_to_file );
         SIXTRL_HOST_FN Buffer( std::string const& path_to_file );
-        #endif /* !defined( GPUCODE ) */
 
-        /* TODO: Implement Copy & Move semantics for Buffer */
-        SIXTRL_FN Buffer( Buffer const& other ) = delete;
-        SIXTRL_FN Buffer( Buffer&& other ) = delete;
+        SIXTRL_FN Buffer( Buffer const& SIXTRL_RESTRICT_REF other );
+        SIXTRL_FN Buffer( Buffer&& other ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN Buffer& operator=( Buffer const& SIXTRL_RESTRICT_REF rhs );
+        SIXTRL_FN Buffer& operator=( Buffer&& rhs );
+
+        SIXTRL_FN Buffer& operator=( ::NS(Buffer) const& rhs ) SIXTRL_NOEXCEPT;
+
+        #else
+
+        SIXTRL_FN Buffer( Buffer const& other) = delete;
+        SIXTRL_FN Buffer( Buffer&& other) = delete;
 
         SIXTRL_FN Buffer& operator=( Buffer const& rhs ) = delete;
         SIXTRL_FN Buffer& operator=( Buffer&& rhs ) = delete;
 
-        SIXTRL_FN Buffer& operator=( ::NS(Buffer) const& rhs ) SIXTRL_NOEXCEPT;
+        #endif /* !defined( _GPUCODE ) */
 
         SIXTRL_FN virtual ~Buffer();
+
+        /* ----------------------------------------------------------------- */
+
+        #if !defined( _GPUCODE )
+
+        SIXTRL_FN bool deepCopyFrom(
+            Buffer const& SIXTRL_RESTRICT_REF other );
+
+        SIXTRL_FN bool deepCopyFrom(
+            const ::NS(Buffer) *const SIXTRL_RESTRICT ptr_other );
+
+        #endif /* !defined( _GPUCODE ) */
 
         /* ----------------------------------------------------------------- */
 
@@ -423,7 +446,7 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    #if !defined( GPUCODE )
+    #if !defined( _GPUCODE )
     SIXTRL_INLINE Buffer::Buffer( char const* path_to_file ) : ::NS(Buffer)()
     {
         using c_api_t = Buffer::c_api_t;
@@ -465,6 +488,143 @@ namespace SIXTRL_CXX_NAMESPACE
             ::NS(Buffer_free)( _buffer );
         }
     }
+
+    SIXTRL_INLINE Buffer::Buffer(
+        Buffer const& SIXTRL_RESTRICT_REF other ) : ::NS(Buffer)()
+    {
+        using c_api_t = Buffer::c_api_t;
+        using size_t  = Buffer::size_type;
+        using raw_t   = unsigned char;
+
+        c_api_t* _buffer = ::NS(Buffer_preset)( this->getCApiPtr() );
+        size_t const required_buffer_size = other.getCapacity();
+
+        if( required_buffer_size > size_t{ 0 } )
+        {
+            raw_t const* other_begin = other.dataBegin< raw_t const* >();
+            raw_t const* other_end   = other.dataEnd< raw_t const* >();
+
+            if( ( other_begin != nullptr ) && ( other_end != nullptr ) &&
+                ( this->allocateDataStore( required_buffer_size,
+                    Buffer::DEFAULT_DATASTORE_FLAGS ) ) )
+            {
+                raw_t* my_begin = this->dataBegin< raw_t* >();
+                SIXTRL_ASSERT( my_begin != nullptr );
+
+                std::copy( other_begin, other_end, my_begin );
+                this->remap();
+            }
+            else
+            {
+                ::NS(Buffer_free)( _buffer );
+            }
+        }
+    }
+
+    SIXTRL_INLINE Buffer::Buffer( Buffer&& other ) SIXTRL_NOEXCEPT :
+        ::NS(Buffer)( other )
+    {
+        ::NS(Buffer_preset)( other.getCApiPtr() );
+    }
+
+
+    SIXTRL_INLINE Buffer& Buffer::operator=(
+        Buffer const& SIXTRL_RESTRICT_REF rhs )
+    {
+        if( this != &rhs )
+        {
+            this->deepCopyFrom( rhs );
+        }
+
+        return *this;
+    }
+
+    SIXTRL_INLINE Buffer& Buffer::operator=( Buffer&& rhs )
+    {
+        using size_t = Buffer::size_type;
+
+        if( ( this != &rhs ) && ( rhs.allowClear() ) &&
+            ( rhs.allowModifyContents() ) )
+        {
+            if( this->getCapacity() > size_t{ 0 } )
+            {
+                if( !this->allowDelete() )
+                {
+                    throw std::runtime_error( "unable to delete destination "
+                        "buffer before assignment" );
+                }
+
+                ::NS(Buffer_free)( this->getCApiPtr() );
+                ::NS(Buffer_preset)( this->getCApiPtr() );
+            }
+
+            SIXTRL_ASSERT( this->getCapacity() == size_t{ 0 } );
+
+            *( this->getCApiPtr() ) = *( rhs.getCApiPtr() );
+            ::NS(Buffer_preset)( rhs.getCApiPtr() );
+        }
+
+        return *this;
+    }
+
+    /* ----------------------------------------------------------------- */
+
+    SIXTRL_INLINE bool Buffer::deepCopyFrom(
+        Buffer const& SIXTRL_RESTRICT_REF other )
+    {
+        return this->deepCopyFrom( other.getCApiPtr() );
+    }
+
+    SIXTRL_INLINE bool Buffer::deepCopyFrom(
+        const ::NS(Buffer) *const SIXTRL_RESTRICT other )
+    {
+        bool success = false;
+
+        using size_t = Buffer::size_type;
+
+        size_t const other_capacity = ::NS(Buffer_get_capacity)( other );
+
+        if( ( other != nullptr ) && ( other_capacity > size_t{ 0 } ) )
+        {
+            size_t capacity = this->getCapacity();
+
+            if( ( this->allowClear() ) && ( this->allowModifyContents() ) )
+            {
+                this->clear( true );
+
+                if( ( capacity < other_capacity ) && ( this->allowResize() ) )
+                {
+                    this->reserve(
+                        ::NS(Buffer_get_max_num_of_objects)( other ),
+                        ::NS(Buffer_get_max_num_of_slots)( other ),
+                        ::NS(Buffer_get_max_num_of_dataptrs)( other ),
+                        ::NS(Buffer_get_max_num_of_garbage_ranges)( other ) );
+
+                    capacity = this->getCapacity();
+                }
+
+                if( ( capacity >= other_capacity ) &&
+                    ( this->getNumObjects() == size_t{ 0 } ) &&
+                    ( this->getNumSlots() == size_t{ 0 } ) &&
+                    ( this->getNumDataptrs() == size_t{ 0 } ) )
+                {
+                    using raw_t = unsigned char;
+                    raw_t* destination = this->dataBegin< raw_t* >();
+                    raw_t const* source = reinterpret_cast< raw_t const* >(
+                        static_cast< std::uintptr_t >(
+                            ::NS(Buffer_get_data_begin_addr)( other ) ) );
+
+                    SIXTRACKLIB_COPY_VALUES(
+                        raw_t, destination, source, other_capacity );
+
+                    success = this->remap();
+                }
+            }
+        }
+
+        return success;
+    }
+
     #endif /* !defined( _GPUCODE ) */
 
     SIXTRL_INLINE Buffer& Buffer::operator=(
