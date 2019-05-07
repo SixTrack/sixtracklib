@@ -1,13 +1,16 @@
 #ifndef CXX_SIXTRACKLIB_COMMON_PARTICLES_HPP__
 #define CXX_SIXTRACKLIB_COMMON_PARTICLES_HPP__
 
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/particles.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #if defined( __cplusplus )
         #include <cstddef>
         #include <cstdint>
         #include <cstdlib>
         #include <utility>
-
         #include <type_traits>
         #include <iterator>
     #endif /* defined( __cplusplus ) */

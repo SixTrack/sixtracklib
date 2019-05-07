@@ -25,6 +25,7 @@
     #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
+    #include "sixtracklib/common/particles/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -32,45 +33,6 @@ extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 /* ========================================================================= */
-
-typedef SIXTRL_INT64_T  NS(particle_index_t);
-typedef SIXTRL_REAL_T   NS(particle_real_t);
-typedef SIXTRL_INT64_T  NS(particle_num_elements_t);
-
-typedef SIXTRL_PARTICLE_DATAPTR_DEC NS(particle_real_t)*
-        NS(particle_real_ptr_t);
-
-typedef SIXTRL_PARTICLE_DATAPTR_DEC NS(particle_real_t) const*
-        NS(particle_real_const_ptr_t);
-
-typedef SIXTRL_PARTICLE_DATAPTR_DEC NS(particle_index_t)*
-        NS(particle_index_ptr_t);
-
-typedef SIXTRL_PARTICLE_DATAPTR_DEC NS(particle_index_t) const*
-        NS(particle_index_const_ptr_t);
-
-#if ( !defined( _GPUCODE ) ) && ( !defined( __cplusplus ) )
-
-SIXTRL_STATIC_VAR NS(buffer_size_t) const
-    NS(PARTICLES_NUM_REAL_DATAPTRS) = ( NS(buffer_size_t) )17u;
-
-SIXTRL_STATIC_VAR NS(buffer_size_t) const
-    NS(PARTICLES_NUM_INDEX_DATAPTRS) = ( NS(buffer_size_t) )4u;
-
-SIXTRL_STATIC_VAR NS(buffer_size_t) const
-    NS(PARTICLES_NUM_DATAPTRS) = ( NS(buffer_size_t) )21u;
-
-#else /* ( !defined( _GPUCODE ) ) && ( !defined( __cplusplus ) ) */
-
-typedef enum
-{
-    NS(PARTICLES_NUM_INDEX_DATAPTRS) = 4,
-    NS(PARTICLES_NUM_REAL_DATAPTRS)  = 17,
-    NS(PARTICLES_NUM_DATAPTRS)       = 21
-}
-NS(_ParticlesGlobalConstants);
-
-#endif /* ( !defined( _GPUCODE ) ) && ( !defined( __cplusplus ) ) */
 
 typedef struct NS(Particles)
 {
@@ -134,14 +96,6 @@ typedef struct NS(ParticlesGenericAddr)
     NS(buffer_addr_t) state_addr         SIXTRL_ALIGN( 8 );
 }
 NS(ParticlesGenericAddr);
-
-#if !defined( _GPUCODE )
-
-SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC
-NS(ParticlesGenericAddr)* NS(ParticlesAddr_preset)(
-    SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT paddr );
-
-#endif /* !defined( _GPUCODE ) */
 
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_store_addresses)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT paddr,
