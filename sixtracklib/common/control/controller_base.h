@@ -13,6 +13,7 @@
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/control/controller_base.hpp"
     #include "sixtracklib/common/control/argument_base.hpp"
+    #include "sixtracklib/common/control/kernel_config_base.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
@@ -96,6 +97,73 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_is_ready_to_receive)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_is_in_debug_mode)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT controller );
+
+/* ========================================================================= */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_size_t)
+NS(Controller_get_num_of_kernels)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT controller );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_size_t)
+NS(Controller_get_kernel_work_items_dim)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    NS(controller_kernel_id_t) const kernel_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_size_t)
+NS(Controller_get_kernel_work_groups_dim)(
+    const NS(ControllerBase) *const  SIXTRL_RESTRICT controller,
+    NS(controller_kernel_id_t) const kernel_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_size_t)
+NS(Controller_get_num_of_kernel_arguments)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    NS(controller_kernel_id_t) const kernel_id );
+
+/* ----------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_kernel_has_name)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    NS(controller_kernel_id_t) const kernel_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(Controller_get_kernel_name_string)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    NS(controller_kernel_id_t) const kernel_id );
+
+/* ----------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_has_kernel_id)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    NS(controller_kernel_id_t) const kernel_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_has_kernel_by_name)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    char const* SIXTRL_RESTRICT kernel_name );
+
+/* ----------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(KernelConfigBase) const*
+NS(Controller_get_ptr_const_kernel_config_base)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    NS(controller_kernel_id_t) const kernel_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(KernelConfigBase) const*
+NS(Controller_get_ptr_const_kernel_config_base_by_name)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    char const* SIXTRL_RESTRICT kernel_name );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(KernelConfigBase)*
+NS(Controller_get_ptr_kernel_config_base)(
+    NS(ControllerBase)* SIXTRL_RESTRICT controller,
+    NS(controller_kernel_id_t) const kernel_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(KernelConfigBase)*
+NS(Controller_get_ptr_kernel_config_base_by_name)(
+    NS(ControllerBase)* SIXTRL_RESTRICT controller,
+    char const* SIXTRL_RESTRICT kernel_name );
+
+/* ================================================================= */
 
 #endif /* !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ ) */
 

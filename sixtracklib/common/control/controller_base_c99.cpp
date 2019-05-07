@@ -150,6 +150,115 @@ bool NS(Controller_is_in_debug_mode)(
     return ( ( ctrl != nullptr ) && ( ctrl->isInDebugMode() ) );
 }
 
+/* ========================================================================= */
+
+::NS(controller_size_t) NS(Controller_get_num_of_kernels)(
+    const ::NS(ControllerBase) *const SIXTRL_RESTRICT controller )
+{
+    return ( controller != nullptr )
+        ? controller->numKernels() : ::NS(controller_size_t){ 0 };
+}
+
+::NS(controller_size_t) NS(Controller_get_kernel_work_items_dim)(
+    const ::NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    ::NS(controller_kernel_id_t) const kernel_id )
+{
+    return ( controller != nullptr )
+        ? controller->kernelWorkItemsDim( kernel_id )
+        : ::NS(controller_size_t){ 0 };
+}
+
+::NS(controller_size_t) NS(Controller_get_kernel_work_groups_dim)(
+    const ::NS(ControllerBase) *const  SIXTRL_RESTRICT controller,
+    ::NS(controller_kernel_id_t) const kernel_id )
+{
+    return ( controller != nullptr )
+        ? controller->kernelWorkGroupsDim( kernel_id )
+        : ::NS(controller_size_t){ 0 };
+}
+
+::NS(controller_size_t) NS(Controller_get_num_of_kernel_arguments)(
+    const ::NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    ::NS(controller_kernel_id_t) const kernel_id )
+{
+    return ( controller != nullptr )
+        ? controller->kernelNumArguments( kernel_id )
+        : ::NS(controller_size_t){ 0 };
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool NS(Controller_kernel_has_name)(
+    const ::NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    NS(controller_kernel_id_t) const kernel_id )
+{
+    return ( ( controller != nullptr ) &&
+             ( controller->kernelHasName( kernel_id ) ) );
+}
+
+char const* NS(Controller_get_kernel_name_string)(
+    const ::NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    ::NS(controller_kernel_id_t) const kernel_id )
+{
+    return ( controller != nullptr ) ?
+        controller->ptrKernelNameStr( kernel_id ) : nullptr;
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool NS(Controller_has_kernel_id)(
+    const ::NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    ::NS(controller_kernel_id_t) const kernel_id )
+{
+    return ( ( controller != nullptr ) &&
+             ( controller->hasKernel( kernel_id ) ) );
+}
+
+bool NS(Controller_has_kernel_by_name)(
+    const ::NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    char const* SIXTRL_RESTRICT kernel_name )
+{
+    return ( ( controller != nullptr ) &&
+             ( controller->hasKernel( kernel_name ) ) );
+}
+
+/* ------------------------------------------------------------------------- */
+
+::NS(KernelConfigBase) const* NS(Controller_get_ptr_const_kernel_config_base)(
+    const ::NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    ::NS(controller_kernel_id_t) const kernel_id )
+{
+    return ( controller != nullptr )
+        ? controller->ptrKernelConfigBase( kernel_id ) : nullptr;
+}
+
+::NS(KernelConfigBase) const*
+NS(Controller_get_ptr_const_kernel_config_base_by_name)(
+    const ::NS(ControllerBase) *const SIXTRL_RESTRICT controller,
+    char const* SIXTRL_RESTRICT kernel_name )
+{
+    return ( controller != nullptr )
+        ? controller->ptrKernelConfigBase( kernel_name ) : nullptr;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+::NS(KernelConfigBase)* NS(Controller_get_ptr_kernel_config_base)(
+    ::NS(ControllerBase)* SIXTRL_RESTRICT controller,
+    ::NS(controller_kernel_id_t) const kernel_id )
+{
+    return ( controller != nullptr )
+        ? controller->ptrKernelConfigBase( kernel_id ) : nullptr;
+}
+
+::NS(KernelConfigBase)* NS(Controller_get_ptr_kernel_config_base_by_name)(
+    ::NS(ControllerBase)* SIXTRL_RESTRICT controller,
+    char const* SIXTRL_RESTRICT kernel_name )
+{
+    return ( controller != nullptr )
+        ? controller->ptrKernelConfigBase( kernel_name ) : nullptr;
+}
+
 #endif /* C++, Host */
 
 /* end: sixtracklib/common/control/controller_base_c99.cpp */

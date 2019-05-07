@@ -8,21 +8,24 @@
         #include <cstdlib>
         #include <string>
         #include <memory>
+        #include <vector>
     #endif /* C++, host code */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/common/control/arch_base.hpp"
+    #include "sixtracklib/common/control/arch_base.h"
+    #include "sixtracklib/common/control/kernel_config_base.hpp"
 
     #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
        !defined( __CUDA_ARCH__ )
         #include "sixtracklib/common/buffer.hpp"
-        #include "sixtracklib/common/control/arch_base.hpp"
     #endif /* C++, host code */
 
-    #include "sixtracklib/common/control/arch_base.h"
     #include "sixtracklib/common/buffer.h"
+
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( __CUDA_ARCH__ ) && !defined( _GPUCODE )
@@ -43,8 +46,11 @@ namespace SIXTRL_CXX_NAMESPACE
         using status_t       = SIXTRL_CXX_NAMESPACE::controller_status_t;
         using success_flag_t = SIXTRL_CXX_NAMESPACE::controller_success_flag_t;
         using buffer_t       = SIXTRL_CXX_NAMESPACE::Buffer;
-        using c_buffer_t     = buffer_t::c_api_t;
-        using size_type      = buffer_t::size_type;
+
+        using c_buffer_t           = buffer_t::c_api_t;
+        using size_type            = buffer_t::size_type;
+        using kernel_config_base_t = SIXTRL_CXX_NAMESPACE::KernelConfigBase;
+        using kernel_id_t          = kernel_config_base_t::kernel_id_t;
 
         using ptr_arg_base_t       = ArgumentBase*;
         using ptr_const_arg_base_t = ArgumentBase const*;
@@ -55,14 +61,20 @@ namespace SIXTRL_CXX_NAMESPACE
         static SIXTRL_CONSTEXPR_OR_CONST arch_id_t NO_ARCH_ID =
             SIXTRL_CXX_NAMESPACE::ARCHITECTURE_NONE;
 
+        static SIXTRL_CONSTEXPR_OR_CONST kernel_id_t ILLEGAL_KERNEL_ID =
+            SIXTRL_CXX_NAMESPACE::CONTROLER_ILLEGAL_KERNEL_ID;
 
         SIXTRL_HOST_FN bool usesNodes() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void clear();
 
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_HOST_FN bool readyForSend()    const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN bool readyForReceive() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN bool readyForRemap()   const SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN status_t send( ptr_arg_base_t SIXTRL_RESTRICT dest,
             void const* SIXTRL_RESTRICT source, size_type const src_length );
@@ -73,6 +85,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN status_t send( ptr_arg_base_t SIXTRL_RESTRICT dest,
             buffer_t const& SIXTRL_RESTRICT_REF source );
 
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_HOST_FN status_t receive( void* SIXTRL_RESTRICT destination,
             size_type const destination_capacity,
             ptr_arg_base_t SIXTRL_RESTRICT source );
@@ -82,6 +96,84 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN status_t receive( buffer_t& SIXTRL_RESTRICT_REF dest,
             ptr_arg_base_t SIXTRL_RESTRICT source );
+
+        /* ================================================================= */
+
+        SIXTRL_HOST_FN size_type numKernels() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN size_type kernelWorkItemsDim(
+            kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN size_type kernelWorkGroupsDim(
+            kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN size_type kernelNumArguments(
+            kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN bool kernelHasName(
+            kernel_id_t const id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN std::string const& kernelName(
+            kernel_id_t const kernel_id ) const;
+
+        SIXTRL_HOST_FN char const* ptrKernelNameStr(
+            kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN bool hasKernel(
+            kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN bool hasKernel( std::string const& SIXTRL_RESTRICT_REF
+                kernel_name ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN bool hasKernel(
+            char const* SIXTRL_RESTRICT kernel_name ) const SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN kernel_config_base_t const* ptrKernelConfigBase(
+            kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_config_base_t const* ptrKernelConfigBase(
+            std::string const& SIXTRL_RESTRICT_REF
+                kernel_name ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_config_base_t const* ptrKernelConfigBase(
+            char const* SIXTRL_RESTRICT kernel_name ) const SIXTRL_NOEXCEPT;
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        SIXTRL_HOST_FN kernel_config_base_t* ptrKernelConfigBase(
+            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_config_base_t* ptrKernelConfigBase(
+            std::string const& SIXTRL_RESTRICT_REF kern_name ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_config_base_t* ptrKernelConfigBase(
+            char const* SIXTRL_RESTRICT kernel_name ) SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        template< typename... Args >
+        SIXTRL_HOST_FN bool setKernelNumWorkItems(
+            kernel_id_t kernel_id, Args&&... params ) SIXTRL_NOEXCEPT;
+
+        template< typename... Args >
+        SIXTRL_HOST_FN bool setKernelWorkGroupSizes(
+            kernel_id_t kernel_id, Args&&... params ) SIXTRL_NOEXCEPT;
+
+        template< typename... Args >
+        SIXTRL_HOST_FN bool setKernelWorkItemOffsets(
+            kernel_id_t kernel_id, Args&&... params ) SIXTRL_NOEXCEPT;
+
+        template< typename... Args >
+        SIXTRL_HOST_FN bool setKernelPreferredWorkGroupMultiple(
+            kernel_id_t kernel_id, Args&&... params ) SIXTRL_NOEXCEPT;
+
+        /* ================================================================= */
 
         SIXTRL_HOST_FN status_t remapSentCObjectsBuffer(
             ptr_arg_base_t SIXTRL_RESTRICT arg,
@@ -109,6 +201,7 @@ namespace SIXTRL_CXX_NAMESPACE
         protected:
 
         using ptr_stored_base_argument_t = std::unique_ptr< ArgumentBase >;
+        using ptr_kernel_conf_base_t = std::unique_ptr< kernel_config_base_t >;
 
         SIXTRL_HOST_FN explicit ControllerBase(
             arch_id_t const arch_id,
@@ -163,15 +256,33 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doUpdateStoredSuccessFlagArgument(
             ptr_stored_base_argument_t&& ptr_stored_arg ) SIXTRL_NOEXCEPT;
 
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN void doReserveForNumKernelConfigs(
+            size_type const kernel_configs_capacity );
+
+        SIXTRL_HOST_FN kernel_id_t doFindKernelConfigByName(
+            char const* SIXTRL_RESTRICT kernel_name ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_id_t doAppendKernelConfig(
+            ptr_kernel_conf_base_t&& ptr_kernel_conf_base ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void doRemoveKernelConfig(
+            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+
         private:
 
-        ptr_stored_base_argument_t m_ptr_success_flag_arg;
+        using kernel_config_list_t = std::vector< ptr_kernel_conf_base_t >;
 
-        bool        m_uses_nodes;
-        bool        m_ready_for_remap;
-        bool        m_ready_for_send;
-        bool        m_ready_for_receive;
-        bool        m_debug_mode;
+        kernel_config_list_t        m_kernel_configs;
+        ptr_stored_base_argument_t  m_ptr_success_flag_arg;
+        size_type                   m_num_kernels;
+
+        bool                        m_uses_nodes;
+        bool                        m_ready_for_remap;
+        bool                        m_ready_for_send;
+        bool                        m_ready_for_receive;
+        bool                        m_debug_mode;
     };
 }
 #endif /* C++, host */
@@ -195,6 +306,60 @@ typedef void NS(ControllerBase);
 
 namespace SIXTRL_CXX_NAMESPACE
 {
+    template< typename... Args >
+    bool ControllerBase::setKernelNumWorkItems(
+        ControllerBase::kernel_id_t kernel_id,
+        Args&&... params ) SIXTRL_NOEXCEPT
+    {
+        ControllerBase::kernel_config_base_t* ptr_kernel_conf =
+            this->ptrKernelConfigBase( kernel_id );
+
+        return ( ptr_kernel_conf != nullptr )
+            ? ptr_kernel_conf->setNumWorkItems(
+                std::forward< Args >( params )... ) : false;
+    }
+
+    template< typename... Args >
+    bool ControllerBase::setKernelWorkGroupSizes(
+        ControllerBase::kernel_id_t kernel_id,
+        Args&&... params ) SIXTRL_NOEXCEPT
+    {
+        ControllerBase::kernel_config_base_t* ptr_kernel_conf =
+            this->ptrKernelConfigBase( kernel_id );
+
+        return ( ptr_kernel_conf != nullptr )
+            ? ptr_kernel_conf->setWorkGroupSizes(
+                std::forward< Args >( params )... ) : false;
+    }
+
+    template< typename... Args >
+    bool ControllerBase::setKernelWorkItemOffsets(
+        ControllerBase::kernel_id_t kernel_id,
+        Args&&... params ) SIXTRL_NOEXCEPT
+    {
+        ControllerBase::kernel_config_base_t* ptr_kernel_conf =
+            this->ptrKernelConfigBase( kernel_id );
+
+        return ( ptr_kernel_conf != nullptr )
+            ? ptr_kernel_conf->setWorkItemOffset(
+                std::forward< Args >( params )... ) : false;
+    }
+
+    template< typename... Args >
+    bool ControllerBase::setKernelPreferredWorkGroupMultiple(
+        ControllerBase::kernel_id_t kernel_id,
+        Args&&... params ) SIXTRL_NOEXCEPT
+    {
+        ControllerBase::kernel_config_base_t* ptr_kernel_conf =
+            this->ptrKernelConfigBase( kernel_id );
+
+        return ( ptr_kernel_conf != nullptr )
+            ? ptr_kernel_conf->setPreferredWorkGroupMultiple(
+                std::forward< Args >( params )... ) : false;
+    }
+
+    /* --------------------------------------------------------------------- */
+
     template< class Derived > Derived const*
     ControllerBase::asDerivedController(
         ControllerBase::arch_id_t const requ_arch_id,

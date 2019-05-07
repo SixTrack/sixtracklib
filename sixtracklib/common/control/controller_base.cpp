@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <limits>
+#include <stdexcept>
+#include <vector>
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/namespace.h"
@@ -218,6 +220,177 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
+    /* ===================================================================== */
+
+    ControllerBase::size_type
+    ControllerBase::numKernels() const SIXTRL_NOEXCEPT
+    {
+        return this->m_num_kernels;
+    }
+
+    ControllerBase::size_type
+    ControllerBase::kernelWorkItemsDim(
+        kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        ControllerBase::kernel_config_base_t const* ptr_kernel_conf_base =
+            this->ptrKernelConfigBase( kernel_id );
+
+        return ( ptr_kernel_conf_base != nullptr )
+            ? ptr_kernel_conf_base->workItemsDim()
+            : ControllerBase::size_type{ 0 };
+    }
+
+    ControllerBase::size_type
+    ControllerBase::kernelWorkGroupsDim(
+        kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        ControllerBase::kernel_config_base_t const* ptr_kernel_conf_base =
+            this->ptrKernelConfigBase( kernel_id );
+
+        return ( ptr_kernel_conf_base != nullptr )
+            ? ptr_kernel_conf_base->workGroupsDim()
+            : ControllerBase::size_type{ 0 };
+    }
+
+    ControllerBase::size_type ControllerBase::kernelNumArguments(
+        ControllerBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        ControllerBase::kernel_config_base_t const* ptr_kernel_conf_base =
+            this->ptrKernelConfigBase( kernel_id );
+
+        return ( ptr_kernel_conf_base != nullptr )
+            ? ptr_kernel_conf_base->numArguments()
+            : ControllerBase::size_type{ 0 };
+    }
+
+    /* --------------------------------------------------------------------- */
+
+    bool ControllerBase::kernelHasName(
+        ControllerBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        ControllerBase::kernel_config_base_t const* ptr_kernel_conf_base =
+            this->ptrKernelConfigBase( kernel_id );
+
+        return ( ( ptr_kernel_conf_base != nullptr ) &&
+                 ( ptr_kernel_conf_base->hasName() ) );
+    }
+
+    std::string const& ControllerBase::kernelName(
+        ControllerBase::kernel_id_t const kernel_id ) const
+    {
+        ControllerBase::kernel_config_base_t const* ptr_kernel_conf_base =
+            this->ptrKernelConfigBase( kernel_id );
+
+        if( ptr_kernel_conf_base == nullptr )
+        {
+            throw std::runtime_error( "no kernel found for kernel_id" );
+        }
+
+        return ptr_kernel_conf_base->name();
+    }
+
+    char const* ControllerBase::ptrKernelNameStr(
+        ControllerBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        ControllerBase::kernel_config_base_t const* ptr_kernel_conf_base =
+            this->ptrKernelConfigBase( kernel_id );
+
+        return ( ptr_kernel_conf_base != nullptr )
+            ? ptr_kernel_conf_base->ptrNameStr() : nullptr;
+    }
+
+    /* --------------------------------------------------------------------- */
+
+    bool ControllerBase::hasKernel(
+        ControllerBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        return ( this->ptrKernelConfigBase( kernel_id ) != nullptr );
+    }
+
+    bool ControllerBase::hasKernel( std::string const& SIXTRL_RESTRICT_REF
+        kernel_name ) const SIXTRL_NOEXCEPT
+    {
+        return ( this->ptrKernelConfigBase( this->doFindKernelConfigByName(
+            kernel_name.c_str() ) ) != nullptr );
+    }
+
+    bool ControllerBase::hasKernel(
+        char const* SIXTRL_RESTRICT kernel_name ) const SIXTRL_NOEXCEPT
+    {
+        return ( this->ptrKernelConfigBase( this->doFindKernelConfigByName(
+            kernel_name ) ) != nullptr );
+    }
+
+    /* --------------------------------------------------------------------- */
+
+    ControllerBase::kernel_config_base_t const*
+    ControllerBase::ptrKernelConfigBase(
+        ControllerBase::kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        using _this_t = ControllerBase;
+
+        _this_t::kernel_config_base_t const* ptr_kernel_conf_base = nullptr;
+
+        if( ( kernel_id != _this_t::ILLEGAL_KERNEL_ID ) &&
+            ( static_cast< _this_t::size_type >( kernel_id ) <
+                this->m_kernel_configs.size() ) )
+        {
+            ptr_kernel_conf_base = this->m_kernel_configs[ kernel_id ].get();
+        }
+
+        return ptr_kernel_conf_base;
+    }
+
+    ControllerBase::kernel_config_base_t const*
+    ControllerBase::ptrKernelConfigBase( std::string const& SIXTRL_RESTRICT_REF
+        kernel_name ) const SIXTRL_NOEXCEPT
+    {
+        return this->ptrKernelConfigBase( this->doFindKernelConfigByName(
+            kernel_name.c_str() ) );
+    }
+
+    ControllerBase::kernel_config_base_t const*
+    ControllerBase::ptrKernelConfigBase(
+        char const* SIXTRL_RESTRICT kernel_name ) const SIXTRL_NOEXCEPT
+    {
+        return this->ptrKernelConfigBase( this->doFindKernelConfigByName(
+            kernel_name ) );
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    ControllerBase::kernel_config_base_t* ControllerBase::ptrKernelConfigBase(
+        ControllerBase::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
+    {
+        using _this_t = ControllerBase;
+        using ptr_t = _this_t::kernel_config_base_t*;
+
+        return const_cast< ptr_t >( static_cast< _this_t const& >(
+            *this ).ptrKernelConfigBase( kernel_id ) );
+    }
+
+    ControllerBase::kernel_config_base_t* ControllerBase::ptrKernelConfigBase(
+        std::string const& SIXTRL_RESTRICT_REF kernel_name ) SIXTRL_NOEXCEPT
+    {
+        using _this_t = ControllerBase;
+        using ptr_t = _this_t::kernel_config_base_t*;
+
+        return const_cast< ptr_t >( static_cast< _this_t const& >(
+            *this ).ptrKernelConfigBase( kernel_name ) );
+    }
+
+    ControllerBase::kernel_config_base_t* ControllerBase::ptrKernelConfigBase(
+        char const* SIXTRL_RESTRICT kernel_name ) SIXTRL_NOEXCEPT
+    {
+        using _this_t = ControllerBase;
+        using ptr_t = _this_t::kernel_config_base_t*;
+
+        return const_cast< ptr_t >( static_cast< _this_t const& >(
+            *this ).ptrKernelConfigBase( kernel_name ) );
+    }
+
+    /* ===================================================================== */
+
     ControllerBase::status_t ControllerBase::remapSentCObjectsBuffer(
         ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT arg,
         ControllerBase::size_type const arg_size )
@@ -278,7 +451,9 @@ namespace SIXTRL_CXX_NAMESPACE
         const char *const SIXTRL_RESTRICT arch_str,
         const char *const SIXTRL_RESTRICT config_str ) :
         ArchBase( arch_id, arch_str, config_str ),
+            m_kernel_configs(),
             m_ptr_success_flag_arg( nullptr ),
+            m_num_kernels( ControllerBase::size_type{ 0 } ),
             m_uses_nodes( false ),
             m_ready_for_remap( false ),
             m_ready_for_send( false ),
@@ -336,7 +511,8 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_uses_nodes = flag;
     }
 
-    void ControllerBase::doSetReadyForSendFlag( bool const flag ) SIXTRL_NOEXCEPT
+    void ControllerBase::doSetReadyForSendFlag(
+        bool const flag ) SIXTRL_NOEXCEPT
     {
         this->m_ready_for_send = flag;
     }
@@ -347,7 +523,8 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_ready_for_receive = flag;
     }
 
-    void ControllerBase::doSetReadyForRemapFlag( bool const flag ) SIXTRL_NOEXCEPT
+    void ControllerBase::doSetReadyForRemapFlag(
+        bool const flag ) SIXTRL_NOEXCEPT
     {
         this->m_ready_for_remap = flag;
     }
@@ -364,6 +541,88 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_ptr_success_flag_arg = std::move( ptr_stored_arg );
     }
 
+    /* -------------------------------------------------------------------- */
+
+    void ControllerBase::doReserveForNumKernelConfigs(
+        ControllerBase::size_type const kernel_configs_capacity )
+    {
+        this->m_kernel_configs.reserve( kernel_configs_capacity );
+    }
+
+    ControllerBase::kernel_id_t ControllerBase::doFindKernelConfigByName(
+        char const* SIXTRL_RESTRICT kernel_name ) const SIXTRL_NOEXCEPT
+    {
+        using _this_t = ControllerBase;
+        _this_t::kernel_id_t kernel_id = ControllerBase::ILLEGAL_KERNEL_ID;
+
+        if( ( kernel_name != nullptr ) &&
+            ( std::strlen( kernel_name ) > _this_t::size_type{ 0 } ) )
+        {
+            _this_t::size_type ii = _this_t::size_type{ 0 };
+            _this_t::size_type const nkernels = this->m_kernel_configs.size();
+
+            for( ; ii < nkernels ; ++ii )
+            {
+                _this_t::kernel_config_base_t const* ptr_kernel_conf_base =
+                    this->m_kernel_configs[ ii ].get();
+
+                if( ( ptr_kernel_conf_base != nullptr ) &&
+                    ( ptr_kernel_conf_base->hasName() ) &&
+                    ( 0 == ptr_kernel_conf_base->name().compare(
+                        kernel_name ) ) )
+                {
+                    kernel_id = static_cast< _this_t::kernel_id_t >( ii );
+                    break;
+                }
+            }
+        }
+
+        return kernel_id;
+    }
+
+    ControllerBase::kernel_id_t ControllerBase::doAppendKernelConfig(
+        ControllerBase::ptr_kernel_conf_base_t&&
+            ptr_kernel_conf_base ) SIXTRL_NOEXCEPT
+    {
+        using _this_t = ControllerBase;
+        _this_t::kernel_id_t kernel_id = _this_t::ILLEGAL_KERNEL_ID;
+
+        if( ptr_kernel_conf_base.get() != nullptr )
+        {
+            SIXTRL_ASSERT( this->m_kernel_configs.size() < static_cast<
+                _this_t::size_type >( _this_t::ILLEGAL_KERNEL_ID ) );
+
+            kernel_id = static_cast< kernel_id_t >(
+                this->m_kernel_configs.size() );
+
+
+            this->m_kernel_configs.push_back(
+                std::move( ptr_kernel_conf_base ) );
+        }
+
+        return kernel_id;
+    }
+
+    void ControllerBase::doRemoveKernelConfig(
+        ControllerBase::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
+    {
+        using kernel_conf_base_t = ControllerBase::kernel_config_base_t;
+        using size_t = ControllerBase::size_type;
+
+        kernel_conf_base_t* ptr_kernel_conf_base =
+            this->ptrKernelConfigBase( kernel_id );
+
+        if( ptr_kernel_conf_base != nullptr )
+        {
+            SIXTRL_ASSERT( kernel_id < this->m_kernel_configs.size() );
+            SIXTRL_ASSERT( this->m_num_kernels > size_t{ 0 } );
+
+            this->m_kernel_configs[ kernel_id ].reset( nullptr );
+            --this->m_num_kernels;
+        }
+
+        return;
+    }
 }
 
 #endif /* C++, host */
