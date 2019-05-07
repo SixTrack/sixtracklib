@@ -10,7 +10,6 @@ set( SIXTRACKLIB_COMMON_C99_HEADERS )
 set( SIXTRACKLIB_COMMON_CXX_HEADERS )
 
 add_subdirectory( generated      )
-
 add_subdirectory( buffer         )
 add_subdirectory( control        )
 add_subdirectory( context        )
@@ -24,6 +23,8 @@ add_subdirectory( be_srotation   )
 add_subdirectory( be_xyshift     )
 add_subdirectory( be_monitor     )
 add_subdirectory( output         )
+add_subdirectory( particles      )
+add_subdirectory( track          )
 
 set( SIXTRACKLIB_COMMON_INTERNAL_CXX_HEADERS )
 set( SIXTRACKLIB_COMMON_INTERNAL_CXX_SOURCES )
