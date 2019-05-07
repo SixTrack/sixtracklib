@@ -24,6 +24,7 @@ typedef enum NS(object_type_values_e)
     NS(OBJECT_TYPE_BEAM_MONITOR)          =         10,
     NS(OBJECT_TYPE_LINE)                  =       1024,
     NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF)     =      65535,
+    NS(OBJECT_TYPE_PARTICLES_ADDR)        =      65536,
     NS(OBJECT_TYPE_LAST_AVAILABLE)        = 0x3fffffff,
     NS(OBJECT_TYPE_INVALID)               = 0x7fffffff
 }
@@ -90,7 +91,15 @@ namespace SIXTRL_CXX_NAMESPACE
             NS(OBJECT_TYPE_LINE) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_INVALID      = static_cast< object_type_id_t >(
+        OBJECT_TYPE_ELEM_BY_ELEM_CONF = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_PARTICLES_ADDR = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_PARTICLES_ADDR) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_INVALID = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_INVALID) );
 
     template< class Elem >
