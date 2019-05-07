@@ -9,6 +9,8 @@
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/control/arch_info.hpp"
 
+namespace st = SIXTRL_CXX_NAMESPACE;
+
 SIXTRL_ARGPTR_DEC ::NS(ArchInfo)* NS(ArchInfo_preset)(
     SIXTRL_ARGPTR_DEC ::NS(ArchInfo)* SIXTRL_RESTRICT arch_info )
 {
@@ -22,13 +24,13 @@ SIXTRL_ARGPTR_DEC ::NS(ArchInfo)* NS(ArchInfo_preset)(
 
 SIXTRL_ARGPTR_DEC NS(ArchInfo)* NS(ArchInfo_create)()
 {
-    return new SIXTRL_CXX_NAMESPACE::ArchInfo;
+    return new st::ArchInfo;
 }
 
 SIXTRL_ARGPTR_DEC NS(ArchInfo)* NS(ArchInfo_new)(
     NS(arch_id_t) const arch_id, char const* SIXTRL_RESTRICT arch_str )
 {
-    return new SIXTRL_CXX_NAMESPACE::ArchInfo( arch_id, arch_str );
+    return new st::ArchInfo( arch_id, arch_str );
 }
 
 void NS(ArchInfo_delete)(
@@ -41,7 +43,7 @@ void NS(ArchInfo_delete)(
     SIXTRL_ARGPTR_DEC const ::NS(ArchInfo) *const SIXTRL_RESTRICT arch_info )
 {
     return ( arch_info != nullptr )
-        ? arch_info->archId() : ::NS(ARCHITECTURE_ILLEGAL);
+        ? arch_info->archId() : st::ArchInfo::ILLEGAL_ARCH;
 }
 
 bool NS(ArchInfo_has_arch_string)(
@@ -105,6 +107,56 @@ void NS(ArchInfo_reset_to_initial_values)(
     {
         arch_info->reset();
     }
+}
+
+/* ------------------------------------------------------------------------ */
+
+
+NS(controller_status_t) NS(ArchInfo_sanitize_arch_str_inplace)(
+    char* SIXTRL_RESTRICT arch_str,
+    ::NS(buffer_size_t) const arch_str_capacity )
+{
+     NS(controller_status_t) success = ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+
+    if( ( arch_str != nullptr ) &&
+        ( std::strlen( arch_str ) < arch_str_capacity ) )
+    {
+        std::string const str = st::ArchInfo_sanitize_arch_str( arch_str );
+
+        if( ( !str.empty() ) && ( str.size() < arch_str_capacity ) )
+        {
+            std::memset( arch_str, ( int )'\0', arch_str_capacity );
+            std::strncpy( arch_str, str.c_str(), str.size() );
+            success = ::NS(CONTROLLER_STATUS_SUCCESS);
+        }
+    }
+
+    return success;
+}
+
+NS(controller_status_t) NS(ArchInfo_sanitize_arch_str)(
+    const char *const SIXTRL_RESTRICT arch_str,
+    char* SIXTRL_RESTRICT sanarch_str,
+    ::NS(buffer_size_t) const sanarch_str_capacity )
+{
+    using buf_size_t = ::NS(buffer_size_t);
+
+    NS(controller_status_t) success = ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+
+    if( ( arch_str != nullptr ) && ( sanarch_str != nullptr ) &&
+        ( sanarch_str_capacity > buf_size_t{ 1 } ) )
+    {
+        std::string const str = st::ArchInfo_sanitize_arch_str( arch_str );
+
+        if( ( !str.empty() ) && ( str.size() <= sanarch_str_capacity ) )
+        {
+            std::memset( sanarch_str, ( int )'\0', sanarch_str_capacity );
+            std::strncpy( sanarch_str, str.c_str(), str.size() );
+            success = ::NS(CONTROLLER_STATUS_SUCCESS);
+        }
+    }
+
+    return success;
 }
 
 /* end: sixtracklib/common/control/arch_info_c99.cpp */

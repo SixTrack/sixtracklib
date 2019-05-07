@@ -28,8 +28,11 @@ namespace SIXTRL_CXX_NAMESPACE
         using arch_id_t = SIXTRL_CXX_NAMESPACE::arch_id_t;
         using size_type = SIXTRL_CXX_NAMESPACE::arch_size_t;
 
-        SIXTRL_HOST_FN explicit ArchInfo( arch_id_t const arch_id =
-                SIXTRL_CXX_NAMESPACE::ARCHITECTURE_ILLEGAL,
+        static constexpr arch_id_t ILLEGAL_ARCH =
+            SIXTRL_CXX_NAMESPACE::ARCHITECTURE_ILLEGAL;
+
+        SIXTRL_HOST_FN explicit ArchInfo(
+            arch_id_t const arch_id = ILLEGAL_ARCH,
             const char *const SIXTRL_RESTRICT arch_str = nullptr );
 
         SIXTRL_HOST_FN explicit ArchInfo( arch_id_t const arch_id,
@@ -78,6 +81,20 @@ namespace SIXTRL_CXX_NAMESPACE
         std::string m_arch_str;
         arch_id_t   m_arch_id;
     };
+
+    SIXTRL_HOST_FN SIXTRL_STATIC std::string ArchInfo_sanitize_arch_str(
+        std::string const& SIXTRL_RESTRICT_REF arch_str );
+
+    SIXTRL_HOST_FN SIXTRL_STATIC std::string ArchInfo_sanitize_arch_str(
+        const char *const SIXTRL_RESTRICT arch_str );
+
+    SIXTRL_HOST_FN SIXTRL_STATIC SIXTRL_CXX_NAMESPACE::arch_id_t
+    ArchInfo_arch_string_to_arch_id(
+        std::string const& SIXTRL_RESTRICT_REF arch_str ) SIXTRL_NOEXCEPT;
+
+    SIXTRL_HOST_FN SIXTRL_STATIC SIXTRL_CXX_NAMESPACE::arch_id_t
+    ArchInfo_arch_string_to_arch_id(
+        char const* SIXTRL_RESTRICT arch_str ) SIXTRL_NOEXCEPT;
 }
 
 typedef SIXTRL_CXX_NAMESPACE::ArchInfo NS(ArchInfo);
@@ -85,6 +102,87 @@ typedef SIXTRL_CXX_NAMESPACE::ArchInfo NS(ArchInfo);
 #else /* C++, Host */
 
 typedef void NS(ArchInfo);
+
+#endif /* C++, Host */
+
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+    #include <algorithm>
+    #include <cstring>
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
+namespace SIXTRL_CXX_NAMESPACE
+{
+    SIXTRL_INLINE std::string ArchInfo_sanitize_arch_str(
+        std::string const& SIXTRL_RESTRICT_REF arch_str )
+    {
+        return SIXTRL_CXX_NAMESPACE::ArchInfo_sanitize_arch_str(
+            arch_str.c_str() );
+    }
+
+    SIXTRL_INLINE std::string ArchInfo_sanitize_arch_str(
+        const char *const SIXTRL_RESTRICT arch_str )
+    {
+        std::size_t const arch_str_len = ( arch_str != nullptr )
+            ? std::strlen( arch_str ) : std::size_t{ 0 };
+
+        std::string result_str;
+
+        if( arch_str_len > std::size_t{ 0 } )
+        {
+            char const* it  = arch_str;
+            char const* end = arch_str;
+            std::advance( end, arch_str_len );
+
+            result_str.resize( arch_str_len );
+            std::transform( it, end, result_str.begin(), ::tolower );
+        }
+
+        return result_str;
+    }
+
+    SIXTRL_INLINE SIXTRL_CXX_NAMESPACE::arch_id_t
+    ArchInfo_arch_string_to_arch_id(
+        std::string const& SIXTRL_RESTRICT_REF arch_str ) SIXTRL_NOEXCEPT
+    {
+        return ArchInfo_arch_string_to_arch_id( arch_str.c_str() );
+    }
+
+    SIXTRL_INLINE SIXTRL_CXX_NAMESPACE::arch_id_t
+    ArchInfo_arch_string_to_arch_id(
+        char const* SIXTRL_RESTRICT arch_str ) SIXTRL_NOEXCEPT
+    {
+        SIXTRL_CXX_NAMESPACE::arch_id_t arch_id =
+            SIXTRL_CXX_NAMESPACE::ARCHITECTURE_NONE;
+
+        if( ( arch_str != nullptr ) &&
+            ( std::strlen( arch_str ) > std::size_t{ 0 } ) )
+        {
+            if( 0 == std::strcmp( arch_str, SIXTRL_ARCHITECTURE_CPU_STR ) )
+            {
+                arch_id = SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CPU;
+            }
+            else if( 0 == std::strcmp(
+                    arch_str, SIXTRL_ARCHITECTURE_OPENCL_STR ) )
+            {
+                arch_id = SIXTRL_CXX_NAMESPACE::ARCHITECTURE_OPENCL;
+            }
+            else if( 0 == std::strcmp(
+                    arch_str, SIXTRL_ARCHITECTURE_CUDA_STR ) )
+            {
+                arch_id = SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA;
+            }
+            else
+            {
+                arch_id = SIXTRL_CXX_NAMESPACE::ARCHITECTURE_ILLEGAL;
+            }
+        }
+
+        return arch_id;
+    }
+}
 
 #endif /* C++, Host */
 

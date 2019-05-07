@@ -88,7 +88,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_HOST_FN void ArchInfo::reset() SIXTRL_NOEXCEPT
     {
-        this->m_arch_id = SIXTRL_CXX_NAMESPACE::ARCHITECTURE_ILLEGAL;
+        this->m_arch_id = ArchInfo::ILLEGAL_ARCH;
         this->m_arch_str.clear();
 
         return;
