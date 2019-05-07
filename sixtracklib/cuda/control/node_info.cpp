@@ -1,4 +1,4 @@
-#include "sixtracklib/cuda/node_info.hpp"
+#include "sixtracklib/cuda/control/node_info.hpp"
 
 #include <cstddef>
 #include <cstdlib>
@@ -138,13 +138,14 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_cu_device_pci_bus_id.c_str();
     }
 
-    ::cudaDeviceProp const*
-    CudaNodeInfo::ptrCudaDeviceProperties() const SIXTRL_NOEXCEPT
+    ::cudaDeviceProp const&
+    CudaNodeInfo::cudaDeviceProperties() const SIXTRL_NOEXCEPT
     {
-        return &this->m_cu_device_properties;
+        return this->m_cu_device_properties;
     }
 
-    ::cudaDeviceProp* CudaNodeInfo::ptrCudaDeviceProperties() SIXTRL_NOEXCEPT
+    ::cudaDeviceProp const*
+    CudaNodeInfo::ptrCudaDeviceProperties() const SIXTRL_NOEXCEPT
     {
         return &this->m_cu_device_properties;
     }
@@ -176,4 +177,4 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 }
 
-/* end: sixtracklib/cuda/internal/node_info.cpp */
+/* end: sixtracklib/cuda/control/node_info.cpp */

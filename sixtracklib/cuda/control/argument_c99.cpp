@@ -149,4 +149,4 @@ char const* NS(CudaArgument_get_arch_string)(
 
 #endif /* C++, Host */
 
-/* end: sixtracklib/cuda/internal/argument_c99.cpp */
+/* end: sixtracklib/cuda/control/argument_c99.cpp */

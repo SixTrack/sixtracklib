@@ -18,8 +18,8 @@
 #include "sixtracklib/common/control/controller_base.hpp"
 
 #include "sixtracklib/cuda/definitions.h"
-#include "sixtracklib/cuda/internal/controller_base.hpp"
-#include "sixtracklib/cuda/internal/argument_base.hpp"
+#include "sixtracklib/cuda/control/controller_base.hpp"
+#include "sixtracklib/cuda/control/argument_base.hpp"
 #include "sixtracklib/cuda/controller.hpp"
 
 namespace SIXTRL_CXX_NAMESPACE
@@ -165,4 +165,4 @@ namespace SIXTRL_CXX_NAMESPACE
 
 #endif /* C++, Host */
 
-/* end: sixtracklib/cuda/internal/argument.cpp */
+/* end: sixtracklib/cuda/control/argument.cpp */

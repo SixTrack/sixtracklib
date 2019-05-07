@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_CUDA_INTERNAL_ARGUMENT_BASE_HPP__
-#define SIXTRACKLIB_CUDA_INTERNAL_ARGUMENT_BASE_HPP__
+#ifndef SIXTRACKLIB_CUDA_CONTROL_ARGUMENT_BASE_HPP__
+#define SIXTRACKLIB_CUDA_CONTROL_ARGUMENT_BASE_HPP__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
@@ -116,5 +116,5 @@ typedef void  NS(CudaArgumentBase);
 
 #endif /* C++, Host */
 
-#endif /* SIXTRACKLIB_CUDA_INTERNAL_ARGUMENT_BASE_HPP__ */
-/* end: sixtracklib/cuda/internal/argument_base.h */
+#endif /* SIXTRACKLIB_CUDA_CONTROL_ARGUMENT_BASE_HPP__ */
+/* end: sixtracklib/cuda/control/argument_base.h */

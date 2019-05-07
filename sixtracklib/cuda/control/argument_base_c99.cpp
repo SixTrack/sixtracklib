@@ -1,4 +1,4 @@
-#include "sixtracklib/cuda/internal/argument_base.h"
+#include "sixtracklib/cuda/control/argument_base.h"
 
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
@@ -6,7 +6,7 @@
 #include <cstddef>
 
 #include "sixtracklib/common/definitions.h"
-#include "sixtracklib/cuda/internal/argument_base.hpp"
+#include "sixtracklib/cuda/control/argument_base.hpp"
 
 bool NS(CudaArgument_has_cuda_arg_buffer)(
     const ::NS(CudaArgumentBase) *const SIXTRL_RESTRICT arg )
@@ -22,4 +22,4 @@ bool NS(CudaArgument_has_cuda_arg_buffer)(
 
 #endif /* C++, Host */
 
-/* end: sixtracklib/cuda/internal/argument_base_c99.cpp */
+/* end: sixtracklib/cuda/control/argument_base_c99.cpp */

@@ -8,7 +8,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/internal/argument_base.hpp"
+    #include "sixtracklib/cuda/control/argument_base.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
@@ -27,4 +27,4 @@ NS(CudaArgument_get_cuda_arg_buffer)(
 #endif /* C++, Host */
 
 #endif /* SIXTRACKLIB_CUDA_INTERNAL_ARGUMENT_BASE_H__ */
-/* end: sixtracklib/cuda/internal/argument_base.h */
+/* end: sixtracklib/cuda/control/argument_base.h */

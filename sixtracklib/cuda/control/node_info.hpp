@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_CUDA_NODE_INFO_HPP__
-#define SIXTRACKLIB_CUDA_NODE_INFO_HPP__
+#ifndef SIXTRACKLIB_CUDA_CONTROL_NODE_INFO_HPP__
+#define SIXTRACKLIB_CUDA_CONTROL_NODE_INFO_HPP__
 
 #if !defined( SIXTRKL_NO_SYSTEM_INCLUDES )
     #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
@@ -66,10 +66,11 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN std::string const& pciBusId() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN char const* ptrPciBusIdStr() const SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN ::cudaDeviceProp const&
+        cudaDeviceProperties() const SIXTRL_NOEXCEPT;
+
         SIXTRL_HOST_FN ::cudaDeviceProp const*
         ptrCudaDeviceProperties() const SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN ::cudaDeviceProp* ptrCudaDeviceProperties() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool hasCudaDeviceIndex() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN cuda_dev_index_t cudaDeviceIndex() const SIXTRL_NOEXCEPT;
@@ -95,6 +96,6 @@ typedef void NS(CudaNodeInfo);
 
 #endif /* C++, Host */
 
-#endif /* SIXTRACKLIB_CUDA_NODE_INFO_HPP__ */
+#endif /* SIXTRACKLIB_CUDA_CONTROL_NODE_INFO_HPP__ */
 
-/* end : sixtracklib/cuda/node_info.hpp */
+/* end : sixtracklib/cuda/control/node_info.hpp */

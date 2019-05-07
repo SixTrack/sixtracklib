@@ -1,4 +1,4 @@
-#include "sixtracklib/cuda/internal/controller_base.h"
+#include "sixtracklib/cuda/control/controller_base.h"
 
 #if !defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
@@ -8,7 +8,7 @@
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/cuda/definitions.h"
-#include "sixtracklib/cuda/internal/controller_base.hpp"
+#include "sixtracklib/cuda/control/controller_base.hpp"
 
 void NS(CudaControllerBase_delete)(
     NS(CudaControllerBase)* SIXTRL_RESTRICT ctrl )

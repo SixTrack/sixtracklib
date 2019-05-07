@@ -1,4 +1,4 @@
-#include "sixtracklib/cuda/internal/controller_base.hpp"
+#include "sixtracklib/cuda/control/controller_base.hpp"
 
 #if defined( __cplusplus ) && !defined( __CUDA_ARCH__ ) && !defined( _GPUCODE )
 
@@ -13,7 +13,7 @@
 #include "sixtracklib/common/control/controller_on_nodes_base.hpp"
 #include "sixtracklib/common/buffer.h"
 
-#include "sixtracklib/cuda/internal/argument_base.hpp"
+#include "sixtracklib/cuda/control/argument_base.hpp"
 #include "sixtracklib/cuda/wrappers/context_operations.h"
 
 namespace SIXTRL_CXX_NAMESPACE
@@ -81,6 +81,152 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         return this->doSelectNode(
             this->doFindAvailableNodesByPciBusId( pci_bus_id ) );
+    }
+
+    /* ===================================================================== */
+
+    CudaControllerBase::kernel_config_t const*
+    CudaControllerBase::ptrKernelConfig(
+        kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT
+    {
+        auto ptr_config = this->ptrKernelConfigBase( kernel_id );
+
+        return ( ptr_config != nullptr )
+            ? ptr_config->asDerivedKernelConfig<
+                CudaControllerBase::kernel_config_t >( this->archId() )
+            : nullptr;
+    }
+
+    CudaControllerBase::kernel_config_t const*
+    CudaControllerBase::ptrKernelConfig( std::string const&
+        SIXTRL_RESTRICT_REF kernel_name ) const SIXTRL_NOEXCEPT
+    {
+        return this->ptrKernelConfig(
+            this->doFindKernelConfigByName( kernel_name.c_str() ) );
+    }
+
+    CudaControllerBase::kernel_config_t const*
+    CudaControllerBase::ptrKernelConfig(
+        char const* SIXTRL_RESTRICT kernel_name ) const SIXTRL_NOEXCEPT
+    {
+        return this->ptrKernelConfig(
+            this->doFindKernelConfigByName( kernel_name ) );
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    CudaControllerBase::kernel_config_t* CudaControllerBase::ptrKernelConfig(
+        kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
+    {
+        return const_cast< CudaControllerBase::kernel_config_t* >(
+            static_cast< CudaControllerBase const& >(
+                *this ).ptrKernelConfig( kernel_id ) );
+    }
+
+    CudaControllerBase::kernel_config_t* CudaControllerBase::ptrKernelConfig(
+        std::string const& SIXTRL_RESTRICT_REF kernel_name ) SIXTRL_NOEXCEPT
+    {
+        return this->ptrKernelConfig(
+            this->doFindKernelConfigByName( kernel_name.c_str() ) );
+    }
+
+    CudaControllerBase::kernel_config_t* CudaControllerBase::ptrKernelConfig(
+        char const* SIXTRL_RESTRICT kernel_name ) SIXTRL_NOEXCEPT
+    {
+        return this->ptrKernelConfig(
+            this->doFindKernelConfigByName( kernel_name ) );
+    }
+
+    /* --------------------------------------------------------------------- */
+
+    CudaControllerBase::kernel_id_t CudaControllerBase::addCudaKernelConfig(
+        CudaControllerBase::kernel_config_t const& kernel_config )
+    {
+        CudaControllerBase::ptr_cuda_kernel_config_t ptr_kernel_conf(
+            new kernel_config_t( kernel_config ) );
+
+        return this->doAppendCudaKernelConfig( std::move( ptr_kernel_conf ) );
+    }
+
+    CudaControllerBase::kernel_id_t CudaControllerBase::addCudaKernelConfig(
+        std::string const& kernel_name,
+        CudaControllerBase::size_type const num_arguments,
+        CudaControllerBase::size_type const grid_dim ,
+        CudaControllerBase::size_type const shared_mem_per_block,
+        CudaControllerBase::size_type const max_blocks_limit,
+        char const* SIXTRL_RESTRICT config_str )
+    {
+        return this->addCudaKernelConfig( kernel_name.c_str(), num_arguments,
+            grid_dim, shared_mem_per_block, max_blocks_limit, config_str );
+    }
+
+    CudaControllerBase::kernel_id_t CudaControllerBase::addCudaKernelConfig(
+        char const* SIXTRL_RESTRICT kernel_name,
+        CudaControllerBase::size_type const num_arguments,
+        CudaControllerBase::size_type const grid_dim,
+        CudaControllerBase::size_type const shared_mem_per_block,
+        CudaControllerBase::size_type const max_blocks_limit,
+        char const* SIXTRL_RESTRICT config_str )
+    {
+        using kernel_config_t = CudaControllerBase::kernel_config_t;
+
+        CudaControllerBase::ptr_cuda_kernel_config_t ptr_kernel_conf(
+            new kernel_config_t( grid_dim, grid_dim, shared_mem_per_block,
+                max_blocks_limit, kernel_config_t::DEFAULT_WARP_SIZE,
+                    config_str ) );
+
+        ptr_kernel_conf->setName( kernel_name );
+
+        if( ptr_kernel_conf.get() != nullptr )
+        {
+            ptr_kernel_conf->setName( kernel_name );
+        }
+
+        return this->doAppendCudaKernelConfig( std::move( ptr_kernel_conf ) );
+    }
+
+    CudaControllerBase::kernel_id_t
+    CudaControllerBase::doAppendCudaKernelConfig(
+        CudaControllerBase::ptr_cuda_kernel_config_t&&
+            ptr_kernel_conf ) SIXTRL_NOEXCEPT
+    {
+        using _this_t = CudaControllerBase;
+        using size_t = _this_t::size_type;
+        using kernel_id_t = _this_t::kernel_id_t;
+        using node_info_t = _this_t::node_info_t;
+        using kernel_config_t = _this_t::kernel_config_t;
+
+        kernel_id_t kernel_id = _this_t::ILLEGAL_KERNEL_ID;
+
+        if( ( this->hasSelectedNode() ) &&
+            ( ptr_kernel_conf.get() != nullptr ) )
+        {
+            node_info_t const* ptr_node_info = this->ptrNodeInfo(
+                this->selectedNodeIndex() );
+
+            if( ptr_node_info == nullptr )
+            {
+                return kernel_id;
+            }
+
+            size_t const warp_size =
+                ptr_node_info->cudaDeviceProperties().warpSize;
+
+            if( warp_size != ptr_kernel_conf->warpSize() )
+            {
+                ptr_kernel_conf->setWarpSize( warp_size );
+            }
+
+            if( ptr_kernel_conf->needsUpdate() )
+            {
+                ptr_kernel_conf->update();
+            }
+
+            kernel_id = this->doAppendKernelConfig(
+                std::move( ptr_kernel_conf ) );
+        }
+
+        return kernel_id;
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

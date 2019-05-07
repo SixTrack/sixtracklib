@@ -1,4 +1,4 @@
-#include "sixtracklib/cuda/internal/argument_base.hpp"
+#include "sixtracklib/cuda/control/argument_base.hpp"
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
@@ -17,7 +17,7 @@
 #include "sixtracklib/common/control/argument_base.hpp"
 #include "sixtracklib/common/control/controller_base.hpp"
 
-#include "sixtracklib/cuda/internal/controller_base.hpp"
+#include "sixtracklib/cuda/control/controller_base.hpp"
 #include "sixtracklib/cuda/wrappers/argument_operations.h"
 
 namespace SIXTRL_CXX_NAMESPACE
@@ -152,4 +152,4 @@ namespace SIXTRL_CXX_NAMESPACE
 
 #endif /* c++, host */
 
-/* end: sixtracklib/cuda/internal/argument_base.cpp */
+/* end: sixtracklib/cuda/control/argument_base.cpp */

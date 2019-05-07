@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_CUDA_INTERNAL_CONTROLLER_BASE_H__
-#define SIXTRACKLIB_CUDA_INTERNAL_CONTROLLER_BASE_H__
+#ifndef SIXTRACKLIB_CUDA_CONTROL_CONTROLLER_BASE_H__
+#define SIXTRACKLIB_CUDA_CONTROL_CONTROLLER_BASE_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -12,7 +12,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/internal/controller_base.hpp"
+    #include "sixtracklib/cuda/control/controller_base.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
@@ -39,6 +39,6 @@ NS(CudaController_select_node_by_cuda_pci_bus_id)(
 }
 #endif /* C++, Host */
 
-#endif /* SIXTRACKLIB_CUDA_INTERNAL_CONTROLLER_BASE_H__ */
+#endif /* SIXTRACKLIB_CUDA_CONTROL_CONTROLLER_BASE_H__ */
 
-/* end: sixtracklib/cuda/internal/controller_base.h */
+/* end: sixtracklib/cuda/control/controller_base.h */

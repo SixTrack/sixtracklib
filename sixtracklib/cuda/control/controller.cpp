@@ -7,7 +7,8 @@
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/control/definitions.h"
-#include "sixtracklib/cuda/internal/controller_base.hpp"
+#include "sixtracklib/cuda/definitions.h"
+#include "sixtracklib/cuda/control/controller_base.hpp"
 #include "sixtracklib/cuda/argument.hpp"
 
 namespace SIXTRL_CXX_NAMESPACE

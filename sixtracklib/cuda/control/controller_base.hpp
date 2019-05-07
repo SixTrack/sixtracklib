@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_CUDA_INTERNAL_CONTROL_BASE_HPP__
-#define SIXTRACKLIB_CUDA_INTERNAL_CONTROL_BASE_HPP__
+#ifndef SIXTRACKLIB_CUDA_CONTROL_CONTROLLER_BASE_HPP__
+#define SIXTRACKLIB_CUDA_CONTROL_CONTROLLER_BASE_HPP__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
@@ -15,12 +15,15 @@
     #include "sixtracklib/common/control/controller_base.hpp"
     #include "sixtracklib/common/control/controller_on_nodes_base.hpp"
     #include "sixtracklib/common/buffer.h"
-    #include "sixtracklib/cuda/node_info.hpp"
 
     #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
        !defined( __CUDA_ARCH__ )
         #include "sixtracklib/common/buffer.hpp"
     #endif /* C++, Host */
+
+    #include "sixtracklib/cuda/definitions.h"
+    #include "sixtracklib/cuda/control/node_info.hpp"
+    #include "sixtracklib/cuda/control/kernel_config.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
@@ -37,6 +40,7 @@ namespace SIXTRL_CXX_NAMESPACE
         public:
 
         using node_info_t         = SIXTRL_CXX_NAMESPACE::CudaNodeInfo;
+        using kernel_config_t     = SIXTRL_CXX_NAMESPACE::CudaKernelConfig;
         using cuda_device_index_t = node_info_t::cuda_dev_index_t;
 
         using arch_id_t           = _base_controller_t::arch_id_t;
@@ -48,6 +52,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using node_index_t        = _base_controller_t::node_index_t;
         using ptr_arg_base_t      = _base_controller_t::ptr_arg_base_t;
         using status_t            = _base_controller_t::status_t;
+        using kernel_id_t         = _base_controller_t::kernel_id_t;
         using buffer_t            = _base_controller_t::buffer_t;
         using c_buffer_t          = _base_controller_t::c_buffer_t;
 
@@ -83,9 +88,53 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN bool selectNodeByPciBusId(
             char const* SIXTRL_RESTRICT pci_bus_id );
 
-        /* ---------------------------------------------------------------- */
+        /* ================================================================ */
+
+        SIXTRL_HOST_FN kernel_config_t const*
+        ptrKernelConfig( kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_config_t const* ptrKernelConfig(
+            std::string const& SIXTRL_RESTRICT_REF kernel_name
+        ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_config_t const* ptrKernelConfig(
+            char const* SIXTRL_RESTRICT kernel_name ) const SIXTRL_NOEXCEPT;
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        SIXTRL_HOST_FN kernel_config_t*
+        ptrKernelConfig( kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_config_t* ptrKernelConfig(
+            std::string const& SIXTRL_RESTRICT_REF kname ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_config_t* ptrKernelConfig(
+            char const* SIXTRL_RESTRICT kernel_name ) SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN kernel_id_t addCudaKernelConfig(
+            kernel_config_t const& kernel_config );
+
+        SIXTRL_HOST_FN kernel_id_t addCudaKernelConfig(
+            std::string const& kernel_name,
+            size_type const num_arguments,
+            size_type const grid_dim = size_type{ 1 },
+            size_type const shared_mem_per_block = size_type{ 0 },
+            size_type const max_blocks_limit = size_type{ 0 },
+            char const* SIXTRL_RESTRICT config_str = nullptr );
+
+        SIXTRL_HOST_FN kernel_id_t addCudaKernelConfig(
+            char const* SIXTRL_RESTRICT kernel_name,
+            size_type const num_arguments,
+            size_type const grid_dim = size_type{ 1 },
+            size_type const shared_mem_per_block = size_type{ 0 },
+            size_type const max_blocks_limit = size_type{ 0 },
+            char const* SIXTRL_RESTRICT config_str = nullptr );
 
         protected:
+
+        using ptr_cuda_kernel_config_t = std::unique_ptr< kernel_config_t >;
 
         SIXTRL_HOST_FN explicit CudaControllerBase(
             char const* config_str = nullptr );
@@ -126,6 +175,9 @@ namespace SIXTRL_CXX_NAMESPACE
             char const* SIXTRL_RESTRICT pci_bus_id_str ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool doInitAllCudaNodes();
+
+        SIXTRL_HOST_FN kernel_id_t doAppendCudaKernelConfig(
+            ptr_cuda_kernel_config_t&& ptr_kernel_conf ) SIXTRL_NOEXCEPT;
     };
 }
 
@@ -141,6 +193,6 @@ typedef void NS(CudaControllerBase);
 
 #endif /* C++, Host */
 
-#endif /* SIXTRACKLIB_CUDA_INTERNAL_CONTROL_BASE_HPP__ */
+#endif /* SIXTRACKLIB_CUDA_CONTROL_CONTROLLER_BASE_HPP__ */
 
-/* end: sixtracklib/cuda/internal/context_base.hpp */
+/* end: sixtracklib/cuda/control/controller_base.hpp */
