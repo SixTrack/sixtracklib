@@ -233,9 +233,9 @@ if( GTEST_FOUND )
     # ==========================================================================
     # test_track_job_common_c99:
 
-    add_executable( test_track_job_common_c99 test_track_job_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_common_c99 )
-    add_test( C99_CommonTrackJobTests, test_track_job_common_c99 )
+#     add_executable( test_track_job_common_c99 test_track_job_c99.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_common_c99 )
+#     add_test( C99_CommonTrackJobTests, test_track_job_common_c99 )
 
     # --------------------------------------------------------------------------
     # test_track_job_common_cxx:
