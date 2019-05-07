@@ -18,7 +18,7 @@
     #endif /* defined( __cplusplus ) */
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/internal/argument_base.hpp"
+    #include "sixtracklib/cuda/control/argument_base.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )

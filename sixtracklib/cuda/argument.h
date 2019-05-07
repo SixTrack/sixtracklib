@@ -10,7 +10,7 @@
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/internal/argument_base.h"
+    #include "sixtracklib/cuda/control/argument_base.h"
     #include "sixtracklib/cuda/argument.hpp"
     #include "sixtracklib/cuda/controller.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */

@@ -13,8 +13,8 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/internal/controller_base.hpp"
-    #include "sixtracklib/cuda/internal/argument_base.hpp"
+    #include "sixtracklib/cuda/control/controller_base.hpp"
+    #include "sixtracklib/cuda/control/argument_base.hpp"
     #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
        !defined( __CUDA_ARCH__ )
         #include "sixtracklib/common/buffer.hpp"
