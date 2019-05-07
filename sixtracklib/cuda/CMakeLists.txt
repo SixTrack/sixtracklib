@@ -1,5 +1,5 @@
 # ==============================================================================
-# CUDA sixtracklib submodule
+# CUDA sixtracklib architecture
 
 message( STATUS "---- processing sixtracklib/cuda/CMakeLists.txt" )
 
@@ -28,6 +28,12 @@ endif()
 
 set( SIXTRACKL_CUDA_HOST_DEFINITIONS )
 list( APPEND SIXTRACKL_CUDA_HOST_DEFINITIONS ${SIXTRACKLIB_NAMESPACE_FLAGS} )
+
+
+# -----------------------------------------------------------------------------
+# submodules
+
+add_subdirectory( control )
 
 set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
      wrappers/argument_operations.h
@@ -95,49 +101,9 @@ set( SIXTRACKL_CUDA_C99_HEADERS
 )
 
 set( SIXTRACKL_CUDA_CXX_HEADERS
-     node_info.hpp
-     internal/argument_base.hpp
-     internal/controller_base.hpp
      argument.hpp
      controller.hpp
 )
-
-set( SIXTRACKL_CUDA_CXX_SOURCES
-     internal/node_info.cpp
-     internal/argument_base.cpp
-     internal/argument_base_c99.cpp
-     internal/argument.cpp
-     internal/argument_c99.cpp
-     internal/controller_base.cpp
-     internal/controller_base_c99.cpp
-     internal/controller.cpp
-     internal/controller_c99.cpp
-)
-
-
-add_library( sixtrack_cuda_cxx OBJECT
-             ${SIXTRACKL_CUDA_CXX_HEADERS}
-             ${SIXTRACKL_CUDA_C99_HEADERS}
-             ${SIXTRACKL_CUDA_CXX_SOURCES}
-)
-
-target_compile_definitions( sixtrack_cuda_cxx
-    PUBLIC ${SIXTRACKLIB_NAMESPACE_FLAGS} )
-
-target_include_directories( sixtrack_cuda_cxx
-    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
-
-set_target_properties( sixtrack_cuda_cxx PROPERTIES POSITION_INDEPENDENT_CODE ON )
-set_target_properties( sixtrack_cuda_cxx PROPERTIES LINKER_LANGUAGE C )
-set_target_properties( sixtrack_cuda_cxx PROPERTIES CXX_STANDARD 11 )
-set_target_properties( sixtrack_cuda_cxx PROPERTIES CXX_STANDARD_REQUIRED ON )
-
-# ------------------------------------------------------------------------------
-# pass on sixtrack_cuda_cxx as a module for sixtracklib:
-
-set(  SIXTRACKL_LIBRARY_MODULES
-    ${SIXTRACKL_LIBRARY_MODULES}
-    $<TARGET_OBJECTS:sixtrack_cuda_cxx> CACHE INTERNAL "" FORCE )
 
 # ------------------------------------------------------------------------------
 # --- CUDA Kernel object library:
