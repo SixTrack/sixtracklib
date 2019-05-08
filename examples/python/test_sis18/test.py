@@ -6,8 +6,8 @@ from scipy.constants import e, m_p, c
 
 import numpy as np
 
-p0c = 6 * 1e9 * e
-Etot = np.sqrt(p0c**2 + m_p**2 * c**4) / e * 1e-9 # in GeV
+p0c = 6 * 1e9 # in eV
+Etot = np.sqrt(p0c**2 + (m_p/e)**2 * c**4) * 1e-9 # in GeV
 
 mad = Madx()
 mad.options.echo = False
@@ -42,13 +42,13 @@ class Timer(object):
     def __enter__(self):
         self.t0 = time.time()
         return self
-    
+
     def __exit__(self, *args, **kwargs):
         self.t1 = time.time()
         self.interval = self.t1 - self.t0
         return False
 
-def timeit(device='cpu', nturns=nturns, repeat=10):
+def timeit(device='cpu:', nturns=nturns, repeat=10):
     res = 0
     for i in range(repeat):
         job = prepare(device=device)
@@ -56,12 +56,12 @@ def timeit(device='cpu', nturns=nturns, repeat=10):
             job.track((i + 1) * nturns)
         res = (res * i + t.interval) / (i + 1)
 
-    print ('The job took {:.3f} ms for {} turns (min of {} loops).'.format(
+    print ('The job took {:.3f} ms for {} turns (mean of {} loops).'.format(
         res * 1e3, nturns, repeat))
 
 
 print ('CPU:')
 timeit(device='cpu:')
 
-print ('OpenCL enabled multi-core CPU:')
+print ('(Trying) OpenCL enabled multi-core CPU:')
 timeit(device="opencl:1.0")
