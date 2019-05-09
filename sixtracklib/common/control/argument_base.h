@@ -30,30 +30,30 @@ SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(Argument_get_arch_string)(
 
 
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t) NS(Argument_send_again)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t) NS(Argument_send_again)(
     NS(ArgumentBase)* SIXTRL_RESTRICT arg );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t) NS(Argument_send_buffer)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t) NS(Argument_send_buffer)(
     NS(ArgumentBase)* SIXTRL_RESTRICT arg,
     const NS(Buffer) *const SIXTRL_RESTRICT_REF buffer );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t) NS(Argument_send_memory)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t) NS(Argument_send_memory)(
     NS(ArgumentBase)* SIXTRL_RESTRICT arg,
     void const* SIXTRL_RESTRICT arg_begin,
-    NS(controller_size_t) const arg_size );
+    NS(ctrl_size_t) const arg_size );
 
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(Argument_receive_again)( NS(ArgumentBase)* SIXTRL_RESTRICT arg );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(Argument_receive_buffer)( NS(ArgumentBase)* SIXTRL_RESTRICT arg,
                              NS(Buffer)* SIXTRL_RESTRICT buf );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(Argument_receive_memory)( NS(ArgumentBase)* SIXTRL_RESTRICT arg,
                              void* SIXTRL_RESTRICT arg_begin,
-                             NS(controller_size_t) const arg_capacity );
+                             NS(ctrl_size_t) const arg_capacity );
 
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Argument_uses_cobjects_buffer)(
@@ -78,10 +78,10 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void* NS(Argument_get_ptr_raw_argument)(
     NS(ArgumentBase)* SIXTRL_RESTRICT arg );
 
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_size_t) NS(Argument_get_size)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t) NS(Argument_get_size)(
     const NS(ArgumentBase) *const SIXTRL_RESTRICT arg );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_size_t) NS(Argument_get_capacity)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t) NS(Argument_get_capacity)(
     const NS(ArgumentBase) *const SIXTRL_RESTRICT arg );
 
 
