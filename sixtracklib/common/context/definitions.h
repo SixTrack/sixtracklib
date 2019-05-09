@@ -12,7 +12,7 @@ extern "C" {
 typedef SIXTRL_UINT64_T  NS(context_type_id_t);
 typedef SIXTRL_INT32_T   NS(context_status_t);
 typedef SIXTRL_UINT64_T  NS(context_size_t);
-typedef SIXTRL_UINT64_T  NS(context_success_flag_t);
+typedef SIXTRL_UINT64_T  NS(context_debug_flag);
 
 typedef SIXTRL_UINT64_T  NS(arch_id_t);
 typedef SIXTRL_UINT64_T  NS(arch_size_t);
@@ -148,7 +148,7 @@ namespace SIXTRL_CXX_NAMESPACE
 {
     typedef ::NS(context_type_id_t)         context_type_id_t;
     typedef ::NS(context_status_t)          context_status_t;
-    typedef ::NS(context_success_flag_t)    context_success_flag_t;
+    typedef ::NS(context_debug_flag)        context_debug_flag;
     typedef ::NS(context_size_t)            context_size_t;
 
     typedef ::NS(arch_id_t)                 arch_id_t;
