@@ -54,32 +54,32 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_uses_nodes)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(Controller_send_detailed)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     NS(ArgumentBase)* SIXTRL_RESTRICT destination,
-    void const* SIXTRL_RESTRICT source, NS(controller_size_t) const src_len );
+    void const* SIXTRL_RESTRICT source, NS(ctrl_size_t) const src_len );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(Controller_send_buffer)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     NS(ArgumentBase)* SIXTRL_RESTRICT destination,
     NS(Buffer) const* SIXTRL_RESTRICT source );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(Controller_receive_detailed)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     void* SIXTRL_RESTRICT destination,
-    NS(controller_size_t) const destination_capacity,
+    NS(ctrl_size_t) const destination_capacity,
     NS(ArgumentBase)* SIXTRL_RESTRICT source );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(Controller_receive_buffer)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     NS(Buffer)* SIXTRL_RESTRICT destination,
     NS(ArgumentBase)* SIXTRL_RESTRICT source );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(Controller_remap_sent_cobjects_buffer)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     NS(ArgumentBase)* SIXTRL_RESTRICT source );
@@ -100,40 +100,40 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_is_in_debug_mode)(
 
 /* ========================================================================= */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_size_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t)
 NS(Controller_get_num_of_kernels)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT controller );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_size_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t)
 NS(Controller_get_kernel_work_items_dim)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
-    NS(controller_kernel_id_t) const kernel_id );
+    NS(ctrl_kernel_id_t) const kernel_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_size_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t)
 NS(Controller_get_kernel_work_groups_dim)(
     const NS(ControllerBase) *const  SIXTRL_RESTRICT controller,
-    NS(controller_kernel_id_t) const kernel_id );
+    NS(ctrl_kernel_id_t) const kernel_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_size_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t)
 NS(Controller_get_num_of_kernel_arguments)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
-    NS(controller_kernel_id_t) const kernel_id );
+    NS(ctrl_kernel_id_t) const kernel_id );
 
 /* ----------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_kernel_has_name)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
-    NS(controller_kernel_id_t) const kernel_id );
+    NS(ctrl_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(Controller_get_kernel_name_string)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
-    NS(controller_kernel_id_t) const kernel_id );
+    NS(ctrl_kernel_id_t) const kernel_id );
 
 /* ----------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_has_kernel_id)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
-    NS(controller_kernel_id_t) const kernel_id );
+    NS(ctrl_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_has_kernel_by_name)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
@@ -144,7 +144,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_has_kernel_by_name)(
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(KernelConfigBase) const*
 NS(Controller_get_ptr_const_kernel_config_base)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT controller,
-    NS(controller_kernel_id_t) const kernel_id );
+    NS(ctrl_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(KernelConfigBase) const*
 NS(Controller_get_ptr_const_kernel_config_base_by_name)(
@@ -156,7 +156,7 @@ NS(Controller_get_ptr_const_kernel_config_base_by_name)(
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(KernelConfigBase)*
 NS(Controller_get_ptr_kernel_config_base)(
     NS(ControllerBase)* SIXTRL_RESTRICT controller,
-    NS(controller_kernel_id_t) const kernel_id );
+    NS(ctrl_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(KernelConfigBase)*
 NS(Controller_get_ptr_kernel_config_base_by_name)(

@@ -42,10 +42,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
         public:
 
-        using arch_id_t      = _base_arch_obj_t::arch_id_t;
-        using status_t       = SIXTRL_CXX_NAMESPACE::controller_status_t;
-        using success_flag_t = SIXTRL_CXX_NAMESPACE::controller_success_flag_t;
-        using buffer_t       = SIXTRL_CXX_NAMESPACE::Buffer;
+        using arch_id_t            = _base_arch_obj_t::arch_id_t;
+        using status_t             = SIXTRL_CXX_NAMESPACE::ctrl_status_t;
+        using buffer_t             = SIXTRL_CXX_NAMESPACE::Buffer;
 
         using c_buffer_t           = buffer_t::c_api_t;
         using size_type            = buffer_t::size_type;
@@ -70,9 +69,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN bool readyForSend()    const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN bool readyForReceive() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN bool readyForRemap()   const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool readyForRunningKernel() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN bool readyForSend()          const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool readyForReceive()       const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool readyForRemap()         const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -80,10 +81,12 @@ namespace SIXTRL_CXX_NAMESPACE
             void const* SIXTRL_RESTRICT source, size_type const src_length );
 
         SIXTRL_HOST_FN status_t send( ptr_arg_base_t SIXTRL_RESTRICT dest,
-            const c_buffer_t *const SIXTRL_RESTRICT source );
+            const c_buffer_t *const SIXTRL_RESTRICT source,
+            ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg = nullptr );
 
         SIXTRL_HOST_FN status_t send( ptr_arg_base_t SIXTRL_RESTRICT dest,
-            buffer_t const& SIXTRL_RESTRICT_REF source );
+            buffer_t const& SIXTRL_RESTRICT_REF source,
+            ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg = nullptr );
 
         /* ----------------------------------------------------------------- */
 
@@ -100,6 +103,22 @@ namespace SIXTRL_CXX_NAMESPACE
         /* ================================================================= */
 
         SIXTRL_HOST_FN size_type numKernels() const SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN bool
+        hasRemapCObjectBufferKernel() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_id_t
+        remapCObjectBufferKernelId() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN bool
+        hasRemapCObjectBufferDebugKernel() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_id_t
+        remapCObjectBufferDebugKernelId() const SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN size_type kernelWorkItemsDim(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
@@ -175,18 +194,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ================================================================= */
 
-        SIXTRL_HOST_FN status_t remapSentCObjectsBuffer(
+        SIXTRL_HOST_FN status_t remapCObjectsBuffer(
             ptr_arg_base_t SIXTRL_RESTRICT arg,
-            size_type const arg_size = size_type{ 0 } );
-
-        SIXTRL_HOST_FN bool hasSuccessFlagArgument() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN ptr_arg_base_t ptrSuccessFlagArgument() SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN ptr_const_arg_base_t
-        ptrSuccessFlagArgument() const SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN success_flag_t lastSuccessFlagValue() const;
-        SIXTRL_HOST_FN bool isInDebugMode() const SIXTRL_NOEXCEPT;
+            size_type const arg_size = size_type{ 0 },
+            ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg = nullptr );
 
         SIXTRL_HOST_FN virtual ~ControllerBase() SIXTRL_NOEXCEPT;
 
@@ -200,7 +211,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
-        using ptr_stored_base_argument_t = std::unique_ptr< ArgumentBase >;
         using ptr_kernel_conf_base_t = std::unique_ptr< kernel_config_base_t >;
 
         SIXTRL_HOST_FN explicit ControllerBase(
@@ -228,17 +238,20 @@ namespace SIXTRL_CXX_NAMESPACE
             void* SIXTRL_RESTRICT destination, size_type const dest_capacity,
             ptr_arg_base_t SIXTRL_RESTRICT source );
 
-        SIXTRL_HOST_FN virtual status_t doRemapSentCObjectsBuffer(
-            ptr_arg_base_t SIXTRL_RESTRICT arg,
-            size_type arg_size );
+        SIXTRL_HOST_FN virtual status_t doRemapCObjectsBuffer(
+            ptr_arg_base_t SIXTRL_RESTRICT arg, size_type arg_size,
+            ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg );
 
-        SIXTRL_HOST_FN virtual success_flag_t
-            doGetSuccessFlagValueFromArg() const;
+        SIXTRL_HOST_FN void doSetRemapCObjectBufferKernelId(
+            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN virtual void doSetSuccessFlagValueFromArg(
-            success_flag_t const success_flag );
+        SIXTRL_HOST_FN void doSetRemapCObjectBufferDebugKernelId(
+            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void doSetUsesNodesFlag(
+            bool const flag ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void doSetReadyForRunningKernelsFlag(
             bool const flag ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void doSetReadyForSendFlag(
@@ -246,15 +259,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN void doSetReadyForReceiveFlag(
             bool const flag ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN void doSetReadyForRemapFlag(
-            bool const flag ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN void doSetDebugModeFlag(
-            bool const flag ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN void doUpdateStoredSuccessFlagArgument(
-            ptr_stored_base_argument_t&& ptr_stored_arg ) SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -275,14 +279,15 @@ namespace SIXTRL_CXX_NAMESPACE
         using kernel_config_list_t = std::vector< ptr_kernel_conf_base_t >;
 
         kernel_config_list_t        m_kernel_configs;
-        ptr_stored_base_argument_t  m_ptr_success_flag_arg;
         size_type                   m_num_kernels;
 
+        kernel_id_t                 m_remap_kernel_id;
+        kernel_id_t                 m_remap_debug_kernel_id;
+
         bool                        m_uses_nodes;
-        bool                        m_ready_for_remap;
+        bool                        m_ready_for_running_kernels;
         bool                        m_ready_for_send;
         bool                        m_ready_for_receive;
-        bool                        m_debug_mode;
     };
 }
 #endif /* C++, host */

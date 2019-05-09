@@ -66,10 +66,10 @@ bool NS(Controller_uses_nodes)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-::NS(controller_status_t) NS(Controller_send_detailed)(
+::NS(ctrl_status_t) NS(Controller_send_detailed)(
     ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     ::NS(ArgumentBase)* SIXTRL_RESTRICT destination,
-    void const* SIXTRL_RESTRICT source, NS(controller_size_t) const src_len )
+    void const* SIXTRL_RESTRICT source, NS(ctrl_size_t) const src_len )
 {
     return ( ctrl != nullptr )
         ? ctrl->send( destination, source, src_len )
@@ -78,7 +78,7 @@ bool NS(Controller_uses_nodes)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-::NS(controller_status_t) NS(Controller_send_buffer)(
+::NS(ctrl_status_t) NS(Controller_send_buffer)(
     ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     ::NS(ArgumentBase)* SIXTRL_RESTRICT destination,
     ::NS(Buffer) const* SIXTRL_RESTRICT source )
@@ -90,10 +90,10 @@ bool NS(Controller_uses_nodes)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-::NS(controller_status_t) NS(Controller_receive_detailed)(
+::NS(ctrl_status_t) NS(Controller_receive_detailed)(
     ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     void* SIXTRL_RESTRICT destination,
-    ::NS(controller_size_t) const destination_capacity,
+    ::NS(ctrl_size_t) const destination_capacity,
     ::NS(ArgumentBase)* SIXTRL_RESTRICT source )
 {
     return ( ctrl != nullptr )
@@ -103,7 +103,7 @@ bool NS(Controller_uses_nodes)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-::NS(controller_status_t) NS(Controller_receive_buffer)(
+::NS(ctrl_status_t) NS(Controller_receive_buffer)(
     ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     ::NS(Buffer)* SIXTRL_RESTRICT destination,
     ::NS(ArgumentBase)* SIXTRL_RESTRICT source )
@@ -115,7 +115,7 @@ bool NS(Controller_uses_nodes)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-::NS(controller_status_t) NS(Controller_remap_sent_cobjects_buffer)(
+::NS(ctrl_status_t) NS(Controller_remap_sent_cobjects_buffer)(
     ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg )
 {
@@ -152,38 +152,38 @@ bool NS(Controller_is_in_debug_mode)(
 
 /* ========================================================================= */
 
-::NS(controller_size_t) NS(Controller_get_num_of_kernels)(
+::NS(ctrl_size_t) NS(Controller_get_num_of_kernels)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT controller )
 {
     return ( controller != nullptr )
-        ? controller->numKernels() : ::NS(controller_size_t){ 0 };
+        ? controller->numKernels() : ::NS(ctrl_size_t){ 0 };
 }
 
-::NS(controller_size_t) NS(Controller_get_kernel_work_items_dim)(
+::NS(ctrl_size_t) NS(Controller_get_kernel_work_items_dim)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT controller,
     ::NS(controller_kernel_id_t) const kernel_id )
 {
     return ( controller != nullptr )
         ? controller->kernelWorkItemsDim( kernel_id )
-        : ::NS(controller_size_t){ 0 };
+        : ::NS(ctrl_size_t){ 0 };
 }
 
-::NS(controller_size_t) NS(Controller_get_kernel_work_groups_dim)(
+::NS(ctrl_size_t) NS(Controller_get_kernel_work_groups_dim)(
     const ::NS(ControllerBase) *const  SIXTRL_RESTRICT controller,
     ::NS(controller_kernel_id_t) const kernel_id )
 {
     return ( controller != nullptr )
         ? controller->kernelWorkGroupsDim( kernel_id )
-        : ::NS(controller_size_t){ 0 };
+        : ::NS(ctrl_size_t){ 0 };
 }
 
-::NS(controller_size_t) NS(Controller_get_num_of_kernel_arguments)(
+::NS(ctrl_size_t) NS(Controller_get_num_of_kernel_arguments)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT controller,
     ::NS(controller_kernel_id_t) const kernel_id )
 {
     return ( controller != nullptr )
         ? controller->kernelNumArguments( kernel_id )
-        : ::NS(controller_size_t){ 0 };
+        : ::NS(ctrl_size_t){ 0 };
 }
 
 /* ------------------------------------------------------------------------- */
