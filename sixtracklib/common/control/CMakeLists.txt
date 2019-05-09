@@ -8,7 +8,7 @@ set( SIXTRL_COMMON_CONTROL_C99_HEADERS
      node_id.h
      node_info.h
      controller_base.h
-     controller_on_nodes_base.h
+     node_controller_base.h
      argument_base.h
 )
 
@@ -47,7 +47,7 @@ set( SIXTRL_COMMON_CONTROL_CXX_HEADERS
      node_info.hpp
      kernel_config_base.hpp
      controller_base.hpp
-     controller_on_nodes_base.hpp
+     node_controller_base.hpp
      argument_base.hpp
 )
 
@@ -63,8 +63,8 @@ set( SIXTRL_COMMON_CONTROL_CXX_SOURCES
      kernel_config_base.cpp
      controller_base.cpp
      controller_base_c99.cpp
-     controller_on_nodes_base.cpp
-     controller_on_nodes_base_c99.cpp
+     node_controller_base.cpp
+     node_controller_base_c99.cpp
      argument_base.cpp
      argument_base_c99.cpp
 )
