@@ -9,10 +9,10 @@
 extern "C" {
 #endif /* C++, Host */
 
-typedef SIXTRL_INT32_T   NS(controller_status_t);
-typedef SIXTRL_UINT64_T  NS(controller_size_t);
-typedef SIXTRL_UINT64_T  NS(controller_success_flag_t);
-typedef SIXTRL_UINT32_T  NS(controller_kernel_id_t);
+typedef SIXTRL_INT32_T   NS(ctrl_status_t);
+typedef SIXTRL_UINT64_T  NS(ctrl_size_t);
+typedef SIXTRL_UINT64_T  NS(ctrl_debug_flag_t);
+typedef SIXTRL_UINT32_T  NS(ctrl_kernel_id_t);
 
 typedef SIXTRL_UINT64_T  NS(arch_id_t);
 typedef SIXTRL_UINT64_T  NS(arch_size_t);
@@ -80,6 +80,20 @@ typedef SIXTRL_UINT32_T  NS(node_index_t);
 
 /* ------------------------------------------------------------------------- */
 
+#if !defined( SIXTRL_CONTROLLER_DEBUG_FLAG_OK )
+    #define SIXTRL_CONTROLLER_DEBUG_FLAG_OK 0x0000000000000000
+#endif /* !defined( SIXTRL_CONTROLLER_DEBUG_FLAG_OK ) */
+
+#if !defined( SIXTRL_CONTROLLER_DEBUG_FLAG_NOT_OK )
+    #define SIXTRL_CONTROLLER_DEBUG_FLAG_NOT_OK 0xFFFFFFFFFFFFFFFF
+#endif /* !defined( SIXTRL_CONTROLLER_DEBUG_FLAG_NOT_OK ) */
+
+#if !defined( SIXTRL_CONTROLLER_DEBUG_FLAG_GENERAL_FAILURE )
+    #define SIXTRL_CONTROLLER_DEBUG_FLAG_GENERAL_FAILURE 0x8000000000000000
+#endif /* !defined( SIXTRL_CONTROLLER_DEBUG_FLAG_GENERAL_FAILURE ) */
+
+/* ------------------------------------------------------------------------- */
+
 #if !defined(SIXTRL_CONTROLLER_STATUS_SUCCESS)
     #define SIXTRL_CONTROLLER_STATUS_SUCCESS 0
 #endif /* !defined(SIXTRL_CONTROLLER_STATUS_SUCCESS) */
@@ -121,15 +135,28 @@ SIXTRL_STATIC_VAR NS(arch_id_t) const NS(ARCHITECTURE_CUDA) =
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC_VAR NS(controller_status_t) const NS(CONTROLLER_STATUS_SUCCESS) =
-    ( NS(controller_status_t) )SIXTRL_CONTROLLER_STATUS_SUCCESS;
+SIXTRL_STATIC_VAR NS(ctrl_debug_flag_t) const
+    NS(CONTROLLER_DEBUG_FLAG_OK) = ( NS(ctrl_debug_flag_t) )0;
 
-SIXTRL_STATIC_VAR NS(controller_status_t) const
+SIXTRL_STATIC_VAR NS(ctrl_debug_flag_t) const
+    NS(CONTROLLER_DEBUG_FLAG_NOT_OK) =
+        ( NS(ctrl_debug_flag_t) )0xFFFFFFFFFFFFFFFF;
+
+SIXTRL_STATIC_VAR NS(ctrl_debug_flag_t) const
+    NS(CONTROLLER_DEBUG_FLAG_GENERAL_FAILURE) =
+        ( NS(ctrl_debug_flag_t) )0x8000000000000000;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_STATIC_VAR NS(ctrl_status_t) const NS(CONTROLLER_STATUS_SUCCESS) =
+    ( NS(ctrl_status_t) )SIXTRL_CONTROLLER_STATUS_SUCCESS;
+
+SIXTRL_STATIC_VAR NS(ctrl_status_t) const
     NS(CONTROLLER_STATUS_GENERAL_FAILURE) =
-        ( NS(controller_status_t) )SIXTRL_CONTROLLER_STATUS_GENERAL_FAILURE;
+        ( NS(ctrl_status_t) )SIXTRL_CONTROLLER_STATUS_GENERAL_FAILURE;
 
-SIXTRL_STATIC_VAR NS(controller_kernel_id_t) const
-    NS(CONTROLER_ILLEGAL_KERNEL_ID) = ( NS(controller_kernel_id_t) )0xFFFFFFFF;
+SIXTRL_STATIC_VAR NS(ctrl_kernel_id_t) const
+    NS(CONTROLER_ILLEGAL_KERNEL_ID) = ( NS(ctrl_kernel_id_t) )0xFFFFFFFF;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -150,18 +177,18 @@ SIXTRL_STATIC_VAR NS(node_index_t) const NS(NODE_UNDEFINED_INDEX) =
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    typedef ::NS(arch_id_t)                 arch_id_t;
-    typedef ::NS(controller_status_t)       controller_status_t;
-    typedef ::NS(controller_success_flag_t) controller_success_flag_t;
-    typedef ::NS(controller_size_t)         controller_size_t;
-    typedef ::NS(controller_kernel_id_t)    controller_kernel_id_t;
+    typedef ::NS(arch_id_t)           arch_id_t;
+    typedef ::NS(ctrl_status_t)       ctrl_status_t;
+    typedef ::NS(ctrl_debug_flag_t) ctrl_debug_flag_t;
+    typedef ::NS(ctrl_size_t)         ctrl_size_t;
+    typedef ::NS(ctrl_kernel_id_t)    ctrl_kernel_id_t;
 
-    typedef ::NS(arch_id_t)                 arch_id_t;
-    typedef ::NS(arch_size_t)               arch_size_t;
+    typedef ::NS(arch_id_t)           arch_id_t;
+    typedef ::NS(arch_size_t)         arch_size_t;
 
-    typedef ::NS(node_platform_id_t)        node_platform_id_t;
-    typedef ::NS(node_device_id_t)          node_device_id_t;
-    typedef ::NS(node_index_t)              node_index_t;
+    typedef ::NS(node_platform_id_t)  node_platform_id_t;
+    typedef ::NS(node_device_id_t)    node_device_id_t;
+    typedef ::NS(node_index_t)        node_index_t;
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_id_t
         ARCHITECTURE_ID_BITMASK = static_cast< arch_id_t >(
@@ -199,20 +226,33 @@ namespace SIXTRL_CXX_NAMESPACE
         ARCHITECTURE_CUDA = static_cast< arch_id_t >(
             SIXTRL_ARCHITECTURE_CUDA );
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST controller_status_t
-        CONTROLLER_STATUS_SUCCESS = static_cast< controller_status_t >(
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_debug_flag_t
+        CONTROLLER_DEBUG_FLAG_OK = static_cast< ctrl_debug_flag_t >( 0 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_debug_flag_t
+        CONTROLLER_DEBUG_FLAG_NOT_OK =
+            static_cast< ctrl_debug_flag_t >( 0xFFFFFFFFFFFFFFFF );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_debug_flag_t
+        CONTROLLER_DEBUG_FLAG_GENERAL_FAILURE =
+            static_cast< ctrl_debug_flag_t>( 0x8000000000000000 );
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_status_t
+        CONTROLLER_STATUS_SUCCESS = static_cast< ctrl_status_t >(
             SIXTRL_CONTROLLER_STATUS_SUCCESS );
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST controller_status_t
-        CONTROLLER_STATUS_GENERAL_FAILURE = static_cast< controller_status_t >(
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_status_t
+        CONTROLLER_STATUS_GENERAL_FAILURE = static_cast< ctrl_status_t >(
             SIXTRL_CONTROLLER_STATUS_GENERAL_FAILURE );
 
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST controller_kernel_id_t
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_kernel_id_t
         CONTROLER_ILLEGAL_KERNEL_ID =
-            static_cast< controller_kernel_id_t >( 0xFFFFFFFF );
+            static_cast< ctrl_kernel_id_t >( 0xFFFFFFFF );
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
