@@ -1,4 +1,4 @@
-#include "sixtracklib/common/control/controller_on_nodes_base.hpp"
+#include "sixtracklib/common/control/node_controller_base.hpp"
 
 #include <algorithm>
 #include <cstddef>
@@ -16,17 +16,19 @@
 #include "sixtracklib/common/control/node_id.h"
 #include "sixtracklib/common/control/node_info.h"
 
+namespace st = SIXTRL_CXX_NAMESPACE;
+
 namespace SIXTRL_CXX_NAMESPACE
 {
-    ControllerOnNodesBase::node_index_t
-    ControllerOnNodesBase::numAvailableNodes() const SIXTRL_NOEXCEPT
+    NodeControllerBase::node_index_t
+    NodeControllerBase::numAvailableNodes() const SIXTRL_NOEXCEPT
     {
         return this->m_available_nodes.size();
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    bool ControllerOnNodesBase::hasDefaultNode() const SIXTRL_NOEXCEPT
+    bool NodeControllerBase::hasDefaultNode() const SIXTRL_NOEXCEPT
     {
         bool const has_default_node = (
             ( this->m_ptr_default_node_id != nullptr ) &&
@@ -48,16 +50,16 @@ namespace SIXTRL_CXX_NAMESPACE
         return has_default_node;
     }
 
-    ControllerOnNodesBase::node_id_t const*
-    ControllerOnNodesBase::ptrDefaultNodeId() const SIXTRL_NOEXCEPT
+    NodeControllerBase::node_id_t const*
+    NodeControllerBase::ptrDefaultNodeId() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_default_node_id;
     }
 
-    ControllerOnNodesBase::node_index_t
-    ControllerOnNodesBase::defaultNodeIndex() const SIXTRL_NOEXCEPT
+    NodeControllerBase::node_index_t
+    NodeControllerBase::defaultNodeIndex() const SIXTRL_NOEXCEPT
     {
-        using node_index_t = ControllerOnNodesBase::node_index_t;
+        using node_index_t = NodeControllerBase::node_index_t;
         node_index_t default_node_index = NodeId::UNDEFINED_INDEX;
 
         if( ( this->ptrDefaultNodeId() != nullptr ) &&
@@ -71,11 +73,11 @@ namespace SIXTRL_CXX_NAMESPACE
         return default_node_index;
     }
 
-    ControllerOnNodesBase::node_info_base_t const*
-    ControllerOnNodesBase::ptrDefaultNodeInfoBase() const SIXTRL_NOEXCEPT
+    NodeControllerBase::node_info_base_t const*
+    NodeControllerBase::ptrDefaultNodeInfoBase() const SIXTRL_NOEXCEPT
     {
-        using node_index_t = ControllerOnNodesBase::node_index_t;
-        using ptr_node_info_t = ControllerOnNodesBase::node_info_base_t const*;
+        using node_index_t = NodeControllerBase::node_index_t;
+        using ptr_node_info_t = NodeControllerBase::node_info_base_t const*;
 
         node_index_t const default_node_idx = this->defaultNodeIndex();
         ptr_node_info_t ptr_node_info_base = nullptr;
@@ -100,37 +102,37 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    bool ControllerOnNodesBase::isNodeAvailable(
-        ControllerOnNodesBase::node_index_t const idx ) const SIXTRL_RESTRICT
+    bool NodeControllerBase::isNodeAvailable(
+        NodeControllerBase::node_index_t const idx ) const SIXTRL_RESTRICT
     {
         return ( ( idx != NodeId::UNDEFINED_INDEX ) &&
             ( idx <  this->numAvailableNodes() ) &&
             ( this->m_available_nodes[ idx ].get() != nullptr ) );
     }
 
-    bool ControllerOnNodesBase::isNodeAvailable(
-        ControllerOnNodesBase::node_id_t const& node_id ) const SIXTRL_NOEXCEPT
+    bool NodeControllerBase::isNodeAvailable(
+        NodeControllerBase::node_id_t const& node_id ) const SIXTRL_NOEXCEPT
     {
         return this->isNodeAvailable( this->doFindAvailableNodesIndex(
             node_id.platformId(), node_id.deviceId() ) );
     }
 
-    bool ControllerOnNodesBase::isNodeAvailable(
-        ControllerOnNodesBase::platform_id_t const platform_id,
-        ControllerOnNodesBase::device_id_t const dev_id ) const SIXTRL_NOEXCEPT
+    bool NodeControllerBase::isNodeAvailable(
+        NodeControllerBase::platform_id_t const platform_id,
+        NodeControllerBase::device_id_t const dev_id ) const SIXTRL_NOEXCEPT
     {
         return this->isNodeAvailable( this->doFindAvailableNodesIndex(
             platform_id, dev_id ) );
     }
 
-    bool ControllerOnNodesBase::isNodeAvailable(
+    bool NodeControllerBase::isNodeAvailable(
         char const* node_id_str ) const SIXTRL_NOEXCEPT
     {
         return this->isNodeAvailable( this->doFindAvailableNodesIndex(
             node_id_str ) );
     }
 
-    bool ControllerOnNodesBase::isNodeAvailable(
+    bool NodeControllerBase::isNodeAvailable(
         std::string const& node_id_str ) const SIXTRL_NOEXCEPT
     {
         return this->isNodeAvailable( this->doFindAvailableNodesIndex(
@@ -139,7 +141,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    bool ControllerOnNodesBase::isDefaultNode(
+    bool NodeControllerBase::isDefaultNode(
         char const* node_id_str ) const SIXTRL_NOEXCEPT
     {
         return ( ( this->hasDefaultNode() ) &&
@@ -147,7 +149,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 node_id_str ) ) );
     }
 
-    bool ControllerOnNodesBase::isDefaultNode( std::string const&
+    bool NodeControllerBase::isDefaultNode( std::string const&
         SIXTRL_RESTRICT_REF node_id_str ) const SIXTRL_NOEXCEPT
     {
         return ( ( this->hasDefaultNode() ) &&
@@ -155,7 +157,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 node_id_str.c_str() ) ) );
     }
 
-    bool ControllerOnNodesBase::isDefaultNode( ControllerOnNodesBase::node_id_t
+    bool NodeControllerBase::isDefaultNode( NodeControllerBase::node_id_t
         const& node_id ) const SIXTRL_NOEXCEPT
     {
         return ( ( this->hasDefaultNode() ) &&
@@ -163,17 +165,17 @@ namespace SIXTRL_CXX_NAMESPACE
                 node_id.platformId(), node_id.deviceId() ) ) );
     }
 
-    bool ControllerOnNodesBase::isDefaultNode(
-        ControllerOnNodesBase::platform_id_t const platform_id,
-        ControllerOnNodesBase::device_id_t const dev_id ) const SIXTRL_NOEXCEPT
+    bool NodeControllerBase::isDefaultNode(
+        NodeControllerBase::platform_id_t const platform_id,
+        NodeControllerBase::device_id_t const dev_id ) const SIXTRL_NOEXCEPT
     {
         return ( ( this->hasDefaultNode() ) &&
             ( this->defaultNodeIndex() == this->doFindAvailableNodesIndex(
                 platform_id, dev_id ) ) );
     }
 
-    bool ControllerOnNodesBase::isDefaultNode(
-        ControllerOnNodesBase::node_index_t const idx ) const SIXTRL_NOEXCEPT
+    bool NodeControllerBase::isDefaultNode(
+        NodeControllerBase::node_index_t const idx ) const SIXTRL_NOEXCEPT
     {
         return ( ( this->hasDefaultNode() ) &&
                  ( this->defaultNodeIndex() == idx ) );
@@ -181,33 +183,72 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    ControllerOnNodesBase::node_id_t const* ControllerOnNodesBase::ptrNodeId(
+    bool NodeControllerBase::isSelectedNode(
+        char const* node_id_str ) const SIXTRL_NOEXCEPT
+    {
+        return this->isSelectedNode( this->doFindAvailableNodesIndex(
+            node_id_str ) );
+    }
+
+    bool NodeControllerBase::isSelectedNode( std::string const&
+        SIXTRL_RESTRICT_REF node_id_str ) const SIXTRL_NOEXCEPT
+    {
+        return this->isSelectedNode( this->doFindAvailableNodesIndex(
+            node_id_str.c_str() ) );
+    }
+
+    bool NodeControllerBase::isSelectedNode(
+        NodeControllerBase::node_id_t const& node_id ) const SIXTRL_NOEXCEPT
+    {
+        return this->isSelectedNode( this->doFindAvailableNodesIndex(
+            node_id.platformId(), node_id.deviceId() ) );
+    }
+
+    bool NodeControllerBase::isSelectedNode(
+        NodeControllerBase::platform_id_t const platform_id,
+        NodeControllerBase::device_id_t const dev_id ) const SIXTRL_NOEXCEPT
+    {
+        return this->isSelectedNode( this->doFindAvailableNodesIndex(
+            platform_id, dev_id ) );
+    }
+
+    bool NodeControllerBase::isSelectedNode(
+        NodeControllerBase::node_index_t const idx ) const SIXTRL_NOEXCEPT
+    {
+        return ( ( idx != NodeControllerBase::UNDEFINED_INDEX ) &&
+                 ( this->hasSelectedNode() ) &&
+                 ( this->selectedNodeIndex() == idx ) );
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    NodeControllerBase::node_id_t const* NodeControllerBase::ptrNodeId(
         char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT
     {
         return this->ptrNodeId( this->doFindAvailableNodesIndex(
             node_id_str ) );
     }
 
-    ControllerOnNodesBase::node_id_t const*
-    ControllerOnNodesBase::ptrNodeId( std::string const&
+    NodeControllerBase::node_id_t const*
+    NodeControllerBase::ptrNodeId( std::string const&
         SIXTRL_RESTRICT_REF node_id_str ) const SIXTRL_NOEXCEPT
     {
         return this->ptrNodeId( this->doFindAvailableNodesIndex(
             node_id_str.c_str() ) );
     }
 
-    ControllerOnNodesBase::node_id_t const* ControllerOnNodesBase::ptrNodeId(
-        ControllerOnNodesBase::platform_id_t const platform_id,
-        ControllerOnNodesBase::device_id_t const dev_id ) const SIXTRL_NOEXCEPT
+    NodeControllerBase::node_id_t const* NodeControllerBase::ptrNodeId(
+        NodeControllerBase::platform_id_t const platform_id,
+        NodeControllerBase::device_id_t const dev_id ) const SIXTRL_NOEXCEPT
     {
         return this->ptrNodeId( this->doFindAvailableNodesIndex(
             platform_id, dev_id ) );
     }
 
-    ControllerOnNodesBase::node_id_t const* ControllerOnNodesBase::ptrNodeId(
-        ControllerOnNodesBase::node_index_t const idx ) const SIXTRL_NOEXCEPT
+    NodeControllerBase::node_id_t const* NodeControllerBase::ptrNodeId(
+        NodeControllerBase::node_index_t const idx ) const SIXTRL_NOEXCEPT
     {
-        ControllerOnNodesBase::node_id_t const* ptr_node_id = nullptr;
+        NodeControllerBase::node_id_t const* ptr_node_id = nullptr;
 
         if( ( idx < this->numAvailableNodes() ) &&
             ( this->m_available_nodes[ idx ].get() != nullptr ) )
@@ -220,11 +261,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    ControllerOnNodesBase::node_info_base_t const*
-    ControllerOnNodesBase::ptrNodeInfoBase(
-        ControllerOnNodesBase::node_index_t const index ) const SIXTRL_NOEXCEPT
+    NodeControllerBase::node_info_base_t const*
+    NodeControllerBase::ptrNodeInfoBase(
+        NodeControllerBase::node_index_t const index ) const SIXTRL_NOEXCEPT
     {
-        ControllerOnNodesBase::node_info_base_t const*
+        NodeControllerBase::node_info_base_t const*
             ptr_node_info_base = nullptr;
 
         if( ( index < this->numAvailableNodes() ) &&
@@ -236,33 +277,33 @@ namespace SIXTRL_CXX_NAMESPACE
         return ptr_node_info_base;
     }
 
-    ControllerOnNodesBase::node_info_base_t const*
-    ControllerOnNodesBase::ptrNodeInfoBase(
-        ControllerOnNodesBase::platform_id_t const platform_id,
-        ControllerOnNodesBase::device_id_t const dev_id ) const SIXTRL_NOEXCEPT
+    NodeControllerBase::node_info_base_t const*
+    NodeControllerBase::ptrNodeInfoBase(
+        NodeControllerBase::platform_id_t const platform_id,
+        NodeControllerBase::device_id_t const dev_id ) const SIXTRL_NOEXCEPT
         {
         return this->ptrNodeInfoBase( this->doFindAvailableNodesIndex(
             platform_id, dev_id ) );
         }
 
-    ControllerOnNodesBase::node_info_base_t const*
-    ControllerOnNodesBase::ptrNodeInfoBase(
-        ControllerOnNodesBase::node_id_t const& node_id ) const SIXTRL_NOEXCEPT
+    NodeControllerBase::node_info_base_t const*
+    NodeControllerBase::ptrNodeInfoBase(
+        NodeControllerBase::node_id_t const& node_id ) const SIXTRL_NOEXCEPT
     {
         return this->ptrNodeInfoBase( this->doFindAvailableNodesIndex(
             node_id.platformId(), node_id.deviceId() ) );
     }
 
-    ControllerOnNodesBase::node_info_base_t const*
-    ControllerOnNodesBase::ptrNodeInfoBase(
+    NodeControllerBase::node_info_base_t const*
+    NodeControllerBase::ptrNodeInfoBase(
         char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT
     {
         return this->ptrNodeInfoBase( this->doFindAvailableNodesIndex(
             node_id_str ) );
     }
 
-    ControllerOnNodesBase::node_info_base_t const*
-    ControllerOnNodesBase::ptrNodeInfoBase( std::string const&
+    NodeControllerBase::node_info_base_t const*
+    NodeControllerBase::ptrNodeInfoBase( std::string const&
         SIXTRL_RESTRICT_REF node_id_str ) const SIXTRL_NOEXCEPT
     {
         return this->ptrNodeInfoBase( this->doFindAvailableNodesIndex(
@@ -271,7 +312,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    bool ControllerOnNodesBase::hasSelectedNode() const SIXTRL_NOEXCEPT
+    bool NodeControllerBase::hasSelectedNode() const SIXTRL_NOEXCEPT
     {
         bool const has_selected_node = (
             ( this->m_ptr_selected_node_id != nullptr ) &&
@@ -286,8 +327,8 @@ namespace SIXTRL_CXX_NAMESPACE
         return has_selected_node;
     }
 
-    ControllerOnNodesBase::node_index_t
-    ControllerOnNodesBase::selectedNodeIndex() const SIXTRL_NOEXCEPT
+    NodeControllerBase::node_index_t
+    NodeControllerBase::selectedNodeIndex() const SIXTRL_NOEXCEPT
     {
         return ( ( this->m_ptr_selected_node_id != nullptr ) &&
                     ( this->m_ptr_selected_node_id->hasIndex() ) )
@@ -295,14 +336,14 @@ namespace SIXTRL_CXX_NAMESPACE
             : NodeId::UNDEFINED_INDEX;
     }
 
-    ControllerOnNodesBase::node_id_t const*
-    ControllerOnNodesBase::ptrSelectedNodeId() const SIXTRL_NOEXCEPT
+    NodeControllerBase::node_id_t const*
+    NodeControllerBase::ptrSelectedNodeId() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_selected_node_id;
     }
 
-    ControllerOnNodesBase::node_info_base_t const*
-    ControllerOnNodesBase::ptrSelectedNodeInfoBase() const SIXTRL_NOEXCEPT
+    NodeControllerBase::node_info_base_t const*
+    NodeControllerBase::ptrSelectedNodeInfoBase() const SIXTRL_NOEXCEPT
     {
         return ( this->hasSelectedNode() )
             ? this->m_available_nodes[ this->selectedNodeIndex() ].get()
@@ -310,25 +351,25 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     std::string
-    ControllerOnNodesBase::selectedNodeIdStr() const SIXTRL_NOEXCEPT
+    NodeControllerBase::selectedNodeIdStr() const SIXTRL_NOEXCEPT
     {
         return std::string{ this->m_selected_node_id_str.data() };
     }
 
     char const*
-    ControllerOnNodesBase::ptrSelectedNodeIdStr() const SIXTRL_NOEXCEPT
+    NodeControllerBase::ptrSelectedNodeIdStr() const SIXTRL_NOEXCEPT
     {
         return ( this->hasSelectedNode() )
             ? this->m_selected_node_id_str.data() : nullptr;
     }
 
-    bool ControllerOnNodesBase::selectedNodeIdStr(
-        char* SIXTRL_RESTRICT node_id_str, ControllerOnNodesBase::size_type
+    bool NodeControllerBase::selectedNodeIdStr(
+        char* SIXTRL_RESTRICT node_id_str, NodeControllerBase::size_type
             const max_str_length ) const SIXTRL_NOEXCEPT
     {
         bool success = false;
 
-        using size_t = ControllerOnNodesBase::size_type;
+        using size_t = NodeControllerBase::size_type;
 
         if( this->hasSelectedNode() )
         {
@@ -348,51 +389,162 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    bool ControllerOnNodesBase::selectNode(
-        ControllerOnNodesBase::node_index_t const index )
+    bool NodeControllerBase::usesAutoSelect() const SIXTRL_NOEXCEPT
     {
-        return this->doSelectNode( index );
+        return this->m_use_autoselect;
     }
 
-    bool ControllerOnNodesBase::selectNode(
-        ControllerOnNodesBase::node_id_t const& node_id )
+    bool NodeControllerBase::selectNode(
+        NodeControllerBase::node_index_t const new_selected_node_index )
     {
-        return this->doSelectNode( this->doFindAvailableNodesIndex(
+        bool success = false;
+
+        using node_index_t = NodeControllerBase::node_index_t;
+
+        if( !this->hasSelectedNode() )
+        {
+            success = this->doSelectNode( new_selected_node_index );
+        }
+        else if( this->canChangeSelectedNode() )
+        {
+            node_index_t const current_selected_node_index =
+                this->selectedNodeIndex();
+
+            SIXTRL_ASSERT( current_selected_node_index !=
+                           NodeControllerBase::UNDEFINED_INDEX );
+
+            success = this->doChangeSelectedNode(
+                current_selected_node_index, new_selected_node_index );
+        }
+
+        return success;
+    }
+
+    bool NodeControllerBase::selectNode(
+        NodeControllerBase::node_id_t const& node_id )
+    {
+        return this->selectNode( this->doFindAvailableNodesIndex(
             node_id.platformId(), node_id.deviceId() ) );
     }
 
-    bool ControllerOnNodesBase::selectNode(
-        ControllerOnNodesBase::platform_id_t const platform_idx,
-        ControllerOnNodesBase::device_id_t const device_idx )
+    bool NodeControllerBase::selectNode(
+        NodeControllerBase::platform_id_t const platform_idx,
+        NodeControllerBase::device_id_t const device_idx )
     {
-        return this->doSelectNode( this->doFindAvailableNodesIndex(
+        return this->selectNode( this->doFindAvailableNodesIndex(
             platform_idx, device_idx ) );
     }
 
-    bool ControllerOnNodesBase::selectNode( char const* node_id_str )
+    bool NodeControllerBase::selectNode( char const* node_id_str )
     {
-        return this->doSelectNode( this->doFindAvailableNodesIndex(
+        return this->selectNode( this->doFindAvailableNodesIndex(
             node_id_str ) );
     }
 
-    bool ControllerOnNodesBase::selectNode( std::string const& node_id_str )
+    bool NodeControllerBase::selectNode( std::string const& node_id_str )
     {
-        return this->doSelectNode( this->doFindAvailableNodesIndex(
+        return this->selectNode( this->doFindAvailableNodesIndex(
             node_id_str.c_str() ) );
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    void ControllerOnNodesBase::printAvailableNodesInfo() const
+    bool NodeControllerBase::canChangeSelectedNode() const SIXTRL_NOEXCEPT
+    {
+        return ( ( this->canDirectlyChangeSelectedNode() ) ||
+                 ( this->canUnselectNode() ) );
+    }
+
+    bool NodeControllerBase::canDirectlyChangeSelectedNode()
+        const SIXTRL_NOEXCEPT
+    {
+        return this->m_can_directly_change_selected_node;
+    }
+
+    bool NodeControllerBase::changeSelectedNode(
+        NodeControllerBase::node_index_t const new_selected_node_index )
+    {
+        return this->doChangeSelectedNode(
+            this->selectedNodeIndex(), new_selected_node_index );
+    }
+
+    bool NodeControllerBase::changeSelectedNode(
+        NodeControllerBase::node_index_t const current_selected_node_index,
+        NodeControllerBase::node_index_t const new_selected_node_index )
+    {
+        return this->doChangeSelectedNode(
+            current_selected_node_index, new_selected_node_index );
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    bool NodeControllerBase::canUnselectNode() const SIXTRL_NOEXCEPT
+    {
+        return this->m_can_unselect_node;
+    }
+
+    bool NodeControllerBase::unselectNode() const SIXTRL_NOEXCEPT
+    {
+        return this->doUnselectNode( this->selectedNodeIndex() );
+    }
+
+    bool NodeControllerBase::unselectNode(
+        NodeControllerBase::node_index_t const index )
+    {
+        bool const is_currently_default_node =
+            this->isDefaultNode( index );
+
+        bool success = this->doUnselectNode( index );
+
+        if( ( success ) && ( this->usesAutoSelect() ) &&
+            ( !is_currently_default_node ) &&
+            ( this->hasDefaultNode() ) )
+        {
+            success = this->doSelectNode( this->defaultNodeIndex() );
+        }
+
+        return success;
+    }
+
+    bool NodeControllerBase::unselectNode(
+        NodeControllerBase::node_id_t const& node_id )
+    {
+        return this->unselectNode( this->doFindAvailableNodesIndex(
+            node_id.platformId(), node_id.deviceId() ) );
+    }
+
+    bool NodeControllerBase::unselectNode(
+        NodeControllerBase::platform_id_t const platform_idx,
+        NodeControllerBase::device_id_t const device_idx )
+    {
+        return this->unselectNode( this->doFindAvailableNodesIndex(
+            platform_idx, device_idx ) );
+    }
+
+    bool NodeControllerBase::unselectNode( char const* node_id_str )
+    {
+        return this->unselectNode( this->doFindAvailableNodesIndex(
+            node_id_str ) );
+    }
+
+    bool NodeControllerBase::unselectNode( std::string const& node_id_str )
+    {
+        return this->unselectNode( this->doFindAvailableNodesIndex(
+            node_id_str.c_str() ) );
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    void NodeControllerBase::printAvailableNodesInfo() const
     {
         this->printAvailableNodesInfo( std::cout );
     }
 
-    void ControllerOnNodesBase::printAvailableNodesInfo(
+    void NodeControllerBase::printAvailableNodesInfo(
         std::ostream& SIXTRL_RESTRICT_REF output ) const
     {
-        using node_index_t = ControllerOnNodesBase::node_index_t;
-        using node_info_base_t = ControllerOnNodesBase::node_info_base_t;
+        using node_index_t = NodeControllerBase::node_index_t;
+        using node_info_base_t = NodeControllerBase::node_info_base_t;
         using ptr_node_info_t  = node_info_base_t const*;
 
         node_index_t const num_avail_nodes = this->numAvailableNodes();
@@ -415,9 +567,9 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    std::string ControllerOnNodesBase::availableNodesInfoToString() const
+    std::string NodeControllerBase::availableNodesInfoToString() const
     {
-        using _this_t = ControllerOnNodesBase;
+        using _this_t = NodeControllerBase;
 
         if( this->numAvailableNodes() > _this_t::node_index_t{ 0 } )
         {
@@ -429,10 +581,10 @@ namespace SIXTRL_CXX_NAMESPACE
         return std::string{};
     }
 
-    void ControllerOnNodesBase::printAvailableNodesInfo(
+    void NodeControllerBase::printAvailableNodesInfo(
         ::FILE* SIXTRL_RESTRICT output ) const
     {
-        using _this_t = ControllerOnNodesBase;
+        using _this_t = NodeControllerBase;
 
         if( ( output != nullptr ) &&
             ( this->numAvailableNodes() > _this_t::node_index_t{ 0 } ) )
@@ -452,13 +604,13 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    void ControllerOnNodesBase::storeAvailableNodesInfoToCString(
+    void NodeControllerBase::storeAvailableNodesInfoToCString(
         char* SIXTRL_RESTRICT nodes_info_str,
-        ControllerOnNodesBase::size_type const nodes_info_str_capacity,
-        ControllerOnNodesBase::size_type* SIXTRL_RESTRICT
+        NodeControllerBase::size_type const nodes_info_str_capacity,
+        NodeControllerBase::size_type* SIXTRL_RESTRICT
             ptr_required_max_nodes_info_str_length ) const
     {
-        using size_t = ControllerOnNodesBase::size_type;
+        using size_t = NodeControllerBase::size_type;
         size_t info_str_length = size_t{ 0 };
 
         if( ( nodes_info_str != nullptr ) &&
@@ -500,26 +652,29 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    ControllerOnNodesBase::~ControllerOnNodesBase() SIXTRL_NOEXCEPT
+    NodeControllerBase::~NodeControllerBase() SIXTRL_NOEXCEPT
     {
 
     }
 
-    ControllerOnNodesBase::ControllerOnNodesBase(
-        ControllerOnNodesBase::arch_id_t const arch_id,
+    NodeControllerBase::NodeControllerBase(
+        NodeControllerBase::arch_id_t const arch_id,
         const char *const SIXTRL_RESTRICT arch_str,
         const char *const SIXTRL_RESTRICT config_str ) :
         ControllerBase( arch_id, arch_str, config_str ),
         m_available_nodes(),
         m_selected_node_id_str(
-            ControllerOnNodesBase::NODE_ID_STR_CAPACITY, char{ '\0' } ),
+            NodeControllerBase::NODE_ID_STR_CAPACITY, char{ '\0' } ),
         m_ptr_default_node_id( nullptr ),
-        m_ptr_selected_node_id( nullptr )
+        m_ptr_selected_node_id( nullptr ),
+        m_can_directly_change_selected_node( false ),
+        m_can_unselect_node( false ),
+        m_use_autoselect( false )
     {
 
     }
 
-    void ControllerOnNodesBase::doClear()
+    void NodeControllerBase::doClear()
     {
         this->doClearOnNodesBaseImpl();
         this->doClearAvailableNodes();
@@ -528,19 +683,64 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    bool ControllerOnNodesBase::doSelectNode(
-        ControllerOnNodesBase::node_index_t const node_index )
+    bool NodeControllerBase::doSelectNode(
+        NodeControllerBase::node_index_t const node_index )
     {
-        return this->doSelectNodeControllerOnNodesBaseImpl( node_index );
+        return this->doSelectNodeNodeControllerBaseImpl( node_index );
     }
 
-    ControllerOnNodesBase::node_index_t
-    ControllerOnNodesBase::doFindAvailableNodesIndex(
-        ControllerOnNodesBase::platform_id_t const platform_id,
-        ControllerOnNodesBase::device_id_t const dev_id ) const SIXTRL_NOEXCEPT
+    bool NodeControllerBase::doChangeSelectedNode(
+        NodeControllerBase::node_index_t const current_selected_node_index,
+        NodeControllerBase::node_index_t const new_selected_node_index )
     {
-        using node_index_t = ControllerOnNodesBase::node_index_t;
-        using node_info_base_t = ControllerOnNodesBase::node_info_base_t;
+        bool success = false;
+
+        if( ( this->hasSelectedNode() ) &&
+            ( current_selected_node_index != new_selected_node_index ) &&
+            ( this->isNodeAvailable( new_selected_node_index ) ) &&
+            ( this->isSelectedNode( current_selected_node_index ) ) &&
+            ( !this->isSelectedNode( new_selected_node_index ) ) &&
+            ( this->canChangeSelectedNode() ) )
+        {
+            if( this->canDirectlyChangeSelectedNode() )
+            {
+                this->doRemoveNodeFromSelection( current_selected_node_index );
+                success = !this->isSelectedNode( current_selected_node_index );
+                success &= this->doSelectNode( new_selected_node_index );
+            }
+            else if( this->canUnselectNode() )
+            {
+                success = (
+                    ( this->doUnselectNode( this->selectedNodeIndex() ) ) &&
+                    ( this->doSelectNode( new_selected_node_index ) ) );
+            }
+        }
+
+        return success;
+    }
+
+    bool NodeControllerBase::doUnselectNode(
+        NodeControllerBase::node_index_t const selected_node_index )
+    {
+        bool success = false;
+
+        if( ( this->isSelectedNode( selected_node_index ) ) &&
+            ( this->canUnselectNode() ) )
+        {
+            this->doRemoveNodeFromSelection( selected_node_index );
+            success = !this->isSelectedNode( selected_node_index );
+        }
+
+        return success;
+    }
+
+    NodeControllerBase::node_index_t
+    NodeControllerBase::doFindAvailableNodesIndex(
+        NodeControllerBase::platform_id_t const platform_id,
+        NodeControllerBase::device_id_t const dev_id ) const SIXTRL_NOEXCEPT
+    {
+        using node_index_t = NodeControllerBase::node_index_t;
+        using node_info_base_t = NodeControllerBase::node_info_base_t;
         using ptr_node_info_t  = node_info_base_t const*;
 
         node_index_t node_index = NodeId::UNDEFINED_INDEX;
@@ -573,12 +773,12 @@ namespace SIXTRL_CXX_NAMESPACE
         return node_index;
     }
 
-    ControllerOnNodesBase::node_index_t
-    ControllerOnNodesBase::doFindAvailableNodesIndex(
+    NodeControllerBase::node_index_t
+    NodeControllerBase::doFindAvailableNodesIndex(
         char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT
     {
-        using node_index_t = ControllerOnNodesBase::node_index_t;
-        using node_id_t = ControllerOnNodesBase::node_id_t;
+        using node_index_t = NodeControllerBase::node_index_t;
+        using node_id_t = NodeControllerBase::node_id_t;
 
         node_index_t node_index = NodeId::UNDEFINED_INDEX;
 
@@ -596,18 +796,32 @@ namespace SIXTRL_CXX_NAMESPACE
         return node_index;
     }
 
-    void ControllerOnNodesBase::doClearAvailableNodes() SIXTRL_NOEXCEPT
+    void NodeControllerBase::doClearAvailableNodes() SIXTRL_NOEXCEPT
     {
         this->m_available_nodes.clear();
         return;
     }
 
-    ControllerOnNodesBase::node_index_t
-    ControllerOnNodesBase::doAppendAvailableNodeInfoBase(
-        ControllerOnNodesBase::ptr_node_info_base_t&& ptr_node_info_base )
+    void NodeControllerBase::doRemoveNodeFromSelection(
+         NodeControllerBase::node_index_t const node_index ) SIXTRL_NOEXCEPT
     {
-        using node_index_t = ControllerOnNodesBase::node_index_t;
-        using node_id_t = ControllerOnNodesBase::node_id_t;
+        if( this->isSelectedNode( node_index ) )
+        {
+            SIXTRL_ASSERT( this->canUnselectNode() );
+
+            std::fill( this->m_selected_node_id_str.begin(),
+                       this->m_selected_node_id_str.end(), '\0' );
+
+            this->m_ptr_selected_node_id = nullptr;
+        }
+    }
+
+    NodeControllerBase::node_index_t
+    NodeControllerBase::doAppendAvailableNodeInfoBase(
+        NodeControllerBase::ptr_node_info_base_t&& ptr_node_info_base )
+    {
+        using node_index_t = NodeControllerBase::node_index_t;
+        using node_id_t = NodeControllerBase::node_id_t;
 
         node_index_t new_index = node_id_t::UNDEFINED_INDEX;
 
@@ -672,19 +886,19 @@ namespace SIXTRL_CXX_NAMESPACE
         return new_index;
     }
 
-    ControllerOnNodesBase::node_info_base_t*
-    ControllerOnNodesBase::doGetPtrNodeInfoBase(
-        ControllerOnNodesBase::node_index_t const node_index ) SIXTRL_NOEXCEPT
+    NodeControllerBase::node_info_base_t*
+    NodeControllerBase::doGetPtrNodeInfoBase(
+        NodeControllerBase::node_index_t const node_index ) SIXTRL_NOEXCEPT
     {
-        return const_cast< ControllerOnNodesBase::node_info_base_t* >(
-            static_cast< ControllerOnNodesBase const& >(
+        return const_cast< NodeControllerBase::node_info_base_t* >(
+            static_cast< NodeControllerBase const& >(
                 *this ).ptrNodeInfoBase( node_index ) );
     }
 
-    void ControllerOnNodesBase::doSetDefaultNodeIndex(
-        ControllerOnNodesBase::node_index_t const node_index ) SIXTRL_NOEXCEPT
+    void NodeControllerBase::doSetDefaultNodeIndex(
+        NodeControllerBase::node_index_t const node_index ) SIXTRL_NOEXCEPT
     {
-        using node_info_base_t = ControllerOnNodesBase::node_info_base_t;
+        using node_info_base_t = NodeControllerBase::node_info_base_t;
 
         if( node_index != NodeId::UNDEFINED_INDEX )
         {
@@ -716,12 +930,12 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    ControllerOnNodesBase::platform_id_t
-    ControllerOnNodesBase::doGetNextPlatformId() const SIXTRL_NOEXCEPT
+    NodeControllerBase::platform_id_t
+    NodeControllerBase::doGetNextPlatformId() const SIXTRL_NOEXCEPT
     {
-        using node_info_base_t = ControllerOnNodesBase::node_info_base_t;
-        using platform_id_t = ControllerOnNodesBase::platform_id_t;
-        using node_index_t = ControllerOnNodesBase::node_index_t;
+        using node_info_base_t = NodeControllerBase::node_info_base_t;
+        using platform_id_t = NodeControllerBase::platform_id_t;
+        using node_index_t = NodeControllerBase::node_index_t;
 
         platform_id_t next_platform_id = platform_id_t{ 0 };
         node_index_t const num_avail_nodes = this->numAvailableNodes();
@@ -748,15 +962,15 @@ namespace SIXTRL_CXX_NAMESPACE
         return next_platform_id;
     }
 
-    ControllerOnNodesBase::device_id_t
-    ControllerOnNodesBase::doGetNextDeviceIdForPlatform(
-        ControllerOnNodesBase::platform_id_t const platform_id
+    NodeControllerBase::device_id_t
+    NodeControllerBase::doGetNextDeviceIdForPlatform(
+        NodeControllerBase::platform_id_t const platform_id
         ) const SIXTRL_NOEXCEPT
     {
-        using node_info_base_t = ControllerOnNodesBase::node_info_base_t;
-        using node_index_t = ControllerOnNodesBase::node_index_t;
-        using device_id_t = ControllerOnNodesBase::device_id_t;
-        using node_id_t = ControllerOnNodesBase::node_id_t;
+        using node_info_base_t = NodeControllerBase::node_info_base_t;
+        using node_index_t = NodeControllerBase::node_index_t;
+        using device_id_t = NodeControllerBase::device_id_t;
+        using node_id_t = NodeControllerBase::node_id_t;
 
         device_id_t next_device_id = node_id_t::ILLEGAL_DEVICE_ID;
 
@@ -788,14 +1002,14 @@ namespace SIXTRL_CXX_NAMESPACE
         return next_device_id;
     }
 
-    ControllerOnNodesBase::platform_id_t
-    ControllerOnNodesBase::doGetPlatformIdByPlatformName(
+    NodeControllerBase::platform_id_t
+    NodeControllerBase::doGetPlatformIdByPlatformName(
         char const* SIXTRL_RESTRICT platform_name ) const SIXTRL_NOEXCEPT
     {
-        using node_info_base_t = ControllerOnNodesBase::node_info_base_t;
-        using platform_id_t = ControllerOnNodesBase::platform_id_t;
-        using node_index_t = ControllerOnNodesBase::node_index_t;
-        using node_id_t = ControllerOnNodesBase::node_id_t;
+        using node_info_base_t = NodeControllerBase::node_info_base_t;
+        using platform_id_t = NodeControllerBase::platform_id_t;
+        using node_index_t = NodeControllerBase::node_index_t;
+        using node_id_t = NodeControllerBase::node_id_t;
 
         platform_id_t platform_id = node_id_t::ILLEGAL_PLATFORM_ID;
 
@@ -827,18 +1041,40 @@ namespace SIXTRL_CXX_NAMESPACE
         return platform_id;
     }
 
-    void ControllerOnNodesBase::doClearOnNodesBaseImpl() SIXTRL_NOEXCEPT
+    void NodeControllerBase::doSetCanDirectlyChangeSelectedNodeFlag(
+        bool const can_directly_change_selected_node ) SIXTRL_NOEXCEPT
+    {
+        this->m_can_directly_change_selected_node =
+            can_directly_change_selected_node;
+    }
+
+    void NodeControllerBase::doSetCanUnselectNodeFlag(
+        bool const can_unselect_node ) SIXTRL_NOEXCEPT
+    {
+        this->m_can_unselect_node = can_unselect_node;
+    }
+
+    void NodeControllerBase::doSetUseAutoSelectFlag(
+        bool const use_autoselect ) SIXTRL_NOEXCEPT
+    {
+        this->m_use_autoselect = use_autoselect;
+    }
+
+    /* ===================================================================== */
+
+
+    void NodeControllerBase::doClearOnNodesBaseImpl() SIXTRL_NOEXCEPT
     {
         if( this->hasSelectedNode() )
         {
-            using _this_t = ControllerOnNodesBase;
+            using _this_t = NodeControllerBase;
             using node_index_t = _this_t::node_index_t;
 
             node_index_t const selected_node_index = this->selectedNodeIndex();
             SIXTRL_ASSERT( selected_node_index != NodeId::UNDEFINED_INDEX );
             SIXTRL_ASSERT( selected_node_index < this->numAvailableNodes() );
 
-            ControllerOnNodesBase::node_info_base_t* ptr_info_base =
+            NodeControllerBase::node_info_base_t* ptr_info_base =
                 this->m_available_nodes[ selected_node_index ].get();
 
             if( ptr_info_base != nullptr )
@@ -853,17 +1089,18 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    bool ControllerOnNodesBase::doSelectNodeControllerOnNodesBaseImpl(
-        ControllerOnNodesBase::node_index_t const node_index ) SIXTRL_NOEXCEPT
+    bool NodeControllerBase::doSelectNodeNodeControllerBaseImpl(
+        NodeControllerBase::node_index_t const node_index ) SIXTRL_NOEXCEPT
     {
         bool success = false;
 
-        using _this_t          = ControllerOnNodesBase;
+        using _this_t          = NodeControllerBase;
         using size_t           = _this_t::size_type;
         using ptr_node_id_t    = _this_t::node_id_t const*;
         using ptr_node_info_t  = _this_t::node_info_base_t*;
 
         if( ( !this->hasSelectedNode() ) &&
+            ( node_index != _this_t::UNDEFINED_INDEX ) &&
             ( node_index < this->numAvailableNodes() ) )
         {
             SIXTRL_ASSERT( this->m_ptr_selected_node_id == nullptr );
@@ -907,4 +1144,4 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 }
 
-/* end: sixtracklib/common/control/context_base_with_nodes.cpp */
+/* end: sixtracklib/common/control/node_controller_base.cpp */
