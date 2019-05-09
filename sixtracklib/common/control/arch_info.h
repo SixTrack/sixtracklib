@@ -70,11 +70,11 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ArchInfo_reset_to_initial_values)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(ArchBase_sanitize_arch_str_inplace)( char* SIXTRL_RESTRICT arch_str,
     NS(buffer_size_t) const arch_str_capacity );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(ArchInfo_sanitize_arch_str)( const char *const SIXTRL_RESTRICT arch_str,
     char* SIXTRL_RESTRICT sanitized_arch_str,
     NS(buffer_size_t) const sanitized_arch_str_capacity );

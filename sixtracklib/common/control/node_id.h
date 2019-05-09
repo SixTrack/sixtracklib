@@ -121,7 +121,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(NodeId_print)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(NodeId_extract_node_id_str_from_config_str)(
     char const* SIXTRL_RESTRICT config_str, char* SIXTRL_RESTRICT node_id_str,
     NS(buffer_size_t) const max_node_id_str_len );

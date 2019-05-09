@@ -27,7 +27,7 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         public:
 
-        using size_type     = SIXTRL_CXX_NAMESPACE::controller_size_t;
+        using size_type     = SIXTRL_CXX_NAMESPACE::ctrl_size_t;
         using platform_id_t = SIXTRL_CXX_NAMESPACE::node_platform_id_t;
         using device_id_t   = SIXTRL_CXX_NAMESPACE::node_device_id_t;
         using index_t       = SIXTRL_CXX_NAMESPACE::node_index_t;

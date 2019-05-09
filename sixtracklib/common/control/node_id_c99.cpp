@@ -179,7 +179,7 @@ void NS(NodeId_print)( ::FILE* SIXTRL_RESTRICT output,
     }
 }
 
-::NS(controller_status_t) NS(NodeId_extract_node_id_str_from_config_str)(
+::NS(ctrl_status_t) NS(NodeId_extract_node_id_str_from_config_str)(
     char const* SIXTRL_RESTRICT config_str, char* SIXTRL_RESTRICT node_id_str,
     ::NS(buffer_size_t) const node_id_str_capacity )
 {

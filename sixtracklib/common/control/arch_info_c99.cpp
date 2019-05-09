@@ -112,11 +112,11 @@ void NS(ArchInfo_reset_to_initial_values)(
 /* ------------------------------------------------------------------------ */
 
 
-NS(controller_status_t) NS(ArchInfo_sanitize_arch_str_inplace)(
+NS(ctrl_status_t) NS(ArchInfo_sanitize_arch_str_inplace)(
     char* SIXTRL_RESTRICT arch_str,
     ::NS(buffer_size_t) const arch_str_capacity )
 {
-     NS(controller_status_t) success = ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+     NS(ctrl_status_t) success = ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
 
     if( ( arch_str != nullptr ) &&
         ( std::strlen( arch_str ) < arch_str_capacity ) )
@@ -134,14 +134,14 @@ NS(controller_status_t) NS(ArchInfo_sanitize_arch_str_inplace)(
     return success;
 }
 
-NS(controller_status_t) NS(ArchInfo_sanitize_arch_str)(
+NS(ctrl_status_t) NS(ArchInfo_sanitize_arch_str)(
     const char *const SIXTRL_RESTRICT arch_str,
     char* SIXTRL_RESTRICT sanarch_str,
     ::NS(buffer_size_t) const sanarch_str_capacity )
 {
     using buf_size_t = ::NS(buffer_size_t);
 
-    NS(controller_status_t) success = ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+    NS(ctrl_status_t) success = ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
 
     if( ( arch_str != nullptr ) && ( sanarch_str != nullptr ) &&
         ( sanarch_str_capacity > buf_size_t{ 1 } ) )
