@@ -27,15 +27,15 @@ namespace SIXTRL_CXX_NAMESPACE
     using output_buffer_flag_t = ::NS(output_buffer_flag_t);
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST output_buffer_flag_t
-        NS(OUTPUT_BUFFER_NONE) = static_cast< output_buffer_flag_t >(
+        OUTPUT_BUFFER_NONE = static_cast< output_buffer_flag_t >(
             SIXTRL_OUTPUT_BUFFER_NONE );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST output_buffer_flag_t
-        NS(OUTPUT_BUFFER_ELEM_BY_ELEM) = static_cast< output_buffer_flag_t >(
+        OUTPUT_BUFFER_ELEM_BY_ELEM = static_cast< output_buffer_flag_t >(
             SIXTRL_OUTPUT_BUFFER_ELEM_BY_ELEM );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST output_buffer_flag_t
-        NS(OUTPUT_BUFFER_BEAM_MONITORS) = static_cast< output_buffer_flag_t >(
+        OUTPUT_BUFFER_BEAM_MONITORS = static_cast< output_buffer_flag_t >(
             SIXTRL_OUTPUT_BUFFER_BEAM_MONITORS );
 
     /* --------------------------------------------------------------------- */
