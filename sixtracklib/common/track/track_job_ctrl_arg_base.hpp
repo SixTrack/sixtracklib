@@ -2,20 +2,13 @@
 #define SIXTRACKLIB_COMMON_TRACK_TRACK_JOB_CONTROLLER_ARGUMENT_BASE_HPP__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #if defined( __cplusplus )
-        #include <algorithm>
+    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
+       !defined( __CUDA_ARCH__ )
         #include <cstddef>
-        #include <cstdint>
         #include <cstdlib>
-        #include <memory>
+        #include <cstring>
         #include <string>
-        #include <vector>
-    #else /* !defined( __cplusplus ) */
-        #include <stdbool.h>
-        #include <stddef.h>
-        #include <stdint.h>
-        #include <stdlib.h>
-    #endif /* !defined( __cplusplus ) */
+    #endif /* C++, Host */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
@@ -25,15 +18,10 @@
     #include "sixtracklib/common/control/argument_base.hpp"
     #include "sixtracklib/common/track/definitions.h"
     #include "sixtracklib/common/track/track_job_base.hpp"
-
     #if defined( __cplusplus )
         #include "sixtracklib/common/buffer.hpp"
     #endif /* defined( __cplusplus ) */
-
     #include "sixtracklib/common/buffer.h"
-    #include "sixtracklib/common/particles.h"
-    #include "sixtracklib/common/output/output_buffer.h"
-    #include "sixtracklib/common/output/elem_by_elem_config.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
@@ -56,10 +44,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual ~TrackJobCtrlArgBase() = default;
 
-        /* ================================================================ */
+        /* ---------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN bool hasRemapKernel() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN kernel_id_t remapKernelId() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN status_t resetDebugFlag(
+            debug_flag_t const debug_flag_value = debug_flag_t{ 0 } );
+
+        SIXTRL_HOST_FN status_t prepareDebugFlagForUse();
+        SIXTRL_HOST_FN status_t evaluateDebugFlagAfterUse();
+
+        /* ================================================================ */
 
         SIXTRL_HOST_FN bool
         hasAssignOutputToBeamMonitorsKernel() const SIXTRL_NOEXCEPT;
@@ -67,31 +60,54 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN kernel_id_t
         assignOutputToBeamMonitorsKernelId() const SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN void setAssignOutputToBeamMonitorsKernelId(
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
+
+        /* ---------------------------------------------------------------- */
+
         SIXTRL_HOST_FN bool hasTrackUntilKernel() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN kernel_id_t trackUntilKernelId() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void setTrackUntilKernelId(
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
+
+        /* ---------------------------------------------------------------- */
 
         SIXTRL_HOST_FN bool hasTrackLineKernel() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN kernel_id_t
         trackLineKernelId() const SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN void setTrackLineKernelId(
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
+
+        /* ---------------------------------------------------------------- */
+
         SIXTRL_HOST_FN bool hasTrackElemByElemKernel() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN kernel_id_t
         trackElemByElemKernelId() const SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN void setTrackElemByElemKernelId(
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
+
+        /* ---------------------------------------------------------------- */
+
         SIXTRL_HOST_FN bool
-        hasExtractParticlesAddressesKernel() const SIXTRL_NOEXCEPT;
+        hasFetchParticlesAddressesKernel() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN kernel_id_t
-        extractParticlesAddressesKernelId() const SIXTRL_NOEXCEPT;
+        fetchParticlesAddressesKernelId() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void setFetchParticlesAddressesKernelId(
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
 
         /* ================================================================ */
 
         protected:
 
         using stored_ctrl_base_t = std::unique_ptr< controller_base_t >;
-        using stored_arg_base_t  = std::unique_ptr< argument_base_t >;
+        using stored_arg_base_t = std::unique_ptr< argument_base_t >;
 
         SIXTRL_HOST_FN TrackJobCtrlArgBase(
             arch_id_t const arch_id, char const* SIXTRL_RESTRICT arch_str,
@@ -117,6 +133,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
+        SIXTRL_HOST_FN virtual bool doPrepareController(
+            char const* SIXTRL_RESTRICT config_str );
+
+        SIXTRL_HOST_FN virtual bool doPrepareDefaultKernels(
+            char const* SIXTRL_RESTRICT config_str );
+
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_HOST_FN controller_base_t const*
         ptrControllerBase() const SIXTRL_NOEXCEPT;
 
@@ -129,6 +153,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN argument_base_t* ptrParticlesArgBase() SIXTRL_NOEXCEPT;
 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN argument_base_t const*
         ptrBeamElementsArg() const SIXTRL_NOEXCEPT;
@@ -136,6 +161,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN argument_base_t*
         ptrBeamElementsArgBase() SIXTRL_NOEXCEPT;
 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN argument_base_t const*
         ptrOutputArg() const SIXTRL_NOEXCEPT;
@@ -143,6 +169,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN argument_base_t*
         ptrOutputArgBase() SIXTRL_NOEXCEPT;
 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN argument_base_t const*
         ptrElemByElemConfigArgBase() const SIXTRL_NOEXCEPT;
@@ -150,6 +177,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN argument_base_t*
         ptrElemByElemConfigArgBase() SIXTRL_NOEXCEPT;
 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN argument_base_t const*
         ptrParticlesAddrArgBase() const SIXTRL_NOEXCEPT;
@@ -157,12 +185,13 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN argument_base_t*
         ptrParticlesAddrArgBase() SIXTRL_NOEXCEPT;
 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN argument_base_t const*
-        ptrSuccessFlagArgBase() const SIXTRL_NOEXCEPT;
+        ptrDebugFlagArgBase() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN argument_base_t*
-        ptrSuccessFlagArgBase() SIXTRL_NOEXCEPT;
+        ptrDebugFlagArgBase() SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -186,28 +215,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doUpdateStoredParticlesAddrArg(
             stored_arg_base_t&& ptr_particles_addr_arg ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void doUpdateStoredSuccessFlagArg(
-            stored_arg_base_t&& ptr_success_flag_arg ) SIXTRL_NOEXCEPT;
-
-        /* ----------------------------------------------------------------- */
-
-        SIXTRL_HOST_FN void doSetRemapKernelId(
-            kernel_id_t const id ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN void doSetAssignOutputToBeamMonitorsKernelId(
-            kernel_id_t const id ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN void doSetTrackUntilKernelId(
-            kernel_id_t const id ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN void doSetTrackLineKernelId(
-            kernel_id_t const id ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN void doSetTrackElemByElemKernelId(
-            kernel_id_t const id ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN void doSetExtractParticlesAddressesKernelId(
-            kernel_id_t const id ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void doUpdateStoredDebugFlagArg(
+            stored_arg_base_t&& ptr_debug_flag_arg ) SIXTRL_NOEXCEPT;
 
         private:
 
@@ -220,14 +229,13 @@ namespace SIXTRL_CXX_NAMESPACE
         stored_arg_base_t       m_stored_output_arg;
         stored_arg_base_t       m_stored_elem_by_elem_conf_arg;
         stored_arg_base_t       m_stored_particles_addr_arg;
-        stored_arg_base_t       m_stored_success_flag_arg;
+        stored_arg_base_t       m_stored_debug_flag_arg;
 
-        kernel_id_t             m_remap_kernel_id;
         kernel_id_t             m_assign_output_bemon_kernel_id;
         kernel_id_t             m_track_until_kernel_id;
         kernel_id_t             m_track_line_kernel_id;
         kernel_id_t             m_track_elem_by_elem_kernel_id;
-        kernel_id_t             m_extract_particles_addr_kernel_id;
+        kernel_id_t             m_fetch_particles_addr_kernel_id;
     };
 }
 

@@ -44,10 +44,14 @@ SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
     NS(TRACK_JOB_COLLECT_OUTPUT) = ( NS(track_job_collect_flag_t) )0x04;
 
 SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
-    NS(TRACK_JOB_COLLECT_SUCCSS_FLAG) = ( NS(track_job_collect_flag_t) )0x08;
+    NS(TRACK_JOB_COLLECT_SUCCESS_FLAG) = ( NS(track_job_collect_flag_t) )0x08;
 
 SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
-    NS(TRACK_JOB_COLLECT_ALL) = ( NS(track_job_collect_flag_t) )0x0F;
+    NS(TRACK_JOB_COLLECT_PARTICLES_ADDR) =
+        ( NS(track_job_collect_flag_t) )0x18;
+
+SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
+    NS(TRACK_JOB_COLLECT_ALL) = ( NS(track_job_collect_flag_t) )0x1F;
 
 SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
     NS(TRACK_JOB_COLLECT_DEFAULT_FLAGS) = ( NS(track_job_collect_flag_t) )0x05;
@@ -100,7 +104,10 @@ namespace SIXTRL_CXX_NAMESPACE
         TRACK_JOB_COLLECT_SUCCESS_FLAG = track_job_collect_flag_t{ 0x0008 };
 
     SIXTRL_STATIC_VAR track_job_collect_flag_t const
-        TRACK_JOB_COLLECT_ALL = track_job_collect_flag_t{ 0x000F };
+        TRACK_JOB_COLLECT_PARTICLES_ADDR = track_job_collect_flag_t{ 0x0010 };
+
+    SIXTRL_STATIC_VAR track_job_collect_flag_t const
+        TRACK_JOB_COLLECT_ALL = track_job_collect_flag_t{ 0x001F };
 
     SIXTRL_STATIC_VAR track_job_collect_flag_t const
         TRACK_JOB_COLLECT_DEFAULT_FLAGS = track_job_collect_flag_t{ 0x0005 };

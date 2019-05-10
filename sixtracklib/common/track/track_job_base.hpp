@@ -52,7 +52,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using buffer_t              = SIXTRL_CXX_NAMESPACE::Buffer;
         using c_buffer_t            = buffer_t::c_api_t;
         using size_type             = buffer_t::size_type;
-        using status_t              = ::NS(controller_status_t);
+        using status_t              = ::NS(ctrl_status_t);
         using track_status_t        = ::NS(track_status_t);
 
         using elem_by_elem_config_t = ::NS(ElemByElemConfig);
@@ -60,7 +60,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using particle_index_t      = ::NS(particle_index_t);
         using collect_flag_t        = ::NS(track_job_collect_flag_t);
         using output_buffer_flag_t  = ::NS(output_buffer_flag_t);
-        using success_flag_t        = ::NS(controller_success_flag_t);
+        using debug_flag_t          = ::NS(ctrl_debug_flag_t);
         using particles_addr_t      = ::NS(ParticlesAddr);
         using num_particles_t       = ::NS(particle_num_elements_t);
 
@@ -94,7 +94,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN bool collectParticles();
         SIXTRL_HOST_FN bool collectBeamElements();
         SIXTRL_HOST_FN bool collectOutput();
-        SIXTRL_HOST_FN bool collectSuccessFlag();
+        SIXTRL_HOST_FN bool collectDebugFlag();
+        SIXTRL_HOST_FN bool collectParticlesAddresses();
 
         SIXTRL_HOST_FN void enableCollectParticles()  SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN void disableCollectParticles() SIXTRL_NOEXCEPT;
@@ -113,6 +114,12 @@ namespace SIXTRL_CXX_NAMESPACE
             collect_flag_t const flag ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool requiresCollecting() const SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN bool isInDebugMode() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool enableDebugMode();
+        SIXTRL_HOST_FN bool disableDebugMode();
 
         /* ----------------------------------------------------------------- */
 
@@ -234,7 +241,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN success_flag_t lastSuccessFlag() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN debug_flag_t lastDebugFlag() const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -384,6 +391,11 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT output_buffer );
 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        SIXTRL_HOST_FN virtual bool doSwitchDebugModeFlag(
+            bool const is_in_debug_mode );
+
         SIXTRL_HOST_FN virtual bool doReset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
@@ -513,16 +525,18 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doSetUsesArgumentsFlag(
             bool const arguments_flag ) SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN void doSetIsInDebugModeflag(
+            bool const in_debug_mode ) SIXTRL_NOEXCEPT;
+
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN void doSetLastSuccessFlag(
-            success_flag_t const last_success_flag_value ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void doSetLastDebugFlag( debug_flag_t const
+            last_debug_flag_value ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN success_flag_t const*
-        doGetPtrLastSuccessFlag() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN debug_flag_t const*
+        doGetPtrLastDebugFlag() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN success_flag_t*
-        doGetPtrLastSuccessFlag() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN debug_flag_t* doGetPtrLastDebugFlag() SIXTRL_NOEXCEPT;
 
         private:
 
@@ -560,17 +574,22 @@ namespace SIXTRL_CXX_NAMESPACE
         particle_index_t                m_until_turn_elem_by_elem;
 
         collect_flag_t                  m_collect_flags;
-        success_flag_t                  m_success_flag;
+        debug_flag_t                    m_debug_flag;
 
         bool                            m_default_elem_by_elem_rolling;
         bool                            m_has_beam_monitor_output;
         bool                            m_has_elem_by_elem_output;
         bool                            m_has_particle_addresses;
+        bool                            m_in_debug_mode;
 
         bool                            m_requires_collect;
         bool                            m_uses_controller;
         bool                            m_uses_arguments;
     };
+
+    /* ********************************************************************* */
+    /* ********               Stand-alone functions              *********** */
+    /* ********************************************************************* */
 
     SIXTRL_HOST_FN TrackJobBaseNew* TrackJobNew_create(
         char const* SIXTRL_RESTRICT arch_str,

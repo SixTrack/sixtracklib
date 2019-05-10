@@ -106,11 +106,18 @@ namespace SIXTRL_CXX_NAMESPACE
                 st::TRACK_JOB_COLLECT_OUTPUT );
     }
 
-    bool TrackJobBaseNew::collectSuccessFlag()
+    bool TrackJobBaseNew::collectDebugFlag()
     {
         return TrackJobBaseNew::IsCollectFlagSet(
             this->doCollect( st::TRACK_JOB_COLLECT_SUCCESS_FLAG ),
                 st::TRACK_JOB_COLLECT_SUCCESS_FLAG );
+    }
+
+    bool TrackJobBaseNew::collectParticlesAddresses()
+    {
+        return TrackJobBaseNew::isCollectFlagSet(
+            this->doCollect( st::TRACK_JOB_COLLECT_PARTICLES_ADDR ) ==
+                st::TRACK_JOB_COLLECT_PARTICLES_ADDR );
     }
 
     void TrackJobBaseNew::enableCollectParticles()  SIXTRL_NOEXCEPT
@@ -183,9 +190,56 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
+    bool TrackJobBaseNew::isInDebugMode() const SIXTRL_NOEXCEPT
+    {
+        return this->m_in_debug_mode;
+    }
+
+    bool TrackJobBaseNew::enableDebugMode()
+    {
+        bool success = false;
+
+        if( !this->isInDebugMode() )
+        {
+            success = this->doSwitchDebugModeFlag( true );
+        }
+        else
+        {
+            success = true;
+        }
+
+        return success;
+    }
+
+    bool TrackJobBaseNew::disableDebugMode()
+    {
+        bool success = false;
+
+        if( this->isInDebugMode() )
+        {
+            success = this->doSwitchDebugModeFlag( false );
+        }
+        else
+        {
+            success = true;
+        }
+
+        return success;
+    }
+
+    /* --------------------------------------------------------------------- */
+
     TrackJobBaseNew::status_t TrackJobBaseNew::fetchParticleAddresses()
     {
-        return this->doFetchParticleAddresses();
+        TrackJobBaseNew::status_t const status =
+            this->doFetchParticleAddresses();
+
+        if( status == st::CONTROLLER_STATUS_SUCCESS )
+        {
+            this->doSetHasParticleAddressesFlag( true );
+        }
+
+        return status;
     }
 
     bool TrackJobBaseNew::hasParticleAddresses() const SIXTRL_NOEXCEPT
@@ -530,10 +584,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    TrackJobBaseNew::success_flag_t
-    TrackJobBaseNew::lastSuccessFlag() const SIXTRL_NOEXCEPT
+    TrackJobBaseNew::debug_flag_t
+    TrackJobBaseNew::lastDebugFlag() const SIXTRL_NOEXCEPT
     {
-        return this->m_success_flag;
+        return this->m_debug_flag;
     }
 
     /* --------------------------------------------------------------------- */
@@ -846,8 +900,9 @@ namespace SIXTRL_CXX_NAMESPACE
         m_collect_flags( st::TRACK_JOB_COLLECT_DEFAULT_FLAGS ),
         m_default_elem_by_elem_rolling( true ),
         m_has_beam_monitor_output( false ), m_has_elem_by_elem_output( false ),
-        m_has_particle_addresses( false ), m_requires_collect( true ),
-        m_uses_controller( false ), m_uses_arguments( false )
+        m_has_particle_addresses( false ), m_in_debug_mode( false ),
+        m_requires_collect( true ), m_uses_controller( false ),
+        m_uses_arguments( false )
     {
         this->doInitDefaultParticleSetIndices();
         this->doInitDefaultBeamMonitorIndices();
@@ -882,6 +937,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_has_beam_monitor_output( other.m_has_beam_monitor_output ),
         m_has_elem_by_elem_output( other.m_has_elem_by_elem_output ),
         m_has_particle_addresses( other.m_has_particle_addresses ),
+        m_in_debug_mode( other.m_in_debug_mode ),
         m_requires_collect( other.m_requires_collect ),
         m_uses_controller( other.m_uses_controller ),
         m_uses_arguments( other.m_uses_arguments )
@@ -964,6 +1020,7 @@ namespace SIXTRL_CXX_NAMESPACE
             std::move( other.m_has_elem_by_elem_output ) ),
         m_has_particle_addresses(
             std::move( other.m_has_particle_addresses ) ),
+        m_in_debug_mode( std::move( other.m_in_debug_mode ) ),
         m_requires_collect( std::move( other.m_requires_collect ) ),
         m_uses_controller( std::move( other.m_uses_controller ) ),
         m_uses_arguments( std::move( other.m_uses_arguments ) )
@@ -1073,6 +1130,7 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_has_elem_by_elem_output = rhs.m_has_elem_by_elem_output;
             this->m_has_particle_addresses  = rhs.m_has_particle_addresses;
 
+            this->m_in_debug_mode = rhs.m_in_debug_mode;
             this->m_requires_collect = rhs.m_requires_collect;
             this->m_uses_controller = rhs.m_uses_controller;
             this->m_uses_arguments = rhs.m_uses_arguments;
@@ -1156,6 +1214,7 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_has_particle_addresses =
                 std::move( rhs.m_has_particle_addresses );
 
+            this->m_in_debug_mode = std::move( rhs.m_in_debug_mode );
             this->m_requires_collect = std::move( rhs.m_requires_collect );
             this->m_uses_controller = std::move( rhs.m_uses_controller );
             this->m_uses_arguments = std::move( rhs.m_uses_arguments );
@@ -1174,9 +1233,9 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     TrackJobBaseNew::collect_flag_t TrackJobBaseNew::doCollect(
-        TrackJobBaseNew::collect_flag_t const )
+        TrackJobBaseNew::collect_flag_t const flags )
     {
-        return st::TRACK_JOB_COLLECT_NONE;
+        return ( flags & st::TRACK_JOB_COLLECT_ALL );
     }
 
     /* --------------------------------------------------------------------- */
@@ -1587,6 +1646,13 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
+    bool TrackJobBaseNew::doSwitchDebugModeFlag(
+        bool const target_is_in_debug_mode )
+    {
+        this->doSetIsInDebugModeflag( target_is_in_debug_mode );
+        return true;
+    }
+
     bool TrackJobBaseNew::doReset(
         TrackJobBaseNew::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         TrackJobBaseNew::c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
@@ -1943,25 +2009,31 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    void TrackJobBaseNew::doSetLastSuccessFlag( TrackJobBaseNew::success_flag_t
-        const last_success_flag_value ) SIXTRL_NOEXCEPT
+    void TrackJobBaseNew::doSetLastDebugFlag( TrackJobBaseNew::debug_flag_t
+        const last_debug_flag_value ) SIXTRL_NOEXCEPT
     {
-        this->m_success_flag = last_success_flag_value;
+        this->m_debug_flag = last_debug_flag_value;
     }
 
-    TrackJobBaseNew::success_flag_t const*
-    TrackJobBaseNew::doGetPtrLastSuccessFlag() const SIXTRL_NOEXCEPT
+    TrackJobBaseNew::debug_flag_t const*
+    TrackJobBaseNew::doGetPtrLastDebugFlag() const SIXTRL_NOEXCEPT
     {
-        return &this->m_success_flag;
+        return &this->m_debug_flag;
     }
 
-    TrackJobBaseNew::success_flag_t*
-    TrackJobBaseNew::doGetPtrLastSuccessFlag() SIXTRL_NOEXCEPT
+    TrackJobBaseNew::debug_flag_t*
+    TrackJobBaseNew::doGetPtrLastDebugFlag() SIXTRL_NOEXCEPT
     {
-        return &this->m_success_flag;
+        return &this->m_debug_flag;
     }
 
     /* --------------------------------------------------------------------- */
+
+    void TrackJobBaseNew::doSetIsInDebugModeflag(
+        bool const target_is_in_debug_mode )
+    {
+        this->m_in_debug_mode = target_is_in_debug_mode;
+    }
 
     void TrackJobBaseNew::doClearBaseImpl() SIXTRL_NOEXCEPT
     {

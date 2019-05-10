@@ -20,6 +20,7 @@
         #include "sixtracklib/common/output/output_buffer.h"
         #include "sixtracklib/common/output/elem_by_elem_config.h"
         #include "sixtracklib/common/control/controller_base.hpp"
+        #include "sixtracklib/common/control/controller_on_nodes_base.hpp"
         #include "sixtracklib/common/control/argument_base.hpp"
         #include "sixtracklib/common/track/definitions.h"
         #include "sixtracklib/common/track/track_job_base.hpp"
@@ -33,17 +34,61 @@ namespace st = SIXTRL_CXX_NAMESPACE;
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    bool TrackJobCtrlArgBase::hasRemapKernel() const SIXTRL_NOEXCEPT
+    TrackJobCtrlArgBase::status_t
+    TrackJobCtrlArgBase::resetDebugFlag(
+        TrackJobCtrlArgBase::debug_flag_t const flag_value );
     {
-        using base_ctrl_t = TrackJobCtrlArgBase::controller_base_t;
-        return ( base_ctrl_t::ILLEGAL_KERNEL_ID == this->m_remap_kernel_id );
+        using status_t = TrackJobCtrlArgBase::status_t;
+        using debug_flag_t = TrackJobCtrlArgBase::debug_flag_t;
+        using size_t = TrackJobCtrlArgBase::size_type;
+
+        status_t status = st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        size_t const flag_size = sizeof( debug_flag_t );
+
+        if( ( this->doGetPtrLastDebugFlag() != nullptr ) &&
+            ( this->ptrDebugFlagArgBase() != nullptr ) &&
+            ( this->ptrDebugFlagArgBase()->usesRawArgument() ) &&
+            ( this->ptrDebugFlagArgBase()->size() == flag_size ) )
+        {
+            this->doSetLastDebugFlag( flag_value );
+
+            status = this->ptrDebugFlagArgBase()->send(
+                this->doGetPtrLastDebugFlag(), flag_size );
+        }
+
+        return status;
     }
 
-    TrackJobCtrlArgBase::kernel_id_t
-    TrackJobCtrlArgBase::remapKernelId() const SIXTRL_NOEXCEPT
+    TrackJobCtrlArgBase::status_t
+    TrackJobCtrlArgBase::prepareDebugFlagForUse()
     {
-        return this->m_remap_kernel_id;
+        using debug_flag_t = TrackJobCtrlArgBase::debug_flag_t;
+        using status_t = TrackJobCtrlArgBase::status_t;
+
+        status_t status = this->resetDebugFlag(
+            ::NS(CONTROLLER_DEBUG_FLAG_NOT_OK) );
+
+        if( ( status == st::CONTROLLER_STATUS_SUCCESS ) &&
+            ( this->lastDebugFlag() != flag ) )
+        {
+            status = st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        }
+
+        return status;
     }
+
+    TrackJobCtrlArgBase::status_t
+    TrackJobCtrlArgBase::evaluateDebugFlagAfterUse()
+    {
+        using debug_flag_t = TrackJobCtrlArgBase::debug_flag_t;
+
+        return ( ( this->collectDebugFlag() ) ||
+                 ( this->lastDebugFlag() == ::NS(CONTROLLER_DEBUG_FLAG_OK) ) )
+            ? st::CONTROLLER_STATUS_SUCCESS
+            : st::CONTROLLER_STATUS_GENERAL_FAILURE;
+    }
+
+    /* --------------------------------------------------------------------- */
 
     bool TrackJobCtrlArgBase::hasAssignOutputToBeamMonitorsKernel(
         ) const SIXTRL_NOEXCEPT
@@ -60,6 +105,14 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_assign_output_bemon_kernel_id;
     }
 
+    void TrackJobCtrlArgBase::setAssignOutputToBeamMonitorsKernelId(
+        TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
+    {
+        this->m_assign_output_bemon_kernel_id = id;
+    }
+
+    /* --------------------------------------------------------------------- */
+
     bool TrackJobCtrlArgBase::hasTrackUntilKernel() const SIXTRL_NOEXCEPT
     {
         using base_ctrl_t = TrackJobCtrlArgBase::controller_base_t;
@@ -72,6 +125,14 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         return this->m_track_until_kernel_id;
     }
+
+    void TrackJobCtrlArgBase::setTrackUntilKernelId(
+        TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
+    {
+        this->m_track_until_kernel_id = id;
+    }
+
+    /* --------------------------------------------------------------------- */
 
     bool TrackJobCtrlArgBase::hasTrackLineKernel() const SIXTRL_NOEXCEPT
     {
@@ -86,6 +147,14 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_track_line_kernel_id;
     }
 
+    void TrackJobCtrlArgBase::setTrackLineKernelId(
+        TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
+    {
+        this->m_track_line_kernel_id = id;
+    }
+
+    /* --------------------------------------------------------------------- */
+
     bool TrackJobCtrlArgBase::hasTrackElemByElemKernel() const SIXTRL_NOEXCEPT
     {
         using base_ctrl_t = TrackJobCtrlArgBase::controller_base_t;
@@ -99,19 +168,33 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_track_elem_by_elem_kernel_id;
     }
 
-    bool TrackJobCtrlArgBase::hasExtractParticlesAddressesKernel()
+    void TrackJobCtrlArgBase::setTrackElemByElemKernelId(
+        TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
+    {
+        this->m_track_elem_by_elem_kernel_id = id;
+    }
+
+    /* --------------------------------------------------------------------- */
+
+    bool TrackJobCtrlArgBase::hasFetchParticlesAddressesKernel()
         const SIXTRL_NOEXCEPT
     {
         using base_ctrl_t = TrackJobCtrlArgBase::controller_base_t;
         return ( base_ctrl_t::ILLEGAL_KERNEL_ID ==
-            this->m_extract_particles_addr_kernel_id );
+            this->m_fetch_particles_addr_kernel_id );
     }
 
     TrackJobCtrlArgBase::kernel_id_t
-    TrackJobCtrlArgBase::extractParticlesAddressesKernelId(
+    TrackJobCtrlArgBase::fetchParticlesAddressesKernelId(
         ) const SIXTRL_NOEXCEPT
     {
-        return this->m_extract_particles_addr_kernel_id;
+        return this->m_fetch_particles_addr_kernel_id;
+    }
+
+    void TrackJobCtrlArgBase::setFetchParticlesAddressesKernelId(
+        TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
+    {
+        this->m_fetch_particles_addr_kernel_id = id;
     }
 
     /* --------------------------------------------------------------------- */
@@ -125,15 +208,14 @@ namespace SIXTRL_CXX_NAMESPACE
         m_stored_particles_arg( nullptr ),
         m_stored_beam_elements_arg( nullptr ),
         m_stored_output_arg( nullptr ),
-        m_stored_success_flag_arg( nullptr ),
-        m_remap_kernel_id( st::ControllerBase::ILLEGAL_KERNEL_ID ),
+        m_stored_debug_flag_arg( nullptr ),
         m_assign_output_bemon_kernel_id(
             st::ControllerBase::ILLEGAL_KERNEL_ID ),
         m_track_until_kernel_id( st::ControllerBase::ILLEGAL_KERNEL_ID ),
         m_track_line_kernel_id( st::ControllerBase::ILLEGAL_KERNEL_ID ),
         m_track_elem_by_elem_kernel_id(
             st::ControllerBase::ILLEGAL_KERNEL_ID ),
-        m_extract_particles_addr_kernel_id(
+        m_fetch_particles_addr_kernel_id(
             st::ControllerBase::ILLEGAL_KERNEL_ID )
     {
 
@@ -146,15 +228,14 @@ namespace SIXTRL_CXX_NAMESPACE
         m_stored_particles_arg( nullptr ),
         m_stored_beam_elements_arg( nullptr ),
         m_stored_output_arg( nullptr ),
-        m_stored_success_flag_arg( nullptr ),
-        m_remap_kernel_id( other.m_remap_kernel_id ),
+        m_stored_debug_flag_arg( nullptr ),
         m_assign_output_bemon_kernel_id(
             other.m_assign_output_bemon_kernel_id ),
         m_track_until_kernel_id( other.m_track_until_kernel_id ),
         m_track_line_kernel_id( other.m_track_line_kernel_id ),
         m_track_elem_by_elem_kernel_id( other.m_track_elem_by_elem_kernel_id ),
-        m_extract_particles_addr_kernel_id(
-            other.m_extract_particles_addr_kernel_id )
+        m_fetch_particles_addr_kernel_id(
+            other.m_fetch_particles_addr_kernel_id )
     {
 //         using base_ctrl_t = TrackJobCtrlArgBase::controller_base_t;
 //         using base_arg_t  = TrackJobCtrlArgBase::argument_base_t;
@@ -173,17 +254,16 @@ namespace SIXTRL_CXX_NAMESPACE
         m_stored_beam_elements_arg(
             std::move( other.m_stored_beam_elements_arg ) ),
         m_stored_output_arg( std::move( other.m_stored_output_arg ) ),
-        m_stored_success_flag_arg(
-            std::move( other.m_stored_success_flag_arg ) ),
-        m_remap_kernel_id( std::move( other.m_remap_kernel_id ) ),
+        m_stored_debug_flag_arg(
+            std::move( other.m_stored_debug_flag_arg ) ),
         m_assign_output_bemon_kernel_id( std::move(
             other.m_assign_output_bemon_kernel_id ) ),
         m_track_until_kernel_id( std::move( other.m_track_until_kernel_id ) ),
         m_track_line_kernel_id( std::move( other.m_track_line_kernel_id ) ),
         m_track_elem_by_elem_kernel_id( std::move(
             other.m_track_elem_by_elem_kernel_id ) ),
-        m_extract_particles_addr_kernel_id(
-            std::move( other.m_extract_particles_addr_kernel_id ) )
+        m_fetch_particles_addr_kernel_id(
+            std::move( other.m_fetch_particles_addr_kernel_id ) )
     {
         other.doClearCtrlArgBaseImpl();
     }
@@ -198,9 +278,8 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_stored_particles_arg.reset( nullptr );
             this->m_stored_beam_elements_arg.reset( nullptr );
             this->m_stored_output_arg.reset( nullptr );
-            this->m_stored_success_flag_arg.reset( nullptr );
+            this->m_stored_debug_flag_arg.reset( nullptr );
 
-            this->m_remap_kernel_id = rhs.m_remap_kernel_id;
             this->m_assign_output_bemon_kernel_id =
                 rhs.m_assign_output_bemon_kernel_id;
 
@@ -210,8 +289,8 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_track_elem_by_elem_kernel_id =
                 rhs.m_track_elem_by_elem_kernel_id;
 
-            this->m_extract_particles_addr_kernel_id =
-                rhs.m_extract_particles_addr_kernel_id;
+            this->m_fetch_particles_addr_kernel_id =
+                rhs.m_fetch_particles_addr_kernel_id;
 
             /* TODO: Implement copying of arguments and controller */
         }
@@ -234,11 +313,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->m_stored_output_arg = std::move( rhs.m_stored_output_arg );
 
-            this->m_stored_success_flag_arg =
-                std::move( rhs.m_stored_success_flag_arg );
-
-            this->m_remap_kernel_id =
-                std::move( rhs.m_remap_kernel_id );
+            this->m_stored_debug_flag_arg =
+                std::move( rhs.m_stored_debug_flag_arg );
 
             this->m_assign_output_bemon_kernel_id =
                 std::move( rhs.m_assign_output_bemon_kernel_id );
@@ -252,8 +328,8 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_track_elem_by_elem_kernel_id =
                 std::move( rhs.m_track_elem_by_elem_kernel_id );
 
-            this->m_extract_particles_addr_kernel_id =
-                std::move( rhs.m_extract_particles_addr_kernel_id );
+            this->m_fetch_particles_addr_kernel_id =
+                std::move( rhs.m_fetch_particles_addr_kernel_id );
         }
 
         return *this;
@@ -321,26 +397,57 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         if( ( _base_t::IsCollectFlagSet(
-                flags, st::TRACK_JOB_COLLECT_SUCCESS_FLAG ) ) &&
-            ( this->ptrSuccessFlagArgBase() != nullptr ) &&
-            ( this->ptrSuccessFlagArgBase()->usesRawArgument() ) &&
-            ( this->doGetPtrLastSuccessFlag() != nullptr ) )
+                flags, st::TRACK_JOB_COLLECT_DEBUG_FLAG ) ) &&
+            ( this->ptrDebugFlagArgBase() != nullptr ) &&
+            ( this->ptrDebugFlagArgBase()->usesRawArgument() ) &&
+            ( this->doGetPtrLastDebugFlag() != nullptr ) )
         {
-            using success_flag_t = _base_t::success_flag_t;
+            using debug_flag_t = _base_t::debug_flag_t;
 
-            status_t const status = this->ptrSuccessFlagArgBase()->receive(
-                this->doGetPtrLastSuccessFlag(), sizeof( success_flag_t ) );
+            status_t const status = this->ptrDebugFlagArgBase()->receive(
+                this->doGetPtrLastDebugFlag(), sizeof( debug_flag_t ) );
 
             if( status == st::CONTROLLER_STATUS_SUCCESS )
             {
-                result |= st::TRACK_JOB_COLLECT_SUCCESS_FLAG;
+                result |= st::TRACK_JOB_COLLECT_DEBUG_FLAG;
+            }
+        }
+
+        if( ( _base_t::IsCollectFlagSet(
+                flags, st::TRACK_JOB_COLLECT_PARTICLES_ADDR ) ) &&
+            ( this->ptrParticlesArgBase() != nullptr ) &&
+            ( this->ptrParticlesArgBase()->usesCxxObjectsBuffer() ) &&
+            ( this->doGetPtrParticlesAddrBuffer() != nullptr ) &&
+            ( this->doGetPtrParticlesAddrBuffer() ==
+              this->ptrParticlesArgBase()->ptrCObjectsCxxBuffer() ) )
+        {
+            status_t const status = this->ptrParticlesArgBase()->receive(
+                this->ptrCObjectsCxxBuffer() );
+
+            if( status == st::CONTROLLER_STATUS_SUCCESS )
+            {
+                result |= st::TRACK_JOB_COLLECT_PARTICLES_ADDR;
             }
         }
 
         return result;
     }
 
-    /* ----------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+
+    bool TrackJobCtrlArgBase::doPrepareController(
+        char const* SIXTRL_RESTRICT )
+    {
+        return true;
+    }
+
+    bool TrackJobCtrlArgBase::doPrepareDefaultKernels(
+        char const* SIXTRL_RESTRICT )
+    {
+        return true;
+    }
+
+    /* --------------------------------------------------------------------- */
 
     TrackJobCtrlArgBase::controller_base_t const*
     TrackJobCtrlArgBase::ptrControllerBase() const SIXTRL_NOEXCEPT
@@ -354,6 +461,8 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_stored_controller.get();
     }
 
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
     TrackJobCtrlArgBase::argument_base_t const*
     TrackJobCtrlArgBase::ptrParticlesArg() const SIXTRL_NOEXCEPT
     {
@@ -365,6 +474,8 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         return this->m_stored_particles_arg.get();
     }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     TrackJobCtrlArgBase::argument_base_t const*
     TrackJobCtrlArgBase::ptrBeamElementsArg() const SIXTRL_NOEXCEPT
@@ -378,6 +489,8 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_stored_beam_elements_arg.get();
     }
 
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
     TrackJobCtrlArgBase::argument_base_t const*
     TrackJobCtrlArgBase::ptrOutputArg() const SIXTRL_NOEXCEPT
     {
@@ -390,17 +503,21 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_stored_output_arg.get();
     }
 
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
     TrackJobCtrlArgBase::argument_base_t const*
-    TrackJobCtrlArgBase::ptrSuccessFlagArgBase() const SIXTRL_NOEXCEPT
+    TrackJobCtrlArgBase::ptrDebugFlagArgBase() const SIXTRL_NOEXCEPT
     {
-        return this->m_stored_success_flag_arg.get();
+        return this->m_stored_debug_flag_arg.get();
     }
 
     TrackJobCtrlArgBase::argument_base_t*
-    TrackJobCtrlArgBase::ptrSuccessFlagArgBase() SIXTRL_NOEXCEPT
+    TrackJobCtrlArgBase::ptrDebugFlagArgBase() SIXTRL_NOEXCEPT
     {
-        return this->m_stored_success_flag_arg.get();
+        return this->m_stored_debug_flag_arg.get();
     }
+
+    /* --------------------------------------------------------------------- */
 
     void TrackJobCtrlArgBase::doUpdateStoredController(
         TrackJobCtrlArgBase::stored_ctrl_base_t&&
@@ -430,47 +547,11 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_stored_output_arg = std::move( ptr_output_arg );
     }
 
-    void TrackJobCtrlArgBase::doUpdateStoredSuccessFlagArg(
+    void TrackJobCtrlArgBase::doUpdateStoredDebugFlagArg(
         TrackJobCtrlArgBase::stored_arg_base_t&&
-            ptr_success_flag_arg ) SIXTRL_NOEXCEPT
+            ptr_debug_flag_arg ) SIXTRL_NOEXCEPT
     {
-        this->m_stored_success_flag_arg = std::move( ptr_success_flag_arg );
-    }
-
-    void TrackJobCtrlArgBase::doSetRemapKernelId(
-        TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
-    {
-        this->m_remap_kernel_id = id;
-    }
-
-    void TrackJobCtrlArgBase::doSetAssignOutputToBeamMonitorsKernelId(
-        TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
-    {
-        this->m_assign_output_bemon_kernel_id = id;
-    }
-
-    void TrackJobCtrlArgBase::doSetTrackUntilKernelId(
-        TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
-    {
-        this->m_track_until_kernel_id = id;
-    }
-
-    void TrackJobCtrlArgBase::doSetTrackLineKernelId(
-        TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
-    {
-        this->m_track_line_kernel_id = id;
-    }
-
-    void TrackJobCtrlArgBase::doSetTrackElemByElemKernelId(
-        TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
-    {
-        this->m_track_elem_by_elem_kernel_id = id;
-    }
-
-    void TrackJobCtrlArgBase::doSetExtractParticlesAddressesKernelId(
-        TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
-    {
-        this->m_extract_particles_addr_kernel_id = id;
+        this->m_stored_debug_flag_arg = std::move( ptr_debug_flag_arg );
     }
 
     /* --------------------------------------------------------------------- */
@@ -479,18 +560,17 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         using base_ctrl_t = st::TrackJobCtrlArgBase::controller_base_t;
 
-        this->m_remap_kernel_id = base_ctrl_t::ILLEGAL_KERNEL_ID;
         this->m_assign_output_bemon_kernel_id = base_ctrl_t::ILLEGAL_KERNEL_ID;
         this->m_track_until_kernel_id = base_ctrl_t::ILLEGAL_KERNEL_ID;
         this->m_track_line_kernel_id = base_ctrl_t::ILLEGAL_KERNEL_ID;
         this->m_track_elem_by_elem_kernel_id = base_ctrl_t::ILLEGAL_KERNEL_ID;
-        this->m_extract_particles_addr_kernel_id =
+        this->m_fetch_particles_addr_kernel_id =
             base_ctrl_t::ILLEGAL_KERNEL_ID;
 
         this->m_stored_particles_arg.reset( nullptr );
         this->m_stored_beam_elements_arg.reset( nullptr );
         this->m_stored_output_arg.reset( nullptr );
-        this->m_stored_success_flag_arg.reset( nullptr );
+        this->m_stored_debug_flag_arg.reset( nullptr );
         this->m_stored_controller.reset( nullptr );
 
         return;

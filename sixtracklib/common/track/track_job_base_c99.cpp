@@ -133,10 +133,10 @@ bool NS(TrackJob_collect_output)( ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
     return ( ( job != nullptr ) && ( job->collectOutput() ) );
 }
 
-bool NS(TrackJob_collect_success_flag)(
+bool NS(TrackJob_collect_debug_flag)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
-    return ( ( job != nullptr ) && ( job->collectSuccessFlag() ) );
+    return ( ( job != nullptr ) && ( job->collectDebugFlag() ) );
 }
 
 void NS(TrackJob_enable_collect_particles)(

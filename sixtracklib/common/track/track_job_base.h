@@ -92,7 +92,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_collect_beam_elements)(
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_collect_output)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_collect_success_flag)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_collect_debug_flag)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobNew_enable_collect_particles)(
