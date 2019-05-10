@@ -16,8 +16,6 @@
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/cuda/definitions.h"
     #include "sixtracklib/common/control/argument_base.hpp"
-    #include "sixtracklib/common/control/controller_base.hpp"
-    #include "sixtracklib/common/control/controller_on_nodes_base.hpp"
     #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
        !defined( __CUDA_ARCH__ )
         #include "sixtracklib/common/buffer.hpp"
@@ -28,28 +26,15 @@
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 namespace SIXTRL_CXX_NAMESPACE
 {
-    class CudaControllerBase;
+    class CudaController;
 
     class CudaArgumentBase : public SIXTRL_CXX_NAMESPACE::ArgumentBase
     {
-        private:
-
-        using _base_arg_t = SIXTRL_CXX_NAMESPACE::ArgumentBase;
-
         public:
 
-        using arch_id_t                = _base_arg_t::arch_id_t;
-        using status_t                 = _base_arg_t::status_t;
-        using buffer_t                 = _base_arg_t::buffer_t;
-        using c_buffer_t               = _base_arg_t::c_buffer_t;
-        using size_type                = _base_arg_t::size_type;
-        using ptr_base_controller_t    = _base_arg_t::ptr_base_controller_t;
-
-        using ptr_const_base_controller_t =
-            _base_arg_t::ptr_const_base_controller_t;
-
-        using cuda_arg_buffer_t        = ::NS(cuda_arg_buffer_t);
-        using cuda_const_arg_buffer_t  = ::NS(cuda_const_arg_buffer_t);
+        using cuda_controller_t = SIXTRL_CXX_NAMESPACE::CudaControllerBase;
+        using cuda_arg_buffer_t = ::NS(cuda_arg_buffer_t);
+        using cuda_const_arg_buffer_t = ::NS(cuda_const_arg_buffer_t);
 
         SIXTRL_HOST_FN virtual ~CudaArgumentBase() SIXTRL_NOEXCEPT;
 
@@ -60,16 +45,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
-        using base_controller_t = SIXTRL_CXX_NAMESPACE::CudaControllerBase;
-        using ptr_cuda_base_controller_t = base_controller_t*;
-        using ptr_cuda_base_const_controller_t = base_controller_t const*;
+        using ptr_cuda_controller_t = cuda_controller_t*;
+        using ptr_cuda_const_controller_t = cuda_controller_t const*;
 
         SIXTRL_HOST_FN explicit CudaArgumentBase(
-            ControllerOnNodesBase* SIXTRL_RESTRICT ptr_controller = nullptr );
+            cuda_controller_t* SIXTRL_RESTRICT ptr_controller = nullptr );
 
         SIXTRL_HOST_FN explicit CudaArgumentBase(
             size_type const arg_buffer_capacity,
-            ControllerOnNodesBase* SIXTRL_RESTRICT ptr_controller = nullptr );
+            cuda_controller_t* SIXTRL_RESTRICT ptr_controller = nullptr );
 
         SIXTRL_HOST_FN CudaArgumentBase(
             CudaArgumentBase const& other ) = delete;
@@ -94,6 +78,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual bool doReserveArgumentBuffer(
             size_type const required_buffer_size ) override;
+
+        SIXTRL_HOST_FN static cuda_arg_buffer_t CudaAllocArgBuffer(
+            size_type const capacity );
+
+        SIXTRL_HOST_FN static void CudaFreeArgBuffer(
+            cuda_arg_buffer_t SIXTRL_RESTRICT arg_buffer );
 
         private:
 

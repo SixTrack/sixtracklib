@@ -15,6 +15,21 @@ NS(CudaController)* NS(CudaController_create)( void )
     return new SIXTRL_CXX_NAMESPACE::CudaController( "" );
 }
 
+bool NS(CudaController_select_node_by_cuda_device_index)(
+    NS(CudaController)* SIXTRL_RESTRICT ctrl, int cuda_device_index )
+{
+    return ( ( ctrl != nullptr ) &&
+             ( ctrl->selectNodeByCudaIndex( cuda_device_index ) ) );
+}
+
+bool NS(CudaController_select_node_by_cuda_pci_bus_id)(
+    NS(CudaController)* SIXTRL_RESTRICT ctrl,
+    char const* SIXTRL_RESTRICT cuda_pci_bus_id )
+{
+    return ( ( ctrl != nullptr ) &&
+             ( ctrl->selectNodeByPciBusId( cuda_pci_bus_id ) ) );
+}
+
 void NS(CudaController_delete)( NS(CudaController)* SIXTRL_RESTRICT ctrl )
 {
     delete ctrl;

@@ -5,7 +5,6 @@ set( SIXTRACKLIB_CUDA_CONTROL_CXX_HEADERS
      kernel_config.hpp
      node_info.hpp
      argument_base.hpp
-     controller_base.hpp
 )
 
 set( SIXTRACKLIB_CUDA_CONTROL_CXX_SOURCES
@@ -15,15 +14,12 @@ set( SIXTRACKLIB_CUDA_CONTROL_CXX_SOURCES
      argument_base_c99.cpp
      argument.cpp
      argument_c99.cpp
-     controller_base.cpp
-     controller_base_c99.cpp
-     controller_c99.cpp
      controller.cpp
+     controller_c99.cpp
 )
 
 set( SIXTRACKLIB_CUDA_CONTROL_C99_HEADERS
      argument_base.h
-     controller_base.h
 )
 
 add_library( sixtrack_cuda_cxx_control OBJECT

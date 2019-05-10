@@ -18,7 +18,6 @@
 #include "sixtracklib/common/control/controller_base.hpp"
 
 #include "sixtracklib/cuda/definitions.h"
-#include "sixtracklib/cuda/control/controller_base.hpp"
 #include "sixtracklib/cuda/control/argument_base.hpp"
 #include "sixtracklib/cuda/controller.hpp"
 

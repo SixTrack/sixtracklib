@@ -15,7 +15,7 @@
     #include "sixtracklib/common/control/arch_base.hpp"
     #include "sixtracklib/common/control/kernel_config_base.hpp"
     #include "sixtracklib/common/track/definitions.h"
-    #include "sixtracklib/common/track/track_job_ctrl_arg_base.hpp"
+    #include "sixtracklib/common/track/track_job_nodectrl_arg_base.hpp"
 
     #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
        !defined( __CUDA_ARCH__ )
@@ -31,15 +31,17 @@
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 namespace SIXTRL_CXX_NAMESPACE
 {
-    class CudaTrackJob : public SIXTRL_CXX_NAMESPACE::TrackJobCtrlArgBase
+    class CudaTrackJob : public SIXTRL_CXX_NAMESPACE::TrackJobNodeCtrlArgBase
     {
         private:
 
-        using _base_track_job_t = SIXTRL_CXX_NAMESPACE::TrackJobCtrlArgBase;
+        using _base_track_job_t =
+            SIXTRL_CXX_NAMESPACE::TrackJobNodeCtrlArgBase;
 
         public:
 
         using cuda_controller_t     = SIXTRL_CXX_NAMESPACE::CudaController;
+        using cuda_node_info_t      = cuda_controller_t::node_info_t;
         using cuda_argument_t       = SIXTRL_CXX_NAMESPACE::CudaArgument;
         using cuda_kernel_config_t  = SIXTRL_CXX_NAMESPACE::CudaKernelConfig;
 
@@ -48,24 +50,24 @@ namespace SIXTRL_CXX_NAMESPACE
         using c_buffer_t            = _base_track_job_t::c_buffer_t;
         using size_type             = _base_track_job_t::size_type;
         using kernel_id_t           = _base_track_job_t::kernel_id_t;
+        using kernel_config_base_t  = _base_track_job_t::kernel_config_base_t;
         using track_status_t        = _base_track_job_t::track_status_t;
         using status_t              = _base_track_job_t::status_t;
         using elem_by_elem_config_t = _base_track_job_t::elem_by_elem_config_t;
         using output_buffer_flag_t  = _base_track_job_t::output_buffer_flag_t;
         using collect_flag_t        = _base_track_job_t::collect_flag_t;
+        using particles_addr_t      = _base_track_job_t::particles_addr_t;
 
-        using cuda_node_info_t      = cuda_controller_t::node_info_t;
         using node_id_t             = cuda_controller_t::node_id_t;
         using platform_id_t         = cuda_controller_t::platform_id_t;
         using device_id_t           = cuda_controller_t::device_id_t;
+        using node_index_t          = cuda_controller_t::node_index_t;
 
         SIXTRL_HOST_FN explicit CudaTrackJob(
-            const char *const SIXTRL_RESTRICT node_id_str = nullptr,
             const char *const SIXTRL_RESTRICT config_str = nullptr );
 
         SIXTRL_HOST_FN explicit CudaTrackJob(
-            std::string const& SIXTRL_RESTRICT_REF node_id_str,
-            std::string const& SIXTRL_RESTRICT_REF config_str = std::string{} );
+            std::string const& SIXTRL_RESTRICT_REF config_str );
 
         SIXTRL_HOST_FN CudaTrackJob(
             const char *const SIXTRL_RESTRICT node_id_str,
@@ -91,74 +93,105 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual ~CudaTrackJob() SIXTRL_NOEXCEPT;
 
-        /* ----------------------------------------------------------------- */
+        /* ================================================================= */
 
-        SIXTRL_HOST_FN cuda_controller_t& cudaController() SIXTRL_RESTRICT;
-        SIXTRL_HOST_FN cuda_controller_t const&
-        cudaController() const SIXTRL_RESTRICT;
+        SIXTRL_HOST_FN bool hasCudaController() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cuda_controller_t& cudaController();
+        SIXTRL_HOST_FN cuda_controller_t const& cudaController() const;
 
-        SIXTRL_HOST_FN cuda_controller_t* ptrCudaController() SIXTRL_RESTRICT;
+        SIXTRL_HOST_FN cuda_controller_t* ptrCudaController() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN cuda_controller_t const*
-        ptrCudaController() const SIXTRL_RESTRICT;
+        ptrCudaController() const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN cuda_argument_t& particlesArg() SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN cuda_argument_t const&
-        particlesArg() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool hasCudaParticlesArg() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cuda_argument_t& cudaParticlesArg();
+        SIXTRL_HOST_FN cuda_argument_t const& cudaParticlesArg() const;
 
         SIXTRL_HOST_FN cuda_argument_t*
-        ptrParticlesArg() SIXTRL_NOEXCEPT;
+        ptrCudaParticlesArg() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN cuda_argument_t const*
-        ptrParticlesArg() const SIXTRL_NOEXCEPT;
+        ptrCudaParticlesArg() const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN cuda_argument_t& beamElementsArg() SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN cuda_argument_t const&
-        beamElementsArg() const SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN cuda_argument_t* ptrBeamElementsArg() SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN cuda_argument_t const*
-        ptrBeamElementsArg() const SIXTRL_NOEXCEPT;
-
-        /* ----------------------------------------------------------------- */
-
-        SIXTRL_HOST_FN cuda_argument_t& outputArg() SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN cuda_argument_t const&
-        outputArg() const SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN cuda_argument_t* ptrOutputArg() SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN cuda_argument_t const*
-        ptrOutputArg() const SIXTRL_NOEXCEPT;
-
-        /* ----------------------------------------------------------------- */
-
-        SIXTRL_HOST_FN cuda_argument_t& elemByElemConfigArg() SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN cuda_argument_t const&
-        elemByElemConfigArg() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool hasCudaBeamElementsArg() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cuda_argument_t& cudaBeamElementsArg();
+        SIXTRL_HOST_FN cuda_argument_t const& cudaBeamElementsArg() const;
 
         SIXTRL_HOST_FN cuda_argument_t const*
-        ptrElemByElemConfigArg() const SIXTRL_NOEXCEPT;
+        ptrCudaBeamElementsArg() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN cuda_argument_t*
-        ptrElemByElemConfigArg() SIXTRL_NOEXCEPT;
+        ptrCudaBeamElementsArg() SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN bool hasCudaOutputArg() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cuda_argument_t& cudaOutputArg();
+        SIXTRL_HOST_FN cuda_argument_t const& cudaOutputArg() const;
+
+        SIXTRL_HOST_FN cuda_argument_t* ptrCudaOutputArg() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cuda_argument_t const*
+        ptrCudaOutputArg() const SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN bool hasCudaElemByElemConfigArg() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cuda_argument_t& cudaElemByElemConfigArg();
+        SIXTRL_HOST_FN cuda_argument_t const& cudaElemByElemConfigArg() const;
+
+        SIXTRL_HOST_FN cuda_argument_t const*
+        ptrCudaElemByElemConfigArg() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN cuda_argument_t*
+        ptrCudaElemByElemConfigArg() SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN bool hasCudaDebugFlagArg() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cuda_argument_t& cudaDebugFlagArg();
+        SIXTRL_HOST_FN cuda_argument_t const& cudaDebugFlagArg() const;
+
+        SIXTRL_HOST_FN cuda_argument_t const*
+        ptrCudaDebugFlagArg() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN cuda_argument_t*
+        ptrCudaDebugFlagArg() SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN bool hasCudaParticlesAddrArg() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cuda_argument_t const& cudaParticlesAddrArg() const;
+        SIXTRL_HOST_FN cuda_argument_t& cudaParticlesAddrArg();
+
+        SIXTRL_HOST_FN cuda_argument_t const*
+        ptrCudaParticlesAddrArg() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN cuda_argument_t*
+        ptrCudaParticlesAddrArg() SIXTRL_NOEXCEPT;
+
+        /* ================================================================= */
 
         protected:
 
-        using cuda_ctrl_store_t     = std::unique_ptr< cuda_controller_t >;
-        using cuda_arg_store_t      = std::unique_ptr< cuda_argument_t >;
+        using argument_base_t   = _base_track_job_t::argument_base_t;
+        using cuda_ctrl_store_t = std::unique_ptr< cuda_controller_t >;
+        using cuda_arg_store_t  = std::unique_ptr< cuda_argument_t >;
 
-        SIXTRL_HOST_FN void doSetTotalNumParticles(
-            size_type const total_num_particles ) SIXTRL_NOEXCEPT;
+        using cuda_kernel_conf_store_t =
+            std::unique_ptr< cuda_kernel_config_t >;
 
         SIXTRL_HOST_FN virtual bool doPrepareController(
-            char const* SIXTRL_RESTRICT device_id_str,
-            const char *const SIXTRL_RESTRICT ptr_config_str );
+            char const* SIXTRL_RESTRICT config_str ) override;
+
+        SIXTRL_HOST_FN virtual bool doPrepareDefaultKernels(
+            char const* SIXTRL_RESTRICT config_str ) override;
+
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN virtual bool doPrepareParticlesStructures(
             c_buffer_t* SIXTRL_RESTRICT ptr_particles_buffer ) override;
@@ -182,6 +215,10 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
             size_type const until_turn_elem_by_elem ) override;
 
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN virtual status_t doFetchParticleAddresses() override;
+
         SIXTRL_HOST_FN virtual track_status_t doTrackUntilTurn(
             size_type const until_turn ) override;
 
@@ -195,48 +232,54 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual collect_flag_t doCollect(
             collect_flag_t const flags ) override;
 
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_HOST_FN virtual bool doParseConfigStr(
             const char *const SIXTRL_RESTRICT config_str ) override;
 
-        SIXTRL_HOST_FN void doUpdateStoredController(
-            cuda_ctrl_store_t&& ptr_stored_controller );
+        /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN void doUpdateStoredParticlesArg(
-            cuda_arg_store_t&& ptr_stored_particle_arg );
+        SIXTRL_HOST_FN cuda_argument_t const& doGetRefCudaArgument(
+            argument_base_t const* ptr_base_arg,
+            char const* SIXTRL_RESTRICT arg_name = "",
+            bool const requires_exact_match = false ) const;
 
-        SIXTRL_HOST_FN void doUpdateStoredBeamElementsArg(
-            cuda_arg_store_t&& ptr_stored_beam_elements_arg );
+        SIXTRL_HOST_FN cuda_argument_t& doGetRefCudaArgument(
+            argument_base_t const* ptr_base_arg,
+            char const* SIXTRL_RESTRICT arg_name = "",
+            bool const requires_exact_match = false );
 
-        SIXTRL_HOST_FN void doUpdateStoredOutputArg(
-            cuda_arg_store_t&& ptr_stored_output_arg );
+        SIXTRL_HOST_FN cuda_argument_t const* doGetPtrCudaArgument(
+            argument_base_t const* ptr_base_arg,
+            bool const requires_exact_match = false ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void doUpdateStoredClElemByElemConfigBuffer(
-            cuda_arg_store_t&& ptr_stored_elem_by_elem_conf_arg );
+        SIXTRL_HOST_FN cuda_argument_t* doGetPtrCudaArgument(
+            argument_base_t* ptr_base_arg,
+            bool const requires_exact_match = false ) SIXTRL_NOEXCEPT;
+
 
         private:
 
         template< typename PartSetIndexIter >
         SIXTRL_HOST_FN bool doInitCudaTrackJob(
-            const char *const SIXTRL_RESTRICT node_id_str,
+            const char *const SIXTRL_RESTRICT config_str,
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             PartSetIndexIter particle_set_indices_begin,
             PartSetIndexIter particle_set_indices_end,
             c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
-            size_type const until_turn_elem_by_elem,
-            const char *const SIXTRL_RESTRICT config_str );
+            size_type const until_turn_elem_by_elem );
 
         SIXTRL_HOST_FN bool doPrepareControllerCudaImpl(
-            const char *const SIXTRL_RESTRICT device_id_str,
             const char *const SIXTRL_RESTRICT ptr_config_str );
 
-        SIXTRL_HOST_FN void doParseConfigStrCudaImpl(
-            const char *const SIXTRL_RESTRICT config_str );
+        SIXTRL_HOST_FN bool doPrepareDefaultKernelsCudaImpl(
+            const char *const SIXTRL_RESTRICT ptr_config_str );
 
         SIXTRL_HOST_FN bool doPrepareParticlesStructuresCudaImpl(
             c_buffer_t* SIXTRL_RESTRICT ptr_particles_buffer );
 
-        SIXTRL_HOST_FN bool doPrepareBeamElementsStructuresCudaImp(
+        SIXTRL_HOST_FN bool doPrepareBeamElementsStructuresCudaImpl(
             c_buffer_t* SIXTRL_RESTRICT ptr_beam_elem_buffer );
 
         SIXTRL_HOST_FN bool doPrepareOutputStructuresCudaImpl(
@@ -254,19 +297,24 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
             size_type const until_turn_elem_by_elem );
-
-        cuda_ctrl_store_t       m_stored_controller;
-        cuda_arg_store_t        m_stored_particles_arg;
-        cuda_arg_store_t        m_stored_beam_elements_arg;
-        cuda_arg_store_t        m_stored_output_arg;
-        cuda_arg_store_t        m_stored_elem_by_elem_conf_arg;
-
-        kernel_id_t             m_remap_kernel_id;
-        kernel_id_t             m_assign_outbuffer_kernel_id;
-        kernel_id_t             m_track_until_kernel_id;
-        kernel_id_t             m_track_line_kernel_id;
-        kernel_id_t             m_track_elem_by_elem_kernel_id;
     };
+
+    CudaTrackJob::collect_flag_t collect(
+        CudaTrackJob& SIXTRL_RESTRICT_REF track_job );
+
+    CudaTrackJob::track_status_t trackUntilTurn(
+        CudaTrackJob& SIXTRL_RESTRICT_REF track_job,
+        CudaTrackJob::size_type const until_turn );
+
+    CudaTrackJob::track_status_t trackElemByElemUntilTurn(
+        CudaTrackJob& SIXTRL_RESTRICT_REF track_job,
+        CudaTrackJob::size_type const until_turn );
+
+    CudaTrackJob::track_status_t trackLine(
+        CudaTrackJob& SIXTRL_RESTRICT_REF track_job,
+        CudaTrackJob::size_type const belem_begin_id,
+        CudaTrackJob::size_type const belem_end_id,
+        bool const finish_turn = false );
 }
 
 typedef SIXTRL_CXX_NAMESPACE::CudaTrackJob NS(CudaTrackJob);
@@ -274,6 +322,116 @@ typedef SIXTRL_CXX_NAMESPACE::CudaTrackJob NS(CudaTrackJob);
 #else /* C++, Host */
 
 typedef void NS(CudaTrackJob);
+
+#endif /* C++, Host */
+
+/* ************************************************************************* */
+/* *******   Implementation of inline and template member functions  ******* */
+/* ************************************************************************* */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+
+namespace SIXTRL_CXX_NAMESPACE
+{
+    template< typename PartSetIndexIter >
+    bool CudaTrackJob::doInitCudaTrackJob(
+        const char *const SIXTRL_RESTRICT config_str,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT pbuffer,
+        PartSetIndexIter pset_begin,
+        PartSetIndexIter pset_end,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belem_buffer,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT output_buffer,
+        CudaTrackJob::size_type const until_turn_elem_by_elem )
+    {
+        using _this_t     = SIXTRL_CXX_NAMESPACE::CudaTrackJob;
+        using _base_t     = SIXTRL_CXX_NAMESPACE::TrackJobNodeCtrlArgBase;
+        using flags_t     = _this_t::output_buffer_flag_t;
+        using cuda_ctrl_t = _this_t::cuda_controller_t;
+        using cuda_arg_t  = _this_t::cuda_argument_t;
+        using size_t      = _this_t::size_type;
+        using diff_t      = std::ptrdiff_t;
+
+        bool success  = this->doPrepareControllerCudaImpl( config_str );
+        cuda_ctrl_t* ptr_ctrl = this->ptrCudaController();
+
+        if( ( !success ) || ( ptr_ctrl == nullptr ) )
+        {
+            return false;
+        }
+
+        success  = _base_t::doPrepareParticlesStructures( pbuffer );
+        success &= this->doPrepareParticlesStructuresCudaImpl( pbuffer );
+
+        if( !success )
+        {
+            return success;
+        }
+
+        this->doSetPtrCParticleBuffer( pbuffer );
+
+        if( ( pset_begin != pset_end ) &&
+            ( std::distance( pset_begin, pset_end ) > diff_t{ 0 } ) )
+        {
+            this->doSetParticleSetIndices( pset_begin, pset_end, pbuffer );
+        }
+
+        size_t const num_psets = this->numParticleSets();
+        size_t const* pset_id_begin = this->particleSetIndicesBegin();
+
+        success = _base_t::doPrepareBeamElementsStructures( belem_buffer );
+        success &= this->doPrepareBeamElementsStructuresCudaImpl(belem_buffer);
+
+        if( !success )
+        {
+            return success;
+        }
+
+        this->doSetPtrCBeamElementsBuffer( belem_buffer );
+
+        flags_t const flags =
+        ::NS(OutputBuffer_required_for_tracking_of_particle_sets)( pbuffer,
+            num_psets, pset_id_begin, belem_buffer, until_turn_elem_by_elem );
+
+        bool const requ_out_buffer =
+            ::NS(OutputBuffer_requires_output_buffer)( flags );
+
+        if( ( requ_out_buffer ) || ( output_buffer != nullptr ) )
+        {
+            success = _base_t::doPrepareOutputStructures( pbuffer,
+                belem_buffer, output_buffer, until_turn_elem_by_elem );
+
+            if( success )
+            {
+                success = this->doPrepareOutputStructuresCudaImpl(
+                    pbuffer, belem_buffer, this->ptrCOutputBuffer(),
+                        until_turn_elem_by_elem );
+            }
+        }
+
+        if( ( success ) && ( this->hasOutputBuffer() ) && ( requ_out_buffer ) )
+        {
+            success = _base_t::doAssignOutputBufferToBeamMonitors(
+                belem_buffer, this->ptrCOutputBuffer() );
+
+            bool const requires_beam_monitor_output =
+                ::NS(OutputBuffer_requires_beam_monitor_output)( flags );
+
+            if( ( success ) && ( this->hasOutputBuffer() ) &&
+                ( requires_beam_monitor_output ) )
+            {
+                this->doAssignOutputBufferToBeamMonitorsCudaImpl)(
+                    belem_buffer, this->ptrCOutputBuffer() );
+            }
+        }
+
+        if( success )
+        {
+            success = this->doPrepareDefaultKernelsCudaImpl( config_str );
+        }
+
+        return success;
+    }
+}
 
 #endif /* C++, Host */
 

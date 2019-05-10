@@ -13,6 +13,8 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/cuda/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -21,40 +23,44 @@ extern "C" {
 
 #if !defined( _GPUCODE )
 
-SIXTRL_HOST_FN SIXTRL_STATIC unsigned long NS(Cuda_get_1d_thread_id)(
+SIXTRL_STATIC SIXTRL_HOST_FN unsigned long NS(Cuda_get_1d_thread_id)(
     dim3 const thread_idx, dim3 const block_idx,
     dim3 const grid_dim,   dim3 const block_dim );
 
-SIXTRL_HOST_FN SIXTRL_STATIC unsigned long NS(Cuda_get_1d_thread_stride)(
+SIXTRL_STATIC SIXTRL_HOST_FN unsigned long NS(Cuda_get_1d_thread_stride)(
     dim3 const grid_dim, dim3 const block_dim );
 
-SIXTRL_HOST_FN SIXTRL_STATIC unsigned long NS(Cuda_get_num_blocks)(
+SIXTRL_STATIC SIXTRL_HOST_FN unsigned long NS(Cuda_get_num_blocks)(
     dim3 const grid_dim, dim3 const block_dim );
 
-SIXTRL_HOST_FN SIXTRL_STATIC unsigned long NS(Cuda_get_num_threads_per_block)(
+SIXTRL_STATIC SIXTRL_HOST_FN unsigned long NS(Cuda_get_num_threads_per_block)(
     dim3 const grid_dim, dim3 const block_dim );
 
-SIXTRL_HOST_FN SIXTRL_STATIC unsigned long NS(Cuda_get_total_num_threads)(
+SIXTRL_STATIC SIXTRL_HOST_FN unsigned long NS(Cuda_get_total_num_threads)(
     dim3 const grid_dim, dim3 const block_dim );
 
 #endif /* !defined( _GPUCODE ) */
 
 #if defined( _GPUCODE )
 
-SIXTRL_DEVICE_FN SIXTRL_STATIC unsigned long
+SIXTRL_STATIC SIXTRL_DEVICE_FN unsigned long
     NS(Cuda_get_1d_thread_id_in_kernel)( void );
 
-SIXTRL_DEVICE_FN SIXTRL_STATIC unsigned long
+SIXTRL_STATIC SIXTRL_DEVICE_FN unsigned long
     NS(Cuda_get_1d_thread_stride_in_kernel)( void );
 
-SIXTRL_DEVICE_FN SIXTRL_STATIC unsigned long
+SIXTRL_STATIC SIXTRL_DEVICE_FN unsigned long
     NS(Cuda_get_num_blocks_in_kernel)( void );
 
-SIXTRL_DEVICE_FN SIXTRL_STATIC unsigned long
+SIXTRL_STATIC SIXTRL_DEVICE_FN unsigned long
     NS(Cuda_get_num_threads_per_block_in_kernel)( void );
 
-SIXTRL_DEVICE_FN SIXTRL_STATIC unsigned long
+SIXTRL_STATIC SIXTRL_DEVICE_FN unsigned long
     NS(Cuda_get_total_num_threads_in_kernel)( void );
+
+SIXTRL_STATIC SIXTRL_DEVICE_FN void NS(Cuda_handle_debug_flag_in_kernel)(
+    SIXTRL_DATAPTR_DEC NS(ctrl_debug_flag_t)* SIXTRL_RESTRICT ptr_debug_flag,
+    NS(ctrl_debug_flag_t) const debug_flag );
 
 #endif /* #if defined( _GPUCODE ) */
 
@@ -146,7 +152,7 @@ SIXTRL_INLINE unsigned long NS(Cuda_get_total_num_threads)(
 
 #if defined( _GPUCODE )
 
-SIXTRL_INLINE SIXTRL_DEVICE_FN unsigned long NS(Cuda_get_1d_thread_id_in_kernel)()
+SIXTRL_INLINE unsigned long NS(Cuda_get_1d_thread_id_in_kernel)()
 {
     unsigned long const num_threads_per_block =
         NS(Cuda_get_num_threads_per_block_in_kernel)();
@@ -169,7 +175,7 @@ SIXTRL_INLINE SIXTRL_DEVICE_FN unsigned long NS(Cuda_get_1d_thread_id_in_kernel)
     return thread_id + blockIdx.z * temp;
 }
 
-SIXTRL_INLINE SIXTRL_DEVICE_FN unsigned long NS(Cuda_get_1d_thread_stride_in_kernel)()
+SIXTRL_INLINE unsigned long NS(Cuda_get_1d_thread_stride_in_kernel)()
 {
     SIXTRL_ASSERT(
         ( gridDim.x  > 0 ) && ( gridDim.y  > 0 ) && ( gridDim.z  > 0 ) &&
@@ -179,24 +185,63 @@ SIXTRL_INLINE SIXTRL_DEVICE_FN unsigned long NS(Cuda_get_1d_thread_stride_in_ker
            ( blockDim.x * blockDim.y * blockDim.z );
 }
 
-SIXTRL_INLINE SIXTRL_DEVICE_FN unsigned long NS(Cuda_get_num_blocks_in_kernel)()
+SIXTRL_INLINE unsigned long NS(Cuda_get_num_blocks_in_kernel)()
 {
-    SIXTRL_ASSERT( ( gridDim.x > 0 ) && ( gridDim.y > 0 ) && ( gridDim.z > 0 ) );
+    SIXTRL_ASSERT( ( gridDim.x > 0 ) && ( gridDim.y > 0 ) &&
+                   ( gridDim.z > 0 ) );
+
     return ( gridDim.x * gridDim.y * gridDim.z );
 }
 
-SIXTRL_INLINE SIXTRL_DEVICE_FN unsigned long
-    NS(Cuda_get_num_threads_per_block_in_kernel)()
+SIXTRL_INLINE unsigned long NS(Cuda_get_num_threads_per_block_in_kernel)()
 {
-    SIXTRL_ASSERT( ( blockDim.y > 0 ) && ( blockDim.y > 0 ) && ( blockDim.z > 0 ) );
+    SIXTRL_ASSERT( ( blockDim.y > 0 ) && ( blockDim.y > 0 ) &&
+                   ( blockDim.z > 0 ) );
+
     return ( blockDim.x * blockDim.y * blockDim.z );
 }
 
-SIXTRL_INLINE SIXTRL_DEVICE_FN unsigned long
-    NS(Cuda_get_total_num_threads_in_kernel)()
+SIXTRL_INLINE unsigned long NS(Cuda_get_total_num_threads_in_kernel)()
 {
     return NS(Cuda_get_num_blocks_in_kernel)() *
            NS(Cuda_get_num_threads_per_block_in_kernel)();
+}
+
+SIXTRL_INLINE void NS(Cuda_handle_debug_flag_in_kernel)(
+    SIXTRL_DATAPTR_DEC NS(ctrl_debug_flag_t)* SIXTRL_RESTRICT ptr_debug_flag,
+    NS(ctrl_debug_flag_t) const debug_flag )
+{
+    if( ( debug_flag != SIXTRL_CONTROLLER_DEBUG_FLAG_OK ) &&
+        ( ptr_debug_flag != SIXTRL_NULLPTR ) )
+    {
+        #if ( defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 350 ) )
+            /* sm_35 or larger defines atomicOr also for
+             * 64Bit variables -> this is the only clean solution */
+            atomicOr( ptr_debug_flag, debug_flag );
+
+        #elif defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 120 ) )
+            /* NOTE: 64 bit atomic support is available but not atomicOr ->
+             * use a spin-lock + copy&swap to emulate proper atomics.
+             * this is not exactly a clean solution but since this is
+             * intended to be used only in the debug kernels, it should not
+             * be a big problem. */
+
+            SIXTRL_UINT64_T old;
+            SIXTRL_UINT64_T ret = *ptr_debug_flag;
+
+            do
+            {
+                old = ret;
+            }
+            while( ( ret = atomicCAS( ptr_debug_flag, old,
+                    old | debug_flag ) ) != old );
+        #else
+
+            /* No integer atomic support. We do not support devices with this
+            * limitations -> terminate compilation of device code */
+            #error "__CUDA_ARCH__ >= 120 required for atomic integer functions"
+        #endif /* defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 350 ) */
+    }
 }
 
 #endif /* defined( _GPUCODE ) */

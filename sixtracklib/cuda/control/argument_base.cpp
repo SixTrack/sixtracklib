@@ -10,15 +10,16 @@
 #include <stdexcept>
 #include <utility>
 
+#include <cuda_runtime_api.h>
+
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/control/argument_base.hpp"
-#include "sixtracklib/common/control/controller_base.hpp"
+#include "sixtracklib/cuda/controller.hpp"
 
-#include "sixtracklib/cuda/control/controller_base.hpp"
-#include "sixtracklib/cuda/wrappers/argument_operations.h"
+namespace st = SIXTRL_CXX_NAMESPACE;
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -47,18 +48,18 @@ namespace SIXTRL_CXX_NAMESPACE
 
     CudaArgumentBase::CudaArgumentBase(
         CudaArgumentBase::size_type const arg_buffer_capacity,
-        ControllerOnNodesBase* SIXTRL_RESTRICT ctx ) :
-        ArgumentBase( SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA,
-            SIXTRL_ARCHITECTURE_CUDA_STR, nullptr, true, ctx ),
+        CudaController* SIXTRL_RESTRICT ctrl ) :
+        ArgumentBase( st::ARCHITECTURE_CUDA,
+            SIXTRL_ARCHITECTURE_CUDA_STR, nullptr, true, ctrl ),
         m_arg_buffer( nullptr )
     {
         this->doReserveArgumentBufferCudaBaseImpl( arg_buffer_capacity );
     }
 
     CudaArgumentBase::CudaArgumentBase(
-        ControllerOnNodesBase* SIXTRL_RESTRICT ctx ) :
-        ArgumentBase( SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA,
-            SIXTRL_ARCHITECTURE_CUDA_STR, nullptr, true, ctx ),
+        CudaController* SIXTRL_RESTRICT ctrl ) :
+        ArgumentBase( st::ARCHITECTURE_CUDA,
+            SIXTRL_ARCHITECTURE_CUDA_STR, nullptr, true, ctrl ),
         m_arg_buffer( nullptr )
     {
 
@@ -66,9 +67,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
     void CudaArgumentBase::doDeleteCudaArgumentBuffer() SIXTRL_NOEXCEPT
     {
-        using size_t = CudaArgumentBase::size_type;
+        using _this_t = st::CudaArgumentBase;
+        using size_t = _this_t::size_type;
 
-        ::NS(CudaArgument_free_arg_buffer)( this->m_arg_buffer );
+        _this_t::CudaFreeArgBuffer( this->m_arg_buffer );
 
         this->m_arg_buffer = nullptr;
         this->doSetArgCapacity( size_t{ 0 } );
@@ -118,13 +120,14 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         bool success = false;
 
-        using size_t = CudaArgumentBase::size_type;
-        using arg_buffer_t = CudaArgumentBase::cuda_arg_buffer_t;
+        using _this_t      = st::CudaArgumentBase;
+        using size_t       = _this_t::size_type;
+        using arg_buffer_t = _this_t::cuda_arg_buffer_t;
 
         if( this->capacity() < required_buffer_size )
         {
-            arg_buffer_t arg_buffer = ::NS(CudaArgument_alloc_arg_buffer)(
-                required_buffer_size );
+            arg_buffer_t arg_buffer =
+                _this_t::CudaAllocArgBuffer( required_buffer_size );
 
             if( arg_buffer != nullptr )
             {
@@ -148,6 +151,42 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* ----------------------------------------------------------------- */
+
+    CudaArgumentBase::cuda_arg_buffer_t CudaArgumentBase::CudaAllocArgBuffer(
+        CudaArgumentBase::size_type const capacity )
+    {
+        CudaArgumentBase::cuda_arg_buffer_t arg_buffer = nullptr;
+
+        if( capacity > CudaArgumentBase::size_t{ 0 } )
+        {
+            ::cudaError_t const ret =
+                ::cudaMalloc( ( void** )&arg_buffer, capacity );
+
+            if( ret != ::cudaSuccess )
+            {
+                if( arg_buffer != nullptr )
+                {
+                    ::cudaFree( arg_buffer );
+                    arg_buffer = nullptr;
+                }
+            }
+        }
+
+        return arg_buffer;
+    }
+
+    void CudaArgumentBase::CudaFreeArgBuffer(
+        CudaArgumentBase::cuda_arg_buffer_t SIXTRL_RESTRICT arg_buffer )
+    {
+        if( arg_buffer != nullptr )
+        {
+            ::cudaError_t const err = ::cudaFree( arg_buffer );
+            SIXTRL_ASSERT( err == ::cudaSuccess );
+            ( void )err;
+
+            arg_buffer = nullptr;
+        }
+    }
 }
 
 #endif /* c++, host */

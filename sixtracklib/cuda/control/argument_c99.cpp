@@ -25,7 +25,7 @@ namespace st = SIXTRL_CXX_NAMESPACE;
 }
 
 ::NS(CudaArgument)* NS(CudaArgument_new_from_size)(
-    ::NS(controller_size_t) const capacity,
+    ::NS(ctrl_size_t) const capacity,
     ::NS(CudaController)* SIXTRL_RESTRICT ctrl )
 {
     return new SIXTRL_CXX_NAMESPACE::CudaArgument( capacity, ctrl );
@@ -33,7 +33,7 @@ namespace st = SIXTRL_CXX_NAMESPACE;
 
 ::NS(CudaArgument)* NS(CudaArgument_new_from_memory)(
     void const* SIXTRL_RESTRICT raw_arg_begin,
-    ::NS(controller_size_t) const raw_arg_length,
+    ::NS(ctrl_size_t) const raw_arg_length,
     ::NS(CudaController)* SIXTRL_RESTRICT ctrl )
 {
     return new SIXTRL_CXX_NAMESPACE::CudaArgument(
@@ -45,7 +45,7 @@ void NS(CudaArgument_delete)( ::NS(CudaArgument)* SIXTRL_RESTRICT argument )
     delete argument;
 }
 
-::NS(controller_status_t) NS(CudaArgument_send_buffer)(
+::NS(ctrl_status_t) NS(CudaArgument_send_buffer)(
     ::NS(CudaArgument)* SIXTRL_RESTRICT arg,
     const ::NS(Buffer) *const SIXTRL_RESTRICT source_buffer )
 {
@@ -53,17 +53,17 @@ void NS(CudaArgument_delete)( ::NS(CudaArgument)* SIXTRL_RESTRICT argument )
         ? arg->send( source_buffer ) : st::CONTROLLER_STATUS_GENERAL_FAILURE;
 }
 
-::NS(controller_status_t) NS(CudaArgument_send_memory)(
+::NS(ctrl_status_t) NS(CudaArgument_send_memory)(
     ::NS(CudaArgument)* SIXTRL_RESTRICT arg,
     const void *const SIXTRL_RESTRICT source_arg_begin,
-    ::NS(controller_size_t) const source_arg_length )
+    ::NS(ctrl_size_t) const source_arg_length )
 {
     return ( arg != nullptr )
         ? arg->send( source_arg_begin, source_arg_length )
         : st::CONTROLLER_STATUS_GENERAL_FAILURE;
 }
 
-::NS(controller_status_t) NS(CudaArgument_receive_buffer)(
+::NS(ctrl_status_t) NS(CudaArgument_receive_buffer)(
     ::NS(CudaArgument)* SIXTRL_RESTRICT arg,
     ::NS(Buffer)* SIXTRL_RESTRICT destination_buffer )
 {
@@ -72,10 +72,10 @@ void NS(CudaArgument_delete)( ::NS(CudaArgument)* SIXTRL_RESTRICT argument )
         : st::CONTROLLER_STATUS_GENERAL_FAILURE;
 }
 
-::NS(controller_status_t) NS(CudaArgument_receive_memory)(
+::NS(ctrl_status_t) NS(CudaArgument_receive_memory)(
     ::NS(CudaArgument)* SIXTRL_RESTRICT arg,
     void* SIXTRL_RESTRICT destination_buffer,
-    ::NS(controller_size_t) const destination_capacity )
+    ::NS(ctrl_size_t) const destination_capacity )
 {
     return ( arg != nullptr )
         ? arg->receive( destination_buffer, arg->size() )
@@ -107,44 +107,40 @@ bool NS(CudaArgument_get_ptr_raw_argument)(
     return ( argument != nullptr ) ? argument->ptrRawArgument() : nullptr;
 }
 
-::NS(controller_size_t) NS(CudaArgument_get_size)(
+::NS(ctrl_size_t) NS(CudaArgument_get_size)(
     const ::NS(CudaArgument) *const SIXTRL_RESTRICT argument )
 {
-    return ( argument != nullptr )
-        ? argument->size() : ::NS(controller_size_t){ 0 };
+    return ( argument != nullptr ) ? argument->size() : ::NS(ctrl_size_t){ 0 };
 }
 
-::NS(controller_size_t) NS(CudaArgument_get_capacity)(
-    const ::NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+::NS(ctrl_size_t) NS(CudaArgument_get_capacity)(
+    const ::NS(CudaArgument) *const SIXTRL_RESTRICT arg )
 {
-    return ( argument != nullptr )
-        ? argument->capacity() : ::NS(controller_size_t){ 0 };
+    return ( arg != nullptr ) ? arg->capacity() : ::NS(ctrl_size_t){ 0 };
 }
 
 bool NS(CudaArgument_has_argument_buffer)(
-    const ::NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+    const ::NS(CudaArgument) *const SIXTRL_RESTRICT arg )
 {
-    return ( argument != nullptr ) ? argument->hasArgumentBuffer() : false;
+    return ( arg != nullptr ) ? arg->hasArgumentBuffer() : false;
 }
 
 bool NS(CudaArgument_requires_argument_buffer)(
-    const ::NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+    const ::NS(CudaArgument) *const SIXTRL_RESTRICT arg )
 {
-    return ( argument != nullptr )
-        ? argument->requiresArgumentBuffer() : false;
+    return ( arg != nullptr ) ? arg->requiresArgumentBuffer() : false;
 }
 
 ::NS(arch_id_t) NS(CudaArgument_get_arch_id)(
-    const ::NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+    const ::NS(CudaArgument) *const SIXTRL_RESTRICT arg )
 {
-    return ( argument != nullptr ) ? argument->archId()
-        : ::NS(ARCHITECTURE_ILLEGAL);
+    return ( arg != nullptr ) ? arg->archId() : ::NS(ARCHITECTURE_ILLEGAL);
 }
 
 char const* NS(CudaArgument_get_arch_string)(
-    const ::NS(CudaArgument) *const SIXTRL_RESTRICT argument )
+    const ::NS(CudaArgument) *const SIXTRL_RESTRICT arg )
 {
-    return ( argument != nullptr ) ? argument->ptrArchStr() : nullptr;
+    return ( arg != nullptr ) ? arg->ptrArchStr() : nullptr;
 }
 
 #endif /* C++, Host */

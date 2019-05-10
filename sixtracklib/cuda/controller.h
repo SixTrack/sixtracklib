@@ -18,7 +18,18 @@
 extern "C" {
 #endif /* C++, Host */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController)* NS(CudaController_create)( void );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController)*
+NS(CudaController_create)( void );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(CudaController_select_node_by_cuda_device_index)(
+    NS(CudaController)* SIXTRL_RESTRICT ctrl, int cuda_device_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(CudaController_select_node_by_cuda_pci_bus_id)(
+    NS(CudaController)* SIXTRL_RESTRICT ctrl,
+    char const* SIXTRL_RESTRICT cuda_pci_bus_id );
+
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(CudaController_delete)(
     NS(CudaController)* SIXTRL_RESTRICT ctrl );

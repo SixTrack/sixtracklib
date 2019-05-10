@@ -45,6 +45,9 @@ namespace SIXTRL_CXX_NAMESPACE
         static SIXTRL_CONSTEXPR_OR_CONST cuda_dev_index_t
             ILLEGAL_DEV_INDEX = cuda_dev_index_t{ -1 };
 
+        static SIXTRL_CONSTEXPR_OR_CONST size_type
+            DEFAULT_WARP_SIZE = size_type{ 32 };
+
         SIXTRL_HOST_FN explicit CudaNodeInfo(
             cuda_dev_index_t const cuda_dev_index = ILLEGAL_DEV_INDEX );
 
