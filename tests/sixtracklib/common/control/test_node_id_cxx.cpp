@@ -15,7 +15,7 @@ TEST( CXX_CommonControlNodeIdTests, MinimalUsage )
     namespace st = SIXTRL_CXX_NAMESPACE;
 
     using node_id_t     = st::NodeId;
-    using ctrl_size_t   = st::controller_size_t;
+    using ctrl_size_t   = st::ctrl_size_t;
     using platform_id_t = node_id_t::platform_id_t;
     using device_id_t   = node_id_t::device_id_t;
     using node_index_t  = node_id_t::index_t;

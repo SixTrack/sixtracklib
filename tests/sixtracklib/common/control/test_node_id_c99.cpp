@@ -16,7 +16,7 @@ TEST( C99_CommonControlNodeIdTests, MinimalUsage )
     using platform_id_t = ::NS(node_platform_id_t);
     using device_id_t   = ::NS(node_device_id_t);
     using node_index_t  = ::NS(node_index_t);
-    using ctrl_size_t   = ::NS(controller_size_t);
+    using ctrl_size_t   = ::NS(ctrl_size_t);
 
     char node_id_str[] = { '\0', '\0', '\0', '\0' };
 
@@ -186,7 +186,7 @@ TEST( C99_CommonControlNodeIdTests, MinimalUsage )
 TEST( C99_CommonControlNodeIdTests, ExtractNodeIdFromConfigStr )
 {
     using buf_size_t = ::NS(buffer_size_t);
-    using status_t   = ::NS(controller_status_t;
+    using status_t   = ::NS(ctrl_status_t);
     std::string conf_str( "" );
 
     ::NS(buffer_size_t) const max_out_str_len = 32u;

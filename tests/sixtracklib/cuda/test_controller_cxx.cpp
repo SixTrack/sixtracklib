@@ -40,13 +40,16 @@ TEST( CXX_CudaControllerTests, MinimalUsageTest )
 
         ASSERT_TRUE( cmp_num_devices == controller.numAvailableNodes() );
 
-        controller.printAvailableNodesInfo();
+        ASSERT_TRUE( !controller.hasSelectedNode() );
+        ASSERT_TRUE( !controller.readyForSend() );
+        ASSERT_TRUE( !controller.readyForReceive() );
+        ASSERT_TRUE( !controller.readyForRemap() );
+
     }
-
-
-    ASSERT_TRUE( controller.readyForSend() );
-    ASSERT_TRUE( controller.readyForReceive() );
-    ASSERT_TRUE( controller.readyForRemap() );
+    else
+    {
+        ASSERT_TRUE( controller.numAvailableNodes() == node_index_t{ 0 } );
+    }
 }
 
 /* end: tests/sixtracklib/cuda/test_controller_cxx.cpp */

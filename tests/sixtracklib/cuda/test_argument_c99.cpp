@@ -28,8 +28,8 @@ TEST( C99_CudaArgumentTests, ArgumentCObjectBufferTest )
     using particles_t  = ::NS(Particles);
     using buffer_t     = ::NS(Buffer);
     using buf_size_t   = ::NS(buffer_size_t);
-    using ctrl_size_t  = ::NS(controller_size_t);
-    using status_t     = ::NS(controller_status_t);
+    using ctrl_size_t  = ::NS(ctrl_size_t);
+    using status_t     = ::NS(ctrl_status_t);
 
     buf_size_t const NUM_PARTICLES = 1000;
     buffer_t* pb = ::NS(Buffer_new)( 0u );
