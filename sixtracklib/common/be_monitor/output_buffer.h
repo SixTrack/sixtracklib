@@ -9,6 +9,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/be_monitor/be_monitor.h"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/particles.h"
@@ -119,6 +120,14 @@ SIXTRL_FN SIXTRL_STATIC int NS(BeamMonitor_assign_managed_output_buffer)(
     NS(particle_index_t) const min_turn_id,
     NS(buffer_size_t) const out_buffer_index_offset,
     NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC int NS(BeamMonitor_assign_managed_output_buffer_debug)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
+    NS(particle_index_t) const min_turn_id,
+    NS(buffer_size_t) const out_buffer_index_offset,
+    NS(buffer_size_t) const slot_size,
+    SIXTRL_ARGPTR_DEC NS(ctrl_debug_flag_t)* ptr_debug_flag );
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
@@ -326,6 +335,53 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_managed_output_buffer)(
                 break;
             }
         }
+    }
+
+    return success;
+}
+
+
+SIXTRL_INLINE int NS(BeamMonitor_assign_managed_output_buffer_debug)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
+    NS(particle_index_t) const min_turn_id,
+    NS(buffer_size_t) const out_buffer_index_offset,
+    NS(buffer_size_t) const slot_size,
+    SIXTRL_ARGPTR_DEC NS(ctrl_debug_flag_t)* ptr_debug_flag )
+{
+    typedef NS(ctrl_debug_flag_t)   flag_t;
+    typedef NS(buffer_size_t)               buf_size_t;
+
+    flag_t debug_flag = ( flag_t )0u;
+
+    int const success = NS(BeamMonitor_assign_managed_output_buffer)(
+        beam_elements, output_buffer, min_turn_id, out_buffer_index_offset,
+            slot_size );
+
+    if( ( success != 0 ) && ( ptr_debug_flag != SIXTRL_NULLPTR ) )
+    {
+        if( slot_size == ( buf_size_t )0u )   debug_flag |= ( flag_t )0x0001;
+        if( beam_elements == SIXTRL_NULLPTR ) debug_flag |= ( flag_t )0x0002;
+
+        if( NS(ManagedBuffer_needs_remapping)( beam_elements, slot_size ) )
+            debug_flag |= ( flag_t )0x0004;
+
+        if( output_buffer == SIXTRL_NULLPTR ) debug_flag |= ( flag_t )0x0008;
+
+        if( NS(ManagedBuffer_needs_remapping)( output_buffer, slot_size ) )
+            debug_flag |= ( flag_t )0x0010;
+
+        if( min_turn_id < ( NS(particle_index_t) )0 )
+            debug_flag |= ( flag_t )0x0020;
+
+        if( NS(ManagedBuffer_get_num_objects)( output_buffer, slot_size ) <
+                out_buffer_index_offset )
+        {
+            debug_flag |= ( flag_t )0x0040;
+        }
+
+        if( debug_flag == ( flag_t )0u ) debug_flag |= ( flag_t )0x0080;
+        *ptr_debug_flag |= debug_flag;
     }
 
     return success;
