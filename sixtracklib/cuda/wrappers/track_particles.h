@@ -15,7 +15,7 @@
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(Track_particles_line_cuda_on_grid)(
     void* SIXTRL_RESTRICT particles_buffer_arg,
     void* SIXTRL_RESTRICT beam_elements_buffer_arg,
@@ -25,7 +25,7 @@ NS(Track_particles_line_cuda_on_grid)(
     NS(buffer_size_t) const num_blocks,
     NS(buffer_size_t) const num_threads_per_block );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(controller_status_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(Track_particles_line_cuda)(
     void* SIXTRL_RESTRICT particles_buffer_arg,
     void* SIXTRL_RESTRICT beam_elements_buffer_arg,
