@@ -43,7 +43,7 @@
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/control/argument_base.h"
 #include "sixtracklib/common/control/controller_base.h"
-#include "sixtracklib/common/control/controller_on_nodes_base.h"
+#include "sixtracklib/common/control/node_controller_base.h"
 #include "sixtracklib/common/controller.h"
 #include "sixtracklib/common/internal/track_job_base.h"
 #include "sixtracklib/common/output/elem_by_elem_config.h"
