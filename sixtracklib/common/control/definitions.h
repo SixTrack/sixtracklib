@@ -9,17 +9,19 @@
 extern "C" {
 #endif /* C++, Host */
 
-typedef SIXTRL_INT32_T   NS(ctrl_status_t);
-typedef SIXTRL_UINT64_T  NS(ctrl_size_t);
-typedef SIXTRL_UINT64_T  NS(ctrl_debug_flag_t);
-typedef SIXTRL_UINT32_T  NS(ctrl_kernel_id_t);
+typedef SIXTRL_UINT64_T      NS(arch_id_t);
+typedef SIXTRL_INT32_T       NS(arch_status_t);
+typedef SIXTRL_UINT64_T      NS(arch_size_t);
+typedef SIXTRL_UINT64_T      NS(arch_debugging_t);
+typedef SIXTRL_UINT32_T      NS(arch_kernel_id_t);
 
-typedef SIXTRL_UINT64_T  NS(arch_id_t);
-typedef SIXTRL_UINT64_T  NS(arch_size_t);
+typedef NS(arch_status_t)    NS(ctrl_status_t);
+typedef NS(arch_size_t)      NS(ctrl_size_t);
+typedef NS(arch_kernel_id_t) NS(ctrl_kernel_id_t);
 
-typedef SIXTRL_INT64_T   NS(node_platform_id_t);
-typedef SIXTRL_INT64_T   NS(node_device_id_t);
-typedef SIXTRL_UINT32_T  NS(node_index_t);
+typedef SIXTRL_INT64_T       NS(node_platform_id_t);
+typedef SIXTRL_INT64_T       NS(node_device_id_t);
+typedef SIXTRL_UINT32_T      NS(node_index_t);
 
 
 /* Predefined  context type id's: limit them to 0x0000 - 0x01FF */
@@ -80,27 +82,39 @@ typedef SIXTRL_UINT32_T  NS(node_index_t);
 
 /* ------------------------------------------------------------------------- */
 
-#if !defined( SIXTRL_CONTROLLER_DEBUG_FLAG_OK )
-    #define SIXTRL_CONTROLLER_DEBUG_FLAG_OK 0x0000000000000000
-#endif /* !defined( SIXTRL_CONTROLLER_DEBUG_FLAG_OK ) */
+#if !defined(SIXTRL_ARCH_STATUS_SUCCESS)
+    #define SIXTRL_ARCH_STATUS_SUCCESS 0
+#endif /* !defined(SIXTRL_ARCH_STATUS_SUCCESS) */
 
-#if !defined( SIXTRL_CONTROLLER_DEBUG_FLAG_NOT_OK )
-    #define SIXTRL_CONTROLLER_DEBUG_FLAG_NOT_OK 0xFFFFFFFFFFFFFFFF
-#endif /* !defined( SIXTRL_CONTROLLER_DEBUG_FLAG_NOT_OK ) */
-
-#if !defined( SIXTRL_CONTROLLER_DEBUG_FLAG_GENERAL_FAILURE )
-    #define SIXTRL_CONTROLLER_DEBUG_FLAG_GENERAL_FAILURE 0x8000000000000000
-#endif /* !defined( SIXTRL_CONTROLLER_DEBUG_FLAG_GENERAL_FAILURE ) */
+#if !defined(SIXTRL_ARCH_STATUS_GENERAL_FAILURE)
+    #define SIXTRL_ARCH_STATUS_GENERAL_FAILURE -1
+#endif /* !defined(SIXTRL_ARCH_STATUS_GENERAL_FAILURE) */
 
 /* ------------------------------------------------------------------------- */
 
-#if !defined(SIXTRL_CONTROLLER_STATUS_SUCCESS)
-    #define SIXTRL_CONTROLLER_STATUS_SUCCESS 0
-#endif /* !defined(SIXTRL_CONTROLLER_STATUS_SUCCESS) */
+#if !defined( SIXTRL_ARCH_DEBUGGING_REGISTER_EMPTY )
+    #define SIXTRL_ARCH_DEBUGGING_REGISTER_EMPTY 0
+#endif /* SIXTRL_ARCH_DEBUGGING_REGISTER_EMPTY */
 
-#if !defined(SIXTRL_CONTROLLER_STATUS_GENERAL_FAILURE)
-    #define SIXTRL_CONTROLLER_STATUS_GENERAL_FAILURE -1
-#endif /* !defined(SIXTRL_CONTROLLER_STATUS_GENERAL_FAILURE) */
+#if !defined( SIXTRL_ARCH_DEBUGGING_MIN_FLAG )
+    #define SIXTRL_ARCH_DEBUGGING_MIN_FLAG 0x0000000100000000
+#endif /* !defined( SIXTRL_ARCH_DEBUGGING_MIN_FLAG ) */
+
+#if !defined( SIXTRL_ARCH_DEBUGGING_MAX_FLAG )
+    #define SIXTRL_ARCH_DEBUGGING_MAX_FLAG 0x8000000000000000
+#endif /* !defined( SIXTRL_ARCH_DEBUGGING_MAX_FLAG ) */
+
+#if !defined( SIXTRL_ARCH_DEBUGGING_STATUS_BITMASK )
+    #define SIXTRL_ARCH_DEBUGGING_STATUS_BITMASK 0x00000000ffffffff
+#endif /* !defined( SIXTRL_ARCH_DEBUGGING_STATUS_BITMASK ) */
+
+#if !defined( SIXTRL_ARCH_DEBUGGING_STATUS_MAX_FLAG )
+    #define SIXTRL_ARCH_DEBUGGING_STATUS_MAX_FLAG 0x80000000
+#endif /* !defined( SIXTRL_ARCH_DEBUGGING_STATUS_MAX_FLAG ) */
+
+#if !defined( SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE )
+    #define SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE 0xFFFFFFFF00000000
+#endif /* !defined( SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE ) */
 
 #if !defined( _GPUCODE )
 
@@ -135,28 +149,41 @@ SIXTRL_STATIC_VAR NS(arch_id_t) const NS(ARCHITECTURE_CUDA) =
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC_VAR NS(ctrl_debug_flag_t) const
-    NS(CONTROLLER_DEBUG_FLAG_OK) = ( NS(ctrl_debug_flag_t) )0;
+SIXTRL_STATIC_VAR NS(arch_status_t) const NS(ARCH_STATUS_SUCCESS) =
+    ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 
-SIXTRL_STATIC_VAR NS(ctrl_debug_flag_t) const
-    NS(CONTROLLER_DEBUG_FLAG_NOT_OK) =
-        ( NS(ctrl_debug_flag_t) )0xFFFFFFFFFFFFFFFF;
-
-SIXTRL_STATIC_VAR NS(ctrl_debug_flag_t) const
-    NS(CONTROLLER_DEBUG_FLAG_GENERAL_FAILURE) =
-        ( NS(ctrl_debug_flag_t) )0x8000000000000000;
+SIXTRL_STATIC_VAR NS(arch_status_t) const NS(ARCH_STATUS_GENERAL_FAILURE) =
+    ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC_VAR NS(ctrl_status_t) const NS(CONTROLLER_STATUS_SUCCESS) =
-    ( NS(ctrl_status_t) )SIXTRL_CONTROLLER_STATUS_SUCCESS;
+SIXTRL_STATIC_VAR NS(arch_debugging_t) const
+    NS(ARCH_DEBUGGING_REGISTER_EMPTY) =
+        ( NS(arch_debugging_t) )SIXTRL_ARCH_DEBUGGING_REGISTER_EMPTY;
 
-SIXTRL_STATIC_VAR NS(ctrl_status_t) const
-    NS(CONTROLLER_STATUS_GENERAL_FAILURE) =
-        ( NS(ctrl_status_t) )SIXTRL_CONTROLLER_STATUS_GENERAL_FAILURE;
+SIXTRL_STATIC_VAR NS(arch_debugging_t) const
+    NS(ARCH_DEBUGGING_MIN_FLAG) =
+        ( NS(arch_debugging_t) )SIXTRL_ARCH_DEBUGGING_MIN_FLAG;
 
-SIXTRL_STATIC_VAR NS(ctrl_kernel_id_t) const
-    NS(CONTROLER_ILLEGAL_KERNEL_ID) = ( NS(ctrl_kernel_id_t) )0xFFFFFFFF;
+SIXTRL_STATIC_VAR NS(arch_debugging_t) const
+    NS(ARCH_DEBUGGING_MAX_FLAG) =
+        ( NS(arch_debugging_t) )SIXTRL_ARCH_DEBUGGING_MAX_FLAG;
+
+SIXTRL_STATIC_VAR NS(arch_debugging_t) const
+    NS(ARCH_DEBUGGING_STATUS_BITMASK) =
+        ( NS(arch_debugging_t) )SIXTRL_ARCH_DEBUGGING_STATUS_BITMASK;
+
+SIXTRL_STATIC_VAR NS(arch_debugging_t) const NS(ARCH_DEBUGGING_STATUS_MAX_FLAG)
+    ( NS(arch_debugging_t) )SIXTRL_ARCH_DEBUGGING_STATUS_MAX_FLAG;
+
+SIXTRL_STATIC_VAR NS(arch_debugging_t) const
+    NS(ARCH_DEBUGGING_GENERAL_FAILURE) =
+        ( NS(arch_debugging_t) )SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_STATIC_VAR NS(arch_kernel_id_t) const
+    NS(ARCH_ILLEGAL_KERNEL_ID) = ( NS(arch_kernel_id_t) )0xFFFFFFFF;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -177,14 +204,14 @@ SIXTRL_STATIC_VAR NS(node_index_t) const NS(NODE_UNDEFINED_INDEX) =
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    typedef ::NS(arch_id_t)           arch_id_t;
     typedef ::NS(ctrl_status_t)       ctrl_status_t;
-    typedef ::NS(ctrl_debug_flag_t) ctrl_debug_flag_t;
     typedef ::NS(ctrl_size_t)         ctrl_size_t;
     typedef ::NS(ctrl_kernel_id_t)    ctrl_kernel_id_t;
 
+    typedef ::NS(arch_status_t)       arch_status_t;
     typedef ::NS(arch_id_t)           arch_id_t;
     typedef ::NS(arch_size_t)         arch_size_t;
+    typedef ::NS(arch_debugging_t)    arch_debugging_t;
 
     typedef ::NS(node_platform_id_t)  node_platform_id_t;
     typedef ::NS(node_device_id_t)    node_device_id_t;
@@ -228,31 +255,43 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_debug_flag_t
-        CONTROLLER_DEBUG_FLAG_OK = static_cast< ctrl_debug_flag_t >( 0 );
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_debugging_t
+        ARCH_DEBUGGING_REGISTER_EMPTY = static_cast< arch_debugging_t >( 0 );
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_debug_flag_t
-        CONTROLLER_DEBUG_FLAG_NOT_OK =
-            static_cast< ctrl_debug_flag_t >( 0xFFFFFFFFFFFFFFFF );
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_debugging_t
+        ARCH_DEBUGGING_MIN_FLAG = static_cast< arch_debugging_t >(
+            SIXTRL_ARCH_DEBUGGING_MIN_FLAG );
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_debug_flag_t
-        CONTROLLER_DEBUG_FLAG_GENERAL_FAILURE =
-            static_cast< ctrl_debug_flag_t>( 0x8000000000000000 );
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_debugging_t
+        ARCH_DEBUGGING_MAX_FLAG = static_cast< arch_debugging_t >(
+            SIXTRL_ARCH_DEBUGGING_MAX_FLAG );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_debugging_t
+        ARCH_DEBUGGING_STATUS_BITMASK = static_cast< arch_debugging_t >(
+            SIXTRL_ARCH_DEBUGGING_STATUS_BITMASK );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_debugging_t
+        ARCH_DEBUGGING_STATUS_MAX_FLAG = static_cast< arch_debugging_t >(
+            SIXTRL_ARCH_DEBUGGING_STATUS_MAX_FLAG );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_debugging_t
+        ARCH_DEBUGGING_GENERAL_FAILURE = static_cast< arch_debugging_t >(
+            SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE );
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_status_t
-        CONTROLLER_STATUS_SUCCESS = static_cast< ctrl_status_t >(
-            SIXTRL_CONTROLLER_STATUS_SUCCESS );
+        ARCH_STATUS_SUCCESS = static_cast< ctrl_status_t >(
+            SIXTRL_ARCH_STATUS_SUCCESS );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_status_t
-        CONTROLLER_STATUS_GENERAL_FAILURE = static_cast< ctrl_status_t >(
-            SIXTRL_CONTROLLER_STATUS_GENERAL_FAILURE );
+        ARCH_STATUS_GENERAL_FAILURE = static_cast< ctrl_status_t >(
+            SIXTRL_ARCH_STATUS_GENERAL_FAILURE );
 
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_kernel_id_t
-        CONTROLER_ILLEGAL_KERNEL_ID =
-            static_cast< ctrl_kernel_id_t >( 0xFFFFFFFF );
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_kernel_id_t
+        ARCH_ILLEGAL_KERNEL_ID = static_cast< arch_kernel_id_t >( 0xFFFFFFFF );
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 

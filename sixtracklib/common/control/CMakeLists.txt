@@ -3,6 +3,7 @@
 
 set( SIXTRL_COMMON_CONTROL_C99_HEADERS
      definitions.h
+     debug_register.h
      arch_info.h
      arch_base.h
      node_id.h
