@@ -50,9 +50,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
     bool ControllerBase::readyForRemap() const SIXTRL_NOEXCEPT
     {
-        return ( ( this->hasRemapCObjectBufferKernel() ) &&
-                 ( this->hasRemapCObjectBufferDebugKernel() ) &&
-                 ( this->readyForRunningKernels() ) );
+        return ( ( this->readyForRunningKernels() ) &&
+                 ( ( ( !this->isInDebugMode() ) &&
+                     ( this->hasRemapCObjectBufferKernel() ) ) ||
+                   ( ( this->isInDebugMode() ) &&
+                     ( this->hasRemapCObjectBufferDebugKernel() ) ) ) );
     }
 
     ControllerBase::status_t ControllerBase::send(
@@ -80,8 +82,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ControllerBase::status_t ControllerBase::send(
         ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT arg,
-        const ControllerBase::c_buffer_t *const SIXTRL_RESTRICT source,
-        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg )
+        const ControllerBase::c_buffer_t *const SIXTRL_RESTRICT source )
     {
         using size_t         = ControllerBase::size_type;
         using status_t       = ControllerBase::status_t;
@@ -102,8 +103,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( status == st::CONTROLLER_STATUS_SUCCESS )
             {
-                status = this->doRemapCObjectsBuffer(
-                    arg, src_size, remap_debug_flag_arg );
+                status = this->doRemapCObjectsBuffer( arg, src_size );
             }
         }
 
@@ -112,8 +112,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ControllerBase::status_t ControllerBase::send(
         ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT arg,
-        ControllerBase::buffer_t const& SIXTRL_RESTRICT_REF source,
-        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg )
+        ControllerBase::buffer_t const& SIXTRL_RESTRICT_REF source )
     {
         using size_t     = ControllerBase::size_type;
         using status_t   = ControllerBase::status_t;
@@ -134,8 +133,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( status == st::CONTROLLER_STATUS_SUCCESS )
             {
-                status = this->doRemapSentCObjectsBuffer(
-                    arg, src_size, remap_debug_flag_arg );
+                status = this->doRemapSentCObjectsBuffer( arg, src_size );
             }
         }
 
@@ -435,16 +433,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ControllerBase::status_t ControllerBase::remapCObjectsBuffer(
         ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT arg,
-        ControllerBase::size_type const arg_size,
-        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg )
+        ControllerBase::size_type const arg_size )
     {
         ControllerBase::status_t status =
             st::CONTROLLER_STATUS_GENERAL_FAILURE;
 
         if( ( arg != nullptr ) && ( this->readyForRemap() ) )
         {
-            status = this->doRemapCObjectsBuffer(
-                arg, arg_size, remap_debug_flag_arg );
+            status = this->doRemapCObjectsBuffer( arg, arg_size );
         }
 
         return status;
@@ -498,11 +494,26 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ControllerBase::status_t ControllerBase::doRemapCObjectsBuffer(
         ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT,
-        ControllerBase::size_type const,
-        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT )
+        ControllerBase::size_type const )
     {
         return ControllerBase::st::CONTROLLER_STATUS_GENERAL_FAILURE;
     }
+
+    bool ControllerBase::doSwitchDebugMode( bool const is_in_debug_mode )
+    {
+        if( ( ( is_in_debug_mode ) &&
+              ( this->hasRemapCObjectBufferDebugKernel() ) ) ||
+            ( ( !is_in_debug_mode ) &&
+              ( this->hasRemapCObjectBufferKernel() ) ) )
+        {
+            return ControllerBase::_base_arch_obj_t::doSwitchDebugMode(
+                is_in_debug_mode );
+        }
+
+        return false;
+    }
+
+    /* --------------------------------------------------------------------- */
 
     void ControllerBase::doSetRemapCObjectBufferKernelId(
         ControllerBase::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT

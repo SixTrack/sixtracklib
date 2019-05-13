@@ -34,16 +34,17 @@ namespace SIXTRL_CXX_NAMESPACE
 {
     class ArgumentBase;
 
-    class ControllerBase : public SIXTRL_CXX_NAMESPACE::ArchBase
+    class ControllerBase : public SIXTRL_CXX_NAMESPACE::ArchBaseDebug
     {
         private:
 
-        using _base_arch_obj_t = SIXTRL_CXX_NAMESPACE::ArchBase;
+        using _base_arch_obj_t = SIXTRL_CXX_NAMESPACE::ArchBaseDebug;
 
         public:
 
         using arch_id_t            = _base_arch_obj_t::arch_id_t;
-        using status_t             = SIXTRL_CXX_NAMESPACE::ctrl_status_t;
+        using status_t             = _base_arch_obj_t::arch_status_t;
+        using debug_register_t     = _base_arch_obj_t::debug_register_t;
         using buffer_t             = SIXTRL_CXX_NAMESPACE::Buffer;
 
         using c_buffer_t           = buffer_t::c_api_t;
@@ -61,7 +62,7 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_CXX_NAMESPACE::ARCHITECTURE_NONE;
 
         static SIXTRL_CONSTEXPR_OR_CONST kernel_id_t ILLEGAL_KERNEL_ID =
-            SIXTRL_CXX_NAMESPACE::CONTROLER_ILLEGAL_KERNEL_ID;
+            SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_KERNEL_ID;
 
         SIXTRL_HOST_FN bool usesNodes() const SIXTRL_NOEXCEPT;
 
@@ -81,12 +82,10 @@ namespace SIXTRL_CXX_NAMESPACE
             void const* SIXTRL_RESTRICT source, size_type const src_length );
 
         SIXTRL_HOST_FN status_t send( ptr_arg_base_t SIXTRL_RESTRICT dest,
-            const c_buffer_t *const SIXTRL_RESTRICT source,
-            ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg = nullptr );
+            const c_buffer_t *const SIXTRL_RESTRICT source );
 
         SIXTRL_HOST_FN status_t send( ptr_arg_base_t SIXTRL_RESTRICT dest,
-            buffer_t const& SIXTRL_RESTRICT_REF source,
-            ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg = nullptr );
+            buffer_t const& SIXTRL_RESTRICT_REF source );
 
         /* ----------------------------------------------------------------- */
 
@@ -112,11 +111,19 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN kernel_id_t
         remapCObjectBufferKernelId() const SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN void setRemapCObjectBufferKernelId(
+            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
         SIXTRL_HOST_FN bool
         hasRemapCObjectBufferDebugKernel() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN kernel_id_t
         remapCObjectBufferDebugKernelId() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void setRemapCObjectBufferDebugKernelId(
+            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -196,8 +203,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN status_t remapCObjectsBuffer(
             ptr_arg_base_t SIXTRL_RESTRICT arg,
-            size_type const arg_size = size_type{ 0 },
-            ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg = nullptr );
+            size_type const arg_size = size_type{ 0 } );
 
         SIXTRL_HOST_FN virtual ~ControllerBase() SIXTRL_NOEXCEPT;
 
@@ -227,6 +233,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN ControllerBase&
         operator=( ControllerBase&& rhs ) = default;
 
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_HOST_FN virtual void doClear();
 
         SIXTRL_HOST_FN virtual status_t doSend(
@@ -239,14 +247,12 @@ namespace SIXTRL_CXX_NAMESPACE
             ptr_arg_base_t SIXTRL_RESTRICT source );
 
         SIXTRL_HOST_FN virtual status_t doRemapCObjectsBuffer(
-            ptr_arg_base_t SIXTRL_RESTRICT arg, size_type arg_size,
-            ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg );
+            ptr_arg_base_t SIXTRL_RESTRICT arg, size_type arg_size );
 
-        SIXTRL_HOST_FN void doSetRemapCObjectBufferKernelId(
-            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN virtual bool doSwitchDebugMode(
+            bool const is_in_debug_mode ) override;
 
-        SIXTRL_HOST_FN void doSetRemapCObjectBufferDebugKernelId(
-            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN void doSetUsesNodesFlag(
             bool const flag ) SIXTRL_NOEXCEPT;
