@@ -74,6 +74,9 @@ namespace SIXTRL_CXX_NAMESPACE
         ::dim3 const& blocks() const SIXTRL_NOEXCEPT;
         ::dim3 const& threadsPerBlock() const SIXTRL_NOEXCEPT;
 
+        ::dim3 const* ptrBlocks() const SIXTRL_NOEXCEPT;
+        ::dim3 const* ptrThreadsPerBlock() const SIXTRL_NOEXCEPT;
+
         protected:
 
         virtual bool doUpdate() override;

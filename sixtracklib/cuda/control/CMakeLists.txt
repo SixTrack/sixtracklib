@@ -9,6 +9,7 @@ set( SIXTRACKLIB_CUDA_CONTROL_CXX_HEADERS
 
 set( SIXTRACKLIB_CUDA_CONTROL_CXX_SOURCES
      kernel_config.cpp
+     kernel_config_c99.cpp
      node_info.cpp
      argument_base.cpp
      argument_base_c99.cpp
@@ -20,6 +21,7 @@ set( SIXTRACKLIB_CUDA_CONTROL_CXX_SOURCES
 
 set( SIXTRACKLIB_CUDA_CONTROL_C99_HEADERS
      argument_base.h
+     kernel_config.h
 )
 
 add_library( sixtrack_cuda_cxx_control OBJECT

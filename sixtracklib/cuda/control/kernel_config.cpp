@@ -83,6 +83,16 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_threads_per_block;
     }
 
+    ::dim3 const* CudaKernelConfig::ptrBlocks() const SIXTRL_NOEXCEPT
+    {
+        return ( !this->needsUpdate() ) ? &this->m_blocks : nullptr;
+    }
+
+    ::dim3 const* CudaKernelConfig::ptrThreadsPerBlock() const SIXTRL_NOEXCEPT
+    {
+        return ( !this->needsUpdate() ) ? &this->m_threads_per_block : nullptr;
+    }
+
     CudaKernelConfig::size_type
     CudaKernelConfig::warpSize() const SIXTRL_NOEXCEPT
     {
