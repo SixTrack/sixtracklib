@@ -8,6 +8,18 @@ if( GTEST_FOUND )
          ${SIXTRACKL_GTEST_LIBRARIES} )
 
     # ==========================================================================
+    # test_debug_register_common_c99:
+
+    add_executable( test_debug_register_common_c99
+                    test_debug_register_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+         test_debug_register_common_c99 )
+
+    add_test( C99_CommonControlDebuggingRegisterTests
+              test_debug_register_common_c99 )
+
+    # ==========================================================================
     # test_node_id_common_c99:
 
     add_executable( test_node_id_common_c99 test_node_id_c99.cpp )
@@ -38,8 +50,6 @@ if( GTEST_FOUND )
 
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_arch_info_common_cxx )
     add_test( CXX_CommonControlArchInfoTests test_arch_info_common_cxx )
-
-
 
     # *************************************************************************
     # Set all properties:
