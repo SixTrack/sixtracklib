@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_HPP__
-#define SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_HPP__
+#ifndef SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_CXX_HPP__
+#define SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_CXX_HPP__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
@@ -39,6 +39,26 @@ namespace SIXTRL_CXX_NAMESPACE
         static constexpr size_type DEFAULT_WARP_SIZE = size_type{ 32 };
 
         SIXTRL_HOST_FN explicit CudaKernelConfig(
+            size_type const block_dimensions = size_type{ 1 },
+            size_type const threads_per_block_dimensions = size_type{ 1 },
+            size_type const shared_mem_per_block = size_type{ 0 },
+            size_type const max_block_size_limit = size_type{ 0 },
+            size_type const warp_size = DEFAULT_WARP_SIZE,
+            char const* SIXTRL_RESTRICT config_str = nullptr );
+
+        SIXTRL_HOST_FN explicit CudaKernelConfig(
+            std::string const& SIXTRL_RESTRICT_REF name_str,
+            size_type const num_kernel_arguments = size_type{ 0 },
+            size_type const block_dimensions = size_type{ 1 },
+            size_type const threads_per_block_dimensions = size_type{ 1 },
+            size_type const shared_mem_per_block = size_type{ 0 },
+            size_type const max_block_size_limit = size_type{ 0 },
+            size_type const warp_size = DEFAULT_WARP_SIZE,
+            char const* SIXTRL_RESTRICT config_str = nullptr );
+
+        SIXTRL_HOST_FN explicit CudaKernelConfig(
+            char const* SIXTRL_RESTRICT name_str,
+            size_type const num_kernel_arguments = size_type{ 0 },
             size_type const block_dimensions = size_type{ 1 },
             size_type const threads_per_block_dimensions = size_type{ 1 },
             size_type const shared_mem_per_block = size_type{ 0 },
@@ -102,4 +122,4 @@ typedef void NS(CudaKernelConfig);
 
 #endif /* C++, Host */
 
-#endif /* SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_HPP__ */
+#endif /* SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_CXX_HPP__ */

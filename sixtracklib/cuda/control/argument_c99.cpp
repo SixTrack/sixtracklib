@@ -50,7 +50,7 @@ void NS(CudaArgument_delete)( ::NS(CudaArgument)* SIXTRL_RESTRICT argument )
     const ::NS(Buffer) *const SIXTRL_RESTRICT source_buffer )
 {
     return ( arg != nullptr )
-        ? arg->send( source_buffer ) : st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        ? arg->send( source_buffer ) : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(ctrl_status_t) NS(CudaArgument_send_memory)(
@@ -60,7 +60,7 @@ void NS(CudaArgument_delete)( ::NS(CudaArgument)* SIXTRL_RESTRICT argument )
 {
     return ( arg != nullptr )
         ? arg->send( source_arg_begin, source_arg_length )
-        : st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(ctrl_status_t) NS(CudaArgument_receive_buffer)(
@@ -69,7 +69,7 @@ void NS(CudaArgument_delete)( ::NS(CudaArgument)* SIXTRL_RESTRICT argument )
 {
     return ( arg != nullptr )
         ? arg->receive( destination_buffer )
-        : st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(ctrl_status_t) NS(CudaArgument_receive_memory)(
@@ -79,7 +79,7 @@ void NS(CudaArgument_delete)( ::NS(CudaArgument)* SIXTRL_RESTRICT argument )
 {
     return ( arg != nullptr )
         ? arg->receive( destination_buffer, arg->size() )
-        : st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 

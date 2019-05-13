@@ -22,6 +22,8 @@
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
+namespace st = SIXTRL_CXX_NAMESPACE;
+
 namespace SIXTRL_CXX_NAMESPACE
 {
     CudaKernelConfig::CudaKernelConfig(
@@ -31,22 +33,79 @@ namespace SIXTRL_CXX_NAMESPACE
         CudaKernelConfig::size_type const max_block_size_limit,
         CudaKernelConfig::size_type const warp_size,
         char const* SIXTRL_RESTRICT config_str ) :
-        SIXTRL_CXX_NAMESPACE::KernelConfigBase(
-            SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA,
-            SIXTRL_ARCHITECTURE_CUDA_STR,
-            config_str, block_dimensions, threads_per_block_dimensions ),
+        st::KernelConfigBase( st::ARCHITECTURE_CUDA,
+            SIXTRL_ARCHITECTURE_CUDA_STR, config_str, block_dimensions,
+            threads_per_block_dimensions ),
             m_blocks(), m_threads_per_block(),
             m_warp_size( CudaKernelConfig::DEFAULT_WARP_SIZE ),
             m_shared_mem_per_block( shared_mem_per_block ),
             m_max_block_size_limit( max_block_size_limit )
     {
-        using _this_t = CudaKernelConfig;
-        using size_t = CudaKernelConfig::size_type;
+        using _this_t = st::CudaKernelConfig;
+        using size_t = _this_t::size_type;
 
         if( warp_size > size_t{ 0 } )
         {
             this->setWarpSize( warp_size );
         }
+    }
+
+    CudaKernelConfig::CudaKernelConfig(
+        std::string const& SIXTRL_RESTRICT_REF name_str,
+        CudaKernelConfig::size_type const num_kernel_arguments,
+        CudaKernelConfig::size_type const block_dimensions,
+        CudaKernelConfig::size_type const threads_per_block_dimensions,
+        CudaKernelConfig::size_type const shared_mem_per_block,
+        CudaKernelConfig::size_type const max_block_size_limit,
+        CudaKernelConfig::size_type const warp_size,
+        char const* SIXTRL_RESTRICT config_str ) :
+        st::KernelConfigBase( st::ARCHITECTURE_CUDA,
+            SIXTRL_ARCHITECTURE_CUDA_STR, config_str, block_dimensions,
+            threads_per_block_dimensions ),
+            m_blocks(), m_threads_per_block(),
+            m_warp_size( CudaKernelConfig::DEFAULT_WARP_SIZE ),
+            m_shared_mem_per_block( shared_mem_per_block ),
+            m_max_block_size_limit( max_block_size_limit )
+    {
+        using _this_t = st::CudaKernelConfig;
+        using size_t = _this_t::size_type;
+
+        if( warp_size > size_t{ 0 } )
+        {
+            this->setWarpSize( warp_size );
+        }
+
+        this->setNumArguments( num_kernel_arguments );
+        this->setName( name_str );
+    }
+
+    CudaKernelConfig::CudaKernelConfig(
+        char const* SIXTRL_RESTRICT name_str,
+        CudaKernelConfig::size_type const num_kernel_arguments,
+        CudaKernelConfig::size_type const block_dimensions,
+        CudaKernelConfig::size_type const threads_per_block_dimensions,
+        CudaKernelConfig::size_type const shared_mem_per_block,
+        CudaKernelConfig::size_type const max_block_size_limit,
+        CudaKernelConfig::size_type const warp_size,
+        char const* SIXTRL_RESTRICT config_str ) :
+        st::KernelConfigBase( st::ARCHITECTURE_CUDA,
+            SIXTRL_ARCHITECTURE_CUDA_STR, config_str, block_dimensions,
+            threads_per_block_dimensions ),
+            m_blocks(), m_threads_per_block(),
+            m_warp_size( CudaKernelConfig::DEFAULT_WARP_SIZE ),
+            m_shared_mem_per_block( shared_mem_per_block ),
+            m_max_block_size_limit( max_block_size_limit )
+    {
+        using _this_t = st::CudaKernelConfig;
+        using size_t = _this_t::size_type;
+
+        if( warp_size > size_t{ 0 } )
+        {
+            this->setWarpSize( warp_size );
+        }
+
+        this->setNumArguments( num_kernel_arguments );
+        this->setName( name_str );
     }
 
     CudaKernelConfig::size_type

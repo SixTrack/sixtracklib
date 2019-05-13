@@ -52,12 +52,12 @@ namespace SIXTRL_CXX_NAMESPACE
             status_t status = this->cudaController()->send(
                 this, buffer_data_begin, buffer_size );
 
-            if( status == ::NS(CONTROLLER_STATUS_SUCCESS) )
+            if( status == ::NS(ARCH_STATUS_SUCCESS) )
             {
-                status = ctrl->remapSentCObjectsBuffer( this );
+                status = ctrl->remapCObjectsBuffer( this );
             }
 
-            if( status == ::NS(CONTROLLER_STATUS_SUCCESS) )
+            if( status == ::NS(ARCH_STATUS_SUCCESS) )
             {
                 this->doSetArgSize( buffer_size );
                 this->doSetBufferRef( buffer );
@@ -92,12 +92,12 @@ namespace SIXTRL_CXX_NAMESPACE
             status_t status = this->cudaController()->send(
                 this, buffer_data_begin, buffer_size );
 
-            if( status == ::NS(CONTROLLER_STATUS_SUCCESS) )
+            if( status == ::NS(ARCH_STATUS_SUCCESS) )
             {
-                status = ctrl->remapSentCObjectsBuffer( this );
+                status = ctrl->remapCObjectsBuffer( this );
             }
 
-            if( status == ::NS(CONTROLLER_STATUS_SUCCESS) )
+            if( status == ::NS(ARCH_STATUS_SUCCESS) )
             {
                 this->doSetArgSize( buffer_size );
                 this->doSetPtrCBuffer( ptr_c_buffer );
@@ -133,7 +133,7 @@ namespace SIXTRL_CXX_NAMESPACE
             status_t status = this->cudaController()->send(
                 this, raw_arg_begin, raw_arg_length );
 
-            if( status == ::NS(CONTROLLER_STATUS_SUCCESS) )
+            if( status == ::NS(ARCH_STATUS_SUCCESS) )
             {
                 this->doSetArgSize( raw_arg_length );
                 this->doSetPtrRawArgument( raw_arg_begin );

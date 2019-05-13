@@ -157,7 +157,7 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         CudaArgumentBase::cuda_arg_buffer_t arg_buffer = nullptr;
 
-        if( capacity > CudaArgumentBase::size_t{ 0 } )
+        if( capacity > CudaArgumentBase::size_type{ 0 } )
         {
             ::cudaError_t const ret =
                 ::cudaMalloc( ( void** )&arg_buffer, capacity );

@@ -12,7 +12,7 @@
 #include "sixtracklib/common/control/node_controller_base.hpp"
 
 #include "sixtracklib/cuda/definitions.h"
-#include "sixtracklib/cuda/base_argument.hpp"
+#include "sixtracklib/cuda/control/argument_base.hpp"
 #include "sixtracklib/cuda/wrappers/controller_wrappers.h"
 
 namespace st = SIXTRL_CXX_NAMESPACE;
@@ -131,8 +131,7 @@ namespace SIXTRL_CXX_NAMESPACE
         if( this->doInitAllCudaNodes() )
         {
             CudaController::node_index_t node_index_to_select =
-                this->doFindAvailableNodesIndex(
-                    node_id.platformId(), node_id.deviceId() );
+                this->doFindAvailableNodesIndex( platform_id, device_id );
 
             if( node_index_to_select == CudaController::UNDEFINED_INDEX )
             {
@@ -156,8 +155,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    CudaController::CudaController(
-        std::string const& const& config_str  ) :
+    CudaController::CudaController( std::string const& config_str  ) :
         st::NodeControllerBase( st::ARCHITECTURE_CUDA,
             SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() ),
         m_cuda_debug_register( nullptr )
@@ -269,8 +267,7 @@ namespace SIXTRL_CXX_NAMESPACE
         if( this->doInitAllCudaNodes() )
         {
             CudaController::node_index_t node_index_to_select =
-                this->doFindAvailableNodesIndex(
-                    node_id.platformId(), node_id.deviceId() );
+                this->doFindAvailableNodesIndex( platform_id, device_id );
 
             if( node_index_to_select == CudaController::UNDEFINED_INDEX )
             {
@@ -298,10 +295,8 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         if( this->m_cuda_debug_register != nullptr )
         {
-            ::cudaError_t const err =
-                ::cudaFree( this->m_cuda_debug_register );
-
-            SIXTRL_ASSERT( err != ::cudaSuccess ):
+            cudaError_t const err = ::cudaFree( this->m_cuda_debug_register );
+            SIXTRL_ASSERT( err != ::cudaSuccess );
             this->m_cuda_debug_register = nullptr;
         }
     }
@@ -519,14 +514,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    CudaController::CudaController( char const* config_str ) :
-        ControllerOnNodesBase( st::ARCHITECTURE_CUDA,
-            SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
-    {
-        bool const success = this->doInitAllCudaNodes();
-        ( void )success;
-    }
-
     CudaController::status_t CudaController::doSend(
         CudaController::ptr_arg_base_t SIXTRL_RESTRICT dest_arg,
         const void *const SIXTRL_RESTRICT source,
@@ -587,7 +574,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( ( cuda_arg != nullptr ) && ( cuda_arg->hasCudaArgBuffer() ) )
             {
-                status = st::PerformReceiveOperation( destination,
+                status = _this_t::PerformReceiveOperation( destination,
                     dest_capacity, cuda_arg->cudaArgBuffer(), src_arg->size() );
             }
         }
@@ -625,8 +612,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
-            status = _base_t::doFetchDebugRegisterCudaBaseImpl(
-                ptr_debug_register );
+            status = _base_t::doFetchDebugRegister( ptr_debug_register );
         }
 
         return status;
@@ -637,29 +623,29 @@ namespace SIXTRL_CXX_NAMESPACE
         CudaController::size_type const arg_size )
     {
         using    _this_t        = CudaController;
+        using kernel_config_t   = _this_t::kernel_config_t;
         using   status_t        = _this_t::status_t;
         using     size_t        = _this_t::size_type;
-        using kernel_config_t   = _this_t::kernel_config_t;
-        using cuda_arg_t        = st::CudaArgumentBase;
+        using cuda_arg_t        = st::CudaArgument;
         using c_buffer_t        = cuda_arg_t::c_buffer_t;
         using cuda_arg_buffer_t = cuda_arg_t::cuda_arg_buffer_t;
 
-        SIXTRL_ASSERT( managed_buffer_arg != nullptr );
+        SIXTRL_ASSERT( buffer_arg != nullptr );
 
         status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
         bool const in_debug_mode = this->isInDebugMode();
 
-        if( ( this->readyForRunningKernels() ) && ( arg_size > size_t{ 0 } ) &&
+        if( ( this->readyForRunningKernel() ) && ( arg_size > size_t{ 0 } ) &&
             ( buffer_arg->hasArgumentBuffer() ) &&
             ( buffer_arg->usesCObjectsBuffer() ) )
         {
             c_buffer_t const* ptr_buffer = buffer_arg->ptrCObjectsBuffer();
 
-            cuda_arg_t* cuda_buf_arg = buffer_arg->asDerivedArgument<
-                cuda_arg_t >( this->archId() );
+            cuda_arg_t* cuda_buf_arg =
+                buffer_arg->asDerivedArgument< cuda_arg_t >( this->archId() );
 
-            kernel_config_t const* kernel_config =
-                this->ptrKernelConfig( ( in_debug_mode )
+            kernel_config_t const* kernel_config = this->ptrKernelConfig(
+                ( in_debug_mode )
                     ? this->remapCObjectBufferDebugKernelId()
                     : this->remapCObjectBufferKernelId() );
 
@@ -667,9 +653,7 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 if( !in_debug_mode )
                 {
-                    ::NS(Buffer_remap_cuda_wrapper)(
-                        kernel_config, cuda_buf_arg, nullptr );
-
+                    ::NS(Buffer_remap_cuda_wrapper)( kernel_config, cuda_buf_arg );
                     status = st::ARCH_STATUS_SUCCESS;
                 }
                 else if( this->doGetPtrCudaSuccessRegister() != nullptr )
@@ -678,7 +662,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
                     if( status == st::ARCH_STATUS_SUCCESS )
                     {
-                        ::NS(Buffer_remap_cuda_wrapper)( kernel_config,
+                        ::NS(Buffer_remap_cuda_debug_wrapper)( kernel_config,
                             cuda_buf_arg, this->doGetPtrCudaSuccessRegister() );
 
                         status = this->evaluateDebugRegisterAfterUse();
@@ -690,10 +674,9 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
-    bool CudaController::doSelectNode(
-        CudaController::node_index_t const node_index )
+    bool CudaController::doSelectNode( CudaController::node_index_t const idx )
     {
-        return this->doSelectNodeCudaBaseImpl( node_index );
+        return this->doSelectNodeCudaImpl( idx );
     }
 
     bool CudaController::doChangeSelectedNode(
@@ -716,7 +699,7 @@ namespace SIXTRL_CXX_NAMESPACE
             success = ( err == ::cudaSuccess );
 
             if( ( !this->canUnselectNode() ) &&
-                ( ( !success ) || ( !this->hasSelectedNod() ) ) )
+                ( ( !success ) || ( !this->hasSelectedNode() ) ) )
             {
                 success = this->doSelectNode( current_selected_node_idx );
             }
@@ -1028,7 +1011,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ::cudaError_t const err = ::cudaMemcpy(
                 destination, src_begin, src_length, cudaMemcpyDeviceToHost );
 
-            if( ret == ::cudaSuccess )
+            if( err == ::cudaSuccess )
             {
                 status = st::ARCH_STATUS_SUCCESS;
             }
@@ -1056,15 +1039,16 @@ namespace SIXTRL_CXX_NAMESPACE
             sizeof( debug_register_t ) );
     }
 
-    bool CudaController::doSelectNodeCudaBaseImpl(
+    bool CudaController::doSelectNodeCudaImpl(
             CudaController::node_index_t const node_index )
     {
-        using _base_ctrl_t = st::ControllerOnNodesBase;
+        using _base_ctrl_t = st::NodeControllerBase;
         using node_info_base_t = CudaController::node_info_base_t;
         using node_info_t = CudaController::node_info_t;
         using cuda_dev_index_t = node_info_t::cuda_dev_index_t;
         using size_t = CudaController::size_type;
         using kernel_id_t = CudaController::kernel_id_t;
+        using kernel_config_t = CudaController::kernel_config_t;
 
         bool success = false;
 
@@ -1090,24 +1074,34 @@ namespace SIXTRL_CXX_NAMESPACE
             }
         }
 
-        if( ( success ) && ( ptr_
+        if( ( success ) && ( this->hasSelectedNode() ) )
         {
-            std::string kernel_name( size_t{ 64 } );
+            std::string kernel_name( size_t{ 64 }, '\0' );
 
+            kernel_name.clear();
             kernel_name = SIXTRL_C99_NAMESPACE_PREFIX_STR;
-            kernel_name += "Cuda_remap_managed_buffer";
+            kernel_name += "Buffer_remap_cuda_wrapper";
+
+            ptr_cuda_kernel_config_t ptr_remap_kernel( new kernel_config_t(
+                kernel_name, size_t{ 1 } ) );
 
             kernel_id_t const remap_kernel_id = this->doAppendCudaKernelConfig(
-                kernel_name, size_t{ 2 } );
+                std::move( ptr_remap_kernel ) );
 
-            this->doSetRemapCObjectBufferKernelId( remap_kernel_id );
+            this->setRemapCObjectBufferKernelId( remap_kernel_id );
 
-            kernel_name += "_debug";
+
+            kernel_name.clear();
+            kernel_name  = SIXTRL_C99_NAMESPACE_PREFIX_STR;
+            kernel_name += "Buffer_remap_cuda_debug_wrapper";
+
+            ptr_cuda_kernel_config_t ptr_debug_remap_kernel(
+                new kernel_config_t( kernel_name, size_t{ 2 } ) );
 
             kernel_id_t const debug_kernel_id = this->doAppendCudaKernelConfig(
-                kernel_name, size_t{ 3 } );
+                std::move( ptr_debug_remap_kernel ) );
 
-            this->doSetRemapCObjectBufferDebugKernelId( debug_kernel_id );
+            this->setRemapCObjectBufferDebugKernelId( debug_kernel_id );
         }
 
         return success;

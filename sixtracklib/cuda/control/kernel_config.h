@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_C99_H__
-#define SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_C99_H__
+#ifndef SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_C9999_H__
+#define SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_C9999_H__
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/cuda/control/kernel_config.hpp"
@@ -12,7 +12,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
-    #include "sixtracklib/common/control/kernel_config_base.hpp"
+    #include "sixtracklib/common/control/kernel_config_base.h"
     #include "sixtracklib/cuda/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -22,11 +22,11 @@ extern "C" {
 
 #if !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
-SIXTRL_EXTERN SIXTRL_HOST_FN dim3 const*
+SIXTRL_EXTERN SIXTRL_FN dim3 const*
 NS(CudaKernelConfig_get_ptr_const_blocks)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT cuda_kernel_config );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN dim3 const*
+SIXTRL_EXTERN SIXTRL_FN dim3 const*
 NS(CudaKernelConfig_get_ptr_const_threads_per_block)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT cuda_kernel_config );
 
@@ -36,6 +36,6 @@ NS(CudaKernelConfig_get_ptr_const_threads_per_block)(
 }
 #endif /* C++, Host */
 
-#endif /* SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_C99_H__ */
+#endif /* SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_C9999_H__ */
 
 /* end: sixtracklib/cuda/control/kernel_config.h */
