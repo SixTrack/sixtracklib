@@ -1,5 +1,6 @@
 #if !defined( SIXTRL_NO_INCLUDE )
     #include "sixtracklib/cuda/wrappers/track_job_wrappers.h"
+    #include "sixtracklib/cuda/control/kernel_config.h"
 #endif /* !defined( SIXTRL_NO_INCLUDE ) */
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
@@ -23,7 +24,7 @@
     #include "sixtracklib/cuda/kernels/track_particles.cuh"
 #endif /* !defined( SIXTRL_NO_INCLUDE ) */
 
-void NS(Track_particles_until_turn_cuda_wrapper)(
+SIXTRL_HOST_FN void NS(Track_particles_until_turn_cuda_wrapper)(
     const NS(CudaKernelConfig) *const SIXTRL_RESTRICT kernel_config,
     NS(CudaArgument)* SIXTRL_RESTRICT particles_arg,
     NS(buffer_size_t) const pset_index,
@@ -31,11 +32,12 @@ void NS(Track_particles_until_turn_cuda_wrapper)(
     NS(buffer_size_t) const until_turn,
     NS(CudaArgument)* SIXTRL_RESTRICT dbg_register_arg )
 {
-    dim3 const* ptr_blocks = NS(CudaKernelConfig_get_ptr_const_blocks)(
-        kernel_config );
+    dim3 const* ptr_blocks = SIXTRL_NULLPTR;
 
-    dim3 const* ptr_threads =
-        NS(CudaKernelConfig_get_ptr_const_threads_per_block)( kernel_config );
+    bool const is_finished = NS(KernelConfig_needs_update)( kernel_config );
+
+    dim3 const* ptr_threads = SIXTRL_NULLPTR;
+//         NS(CudaKernelConfig_get_ptr_const_threads_per_block)( kernel_config );
 
     if( dbg_register_arg == SIXTRL_NULLPTR )
     {
