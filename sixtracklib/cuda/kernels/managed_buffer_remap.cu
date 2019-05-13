@@ -4,7 +4,7 @@
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <cuda_runtime_api.h>
-#if /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
@@ -30,7 +30,7 @@ __global__ void NS(ManagedBuffer_remap_cuda_debug)(
     NS(buffer_size_t) const slot_size,
     SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register )
 {
-    typedef NS(arch_debugging_t) debug_register_t
+    typedef NS(arch_debugging_t) debug_register_t;
     typedef NS(arch_status_t) status_t;
     typedef NS(buffer_size_t) buf_size_t;
 

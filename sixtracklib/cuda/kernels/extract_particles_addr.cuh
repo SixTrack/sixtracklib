@@ -5,6 +5,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/cuda/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -21,7 +22,7 @@ __global__ void NS(Particles_buffer_store_all_addresses_cuda_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT particles_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     NS(buffer_size_t) const slot_size,
-    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SXITRL_RESTRICT ptr_dbg_register);
+    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register);
 
 #if defined( __cplusplus )
 }

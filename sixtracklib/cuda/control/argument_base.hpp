@@ -32,7 +32,7 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         public:
 
-        using cuda_controller_t = SIXTRL_CXX_NAMESPACE::CudaControllerBase;
+        using cuda_controller_t = SIXTRL_CXX_NAMESPACE::CudaController;
         using cuda_arg_buffer_t = ::NS(cuda_arg_buffer_t);
         using cuda_const_arg_buffer_t = ::NS(cuda_const_arg_buffer_t);
 

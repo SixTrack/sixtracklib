@@ -211,7 +211,7 @@ namespace SIXTRL_CXX_NAMESPACE
             particle_index_t const min_turn_id,
             size_type const output_buffer_offset_index ) override;
 
-        SIXTRL_HOST_FN virtual bool doAssignOutputBuffertoElemByElemConfig(
+        SIXTRL_HOST_FN virtual bool doAssignOutputBufferToElemByElemConfig(
             elem_by_elem_config_t* SIXTRL_RESTRICT elem_by_elem_config,
             c_buffer_t* SIXTRL_RESTRICT output_buffer,
             size_type const output_buffer_offset_index ) override;
@@ -277,6 +277,16 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
             size_type const until_turn_elem_by_elem );
 
+        template< typename PartSetIndexIter >
+        SIXTRL_HOST_FN bool doInitCudaTrackJob(
+            std::string const& SIXTRL_RESTRICT_REF config_str,
+            buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+            PartSetIndexIter particle_set_indices_begin,
+            PartSetIndexIter particle_set_indices_end,
+            buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
+            buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+            size_type const until_turn_elem_by_elem );
+
         SIXTRL_HOST_FN bool doPrepareControllerCudaImpl(
             const char *const SIXTRL_RESTRICT ptr_config_str );
 
@@ -295,11 +305,18 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
             size_type const until_turn_elem_by_elem );
 
-        SIXTRL_HOST_FN bool doAssignOutputBufferToBeamMonitorsCudaImp(
+        SIXTRL_HOST_FN bool doAssignOutputBufferToBeamMonitorsCudaImpl(
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
-            c_buffer_t* SIXTRL_RESTRICT output_buffer );
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
+            particle_index_t const min_turn_id,
+            size_type const output_buffer_offset_index );
 
-        SIXTRL_HOST_FN bool doResetCudaImp(
+        SIXTRL_HOST_FN bool doAssignOutputBufferToElemByElemConfigCudaImpl(
+            elem_by_elem_config_t* SIXTRL_RESTRICT elem_by_elem_config,
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
+            size_type const output_buffer_offset_index );
+
+        SIXTRL_HOST_FN bool doResetCudaImpl(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
@@ -342,6 +359,29 @@ namespace SIXTRL_CXX_NAMESPACE
 {
     template< typename PartSetIndexIter >
     bool CudaTrackJob::doInitCudaTrackJob(
+        std::string const& SIXTRL_RESTRICT_REF config_str,
+        CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+        PartSetIndexIter pset_begin,
+        PartSetIndexIter pset_end,
+        CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
+        CudaTrackJob::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        CudaTrackJob::size_type const until_turn_elem_by_elem )
+    {
+        using _this_t = SIXTRL_CXX_NAMESPACE::CudaTrackJob;
+        using c_buffer_t = _this_t::c_buffer_t;
+
+        c_buffer_t* ptr_c_particles_buffer = particles_buffer.getCApiPtr();
+        c_buffer_t* ptr_c_belem_buffer = beam_elements_buffer.getCApiPtr();
+        c_buffer_t* ptr_c_out_buffer = ( ptr_output_buffer != nullptr )
+            ? ptr_output_buffer->getCApiPtr() : nullptr;
+
+        return this->doInitCudaTrackJob( config_str.c_str(),
+            ptr_c_particles_buffer, pset_begin, pset_end, ptr_c_belem_buffer,
+                ptr_c_out_buffer, until_turn_elem_by_elem );
+    }
+
+    template< typename PartSetIndexIter >
+    bool CudaTrackJob::doInitCudaTrackJob(
         const char *const SIXTRL_RESTRICT config_str,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT pbuffer,
         PartSetIndexIter pset_begin,
@@ -352,11 +392,13 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         using _this_t     = SIXTRL_CXX_NAMESPACE::CudaTrackJob;
         using _base_t     = SIXTRL_CXX_NAMESPACE::TrackJobNodeCtrlArgBase;
-        using flags_t     = _this_t::output_buffer_flag_t;
         using cuda_ctrl_t = _this_t::cuda_controller_t;
-        using cuda_arg_t  = _this_t::cuda_argument_t;
         using size_t      = _this_t::size_type;
         using diff_t      = std::ptrdiff_t;
+        using c_buffer_t  = _this_t::c_buffer_t;
+        using pindex_t    = _this_t::particle_index_t;
+
+        using output_buffer_flag_t = _this_t::output_buffer_flag_t;
 
         bool success  = this->doPrepareControllerCudaImpl( config_str );
         cuda_ctrl_t* ptr_ctrl = this->ptrCudaController();
@@ -395,39 +437,52 @@ namespace SIXTRL_CXX_NAMESPACE
 
         this->doSetPtrCBeamElementsBuffer( belem_buffer );
 
-        flags_t const flags =
-        ::NS(OutputBuffer_required_for_tracking_of_particle_sets)( pbuffer,
-            num_psets, pset_id_begin, belem_buffer, until_turn_elem_by_elem );
+        output_buffer_flag_t const out_buffer_flags =
+            ::NS(OutputBuffer_required_for_tracking_of_particle_sets)( pbuffer,
+                this->numParticleSets(), this->particleSetIndicesBegin(),
+                    belem_buffer, until_turn_elem_by_elem );
 
-        bool const requ_out_buffer =
-            ::NS(OutputBuffer_requires_output_buffer)( flags );
+            bool const requires_output_buffer =
+                ::NS(OutputBuffer_requires_output_buffer)( out_buffer_flags );
 
-        if( ( requ_out_buffer ) || ( output_buffer != nullptr ) )
+        if( ( requires_output_buffer ) || ( output_buffer != nullptr ) )
         {
             success = _base_t::doPrepareOutputStructures( pbuffer,
                 belem_buffer, output_buffer, until_turn_elem_by_elem );
 
-            if( success )
-            {
-                success = this->doPrepareOutputStructuresCudaImpl(
+            success &= this->doPrepareOutputStructuresCudaImpl(
                     pbuffer, belem_buffer, this->ptrCOutputBuffer(),
                         until_turn_elem_by_elem );
-            }
         }
 
-        if( ( success ) && ( this->hasOutputBuffer() ) && ( requ_out_buffer ) )
+        if( ( success ) && ( this->hasOutputBuffer() ) &&
+            ( requires_output_buffer ) )
         {
-            success = _base_t::doAssignOutputBufferToBeamMonitors(
-                belem_buffer, this->ptrCOutputBuffer() );
-
-            bool const requires_beam_monitor_output =
-                ::NS(OutputBuffer_requires_beam_monitor_output)( flags );
-
-            if( ( success ) && ( this->hasOutputBuffer() ) &&
-                ( requires_beam_monitor_output ) )
+            if( ::NS(OutputBuffer_requires_elem_by_elem_output)(
+                    out_buffer_flags ) )
             {
-                this->doAssignOutputBufferToBeamMonitorsCudaImpl)(
-                    belem_buffer, this->ptrCOutputBuffer() );
+                size_t const out_offset = this->elemByElemOutputBufferOffset();
+                c_buffer_t* out_buffer = this->ptrCOutputBuffer();
+
+                success &= _base_t::doAssignOutputBufferToElemByElemConfig(
+                    this->ptrElemByElemConfig(), out_buffer, out_offset );
+
+                success &= this->doAssignOutputBufferToElemByElemConfigCudaImpl(
+                    this->ptrElemByElemConfig(), out_buffer, out_offset );
+            }
+
+            if( ::NS(OutputBuffer_requires_beam_monitor_output)(
+                    out_buffer_flags ) )
+            {
+                pindex_t const min_turn_id = this->minInitialTurnId();
+                size_t const offset = this->beamMonitorsOutputBufferOffset();
+                c_buffer_t* ptr_output_buffer = this->ptrCOutputBuffer();
+
+                success &= _base_t::doAssignOutputBufferToBeamMonitors(
+                    belem_buffer, ptr_output_buffer, min_turn_id, offset );
+
+                success &= this->doAssignOutputBufferToBeamMonitorsCudaImpl(
+                    belem_buffer, ptr_output_buffer, min_turn_id, offset );
             }
         }
 

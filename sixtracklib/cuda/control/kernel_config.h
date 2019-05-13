@@ -5,7 +5,7 @@
     #include "sixtracklib/cuda/control/kernel_config.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#include !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <cuda_runtime_api.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 

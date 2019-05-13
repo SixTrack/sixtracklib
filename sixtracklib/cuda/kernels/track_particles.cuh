@@ -28,11 +28,11 @@ __global__ void NS(Track_particles_until_turn_cuda_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT be_buffer_begin,
     NS(buffer_size_t) const until_turn,
     NS(buffer_size_t) const slot_size,
-    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SXITRL_RESTRICT ptr_dbg_register);
+    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register);
 
 /* ------------------------------------------------------------------------- */
 
-__global__ void NS(Track_track_elem_by_elem_until_turn_kernel_cuda)(
+__global__ void NS(Track_track_elem_by_elem_until_turn_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer_begin,
     NS(buffer_size_t) const pset_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT be_buffer_begin,
@@ -42,7 +42,7 @@ __global__ void NS(Track_track_elem_by_elem_until_turn_kernel_cuda)(
     NS(buffer_size_t) const until_turn,
     NS(buffer_size_t) const slot_size );
 
-__global__ void NS(Track_track_elem_by_elem_until_turn_kernel_cuda_debug)(
+__global__ void NS(Track_track_elem_by_elem_until_turn_cuda_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer_begin,
     NS(buffer_size_t) const pset_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT be_buffer_begin,
@@ -51,27 +51,27 @@ __global__ void NS(Track_track_elem_by_elem_until_turn_kernel_cuda_debug)(
     NS(buffer_size_t) const out_buffer_offset_index,
     NS(buffer_size_t) const until_turn,
     NS(buffer_size_t) const slot_size,
-    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SXITRL_RESTRICT ptr_dbg_register);
+    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register);
 
 /* ------------------------------------------------------------------------- */
 
-__global__ void NS(Track_particles_line_kernel_cuda)(
+__global__ void NS(Track_particles_line_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer_begin,
     NS(buffer_size_t) const pset_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT be_buffer_begin,
     NS(buffer_size_t) const belem_begin_id,
     NS(buffer_size_t) const belem_end_id,
     bool const finish_turn,
-    NS(buffer_size_t) const slot_size )
+    NS(buffer_size_t) const slot_size );
 
-__global__ void NS(Track_particles_line_kernel_cuda_debug)(
+__global__ void NS(Track_particles_line_cuda_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer_begin,
     NS(buffer_size_t) const pset_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT be_buffer_begin,
     NS(buffer_size_t) const belem_begin_id,
     NS(buffer_size_t) const belem_end_id,
     bool const finish_turn, NS(buffer_size_t) const slot_size,
-    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SXITRL_RESTRICT ptr_dbg_register);
+    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register);
 
 #if defined( __cplusplus )
 }

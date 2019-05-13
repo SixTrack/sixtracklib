@@ -15,6 +15,8 @@
     #include "sixtracklib/common/control/node_controller_base.h"
     #include "sixtracklib/cuda/definitions.h"
     #include "sixtracklib/cuda/control/argument_base.hpp"
+    #include "sixtracklib/cuda/control/node_info.hpp"
+    #include "sixtracklib/cuda/control/kernel_config.hpp"
     #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
        !defined( __CUDA_ARCH__ )
         #include "sixtracklib/common/buffer.hpp"
@@ -160,6 +162,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         using cuda_arg_buffer_t  = ::NS(cuda_arg_buffer_t);
         using cuda_const_arg_buffer_t = ::NS(cuda_const_arg_buffer_t);
+        using ptr_cuda_kernel_config_t = std::unique_ptr< kernel_config_t >;
 
          SIXTRL_HOST_FN virtual status_t doSend(
             ptr_arg_base_t SIXTRL_RESTRICT destination,
@@ -172,8 +175,8 @@ namespace SIXTRL_CXX_NAMESPACE
             ptr_arg_base_t SIXTRL_RESTRICT source ) override;
 
         SIXTRL_HOST_FN virtual status_t doRemapCObjectsBuffer(
-            ptr_arg_base_t SIXTRL_RESTRICT arg, size_type const arg_size,
-            ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg ) override;
+            ptr_arg_base_t SIXTRL_RESTRICT arg,
+            size_type const arg_size ) override;
 
         SIXTRL_HOST_FN virtual status_t doSetDebugRegister(
             debug_register_t const debug_register ) override;
@@ -237,8 +240,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN bool doSelectNodeCudaImpl( node_index_t const idx );
 
         SIXTRL_HOST_FN status_t doRemapCObjectsBufferCudaBaseImpl(
-            ptr_arg_base_t SIXTRL_RESTRICT arg, size_type const arg_size
-            ptr_arg_base_t SIXTRL_RESTRICT debug_flag_arg );
+            ptr_arg_base_t SIXTRL_RESTRICT arg, size_type const arg_size );
 
         cuda_arg_buffer_t   m_cuda_debug_register;
     };
@@ -255,4 +257,3 @@ typedef void NS(CudaController);
 #endif /* SIXTRACKLIB_CUDA_CONTROLLER_HPP__ */
 
 /* end: sixtracklib/cuda/controller.hpp */
-19

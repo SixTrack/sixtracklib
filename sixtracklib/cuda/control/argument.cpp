@@ -156,8 +156,8 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         using cuda_ctrl_t = SIXTRL_CXX_NAMESPACE::CudaController;
 
-        return ( this->ptrBaseController() != nullptr )
-            ? this->ptrBaseController()->asDerivedController< cuda_ctrl_t >(
+        return ( this->ptrControllerBase() != nullptr )
+            ? this->ptrControllerBase()->asDerivedController< cuda_ctrl_t >(
                     SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA ) : nullptr;
     }
 }

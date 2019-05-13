@@ -32,7 +32,7 @@ __global__ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda)(
     }
 }
 
-__global__ void NS(ElemByElemConfig_assign_managed_output_buffer_debug)(
+__global__ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_debug)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
         SIXTRL_RESTRICT elem_by_elem_config,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
