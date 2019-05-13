@@ -33,8 +33,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         public:
 
-        using node_info_t         = SIXTRL_CXX_NAMESPACE::CudaNodeInfo;
-        using kernel_config_t     = SIXTRL_CXX_NAMESPACE::CudaKernelConfig;
+        using node_info_t = SIXTRL_CXX_NAMESPACE::CudaNodeInfo;
+        using kernel_config_t = SIXTRL_CXX_NAMESPACE::CudaKernelConfig;
         using cuda_device_index_t = node_info_t::cuda_dev_index_t;
 
         SIXTRL_HOST_FN explicit CudaController(
@@ -80,7 +80,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN CudaController& operator=(
             CudaController&& other) = default;
 
-        SIXTRL_HOST_FN virtual ~CudaController() = default;
+        SIXTRL_HOST_FN virtual ~CudaController() SIXTRL_NOEXCEPT;
 
         /* ================================================================= */
 
@@ -172,9 +172,14 @@ namespace SIXTRL_CXX_NAMESPACE
             ptr_arg_base_t SIXTRL_RESTRICT source ) override;
 
         SIXTRL_HOST_FN virtual status_t doRemapCObjectsBuffer(
-            ptr_arg_base_t SIXTRL_RESTRICT arg,
-            size_type const arg_size,
+            ptr_arg_base_t SIXTRL_RESTRICT arg, size_type const arg_size,
             ptr_arg_base_t SIXTRL_RESTRICT remap_debug_flag_arg ) override;
+
+        SIXTRL_HOST_FN virtual status_t doSetDebugRegister(
+            debug_register_t const debug_register ) override;
+
+        SIXTRL_HOST_FN virtual status_t doFetchDebugRegister(
+            debug_register_t* SIXTRL_RESTRICT ptr_debug_register ) override;
 
         SIXTRL_HOST_FN virtual bool
             doSelectNode( node_index_t const node_index ) override;
@@ -182,6 +187,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual bool doChangeSelectedNode(
             node_index_t const current_selected_node_idx,
             node_index_t const new_selected_node_index ) override;
+
+        SIXTRL_HOST_FN  bool doInitCudaDebugRegister();
 
         SIXTRL_HOST_FN node_index_t doFindAvailableNodesByCudaDeviceIndex(
             cuda_device_index_t const cuda_device_index ) const SIXTRL_NOEXCEPT;
@@ -199,24 +206,41 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN kernel_id_t doAppendCudaKernelConfig(
             ptr_cuda_kernel_config_t&& ptr_kernel_conf ) SIXTRL_NOEXCEPT;
 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        SIXTRL_HOST_FN cuda_arg_buffer_t
+        doGetPtrCudaSuccessRegister() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN cuda_const_arg_buffer_t
+        doGetPtrCudaSuccessRegister() const SIXTRL_NOEXCEPT;
+
         private:
 
-         SIXTRL_HOST_FN static status_t PerformSendOperation(
+        SIXTRL_HOST_FN static status_t PerformSendOperation(
             cuda_arg_buffer_t SIXTRL_RESTRICT destination,
-            cuda_const_arg_buffer_t SIXTRL_RESTRICT source_begin,
-            size_type const source_length );
+            void const* SIXTRL_RESTRICT src_begin, size_type const src_length );
 
         SIXTRL_HOST_FN static status_t PerformReceiveOperation(
-            cuda_arg_buffer_t SIXTRL_RESTRICT destination,
+            void* SIXTRL_RESTRICT destination,
             size_type const destination_capacity,
             cuda_const_arg_buffer_t SIXTRL_RESTRICT source_begin,
             size_type const source_length );
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        SIXTRL_HOST_FN status_t doSetDebugRegisterCudaBaseImpl(
+            debug_register_t const debug_register );
+
+        SIXTRL_HOST_FN status_t doFetchDebugRegisterCudaBaseImpl(
+            debug_register_t* SIXTRL_RESTRICT ptr_debug_register );
 
         SIXTRL_HOST_FN bool doSelectNodeCudaImpl( node_index_t const idx );
 
         SIXTRL_HOST_FN status_t doRemapCObjectsBufferCudaBaseImpl(
             ptr_arg_base_t SIXTRL_RESTRICT arg, size_type const arg_size
             ptr_arg_base_t SIXTRL_RESTRICT debug_flag_arg );
+
+        cuda_arg_buffer_t   m_cuda_debug_register;
     };
 }
 
@@ -231,3 +255,4 @@ typedef void NS(CudaController);
 #endif /* SIXTRACKLIB_CUDA_CONTROLLER_HPP__ */
 
 /* end: sixtracklib/cuda/controller.hpp */
+19
