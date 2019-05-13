@@ -29,8 +29,7 @@ namespace SIXTRL_CXX_NAMESPACE
         public:
 
         using arch_info_t = SIXTRL_CXX_NAMESPACE::ArchInfo;
-        using arch_id_t   = arch_info_t::arch_id_t;
-        using size_type   = arch_info_t::size_type;
+        using status_t    = SIXTRL_CXX_NAMESPACE::arch_status_t;
 
         SIXTRL_HOST_FN explicit ArchBase( arch_id_t const arch_id,
             const char *const SIXTRL_RESTRICT arch_str = nullptr,
@@ -76,57 +75,86 @@ namespace SIXTRL_CXX_NAMESPACE
 
         std::string m_config_str;
     };
+
+    class ArchDebugBase : public SIXTRL_CXX_NAMESPACE::ArchBase
+    {
+        private:
+
+        using _arch_base_t = SIXTRL_CXX_NAMESPACE::ArchBase;
+
+        public:
+
+        using debug_register_t = SIXTRL_CXX_NAMESPACE::arch_debugging_t;
+
+        static SIXTRL_CONSTEXPR_OR_CONST debug_register_t DEBUG_REGISTER_OK =
+            SIXTRL_CXX_NAMESPACE::ARCH_DEBUGGING_REGISTER_EMPTY;
+
+        SIXTRL_HOST_FN explicit ArchDebugBase( arch_id_t const arch_id,
+            const char *const SIXTRL_RESTRICT arch_str = nullptr,
+            const char *const SIXTRL_RESTRICT config_str = nullptr );
+
+        SIXTRL_HOST_FN ArchDebugBase( ArchDebugBase const& other ) = default;
+        SIXTRL_HOST_FN ArchDebugBase( ArchDebugBase&& other ) = default;
+
+        SIXTRL_HOST_FN ArchDebugBase&
+        operator=( ArchDebugBase const& rhs ) = default;
+
+        SIXTRL_HOST_FN ArchDebugBase&
+        operator=( ArchDebugBase&& rhs ) = default;
+
+        SIXTRL_HOST_FN virtual ~ArchDebugBase() = default;
+
+        SIXTRL_HOST_FN bool isInDebugMode() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool enableDebugMode() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool disableDebugMode() const SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN debug_register_t debugRegister() const;
+
+        SIXTRL_HOST_FN status_t setDebugRegister(
+            debug_register_t const debug_register );
+
+        SIXTRL_HOST_FN status_t prepareDebugRegisterForUse();
+        SIXTRL_HOST_FN status_t evaluateDebugRegisterAfterUse();
+
+        protected:
+
+        static SIXTRL_CONSTEXPR_OR_CONST size_type
+            DEBUG_REGISTER_SIZE = sizeof( debug_register_t );
+
+        SIXTRL_HOST_FN virtual bool doSwitchDebugMode(
+            bool const is_in_debug_mode );
+
+        SIXTRL_HOST_FN virtual status_t doSetDebugRegister(
+            debug_register_t const debug_register );
+
+        SIXTRL_HOST_FN virtual status_t doFetchDebugRegister(
+            debug_register_t* SIXTRL_RESTRICT ptr_debug_register );
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN void doSetDebugModeFlag(
+            bool const debug_mode ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN debug_register_t const*
+        doGetPtrLocalDebugRegister() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN debug_flag_t*
+        doGetPtrLocalDebugRegister() SIXTRL_NOEXCEPT;
+
+        private:
+
+        bool m_debug_mode;
+        debug_register_t m_local_debug_register;
+    };
 }
 
-typedef SIXTRL_CXX_NAMESPACE::ArchBase NS(ArchBase);
+typedef SIXTRL_CXX_NAMESPACE::ArchDebugBase NS(ArchDebugBase);
 
 #else /* C++, Host */
 
-typedef void NS(ArchBase);
-
-#endif /* C++, Host */
-
-/* ************************************************************************* */
-/* **********  Implementation of template member functions      ************ */
-/* ************************************************************************* */
-
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
-
-#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #include <type_traits>
-#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
-
-namespace SIXTRL_CXX_NAMESPACE
-{
-    template< class Derived > Derived const* ArchBase::asDerived(
-        ArchBase::arch_id_t const required_arch_id,
-        bool requires_exact_match ) const SIXTRL_NOEXCEPT
-    {
-        Derived const* ptr_derived = nullptr;
-
-        static_assert( std::is_base_of< ArchBase, Derived >::value,
-                       "asDerived< Derived > requires Dervied to be derived "
-                       "from SIXTRL_CXX_NAMESPACE::ArchBase" );
-
-        if( ( ( !requires_exact_match ) &&
-              ( this->isArchCompatibleWith( required_arch_id ) ) ) ||
-            ( this->isArchIdenticalTo( required_arch_id ) ) )
-        {
-            ptr_derived = static_cast< Derived const* >( this );
-        }
-
-        return ptr_derived;
-    }
-
-    template< class Derived > Derived* ArchBase::asDerived(
-        ArchBase::arch_id_t const required_arch_id,
-        bool requires_exact_match ) SIXTRL_NOEXCEPT
-    {
-        return const_cast< Derived* >( static_cast< ArchBase const& >(
-            *this ).asDerived< Derived >(
-                required_arch_id, requires_exact_match ) );
-    }
-}
+typedef void NS(ArchDebugBase);
 
 #endif /* C++, Host */
 
