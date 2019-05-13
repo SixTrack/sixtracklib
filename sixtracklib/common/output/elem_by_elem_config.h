@@ -10,6 +10,8 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/common/control/debug_register.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
@@ -159,7 +161,7 @@ NS(ElemByElemConfig_get_at_turn_from_store_index)(
 
 /* ------------------------------------------------------------------------ */
 
-SIXTRL_FN SIXTRL_STATIC int NS(ElemByElemConfig_init_detailed)(
+SIXTRL_FN SIXTRL_STATIC NS(arch_status_t) NS(ElemByElemConfig_init_detailed)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
     NS(elem_by_elem_order_t) const order,
@@ -171,13 +173,26 @@ SIXTRL_FN SIXTRL_STATIC int NS(ElemByElemConfig_init_detailed)(
     NS(particle_index_t) const max_turn,
     bool const is_rolling_flag );
 
-SIXTRL_FN SIXTRL_STATIC int
+/* ------------------------------------------------------------------------ */
+
+SIXTRL_FN SIXTRL_STATIC NS(arch_status_t)
 NS(ElemByElemConfig_assign_managed_output_buffer)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const out_buffer_index_offset,
     NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC NS(arch_status_t)
+NS(ElemByElemConfig_assign_managed_output_buffer_debug)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+        NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
+    NS(buffer_size_t) const out_buffer_index_offset,
+    NS(buffer_size_t) const slot_size,
+    NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_debug_register );
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
 NS(ElemByElemConfig)* NS(ElemByElemConfig_preset)(
@@ -205,7 +220,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(ElemByElemConfig_set_output_store_address)(
 
 #if !defined( _GPUCODE )
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ElemByElemConfig_init)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ElemByElemConfig_init)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
     NS(elem_by_elem_order_t) const order,
@@ -261,11 +276,20 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add_copy)(
      SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const
         NS(ElemByElemConfig) *const SIXTRL_RESTRICT config );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ElemByElemConfig_assign_output_buffer)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ElemByElemConfig_assign_output_buffer)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* output_buffer,
     NS(buffer_size_t) const out_buffer_index_offset );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ElemByElemConfig_assign_output_buffer_debug)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+        NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* output_buffer,
+    NS(buffer_size_t) const out_buffer_index_offset,
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register );
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -810,7 +834,7 @@ NS(ElemByElemConfig_get_at_turn_from_store_index)(
 
 /* ------------------------------------------------------------------------ */
 
-SIXTRL_INLINE int NS(ElemByElemConfig_init_detailed)(
+SIXTRL_INLINE NS(arch_status_t) NS(ElemByElemConfig_init_detailed)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
         SIXTRL_RESTRICT config,
     NS(elem_by_elem_order_t) const order,
@@ -822,7 +846,7 @@ SIXTRL_INLINE int NS(ElemByElemConfig_init_detailed)(
     NS(particle_index_t) const max_turn,
     bool const is_rolling_flag )
 {
-    int success = -1;
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
     typedef NS(particle_num_elements_t)     num_elem_t;
     typedef NS(particle_index_t)            index_t;
@@ -863,22 +887,26 @@ SIXTRL_INLINE int NS(ElemByElemConfig_init_detailed)(
         config->min_turn                = min_turn;
         config->max_turn                = max_turn;
 
-        success = 0;
+        status = SIXTRL_ARCH_STATUS_SUCCESS;
     }
 
-    return success;
+    return status;
 }
 
-SIXTRL_INLINE int NS(ElemByElemConfig_assign_managed_output_buffer)(
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE NS(arch_status_t)
+NS(ElemByElemConfig_assign_managed_output_buffer)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const out_buffer_index_offset,
     NS(buffer_size_t) const slot_size )
 {
-    int success = -1;
-
+    typedef NS(arch_status_t) status_t;
     typedef NS(buffer_size_t) buf_size_t;
+
+    status_t status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
     if( ( config != SIXTRL_NULLPTR ) && ( output_buffer != SIXTRL_NULLPTR ) &&
         ( slot_size > ( buf_size_t )0u ) )
@@ -910,12 +938,78 @@ SIXTRL_INLINE int NS(ElemByElemConfig_assign_managed_output_buffer)(
             NS(ElemByElemConfig_set_output_store_address)( config,
                 ( address_t )( uintptr_t )particles );
 
-            success = 0;
+            status = SIXTRL_ARCH_STATUS_SUCCESS;
         }
     }
 
-    return success;
+    return status;
 }
+
+SIXTRL_INLINE NS(arch_status_t)
+NS(ElemByElemConfig_assign_managed_output_buffer_debug)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+        NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
+    NS(buffer_size_t) const out_buffer_index_offset,
+    NS(buffer_size_t) const slot_size,
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register )
+{
+    typedef NS(arch_status_t) status_t;
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(arch_debugging_t) debug_register_t;
+    typedef NS(elem_by_elem_out_addr_t) address_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)* ptr_particles_t;
+
+    status_t status = NS(ElemByElemConfig_assign_managed_output_buffer)(
+        config, output_buffer, out_buffer_index_offset, slot_size );
+
+    if( ptr_dbg_register != SIXTRL_NULLPTR )
+    {
+        debug_register_t dbg = SIXTRL_ARCH_DEBUGGING_REGISTER_EMPTY;
+
+        if( status != SIXTRL_ARCH_STATUS_SUCCESS )
+        {
+            ptr_particles_t particles = SIXTRL_NULLPTR;
+
+            if( config == SIXTRL_NULLPTR ) /* 0x0000000100000000 */
+                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( slot_size == ( buf_size_t )0u ) /* 0x0000000200000000 */
+                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( output_buffer == SIXTRL_NULLPTR ) /* 0x0000000400000000 */
+                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+
+            /* 0x0000000800000000 */
+            if( ::NS(ManagedBuffer_needs_remapping)( output_buffer ) )
+                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( ::NS(ElemByElemConfig_get_order)( config ) !=
+                    NS(ELEM_BY_ELEM_ORDER_INVALID) ) /* 0x0000001000000000 */
+                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( ::NS(ManagedBuffer_get_num_objects)( output_buffer, slot_size )
+                    > out_buffer_index_offset ) /* 0x0000002000000000 */
+                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+
+            particles = ::NS(Particles_managed_buffer_get_particles)(
+                    output_buffer, out_buffer_index_offset, slot_size );
+
+            if( particles == SIXTRL_NULLPTR ) /* 0x0000004000000000 */
+                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( NS(Particles_get_num_of_particles)( particles ) <
+                NS(ElemByElemConfig_get_out_store_num_particles)( config ) )
+                    dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+        }
+
+        *ptr_dbg_register = ::NS(DebugReg_store_arch_status)( dbg, status );
+    }
+
+    return status;
+}
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
 NS(ElemByElemConfig)* NS(ElemByElemConfig_preset)(
@@ -1102,9 +1196,9 @@ NS(ElemByElemConfig)* NS(ElemByElemConfig_add)(
     config_t config;
     NS(ElemByElemConfig_preset)( &config );
 
-    if( 0 == NS(ElemByElemConfig_init_detailed)( &config, order,
-            min_particle_id, max_particle_id, min_element_id, max_element_id,
-            min_turn, max_turn, is_rolling_flag ) )
+    if( SIXTRL_ARCH_STATUS_SUCCESS == NS(ElemByElemConfig_init_detailed)(
+        &config, order, min_particle_id, max_particle_id, min_element_id,
+            max_element_id, min_turn, max_turn, is_rolling_flag ) )
     {
         ptr_new_config = ( ptr_new_config_t )( uintptr_t
             )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
