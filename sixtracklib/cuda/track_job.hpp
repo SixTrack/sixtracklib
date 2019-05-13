@@ -152,15 +152,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN bool hasCudaDebugFlagArg() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN cuda_argument_t& cudaDebugFlagArg();
-        SIXTRL_HOST_FN cuda_argument_t const& cudaDebugFlagArg() const;
+        SIXTRL_HOST_FN bool hasCudaDebugRegisterArg() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cuda_argument_t& cudaDebugRegisterArg();
+        SIXTRL_HOST_FN cuda_argument_t const& cudaDebugRegisterArg() const;
 
         SIXTRL_HOST_FN cuda_argument_t const*
-        ptrCudaDebugFlagArg() const SIXTRL_NOEXCEPT;
+        ptrCudaDebugRegisterArg() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN cuda_argument_t*
-        ptrCudaDebugFlagArg() SIXTRL_NOEXCEPT;
+        ptrCudaDebugRegisterArg() SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -207,7 +207,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual bool doAssignOutputBufferToBeamMonitors(
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
-            c_buffer_t* SIXTRL_RESTRICT output_buffer ) override;
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
+            particle_index_t const min_turn_id,
+            size_type const output_buffer_offset_index ) override;
+
+        SIXTRL_HOST_FN virtual bool doAssignOutputBuffertoElemByElemConfig(
+            elem_by_elem_config_t* SIXTRL_RESTRICT elem_by_elem_config,
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
+            size_type const output_buffer_offset_index ) override;
 
         SIXTRL_HOST_FN virtual bool doReset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
