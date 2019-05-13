@@ -15,17 +15,17 @@ extern "C" {
 __global__ void NS(BeamMonitor_assign_out_buffer_from_offset_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elem_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const slot_size,
     NS(particle_index_t) const min_turn_id,
-    NS(buffer_size_t) const out_buffer_offset_index );
+    NS(buffer_size_t) const out_buffer_offset_index,
+    NS(buffer_size_t) const slot_size );
 
 __global__ void NS(BeamMonitor_assign_out_buffer_from_offset_cuda_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elem_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const slot_size,
     NS(particle_index_t) const min_turn_id,
     NS(buffer_size_t) const out_buffer_offset_index,
-    SIXTRL_DATAPTR_DEC NS(ctrl_debug_flag_t)* SIXTRL_RESTRICT debug_flag );
+    NS(buffer_size_t) const slot_size,
+    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SXITRL_RESTRICT ptr_dbg_register);
 
 #if defined( __cplusplus )
 }

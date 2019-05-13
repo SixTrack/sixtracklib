@@ -3,18 +3,13 @@
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #include <stddef.h>
-    #include <stdint.h>
-    #include <stdlib.h>
-
-    #include <cuda_runtime.h>
-    #include <cuda.h>
-#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+    #include <cuda_runtime_api.h>
+#if /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/internal/buffer_main_defines.h"
-    #include "sixtracklib/common/buffer/buffer_type.h"
+    #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/common/control/debug_register.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #include "sixtracklib/common/buffer/managed_buffer_remap.h"
     #include "sixtracklib/cuda/cuda_tools.h"
@@ -22,85 +17,45 @@
 
 __global__ void NS(ManagedBuffer_remap_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
-    uint64_t const slot_size )
+    NS(buffer_size_t) const slot_size )
 {
-    size_t const thread_id = NS(Cuda_get_1d_thread_id_in_kernel)();
-    size_t const thread_id_to_remap = ( size_t )0u;
-
-    SIXTRL_ASSERT( NS(Cuda_get_total_num_threads_in_kernel)() >
-        ( NS(buffer_size_t) )0u );
-
-    if( thread_id_to_remap == thread_id )
+    if( NS(Cuda_get_1d_thread_id_in_kernel)() == ( size_t )0 )
     {
-        int32_t const ret = NS(ManagedBuffer_remap)( buffer_begin, slot_size );
-        SIXTRL_ASSERT( ret == 0 );
-        ( void )ret;
+        NS(ManagedBuffer_remap)( buffer_begin, slot_size );
     }
-
-    return;
 }
 
 __global__ void NS(ManagedBuffer_remap_cuda_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer,
-    uint64_t const slot_size,
-    SIXTRL_BUFFER_DATAPTR_DEC uint32_t* SIXTRL_RESTRICT ptr_success_flag )
+    NS(buffer_size_t) const slot_size,
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register )
 {
+    typedef NS(arch_debugging_t) debug_register_t
+    typedef NS(arch_status_t) status_t;
     typedef NS(buffer_size_t) buf_size_t;
 
-    SIXTRL_STATIC_VAR buf_size_t ZERO = ( buf_size_t )0u;
-    uint32_t success_flag = ( uint32_t )0x80000000;
-
-    size_t const thread_id = NS(Cuda_get_1d_thread_id_in_kernel)();
-    size_t const thread_id_to_remap = ( size_t )0u;
-
-    if( NS(Cuda_get_total_num_threads_in_kernel)() > ZERO )
+    if( NS(Cuda_get_1d_thread_id_in_kernel)() == ( buf_size_t )0u )
     {
-        if( thread_id_to_remap == thread_id )
-        {
-            if( ( buffer != SIXTRL_NULLPTR ) && ( slot_size > ZERO ) )
-            {
-                int32_t const ret = NS(ManagedBuffer_remap)( buffer, slot_size );
+        debug_register_t dbg = SIXTRL_ARCH_DEBUGGING_REGISTER_EMPTY;
+        status_t const status = NS(ManagedBuffer_remap)( buffer, slot_size );
 
-                if( ( ret == ( int32_t )0 ) &&
-                    ( !NS(ManagedBuffer_needs_remapping)( buffer, slot_size ) )
-                  )
-                {
-                    success_flag = ( uint32_t )0u;
-                }
-                else if( ret != ( int32_t )0 )
-                {
-                    success_flag |= ( ret >= 0 ) ? ret : -ret;
-                }
-                else
-                {
-                    success_flag |= ( uint32_t )0x10000000;
-                }
-            }
-            else if( buffer != SIXTRL_NULLPTR )
-            {
-                success_flag = ( uint32_t )0x20000000;
-            }
-            else
-            {
-                success_flag = ( uint32_t )0x40000000;
-            }
-        }
-        else
+        if( ptr_dbg_register != SIXTRL_NULLPTR )
         {
-            success_flag = ( uint32_t )0;
+            if( status != SIXTRL_ARCH_STATUS_SUCCESS )
+            {
+                if( buffer == SIXTRL_NULLPTR )
+                    dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+                if( slot_size == ( buf_size_t )0u )
+                    dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+                if( NS(ManagedBuffer_needs_remapping)( buffer, slot_size ) )
+                    dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+            }
+
+            *ptr_dbg_register = ::NS(DebugReg_store_arch_status)( dbg, status );
         }
     }
-
-    if( ( success_flag != ( uint32_t )0u ) &&
-        ( ptr_success_flag != SIXTRL_NULLPTR ) )
-    {
-        #if ( defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 120 ) )
-        atomicOr( ptr_success_flag, success_flag );
-        #else  /* defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 120 ) */
-        *ptr_success_flag |= success_flag;
-        #endif /* defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 120 ) */
-    }
-
 }
 
 /* end: sixtracklib/cuda/kernels/managed_buffer_remap.cu */
