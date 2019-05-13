@@ -109,14 +109,14 @@ namespace SIXTRL_CXX_NAMESPACE
     bool TrackJobBaseNew::collectDebugFlag()
     {
         return TrackJobBaseNew::IsCollectFlagSet(
-            this->doCollect( st::TRACK_JOB_COLLECT_SUCCESS_FLAG ),
-                st::TRACK_JOB_COLLECT_SUCCESS_FLAG );
+            this->doCollect( st::TRACK_JOB_COLLECT_DEBUG_REGISTER ),
+                st::TRACK_JOB_COLLECT_DEBUG_REGISTER );
     }
 
     bool TrackJobBaseNew::collectParticlesAddresses()
     {
-        return TrackJobBaseNew::isCollectFlagSet(
-            this->doCollect( st::TRACK_JOB_COLLECT_PARTICLES_ADDR ) ==
+        return TrackJobBaseNew::IsCollectFlagSet(
+            this->doCollect( st::TRACK_JOB_COLLECT_PARTICLES_ADDR ),
                 st::TRACK_JOB_COLLECT_PARTICLES_ADDR );
     }
 
@@ -195,7 +195,7 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBaseNew::status_t const status =
             this->doFetchParticleAddresses();
 
-        if( status == st::CONTROLLER_STATUS_SUCCESS )
+        if( status == st::ARCH_STATUS_SUCCESS )
         {
             this->doSetHasParticleAddressesFlag( true );
         }
@@ -533,7 +533,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 this->m_particle_set_begin_offsets[ pset_index ];
 
             num_particles_t const end_offset =
-                this->m_particles_set_end_offsets[ pset_index ];
+                this->m_particle_set_end_offsets[ pset_index ];
 
             if( begin_offset < end_offset )
             {
@@ -652,47 +652,6 @@ namespace SIXTRL_CXX_NAMESPACE
     TrackJobBaseNew::totalNumOfAvailableBeamElements() const SIXTRL_NOEXCEPT
     {
         return this->m_num_beam_elements_in_buffer;
-    }
-
-    /* --------------------------------------------------------------------- */
-
-    TrackJobBaseNew::status_t TrackJobBaseNew::resetDebugFlag(
-        TrackJobCtrlArgBase::debug_flag_t const flag_value );
-    {
-        return this->doSetDebugFlagValue( flag_value );
-    }
-
-    TrackJobBaseNew::status_t TrackJobBaseNew::prepareDebugFlagForUse()
-    {
-        using debug_flag_t = TrackJobCtrlArgBase::debug_flag_t;
-        using status_t = TrackJobCtrlArgBase::status_t;
-
-        status_t status = this->doSetDebugFlagValue(
-            st::CONTROLLER_DEBUG_FLAG_NOT_OK );
-
-        if( ( status == st::CONTROLLER_STATUS_SUCCESS ) &&
-            ( this->lastDebugFlagValue() != flag ) )
-        {
-            status = st::CONTROLLER_STATUS_GENERAL_FAILURE;
-        }
-
-        return status;
-    }
-
-    TrackJobBaseNew::status_t TrackJobBaseNew::evaluateDebugFlagAfterUse()
-    {
-        using debug_flag_t = TrackJobCtrlArgBase::debug_flag_t;
-
-        return ( ( this->collectDebugFlag() ) ||
-            ( this->lastDebugFlagValue() == ::NS(CONTROLLER_DEBUG_FLAG_OK) ) )
-                ? st::CONTROLLER_STATUS_SUCCESS
-                : st::CONTROLLER_STATUS_GENERAL_FAILURE;
-    }
-
-    TrackJobBaseNew::debug_flag_t
-    TrackJobBaseNew::lastDebugFlagValue() const SIXTRL_NOEXCEPT
-    {
-        return this->m_debug_flag;
     }
 
     /* --------------------------------------------------------------------- */
@@ -982,7 +941,7 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBaseNew::arch_id_t const arch_id,
         char const* SIXTRL_RESTRICT arch_str,
         char const* SIXTRL_RESTRICT config_str ) :
-        st::ArchBase( arch_id, arch_str, config_str ),
+        st::ArchDebugBase( arch_id, arch_str, config_str ),
         m_particle_set_indices(),
         m_particle_set_begin_offsets(),
         m_particle_set_end_offsets(),
@@ -998,9 +957,9 @@ namespace SIXTRL_CXX_NAMESPACE
         m_elem_by_elem_output_offset( TrackJobBaseNew::size_type{ 0 } ),
         m_num_particle_sets_in_buffer( TrackJobBaseNew::size_type{ 0 } ),
         m_num_beam_elements_in_buffer( TrackJobBaseNew::size_type{ 0 } ),
+        m_default_elem_by_elem_order( ::NS(ELEM_BY_ELEM_ORDER_DEFAULT) ),
         m_total_num_particles( TrackJobBaseNew::num_particles_t{ 0 } ),
         m_total_num_particles_in_sets( TrackJobBaseNew::num_particles_t{ 0 } ),
-        m_default_elem_by_elem_order( ::NS(ELEM_BY_ELEM_ORDER_DEFAULT) ),
         m_min_particle_id( TrackJobBaseNew::particle_index_t{ 0 } ),
         m_max_particle_id( TrackJobBaseNew::particle_index_t{ 0 } ),
         m_min_element_id( TrackJobBaseNew::particle_index_t{ 0 } ),
@@ -1011,16 +970,15 @@ namespace SIXTRL_CXX_NAMESPACE
         m_collect_flags( st::TRACK_JOB_COLLECT_DEFAULT_FLAGS ),
         m_default_elem_by_elem_rolling( true ),
         m_has_beam_monitor_output( false ), m_has_elem_by_elem_output( false ),
-        m_has_particle_addresses( false ), m_in_debug_mode( false ),
-        m_requires_collect( true ), m_uses_controller( false ),
-        m_uses_arguments( false )
+        m_has_particle_addresses( false ), m_requires_collect( true ),
+        m_uses_controller( false ), m_uses_arguments( false )
     {
         this->doInitDefaultParticleSetIndices();
         this->doInitDefaultBeamMonitorIndices();
     }
 
     TrackJobBaseNew::TrackJobBaseNew( TrackJobBaseNew const& other ) :
-        st::ArchBase( other ),
+        st::ArchDebugBase( other ),
         m_particle_set_indices( other.m_particle_set_indices ),
         m_particle_set_begin_offsets( other.m_particle_set_begin_offsets ),
         m_particle_set_end_offsets( other.m_particle_set_end_offsets ),
@@ -1038,9 +996,9 @@ namespace SIXTRL_CXX_NAMESPACE
         m_elem_by_elem_output_offset( other.m_elem_by_elem_output_offset ),
         m_num_particle_sets_in_buffer( other.m_num_particle_sets_in_buffer ),
         m_num_beam_elements_in_buffer( other.m_num_beam_elements_in_buffer ),
+        m_default_elem_by_elem_order( other.m_default_elem_by_elem_order ),
         m_total_num_particles( other.m_total_num_particles ),
         m_total_num_particles_in_sets( other.m_total_num_particles_in_sets ),
-        m_default_elem_by_elem_order( other.m_default_elem_by_elem_order ),
         m_min_particle_id( other.m_min_particle_id ),
         m_max_particle_id( other.m_max_particle_id ),
         m_min_element_id( other.m_min_element_id ),
@@ -1053,7 +1011,6 @@ namespace SIXTRL_CXX_NAMESPACE
         m_has_beam_monitor_output( other.m_has_beam_monitor_output ),
         m_has_elem_by_elem_output( other.m_has_elem_by_elem_output ),
         m_has_particle_addresses( other.m_has_particle_addresses ),
-        m_in_debug_mode( other.m_in_debug_mode ),
         m_requires_collect( other.m_requires_collect ),
         m_uses_controller( other.m_uses_controller ),
         m_uses_arguments( other.m_uses_arguments )
@@ -1099,7 +1056,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     TrackJobBaseNew::TrackJobBaseNew(
         TrackJobBaseNew&& other ) SIXTRL_NOEXCEPT :
-        st::ArchBase( std::move( other ) ),
+        st::ArchDebugBase( std::move( other ) ),
         m_particle_set_indices( std::move( other.m_particle_set_indices ) ),
         m_particle_set_begin_offsets(
             std::move( other.m_particle_set_begin_offsets ) ),
@@ -1124,11 +1081,11 @@ namespace SIXTRL_CXX_NAMESPACE
             std::move( other.m_num_particle_sets_in_buffer ) ),
         m_num_beam_elements_in_buffer(
             std::move( other.m_num_beam_elements_in_buffer ) ),
+        m_default_elem_by_elem_order(
+            std::move( other.m_default_elem_by_elem_order ) ),
         m_total_num_particles( std::move( other.m_total_num_particles ) ),
         m_total_num_particles_in_sets( std::move(
             other.m_total_num_particles_in_sets ) ),
-        m_default_elem_by_elem_order(
-            std::move( other.m_default_elem_by_elem_order ) ),
         m_min_particle_id( std::move( other.m_min_particle_id ) ),
         m_max_particle_id( std::move( other.m_max_particle_id ) ),
         m_min_element_id( std::move( other.m_min_element_id ) ),
@@ -1146,7 +1103,6 @@ namespace SIXTRL_CXX_NAMESPACE
             std::move( other.m_has_elem_by_elem_output ) ),
         m_has_particle_addresses(
             std::move( other.m_has_particle_addresses ) ),
-        m_in_debug_mode( std::move( other.m_in_debug_mode ) ),
         m_requires_collect( std::move( other.m_requires_collect ) ),
         m_uses_controller( std::move( other.m_uses_controller ) ),
         m_uses_arguments( std::move( other.m_uses_arguments ) )
@@ -1158,7 +1114,7 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         if( ( this != &rhs ) && ( this->isArchCompatibleWith( rhs ) ) )
         {
-            st::ArchBase::operator=( rhs );
+            st::ArchDebugBase::operator=( rhs );
 
             this->m_particle_set_indices = rhs.m_particle_set_indices;
 
@@ -1248,13 +1204,13 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_num_beam_elements_in_buffer =
                 rhs.m_num_beam_elements_in_buffer;
 
+            this->m_default_elem_by_elem_order =
+                rhs.m_default_elem_by_elem_order;
+
             this->m_total_num_particles = rhs.m_total_num_particles;
 
             this->m_total_num_particles_in_sets =
                 rhs.m_total_num_particles_in_sets;
-
-            this->m_default_elem_by_elem_order =
-                rhs.m_default_elem_by_elem_order;
 
             this->m_min_particle_id = rhs.m_min_particle_id;
             this->m_max_particle_id = rhs.m_max_particle_id;
@@ -1272,7 +1228,6 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_has_elem_by_elem_output = rhs.m_has_elem_by_elem_output;
             this->m_has_particle_addresses  = rhs.m_has_particle_addresses;
 
-            this->m_in_debug_mode = rhs.m_in_debug_mode;
             this->m_requires_collect = rhs.m_requires_collect;
             this->m_uses_controller = rhs.m_uses_controller;
             this->m_uses_arguments = rhs.m_uses_arguments;
@@ -1286,7 +1241,7 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         if( this != &rhs )
         {
-            st::ArchBase::operator=( std::move( rhs ) );
+            st::ArchDebugBase::operator=( std::move( rhs ) );
 
             this->m_particle_set_indices =
                 std::move( rhs.m_particle_set_indices );
@@ -1334,14 +1289,14 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_num_beam_elements_in_buffer =
                 std::move( rhs.m_num_beam_elements_in_buffer );
 
+            this->m_default_elem_by_elem_order = std::move(
+                rhs.m_default_elem_by_elem_order );
+
             this->m_total_num_particles =
                 std::move( rhs.m_total_num_particles );
 
             this->m_total_num_particles_in_sets =
                 std::move( rhs.m_total_num_particles_in_sets );
-
-            this->m_default_elem_by_elem_order = std::move(
-                rhs.m_default_elem_by_elem_order );
 
             this->m_min_particle_id = std::move( rhs.m_min_particle_id );
             this->m_max_particle_id = std::move( rhs.m_max_particle_id );
@@ -1371,7 +1326,6 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_has_particle_addresses =
                 std::move( rhs.m_has_particle_addresses );
 
-            this->m_in_debug_mode = std::move( rhs.m_in_debug_mode );
             this->m_requires_collect = std::move( rhs.m_requires_collect );
             this->m_uses_controller = std::move( rhs.m_uses_controller );
             this->m_uses_arguments = std::move( rhs.m_uses_arguments );
@@ -1395,13 +1349,6 @@ namespace SIXTRL_CXX_NAMESPACE
         return ( flags & st::TRACK_JOB_COLLECT_ALL );
     }
 
-    TrackJobBaseNew::status_t TrackJobBaseNew::doSetDebugFlagValue(
-        TrackJobBaseNew::debug_flag_t const flag_value )
-    {
-        this->m_debug_flag = flag_value;
-        return st::CONTROLLER_STATUS_SUCCESS;
-    }
-
     /* --------------------------------------------------------------------- */
 
     bool TrackJobBaseNew::doPrepareParticlesStructures(
@@ -1414,7 +1361,6 @@ namespace SIXTRL_CXX_NAMESPACE
         using p_index_t       = _this_t::particle_index_t;
         using buffer_t        = _this_t::buffer_t;
         using paddr_t         = _this_t::particles_addr_t;
-        using num_particles_t = _this_t::num_particles_t;
 
         SIXTRL_STATIC_VAR size_t const ZERO = size_t{ 0 };
         SIXTRL_STATIC_VAR size_t const ONE  = size_t{ 1 };
@@ -1749,7 +1695,6 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBaseNew::size_type const output_buffer_offset_index )
     {
         using size_t   = TrackJobBaseNew::size_type;
-        using config_t = TrackJobBaseNew::elem_by_elem_config_t;
         using pindex_t = TrackJobBaseNew::particle_index_t;
         using status_t = TrackJobBaseNew::status_t;
 
@@ -1780,11 +1725,11 @@ namespace SIXTRL_CXX_NAMESPACE
                     ::NS(Buffer_get_slot_size)( beam_elem_buffer ) );
 
                 status = NS(BeamMonitor_assign_output_buffer_from_offset_debug)(
-                    belements_buffer, output_buffer, min_turn_id,
+                    beam_elem_buffer, output_buffer, min_turn_id,
                         output_buffer_offset_index,
                             this->doGetPtrLocalDebugRegister() );
 
-                if( status == st::ARCH_STATUS_SUCCESS
+                if( status == st::ARCH_STATUS_SUCCESS )
                 {
                     status = ::NS(DebugReg_get_stored_arch_status)(
                         *this->doGetPtrLocalDebugRegister() );
@@ -1802,16 +1747,14 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    bool TrackJobBaseNew::doAssignOutputBuffertoElemByElemConfig(
+    bool TrackJobBaseNew::doAssignOutputBufferToElemByElemConfig(
         TrackJobBaseNew::elem_by_elem_config_t*
             SIXTRL_RESTRICT elem_by_elem_config,
         TrackJobBaseNew::c_buffer_t* SIXTRL_RESTRICT output_buffer,
         TrackJobBaseNew::size_type const output_buffer_offset_index )
     {
         using _this_t  = TrackJobBaseNew;
-        using size_t   = _this_t::size_type;
         using status_t = _this_t::status_t;
-        using debug_register_t = _this_t::debug_register_t;
 
         bool success = false;
 
@@ -1879,7 +1822,7 @@ namespace SIXTRL_CXX_NAMESPACE
                         until_turn_elem_by_elem );
 
             bool const requires_output_buffer =
-                ::NS(OutputBuffer_required_for_tracking)( out_buffer_flags );
+                ::NS(OutputBuffer_requires_output_buffer)( out_buffer_flags );
 
             if( requires_output_buffer )
             {
@@ -1893,7 +1836,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 if( ::NS(OutputBuffer_requires_elem_by_elem_output)(
                         out_buffer_flags ) )
                 {
-                    success &= this->doAssignOutputBuffertoElemByElemConfig(
+                    success &= this->doAssignOutputBufferToElemByElemConfig(
                         this->ptrElemByElemConfig(), this->ptrCOutputBuffer(),
                             this->elemByElemOutputBufferOffset() );
                 }
@@ -1902,7 +1845,9 @@ namespace SIXTRL_CXX_NAMESPACE
                         out_buffer_flags ) )
                 {
                     success &= this->doAssignOutputBufferToBeamMonitors(
-                        beam_elem_buffer, this->ptrCOutputBuffer() );
+                        beam_elem_buffer, this->ptrCOutputBuffer(),
+                        this->minInitialTurnId(),
+                        this->beamMonitorsOutputBufferOffset() );
                 }
             }
 
@@ -1956,7 +1901,7 @@ namespace SIXTRL_CXX_NAMESPACE
             if( ( ::NS(OutputBuffer_requires_elem_by_elem_output)( flags ) ) &&
                 ( this->hasElemByElemOutput() ) )
             {
-                success &= this->doAssignOutputBuffertoElemByElemConfig(
+                success &= this->doAssignOutputBufferToElemByElemConfig(
                     this->ptrElemByElemConfig(), this->ptrCOutputBuffer(),
                         this->elemByElemOutputBufferOffset() );
             }
@@ -1969,7 +1914,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     TrackJobBaseNew::status_t TrackJobBaseNew::doFetchParticleAddresses()
     {
-        return st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     TrackJobBaseNew::track_status_t
@@ -2160,7 +2105,7 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_num_particle_sets_in_buffer = num_psets;
     }
 
-    SIXTRL_HOST_FN void doSetNumBeamElementsInBuffer(
+    SIXTRL_HOST_FN void TrackJobBaseNew::doSetNumBeamElementsInBuffer(
         TrackJobBaseNew::size_type const num_belems ) SIXTRL_NOEXCEPT
     {
         this->m_num_beam_elements_in_buffer = num_belems;
@@ -2329,11 +2274,7 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
                     SIXTRACKLIB_ENABLE_MODULE_CUDA == 1
-                std::string const node_id_str =
-                    st::NodeId_extract_node_id_str_from_config_str( conf_str );
-
-                ptr_track_job = new st::CudaTrackJob( ( !node_id_str.empty() )
-                    ? node_id_str.c_str() : nullptr, conf_str );
+                ptr_track_job = new st::CudaTrackJob( conf_str );
                 #endif /* CUDA */
 
                 break;

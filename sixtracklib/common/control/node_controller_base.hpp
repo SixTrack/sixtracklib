@@ -315,7 +315,7 @@ namespace SIXTRL_CXX_NAMESPACE
         node_id_t const* m_ptr_selected_node_id;
 
         bool m_can_directly_change_selected_node;
-        bool m_node_change_requires_kernels
+        bool m_node_change_requires_kernels;
         bool m_can_unselect_node;
         bool m_use_autoselect;
     };
@@ -364,10 +364,10 @@ namespace SIXTRL_CXX_NAMESPACE
             : nullptr;
     }
 
-    SIXTRL_INLINE NodeControllerBase* asControllerOnNodes(
+    SIXTRL_INLINE NodeControllerBase* asNodeController(
         ControllerBase* SIXTRL_RESTRICT base_controller )
     {
-        NodeControllerBase const* cptr_base_ctrl = base_controller;
+        ControllerBase const* cptr_base_ctrl = base_controller;
 
         return const_cast< NodeControllerBase* >(
             asNodeController( cptr_base_ctrl ) );

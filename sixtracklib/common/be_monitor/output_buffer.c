@@ -429,7 +429,7 @@ NS(arch_status_t) NS(BeamMonitor_assign_output_buffer_from_offset_debug)(
     NS(buffer_size_t) const out_buffer_index_offset,
     SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register )
 {
-    return NS(BeamMonitor_assign_managed_output_buffer)(
+    return NS(BeamMonitor_assign_managed_output_buffer_debug)(
         NS(Buffer_get_data_begin)( belements_buffer ),
         NS(Buffer_get_data_begin)( out_buffer ),
         min_turn_id, out_buffer_index_offset,

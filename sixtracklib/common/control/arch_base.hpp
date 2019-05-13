@@ -109,12 +109,12 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual ~ArchDebugBase() = default;
 
         SIXTRL_HOST_FN bool isInDebugMode() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN bool enableDebugMode() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN bool disableDebugMode() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool enableDebugMode();
+        SIXTRL_HOST_FN bool disableDebugMode();
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN debug_register_t debugRegister() const;
+        SIXTRL_HOST_FN debug_register_t debugRegister();
 
         SIXTRL_HOST_FN status_t setDebugRegister(
             debug_register_t const debug_register );

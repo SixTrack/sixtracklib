@@ -957,7 +957,6 @@ NS(ElemByElemConfig_assign_managed_output_buffer_debug)(
     typedef NS(arch_status_t) status_t;
     typedef NS(buffer_size_t) buf_size_t;
     typedef NS(arch_debugging_t) debug_register_t;
-    typedef NS(elem_by_elem_out_addr_t) address_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)* ptr_particles_t;
 
     status_t status = NS(ElemByElemConfig_assign_managed_output_buffer)(
@@ -972,38 +971,38 @@ NS(ElemByElemConfig_assign_managed_output_buffer_debug)(
             ptr_particles_t particles = SIXTRL_NULLPTR;
 
             if( config == SIXTRL_NULLPTR ) /* 0x0000000100000000 */
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
             if( slot_size == ( buf_size_t )0u ) /* 0x0000000200000000 */
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
             if( output_buffer == SIXTRL_NULLPTR ) /* 0x0000000400000000 */
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
             /* 0x0000000800000000 */
-            if( ::NS(ManagedBuffer_needs_remapping)( output_buffer ) )
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+            if( NS(ManagedBuffer_needs_remapping)( output_buffer, slot_size ) )
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
-            if( ::NS(ElemByElemConfig_get_order)( config ) !=
+            if( NS(ElemByElemConfig_get_order)( config ) !=
                     NS(ELEM_BY_ELEM_ORDER_INVALID) ) /* 0x0000001000000000 */
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
-            if( ::NS(ManagedBuffer_get_num_objects)( output_buffer, slot_size )
+            if( NS(ManagedBuffer_get_num_objects)( output_buffer, slot_size )
                     > out_buffer_index_offset ) /* 0x0000002000000000 */
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
-            particles = ::NS(Particles_managed_buffer_get_particles)(
+            particles = NS(Particles_managed_buffer_get_particles)(
                     output_buffer, out_buffer_index_offset, slot_size );
 
             if( particles == SIXTRL_NULLPTR ) /* 0x0000004000000000 */
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
             if( NS(Particles_get_num_of_particles)( particles ) <
                 NS(ElemByElemConfig_get_out_store_num_particles)( config ) )
-                    dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                    dbg = NS(DebugReg_raise_next_error_flag)( dbg );
         }
 
-        *ptr_dbg_register = ::NS(DebugReg_store_arch_status)( dbg, status );
+        *ptr_dbg_register = NS(DebugReg_store_arch_status)( dbg, status );
     }
 
     return status;

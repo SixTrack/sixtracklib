@@ -40,11 +40,11 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    class TrackJobBaseNew : public SIXTRL_CXX_NAMESPACE::ArchBaseDebug
+    class TrackJobBaseNew : public SIXTRL_CXX_NAMESPACE::ArchDebugBase
     {
         private:
 
-        using _arch_base_t = SIXTRL_CXX_NAMESPACE::ArchBaseDebug;
+        using _arch_base_t = SIXTRL_CXX_NAMESPACE::ArchDebugBase;
 
         public:
 
@@ -242,7 +242,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN num_particles_t
         totalNumParticlesInParticleSets() const SIXTRL_NOEXCEPT;
 
-        SIXTR_HOST_FN size_type
+        SIXTRL_HOST_FN size_type
         totalNumOfAvailableParticleSets() const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
@@ -415,7 +415,7 @@ namespace SIXTRL_CXX_NAMESPACE
             particle_index_t const min_turn_id,
             size_type const output_buffer_offset_index );
 
-        SIXTRL_HOST_FN virtual bool doAssignOutputBuffertoElemByElemConfig(
+        SIXTRL_HOST_FN virtual bool doAssignOutputBufferToElemByElemConfig(
             elem_by_elem_config_t* SIXTRL_RESTRICT elem_by_elem_config,
             c_buffer_t* SIXTRL_RESTRICT output_buffer,
             size_type const output_buffer_offset_index );
@@ -954,31 +954,27 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             std::vector< size_t > temp_particle_set_indices( begin, end );
 
-            if( !this->temp_particle_set_indices.empty() )
+            if( !temp_particle_set_indices.empty() )
             {
-                std::sort( this->temp_particle_set_indices.begin(),
-                           this->temp_particle_set_indices.end() );
+                std::sort( temp_particle_set_indices.begin(),
+                           temp_particle_set_indices.end() );
 
-                this->temp_particle_set_indices.erase( std::unique(
-                    this->temp_particle_set_indices.begin(),
-                    this->temp_particle_set_indices.end() ),
-                    this->temp_particle_set_indices.end() );
+                temp_particle_set_indices.erase( std::unique(
+                    temp_particle_set_indices.begin(),
+                    temp_particle_set_indices.end() ),
+                    temp_particle_set_indices.end() );
             }
 
-            if( !this->m_temp_particle_set_indices.empty() )
+            if( !temp_particle_set_indices.empty() )
             {
-                size_t const max_num_psets =
-                    this->m_temp_particle_set_indices.size();
+                size_t const max_num_psets = temp_particle_set_indices.size();
 
                 this->m_particle_set_indices.reserve( max_num_psets );
                 this->m_particle_set_begin_offsets.reserve( max_num_psets );
                 this->m_particle_set_end_offsets.reserve( max_num_psets );
 
-                auto pset_index_it =
-                    this->m_temp_particle_set_indices.cbegin();
-
-                auto const pset_index_end =
-                    this->m_temp_particle_set_indices.cend();
+                auto pset_index_it = temp_particle_set_indices.cbegin();
+                auto const pset_index_end = temp_particle_set_indices.cend();
 
                 num_particles_t running_offset = num_particles_t{ 0 };
 

@@ -43,14 +43,14 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_ready_for_receive;
     }
 
-    bool ControllerBase::readyForRunningKernels() const SIXTRL_NOEXCEPT
+    bool ControllerBase::readyForRunningKernel() const SIXTRL_NOEXCEPT
     {
         return this->m_ready_for_running_kernels;
     }
 
     bool ControllerBase::readyForRemap() const SIXTRL_NOEXCEPT
     {
-        return ( ( this->readyForRunningKernels() ) &&
+        return ( ( this->readyForRunningKernel() ) &&
                  ( ( ( !this->isInDebugMode() ) &&
                      ( this->hasRemapCObjectBufferKernel() ) ) ||
                    ( ( this->isInDebugMode() ) &&
@@ -62,11 +62,9 @@ namespace SIXTRL_CXX_NAMESPACE
         const void *const SIXTRL_RESTRICT src_begin,
         ControllerBase::size_type const src_size )
     {
-        using size_t         = ControllerBase::size_type;
-        using status_t       = ControllerBase::status_t;
-        using debug_flag_t = ControllerBase::debug_flag_t;
-
-        status_t status = st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        using size_t    = ControllerBase::size_type;
+        using status_t  = ControllerBase::status_t;
+        status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( ( arg != nullptr ) &&
             ( this->readyForSend() ) && ( this->readyForRemap() ) &&
@@ -88,7 +86,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using status_t       = ControllerBase::status_t;
         using data_ptr_t     = void const*;
 
-        status_t status = st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         data_ptr_t   src_begin = ::NS(Buffer_get_const_data_begin)( source );
         size_t const src_size  = ::NS(Buffer_get_size)( source );
@@ -101,7 +99,7 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             status = this->doSend( arg, src_begin, src_size );
 
-            if( status == st::CONTROLLER_STATUS_SUCCESS )
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
                 status = this->doRemapCObjectsBuffer( arg, src_size );
             }
@@ -118,7 +116,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using status_t   = ControllerBase::status_t;
         using data_ptr_t = void const*;
 
-        status_t status = st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         data_ptr_t   src_begin = source.dataBegin< data_ptr_t >();
         size_t const src_size  = source.size();
@@ -131,9 +129,9 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             status = this->doSend( arg, src_begin, src_size );
 
-            if( status == st::CONTROLLER_STATUS_SUCCESS )
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
-                status = this->doRemapSentCObjectsBuffer( arg, src_size );
+                status = this->doRemapCObjectsBuffer( arg, src_size );
             }
         }
 
@@ -148,7 +146,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using size_t     = ControllerBase::size_type;
         using status_t   = ControllerBase::status_t;
 
-        status_t status = st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( ( src_arg != nullptr ) && ( this->readyForReceive() ) &&
             ( src_arg->size() > size_t{ 0 } ) &&
@@ -156,7 +154,7 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             status = this->doReceive( dest_begin, dest_capacity, src_arg );
 
-            if( ( status == st::CONTROLLER_STATUS_SUCCESS ) &&
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
                 ( src_arg->usesCObjectsBuffer() ) )
             {
                 unsigned char* managed_buffer_begin =
@@ -166,7 +164,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 if( ::NS(ManagedBuffer_remap)( managed_buffer_begin,
                         slot_size ) != 0 )
                 {
-                    status = st::CONTROLLER_STATUS_GENERAL_FAILURE;
+                    status = st::ARCH_STATUS_GENERAL_FAILURE;
                 }
             }
         }
@@ -183,7 +181,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using status_t   = ControllerBase::status_t;
         using data_ptr_t = void*;
 
-        status_t status = st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
         data_ptr_t dest_begin = ::NS(Buffer_get_data_begin)( destination );
         size_t const dest_capacity = ::NS(Buffer_get_capacity)( destination );
 
@@ -194,7 +192,7 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             status = this->doReceive( dest_begin, dest_capacity, src_arg );
 
-            if( status == st::CONTROLLER_STATUS_SUCCESS )
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
                 status = ::NS(Buffer_remap)( destination );
             }
@@ -211,7 +209,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using status_t   = ControllerBase::status_t;
         using data_ptr_t = void*;
 
-        status_t status = st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( ( src_arg != nullptr ) && ( this->readyForReceive() ) &&
             ( src_arg->usesCObjectsBuffer() ) &&
@@ -222,11 +220,11 @@ namespace SIXTRL_CXX_NAMESPACE
             status = this->doReceive( destination.dataBegin< data_ptr_t >(),
                                       destination.capacity(), src_arg );
 
-            if( status == st::CONTROLLER_STATUS_SUCCESS )
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
                 status = ( destination.remap() )
-                    ? st::CONTROLLER_STATUS_SUCCESS
-                    : st::CONTROLLER_STATUS_GENERAL_FAILURE;
+                    ? st::ARCH_STATUS_SUCCESS
+                    : st::ARCH_STATUS_GENERAL_FAILURE;
             }
         }
 
@@ -254,6 +252,14 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_remap_kernel_id;
     }
 
+    void ControllerBase::setRemapCObjectBufferKernelId(
+        ControllerBase::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
+    {
+        this->m_remap_kernel_id = kernel_id;
+    }
+
+
+
     bool
     ControllerBase::hasRemapCObjectBufferDebugKernel() const SIXTRL_NOEXCEPT
     {
@@ -264,6 +270,12 @@ namespace SIXTRL_CXX_NAMESPACE
     ControllerBase::remapCObjectBufferDebugKernelId() const SIXTRL_NOEXCEPT
     {
         return this->m_remap_debug_kernel_id;
+    }
+
+    void ControllerBase::setRemapCObjectBufferDebugKernelId(
+        ControllerBase::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
+    {
+        this->m_remap_debug_kernel_id = kernel_id;
     }
 
     /* --------------------------------------------------------------------- */
@@ -436,7 +448,7 @@ namespace SIXTRL_CXX_NAMESPACE
         ControllerBase::size_type const arg_size )
     {
         ControllerBase::status_t status =
-            st::CONTROLLER_STATUS_GENERAL_FAILURE;
+            st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( ( arg != nullptr ) && ( this->readyForRemap() ) )
         {
@@ -455,7 +467,7 @@ namespace SIXTRL_CXX_NAMESPACE
         ControllerBase::arch_id_t const arch_id,
         const char *const SIXTRL_RESTRICT arch_str,
         const char *const SIXTRL_RESTRICT config_str ) :
-        ArchBase( arch_id, arch_str, config_str ),
+        ArchDebugBase( arch_id, arch_str, config_str ),
             m_kernel_configs(),
             m_num_kernels( ControllerBase::size_type{ 0 } ),
             m_remap_kernel_id( ControllerBase::ILLEGAL_KERNEL_ID ),
@@ -482,21 +494,21 @@ namespace SIXTRL_CXX_NAMESPACE
         ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT,
         const void *const SIXTRL_RESTRICT, size_type const )
     {
-        return ControllerBase::st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     ControllerBase::status_t ControllerBase::doReceive( void* SIXTRL_RESTRICT,
         ControllerBase::size_type const,
         ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT )
     {
-        return ControllerBase::st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     ControllerBase::status_t ControllerBase::doRemapCObjectsBuffer(
         ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT,
         ControllerBase::size_type const )
     {
-        return ControllerBase::st::CONTROLLER_STATUS_GENERAL_FAILURE;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     bool ControllerBase::doSwitchDebugMode( bool const is_in_debug_mode )
@@ -514,12 +526,6 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* --------------------------------------------------------------------- */
-
-    void ControllerBase::doSetRemapCObjectBufferKernelId(
-        ControllerBase::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
-    {
-        this->m_remap_kernel_id = kernel_id;
-    }
 
     void ControllerBase::doSetUsesNodesFlag( bool const flag ) SIXTRL_NOEXCEPT
     {

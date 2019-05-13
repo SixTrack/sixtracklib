@@ -55,6 +55,17 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void setAssignOutputToBeamMonitorsKernelId(
             kernel_id_t const id ) SIXTRL_NOEXCEPT;
 
+        /* --------------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN bool
+        hasAssignOutputToElemByElemConfigKernel() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_id_t
+        assignOutputToElemByElemConfigKernelId() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void setAssignOutputToElemByElemConfigKernelId(
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
+
         /* ---------------------------------------------------------------- */
 
         SIXTRL_HOST_FN bool hasTrackUntilKernel() const SIXTRL_NOEXCEPT;
@@ -150,14 +161,14 @@ namespace SIXTRL_CXX_NAMESPACE
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN argument_base_t const*
-        ptrParticlesArg() const SIXTRL_NOEXCEPT;
+        ptrParticlesArgBase() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN argument_base_t* ptrParticlesArgBase() SIXTRL_NOEXCEPT;
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN argument_base_t const*
-        ptrBeamElementsArg() const SIXTRL_NOEXCEPT;
+        ptrBeamElementsArgBase() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN argument_base_t*
         ptrBeamElementsArgBase() SIXTRL_NOEXCEPT;
@@ -165,7 +176,7 @@ namespace SIXTRL_CXX_NAMESPACE
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN argument_base_t const*
-        ptrOutputArg() const SIXTRL_NOEXCEPT;
+        ptrOutputArgBase() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN argument_base_t*
         ptrOutputArgBase() SIXTRL_NOEXCEPT;

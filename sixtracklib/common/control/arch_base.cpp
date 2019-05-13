@@ -79,12 +79,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* ********************************************************************* */
 
-    bool ArchBaseDebug::isInDebugMode() const SIXTRL_NOEXCEPT
+    bool ArchDebugBase::isInDebugMode() const SIXTRL_NOEXCEPT
     {
         return this->m_debug_mode;
     }
 
-    bool ArchBaseDebug::enableDebugMode() const SIXTRL_NOEXCEPT
+    bool ArchDebugBase::enableDebugMode()
     {
         bool success = false;
 
@@ -100,13 +100,13 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    bool ArchBaseDebug::disableDebugMode() const SIXTRL_NOEXCEPT
+    bool ArchDebugBase::disableDebugMode()
     {
         bool success = false;
 
         if( this->isInDebugMode() )
         {
-            success = this->doSwitchDebugModeFlag( false );
+            success = this->doSwitchDebugMode( false );
         }
         else
         {
@@ -116,16 +116,16 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    bool ArchBaseDebug::doSwitchDebugMode( bool const is_in_debug_mode )
+    bool ArchDebugBase::doSwitchDebugMode( bool const is_in_debug_mode )
     {
         bool const old_debug_state = this->isInDebugMode();
-        this->doSetIsInDebugModeFlag( is_in_debug_mode );
+        this->doSetDebugModeFlag( is_in_debug_mode );
 
         return ( ( is_in_debug_mode == this->isInDebugMode() ) &&
                  ( is_in_debug_mode != old_debug_state ) );
     }
 
-    void ArchBaseDebug::doSetDebugModeFlag(
+    void ArchDebugBase::doSetDebugModeFlag(
         bool const debug_mode ) SIXTRL_NOEXCEPT
     {
         this->m_debug_mode = debug_mode;
@@ -133,26 +133,25 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    ArchBaseDebug::debug_register_t
-    ArchBaseDebug::debugRegister() const
+    ArchDebugBase::debug_register_t ArchDebugBase::debugRegister()
     {
-        ArchBaseDebug::status_t status = this->doFetchDebugRegister(
+        ArchDebugBase::status_t status = this->doFetchDebugRegister(
             this->doGetPtrLocalDebugRegister() );
 
         return ( status == st::ARCH_STATUS_SUCCESS )
             ? *this->doGetPtrLocalDebugRegister()
-            : st::SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE;
+            : st::ARCH_DEBUGGING_GENERAL_FAILURE;
     }
 
-    ArchBaseDebug::status_t ArchBaseDebug::setDebugRegister(
-        ArchBaseDebug::debug_register_t const debug_register )
+    ArchDebugBase::status_t ArchDebugBase::setDebugRegister(
+        ArchDebugBase::debug_register_t const debug_register )
     {
         return this->doSetDebugRegister( debug_register );
     }
 
-    ArchBaseDebug::status_t ArchBaseDebug::prepareDebugRegisterForUse()
+    ArchDebugBase::status_t ArchDebugBase::prepareDebugRegisterForUse()
     {
-        ArchBaseDebug::status_t const status = this->doSetDebugRegister(
+        ArchDebugBase::status_t const status = this->doSetDebugRegister(
             st::ARCH_DEBUGGING_REGISTER_EMPTY );
 
         SIXTRL_ASSERT( ( status != st::ARCH_STATUS_SUCCESS ) ||
@@ -163,9 +162,9 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
-    ArchBaseDebug::status_t ArchBaseDebug::evaluateDebugRegisterAfterUse()
+    ArchDebugBase::status_t ArchDebugBase::evaluateDebugRegisterAfterUse()
     {
-        ArchBaseDebug::status_t status = this->doFetchDebugRegister(
+        ArchDebugBase::status_t status = this->doFetchDebugRegister(
             this->doGetPtrLocalDebugRegister() );
 
         if( status == st::ARCH_STATUS_SUCCESS )
@@ -188,10 +187,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    ArchBaseDebug::status_t ArchBaseDebug::doSetDebugRegister(
-        ArchBaseDebug::debug_register_t const debug_register )
+    ArchDebugBase::status_t ArchDebugBase::doSetDebugRegister(
+        ArchDebugBase::debug_register_t const debug_register )
     {
-        ArchBaseDebug::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        ArchDebugBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( this->doGetPtrLocalDebugRegister() != nullptr )
         {
@@ -202,10 +201,10 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
-    ArchBaseDebug::status_t ArchBaseDebug::doFetchDebugRegister(
-        ArchBaseDebug::debug_register_t* SIXTRL_RESTRICT ptr_debug_register )
+    ArchDebugBase::status_t ArchDebugBase::doFetchDebugRegister(
+        ArchDebugBase::debug_register_t* SIXTRL_RESTRICT ptr_debug_register )
     {
-        ArchBaseDebug::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        ArchDebugBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( ptr_debug_register != nullptr )
         {
@@ -220,14 +219,14 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
-    ArchBaseDebug::debug_register_t const*
-    ArchBaseDebug::doGetPtrLocalDebugRegister() const SIXTRL_NOEXCEPT
+    ArchDebugBase::debug_register_t const*
+    ArchDebugBase::doGetPtrLocalDebugRegister() const SIXTRL_NOEXCEPT
     {
         return &this->m_local_debug_register;
     }
 
-    ArchBaseDebug::debug_register_t*
-    ArchBaseDebug::doGetPtrLocalDebugFlag() SIXTRL_NOEXCEPT
+    ArchDebugBase::debug_register_t*
+    ArchDebugBase::doGetPtrLocalDebugRegister() SIXTRL_NOEXCEPT
     {
         return &this->m_local_debug_register;
     }

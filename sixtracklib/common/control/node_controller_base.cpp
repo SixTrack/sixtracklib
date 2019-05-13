@@ -483,7 +483,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_can_unselect_node;
     }
 
-    bool NodeControllerBase::unselectNode() const SIXTRL_NOEXCEPT
+    bool NodeControllerBase::unselectNode()
     {
         return this->doUnselectNode( this->selectedNodeIndex() );
     }

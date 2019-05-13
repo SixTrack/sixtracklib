@@ -20,7 +20,7 @@
         #include "sixtracklib/common/output/output_buffer.h"
         #include "sixtracklib/common/output/elem_by_elem_config.h"
         #include "sixtracklib/common/control/controller_base.hpp"
-        #include "sixtracklib/common/control/controller_on_nodes_base.hpp"
+        #include "sixtracklib/common/control/node_controller_base.hpp"
         #include "sixtracklib/common/control/argument_base.hpp"
         #include "sixtracklib/common/track/definitions.h"
         #include "sixtracklib/common/track/track_job_base.hpp"
@@ -175,6 +175,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_stored_particles_arg( nullptr ),
         m_stored_beam_elements_arg( nullptr ),
         m_stored_output_arg( nullptr ),
+        m_stored_elem_by_elem_conf_arg( nullptr ),
+        m_stored_particles_addr_arg( nullptr ),
         m_stored_debug_flag_arg( nullptr ),
         m_assign_output_bemon_kernel_id(
             st::ControllerBase::ILLEGAL_KERNEL_ID ),
@@ -197,6 +199,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_stored_particles_arg( nullptr ),
         m_stored_beam_elements_arg( nullptr ),
         m_stored_output_arg( nullptr ),
+        m_stored_elem_by_elem_conf_arg( nullptr ),
+        m_stored_particles_addr_arg( nullptr ),
         m_stored_debug_flag_arg( nullptr ),
         m_assign_output_bemon_kernel_id(
             other.m_assign_output_bemon_kernel_id ),
@@ -225,6 +229,10 @@ namespace SIXTRL_CXX_NAMESPACE
         m_stored_beam_elements_arg(
             std::move( other.m_stored_beam_elements_arg ) ),
         m_stored_output_arg( std::move( other.m_stored_output_arg ) ),
+        m_stored_elem_by_elem_conf_arg(
+            std::move( other.m_stored_elem_by_elem_conf_arg ) ),
+        m_stored_particles_addr_arg(
+            std::move( other.m_stored_particles_addr_arg ) ),
         m_stored_debug_flag_arg(
             std::move( other.m_stored_debug_flag_arg ) ),
         m_assign_output_bemon_kernel_id( std::move(
@@ -251,6 +259,8 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_stored_particles_arg.reset( nullptr );
             this->m_stored_beam_elements_arg.reset( nullptr );
             this->m_stored_output_arg.reset( nullptr );
+            this->m_stored_elem_by_elem_conf_arg.reset( nullptr );
+            this->m_stored_particles_addr_arg.reset( nullptr );
             this->m_stored_debug_flag_arg.reset( nullptr );
 
             this->m_assign_output_bemon_kernel_id =
@@ -288,6 +298,12 @@ namespace SIXTRL_CXX_NAMESPACE
                 std::move( rhs.m_stored_beam_elements_arg );
 
             this->m_stored_output_arg = std::move( rhs.m_stored_output_arg );
+
+            this->m_stored_elem_by_elem_conf_arg =
+                std::move( rhs.m_stored_elem_by_elem_conf_arg );
+
+            this->m_stored_particles_addr_arg =
+                std::move( rhs.m_stored_particles_addr_arg );
 
             this->m_stored_debug_flag_arg =
                 std::move( rhs.m_stored_debug_flag_arg );
@@ -376,32 +392,33 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         if( ( _base_t::IsCollectFlagSet(
-                flags, st::TRACK_JOB_COLLECT_DEBUG_FLAG ) ) &&
+                flags, st::TRACK_JOB_COLLECT_DEBUG_REGISTER ) ) &&
             ( this->ptrDebugRegisterArgBase() != nullptr ) &&
             ( this->ptrDebugRegisterArgBase()->usesRawArgument() ) &&
-            ( this->doGetPtrLastDebugRegister() != nullptr ) )
+            ( this->doGetPtrLocalDebugRegister() != nullptr ) )
         {
-            using debug_flag_t = _base_t::debug_flag_t;
+            using debug_register_t = _base_t::debug_register_t;
 
             status_t const status = this->ptrDebugRegisterArgBase()->receive(
-                this->doGetPtrLastDebugRegister(), sizeof( debug_flag_t ) );
+                this->doGetPtrLocalDebugRegister(),
+                    sizeof( debug_register_t ) );
 
             if( status == st::ARCH_STATUS_SUCCESS )
             {
-                result |= st::TRACK_JOB_COLLECT_DEBUG_FLAG;
+                result |= st::TRACK_JOB_COLLECT_DEBUG_REGISTER;
             }
         }
 
         if( ( _base_t::IsCollectFlagSet(
                 flags, st::TRACK_JOB_COLLECT_PARTICLES_ADDR ) ) &&
             ( this->ptrParticlesArgBase() != nullptr ) &&
-            ( this->ptrParticlesArgBase()->usesCxxObjectsBuffer() ) &&
+            ( this->ptrParticlesArgBase()->usesCObjectsCxxBuffer() ) &&
             ( this->doGetPtrParticlesAddrBuffer() != nullptr ) &&
             ( this->doGetPtrParticlesAddrBuffer() ==
               this->ptrParticlesArgBase()->ptrCObjectsCxxBuffer() ) )
         {
             status_t const status = this->ptrParticlesArgBase()->receive(
-                this->ptrCObjectsCxxBuffer() );
+                *this->ptrParticlesArgBase()->ptrCObjectsCxxBuffer() );
 
             if( status == st::ARCH_STATUS_SUCCESS )
             {
@@ -417,19 +434,18 @@ namespace SIXTRL_CXX_NAMESPACE
     bool TrackJobCtrlArgBase::doSwitchDebugMode( bool const is_in_debug_mode )
     {
         using _base_t = st::TrackJobBaseNew;
-        using _this_t = st::TrackJobCtrlArgBase;
 
         bool success = true;
 
-        if( this->ptrBaseController() != nullptr )
+        if( this->ptrControllerBase() != nullptr )
         {
             if( is_in_debug_mode )
             {
-                success = this->ptrBaseController()->enableDebugMode();
+                success = this->ptrControllerBase()->enableDebugMode();
             }
             else
             {
-                success = this->ptrBaseController()->disableDebugMode();
+                success = this->ptrControllerBase()->disableDebugMode();
             }
         }
 
@@ -454,7 +470,7 @@ namespace SIXTRL_CXX_NAMESPACE
         ptr_ctrl_t ptr_ctrl_base = this->ptrControllerBase();
 
         if( ( ptr_debug_register_arg != nullptr ) &&
-            ( ptr_debug_register_arg->ptrBaseController() == ptr_ctrl_base ) &&
+            ( ptr_debug_register_arg->ptrControllerBase() == ptr_ctrl_base ) &&
             ( ptr_debug_register_arg->usesRawArgument() ) &&
             ( this->doGetPtrLocalDebugRegister() != nullptr ) &&
             ( ptr_debug_register_arg->ptrRawArgument() ==
@@ -489,7 +505,7 @@ namespace SIXTRL_CXX_NAMESPACE
         ptr_ctrl_t ptr_ctrl_base = this->ptrControllerBase();
 
         if( ( ptr_debug_register_arg != nullptr ) &&
-            ( ptr_debug_register_arg->ptrBaseController() == ptr_ctrl_base ) &&
+            ( ptr_debug_register_arg->ptrControllerBase() == ptr_ctrl_base ) &&
             ( ptr_debug_register_arg->usesRawArgument() ) &&
             ( this->doGetPtrLocalDebugRegister() != nullptr ) &&
             ( ptr_debug_register_arg->ptrRawArgument() ==
@@ -539,7 +555,7 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     TrackJobCtrlArgBase::argument_base_t const*
-    TrackJobCtrlArgBase::ptrParticlesArg() const SIXTRL_NOEXCEPT
+    TrackJobCtrlArgBase::ptrParticlesArgBase() const SIXTRL_NOEXCEPT
     {
         return this->m_stored_particles_arg.get();
     }
@@ -553,7 +569,7 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     TrackJobCtrlArgBase::argument_base_t const*
-    TrackJobCtrlArgBase::ptrBeamElementsArg() const SIXTRL_NOEXCEPT
+    TrackJobCtrlArgBase::ptrBeamElementsArgBase() const SIXTRL_NOEXCEPT
     {
         return this->m_stored_beam_elements_arg.get();
     }
@@ -567,7 +583,7 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     TrackJobCtrlArgBase::argument_base_t const*
-    TrackJobCtrlArgBase::ptrOutputArg() const SIXTRL_NOEXCEPT
+    TrackJobCtrlArgBase::ptrOutputArgBase() const SIXTRL_NOEXCEPT
     {
         return this->m_stored_output_arg.get();
     }
@@ -576,6 +592,34 @@ namespace SIXTRL_CXX_NAMESPACE
     TrackJobCtrlArgBase::ptrOutputArgBase() SIXTRL_NOEXCEPT
     {
         return this->m_stored_output_arg.get();
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    TrackJobCtrlArgBase::argument_base_t const*
+    TrackJobCtrlArgBase::ptrElemByElemConfigArgBase() const SIXTRL_NOEXCEPT
+    {
+        return this->m_stored_elem_by_elem_conf_arg.get();
+    }
+
+    TrackJobCtrlArgBase::argument_base_t*
+    TrackJobCtrlArgBase::ptrElemByElemConfigArgBase() SIXTRL_NOEXCEPT
+    {
+        return this->m_stored_elem_by_elem_conf_arg.get();
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    TrackJobCtrlArgBase::argument_base_t const*
+    TrackJobCtrlArgBase::ptrParticlesAddrArgBase() const SIXTRL_NOEXCEPT
+    {
+        return this->m_stored_particles_addr_arg.get();
+    }
+
+    TrackJobCtrlArgBase::argument_base_t*
+    TrackJobCtrlArgBase::ptrParticlesAddrArgBase() SIXTRL_NOEXCEPT
+    {
+        return this->m_stored_particles_addr_arg.get();
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -622,6 +666,22 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_stored_output_arg = std::move( ptr_output_arg );
     }
 
+    void TrackJobCtrlArgBase::doUpdateStoredElemByElemConfigArg(
+        TrackJobCtrlArgBase::stored_arg_base_t&&
+            ptr_elem_by_elem_conf_arg ) SIXTRL_NOEXCEPT
+    {
+        this->m_stored_elem_by_elem_conf_arg =
+            std::move( ptr_elem_by_elem_conf_arg );
+    }
+
+    void TrackJobCtrlArgBase::doUpdateStoredParticlesAddrArg(
+        TrackJobCtrlArgBase::stored_arg_base_t&&
+            ptr_particles_addr_arg ) SIXTRL_NOEXCEPT
+    {
+        this->m_stored_particles_addr_arg =
+            std::move( ptr_particles_addr_arg );
+    }
+
     void TrackJobCtrlArgBase::doUpdateStoredDebugRegisterArg(
         TrackJobCtrlArgBase::stored_arg_base_t&&
             ptr_debug_flag_arg ) SIXTRL_NOEXCEPT
@@ -648,6 +708,8 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_stored_particles_arg.reset( nullptr );
         this->m_stored_beam_elements_arg.reset( nullptr );
         this->m_stored_output_arg.reset( nullptr );
+        this->m_stored_elem_by_elem_conf_arg.reset( nullptr );
+        this->m_stored_particles_addr_arg.reset( nullptr );
         this->m_stored_debug_flag_arg.reset( nullptr );
         this->m_stored_controller.reset( nullptr );
 

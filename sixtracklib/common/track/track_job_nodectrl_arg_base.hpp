@@ -15,6 +15,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/control/controller_base.hpp"
+    #include "sixtracklib/common/control/node_controller_base.hpp"
     #include "sixtracklib/common/control/argument_base.hpp"
     #include "sixtracklib/common/track/definitions.h"
     #include "sixtracklib/common/track/track_job_base.hpp"
@@ -44,7 +45,7 @@ namespace SIXTRL_CXX_NAMESPACE
         public:
 
         using node_controller_base_t =
-            SIXTRL_CXX_NAMESPACE::ControllerOnNodeBase;
+            SIXTRL_CXX_NAMESPACE::NodeControllerBase;
 
         using kernel_id_t           = controller_base_t::kernel_id_t;
         using kernel_config_base_t  = controller_base_t::kernel_config_base_t;
@@ -67,17 +68,17 @@ namespace SIXTRL_CXX_NAMESPACE
             arch_id_t const arch_id, char const* SIXTRL_RESTRICT arch_str,
             char const* SIXTRL_RESTRICT config_str = nullptr );
 
-        SIXTRL_HOST_FN TrackJobCtrlArgBase(
-            TrackJobCtrlArgBase const& other ) = default;
+        SIXTRL_HOST_FN TrackJobNodeCtrlArgBase(
+            TrackJobNodeCtrlArgBase const& other ) = default;
 
-        SIXTRL_HOST_FN TrackJobCtrlArgBase(
-            TrackJobCtrlArgBase&& other ) = default;
+        SIXTRL_HOST_FN TrackJobNodeCtrlArgBase(
+            TrackJobNodeCtrlArgBase&& other ) = default;
 
-        SIXTRL_HOST_FN TrackJobCtrlArgBase& operator=(
-            TrackJobCtrlArgBase const& rhs ) = default;
+        SIXTRL_HOST_FN TrackJobNodeCtrlArgBase& operator=(
+            TrackJobNodeCtrlArgBase const& rhs ) = default;
 
-        SIXTRL_HOST_FN TrackJobCtrlArgBase& operator=(
-            TrackJobCtrlArgBase&& rhs )  = default;
+        SIXTRL_HOST_FN TrackJobNodeCtrlArgBase& operator=(
+            TrackJobNodeCtrlArgBase&& rhs )  = default;
 
         /* ----------------------------------------------------------------- */
 

@@ -100,6 +100,14 @@ NS(BeamMonitor_assign_output_buffer_from_offset)(
     NS(buffer_size_t) const out_buffer_index_offset );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(BeamMonitor_assign_output_buffer_from_offset_debug)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
+    NS(particle_index_t) const min_turn_id,
+    NS(buffer_size_t) const out_buffer_index_offset,
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_reg );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(BeamMonitor_setup_for_particles_all)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
@@ -363,38 +371,38 @@ NS(BeamMonitor_assign_managed_output_buffer_debug)(
         NS(BeamMonitor_assign_managed_output_buffer)( beam_elements,
             output_buffer, min_turn_id, out_buffer_index_offset, slot_size );
 
-    if( ptr_dbg_register != SIXTRL_NULLPTR )
+    if( ptr_debug_register != SIXTRL_NULLPTR )
     {
         debug_register_t dbg = ( debug_register_t )0u;
 
         if( status != SIXTRL_ARCH_STATUS_SUCCESS )
         {
             if( slot_size == ( NS(buffer_size_t) )0u )
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
             if( beam_elements == SIXTRL_NULLPTR )
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
             if( NS(ManagedBuffer_needs_remapping)( beam_elements, slot_size ) )
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
             if( output_buffer == SIXTRL_NULLPTR )
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
             if( NS(ManagedBuffer_needs_remapping)( output_buffer, slot_size ) )
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
             if( min_turn_id < ( NS(particle_index_t) )0 )
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
 
             if( NS(ManagedBuffer_get_num_objects)( output_buffer, slot_size ) <
                     out_buffer_index_offset )
             {
-                dbg = ::NS(DebugReg_raise_next_error_flag)( dbg );
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
             }
         }
 
-        *ptr_debug_register = ::NS(DebugReg_store_arch_status)( dbg, status );
+        *ptr_debug_register = NS(DebugReg_store_arch_status)( dbg, status );
     }
 
     return status;

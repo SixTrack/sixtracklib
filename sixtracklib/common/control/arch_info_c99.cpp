@@ -116,7 +116,7 @@ NS(ctrl_status_t) NS(ArchInfo_sanitize_arch_str_inplace)(
     char* SIXTRL_RESTRICT arch_str,
     ::NS(buffer_size_t) const arch_str_capacity )
 {
-     NS(ctrl_status_t) success = ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+     NS(ctrl_status_t) success = ::NS(ARCH_STATUS_GENERAL_FAILURE);
 
     if( ( arch_str != nullptr ) &&
         ( std::strlen( arch_str ) < arch_str_capacity ) )
@@ -127,7 +127,7 @@ NS(ctrl_status_t) NS(ArchInfo_sanitize_arch_str_inplace)(
         {
             std::memset( arch_str, ( int )'\0', arch_str_capacity );
             std::strncpy( arch_str, str.c_str(), str.size() );
-            success = ::NS(CONTROLLER_STATUS_SUCCESS);
+            success = ::NS(ARCH_STATUS_SUCCESS);
         }
     }
 
@@ -141,7 +141,7 @@ NS(ctrl_status_t) NS(ArchInfo_sanitize_arch_str)(
 {
     using buf_size_t = ::NS(buffer_size_t);
 
-    NS(ctrl_status_t) success = ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+    NS(ctrl_status_t) success = ::NS(ARCH_STATUS_GENERAL_FAILURE);
 
     if( ( arch_str != nullptr ) && ( sanarch_str != nullptr ) &&
         ( sanarch_str_capacity > buf_size_t{ 1 } ) )
@@ -152,7 +152,7 @@ NS(ctrl_status_t) NS(ArchInfo_sanitize_arch_str)(
         {
             std::memset( sanarch_str, ( int )'\0', sanarch_str_capacity );
             std::strncpy( sanarch_str, str.c_str(), str.size() );
-            success = ::NS(CONTROLLER_STATUS_SUCCESS);
+            success = ::NS(ARCH_STATUS_SUCCESS);
         }
     }
 

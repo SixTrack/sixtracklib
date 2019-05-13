@@ -183,7 +183,7 @@ void NS(NodeId_print)( ::FILE* SIXTRL_RESTRICT output,
     char const* SIXTRL_RESTRICT config_str, char* SIXTRL_RESTRICT node_id_str,
     ::NS(buffer_size_t) const node_id_str_capacity )
 {
-    int success = ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+    int success = ::NS(ARCH_STATUS_GENERAL_FAILURE);
     using buf_size_t = ::NS(buffer_size_t);
 
     if( ( config_str != nullptr ) && ( node_id_str != nullptr ) &&
@@ -199,12 +199,12 @@ void NS(NodeId_print)( ::FILE* SIXTRL_RESTRICT output,
             if( str.size() < node_id_str_capacity )
             {
                 std::strncpy( node_id_str, str.c_str(), str.size() );
-                success = ::NS(CONTROLLER_STATUS_SUCCESS);
+                success = ::NS(ARCH_STATUS_SUCCESS);
             }
         }
         else
         {
-            success = ::NS(CONTROLLER_STATUS_SUCCESS);
+            success = ::NS(ARCH_STATUS_SUCCESS);
         }
     }
     else if( ( config_str != nullptr ) &&
@@ -216,7 +216,7 @@ void NS(NodeId_print)( ::FILE* SIXTRL_RESTRICT output,
             std::memset( node_id_str, ( int )'\0', node_id_str_capacity );
         }
 
-        success = ::NS(CONTROLLER_STATUS_SUCCESS);
+        success = ::NS(ARCH_STATUS_SUCCESS);
     }
 
     return success;

@@ -10,12 +10,12 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/common/control/debug_register.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/buffer_object_defines.h"
     #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
-    #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/particles/definitions.h"
     #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -528,7 +528,6 @@ SIXTRL_INLINE NS(arch_status_t) NS(Particles_managed_buffer_store_addresses)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     NS(buffer_size_t) const index, NS(buffer_size_t) const slot_size )
 {
-    typedef NS(buffer_size_t) buf_size_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Particles) const* ptr_particles_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesAddr)* ptr_paddr_t;
 
@@ -537,7 +536,7 @@ SIXTRL_INLINE NS(arch_status_t) NS(Particles_managed_buffer_store_addresses)(
     ptr_paddr_t ptr_paddr = NS(ParticlesAddr_managed_buffer_get_particle_addr)(
         paddr_buffer, index, slot_size );
 
-    if( ptr_addr != SIXTRL_NULLPTR )
+    if( ptr_paddr != SIXTRL_NULLPTR )
     {
         ptr_particles_t p = NS(Particles_managed_buffer_get_const_particles)(
             pbuffer, index, slot_size );
@@ -568,8 +567,8 @@ NS(Particles_managed_buffer_store_addresses_debug)(
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesAddr)* ptr_paddr_t;
 
     NS(arch_status_t) const status =
-        NS(Particles_managed_buffer_store_addresses)(
-            pbuffer, paddr_buffer, slot_size );
+    NS(Particles_managed_buffer_store_addresses)(
+            pbuffer, paddr_buffer, index, slot_size );
 
     if( ptr_dbg_register != SIXTRL_NULLPTR )
     {
@@ -608,7 +607,7 @@ NS(Particles_managed_buffer_store_addresses_debug)(
             ptr_paddr = NS(ParticlesAddr_managed_buffer_get_particle_addr)(
                 paddr_buffer, index, slot_size );
 
-            if( ptr_addr != SIXTRL_NULLPTR )
+            if( ptr_paddr != SIXTRL_NULLPTR )
             {
                 ptr_particles_t p =
                     NS(Particles_managed_buffer_get_const_particles)(
@@ -622,8 +621,6 @@ NS(Particles_managed_buffer_store_addresses_debug)(
                 {
                     NS(ParticlesAddr_preset)( ptr_paddr );
                 }
-
-                status = SIXTRL_ARCH_STATUS_SUCCESS;
             }
             else
             {
@@ -638,7 +635,7 @@ NS(Particles_managed_buffer_store_addresses_debug)(
 }
 
 SIXTRL_INLINE NS(arch_status_t)
-NS(Particles_buffer_store_all_addresses_managed_buffer)(
+NS(Particles_managed_buffer_store_all_addresses)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     NS(buffer_size_t) const slot_size )
@@ -668,7 +665,7 @@ NS(Particles_buffer_store_all_addresses_managed_buffer)(
 }
 
 SIXTRL_INLINE NS(arch_status_t)
-NS(Particles_buffer_store_all_addresses_managed_buffer_debug)(
+NS(Particles_managed_buffer_store_all_addresses_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     NS(buffer_size_t) const slot_size,

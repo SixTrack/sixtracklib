@@ -36,20 +36,21 @@ char const* NS(KernelConfig_get_ptr_arch_string)(
 bool NS(KernelConfig_has_kernel_id)(
     const ::NS(KernelConfigBase) *const SIXTRL_RESTRICT conf )
 {
-    return ( ( conf != nullptr ) && ( config->hasKernelId() ) );
+    return ( ( conf != nullptr ) && ( conf->hasKernelId() ) );
 }
 
 NS(ctrl_kernel_id_t) NS(KernelConfig_get_kernel_id)(
     const ::NS(KernelConfigBase) *const SIXTRL_RESTRICT conf )
 {
     return ( conf != nullptr )
-        ? conf->kernelId() : ::NS(CONTROLER_ILLEGAL_KERNEL_ID);
+        ? conf->kernelId() : ::NS(ARCH_ILLEGAL_KERNEL_ID);
 }
 
-void NS(KernelConfig_set_kernel_id( ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
+void NS(KernelConfig_set_kernel_id)(
+    ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     NS(ctrl_kernel_id_t) const kernel_id )
 {
-    if( conf != nullptr ) conf->setKerneId( kernel_id );
+    if( conf != nullptr ) conf->setKernelId( kernel_id );
 }
 
 /* ------------------------------------------------------------------------- */
@@ -63,7 +64,7 @@ bool NS(KernelConfig_has_name)(
 char const* NS(KernelConfig_get_ptr_name_string)(
     const ::NS(KernelConfigBase) *const SIXTRL_RESTRICT conf )
 {
-    return ( conf != nullptr ) ? conf->ptrName() : nullptr;
+    return ( conf != nullptr ) ? conf->ptrNameStr() : nullptr;
 }
 
 void NS(KernelConfig_set_name)( ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
@@ -74,7 +75,7 @@ void NS(KernelConfig_set_name)( ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
 
 /* ------------------------------------------------------------------------- */
 
-::::NS(ctrl_size_t) NS(KernelConfig_get_num_arguments)(
+::NS(ctrl_size_t) NS(KernelConfig_get_num_arguments)(
     const ::NS(KernelConfigBase) *const SIXTRL_RESTRICT conf )
 {
     return ( conf != nullptr ) ? conf->numArguments() : ::NS(ctrl_size_t){ 0 };
@@ -156,7 +157,7 @@ bool NS(KernelConfig_set_num_work_items_2d)(
 bool NS(KernelConfig_set_num_work_items_3d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_items_a, ::NS(ctrl_size_t) const work_items_b,
-    ::NS(ctrl_size_t) const work_item_c )
+    ::NS(ctrl_size_t) const work_items_c )
 {
     return ( ( conf != nullptr ) && ( conf->setNumWorkItems(
         work_items_a, work_items_b, work_items_c ) ) );
@@ -168,7 +169,7 @@ bool NS(KernelConfig_set_num_work_items)(
     ::NS(ctrl_size_t) const* SIXTRL_RESTRICT work_itms_begin )
 {
     return ( ( conf != nullptr ) &&
-             ( conf->setNumWorkItems( work_items_dim, work_items_begin ) ) );
+             ( conf->setNumWorkItems( work_items_dim, work_itms_begin ) ) );
 }
 
 /* ------------------------------------------------------------------------- */
@@ -187,7 +188,7 @@ bool NS(KernelConfig_set_num_work_items)(
     return ( conf != nullptr ) ? conf->workItemOffsetsBegin() : nullptr;
 }
 
-::NS(ctrl_size_t) const* NS(KernelConfig_work_item_offsets_end)(
+::NS(ctrl_size_t) const* NS(KernelConfig_get_const_work_item_offsets_end)(
     const ::NS(KernelConfigBase) *const SIXTRL_RESTRICT conf )
 {
     return ( conf != nullptr ) ? conf->workItemOffsetsEnd() : nullptr;
@@ -214,7 +215,7 @@ bool NS(KernelConfig_set_work_item_offset_1d)(
     return ( ( conf != nullptr ) && ( conf->setWorkItemOffset( offset_a ) ) );
 }
 
-bool NS(KernelConfig_set_work_item_offset_2d(
+bool NS(KernelConfig_set_work_item_offset_2d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const offset_a,
     ::NS(ctrl_size_t) const offset_b )
@@ -289,7 +290,7 @@ bool NS(KernelConfig_set_work_group_sizes_1d)(
     ::NS(ctrl_size_t) const work_groups_a )
 {
     return ( ( conf != nullptr ) &&
-             ( conf->setWorkGroupSizes( work_groups_a ) );
+             ( conf->setWorkGroupSizes( work_groups_a ) ) );
 }
 
 bool NS(KernelConfig_set_work_group_sizes_2d)(
@@ -298,7 +299,7 @@ bool NS(KernelConfig_set_work_group_sizes_2d)(
     ::NS(ctrl_size_t) const work_groups_b )
 {
     return ( ( conf != nullptr ) &&
-             ( conf->setWorkGroupSizes( work_groups_a, work_groups_b ) );
+             ( conf->setWorkGroupSizes( work_groups_a, work_groups_b ) ) );
 }
 
 bool NS(KernelConfig_set_work_group_sizes_3d)(
@@ -323,7 +324,7 @@ bool NS(KernelConfig_set_work_group_sizes)(
 /* ------------------------------------------------------------------------- */
 
 ::NS(ctrl_size_t) NS(KernelConfig_get_preferred_work_group_multiple_by_dim)(
-    const ::NS(KernelConfigBase) *const SIXTRL_RESTRICT conf );
+    const ::NS(KernelConfigBase) *const SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const index )
 {
     return ( conf != nullptr )
@@ -370,7 +371,7 @@ bool NS(KernelConfig_set_preferred_work_group_multiple_1d)(
         ( conf->setPreferredWorkGroupMultiple( work_groups_a ) ) );
 }
 
-bool NS(KernelConfig_set_preferred_work_group_multiple_1d)(
+bool NS(KernelConfig_set_preferred_work_group_multiple_2d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_groups_a,
     ::NS(ctrl_size_t) const work_groups_b )
@@ -379,7 +380,7 @@ bool NS(KernelConfig_set_preferred_work_group_multiple_1d)(
                work_groups_a, work_groups_b ) ) );
 }
 
-bool NS(KernelConfig_set_preferred_work_group_multiple_1d)(
+bool NS(KernelConfig_set_preferred_work_group_multiple_3d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_groups_a,
     ::NS(ctrl_size_t) const work_groups_b,
@@ -390,7 +391,7 @@ bool NS(KernelConfig_set_preferred_work_group_multiple_1d)(
                 work_groups_a, work_groups_b, work_groups_c ) ) );
 }
 
-bool NS(KernelConfig_set_preferred_work_group_multiple_1d)(
+bool NS(KernelConfig_set_preferred_work_group_multiple)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_groups_dim,
     ::NS(ctrl_size_t) const* SIXTRL_RESTRICT pref_work_groups_multiple )
@@ -437,7 +438,7 @@ void NS(KernelConfig_print)(
 void NS(KernelConfig_print_out)(
     const ::NS(KernelConfigBase) *const SIXTRL_RESTRICT conf )
 {
-    if( conf != nullptr ) conf->print();
+    if( conf != nullptr ) conf->printOut();
 }
 
 #endif /* C++, Host */

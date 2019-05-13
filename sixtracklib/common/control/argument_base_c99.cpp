@@ -153,13 +153,13 @@ bool NS(Argument_requires_argument_buffer)(
 ::NS(ControllerBase)* NS(Argument_get_ptr_base_controller)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg )
 {
-    return ( arg != nullptr ) ? arg->ptrBaseController() : nullptr;
+    return ( arg != nullptr ) ? arg->ptrControllerBase() : nullptr;
 }
 
 ::NS(ControllerBase) const* NS(Argument_get_const_ptr_base_controller)(
     const ::NS(ArgumentBase) *const SIXTRL_RESTRICT arg )
 {
-    return ( arg != nullptr ) ? arg->ptrBaseController() : nullptr;
+    return ( arg != nullptr ) ? arg->ptrControllerBase() : nullptr;
 }
 
 #endif /* C++, Host */

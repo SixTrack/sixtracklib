@@ -35,6 +35,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         public:
 
+        using status_t    = SIXTRL_CXX_NAMESPACE::arch_status_t;
         using buffer_t    = SIXTRL_CXX_NAMESPACE::Buffer;
         using c_buffer_t  = buffer_t::c_api_t;
 
@@ -49,28 +50,27 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual ~ArgumentBase() = default;
 
-        SIXTRL_HOST_FN NS(status_t) send();
-        SIXTRL_HOST_FN NS(status_t) send(
-            buffer_t const& SIXTRL_RESTRICT_REF buffer );
+        SIXTRL_HOST_FN status_t send();
+        SIXTRL_HOST_FN status_t send( buffer_t const& SIXTRL_RESTRICT_REF buf );
 
-        SIXTRL_HOST_FN NS(status_t) send(
+        SIXTRL_HOST_FN status_t send(
             const c_buffer_t *const SIXTRL_RESTRICT ptr_c_buffer );
 
-        SIXTRL_HOST_FN NS(status_t) send( void const* SIXTRL_RESTRICT arg_begin,
+        SIXTRL_HOST_FN status_t send( void const* SIXTRL_RESTRICT arg_begin,
             size_type const arg_size );
 
 
-        SIXTRL_HOST_FN NS(status_t) receive();
-        SIXTRL_HOST_FN NS(status_t) receive(
+        SIXTRL_HOST_FN status_t receive();
+        SIXTRL_HOST_FN status_t receive(
             buffer_t& SIXTRL_RESTRICT_REF buffer );
 
-        SIXTRL_HOST_FN NS(status_t) receive(
+        SIXTRL_HOST_FN status_t receive(
             c_buffer_t* SIXTRL_RESTRICT ptr_c_buffer );
 
-        SIXTRL_HOST_FN NS(status_t) receive( void* SIXTRL_RESTRICT arg_begin,
+        SIXTRL_HOST_FN status_t receive( void* SIXTRL_RESTRICT arg_begin,
             size_type const arg_capacity );
 
-        SIXTRL_HOST_FN NS(status_t) remap();
+        SIXTRL_HOST_FN status_t remap();
 
         SIXTRL_HOST_FN bool usesCObjectsCxxBuffer() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN buffer_t* ptrCObjectsCxxBuffer() const SIXTRL_NOEXCEPT;
@@ -90,10 +90,10 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN bool requiresArgumentBuffer() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN ptr_base_controller_t
-        ptrBaseController() SIXTRL_NOEXCEPT;
+        ptrControllerBase() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN ptr_const_base_controller_t
-        ptrBaseController() const SIXTRL_NOEXCEPT;
+        ptrControllerBase() const SIXTRL_NOEXCEPT;
 
         template< class Derived > SIXTRL_HOST_FN Derived const*
         asDerivedArgument( arch_id_t const required_arch_id,

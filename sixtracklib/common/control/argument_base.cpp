@@ -49,7 +49,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
 
         status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
-        ptr_base_controller_t ptr_controller = this->ptrBaseController();
+        ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ptr_controller != nullptr )
         {
@@ -115,7 +115,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
 
         status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
-        ptr_base_controller_t ptr_controller = this->ptrBaseController();
+        ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ptr_controller != nullptr )
         {
@@ -182,7 +182,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
 
         status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
-        ptr_base_controller_t ptr_controller = this->ptrBaseController();
+        ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ( ptr_controller != nullptr ) && ( raw_arg_begin != nullptr ) &&
             ( raw_arg_len > size_t{ 0 } ) )
@@ -275,7 +275,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
 
         status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
-        ptr_base_controller_t ptr_controller = this->ptrBaseController();
+        ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ( ptr_controller != nullptr ) && ( this->usesCObjectsBuffer() ) )
         {
@@ -293,7 +293,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
 
         status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
-        ptr_base_controller_t ptr_controller = this->ptrBaseController();
+        ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ( ptr_controller != nullptr ) && ( this->usesCObjectsBuffer() ) )
         {
@@ -311,7 +311,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
 
         status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
-        ptr_base_controller_t ptr_controller = this->ptrBaseController();
+        ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ( ptr_controller != nullptr ) &&
             ( raw_arg_capacity >= this->size() ) )
@@ -323,13 +323,13 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    ArgumentBase::NS(status_t) ArgumentBase::remap()
+    ArgumentBase::status_t ArgumentBase::remap()
     {
         using status_t = ArgumentBase::status_t;
         using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
 
         status_t status = ArgumentBase::STATUS_GENERAL_FAILURE;
-        ptr_base_controller_t ptr_controller = this->ptrBaseController();
+        ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ( ptr_controller != nullptr ) &&
             ( ( this->usesCObjectsBuffer() ) ||
@@ -423,13 +423,13 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     ArgumentBase::ptr_base_controller_t
-    ArgumentBase::ptrBaseController() SIXTRL_NOEXCEPT
+    ArgumentBase::ptrControllerBase() SIXTRL_NOEXCEPT
     {
         return this->m_ptr_base_controller;
     }
 
     ArgumentBase::ptr_const_base_controller_t
-    ArgumentBase::ptrBaseController() const SIXTRL_NOEXCEPT
+    ArgumentBase::ptrControllerBase() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_base_controller;
     }

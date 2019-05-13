@@ -44,7 +44,7 @@ SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
     NS(TRACK_JOB_COLLECT_OUTPUT) = ( NS(track_job_collect_flag_t) )0x04;
 
 SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
-    NS(TRACK_JOB_COLLECT_DEBUG_FLAG) = ( NS(track_job_collect_flag_t) )0x08;
+    NS(TRACK_JOB_COLLECT_DEBUG_REGISTER) = ( NS(track_job_collect_flag_t) )0x08;
 
 SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
     NS(TRACK_JOB_COLLECT_PARTICLES_ADDR) =
@@ -101,7 +101,7 @@ namespace SIXTRL_CXX_NAMESPACE
         TRACK_JOB_COLLECT_OUTPUT = track_job_collect_flag_t{ 0x0004 };
 
     SIXTRL_STATIC_VAR track_job_collect_flag_t const
-        TRACK_JOB_COLLECT_DEBUG_FLAG = track_job_collect_flag_t{ 0x0008 };
+        TRACK_JOB_COLLECT_DEBUG_REGISTER = track_job_collect_flag_t{ 0x0008 };
 
     SIXTRL_STATIC_VAR track_job_collect_flag_t const
         TRACK_JOB_COLLECT_PARTICLES_ADDR = track_job_collect_flag_t{ 0x0010 };
