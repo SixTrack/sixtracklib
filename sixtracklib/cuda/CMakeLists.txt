@@ -38,8 +38,7 @@ add_subdirectory( track )
 
 set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
      wrappers/controller_wrappers.h
-     wrappers/track_job_wrappers.cu
-     wrappers/track_particles.h
+     wrappers/track_job_wrappers.h
      cuda_tools.h
      track_particles_kernel_c_wrapper.h
 )
@@ -47,7 +46,6 @@ set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
 set( SIXTRACKLIB_CUDA_PART_HOST_SOURCES
      wrappers/controller_wrappers.cu
      wrappers/track_job_wrappers.cu
-     wrappers/track_particles.cu
      internal/track_particles_kernel_c_wrapper.cu
 )
 
@@ -113,21 +111,17 @@ list( APPEND SIXTRACKL_CUDA_DEVICE_DEFINITIONS ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 set( SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS
      cuda_tools.h
      kernels/be_monitors_assign_out_buffer.cuh
-     kernels/extract_particles_addr_kernels.cuh
-
+     kernels/elem_by_elem_assign_out_buffer.cuh
+     kernels/extract_particles_addr.cuh
      kernels/managed_buffer_remap.cuh
-     kernels/managed_buffer_remap_kernel.cuh
-     kernels/track_particles_kernel.cuh
      kernels/track_particles.cuh
 )
 
 set( SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES
      kernels/be_monitors_assign_out_buffer.cu
-     kernels/extract_particles_addr_kernels.cu
-
+     kernels/elem_by_elem_assign_out_buffer.cu
+     kernels/extract_particles_addr.cu
      kernels/managed_buffer_remap.cu
-     kernels/managed_buffer_remap_kernel.cu
-     kernels/track_particles_kernel.cu
      kernels/track_particles.cu
 )
 
