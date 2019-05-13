@@ -33,7 +33,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         using arch_id_t   = _arch_base_t::arch_id_t;
         using size_type   = _arch_base_t::size_type;
-        using kernel_id_t = SIXTRL_CXX_NAMESPACE::controller_kernel_id_t;
+        using kernel_id_t = SIXTRL_CXX_NAMESPACE::arch_kernel_id_t;
 
         static constexpr size_type MAX_WORK_ITEMS_DIM  = size_type{ 3 };
         static constexpr size_type MAX_WORK_GROUPS_DIM = size_type{ 3 };
@@ -42,7 +42,7 @@ namespace SIXTRL_CXX_NAMESPACE
         static constexpr size_type DEFAULT_WORK_GROUPS_DIM = size_type{ 1 };
 
         static constexpr kernel_id_t ILLEGAL_KERNEL_ID =
-            SIXTRL_CXX_NAMESPACE::CONTROLER_ILLEGAL_KERNEL_ID;
+            SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_KERNEL_ID;
 
         SIXTRL_HOST_FN explicit KernelConfigBase(
             arch_id_t const arch_id,

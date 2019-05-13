@@ -17,7 +17,7 @@ extern "C" {
 #endif /* C++, Host */
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_debugging_t) NS(DebugReg_store_arch_status)(
-    NS(arch_debugging_t debugging_register,
+    NS(arch_debugging_t) debugging_register,
     NS(arch_status_t) const status_flags_to_add );
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(DebugReg_get_stored_arch_status)(
@@ -53,20 +53,20 @@ NS(DebugReg_raise_next_error_flag)( NS(arch_debugging_t) debugging_register );
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(arch_debugging_t) NS(DebugReg_store_arch_status)(
-    NS(arch_debugging_t debugging_register,
+    NS(arch_debugging_t) debugging_register,
     NS(arch_status_t) const status_flags_to_add )
 {
-    NS(arch_debugging_t) flags_bitmask = ( arch_debugging_t)0u;
+    NS(arch_debugging_t) flags_bitmask = ( NS(arch_debugging_t) )0u;
 
-    if( status_flags_to_add >= ( arch_status_t )0 )
+    if( status_flags_to_add >= ( NS(arch_status_t) )0 )
     {
-        flags_bitmask = ( arch_debugging_t)status_flags_to_add;
+        flags_bitmask = ( NS(arch_debugging_t) )status_flags_to_add;
     }
     else
     {
-        arch_debugging_t flags_bitmask = -status_flags_to_add;
+        NS(arch_debugging_t) flags_bitmask = -status_flags_to_add;
         flags_bitmask = ~( flags_bitmask );
-        flags_bitmask += ( arch_debugging_t )1u;
+        flags_bitmask += ( NS(arch_debugging_t) )1u;
     }
 
     debugging_register &= ~( SIXTRL_ARCH_DEBUGGING_STATUS_BITMASK );
@@ -128,7 +128,7 @@ SIXTRL_INLINE NS(arch_debugging_t) NS(DebugReg_get_highest_set_flag)(
     debugging_register |= ( debugging_register >> 16 );
     debugging_register |= ( debugging_register >> 32 );
 
-    return debuging_register ^ ( debugging_register >> 1 );
+    return debugging_register ^ ( debugging_register >> 1 );
 }
 
 SIXTRL_INLINE NS(arch_debugging_t) NS(DebugReg_get_next_error_flag)(

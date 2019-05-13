@@ -173,8 +173,9 @@ SIXTRL_STATIC_VAR NS(arch_debugging_t) const
     NS(ARCH_DEBUGGING_STATUS_BITMASK) =
         ( NS(arch_debugging_t) )SIXTRL_ARCH_DEBUGGING_STATUS_BITMASK;
 
-SIXTRL_STATIC_VAR NS(arch_debugging_t) const NS(ARCH_DEBUGGING_STATUS_MAX_FLAG)
-    ( NS(arch_debugging_t) )SIXTRL_ARCH_DEBUGGING_STATUS_MAX_FLAG;
+SIXTRL_STATIC_VAR NS(arch_debugging_t) const
+    NS(ARCH_DEBUGGING_STATUS_MAX_FLAG) = ( NS(arch_debugging_t)
+        )SIXTRL_ARCH_DEBUGGING_STATUS_MAX_FLAG;
 
 SIXTRL_STATIC_VAR NS(arch_debugging_t) const
     NS(ARCH_DEBUGGING_GENERAL_FAILURE) =
@@ -212,6 +213,7 @@ namespace SIXTRL_CXX_NAMESPACE
     typedef ::NS(arch_id_t)           arch_id_t;
     typedef ::NS(arch_size_t)         arch_size_t;
     typedef ::NS(arch_debugging_t)    arch_debugging_t;
+    typedef ::NS(arch_kernel_id_t)    arch_kernel_id_t;
 
     typedef ::NS(node_platform_id_t)  node_platform_id_t;
     typedef ::NS(node_device_id_t)    node_device_id_t;

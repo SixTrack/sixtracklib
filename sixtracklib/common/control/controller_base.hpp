@@ -34,16 +34,16 @@ namespace SIXTRL_CXX_NAMESPACE
 {
     class ArgumentBase;
 
-    class ControllerBase : public SIXTRL_CXX_NAMESPACE::ArchBaseDebug
+    class ControllerBase : public SIXTRL_CXX_NAMESPACE::ArchDebugBase
     {
         private:
 
-        using _base_arch_obj_t = SIXTRL_CXX_NAMESPACE::ArchBaseDebug;
+        using _base_arch_obj_t = SIXTRL_CXX_NAMESPACE::ArchDebugBase;
 
         public:
 
         using arch_id_t            = _base_arch_obj_t::arch_id_t;
-        using status_t             = _base_arch_obj_t::arch_status_t;
+        using status_t             = _base_arch_obj_t::status_t;
         using debug_register_t     = _base_arch_obj_t::debug_register_t;
         using buffer_t             = SIXTRL_CXX_NAMESPACE::Buffer;
 
