@@ -292,4 +292,4 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(KernelConfig_print_out)(
 #endif /* C++, Host */
 
 #endif /* SIXTRACKLIB_COMMON_CONTROL_KERNEL_CONFIG_BASE_C99_H__ */
-/* end: sixtracklib/common/control/arch_base.h */
+/* end: sixtracklib/common/control/kernel_config_base.h */

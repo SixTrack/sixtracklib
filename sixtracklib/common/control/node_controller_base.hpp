@@ -333,21 +333,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
 extern "C" {
 
-typedef SIXTRL_CXX_NAMESPACE::NodeControllerBase NS(NodeControllerBase);
-
-typedef SIXTRL_CXX_NAMESPACE::NodeControllerBase::node_id_t NS(node_id_t);
-
-typedef SIXTRL_CXX_NAMESPACE::NodeControllerBase::node_info_base_t
-        NS(node_info_base_t);
-
+    typedef SIXTRL_CXX_NAMESPACE::NodeControllerBase NS(NodeControllerBase);
 }
 
 #else /* C++, Host */
 
-typedef void NS(ContextNodeBase);
-
-typedef NS(NodeId)              NS(node_id_t);
-typedef NS(ComputeNodeInfo)     NS(node_info_base_t);
+typedef void NS(NodeControllerBase);
 
 #endif /* C++, Host */
 

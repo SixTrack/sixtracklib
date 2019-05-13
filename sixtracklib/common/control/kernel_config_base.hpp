@@ -370,4 +370,5 @@ namespace SIXTRL_CXX_NAMESPACE
 #endif /* C++, Host */
 
 #endif /* SIXTRACKLIB_COMMON_CONTROL_KERNEL_CONFIG_BASE_HPP_ */
+
 /* end: sixtracklib/common/control/kernel_config_base.hpp */
