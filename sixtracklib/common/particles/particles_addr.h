@@ -9,6 +9,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/buffer_object_defines.h"
     #include "sixtracklib/common/internal/particles_defines.h"
@@ -122,28 +123,31 @@ NS(ParticlesAddr_managed_buffer_get_particle_addr)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_FN int NS(Particles_managed_buffer_store_addresses)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
+NS(Particles_managed_buffer_store_addresses)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     NS(buffer_size_t) const index, NS(buffer_size_t) const slot_size );
 
-SIXTRL_STATIC SIXTRL_FN int NS(Particles_managed_buffer_store_addresses_debug)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
+NS(Particles_managed_buffer_store_addresses_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     NS(buffer_size_t) const index, NS(buffer_size_t) const slot_size,
-    SIXTRL_DATAPTR_DEC NS(ctrl_debug_flag_t)* SIXTRL_RESTRICT ptr_debug_flag );
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_debug_flag );
 
-SIXTRL_STATIC SIXTRL_FN int NS(Particles_managed_buffer_store_all_addresses)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
+NS(Particles_managed_buffer_store_all_addresses)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_STATIC SIXTRL_FN int
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(Particles_managed_buffer_store_all_addresses_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     NS(buffer_size_t) const slot_size,
-    SIXTRL_DATAPTR_DEC NS(ctrl_debug_flag_t)* SIXTRL_RESTRICT ptr_error_flag );
+    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_error_flag );
 
 #if !defined( _GPUCODE )
 
@@ -519,7 +523,7 @@ NS(ParticlesAddr_managed_buffer_get_particle_addr)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE int NS(Particles_managed_buffer_store_addresses)(
+SIXTRL_INLINE NS(arch_status_t) NS(Particles_managed_buffer_store_addresses)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     NS(buffer_size_t) const index, NS(buffer_size_t) const slot_size )
@@ -553,103 +557,93 @@ SIXTRL_INLINE int NS(Particles_managed_buffer_store_addresses)(
     return success;
 }
 
-SIXTRL_INLINE int NS(Particles_managed_buffer_store_addresses_debug)(
+SIXTRL_INLINE NS(arch_status_t)
+NS(Particles_managed_buffer_store_addresses_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     NS(buffer_size_t) const index, NS(buffer_size_t) const slot_size,
-    SIXTRL_DATAPTR_DEC NS(ctrl_debug_flag_t)* SIXTRL_RESTRICT ptr_debug_flag )
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register )
 {
-    typedef NS(buffer_size_t) buf_size_t;
-    typedef NS(ctrl_debug_flag_t) debug_flag_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Particles) const* ptr_particles_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesAddr)* ptr_paddr_t;
 
-    int success = -1;
+    NS(arch_status_t) const status =
+        NS(Particles_managed_buffer_store_addresses)(
+            pbuffer, paddr_buffer, slot_size );
 
-    debug_flag_t debug_flag = NS(CONTROLLER_DEBUG_FLAG_OK);
-
-    ptr_paddr_t ptr_paddr = SIXTRL_NULLPTR;
-
-    if( slot_size == ( buf_size_t )0u )
+    if( ptr_dbg_register != SIXTRL_NULLPTR )
     {
-        debug_flag |= ( debug_flag_t )0x0001;
-    }
+        NS(arch_debugging_t) dbg = SIXTRL_ARCH_DEBUGGING_REGISTER_EMPTY;
 
-    if( pbuffer == SIXTRL_NULLPTR )
-    {
-        debug_flag |= ( debug_flag_t )0x0002;
-    }
-
-    if( paddr_buffer == SIXTRL_NULLPTR )
-    {
-        debug_flag |= ( debug_flag_t )0x0004;
-    }
-
-    if( NS(ManagedBuffer_needs_remapping)( pbuffer, slot_size ) )
-    {
-        debug_flag |= ( debug_flag_t )0x0008;
-    }
-
-    if( NS(ManagedBuffer_needs_remapping)( paddr_buffer, slot_size ) )
-    {
-        debug_flag |= ( debug_flag_t )0x0010;
-    }
-
-    if( NS(ManagedBuffer_get_num_objects)( pbuffer, slot_size ) == 0u )
-    {
-        debug_flag |= ( debug_flag_t )0x0020;
-    }
-
-    if( NS(ManagedBuffer_get_num_objects)( pbuffer, slot_size ) !=
-        NS(ManagedBuffer_get_num_objects)( paddr_buffer, slot_size ) )
-    {
-        debug_flag |= ( debug_flag_t )0x0040;
-    }
-
-    if( NS(ManagedBuffer_get_num_objects)( paddr_buffer, slot_size ) <= index )
-    {
-        debug_flag |= ( debug_flag_t )0x0080;
-    }
-
-    ptr_paddr = NS(ParticlesAddr_managed_buffer_get_particle_addr)(
-        paddr_buffer, index, slot_size );
-
-    if( ptr_addr != SIXTRL_NULLPTR )
-    {
-        ptr_particles_t p = NS(Particles_managed_buffer_get_const_particles)(
-            pbuffer, index, slot_size );
-
-        if( p != SIXTRL_NULLPTR )
+        if( status != SIXTRL_ARCH_STATUS_SUCCESS )
         {
-            NS(ParticlesAddr_assign_from_particles)( ptr_paddr, p );
+            ptr_paddr_t ptr_paddr = SIXTRL_NULLPTR;
+
+            if( slot_size == ( NS(buffer_size_t) )0u )
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( pbuffer == SIXTRL_NULLPTR )
+                    dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( paddr_buffer == SIXTRL_NULLPTR )
+                    dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( NS(ManagedBuffer_needs_remapping)( pbuffer, slot_size ) )
+                    dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( NS(ManagedBuffer_needs_remapping)( paddr_buffer, slot_size ) )
+                    dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( NS(ManagedBuffer_get_num_objects)( pbuffer, slot_size ) == 0u )
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( NS(ManagedBuffer_get_num_objects)( pbuffer, slot_size ) !=
+                NS(ManagedBuffer_get_num_objects)( paddr_buffer, slot_size ) )
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( NS(ManagedBuffer_get_num_objects)(
+                    paddr_buffer, slot_size ) <= index )
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            ptr_paddr = NS(ParticlesAddr_managed_buffer_get_particle_addr)(
+                paddr_buffer, index, slot_size );
+
+            if( ptr_addr != SIXTRL_NULLPTR )
+            {
+                ptr_particles_t p =
+                    NS(Particles_managed_buffer_get_const_particles)(
+                        pbuffer, index, slot_size );
+
+                if( p != SIXTRL_NULLPTR )
+                {
+                    NS(ParticlesAddr_assign_from_particles)( ptr_paddr, p );
+                }
+                else
+                {
+                    NS(ParticlesAddr_preset)( ptr_paddr );
+                }
+
+                status = SIXTRL_ARCH_STATUS_SUCCESS;
+            }
+            else
+            {
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+            }
         }
-        else
-        {
-            NS(ParticlesAddr_preset)( ptr_paddr );
-        }
 
-        success = 0;
-    }
-    else
-    {
-        debug_flag |= ( debug_flag_t )0x0100;
+        *ptr_dbg_register = NS(DebugReg_store_arch_status)( dbg, status );
     }
 
-    if( ( debug_flag != NS(CONTROLLER_DEBUG_FLAG_OK) ) &&
-        ( ptr_debug_flag != SIXTRL_NULLPTR ) )
-    {
-        *ptr_debug_flag |= debug_flag;
-    }
-
-    return success;
+    return status;
 }
 
-SIXTRL_INLINE int NS(Particles_buffer_store_all_addresses_managed_buffer)(
+SIXTRL_INLINE NS(arch_status_t)
+NS(Particles_buffer_store_all_addresses_managed_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     NS(buffer_size_t) const slot_size )
 {
-    int success = -1;
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
     typedef NS(buffer_size_t) buf_size_t;
 
@@ -663,23 +657,24 @@ SIXTRL_INLINE int NS(Particles_buffer_store_all_addresses_managed_buffer)(
 
         for( ; ii < num_objects ; ++ii )
         {
-            success = NS(Particles_managed_buffer_store_addresses)(
+            status = NS(Particles_managed_buffer_store_addresses)(
                 pbuffer, paddr_buffer, ii, slot_size );
 
-            if( success != 0 ) break;
+            if( status != SIXTRL_ARCH_STATUS_GENERAL_FAILURE ) break;
         }
     }
 
-    return success;
+    return status;
 }
 
-SIXTRL_INLINE int NS(Particles_buffer_store_all_addresses_managed_buffer_debug)(
+SIXTRL_INLINE NS(arch_status_t)
+NS(Particles_buffer_store_all_addresses_managed_buffer_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     NS(buffer_size_t) const slot_size,
-    SIXTRL_ARGPTR_DEC NS(ctrl_debug_flag_t)* SIXTRL_RESTRICT ptr_debug_flag )
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_debug_flag )
 {
-    int success = -1;
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
     typedef NS(buffer_size_t) buf_size_t;
 
@@ -693,14 +688,14 @@ SIXTRL_INLINE int NS(Particles_buffer_store_all_addresses_managed_buffer_debug)(
 
         for( ; ii < num_objects ; ++ii )
         {
-            success = NS(Particles_managed_buffer_store_addresses_debug)(
+            status = NS(Particles_managed_buffer_store_addresses_debug)(
                 pbuffer, paddr_buffer, ii, slot_size, ptr_debug_flag );
 
-            if( success != 0 ) break;
+            if( status != SIXTRL_ARCH_STATUS_SUCCESS ) break;
         }
     }
 
-    return success;
+    return status;
 }
 
 #if !defined( _GPUCODE )
