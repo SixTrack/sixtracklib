@@ -44,14 +44,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual ~TrackJobCtrlArgBase() = default;
 
-        /* ---------------------------------------------------------------- */
-
-        SIXTRL_HOST_FN status_t resetDebugFlag(
-            debug_flag_t const debug_flag_value = debug_flag_t{ 0 } );
-
-        SIXTRL_HOST_FN status_t prepareDebugFlagForUse();
-        SIXTRL_HOST_FN status_t evaluateDebugFlagAfterUse();
-
         /* ================================================================ */
 
         SIXTRL_HOST_FN bool
@@ -131,6 +123,15 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual collect_flag_t doCollect(
             collect_flag_t const flags ) override;
 
+        SIXTRL_HOST_FN virtual bool doSwitchDebugMode(
+            bool const is_in_debug_mode ) override;
+
+        SIXTRL_HOST_FN virtual status_t doSetDebugRegister(
+            debug_register_t const debug_register ) override;
+
+        SIXTRL_HOST_FN virtual status_t doFetchDebugRegister(
+            debug_register_t* SIXTRL_RESTRICT ptr_debug_register ) override;
+
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN virtual bool doPrepareController(
@@ -188,10 +189,10 @@ namespace SIXTRL_CXX_NAMESPACE
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN argument_base_t const*
-        ptrDebugFlagArgBase() const SIXTRL_NOEXCEPT;
+        ptrDebugRegisterArgBase() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN argument_base_t*
-        ptrDebugFlagArgBase() SIXTRL_NOEXCEPT;
+        ptrDebugRegisterArgBase() SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -215,7 +216,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doUpdateStoredParticlesAddrArg(
             stored_arg_base_t&& ptr_particles_addr_arg ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void doUpdateStoredDebugFlagArg(
+        SIXTRL_HOST_FN void doUpdateStoredDebugRegisterArg(
             stored_arg_base_t&& ptr_debug_flag_arg ) SIXTRL_NOEXCEPT;
 
         private:
@@ -232,6 +233,7 @@ namespace SIXTRL_CXX_NAMESPACE
         stored_arg_base_t       m_stored_debug_flag_arg;
 
         kernel_id_t             m_assign_output_bemon_kernel_id;
+        kernel_id_t             m_assign_output_elem_by_elem_kernel_id;
         kernel_id_t             m_track_until_kernel_id;
         kernel_id_t             m_track_line_kernel_id;
         kernel_id_t             m_track_elem_by_elem_kernel_id;

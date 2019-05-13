@@ -34,62 +34,6 @@ namespace st = SIXTRL_CXX_NAMESPACE;
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    TrackJobCtrlArgBase::status_t
-    TrackJobCtrlArgBase::resetDebugFlag(
-        TrackJobCtrlArgBase::debug_flag_t const flag_value );
-    {
-        using status_t = TrackJobCtrlArgBase::status_t;
-        using debug_flag_t = TrackJobCtrlArgBase::debug_flag_t;
-        using size_t = TrackJobCtrlArgBase::size_type;
-
-        status_t status = st::CONTROLLER_STATUS_GENERAL_FAILURE;
-        size_t const flag_size = sizeof( debug_flag_t );
-
-        if( ( this->doGetPtrLastDebugFlag() != nullptr ) &&
-            ( this->ptrDebugFlagArgBase() != nullptr ) &&
-            ( this->ptrDebugFlagArgBase()->usesRawArgument() ) &&
-            ( this->ptrDebugFlagArgBase()->size() == flag_size ) )
-        {
-            this->doSetLastDebugFlag( flag_value );
-
-            status = this->ptrDebugFlagArgBase()->send(
-                this->doGetPtrLastDebugFlag(), flag_size );
-        }
-
-        return status;
-    }
-
-    TrackJobCtrlArgBase::status_t
-    TrackJobCtrlArgBase::prepareDebugFlagForUse()
-    {
-        using debug_flag_t = TrackJobCtrlArgBase::debug_flag_t;
-        using status_t = TrackJobCtrlArgBase::status_t;
-
-        status_t status = this->resetDebugFlag(
-            ::NS(CONTROLLER_DEBUG_FLAG_NOT_OK) );
-
-        if( ( status == st::CONTROLLER_STATUS_SUCCESS ) &&
-            ( this->lastDebugFlag() != flag ) )
-        {
-            status = st::CONTROLLER_STATUS_GENERAL_FAILURE;
-        }
-
-        return status;
-    }
-
-    TrackJobCtrlArgBase::status_t
-    TrackJobCtrlArgBase::evaluateDebugFlagAfterUse()
-    {
-        using debug_flag_t = TrackJobCtrlArgBase::debug_flag_t;
-
-        return ( ( this->collectDebugFlag() ) ||
-                 ( this->lastDebugFlag() == ::NS(CONTROLLER_DEBUG_FLAG_OK) ) )
-            ? st::CONTROLLER_STATUS_SUCCESS
-            : st::CONTROLLER_STATUS_GENERAL_FAILURE;
-    }
-
-    /* --------------------------------------------------------------------- */
-
     bool TrackJobCtrlArgBase::hasAssignOutputToBeamMonitorsKernel(
         ) const SIXTRL_NOEXCEPT
     {
@@ -109,6 +53,29 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
     {
         this->m_assign_output_bemon_kernel_id = id;
+    }
+
+    /* --------------------------------------------------------------------- */
+
+    bool TrackJobCtrlArgBase::hasAssignOutputToElemByElemConfigKernel(
+        ) const SIXTRL_NOEXCEPT
+    {
+        using base_ctrl_t = TrackJobCtrlArgBase::controller_base_t;
+        return ( base_ctrl_t::ILLEGAL_KERNEL_ID ==
+            this->m_assign_output_elem_by_elem_kernel_id );
+    }
+
+    TrackJobCtrlArgBase::kernel_id_t
+    TrackJobCtrlArgBase::assignOutputToElemByElemConfigKernelId(
+        ) const SIXTRL_NOEXCEPT
+    {
+        return this->m_assign_output_elem_by_elem_kernel_id;
+    }
+
+    void TrackJobCtrlArgBase::setAssignOutputToElemByElemConfigKernelId(
+        TrackJobCtrlArgBase::kernel_id_t const id ) SIXTRL_NOEXCEPT
+    {
+        this->m_assign_output_elem_by_elem_kernel_id = id;
     }
 
     /* --------------------------------------------------------------------- */
@@ -211,6 +178,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_stored_debug_flag_arg( nullptr ),
         m_assign_output_bemon_kernel_id(
             st::ControllerBase::ILLEGAL_KERNEL_ID ),
+        m_assign_output_elem_by_elem_kernel_id(
+            st::ControllerBase::ILLEGAL_KERNEL_ID ),
         m_track_until_kernel_id( st::ControllerBase::ILLEGAL_KERNEL_ID ),
         m_track_line_kernel_id( st::ControllerBase::ILLEGAL_KERNEL_ID ),
         m_track_elem_by_elem_kernel_id(
@@ -231,6 +200,8 @@ namespace SIXTRL_CXX_NAMESPACE
         m_stored_debug_flag_arg( nullptr ),
         m_assign_output_bemon_kernel_id(
             other.m_assign_output_bemon_kernel_id ),
+        m_assign_output_elem_by_elem_kernel_id(
+            other.m_assign_output_elem_by_elem_kernel_id ),
         m_track_until_kernel_id( other.m_track_until_kernel_id ),
         m_track_line_kernel_id( other.m_track_line_kernel_id ),
         m_track_elem_by_elem_kernel_id( other.m_track_elem_by_elem_kernel_id ),
@@ -258,6 +229,8 @@ namespace SIXTRL_CXX_NAMESPACE
             std::move( other.m_stored_debug_flag_arg ) ),
         m_assign_output_bemon_kernel_id( std::move(
             other.m_assign_output_bemon_kernel_id ) ),
+        m_assign_output_elem_by_elem_kernel_id( std::move(
+            other.m_assign_output_elem_by_elem_kernel_id ) ),
         m_track_until_kernel_id( std::move( other.m_track_until_kernel_id ) ),
         m_track_line_kernel_id( std::move( other.m_track_line_kernel_id ) ),
         m_track_elem_by_elem_kernel_id( std::move(
@@ -282,6 +255,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->m_assign_output_bemon_kernel_id =
                 rhs.m_assign_output_bemon_kernel_id;
+
+            this->m_assign_output_elem_by_elem_kernel_id =
+                rhs.m_assign_output_elem_by_elem_kernel_id;
 
             this->m_track_until_kernel_id = rhs.m_track_until_kernel_id;
             this->m_track_line_kernel_id  = rhs.m_track_line_kernel_id;
@@ -318,6 +294,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->m_assign_output_bemon_kernel_id =
                 std::move( rhs.m_assign_output_bemon_kernel_id );
+
+            this->m_assign_output_elem_by_elem_kernel_id =
+                std::move( rhs.m_assign_output_elem_by_elem_kernel_id );
 
             this->m_track_until_kernel_id =
                 std::move( rhs.m_track_until_kernel_id );
@@ -360,7 +339,7 @@ namespace SIXTRL_CXX_NAMESPACE
             status_t const status = this->ptrParticlesArgBase()->receive(
                 this->ptrCParticlesBuffer() );
 
-            if( status == st::CONTROLLER_STATUS_SUCCESS )
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
                 result |= st::TRACK_JOB_COLLECT_PARTICLES;
             }
@@ -375,7 +354,7 @@ namespace SIXTRL_CXX_NAMESPACE
             status_t const status = this->ptrBeamElementsArgBase()->receive(
                 this->ptrCBeamElementsBuffer() );
 
-            if( status == st::CONTROLLER_STATUS_SUCCESS )
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
                 result |= st::TRACK_JOB_COLLECT_BEAM_ELEMENTS;
             }
@@ -390,7 +369,7 @@ namespace SIXTRL_CXX_NAMESPACE
             status_t const status = this->ptrOutputArgBase()->receive(
                 this->ptrCOutputBuffer() );
 
-            if( status == st::CONTROLLER_STATUS_SUCCESS )
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
                 result |= st::TRACK_JOB_COLLECT_OUTPUT;
             }
@@ -398,16 +377,16 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ( _base_t::IsCollectFlagSet(
                 flags, st::TRACK_JOB_COLLECT_DEBUG_FLAG ) ) &&
-            ( this->ptrDebugFlagArgBase() != nullptr ) &&
-            ( this->ptrDebugFlagArgBase()->usesRawArgument() ) &&
-            ( this->doGetPtrLastDebugFlag() != nullptr ) )
+            ( this->ptrDebugRegisterArgBase() != nullptr ) &&
+            ( this->ptrDebugRegisterArgBase()->usesRawArgument() ) &&
+            ( this->doGetPtrLastDebugRegister() != nullptr ) )
         {
             using debug_flag_t = _base_t::debug_flag_t;
 
-            status_t const status = this->ptrDebugFlagArgBase()->receive(
-                this->doGetPtrLastDebugFlag(), sizeof( debug_flag_t ) );
+            status_t const status = this->ptrDebugRegisterArgBase()->receive(
+                this->doGetPtrLastDebugRegister(), sizeof( debug_flag_t ) );
 
-            if( status == st::CONTROLLER_STATUS_SUCCESS )
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
                 result |= st::TRACK_JOB_COLLECT_DEBUG_FLAG;
             }
@@ -424,13 +403,109 @@ namespace SIXTRL_CXX_NAMESPACE
             status_t const status = this->ptrParticlesArgBase()->receive(
                 this->ptrCObjectsCxxBuffer() );
 
-            if( status == st::CONTROLLER_STATUS_SUCCESS )
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
                 result |= st::TRACK_JOB_COLLECT_PARTICLES_ADDR;
             }
         }
 
         return result;
+    }
+
+    /* --------------------------------------------------------------------- */
+
+    bool TrackJobCtrlArgBase::doSwitchDebugMode( bool const is_in_debug_mode )
+    {
+        using _base_t = st::TrackJobBaseNew;
+        using _this_t = st::TrackJobCtrlArgBase;
+
+        bool success = true;
+
+        if( this->ptrBaseController() != nullptr )
+        {
+            if( is_in_debug_mode )
+            {
+                success = this->ptrBaseController()->enableDebugMode();
+            }
+            else
+            {
+                success = this->ptrBaseController()->disableDebugMode();
+            }
+        }
+
+        success &= _base_t::doSwitchDebugMode( is_in_debug_mode );
+        return success;
+    }
+
+    TrackJobCtrlArgBase::status_t TrackJobCtrlArgBase::doSetDebugRegister(
+        TrackJobCtrlArgBase::debug_register_t const dbg_reg )
+    {
+        using _base_t      = st::TrackJobBaseNew;
+        using _this_t      = TrackJobCtrlArgBase;
+        using size_t       = _this_t::size_type;
+        using status_t     = _this_t::status_t;
+        using ptr_arg_t    = _this_t::argument_base_t*;
+        using ptr_ctrl_t   = _this_t::controller_base_t*;
+
+        status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        size_t const dbg_reg_size = sizeof( _this_t::debug_register_t );
+
+        ptr_arg_t ptr_debug_register_arg = this->ptrDebugRegisterArgBase();
+        ptr_ctrl_t ptr_ctrl_base = this->ptrControllerBase();
+
+        if( ( ptr_debug_register_arg != nullptr ) &&
+            ( ptr_debug_register_arg->ptrBaseController() == ptr_ctrl_base ) &&
+            ( ptr_debug_register_arg->usesRawArgument() ) &&
+            ( this->doGetPtrLocalDebugRegister() != nullptr ) &&
+            ( ptr_debug_register_arg->ptrRawArgument() ==
+              this->doGetPtrLocalDebugRegister() ) &&
+            ( ptr_debug_register_arg->size() == dbg_reg_size ) )
+        {
+            status = ptr_debug_register_arg->send( &dbg_reg, dbg_reg_size );
+
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                status = _base_t::doSetDebugRegister( dbg_reg );
+            }
+        }
+
+        return status;
+    }
+
+    TrackJobCtrlArgBase::status_t TrackJobCtrlArgBase::doFetchDebugRegister(
+        TrackJobCtrlArgBase::debug_register_t* ptr_dbg_reg )
+    {
+        using _base_t      = st::TrackJobBaseNew;
+        using _this_t      = TrackJobCtrlArgBase;
+        using size_t       = _this_t::size_type;
+        using status_t     = _this_t::status_t;
+        using ptr_arg_t    = _this_t::argument_base_t*;
+        using ptr_ctrl_t   = _this_t::controller_base_t*;
+
+        status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        size_t const dbg_reg_size = sizeof( _this_t::debug_register_t );
+
+        ptr_arg_t ptr_debug_register_arg = this->ptrDebugRegisterArgBase();
+        ptr_ctrl_t ptr_ctrl_base = this->ptrControllerBase();
+
+        if( ( ptr_debug_register_arg != nullptr ) &&
+            ( ptr_debug_register_arg->ptrBaseController() == ptr_ctrl_base ) &&
+            ( ptr_debug_register_arg->usesRawArgument() ) &&
+            ( this->doGetPtrLocalDebugRegister() != nullptr ) &&
+            ( ptr_debug_register_arg->ptrRawArgument() ==
+              this->doGetPtrLocalDebugRegister() ) &&
+            ( ptr_debug_register_arg->size() == dbg_reg_size ) )
+        {
+            status = ptr_debug_register_arg->receive(
+                ptr_dbg_reg, dbg_reg_size );
+
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                status = _base_t::doFetchDebugRegister( ptr_dbg_reg );
+            }
+        }
+
+        return status;
     }
 
     /* --------------------------------------------------------------------- */
@@ -506,13 +581,13 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     TrackJobCtrlArgBase::argument_base_t const*
-    TrackJobCtrlArgBase::ptrDebugFlagArgBase() const SIXTRL_NOEXCEPT
+    TrackJobCtrlArgBase::ptrDebugRegisterArgBase() const SIXTRL_NOEXCEPT
     {
         return this->m_stored_debug_flag_arg.get();
     }
 
     TrackJobCtrlArgBase::argument_base_t*
-    TrackJobCtrlArgBase::ptrDebugFlagArgBase() SIXTRL_NOEXCEPT
+    TrackJobCtrlArgBase::ptrDebugRegisterArgBase() SIXTRL_NOEXCEPT
     {
         return this->m_stored_debug_flag_arg.get();
     }
@@ -547,7 +622,7 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_stored_output_arg = std::move( ptr_output_arg );
     }
 
-    void TrackJobCtrlArgBase::doUpdateStoredDebugFlagArg(
+    void TrackJobCtrlArgBase::doUpdateStoredDebugRegisterArg(
         TrackJobCtrlArgBase::stored_arg_base_t&&
             ptr_debug_flag_arg ) SIXTRL_NOEXCEPT
     {
@@ -561,6 +636,9 @@ namespace SIXTRL_CXX_NAMESPACE
         using base_ctrl_t = st::TrackJobCtrlArgBase::controller_base_t;
 
         this->m_assign_output_bemon_kernel_id = base_ctrl_t::ILLEGAL_KERNEL_ID;
+        this->m_assign_output_elem_by_elem_kernel_id =
+            base_ctrl_t::ILLEGAL_KERNEL_ID;
+
         this->m_track_until_kernel_id = base_ctrl_t::ILLEGAL_KERNEL_ID;
         this->m_track_line_kernel_id = base_ctrl_t::ILLEGAL_KERNEL_ID;
         this->m_track_elem_by_elem_kernel_id = base_ctrl_t::ILLEGAL_KERNEL_ID;
