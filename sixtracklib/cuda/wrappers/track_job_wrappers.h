@@ -62,7 +62,6 @@ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
     NS(CudaArgument)* SIXTRL_RESTRICT elem_by_elem_config_arg,
     NS(CudaArgument)* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const out_buffer_offset_index,
-    NS(buffer_size_t) const slot_size,
     NS(CudaArgument)* SIXTRL_RESTRICT debug_register_arg );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN

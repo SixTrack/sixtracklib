@@ -2,7 +2,7 @@
     #include "sixtracklib/cuda/wrappers/controller_wrappers.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#include !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <cuda_runtime_api.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 

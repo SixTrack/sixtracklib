@@ -2,7 +2,7 @@
     #include "sixtracklib/cuda/wrappers/track_job_wrappers.h"
 #endif /* !defined( SIXTRL_NO_INCLUDE ) */
 
-#include !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <cuda_runtime_api.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
@@ -329,7 +329,6 @@ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
     NS(CudaArgument)* SIXTRL_RESTRICT elem_by_elem_config_arg,
     NS(CudaArgument)* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const out_buffer_offset_index,
-    NS(buffer_size_t) const slot_size,
     NS(CudaArgument)* SIXTRL_RESTRICT debug_register_arg )
 {
     dim3 const* ptr_blocks = NS(CudaKernelConfig_get_ptr_const_blocks)(
@@ -390,7 +389,7 @@ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
                 NS(ARCHITECTURE_CUDA) ) &&
         ( !NS(KernelConfig_needs_update)( kernel_config ) ) )
     {
-        NS(BeamMonitor_assign_out_buffer_from_offset_cuda_debug)<<<
+        NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_debug)<<<
             *ptr_blocks, *ptr_threads >>>(
             NS(CudaArgument_get_cuda_arg_buffer)( elem_by_elem_config_arg ),
             NS(CudaArgument_get_cuda_arg_buffer)( output_arg ),
@@ -442,7 +441,7 @@ void NS(Particles_buffer_store_all_addresses_cuda_wrapper)(
         SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
             particles_addresses_arg ) != SIXTRL_NULLPTR );
 
-        NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda)<<<
+        NS(Particles_buffer_store_all_addresses_cuda)<<<
             *ptr_blocks, *ptr_threads >>>(
             NS(CudaArgument_get_cuda_arg_buffer)( particles_addresses_arg ),
             NS(CudaArgument_get_cuda_arg_buffer)( particles_arg ),
@@ -456,7 +455,7 @@ void NS(Particles_buffer_store_all_addresses_cuda_wrapper)(
                 NS(ARCHITECTURE_CUDA) ) &&
         ( !NS(KernelConfig_needs_update)( kernel_config ) ) )
     {
-        NS(BeamMonitor_assign_out_buffer_from_offset_cuda_debug)<<<
+        NS(Particles_buffer_store_all_addresses_cuda_debug)<<<
             *ptr_blocks, *ptr_threads >>>(
             NS(CudaArgument_get_cuda_arg_buffer)( particles_addresses_arg ),
             NS(CudaArgument_get_cuda_arg_buffer)( particles_arg ),
