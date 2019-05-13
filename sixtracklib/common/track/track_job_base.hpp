@@ -40,27 +40,24 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    class TrackJobBaseNew : public SIXTRL_CXX_NAMESPACE::ArchBase
+    class TrackJobBaseNew : public SIXTRL_CXX_NAMESPACE::ArchBaseDebug
     {
         private:
 
-        using _arch_base_t          = SIXTRL_CXX_NAMESPACE::ArchBase;
+        using _arch_base_t = SIXTRL_CXX_NAMESPACE::ArchBaseDebug;
 
         public:
 
         using arch_id_t             = _arch_base_t::arch_id_t;
+        using track_status_t        = ::NS(track_status_t);
         using buffer_t              = SIXTRL_CXX_NAMESPACE::Buffer;
         using c_buffer_t            = buffer_t::c_api_t;
-        using size_type             = buffer_t::size_type;
-        using status_t              = ::NS(ctrl_status_t);
-        using track_status_t        = ::NS(track_status_t);
 
         using elem_by_elem_config_t = ::NS(ElemByElemConfig);
         using elem_by_elem_order_t  = ::NS(elem_by_elem_order_t);
         using particle_index_t      = ::NS(particle_index_t);
         using collect_flag_t        = ::NS(track_job_collect_flag_t);
         using output_buffer_flag_t  = ::NS(output_buffer_flag_t);
-        using debug_flag_t          = ::NS(ctrl_debug_flag_t);
         using particles_addr_t      = ::NS(ParticlesAddr);
         using num_particles_t       = ::NS(particle_num_elements_t);
 
@@ -114,12 +111,6 @@ namespace SIXTRL_CXX_NAMESPACE
             collect_flag_t const flag ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool requiresCollecting() const SIXTRL_NOEXCEPT;
-
-        /* ----------------------------------------------------------------- */
-
-        SIXTRL_HOST_FN bool isInDebugMode() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN bool enableDebugMode();
-        SIXTRL_HOST_FN bool disableDebugMode();
 
         /* ----------------------------------------------------------------- */
 
@@ -224,8 +215,37 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
+        SIXTRL_HOST_FN num_particles_t particleSetBeginIndexOffset(
+            size_type const particle_set_index ) const;
+
+        SIXTRL_HOST_FN num_particles_t particleSetEndIndexOffset(
+            size_type const particle_set_index ) const;
+
+        SIXTRL_HOST_FN num_particles_t numParticlesInSet(
+            size_type const particle_set_index ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN num_particles_t const*
+        particleSetBeginOffsetsBegin() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN num_particles_t const*
+        particleSetBeginOffsetsEnd() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN num_particles_t const*
+        particleSetEndOffsetsBegin() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN num_particles_t const*
+        particleSetEndOffsetsEnd() const SIXTRL_NOEXCEPT;
+
         SIXTRL_HOST_FN num_particles_t
         totalNumParticles() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN num_particles_t
+        totalNumParticlesInParticleSets() const SIXTRL_NOEXCEPT;
+
+        SIXTR_HOST_FN size_type
+        totalNumOfAvailableParticleSets() const SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN particle_index_t minParticleId() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN particle_index_t maxParticleId() const SIXTRL_NOEXCEPT;
@@ -241,7 +261,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN debug_flag_t lastDebugFlag() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN size_type
+        totalNumOfAvailableBeamElements() const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -370,6 +391,7 @@ namespace SIXTRL_CXX_NAMESPACE
             TrackJobBaseNew&& rhs ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN virtual void doClear();
+
         SIXTRL_HOST_FN virtual collect_flag_t doCollect(
             collect_flag_t const flags );
 
@@ -389,12 +411,16 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual bool doAssignOutputBufferToBeamMonitors(
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
-            c_buffer_t* SIXTRL_RESTRICT output_buffer );
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
+            particle_index_t const min_turn_id,
+            size_type const output_buffer_offset_index );
+
+        SIXTRL_HOST_FN virtual bool doAssignOutputBuffertoElemByElemConfig(
+            elem_by_elem_config_t* SIXTRL_RESTRICT elem_by_elem_config,
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
+            size_type const output_buffer_offset_index );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        SIXTRL_HOST_FN virtual bool doSwitchDebugModeFlag(
-            bool const is_in_debug_mode );
 
         SIXTRL_HOST_FN virtual bool doReset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
@@ -460,8 +486,8 @@ namespace SIXTRL_CXX_NAMESPACE
         /* ----------------------------------------------------------------- */
 
         template< typename Iter >
-        SIXTRL_HOST_FN void doSetParticleSetIndices( Iter begin, Iter end,
-            const c_buffer_t *const SIXTRL_RESTRICT pbuffer = nullptr );
+        SIXTRL_HOST_FN bool doSetParticleSetIndices( Iter begin, Iter end,
+            const c_buffer_t *const SIXTRL_RESTRICT pbuffer );
 
         SIXTRL_HOST_FN void doInitDefaultParticleSetIndices();
 
@@ -475,8 +501,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
+        SIXTRL_HOST_FN void doSetNumParticleSetsInBuffer(
+            size_type const num_particle_sets_in_buffer ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void doSetNumBeamElementsInBuffer(
+            size_type const num_beam_elements_in_buffer ) SIXTRL_NOEXCEPT;
+
         SIXTRL_HOST_FN void doSetTotalNumParticles(
-            num_particles_t const total_num_particles ) SIXTRL_NOEXCEPT;
+            num_particles_t const total_nparticles ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void doSetTotalNumParticlesInSets(
+            num_particles_t const total_nparticles_in_sets ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void doSetMinParticleId(
             particle_index_t const min_particle_id ) SIXTRL_NOEXCEPT;
@@ -525,24 +560,15 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doSetUsesArgumentsFlag(
             bool const arguments_flag ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void doSetIsInDebugModeflag(
-            bool const in_debug_mode ) SIXTRL_NOEXCEPT;
-
         /* ----------------------------------------------------------------- */
-
-        SIXTRL_HOST_FN void doSetLastDebugFlag( debug_flag_t const
-            last_debug_flag_value ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN debug_flag_t const*
-        doGetPtrLastDebugFlag() const SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN debug_flag_t* doGetPtrLastDebugFlag() SIXTRL_NOEXCEPT;
 
         private:
 
         SIXTRL_HOST_FN void doClearBaseImpl() SIXTRL_NOEXCEPT;
 
         std::vector< size_type >        m_particle_set_indices;
+        std::vector< num_particles_t >  m_particle_set_begin_offsets;
+        std::vector< num_particles_t >  m_particle_set_end_offsets;
         std::vector< size_type >        m_beam_monitor_indices;
 
         ptr_output_buffer_t             m_my_output_buffer;
@@ -559,9 +585,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
         size_type                       m_be_mon_output_buffer_offset;
         size_type                       m_elem_by_elem_output_offset;
-        num_particles_t                 m_total_num_particles;
+        size_type                       m_num_particle_sets_in_buffer;
+        size_type                       m_num_beam_elements_in_buffer;
 
         elem_by_elem_order_t            m_default_elem_by_elem_order;
+        num_particles_t                 m_total_num_particles;
+        num_particles_t                 m_total_num_particles_in_sets;
 
         particle_index_t                m_min_particle_id;
         particle_index_t                m_max_particle_id;
@@ -574,13 +603,11 @@ namespace SIXTRL_CXX_NAMESPACE
         particle_index_t                m_until_turn_elem_by_elem;
 
         collect_flag_t                  m_collect_flags;
-        debug_flag_t                    m_debug_flag;
 
         bool                            m_default_elem_by_elem_rolling;
         bool                            m_has_beam_monitor_output;
         bool                            m_has_elem_by_elem_output;
         bool                            m_has_particle_addresses;
-        bool                            m_in_debug_mode;
 
         bool                            m_requires_collect;
         bool                            m_uses_controller;
@@ -797,25 +824,31 @@ namespace SIXTRL_CXX_NAMESPACE
             ( std::distance( particle_set_indices_begin,
                 particle_set_indices_end ) > std::ptrdiff_t{ 0 } ) )
         {
-            this->doSetParticleSetIndices(
+            success = this->doSetParticleSetIndices(
                 particle_set_indices_begin, particle_set_indices_end, ptr_pb );
         }
         else
         {
             this->doInitDefaultBeamMonitorIndices();
+            success = true;
         }
-
-        success = this->doReset(
-            ptr_pb, ptr_eb, ptr_out, until_turn_elem_by_elem );
 
         if( success )
         {
-            this->doSetPtrParticleBuffer( &particles_buffer );
-            this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
-
-            if( ( ptr_out != nullptr ) && ( this->hasOutputBuffer() ) )
+            if( this->doReset( ptr_pb, ptr_eb, ptr_out,
+                    until_turn_elem_by_elem ) )
             {
-                this->doSetPtrOutputBuffer( ptr_output_buffer );
+                this->doSetPtrParticleBuffer( &particles_buffer );
+                this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
+
+                if( ( ptr_out != nullptr ) && ( this->hasOutputBuffer() ) )
+                {
+                    this->doSetPtrOutputBuffer( ptr_output_buffer );
+                }
+            }
+            else
+            {
+                success = false;
             }
         }
 
@@ -831,6 +864,8 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBaseNew::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         TrackJobBaseNew::size_type const until_turn_elem_by_elem )
     {
+        bool success = false;
+
         this->doClear();
 
         if( ( particle_set_indices_begin !=
@@ -838,16 +873,22 @@ namespace SIXTRL_CXX_NAMESPACE
             ( std::distance( particle_set_indices_begin,
                 particle_set_indices_end ) > std::ptrdiff_t{ 0 } ) )
         {
-            this->doSetParticleSetIndices( particle_set_indices_begin,
+            success = this->doSetParticleSetIndices(
+                particle_set_indices_begin,
                 particle_set_indices_end, particles_buffer );
         }
         else
         {
             this->doInitDefaultBeamMonitorIndices();
+            success = true;
         }
 
-        bool success = this->doReset( particles_buffer, beam_elements_buffer,
-            ptr_output_buffer, until_turn_elem_by_elem );
+        if( success )
+        {
+            success = this->doReset(
+                particles_buffer, beam_elements_buffer,
+                ptr_output_buffer, until_turn_elem_by_elem );
+        }
 
         return success;
     }
@@ -886,61 +927,116 @@ namespace SIXTRL_CXX_NAMESPACE
     /* --------------------------------------------------------------------- */
 
     template< typename ParSetIndexIter >
-    SIXTRL_HOST_FN void TrackJobBaseNew::doSetParticleSetIndices(
+    SIXTRL_HOST_FN bool TrackJobBaseNew::doSetParticleSetIndices(
         ParSetIndexIter begin, ParSetIndexIter end,
         const TrackJobBaseNew::c_buffer_t *const SIXTRL_RESTRICT pbuffer )
     {
-        using diff_t   = std::ptrdiff_t;
-        using size_t   = TrackJobBaseNew::size_type;
-        using obj_it_t = SIXTRL_BUFFER_DATAPTR_DEC ::NS(Object) const*;
+        using diff_t          = std::ptrdiff_t;
+        using size_t          = TrackJobBaseNew::size_type;
+        using num_particles_t = TrackJobBaseNew::num_particles_t;
+        using ptr_part_t      = ::NS(Particles) const*;
 
-        diff_t const temp_len = std::distance( begin, end );
+        bool success   = false;
 
-        if( temp_len >= diff_t{ 0 } )
+        size_t const num_objects =
+            ::NS(Buffer_get_num_of_objects)( pbuffer );
+
+        size_t const num_stored_psets =
+            ::NS(Particles_buffer_get_num_of_particle_blocks)( pbuffer );
+
+        this->m_particle_set_begin_offsets.clear();
+        this->m_particle_set_end_offsets.clear();
+        this->m_particle_set_indices.clear();
+
+        if( ( std::distance( begin, end ) >= diff_t{ 0 } ) &&
+            ( num_objects > size_t{ 0 } ) &&
+            ( num_stored_psets > size_t{ 0 } ) )
         {
-            this->m_particle_set_indices.clear();
+            std::vector< size_t > temp_particle_set_indices( begin, end );
 
-            if( temp_len > diff_t{ 0 } )
+            if( !this->temp_particle_set_indices.empty() )
             {
-                this->m_particle_set_indices.clear();
-                this->m_particle_set_indices.reserve(
-                    static_cast< size_t >( temp_len ) );
+                std::sort( this->temp_particle_set_indices.begin(),
+                           this->temp_particle_set_indices.end() );
 
-                if( pbuffer == nullptr )
+                this->temp_particle_set_indices.erase( std::unique(
+                    this->temp_particle_set_indices.begin(),
+                    this->temp_particle_set_indices.end() ),
+                    this->temp_particle_set_indices.end() );
+            }
+
+            if( !this->m_temp_particle_set_indices.empty() )
+            {
+                size_t const max_num_psets =
+                    this->m_temp_particle_set_indices.size();
+
+                this->m_particle_set_indices.reserve( max_num_psets );
+                this->m_particle_set_begin_offsets.reserve( max_num_psets );
+                this->m_particle_set_end_offsets.reserve( max_num_psets );
+
+                auto pset_index_it =
+                    this->m_temp_particle_set_indices.cbegin();
+
+                auto const pset_index_end =
+                    this->m_temp_particle_set_indices.cend();
+
+                num_particles_t running_offset = num_particles_t{ 0 };
+
+                num_particles_t total_num_particles_in_sets =
+                    num_particles_t{ 0 };
+
+                for( size_t ii = size_t{ 0 } ; ii < num_objects ; ++ii )
                 {
-                    this->m_particle_set_indices.assign( begin, end );
-                }
-                else
-                {
-                    size_t const SETS_IN_BUFFER =
-                        ::NS(Buffer_get_num_of_objects)( pbuffer );
+                    ptr_part_t p = ::NS(Particles_buffer_get_const_particles)(
+                        pbuffer, ii );
 
-                    obj_it_t obj = nullptr;
+                    num_particles_t const pset_num_particles =
+                        ::NS(Particles_get_num_of_particles)( p );
 
-                    for( ParSetIndexIter it = begin ; it != end ; ++it )
+                    SIXTRL_ASSERT( ( pset_index_it == pset_index_end ) ||
+                                   ( ii <= *pset_index_it ) );
+
+                    if( ( pset_index_it != pset_index_end ) &&
+                        ( ii == *pset_index_it ) )
                     {
-                        obj = ::NS(Buffer_get_const_object)( pbuffer, *it );
-
-                        if( ( *it < SETS_IN_BUFFER ) && ( obj != nullptr ) &&
-                            ( ::NS(Object_get_type_id)( obj ) ==
-                                ::NS(OBJECT_TYPE_PARTICLE) ) )
+                        if( p != nullptr )
                         {
-                            this->m_particle_set_indices.push_back( *it );
+                            this->m_particle_set_indices.push_back( ii );
+                            this->m_particle_set_begin_offsets.push_back(
+                                running_offset );
+
+                            this->m_particle_set_end_offsets.push_back(
+                                running_offset + pset_num_particles );
+
+                            total_num_particles_in_sets += pset_num_particles;
                         }
+
+                        ++pset_index_it;
+                    }
+
+                    if( p != nullptr )
+                    {
+                        running_offset += pset_num_particles;
                     }
                 }
 
-                std::sort( this->m_particle_set_indices.begin(),
-                           this->m_particle_set_indices.end() );
+                SIXTRL_ASSERT( this->m_particle_set_indices.size() ==
+                               this->m_particle_set_begin_offsets.size() );
 
-                this->m_particle_set_indices.erase( std::unique(
-                    this->m_particle_set_indices.begin(),
-                    this->m_particle_set_indices.end() ),
-                    this->m_particle_set_indices.end() );
+                SIXTRL_ASSERT( this->m_particle_set_indices.size() ==
+                               this->m_particle_set_end_offsets.size() );
+
+                this->m_num_particle_sets_in_buffer = num_stored_psets;
+
+                this->m_total_num_particles_in_sets =
+                    total_num_particles_in_sets;
+
+                this->m_total_num_particles = running_offset;
+                success = !this->m_particle_set_indices.empty();
             }
         }
 
-        return;
+        return success;
     }
 
     /* --------------------------------------------------------------------- */
