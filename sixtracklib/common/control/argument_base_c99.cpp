@@ -30,52 +30,56 @@ char const* NS(Argument_get_arch_string)(
     return ( arg != nullptr ) ? arg->ptrArchStr() : nullptr;
 }
 
-::NS(ctrl_status_t) NS(Argument_send_again)(
+::NS(arch_status_t) NS(Argument_send_again)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg )
 {
     return ( arg != nullptr )
-        ? arg->send() : ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+        ? arg->send() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-::NS(ctrl_status_t) NS(Argument_send_buffer)(
+::NS(arch_status_t) NS(Argument_send_buffer)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg,
     const ::NS(Buffer) *const SIXTRL_RESTRICT_REF buffer )
 {
     return ( arg != nullptr )
-        ? arg->send( buffer ) : ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+        ? arg->send( buffer ) : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-::NS(ctrl_status_t) NS(Argument_send_memory)(
-    ::NS(ArgumentBase)* SIXTRL_RESTRICT arg,
-    void const* SIXTRL_RESTRICT arg_begin,
-    ::NS(ctrl_size_t) const arg_size )
+::NS(arch_status_t) NS(Argument_send_memory)(
+    ::NS(ArgumentBase)* SIXTRL_RESTRICT arg, void const* SIXTRL_RESTRICT begin,
+    ::NS(arch_size_t) const arg_size )
 {
-    return ( arg != nullptr ) ? arg->send( arg_begin, arg_size )
-        : ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+    return ( arg != nullptr ) ? arg->send( begin, arg_size )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-::NS(ctrl_status_t) NS(Argument_receive_again)(
+::NS(arch_status_t) NS(Argument_receive_again)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg )
 {
     return ( arg != nullptr ) ? arg->receive()
-        : ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-::NS(ctrl_status_t) NS(Argument_receive_buffer)(
-    ::NS(ArgumentBase)* SIXTRL_RESTRICT arg,
-    ::NS(Buffer)* SIXTRL_RESTRICT buf )
+::NS(arch_status_t) NS(Argument_receive_buffer)(
+    ::NS(ArgumentBase)* SIXTRL_RESTRICT arg, ::NS(Buffer)* SIXTRL_RESTRICT buf)
 {
     return ( arg != nullptr )
-        ? arg->receive( buf ) : ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+        ? arg->receive( buf ) : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-::NS(ctrl_status_t) NS(Argument_receive_memory)(
+::NS(arch_status_t) NS(Argument_receive_memory)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg, void* SIXTRL_RESTRICT arg_begin,
-    ::NS(ctrl_size_t) const arg_capacity )
+    ::NS(arch_size_t) const arg_capacity )
+{
+    return ( arg != nullptr ) ? arg->receive( arg_begin, arg_capacity )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+
+::NS(arch_status_t) NS(Argument_remap_cobjects_buffer)(
+    ::NS(ArgumentBase)* SIXTRL_RESTRICT arg )
 {
     return ( arg != nullptr )
-        ? arg->receive( arg_begin, arg_capacity )
-        : ::NS(CONTROLLER_STATUS_GENERAL_FAILURE);
+        ? arg->remap() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 bool NS(Argument_uses_cobjects_buffer)(
@@ -90,6 +94,13 @@ bool NS(Argument_uses_cobjects_buffer)(
     return ( arg != nullptr ) ? arg->ptrCObjectsBuffer() : nullptr;
 }
 
+::NS(arch_size_t) NS(Argument_get_cobjects_buffer_slot_size)(
+    const ::NS(ArgumentBase) *const SIXTRL_RESTRICT arg )
+{
+    return ( arg != nullptr )
+        ? arg->cobjectsBufferSlotSize() : ::NS(arch_size_t){ 0 };
+}
+
 ::NS(Buffer)* NS(Argument_get_cobjects_buffer)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg )
 {
@@ -97,7 +108,7 @@ bool NS(Argument_uses_cobjects_buffer)(
 }
 
 
-bool NS(Argument_is_using_raw_argument)(
+bool NS(Argument_uses_raw_argument)(
     const ::NS(ArgumentBase) *const SIXTRL_RESTRICT arg )
 {
     return ( arg != nullptr ) ? arg->usesRawArgument() : false;
@@ -115,16 +126,16 @@ void* NS(Argument_get_ptr_raw_argument)(
     return ( arg != nullptr ) ? arg->ptrRawArgument() : nullptr;
 }
 
-::NS(ctrl_size_t) NS(Argument_get_size)(
+::NS(arch_size_t) NS(Argument_get_size)(
     const ::NS(ArgumentBase) *const SIXTRL_RESTRICT arg )
 {
-    return ( arg != nullptr ) ? arg->size() : ::NS(ctrl_size_t){ 0 };
+    return ( arg != nullptr ) ? arg->size() : ::NS(arch_size_t){ 0 };
 }
 
-::NS(ctrl_size_t) NS(Argument_get_capacity)(
+::NS(arch_size_t) NS(Argument_get_capacity)(
     const ::NS(ArgumentBase) *const SIXTRL_RESTRICT arg )
 {
-    return ( arg != nullptr ) ? arg->capacity() : ::NS(ctrl_size_t){ 0 };
+    return ( arg != nullptr ) ? arg->capacity() : ::NS(arch_size_t){ 0 };
 }
 
 bool NS(Argument_has_argument_buffer)(

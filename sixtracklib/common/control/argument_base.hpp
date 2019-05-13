@@ -35,46 +35,42 @@ namespace SIXTRL_CXX_NAMESPACE
 
         public:
 
-        using arch_id_t   = _arch_base_t::arch_id_t;
-        using status_t    = SIXTRL_CXX_NAMESPACE::ctrl_status_t;
         using buffer_t    = SIXTRL_CXX_NAMESPACE::Buffer;
         using c_buffer_t  = buffer_t::c_api_t;
-        using size_type   = buffer_t::size_type;
 
         using ptr_base_controller_t       = ControllerBase*;
         using ptr_const_base_controller_t = ControllerBase const*;
 
         static SIXTRL_CONSTEXPR_OR_CONST status_t
-            STATUS_SUCCESS = SIXTRL_CXX_NAMESPACE::CONTROLLER_STATUS_SUCCESS;
+            STATUS_SUCCESS = SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS;
 
         static SIXTRL_CONSTEXPR_OR_CONST status_t STATUS_GENERAL_FAILURE =
-                SIXTRL_CXX_NAMESPACE::CONTROLLER_STATUS_GENERAL_FAILURE;
+                SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 
         SIXTRL_HOST_FN virtual ~ArgumentBase() = default;
 
-        SIXTRL_HOST_FN NS(ctrl_status_t) send();
-
-        SIXTRL_HOST_FN NS(ctrl_status_t) send(
+        SIXTRL_HOST_FN NS(status_t) send();
+        SIXTRL_HOST_FN NS(status_t) send(
             buffer_t const& SIXTRL_RESTRICT_REF buffer );
 
-        SIXTRL_HOST_FN NS(ctrl_status_t) send(
+        SIXTRL_HOST_FN NS(status_t) send(
             const c_buffer_t *const SIXTRL_RESTRICT ptr_c_buffer );
 
-        SIXTRL_HOST_FN NS(ctrl_status_t) send(
-            void const* SIXTRL_RESTRICT arg_begin,
+        SIXTRL_HOST_FN NS(status_t) send( void const* SIXTRL_RESTRICT arg_begin,
             size_type const arg_size );
 
-        SIXTRL_HOST_FN NS(ctrl_status_t) receive();
 
-        SIXTRL_HOST_FN NS(ctrl_status_t) receive(
+        SIXTRL_HOST_FN NS(status_t) receive();
+        SIXTRL_HOST_FN NS(status_t) receive(
             buffer_t& SIXTRL_RESTRICT_REF buffer );
 
-        SIXTRL_HOST_FN NS(ctrl_status_t) receive(
+        SIXTRL_HOST_FN NS(status_t) receive(
             c_buffer_t* SIXTRL_RESTRICT ptr_c_buffer );
 
-        SIXTRL_HOST_FN NS(ctrl_status_t) receive(
-            void* SIXTRL_RESTRICT arg_begin,
+        SIXTRL_HOST_FN NS(status_t) receive( void* SIXTRL_RESTRICT arg_begin,
             size_type const arg_capacity );
+
+        SIXTRL_HOST_FN NS(status_t) remap();
 
         SIXTRL_HOST_FN bool usesCObjectsCxxBuffer() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN buffer_t* ptrCObjectsCxxBuffer() const SIXTRL_NOEXCEPT;
@@ -82,6 +78,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN bool usesCObjectsBuffer() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN c_buffer_t* ptrCObjectsBuffer() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN size_type cobjectsBufferSlotSize() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool usesRawArgument() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN void* ptrRawArgument() const SIXTRL_NOEXCEPT;

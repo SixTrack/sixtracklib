@@ -17,6 +17,8 @@
 
 #include "sixtracklib/common/control/controller_base.h"
 
+namespace st = SIXTRL_CXX_NAMESPACE;
+
 namespace SIXTRL_CXX_NAMESPACE
 {
     ArgumentBase::status_t ArgumentBase::send()
@@ -321,6 +323,25 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
+    ArgumentBase::NS(status_t) ArgumentBase::remap()
+    {
+        using status_t = ArgumentBase::status_t;
+        using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
+
+        status_t status = ArgumentBase::STATUS_GENERAL_FAILURE;
+        ptr_base_controller_t ptr_controller = this->ptrBaseController();
+
+        if( ( ptr_controller != nullptr ) &&
+            ( ( this->usesCObjectsBuffer() ) ||
+              ( this->usesCObjectsCxxBuffer() ) ) &&
+            ( ( this->ptrCObjectsBuffer() != nullptr ) ) )
+        {
+            status = ptr_controller->remapCObjectsBuffer( this, this->size() );
+        }
+
+        return status;
+    }
+
     bool ArgumentBase::usesCObjectsCxxBuffer() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT( ( this->m_ptr_cobj_cxx_buffer == nullptr ) ||
@@ -361,6 +382,14 @@ namespace SIXTRL_CXX_NAMESPACE
     ArgumentBase::ptrCObjectsBuffer() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_cobj_c99_buffer;
+    }
+
+    ArgumentBase::size_type
+    ArgumentBase::cobjectsBufferSlotSize() const SIXTRL_NOEXCEPT
+    {
+        return ( this->usesCObjectsBuffer() )
+            ? ::NS(Buffer_get_slot_size)( this->ptrCObjectsBuffer() )
+            : ArgumentBase::size_type{ 0 };
     }
 
     bool ArgumentBase::usesRawArgument() const SIXTRL_NOEXCEPT
@@ -411,7 +440,7 @@ namespace SIXTRL_CXX_NAMESPACE
         char const* SIXTRL_RESTRICT config_str,
         bool const needs_argument_buffer,
         ArgumentBase::ptr_base_controller_t SIXTRL_RESTRICT controller ) :
-        SIXTRL_CXX_NAMESPACE::ArchBase( arch_id, arch_str, config_str ),
+        st::ArchBase( arch_id, arch_str, config_str ),
         m_ptr_raw_arg_begin( nullptr ),
         m_ptr_cobj_cxx_buffer( nullptr ),
         m_ptr_cobj_c99_buffer( nullptr ),
@@ -458,12 +487,12 @@ namespace SIXTRL_CXX_NAMESPACE
         using c_buffer_t = ArgumentBase::c_buffer_t;
         using buffer_t   = ArgumentBase::buffer_t;
 
-        c_buffer_t* new_ptr_cobj_c99_buffer = const_cast< c_buffer_t* >(
-            buffer.getCApiPtr() );
+        c_buffer_t* _ptr_cobj_c99_buffer =
+            const_cast< c_buffer_t* >( buffer.getCApiPtr() );
 
-        if( new_ptr_cobj_c99_buffer != this->m_ptr_cobj_c99_buffer )
+        if( _ptr_cobj_c99_buffer != this->m_ptr_cobj_c99_buffer )
         {
-            this->m_ptr_cobj_c99_buffer = new_ptr_cobj_c99_buffer;
+            this->m_ptr_cobj_c99_buffer = _ptr_cobj_c99_buffer;
         }
 
         this->m_ptr_cobj_cxx_buffer = const_cast< buffer_t* >( &buffer );
@@ -480,28 +509,25 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         using c_buffer_t = ArgumentBase::c_buffer_t;
 
-        c_buffer_t* non_const_new_ptr =
-            const_cast< c_buffer_t* >( ptr_c_buffer );
+        c_buffer_t* non_const_ptr = const_cast< c_buffer_t* >( ptr_c_buffer );
 
         if( this->m_ptr_cobj_cxx_buffer != nullptr )
         {
             SIXTRL_ASSERT( this->m_ptr_cobj_cxx_buffer->getCApiPtr() ==
                            this->m_ptr_cobj_c99_buffer );
 
-            if( this->m_ptr_cobj_cxx_buffer->getCApiPtr() !=
-                non_const_new_ptr )
+            if( this->m_ptr_cobj_cxx_buffer->getCApiPtr() != non_const_ptr )
             {
                 this->doResetPtrCxxBuffer();
             }
         }
 
         SIXTRL_ASSERT( ( this->m_ptr_cobj_cxx_buffer == nullptr ) ||
-            ( ( this->m_ptr_cobj_cxx_buffer->getCApiPtr() ==
-                non_const_new_ptr ) &&
+            ( ( this->m_ptr_cobj_cxx_buffer->getCApiPtr() == non_const_ptr ) &&
               ( this->m_ptr_cobj_c99_buffer ==
                 this->m_ptr_cobj_cxx_buffer->getCApiPtr() ) ) );
 
-        this->m_ptr_cobj_c99_buffer = non_const_new_ptr;
+        this->m_ptr_cobj_c99_buffer = non_const_ptr;
     }
 
     void ArgumentBase::doSetPtrRawArgument(
