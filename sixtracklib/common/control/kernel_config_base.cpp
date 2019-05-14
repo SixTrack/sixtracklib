@@ -771,9 +771,8 @@ namespace SIXTRL_CXX_NAMESPACE
     void KernelConfigBase::doPerformWorkItemsCopyBaseImpl(
         KernelConfigBase const& other ) SIXTRL_NOEXCEPT
     {
-        using size_t = KernelConfigBase::size_type;
-
-        SIXTRL_ASSERT( other.m_work_items_dim > size_t{ 0 } );
+        SIXTRL_ASSERT( other.m_work_items_dim >
+                       KernelConfigBase::size_type{ 0 } );
 
         SIXTRL_ASSERT( other.m_work_items_dim <=
                        KernelConfigBase::MAX_WORK_ITEMS_DIM );
@@ -792,9 +791,8 @@ namespace SIXTRL_CXX_NAMESPACE
     void KernelConfigBase::doPerformWorkGroupsCopyBaseImpl(
         KernelConfigBase const& other ) SIXTRL_NOEXCEPT
     {
-        using size_t = KernelConfigBase::size_type;
-
-        SIXTRL_ASSERT( other.m_work_groups_dim > size_t{ 0 } );
+        SIXTRL_ASSERT( other.m_work_groups_dim >
+                       KernelConfigBase::size_type{ 0 } );
 
         SIXTRL_ASSERT( other.m_work_groups_dim <=
                        KernelConfigBase::MAX_WORK_GROUPS_DIM );

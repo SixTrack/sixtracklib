@@ -616,7 +616,6 @@ namespace SIXTRL_CXX_NAMESPACE
         ControllerBase::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
         using kernel_conf_base_t = ControllerBase::kernel_config_base_t;
-        using size_t = ControllerBase::size_type;
 
         kernel_conf_base_t* ptr_kernel_conf_base =
             this->ptrKernelConfigBase( kernel_id );
@@ -624,7 +623,8 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ptr_kernel_conf_base != nullptr )
         {
             SIXTRL_ASSERT( kernel_id < this->m_kernel_configs.size() );
-            SIXTRL_ASSERT( this->m_num_kernels > size_t{ 0 } );
+            SIXTRL_ASSERT( this->m_num_kernels >
+                           ControllerBase::size_type{ 0 } );
 
             this->m_kernel_configs[ kernel_id ].reset( nullptr );
             --this->m_num_kernels;

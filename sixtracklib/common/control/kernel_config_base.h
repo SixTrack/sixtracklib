@@ -280,7 +280,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_update)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(KernelConfig_print)(
     const NS(KernelConfigBase) *const SIXTRL_RESTRICT config,
-    ::FILE* SIXTRL_RESTRICT output );
+    FILE* SIXTRL_RESTRICT output );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(KernelConfig_print_out)(
     const NS(KernelConfigBase) *const SIXTRL_RESTRICT config );
