@@ -14,6 +14,7 @@
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #include "sixtracklib/common/output/elem_by_elem_config.h"
+    #include "sixtracklib/common/output/output_buffer.h"
     #include "sixtracklib/cuda/definitions.h"
     #include "sixtracklib/cuda/cuda_tools.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
