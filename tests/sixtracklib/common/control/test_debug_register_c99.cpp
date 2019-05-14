@@ -31,7 +31,7 @@ TEST( C99_CommonControlDebuggingRegisterTests, BasicUsage )
     arch_debugging_t next_flag =
         ::NS(DebugReg_get_next_error_flag)( debug_register );
 
-    ASSERT_TRUE( next_flag == ::NS(ARCH_DEBUGGING_MIN_FLAG) )
+    ASSERT_TRUE( next_flag == ::NS(ARCH_DEBUGGING_MIN_FLAG) );
 
     /* Apply the first error flag, and check whether the register is changed
      * accordingly */
@@ -52,7 +52,7 @@ TEST( C99_CommonControlDebuggingRegisterTests, BasicUsage )
         debug_register ) );
 
     /* use automatic increment option to actually modify the register but ...*/
-    ::NS(DebugReg_raise_next_error_flag)( debug_register );
+    debug_register = ::NS(DebugReg_raise_next_error_flag)( debug_register );
 
     /* ... verify against the manually raised flag */
     ASSERT_TRUE( next_flag == ::NS(DebugReg_get_highest_set_flag)(
@@ -75,7 +75,7 @@ TEST( C99_CommonControlDebuggingRegisterTests, BasicUsage )
 
     /* Add maximum possible flag to register */
 
-    ::NS(DebugReg_raise_next_error_flag)( debug_register );
+    debug_register = ::NS(DebugReg_raise_next_error_flag)( debug_register );
 
     /* Now it should not be possible to add any more flags */
 
@@ -118,9 +118,6 @@ TEST( C99_CommonControlDebuggingRegisterTests, BasicUsage )
 
     ASSERT_TRUE( ::NS(DebugReg_has_status_flags_set)( debug_register ) );
     ASSERT_TRUE( ::NS(DebugReg_has_any_flags_set)( debug_register ) );
-
-    ASSERT_TRUE( cpy_debug_register ==
-        ( debug_register & ( arch_debugging_t )arch_status_ok ) );
 
     ASSERT_TRUE( ::NS(DebugReg_get_stored_arch_status)( debug_register ) ==
                  arch_status_fail );

@@ -12,7 +12,7 @@
     #include "sixtracklib/common/control/definitions.h"
 #endif /* #if !defined( SIXTRL_NO_INCLUDES ) */
 
-#if !defined( __cplusplus ) && defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
 #endif /* C++, Host */
 
@@ -44,13 +44,17 @@ NS(DebugReg_get_next_error_flag)(
 SIXTRL_STATIC SIXTRL_FN NS(arch_debugging_t)
 NS(DebugReg_raise_next_error_flag)( NS(arch_debugging_t) debugging_register );
 
-#if !defined( __cplusplus ) && defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 }
 #endif /* C++, Host */
 
 /* ------------------------------------------------------------------------- */
 /* -----          inline/header-only function implementation        -------- */
 /* ------------------------------------------------------------------------- */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* C++, Host */
 
 SIXTRL_INLINE NS(arch_debugging_t) NS(DebugReg_store_arch_status)(
     NS(arch_debugging_t) debugging_register,
@@ -64,13 +68,15 @@ SIXTRL_INLINE NS(arch_debugging_t) NS(DebugReg_store_arch_status)(
     }
     else
     {
-        NS(arch_debugging_t) flags_bitmask = -status_flags_to_add;
-        flags_bitmask = ~( flags_bitmask );
-        flags_bitmask += ( NS(arch_debugging_t) )1u;
+        SIXTRL_UINT32_T const temp = ( SIXTRL_UINT32_T )( -status_flags_to_add );
+        flags_bitmask = ( NS(arch_debugging_t) )~temp;
+        ++flags_bitmask;
     }
 
-    debugging_register &= ~( SIXTRL_ARCH_DEBUGGING_STATUS_BITMASK );
-    return debugging_register | flags_bitmask;
+    debugging_register &= SIXTRL_ARCH_DEBUGGING_STATUS_INV_BITMASK;
+    debugging_register |= flags_bitmask;
+
+    return debugging_register;
 }
 
 SIXTRL_INLINE NS(arch_status_t) NS(DebugReg_get_stored_arch_status)(
@@ -83,14 +89,21 @@ SIXTRL_INLINE NS(arch_status_t) NS(DebugReg_get_stored_arch_status)(
 
     if( flags_bitmask >= SIXTRL_ARCH_DEBUGGING_STATUS_MAX_FLAG )
     {
+        SIXTRL_UINT32_T temp = ( SIXTRL_UINT32_T )0u;
+
         flags_bitmask -= ( NS(arch_debugging_t) )1u;
         flags_bitmask  = ~flags_bitmask;
+        temp = ( SIXTRL_UINT32_T )(
+            SIXTRL_ARCH_DEBUGGING_STATUS_BITMASK & flags_bitmask );
+
+        restored_status = -( NS(arch_status_t) )temp;
+    }
+    else
+    {
+        restored_status = ( NS(arch_status_t) )(
+            SIXTRL_ARCH_DEBUGGING_STATUS_BITMASK & flags_bitmask );
     }
 
-    SIXTRL_ASSERT( ( flags_bitmask & SIXTRL_ARCH_DEBUGGING_STATUS_MAX_FLAG ) !=
-        SIXTRL_ARCH_DEBUGGING_STATUS_MAX_FLAG );
-
-    restored_status = ( NS(arch_status_t) )flags_bitmask;
     return restored_status;
 }
 
@@ -143,7 +156,7 @@ SIXTRL_INLINE NS(arch_debugging_t) NS(DebugReg_get_next_error_flag)(
     }
     else if( highest_flag < SIXTRL_ARCH_DEBUGGING_MAX_FLAG )
     {
-        return highest_flag + ( NS(arch_debugging_t) )1u;
+        return ( highest_flag << ( NS(arch_debugging_t) )1u );
     }
 
     return ( NS(arch_debugging_t) )0u;
@@ -155,6 +168,10 @@ SIXTRL_INLINE NS(arch_debugging_t) NS(DebugReg_raise_next_error_flag)(
     debugging_register |= NS(DebugReg_get_next_error_flag)(debugging_register);
     return debugging_register;
 }
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* C++, Host */
 
 #endif /* SIXTRACKLIB_COMMON_CONTROL_DEBUGGING_REGISTER_H__ */
 
