@@ -20,7 +20,7 @@ typedef SIXTRL_INT32_T      NS(track_status_t);
 
 #if !defined( _GPUCODE )
 typedef SIXTRL_UINT16_T     NS(track_job_collect_flag_t);
-typedef ::NS(buffer_size_t)   NS(track_job_size_t);
+typedef NS(buffer_size_t)   NS(track_job_size_t);
 typedef SIXTRL_INT64_T      NS(track_job_type_t);
 
 /* ------------------------------------------------------------------------- */
