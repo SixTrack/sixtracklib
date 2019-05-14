@@ -97,6 +97,10 @@ namespace SIXTRL_CXX_NAMESPACE
             const char *const SIXTRL_RESTRICT arch_str = nullptr,
             const char *const SIXTRL_RESTRICT config_str = nullptr );
 
+        SIXTRL_HOST_FN explicit ArchDebugBase( arch_id_t const arch_id,
+            std::string const& SIXTRL_RESTRICT_REF arch_str,
+            std::string const& SIXTRL_RESTRICT_REF config_str );
+
         SIXTRL_HOST_FN ArchDebugBase( ArchDebugBase const& other ) = default;
         SIXTRL_HOST_FN ArchDebugBase( ArchDebugBase&& other ) = default;
 
@@ -149,8 +153,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         private:
 
-        bool m_debug_mode;
         debug_register_t m_local_debug_register;
+        bool m_debug_mode;
     };
 }
 

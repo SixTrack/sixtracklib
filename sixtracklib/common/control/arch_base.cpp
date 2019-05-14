@@ -79,6 +79,28 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* ********************************************************************* */
 
+    ArchDebugBase::ArchDebugBase(
+        ArchDebugBase::arch_id_t const arch_id,
+        const char *const SIXTRL_RESTRICT arch_str,
+        const char *const SIXTRL_RESTRICT config_str ) :
+        ArchBase( arch_id, arch_str, config_str ),
+        m_local_debug_register( st::ARCH_DEBUGGING_REGISTER_EMPTY ),
+        m_debug_mode( false )
+    {
+
+    }
+
+    ArchDebugBase::ArchDebugBase(
+        ArchDebugBase::arch_id_t const arch_id,
+        std::string const& SIXTRL_RESTRICT_REF arch_str,
+        std::string const& SIXTRL_RESTRICT_REF config_str ) :
+        ArchBase( arch_id, arch_str, config_str ),
+            m_local_debug_register( st::ARCH_DEBUGGING_REGISTER_EMPTY ),
+            m_debug_mode( false )
+    {
+
+    }
+
     bool ArchDebugBase::isInDebugMode() const SIXTRL_NOEXCEPT
     {
         return this->m_debug_mode;
