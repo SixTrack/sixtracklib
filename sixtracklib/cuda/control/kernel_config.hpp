@@ -1,25 +1,32 @@
 #ifndef SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_CXX_HPP__
 #define SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_CXX_HPP__
 
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-       !defined( __CUDA_ARCH__ )
-        #include <cstddef>
-        #include <cstdlib>
-    #endif /* C++, Host */
-
+    #include <cstddef>
+    #include <cstdlib>
     #include <cuda_runtime_api.h>
-
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
+#endif /* C++, Host */
+
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
-    #include "sixtracklib/common/control/kernel_config_base.hpp"
+    #include "sixtracklib/common/control/kernel_config_base.h"
     #include "sixtracklib/cuda/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/control/kernel_config_base.hpp"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -113,6 +120,14 @@ namespace SIXTRL_CXX_NAMESPACE
         size_type m_max_block_size_limit;
     };
 }
+#endif /* C++, Host */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* C++ */
+
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
 
 typedef SIXTRL_CXX_NAMESPACE::CudaKernelConfig NS(CudaKernelConfig);
 
@@ -121,5 +136,9 @@ typedef SIXTRL_CXX_NAMESPACE::CudaKernelConfig NS(CudaKernelConfig);
 typedef void NS(CudaKernelConfig);
 
 #endif /* C++, Host */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* C++ */
 
 #endif /* SIXTRACKLIB_CUDA_CONTROL_KERNEL_CONFIG_CXX_HPP__ */

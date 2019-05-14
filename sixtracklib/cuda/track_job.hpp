@@ -1,34 +1,42 @@
 #ifndef SIXTRACKLIB_CUDA_TRACK_JOB_HPP__
 #define SIXTRACKLIB_CUDA_TRACK_JOB_HPP__
 
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-       !defined( __CUDA_ARCH__ )
-        #include <cstddef>
-        #include <cstdlib>
-    #endif /* C++, Host */
+    #include <cstddef>
+    #include <cstdlib>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
+#endif /* C++, Host */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/control/arch_base.hpp"
-    #include "sixtracklib/common/control/kernel_config_base.hpp"
+    #include "sixtracklib/common/control/kernel_config_base.h"
     #include "sixtracklib/common/track/definitions.h"
-    #include "sixtracklib/common/track/track_job_nodectrl_arg_base.hpp"
-
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-       !defined( __CUDA_ARCH__ )
-        #include "sixtracklib/common/buffer.hpp"
-    #endif /* C++, Host */
     #include "sixtracklib/common/buffer.h"
+    #include "sixtracklib/cuda/definitions.h"
+    #include "sixtracklib/cuda/controller.h"
+    #include "sixtracklib/cuda/argument.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/control/arch_base.hpp"
+    #include "sixtracklib/common/control/kernel_config_base.hpp"
+    #include "sixtracklib/common/track/track_job_nodectrl_arg_base.hpp"
+    #include "sixtracklib/common/buffer.hpp"
 
     #include "sixtracklib/cuda/definitions.h"
     #include "sixtracklib/cuda/controller.hpp"
     #include "sixtracklib/cuda/argument.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 namespace SIXTRL_CXX_NAMESPACE
 {
     class CudaTrackJob : public SIXTRL_CXX_NAMESPACE::TrackJobNodeCtrlArgBase
@@ -341,6 +349,16 @@ namespace SIXTRL_CXX_NAMESPACE
         bool const finish_turn = false );
 }
 
+#endif /* #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
+   !defined( __CUDACC__  ) && !defined( __CUDA_ARCH__ ) */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* C++ */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && \
+   !defined( __CUDACC__  ) && !defined( __CUDACC__ )
+
 typedef SIXTRL_CXX_NAMESPACE::CudaTrackJob NS(CudaTrackJob);
 
 #else /* C++, Host */
@@ -349,11 +367,16 @@ typedef void NS(CudaTrackJob);
 
 #endif /* C++, Host */
 
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* C++ */
+
 /* ************************************************************************* */
 /* *******   Implementation of inline and template member functions  ******* */
 /* ************************************************************************* */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
 
 namespace SIXTRL_CXX_NAMESPACE
 {

@@ -37,14 +37,14 @@ add_subdirectory( control )
 add_subdirectory( track )
 
 set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
-#      wrappers/controller_wrappers.h
+     wrappers/controller_wrappers.h
      wrappers/track_job_wrappers.h
      cuda_tools.h
      track_particles_kernel_c_wrapper.h
 )
 
 set( SIXTRACKLIB_CUDA_PART_HOST_SOURCES
-#      wrappers/controller_wrappers.cu
+     wrappers/controller_wrappers.cu
      wrappers/track_job_wrappers.cu
      internal/track_particles_kernel_c_wrapper.cu
 )

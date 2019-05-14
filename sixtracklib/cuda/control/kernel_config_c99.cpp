@@ -10,14 +10,14 @@
 #include "sixtracklib/cuda/control/kernel_config.hpp"
 
 ::dim3 const* NS(CudaKernelConfig_get_ptr_const_blocks)(
-    NS(CudaKernelConfig)* SIXTRL_RESTRICT cuda_kernel_config )
+    const NS(CudaKernelConfig) *const SIXTRL_RESTRICT cuda_kernel_config )
 {
     return ( cuda_kernel_config != nullptr )
         ? cuda_kernel_config->ptrBlocks() : nullptr;
 }
 
 ::dim3 const* NS(CudaKernelConfig_get_ptr_const_threads_per_block)(
-    NS(CudaKernelConfig)* SIXTRL_RESTRICT cuda_kernel_config )
+    const NS(CudaKernelConfig) *const SIXTRL_RESTRICT cuda_kernel_config )
 {
     return ( cuda_kernel_config != nullptr )
         ? cuda_kernel_config->ptrThreadsPerBlock() : nullptr;

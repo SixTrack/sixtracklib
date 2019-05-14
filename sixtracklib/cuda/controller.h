@@ -14,9 +14,11 @@
     #include "sixtracklib/cuda/controller.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
 #endif /* C++, Host */
+
+#if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController)*
 NS(CudaController_create)( void );
@@ -30,11 +32,12 @@ NS(CudaController_select_node_by_cuda_pci_bus_id)(
     NS(CudaController)* SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT cuda_pci_bus_id );
 
-
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(CudaController_delete)(
     NS(CudaController)* SIXTRL_RESTRICT ctrl );
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#endif /* !defined( _GPUCODE ) */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 }
 #endif /* C++, Host */
 

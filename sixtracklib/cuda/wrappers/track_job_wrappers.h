@@ -1,7 +1,7 @@
 #ifndef SIXTRACKLIB_CUDA_WRAPPERS_TRACK_JOB_WRAPPERS_C99_H__
 #define SIXTRACKLIB_CUDA_WRAPPERS_TRACK_JOB_WRAPPERS_C99_H__
 
-#if !defined( SIXTRL_NO_INCLUDE )
+#if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/control/definitions.h"
@@ -11,11 +11,13 @@
     #include "sixtracklib/cuda/definitions.h"
     #include "sixtracklib/cuda/argument.h"
     #include "sixtracklib/cuda/control/kernel_config.h"
-#endif /* !defined( SIXTRL_NO_INCLUDE ) */
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
 #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+
+#if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN
 void NS(Track_particles_until_turn_cuda_wrapper)(
@@ -70,6 +72,8 @@ void NS(Particles_buffer_store_all_addresses_cuda_wrapper)(
     NS(CudaArgument)* SIXTRL_RESTRICT particles_addresses_arg,
     NS(CudaArgument)* SIXTRL_RESTRICT particles_arg,
     NS(CudaArgument)* SIXTRL_RESTRICT debug_flag_arg );
+
+#endif /* !defined( _GPUCODE ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }

@@ -2,7 +2,8 @@
     #include "sixtracklib/cuda/track_job.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && \
+   !defined( __CUDACC__  ) && !defined( __CUDA_ARCH__ )
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <cstddef>
@@ -10,8 +11,8 @@
     #include <stdexcept>
 
     #include <cuda_runtime_api.h>
-
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+#endif /* C++, Host */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
@@ -31,11 +32,10 @@
 
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#endif /* C++, Host */
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && \
+   !defined( __CUDACC__  ) && !defined( __CUDA_ARCH__ )
 
 namespace st = SIXTRL_CXX_NAMESPACE;
-
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
 namespace SIXTRL_CXX_NAMESPACE
 {

@@ -16,23 +16,23 @@
     #include "sixtracklib/cuda/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
-#endif /* C++, Host */
+#endif /* C++ */
 
-#if !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_FN dim3 const*
 NS(CudaKernelConfig_get_ptr_const_blocks)(
-    NS(CudaKernelConfig)* SIXTRL_RESTRICT cuda_kernel_config );
+    const NS(CudaKernelConfig) *const SIXTRL_RESTRICT cuda_kernel_config );
 
 SIXTRL_EXTERN SIXTRL_FN dim3 const*
 NS(CudaKernelConfig_get_ptr_const_threads_per_block)(
-    NS(CudaKernelConfig)* SIXTRL_RESTRICT cuda_kernel_config );
+    const NS(CudaKernelConfig) *const SIXTRL_RESTRICT cuda_kernel_config );
 
-#endif /* Host */
+#endif /* !defined( _GPUCODE ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 }
 #endif /* C++, Host */
 

@@ -16,7 +16,9 @@
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/control/definitions.h"
+#include "sixtracklib/common/control/debug_register.h"
 #include "sixtracklib/common/control/argument_base.hpp"
+#include "sixtracklib/common/output/elem_by_elem_config.h"
 #include "sixtracklib/cuda/controller.hpp"
 
 namespace st = SIXTRL_CXX_NAMESPACE;
@@ -186,6 +188,81 @@ namespace SIXTRL_CXX_NAMESPACE
 
             arg_buffer = nullptr;
         }
+    }
+
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char*
+    CudaArgumentBase::cudaArgBufferAsCObjectsDataBegin() SIXTRL_NOEXCEPT
+    {
+        return const_cast< SIXTRL_BUFFER_DATAPTR_DEC unsigned char* >(
+            static_cast< CudaArgumentBase const& >( *this
+                ).cudaArgBufferAsCObjectsDataBegin() );
+    }
+
+    SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC unsigned char const*
+    CudaArgumentBase::cudaArgBufferAsCObjectsDataBegin() const SIXTRL_NOEXCEPT
+    {
+        using ptr_t = SIXTRL_BUFFER_DATAPTR_DEC unsigned char const*;
+
+        if( ( this->hasArgumentBuffer() ) &&
+            ( ( this->usesCObjectsBuffer() ) ||
+              ( this->usesCObjectsCxxBuffer() ) ) &&
+            ( this->size() > CudaArgumentBase::size_type{ 0 } ) )
+        {
+            return reinterpret_cast< ptr_t >( this->cudaArgBuffer() );
+        }
+
+        return nullptr;
+    }
+
+    SIXTRL_BUFFER_DATAPTR_DEC CudaArgumentBase::debug_register_t*
+    CudaArgumentBase::cudaArgBufferAsPtrDebugRegister() SIXTRL_NOEXCEPT
+    {
+        return const_cast< SIXTRL_BUFFER_DATAPTR_DEC
+            CudaArgumentBase::debug_register_t* >( static_cast<
+                CudaArgumentBase const& >( *this
+                    ).cudaArgBufferAsPtrDebugRegister() );
+    }
+
+    SIXTRL_BUFFER_DATAPTR_DEC CudaArgumentBase::debug_register_t const*
+    CudaArgumentBase::cudaArgBufferAsPtrDebugRegister() const SIXTRL_NOEXCEPT
+    {
+        using dbg_register_t = CudaArgumentBase::debug_register_t;
+        using ptr_t = SIXTRL_BUFFER_DATAPTR_DEC dbg_register_t const*;
+
+        if( ( this->hasArgumentBuffer() ) &&
+            ( this->usesRawArgument() ) &&
+            ( this->size() == sizeof( dbg_register_t ) ) )
+        {
+            return reinterpret_cast< ptr_t >( this->cudaArgBuffer() );
+        }
+
+        return nullptr;
+    }
+
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+    CudaArgumentBase::elem_by_elem_config_t*
+    CudaArgumentBase::cudaArgBufferAsElemByElemByElemConfig() SIXTRL_NOEXCEPT
+    {
+        return const_cast< CudaArgumentBase::elem_by_elem_config_t* >(
+            static_cast< CudaArgumentBase const& >( *this
+                ).cudaArgBufferAsElemByElemByElemConfig() );
+    }
+
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+    CudaArgumentBase::elem_by_elem_config_t const*
+    CudaArgumentBase::cudaArgBufferAsElemByElemByElemConfig() const SIXTRL_NOEXCEPT
+    {
+        using elem_by_elem_conf_t = CudaArgumentBase::elem_by_elem_config_t;
+        using ptr_t = SIXTRL_BUFFER_DATAPTR_DEC elem_by_elem_conf_t const*;
+
+        if( ( this->hasArgumentBuffer() ) &&
+            ( this->usesRawArgument() ) &&
+            ( this->size() == sizeof( elem_by_elem_config_t ) ) )
+        {
+            return reinterpret_cast< ptr_t >( this->cudaArgBuffer() );
+        }
+
+        return nullptr;
     }
 }
 

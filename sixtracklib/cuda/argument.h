@@ -15,9 +15,11 @@
     #include "sixtracklib/cuda/controller.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
-#endif /* C++, Host */
+#endif /* C++ */
+
+#if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)* NS(CudaArgument_new)(
     NS(CudaController)* SIXTRL_RESTRICT ctrl );
@@ -84,9 +86,11 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_id_t) NS(CudaArgument_get_arch_id)(
 SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(CudaArgument_get_arch_string)(
     const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#endif /* !defined( _GPUCODE ) */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 }
-#endif /* C++, Host */
+#endif /* C++ */
 
 #endif /* SIXTRACKLIB_CUDA_ARGUMENT_H__ */
 

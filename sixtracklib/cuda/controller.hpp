@@ -1,30 +1,37 @@
 #ifndef SIXTRACKLIB_CUDA_CONTROLLER_HPP__
 #define SIXTRACKLIB_CUDA_CONTROLLER_HPP__
 
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-       !defined( __CUDA_ARCH__ )
-        #include <cstddef>
-        #include <cstdlib>
-    #endif /* C++, Host */
+    #include <cstddef>
+    #include <cstdlib>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
+#endif /* C++, Host */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/control/node_controller_base.h"
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/control/argument_base.hpp"
-    #include "sixtracklib/cuda/control/node_info.hpp"
-    #include "sixtracklib/cuda/control/kernel_config.hpp"
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-       !defined( __CUDA_ARCH__ )
-        #include "sixtracklib/common/buffer.hpp"
-    #endif /* C++, Host */
+    #include "sixtracklib/cuda/control/argument_base.h"
+//     #include "sixtracklib/cuda/control/node_info.h"
+    #include "sixtracklib/cuda/control/kernel_config.h"
     #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/cuda/control/argument_base.hpp"
+    #include "sixtracklib/cuda/control/node_info.hpp"
+    #include "sixtracklib/cuda/control/kernel_config.hpp"
+    #include "sixtracklib/common/buffer.hpp"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
 namespace SIXTRL_CXX_NAMESPACE
 {
     class CudaController : public SIXTRL_CXX_NAMESPACE::NodeControllerBase
@@ -245,14 +252,26 @@ namespace SIXTRL_CXX_NAMESPACE
         cuda_arg_buffer_t   m_cuda_debug_register;
     };
 }
+#endif /* C++, Host */
 
-extern "C" { typedef SIXTRL_CXX_NAMESPACE::CudaController NS(CudaController); }
+#if defined( __cplusplus ) && defined( _GPUCODE )
+extern "C" {
+#endif /* C++ */
+
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+typedef SIXTRL_CXX_NAMESPACE::CudaController NS(CudaController);
 
 #else /* C++, Host */
 
 typedef void NS(CudaController);
 
 #endif /* C++, Host */
+
+#if defined( __cplusplus ) && defined( _GPUCODE )
+}
+#endif /* C++ */
 
 #endif /* SIXTRACKLIB_CUDA_CONTROLLER_HPP__ */
 

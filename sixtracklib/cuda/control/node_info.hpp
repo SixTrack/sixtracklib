@@ -1,26 +1,32 @@
 #ifndef SIXTRACKLIB_CUDA_CONTROL_NODE_INFO_HPP__
 #define SIXTRACKLIB_CUDA_CONTROL_NODE_INFO_HPP__
 
-#if !defined( SIXTRKL_NO_SYSTEM_INCLUDES )
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-       !defined( __CUDA_ARCH__ )
-        #include <cstddef>
-        #include <cstdlib>
-        #include <cstring>
-        #include <cstdio>
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
 
-        #include <cuda.h>
-        #include <cuda_runtime.h>
-    #endif /* C++, Host */
+#if !defined( SIXTRKL_NO_SYSTEM_INCLUDES )
+    #include <cstddef>
+    #include <cstdlib>
+    #include <cstring>
+    #include <cstdio>
+
+    #include <cuda_runtime_api.h>
+
 #endif /* !defined( SIXTRKL_NO_SYSTEM_INCLUDES ) */
+#endif /* C++, Host */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
-    #include "sixtracklib/common/control/node_info.hpp"
+    #include "sixtracklib/common/control/node_info.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/control/node_info.hpp"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -92,12 +98,27 @@ namespace SIXTRL_CXX_NAMESPACE
         std::string         m_cu_device_pci_bus_id;
     };
 }
+#endif /* C++, Host */
+
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* C++ */
+
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+typedef SIXTRL_CXX_NAMESPACE::CudaNodeInfo NS(CudaNodeInfo);
 
 #else /* C++, Host */
 
-typedef void NS(CudaNodeInfo);
+void NS(CudaNodeInfo);
 
 #endif /* C++, Host */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* C++ */
 
 #endif /* SIXTRACKLIB_CUDA_CONTROL_NODE_INFO_HPP__ */
 

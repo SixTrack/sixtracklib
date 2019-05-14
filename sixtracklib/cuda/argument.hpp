@@ -1,27 +1,31 @@
 #ifndef SIXTRACKLIB_CUDA_ARGUMENT_HPP__
 #define SIXTRACKLIB_CUDA_ARGUMENT_HPP__
 
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-       !defined( __CUDA_ARCH__ )
-        #include <cstddef>
-        #include <cstdlib>
-    #endif /* C++, Host */
+    #include <cstddef>
+    #include <cstdlib>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
+#endif /* C++, Host */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-       !defined( __CUDA_ARCH__ )
-        #include "sixtracklib/common/buffer.hpp"
-    #endif /* defined( __cplusplus ) */
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/control/argument_base.hpp"
+    #include "sixtracklib/cuda/control/argument_base.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/buffer.hpp"
+    #include "sixtracklib/cuda/control/argument_base.hpp"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -84,14 +88,26 @@ namespace SIXTRL_CXX_NAMESPACE
         cudaController() const SIXTRL_NOEXCEPT;
     };
 }
+#endif /* C++, Host */
 
-extern "C" { typedef SIXTRL_CXX_NAMESPACE::CudaArgument NS(CudaArgument); }
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* C++ */
 
-#else /* !defined( __cplusplus ) */
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+typedef SIXTRL_CXX_NAMESPACE::CudaArgument NS(CudaArgument);
+
+#else /* C++, Host */
 
 typedef void NS(CudaArgument);
 
-#endif /* defined( __cplusplus ) */
+#endif /* C++, Host */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* C++ */
 
 #endif /* SIXTRACKLIB_CUDA_ARGUMENT_H__ */
 
