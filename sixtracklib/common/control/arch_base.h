@@ -7,9 +7,9 @@
     #include "sixtracklib/common/control/arch_base.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
-#endif /* C++, Host */
+#endif /* C++ */
 
 #if !defined( _GPUCODE )
 
@@ -21,7 +21,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(ArchBase_get_config_string)(
 
 #endif /* !defined( _GPUCODE ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 }
 #endif /* C++, Host */
 

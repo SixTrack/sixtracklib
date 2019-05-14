@@ -14,11 +14,11 @@
     #include "sixtracklib/common/control/kernel_config_base.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
-#endif /* C++, Host */
+#endif /* C++ */
 
-#if !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_id_t) NS(KernelConfig_get_arch_id)(
     const NS(KernelConfigBase) *const SIXTRL_RESTRICT config );
@@ -285,9 +285,9 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(KernelConfig_print)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(KernelConfig_print_out)(
     const NS(KernelConfigBase) *const SIXTRL_RESTRICT config );
 
-#endif /* Host */
+#endif /* !defined( _GPUCODE ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 }
 #endif /* C++, Host */
 

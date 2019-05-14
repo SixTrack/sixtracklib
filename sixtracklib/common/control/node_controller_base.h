@@ -18,11 +18,11 @@
     #include "sixtracklib/common/control/node_controller_base.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
 #endif /* C++, Host */
 
-#if !defined( __CUDA_ARCH ) && !defined( _GPUCODE )
+#if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t)
 NS(Controller_get_num_available_nodes)(
@@ -189,9 +189,9 @@ NS(Controller_store_available_nodes_info_to_string)(
     NS(ctrl_size_t) const max_str_length,
     NS(ctrl_size_t)* SIXTRL_RESTRICT ptr_required_max_str_length );
 
-#endif /* !defined( __CUDA_ARCH ) && !defined( _GPUCODE ) */
+#endif /* !defined( _GPUCODE ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 }
 #endif /* C++, Host */
 

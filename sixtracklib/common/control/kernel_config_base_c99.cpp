@@ -6,9 +6,11 @@
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/control/definitions.h"
-#include "sixtracklib/common/control/kernel_config_base.hpp"
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+#include "sixtracklib/common/control/kernel_config_base.hpp"
 
 /* ------------------------------------------------------------------------- */
 

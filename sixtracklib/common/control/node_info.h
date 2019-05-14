@@ -17,7 +17,7 @@
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
 #endif /* C++, Host */
 
@@ -126,7 +126,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(NodeInfo_print_out)(
 
 #endif /* !defined( _GPUCODE ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 }
 #endif /* C++, Host */
 

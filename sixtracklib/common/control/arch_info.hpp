@@ -1,14 +1,15 @@
 #ifndef SIXTRACKLIB_COMMON_CONTROL_ARCH_INFO_HPP__
 #define SIXTRACKLIB_COMMON_CONTROL_ARCH_INFO_HPP__
 
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-       !defined( __CUDA_ARCH__ )
-        #include <cstddef>
-        #include <cstdlib>
-        #include <string>
-    #endif
+    #include <cstddef>
+    #include <cstdlib>
+    #include <string>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+#endif /* C++, Host */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
@@ -17,7 +18,8 @@
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if  defined( __cplusplus ) && !defined( _GPUCODE ) && \
+    !defined( __CUDACC__  ) && !defined( __CUDA_ARCH__ )
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -96,6 +98,14 @@ namespace SIXTRL_CXX_NAMESPACE
     ArchInfo_arch_string_to_arch_id(
         char const* SIXTRL_RESTRICT arch_str ) SIXTRL_NOEXCEPT;
 }
+#endif /* C++, Host */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* C++ */
+
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
 
 typedef SIXTRL_CXX_NAMESPACE::ArchInfo NS(ArchInfo);
 
@@ -105,8 +115,16 @@ typedef void NS(ArchInfo);
 
 #endif /* C++, Host */
 
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* C++ */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+/* ************************************************************************* */
+/* ********     Inline and template function implementation     ************ */
+/* ************************************************************************* */
+
+#if  defined( __cplusplus ) && !defined( _GPUCODE ) && \
+    !defined( __CUDACC__  ) && !defined( __CUDA_ARCH__ )
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <algorithm>

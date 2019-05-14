@@ -1,17 +1,18 @@
 #ifndef SIXTRACKLIB_COMMON_CONTROL_NODE_ID_HPP__
 #define SIXTRACKLIB_COMMON_CONTROL_NODE_ID_HPP__
 
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && \
+   !defined( __CUDACC__  ) && !defined( __CUDA_ARCH__ )
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-       !defined( __CUDA_ARCH__ )
-        #include <cstddef>
-        #include <cstdlib>
-        #include <cstdio>
-        #include <cstring>
-        #include <string>
-        #include <ostream>
-    #endif /* C++, Host */
+    #include <cstddef>
+    #include <cstdlib>
+    #include <cstdio>
+    #include <cstring>
+    #include <string>
+    #include <ostream>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+#endif /* C++, Host */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
@@ -19,7 +20,8 @@
     #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && \
+   !defined( __CUDACC__  ) && !defined( __CUDA_ARCH__ )
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -120,8 +122,16 @@ namespace SIXTRL_CXX_NAMESPACE
     NodeId_extract_node_id_str_from_config_str(
         char const* SIXTRL_RESTRICT config_str );
 }
+#endif /* C++, Host */
 
-typedef SIXTRL_CXX_NAMESPACE::NodeId    NS(NodeId);
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* c++ */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && \
+   !defined( __CUDACC__  ) && !defined( __CUDA_ARCH__ )
+
+typedef SIXTRL_CXX_NAMESPACE::NodeId  NS(NodeId);
 
 #else  /* !C++, Host */
 
@@ -129,11 +139,16 @@ typedef void NS(NodeId);
 
 #endif /* C++, Host */
 
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* c++ */
+
 /* ************************************************************************* */
 /* ******  Implementation of inline and template member functions    ******* */
 /* ************************************************************************* */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && \
+   !defined( __CUDACC__  ) && !defined( __CUDA_ARCH__ )
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <algorithm>
@@ -181,5 +196,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
 #endif /* C++, Host */
 
-#endif /* SIXTRACKLIB_COMMON_CONTROL_NODE_BASE_HPP__ */
-/* end: sixtracklib/common/control/node_base.hpp */
+#endif /* SIXTRACKLIB_COMMON_CONTROL_NODE_ID_HPP__ */
+
+/* end: sixtracklib/common/control/node_id.hpp */

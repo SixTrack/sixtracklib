@@ -1,20 +1,20 @@
 #ifndef SIXTRACKLIB_COMMON_CONTROL_ARCH_BASE_OBJECT_HPP__
 #define SIXTRACKLIB_COMMON_CONTROL_ARCH_BASE_OBJECT_HPP__
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && \
+   !defined( __CUDACC__  ) && !defined( __CUDA_ARCH__ )
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/control/arch_info.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-       !defined( __CUDA_ARCH__ )
-        #include <cstddef>
-        #include <cstdlib>
-        #include <string>
-    #endif /* C++, Host */
+    #include <cstddef>
+    #include <cstdlib>
+    #include <string>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
+#endif /* C++, Host */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
@@ -22,9 +22,9 @@
     #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#endif /* C++, Host */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && \
+   !defined( __CUDACC__  ) && !defined( __CUDA_ARCH__ )
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -154,6 +154,15 @@ namespace SIXTRL_CXX_NAMESPACE
     };
 }
 
+#endif /* C++, Host */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* C++ */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE ) && \
+   !defined( __CUDACC__  ) && !defined( __CUDA_ARCH__ )
+
 typedef SIXTRL_CXX_NAMESPACE::ArchBase      NS(ArchBase);
 typedef SIXTRL_CXX_NAMESPACE::ArchDebugBase NS(ArchDebugBase);
 
@@ -163,6 +172,10 @@ typedef void NS(ArchBase);
 typedef void NS(ArchDebugBase);
 
 #endif /* C++, Host */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* C++ */
 
 #endif /* SIXTRACKLIB_COMMON_CONTROL_ARCH_BASE_OBJECT_HPP__ */
 

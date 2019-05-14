@@ -19,9 +19,9 @@
     #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
-extern "C" {
-#endif /* C++, Host */
+// #if defined( __cplusplus ) && !defined( _GPUCODE )
+// extern "C" {
+// #endif /* C++ */
 
 #if !defined( _GPUCODE )
 
@@ -126,12 +126,11 @@ NS(NodeId_extract_node_id_str_from_config_str)(
     char const* SIXTRL_RESTRICT config_str, char* SIXTRL_RESTRICT node_id_str,
     NS(buffer_size_t) const max_node_id_str_len );
 
-
 #endif /* !defined( _GPUCODE )  */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
-}
-#endif /* C++, Host */
+// #if defined( __cplusplus ) && !defined( _GPUCODE )
+// }
+// #endif /* C++ */
 
 #endif /* SIXTRACKLIB_COMMON_CONTROL_NODE_ID_H__ */
 

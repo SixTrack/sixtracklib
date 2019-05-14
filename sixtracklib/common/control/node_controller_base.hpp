@@ -1,16 +1,18 @@
 #ifndef SIXTRACKLIB_COMMON_CONTROL_NODE_CONTROLLER_BASE_HPP__
 #define SIXTRACKLIB_COMMON_CONTROL_NODE_CONTROLLER_BASE_HPP__
 
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-       !defined( __CUDA_ARCH__ )
         #include <cstddef>
         #include <cstdlib>
         #include <string>
         #include <iostream>
         #include <vector>
-    #endif /* C++, Host */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
+#endif /* C++, Host */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
@@ -20,7 +22,12 @@
     #include "sixtracklib/common/control/controller_base.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/control/controller_base.hpp"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -329,12 +336,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
 #endif /* C++, Host */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
-
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
+#endif /* C++, Host */
 
-    typedef SIXTRL_CXX_NAMESPACE::NodeControllerBase NS(NodeControllerBase);
-}
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+typedef SIXTRL_CXX_NAMESPACE::NodeControllerBase NS(NodeControllerBase);
 
 #else /* C++, Host */
 
@@ -342,7 +351,12 @@ typedef void NS(NodeControllerBase);
 
 #endif /* C++, Host */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* C++, Host */
+
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
 
 namespace SIXTRL_CXX_NAMESPACE
 {

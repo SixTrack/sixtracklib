@@ -1,28 +1,27 @@
 #ifndef SIXTRACKLIB_COMMON_CONTROL_ARGUMENT_BASE_HPP__
 #define SIXTRACKLIB_COMMON_CONTROL_ARGUMENT_BASE_HPP__
 
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #if  defined( __cplusplus ) && !defined( _GPUCODE ) && \
-        !defined( __CUDA_ARCH__ )
         #include <cstddef>
         #include <cstdlib>
-    #endif /* C++, host */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+#endif /* C++, host */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
-
-    #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
-        !defined( __CUDA_ARCH__ )
-        #include "sixtracklib/common/buffer.hpp"
-        #include "sixtracklib/common/control/arch_base.hpp"
-    #endif /* C++, host */
-
     #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( __CUDA_ARCH__ ) && !defined( _GPUCODE )
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/buffer.hpp"
+    #include "sixtracklib/common/control/arch_base.hpp"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -172,9 +171,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
 #endif /* C++, host */
 
-#if defined( __cplusplus ) && !defined( __CUDA_ARCH__ ) && !defined( _GPUCODE )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* C++ */
 
-extern "C" { typedef SIXTRL_CXX_NAMESPACE::ArgumentBase  NS(ArgumentBase); }
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+
+typedef SIXTRL_CXX_NAMESPACE::ArgumentBase  NS(ArgumentBase);
 
 #else /* C++, host */
 
@@ -182,9 +186,16 @@ typedef void NS(ArgumentBase);
 
 #endif /* C++, host */
 
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* C++ */
 
+/* ************************************************************************* */
+/* ********     Inline and template function implementation     ************ */
+/* ************************************************************************* */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <type_traits>

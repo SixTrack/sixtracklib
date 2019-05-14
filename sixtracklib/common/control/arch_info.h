@@ -16,9 +16,9 @@
     #include "sixtracklib/common/control/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
-#endif /* C++, Host */
+#endif /* C++ */
 
 #if !defined( _GPUCODE )
 
@@ -82,7 +82,7 @@ NS(ArchInfo_sanitize_arch_str)( const char *const SIXTRL_RESTRICT arch_str,
 
 #endif /* !defined( _GPUCODE ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 }
 #endif /* C++, Host */
 

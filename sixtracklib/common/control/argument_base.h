@@ -10,14 +10,14 @@
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/control/argument_base.hpp"
-    #include "sixtracklib/common/control/controller_base.hpp"
+    #include "sixtracklib/common/control/controller_base.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
-#endif /* C++, host */
+#endif /* C++ */
 
-#if defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_id_t) NS(Argument_get_arch_id)(
     const NS(ArgumentBase) *const SIXTRL_RESTRICT arg );
@@ -101,18 +101,18 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Argument_requires_argument_buffer)(
     const NS(ArgumentBase) *const SIXTRL_RESTRICT arg );
 
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ContextBase)*
-NS(Argument_get_ptr_base_controller)( NS(Argument)* SIXTRL_RESTRICT arg );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ControllerBase)*
+NS(Argument_get_ptr_base_controller)( NS(ArgumentBase)* SIXTRL_RESTRICT arg );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ContextBase) const*
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ControllerBase) const*
 NS(Argument_get_const_ptr_base_controller)(
-    const NS(Argument) *const SIXTRL_RESTRICT arg );
+    const NS(ArgumentBase) *const SIXTRL_RESTRICT arg );
 
-#endif /* !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ ) */
+#endif /* !defined( _GPUCODE ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 }
-#endif /* C++, host */
+#endif /* C++ */
 
 #endif /* SIXTRACKLIB_COMMON_CONTROL_ARGUMENT_BASE_H__ */
 /* end: sixtracklib/common/control/argument_base.h */
