@@ -244,14 +244,6 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const line_begin_idx, size_type const line_end_idx,
             bool const finish_turn ) override;
 
-        SIXTRL_HOST_FN virtual collect_flag_t doCollect(
-            collect_flag_t const flags ) override;
-
-        /* ----------------------------------------------------------------- */
-
-        SIXTRL_HOST_FN virtual bool doParseConfigStr(
-            const char *const SIXTRL_RESTRICT config_str ) override;
-
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN cuda_argument_t const& doGetRefCudaArgument(

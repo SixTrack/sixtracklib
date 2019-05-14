@@ -113,6 +113,11 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
+    CudaTrackJob::~CudaTrackJob()
+    {
+
+    }
+
     /* ===================================================================== */
 
     bool CudaTrackJob::hasCudaController() const SIXTRL_NOEXCEPT

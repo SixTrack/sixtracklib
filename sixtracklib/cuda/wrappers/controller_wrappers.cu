@@ -63,14 +63,12 @@ void NS(Buffer_remap_cuda_wrapper)(
 void NS(Buffer_remap_cuda_debug_wrapper)(
     const NS(CudaKernelConfig) *const SIXTRL_RESTRICT conf,
     NS(CudaArgument)* SIXTRL_RESTRICT buffer_arg,
-    NS(buffer_size_t) const slot_size,
     NS(cuda_arg_buffer_t) SIXTRL_RESTRICT dbg_register_arg )
 {
     dim3 const* ptr_blocks = SIXTRL_NULLPTR;
     dim3 const* ptr_threads = SIXTRL_NULLPTR;
 
-    if( ( slot_size > ( NS(buffer_size_t) )0u ) &&
-        ( NS(KernelConfig_get_arch_id)( conf ) == NS(ARCHITECTURE_CUDA) ) &&
+    if( ( NS(KernelConfig_get_arch_id)( conf ) == NS(ARCHITECTURE_CUDA) ) &&
         ( !NS(KernelConfig_needs_update)( conf ) ) )
     {
         ptr_blocks = NS(CudaKernelConfig_get_ptr_const_blocks)( conf );
@@ -101,9 +99,9 @@ void NS(Buffer_remap_cuda_debug_wrapper)(
     {
         NS(ManagedBuffer_remap_cuda_debug)<<< *ptr_blocks, *ptr_threads >>>(
             NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
-                buffer_arg ), slot_size,
-            NS(CudaArgument_get_cuda_arg_buffer_as_debugging_register_begin)(
-                dbg_register_arg ) );
+                buffer_arg ),
+        NS(Argument_get_cobjects_buffer_slot_size)( buffer_arg ),
+        reinterpret_cast< NS(arch_debugging_t)* >( dbg_register_arg ) );
     }
 }
 
