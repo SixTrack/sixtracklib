@@ -196,7 +196,7 @@ TEST( C99_CommonControlNodeIdTests, ExtractNodeIdFromConfigStr )
     status_t ret = ::NS(NodeId_extract_node_id_str_from_config_str)(
         conf_str.c_str(), &device_id_str[ 0 ], max_out_str_len );
 
-    ASSERT_TRUE( ret == ::NS(CONTROLLER_STATUS_SUCCESS) );
+    ASSERT_TRUE( ret == ::NS(ARCH_STATUS_SUCCESS) );
     ASSERT_TRUE( std::strlen( &device_id_str[ 0 ] ) == buf_size_t{ 0 } );
 
     conf_str = "0.0";
@@ -205,7 +205,7 @@ TEST( C99_CommonControlNodeIdTests, ExtractNodeIdFromConfigStr )
     ret = ::NS(NodeId_extract_node_id_str_from_config_str)(
         conf_str.c_str(), &device_id_str[ 0 ], max_out_str_len );
 
-    ASSERT_TRUE( ret == ::NS(CONTROLLER_STATUS_SUCCESS) );
+    ASSERT_TRUE( ret == ::NS(ARCH_STATUS_SUCCESS) );
     ASSERT_TRUE( std::strcmp( &device_id_str[ 0 ], "0.0" ) == 0 );
 
     conf_str = "  0.0  ";
@@ -214,7 +214,7 @@ TEST( C99_CommonControlNodeIdTests, ExtractNodeIdFromConfigStr )
     ret = ::NS(NodeId_extract_node_id_str_from_config_str)(
         conf_str.c_str(), &device_id_str[ 0 ], max_out_str_len );
 
-    ASSERT_TRUE( ret == ::NS(CONTROLLER_STATUS_SUCCESS) );
+    ASSERT_TRUE( ret == ::NS(ARCH_STATUS_SUCCESS) );
     ASSERT_TRUE( std::strcmp( &device_id_str[ 0 ], "0.0" ) == 0 );
 
 //     conf_str = "0.0;a=b;#this is a comment";
