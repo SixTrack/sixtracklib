@@ -15,12 +15,20 @@ extern "C" {
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Buffer_remap_cuda_wrapper)(
     const NS(CudaKernelConfig) *const SIXTRL_RESTRICT kernel_config,
-    NS(CudaArgument)* SIXTRL_RESTRICT buffer_arg );
+    NS(cuda_arg_buffer_t) SIXTRL_RESTRICT managed_buffer_begin,
+    NS(buffer_size_t) const slot_size );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Buffer_remap_cuda_debug_wrapper)(
     const NS(CudaKernelConfig) *const SIXTRL_RESTRICT kernel_config,
-    NS(CudaArgument)* SIXTRL_RESTRICT buffer_arg,
+    NS(cuda_arg_buffer_t) SIXTRL_RESTRICT managed_buffer_begin,
+    NS(buffer_size_t) const slot_size,
     NS(cuda_arg_buffer_t) SIXTRL_RESTRICT ptr_debug_register );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Buffer_is_remapped_cuda_wrapper)(
+    NS(cuda_arg_buffer_t) SIXTRL_RESTRICT managed_buffer_begin,
+    NS(buffer_size_t) const slot_size,
+    NS(cuda_arg_buffer_t) SIXTRL_RESTRICT ptr_debug_register,
+    NS(arch_status_t)* SIXTRL_RESTRICT ptr_status );
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }

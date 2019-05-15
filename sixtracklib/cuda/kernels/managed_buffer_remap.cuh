@@ -20,6 +20,13 @@ __global__ void NS(ManagedBuffer_remap_cuda_debug)(
     NS(buffer_size_t) const slot_size,
     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register );
 
+__global__ void NS(ManagedBuffer_needs_remapping_cuda)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const slot_size,
+    NS(arch_debugging_t) const needs_remapping_true,
+    NS(arch_debugging_t) const needs_remapping_false,
+    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_result );
+
 #if defined( __cplusplus )
 }
 #endif /* defined( __cplusplus ) */

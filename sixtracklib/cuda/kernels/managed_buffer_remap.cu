@@ -58,4 +58,28 @@ __global__ void NS(ManagedBuffer_remap_cuda_debug)(
     }
 }
 
+__global__ void NS(ManagedBuffer_needs_remapping_cuda)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const slot_size,
+    NS(arch_debugging_t) const needs_remapping_true,
+    NS(arch_debugging_t) const needs_remapping_false,
+    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_result )
+{
+    typedef NS(arch_debugging_t) debug_register_t;
+    typedef NS(arch_status_t) status_t;
+    typedef NS(buffer_size_t) buf_size_t;
+
+    if( NS(Cuda_get_1d_thread_id_in_kernel)() == ( buf_size_t )0u )
+    {
+        bool const needs_remapping =
+            NS(ManagedBuffer_needs_remapping)( buffer_begin, slot_size );
+
+        if( ptr_result != SIXTRL_NULLPTR )
+        {
+            *ptr_result = ( needs_remapping )
+                ? needs_remapping_true : needs_remapping_false;
+        }
+    }
+}
+
 /* end: sixtracklib/cuda/kernels/managed_buffer_remap.cu */

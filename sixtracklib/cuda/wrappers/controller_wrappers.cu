@@ -20,12 +20,15 @@
 
 void NS(Buffer_remap_cuda_wrapper)(
     const NS(CudaKernelConfig) *const SIXTRL_RESTRICT kernel_config,
-    NS(CudaArgument)* SIXTRL_RESTRICT buffer_arg )
+    NS(cuda_arg_buffer_t) SIXTRL_RESTRICT managed_buffer_begin,
+    NS(buffer_size_t) const slot_size )
 {
-    dim3 const* ptr_blocks = SIXTRL_NULLPTR;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char* ptr_managed_buffer_t;
+
+    dim3 const* ptr_blocks =
         NS(CudaKernelConfig_get_ptr_const_blocks)( kernel_config );
 
-    dim3 const* ptr_threads = SIXTRL_NULLPTR;
+    dim3 const* ptr_threads =
         NS(CudaKernelConfig_get_ptr_const_threads_per_block)( kernel_config );
 
     /* kernel config */
@@ -38,33 +41,25 @@ void NS(Buffer_remap_cuda_wrapper)(
 
     SIXTRL_ASSERT( !NS(KernelConfig_needs_update)( kernel_config ) );
 
-    /* argument: */
-
-    SIXTRL_ASSERT( buffer_arg != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( NS(Argument_get_arch_id)( buffer_arg ) ==
-                   NS(ARCHITECTURE_CUDA) );
-
-    SIXTRL_ASSERT( NS(Argument_has_argument_buffer)( buffer_arg) );
-    SIXTRL_ASSERT( NS(Argument_uses_cobjects_buffer)( buffer_arg ) );
-    SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
-        buffer_arg ) != SIXTRL_NULLPTR );
-
-    SIXTRL_ASSERT( NS(Argument_get_const_ptr_base_controller)(
-        buffer_arg ) != SIXTRL_NULLPTR );
-
-    SIXTRL_ASSERT( NS(Argument_get_cobjects_buffer_slot_size)( buffer_arg ) >
-                  ( NS(buffer_size_t) )0u );
+    SIXTRL_ASSERT( managed_buffer_begin != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( slot_size > ( NS(buffer_size_t) )0u );
 
     NS(ManagedBuffer_remap_cuda)<<< *ptr_blocks, *ptr_threads >>>(
-        NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)( buffer_arg ),
-        NS(Argument_get_cobjects_buffer_slot_size)( buffer_arg ) );
+        reinterpret_cast< ptr_managed_buffer_t >( managed_buffer_begin ),
+        slot_size );
+
+    ::cudaDeviceSynchronize();
 }
 
 void NS(Buffer_remap_cuda_debug_wrapper)(
     const NS(CudaKernelConfig) *const SIXTRL_RESTRICT conf,
-    NS(CudaArgument)* SIXTRL_RESTRICT buffer_arg,
+    NS(cuda_arg_buffer_t) SIXTRL_RESTRICT managed_buffer_begin,
+    NS(buffer_size_t) const slot_size,
     NS(cuda_arg_buffer_t) SIXTRL_RESTRICT dbg_register_arg )
 {
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char* ptr_managed_buffer_t;
+    typedef SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* ptr_dbg_register_t;
+
     dim3 const* ptr_blocks = SIXTRL_NULLPTR;
     dim3 const* ptr_threads = SIXTRL_NULLPTR;
 
@@ -79,30 +74,78 @@ void NS(Buffer_remap_cuda_debug_wrapper)(
 
     if( ( ptr_blocks  != SIXTRL_NULLPTR ) &&
         ( ptr_threads != SIXTRL_NULLPTR ) &&
-        ( buffer_arg != SIXTRL_NULLPTR ) &&
-        ( NS(Argument_has_argument_buffer)( buffer_arg ) ) &&
-        ( NS(Argument_uses_cobjects_buffer)( buffer_arg ) ) &&
-        ( NS(Argument_get_const_cobjects_buffer)( buffer_arg ) !=
-          SIXTRL_NULLPTR ) &&
-        ( NS(Argument_get_const_ptr_base_controller)( buffer_arg) !=
-          SIXTRL_NULLPTR ) &&
-        ( NS(Argument_get_cobjects_buffer_slot_size)( buffer_arg ) >
-          ( NS(arch_size_t) )0u ) &&
-        ( dbg_register_arg != SIXTRL_NULLPTR ) &&
-        ( NS(Argument_has_argument_buffer)( dbg_register_arg ) ) &&
-        ( NS(Argument_uses_raw_argument)( dbg_register_arg ) ) &&
-        ( NS(Argument_get_ptr_raw_argument)( dbg_register_arg ) ) &&
-        ( NS(Argument_get_size)( dbg_register_arg ) ==
-          sizeof( NS(arch_debugging_t) ) ) &&
-        ( NS(Argument_get_const_ptr_base_controller)( dbg_register_arg ) ==
-          NS(Argument_get_const_ptr_base_controller)( buffer_arg ) ) )
+        ( managed_buffer_begin != SIXTRL_NULLPTR ) &&
+        ( slot_size > ( NS(buffer_size_t) )0u ) )
     {
         NS(ManagedBuffer_remap_cuda_debug)<<< *ptr_blocks, *ptr_threads >>>(
-            NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
-                buffer_arg ),
-        NS(Argument_get_cobjects_buffer_slot_size)( buffer_arg ),
-        reinterpret_cast< NS(arch_debugging_t)* >( dbg_register_arg ) );
+            reinterpret_cast< ptr_managed_buffer_t >( managed_buffer_begin ),
+            slot_size,
+            reinterpret_cast< ptr_dbg_register_t >( dbg_register_arg ) );
+
+        ::cudaDeviceSynchronize();
     }
+}
+
+bool NS(Buffer_is_remapped_cuda_wrapper)(
+    NS(cuda_arg_buffer_t) SIXTRL_RESTRICT managed_buffer_begin,
+    NS(buffer_size_t) const slot_size,
+    NS(cuda_arg_buffer_t) SIXTRL_RESTRICT ptr_debug_register,
+    NS(arch_status_t)* SIXTRL_RESTRICT ptr_status )
+{
+    typedef NS(arch_status_t) status_t;
+    typedef NS(arch_debugging_t) debug_register_t;
+    typedef SIXTRL_DATAPTR_DEC debug_register_t* ptr_dbg_register_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char* ptr_managed_buffer_t;
+
+    status_t local_status = NS(ARCH_STATUS_GENERAL_FAILURE);
+
+    bool is_remapped = false;
+
+    if( ( ptr_debug_register != SIXTRL_NULLPTR ) &&
+        ( managed_buffer_begin != SIXTRL_NULLPTR ) &&
+        ( slot_size > ( NS(buffer_size_t) )0u ) )
+    {
+        debug_register_t local_dbg = NS(ARCH_DEBUGGING_GENERAL_FAILURE);
+
+        debug_register_t const needs_remapping_true  = ( debug_register_t )1;
+        debug_register_t const needs_remapping_false = ( debug_register_t )2;
+
+        ::cudaError_t err = ::cudaMemcpy( ptr_debug_register, &local_dbg,
+            sizeof( local_dbg ), ::cudaMemcpyHostToDevice );
+
+        if( err == ::cudaSuccess )
+        {
+            local_status = NS(ARCH_STATUS_SUCCESS);
+
+            ptr_dbg_register_t dbg_register =
+                reinterpret_cast< ptr_dbg_register_t >( ptr_debug_register );
+
+            NS(ManagedBuffer_needs_remapping_cuda)<<< 1, 1 >>>(
+                reinterpret_cast< ptr_managed_buffer_t >( managed_buffer_begin ),
+                    slot_size, needs_remapping_true, needs_remapping_false,
+                        dbg_register );
+
+            ::cudaDeviceSynchronize();
+
+            err = ::cudaMemcpy( &local_dbg, dbg_register, sizeof( local_dbg ),
+                                ::cudaMemcpyDeviceToHost );
+
+            if( err != ::cudaSuccess )
+            {
+                local_status = NS(ARCH_STATUS_GENERAL_FAILURE);
+            }
+
+            SIXTRL_ASSERT( ( local_dbg == needs_remapping_false ) ||
+                           ( local_dbg == needs_remapping_true  ) );
+
+            is_remapped = ( local_dbg == needs_remapping_false );
+        }
+
+    }
+
+    if( ptr_status != SIXTRL_NULLPTR) *ptr_status = local_status;
+
+    return is_remapped;
 }
 
 /* end: sixtracklib/cuda/wrappers/controller_wrappers.cu */
