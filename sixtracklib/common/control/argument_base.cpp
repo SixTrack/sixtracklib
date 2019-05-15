@@ -336,7 +336,7 @@ namespace SIXTRL_CXX_NAMESPACE
               ( this->usesCObjectsCxxBuffer() ) ) &&
             ( ( this->ptrCObjectsBuffer() != nullptr ) ) )
         {
-            status = ptr_controller->remapCObjectsBuffer( this, this->size() );
+            status = ptr_controller->remap( this );
         }
 
         return status;
@@ -479,7 +479,7 @@ namespace SIXTRL_CXX_NAMESPACE
         ArgumentBase::ptr_base_controller_t SIXTRL_RESTRICT ctrl
     ) SIXTRL_NOEXCEPT
     {
-        this->m_ptr_base_controller = ptr_controller;
+        this->m_ptr_base_controller = ctrl;
     }
 
     void ArgumentBase::doSetBufferRef( ArgumentBase::buffer_t const&
