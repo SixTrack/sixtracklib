@@ -647,6 +647,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->m_kernel_configs.push_back(
                 std::move( ptr_kernel_conf_base ) );
+            
+            if( this->ptrKernelConfigBase( kernel_id ) != nullptr )
+            {
+                ++this->m_num_kernels;
+            }
         }
 
         return kernel_id;

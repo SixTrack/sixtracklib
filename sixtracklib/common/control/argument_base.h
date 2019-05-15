@@ -19,6 +19,9 @@ extern "C" {
 
 #if !defined( _GPUCODE )
 
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Argument_delete)(
+    NS(ArgumentBase)* SIXTRL_RESTRICT arg );
+    
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_id_t) NS(Argument_get_arch_id)(
     const NS(ArgumentBase) *const SIXTRL_RESTRICT arg );
 

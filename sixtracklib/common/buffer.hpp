@@ -240,6 +240,14 @@ namespace SIXTRL_CXX_NAMESPACE
         get( size_type const object_index ) SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
+        
+        SIXTRL_FN bool reset(
+            size_type const max_num_objects = size_type{ 0 },
+            size_type const max_num_slots = size_type{ 0 },
+            size_type const max_num_dataptrs = size_type{ 0 },
+            size_type const max_num_garbage_ranges = size_type{ 0 } );
+        
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_FN bool needsRemapping() const SIXTRL_NOEXCEPT;
         SIXTRL_FN bool remap() SIXTRL_NOEXCEPT;
@@ -1081,6 +1089,19 @@ namespace SIXTRL_CXX_NAMESPACE
         return NS(Buffer_get_object)( this->getCApiPtr(), object_index );
     }
 
+    /* ----------------------------------------------------------------- */
+    
+    SIXTRL_INLINE bool Buffer::reset(
+            Buffer::size_type const max_num_objects,
+            Buffer::size_type const max_num_slots,
+            Buffer::size_type const max_num_dataptrs,
+            Buffer::size_type const max_num_garbage_ranges  )
+    {
+        return ( ::NS(Buffer_reset_detailed)( this->getCApiPtr(),
+            max_num_objects, max_num_slots, max_num_dataptrs, 
+                max_num_garbage_ranges ) == 0 );
+    }
+    
     /* ----------------------------------------------------------------- */
 
     SIXTRL_INLINE bool Buffer::needsRemapping() const SIXTRL_NOEXCEPT

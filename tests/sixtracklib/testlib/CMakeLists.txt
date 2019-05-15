@@ -20,7 +20,7 @@ if( SIXTRACKL_ENABLE_OPENCL )
 endif()
 
 if( SIXTRACKL_ENABLE_CUDA )
-    add_subdirectory( cuda )
+#     add_subdirectory( cuda )
 endif()
 
 # -----------------------------------------------------------------------------

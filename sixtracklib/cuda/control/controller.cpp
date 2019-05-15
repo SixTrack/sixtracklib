@@ -684,7 +684,7 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( buffer_cuda_arg != nullptr ) &&
             ( buffer_cuda_arg->usesCObjectsBuffer() ) &&
             ( buffer_cuda_arg->hasCudaArgBuffer() ) &&
-            ( buffer_cuda_arg->size() > size_t{ 0 } ) )
+            ( buffer_cuda_arg->capacity() > size_t{ 0 } ) )
         {
             status = this->doRemapCObjectsBufferDirectly(
                 buffer_cuda_arg->cudaArgBuffer(),
@@ -720,7 +720,7 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( buffer_cuda_arg != nullptr ) &&
             ( buffer_cuda_arg->usesCObjectsBuffer() ) &&
             ( buffer_cuda_arg->hasCudaArgBuffer() ) &&
-            ( buffer_cuda_arg->size() > size_t{ 0 } ) )
+            ( buffer_cuda_arg->capacity() > size_t{ 0 } ) )
         {
             is_remapped = this->doCheckIsCobjectsBufferRemappedDirectly(
                 ptr_status, buffer_cuda_arg->cudaArgBuffer(),

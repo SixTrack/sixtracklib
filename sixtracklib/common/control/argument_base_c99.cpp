@@ -11,6 +11,10 @@
 #include "sixtracklib/common/control/argument_base.hpp"
 #include "sixtracklib/common/control/controller_base.hpp"
 
+void NS(Argument_delete)( ::NS(ArgumentBase)* SIXTRL_RESTRICT arg )
+{
+    if( arg != nullptr ) delete arg;
+}
 
 ::NS(arch_id_t) NS(Argument_get_arch_id)(
     const ::NS(ArgumentBase) *const SIXTRL_RESTRICT arg )
