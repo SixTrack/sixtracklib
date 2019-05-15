@@ -181,10 +181,10 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( items_dim > size_t{ 0 } ) && ( wgroups_dim == items_dim ) )
         {
             size_t ii = size_t{ 0 };
-            bool success = true;
+            success = true;
 
-            size_t num_blocks[]  = { size_t{ 0 }, size_t{ 0 }, size_t{ 0 } };
-            size_t num_threads[] = { size_t{ 0 }, size_t{ 0 }, size_t{ 0 } };
+            size_t num_blocks[]  = { size_t{ 1 }, size_t{ 1 }, size_t{ 1 } };
+            size_t num_threads[] = { size_t{ 1 }, size_t{ 1 }, size_t{ 1 } };
 
             for( ; ii < items_dim ; ++ii )
             {
@@ -209,13 +209,22 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( success )
             {
+                size_t const total_num_blocks =
+                    num_blocks[ 0 ] * num_blocks[ 1 ] * num_blocks[ 2 ];
+
                 this->m_blocks.x = num_blocks[ 0 ];
                 this->m_blocks.y = num_blocks[ 1 ];
                 this->m_blocks.z = num_blocks[ 2 ];
 
+                size_t const threads_per_block =
+                    num_threads[ 0 ] * num_threads[ 1 ] * num_threads[ 2 ];
+
                 this->m_threads_per_block.x = num_threads[ 0 ];
                 this->m_threads_per_block.y = num_threads[ 1 ];
                 this->m_threads_per_block.z = num_threads[ 2 ];
+
+                success = ( ( total_num_blocks  > size_t{ 0 } ) &&
+                            ( threads_per_block > size_t{ 0 } ) );
             }
         }
 
