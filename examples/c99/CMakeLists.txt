@@ -69,8 +69,8 @@ if( SIXTRACKL_ENABLE_CUDA )
     # -------------------------------------------------------------------------
     # track_lhc_no_bb_cuda_c99:
 
-    add_executable( track_lhc_no_bb_cuda_c99 track_lhc_no_bb_cuda.c )
-    list( APPEND EXAMPLE_CUDA_TARGETS        track_lhc_no_bb_cuda_c99 )
+#     add_executable( track_lhc_no_bb_cuda_c99 track_lhc_no_bb_cuda.c )
+#     list( APPEND EXAMPLE_CUDA_TARGETS        track_lhc_no_bb_cuda_c99 )
 endif()
 
 if( SIXTRACKL_ENABLE_OPENCL )
