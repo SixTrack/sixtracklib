@@ -7,6 +7,7 @@
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <cstddef>
     #include <cstdlib>
+    #include <stdexcept>
     #include <string>
     #include <memory>
     #include <vector>
@@ -52,6 +53,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using kernel_config_base_t = SIXTRL_CXX_NAMESPACE::KernelConfigBase;
         using kernel_id_t          = kernel_config_base_t::kernel_id_t;
 
+        using arg_base_ref_t       = ArgumentBase&;
         using ptr_arg_base_t       = ArgumentBase*;
         using ptr_const_arg_base_t = ArgumentBase const*;
 
@@ -201,9 +203,20 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ================================================================= */
 
-        SIXTRL_HOST_FN status_t remapCObjectsBuffer(
-            ptr_arg_base_t SIXTRL_RESTRICT arg,
-            size_type const arg_size = size_type{ 0 } );
+        SIXTRL_HOST_FN status_t remap(
+            ptr_arg_base_t SIXTRL_RESTRICT ptr_arg );
+
+        SIXTRL_HOST_FN status_t remap(
+            arg_base_ref_t SIXTRL_RESTRICT_REF arg );
+
+
+        SIXTRL_HOST_FN bool isRemapped(
+            ptr_arg_base_t SIXTRL_RESTRICT ptr_arg );
+
+        SIXTRL_HOST_FN bool isRemapped(
+            arg_base_ref_t SIXTRL_RESTRICT_REF arg );
+
+        /* ================================================================= */
 
         SIXTRL_HOST_FN virtual ~ControllerBase() SIXTRL_NOEXCEPT;
 
@@ -246,8 +259,12 @@ namespace SIXTRL_CXX_NAMESPACE
             void* SIXTRL_RESTRICT destination, size_type const dest_capacity,
             ptr_arg_base_t SIXTRL_RESTRICT source );
 
-        SIXTRL_HOST_FN virtual status_t doRemapCObjectsBuffer(
-            ptr_arg_base_t SIXTRL_RESTRICT arg, size_type arg_size );
+        SIXTRL_HOST_FN virtual status_t doRemapCObjectsBufferArg(
+            ptr_arg_base_t SIXTRL_RESTRICT arg );
+
+        SIXTRL_HOST_FN virtual bool doIsCObjectsBufferArgRemapped(
+            ptr_arg_base_t SIXTRL_RESTRICT arg,
+            status_t* SIXTRL_RESTRICT ptr_status );
 
         SIXTRL_HOST_FN virtual bool doSwitchDebugMode(
             bool const is_in_debug_mode ) override;

@@ -101,7 +101,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( status == st::ARCH_STATUS_SUCCESS )
             {
-                status = this->doRemapCObjectsBuffer( arg, src_size );
+                status = this->doRemapCObjectsBufferArg( arg );
             }
         }
 
@@ -131,7 +131,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( status == st::ARCH_STATUS_SUCCESS )
             {
-                status = this->doRemapCObjectsBuffer( arg, src_size );
+                status = this->doRemapCObjectsBufferArg( arg );
             }
         }
 
@@ -443,19 +443,48 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* ===================================================================== */
 
-    ControllerBase::status_t ControllerBase::remapCObjectsBuffer(
-        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT arg,
-        ControllerBase::size_type const arg_size )
+    ControllerBase::status_t ControllerBase::remap(
+        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT ptr_arg )
     {
         ControllerBase::status_t status =
             st::ARCH_STATUS_GENERAL_FAILURE;
 
-        if( ( arg != nullptr ) && ( this->readyForRemap() ) )
+        if( ( ptr_arg != nullptr ) && ( this->readyForRemap() ) )
         {
-            status = this->doRemapCObjectsBuffer( arg, arg_size );
+            status = this->doRemapCObjectsBufferArg( ptr_arg );
         }
 
         return status;
+    }
+
+    ControllerBase::status_t ControllerBase::remap(
+        ControllerBase::arg_base_ref_t SIXTRL_RESTRICT_REF arg )
+    {
+        return this->remap( &arg );
+    }
+
+    bool ControllerBase::isRemapped(
+        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT ptr_arg )
+    {
+        ControllerBase::status_t local_status =
+            st::ARCH_STATUS_GENERAL_FAILURE;
+
+        bool const is_remapped = this->doIsCObjectsBufferArgRemapped(
+            ptr_arg, &local_status );
+
+        if( local_status != st::ARCH_STATUS_SUCCESS )
+        {
+            throw std::runtime_error(
+                "could not determine if cobject argument is remapped" );
+        }
+
+        return is_remapped;
+    }
+
+    bool ControllerBase::isRemapped(
+        ControllerBase::arg_base_ref_t SIXTRL_RESTRICT_REF arg )
+    {
+        return this->isRemapped( &arg );
     }
 
     ControllerBase::~ControllerBase() SIXTRL_NOEXCEPT
@@ -504,11 +533,22 @@ namespace SIXTRL_CXX_NAMESPACE
         return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    ControllerBase::status_t ControllerBase::doRemapCObjectsBuffer(
-        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT,
-        ControllerBase::size_type const )
+    ControllerBase::status_t ControllerBase::doRemapCObjectsBufferArg(
+        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT )
     {
         return st::ARCH_STATUS_GENERAL_FAILURE;
+    }
+
+    bool ControllerBase::doIsCObjectsBufferArgRemapped(
+        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT,
+        ControllerBase::status_t* SIXTRL_RESTRICT ptr_status )
+    {
+        if( ptr_status != nullptr )
+        {
+            *ptr_status = st::ARCH_STATUS_GENERAL_FAILURE;
+        }
+
+        return false;
     }
 
     bool ControllerBase::doSwitchDebugMode( bool const is_in_debug_mode )
