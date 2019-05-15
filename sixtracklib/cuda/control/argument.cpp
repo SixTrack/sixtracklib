@@ -54,7 +54,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( status == ::NS(ARCH_STATUS_SUCCESS) )
             {
-                status = ctrl->remapCObjectsBuffer( this );
+                status = ctrl->remap( this );
             }
 
             if( status == ::NS(ARCH_STATUS_SUCCESS) )
@@ -94,7 +94,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( status == ::NS(ARCH_STATUS_SUCCESS) )
             {
-                status = ctrl->remapCObjectsBuffer( this );
+                status = ctrl->remap( this );
             }
 
             if( status == ::NS(ARCH_STATUS_SUCCESS) )
