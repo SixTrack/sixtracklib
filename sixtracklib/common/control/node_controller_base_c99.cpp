@@ -6,16 +6,18 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "sixtracklib/common/control/definitions.h"
+
 namespace st = SIXTRL_CXX_NAMESPACE;
 
 /* ========================================================================= */
 
-::NS(arch_size_t) NS(Controller_get_num_available_nodes)(
+::NS(node_index_t) NS(Controller_get_num_available_nodes)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl )
 {
     auto ptr_nodes_ctx = st::asNodeController( ctrl );
     return ( ptr_nodes_ctx != nullptr )
-        ? ptr_nodes_ctx->numAvailableNodes() : ::NS(arch_size_t){ 0 };
+        ? ptr_nodes_ctx->numAvailableNodes() : ::NS(node_index_t){ 0 };
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -28,7 +30,7 @@ bool NS(Controller_has_default_node)(
              ( ptr_nodes_ctx->hasDefaultNode() ) );
 }
 
-::NS(arch_size_t) NS(Controller_get_default_node_index)(
+::NS(node_index_t) NS(Controller_get_default_node_index)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl )
 {
     auto ptr_nodes_ctx = st::asNodeController( ctrl );
@@ -177,8 +179,8 @@ bool NS(Controller_is_node_available)(
     const ::NS(NodeId) *const SIXTRL_RESTRICT node_id )
 {
     auto ptr_nodes_ctx = st::asNodeController( ctrl );
-    return ( ptr_nodes_ctx != nullptr )
-        ? ptr_nodes_ctx->ptrNodeInfoBase( node_id ) : nullptr;
+    return ( ( ptr_nodes_ctx != nullptr ) && ( node_id != nullptr ) )
+        ? ptr_nodes_ctx->ptrNodeInfoBase( *node_id ) : nullptr;
 }
 
 ::NS(NodeInfoBase) const*
@@ -292,7 +294,90 @@ bool NS(Controller_select_node_by_index)( NS(ControllerBase)* SIXTRL_RESTRICT ct
              ( ptr_nodes_ctx->selectNode( node_index ) ) );
 }
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* ========================================================================= */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_can_change_selected_node)(
+    const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl )
+{
+    auto ptr_nodes_ctx = st::asNodeController( ctrl );
+    return ( ( ptr_nodes_ctx != nullptr ) &&
+             ( ptr_nodes_ctx->canChangeSelectedNode() ) );
+}
+
+bool NS(Controller_can_directly_change_selected_node)(
+    const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl )
+{
+    auto ptr_nodes_ctx = st::asNodeController( ctrl );
+    return ( ( ptr_nodes_ctx != nullptr ) &&
+             ( ptr_nodes_ctx->canDirectlyChangeSelectedNode() ) );
+}
+
+bool NS(Controller_change_selected_node)(
+    ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    ::NS(node_index_t) const current_selected_node_index,
+    ::NS(node_index_t) const new_selected_node_index )
+{
+    auto ptr_nodes_ctx = st::asNodeController( ctrl );
+    return ( ( ptr_nodes_ctx != nullptr ) &&
+    ( ptr_nodes_ctx->changeSelectedNode(
+        current_selected_node_index, new_selected_node_index ) ) );
+}
+
+/* ========================================================================= */
+
+bool NS(Controller_can_unselect_node)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl )
+{
+    auto ptr_nodes_ctx = st::asNodeController( ctrl );
+    return ( ( ptr_nodes_ctx != nullptr ) &&
+             ( ptr_nodes_ctx->canUnselectNode() ) );
+}
+
+bool NS(Controller_unselect_node)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl )
+{
+    auto ptr_nodes_ctx = st::asNodeController( ctrl );
+    return ( ( ptr_nodes_ctx != nullptr ) &&
+             ( ptr_nodes_ctx->unselectNode() ) );
+}
+
+bool NS(Controller_unselect_node_by_index)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl, NS(node_index_t) const index )
+{
+    auto ptr_nodes_ctx = st::asNodeController( ctrl );
+    return ( ( ptr_nodes_ctx != nullptr ) &&
+             ( ptr_nodes_ctx->unselectNode( index ) ) );
+}
+
+bool NS(Controller_unselect_node_by_node_id)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    const NS(NodeId) *const SIXTRL_RESTRICT ptr_node_id )
+{
+    auto ptr_nodes_ctx = st::asNodeController( ctrl );
+    return ( ( ptr_nodes_ctx != nullptr ) && ( ptr_node_id != nullptr ) &&
+             ( ptr_nodes_ctx->unselectNode( *ptr_node_id ) ) );
+}
+
+bool NS(Controller_unselect_node_by_platform_id_and_device_id)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    NS(node_platform_id_t) const platform_id,
+    NS(node_device_id_t) const device_id )
+{
+    auto ptr_nodes_ctx = st::asNodeController( ctrl );
+    return ( ( ptr_nodes_ctx != nullptr ) &&
+             ( ptr_nodes_ctx->unselectNode( platform_id, device_id ) ) );
+}
+
+bool NS(Controller_unselect_node_by_node_id_str)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    char const* SIXTRL_RESTRICT node_id_str )
+{
+    auto ptr_nodes_ctx = st::asNodeController( ctrl );
+    return ( ( ptr_nodes_ctx != nullptr ) &&
+             ( ptr_nodes_ctx->unselectNode( node_id_str ) ) );
+}
+
+/* ========================================================================= */
 
 void NS(Controller_print_available_nodes_info)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,

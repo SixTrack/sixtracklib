@@ -172,7 +172,48 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_select_node_by_index)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     NS(node_index_t) const node_index );
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* ========================================================================== */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_can_change_selected_node)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(Controller_can_directly_change_selected_node)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
+
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_change_selected_node)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    NS(node_index_t) const current_selected_node_index,
+    NS(node_index_t) const new_selected_node_index );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_can_unselect_node)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
+
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_unselect_node)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_unselect_node_by_index)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl, NS(node_index_t) const index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_unselect_node_by_node_id)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    const NS(NodeId) *const SIXTRL_RESTRICT ptr_node_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(Controller_unselect_node_by_platform_id_and_device_id)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    NS(node_platform_id_t) const platform_idx,
+    NS(node_device_id_t) const device_idx );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_unselect_node_by_node_id_str)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    char const* SIXTRL_RESTRICT node_id_str );
+
+/* ========================================================================== */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Controller_print_available_nodes_info)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
@@ -188,6 +229,7 @@ NS(Controller_store_available_nodes_info_to_string)(
     char* SIXTRL_RESTRICT nodes_info,
     NS(arch_size_t) const max_str_length,
     NS(arch_size_t)* SIXTRL_RESTRICT ptr_required_max_str_length );
+
 
 #endif /* !defined( _GPUCODE ) */
 

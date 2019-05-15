@@ -310,7 +310,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         private:
 
-        SIXTRL_HOST_FN void doClearOnNodesBaseImpl() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void doClearNodeControllerBaseImpl() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool doSelectNodeNodeControllerBaseImpl(
             node_index_t const node_index ) SIXTRL_NOEXCEPT;

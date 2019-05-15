@@ -671,12 +671,12 @@ namespace SIXTRL_CXX_NAMESPACE
         m_can_unselect_node( false ),
         m_use_autoselect( false )
     {
-
+        this->doSetUsesNodesFlag( true );
     }
 
     void NodeControllerBase::doClear()
     {
-        this->doClearOnNodesBaseImpl();
+        this->doClearNodeControllerBaseImpl();
         this->doClearAvailableNodes();
         ControllerBase::doClear();
 
@@ -1063,7 +1063,7 @@ namespace SIXTRL_CXX_NAMESPACE
     /* ===================================================================== */
 
 
-    void NodeControllerBase::doClearOnNodesBaseImpl() SIXTRL_NOEXCEPT
+    void NodeControllerBase::doClearNodeControllerBaseImpl() SIXTRL_NOEXCEPT
     {
         if( this->hasSelectedNode() )
         {
