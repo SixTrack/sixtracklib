@@ -132,7 +132,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doSetArgCapacity(
             size_type const arg_capacity ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void doSetPtrContext(
+        SIXTRL_HOST_FN void doSetPtrControllerBase(
             ptr_base_controller_t SIXTRL_RESTRICT ptr_ctrl ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void doSetBufferRef(

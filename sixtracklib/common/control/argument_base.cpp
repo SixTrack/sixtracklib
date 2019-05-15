@@ -475,8 +475,9 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_arg_capacity = arg_capacity;
     }
 
-    void ArgumentBase::doSetPtrContext( ArgumentBase::ptr_base_controller_t
-        SIXTRL_RESTRICT ptr_controller ) SIXTRL_NOEXCEPT
+    void ArgumentBase::doSetPtrControllerBase(
+        ArgumentBase::ptr_base_controller_t SIXTRL_RESTRICT ctrl
+    ) SIXTRL_NOEXCEPT
     {
         this->m_ptr_base_controller = ptr_controller;
     }

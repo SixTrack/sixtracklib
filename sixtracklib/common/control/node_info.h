@@ -131,4 +131,4 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(NodeInfo_print_out)(
 #endif /* C++, Host */
 
 #endif /* SIXTRACKLIB_COMMON_CONTROL_NODE_INFO_H__ */
-/* end: sixtracklib/common/context/node_info.h */
+/* end: sixtracklib/common/control/node_info.h */

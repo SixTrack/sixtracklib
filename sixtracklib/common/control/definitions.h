@@ -24,7 +24,7 @@ typedef SIXTRL_INT64_T       NS(node_device_id_t);
 typedef SIXTRL_UINT32_T      NS(node_index_t);
 
 
-/* Predefined  context type id's: limit them to 0x0000 - 0x01FF */
+/* Predefined  architecture type id's: limit them to 0x0000 - 0x01FF */
 /* For userdefined type id's, the range 0x0200 - 0x03FF is reserved */
 
 #if !defined( SIXTRL_ARCHITECTURE_ID_BITMASK )
