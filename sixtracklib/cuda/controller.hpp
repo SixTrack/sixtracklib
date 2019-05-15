@@ -46,6 +46,9 @@ namespace SIXTRL_CXX_NAMESPACE
         using kernel_config_t = SIXTRL_CXX_NAMESPACE::CudaKernelConfig;
         using cuda_device_index_t = node_info_t::cuda_dev_index_t;
 
+        using cuda_arg_buffer_t = ::NS(cuda_arg_buffer_t);
+        using cuda_const_arg_buffer_t = ::NS(cuda_const_arg_buffer_t);
+
         SIXTRL_HOST_FN explicit CudaController(
             char const* config_str = nullptr );
 
@@ -123,6 +126,29 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ================================================================ */
 
+        status_t sendMemory(
+            cuda_arg_buffer_t SIXTRL_RESTRICT destination,
+            void const* SIXTRL_RESTRICT source,
+            size_type const source_length );
+
+        status_t receiveMemory(
+            void* SIXTRL_RESTRICT destination,
+            cuda_const_arg_buffer_t SIXTRL_RESTRICT source,
+            size_type const source_length );
+
+        /* ================================================================ */
+
+        using _base_controller_t::remap;
+        using _base_controller_t::isRemapped;
+
+        status_t remap( cuda_arg_buffer_t SIXTRL_RESTRICT managed_buffer_begin,
+            size_type const slot_size );
+
+        bool isRemapped( cuda_arg_buffer_t SIXTRL_RESTRICT managed_buffer_begin,
+            size_type const slot_size );
+
+        /* ================================================================ */
+
         SIXTRL_HOST_FN kernel_config_t const*
         ptrKernelConfig( kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
@@ -167,8 +193,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
-        using cuda_arg_buffer_t  = ::NS(cuda_arg_buffer_t);
-        using cuda_const_arg_buffer_t = ::NS(cuda_const_arg_buffer_t);
         using ptr_cuda_kernel_config_t = std::unique_ptr< kernel_config_t >;
 
          SIXTRL_HOST_FN virtual status_t doSend(
@@ -181,9 +205,12 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const dest_capacity,
             ptr_arg_base_t SIXTRL_RESTRICT source ) override;
 
-        SIXTRL_HOST_FN virtual status_t doRemapCObjectsBuffer(
+        SIXTRL_HOST_FN virtual status_t doRemapCObjectsBufferArg(
+            ptr_arg_base_t SIXTRL_RESTRICT arg ) override;
+
+        SIXTRL_HOST_FN virtual bool doIsCObjectsBufferArgRemapped(
             ptr_arg_base_t SIXTRL_RESTRICT arg,
-            size_type const arg_size ) override;
+            status_t* SIXTRL_RESTRICT ptr_status ) override;
 
         SIXTRL_HOST_FN virtual status_t doSetDebugRegister(
             debug_register_t const debug_register ) override;
@@ -197,6 +224,19 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual bool doChangeSelectedNode(
             node_index_t const current_selected_node_idx,
             node_index_t const new_selected_node_index ) override;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN status_t doRemapCObjectsBufferDirectly(
+            cuda_arg_buffer_t SIXTRL_RESTRICT managed_buffer_begin,
+            size_type const slot_size );
+
+        SIXTRL_HOST_FN bool doCheckIsCobjectsBufferRemappedDirectly(
+            status_t* SIXTRL_RESTRICT ptr_status,
+            cuda_arg_buffer_t SIXTRL_RESTRICT managed_buffer_begin,
+            size_type const slot_size );
+
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN  bool doInitCudaDebugRegister();
 
@@ -219,10 +259,10 @@ namespace SIXTRL_CXX_NAMESPACE
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN cuda_arg_buffer_t
-        doGetPtrCudaSuccessRegister() SIXTRL_NOEXCEPT;
+        doGetPtrCudaDebugRegister() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN cuda_const_arg_buffer_t
-        doGetPtrCudaSuccessRegister() const SIXTRL_NOEXCEPT;
+        doGetPtrCudaDebugRegister() const SIXTRL_NOEXCEPT;
 
         private:
 

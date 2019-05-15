@@ -296,7 +296,7 @@ namespace SIXTRL_CXX_NAMESPACE
         if( this->m_cuda_debug_register != nullptr )
         {
             cudaError_t const err = ::cudaFree( this->m_cuda_debug_register );
-            SIXTRL_ASSERT( err != ::cudaSuccess );
+            SIXTRL_ASSERT( err == ::cudaSuccess );
             this->m_cuda_debug_register = nullptr;
         }
     }
@@ -365,6 +365,52 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         return this->selectNode(
             this->doFindAvailableNodesByPciBusId( pci_bus_id ) );
+    }
+
+    /* ===================================================================== */
+
+    CudaController::status_t CudaController::sendMemory(
+        CudaController::cuda_arg_buffer_t SIXTRL_RESTRICT destination,
+        void const* SIXTRL_RESTRICT source,
+        CudaController::size_type const source_length )
+    {
+        return CudaController::PerformSendOperation(
+            destination, source, source_length );
+    }
+
+    CudaController::status_t CudaController::receiveMemory(
+        void* SIXTRL_RESTRICT destination,
+        CudaController::cuda_const_arg_buffer_t SIXTRL_RESTRICT source,
+        CudaController::size_type const source_length )
+    {
+        return CudaController::PerformReceiveOperation(
+            destination, source_length, source, source_length );
+    }
+
+    CudaController::status_t
+    CudaController::remap(
+        cuda_arg_buffer_t SIXTRL_RESTRICT managed_buffer_begin,
+        size_type const slot_size )
+    {
+        return this->doRemapCObjectsBufferDirectly(
+            managed_buffer_begin, slot_size );
+    }
+
+    bool CudaController::isRemapped(
+        CudaController::cuda_arg_buffer_t SIXTRL_RESTRICT managed_buffer_begin,
+        CudaController::size_type const slot_size )
+    {
+        CudaController::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        bool const is_remapped = this->doCheckIsCobjectsBufferRemappedDirectly(
+            &status, managed_buffer_begin, slot_size );
+
+        if( status != st::ARCH_STATUS_SUCCESS )
+        {
+            throw std::runtime_error(
+                "unable to perform isRemapped() check on managd cuda buffer" );
+        }
+
+        return is_remapped;
     }
 
     /* ===================================================================== */
@@ -618,31 +664,88 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
-    CudaController::status_t CudaController::doRemapCObjectsBuffer(
+    CudaController::status_t CudaController::doRemapCObjectsBufferArg(
+        CudaController::ptr_arg_base_t SIXTRL_RESTRICT buffer_arg )
+    {
+        using   status_t = st::CudaController::status_t;
+        using     size_t = st::CudaController::size_type;
+        using cuda_arg_t = st::CudaArgument;
+
+        status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        if( ( buffer_arg == nullptr ) || ( !this->readyForRunningKernel() ) )
+        {
+            return status;
+        }
+
+        cuda_arg_t* buffer_cuda_arg = buffer_arg->asDerivedArgument<
+            st::CudaArgument >( this->archId() );
+
+        if( ( buffer_cuda_arg != nullptr ) &&
+            ( buffer_cuda_arg->usesCObjectsBuffer() ) &&
+            ( buffer_cuda_arg->hasCudaArgBuffer() ) &&
+            ( buffer_cuda_arg->size() > size_t{ 0 } ) )
+        {
+            status = this->doRemapCObjectsBufferDirectly(
+                buffer_cuda_arg->cudaArgBuffer(),
+                buffer_cuda_arg->cobjectsBufferSlotSize() );
+        }
+
+        return status;
+    }
+
+    bool CudaController::doIsCObjectsBufferArgRemapped(
         CudaController::ptr_arg_base_t SIXTRL_RESTRICT buffer_arg,
-        CudaController::size_type const arg_size )
+        CudaController::status_t* SIXTRL_RESTRICT ptr_status )
+    {
+        using   status_t = st::CudaController::status_t;
+        using     size_t = st::CudaController::size_type;
+        using cuda_arg_t = st::CudaArgument;
+
+        bool is_remapped = false;
+
+        if( ( buffer_arg == nullptr ) || ( !this->readyForRunningKernel() ) )
+        {
+            if( ptr_status != nullptr )
+            {
+                *ptr_status = st::ARCH_STATUS_GENERAL_FAILURE;
+            }
+
+            return is_remapped;
+        }
+
+        cuda_arg_t* buffer_cuda_arg = buffer_arg->asDerivedArgument<
+            st::CudaArgument >( this->archId() );
+
+        if( ( buffer_cuda_arg != nullptr ) &&
+            ( buffer_cuda_arg->usesCObjectsBuffer() ) &&
+            ( buffer_cuda_arg->hasCudaArgBuffer() ) &&
+            ( buffer_cuda_arg->size() > size_t{ 0 } ) )
+        {
+            is_remapped = this->doCheckIsCobjectsBufferRemappedDirectly(
+                ptr_status, buffer_cuda_arg->cudaArgBuffer(),
+                buffer_cuda_arg->cobjectsBufferSlotSize() );
+        }
+
+        return is_remapped;
+    }
+
+    CudaController::status_t CudaController::doRemapCObjectsBufferDirectly(
+        CudaController::cuda_arg_buffer_t SIXTRL_RESTRICT managed_buffer_begin,
+        CudaController::size_type const slot_size )
     {
         using    _this_t        = CudaController;
         using kernel_config_t   = _this_t::kernel_config_t;
         using   status_t        = _this_t::status_t;
         using     size_t        = _this_t::size_type;
-        using cuda_arg_t        = st::CudaArgument;
-        using c_buffer_t        = cuda_arg_t::c_buffer_t;
-        using cuda_arg_buffer_t = cuda_arg_t::cuda_arg_buffer_t;
-
-        SIXTRL_ASSERT( buffer_arg != nullptr );
+        using cuda_arg_buffer_t = _this_t::cuda_arg_buffer_t;
 
         status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-        bool const in_debug_mode = this->isInDebugMode();
 
-        if( ( this->readyForRunningKernel() ) && ( arg_size > size_t{ 0 } ) &&
-            ( buffer_arg->hasArgumentBuffer() ) &&
-            ( buffer_arg->usesCObjectsBuffer() ) )
+        if( ( this->readyForRunningKernel() ) && ( slot_size > size_t{ 0 } ) &&
+            ( managed_buffer_begin != nullptr ) )
         {
-            c_buffer_t const* ptr_buffer = buffer_arg->ptrCObjectsBuffer();
-
-            cuda_arg_t* cuda_buf_arg =
-                buffer_arg->asDerivedArgument< cuda_arg_t >( this->archId() );
+            bool const in_debug_mode = this->isInDebugMode();
 
             kernel_config_t const* kernel_config = this->ptrKernelConfig(
                 ( in_debug_mode )
@@ -653,17 +756,20 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 if( !in_debug_mode )
                 {
-                    ::NS(Buffer_remap_cuda_wrapper)( kernel_config, cuda_buf_arg );
+                    ::NS(Buffer_remap_cuda_wrapper)(
+                        kernel_config, managed_buffer_begin, slot_size );
+
                     status = st::ARCH_STATUS_SUCCESS;
                 }
-                else if( this->doGetPtrCudaSuccessRegister() != nullptr )
+                else if( this->doGetPtrCudaDebugRegister() != nullptr )
                 {
                     status = this->prepareDebugRegisterForUse();
 
                     if( status == st::ARCH_STATUS_SUCCESS )
                     {
                         ::NS(Buffer_remap_cuda_debug_wrapper)( kernel_config,
-                            cuda_buf_arg, this->doGetPtrCudaSuccessRegister() );
+                            managed_buffer_begin, slot_size,
+                                this->doGetPtrCudaDebugRegister() );
 
                         status = this->evaluateDebugRegisterAfterUse();
                     }
@@ -672,6 +778,29 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return status;
+    }
+
+    bool CudaController::doCheckIsCobjectsBufferRemappedDirectly(
+        CudaController::status_t* SIXTRL_RESTRICT ptr_status,
+        CudaController::cuda_arg_buffer_t SIXTRL_RESTRICT managed_buffer_begin,
+        CudaController::size_type const slot_size )
+    {
+        using    _this_t        = CudaController;
+        using   status_t        = _this_t::status_t;
+        using     size_t        = _this_t::size_type;
+        using cuda_arg_buffer_t = _this_t::cuda_arg_buffer_t;
+
+        bool is_remapped = false;
+
+        if( ( this->readyForRunningKernel() ) && ( slot_size > size_t{ 0 } ) &&
+            ( managed_buffer_begin != nullptr ) )
+        {
+            is_remapped = ::NS(Buffer_is_remapped_cuda_wrapper)(
+                managed_buffer_begin, slot_size,
+                    this->doGetPtrCudaDebugRegister(), ptr_status );
+        }
+
+        return is_remapped;
     }
 
     bool CudaController::doSelectNode( CudaController::node_index_t const idx )
@@ -953,13 +1082,13 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     CudaController::cuda_arg_buffer_t
-    CudaController::doGetPtrCudaSuccessRegister() SIXTRL_NOEXCEPT
+    CudaController::doGetPtrCudaDebugRegister() SIXTRL_NOEXCEPT
     {
         return this->m_cuda_debug_register;
     }
 
     CudaController::cuda_const_arg_buffer_t
-    CudaController::doGetPtrCudaSuccessRegister() const SIXTRL_NOEXCEPT
+    CudaController::doGetPtrCudaDebugRegister() const SIXTRL_NOEXCEPT
     {
         return this->m_cuda_debug_register;
     }
@@ -1024,7 +1153,7 @@ namespace SIXTRL_CXX_NAMESPACE
         CudaController::debug_register_t const debug_register )
     {
         return CudaController::PerformSendOperation(
-            this->doGetPtrCudaSuccessRegister(),
+            this->doGetPtrCudaDebugRegister(),
                 &debug_register, sizeof( debug_register ) );
     }
 
@@ -1035,7 +1164,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return CudaController::PerformReceiveOperation(
             ptr_debug_register, sizeof( debug_register_t ),
-            this->doGetPtrCudaSuccessRegister(),
+            this->doGetPtrCudaDebugRegister(),
             sizeof( debug_register_t ) );
     }
 
@@ -1043,12 +1172,13 @@ namespace SIXTRL_CXX_NAMESPACE
             CudaController::node_index_t const node_index )
     {
         using _base_ctrl_t = st::NodeControllerBase;
-        using node_info_base_t = CudaController::node_info_base_t;
-        using node_info_t = CudaController::node_info_t;
+        using _this_t = st::CudaController;
+        using node_info_base_t = _this_t::node_info_base_t;
+        using node_info_t = _this_t::node_info_t;
         using cuda_dev_index_t = node_info_t::cuda_dev_index_t;
-        using size_t = CudaController::size_type;
-        using kernel_id_t = CudaController::kernel_id_t;
-        using kernel_config_t = CudaController::kernel_config_t;
+        using size_t = _this_t::size_type;
+        using kernel_id_t = _this_t::kernel_id_t;
+        using kernel_config_t = _this_t::kernel_config_t;
 
         bool success = false;
 
@@ -1078,6 +1208,8 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             std::string kernel_name( size_t{ 64 }, '\0' );
 
+            kernel_id_t kernel_id = _this_t::ILLEGAL_KERNEL_ID;
+
             kernel_name.clear();
             kernel_name = SIXTRL_C99_NAMESPACE_PREFIX_STR;
             kernel_name += "Buffer_remap_cuda_wrapper";
@@ -1085,12 +1217,21 @@ namespace SIXTRL_CXX_NAMESPACE
             ptr_cuda_kernel_config_t ptr_remap_kernel( new kernel_config_t(
                 kernel_name, size_t{ 1 } ) );
 
-            kernel_id_t const remap_kernel_id = this->doAppendCudaKernelConfig(
-                std::move( ptr_remap_kernel ) );
+            SIXTRL_ASSERT( ptr_remap_kernel.get() != nullptr );
+            success &= ptr_remap_kernel->setNumWorkItems( size_t{ 1 } );
+            success &= ptr_remap_kernel->setWorkGroupSizes( size_t{ 1 } );
+            success &= ptr_remap_kernel->update();
+            success &= !ptr_remap_kernel->needsUpdate();
 
-            this->setRemapCObjectBufferKernelId( remap_kernel_id );
+            if( success )
+            {
+                kernel_id = this->doAppendCudaKernelConfig(
+                    std::move( ptr_remap_kernel ) );
+            }
 
+            this->setRemapCObjectBufferKernelId( kernel_id );
 
+            kernel_id = _this_t::ILLEGAL_KERNEL_ID;
             kernel_name.clear();
             kernel_name  = SIXTRL_C99_NAMESPACE_PREFIX_STR;
             kernel_name += "Buffer_remap_cuda_debug_wrapper";
@@ -1098,10 +1239,20 @@ namespace SIXTRL_CXX_NAMESPACE
             ptr_cuda_kernel_config_t ptr_debug_remap_kernel(
                 new kernel_config_t( kernel_name, size_t{ 2 } ) );
 
-            kernel_id_t const debug_kernel_id = this->doAppendCudaKernelConfig(
-                std::move( ptr_debug_remap_kernel ) );
+            SIXTRL_ASSERT( ptr_debug_remap_kernel.get() != nullptr );
 
-            this->setRemapCObjectBufferDebugKernelId( debug_kernel_id );
+            success &= ptr_debug_remap_kernel->setNumWorkItems( size_t{ 1 } );
+            success &= ptr_debug_remap_kernel->setWorkGroupSizes( size_t{ 1 } );
+            success &= ptr_debug_remap_kernel->update();
+            success &= !ptr_debug_remap_kernel->needsUpdate();
+
+            if( success )
+            {
+                kernel_id = this->doAppendCudaKernelConfig(
+                    std::move( ptr_debug_remap_kernel ) );
+            }
+
+            this->setRemapCObjectBufferDebugKernelId( kernel_id );
         }
 
         return success;

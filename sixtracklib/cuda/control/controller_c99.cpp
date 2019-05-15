@@ -36,6 +36,48 @@ void NS(CudaController_delete)( NS(CudaController)* SIXTRL_RESTRICT ctrl )
     return;
 }
 
+/* ------------------------------------------------------------------------- */
+
+::NS(arch_status_t) NS(CudaController_remap_managed_cobject_buffer)(
+    ::NS(CudaController)* SIXTRL_RESTRICT ctrl,
+    ::NS(cuda_arg_buffer_t) SIXTRL_RESTRICT managed_buffer_begin,
+    ::NS(arch_size_t) const slot_size )
+{
+    return ( ctrl != nullptr )
+        ? ctrl->remap( managed_buffer_begin, slot_size )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+
+bool NS(CudaController_is_managed_cobject_buffer_remapped)(
+    ::NS(CudaController)* SIXTRL_RESTRICT ctrl,
+    ::NS(cuda_arg_buffer_t) SIXTRL_RESTRICT managed_buffer_begin,
+    ::NS(arch_size_t) const slot_size )
+{
+    return ( ( ctrl != nullptr ) &&
+             ( ctrl->isRemapped( managed_buffer_begin, slot_size ) ) );
+}
+
+::NS(arch_status_t) NS(CudaController_send_memory)(
+    ::NS(CudaController)* SIXTRL_RESTRICT ctrl,
+    ::NS(cuda_arg_buffer_t) SIXTRL_RESTRICT destination,
+    void const* SIXTRL_RESTRICT source, ::NS(arch_size_t) const source_length )
+{
+    return ( ctrl != nullptr )
+        ? ctrl->sendMemory( destination, source, source_length )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+
+::NS(arch_status_t) NS(CudaController_receive_memory)(
+    ::NS(CudaController)* SIXTRL_RESTRICT ctrl,
+    void* SIXTRL_RESTRICT destination,
+    ::NS(cuda_const_arg_buffer_t) SIXTRL_RESTRICT source,
+    ::NS(arch_size_t) const source_length )
+{
+    return ( ctrl != nullptr )
+        ? ctrl->receiveMemory( destination, source, source_length )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+
 #endif /* C++, Host */
 
 /* end: sixtracklib/cuda/internal/controller_c99.cpp */
