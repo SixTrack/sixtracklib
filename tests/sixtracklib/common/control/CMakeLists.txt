@@ -51,6 +51,30 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_arch_info_common_cxx )
     add_test( CXX_CommonControlArchInfoTests test_arch_info_common_cxx )
 
+    # ==========================================================================
+    # test_node_controller_base_common_c99:
+
+    add_executable( test_node_controller_base_common_c99
+        test_node_controller_base_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+        test_node_controller_base_common_c99 )
+
+    add_test( C99_CommonNodeControllerBaseTests
+        test_node_controller_base_common_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_node_controller_base_common_cxx:
+
+    add_executable( test_node_controller_base_common_cxx
+        test_node_controller_base_cxx.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+        test_node_controller_base_common_cxx )
+
+    add_test( CXX_CommonNodeControllerBaseTests
+        test_node_controller_base_common_cxx )
+
     # *************************************************************************
     # Set all properties:
 
