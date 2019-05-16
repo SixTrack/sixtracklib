@@ -33,7 +33,8 @@ NS(CudaArgument_new_from_size)( NS(ctrl_size_t) const capacity,
     NS(CudaController)* SIXTRL_RESTRICT ctrl );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
-NS(CudaArgument_new_from_memory)( void const* SIXTRL_RESTRICT raw_arg_begin,
+NS(CudaArgument_new_from_raw_argument)(
+    void const* SIXTRL_RESTRICT raw_arg_begin,
     NS(ctrl_size_t) const arg_length, NS(CudaController)* SIXTRL_RESTRICT c );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(CudaArgument_delete)(

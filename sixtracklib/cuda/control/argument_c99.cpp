@@ -31,7 +31,7 @@ namespace st = SIXTRL_CXX_NAMESPACE;
     return new SIXTRL_CXX_NAMESPACE::CudaArgument( capacity, ctrl );
 }
 
-::NS(CudaArgument)* NS(CudaArgument_new_from_memory)(
+::NS(CudaArgument)* NS(CudaArgument_new_from_raw_argument)(
     void const* SIXTRL_RESTRICT raw_arg_begin,
     ::NS(ctrl_size_t) const raw_arg_length,
     ::NS(CudaController)* SIXTRL_RESTRICT ctrl )
