@@ -231,6 +231,29 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
+    CudaKernelConfig::size_type
+    CudaKernelConfig::totalNumBlocks() const SIXTRL_NOEXCEPT
+    {
+        return ( !this->needsUpdate() )
+            ? ( this->m_blocks.x * this->m_blocks.y * this->m_blocks.z )
+            : CudaKernelConfig::size_type{ 0 };
+    }
+
+    CudaKernelConfig::size_type
+    CudaKernelConfig::totalNumThreadsPerBlock() const SIXTRL_NOEXCEPT
+    {
+        return ( !this->needsUpdate() )
+            ? ( this->m_threads_per_block.x * this->m_threads_per_block.y *
+                this->m_threads_per_block.z )
+            : CudaKernelConfig::size_type{ 0 };
+    }
+
+    CudaKernelConfig::size_type
+    CudaKernelConfig::totalNumThreads() const SIXTRL_NOEXCEPT
+    {
+        return this->totalNumBlocks() * this->totalNumThreadsPerBlock();
+    }
+
     void CudaKernelConfig::doPrintToOutputStream(
         std::ostream& SIXTRL_RESTRICT_REF output ) const
     {
