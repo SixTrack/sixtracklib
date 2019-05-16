@@ -27,6 +27,7 @@ endif()
 # add unit-tests for submodules:
 
 add_subdirectory( control )
+add_subdirectory( wrappers )
 add_subdirectory( track )
 
 # ==============================================================================
