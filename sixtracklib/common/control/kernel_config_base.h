@@ -20,6 +20,11 @@ extern "C" {
 
 #if !defined( _GPUCODE )
 
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(KernelConfig_delete)(
+    NS(KernelConfigBase)* SIXTRL_RESTRICT config );
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_id_t) NS(KernelConfig_get_arch_id)(
     const NS(KernelConfigBase) *const SIXTRL_RESTRICT config );
 

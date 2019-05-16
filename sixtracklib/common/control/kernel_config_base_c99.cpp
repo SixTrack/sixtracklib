@@ -12,6 +12,12 @@
 
 #include "sixtracklib/common/control/kernel_config_base.hpp"
 
+void NS(KernelConfig_delete)( ::NS(KernelConfigBase)* SIXTRL_RESTRICT config )
+{
+    if( config != nullptr ) delete config;
+    return;
+}
+
 /* ------------------------------------------------------------------------- */
 
 ::NS(arch_id_t) NS(KernelConfig_get_arch_id)(
