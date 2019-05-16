@@ -31,7 +31,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
     CudaArgument::CudaArgument(
         CudaArgument::buffer_t const& SIXTRL_RESTRICT_REF buffer,
-        CudaController* SIXTRL_RESTRICT ctrl )
+        CudaController* SIXTRL_RESTRICT ctrl )  :
+        SIXTRL_CXX_NAMESPACE::CudaArgumentBase( buffer.getSize(), ctrl )
     {
         using status_t = CudaArgument::status_t;
         using size_t   = CudaArgument::size_type;
@@ -49,12 +50,13 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ASSERT( this->cudaArgBuffer() != nullptr );
             SIXTRL_ASSERT( this->size() == size_t{ 0 } );
 
-            status_t status = this->cudaController()->send(
-                this, buffer_data_begin, buffer_size );
+            status_t status = this->cudaController()->sendMemory(
+                this->cudaArgBuffer(), buffer_data_begin, buffer_size );
 
             if( status == ::NS(ARCH_STATUS_SUCCESS) )
             {
-                status = ctrl->remap( this );
+                status = ctrl->remap( 
+                    this->cudaArgBuffer(), buffer.getSlotSize() );
             }
 
             if( status == ::NS(ARCH_STATUS_SUCCESS) )
@@ -66,18 +68,18 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     CudaArgument::CudaArgument(
-        const CudaArgument::c_buffer_t *const SIXTRL_RESTRICT ptr_c_buffer,
+        const CudaArgument::c_buffer_t *const SIXTRL_RESTRICT ptr_buffer,
         CudaController* SIXTRL_RESTRICT ctrl ) :
         SIXTRL_CXX_NAMESPACE::CudaArgumentBase(
-            ::NS(Buffer_get_size)( ptr_c_buffer ), ctrl )
+            ::NS(Buffer_get_size)( ptr_buffer ), ctrl )
     {
         using status_t = CudaArgument::status_t;
         using size_t   = CudaArgument::size_type;
 
-        size_t const buffer_size = ::NS(Buffer_get_size)( ptr_c_buffer );
+        size_t const buffer_size = ::NS(Buffer_get_size)( ptr_buffer );
 
         void const*  buffer_data_begin =
-            ::NS(Buffer_get_const_data_begin)( ptr_c_buffer );
+            ::NS(Buffer_get_const_data_begin)( ptr_buffer );
 
         if( ( buffer_size > size_t{ 0 } ) &&
             ( this->capacity() >= buffer_size ) &&
@@ -89,18 +91,19 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ASSERT( this->cudaArgBuffer() != nullptr );
             SIXTRL_ASSERT( this->size() == size_t{ 0 } );
 
-            status_t status = this->cudaController()->send(
-                this, buffer_data_begin, buffer_size );
+            status_t status = this->cudaController()->sendMemory( 
+                this->cudaArgBuffer(), buffer_data_begin, buffer_size );
 
             if( status == ::NS(ARCH_STATUS_SUCCESS) )
             {
-                status = ctrl->remap( this );
+                status = ctrl->remap( this->cudaArgBuffer(), 
+                    ::NS(Buffer_get_slot_size( ptr_buffer ) ) );
             }
 
             if( status == ::NS(ARCH_STATUS_SUCCESS) )
             {
                 this->doSetArgSize( buffer_size );
-                this->doSetPtrCBuffer( ptr_c_buffer );
+                this->doSetPtrCBuffer( ptr_buffer );
             }
         }
     }
@@ -130,8 +133,8 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ASSERT( this->size() == size_t{ 0 } );
             SIXTRL_ASSERT( this->capacity() >= raw_arg_length );
 
-            status_t status = this->cudaController()->send(
-                this, raw_arg_begin, raw_arg_length );
+            status_t status = this->cudaController()->sendMemory(
+                this->cudaArgBuffer(), raw_arg_begin, raw_arg_length );
 
             if( status == ::NS(ARCH_STATUS_SUCCESS) )
             {

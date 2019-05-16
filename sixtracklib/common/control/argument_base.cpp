@@ -214,8 +214,16 @@ namespace SIXTRL_CXX_NAMESPACE
                         success = ArgumentBase::STATUS_GENERAL_FAILURE;
                     }
                 }
+                else 
+                {
+                    success = ArgumentBase::STATUS_SUCCESS;
+                }
 
                 SIXTRL_ASSERT( raw_arg_len <= this->capacity() );
+            }
+            else 
+            {
+                success = ArgumentBase::STATUS_SUCCESS;
             }
 
             if( ( success == ArgumentBase::STATUS_SUCCESS ) &&

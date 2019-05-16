@@ -274,7 +274,7 @@ TEST( CXX_CudaArgumentTests, BasicUsage )
     SIXTRL_ASSERT( config_orig.min_particle_id != config_copy.min_particle_id );
     SIXTRL_ASSERT( config_orig.max_particle_id != config_copy.max_particle_id );
     
-    status = arg4.receive( &config_orig, sizeof( config_orig ) );
+    status = arg4.receive( &config_copy, sizeof( config_copy ) );
     
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
     
