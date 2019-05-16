@@ -38,7 +38,7 @@ job.track(nturns)
 ff = np.linspace(0, 0.5, nturns//2+1)
 x = job.output.particles[0].x[1::npart]
 xf = abs(np.fft.rfft(x))
-plot(ff, xf)
+pl.plot(ff, xf)
 q1st = ff[xf.argmax()]
 print((q1mad-20)-q1st)
 
@@ -61,4 +61,4 @@ px = job.output.particles[0].px.copy()
 px = px.reshape(nturns, npart)
 
 for i in range(npart):
-    plot(x[:, i], px[:, i], '.')
+    pl.plot(x[:, i], px[:, i], '.')
