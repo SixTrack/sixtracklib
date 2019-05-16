@@ -8,6 +8,7 @@ set( SIXTRL_COMMON_PARTICLES_C99_HEADERS
 
 set( SIXTRL_COMMON_PARTICLES_C99_SOURCES
      particles.c
+     particles_addr.c
 )
 
 add_library( sixtrack_common_particles_c99 OBJECT

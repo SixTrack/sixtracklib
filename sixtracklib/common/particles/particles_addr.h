@@ -173,6 +173,14 @@ NS(ParticlesAddr_buffer_get_particle_addr)(
 
 /* ------------------------------------------------------------------------ */
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer)
+        *const SIXTRL_RESTRICT particles_buffer );
+
+/* ------------------------------------------------------------------------ */
+
 SIXTRL_STATIC SIXTRL_FN bool NS(ParticlesAddr_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     NS(particle_num_elements_t) const num_particles,
