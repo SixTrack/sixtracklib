@@ -49,7 +49,7 @@ char const* NS(Argument_get_arch_string)(
         ? arg->send( buffer ) : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-::NS(arch_status_t) NS(Argument_send_memory)(
+::NS(arch_status_t) NS(Argument_send_raw_argument)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg, void const* SIXTRL_RESTRICT begin,
     ::NS(arch_size_t) const arg_size )
 {
@@ -71,7 +71,7 @@ char const* NS(Argument_get_arch_string)(
         ? arg->receive( buf ) : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-::NS(arch_status_t) NS(Argument_receive_memory)(
+::NS(arch_status_t) NS(Argument_receive_raw_argument)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg, void* SIXTRL_RESTRICT arg_begin,
     ::NS(arch_size_t) const arg_capacity )
 {

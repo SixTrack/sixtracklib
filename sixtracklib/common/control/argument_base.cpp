@@ -187,8 +187,6 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( ptr_controller != nullptr ) && ( raw_arg_begin != nullptr ) &&
             ( raw_arg_len > size_t{ 0 } ) )
         {
-            success = true;
-
             bool updated_argument_buffer = false;
 
             if( this->usesCObjectsCxxBuffer() )
@@ -204,24 +202,16 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 if( raw_arg_len > this->capacity() )
                 {
-                    bool const reserved_success =
+                    updated_argument_buffer =
                         this->doReserveArgumentBuffer( raw_arg_len );
-
-                    updated_argument_buffer = reserved_success;
-
-                    if( !reserved_success )
-                    {
-                        success = ArgumentBase::STATUS_GENERAL_FAILURE;
-                    }
                 }
-                else 
+
+                if( raw_arg_len <= this->capacity() )
                 {
                     success = ArgumentBase::STATUS_SUCCESS;
                 }
-
-                SIXTRL_ASSERT( raw_arg_len <= this->capacity() );
             }
-            else 
+            else
             {
                 success = ArgumentBase::STATUS_SUCCESS;
             }

@@ -21,7 +21,7 @@ extern "C" {
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Argument_delete)(
     NS(ArgumentBase)* SIXTRL_RESTRICT arg );
-    
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_id_t) NS(Argument_get_arch_id)(
     const NS(ArgumentBase) *const SIXTRL_RESTRICT arg );
 
@@ -40,7 +40,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(Argument_send_buffer)(
     NS(ArgumentBase)* SIXTRL_RESTRICT arg,
     const NS(Buffer) *const SIXTRL_RESTRICT_REF buffer );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(Argument_send_memory)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(Argument_send_raw_argument)(
     NS(ArgumentBase)* SIXTRL_RESTRICT arg,
     void const* SIXTRL_RESTRICT arg_begin,
     NS(arch_size_t) const arg_size );
@@ -54,9 +54,10 @@ NS(Argument_receive_buffer)( NS(ArgumentBase)* SIXTRL_RESTRICT arg,
                              NS(Buffer)* SIXTRL_RESTRICT buf );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(Argument_receive_memory)( NS(ArgumentBase)* SIXTRL_RESTRICT arg,
-                             void* SIXTRL_RESTRICT arg_begin,
-                             NS(arch_size_t) const arg_capacity );
+NS(Argument_receive_raw_argument)(
+    NS(ArgumentBase)* SIXTRL_RESTRICT arg,
+    void* SIXTRL_RESTRICT arg_begin,
+    NS(arch_size_t) const arg_capacity );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(Argument_remap_cobjects_buffer)(
