@@ -19,6 +19,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/control/node_info.h"
+    #include "sixtracklib/cuda/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
@@ -51,8 +52,8 @@ namespace SIXTRL_CXX_NAMESPACE
         static SIXTRL_CONSTEXPR_OR_CONST cuda_dev_index_t
             ILLEGAL_DEV_INDEX = cuda_dev_index_t{ -1 };
 
-        static SIXTRL_CONSTEXPR_OR_CONST size_type
-            DEFAULT_WARP_SIZE = size_type{ 32 };
+        static SIXTRL_CONSTEXPR_OR_CONST size_type DEFAULT_WARP_SIZE =
+                SIXTRL_CXX_NAMESPACE::ARCH_CUDA_DEFAULT_WARP_SIZE;
 
         SIXTRL_HOST_FN explicit CudaNodeInfo(
             cuda_dev_index_t const cuda_dev_index = ILLEGAL_DEV_INDEX );

@@ -13,12 +13,22 @@ extern "C" {
 typedef void* NS(cuda_arg_buffer_t);
 typedef void const* NS(cuda_const_arg_buffer_t);
 
+#if !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+
+SIXTRL_STATIC_VAR NS(ctrl_size_t) const
+    NS(ARCH_CUDA_DEFAULT_WARP_SIZE) = ( NS(ctrl_size_t) )32u;
+
+#endif /* !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ ) */
+
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 
 namespace SIXTRL_CXX_NAMESPACE
 {
     typedef ::NS(cuda_arg_buffer_t)       cuda_arg_buffer_t;
     typedef ::NS(cuda_const_arg_buffer_t) cuda_const_arg_buffer_t;
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ctrl_size_t
+        ARCH_CUDA_DEFAULT_WARP_SIZE = static_cast< ctrl_size_t >( 32u );
 }
 
 #endif /* C++, Host */
