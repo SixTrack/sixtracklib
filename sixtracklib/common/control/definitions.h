@@ -23,6 +23,12 @@ typedef SIXTRL_INT64_T       NS(node_platform_id_t);
 typedef SIXTRL_INT64_T       NS(node_device_id_t);
 typedef SIXTRL_UINT32_T      NS(node_index_t);
 
+typedef enum NS(ctrl_perform_remap_flag_e)
+{
+    NS(CTRL_PERFORM_REMAP) = 0,
+    NS(CTRL_PERFORM_NO_REMAP) = 1
+}
+NS(ctrl_perform_remap_flag_t);
 
 /* Predefined  architecture type id's: limit them to 0x0000 - 0x01FF */
 /* For userdefined type id's, the range 0x0200 - 0x03FF is reserved */
@@ -222,6 +228,13 @@ namespace SIXTRL_CXX_NAMESPACE
     typedef ::NS(node_platform_id_t)  node_platform_id_t;
     typedef ::NS(node_device_id_t)    node_device_id_t;
     typedef ::NS(node_index_t)        node_index_t;
+
+    typedef enum
+    {
+        CTRL_PERFORM_REMAP = ::NS(CTRL_PERFORM_REMAP),
+        CTRL_PERFORM_NO_REMAP = ::NS(CTRL_PERFORM_NO_REMAP)
+    }
+    ctrl_perform_remap_flag_t;
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_id_t
         ARCHITECTURE_ID_BITMASK = static_cast< arch_id_t >(

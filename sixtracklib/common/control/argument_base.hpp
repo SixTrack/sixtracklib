@@ -38,6 +38,9 @@ namespace SIXTRL_CXX_NAMESPACE
         using buffer_t    = SIXTRL_CXX_NAMESPACE::Buffer;
         using c_buffer_t  = buffer_t::c_api_t;
 
+        using perform_remap_flag_t =
+            SIXTRL_CXX_NAMESPACE::ctrl_perform_remap_flag_t;
+
         using ptr_base_controller_t       = ControllerBase*;
         using ptr_const_base_controller_t = ControllerBase const*;
 
@@ -49,11 +52,18 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual ~ArgumentBase() = default;
 
-        SIXTRL_HOST_FN status_t send();
-        SIXTRL_HOST_FN status_t send( buffer_t const& SIXTRL_RESTRICT_REF buf );
+        SIXTRL_HOST_FN status_t send(
+            perform_remap_flag_t const perform_remap_flag =
+                SIXTRL_CXX_NAMESPACE::CTRL_REMAP );
+
+        SIXTRL_HOST_FN status_t send( buffer_t const& SIXTRL_RESTRICT_REF buf,
+            perform_remap_flag_t const perform_remap_flag =
+                SIXTRL_CXX_NAMESPACE::CTRL_REMAP );
 
         SIXTRL_HOST_FN status_t send(
-            const c_buffer_t *const SIXTRL_RESTRICT ptr_c_buffer );
+            const c_buffer_t *const SIXTRL_RESTRICT ptr_c_buffer,
+            perform_remap_flag_t const perform_remap_flag =
+                SIXTRL_CXX_NAMESPACE::CTRL_REMAP );
 
         SIXTRL_HOST_FN status_t send( void const* SIXTRL_RESTRICT arg_begin,
             size_type const arg_size );
@@ -61,10 +71,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN status_t receive();
         SIXTRL_HOST_FN status_t receive(
-            buffer_t& SIXTRL_RESTRICT_REF buffer );
+            buffer_t& SIXTRL_RESTRICT_REF buffer,
+            perform_remap_flag_t const perform_remap_flag =
+                SIXTRL_CXX_NAMESPACE::CTRL_REMAP );
 
         SIXTRL_HOST_FN status_t receive(
-            c_buffer_t* SIXTRL_RESTRICT ptr_c_buffer );
+            c_buffer_t* SIXTRL_RESTRICT ptr_c_buffer,
+            perform_remap_flag_t const perform_remap_flag =
+                SIXTRL_CXX_NAMESPACE::CTRL_REMAP );
 
         SIXTRL_HOST_FN status_t receive( void* SIXTRL_RESTRICT arg_begin,
             size_type const arg_capacity );

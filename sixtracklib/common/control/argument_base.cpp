@@ -21,17 +21,20 @@ namespace st = SIXTRL_CXX_NAMESPACE;
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    ArgumentBase::status_t ArgumentBase::send()
+    ArgumentBase::status_t ArgumentBase::send(
+        ArgumentBase::perform_remap_flag_t const perform_remap_flag )
     {
         ArgumentBase::status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
 
         if( this->usesCObjectsCxxBuffer() )
         {
-            success = this->send( this->cobjectsCxxBuffer() );
+            success = this->send(
+                this->cobjectsCxxBuffer(), perform_remap_flag );
         }
         else if( this->usesCObjectsBuffer() )
         {
-            success = this->send( this->ptrCObjectsBuffer() );
+            success = this->send(
+                this->ptrCObjectsBuffer(), perform_remap_flag );
         }
         else if( this->usesRawArgument() )
         {
@@ -42,7 +45,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     ArgumentBase::status_t ArgumentBase::send(
-        ArgumentBase::buffer_t const& SIXTRL_RESTRICT_REF buffer )
+        ArgumentBase::buffer_t const& SIXTRL_RESTRICT_REF buffer,
+        ArgumentBase::perform_remap_flag_t const perform_remap_flag )
     {
         using status_t = ArgumentBase::status_t;
         using size_t = ArgumentBase::size_type;
@@ -92,7 +96,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( success == ArgumentBase::STATUS_SUCCESS )
             {
-                success = ptr_controller->send( this, buffer );
+                success = ptr_controller->send(
+                    this, buffer, perform_remap_flag );
 
                 if( success == ArgumentBase::STATUS_SUCCESS )
                 {
@@ -108,7 +113,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     ArgumentBase::status_t ArgumentBase::send(
-        const ArgumentBase::c_buffer_t *const SIXTRL_RESTRICT buffer )
+        const ArgumentBase::c_buffer_t *const SIXTRL_RESTRICT buffer,
+        ArgumentBase::perform_remap_flag_t const perform_remap_flag )
     {
         using status_t = ArgumentBase::status_t;
         using size_t = ArgumentBase::size_type;
@@ -157,7 +163,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( success == ArgumentBase::STATUS_SUCCESS )
             {
-                success = ptr_controller->send( this, buffer );
+                success = ptr_controller->send(
+                    this, buffer, perform_remap_flag );
 
                 if( success == ArgumentBase::STATUS_SUCCESS )
                 {
@@ -245,17 +252,20 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    ArgumentBase::status_t ArgumentBase::receive()
+    ArgumentBase::status_t ArgumentBase::receive(
+        ArgumentBase::perform_remap_flag_t const perform_remap_flag )
     {
         ArgumentBase::status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
 
         if( this->usesCObjectsCxxBuffer() )
         {
-            success = this->receive( this->cobjectsCxxBuffer() );
+            success = this->receive(
+                this->cobjectsCxxBuffer(), perform_remap_flag );
         }
         else if( this->usesCObjectsBuffer() )
         {
-            success = this->receive( this->ptrCObjectsBuffer() );
+            success = this->receive(
+                this->ptrCObjectsBuffer(), perform_remap_flag );
         }
         else if( this->usesRawArgument() )
         {
@@ -266,7 +276,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     ArgumentBase::status_t ArgumentBase::receive(
-        ArgumentBase::buffer_t& SIXTRL_RESTRICT_REF buffer )
+        ArgumentBase::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        ArgumentBase::perform_remap_flag_t const perform_remap_flag )
     {
 
         using status_t = ArgumentBase::status_t;
@@ -277,14 +288,16 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ( ptr_controller != nullptr ) && ( this->usesCObjectsBuffer() ) )
         {
-            success = ptr_controller->receive( buffer, this );
+            success = ptr_controller->receive(
+                buffer, this, perform_remap_flag );
         }
 
         return success;
     }
 
     ArgumentBase::status_t ArgumentBase::receive(
-        ArgumentBase::c_buffer_t* SIXTRL_RESTRICT buf )
+        ArgumentBase::c_buffer_t* SIXTRL_RESTRICT buf,
+        ArgumentBase::perform_remap_flag_t const perform_remap_flag )
     {
 
         using status_t = ArgumentBase::status_t;
@@ -295,7 +308,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ( ptr_controller != nullptr ) && ( this->usesCObjectsBuffer() ) )
         {
-            success = ptr_controller->receive( buf, this );
+            success = ptr_controller->receive( buf, this, perform_remap_flag );
         }
 
         return success;

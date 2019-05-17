@@ -49,6 +49,14 @@ char const* NS(Argument_get_arch_string)(
         ? arg->send( buffer ) : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
+::NS(arch_status_t) NS(Argument_receive_buffer_without_remap)(
+    ::NS(ArgumentBase)* SIXTRL_RESTRICT arg,
+    ::NS(Buffer)* SIXTRL_RESTRICT buf )
+{
+    return ( arg != nullptr ) ? arg->send( buf, st::CTRL_PERFORM_NO_REMAP )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+
 ::NS(arch_status_t) NS(Argument_send_raw_argument)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg, void const* SIXTRL_RESTRICT begin,
     ::NS(arch_size_t) const arg_size )
@@ -69,6 +77,14 @@ char const* NS(Argument_get_arch_string)(
 {
     return ( arg != nullptr )
         ? arg->receive( buf ) : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+
+::NS(arch_status_t) NS(Argument_receive_buffer_without_remap)(
+    ::NS(ArgumentBase)* SIXTRL_RESTRICT arg,
+    ::NS(Buffer)* SIXTRL_RESTRICT buf )
+{
+    return ( arg != nullptr ) ? arg->receive( buf, st::CTRL_PERFORM_NO_REMAP )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 ::NS(arch_status_t) NS(Argument_receive_raw_argument)(

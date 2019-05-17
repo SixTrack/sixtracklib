@@ -80,7 +80,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ControllerBase::status_t ControllerBase::send(
         ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT arg,
-        const ControllerBase::c_buffer_t *const SIXTRL_RESTRICT source )
+        const ControllerBase::c_buffer_t *const SIXTRL_RESTRICT source,
+        ControllerBase::perform_remap_flag_t const perform_remap_flag )
     {
         using size_t         = ControllerBase::size_type;
         using status_t       = ControllerBase::status_t;
@@ -99,7 +100,8 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             status = this->doSend( arg, src_begin, src_size );
 
-            if( status == st::ARCH_STATUS_SUCCESS )
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+                ( perform_remap_flag == st::CTRL_REMAP ) )
             {
                 status = this->doRemapCObjectsBufferArg( arg );
             }
@@ -110,7 +112,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ControllerBase::status_t ControllerBase::send(
         ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT arg,
-        ControllerBase::buffer_t const& SIXTRL_RESTRICT_REF source )
+        ControllerBase::buffer_t const& SIXTRL_RESTRICT_REF source,
+        ControllerBase::perform_remap_flag_t const perform_remap_flag )
     {
         using size_t     = ControllerBase::size_type;
         using status_t   = ControllerBase::status_t;
@@ -129,7 +132,8 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             status = this->doSend( arg, src_begin, src_size );
 
-            if( status == st::ARCH_STATUS_SUCCESS )
+            if( ( status == st::ARCH_STATUS_SUCCESS )&&
+                ( perform_remap_flag == st::CTRL_REMAP ) )
             {
                 status = this->doRemapCObjectsBufferArg( arg );
             }
@@ -175,7 +179,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ControllerBase::status_t ControllerBase::receive(
         ControllerBase::c_buffer_t* SIXTRL_RESTRICT destination,
-        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT src_arg )
+        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT src_arg,
+        ControllerBase::perform_remap_flag_t const perform_remap_flag )
     {
         using size_t     = ControllerBase::size_type;
         using status_t   = ControllerBase::status_t;
@@ -192,7 +197,8 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             status = this->doReceive( dest_begin, dest_capacity, src_arg );
 
-            if( status == st::ARCH_STATUS_SUCCESS )
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+                ( perform_remap_flag == st::CTRL_REMAP ) )
             {
                 status = ::NS(Buffer_remap)( destination );
             }
@@ -203,7 +209,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ControllerBase::status_t ControllerBase::receive(
         ControllerBase::buffer_t& SIXTRL_RESTRICT_REF destination,
-        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT src_arg )
+        ControllerBase::ptr_arg_base_t SIXTRL_RESTRICT src_arg,
+        ControllerBase::perform_remap_flag_t const perform_remap_flag )
     {
         using size_t     = ControllerBase::size_type;
         using status_t   = ControllerBase::status_t;
@@ -220,7 +227,8 @@ namespace SIXTRL_CXX_NAMESPACE
             status = this->doReceive( destination.dataBegin< data_ptr_t >(),
                                       destination.capacity(), src_arg );
 
-            if( status == st::ARCH_STATUS_SUCCESS )
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+                ( perform_remap_flag == st::CTRL_REMAP ) )
             {
                 status = ( destination.remap() )
                     ? st::ARCH_STATUS_SUCCESS
@@ -647,7 +655,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->m_kernel_configs.push_back(
                 std::move( ptr_kernel_conf_base ) );
-            
+
             if( this->ptrKernelConfigBase( kernel_id ) != nullptr )
             {
                 ++this->m_num_kernels;

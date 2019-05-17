@@ -40,6 +40,11 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(Argument_send_buffer)(
     NS(ArgumentBase)* SIXTRL_RESTRICT arg,
     const NS(Buffer) *const SIXTRL_RESTRICT_REF buffer );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Argument_send_buffer_without_remap)(
+    NS(ArgumentBase)* SIXTRL_RESTRICT arg,
+    const NS(Buffer) *const SIXTRL_RESTRICT_REF buffer );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(Argument_send_raw_argument)(
     NS(ArgumentBase)* SIXTRL_RESTRICT arg,
     void const* SIXTRL_RESTRICT arg_begin,
@@ -52,6 +57,11 @@ NS(Argument_receive_again)( NS(ArgumentBase)* SIXTRL_RESTRICT arg );
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(Argument_receive_buffer)( NS(ArgumentBase)* SIXTRL_RESTRICT arg,
                              NS(Buffer)* SIXTRL_RESTRICT buf );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Argument_receive_buffer_without_remap)(
+    NS(ArgumentBase)* SIXTRL_RESTRICT arg,
+    NS(Buffer)* SIXTRL_RESTRICT buf );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(Argument_receive_raw_argument)(
