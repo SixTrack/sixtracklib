@@ -74,4 +74,54 @@ NS(arch_status_t) NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
     return status;
 }
 
+
+NS(arch_status_t) NS(ParticlesAddr_buffer_store_addresses)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT particles_buffer,
+    NS(buffer_size_t) const index )
+{
+    SIXTRL_ASSERT( NS(Buffer_get_slot_size)( paddr_buffer ) ==
+                   NS(Buffer_get_slot_size)( particles_buffer ) );
+
+    return NS(Particles_managed_buffer_store_addresses)(
+        ::NS(Buffer_get_data_begin)( paddr_buffer ),
+        ::NS(Buffer_get_data_begin)( particles_buffer ),
+        index, ::NS(Buffer_get_slot_size)( paddr_buffer ) );
+}
+
+NS(arch_status_t) NS(ParticlesAddr_buffer_store_all_addresses)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT particles_buffer )
+{
+    SIXTRL_ASSSERT( NS(Buffer_get_slot_size)( paddr_buffer ),
+                    NS(Buffer_get_slot_size)( particles_buffer ) );
+
+    return NS(Particles_managed_buffer_store_all_addresses)(
+        NS(Buffer_get_data_begin)( paddr_buffer ),
+        NS(Buffer_get_data_begin)( particles_buffer ),
+        NS(Buffer_get_slot_size)( particles_buffer ) );
+}
+
+void NS(ParticlesAddr_buffer_remap_adresses)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const buffer_index,
+    NS(buffer_addr_diff_t) const addr_offset )
+{
+    NS(ParticlesAddr_managed_buffer_remap_addresses)(
+        NS(Buffer_get_data_begin)( buffer ), buffer_index, addr_offset,
+        NS(Buffer_get_slot_size)( buffer ) );
+}
+
+void NS(ParticlesAddr_buffer_all_remap_adresses)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const buffer_index,
+    NS(buffer_addr_diff_t) const addr_offset )
+{
+    NS(ParticlesAddr_managed_buffer_all_remap_addresses)(
+        NS(Buffer_get_data_begin)( buffer ), addr_offset,
+        NS(Buffer_get_slot_size)( buffer ) );
+}
+
 /* end: sixtracklib/common/particles/particles_addr.c */

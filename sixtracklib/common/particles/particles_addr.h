@@ -100,6 +100,33 @@ SIXTRL_STATIC SIXTRL_FN void NS(ParticlesAddr_assign_to_particles)(
         SIXTRL_RESTRICT part_addr,
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*  SIXTRL_RESTRICT p );
 
+SIXTRL_STATIC SIXTRL_FN void NS(ParticlesAddr_remap_addresses)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)* SIXTRL_RESTRICT part_addr,
+    NS(buffer_addr_diff_t) const addr_offset );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC SIXTRL_FN void NS(ParticlesAddr_managed_buffer_remap_addresses)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const buffer_index, NS(buffer_size_t) const slot_size );
+
+SIXTRL_STATIC SIXTRL_FN void
+NS(ParticlesAddr_managed_buffer_all_remap_addresses)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const slot_size );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC SIXTRL_FN int NS(ParticlesAddr_managed_buffer_compare)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT lhs_buffer_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT rhs_buffer_begin,
+    NS(buffer_size_t) const buffer_index, NS(buffer_size_t) const slot_size );
+
+SIXTRL_STATIC SIXTRL_FN int NS(ParticlesAddr_managed_buffer_all_compare)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT lhs_buffer_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT rhs_buffer_begin,
+    NS(buffer_size_t) const slot_size );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesAddr) const*
@@ -178,6 +205,33 @@ NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer)
         *const SIXTRL_RESTRICT particles_buffer );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ParticlesAddr_buffer_store_addresses)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT particles_buffer,
+    NS(buffer_size_t) const index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ParticlesAddr_buffer_store_all_addresses)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT particles_buffer );
+
+/* ------------------------------------------------------------------------ */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void
+NS(ParticlesAddr_buffer_remap_adresses)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const buffer_index,
+    NS(buffer_addr_diff_t) const addr_offset );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void
+NS(ParticlesAddr_buffer_all_remap_adresses)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const buffer_index,
+    NS(buffer_addr_diff_t) const addr_offset );
 
 /* ------------------------------------------------------------------------ */
 
@@ -470,6 +524,147 @@ SIXTRL_INLINE void NS(ParticlesAddr_assign_to_particles)(
         p->state         = ( index_ptr_t )( uaddr_t )paddr->state_addr;
     }
 }
+
+SIXTRL_INLINE void NS(ParticlesAddr_remap_addresses)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)* SIXTRL_RESTRICT p,
+    NS(buffer_addr_diff_t) const addr_offset )
+{
+    typedef NS(buffer_addr_t)       address_t;
+    typedef NS(buffer_addr_diff_t)  diff_t;
+
+    SIXTRL_STATIC_VAR address_t const ADDR0 = ( address_t )0u;
+
+    if( p != SIXTRL_NULLPTR )
+    {
+        if( ( addr_offset == ( NS(buffer_addr_diff_t) )0u ) ||
+            ( p->q0    == ADDR0 ) || ( p->mass0  == ADDR0 ) ||
+            ( p->beta0 == ADDR0 ) || ( p->gamma0 == ADDR0 ) ||
+            ( p->p0c   == ADDR0 ) || ( p->s      == ADDR0 ) ||
+            ( p->x     == ADDR0 ) || ( p->y      == ADDR0 ) ||
+            ( p->px    == ADDR0 ) || ( p->py     == ADDR0 ) ||
+            ( p->zeta  == ADDR0 ) || ( p->psigma == ADDR0 ) ||
+            ( p->delta == ADDR0 ) || ( p->rpp    == ADDR0 ) ||
+            ( p->rvv   == ADDR0 ) || ( p->chi    == ADDR0 ) ||
+            ( p->charge_ratio == ADDR0 ) ||
+            ( p->particle_id  == ADDR0 ) ||
+            ( p->at_element_id == ADDR0 ) ||
+            ( p->at_turn == ADDR0 ) ||
+            ( p->state == ADDR0 ) )
+        {
+            return;
+        }
+    }
+
+    if( ( p != SIXTRL_NULLPTR ) && ( addr_offset > ( diff_t )0u ) )
+    {
+        /* TODO: Prevent overflows by checking value + addr_offset <= MAX */
+
+        p->q0             += addr_offset;
+        p->mass0          += addr_offset;
+        p->beta0          += addr_offset;
+        p->gamma0         += addr_offset;
+        p->p0c            += addr_offset;
+        p->s              += addr_offset;
+        p->x              += addr_offset;
+        p->y              += addr_offset;
+        p->px             += addr_offset;
+        p->py             += addr_offset;
+        p->zeta           += addr_offset;
+        p->psigma         += addr_offset;
+        p->delta          += addr_offset;
+        p->rpp            += addr_offset;
+        p->rvv            += addr_offset;
+        p->chi            += addr_offset;
+        p->charge_ratio   += addr_offset;
+        p->particle_id    += addr_offset;
+        p->at_element_id  += addr_offset;
+        p->at_turn        += addr_offset;
+        p->state          += addr_offset;
+    }
+    else if( ( p != SIXTRL_NULLPTR ) && ( addr_offset < ( diff_t )0u ) )
+    {
+        address_t const _abs = ( address_t )( -addr_offset );
+
+        p->q0     = ( p->q0     >= _abs ) ? p->q0 - _abs     : ADDR0;
+        p->mass0  = ( p->mass0  >= _abs ) ? p->mass0 - _abs  : ADDR0;
+        p->beta0  = ( p->beta0  >= _abs ) ? p->beta0 - _abs  : ADDR0;
+        p->gamma0 = ( p->gamma0 >= _abs ) ? p->gamma0 - _abs : ADDR0;
+        p->p0c    = ( p->p0c    >= _abs ) ? p->p0c - _abs    : ADDR0;
+        p->s      = ( p->s      >= _abs ) ? p->s - _abs      : ADDR0;
+        p->x      = ( p->x      >= _abs ) ? p->x - _abs      : ADDR0;
+        p->y      = ( p->y      >= _abs ) ? p->y - _abs      : ADDR0;
+        p->px     = ( p->px     >= _abs ) ? p->px - _abs     : ADDR0;
+        p->py     = ( p->py     >= _abs ) ? p->py - _abs     : ADDR0;
+        p->zeta   = ( p->zeta   >= _abs ) ? p->zeta - _abs   : ADDR0;
+        p->psigma = ( p->psigma >= _abs ) ? p->psigma - _abs : ADDR0;
+        p->delta  = ( p->delta  >= _abs ) ? p->delta - _abs  : ADDR0;
+        p->rpp    = ( p->rpp    >= _abs ) ? p->rpp - _abs    : ADDR0;
+        p->rvv    = ( p->rvv    >= _abs ) ? p->rvv - _abs    : ADDR0;
+        p->chi    = ( p->chi    >= _abs ) ? p->chi - _abs    : ADDR0;
+
+        p->charge_ratio = ( p->charge_ratio  >= _abs )
+            ? p->charge_ratio - _abs : ADDR0;
+
+        p->particle_id = ( p->particle_id >= _abs )
+            ? p->particle_id - _abs : ADDR0;
+
+        p->at_element_id = ( p->at_element_id >= _abs )
+            ? p->at_element_id - _abs : ADDR0;
+
+        p->at_turn = ( p->at_turn >= _abs ) ? p->at_turn - _abs : ADDR0;
+        p->state   = ( p->state   >= _abs ) ? p->state - _abs   : ADDR0;
+    }
+
+    return;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE void NS(ParticlesAddr_managed_buffer_remap_addresses)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const buffer_index,
+    NS(buffer_addr_diff_t) const addr_offset,
+    NS(buffer_size_t) const slot_size )
+{
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)* paddr =
+        NS(ParticlesAddr_managed_buffer_get_particle_addr)(
+            buffer_begin, buffer_index, slot_size );
+
+    NS(ParticlesAddr_remap_addresses)( paddr, addr_offset );
+}
+
+SIXTRL_INLINE void NS(ParticlesAddr_managed_buffer_all_remap_addresses)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_addr_diff_t) const addr_offset,
+    NS(buffer_size_t) const slot_size )
+{
+    NS(buffer_size_t) const num_paddr_elements =
+        NS(ManagedBuffer_get_num_objects)( buffer_begin, slot_size );
+
+    NS(buffer_size_t) ii = ( NS(buffer_size_t) )0u;
+
+    for( ; ii < num_paddr_elements ; ++ii )
+    {
+        NS(ParticlesAddr_managed_buffer_remap_addresses)(
+            buffer_begin, ii, addr_offset, slot_size );
+    }
+
+    return;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE int NS(ParticlesAddr_managed_buffer_compare)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT lhs_buffer_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT rhs_buffer_begin,
+    NS(buffer_size_t) const buffer_index, NS(buffer_size_t) const slot_size );
+
+SIXTRL_INLINE int NS(ParticlesAddr_managed_buffer_all_compare)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT lhs_buffer_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT rhs_buffer_begin,
+    NS(buffer_size_t) const slot_size );
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesAddr) const*
 NS(BufferIndex_get_const_particles_addr)(
