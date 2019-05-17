@@ -1,4 +1,4 @@
-#include "sixtracklib/testlib/common/particles.h"
+#include "sixtracklib/testlib/common/particles/particles.h"
 
 #include <assert.h>
 #include <math.h>
@@ -1722,4 +1722,4 @@ void NS(Particles_buffer_print_max_diff_out)(
 
 /* ------------------------------------------------------------------------- */
 
-/* end: tests/sixtracklib/testlib/common/test_particles_tools.c */
+/* end: tests/sixtracklib/testlib/common/particles/particles.c */

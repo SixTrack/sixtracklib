@@ -148,4 +148,4 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Particles_buffer_print_max_diff_out)(
 
 #endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_PARTICLES_HEADER_H__ */
 
-/* end: tests/sixtracklib/testlib/common/particles.h */
+/* end: tests/sixtracklib/testlib/common/particles/particles.h */

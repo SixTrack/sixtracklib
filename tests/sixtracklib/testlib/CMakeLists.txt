@@ -2,6 +2,12 @@
 
 message( STATUS "------ processing tests/sixtracklib/testlib/CMakeLists.txt" )
 
+set( SIXTRL_TESTLIB_INSTALL_C99_PATH
+     "${SIXTRL_TESTLIB_INSTALL_C99_PREFIX}/testlib" )
+
+set( SIXTRL_TESTLIB_INSTALL_CXX_PATH
+     "${SIXTRL_TESTLIB_INSTALL_CXX_PREFIX}/testlib" )
+
 set( SIXTRACKL_TESTLIB_LINK_LIBRARIES sixtrack  CACHE INTERNAL "" FORCE )
 set( SIXTRACKL_TESTLIB_LIBRARY_MODULES
      "" CACHE INTERNAL "" FORCE )
@@ -26,7 +32,6 @@ endif()
 # -----------------------------------------------------------------------------
 # Handle top-level and general files at this level :
 
-set( SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS ../testlib.h )
 set( SIXTRACKL_TESTLIB_LOCAL_C99_HEADERS )
 set( SIXTRACKL_TESTLIB_LOCAL_CXX_HEADERS )
 
@@ -102,7 +107,7 @@ endif()
 # ------------------------------------------------------------------------------
 # install :
 
-set( TESTLIB_INSTALL_CONFIG_PATH ${CMAKE_INSTALL_PREFIX}/lib/cmake )
+set( TESTLIB_INSTALL_CONFIG_PATH "${SIXTRL_TESTLIB_INSTALL_LIB_PREFIX}/cmake" )
 
 install( TARGETS sixtrack_test
          EXPORT  SixTrackTestlib-targets
@@ -116,25 +121,14 @@ install( EXPORT SixTrackTestlib-targets
          DESTINATION ${TESTLIB_INSTALL_CONFIG_PATH}
 )
 
-if( SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS )
-    set( TESTLIB_TOP_LEVEL_INSTALL_INCLUDE_PATH include/sixtracklib )
-
-    install( FILES ${SIXTRACKL_TESTLIB_TOP_LEVEL_HEADERS}
-             DESTINATION ${TESTLIB_TOP_LEVEL_INSTALL_INCLUDE_PATH} )
-endif()
-
 if( SIXTRACKL_TESTLIB_LOCAL_C99_HEADERS )
-    set( TESTLIB_C99_INSTALL_PATH include/sixtracklib/testlib )
-
     install( FILES ${SIXTRACKL_TESTLIB_LOCAL_C99_HEADERS}
-             DESTINATION ${TESTLIB_C99_INSTALL_PATH} )
+             DESTINATION ${SIXTRL_TESTLIB_INSTALL_C99_PATH} )
 endif()
 
-if( SIXTRACKL_TESTLIB_LOCAL_CXX_HEADERS )
-    set( TESTLIB_CXX_INSTALL_PATH include/sixtracklib/testlib )
-
+if( ( SIXTRACKL_TESTLIB_LOCAL_CXX_HEADERS ) AND ( SIXTRACKL_ENABLE_CXX ) )
     install( FILES ${SIXTRACKL_TESTLIB_LOCAL_CXX_HEADERS}
-             DESTINATION ${TESTLIB_CXX_INSTALL_PATH} )
+             DESTINATION ${SIXTRL_TESTLIB_INSTALL_CXX_PATH} )
 endif()
 
 #end sixtracklib/common/CMakeLists.txt
