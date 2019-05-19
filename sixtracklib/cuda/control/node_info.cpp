@@ -167,6 +167,45 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_cu_device_index = index;
     }
 
+    CudaNodeInfo::size_type CudaNodeInfo::warpSize() const SIXTRL_NOEXCEPT
+    {
+        return static_cast< CudaNodeInfo::size_type >(
+            this->m_cu_device_properties.warpSize );
+    }
+
+    CudaNodeInfo::size_type
+    CudaNodeInfo::computeCapability() const SIXTRL_NOEXCEPT
+    {
+        typedef size_t = CudaNodeInfo::size_type;
+
+        size_t compute_capability = this->m_cu_device_properties.major;
+        compute_capability *= size_t{ 10 };
+        compute_capability += this->m_cu_device_properties.minor;
+
+        return compute_capability;
+    }
+
+    CudaNodeInfo::size_type
+    CudaNodeInfo::numMultiprocessors() const SIXTRL_NOEXCEPT
+    {
+        return static_cast< CudaNodeInfo::size_type >(
+            this->m_cu_device_properties.multiProcessorCount );
+    }
+
+    CudaNodeInfo::size_type
+    CudaNodeInfo::maxThreadsPerBlock() const SIXTRL_NOEXCEPT
+    {
+        return static_cast< CudaNodeInfo::size_type >(
+            this->m_cu_device_properties.maxThreadsPerBlock );
+    }
+
+    CudaNodeInfo::size_type
+    CudaNodeInfo::maxThreadsPerMultiprocessor() const SIXTRL_NOEXCEPT
+    {
+        return static_cast< CudaNodeInfo::size_type >(
+            this->m_cu_device_properties.maxThreadsPerMultiprocessor );
+    }
+
     void CudaNodeInfo::doPrintToOutputStream(
         std::ostream& SIXTRL_RESTRICT_REF output ) const
     {

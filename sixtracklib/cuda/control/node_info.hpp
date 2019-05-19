@@ -88,6 +88,16 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void setCudaDeviceIndex(
             cuda_dev_index_t const index ) SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN size_type warpSize() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN size_type computeCapability() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN size_type numMultiprocessors() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN size_type maxThreadsPerBlock() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN size_type
+        maxThreadsPerMultiprocessor() const SIXTRL_NOEXCEPT;
+
+
+
         protected:
 
         SIXTRL_HOST_FN virtual void doPrintToOutputStream(
