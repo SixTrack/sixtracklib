@@ -230,7 +230,6 @@ NS(ParticlesAddr_buffer_remap_adresses)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void
 NS(ParticlesAddr_buffer_all_remap_adresses)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(buffer_size_t) const buffer_index,
     NS(buffer_addr_diff_t) const addr_offset );
 
 /* ------------------------------------------------------------------------ */
