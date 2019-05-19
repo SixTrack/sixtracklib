@@ -12,7 +12,7 @@
 extern "C" {
 #endif /* C++ */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TestParticlesAddr_prepare_buffers)(
     NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
@@ -30,6 +30,18 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TestParticlesAddr_verify_addresses)(
     const NS(Buffer) *const SIXTRL_RESTRICT paddr_buffer,
     const NS(Buffer) *const SIXTRL_RESTRICT particles_buffer );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TestParticlesAddr_run_ctrl_args_test)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    NS(ArgumentBase)* SIXTRL_RESTRICT paddr_arg,
+    NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
+    NS(ArgumentBase)* SIXTRL_RESTRICT particles_arg,
+    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+    NS(ArgumentBase)* SIXTRL_RESTRICT result_arg );
+
+/* ------------------------------------------------------------------------- */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }

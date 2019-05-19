@@ -8,6 +8,8 @@
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/buffer.hpp"
+#include "sixtracklib/common/control/controller_base.hpp"
+#include "sixtracklib/common/control/argument_base.hpp"
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -35,6 +37,16 @@ namespace SIXTRL_CXX_NAMESPACE
                 SIXTRL_RESTRICT_REF paddr_buffer,
             SIXTRL_CXX_NAMESPACE::Buffer const&
                 SIXTRL_RESTRICT_REF particles_buffer );
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN bool TestParticlesAddr_run_ctrl_args_test(
+            SIXTRL_CXX_NAMESPACE::ControllerBase* SIXTRL_RESTRICT ctrl,
+            SIXTRL_CXX_NAMESPACE::ArgumentBase* SIXTRL_RESTRICT paddr_arg,
+            SIXTRL_CXX_NAMESPACE::Buffer& SIXTRL_RESTRICT_REF paddr_buffer,
+            SIXTRL_CXX_NAMESPACE::ArgumentBase* SIXTRL_RESTRICT particles_arg,
+            SIXTRL_CXX_NAMESPACE::Buffer& SIXTRL_RESTRICT_REF particles_buffer,
+            SIXTRL_CXX_NAMESPACE::ArgumentBase* SIXTRL_RESTRICT result_arg );
     }
 }
 
