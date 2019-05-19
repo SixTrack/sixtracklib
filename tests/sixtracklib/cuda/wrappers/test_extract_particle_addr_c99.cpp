@@ -241,6 +241,8 @@ namespace SIXTRL_CXX_NAMESPACE
                 addr_diff_t const addr_offset =
                     host_begin_addr - device_begin_addr;
 
+
+
             }
 
             /* Cleanup: */
