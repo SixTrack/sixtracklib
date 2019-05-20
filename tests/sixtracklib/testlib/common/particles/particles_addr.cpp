@@ -73,7 +73,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 ctrl, paddr_arg, paddr_buffer.getCApiPtr(), particles_arg,
                     particles_buffer.getCApiPtr(), result_arg );
         }
-        
+
         bool TestParticlesAddr_evaluate_ctrl_args_test(
             st::ControllerBase* SIXTRL_RESTRICT ctrl,
             st::ArgumentBase* SIXTRL_RESTRICT paddr_arg,
@@ -342,28 +342,33 @@ bool NS(TestParticlesAddr_prepare_ctrl_args_test)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT result_arg )
 {
     using result_reg_t = ::NS(arch_debugging_t);
-    
+
     bool success = false;
-    
-    result_reg_t result_register = ::NS(ARCH_DEBUGGING_GENERAL_FAILURE);
-    
-    ::NS(arch_status_t) status = 
+
+    ::NS(arch_status_t) status =
         ::NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
             paddr_buffer, particles_buffer );
-        
+
     if( status != st::ARCH_STATUS_SUCCESS ) return success;
-    
+
     status = ::NS(Argument_send_buffer)( particles_arg, particles_buffer );
     if( status != ::NS(ARCH_STATUS_SUCCESS) ) return success;
 
     status = ::NS(Argument_send_buffer)( paddr_arg, paddr_buffer );
     if( status != ::NS(ARCH_STATUS_SUCCESS) ) return success;
-    
-    status = ::NS(Argument_send_raw_argument)( 
+
+    result_reg_t result_register = ::NS(ARCH_DEBUGGING_REGISTER_EMPTY);
+    status = ::NS(Argument_send_raw_argument)(
         result_arg, &result_register, sizeof( result_register ) );
-    
+    if( status != ::NS(ARCH_STATUS_SUCCESS) ) return success;
+
+    result_register = ( result_reg_t )5u;
+
+    status = ::NS(Argument_receive_raw_argument)(
+        result_arg, &result_register, sizeof( result_register ) );
+
     success = ( status == ::NS(ARCH_STATUS_SUCCESS ) );
-    
+
     return success;
 }
 
@@ -402,7 +407,7 @@ bool NS(TestParticlesAddr_evaluate_ctrl_args_test)(
 
         SIXTRL_ASSERT( ::NS(Buffer_get_num_of_objects)( paddr_buffer ) == 0u );
 
-        status_t status = ::NS(Argument_receive_buffer)( 
+        status_t status = ::NS(Argument_receive_buffer)(
             paddr_arg, paddr_buffer );
         result_reg_t result_register = ::NS(ARCH_DEBUGGING_GENERAL_FAILURE);
 
@@ -412,13 +417,13 @@ bool NS(TestParticlesAddr_evaluate_ctrl_args_test)(
             return success;
         }
 
-        status = ::NS(Argument_receive_raw_argument)( 
+        status = ::NS(Argument_receive_raw_argument)(
             result_arg, &result_register, res_size );
 
         if( ( status != ::NS(ARCH_STATUS_SUCCESS) ) ||
             ( result_register != ::NS(ARCH_DEBUGGING_REGISTER_EMPTY) ) )
         {
-            success = false;
+            return success;
         }
 
         if( ::NS(TestParticlesAddr_verify_structure)( paddr_buffer,
