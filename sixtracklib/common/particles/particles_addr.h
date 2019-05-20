@@ -108,7 +108,7 @@ SIXTRL_STATIC SIXTRL_FN void NS(ParticlesAddr_remap_addresses)(
 
 SIXTRL_STATIC SIXTRL_FN void NS(ParticlesAddr_managed_buffer_remap_addresses)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
-    NS(buffer_size_t) const buffer_index, 
+    NS(buffer_size_t) const buffer_index,
     NS(buffer_addr_diff_t) const addr_offset,
     NS(buffer_size_t) const slot_size );
 
@@ -155,27 +155,27 @@ NS(ParticlesAddr_managed_buffer_get_particle_addr)(
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(Particles_managed_buffer_store_addresses)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const index, NS(buffer_size_t) const slot_size );
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(Particles_managed_buffer_store_addresses_debug)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const index, NS(buffer_size_t) const slot_size,
     SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_debug_flag );
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(Particles_managed_buffer_store_all_addresses)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(Particles_managed_buffer_store_all_addresses_debug)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const slot_size,
     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_error_flag );
 
@@ -588,16 +588,16 @@ SIXTRL_INLINE void NS(ParticlesAddr_remap_addresses)(
         address_t const _abs = ( address_t )( -addr_offset );
 
         p->q0_addr = ( p->q0_addr >= _abs ) ? p->q0_addr - _abs : ADDR0;
-        
-        p->mass0_addr = ( p->mass0_addr >= _abs ) 
+
+        p->mass0_addr = ( p->mass0_addr >= _abs )
             ? p->mass0_addr - _abs  : ADDR0;
-        
-        p->beta0_addr = ( p->beta0_addr  >= _abs ) 
+
+        p->beta0_addr = ( p->beta0_addr  >= _abs )
             ? p->beta0_addr - _abs  : ADDR0;
-            
-        p->gamma0_addr = ( p->gamma0_addr >= _abs ) 
+
+        p->gamma0_addr = ( p->gamma0_addr >= _abs )
             ? p->gamma0_addr - _abs : ADDR0;
-            
+
         p->p0c_addr = ( p->p0c_addr >= _abs ) ? p->p0c_addr - _abs : ADDR0;
         p->s_addr = ( p->s_addr >= _abs ) ? p->s_addr - _abs : ADDR0;
         p->x_addr = ( p->x_addr >= _abs ) ? p->x_addr - _abs : ADDR0;
@@ -605,10 +605,10 @@ SIXTRL_INLINE void NS(ParticlesAddr_remap_addresses)(
         p->px_addr = ( p->px_addr >= _abs ) ? p->px_addr - _abs : ADDR0;
         p->py_addr = ( p->py_addr >= _abs ) ? p->py_addr - _abs : ADDR0;
         p->zeta_addr = ( p->zeta_addr >= _abs ) ? p->zeta_addr - _abs : ADDR0;
-        
-        p->psigma_addr = ( p->psigma_addr >= _abs ) 
+
+        p->psigma_addr = ( p->psigma_addr >= _abs )
             ? p->psigma_addr - _abs : ADDR0;
-            
+
         p->delta_addr = ( p->delta_addr  >= _abs ) ? p->delta_addr - _abs : ADDR0;
         p->rpp_addr = ( p->rpp_addr >= _abs ) ? p->rpp_addr - _abs : ADDR0;
         p->rvv_addr = ( p->rvv_addr >= _abs ) ? p->rvv_addr - _abs : ADDR0;
@@ -623,10 +623,10 @@ SIXTRL_INLINE void NS(ParticlesAddr_remap_addresses)(
         p->at_element_id_addr = ( p->at_element_id_addr >= _abs )
             ? p->at_element_id_addr - _abs : ADDR0;
 
-        p->at_turn_addr = ( p->at_turn_addr >= _abs ) 
+        p->at_turn_addr = ( p->at_turn_addr >= _abs )
             ? p->at_turn_addr - _abs : ADDR0;
-            
-        p->state_addr = ( p->state_addr >= _abs ) 
+
+        p->state_addr = ( p->state_addr >= _abs )
             ? p->state_addr - _abs   : ADDR0;
     }
 
@@ -674,14 +674,14 @@ SIXTRL_INLINE int NS(ParticlesAddr_managed_buffer_compare)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT rhs_begin,
     NS(buffer_size_t) const buffer_index, NS(buffer_size_t) const slot_size )
 {
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr) const* lhs = 
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr) const* lhs =
         NS(ParticlesAddr_managed_buffer_get_const_particle_addr)(
             lhs_begin, buffer_index, slot_size );
-        
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr) const* rhs = 
+
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr) const* rhs =
         NS(ParticlesAddr_managed_buffer_get_const_particle_addr)(
             rhs_begin, buffer_index, slot_size );
-        
+
     return NS(ParticlesAddr_compare_values)( lhs, rhs );
 }
 
@@ -691,30 +691,30 @@ SIXTRL_INLINE int NS(ParticlesAddr_managed_buffer_all_compare)(
     NS(buffer_size_t) const slot_size )
 {
     int cmp_result = -1;
-    
+
     NS(buffer_size_t) const lhs_num_elem = NS(ManagedBuffer_get_num_objects)(
         lhs_begin, slot_size );
-    
+
     NS(buffer_size_t) const rhs_num_elem = NS(ManagedBuffer_get_num_objects)(
         rhs_begin, slot_size );
-    
+
     if( lhs_num_elem == rhs_num_elem )
     {
         NS(buffer_size_t) ii = ( NS(buffer_size_t) )0u;
         cmp_result = 0;
-        
+
         for( ; ii < lhs_num_elem ; ++ii )
         {
-            SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr) const* lhs = 
+            SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr) const* lhs =
                 NS(ParticlesAddr_managed_buffer_get_const_particle_addr)(
                     lhs_begin, ii, slot_size );
-                
-            SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr) const* rhs = 
+
+            SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr) const* rhs =
                 NS(ParticlesAddr_managed_buffer_get_const_particle_addr)(
                     rhs_begin, ii, slot_size );
-                
+
             cmp_result = NS(ParticlesAddr_compare_values)( lhs, rhs );
-            
+
             if( cmp_result != 0 ) break;
         }
     }
@@ -722,7 +722,7 @@ SIXTRL_INLINE int NS(ParticlesAddr_managed_buffer_all_compare)(
     {
         cmp_result = +1;
     }
-    
+
     return cmp_result;
 }
 
@@ -789,8 +789,8 @@ NS(ParticlesAddr_managed_buffer_get_particle_addr)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(arch_status_t) NS(Particles_managed_buffer_store_addresses)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const index, NS(buffer_size_t) const slot_size )
 {
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Particles) const* ptr_particles_t;
@@ -823,8 +823,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(Particles_managed_buffer_store_addresses)(
 
 SIXTRL_INLINE NS(arch_status_t)
 NS(Particles_managed_buffer_store_addresses_debug)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const index, NS(buffer_size_t) const slot_size,
     SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register )
 {
@@ -833,7 +833,7 @@ NS(Particles_managed_buffer_store_addresses_debug)(
 
     NS(arch_status_t) const status =
     NS(Particles_managed_buffer_store_addresses)(
-            pbuffer, paddr_buffer, index, slot_size );
+            paddr_buffer, pbuffer, index, slot_size );
 
     if( ptr_dbg_register != SIXTRL_NULLPTR )
     {
@@ -901,8 +901,8 @@ NS(Particles_managed_buffer_store_addresses_debug)(
 
 SIXTRL_INLINE NS(arch_status_t)
 NS(Particles_managed_buffer_store_all_addresses)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const slot_size )
 {
     NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
@@ -920,9 +920,9 @@ NS(Particles_managed_buffer_store_all_addresses)(
         for( ; ii < num_objects ; ++ii )
         {
             status = NS(Particles_managed_buffer_store_addresses)(
-                pbuffer, paddr_buffer, ii, slot_size );
+                paddr_buffer, pbuffer, ii, slot_size );
 
-            if( status != SIXTRL_ARCH_STATUS_GENERAL_FAILURE ) break;
+            if( status != SIXTRL_ARCH_STATUS_SUCCESS ) break;
         }
     }
 
@@ -931,8 +931,8 @@ NS(Particles_managed_buffer_store_all_addresses)(
 
 SIXTRL_INLINE NS(arch_status_t)
 NS(Particles_managed_buffer_store_all_addresses_debug)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const slot_size,
     SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_debug_flag )
 {
@@ -951,7 +951,7 @@ NS(Particles_managed_buffer_store_all_addresses_debug)(
         for( ; ii < num_objects ; ++ii )
         {
             status = NS(Particles_managed_buffer_store_addresses_debug)(
-                pbuffer, paddr_buffer, ii, slot_size, ptr_debug_flag );
+                paddr_buffer, pbuffer, ii, slot_size, ptr_debug_flag );
 
             if( status != SIXTRL_ARCH_STATUS_SUCCESS ) break;
         }
