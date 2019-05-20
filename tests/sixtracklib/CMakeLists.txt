@@ -49,12 +49,12 @@ endif()
 # ==============================================================================
 # Install:
 
-install( FILE testlib.h
+install( FILES testlib.h
          DESTINATION "${SIXTRL_TESTLIB_INSTALL_C99_PREFIX}/testlib" )
 
 if( SIXTRACKL_ENABLE_CXX )
 
-    install( FILE testlib.hpp
+    install( FILES testlib.hpp
              DESTINATION "${SIXTRL_TESTLIB_INSTALL_CXX_PREFIX}/testlib" )
 
 endif()

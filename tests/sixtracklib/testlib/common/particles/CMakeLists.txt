@@ -21,7 +21,7 @@ set_target_properties( sixtrack_test_common_particle_c99 PROPERTIES
     LINKER_LANGUAGE C  POSITION_INDEPENDENT_CODE ON
     C_STANDARD 99 C_STANDARD_REQUIRED ON )
 
-target_compile_options( sixtrack_test_common PRIVATE
+target_compile_options( sixtrack_test_common_particle_c99 PRIVATE
         -Wall -Werror -pedantic -ansi ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------
@@ -45,11 +45,12 @@ set_target_properties( sixtrack_test_common_particle_cxx PROPERTIES
     LINKER_LANGUAGE C  POSITION_INDEPENDENT_CODE ON
     CXX_STANDARD 11 C_STANDARD_REQUIRED ON )
 
-target_compile_options( sixtrack_test_common PRIVATE
+target_compile_options( sixtrack_test_common_particle_cxx PRIVATE
         -Wall -Werror -pedantic -ansi ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------
-# pass on sixtrack_test_common as a module for sixtrack_test:
+# pass on sixtrack_test_common_particle_c99 and 
+# sixtrack_test_common_particle_cxx as a module for sixtrack_test:
 
 set(  SIXTRACKL_TESTLIB_LIBRARY_MODULES
     ${SIXTRACKL_TESTLIB_LIBRARY_MODULES}
