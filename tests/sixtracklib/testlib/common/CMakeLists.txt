@@ -12,6 +12,7 @@ set( SIXTRL_TESTLIB_COMMON_INSTALL_CXX_PATH
 # ------------------------------------------------------------------------------
 
 add_subdirectory( particles )
+add_subdirectory( track )
 
 # ------------------------------------------------------------------------------
 
