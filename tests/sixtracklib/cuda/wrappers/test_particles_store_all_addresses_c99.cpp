@@ -27,7 +27,7 @@
 TEST( C99_CudaWrappersParticlesStoreAddrTests, TestSingleParticleSetPerBuffer )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
-    
+
     using particles_t        = ::NS(Particles);
     using particles_addr_t   = ::NS(ParticlesAddr);
     using c_buffer_t         = ::NS(Buffer);
@@ -40,7 +40,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestSingleParticleSetPerBuffer )
     using status_t           = ::NS(arch_status_t);
     using node_index_t       = ::NS(node_index_t);
     using kernel_id_t        = ::NS(ctrl_kernel_id_t);
-    
+
     c_buffer_t* particles_buffer  = ::NS(Buffer_new)( size_t{ 0 } );
     c_buffer_t* cmp_paddr_buffer  = ::NS(Buffer_new)( size_t{ 0 } );
 
@@ -59,8 +59,8 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestSingleParticleSetPerBuffer )
     /* Enforce that we always have  a NS(Particles) instance in this test */
     double const probabilty_to_not_particles = double{ 0.0 };
 
-    status_t status = ::NS(TestParticlesAddr_prepare_buffers)( particles_buffer,
-        cmp_paddr_buffer, num_psets, min_num_particles, max_num_particles,
+    status_t status = ::NS(TestParticlesAddr_prepare_buffers)( cmp_paddr_buffer,
+        particles_buffer, num_psets, min_num_particles, max_num_particles,
             probabilty_to_not_particles, prng_seed );
     SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -81,67 +81,67 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestSingleParticleSetPerBuffer )
      * and the particles */
 
     cuda_ctrl_t* ctrl = ::NS(CudaController_create)();
-    node_index_t const num_avail_nodes = 
+    node_index_t const num_avail_nodes =
         ::NS(Controller_get_num_available_nodes)( ctrl );
-    
+
     if( num_avail_nodes > node_index_t{ 0 } )
     {
         size_t num_processed_nodes = size_t{ 0 };
-        
-        std::vector< node_index_t > available_indices( 
+
+        std::vector< node_index_t > available_indices(
             num_avail_nodes, cuda_ctrl_t::UNDEFINED_INDEX );
-        
-        size_t const num_retrieved_node_indices = 
-            ::NS(Controller_get_available_node_indices)( ctrl, 
+
+        size_t const num_retrieved_node_indices =
+            ::NS(Controller_get_available_node_indices)( ctrl,
                 available_indices.size(), available_indices.data() );
-            
+
         ASSERT_TRUE( num_retrieved_node_indices == available_indices.size() );
-        
+
         for( node_index_t const ii : available_indices )
         {
             if( ii != ::NS(Controller_get_selected_node_index)( ctrl ) )
             {
                 ::NS(Controller_select_node_by_index)( ctrl, ii );
             }
-            
-            ASSERT_TRUE( ii == ::NS(Controller_get_selected_node_index)( 
+
+            ASSERT_TRUE( ii == ::NS(Controller_get_selected_node_index)(
                 ctrl ) );
-            
-            cuda_node_info_t const* ptr_node_info = 
+
+            cuda_node_info_t const* ptr_node_info =
                 ::NS(CudaController_get_ptr_node_info_by_index)( ctrl, ii );
-                
+
             ASSERT_TRUE( ptr_node_info != nullptr );
-        
+
             ::NS(NodeInfo_print_out)( ptr_node_info );
-            
+
             /* ************************************************************* */
-            
+
             std::string kernel_name = SIXTRL_C99_NAMESPACE_PREFIX_STR;
             kernel_name += "Particles_buffer_store_all_addresses_cuda_wrapper";
-            
-            kernel_id_t const kernel_id = 
-                ::NS(CudaController_add_kernel_config_detailed)( ctrl, 
-                    kernel_name.c_str(), size_t{ 3 }, size_t{ 1 }, size_t{ 0 }, 
+
+            kernel_id_t const kernel_id =
+                ::NS(CudaController_add_kernel_config_detailed)( ctrl,
+                    kernel_name.c_str(), size_t{ 3 }, size_t{ 1 }, size_t{ 0 },
                         size_t{ 0 }, nullptr );
-                
-            cuda_kernel_conf_t* ptr_kernel_config = 
+
+            cuda_kernel_conf_t* ptr_kernel_config =
                 ::NS(CudaController_get_ptr_kernel_config)( ctrl, kernel_id );
-            
-            status = 
+
+            status =
             ::NS(CudaKernelConfig_configure_fetch_particles_addresses_kernel)(
                 ptr_kernel_config, ptr_node_info, num_psets );
-            
-            ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );               
-                        
+
+            ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
+
             /* ************************************************************* */
-            
+
             c_buffer_t* paddr_buffer = ::NS(Buffer_new)( size_t{ 0 } );
             SIXTRL_ASSERT( paddr_buffer != nullptr );
 
             status = ::NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
                 paddr_buffer, particles_buffer );
-            SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );            
-        
+            SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
+
             cuda_arg_t* particles_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( particles_arg != nullptr );
 
@@ -150,40 +150,40 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestSingleParticleSetPerBuffer )
 
             cuda_arg_t* result_register_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( result_register_arg != nullptr );
-            
+
             /* ************************************************************* */
 
             ASSERT_TRUE( ::NS(TestParticlesAddr_prepare_ctrl_args_test)(
-                ctrl, addresses_arg, paddr_buffer, particles_arg, 
+                ctrl, addresses_arg, paddr_buffer, particles_arg,
                     particles_buffer, result_register_arg ) );
-            
+
             ::NS(Particles_buffer_store_all_addresses_cuda_wrapper)(
                 ptr_kernel_config, addresses_arg, particles_arg,
                     result_register_arg );
-            
+
             ASSERT_TRUE( ::NS(TestParticlesAddr_evaluate_ctrl_args_test)(
-                ctrl, addresses_arg, paddr_buffer, particles_arg, 
+                ctrl, addresses_arg, paddr_buffer, particles_arg,
                     particles_buffer, result_register_arg ) );
-            
+
             /* ************************************************************* */
-            
+
             ::NS(Argument_delete)( result_register_arg );
             ::NS(Argument_delete)( addresses_arg );
             ::NS(Argument_delete)( particles_arg );
-            
+
             ::NS(Buffer_delete)( paddr_buffer );
-            
+
             ++num_processed_nodes;
         }
-        
-        ASSERT_TRUE( num_processed_nodes == 
+
+        ASSERT_TRUE( num_processed_nodes ==
             static_cast< size_t >( num_avail_nodes ) );
     }
-    else 
+    else
     {
         std::cout << "No cuda nodes found -> skipping test" << std::endl;
     }
-    
+
     ::NS(Buffer_delete)( cmp_paddr_buffer );
     ::NS(Controller_delete)( ctrl );
 }
@@ -192,7 +192,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestSingleParticleSetPerBuffer )
 TEST( C99_CudaWrappersParticlesStoreAddrTests, TestMultiParticleSetsPerBuffer )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
-    
+
     using particles_t        = ::NS(Particles);
     using particles_addr_t   = ::NS(ParticlesAddr);
     using c_buffer_t         = ::NS(Buffer);
@@ -205,7 +205,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestMultiParticleSetsPerBuffer )
     using status_t           = ::NS(arch_status_t);
     using node_index_t       = ::NS(node_index_t);
     using kernel_id_t        = ::NS(ctrl_kernel_id_t);
-    
+
     c_buffer_t* particles_buffer  = ::NS(Buffer_new)( size_t{ 0 } );
     c_buffer_t* cmp_paddr_buffer  = ::NS(Buffer_new)( size_t{ 0 } );
 
@@ -224,8 +224,8 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestMultiParticleSetsPerBuffer )
     /* Enforce that we always have  a NS(Particles) instance in this test */
     double const probabilty_to_not_particles = double{ 0.0 };
 
-    status_t status = ::NS(TestParticlesAddr_prepare_buffers)( particles_buffer,
-        cmp_paddr_buffer, num_psets, min_num_particles, max_num_particles,
+    status_t status = ::NS(TestParticlesAddr_prepare_buffers)( cmp_paddr_buffer,
+        particles_buffer, num_psets, min_num_particles, max_num_particles,
             probabilty_to_not_particles, prng_seed );
     SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -246,67 +246,67 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestMultiParticleSetsPerBuffer )
      * and the particles */
 
     cuda_ctrl_t* ctrl = ::NS(CudaController_create)();
-    node_index_t const num_avail_nodes = 
+    node_index_t const num_avail_nodes =
         ::NS(Controller_get_num_available_nodes)( ctrl );
-    
+
     if( num_avail_nodes > node_index_t{ 0 } )
     {
         size_t num_processed_nodes = size_t{ 0 };
-        
-        std::vector< node_index_t > available_indices( 
+
+        std::vector< node_index_t > available_indices(
             num_avail_nodes, cuda_ctrl_t::UNDEFINED_INDEX );
-        
-        size_t const num_retrieved_node_indices = 
-            ::NS(Controller_get_available_node_indices)( ctrl, 
+
+        size_t const num_retrieved_node_indices =
+            ::NS(Controller_get_available_node_indices)( ctrl,
                 available_indices.size(), available_indices.data() );
-            
+
         ASSERT_TRUE( num_retrieved_node_indices == available_indices.size() );
-        
+
         for( node_index_t const ii : available_indices )
         {
             if( ii != ::NS(Controller_get_selected_node_index)( ctrl ) )
             {
                 ::NS(Controller_select_node_by_index)( ctrl, ii );
             }
-            
-            ASSERT_TRUE( ii == ::NS(Controller_get_selected_node_index)( 
+
+            ASSERT_TRUE( ii == ::NS(Controller_get_selected_node_index)(
                 ctrl ) );
-            
-            cuda_node_info_t const* ptr_node_info = 
+
+            cuda_node_info_t const* ptr_node_info =
                 ::NS(CudaController_get_ptr_node_info_by_index)( ctrl, ii );
-                
+
             ASSERT_TRUE( ptr_node_info != nullptr );
-        
+
             ::NS(NodeInfo_print_out)( ptr_node_info );
-            
+
             /* ************************************************************* */
-            
+
             std::string kernel_name = SIXTRL_C99_NAMESPACE_PREFIX_STR;
             kernel_name += "Particles_buffer_store_all_addresses_cuda_wrapper";
-            
-            kernel_id_t const kernel_id = 
-                ::NS(CudaController_add_kernel_config_detailed)( ctrl, 
-                    kernel_name.c_str(), size_t{ 3 }, size_t{ 1 }, size_t{ 0 }, 
+
+            kernel_id_t const kernel_id =
+                ::NS(CudaController_add_kernel_config_detailed)( ctrl,
+                    kernel_name.c_str(), size_t{ 3 }, size_t{ 1 }, size_t{ 0 },
                         size_t{ 0 }, nullptr );
-                
-            cuda_kernel_conf_t* ptr_kernel_config = 
+
+            cuda_kernel_conf_t* ptr_kernel_config =
                 ::NS(CudaController_get_ptr_kernel_config)( ctrl, kernel_id );
-                
-            status = 
+
+            status =
             ::NS(CudaKernelConfig_configure_fetch_particles_addresses_kernel)(
                 ptr_kernel_config, ptr_node_info, num_psets );
-            
-            ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );               
-                        
+
+            ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
+
             /* ************************************************************* */
-            
+
             c_buffer_t* paddr_buffer = ::NS(Buffer_new)( size_t{ 0 } );
             SIXTRL_ASSERT( paddr_buffer != nullptr );
 
             status = ::NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
                 paddr_buffer, particles_buffer );
-            SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );            
-        
+            SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
+
             cuda_arg_t* particles_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( particles_arg != nullptr );
 
@@ -315,50 +315,50 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestMultiParticleSetsPerBuffer )
 
             cuda_arg_t* result_register_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( result_register_arg != nullptr );
-            
+
             /* ************************************************************* */
 
             ASSERT_TRUE( ::NS(TestParticlesAddr_prepare_ctrl_args_test)(
-                ctrl, addresses_arg, paddr_buffer, particles_arg, 
+                ctrl, addresses_arg, paddr_buffer, particles_arg,
                     particles_buffer, result_register_arg ) );
-            
+
             ::NS(Particles_buffer_store_all_addresses_cuda_wrapper)(
                 ptr_kernel_config, addresses_arg, particles_arg,
                     result_register_arg );
-            
+
             ASSERT_TRUE( ::NS(TestParticlesAddr_evaluate_ctrl_args_test)(
-                ctrl, addresses_arg, paddr_buffer, particles_arg, 
+                ctrl, addresses_arg, paddr_buffer, particles_arg,
                     particles_buffer, result_register_arg ) );
-            
+
             /* ************************************************************* */
-            
+
             ::NS(Argument_delete)( result_register_arg );
             ::NS(Argument_delete)( addresses_arg );
             ::NS(Argument_delete)( particles_arg );
-            
+
             ::NS(Buffer_delete)( paddr_buffer );
-            
+
             ++num_processed_nodes;
         }
-        
-        ASSERT_TRUE( num_processed_nodes == 
+
+        ASSERT_TRUE( num_processed_nodes ==
             static_cast< size_t >( num_avail_nodes ) );
     }
-    else 
+    else
     {
         std::cout << "No cuda nodes found -> skipping test" << std::endl;
     }
-    
+
     ::NS(Buffer_delete)( cmp_paddr_buffer );
     ::NS(Controller_delete)( ctrl );
 }
 
 
-TEST( C99_CudaWrappersParticlesStoreAddrTests, 
+TEST( C99_CudaWrappersParticlesStoreAddrTests,
       TestMultiParticleSetsPerBufferWithGenericObj )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
-    
+
     using particles_t        = ::NS(Particles);
     using particles_addr_t   = ::NS(ParticlesAddr);
     using c_buffer_t         = ::NS(Buffer);
@@ -371,7 +371,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests,
     using status_t           = ::NS(arch_status_t);
     using node_index_t       = ::NS(node_index_t);
     using kernel_id_t        = ::NS(ctrl_kernel_id_t);
-    
+
     c_buffer_t* particles_buffer  = ::NS(Buffer_new)( size_t{ 0 } );
     c_buffer_t* cmp_paddr_buffer  = ::NS(Buffer_new)( size_t{ 0 } );
 
@@ -390,8 +390,8 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests,
     /* Enforce that we always have  a NS(Particles) instance in this test */
     double const probabilty_to_not_particles = double{ 0.1 };
 
-    status_t status = ::NS(TestParticlesAddr_prepare_buffers)( particles_buffer,
-        cmp_paddr_buffer, num_psets, min_num_particles, max_num_particles,
+    status_t status = ::NS(TestParticlesAddr_prepare_buffers)( cmp_paddr_buffer,
+        particles_buffer, num_psets, min_num_particles, max_num_particles,
             probabilty_to_not_particles, prng_seed );
     SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -412,67 +412,67 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests,
      * and the particles */
 
     cuda_ctrl_t* ctrl = ::NS(CudaController_create)();
-    node_index_t const num_avail_nodes = 
+    node_index_t const num_avail_nodes =
         ::NS(Controller_get_num_available_nodes)( ctrl );
-    
+
     if( num_avail_nodes > node_index_t{ 0 } )
     {
         size_t num_processed_nodes = size_t{ 0 };
-        
-        std::vector< node_index_t > available_indices( 
+
+        std::vector< node_index_t > available_indices(
             num_avail_nodes, cuda_ctrl_t::UNDEFINED_INDEX );
-        
-        size_t const num_retrieved_node_indices = 
-            ::NS(Controller_get_available_node_indices)( ctrl, 
+
+        size_t const num_retrieved_node_indices =
+            ::NS(Controller_get_available_node_indices)( ctrl,
                 available_indices.size(), available_indices.data() );
-            
+
         ASSERT_TRUE( num_retrieved_node_indices == available_indices.size() );
-        
+
         for( node_index_t const ii : available_indices )
         {
             if( ii != ::NS(Controller_get_selected_node_index)( ctrl ) )
             {
                 ::NS(Controller_select_node_by_index)( ctrl, ii );
             }
-            
-            ASSERT_TRUE( ii == ::NS(Controller_get_selected_node_index)( 
+
+            ASSERT_TRUE( ii == ::NS(Controller_get_selected_node_index)(
                 ctrl ) );
-            
-            cuda_node_info_t const* ptr_node_info = 
+
+            cuda_node_info_t const* ptr_node_info =
                 ::NS(CudaController_get_ptr_node_info_by_index)( ctrl, ii );
-                
+
             ASSERT_TRUE( ptr_node_info != nullptr );
-        
+
             ::NS(NodeInfo_print_out)( ptr_node_info );
-            
+
             /* ************************************************************* */
-            
+
             std::string kernel_name = SIXTRL_C99_NAMESPACE_PREFIX_STR;
             kernel_name += "Particles_buffer_store_all_addresses_cuda_wrapper";
-            
-            kernel_id_t const kernel_id = 
-                ::NS(CudaController_add_kernel_config_detailed)( ctrl, 
-                    kernel_name.c_str(), size_t{ 3 }, size_t{ 1 }, size_t{ 0 }, 
+
+            kernel_id_t const kernel_id =
+                ::NS(CudaController_add_kernel_config_detailed)( ctrl,
+                    kernel_name.c_str(), size_t{ 3 }, size_t{ 1 }, size_t{ 0 },
                         size_t{ 0 }, nullptr );
-                
-            cuda_kernel_conf_t* ptr_kernel_config = 
+
+            cuda_kernel_conf_t* ptr_kernel_config =
                 ::NS(CudaController_get_ptr_kernel_config)( ctrl, kernel_id );
-                
-            status = 
+
+            status =
             ::NS(CudaKernelConfig_configure_fetch_particles_addresses_kernel)(
                 ptr_kernel_config, ptr_node_info, num_psets );
-            
-            ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );               
-                        
+
+            ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
+
             /* ************************************************************* */
-            
+
             c_buffer_t* paddr_buffer = ::NS(Buffer_new)( size_t{ 0 } );
             SIXTRL_ASSERT( paddr_buffer != nullptr );
 
             status = ::NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
                 paddr_buffer, particles_buffer );
-            SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );            
-        
+            SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
+
             cuda_arg_t* particles_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( particles_arg != nullptr );
 
@@ -481,42 +481,42 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests,
 
             cuda_arg_t* result_register_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( result_register_arg != nullptr );
-            
+
             /* ************************************************************* */
 
             ASSERT_TRUE( ::NS(TestParticlesAddr_prepare_ctrl_args_test)(
-                ctrl, addresses_arg, paddr_buffer, particles_arg, 
+                ctrl, addresses_arg, paddr_buffer, particles_arg,
                     particles_buffer, result_register_arg ) );
-            
+
             ::NS(Particles_buffer_store_all_addresses_cuda_wrapper)(
                 ptr_kernel_config, addresses_arg, particles_arg,
                     result_register_arg );
-            
+
             ASSERT_TRUE( ::NS(TestParticlesAddr_evaluate_ctrl_args_test)(
-                ctrl, addresses_arg, paddr_buffer, particles_arg, 
+                ctrl, addresses_arg, paddr_buffer, particles_arg,
                     particles_buffer, result_register_arg ) );
-            
+
             /* ************************************************************* */
-            
+
             ::NS(Argument_delete)( result_register_arg );
             ::NS(Argument_delete)( addresses_arg );
             ::NS(Argument_delete)( particles_arg );
-            
+
             ::NS(Buffer_delete)( paddr_buffer );
-            
+
             ++num_processed_nodes;
         }
-        
-        ASSERT_TRUE( num_processed_nodes > 
+
+        ASSERT_TRUE( num_processed_nodes ==
             static_cast< size_t >( num_avail_nodes ) );
     }
-    else 
+    else
     {
         std::cout << "No cuda nodes found -> skipping test" << std::endl;
     }
-    
+
     ::NS(Buffer_delete)( cmp_paddr_buffer );
     ::NS(Controller_delete)( ctrl );
 }
-    
+
 /* end: sixtracklib/cuda/wrappers/test_particles_store_all_addresses_c99.cpp */
