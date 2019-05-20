@@ -128,16 +128,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeId) const* NS(Controller_get_ptr_node_id)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeInfo) const* 
-NS(Controller_get_ptr_node_info_base_begin)(
-    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeInfo) const* 
-NS(Controller_get_ptr_node_info_base_end)(
-    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeInfoBase) const*
 NS(Controller_get_ptr_node_info_base_by_index)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,

@@ -211,20 +211,6 @@ bool NS(Controller_is_node_available)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-::NS(NodeInfo) const* NS(Controller_get_ptr_node_info_base_begin)(
-    const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl )
-{
-    return ( ctrl != nullptr ) ? ctrl->nodeInfoBaseBegin() : nullptr;
-}
-
-::NS(NodeInfo) const* NS(Controller_get_ptr_node_info_base_end)(
-    const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl )
-{
-    return ( ctrl != nullptr ) ? ctrl->nodeInfoBaseEnd() : nullptr;
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
 ::NS(NodeInfoBase) const* NS(Controller_get_ptr_node_info_base_by_index)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
     ::NS(arch_size_t)const node_index )
