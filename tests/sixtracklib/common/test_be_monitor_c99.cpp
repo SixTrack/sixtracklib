@@ -14,6 +14,8 @@
 
 #include <gtest/gtest.h>
 
+#include "sixtracklib/testlib.h"
+
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
@@ -25,7 +27,6 @@
 #include "sixtracklib/common/output/output_buffer.h"
 #include "sixtracklib/common/track.h"
 
-#include "sixtracklib/testlib/common/particles.h"
 
 TEST( C99_CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
 {
