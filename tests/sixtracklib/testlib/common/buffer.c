@@ -11,7 +11,7 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/testlib/common/particles.h"
+    #include "sixtracklib/testlib/common/particles/particles.h"
     #include "sixtracklib/testlib/common/beam_elements.h"
 
     #include "sixtracklib/common/definitions.h"

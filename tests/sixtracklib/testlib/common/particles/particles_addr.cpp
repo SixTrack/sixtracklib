@@ -1,11 +1,11 @@
-#include "sixtracklib/testlib/common/patricles/particles_addr.hpp"
-#include "sixtracklib/testlib/common/patricles/particles_addr.h"
+#include "sixtracklib/testlib/common/particles/particles_addr.hpp"
+#include "sixtracklib/testlib/common/particles/particles_addr.h"
 
 #include <cstddef>
 #include <cstdlib>
 #include <random>
 
-#include "sixtracklib/testlib/common/generic_obj.h"
+#include "sixtracklib/testlib/common/generic_buffer_obj.h"
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/control/definitions.h"
@@ -37,7 +37,7 @@ namespace SIXTRL_CXX_NAMESPACE
             st::buffer_size_t const initial_seed_value =
                 st::buffer_size_t{ 20190517u } )
         {
-            return st::tests::TestParticlesAddr_prepare_buffers(
+            return ::NS(TestParticlesAddr_prepare_buffers)(
                 paddr_buffer.getCApiPtr(), particles_buffer.getCApiPtr(),
                     num_elements, min_num_particles, max_num_particles,
                         probablity_for_non_particles, initial_seed_value );
@@ -47,7 +47,7 @@ namespace SIXTRL_CXX_NAMESPACE
             st::Buffer const& SIXTRL_RESTRICT_REF paddr_buffer,
             st::Buffer const& SIXTRL_RESTRICT_REF particles_buffer )
         {
-            return st::tests::TestParticlesAddr_verify_structure(
+            return ::NS(TestParticlesAddr_verify_structure)(
                 paddr_buffer.getCApiPtr(), particles_buffer.getCApiPtr() );
         }
 
@@ -55,7 +55,7 @@ namespace SIXTRL_CXX_NAMESPACE
             st::Buffer const& SIXTRL_RESTRICT_REF paddr_buffer,
             st::Buffer const& SIXTRL_RESTRICT_REF particles_buffer )
         {
-            return st::tests::TestParticlesAddr_verify_addresses(
+            return ::NS(TestParticlesAddr_verify_addresses)(
                 paddr_buffer.getCApiPtr(), particles_buffer.getCApiPtr() );
         }
 
@@ -89,7 +89,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 }
 
-::NS(arch_status_t) TestParticlesAddr_prepare_buffers(
+::NS(arch_status_t) NS(TestParticlesAddr_prepare_buffers)(
     ::NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
     ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     ::NS(buffer_size_t) const num_elements,
@@ -179,7 +179,7 @@ namespace SIXTRL_CXX_NAMESPACE
     return status;
 }
 
-::NS(arch_status_t) TestParticlesAddr_verify_structure(
+::NS(arch_status_t) NS(TestParticlesAddr_verify_structure)(
     const ::NS(Buffer) *const SIXTRL_RESTRICT paddr_buffer,
     const ::NS(Buffer) *const SIXTRL_RESTRICT particles_buffer )
 {
@@ -188,8 +188,6 @@ namespace SIXTRL_CXX_NAMESPACE
     using size_t      = ::NS(buffer_size_t);
     using particles_t = ::NS(Particles);
     using paddr_t     = ::NS(ParticlesAddr);
-    using type_id_t   = ::NS(object_type_id_t);
-    using gen_obj_t   = ::NS(GenericObj);
     using object_t    = ::NS(Object);
 
     if( ( particles_buffer != nullptr ) &&
@@ -259,8 +257,6 @@ namespace SIXTRL_CXX_NAMESPACE
     using size_t      = ::NS(buffer_size_t);
     using particles_t = ::NS(Particles);
     using paddr_t     = ::NS(ParticlesAddr);
-    using type_id_t   = ::NS(object_type_id_t);
-    using gen_obj_t   = ::NS(GenericObj);
     using object_t    = ::NS(Object);
 
     if( ( particles_buffer != nullptr ) &&
@@ -337,7 +333,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
 /* ----------------------------------------------------------------- */
 
-bool NS(TestParticlesAddr_evaluate_ctrl_args_test)(
+bool NS(TestParticlesAddr_prepare_ctrl_args_test)(
     ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     ::NS(ArgumentBase)* SIXTRL_RESTRICT paddr_arg,
     ::NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
@@ -345,7 +341,7 @@ bool NS(TestParticlesAddr_evaluate_ctrl_args_test)(
     ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     ::NS(ArgumentBase)* SIXTRL_RESTRICT result_arg )
 {
-    typedef result_reg_t = ::NS(arch_debugging_t);
+    using result_reg_t = ::NS(arch_debugging_t);
     
     bool success = false;
     
@@ -360,13 +356,13 @@ bool NS(TestParticlesAddr_evaluate_ctrl_args_test)(
     status = ::NS(Argument_send_buffer)( particles_arg, particles_buffer );
     if( status != ::NS(ARCH_STATUS_SUCCESS) ) return success;
 
-    status = ::NS(Argument_send_buffer)( addresses_arg, paddr_buffer );
+    status = ::NS(Argument_send_buffer)( paddr_arg, paddr_buffer );
     if( status != ::NS(ARCH_STATUS_SUCCESS) ) return success;
     
     status = ::NS(Argument_send_raw_argument)( 
         result_arg, &result_register, sizeof( result_register ) );
     
-    success = ( status == ::NS(ARCH_STATUS_SUCCESS );
+    success = ( status == ::NS(ARCH_STATUS_SUCCESS ) );
     
     return success;
 }
@@ -380,11 +376,11 @@ bool NS(TestParticlesAddr_evaluate_ctrl_args_test)(
     ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     ::NS(ArgumentBase)* SIXTRL_RESTRICT result_arg )
 {
-    typedef buf_size_t   = ::NS(buffer_size_t);
-    typedef status_t     = ::NS(arch_status_t);
-    typedef result_reg_t = ::NS(arch_debugging_t);
-    typedef address_t    = ::NS(buffer_addr_t);
-    typedef addr_diff_t  = ::NS(buffer_addr_diff_t);
+    using buf_size_t   = ::NS(buffer_size_t);
+    using status_t     = ::NS(arch_status_t);
+    using result_reg_t = ::NS(arch_debugging_t);
+    using address_t    = ::NS(buffer_addr_t);
+    using addr_diff_t  = ::NS(buffer_addr_diff_t);
 
     bool success = false;
 
@@ -406,7 +402,8 @@ bool NS(TestParticlesAddr_evaluate_ctrl_args_test)(
 
         SIXTRL_ASSERT( ::NS(Buffer_get_num_of_objects)( paddr_buffer ) == 0u );
 
-        status_t status = ::NS(Argument_receive_buffer)( paddr_buffer );
+        status_t status = ::NS(Argument_receive_buffer)( 
+            paddr_arg, paddr_buffer );
         result_reg_t result_register = ::NS(ARCH_DEBUGGING_GENERAL_FAILURE);
 
         if( ( status != ::NS(ARCH_STATUS_SUCCESS ) ) ||
@@ -415,16 +412,20 @@ bool NS(TestParticlesAddr_evaluate_ctrl_args_test)(
             return success;
         }
 
-        status = ::NS(Argument_receive_raw_arg)( &result_register, res_size );
+        status = ::NS(Argument_receive_raw_argument)( 
+            result_arg, &result_register, res_size );
 
-        if( ( status != :NS(ARCH_STATUS_SUCCESS) ) ||
+        if( ( status != ::NS(ARCH_STATUS_SUCCESS) ) ||
             ( result_register != ::NS(ARCH_DEBUGGING_REGISTER_EMPTY) ) )
         {
             success = false;
         }
 
         if( ::NS(TestParticlesAddr_verify_structure)( paddr_buffer,
-           particles_buffer ) != ::NS(ARCH_STATUS_SUCCESS) );
+           particles_buffer ) != ::NS(ARCH_STATUS_SUCCESS) )
+        {
+            return success;
+        }
 
         status = ::NS(Argument_receive_buffer_without_remap)(
             particles_arg, particles_buffer );
