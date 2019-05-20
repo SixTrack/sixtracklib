@@ -249,23 +249,23 @@ namespace SIXTRL_CXX_NAMESPACE
         
         if( ( node_indices_begin != nullptr ) &&
             ( this->numAvailableNodes() > node_index_t{ 0 } ) &&
-            ( this->numAvailableNodes() != _this_t::UNDEFINED_INDEX ) )
+            ( this->numAvailableNodes() != st::NODE_UNDEFINED_INDEX ) )
         {
             node_index_t ii = this->minAvailableNodeIndex();
             node_index_t const max_node_idx = this->maxAvailableNodeIndex();
             
             std::fill( node_indices_begin, 
                        node_indices_begin + max_num_node_indices, 
-                       _this_t::UNDEFINED_INDEX );
+                       st::NODE_UNDEFINED_INDEX );
             
-            SIXTRL_ASSERT( ii != _this_t::UNDEFINED_INDEX );
-            SIXTRL_ASSERT( max_node_idx != _this_t::UNDEFINED_INDEX );
+            SIXTRL_ASSERT( ii != st::NODE_UNDEFINED_INDEX );
+            SIXTRL_ASSERT( max_node_idx != st::NODE_UNDEFINED_INDEX );
             SIXTRL_ASSERT( ii <= max_node_idx );
             SIXTRL_ASSERT( ( node_index_t{ 1 } + ( max_node_idx - ii ) ) <= 
                 this->numAvailableNodes() );
             
             while( ( ii <= max_node_idx ) && 
-                   ( ii != _this_t::UNDEFINED_INDEX ) &&
+                   ( ii != st::NODE_UNDEFINED_INDEX ) &&
                    ( num_avail_elements < max_num_node_indices ) )
             {
                 if( this->isNodeAvailable( ii ) )
@@ -294,13 +294,13 @@ namespace SIXTRL_CXX_NAMESPACE
         
         if( ( node_ids_begin != nullptr ) &&
             ( this->numAvailableNodes() > node_index_t{ 0 } ) &&
-            ( this->numAvailableNodes() != _this_t::UNDEFINED_INDEX ) )
+            ( this->numAvailableNodes() != st::NODE_UNDEFINED_INDEX ) )
         {
             node_index_t ii = this->minAvailableNodeIndex();
             node_index_t const max_node_idx = this->maxAvailableNodeIndex();
             
-            SIXTRL_ASSERT( ii != _this_t::UNDEFINED_INDEX );
-            SIXTRL_ASSERT( max_node_idx != _this_t::UNDEFINED_INDEX );
+            SIXTRL_ASSERT( ii != st::NODE_UNDEFINED_INDEX );
+            SIXTRL_ASSERT( max_node_idx != st::NODE_UNDEFINED_INDEX );
             SIXTRL_ASSERT( ii <= max_node_idx );
             SIXTRL_ASSERT( ( node_index_t{ 1 } + ( max_node_idx - ii ) ) <= 
                 this->numAvailableNodes() );
@@ -309,7 +309,7 @@ namespace SIXTRL_CXX_NAMESPACE
                        node_ids_begin + max_num_node_ids, node_id_t{} );
             
             while( ( ii <= max_node_idx ) && 
-                   ( ii != _this_t::UNDEFINED_INDEX ) &&
+                   ( ii != st::NODE_UNDEFINED_INDEX ) &&
                    ( num_avail_elements < max_num_node_ids ) )
             {
                 if( this->isNodeAvailable( ii ) )
@@ -340,7 +340,7 @@ namespace SIXTRL_CXX_NAMESPACE
         
         if( ( ptr_node_infos_begin != nullptr ) &&
             ( this->numAvailableNodes() > node_index_t{ 0 } ) &&
-            ( this->numAvailableNodes() != _this_t::UNDEFINED_INDEX ) )
+            ( this->numAvailableNodes() != st::NODE_UNDEFINED_INDEX ) )
         {
             node_index_t ii = this->minAvailableNodeIndex();
             node_index_t const max_node_idx = this->maxAvailableNodeIndex();
@@ -348,14 +348,14 @@ namespace SIXTRL_CXX_NAMESPACE
             std::fill( ptr_node_infos_begin, 
                        ptr_node_infos_begin + max_num_node_infos, nullptr );
             
-            SIXTRL_ASSERT( ii != _this_t::UNDEFINED_INDEX );
-            SIXTRL_ASSERT( max_node_idx != _this_t::UNDEFINED_INDEX );
+            SIXTRL_ASSERT( ii != st::NODE_UNDEFINED_INDEX );
+            SIXTRL_ASSERT( max_node_idx != st::NODE_UNDEFINED_INDEX );
             SIXTRL_ASSERT( ii <= max_node_idx );
             SIXTRL_ASSERT( ( node_index_t{ 1 } + ( max_node_idx - ii ) ) <= 
                 this->numAvailableNodes() );
             
             while( ( ii <= max_node_idx ) && 
-                   ( ii != _this_t::UNDEFINED_INDEX ) &&
+                   ( ii != st::NODE_UNDEFINED_INDEX ) &&
                    ( num_avail_elements < max_num_node_infos ) )
             {
                 if( this->isNodeAvailable( ii ) )
@@ -398,7 +398,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return ( ptr_node_id != nullptr ) 
             ? this->doFindAvailableNodesIndex( 
                 ptr_node_id->platformId(), ptr_node_id->deviceId() )
-            : NodeControllerBase::UNDEFINED_INDEX;
+            : st::NODE_UNDEFINED_INDEX;
     }
             
     NodeControllerBase::node_index_t NodeControllerBase::nodeIndex(
@@ -1312,7 +1312,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using ptr_node_info_t  = _this_t::node_info_base_t*;
 
         if( ( !this->hasSelectedNode() ) &&
-            ( node_index != _this_t::UNDEFINED_INDEX ) &&
+            ( node_index != st::NODE_UNDEFINED_INDEX ) &&
             ( node_index < this->numAvailableNodes() ) )
         {
             SIXTRL_ASSERT( this->m_ptr_selected_node_id == nullptr );
