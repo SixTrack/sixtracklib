@@ -37,6 +37,23 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(CudaController_delete)(
 
 /* ------------------------------------------------------------------------ */
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_kernel_id_t)
+NS(CudaController_add_kernel_config)(
+    NS(CudaController)* SIXTRL_RESTRICT ctrl, 
+    const NS(CudaKernelConfig) *const SIXTRL_RESTRICT cuda_kernel_config );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_kernel_id_t)
+NS(CudaController_add_kernel_config_detailed)(
+    NS(CudaController)* SIXTRL_RESTRICT ctrl, 
+    char const* SIXTRL_RESTRICT kernel_name,
+    NS(ctrl_size_t) const num_arguments,
+    NS(ctrl_size_t) const grid_dim,
+    NS(ctrl_size_t) const shared_mem_per_block,
+    NS(ctrl_size_t) const max_blocks_limit,
+    char const* SIXTRL_RESTRICT config_str );
+
+/* ------------------------------------------------------------------------ */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaController_remap_managed_cobject_buffer)(
     NS(CudaController)* SIXTRL_RESTRICT ctrl,

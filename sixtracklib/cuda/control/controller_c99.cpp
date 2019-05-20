@@ -38,6 +38,32 @@ void NS(CudaController_delete)( NS(CudaController)* SIXTRL_RESTRICT ctrl )
 
 /* ------------------------------------------------------------------------- */
 
+::NS(ctrl_kernel_id_t) NS(CudaController_add_kernel_config)(
+    ::NS(CudaController)* SIXTRL_RESTRICT ctrl, 
+    const ::NS(CudaKernelConfig) *const SIXTRL_RESTRICT cuda_kernel_config )
+{
+    return ( ( ctrl != nullptr ) && ( cuda_kernel_config != nullptr ) )
+        ? ctrl->addCudaKernelConfig( *cuda_kernel_config )
+        : st::CudaController::ILLEGAL_KERNEL_ID
+}
+
+::NS(ctrl_kernel_id_t) NS(CudaController_add_kernel_config_detailed)(
+    ::NS(CudaController)* SIXTRL_RESTRICT ctrl, 
+    char const* SIXTRL_RESTRICT kernel_name,
+    ::NS(ctrl_size_t) const num_arguments,
+    ::NS(ctrl_size_t) const grid_dim,
+    ::NS(ctrl_size_t) const shared_mem_per_block,
+    ::NS(ctrl_size_t) const max_blocks_limit,
+    char const* SIXTRL_RESTRICT config_str )
+{
+    return ( ctrl != nullptr ) 
+        ? cltr->addCudaKernelConfig( kernel_name, num_arguments, grid_dim, 
+            shared_mem_per_block, max_blocks_limit, config_str )
+        : st::CudaController::ILLEGAL_KERNEL_ID;
+}
+
+/* ------------------------------------------------------------------------- */
+
 ::NS(arch_status_t) NS(CudaController_remap_managed_cobject_buffer)(
     ::NS(CudaController)* SIXTRL_RESTRICT ctrl,
     ::NS(cuda_arg_buffer_t) SIXTRL_RESTRICT managed_buffer_begin,
