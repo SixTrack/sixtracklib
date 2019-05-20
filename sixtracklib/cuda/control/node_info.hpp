@@ -108,9 +108,16 @@ namespace SIXTRL_CXX_NAMESPACE
         cuda_dev_index_t    m_cu_device_index;
         std::string         m_cu_device_pci_bus_id;
     };
+    
+    SIXTRL_HOST_FN CudaNodeInfo const* NodeInfo_as_cuda_node_info(
+        SIXTRL_CXX_NAMESPACE::NodeInfoBase const* 
+            SIXTRL_RESTRICT ptr_info ) SIXTRL_NOEXCEPT;
+            
+    SIXTRL_HOST_FN CudaNodeInfo* NodeInfo_as_cuda_node_info(
+        SIXTRL_CXX_NAMESPACE::NodeInfoBase* 
+            SIXTRL_RESTRICT ptr_info ) SIXTRL_NOEXCEPT;
 }
 #endif /* C++, Host */
-
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
@@ -130,6 +137,36 @@ void NS(CudaNodeInfo);
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }
 #endif /* C++ */
+
+#if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
+   !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
+   
+namespace SIXTRL_CXX_NAMESPACE
+{
+    SIXTRL_CXX_NAMESPACE::CudaNodeInfo const* NodeInfo_as_cuda_node_info(           
+        SIXTRL_CXX_NAMESPACE::NodeInfoBase const* 
+            SIXTRL_RESTRICT node_info_base ) SIXTRL_NOEXCEPT
+    {
+        using cuda_node_info_t = SIXTRL_CXX_NAMESPACE::CudaNodeInfo;
+        
+        return ( node_info_base != nullptr )
+            ? node_info_base->asDerivedNodeInfo< cuda_node_info_t >(
+                st::ARCHITECTURE_CUDA )
+            : nullptr;
+    }
+    
+    SIXTRL_CXX_NAMESPACE::CudaNodeInfo* NodeInfo_as_cuda_node_info(
+        SIXTRL_CXX_NAMESPACE::NodeInfoBase* 
+            SIXTRL_RESTRICT node_info_base ) SIXTRL_NOEXCEPT
+    {
+        SIXTRL_CXX_NAMESPACE::NodeInfoBase const* c_ptr = node_info_base;
+        
+        return const_cast< SIXTRL_CXX_NAMESPACE::CudaNodeInfo* >(
+            NodeInfo_as_cuda_node_info( c_ptr ) );
+    }
+}
+
+#endif /* C++, Host */
 
 #endif /* SIXTRACKLIB_CUDA_CONTROL_NODE_INFO_HPP__ */
 

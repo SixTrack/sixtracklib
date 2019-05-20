@@ -41,6 +41,16 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
 NS(CudaNodeInfo_get_max_threads_per_multiprocessor)(
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info );
 
+/* ------------------------------------------------------------------------ */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo) const*
+NS(NodeInfo_as_const_cuda_node_info)(
+    NS(NodeInfoBase) const* SIXTRL_RESTRICT node_info_base );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo)*
+NS(NodeInfo_as_cuda_node_info)( 
+    NS(NodeInfoBase)* SIXTRL_RESTRICT node_info_base );
+
 #endif /* !defined( _GPUCODE ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )

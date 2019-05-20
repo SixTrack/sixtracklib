@@ -54,6 +54,20 @@ namespace st = SIXTRL_CXX_NAMESPACE;
         ? node_info->maxThreadsPerMultiprocessor() : ::NS(arch_size_t){ 0 };
 }
 
+/* ------------------------------------------------------------------------- */
+
+::NS(CudaNodeInfo) const* NS(NodeInfo_as_const_cuda_node_info)(
+    ::NS(NodeInfoBase) const* SIXTRL_RESTRICT node_info_base )
+{
+    return st::NodeInfo_as_cuda_node_info( node_info_base );
+}
+
+::NS(CudaNodeInfo)* NS(NodeInfo_as_cuda_node_info)( 
+    ::NS(NodeInfoBase)* SIXTRL_RESTRICT node_info_base )
+{
+    return st::NodeInfo_as_cuda_node_info( node_info_base );
+}
+
 #endif /* C++, Host */
 
 /* end: sixtracklib/cuda/control/node_info_c99.cpp */
