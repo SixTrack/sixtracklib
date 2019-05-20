@@ -33,7 +33,15 @@ NS(TestParticlesAddr_verify_addresses)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TestParticlesAddr_run_ctrl_args_test)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TestParticlesAddr_prepare_ctrl_args_test)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    NS(ArgumentBase)* SIXTRL_RESTRICT paddr_arg,
+    NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
+    NS(ArgumentBase)* SIXTRL_RESTRICT particles_arg,
+    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+    NS(ArgumentBase)* SIXTRL_RESTRICT result_arg );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TestParticlesAddr_verify_ctrl_args_test)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     NS(ArgumentBase)* SIXTRL_RESTRICT paddr_arg,
     NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,

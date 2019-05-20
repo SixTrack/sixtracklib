@@ -40,7 +40,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN bool TestParticlesAddr_run_ctrl_args_test(
+        SIXTRL_HOST_FN bool TestParticlesAddr_prepare_ctrl_args_test(
+            SIXTRL_CXX_NAMESPACE::ControllerBase* SIXTRL_RESTRICT ctrl,
+            SIXTRL_CXX_NAMESPACE::ArgumentBase* SIXTRL_RESTRICT paddr_arg,
+            SIXTRL_CXX_NAMESPACE::Buffer& SIXTRL_RESTRICT_REF paddr_buffer,
+            SIXTRL_CXX_NAMESPACE::ArgumentBase* SIXTRL_RESTRICT particles_arg,
+            SIXTRL_CXX_NAMESPACE::Buffer& SIXTRL_RESTRICT_REF particles_buffer,
+            SIXTRL_CXX_NAMESPACE::ArgumentBase* SIXTRL_RESTRICT result_arg );
+        
+        SIXTRL_HOST_FN bool TestParticlesAddr_verify_ctrl_args_test(
             SIXTRL_CXX_NAMESPACE::ControllerBase* SIXTRL_RESTRICT ctrl,
             SIXTRL_CXX_NAMESPACE::ArgumentBase* SIXTRL_RESTRICT paddr_arg,
             SIXTRL_CXX_NAMESPACE::Buffer& SIXTRL_RESTRICT_REF paddr_buffer,

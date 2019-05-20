@@ -61,7 +61,20 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        bool TestParticlesAddr_run_ctrl_args_test(
+        bool TestParticlesAddr_prepare_ctrl_args_test(
+            st::ControllerBase* SIXTRL_RESTRICT ctrl,
+            st::ArgumentBase* SIXTRL_RESTRICT paddr_arg,
+            st::Buffer& SIXTRL_RESTRICT_REF paddr_buffer,
+            st::ArgumentBase* SIXTRL_RESTRICT particles_arg,
+            st::Buffer& SIXTRL_RESTRICT_REF particles_buffer,
+            st::ArgumentBase* SIXTRL_RESTRICT result_arg )
+        {
+            return ::NS(TestParticlesAddr_prepare_ctrl_args_test)(
+                ctrl, paddr_arg, paddr_buffer.getCApiPtr(), particles_arg,
+                    particles_buffer.getCApiPtr(), result_arg );
+        }
+        
+        bool TestParticlesAddr_evaluate_ctrl_args_test(
             st::ControllerBase* SIXTRL_RESTRICT ctrl,
             st::ArgumentBase* SIXTRL_RESTRICT paddr_arg,
             st::Buffer& SIXTRL_RESTRICT_REF paddr_buffer,
@@ -237,7 +250,7 @@ namespace SIXTRL_CXX_NAMESPACE
     return status;
 }
 
-::NS(arch_status_t) TestParticlesAddr_verify_addresses(
+::NS(arch_status_t) NS(TestParticlesAddr_verify_addresses)(
     const ::NS(Buffer) *const SIXTRL_RESTRICT paddr_buffer,
     const ::NS(Buffer) *const SIXTRL_RESTRICT particles_buffer )
 {
@@ -323,6 +336,41 @@ namespace SIXTRL_CXX_NAMESPACE
 }
 
 /* ----------------------------------------------------------------- */
+
+bool NS(TestParticlesAddr_evaluate_ctrl_args_test)(
+    ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    ::NS(ArgumentBase)* SIXTRL_RESTRICT paddr_arg,
+    ::NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
+    ::NS(ArgumentBase)* SIXTRL_RESTRICT particles_arg,
+    ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+    ::NS(ArgumentBase)* SIXTRL_RESTRICT result_arg )
+{
+    typedef result_reg_t = ::NS(arch_debugging_t);
+    
+    bool success = false;
+    
+    result_reg_t result_register = ::NS(ARCH_DEBUGGING_GENERAL_FAILURE);
+    
+    ::NS(arch_status_t) status = 
+        ::NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
+            paddr_buffer, particles_buffer );
+        
+    if( status != st::ARCH_STATUS_SUCCESS ) return success;
+    
+    status = ::NS(Argument_send_buffer)( particles_arg, particles_buffer );
+    if( status != ::NS(ARCH_STATUS_SUCCESS) ) return success;
+
+    status = ::NS(Argument_send_buffer)( addresses_arg, paddr_buffer );
+    if( status != ::NS(ARCH_STATUS_SUCCESS) ) return success;
+    
+    status = ::NS(Argument_send_raw_argument)( 
+        result_arg, &result_register, sizeof( result_register ) );
+    
+    success = ( status == ::NS(ARCH_STATUS_SUCCESS );
+    
+    return success;
+}
+
 
 bool NS(TestParticlesAddr_evaluate_ctrl_args_test)(
     ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
