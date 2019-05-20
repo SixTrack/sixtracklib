@@ -91,12 +91,12 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN status_t send( ptr_arg_base_t SIXTRL_RESTRICT dest,
             const c_buffer_t *const SIXTRL_RESTRICT source,
             perform_remap_flag_t const perform_remap_flag =
-                SIXTRL_CXX_NAMESPACE::CTRL_REMAP );
+                SIXTRL_CXX_NAMESPACE::CTRL_PERFORM_REMAP );
 
         SIXTRL_HOST_FN status_t send( ptr_arg_base_t SIXTRL_RESTRICT dest,
             buffer_t const& SIXTRL_RESTRICT_REF source,
             perform_remap_flag_t const perform_remap_flag =
-                SIXTRL_CXX_NAMESPACE::CTRL_REMAP );
+                SIXTRL_CXX_NAMESPACE::CTRL_PERFORM_REMAP );
 
         /* ----------------------------------------------------------------- */
 
@@ -107,12 +107,12 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN status_t receive( c_buffer_t* SIXTRL_RESTRICT dest,
             ptr_arg_base_t SIXTRL_RESTRICT source,
             perform_remap_flag_t const perform_remap_flag =
-                SIXTRL_CXX_NAMESPACE::CTRL_REMAP );
+                SIXTRL_CXX_NAMESPACE::CTRL_PERFORM_REMAP );
 
         SIXTRL_HOST_FN status_t receive( buffer_t& SIXTRL_RESTRICT_REF dest,
             ptr_arg_base_t SIXTRL_RESTRICT source,
             perform_remap_flag_t const perform_remap_flag =
-                SIXTRL_CXX_NAMESPACE::CTRL_REMAP );
+                SIXTRL_CXX_NAMESPACE::CTRL_PERFORM_REMAP );
 
         /* ================================================================= */
 

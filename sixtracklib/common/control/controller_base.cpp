@@ -101,7 +101,7 @@ namespace SIXTRL_CXX_NAMESPACE
             status = this->doSend( arg, src_begin, src_size );
 
             if( ( status == st::ARCH_STATUS_SUCCESS ) &&
-                ( perform_remap_flag == st::CTRL_REMAP ) )
+                ( perform_remap_flag == st::CTRL_PERFORM_REMAP ) )
             {
                 status = this->doRemapCObjectsBufferArg( arg );
             }
@@ -133,7 +133,7 @@ namespace SIXTRL_CXX_NAMESPACE
             status = this->doSend( arg, src_begin, src_size );
 
             if( ( status == st::ARCH_STATUS_SUCCESS )&&
-                ( perform_remap_flag == st::CTRL_REMAP ) )
+                ( perform_remap_flag == st::CTRL_PERFORM_REMAP ) )
             {
                 status = this->doRemapCObjectsBufferArg( arg );
             }
@@ -198,7 +198,7 @@ namespace SIXTRL_CXX_NAMESPACE
             status = this->doReceive( dest_begin, dest_capacity, src_arg );
 
             if( ( status == st::ARCH_STATUS_SUCCESS ) &&
-                ( perform_remap_flag == st::CTRL_REMAP ) )
+                ( perform_remap_flag == st::CTRL_PERFORM_REMAP ) )
             {
                 status = ::NS(Buffer_remap)( destination );
             }
@@ -228,7 +228,7 @@ namespace SIXTRL_CXX_NAMESPACE
                                       destination.capacity(), src_arg );
 
             if( ( status == st::ARCH_STATUS_SUCCESS ) &&
-                ( perform_remap_flag == st::CTRL_REMAP ) )
+                ( perform_remap_flag == st::CTRL_PERFORM_REMAP ) )
             {
                 status = ( destination.remap() )
                     ? st::ARCH_STATUS_SUCCESS

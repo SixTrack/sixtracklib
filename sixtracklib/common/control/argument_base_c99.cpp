@@ -11,6 +11,8 @@
 #include "sixtracklib/common/control/argument_base.hpp"
 #include "sixtracklib/common/control/controller_base.hpp"
 
+namespace st = SIXTRL_CXX_NAMESPACE;
+
 void NS(Argument_delete)( ::NS(ArgumentBase)* SIXTRL_RESTRICT arg )
 {
     if( arg != nullptr ) delete arg;
@@ -49,7 +51,7 @@ char const* NS(Argument_get_arch_string)(
         ? arg->send( buffer ) : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-::NS(arch_status_t) NS(Argument_receive_buffer_without_remap)(
+::NS(arch_status_t) NS(Argument_send_buffer_without_remap)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg,
     ::NS(Buffer)* SIXTRL_RESTRICT buf )
 {
