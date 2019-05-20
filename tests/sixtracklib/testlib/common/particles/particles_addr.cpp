@@ -440,9 +440,9 @@ bool NS(TestParticlesAddr_evaluate_ctrl_args_test)(
         address_t const host_addr = ::NS(ManagdBuffer_get_buffer_begin_addr)(
             ::NS(Buffer_get_data_begin)( particles_buffer ), slot_size );
 
-        SIXTRL_ASSERT( ( stored_addr != ( address_t )0u ) &&
-                       ( begin_addr  != ( address_t )0u ) &&
-                       ( stored_addr != begin_addr ) );
+        SIXTRL_ASSERT( ( remote_addr != ( address_t )0u ) &&
+                       ( host_addr   != ( address_t )0u ) &&
+                       ( remote_addr != host_addr ) );
 
         /* remote_addr + addr_offset = host_addr ->
          * addr_offset = host_addr - remote_addr */
