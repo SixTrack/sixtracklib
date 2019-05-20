@@ -62,7 +62,7 @@
 #if defined( SIXTRACKLIB_ENABLE_MODULE_SIMD ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_SIMD == 1 )
 
-    #include "sixtracklib/simd/track.h"
+//     #include "sixtracklib/simd/track.h"
 
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_SIMD ) */
 
