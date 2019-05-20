@@ -28,7 +28,7 @@ NS(CudaKernelConfig_configure_track_elem_by_elem_until_turn_kernel)(
     NS(buffer_size_t) const total_num_particles_to_track );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(CudaKernelConfig_configure_track_elem_by_elem_until_turn_kernel)(
+NS(CudaKernelConfig_configure_track_line_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
     NS(buffer_size_t) const total_num_particles_to_track );
