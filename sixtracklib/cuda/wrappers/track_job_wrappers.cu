@@ -428,7 +428,7 @@ void NS(Particles_buffer_store_all_addresses_cuda_wrapper)(
     dim3 const* ptr_threads =
         NS(CudaKernelConfig_get_ptr_const_threads_per_block)( kernel_config );
 
-    if( dbg_register_arg != SIXTRL_NULLPTR )
+    if( dbg_register_arg == SIXTRL_NULLPTR )
     {
         SIXTRL_ASSERT( ptr_blocks  != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( ptr_threads != SIXTRL_NULLPTR );
@@ -484,6 +484,11 @@ void NS(Particles_buffer_store_all_addresses_cuda_wrapper)(
             NS(CudaArgument_get_cuda_arg_buffer_as_debugging_register_begin)(
                 dbg_register_arg ) );
     }
+
+    ::cudaError_t const err = ::cudaDeviceSynchronize();
+    SIXTRL_ASSERT( err == ::cudaSuccess );
+
+    ( void )err;
 }
 
 /* end: sixtracklib/cuda/wrappers/track_job_wrappers.cu */

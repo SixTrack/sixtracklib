@@ -49,7 +49,7 @@ __global__ void NS(Particles_buffer_store_all_addresses_cuda_debug)(
     typedef NS(buffer_size_t) buf_size_t;
     typedef NS(arch_debugging_t) debug_register_t;
 
-    debug_register_t dbg = SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE;
+    debug_register_t dbg = SIXTRL_ARCH_DEBUGGING_REGISTER_EMPTY;
 
     buf_size_t const num_objects = NS(ManagedBuffer_get_num_objects)(
         pbuffer, slot_size );
@@ -62,7 +62,10 @@ __global__ void NS(Particles_buffer_store_all_addresses_cuda_debug)(
         NS(Particles_managed_buffer_store_addresses_debug)(
             pbuffer, paddr_buffer, thread_id, slot_size, &dbg );
 
-        if( dbg != SIXTRL_ARCH_DEBUGGING_REGISTER_EMPTY ) break;
+        if( dbg != SIXTRL_ARCH_DEBUGGING_REGISTER_EMPTY )
+        {
+            break;
+        }
     }
 
     if( ( ptr_dbg_register != SIXTRL_NULLPTR ) &&
