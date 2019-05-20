@@ -19,8 +19,6 @@
     #include "sixtracklib/common/track/definitions.h"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/controller.h"
-    #include "sixtracklib/cuda/argument.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
