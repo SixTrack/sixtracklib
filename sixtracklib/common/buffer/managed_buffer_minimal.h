@@ -126,6 +126,18 @@ NS(ManagedBuffer_get_section_num_entities)(
 struct NS(Object);
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC struct NS(Object) const*
+NS(ManagedBuffer_get_const_object)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) const buffer_index,
+    NS(buffer_size_t) slot_size );
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC struct NS(Object)*
+NS(ManagedBuffer_get_object)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) const buffer_index,
+    NS(buffer_size_t) slot_size );
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC struct NS(Object) const*
 NS(ManagedBuffer_get_const_objects_index_begin)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) slot_size );
@@ -755,6 +767,32 @@ SIXTRL_INLINE NS(buffer_size_t) NS(ManagedBuffer_get_section_num_entities)(
 
 /* ========================================================================= */
 
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC struct NS(Object) const*
+NS(ManagedBuffer_get_const_object)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) const buffer_index,
+    NS(buffer_size_t) const slot_size )
+{
+    SIXTRL_BUFFER_DATAPTR_DEC struct NS(Object) const* obj_ptr =
+    NS(ManagedBuffer_get_const_objects_index_begin)( begin, slot_size );
+
+    return ( ( begin != SIXTRL_NULLPTR ) && ( buffer_index <=
+        NS(ManagedBuffer_get_num_objects)( begin, slot_size ) ) )
+        ? obj_ptr + buffer_index : SIXTRL_NULLPTR;
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC struct NS(Object)*
+NS(ManagedBuffer_get_object)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
+    NS(buffer_size_t) const buffer_index,
+    NS(buffer_size_t) const slot_size )
+{
+    return ( SIXTRL_BUFFER_DATAPTR_DEC struct NS(Object)*
+        )NS(ManagedBuffer_get_const_object)( begin, buffer_index, slot_size );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Object) const*
 NS(ManagedBuffer_get_const_objects_index_begin)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
@@ -861,10 +899,15 @@ SIXTRL_INLINE NS(buffer_addr_t) NS(ManagdBuffer_get_stored_begin_addr)(
     typedef NS(buffer_addr_t)   address_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC address_t const* ptr_to_addr_t;
 
+    ptr_to_addr_t ptr_header = ( ptr_to_addr_t )( uintptr_t )begin;
+
     SIXTRL_ASSERT( ( slot_size > ( NS(buffer_size_t) )0u ) &&
                    ( ( ( ( uintptr_t )begin ) % slot_size ) == 0u ) );
+
     ( void )slot_size;
-    return ( NS(buffer_addr_t) )( uintptr_t)( ptr_to_addr_t )begin;
+
+    return ( ptr_header != SIXTRL_NULLPTR )
+        ? ptr_header[ 0 ] : ( address_t )0u;
 }
 
 SIXTRL_INLINE NS(buffer_addr_t) NS(ManagdBuffer_get_buffer_begin_addr)(
