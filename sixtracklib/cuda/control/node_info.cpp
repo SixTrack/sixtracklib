@@ -15,6 +15,8 @@
 #include "sixtracklib/common/control/node_info.hpp"
 #include "sixtracklib/common/control/arch_info.hpp"
 
+namespace st = SIXTRL_CXX_NAMESPACE;
+
 namespace SIXTRL_CXX_NAMESPACE
 {
     CudaNodeInfo::CudaNodeInfo(
@@ -176,7 +178,7 @@ namespace SIXTRL_CXX_NAMESPACE
     CudaNodeInfo::size_type
     CudaNodeInfo::computeCapability() const SIXTRL_NOEXCEPT
     {
-        typedef size_t = CudaNodeInfo::size_type;
+        using size_t = st::CudaNodeInfo::size_type;
 
         size_t compute_capability = this->m_cu_device_properties.major;
         compute_capability *= size_t{ 10 };
@@ -203,7 +205,7 @@ namespace SIXTRL_CXX_NAMESPACE
     CudaNodeInfo::maxThreadsPerMultiprocessor() const SIXTRL_NOEXCEPT
     {
         return static_cast< CudaNodeInfo::size_type >(
-            this->m_cu_device_properties.maxThreadsPerMultiprocessor );
+            this->m_cu_device_properties.maxThreadsPerMultiProcessor );
     }
 
     void CudaNodeInfo::doPrintToOutputStream(

@@ -143,7 +143,8 @@ typedef void NS(CudaNodeInfo);
    
 namespace SIXTRL_CXX_NAMESPACE
 {
-    SIXTRL_CXX_NAMESPACE::CudaNodeInfo const* NodeInfo_as_cuda_node_info(           
+    SIXTRL_INLINE SIXTRL_CXX_NAMESPACE::CudaNodeInfo const* 
+    NodeInfo_as_cuda_node_info(           
         SIXTRL_CXX_NAMESPACE::NodeInfoBase const* 
             SIXTRL_RESTRICT node_info_base ) SIXTRL_NOEXCEPT
     {
@@ -155,7 +156,8 @@ namespace SIXTRL_CXX_NAMESPACE
             : nullptr;
     }
     
-    SIXTRL_CXX_NAMESPACE::CudaNodeInfo* NodeInfo_as_cuda_node_info(
+    SIXTRL_INLINE SIXTRL_CXX_NAMESPACE::CudaNodeInfo* 
+    NodeInfo_as_cuda_node_info(
         SIXTRL_CXX_NAMESPACE::NodeInfoBase* 
             SIXTRL_RESTRICT node_info_base ) SIXTRL_NOEXCEPT
     {
