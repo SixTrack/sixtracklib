@@ -871,16 +871,11 @@ SIXTRL_INLINE NS(buffer_addr_t) NS(ManagdBuffer_get_buffer_begin_addr)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size )
 {
-    typedef NS(buffer_addr_t) address_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC address_t const* ptr_to_addr_t;
-
     SIXTRL_ASSERT( ( slot_size > ( NS(buffer_size_t)  )0u ) &&
-                   ( ( ( ( uintptr_t )begin ) % slot_size ) == 0u ) &&
-                   ( ptr_header != SIXTRL_NULLPTR ) );
+                   ( ( ( ( uintptr_t )begin ) % slot_size ) == 0u ) );
 
-    return ( ( slot_size > ( buf_size_t )0u ) &&
-             ( ptr_header[ 0 ] != ( address_t )ptr_header ) &&
-             ( ptr_header[ 0 ] != ( address_t )0u ) );
+    ( void )slot_size;
+    return ( NS(buffer_addr_t) )( uintptr_t )begin;
 }
 
 
