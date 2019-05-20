@@ -222,6 +222,157 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
     
+    NodeControllerBase::node_index_t 
+    NodeControllerBase::minAvailableNodeIndex() const SIXTRL_NOEXCEPT
+    {
+        return this->m_min_available_node_index;
+    }
+        
+    NodeControllerBase::node_index_t 
+    NodeControllerBase::maxAvailableNodeIndex() const SIXTRL_NOEXCEPT
+    {
+        return this->m_max_available_node_index;
+    }
+    
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+        
+    NodeControllerBase::size_type NodeControllerBase::availableNodeIndices(
+        NodeControllerBase::size_type const max_num_node_indices,
+        NodeControllerBase::node_index_t* 
+            SIXTRL_RESTRICT node_indices_begin ) const SIXTRL_NOEXCEPT
+    {
+        using _this_t      = st::NodeControllerBase;
+        using size_t       = _this_t::size_type;
+        using node_index_t = _this_t::node_index_t;
+        
+        size_t num_avail_elements = size_t{ 0 };
+        
+        if( ( node_indices_begin != nullptr ) &&
+            ( this->numAvailableNodes() > node_index_t{ 0 } ) &&
+            ( this->numAvailableNodes() != _this_t::UNDEFINED_INDEX ) )
+        {
+            node_index_t ii = this->minAvailableNodeIndex();
+            node_index_t const max_node_idx = this->maxAvailableNodeIndex();
+            
+            std::fill( node_indices_begin, 
+                       node_indices_begin + max_num_node_indices, 
+                       _this_t::UNDEFINED_INDEX );
+            
+            SIXTRL_ASSERT( ii != _this_t::UNDEFINED_INDEX );
+            SIXTRL_ASSERT( max_node_idx != _this_t::UNDEFINED_INDEX );
+            SIXTRL_ASSERT( ii <= max_node_idx );
+            SIXTRL_ASSERT( ( node_index_t{ 1 } + ( max_node_idx - ii ) ) <= 
+                this->numAvailableNodes() );
+            
+            while( ( ii <= max_node_idx ) && 
+                   ( ii != _this_t::UNDEFINED_INDEX ) &&
+                   ( num_avail_elements < max_num_node_indices ) )
+            {
+                if( this->isNodeAvailable( ii ) )
+                {
+                    node_indices_begin[ num_avail_elements++ ] = ii;
+                }
+                
+                ++ii;
+            }
+        }
+        
+        return num_avail_elements;
+    }
+    
+    NodeControllerBase::size_type NodeControllerBase::availableNodeIds(
+        NodeControllerBase::size_type const max_num_node_ids,
+        NodeControllerBase::node_id_t* SIXTRL_RESTRICT 
+            node_ids_begin ) const SIXTRL_NOEXCEPT
+    {
+        using _this_t = st::NodeControllerBase;
+        using size_t = _this_t::size_type;
+        using node_id_t = _this_t::node_id_t;
+        using node_index_t = _this_t::node_index_t;
+        
+        size_t num_avail_elements = size_t{ 0 };
+        
+        if( ( node_ids_begin != nullptr ) &&
+            ( this->numAvailableNodes() > node_index_t{ 0 } ) &&
+            ( this->numAvailableNodes() != _this_t::UNDEFINED_INDEX ) )
+        {
+            node_index_t ii = this->minAvailableNodeIndex();
+            node_index_t const max_node_idx = this->maxAvailableNodeIndex();
+            
+            SIXTRL_ASSERT( ii != _this_t::UNDEFINED_INDEX );
+            SIXTRL_ASSERT( max_node_idx != _this_t::UNDEFINED_INDEX );
+            SIXTRL_ASSERT( ii <= max_node_idx );
+            SIXTRL_ASSERT( ( node_index_t{ 1 } + ( max_node_idx - ii ) ) <= 
+                this->numAvailableNodes() );
+            
+            std::fill( node_ids_begin, 
+                       node_ids_begin + max_num_node_ids, node_id_t{} );
+            
+            while( ( ii <= max_node_idx ) && 
+                   ( ii != _this_t::UNDEFINED_INDEX ) &&
+                   ( num_avail_elements < max_num_node_ids ) )
+            {
+                if( this->isNodeAvailable( ii ) )
+                {
+                    node_id_t const* ptr_node_id = this->ptrNodeId( ii );
+                    SIXTRL_ASSERT( ptr_node_id != nullptr );
+                    
+                    node_ids_begin[ num_avail_elements++ ] = *ptr_node_id;
+                }
+                
+                ++ii;
+            }
+        }
+        
+        return num_avail_elements;
+    }
+    
+    NodeControllerBase::size_type NodeControllerBase::availableBaseNodeInfos(
+        NodeControllerBase::size_type const max_num_node_infos,
+        NodeControllerBase::node_info_base_t const** 
+            SIXTRL_RESTRICT ptr_node_infos_begin ) const SIXTRL_NOEXCEPT
+    {
+        using _this_t = st::NodeControllerBase;
+        using size_t = _this_t::size_type;
+        using node_index_t = _this_t::node_index_t;
+        
+        size_t num_avail_elements = size_t{ 0 };
+        
+        if( ( ptr_node_infos_begin != nullptr ) &&
+            ( this->numAvailableNodes() > node_index_t{ 0 } ) &&
+            ( this->numAvailableNodes() != _this_t::UNDEFINED_INDEX ) )
+        {
+            node_index_t ii = this->minAvailableNodeIndex();
+            node_index_t const max_node_idx = this->maxAvailableNodeIndex();
+            
+            std::fill( ptr_node_infos_begin, 
+                       ptr_node_infos_begin + max_num_node_infos, nullptr );
+            
+            SIXTRL_ASSERT( ii != _this_t::UNDEFINED_INDEX );
+            SIXTRL_ASSERT( max_node_idx != _this_t::UNDEFINED_INDEX );
+            SIXTRL_ASSERT( ii <= max_node_idx );
+            SIXTRL_ASSERT( ( node_index_t{ 1 } + ( max_node_idx - ii ) ) <= 
+                this->numAvailableNodes() );
+            
+            while( ( ii <= max_node_idx ) && 
+                   ( ii != _this_t::UNDEFINED_INDEX ) &&
+                   ( num_avail_elements < max_num_node_infos ) )
+            {
+                if( this->isNodeAvailable( ii ) )
+                {
+                    ptr_node_infos_begin[ num_avail_elements++ ] = 
+                        this->ptrNodeInfoBase( ii );
+                }
+                
+                ++ii;
+            }
+        }
+        
+        return num_avail_elements;
+    }
+    
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    
     NodeControllerBase::node_index_t NodeControllerBase::nodeIndex( 
         NodeControllerBase::node_id_t const& 
             SIXTRL_RESTRICT_REF node_id ) const SIXTRL_NOEXCEPT
@@ -709,6 +860,8 @@ namespace SIXTRL_CXX_NAMESPACE
             NodeControllerBase::NODE_ID_STR_CAPACITY, char{ '\0' } ),
         m_ptr_default_node_id( nullptr ),
         m_ptr_selected_node_id( nullptr ),
+        m_min_available_node_index( NodeControllerBase::UNDEFINED_INDEX ),
+        m_max_available_node_index( NodeControllerBase::UNDEFINED_INDEX ),
         m_can_directly_change_selected_node( false ),
         m_can_unselect_node( false ),
         m_use_autoselect( false )
@@ -841,6 +994,8 @@ namespace SIXTRL_CXX_NAMESPACE
     void NodeControllerBase::doClearAvailableNodes() SIXTRL_NOEXCEPT
     {
         this->m_available_nodes.clear();
+        this->m_min_available_node_index = st::NodeId::UNDEFINED_INDEX;
+        this->m_max_available_node_index = st::NodeId::UNDEFINED_INDEX;
         return;
     }
 
@@ -920,8 +1075,23 @@ namespace SIXTRL_CXX_NAMESPACE
             if( new_index != node_id_t::UNDEFINED_INDEX )
             {
                 ptr_node_info_base->setNodeIndex( new_index );
+                
                 this->m_available_nodes.push_back(
                     std::move( ptr_node_info_base ) );
+                
+                if( ( this->minAvailableNodeIndex() == 
+                        node_id_t::UNDEFINED_INDEX ) ||
+                    ( this->minAvailableNodeIndex() > new_index ) )
+                {
+                    this->m_min_available_node_index = new_index;
+                }
+                
+                if( ( this->maxAvailableNodeIndex() ==
+                      node_id_t::UNDEFINED_INDEX ) ||
+                    ( this->maxAvailableNodeIndex() < new_index ) )
+                {
+                    this->m_max_available_node_index = new_index;
+                }
             }
         }
 

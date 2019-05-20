@@ -89,6 +89,36 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_is_node_available)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t) 
+NS(Controller_get_min_available_node_index)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t) 
+NS(Controller_get_max_available_node_index)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t) 
+NS(Controller_get_available_node_indices)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
+    NS(ctrl_size_t) const max_num_node_indices,
+    NS(node_index_t)* SIXTRL_RESTRICT node_index_begin );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t) 
+NS(Controller_get_available_node_ids)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
+    NS(ctrl_size_t) const max_num_node_ids,
+    NS(NodeId)* SIXTRL_RESTRICT node_index_begin );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t) 
+NS(Controller_get_available_base_node_infos)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
+    NS(ctrl_size_t) const max_num_node_infos,
+    NS(NodeInfoBase) const** SIXTRL_RESTRICT ptr_node_infos_begin );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t) 
 NS(Controller_get_node_index_by_node_id)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
     const NS(NodeId) *const SIXTRL_RESTRICT node_id );

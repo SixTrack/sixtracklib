@@ -139,7 +139,31 @@ namespace SIXTRL_CXX_NAMESPACE
                 node_id_str ) const SIXTRL_NOEXCEPT;
         
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+        
+        SIXTRL_HOST_FN node_index_t 
+        minAvailableNodeIndex() const SIXTRL_NOEXCEPT;
+        
+        SIXTRL_HOST_FN node_index_t 
+        maxAvailableNodeIndex() const SIXTRL_NOEXCEPT;
+        
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+        
+        SIXTRL_HOST_FN size_type availableNodeIndices(
+            size_type const max_num_node_indices,
+            node_index_t* SIXTRL_RESTRICT node_indices_begin 
+        ) const SIXTRL_NOEXCEPT;
+        
+        SIXTRL_HOST_FN size_type availableNodeIds(
+            size_type const max_num_node_ids,
+            node_id_t* SIXTRL_RESTRICT node_ids_begin ) const SIXTRL_NOEXCEPT;
+        
+        SIXTRL_HOST_FN size_type availableBaseNodeInfos(
+            size_type const max_num_node_infos,
+            node_info_base_t const** SIXTRL_RESTRICT ptr_node_infos_begin 
+        ) const SIXTRL_NOEXCEPT;
+            
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                
         SIXTRL_HOST_FN node_id_t const* ptrNodeId(
             char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT;
 
@@ -341,6 +365,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
         node_id_t const* m_ptr_default_node_id;
         node_id_t const* m_ptr_selected_node_id;
+        
+        node_index_t m_min_available_node_index;
+        node_index_t m_max_available_node_index;
 
         bool m_can_directly_change_selected_node;
         bool m_node_change_requires_kernels;
