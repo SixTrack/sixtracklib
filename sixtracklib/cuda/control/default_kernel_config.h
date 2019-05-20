@@ -4,8 +4,10 @@
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/control/kernel_config_base.h"
-#include "sixtracklib/cuda/control/definitions.h"
+
+#include "sixtracklib/cuda/definitions.h"
 #include "sixtracklib/cuda/control/kernel_config.h"
+#include "sixtracklib/cuda/control/node_info.h"
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
@@ -60,3 +62,4 @@ NS(CudaKernelConfig_configure_assign_output_to_elem_by_elem_config_kernel)(
 
 #endif /* SIXTRACKLIB_CUDA_CONTROL_DEFAULT_KERNEL_CONFIGS_H__*/
 /* end: sixtracklib/cuda/control/default_kernel_config.h */
+

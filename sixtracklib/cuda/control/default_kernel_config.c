@@ -7,8 +7,9 @@
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/control/kernel_config_base.h"
-#include "sixtracklib/cuda/control/definitions.h"
+#include "sixtracklib/cuda/definitions.h"
 #include "sixtracklib/cuda/control/kernel_config.h"
+#include "sixtracklib/cuda/control/node_info.h"
 
 SIXTRL_STATIC SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaKernelConfig_configure_generic_track_kernel)(
