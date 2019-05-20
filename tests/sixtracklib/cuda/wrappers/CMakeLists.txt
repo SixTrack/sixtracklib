@@ -8,19 +8,19 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS )
 
     # ==========================================================================
-    # test_cuda_extract_particle_addr_c99:
+    # test_particles_store_all_addresses_cuda_c99:
 
-    add_executable( test_cuda_extract_particle_addr_c99
-        test_extract_particle_addr_c99.cpp )
+    add_executable( test_particles_store_all_addresses_cuda_c99
+        test_particles_store_all_addresses_c99.cpp )
 
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
-        test_cuda_extract_particle_addr_c99 )
+        test_particles_store_all_addresses_cuda_c99 )
 
-    target_link_libraries( test_cuda_extract_particle_addr_c99
+    target_link_libraries( test_particles_store_all_addresses_cuda_c99
         ${SIXTRL_TEST_LIBS} )
 
-    add_test( C99_CudaWrappersExtractParticleAddrTest,
-              test_cuda_extract_particle_addr_c99 )
+    add_test( C99_CudaWrappersParticlesStoreAddrTests,
+              test_particles_store_all_addresses_cuda_c99 )
 
     # --------------------------------------------------------------------------
     # test_track_job_cuda_c99:
