@@ -118,6 +118,27 @@ namespace SIXTRL_CXX_NAMESPACE
             node_index_t const node_index ) const SIXTRL_NOEXCEPT;
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+        
+        SIXTRL_HOST_FN node_index_t nodeIndex( 
+            node_id_t const& SIXTRL_RESTRICT_REF node_id 
+            ) const SIXTRL_NOEXCEPT;
+            
+        SIXTRL_HOST_FN node_index_t nodeIndex(
+            platform_id_t const platform_id, 
+            device_id_t const device_id ) const SIXTRL_NOEXCEPT;
+            
+        SIXTRL_HOST_FN node_index_t nodeIndex(
+            node_info_t const* SIXTRL_RESTRICT 
+                ptr_node_info ) const SIXTRL_NOEXCEPT;
+                
+        SIXTRL_HOST_FN node_index_t nodeIndex(
+            char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT;
+            
+        SIXTRL_HOST_FN node_index_t nodeIndex(
+            std::string const& SIXTRL_RESTRICT_REF 
+                node_id_str ) const SIXTRL_NOEXCEPT;
+        
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN node_id_t const* ptrNodeId(
             char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT;
@@ -132,6 +153,14 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN node_id_t const* ptrNodeId(
             node_index_t const index ) const SIXTRL_NOEXCEPT;
 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+        
+        SIXTRL_HOST_FN node_info_t const* 
+        nodeInfoBaseBegin() const SIXTRL_NOEXCEPT;
+        
+        SIXTRL_HOST_FN node_info_t const* 
+        nodeInfoBaseEnd() const SIXTRL_NOEXCEPT;
+            
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN node_info_base_t const* ptrNodeInfoBase(

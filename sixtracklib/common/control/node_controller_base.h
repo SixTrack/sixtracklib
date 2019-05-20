@@ -88,6 +88,29 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_is_node_available)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t) 
+NS(Controller_get_node_index_by_node_id)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
+    const NS(NodeId) *const SIXTRL_RESTRICT node_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t) 
+NS(Controller_get_node_index_by_platform_id_and_device_id)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
+    NS(node_platform_id_t) const platform_id, 
+    NS(node_device_id_t) const device_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t)
+NS(Controller_get_node_index_by_node_info)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
+    const NS(NodeInfoBase) *const SIXTRL_RESTRICT ptr_node_info );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t)
+NS(Controller_get_node_index)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
+    char const* SIXTRL_RESTRICT node_id_str );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeId) const*
 NS(Controller_get_ptr_node_id_by_index)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
@@ -102,6 +125,16 @@ NS(Controller_get_ptr_node_id_by_platform_id_and_device_id)(
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeId) const* NS(Controller_get_ptr_node_id)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT node_id_str );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeInfo) const* 
+NS(Controller_get_ptr_node_info_base_begin)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeInfo) const* 
+NS(Controller_get_ptr_node_info_base_end)(
+    const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 

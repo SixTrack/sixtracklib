@@ -221,6 +221,48 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    
+    NodeControllerBase::node_index_t NodeControllerBase::nodeIndex( 
+        NodeControllerBase::node_id_t const& 
+            SIXTRL_RESTRICT_REF node_id ) const SIXTRL_NOEXCEPT
+    {
+        return this->doFindAvailableNodesIndex( 
+            node_id.platformId(), node_id.deviceId() );
+    }
+        
+    NodeControllerBase::node_index_t NodeControllerBase::nodeIndex(
+        NodeControllerBase::platform_id_t const platform_id, 
+        NodeControllerBase::device_id_t const device_id ) const SIXTRL_NOEXCEPT
+    {
+        return this->doFindAvailableNodesIndex( platform_id, device_id );
+    }
+        
+    NodeControllerBase::node_index_t NodeControllerBase::nodeIndex(
+        NodeControllerBase::node_info_t const* SIXTRL_RESTRICT 
+            ptr_node_info ) const SIXTRL_NOEXCEPT
+    {
+        NodeControllerBase::node_id_t const* ptr_node_id = 
+            ( ptr_node_info != nullptr ) ? ptr_node_info->nodeId() : nullptr;
+            
+        return ( ptr_node_id != nullptr ) 
+            ? this->doFindAvailableNodesIndex( 
+                ptr_node_id->platformId(), ptr_node_id->deviceId() )
+            : NodeControllerBase::UNDEFINED_INDEX;
+    }
+            
+    NodeControllerBase::node_index_t NodeControllerBase::nodeIndex(
+        char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT
+    {
+        return this->doFindAvailableNodesIndex( node_id_str );
+    }
+        
+    NodeControllerBase::node_index_t NodeControllerBase::nodeIndex( std::string 
+        const& SIXTRL_RESTRICT_REF node_id_str ) const SIXTRL_NOEXCEPT
+    {
+        return this->doFindAvailableNodesIndex( node_id_str.c_str() );
+    }
+            
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     NodeControllerBase::node_id_t const* NodeControllerBase::ptrNodeId(
         char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT
@@ -259,7 +301,29 @@ namespace SIXTRL_CXX_NAMESPACE
         return ptr_node_id;
     }
 
-    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+        
+    NodeControllerBase::node_info_t const* 
+    NodeControllerBase::nodeInfoBaseBegin() const SIXTRL_NOEXCEPT
+    {
+        return this->m_available_nodes.data();
+    }
+    
+    NodeControllerBase::node_info_t const* 
+    NodeControllerBase::nodeInfoBaseEnd() const SIXTRL_NOEXCEPT
+    {
+        NodeControllerBase::node_info_t const* end_ptr = 
+            this->nodeInfoBaseBegin();
+            
+        if( end_ptr != nullptr )
+        {
+            std::advance( end_ptr, this->m_available_nodes.size() );
+        }
+        
+        return end_ptr;
+    }
+    
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     NodeControllerBase::node_info_base_t const*
     NodeControllerBase::ptrNodeInfoBase(
