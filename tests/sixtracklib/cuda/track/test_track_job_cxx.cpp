@@ -22,9 +22,7 @@ TEST( CXX_CudaTrackJobTests, BasicUsageCBuffer )
     using track_job_t = st::CudaTrackJob;
     using c_buffer_t    = track_job_t::buffer_t;
 
-    c_buffer_t*
-
-
+    track_job_t track_job;
 }
 
 /* end: tests/sixtracklib/cuda/track/test_track_job_cxx.cpp */
