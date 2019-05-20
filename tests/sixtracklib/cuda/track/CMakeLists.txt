@@ -8,12 +8,12 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS )
 
     # ==========================================================================
-    # test_track_job_cuda_cxx:
+    # test_track_job_cuda_setup_cxx:
 
-    add_executable( test_track_job_cuda_cxx test_track_job_cxx.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_cuda_cxx )
-    target_link_libraries( test_track_job_cuda_cxx ${SIXTRL_TEST_LIBS} )
-    add_test( CXX_CudaTrackJobTests test_track_job_cuda_cxx )
+    add_executable( test_track_job_cuda_setup_cxx test_track_job_setup_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_cuda_setup_cxx )
+    target_link_libraries( test_track_job_cuda_setup_cxx ${SIXTRL_TEST_LIBS} )
+    add_test( CXX_CudaTrackJobTests test_track_job_cuda_setup_cxx )
 
     # --------------------------------------------------------------------------
     # test_track_job_cuda_c99:

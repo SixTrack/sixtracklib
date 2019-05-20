@@ -28,6 +28,7 @@
     #include "sixtracklib/cuda/definitions.h"
     #include "sixtracklib/cuda/controller.hpp"
     #include "sixtracklib/cuda/argument.hpp"
+    #include "sixtracklib/cuda/control/default_kernel_config.h"
     #include "sixtracklib/cuda/wrappers/track_job_wrappers.h"
 
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -561,10 +562,13 @@ namespace SIXTRL_CXX_NAMESPACE
     bool CudaTrackJob::doPrepareDefaultKernelsCudaImpl(
         char const* SIXTRL_RESTRICT config_str )
     {
-        using _this_t     = st::CudaTrackJob;
-        using size_t      = _this_t::size_type;
+        using _this_t = st::CudaTrackJob;
+        using size_t = _this_t::size_type;
         using cuda_ctrl_t = _this_t::cuda_controller_t;
+        using cuda_kernel_config_t = _this_t::cuda_kernel_config_t;
         using kernel_id_t = _this_t::kernel_id_t;
+        using cuda_node_info_t = _this_t::cuda_node_info_t;
+        using node_index_t = _this_t::node_index_t;
 
         bool success = false;
 
@@ -572,6 +576,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ptr_cuda_ctrl != nullptr )
         {
+            node_index_t const selected_node_index =
+                ptr_cuda_ctrl->selectedNodeIndex();
+
+            cuda_node_info_t const* ptr_node_info = ptr_cuda_ctrl->ptrNodeInfo(
+                selected_node_index );
+
             std::string kernel_name( 256, '\0' );
             std::string const kernel_prefix( SIXTRL_C99_NAMESPACE_PREFIX_STR );
 
@@ -590,6 +600,17 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_id = ptr_cuda_ctrl->addCudaKernelConfig(
                 kernel_name, num_kernel_args );
 
+            cuda_kernel_config_t* ptr_kernel_config =
+                ptr_cuda_ctrl->ptrKernelConfig( kernel_id );
+
+            if( st::ARCH_STATUS_SUCCESS !=
+                ::NS(CudaKernelConfig_configure_track_until_turn_kernel)(
+                    ptr_kernel_config, ptr_node_info,
+                        this->totalNumParticlesInParticleSets() ) )
+            {
+                kernel_id = cuda_ctrl_t::ILLEGAL_KERNEL_ID;
+            }
+
             this->setTrackUntilKernelId( kernel_id );
 
             /* trackElemByElemKernelId() */
@@ -603,6 +624,16 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_id = ptr_cuda_ctrl->addCudaKernelConfig(
                 kernel_name, num_kernel_args );
 
+            ptr_kernel_config = ptr_cuda_ctrl->ptrKernelConfig( kernel_id );
+
+            if( st::ARCH_STATUS_SUCCESS !=
+                ::NS(CudaKernelConfig_configure_track_elem_by_elem_until_turn_kernel)(
+                    ptr_kernel_config, ptr_node_info,
+                        this->totalNumParticlesInParticleSets() ) )
+            {
+                kernel_id = cuda_ctrl_t::ILLEGAL_KERNEL_ID;
+            }
+
             this->setTrackElemByElemKernelId( kernel_id );
 
             /* trackLineKernelId() */
@@ -614,6 +645,16 @@ namespace SIXTRL_CXX_NAMESPACE
 
             kernel_id = ptr_cuda_ctrl->addCudaKernelConfig(
                 kernel_name, num_kernel_args );
+
+            ptr_kernel_config = ptr_cuda_ctrl->ptrKernelConfig( kernel_id );
+
+            if( st::ARCH_STATUS_SUCCESS !=
+                ::NS(CudaKernelConfig_configure_track_line_kernel)(
+                    ptr_kernel_config, ptr_node_info,
+                        this->totalNumParticlesInParticleSets() ) )
+            {
+                kernel_id = cuda_ctrl_t::ILLEGAL_KERNEL_ID;
+            }
 
             this->setTrackLineKernelId( kernel_id );
 
@@ -628,6 +669,16 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_id = ptr_cuda_ctrl->addCudaKernelConfig(
                 kernel_name, num_kernel_args );
 
+            ptr_kernel_config = ptr_cuda_ctrl->ptrKernelConfig( kernel_id );
+
+            if( st::ARCH_STATUS_SUCCESS !=
+                ::NS(CudaKernelConfig_configure_assign_output_to_beam_monitors_kernel)(
+                    ptr_kernel_config, ptr_node_info,
+                        this->numBeamMonitors() ) )
+            {
+                kernel_id = cuda_ctrl_t::ILLEGAL_KERNEL_ID;
+            }
+
             this->setAssignOutputToBeamMonitorsKernelId( kernel_id );
 
             /* assignOutputToElemByElemConfigKernelId() */
@@ -641,6 +692,15 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_id = ptr_cuda_ctrl->addCudaKernelConfig(
                 kernel_name, num_kernel_args );
 
+            ptr_kernel_config = ptr_cuda_ctrl->ptrKernelConfig( kernel_id );
+
+            if( st::ARCH_STATUS_SUCCESS !=
+                ::NS(CudaKernelConfig_configure_assign_output_to_elem_by_elem_config_kernel)(
+                    ptr_kernel_config, ptr_node_info ) )
+            {
+                kernel_id = cuda_ctrl_t::ILLEGAL_KERNEL_ID;
+            }
+
             this->setAssignOutputToElemByElemConfigKernelId( kernel_id );
 
 
@@ -653,6 +713,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
             kernel_id = ptr_cuda_ctrl->addCudaKernelConfig(
                 kernel_name, num_kernel_args );
+
+            ptr_kernel_config = ptr_cuda_ctrl->ptrKernelConfig( kernel_id );
+
+            if( st::ARCH_STATUS_SUCCESS !=
+                ::NS(CudaKernelConfig_configure_fetch_particles_addresses_kernel)(
+                    ptr_kernel_config, ptr_node_info, this->numParticleSets() ) )
+            {
+                kernel_id = cuda_ctrl_t::ILLEGAL_KERNEL_ID;
+            }
 
             this->setFetchParticlesAddressesKernelId( kernel_id );
         }
