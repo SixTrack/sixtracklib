@@ -62,6 +62,9 @@ NS(arch_status_t) NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
             {
                 ptr_paddr_t paddr = NS(ParticlesAddr_new)(
                     paddr_buffer, ( buf_size_t )0u );
+                
+                SIXTRL_ASSERT( paddr != SIXTRL_NULLPTR );
+                ( void )paddr;
             }
         }
 
@@ -85,9 +88,9 @@ NS(arch_status_t) NS(ParticlesAddr_buffer_store_addresses)(
                    NS(Buffer_get_slot_size)( particles_buffer ) );
 
     return NS(Particles_managed_buffer_store_addresses)(
-        ::NS(Buffer_get_data_begin)( paddr_buffer ),
-        ::NS(Buffer_get_data_begin)( particles_buffer ),
-        index, ::NS(Buffer_get_slot_size)( paddr_buffer ) );
+        NS(Buffer_get_const_data_begin)( particles_buffer ),
+        NS(Buffer_get_data_begin)( paddr_buffer ),
+        index, NS(Buffer_get_slot_size)( paddr_buffer ) );
 }
 
 NS(arch_status_t) NS(ParticlesAddr_buffer_store_all_addresses)(
@@ -95,12 +98,12 @@ NS(arch_status_t) NS(ParticlesAddr_buffer_store_all_addresses)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
         SIXTRL_RESTRICT particles_buffer )
 {
-    SIXTRL_ASSSERT( NS(Buffer_get_slot_size)( paddr_buffer ),
+    SIXTRL_ASSERT( NS(Buffer_get_slot_size)( paddr_buffer ) ==
                     NS(Buffer_get_slot_size)( particles_buffer ) );
 
     return NS(Particles_managed_buffer_store_all_addresses)(
+        NS(Buffer_get_const_data_begin)( particles_buffer ),
         NS(Buffer_get_data_begin)( paddr_buffer ),
-        NS(Buffer_get_data_begin)( particles_buffer ),
         NS(Buffer_get_slot_size)( particles_buffer ) );
 }
 
