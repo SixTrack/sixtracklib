@@ -17,7 +17,7 @@
     #include "sixtracklib/common/control/node_controller_base.h"
     #include "sixtracklib/cuda/definitions.h"
     #include "sixtracklib/cuda/control/argument_base.h"
-//     #include "sixtracklib/cuda/control/node_info.h"
+    #include "sixtracklib/cuda/control/node_info.h"
     #include "sixtracklib/cuda/control/kernel_config.h"
     #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -297,7 +297,7 @@ namespace SIXTRL_CXX_NAMESPACE
 }
 #endif /* C++, Host */
 
-#if defined( __cplusplus ) && defined( _GPUCODE )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
 #endif /* C++ */
 
@@ -312,7 +312,7 @@ typedef void NS(CudaController);
 
 #endif /* C++, Host */
 
-#if defined( __cplusplus ) && defined( _GPUCODE )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 }
 #endif /* C++ */
 
