@@ -130,7 +130,7 @@ typedef SIXTRL_CXX_NAMESPACE::CudaNodeInfo NS(CudaNodeInfo);
 
 #else /* C++, Host */
 
-void NS(CudaNodeInfo);
+typedef void NS(CudaNodeInfo);
 
 #endif /* C++, Host */
 
@@ -151,7 +151,7 @@ namespace SIXTRL_CXX_NAMESPACE
         
         return ( node_info_base != nullptr )
             ? node_info_base->asDerivedNodeInfo< cuda_node_info_t >(
-                st::ARCHITECTURE_CUDA )
+                SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA )
             : nullptr;
     }
     
