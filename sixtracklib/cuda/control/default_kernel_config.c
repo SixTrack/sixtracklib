@@ -177,10 +177,15 @@ NS(arch_status_t) NS(CudaKernelConfig_configure_generic_track_kernel)(
 
         NS(buffer_size_t) num_blocks =
             total_num_particles_to_track / threads_per_block;
-
+            
         if( ( num_blocks * threads_per_block ) < total_num_particles_to_track )
         {
             ++num_blocks;
+        }
+        
+        if( num_blocks == ( NS(buffer_size_t) )0u )
+        {
+            num_blocks = ( NS(buffer_size_t) )1u;
         }
 
         if( ( NS(KernelConfig_set_num_work_items_1d)(

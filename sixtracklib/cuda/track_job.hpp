@@ -449,6 +449,13 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         this->doSetPtrCBeamElementsBuffer( belem_buffer );
+        
+        success = this->doPrepareDefaultKernelsCudaImpl( config_str );
+        
+        if( !success )
+        {
+            return success;
+        }
 
         output_buffer_flag_t const out_buffer_flags =
             ::NS(OutputBuffer_required_for_tracking_of_particle_sets)( pbuffer,

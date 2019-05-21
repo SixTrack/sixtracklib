@@ -574,13 +574,18 @@ namespace SIXTRL_CXX_NAMESPACE
 
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
 
-        if( ptr_cuda_ctrl != nullptr )
+        if( ( ptr_cuda_ctrl != nullptr ) && 
+            ( ptr_cuda_ctrl->numAvailableNodes() > node_index_t{ 0 } ) &&
+            ( ptr_cuda_ctrl->hasSelectedNode() ) )
         {
             node_index_t const selected_node_index =
                 ptr_cuda_ctrl->selectedNodeIndex();
 
             cuda_node_info_t const* ptr_node_info = ptr_cuda_ctrl->ptrNodeInfo(
                 selected_node_index );
+            
+            success = ( ( ptr_node_info != nullptr ) &&
+                        ( selected_node_index != st::NODE_UNDEFINED_INDEX ) );
 
             std::string kernel_name( 256, '\0' );
             std::string const kernel_prefix( SIXTRL_C99_NAMESPACE_PREFIX_STR );
@@ -609,6 +614,7 @@ namespace SIXTRL_CXX_NAMESPACE
                         this->totalNumParticlesInParticleSets() ) )
             {
                 kernel_id = cuda_ctrl_t::ILLEGAL_KERNEL_ID;
+                success = false;
             }
 
             this->setTrackUntilKernelId( kernel_id );
@@ -632,6 +638,7 @@ namespace SIXTRL_CXX_NAMESPACE
                         this->totalNumParticlesInParticleSets() ) )
             {
                 kernel_id = cuda_ctrl_t::ILLEGAL_KERNEL_ID;
+                success = false;
             }
 
             this->setTrackElemByElemKernelId( kernel_id );
@@ -654,6 +661,7 @@ namespace SIXTRL_CXX_NAMESPACE
                         this->totalNumParticlesInParticleSets() ) )
             {
                 kernel_id = cuda_ctrl_t::ILLEGAL_KERNEL_ID;
+                success = false;
             }
 
             this->setTrackLineKernelId( kernel_id );
@@ -677,6 +685,7 @@ namespace SIXTRL_CXX_NAMESPACE
                         this->numBeamMonitors() ) )
             {
                 kernel_id = cuda_ctrl_t::ILLEGAL_KERNEL_ID;
+                success = false;
             }
 
             this->setAssignOutputToBeamMonitorsKernelId( kernel_id );
@@ -699,6 +708,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     ptr_kernel_config, ptr_node_info ) )
             {
                 kernel_id = cuda_ctrl_t::ILLEGAL_KERNEL_ID;
+                success = false;
             }
 
             this->setAssignOutputToElemByElemConfigKernelId( kernel_id );
@@ -721,9 +731,15 @@ namespace SIXTRL_CXX_NAMESPACE
                     ptr_kernel_config, ptr_node_info, this->numParticleSets() ) )
             {
                 kernel_id = cuda_ctrl_t::ILLEGAL_KERNEL_ID;
+                success = false;
             }
 
             this->setFetchParticlesAddressesKernelId( kernel_id );
+        }
+        else if( ( ptr_cuda_ctrl != nullptr ) && 
+            ( ptr_cuda_ctrl->numAvailableNodes() > node_index_t{ 0 } ) )
+        {
+            success = true;
         }
 
         return success;
@@ -1190,7 +1206,8 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( _base_t::doPrepareParticlesStructures( pbuffer ) ) &&
             ( _base_t::doPrepareBeamElementsStructures( belem_buffer ) ) &&
             ( this->doPrepareParticlesStructuresCudaImpl( pbuffer ) ) &&
-            ( this->doPrepareBeamElementsStructuresCudaImpl( belem_buffer ) ) )
+            ( this->doPrepareBeamElementsStructuresCudaImpl( belem_buffer ) ) &&
+            ( this->doPrepareDefaultKernelsCudaImpl( this->ptrConfigStr() ) ) )
         {
             output_buffer_flag_t const out_buffer_flags =
             ::NS(OutputBuffer_required_for_tracking_of_particle_sets)( pbuffer,
