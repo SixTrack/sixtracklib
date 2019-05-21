@@ -52,8 +52,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN kernel_id_t
         assignOutputToBeamMonitorsKernelId() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void setAssignOutputToBeamMonitorsKernelId(
-            kernel_id_t const id ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN status_t
+        setAssignOutputToBeamMonitorsKernelId( kernel_id_t const id );
 
         /* --------------------------------------------------------------------- */
 
@@ -63,16 +63,14 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN kernel_id_t
         assignOutputToElemByElemConfigKernelId() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void setAssignOutputToElemByElemConfigKernelId(
-            kernel_id_t const id ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN status_t
+        setAssignOutputToElemByElemConfigKernelId( kernel_id_t const id );
 
         /* ---------------------------------------------------------------- */
 
         SIXTRL_HOST_FN bool hasTrackUntilKernel() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN kernel_id_t trackUntilKernelId() const SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN void setTrackUntilKernelId(
-            kernel_id_t const id ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN status_t setTrackUntilKernelId( kernel_id_t const id );
 
         /* ---------------------------------------------------------------- */
 
@@ -81,8 +79,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN kernel_id_t
         trackLineKernelId() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void setTrackLineKernelId(
-            kernel_id_t const id ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN status_t setTrackLineKernelId( kernel_id_t const id );
 
         /* ---------------------------------------------------------------- */
 
@@ -91,8 +88,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN kernel_id_t
         trackElemByElemKernelId() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void setTrackElemByElemKernelId(
-            kernel_id_t const id ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN status_t
+        setTrackElemByElemKernelId( kernel_id_t const id );
 
         /* ---------------------------------------------------------------- */
 
@@ -102,8 +99,13 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN kernel_id_t
         fetchParticlesAddressesKernelId() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void setFetchParticlesAddressesKernelId(
-            kernel_id_t const id ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN status_t
+        setFetchParticlesAddressesKernelId( kernel_id_t const id );
+
+        /* ---------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN controller_base_t const*
+        ptrControllerBase() const SIXTRL_NOEXCEPT;
 
         /* ================================================================ */
 
@@ -129,7 +131,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN virtual void doClear() override;
+        SIXTRL_HOST_FN virtual void doClearParticlesStructures() override;
+        SIXTRL_HOST_FN virtual void doClearBeamElementsStructures() override;
+        SIXTRL_HOST_FN virtual void doClearOutputStructures() override;
+
+        SIXTRL_HOST_FN virtual void doClearController();
+        SIXTRL_HOST_FN virtual void doClearDefaultKernels();
+
+        SIXTRL_HOST_FN virtual void doClear(
+            clear_flag_t const clear_flags ) override;
 
         SIXTRL_HOST_FN virtual collect_flag_t doCollect(
             collect_flag_t const flags ) override;
@@ -145,6 +155,26 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
+        SIXTRL_HOST_FN virtual status_t
+        doSetAssignOutputToBeamMonitorsKernelId( kernel_id_t const id );
+
+        SIXTRL_HOST_FN virtual status_t
+        doSetAssignOutputToElemByElemConfigKernelId( kernel_id_t const id );
+
+        SIXTRL_HOST_FN virtual status_t
+        doSetTrackUntilKernelId( kernel_id_t const id );
+
+        SIXTRL_HOST_FN virtual status_t
+        doSetTrackLineKernelId( kernel_id_t const id );
+
+        SIXTRL_HOST_FN virtual status_t
+        doSetTrackElemByElemKernelId( kernel_id_t const id );
+
+        SIXTRL_HOST_FN virtual status_t
+        doSetFetchParticlesAddressesKernelId( kernel_id_t const id );
+
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_HOST_FN virtual bool doPrepareController(
             char const* SIXTRL_RESTRICT config_str );
 
@@ -152,9 +182,6 @@ namespace SIXTRL_CXX_NAMESPACE
             char const* SIXTRL_RESTRICT config_str );
 
         /* ----------------------------------------------------------------- */
-
-        SIXTRL_HOST_FN controller_base_t const*
-        ptrControllerBase() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN controller_base_t* ptrControllerBase() SIXTRL_NOEXCEPT;
 
@@ -232,7 +259,45 @@ namespace SIXTRL_CXX_NAMESPACE
 
         private:
 
-        SIXTRL_HOST_FN void doClearCtrlArgBaseImpl() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void doClearAllCtrlArgBaseImpl() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void
+        doClearParticlesStructuresCtrlArgBaseImpl() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void
+        doClearBeamElementsStructuresCtrlArgBaseImpl() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void
+        doClearOutputStructuresCtrlArgBaseImpl() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void
+        doClearControllerCtrlArgBaseImpl() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void
+        doClearDefaultKernelsCtrlArgBaseImpl() SIXTRL_NOEXCEPT;
+
+        /* ---------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN status_t
+        doSetAssignOutputToBeamMonitorsKernelIdCtrlArgBaseImpl(
+            kernel_id_t const id );
+
+        SIXTRL_HOST_FN status_t
+        doSetAssignOutputToElemByElemConfigKernelIdCtrlArgBaseImpl(
+            kernel_id_t const id );
+
+        SIXTRL_HOST_FN status_t
+        doSetTrackUntilKernelIdCtrlArgBaseImpl( kernel_id_t const id );
+
+        SIXTRL_HOST_FN status_t
+        doSetTrackLineKernelIdCtrlArgBaseImpl( kernel_id_t const id );
+
+        SIXTRL_HOST_FN status_t
+        doSetTrackElemByElemKernelIdCtrlArgBaseImpl( kernel_id_t const id );
+
+        SIXTRL_HOST_FN status_t
+        doSetFetchParticlesAddressesKernelIdCtrlArgBaseImpl(
+            kernel_id_t const id );
 
         stored_ctrl_base_t      m_stored_controller;
 
