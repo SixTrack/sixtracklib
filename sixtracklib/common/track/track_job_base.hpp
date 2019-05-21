@@ -368,14 +368,24 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
+        using clear_flag_t = SIXTRL_CXX_NAMESPACE::track_job_clear_flag_t;
         using el_by_el_conf_t = elem_by_elem_config_t;
         using ptr_output_buffer_t = std::unique_ptr< buffer_t >;
         using ptr_particles_addr_buffer_t = std::unique_ptr< buffer_t >;
         using ptr_elem_by_elem_config_t = std::unique_ptr< el_by_el_conf_t >;
 
+        SIXTRL_HOST_FN static bool IsClearFlagSet( clear_flag_t const haystack,
+            clear_flag_t const needle ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN static clear_flag_t UnsetClearFlag(
+            clear_flag_t const haystack,
+            clear_flag_t const needle ) SIXTRL_NOEXCEPT;
+
         SIXTRL_HOST_FN static collect_flag_t UnsetCollectFlag(
             collect_flag_t const haystack,
             collect_flag_t const needle ) SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN TrackJobBaseNew( arch_id_t const arch_id,
             char const* SIXTRL_RESTRICT arch_str,
@@ -390,7 +400,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN TrackJobBaseNew& operator=(
             TrackJobBaseNew&& rhs ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN virtual void doClear();
+        SIXTRL_HOST_FN virtual void doClear( clear_flag_t const flags );
 
         SIXTRL_HOST_FN virtual collect_flag_t doCollect(
             collect_flag_t const flags );
@@ -400,14 +410,20 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual bool doPrepareParticlesStructures(
             c_buffer_t* SIXTRL_RESTRICT ptr_particles_buffer );
 
+        SIXTRL_HOST_FN virtual void doClearParticlesStructures();
+
         SIXTRL_HOST_FN virtual bool doPrepareBeamElementsStructures(
             c_buffer_t* SIXTRL_RESTRICT ptr_beam_elem_buffer );
+
+        SIXTRL_HOST_FN virtual void doClearBeamElementsStructures();
 
         SIXTRL_HOST_FN virtual bool doPrepareOutputStructures(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
             size_type const until_turn_elem_by_elem );
+
+        SIXTRL_HOST_FN virtual void doClearOutputStructures();
 
         SIXTRL_HOST_FN virtual bool doAssignOutputBufferToBeamMonitors(
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
@@ -421,6 +437,14 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const output_buffer_offset_index );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        SIXTRL_HOST_FN virtual clear_flag_t doPrepareResetClearFlags(
+            const c_buffer_t *const SIXTRL_RESTRICT particles_buffer,
+            size_type const num_particle_sets,
+            size_type const* SIXTRL_RESTRICT particle_set_indices_begin,
+            const c_buffer_t *const SIXTRL_RESTRICT beam_elements_buffer,
+            const c_buffer_t *const SIXTRL_RESTRICT output_buffer,
+            size_type const until_turn_elem_by_elem );
 
         SIXTRL_HOST_FN virtual bool doReset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
@@ -456,7 +480,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doSetPtrOutputBuffer(
             buffer_t* SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void doSetPtrCParticleBuffer(
+        SIXTRL_HOST_FN void doSetPtrCParticlesBuffer(
             c_buffer_t* SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void doSetPtrCBeamElementsBuffer(
@@ -562,9 +586,32 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
+        SIXTRL_HOST_FN clear_flag_t
+        doGetDefaultAllClearFlags() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void
+        doSetDefaultAllClearFlags( clear_flag_t const flags ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN clear_flag_t
+        doGetDefaultPrepareResetClearFlags() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void doSetDefaultPrepareResetClearFlags(
+            clear_flag_t const flags ) SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
         private:
 
-        SIXTRL_HOST_FN void doClearBaseImpl() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void
+        doSetDefaultPrepareResetClearFlags() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void
+        doClearParticlesStructuresBaseImpl() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void
+        doClearBeamElementsStructuresBaseImpl() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void doClearOutputStructuresBaseImpl() SIXTRL_NOEXCEPT;
 
         std::vector< size_type >        m_particle_set_indices;
         std::vector< num_particles_t >  m_particle_set_begin_offsets;
@@ -603,6 +650,8 @@ namespace SIXTRL_CXX_NAMESPACE
         particle_index_t                m_until_turn_elem_by_elem;
 
         collect_flag_t                  m_collect_flags;
+        clear_flag_t                    m_clear_prepare_reset_flags;
+        clear_flag_t                    m_clear_all_flags;
 
         bool                            m_default_elem_by_elem_rolling;
         bool                            m_has_beam_monitor_output;
@@ -808,47 +857,23 @@ namespace SIXTRL_CXX_NAMESPACE
         buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         size_type const until_turn_elem_by_elem )
     {
-        using c_buffer_t = TrackJobBaseNew::c_buffer_t;
-
-        bool success = false;
-
-        this->doClear();
-
-        c_buffer_t* ptr_pb  = particles_buffer.getCApiPtr();
-        c_buffer_t* ptr_eb  = beam_elements_buffer.getCApiPtr();
         c_buffer_t* ptr_out = ( ptr_output_buffer != nullptr )
             ? ptr_output_buffer->getCApiPtr() : nullptr;
 
-        if( ( particle_set_indices_begin !=
-              particle_set_indices_end ) &&
-            ( std::distance( particle_set_indices_begin,
-                particle_set_indices_end ) > std::ptrdiff_t{ 0 } ) )
-        {
-            success = this->doSetParticleSetIndices(
-                particle_set_indices_begin, particle_set_indices_end, ptr_pb );
-        }
-        else
-        {
-            this->doInitDefaultBeamMonitorIndices();
-            success = true;
-        }
+        bool success = this->reset(
+            particles_buffer.getCApiPtr(), particle_set_indices_begin,
+                particle_set_indices_end, beam_elements_buffer.getCApiPtr(),
+                    ptr_out, m_until_turn_elem_by_elem );
 
         if( success )
         {
-            if( this->doReset( ptr_pb, ptr_eb, ptr_out,
-                    until_turn_elem_by_elem ) )
-            {
-                this->doSetPtrParticleBuffer( &particles_buffer );
-                this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
+            this->doSetPtrParticleBuffer( &particles_buffer );
+            this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
 
-                if( ( ptr_out != nullptr ) && ( this->hasOutputBuffer() ) )
-                {
-                    this->doSetPtrOutputBuffer( ptr_output_buffer );
-                }
-            }
-            else
+            if( ( ptr_out != nullptr ) && ( this->hasOutputBuffer() ) &&
+                ( !this->ownsOutputBuffer() ) )
             {
-                success = false;
+                this->doSetPtrOutputBuffer( ptr_output_buffer );
             }
         }
 
@@ -864,33 +889,12 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBaseNew::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         TrackJobBaseNew::size_type const until_turn_elem_by_elem )
     {
-        bool success = false;
+        std::vector< TrackJobBaseNew::size_type > const temp_psets(
+            particle_set_indices_begin, particle_set_indices_end );
 
-        this->doClear();
-
-        if( ( particle_set_indices_begin !=
-              particle_set_indices_end ) &&
-            ( std::distance( particle_set_indices_begin,
-                particle_set_indices_end ) > std::ptrdiff_t{ 0 } ) )
-        {
-            success = this->doSetParticleSetIndices(
-                particle_set_indices_begin,
-                particle_set_indices_end, particles_buffer );
-        }
-        else
-        {
-            this->doInitDefaultBeamMonitorIndices();
-            success = true;
-        }
-
-        if( success )
-        {
-            success = this->doReset(
-                particles_buffer, beam_elements_buffer,
-                ptr_output_buffer, until_turn_elem_by_elem );
-        }
-
-        return success;
+        return this->reset( particles_buffer, temp_psets.size(),
+            temp_psets.data(), beam_elements_buffer, ptr_output_buffer,
+                until_turn_elem_by_elem );
     }
 
     /* --------------------------------------------------------------------- */
@@ -927,7 +931,7 @@ namespace SIXTRL_CXX_NAMESPACE
     /* --------------------------------------------------------------------- */
 
     template< typename ParSetIndexIter >
-    SIXTRL_HOST_FN bool TrackJobBaseNew::doSetParticleSetIndices(
+    bool TrackJobBaseNew::doSetParticleSetIndices(
         ParSetIndexIter begin, ParSetIndexIter end,
         const TrackJobBaseNew::c_buffer_t *const SIXTRL_RESTRICT pbuffer )
     {
@@ -1077,6 +1081,21 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBaseNew::collect_flag_t const flag ) SIXTRL_NOEXCEPT
     {
         return ( ( flag_set & flag ) == flag );
+    }
+
+    SIXTRL_INLINE bool TrackJobBaseNew::IsClearFlagSet(
+        TrackJobBaseNew::clear_flag_t const flag_set,
+        TrackJobBaseNew::clear_flag_t const flag ) SIXTRL_NOEXCEPT
+    {
+        return ( ( flag_set & flag ) == flag );
+    }
+
+    SIXTRL_INLINE TrackJobBaseNew::clear_flag_t
+    TrackJobBaseNew::UnsetClearFlag(
+        TrackJobBaseNew::clear_flag_t const haystack,
+        TrackJobBaseNew::clear_flag_t const needle ) SIXTRL_NOEXCEPT
+    {
+        return haystack & ~needle;
     }
 
     SIXTRL_INLINE TrackJobBaseNew::collect_flag_t
