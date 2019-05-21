@@ -187,7 +187,7 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( ptr_context != nullptr ) && ( raw_arg_begin != nullptr ) &&
             ( raw_arg_len > size_t{ 0 } ) )
         {
-            success = true;
+            success = st::CONTEXT_STATUS_SUCCESS;
 
             bool updated_argument_buffer = false;
 
