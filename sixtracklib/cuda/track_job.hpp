@@ -429,7 +429,7 @@ namespace SIXTRL_CXX_NAMESPACE
             return success;
         }
 
-        this->doSetPtrCParticleBuffer( pbuffer );
+        this->doSetPtrCParticlesBuffer( pbuffer );
 
         if( ( pset_begin != pset_end ) &&
             ( std::distance( pset_begin, pset_end ) > diff_t{ 0 } ) )
@@ -449,9 +449,9 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         this->doSetPtrCBeamElementsBuffer( belem_buffer );
-        
+
         success = this->doPrepareDefaultKernelsCudaImpl( config_str );
-        
+
         if( !success )
         {
             return success;
@@ -504,11 +504,6 @@ namespace SIXTRL_CXX_NAMESPACE
                 success &= this->doAssignOutputBufferToBeamMonitorsCudaImpl(
                     belem_buffer, ptr_output_buffer, min_turn_id, offset );
             }
-        }
-
-        if( success )
-        {
-            success = this->doPrepareDefaultKernelsCudaImpl( config_str );
         }
 
         return success;

@@ -574,7 +574,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
 
-        if( ( ptr_cuda_ctrl != nullptr ) && 
+        if( ( ptr_cuda_ctrl != nullptr ) &&
             ( ptr_cuda_ctrl->numAvailableNodes() > node_index_t{ 0 } ) &&
             ( ptr_cuda_ctrl->hasSelectedNode() ) )
         {
@@ -583,7 +583,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             cuda_node_info_t const* ptr_node_info = ptr_cuda_ctrl->ptrNodeInfo(
                 selected_node_index );
-            
+
             success = ( ( ptr_node_info != nullptr ) &&
                         ( selected_node_index != st::NODE_UNDEFINED_INDEX ) );
 
@@ -736,7 +736,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->setFetchParticlesAddressesKernelId( kernel_id );
         }
-        else if( ( ptr_cuda_ctrl != nullptr ) && 
+        else if( ( ptr_cuda_ctrl != nullptr ) &&
             ( ptr_cuda_ctrl->numAvailableNodes() > node_index_t{ 0 } ) )
         {
             success = true;
@@ -1206,9 +1206,13 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( _base_t::doPrepareParticlesStructures( pbuffer ) ) &&
             ( _base_t::doPrepareBeamElementsStructures( belem_buffer ) ) &&
             ( this->doPrepareParticlesStructuresCudaImpl( pbuffer ) ) &&
-            ( this->doPrepareBeamElementsStructuresCudaImpl( belem_buffer ) ) &&
-            ( this->doPrepareDefaultKernelsCudaImpl( this->ptrConfigStr() ) ) )
+            ( this->doPrepareBeamElementsStructuresCudaImpl( belem_buffer ) ) )
         {
+            success = this->doPrepareDefaultKernelsCudaImpl(
+                this->ptrConfigStr() );
+
+            if( !success ) return success;
+
             output_buffer_flag_t const out_buffer_flags =
             ::NS(OutputBuffer_required_for_tracking_of_particle_sets)( pbuffer,
                 this->numParticleSets(), this->particleSetIndicesBegin(),
@@ -1217,7 +1221,7 @@ namespace SIXTRL_CXX_NAMESPACE
             bool const requires_output_buffer =
                 ::NS(OutputBuffer_requires_output_buffer)( out_buffer_flags );
 
-            this->doSetPtrCParticleBuffer( pbuffer );
+            this->doSetPtrCParticlesBuffer( pbuffer );
             this->doSetPtrCBeamElementsBuffer( belem_buffer );
 
             if( ( requires_output_buffer ) || ( ptr_output_buffer != nullptr ) )
