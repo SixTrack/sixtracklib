@@ -20,6 +20,8 @@ typedef SIXTRL_INT32_T      NS(track_status_t);
 
 #if !defined( _GPUCODE )
 typedef SIXTRL_UINT16_T     NS(track_job_collect_flag_t);
+typedef SIXTRL_UINT16_T     NS(track_job_clear_flag_t);
+
 typedef NS(buffer_size_t)   NS(track_job_size_t);
 typedef SIXTRL_INT64_T      NS(track_job_type_t);
 
@@ -59,6 +61,35 @@ SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
 SIXTRL_STATIC_VAR NS(track_job_size_t) const
     NS(TRACK_JOB_DEFAULT_NUM_PARTICLE_SETS) = ( NS(track_job_size_t) )1u;
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC_VAR NS(track_job_clear_flag_t) const
+    NS(TRACK_JOB_CLEAR_PARTICLE_STRUCTURES) =
+        ( NS(track_job_clear_flag_t) )0x01;
+
+SIXTRL_STATIC_VAR NS(track_job_clear_flag_t) const
+    NS(TRACK_JOB_CLEAR_BEAM_ELEMENT_STRUCTURES) =
+        ( NS(track_job_clear_flag_t) )0x02;
+
+SIXTRL_STATIC_VAR NS(track_job_clear_flag_t) const
+    NS(TRACK_JOB_CLEAR_OUTPUT_STRUCTURES) =
+        ( NS(track_job_clear_flag_t) )0x04;
+
+SIXTRL_STATIC_VAR NS(track_job_clear_flag_t) const
+    NS(TRACK_JOB_CLEAR_CONTROLLER) = ( NS(track_job_clear_flag_t) )0x08;
+
+SIXTRL_STATIC_VAR NS(track_job_clear_flag_t) const
+    NS(TRACK_JOB_CLEAR_DEFAULT_KERNELS) = ( NS(track_job_clear_flag_t) )0x10;
+
+
+SIXTRL_STATIC_VAR NS(track_job_clear_flag_t) const
+    NS(TRACK_JOB_DEFAULT_CLEAR_FLAGS) = ( NS(track_job_clear_flag_t) )0x07;
+
+SIXTRL_STATIC_VAR NS(track_job_clear_flag_t) const
+    NS(TRACK_JOB_CLEAR_ALL_FLAGS) = ( NS(track_job_clear_flag_t) )0x1f;
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_STATIC_VAR NS(track_job_size_t) const
     NS(TRACK_JOB_DEFAULT_PARTICLE_SET_INDICES)[] = { 0u };
 
@@ -87,6 +118,8 @@ namespace SIXTRL_CXX_NAMESPACE
 namespace SIXTRL_CXX_NAMESPACE
 {
     typedef ::NS(track_job_collect_flag_t)  track_job_collect_flag_t;
+    typedef ::NS(track_job_clear_flag_t)    track_job_clear_flag_t;
+
     typedef ::NS(track_job_size_t)          track_job_size_t;
     typedef ::NS(track_job_type_t)          track_job_type_t;
 
@@ -122,6 +155,39 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_size_t
         TRACK_JOB_DEFAULT_NUM_PARTICLE_SETS =
             static_cast< track_job_collect_flag_t >( 1 );
+
+    /* --------------------------------------------------------------------- */
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_clear_flag_t
+        TRACK_JOB_CLEAR_PARTICLE_STRUCTURES =
+            static_cast< track_job_clear_flag_t >( 0x01 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_clear_flag_t
+        TRACK_JOB_CLEAR_BEAM_ELEMENT_STRUCTURES =
+            static_cast< track_job_clear_flag_t >( 0x02 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_clear_flag_t
+        TRACK_JOB_CLEAR_OUTPUT_STRUCTURES =
+            static_cast< track_job_clear_flag_t >( 0x04 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_clear_flag_t
+        TRACK_JOB_CLEAR_CONTROLLER =
+            static_cast< track_job_clear_flag_t >( 0x08 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_clear_flag_t
+        TRACK_JOB_CLEAR_DEFAULT_KERNELS =
+            static_cast< track_job_clear_flag_t >( 0x10 );
+
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_clear_flag_t
+        TRACK_JOB_DEFAULT_CLEAR_FLAGS =
+            static_cast< track_job_clear_flag_t >( 0x07 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_clear_flag_t
+        TRACK_JOB_CLEAR_ALL_FLAGS =
+            static_cast< track_job_clear_flag_t >( 0x1f );
+
+    /* --------------------------------------------------------------------- */
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_size_t
         TRACK_JOB_DEFAULT_PARTICLE_SET_INDICES[] = { ( track_job_size_t )0u };
