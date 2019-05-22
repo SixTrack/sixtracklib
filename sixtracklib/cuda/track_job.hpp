@@ -229,6 +229,28 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const until_turn_elem_by_elem ) override;
 
         /* ----------------------------------------------------------------- */
+        
+        SIXTRL_HOST_FN virtual status_t
+        doSetAssignOutputToBeamMonitorsKernelId( 
+            kernel_id_t const id ) override;
+
+        SIXTRL_HOST_FN virtual status_t
+        doSetAssignOutputToElemByElemConfigKernelId( 
+            kernel_id_t const id ) override;
+
+        SIXTRL_HOST_FN virtual status_t
+        doSetTrackUntilKernelId( kernel_id_t const id ) override;
+
+        SIXTRL_HOST_FN virtual status_t
+        doSetTrackLineKernelId( kernel_id_t const id ) override;
+
+        SIXTRL_HOST_FN virtual status_t
+        doSetTrackElemByElemKernelId( kernel_id_t const id )  override;
+
+        SIXTRL_HOST_FN virtual status_t
+        doSetFetchParticlesAddressesKernelId( kernel_id_t const id ) override;
+        
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN virtual status_t doFetchParticleAddresses() override;
 
@@ -319,6 +341,32 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
             size_type const until_turn_elem_by_elem );
+        
+        /* ---------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN status_t
+        doSetAssignOutputToBeamMonitorsKernelIdCudaImpl( 
+            kernel_id_t const id ) SIXTRL_HOST_FN;
+
+        SIXTRL_HOST_FN status_t
+        doSetAssignOutputToElemByElemConfigKernelIdCudaImpl(
+            kernel_id_t const id ) SIXTRL_HOST_FN;
+
+        SIXTRL_HOST_FN status_t
+        doSetTrackUntilKernelIdCudaImpl( 
+            kernel_id_t const id ) SIXTRL_HOST_FN;
+
+        SIXTRL_HOST_FN status_t
+        doSetTrackLineKernelIdCudaImpl( 
+            kernel_id_t const id ) SIXTRL_HOST_FN; 
+
+        SIXTRL_HOST_FN status_t
+        doSetTrackElemByElemKernelIdCudaImpl( 
+            kernel_id_t const id ) SIXTRL_HOST_FN;
+
+        SIXTRL_HOST_FN status_t
+        doSetFetchParticlesAddressesKernelIdCudaImpl( 
+            kernel_id_t const id ) SIXTRL_HOST_FN;
     };
 
     CudaTrackJob::collect_flag_t collect(
