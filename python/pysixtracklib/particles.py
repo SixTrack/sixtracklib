@@ -64,10 +64,10 @@ class Particles(CObject):
 
     @classmethod
     def from_ref(cls, num_particles=1, mass0=938272081.3,
-                 p0c=1e9, q0=1, **kwargs):
+                 p0c=1e9, q0=1):
         return cls(num_particles=num_particles,
                    particle_id=np.arange(num_particles),
-                   ).set_reference()
+                   ).set_reference(mass0=mass0,p0c=p0c,q0=q0)
 
     sigma = property(lambda self: (self.beta0 / self.beta) * self.zeta)
     beta = property(lambda p: (1 + p.delta) / (1 / p.beta0 + p.ptau))
