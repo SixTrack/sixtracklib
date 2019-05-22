@@ -144,7 +144,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual collect_flag_t doCollect(
             collect_flag_t const flags ) override;
 
-        SIXTRL_HOST_FN virtual bool doSwitchDebugMode(
+        SIXTRL_HOST_FN virtual status_t doSwitchDebugMode(
             bool const is_in_debug_mode ) override;
 
         SIXTRL_HOST_FN virtual status_t doSetDebugRegister(
@@ -175,10 +175,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN virtual bool doPrepareController(
+        SIXTRL_HOST_FN virtual status_t doPrepareController(
             char const* SIXTRL_RESTRICT config_str );
 
-        SIXTRL_HOST_FN virtual bool doPrepareDefaultKernels(
+        SIXTRL_HOST_FN virtual status_t doPrepareDefaultKernels(
             char const* SIXTRL_RESTRICT config_str );
 
         /* ----------------------------------------------------------------- */

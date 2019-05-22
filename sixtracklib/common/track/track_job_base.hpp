@@ -471,7 +471,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN void doSetPtrParticleBuffer(
+        SIXTRL_HOST_FN void doSetPtrParticlesBuffer(
             buffer_t* SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void doSetPtrBeamElementsBuffer(
@@ -860,14 +860,14 @@ namespace SIXTRL_CXX_NAMESPACE
         c_buffer_t* ptr_out = ( ptr_output_buffer != nullptr )
             ? ptr_output_buffer->getCApiPtr() : nullptr;
 
-        bool success = this->reset(
+        TrackJobBaseNew::status_t status = this->reset(
             particles_buffer.getCApiPtr(), particle_set_indices_begin,
                 particle_set_indices_end, beam_elements_buffer.getCApiPtr(),
-                    ptr_out, m_until_turn_elem_by_elem );
+                    ptr_out, until_turn_elem_by_elem );
 
-        if( success )
+        if( status == ::NS(ARCH_STATUS_SUCCESS) )
         {
-            this->doSetPtrParticleBuffer( &particles_buffer );
+            this->doSetPtrParticlesBuffer( &particles_buffer );
             this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
 
             if( ( ptr_out != nullptr ) && ( this->hasOutputBuffer() ) &&
@@ -877,7 +877,7 @@ namespace SIXTRL_CXX_NAMESPACE
             }
         }
 
-        return success;
+        return status;
     }
 
     template< typename ParSetIndexIter  >
@@ -931,7 +931,7 @@ namespace SIXTRL_CXX_NAMESPACE
     /* --------------------------------------------------------------------- */
 
     template< typename ParSetIndexIter >
-    bool TrackJobBaseNew::doSetParticleSetIndices(
+    TrackJobBaseNew::status_t TrackJobBaseNew::doSetParticleSetIndices(
         ParSetIndexIter begin, ParSetIndexIter end,
         const TrackJobBaseNew::c_buffer_t *const SIXTRL_RESTRICT pbuffer )
     {
@@ -940,7 +940,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using num_particles_t = TrackJobBaseNew::num_particles_t;
         using ptr_part_t      = ::NS(Particles) const*;
 
-        bool success   = false;
+        TrackJobBaseNew::status_t status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
 
         size_t const num_objects =
             ::NS(Buffer_get_num_of_objects)( pbuffer );
@@ -1032,11 +1032,15 @@ namespace SIXTRL_CXX_NAMESPACE
                     total_num_particles_in_sets;
 
                 this->m_total_num_particles = running_offset;
-                success = !this->m_particle_set_indices.empty();
+
+                if( !this->m_particle_set_indices.empty() )
+                {
+                    status = ::NS(ARCH_STATUS_SUCCESS);
+                }
             }
         }
 
-        return success;
+        return status;
     }
 
     /* --------------------------------------------------------------------- */

@@ -502,26 +502,31 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    bool TrackJobCtrlArgBase::doSwitchDebugMode( bool const is_in_debug_mode )
+    TrackJobCtrlArgBase::status_t
+    TrackJobCtrlArgBase::doSwitchDebugMode( bool const is_in_debug_mode )
     {
         using _base_t = st::TrackJobBaseNew;
 
-        bool success = true;
+        TrackJobCtrlArgBase::status_t status = st::ARCH_STATUS_SUCCESS;
 
         if( this->ptrControllerBase() != nullptr )
         {
             if( is_in_debug_mode )
             {
-                success = this->ptrControllerBase()->enableDebugMode();
+                status = this->ptrControllerBase()->enableDebugMode();
             }
             else
             {
-                success = this->ptrControllerBase()->disableDebugMode();
+                status = this->ptrControllerBase()->disableDebugMode();
             }
         }
 
-        success &= _base_t::doSwitchDebugMode( is_in_debug_mode );
-        return success;
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = _base_t::doSwitchDebugMode( is_in_debug_mode );
+        }
+
+        return status;
     }
 
     TrackJobCtrlArgBase::status_t TrackJobCtrlArgBase::doSetDebugRegister(
@@ -642,16 +647,16 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    bool TrackJobCtrlArgBase::doPrepareController(
+    TrackJobCtrlArgBase::status_t TrackJobCtrlArgBase::doPrepareController(
         char const* SIXTRL_RESTRICT )
     {
-        return true;
+        return st::ARCH_STATUS_SUCCESS;
     }
 
-    bool TrackJobCtrlArgBase::doPrepareDefaultKernels(
+    TrackJobCtrlArgBase::status_t TrackJobCtrlArgBase::doPrepareDefaultKernels(
         char const* SIXTRL_RESTRICT )
     {
-        return true;
+        return st::ARCH_STATUS_SUCCESS;
     }
 
     /* --------------------------------------------------------------------- */

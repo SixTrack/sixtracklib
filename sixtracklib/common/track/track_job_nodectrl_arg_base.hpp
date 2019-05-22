@@ -85,13 +85,13 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN node_controller_base_t*
             ptrNodeControllerBase() SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool doSelectNodeOnController(
+        SIXTRL_HOST_FN status_t doSelectNodeOnController(
             node_index_t const node_index );
 
-        SIXTRL_HOST_FN bool doUnselectNodeOnController(
+        SIXTRL_HOST_FN status_t doUnselectNodeOnController(
             node_index_t const selected_node_index );
 
-        SIXTRL_HOST_FN bool doChangeSelectedNodeOnController(
+        SIXTRL_HOST_FN status_t doChangeSelectedNodeOnController(
             node_index_t const currently_selected_node_index,
             node_index_t const new_selected_node_index );
     };
