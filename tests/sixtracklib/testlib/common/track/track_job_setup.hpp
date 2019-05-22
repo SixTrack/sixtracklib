@@ -1,15 +1,9 @@
 #ifndef SIXTRACKLIB_TESTS_TESTLIB_COMMON_TRACK_TRACK_JOB_SETUP_CXX_HPP__
 #define SIXTRACKLIB_TESTS_TESTLIB_COMMON_TRACK_TRACK_JOB_SETUP_CXX_HPP__
 
-#include <algorithm>
-#include <cstddef>
-#include <cstdlib>
-#include <vector>
-
 #include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/track/track_job_base.hpp"
-#include "sixtracklib/common/track/track_job_ctrl_arg_base.hpp"
-#include "sixtracklib/common/track/track_job_nodectrl_arg_base.hpp"
 
 namespace SIXTRL_CXX_NAMESPACE
 {

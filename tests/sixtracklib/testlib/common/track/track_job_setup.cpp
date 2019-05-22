@@ -11,8 +11,7 @@
 #include "sixtracklib/common/track/track_job_ctrl_arg_base.hpp"
 #include "sixtracklib/common/track/track_job_nodectrl_arg_base.hpp"
 
-namespace st      = SIXTRL_CXX_NAMESPACE;
-namespace st_test = st::tests;
+namespace st = SIXTRL_CXX_NAMESPACE;
 
 namespace SIXTRL_CXX_NAMESPACE
 {
