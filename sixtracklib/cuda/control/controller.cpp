@@ -25,9 +25,15 @@ namespace SIXTRL_CXX_NAMESPACE
         m_cuda_debug_register( nullptr )
     {
         this->doInitCudaController();
-        this->doInitCudaDebugRegister();
 
-        if( this->doInitAllCudaNodes() )
+        CudaController::status_t status = this->doInitCudaDebugRegister();
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doInitAllCudaNodes();
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
         {
             CudaController::node_index_t node_index_to_select =
                 this->doGetNodeIndexFromConfigString( config_str );
@@ -38,7 +44,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 node_index_to_select = this->defaultNodeIndex();
             }
 
-            if( ( this->doSelectNodeCudaImpl( node_index_to_select ) ) &&
+            status = this->doSelectNodeCudaImpl( node_index_to_select );
+
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
                 ( this->hasSelectedNode() ) )
             {
                 this->doEnableCudaController();
@@ -54,9 +62,14 @@ namespace SIXTRL_CXX_NAMESPACE
         m_cuda_debug_register( nullptr )
     {
         this->doInitCudaController();
-        this->doInitCudaDebugRegister();
+        CudaController::status_t status = this->doInitCudaDebugRegister();
 
-        if( this->doInitAllCudaNodes() )
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doInitAllCudaNodes();
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
         {
             CudaController::node_index_t node_index_to_select =
                 this->doFindAvailableNodesByCudaDeviceIndex( cuda_node_index );
@@ -73,7 +86,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 node_index_to_select = this->defaultNodeIndex();
             }
 
-            if( ( this->doSelectNodeCudaImpl( node_index_to_select ) ) &&
+            status = this->doSelectNodeCudaImpl( node_index_to_select );
+
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
                 ( this->hasSelectedNode() ) )
             {
                 this->doEnableCudaController();
@@ -89,9 +104,15 @@ namespace SIXTRL_CXX_NAMESPACE
         m_cuda_debug_register( nullptr )
     {
         this->doInitCudaController();
-        this->doInitCudaDebugRegister();
 
-        if( this->doInitAllCudaNodes() )
+        CudaController::status_t status = this->doInitCudaDebugRegister();
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doInitAllCudaNodes();
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
         {
             CudaController::node_index_t node_index_to_select =
                 this->doFindAvailableNodesIndex(
@@ -109,7 +130,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 node_index_to_select = this->defaultNodeIndex();
             }
 
-            if( ( this->doSelectNodeCudaImpl( node_index_to_select ) ) &&
+           status = this->doSelectNodeCudaImpl( node_index_to_select );
+
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
                 ( this->hasSelectedNode() ) )
             {
                 this->doEnableCudaController();
@@ -126,9 +149,15 @@ namespace SIXTRL_CXX_NAMESPACE
         m_cuda_debug_register( nullptr )
     {
         this->doInitCudaController();
-        this->doInitCudaDebugRegister();
 
-        if( this->doInitAllCudaNodes() )
+        CudaController::status_t status = this->doInitCudaDebugRegister();
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doInitAllCudaNodes();
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
         {
             CudaController::node_index_t node_index_to_select =
                 this->doFindAvailableNodesIndex( platform_id, device_id );
@@ -145,7 +174,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 node_index_to_select = this->defaultNodeIndex();
             }
 
-            if( ( this->doSelectNodeCudaImpl( node_index_to_select ) ) &&
+            status = this->doSelectNodeCudaImpl( node_index_to_select );
+
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
                 ( this->hasSelectedNode() ) )
             {
                 this->doEnableCudaController();
@@ -161,9 +192,15 @@ namespace SIXTRL_CXX_NAMESPACE
         m_cuda_debug_register( nullptr )
     {
         this->doInitCudaController();
-        this->doInitCudaDebugRegister();
 
-        if( this->doInitAllCudaNodes() )
+        CudaController::status_t status = this->doInitCudaDebugRegister();
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doInitAllCudaNodes();
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
         {
             CudaController::node_index_t node_index_to_select =
                 this->doGetNodeIndexFromConfigString( config_str.c_str() );
@@ -174,7 +211,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 node_index_to_select = this->defaultNodeIndex();
             }
 
-            if( ( this->doSelectNodeCudaImpl( node_index_to_select ) ) &&
+            status = this->doSelectNodeCudaImpl( node_index_to_select );
+
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
                 ( this->hasSelectedNode() ) )
             {
                 this->doEnableCudaController();
@@ -190,9 +229,15 @@ namespace SIXTRL_CXX_NAMESPACE
         m_cuda_debug_register( nullptr )
     {
         this->doInitCudaController();
-        this->doInitCudaDebugRegister();
 
-        if( this->doInitAllCudaNodes() )
+        CudaController::status_t status = this->doInitCudaDebugRegister();
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doInitAllCudaNodes();
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
         {
             CudaController::node_index_t node_index_to_select =
                 this->doFindAvailableNodesByCudaDeviceIndex( cuda_node_index );
@@ -209,7 +254,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 node_index_to_select = this->defaultNodeIndex();
             }
 
-            if( ( this->doSelectNodeCudaImpl( node_index_to_select ) ) &&
+            status = this->doSelectNodeCudaImpl( node_index_to_select );
+
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
                 ( this->hasSelectedNode() ) )
             {
                 this->doEnableCudaController();
@@ -225,9 +272,15 @@ namespace SIXTRL_CXX_NAMESPACE
         m_cuda_debug_register( nullptr )
     {
         this->doInitCudaController();
-        this->doInitCudaDebugRegister();
 
-        if( this->doInitAllCudaNodes() )
+        CudaController::status_t status = this->doInitCudaDebugRegister();
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doInitAllCudaNodes();
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
         {
             CudaController::node_index_t node_index_to_select =
                 this->doFindAvailableNodesIndex(
@@ -245,7 +298,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 node_index_to_select = this->defaultNodeIndex();
             }
 
-            if( ( this->doSelectNodeCudaImpl( node_index_to_select ) ) &&
+            status = this->doSelectNodeCudaImpl( node_index_to_select );
+
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
                 ( this->hasSelectedNode() ) )
             {
                 this->doEnableCudaController();
@@ -262,9 +317,15 @@ namespace SIXTRL_CXX_NAMESPACE
         m_cuda_debug_register( nullptr )
     {
         this->doInitCudaController();
-        this->doInitCudaDebugRegister();
 
-        if( this->doInitAllCudaNodes() )
+        CudaController::status_t status = this->doInitCudaDebugRegister();
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doInitAllCudaNodes();
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
         {
             CudaController::node_index_t node_index_to_select =
                 this->doFindAvailableNodesIndex( platform_id, device_id );
@@ -281,7 +342,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 node_index_to_select = this->defaultNodeIndex();
             }
 
-            if( ( this->doSelectNodeCudaImpl( node_index_to_select ) ) &&
+            status = this->doSelectNodeCudaImpl( node_index_to_select );
+
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
                 ( this->hasSelectedNode() ) )
             {
                 this->doEnableCudaController();
@@ -346,21 +409,21 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    bool CudaController::selectNodeByCudaIndex(
+    CudaController::status_t CudaController::selectNodeByCudaIndex(
         CudaController::cuda_device_index_t const cuda_device_index )
     {
         return this->selectNode(
             this->doFindAvailableNodesByCudaDeviceIndex( cuda_device_index ) );
     }
 
-    bool CudaController::selectNodeByPciBusId(
+    CudaController::status_t CudaController::selectNodeByPciBusId(
         std::string const& SIXTRL_RESTRICT_REF pci_bus_id )
     {
         return this->selectNode(
             this->doFindAvailableNodesByPciBusId( pci_bus_id.c_str() ) );
     }
 
-    bool CudaController::selectNodeByPciBusId(
+    CudaController::status_t CudaController::selectNodeByPciBusId(
         char const* SIXTRL_RESTRICT pci_bus_id )
     {
         return this->selectNode(
@@ -803,16 +866,16 @@ namespace SIXTRL_CXX_NAMESPACE
         return is_remapped;
     }
 
-    bool CudaController::doSelectNode( CudaController::node_index_t const idx )
+    CudaController::status_t CudaController::doSelectNode( CudaController::node_index_t const idx )
     {
         return this->doSelectNodeCudaImpl( idx );
     }
 
-    bool CudaController::doChangeSelectedNode(
+    CudaController::status_t CudaController::doChangeSelectedNode(
         CudaController::node_index_t const current_selected_node_idx,
         CudaController::node_index_t const new_selected_node_index )
     {
-        bool success = false;
+        CudaController::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         auto ptr_node_info = this->ptrNodeInfo( new_selected_node_index );
 
@@ -825,21 +888,25 @@ namespace SIXTRL_CXX_NAMESPACE
             ::cudaError_t err = ::cudaSetDevice(
                 ptr_node_info->cudaDeviceIndex() );
 
-            success = ( err == ::cudaSuccess );
+            if( err == ::cudaSuccess )
+            {
+                status = st::ARCH_STATUS_SUCCESS;
+            }
 
             if( ( !this->canUnselectNode() ) &&
-                ( ( !success ) || ( !this->hasSelectedNode() ) ) )
+                ( ( status != st::ARCH_STATUS_SUCCESS ) ||
+                  ( !this->hasSelectedNode() ) ) )
             {
-                success = this->doSelectNode( current_selected_node_idx );
+                status = this->doSelectNode( current_selected_node_idx );
             }
         }
 
-        return success;
+        return status;
     }
 
-    bool CudaController::doInitCudaDebugRegister()
+    CudaController::status_t CudaController::doInitCudaDebugRegister()
     {
-        bool success = false;
+        CudaController::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         using debug_register_t = CudaController::debug_register_t;
 
@@ -850,7 +917,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( err == ::cudaSuccess )
             {
-                success = true;
+                status = st::ARCH_STATUS_SUCCESS;
             }
             else if( this->m_cuda_debug_register != nullptr )
             {
@@ -862,7 +929,7 @@ namespace SIXTRL_CXX_NAMESPACE
             }
         }
 
-        return success;
+        return status;
     }
 
     CudaController::node_index_t
@@ -985,9 +1052,9 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    bool CudaController::doInitAllCudaNodes()
+    CudaController::status_t CudaController::doInitAllCudaNodes()
     {
-        bool success = false;
+        CudaController::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         using _this_t = CudaController;
         using node_index_t     = _this_t::node_index_t;
@@ -1062,10 +1129,13 @@ namespace SIXTRL_CXX_NAMESPACE
                 }
             }
 
-            success = ( this->numAvailableNodes() > initial_num_avail_nodes );
+            if( this->numAvailableNodes() > initial_num_avail_nodes )
+            {
+                status = st::ARCH_STATUS_SUCCESS;
+            }
         }
 
-        return success;
+        return status;
     }
 
     void CudaController::doEnableCudaController()
@@ -1168,7 +1238,7 @@ namespace SIXTRL_CXX_NAMESPACE
             sizeof( debug_register_t ) );
     }
 
-    bool CudaController::doSelectNodeCudaImpl(
+    CudaController::status_t CudaController::doSelectNodeCudaImpl(
             CudaController::node_index_t const node_index )
     {
         using _base_ctrl_t = st::NodeControllerBase;
@@ -1180,7 +1250,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using kernel_id_t = _this_t::kernel_id_t;
         using kernel_config_t = _this_t::kernel_config_t;
 
-        bool success = false;
+        CudaController::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         node_info_base_t* node_base = this->doGetPtrNodeInfoBase( node_index );
 
@@ -1199,12 +1269,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( err == ::cudaSuccess )
                 {
-                    success = _base_ctrl_t::doSelectNode( node_index );
+                    status = _base_ctrl_t::doSelectNode( node_index );
                 }
             }
         }
 
-        if( ( success ) && ( this->hasSelectedNode() ) )
+        if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+            ( this->hasSelectedNode() ) )
         {
             std::string kernel_name( size_t{ 64 }, '\0' );
 
@@ -1218,7 +1289,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 kernel_name, size_t{ 1 } ) );
 
             SIXTRL_ASSERT( ptr_remap_kernel.get() != nullptr );
-            success &= ptr_remap_kernel->setNumWorkItems( size_t{ 1 } );
+            bool success = ptr_remap_kernel->setNumWorkItems( size_t{ 1 } );
             success &= ptr_remap_kernel->setWorkGroupSizes( size_t{ 1 } );
             success &= ptr_remap_kernel->update();
             success &= !ptr_remap_kernel->needsUpdate();
@@ -1227,6 +1298,10 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 kernel_id = this->doAppendCudaKernelConfig(
                     std::move( ptr_remap_kernel ) );
+            }
+            else
+            {
+                status = st::ARCH_STATUS_GENERAL_FAILURE;
             }
 
             this->setRemapCObjectBufferKernelId( kernel_id );
@@ -1241,7 +1316,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             SIXTRL_ASSERT( ptr_debug_remap_kernel.get() != nullptr );
 
-            success &= ptr_debug_remap_kernel->setNumWorkItems( size_t{ 1 } );
+            success = ptr_debug_remap_kernel->setNumWorkItems( size_t{ 1 } );
             success &= ptr_debug_remap_kernel->setWorkGroupSizes( size_t{ 1 } );
             success &= ptr_debug_remap_kernel->update();
             success &= !ptr_debug_remap_kernel->needsUpdate();
@@ -1251,11 +1326,15 @@ namespace SIXTRL_CXX_NAMESPACE
                 kernel_id = this->doAppendCudaKernelConfig(
                     std::move( ptr_debug_remap_kernel ) );
             }
+            else
+            {
+                status = st::ARCH_STATUS_GENERAL_FAILURE;
+            }
 
             this->setRemapCObjectBufferDebugKernelId( kernel_id );
         }
 
-        return success;
+        return status;
     }
 }
 

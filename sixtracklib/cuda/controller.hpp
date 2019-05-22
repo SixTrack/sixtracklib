@@ -118,13 +118,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ---------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN bool selectNodeByCudaIndex(
+        SIXTRL_HOST_FN status_t selectNodeByCudaIndex(
             cuda_device_index_t const cuda_device_index );
 
-        SIXTRL_HOST_FN bool selectNodeByPciBusId(
+        SIXTRL_HOST_FN status_t selectNodeByPciBusId(
             std::string const& SIXTRL_RESTRICT_REF pci_bus_id );
 
-        SIXTRL_HOST_FN bool selectNodeByPciBusId(
+        SIXTRL_HOST_FN status_t selectNodeByPciBusId(
             char const* SIXTRL_RESTRICT pci_bus_id );
 
         /* ================================================================ */
@@ -221,10 +221,10 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual status_t doFetchDebugRegister(
             debug_register_t* SIXTRL_RESTRICT ptr_debug_register ) override;
 
-        SIXTRL_HOST_FN virtual bool
+        SIXTRL_HOST_FN virtual status_t
             doSelectNode( node_index_t const node_index ) override;
 
-        SIXTRL_HOST_FN virtual bool doChangeSelectedNode(
+        SIXTRL_HOST_FN virtual status_t doChangeSelectedNode(
             node_index_t const current_selected_node_idx,
             node_index_t const new_selected_node_index ) override;
 
@@ -241,7 +241,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN  bool doInitCudaDebugRegister();
+        SIXTRL_HOST_FN status_t doInitCudaDebugRegister();
 
         SIXTRL_HOST_FN node_index_t doFindAvailableNodesByCudaDeviceIndex(
             cuda_device_index_t const cuda_device_index ) const SIXTRL_NOEXCEPT;
@@ -253,7 +253,7 @@ namespace SIXTRL_CXX_NAMESPACE
             char const* SIXTRL_RESTRICT select_str );
 
         SIXTRL_HOST_FN void doInitCudaController();
-        SIXTRL_HOST_FN bool doInitAllCudaNodes();
+        SIXTRL_HOST_FN status_t doInitAllCudaNodes();
         SIXTRL_HOST_FN void doEnableCudaController();
 
         SIXTRL_HOST_FN kernel_id_t doAppendCudaKernelConfig(
@@ -287,7 +287,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN status_t doFetchDebugRegisterCudaBaseImpl(
             debug_register_t* SIXTRL_RESTRICT ptr_debug_register );
 
-        SIXTRL_HOST_FN bool doSelectNodeCudaImpl( node_index_t const idx );
+        SIXTRL_HOST_FN status_t doSelectNodeCudaImpl( node_index_t const idx );
 
         SIXTRL_HOST_FN status_t doRemapCObjectsBufferCudaBaseImpl(
             ptr_arg_base_t SIXTRL_RESTRICT arg, size_type const arg_size );
