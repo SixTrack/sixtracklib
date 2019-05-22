@@ -118,52 +118,52 @@ namespace SIXTRL_CXX_NAMESPACE
             node_index_t const node_index ) const SIXTRL_NOEXCEPT;
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-        
-        SIXTRL_HOST_FN node_index_t nodeIndex( 
-            node_id_t const& SIXTRL_RESTRICT_REF node_id 
+
+        SIXTRL_HOST_FN node_index_t nodeIndex(
+            node_id_t const& SIXTRL_RESTRICT_REF node_id
             ) const SIXTRL_NOEXCEPT;
-            
+
         SIXTRL_HOST_FN node_index_t nodeIndex(
-            platform_id_t const platform_id, 
+            platform_id_t const platform_id,
             device_id_t const device_id ) const SIXTRL_NOEXCEPT;
-            
+
         SIXTRL_HOST_FN node_index_t nodeIndex(
-            node_info_base_t const* SIXTRL_RESTRICT 
+            node_info_base_t const* SIXTRL_RESTRICT
                 ptr_node_info ) const SIXTRL_NOEXCEPT;
-                
+
         SIXTRL_HOST_FN node_index_t nodeIndex(
             char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT;
-            
+
         SIXTRL_HOST_FN node_index_t nodeIndex(
-            std::string const& SIXTRL_RESTRICT_REF 
+            std::string const& SIXTRL_RESTRICT_REF
                 node_id_str ) const SIXTRL_NOEXCEPT;
-        
+
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-        
-        SIXTRL_HOST_FN node_index_t 
+
+        SIXTRL_HOST_FN node_index_t
         minAvailableNodeIndex() const SIXTRL_NOEXCEPT;
-        
-        SIXTRL_HOST_FN node_index_t 
+
+        SIXTRL_HOST_FN node_index_t
         maxAvailableNodeIndex() const SIXTRL_NOEXCEPT;
-        
+
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-        
+
         SIXTRL_HOST_FN size_type availableNodeIndices(
             size_type const max_num_node_indices,
-            node_index_t* SIXTRL_RESTRICT node_indices_begin 
+            node_index_t* SIXTRL_RESTRICT node_indices_begin
         ) const SIXTRL_NOEXCEPT;
-        
+
         SIXTRL_HOST_FN size_type availableNodeIds(
             size_type const max_num_node_ids,
             node_id_t* SIXTRL_RESTRICT node_ids_begin ) const SIXTRL_NOEXCEPT;
-        
+
         SIXTRL_HOST_FN size_type availableBaseNodeInfos(
             size_type const max_num_node_infos,
-            node_info_base_t const** SIXTRL_RESTRICT ptr_node_infos_begin 
+            node_info_base_t const** SIXTRL_RESTRICT ptr_node_infos_begin
         ) const SIXTRL_NOEXCEPT;
-            
+
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-                
+
         SIXTRL_HOST_FN node_id_t const* ptrNodeId(
             char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT;
 
@@ -213,20 +213,21 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN char const*
         ptrSelectedNodeIdStr() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool selectedNodeIdStr( char* SIXTRL_RESTRICT node_str,
+        SIXTRL_HOST_FN status_t selectedNodeIdStr(
+            char* SIXTRL_RESTRICT node_str,
             size_type const max_str_length ) const SIXTRL_NOEXCEPT;
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN bool usesAutoSelect() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool selectNode( node_index_t const index );
-        SIXTRL_HOST_FN bool selectNode( node_id_t const& node_id );
-        SIXTRL_HOST_FN bool selectNode(
+        SIXTRL_HOST_FN status_t selectNode( node_index_t const index );
+        SIXTRL_HOST_FN status_t selectNode( node_id_t const& node_id );
+        SIXTRL_HOST_FN status_t selectNode(
             platform_id_t const platform_idx, device_id_t const device_idx );
 
-        SIXTRL_HOST_FN bool selectNode( char const* node_id_str );
-        SIXTRL_HOST_FN bool selectNode( std::string const& node_id_str );
+        SIXTRL_HOST_FN status_t selectNode( char const* node_id_str );
+        SIXTRL_HOST_FN status_t selectNode( std::string const& node_id_str );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -235,10 +236,10 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN bool
         canDirectlyChangeSelectedNode() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool changeSelectedNode(
+        SIXTRL_HOST_FN status_t changeSelectedNode(
             node_index_t const new_selected_node_index );
 
-        SIXTRL_HOST_FN bool changeSelectedNode(
+        SIXTRL_HOST_FN status_t changeSelectedNode(
             node_index_t const current_selected_node_index,
             node_index_t const new_selected_node_index );
 
@@ -246,14 +247,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN bool canUnselectNode() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool unselectNode();
-        SIXTRL_HOST_FN bool unselectNode( node_index_t const index );
-        SIXTRL_HOST_FN bool unselectNode( node_id_t const& node_id );
-        SIXTRL_HOST_FN bool unselectNode(
+        SIXTRL_HOST_FN status_t unselectNode();
+        SIXTRL_HOST_FN status_t unselectNode( node_index_t const index );
+        SIXTRL_HOST_FN status_t unselectNode( node_id_t const& node_id );
+        SIXTRL_HOST_FN status_t unselectNode(
             platform_id_t const platform_idx, device_id_t const device_idx );
 
-        SIXTRL_HOST_FN bool unselectNode( char const* node_id_str );
-        SIXTRL_HOST_FN bool unselectNode( std::string const& node_id_str );
+        SIXTRL_HOST_FN status_t unselectNode( char const* node_id_str );
+        SIXTRL_HOST_FN status_t unselectNode( std::string const& node_id_str );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -300,14 +301,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual void doClear() override;
 
-        SIXTRL_HOST_FN virtual bool doSelectNode(
+        SIXTRL_HOST_FN virtual status_t doSelectNode(
             node_index_t const node_index );
 
-        SIXTRL_HOST_FN virtual bool doChangeSelectedNode(
+        SIXTRL_HOST_FN virtual status_t doChangeSelectedNode(
             node_index_t const current_selected_node_index,
             node_index_t const new_selected_node_index );
 
-        SIXTRL_HOST_FN virtual bool doUnselectNode(
+        SIXTRL_HOST_FN virtual status_t doUnselectNode(
             node_index_t const selected_node_index );
 
         /* ----------------------------------------------------------------- */
@@ -357,7 +358,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN void doClearNodeControllerBaseImpl() SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool doSelectNodeNodeControllerBaseImpl(
+        SIXTRL_HOST_FN status_t doSelectNodeNodeControllerBaseImpl(
             node_index_t const node_index ) SIXTRL_NOEXCEPT;
 
         std::vector< ptr_node_info_base_t > m_available_nodes;
@@ -365,7 +366,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         node_id_t const* m_ptr_default_node_id;
         node_id_t const* m_ptr_selected_node_id;
-        
+
         node_index_t m_min_available_node_index;
         node_index_t m_max_available_node_index;
 

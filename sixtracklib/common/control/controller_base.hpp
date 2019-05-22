@@ -279,7 +279,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ptr_arg_base_t SIXTRL_RESTRICT arg,
             status_t* SIXTRL_RESTRICT ptr_status );
 
-        SIXTRL_HOST_FN virtual bool doSwitchDebugMode(
+        SIXTRL_HOST_FN virtual status_t doSwitchDebugMode(
             bool const is_in_debug_mode ) override;
 
         /* ----------------------------------------------------------------- */

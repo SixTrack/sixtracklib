@@ -88,29 +88,29 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_is_node_available)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t) 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t)
 NS(Controller_get_min_available_node_index)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t) 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t)
 NS(Controller_get_max_available_node_index)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t) 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t)
 NS(Controller_get_available_node_indices)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
     NS(ctrl_size_t) const max_num_node_indices,
     NS(node_index_t)* SIXTRL_RESTRICT node_index_begin );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t) 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t)
 NS(Controller_get_available_node_ids)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
     NS(ctrl_size_t) const max_num_node_ids,
     NS(NodeId)* SIXTRL_RESTRICT node_index_begin );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t) 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t)
 NS(Controller_get_available_base_node_infos)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
     NS(ctrl_size_t) const max_num_node_infos,
@@ -118,15 +118,15 @@ NS(Controller_get_available_base_node_infos)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t) 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t)
 NS(Controller_get_node_index_by_node_id)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
     const NS(NodeId) *const SIXTRL_RESTRICT node_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t) 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t)
 NS(Controller_get_node_index_by_platform_id_and_device_id)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
-    NS(node_platform_id_t) const platform_id, 
+    NS(node_platform_id_t) const platform_id,
     NS(node_device_id_t) const device_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t)
@@ -200,29 +200,30 @@ SIXTRL_EXTERN SIXTRL_HOST_FN char const*
 NS(Controller_get_selected_node_id_str)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_copy_selected_node_id_str)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Controller_copy_selected_node_id_str)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
     char* SIXTRL_RESTRICT node_id_str,
     NS(arch_size_t) const max_str_length );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_select_node)(
-    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Controller_select_node)( NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT node_id_str );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_select_node_by_node_id)(
-    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Controller_select_node_by_node_id)( NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     const NS(NodeId) *const SIXTRL_RESTRICT node_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(Controller_select_node_by_plaform_id_and_device_id)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     NS(node_platform_id_t) const platform_id,
     NS(node_device_id_t) const device_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_select_node_by_index)(
-    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Controller_select_node_by_index)( NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     NS(node_index_t) const node_index );
 
 /* ========================================================================== */
@@ -235,7 +236,8 @@ NS(Controller_can_directly_change_selected_node)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
 
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_change_selected_node)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Controller_change_selected_node)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     NS(node_index_t) const current_selected_node_index,
     NS(node_index_t) const new_selected_node_index );
@@ -246,23 +248,26 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_can_unselect_node)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
 
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_unselect_node)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(Controller_unselect_node)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_unselect_node_by_index)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Controller_unselect_node_by_index)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl, NS(node_index_t) const index );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_unselect_node_by_node_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Controller_unselect_node_by_node_id)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     const NS(NodeId) *const SIXTRL_RESTRICT ptr_node_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(Controller_unselect_node_by_platform_id_and_device_id)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     NS(node_platform_id_t) const platform_idx,
     NS(node_device_id_t) const device_idx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_unselect_node_by_node_id_str)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Controller_unselect_node_by_node_id_str)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT node_id_str );
 

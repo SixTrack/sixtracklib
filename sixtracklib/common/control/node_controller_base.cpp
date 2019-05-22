@@ -221,50 +221,50 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-    
-    NodeControllerBase::node_index_t 
+
+    NodeControllerBase::node_index_t
     NodeControllerBase::minAvailableNodeIndex() const SIXTRL_NOEXCEPT
     {
         return this->m_min_available_node_index;
     }
-        
-    NodeControllerBase::node_index_t 
+
+    NodeControllerBase::node_index_t
     NodeControllerBase::maxAvailableNodeIndex() const SIXTRL_NOEXCEPT
     {
         return this->m_max_available_node_index;
     }
-    
+
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-        
+
     NodeControllerBase::size_type NodeControllerBase::availableNodeIndices(
         NodeControllerBase::size_type const max_num_node_indices,
-        NodeControllerBase::node_index_t* 
+        NodeControllerBase::node_index_t*
             SIXTRL_RESTRICT node_indices_begin ) const SIXTRL_NOEXCEPT
     {
         using _this_t      = st::NodeControllerBase;
         using size_t       = _this_t::size_type;
         using node_index_t = _this_t::node_index_t;
-        
+
         size_t num_avail_elements = size_t{ 0 };
-        
+
         if( ( node_indices_begin != nullptr ) &&
             ( this->numAvailableNodes() > node_index_t{ 0 } ) &&
             ( this->numAvailableNodes() != st::NODE_UNDEFINED_INDEX ) )
         {
             node_index_t ii = this->minAvailableNodeIndex();
             node_index_t const max_node_idx = this->maxAvailableNodeIndex();
-            
-            std::fill( node_indices_begin, 
-                       node_indices_begin + max_num_node_indices, 
+
+            std::fill( node_indices_begin,
+                       node_indices_begin + max_num_node_indices,
                        st::NODE_UNDEFINED_INDEX );
-            
+
             SIXTRL_ASSERT( ii != st::NODE_UNDEFINED_INDEX );
             SIXTRL_ASSERT( max_node_idx != st::NODE_UNDEFINED_INDEX );
             SIXTRL_ASSERT( ii <= max_node_idx );
-            SIXTRL_ASSERT( ( node_index_t{ 1 } + ( max_node_idx - ii ) ) <= 
+            SIXTRL_ASSERT( ( node_index_t{ 1 } + ( max_node_idx - ii ) ) <=
                 this->numAvailableNodes() );
-            
-            while( ( ii <= max_node_idx ) && 
+
+            while( ( ii <= max_node_idx ) &&
                    ( ii != st::NODE_UNDEFINED_INDEX ) &&
                    ( num_avail_elements < max_num_node_indices ) )
             {
@@ -272,43 +272,43 @@ namespace SIXTRL_CXX_NAMESPACE
                 {
                     node_indices_begin[ num_avail_elements++ ] = ii;
                 }
-                
+
                 ++ii;
             }
         }
-        
+
         return num_avail_elements;
     }
-    
+
     NodeControllerBase::size_type NodeControllerBase::availableNodeIds(
         NodeControllerBase::size_type const max_num_node_ids,
-        NodeControllerBase::node_id_t* SIXTRL_RESTRICT 
+        NodeControllerBase::node_id_t* SIXTRL_RESTRICT
             node_ids_begin ) const SIXTRL_NOEXCEPT
     {
         using _this_t = st::NodeControllerBase;
         using size_t = _this_t::size_type;
         using node_id_t = _this_t::node_id_t;
         using node_index_t = _this_t::node_index_t;
-        
+
         size_t num_avail_elements = size_t{ 0 };
-        
+
         if( ( node_ids_begin != nullptr ) &&
             ( this->numAvailableNodes() > node_index_t{ 0 } ) &&
             ( this->numAvailableNodes() != st::NODE_UNDEFINED_INDEX ) )
         {
             node_index_t ii = this->minAvailableNodeIndex();
             node_index_t const max_node_idx = this->maxAvailableNodeIndex();
-            
+
             SIXTRL_ASSERT( ii != st::NODE_UNDEFINED_INDEX );
             SIXTRL_ASSERT( max_node_idx != st::NODE_UNDEFINED_INDEX );
             SIXTRL_ASSERT( ii <= max_node_idx );
-            SIXTRL_ASSERT( ( node_index_t{ 1 } + ( max_node_idx - ii ) ) <= 
+            SIXTRL_ASSERT( ( node_index_t{ 1 } + ( max_node_idx - ii ) ) <=
                 this->numAvailableNodes() );
-            
-            std::fill( node_ids_begin, 
+
+            std::fill( node_ids_begin,
                        node_ids_begin + max_num_node_ids, node_id_t{} );
-            
-            while( ( ii <= max_node_idx ) && 
+
+            while( ( ii <= max_node_idx ) &&
                    ( ii != st::NODE_UNDEFINED_INDEX ) &&
                    ( num_avail_elements < max_num_node_ids ) )
             {
@@ -316,103 +316,103 @@ namespace SIXTRL_CXX_NAMESPACE
                 {
                     node_id_t const* ptr_node_id = this->ptrNodeId( ii );
                     SIXTRL_ASSERT( ptr_node_id != nullptr );
-                    
+
                     node_ids_begin[ num_avail_elements++ ] = *ptr_node_id;
                 }
-                
+
                 ++ii;
             }
         }
-        
+
         return num_avail_elements;
     }
-    
+
     NodeControllerBase::size_type NodeControllerBase::availableBaseNodeInfos(
         NodeControllerBase::size_type const max_num_node_infos,
-        NodeControllerBase::node_info_base_t const** 
+        NodeControllerBase::node_info_base_t const**
             SIXTRL_RESTRICT ptr_node_infos_begin ) const SIXTRL_NOEXCEPT
     {
         using _this_t = st::NodeControllerBase;
         using size_t = _this_t::size_type;
         using node_index_t = _this_t::node_index_t;
-        
+
         size_t num_avail_elements = size_t{ 0 };
-        
+
         if( ( ptr_node_infos_begin != nullptr ) &&
             ( this->numAvailableNodes() > node_index_t{ 0 } ) &&
             ( this->numAvailableNodes() != st::NODE_UNDEFINED_INDEX ) )
         {
             node_index_t ii = this->minAvailableNodeIndex();
             node_index_t const max_node_idx = this->maxAvailableNodeIndex();
-            
-            std::fill( ptr_node_infos_begin, 
+
+            std::fill( ptr_node_infos_begin,
                        ptr_node_infos_begin + max_num_node_infos, nullptr );
-            
+
             SIXTRL_ASSERT( ii != st::NODE_UNDEFINED_INDEX );
             SIXTRL_ASSERT( max_node_idx != st::NODE_UNDEFINED_INDEX );
             SIXTRL_ASSERT( ii <= max_node_idx );
-            SIXTRL_ASSERT( ( node_index_t{ 1 } + ( max_node_idx - ii ) ) <= 
+            SIXTRL_ASSERT( ( node_index_t{ 1 } + ( max_node_idx - ii ) ) <=
                 this->numAvailableNodes() );
-            
-            while( ( ii <= max_node_idx ) && 
+
+            while( ( ii <= max_node_idx ) &&
                    ( ii != st::NODE_UNDEFINED_INDEX ) &&
                    ( num_avail_elements < max_num_node_infos ) )
             {
                 if( this->isNodeAvailable( ii ) )
                 {
-                    ptr_node_infos_begin[ num_avail_elements++ ] = 
+                    ptr_node_infos_begin[ num_avail_elements++ ] =
                         this->ptrNodeInfoBase( ii );
                 }
-                
+
                 ++ii;
             }
         }
-        
+
         return num_avail_elements;
     }
-    
+
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-    
-    NodeControllerBase::node_index_t NodeControllerBase::nodeIndex( 
-        NodeControllerBase::node_id_t const& 
+
+    NodeControllerBase::node_index_t NodeControllerBase::nodeIndex(
+        NodeControllerBase::node_id_t const&
             SIXTRL_RESTRICT_REF node_id ) const SIXTRL_NOEXCEPT
     {
-        return this->doFindAvailableNodesIndex( 
+        return this->doFindAvailableNodesIndex(
             node_id.platformId(), node_id.deviceId() );
     }
-        
+
     NodeControllerBase::node_index_t NodeControllerBase::nodeIndex(
-        NodeControllerBase::platform_id_t const platform_id, 
+        NodeControllerBase::platform_id_t const platform_id,
         NodeControllerBase::device_id_t const device_id ) const SIXTRL_NOEXCEPT
     {
         return this->doFindAvailableNodesIndex( platform_id, device_id );
     }
-        
+
     NodeControllerBase::node_index_t NodeControllerBase::nodeIndex(
-        NodeControllerBase::node_info_base_t const* SIXTRL_RESTRICT 
+        NodeControllerBase::node_info_base_t const* SIXTRL_RESTRICT
             ptr_node_info ) const SIXTRL_NOEXCEPT
     {
-        NodeControllerBase::node_id_t const* ptr_node_id = 
+        NodeControllerBase::node_id_t const* ptr_node_id =
             ( ptr_node_info != nullptr ) ? &ptr_node_info->nodeId() : nullptr;
-            
-        return ( ptr_node_id != nullptr ) 
-            ? this->doFindAvailableNodesIndex( 
+
+        return ( ptr_node_id != nullptr )
+            ? this->doFindAvailableNodesIndex(
                 ptr_node_id->platformId(), ptr_node_id->deviceId() )
             : st::NODE_UNDEFINED_INDEX;
     }
-            
+
     NodeControllerBase::node_index_t NodeControllerBase::nodeIndex(
         char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT
     {
         return this->doFindAvailableNodesIndex( node_id_str );
     }
-        
-    NodeControllerBase::node_index_t NodeControllerBase::nodeIndex( std::string 
+
+    NodeControllerBase::node_index_t NodeControllerBase::nodeIndex( std::string
         const& SIXTRL_RESTRICT_REF node_id_str ) const SIXTRL_NOEXCEPT
     {
         return this->doFindAvailableNodesIndex( node_id_str.c_str() );
     }
-            
+
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     NodeControllerBase::node_id_t const* NodeControllerBase::ptrNodeId(
@@ -556,28 +556,28 @@ namespace SIXTRL_CXX_NAMESPACE
             ? this->m_selected_node_id_str.data() : nullptr;
     }
 
-    bool NodeControllerBase::selectedNodeIdStr(
+    NodeControllerBase::status_t NodeControllerBase::selectedNodeIdStr(
         char* SIXTRL_RESTRICT node_id_str, NodeControllerBase::size_type
             const max_str_length ) const SIXTRL_NOEXCEPT
     {
-        bool success = false;
+        NodeControllerBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         using size_t = NodeControllerBase::size_type;
 
         if( this->hasSelectedNode() )
         {
             SIXTRL_ASSERT( this->ptrSelectedNodeId() != nullptr );
-            success = this->ptrSelectedNodeId()->toString(
+            status = this->ptrSelectedNodeId()->toString(
                 node_id_str, max_str_length );
         }
         else if( ( node_id_str != nullptr ) &&
-                    ( max_str_length > size_t{ 0 } ) )
+                 ( max_str_length > size_t{ 0 } ) )
         {
             std::memset( node_id_str, static_cast< int >( '\0' ),
                          max_str_length );
         }
 
-        return success;
+        return status;
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -587,16 +587,16 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_use_autoselect;
     }
 
-    bool NodeControllerBase::selectNode(
+    NodeControllerBase::status_t NodeControllerBase::selectNode(
         NodeControllerBase::node_index_t const new_selected_node_index )
     {
-        bool success = false;
+        NodeControllerBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         using node_index_t = NodeControllerBase::node_index_t;
 
         if( !this->hasSelectedNode() )
         {
-            success = this->doSelectNode( new_selected_node_index );
+            status = this->doSelectNode( new_selected_node_index );
         }
         else if( this->canChangeSelectedNode() )
         {
@@ -606,21 +606,21 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ASSERT( current_selected_node_index !=
                            NodeControllerBase::UNDEFINED_INDEX );
 
-            success = this->doChangeSelectedNode(
+            status = this->doChangeSelectedNode(
                 current_selected_node_index, new_selected_node_index );
         }
 
-        return success;
+        return status;
     }
 
-    bool NodeControllerBase::selectNode(
+    NodeControllerBase::status_t NodeControllerBase::selectNode(
         NodeControllerBase::node_id_t const& node_id )
     {
         return this->selectNode( this->doFindAvailableNodesIndex(
             node_id.platformId(), node_id.deviceId() ) );
     }
 
-    bool NodeControllerBase::selectNode(
+    NodeControllerBase::status_t NodeControllerBase::selectNode(
         NodeControllerBase::platform_id_t const platform_idx,
         NodeControllerBase::device_id_t const device_idx )
     {
@@ -628,13 +628,15 @@ namespace SIXTRL_CXX_NAMESPACE
             platform_idx, device_idx ) );
     }
 
-    bool NodeControllerBase::selectNode( char const* node_id_str )
+    NodeControllerBase::status_t NodeControllerBase::selectNode(
+        char const* node_id_str )
     {
         return this->selectNode( this->doFindAvailableNodesIndex(
             node_id_str ) );
     }
 
-    bool NodeControllerBase::selectNode( std::string const& node_id_str )
+    NodeControllerBase::status_t NodeControllerBase::selectNode(
+        std::string const& node_id_str )
     {
         return this->selectNode( this->doFindAvailableNodesIndex(
             node_id_str.c_str() ) );
@@ -654,14 +656,14 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_can_directly_change_selected_node;
     }
 
-    bool NodeControllerBase::changeSelectedNode(
+    NodeControllerBase::status_t NodeControllerBase::changeSelectedNode(
         NodeControllerBase::node_index_t const new_selected_node_index )
     {
         return this->doChangeSelectedNode(
             this->selectedNodeIndex(), new_selected_node_index );
     }
 
-    bool NodeControllerBase::changeSelectedNode(
+    NodeControllerBase::status_t NodeControllerBase::changeSelectedNode(
         NodeControllerBase::node_index_t const current_selected_node_index,
         NodeControllerBase::node_index_t const new_selected_node_index )
     {
@@ -676,37 +678,37 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_can_unselect_node;
     }
 
-    bool NodeControllerBase::unselectNode()
+    NodeControllerBase::status_t NodeControllerBase::unselectNode()
     {
         return this->doUnselectNode( this->selectedNodeIndex() );
     }
 
-    bool NodeControllerBase::unselectNode(
+    NodeControllerBase::status_t NodeControllerBase::unselectNode(
         NodeControllerBase::node_index_t const index )
     {
         bool const is_currently_default_node =
             this->isDefaultNode( index );
 
-        bool success = this->doUnselectNode( index );
+        NodeControllerBase::status_t status = this->doUnselectNode( index );
 
-        if( ( success ) && ( this->usesAutoSelect() ) &&
-            ( !is_currently_default_node ) &&
+        if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+            ( this->usesAutoSelect() ) && ( !is_currently_default_node ) &&
             ( this->hasDefaultNode() ) )
         {
-            success = this->doSelectNode( this->defaultNodeIndex() );
+            status = this->doSelectNode( this->defaultNodeIndex() );
         }
 
-        return success;
+        return status;
     }
 
-    bool NodeControllerBase::unselectNode(
+    NodeControllerBase::status_t NodeControllerBase::unselectNode(
         NodeControllerBase::node_id_t const& node_id )
     {
         return this->unselectNode( this->doFindAvailableNodesIndex(
             node_id.platformId(), node_id.deviceId() ) );
     }
 
-    bool NodeControllerBase::unselectNode(
+    NodeControllerBase::status_t NodeControllerBase::unselectNode(
         NodeControllerBase::platform_id_t const platform_idx,
         NodeControllerBase::device_id_t const device_idx )
     {
@@ -714,13 +716,15 @@ namespace SIXTRL_CXX_NAMESPACE
             platform_idx, device_idx ) );
     }
 
-    bool NodeControllerBase::unselectNode( char const* node_id_str )
+    NodeControllerBase::status_t NodeControllerBase::unselectNode(
+        char const* node_id_str )
     {
         return this->unselectNode( this->doFindAvailableNodesIndex(
             node_id_str ) );
     }
 
-    bool NodeControllerBase::unselectNode( std::string const& node_id_str )
+    NodeControllerBase::status_t NodeControllerBase::unselectNode(
+        std::string const& node_id_str )
     {
         return this->unselectNode( this->doFindAvailableNodesIndex(
             node_id_str.c_str() ) );
@@ -878,17 +882,17 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    bool NodeControllerBase::doSelectNode(
+    NodeControllerBase::status_t NodeControllerBase::doSelectNode(
         NodeControllerBase::node_index_t const node_index )
     {
         return this->doSelectNodeNodeControllerBaseImpl( node_index );
     }
 
-    bool NodeControllerBase::doChangeSelectedNode(
+    NodeControllerBase::status_t NodeControllerBase::doChangeSelectedNode(
         NodeControllerBase::node_index_t const current_selected_node_index,
         NodeControllerBase::node_index_t const new_selected_node_index )
     {
-        bool success = false;
+        NodeControllerBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( ( this->hasSelectedNode() ) &&
             ( current_selected_node_index != new_selected_node_index ) &&
@@ -900,33 +904,43 @@ namespace SIXTRL_CXX_NAMESPACE
             if( this->canDirectlyChangeSelectedNode() )
             {
                 this->doRemoveNodeFromSelection( current_selected_node_index );
-                success = !this->isSelectedNode( current_selected_node_index );
-                success &= this->doSelectNode( new_selected_node_index );
+
+                if( !this->isSelectedNode( current_selected_node_index ) )
+                {
+                    status = this->doSelectNode( new_selected_node_index );
+                }
             }
             else if( this->canUnselectNode() )
             {
-                success = (
-                    ( this->doUnselectNode( this->selectedNodeIndex() ) ) &&
-                    ( this->doSelectNode( new_selected_node_index ) ) );
+                status = this->doUnselectNode( this->selectedNodeIndex() );
+
+                if( status == st::ARCH_STATUS_SUCCESS )
+                {
+                    status = this->doSelectNode( new_selected_node_index );
+                }
             }
         }
 
-        return success;
+        return status;
     }
 
-    bool NodeControllerBase::doUnselectNode(
+    NodeControllerBase::status_t NodeControllerBase::doUnselectNode(
         NodeControllerBase::node_index_t const selected_node_index )
     {
-        bool success = false;
+        NodeControllerBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( ( this->isSelectedNode( selected_node_index ) ) &&
             ( this->canUnselectNode() ) )
         {
             this->doRemoveNodeFromSelection( selected_node_index );
-            success = !this->isSelectedNode( selected_node_index );
+
+            if( !this->isSelectedNode( selected_node_index ) )
+            {
+                status = st::ARCH_STATUS_SUCCESS;
+            }
         }
 
-        return success;
+        return status;
     }
 
     NodeControllerBase::node_index_t
@@ -1075,17 +1089,17 @@ namespace SIXTRL_CXX_NAMESPACE
             if( new_index != node_id_t::UNDEFINED_INDEX )
             {
                 ptr_node_info_base->setNodeIndex( new_index );
-                
+
                 this->m_available_nodes.push_back(
                     std::move( ptr_node_info_base ) );
-                
-                if( ( this->minAvailableNodeIndex() == 
+
+                if( ( this->minAvailableNodeIndex() ==
                         node_id_t::UNDEFINED_INDEX ) ||
                     ( this->minAvailableNodeIndex() > new_index ) )
                 {
                     this->m_min_available_node_index = new_index;
                 }
-                
+
                 if( ( this->maxAvailableNodeIndex() ==
                       node_id_t::UNDEFINED_INDEX ) ||
                     ( this->maxAvailableNodeIndex() < new_index ) )
@@ -1301,10 +1315,10 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    bool NodeControllerBase::doSelectNodeNodeControllerBaseImpl(
+    NodeControllerBase::status_t NodeControllerBase::doSelectNodeNodeControllerBaseImpl(
         NodeControllerBase::node_index_t const node_index ) SIXTRL_NOEXCEPT
     {
-        bool success = false;
+        NodeControllerBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         using _this_t          = NodeControllerBase;
         using size_t           = _this_t::size_type;
@@ -1335,7 +1349,8 @@ namespace SIXTRL_CXX_NAMESPACE
                     ptr_selected_node_info->ptrNodeId();
 
                 if( ( ptr_selected_node_id != nullptr ) &&
-                    ( ptr_selected_node_id->toString(
+                    ( st::ARCH_STATUS_SUCCESS ==
+                      ptr_selected_node_id->toString(
                         this->m_selected_node_id_str.data(),
                         max_id_str_len ) ) )
                 {
@@ -1347,12 +1362,12 @@ namespace SIXTRL_CXX_NAMESPACE
                                    node_index );
 
                     this->m_ptr_selected_node_id = ptr_selected_node_id;
-                    success = true;
+                    status = st::ARCH_STATUS_SUCCESS;
                 }
             }
         }
 
-        return success;
+        return status;
     }
 }
 

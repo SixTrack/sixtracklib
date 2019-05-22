@@ -113,8 +113,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual ~ArchDebugBase() = default;
 
         SIXTRL_HOST_FN bool isInDebugMode() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN bool enableDebugMode();
-        SIXTRL_HOST_FN bool disableDebugMode();
+        SIXTRL_HOST_FN status_t enableDebugMode();
+        SIXTRL_HOST_FN status_t disableDebugMode();
 
         /* ----------------------------------------------------------------- */
 
@@ -131,7 +131,7 @@ namespace SIXTRL_CXX_NAMESPACE
         static SIXTRL_CONSTEXPR_OR_CONST size_type
             DEBUG_REGISTER_SIZE = sizeof( debug_register_t );
 
-        SIXTRL_HOST_FN virtual bool doSwitchDebugMode(
+        SIXTRL_HOST_FN virtual status_t doSwitchDebugMode(
             bool const is_in_debug_mode );
 
         SIXTRL_HOST_FN virtual status_t doSetDebugRegister(

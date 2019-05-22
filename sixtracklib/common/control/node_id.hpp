@@ -33,6 +33,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using platform_id_t = SIXTRL_CXX_NAMESPACE::node_platform_id_t;
         using device_id_t   = SIXTRL_CXX_NAMESPACE::node_device_id_t;
         using index_t       = SIXTRL_CXX_NAMESPACE::node_index_t;
+        using status_t      = SIXTRL_CXX_NAMESPACE::arch_status_t;
 
         static SIXTRL_CONSTEXPR_OR_CONST platform_id_t ILLEGAL_PLATFORM_ID =
             SIXTRL_CXX_NAMESPACE::NODE_ILLEGAL_PATFORM_ID;
@@ -76,15 +77,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_FN void setIndex( node_index_t const index ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN bool fromString(
+        SIXTRL_FN status_t fromString(
             std::string const& SIXTRL_RESTRICT_REF id_str ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN bool fromString(
+        SIXTRL_FN status_t fromString(
             const char *const SIXTRL_RESTRICT id_str ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN std::string toString() const;
 
-        SIXTRL_FN bool toString( char* SIXTRL_RESTRICT node_id_str,
+        SIXTRL_FN status_t toString( char* SIXTRL_RESTRICT node_id_str,
             size_type const node_id_str_capacity ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN bool operator<(
