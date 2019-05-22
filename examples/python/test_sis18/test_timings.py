@@ -25,9 +25,10 @@ mad.twiss()
 
 sis18 = mad.sequence.FODO
 
+nturns = 1
 elements = pyst.Elements.from_mad(sis18)
 
-def prepare(npart=int(1e2), p0c=p0c, elements=elements, device='cpu'):
+def prepare(npart=int(1e6), p0c=p0c, elements=elements, device='cpu'):
     particles = pyst.Particles.from_ref(npart, p0c=p0c)
     particles.x += np.linspace(0, 1e-6, npart)
 
@@ -47,7 +48,7 @@ class Timer(object):
         self.interval = self.t1 - self.t0
         return False
 
-def timeit(device='cpu:', nturns=nturns, repeat=1):
+def timeit(device='cpu:', nturns=nturns, repeat=10):
     res = 0
     for i in range(repeat):
         job = prepare(device=device)
@@ -58,20 +59,9 @@ def timeit(device='cpu:', nturns=nturns, repeat=1):
     print ('The job took {:.3f} ms for {} turns (mean of {} loops).'.format(
         res * 1e3, nturns, repeat))
 
-nturns = 2
-repeat = 1
 
 print ('CPU:')
-timeit(device='cpu:',nturns,repeat)
+timeit(device='cpu:')
 
 print ('(Trying) OpenCL enabled multi-core CPU:')
-timeit(device="opencl:0.0",nturns,repeat)
-
-print ('(Trying) OpenCL enabled multi-core CPU:')
-timeit(device="opencl:1.0",nturns,repeat)
-
-print ('(Trying) OpenCL enabled multi-core CPU:')
-timeit(device="opencl:2.0",nturns,repeat)
-
-print ('(Trying) OpenCL enabled multi-core CPU:')
-timeit(device="opencl:3.0",nturns,repeat)
+timeit(device="opencl:1.0")

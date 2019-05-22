@@ -31,11 +31,8 @@ pl.plot(job.output.particles[0].x[1::10])
 npart = 10
 particles = pyst.Particles.from_ref(npart, p0c=26e6)
 particles.x += np.linspace(0, 1e-6, npart)
-#job = pyst.TrackJob(elements, particles)
-#job.track(nturns)
-job = pyst.TrackJob(elements, particles, device="opencl:3.0")
+job = pyst.TrackJob(elements, particles)
 job.track(nturns)
-
 
 # Find tunes
 ff = np.linspace(0, 0.5, nturns//2+1)
