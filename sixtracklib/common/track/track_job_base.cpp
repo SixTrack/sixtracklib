@@ -85,39 +85,44 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->doCollect( flags & st::TRACK_JOB_COLLECT_ALL );
     }
 
-    bool TrackJobBaseNew::collectParticles()
+    TrackJobBaseNew::status_t TrackJobBaseNew::collectParticles()
     {
-        return st::TrackJobBaseNew::IsCollectFlagSet(
+        return ( st::TrackJobBaseNew::IsCollectFlagSet(
             this->doCollect( st::TRACK_JOB_COLLECT_PARTICLES ),
-                st::TRACK_JOB_COLLECT_PARTICLES );
+                st::TRACK_JOB_COLLECT_PARTICLES ) )
+            ? st::ARCH_STATUS_SUCCESS : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool TrackJobBaseNew::collectBeamElements()
+    TrackJobBaseNew::status_t TrackJobBaseNew::collectBeamElements()
     {
-        return st::TrackJobBaseNew::IsCollectFlagSet(
+        return ( st::TrackJobBaseNew::IsCollectFlagSet(
             this->doCollect( st::TRACK_JOB_COLLECT_BEAM_ELEMENTS ),
-                st::TRACK_JOB_COLLECT_BEAM_ELEMENTS );
+                st::TRACK_JOB_COLLECT_BEAM_ELEMENTS ) )
+            ? st::ARCH_STATUS_SUCCESS : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool TrackJobBaseNew::collectOutput()
+    TrackJobBaseNew::status_t TrackJobBaseNew::collectOutput()
     {
-        return TrackJobBaseNew::IsCollectFlagSet(
+        return ( TrackJobBaseNew::IsCollectFlagSet(
             this->doCollect( st::TRACK_JOB_COLLECT_OUTPUT ),
-                st::TRACK_JOB_COLLECT_OUTPUT );
+                st::TRACK_JOB_COLLECT_OUTPUT ) )
+            ? st::ARCH_STATUS_SUCCESS : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool TrackJobBaseNew::collectDebugFlag()
+    TrackJobBaseNew::status_t TrackJobBaseNew::collectDebugFlag()
     {
-        return TrackJobBaseNew::IsCollectFlagSet(
+        return ( TrackJobBaseNew::IsCollectFlagSet(
             this->doCollect( st::TRACK_JOB_COLLECT_DEBUG_REGISTER ),
-                st::TRACK_JOB_COLLECT_DEBUG_REGISTER );
+                st::TRACK_JOB_COLLECT_DEBUG_REGISTER ) )
+            ? st::ARCH_STATUS_SUCCESS : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool TrackJobBaseNew::collectParticlesAddresses()
+    TrackJobBaseNew::status_t TrackJobBaseNew::collectParticlesAddresses()
     {
-        return TrackJobBaseNew::IsCollectFlagSet(
+        return ( TrackJobBaseNew::IsCollectFlagSet(
             this->doCollect( st::TRACK_JOB_COLLECT_PARTICLES_ADDR ),
-                st::TRACK_JOB_COLLECT_PARTICLES_ADDR );
+                st::TRACK_JOB_COLLECT_PARTICLES_ADDR ) )
+            ? st::ARCH_STATUS_SUCCESS : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     void TrackJobBaseNew::enableCollectParticles()  SIXTRL_NOEXCEPT
@@ -301,16 +306,12 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBaseNew::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         TrackJobBaseNew::size_type const until_turn_elem_by_elem  )
     {
-        using _this_t = TrackJobBaseNew;
-
         TrackJobBaseNew::c_buffer_t* ptr_out = ( ptr_output_buffer != nullptr )
             ? ptr_output_buffer->getCApiPtr() : nullptr;
 
-        return TrackJobBaseNew::reset( particles_buffer.getCApiPtr(),
-            _this_t::DefaultNumParticleSetIndices(),
-            _this_t::DefaultParticleSetIndicesBegin(),
-            beam_elements_buffer.getCApiPtr(), ptr_out,
-            until_turn_elem_by_elem );
+        bool success = TrackJobBaseNew::reset( particles_buffer.getCApiPtr(),
+            size_t{ 1 }, &pset_index, beam_elements_buffer.getCApiPtr(), 
+                ptr_out, until_turn_elem_by_elem );
     }
 
     bool TrackJobBaseNew::reset(
@@ -2105,22 +2106,23 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         this->m_ptr_particles_buffer = ptr_buffer;
-        return;
     }
 
     void TrackJobBaseNew::doSetPtrBeamElementsBuffer(
         TrackJobBaseNew::buffer_t* SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT
     {
-        if( ( this->m_ptr_particles_buffer   != nullptr ) &&
-            ( this->m_ptr_c_particles_buffer ==
-              this->m_ptr_particles_buffer->getCApiPtr() ) &&
-            ( this->m_ptr_particles_buffer->getCApiPtr() != ptr_buffer ) )
+        if( ptr_buffer != nullptr )
         {
-            this->m_ptr_particles_buffer = nullptr;
+            this->m_ptr_c_beam_elem_buffer = ptr_buffer->getCApiPtr();
         }
-
-        this->m_ptr_c_particles_buffer = ptr_buffer;
-        return;
+        else if( ( this->m_ptr_beam_elem_buffer != nullptr ) &&
+                 ( this->m_ptr_c_beam_elem_buffer ==
+                   this->m_ptr_beam_elem_buffer->getCApiPtr() ) )
+        {
+            this->m_ptr_c_beam_elem_buffer = nullptr;
+        }
+        
+        this->m_ptr_beam_elem_buffer = ptr_buffer;
     }
 
     void TrackJobBaseNew::doSetPtrOutputBuffer(
@@ -2152,7 +2154,6 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         this->m_ptr_c_particles_buffer = ptr_buffer;
-        return;
     }
 
     void TrackJobBaseNew::doSetPtrCBeamElementsBuffer(
@@ -2168,7 +2169,6 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         this->m_ptr_c_beam_elem_buffer = ptr_buffer;
-        return;
     }
 
     void TrackJobBaseNew::doSetPtrCOutputBuffer( TrackJobBaseNew::c_buffer_t*
@@ -2183,7 +2183,6 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         this->m_ptr_c_output_buffer = ptr_buffer;
-        return;
     }
 
     void TrackJobBaseNew::doSetBeamMonitorOutputBufferOffset(

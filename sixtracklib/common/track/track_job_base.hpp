@@ -88,11 +88,11 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN collect_flag_t collect();
         SIXTRL_HOST_FN collect_flag_t collect( collect_flag_t const flags );
 
-        SIXTRL_HOST_FN bool collectParticles();
-        SIXTRL_HOST_FN bool collectBeamElements();
-        SIXTRL_HOST_FN bool collectOutput();
-        SIXTRL_HOST_FN bool collectDebugFlag();
-        SIXTRL_HOST_FN bool collectParticlesAddresses();
+        SIXTRL_HOST_FN status_t collectParticles();
+        SIXTRL_HOST_FN status_t collectBeamElements();
+        SIXTRL_HOST_FN status_t collectOutput();
+        SIXTRL_HOST_FN status_t collectDebugFlag();
+        SIXTRL_HOST_FN status_t collectParticlesAddresses();
 
         SIXTRL_HOST_FN void enableCollectParticles()  SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN void disableCollectParticles() SIXTRL_NOEXCEPT;
@@ -140,13 +140,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN bool reset(
+        SIXTRL_HOST_FN status_t reset(
             buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
             buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
             buffer_t* SIXTRL_RESTRICT ptr_output_buffer   = nullptr,
             size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
-        SIXTRL_HOST_FN bool reset(
+        SIXTRL_HOST_FN status_t reset(
             buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
             size_type const particle_set_index,
             buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
@@ -154,7 +154,7 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
         template< typename ParSetIndexIter  >
-        SIXTRL_HOST_FN bool reset(
+        SIXTRL_HOST_FN status_t reset(
             buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
             ParSetIndexIter  particle_set_indices_begin,
             ParSetIndexIter  particle_set_indices_end,
@@ -162,20 +162,20 @@ namespace SIXTRL_CXX_NAMESPACE
             buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
             size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
-        SIXTRL_HOST_FN bool reset(
+        SIXTRL_HOST_FN status_t reset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
             size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
-        SIXTRL_HOST_FN bool reset(
+        SIXTRL_HOST_FN status_t reset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             size_type const particle_set_index,
             c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
             size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
-        SIXTRL_HOST_FN bool reset(
+        SIXTRL_HOST_FN status_t reset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             size_type const num_particle_sets,
             size_type const* SIXTRL_RESTRICT particle_set_indices_begin,
@@ -184,7 +184,7 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
         template< typename ParSetIndexIter  >
-        SIXTRL_HOST_FN bool reset(
+        SIXTRL_HOST_FN status_t reset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             ParSetIndexIter  particle_set_indices_begin,
             ParSetIndexIter  particle_set_indices_end,
@@ -192,13 +192,13 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
             size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
-        SIXTRL_HOST_FN bool selectParticleSet(
+        SIXTRL_HOST_FN status_t selectParticleSet(
             size_type const particle_set_index );
 
-        SIXTRL_HOST_FN bool assignOutputBuffer(
+        SIXTRL_HOST_FN status_t assignOutputBuffer(
             buffer_t& SIXTRL_RESTRICT_REF output_buffer );
 
-        SIXTRL_HOST_FN bool assignOutputBuffer(
+        SIXTRL_HOST_FN status_t assignOutputBuffer(
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer );
 
         /* ----------------------------------------------------------------- */
@@ -407,17 +407,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN virtual bool doPrepareParticlesStructures(
+        SIXTRL_HOST_FN virtual status_t doPrepareParticlesStructures(
             c_buffer_t* SIXTRL_RESTRICT ptr_particles_buffer );
 
         SIXTRL_HOST_FN virtual void doClearParticlesStructures();
 
-        SIXTRL_HOST_FN virtual bool doPrepareBeamElementsStructures(
+        SIXTRL_HOST_FN virtual status_t doPrepareBeamElementsStructures(
             c_buffer_t* SIXTRL_RESTRICT ptr_beam_elem_buffer );
 
         SIXTRL_HOST_FN virtual void doClearBeamElementsStructures();
 
-        SIXTRL_HOST_FN virtual bool doPrepareOutputStructures(
+        SIXTRL_HOST_FN virtual status_t doPrepareOutputStructures(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
@@ -425,13 +425,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual void doClearOutputStructures();
 
-        SIXTRL_HOST_FN virtual bool doAssignOutputBufferToBeamMonitors(
+        SIXTRL_HOST_FN virtual status_t doAssignOutputBufferToBeamMonitors(
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT output_buffer,
             particle_index_t const min_turn_id,
             size_type const output_buffer_offset_index );
 
-        SIXTRL_HOST_FN virtual bool doAssignOutputBufferToElemByElemConfig(
+        SIXTRL_HOST_FN virtual status_t doAssignOutputBufferToElemByElemConfig(
             elem_by_elem_config_t* SIXTRL_RESTRICT elem_by_elem_config,
             c_buffer_t* SIXTRL_RESTRICT output_buffer,
             size_type const output_buffer_offset_index );
@@ -446,13 +446,13 @@ namespace SIXTRL_CXX_NAMESPACE
             const c_buffer_t *const SIXTRL_RESTRICT output_buffer,
             size_type const until_turn_elem_by_elem );
 
-        SIXTRL_HOST_FN virtual bool doReset(
+        SIXTRL_HOST_FN virtual status_t doReset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
             size_type const until_turn_elem_by_elem );
 
-        SIXTRL_HOST_FN virtual bool doAssignNewOutputBuffer(
+        SIXTRL_HOST_FN virtual status_t doAssignNewOutputBuffer(
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer );
 
         /* ----------------------------------------------------------------- */
@@ -510,7 +510,7 @@ namespace SIXTRL_CXX_NAMESPACE
         /* ----------------------------------------------------------------- */
 
         template< typename Iter >
-        SIXTRL_HOST_FN bool doSetParticleSetIndices( Iter begin, Iter end,
+        SIXTRL_HOST_FN status_t doSetParticleSetIndices( Iter begin, Iter end,
             const c_buffer_t *const SIXTRL_RESTRICT pbuffer );
 
         SIXTRL_HOST_FN void doInitDefaultParticleSetIndices();
@@ -849,7 +849,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename ParSetIndexIter  >
-    SIXTRL_HOST_FN bool TrackJobBaseNew::reset(
+    SIXTRL_HOST_FN TrackJobBaseNew::status_t TrackJobBaseNew::reset(
         TrackJobBaseNew::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
         ParSetIndexIter  particle_set_indices_begin,
         ParSetIndexIter  particle_set_indices_end,
@@ -881,7 +881,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename ParSetIndexIter  >
-    SIXTRL_HOST_FN bool TrackJobBaseNew::reset(
+    SIXTRL_HOST_FN TrackJobBaseNew::status_t TrackJobBaseNew::reset(
         TrackJobBaseNew::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         ParSetIndexIter  particle_set_indices_begin,
         ParSetIndexIter  particle_set_indices_end,

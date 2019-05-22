@@ -83,16 +83,19 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_job_collect_flag_t)
 NS(TrackJobNew_collect_detailed)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     NS(track_job_collect_flag_t) const flags );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_collect_particles)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+NS(TrackJobNew_collect_particles)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_collect_beam_elements)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+NS(TrackJobNew_collect_beam_elements)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_collect_output)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(TrackJobNew_collect_output)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_collect_debug_flag)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+NS(TrackJobNew_collect_debug_flag)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobNew_enable_collect_particles)(
@@ -138,27 +141,29 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool requiresCollect(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobNew_clear)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_reset)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(TrackJobNew_reset)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_reset_particle_set)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+NS(TrackJobNew_reset_particle_set)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(buffer_size_t) const particle_set_index,
     NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_reset_with_output)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+NS(TrackJobNew_reset_with_output)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const dump_elem_by_elem_turns );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_reset_detailed)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(TrackJobNew_reset_detailed)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(buffer_size_t) const num_particle_sets,
@@ -167,11 +172,13 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_reset_detailed)(
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const dump_elem_by_elem_turns );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_select_particle_set)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+NS(TrackJobNew_select_particle_set)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     NS(buffer_size_t) const particle_set_index );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_assign_output_buffer)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+NS(TrackJobNew_assign_output_buffer)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     NS(Buffer)* SIXTRL_RESTRICT ptr_output_buffer );
 
