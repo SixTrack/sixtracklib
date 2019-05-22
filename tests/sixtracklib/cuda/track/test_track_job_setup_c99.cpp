@@ -1,4 +1,4 @@
-#include "sixtracklib/cuda/track_job.hpp"
+#include "sixtracklib/cuda/track_job.hp"
 
 #include <iomanip>
 #include <cstddef>
@@ -15,8 +15,10 @@
 #include "sixtracklib/testlib.hpp"
 
 #include "sixtracklib/common/definitions.h"
-#include "sixtracklib/common/particles.hpp"
-#include "sixtracklib/common/be_monitor/be_monitor.hpp"
+#include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/be_monitor/be_monitor.h"
+#include "sixtracklib/common/output/elem_by_elem_config.h"
+#include "sixtracklib/common/output/output_buffer.h"
 
 TEST( CXX_CudaTrackJobSetupTests, CreateTrackJobNoOutput )
 {
