@@ -8,20 +8,109 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS )
 
     # ==========================================================================
-    # test_track_job_cuda_setup_cxx:
+    # test_track_job_setup_cuda_cxx:
 
-    add_executable( test_track_job_cuda_setup_cxx test_track_job_setup_cxx.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_cuda_setup_cxx )
-    target_link_libraries( test_track_job_cuda_setup_cxx ${SIXTRL_TEST_LIBS} )
-    add_test( CXX_CudaTrackJobTests test_track_job_cuda_setup_cxx )
+    add_executable( test_track_job_setup_cuda_cxx test_track_job_setup_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_setup_cuda_cxx )
+    target_link_libraries( test_track_job_setup_cuda_cxx ${SIXTRL_TEST_LIBS} )
+    add_test( CXX_CudaTrackJobSetupTests test_track_job_setup_cuda_cxx )
 
     # --------------------------------------------------------------------------
-    # test_track_job_cuda_setup_c99:
+    # test_track_job_setup_cuda_c99:
 
-    add_executable( test_track_job_cuda_setup_c99 test_track_job_setup_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_cuda_setup_c99 )
-    target_link_libraries( test_track_job_cuda_setup_c99 ${SIXTRL_TEST_LIBS} )
-    add_test( C99_CudaTrackJobTests test_track_job_cuda_setup_c99 )
+    add_executable( test_track_job_setup_cuda_c99 test_track_job_setup_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_setup_cuda_c99 )
+    target_link_libraries( test_track_job_setup_cuda_c99 ${SIXTRL_TEST_LIBS} )
+    add_test( C99_CudaTrackJobSetupTests test_track_job_setup_cuda_c99 )
+
+    # ==========================================================================
+    # test_track_until_cuda_cxx:
+
+    add_executable( test_track_until_cuda_cxx test_track_until_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_until_cuda_cxx )
+    target_link_libraries( test_track_until_cuda_cxx ${SIXTRL_TEST_LIBS} )
+    add_test( CXX_CudaTrackUntilTests test_track_until_cuda_cxx )
+
+    # --------------------------------------------------------------------------
+    # test_track_until_cuda_c99:
+
+#     add_executable( test_track_until_cuda_c99 test_track_until_c99.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_until_cuda_c99 )
+#     target_link_libraries( test_track_until_cuda_c99 ${SIXTRL_TEST_LIBS} )
+#     add_test( C99_CudaTrackUntilTests test_track_until_cuda_c99 )
+
+    # ==========================================================================
+    # test_track_elem_by_elem_cuda_cxx:
+
+#     add_executable(
+#         test_track_elem_by_elem_cuda_cxx test_track_elem_by_elem_cxx.cpp )
+#
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+#          test_track_elem_by_elem_cuda_cxx )
+#
+#     target_link_libraries(
+#         test_track_elem_by_elem_cuda_cxx ${SIXTRL_TEST_LIBS} )
+#
+#     add_test( CXX_CudaTrackElemByElemTests test_track_elem_by_elem_cuda_cxx )
+
+    # --------------------------------------------------------------------------
+    # test_track_elem_by_elem_cuda_c99:
+
+#     add_executable(
+#         test_track_elem_by_elem_cuda_c99 test_track_elem_by_elem_c99.cpp )
+#
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+#          test_track_elem_by_elem_cuda_c99 )
+#
+#     target_link_libraries(
+#         test_track_elem_by_elem_cuda_c99 ${SIXTRL_TEST_LIBS} )
+#
+#     add_test( C99_CudaTrackElemByElemTests test_track_elem_by_elem_cuda_c99 )
+
+    # ==========================================================================
+    # test_track_line_cuda_cxx:
+
+#     add_executable( test_track_line_cuda_cxx test_track_line_cxx.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_line_cuda_cxx )
+#     target_link_libraries( test_track_line_cuda_cxx ${SIXTRL_TEST_LIBS} )
+#     add_test( CXX_CudaTrackLineTests test_track_line_cuda_cxx )
+
+    # --------------------------------------------------------------------------
+    # test_track_line_cuda_c99:
+
+#     add_executable( test_track_line_cuda_c99 test_track_line_c99.cpp )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_line_cuda_c99 )
+#     target_link_libraries( test_track_line_cuda_c99 ${SIXTRL_TEST_LIBS} )
+#     add_test( C99_CudaTrackLineTests test_track_line_cuda_c99 )
+
+    # ==========================================================================
+    # test_fetch_particle_addr_cuda_cxx:
+
+#     add_executable(
+#         test_fetch_particle_addr_cuda_cxx test_fetch_particle_addr_cxx.cpp )
+#
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+#         test_fetch_particle_addr_cuda_cxx )
+#
+#     target_link_libraries(
+#         test_fetch_particle_addr_cuda_cxx ${SIXTRL_TEST_LIBS} )
+#
+#     add_test( CXX_CudaFetchParticleAddrTests test_fetch_particle_addr_cuda_cxx )
+
+    # --------------------------------------------------------------------------
+    # test_fetch_particle_addr_cuda_c99:
+
+#     add_executable(
+#         test_fetch_particle_addr_cuda_c99 test_fetch_particle_addr_c99.cpp )
+#
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+#         test_fetch_particle_addr_cuda_c99 )
+#
+#     target_link_libraries(
+#         test_fetch_particle_addr_cuda_c99 ${SIXTRL_TEST_LIBS} )
+#
+#     add_test( C99_CudaFetchParticleAddrTests test_fetch_particle_addr_cuda_c99 )
+
 
 endif()
 
