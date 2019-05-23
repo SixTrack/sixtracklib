@@ -3,10 +3,14 @@
 
 set( SIXTRL_TESTLIB_COMMON_TRACK_C99_HEADERS
      track_job_setup.h
+     track_particles_cpu.h
+     track_particles_ctrl_arg.h
 )
 
 set( SIXTRL_TESTLIB_COMMON_TRACK_C99_SOURCES
      track_job_setup.c
+     track_particles_cpu.c
+     track_particles_ctrl_arg.c
 )
 
 add_library( sixtrack_test_common_track_c99 OBJECT

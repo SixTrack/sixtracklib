@@ -11,7 +11,11 @@
 #include "sixtracklib/testlib/common/time.h"
 #include "sixtracklib/testlib/common/particles/particles.h"
 #include "sixtracklib/testlib/common/particles/particles_addr.h"
+
 #include "sixtracklib/testlib/common/track/track_job_setup.h"
+#include "sixtracklib/testlib/common/track/track_particles_cpu.h"
+#include "sixtracklib/testlib/common/track/track_particles_ctrl_arg.h"
+
 #include "sixtracklib/testlib/common/buffer.h"
 #include "sixtracklib/testlib/common/beam_elements.h"
 #include "sixtracklib/testlib/common/path.h"
