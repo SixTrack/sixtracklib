@@ -328,8 +328,8 @@ bool NS(TestTrackJob_setup_beam_monitors_and_elem_by_elem)(
               NS(TrackJobNew_get_elem_by_elem_output_buffer_offset)( job ) ) &&
             ( ( ( ptrdiff_t )0 ) < ( ( ( intptr_t )be_mon_idx_end ) -
                 ( intptr_t )be_mon_idx_it ) ) &&
-            ( ( buf_size_t )( ( ( uintptr_t )be_mon_idx_end ) -
-                ( uintptr_t )be_mon_idx_end ) == num_beam_monitors ) );
+            ( ( buf_size_t )( be_mon_idx_end - be_mon_idx_it ) ==
+                num_beam_monitors ) );
 
         if( success )
         {
