@@ -1,5 +1,15 @@
 # tests/sixtracklib/opencl/CMakeLists.txt
 
+# ==============================================================================
+# Handle special case if OpenCL headers have been downloaded by cmake: 
+
+if( SIXTRACKL_ENABLE_OPENCL AND CONTRIBUTED_CXX_HEADER AND EXT_OCLCXX_DIR AND 
+    EXISTS ${CONTRIBUTED_CXX_HEADER} )
+    
+    include_directories( ${EXT_OCLCXX_DIR} )
+    
+endif()
+
 if( GTEST_FOUND )
 
     set(   C99_UNIT_TEST_TARGETS )

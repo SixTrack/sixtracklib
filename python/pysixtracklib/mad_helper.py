@@ -18,10 +18,12 @@ def dispatch(el, classes):
 
     key = el.base_type.name
     if key == 'multipole':
+        knl= el.knl if hasattr(el,'knl') else [0]
+        ksl= el.ksl if hasattr(el,'ksl') else [0]
         el = Multipole(
-            knl=el.knl,
-            ksl=el.ksl,
-            hxl=el.knl[0],
+            knl=knl,
+            ksl=ksl,
+            hxl=knl[0],
             hyl=0,
             length=el.lrad)
     elif key in ['marker', 'hmonitor', 'vmonitor', 'instrument',

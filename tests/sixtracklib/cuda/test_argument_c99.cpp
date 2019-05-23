@@ -64,8 +64,19 @@ TEST( C99_CudaArgumentTests, ArgumentCObjectBufferTest )
     ASSERT_TRUE( ::NS(Particles_compare_values)(
         particles, cmp_particles ) == 0 );
 
+    ::NS(ParticlesGenericAddr) particles_addr;
+    ::NS(ParticlesAddr_preset)( &particles_addr );
+    
+    argument_t* raw_argument = ::NS(CudaArgument_new)( context );
+    ASSERT_TRUE( raw_argument != nullptr );
+    
+    success = ::NS(CudaArgument_send_memory)( raw_argument, &particles_addr, sizeof( particles_addr ) );
+    ASSERT_TRUE( success == ::NS(CONTEXT_STATUS_SUCCESS) );
+
     ::NS(CudaArgument_delete)( particles_arg );
-    ::NS(CudaController_delete)( controller );
+    ::NS(CudaArgument_delete)( raw_argument );
+    ::NS(CudaContext_delete)( context );
+    
     ::NS(Buffer_delete)( pb );
     ::NS(Buffer_delete)( cmp_pb );
 
