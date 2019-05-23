@@ -57,85 +57,96 @@ NS(CudaTrackJob_new_detailed)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaTrackJob_has_controller)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_controller_t& cudaController();
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_controller_t const& cudaController() const;
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController)* 
+NS(CudaTrackJob_get_ptr_controller)(
+    NS(CudaTrackJob)* SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_controller_t* ptrCudaController() SIXTRL_NOEXCEPT;
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController) const* 
+NS(CudaTrackJob_get_ptr_const_controller)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
+    
 
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_controller_t const*
-ptrCudaController() const SIXTRL_NOEXCEPT;
+/* ------------------------------------------------------------------------- */
 
-/* ----------------------------------------------------------------- */
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaTrackJob_has_particles_arg)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
+    
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
+NS(CudaTrackJob_get_ptr_particles_arg)(
+    NS(CudaTrackJob)* SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool hasCudaParticlesArg() const SIXTRL_NOEXCEPT;
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t& cudaParticlesArg();
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t const& cudaParticlesArg() const;
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument) const*
+NS(CudaTrackJob_get_ptr_const_particles_arg)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t*
-ptrCudaParticlesArg() SIXTRL_NOEXCEPT;
+/* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t const*
-ptrCudaParticlesArg() const SIXTRL_NOEXCEPT;
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaTrackJob_has_beam_elements_arg)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
+    
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
+NS(CudaTrackJob_get_ptr_beam_elements_arg)(
+    NS(CudaTrackJob)* SIXTRL_RESTRICT track_job );
 
-/* ----------------------------------------------------------------- */
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument) const*
+NS(CudaTrackJob_get_ptr_const_beam_elements_arg)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool hasCudaBeamElementsArg() const SIXTRL_NOEXCEPT;
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t& cudaBeamElementsArg();
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t const& cudaBeamElementsArg() const;
+/* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t const*
-ptrCudaBeamElementsArg() const SIXTRL_NOEXCEPT;
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaTrackJob_has_output_arg)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
+    
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
+NS(CudaTrackJob_get_ptr_output_arg)(
+    NS(CudaTrackJob)* SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t*
-ptrCudaBeamElementsArg() SIXTRL_NOEXCEPT;
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument) const*
+NS(CudaTrackJob_get_ptr_const_output_arg)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
 
-/* ----------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool hasCudaOutputArg() const SIXTRL_NOEXCEPT;
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t& cudaOutputArg();
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t const& cudaOutputArg() const;
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaTrackJob_has_elem_by_elem_config_arg)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
+    
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
+NS(CudaTrackJob_get_ptr_elem_by_elem_config_arg)(
+    NS(CudaTrackJob)* SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t* ptrCudaOutputArg() SIXTRL_NOEXCEPT;
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t const*
-ptrCudaOutputArg() const SIXTRL_NOEXCEPT;
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument) const*
+NS(CudaTrackJob_get_ptr_const_elem_by_elem_config_arg)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
 
-/* ----------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool hasCudaElemByElemConfigArg() const SIXTRL_NOEXCEPT;
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t& cudaElemByElemConfigArg();
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t const& cudaElemByElemConfigArg() const;
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaTrackJob_has_debug_register_arg)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
+    
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
+NS(CudaTrackJob_get_ptr_debug_register_arg)(
+    NS(CudaTrackJob)* SIXTRL_RESTRICT track_job );
+    
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument) const*
+NS(CudaTrackJob_get_ptr_const_debug_register_arg)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t const*
-ptrCudaElemByElemConfigArg() const SIXTRL_NOEXCEPT;
+/* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t*
-ptrCudaElemByElemConfigArg() SIXTRL_NOEXCEPT;
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaTrackJob_has_particles_addr_arg)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
+    
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
+NS(CudaTrackJob_get_ptr_particles_addr_arg)(
+    NS(CudaTrackJob)* SIXTRL_RESTRICT track_job );
 
-/* ----------------------------------------------------------------- */
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument) const*
+NS(CudaTrackJob_get_ptr_const_particles_addr_arg)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool hasCudaDebugRegisterArg() const SIXTRL_NOEXCEPT;
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t& cudaDebugRegisterArg();
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t const& cudaDebugRegisterArg() const;
-
-SIXTRL_EXTERN SIXTRL_HOST_FN cuda_argument_t const*
-ptrCudaDebugRegisterArg() const SIXTRL_NOEXCEPT;
-
-SIXTRL_HOST_FN cuda_argument_t*
-ptrCudaDebugRegisterArg() SIXTRL_NOEXCEPT;
-
-/* ----------------------------------------------------------------- */
-
-SIXTRL_HOST_FN bool hasCudaParticlesAddrArg() const SIXTRL_NOEXCEPT;
-SIXTRL_HOST_FN cuda_argument_t const& cudaParticlesAddrArg() const;
-SIXTRL_HOST_FN cuda_argument_t& cudaParticlesAddrArg();
-
-SIXTRL_HOST_FN cuda_argument_t const*
-ptrCudaParticlesAddrArg() const SIXTRL_NOEXCEPT;
-
-SIXTRL_HOST_FN cuda_argument_t*
-ptrCudaParticlesAddrArg() SIXTRL_NOEXCEPT;
-
+/* ------------------------------------------------------------------------- */
 
 #endif /* !defined( _GPUCODE ) */
 

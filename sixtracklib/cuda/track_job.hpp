@@ -90,7 +90,67 @@ namespace SIXTRL_CXX_NAMESPACE
             buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
             size_type const until_turn_elem_by_elem  = size_type{ 0 },
             std::string const& config_str = std::string{} );
+        
+        SIXTRL_HOST_FN CudaTrackJob(
+            std::string const& SIXTRL_RESTRICT_REF node_id_str,
+            buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+            size_type const particle_set_index,
+            buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
+            buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
+            size_type const until_turn_elem_by_elem  = size_type{ 0 },
+            std::string const& config_str = std::string{} );
 
+        SIXTRL_HOST_FN CudaTrackJob(
+            char const* SIXTRL_RESTRICT node_id_str,
+            c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+            size_type const particle_set_index,
+            c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
+            c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
+            size_type const until_turn_elem_by_elem  = size_type{ 0 },
+            char const* SIXTRL_RESTRICT config_str = nullptr );
+        
+        SIXTRL_HOST_FN CudaTrackJob(
+            std::string const& SIXTRL_RESTRICT_REF node_id_str,
+            buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+            size_type const num_particle_sets,
+            size_type const* SIXTRL_RESTRICT particle_set_indices_begin,
+            buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
+            buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
+            size_type const until_turn_elem_by_elem  = size_type{ 0 },
+            std::string const& config_str = std::string{} );
+
+        SIXTRL_HOST_FN CudaTrackJob(
+            char const* SIXTRL_RESTRICT node_id_str,
+            c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+            size_type const num_particle_sets,
+            size_type const* SIXTRL_RESTRICT particle_set_indices_begin,
+            c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
+            c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
+            size_type const until_turn_elem_by_elem  = size_type{ 0 },
+            char const* SIXTRL_RESTRICT config_str = nullptr );
+        
+        template< typename PartSetIndexIter >
+        SIXTRL_HOST_FN CudaTrackJob(
+            std::string const& SIXTRL_RESTRICT_REF node_id_str,
+            buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+            PartSetIndexIter particle_set_indices_begin,
+            PartSetIndexIter particle_set_indices_end,
+            buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
+            buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
+            size_type const until_turn_elem_by_elem  = size_type{ 0 },
+            std::string const& config_str = std::string{} );
+
+        template< typename PartSetIndexIter >
+        SIXTRL_HOST_FN CudaTrackJob(
+            char const* SIXTRL_RESTRICT node_id_str,
+            c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+            PartSetIndexIter particle_set_indices_begin,
+            PartSetIndexIter particle_set_indices_end,
+            c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
+            c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
+            size_type const until_turn_elem_by_elem  = size_type{ 0 },
+            char const* SIXTRL_RESTRICT config_str = nullptr );
+        
         SIXTRL_HOST_FN CudaTrackJob( CudaTrackJob const& other ) = default;
         SIXTRL_HOST_FN CudaTrackJob( CudaTrackJob&& other ) = default;
 
@@ -418,6 +478,49 @@ typedef void NS(CudaTrackJob);
 
 namespace SIXTRL_CXX_NAMESPACE
 {
+    template< typename PartSetIndexIter >
+    CudaTrackJob::CudaTrackJob(
+        std::string const& SIXTRL_RESTRICT_REF node_id_str,
+        CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+        PartSetIndexIter pset_indices_begin, PartSetIndexIter pset_indices_end,
+        CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF belems_buffer,
+        CudaTrackJob::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        CudaTrackJob::size_type const until_turn_elem_by_elem,
+        std::string const& config_str ) : 
+        SIXTRL_CXX_NAMESPACE::TrackJobNodeCtrlArgBase( 
+                SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA,
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() )
+    {
+        CudaTrackJob::status_t const status = this->doInitCudaTrackJob(
+            config_str, particles_buffer, pset_indices_begin, pset_indices_end, 
+                belems_buffer, ptr_output_buffer, until_turn_elem_by_elem );
+        
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+    }
+
+    template< typename PartSetIndexIter >
+    CudaTrackJob::CudaTrackJob(
+        char const* SIXTRL_RESTRICT node_id_str,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+        PartSetIndexIter pset_indices_begin, PartSetIndexIter pset_indices_end,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems_buffer,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        CudaTrackJob::size_type const until_turn_elem_by_elem,
+        char const* SIXTRL_RESTRICT config_str ) : 
+        SIXTRL_CXX_NAMESPACE::TrackJobNodeCtrlArgBase( 
+            SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA,
+            SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
+    {
+        CudaTrackJob::status_t const status = this->doInitCudaTrackJob(
+            config_str, particles_buffer, pset_indices_begin, pset_indices_end, 
+                belems_buffer, ptr_output_buffer, until_turn_elem_by_elem );
+        
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+    }
+    
+    
     template< typename PartSetIndexIter >
     CudaTrackJob::status_t CudaTrackJob::doInitCudaTrackJob(
         std::string const& SIXTRL_RESTRICT_REF config_str,

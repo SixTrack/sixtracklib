@@ -67,7 +67,7 @@ namespace SIXTRL_CXX_NAMESPACE
             status = this->doPrepareDefaultKernelsCudaImpl( config_str.c_str() );
         }
     }
-
+    
     CudaTrackJob::CudaTrackJob(
         const char *const SIXTRL_RESTRICT node_id_str,
         c_buffer_t* SIXTRL_RESTRICT particles_buffer,
@@ -114,6 +114,115 @@ namespace SIXTRL_CXX_NAMESPACE
                 this->doSetPtrOutputBuffer( ptr_output_buffer );
             }
         }
+    }
+    
+    CudaTrackJob::CudaTrackJob(
+        std::string const& SIXTRL_RESTRICT_REF node_id_str,
+        CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+        CudaTrackJob::size_type const particle_set_index,
+        CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF belems_buffer,
+        CudaTrackJob::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        CudaTrackJob::size_type const until_turn_elem_by_elem,
+        std::string const& config_str ) :
+            st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() )
+    {
+        CudaTrackJob::size_type const* psets_begin = &particle_set_index;
+        CudaTrackJob::size_type const* psets_end = psets_begin;
+        std::advance( psets_end, CudaTrackJob::size_type{ 1 } );
+        
+        CudaTrackJob::status_t const status = this->doInitCudaTrackJob(
+            config_str, particles_buffer, psets_begin, psets_end, belems_buffer, 
+                ptr_output_buffer, until_turn_elem_by_elem );
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            this->doSetPtrParticlesBuffer( &particles_buffer );
+            this->doSetPtrBeamElementsBuffer( &belems_buffer );
+
+            if( ( ptr_output_buffer != nullptr ) &&
+                ( this->hasOutputBuffer() ) && ( !this->ownsOutputBuffer() ) )
+            {
+                this->doSetPtrOutputBuffer( ptr_output_buffer );
+            }
+        }
+    }
+
+    CudaTrackJob::CudaTrackJob(
+        char const* SIXTRL_RESTRICT node_id_str,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+        CudaTrackJob::size_type const particle_set_index,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems_buffer,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        CudaTrackJob::size_type const until_turn_elem_by_elem,
+        char const* SIXTRL_RESTRICT config_str ) :
+            st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
+    {
+        CudaTrackJob::size_type const* psets_begin = &particle_set_index;
+        CudaTrackJob::size_type const* psets_end = psets_begin;
+        std::advance( psets_end, CudaTrackJob::size_type{ 1 } );
+        
+        CudaTrackJob::status_t const status = this->doInitCudaTrackJob(
+            config_str, particles_buffer, psets_begin, psets_end, belems_buffer, 
+                ptr_output_buffer, until_turn_elem_by_elem );
+        
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+    }
+    
+    CudaTrackJob::CudaTrackJob(
+        std::string const& SIXTRL_RESTRICT_REF node_id_str,
+        CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+        CudaTrackJob::size_type const num_particle_sets,
+        CudaTrackJob::size_type const* SIXTRL_RESTRICT pset_indices_begin,
+        CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF belems_buffer,
+        CudaTrackJob::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        CudaTrackJob::size_type const until_turn_elem_by_elem,
+        std::string const& config_str ) :
+            st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() )
+    {
+        CudaTrackJob::size_type const* pset_indices_end = pset_indices_begin;
+        
+        if( pset_indices_end != nullptr )
+        {
+            std::advance( pset_indices_end, num_particle_sets );
+        }
+        
+        CudaTrackJob::status_t const status = this->doInitCudaTrackJob(
+            config_str, particles_buffer, pset_indices_begin, pset_indices_end, 
+                belems_buffer, ptr_output_buffer, until_turn_elem_by_elem );
+        
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+    }
+
+    CudaTrackJob::CudaTrackJob(
+        char const* SIXTRL_RESTRICT node_id_str,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+        CudaTrackJob::size_type const num_particle_sets,
+        CudaTrackJob::size_type const* SIXTRL_RESTRICT pset_indices_begin,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems_buffer,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        CudaTrackJob::size_type const until_turn_elem_by_elem,
+        char const* SIXTRL_RESTRICT config_str ) :
+            st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
+    {
+        CudaTrackJob::size_type const* pset_indices_end = pset_indices_begin;
+        
+        if( pset_indices_end != nullptr )
+        {
+            std::advance( pset_indices_end, num_particle_sets );
+        }
+        
+        CudaTrackJob::status_t const status = this->doInitCudaTrackJob(
+            config_str, particles_buffer, pset_indices_begin, pset_indices_end, 
+                belems_buffer, ptr_output_buffer, until_turn_elem_by_elem );
+        
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
     }
 
     CudaTrackJob::~CudaTrackJob()
