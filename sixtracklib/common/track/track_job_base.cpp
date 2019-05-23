@@ -400,6 +400,24 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* --------------------------------------------------------------------- */
+    
+    /* 
+    TrackJobBaseNew::status_t TrackJobBaseNew::selectParticleSets(
+        TrackJobBaseNew::size_type const num_particle_sets, 
+        TrackJobBaseNew::size_type const* 
+            SIXTRL_RESTRICT particle_set_indices_begin )
+    {
+        TrackJobBaseNew::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        
+        if( this->ptrCParticlesBuffer() != nullptr )
+        {
+            
+            
+        }
+        
+        return status;
+    }
+    */
 
     TrackJobBaseNew::status_t TrackJobBaseNew::selectParticleSet(
         TrackJobBaseNew::size_type const particle_set_index )
@@ -479,6 +497,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return status;
     }
+    
+    
+    
+    /* --------------------------------------------------------------------- */
 
     TrackJobBaseNew::status_t TrackJobBaseNew::assignOutputBuffer(
         TrackJobBaseNew::buffer_t& SIXTRL_RESTRICT_REF output_buffer )

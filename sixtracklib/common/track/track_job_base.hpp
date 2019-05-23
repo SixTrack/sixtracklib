@@ -192,9 +192,24 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
             size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
+        /* ----------------------------------------------------------------- */
+        
         SIXTRL_HOST_FN status_t selectParticleSet(
             size_type const particle_set_index );
+        
+        /*
+        SIXTRL_HOST_FN status_t selectParticleSets(
+            size_type const num_particle_sets, 
+            size_type const* SIXTRL_RESTRICT particle_set_indices_begin );
+        
+        template< typename ParSetIndexIter >
+        SIXTRL_HOST_FN status_t selectParticleSets(
+            ParSetIndexIter particle_set_indices_begin, 
+            ParSetIndexIter particle_set_indices_end );
+        */
 
+        /* ----------------------------------------------------------------- */
+        
         SIXTRL_HOST_FN status_t assignOutputBuffer(
             buffer_t& SIXTRL_RESTRICT_REF output_buffer );
 

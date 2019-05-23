@@ -42,7 +42,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBaseNew)* NS(TrackJobNew_new_with_output
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t) const until_turn_elem_by_elem,
     const char *const SIXTRL_RESTRICT config_str );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBaseNew)* NS(TrackJobNew_new_detailed)(
@@ -52,7 +52,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBaseNew)* NS(TrackJobNew_new_detailed)(
     NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,
     NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const dump_elem_by_elem_turns,
+    NS(buffer_size_t) const until_turn_elem_by_elem,
     const char *const SIXTRL_RESTRICT config_str );
 
 /* ------------------------------------------------------------------------- */
@@ -133,7 +133,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobNew_set_collect_flags)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     NS(track_job_collect_flag_t) const flag );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool requiresCollect(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_requires_collecting)(
     const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job );
 
 /* ------------------------------------------------------------------------- */
@@ -161,7 +161,7 @@ NS(TrackJobNew_reset_with_output)(
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const dump_elem_by_elem_turns );
+    NS(buffer_size_t) const until_turn_elem_by_elem );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(TrackJobNew_reset_detailed)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
@@ -170,7 +170,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(TrackJobNew_reset_detailed)(
     NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,
     NS(Buffer)* SIXTRL_RESTRICT beam_elem_buffer,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const dump_elem_by_elem_turns );
+    NS(buffer_size_t) const until_turn_elem_by_elem );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TrackJobNew_select_particle_set)(
