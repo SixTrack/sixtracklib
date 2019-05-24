@@ -34,10 +34,8 @@ void NS(Track_particles_elem_by_elem_until_turn_cuda_wrapper)(
     NS(CudaArgument)* SIXTRL_RESTRICT particles_arg,
     NS(buffer_size_t) const pset_index,
     NS(CudaArgument)* SIXTRL_RESTRICT beam_elements_arg,
-    NS(CudaArgument)* SIXTRL_RESTRICT output_arg,
     NS(CudaArgument)* SIXTRL_RESTRICT elem_by_elem_config_arg,
-    NS(buffer_size_t) const out_buffer_offset_index,
-    NS(buffer_size_t) const until_turn,
+    NS(buffer_size_t) const until_turn_elem_by_elem,
     NS(CudaArgument)* SIXTRL_RESTRICT debug_register_arg );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Track_particles_line_cuda_wrapper)(

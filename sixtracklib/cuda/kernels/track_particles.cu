@@ -133,11 +133,10 @@ __global__ void NS(Track_track_elem_by_elem_until_turn_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer_begin,
     NS(buffer_size_t) const pset_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT be_buffer_begin,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig) *const
         SIXTRL_RESTRICT elem_by_elem_config,
-    NS(buffer_size_t) const out_buffer_offset_index,
-    NS(buffer_size_t) const until_turn, NS(buffer_size_t) const slot_size )
+    NS(buffer_size_t) const until_turn_elem_by_elem,
+    NS(buffer_size_t) const slot_size )
 {
     typedef NS(particle_num_elements_t)    nelements_t;
     typedef SIXTRL_DATAPTR_DEC NS(Particles)* ptr_particles_t;
@@ -162,7 +161,7 @@ __global__ void NS(Track_track_elem_by_elem_until_turn_cuda)(
     {
         NS(Track_particle_element_by_element_until_turn_objs)( particles,
             particle_index, elem_by_elem_config, belem_begin, belem_end,
-                until_turn );
+                until_turn_elem_by_elem );
     }
 }
 
@@ -170,11 +169,9 @@ __global__ void NS(Track_track_elem_by_elem_until_turn_cuda_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer_begin,
     NS(buffer_size_t) const pset_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT be_buffer_begin,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig) *const
         SIXTRL_RESTRICT elem_by_elem_config,
-    NS(buffer_size_t) const out_buffer_offset_index,
-    NS(buffer_size_t) const until_turn,
+    NS(buffer_size_t) const until_turn_elem_by_elem,
     NS(buffer_size_t) const slot_size,
     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register )
 {
@@ -193,12 +190,9 @@ __global__ void NS(Track_track_elem_by_elem_until_turn_cuda_debug)(
     if( ( pbuffer_begin != SIXTRL_NULLPTR ) &&
         ( be_buffer_begin != SIXTRL_NULLPTR ) &&
         ( slot_size > ( NS(buffer_size_t) )0u ) &&
-        ( output_buffer != SIXTRL_NULLPTR ) &&
         ( elem_by_elem_config != SIXTRL_NULLPTR ) &&
         ( NS(ElemByElemConfig_get_output_store_address)(
-            elem_by_elem_config ) > ( e_by_e_out_addr_t )0u ) &&
-        ( out_buffer_offset_index < NS(ManagedBuffer_get_num_objects)(
-            output_buffer, slot_size ) ) )
+            elem_by_elem_config ) > ( e_by_e_out_addr_t )0u ) )
     {
         ptr_particles_t particles = NS(Particles_managed_buffer_get_particles)(
             pbuffer_begin, pset_index, slot_size );
@@ -223,7 +217,7 @@ __global__ void NS(Track_track_elem_by_elem_until_turn_cuda_debug)(
                 track_status =
                 NS(Track_particle_element_by_element_until_turn_objs)(
                     particles, particle_index, elem_by_elem_config,
-                        be_begin, be_end, until_turn );
+                        be_begin, be_end, until_turn_elem_by_elem );
 
                 particle_index += stride;
             }

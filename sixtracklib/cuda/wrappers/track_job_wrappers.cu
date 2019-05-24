@@ -92,10 +92,8 @@ void NS(Track_particles_elem_by_elem_until_turn_cuda_wrapper)(
     NS(CudaArgument)* SIXTRL_RESTRICT particles_arg,
     NS(buffer_size_t) const pset_index,
     NS(CudaArgument)* SIXTRL_RESTRICT beam_elem_arg,
-    NS(CudaArgument)* SIXTRL_RESTRICT output_arg,
     NS(CudaArgument)* SIXTRL_RESTRICT elem_by_elem_config_arg,
-    NS(buffer_size_t) const out_buffer_offset_index,
-    NS(buffer_size_t) const until_turn,
+    NS(buffer_size_t) const until_turn_elem_by_elem,
     NS(CudaArgument)* SIXTRL_RESTRICT dbg_register_arg )
 {
     dim3 const* ptr_blocks = NS(CudaKernelConfig_get_ptr_const_blocks)(
@@ -129,14 +127,6 @@ void NS(Track_particles_elem_by_elem_until_turn_cuda_wrapper)(
         SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
             beam_elem_arg ) != SIXTRL_NULLPTR );
 
-        SIXTRL_ASSERT( output_arg != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Argument_get_arch_id)( output_arg ) ==
-                   NS(ARCHITECTURE_CUDA) );
-
-        SIXTRL_ASSERT( NS(Argument_uses_cobjects_buffer)( output_arg ) );
-        SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
-            output_arg ) != SIXTRL_NULLPTR );
-
         SIXTRL_ASSERT( elem_by_elem_config_arg != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( NS(Argument_get_arch_id)( elem_by_elem_config_arg ) ==
                    NS(ARCHITECTURE_CUDA) );
@@ -152,10 +142,6 @@ void NS(Track_particles_elem_by_elem_until_turn_cuda_wrapper)(
 
         SIXTRL_ASSERT(
             NS(Argument_get_cobjects_buffer_slot_size)( particles_arg ) ==
-            NS(Argument_get_cobjects_buffer_slot_size)( output_arg ) );
-
-        SIXTRL_ASSERT(
-            NS(Argument_get_cobjects_buffer_slot_size)( particles_arg ) ==
             NS(Argument_get_cobjects_buffer_slot_size)( beam_elem_arg ) );
 
         NS(Track_track_elem_by_elem_until_turn_cuda)<<< *ptr_blocks, *ptr_threads >>>(
@@ -163,10 +149,8 @@ void NS(Track_particles_elem_by_elem_until_turn_cuda_wrapper)(
                 particles_arg ), pset_index,
             NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
                 beam_elem_arg ),
-            NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
-                output_arg ),
             NS(CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin)(
-                elem_by_elem_config_arg ), out_buffer_offset_index, until_turn,
+                elem_by_elem_config_arg ), until_turn_elem_by_elem,
             NS(Argument_get_cobjects_buffer_slot_size)( particles_arg ) );
     }
     else if( ( ptr_blocks != SIXTRL_NULLPTR ) &&
@@ -180,10 +164,8 @@ void NS(Track_particles_elem_by_elem_until_turn_cuda_wrapper)(
                 particles_arg ), pset_index,
             NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
                 beam_elem_arg ),
-            NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
-                output_arg ),
             NS(CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin)(
-                elem_by_elem_config_arg ), out_buffer_offset_index, until_turn,
+                elem_by_elem_config_arg ), until_turn_elem_by_elem,
             NS(Argument_get_cobjects_buffer_slot_size)( particles_arg ),
             NS(CudaArgument_get_cuda_arg_buffer_as_debugging_register_begin)(
                 dbg_register_arg ) );
