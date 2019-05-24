@@ -60,7 +60,8 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
     buf_size_t track_pset_index = buf_size_t{ 0 };
     buf_size_t const UNTIL_TURN = buf_size_t{ 5 };
 
-    track_status_t track_status = ::NS(TestTrackCpu_track_particles_until_cpu)(
+    track_status_t track_status =
+    ::NS(TestTrackCpu_track_particles_until_turn_cpu)(
         cmp_track_pb, buf_size_t{ 1 }, &track_pset_index, eb, UNTIL_TURN );
 
     SIXTRL_ASSERT( track_status == ::NS(TRACK_SUCCESS) );
