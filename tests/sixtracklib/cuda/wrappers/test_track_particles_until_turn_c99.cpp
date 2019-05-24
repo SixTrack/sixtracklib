@@ -183,4 +183,4 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
     ::NS(Buffer_delete)( eb );
 }
 
-/* end: tests/sixtracklib/cuda/track/test_track_job_setup_cxx.cpp */
+/*end:tests/sixtracklib/cuda/wrappers/test_track_particles_until_turn_c99.cpp*/
