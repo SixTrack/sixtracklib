@@ -106,45 +106,47 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_debug_mode;
     }
 
-    bool ArchDebugBase::enableDebugMode()
+    ArchDebugBase::status_t ArchDebugBase::enableDebugMode()
     {
-        bool success = false;
+        ArchDebugBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( !this->isInDebugMode() )
         {
-            success = this->doSwitchDebugMode( true );
+            status = this->doSwitchDebugMode( true );
         }
         else
         {
-            success = true;
+            status = st::ARCH_STATUS_SUCCESS;
         }
 
-        return success;
+        return status;
     }
 
-    bool ArchDebugBase::disableDebugMode()
+    ArchDebugBase::status_t ArchDebugBase::disableDebugMode()
     {
-        bool success = false;
+        ArchDebugBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( this->isInDebugMode() )
         {
-            success = this->doSwitchDebugMode( false );
+            status = this->doSwitchDebugMode( false );
         }
         else
         {
-            success = true;
+            status = st::ARCH_STATUS_SUCCESS;
         }
 
-        return success;
+        return status;
     }
 
-    bool ArchDebugBase::doSwitchDebugMode( bool const is_in_debug_mode )
+    ArchDebugBase::status_t
+    ArchDebugBase::doSwitchDebugMode( bool const is_in_debug_mode )
     {
         bool const old_debug_state = this->isInDebugMode();
         this->doSetDebugModeFlag( is_in_debug_mode );
 
         return ( ( is_in_debug_mode == this->isInDebugMode() ) &&
-                 ( is_in_debug_mode != old_debug_state ) );
+                 ( is_in_debug_mode != old_debug_state ) )
+            ? st::ARCH_STATUS_SUCCESS : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     void ArchDebugBase::doSetDebugModeFlag(

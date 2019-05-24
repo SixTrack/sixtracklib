@@ -91,12 +91,12 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(NodeId_set_index)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(NodeId_to_string)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(NodeId_to_string)(
     SIXTRL_ARGPTR_DEC const NS(NodeId) *const SIXTRL_RESTRICT node_id,
     SIXTRL_ARGPTR_DEC char* SIXTRL_RESTRICT node_id_str,
     NS(buffer_size_t) const node_id_str_capacity );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(NodeId_from_string)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(NodeId_from_string)(
     SIXTRL_ARGPTR_DEC NS(NodeId)* SIXTRL_RESTRICT node_id,
     SIXTRL_ARGPTR_DEC const char *const SIXTRL_RESTRICT node_id_str );
 

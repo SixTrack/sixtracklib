@@ -47,29 +47,31 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    bool _this_t::doSelectNodeOnController(
+    _this_t::status_t _this_t::doSelectNodeOnController(
         _this_t::node_index_t const node_index )
     {
         using node_ctrl_t = _this_t::node_controller_base_t;
 
         node_ctrl_t* ptr_node_ctrl = this->ptrNodeControllerBase();
 
-        return ( ( ptr_node_ctrl != nullptr ) &&
-                 ( ptr_node_ctrl->selectNode( node_index ) ) );
+        return ( ptr_node_ctrl != nullptr )
+            ? ptr_node_ctrl->selectNode( node_index )
+            : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool _this_t::doUnselectNodeOnController(
+    _this_t::status_t  _this_t::doUnselectNodeOnController(
         _this_t::node_index_t const selected_node_index )
     {
         using node_ctrl_t = _this_t::node_controller_base_t;
 
         node_ctrl_t* ptr_node_ctrl = this->ptrNodeControllerBase();
 
-        return ( ( ptr_node_ctrl != nullptr ) &&
-                 ( ptr_node_ctrl->unselectNode( selected_node_index ) ) );
+        return ( ptr_node_ctrl != nullptr )
+            ? ptr_node_ctrl->unselectNode( selected_node_index )
+            : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool _this_t::doChangeSelectedNodeOnController(
+    _this_t::status_t  _this_t::doChangeSelectedNodeOnController(
         _this_t::node_index_t const currently_selected_index,
         _this_t::node_index_t const new_selected_node_index )
     {
@@ -77,9 +79,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         node_ctrl_t* ptr_node_ctrl = this->ptrNodeControllerBase();
 
-        return ( ( ptr_node_ctrl != nullptr ) &&
-                 ( ptr_node_ctrl->changeSelectedNode( currently_selected_index,
-                    new_selected_node_index ) ) );
+        return ( ptr_node_ctrl != nullptr )
+            ? ptr_node_ctrl->changeSelectedNode( currently_selected_index,
+                    new_selected_node_index )
+            : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 }
 

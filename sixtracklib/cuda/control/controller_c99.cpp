@@ -17,19 +17,21 @@ NS(CudaController)* NS(CudaController_create)( void )
     return new SIXTRL_CXX_NAMESPACE::CudaController( "" );
 }
 
-bool NS(CudaController_select_node_by_cuda_device_index)(
+::NS(arch_status_t) NS(CudaController_select_node_by_cuda_device_index)(
     NS(CudaController)* SIXTRL_RESTRICT ctrl, int cuda_device_index )
 {
-    return ( ( ctrl != nullptr ) &&
-             ( ctrl->selectNodeByCudaIndex( cuda_device_index ) ) );
+    return ( ctrl != nullptr )
+        ? ctrl->selectNodeByCudaIndex( cuda_device_index )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(CudaController_select_node_by_cuda_pci_bus_id)(
+::NS(arch_status_t) NS(CudaController_select_node_by_cuda_pci_bus_id)(
     NS(CudaController)* SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT cuda_pci_bus_id )
 {
-    return ( ( ctrl != nullptr ) &&
-             ( ctrl->selectNodeByPciBusId( cuda_pci_bus_id ) ) );
+    return ( ctrl != nullptr )
+        ? ctrl->selectNodeByPciBusId( cuda_pci_bus_id )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 void NS(CudaController_delete)( NS(CudaController)* SIXTRL_RESTRICT ctrl )
@@ -47,7 +49,7 @@ void NS(CudaController_delete)( NS(CudaController)* SIXTRL_RESTRICT ctrl )
     return ( ctrl != nullptr ) ? ctrl->ptrNodeInfo( index ) : nullptr;
 }
 
-::NS(CudaNodeInfo) const*  
+::NS(CudaNodeInfo) const*
 NS(CudaController_get_ptr_node_info_by_platform_id_and_device_id)(
      const ::NS(CudaController) *const SIXTRL_RESTRICT ctrl,
      ::NS(node_platform_id_t) const platform_idx,
@@ -75,7 +77,7 @@ NS(CudaController_get_ptr_node_info_by_platform_id_and_device_id)(
 /* ------------------------------------------------------------------------- */
 
 ::NS(ctrl_kernel_id_t) NS(CudaController_add_kernel_config)(
-    ::NS(CudaController)* SIXTRL_RESTRICT ctrl, 
+    ::NS(CudaController)* SIXTRL_RESTRICT ctrl,
     const ::NS(CudaKernelConfig) *const SIXTRL_RESTRICT cuda_kernel_config )
 {
     return ( ( ctrl != nullptr ) && ( cuda_kernel_config != nullptr ) )
@@ -84,7 +86,7 @@ NS(CudaController_get_ptr_node_info_by_platform_id_and_device_id)(
 }
 
 ::NS(ctrl_kernel_id_t) NS(CudaController_add_kernel_config_detailed)(
-    ::NS(CudaController)* SIXTRL_RESTRICT ctrl, 
+    ::NS(CudaController)* SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT kernel_name,
     ::NS(ctrl_size_t) const num_arguments,
     ::NS(ctrl_size_t) const grid_dim,
@@ -92,8 +94,8 @@ NS(CudaController_get_ptr_node_info_by_platform_id_and_device_id)(
     ::NS(ctrl_size_t) const max_blocks_limit,
     char const* SIXTRL_RESTRICT config_str )
 {
-    return ( ctrl != nullptr ) 
-        ? ctrl->addCudaKernelConfig( kernel_name, num_arguments, grid_dim, 
+    return ( ctrl != nullptr )
+        ? ctrl->addCudaKernelConfig( kernel_name, num_arguments, grid_dim,
             shared_mem_per_block, max_blocks_limit, config_str )
         : st::CudaController::ILLEGAL_KERNEL_ID;
 }
@@ -101,17 +103,17 @@ NS(CudaController_get_ptr_node_info_by_platform_id_and_device_id)(
 /* ------------------------------------------------------------------------- */
 
 ::NS(CudaKernelConfig)* NS(CudaController_get_ptr_kernel_config)(
-    ::NS(CudaController)* SIXTRL_RESTRICT ctrl, 
+    ::NS(CudaController)* SIXTRL_RESTRICT ctrl,
     ::NS(ctrl_kernel_id_t) const kernel_id )
 {
     return ( ctrl != nullptr ) ? ctrl->ptrKernelConfig( kernel_id ) : nullptr;
 }
 
 ::NS(CudaKernelConfig)* NS(CudaController_get_ptr_kernel_config_by_kernel_name)(
-    ::NS(CudaController)* SIXTRL_RESTRICT ctrl, 
+    ::NS(CudaController)* SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT kernel_name )
 {
-    return ( ctrl != nullptr ) 
+    return ( ctrl != nullptr )
         ? ctrl->ptrKernelConfig( kernel_name ) : nullptr;
 }
 

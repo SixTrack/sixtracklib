@@ -139,8 +139,8 @@ bool NS(Controller_is_node_available)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    return ( ptr_nodes_ctrl != nullptr ) 
-        ? ptr_nodes_ctrl->minAvailableNodeIndex() 
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->minAvailableNodeIndex()
         : st::NODE_UNDEFINED_INDEX;
 }
 
@@ -148,8 +148,8 @@ bool NS(Controller_is_node_available)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    return ( ptr_nodes_ctrl != nullptr ) 
-        ? ptr_nodes_ctrl->maxAvailableNodeIndex() 
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->maxAvailableNodeIndex()
         : st::NODE_UNDEFINED_INDEX;
 }
 
@@ -162,7 +162,7 @@ bool NS(Controller_is_node_available)(
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
     return ( ptr_nodes_ctrl != nullptr )
-        ? ptr_nodes_ctrl->availableNodeIndices( 
+        ? ptr_nodes_ctrl->availableNodeIndices(
             max_num_node_indices, node_index_begin )
         : ::NS(ctrl_size_t){ 0 };
 }
@@ -185,7 +185,7 @@ bool NS(Controller_is_node_available)(
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
     return ( ptr_nodes_ctrl != nullptr )
-        ? ptr_nodes_ctrl->availableBaseNodeInfos( 
+        ? ptr_nodes_ctrl->availableBaseNodeInfos(
             max_num_node_infos, ptr_node_infos_begin )
         : ::NS(ctrl_size_t){ 0 };
 }
@@ -197,20 +197,20 @@ bool NS(Controller_is_node_available)(
     const ::NS(NodeId) *const SIXTRL_RESTRICT node_id )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    
+
     return ( ( ptr_nodes_ctrl != nullptr ) && ( node_id != nullptr ) )
         ? ptr_nodes_ctrl->nodeIndex( *node_id ) : st::NODE_UNDEFINED_INDEX;
 }
 
 ::NS(node_index_t) NS(Controller_get_node_index_by_platform_id_and_device_id)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
-    ::NS(node_platform_id_t) const platform_id, 
+    ::NS(node_platform_id_t) const platform_id,
     ::NS(node_device_id_t) const device_id )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    
-    return ( ptr_nodes_ctrl != nullptr ) 
-        ? ptr_nodes_ctrl->nodeIndex( platform_id, device_id ) 
+
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->nodeIndex( platform_id, device_id )
         : st::NODE_UNDEFINED_INDEX;
 }
 
@@ -219,9 +219,9 @@ bool NS(Controller_is_node_available)(
     const ::NS(NodeInfoBase) *const SIXTRL_RESTRICT ptr_node_info )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    
-    return ( ptr_nodes_ctrl != nullptr ) 
-        ? ptr_nodes_ctrl->nodeIndex( ptr_node_info ) 
+
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->nodeIndex( ptr_node_info )
         : st::NODE_UNDEFINED_INDEX;
 }
 
@@ -230,9 +230,9 @@ bool NS(Controller_is_node_available)(
     char const* SIXTRL_RESTRICT node_id_str )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    
-    return ( ptr_nodes_ctrl != nullptr ) 
-        ? ptr_nodes_ctrl->nodeIndex( node_id_str ) 
+
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->nodeIndex( node_id_str )
         : st::NODE_UNDEFINED_INDEX;
 }
 
@@ -349,7 +349,7 @@ char const* NS(Controller_get_selected_node_id_str)(
         ? ptr_nodes_ctrl->ptrSelectedNodeIdStr() : nullptr;
 }
 
-bool NS(Controller_copy_selected_node_id_str)(
+::NS(arch_status_t) NS(Controller_copy_selected_node_id_str)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
     char* SIXTRL_RESTRICT node_id_str,
     ::NS(arch_size_t) const max_str_length )
@@ -357,50 +357,56 @@ bool NS(Controller_copy_selected_node_id_str)(
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
     return ( ptr_nodes_ctrl != nullptr )
         ? ptr_nodes_ctrl->selectedNodeIdStr( node_id_str, max_str_length )
-        : false;
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-bool NS(Controller_select_node)( ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+::NS(arch_status_t) NS(Controller_select_node)(
+    ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT node_id_str )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    return ( ( ptr_nodes_ctrl != nullptr ) &&
-             ( ptr_nodes_ctrl->selectNode( node_id_str ) ) );
+
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->selectNode( node_id_str )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(Controller_select_node_by_node_id)(
+::NS(arch_status_t) NS(Controller_select_node_by_node_id)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     const NS(NodeId) *const SIXTRL_RESTRICT node_id )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    return ( ( ptr_nodes_ctrl != nullptr ) && ( node_id != nullptr ) &&
-             ( ptr_nodes_ctrl->selectNode( *node_id ) ) );
+    return ( ( ptr_nodes_ctrl != nullptr ) && ( node_id != nullptr ) )
+        ? ptr_nodes_ctrl->selectNode( *node_id )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(Controller_select_node_by_plaform_id_and_device_id)(
+::NS(arch_status_t) NS(Controller_select_node_by_plaform_id_and_device_id)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     NS(node_platform_id_t) const platform_id,
     NS(node_device_id_t) const device_id )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    return ( ( ptr_nodes_ctrl != nullptr ) &&
-             ( ptr_nodes_ctrl->selectNode( platform_id, device_id ) ) );
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->selectNode( platform_id, device_id )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(Controller_select_node_by_index)( 
+::NS(arch_status_t) NS(Controller_select_node_by_index)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctx,
     ::NS(node_index_t) const node_index )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctx );
-    return ( ( ptr_nodes_ctrl != nullptr ) &&
-             ( ptr_nodes_ctrl->selectNode( node_index ) ) );
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->selectNode( node_index )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 /* ========================================================================= */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_can_change_selected_node)(
+bool NS(Controller_can_change_selected_node)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
@@ -416,15 +422,16 @@ bool NS(Controller_can_directly_change_selected_node)(
              ( ptr_nodes_ctrl->canDirectlyChangeSelectedNode() ) );
 }
 
-bool NS(Controller_change_selected_node)(
+::NS(arch_status_t) NS(Controller_change_selected_node)(
     ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     ::NS(node_index_t) const current_selected_node_index,
     ::NS(node_index_t) const new_selected_node_index )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    return ( ( ptr_nodes_ctrl != nullptr ) &&
-    ( ptr_nodes_ctrl->changeSelectedNode(
-        current_selected_node_index, new_selected_node_index ) ) );
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->changeSelectedNode(
+            current_selected_node_index, new_selected_node_index )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 /* ========================================================================= */
@@ -437,48 +444,52 @@ bool NS(Controller_can_unselect_node)(
              ( ptr_nodes_ctrl->canUnselectNode() ) );
 }
 
-bool NS(Controller_unselect_node)(
+::NS(arch_status_t) NS(Controller_unselect_node)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    return ( ( ptr_nodes_ctrl != nullptr ) &&
-             ( ptr_nodes_ctrl->unselectNode() ) );
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->unselectNode() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(Controller_unselect_node_by_index)(
+::NS(arch_status_t) NS(Controller_unselect_node_by_index)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl, NS(node_index_t) const index )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    return ( ( ptr_nodes_ctrl != nullptr ) &&
-             ( ptr_nodes_ctrl->unselectNode( index ) ) );
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->unselectNode( index )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(Controller_unselect_node_by_node_id)(
+::NS(arch_status_t) NS(Controller_unselect_node_by_node_id)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     const NS(NodeId) *const SIXTRL_RESTRICT ptr_node_id )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    return ( ( ptr_nodes_ctrl != nullptr ) && ( ptr_node_id != nullptr ) &&
-             ( ptr_nodes_ctrl->unselectNode( *ptr_node_id ) ) );
+    return ( ( ptr_nodes_ctrl != nullptr ) && ( ptr_node_id != nullptr ) )
+        ? ptr_nodes_ctrl->unselectNode( *ptr_node_id )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(Controller_unselect_node_by_platform_id_and_device_id)(
+::NS(arch_status_t) NS(Controller_unselect_node_by_platform_id_and_device_id)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     NS(node_platform_id_t) const platform_id,
     NS(node_device_id_t) const device_id )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    return ( ( ptr_nodes_ctrl != nullptr ) &&
-             ( ptr_nodes_ctrl->unselectNode( platform_id, device_id ) ) );
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->unselectNode( platform_id, device_id )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(Controller_unselect_node_by_node_id_str)(
+::NS(arch_status_t) NS(Controller_unselect_node_by_node_id_str)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT node_id_str )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
-    return ( ( ptr_nodes_ctrl != nullptr ) &&
-             ( ptr_nodes_ctrl->unselectNode( node_id_str ) ) );
+    return ( ptr_nodes_ctrl != nullptr )
+        ? ptr_nodes_ctrl->unselectNode( node_id_str )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 /* ========================================================================= */

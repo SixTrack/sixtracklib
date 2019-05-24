@@ -1,24 +1,33 @@
 # ==============================================================================
 # tests/sixtracklib/testlib/common/track/CMakeLists.txt
 
-set( SIXTRL_TESTLIB_COMMON_TRACK_C99_HEADERS )
-set( SIXTRL_TESTLIB_COMMON_TRACK_C99_SOURCES )
+set( SIXTRL_TESTLIB_COMMON_TRACK_C99_HEADERS
+     track_job_setup.h
+     track_particles_cpu.h
+     track_particles_ctrl_arg.h
+)
 
-# add_library( sixtrack_test_common_track_c99 OBJECT
-#              ${SIXTRL_TESTLIB_COMMON_TRACK_C99_HEADERS}
-#              ${SIXTRL_TESTLIB_COMMON_TRACK_C99_SOURCES}
-# )
+set( SIXTRL_TESTLIB_COMMON_TRACK_C99_SOURCES
+     track_job_setup.c
+     track_particles_cpu.c
+     track_particles_ctrl_arg.c
+)
 
-# target_include_directories( sixtrack_test_common_track_c99 PRIVATE
-#     PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
-#     PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests> )
+add_library( sixtrack_test_common_track_c99 OBJECT
+             ${SIXTRL_TESTLIB_COMMON_TRACK_C99_HEADERS}
+             ${SIXTRL_TESTLIB_COMMON_TRACK_C99_SOURCES}
+)
 
-# set_target_properties( sixtrack_test_common_track_c99 PROPERTIES
-#     LINKER_LANGUAGE C  POSITION_INDEPENDENT_CODE ON
-#     C_STANDARD 99 C_STANDARD_REQUIRED ON )
+target_include_directories( sixtrack_test_common_track_c99 PRIVATE
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests> )
 
-# target_compile_options( sixtrack_test_common_track_c99 PRIVATE
-#         -Wall -Werror -pedantic -ansi ${SIXTRACKLIB_CPU_FLAGS} )
+set_target_properties( sixtrack_test_common_track_c99 PROPERTIES
+    LINKER_LANGUAGE C  POSITION_INDEPENDENT_CODE ON
+    C_STANDARD 99 C_STANDARD_REQUIRED ON )
+
+target_compile_options( sixtrack_test_common_track_c99 PRIVATE
+        -Wall -Werror -pedantic -ansi ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------
 
@@ -51,7 +60,7 @@ target_compile_options( sixtrack_test_common_track_cxx PRIVATE
 
 set(  SIXTRACKL_TESTLIB_LIBRARY_MODULES
     ${SIXTRACKL_TESTLIB_LIBRARY_MODULES}
-#     $<TARGET_OBJECTS:sixtrack_test_common_track_c99>
+    $<TARGET_OBJECTS:sixtrack_test_common_track_c99>
     $<TARGET_OBJECTS:sixtrack_test_common_track_cxx>
     CACHE INTERNAL "" FORCE )
 

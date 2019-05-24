@@ -120,21 +120,23 @@ void NS(NodeId_set_index)(
     if( node_id != nullptr ) node_id->setIndex( node_index );
 }
 
-bool NS(NodeId_to_string)(
+::NS(arch_status_t) NS(NodeId_to_string)(
     SIXTRL_ARGPTR_DEC const ::NS(NodeId) *const SIXTRL_RESTRICT node_id,
     SIXTRL_ARGPTR_DEC char* SIXTRL_RESTRICT node_id_str,
     ::NS(buffer_size_t) const node_id_str_capacity )
 {
     return ( ( node_id != nullptr ) &&
-             ( node_id->toString( node_id_str, node_id_str_capacity ) ) );
+             ( node_id->toString( node_id_str, node_id_str_capacity ) ) )
+        ? ::NS(ARCH_STATUS_SUCCESS) : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(NodeId_from_string)(
+::NS(arch_status_t) NS(NodeId_from_string)(
     SIXTRL_ARGPTR_DEC ::NS(NodeId)* SIXTRL_RESTRICT node_id,
     SIXTRL_ARGPTR_DEC const char *const SIXTRL_RESTRICT node_id_str )
 {
     return ( ( node_id != nullptr ) &&
-             ( node_id->fromString( node_id_str ) ) );
+             ( node_id->fromString( node_id_str ) ) )
+        ? ::NS(ARCH_STATUS_SUCCESS) : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 int NS(NodeId_compare)(

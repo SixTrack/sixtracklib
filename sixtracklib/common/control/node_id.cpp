@@ -11,6 +11,8 @@
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/control/definitions.h"
 
+namespace st = SIXTRL_CXX_NAMESPACE;
+
 namespace SIXTRL_CXX_NAMESPACE
 {
     NodeId::NodeId(
@@ -95,10 +97,10 @@ namespace SIXTRL_CXX_NAMESPACE
         return a2str.str();
     }
 
-    bool NodeId::toString( char* SIXTRL_RESTRICT node_id_str,
+    NodeId::status_t NodeId::toString( char* SIXTRL_RESTRICT node_id_str,
         NodeId::size_type const node_id_str_capacity ) const SIXTRL_NOEXCEPT
     {
-        bool success = false;
+        NodeId::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( ( node_id_str != nullptr ) &&
             ( node_id_str_capacity > NodeId::size_type{ 0 } ) )
@@ -117,24 +119,24 @@ namespace SIXTRL_CXX_NAMESPACE
             if( str.size() < node_id_str_capacity )
             {
                 std::copy( str.begin(), str.end(), node_id_str );
-                success = true;
+                status = st::ARCH_STATUS_SUCCESS;
             }
         }
 
-        return success;
+        return status;
     }
 
-    bool NodeId::fromString(
+    NodeId::status_t NodeId::fromString(
         std::string const& SIXTRL_RESTRICT_REF id_str ) SIXTRL_NOEXCEPT
     {
-        return ( !id_str.empty() )
-            ? this->fromString( id_str.c_str() ) : false;
+        return ( !id_str.empty() ) ? this->fromString( id_str.c_str() )
+            : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool NodeId::fromString(
+    NodeId::status_t NodeId::fromString(
         const char *const SIXTRL_RESTRICT id_str ) SIXTRL_NOEXCEPT
     {
-        bool success = false;
+        NodeId::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( ( id_str != nullptr ) &&
             ( std::strlen( id_str ) > NodeId::size_type{ 0 } ) )
@@ -151,11 +153,11 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 this->setPlatformId( temp_platform_id );
                 this->setDeviceId( temp_device_id );
-                success = true;
+                status = st::ARCH_STATUS_SUCCESS;
             }
         }
 
-        return success;
+        return status;
     }
 
     bool NodeId::operator<(
@@ -184,21 +186,20 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     std::ostream& operator<<( std::ostream& SIXTRL_RESTRICT_REF output,
-        SIXTRL_CXX_NAMESPACE::NodeId const& SIXTRL_RESTRICT_REF node_id )
+        st::NodeId const& SIXTRL_RESTRICT_REF node_id )
     {
         output << node_id.platformId() << "." << node_id.deviceId();
         return output;
     }
 
-    int compareNodeIds(
-        SIXTRL_CXX_NAMESPACE::NodeId const& SIXTRL_RESTRICT_REF lhs,
-        SIXTRL_CXX_NAMESPACE::NodeId const& SIXTRL_RESTRICT_REF rhs )
+    int compareNodeIds( st::NodeId const& SIXTRL_RESTRICT_REF lhs,
+                        st::NodeId const& SIXTRL_RESTRICT_REF rhs )
     {
         return ( lhs < rhs ) ? -1 : ( rhs < lhs ) ? +1 : 0;
     }
 
     void printNodeId( ::FILE* SIXTRL_RESTRICT fp,
-        SIXTRL_CXX_NAMESPACE::NodeId const& SIXTRL_RESTRICT_REF node_id )
+        st::NodeId const& SIXTRL_RESTRICT_REF node_id )
     {
         if( fp != nullptr )
         {

@@ -559,7 +559,8 @@ namespace SIXTRL_CXX_NAMESPACE
         return false;
     }
 
-    bool ControllerBase::doSwitchDebugMode( bool const is_in_debug_mode )
+    ControllerBase::status_t
+    ControllerBase::doSwitchDebugMode( bool const is_in_debug_mode )
     {
         if( ( ( is_in_debug_mode ) &&
               ( this->hasRemapCObjectBufferDebugKernel() ) ) ||
@@ -570,7 +571,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 is_in_debug_mode );
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     /* --------------------------------------------------------------------- */

@@ -23,11 +23,11 @@ extern "C" {
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController)*
 NS(CudaController_create)( void );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaController_select_node_by_cuda_device_index)(
     NS(CudaController)* SIXTRL_RESTRICT ctrl, int cuda_device_index );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaController_select_node_by_cuda_pci_bus_id)(
     NS(CudaController)* SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT cuda_pci_bus_id );
@@ -37,23 +37,23 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(CudaController_delete)(
 
 /* ------------------------------------------------------------------------ */
 
- SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo) const* 
+ SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo) const*
  NS(CudaController_get_ptr_node_info_by_index)(
      const NS(CudaController) *const SIXTRL_RESTRICT ctrl,
      NS(ctrl_size_t) const index );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo) const* 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo) const*
  NS(CudaController_get_ptr_node_info_by_platform_id_and_device_id)(
      const NS(CudaController) *const SIXTRL_RESTRICT ctrl,
      NS(node_platform_id_t) const platform_idx,
      NS(node_device_id_t) const device_idx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo) const* 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo) const*
  NS(CudaController_get_ptr_node_info_by_node_id)(
      const NS(CudaController) *const SIXTRL_RESTRICT ctrl,
      const NS(NodeId) *const SIXTRL_RESTRICT node_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo) const* 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo) const*
 NS(CudaController_get_ptr_node_info)(
      const NS(CudaController) *const SIXTRL_RESTRICT ctrl,
      char const* SIXTRL_RESTRICT node_id_str );
@@ -62,12 +62,12 @@ NS(CudaController_get_ptr_node_info)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_kernel_id_t)
 NS(CudaController_add_kernel_config)(
-    NS(CudaController)* SIXTRL_RESTRICT ctrl, 
+    NS(CudaController)* SIXTRL_RESTRICT ctrl,
     const NS(CudaKernelConfig) *const SIXTRL_RESTRICT cuda_kernel_config );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_kernel_id_t)
 NS(CudaController_add_kernel_config_detailed)(
-    NS(CudaController)* SIXTRL_RESTRICT ctrl, 
+    NS(CudaController)* SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT kernel_name,
     NS(ctrl_size_t) const num_arguments,
     NS(ctrl_size_t) const grid_dim,
@@ -77,14 +77,14 @@ NS(CudaController_add_kernel_config_detailed)(
 
 /* ------------------------------------------------------------------------ */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaKernelConfig)* 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaKernelConfig)*
 NS(CudaController_get_ptr_kernel_config)(
-    NS(CudaController)* SIXTRL_RESTRICT ctrl, 
+    NS(CudaController)* SIXTRL_RESTRICT ctrl,
     NS(ctrl_kernel_id_t) const kernel_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaKernelConfig)* 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaKernelConfig)*
 NS(CudaController_get_ptr_kernel_config_by_kernel_name)(
-    NS(CudaController)* SIXTRL_RESTRICT ctrl, 
+    NS(CudaController)* SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT kernel_name );
 
 /* ------------------------------------------------------------------------ */

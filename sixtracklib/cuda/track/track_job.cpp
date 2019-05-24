@@ -45,11 +45,13 @@ namespace SIXTRL_CXX_NAMESPACE
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
                 SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
     {
-        bool success = this->doPrepareControllerCudaImpl( config_str );
-        success &= this->doPrepareDefaultKernelsCudaImpl( config_str );
+        CudaTrackJob::status_t status =
+            this->doPrepareControllerCudaImpl( config_str );
 
-        SIXTRL_ASSERT( success );
-        ( void )success;
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doPrepareDefaultKernelsCudaImpl( config_str );
+        }
     }
 
     CudaTrackJob::CudaTrackJob(
@@ -57,13 +59,15 @@ namespace SIXTRL_CXX_NAMESPACE
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
                 SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() )
     {
-        bool success = this->doPrepareControllerCudaImpl( config_str.c_str() );
-        success &= this->doPrepareDefaultKernelsCudaImpl( config_str.c_str() );
+        CudaTrackJob::status_t status =
+            this->doPrepareControllerCudaImpl( config_str.c_str() );
 
-        SIXTRL_ASSERT( success );
-        ( void )success;
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doPrepareDefaultKernelsCudaImpl( config_str.c_str() );
+        }
     }
-
+    
     CudaTrackJob::CudaTrackJob(
         const char *const SIXTRL_RESTRICT node_id_str,
         c_buffer_t* SIXTRL_RESTRICT particles_buffer,
@@ -74,14 +78,12 @@ namespace SIXTRL_CXX_NAMESPACE
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
                 SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
     {
-        using _this_t = st::CudaTrackJob;
-        bool const success = this->doInitCudaTrackJob( config_str,
-            particles_buffer, _this_t::DefaultParticleSetIndicesBegin(),
-                _this_t::DefaultParticleSetIndicesEnd(), beam_elements_buffer,
-                    output_buffer, until_turn_elem_by_elem );
-
-        SIXTRL_ASSERT( success );
-        ( void )success;
+        CudaTrackJob::status_t const status = this->doInitCudaTrackJob(
+            config_str, particles_buffer,
+            CudaTrackJob::DefaultParticleSetIndicesBegin(),
+                CudaTrackJob::DefaultParticleSetIndicesEnd(),
+                   beam_elements_buffer, output_buffer,
+                       until_turn_elem_by_elem );
     }
 
     CudaTrackJob::CudaTrackJob(
@@ -94,16 +96,16 @@ namespace SIXTRL_CXX_NAMESPACE
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
                 SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() )
     {
-        using _this_t = CudaTrackJob;
+        CudaTrackJob::status_t const status = this->doInitCudaTrackJob(
+            config_str, particles_buffer,
+                st::CudaTrackJob::DefaultParticleSetIndicesBegin(),
+                    st::CudaTrackJob::DefaultParticleSetIndicesEnd(),
+                        beam_elements_buffer, ptr_output_buffer,
+                            until_turn_elem_by_elem );
 
-        bool const success = this->doInitCudaTrackJob( config_str,
-            particles_buffer, _this_t::DefaultParticleSetIndicesBegin(),
-                _this_t::DefaultParticleSetIndicesEnd(), beam_elements_buffer,
-                    ptr_output_buffer, until_turn_elem_by_elem );
-
-        if( success )
+        if( status == st::ARCH_STATUS_SUCCESS )
         {
-            this->doSetPtrParticleBuffer( &particles_buffer );
+            this->doSetPtrParticlesBuffer( &particles_buffer );
             this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
 
             if( ( ptr_output_buffer != nullptr ) &&
@@ -112,6 +114,115 @@ namespace SIXTRL_CXX_NAMESPACE
                 this->doSetPtrOutputBuffer( ptr_output_buffer );
             }
         }
+    }
+    
+    CudaTrackJob::CudaTrackJob(
+        std::string const& SIXTRL_RESTRICT_REF node_id_str,
+        CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+        CudaTrackJob::size_type const particle_set_index,
+        CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF belems_buffer,
+        CudaTrackJob::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        CudaTrackJob::size_type const until_turn_elem_by_elem,
+        std::string const& config_str ) :
+            st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() )
+    {
+        CudaTrackJob::size_type const* psets_begin = &particle_set_index;
+        CudaTrackJob::size_type const* psets_end = psets_begin;
+        std::advance( psets_end, CudaTrackJob::size_type{ 1 } );
+        
+        CudaTrackJob::status_t const status = this->doInitCudaTrackJob(
+            config_str, particles_buffer, psets_begin, psets_end, belems_buffer, 
+                ptr_output_buffer, until_turn_elem_by_elem );
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            this->doSetPtrParticlesBuffer( &particles_buffer );
+            this->doSetPtrBeamElementsBuffer( &belems_buffer );
+
+            if( ( ptr_output_buffer != nullptr ) &&
+                ( this->hasOutputBuffer() ) && ( !this->ownsOutputBuffer() ) )
+            {
+                this->doSetPtrOutputBuffer( ptr_output_buffer );
+            }
+        }
+    }
+
+    CudaTrackJob::CudaTrackJob(
+        char const* SIXTRL_RESTRICT node_id_str,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+        CudaTrackJob::size_type const particle_set_index,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems_buffer,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        CudaTrackJob::size_type const until_turn_elem_by_elem,
+        char const* SIXTRL_RESTRICT config_str ) :
+            st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
+    {
+        CudaTrackJob::size_type const* psets_begin = &particle_set_index;
+        CudaTrackJob::size_type const* psets_end = psets_begin;
+        std::advance( psets_end, CudaTrackJob::size_type{ 1 } );
+        
+        CudaTrackJob::status_t const status = this->doInitCudaTrackJob(
+            config_str, particles_buffer, psets_begin, psets_end, belems_buffer, 
+                ptr_output_buffer, until_turn_elem_by_elem );
+        
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+    }
+    
+    CudaTrackJob::CudaTrackJob(
+        std::string const& SIXTRL_RESTRICT_REF node_id_str,
+        CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+        CudaTrackJob::size_type const num_particle_sets,
+        CudaTrackJob::size_type const* SIXTRL_RESTRICT pset_indices_begin,
+        CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF belems_buffer,
+        CudaTrackJob::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        CudaTrackJob::size_type const until_turn_elem_by_elem,
+        std::string const& config_str ) :
+            st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() )
+    {
+        CudaTrackJob::size_type const* pset_indices_end = pset_indices_begin;
+        
+        if( pset_indices_end != nullptr )
+        {
+            std::advance( pset_indices_end, num_particle_sets );
+        }
+        
+        CudaTrackJob::status_t const status = this->doInitCudaTrackJob(
+            config_str, particles_buffer, pset_indices_begin, pset_indices_end, 
+                belems_buffer, ptr_output_buffer, until_turn_elem_by_elem );
+        
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+    }
+
+    CudaTrackJob::CudaTrackJob(
+        char const* SIXTRL_RESTRICT node_id_str,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
+        CudaTrackJob::size_type const num_particle_sets,
+        CudaTrackJob::size_type const* SIXTRL_RESTRICT pset_indices_begin,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems_buffer,
+        CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        CudaTrackJob::size_type const until_turn_elem_by_elem,
+        char const* SIXTRL_RESTRICT config_str ) :
+            st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
+    {
+        CudaTrackJob::size_type const* pset_indices_end = pset_indices_begin;
+        
+        if( pset_indices_end != nullptr )
+        {
+            std::advance( pset_indices_end, num_particle_sets );
+        }
+        
+        CudaTrackJob::status_t const status = this->doInitCudaTrackJob(
+            config_str, particles_buffer, pset_indices_begin, pset_indices_end, 
+                belems_buffer, ptr_output_buffer, until_turn_elem_by_elem );
+        
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
     }
 
     CudaTrackJob::~CudaTrackJob()
@@ -356,19 +467,19 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* ===================================================================== */
 
-    bool CudaTrackJob::doPrepareController(
+    CudaTrackJob::status_t CudaTrackJob::doPrepareController(
         char const* SIXTRL_RESTRICT config_str )
     {
         return this->doPrepareControllerCudaImpl( config_str );
     }
 
-    bool CudaTrackJob::doPrepareDefaultKernels(
+    CudaTrackJob::status_t CudaTrackJob::doPrepareDefaultKernels(
         char const* SIXTRL_RESTRICT config_str )
     {
         return this->doPrepareDefaultKernelsCudaImpl( config_str );
     }
 
-    bool CudaTrackJob::doPrepareParticlesStructures(
+    CudaTrackJob::status_t CudaTrackJob::doPrepareParticlesStructures(
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT ptr_pbuffer )
     {
         using _base_t = st::CudaTrackJob::_base_track_job_t;
@@ -376,7 +487,7 @@ namespace SIXTRL_CXX_NAMESPACE
                  ( this->doPrepareParticlesStructuresCudaImpl( ptr_pbuffer ) ) );
     }
 
-    bool CudaTrackJob::doPrepareBeamElementsStructures(
+    CudaTrackJob::status_t CudaTrackJob::doPrepareBeamElementsStructures(
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems )
     {
         using _base_t = st::CudaTrackJob::_base_track_job_t;
@@ -384,7 +495,7 @@ namespace SIXTRL_CXX_NAMESPACE
                  ( this->doPrepareBeamElementsStructuresCudaImpl( belems ) ) );
     }
 
-    bool CudaTrackJob::doPrepareOutputStructures(
+    CudaTrackJob::status_t CudaTrackJob::doPrepareOutputStructures(
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT pbuffer,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT output,
@@ -392,19 +503,20 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         using _base_t = st::CudaTrackJob::_base_track_job_t;
 
-        bool success = _base_t::doPrepareOutputStructures( pbuffer, belems,
-            output, until_turn_elem_by_elem );
+        CudaTrackJob::status_t status = _base_t::doPrepareOutputStructures(
+                pbuffer, belems, output, until_turn_elem_by_elem );
 
-        if( ( success ) && ( this->hasOutputBuffer() ) )
+        if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+            ( this->hasOutputBuffer() ) )
         {
-            success = this->doPrepareOutputStructuresCudaImpl( pbuffer, belems,
+            status = this->doPrepareOutputStructuresCudaImpl( pbuffer, belems,
                 this->ptrCOutputBuffer(), until_turn_elem_by_elem );
         }
 
-        return success;
+        return status;
     }
 
-    bool CudaTrackJob::doAssignOutputBufferToBeamMonitors(
+    CudaTrackJob::status_t CudaTrackJob::doAssignOutputBufferToBeamMonitors(
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT output,
         CudaTrackJob::particle_index_t const min_turn_id,
@@ -412,39 +524,42 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         using _base_t = st::CudaTrackJob::_base_track_job_t;
 
-        bool success = _base_t::doAssignOutputBufferToBeamMonitors(
-            belems, output, min_turn_id, output_buffer_offset_index );
+        CudaTrackJob::status_t status =
+            _base_t::doAssignOutputBufferToBeamMonitors( belems, output,
+                min_turn_id, output_buffer_offset_index );
 
-        if( ( success ) && ( this->hasBeamMonitorOutput() ) )
+        if( ( status == st::ARCH_STATUS_SUCCESS ) && ( this->hasBeamMonitorOutput() ) )
         {
-            success = this->doAssignOutputBufferToBeamMonitorsCudaImpl(
+            status = this->doAssignOutputBufferToBeamMonitorsCudaImpl(
                 belems, output, min_turn_id, output_buffer_offset_index );
         }
 
-        return success;
+        return status;
     }
 
-    bool CudaTrackJob::doAssignOutputBufferToElemByElemConfig(
+    CudaTrackJob::status_t CudaTrackJob::doAssignOutputBufferToElemByElemConfig(
         CudaTrackJob::elem_by_elem_config_t* SIXTRL_RESTRICT elem_by_elem_conf,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT output,
         CudaTrackJob::size_type const output_buffer_offset_index )
     {
         using _base_t = st::CudaTrackJob::_base_track_job_t;
 
-        bool success = _base_t::doAssignOutputBufferToElemByElemConfig(
-            elem_by_elem_conf, output, output_buffer_offset_index );
+        CudaTrackJob::status_t status =
+        _base_t::doAssignOutputBufferToElemByElemConfig( elem_by_elem_conf,
+            output, output_buffer_offset_index );
 
-        if( ( success ) && ( this->hasElemByElemOutput() ) )
+        if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+            ( this->hasElemByElemOutput() ) )
         {
-            success = this->doAssignOutputBufferToElemByElemConfigCudaImpl(
+            status = this->doAssignOutputBufferToElemByElemConfigCudaImpl(
                 elem_by_elem_conf, output, output_buffer_offset_index );
         }
 
-        return success;
+        return status;
     }
 
 
-    bool CudaTrackJob::doReset(
+    CudaTrackJob::status_t CudaTrackJob::doReset(
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT pbuffer,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT output,
@@ -453,18 +568,18 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->doResetCudaImpl(
             pbuffer, belems, output, until_turn_elem_by_elem );
     }
-    
+
     /* ----------------------------------------------------------------- */
-        
-    CudaTrackJob::status_t 
-    CudaTrackJob::doSetAssignOutputToBeamMonitorsKernelId( 
+
+    CudaTrackJob::status_t
+    CudaTrackJob::doSetAssignOutputToBeamMonitorsKernelId(
         CudaTrackJob::kernel_id_t const id )
     {
         return this->doSetAssignOutputToBeamMonitorsKernelIdCudaImpl( id );
     }
 
     CudaTrackJob::status_t
-    CudaTrackJob::doSetAssignOutputToElemByElemConfigKernelId( 
+    CudaTrackJob::doSetAssignOutputToElemByElemConfigKernelId(
         CudaTrackJob::kernel_id_t const id )
     {
         return this->doSetAssignOutputToElemByElemConfigKernelIdCudaImpl( id );
@@ -482,14 +597,14 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->doSetTrackLineKernelIdCudaImpl( id );
     }
 
-    CudaTrackJob::status_t CudaTrackJob::doSetTrackElemByElemKernelId( 
+    CudaTrackJob::status_t CudaTrackJob::doSetTrackElemByElemKernelId(
         CudaTrackJob::kernel_id_t const id )
     {
-        return this->doSetTrackElemByElemKernelIdCudaImpl( id );        
+        return this->doSetTrackElemByElemKernelIdCudaImpl( id );
     }
 
     CudaTrackJob::status_t
-    CudaTrackJob::doSetFetchParticlesAddressesKernelId( 
+    CudaTrackJob::doSetFetchParticlesAddressesKernelId(
         CudaTrackJob::kernel_id_t const id )
     {
         return this->doSetFetchParticlesAddressesKernelIdCudaImpl( id );
@@ -564,9 +679,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* ===================================================================== */
 
-    bool CudaTrackJob::doPrepareControllerCudaImpl(
+    CudaTrackJob::status_t CudaTrackJob::doPrepareControllerCudaImpl(
         char const* SIXTRL_RESTRICT config_str )
     {
+        CudaTrackJob::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
         using _this_t           = st::CudaTrackJob;
         using cuda_ctrl_t       = _this_t::cuda_controller_t;
         using cuda_ctrl_store_t = _this_t::cuda_ctrl_store_t;
@@ -580,9 +697,8 @@ namespace SIXTRL_CXX_NAMESPACE
         cuda_ctrl_store_t ptr_store_cuda_ctrl( new cuda_ctrl_t( config_str ) );
         this->doUpdateStoredController( std::move( ptr_store_cuda_ctrl ) );
 
-        bool success = this->hasCudaController();
-
-        if( ( success ) && ( nullptr != this->doGetPtrLocalDebugRegister() ) )
+        if( ( this->hasCudaController() ) &&
+            ( nullptr != this->doGetPtrLocalDebugRegister() ) )
         {
             *( this->doGetPtrLocalDebugRegister() ) =
                 st::ARCH_DEBUGGING_REGISTER_EMPTY;
@@ -594,13 +710,16 @@ namespace SIXTRL_CXX_NAMESPACE
             this->doUpdateStoredDebugRegisterArg(
                 std::move( ptr_store_debug_flag_arg ) );
 
-            success = this->hasCudaDebugRegisterArg();
+            if( this->hasCudaDebugRegisterArg() )
+            {
+                status = st::ARCH_STATUS_SUCCESS;
+            }
         }
 
-        return success;
+        return status;
     }
 
-    bool CudaTrackJob::doPrepareDefaultKernelsCudaImpl(
+    CudaTrackJob::status_t CudaTrackJob::doPrepareDefaultKernelsCudaImpl(
         char const* SIXTRL_RESTRICT config_str )
     {
         using _this_t = st::CudaTrackJob;
@@ -612,7 +731,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using cuda_node_info_t = _this_t::cuda_node_info_t;
         using node_index_t = _this_t::node_index_t;
 
-        bool success = false;
+        CudaTrackJob::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
 
@@ -626,8 +745,8 @@ namespace SIXTRL_CXX_NAMESPACE
             cuda_node_info_t const* ptr_node_info = ptr_cuda_ctrl->ptrNodeInfo(
                 selected_node_index );
 
-            success = ( ( ptr_node_info != nullptr ) &&
-                        ( selected_node_index != st::NODE_UNDEFINED_INDEX ) );
+            bool success = ( ( ptr_node_info != nullptr ) &&
+                ( selected_node_index != st::NODE_UNDEFINED_INDEX ) );
 
             std::string kernel_name( 256, '\0' );
             std::string const kernel_prefix( SIXTRL_C99_NAMESPACE_PREFIX_STR );
@@ -646,8 +765,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
             kernel_id = ptr_cuda_ctrl->addCudaKernelConfig(
                 kernel_name, num_kernel_args );
-            
-            success &= ( this->doSetTrackUntilKernelIdCudaImpl( kernel_id ) ==      
+
+            success &= ( this->doSetTrackUntilKernelIdCudaImpl( kernel_id ) ==
                 st::ARCH_STATUS_SUCCESS );
 
             /* trackElemByElemKernelId() */
@@ -661,7 +780,7 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_id = ptr_cuda_ctrl->addCudaKernelConfig(
                 kernel_name, num_kernel_args );
 
-            success &= ( this->doSetTrackElemByElemKernelIdCudaImpl( 
+            success &= ( this->doSetTrackElemByElemKernelIdCudaImpl(
                 kernel_id ) == st::ARCH_STATUS_SUCCESS );
 
             /* trackLineKernelId() */
@@ -674,7 +793,7 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_id = ptr_cuda_ctrl->addCudaKernelConfig(
                 kernel_name, num_kernel_args );
 
-            success &= ( this->doSetTrackLineKernelIdCudaImpl( 
+            success &= ( this->doSetTrackLineKernelIdCudaImpl(
                 kernel_id ) == st::ARCH_STATUS_SUCCESS );
 
             /* assignOutputToBeamMonitorsKernelId() */
@@ -688,7 +807,7 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_id = ptr_cuda_ctrl->addCudaKernelConfig(
                 kernel_name, num_kernel_args );
 
-            success &= ( this->doSetAssignOutputToBeamMonitorsKernelIdCudaImpl( 
+            success &= ( this->doSetAssignOutputToBeamMonitorsKernelIdCudaImpl(
                 kernel_id ) == st::ARCH_STATUS_SUCCESS );
 
             /* assignOutputToElemByElemConfigKernelId() */
@@ -702,7 +821,7 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_id = ptr_cuda_ctrl->addCudaKernelConfig(
                 kernel_name, num_kernel_args );
 
-            success &= ( this->doSetAssignOutputToElemByElemConfigKernelIdCudaImpl( 
+            success &= ( this->doSetAssignOutputToElemByElemConfigKernelIdCudaImpl(
                     kernel_id ) == st::ARCH_STATUS_SUCCESS );
 
             /* fetchParticlesAddressesKernelId() */
@@ -715,19 +834,24 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_id = ptr_cuda_ctrl->addCudaKernelConfig(
                 kernel_name, num_kernel_args );
 
-            success &= ( this->doSetFetchParticlesAddressesKernelId( 
+            success &= ( this->doSetFetchParticlesAddressesKernelId(
                     kernel_id ) == st::ARCH_STATUS_SUCCESS );
+
+            if( success )
+            {
+                status = st::ARCH_STATUS_SUCCESS;
+            }
         }
         else if( ( ptr_cuda_ctrl != nullptr ) &&
             ( ptr_cuda_ctrl->numAvailableNodes() > node_index_t{ 0 } ) )
         {
-            success = true;
+            status = st::ARCH_STATUS_SUCCESS;
         }
 
-        return success;
+        return status;
     }
 
-    bool CudaTrackJob::doPrepareParticlesStructuresCudaImpl(
+    CudaTrackJob::status_t CudaTrackJob::doPrepareParticlesStructuresCudaImpl(
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT particles_buffer )
     {
         using _this_t = st::CudaTrackJob;
@@ -736,7 +860,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using cuda_arg_t       = _this_t::cuda_argument_t;
         using store_base_arg_t = _this_t::stored_arg_base_t;
 
-        bool success = false;
+        CudaTrackJob::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
 
@@ -748,27 +872,41 @@ namespace SIXTRL_CXX_NAMESPACE
                     new cuda_arg_t( *this->doGetPtrParticlesAddrBuffer(),
                         ptr_cuda_ctrl ) );
 
-                success = ( ( cuda_particles_addr_arg.get() != nullptr ) &&
+                if( ( cuda_particles_addr_arg.get() != nullptr ) &&
                     ( cuda_particles_addr_arg->ptrControllerBase() ==
                       ptr_cuda_ctrl ) &&
                     ( cuda_particles_addr_arg->usesCObjectsCxxBuffer() ) &&
                     ( cuda_particles_addr_arg->ptrCObjectsCxxBuffer() ==
-                      this->doGetPtrParticlesAddrBuffer() ) );
+                      this->doGetPtrParticlesAddrBuffer() ) )
+                {
+                    status = st::ARCH_STATUS_SUCCESS;
+                }
 
                 this->doUpdateStoredParticlesAddrArg(
                     std::move( cuda_particles_addr_arg ) );
 
-                success &= (
-                    ( this->ptrParticlesAddrArgBase() != nullptr ) &&
-                    ( this->ptrParticlesAddrArgBase()->usesCObjectsCxxBuffer() ) &&
-                    ( this->ptrParticlesAddrArgBase()->ptrCObjectsCxxBuffer()
-                      == this->doGetPtrParticlesAddrBuffer() ) );
+                if( status == st::ARCH_STATUS_SUCCESS )
+                {
+                    if( ( this->ptrParticlesAddrArgBase() != nullptr ) &&
+                        ( this->ptrParticlesAddrArgBase(
+                            )->usesCObjectsCxxBuffer() ) &&
+                        ( this->ptrParticlesAddrArgBase()->ptrCObjectsCxxBuffer()
+                           == this->doGetPtrParticlesAddrBuffer() ) )
+                    {
+                        status = st::ARCH_STATUS_SUCCESS;
+                    }
+                    else
+                    {
+                        status = st::ARCH_STATUS_GENERAL_FAILURE;
+                    }
+                }
             }
 
             store_base_arg_t cuda_particles_arg(
                 new cuda_arg_t( particles_buffer, ptr_cuda_ctrl ) );
 
-            if( ( cuda_particles_arg.get() != nullptr ) &&
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+                ( cuda_particles_arg.get() != nullptr ) &&
                 ( cuda_particles_arg->usesCObjectsBuffer() ) &&
                 ( cuda_particles_arg->ptrCObjectsBuffer() ==
                   particles_buffer  ) )
@@ -783,15 +921,19 @@ namespace SIXTRL_CXX_NAMESPACE
                     ( this->ptrParticlesArgBase()->ptrCObjectsBuffer() ==
                       particles_buffer ) )
                 {
-                    success = true;
+                    status = st::ARCH_STATUS_SUCCESS;
+                }
+                else
+                {
+                    status = st::ARCH_STATUS_GENERAL_FAILURE;
                 }
             }
         }
 
-        return success;
+        return status;
     }
 
-    bool CudaTrackJob::doPrepareBeamElementsStructuresCudaImpl(
+    CudaTrackJob::status_t CudaTrackJob::doPrepareBeamElementsStructuresCudaImpl(
          CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems_buffer )
     {
         using _this_t          = st::CudaTrackJob;
@@ -799,7 +941,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using cuda_arg_t       = _this_t::cuda_argument_t;
         using store_base_arg_t = _this_t::stored_arg_base_t;
 
-        bool success = false;
+        CudaTrackJob::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
 
@@ -822,15 +964,15 @@ namespace SIXTRL_CXX_NAMESPACE
                     ( this->ptrBeamElementsArgBase()->ptrCObjectsBuffer() ==
                       belems_buffer ) )
                 {
-                    success = true;
+                    status = st::ARCH_STATUS_SUCCESS;
                 }
             }
         }
 
-        return success;
+        return status;
     }
 
-    bool CudaTrackJob::doPrepareOutputStructuresCudaImpl(
+    CudaTrackJob::status_t CudaTrackJob::doPrepareOutputStructuresCudaImpl(
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems_buffer,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT output_buffer,
@@ -843,7 +985,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using elem_config_t    = _this_t::elem_by_elem_config_t;
         using ctrl_status_t    = _this_t::status_t;
 
-        bool success = false;
+        CudaTrackJob::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
 
@@ -854,7 +996,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( this->ptrElemByElemConfig() == nullptr )
             {
-                success = true;
+                status = st::ARCH_STATUS_SUCCESS;
             }
             else
             {
@@ -862,59 +1004,93 @@ namespace SIXTRL_CXX_NAMESPACE
                     this->ptrElemByElemConfig(), sizeof( elem_config_t ),
                         ptr_cuda_ctrl ) );
 
-                success = ( ( cuda_elem_by_elem_conf_arg.get() != nullptr ) &&
+                status = ( ( cuda_elem_by_elem_conf_arg.get() != nullptr ) &&
                     ( cuda_elem_by_elem_conf_arg->ptrControllerBase() ==
-                      ptr_cuda_ctrl ) );
+                      ptr_cuda_ctrl ) )
+                    ? st::ARCH_STATUS_SUCCESS
+                    : st::ARCH_STATUS_GENERAL_FAILURE;
 
                 this->doUpdateStoredElemByElemConfigArg( std::move(
                     cuda_elem_by_elem_conf_arg ) );
 
-                success &= (
-                    ( this->ptrElemByElemConfigArgBase() != nullptr ) &&
-                    ( this->ptrElemByElemConfigArgBase()->ptrControllerBase()
-                      == ptr_cuda_ctrl ) );
-
-                if( success )
+                if( status == st::ARCH_STATUS_SUCCESS )
                 {
-                    ctrl_status_t const status =
-                    this->ptrElemByElemConfigArgBase()->send(
+                    if( ( this->ptrElemByElemConfigArgBase() != nullptr ) &&
+                        ( this->ptrElemByElemConfigArgBase(
+                            )->ptrControllerBase() == ptr_cuda_ctrl ) )
+                    {
+                        status == st::ARCH_STATUS_SUCCESS;
+                    }
+                    else
+                    {
+                        status == st::ARCH_STATUS_GENERAL_FAILURE;
+                    }
+                }
+
+                if( status == st::ARCH_STATUS_SUCCESS )
+                {
+                    status = this->ptrElemByElemConfigArgBase()->send(
                         this->ptrElemByElemConfig(), sizeof( elem_config_t ) );
 
-                    success = (
-                        ( status == st::ARCH_STATUS_SUCCESS ) &&
-                        ( this->ptrElemByElemConfigArgBase(
-                            )->usesRawArgument() )&&
-                        ( this->ptrElemByElemConfigArgBase()->ptrRawArgument()
-                            == this->ptrElemByElemConfig() ) );
+                    if( status == st::ARCH_STATUS_SUCCESS )
+                    {
+                        if( ( this->ptrElemByElemConfigArgBase()->usesRawArgument() ) &&
+                            ( this->ptrElemByElemConfigArgBase()->ptrRawArgument()
+                              == this->ptrElemByElemConfig() ) )
+                        {
+                            status == st::ARCH_STATUS_SUCCESS;
+                        }
+                        else
+                        {
+                            status == st::ARCH_STATUS_GENERAL_FAILURE;
+                        }
+                    }
                 }
             }
 
-            if( success )
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
                 store_base_arg_t cuda_output_arg(
                     new cuda_arg_t( output_buffer, ptr_cuda_ctrl ) );
 
-                success = ( ( cuda_output_arg.get() != nullptr ) &&
+                if( ( cuda_output_arg.get() != nullptr ) &&
                     ( cuda_output_arg->ptrControllerBase() == ptr_cuda_ctrl ) &&
                     ( cuda_output_arg->usesCObjectsBuffer() ) &&
                     ( cuda_output_arg->ptrCObjectsBuffer() != nullptr ) &&
-                    ( cuda_output_arg->ptrCObjectsBuffer() == output_buffer ) );
+                    ( cuda_output_arg->ptrCObjectsBuffer() == output_buffer ) )
+                {
+                    status = st::ARCH_STATUS_SUCCESS;
+                }
+                else
+                {
+                    status = st::ARCH_STATUS_GENERAL_FAILURE;
+                }
 
                 this->doUpdateStoredOutputArg( std::move( cuda_output_arg ) );
 
-                success &= ( ( this->ptrOutputArgBase() != nullptr ) &&
-                    ( this->ptrOutputArgBase()->ptrControllerBase() ==
-                      ptr_cuda_ctrl ) &&
-                    ( this->ptrOutputArgBase()->usesCObjectsBuffer() ) &&
-                    ( this->ptrOutputArgBase()->ptrCObjectsBuffer() ==
-                      output_buffer ) );
+                if( status == st::ARCH_STATUS_SUCCESS )
+                {
+                    if( ( this->ptrOutputArgBase() != nullptr ) &&
+                        ( this->ptrOutputArgBase()->ptrControllerBase() ==
+                          ptr_cuda_ctrl ) &&
+                        ( this->ptrOutputArgBase()->usesCObjectsBuffer() ) &&
+                        ( this->ptrOutputArgBase()->ptrCObjectsBuffer() ==
+                          output_buffer ) )
+                    {
+                        status = st::ARCH_STATUS_SUCCESS;
+                    }
+                    else
+                    {
+                        status = st::ARCH_STATUS_GENERAL_FAILURE;
+                    }
+                }
             }
         }
 
-        return success;
+        return status;
     }
 
-    bool CudaTrackJob::doAssignOutputBufferToBeamMonitorsCudaImpl(
+    CudaTrackJob::status_t CudaTrackJob::doAssignOutputBufferToBeamMonitorsCudaImpl(
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems_buffer,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT output_buffer,
         CudaTrackJob::particle_index_t const min_turn_id,
@@ -991,10 +1167,10 @@ namespace SIXTRL_CXX_NAMESPACE
             }
         }
 
-        return ( status == st::ARCH_STATUS_SUCCESS );
+        return status;
     }
 
-    bool CudaTrackJob::doAssignOutputBufferToElemByElemConfigCudaImpl(
+    CudaTrackJob::status_t CudaTrackJob::doAssignOutputBufferToElemByElemConfigCudaImpl(
         CudaTrackJob::elem_by_elem_config_t* SIXTRL_RESTRICT elem_by_elem_config,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT output_buffer,
         CudaTrackJob::size_type const output_buffer_offset_index )
@@ -1021,7 +1197,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         cuda_arg_t* output_arg = this->ptrCudaOutputArg();
 
-        bool const output_ready = ( ( this->hasBeamMonitorOutput() ) &&
+        bool const output_ready = ( ( this->hasElemByElemOutput() ) &&
             ( output_buffer != nullptr ) && ( output_arg != nullptr ) &&
             ( ::NS(Buffer_get_num_of_objects)( output_buffer ) >
               output_buffer_offset_index ) &&
@@ -1068,7 +1244,7 @@ namespace SIXTRL_CXX_NAMESPACE
             }
         }
 
-        return ( status == st::ARCH_STATUS_SUCCESS );
+        return status;
     }
 
     /* --------------------------------------------------------------------- */
@@ -1174,89 +1350,125 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    bool CudaTrackJob::doResetCudaImpl(
+    CudaTrackJob::status_t CudaTrackJob::doResetCudaImpl(
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT pbuffer,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belem_buffer,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         CudaTrackJob::size_type const until_turn_elem_by_elem )
     {
-        bool success = false;
         using _this_t = st::CudaTrackJob;
         using _base_t = _this_t::_base_track_job_t;
         using output_buffer_flag_t = _this_t::output_buffer_flag_t;
 
-        if( ( _base_t::doPrepareParticlesStructures( pbuffer ) ) &&
-            ( _base_t::doPrepareBeamElementsStructures( belem_buffer ) ) &&
-            ( this->doPrepareParticlesStructuresCudaImpl( pbuffer ) ) &&
-            ( this->doPrepareBeamElementsStructuresCudaImpl( belem_buffer ) ) )
+        CudaTrackJob::status_t status =
+            _base_t::doPrepareParticlesStructures( pbuffer );
+
+        if( status == st::ARCH_STATUS_SUCCESS )
         {
-            success = this->doPrepareDefaultKernelsCudaImpl(
-                this->ptrConfigStr() );
+            status = _base_t::doPrepareBeamElementsStructures( belem_buffer );
+        }
 
-            if( !success ) return success;
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doPrepareParticlesStructuresCudaImpl( pbuffer );
+        }
 
-            output_buffer_flag_t const out_buffer_flags =
-            ::NS(OutputBuffer_required_for_tracking_of_particle_sets)( pbuffer,
-                this->numParticleSets(), this->particleSetIndicesBegin(),
-                    belem_buffer, until_turn_elem_by_elem );
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status =
+                this->doPrepareBeamElementsStructuresCudaImpl( belem_buffer );
+        }
 
-            bool const requires_output_buffer =
-                ::NS(OutputBuffer_requires_output_buffer)( out_buffer_flags );
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doPrepareDefaultKernelsCudaImpl( this->ptrConfigStr() );
+        }
 
+        output_buffer_flag_t const out_buffer_flags =
+        ::NS(OutputBuffer_required_for_tracking_of_particle_sets)( pbuffer,
+            this->numParticleSets(), this->particleSetIndicesBegin(),
+                belem_buffer, until_turn_elem_by_elem );
+
+        bool const requires_output_buffer =
+            ::NS(OutputBuffer_requires_output_buffer)( out_buffer_flags );
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
             this->doSetPtrCParticlesBuffer( pbuffer );
             this->doSetPtrCBeamElementsBuffer( belem_buffer );
+        }
 
-            if( ( requires_output_buffer ) || 
-                ( ptr_output_buffer != nullptr ) )
+        if( ( requires_output_buffer ) || ( ptr_output_buffer != nullptr ) )
+        {
+            status = _base_t::doPrepareOutputStructures( pbuffer,
+                belem_buffer, ptr_output_buffer, until_turn_elem_by_elem );
+
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+                ( this->hasOutputBuffer() ) )
             {
-                success = this->doPrepareOutputStructures( pbuffer,
-                    belem_buffer, ptr_output_buffer, until_turn_elem_by_elem );
-
-                success &= this->doPrepareOutputStructuresCudaImpl( pbuffer,
-                    belem_buffer, ptr_output_buffer, until_turn_elem_by_elem );
+                status = this->doPrepareOutputStructuresCudaImpl( pbuffer,
+                    belem_buffer, this->ptrCOutputBuffer(),
+                        until_turn_elem_by_elem );
             }
-
-            if( ( success ) && ( this->hasOutputBuffer() ) &&
-                ( requires_output_buffer ) )
+            else if( !this->hasOutputBuffer() )
             {
-                if( ::NS(OutputBuffer_requires_elem_by_elem_output)(
-                        out_buffer_flags ) )
-                {
-                    success &= _base_t::doAssignOutputBufferToElemByElemConfig(
-                        this->ptrElemByElemConfig(), this->ptrCOutputBuffer(),
-                            this->elemByElemOutputBufferOffset() );
-
-                    success &= 
-                    this->doAssignOutputBufferToElemByElemConfigCudaImpl(
-                        this->ptrElemByElemConfig(), this->ptrCOutputBuffer(),
-                            this->elemByElemOutputBufferOffset() );
-                }
-
-                if( ::NS(OutputBuffer_requires_beam_monitor_output)(
-                        out_buffer_flags ) )
-                {
-                    success &= 
-                    _base_t::doAssignOutputBufferToBeamMonitors(
-                        belem_buffer, this->ptrCOutputBuffer(),
-                        this->minInitialTurnId(),
-                        this->beamMonitorsOutputBufferOffset() );
-
-                    success &= 
-                    this->doAssignOutputBufferToBeamMonitorsCudaImpl(
-                        belem_buffer, this->ptrCOutputBuffer(),
-                        this->minInitialTurnId(),
-                        this->beamMonitorsOutputBufferOffset() );
-                }
+                status = st::ARCH_STATUS_GENERAL_FAILURE;
             }
         }
 
-        return success;
+        if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+            ( this->hasOutputBuffer() ) && ( requires_output_buffer ) )
+        {
+            if( ::NS(OutputBuffer_requires_elem_by_elem_output)( out_buffer_flags ) )
+            {
+                status = _base_t::doAssignOutputBufferToElemByElemConfig(
+                    this->ptrElemByElemConfig(), this->ptrCOutputBuffer(),
+                        this->elemByElemOutputBufferOffset() );
+
+                if( status == st::ARCH_STATUS_SUCCESS )
+                {
+                    status = this->doAssignOutputBufferToElemByElemConfigCudaImpl(
+                    this->ptrElemByElemConfig(), this->ptrCOutputBuffer(),
+                        this->elemByElemOutputBufferOffset() );
+                }
+            }
+
+            if( ::NS(OutputBuffer_requires_beam_monitor_output)(
+                    out_buffer_flags ) )
+            {
+                if( status == st::ARCH_STATUS_SUCCESS )
+                {
+                    status = _base_t::doAssignOutputBufferToBeamMonitors(
+                    belem_buffer, this->ptrCOutputBuffer(),
+                    this->minInitialTurnId(),
+                    this->beamMonitorsOutputBufferOffset() );
+                }
+
+                if( status == st::ARCH_STATUS_SUCCESS )
+                {
+                    status = this->doAssignOutputBufferToBeamMonitorsCudaImpl(
+                    belem_buffer, this->ptrCOutputBuffer(),
+                    this->minInitialTurnId(),
+                    this->beamMonitorsOutputBufferOffset() );
+                }
+            }
+        }
+        else if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+                 ( requires_output_buffer ) )
+        {
+            if( !this->hasOutputBuffer() )
+            {
+                status = st::ARCH_STATUS_GENERAL_FAILURE;
+            }
+        }
+
+        return status;
     }
-    
+
     /* --------------------------------------------------------------------- */
 
-    CudaTrackJob::status_t 
-    CudaTrackJob::doSetAssignOutputToBeamMonitorsKernelIdCudaImpl( 
+    CudaTrackJob::status_t
+    CudaTrackJob::doSetAssignOutputToBeamMonitorsKernelIdCudaImpl(
         CudaTrackJob::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
     {
         using _base_t         = CudaTrackJob::_base_track_job_t;
@@ -1266,21 +1478,21 @@ namespace SIXTRL_CXX_NAMESPACE
         using status_t        = CudaTrackJob::status_t;
         using node_index_t    = cuda_ctrl_t::node_index_t;
         using node_info_t     = cuda_ctrl_t::node_info_t;
-        
+
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
-        
+
         node_index_t const selected_node_index = ( ptr_cuda_ctrl != nullptr )
-            ? ptr_cuda_ctrl->selectedNodeIndex() 
+            ? ptr_cuda_ctrl->selectedNodeIndex()
             : cuda_ctrl_t::UNDEFINED_INDEX;
-            
+
         node_info_t const* node_info = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrNodeInfo( selected_node_index ) : nullptr;
-            
-        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr ) 
+
+        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
-            
+
         size_t num_beam_monitors = size_t{ 0 };
-        
+
         if( this->hasBeamMonitorOutput() )
         {
             num_beam_monitors = this->numBeamMonitors();
@@ -1289,21 +1501,21 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             num_beam_monitors = size_t{ 1 };
         }
-            
-        status_t status = 
+
+        status_t status =
         ::NS(CudaKernelConfig_configure_assign_output_to_beam_monitors_kernel)(
             kernel_conf, node_info, num_beam_monitors );
-        
+
         if( status == st::ARCH_STATUS_SUCCESS )
         {
-            status = _base_t::doSetAssignOutputToBeamMonitorsKernelId( 
+            status = _base_t::doSetAssignOutputToBeamMonitorsKernelId(
                 kernel_id );
         }
-        
+
         return status;
     }
 
-    CudaTrackJob::status_t 
+    CudaTrackJob::status_t
     CudaTrackJob::doSetAssignOutputToElemByElemConfigKernelIdCudaImpl(
         CudaTrackJob::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
     {
@@ -1313,34 +1525,34 @@ namespace SIXTRL_CXX_NAMESPACE
         using status_t        = CudaTrackJob::status_t;
         using node_index_t    = cuda_ctrl_t::node_index_t;
         using node_info_t     = cuda_ctrl_t::node_info_t;
-        
+
         status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
-        
+
         node_index_t const selected_node_index = ( ptr_cuda_ctrl != nullptr )
-            ? ptr_cuda_ctrl->selectedNodeIndex() 
+            ? ptr_cuda_ctrl->selectedNodeIndex()
             : cuda_ctrl_t::UNDEFINED_INDEX;
-            
+
         node_info_t const* node_info = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrNodeInfo( selected_node_index ) : nullptr;
-            
-        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr ) 
+
+        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
-            
-        return 
+
+        return
         ::NS(CudaKernelConfig_configure_assign_output_to_elem_by_elem_config_kernel)(
             kernel_conf, node_info );
-        
+
         if( status == st::ARCH_STATUS_SUCCESS )
         {
-            status = 
+            status =
             _base_t::doSetAssignOutputToElemByElemConfigKernelId( kernel_id );
         }
-        
+
         return status;
     }
 
-    CudaTrackJob::status_t CudaTrackJob::doSetTrackUntilKernelIdCudaImpl( 
+    CudaTrackJob::status_t CudaTrackJob::doSetTrackUntilKernelIdCudaImpl(
         CudaTrackJob::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
     {
         using _base_t         = CudaTrackJob::_base_track_job_t;
@@ -1349,32 +1561,32 @@ namespace SIXTRL_CXX_NAMESPACE
         using status_t        = CudaTrackJob::status_t;
         using node_index_t    = cuda_ctrl_t::node_index_t;
         using node_info_t     = cuda_ctrl_t::node_info_t;
-        
+
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
-        
+
         node_index_t const selected_node_index = ( ptr_cuda_ctrl != nullptr )
-            ? ptr_cuda_ctrl->selectedNodeIndex() 
+            ? ptr_cuda_ctrl->selectedNodeIndex()
             : cuda_ctrl_t::UNDEFINED_INDEX;
-            
+
         node_info_t const* node_info = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrNodeInfo( selected_node_index ) : nullptr;
-            
-        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr ) 
+
+        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
-            
-        status_t status = 
+
+        status_t status =
         ::NS(CudaKernelConfig_configure_track_until_turn_kernel)(
             kernel_conf, node_info, this->totalNumParticlesInParticleSets() );
-        
+
         if( status == st::ARCH_STATUS_SUCCESS )
         {
             status = _base_t::doSetTrackUntilKernelId( kernel_id );
         }
-        
+
         return status;
     }
 
-    CudaTrackJob::status_t CudaTrackJob::doSetTrackLineKernelIdCudaImpl( 
+    CudaTrackJob::status_t CudaTrackJob::doSetTrackLineKernelIdCudaImpl(
         CudaTrackJob::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
     {
         using _base_t         = CudaTrackJob::_base_track_job_t;
@@ -1383,32 +1595,32 @@ namespace SIXTRL_CXX_NAMESPACE
         using status_t        = CudaTrackJob::status_t;
         using node_index_t    = cuda_ctrl_t::node_index_t;
         using node_info_t     = cuda_ctrl_t::node_info_t;
-        
+
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
-        
+
         node_index_t const selected_node_index = ( ptr_cuda_ctrl != nullptr )
-            ? ptr_cuda_ctrl->selectedNodeIndex() 
+            ? ptr_cuda_ctrl->selectedNodeIndex()
             : cuda_ctrl_t::UNDEFINED_INDEX;
-            
+
         node_info_t const* node_info = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrNodeInfo( selected_node_index ) : nullptr;
-            
-        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr ) 
+
+        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
-            
-        status_t status = 
+
+        status_t status =
         ::NS(CudaKernelConfig_configure_track_line_kernel)(
             kernel_conf, node_info, this->totalNumParticlesInParticleSets() );
-        
+
         if( status == st::ARCH_STATUS_SUCCESS )
         {
             status = _base_t::doSetTrackLineKernelId( kernel_id );
         }
-        
+
         return status;
     }
 
-    CudaTrackJob::status_t CudaTrackJob::doSetTrackElemByElemKernelIdCudaImpl( 
+    CudaTrackJob::status_t CudaTrackJob::doSetTrackElemByElemKernelIdCudaImpl(
         CudaTrackJob::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
     {
         using _base_t         = CudaTrackJob::_base_track_job_t;
@@ -1417,33 +1629,33 @@ namespace SIXTRL_CXX_NAMESPACE
         using status_t        = CudaTrackJob::status_t;
         using node_index_t    = cuda_ctrl_t::node_index_t;
         using node_info_t     = cuda_ctrl_t::node_info_t;
-        
+
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
-        
+
         node_index_t const selected_node_index = ( ptr_cuda_ctrl != nullptr )
-            ? ptr_cuda_ctrl->selectedNodeIndex() 
+            ? ptr_cuda_ctrl->selectedNodeIndex()
             : cuda_ctrl_t::UNDEFINED_INDEX;
-            
+
         node_info_t const* node_info = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrNodeInfo( selected_node_index ) : nullptr;
-            
-        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr ) 
+
+        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
-            
-        status_t status = 
+
+        status_t status =
         ::NS(CudaKernelConfig_configure_track_elem_by_elem_until_turn_kernel)(
             kernel_conf, node_info, this->totalNumParticlesInParticleSets() );
-        
+
         if( status == st::ARCH_STATUS_SUCCESS )
         {
             status = _base_t::doSetTrackElemByElemKernelId( kernel_id );
         }
-        
+
         return status;
     }
 
-    CudaTrackJob::status_t 
-    CudaTrackJob::doSetFetchParticlesAddressesKernelIdCudaImpl( 
+    CudaTrackJob::status_t
+    CudaTrackJob::doSetFetchParticlesAddressesKernelIdCudaImpl(
             CudaTrackJob::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
     {
         using _base_t         = CudaTrackJob::_base_track_job_t;
@@ -1453,39 +1665,39 @@ namespace SIXTRL_CXX_NAMESPACE
         using size_t          = CudaTrackJob::size_type;
         using node_index_t    = cuda_ctrl_t::node_index_t;
         using node_info_t     = cuda_ctrl_t::node_info_t;
-        
+
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
-        
+
         node_index_t const selected_node_index = ( ptr_cuda_ctrl != nullptr )
-            ? ptr_cuda_ctrl->selectedNodeIndex() 
+            ? ptr_cuda_ctrl->selectedNodeIndex()
             : cuda_ctrl_t::UNDEFINED_INDEX;
-            
+
         node_info_t const* node_info = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrNodeInfo( selected_node_index ) : nullptr;
-            
-        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr ) 
+
+        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
-            
+
         size_t num_particle_sets = size_t{ 0 };
-        
+
         if( this->doGetPtrParticlesAddrBuffer() != nullptr )
         {
-            num_particle_sets = this->doGetPtrParticlesAddrBuffer()->getSize();            
+            num_particle_sets = this->doGetPtrParticlesAddrBuffer()->getSize();
         }
         else if( this->ptrCParticlesBuffer() != nullptr )
         {
             num_particle_sets = ::NS(Buffer_get_num_of_objects)(
                 this->ptrCParticlesBuffer() );
         }
-            
+
         status_t status = ::NS(CudaKernelConfig_configure_track_line_kernel)(
             kernel_conf, node_info, num_particle_sets );
-        
+
         if( status == st::ARCH_STATUS_SUCCESS )
         {
             status = _base_t::doSetFetchParticlesAddressesKernelId( kernel_id );
         }
-        
+
         return status;
     }
 
