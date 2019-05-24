@@ -21,17 +21,10 @@
 
     #include "sixtracklib/opencl/context.h"
     #include "sixtracklib/opencl/argument.h"
+    #include "sixtracklib/opencl/make_track_job.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE )
-
-#if !defined( SIXTRL_TRACK_JOB_CL_ID )
-    #define   SIXTRL_TRACK_JOB_CL_ID 2
-#endif /* !defined( SIXTRL_TRACK_JOB_CL_ID ) */
-
-#if !defined( SIXTRL_TRACK_JOB_CL_STR )
-    #define   SIXTRL_TRACK_JOB_CL_STR "opencl"
-#endif /* !defined( SIXTRL_TRACK_JOB_CL_STR ) */
 
 #if defined( __cplusplus )
 
