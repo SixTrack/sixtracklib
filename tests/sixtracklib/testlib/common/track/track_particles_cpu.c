@@ -14,7 +14,7 @@ NS(track_status_t) NS(TestTrackCpu_track_particles_until_cpu)(
     NS(buffer_size_t) const num_particle_sets,
     NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,
     const NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
-    NS(buffer_size_t) const until_turn )
+    NS(particle_index_t) const until_turn )
 {
     typedef NS(buffer_size_t) buf_size_t;
 
@@ -62,7 +62,7 @@ NS(track_status_t) NS(TestTrackCpu_track_particles_elem_by_elem_until_turn_cpu)(
     NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,
     const NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
     NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
-    NS(buffer_size_t) const until_turn )
+    NS(particle_index_t) const until_turn )
 {
     typedef NS(buffer_size_t) buf_size_t;
     typedef NS(track_status_t) track_status_t;
