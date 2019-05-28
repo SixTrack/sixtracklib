@@ -163,7 +163,9 @@ add_subdirectory( sixtracklib )
 # ------------------------------------------------------------------------------
 # Add tools
 
-add_subdirectory( tools )
+if( SIXTRACKL_BUILD_TOOLS )
+    add_subdirectory( tools )
+endif()
 
 # ------------------------------------------------------------------------------
 # Add pysixtracklib Python 3.x bindings
@@ -183,7 +185,7 @@ endif()
 # tests: unit-tests, benchmarks, testdata generators:
 
 if( SIXTRACKL_ENABLE_PROGRAMM_TESTS OR SIXTRACKL_ENABLE_BENCHMARK_TESTS OR
-    SIXTRACKL_BUILD_EXAMPLES )
+    SIXTRACKL_BUILD_EXAMPLES OR SIXTRACKL_BUILD_TOOLS )
     add_subdirectory( tests )
 endif()
 
