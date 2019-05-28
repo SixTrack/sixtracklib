@@ -17,7 +17,7 @@
 option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"     OFF )
 option( SIXTRACKL_ENABLE_MANUAL_SIMD       "Enable manual SIMD backend"   OFF )
 option( SIXTRACKL_ENABLE_OPENMP            "Enable OpenMP backend"        OFF )
-option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL 1.x backend"    OFF )
+option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL 1.x backend"    ON  )
 option( SIXTRACKL_ENABLE_CUDA              "Enable CUDA backend"          OFF )
 option( SIXTRACKL_ENABLE_MPFR4             "Enable GMP/MPFR4 backend"     OFF )
 
@@ -27,8 +27,9 @@ option( SIXTRACKL_ENABLE_PYTHON            "Enable Python bindings"       ON  )
 # ------------------------------------------------------------------------------
 # ---- Program logistic options:
 
+option( SIXTRACKL_BUILD_TOOLS            "Build sixtracklib examples"     OFF )
 option( SIXTRACKL_BUILD_EXAMPLES         "Build sixtracklib examples"     ON  )
-option( SIXTRACKL_ENABLE_PROGRAMM_TESTS  "Enable programmatic unit-tests" OFF )
+option( SIXTRACKL_ENABLE_PROGRAMM_TESTS  "Enable programmatic unit-tests" ON  )
 option( SIXTRACKL_ENABLE_BENCHMARK_TESTS "Enable benchmark tests"         OFF )
 
 # ------------------------------------------------------------------------------
