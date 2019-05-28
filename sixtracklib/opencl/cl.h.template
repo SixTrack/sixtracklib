@@ -33,7 +33,20 @@
         #define SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS @SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG@
     #endif /* !defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) */
 
+    /* Attempt to disable -Wignored-attributes warnings on affected compilers
+     * only for the C++ OpenCL header -> cf. 
+     * http://eigen.tuxfamily.org/bz/show_bug.cgi?id=1221 for reference */
+    
+    #if defined( __GNUC__ ) && __GNUC__ >= 6 
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wignored-attributes"
+    #endif 
+    
     #include <@SIXTRL_OPENCL_CL_HPP@>
+    
+    #if defined( __GNUC__ ) && __GNUC__ >= 6
+        #pragma GCC diagnostic pop
+    #endif
 
 #endif /* C++, Host */
 

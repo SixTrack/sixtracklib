@@ -76,6 +76,7 @@ set( SIXTRACKLIB_OPENCL_HEADERS
      argument.h
      context.h
      track_job_cl.h
+     make_track_job.h
 )
 
 set( SIXTRACKLIB_OPENCL_INTERNAL_HEADERS
@@ -88,6 +89,7 @@ set( SIXTRACKLIB_OPENCL_SOURCES
      internal/base_context.cpp
      internal/context.cpp
      internal/track_job_cl.cpp
+     internal/make_track_job.cpp
 )
 
 set( SIXTRACKLIB_OPENCL_C99_HEADERS
@@ -113,8 +115,9 @@ add_library( sixtrack_opencl OBJECT
 )
 
 target_include_directories( sixtrack_opencl PUBLIC
-    ${CMAKE_SOURCE_DIR}
-    ${SIXTRACKL_OPENCL_INCLUDE_DIR} )
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${SIXTRACKL_OPENCL_INCLUDE_DIR}>
+)
 
 set_target_properties( sixtrack_opencl PROPERTIES LINKER_LANGUAGE C )
 set_target_properties( sixtrack_opencl PROPERTIES POSITION_INDEPENDENT_CODE True )
@@ -146,6 +149,23 @@ set_target_properties( sixtrack_opencl_c99 PROPERTIES C_STANDARD_REQUIRED ON   )
 
 target_compile_options( sixtrack_opencl_c99 BEFORE PUBLIC
         ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic -ansi )
+        
+        
+# ------------------------------------------------------------------------------
+# Handle special case if OpenCL headers have been downloaded by cmake: 
+
+if( CONTRIBUTED_CXX_HEADER AND EXT_OCLCXX_DIR AND 
+    EXISTS ${CONTRIBUTED_CXX_HEADER} )
+    
+    target_include_directories( sixtrack_opencl PRIVATE
+        $<BUILD_INTERFACE:${EXT_OCLCXX_DIR}>
+    )
+    
+    target_include_directories( sixtrack_opencl_c99 PRIVATE
+        $<BUILD_INTERFACE:${EXT_OCLCXX_DIR}>
+    )
+    
+endif()
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_opencl as a module for sixtracklib:

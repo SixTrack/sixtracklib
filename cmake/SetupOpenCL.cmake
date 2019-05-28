@@ -66,8 +66,6 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
                     message( STATUS ${MSG} )
 
                     set( CXX_OPENCL_HEADER ${CONTRIBUTED_CXX_HEADER} )
-                    set(   SIXTRACKL_OPENCL_INCLUDE_DIR
-                          ${SIXTRACKL_OPENCL_INCLUDE_DIR} ${EXT_OCLCXX_DIR})
 
                 elseif( NOT SIXTRACK_REQUIRE_OFFLINE_BUILD )
                     if( NOT SIXTRACKL_USE_LEGACY_CL_HPP )
@@ -81,8 +79,6 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
                         message( STATUS "${MSG} ${CONTRIBUTED_CXX_HEADER}" )
 
                         set( CXX_OPENCL_HEADER ${CONTRIBUTED_CXX_HEADER} )
-                        set(   SIXTRACKL_OPENCL_INCLUDE_DIR
-                            ${SIXTRACKL_OPENCL_INCLUDE_DIR} ${EXT_OCLCXX_DIR})
                     endif()
                 endif()
             endif()
