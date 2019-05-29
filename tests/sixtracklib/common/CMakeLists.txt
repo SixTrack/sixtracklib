@@ -1,5 +1,7 @@
 # sixtracklib/tests/sixtracklib/common/CMakeLists.txt
 
+add_subdirectory( beam_elements )
+
 # -----------------------------------------------------------------------------
 # ---- Generate testdata:
 
@@ -103,42 +105,6 @@ if( GTEST_FOUND )
     add_test( C99_CommonParticlesAperatureDisabledTests
               test_particles_aperature_check_disabled_common_c99 )
 
-
-    # ==========================================================================
-    # test_be_drift_common_c99:
-
-    add_executable( test_be_drift_common_c99      test_be_drift_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_drift_common_c99 )
-    add_test( C99_CommonBeamElementDriftTests     test_be_drift_common_c99 )
-
-    # --------------------------------------------------------------------------
-    # test_be_multipole_common_c99:
-
-    add_executable( test_be_multipole_common_c99  test_be_multipole_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_multipole_common_c99 )
-    add_test( C99_CommonBeamElementMultiPoleTests test_be_multipole_common_c99 )
-
-    # --------------------------------------------------------------------------
-    # test_be_xy_shift_common_c99:
-
-    add_executable( test_be_xy_shift_common_c99   test_be_xy_shift_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_xy_shift_common_c99 )
-    add_test( C99_CommonBeamElementXYShiftTests   test_be_xy_shift_common_c99 )
-
-    # --------------------------------------------------------------------------
-    # test_be_srotation_common_c99:
-
-    add_executable( test_be_srotation_common_c99  test_be_srotation_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_srotation_common_c99 )
-    add_test( C99_CommonBeamElementSRotationTests test_be_srotation_common_c99 )
-
-    # --------------------------------------------------------------------------
-    # test_be_cavity_common_c99:
-
-    add_executable( test_be_cavity_common_c99     test_be_cavity_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_cavity_common_c99 )
-    add_test( C99_CommonBeamElementCavityTests    test_be_cavity_common_c99 )
-
     # --------------------------------------------------------------------------
     # test_elem_by_elem_config_c99:
 
@@ -154,13 +120,6 @@ if( GTEST_FOUND )
     add_executable( test_be_monitor_common_c99    test_be_monitor_c99.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_monitor_common_c99 )
     add_test( C99_CommonBeamMonitorTests          test_be_monitor_common_c99 )
-
-    # ==========================================================================
-    # test_be_drift_common_cxx:
-
-    add_executable( test_be_drift_common_cxx    test_be_drift_cxx.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_drift_common_cxx )
-    add_test( CXX_CommonBeamElementDriftTests   test_be_drift_common_cxx )
 
     # --------------------------------------------------------------------------
     # test_faddeeva_errf:
@@ -265,7 +224,7 @@ if( GTEST_FOUND )
 
     set_property( TARGET ${UNIT_TEST_TARGETS}
                   APPEND PROPERTY COMPILE_OPTIONS
-                  ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic )
+                  ${SIXTRACKLIB_CXX_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
 
 endif()
 
