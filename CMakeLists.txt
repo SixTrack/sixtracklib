@@ -90,6 +90,8 @@ set( SIXTRACKLIB_TESTDATA_DIR
      "${CMAKE_SOURCE_DIR}/tests/testdata" CACHE STRING "" FORCE )
 
 set( SIXTRACKLIB_CPU_FLAGS )
+set( SIXTRACKLIB_C99_FLAGS )
+set( SIXTRACKLIB_CXX_FLAGS )
 
 # ------------------------------------------------------------------------------
 # place all contributed cmake modules and snipplets into the cmake subdirectory
@@ -102,6 +104,7 @@ message( STATUS "---- cmake_module_path: ${CMAKE_MODULE_PATH}" )
 # Setup language bindings - we have to be first to pull in python (if needed)
 # to prevent any module picking a python version we do not wish to support:
 
+include( SetupC99 )
 include( SetupCxx )
 include( SetupPython )
 

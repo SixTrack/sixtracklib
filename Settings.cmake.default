@@ -17,7 +17,7 @@
 option( SIXTRACKL_ENABLE_AUTOVECTORIZATION "Enable Autovectorization"     OFF )
 option( SIXTRACKL_ENABLE_MANUAL_SIMD       "Enable manual SIMD backend"   OFF )
 option( SIXTRACKL_ENABLE_OPENMP            "Enable OpenMP backend"        OFF )
-option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL 1.x backend"    OFF  )
+option( SIXTRACKL_ENABLE_OPENCL            "Enable OpenCL 1.x backend"    OFF )
 option( SIXTRACKL_ENABLE_CUDA              "Enable CUDA backend"          OFF )
 option( SIXTRACKL_ENABLE_MPFR4             "Enable GMP/MPFR4 backend"     OFF )
 
@@ -38,8 +38,14 @@ option( SIXTRACKL_ENABLE_BENCHMARK_TESTS "Enable benchmark tests"         OFF )
 set( SIXTRACKL_CPU_ARCH "sse2" CACHE STRING "CPU/System architecture" )
 set_property( CACHE SIXTRACKL_CPU_ARCH PROPERTY STRINGS sse2 avx avx2 native )
 
-set( SIXTRACKL_C_FLAGS   "-Wall -Werror -pedantic -ansi -fno-fast-math" )
-set( SIXTRACKL_CXX_FLAGS "-Wall -Werror -pedantic -ansi -fno-fast-math" )
+# ------------------------------------------------------------------------------
+# Default compiler flags:
+
+set( SIXTRACKL_DEFAULT_C99_FLAGS
+     "-Wall -Werror -pedantic -ansi -fno-fast-math" )
+
+set( SIXTRACKL_DEFAULT_CXX_FLAGS
+     "-Wall -Werror -pedantic -ansi -fno-fast-math" )
 
 # ------------------------------------------------------------------------------
 # ---- SixTrackLib Features:
