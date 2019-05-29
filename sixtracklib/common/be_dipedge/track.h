@@ -14,19 +14,20 @@
 extern "C" {
 #endif /* C++, host */
 
-struct NS(Limit);
+struct NS(DipoleEdge);
 
-SIXTRL_STATIC SIXTRL_FN NS(track_status_t) NS(Track_particle_limit)(
+SIXTRL_STATIC SIXTRL_FN NS(track_status_t) NS(Track_particle_dipedge)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Limit) *const SIXTRL_RESTRICT limit );
+    SIXTRL_BE_ARGPTR_DEC const struct NS(DipoleEdge) 
+        *const SIXTRL_RESTRICT dipedge);
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }
 #endif /* C++, host */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/be_limit/be_limit.h"
+    #include "sixtracklib/common/be_dipedge/be_dipedge.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
@@ -35,29 +36,16 @@ extern "C" {
 
 SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT limit )
+    NS(particle_num_elements_t) const particle_idx,
+    SIXTRL_BE_ARGPTR_DEC const NS(DipoleEdge) *const SIXTRL_RESTRICT dipedge )
 {
-    typedef NS(particle_real_t)  real_t;
-    typedef NS(particle_index_t) index_t;
-
-    SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0;
-
-    real_t const x = NS(Particles_get_x_value)( particles, particle_index );
-    real_t const sign_x = ( real_t )( ZERO < x ) - ( real_t )( x < ZERO  );
-
-    real_t const y = NS(Particles_get_y_value)( particles, particle_index );
-    real_t const sign_y = ( real_t )( ZERO < y ) - ( real_t )( y < ZERO  );
-
-    index_t const new_state = (
-        ( index_t )( ( sign_x * x ) < NS(Limit_get_x_limit)( limit ) ) &
-        ( index_t )( ( sign_y * y ) < NS(Limit_get_y_limit)( limit ) ) );
-
-    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_idx ) !=
-        ( index_t )0 );
+    typedef NS(particle_real_t) real_t;
     
-    NS(Particles_set_state_value)( particles, particle_index, new_state );
-
+    NS(Particles_add_to_px_value)( particles, particle_idx, 
+       NS(DipoleEdge_get_inv_rho)( dipedge ) 
+       NS(DipoleEdge_get_tan_rot_angle)( dipedge ) * 
+       NS(Particles_get_x_value)( particles, particle_idx ) );
+    
     return NS(TRACK_SUCCESS);
 }
 

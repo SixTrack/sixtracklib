@@ -1,7 +1,6 @@
 #ifndef SIXTRACKLIB_COMMON_BE_LIMIT_CXX_HPP__
 #define SIXTRACKLIB_COMMON_BE_LIMIT_CXX_HPP__
 
-
 #if defined( __cplusplus )
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
@@ -34,8 +33,9 @@ namespace SIXTRL_CXX_NAMESPACE
         using reference       = T&;
         using const_reference = T const&;
         using type_id_t       = ::NS(object_type_id_t);
-        using size_type       = ::NS(buffer_size_t);
-        using buffer_t        = Buffer;
+        using buffer_t        = SIXTRL_CXX_NAMESPACE::Buffer;
+        using size_type       = buffer_t::size_type;
+        using c_buffer_t      = buffer_t::c_api_t;
 
         static SIXTRL_CONSTEXPR_OR_CONST value_type
             DEFAULT_X_LIMIT = static_cast< value_type >(
@@ -45,9 +45,7 @@ namespace SIXTRL_CXX_NAMESPACE
             DEFAULT_Y_LIMIT = static_cast< value_type >(
                 SIXTRL_DEFAULT_Y_LIMIT );
 
-        SIXTRL_FN explicit TLimit(
-            T const& SIXTRL_RESTRICT_REF x_limit = DEFAULT_X_LIMIT,
-            T const& SIXTRL_RESTRICT_REF y_limit = DEFAULT_Y_LIMIT );
+        SIXTRL_FN TLimit() = default;
 
         SIXTRL_FN TLimit( TLimit< T > const& other ) = default;
         TLimit( TLimit< T >&& other ) = default;
@@ -100,8 +98,12 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_FN type_id_t getTypeId() const SIXTRL_NOEXCEPT;
 
         SIXTRL_STATIC SIXTRL_FN size_type RequiredNumDataPtrs(
-            buffer_t const& SIXTRL_RESTRICT_REF buffer ) const SIXTRL_NOEXCEPT;
+            buffer_t const& SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT;
 
+        SIXTRL_STATIC SIXTRL_FN size_type RequiredNumDataPtrs(
+            SIXTRL_BUFFER_ARGPTR_DEC const c_buffer_t *const 
+                SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT;
+            
         SIXTRL_FN value_type const& getXLimit() const SIXTRL_NOEXCEPT;
         SIXTRL_FN value_type const& getYLimit() const SIXTRL_NOEXCEPT;
 
@@ -171,7 +173,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using value_type = ::NS(particle_real_t);
         using type_id_t  = ::NS(object_type_id_t);
         using size_type  = ::NS(buffer_size_t);
-        using buffer_t   = Buffer;
+        using buffer_t   = SIXTRL_CXX_NAMESPACE::Buffer;
         using c_buffer_t = buffer_t::c_api_t;
         using c_api_t    = ::NS(Limit);
 
@@ -192,20 +194,20 @@ namespace SIXTRL_CXX_NAMESPACE
             TLimit< value_type > const& other ) = default;
 
         SIXTRL_FN TLimit< value_type >& operator=(
-            TLimit< value_type >&& other ) = default;s
+            TLimit< value_type >&& other ) = default;
 
         SIXTRL_FN ~TLimit() = default;
 
         /* ---------------------------------------------------------------- */
 
         SIXTRL_STATIC SIXTRL_FN bool CanAddToBuffer(
-            buffer_t& SIXTRL_RESTRICT_REF buffer,
+            buffer_t const& SIXTRL_RESTRICT_REF buffer,
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_objects  = nullptr,
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_slots    = nullptr,
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
-                ptr_requ_dataptrs = nullptr );
+                ptr_requ_dataptrs = nullptr ) SIXTRL_NOEXCEPT;
 
         SIXTRL_STATIC SIXTRL_FN bool CanAddToBuffer(
             SIXTRL_BUFFER_ARGPTR_DEC const c_buffer_t *const
@@ -215,7 +217,7 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_slots    = nullptr,
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
-                ptr_requ_dataptrs = nullptr );
+                ptr_requ_dataptrs = nullptr ) SIXTRL_NOEXCEPT;
 
 
         SIXTRL_STATIC SIXTRL_FN
@@ -224,7 +226,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_STATIC SIXTRL_FN
         SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >*
-        CreateNewOnBuffer( SIXTRL_BUFFER_ARGPTR_DEC *buffer_t*
+        CreateNewOnBuffer( SIXTRL_BUFFER_ARGPTR_DEC c_buffer_t*
             SIXTRL_RESTRICT ptr_buffer );
 
 
@@ -245,21 +247,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        template< typename T > struct ObjectTypeTraits<
-        SIXTRL_CXX_NAMESPACE::TLimit< T > >
-        {
-            SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
-            {
-                return ::NS(OBJECT_TYPE_LIMIT);
-            }
-        };
-
         SIXTRL_STATIC SIXTRL_FN size_type RequiredNumDataPtrs(
-            buffer_t const& SIXTRL_RESTRICT_REF buffer ) const SIXTRL_NOEXCEPT;
+            buffer_t const& SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT;
 
         SIXTRL_STATIC SIXTRL_FN size_type RequiredNumDataPtrs(
             SIXTRL_BUFFER_ARGPTR_DEC const c_buffer_t *const
-                SIXTRL_RESTRICT ptr_buffer ) const SIXTRL_NOEXCEPT;
+                SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN type_id_t getTypeId() const SIXTRL_NOEXCEPT;
 
@@ -288,14 +281,13 @@ namespace SIXTRL_CXX_NAMESPACE
         ::NS(particle_real_t) const x_limit,
         ::NS(particle_real_t) const y_limit );
 
-    SIXTRL_ARGPTR_DEC Limit* Limit_add( SIXTRL_CXX_NAMESPACE::Buffer& buffer,
-        ::NS(particle_real_t) const x_limit,
-        ::NS(particle_real_t) const y_limit );
+    SIXTRL_ARGPTR_DEC Limit* Limit_add_copy( 
+        SIXTRL_CXX_NAMESPACE::Buffer& buffer,
+        SIXTRL_CXX_NAMESPACE::Limit const& SIXTRL_RESTRICT_REF limit );
 
-    SIXTRL_ARGPTR_DEC Limit* Limit_add(
+    SIXTRL_ARGPTR_DEC Limit* Limit_add_copy(
         SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
-        ::NS(particle_real_t) const x_limit,
-        ::NS(particle_real_t) const y_limit );
+        SIXTRL_CXX_NAMESPACE::Limit const& SIXTRL_RESTRICT_REF limit );
 }
 
 /* ************************************************************************* *
@@ -317,7 +309,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ARGPTR_DEC typename TLimit< T >::size_type*
             SIXTRL_RESTRICT req_slots,
         SIXTRL_ARGPTR_DEC typename TLimit< T >::size_type*
-            SIXTRL_RESTRICT req_dataptrs )
+            SIXTRL_RESTRICT req_dataptrs ) SIXTRL_NOEXCEPT
     {
         return TLimit< T >::CanAddToBuffer(
             buffer.getCApiPtr(), req_objects, req_slots, req_dataptrs );
@@ -332,7 +324,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ARGPTR_DEC typename TLimit< T >::size_type*
             SIXTRL_RESTRICT req_slots,
         SIXTRL_ARGPTR_DEC typename TLimit< T >::size_type*
-            SIXTRL_RESTRICT req_dataptrs )
+            SIXTRL_RESTRICT req_dataptrs ) SIXTRL_NOEXCEPT
     {
         using _this_t = SIXTRL_CXX_NAMESPACE::TLimit< T >;
         using  size_t = typename _this_t::size_type;
@@ -340,7 +332,7 @@ namespace SIXTRL_CXX_NAMESPACE
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        size_t const num_dataptrs = _this_t::RequiredNumDataPtrs();
+        size_t const num_dataptrs = _this_t::RequiredNumDataPtrs( ptr_buffer );
         SIXTRL_ASSERT( num_dataptrs == size_t{ 0 } );
 
         SIXTRL_ARGPTR_DEC size_t const* sizes  = nullptr;
@@ -351,28 +343,25 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimit< T >*
-    TLimit< T >::CreateNewOnBuffer(
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit< T >::CreateNewOnBuffer(
         typename TLimit< T >::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
         return TLimit< T >::CreateNewOnBuffer( buffer.getCApiPtr() );
     }
 
     template< typename T >
-    SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimit< T >*
-    TLimit< T >::CreateNewOnBuffer(
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit< T >::CreateNewOnBuffer(
         SIXTRL_BUFFER_ARGPTR_DEC typename TLimit< T >::c_buffer_t*
-            SIXTRL_RESTRICT buffer )
+            SIXTRL_RESTRICT ptr_buffer )
     {
         using _this_t = SIXTRL_CXX_NAMESPACE::TLimit< T >;
         using size_t  = typename _this_t::size_type;
-        using value_t = typename _this_t::value_type;
         using ptr_t   = SIXTRL_ARGPTR_DEC _this_t*;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        size_t const num_dataptrs = _this_t::RequiredNumDataPtrs();
+        size_t const num_dataptrs = _this_t::RequiredNumDataPtrs( ptr_buffer );
         SIXTRL_ASSERT( num_dataptrs == size_t{ 0 } );
 
         SIXTRL_ARGPTR_DEC size_t const* offsets = nullptr;
@@ -388,8 +377,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_STATIC SIXTRL_ARGPTR_DEC TLimit< T >*
-    TLimit< T >::AddToBuffer(
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit< T >::AddToBuffer(
         typename TLimit< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         typename TLimit< T >::value_type const& SIXTRL_RESTRICT_REF x_limit,
         typename TLimit< T >::value_type const& SIXTRL_RESTRICT_REF y_limit )
@@ -399,8 +387,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_STATIC SIXTRL_ARGPTR_DEC TLimit< T >*
-    TLimit< T >::AddToBuffer(
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit< T >::AddToBuffer(
         SIXTRL_BUFFER_ARGPTR_DEC typename TLimit< T >::c_buffer_t*
             SIXTRL_RESTRICT ptr_buffer,
         typename TLimit< T >::value_type const& SIXTRL_RESTRICT_REF x_limit,
@@ -408,13 +395,12 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         using _this_t = SIXTRL_CXX_NAMESPACE::TLimit< T >;
         using size_t  = typename _this_t::size_type;
-        using value_t = typename _this_t::value_type;
         using ptr_t   = SIXTRL_ARGPTR_DEC _this_t*;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        size_t const num_dataptrs = _this_t::RequiredNumDataPtrs();
+        size_t const num_dataptrs = _this_t::RequiredNumDataPtrs( ptr_buffer );
         SIXTRL_ASSERT( num_dataptrs == size_t{ 0 } );
 
         SIXTRL_ARGPTR_DEC size_t const* offsets = nullptr;
@@ -433,18 +419,28 @@ namespace SIXTRL_CXX_NAMESPACE
     /* ---------------------------------------------------------------- */
 
     template< typename T >
-    typename TLimit< T >::type_id_t
+    SIXTRL_INLINE typename TLimit< T >::type_id_t
     TLimit< T >::getTypeId() const SIXTRL_NOEXCEPT
     {
         return SIXTRL_CXX_NAMESPACE::OBJECT_TYPE_LIMIT;
     }
 
     template< typename T >
-    SIXTRL_STATIC typename TLimit< T >::size_type
+    SIXTRL_INLINE typename TLimit< T >::size_type
     TLimit< T >::RequiredNumDataPtrs( typename TLimit< T >::buffer_t const&
-        SIXTRL_RESTRICT_REF buffer ) const SIXTRL_NOEXCEPT
+        SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT
     {
-        ::NS(Limit_get_required_num_dataptrs)( buffer.getCApiPtr() );
+        return ::NS(Limit_get_required_num_dataptrs)( 
+            buffer.getCApiPtr(), nullptr );
+    }
+    
+    template< typename T >
+    SIXTRL_INLINE typename TLimit< T >::size_type 
+    TLimit< T >::RequiredNumDataPtrs( 
+        SIXTRL_BUFFER_ARGPTR_DEC const typename TLimit< T >::c_buffer_t *const
+            SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT
+    {
+        return ::NS(Limit_get_required_num_dataptrs)( ptr_buffer, nullptr );
     }
 
     template< typename T >
@@ -546,13 +542,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
     template<>
     bool TLimit< ::NS(particle_real_t) >::CanAddToBuffer(
-        TLimit< ::NS(particle_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        TLimit< ::NS(particle_real_t) >::buffer_t const& SIXTRL_RESTRICT_REF buffer,
         SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::size_type*
             SIXTRL_RESTRICT ptr_requ_objects,
         SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::size_type*
             SIXTRL_RESTRICT ptr_requ_slots,
         SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::size_type*
-            SIXTRL_RESTRICT ptr_requ_dataptrs )
+            SIXTRL_RESTRICT ptr_requ_dataptrs ) SIXTRL_NOEXCEPT
     {
         return ::NS(Limit_can_be_added)( buffer.getCApiPtr(), ptr_requ_objects,
             ptr_requ_slots, ptr_requ_dataptrs );
@@ -568,14 +564,14 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::size_type*
             SIXTRL_RESTRICT ptr_requ_slots,
         SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::size_type*
-            SIXTRL_RESTRICT ptr_requ_dataptrs )
+            SIXTRL_RESTRICT ptr_requ_dataptrs ) SIXTRL_NOEXCEPT
     {
         return ::NS(Limit_can_be_added)( buffer.getCApiPtr(), ptr_requ_objects,
             ptr_requ_slots, ptr_requ_dataptrs );
     }
 
     template<>
-    SIXTRL_STATIC SIXTRL_ARGPTR_DEC TLimit< NS(particle_real_t) >*
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< NS(particle_real_t) >*
     TLimit< ::NS(particle_real_t) >::CreateNewOnBuffer(
         TLimit< ::NS(particle_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
@@ -583,7 +579,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template<>
-    SIXTRL_STATIC SIXTRL_ARGPTR_DEC TLimit< NS(particle_real_t) >*
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< NS(particle_real_t) >*
     TLimit< ::NS(particle_real_t) >::CreateNewOnBuffer(
         SIXTRL_BUFFER_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::c_buffer_t*
             SIXTRL_RESTRICT ptr_buffer )
@@ -618,7 +614,7 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::c_api_t const*
     TLimit< ::NS(particle_real_t) >::getCApiPtr() const SIXTRL_NOEXCEPT
     {
-        using ptr_t = TXYShift< ::NS(particle_real_t) >::c_api_t const*;
+        using ptr_t = TLimit< ::NS(particle_real_t) >::c_api_t const*;
         return reinterpret_cast< ptr_t >( this );
     }
 
@@ -644,9 +640,10 @@ namespace SIXTRL_CXX_NAMESPACE
     TLimit< ::NS(particle_real_t) >::size_type
     TLimit< ::NS(particle_real_t) >::RequiredNumDataPtrs(
         TLimit< ::NS(particle_real_t) >::buffer_t const&
-            SIXTRL_RESTRICT_REF buffer ) const SIXTRL_NOEXCEPT
+            SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT
     {
-        return ::NS(Limit_get_required_num_dataptrs)( buffer.getCApiPtr() );
+        return ::NS(Limit_get_required_num_dataptrs)( 
+            buffer.getCApiPtr(), nullptr );
     }
 
     template<>
@@ -654,9 +651,10 @@ namespace SIXTRL_CXX_NAMESPACE
     TLimit< ::NS(particle_real_t) >::RequiredNumDataPtrs(
         SIXTRL_BUFFER_ARGPTR_DEC const
             TLimit< ::NS(particle_real_t) >::c_buffer_t *const
-                SIXTRL_RESTRICT ptr_buffer ) const SIXTRL_NOEXCEPT
+                SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT
     {
-        return ::NS(Limit_get_required_num_dataptrs)( ptr_buffer );
+        return ::NS(Limit_get_required_num_dataptrs)( 
+            ptr_buffer, nullptr );
     }
 
     template<>
@@ -742,6 +740,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 }
 
+#endif /* __cplusplus */
 
 #endif /* SIXTRACKLIB_COMMON_BE_LIMIT_CXX_HPP__ */
 

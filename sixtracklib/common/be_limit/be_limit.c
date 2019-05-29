@@ -12,7 +12,7 @@
     #include "sixtracklib/common/internal/beam_elements_defines.h"
     #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/control/definitions.h"
-    #include "sixtracklib/common/particles/definitions.h"
+    #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -22,7 +22,7 @@ NS(buffer_size_t) NS(Limit_get_required_num_dataptrs)(
     SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT limit )
 {
     return NS(Limit_get_required_num_dataptrs_on_managed_buffer)(
-        NS(Buffer_get_data_begin)( buffer ), limit,
+        NS(Buffer_get_const_data_begin)( buffer ), limit,
         NS(Buffer_get_slot_size)( buffer ) );
 }
 
@@ -31,7 +31,7 @@ NS(buffer_size_t) NS(Limit_get_required_num_slots)(
     SIXTRL_BE_ARGPTR_DEC  const NS(Limit) *const SIXTRL_RESTRICT limit )
 {
     return NS(Limit_get_required_num_slots_on_managed_buffer)(
-        NS(Buffer_get_data_begin)( buffer ), limit,
+        NS(Buffer_get_const_data_begin)( buffer ), limit,
         NS(Buffer_get_slot_size)( buffer ) );
 }
 
@@ -45,7 +45,7 @@ bool NS(Limit_can_be_added)(
     typedef NS(Limit) elem_t;
 
     buf_size_t const num_dataptrs =
-        NS(Limit_get_required_num_dataptrs)( SIXTRL_NULLPTR, SIXTRL_NULLPTR );
+        NS(Limit_get_required_num_dataptrs)( buffer, SIXTRL_NULLPTR );
 
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
@@ -58,20 +58,19 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(Limit)* NS(Limit_new)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
 {
     typedef NS(buffer_size_t)   buf_size_t;
-    typedef NS(particle_real_t) real_t;
     typedef NS(Limit)           elem_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC elem_t* ptr_to_elem_t;
 
     buf_size_t const num_dataptrs =
-        NS(Limit_get_required_num_dataptrs)( SIXTRL_NULLPTR, SIXTRL_NULLPTR );
+        NS(Limit_get_required_num_dataptrs)( buffer, SIXTRL_NULLPTR );
 
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
 
     elem_t temp_obj;
-    NS(Limit_set_x_limit)( &temp_obj, NS(BE_LIMIT_DEFAULT_X_LIMIT) );
-    NS(Limit_set_y_limit)( &temp_obj, NS(BE_LIMIT_DEFAULT_Y_LIMIT) );
+    NS(Limit_set_x_limit)( &temp_obj, NS(DEFAULT_X_LIMIT) );
+    NS(Limit_set_y_limit)( &temp_obj, NS(DEFAULT_Y_LIMIT) );
 
     return ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
         NS(Buffer_add_object)( buffer, &temp_obj, sizeof( elem_t ),
@@ -83,12 +82,11 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(Limit)* NS(Limit_add)(
     NS(particle_real_t) const x_limit, NS(particle_real_t) const y_limit )
 {
     typedef NS(buffer_size_t)   buf_size_t;
-    typedef NS(particle_real_t) real_t;
     typedef NS(Limit)           elem_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC elem_t* ptr_to_elem_t;
 
     buf_size_t const num_dataptrs =
-        NS(Limit_get_required_num_dataptrs)( SIXTRL_NULLPTR, SIXTRL_NULLPTR );
+        NS(Limit_get_required_num_dataptrs)( buffer, SIXTRL_NULLPTR );
 
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;

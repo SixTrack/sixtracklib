@@ -13,7 +13,7 @@
     #include "sixtracklib/common/internal/beam_elements_defines.h"
     #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/control/definitions.h"
-    #include "sixtracklib/common/particles/definitions.h"
+    #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -23,11 +23,10 @@ extern "C" {
 
 typedef struct NS(Limit)
 {
-    NS(particle_real_t) x_limit;
-    NS(particle_real_t) y_limit;
+    NS(particle_real_t) x_limit     SIXTRL_ALIGN( 8 );
+    NS(particle_real_t) y_limit     SIXTRL_ALIGN( 8 );
 }
 NS(Limit);
-
 
 #if !defined( SIXTRL_DEFAULT_X_LIMIT )
     #define SIXTRL_DEFAULT_X_LIMIT 1.0
@@ -60,35 +59,35 @@ NS(Limit_get_required_num_slots_on_managed_buffer)(
     SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT limit,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_STATIC_SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(Limit)* NS(Limit_preset)(
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(Limit)* NS(Limit_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(Limit)* SIXTRL_RESTRICT  );
 
-SIXTRL_STATIC_SIXTRL_FN NS(particle_real_t) NS(Limit_get_x_limit)(
+SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(Limit_get_x_limit)(
     SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT  );
 
-SIXTRL_STATIC_SIXTRL_FN NS(particle_real_t) NS(Limit_get_y_limit)(
+SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(Limit_get_y_limit)(
     SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT  );
 
-SIXTRL_STATIC_SIXTRL_FN void NS(Limit_set_x_limit)(
+SIXTRL_STATIC SIXTRL_FN void NS(Limit_set_x_limit)(
     SIXTRL_BE_ARGPTR_DEC NS(Limit)* SIXTRL_RESTRICT ,
     NS(particle_real_t) const x_limit );
 
-SIXTRL_STATIC_SIXTRL_FN void NS(Limit_set_y_limit)(
+SIXTRL_STATIC SIXTRL_FN void NS(Limit_set_y_limit)(
     SIXTRL_BE_ARGPTR_DEC NS(Limit)* SIXTRL_RESTRICT ,
     NS(particle_real_t) const y_limit );
 
-SIXTRL_STATIC_SIXTRL_FN void NS(Limit_clear)(
+SIXTRL_STATIC SIXTRL_FN void NS(Limit_clear)(
     SIXTRL_BE_ARGPTR_DEC NS(Limit)* SIXTRL_RESTRICT  );
 
-SIXTRL_STATIC_SIXTRL_FN NS(arch_status_t) NS(Limit_copy)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Limit_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(Limit)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT source );
 
-SIXTRL_STATIC_SIXTRL_FN int NS(Limit_compare_values)(
+SIXTRL_STATIC SIXTRL_FN int NS(Limit_compare_values)(
     SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT rhs );
 
-SIXTRL_STATIC_SIXTRL_FN int NS(Limit_compare_values_with_treshold)(
+SIXTRL_STATIC SIXTRL_FN int NS(Limit_compare_values_with_treshold)(
     SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT rhs,
     SIXTRL_REAL_T const treshold );
@@ -191,7 +190,7 @@ SIXTRL_INLINE NS(particle_real_t) NS(Limit_get_x_limit)(
 }
 
 SIXTRL_INLINE NS(particle_real_t) NS(Limit_get_y_limit)(
-    SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT  )
+    SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT limit )
 {
     return ( limit != SIXTRL_NULLPTR )
         ? limit->y_limit : SIXTRL_DEFAULT_Y_LIMIT;
@@ -210,7 +209,7 @@ SIXTRL_INLINE void NS(Limit_set_x_limit)(
 }
 
 SIXTRL_INLINE void NS(Limit_set_y_limit)(
-    SIXTRL_BE_ARGPTR_DEC NS(Limit)* SIXTRL_RESTRICT ,
+    SIXTRL_BE_ARGPTR_DEC NS(Limit)* SIXTRL_RESTRICT limit,
     NS(particle_real_t) const y_limit )
 {
     if( ( limit != SIXTRL_NULLPTR ) && ( y_limit >= ( NS(particle_real_t) )0 ) )
@@ -277,11 +276,11 @@ SIXTRL_INLINE int NS(Limit_compare_values)(
             NS(particle_real_t) const delta_y =
                 NS(Limit_get_y_limit)( lhs ) - NS(Limit_get_y_limit)( rhs );
 
-            if( delta_y > NS(particle_real_t)0.0 )
+            if( delta_y > ( NS(particle_real_t) )0.0 )
             {
                 cmp_result = +1;
             }
-            else if( delta_y < NS(particle_real_t)0.0 )
+            else if( delta_y < ( NS(particle_real_t) )0.0 )
             {
                 cmp_result = -1;
             }
@@ -324,11 +323,11 @@ SIXTRL_INLINE int NS(Limit_compare_values_with_treshold)(
             NS(particle_real_t) const delta_y =
                 NS(Limit_get_y_limit)( lhs ) - NS(Limit_get_y_limit)( rhs );
 
-            if( delta_y > NS(particle_real_t)0.0 )
+            if( delta_y > ( NS(particle_real_t) )0.0 )
             {
                 cmp_result = +1;
             }
-            else if( delta_y < NS(particle_real_t)0.0 )
+            else if( delta_y < ( NS(particle_real_t) )0.0 )
             {
                 cmp_result = -1;
             }

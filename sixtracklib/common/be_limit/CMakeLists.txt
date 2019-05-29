@@ -1,10 +1,17 @@
 # =============================================================================
 # end: sixtracklib/common/be_limit/CMakeLitst.txt
 
-set( SIXTRL_COMMON_BE_LIMIT_CXX_HEADERS )
+set( SIXTRL_COMMON_BE_LIMIT_CXX_HEADERS 
+     be_limit.hpp
+)
 
-set( SIXTRL_COMMON_BE_LIMIT_C99_HEADERS )
-set( SIXTRL_COMMON_BE_LIMIT_C99_SOURCES )
+set( SIXTRL_COMMON_BE_LIMIT_C99_HEADERS 
+     be_limit.h
+     track.h
+)
+set( SIXTRL_COMMON_BE_LIMIT_C99_SOURCES 
+     be_limit.c
+)
 
 add_library( sixtrack_common_be_limit OBJECT
     ${SIXTRL_COMMON_BE_LIMIT_C99_HEADERS}
@@ -20,7 +27,7 @@ set_target_properties( sixtrack_common_be_limit PROPERTIES
     C_STANDARD 99 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_common_be_limit PRIVATE
-    -Wall -Werror -pedantic -ansi ${SIXTRACKLIB_CPU_FLAGS} )
+    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_common_be_beambeam as a module for sixtracklib:
@@ -47,4 +54,4 @@ if( SIXTRACKL_ENABLE_CXX AND SIXTRL_COMMON_BE_LIMIT_CXX_HEADERS )
              DESTINATION ${SIXTRL_COMMON_BE_LIMIT_CXX_INSTALL_PATH} )
 endif()
 
-#end:
+#end: sixtracklib/common/be_limit/CMakeLists.txt
