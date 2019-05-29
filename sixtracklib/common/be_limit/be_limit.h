@@ -29,23 +29,21 @@ typedef struct NS(Limit)
 NS(Limit);
 
 
-#if !defined( SIXTRL_BE_LIMIT_DEFAULT_X_LIMIT )
-    #define SIXTRL_BE_LIMIT_DEFAULT_X_LIMIT 1.0
-#endif /* !defined( SIXTRL_BE_LIMIT_DEFAULT_X_LIMIT ) */
+#if !defined( SIXTRL_DEFAULT_X_LIMIT )
+    #define SIXTRL_DEFAULT_X_LIMIT 1.0
+#endif /* !defined( SIXTRL_DEFAULT_X_LIMIT ) */
 
-#if !defined( SIXTRL_BE_LIMIT_DEFAULT_Y_LIMIT )
-    #define SIXTRL_BE_LIMIT_DEFAULT_Y_LIMIT 1.0
-#endif /* !defined( SIXTRL_BE_LIMIT_DEFAULT_Y_LIMIT ) */
+#if !defined( SIXTRL_DEFAULT_Y_LIMIT )
+    #define SIXTRL_DEFAULT_Y_LIMIT 1.0
+#endif /* !defined( SIXTRL_DEFAULT_Y_LIMIT ) */
 
 #if !defined( _GPUCODE )
 
-    SIXTRL_STATIC_VAR NS(particle_real_t) const
-        NS(BE_LIMIT_DEFAULT_X_LIMIT) = (
-            NS(particle_real_t) )SIXTRL_BE_LIMIT_DEFAULT_X_LIMIT;
+    SIXTRL_STATIC_VAR NS(particle_real_t) const NS(DEFAULT_X_LIMIT) = (
+            NS(particle_real_t) )SIXTRL_DEFAULT_X_LIMIT;
 
-    SIXTRL_STATIC_VAR NS(particle_real_t) const
-        NS(BE_LIMIT_DEFAULT_Y_LIMIT) = (
-            NS(particle_real_t) )SIXTRL_BE_LIMIT_DEFAULT_Y_LIMIT;
+    SIXTRL_STATIC_VAR NS(particle_real_t) const NS(DEFAULT_Y_LIMIT) = (
+            NS(particle_real_t) )SIXTRL_DEFAULT_Y_LIMIT;
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -53,11 +51,13 @@ NS(Limit);
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(Limit_get_required_num_dataptrs_on_managed_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT limit,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(Limit_get_required_num_slots_on_managed_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT limit,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_STATIC_SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(Limit)* NS(Limit_preset)(
@@ -140,22 +140,25 @@ extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 SIXTRL_INLINE NS(buffer_size_t)
-NS(ParticlesAddr_get_required_num_dataptrs_on_managed_buffer)(
+NS(Limit_get_required_num_dataptrs_on_managed_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT limit,
     NS(buffer_size_t) const slot_size )
 {
     SIXTRL_ASSERT( buffer != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( slot_size > ( NS(buffer_size_t) )0u );
 
     ( void )buffer;
+    ( void )limit;
     ( void )slot_size;
 
     return ( NS(buffer_size_t) )0u;
 }
 
 SIXTRL_INLINE NS(buffer_size_t)
-NS(ParticlesAddr_get_required_num_slots_on_managed_buffer)(
+NS(Limit_get_required_num_slots_on_managed_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT limit,
     NS(buffer_size_t) const slot_size )
 {
     SIXTRL_ASSERT( buffer != SIXTRL_NULLPTR );
@@ -163,8 +166,9 @@ NS(ParticlesAddr_get_required_num_slots_on_managed_buffer)(
 
     ( void )buffer;
 
-    return NS(ManagedBuffer_get_slot_based_length)(
-        sizeof( NS(Limit) ), slot_size );
+    return ( limit != SIXTRL_NULLPTR )
+        ? NS(ManagedBuffer_get_slot_based_length)( sizeof( *limit ), slot_size )
+        : ( NS(buffer_size_t) )0u;
 }
 
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Limit)* NS(Limit_preset)(
@@ -172,8 +176,8 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Limit)* NS(Limit_preset)(
 {
     if( limit != SIXTRL_NULLPTR )
     {
-        NS(Limit_set_x_limit)( limit, SIXTRL_BE_LIMIT_DEFAULT_X_LIMIT );
-        NS(Limit_set_y_limit)( limit, SIXTRL_BE_LIMIT_DEFAULT_Y_LIMIT );
+        NS(Limit_set_x_limit)( limit, SIXTRL_DEFAULT_X_LIMIT );
+        NS(Limit_set_y_limit)( limit, SIXTRL_DEFAULT_Y_LIMIT );
     }
 
     return limit;
@@ -183,14 +187,14 @@ SIXTRL_INLINE NS(particle_real_t) NS(Limit_get_x_limit)(
     SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT limit )
 {
     return ( limit != SIXTRL_NULLPTR )
-        ? limit->x_limit : SIXTRL_BE_LIMIT_DEFAULT_X_LIMIT;
+        ? limit->x_limit : SIXTRL_DEFAULT_X_LIMIT;
 }
 
 SIXTRL_INLINE NS(particle_real_t) NS(Limit_get_y_limit)(
     SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT  )
 {
     return ( limit != SIXTRL_NULLPTR )
-        ? limit->y_limit : SIXTRL_BE_LIMIT_DEFAULT_Y_LIMIT;
+        ? limit->y_limit : SIXTRL_DEFAULT_Y_LIMIT;
 }
 
 SIXTRL_INLINE void NS(Limit_set_x_limit)(

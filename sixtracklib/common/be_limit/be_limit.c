@@ -19,19 +19,19 @@
 
 NS(buffer_size_t) NS(Limit_get_required_num_dataptrs)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT )
+    SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT limit )
 {
     return NS(Limit_get_required_num_dataptrs_on_managed_buffer)(
-        NS(Buffer_get_data_begin)( buffer ),
+        NS(Buffer_get_data_begin)( buffer ), limit,
         NS(Buffer_get_slot_size)( buffer ) );
 }
 
 NS(buffer_size_t) NS(Limit_get_required_num_slots)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_BE_ARGPTR_DEC  const NS(Limit) *const SIXTRL_RESTRICT )
+    SIXTRL_BE_ARGPTR_DEC  const NS(Limit) *const SIXTRL_RESTRICT limit )
 {
     return NS(Limit_get_required_num_slots_on_managed_buffer)(
-        NS(Buffer_get_data_begin)( buffer ),
+        NS(Buffer_get_data_begin)( buffer ), limit,
         NS(Buffer_get_slot_size)( buffer ) );
 }
 

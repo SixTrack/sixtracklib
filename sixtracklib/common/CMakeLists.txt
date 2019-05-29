@@ -22,6 +22,7 @@ add_subdirectory( be_rfmultipole )
 add_subdirectory( be_srotation   )
 add_subdirectory( be_xyshift     )
 add_subdirectory( be_monitor     )
+add_subdirectory( be_limit       )
 add_subdirectory( output         )
 
 set( SIXTRACKLIB_COMMON_INTERNAL_CXX_HEADERS )
