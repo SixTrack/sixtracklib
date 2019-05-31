@@ -115,13 +115,6 @@ if( GTEST_FOUND )
     add_test( C99_CommonElemByElemConfigTests   test_elem_by_elem_config_c99 )
 
     # --------------------------------------------------------------------------
-    # test_be_monitor_common_c99:
-
-    add_executable( test_be_monitor_common_c99    test_be_monitor_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_monitor_common_c99 )
-    add_test( C99_CommonBeamMonitorTests          test_be_monitor_common_c99 )
-
-    # --------------------------------------------------------------------------
     # test_faddeeva_errf:
 
 #     add_executable( test_faddeeva_errf test_faddeeva_errf.cpp )
