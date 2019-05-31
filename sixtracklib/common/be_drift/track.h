@@ -56,7 +56,8 @@ SIXTRL_INLINE int NS(Track_particle_drift)(
     real_t const dzeta  = NS(Particles_get_rvv_value)( p, ii ) -
                           ( ( real_t )1 + ( xp*xp + yp*yp ) / ( real_t )2 );
 
-    #if defined( SIXTRL_ENABLE_APERTURE_CHECK ) && ( SIXTRL_ENABLE_APERTURE_CHECK == 1 )
+    #if defined( SIXTRL_ENABLE_APERTURE_CHECK ) && \
+               ( SIXTRL_ENABLE_APERTURE_CHECK == 1 )
 
     typedef NS(particle_index_t) index_t;
 
