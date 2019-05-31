@@ -18,12 +18,12 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST NS(particle_real_t)
-        BE_LIMIT_DEFAULT_X_LIMIT = static_cast< ::NS(particle_real_t) >(
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ::NS(particle_real_t)
+        DEFAULT_X_LIMIT = static_cast< ::NS(particle_real_t) >(
             SIXTRL_DEFAULT_X_LIMIT );
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST NS(particle_real_t)
-        BE_LIMIT_DEFAULT_Y_LIMIT = static_cast< ::NS(particle_real_t) >(
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ::NS(particle_real_t)
+        DEFAULT_Y_LIMIT = static_cast< ::NS(particle_real_t) >(
             SIXTRL_DEFAULT_Y_LIMIT );
 
     template< typename T >
@@ -75,23 +75,29 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_dataptrs = nullptr ) SIXTRL_NOEXCEPT;
 
-
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimit< T >*
         CreateNewOnBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer );
 
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimit< T >*
-        CreateNewOnBuffer(
-            SIXTRL_BUFFER_ARGPTR_DEC c_buffer_t* SIXTRL_RESTRICT ptr_buffer );
+        CreateNewOnBuffer( c_buffer_t& SIXTRL_RESTRICT_REF buffer );
 
-
-
+        
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimit< T >* AddToBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer,
             value_type const& dx, value_type const& dy );
 
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimit< T >* AddToBuffer(
-            SIXTRL_BUFFER_ARGPTR_DEC c_buffer_t* SIXTRL_RESTRICT ptr_buffer,
+            c_buffer_t& SIXTRL_RESTRICT_REF buffer,
             value_type const& dx, value_type const& dy );
+        
+        
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimit< T >* AddCopyToBuffer(
+            buffer_t& SIXTRL_RESTRICT_REF buffer,
+            TLimit< T > const& SIXTRL_RESTRICT_REF other );
+        
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimit< T >* AddCopyToBuffer(
+            c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+            TLimit< T > const& SIXTRL_RESTRICT_REF other );
 
         /* ---------------------------------------------------------------- */
 
@@ -201,7 +207,7 @@ namespace SIXTRL_CXX_NAMESPACE
         /* ---------------------------------------------------------------- */
 
         SIXTRL_STATIC SIXTRL_FN bool CanAddToBuffer(
-            buffer_t const& SIXTRL_RESTRICT_REF buffer,
+            buffer_t& SIXTRL_RESTRICT_REF buffer,
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_objects  = nullptr,
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
@@ -210,8 +216,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 ptr_requ_dataptrs = nullptr ) SIXTRL_NOEXCEPT;
 
         SIXTRL_STATIC SIXTRL_FN bool CanAddToBuffer(
-            SIXTRL_BUFFER_ARGPTR_DEC const c_buffer_t *const
-                SIXTRL_RESTRICT ptr_buffer,
+            SIXTRL_BUFFER_ARGPTR_DEC c_buffer_t* SIXTRL_RESTRICT ptr_buffer,
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_objects  = nullptr,
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
@@ -226,8 +231,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_STATIC SIXTRL_FN
         SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >*
-        CreateNewOnBuffer( SIXTRL_BUFFER_ARGPTR_DEC c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer );
+        CreateNewOnBuffer( c_buffer_t& SIXTRL_RESTRICT_REF buffer );
 
 
         SIXTRL_STATIC SIXTRL_FN
@@ -237,8 +241,19 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_STATIC SIXTRL_FN
         SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >* AddToBuffer(
-            SIXTRL_BUFFER_ARGPTR_DEC c_buffer_t* SIXTRL_RESTRICT ptr_buffer,
+            c_buffer_t& SIXTRL_RESTRICT_REF buffer,
             value_type const x_limit, value_type const y_limit );
+        
+        
+        SIXTRL_STATIC SIXTRL_FN 
+        SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >* AddCopyToBuffer(
+            buffer_t& SIXTRL_RESTRICT_REF buffer,
+            TLimit< ::NS(particle_real_t) > const& SIXTRL_RESTRICT_REF other );
+        
+        SIXTRL_STATIC SIXTRL_FN 
+        SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >* AddCopyToBuffer(
+            c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+            TLimit< ::NS(particle_real_t) > const& SIXTRL_RESTRICT_REF other );
 
         /* ----------------------------------------------------------------- */
 
@@ -261,7 +276,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_FN void preset() SIXTRL_NOEXCEPT;
         SIXTRL_FN void setXLimit( value_type const x_limit ) SIXTRL_NOEXCEPT;
-        SIXTRL_FN void setyLimit( value_type const y_limit ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setYLimit( value_type const y_limit ) SIXTRL_NOEXCEPT;
 
     };
 
@@ -317,8 +332,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     template< typename T >
     bool TLimit< T >::CanAddToBuffer(
-        SIXTRL_BUFFER_ARGPTR_DEC typename TLimit< T >::c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer,
+        typename TLimit< T >::c_buffer_t* SIXTRL_RESTRICT ptr_buffer,
         SIXTRL_ARGPTR_DEC typename TLimit< T >::size_type*
             SIXTRL_RESTRICT req_objects,
         SIXTRL_ARGPTR_DEC typename TLimit< T >::size_type*
@@ -346,13 +360,12 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit< T >::CreateNewOnBuffer(
         typename TLimit< T >::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
-        return TLimit< T >::CreateNewOnBuffer( buffer.getCApiPtr() );
+        return TLimit< T >::CreateNewOnBuffer( *( buffer.getCApiPtr() ) );
     }
 
     template< typename T >
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit< T >::CreateNewOnBuffer(
-        SIXTRL_BUFFER_ARGPTR_DEC typename TLimit< T >::c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer )
+        typename TLimit< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
         using _this_t = SIXTRL_CXX_NAMESPACE::TLimit< T >;
         using size_t  = typename _this_t::size_type;
@@ -361,7 +374,7 @@ namespace SIXTRL_CXX_NAMESPACE
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        size_t const num_dataptrs = _this_t::RequiredNumDataPtrs( ptr_buffer );
+        size_t const num_dataptrs = _this_t::RequiredNumDataPtrs( &buffer );
         SIXTRL_ASSERT( num_dataptrs == size_t{ 0 } );
 
         SIXTRL_ARGPTR_DEC size_t const* offsets = nullptr;
@@ -372,7 +385,7 @@ namespace SIXTRL_CXX_NAMESPACE
         temp.preset();
 
         return reinterpret_cast< ptr_t >( ::NS(Object_get_begin_addr)(
-            ::NS(Buffer_add_object)( ptr_buffer, &temp, sizeof( _this_t ),
+            ::NS(Buffer_add_object)( &buffer, &temp, sizeof( _this_t ),
                 temp.getTypeId(), num_dataptrs, offsets, sizes, counts ) ) );
     }
 
@@ -382,14 +395,13 @@ namespace SIXTRL_CXX_NAMESPACE
         typename TLimit< T >::value_type const& SIXTRL_RESTRICT_REF x_limit,
         typename TLimit< T >::value_type const& SIXTRL_RESTRICT_REF y_limit )
     {
-        return TLimit< T> ::AddToBuffer(
-            buffer.getCApiPtr(), x_limit, y_limit );
+        typename TLimit< T >::c_buffer_t& c_buffer = *( buffer.getCApiPtr() );
+        return TLimit< T>::AddToBuffer( c_buffer, x_limit, y_limit);
     }
 
     template< typename T >
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit< T >::AddToBuffer(
-        SIXTRL_BUFFER_ARGPTR_DEC typename TLimit< T >::c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer,
+        typename TLimit< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
         typename TLimit< T >::value_type const& SIXTRL_RESTRICT_REF x_limit,
         typename TLimit< T >::value_type const& SIXTRL_RESTRICT_REF y_limit )
     {
@@ -400,7 +412,7 @@ namespace SIXTRL_CXX_NAMESPACE
         static_assert( std::is_trivial< _this_t >::value, "" );
         static_assert( std::is_standard_layout< _this_t >::value, "" );
 
-        size_t const num_dataptrs = _this_t::RequiredNumDataPtrs( ptr_buffer );
+        size_t const num_dataptrs = _this_t::RequiredNumDataPtrs( &buffer );
         SIXTRL_ASSERT( num_dataptrs == size_t{ 0 } );
 
         SIXTRL_ARGPTR_DEC size_t const* offsets = nullptr;
@@ -412,8 +424,26 @@ namespace SIXTRL_CXX_NAMESPACE
         temp.setYLimit( y_limit );
 
         return reinterpret_cast< ptr_t >( ::NS(Object_get_begin_addr)(
-            ::NS(Buffer_add_object)( ptr_buffer, &temp, sizeof( _this_t ),
+            ::NS(Buffer_add_object)( &buffer, &temp, sizeof( _this_t ),
                 temp.getTypeId(), num_dataptrs, offsets, sizes, counts ) ) );
+    }
+    
+    template< typename T >
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit< T >::AddCopyToBuffer(
+        typename TLimit< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        TLimit< T > const& SIXTRL_RESTRICT_REF orig )
+    {
+        return TLimit< T >::AddToBuffer( 
+            *( buffer.getCApiPtr() ), orig.getXLimit(), orig.getYLimit() );
+    }
+    
+    template< typename T >
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit< T >::AddCopyToBuffer(
+        typename TLimit< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+        TLimit< T > const& SIXTRL_RESTRICT_REF orig )
+    {
+        return TLimit< T >::AddToBuffer( 
+            buffer, orig.getXLimit(), orig.getYLimit() );
     }
 
     /* ---------------------------------------------------------------- */
@@ -481,226 +511,196 @@ namespace SIXTRL_CXX_NAMESPACE
     /* ----------------------------------------------------------------- */
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TLimit< T >* TLimit_new(
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit_new(
         typename TLimit< T >::buffer_t& buffer )
     {
-        return SIXTRL_CXX_NAMESPACE::TLimit< T >::CreateNewOnBuffer(
-            buffer.getCApiPtr() );
+        return TLimit< T >::CreateNewOnBuffer( buffer );
     }
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TLimit< T >* TLimit_new(
-        SIXTRL_BUFFER_ARGPTR_DEC typename TLimit< T >::c_buffer_t* ptr_buffer )
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit_new(
+        typename TLimit< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
-        return SIXTRL_CXX_NAMESPACE::TLimit< T >::CreateNewOnBuffer(
-            ptr_buffer );
+        return TLimit< T >::CreateNewOnBuffer( buffer );
     }
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TLimit< T >* TLimit_add(
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit_add(
         typename TLimit< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         typename TLimit< T >::value_type const& SIXTRL_RESTRICT_REF x_limits,
         typename TLimit< T >::value_type const& SIXTRL_RESTRICT_REF y_limits )
     {
-        return SIXTRL_CXX_NAMESPACE::TLimit< T >::AddToBuffer(
-            buffer.getCApiPtr(), x_limits, y_limits );
+        return TLimit< T >::AddToBuffer( buffer, x_limits, y_limits );
     }
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TLimit< T >* TLimit_add(
-        SIXTRL_BUFFER_ARGPTR_DEC typename TLimit< T >::c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer,
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit_add(
+        typename TLimit< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
         typename TLimit< T >::value_type const& SIXTRL_RESTRICT_REF x_limits,
         typename TLimit< T >::value_type const& SIXTRL_RESTRICT_REF y_limits )
     {
-        return SIXTRL_CXX_NAMESPACE::TLimit< T >::AddToBuffer(
-            ptr_buffer, x_limits, y_limits );
+        return TLimit< T >::AddToBuffer( buffer, x_limits, y_limits );
     }
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TLimit< T >* TLimit_add_copy(
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit_add_copy(
         typename TLimit< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         TLimit< T > const& SIXTRL_RESTRICT_REF  other )
     {
-        return SIXTRL_CXX_NAMESPACE::TLimit< T >::AddToBuffer(
-            buffer.getCApiPtr(), other.getXLimit(), other.getYLimit() );
+        return TLimit< T >::AddCopyToBuffer( buffer, other );
     }
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TLimit< T >* TLimit_add_copy(
-        SIXTRL_BUFFER_ARGPTR_DEC typename TLimit< T >::c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer,
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< T >* TLimit_add_copy(
+        typename TLimit< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
         TLimit< T > const& SIXTRL_RESTRICT_REF  other )
     {
-        return SIXTRL_CXX_NAMESPACE::TLimit< T >::AddToBuffer(
-            ptr_buffer, other.getXLimit(), other.getYLimit() );
+        return TLimit< T >::AddCopyToBuffer( buffer, other );
     }
 
     /* ===================================================================== *
      * ====  Specialization TLimit< ::NS(particle_real_t) > :
      * ===================================================================== */
 
-    template<>
-    bool TLimit< ::NS(particle_real_t) >::CanAddToBuffer(
-        TLimit< ::NS(particle_real_t) >::buffer_t const& SIXTRL_RESTRICT_REF buffer,
-        SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::size_type*
-            SIXTRL_RESTRICT ptr_requ_objects,
-        SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::size_type*
-            SIXTRL_RESTRICT ptr_requ_slots,
-        SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::size_type*
-            SIXTRL_RESTRICT ptr_requ_dataptrs ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE bool Limit::CanAddToBuffer( 
+        Limit::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        SIXTRL_ARGPTR_DEC Limit::size_type* SIXTRL_RESTRICT ptr_requ_objects,
+        SIXTRL_ARGPTR_DEC Limit::size_type* SIXTRL_RESTRICT ptr_requ_slots,
+        SIXTRL_ARGPTR_DEC Limit::size_type* SIXTRL_RESTRICT ptr_requ_dataptrs 
+        ) SIXTRL_NOEXCEPT
     {
         return ::NS(Limit_can_be_added)( buffer.getCApiPtr(), ptr_requ_objects,
             ptr_requ_slots, ptr_requ_dataptrs );
     }
 
 
-    template<>
-    bool TLimit< ::NS(particle_real_t) >::CanAddToBuffer(
-        SIXTRL_BUFFER_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer,
-        SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::size_type*
-            SIXTRL_RESTRICT ptr_requ_objects,
-        SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::size_type*
-            SIXTRL_RESTRICT ptr_requ_slots,
-        SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::size_type*
-            SIXTRL_RESTRICT ptr_requ_dataptrs ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE bool Limit::CanAddToBuffer(
+        Limit::c_buffer_t* SIXTRL_RESTRICT ptr_buffer,
+        SIXTRL_ARGPTR_DEC Limit::size_type* SIXTRL_RESTRICT ptr_requ_objects,
+        SIXTRL_ARGPTR_DEC Limit::size_type* SIXTRL_RESTRICT ptr_requ_slots,
+        SIXTRL_ARGPTR_DEC Limit::size_type* SIXTRL_RESTRICT ptr_requ_dataptrs 
+        ) SIXTRL_NOEXCEPT
     {
-        return ::NS(Limit_can_be_added)( buffer.getCApiPtr(), ptr_requ_objects,
+        return ::NS(Limit_can_be_added)( ptr_buffer, ptr_requ_objects,
             ptr_requ_slots, ptr_requ_dataptrs );
     }
-
-    template<>
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< NS(particle_real_t) >*
-    TLimit< ::NS(particle_real_t) >::CreateNewOnBuffer(
-        TLimit< ::NS(particle_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer )
+    
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC Limit* Limit::CreateNewOnBuffer( 
+        Limit::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
-        return ::NS(Limit_new)( buffer.getCApiPtr() );
+        return static_cast< SIXTRL_ARGPTR_DEC Limit* >(
+            ::NS(Limit_new)( buffer.getCApiPtr() ) );
     }
 
-    template<>
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimit< NS(particle_real_t) >*
-    TLimit< ::NS(particle_real_t) >::CreateNewOnBuffer(
-        SIXTRL_BUFFER_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer )
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC Limit* Limit::CreateNewOnBuffer(
+        Limit::c_buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
-        return ::NS(Limit_new)( ptr_buffer );
+        return static_cast< SIXTRL_ARGPTR_DEC Limit* >(
+            ::NS(Limit_new)( &buffer ) );
     }
 
-    template<>
-    SIXTRL_ARGPTR_DEC TLimit< NS(particle_real_t) >*
-    TLimit< ::NS(particle_real_t) >::AddToBuffer(
-        TLimit< ::NS(particle_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        TLimit< ::NS(particle_real_t) >::value_type const x_limit,
-        TLimit< ::NS(particle_real_t) >::value_type const y_limit )
+    SIXTRL_ARGPTR_DEC Limit* Limit::AddToBuffer(
+        Limit::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        Limit::value_type const x_limit,
+        Limit::value_type const y_limit )
     {
-        return ::NS(Limit_add)( buffer.getCApiPtr(), x_limit, y_limit );
+        return static_cast< SIXTRL_ARGPTR_DEC Limit* >(
+            ::NS(Limit_add)( buffer.getCApiPtr(), x_limit, y_limit ) );
     }
 
-    template<>
-    SIXTRL_ARGPTR_DEC TLimit< NS(particle_real_t) >*
-    TLimit< ::NS(particle_real_t) >::AddToBuffer(
-        SIXTRL_BUFFER_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer,
-        TLimit< ::NS(particle_real_t) >::value_type const x_limit,
-        TLimit< ::NS(particle_real_t) >::value_type const y_limit )
+    SIXTRL_ARGPTR_DEC Limit*
+    Limit::AddToBuffer( Limit::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+        Limit::value_type const x_limit, Limit::value_type const y_limit )
     {
-        return ::NS(Limit_add)( ptr_buffer, x_limit, y_limit );
+        return static_cast< SIXTRL_ARGPTR_DEC Limit* >(
+            ::NS(Limit_add)( &buffer, x_limit, y_limit ) );
+    }
+    
+    SIXTRL_ARGPTR_DEC Limit* Limit::AddCopyToBuffer(
+        Limit::buffer_t& SIXTRL_RESTRICT_REF buffer, Limit const& other )
+    {
+        return static_cast< SIXTRL_ARGPTR_DEC Limit* >(
+            ::NS(Limit_add_copy)( buffer.getCApiPtr(), other.getCApiPtr() ) );
+    }
+
+    SIXTRL_ARGPTR_DEC Limit* Limit::AddCopyToBuffer( 
+        Limit::c_buffer_t& SIXTRL_RESTRICT_REF buffer, Limit const& other )
+    {
+        return static_cast< SIXTRL_ARGPTR_DEC Limit* >(
+            ::NS(Limit_add_copy)( &buffer, other.getCApiPtr() ) );
     }
 
     /* ----------------------------------------------------------------- */
 
-    template<>
-    SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::c_api_t const*
-    TLimit< ::NS(particle_real_t) >::getCApiPtr() const SIXTRL_NOEXCEPT
+    SIXTRL_ARGPTR_DEC Limit::c_api_t const* 
+    Limit::getCApiPtr() const SIXTRL_NOEXCEPT
     {
-        using ptr_t = TLimit< ::NS(particle_real_t) >::c_api_t const*;
-        return reinterpret_cast< ptr_t >( this );
+        return reinterpret_cast< Limit::c_api_t const* >( this );
     }
 
-    template<>
-    SIXTRL_ARGPTR_DEC TLimit< ::NS(particle_real_t) >::c_api_t*
-    TLimit< ::NS(particle_real_t) >::getCApiPtr() SIXTRL_NOEXCEPT
+    SIXTRL_ARGPTR_DEC Limit::c_api_t*
+    Limit::getCApiPtr() SIXTRL_NOEXCEPT
     {
-        return const_cast< TLimit< ::NS(particle_real_t) >::c_api_t* >(
-            static_cast< TLimit< ::NS(particle_real_t) > const& >( *this
+        return const_cast< Limit::c_api_t* >(
+            static_cast< Limit const& >( *this
                 ).getCApiPtr() );
     }
 
     /* ----------------------------------------------------------------- */
 
-    template<>
-    TLimit< ::NS(particle_real_t) >::type_id_t
-    TLimit< ::NS(particle_real_t) >::getTypeId() const SIXTRL_NOEXCEPT
+    Limit::type_id_t Limit::getTypeId() const SIXTRL_NOEXCEPT
     {
         return SIXTRL_CXX_NAMESPACE::OBJECT_TYPE_LIMIT;
     }
 
-    template<>
-    TLimit< ::NS(particle_real_t) >::size_type
-    TLimit< ::NS(particle_real_t) >::RequiredNumDataPtrs(
-        TLimit< ::NS(particle_real_t) >::buffer_t const&
-            SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT
+    Limit::size_type Limit::RequiredNumDataPtrs( 
+        Limit::buffer_t const& SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT
     {
         return ::NS(Limit_get_required_num_dataptrs)( 
             buffer.getCApiPtr(), nullptr );
     }
 
-    template<>
-    TLimit< ::NS(particle_real_t) >::size_type
-    TLimit< ::NS(particle_real_t) >::RequiredNumDataPtrs(
-        SIXTRL_BUFFER_ARGPTR_DEC const
-            TLimit< ::NS(particle_real_t) >::c_buffer_t *const
-                SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT
+    Limit::size_type Limit::RequiredNumDataPtrs( SIXTRL_BUFFER_ARGPTR_DEC 
+        const Limit::c_buffer_t *const SIXTRL_RESTRICT ptr_buffer 
+    ) SIXTRL_NOEXCEPT
     {
         return ::NS(Limit_get_required_num_dataptrs)( 
             ptr_buffer, nullptr );
     }
 
-    template<>
-    TLimit< ::NS(particle_real_t) >::value_type
-    TLimit< ::NS(particle_real_t) >::getXLimit() const SIXTRL_NOEXCEPT
+    Limit::value_type Limit::getXLimit() const SIXTRL_NOEXCEPT
     {
         return ::NS(Limit_get_x_limit)( this->getCApiPtr() );
     }
 
-    template<>
-    TLimit< ::NS(particle_real_t) >::value_type
-    TLimit< ::NS(particle_real_t) >::getYLimit() const SIXTRL_NOEXCEPT
+    Limit::value_type Limit::getYLimit() const SIXTRL_NOEXCEPT
     {
         return ::NS(Limit_get_y_limit)( this->getCApiPtr() );
     }
 
-    template<>
-    void TLimit< ::NS(particle_real_t) >::preset() SIXTRL_NOEXCEPT
+    void Limit::preset() SIXTRL_NOEXCEPT
     {
         ::NS(Limit_preset)( this->getCApiPtr() );
     }
 
-    template<>
-    void TLimit< ::NS(particle_real_t) >::setXLimit(
-        TLimit< ::NS(particle_real_t) >::value_type
-            const x_limit ) SIXTRL_NOEXCEPT
+    void Limit::setXLimit( Limit::value_type const x_limit ) SIXTRL_NOEXCEPT
     {
         ::NS(Limit_set_x_limit)( this->getCApiPtr(), x_limit );
     }
 
-    template<>
-    void TLimit< ::NS(particle_real_t) >::setyLimit(
-        TLimit< ::NS(particle_real_t) >::value_type const
-            y_limit ) SIXTRL_NOEXCEPT
+    void Limit::setYLimit( Limit::value_type const y_limit ) SIXTRL_NOEXCEPT
     {
         ::NS(Limit_set_y_limit)( this->getCApiPtr(), y_limit );
     }
 
-    SIXTRL_ARGPTR_DEC SIXTRL_CXX_NAMESPACE::Limit* Limit_new(
+    SIXTRL_ARGPTR_DEC Limit* Limit_new(
         SIXTRL_CXX_NAMESPACE::Buffer& SIXTRL_RESTRICT_REF buffer )
     {
         return static_cast< SIXTRL_ARGPTR_DEC Limit* >(
             ::NS(Limit_new)( buffer.getCApiPtr() ) );
     }
 
-    SIXTRL_ARGPTR_DEC SIXTRL_CXX_NAMESPACE::Limit* Limit_new(
+    SIXTRL_ARGPTR_DEC Limit* Limit_new(
         SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer )
     {
         return static_cast< SIXTRL_ARGPTR_DEC Limit* >(
@@ -712,7 +712,7 @@ namespace SIXTRL_CXX_NAMESPACE
         NS(particle_real_t) const x_limit, NS(particle_real_t) const y_limit )
     {
         return static_cast< SIXTRL_ARGPTR_DEC Limit* >(
-            ::NS(Limit_add)( buffer.getCApiPtr(), x_limit, y_limit );
+            ::NS(Limit_add)( buffer.getCApiPtr(), x_limit, y_limit ) );
     }
 
     SIXTRL_ARGPTR_DEC Limit* Limit_add(
@@ -720,7 +720,7 @@ namespace SIXTRL_CXX_NAMESPACE
         NS(particle_real_t) const x_limit, NS(particle_real_t) const y_limit )
     {
         return static_cast< SIXTRL_ARGPTR_DEC Limit* >(
-            ::NS(Limit_add)( ptr_buffer, x_limit, y_limit );
+            ::NS(Limit_add)( ptr_buffer, x_limit, y_limit ) );
     }
 
     SIXTRL_ARGPTR_DEC SIXTRL_CXX_NAMESPACE::Limit* Limit_add_copy(
@@ -728,7 +728,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_CXX_NAMESPACE::Limit const& SIXTRL_RESTRICT_REF other )
     {
         return static_cast< SIXTRL_ARGPTR_DEC Limit* >(
-            ::NS(Limit_add_copy)( buffer.getCApiPtr(), other.getCApiPtr() );
+            ::NS(Limit_add_copy)( buffer.getCApiPtr(), other.getCApiPtr() ) );
     }
 
     SIXTRL_ARGPTR_DEC SIXTRL_CXX_NAMESPACE::Limit* Limit_add_copy(
@@ -736,7 +736,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_CXX_NAMESPACE::Limit const& SIXTRL_RESTRICT_REF other )
     {
         return static_cast< SIXTRL_ARGPTR_DEC SIXTRL_CXX_NAMESPACE::Limit* >(
-            ::NS(Limit_add_copy)( ptr_buffer, other.getCApiPtr() );
+            ::NS(Limit_add_copy)( ptr_buffer, other.getCApiPtr() ) );
     }
 }
 

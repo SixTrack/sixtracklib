@@ -18,7 +18,7 @@ struct NS(Limit);
 
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t) NS(Track_particle_limit)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
+    NS(particle_num_elements_t) const particle_idx,
     SIXTRL_BE_ARGPTR_DEC const struct NS(Limit) *const SIXTRL_RESTRICT limit );
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
@@ -35,7 +35,7 @@ extern "C" {
 
 SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
+    NS(particle_num_elements_t) const particle_idx,
     SIXTRL_BE_ARGPTR_DEC const NS(Limit) *const SIXTRL_RESTRICT limit )
 {
     typedef NS(particle_real_t)  real_t;
@@ -43,10 +43,10 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit)(
 
     SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0;
 
-    real_t const x = NS(Particles_get_x_value)( particles, particle_index );
+    real_t const x = NS(Particles_get_x_value)( particles, particle_idx );
     real_t const sign_x = ( real_t )( ZERO < x ) - ( real_t )( x < ZERO  );
 
-    real_t const y = NS(Particles_get_y_value)( particles, particle_index );
+    real_t const y = NS(Particles_get_y_value)( particles, particle_idx );
     real_t const sign_y = ( real_t )( ZERO < y ) - ( real_t )( y < ZERO  );
 
     index_t const new_state = (
@@ -56,7 +56,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit)(
     SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_idx ) !=
         ( index_t )0 );
     
-    NS(Particles_set_state_value)( particles, particle_index, new_state );
+    NS(Particles_set_state_value)( particles, particle_idx, new_state );
 
     return NS(TRACK_SUCCESS);
 }

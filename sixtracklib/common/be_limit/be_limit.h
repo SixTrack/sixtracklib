@@ -309,11 +309,14 @@ SIXTRL_INLINE int NS(Limit_compare_values_with_treshold)(
 
         cmp_result = 0;
 
-        if( delta_x > ( NS(particle_real_t) )0.0 )
+        if( ( delta_x > ( NS(particle_real_t) )0.0 ) &&
+            ( delta_x > treshold ) )
         {
             cmp_result = +1;
         }
-        else if( delta_x < ( NS(particle_real_t) )0.0 )
+        else if( 
+            ( delta_x < ( NS(particle_real_t) )0.0 ) &&
+            ( delta_x < -treshold ) )
         {
             cmp_result = -1;
         }
@@ -323,11 +326,13 @@ SIXTRL_INLINE int NS(Limit_compare_values_with_treshold)(
             NS(particle_real_t) const delta_y =
                 NS(Limit_get_y_limit)( lhs ) - NS(Limit_get_y_limit)( rhs );
 
-            if( delta_y > ( NS(particle_real_t) )0.0 )
+            if( ( delta_y > ( NS(particle_real_t) )0.0 ) &&
+                ( delta_y > treshold ) )
             {
                 cmp_result = +1;
             }
-            else if( delta_y < ( NS(particle_real_t) )0.0 )
+            else if( ( delta_y < ( NS(particle_real_t) )0.0 ) &&
+                     ( delta_y < -treshold ) )
             {
                 cmp_result = -1;
             }
