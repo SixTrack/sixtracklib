@@ -19,7 +19,7 @@ TEST( C99_CommonBeamElementDipoleEdgeTests, BasicUsage )
     using size_t       = ::NS(buffer_size_t);
     
     be_dipedge_t e1;
-    ::NS(DipoleEdge_preset)( &limit );
+    ::NS(DipoleEdge_preset)( &e1 );
     
     buffer_t* eb = ::NS(Buffer_new)( size_t{ 0 } );
     SIXTRL_ASSERT( eb != nullptr );

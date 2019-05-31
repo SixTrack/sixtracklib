@@ -36,6 +36,22 @@ typedef struct NS(DipoleEdge)
 }
 NS(DipoleEdge);
 
+#if !defined( _GPUCODE )
+
+SIXTRL_STATIC_VAR NS(dipedge_real_t) const NS(DIPOLE_EDGE_DEFAULT_INV_RHO) = 
+    ( NS(dipedge_real_t) )0;
+
+SIXTRL_STATIC_VAR NS(dipedge_real_t) const NS(DIPOLE_EDGE_DEFAULT_B) = 
+    ( NS(dipedge_real_t) )0;    
+
+SIXTRL_STATIC_VAR NS(dipedge_real_t) const NS(DIPOLE_EDGE_ROT_ANGLE_DEG) = 
+    ( NS(dipedge_real_t) )0;    
+
+SIXTRL_STATIC_VAR NS(dipedge_real_t) const NS(DIPOLE_EDGE_TILT_ANGLE_DEG) = 
+    ( NS(dipedge_real_t) )0;    
+    
+#endif /* !defined( _GPUCODE ) */
+    
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(DipoleEdge_get_required_num_dataptrs_on_managed_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
@@ -553,7 +569,7 @@ SIXTRL_INLINE int NS(DipoleEdge_compare_values_with_treshold)(
         if( cmp_result == 0 )
         {
             delta = NS(DipoleEdge_get_cos_tilt_angle)( lhs ) -
-                NS(DipoleEdge_get_sin_tilt_angle)( rhs );
+                NS(DipoleEdge_get_cos_tilt_angle)( rhs );
                 
             if( delta > treshold ) cmp_result = +1;
             else if( delta < minus_treshold ) cmp_result = -1;

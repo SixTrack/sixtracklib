@@ -22,9 +22,8 @@ TEST( CXX_CommonBeamElementDipoleEdgeTests, BasicUsage )
     be_dipedge_t e1;
     e1.preset();
     
-    buffer_t* eb = ::NS(Buffer_new)( size_t{ 0 } );
-    SIXTRL_ASSERT( eb != nullptr );
-    
+    buffer_t eb;
+        
     be_dipedge_t* e2 = eb.createNew< be_dipedge_t >();
     ASSERT_TRUE( e2 != nullptr );
     
@@ -33,6 +32,7 @@ TEST( CXX_CommonBeamElementDipoleEdgeTests, BasicUsage )
     
     be_dipedge_t* e4 = eb.addCopy( e1 );
     ASSERT_TRUE( e4 != nullptr );
+    
     ASSERT_TRUE( 0 == ::NS(DipoleEdge_compare_values)( 
         e4->getCApiPtr(), e1.getCApiPtr() ) );
 }

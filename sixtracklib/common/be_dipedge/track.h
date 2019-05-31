@@ -18,7 +18,7 @@ struct NS(DipoleEdge);
 
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t) NS(Track_particle_dipedge)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
+    NS(particle_num_elements_t) const particle_idx,
     SIXTRL_BE_ARGPTR_DEC const struct NS(DipoleEdge) 
         *const SIXTRL_RESTRICT dipedge);
 
