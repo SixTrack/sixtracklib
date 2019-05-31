@@ -6,11 +6,13 @@ set( SIXTRL_COMMON_BE_LIMIT_CXX_HEADERS
 )
 
 set( SIXTRL_COMMON_BE_LIMIT_C99_HEADERS 
-     be_limit.h
+     be_limit_rect.h
+     be_limit_ellipse.h
      track.h
 )
 set( SIXTRL_COMMON_BE_LIMIT_C99_SOURCES 
-     be_limit.c
+     be_limit_rect.c
+     be_limit_ellipse.c
 )
 
 add_library( sixtrack_common_be_limit OBJECT

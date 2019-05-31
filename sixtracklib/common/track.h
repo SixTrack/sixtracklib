@@ -571,6 +571,8 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Track_all_particles_line_ext)(
     #include "sixtracklib/common/be_monitor/track.h"
     #include "sixtracklib/common/be_srotation/track.h"
     #include "sixtracklib/common/be_xyshift/track.h"
+    #include "sixtracklib/common/be_limit/track.h"
+    #include "sixtracklib/common/be_dipedge/track.h"
 
     #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
         #include "sixtracklib/common/be_beambeam/track.h"
@@ -792,6 +794,32 @@ SIXTRL_INLINE int NS(Track_particle_beam_element_obj_dispatcher)(
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
             ret = NS(Track_particle_beam_monitor)( particles, index, belem );
+            break;
+        }
+        
+        case NS(OBJECT_TYPE_LIMIT_RECT):
+        {
+            typedef NS(Limit) belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_limit_rect)( particles, index, belem );
+            break;
+        }
+        
+        case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
+        {
+            ret = NS(TRACK_STATUS_GENERAL_FAILURE);
+            break;
+        }
+        
+        case NS(OBJECT_TYPE_LIMIT_DIPEDGE):
+        {
+            typedef NS(Limit) belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_limit_dipedge)( particles, index, belem );
             break;
         }
 
