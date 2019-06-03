@@ -50,7 +50,7 @@ set( SIXTRACKL_DEFAULT_CXX_FLAGS
 # ------------------------------------------------------------------------------
 # ---- SixTrackLib Features:
 
-option( SIXTRACKL_ENABLE_APERTURE_CHECK   "Enable xy - aperature check" ON )
+option( SIXTRACKL_ENABLE_APERTURE_CHECK   "Enable xy - aperture check" ON )
 
 
 # ==============================================================================

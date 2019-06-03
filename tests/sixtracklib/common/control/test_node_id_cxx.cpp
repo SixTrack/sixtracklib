@@ -40,10 +40,11 @@ TEST( CXX_CommonControlNodeIdTests, MinimalUsage )
     /* creating a node_id string from an illegal nodeId should never work,
        regardless whether the buffer is large enough or not */
 
-    ASSERT_TRUE( !node_id_a.toString(
-        node_id_str, TOO_SHORT_ID_STR_CAPACITY ) );
+    ASSERT_TRUE( node_id_a.toString( node_id_str, TOO_SHORT_ID_STR_CAPACITY 
+        ) != st::ARCH_STATUS_SUCCESS );
 
-    ASSERT_TRUE( !node_id_a.toString( node_id_str, NODE_ID_STR_CAPACITY ) );
+    ASSERT_TRUE( node_id_a.toString( node_id_str, NODE_ID_STR_CAPACITY ) !=
+                 st::ARCH_STATUS_SUCCESS );
 
     /* Setting the platform_id to a valid value should not change the
        overall picture much: */
@@ -53,10 +54,11 @@ TEST( CXX_CommonControlNodeIdTests, MinimalUsage )
     ASSERT_TRUE( !node_id_a.valid() );
     ASSERT_TRUE( node_id_a.platformId() == platform_id_t{ 0 } );
 
-    ASSERT_TRUE( !node_id_a.toString(
-        node_id_str, TOO_SHORT_ID_STR_CAPACITY ) );
+    ASSERT_TRUE( node_id_a.toString(
+        node_id_str, TOO_SHORT_ID_STR_CAPACITY ) != st::ARCH_STATUS_SUCCESS);
 
-    ASSERT_TRUE( !node_id_a.toString( node_id_str, NODE_ID_STR_CAPACITY ) );
+    ASSERT_TRUE( node_id_a.toString( node_id_str, NODE_ID_STR_CAPACITY ) !=
+                 st::ARCH_STATUS_SUCCESS );
 
     /* Setting also the device makes however a difference: */
 
@@ -74,10 +76,12 @@ TEST( CXX_CommonControlNodeIdTests, MinimalUsage )
     /* Now we should be able to create a node_id_str if we provide a
        large enough string buffer */
 
-    ASSERT_TRUE( !node_id_a.toString(
-        node_id_str, TOO_SHORT_ID_STR_CAPACITY ) );
+    ASSERT_TRUE( node_id_a.toString( node_id_str, TOO_SHORT_ID_STR_CAPACITY 
+            ) != st::ARCH_STATUS_SUCCESS );
 
-    ASSERT_TRUE( node_id_a.toString( node_id_str, NODE_ID_STR_CAPACITY ) );
+    ASSERT_TRUE( node_id_a.toString( node_id_str, NODE_ID_STR_CAPACITY ) ==
+                 st::ARCH_STATUS_SUCCESS );
+    
     ASSERT_TRUE( std::strcmp( node_id_str, "0.0" ) == 0 );
 
     std::string const cxx_node_id_str = node_id_a.toString();
@@ -126,9 +130,12 @@ TEST( CXX_CommonControlNodeIdTests, MinimalUsage )
 
     /* Update node_id_a to the same state as node_id_b via a node_id_str */
 
-    ASSERT_TRUE( node_id_b.toString( node_id_str, NODE_ID_STR_CAPACITY ) );
+    ASSERT_TRUE( node_id_b.toString( node_id_str, NODE_ID_STR_CAPACITY ) ==
+                 st::ARCH_STATUS_SUCCESS );
+    
     ASSERT_TRUE( 0 == std::strcmp( node_id_str, "1.0" ) );
-    ASSERT_TRUE( node_id_a.fromString( node_id_str ) );
+    ASSERT_TRUE( node_id_a.fromString( node_id_str ) == 
+                 st::ARCH_STATUS_SUCCESS );
 
     /* Verify that node_id_a is now again equivalent to node_id_b and that
      * the operation has not changed the node index of node_id_a */

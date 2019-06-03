@@ -25,8 +25,10 @@ typedef enum NS(object_type_values_e)
     NS(OBJECT_TYPE_LIMIT_RECT)        =         11,
     NS(OBJECT_TYPE_LIMIT_ELLIPSE)     =         12,
     NS(OBJECT_TYPE_DIPEDGE)           =         24,
+    NS(OBJECT_TYPE_PARTICLES_ADDR)    =        512,
     NS(OBJECT_TYPE_LINE)              =       1024,
     NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) =      65535,
+    NS(OBJECT_TYPE_LAST_AVAILABLE)    =      65535,
     NS(OBJECT_TYPE_INVALID)           = 0x7fffffff
 }
 NS(object_type_values_t);
