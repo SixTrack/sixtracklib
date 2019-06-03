@@ -74,36 +74,36 @@ if( GTEST_FOUND )
     add_test( CXX_CommonParticlesTests            test_particles_common_cxx )
 
     # ==========================================================================
-    # test_particles_aperature_check_enabled_common_c99:
+    # test_particles_aperture_check_enabled_common_c99:
 
-    add_executable( test_particles_aperature_check_enabled_common_c99
-                    test_particles_aperature_c99.cpp )
+    add_executable( test_particles_aperture_check_enabled_common_c99
+                    test_particles_aperture_c99.cpp )
 
-    target_compile_options( test_particles_aperature_check_enabled_common_c99
-        BEFORE PRIVATE -DSIXTRL_ENABLE_APERATURE_CHECK=1
-                       -DSIXTRL_APERATURE_X_LIMIT=1.0
-                       -DSIXTRL_APERATURE_Y_LIMIT=1.0 )
+    target_compile_options( test_particles_aperture_check_enabled_common_c99
+        BEFORE PRIVATE -DSIXTRL_ENABLE_APERTURE_CHECK=1
+                       -DSIXTRL_APERTURE_X_LIMIT=1.0
+                       -DSIXTRL_APERTURE_Y_LIMIT=1.0 )
 
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
-         test_particles_aperature_check_enabled_common_c99 )
+         test_particles_aperture_check_enabled_common_c99 )
 
-    add_test( C99_CommonParticlesAperatureEnabledTests
-              test_particles_aperature_check_enabled_common_c99 )
+    add_test( C99_CommonParticlesApertureEnabledTests
+              test_particles_aperture_check_enabled_common_c99 )
 
     # ------------------------------------------------------------------------
-    # test_particles_aperature_check_disabled_common_c99:
+    # test_particles_aperture_check_disabled_common_c99:
 
-    add_executable( test_particles_aperature_check_disabled_common_c99
-                    test_particles_aperature_c99.cpp )
+    add_executable( test_particles_aperture_check_disabled_common_c99
+                    test_particles_aperture_c99.cpp )
 
-    target_compile_options( test_particles_aperature_check_disabled_common_c99
-        BEFORE PRIVATE -DSIXTRL_ENABLE_APERATURE_CHECK=0 )
+    target_compile_options( test_particles_aperture_check_disabled_common_c99
+        BEFORE PRIVATE -DSIXTRL_ENABLE_APERTURE_CHECK=0 )
 
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
-         test_particles_aperature_check_disabled_common_c99 )
+         test_particles_aperture_check_disabled_common_c99 )
 
-    add_test( C99_CommonParticlesAperatureDisabledTests
-              test_particles_aperature_check_disabled_common_c99 )
+    add_test( C99_CommonParticlesApertureDisabledTests
+              test_particles_aperture_check_disabled_common_c99 )
 
     # --------------------------------------------------------------------------
     # test_elem_by_elem_config_c99:
