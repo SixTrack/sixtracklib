@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_BE_LIMIT_CXX_HPP__
-#define SIXTRACKLIB_COMMON_BE_LIMIT_CXX_HPP__
+#ifndef SIXTRACKLIB_COMMON_BE_LIMIT_RECT_CXX_HPP__
+#define SIXTRACKLIB_COMMON_BE_LIMIT_RECT_CXX_HPP__
 
 #if defined( __cplusplus )
 
@@ -13,19 +13,11 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer.hpp"
-    #include "sixtracklib/common/be_limit/be_limit.h"
+    #include "sixtracklib/common/be_limit/be_limit_rect.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ::NS(particle_real_t)
-        DEFAULT_X_LIMIT = static_cast< ::NS(particle_real_t) >(
-            SIXTRL_DEFAULT_X_LIMIT );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST ::NS(particle_real_t)
-        DEFAULT_Y_LIMIT = static_cast< ::NS(particle_real_t) >(
-            SIXTRL_DEFAULT_Y_LIMIT );
-
     template< typename T >
     struct TLimitRect
     {
@@ -37,13 +29,22 @@ namespace SIXTRL_CXX_NAMESPACE
         using size_type       = buffer_t::size_type;
         using c_buffer_t      = buffer_t::c_api_t;
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type
-            DEFAULT_X_LIMIT = static_cast< value_type >(
-                SIXTRL_DEFAULT_X_LIMIT );
-
-        static SIXTRL_CONSTEXPR_OR_CONST value_type
-            DEFAULT_Y_LIMIT = static_cast< value_type >(
-                SIXTRL_DEFAULT_Y_LIMIT );
+        /* ----------------------------------------------------------------- */
+        
+        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MAX_X = 
+             value_type{ SIXTRL_LIMIT_DEFAULT_MAX_X };
+        
+        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MIN_X = 
+            value_type{ SIXTRL_LIMIT_DEFAULT_MIN_X };
+            
+        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MAX_Y = 
+            value_type{ SIXTRL_LIMIT_DEFAULT_MAX_Y };
+        
+        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MIN_Y = 
+            value_type{ SIXTRL_LIMIT_DEFAULT_MIN_Y };
+            
+        /* ----------------------------------------------------------------- */
+        
 
         SIXTRL_FN TLimitRect() = default;
 
@@ -58,7 +59,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_FN ~TLimitRect() = default;
 
-        /* ---------------------------------------------------------------- */
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_STATIC SIXTRL_FN bool CanAddToBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer,
@@ -87,11 +88,13 @@ namespace SIXTRL_CXX_NAMESPACE
         
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimitRect< T >* AddToBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer,
-            value_type const& dx, value_type const& dy );
+            const_reference min_x, const_reference max_x,
+            const_reference min_y, const_reference max_y );
 
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimitRect< T >* AddToBuffer(
             c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-            value_type const& dx, value_type const& dy );
+            const_reference min_x, const_reference max_x,
+            const_reference min_y, const_reference max_y );
         
         
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimitRect< T >* 
@@ -102,7 +105,7 @@ namespace SIXTRL_CXX_NAMESPACE
         AddCopyToBuffer( c_buffer_t& SIXTRL_RESTRICT_REF buffer,
             TLimitRect< T > const& SIXTRL_RESTRICT_REF other );
 
-        /* ---------------------------------------------------------------- */
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_FN type_id_t getTypeId() const SIXTRL_NOEXCEPT;
 
@@ -112,18 +115,31 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_STATIC SIXTRL_FN size_type RequiredNumDataPtrs(
             SIXTRL_BUFFER_ARGPTR_DEC const c_buffer_t *const 
                 SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT;
+                
+        /* ----------------------------------------------------------------- */
             
-        SIXTRL_FN value_type const& getXLimitRect() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type const& getYLimitRect() const SIXTRL_NOEXCEPT;
-
         SIXTRL_FN void preset() SIXTRL_NOEXCEPT;
+        SIXTRL_FN void clear() SIXTRL_NOEXCEPT;
+        
+        /* ----------------------------------------------------------------- */
+                
+        SIXTRL_FN const_reference getMinX() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN const_reference getMaxX() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN void setXLimitRect(
-            value_type const& SIXTRL_RESTRICT_REF x_limit ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN void setYLimitRect(
-            value_type const& SIXTRL_RESTRICT_REF y_limit ) SIXTRL_NOEXCEPT;
-
+        SIXTRL_FN const_reference getMinY() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN const_reference getMaxY() const SIXTRL_NOEXCEPT;
+        
+        /* ----------------------------------------------------------------- */
+        
+        SIXTRL_FN void setXLimit( const_reference x_lim ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setYLimit( const_reference y_lim ) SIXTRL_NOEXCEPT;
+        
+        SIXTRL_FN void setMinX( const_reference min_x ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setMaxX( const_reference max_x ) SIXTRL_NOEXCEPT;
+        
+        SIXTRL_FN void setMinY( const_reference min_y ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setMaxY( const_reference max_y ) SIXTRL_NOEXCEPT;
+        
         /* ----------------------------------------------------------------- */
 
         value_type x_limit SIXTRL_ALIGN( 8 );
@@ -145,22 +161,24 @@ namespace SIXTRL_CXX_NAMESPACE
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TLimitRect< T >* TLimitRect_new(
-        SIXTRL_BUFFER_ARGPTR_DEC typename TLimitRect< T >::c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer );
+        typename TLimitRect< T >::c_buffer_t& SIXTRL_RESTRICT buffer );
 
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TLimitRect< T >* TLimitRect_add(
         typename TLimitRect< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TLimitRect< T >::value_type const& SIXTRL_RESTRICT_REF x_lim,
-        typename TLimitRect< T >::value_type const& SIXTRL_RESTRICT_REF y_lim);
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF min_x,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF max_x,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF min_y,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF max_y);
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TLimitRect< T >* TLimitRect_add(
-        SIXTRL_BUFFER_ARGPTR_DEC typename TLimitRect< T >::c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer,
-        typename TLimitRect< T >::value_type const& SIXTRL_RESTRICT_REF x_lim,
-        typename TLimitRect< T >::value_type const& SIXTRL_RESTRICT_REF y_lim);
+        typename TLimitRect< T >::c_buffer_t& SIXTRL_RESTRICT buffer,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF min_x,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF max_x,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF min_y,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF max_y);
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TLimitRect< T >* TLimitRect_add_copy(
@@ -169,8 +187,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TLimitRect< T >* TLimitRect_add_copy(
-        SIXTRL_BUFFER_ARGPTR_DEC typename TLimitRect< T >::c_buffer_t*
-            SIXTRL_RESTRICT_REF ptr_buffer,
+        typename TLimitRect< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
         TLimitRect< T > const& SIXTRL_RESTRICT_REF other );
 
     /* ===================================================================== *
@@ -187,20 +204,26 @@ namespace SIXTRL_CXX_NAMESPACE
         using c_buffer_t = buffer_t::c_api_t;
         using c_api_t    = ::NS(LimitRect);
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type
-            DEFAULT_X_LIMIT = static_cast< value_type >(
-                SIXTRL_DEFAULT_X_LIMIT );
+        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MAX_X = 
+             SIXTRL_CXX_NAMESPACE::LIMIT_DEFAULT_MAX_X;
+        
+        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MIN_X = 
+            SIXTRL_CXX_NAMESPACE::LIMIT_DEFAULT_MIN_X;
+            
+        static SIXTRL_CONSTEXPR_OR_CONST value_type DEFAULT_MAX_Y = 
+            SIXTRL_CXX_NAMESPACE::LIMIT_DEFAULT_MAX_Y;
+        
+        static SIXTRL_CONSTEXPR_OR_CONST value_type DEFAULT_MIN_Y = 
+            SIXTRL_CXX_NAMESPACE::LIMIT_DEFAULT_MIN_Y;
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type
-            DEFAULT_Y_LIMIT = static_cast< value_type >(
-                SIXTRL_DEFAULT_Y_LIMIT );
-
+        /* ---------------------------------------------------------------- */
+            
         SIXTRL_FN TLimitRect() = default;
 
         SIXTRL_FN TLimitRect( 
             TLimitRect< value_type > const& other ) = default;
             
-        TLimitRect( TLimitRect< value_type >&& other ) = default;
+        SIXTRL_FN TLimitRect( TLimitRect< value_type >&& other ) = default;
 
         SIXTRL_FN TLimitRect< value_type >& operator=(
             TLimitRect< value_type > const& other ) = default;
@@ -243,12 +266,14 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_STATIC SIXTRL_FN
         SIXTRL_ARGPTR_DEC TLimitRect< ::NS(particle_real_t) >* AddToBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer,
-            value_type const x_limit, value_type const y_limit );
+            value_type const min_x, value_type const max_x, 
+            value_type const min_y, value_type const max_y );
 
         SIXTRL_STATIC SIXTRL_FN
         SIXTRL_ARGPTR_DEC TLimitRect< ::NS(particle_real_t) >* AddToBuffer(
             c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-            value_type const x_limit, value_type const y_limit );
+            value_type const min_x, value_type const max_x, 
+            value_type const min_y, value_type const max_y );
         
         
         SIXTRL_STATIC SIXTRL_FN 
@@ -279,13 +304,29 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_FN type_id_t getTypeId() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN value_type getXLimitRect() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getYLimitRect() const SIXTRL_NOEXCEPT;
-
+        /* ----------------------------------------------------------------- */
+        
         SIXTRL_FN void preset() SIXTRL_NOEXCEPT;
-        SIXTRL_FN void setXLimitRect( value_type const x_lim ) SIXTRL_NOEXCEPT;
-        SIXTRL_FN void setYLimitRect( value_type const y_lim ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void clear()  SIXTRL_NOEXCEPT;
+        
+        /* ----------------------------------------------------------------- */
+        
+        SIXTRL_FN value_type getMinX() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN value_type getMaxX() const SIXTRL_NOEXCEPT;
 
+        SIXTRL_FN value_type getMinY() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN value_type getMaxY() const SIXTRL_NOEXCEPT;
+        
+        /* ----------------------------------------------------------------- */
+        
+        SIXTRL_FN void setXLimit( value_type const x_lim ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setYLimit( value_type const y_lim ) SIXTRL_NOEXCEPT;
+        
+        SIXTRL_FN void setMinX( value_type const min_x ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setMaxX( value_type const max_x ) SIXTRL_NOEXCEPT;
+        
+        SIXTRL_FN void setMinY( value_type const min_y ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setMaxY( value_type const max_y ) SIXTRL_NOEXCEPT;
     };
 
     using LimitRect = TLimitRect< ::NS(particle_real_t) >;
@@ -298,13 +339,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_ARGPTR_DEC LimitRect* LimitRect_add( 
         SIXTRL_CXX_NAMESPACE::Buffer& buffer,
-        ::NS(particle_real_t) const x_limit,
-        ::NS(particle_real_t) const y_limit );
+        ::NS(particle_real_t) const x_min, ::NS(particle_real_t) const x_max,
+        ::NS(particle_real_t) const y_min, ::NS(particle_real_t) const y_max );
 
     SIXTRL_ARGPTR_DEC LimitRect* LimitRect_add(
         SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
-        ::NS(particle_real_t) const x_limit,
-        ::NS(particle_real_t) const y_limit );
+        ::NS(particle_real_t) const x_min, ::NS(particle_real_t) const x_max,
+        ::NS(particle_real_t) const y_min, ::NS(particle_real_t) const y_max );
 
     SIXTRL_ARGPTR_DEC LimitRect* LimitRect_add_copy( 
         SIXTRL_CXX_NAMESPACE::Buffer& buffer,
@@ -405,21 +446,23 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimitRect< T >* 
     TLimitRect< T >::AddToBuffer(
         typename TLimitRect< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TLimitRect< T >::value_type const& SIXTRL_RESTRICT_REF x_lim,
-        typename TLimitRect< T >::value_type const& SIXTRL_RESTRICT_REF y_lim )
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF min_x,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF max_x,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF min_y,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF max_y )
     {
-        typename TLimitRect< T >::c_buffer_t& c_buffer = *( 
-            buffer.getCApiPtr() );
-        
-        return TLimitRect< T>::AddToBuffer( c_buffer, x_limit, y_limit);
+        return TLimitRect< T>::AddToBuffer( 
+            *buffer.getCApiPtr(), min_x, max_x, min_y, max_y );
     }
 
     template< typename T >
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimitRect< T >* 
     TLimitRect< T >::AddToBuffer(
         typename TLimitRect< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TLimitRect< T >::value_type const& SIXTRL_RESTRICT_REF x_lim,
-        typename TLimitRect< T >::value_type const& SIXTRL_RESTRICT_REF y_lim )
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF min_x,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF max_x,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF min_y,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF max_y )
     {
         using _this_t = SIXTRL_CXX_NAMESPACE::TLimitRect< T >;
         using size_t  = typename _this_t::size_type;
@@ -436,8 +479,10 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
 
         _this_t temp;
-        temp.setXLimitRect( x_limit );
-        temp.setYLimitRect( y_limit );
+        temp.setMinX( min_x );
+        temp.setMaxX( max_x );
+        temp.setMinY( min_y );
+        temp.setMaxY( max_y );
 
         return reinterpret_cast< ptr_t >( ::NS(Object_get_begin_addr)(
             ::NS(Buffer_add_object)( &buffer, &temp, sizeof( _this_t ),
@@ -450,8 +495,8 @@ namespace SIXTRL_CXX_NAMESPACE
         typename TLimitRect< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         TLimitRect< T > const& SIXTRL_RESTRICT_REF orig )
     {
-        return TLimitRect< T >::AddToBuffer( 
-            *( buffer.getCApiPtr() ), orig.getXLimitRect(), orig.getYLimitRect() );
+        return TLimitRect< T >::AddToBuffer( *( buffer.getCApiPtr() ), 
+             orig.getMinX(), orig.getMaxX(), orig.getMinY(), orig.getMaxY() );
     }
     
     template< typename T >
@@ -460,11 +505,11 @@ namespace SIXTRL_CXX_NAMESPACE
         typename TLimitRect< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
         TLimitRect< T > const& SIXTRL_RESTRICT_REF orig )
     {
-        return TLimitRect< T >::AddToBuffer( 
-            buffer, orig.getXLimitRect(), orig.getYLimitRect() );
+        return TLimitRect< T >::AddToBuffer( buffer, 
+            orig.getMinX(), orig.getMaxX(), orig.getMinY(), orig.getMaxY() );
     }
 
-    /* ---------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
     template< typename T >
     SIXTRL_INLINE typename TLimitRect< T >::type_id_t
@@ -491,46 +536,107 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         return ::NS(LimitRect_get_required_num_dataptrs)( ptr_buffer, nullptr );
     }
-
-    template< typename T >
-    typename TLimitRect< T >::value_type const&
-    TLimitRect< T >::getXLimitRect() const SIXTRL_NOEXCEPT
-    {
-        return this->x_limit;
-    }
-
-    template< typename T >
-    typename TLimitRect< T >::value_type const&
-    TLimitRect< T >::getYLimitRect() const SIXTRL_NOEXCEPT
-    {
-        return this->y_limit;
-    }
+    
+    /* --------------------------------------------------------------------- */
 
     template< typename T >
     void TLimitRect< T >::preset() SIXTRL_NOEXCEPT
     {
-        this->x_limit = SIXTRL_CXX_NAMESPACE::TLimitRect< T >::DEFAULT_X_LIMIT;
-        this->y_limit = SIXTRL_CXX_NAMESPACE::TLimitRect< T >::DEFAULT_Y_LIMIT;
+        using _this_t = TLimitRect< T >;
+        
+        this->min_x = _this_t::DEFAULT_MIN_X;
+        this->max_x = _this_t::DEFAULT_MAX_X;
+        
+        this->min_y = _this_t::DEFAULT_MIN_Y;
+        this->max_y = _this_t::DEFAULT_MAX_Y;
     }
-
+    
     template< typename T >
-    void TLimitRect< T >::setXLimitRect( 
-        typename TLimitRect< T >::value_type const& 
-            SIXTRL_RESTRICT_REF x_limit ) SIXTRL_NOEXCEPT
+    void TLimitRect< T >::clear() SIXTRL_NOEXCEPT
     {
-        this->x_limit = x_limit;
+        this->preset();
+    }
+    
+    /* --------------------------------------------------------------------- */
+
+    template< typename T > typename TLimitRect< T >::const_reference 
+    TLimitRect< T >::getMinX() const SIXTRL_NOEXCEPT
+    {
+        return this->min_x;
+    }
+    
+    template< typename T > typename TLimitRect< T >::const_reference 
+    TLimitRect< T >::getMaxX() const SIXTRL_NOEXCEPT
+    {
+        return this->max_x;
     }
 
+    template< typename T > typename TLimitRect< T >::const_reference 
+    TLimitRect< T >::getMinY() const SIXTRL_NOEXCEPT
+    {
+        return this->min_y;
+    }
+    
+    template< typename T > typename TLimitRect< T >::const_reference 
+    TLimitRect< T >::getMaxY() const SIXTRL_NOEXCEPT
+    {
+        return this->max_y;
+    }
+    
+    /* --------------------------------------------------------------------- */
+    
     template< typename T >
-    void TLimitRect< T >::setYLimitRect( 
-        typename TLimitRect< T >::value_type const& 
-            SIXTRL_RESTRICT_REF y_limit ) SIXTRL_NOEXCEPT
+    void TLimitRect< T >::setXLimit( 
+        typename TLimitRect< T >::const_reference x_lim ) SIXTRL_NOEXCEPT
     {
-        this->y_limit = y_limit;
+        using value_t = typename TLimitRect< T >::value_type;
+        SIXTRL_ASSERT( x_lim >= ( value_t{ 0 } ) );
+        
+        this->min_x =  x_lim;
+        this->max_x = -x_lim;
     }
-
-    /* ----------------------------------------------------------------- */
-
+    
+    template< typename T >
+    void TLimitRect< T >::setYLimit( 
+        typename TLimitRect< T >::const_reference y_lim ) SIXTRL_NOEXCEPT
+    {
+        using value_t = typename TLimitRect< T >::value_type;
+        SIXTRL_ASSERT( y_lim >= ( value_t{ 0 } ) );
+        
+        this->min_y =  y_lim;
+        this->max_y = -y_lim;
+    }
+    
+    template< typename T >
+    void TLimitRect< T >::setMinX( 
+        typename TLimitRect< T >::const_reference min_x ) SIXTRL_NOEXCEPT
+    {
+        this->min_x = min_x;
+    }
+    
+    template< typename T >
+    void TLimitRect< T >::setMaxX( 
+        typename TLimitRect< T >::const_reference max_x ) SIXTRL_NOEXCEPT
+    {
+        this->max_x = max_x;
+    }
+    
+    template< typename T >
+    void TLimitRect< T >::setMinY( 
+        typename TLimitRect< T >::const_reference min_y ) SIXTRL_NOEXCEPT
+    {
+        this->min_y = min_y;
+    }
+    
+    template< typename T >
+    void TLimitRect< T >::setMaxY( 
+        typename TLimitRect< T >::const_reference max_y ) SIXTRL_NOEXCEPT
+    {
+        this->max_y = max_y;
+    }
+    
+    /* --------------------------------------------------------------------- */
+    
     template< typename T >
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimitRect< T >* TLimitRect_new(
         typename TLimitRect< T >::buffer_t& buffer )
@@ -548,19 +654,25 @@ namespace SIXTRL_CXX_NAMESPACE
     template< typename T >
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimitRect< T >* TLimitRect_add(
         typename TLimitRect< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TLimitRect< T >::value_type const& SIXTRL_RESTRICT_REF x_lim,
-        typename TLimitRect< T >::value_type const& SIXTRL_RESTRICT_REF y_lim )
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF min_x,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF max_x,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF min_y,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF max_y )
     {
-        return TLimitRect< T >::AddToBuffer( buffer, x_lim, y_lim );
+        return TLimitRect< T >::AddToBuffer( 
+            buffer, min_x, max_x, min_y, max_y );
     }
 
     template< typename T >
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimitRect< T >* TLimitRect_add(
         typename TLimitRect< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TLimitRect< T >::value_type const& SIXTRL_RESTRICT_REF x_lim,
-        typename TLimitRect< T >::value_type const& SIXTRL_RESTRICT_REF y_lim )
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF min_x,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF max_x,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF min_y,
+        typename TLimitRect< T >::const_reference SIXTRL_RESTRICT_REF max_y )
     {
-        return TLimitRect< T >::AddToBuffer( buffer, x_lim, y_lim );
+        return TLimitRect< T >::AddToBuffer( 
+            buffer, min_x, max_x, min_y, max_y );
     }
 
     template< typename T >
@@ -596,14 +708,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
 
     SIXTRL_INLINE bool LimitRect::CanAddToBuffer(
-        LimitRect::c_buffer_t* SIXTRL_RESTRICT ptr_buffer,
+        SIXTRL_BE_ARGPTR_DEC LimitRect::c_buffer_t* SIXTRL_RESTRICT ptr_buffer,
         SIXTRL_ARGPTR_DEC LimitRect::size_type* SIXTRL_RESTRICT requ_objects,
         SIXTRL_ARGPTR_DEC LimitRect::size_type* SIXTRL_RESTRICT requ_slots,
         SIXTRL_ARGPTR_DEC LimitRect::size_type* SIXTRL_RESTRICT requ_dataptrs 
         ) SIXTRL_NOEXCEPT
     {
         return ::NS(LimitRect_can_be_added)( 
-            ptr_buffer, requ_objects, requ_slots, _requ_dataptrs );
+            ptr_buffer, requ_objects, requ_slots, requ_dataptrs );
     }
     
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC LimitRect* LimitRect::CreateNewOnBuffer( 
@@ -620,21 +732,22 @@ namespace SIXTRL_CXX_NAMESPACE
             ::NS(LimitRect_new)( &buffer ) );
     }
 
-    SIXTRL_ARGPTR_DEC LimitRect* LimitRect::AddToBuffer(
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC LimitRect* LimitRect::AddToBuffer(
         LimitRect::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        LimitRect::value_type const x_limit,
-        LimitRect::value_type const y_limit )
+        LimitRect::value_type const min_x, LimitRect::value_type const max_x,
+        LimitRect::value_type const min_y, LimitRect::value_type const max_y )
     {
-        return static_cast< SIXTRL_ARGPTR_DEC LimitRect* >(
-            ::NS(LimitRect_add)( buffer.getCApiPtr(), x_limit, y_limit ) );
+        return static_cast< SIXTRL_ARGPTR_DEC LimitRect* >( ::NS(LimitRect_add)( 
+            buffer.getCApiPtr(), min_x, max_x, min_y, max_y ) );
     }
 
-    SIXTRL_ARGPTR_DEC LimitRect*
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC LimitRect*
     LimitRect::AddToBuffer( LimitRect::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        LimitRect::value_type const x_lim, LimitRect::value_type const y_lim )
+        LimitRect::value_type const min_x, LimitRect::value_type const max_x,
+        LimitRect::value_type const min_y, LimitRect::value_type const max_y )
     {
         return static_cast< SIXTRL_ARGPTR_DEC LimitRect* >(
-            ::NS(LimitRect_add)( &buffer, x_lim, y_lim ) );
+            ::NS(LimitRect_add)( &buffer, min_x, max_x, min_y, max_y ) );
     }
     
     SIXTRL_ARGPTR_DEC LimitRect* LimitRect::AddCopyToBuffer(
@@ -654,7 +767,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ::NS(LimitRect_add_copy)( &buffer, other.getCApiPtr() ) );
     }
 
-    /* ----------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
     SIXTRL_ARGPTR_DEC LimitRect::c_api_t const* 
     LimitRect::getCApiPtr() const SIXTRL_NOEXCEPT
@@ -666,11 +779,10 @@ namespace SIXTRL_CXX_NAMESPACE
     LimitRect::getCApiPtr() SIXTRL_NOEXCEPT
     {
         return const_cast< LimitRect::c_api_t* >(
-            static_cast< LimitRect const& >( *this
-                ).getCApiPtr() );
+            static_cast< LimitRect const& >( *this ).getCApiPtr() );
     }
 
-    /* ----------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
     LimitRect::type_id_t LimitRect::getTypeId() const SIXTRL_NOEXCEPT
     {
@@ -691,33 +803,80 @@ namespace SIXTRL_CXX_NAMESPACE
         return ::NS(LimitRect_get_required_num_dataptrs)( 
             ptr_buffer, nullptr );
     }
-
-    LimitRect::value_type LimitRect::getXLimitRect() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(LimitRect_get_x_limit)( this->getCApiPtr() );
-    }
-
-    LimitRect::value_type LimitRect::getYLimitRect() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(LimitRect_get_y_limit)( this->getCApiPtr() );
-    }
-
+    
+    /* --------------------------------------------------------------------- */
+    
     void LimitRect::preset() SIXTRL_NOEXCEPT
     {
         ::NS(LimitRect_preset)( this->getCApiPtr() );
     }
-
-    void LimitRect::setXLimitRect( 
+    
+    void LimitRect::clear() SIXTRL_NOEXCEPT
+    {
+        ::NS(LimitRect_clear)( this->getCApiPtr() );
+    }
+    
+    /* --------------------------------------------------------------------- */
+    
+    LimitRect::value_type LimitRect::getMinX() const SIXTRL_NOEXCEPT
+    {
+        return ::NS(LimitRect_get_min_x)( this->getCApiPtr() );
+    }
+    
+    LimitRect::value_type LimitRect::getMaxX() const SIXTRL_NOEXCEPT
+    {
+        return ::NS(LimitRect_get_max_x)( this->getCApiPtr() );
+    }
+    
+    LimitRect::value_type LimitRect::getMinY() const SIXTRL_NOEXCEPT
+    {
+        return ::NS(LimitRect_get_min_y)( this->getCApiPtr() );
+    }
+    
+    LimitRect::value_type LimitRect::getMaxY() const SIXTRL_NOEXCEPT
+    {
+        return ::NS(LimitRect_get_max_y)( this->getCApiPtr() );
+    }
+    
+    /* --------------------------------------------------------------------- */
+    
+    void LimitRect::setXLimit( 
         LimitRect::value_type const x_limit ) SIXTRL_NOEXCEPT
     {
         ::NS(LimitRect_set_x_limit)( this->getCApiPtr(), x_limit );
     }
-
-    void LimitRect::setYLimitRect( 
+    
+    void LimitRect::setYLimit( 
         LimitRect::value_type const y_limit ) SIXTRL_NOEXCEPT
     {
         ::NS(LimitRect_set_y_limit)( this->getCApiPtr(), y_limit );
     }
+    
+    void LimitRect::setMinX( 
+        LimitRect::value_type const min_x ) SIXTRL_NOEXCEPT
+    {
+        ::NS(LimitRect_set_min_x)( this->getCApiPtr(), min_x );
+    }
+    
+    void LimitRect::setMaxX( 
+        LimitRect::value_type const max_x ) SIXTRL_NOEXCEPT
+    {
+        ::NS(LimitRect_set_max_x)( this->getCApiPtr(), max_x );
+    }
+    
+    void LimitRect::setMinY( 
+        LimitRect::value_type const min_y ) SIXTRL_NOEXCEPT
+    {
+        ::NS(LimitRect_set_min_y)( this->getCApiPtr(), min_y );
+    }
+    
+    void LimitRect::setMaxY( 
+        LimitRect::value_type const max_y ) SIXTRL_NOEXCEPT
+    {
+        ::NS(LimitRect_set_max_y)( this->getCApiPtr(), max_y );
+    }
+    
+    /* --------------------------------------------------------------------- */
 
     SIXTRL_ARGPTR_DEC LimitRect* LimitRect_new(
         SIXTRL_CXX_NAMESPACE::Buffer& SIXTRL_RESTRICT_REF buffer )
@@ -735,18 +894,20 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_ARGPTR_DEC SIXTRL_CXX_NAMESPACE::LimitRect* LimitRect_add(
         SIXTRL_CXX_NAMESPACE::Buffer& SIXTRL_RESTRICT_REF buffer,
-        NS(particle_real_t) const x_limit, NS(particle_real_t) const y_limit )
+        NS(particle_real_t) const min_x, NS(particle_real_t) const max_x,
+        NS(particle_real_t) const min_y, NS(particle_real_t) const max_y )
     {
-        return static_cast< SIXTRL_ARGPTR_DEC LimitRect* >(
-            ::NS(LimitRect_add)( buffer.getCApiPtr(), x_limit, y_limit ) );
+        return static_cast< SIXTRL_ARGPTR_DEC LimitRect* >(::NS(LimitRect_add)( 
+            buffer.getCApiPtr(), min_x, max_x, min_y, max_y ) );
     }
 
     SIXTRL_ARGPTR_DEC LimitRect* LimitRect_add(
-        SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
-        NS(particle_real_t) const x_limit, NS(particle_real_t) const y_limit )
+        SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+        NS(particle_real_t) const min_x, NS(particle_real_t) const max_x,
+        NS(particle_real_t) const min_y, NS(particle_real_t) const max_y )
     {
         return static_cast< SIXTRL_ARGPTR_DEC LimitRect* >(
-            ::NS(LimitRect_add)( ptr_buffer, x_limit, y_limit ) );
+            ::NS(LimitRect_add)( buffer, min_x, max_x, min_y, max_y ) );
     }
 
     SIXTRL_ARGPTR_DEC SIXTRL_CXX_NAMESPACE::LimitRect* LimitRect_add_copy(
@@ -769,6 +930,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
 #endif /* __cplusplus */
 
-#endif /* SIXTRACKLIB_COMMON_BE_LIMIT_CXX_HPP__ */
+#endif /* SIXTRACKLIB_COMMON_BE_LIMIT_RECT_CXX_HPP__ */
 
 /* end: sixtracklib/common/be_limit/be_limit.hpp */

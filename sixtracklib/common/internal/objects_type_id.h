@@ -88,9 +88,13 @@ namespace SIXTRL_CXX_NAMESPACE
             NS(OBJECT_TYPE_BEAM_MONITOR) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_LIMIT = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_LIMIT) );
+        OBJECT_TYPE_LIMIT_RECT = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_LIMIT_RECT) );
 
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_LIMIT_ELLIPSE = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_LIMIT_ELLIPSE) );
+        
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_DIPEDGE = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_DIPEDGE) );

@@ -2,7 +2,8 @@
 # end: sixtracklib/common/be_limit/CMakeLitst.txt
 
 set( SIXTRL_COMMON_BE_LIMIT_CXX_HEADERS 
-     be_limit.hpp
+     be_limit_rect.hpp
+     be_limit_ellipse.hpp
 )
 
 set( SIXTRL_COMMON_BE_LIMIT_C99_HEADERS 

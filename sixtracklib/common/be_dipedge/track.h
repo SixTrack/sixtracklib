@@ -1,5 +1,5 @@
-#ifndef SIXTRL_COMMON_BE_LIMIT_TRACK_C99_H__
-#define SIXTRL_COMMON_BE_LIMIT_TRACK_C99_H__
+#ifndef SIXTRL_COMMON_BE_DIPEDGE_TRACK_C99_H__
+#define SIXTRL_COMMON_BE_DIPEDGE_TRACK_C99_H__
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
@@ -34,15 +34,13 @@ SIXTRL_STATIC SIXTRL_FN NS(track_status_t) NS(Track_particle_dipedge)(
 extern "C" {
 #endif /* C++, host */
 
-SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit)(
+SIXTRL_INLINE NS(track_status_t) NS(Track_particle_dipedge)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_idx,
     SIXTRL_BE_ARGPTR_DEC const NS(DipoleEdge) *const SIXTRL_RESTRICT dipedge )
 {
-    typedef NS(particle_real_t) real_t;
-    
     NS(Particles_add_to_px_value)( particles, particle_idx, 
-       NS(DipoleEdge_get_inv_rho)( dipedge ) 
+       NS(DipoleEdge_get_inv_rho)( dipedge ) * 
        NS(DipoleEdge_get_tan_rot_angle)( dipedge ) * 
        NS(Particles_get_x_value)( particles, particle_idx ) );
     
@@ -53,5 +51,5 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit)(
 }
 #endif /* C++, host */
 
-#endif /* SIXTRL_COMMON_BE_LIMIT_TRACK_C99_H__ */
-/* end: sixtracklib/common/be_limit/track.h */
+#endif /* SIXTRL_COMMON_BE_DIPEDGE_TRACK_C99_H__ */
+/* end: sixtracklib/common/be_dipedge/track.h */

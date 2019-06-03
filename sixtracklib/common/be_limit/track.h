@@ -19,14 +19,13 @@ struct NS(LimitEllipse);
 
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t) NS(Track_particle_limit_rect)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_idx,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Limit) *const SIXTRL_RESTRICT limit );
+    NS(particle_num_elements_t) const particle_idx, SIXTRL_BE_ARGPTR_DEC 
+    const struct NS(LimitRect) *const SIXTRL_RESTRICT limit );
 
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t) NS(Track_particle_limit_ellipse)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_idx,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(LimitEllipse) *const 
-        SIXTRL_RESTRICT limit );
+    NS(particle_num_elements_t) const particle_idx, SIXTRL_BE_ARGPTR_DEC 
+    const struct NS(LimitEllipse) *const SIXTRL_RESTRICT limit );
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }
@@ -85,7 +84,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit_ellipse)(
     
     NS(Particles_update_state_value_if_not_already_lost)( particles, 
         particle_idx, ( NS(particle_index_t) )( temp <= 
-            NS(LimitEllipse_get_half_axis_product_squ)( limit ) ) );
+            NS(LimitEllipse_get_half_axes_product_squ)( limit ) ) );
 
     return NS(TRACK_SUCCESS);
 }

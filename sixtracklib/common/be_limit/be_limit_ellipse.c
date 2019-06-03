@@ -1,3 +1,7 @@
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/be_limit/be_limit_ellipse.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
     #include <stdint.h>
@@ -54,7 +58,7 @@ bool NS(LimitEllipse_can_be_added)(
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
     return NS(Buffer_can_add_object)( buffer, sizeof( elem_t ),
-        num_dataptrs, sizes, counts, requ_objects, requ_slots, requ_dataptrs );
+        num_dataptrs, sizes, counts, req_objects, req_slots, req_dataptrs );
 }
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)* NS(LimitEllipse_new)(
@@ -65,14 +69,14 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)* NS(LimitEllipse_new)(
     typedef SIXTRL_BUFFER_DATAPTR_DEC elem_t* ptr_to_elem_t;
 
     buf_size_t const num_dataptrs =
-        NS(LimitRect_get_required_num_dataptrs)( buffer, SIXTRL_NULLPTR );
+        NS(LimitEllipse_get_required_num_dataptrs)( buffer, SIXTRL_NULLPTR );
 
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
     
     elem_t temp_obj;
-    NS(LimitRect_preset)( &temp_obj );
+    NS(LimitEllipse_preset)( &temp_obj );
 
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
     
@@ -93,7 +97,7 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)* NS(LimitEllipse_add)(
     typedef SIXTRL_BUFFER_DATAPTR_DEC elem_t* ptr_to_elem_t;
 
     buf_size_t const num_dataptrs =
-        NS(LimitRect_get_required_num_dataptrs)( buffer, SIXTRL_NULLPTR );
+        NS(LimitEllipse_get_required_num_dataptrs)( buffer, SIXTRL_NULLPTR );
 
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
@@ -103,9 +107,9 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)* NS(LimitEllipse_add)(
     
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
     
-    NS(LimitRect_set_x_origin)( &temp_obj, x_origin );
-    NS(LimitRect_set_y_origin)( &temp_obj, y_origin );
-    NS(LimitEllipse_set_half_axis)( &temp_obj, x_semi_axis, y_semi_axis );
+    NS(LimitEllipse_set_x_origin)( &temp_obj, x_origin );
+    NS(LimitEllipse_set_y_origin)( &temp_obj, y_origin );
+    NS(LimitEllipse_set_half_axes)( &temp_obj, x_semi_axis, y_semi_axis );
     
     return ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
         NS(Buffer_add_object)( buffer, &temp_obj, sizeof( elem_t ),

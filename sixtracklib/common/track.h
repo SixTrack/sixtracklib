@@ -22,7 +22,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(Track_particle_increment_at_element)(
 
 SIXTRL_FN SIXTRL_STATIC void NS(Track_subset_particles_increment_at_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_begin_index,
+    NS(particle_num_elements_t) particle_begin_index,
     NS(particle_num_elements_t) const particle_end_index,
     NS(particle_num_elements_t) const particle_index_stride );
 
@@ -799,7 +799,7 @@ SIXTRL_INLINE int NS(Track_particle_beam_element_obj_dispatcher)(
         
         case NS(OBJECT_TYPE_LIMIT_RECT):
         {
-            typedef NS(Limit) belem_t;
+            typedef NS(LimitRect) belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
@@ -809,17 +809,21 @@ SIXTRL_INLINE int NS(Track_particle_beam_element_obj_dispatcher)(
         
         case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
         {
-            ret = NS(TRACK_STATUS_GENERAL_FAILURE);
-            break;
-        }
-        
-        case NS(OBJECT_TYPE_LIMIT_DIPEDGE):
-        {
-            typedef NS(Limit) belem_t;
+            typedef NS(LimitEllipse) belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
-            ret = NS(Track_particle_limit_dipedge)( particles, index, belem );
+            ret = NS(Track_particle_limit_ellipse)( particles, index, belem );
+            break;
+        }
+        
+        case NS(OBJECT_TYPE_DIPEDGE):
+        {
+            typedef NS(DipoleEdge) belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_dipedge)( particles, index, belem );
             break;
         }
 
