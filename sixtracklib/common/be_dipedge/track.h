@@ -19,7 +19,7 @@ struct NS(DipoleEdge);
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t) NS(Track_particle_dipedge)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_idx,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(DipoleEdge) 
+    SIXTRL_BE_ARGPTR_DEC const struct NS(DipoleEdge)
         *const SIXTRL_RESTRICT dipedge);
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
@@ -39,12 +39,12 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_dipedge)(
     NS(particle_num_elements_t) const particle_idx,
     SIXTRL_BE_ARGPTR_DEC const NS(DipoleEdge) *const SIXTRL_RESTRICT dipedge )
 {
-    NS(Particles_add_to_px_value)( particles, particle_idx, 
-       NS(DipoleEdge_get_inv_rho)( dipedge ) * 
-       NS(DipoleEdge_get_tan_rot_angle)( dipedge ) * 
+    NS(Particles_add_to_px_value)( particles, particle_idx,
+       NS(DipoleEdge_get_inv_rho)( dipedge ) *
+       NS(DipoleEdge_get_tan_rot_angle)( dipedge ) *
        NS(Particles_get_x_value)( particles, particle_idx ) );
-    
-    return NS(TRACK_SUCCESS);
+
+    return SIXTRL_TRACK_SUCCESS;
 }
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )

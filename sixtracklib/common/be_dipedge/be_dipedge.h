@@ -24,7 +24,7 @@ extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 typedef SIXTRL_REAL_T NS(dipedge_real_t);
-    
+
 typedef struct NS(DipoleEdge)
 {
     NS(dipedge_real_t) inv_rho        SIXTRL_ALIGN( 8 );
@@ -38,20 +38,20 @@ NS(DipoleEdge);
 
 #if !defined( _GPUCODE )
 
-SIXTRL_STATIC_VAR NS(dipedge_real_t) const NS(DIPOLE_EDGE_DEFAULT_INV_RHO) = 
+SIXTRL_STATIC_VAR NS(dipedge_real_t) const NS(DIPOLE_EDGE_DEFAULT_INV_RHO) =
     ( NS(dipedge_real_t) )0;
 
-SIXTRL_STATIC_VAR NS(dipedge_real_t) const NS(DIPOLE_EDGE_DEFAULT_B) = 
-    ( NS(dipedge_real_t) )0;    
+SIXTRL_STATIC_VAR NS(dipedge_real_t) const NS(DIPOLE_EDGE_DEFAULT_B) =
+    ( NS(dipedge_real_t) )0;
 
-SIXTRL_STATIC_VAR NS(dipedge_real_t) const NS(DIPOLE_EDGE_ROT_ANGLE_DEG) = 
-    ( NS(dipedge_real_t) )0;    
+SIXTRL_STATIC_VAR NS(dipedge_real_t) const NS(DIPOLE_EDGE_ROT_ANGLE_DEG) =
+    ( NS(dipedge_real_t) )0;
 
-SIXTRL_STATIC_VAR NS(dipedge_real_t) const NS(DIPOLE_EDGE_TILT_ANGLE_DEG) = 
-    ( NS(dipedge_real_t) )0;    
-    
+SIXTRL_STATIC_VAR NS(dipedge_real_t) const NS(DIPOLE_EDGE_TILT_ANGLE_DEG) =
+    ( NS(dipedge_real_t) )0;
+
 #endif /* !defined( _GPUCODE ) */
-    
+
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(DipoleEdge_get_required_num_dataptrs_on_managed_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
@@ -64,11 +64,11 @@ NS(DipoleEdge_get_required_num_slots_on_managed_buffer)(
     SIXTRL_BE_ARGPTR_DEC const NS(DipoleEdge) *const SIXTRL_RESTRICT dipedge,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(DipoleEdge)* 
-NS(DipoleEdge_preset)( SIXTRL_BE_ARGPTR_DEC 
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(DipoleEdge)*
+NS(DipoleEdge_preset)( SIXTRL_BE_ARGPTR_DEC
     NS(DipoleEdge)* SIXTRL_RESTRICT dipedge );
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC void NS(DipoleEdge_clear)( 
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC void NS(DipoleEdge_clear)(
     SIXTRL_BE_ARGPTR_DEC NS(DipoleEdge)* SIXTRL_RESTRICT dipedge );
 
 /* ------------------------------------------------------------------------- */
@@ -191,9 +191,9 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(DipoleEdge)* NS(DipoleEdge_new)(
 SIXTRL_EXTERN SIXTRL_HOST_FN
 SIXTRL_BUFFER_DATAPTR_DEC NS(DipoleEdge)* NS(DipoleEdge_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(dipedge_real_t) const inv_rho, 
-    NS(dipedge_real_t) const rot_angle_deg, 
-    NS(dipedge_real_t) const b, 
+    NS(dipedge_real_t) const inv_rho,
+    NS(dipedge_real_t) const rot_angle_deg,
+    NS(dipedge_real_t) const b,
     NS(dipedge_real_t) const tilt_angle_deg );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(DipoleEdge)*
@@ -243,7 +243,7 @@ NS(DipoleEdge_get_required_num_slots_on_managed_buffer)(
     ( void )buffer;
 
     return ( dipedge != SIXTRL_NULLPTR )
-        ? NS(ManagedBuffer_get_slot_based_length)( 
+        ? NS(ManagedBuffer_get_slot_based_length)(
             sizeof( *dipedge ), slot_size )
         : ( NS(buffer_size_t) )0u;
 }
@@ -260,18 +260,18 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(DipoleEdge)* NS(DipoleEdge_preset)(
     return dipedge;
 }
 
-SIXTRL_INLINE void NS(DipoleEdge_clear)( 
+SIXTRL_INLINE void NS(DipoleEdge_clear)(
     SIXTRL_BE_ARGPTR_DEC NS(DipoleEdge)* SIXTRL_RESTRICT dipedge )
 {
     SIXTRL_STATIC_VAR NS(dipedge_real_t) const ZERO = ( NS(dipedge_real_t) )0;
     SIXTRL_STATIC_VAR NS(dipedge_real_t) const ONE  = ( NS(dipedge_real_t) )1;
-    
+
     NS(DipoleEdge_set_inv_rho)( dipedge, ZERO );
     NS(DipoleEdge_set_cos_rot_angle)( dipedge, ONE );
     NS(DipoleEdge_set_tan_rot_angle)( dipedge, ZERO );
     NS(DipoleEdge_set_cos_tilt_angle)( dipedge, ONE );
     NS(DipoleEdge_set_sin_tilt_angle)( dipedge, ZERO );
-    
+
     return;
 }
 
@@ -283,7 +283,7 @@ SIXTRL_INLINE NS(dipedge_real_t) NS(DipoleEdge_get_rho)(
 {
     SIXTRL_ASSERT( dipedge != SIXTRL_NULLPTR );
     return ( dipedge->inv_rho > ( NS(dipedge_real_t) )0 )
-        ? ( NS(dipedge_real_t) )1.0 / dipedge->inv_rho 
+        ? ( NS(dipedge_real_t) )1.0 / dipedge->inv_rho
         : ( NS(dipedge_real_t) )0.0;
 }
 
@@ -303,7 +303,7 @@ SIXTRL_INLINE NS(dipedge_real_t) NS(DipoleEdge_get_rot_angle)(
 SIXTRL_INLINE NS(dipedge_real_t) NS(DipoleEdge_get_rot_angle_rad)(
     SIXTRL_BE_ARGPTR_DEC const NS(DipoleEdge) *const SIXTRL_RESTRICT dipedge )
 {
-    return atan2( NS(DipoleEdge_get_cos_rot_angle)( dipedge ), 
+    return atan2( NS(DipoleEdge_get_cos_rot_angle)( dipedge ),
         NS(DipoleEdge_get_sin_rot_angle)( dipedge ) );
 }
 
@@ -316,8 +316,8 @@ SIXTRL_INLINE NS(dipedge_real_t) NS(DipoleEdge_get_cos_rot_angle)(
 
 SIXTRL_INLINE NS(dipedge_real_t) NS(DipoleEdge_get_sin_rot_angle)(
     SIXTRL_BE_ARGPTR_DEC const NS(DipoleEdge) *const SIXTRL_RESTRICT dipedge )
-{    
-    return NS(DipoleEdge_get_cos_rot_angle)( dipedge ) * 
+{
+    return NS(DipoleEdge_get_cos_rot_angle)( dipedge ) *
            NS(DipoleEdge_get_tan_rot_angle)( dipedge );
 }
 
@@ -337,7 +337,7 @@ SIXTRL_INLINE NS(dipedge_real_t) NS(DipoleEdge_get_tilt_angle)(
 SIXTRL_INLINE NS(dipedge_real_t) NS(DipoleEdge_get_tilt_angle_rad)(
     SIXTRL_BE_ARGPTR_DEC const NS(DipoleEdge) *const SIXTRL_RESTRICT dipedge )
 {
-    return atan2( NS(DipoleEdge_get_cos_tilt_angle)( dipedge ), 
+    return atan2( NS(DipoleEdge_get_cos_tilt_angle)( dipedge ),
                   NS(DipoleEdge_get_sin_tilt_angle)( dipedge ) );
 }
 
@@ -368,7 +368,7 @@ SIXTRL_INLINE void NS(DipoleEdge_set_inv_rho)(
     SIXTRL_BE_ARGPTR_DEC NS(DipoleEdge)* SIXTRL_RESTRICT dipedge,
     NS(dipedge_real_t) const inv_rho  )
 {
-    if( ( dipedge != SIXTRL_NULLPTR ) && 
+    if( ( dipedge != SIXTRL_NULLPTR ) &&
         ( inv_rho >= ( NS(dipedge_real_t) )0 ) )
     {
         dipedge->inv_rho = inv_rho;
@@ -379,7 +379,7 @@ SIXTRL_INLINE void NS(DipoleEdge_set_rot_angle)(
     SIXTRL_BE_ARGPTR_DEC NS(DipoleEdge)* SIXTRL_RESTRICT dipedge,
     NS(dipedge_real_t) const rot_angle_deg )
 {
-    NS(DipoleEdge_set_rot_angle_rad)( 
+    NS(DipoleEdge_set_rot_angle_rad)(
         dipedge, SIXTRL_DEG2RAD * rot_angle_deg );
 }
 
@@ -422,7 +422,7 @@ SIXTRL_INLINE void NS(DipoleEdge_set_tilt_angle)(
     SIXTRL_BE_ARGPTR_DEC NS(DipoleEdge)* SIXTRL_RESTRICT dipedge,
     NS(dipedge_real_t) const tilt_angle_deg )
 {
-    NS(DipoleEdge_set_tilt_angle_rad)( 
+    NS(DipoleEdge_set_tilt_angle_rad)(
         dipedge, SIXTRL_DEG2RAD * tilt_angle_deg );
 }
 
@@ -477,31 +477,31 @@ SIXTRL_INLINE NS(arch_status_t) NS(DipoleEdge_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(DipoleEdge)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(DipoleEdge) *const SIXTRL_RESTRICT source )
 {
-    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
-    
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+
     if( ( destination != SIXTRL_NULLPTR ) &&
         ( source != SIXTRL_NULLPTR ) )
     {
-        NS(DipoleEdge_set_inv_rho)( destination, 
+        NS(DipoleEdge_set_inv_rho)( destination,
             NS(DipoleEdge_get_inv_rho)( source ) );
-        
-        NS(DipoleEdge_set_cos_rot_angle)( destination, 
+
+        NS(DipoleEdge_set_cos_rot_angle)( destination,
             NS(DipoleEdge_get_cos_rot_angle)( source ) );
-        
-        NS(DipoleEdge_set_tan_rot_angle)( destination, 
+
+        NS(DipoleEdge_set_tan_rot_angle)( destination,
             NS(DipoleEdge_get_tan_rot_angle)( source ) );
-        
+
         NS(DipoleEdge_set_b)( destination, NS(DipoleEdge_get_b)( source ) );
-        
-        NS(DipoleEdge_set_cos_tilt_angle)( destination, 
+
+        NS(DipoleEdge_set_cos_tilt_angle)( destination,
             NS(DipoleEdge_get_cos_tilt_angle)( source ) );
-        
-        NS(DipoleEdge_set_sin_tilt_angle)( destination, 
+
+        NS(DipoleEdge_set_sin_tilt_angle)( destination,
             NS(DipoleEdge_get_sin_tilt_angle)( source ) );
-        
-        status = NS(ARCH_STATUS_SUCCESS);
+
+        status = SIXTRL_ARCH_STATUS_SUCCESS;
     }
-    
+
     return status;
 }
 
@@ -519,67 +519,67 @@ SIXTRL_INLINE int NS(DipoleEdge_compare_values_with_treshold)(
     SIXTRL_REAL_T const treshold )
 {
     int cmp_result = -1;
-    
+
     if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
     {
-        SIXTRL_STATIC_VAR NS(dipedge_real_t) const ZERO = 
+        SIXTRL_STATIC_VAR NS(dipedge_real_t) const ZERO =
             ( NS(dipedge_real_t) )0;
-        
-        NS(dipedge_real_t) delta = NS(DipoleEdge_get_inv_rho)( lhs ) - 
+
+        NS(dipedge_real_t) delta = NS(DipoleEdge_get_inv_rho)( lhs ) -
             NS(DipoleEdge_get_inv_rho)( rhs );
-            
+
         NS(dipedge_real_t) const minus_treshold = -treshold;
-            
+
         if( ( delta == ZERO ) ||
             ( ( delta > ZERO ) && ( delta < treshold ) ) ||
             ( ( delta < ZERO ) && ( delta > minus_treshold ) ) )
         {
-            cmp_result = 0;            
+            cmp_result = 0;
         }
         else
         {
             cmp_result = ( delta > 0 ) ? +1 : -1;
         }
-        
+
         if( cmp_result == 0 )
         {
-            delta = NS(DipoleEdge_get_cos_rot_angle)( lhs ) - 
+            delta = NS(DipoleEdge_get_cos_rot_angle)( lhs ) -
                 NS(DipoleEdge_get_cos_rot_angle)( rhs );
-                
+
             if( delta > treshold ) cmp_result = +1;
             else if( delta < minus_treshold ) cmp_result = -1;
         }
-        
+
         if( cmp_result == 0 )
         {
-            delta = NS(DipoleEdge_get_tan_rot_angle)( lhs ) - 
+            delta = NS(DipoleEdge_get_tan_rot_angle)( lhs ) -
                 NS(DipoleEdge_get_tan_rot_angle)( rhs );
-                
+
             if( delta > treshold ) cmp_result = +1;
             else if( delta < minus_treshold ) cmp_result = -1;
         }
-        
+
         if( cmp_result == 0 )
         {
             delta = NS(DipoleEdge_get_b)( lhs ) - NS(DipoleEdge_get_b)( rhs );
             if( delta > treshold ) cmp_result = +1;
             else if( delta < minus_treshold ) cmp_result = -1;
         }
-        
+
         if( cmp_result == 0 )
         {
             delta = NS(DipoleEdge_get_cos_tilt_angle)( lhs ) -
                 NS(DipoleEdge_get_cos_tilt_angle)( rhs );
-                
+
             if( delta > treshold ) cmp_result = +1;
             else if( delta < minus_treshold ) cmp_result = -1;
         }
-        
+
         if( cmp_result == 0 )
         {
             delta = NS(DipoleEdge_get_sin_tilt_angle)( lhs ) -
                 NS(DipoleEdge_get_sin_tilt_angle)( rhs );
-                
+
             if( delta > treshold ) cmp_result = +1;
             else if( delta < minus_treshold ) cmp_result = -1;
         }
@@ -588,7 +588,7 @@ SIXTRL_INLINE int NS(DipoleEdge_compare_values_with_treshold)(
     {
         cmp_result = +1;
     }
-    
+
     return cmp_result;
 }
 

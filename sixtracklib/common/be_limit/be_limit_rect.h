@@ -26,7 +26,7 @@ typedef struct NS(LimitRect)
 {
     NS(particle_real_t) min_x SIXTRL_ALIGN( 8 );
     NS(particle_real_t) max_x SIXTRL_ALIGN( 8 );
-    
+
     NS(particle_real_t) min_y SIXTRL_ALIGN( 8 );
     NS(particle_real_t) max_y SIXTRL_ALIGN( 8 );
 }
@@ -44,23 +44,23 @@ NS(LimitRect_get_required_num_slots_on_managed_buffer)(
     SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const SIXTRL_RESTRICT limit,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(LimitRect)* 
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(LimitRect)*
 NS(LimitRect_preset)( SIXTRL_BE_ARGPTR_DEC NS(LimitRect)* SIXTRL_RESTRICT );
 
 SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(LimitRect_get_min_x)(
-    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const 
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const
         SIXTRL_RESTRICT limit_rect );
 
 SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(LimitRect_get_max_x)(
-    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const 
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const
         SIXTRL_RESTRICT limit_rect );
 
 SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(LimitRect_get_min_y)(
-    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const 
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const
         SIXTRL_RESTRICT limit_rect );
 
-SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(LimitRect_get_max_x)(
-    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const 
+SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(LimitRect_get_max_y)(
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const
         SIXTRL_RESTRICT limit_rect );
 
 SIXTRL_STATIC SIXTRL_FN void NS(LimitRect_set_x_limit)(
@@ -180,7 +180,7 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(LimitRect)* NS(LimitRect_preset)(
     {
         NS(LimitRect_set_min_x)( limit, SIXTRL_LIMIT_DEFAULT_MIN_X );
         NS(LimitRect_set_max_x)( limit, SIXTRL_LIMIT_DEFAULT_MAX_X );
-        
+
         NS(LimitRect_set_min_y)( limit, SIXTRL_LIMIT_DEFAULT_MIN_Y );
         NS(LimitRect_set_max_y)( limit, SIXTRL_LIMIT_DEFAULT_MAX_Y );
     }
@@ -188,28 +188,28 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(LimitRect)* NS(LimitRect_preset)(
     return limit;
 }
 
-SIXTRL_INLINE  NS(particle_real_t) NS(LimitRect_get_min_x)( SIXTRL_BE_ARGPTR_DEC 
+SIXTRL_INLINE  NS(particle_real_t) NS(LimitRect_get_min_x)( SIXTRL_BE_ARGPTR_DEC
     const NS(LimitRect) *const SIXTRL_RESTRICT limit_rect )
 {
     SIXTRL_ASSERT( limit_rect != SIXTRL_NULLPTR );
     return limit_rect->min_x;
 }
 
-SIXTRL_INLINE NS(particle_real_t) NS(LimitRect_get_max_x)( SIXTRL_BE_ARGPTR_DEC 
+SIXTRL_INLINE NS(particle_real_t) NS(LimitRect_get_max_x)( SIXTRL_BE_ARGPTR_DEC
     const NS(LimitRect) *const SIXTRL_RESTRICT limit_rect )
 {
     SIXTRL_ASSERT( limit_rect != SIXTRL_NULLPTR );
     return limit_rect->max_x;
 }
 
-SIXTRL_INLINE NS(particle_real_t) NS(LimitRect_get_min_y)( SIXTRL_BE_ARGPTR_DEC 
+SIXTRL_INLINE NS(particle_real_t) NS(LimitRect_get_min_y)( SIXTRL_BE_ARGPTR_DEC
     const NS(LimitRect) *const SIXTRL_RESTRICT limit_rect )
 {
     SIXTRL_ASSERT( limit_rect != SIXTRL_NULLPTR );
     return limit_rect->min_y;
 }
 
-SIXTRL_INLINE NS(particle_real_t) NS(LimitRect_get_max_y)( SIXTRL_BE_ARGPTR_DEC 
+SIXTRL_INLINE NS(particle_real_t) NS(LimitRect_get_max_y)( SIXTRL_BE_ARGPTR_DEC
     const NS(LimitRect) *const SIXTRL_RESTRICT limit_rect )
 {
     SIXTRL_ASSERT( limit_rect != SIXTRL_NULLPTR );
@@ -280,7 +280,7 @@ SIXTRL_INLINE NS(arch_status_t) NS(LimitRect_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(LimitRect)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const SIXTRL_RESTRICT source )
 {
-    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
     if( ( destination != SIXTRL_NULLPTR ) &&
         ( source != SIXTRL_NULLPTR ) && ( destination != source ) )
@@ -289,12 +289,12 @@ SIXTRL_INLINE NS(arch_status_t) NS(LimitRect_copy)(
         {
             destination->min_x = source->min_x;
             destination->max_x = source->max_x;
-            
+
             destination->min_y = source->min_y;
             destination->max_y = source->max_y;
         }
-        
-        status = NS(ARCH_STATUS_SUCCESS);
+
+        status = SIXTRL_ARCH_STATUS_SUCCESS;
     }
 
     return status;

@@ -19,12 +19,12 @@ struct NS(LimitEllipse);
 
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t) NS(Track_particle_limit_rect)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_idx, SIXTRL_BE_ARGPTR_DEC 
+    NS(particle_num_elements_t) const particle_idx, SIXTRL_BE_ARGPTR_DEC
     const struct NS(LimitRect) *const SIXTRL_RESTRICT limit );
 
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t) NS(Track_particle_limit_ellipse)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_idx, SIXTRL_BE_ARGPTR_DEC 
+    NS(particle_num_elements_t) const particle_idx, SIXTRL_BE_ARGPTR_DEC
     const struct NS(LimitEllipse) *const SIXTRL_RESTRICT limit );
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
@@ -50,17 +50,17 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit_rect)(
 
     real_t const x = NS(Particles_get_x_value)( particles, particle_idx );
     real_t const y = NS(Particles_get_y_value)( particles, particle_idx );
-    
-    index_t const new_state = ( index_t )( 
+
+    index_t const new_state = ( index_t )(
         ( x >= NS(LimitRect_get_min_x)( limit ) ) &&
         ( x <= NS(LimitRect_get_max_x)( limit ) ) &&
         ( y >= NS(LimitRect_get_min_y)( limit ) ) &&
         ( y <= NS(LimitRect_get_max_y)( limit ) ) );
 
-    NS(Particles_update_state_value_if_not_already_lost)( 
+    NS(Particles_update_state_value_if_not_already_lost)(
         particles, particle_idx, new_state );
 
-    return NS(TRACK_SUCCESS);
+    return SIXTRL_TRACK_SUCCESS;
 }
 
 SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit_ellipse)(
@@ -68,25 +68,25 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit_ellipse)(
     NS(particle_num_elements_t) const particle_idx,
     SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit )
 {
-    NS(particle_real_t) const delta_x = NS(Particles_get_x_value)( 
+    NS(particle_real_t) const delta_x = NS(Particles_get_x_value)(
         particles, particle_idx ) - NS(LimitEllipse_get_x_origin)( limit );
-    
+
     NS(particle_real_t) temp    = delta_x;
-    NS(particle_real_t) delta_y = NS(Particles_get_y_value)( 
+    NS(particle_real_t) delta_y = NS(Particles_get_y_value)(
         particles, particle_idx ) - NS(LimitEllipse_get_y_origin)( limit );
-    
+
     delta_y *= delta_y;
     delta_y *= NS(LimitEllipse_get_x_half_axis_squ)( limit );
-        
+
     temp    *= delta_x;
-    temp    *= NS(LimitEllipse_get_y_half_axis_squ)( limit );    
+    temp    *= NS(LimitEllipse_get_y_half_axis_squ)( limit );
     temp    += delta_y;
-    
-    NS(Particles_update_state_value_if_not_already_lost)( particles, 
-        particle_idx, ( NS(particle_index_t) )( temp <= 
+
+    NS(Particles_update_state_value_if_not_already_lost)( particles,
+        particle_idx, ( NS(particle_index_t) )( temp <=
             NS(LimitEllipse_get_half_axes_product_squ)( limit ) ) );
 
-    return NS(TRACK_SUCCESS);
+    return SIXTRL_TRACK_SUCCESS;
 }
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
