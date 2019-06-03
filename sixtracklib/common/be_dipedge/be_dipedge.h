@@ -68,7 +68,7 @@ SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(DipoleEdge)*
 NS(DipoleEdge_preset)( SIXTRL_BE_ARGPTR_DEC
     NS(DipoleEdge)* SIXTRL_RESTRICT dipedge );
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC void NS(DipoleEdge_clear)(
+SIXTRL_STATIC SIXTRL_FN void NS(DipoleEdge_clear)(
     SIXTRL_BE_ARGPTR_DEC NS(DipoleEdge)* SIXTRL_RESTRICT dipedge );
 
 /* ------------------------------------------------------------------------- */
