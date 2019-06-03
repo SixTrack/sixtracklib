@@ -50,7 +50,7 @@ set( SIXTRACKL_DEFAULT_CXX_FLAGS
 # ------------------------------------------------------------------------------
 # ---- SixTrackLib Features:
 
-option( SIXTRACKL_ENABLE_APERTURE_CHECK   "Enable xy - aperature check" ON )
+option( SIXTRACKL_ENABLE_APERTURE_CHECK   "Enable xy - aperture check" ON )
 
 
 # ==============================================================================
@@ -60,10 +60,10 @@ option( SIXTRACKL_ENABLE_APERTURE_CHECK   "Enable xy - aperature check" ON )
 # ---- SixTrackLib detailed features settings:
 
 set( SIXTRACKL_APERTURE_X_LIMIT_VALUE "1.0"
-     CACHE STRING "Aperature check x limit" FORCE )
+     CACHE STRING "Aperture check x limit" FORCE )
 
 set( SIXTRACKL_APERTURE_Y_LIMIT_VALUE "1.0"
-     CACHE STRING "Aperature check y limit" FORCE )
+     CACHE STRING "Aperture check y limit" FORCE )
 
 
 # ------------------------------------------------------------------------------
