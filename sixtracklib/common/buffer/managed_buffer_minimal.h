@@ -173,12 +173,12 @@ NS(ManagedBuffer_get_object_begin_addr_by_index_filter_by_type_id)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_STATIC SIXTRL_FN NS(buffer_addr_t)
-NS(ManagdBuffer_get_stored_begin_addr)(
+NS(ManagedBuffer_get_stored_begin_addr)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_STATIC SIXTRL_FN NS(buffer_addr_t)
-NS(ManagdBuffer_get_buffer_begin_addr)(
+NS(ManagedBuffer_get_buffer_begin_addr)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size );
 
@@ -892,7 +892,7 @@ NS(ManagedBuffer_get_object_begin_addr_by_index_filter_by_type_id)(
 
 /* ========================================================================= */
 
-SIXTRL_INLINE NS(buffer_addr_t) NS(ManagdBuffer_get_stored_begin_addr)(
+SIXTRL_INLINE NS(buffer_addr_t) NS(ManagedBuffer_get_stored_begin_addr)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size )
 {
@@ -910,7 +910,7 @@ SIXTRL_INLINE NS(buffer_addr_t) NS(ManagdBuffer_get_stored_begin_addr)(
         ? ptr_header[ 0 ] : ( address_t )0u;
 }
 
-SIXTRL_INLINE NS(buffer_addr_t) NS(ManagdBuffer_get_buffer_begin_addr)(
+SIXTRL_INLINE NS(buffer_addr_t) NS(ManagedBuffer_get_buffer_begin_addr)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const slot_size )
 {
