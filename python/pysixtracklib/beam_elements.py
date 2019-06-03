@@ -229,6 +229,31 @@ class BeamBeam6D(CObject):
             CObject.__init__(self, **kwargs)
 
 
+class LimitRect(object):
+    _typeid = 11
+    min_x = CField( 0, 'float64', default=-1.0, alignment=8 )
+    max_x = CField( 1, 'float64', default=+1.0, alignment=8 )
+    min_y = CField( 2, 'float64', default=-1.0, alignment=8 )
+    max_y = CField( 3, 'float64', default=+1.0, alignment=8 )
+
+class LimitEllipse(object):
+    _typeid = 12
+    x_origin = CField( 0, 'float64', default=0.0, alignment=8 )
+    y_origin = CField( 1, 'float64', default=0.0, alignment=8 )
+    a_squ = CField( 2, 'float64', default=1.0, alignment=8 )
+    b_squ = CField( 3, 'float64', default=1.0, alignment=8 )
+    a_b_squ = CField( 4, 'float64', default=1.0, alignment=8 )
+
+class DipoleEdge(object):
+    _typeid = 24
+    inv_rho = CField( 0, 'float64', default=0.0, alignment=8 )
+    cos_rot_angle = CField( 1, 'float64', default=1.0, alignment=8 )
+    tan_rot_angle = CField( 2, 'float64', default=0.0, alignment=8 )
+    b = CField( 3, 'float64', default=0.0, alignment=8 )
+    cos_tilt_angle = CField( 4, 'float64', default=0.0, alignment=8 )
+    sin_tilt_angle = CField( 5, 'float64', default=0.0, alignment=8 )
+
+
 class Elements(object):
     element_types = {'Cavity': Cavity,
                      'Drift': Drift,
@@ -239,6 +264,9 @@ class Elements(object):
                      'XYShift': XYShift,
                      'BeamBeam6D': BeamBeam6D,
                      'BeamBeam4D': BeamBeam4D,
+                     'LimitRect' : LimitRect,
+                     'LimitEllipse': LimitEllipse,
+                     'DipoleEdge': DipoleEdge,
                      #                     'Line': Line,
                      'BeamMonitor': BeamMonitor,
                      }
@@ -297,3 +325,4 @@ class Elements(object):
     #    self=cls()
     #    list(madseq_to_line(seq,self._builder))
     #    return self
+
