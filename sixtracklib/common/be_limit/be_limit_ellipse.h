@@ -25,8 +25,6 @@ extern "C" {
 
 typedef struct NS(LimitEllipse)
 {
-    NS(particle_real_t) x_origin    SIXTRL_ALIGN( 8 );
-    NS(particle_real_t) y_origin    SIXTRL_ALIGN( 8 );
     NS(particle_real_t) a_squ       SIXTRL_ALIGN( 8 );
     NS(particle_real_t) b_squ       SIXTRL_ALIGN( 8 );
     NS(particle_real_t) a_b_squ     SIXTRL_ALIGN( 8 );
@@ -49,12 +47,6 @@ SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(LimitEllipse)*
 NS(LimitEllipse_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(LimitEllipse)* SIXTRL_RESTRICT limit );
 
-SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(LimitEllipse_get_x_origin)(
-    SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit );
-
-SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(LimitEllipse_get_y_origin)(
-    SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit );
-
 SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(LimitEllipse_get_x_half_axis)(
     SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit );
 
@@ -72,15 +64,6 @@ NS(LimitEllipse_get_y_half_axis_squ)(
 SIXTRL_STATIC SIXTRL_FN NS(particle_real_t)
 NS(LimitEllipse_get_half_axes_product_squ)(
     SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit );
-
-
-SIXTRL_STATIC SIXTRL_FN void NS(LimitEllipse_set_x_origin)(
-    SIXTRL_BE_ARGPTR_DEC NS(LimitEllipse)* SIXTRL_RESTRICT limit,
-    NS(particle_real_t) const x_origin );
-
-SIXTRL_STATIC SIXTRL_FN void NS(LimitEllipse_set_y_origin)(
-    SIXTRL_BE_ARGPTR_DEC NS(LimitEllipse)* SIXTRL_RESTRICT limit,
-    NS(particle_real_t) const y_origin );
 
 
 SIXTRL_STATIC SIXTRL_FN void NS(LimitEllipse_set_half_axes)(
@@ -127,8 +110,6 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)* NS(LimitEllipse_new)(
 SIXTRL_EXTERN SIXTRL_HOST_FN
 SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)* NS(LimitEllipse_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(particle_real_t) const x_origin,
-    NS(particle_real_t) const y_origin,
     NS(particle_real_t) const x_semi_axis,
     NS(particle_real_t) const y_semi_axis );
 
@@ -196,20 +177,6 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(LimitEllipse)* NS(LimitEllipse_preset)(
 }
 
 
-SIXTRL_INLINE NS(particle_real_t) NS(LimitEllipse_get_x_origin)(
-    SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit )
-{
-    SIXTRL_ASSERT( limit != SIXTRL_NULLPTR );
-    return limit->x_origin;
-}
-
-SIXTRL_INLINE NS(particle_real_t) NS(LimitEllipse_get_y_origin)(
-    SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit )
-{
-    SIXTRL_ASSERT( limit != SIXTRL_NULLPTR );
-    return limit->y_origin;
-}
-
 SIXTRL_INLINE NS(particle_real_t) NS(LimitEllipse_get_x_half_axis)(
     SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit )
 {
@@ -247,21 +214,6 @@ NS(LimitEllipse_get_half_axes_product_squ)(
 }
 
 
-SIXTRL_INLINE void NS(LimitEllipse_set_x_origin)(
-    SIXTRL_BE_ARGPTR_DEC NS(LimitEllipse)* SIXTRL_RESTRICT limit,
-    NS(particle_real_t) const x_origin )
-{
-    if( limit != SIXTRL_NULLPTR ) limit->x_origin = x_origin;
-}
-
-SIXTRL_INLINE void NS(LimitEllipse_set_y_origin)(
-    SIXTRL_BE_ARGPTR_DEC NS(LimitEllipse)* SIXTRL_RESTRICT limit,
-    NS(particle_real_t) const y_origin )
-{
-    if( limit != SIXTRL_NULLPTR ) limit->y_origin = y_origin;
-}
-
-
 SIXTRL_INLINE void NS(LimitEllipse_set_half_axes)(
     SIXTRL_BE_ARGPTR_DEC NS(LimitEllipse)* SIXTRL_RESTRICT limit,
     NS(particle_real_t) const x_half_axis,
@@ -291,12 +243,6 @@ SIXTRL_INLINE void NS(LimitEllipse_clear)(
     SIXTRL_STATIC_VAR NS(particle_real_t) const ONE_HALF =
         ( NS(particle_real_t) )0.5;
 
-    NS(particle_real_t) const x_origin =
-        ONE_HALF * ( SIXTRL_LIMIT_DEFAULT_MAX_X + SIXTRL_LIMIT_DEFAULT_MIN_X );
-
-    NS(particle_real_t) const y_origin =
-        ONE_HALF * ( SIXTRL_LIMIT_DEFAULT_MAX_Y + SIXTRL_LIMIT_DEFAULT_MIN_Y );
-
     NS(particle_real_t) const x_half_axis =
         ONE_HALF * ( SIXTRL_LIMIT_DEFAULT_MAX_X - SIXTRL_LIMIT_DEFAULT_MIN_X );
 
@@ -305,8 +251,6 @@ SIXTRL_INLINE void NS(LimitEllipse_clear)(
 
     SIXTRL_ASSERT( limit != SIXTRL_NULLPTR );
 
-    NS(LimitEllipse_set_x_origin)( limit, x_origin );
-    NS(LimitEllipse_set_y_origin)( limit, y_origin );
     NS(LimitEllipse_set_half_axes)( limit, x_half_axis, y_half_axis );
 }
 
@@ -323,8 +267,6 @@ SIXTRL_INLINE NS(arch_status_t) NS(LimitEllipse_copy)(
     {
         if( destination != source )
         {
-            destination->x_origin = source->x_origin;
-            destination->y_origin = source->y_origin;
             destination->a_squ    = source->a_squ;
             destination->b_squ    = source->b_squ;
             destination->a_b_squ  = source->a_b_squ;

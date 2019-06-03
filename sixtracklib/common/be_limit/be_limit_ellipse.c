@@ -87,8 +87,6 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)* NS(LimitEllipse_new)(
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)* NS(LimitEllipse_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(particle_real_t) const x_origin, 
-    NS(particle_real_t) const y_origin,
     NS(particle_real_t) const x_semi_axis, 
     NS(particle_real_t) const y_semi_axis )
 {
@@ -107,8 +105,6 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)* NS(LimitEllipse_add)(
     
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
     
-    NS(LimitEllipse_set_x_origin)( &temp_obj, x_origin );
-    NS(LimitEllipse_set_y_origin)( &temp_obj, y_origin );
     NS(LimitEllipse_set_half_axes)( &temp_obj, x_semi_axis, y_semi_axis );
     
     return ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
@@ -122,8 +118,6 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)* NS(LimitEllipse_add_copy)(
     SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit )
 {
     return NS(LimitEllipse_add)( buffer, 
-        NS(LimitEllipse_get_x_origin)( limit ),
-        NS(LimitEllipse_get_y_origin)( limit ), 
         NS(LimitEllipse_get_x_half_axis)( limit ),
         NS(LimitEllipse_get_y_half_axis)( limit ) );
 }

@@ -82,22 +82,8 @@ SIXTRL_INLINE int NS(LimitEllipse_compare_values_with_treshold)(
         if( lhs != rhs )
         {
             cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                NS(LimitEllipse_get_x_origin)( lhs ), 
-                NS(LimitEllipse_get_x_origin)( rhs ), treshold );
-            
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                    NS(LimitEllipse_get_y_origin)( lhs ), 
-                    NS(LimitEllipse_get_y_origin)( rhs ), treshold );
-            }
-            
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                    NS(LimitEllipse_get_x_half_axis_squ)( lhs ), 
-                    NS(LimitEllipse_get_x_half_axis_squ)( rhs ), treshold );
-            }
+                NS(LimitEllipse_get_x_half_axis_squ)( lhs ), 
+                NS(LimitEllipse_get_x_half_axis_squ)( rhs ), treshold );
             
             if( cmp_result == 0 )
             {
@@ -138,12 +124,8 @@ SIXTRL_INLINE void NS(LimitEllipse_print_out)(
 {
     if( limit != SIXTRL_NULLPTR )
     {
-        printf( "|limit_ellipse    | origin x    = %+16.12f m;\r\n"
-                "                  | origin y    = %+16.12f m;\r\n"
-                "                  | half-axis x = %+16.12f m;\r\n"
+        printf( "|limit_ellipse    | half-axis x = %+16.12f m;\r\n"
                 "                  | half-axis y = %+16.12f m;\r\n",
-                NS(LimitEllipse_get_origin_x)( limit ),
-                NS(LimitEllipse_get_origin_y)( limit ),
                 NS(LimitEllipse_get_x_half_axis)( limit ),
                 NS(LimitEllipse_get_y_half_axis)( limit ) );
     }

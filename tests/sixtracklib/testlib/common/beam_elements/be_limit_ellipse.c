@@ -27,12 +27,8 @@ void NS(LimitEllipse_print)( SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
     if( ( fp != SIXTRL_NULLPTR ) && ( limit != SIXTRL_NULLPTR ) )
     {
         fprintf( fp, 
-                "|limit_ellipse    | origin x    = %+16.12f m;\r\n"
-                "                  | origin y    = %+16.12f m;\r\n"
-                "                  | half-axis x = %+16.12f m;\r\n"
-                "                  | half-axis y = %+16.12f m;\r\n",
-                NS(LimitEllipse_get_x_origin)( limit ),
-                NS(LimitEllipse_get_y_origin)( limit ),
+                "|limit_ellipse    | half-axis x = %+16.12f m;\r\n"
+                "                  | half-axis y = %+16.12f m;\r\n",                
                 NS(LimitEllipse_get_x_half_axis)( limit ),
                 NS(LimitEllipse_get_y_half_axis)( limit ) );
     }
