@@ -20,23 +20,6 @@ namespace SIXTRL_CXX_NAMESPACE
 {
     typedef ::NS(dipedge_real_t) dipedge_real_t;
     
-    #if !defined( _GPUCODE )
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST dipedge_real_t 
-        DIPOLE_EDGE_DEFAULT_INV_RHO = static_cast< dipedge_real_t >( 0 );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST dipedge_real_t 
-        DIPOLE_EDGE_DEFAULT_B = static_cast< dipedge_real_t >( 0 );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST dipedge_real_t 
-        DIPOLE_EDGE_DEFAULT_ROT_ANGLE_DEG = static_cast< dipedge_real_t >( 0 );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST dipedge_real_t 
-        DIPOLE_EDGE_DEFAULT_TILT_ANGLE_DEG = 
-            static_cast< dipedge_real_t >( 0 );
-        
-    #endif /* !defined( _GPUCODE ) */
-    
     template< typename T >
     struct TDipoleEdge
     {
@@ -48,19 +31,6 @@ namespace SIXTRL_CXX_NAMESPACE
         using buffer_t        = Buffer;
         using c_buffer_t      = buffer_t::c_api_t;
         
-        static SIXTRL_CONSTEXPR_OR_CONST value_type DEFAULT_INV_RHO = 
-            static_cast< value_type >( DIPOLE_EDGE_DEFAULT_INV_RHO );
-            
-        static SIXTRL_CONSTEXPR_OR_CONST value_type DEFAULT_ROT_ANGLE_DEG = 
-            static_cast< value_type >( DIPOLE_EDGE_DEFAULT_ROT_ANGLE_DEG );
-            
-        static SIXTRL_CONSTEXPR_OR_CONST value_type DEFAULT_B = 
-            static_cast< value_type >( DIPOLE_EDGE_DEFAULT_B );
-            
-        static SIXTRL_CONSTEXPR_OR_CONST value_type DEFAULT_TILT_ANGLE_DEG = 
-            static_cast< value_type >( DIPOLE_EDGE_DEFAULT_TILT_ANGLE_DEG );
-            
-
         SIXTRL_FN TDipoleEdge() = default;
 
         SIXTRL_FN TDipoleEdge( TDipoleEdge< T > const& other ) = default;
@@ -106,17 +76,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TDipoleEdge< T >* AddToBuffer(
             buffer_t& SIXTRL_RESTRICT_REF buffer,
-            const_reference SIXTRL_RESTRICT_REF inv_rho, 
-            const_reference SIXTRL_RESTRICT_REF rot_angle_deg, 
-            const_reference SIXTRL_RESTRICT_REF b, 
-            const_reference SIXTRL_RESTRICT_REF tilt_angle_deg );
+            const_reference SIXTRL_RESTRICT_REF r21, 
+            const_reference SIXTRL_RESTRICT_REF r43 );
 
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TDipoleEdge< T >* AddToBuffer(
             c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-            const_reference SIXTRL_RESTRICT_REF inv_rho, 
-            const_reference SIXTRL_RESTRICT_REF rot_angle_deg, 
-            const_reference SIXTRL_RESTRICT_REF b, 
-            const_reference SIXTRL_RESTRICT_REF tilt_angle_deg );
+            const_reference SIXTRL_RESTRICT_REF r21, 
+            const_reference SIXTRL_RESTRICT_REF r43 );
         
         /* - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - -  */                
 
@@ -144,64 +110,21 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_FN void preset() SIXTRL_NOEXCEPT;
         SIXTRL_FN void clear()  SIXTRL_NOEXCEPT;
         
-        SIXTRL_FN value_type const& getInvRho() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getRho() const SIXTRL_NOEXCEPT;
-        
-        SIXTRL_FN value_type const& getCosRotAngle() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type const& getTanRotAngle() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getSinRotAngle() const SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN value_type getRotAngleDeg() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getRotAngleRad() const SIXTRL_NOEXCEPT;
-        
-        SIXTRL_FN value_type const& getCosTiltAngle() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type const& getSinTiltAngle() const SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN value_type getTiltAngleDeg() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getTiltAngleRad() const SIXTRL_NOEXCEPT;
-        
-        SIXTRL_FN value_type const& getB() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN const_reference getR21() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN const_reference getR43() const SIXTRL_NOEXCEPT;
         
         /* ----------------------------------------------------------------- */
         
-        SIXTRL_FN void setInvRho( value_type const& SIXTRL_RESTRICT_REF
-            inv_rho ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setR21( 
+            const_reference SIXTRL_RESTRICT_REF r21 ) SIXTRL_NOEXCEPT;
             
-        SIXTRL_FN void setCosRotAngle( value_type const& SIXTRL_RESTRICT_REF 
-            cos_rot_angle ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setR43( 
+            const_reference SIXTRL_RESTRICT_REF r43 ) SIXTRL_NOEXCEPT;
             
-        SIXTRL_FN void  setTanRotAngle( value_type const& SIXTRL_RESTRICT_REF 
-            tan_rot_angle ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN void setRotAngleDeg( value_type const& SIXTRL_RESTRICT_REF 
-            rot_angle_deg ) SIXTRL_NOEXCEPT;
-            
-        SIXTRL_FN void setRotAngleRad( value_type const& SIXTRL_RESTRICT_REF 
-            rot_angle_rad ) SIXTRL_NOEXCEPT;
-        
-        SIXTRL_FN void setCosTiltAngle( value_type const& SIXTRL_RESTRICT_REF 
-            cos_tilt_angle ) SIXTRL_NOEXCEPT;
-            
-        SIXTRL_FN void setSinTiltAngle( value_type const& SIXTRL_RESTRICT_REF 
-            sin_tilt_angle ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN void setTiltAngleDeg( value_type const& SIXTRL_RESTRICT_REF 
-            tilt_angle_deg) SIXTRL_NOEXCEPT;
-            
-        SIXTRL_FN void setTiltAngleRad( value_type const& SIXTRL_RESTRICT_REF 
-            tilt_angle_rad ) SIXTRL_NOEXCEPT;
-        
-        SIXTRL_FN void setB( 
-            value_type const& SIXTRL_RESTRICT_REF b ) SIXTRL_NOEXCEPT;
-
         /* ----------------------------------------------------------------- */
          
-        value_type inv_rho        SIXTRL_ALIGN( 8 );
-        value_type cos_rot_angle  SIXTRL_ALIGN( 8 );
-        value_type tan_rot_angle  SIXTRL_ALIGN( 8 );
-        value_type b              SIXTRL_ALIGN( 8 );
-        value_type cos_tilt_angle SIXTRL_ALIGN( 8 );
-        value_type sin_tilt_angle SIXTRL_ALIGN( 8 );
+        value_type r21  SIXTRL_ALIGN( 8 );
+        value_type r43  SIXTRL_ALIGN( 8 );
     };
 
     template< typename T > struct ObjectTypeTraits<
@@ -225,22 +148,14 @@ namespace SIXTRL_CXX_NAMESPACE
     template< typename T >
     SIXTRL_ARGPTR_DEC TDipoleEdge< T >* TDipoleEdge_add(
         typename TDipoleEdge< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF inv_rho,
-        typename TDipoleEdge< T >::const_reference 
-            SIXTRL_RESTRICT_REF rot_angle_deg,
-        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF b, 
-        typename TDipoleEdge< T >::const_reference 
-            SIXTRL_RESTRICT_REF tilt_angle_deg );
+        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF r21,
+        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF r43 );
     
     template< typename T >
     SIXTRL_ARGPTR_DEC TDipoleEdge< T >* TDipoleEdge_add(
         typename TDipoleEdge< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF inv_rho,
-        typename TDipoleEdge< T >::const_reference 
-            SIXTRL_RESTRICT_REF rot_angle_deg,
-        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF b, 
-        typename TDipoleEdge< T >::const_reference
-            SIXTRL_RESTRICT_REF tilt_angle_deg );
+        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF r21,
+        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF r43 );
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TDipoleEdge< T >* TDipoleEdge_add_copy(
@@ -266,18 +181,6 @@ namespace SIXTRL_CXX_NAMESPACE
         using c_buffer_t = buffer_t::c_api_t;
         using c_api_t    = ::NS(DipoleEdge);
         
-        static SIXTRL_CONSTEXPR_OR_CONST value_type DEFAULT_INV_RHO = 
-            DIPOLE_EDGE_DEFAULT_INV_RHO;
-            
-        static SIXTRL_CONSTEXPR_OR_CONST value_type DEFAULT_ROT_ANGLE_DEG = 
-            DIPOLE_EDGE_DEFAULT_ROT_ANGLE_DEG;
-            
-        static SIXTRL_CONSTEXPR_OR_CONST value_type DEFAULT_B = 
-            DIPOLE_EDGE_DEFAULT_B;
-            
-        static SIXTRL_CONSTEXPR_OR_CONST value_type DEFAULT_TILT_ANGLE_DEG =        
-            DIPOLE_EDGE_DEFAULT_TILT_ANGLE_DEG;
-            
         /* ---------------------------------------------------------------- */
 
         SIXTRL_FN TDipoleEdge() = default;
@@ -327,15 +230,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_STATIC SIXTRL_FN
         SIXTRL_ARGPTR_DEC TDipoleEdge< ::NS(dipedge_real_t) >* AddToBuffer(
-            buffer_t& SIXTRL_RESTRICT_REF buffer,
-            value_type const inv_rho, value_type const rot_angle_deg, 
-            value_type const b, value_type const tilt_angle_deg );
+            buffer_t& SIXTRL_RESTRICT_REF buffer, 
+            value_type const r21, value_type const r43 );
 
         SIXTRL_STATIC SIXTRL_FN
         SIXTRL_ARGPTR_DEC TDipoleEdge< ::NS(dipedge_real_t) >* AddToBuffer(
             c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-            value_type const inv_rho, value_type const rot_angle_deg, 
-            value_type const b, value_type const tilt_angle_deg );
+            value_type const r21, value_type const r43 );
 
         SIXTRL_STATIC SIXTRL_FN
         SIXTRL_ARGPTR_DEC TDipoleEdge< ::NS(dipedge_real_t) >* AddCopyToBuffer(
@@ -368,53 +269,13 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_FN void preset() SIXTRL_NOEXCEPT;
         SIXTRL_FN void clear() SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN value_type getInvRho() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getRho() const SIXTRL_NOEXCEPT;
-        
-        SIXTRL_FN value_type getCosRotAngle() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getTanRotAngle() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getSinRotAngle() const SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN value_type getRotAngleDeg() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getRotAngleRad() const SIXTRL_NOEXCEPT;
-        
-        SIXTRL_FN value_type getCosTiltAngle() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getSinTiltAngle() const SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN value_type getTiltAngleDeg() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getTiltAngleRad() const SIXTRL_NOEXCEPT;
-        
-        SIXTRL_FN value_type getB() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN value_type getR21() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN value_type getR43() const SIXTRL_NOEXCEPT;
         
         /* ----------------------------------------------------------------- */
         
-        SIXTRL_FN void setInvRho( value_type const inv_rho ) SIXTRL_NOEXCEPT;
-            
-        SIXTRL_FN void setCosRotAngle( value_type const  
-            cos_rot_angle ) SIXTRL_NOEXCEPT;
-            
-        SIXTRL_FN void  setTanRotAngle( value_type const  
-            tan_rot_angle ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN void setRotAngleDeg( value_type const  
-            rot_angle_deg ) SIXTRL_NOEXCEPT;
-            
-        SIXTRL_FN void setRotAngleRad( value_type const  
-            rot_angle_rad ) SIXTRL_NOEXCEPT;
-        
-        SIXTRL_FN void setCosTiltAngle( value_type const  
-            cos_tilt_angle ) SIXTRL_NOEXCEPT;
-            
-        SIXTRL_FN void setSinTiltAngle( value_type const  
-            sin_tilt_angle ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN void setTiltAngleDeg( value_type const  
-            tilt_angle_deg) SIXTRL_NOEXCEPT;
-            
-        SIXTRL_FN void setTiltAngleRad( value_type const  
-            tilt_angle_rad ) SIXTRL_NOEXCEPT;
-        
-        SIXTRL_FN void setB( value_type const b ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setR21( value_type const r21 ) SIXTRL_NOEXCEPT;            
+        SIXTRL_FN void setR43( value_type const r43 ) SIXTRL_NOEXCEPT;
     };
 
     using DipoleEdge = TDipoleEdge< ::NS(dipedge_real_t) >;
@@ -427,17 +288,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_ARGPTR_DEC DipoleEdge* DipoleEdge_add( 
         DipoleEdge::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        DipoleEdge::value_type const inv_rho,
-        DipoleEdge::value_type const rot_angle_deg,
-        DipoleEdge::value_type const b, 
-        DipoleEdge::value_type const tilt_angle_deg );
+        DipoleEdge::value_type const r21, DipoleEdge::value_type const r43 );
 
     SIXTRL_ARGPTR_DEC DipoleEdge* DipoleEdge_add(
         DipoleEdge::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        DipoleEdge::value_type const inv_rho,
-        DipoleEdge::value_type const rot_angle_deg,
-        DipoleEdge::value_type const b, 
-        DipoleEdge::value_type const tilt_angle_deg );
+        DipoleEdge::value_type const r21, DipoleEdge::value_type const r43 );
 
     SIXTRL_ARGPTR_DEC DipoleEdge* DipoleEdge_add_copy( 
         DipoleEdge::buffer_t& SIXTRL_RESTRICT_REF buffer,
@@ -538,26 +393,18 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDipoleEdge< T >*
     TDipoleEdge< T >::AddToBuffer(
         typename TDipoleEdge< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF inv_rho,
-        typename TDipoleEdge< T >::const_reference 
-            SIXTRL_RESTRICT_REF rot_angle_deg,
-        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF b,
-        typename TDipoleEdge< T >::const_reference
-            SIXTRL_RESTRICT_REF tilt_angle_deg )
+        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF r21,
+        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF r43 )
     {
         return SIXTRL_CXX_NAMESPACE::TDipoleEdge< T>::AddToBuffer(
-            *buffer.getCApiPtr(), inv_rho, rot_angle_deg, b, tilt_angle_deg );
+            *buffer.getCApiPtr(), r21, r43 );
     }
 
     template< typename T > SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDipoleEdge< T >* 
     TDipoleEdge< T >::AddToBuffer(
         typename TDipoleEdge< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF inv_rho,
-        typename TDipoleEdge< T >::const_reference 
-            SIXTRL_RESTRICT_REF rot_angle_deg,
-        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF b,
-        typename TDipoleEdge< T >::const_reference 
-            SIXTRL_RESTRICT_REF tilt_angle_deg )
+        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF r21,
+        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF r43 )
     {
         using _this_t = SIXTRL_CXX_NAMESPACE::TDipoleEdge< T >;
         using size_t  = typename _this_t::size_type;
@@ -574,10 +421,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
 
         _this_t temp;
-        temp.setInvRho( inv_rho );
-        temp.setRotAngleDeg( rot_angle_deg );
-        temp.setB( b );
-        temp.setTiltAngleDeg( tilt_angle_deg );
+        temp.setR21( r21 );
+        temp.setR43( r43 );
 
         return reinterpret_cast< ptr_t >( ::NS(Object_get_begin_addr)(
             ::NS(Buffer_add_object)( &buffer, &temp, sizeof( _this_t ),
@@ -589,8 +434,7 @@ namespace SIXTRL_CXX_NAMESPACE
         typename TDipoleEdge< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         TDipoleEdge< T > const& SIXTRL_RESTRICT_REF orig )
     {
-        return TDipoleEdge< T >::AddCopyToBuffer(
-            *buffer.getCApiPtr(), orig );
+        return TDipoleEdge< T >::AddCopyToBuffer( *buffer.getCApiPtr(), orig );
     }
     
     template< typename T >SIXTRL_INLINE SIXTRL_ARGPTR_DEC TDipoleEdge< T >*
@@ -613,12 +457,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
 
         _this_t temp;
-        temp.setInvRho( orig.getInvRho() );
-        temp.setCosRotAngle( orig.getCosRotAngle() );
-        temp.setTanRotAngle( orig.getTanRotAngle() );
-        temp.setB( orig.getB() );
-        temp.setCosTiltAngle( orig.getCosTiltAngle() );
-        temp.setSinTiltAngle( orig.getSinTiltAngle() );
+        temp.setR21( orig.getR21() );
+        temp.setR43( orig.getR43() );
 
         return reinterpret_cast< ptr_t >( ::NS(Object_get_begin_addr)(
             ::NS(Buffer_add_object)( &buffer, &temp, sizeof( _this_t ),
@@ -667,235 +507,66 @@ namespace SIXTRL_CXX_NAMESPACE
         this->setTiltAngleDeg( _this_t::DEFAULT_TILT_ANGLE_DEG );
     }
     
-    template< typename T > 
-    typename TDipoleEdge< T >::value_type const& 
-    TDipoleEdge< T >::getInvRho() const SIXTRL_NOEXCEPT
+    template< typename T > typename TDipoleEdge< T >::const_reference 
+    TDipoleEdge< T >::getR21() const SIXTRL_NOEXCEPT
     {
-        return this->inv_rho;
+        return this->r21;
     }
     
-    template< typename T > 
-    typename TDipoleEdge< T >::value_type 
-    TDipoleEdge< T >::getRho() const SIXTRL_NOEXCEPT
+    template< typename T > typename TDipoleEdge< T >::const_reference  
+    TDipoleEdge< T >::getR43() const SIXTRL_NOEXCEPT
     {
-        typedef typename TDipoleEdge< T >::value_type real_t;
-        
-        return ( this->inv_rho > real_t{ 0 } )
-            ? static_cast< real_t >( 1 ) / this->inv_rho 
-            : static_cast< real_t >( 0 );
-    }
-    
-    template< typename T > 
-    typename TDipoleEdge< T >::value_type const& 
-    TDipoleEdge< T >::getCosRotAngle() const SIXTRL_NOEXCEPT
-    {
-        return this->cos_rot_angle;
-    }
-    
-    template< typename T > 
-    typename TDipoleEdge< T >::value_type const& 
-    TDipoleEdge< T >::getTanRotAngle() const SIXTRL_NOEXCEPT
-    {
-        return this->tan_rot_angle;
-    }
-    
-    template< typename T > 
-    typename TDipoleEdge< T >::value_type 
-    TDipoleEdge< T >::getSinRotAngle() const SIXTRL_NOEXCEPT
-    {
-        return this->getCosRotAngle() * this->getTanRotAngle();
-    }
-
-    template< typename T > 
-    typename TDipoleEdge< T >::value_type 
-    TDipoleEdge< T >::getRotAngleDeg() const SIXTRL_NOEXCEPT
-    {
-        return SIXTRL_CXX_NAMESPACE::RAD2DEG * this->getRotAngleRad();
-    }
-    
-    template< typename T > 
-    typename TDipoleEdge< T >::value_type 
-    TDipoleEdge< T >::getRotAngleRad() const SIXTRL_NOEXCEPT
-    {
-        return std::atan2( this->getCosRotAngle(), this->getSinRotAngle() );
-    }
-    
-    template< typename T > 
-    typename TDipoleEdge< T >::value_type const& 
-    TDipoleEdge< T >::getCosTiltAngle() const SIXTRL_NOEXCEPT
-    {
-        return this->cos_tilt_angle;
-    }
-    
-    template< typename T > 
-    typename TDipoleEdge< T >::value_type const& 
-    TDipoleEdge< T >::getSinTiltAngle() const SIXTRL_NOEXCEPT
-    {
-        return this->sin_tilt_angle;
-    }
-
-    template< typename T > 
-    typename TDipoleEdge< T >::value_type 
-    TDipoleEdge< T >::getTiltAngleDeg() const SIXTRL_NOEXCEPT
-    {
-        return SIXTRL_CXX_NAMESPACE::RAD2DEG * this->getTiltAngleRad();
-    }
-    
-    template< typename T > 
-    typename TDipoleEdge< T >::value_type 
-    TDipoleEdge< T >::getTiltAngleRad() const SIXTRL_NOEXCEPT
-    {
-        return std::atan2( this->cos_tilt_angle, this->sin_tilt_angle );
-    }
-    
-    template< typename T > 
-    typename TDipoleEdge< T >::value_type const&
-    TDipoleEdge< T >::getB() const SIXTRL_NOEXCEPT
-    {
-        return this->b;
+        return this->r43;
     }
     
     /* ----------------------------------------------------------------- */
     
-    template< typename T > void TDipoleEdge< T >::setInvRho( 
-        typename TDipoleEdge< T >::value_type const& 
-            SIXTRL_RESTRICT_REF inv_rho ) SIXTRL_NOEXCEPT
+    template< typename T > void TDipoleEdge< T >::setR21( 
+        typename TDipoleEdge< T >::const_reference 
+            SIXTRL_RESTRICT_REF r21 ) SIXTRL_NOEXCEPT
     {
-        typedef typename TDipoleEdge< T >::value_type real_t;
-        
-        if( inv_rho > real_t{ 0 } )
-        {
-            this->inv_rho = inv_rho;
-        }
-    }
-        
-    template< typename T > void TDipoleEdge< T >::setCosRotAngle( 
-        typename TDipoleEdge< T >::value_type const& SIXTRL_RESTRICT_REF 
-            cos_rot_angle ) SIXTRL_NOEXCEPT
-    {
-        typedef typename TDipoleEdge< T >::value_type real_t;
-        
-        if( ( cos_rot_angle >= real_t{ 0 } ) &&
-            ( cos_rot_angle <= real_t{ 1 } ) )
-        {
-            this->cos_rot_angle = cos_rot_angle;
-        }
-    }
-        
-    template< typename T > void TDipoleEdge< T >::setTanRotAngle( 
-        typename TDipoleEdge< T >::value_type const& SIXTRL_RESTRICT_REF 
-            tan_rot_angle ) SIXTRL_NOEXCEPT
-    {
-        typedef typename TDipoleEdge< T >::value_type real_t;
-        
-        if( ( tan_rot_angle >= real_t{ 0 } ) &&
-            ( tan_rot_angle <= real_t{ 1 } ) )
-        {
-            this->tan_rot_angle = tan_rot_angle;
-        }
-    }
-
-    template< typename T > void TDipoleEdge< T >::setRotAngleDeg( 
-        typename TDipoleEdge< T >::value_type const& SIXTRL_RESTRICT_REF 
-            rot_angle_deg ) SIXTRL_NOEXCEPT
-    {
-        this->setRotAngleRad( SIXTRL_CXX_NAMESPACE::DEG2RAD * rot_angle_deg );
-    }
-        
-    template< typename T > void TDipoleEdge< T >::setRotAngleRad( 
-        typename TDipoleEdge< T >::value_type const& SIXTRL_RESTRICT_REF 
-        rot_angle_rad ) SIXTRL_NOEXCEPT
-    {
-        this->cos_rot_angle = std::cos( rot_angle_rad );
-        this->tan_rot_angle = std::cos( rot_angle_rad );
+        this->r21 = r21;
     }
     
-    template< typename T > void TDipoleEdge< T >::setCosTiltAngle( 
-        typename TDipoleEdge< T >::value_type const& SIXTRL_RESTRICT_REF 
-        cos_tilt_angle ) SIXTRL_NOEXCEPT
+    template< typename T > void TDipoleEdge< T >::setR43( 
+        typename TDipoleEdge< T >::const_reference 
+            SIXTRL_RESTRICT_REF r43 ) SIXTRL_NOEXCEPT
     {
-        typedef typename TDipoleEdge< T >::value_type real_t;
-        
-        if( ( cos_tilt_angle >= real_t{ 0 } ) &&
-            ( cos_tilt_angle <= real_t{ 1 } ) )
-        {
-            this->cos_tilt_angle = cos_tilt_angle;
-        }
-    }
-        
-    template< typename T > void TDipoleEdge< T >::setSinTiltAngle( 
-        typename TDipoleEdge< T >::value_type const& SIXTRL_RESTRICT_REF 
-        sin_tilt_angle ) SIXTRL_NOEXCEPT
-    {
-        typedef typename TDipoleEdge< T >::value_type real_t;
-        
-        if( ( sin_tilt_angle >= real_t{ 0 } ) &&
-            ( sin_tilt_angle <= real_t{ 1 } ) )
-        {
-            this->sin_tilt_angle = sin_tilt_angle;
-        }
-    }
-
-    template< typename T > void TDipoleEdge< T >::setTiltAngleDeg( 
-        typename TDipoleEdge< T >::value_type const& SIXTRL_RESTRICT_REF 
-        tilt_angle_deg) SIXTRL_NOEXCEPT
-    {
-        this->setTiltAngleRad( 
-            SIXTRL_CXX_NAMESPACE::DEG2RAD * tilt_angle_deg );
-    }
-        
-    template< typename T > void TDipoleEdge< T >::setTiltAngleRad( 
-        typename TDipoleEdge< T >::value_type const& SIXTRL_RESTRICT_REF 
-        tilt_angle_rad ) SIXTRL_NOEXCEPT
-    {
-        this->cos_tilt_angle = std::cos( tilt_angle_rad );
-        this->sin_tilt_angle = std::sin( tilt_angle_rad );
-    }
-    
-    template< typename T > void TDipoleEdge< T >::setB( 
-        typename TDipoleEdge< T >::value_type const& 
-            SIXTRL_RESTRICT_REF b ) SIXTRL_NOEXCEPT
-    {
-        this->b = b;
+        this->r43 = r43;
     }
 
     /* ----------------------------------------------------------------- */
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TDipoleEdge< T >* TDipoleEdge_new(
-        typename TDipoleEdge< T >::buffer_t& buffer )
+        typename TDipoleEdge< T >::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
-        return SIXTRL_CXX_NAMESPACE::TDipoleEdge< T >::CreateNewOnBuffer(
-            buffer.getCApiPtr() );
+        return TDipoleEdge< T >::CreateNewOnBuffer( *buffer.getCApiPtr() );
     }
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TDipoleEdge< T >* TDipoleEdge_new(
-        SIXTRL_BUFFER_ARGPTR_DEC typename TDipoleEdge< T >::c_buffer_t* ptr_buffer )
+        typename TDipoleEdge< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
-        return SIXTRL_CXX_NAMESPACE::TDipoleEdge< T >::CreateNewOnBuffer(
-            ptr_buffer );
+        return TDipoleEdge< T >::CreateNewOnBuffer( buffer );
     }
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TDipoleEdge< T >* TDipoleEdge_add(
         typename TDipoleEdge< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TDipoleEdge< T >::value_type const& SIXTRL_RESTRICT_REF x_limits,
-        typename TDipoleEdge< T >::value_type const& SIXTRL_RESTRICT_REF y_limits )
+        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF r21,
+        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF r43 )
     {
-        return SIXTRL_CXX_NAMESPACE::TDipoleEdge< T >::AddToBuffer(
-            buffer.getCApiPtr(), x_limits, y_limits );
+        return TDipoleEdge< T >::AddToBuffer( *buffer.getCApiPtr(), r21, r43 );
     }
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TDipoleEdge< T >* TDipoleEdge_add(
-        SIXTRL_BUFFER_ARGPTR_DEC typename TDipoleEdge< T >::c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer,
-        typename TDipoleEdge< T >::value_type const& SIXTRL_RESTRICT_REF x_limits,
-        typename TDipoleEdge< T >::value_type const& SIXTRL_RESTRICT_REF y_limits )
+        typename TDipoleEdge< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF r21,
+        typename TDipoleEdge< T >::const_reference SIXTRL_RESTRICT_REF r43 )
     {
-        return SIXTRL_CXX_NAMESPACE::TDipoleEdge< T >::AddToBuffer(
-            ptr_buffer, x_limits, y_limits );
+        return TDipoleEdge< T >::AddToBuffer( buffer, r21, r43);
     }
 
     template< typename T >
@@ -904,17 +575,16 @@ namespace SIXTRL_CXX_NAMESPACE
         TDipoleEdge< T > const& SIXTRL_RESTRICT_REF  other )
     {
         return SIXTRL_CXX_NAMESPACE::TDipoleEdge< T >::AddToBuffer(
-            buffer.getCApiPtr(), other.getXDipoleEdge(), other.getYDipoleEdge() );
+            *buffer.getCApiPtr(), other.getR21(), other.getR43() );
     }
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TDipoleEdge< T >* TDipoleEdge_add_copy(
-        SIXTRL_BUFFER_ARGPTR_DEC typename TDipoleEdge< T >::c_buffer_t*
-            SIXTRL_RESTRICT ptr_buffer,
-        TDipoleEdge< T > const& SIXTRL_RESTRICT_REF  other )
+        typename TDipoleEdge< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+        TDipoleEdge< T > const& SIXTRL_RESTRICT_REF other )
     {
         return SIXTRL_CXX_NAMESPACE::TDipoleEdge< T >::AddToBuffer(
-            ptr_buffer, other.getXDipoleEdge(), other.getYDipoleEdge() );
+            buffer, other.getXDipoleEdge(), other.getYDipoleEdge() );
     }
 
     /* ===================================================================== *
@@ -961,26 +631,18 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC DipoleEdge* DipoleEdge::AddToBuffer(
         DipoleEdge::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        DipoleEdge::value_type const inv_rho, 
-        DipoleEdge::value_type const rot_angle_deg, 
-        DipoleEdge::value_type const b, 
-        DipoleEdge::value_type const tilt_angle_deg  )
+        DipoleEdge::value_type const r21, DipoleEdge::value_type const r43 )
     {
         return static_cast< SIXTRL_ARGPTR_DEC DipoleEdge* >(
-            ::NS(DipoleEdge_add)( buffer.getCApiPtr(), inv_rho, 
-                  rot_angle_deg, b, tilt_angle_deg ) );
+            ::NS(DipoleEdge_add)( buffer.getCApiPtr(), r21, r43 ) );
     }
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC DipoleEdge* DipoleEdge::AddToBuffer(
         DipoleEdge::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        DipoleEdge::value_type const inv_rho, 
-        DipoleEdge::value_type const rot_angle_deg, 
-        DipoleEdge::value_type const b, 
-        DipoleEdge::value_type const tilt_angle_deg  )
+        DipoleEdge::value_type const r21, DipoleEdge::value_type const r43 )
     {
         return static_cast< SIXTRL_ARGPTR_DEC DipoleEdge* >(
-            ::NS(DipoleEdge_add)( &buffer, inv_rho, rot_angle_deg, 
-              b, tilt_angle_deg ) );
+            ::NS(DipoleEdge_add)( &buffer, r21, r43 ) );
     }
     
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC DipoleEdge* DipoleEdge::AddCopyToBuffer(
@@ -1051,130 +713,30 @@ namespace SIXTRL_CXX_NAMESPACE
         ::NS(DipoleEdge_clear)( this->getCApiPtr() );
     }
 
-    DipoleEdge::value_type DipoleEdge::getInvRho() const SIXTRL_NOEXCEPT
+    DipoleEdge::value_type DipoleEdge::getR21() const SIXTRL_NOEXCEPT
     {
-        return ::NS(DipoleEdge_get_inv_rho)( this->getCApiPtr() );
+        return ::NS(DipoleEdge_get_r21)( this->getCApiPtr() );
     }
     
-    DipoleEdge::value_type DipoleEdge::getRho() const SIXTRL_NOEXCEPT
+    DipoleEdge::value_type DipoleEdge::getR43() const SIXTRL_NOEXCEPT
     {
-        return ::NS(DipoleEdge_get_rho)( this->getCApiPtr() );
-    }
-    
-    DipoleEdge::value_type DipoleEdge::getCosRotAngle() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(DipoleEdge_get_cos_rot_angle)( this->getCApiPtr() );
-    }
-    
-    DipoleEdge::value_type DipoleEdge::getTanRotAngle() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(DipoleEdge_get_tan_rot_angle)( this->getCApiPtr() );
-    }
-    
-    DipoleEdge::value_type DipoleEdge::getSinRotAngle() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(DipoleEdge_get_sin_rot_angle)( this->getCApiPtr() );
-    }
-
-    DipoleEdge::value_type DipoleEdge::getRotAngleDeg() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(DipoleEdge_get_rot_angle)( this->getCApiPtr() );
-    }
-    
-    DipoleEdge::value_type DipoleEdge::getRotAngleRad() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(DipoleEdge_get_rot_angle_rad)( this->getCApiPtr() );
-    }
-    
-    DipoleEdge::value_type DipoleEdge::getCosTiltAngle() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(DipoleEdge_get_cos_tilt_angle)( this->getCApiPtr() );
-    }
-    
-    DipoleEdge::value_type DipoleEdge::getSinTiltAngle() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(DipoleEdge_get_sin_tilt_angle)( this->getCApiPtr() );
-    }
-
-    DipoleEdge::value_type DipoleEdge::getTiltAngleDeg() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(DipoleEdge_get_tilt_angle)( this->getCApiPtr() );
-    }
-    
-    DipoleEdge::value_type DipoleEdge::getTiltAngleRad() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(DipoleEdge_get_tilt_angle_rad)( this->getCApiPtr() );
-    }
-    
-    DipoleEdge::value_type DipoleEdge::getB() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(DipoleEdge_get_b)( this->getCApiPtr() );
+        return ::NS(DipoleEdge_get_r43)( this->getCApiPtr() );
     }
     
     /* ----------------------------------------------------------------- */
     
-     void DipoleEdge::setInvRho( 
-         DipoleEdge::value_type const inv_rho ) SIXTRL_NOEXCEPT
+     void DipoleEdge::setR21( 
+         DipoleEdge::value_type const r21 ) SIXTRL_NOEXCEPT
     {
-        ::NS(DipoleEdge_set_inv_rho)( this->getCApiPtr(), inv_rho );
+        ::NS(DipoleEdge_set_r21)( this->getCApiPtr(), r21 );
     }
         
-     void DipoleEdge::setCosRotAngle( 
-        DipoleEdge::value_type const cos_rot_angle ) SIXTRL_NOEXCEPT
+     void DipoleEdge::setR43( 
+        DipoleEdge::value_type const r43 ) SIXTRL_NOEXCEPT
     {
-        ::NS(DipoleEdge_set_cos_rot_angle)( this->getCApiPtr(), cos_rot_angle );
+        ::NS(DipoleEdge_set_r43)( this->getCApiPtr(), r43 );
     }
         
-     void DipoleEdge::setTanRotAngle( 
-        DipoleEdge::value_type const tan_rot_angle ) SIXTRL_NOEXCEPT
-    {
-        ::NS(DipoleEdge_set_tan_rot_angle)( this->getCApiPtr(), tan_rot_angle );
-    }
-
-     void DipoleEdge::setRotAngleDeg( 
-        DipoleEdge::value_type const  rot_angle_deg ) SIXTRL_NOEXCEPT
-    {
-        ::NS(DipoleEdge_set_rot_angle)( this->getCApiPtr(), rot_angle_deg );
-    }
-        
-     void DipoleEdge::setRotAngleRad( 
-        DipoleEdge::value_type const rot_angle_rad ) SIXTRL_NOEXCEPT
-    {
-        ::NS(DipoleEdge_set_rot_angle_rad)( this->getCApiPtr(), rot_angle_rad );
-    }
-    
-     void DipoleEdge::setCosTiltAngle( 
-        DipoleEdge::value_type const  cos_tilt_angle ) SIXTRL_NOEXCEPT
-    {
-        ::NS(DipoleEdge_set_cos_tilt_angle)( 
-            this->getCApiPtr(), cos_tilt_angle );
-    }
-        
-     void DipoleEdge::setSinTiltAngle( 
-        DipoleEdge::value_type const  sin_tilt_angle ) SIXTRL_NOEXCEPT
-    {
-        ::NS(DipoleEdge_set_sin_tilt_angle)( 
-            this->getCApiPtr(), sin_tilt_angle );
-    }
-
-     void DipoleEdge::setTiltAngleDeg( 
-         DipoleEdge::value_type const  tilt_angle_deg ) SIXTRL_NOEXCEPT
-    {
-        ::NS(DipoleEdge_set_tilt_angle)( this->getCApiPtr(), tilt_angle_deg );
-    }
-        
-     void DipoleEdge::setTiltAngleRad( 
-        DipoleEdge::value_type const tilt_angle_rad ) SIXTRL_NOEXCEPT
-    {
-        ::NS(DipoleEdge_set_tilt_angle_rad)( 
-            this->getCApiPtr(), tilt_angle_rad );
-    }
-    
-     void DipoleEdge::setB( DipoleEdge::value_type const b ) SIXTRL_NOEXCEPT
-    {
-        ::NS(DipoleEdge_set_b)( this->getCApiPtr(), b );
-    }
-    
     /* --------------------------------------------------------------------- */
     
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC DipoleEdge* 
@@ -1191,24 +753,16 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC DipoleEdge* DipoleEdge_add(
         DipoleEdge::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        DipoleEdge::value_type const inv_rho,
-        DipoleEdge::value_type const rot_angle_deg,
-        DipoleEdge::value_type const b, 
-        DipoleEdge::value_type const tilt_angle_deg )
+        DipoleEdge::value_type const r21, DipoleEdge::value_type const r43  )
     {
-        return DipoleEdge::AddToBuffer( 
-            buffer, inv_rho, rot_angle_deg, b, tilt_angle_deg );
+        return DipoleEdge::AddToBuffer( buffer, r21, r43 );
     }
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC DipoleEdge* DipoleEdge_add(
         DipoleEdge::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        DipoleEdge::value_type const inv_rho,
-        DipoleEdge::value_type const rot_angle_deg,
-        DipoleEdge::value_type const b, 
-        DipoleEdge::value_type const tilt_angle_deg )
+        DipoleEdge::value_type const r21, DipoleEdge::value_type const r43 )
     {
-        return DipoleEdge::AddToBuffer(
-            buffer, inv_rho, rot_angle_deg, b, tilt_angle_deg );
+        return DipoleEdge::AddToBuffer( buffer, r21, r43 );
     }
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC DipoleEdge* DipoleEdge_add_copy(

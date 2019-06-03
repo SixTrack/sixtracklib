@@ -82,10 +82,7 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(DipoleEdge)* NS(DipoleEdge_new)(
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(DipoleEdge)* NS(DipoleEdge_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(dipedge_real_t) const inv_rho, 
-    NS(dipedge_real_t) const rot_angle_deg, 
-    NS(dipedge_real_t) const b, 
-    NS(dipedge_real_t) const tilt_angle_deg )
+    NS(dipedge_real_t) const r21, NS(dipedge_real_t) const r43 )
 {
     typedef NS(buffer_size_t) buf_size_t;
     typedef NS(DipoleEdge) elem_t;
@@ -100,10 +97,8 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(DipoleEdge)* NS(DipoleEdge_add)(
     
     elem_t temp_obj;
     
-    NS(DipoleEdge_set_inv_rho)( &temp_obj, inv_rho );
-    NS(DipoleEdge_set_rot_angle)( &temp_obj, rot_angle_deg );
-    NS(DipoleEdge_set_b)( &temp_obj, b );
-    NS(DipoleEdge_set_tilt_angle)( &temp_obj, tilt_angle_deg );
+    NS(DipoleEdge_set_r21)( &temp_obj, r21 );
+    NS(DipoleEdge_set_r43)( &temp_obj, r43 );
     
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 

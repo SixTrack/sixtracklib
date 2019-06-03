@@ -173,6 +173,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamElement_fprint)(
     
     #include "sixtracklib/testlib/common/beam_elements/be_limit_rect.h"
     #include "sixtracklib/testlib/common/beam_elements/be_limit_ellipse.h"
+    #include "sixtracklib/testlib/common/beam_elements/be_dipedge.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -556,13 +557,13 @@ SIXTRL_INLINE void NS(BeamElement_print)(
             
             case NS(OBJECT_TYPE_DIPEDGE):
             {
-                /* typedef SIXTRL_DATAPTR_DEC NS(LimitEllipse) const* 
-                           ptr_to_belem_t;
+                typedef SIXTRL_DATAPTR_DEC NS(DipoleEdge) const* 
+                    ptr_to_belem_t;
                  
                 ptr_to_belem_t beam_element = 
                     ( ptr_to_belem_t )( uintptr_t )addr;
 
-                NS(DipoleEdge_print_out)( beam_element ); */
+                NS(DipoleEdge_print_out)( beam_element );
                 break;
             }
 

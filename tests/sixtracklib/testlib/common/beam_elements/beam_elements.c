@@ -474,13 +474,13 @@ void NS(BeamElement_fprint)( FILE* SIXTRL_RESTRICT fp,
             
             case NS(OBJECT_TYPE_DIPEDGE):
             {
-                /* typedef SIXTRL_DATAPTR_DEC NS(DipoleEdge) const* 
+                typedef SIXTRL_DATAPTR_DEC NS(DipoleEdge) const* 
                         ptr_to_belem_t;
                         
                 ptr_to_belem_t beam_element = 
                     ( ptr_to_belem_t )( uintptr_t )addr;
 
-                NS(LimitEllipse_print)( fp, beam_element ); */
+                NS(DipoleEdge_print)( fp, beam_element );
                 break;
             }
 
