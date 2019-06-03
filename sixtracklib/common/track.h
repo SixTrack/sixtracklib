@@ -796,7 +796,7 @@ SIXTRL_INLINE int NS(Track_particle_beam_element_obj_dispatcher)(
             ret = NS(Track_particle_beam_monitor)( particles, index, belem );
             break;
         }
-        
+
         case NS(OBJECT_TYPE_LIMIT_RECT):
         {
             typedef NS(LimitRect) belem_t;
@@ -806,7 +806,7 @@ SIXTRL_INLINE int NS(Track_particle_beam_element_obj_dispatcher)(
             ret = NS(Track_particle_limit_rect)( particles, index, belem );
             break;
         }
-        
+
         case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
         {
             typedef NS(LimitEllipse) belem_t;
@@ -816,7 +816,7 @@ SIXTRL_INLINE int NS(Track_particle_beam_element_obj_dispatcher)(
             ret = NS(Track_particle_limit_ellipse)( particles, index, belem );
             break;
         }
-        
+
         case NS(OBJECT_TYPE_DIPEDGE):
         {
             typedef NS(DipoleEdge) belem_t;
