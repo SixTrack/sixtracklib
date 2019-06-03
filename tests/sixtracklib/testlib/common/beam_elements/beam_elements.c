@@ -1,187 +1,126 @@
-#ifndef SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_HEADER_H__
-#define SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_HEADER_H__
+#include "sixtracklib/testlib/common/beam_elements/beam_elements.h"
 
-#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #include <stdio.h>
-#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
-#if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/internal/buffer_main_defines.h"
-    #include "sixtracklib/common/internal/beam_elements_defines.h"
-#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+#include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/buffer.h"
+#include "sixtracklib/common/beam_elements.h"
 
-#if !defined( _GPUCODE ) && defined( __cplusplus )
-extern "C" {
-#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+/* ========================================================================= */
+/* =====           BEAM_ELEMENTS_TOOLS IMPLEMENTATION                  ===== */
+/* ========================================================================= */
 
-struct NS(Drift);
-struct NS(DriftExact);
-struct NS(MultiPole);
-struct NS(XYShift);
-struct NS(SRotation);
-struct NS(Cavity);
-struct NS(BeamBeam4D);
-struct NS(BeamBeam6D);
-struct NS(BeamMonitor);
-
-struct NS(Object);
-
-/* ------------------------------------------------------------------------- */
-
-SIXTRL_FN SIXTRL_STATIC void NS(Drift_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Drift) *const SIXTRL_RESTRICT e );
-
-SIXTRL_FN SIXTRL_STATIC void NS(DriftExact_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(DriftExact) *const SIXTRL_RESTRICT e );
-
-SIXTRL_FN SIXTRL_STATIC void NS(MultiPole_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(MultiPole) *const SIXTRL_RESTRICT e );
-
-SIXTRL_FN SIXTRL_STATIC void NS(XYShift_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(XYShift) *const SIXTRL_RESTRICT e );
-
-SIXTRL_FN SIXTRL_STATIC void NS(SRotation_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(SRotation) *const SIXTRL_RESTRICT e );
-
-SIXTRL_FN SIXTRL_STATIC void NS(Cavity_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Cavity) *const SIXTRL_RESTRICT e );
-
-SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam4D_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam4D) *const SIXTRL_RESTRICT e );
-
-SIXTRL_FN SIXTRL_STATIC void NS(BeamBeam6D_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT e );
-
-SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamMonitor) *const SIXTRL_RESTRICT e );
-
-SIXTRL_FN SIXTRL_STATIC void NS(BeamElement_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Object) *const SIXTRL_RESTRICT be_info );
-
-/* ------------------------------------------------------------------------- */
-
-#if !defined( _GPUCODE )
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Drift_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Drift) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(DriftExact_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(DriftExact) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(MultiPole_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(MultiPole) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(XYShift_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(XYShift) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SRotation_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(SRotation) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Cavity_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Cavity) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamBeam4D_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam4D) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamBeam6D_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamMonitor_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamMonitor) *const SIXTRL_RESTRICT e );
-
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamElement_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Object) *const SIXTRL_RESTRICT info );
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Drift_fprint)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Drift) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(DriftExact_fprint)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(DriftExact) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(MultiPole_fprint)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(MultiPole) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(XYShift_fprint)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(XYShift) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SRotation_fprint)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(SRotation) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Cavity_fprint)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Cavity) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamBeam4D_fprint)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam4D) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamBeam6D_fprint)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamMonitor_fprint)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamMonitor) *const SIXTRL_RESTRICT e );
-
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamElement_fprint)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC  const struct NS(Object) *const SIXTRL_RESTRICT info );
-
-#endif /* !defined( _GPUCODE ) */
-
-#if !defined( _GPUCODE ) && defined( __cplusplus )
+void NS(Drift_print_out)( SIXTRL_BE_ARGPTR_DEC const
+    NS(Drift) *const SIXTRL_RESTRICT drift )
+{
+    NS(Drift_print)( drift );
+    return;
 }
-#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-/* ========================================================================= *
- * ======== INLINE IMPLEMENTATION                                            *
- * ========================================================================= */
+void NS(DriftExact_print_out)( SIXTRL_BE_ARGPTR_DEC const
+    NS(DriftExact) *const SIXTRL_RESTRICT drift )
+{
+    NS(DriftExact_print)( drift );
+    return;
+}
 
-#if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/common/buffer.h"
-    #include "sixtracklib/common/beam_elements.h"
-#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+void NS(MultiPole_print_out)( SIXTRL_BE_ARGPTR_DEC const
+    NS(MultiPole) *const SIXTRL_RESTRICT mp )
+{
+    NS(MultiPole_print)( mp );
+    return;
+}
 
-#if !defined( _GPUCODE ) && defined( __cplusplus )
-extern "C" {
-#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
+void NS(XYShift_print_out)( SIXTRL_BE_ARGPTR_DEC const
+    NS(XYShift) *const SIXTRL_RESTRICT xy_shift )
+{
+    NS(XYShift_print)( xy_shift );
+    return;
+}
 
-SIXTRL_INLINE void NS(Drift_print)(
+void NS(SRotation_print_out)( SIXTRL_BE_ARGPTR_DEC const
+    NS(SRotation) *const SIXTRL_RESTRICT srot )
+{
+    NS(SRotation_print)( srot );
+    return;
+}
+
+void NS(Cavity_print_out)( SIXTRL_BE_ARGPTR_DEC const
+    NS(Cavity) *const SIXTRL_RESTRICT cav )
+{
+    NS(Cavity_print)( cav );
+    return;
+}
+
+void NS(BeamBeam4D_print_out)( SIXTRL_BE_ARGPTR_DEC const
+    NS(BeamBeam4D) *const SIXTRL_RESTRICT bb4d )
+{
+    NS(BeamBeam4D_print)( bb4d );
+    return;
+}
+
+void NS(BeamBeam6D_print_out)( SIXTRL_BE_ARGPTR_DEC const
+    NS(BeamBeam6D) *const SIXTRL_RESTRICT bb6d )
+{
+    NS(BeamBeam6D_print)( bb6d );
+    return;
+}
+
+void NS(BeamMonitor_print_out)( SIXTRL_BE_ARGPTR_DEC const
+    NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
+{
+    NS(BeamMonitor_print)( monitor );
+    return;
+}
+
+
+void NS(BeamElement_print_out)( SIXTRL_BE_ARGPTR_DEC const
+    NS(Object) *const SIXTRL_RESTRICT be_info )
+{
+    NS(BeamElement_print)( be_info );
+    return;
+}
+
+/* ========================================================================= */
+
+void NS(Drift_fprint)( FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift )
 {
-    printf( "|drift            | length   = %+16.12f m;\r\n",
+    SIXTRL_ASSERT( fp != SIXTRL_NULLPTR );
+    fprintf( fp, "|drift            | length   = %+16.12f m;\r\n",
             NS(Drift_get_length)( drift ) );
 
     return;
 }
 
-SIXTRL_INLINE void NS(DriftExact_print)(
+/* ------------------------------------------------------------------------- */
+
+void NS(DriftExact_fprint)(
+    FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift )
 {
-    printf( "|drift exact      | length   = %+16.12f m;\r\n",
+    SIXTRL_ASSERT( fp != SIXTRL_NULLPTR );
+
+    fprintf( fp, "|drift            | length   = %+16.12f m;\r\n",
             NS(DriftExact_get_length)( drift ) );
 
     return;
 }
 
-SIXTRL_INLINE void NS(MultiPole_print)(
+void NS(MultiPole_fprint)(
+    FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT mp )
 {
     typedef NS(multipole_order_t) mp_order_t;
 
     mp_order_t const order = NS(MultiPole_get_order)( mp );
+    SIXTRL_ASSERT( fp != SIXTRL_NULLPTR );
 
-    printf( "|multipole        | order    = %3d;\r\n"
+    fprintf( fp, "|multipole        | order    = %3d;\r\n"
             "                  | length   = %+16.12f m;\r\n"
             "                  | hxl      = %+16.12f m;\r\n"
             "                  | hyl      = %+16.12f m;\r\n",
@@ -195,7 +134,7 @@ SIXTRL_INLINE void NS(MultiPole_print)(
 
         for( ; ii < num_k_values ; ++ii )
         {
-            printf( "                  |"
+            fprintf( fp, "                  |"
                     "knl[ %3d ] = %+20.12f ; ksl[ %3d ] = %+20.12f \r\n",
                     ( int )ii, NS(MultiPole_get_knl_value)( mp, ii ),
                     ( int )ii, NS(MultiPole_get_ksl_value)( mp, ii ) );
@@ -203,52 +142,60 @@ SIXTRL_INLINE void NS(MultiPole_print)(
     }
     else
     {
-        printf( "                  | knl = n/a ; ksl = n/a\r\n" );
+        fprintf( fp, "                  | knl = n/a ; ksl = n/a\r\n" );
     }
 
     return;
 }
 
-SIXTRL_INLINE void NS(XYShift_print)(
+void NS(XYShift_fprint)(
+    FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xy_shift )
 {
-    printf( "|xy_shift         | dx       = %+16.12f m;\r\n"
-            "                  | dy       = %+16.12f m;\r\n",
-            NS(XYShift_get_dx)( xy_shift ),
-            NS(XYShift_get_dy)( xy_shift ) );
-
-    return;
+    SIXTRL_ASSERT( fp != SIXTRL_NULLPTR );
+    fprintf( fp,
+             "|xy_shift         | dx       = %+16.12f m;\r\n"
+             "                  | dy       = %+16.12f m;\r\n",
+             NS(XYShift_get_dx)( xy_shift ),
+             NS(XYShift_get_dy)( xy_shift ) );
 }
 
-SIXTRL_INLINE void NS(SRotation_print)(
+void NS(SRotation_fprint)(
+    FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(SRotation) *const SIXTRL_RESTRICT srot )
 {
-    printf( "|srotation        | angle    = %+16.12f deg  ( %+16.12f rad )\r\n"
-            "                  | cos_z    = %+13.12f;\r\n"
-            "                  | sin_z    = %+13.12f;\r\n",
-            NS(SRotation_get_angle_deg)( srot ),
-            NS(SRotation_get_angle)( srot ),
-            NS(SRotation_get_cos_angle)( srot ),
-            NS(SRotation_get_sin_angle)( srot ) );
+    SIXTRL_ASSERT( fp != SIXTRL_NULLPTR );
+    fprintf( fp,
+             "|srotation        | angle    = %+16.12f deg  ( %+16.12f rad )\r\n"
+             "                  | cos_z    = %+13.12f;\r\n"
+             "                  | sin_z    = %+13.12f;\r\n",
+             NS(SRotation_get_angle_deg)( srot ),
+             NS(SRotation_get_angle)( srot ),
+             NS(SRotation_get_cos_angle)( srot ),
+             NS(SRotation_get_sin_angle)( srot ) );
 
     return;
 }
 
-SIXTRL_INLINE void NS(Cavity_print)(
+void NS(Cavity_fprint)(
+    FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cav )
 {
-    printf( "|cavity           | voltage   = %+16.12f V   \r\n"
-            "                  | frequency = %+20.12f Hz; \r\n"
-            "                  | lag       = %+15.12f deg;\r\n",
-            NS(Cavity_get_voltage)( cav ),
-            NS(Cavity_get_frequency)( cav ),
-            NS(Cavity_get_lag)( cav ) );
+    SIXTRL_ASSERT( fp != SIXTRL_NULLPTR );
+    fprintf( fp,
+             "|cavity           | voltage   = %+16.12f V   \r\n"
+             "                  | frequency = %+20.12f Hz; \r\n"
+             "                  | lag       = %+15.12f deg;\r\n",
+             NS(Cavity_get_voltage)( cav ),
+             NS(Cavity_get_frequency)( cav ),
+             NS(Cavity_get_lag)( cav ) );
 
     return;
 }
 
-SIXTRL_INLINE void NS(BeamBeam4D_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam4D) *const SIXTRL_RESTRICT bb4d )
+
+void NS(BeamBeam4D_fprint)( FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT bb4d )
 {
     typedef NS(beambeam4d_real_const_ptr_t)  bb_data_ptr_t;
     typedef SIXTRL_BE_DATAPTR_DEC BB4D_data* BB4D_data_ptr_t;
@@ -258,7 +205,8 @@ SIXTRL_INLINE void NS(BeamBeam4D_print)(
 
     SIXTRL_ASSERT( bb4ddata != SIXTRL_NULLPTR );
 
-    printf( "|beambeam4d      | q_part         = %+20e\r\n"
+    fprintf( fp,
+            "|beambeam4d      | q_part         = %+20e\r\n"
             "                 | N_part         = %+20e\r\n"
             "                 | sigma_x        = %+20.12f\r\n"
             "                 | sigma_y        = %+20.12f\r\n"
@@ -277,8 +225,9 @@ SIXTRL_INLINE void NS(BeamBeam4D_print)(
     return;
 }
 
-SIXTRL_INLINE void NS(BeamBeam6D_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT bb6d )
+void NS(BeamBeam6D_fprint)(
+    FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT bb6d )
 {
     typedef SIXTRL_REAL_T                       real_t;
     typedef NS(beambeam6d_real_const_ptr_t)     bb_data_ptr_t;
@@ -310,7 +259,8 @@ SIXTRL_INLINE void NS(BeamBeam6D_print)(
         SIXTRL_ASSERT( y_slices_star     != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( sigma_slices_star != SIXTRL_NULLPTR );
 
-        printf( "|beambeam6d      | enabled                = %20ld\r\n"
+        fprintf( fp,
+                "|beambeam6d      | enabled                = %20ld\r\n"
                 "                 | sphi                   = %+20e\r\n"
                 "                 | calpha                 = %+20e\r\n"
                 "                 | S33                    = %+20.12f\r\n"
@@ -321,7 +271,8 @@ SIXTRL_INLINE void NS(BeamBeam6D_print)(
 
         for( ; ii < num_slices ; ++ii )
         {
-            printf( ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+            fprintf( fp,
+                    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
                     ". . . . . . . . . . . . . . . . . . . . . . . . . . . . \r\n"
                     "                 | N_part_per_slice[%4d]  = %20e\r\n"
                     "                 | x_slices_star[%4d]     = %20.12f\r\n"
@@ -335,14 +286,15 @@ SIXTRL_INLINE void NS(BeamBeam6D_print)(
     }
     else
     {
-        printf( "|beambeam6d      | enabled                = %20ld\r\n",
-                ( long int )0 );
+        fprintf( fp, "|beambeam6d      | enabled                = %20ld\r\n",
+                 ( long int )0 );
     }
 
     return;
 }
 
-SIXTRL_INLINE void NS(BeamMonitor_print)(
+void NS(BeamMonitor_fprint)(
+    FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(BeamMonitor) *const SIXTRL_RESTRICT monitor )
 {
     int const is_rolling =
@@ -353,10 +305,11 @@ SIXTRL_INLINE void NS(BeamMonitor_print)(
 
     SIXTRL_ASSERT( monitor != SIXTRL_NULLPTR );
 
-    printf( "|beam-monitor     | num stores       = %20d\r\n"
+    fprintf( fp,
+            "|beam-monitor     | num stores       = %20d \r\n"
             "                  | start turn       = %20d\r\n"
             "                  | skip turns       = %20d\r\n"
-            "                  | out_address      = %20lu\r\n"
+            "                  | out_address      = %20lu;\r\n"
             "                  | min_particle_id  = %20d\r\n"
             "                  | max_particle_id  = %20d\r\n"
             "                  | is_rolling       = %20d\r\n"
@@ -372,10 +325,12 @@ SIXTRL_INLINE void NS(BeamMonitor_print)(
     return;
 }
 
-SIXTRL_INLINE void NS(BeamElement_print)(
+/* ------------------------------------------------------------------------- */
+
+void NS(BeamElement_fprint)( FILE* SIXTRL_RESTRICT fp,
     SIXTRL_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT be_info )
 {
-    if( be_info != SIXTRL_NULLPTR )
+    if( ( fp != SIXTRL_NULLPTR ) && ( be_info != SIXTRL_NULLPTR ) )
     {
         NS(object_type_id_t) const type_id = NS(Object_get_type_id)( be_info );
         NS(buffer_addr_t) const addr = NS(Object_get_begin_addr)( be_info );
@@ -392,8 +347,7 @@ SIXTRL_INLINE void NS(BeamElement_print)(
                 SIXTRL_ASSERT( sizeof( beam_element_t ) <=
                                NS(Object_get_size)( be_info ) );
 
-                NS(Drift_print)( beam_element );
-
+                NS(Drift_fprint)( fp, beam_element );
                 break;
             }
 
@@ -407,8 +361,7 @@ SIXTRL_INLINE void NS(BeamElement_print)(
                 SIXTRL_ASSERT( sizeof( beam_element_t ) <=
                                NS(Object_get_size)( be_info ) );
 
-                NS(DriftExact_print)( beam_element );
-
+                NS(DriftExact_fprint)( fp, beam_element );
                 break;
             }
 
@@ -422,8 +375,7 @@ SIXTRL_INLINE void NS(BeamElement_print)(
                 SIXTRL_ASSERT( sizeof( beam_element_t ) <=
                                NS(Object_get_size)( be_info ) );
 
-                NS(MultiPole_print)( beam_element );
-
+                NS(MultiPole_fprint)( fp, beam_element );
                 break;
             }
 
@@ -437,8 +389,7 @@ SIXTRL_INLINE void NS(BeamElement_print)(
                 SIXTRL_ASSERT( sizeof( beam_element_t ) <=
                                NS(Object_get_size)( be_info ) );
 
-                NS(Cavity_print)( beam_element );
-
+                NS(Cavity_fprint)( fp, beam_element );
                 break;
             }
 
@@ -452,8 +403,7 @@ SIXTRL_INLINE void NS(BeamElement_print)(
                 SIXTRL_ASSERT( sizeof( beam_element_t ) <=
                                NS(Object_get_size)( be_info ) );
 
-                NS(XYShift_print)( beam_element );
-
+                NS(XYShift_fprint)( fp, beam_element );
                 break;
             }
 
@@ -467,7 +417,7 @@ SIXTRL_INLINE void NS(BeamElement_print)(
                 SIXTRL_ASSERT( sizeof( beam_element_t ) <=
                                NS(Object_get_size)( be_info ) );
 
-                NS(SRotation_print)( beam_element );
+                NS(SRotation_fprint)( fp, beam_element );
 
                 break;
             }
@@ -477,7 +427,7 @@ SIXTRL_INLINE void NS(BeamElement_print)(
                 typedef SIXTRL_DATAPTR_DEC NS(BeamBeam4D) const* ptr_to_belem_t;
                 ptr_to_belem_t beam_element = ( ptr_to_belem_t )( uintptr_t )addr;
 
-                NS(BeamBeam4D_print)( beam_element );
+                NS(BeamBeam4D_fprint)( fp, beam_element );
                 break;
             }
 
@@ -486,7 +436,7 @@ SIXTRL_INLINE void NS(BeamElement_print)(
                 typedef SIXTRL_DATAPTR_DEC NS(BeamBeam6D) const* ptr_to_belem_t;
                 ptr_to_belem_t beam_element = ( ptr_to_belem_t )( uintptr_t )addr;
 
-                NS(BeamBeam6D_print)( beam_element );
+                NS(BeamBeam6D_fprint)( fp, beam_element );
                 break;
             }
 
@@ -495,17 +445,52 @@ SIXTRL_INLINE void NS(BeamElement_print)(
                 typedef SIXTRL_DATAPTR_DEC NS(BeamMonitor) const* ptr_to_belem_t;
                 ptr_to_belem_t beam_element = ( ptr_to_belem_t )( uintptr_t )addr;
 
-                NS(BeamMonitor_print)( beam_element );
+                NS(BeamMonitor_fprint)( fp, beam_element );
+                break;
+            }
+            
+            case NS(OBJECT_TYPE_LIMIT_RECT):
+            {
+                typedef SIXTRL_DATAPTR_DEC NS(LimitRect) const* ptr_to_belem_t;
+                        
+                ptr_to_belem_t beam_element = 
+                    ( ptr_to_belem_t )( uintptr_t )addr;
+
+                NS(LimitRect_print)( fp, beam_element );
+                break;
+            }
+            
+            case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
+            {
+                typedef SIXTRL_DATAPTR_DEC NS(LimitEllipse) const* 
+                        ptr_to_belem_t;
+                        
+                ptr_to_belem_t beam_element = 
+                    ( ptr_to_belem_t )( uintptr_t )addr;
+
+                NS(LimitEllipse_print)( fp, beam_element );
+                break;
+            }
+            
+            case NS(OBJECT_TYPE_DIPEDGE):
+            {
+                /* typedef SIXTRL_DATAPTR_DEC NS(DipoleEdge) const* 
+                        ptr_to_belem_t;
+                        
+                ptr_to_belem_t beam_element = 
+                    ( ptr_to_belem_t )( uintptr_t )addr;
+
+                NS(LimitEllipse_print)( fp, beam_element ); */
                 break;
             }
 
             default:
             {
-                printf( "|unknown          | type_id  = %3d;\r\n"
-                        "                  | size     = %8lu bytes;\r\n"
-                        "                  | addr     = %16p;\r\n",
+                printf( "|unknown          | type_id  = %3d\r\n"
+                        "                  | size     = %8lu bytes\r\n"
+                        "                  | addr     = %16p\r\n",
                         ( int )type_id, NS(Object_get_size)( be_info ),
-                        ( void const* )( uintptr_t )addr );
+                        ( void* )( uintptr_t )addr );
             }
         };
     }
@@ -513,10 +498,4 @@ SIXTRL_INLINE void NS(BeamElement_print)(
     return;
 }
 
-#if !defined( _GPUCODE ) && defined( __cplusplus )
-}
-#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
-
-#endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_HEADER_H__ */
-
-/* end: tests/sixtracklib/testlib/common/beam_elements.h */
+/* end: tests/sixtracklib/testlib/common/beam_elements/beam_elements.c */

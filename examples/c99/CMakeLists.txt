@@ -58,13 +58,6 @@ list( APPEND EXAMPLE_TARGETS track_beambeam_c99 )
 add_executable( track_job_cpu_c99 track_job_cpu.c )
 list( APPEND EXAMPLE_TARGETS track_job_cpu_c99 )
 
-# -----------------------------------------------------------------------------
-# track_job_opencl_c99:
-
-add_executable( track_job_cl_c99 track_job_cl.c )
-list( APPEND EXAMPLE_TARGETS track_job_cl_c99 )
-
-
 if( SIXTRACKL_ENABLE_CUDA )
     # -------------------------------------------------------------------------
     # track_lhc_no_bb_cuda_c99:
@@ -74,7 +67,14 @@ if( SIXTRACKL_ENABLE_CUDA )
 endif()
 
 if( SIXTRACKL_ENABLE_OPENCL )
-    # -----------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # track_job_opencl_c99:
+
+    add_executable( track_job_cl_c99 track_job_cl.c )
+    list( APPEND EXAMPLE_TARGETS track_job_cl_c99 )
+
+
+    # --------------------------------------------------------------------------
     # run_opencl_kernel:
 
     add_executable( run_opencl_kernel_c99 run_opencl_kernel.c )

@@ -17,7 +17,7 @@
 #include "sixtracklib/testlib/common/track/track_particles_ctrl_arg.h"
 
 #include "sixtracklib/testlib/common/buffer.h"
-#include "sixtracklib/testlib/common/beam_elements.h"
+#include "sixtracklib/testlib/common/beam_elements/beam_elements.h"
 #include "sixtracklib/testlib/common/path.h"
 #include "sixtracklib/testlib/testdata/track_testdata.h"
 #include "sixtracklib/testlib/testdata/testdata_files.h"

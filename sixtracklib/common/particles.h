@@ -1383,6 +1383,12 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_state_value)(
     NS(particle_num_elements_t) const ii,
     NS(particle_index_t) const state_value );
 
+SIXTRL_FN SIXTRL_STATIC 
+void NS(Particles_update_state_value_if_not_already_lost)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii,
+    NS(particle_index_t) const new_state );
+
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_state)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_index_ptr_t) ptr_to_states );
@@ -6336,6 +6342,19 @@ SIXTRL_INLINE void NS(Particles_set_state_value)(
 
     particles->state[ ii ] = state_value;
     return;
+}
+
+SIXTRL_INLINE void NS(Particles_update_state_value_if_not_already_lost)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii,
+    NS(particle_index_t) const new_state )
+{
+    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ii < particles->num_particles );
+    SIXTRL_ASSERT( ( particles->state[ ii ] == ( NS(particle_index_t) )1u ) ||
+                   ( particles->state[ ii ] == ( NS(particle_index_t) )0u ) );
+    
+    particles->state[ ii ] &= new_state;
 }
 
 SIXTRL_INLINE void NS(Particles_assign_ptr_to_state)(

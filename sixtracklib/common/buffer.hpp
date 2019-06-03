@@ -288,6 +288,12 @@ namespace SIXTRL_CXX_NAMESPACE
             return T::AddToBuffer(
                 *this->getCApiPtr(), std::forward< Args >( args )... );
         }
+        
+        template< class T >
+        SIXTRL_FN T* addCopy( T const& SIXTRL_RESTRICT_REF other )
+        {
+            return T::AddCopyToBuffer( *this->getCApiPtr(), other );
+        }
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 

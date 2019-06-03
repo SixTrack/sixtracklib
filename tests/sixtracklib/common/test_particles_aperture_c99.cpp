@@ -21,20 +21,20 @@
 #include "sixtracklib/common/generated/config.h"
 #include "sixtracklib/testlib.h"
 
-#if defined( SIXTRL_ENABLE_APERATURE_CHECK ) && \
-    SIXTRL_ENABLE_APERATURE_CHECK == 1
+#if defined( SIXTRL_ENABLE_APERTURE_CHECK ) && \
+    SIXTRL_ENABLE_APERTURE_CHECK == 1
 
-TEST( C99_CommonParticlesAperatureTests,
-      TrackParticlesOverDriftEnabledAperatureCheck )
+TEST( C99_CommonParticlesApertureTests,
+      TrackParticlesOverDriftEnabledApertureCheck )
 {
 
 #else
 
-TEST( C99_CommonParticlesAperatureTests,
-      TrackParticlesOverDriftDisabledAperatureCheck )
+TEST( C99_CommonParticlesApertureTests,
+      TrackParticlesOverDriftDisabledApertureCheck )
 {
 
-#endif /* SIXTRL_ENABLE_APERATURE_CHECK */
+#endif /* SIXTRL_ENABLE_APERTURE_CHECK */
     ::st_buffer_size_t const NUM_PARTICLES = ( ::st_buffer_size_t )100u;
     ::st_buffer_size_t const NUM_DRIFTS    = ( ::st_buffer_size_t )10000u;
 
@@ -71,14 +71,14 @@ TEST( C99_CommonParticlesAperatureTests,
 
         for( ::st_buffer_size_t jj = ::st_buffer_size_t{ 0 } ; jj < NUM_PARTICLES ; ++jj )
         {
-            #if defined( SIXTRL_ENABLE_APERATURE_CHECK ) && \
-                SIXTRL_ENABLE_APERATURE_CHECK == 1
+            #if defined( SIXTRL_ENABLE_APERTURE_CHECK ) && \
+                         SIXTRL_ENABLE_APERTURE_CHECK == 1
 
             double const x = ::st_Particles_get_x_value( particles, jj );
             double const y = ::st_Particles_get_y_value( particles, jj );
 
-            if( ( fabs( x ) > SIXTRL_APERATURE_X_LIMIT ) ||
-                ( fabs( y ) > SIXTRL_APERATURE_Y_LIMIT ) )
+            if( ( fabs( x ) > SIXTRL_APERTURE_X_LIMIT ) ||
+                ( fabs( y ) > SIXTRL_APERTURE_Y_LIMIT ) )
             {
                 ASSERT_TRUE( ::st_Particles_is_lost_value( particles, jj ) );
             }
@@ -91,7 +91,7 @@ TEST( C99_CommonParticlesAperatureTests,
 
             ASSERT_TRUE( ::st_Particles_is_not_lost_value( particles, jj ) );
 
-            #endif /* SIXTRL_ENABLE_APERATURE_CHECK */
+            #endif /* SIXTRL_ENABLE_APERTURE_CHECK */
         }
     }
 
@@ -102,20 +102,20 @@ TEST( C99_CommonParticlesAperatureTests,
     eb = nullptr;
 }
 
-#if defined( SIXTRL_ENABLE_APERATURE_CHECK ) && \
-    SIXTRL_ENABLE_APERATURE_CHECK == 1
+#if defined( SIXTRL_ENABLE_APERTURE_CHECK ) && \
+             SIXTRL_ENABLE_APERTURE_CHECK == 1
 
-TEST( C99_CommonParticlesAperatureTests,
-      TrackParticlesOverDriftExactEnabledAperatureCheck )
+TEST( C99_CommonParticlesApertureTests,
+      TrackParticlesOverDriftExactEnabledApertureCheck )
 {
 
 #else
 
-TEST( C99_CommonParticlesAperatureTests,
-      TrackParticlesOverDriftExactDisabledAperatureCheck )
+TEST( C99_CommonParticlesApertureTests,
+      TrackParticlesOverDriftExactDisabledApertureCheck )
 {
 
-#endif /* SIXTRL_ENABLE_APERATURE_CHECK */
+#endif /* SIXTRL_ENABLE_APERTURE_CHECK */
     ::st_buffer_size_t const NUM_PARTICLES = ( ::st_buffer_size_t )100u;
     ::st_buffer_size_t const NUM_DRIFTS    = ( ::st_buffer_size_t )10000u;
 
@@ -152,14 +152,14 @@ TEST( C99_CommonParticlesAperatureTests,
 
         for( ::st_buffer_size_t jj = ::st_buffer_size_t{ 0 } ; jj < NUM_PARTICLES ; ++jj )
         {
-            #if defined( SIXTRL_ENABLE_APERATURE_CHECK ) && \
-                SIXTRL_ENABLE_APERATURE_CHECK == 1
+            #if defined( SIXTRL_ENABLE_APERTURE_CHECK ) && \
+                SIXTRL_ENABLE_APERTURE_CHECK == 1
 
             double const x = ::st_Particles_get_x_value( particles, jj );
             double const y = ::st_Particles_get_y_value( particles, jj );
 
-            if( ( fabs( x ) > SIXTRL_APERATURE_X_LIMIT ) ||
-                ( fabs( y ) > SIXTRL_APERATURE_Y_LIMIT ) )
+            if( ( fabs( x ) > SIXTRL_APERTURE_X_LIMIT ) ||
+                ( fabs( y ) > SIXTRL_APERTURE_Y_LIMIT ) )
             {
                 ASSERT_TRUE( ::st_Particles_is_lost_value( particles, jj ) );
             }
@@ -172,7 +172,7 @@ TEST( C99_CommonParticlesAperatureTests,
 
             ASSERT_TRUE( ::st_Particles_is_not_lost_value( particles, jj ) );
 
-            #endif /* SIXTRL_ENABLE_APERATURE_CHECK */
+            #endif /* SIXTRL_ENABLE_APERTURE_CHECK */
         }
     }
 
@@ -183,4 +183,4 @@ TEST( C99_CommonParticlesAperatureTests,
     eb = nullptr;
 }
 
-/* end: tests/sixtracklib/common/test_particles_aperature_c99.cpp */
+/* end: tests/sixtracklib/common/test_particles_aperture_c99.cpp */
