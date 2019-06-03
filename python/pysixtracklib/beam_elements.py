@@ -288,9 +288,15 @@ class Elements(object):
         return self.cbuffer.get_object(objid)
 
     @classmethod
-    def from_mad(cls, seq):
+    def from_mad(cls, seq, drift_exact=True):
+        if drift_exact:
+            drift = Elements.element_types['Drift']
+            Elements.element_types['Drift'] = DriftExact
         line = madseq_to_line(seq)
-        return cls.fromline(line)
+        instance = cls.fromline(line)
+        if drift_exact:
+            Elements.element_types['Drift'] = drift
+        return instance
 
     # @classmethod
     # def from_mad2(cls, seq):
