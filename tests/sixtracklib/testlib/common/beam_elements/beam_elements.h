@@ -7,8 +7,8 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -171,8 +171,8 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamElement_fprint)(
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/beam_elements.h"
     
-    #include "sixtracklib/testlib/common/be_limit_rect.h"
-    #include "sixtracklib/testlib/common/be_limit_ellipse.h"
+    #include "sixtracklib/testlib/common/beam_elements/be_limit_rect.h"
+    #include "sixtracklib/testlib/common/beam_elements/be_limit_ellipse.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -718,12 +718,24 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects)(
                         break;
                     }
 
-                    case NS(OBJECT_TYPE_LIMIT):
+                    case NS(OBJECT_TYPE_LIMIT_RECT):
                     {
-                        typedef NS(Limit) belem_t;
+                        typedef NS(LimitRect) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const*  ptr_belem_t;
 
-                        compare_value = NS(Limit_compare_values)(
+                        compare_value = NS(LimitRect_compare_values)(
+                            ( ptr_belem_t )( uintptr_t )lhs_addr,
+                            ( ptr_belem_t )( uintptr_t )rhs_addr );
+
+                        break;
+                    }
+                    
+                    case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
+                    {
+                        typedef NS(LimitEllipse) belem_t;
+                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const*  ptr_belem_t;
+
+                        compare_value = NS(LimitEllipse_compare_values)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
                             ( ptr_belem_t )( uintptr_t )rhs_addr );
 
@@ -911,15 +923,28 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
                         break;
                     }
 
-                    case NS(OBJECT_TYPE_LIMIT):
+                    case NS(OBJECT_TYPE_LIMIT_RECT):
                     {
-                        typedef NS(Limit) belem_t;
+                        typedef NS(LimitRect) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
 
-                        compare_value = NS(Limit_compare_values_with_treshold)(
+                        compare_value = 
+                        NS(LimitRect_compare_values_with_treshold)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold  );
+                            ( ptr_belem_t )( uintptr_t )rhs_addr, treshold  );
+
+                        break;
+                    }
+                    
+                    case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
+                    {
+                        typedef NS(LimitEllipse) belem_t;
+                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
+
+                        compare_value = 
+                        NS(LimitEllipse_compare_values_with_treshold)(
+                            ( ptr_belem_t )( uintptr_t )lhs_addr,
+                            ( ptr_belem_t )( uintptr_t )rhs_addr, treshold  );
 
                         break;
                     }
@@ -1023,4 +1048,4 @@ SIXTRL_INLINE int NS(BeamElements_compare_lines_with_treshold)(
 
 #endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_HEADER_H__ */
 
-/* end: tests/sixtracklib/testlib/common/beam_elements.h */
+/* end: tests/sixtracklib/testlib/common/beam_elements/beam_elements.h */

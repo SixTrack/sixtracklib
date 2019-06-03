@@ -58,6 +58,8 @@ SIXTRL_INLINE int NS(TestLibCompare_real_attribute_with_treshold)(
     }
     else if( treshold >= ZERO )
     {
+        cmp_result = 0;
+        
         if( ( delta >= ZERO ) && ( delta > treshold ) )
         {
             cmp_result = -1;

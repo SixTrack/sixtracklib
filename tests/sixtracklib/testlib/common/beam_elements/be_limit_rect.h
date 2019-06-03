@@ -32,15 +32,13 @@ SIXTRL_STATIC SIXTRL_FN int NS(LimitRect_compare_values_with_treshold)(
     SIXTRL_REAL_T const treshold );
 
 SIXTRL_STATIC SIXTRL_FN void NS(LimitRect_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamMonitor) *const 
-        SIXTRL_RESTRICT limit_rect );
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const SIXTRL_RESTRICT limit );
 
 #if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(LimitRect_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(LimitRect) *const 
-        SIXTRL_RESTRICT limit_rect );
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const SIXTRL_RESTRICT limit );
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -118,28 +116,26 @@ SIXTRL_INLINE int NS(LimitRect_compare_values_with_treshold)(
 #if !defined( _GPUCODE )
     
 SIXTRL_INLINE void NS(LimitRect_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamMonitor) *const 
-        SIXTRL_RESTRICT limit_rect )
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const SIXTRL_RESTRICT limit )
 {
-    NS(LimitRect_print)( stdout, limit_rect );
+    NS(LimitRect_print)( stdout, limit );
 }
 
 #else /* !defined( _GPUCODE ) */
 
-SIXTRL_INLINE void NS(LimitRect_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamMonitor) *const 
-        SIXTRL_RESTRICT limit_rect )
+SIXTRL_INLINE void NS(LimitRect_print_out)( 
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const SIXTRL_RESTRICT limit )
 {
-    if( limit_rect != SIXTRL_NULLPTR )
+    if( limit != SIXTRL_NULLPTR )
     {
         printf( "|limit_rect       | min_x    = %+16.12f m;\r\n"
                 "                  | max_x    = %+16.12f m;\r\n"
                 "                  | min_y    = %+16.12f m;\r\n"
                 "                  | max_y    = %+16.12f m;\r\n",
-                NS(LimitRect_get_min_x)( limit_rect ),
-                NS(LimitRect_get_max_x)( limit_rect ),
-                NS(LimitRect_get_min_y)( limit_rect ),
-                NS(LimitRect_get_max_y)( limit_rect ) );
+                NS(LimitRect_get_min_x)( limit ),
+                NS(LimitRect_get_max_x)( limit ),
+                NS(LimitRect_get_min_y)( limit ),
+                NS(LimitRect_get_max_y)( limit ) );
     }
     
     return;

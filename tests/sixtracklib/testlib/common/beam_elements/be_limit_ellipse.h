@@ -32,14 +32,14 @@ SIXTRL_STATIC SIXTRL_FN int NS(LimitEllipse_compare_values_with_treshold)(
     SIXTRL_REAL_T const treshold );
 
 SIXTRL_STATIC SIXTRL_FN void NS(LimitEllipse_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamMonitor) *const 
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const 
         SIXTRL_RESTRICT limit_ellipse );
 
 #if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(LimitEllipse_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(LimitEllipse) *const 
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const 
         SIXTRL_RESTRICT limit_ellipse );
 
 #endif /* !defined( _GPUCODE ) */
@@ -82,14 +82,14 @@ SIXTRL_INLINE int NS(LimitEllipse_compare_values_with_treshold)(
         if( lhs != rhs )
         {
             cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                NS(LimitEllipse_get_origin_x)( lhs ), 
-                NS(LimitEllipse_get_origin_x)( rhs ), treshold );
+                NS(LimitEllipse_get_x_origin)( lhs ), 
+                NS(LimitEllipse_get_x_origin)( rhs ), treshold );
             
             if( cmp_result == 0 )
             {
                 cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                    NS(LimitEllipse_get_origin_y)( lhs ), 
-                    NS(LimitEllipse_get_origin_y)( rhs ), treshold );
+                    NS(LimitEllipse_get_y_origin)( lhs ), 
+                    NS(LimitEllipse_get_y_origin)( rhs ), treshold );
             }
             
             if( cmp_result == 0 )
@@ -109,8 +109,8 @@ SIXTRL_INLINE int NS(LimitEllipse_compare_values_with_treshold)(
             if( cmp_result == 0 )
             {
                 cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                    NS(LimitEllipse_get_half_axis_product_squ)( lhs ), 
-                    NS(LimitEllipse_get_half_axis_product_squ)( rhs ), 
+                    NS(LimitEllipse_get_half_axes_product_squ)( lhs ), 
+                    NS(LimitEllipse_get_half_axes_product_squ)( rhs ), 
                     treshold );
             }
         }
@@ -126,28 +126,26 @@ SIXTRL_INLINE int NS(LimitEllipse_compare_values_with_treshold)(
 #if !defined( _GPUCODE )
     
 SIXTRL_INLINE void NS(LimitEllipse_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamMonitor) *const 
-        SIXTRL_RESTRICT limit_ellipse )
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit )
 {
-    NS(LimitEllipse_print)( stdout, limit_ellipse );
+    NS(LimitEllipse_print)( stdout, limit );
 }
 
 #else /* !defined( _GPUCODE ) */
 
 SIXTRL_INLINE void NS(LimitEllipse_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamMonitor) *const 
-        SIXTRL_RESTRICT limit_ellipse )
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit )
 {
-    if( limit_ellipse != SIXTRL_NULLPTR )
+    if( limit != SIXTRL_NULLPTR )
     {
         printf( "|limit_ellipse    | origin x    = %+16.12f m;\r\n"
                 "                  | origin y    = %+16.12f m;\r\n"
                 "                  | half-axis x = %+16.12f m;\r\n"
                 "                  | half-axis y = %+16.12f m;\r\n",
-                NS(LimitEllipse_get_origin_x)( limit_ellipse ),
-                NS(LimitEllipse_get_origin_y)( limit_ellipse ),
-                NS(LimitEllipse_get_x_half_axis)( limit_ellipse ),
-                NS(LimitEllipse_get_y_half_axis)( limit_ellipse ) );
+                NS(LimitEllipse_get_origin_x)( limit ),
+                NS(LimitEllipse_get_origin_y)( limit ),
+                NS(LimitEllipse_get_x_half_axis)( limit ),
+                NS(LimitEllipse_get_y_half_axis)( limit ) );
     }
     
     return;

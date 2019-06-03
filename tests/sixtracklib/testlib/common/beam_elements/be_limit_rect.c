@@ -21,10 +21,8 @@
     #include <stdio.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
-void NS(LimitRect_print)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamMonitor) *const 
-        SIXTRL_RESTRICT limit_rect )
+void NS(LimitRect_print)( SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const SIXTRL_RESTRICT limit_rect )
 {
     if( ( fp != SIXTRL_NULLPTR ) && ( limit_rect != SIXTRL_NULLPTR ) )
     {

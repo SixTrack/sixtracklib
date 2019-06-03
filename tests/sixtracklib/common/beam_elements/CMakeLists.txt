@@ -44,23 +44,51 @@ if( GTEST_FOUND )
     # ==========================================================================
     # test_be_cavity_common_c99:
 
-    add_executable( test_be_cavity_common_c99     test_be_cavity_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_cavity_common_c99 )
-    add_test( C99_CommonBeamElementCavityTests    test_be_cavity_common_c99 )
+    add_executable( test_be_cavity_common_c99   test_be_cavity_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_cavity_common_c99 )
+    add_test( C99_CommonBeamElementCavityTests  test_be_cavity_common_c99 )
     
     # ==========================================================================
-    # test_be_limit_common_c99:
+    # test_be_limit_rect_common_c99:
     
-    add_executable( test_be_limit_common_c99      test_be_limit_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_limit_common_c99 )
-    add_test( C99_CommonBeamElementLimitTests     test_be_limit_common_c99 )
+    add_executable( test_be_limit_rect_common_c99  test_be_limit_rect_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_limit_rect_common_c99 )
+    
+    add_test( C99_CommonBeamElementLimitRectTests 
+              test_be_limit_rect_common_c99 )
     
     # --------------------------------------------------------------------------
-    # test_be_limit_common_cxx:
+    # test_be_limit_rect_common_cxx:
     
-    add_executable( test_be_limit_common_cxx      test_be_limit_cxx.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_limit_common_cxx )
-    add_test( CXX_CommonBeamElementLimitTests     test_be_limit_common_cxx )
+    add_executable( test_be_limit_rect_common_cxx  test_be_limit_rect_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_limit_rect_common_cxx )
+    
+    add_test( CXX_CommonBeamElementLimitRectTests   
+              test_be_limit_rect_common_cxx )
+              
+    # ==========================================================================
+    # test_be_limit_ellipse_common_c99:
+    
+    add_executable( test_be_limit_ellipse_common_c99  
+                    test_be_limit_ellipse_c99.cpp )
+                    
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} 
+         test_be_limit_ellipse_common_c99 )
+    
+    add_test( C99_CommonBeamElementLimitEllipseTests 
+              test_be_limit_ellipse_common_c99 )
+    
+    # --------------------------------------------------------------------------
+    # test_be_limit_ellipse_common_cxx:
+    
+    add_executable( test_be_limit_ellipse_common_cxx  
+                    test_be_limit_ellipse_cxx.cpp )
+                    
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} 
+         test_be_limit_ellipse_common_cxx )
+    
+    add_test( CXX_CommonBeamElementLimitEllipseTests   
+              test_be_limit_ellipse_common_cxx )
     
     # ==========================================================================
     # test_be_dipedge_common_c99:

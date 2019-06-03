@@ -75,4 +75,10 @@ TEST( C99_CommonBeamElementLimitTests, BasicUsage )
     ::NS(Buffer_delete)( eb );
 }
 
+
+TEST( C99_CommonBeamElementLimitTests, ApertureCheck )
+{
+    
+}
+
 /* end: tests/sixtracklib/common/beam_elements/test_be_limit_c99.cpp */
