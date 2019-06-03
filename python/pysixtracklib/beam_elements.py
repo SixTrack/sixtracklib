@@ -242,7 +242,7 @@ class LimitEllipse(CObject):
     b_squ = CField( 1, 'float64', default=+1.0, alignment=8 )
     a_b_squ = CField( 2, 'float64', alignment=8 )
     
-    def __init__( self, a_squ=None, b_squ=None, a_b_squ=None, **kwargs ):
+    def __init__( self, a_squ=None, b_squ=None, **kwargs ):
         if a is not None:
             a_squ = a * a 
         if b is not None:
@@ -283,8 +283,6 @@ class DipoleEdge(CObject):
         CObject.__init__( self, *kwargs )
     
     
-
-
 class Elements(object):
     element_types = {'Cavity': Cavity,
                      'Drift': Drift,
@@ -356,3 +354,4 @@ class Elements(object):
     #    self=cls()
     #    list(madseq_to_line(seq,self._builder))
     #    return self
+
