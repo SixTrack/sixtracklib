@@ -439,10 +439,10 @@ bool NS(TestParticlesAddr_evaluate_ctrl_args_test)(
 
         SIXTRL_ASSERT( ::NS(Buffer_needs_remapping)( particles_buffer ) );
 
-        address_t const remote_addr = ::NS(ManagdBuffer_get_stored_begin_addr)(
+        address_t const remote_addr = ::NS(ManagedBuffer_get_stored_begin_addr)(
             ::NS(Buffer_get_data_begin)( particles_buffer ), slot_size );
 
-        address_t const host_addr = ::NS(ManagdBuffer_get_buffer_begin_addr)(
+        address_t const host_addr = ::NS(ManagedBuffer_get_buffer_begin_addr)(
             ::NS(Buffer_get_data_begin)( particles_buffer ), slot_size );
 
         SIXTRL_ASSERT( ( remote_addr != ( address_t )0u ) &&

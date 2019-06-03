@@ -37,6 +37,9 @@ TEST( C99_CommonBufferArrayObjectTests, BasicUsage )
     ASSERT_TRUE( ::NS(BufferArrayObj_get_max_num_elements)( arr1 ) ==
                  arr1_max_num_elements );
 
+    ASSERT_TRUE( ::NS(BufferArrayObj_get_slot_size)( arr1 ) ==
+                 ::NS(BUFFER_DEFAULT_SLOT_SIZE) );
+
     ASSERT_TRUE( ::NS(BufferArrayObj_get_num_elements)( arr1 ) ==
                  buf_size_t{ 0 } );
 
