@@ -20,26 +20,26 @@ extern "C" {
 #if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(TestBeamMonitorCtrlArg_prepare_assign_beam_monitor_output_buffer)(
+NS(TestBeamMonitorCtrlArg_prepare_assign_output_buffer)(
+    NS(Buffer)* SIXTRL_RESTRICT particles_buffer, 
+    NS(buffer_size_t) const num_particle_sets, 
+    NS(buffer_size_t) const* particle_set_indices_begin,
     NS(ArgumentBase)* SIXTRL_RESTRICT beam_elements_arg,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     NS(particle_index_t) const min_turn_id,
-    NS(buffer_size_t) const output_buffer_index_offset,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_output_buffer_index_offset,
     NS(ArgumentBase)* SIXTRL_RESTRICT result_arg );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(TestBeamMonitorCtrlArg_evaluate_assign_beam_monitor_output_buffer)(
+NS(TestBeamMonitorCtrlArg_evaluate_assign_output_buffer)(
     NS(ArgumentBase)* SIXTRL_RESTRICT beam_elements_arg,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    const NS(Buffer) *const SIXTRL_RESTRICT cmp_output_buffer,
     NS(buffer_size_t) const output_buffer_index_offset,
     NS(buffer_size_t) const num_beam_monitors,
-    bool const compare_buffer_content,
-    NS(particle_real_t) const abs_tolerance,
     NS(ArgumentBase)* SIXTRL_RESTRICT result_arg );
 
 #endif /* !defined( _GPUCODE ) */

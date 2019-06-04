@@ -14,29 +14,47 @@
 
 #include "sixtracklib/testlib/common/particles/particles.h"
 
-NS(arch_status_t)
-NS(TestBeamMonitorCtrlArg_prepare_assign_beam_monitor_output_buffer)(
+NS(arch_status_t) NS(TestBeamMonitorCtrlArg_prepare_assign_output_buffer)(
+    NS(Buffer)* SIXTRL_RESTRICT particles_buffer, 
+    NS(buffer_size_t) const num_particle_sets, 
+    NS(buffer_size_t) const* particle_set_indices_begin,
     NS(ArgumentBase)* SIXTRL_RESTRICT beam_elements_arg,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     NS(particle_index_t) const min_turn_id,
-    NS(buffer_size_t) const output_buffer_index_offset,
+    NS(buffer_size_t)* ptr_output_buffer_index_offset,
     NS(ArgumentBase)* SIXTRL_RESTRICT result_arg )
 {
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( beam_elements_arg != SIXTRL_NULLPTR ) &&
+    if( ( particles_buffer != SIXTRL_NULLPTR ) &&
+        ( num_particle_sets > ( NS(buffer_size_t) )0u ) &&
+        ( particle_set_indices_begin != SIXTRL_NULLPTR ) &&
+        ( beam_elements_arg != SIXTRL_NULLPTR ) &&
         ( beam_elements_buffer != SIXTRL_NULLPTR ) &&
         ( output_arg != SIXTRL_NULLPTR ) &&
         ( output_buffer != SIXTRL_NULLPTR ) &&
-        ( NS(Buffer_is_particles_buffer)( output_buffer ) ) &&
-        ( NS(Buffer_get_num_of_objects)( output_buffer ) >
-            output_buffer_index_offset ) )
+        ( NS(Buffer_is_particles_buffer)( output_buffer ) ) )
     {
-        status = NS(BeamMonitor_assign_output_buffer_from_offset)(
-            beam_elements_buffer, output_buffer, min_turn_id,
-                out_buffer_index_offset );
+        NS(buffer_size_t) output_buffer_index_offset = ( NS(buffer_size_t) )0u;
+        
+        status = NS(BeamMonitor_prepare_output_buffer_for_particle_sets)(
+            beam_elements_buffer, output_buffer, particles_buffer, 
+                num_particle_sets, particle_set_indices_begin, 
+                    &output_buffer_index_offset );
+        
+        if( ptr_output_buffer_index_offset != SIXTRL_NULLPTR )
+        {
+            *ptr_output_buffer_index_offset = output_buffer_index_offset;
+        }
+        
+        if( status == NS(ARCH_STATUS_SUCCESS) )
+        {
+            status = NS(BeamMonitor_assign_output_buffer_from_offset)(
+                beam_elements_buffer, output_buffer, min_turn_id,
+                    output_buffer_index_offset );
+        }
 
         if( status == NS(ARCH_STATUS_SUCCESS) )
         {
@@ -63,17 +81,13 @@ NS(TestBeamMonitorCtrlArg_prepare_assign_beam_monitor_output_buffer)(
     return status;
 }
 
-NS(arch_status_t)
-NS(TestBeamMonitorCtrlArg_evaluate_assign_beam_monitor_output_buffer)(
+NS(arch_status_t) NS(TestBeamMonitorCtrlArg_evaluate_assign_output_buffer)(
     NS(ArgumentBase)* SIXTRL_RESTRICT beam_elements_arg,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    const NS(Buffer) *const SIXTRL_RESTRICT cmp_output_buffer,
-    NS(buffer_size_t) const out_buffer_index_offset,
-    NS(buffer_size_t) const num_beam_monitors,
-    bool const compare_buffer_content,
-    NS(particle_real_t) const abs_tolerance,
+    NS(buffer_size_t) const output_buffer_index_offset,
+    NS(buffer_size_t) const num_beam_monitors,    
     NS(ArgumentBase)* SIXTRL_RESTRICT result_arg )
 {
     typedef NS(buffer_addr_t) address_t;
@@ -82,17 +96,14 @@ NS(TestBeamMonitorCtrlArg_evaluate_assign_beam_monitor_output_buffer)(
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* obj_iter_t;
 
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
-    NS(buffer_size_t) const nn = out_buffer_index_offset + num_beam_monitors;
+    NS(buffer_size_t) const nn = output_buffer_index_offset + num_beam_monitors;
 
     if( ( beam_elements_arg != SIXTRL_NULLPTR ) &&
-        ( beamelements_buffer != SIXTRL_NULLPTR ) &&
+        ( beam_elements_buffer != SIXTRL_NULLPTR ) &&
         ( output_arg != SIXTRL_NULLPTR ) &&
         ( output_buffer != SIXTRL_NULLPTR ) &&
-        ( cmp_output_buffer != SIXTRL_NULLPTR ) &&
-        ( !NS(Buffer_needs_remapping)( cmp_output_buffer ) ) &&
-        ( NS(Buffer_get_num_of_objects)( cmp_output_buffer ) >= nn ) &&
-        ( NS(Buffer_is_particles_buffer)( cmp_output_buffer ) >
-            ( NS(buffer_size_t) )0u ) )
+        ( NS(Buffer_get_num_of_objects)( output_buffer ) >= nn ) &&
+        ( NS(Buffer_is_particles_buffer)( output_buffer ) ) )
     {
         NS(buffer_size_t) const slot_size =
             NS(Buffer_get_slot_size)( output_buffer );
@@ -103,7 +114,7 @@ NS(TestBeamMonitorCtrlArg_evaluate_assign_beam_monitor_output_buffer)(
         SIXTRL_ASSERT( slot_size > ( NS(buffer_size_t) )0u );
 
         status = NS(Argument_receive_buffer)(
-            bem_elements_arg, beam_elements_buffer );
+            beam_elements_arg, beam_elements_buffer );
 
         if( ( result_arg != SIXTRL_NULLPTR ) &&
             ( status == NS(ARCH_STATUS_SUCCESS) ) )
@@ -139,7 +150,7 @@ NS(TestBeamMonitorCtrlArg_evaluate_assign_beam_monitor_output_buffer)(
             NS(Buffer_clear)( output_buffer, true );
             NS(Buffer_reset)( output_buffer );
 
-            status = NS(Argument_receive_buffer_without_remapping)(
+            status = NS(Argument_receive_buffer_without_remap)( 
                 output_arg, output_buffer );
 
             if( status == NS(ARCH_STATUS_SUCCESS) )
@@ -153,8 +164,7 @@ NS(TestBeamMonitorCtrlArg_evaluate_assign_beam_monitor_output_buffer)(
                 NS(Buffer_remap)( output_buffer );
 
                 if( ( NS(Buffer_needs_remapping)( output_buffer ) ) ||
-                    ( NS(Buffer_get_num_of_objects)( output_buffer ) <
-                      ( output_buffer_index_offset + num_beam_monitors ) ) )
+                    ( NS(Buffer_get_num_of_objects)( output_buffer ) < nn ) )
                 {
                     status = NS(ARCH_STATUS_GENERAL_FAILURE);
                 }
@@ -168,7 +178,7 @@ NS(TestBeamMonitorCtrlArg_evaluate_assign_beam_monitor_output_buffer)(
             if( ( remote_base_addr != ( address_t )0u ) &&
                 ( host_base_addr   != ( address_t )0u ) )
             {
-                NS(buffer_size_t) ii = out_buffer_index_offset;
+                NS(buffer_size_t) ii = output_buffer_index_offset;
 
                 obj_iter_t be_it  = NS(Buffer_get_const_objects_begin)(
                     beam_elements_buffer );
@@ -186,7 +196,6 @@ NS(TestBeamMonitorCtrlArg_evaluate_assign_beam_monitor_output_buffer)(
 
                 for( ; be_it != be_end ; ++be_it )
                 {
-                    NS(Particles) const* out_particles = SIXTRL_NULLPTR;
                     ptr_be_monitor_t be_monitor = SIXTRL_NULLPTR;
                     address_t cmp_out_addr = ( address_t )0u;
                     address_t be_out_addr  = ( address_t )0u;
@@ -196,9 +205,6 @@ NS(TestBeamMonitorCtrlArg_evaluate_assign_beam_monitor_output_buffer)(
                     {
                         continue;
                     }
-
-                    out_particles = NS(Particles_buffer_get_const_particles)(
-                            output_buffer, ii );
 
                     be_monitor = ( ptr_be_monitor_t )( uintptr_t
                         )NS(Object_get_begin_addr)( be_it );
@@ -233,59 +239,6 @@ NS(TestBeamMonitorCtrlArg_evaluate_assign_beam_monitor_output_buffer)(
                     {
                         break;
                     }
-                }
-            }
-        }
-
-        if( status == NS(ARCH_STATUS_SUCCESS) )
-        {
-            NS(buffer_size_t) ii = out_buffer_index_offset;
-
-            for( ; ii < nn ; ++ii )
-            {
-                NS(Particles) const* cmp_particles =
-                    NS(Particles_buffer_get_const_particles)(
-                        cmp_output_buffer, ii );
-
-                NS(Particles) const* out_particles =
-                    NS(Particles_buffer_get_const_particles)(
-                        output_buffer, ii );
-
-
-                if( ( out_particles == SIXTRL_NULLPTR ) ||
-                    ( cmp_particles == SIXTRL_NULLPTR ) ||
-                    ( NS(Particles_get_num_of_particles)( out_particles ) !=
-                      NS(Particles_get_num_of_particles)( cmp_particles ) ) )
-                {
-                    status = NS(ARCH_STATUS_GENERAL_FAILURE);
-                    break;
-                }
-            }
-        }
-
-        if( ( status == NS(ARCH_STATUS_SUCCESS) ) &&
-            ( compare_buffer_content ) &&
-            ( abs_tolerance >= ( NS(particle_real_t) )0.0 ) )
-        {
-            NS(buffer_size_t) ii = out_buffer_index_offset;
-
-            for( ; ii < nn ; ++ii )
-            {
-                NS(Particles) const* cmp_particles =
-                    NS(Particles_buffer_get_const_particles)(
-                        cmp_output_buffer, ii );
-
-                NS(Particles) const* out_particles =
-                    NS(Particles_buffer_get_const_particles)(
-                        output_buffer, ii );
-
-                if( ( 0 != NS(Particles_compare_values)(
-                            cmp_particles, out_particles ) ) &&
-                    ( 0 != NS(Particles_compare_values_with_treshold)(
-                        cmp_particles, out_particles, abs_tolerance ) ) )
-                {
-                    status = NS(ARCH_STATUS_GENERAL_FAILURE);
-                    break;
                 }
             }
         }

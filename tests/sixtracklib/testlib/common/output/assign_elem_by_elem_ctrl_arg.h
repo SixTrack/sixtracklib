@@ -20,7 +20,7 @@ extern "C" {
 #if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(TestBeamMonitorCtrlArg_prepare_assign_elem_by_elem_output_buffer)(
+NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
     NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_arg,
     NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
@@ -30,9 +30,9 @@ NS(TestBeamMonitorCtrlArg_prepare_assign_elem_by_elem_output_buffer)(
     NS(ArgumentBase)* SIXTRL_RESTRICT result_arg );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(TestBeamMonitorCtrlArg_evaluate_assign_elem_by_elem_output_buffer)(
+NS(TestElemByElemConfigCtrlArg_evaluate_assign_output_buffer)(
     NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_arg,
-    NS(ElemByElemConfi)* SIXTRL_RESTRICT elem_by_elem_config,
+    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     const NS(Buffer) *const SIXTRL_RESTRICT cmp_output_buffer,

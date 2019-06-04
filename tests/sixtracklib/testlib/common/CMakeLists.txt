@@ -11,12 +11,12 @@ set( SIXTRL_TESTLIB_COMMON_INSTALL_CXX_PATH
 
 # ------------------------------------------------------------------------------
 
+add_subdirectory( beam_elements )
 add_subdirectory( particles )
 add_subdirectory( track )
+add_subdirectory( output )
 
 # ------------------------------------------------------------------------------
-
-add_subdirectory( beam_elements )
 
 set( TESTLIB_COMMON_C99_HEADERS
      buffer.h

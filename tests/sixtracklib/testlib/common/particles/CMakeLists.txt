@@ -46,7 +46,7 @@ set_target_properties( sixtrack_test_common_particle_cxx PROPERTIES
     CXX_STANDARD 11 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_test_common_particle_cxx PRIVATE
-        -Wall -Werror -pedantic -ansi ${SIXTRACKLIB_CPU_FLAGS} )
+        ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_test_common_particle_c99 and 

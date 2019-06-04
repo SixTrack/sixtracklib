@@ -21,36 +21,51 @@ if( GTEST_FOUND )
 
     add_test( C99_CudaWrappersParticlesStoreAddrTests
               test_particles_store_all_addresses_cuda_c99 )
+              
+    # ==========================================================================
+    # test_beam_monitor_assign_out_buffer_from_offset_wrapper_cuda_c99:
+    
+    add_executable( test_beam_monitor_assign_output_wrapper_cuda_c99
+        test_beam_monitor_assign_output_c99.cpp )
+        
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} 
+         test_beam_monitor_assign_output_wrapper_cuda_c99 )
+         
+     target_link_libraries( 
+         test_beam_monitor_assign_output_wrapper_cuda_c99 ${SIXTRL_TEST_LIBS} )
+         
+     add_test( C99_CudaWrappersBeamMonitorAssignOutputTests
+               test_beam_monitor_assign_output_wrapper_cuda_c99 )
 
     # --------------------------------------------------------------------------
     # test_track_particles_until_turn_cuda_c99:
 
-    add_executable( test_track_particles_until_turn_cuda_c99
-        test_track_particles_until_turn_c99.cpp )
+#     add_executable( test_track_particles_until_turn_cuda_c99
+#         test_track_particles_until_turn_c99.cpp )
 
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
-        test_track_particles_until_turn_cuda_c99 )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+#         test_track_particles_until_turn_cuda_c99 )
 
-    target_link_libraries(
-        test_track_particles_until_turn_cuda_c99 ${SIXTRL_TEST_LIBS} )
+#     target_link_libraries(
+#         test_track_particles_until_turn_cuda_c99 ${SIXTRL_TEST_LIBS} )
 
-    add_test( C99_CudaWrappersTrackParticlesUntilTurnTests
-              test_track_particles_until_turn_cuda_c99 )
+#     add_test( C99_CudaWrappersTrackParticlesUntilTurnTests
+#               test_track_particles_until_turn_cuda_c99 )
 
     # --------------------------------------------------------------------------
     # test_track_particles_elem_by_elem_until_turn_cuda_c99:
 
-    add_executable( test_track_particles_elem_by_elem_until_turn_cuda_c99
-        test_track_particles_elem_by_elem_until_turn_c99.cpp )
+#     add_executable( test_track_particles_elem_by_elem_until_turn_cuda_c99
+#         test_track_particles_elem_by_elem_until_turn_c99.cpp )
 
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
-        test_track_particles_elem_by_elem_until_turn_cuda_c99 )
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+#         test_track_particles_elem_by_elem_until_turn_cuda_c99 )
 
-    target_link_libraries( test_track_particles_elem_by_elem_until_turn_cuda_c99
-        ${SIXTRL_TEST_LIBS} )
+#     target_link_libraries( test_track_particles_elem_by_elem_until_turn_cuda_c99
+#         ${SIXTRL_TEST_LIBS} )
 
-    add_test( C99_CudaWrappersTrackParticlesUntilTurnTests
-              test_track_particles_elem_by_elem_until_turn_cuda_c99 )
+#     add_test( C99_CudaWrappersTrackParticlesUntilTurnTests
+#               test_track_particles_elem_by_elem_until_turn_cuda_c99 )
 
 endif()
 
