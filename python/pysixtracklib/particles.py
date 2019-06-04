@@ -63,11 +63,11 @@ class Particles(CObject):
                    default=1, pointer=True, alignment=8)
 
     @classmethod
-    def from_ref(cls, num_particles=1, mass0=938272081.3,
-                 p0c=1e9, q0=1, **kwargs):
+    def from_ref(cls, num_particles=1, mass0=pmass,
+                 p0c=1e9, q0=1):
         return cls(num_particles=num_particles,
                    particle_id=np.arange(num_particles),
-                   ).set_reference()
+                   ).set_reference(mass0=mass0,p0c=p0c,q0=q0)
 
     sigma = property(lambda self: (self.beta0 / self.beta) * self.zeta)
     beta = property(lambda p: (1 + p.delta) / (1 / p.beta0 + p.ptau))
@@ -77,8 +77,8 @@ class Particles(CObject):
         return np.sqrt(self.delta**2 + 2 * self.delta +
                        1 / self.beta0**2) - 1 / self.beta0
 
-    def set_reference(self, p0c=7e12, mass0=938.27208136e6, q0=1):
-        self.q0 = 1
+    def set_reference(self, p0c=7e12, mass0=pmass, q0=1):
+        self.q0 = q0
         self.mass0 = mass0
         self.p0c = p0c
         return self
