@@ -68,19 +68,19 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit_ellipse)(
     NS(particle_num_elements_t) const particle_idx,
     SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit )
 {
-    NS(particle_real_t) const delta_x = NS(Particles_get_x_value)(
-        particles, particle_idx ) - NS(LimitEllipse_get_x_origin)( limit );
+    NS(particle_real_t) temp = NS(Particles_get_x_value)(
+        particles, particle_idx );
 
-    NS(particle_real_t) temp    = delta_x;
-    NS(particle_real_t) delta_y = NS(Particles_get_y_value)(
-        particles, particle_idx ) - NS(LimitEllipse_get_y_origin)( limit );
+    NS(particle_real_t) y_squ = NS(Particles_get_y_value)(
+        particles, particle_idx );
 
-    delta_y *= delta_y;
-    delta_y *= NS(LimitEllipse_get_x_half_axis_squ)( limit );
+    temp *= temp; /* temp = x² */
+    temp *= NS(LimitEllipse_get_y_half_axis_squ)( limit ); /* temp = x² * b² */
+    
+    y_squ *= y_squ; /* y_squ = y² */
+    y_squ *= NS(LimitEllipse_get_x_half_axis_squ)( limit ); /*y_squ = y² * a²*/
 
-    temp    *= delta_x;
-    temp    *= NS(LimitEllipse_get_y_half_axis_squ)( limit );
-    temp    += delta_y;
+    temp += y_squ; /* temp = x² * b² + y² * a² */
 
     NS(Particles_update_state_value_if_not_already_lost)( particles,
         particle_idx, ( NS(particle_index_t) )( temp <=

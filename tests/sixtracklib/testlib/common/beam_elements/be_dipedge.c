@@ -1,5 +1,5 @@
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #include "sixtracklib/testlib/common/beam_elements/be_limit_ellipse.h"
+    #include "sixtracklib/testlib/common/beam_elements/be_dipedge.h"
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
     
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
@@ -11,7 +11,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/be_limit/definitions.h"
-    #include "sixtracklib/common/be_limit/be_limit_ellipse.h"
+    #include "sixtracklib/common/be_dipedge/be_dipedge.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -21,16 +21,16 @@
     #include <stdio.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
-void NS(LimitEllipse_print)( SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const SIXTRL_RESTRICT limit )
+void NS(DipoleEdge_print)( SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BE_ARGPTR_DEC const NS(DipoleEdge) *const SIXTRL_RESTRICT dipedge )
 {
-    if( ( fp != SIXTRL_NULLPTR ) && ( limit != SIXTRL_NULLPTR ) )
+    if( dipedge != SIXTRL_NULLPTR )
     {
-        fprintf( fp, 
-                "|limit_ellipse    | half-axis x = %+16.12f m;\r\n"
-                "                  | half-axis y = %+16.12f m;\r\n",                
-                NS(LimitEllipse_get_x_half_axis)( limit ),
-                NS(LimitEllipse_get_y_half_axis)( limit ) );
+        fprintf( fp,
+                "|dipole_edge      | r21      = %+16.12f m^-1;\r\n"
+                "                  | r43      = %+16.12f m^-1;\r\n",
+                NS(DipoleEdge_get_r21)( dipedge ),
+                NS(DipoleEdge_get_r43)( dipedge ) );
     }
     
     return;

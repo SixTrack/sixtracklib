@@ -5,12 +5,14 @@ set( SIXTRL_TESTLIB_COMMON_BEAM_ELEMENTS_CXX_HEADERS )
 set( SIXTRL_TESTLIB_COMMON_BEAM_ELEMENTS_C99_HEADERS 
      be_limit_rect.h
      be_limit_ellipse.h
+     be_dipedge.h
      beam_elements.h
 )
 
 set( SIXTRL_TESTLIB_COMMON_BEAM_ELEMENTS_C99_SOURCES 
      be_limit_rect.c
      be_limit_ellipse.c
+     be_dipedge.c
      beam_elements.c
 )
 

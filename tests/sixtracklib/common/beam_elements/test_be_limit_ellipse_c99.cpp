@@ -32,12 +32,7 @@ TEST( C99_CommonBeamElementLimitEllipseTests, BasicUsage )
     real_t const X_HALF_AXIS = real_t{ 2.0 };
     real_t const Y_HALF_AXIS = real_t{ 1.5 };
     
-    real_t const X_ORIGIN    = real_t{ 0.0 };
-    real_t const Y_ORIGIN    = real_t{ 0.0 };
-    
     be_limit_t limit;    
-    ::NS(LimitEllipse_set_x_origin)(  &limit, X_ORIGIN );
-    ::NS(LimitEllipse_set_y_origin)(  &limit, Y_ORIGIN );
     ::NS(LimitEllipse_set_half_axes)( &limit, X_HALF_AXIS, Y_HALF_AXIS );
         
     buffer_t* eb = ::NS(Buffer_new)( size_t{ 0 } );
@@ -45,12 +40,6 @@ TEST( C99_CommonBeamElementLimitEllipseTests, BasicUsage )
     be_limit_t* l2 = ::NS(LimitEllipse_new)( eb );    
     ASSERT_TRUE( l2 != nullptr );
             
-    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_x_origin)( 
-        l2 ) - ::NS(LIMIT_DEFAULT_X_ORIGIN) ) < EPS );
-    
-    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_y_origin)( 
-        l2 ) - ::NS(LIMIT_DEFAULT_Y_ORIGIN) ) < EPS );
-    
     ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_x_half_axis)( l2 ) - 
         ::NS(LIMIT_DEFAULT_X_HALF_AXIS) ) < EPS );
     
@@ -75,8 +64,7 @@ TEST( C99_CommonBeamElementLimitEllipseTests, BasicUsage )
     
     ASSERT_TRUE( 0 == ::NS(LimitEllipse_compare_values)( &limit, l2 ) );
     
-    be_limit_t* l3 = ::NS(LimitEllipse_add)( 
-        eb, X_ORIGIN, Y_ORIGIN, X_HALF_AXIS, Y_HALF_AXIS );
+    be_limit_t* l3 = ::NS(LimitEllipse_add)( eb, X_HALF_AXIS, Y_HALF_AXIS );
     ASSERT_TRUE( l3 != nullptr );
     
     ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_x_half_axis)( l3 ) - 
@@ -84,12 +72,6 @@ TEST( C99_CommonBeamElementLimitEllipseTests, BasicUsage )
     
     ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_y_half_axis)( l3 ) - 
         Y_HALF_AXIS ) < EPS );
-    
-    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_x_origin)( l3 ) - 
-        X_ORIGIN ) < EPS );
-    
-    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_y_origin)( l3 ) - 
-        Y_ORIGIN ) < EPS );
     
     be_limit_t* l4 = ::NS(LimitEllipse_add_copy)( eb, &limit );
     
@@ -140,11 +122,6 @@ TEST( C99_CommonBeamElementLimitRectTests, ApertureCheck )
     real_t const X_HALF_AXIS = real_t{ +1.0 };
     real_t const Y_HALF_AXIS = real_t{ +1.0 };
     
-    real_t const X_ORIGIN    = real_t{ 0.0 };
-    real_t const Y_ORIGIN    = real_t{ 0.0 };
-    
-    ::NS(LimitEllipse_set_x_origin)( &limit, X_ORIGIN );
-    ::NS(LimitEllipse_set_y_origin)( &limit, Y_ORIGIN );    
     ::NS(LimitEllipse_set_half_axes)( &limit, X_HALF_AXIS, Y_HALF_AXIS );
     
     buffer_t* pb = ::NS(Buffer_new)( size_t{ 0 } );

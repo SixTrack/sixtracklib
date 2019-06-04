@@ -8,6 +8,8 @@
 
 #include <gtest/gtest.h>
 
+#include "sixtracklib/testlib.h"
+
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/buffer.hpp"
@@ -27,7 +29,7 @@ TEST( CXX_CommonBeamElementDipoleEdgeTests, BasicUsage )
     be_dipedge_t* e2 = eb.createNew< be_dipedge_t >();
     ASSERT_TRUE( e2 != nullptr );
     
-    be_dipedge_t* e3 = eb.add< be_dipedge_t >( 1.0, 5.0, 0.0, 0.0 );
+    be_dipedge_t* e3 = eb.add< be_dipedge_t >( 1.0, 2.0 );
     ASSERT_TRUE( e3 != nullptr );
     
     be_dipedge_t* e4 = eb.addCopy( e1 );

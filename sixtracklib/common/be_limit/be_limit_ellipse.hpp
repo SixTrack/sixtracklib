@@ -64,9 +64,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN const_reference getXOrigin() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN const_reference getYOrigin() const SIXTRL_NOEXCEPT;
-
         SIXTRL_FN value_type getXHalfAxis() const SIXTRL_NOEXCEPT;
         SIXTRL_FN value_type getYHalfAxis() const SIXTRL_NOEXCEPT;
 
@@ -106,12 +103,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimitEllipse< T >*
         AddToBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
-            const_reference x_origin, const_reference y_origin,
             const_reference x_half_axis, const_reference y_half_axis );
 
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC TLimitEllipse< T >*
         AddToBuffer( c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-            const_reference x_origin, const_reference y_origin,
             const_reference x_half_axis, const_reference y_half_axis );
 
 
@@ -141,11 +136,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN void setXOrigin( const_reference x_origin ) SIXTRL_NOEXCEPT;
-        SIXTRL_FN void setYOrigin( const_reference y_origin ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN void setHalfAxes(
-            const_reference x_half_axis,
+        SIXTRL_FN void setHalfAxes( 
+            const_reference x_half_axis, 
             const_reference y_half_axis ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN void setHalfAxesSqu(
@@ -154,8 +146,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        value_type  x_origin;
-        value_type  y_origin;
         value_type  a_squ;
         value_type  b_squ;
         value_type  a_b_squ;
@@ -182,16 +172,12 @@ namespace SIXTRL_CXX_NAMESPACE
     template< typename T >
     SIXTRL_ARGPTR_DEC TLimitEllipse< T >* TLimitEllipse_add(
         typename TLimitEllipse< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TLimitEllipse< T >::const_reference SIXTRL_RESTRICT_REF x_origin,
-        typename TLimitEllipse< T >::const_reference SIXTRL_RESTRICT_REF y_origin,
         typename TLimitEllipse< T >::const_reference SIXTRL_RESTRICT_REF x_haxis,
         typename TLimitEllipse< T >::const_reference SIXTRL_RESTRICT_REF y_haxis );
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TLimitEllipse< T >* TLimitEllipse_add(
         typename TLimitEllipse< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TLimitEllipse< T >::const_reference SIXTRL_RESTRICT_REF x_origin,
-        typename TLimitEllipse< T >::const_reference SIXTRL_RESTRICT_REF y_origin,
         typename TLimitEllipse< T >::const_reference SIXTRL_RESTRICT_REF x_haxis,
         typename TLimitEllipse< T >::const_reference SIXTRL_RESTRICT_REF y_haxis );
 
@@ -255,9 +241,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN value_type getXOrigin() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getYOrigin() const SIXTRL_NOEXCEPT;
-
         SIXTRL_FN value_type getXHalfAxis() const SIXTRL_NOEXCEPT;
         SIXTRL_FN value_type getYHalfAxis() const SIXTRL_NOEXCEPT;
 
@@ -300,13 +283,11 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC
         TLimitEllipse< ::NS(particle_real_t) >*
         AddToBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
-            value_type const x_origin, value_type const y_origin,
             value_type const x_half_axis, value_type const y_half_axis );
 
         SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC
         TLimitEllipse< ::NS(particle_real_t) >*
         AddToBuffer( c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-            value_type const x_origin, value_type const y_origin,
             value_type const x_half_axis, value_type const y_half_axis );
 
 
@@ -345,9 +326,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN void setXOrigin( value_type const x_origin ) SIXTRL_NOEXCEPT;
-        SIXTRL_FN void setYOrigin( value_type const y_origin ) SIXTRL_NOEXCEPT;
-
         SIXTRL_FN void setHalfAxes( value_type const x_half_axis,
             value_type const y_half_axis ) SIXTRL_NOEXCEPT;
 
@@ -366,16 +344,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_ARGPTR_DEC LimitEllipse* LimitEllipse_add(
         LimitEllipse::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        LimitEllipse::value_type const x_origin,
-        LimitEllipse::value_type const y_origin,
         LimitEllipse::value_type const x_haxis,
         LimitEllipse::value_type const y_haxis );
 
     SIXTRL_ARGPTR_DEC LimitEllipse* LimitEllipse_add(
         LimitEllipse::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        LimitEllipse::value_type const x_origin,
-        LimitEllipse::value_type const y_origin,
-        LimitEllipse::value_type const x_haxis,
+        LimitEllipse::value_type const x_haxis, 
         LimitEllipse::value_type const y_haxis );
 
     SIXTRL_ARGPTR_DEC LimitEllipse* LimitEllipse_add_copy(
@@ -393,20 +367,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    template< typename T >
-    typename TLimitEllipse< T >::const_reference
-    TLimitEllipse< T >::getXOrigin() const SIXTRL_NOEXCEPT
-    {
-        return this->x_origin;
-    }
-
-    template< typename T > typename TLimitEllipse< T >::const_reference
-    TLimitEllipse< T >::getYOrigin() const SIXTRL_NOEXCEPT
-    {
-        return this->y_origin;
-    }
-
-    template< typename T > typename TLimitEllipse< T >::value_type
+    template< typename T > typename TLimitEllipse< T >::value_type 
     TLimitEllipse< T >::getXHalfAxis() const SIXTRL_NOEXCEPT
     {
         return std::sqrt( this->a_squ );
@@ -516,21 +477,17 @@ namespace SIXTRL_CXX_NAMESPACE
     template< typename T > SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimitEllipse< T >*
     TLimitEllipse< T >::AddToBuffer(
         typename TLimitEllipse< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TLimitEllipse< T >::const_reference x_origin,
-        typename TLimitEllipse< T >::const_reference y_origin,
-        typename TLimitEllipse< T >::const_reference x_half_axis,
+        typename TLimitEllipse< T >::const_reference x_half_axis, 
         typename TLimitEllipse< T >::const_reference y_half_axis )
     {
-        return TLimitEllipse< T >::AddToBuffer( *buffer.getCApiPtr(),
-            x_origin, y_origin, x_half_axis, y_half_axis );
+        return TLimitEllipse< T >::AddToBuffer( 
+            *buffer.getCApiPtr(), x_half_axis, y_half_axis );
     }
 
     template< typename T > SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimitEllipse< T >*
     TLimitEllipse< T >::AddToBuffer(
         typename TLimitEllipse< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TLimitEllipse< T >::const_reference x_origin,
-        typename TLimitEllipse< T >::const_reference y_origin,
-        typename TLimitEllipse< T >::const_reference x_half_axis,
+        typename TLimitEllipse< T >::const_reference x_half_axis, 
         typename TLimitEllipse< T >::const_reference y_half_axis )
     {
         using _this_t = SIXTRL_CXX_NAMESPACE::TLimitEllipse< T >;
@@ -548,8 +505,6 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
 
         _this_t temp;
-        temp.setXOrigin( x_origin );
-        temp.setYOrigin( y_origin );
         temp.setHalfAxes( x_half_axis, y_half_axis );
 
         return reinterpret_cast< ptr_t >( ::NS(Object_get_begin_addr)(
@@ -640,15 +595,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         real_t const y_half_axis = real_t{ 0.5 } * (
             _this_t::DEFAULT_MAX_Y - _this_t::DEFAULT_MIN_Y );
-
-        real_t const x_origin = real_t{ 0.5 } * (
-            _this_t::DEFAULT_MAX_X + _this_t::DEFAULT_MIN_X );
-
-        real_t const y_origin = real_t{ 0.5 } * (
-            _this_t::DEFAULT_MAX_Y + _this_t::DEFAULT_MIN_Y );
-
-        this->setXOrigin( x_origin );
-        this->setYOrigin( y_origin );
+        
         this->setHalfAxes( x_half_axis, y_half_axis );
     }
 
@@ -661,23 +608,9 @@ namespace SIXTRL_CXX_NAMESPACE
     /* --------------------------------------------------------------------- */
 
     template< typename T >
-    void TLimitEllipse< T >::setXOrigin(
-        typename TLimitEllipse< T >::const_reference x_origin ) SIXTRL_NOEXCEPT
-    {
-        this->x_origin = x_origin;
-    }
-
-    template< typename T >
-    void TLimitEllipse< T >::setYOrigin(
-        typename TLimitEllipse< T >::const_reference y_origin ) SIXTRL_NOEXCEPT
-    {
-        this->y_origin = y_origin;
-    }
-
-    template< typename T >
-    void TLimitEllipse< T >::setHalfAxes(
-        typename TLimitEllipse< T >::const_reference x_half_axis,
-        typename TLimitEllipse< T >::const_reference y_half_axis
+    void TLimitEllipse< T >::setHalfAxes( 
+        typename TLimitEllipse< T >::const_reference x_half_axis, 
+        typename TLimitEllipse< T >::const_reference y_half_axis 
     ) SIXTRL_NOEXCEPT
     {
         this->setHalfAxesSqu( x_half_axis * x_half_axis,
@@ -704,16 +637,6 @@ namespace SIXTRL_CXX_NAMESPACE
     /* ===================================================================== *
      * ====  Specialization TLimitEllipse< ::NS(particle_real_t) > :
      * ===================================================================== */
-
-    LimitEllipse::value_type LimitEllipse::getXOrigin() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(LimitEllipse_get_x_origin)( this->getCApiPtr() );
-    }
-
-    LimitEllipse::value_type LimitEllipse::getYOrigin() const SIXTRL_NOEXCEPT
-    {
-        return ::NS(LimitEllipse_get_y_origin)( this->getCApiPtr() );
-    }
 
     LimitEllipse::value_type LimitEllipse::getXHalfAxis() const SIXTRL_NOEXCEPT
     {
@@ -789,27 +712,22 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC LimitEllipse*
     LimitEllipse::AddToBuffer(
         LimitEllipse::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        LimitEllipse::value_type const x_origin,
-        LimitEllipse::value_type const y_origin,
-        LimitEllipse::value_type const x_half_axis,
+        LimitEllipse::value_type const x_half_axis, 
         LimitEllipse::value_type const y_half_axis )
     {
         return static_cast< SIXTRL_ARGPTR_DEC LimitEllipse* >(
-            ::NS(LimitEllipse_add)( buffer.getCApiPtr(),
-                x_origin, y_origin, x_half_axis, y_half_axis ) );
+            ::NS(LimitEllipse_add)( 
+                buffer.getCApiPtr(), x_half_axis, y_half_axis ) );
     }
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC LimitEllipse*
     LimitEllipse::AddToBuffer(
         LimitEllipse::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        LimitEllipse::value_type const x_origin,
-        LimitEllipse::value_type const y_origin,
-        LimitEllipse::value_type const x_half_axis,
+        LimitEllipse::value_type const x_half_axis, 
         LimitEllipse::value_type const y_half_axis )
     {
         return static_cast< SIXTRL_ARGPTR_DEC LimitEllipse* >(
-            ::NS(LimitEllipse_add)( &buffer, x_origin, y_origin,
-                                    x_half_axis, y_half_axis ) );
+            ::NS(LimitEllipse_add)( &buffer, x_half_axis, y_half_axis ) );
     }
 
 
@@ -883,20 +801,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* --------------------------------------------------------------------- */
-
-    void LimitEllipse::setXOrigin(
-        LimitEllipse::value_type const x_origin ) SIXTRL_NOEXCEPT
-    {
-        ::NS(LimitEllipse_set_x_origin)( this->getCApiPtr(), x_origin );
-    }
-
-    void LimitEllipse::setYOrigin(
-        LimitEllipse::value_type const y_origin ) SIXTRL_NOEXCEPT
-    {
-        ::NS(LimitEllipse_set_y_origin)( this->getCApiPtr(), y_origin );
-    }
-
-    void LimitEllipse::setHalfAxes(
+    
+    void LimitEllipse::setHalfAxes( 
         LimitEllipse::value_type const x_half_axis,
         LimitEllipse::value_type const y_half_axis ) SIXTRL_NOEXCEPT
     {
@@ -928,24 +834,20 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC LimitEllipse* LimitEllipse_add(
         LimitEllipse::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        LimitEllipse::value_type const x_origin,
-        LimitEllipse::value_type const y_origin,
         LimitEllipse::value_type const x_half_axis,
         LimitEllipse::value_type const y_half_axis )
     {
-        return LimitEllipse::AddToBuffer( *buffer.getCApiPtr(),
-            x_origin, y_origin, x_half_axis, y_half_axis );
+        return LimitEllipse::AddToBuffer( 
+            *buffer.getCApiPtr(), x_half_axis, y_half_axis );
     }
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC LimitEllipse* LimitEllipse_add(
         LimitEllipse::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        LimitEllipse::value_type const x_origin,
-        LimitEllipse::value_type const y_origin,
-        LimitEllipse::value_type const x_half_axis,
+        LimitEllipse::value_type const x_half_axis, 
         LimitEllipse::value_type const y_half_axis )
     {
-        return LimitEllipse::AddToBuffer(
-            buffer, x_origin, y_origin, x_half_axis, y_half_axis );
+        return LimitEllipse::AddToBuffer( 
+            buffer, x_half_axis, y_half_axis );
     }
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC LimitEllipse* LimitEllipse_add_copy(

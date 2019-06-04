@@ -29,21 +29,13 @@ TEST( C99_CommonBeamElementLimitEllipseTests, BasicUsage )
     real_t const X_HALF_AXIS = real_t{ 2.0 };
     real_t const Y_HALF_AXIS = real_t{ 1.5 };
     
-    real_t const X_ORIGIN    = real_t{ 0.0 };
-    real_t const Y_ORIGIN    = real_t{ 0.0 };
-    
     be_limit_t limit;
-    limit.setXOrigin( X_ORIGIN );
-    limit.setYOrigin( Y_ORIGIN );
     limit.setHalfAxes( X_HALF_AXIS, Y_HALF_AXIS );
         
     buffer_t eb;
     
     be_limit_t* l2 = eb.createNew< be_limit_t >();
     ASSERT_TRUE( l2 != nullptr );
-    
-    ASSERT_TRUE( std::fabs( l2->getXOrigin() - st::LIMIT_DEFAULT_X_ORIGIN ) < EPS );
-    ASSERT_TRUE( std::fabs( l2->getYOrigin() - st::LIMIT_DEFAULT_Y_ORIGIN ) < EPS );
     
     ASSERT_TRUE( std::fabs( l2->getXHalfAxis() - 
         st::LIMIT_DEFAULT_X_HALF_AXIS ) < EPS );
@@ -105,14 +97,9 @@ TEST( CXX_CommonBeamElementLimitRectTests, ApertureCheck )
     
     real_t const ZERO = real_t{ 0.0 };
     
-    real_t const X_ORIGIN = real_t{ 0.0 };
-    real_t const Y_ORIGIN = real_t{ 0.0 };
-    
     real_t const X_HALF_AXIS = real_t{ 1.0 };
     real_t const Y_HALF_AXIS = real_t{ 1.0 };
     
-    limit.setXOrigin( X_ORIGIN );
-    limit.setYOrigin( Y_ORIGIN );
     limit.setHalfAxes( X_HALF_AXIS, Y_HALF_AXIS );
     
     buffer_t pb;
