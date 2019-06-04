@@ -15,8 +15,8 @@
 #include "sixtracklib/testlib/common/particles/particles.h"
 
 NS(arch_status_t) NS(TestBeamMonitorCtrlArg_prepare_assign_output_buffer)(
-    NS(Buffer)* SIXTRL_RESTRICT particles_buffer, 
-    NS(buffer_size_t) const num_particle_sets, 
+    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
+    NS(buffer_size_t) const num_particle_sets,
     NS(buffer_size_t) const* particle_set_indices_begin,
     NS(ArgumentBase)* SIXTRL_RESTRICT beam_elements_arg,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
@@ -28,6 +28,8 @@ NS(arch_status_t) NS(TestBeamMonitorCtrlArg_prepare_assign_output_buffer)(
 {
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
+    typedef NS(buffer_size_t) buf_size_t;
+
     if( ( particles_buffer != SIXTRL_NULLPTR ) &&
         ( num_particle_sets > ( NS(buffer_size_t) )0u ) &&
         ( particle_set_indices_begin != SIXTRL_NULLPTR ) &&
@@ -35,20 +37,22 @@ NS(arch_status_t) NS(TestBeamMonitorCtrlArg_prepare_assign_output_buffer)(
         ( beam_elements_buffer != SIXTRL_NULLPTR ) &&
         ( output_arg != SIXTRL_NULLPTR ) &&
         ( output_buffer != SIXTRL_NULLPTR ) &&
-        ( NS(Buffer_is_particles_buffer)( output_buffer ) ) )
+        ( ( NS(Buffer_get_num_of_objects)( output_buffer ) ==
+                ( buf_size_t )0u ) ||
+          ( NS(Buffer_is_particles_buffer)( output_buffer ) ) ) )
     {
         NS(buffer_size_t) output_buffer_index_offset = ( NS(buffer_size_t) )0u;
-        
+
         status = NS(BeamMonitor_prepare_output_buffer_for_particle_sets)(
-            beam_elements_buffer, output_buffer, particles_buffer, 
-                num_particle_sets, particle_set_indices_begin, 
+            beam_elements_buffer, output_buffer, particles_buffer,
+                num_particle_sets, particle_set_indices_begin,
                     &output_buffer_index_offset );
-        
+
         if( ptr_output_buffer_index_offset != SIXTRL_NULLPTR )
         {
             *ptr_output_buffer_index_offset = output_buffer_index_offset;
         }
-        
+
         if( status == NS(ARCH_STATUS_SUCCESS) )
         {
             status = NS(BeamMonitor_assign_output_buffer_from_offset)(
@@ -87,7 +91,7 @@ NS(arch_status_t) NS(TestBeamMonitorCtrlArg_evaluate_assign_output_buffer)(
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const output_buffer_index_offset,
-    NS(buffer_size_t) const num_beam_monitors,    
+    NS(buffer_size_t) const num_beam_monitors,
     NS(ArgumentBase)* SIXTRL_RESTRICT result_arg )
 {
     typedef NS(buffer_addr_t) address_t;
@@ -150,7 +154,7 @@ NS(arch_status_t) NS(TestBeamMonitorCtrlArg_evaluate_assign_output_buffer)(
             NS(Buffer_clear)( output_buffer, true );
             NS(Buffer_reset)( output_buffer );
 
-            status = NS(Argument_receive_buffer_without_remap)( 
+            status = NS(Argument_receive_buffer_without_remap)(
                 output_arg, output_buffer );
 
             if( status == NS(ARCH_STATUS_SUCCESS) )
@@ -216,7 +220,7 @@ NS(arch_status_t) NS(TestBeamMonitorCtrlArg_evaluate_assign_output_buffer)(
                             output_buffer, ii++ );
 
                     if( ( diff_addr >= ( NS(buffer_addr_diff_t) )0u ) ||
-                        ( ( -diff_addr ) >= (
+                        ( ( -diff_addr ) <= (
                             NS(buffer_addr_diff_t) )be_out_addr ) )
                     {
                         be_out_addr += diff_addr;
