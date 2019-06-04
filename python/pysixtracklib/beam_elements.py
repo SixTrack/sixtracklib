@@ -288,7 +288,7 @@ class Elements(object):
         return self.cbuffer.get_object(objid)
 
     @classmethod
-    def from_mad(cls, seq, drift_exact=True):
+    def from_mad(cls, seq, drift_exact=False):
         if drift_exact:
             drift = Elements.element_types['Drift']
             Elements.element_types['Drift'] = DriftExact
