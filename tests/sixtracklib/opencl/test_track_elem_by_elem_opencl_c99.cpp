@@ -128,8 +128,11 @@ TEST( C99_OpenCLTrackElemByElemTests, TrackElemByElemHostAndDeviceCompareDrifts)
     ASSERT_TRUE( 0 == ::NS(Track_all_particles_element_by_element_until_turn)(
         particles, eb, NUM_TURNS, elem_by_elem_particles ) );
 
-    ASSERT_TRUE( ::NS(Particles_copy)( final_state, particles ) );
-    ASSERT_TRUE( ::NS(Particles_copy)( particles, initial_state ) );
+    ASSERT_TRUE( ::NS(Particles_copy)( final_state, particles ) ==
+                 ::NS(ARCH_STATUS_SUCCESS) );
+
+    ASSERT_TRUE( ::NS(Particles_copy)( particles, initial_state ) ==
+                 ::NS(ARCH_STATUS_SUCCESS) );
 
     ::NS(Buffer_delete)( in_particles_buffer );
     in_particles_buffer = nullptr;
