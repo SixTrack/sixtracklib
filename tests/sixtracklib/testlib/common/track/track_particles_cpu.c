@@ -61,8 +61,8 @@ NS(track_status_t) NS(TestTrackCpu_track_particles_elem_by_elem_until_turn_cpu)(
     NS(buffer_size_t) const num_particle_sets,
     NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,
     const NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
-    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
-    NS(particle_index_t) const until_turn )
+    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_conf,
+    NS(particle_index_t) const until_turn_elem_by_elem )
 {
     typedef NS(buffer_size_t) buf_size_t;
     typedef NS(track_status_t) track_status_t;
@@ -77,17 +77,12 @@ NS(track_status_t) NS(TestTrackCpu_track_particles_elem_by_elem_until_turn_cpu)(
         ( beam_elements_buffer != SIXTRL_NULLPTR ) &&
         ( NS(Buffer_get_num_of_objects)( beam_elements_buffer ) >
             ( buf_size_t )0u ) &&
-        ( elem_by_elem_config  != SIXTRL_NULLPTR ) &&
-        ( NS(ElemByElemConfig_get_output_store_address)(
-            elem_by_elem_config ) != ( address_t )0u ) )
+        ( elem_by_elem_conf  != SIXTRL_NULLPTR ) &&
+        ( NS(ElemByElemConfig_get_output_store_address)( elem_by_elem_conf ) !=
+          ( address_t )0u ) )
     {
         buf_size_t const* pset_it = particle_set_indices_begin;
         buf_size_t const* pset_end = pset_it + num_particle_sets;
-
-        buf_size_t const be_end_idx =
-            NS(Buffer_get_num_of_objects)( beam_elements_buffer );
-
-        buf_size_t const be_begin_idx = ( buf_size_t )0u;
 
         status = NS(TRACK_SUCCESS);
 
@@ -102,9 +97,9 @@ NS(track_status_t) NS(TestTrackCpu_track_particles_elem_by_elem_until_turn_cpu)(
                 break;
             }
 
-            status = NS(Track_all_particles_element_by_elements_details)(
-                particles, elem_by_elem_config, beam_elements_buffer,
-                    be_begin_idx, be_end_idx );
+            status = NS(Track_all_particles_element_by_element_until_turn_details)(
+                particles, elem_by_elem_conf, beam_elements_buffer,
+                    until_turn_elem_by_elem );
 
             if( status != NS(TRACK_SUCCESS) )
             {
