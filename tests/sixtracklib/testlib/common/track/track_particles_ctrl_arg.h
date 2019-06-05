@@ -26,18 +26,6 @@ NS(arch_status_t) NS(TestTrackCtrlArg_prepare_tracking)(
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(ArgumentBase)* SIXTRL_RESTRICT result_arg );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN
-NS(arch_status_t) NS(TestTrackCtrlArg_prepare_elem_by_elem_tracking)(
-    NS(ArgumentBase)* SIXTRL_RESTRICT particles_arg,
-    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
-    NS(ArgumentBase)* SIXTRL_RESTRICT beam_elements_arg,
-    NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
-    NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
-    NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_conf_arg,
-    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
-    NS(ArgumentBase)* SIXTRL_RESTRICT result_arg );
-
 
 SIXTRL_EXTERN SIXTRL_HOST_FN
 NS(arch_status_t) NS(TestTrackCtrlArg_evaulate_tracking)(
