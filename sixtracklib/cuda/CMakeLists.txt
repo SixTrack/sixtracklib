@@ -17,6 +17,7 @@ string( APPEND CMAKE_CUDA_FLAGS " -cudart shared" )
 if( CMAKE_BUILD_TYPE MATCHES "Debug" )
     string( APPEND CMAKE_CUDA_FLAGS " -g -G" )
 else()
+    string( APPEND CMAKE_CUDA_FLAGS " -fmad=false" )
     string( APPEND CMAKE_CUDA_FLAGS " -lineinfo" )
 endif()
 
@@ -31,10 +32,10 @@ list( APPEND SIXTRACKL_CUDA_HOST_DEFINITIONS ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
 # ------------------------------------------------------------------------------
 
-set( SIXTRACKLIB_CUDA_C99_INSTALL_PREFIX 
+set( SIXTRACKLIB_CUDA_C99_INSTALL_PREFIX
      "${SIXTRACKLIB_C99_INSTALL_PREFIX}/cuda" )
-     
-set( SIXTRACKLIB_CUDA_CXX_INSTALL_PREFIX 
+
+set( SIXTRACKLIB_CUDA_CXX_INSTALL_PREFIX
      "${SIXTRACKLIB_CXX_INSTALL_PREFIX}/cuda" )
 
 # -----------------------------------------------------------------------------
