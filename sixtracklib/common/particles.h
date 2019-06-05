@@ -20,6 +20,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/buffer_object_defines.h"
     #include "sixtracklib/common/internal/particles_defines.h"
@@ -407,13 +408,13 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_clear)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Particles_copy_single)(
+SIXTRL_FN SIXTRL_STATIC NS(arch_status_t) NS(Particles_copy_single)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     NS(particle_num_elements_t) const destination_index,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
     NS(particle_num_elements_t) const source_index );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Particles_copy_range)(
+SIXTRL_FN SIXTRL_STATIC NS(arch_status_t) NS(Particles_copy_range)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
         SIXTRL_RESTRICT destination,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
@@ -422,7 +423,7 @@ SIXTRL_FN SIXTRL_STATIC bool NS(Particles_copy_range)(
     NS(particle_num_elements_t) const source_end_index,
     NS(particle_num_elements_t) destination_start_index );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Particles_copy)(
+SIXTRL_FN SIXTRL_STATIC NS(arch_status_t) NS(Particles_copy)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
         *const SIXTRL_RESTRICT source );
@@ -441,13 +442,13 @@ SIXTRL_FN SIXTRL_STATIC void NS( Particles_get_max_value)(
 
 #if !defined( _GPUCODE )
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_copy_single_ext)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(Particles_copy_single_ext)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     NS(particle_num_elements_t) const destination_index,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
     NS(particle_num_elements_t) const source_index );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_copy_range_ext)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(Particles_copy_range_ext)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
         SIXTRL_RESTRICT destination,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
@@ -456,7 +457,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_copy_range_ext)(
     NS(particle_num_elements_t) const source_end_index,
     NS(particle_num_elements_t) destination_start_index );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_copy_ext)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(Particles_copy_ext)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
         *const SIXTRL_RESTRICT source );
@@ -1383,7 +1384,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_state_value)(
     NS(particle_num_elements_t) const ii,
     NS(particle_index_t) const state_value );
 
-SIXTRL_FN SIXTRL_STATIC 
+SIXTRL_FN SIXTRL_STATIC
 void NS(Particles_update_state_value_if_not_already_lost)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const ii,
@@ -2713,13 +2714,13 @@ NS(BufferIndex_get_index_object_by_global_index_from_range)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE bool NS(Particles_copy_single)(
+SIXTRL_INLINE NS(arch_status_t) NS(Particles_copy_single)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     NS(particle_num_elements_t) destination_idx,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
     NS(particle_num_elements_t) const source_idx )
 {
-    bool success = false;
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
     typedef NS(particle_num_elements_t) num_elem_t;
 
@@ -2808,13 +2809,13 @@ SIXTRL_INLINE bool NS(Particles_copy_single)(
         NS(Particles_set_state_value)( destination, destination_idx,
             NS(Particles_get_state_value)( source, source_idx ) );
 
-        success = true;
+        status = SIXTRL_ARCH_STATUS_SUCCESS;
     }
 
-    return success;
+    return status;
 }
 
-SIXTRL_INLINE bool NS(Particles_copy_range)(
+SIXTRL_INLINE NS(arch_status_t) NS(Particles_copy_range)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
     NS(particle_num_elements_t) const source_start_index,
@@ -2823,7 +2824,7 @@ SIXTRL_INLINE bool NS(Particles_copy_range)(
 {
     typedef NS(particle_num_elements_t) num_elem_t;
 
-    bool success = false;
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
     num_elem_t const num_to_copy = ( source_start_index <= source_end_index )
         ? ( source_end_index - source_start_index ) : ( num_elem_t )0;
@@ -2852,7 +2853,7 @@ SIXTRL_INLINE bool NS(Particles_copy_range)(
         ( dest_start_index >= 0 ) &&
         ( dest_num_particles >= ( dest_start_index + num_to_copy ) ) )
     {
-        success = true;
+        status = SIXTRL_ARCH_STATUS_SUCCESS;
 
         SIXTRL_ASSERT( source->q0                 != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( source->beta0              != SIXTRL_NULLPTR );
@@ -2983,16 +2984,16 @@ SIXTRL_INLINE bool NS(Particles_copy_range)(
             &source->state[ source_start_index ], num_to_copy );
     }
 
-    return success;
+    return status;
 }
 
-SIXTRL_INLINE bool NS(Particles_copy)(
+SIXTRL_INLINE NS(arch_status_t) NS(Particles_copy)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source )
 {
     typedef NS(particle_num_elements_t) num_elem_t;
 
-    bool success = false;
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
     num_elem_t const num = NS(Particles_get_num_of_particles)( source );
 
@@ -3001,10 +3002,10 @@ SIXTRL_INLINE bool NS(Particles_copy)(
         ( num >  ( num_elem_t )0u ) &&
         ( num == ( NS(Particles_get_num_of_particles)( destination ) ) ) )
     {
-        success = NS(Particles_copy_range)( destination, source, 0, num, 0 );
+        status = NS(Particles_copy_range)( destination, source, 0, num, 0 );
     }
 
-    return success;
+    return status;
 }
 
 SIXTRL_INLINE void NS(Particles_calculate_difference)(
@@ -6353,7 +6354,7 @@ SIXTRL_INLINE void NS(Particles_update_state_value_if_not_already_lost)(
     SIXTRL_ASSERT( ii < particles->num_particles );
     SIXTRL_ASSERT( ( particles->state[ ii ] == ( NS(particle_index_t) )1u ) ||
                    ( particles->state[ ii ] == ( NS(particle_index_t) )0u ) );
-    
+
     particles->state[ ii ] &= new_state;
 }
 

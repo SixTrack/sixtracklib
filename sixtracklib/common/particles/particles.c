@@ -62,7 +62,7 @@ NS(BufferIndex_get_total_num_of_particle_blocks_in_range_ext)(
 
 /* ------------------------------------------------------------------------- */
 
-bool NS(Particles_copy_single_ext)(
+NS(arch_status_t) NS(Particles_copy_single_ext)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT dest,
     NS(particle_num_elements_t) const dest_idx,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT src,
@@ -71,7 +71,7 @@ bool NS(Particles_copy_single_ext)(
     return NS(Particles_copy_single)( dest, dest_idx, src, src_idx );
 }
 
-bool NS(Particles_copy_range_ext)(
+NS(arch_status_t) NS(Particles_copy_range_ext)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT dest,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT src,
     NS(particle_num_elements_t) const src_start_index,
@@ -82,7 +82,7 @@ bool NS(Particles_copy_range_ext)(
         dest, src, src_start_index, src_end_index, dest_start_index );
 }
 
-bool NS(Particles_copy_ext)(
+NS(arch_status_t) NS(Particles_copy_ext)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT dest,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT src )
 {
