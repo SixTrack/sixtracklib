@@ -51,7 +51,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN
 void NS(BeamMonitor_assign_out_buffer_from_offset_cuda_wrapper)(
     const NS(CudaKernelConfig) *const SIXTRL_RESTRICT kernel_config,
     NS(CudaArgument)* SIXTRL_RESTRICT beam_elements_arg,
-    NS(CudaArgument)* SIXTRL_RESTRICT output_arg,
+    NS(CudaArgument)* SIXTRL_RESTRICT output_buffer_arg,
     NS(particle_index_t) const min_turn_id,
     NS(buffer_size_t) const out_buffer_offset_index,
     NS(CudaArgument)* SIXTRL_RESTRICT debug_register_arg );
@@ -60,7 +60,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN
 void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
     const NS(CudaKernelConfig) *const SIXTRL_RESTRICT kernel_config,
     NS(CudaArgument)* SIXTRL_RESTRICT elem_by_elem_config_arg,
-    NS(CudaArgument)* SIXTRL_RESTRICT output_buffer,
+    NS(CudaArgument)* SIXTRL_RESTRICT output_buffer_arg,
     NS(buffer_size_t) const out_buffer_offset_index,
     NS(CudaArgument)* SIXTRL_RESTRICT debug_register_arg );
 
