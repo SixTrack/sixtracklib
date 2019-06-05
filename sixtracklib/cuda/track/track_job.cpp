@@ -40,6 +40,88 @@ namespace st = SIXTRL_CXX_NAMESPACE;
 
 namespace SIXTRL_CXX_NAMESPACE
 {
+    /* --------------------------------------------------------------------- */
+
+    CudaTrackJob::size_type CudaTrackJob::NumAvailableNodes()
+    {
+        CudaTrackJob::size_type num_available_nodes =
+            CudaTrackJob::size_type{ 0 };
+
+        int temp_num_devices = int{ -1 };
+        ::cudaError_t err = ::cudaGetDeviceCount( &temp_num_devices );
+
+        if( ( err == ::cudaSuccess ) && ( temp_num_devices > int{ 0 } ) )
+        {
+            num_available_nodes = static_cast< CudaTrackJob::size_type >(
+                temp_num_devices );
+        }
+
+        return num_available_nodes;
+    }
+
+    CudaTrackJob::size_type CudaTrackJob::GetAvailableNodeIdsList(
+        CudaTrackJob::size_type const max_num_node_ids,
+        CudaTrackJob::node_id_t* SIXTRL_RESTRICT node_ids_begin )
+    {
+        using size_t = CudaTrackJob::size_type;
+
+        size_t num_retrieved_nodes = size_t{ 0 };
+
+        if( ( max_num_node_ids > size_t{ 0 } ) &&
+            ( node_ids_begin != nullptr ) )
+        {
+            std::unique_ptr< st::CudaController > ptr_ctrl(
+                new st::CudaController );
+
+            if( ( ptr_ctrl.get() != nullptr ) &&
+                ( ptr_ctrl->numAvailableNodes() > size_t{ 0 } ) )
+            {
+                num_retrieved_nodes = ptr_ctrl->availableNodeIds(
+                    max_num_node_ids, node_ids_begin );
+
+                SIXTRL_ASSERT( num_retrieved_nodes <= max_num_node_ids );
+
+                SIXTRL_ASSERT( num_retrieved_nodes <=
+                    ptr_ctrl->numAvailableNodes() );
+            }
+        }
+
+        return num_retrieved_nodes;
+    }
+
+    CudaTrackJob::size_type CudaTrackJob::GetAvailableNodeIndicesList(
+        CudaTrackJob::size_type const max_num_node_indices,
+        CudaTrackJob::node_index_t* SIXTRL_RESTRICT node_indices_begin )
+    {
+        using size_t = CudaTrackJob::size_type;
+
+        size_t num_retrieved_nodes = size_t{ 0 };
+
+        if( ( max_num_node_indices > size_t{ 0 } ) &&
+            ( node_indices_begin != nullptr ) )
+        {
+            std::unique_ptr< st::CudaController > ptr_ctrl(
+                new st::CudaController );
+
+            if( ( ptr_ctrl.get() != nullptr ) &&
+                ( ptr_ctrl->numAvailableNodes() > size_t{ 0 } ) )
+            {
+                num_retrieved_nodes = ptr_ctrl->availableNodeIndices(
+                    max_num_node_indices, node_indices_begin );
+
+                SIXTRL_ASSERT( num_retrieved_nodes <= max_num_node_indices );
+
+                SIXTRL_ASSERT( num_retrieved_nodes <=
+                    ptr_ctrl->numAvailableNodes() );
+            }
+        }
+
+        return num_retrieved_nodes;
+    }
+
+    /* --------------------------------------------------------------------- */
+
+
     CudaTrackJob::CudaTrackJob(
         const char *const SIXTRL_RESTRICT config_str ) :
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,

@@ -64,10 +64,28 @@ namespace SIXTRL_CXX_NAMESPACE
         using collect_flag_t        = _base_track_job_t::collect_flag_t;
         using particles_addr_t      = _base_track_job_t::particles_addr_t;
 
+        using node_index_t          = cuda_controller_t::node_index_t;
         using node_id_t             = cuda_controller_t::node_id_t;
+        using node_info_base_t      = cuda_controller_t::node_info_base_t;
         using platform_id_t         = cuda_controller_t::platform_id_t;
         using device_id_t           = cuda_controller_t::device_id_t;
-        using node_index_t          = cuda_controller_t::node_index_t;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_STATIC SIXTRL_HOST_FN size_type NumAvailableNodes();
+
+        SIXTRL_STATIC SIXTRL_HOST_FN size_type
+        GetAvailableNodeIdsList(
+            size_type const max_num_node_ids,
+            node_id_t* SIXTRL_RESTRICT node_ids_begin );
+
+        SIXTRL_STATIC SIXTRL_HOST_FN size_type
+        GetAvailableNodeIndicesList(
+            size_type const max_num_node_indices,
+            node_index_t* SIXTRL_RESTRICT node_indices_begin );
+
+        /* ----------------------------------------------------------------- */
+
 
         SIXTRL_HOST_FN explicit CudaTrackJob(
             const char *const SIXTRL_RESTRICT config_str = nullptr );
