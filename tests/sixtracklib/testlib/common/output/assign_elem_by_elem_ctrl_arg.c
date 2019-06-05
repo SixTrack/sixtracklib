@@ -16,37 +16,94 @@
 
 NS(arch_status_t)
 NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
+    const NS(Buffer) *const SIXTRL_RESTRICT particles_buffer, 
+    NS(buffer_size_t) const num_particle_sets,
+    NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
+    const NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
     NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_arg,
     NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const output_buffer_index_offset,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_output_buffer_index_offset,
     NS(buffer_size_t) const until_turn_elem_by_elem,
     NS(ArgumentBase)* SIXTRL_RESTRICT result_arg )
 {
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( elem_by_elem_config_arg != SIXTRL_NULLPTR ) &&
+    if( ( particles_buffer != SIXTRL_NULLPTR ) &&
+        ( num_particle_sets > ( NS(buffer_size_t) )0u ) &&
+        ( pset_indices_begin != SIXTRL_NULLPTR ) &&
+        ( beam_elements_buffer != SIXTRL_NULLPTR ) && 
+        ( elem_by_elem_config_arg != SIXTRL_NULLPTR ) &&
         ( elem_by_elem_config != SIXTRL_NULLPTR ) &&
         ( output_arg != SIXTRL_NULLPTR ) &&
         ( output_buffer != SIXTRL_NULLPTR ) &&
-        ( NS(Buffer_is_particles_buffer)( output_buffer ) ) &&
-        ( NS(Buffer_get_num_of_objects)( output_buffer ) >
-            output_buffer_index_offset ) )
+        ( ( NS(Buffer_is_particles_buffer)( output_buffer ) ) ||
+          ( NS(Buffer_get_num_of_objects)( output_buffer ) == 
+              ( NS(buffer_size_t) )0u ) ) )
     {
-        status = NS(ElemByElemConfig_assign_output_buffer)(
-            elem_by_elem_config, output_buffer, output_buffer_index_offset );
-
+        typedef NS(particle_index_t) pindex_t;
+        typedef NS(buffer_size_t) buf_size_t;
+        
+        pindex_t min_particle_id, max_particle_id;
+        pindex_t min_at_element_id, max_at_element_id;
+        pindex_t min_at_turn_id, max_at_turn_id;
+        
+        buf_size_t num_elem_by_elem_elements = ( buf_size_t )0u;
+        pindex_t const start_elem_id = ( pindex_t )0u;
+        
+        buf_size_t output_buffer_index_offset = ( buf_size_t )0u;
+        
+        status = NS(OutputBuffer_get_min_max_attributes_on_particle_sets)(
+            particles_buffer, num_particle_sets, pset_indices_begin,
+            beam_elements_buffer, 
+            &min_particle_id, &max_particle_id, &min_at_element_id, 
+            &max_at_element_id, &min_at_turn_id, &max_at_turn_id, 
+            &num_elem_by_elem_elements, start_elem_id );
+        
         if( status == NS(ARCH_STATUS_SUCCESS) )
         {
-            status = NS(Argument_send_raw_argument)(
-                elem_by_elem_config_arg, elem_by_elem_config, 
-                    sizeof( NS(ElemByElemConfig) ) );
+            if( max_at_turn_id < ( pindex_t )until_turn_elem_by_elem )
+            {
+                max_at_turn_id = ( pindex_t )until_turn_elem_by_elem;
+            }
+            
+            status = NS(ElemByElemConfig_prepare_output_buffer_detailed)(
+                output_buffer, min_particle_id, max_particle_id, 
+                    min_at_element_id, max_at_element_id, 
+                    min_at_turn_id, max_at_turn_id, 
+                    &output_buffer_index_offset );
         }
-
+        
+        if( ptr_output_buffer_index_offset != SIXTRL_NULLPTR )
+        {
+            *ptr_output_buffer_index_offset = output_buffer_index_offset;
+        }
+        
+        if( status == NS(ARCH_STATUS_SUCCESS) )
+        {
+            status = NS(ElemByElemConfig_init_detailed)( elem_by_elem_config,
+                NS(ELEM_BY_ELEM_ORDER_DEFAULT), min_particle_id, 
+                    max_particle_id, min_at_element_id, max_at_element_id, 
+                        min_at_turn_id, max_at_turn_id, true );
+        }
+        
+        if( status == NS(ARCH_STATUS_SUCCESS) )
+        {
+            status = NS(Argument_send_raw_argument)( elem_by_elem_config_arg,
+                elem_by_elem_config, sizeof( NS(ElemByElemConfig) ) );
+        }
+        
         if( status == NS(ARCH_STATUS_SUCCESS) )
         {
             status = NS(Argument_send_buffer)( output_arg, output_buffer );
+        }
+        
+        if( status == NS(ARCH_STATUS_SUCCESS) )
+        {
+            status = NS(ElemByElemConfig_assign_output_buffer)(
+                elem_by_elem_config, output_buffer, 
+                    output_buffer_index_offset );
         }
 
         if( ( status == NS(ARCH_STATUS_SUCCESS) ) &&
@@ -68,11 +125,7 @@ NS(arch_status_t) NS(TestElemByElemConfigCtrlArg_evaluate_assign_output_buffer)(
     NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    const NS(Buffer) *const SIXTRL_RESTRICT cmp_output_buffer,
     NS(buffer_size_t) const output_buffer_index_offset,
-    NS(buffer_size_t) const until_turn_elem_by_elem,
-    bool const compare_buffer_content,
-    NS(particle_real_t) const abs_tolerance,
     NS(ArgumentBase)* SIXTRL_RESTRICT result_arg )
 {
     typedef NS(buffer_addr_t) address_t;
@@ -86,11 +139,17 @@ NS(arch_status_t) NS(TestElemByElemConfigCtrlArg_evaluate_assign_output_buffer)(
         ( elem_by_elem_config != SIXTRL_NULLPTR ) &&
         ( output_arg != SIXTRL_NULLPTR ) &&
         ( output_buffer != SIXTRL_NULLPTR ) &&
-        ( cmp_output_buffer != SIXTRL_NULLPTR ) &&
-        ( !NS(Buffer_needs_remapping)( cmp_output_buffer ) ) &&
-        ( NS(Buffer_get_num_of_objects)( cmp_output_buffer ) >= nn ) &&
-        ( NS(Buffer_is_particles_buffer)( cmp_output_buffer ) ) )
+        ( NS(Buffer_get_num_of_objects)( output_buffer ) > 
+            output_buffer_index_offset ) &&
+        ( NS(Buffer_is_particles_buffer)( output_buffer ) ) )
     {
+        NS(Particles) const* cmp_particles = 
+            NS(Particles_buffer_get_const_particles)( output_buffer, 
+                output_buffer_index_offset );
+            
+        NS(particle_num_elements_t) const CMP_NUM_PARTICLES =
+            NS(Particles_get_num_of_particles)( cmp_particles );
+        
         NS(buffer_size_t) const slot_size =
             NS(Buffer_get_slot_size)( output_buffer );
 
@@ -134,6 +193,7 @@ NS(arch_status_t) NS(TestElemByElemConfigCtrlArg_evaluate_assign_output_buffer)(
 
         if( status == NS(ARCH_STATUS_SUCCESS) )
         {
+            cmp_particles = SIXTRL_NULLPTR;            
             NS(Buffer_clear)( output_buffer, true );
             NS(Buffer_reset)( output_buffer );
 
@@ -184,7 +244,7 @@ NS(arch_status_t) NS(TestElemByElemConfigCtrlArg_evaluate_assign_output_buffer)(
                 status = NS(ARCH_STATUS_SUCCESS);
 
                 if( ( diff_addr >= ( NS(buffer_addr_diff_t) )0u ) ||
-                    ( ( -diff_addr ) >= ( 
+                    ( ( -diff_addr ) <= ( 
                         NS(buffer_addr_diff_t) )elem_by_elem_conf_out_addr ) )
                 {
                     elem_by_elem_conf_out_addr += diff_addr;
@@ -205,38 +265,11 @@ NS(arch_status_t) NS(TestElemByElemConfigCtrlArg_evaluate_assign_output_buffer)(
         {
             NS(Particles) const* cmp_particles =
                 NS(Particles_buffer_get_const_particles)(
-                    cmp_output_buffer, output_buffer_index_offset );
-
-            NS(Particles) const* out_particles =
-                NS(Particles_buffer_get_const_particles)(
                     output_buffer, output_buffer_index_offset );
 
-
-            if( ( out_particles == SIXTRL_NULLPTR ) ||
-                ( cmp_particles == SIXTRL_NULLPTR ) ||
-                ( NS(Particles_get_num_of_particles)( out_particles ) !=
-                  NS(Particles_get_num_of_particles)( cmp_particles ) ) )
-            {
-                status = NS(ARCH_STATUS_GENERAL_FAILURE);
-            }
-        }
-
-        if( ( status == NS(ARCH_STATUS_SUCCESS) ) &&
-            ( compare_buffer_content ) && ( abs_tolerance >= 
-                ( NS(particle_real_t) )0.0 ) )
-        {
-            NS(Particles) const* cmp_particles =
-                NS(Particles_buffer_get_const_particles)(
-                    cmp_output_buffer, output_buffer_index_offset );
-
-            NS(Particles) const* out_particles =
-                NS(Particles_buffer_get_const_particles)(
-                    output_buffer, output_buffer_index_offset );
-
-            if( ( 0 != NS(Particles_compare_values)(
-                        cmp_particles, out_particles ) ) &&
-                ( 0 != NS(Particles_compare_values_with_treshold)(
-                    cmp_particles, out_particles, abs_tolerance ) ) )
+            if( ( cmp_particles == SIXTRL_NULLPTR ) ||
+                ( CMP_NUM_PARTICLES != NS(Particles_get_num_of_particles)( 
+                    cmp_particles ) ) )
             {
                 status = NS(ARCH_STATUS_GENERAL_FAILURE);
             }

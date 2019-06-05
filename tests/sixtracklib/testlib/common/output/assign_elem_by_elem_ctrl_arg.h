@@ -21,11 +21,15 @@ extern "C" {
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
+    const NS(Buffer) *const SIXTRL_RESTRICT particles_buffer, 
+    NS(buffer_size_t) const num_particle_sets,
+    NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
+    const NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
     NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_arg,
     NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    NS(buffer_size_t) const output_buffer_index_offset,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_output_buffer_index_offset,
     NS(buffer_size_t) const until_turn_elem_by_elem,
     NS(ArgumentBase)* SIXTRL_RESTRICT result_arg );
 
@@ -35,11 +39,7 @@ NS(TestElemByElemConfigCtrlArg_evaluate_assign_output_buffer)(
     NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
-    const NS(Buffer) *const SIXTRL_RESTRICT cmp_output_buffer,
     NS(buffer_size_t) const output_buffer_index_offset,
-    NS(buffer_size_t) const until_turn_elem_by_elem,
-    bool const compare_buffer_content,
-    NS(particle_real_t) const abs_tolerance,
     NS(ArgumentBase)* SIXTRL_RESTRICT result_arg );
 
 #endif /* !defined( _GPUCODE ) */
