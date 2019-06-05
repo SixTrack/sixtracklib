@@ -248,6 +248,11 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
                 ptr_assign_kernel_config, elem_by_elem_conf_arg, output_arg, 
                     output_buffer_index_offset, result_arg );
             
+            ::NS(Track_particles_elem_by_elem_until_turn_cuda_wrapper)(
+                ptr_track_kernel_config, particles_arg, NUM_PSETS, 
+                    &track_pset_index, beam_elements_arg, elem_by_elem_conf_arg,
+                        UNTIL_TURN_ELEM_BY_ELEM, result_arg );
+            
             status = ::NS(TestTrackCtrlArg_evaulate_tracking)(
                 particles_arg, track_pb, NUM_PSETS, &track_pset_index, 
                 cmp_track_pb, ABS_TOLERANCE, result_arg );
