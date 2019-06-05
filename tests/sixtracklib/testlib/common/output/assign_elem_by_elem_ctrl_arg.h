@@ -21,10 +21,10 @@ extern "C" {
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
-    const NS(Buffer) *const SIXTRL_RESTRICT particles_buffer, 
+    const NS(Buffer) *const SIXTRL_RESTRICT particles_buffer,
     NS(buffer_size_t) const num_particle_sets,
     NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
-    const NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
+    NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
     NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_arg,
     NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
