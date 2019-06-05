@@ -221,6 +221,28 @@ bool NS(TrackJobNew_requires_collecting)(
 
 /* ------------------------------------------------------------------------- */
 
+bool NS(TrackJobNew_is_in_debug_mode)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
+{
+    return ( ( job != nullptr ) && ( job->isInDebugMode() ) );
+}
+
+::NS(arch_status_t) NS(TrackJobNew_enable_debug_mode)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->enableDebugMode() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+
+::NS(arch_status_t) NS(TrackJobNew_disable_debug_mode)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->disableDebugMode() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+
+/* ------------------------------------------------------------------------- */
+
 void NS(TrackJobNew_clear)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
     if( job != nullptr ) job->clear();
