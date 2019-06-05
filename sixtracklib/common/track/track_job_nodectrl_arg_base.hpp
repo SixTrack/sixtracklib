@@ -57,6 +57,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ================================================================ */
 
+        SIXTRL_HOST_FN bool hasSelectedNode() const SIXTRL_NOEXCEPT;
+
         protected:
 
         using stored_node_ctrl_base_t =

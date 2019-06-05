@@ -45,6 +45,13 @@ namespace SIXTRL_CXX_NAMESPACE
         return st::asNodeController( this->ptrControllerBase() );
     }
 
+    bool TrackJobNodeCtrlArgBase::hasSelectedNode() const SIXTRL_NOEXCEPT
+    {
+        auto ptr_ctrl = st::asNodeController( this->ptrControllerBase() );
+
+        return ( ( ptr_ctrl != nullptr ) && ( ptr_ctrl->hasSelectedNode() ) );
+    }
+
     /* --------------------------------------------------------------------- */
 
     _this_t::status_t _this_t::doSelectNodeOnController(
