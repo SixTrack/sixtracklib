@@ -12,6 +12,10 @@
     #define SIXTRL_TRACK_SUCCESS 0
 #endif /* !defined( SIXTRL_TRACK_SUCCESS ) */
 
+#if !defined( SIXTRL_TRACK_STATUS_GENERAL_FAILURE )
+    #define SIXTRL_TRACK_STATUS_GENERAL_FAILURE -1
+#endif /* !defined( SIXTRL_TRACK_STATUS_GENERAL_FAILURE ) */
+
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
 #endif /* defined( __cplusplus ) && ( !defined( _GPUCODE ) */
