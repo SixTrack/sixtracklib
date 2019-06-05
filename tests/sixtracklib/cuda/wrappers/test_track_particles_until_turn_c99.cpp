@@ -89,8 +89,8 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
 
         for( node_index_t const ii : available_indices )
         {
-
             c_buffer_t* track_pb = ::NS(Buffer_new)( buf_size_t{ 0 } );
+            
             particles_t* particles = ::NS(Particles_add_copy)(
                 track_pb, ::NS(Particles_buffer_get_const_particles)(
                     in_particles_buffer, buf_size_t{ 0 } ) );
@@ -136,10 +136,15 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
             /* ************************************************************* */
 
             cuda_arg_t* particles_arg = ::NS(CudaArgument_new)( ctrl );
+            SIXTRL_ASSERT( particles_arg != nullptr );
+            
             cuda_arg_t* beam_elements_arg = ::NS(CudaArgument_new)( ctrl );
-            cuda_arg_t* result_arg = ::NS(CudaArgument_new)( ctrl );
+            SIXTRL_ASSERT( beam_elements_arg != nullptr );
 
-            status = ::NS(TestTrackCtrlArg_prepare_ctrl_arg_tracking)(
+            cuda_arg_t* result_arg = ::NS(CudaArgument_new)( ctrl );
+            SIXTRL_ASSERT( result_arg != nullptr );
+
+            status = ::NS(TestTrackCtrlArg_prepare_tracking)(
                 particles_arg, track_pb, beam_elements_arg, eb, result_arg );
 
             SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
@@ -150,7 +155,7 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
                 ptr_kernel_config, particles_arg, track_pset_index,
                     beam_elements_arg, UNTIL_TURN, result_arg );
 
-            ASSERT_TRUE( ::NS(TestTrackCtrlArg_evaulate_ctrl_arg_tracking)(
+            ASSERT_TRUE( ::NS(TestTrackCtrlArg_evaulate_tracking)(
                 particles_arg, track_pb, buf_size_t{ 1 }, &track_pset_index,
                     cmp_track_pb, ABS_TOLERANCE, result_arg ) ==
                         ::NS(ARCH_STATUS_SUCCESS) );
