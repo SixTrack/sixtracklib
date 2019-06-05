@@ -24,12 +24,34 @@ if( GTEST_FOUND )
     add_test( C99_CudaTrackJobSetupTests test_track_job_setup_cuda_c99 )
 
     # ==========================================================================
-    # test_track_until_cuda_cxx:
+    # test_track_job_track_until_cuda_cxx:
 
-    add_executable( test_track_until_cuda_cxx test_track_until_cxx.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_until_cuda_cxx )
-    target_link_libraries( test_track_until_cuda_cxx ${SIXTRL_TEST_LIBS} )
-    add_test( CXX_CudaTrackUntilTests test_track_until_cuda_cxx )
+    add_executable( test_track_job_track_until_cuda_cxx
+                    test_track_job_track_until_cxx.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+         test_track_job_track_until_cuda_cxx )
+
+    target_link_libraries( test_track_job_track_until_cuda_cxx
+                           ${SIXTRL_TEST_LIBS} )
+
+    add_test( CXX_CudaTrackJobTrackUntilTests
+              test_track_job_track_until_cuda_cxx )
+
+    # ==========================================================================
+    # test_track_job_track_until_cuda_c99:
+
+    add_executable( test_track_job_track_until_cuda_c99
+                    test_track_job_track_until_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+         test_track_job_track_until_cuda_c99 )
+
+    target_link_libraries( test_track_job_track_until_cuda_c99
+                           ${SIXTRL_TEST_LIBS} )
+
+    add_test( C99_CudaTrackJobTrackUntilTests
+              test_track_job_track_until_cuda_c99 )
 
     # --------------------------------------------------------------------------
     # test_track_until_cuda_c99:
