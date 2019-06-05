@@ -77,6 +77,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobNoOutputDelete )
     using node_info_t      = cl_context_t::node_info_t;
     using node_id_t        = cl_context_t::node_id_t;
     using node_info_iter_t = node_info_t const*;
+    using status_t         = particles_t::status_t;
 
     buffer_t eb( ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
     buffer_t in_particle_buffer( ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
@@ -92,8 +93,9 @@ TEST( CXX_TrackJobClTests, CreateTrackJobNoOutputDelete )
 
     SIXTRL_ASSERT( particles != nullptr );
 
-    bool success = particles->copy( *orig_particles );
-    SIXTRL_ASSERT( success );
+    status_t status = particles->copy( *orig_particles );
+    SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+    ( void )status;
 
     /* ---------------------------------------------------------------------- */
     /* Prepare device index to device_id_str map */
@@ -135,9 +137,11 @@ TEST( CXX_TrackJobClTests, CreateTrackJobNoOutputDelete )
         ASSERT_TRUE( job0.type() == ::NS(TRACK_JOB_CL_ID) );
         ASSERT_TRUE( job0.typeStr().compare( ::NS(TRACK_JOB_CL_STR) ) == 0 );
 
-        success = job0.reset( pb, eb, nullptr, size_t{ 0 } );
+        status = job0.reset( pb, eb, nullptr, size_t{ 0 } )
+            ? ::NS(ARCH_STATUS_SUCCESS)
+            : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 
-        ASSERT_TRUE( success );
+        ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
         ASSERT_TRUE( st_test::test1_CreateTrackJobNoOutputDelete(
             job0, pb, eb, nullptr ) );
 
@@ -217,6 +221,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
     using node_info_t      = cl_context_t::node_info_t;
     using node_id_t        = cl_context_t::node_id_t;
     using node_info_iter_t = node_info_t const*;
+    using status_t         = particles_t::status_t;
 
     buffer_t eb( ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
     buffer_t in_particle_buffer( ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
@@ -232,8 +237,8 @@ TEST( CXX_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
 
     SIXTRL_ASSERT( particles != nullptr );
 
-    bool success = particles->copy( *orig_particles );
-    SIXTRL_ASSERT( success );
+    status_t status = particles->copy( *orig_particles );
+    SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
 
     size_t const NUM_BEAM_ELEMENTS       = eb.getNumObjects();
     size_t const NUM_PARTICLES           = particles->getNumParticles();
@@ -280,9 +285,11 @@ TEST( CXX_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
         ::NS(ComputeNodeInfo_print_out)( node_it, &default_node_id );
 
         track_job_t job0( device_id_str );
-        success = job0.reset( pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
+        status = job0.reset( pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS )
+            ? ::NS(ARCH_STATUS_SUCCESS)
+            : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 
-        ASSERT_TRUE( success );
+        ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
         ASSERT_TRUE( st_test::test2_CreateTrackJobElemByElemOutputDelete(
             job0, pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS ) );
 
@@ -350,6 +357,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
     using node_id_t        = cl_context_t::node_id_t;
     using node_info_iter_t = node_info_t const*;
     using beam_monitor_t   = st::BeamMonitor;
+    using status_t         = particles_t::status_t;
 
     buffer_t eb( ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
     buffer_t in_particle_buffer( ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
@@ -365,8 +373,8 @@ TEST( CXX_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
 
     SIXTRL_ASSERT( particles != nullptr );
 
-    bool success = particles->copy( *orig_particles );
-    SIXTRL_ASSERT( success );
+    status_t status = particles->copy( *orig_particles );
+    SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
 
     size_t const NUM_BEAM_ELEMENTS       = eb.getNumObjects();
     size_t const NUM_PARTICLES           = particles->getNumParticles();
@@ -438,9 +446,11 @@ TEST( CXX_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
 
         track_job_t job0( device_id_str );
 
-        success = job0.reset( pb, eb, nullptr );
+        status = job0.reset( pb, eb, nullptr )
+            ? ::NS(ARCH_STATUS_SUCCESS)
+            : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 
-        ASSERT_TRUE( success );
+        ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
         ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
             job0, pb, eb, nullptr, NUM_BEAM_MONITORS, NUM_TURNS, size_t{ 0 } ) );
 
@@ -508,6 +518,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobFullDelete )
     using node_info_t      = cl_context_t::node_info_t;
     using node_id_t        = cl_context_t::node_id_t;
     using node_info_iter_t = node_info_t const*;
+    using status_t         = particles_t::status_t;
 
     buffer_t eb( ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
     buffer_t in_particle_buffer( ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
@@ -523,8 +534,9 @@ TEST( CXX_TrackJobClTests, CreateTrackJobFullDelete )
 
     SIXTRL_ASSERT( particles != nullptr );
 
-    bool success = particles->copy( *orig_particles );
-    SIXTRL_ASSERT( success );
+    status_t status = particles->copy( *orig_particles );
+    SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+    ( void )status;
 
     size_t const NUM_BEAM_ELEMENTS       = eb.getNumObjects();
     size_t const NUM_PARTICLES           = particles->getNumParticles();
@@ -597,8 +609,12 @@ TEST( CXX_TrackJobClTests, CreateTrackJobFullDelete )
         ::NS(ComputeNodeInfo_print_out)( node_it, &default_node_id );
 
         track_job_t job0( device_id_str );
-        success = job0.reset( pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS );
-        ASSERT_TRUE( success );
+        status_t status = job0.reset(
+            pb, eb, nullptr, DUMP_ELEM_BY_ELEM_TURNS )
+            ? ::NS(ARCH_STATUS_SUCCESS)
+            : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+
+        ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
 
         ASSERT_TRUE( st_test::test3_CreateTrackJobFullOutput(
             job0, pb, eb, nullptr, NUM_BEAM_MONITORS, NUM_TURNS,
@@ -810,6 +826,7 @@ TEST( CXX_TrackJobClTests, TrackParticles )
     using node_info_iter_t = node_info_t const*;
     using part_index_t     = particles_t::index_t;
     using beam_monitor_t   = st::BeamMonitor;
+    using status_t         = particles_t::status_t;
 
     buffer_t eb( ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
     buffer_t in_particle_buffer( ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
@@ -828,16 +845,16 @@ TEST( CXX_TrackJobClTests, TrackParticles )
 
     SIXTRL_ASSERT( particles != nullptr );
 
-    bool success = particles->copy( *orig_particles );
-    ASSERT_TRUE( success );
+    status_t status = particles->copy( *orig_particles );
+    ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
 
     particles_t* cmp_particles = cmp_pb.createNew< particles_t >(
         orig_particles->getNumParticles() );
 
     SIXTRL_ASSERT( cmp_particles != nullptr );
 
-    success = cmp_particles->copy( *orig_particles );
-    SIXTRL_ASSERT( success );
+    status = cmp_particles->copy( *orig_particles );
+    SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
 
     size_t const NUM_BEAM_ELEMENTS       = eb.getNumObjects();
     size_t const NUM_PARTICLES           = particles->getNumParticles();
