@@ -9,6 +9,57 @@
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
 
+SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)* NS(ParticlesAddr_preset_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)* SIXTRL_RESTRICT paddr )
+{
+    return NS(ParticlesAddr_preset)( paddr );
+}
+
+void NS(ParticlesAddr_assign_from_particles_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)* SIXTRL_RESTRICT part_addr,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p )
+{
+    NS(ParticlesAddr_assign_from_particles)( part_addr, p );
+}
+
+void NS(ParticlesAddr_assign_to_particles_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(ParticlesAddr) *const
+        SIXTRL_RESTRICT part_addr,
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*  SIXTRL_RESTRICT p )
+{
+    NS(ParticlesAddr_assign_to_particles)( part_addr, p );
+}
+
+void NS(ParticlesAddr_remap_addresses_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)* SIXTRL_RESTRICT part_addr,
+    NS(buffer_addr_diff_t) const addr_offset )
+{
+    NS(ParticlesAddr_remap_addresses)( part_addr, addr_offset );
+}
+
+/* ------------------------------------------------------------------------- */
+
+void NS(ParticlesAddr_managed_buffer_remap_addresses_ext)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const buffer_index,
+    NS(buffer_addr_diff_t) const addr_offset,
+    NS(buffer_size_t) const slot_size )
+{
+    NS(ParticlesAddr_managed_buffer_remap_addresses)(
+        buffer_begin, buffer_index, addr_offset, slot_size );
+}
+
+void NS(ParticlesAddr_managed_buffer_all_remap_addresses_ext)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_addr_diff_t) const addr_offset,
+    NS(buffer_size_t) const slot_size )
+{
+    NS(ParticlesAddr_managed_buffer_all_remap_addresses)(
+        buffer_begin, addr_offset, slot_size );
+}
+
+/* ------------------------------------------------------------------------- */
+
 NS(arch_status_t) NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer)

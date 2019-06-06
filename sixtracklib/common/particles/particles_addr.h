@@ -179,7 +179,44 @@ NS(Particles_managed_buffer_store_all_addresses_debug)(
     NS(buffer_size_t) const slot_size,
     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_error_flag );
 
+
+/* ------------------------------------------------------------------------- */
+
 #if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)*
+NS(ParticlesAddr_preset_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)* SIXTRL_RESTRICT paddr );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ParticlesAddr_assign_from_particles_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)* SIXTRL_RESTRICT part_addr,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ParticlesAddr_assign_to_particles_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(ParticlesAddr) *const
+        SIXTRL_RESTRICT part_addr,
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*  SIXTRL_RESTRICT p );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ParticlesAddr_remap_addresses_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)* SIXTRL_RESTRICT part_addr,
+    NS(buffer_addr_diff_t) const addr_offset );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void 
+NS(ParticlesAddr_managed_buffer_remap_addresses_ext)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const buffer_index,
+    NS(buffer_addr_diff_t) const addr_offset,
+    NS(buffer_size_t) const slot_size );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void
+NS(ParticlesAddr_managed_buffer_all_remap_addresses_ext)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_addr_diff_t) const addr_offset,
+    NS(buffer_size_t) const slot_size );
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(ParticlesAddr_get_required_num_dataptrs)(
