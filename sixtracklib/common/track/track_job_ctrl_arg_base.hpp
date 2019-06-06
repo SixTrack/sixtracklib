@@ -137,6 +137,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual void doClearController();
         SIXTRL_HOST_FN virtual void doClearDefaultKernels();
+        
+        SIXTRL_HOST_FN virtual status_t doClearParticleAddresses(
+            size_type const index ) override;
+            
+        SIXTRL_HOST_FN virtual status_t doClearAllParticleAddresses() override;
 
         SIXTRL_HOST_FN virtual void doClear(
             clear_flag_t const clear_flags ) override;

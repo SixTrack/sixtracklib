@@ -354,6 +354,82 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* --------------------------------------------------------------------- */
+    
+    TrackJobCtrlArgBase::status_t 
+    TrackJobCtrlArgBase::doClearParticleAddresses(
+            TrackJobCtrlArgBase::size_type const index )
+    {
+        TrackJobCtrlArgBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        
+        if( ( this->ptrParticlesAddrArgBase() != nullptr ) &&
+            ( this->ptrParticlesAddrArgBase()->usesCObjectsCxxBuffer() ) &&
+            ( this->doGetPtrParticlesAddrBuffer() != nullptr ) &&
+            ( this->doGetPtrParticlesAddrBuffer() ==
+              this->ptrParticlesAddrArgBase()->ptrCObjectsCxxBuffer() ) )
+        {
+            using _this_t = TrackJobCtrlArgBase;
+            using _base_t = _this_t::_base_track_job_t;
+            
+            /* NOTE: If the architecture we are working on requires collecting,
+             *       we collect first *all* particle addresses before 
+             *       attempting to clear the single particle address that is 
+             *       pertinent to this call. Then, we (always) send the 
+             *       result via the argument.
+             * 
+             *       This is obviously not optimal but should work in most 
+             *       circumstances. If not suitable for a deriving implementation, 
+             *       onus is on the corresponding implementation to specialize 
+             *       this function accordingly */
+            
+            status = st::ARCH_STATUS_SUCCESS;
+            
+            if( this->requiresCollecting() )
+            {
+                status = this->collectParticlesAddresses();
+            }
+            
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                status = _base_t::doClearParticleAddresses( index );
+            }
+            
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                status = this->ptrParticlesAddrArgBase()->send(
+                    *this->doGetPtrParticlesAddrBuffer() );
+            }
+        }
+        
+        return status;
+    }
+            
+    TrackJobCtrlArgBase::status_t 
+    TrackJobCtrlArgBase::doClearAllParticleAddresses()
+    {
+        TrackJobCtrlArgBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        
+        if( ( this->ptrParticlesAddrArgBase() != nullptr ) &&
+            ( this->ptrParticlesAddrArgBase()->usesCObjectsCxxBuffer() ) &&
+            ( this->doGetPtrParticlesAddrBuffer() != nullptr ) &&
+            ( this->doGetPtrParticlesAddrBuffer() ==
+              this->ptrParticlesAddrArgBase()->ptrCObjectsCxxBuffer() ) )
+        {
+            using _this_t = TrackJobCtrlArgBase;
+            using _base_t = _this_t::_base_track_job_t;
+            
+            status = _base_t::doClearAllParticleAddresses();
+            
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                status = this->ptrParticlesAddrArgBase()->send(
+                    *this->doGetPtrParticlesAddrBuffer() );
+            }
+        }
+        
+        return status;
+    }
+    
+    /* --------------------------------------------------------------------- */
 
     void TrackJobCtrlArgBase::doClear(
         TrackJobCtrlArgBase::clear_flag_t const clear_flags )
@@ -482,14 +558,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ( _base_t::IsCollectFlagSet(
                 flags, st::TRACK_JOB_COLLECT_PARTICLES_ADDR ) ) &&
-            ( this->ptrParticlesArgBase() != nullptr ) &&
-            ( this->ptrParticlesArgBase()->usesCObjectsCxxBuffer() ) &&
+            ( this->ptrParticlesAddrArgBase() != nullptr ) &&
+            ( this->ptrParticlesAddrArgBase()->usesCObjectsCxxBuffer() ) &&
             ( this->doGetPtrParticlesAddrBuffer() != nullptr ) &&
             ( this->doGetPtrParticlesAddrBuffer() ==
-              this->ptrParticlesArgBase()->ptrCObjectsCxxBuffer() ) )
+              this->ptrParticlesAddrArgBase()->ptrCObjectsCxxBuffer() ) )
         {
-            status_t const status = this->ptrParticlesArgBase()->receive(
-                *this->ptrParticlesArgBase()->ptrCObjectsCxxBuffer() );
+            _base_t::buffer_t& particles_addr_buffer = 
+                *this->doGetPtrParticlesAddrBuffer();
+            
+            status_t const status = this->ptrParticlesAddrArgBase()->receive(
+                particles_addr_buffer );
 
             if( status == st::ARCH_STATUS_SUCCESS )
             {
