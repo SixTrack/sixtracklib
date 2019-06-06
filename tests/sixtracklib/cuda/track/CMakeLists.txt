@@ -41,17 +41,17 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_track_job_fetch_particle_addr_cuda_c99:
 
-#     add_executable( test_track_job_fetch_particle_addr_cuda_c99
-#                     test_track_job_fetch_particle_addr_c99.cpp )
-#
-#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
-#          test_track_job_fetch_particle_addr_cuda_c99 )
-#
-#     target_link_libraries( test_track_job_fetch_particle_addr_cuda_c99
-#                           ${SIXTRL_TEST_LIBS} )
-#
-#     add_test( C99_CudaTrackJobFetchParticleAddrTests
-#               test_track_job_fetch_particle_addr_cuda_c99 )
+    add_executable( test_track_job_fetch_particle_addr_cuda_c99
+                    test_track_job_fetch_particle_addr_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+         test_track_job_fetch_particle_addr_cuda_c99 )
+
+    target_link_libraries( test_track_job_fetch_particle_addr_cuda_c99
+                          ${SIXTRL_TEST_LIBS} )
+
+    add_test( C99_CudaTrackJobFetchParticleAddrTests
+              test_track_job_fetch_particle_addr_cuda_c99 )
 
     # ==========================================================================
     # test_track_job_track_until_cuda_cxx:

@@ -83,19 +83,22 @@ TEST( CXX_CudaTrackJobFetchParticleAddr, BasicUsage )
             status = track_job.enableDebugMode();
         }
 
-        ASSERT_TRUE( track_job.isInDebugMode() );
         ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
-
+        ASSERT_TRUE( track_job.isInDebugMode() );
+        
+        ASSERT_TRUE( track_job.canFetchParticleAddresses() );
+        
         if( !track_job.hasParticleAddresses() )
         {
             status = track_job.fetchParticleAddresses();
         }
 
-        ASSERT_TRUE( track_job.hasParticleAddresses() );
         ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
-
-        particles_t const* prev_cmp_particles = nullptr;
-        particles_addr_t const* prev_particles_addr = nullptr;
+        ASSERT_TRUE( track_job.hasParticleAddresses() );
+        ASSERT_TRUE( track_job.ptrParticleAddressesBuffer() != nullptr );        
+        
+        size_t const slot_size = 
+            track_job.ptrParticleAddressesBuffer()->getSlotSize();
 
         for( size_t ii = size_t{ 0 } ; ii < num_particle_sets ; ++ii )
         {
@@ -110,90 +113,47 @@ TEST( CXX_CudaTrackJobFetchParticleAddr, BasicUsage )
             ASSERT_TRUE( cmp_particles->getNumParticles() ==
                          particles_addr->num_particles );
 
-            if( prev_cmp_particles != nullptr )
-            {
-                SIXTRL_ASSERT( prev_particles_addr != nullptr );
-
-                addr_diff_t const addr_dist =
-                    reinterpret_cast< addr_diff_t >( cmp_particles ) -
-                    reinterpret_cast< addr_diff_t >( prev_cmp_particles );
-
-                ASSERT_TRUE( addr_dist == (
-                    reinterpret_cast< addr_diff_t >( particles_addr ) -
-                    reinterpret_cast< addr_diff_t >( prev_particles_addr ) ) );
-            }
-
-            address_t const real_offset =
-                real_size * particles_addr->num_particles;
-
-            address_t const idx_offset =
-                idx_size * particles_addr->num_particles;
-
-            ASSERT_TRUE( particles_addr->q0_addr != address_t{ 0 } );
-
-            ASSERT_TRUE( particles_addr->mass0_addr >=
-                         particles_addr->q0_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->beta0_addr >=
-                         particles_addr->mass0_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->gamma0_addr >=
-                         particles_addr->beta0_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->p0c_addr >=
-                         particles_addr->gamma0_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->s_addr >=
-                         particles_addr->p0c_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->x_addr >=
-                         particles_addr->s_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->y_addr >=
-                         particles_addr->x_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->px_addr >=
-                         particles_addr->y_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->py_addr >=
-                         particles_addr->px_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->zeta_addr >=
-                         particles_addr->py_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->psigma_addr >=
-                         particles_addr->zeta_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->delta_addr >=
-                         particles_addr->psigma_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->rpp_addr >=
-                         particles_addr->delta_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->rvv_addr >=
-                         particles_addr->rpp_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->chi_addr >=
-                         particles_addr->rvv_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->charge_ratio_addr >=
-                         particles_addr->chi_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->particle_id_addr >=
-                         particles_addr->charge_ratio_addr + real_offset );
-
-            ASSERT_TRUE( particles_addr->at_element_id_addr >=
-                         particles_addr->particle_id_addr + idx_offset );
-
-            ASSERT_TRUE( particles_addr->at_turn_addr >=
-                         particles_addr->at_element_id_addr + idx_offset );
-
-            ASSERT_TRUE( particles_addr->state_addr >=
-                         particles_addr->at_turn_addr + idx_offset );
-
-            prev_cmp_particles  = cmp_particles;
-            prev_particles_addr = particles_addr;
+            bool const are_consistent =
+                ::NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
+                    particles_addr, cmp_particles->getCApiPtr(), slot_size );
+                
+            ASSERT_TRUE( are_consistent );
         }
+        
+        status = track_job.clearAllParticleAddresses();        
+        ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
+        ASSERT_TRUE( track_job.canFetchParticleAddresses() );
+        ASSERT_TRUE( !track_job.hasParticleAddresses() );
+        
+        status = track_job.disableDebugMode();
+        
+        ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
+        ASSERT_TRUE( !track_job.isInDebugMode() );
+        
+        status = track_job.fetchParticleAddresses();
+        
+        ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
+        ASSERT_TRUE( track_job.hasParticleAddresses() );
+        
+        for( size_t ii = size_t{ 0 } ; ii < num_particle_sets ; ++ii )
+        {
+            particles_t const* cmp_particles = pb.get< particles_t >( ii );
+
+            ASSERT_TRUE( cmp_particles != nullptr );
+
+            particles_addr_t const* particles_addr =
+                track_job.particleAddresses( ii );
+
+            ASSERT_TRUE( particles_addr != nullptr );
+            ASSERT_TRUE( cmp_particles->getNumParticles() ==
+                         particles_addr->num_particles );
+
+            bool const are_consistent =
+                ::NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
+                    particles_addr, cmp_particles->getCApiPtr(), slot_size );
+                
+            ASSERT_TRUE( are_consistent );
+        }        
     }
 }
 
