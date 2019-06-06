@@ -141,7 +141,7 @@ st_Particles_preset.restype = st_Particles_p
 
 st_Particles_get_num_of_particles = \
     sixtracklib.st_Particles_get_num_of_particles_ext
-st_Particles_get_num_of_particles.argtpyes = [st_Particles_p]
+st_Particles_get_num_of_particles.argtypes = [st_Particles_p]
 st_Particles_get_num_of_particles.restype = ct.c_int64
 
 st_Particles_copy_single = sixtracklib.st_Particles_copy_single_ext
@@ -246,9 +246,26 @@ st_Particles_add_copy = sixtracklib.st_Particles_add_copy_ext
 st_Particles_add_copy.restype = st_Particles_p
 st_Particles_add_copy.argtypes = [st_Buffer_p, st_Particles_p]
 
-st_ParticlesAddr_preset = sixtracklib.st_ParticlesAddr_preset
+st_ParticlesAddr_preset = sixtracklib.st_ParticlesAddr_preset_ext
 st_ParticlesAddr_preset.argtypes = [st_ParticlesAddr_p]
 st_ParticlesAddr_preset.restype = st_ParticlesAddr_p
+
+st_ParticlesAddr_assign_from_particles = \
+    sixtracklib.st_ParticlesAddr_assign_from_particles_ext
+st_ParticlesAddr_assign_from_particles.argtypes = [
+    st_ParticlesAddr_p, st_Particles_p]
+st_ParticlesAddr_assign_from_particles.restype = None
+
+st_ParticlesAddr_assign_to_particles = \
+    sixtracklib.st_ParticlesAddr_assign_to_particles_ext 
+st_ParticlesAddr_assign_to_particles.argtypes = [
+    st_ParticlesAddr_p, st_Particles_p]
+st_ParticlesAddr_assign_to_particles.restype = None 
+
+st_ParticlesAddr_remap_addresses = \
+    sixtracklib.st_ParticlesAddr_remap_addresses_ext 
+st_ParticlesAddr_remap_addresses.argtypes = [ st_ParticlesAddr_p, ct.c_int64 ]
+st_ParticlesAddr_remap_addresses.restype  = None 
 
 # -----------------------------------------------------------------------------
 # BeamMonitor objects
@@ -565,134 +582,8 @@ st_TrackJob_get_beam_monitor_output_buffer_offset.restype = ct.c_uint64
 # -----------------------------------------------------------------------------
 # Cuda-Context methods
 
-if SIXTRACKLIB_MODULES.get('cuda', False):
-    st_CudaContext_p = ct.c_void_p
-    st_NullCudaContext = ct.cast(0, st_CudaContext_p)
-
-    st_CudaArgument_p = ct.c_void_p
-    st_NullCudaArgument = ct.cast(0, st_CudaArgument_p)
-
-    st_CudaContext_create = sixtracklib.st_CudaContext_create
-    st_CudaContext_create.argtypes = None
-    st_CudaContext_create.restype = st_CudaContext_p
-
-    st_CudaContext_delete = sixtracklib.st_CudaContext_delete
-    st_CudaContext_delete.argtypes = [st_CudaContext_p]
-    st_CudaContext_delete.restype = None
-
-    st_CudaArgument_new = sixtracklib.st_CudaArgument_new
-    st_CudaArgument_new.argtypes = [st_CudaContext_p]
-    st_CudaArgument_new.restype = st_CudaArgument_p
-
-    st_CudaArgument_new_from_buffer = \
-        sixtracklib.st_CudaArgument_new_from_buffer
-    st_CudaArgument_new_from_buffer.restype = st_CudaArgument_p
-    st_CudaArgument_new_from_buffer.argtypes = [st_Buffer_p, st_CudaContext_p]
-
-    st_CudaArgument_new_from_size = sixtracklib.st_CudaArgument_new_from_size
-    st_CudaArgument_new_from_size.restype = st_CudaArgument_p
-    st_CudaArgument_new_from_size.argtypes = [ct.c_uint64, st_CudaContext_p]
-
-    st_CudaArgument_new_from_memory = \
-        sixtracklib.st_CudaArgument_new_from_memory
-    st_CudaArgument_new_from_memory.restype = st_CudaArgument_p
-    st_CudaArgument_new_from_memory.argtypes = [
-        ct.c_void_p, ct.c_uint64, st_CudaContext_p]
-
-    st_CudaArgument_delete = sixtracklib.st_CudaArgument_delete
-    st_CudaArgument_delete.restype = None
-    st_CudaArgument_delete.argtypes = [st_CudaArgument_p]
-
-    st_CudaArgument_send_buffer = sixtracklib.st_CudaArgument_send_buffer
-    st_CudaArgument_send_buffer.restype = ct.c_int32
-    st_CudaArgument_send_buffer.argtypes = [st_CudaArgument_p, st_Buffer_p]
-
-    st_CudaArgument_send_memory = sixtracklib.st_CudaArgument_send_memory
-    st_CudaArgument_send_memory.restype = ct.c_int32
-    st_CudaArgument_send_memory.argtypes = [
-        st_CudaArgument_p, ct.c_void_p, ct.c_uint64]
-
-    st_CudaArgument_receive_buffer = sixtracklib.st_CudaArgument_receive_buffer
-    st_CudaArgument_receive_buffer.restype = ct.c_int32
-    st_CudaArgument_receive_buffer.argtypes = [st_CudaArgument_p, st_Buffer_p]
-
-    st_CudaArgument_receive_memory = sixtracklib.st_CudaArgument_receive_memory
-    st_CudaArgument_receive_memory.restype = ct.c_int32
-    st_CudaArgument_receive_memory.argtypes = [
-        st_CudaArgument_p, ct.c_void_p, ct.c_uint64]
-
-    st_CudaArgument_get_arg_buffer = \
-        sixtracklib.st_CudaArgument_get_cuda_arg_buffer
-    st_CudaArgument_get_arg_buffer.argtypes = [st_CudaArgument_p]
-    st_CudaArgument_get_arg_buffer.restype = ct.c_void_p
-
-    st_CudaArgument_uses_cobjects_buffer = \
-        sixtracklib.st_CudaArgument_uses_cobjects_buffer
-    st_CudaArgument_uses_cobjects_buffer.restype = ct.c_bool
-    st_CudaArgument_uses_cobjects_buffer.argtypes = [st_CudaArgument_p]
-
-    st_CudaArgument_get_cobjects_buffer =  \
-        sixtracklib.st_CudaArgument_get_cobjects_buffer
-    st_CudaArgument_get_cobjects_buffer.restype = st_Buffer_p
-    st_CudaArgument_get_cobjects_buffer.argtypes = [st_CudaArgument_p]
-
-    st_CudaArgument_uses_raw_argument = \
-        sixtracklib.st_CudaArgument_uses_raw_argument
-    st_CudaArgument_uses_raw_argument.restype = ct.c_bool
-    st_CudaArgument_uses_raw_argument.argtypes = [st_CudaArgument_p]
-
-    st_CudaArgument_get_ptr_raw_argument = \
-        sixtracklib.st_CudaArgument_get_ptr_raw_argument
-    st_CudaArgument_get_ptr_raw_argument.restype = ct.c_void_p
-    st_CudaArgument_get_ptr_raw_argument.argtypes = [st_CudaArgument_p]
-
-    st_CudaArgument_get_size = sixtracklib.st_CudaArgument_get_size
-    st_CudaArgument_get_size.restype = ct.c_uint64
-    st_CudaArgument_get_size.argtypes = [st_CudaArgument_p]
-
-    st_CudaArgument_get_capacity = sixtracklib.st_CudaArgument_get_capacity
-    st_CudaArgument_get_capacity.restype = ct.c_uint64
-    st_CudaArgument_get_capacity.argtypes = [st_CudaArgument_p]
-
-    st_CudaArgument_has_argument_buffer = \
-        sixtracklib.st_CudaArgument_has_argument_buffer
-    st_CudaArgument_has_argument_buffer.restype = ct.c_bool
-    st_CudaArgument_has_argument_buffer.argtypes = [st_CudaArgument_p]
-
-    st_CudaArgument_requires_argument_buffer = \
-        sixtracklib.st_CudaArgument_requires_argument_buffer
-    st_CudaArgument_requires_argument_buffer.restype = ct.c_bool
-    st_CudaArgument_requires_argument_buffer.argtypes = [st_CudaArgument_p]
-
-    st_CudaArgument_get_type_id = sixtracklib.st_CudaArgument_get_type_id
-    st_CudaArgument_get_type_id.restype = ct.c_uint64
-    st_CudaArgument_get_type_id.argtypes = [st_CudaArgument_p]
-
-    # Extract particles API for CUDA
-
-    st_Particles_extract_addresses_cuda = \
-        sixtracklib.st_Particles_extract_addresses_cuda
-    st_Particles_extract_addresses_cuda.argtypes = [ct.c_void_p, ct.c_void_p]
-    st_Particles_extract_addresses_cuda.restype = ct.c_int32
-
-    # Stand-alone tracking functions for CUDA
-
-    st_Track_particles_line_cuda_on_grid = \
-        sixtracklib.st_Track_particles_line_cuda_on_grid
-    st_Track_particles_line_cuda_on_grid.restype = ct.c_int32
-    st_Track_particles_line_cuda_on_grid.argtypes = [
-        ct.c_void_p,
-        ct.c_void_p,
-        ct.c_uint64,
-        ct.c_uint64,
-        ct.c_bool,
-        ct.c_uint64,
-        ct.c_uint64]
-
-    st_Track_particles_line_cuda = sixtracklib.st_Track_particles_line_cuda
-    st_Track_particles_line_cuda.restype = ct.c_int32
-    st_Track_particles_line_cuda.argtypes = [
-        ct.c_void_p, ct.c_void_p, ct.c_uint64, ct.c_uint64, ct.c_bool]
+#if SIXTRACKLIB_MODULES.get('cuda', False):
+    
 
 # -----------------------------------------------------------------------------
 # Cl-Context methods
