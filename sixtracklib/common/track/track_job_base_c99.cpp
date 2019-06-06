@@ -221,6 +221,57 @@ bool NS(TrackJobNew_requires_collecting)(
 
 /* ------------------------------------------------------------------------- */
 
+bool NS(TrackJobNew_can_fetch_particle_addresses)(
+    const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
+{
+    return ( ( job != nullptr ) && ( job->canFetchParticleAddresses() ) );
+}
+    
+bool NS(TrackJobNew_has_particle_addresses)(
+    const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
+{
+    return ( ( job != nullptr ) && ( job->hasParticleAddresses() ) );
+}
+
+::NS(arch_status_t) NS(TrackJobNew_fetch_particle_addresses)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) 
+        ? job->fetchParticleAddresses() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+        
+::NS(arch_status_t) NS(TrackJobNew_clear_particle_addresses)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const particle_set_index )
+{
+    return ( job != nullptr ) 
+        ? job->clearParticleAddresses( particle_set_index ) 
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+        
+::NS(arch_status_t) NS(TrackJobNew_clear_all_particle_addresses)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) 
+        ? job->clearAllParticleAddresses() 
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+    
+::NS(ParticlesAddr) const* NS(TrackJobNew_get_particle_addresses)(
+    const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const particle_set_index )
+{
+    return ( job != nullptr ) ? job->particleAddresses() : nullptr;
+}
+
+::NS(Buffer) const* NS(TrackJobNew_get_ptr_particle_addresses_buffer)(
+    const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->ptrCParticleAddressesBuffer() : nullptr;
+}
+
+/* ------------------------------------------------------------------------- */
+
 bool NS(TrackJobNew_is_in_debug_mode)(
     const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {

@@ -9,6 +9,7 @@
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 struct NS(ElemByElemConfig);
+struct NS(ParticlesAddr);
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 extern "C" {
@@ -134,6 +135,38 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobNew_set_collect_flags)(
     NS(track_job_collect_flag_t) const flag );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_requires_collecting)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool 
+NS(TrackJobNew_can_fetch_particle_addresses)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job );
+    
+SIXTRL_EXTERN SIXTRL_HOST_FN bool 
+NS(TrackJobNew_has_particle_addresses)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+NS(TrackJobNew_fetch_particle_addresses)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
+        
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+NS(TrackJobNew_clear_particle_addresses)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const particle_set_index );
+        
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+NS(TrackJobNew_clear_all_particle_addresses)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
+    
+SIXTRL_EXTERN SIXTRL_HOST_FN struct NS(ParticlesAddr) const* 
+NS(TrackJobNew_get_particle_addresses)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const particle_set_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer) const* 
+NS(TrackJobNew_get_ptr_particle_addresses_buffer)(
     const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job );
 
 /* ------------------------------------------------------------------------- */

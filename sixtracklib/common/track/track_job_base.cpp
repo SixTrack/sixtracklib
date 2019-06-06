@@ -19,6 +19,7 @@
     #include "sixtracklib/common/buffer.hpp"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/particles/definitions.h"
+    #include "sixtracklib/common/particles/particles_addr.h"
     #include "sixtracklib/common/particles/particles_addr.hpp"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/output/output_buffer.h"
@@ -197,9 +198,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
     TrackJobBaseNew::status_t TrackJobBaseNew::fetchParticleAddresses()
     {
-        TrackJobBaseNew::status_t const status =
-            this->doFetchParticleAddresses();
+        TrackJobBaseNew::status_t status = this->doFetchParticleAddresses();
 
+        if( ( status == st::ARCH_STATUS_SUCCESS ) && 
+            ( this->requiresCollecting() ) )
+        {
+            status = this->collectParticlesAddresses();
+        }
+        
         if( status == st::ARCH_STATUS_SUCCESS )
         {
             this->doSetHasParticleAddressesFlag( true );
@@ -207,12 +213,28 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return status;
     }
+    
+    TrackJobBaseNew::status_t TrackJobBaseNew::clearParticleAddresses(
+        TrackJobBaseNew::size_type const index )
+    {
+        return this->doClearParticleAddresses( index );
+    }
+    
+    TrackJobBaseNew::status_t TrackJobBaseNew::clearAllParticleAddresses()
+    {
+        return this->doClearAllParticleAddresses();      
+    }
 
+    bool TrackJobBaseNew::canFetchParticleAddresses() const SIXTRL_NOEXCEPT
+    {
+        return ( this->doGetPtrParticlesAddrBuffer() != nullptr );
+    }
+    
     bool TrackJobBaseNew::hasParticleAddresses() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT( ( !this->m_has_particle_addresses ) ||
             ( ( this->m_has_particle_addresses ) &&
-              ( this->doGetPtrParticlesAddrBuffer() == nullptr ) ) );
+              ( this->canFetchParticleAddresses() ) ) );
 
         return this->m_has_particle_addresses;
     }
@@ -233,6 +255,20 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return ptr_paddr;
+    }
+    
+    TrackJobBaseNew::buffer_t const* 
+    TrackJobBaseNew::ptrParticleAddressesBuffer() const SIXTRL_NOEXCEPT
+    {
+        return this->doGetPtrParticlesAddrBuffer();
+    }
+
+    TrackJobBaseNew::c_buffer_t const* 
+    TrackJobBaseNew::ptrCParticleAddressesBuffer() const SIXTRL_NOEXCEPT
+    {
+        return ( this->doGetPtrParticlesAddrBuffer() != nullptr )
+            ? this->doGetPtrParticlesAddrBuffer()->getCApiPtr() 
+            : nullptr;
     }
 
     /* --------------------------------------------------------------------- */
@@ -2093,6 +2129,42 @@ namespace SIXTRL_CXX_NAMESPACE
     TrackJobBaseNew::status_t TrackJobBaseNew::doFetchParticleAddresses()
     {
         return st::ARCH_STATUS_GENERAL_FAILURE;
+    }
+    
+    TrackJobBaseNew::status_t TrackJobBaseNew::doClearParticleAddresses( 
+        TrackJobBaseNew::size_type const index )
+    {
+        using status_t = TrackJobBaseNew::status_t;
+        
+        status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        
+        if( ( this->doGetPtrParticlesAddrBuffer() != nullptr ) &&
+            ( this->doGetPtrParticlesAddrBuffer()->getNumObjects() > index ) )
+        {
+            status = ::NS(ParticlesAddr_buffer_clear_single)(
+                this->doGetPtrParticlesAddrBuffer()->getCApiPtr(), index );
+            
+            this->doSetHasParticleAddressesFlag( false );
+        }
+      
+        return status;
+    }
+    
+    TrackJobBaseNew::status_t TrackJobBaseNew::doClearAllParticleAddresses()
+    {
+        using status_t = TrackJobBaseNew::status_t;
+        
+        status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        
+        if( this->doGetPtrParticlesAddrBuffer() != nullptr )
+        {
+            status = ::NS(ParticlesAddr_buffer_clear_all)(
+                this->doGetPtrParticlesAddrBuffer()->getCApiPtr() );
+            
+            this->doSetHasParticleAddressesFlag( false );
+        }
+      
+        return status;
     }
 
     TrackJobBaseNew::track_status_t

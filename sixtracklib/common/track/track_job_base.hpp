@@ -114,13 +114,26 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN status_t fetchParticleAddresses();
-
+        SIXTRL_HOST_FN bool canFetchParticleAddresses() const SIXTRL_NOEXCEPT;
+    
         SIXTRL_HOST_FN bool hasParticleAddresses() const SIXTRL_NOEXCEPT;
+        
+        SIXTRL_HOST_FN status_t fetchParticleAddresses();
+        
+        SIXTRL_HOST_FN status_t clearParticleAddresses(
+            size_type const index = size_type{ 0 } );
+        
+        SIXTRL_HOST_FN status_t clearAllParticleAddresses();
 
         SIXTRL_HOST_FN particles_addr_t const* particleAddresses(
             size_type const index = size_type{ 0 } ) const SIXTRL_NOEXCEPT;
+            
+        SIXTRL_HOST_FN buffer_t const* 
+        ptrParticleAddressesBuffer() const SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN c_buffer_t const* 
+        ptrCParticleAddressesBuffer() const SIXTRL_NOEXCEPT;
+        
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN track_status_t trackUntil(
@@ -473,7 +486,12 @@ namespace SIXTRL_CXX_NAMESPACE
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN virtual status_t doFetchParticleAddresses();
+        
+        SIXTRL_HOST_FN virtual status_t doClearParticleAddresses( 
+            size_type const index );
 
+        SIXTRL_HOST_FN virtual status_t doClearAllParticleAddresses();
+        
         SIXTRL_HOST_FN virtual track_status_t doTrackUntilTurn(
             size_type const until_turn );
 
