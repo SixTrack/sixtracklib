@@ -21,7 +21,7 @@ namespace st = SIXTRL_CXX_NAMESPACE;
     return st::CudaTrackJob::NumAvailableNodes();
 }
 
-::NS(ctrl_size_t) NS(CudaTrackJob_get_num_available_node_ids_list)(
+::NS(ctrl_size_t) NS(CudaTrackJob_get_available_node_ids_list)(
     ::NS(ctrl_size_t)  const max_num_node_ids,
     ::NS(NodeId)* SIXTRL_RESTRICT node_ids_begin )
 {

@@ -28,7 +28,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t)
 NS(CudaTrackJob_get_num_available_nodes)( void );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_size_t)
-NS(CudaTrackJob_get_num_available_node_ids_list)(
+NS(CudaTrackJob_get_available_node_ids_list)(
     ::NS(ctrl_size_t)  const max_num_node_ids,
     ::NS(NodeId)* SIXTRL_RESTRICT node_ids_begin );
 
