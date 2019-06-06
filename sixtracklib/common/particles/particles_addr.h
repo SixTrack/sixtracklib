@@ -203,6 +203,17 @@ NS(ParticlesAddr_buffer_get_particle_addr)(
 
 /* ------------------------------------------------------------------------ */
 
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) 
+NS(ParticlesAddr_buffer_clear_single)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT paddr_buffer, 
+    NS(buffer_size_t) const index );
+
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) 
+NS(ParticlesAddr_buffer_clear_all)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT paddr_buffer );
+
+/* ------------------------------------------------------------------------ */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
@@ -998,6 +1009,62 @@ NS(ParticlesAddr_buffer_get_particle_addr)(
     return ( SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesAddr)*
         )NS(ParticlesAddr_buffer_get_const_particle_addr)( buffer, index );
 }
+
+/* ------------------------------------------------------------------------ */
+
+SIXTRL_INLINE NS(arch_status_t) NS(ParticlesAddr_buffer_clear_single)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT paddr_buffer, 
+    NS(buffer_size_t) const index )
+{
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+    
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)* particles_addr = 
+        NS(ParticlesAddr_buffer_get_particle_addr)( paddr_buffer, index );
+        
+    if( particles_addr != SIXTRL_NULLPTR )
+    {
+        NS(ParticlesAddr_clear)( particles_addr );
+        status = SIXTRL_ARCH_STATUS_SUCCESS;
+    }
+    
+    return status;
+}
+
+SIXTRL_INLINE NS(arch_status_t) NS(ParticlesAddr_buffer_clear_all)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT paddr_buffer )
+{
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+    NS(buffer_size_t) const num_objects = 
+        NS(Buffer_get_num_of_objects)( paddr_buffer );
+        
+    if( num_objects > ( NS(buffer_size_t) )0u )
+    {
+        NS(buffer_size_t) ii = ( NS(buffer_size_t) )0u;
+        NS(buffer_size_t) num_cleared_objs = ( NS(buffer_size_t) )0u;
+    
+        for( ; ii < num_objects ; ++ii )
+        {
+            SIXTRL_PARTICLE_ARGPTR_DEC NS(ParticlesAddr)* particles_addr = 
+                NS(ParticlesAddr_buffer_get_particle_addr)( 
+                    paddr_buffer, ii );
+                
+            if( particles_addr != SIXTRL_NULLPTR )
+            {
+                NS(ParticlesAddr_clear)( particles_addr );
+                ++num_cleared_objs;
+            }
+        }
+        
+        if( num_cleared_objs > ( NS(buffer_size_t) )0u )
+        {
+            status = SIXTRL_ARCH_STATUS_SUCCESS;
+        }
+    }
+    
+    return status;
+}
+
+/* ----------------------------------------------------------------------- */
 
 SIXTRL_INLINE bool NS(ParticlesAddr_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
