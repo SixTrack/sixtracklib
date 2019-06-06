@@ -145,7 +145,7 @@ TEST( C99_CudaTrackJobTrackElemByElemTests,
     std::vector< node_id_t > avail_node_ids( num_avail_nodes );
 
     buf_size_t const num_nodes =
-        ::NS(CudaTrackJob_get_num_available_node_ids_list)(
+        ::NS(CudaTrackJob_get_available_node_ids_list)(
             avail_node_ids.size(), avail_node_ids.data() );
 
     ASSERT_TRUE( num_nodes == num_avail_nodes );
