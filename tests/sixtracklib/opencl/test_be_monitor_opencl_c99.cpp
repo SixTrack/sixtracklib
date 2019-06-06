@@ -472,7 +472,8 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
             particles, &elem_by_elem_config, eb, NUM_TURNS );
 
     ASSERT_TRUE( ret == 0 );
-    ASSERT_TRUE( ::st_Particles_copy( final_state, particles ) );
+    ASSERT_TRUE( ::st_Particles_copy( final_state, particles ) ==
+            ::NS(ARCH_STATUS_SUCCESS) );
 
     ::st_Buffer_delete( pb );
     particles = nullptr;
@@ -916,11 +917,17 @@ namespace sixtrack
                 }
             }
 
-            if( success ) success = ::st_Particles_copy(
-                ::st_Particles_buffer_get_particles( pb, 0u ), initial_state );
+            if( success )
+            {
+                success = ( ::NS(ARCH_STATUS_SUCCESS) == ::st_Particles_copy(
+                    ::st_Particles_buffer_get_particles( pb, 0u ),
+                         initial_state ) );
+            }
 
-            if( success ) success =
-                    ::st_ClArgument_write( particles_buffer_arg, pb );
+            if( success )
+            {
+                success = ::st_ClArgument_write( particles_buffer_arg, pb );
+            }
 
             /* ------------------------------------------------------------- */
             /* Now assign the out_buffer buffer to the beam monitors */
@@ -1107,8 +1114,8 @@ namespace sixtrack
                                 ::st_Particles_get_num_of_particles(
                                     elem_by_elem_particles ) );
 
-                            success &= ( ::st_Particles_copy_single(
-                                particles, ll,
+                            success &= ( ::NS(ARCH_STATUS_SUCCESS) ==
+                                ::st_Particles_copy_single( particles, ll,
                                 elem_by_elem_particles, elem_by_elem_index ) );
 
                             if( !success ) break;
@@ -1120,8 +1127,8 @@ namespace sixtrack
                             success &= ( stored_particle_id >=
                                 num_elem_t{ 0 } );
 
-                            success &= ( ::st_Particles_copy_single(
-                                cmp_particles, ll,
+                            success &= ( ::NS(ARCH_STATUS_SUCCESS) ==
+                                ::st_Particles_copy_single( cmp_particles, ll,
                                 out_particles, stored_particle_id ) );
 
                             if( !success ) break;
