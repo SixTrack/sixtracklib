@@ -89,6 +89,117 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 }
 
+
+bool NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
+    const ::NS(ParticlesAddr) *const SIXTRL_RESTRICT particles_addr, 
+    const ::NS(Particles) *const SIXTRL_RESTRICT particles, 
+    NS(buffer_size_t) slot_size )
+{
+    bool is_consistent = false;
+    
+    using address_t  = ::NS(buffer_addr_t);
+    using buf_size_t = ::NS(buffer_size_t);
+    
+    if( slot_size == ::NS(buffer_size_t){ 0 } )
+    {
+        slot_size = ::NS(BUFFER_DEFAULT_SLOT_SIZE);
+    }
+                
+    if( ( particles_addr != nullptr ) && ( particles != nullptr ) &&
+        ( ::NS(Particles_get_num_of_particles)( particles ) ==
+          particles_addr->num_particles ) ) 
+    {
+        is_consistent = true;
+        
+        if( particles_addr->num_particles > 
+            ::NS(particle_num_elements_t){ 0 } )
+        {
+            buf_size_t const real_size  = sizeof( ::NS(particle_real_t) );
+            buf_size_t const index_size = sizeof( ::NS(particle_index_t) );
+            
+             address_t const real_offset = static_cast< address_t >(
+             ::NS(ManagedBuffer_get_slot_based_length)( 
+                 real_size * particles_addr->num_particles, slot_size ) );
+             
+             address_t const index_offset = static_cast< address_t >(
+             ::NS(ManagedBuffer_get_slot_based_length)( 
+                 index_size * particles_addr->num_particles, slot_size ) );
+             
+             is_consistent &= ( real_offset  > address_t{ 0 } );
+             is_consistent &= ( index_offset > address_t{ 0 } );
+             
+             is_consistent &= ( particles_addr->q0_addr != address_t{ 0 } );
+
+             is_consistent &= ( particles_addr->mass0_addr >=
+                                ( particles_addr->q0_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->beta0_addr >=
+                                ( particles_addr->mass0_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->gamma0_addr >=
+                                ( particles_addr->beta0_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->p0c_addr >=
+                                ( particles_addr->gamma0_addr + 
+                                  real_offset ) );
+
+             is_consistent &= ( particles_addr->s_addr >=
+                                ( particles_addr->p0c_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->x_addr >=
+                                ( particles_addr->s_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->y_addr >=
+                                ( particles_addr->x_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->px_addr >=
+                                ( particles_addr->y_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->py_addr >=
+                                ( particles_addr->px_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->zeta_addr >=
+                                ( particles_addr->py_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->psigma_addr >=
+                                ( particles_addr->zeta_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->delta_addr >=
+                                ( particles_addr->psigma_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->rpp_addr >=
+                                ( particles_addr->delta_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->rvv_addr >=
+                                ( particles_addr->rpp_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->chi_addr >=
+                                ( particles_addr->rvv_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->charge_ratio_addr >=
+                                ( particles_addr->chi_addr + real_offset ) );
+
+             is_consistent &= ( particles_addr->particle_id_addr >=
+                                ( particles_addr->charge_ratio_addr + 
+                                real_offset ) );
+
+             is_consistent &= ( particles_addr->at_element_id_addr >=
+                                ( particles_addr->particle_id_addr + 
+                                  index_offset ) );
+
+             is_consistent &= ( particles_addr->at_turn_addr >=
+                                ( particles_addr->at_element_id_addr + 
+                                  index_offset ) );
+
+             is_consistent &= ( particles_addr->state_addr >=
+                                ( particles_addr->at_turn_addr + 
+                                  index_offset ) );
+        }
+    }
+    
+    return is_consistent;
+}
+
 ::NS(arch_status_t) NS(TestParticlesAddr_prepare_buffers)(
     ::NS(Buffer)* SIXTRL_RESTRICT paddr_buffer,
     ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,

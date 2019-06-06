@@ -13,6 +13,9 @@
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
 #endif /* C++ */
+    
+struct NS(ParticlesAddr);
+struct NS(Particles);
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TestParticlesAddr_prepare_buffers)(
@@ -23,6 +26,12 @@ NS(TestParticlesAddr_prepare_buffers)(
     NS(buffer_size_t) const max_num_particles,
     double const probablity_for_non_particles,
     NS(buffer_size_t) const initial_seed_value );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool 
+NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
+    const struct NS(ParticlesAddr) *const SIXTRL_RESTRICT particles_addr, 
+    const struct NS(Particles) *const SIXTRL_RESTRICT particles, 
+    NS(buffer_size_t) slot_size );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TestParticlesAddr_verify_structure)(
