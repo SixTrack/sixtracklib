@@ -255,9 +255,11 @@ class Elements(object):
         return cls(cbuffer=cbuffer)
 
     @classmethod
-    def fromline(cls, line):
+    def fromline(cls, line, exact_drift=False):
         self = cls()
         for label, element_name, element in line:
+            if exact_drift and element_name == 'Drift':
+                element_name = 'DriftExact'
             getattr(self, element_name)(**element._asdict())
         return self
 
@@ -288,9 +290,9 @@ class Elements(object):
         return self.cbuffer.get_object(objid)
 
     @classmethod
-    def from_mad(cls, seq):
+    def from_mad(cls, seq, exact_drift=False):
         line = madseq_to_line(seq)
-        return cls.fromline(line)
+        return cls.fromline(line, exact_drift=exact_drift)
 
     # @classmethod
     # def from_mad2(cls, seq):
