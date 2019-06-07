@@ -316,7 +316,7 @@ bool NS(Controller_has_selected_node)(
              ( ptr_nodes_ctrl->hasSelectedNode() ) );
 }
 
-::NS(arch_size_t) NS(Controller_get_selected_node_index)(
+::NS(node_index_t) NS(Controller_get_selected_node_index)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );

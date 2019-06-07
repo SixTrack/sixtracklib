@@ -184,7 +184,7 @@ NS(Controller_get_ptr_node_info_base)(
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_has_selected_node)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(node_index_t)
 NS(Controller_get_selected_node_index)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl );
 
