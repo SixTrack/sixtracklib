@@ -124,18 +124,18 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        SIXTRL_HOST_FN bool setNumWorkItems(
+        SIXTRL_HOST_FN status_t setNumWorkItems(
             size_type const work_items_a ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool setNumWorkItems(
+        SIXTRL_HOST_FN status_t setNumWorkItems(
             size_type const work_items_a,
             size_type const work_items_b ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool setNumWorkItems(
+        SIXTRL_HOST_FN status_t setNumWorkItems(
             size_type const work_items_a, size_type const work_items_b,
                 size_type const work_item_c ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool setNumWorkItems(
+        SIXTRL_HOST_FN status_t setNumWorkItems(
             size_type const work_items_dim,
             size_type const* SIXTRL_RESTRICT work_itms_begin ) SIXTRL_NOEXCEPT;
 
@@ -155,18 +155,18 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        SIXTRL_HOST_FN bool setWorkItemOffset(
+        SIXTRL_HOST_FN status_t setWorkItemOffset(
             size_type const offset_a ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool setWorkItemOffset(
+        SIXTRL_HOST_FN status_t setWorkItemOffset(
             size_type const offset_a,
             size_type const offset_b ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool setWorkItemOffset(
+        SIXTRL_HOST_FN status_t setWorkItemOffset(
             size_type const offset_a, size_type const offset_b,
                 size_type const offset_c ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool setWorkItemOffset(
+        SIXTRL_HOST_FN status_t setWorkItemOffset(
             size_type const offset_dim,
             size_type const* SIXTRL_RESTRICT offsets_begin ) SIXTRL_NOEXCEPT;
 
@@ -188,17 +188,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        SIXTRL_HOST_FN bool setWorkGroupSizes(
+        SIXTRL_HOST_FN status_t setWorkGroupSizes(
             size_type const work_groups_a ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool setWorkGroupSizes( size_type const work_groups_a,
+        SIXTRL_HOST_FN status_t setWorkGroupSizes( size_type const work_groups_a,
                 size_type const  work_groups_b ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool setWorkGroupSizes(
+        SIXTRL_HOST_FN status_t setWorkGroupSizes(
             size_type const work_groups_a, size_type const work_groups_b,
                 size_type const work_groups_c ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool setWorkGroupSizes( size_type const work_groups_dim,
+        SIXTRL_HOST_FN status_t setWorkGroupSizes( size_type const work_groups_dim,
             size_type const* SIXTRL_RESTRICT work_grps_begin ) SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
@@ -220,18 +220,18 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        SIXTRL_HOST_FN bool setPreferredWorkGroupMultiple(
+        SIXTRL_HOST_FN status_t setPreferredWorkGroupMultiple(
             size_type const work_groups_a ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool setPreferredWorkGroupMultiple(
+        SIXTRL_HOST_FN status_t setPreferredWorkGroupMultiple(
             size_type const work_groups_a,
             size_type const work_groups_b ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool setPreferredWorkGroupMultiple(
+        SIXTRL_HOST_FN status_t setPreferredWorkGroupMultiple(
             size_type const work_groups_a, size_type const work_groups_b,
                 size_type const work_groups_c ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool setPreferredWorkGroupMultiple(
+        SIXTRL_HOST_FN status_t setPreferredWorkGroupMultiple(
             size_type const work_groups_dim,
             size_type const* SIXTRL_RESTRICT pref_work_groups_multiple
         ) SIXTRL_NOEXCEPT;
@@ -244,7 +244,7 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type work_groups_dim );
 
         SIXTRL_HOST_FN bool needsUpdate() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN bool update();
+        SIXTRL_HOST_FN status_t update();
 
         /* ----------------------------------------------------------------- */
 
@@ -274,7 +274,7 @@ namespace SIXTRL_CXX_NAMESPACE
         virtual void doReset( size_type work_items_dim,
             size_type work_groups_dim );
 
-        virtual bool doUpdate();
+        virtual status_t doUpdate();
 
         virtual void doClear();
 

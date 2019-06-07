@@ -145,39 +145,43 @@ void NS(KernelConfig_set_num_arguments)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-bool NS(KernelConfig_set_num_work_items_1d)(
+::NS(ctrl_status_t) NS(KernelConfig_set_num_work_items_1d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_items_a )
 {
-    return ( ( conf != nullptr ) &&
-             ( conf->setNumWorkItems( work_items_a ) ) );
+    return ( conf != nullptr )
+        ? conf->setNumWorkItems( work_items_a )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(KernelConfig_set_num_work_items_2d)(
+::NS(ctrl_status_t) NS(KernelConfig_set_num_work_items_2d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_items_a,
     ::NS(ctrl_size_t) const work_items_b )
 {
-    return ( ( conf != nullptr ) &&
-             ( conf->setNumWorkItems( work_items_a, work_items_b ) ) );
+    return ( conf != nullptr )
+        ? conf->setNumWorkItems( work_items_a, work_items_b )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(KernelConfig_set_num_work_items_3d)(
+::NS(ctrl_status_t) NS(KernelConfig_set_num_work_items_3d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_items_a, ::NS(ctrl_size_t) const work_items_b,
     ::NS(ctrl_size_t) const work_items_c )
 {
-    return ( ( conf != nullptr ) && ( conf->setNumWorkItems(
-        work_items_a, work_items_b, work_items_c ) ) );
+    return ( conf != nullptr )
+        ? conf->setNumWorkItems( work_items_a, work_items_b, work_items_c )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(KernelConfig_set_num_work_items)(
+::NS(ctrl_status_t) NS(KernelConfig_set_num_work_items)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_items_dim,
     ::NS(ctrl_size_t) const* SIXTRL_RESTRICT work_itms_begin )
 {
-    return ( ( conf != nullptr ) &&
-             ( conf->setNumWorkItems( work_items_dim, work_itms_begin ) ) );
+    return ( conf != nullptr )
+        ? conf->setNumWorkItems( work_items_dim, work_itms_begin )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -216,38 +220,43 @@ bool NS(KernelConfig_set_num_work_items)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-bool NS(KernelConfig_set_work_item_offset_1d)(
+::NS(ctrl_status_t) NS(KernelConfig_set_work_item_offset_1d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const offset_a )
 {
-    return ( ( conf != nullptr ) && ( conf->setWorkItemOffset( offset_a ) ) );
+    return ( conf != nullptr )
+        ? conf->setWorkItemOffset( offset_a )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(KernelConfig_set_work_item_offset_2d)(
+::NS(ctrl_status_t) NS(KernelConfig_set_work_item_offset_2d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const offset_a,
     ::NS(ctrl_size_t) const offset_b )
 {
-    return ( ( conf != nullptr ) &&
-             ( conf->setWorkItemOffset( offset_a, offset_b ) ) );
+    return ( conf != nullptr )
+        ? conf->setWorkItemOffset( offset_a, offset_b )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(KernelConfig_set_work_item_offset_3d)(
+::NS(ctrl_status_t) NS(KernelConfig_set_work_item_offset_3d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const offset_a, ::NS(ctrl_size_t) const offset_b,
     ::NS(ctrl_size_t) const offset_c )
 {
-    return ( ( conf != nullptr ) &&
-             ( conf->setWorkItemOffset( offset_a, offset_b, offset_c ) ) );
+    return ( conf != nullptr )
+        ? conf->setWorkItemOffset( offset_a, offset_b, offset_c )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(KernelConfig_set_work_item_offset)(
+::NS(ctrl_status_t) NS(KernelConfig_set_work_item_offset)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const offset_dim,
     ::NS(ctrl_size_t) const* SIXTRL_RESTRICT offsets_begin )
 {
-    return ( ( conf != nullptr ) && ( conf->setWorkItemOffset(
-        offset_dim, offsets_begin ) ) );
+    return ( conf != nullptr )
+        ? conf->setWorkItemOffset( offset_dim, offsets_begin )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -293,40 +302,44 @@ bool NS(KernelConfig_set_work_item_offset)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-bool NS(KernelConfig_set_work_group_sizes_1d)(
+::NS(ctrl_status_t) NS(KernelConfig_set_work_group_sizes_1d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_groups_a )
 {
-    return ( ( conf != nullptr ) &&
-             ( conf->setWorkGroupSizes( work_groups_a ) ) );
+    return ( conf != nullptr )
+        ? conf->setWorkGroupSizes( work_groups_a )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(KernelConfig_set_work_group_sizes_2d)(
+::NS(ctrl_status_t) NS(KernelConfig_set_work_group_sizes_2d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_groups_a,
     ::NS(ctrl_size_t) const work_groups_b )
 {
-    return ( ( conf != nullptr ) &&
-             ( conf->setWorkGroupSizes( work_groups_a, work_groups_b ) ) );
+    return ( conf != nullptr )
+        ? conf->setWorkGroupSizes( work_groups_a, work_groups_b )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(KernelConfig_set_work_group_sizes_3d)(
+::NS(ctrl_status_t) NS(KernelConfig_set_work_group_sizes_3d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_groups_a,
     ::NS(ctrl_size_t) const work_groups_b,
     ::NS(ctrl_size_t) const work_groups_c )
 {
-    return ( ( conf != nullptr ) && ( conf->setWorkGroupSizes(
-        work_groups_a, work_groups_b, work_groups_c ) ) );
+    return ( conf != nullptr )
+        ? conf->setWorkGroupSizes( work_groups_a, work_groups_b, work_groups_c )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(KernelConfig_set_work_group_sizes)(
+::NS(ctrl_status_t) NS(KernelConfig_set_work_group_sizes)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_groups_dim,
     ::NS(ctrl_size_t) const* SIXTRL_RESTRICT work_grps_begin )
 {
-    return ( ( conf != nullptr ) && ( conf->setWorkGroupSizes(
-        work_groups_dim, work_grps_begin ) ) );
+    return ( conf != nullptr )
+        ? conf->setWorkGroupSizes( work_groups_dim, work_grps_begin )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -371,42 +384,46 @@ NS(KernelConfig_get_const_preferred_work_group_multiples_end)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-bool NS(KernelConfig_set_preferred_work_group_multiple_1d)(
+::NS(ctrl_status_t) NS(KernelConfig_set_preferred_work_group_multiple_1d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_groups_a )
 {
     return ( ( conf != nullptr ) &&
-        ( conf->setPreferredWorkGroupMultiple( work_groups_a ) ) );
+        ? conf->setPreferredWorkGroupMultiple( work_groups_a )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(KernelConfig_set_preferred_work_group_multiple_2d)(
+::NS(ctrl_status_t) NS(KernelConfig_set_preferred_work_group_multiple_2d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_groups_a,
     ::NS(ctrl_size_t) const work_groups_b )
 {
-    return ( ( conf != nullptr ) && ( conf->setPreferredWorkGroupMultiple(
-               work_groups_a, work_groups_b ) ) );
+    return ( conf != nullptr )
+        ? conf->setPreferredWorkGroupMultiple( work_groups_a, work_groups_b )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(KernelConfig_set_preferred_work_group_multiple_3d)(
+::NS(ctrl_status_t) NS(KernelConfig_set_preferred_work_group_multiple_3d)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_groups_a,
     ::NS(ctrl_size_t) const work_groups_b,
     ::NS(ctrl_size_t) const work_groups_c )
 {
-    return ( ( conf != nullptr ) &&
-             ( conf->setPreferredWorkGroupMultiple(
-                work_groups_a, work_groups_b, work_groups_c ) ) );
+    return ( conf != nullptr )
+        ? conf->setPreferredWorkGroupMultiple(
+                work_groups_a, work_groups_b, work_groups_c )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
-bool NS(KernelConfig_set_preferred_work_group_multiple)(
+::NS(ctrl_status_t) NS(KernelConfig_set_preferred_work_group_multiple)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_groups_dim,
     ::NS(ctrl_size_t) const* SIXTRL_RESTRICT pref_work_groups_multiple )
 {
-    return ( ( conf != nullptr ) &&
-             ( conf->setPreferredWorkGroupMultiple(
-                work_groups_dim, pref_work_groups_multiple ) ) );
+    return ( conf != nullptr )
+        ? conf->setPreferredWorkGroupMultiple(
+                work_groups_dim, pref_work_groups_multiple )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -428,10 +445,11 @@ bool NS(KernelConfig_needs_update)(
     return ( ( conf != nullptr ) && ( conf->needsUpdate() ) );
 }
 
-bool NS(KernelConfig_update)(
+::NS(ctrl_status_t) NS(KernelConfig_update)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf )
 {
-    return ( ( conf != nullptr ) && ( conf->update() ) );
+    return ( conf != nullptr )
+        ? conf->update() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 /* ------------------------------------------------------------------------- */

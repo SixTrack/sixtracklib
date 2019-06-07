@@ -102,22 +102,26 @@ NS(KernelConfig_get_work_items_end)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_set_num_work_items_1d)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
+NS(KernelConfig_set_num_work_items_1d)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const work_items_a );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_set_num_work_items_2d)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
+NS(KernelConfig_set_num_work_items_2d)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const work_items_a,
     NS(ctrl_size_t) const work_items_b );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_set_num_work_items_3d)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
+NS(KernelConfig_set_num_work_items_3d)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const work_items_a,
     NS(ctrl_size_t) const work_items_b,
     NS(ctrl_size_t) const work_item_c );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_set_num_work_items)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
+NS(KernelConfig_set_num_work_items)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const work_items_dim,
     NS(ctrl_size_t) const* SIXTRL_RESTRICT work_itms_begin );
@@ -147,22 +151,26 @@ NS(KernelConfig_work_item_offsets_end)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_set_work_item_offset_1d)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
+NS(KernelConfig_set_work_item_offset_1d)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const offset_a );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_set_work_item_offset_2d)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
+NS(KernelConfig_set_work_item_offset_2d)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const offset_a,
     NS(ctrl_size_t) const offset_b );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_set_work_item_offset_3d)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
+NS(KernelConfig_set_work_item_offset_3d)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const offset_a,
     NS(ctrl_size_t) const offset_b,
     NS(ctrl_size_t) const offset_c );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_set_work_item_offset)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
+NS(KernelConfig_set_work_item_offset)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const offset_dim,
     NS(ctrl_size_t) const* SIXTRL_RESTRICT offsets_begin );
@@ -196,22 +204,26 @@ NS(KernelConfig_work_group_sizes_end)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_set_work_group_sizes_1d)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
+NS(KernelConfig_set_work_group_sizes_1d)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const work_groups_a );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_set_work_group_sizes_2d)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
+NS(KernelConfig_set_work_group_sizes_2d)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const work_groups_a,
     NS(ctrl_size_t) const work_groups_b );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_set_work_group_sizes_3d)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
+NS(KernelConfig_set_work_group_sizes_3d)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const work_groups_a,
     NS(ctrl_size_t) const work_groups_b,
     NS(ctrl_size_t) const work_groups_c );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_set_work_group_sizes)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
+NS(KernelConfig_set_work_group_sizes)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const work_groups_dim,
     NS(ctrl_size_t) const* SIXTRL_RESTRICT work_grps_begin );
@@ -241,25 +253,25 @@ NS(KernelConfig_get_preferred_work_group_multiples_end)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(KernelConfig_set_preferred_work_group_multiple_1d)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const work_groups_a );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(KernelConfig_set_preferred_work_group_multiple_2d)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const work_groups_a,
     NS(ctrl_size_t) const work_groups_b );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(KernelConfig_set_preferred_work_group_multiple_3d)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const work_groups_a,
     NS(ctrl_size_t) const work_groups_b,
     NS(ctrl_size_t) const work_groups_c );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t)
 NS(KernelConfig_set_preferred_work_group_multiple)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config,
     NS(ctrl_size_t) const work_groups_dim,
@@ -278,7 +290,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(KernelConfig_reset)(
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_needs_update)(
     const NS(KernelConfigBase) *const SIXTRL_RESTRICT config );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_update)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_status_t) NS(KernelConfig_update)(
     NS(KernelConfigBase)* SIXTRL_RESTRICT config );
 
 /* ------------------------------------------------------------------------- */

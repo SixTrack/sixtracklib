@@ -169,7 +169,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    bool CudaKernelConfig::doUpdate()
+    CudaKernelConfig::status_t CudaKernelConfig::doUpdate()
     {
         bool success = false;
 
@@ -228,7 +228,8 @@ namespace SIXTRL_CXX_NAMESPACE
             }
         }
 
-        return success;
+        return ( success )
+            ? st::ARCH_STATUS_SUCCESS : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     CudaKernelConfig::size_type

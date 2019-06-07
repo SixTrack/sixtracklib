@@ -231,7 +231,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    bool KernelConfigBase::setNumWorkItems(
+    KernelConfigBase::status_t KernelConfigBase::setNumWorkItems(
         KernelConfigBase::size_type const work_items_a ) SIXTRL_NOEXCEPT
     {
         using size_t = KernelConfigBase::size_type;
@@ -240,13 +240,13 @@ namespace SIXTRL_CXX_NAMESPACE
             ( work_items_a > size_t{ 0 } ) )
         {
             this->m_work_items[ 0 ] = work_items_a;
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool KernelConfigBase::setNumWorkItems(
+    KernelConfigBase::status_t KernelConfigBase::setNumWorkItems(
         KernelConfigBase::size_type const work_items_a,
         KernelConfigBase::size_type const work_items_b ) SIXTRL_NOEXCEPT
     {
@@ -257,13 +257,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             this->m_work_items[ 0 ] = work_items_a;
             this->m_work_items[ 1 ] = work_items_b;
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool KernelConfigBase::setNumWorkItems(
+    KernelConfigBase::status_t KernelConfigBase::setNumWorkItems(
         KernelConfigBase::size_type const work_items_a,
         KernelConfigBase::size_type const work_items_b,
         KernelConfigBase::size_type const work_items_c ) SIXTRL_NOEXCEPT
@@ -278,13 +278,13 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_work_items[ 0 ] = work_items_a;
             this->m_work_items[ 1 ] = work_items_b;
             this->m_work_items[ 2 ] = work_items_c;
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool KernelConfigBase::setNumWorkItems(
+    KernelConfigBase::status_t KernelConfigBase::setNumWorkItems(
         KernelConfigBase::size_type const work_items_dim,
         KernelConfigBase::size_type const*
             SIXTRL_RESTRICT work_items ) SIXTRL_NOEXCEPT
@@ -305,7 +305,7 @@ namespace SIXTRL_CXX_NAMESPACE
             return ( total_num > size_t{ 0 } );
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     /* --------------------------------------------------------------------- */
@@ -344,7 +344,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    bool KernelConfigBase::setWorkItemOffset(
+    KernelConfigBase::status_t KernelConfigBase::setWorkItemOffset(
         KernelConfigBase::size_type const offset_a ) SIXTRL_NOEXCEPT
     {
         using size_t = KernelConfigBase::size_type;
@@ -352,13 +352,13 @@ namespace SIXTRL_CXX_NAMESPACE
         if( this->workItemsDim() == size_t{ 1 } )
         {
             this->m_work_item_offsets[ 0 ] = offset_a;
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool KernelConfigBase::setWorkItemOffset(
+    KernelConfigBase::status_t KernelConfigBase::setWorkItemOffset(
         KernelConfigBase::size_type const offset_a,
         KernelConfigBase::size_type const offset_b ) SIXTRL_NOEXCEPT
     {
@@ -368,13 +368,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             this->m_work_item_offsets[ 0 ] = offset_a;
             this->m_work_item_offsets[ 1 ] = offset_b;
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool KernelConfigBase::setWorkItemOffset(
+    KernelConfigBase::status_t KernelConfigBase::setWorkItemOffset(
         KernelConfigBase::size_type const offset_a,
         KernelConfigBase::size_type const offset_b,
         KernelConfigBase::size_type const offset_c ) SIXTRL_NOEXCEPT
@@ -386,13 +386,13 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_work_item_offsets[ 0 ] = offset_a;
             this->m_work_item_offsets[ 1 ] = offset_b;
             this->m_work_item_offsets[ 2 ] = offset_c;
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool KernelConfigBase::setWorkItemOffset(
+    KernelConfigBase::status_t KernelConfigBase::setWorkItemOffset(
         KernelConfigBase::size_type const offsets_dim,
         KernelConfigBase::size_type const*
             SIXTRL_RESTRICT offsets_begin ) SIXTRL_NOEXCEPT
@@ -402,10 +402,10 @@ namespace SIXTRL_CXX_NAMESPACE
             std::copy( offsets_begin, offsets_begin + offsets_dim,
                        this->workItemOffsetsBegin() );
 
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     /* --------------------------------------------------------------------- */
@@ -452,7 +452,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    bool KernelConfigBase::setWorkGroupSizes(
+    KernelConfigBase::status_t KernelConfigBase::setWorkGroupSizes(
         KernelConfigBase::size_type const work_groups_a ) SIXTRL_NOEXCEPT
     {
         using size_t = KernelConfigBase::size_type;
@@ -461,13 +461,13 @@ namespace SIXTRL_CXX_NAMESPACE
             ( work_groups_a > size_t{ 0 } ) )
         {
             this->m_work_groups[ 0 ] = work_groups_a;
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool KernelConfigBase::setWorkGroupSizes(
+    KernelConfigBase::status_t KernelConfigBase::setWorkGroupSizes(
         KernelConfigBase::size_type const work_groups_a,
         KernelConfigBase::size_type const work_groups_b ) SIXTRL_NOEXCEPT
     {
@@ -478,13 +478,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             this->m_work_groups[ 0 ] = work_groups_a;
             this->m_work_groups[ 1 ] = work_groups_b;
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool KernelConfigBase::setWorkGroupSizes(
+    KernelConfigBase::status_t KernelConfigBase::setWorkGroupSizes(
         KernelConfigBase::size_type const work_groups_a,
         KernelConfigBase::size_type const work_groups_b,
         KernelConfigBase::size_type const work_groups_c ) SIXTRL_NOEXCEPT
@@ -499,13 +499,13 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_work_groups[ 0 ] = work_groups_a;
             this->m_work_groups[ 1 ] = work_groups_b;
             this->m_work_groups[ 2 ] = work_groups_c;
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool KernelConfigBase::setWorkGroupSizes(
+    KernelConfigBase::status_t KernelConfigBase::setWorkGroupSizes(
         KernelConfigBase::size_type const work_groups_dim,
         KernelConfigBase::size_type const*
             SIXTRL_RESTRICT work_groups ) SIXTRL_NOEXCEPT
@@ -526,7 +526,7 @@ namespace SIXTRL_CXX_NAMESPACE
             return ( total_num > size_t{ 0 } );
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     /* --------------------------------------------------------------------- */
@@ -565,7 +565,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    bool KernelConfigBase::setPreferredWorkGroupMultiple(
+    KernelConfigBase::status_t KernelConfigBase::setPreferredWorkGroupMultiple(
         KernelConfigBase::size_type const pref_wg_multi_a ) SIXTRL_NOEXCEPT
     {
         using size_t = KernelConfigBase::size_type;
@@ -574,13 +574,13 @@ namespace SIXTRL_CXX_NAMESPACE
             ( this->workGroupsDim() == size_t{ 1 } ) )
         {
             this->m_pref_work_groups_multiple[ 0 ] = pref_wg_multi_a;
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool KernelConfigBase::setPreferredWorkGroupMultiple(
+    KernelConfigBase::status_t KernelConfigBase::setPreferredWorkGroupMultiple(
         KernelConfigBase::size_type const pref_wg_multi_a,
         KernelConfigBase::size_type const pref_wg_multi_b ) SIXTRL_NOEXCEPT
     {
@@ -592,13 +592,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             this->m_pref_work_groups_multiple[ 0 ] = pref_wg_multi_a;
             this->m_pref_work_groups_multiple[ 1 ] = pref_wg_multi_b;
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool KernelConfigBase::setPreferredWorkGroupMultiple(
+    KernelConfigBase::status_t KernelConfigBase::setPreferredWorkGroupMultiple(
         KernelConfigBase::size_type const pref_wg_multi_a,
         KernelConfigBase::size_type const pref_wg_multi_b,
         KernelConfigBase::size_type const pref_wg_multi_c ) SIXTRL_NOEXCEPT
@@ -613,13 +613,13 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_pref_work_groups_multiple[ 0 ] = pref_wg_multi_a;
             this->m_pref_work_groups_multiple[ 1 ] = pref_wg_multi_b;
             this->m_pref_work_groups_multiple[ 2 ] = pref_wg_multi_c;
-            return true;
+            return st::ARCH_STATUS_SUCCESS;
         }
 
-        return false;
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    bool KernelConfigBase::setPreferredWorkGroupMultiple(
+    KernelConfigBase::status_t KernelConfigBase::setPreferredWorkGroupMultiple(
         KernelConfigBase::size_type const work_groups_dim,
         KernelConfigBase::size_type const* SIXTRL_RESTRICT pref_wg_multi
     ) SIXTRL_NOEXCEPT
@@ -640,7 +640,8 @@ namespace SIXTRL_CXX_NAMESPACE
             }
         }
 
-        return success;
+        return ( success )
+            ? st::ARCH_STATUS_SUCCESS : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     /* --------------------------------------------------------------------- */
@@ -661,16 +662,16 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_needs_update;
     }
 
-    bool KernelConfigBase::update()
+    KernelConfigBase::status_t KernelConfigBase::update()
     {
-        bool const has_been_updated = this->doUpdate();
+        KernelConfigBase::status_t const update_status = this->doUpdate();
 
-        if( has_been_updated )
+        if( update_status == st::ARCH_STATUS_SUCCESS )
         {
             this->doSetNeedsUpdateFlag( false );
         }
 
-        return has_been_updated;
+        return update_status;
     }
 
     /* --------------------------------------------------------------------- */
@@ -686,12 +687,10 @@ namespace SIXTRL_CXX_NAMESPACE
         this->doResetBaseImpl( work_items_dim, work_groups_dim );
     }
 
-    bool KernelConfigBase::doUpdate()
+    KernelConfigBase::status_t KernelConfigBase::doUpdate()
     {
-        bool const success = this->needsUpdate();
-        if( success ) this->doSetNeedsUpdateFlag( false );
-
-        return success;
+        KernelConfigBase::status_t const status = st::ARCH_STATUS_SUCCESS;
+        return status;
     }
 
     void KernelConfigBase::doSetNeedsUpdateFlag(

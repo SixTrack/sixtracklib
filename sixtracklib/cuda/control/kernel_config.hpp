@@ -110,7 +110,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
-        virtual bool doUpdate() override;
+        virtual status_t doUpdate() override;
         virtual void doPrintToOutputStream(
             std::ostream& SIXTRL_RESTRICT_REF output ) const override;
 

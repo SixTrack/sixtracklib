@@ -71,17 +71,17 @@ NS(arch_status_t) NS(CudaKernelConfig_configure_fetch_particles_addresses_kernel
             ++num_blocks;
         }
 
-        if( ( NS(KernelConfig_set_num_work_items_1d)(
+        if( ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_num_work_items_1d)(
                 kernel_config, num_blocks ) ) &&
-            ( NS(KernelConfig_set_work_group_sizes_1d)(
+            ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_work_group_sizes_1d)(
                 kernel_config, threads_per_block ) ) &&
-            ( NS(KernelConfig_set_preferred_work_group_multiple_1d)(
+            ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_preferred_work_group_multiple_1d)(
                 kernel_config, warp_size ) ) )
         {
-            if( NS(KernelConfig_update)( kernel_config ) )
-            {
-                status = NS(ARCH_STATUS_SUCCESS);
-            }
+            status = NS(KernelConfig_update)( kernel_config );
         }
     }
 
@@ -103,21 +103,21 @@ NS(CudaKernelConfig_configure_assign_output_to_beam_monitors_kernel)(
     {
         NS(buffer_size_t) const threads_per_block = ( NS(buffer_size_t) )1u;
         NS(buffer_size_t) const num_blocks = ( NS(buffer_size_t) )1u;
-        
-        NS(buffer_size_t) const warp_size = 
+
+        NS(buffer_size_t) const warp_size =
             NS(CudaNodeInfo_get_warp_size)( node_info );
 
-        if( ( NS(KernelConfig_set_num_work_items_1d)(
+        if( ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_num_work_items_1d)(
                 kernel_config, num_blocks ) ) &&
-            ( NS(KernelConfig_set_work_group_sizes_1d)(
+            ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_work_group_sizes_1d)(
                 kernel_config, threads_per_block ) ) &&
-            ( NS(KernelConfig_set_preferred_work_group_multiple_1d)(
+            ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_preferred_work_group_multiple_1d)(
                 kernel_config, warp_size ) ) )
         {
-            if( NS(KernelConfig_update)( kernel_config ) )
-            {
-                status = NS(ARCH_STATUS_SUCCESS);
-            }
+            status NS(KernelConfig_update)( kernel_config );
         }
     }
 
@@ -136,21 +136,21 @@ NS(CudaKernelConfig_configure_assign_output_to_elem_by_elem_config_kernel)(
     {
         NS(buffer_size_t) const threads_per_block = ( NS(buffer_size_t) )1u;
         NS(buffer_size_t) const num_blocks = ( NS(buffer_size_t) )1u;
-        
-        NS(buffer_size_t) const warp_size = 
+
+        NS(buffer_size_t) const warp_size =
             NS(CudaNodeInfo_get_warp_size)( node_info );
 
-        if( ( NS(KernelConfig_set_num_work_items_1d)(
+        if( ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_num_work_items_1d)(
                 kernel_config, num_blocks ) ) &&
-            ( NS(KernelConfig_set_work_group_sizes_1d)(
+            ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_work_group_sizes_1d)(
                 kernel_config, threads_per_block ) ) &&
-            ( NS(KernelConfig_set_preferred_work_group_multiple_1d)(
+            ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_preferred_work_group_multiple_1d)(
                 kernel_config, warp_size ) ) )
         {
-            if( NS(KernelConfig_update)( kernel_config ) )
-            {
-                status = NS(ARCH_STATUS_SUCCESS);
-            }
+            status = NS(KernelConfig_update)( kernel_config );
         }
     }
 
@@ -177,28 +177,28 @@ NS(arch_status_t) NS(CudaKernelConfig_configure_generic_track_kernel)(
 
         NS(buffer_size_t) num_blocks =
             total_num_particles_to_track / threads_per_block;
-            
+
         if( ( num_blocks * threads_per_block ) < total_num_particles_to_track )
         {
             ++num_blocks;
         }
-        
+
         if( num_blocks == ( NS(buffer_size_t) )0u )
         {
             num_blocks = ( NS(buffer_size_t) )1u;
         }
 
-        if( ( NS(KernelConfig_set_num_work_items_1d)(
+        if( ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_num_work_items_1d)(
                 kernel_config, num_blocks ) ) &&
-            ( NS(KernelConfig_set_work_group_sizes_1d)(
+            ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_work_group_sizes_1d)(
                 kernel_config, threads_per_block ) ) &&
-            ( NS(KernelConfig_set_preferred_work_group_multiple_1d)(
+            ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_preferred_work_group_multiple_1d)(
                 kernel_config, warp_size ) ) )
         {
-            if( NS(KernelConfig_update)( kernel_config ) )
-            {
-                status = NS(ARCH_STATUS_SUCCESS);
-            }
+            status = NS(KernelConfig_update)( kernel_config );
         }
     }
 
