@@ -22,7 +22,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(Track_particle_increment_at_element)(
 
 SIXTRL_FN SIXTRL_STATIC void NS(Track_subset_particles_increment_at_element)(
     SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_begin_index,
+    NS(particle_num_elements_t) particle_begin_index,
     NS(particle_num_elements_t) const particle_end_index,
     NS(particle_num_elements_t) const particle_index_stride );
 
@@ -571,6 +571,8 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Track_all_particles_line_ext)(
     #include "sixtracklib/common/be_monitor/track.h"
     #include "sixtracklib/common/be_srotation/track.h"
     #include "sixtracklib/common/be_xyshift/track.h"
+    #include "sixtracklib/common/be_limit/track.h"
+    #include "sixtracklib/common/be_dipedge/track.h"
 
     #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
         #include "sixtracklib/common/be_beambeam/track.h"
@@ -792,6 +794,36 @@ SIXTRL_INLINE int NS(Track_particle_beam_element_obj_dispatcher)(
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
             ret = NS(Track_particle_beam_monitor)( particles, index, belem );
+            break;
+        }
+
+        case NS(OBJECT_TYPE_LIMIT_RECT):
+        {
+            typedef NS(LimitRect) belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_limit_rect)( particles, index, belem );
+            break;
+        }
+
+        case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
+        {
+            typedef NS(LimitEllipse) belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_limit_ellipse)( particles, index, belem );
+            break;
+        }
+
+        case NS(OBJECT_TYPE_DIPEDGE):
+        {
+            typedef NS(DipoleEdge) belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_dipedge)( particles, index, belem );
             break;
         }
 

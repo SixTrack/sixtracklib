@@ -22,6 +22,9 @@ typedef enum NS(object_type_values_e)
     NS(OBJECT_TYPE_BEAM_BEAM_4D)      =          8,
     NS(OBJECT_TYPE_BEAM_BEAM_6D)      =          9,
     NS(OBJECT_TYPE_BEAM_MONITOR)      =         10,
+    NS(OBJECT_TYPE_LIMIT_RECT)        =         11,
+    NS(OBJECT_TYPE_LIMIT_ELLIPSE)     =         12,
+    NS(OBJECT_TYPE_DIPEDGE)           =         24,
     NS(OBJECT_TYPE_LINE)              =       1024,
     NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) =      65535,
     NS(OBJECT_TYPE_INVALID)           = 0x7fffffff
@@ -83,6 +86,18 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_BEAM_MONITOR = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_BEAM_MONITOR) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_LIMIT_RECT = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_LIMIT_RECT) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_LIMIT_ELLIPSE = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_LIMIT_ELLIPSE) );
+        
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_DIPEDGE = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_DIPEDGE) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_LINE         = static_cast< object_type_id_t >(
