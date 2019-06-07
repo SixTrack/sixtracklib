@@ -17,17 +17,6 @@ extern "C" {
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(TrackJobNew_sanitize_arch_str_inplace)(
-        char* SIXTRL_RESTRICT arch_str,
-        NS(buffer_size_t) const max_arch_str_len );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(TrackJobNew_sanitize_arch_str)(
-        const char *const SIXTRL_RESTRICT arch_str,
-        char* SIXTRL_RESTRICT sanitized_arch_str,
-        NS(buffer_size_t) const max_arch_str_len );
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobBaseNew)* NS(TrackJobNew_create)(
     const char *const SIXTRL_RESTRICT arch_str,
     const char *const SIXTRL_RESTRICT config_str );
@@ -99,6 +88,10 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TrackJobNew_collect_debug_flag)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJobNew_collect_particles_addresses)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobNew_enable_collect_particles)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
 
@@ -139,33 +132,33 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_requires_collecting)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool 
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
 NS(TrackJobNew_can_fetch_particle_addresses)(
     const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job );
-    
-SIXTRL_EXTERN SIXTRL_HOST_FN bool 
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
 NS(TrackJobNew_has_particle_addresses)(
     const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TrackJobNew_fetch_particle_addresses)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
-        
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TrackJobNew_clear_particle_addresses)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     NS(buffer_size_t) const particle_set_index );
-        
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TrackJobNew_clear_all_particle_addresses)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
-    
-SIXTRL_EXTERN SIXTRL_HOST_FN struct NS(ParticlesAddr) const* 
+
+SIXTRL_EXTERN SIXTRL_HOST_FN struct NS(ParticlesAddr) const*
 NS(TrackJobNew_get_particle_addresses)(
     const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
     NS(buffer_size_t) const particle_set_index );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer) const* 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer) const*
 NS(TrackJobNew_get_ptr_particle_addresses_buffer)(
     const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job );
 
@@ -228,7 +221,10 @@ NS(TrackJobNew_assign_output_buffer)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_job_type_t) NS(TrackJobNew_get_arch_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_id_t) NS(TrackJobNew_get_arch_id)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_has_arch_string)(
     const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(TrackJobNew_get_arch_string)(

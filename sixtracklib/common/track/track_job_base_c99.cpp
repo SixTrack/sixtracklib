@@ -145,6 +145,13 @@ void NS(TrackJobNew_delete)( ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
         ? job->collectDebugFlag() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
+::NS(arch_status_t) NS(TrackJobNew_collect_particles_addresses)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->collectParticlesAddresses() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+
 void NS(TrackJobNew_enable_collect_particles)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
@@ -226,7 +233,7 @@ bool NS(TrackJobNew_can_fetch_particle_addresses)(
 {
     return ( ( job != nullptr ) && ( job->canFetchParticleAddresses() ) );
 }
-    
+
 bool NS(TrackJobNew_has_particle_addresses)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
@@ -236,27 +243,27 @@ bool NS(TrackJobNew_has_particle_addresses)(
 ::NS(arch_status_t) NS(TrackJobNew_fetch_particle_addresses)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) 
+    return ( job != nullptr )
         ? job->fetchParticleAddresses() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
-        
+
 ::NS(arch_status_t) NS(TrackJobNew_clear_particle_addresses)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     ::NS(buffer_size_t) const particle_set_index )
 {
-    return ( job != nullptr ) 
-        ? job->clearParticleAddresses( particle_set_index ) 
+    return ( job != nullptr )
+        ? job->clearParticleAddresses( particle_set_index )
         : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
-        
+
 ::NS(arch_status_t) NS(TrackJobNew_clear_all_particle_addresses)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) 
-        ? job->clearAllParticleAddresses() 
+    return ( job != nullptr )
+        ? job->clearAllParticleAddresses()
         : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
-    
+
 ::NS(ParticlesAddr) const* NS(TrackJobNew_get_particle_addresses)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
     ::NS(buffer_size_t) const particle_set_index )
@@ -371,10 +378,16 @@ void NS(TrackJobNew_clear)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 
 /* ------------------------------------------------------------------------- */
 
-::NS(track_job_type_t) NS(TrackJobNew_get_arch_id)(
+::NS(arch_id_t) NS(TrackJobNew_get_arch_id)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->archId() : ::NS(ARCHITECTURE_ILLEGAL);
+}
+
+bool NS(TrackJobNew_has_arch_string)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
+{
+    return ( ( job != nullptr ) && ( job->hasArchStr() ) );
 }
 
 char const* NS(TrackJobNew_get_arch_string)(
