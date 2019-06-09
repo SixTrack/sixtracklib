@@ -19,9 +19,9 @@
     #include "sixtracklib/common/buffer/buffer_type.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-// #if defined( __cplusplus ) && !defined( _GPUCODE )
-// extern "C" {
-// #endif /* C++ */
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* C++ */
 
 #if !defined( _GPUCODE )
 
@@ -128,9 +128,9 @@ NS(NodeId_extract_node_id_str_from_config_str)(
 
 #endif /* !defined( _GPUCODE )  */
 
-// #if defined( __cplusplus ) && !defined( _GPUCODE )
-// }
-// #endif /* C++ */
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
+#endif /* C++ */
 
 #endif /* SIXTRACKLIB_COMMON_CONTROL_NODE_ID_H__ */
 
