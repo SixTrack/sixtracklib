@@ -60,7 +60,7 @@ TEST( CXX_CudaArgumentTests, BasicUsage )
 
 
     ASSERT_TRUE( !::NS(Argument_has_argument_buffer)( arg1 ) );
-    ASSERT_TRUE( !::NS(CudaArgument_has_cuda_arg_buffer)( arg1 ) );
+    ASSERT_TRUE( !::NS(Argument_has_cuda_arg_buffer)( arg1 ) );
     ASSERT_TRUE(  ::NS(CudaArgument_get_cuda_arg_buffer)( arg1 ) == nullptr );
 
     ASSERT_TRUE( !::NS(Argument_uses_cobjects_buffer)( arg1 ) );
@@ -73,7 +73,7 @@ TEST( CXX_CudaArgumentTests, BasicUsage )
 
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
     ASSERT_TRUE( ::NS(Argument_has_argument_buffer)( arg1 ) );
-    ASSERT_TRUE( ::NS(CudaArgument_has_cuda_arg_buffer)( arg1 ) );
+    ASSERT_TRUE( ::NS(Argument_has_cuda_arg_buffer)( arg1 ) );
     ASSERT_TRUE( ::NS(CudaArgument_get_cuda_arg_buffer)( arg1 ) != nullptr );
 
     ASSERT_TRUE( ::NS(Argument_uses_cobjects_buffer)( arg1 ) );
@@ -97,7 +97,7 @@ TEST( CXX_CudaArgumentTests, BasicUsage )
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
 
     ASSERT_TRUE( ::NS(Argument_has_argument_buffer)( arg1 ) );
-    ASSERT_TRUE( ::NS(CudaArgument_has_cuda_arg_buffer)( arg1 ) );
+    ASSERT_TRUE( ::NS(Argument_has_cuda_arg_buffer)( arg1 ) );
     ASSERT_TRUE( ::NS(CudaArgument_get_cuda_arg_buffer)( arg1 ) != nullptr );
 
     ASSERT_TRUE( ::NS(Argument_uses_cobjects_buffer)( arg1 ) );
@@ -140,7 +140,7 @@ TEST( CXX_CudaArgumentTests, BasicUsage )
     ASSERT_TRUE( arg2 != nullptr );
 
     ASSERT_TRUE( ::NS(Argument_has_argument_buffer)( arg2 ) );
-    ASSERT_TRUE( ::NS(CudaArgument_has_cuda_arg_buffer)( arg2 ) );
+    ASSERT_TRUE( ::NS(Argument_has_cuda_arg_buffer)( arg2 ) );
     ASSERT_TRUE( ::NS(Argument_uses_cobjects_buffer)( arg2 ) );
 
     ASSERT_TRUE( ::NS(Argument_get_const_cobjects_buffer)( arg2 ) != nullptr );
@@ -186,7 +186,7 @@ TEST( CXX_CudaArgumentTests, BasicUsage )
     ASSERT_TRUE( arg3 != nullptr );
 
     ASSERT_TRUE( ::NS(Argument_has_argument_buffer)( arg3 ) );
-    ASSERT_TRUE( ::NS(CudaArgument_has_cuda_arg_buffer)( arg3 ) );
+    ASSERT_TRUE( ::NS(Argument_has_cuda_arg_buffer)( arg3 ) );
     ASSERT_TRUE( !::NS(Argument_uses_cobjects_buffer)( arg3 ) );
     ASSERT_TRUE( ::NS(Argument_uses_raw_argument)( arg3 ) );
     ASSERT_TRUE( ::NS(Argument_get_const_ptr_raw_argument)( arg3 ) != nullptr );
@@ -229,7 +229,7 @@ TEST( CXX_CudaArgumentTests, BasicUsage )
     cuda_arg_t* arg4 = ::NS(CudaArgument_new)( cuda_controller );
 
     ASSERT_TRUE( !::NS(Argument_has_argument_buffer)( arg4 ) );
-    ASSERT_TRUE( !::NS(CudaArgument_has_cuda_arg_buffer)( arg4  ) );
+    ASSERT_TRUE( !::NS(Argument_has_cuda_arg_buffer)( arg4  ) );
     ASSERT_TRUE(  ::NS(CudaArgument_get_cuda_arg_buffer)( arg4 ) == nullptr );
 
     ASSERT_TRUE( !::NS(Argument_uses_cobjects_buffer)( arg4 ) );
@@ -252,7 +252,7 @@ TEST( CXX_CudaArgumentTests, BasicUsage )
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
 
     ASSERT_TRUE( ::NS(Argument_has_argument_buffer)( arg4 ) );
-    ASSERT_TRUE( ::NS(CudaArgument_has_cuda_arg_buffer)( arg4 ) );
+    ASSERT_TRUE( ::NS(Argument_has_cuda_arg_buffer)( arg4 ) );
     ASSERT_TRUE( !::NS(Argument_uses_cobjects_buffer)( arg4 ) );
     ASSERT_TRUE( ::NS(Argument_uses_raw_argument)( arg4 ) );
     ASSERT_TRUE( ::NS(Argument_get_const_ptr_raw_argument)( arg4 ) != nullptr );
@@ -314,5 +314,5 @@ TEST( CXX_CudaArgumentTests, BasicUsage )
     arg4 = nullptr;
 }
 
-/* end: tests/sixtracklib/cuda/control/test_argument_cxx.cpp */
+/* end: tests/sixtracklib/cuda/control/test_argument_c99.cpp */
 
