@@ -31,7 +31,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_id_t) NS(KernelConfig_get_arch_id)(
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(KernelConfig_has_arch_string)(
     const NS(KernelConfigBase) *const SIXTRL_RESTRICT config );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(KernelConfig_get_arch_string)(
+SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(KernelConfig_get_ptr_arch_string)(
     const NS(KernelConfigBase) *const SIXTRL_RESTRICT config );
 
 /* ------------------------------------------------------------------------- */

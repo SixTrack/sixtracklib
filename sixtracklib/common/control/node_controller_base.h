@@ -161,7 +161,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeId) const* NS(Controller_get_ptr_node_id)(
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeInfoBase) const*
 NS(Controller_get_ptr_node_info_base_by_index)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
-    NS(arch_size_t) const node_index );
+    NS(node_index_t) const node_index );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeInfoBase) const*
 NS(Controller_get_ptr_node_info_base_by_node_id)(
@@ -169,7 +169,7 @@ NS(Controller_get_ptr_node_info_base_by_node_id)(
     const NS(NodeId) *const SIXTRL_RESTRICT node_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeInfoBase) const*
-NS(Controller_get_ptr_node_info_by_platform_id_and_device_id)(
+NS(Controller_get_ptr_node_info_base_by_platform_id_and_device_id)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
     NS(node_platform_id_t) const platform_id,
     NS(node_device_id_t) const device_id );

@@ -59,7 +59,7 @@ bool NS(Controller_has_default_node)(
 
 bool NS(Controller_is_default_node_index)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
-    ::NS(arch_size_t)const node_index )
+    ::NS(node_index_t) const node_index )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
     return ( ( ptr_nodes_ctrl != nullptr ) &&
@@ -98,7 +98,7 @@ bool NS(Controller_is_default_node)(
 
 bool NS(Controller_is_node_available_by_index)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
-    ::NS(arch_size_t)const node_index )
+    ::NS(node_index_t) const node_index )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
     return ( ( ptr_nodes_ctrl != nullptr ) &&
@@ -240,7 +240,7 @@ bool NS(Controller_is_node_available)(
 
 ::NS(NodeId) const* NS(Controller_get_ptr_node_id_by_index)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
-    ::NS(arch_size_t)const node_index )
+    ::NS(node_index_t) const node_index )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
     return ( ptr_nodes_ctrl != nullptr )
@@ -270,7 +270,7 @@ bool NS(Controller_is_node_available)(
 
 ::NS(NodeInfoBase) const* NS(Controller_get_ptr_node_info_base_by_index)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
-    ::NS(arch_size_t)const node_index )
+    ::NS(node_index_t) const node_index )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );
     return ( ptr_nodes_ctrl != nullptr )
@@ -518,7 +518,7 @@ void NS(Controller_print_out_available_nodes_info)(
 void NS(Controller_store_available_nodes_info_to_string)(
     const ::NS(ControllerBase) *const SIXTRL_RESTRICT ctrl,
     char* SIXTRL_RESTRICT nodes_info_str,
-    ::NS(arch_size_t)const nodes_info_str_capacity,
+    ::NS(arch_size_t) const nodes_info_str_capacity,
     ::NS(arch_size_t)* SIXTRL_RESTRICT ptr_required_max_str_length )
 {
     auto ptr_nodes_ctrl = st::asNodeController( ctrl );

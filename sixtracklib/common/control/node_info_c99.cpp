@@ -13,7 +13,7 @@
 
 /* ------------------------------------------------------------------------- */
 
-::NS(NodeId) const* NS(NodeInfo_get_ptr_node_id)(
+::NS(NodeId) const* NS(NodeInfo_get_ptr_const_node_id)(
     SIXTRL_ARGPTR_DEC const ::NS(NodeInfoBase) *const SIXTRL_RESTRICT info )
 {
     return ( info != nullptr ) ? info->ptrNodeId() : nullptr;

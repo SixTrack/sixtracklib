@@ -388,7 +388,7 @@ NS(KernelConfig_get_const_preferred_work_group_multiples_end)(
     ::NS(KernelConfigBase)* SIXTRL_RESTRICT conf,
     ::NS(ctrl_size_t) const work_groups_a )
 {
-    return ( ( conf != nullptr ) &&
+    return ( conf != nullptr )
         ? conf->setPreferredWorkGroupMultiple( work_groups_a )
         : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }

@@ -53,7 +53,7 @@ char const* NS(Argument_get_arch_string)(
 
 ::NS(arch_status_t) NS(Argument_send_buffer_without_remap)(
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg,
-    ::NS(Buffer)* SIXTRL_RESTRICT buf )
+    const ::NS(Buffer) *const SIXTRL_RESTRICT buf )
 {
     return ( arg != nullptr ) ? arg->send( buf, st::CTRL_PERFORM_NO_REMAP )
         : ::NS(ARCH_STATUS_GENERAL_FAILURE);
