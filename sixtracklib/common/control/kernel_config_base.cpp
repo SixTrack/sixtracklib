@@ -15,6 +15,8 @@
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/control/arch_base.hpp"
 
+namespace st = SIXTRL_CXX_NAMESPACE;
+
 namespace SIXTRL_CXX_NAMESPACE
 {
     KernelConfigBase::KernelConfigBase(
@@ -23,7 +25,7 @@ namespace SIXTRL_CXX_NAMESPACE
         char const* SIXTRL_RESTRICT config_str,
         KernelConfigBase::size_type const work_items_dim,
         KernelConfigBase::size_type const work_groups_dim ) :
-        SIXTRL_CXX_NAMESPACE::ArchBase( arch_id, arch_str, config_str ),
+        st::ArchBase( arch_id, arch_str, config_str ),
         m_name(),
         m_num_kernel_args( KernelConfigBase::size_type{ 0 } ),
         m_kernel_id( KernelConfigBase::ILLEGAL_KERNEL_ID ),
@@ -33,7 +35,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     KernelConfigBase::KernelConfigBase( KernelConfigBase const& other ) :
-        SIXTRL_CXX_NAMESPACE::ArchBase( other ),
+        st::ArchBase( other ),
         m_name( other.m_name ),
         m_num_kernel_args( other.m_num_kernel_args ),
         m_kernel_id( other.m_kernel_id ),
@@ -45,7 +47,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     KernelConfigBase::KernelConfigBase(
         KernelConfigBase&& other ) SIXTRL_NOEXCEPT :
-        SIXTRL_CXX_NAMESPACE::ArchBase( std::move( other ) ),
+        st::ArchBase( std::move( other ) ),
         m_name( std::move( other.m_name ) ),
         m_num_kernel_args( std::move( other.m_num_kernel_args ) ),
         m_kernel_id( std::move( other.m_kernel_id ) ),
@@ -59,7 +61,7 @@ namespace SIXTRL_CXX_NAMESPACE
     KernelConfigBase& KernelConfigBase::operator=(
         KernelConfigBase const& rhs )
     {
-        SIXTRL_CXX_NAMESPACE::ArchBase::operator=( rhs );
+        st::ArchBase::operator=( rhs );
 
         if( this != &rhs )
         {
@@ -78,7 +80,7 @@ namespace SIXTRL_CXX_NAMESPACE
     KernelConfigBase& KernelConfigBase::operator=(
         KernelConfigBase&& rhs ) SIXTRL_NOEXCEPT
     {
-        SIXTRL_CXX_NAMESPACE::ArchBase::operator=( std::move( rhs ) );
+        st::ArchBase::operator=( std::move( rhs ) );
 
         if( this != &rhs )
         {
