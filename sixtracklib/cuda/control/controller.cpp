@@ -12,7 +12,7 @@
 #include "sixtracklib/common/control/node_controller_base.hpp"
 
 #include "sixtracklib/cuda/definitions.h"
-#include "sixtracklib/cuda/control/argument_base.hpp"
+#include "sixtracklib/cuda/argument.hpp"
 #include "sixtracklib/cuda/wrappers/controller_wrappers.h"
 
 namespace st = SIXTRL_CXX_NAMESPACE;
@@ -631,7 +631,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using _this_t    = st::CudaController;
         using status_t   = _this_t::status_t;
         using size_t     = _this_t::size_type;
-        using cuda_arg_t = st::CudaArgumentBase;
+        using cuda_arg_t = st::CudaArgument;
         using cuda_arg_buffer_t = cuda_arg_t::cuda_arg_buffer_t;
 
         status_t status = status_t{ -1 };
@@ -665,7 +665,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using _this_t    = CudaController;
         using status_t   = _this_t::status_t;
         using size_t     = _this_t::size_type;
-        using cuda_arg_t = st::CudaArgumentBase;
+        using cuda_arg_t = st::CudaArgument;
         using cuda_arg_buffer_t = cuda_arg_t::cuda_arg_buffer_t;
 
         status_t status = status_t{ -1 };

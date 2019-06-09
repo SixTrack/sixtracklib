@@ -16,7 +16,6 @@
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/control/node_controller_base.h"
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/control/argument_base.h"
     #include "sixtracklib/cuda/control/node_info.h"
     #include "sixtracklib/cuda/control/kernel_config.h"
     #include "sixtracklib/common/buffer.h"
@@ -25,8 +24,7 @@
 #if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
    !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
 
-#if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/cuda/control/argument_base.hpp"
+#if !defined( SIXTRL_NO_INCLUDES )    
     #include "sixtracklib/cuda/control/node_info.hpp"
     #include "sixtracklib/cuda/control/kernel_config.hpp"
     #include "sixtracklib/common/buffer.hpp"
@@ -34,6 +32,8 @@
 
 namespace SIXTRL_CXX_NAMESPACE
 {
+    class CudaArgument;
+    
     class CudaController : public SIXTRL_CXX_NAMESPACE::NodeControllerBase
     {
         private:
