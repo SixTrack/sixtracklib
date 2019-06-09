@@ -374,8 +374,7 @@ NS(TrackJobNew_get_default_elem_by_elem_config_rolling_flag)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void
 NS(TrackJobNew_set_default_elem_by_elem_config_rolling_flag)(
-    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
-    bool const is_rolling_flag );
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job, bool const is_rolling_flag );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(elem_by_elem_order_t)
 NS(TrackJobNew_get_elem_by_elem_config_order)(
