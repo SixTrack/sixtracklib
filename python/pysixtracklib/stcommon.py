@@ -2,7 +2,7 @@ import ctypes as ct
 from . import config as stconf
 from .particles import Particles as st_Particles
 from .config import SIXTRACKLIB_MODULES
-import cobjects 
+import cobjects
 from cobjects import CBuffer
 
 sixtracklib = ct.CDLL(stconf.SHARED_LIB)
@@ -300,7 +300,7 @@ class st_ElemByElemConfig(ct.Structure):
                 ("out_store_addr", st_elem_by_elem_out_addr_t )]
 
 st_ElemByElemConfig_p = ct.POINTER( st_ElemByElemConfig )
-st_NullElemByElemConfig_p = ct.cast( 0, st_ElemByElemConfig_p )
+st_NullElemByElemConfig = ct.cast( 0, st_ElemByElemConfig_p )
 
 # -----------------------------------------------------------------------------
 # BeamMonitor objects
@@ -633,7 +633,7 @@ st_ARCH_STATUS_GENERAL_FAILURE = st_arch_status_t( -1 )
 # ------------------------------------------------------------------------------
 # NS(NodeId):
 st_NodeId_p = ct.c_void_p
-st_NullNodeId_p = ct.cast( 0, st_NodeId_p )
+st_NullNodeId = ct.cast( 0, st_NodeId_p )
 
 st_NodeId_preset = sixtracklib.st_NodeId_preset
 st_NodeId_preset.argtypes = [ st_NodeId_p ]
@@ -697,7 +697,7 @@ st_NodeId_print_out.restype = None
 # NS(NodeInfo):
 
 st_NodeInfoBase_p = ct.c_void_p
-st_NullNodeInfoBase_p = ct.cast( 0, st_NodeInfoBase_p )
+st_NullNodeInfoBase = ct.cast( 0, st_NodeInfoBase_p )
 
 st_NodeInfo_get_ptr_const_node_id = \
     sixtracklib.st_NodeInfo_get_ptr_const_node_id
@@ -772,7 +772,7 @@ st_NodeInfo_print_out.restype = None
 # NS(KernelConfigBase)
 
 st_KernelConfigBase_p = ct.c_void_p
-st_NullKernelConfigBase_p = ct.cast( 0, st_KernelConfigBase_p )
+st_NullKernelConfigBase = ct.cast( 0, st_KernelConfigBase_p )
 st_kernel_id_t = ct.c_uint32
 
 st_ctrl_size_t = ct.c_uint64
@@ -996,10 +996,10 @@ st_KernelConfig_print_out.restype = None
 # NS(ControllerBase), NS(NodeControllerBase)
 
 st_ControllerBase_p = ct.c_void_p
-st_NullControllerBase_p = ct.cast( 0, st_ControllerBase_p )
+st_NullControllerBase = ct.cast( 0, st_ControllerBase_p )
 
 st_ArgumentBase_p = ct.c_void_p
-st_NullArgumentBase_p = ct.cast( 0, st_ArgumentBase_p )
+st_NullArgumentBase = ct.cast( 0, st_ArgumentBase_p )
 
 st_Controller_delete = sixtracklib.st_Controller_delete
 st_Controller_delete.argtypes = [ st_ControllerBase_p ]
@@ -1627,7 +1627,7 @@ st_Argument_get_const_ptr_base_controller.restype = st_ControllerBase_p
 # NS(TrackJobBase):
 
 st_TrackJobBaseNew_p = ct.c_void_p
-st_NullTrackJobBaseNew_p = ct.cast( 0, st_TrackJobBaseNew_p )
+st_NullTrackJobBaseNew = ct.cast( 0, st_TrackJobBaseNew_p )
 
 st_track_status_t = ct.c_int32
 st_track_job_collect_flag_t = ct.c_uint16
@@ -2109,22 +2109,22 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     # NS(CudaNodeInfo):
 
     st_CudaNodeInfo_p = ct.c_void_p
-    st_NullCudaNodeInfo_p = ct.cast( 0, st_CudaNodeInfo_p )
+    st_NullCudaNodeInfo = ct.cast( 0, st_CudaNodeInfo_p )
 
     # --------------------------------------------------------------------------
     # NS(CudaKernelConfig):
 
     st_CudaKernelConfig_p = ct.c_void_p
-    st_NullCudaKernelConfig_p = ct.cast( 0, st_CudaKernelConfig_p )
+    st_NullCudaKernelConfig = ct.cast( 0, st_CudaKernelConfig_p )
 
     # --------------------------------------------------------------------------
     # NS(CudaController):
 
     st_CudaArgument_p = ct.c_void_p
-    st_NullCudaArgument_p = ct.cast( 0, st_CudaArgument_p )
+    st_NullCudaArgument = ct.cast( 0, st_CudaArgument_p )
 
     st_CudaController_p = ct.c_void_p
-    st_NullCudaController_p = ct.cast( 0, st_CudaController_p )
+    st_NullCudaController = ct.cast( 0, st_CudaController_p )
 
     st_CudaController_create = sixtracklib.st_CudaController_create
     st_CudaController_create.argtypes = None
@@ -2229,70 +2229,71 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     st_CudaController_receive_memory.argtypes = [
         st_CudaController_p, ct.c_void_p, st_CudaArgument_p, st_arch_size_t ]
     st_CudaController_receive_memory.restype = st_arch_status_t
-    
+
     # --------------------------------------------------------------------------
     # NS(CudaArgument):
-    
-    st_cuda_arg_buffer_t = ct.c_void_p     
+
+    st_cuda_arg_buffer_t = ct.c_void_p
+    st_null_cuda_arg_buffer_t = ct.cast( 0, st_cuda_arg_buffer_t )
     st_arch_debugging_t  = ct.c_uint64
     st_arch_debugging_p  = ct.POINTER( st_arch_debugging_t )
-        
+
     st_CudaArgument_new = sixtracklib.st_CudaArgument_new
     st_CudaArgument_new.argtypes = [ st_CudaController_p ]
-    st_CudaArgument_new.restype = st_CudaArgument_p 
-    
+    st_CudaArgument_new.restype = st_CudaArgument_p
+
     st_CudaArgument_new_from_buffer = \
         sixtracklib.st_CudaArgument_new_from_buffer
-    st_CudaArgument_new_from_buffer.argtypes = [ 
+    st_CudaArgument_new_from_buffer.argtypes = [
         st_Buffer_p, st_CudaController_p ]
-    st_CudaArgument_new_from_buffer.restype = st_CudaArgument_p 
-        
+    st_CudaArgument_new_from_buffer.restype = st_CudaArgument_p
+
     st_CudaArgument_new_from_raw_argument = \
         sixtracklib.st_CudaArgument_new_from_raw_argument
     st_CudaArgument_new_from_raw_argument.argtypes = [
         ct.c_void_p, st_ctrl_size_t, st_CudaArgument_p ]
-    st_CudaArgument_new_from_raw_argument.restype = st_CudaArgument_p 
-    
+    st_CudaArgument_new_from_raw_argument.restype = st_CudaArgument_p
+
     st_CudaArgument_new_from_size = \
         sixtracklib.st_CudaArgument_new_from_size
-    st_CudaArgument_new_from_size.argtypes = [ 
+    st_CudaArgument_new_from_size.argtypes = [
         st_ctrl_size_t, st_CudaController_p ]
-    
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     st_Argument_has_cuda_arg_buffer = \
         sixtracklib.st_Argument_has_cuda_arg_buffer
     st_Argument_has_cuda_arg_buffer.argtypes = [ st_ArgumentBase_p ]
-    st_Argument_has_cuda_arg_buffer.restype = ct.c_bool 
-    
+    st_Argument_has_cuda_arg_buffer.restype = ct.c_bool
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     st_CudaArgument_get_cuda_arg_buffer = \
         sixtracklib.st_CudaArgument_get_cuda_arg_buffer
     st_CudaArgument_get_cuda_arg_buffer.argtypes = [ st_CudaArgument_p ]
     st_CudaArgument_get_cuda_arg_buffer.restype = st_cuda_arg_buffer_t
-    
+
     st_CudaArgument_get_const_cuda_arg_buffer = \
         sixtracklib.st_CudaArgument_get_const_cuda_arg_buffer
     st_CudaArgument_get_const_cuda_arg_buffer.argtypes = [ st_CudaArgument_p ]
     st_CudaArgument_get_const_cuda_arg_buffer.restype = st_cuda_arg_buffer_t
-    
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     st_CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin = \
         sixtracklib.st_CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin
     st_CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin.argtypes = [
         st_CudaArgument_p ]
     st_CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin.restype = \
         st_uchar_p
-    
+
     st_CudaArgument_get_cuda_arg_buffer_as_const_cobject_buffer_begin = \
         sixtracklib.st_CudaArgument_get_cuda_arg_buffer_as_const_cobject_buffer_begin
     st_CudaArgument_get_cuda_arg_buffer_as_const_cobject_buffer_begin.argtypes \
         = [ st_CudaArgument_p ]
     st_CudaArgument_get_cuda_arg_buffer_as_const_cobject_buffer_begin.restype \
         = st_const_uchar_p
-    
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     st_CudaArgument_get_cuda_arg_buffer_as_debugging_register_begin = \
@@ -2301,7 +2302,7 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
         st_CudaArgument_p ]
     st_CudaArgument_get_cuda_arg_buffer_as_debugging_register_begin.restype = \
         st_arch_debugging_p
-    
+
     st_CudaArgument_get_cuda_arg_buffer_as_const_debugging_register_begin = \
         sixtracklib.st_CudaArgument_get_cuda_arg_buffer_as_const_debugging_register_begin
     st_CudaArgument_get_cuda_arg_buffer_as_const_debugging_register_begin.argtypes \
@@ -2310,211 +2311,211 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
         = st_arch_debugging_p
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     st_CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin = \
         sixtracklib.st_CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin
     st_CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin.argtypes = [
         st_CudaArgument_p ]
     st_CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin.restype = \
         st_ElemByElemConfig_p
-    
+
     st_CudaArgument_get_cuda_arg_buffer_as_const_elem_by_elem_config_begin = \
         sixtracklib.st_CudaArgument_get_cuda_arg_buffer_as_const_elem_by_elem_config_begin
     st_CudaArgument_get_cuda_arg_buffer_as_const_elem_by_elem_config_begin.argtypes = [
         st_CudaArgument_p ]
     st_CudaArgument_get_cuda_arg_buffer_as_const_elem_by_elem_config_begin.restype = \
         st_ElemByElemConfig_p
-    
+
     # ==========================================================================
     # NS(CudaTrackJob):
-    
-    st_CudaTrackJob_p = ct.c_void_p 
-    st_NullCudaTrackJob_p = ct.cast( 0, st_CudaTrackJob_p )
-    
+
+    st_CudaTrackJob_p = ct.c_void_p
+    st_NullCudaTrackJob = ct.cast( 0, st_CudaTrackJob_p )
+
     st_CudaTrackJob_get_num_available_nodes = \
         sixtracklib.st_CudaTrackJob_get_num_available_nodes
     st_CudaTrackJob_get_num_available_nodes.argtypes = None
-    st_CudaTrackJob_get_num_available_nodes.restype = st_ctrl_size_t 
-    
+    st_CudaTrackJob_get_num_available_nodes.restype = st_ctrl_size_t
+
     _st_CudaTrackJob_get_available_node_ids_list = \
         sixtracklib.st_CudaTrackJob_get_available_node_ids_list
     _st_CudaTrackJob_get_available_node_ids_list.argtypes = [
         st_ctrl_size_t, st_NodeId_p ]
     _st_CudaTrackJob_get_available_node_ids_list.restype = st_ctrl_size_t
-    
+
     st_CudaTrackJob_get_available_node_indices_list = \
         sixtracklib.st_CudaTrackJob_get_available_node_indices_list
     st_CudaTrackJob_get_available_node_indices_list.argtypes = [
         st_ctrl_size_t, st_node_index_p ]
     st_CudaTrackJob_get_available_node_indices_list.restype = st_ctrl_size_t
-    
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     st_CudaTrackJob_create = sixtracklib.st_CudaTrackJob_create
-    st_CudaTrackJob_create.argtypes = None 
+    st_CudaTrackJob_create.argtypes = None
     st_CudaTrackJob_create.restype = st_CudaTrackJob_p
-    
+
     st_CudaTrackJob_new_from_config_str = \
         sixtracklib.st_CudaTrackJob_new_from_config_str
     st_CudaTrackJob_new_from_config_str.argtypes = [ ct.c_char_p ]
-    st_CudaTrackJob_new_from_config_str.restype = st_CudaTrackJob_p 
-    
+    st_CudaTrackJob_new_from_config_str.restype = st_CudaTrackJob_p
+
     st_CudaTrackJob_new = sixtracklib.st_CudaTrackJob_new
     st_CudaTrackJob_new.argtypes = [ ct.c_char_p, st_Buffer_p, st_Buffer_p ]
-    st_CudaTrackJob_new.restype = st_CudaTrackJob_p 
-    
+    st_CudaTrackJob_new.restype = st_CudaTrackJob_p
+
     st_CudaTrackJob_new_with_output = \
         sixtracklib.st_CudaTrackJob_new_with_output
-    st_CudaTrackJob_new_with_output.argtypes = [ ct.c_char_p, st_Buffer_p, 
+    st_CudaTrackJob_new_with_output.argtypes = [ ct.c_char_p, st_Buffer_p,
         st_Buffer_p, st_Buffer_p, st_buffer_size_t ]
-    st_CudaTrackJob_new_with_output.restype = st_CudaTrackJob_p 
-    
+    st_CudaTrackJob_new_with_output.restype = st_CudaTrackJob_p
+
     st_CudaTrackJob_new_detailed = sixtracklib.st_CudaTrackJob_new_detailed
-    st_CudaTrackJob_new_detailed.argtypes = [ ct.c_char_p, st_Buffer_p, 
-        st_buffer_size_t, st_buffer_size_p, st_Buffer_p, st_Buffer_p, 
+    st_CudaTrackJob_new_detailed.argtypes = [ ct.c_char_p, st_Buffer_p,
+        st_buffer_size_t, st_buffer_size_p, st_Buffer_p, st_Buffer_p,
         st_buffer_size_t, ct.c_char_p ]
-    st_CudaTrackJob_new_detailed.restype = st_CudaTrackJob_p 
-    
+    st_CudaTrackJob_new_detailed.restype = st_CudaTrackJob_p
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     st_CudaTrackJob_has_controller = sixtracklib.st_CudaTrackJob_has_controller
     st_CudaTrackJob_has_controller.argtypes = [ st_CudaTrackJob_p ]
-    st_CudaTrackJob_has_controller.restype = ct.c_bool 
-    
+    st_CudaTrackJob_has_controller.restype = ct.c_bool
+
     st_CudaTrackJob_get_ptr_controller = \
         sixtracklib.st_CudaTrackJob_get_ptr_controller
     st_CudaTrackJob_get_ptr_controller.argtypes = [ st_CudaTrackJob_p ]
-    st_CudaTrackJob_get_ptr_controller.restype = st_CudaController_p 
-    
+    st_CudaTrackJob_get_ptr_controller.restype = st_CudaController_p
+
     st_CudaTrackJob_get_ptr_const_controller = \
         sixtracklib.st_CudaTrackJob_get_ptr_const_controller
     st_CudaTrackJob_get_ptr_const_controller.argtypes = [ st_CudaTrackJob_p ]
-    st_CudaTrackJob_get_ptr_const_controller.restype = st_CudaController_p 
-    
+    st_CudaTrackJob_get_ptr_const_controller.restype = st_CudaController_p
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     st_CudaTrackJob_has_particles_arg = \
         sixtracklib.st_CudaTrackJob_has_particles_arg
     st_CudaTrackJob_has_particles_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_has_particles_arg.restype = ct.c_bool
-    
+
     st_CudaTrackJob_get_ptr_particles_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_particles_arg
     st_CudaTrackJob_get_ptr_particles_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_particles_arg.restype = st_CudaArgument_p
-    
+
     st_CudaTrackJob_get_ptr_const_particles_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_const_particles_arg
     st_CudaTrackJob_get_ptr_const_particles_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_const_particles_arg.restype = st_CudaArgument_p
-    
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     st_CudaTrackJob_has_beam_elements_arg = \
         sixtracklib.st_CudaTrackJob_has_beam_elements_arg
     st_CudaTrackJob_has_beam_elements_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_has_beam_elements_arg.restype = ct.c_bool
-    
+
     st_CudaTrackJob_get_ptr_beam_elements_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_beam_elements_arg
     st_CudaTrackJob_get_ptr_beam_elements_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_beam_elements_arg.restype = st_CudaArgument_p
-    
+
     st_CudaTrackJob_get_ptr_const_beam_elements_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_const_beam_elements_arg
-    st_CudaTrackJob_get_ptr_const_beam_elements_arg.argtypes = [ 
+    st_CudaTrackJob_get_ptr_const_beam_elements_arg.argtypes = [
         st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_const_beam_elements_arg.restype = st_CudaArgument_p
-    
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     st_CudaTrackJob_has_output_arg = \
         sixtracklib.st_CudaTrackJob_has_output_arg
     st_CudaTrackJob_has_output_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_has_output_arg.restype = ct.c_bool
-    
+
     st_CudaTrackJob_get_ptr_output_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_output_arg
     st_CudaTrackJob_get_ptr_output_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_output_arg.restype = st_CudaArgument_p
-    
+
     st_CudaTrackJob_get_ptr_const_output_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_const_output_arg
     st_CudaTrackJob_get_ptr_const_output_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_const_output_arg.restype = st_CudaArgument_p
-    
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     st_CudaTrackJob_has_particles_arg = \
         sixtracklib.st_CudaTrackJob_has_particles_arg
     st_CudaTrackJob_has_particles_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_has_particles_arg.restype = ct.c_bool
-    
+
     st_CudaTrackJob_get_ptr_particles_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_particles_arg
     st_CudaTrackJob_get_ptr_particles_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_particles_arg.restype = st_CudaArgument_p
-    
+
     st_CudaTrackJob_get_ptr_const_particles_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_const_particles_arg
     st_CudaTrackJob_get_ptr_const_particles_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_const_particles_arg.restype = st_CudaArgument_p
-    
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     st_CudaTrackJob_has_elem_by_elem_config_arg = \
         sixtracklib.st_CudaTrackJob_has_elem_by_elem_config_arg
-    st_CudaTrackJob_has_elem_by_elem_config_arg.argtypes = [ 
+    st_CudaTrackJob_has_elem_by_elem_config_arg.argtypes = [
         st_CudaTrackJob_p ]
     st_CudaTrackJob_has_elem_by_elem_config_arg.restype = ct.c_bool
-    
+
     st_CudaTrackJob_get_ptr_elem_by_elem_config_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_elem_by_elem_config_arg
-    st_CudaTrackJob_get_ptr_elem_by_elem_config_arg.argtypes = [ 
+    st_CudaTrackJob_get_ptr_elem_by_elem_config_arg.argtypes = [
         st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_elem_by_elem_config_arg.restype = st_CudaArgument_p
-    
+
     st_CudaTrackJob_get_ptr_const_elem_by_elem_config_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_const_elem_by_elem_config_arg
-    st_CudaTrackJob_get_ptr_const_elem_by_elem_config_arg.argtypes = [ 
+    st_CudaTrackJob_get_ptr_const_elem_by_elem_config_arg.argtypes = [
         st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_const_elem_by_elem_config_arg.restype = \
         st_CudaArgument_p
-    
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        
+
     st_CudaTrackJob_has_debug_register_arg = \
         sixtracklib.st_CudaTrackJob_has_debug_register_arg
     st_CudaTrackJob_has_debug_register_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_has_debug_register_arg.restype = ct.c_bool
-    
+
     st_CudaTrackJob_get_ptr_debug_register_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_debug_register_arg
     st_CudaTrackJob_get_ptr_debug_register_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_debug_register_arg.restype = st_CudaArgument_p
-    
+
     st_CudaTrackJob_get_ptr_const_debug_register_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_const_debug_register_arg
-    st_CudaTrackJob_get_ptr_const_debug_register_arg.argtypes = [ 
+    st_CudaTrackJob_get_ptr_const_debug_register_arg.argtypes = [
         st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_const_debug_register_arg.restype = \
         st_CudaArgument_p
-    
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        
+
     st_CudaTrackJob_has_particles_addr_arg = \
         sixtracklib.st_CudaTrackJob_has_particles_addr_arg
     st_CudaTrackJob_has_particles_addr_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_has_particles_addr_arg.restype = ct.c_bool
-    
+
     st_CudaTrackJob_get_ptr_particles_addr_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_particles_addr_arg
     st_CudaTrackJob_get_ptr_particles_addr_arg.argtypes = [ st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_particles_addr_arg.restype = st_CudaArgument_p
-    
+
     st_CudaTrackJob_get_ptr_const_particles_addr_arg = \
         sixtracklib.st_CudaTrackJob_get_ptr_const_particles_addr_arg
-    st_CudaTrackJob_get_ptr_const_particles_addr_arg.argtypes = [ 
+    st_CudaTrackJob_get_ptr_const_particles_addr_arg.argtypes = [
         st_CudaTrackJob_p ]
     st_CudaTrackJob_get_ptr_const_particles_addr_arg.restype = \
         st_CudaArgument_p
