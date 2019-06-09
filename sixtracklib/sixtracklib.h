@@ -80,7 +80,6 @@
            ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
 
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/control/argument_base.h"
     #include "sixtracklib/cuda/control/kernel_config.h"
     #include "sixtracklib/cuda/argument.h"
     #include "sixtracklib/cuda/controller.h"

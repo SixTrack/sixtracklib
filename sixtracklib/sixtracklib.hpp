@@ -37,7 +37,6 @@
 #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
 
-#include "sixtracklib/cuda/control/argument_base.hpp"
 #include "sixtracklib/cuda/control/kernel_config.hpp"
 #include "sixtracklib/cuda/control/node_info.hpp"
 

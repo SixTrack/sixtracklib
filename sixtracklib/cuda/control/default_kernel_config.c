@@ -117,7 +117,7 @@ NS(CudaKernelConfig_configure_assign_output_to_beam_monitors_kernel)(
               NS(KernelConfig_set_preferred_work_group_multiple_1d)(
                 kernel_config, warp_size ) ) )
         {
-            status NS(KernelConfig_update)( kernel_config );
+            status = NS(KernelConfig_update)( kernel_config );
         }
     }
 

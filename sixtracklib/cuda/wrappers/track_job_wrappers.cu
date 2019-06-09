@@ -6,6 +6,7 @@
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer/buffer_type.h"
 #include "sixtracklib/common/control/definitions.h"
+#include "sixtracklib/common/control/argument_base.h"
 #include "sixtracklib/common/particles/definitions.h"
 #include "sixtracklib/common/track/definitions.h"
 
