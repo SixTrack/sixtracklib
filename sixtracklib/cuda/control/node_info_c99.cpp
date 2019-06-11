@@ -19,6 +19,71 @@
 
 namespace st = SIXTRL_CXX_NAMESPACE;
 
+::NS(CudaNodeInfo)* NS(CudaNodeInfo_new)( 
+    ::NS(cuda_dev_index_t) const cuda_device_index )
+{
+    ::NS(CudaNodeInfo)* ptr_cuda_node_info = nullptr;
+    
+    if( cuda_device_index >= ::NS(cuda_dev_index_t){ 0 } )
+    {
+        ::cudaDeviceProp device_properties;
+        ::cudaError_t err = ::cudaGetDeviceProperties( 
+            &device_properties, cuda_device_index );
+    
+        if( err == ::cudaSuccess )
+        {
+            ptr_cuda_node_info = new st::CudaNodeInfo( 
+                cuda_device_index, device_properties );
+        }
+    }
+    
+    return ptr_cuda_node_info; 
+}
+
+::NS(CudaNodeInfo)* NS(CudaNodeInfo_new_detailed)( 
+    ::NS(cuda_dev_index_t) const cuda_device_index, 
+    ::NS(node_platform_id_t) const platform_id, 
+    ::NS(node_device_id_t) const device_id, 
+    ::NS(node_index_t) const node_index, 
+    bool const is_default_node, bool const is_selected_node )
+{
+    ::NS(CudaNodeInfo)* ptr_cuda_node_info = nullptr;
+    
+    if( cuda_device_index >= ::NS(cuda_dev_index_t){ 0 } )
+    {
+        ::cudaDeviceProp device_properties;
+        ::cudaError_t err = ::cudaGetDeviceProperties( 
+            &device_properties, cuda_device_index );
+    
+        if( err == ::cudaSuccess )
+        {
+            ptr_cuda_node_info = new st::CudaNodeInfo( 
+                cuda_device_index, device_properties, platform_id, device_id,
+                    node_index, is_default_node, is_selected_node );
+        }
+    }
+    
+    return ptr_cuda_node_info; 
+}
+
+/* ------------------------------------------------------------------------- */
+
+::NS(cuda_dev_index_t) NS(CudaNodeInfo_get_cuda_device_index)(
+    const ::NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info )
+{
+    return ( ( node_info != nullptr ) && ( node_info->hasCudaDeviceIndex() ) )
+        ? node_info->cudaDeviceIndex() : ::NS(cuda_dev_index_t){ -1 };
+}
+
+char const* NS(CudaNodeInfo_get_pci_bus_id_str)(
+    const ::NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info )
+{
+    return ( ( node_info != nullptr ) && ( node_info->hasPciBusId() ) )
+        ? node_info->ptrPciBusIdStr() : nullptr;
+}
+
+/* ------------------------------------------------------------------------- */
+
 ::NS(arch_size_t) NS(CudaNodeInfo_get_warp_size)(
     const ::NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info )
 {

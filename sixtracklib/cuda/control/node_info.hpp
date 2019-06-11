@@ -60,7 +60,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN CudaNodeInfo(
             cuda_dev_index_t const cuda_dev_index,
-            ::cudaDeviceProp const& cuda_device_properties );
+            ::cudaDeviceProp const& cuda_device_properties,        
+            platform_id_t const platform_id = node_id_t::ILLEGAL_PLATFORM_ID,
+            device_id_t const device_id = node_id_t::ILLEGAL_DEVICE_ID,
+            node_index_t const node_index = node_id_t::UNDEFINED_INDEX,
+            bool const is_default_node = false,
+            bool const is_selected_node = false );
+        
 
         SIXTRL_HOST_FN CudaNodeInfo( CudaNodeInfo const& other ) = default;
         SIXTRL_HOST_FN CudaNodeInfo( CudaNodeInfo&& other ) = default;
@@ -95,8 +101,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN size_type
         maxThreadsPerMultiprocessor() const SIXTRL_NOEXCEPT;
-
-
 
         protected:
 

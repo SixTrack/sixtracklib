@@ -22,6 +22,29 @@ extern "C" {
 
 #if !defined( _GPUCODE )
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo)*
+NS(CudaNodeInfo_new)( NS(cuda_dev_index_t) const cuda_device_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo)*
+NS(CudaNodeInfo_new_detailed)( 
+    int const cuda_device_index, 
+    NS(node_platform_id_t) const platform_id, 
+    NS(node_device_id_t) const device_id, 
+    NS(node_index_t) const node_index, 
+    bool const is_default_node, bool const is_selected_node );
+
+/* ------------------------------------------------------------------------ */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int 
+NS(CudaNodeInfo_get_cuda_device_index)(
+    const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN char const*
+NS(CudaNodeInfo_get_pci_bus_id_str)(
+    const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info );
+
+/* ------------------------------------------------------------------------ */
+    
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(CudaNodeInfo_get_warp_size)(
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info );
 

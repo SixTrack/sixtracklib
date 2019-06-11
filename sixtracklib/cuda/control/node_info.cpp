@@ -21,8 +21,7 @@ namespace SIXTRL_CXX_NAMESPACE
 {
     CudaNodeInfo::CudaNodeInfo(
         CudaNodeInfo::cuda_dev_index_t const cuda_dev_index ) :
-        SIXTRL_CXX_NAMESPACE::NodeInfoBase(
-            SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA,
+        st::NodeInfoBase( st::ARCHITECTURE_CUDA,
             SIXTRL_ARCHITECTURE_CUDA_STR ),
         m_cu_device_properties(),
         m_cu_device_index( cuda_dev_index ),
@@ -33,15 +32,24 @@ namespace SIXTRL_CXX_NAMESPACE
 
     CudaNodeInfo::CudaNodeInfo(
         CudaNodeInfo::cuda_dev_index_t const cuda_dev_index,
-        ::cudaDeviceProp const& cuda_device_properties ) :
-        SIXTRL_CXX_NAMESPACE::NodeInfoBase(
-            SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA,
-            SIXTRL_ARCHITECTURE_CUDA_STR ),
+        ::cudaDeviceProp const& cuda_device_properties, 
+        CudaNodeInfo::platform_id_t const platform_id, 
+        CudaNodeInfo::device_id_t const device_id, 
+        CudaNodeInfo::node_index_t const node_index, 
+        bool const is_default_node, bool const is_selected_node ) :
+        st::NodeInfoBase( st::ARCHITECTURE_CUDA,
+            SIXTRL_ARCHITECTURE_CUDA_STR, platform_id, device_id, 
+            nullptr, nullptr, nullptr, is_default_node, is_selected_node ),
         m_cu_device_properties( cuda_device_properties ),
         m_cu_device_index( cuda_dev_index ),
         m_cu_device_pci_bus_id( "0000:00:00.0" )
     {
         using size_t = CudaNodeInfo::size_type;
+        
+        if( node_index != st::NODE_UNDEFINED_INDEX )
+        {
+            this->setNodeIndex( node_index );
+        }
 
         ::cudaError_t err = ::cudaSuccess;
         int max_num_devices = int{ 0 };
@@ -122,7 +130,7 @@ namespace SIXTRL_CXX_NAMESPACE
             }
         }
     }
-
+    
     bool CudaNodeInfo::hasPciBusId() const SIXTRL_NOEXCEPT
     {
         return ( ( !this->m_cu_device_pci_bus_id.empty() ) &&
@@ -211,7 +219,7 @@ namespace SIXTRL_CXX_NAMESPACE
     void CudaNodeInfo::doPrintToOutputStream(
         std::ostream& SIXTRL_RESTRICT_REF output ) const
     {
-        SIXTRL_CXX_NAMESPACE::NodeInfoBase::doPrintToOutputStream( output );
+        st::NodeInfoBase::doPrintToOutputStream( output );
 
         output << "cuda device index     : "
                << this->m_cu_device_index << "\r\n";
