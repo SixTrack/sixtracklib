@@ -24,7 +24,7 @@
 #if defined( __cplusplus   ) && !defined( _GPUCODE ) && \
    !defined( __CUDA_ARCH__ ) && !defined( __CUDACC__ )
 
-#if !defined( SIXTRL_NO_INCLUDES )    
+#if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/cuda/control/node_info.hpp"
     #include "sixtracklib/cuda/control/kernel_config.hpp"
     #include "sixtracklib/common/buffer.hpp"
@@ -33,7 +33,7 @@
 namespace SIXTRL_CXX_NAMESPACE
 {
     class CudaArgument;
-    
+
     class CudaController : public SIXTRL_CXX_NAMESPACE::NodeControllerBase
     {
         private:
@@ -115,6 +115,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN node_info_t const* ptrNodeInfo(
             std::string const& SIXTRL_RESTRICT_REF node_id_str
+            ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN node_info_t const* ptrNodeInfoByCudaDeviceIndex(
+            cuda_dev_index_t const cuda_dev_index ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN node_info_t const* ptrNodeInfoByPciBusId(
+                std::string const& SIXTRL_RESTRICT_REF pci_bus_id_str
+            ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN node_info_t const* ptrNodeInfoByPciBusId(
+                const char *const SIXTRL_RESTRICT pci_bus_id_str
             ) const SIXTRL_NOEXCEPT;
 
         /* ---------------------------------------------------------------- */

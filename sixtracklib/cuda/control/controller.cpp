@@ -407,6 +407,31 @@ namespace SIXTRL_CXX_NAMESPACE
             node_id_str.c_str() ) );
     }
 
+    CudaController::node_info_t const*
+    CudaController::ptrNodeInfoByCudaDeviceIndex(
+        CudaController::cuda_dev_index_t const
+            cuda_dev_index ) const SIXTRL_NOEXCEPT
+    {
+        return this->ptrNodeInfo( this->doFindAvailableNodesByCudaDeviceIndex(
+            cuda_dev_index ) );
+    }
+
+    CudaController::node_info_t const* CudaController::ptrNodeInfoByPciBusId(
+            std::string const& SIXTRL_RESTRICT_REF pci_bus_id_str
+        ) const SIXTRL_NOEXCEPT
+    {
+        return this->ptrNodeInfo( this->doFindAvailableNodesByPciBusId(
+            pci_bus_id_str.c_str() ) );
+    }
+
+    CudaController::node_info_t const* CudaController::ptrNodeInfoByPciBusId(
+            const char *const SIXTRL_RESTRICT pci_bus_id_str
+        ) const SIXTRL_NOEXCEPT
+    {
+        return this->ptrNodeInfo( this->doFindAvailableNodesByPciBusId(
+            pci_bus_id_str ) );
+    }
+
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     CudaController::status_t CudaController::selectNodeByCudaIndex(

@@ -12,13 +12,71 @@
 
 namespace st = SIXTRL_CXX_NAMESPACE;
 
-NS(CudaController)* NS(CudaController_create)( void )
+::NS(CudaController)* NS(CudaController_create)( void )
 {
-    return new SIXTRL_CXX_NAMESPACE::CudaController( "" );
+    return new st::CudaController( "" );
 }
 
+::NS(CudaController)* NS(CudaController_new)(
+    const char *const SIXTRL_RESTRICT config_str )
+{
+    return new st::CudaController( config_str );
+}
+
+::NS(CudaController)* NS(CudaController_new_from_node_id)(
+    const ::NS(NodeId) *const SIXTRL_RESTRICT node_id,
+    const char *const SIXTRL_RESTRICT config_str )
+{
+    return ( node_id != nullptr )
+        ? new st::CudaController( *node_id, config_str ) : nullptr;
+}
+
+::NS(CudaController)* NS(CudaController_new_from_node_index)(
+    ::NS(node_index_t) const node_index,
+    const char *const SIXTRL_RESTRICT config_str )
+{
+    ::NS(CudaController)* ptr_ctrl = ( node_index != st::NODE_UNDEFINED_INDEX )
+        ? new st::CudaController( config_str ) : nullptr;
+
+    if( ptr_ctrl != nullptr )
+    {
+        ::NS(arch_status_t) const status = ptr_ctrl->selectNode( node_index );
+
+        if( status != st::ARCH_STATUS_SUCCESS )
+        {
+            delete ptr_ctrl;
+            ptr_ctrl = nullptr;
+        }
+    }
+
+    return ptr_ctrl;
+}
+
+::NS(CudaController)* NS(CudaController_new_from_platform_id_and_device_id)(
+    ::NS(node_platform_id_t) const platform_id,
+    ::NS(node_device_id_t) const device_id,
+    const char *const SIXTRL_RESTRICT config_str )
+{
+    return ( ( platform_id != st::NODE_ILLEGAL_PATFORM_ID ) &&
+             ( device_id != st::NODE_ILLEGAL_PATFORM_ID ) )
+        ? new st::CudaController( platform_id, device_id, config_str )
+        : nullptr;
+}
+
+::NS(CudaController)* NS(CudaController_new_from_cuda_device_index)(
+    ::NS(cuda_dev_index_t) const cuda_device_index,
+    const char *const SIXTRL_RESTRICT config_str )
+{
+     return ( cuda_device_index >= ::NS(cuda_dev_index_t){ 0 } )
+         ? new st::CudaController( cuda_device_index, config_str )
+         : nullptr;
+}
+
+/* ------------------------------------------------------------------------- */
+
 ::NS(arch_status_t) NS(CudaController_select_node_by_cuda_device_index)(
-    NS(CudaController)* SIXTRL_RESTRICT ctrl, int cuda_device_index )
+    NS(CudaController)* SIXTRL_RESTRICT ctrl,
+    NS(cuda_dev_index_t) const cuda_device_index )
 {
     return ( ctrl != nullptr )
         ? ctrl->selectNodeByCudaIndex( cuda_device_index )
@@ -44,7 +102,7 @@ void NS(CudaController_delete)( NS(CudaController)* SIXTRL_RESTRICT ctrl )
 
 ::NS(CudaNodeInfo) const* NS(CudaController_get_ptr_node_info_by_index)(
      const ::NS(CudaController) *const SIXTRL_RESTRICT ctrl,
-     ::NS(ctrl_size_t) const index )
+     ::NS(node_index_t) const index )
 {
     return ( ctrl != nullptr ) ? ctrl->ptrNodeInfo( index ) : nullptr;
 }
@@ -72,6 +130,22 @@ NS(CudaController_get_ptr_node_info_by_platform_id_and_device_id)(
      char const* SIXTRL_RESTRICT node_id_str )
 {
     return ( ctrl != nullptr ) ? ctrl->ptrNodeInfo( node_id_str ) : nullptr;
+}
+
+::NS(CudaNodeInfo) const* NS(CudaController_get_ptr_node_info_by_cuda_dev_index)(
+     const ::NS(CudaController) *const SIXTRL_RESTRICT ctrl,
+     ::NS(cuda_dev_index_t) const cuda_device_index )
+{
+    return ( ctrl != nullptr )
+        ? ctrl->ptrNodeInfoByCudaDeviceIndex( cuda_device_index ) : nullptr;
+}
+
+::NS(CudaNodeInfo) const* NS(CudaController_get_ptr_node_info_by_pci_bus_id)(
+     const ::NS(CudaController) *const SIXTRL_RESTRICT ctrl,
+     char const* SIXTRL_RESTRICT pci_bus_id_str )
+{
+    return ( ctrl != nullptr )
+        ? ctrl->ptrNodeInfoByPciBusId( pci_bus_id_str ) : nullptr;
 }
 
 /* ------------------------------------------------------------------------- */
