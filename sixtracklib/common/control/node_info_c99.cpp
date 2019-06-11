@@ -111,7 +111,7 @@ void NS(NodeInfo_set_is_selected_node)(
 ::NS(arch_id_t) NS(NodeInfo_get_arch_id)(
     SIXTRL_ARGPTR_DEC const ::NS(NodeInfoBase) *const SIXTRL_RESTRICT info )
 {
-    return ( info != nullptr ) ? info->archId() : ::NS(ARCHITECTURE_ILLEGAL);
+    return ( info != nullptr ) ? info->archId() : st::ARCHITECTURE_ILLEGAL;
 }
 
 bool NS(NodeInfo_has_arch_string)(
@@ -206,19 +206,19 @@ void NS(NodeInfo_print_out)(
 ::NS(arch_size_t) NS(NodeInfo_get_required_output_str_length)(
     SIXTRL_ARGPTR_DEC const ::NS(NodeInfoBase) *const SIXTRL_RESTRICT info )
 {
-    return ( info != nullptr ) 
-        ? info->requiredOutStringLength() : ::NS(arch_size_t){ 0 };    
+    return ( info != nullptr )
+        ? info->requiredOutStringLength() : ::NS(arch_size_t){ 0 };
 }
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(NodeInfo_convert_to_string)(
-    SIXTRL_ARGPTR_DEC const NS(NodeInfoBase) *const SIXTRL_RESTRICT info, 
+    SIXTRL_ARGPTR_DEC const NS(NodeInfoBase) *const SIXTRL_RESTRICT info,
     NS(arch_size_t) const out_string_capacity,
     char* SIXTRL_RESTRICT out_string )
 {
-    return ( info != nullptr ) 
-        ? info->toString( out_string_capacity, out_string ) 
-        : st::ARCH_STATUS_GENERAL_FAILURE;    
+    return ( info != nullptr )
+        ? info->toString( out_string_capacity, out_string )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 #endif /* !defined( _GPUCODE ) */
