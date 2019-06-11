@@ -40,6 +40,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         using arch_info_t   = SIXTRL_CXX_NAMESPACE::ArchInfo;
         using arch_id_t     = arch_info_t::arch_id_t;
+        using status_t      = SIXTRL_CXX_NAMESPACE::arch_status_t;
 
         SIXTRL_HOST_FN explicit NodeInfoBase(
             arch_id_t const arch_id,
@@ -167,6 +168,12 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void print( ::FILE* SIXTRL_RESTRICT output ) const;
 
         SIXTRL_HOST_FN void printOut() const;
+        
+        SIXTRL_HOST_FN size_type requiredOutStringLength() const;
+        
+        SIXTRL_HOST_FN std::string toString() const;
+        SIXTRL_HOST_FN status_t toString( size_type const out_str_capacity, 
+            char* SIXTRL_RESTRICT out_str ) const;
 
         /* ----------------------------------------------------------------- */
 

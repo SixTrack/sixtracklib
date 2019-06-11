@@ -25,6 +25,11 @@ extern "C" {
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(NodeInfo_delete)(
+    NS(NodeInfoBase)* SIXTRL_RESTRICT node_info );
+    
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(NodeId) const*
 NS(NodeInfo_get_ptr_const_node_id)(
     SIXTRL_ARGPTR_DEC const NS(NodeInfoBase) *const SIXTRL_RESTRICT info );
@@ -123,6 +128,16 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(NodeInfo_print)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(NodeInfo_print_out)(
     SIXTRL_ARGPTR_DEC const NS(NodeInfoBase) *const SIXTRL_RESTRICT info );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) 
+NS(NodeInfo_get_required_output_str_length)(
+    SIXTRL_ARGPTR_DEC const NS(NodeInfoBase) *const SIXTRL_RESTRICT info );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(NodeInfo_convert_to_string)(
+    SIXTRL_ARGPTR_DEC const NS(NodeInfoBase) *const SIXTRL_RESTRICT info, 
+    NS(arch_size_t) const out_string_capacity,
+    char* SIXTRL_RESTRICT out_string );
 
 #endif /* !defined( _GPUCODE ) */
 

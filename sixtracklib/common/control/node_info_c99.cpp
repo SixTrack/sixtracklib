@@ -11,6 +11,13 @@
 
 #if !defined( _GPUCODE )
 
+namespace st = SIXTRL_CXX_NAMESPACE;
+
+void NS(NodeInfo_delete)( ::NS(NodeInfoBase)* SIXTRL_RESTRICT node_info )
+{
+    if( node_info != nullptr ) delete node_info;
+}
+
 /* ------------------------------------------------------------------------- */
 
 ::NS(NodeId) const* NS(NodeInfo_get_ptr_const_node_id)(
@@ -29,7 +36,7 @@
     SIXTRL_ARGPTR_DEC const ::NS(NodeInfoBase) *const SIXTRL_RESTRICT info )
 {
     return ( info != nullptr )
-        ? info->platformId() : SIXTRL_CXX_NAMESPACE::NODE_ILLEGAL_PATFORM_ID;
+        ? info->platformId() : st::NODE_ILLEGAL_PATFORM_ID;
 }
 
 void NS(NodeInfo_set_platform_id)(
@@ -43,7 +50,7 @@ void NS(NodeInfo_set_platform_id)(
     SIXTRL_ARGPTR_DEC const ::NS(NodeInfoBase) *const SIXTRL_RESTRICT info )
 {
     return ( info != nullptr )
-        ? info->deviceId() : SIXTRL_CXX_NAMESPACE::NODE_ILLEGAL_DEVICE_ID;
+        ? info->deviceId() : st::NODE_ILLEGAL_DEVICE_ID;
 }
 
 void NS(NodeInfo_set_device_id)(
@@ -63,7 +70,7 @@ bool NS(NodeInfo_has_node_index)(
     SIXTRL_ARGPTR_DEC const ::NS(NodeInfoBase) *const SIXTRL_RESTRICT info )
 {
     return ( info != nullptr )
-        ? info->nodeIndex() : SIXTRL_CXX_NAMESPACE::NODE_UNDEFINED_INDEX;
+        ? info->nodeIndex() : st::NODE_UNDEFINED_INDEX;
 }
 
 void NS(NodeInfo_set_node_index)(
@@ -193,6 +200,25 @@ void NS(NodeInfo_print_out)(
     SIXTRL_ARGPTR_DEC const ::NS(NodeInfoBase) *const SIXTRL_RESTRICT info )
 {
     if( info != nullptr ) info->printOut();
+}
+
+
+::NS(arch_size_t) NS(NodeInfo_get_required_output_str_length)(
+    SIXTRL_ARGPTR_DEC const ::NS(NodeInfoBase) *const SIXTRL_RESTRICT info )
+{
+    return ( info != nullptr ) 
+        ? info->requiredOutStringLength() : ::NS(arch_size_t){ 0 };    
+}
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(NodeInfo_convert_to_string)(
+    SIXTRL_ARGPTR_DEC const NS(NodeInfoBase) *const SIXTRL_RESTRICT info, 
+    NS(arch_size_t) const out_string_capacity,
+    char* SIXTRL_RESTRICT out_string )
+{
+    return ( info != nullptr ) 
+        ? info->toString( out_string_capacity, out_string ) 
+        : st::ARCH_STATUS_GENERAL_FAILURE;    
 }
 
 #endif /* !defined( _GPUCODE ) */

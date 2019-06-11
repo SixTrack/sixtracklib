@@ -13,6 +13,8 @@
 #include "sixtracklib/common/control/node_id.hpp"
 #include "sixtracklib/common/control/arch_info.hpp"
 
+namespace st = SIXTRL_CXX_NAMESPACE;
+
 namespace SIXTRL_CXX_NAMESPACE
 {
     NodeInfoBase::NodeInfoBase(
@@ -24,7 +26,7 @@ namespace SIXTRL_CXX_NAMESPACE
         const char *const SIXTRL_RESTRICT device_name,
         const char *const SIXTRL_RESTRICT description,
         bool const is_default_node, bool const is_selected_node ) :
-        SIXTRL_CXX_NAMESPACE::ArchInfo( arch_id, arch_str ), m_platform_name(),
+        st::ArchInfo( arch_id, arch_str ), m_platform_name(),
         m_device_name(), m_description(), m_node_id( platform_id, device_id ),
         m_is_default_node( is_default_node ),
         m_is_selected_node( is_selected_node )
@@ -41,7 +43,7 @@ namespace SIXTRL_CXX_NAMESPACE
         const char *const SIXTRL_RESTRICT device_name,
         const char *const SIXTRL_RESTRICT description,
         bool const is_default_node, bool const is_selected_node ) :
-        SIXTRL_CXX_NAMESPACE::ArchInfo( ),
+        st::ArchInfo( ),
         m_platform_name(), m_device_name(), m_description(), m_node_id(),
         m_is_default_node( is_default_node ),
         m_is_selected_node( is_selected_node )
@@ -68,7 +70,7 @@ namespace SIXTRL_CXX_NAMESPACE
         std::string const& SIXTRL_RESTRICT_REF device_name,
         std::string const& SIXTRL_RESTRICT_REF description,
         bool const is_default_node, bool const is_selected_node ) :
-        SIXTRL_CXX_NAMESPACE::ArchInfo( arch_info ), m_platform_name(),
+        st::ArchInfo( arch_info ), m_platform_name(),
         m_device_name(), m_description(), m_node_id( node_id ),
         m_is_default_node( is_default_node ),
         m_is_selected_node( is_selected_node )
@@ -87,7 +89,7 @@ namespace SIXTRL_CXX_NAMESPACE
         std::string const& SIXTRL_RESTRICT_REF device_name,
         std::string const& SIXTRL_RESTRICT_REF description,
         bool const is_default_node, bool const is_selected_node ):
-        SIXTRL_CXX_NAMESPACE::ArchInfo( arch_id, arch_str ), m_platform_name(),
+        st::ArchInfo( arch_id, arch_str ), m_platform_name(),
         m_device_name(), m_description(), m_node_id( platform_id, device_id ),
         m_is_default_node( is_default_node ),
         m_is_selected_node( is_selected_node )
@@ -97,7 +99,7 @@ namespace SIXTRL_CXX_NAMESPACE
         this->setDescription( description );
     }
 
-    /* ----------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
     NodeInfoBase::node_id_t const&
     NodeInfoBase::nodeId() const SIXTRL_NOEXCEPT
@@ -182,7 +184,7 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_is_selected_node = is_selected_node;
     }
 
-    /* ----------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
     bool NodeInfoBase::hasPlatformName() const SIXTRL_NOEXCEPT
     {
@@ -289,7 +291,7 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    /* ----------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
     std::ostream& operator<<( std::ostream& SIXTRL_RESTRICT_REF output,
         NodeInfoBase const& SIXTRL_RESTRICT_REF node_info )
@@ -317,8 +319,56 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         this->print( ::stdout );
     }
+    
+    
+    NodeInfoBase::size_type 
+    NodeInfoBase::requiredOutStringLength() const
+    {
+        std::ostringstream a2str;
+        this->doPrintToOutputStream( a2str );
+        return a2str.str().size(); /* TODO: Find a more efficient method! */
+    }
+        
+    std::string NodeInfoBase::toString() const
+    {
+        std::ostringstream a2str;
+        this->doPrintToOutputStream( a2str );
+        
+        return a2str.str();
+    }
+    
+    NodeInfoBase::status_t NodeInfoBase::toString(
+        NodeInfoBase::size_type const out_str_capacity, 
+        char* SIXTRL_RESTRICT out_str ) const
+    {
+        using size_t = NodeInfoBase::size_type;
+        
+        NodeInfoBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        
+        if( ( out_str_capacity > size_t{ 0 } ) && ( out_str != nullptr ) )
+        {
+            std::memset( out_str, ( int )'\0', out_str_capacity );
+            
+            std::ostringstream a2str;
+            this->doPrintToOutputStream( a2str );
+            std::string const temp_str = a2str.str();
+            
+            if( !temp_str.empty() )
+            {
+                std::strncpy( out_str, temp_str.c_str(), 
+                              out_str_capacity - size_t{ 1 } );
+            
+                if( out_str_capacity >= temp_str.size() )
+                {
+                    status = st::ARCH_STATUS_SUCCESS;
+                }
+            }            
+        }
+        
+        return status;
+    }
 
-    /* ----------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
     void NodeInfoBase::doPrintToOutputStream(
         std::ostream& SIXTRL_RESTRICT_REF output ) const
