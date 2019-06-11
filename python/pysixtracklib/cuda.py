@@ -63,8 +63,8 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
             _ptr_bus_id_cstr = st_CudaNodeInfo_get_pci_bus_id_str(
                 self._ptr_node_info )
             if _ptr_bus_id_cstr != st_NullChar:
-                _pci_bus_id_str = str( _ptr_bus_id_cstr.value )
-                _pci_bus_id_str = _pci_bus_id_str.decode( 'utf-8' )
+                _pci_bus_id_str = bytes(
+                    _ptr_bus_id_cstr.value ).decode( 'utf-8' )
             return _pci_bus_id_str
 
         @property

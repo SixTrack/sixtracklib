@@ -306,9 +306,8 @@ class ArgumentBase(object):
     def arch_str(self):
         arch_str = None
         if st_Argument_has_arch_string( self._ptr_argument ):
-            arch_str = str( st_Argument_get_arch_string(
-                self._ptr_argument ) )
-            arch_str = arch_str.decode( 'utf-8' )
+            arch_str = bytes( st_Argument_get_arch_string(
+                self._ptr_argument ) ).decode( 'utf-8' )
         return arch_str
 
     @property
@@ -487,8 +486,8 @@ class ControllerBase(object):
     def config_str(self):
         conf_str = None
         if st_Controller_has_config_string( self._ptr_ctrl ):
-            conf_str = str( st_Controller_get_config_string( self._ptr_ctrl ) )
-            conf_str = conf_str.decode( 'utf-8' )
+            conf_str = bytes( st_Controller_get_config_string(
+                    self._ptr_ctrl ) ).decode( 'utf-8' )
         return conf_str
 
     @property
@@ -562,8 +561,7 @@ class ControllerBase(object):
             _kernel_name_cstr = st_Controller_get_kernel_name_string(
                 self._ptr_ctrl, _kernel_id )
         if _kernel_name_cstr != st_NullChar:
-            _kernel_name = str( _kernel_name_cstr.value )
-            _kernel_name = _kernel_name.decode( 'utf-8' )
+            _kernel_name = bytes( _kernel_name_cstr.value ).decode( 'utf-8' )
         return _kernel_name
 
     # TODO: Implement missing KernelConfig* methods as soon as all API details
