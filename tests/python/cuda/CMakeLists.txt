@@ -4,12 +4,11 @@
 if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
 
     # ==========================================================================
-    # CudaArgument:
+    # test_cuda_controller.py:
 
-    add_test( NAME Python_Cuda_ArgumentTests
-        COMMAND ${PYTHON_EXECUTABLE}
-                ${CMAKE_CURRENT_SOURCE_DIR}/test_cuda_argument.py
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
+    add_test( NAME Python_Cuda_CudaControllerTests
+              COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_cuda_controller.py
+              WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
 
 endif()
 
