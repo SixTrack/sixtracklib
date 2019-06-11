@@ -10,7 +10,7 @@ from .control import NodeId, NodeInfoBase, ArgumentBase, NodeControllerBase
 if SIXTRACKLIB_MODULES.get('cuda', False):
     from .stcommon import st_Null, st_node_platform_id_t, st_node_device_id_t, \
         st_node_index_t, st_arch_status_t, st_arch_size_t, st_buffer_size_t, \
-        st_ctrl_size_t, st_ctrl_status_t, \
+        st_ctrl_size_t, st_ctrl_status_t, st_NullBuffer, \
         st_NullChar, st_ARCH_STATUS_GENERAL_FAILURE, st_ARCH_STATUS_SUCCESS, \
         st_NODE_UNDEFINED_INDEX, st_NODE_ILLEGAL_PLATFORM_ID, \
         st_NODE_ILLEGAL_DEVICE_ID, st_NullNodeId
@@ -199,13 +199,18 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
         st_CudaArgument_get_cuda_arg_buffer_as_const_elem_by_elem_config_begin
 
     class CudaArgument(ArgumentBase):
-        def __init__( self, ptr_buffer=None, ptr_cuda_ctrl=st_NullCudaController,
+        def __init__( self, ptr_buffer=None, ctrl=None,
                       ptr_raw_arg_begin=None, raw_arg_size=None,
                       ptr_argument=st_NullCudaArgument, owns_ptr=True ):
-            if ptr_cuda_ctrl is None or ptr_cuda_ctrl == st_NullCudaController:
+            ptr_cuda_ctrl = st_NullCudaController
+            if ctrl is not None and isinstance( ctrl, CudaController ):
+                ptr_cuda_ctrl = ctrl.pointer
+            elif ctrl is not None and ctrl != st_NullCudaController:
+                ptr_cuda_ctrl = ctrl
+
+            if ptr_cuda_ctrl == st_NullCudaController:
                 raise ValueError( "creating CudaArgument requires a " + \
                                   "CudaController instance" )
-
             _ptr_arg = ptr_argument
             if _ptr_arg == st_NullCudaArgument or _ptr_arg is None:
                 owns_ptr = True

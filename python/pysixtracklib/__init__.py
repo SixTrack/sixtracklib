@@ -3,6 +3,7 @@
 
 from .particles import *
 from .beam_elements import *
+from .buffer import Buffer
 from .control import NodeId, NodeInfoBase, ControllerBase, NodeControllerBase, \
                      ArgumentBase
 from .cuda import CudaArgument, CudaController, CudaNodeInfo

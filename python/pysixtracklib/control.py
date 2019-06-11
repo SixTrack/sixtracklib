@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import ctypes as ct
+import cobjects
+from cobjects import CBuffer
+from .buffer import Buffer
 
 from .stcommon import st_Null, st_NullChar, st_Buffer_p, st_NullBuffer, \
     st_ARCH_STATUS_GENERAL_FAILURE, st_ARCH_STATUS_SUCCESS, \
@@ -359,8 +362,18 @@ class ArgumentBase(object):
     def last_status(self):
         return self._last_status
 
-    def send(self, ptr_buffer=st_NullBuffer, remap_buffer=True,
+    def send(self, buffer=st_NullBuffer, remap_buffer=True,
              ptr_raw_arg_begin=st_Null, raw_arg_size=None ):
+        ptr_buffer = st_NullBuffer
+        if buffer is not None and buffer is not st_NullBuffer:
+            if isinstance( buffer, Buffer ):
+                ptr_buffer = buffer.pointer
+            elif isinstance( buffer, CBuffer ):
+                _buffer = Buffer(cbuffer=buffer)
+                ptr_buffer = _buffer.pointer
+            else:
+                ptr_buffer = buffer
+
         if ptr_buffer != st_NullBuffer:
             if remap_buffer:
                 self._last_status = st_Argument_send_buffer(
@@ -377,18 +390,28 @@ class ArgumentBase(object):
             self._last_status = st_Argument_send_again( self._ptr_argument )
         return self
 
-    def send_buffer( self, ptr_buffer ):
-        return self.send(ptr_buffer=ptr_buffer, remap_buffer=True )
+    def send_buffer( self, buffer ):
+        return self.send( buffer=buffer, remap_buffer=True )
 
-    def send_buffer_without_remap( self, ptr_buffer ):
-        return self.send(ptr_buffer=ptr_buffer, remap_buffer=False )
+    def send_buffer_without_remap( self, buffer ):
+        return self.send( buffer=buffer, remap_buffer=False )
 
     def send_raw_argument( self, ptr_raw_arg_begin, raw_arg_size ):
         return self.send( ptr_raw_arg_begin=ptr_raw_arg_begin,
                           raw_arg_size=raw_arg_size )
 
-    def receive( self, ptr_buffer=st_NullBuffer, remap_buffer=True,
+    def receive( self, buffer=st_NullBuffer, remap_buffer=True,
                  ptr_raw_arg_begin=st_Null, raw_arg_capacity=None ):
+        ptr_buffer = st_NullBuffer
+        if buffer is not None and buffer is not st_NullBuffer:
+            if isinstance( buffer, Buffer ):
+                ptr_buffer = buffer.pointer
+            elif isinstance( buffer, CBuffer ):
+                _buffer = Buffer(cbuffer=buffer)
+                ptr_buffer = _buffer.pointer
+            else:
+                ptr_buffer = buffer
+
         if ptr_buffer != st_NullBuffer:
             if remap_buffer:
                 self._last_status = st_Argument_receive_buffer(
@@ -407,11 +430,11 @@ class ArgumentBase(object):
                 self._ptr_argument )
         return self
 
-    def receive_buffer( self, ptr_buffer ):
-        return self.receive( ptr_buffer=ptr_buffer, remap_buffer=True )
+    def receive_buffer( self, buffer ):
+        return self.receive( buffer=buffer, remap_buffer=True )
 
-    def receive_buffer_without_remap( self, ptr_buffer ):
-        return self.receive( ptr_buffer=ptr_buffer, remap_buffer=False )
+    def receive_buffer_without_remap( self, buffer ):
+        return self.receive( buffer=buffer, remap_buffer=False )
 
     def receive_raw_argument( self, ptr_raw_arg_begin, raw_arg_capacity ):
         return self.receive( ptr_raw_arg_begin=ptr_raw_arg_begin,

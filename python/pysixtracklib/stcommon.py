@@ -17,10 +17,19 @@ st_uint64_p = ct.POINTER(ct.c_uint64)
 st_uchar_p = ct.POINTER(ct.c_ubyte)
 st_const_uchar_p = ct.POINTER(ct.c_ubyte)
 
+st_NullUChar = ct.cast( 0, st_uchar_p )
+
 st_double_p = ct.POINTER(ct.c_double)
 st_int64_p = ct.POINTER(ct.c_int64)
 st_buffer_size_t = ct.c_uint64
 st_buffer_size_p = ct.POINTER( st_buffer_size_t )
+
+st_arch_status_t = ct.c_int32
+st_arch_size_t = ct.c_uint64
+st_arch_size_t_p = ct.POINTER( st_arch_size_t )
+
+st_ARCH_STATUS_SUCCESS = st_arch_status_t( 0 )
+st_ARCH_STATUS_GENERAL_FAILURE = st_arch_status_t( -1 )
 
 # ------------------------------------------------------------------------------
 # st_Buffer C-API functions
@@ -40,6 +49,7 @@ class st_Buffer(ct.Structure):
 
 st_Buffer_p = ct.POINTER(st_Buffer)
 st_NullBuffer = ct.cast(0, st_Buffer_p)
+st_buffer_addr_t = ct.c_uint64
 
 st_Buffer_preset = sixtracklib.st_Buffer_preset_ext
 st_Buffer_preset.argtypes = [st_Buffer_p]
@@ -61,6 +71,11 @@ st_Buffer_new_from_file = sixtracklib.st_Buffer_new_from_file
 st_Buffer_new_from_file.argtypes = [ct.c_char_p]
 st_Buffer_new_from_file.restype = st_Buffer_p
 
+st_Buffer_new_detailed = sixtracklib.st_Buffer_new_detailed
+st_Buffer_new_detailed.argtypes = [ st_buffer_size_t, st_buffer_size_t,
+    st_buffer_size_t, st_buffer_size_t, ct.c_uint64 ]
+st_Buffer_new_detailed.restype = st_Buffer_p
+
 st_Buffer_init_from_data = sixtracklib.st_Buffer_init_from_data_ext
 st_Buffer_init_from_data.argtypes = [st_Buffer_p, st_uchar_p, ct.c_uint64]
 st_Buffer_init_from_data.restypes = ct.c_int32
@@ -80,6 +95,111 @@ st_Buffer_get_size.restype = ct.c_uint64
 st_Buffer_get_capacity = sixtracklib.st_Buffer_get_capacity_ext
 st_Buffer_get_capacity.argtypes = [st_Buffer_p]
 st_Buffer_get_capacity.restype = ct.c_uint64
+
+st_Buffer_get_header_size = sixtracklib.st_Buffer_get_header_size_ext
+st_Buffer_get_header_size.argtypes = [ st_Buffer_p ]
+st_Buffer_get_header_size.restype = st_buffer_size_t
+
+st_Buffer_get_data_begin_addr = sixtracklib.st_Buffer_get_data_begin_addr
+st_Buffer_get_data_begin_addr.argtypes = [ st_Buffer_p ]
+st_Buffer_get_data_begin_addr.restype = st_buffer_addr_t
+
+st_Buffer_get_data_end_addr = sixtracklib.st_Buffer_get_data_end_addr_ext
+st_Buffer_get_data_end_addr.argtypes = [ st_Buffer_p ]
+st_Buffer_get_data_end_addr.restype = st_buffer_addr_t
+
+st_Buffer_get_objects_begin_addr = \
+    sixtracklib.st_Buffer_get_objects_begin_addr_ext
+st_Buffer_get_objects_begin_addr.argtypes = [ st_Buffer_p ]
+st_Buffer_get_objects_begin_addr.restype = st_buffer_addr_t
+
+st_Buffer_get_objects_end_addr = sixtracklib.st_Buffer_get_objects_end_addr_ext
+st_Buffer_get_objects_end_addr.argtypes = [ st_Buffer_p ]
+st_Buffer_get_objects_end_addr.restype = st_buffer_addr_t
+
+st_Buffer_get_num_of_slots = sixtracklib.st_Buffer_get_num_of_slots_ext
+st_Buffer_get_num_of_slots.argtypes = [ st_Buffer_p ]
+st_Buffer_get_num_of_slots.restype = st_buffer_size_t
+
+st_Buffer_get_max_num_of_slots = sixtracklib.st_Buffer_get_max_num_of_slots_ext
+st_Buffer_get_max_num_of_slots.argtypes = [ st_Buffer_p ]
+st_Buffer_get_max_num_of_slots.restype = st_buffer_size_t
+
+st_Buffer_get_num_of_objects = sixtracklib.st_Buffer_get_num_of_objects_ext
+st_Buffer_get_num_of_objects.argtypes = [ st_Buffer_p ]
+st_Buffer_get_num_of_objects.restype = st_buffer_size_t
+
+st_Buffer_get_max_num_of_objects = \
+    sixtracklib.st_Buffer_get_max_num_of_objects_ext
+st_Buffer_get_max_num_of_objects.argtypes = [ st_Buffer_p ]
+st_Buffer_get_max_num_of_objects.restype = st_buffer_size_t
+
+st_Buffer_get_num_of_dataptrs = sixtracklib.st_Buffer_get_num_of_dataptrs_ext
+st_Buffer_get_num_of_dataptrs.argtypes = [ st_Buffer_p ]
+st_Buffer_get_num_of_dataptrs.restype = st_buffer_size_t
+
+st_Buffer_get_max_num_of_dataptrs = \
+    sixtracklib.st_Buffer_get_max_num_of_dataptrs_ext
+st_Buffer_get_max_num_of_dataptrs.argtypes = [ st_Buffer_p ]
+st_Buffer_get_max_num_of_dataptrs.restype = st_buffer_size_t
+
+st_Buffer_get_num_of_garbage_ranges = \
+    sixtracklib.st_Buffer_get_num_of_garbage_ranges_ext
+st_Buffer_get_num_of_garbage_ranges.argtypes = [ st_Buffer_p ]
+st_Buffer_get_num_of_garbage_ranges.restype = st_buffer_size_t
+
+st_Buffer_get_max_num_of_garbage_ranges = \
+    sixtracklib.st_Buffer_get_max_num_of_garbage_ranges_ext
+st_Buffer_get_max_num_of_garbage_ranges.argtypes = [ st_Buffer_p ]
+st_Buffer_get_max_num_of_garbage_ranges.restype = st_buffer_size_t
+
+st_Buffer_read_from_file = sixtracklib.st_Buffer_read_from_file
+st_Buffer_read_from_file.argtypes = [ st_Buffer_p ]
+st_Buffer_read_from_file.restype = ct.c_bool
+
+st_Buffer_write_to_file = sixtracklib.st_Buffer_write_to_file
+st_Buffer_write_to_file.argtypes = [ st_Buffer_p, ct.c_char_p ]
+st_Buffer_write_to_file.restype = ct.c_bool
+
+st_Buffer_write_to_file_normalized_addr = \
+    sixtracklib.st_Buffer_write_to_file_normalized_addr
+st_Buffer_write_to_file_normalized_addr.argtypes = [
+    st_Buffer_p, ct.c_char_p, st_buffer_addr_t ]
+st_Buffer_write_to_file_normalized_addr.restype = ct.c_bool
+
+st_Buffer_reset = sixtracklib.st_Buffer_reset_ext
+st_Buffer_reset.argtypes = [ st_Buffer_p ]
+st_Buffer_reset.restype = st_arch_status_t
+
+st_Buffer_reset_detailed = sixtracklib.st_Buffer_reset_detailed_ext
+st_Buffer_reset_detailed.argtypes = [ st_Buffer_p, st_buffer_size_t,
+    st_buffer_size_t, st_buffer_size_t, st_buffer_size_t ]
+st_Buffer_reset_detailed.restype = st_arch_status_t
+
+st_Buffer_reserve = sixtracklib.st_Buffer_reserve_ext
+st_Buffer_reserve.argtypes = [ st_Buffer_p, st_buffer_size_t,
+    st_buffer_size_t, st_buffer_size_t, st_buffer_size_t ]
+st_Buffer_reserve.argtypes = st_arch_status_t
+
+st_Buffer_reserve_capacity = sixtracklib.st_Buffer_reserve_capacity_ext
+st_Buffer_reserve_capacity.argtypes =  [ st_Buffer_p, st_buffer_size_t ]
+st_Buffer_reserve_capacity.restype = st_arch_status_t
+
+st_Buffer_needs_remapping = sixtracklib.st_Buffer_needs_remapping_ext
+st_Buffer_needs_remapping.argtypes = [ st_Buffer_p ]
+st_Buffer_needs_remapping.restype = ct.c_bool
+
+st_Buffer_remap = sixtracklib.st_Buffer_remap_ext
+st_Buffer_remap.argtypes = [ st_Buffer_p ]
+st_Buffer_remap.restype = st_arch_status_t
+
+st_Buffer_refresh = sixtracklib.st_Buffer_refresh_ext
+st_Buffer_refresh.argtypes = [ st_Buffer_p ]
+st_Buffer_refresh.restype = st_arch_status_t
+
+st_Buffer_clear = sixtracklib.st_Buffer_clear_ext
+st_Buffer_clear.argtypes = [ st_Buffer_p, ct.c_bool ]
+st_Buffer_clear.restype = st_arch_status_t
 
 st_Buffer_free = sixtracklib.st_Buffer_free_ext
 st_Buffer_free.argtypes = [st_Buffer_p]
@@ -622,13 +742,6 @@ st_node_platform_id_t = ct.c_int64
 st_node_device_id_t = ct.c_int64
 st_node_index_t = ct.c_uint32
 st_node_index_p = ct.POINTER( st_node_index_t )
-
-st_arch_status_t = ct.c_int32
-st_arch_size_t = ct.c_uint64
-st_arch_size_t_p = ct.POINTER( st_arch_size_t )
-
-st_ARCH_STATUS_SUCCESS = st_arch_status_t( 0 )
-st_ARCH_STATUS_GENERAL_FAILURE = st_arch_status_t( -1 )
 
 # ------------------------------------------------------------------------------
 # NS(NodeId):

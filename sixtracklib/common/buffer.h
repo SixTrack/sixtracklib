@@ -26,12 +26,12 @@ extern "C" {
 
 struct NS(Buffer);
 
-SIXTRL_FN SIXTRL_STATIC  NS(Buffer)* NS(Buffer_preset)(
+SIXTRL_STATIC SIXTRL_FN  NS(Buffer)* NS(Buffer_preset)(
    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_slot_size)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_slot_size)(
    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
 #if !defined( _GPUCODE )
@@ -41,123 +41,123 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t) NS(Buffer_get_slot_size_ext)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_flags_t) NS(Buffer_get_flags)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_flags_t) NS(Buffer_get_flags)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_owns_datastore)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_owns_datastore)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_uses_datastore)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_uses_datastore)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_has_datastore)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_has_datastore)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_allow_modify_datastore_contents)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_allow_modify_datastore_contents)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_allow_clear)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_allow_clear)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_allow_append_objects)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_allow_append_objects)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_allow_delete_objects)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_allow_delete_objects)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_allow_remapping)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_allow_remapping)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_allow_resize)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_allow_resize)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_uses_mempool_datastore)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_uses_mempool_datastore)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_uses_special_opencl_datastore)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_uses_special_opencl_datastore)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_uses_special_cuda_datastore)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_uses_special_cuda_datastore)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_flags_t)
+SIXTRL_STATIC SIXTRL_FN NS(buffer_flags_t)
 NS(Buffer_get_datastore_special_flags)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC void NS(Buffer_set_datastore_special_flags)(
+SIXTRL_STATIC SIXTRL_FN void NS(Buffer_set_datastore_special_flags)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_flags_t) const flags );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(Buffer_get_datastore_begin_addr)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_addr_t) NS(Buffer_get_datastore_begin_addr)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_size)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_size)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_capacity)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_capacity)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_header_size)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_header_size)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(Buffer_get_data_begin_addr)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_addr_t) NS(Buffer_get_data_begin_addr)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(Buffer_get_data_end_addr)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(Buffer_get_objects_begin_addr)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
-
-SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(Buffer_get_objects_end_addr)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_addr_t) NS(Buffer_get_data_end_addr)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_section_header_size)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_addr_t) NS(Buffer_get_objects_begin_addr)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_slots_size)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_addr_t) NS(Buffer_get_objects_end_addr)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_num_of_slots)(
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_section_header_size)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_max_num_of_slots)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_slots_size)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_objects_size)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_num_of_slots)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_max_num_of_slots)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_objects_size)(
     const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC  NS(buffer_size_t) NS(Buffer_get_num_of_objects)(
+SIXTRL_STATIC SIXTRL_FN  NS(buffer_size_t) NS(Buffer_get_num_of_objects)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_max_num_of_objects)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_max_num_of_objects)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_dataptrs_size)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_dataptrs_size)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC  NS(buffer_size_t) NS(Buffer_get_num_of_dataptrs)(
+SIXTRL_STATIC SIXTRL_FN  NS(buffer_size_t) NS(Buffer_get_num_of_dataptrs)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_max_num_of_dataptrs)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_max_num_of_dataptrs)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Buffer_get_garbage_size)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Buffer_get_garbage_size)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC  NS(buffer_size_t)
+SIXTRL_STATIC SIXTRL_FN  NS(buffer_size_t)
 NS(Buffer_get_num_of_garbage_ranges)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(Buffer_get_max_num_of_garbage_ranges)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
@@ -249,7 +249,7 @@ NS(Buffer_get_max_num_of_garbage_ranges_ext)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(Buffer_calculate_required_buffer_length)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const num_objects,
@@ -259,34 +259,34 @@ NS(Buffer_calculate_required_buffer_length)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reset)(
+SIXTRL_STATIC SIXTRL_FN int NS(Buffer_reset)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reset_detailed)(
+SIXTRL_STATIC SIXTRL_FN int NS(Buffer_reset_detailed)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const max_num_objects,
     NS(buffer_size_t) const max_num_slots,
     NS(buffer_size_t) const max_num_dataptrs,
     NS(buffer_size_t) const max_num_garbage_ranges );
 
-SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reserve)(
+SIXTRL_STATIC SIXTRL_FN int NS(Buffer_reserve)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const new_max_num_objects,
     NS(buffer_size_t) const new_max_num_slots,
     NS(buffer_size_t) const new_max_num_dataptrs,
     NS(buffer_size_t) const new_max_num_garbage_ranges );
 
-SIXTRL_FN SIXTRL_STATIC int NS(Buffer_reserve_capacity)(
+SIXTRL_STATIC SIXTRL_FN int NS(Buffer_reserve_capacity)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const new_buffer_capacity );
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_needs_remapping)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_needs_remapping)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC int NS(Buffer_remap)(
+SIXTRL_STATIC SIXTRL_FN int NS(Buffer_remap)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC int NS(Buffer_refresh)(
+SIXTRL_STATIC SIXTRL_FN int NS(Buffer_refresh)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -347,6 +347,30 @@ NS(Buffer_new_detailed)( NS(buffer_size_t)  const initial_max_num_objects,
     NS(buffer_size_t)  const initial_max_num_garbage_elements,
     NS(buffer_flags_t) const buffer_flags );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Buffer_reset_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Buffer_reset_detailed_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const max_num_objects,
+    NS(buffer_size_t) const max_num_slots,
+    NS(buffer_size_t) const max_num_dataptrs,
+    NS(buffer_size_t) const max_num_garbage_ranges );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Buffer_reserve_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const new_max_num_objects,
+    NS(buffer_size_t) const new_max_num_slots,
+    NS(buffer_size_t) const new_max_num_dataptrs,
+    NS(buffer_size_t) const new_max_num_garbage_ranges );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Buffer_reserve_capacity_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const new_buffer_capacity );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Buffer_needs_remapping_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Buffer_remap_ext)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
@@ -355,17 +379,17 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Buffer_refresh_ext)(
 
 #endif /* !defined( _GPUCODE ) */
 
-SIXTRL_FN SIXTRL_STATIC int NS(Buffer_init)(
+SIXTRL_STATIC SIXTRL_FN int NS(Buffer_init)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     NS(buffer_size_t) const data_buffer_capacity );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_FN SIXTRL_STATIC void NS(Buffer_free)(
+SIXTRL_STATIC SIXTRL_FN void NS(Buffer_free)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC int NS(Buffer_clear)(
+SIXTRL_STATIC SIXTRL_FN int NS(Buffer_clear)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     bool const set_data_to_zero );
 
@@ -374,6 +398,10 @@ SIXTRL_FN SIXTRL_STATIC int NS(Buffer_clear)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Buffer_free_ext)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Buffer_clear_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    bool const set_data_to_zero );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Buffer_delete)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
@@ -381,7 +409,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Buffer_delete)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(Buffer_predict_required_num_slots)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const  SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const  object_size,
@@ -390,7 +418,7 @@ NS(Buffer_predict_required_num_slots)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts );
 
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_can_add_object)(
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_can_add_object)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const  SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const object_size,
     NS(buffer_size_t) const num_obj_dataptrs,
@@ -401,7 +429,7 @@ SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_can_add_object)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_num_dataptrs );
 
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
     NS(Buffer_add_object)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*       SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC const void *const SIXTRL_RESTRICT object_handle,
