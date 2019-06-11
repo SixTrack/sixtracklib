@@ -1314,19 +1314,32 @@ namespace SIXTRL_CXX_NAMESPACE
                 kernel_name, size_t{ 1 } ) );
 
             SIXTRL_ASSERT( ptr_remap_kernel.get() != nullptr );
-            bool success = ptr_remap_kernel->setNumWorkItems( size_t{ 1 } );
-            success &= ptr_remap_kernel->setWorkGroupSizes( size_t{ 1 } );
-            success &= ptr_remap_kernel->update();
-            success &= !ptr_remap_kernel->needsUpdate();
 
-            if( success )
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                status = ptr_remap_kernel->setNumWorkItems( size_t{ 1 } );
+            }
+
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                status = ptr_remap_kernel->setWorkGroupSizes( size_t{ 1 } );
+            }
+
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                status = ptr_remap_kernel->update();
+
+                if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+                    ( ptr_remap_kernel->needsUpdate() ) )
+                {
+                    status = st::ARCH_STATUS_GENERAL_FAILURE;
+                }
+            }
+
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
                 kernel_id = this->doAppendCudaKernelConfig(
                     std::move( ptr_remap_kernel ) );
-            }
-            else
-            {
-                status = st::ARCH_STATUS_GENERAL_FAILURE;
             }
 
             this->setRemapCObjectBufferKernelId( kernel_id );
@@ -1341,19 +1354,28 @@ namespace SIXTRL_CXX_NAMESPACE
 
             SIXTRL_ASSERT( ptr_debug_remap_kernel.get() != nullptr );
 
-            success = ptr_debug_remap_kernel->setNumWorkItems( size_t{ 1 } );
-            success &= ptr_debug_remap_kernel->setWorkGroupSizes( size_t{ 1 } );
-            success &= ptr_debug_remap_kernel->update();
-            success &= !ptr_debug_remap_kernel->needsUpdate();
+            status = ptr_debug_remap_kernel->setNumWorkItems( size_t{ 1 } );
 
-            if( success )
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                status = ptr_debug_remap_kernel->setWorkGroupSizes( size_t{ 1 } );
+            }
+
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                status = ptr_debug_remap_kernel->update();
+
+                if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+                    ( ptr_debug_remap_kernel->needsUpdate() ) )
+                {
+                    status = st::ARCH_STATUS_GENERAL_FAILURE;
+                }
+            }
+
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
                 kernel_id = this->doAppendCudaKernelConfig(
                     std::move( ptr_debug_remap_kernel ) );
-            }
-            else
-            {
-                status = st::ARCH_STATUS_GENERAL_FAILURE;
             }
 
             this->setRemapCObjectBufferDebugKernelId( kernel_id );

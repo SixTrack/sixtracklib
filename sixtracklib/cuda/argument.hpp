@@ -38,7 +38,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using _base_arg_t = SIXTRL_CXX_NAMESPACE::ArgumentBase;
 
         public:
-            
+
         using cuda_controller_t       = SIXTRL_CXX_NAMESPACE::CudaController;
         using cuda_arg_buffer_t       = ::NS(cuda_arg_buffer_t);
         using cuda_const_arg_buffer_t = ::NS(cuda_const_arg_buffer_t);
@@ -51,18 +51,18 @@ namespace SIXTRL_CXX_NAMESPACE
         using c_buffer_t = _base_arg_t::c_buffer_t;
         using size_type  = _base_arg_t::size_type;
 
-        using ptr_base_controller_t = 
+        using ptr_base_controller_t =
             _base_arg_t::ptr_base_controller_t;
-            
+
         using ptr_const_base_controller_t =
             _base_arg_t::ptr_const_base_controller_t;
 
-        using ptr_cuda_controller_t = 
+        using ptr_cuda_controller_t =
             SIXTRL_CXX_NAMESPACE::CudaController*;
-            
+
         using ptr_const_cuda_controller_t =
             SIXTRL_CXX_NAMESPACE::CudaController const*;
-            
+
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN explicit CudaArgument(
@@ -86,7 +86,7 @@ namespace SIXTRL_CXX_NAMESPACE
             CudaController* SIXTRL_RESTRICT ctx = nullptr );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-        
+
         SIXTRL_HOST_FN CudaArgument( CudaArgument const& other ) = delete;
         SIXTRL_HOST_FN CudaArgument( CudaArgument&& other ) = delete;
 
@@ -95,9 +95,9 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN CudaArgument& operator=( CudaArgument&& rhs ) = delete;
 
         SIXTRL_HOST_FN virtual ~CudaArgument() = default;
-        
+
         /* ----------------------------------------------------------------- */
-        
+
         SIXTRL_HOST_FN bool hasCudaArgBuffer() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN cuda_arg_buffer_t cudaArgBuffer() SIXTRL_NOEXCEPT;
@@ -130,15 +130,15 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         elem_by_elem_config_t const*
         cudaArgBufferAsElemByElemByElemConfig() const SIXTRL_NOEXCEPT;
-        
+
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_HOST_FN ptr_cuda_controller_t 
+        SIXTRL_HOST_FN ptr_cuda_controller_t
         cudaController() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN ptr_const_cuda_controller_t
         cudaController() const SIXTRL_NOEXCEPT;
-        
+
         protected:
 
         SIXTRL_HOST_FN void doDeleteCudaArgumentBuffer() SIXTRL_NOEXCEPT;
@@ -165,13 +165,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         cuda_arg_buffer_t m_arg_buffer;
     };
-    
+
     SIXTRL_STATIC SIXTRL_HOST_FN CudaArgument const* asCudaArgument(
-        SIXTRL_CXX_NAMESPACE::ArgumentBase const* 
+        SIXTRL_CXX_NAMESPACE::ArgumentBase const*
             SIXTRL_RESTRICT base_arg ) SIXTRL_NOEXCEPT;
 
     SIXTRL_STATIC SIXTRL_HOST_FN CudaArgument* asCudaArgument(
-        SIXTRL_CXX_NAMESPACE::ArgumentBase* 
+        SIXTRL_CXX_NAMESPACE::ArgumentBase*
             SIXTRL_RESTRICT base_arg ) SIXTRL_NOEXCEPT;
 }
 #endif /* C++, Host */
@@ -204,38 +204,34 @@ typedef void NS(CudaArgument);
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    SIXTRL_INLINE CudaArgument const* asCudaArgument( 
-        SIXTRL_CXX_NAMESPACE::ArgumentBase const* 
+    SIXTRL_INLINE CudaArgument const* asCudaArgument(
+        SIXTRL_CXX_NAMESPACE::ArgumentBase const*
             SIXTRL_RESTRICT base_arg ) SIXTRL_NOEXCEPT
     {
         CudaArgument const* ptr = nullptr;
-        
+
         if( base_arg != nullptr )
         {
-            ptr = base_arg->asDerivedArgument< CudaArgument >( 
+            ptr = base_arg->asDerivedArgument< CudaArgument >(
                 SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CUDA, true );
-            
-            SIXTRL_ASSERT( ( ptr == nullptr ) ||
-                ( ( ptr->hasArgumentBuffer() ) && 
-                  ( ptr->hasCudaArgBuffer()  ) ) );
         }
-        
+
         return ptr;
     }
 
-    SIXTRL_INLINE CudaArgument* asCudaArgument( 
-        SIXTRL_CXX_NAMESPACE::ArgumentBase* SIXTRL_RESTRICT 
+    SIXTRL_INLINE CudaArgument* asCudaArgument(
+        SIXTRL_CXX_NAMESPACE::ArgumentBase* SIXTRL_RESTRICT
             base_arg ) SIXTRL_NOEXCEPT
     {
         using base_arg_t = SIXTRL_CXX_NAMESPACE::ArgumentBase;
         using cuda_arg_t = SIXTRL_CXX_NAMESPACE::CudaArgument;
-        
+
         base_arg_t const* cbase_arg_ptr = base_arg;
         return const_cast< cuda_arg_t* >( asCudaArgument( cbase_arg_ptr ) );
     }
-    
+
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-    
+
     template< typename Ptr >
     SIXTRL_INLINE Ptr* CudaArgument::cudaArgBufferAsPtr() SIXTRL_NOEXCEPT
     {
