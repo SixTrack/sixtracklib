@@ -157,6 +157,20 @@ bool NS(Controller_is_in_debug_mode)(
     return ( ( ctrl != nullptr ) && ( ctrl->isInDebugMode() ) );
 }
 
+::NS(arch_status_t) NS(Controller_enable_debug_mode)(
+    ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl )
+{
+    return ( ctrl != nullptr )
+        ? ctrl->enableDebugMode() : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(Controller_disable_debug_mode)(
+    ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl )
+{
+    return ( ctrl != nullptr )
+        ? ctrl->disableDebugMode() : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
 /* ========================================================================= */
 
 ::NS(arch_size_t) NS(Controller_get_num_of_kernels)(
