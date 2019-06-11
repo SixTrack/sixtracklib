@@ -636,23 +636,23 @@ st_NodeId_p = ct.c_void_p
 st_NullNodeId = ct.cast( 0, st_NodeId_p )
 
 st_NodeId_create = sixtracklib.st_NodeId_create
-st_NodeId_create.argtypes = None 
-st_NodeId_create.restype = st_NodeId_p 
+st_NodeId_create.argtypes = None
+st_NodeId_create.restype = st_NodeId_p
 
 st_NodeId_new = sixtracklib.st_NodeId_new
 st_NodeId_new.argtypes = [ st_node_platform_id_t, st_node_device_id_t ]
-st_NodeId_new.restype = st_NodeId_p 
+st_NodeId_new.restype = st_NodeId_p
 
 st_NodeId_new_from_string = sixtracklib.st_NodeId_new_from_string
 st_NodeId_new_from_string.argtypes = [ ct.c_char_p ]
-st_NodeId_new_from_string.restype = st_NodeId_p 
+st_NodeId_new_from_string.restype = st_NodeId_p
 
 st_NodeId_new_detailed = sixtracklib.st_NodeId_new_detailed
-st_NodeId_new_detailed.argtypes = [ 
+st_NodeId_new_detailed.argtypes = [
     st_node_platform_id_t, st_node_device_id_t, st_node_index_t ]
-st_NodeId_new_detailed.restype = st_NodeId_p 
+st_NodeId_new_detailed.restype = st_NodeId_p
 
-st_NodeId_delete = sixtracklib.NodeId_delete
+st_NodeId_delete = sixtracklib.st_NodeId_delete
 st_NodeId_delete.argtypes = [ st_NodeId_p ]
 st_NodeId_delete.restype = None
 
@@ -790,9 +790,9 @@ st_NodeInfo_get_required_output_str_length.argtypes = [ st_NodeInfoBase_p ]
 st_NodeInfo_get_required_output_str_length.restype = st_arch_size_t
 
 _st_NodeInfo_convert_to_string = sixtracklib.st_NodeInfo_convert_to_string
-_st_NodeInfo_convert_to_string.argtypes = [ 
+_st_NodeInfo_convert_to_string.argtypes = [
     st_NodeInfoBase_p, st_arch_size_t, ct.c_char_p ]
-_st_NodeInfo_convert_to_string.restype = st_arch_status_t 
+_st_NodeInfo_convert_to_string.restype = st_arch_status_t
 
 # -----------------------------------------------------------------------------
 # NS(KernelConfigBase)
@@ -1116,11 +1116,11 @@ st_Controller_is_in_debug_mode.restype = ct.c_bool
 
 st_Controller_enable_debug_mode = sixtracklib.st_Controller_enable_debug_mode
 st_Controller_enable_debug_mode.argtypes = [ st_ControllerBase_p ]
-st_Controller_enable_debug_mode.restype = st_arch_status_t 
+st_Controller_enable_debug_mode.restype = st_arch_status_t
 
 st_Controller_disable_debug_mode = sixtracklib.st_Controller_disable_debug_mode
 st_Controller_disable_debug_mode.argtypes = [ st_ControllerBase_p ]
-st_Controller_disable_debug_mode.restype = st_arch_status_t 
+st_Controller_disable_debug_mode.restype = st_arch_status_t
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -2152,59 +2152,59 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
 
     st_CudaNodeInfo_p = ct.c_void_p
     st_NullCudaNodeInfo = ct.cast( 0, st_CudaNodeInfo_p )
-    
+
     st_cuda_dev_index_t = ct.c_int;
-    
+
     st_CudaNodeInfo_new = sixtracklib.st_CudaNodeInfo_new
     st_CudaNodeInfo_new.argtypes = [ st_cuda_dev_index_t ]
     st_CudaNodeInfo_new.restype = st_CudaNodeInfo_p
-    
+
     st_CudaNodeInfo_new_detailed = sixtracklib.st_CudaNodeInfo_new_detailed
-    st_CudaNodeInfo_new_detailed.argtypes = [ st_cuda_dev_index_t, 
-         st_node_platform_id_t, st_node_device_id_t, st_node_index_t, 
+    st_CudaNodeInfo_new_detailed.argtypes = [ st_cuda_dev_index_t,
+         st_node_platform_id_t, st_node_device_id_t, st_node_index_t,
          ct.c_bool, ct.c_bool ]
-    st_CudaNodeInfo_new_detailed.restype = st_CudaNodeInfo_p 
-    
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        
+    st_CudaNodeInfo_new_detailed.restype = st_CudaNodeInfo_p
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     st_CudaNodeInfo_get_cuda_device_index = \
         sixtracklib.st_CudaNodeInfo_get_cuda_device_index
     st_CudaNodeInfo_get_cuda_device_index.argtypes = [ st_CudaNodeInfo_p ]
-    st_CudaNodeInfo_get_cuda_device_index.restype = st_cuda_dev_index_t 
-    
-    
+    st_CudaNodeInfo_get_cuda_device_index.restype = st_cuda_dev_index_t
+
+
     st_CudaNodeInfo_get_pci_bus_id_str = \
         sixtracklib.st_CudaNodeInfo_get_pci_bus_id_str
     st_CudaNodeInfo_get_pci_bus_id_str.argtypes = [ st_CudaNodeInfo_p ]
-    st_CudaNodeInfo_get_pci_bus_id_str.restype = ct.c_char_p 
-        
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        
+    st_CudaNodeInfo_get_pci_bus_id_str.restype = ct.c_char_p
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     st_CudaNodeInfo_get_warp_size = sixtracklib.st_CudaNodeInfo_get_warp_size
     st_CudaNodeInfo_get_warp_size.argtypes = [ st_CudaNodeInfo_p ]
-    st_CudaNodeInfo_get_warp_size.restype = st_arch_size_t 
-    
+    st_CudaNodeInfo_get_warp_size.restype = st_arch_size_t
+
     st_CudaNodeInfo_get_compute_capability = \
         sixtracklib.st_CudaNodeInfo_get_compute_capability
     st_CudaNodeInfo_get_compute_capability.argtypes = [ st_CudaNodeInfo_p ]
-    st_CudaNodeInfo_get_compute_capability.restype = st_arch_size_t 
-        
+    st_CudaNodeInfo_get_compute_capability.restype = st_arch_size_t
+
     st_CudaNodeInfo_get_num_multiprocessors = \
         sixtracklib.st_CudaNodeInfo_get_num_multiprocessors
     st_CudaNodeInfo_get_num_multiprocessors.argtypes = [ st_CudaNodeInfo_p ]
-    st_CudaNodeInfo_get_num_multiprocessors.restype = st_arch_size_t 
-    
+    st_CudaNodeInfo_get_num_multiprocessors.restype = st_arch_size_t
+
     st_CudaNodeInfo_get_max_threads_per_block = \
         sixtracklib.st_CudaNodeInfo_get_max_threads_per_block
     st_CudaNodeInfo_get_max_threads_per_block.argtypes = [ st_CudaNodeInfo_p ]
-    st_CudaNodeInfo_get_max_threads_per_block.restype = st_arch_size_t 
-    
+    st_CudaNodeInfo_get_max_threads_per_block.restype = st_arch_size_t
+
     st_CudaNodeInfo_get_max_threads_per_multiprocessor = \
         sixtracklib.st_CudaNodeInfo_get_max_threads_per_multiprocessor
-    st_CudaNodeInfo_get_max_threads_per_multiprocessor.argtypes = [ 
+    st_CudaNodeInfo_get_max_threads_per_multiprocessor.argtypes = [
         st_CudaNodeInfo_p ]
     st_CudaNodeInfo_get_max_threads_per_multiprocessor.restype = st_arch_size_t
-    
+
     # --------------------------------------------------------------------------
     # NS(CudaKernelConfig):
 
@@ -2223,39 +2223,40 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     st_CudaController_create = sixtracklib.st_CudaController_create
     st_CudaController_create.argtypes = None
     st_CudaController_create.restype = st_CudaController_p
-    
+
     st_CudaController_new = sixtracklib.st_CudaController_new
     st_CudaController_new.argtypes = [ ct.c_char_p ]
-    st_CudaController_new.restype = st_CudaController_p 
-    
+    st_CudaController_new.restype = st_CudaController_p
+
     st_CudaController_new_from_node_id = \
         sixtracklib.st_CudaController_new_from_node_id
     st_CudaController_new_from_node_id.argtypes = [ st_NodeId_p ]
-    st_CudaController_new_from_node_id.restype = st_CudaController_p 
-    
+    st_CudaController_new_from_node_id.restype = st_CudaController_p
+
     st_CudaController_new_from_node_index = \
         sixtracklib.st_CudaController_new_from_node_index
     st_CudaController_new_from_node_index.argtypes = [ st_node_index_t ]
-    st_CudaController_new_from_node_index.restype = st_CudaController_p 
-    
+    st_CudaController_new_from_node_index.restype = st_CudaController_p
+
     st_CudaController_new_from_platform_id_and_device_id = \
         sixtracklib.st_CudaController_new_from_platform_id_and_device_id
     st_CudaController_new_from_platform_id_and_device_id.argtypes = [
         st_node_platform_id_t, st_node_device_id_t ]
     st_CudaController_new_from_platform_id_and_device_id.restype = \
-        st_CudaController_p 
-    
+        st_CudaController_p
+
     st_CudaController_new_from_cuda_device_index = \
         sixtracklib.st_CudaController_new_from_cuda_device_index
-    st_CudaController_new_from_cuda_device_index.argtypes = [ ct.c_int ]
-    st_CudaController_new_from_cuda_device_index.restype = st_CudaController_p 
-    
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    st_CudaController_new_from_cuda_device_index.argtypes = [
+        st_cuda_dev_index_t ]
+    st_CudaController_new_from_cuda_device_index.restype = st_CudaController_p
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     st_CudaController_select_node_by_cuda_device_index = \
         sixtracklib.st_CudaController_select_node_by_cuda_device_index
     st_CudaController_select_node_by_cuda_device_index.argtypes = [
-        st_CudaController_p, ct.c_int ]
+        st_CudaController_p, st_cuda_dev_index_t ]
     st_CudaController_select_node_by_cuda_device_index.restype = \
         st_arch_status_t
 
@@ -2292,6 +2293,20 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     st_CudaController_get_ptr_node_info.argtypes = [
         st_CudaController_p, ct.c_char_p ]
     st_CudaController_get_ptr_node_info.restype = st_CudaNodeInfo_p
+
+    st_CudaController_get_ptr_node_info_by_cuda_dev_index = \
+        sixtracklib.st_CudaController_get_ptr_node_info_by_cuda_dev_index
+    st_CudaController_get_ptr_node_info_by_cuda_dev_index.argtypes = [
+        st_CudaController_p, st_cuda_dev_index_t ]
+    st_CudaController_get_ptr_node_info_by_cuda_dev_index.restype = \
+        st_CudaNodeInfo_p
+
+    st_CudaController_get_ptr_node_info_by_pci_bus_id = \
+        sixtracklib.st_CudaController_get_ptr_node_info_by_pci_bus_id
+    st_CudaController_get_ptr_node_info_by_pci_bus_id.argtypes = [
+        st_CudaController_p, ct.c_char_p ]
+    st_CudaController_get_ptr_node_info_by_pci_bus_id.restype = \
+        st_CudaNodeInfo_p
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -2369,7 +2384,7 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     st_CudaArgument_new_from_raw_argument = \
         sixtracklib.st_CudaArgument_new_from_raw_argument
     st_CudaArgument_new_from_raw_argument.argtypes = [
-        ct.c_void_p, st_ctrl_size_t, st_CudaArgument_p ]
+        ct.c_void_p, st_ctrl_size_t, st_CudaController_p ]
     st_CudaArgument_new_from_raw_argument.restype = st_CudaArgument_p
 
     st_CudaArgument_new_from_size = \
