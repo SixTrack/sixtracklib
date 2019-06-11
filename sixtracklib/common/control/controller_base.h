@@ -98,8 +98,16 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_is_ready_to_send)(
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_is_ready_to_receive)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT controller );
 
+/* ------------------------------------------------------------------------ */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_is_in_debug_mode)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT controller );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+NS(Controller_enable_debug_mode)( NS(ControllerBase)* SIXTRL_RESTRICT ctrl );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+NS(Controller_disable_debug_mode)( NS(ControllerBase)* SIXTRL_RESTRICT ctrl );
 
 /* ========================================================================= */
 
