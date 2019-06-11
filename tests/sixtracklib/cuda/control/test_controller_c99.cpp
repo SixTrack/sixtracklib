@@ -51,7 +51,7 @@ TEST( C99_CudaControllerTests, BasicUsage )
                   << std::endl;
     }
 
-    ::NS(CudaController_delete)( cuda_ctrl );
+    ::NS(Controller_delete)( cuda_ctrl );
     cuda_ctrl = nullptr;
 }
 
@@ -125,7 +125,7 @@ TEST( C99_CudaControllerTests, CObjectsBufferRemapping )
                   << std::endl;
     }
 
-    ::NS(CudaController_delete)( cuda_ctrl );
+    ::NS(Controller_delete)( cuda_ctrl );
     cuda_ctrl = nullptr;
 }
 
