@@ -23,6 +23,32 @@ extern "C" {
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController)*
 NS(CudaController_create)( void );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController)*
+NS(CudaController_new)( const char *const SIXTRL_RESTRICT config_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController)*
+NS(CudaController_new_from_node_id)( 
+    const NS(NodeId) *const SIXTRL_RESTRICT node_id, 
+    const char *const SIXTRL_RESTRICT config_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController)*
+NS(CudaController_new_from_node_index)( 
+    const NS(node_index_t) *const SIXTRL_RESTRICT node_id, 
+    const char *const SIXTRL_RESTRICT config_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController)*
+NS(CudaController_new_from_platform_id_and_device_id)(
+    NS(node_platform_id_t) const platform_id, 
+    NS(node_device_id_t) const device_id,  
+    const char *const SIXTRL_RESTRICT config_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController)*
+NS(CudaController_new_from_cuda_device_index)(
+    int const cuda_device_index,
+    const char *const SIXTRL_RESTRICT config_str );
+
+/* ------------------------------------------------------------------------ */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaController_select_node_by_cuda_device_index)(
     NS(CudaController)* SIXTRL_RESTRICT ctrl, int cuda_device_index );
@@ -31,9 +57,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaController_select_node_by_cuda_pci_bus_id)(
     NS(CudaController)* SIXTRL_RESTRICT ctrl,
     char const* SIXTRL_RESTRICT cuda_pci_bus_id );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(CudaController_delete)(
-    NS(CudaController)* SIXTRL_RESTRICT ctrl );
 
 /* ------------------------------------------------------------------------ */
 
@@ -57,6 +80,16 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo) const*
 NS(CudaController_get_ptr_node_info)(
      const NS(CudaController) *const SIXTRL_RESTRICT ctrl,
      char const* SIXTRL_RESTRICT node_id_str );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo) const*
+ NS(CudaController_get_ptr_node_info_by_cuda_dev_index)(
+     const NS(CudaController) *const SIXTRL_RESTRICT ctrl,
+     int const cuda_device_index );
+ 
+ SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaNodeInfo) const*
+ NS(CudaController_get_ptr_node_info_by_pci_bus_id)(
+     const NS(CudaController) *const SIXTRL_RESTRICT ctrl, 
+     char const* SIXTRL_RESTRICT cuda_pci_bus_id );
 
 /* ------------------------------------------------------------------------ */
 
@@ -113,6 +146,10 @@ NS(CudaController_receive_memory)(
     void* SIXTRL_RESTRICT destination,
     NS(cuda_const_arg_buffer_t) SIXTRL_RESTRICT source,
     NS(arch_size_t) const source_length );
+
+/* ------------------------------------------------------------------------ */
+
+
 
 #endif /* !defined( _GPUCODE ) */
 

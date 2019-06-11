@@ -48,6 +48,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         using cuda_arg_buffer_t = ::NS(cuda_arg_buffer_t);
         using cuda_const_arg_buffer_t = ::NS(cuda_const_arg_buffer_t);
+        using cuda_dev_index_t = SIXTRL_CXX_NAMESPACE::cuda_dev_index_t;
 
         static SIXTRL_CONSTEXPR_OR_CONST size_type DEFAULT_WARP_SIZE =
                 SIXTRL_CXX_NAMESPACE::ARCH_CUDA_DEFAULT_WARP_SIZE;
