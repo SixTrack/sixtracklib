@@ -58,14 +58,14 @@ bool NS(NodeId_is_valid)( SIXTRL_ARGPTR_DEC
     SIXTRL_ARGPTR_DEC const ::NS(NodeId) *const SIXTRL_RESTRICT node_id )
 {
     return ( node_id != nullptr )
-        ? node_id->platformId() : ::NS(NODE_ILLEGAL_PATFORM_ID);
+        ? node_id->platformId() : st::NODE_ILLEGAL_PATFORM_ID;
 }
 
 ::NS(node_device_id_t) NS(NodeId_get_device_id)(
     SIXTRL_ARGPTR_DEC const ::NS(NodeId) *const SIXTRL_RESTRICT node_id )
 {
     return ( node_id != nullptr )
-        ? node_id->deviceId() : ::NS(NODE_ILLEGAL_DEVICE_ID);
+        ? node_id->deviceId() : st::NODE_ILLEGAL_DEVICE_ID;
 }
 
 bool NS(NodeId_has_node_index)(
@@ -78,7 +78,7 @@ bool NS(NodeId_has_node_index)(
     SIXTRL_ARGPTR_DEC const ::NS(NodeId) *const SIXTRL_RESTRICT node_id )
 {
     return ( node_id != nullptr )
-        ? node_id->index() : ::NS(NODE_UNDEFINED_INDEX);
+        ? node_id->index() : st::NODE_UNDEFINED_INDEX;
 }
 
 void NS(NodeId_clear)(
@@ -125,18 +125,17 @@ void NS(NodeId_set_index)(
     SIXTRL_ARGPTR_DEC char* SIXTRL_RESTRICT node_id_str,
     ::NS(buffer_size_t) const node_id_str_capacity )
 {
-    return ( ( node_id != nullptr ) &&
-             ( node_id->toString( node_id_str, node_id_str_capacity ) ) )
-        ? ::NS(ARCH_STATUS_SUCCESS) : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+    return ( node_id != nullptr )
+        ? node_id->toString( node_id_str, node_id_str_capacity )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(NodeId_from_string)(
     SIXTRL_ARGPTR_DEC ::NS(NodeId)* SIXTRL_RESTRICT node_id,
     SIXTRL_ARGPTR_DEC const char *const SIXTRL_RESTRICT node_id_str )
 {
-    return ( ( node_id != nullptr ) &&
-             ( node_id->fromString( node_id_str ) ) )
-        ? ::NS(ARCH_STATUS_SUCCESS) : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+    return ( node_id != nullptr )
+        ? node_id->fromString( node_id_str ) : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 int NS(NodeId_compare)(
@@ -185,7 +184,7 @@ void NS(NodeId_print)( ::FILE* SIXTRL_RESTRICT output,
     char const* SIXTRL_RESTRICT config_str, char* SIXTRL_RESTRICT node_id_str,
     ::NS(buffer_size_t) const node_id_str_capacity )
 {
-    int success = ::NS(ARCH_STATUS_GENERAL_FAILURE);
+    int success = st::ARCH_STATUS_GENERAL_FAILURE;
     using buf_size_t = ::NS(buffer_size_t);
 
     if( ( config_str != nullptr ) && ( node_id_str != nullptr ) &&
@@ -201,12 +200,12 @@ void NS(NodeId_print)( ::FILE* SIXTRL_RESTRICT output,
             if( str.size() < node_id_str_capacity )
             {
                 std::strncpy( node_id_str, str.c_str(), str.size() );
-                success = ::NS(ARCH_STATUS_SUCCESS);
+                success = st::ARCH_STATUS_SUCCESS;
             }
         }
         else
         {
-            success = ::NS(ARCH_STATUS_SUCCESS);
+            success = st::ARCH_STATUS_SUCCESS;
         }
     }
     else if( ( config_str != nullptr ) &&
@@ -218,7 +217,7 @@ void NS(NodeId_print)( ::FILE* SIXTRL_RESTRICT output,
             std::memset( node_id_str, ( int )'\0', node_id_str_capacity );
         }
 
-        success = ::NS(ARCH_STATUS_SUCCESS);
+        success = st::ARCH_STATUS_SUCCESS;
     }
 
     return success;
