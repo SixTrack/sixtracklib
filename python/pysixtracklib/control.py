@@ -20,6 +20,15 @@ from .stcommon import st_NodeId_create, st_NodeId_new, \
     st_NodeId_is_valid, st_NodeId_get_platform_id, st_NodeId_get_device_id, \
     st_NodeId_has_node_index, st_NodeId_get_node_index, _st_NodeId_to_string
 
+def raise_error_if_status_not_success(
+    status, msg=None, cls=RuntimeError, prev=None ):
+    if ( prev is None or prev != status ) and \
+        status != st_ARCH_STATUS_SUCCESS.value:
+        if msg is None:
+            msg = "an error occured; status:{0}".format( status )
+        raise cls( msg )
+
+
 class NodeId(object):
     def __init__(self, node_id_str=None, platform_id=None, device_id=None,
                  node_index=None, ext_ptr_node_id=st_NullNodeId, orig=None ):
@@ -177,6 +186,10 @@ class NodeInfoBase(object):
         return self._last_status
 
     @property
+    def last_status_success(self):
+        return self._last_status == st_ARCH_STATUS_SUCCESS.value
+
+    @property
     def arch_id(self):
         return st_NodeInfo_get_arch_id( self._ptr_node_info )
 
@@ -283,13 +296,13 @@ from .stcommon import st_Argument_delete, \
 
 class ArgumentBase(object):
     def __init__(self, ptr_argument=st_NullArgumentBase, owns_ptr=True ):
+        self._ptr_argument = st_NullArgumentBase
+        self._owns_ptr = True
+        self._last_status = st_ARCH_STATUS_SUCCESS.value
+
         if ptr_argument != st_NullArgumentBase:
             self._ptr_argument = ptr_argument
             self._owns_ptr = owns_ptr
-        else:
-            self._ptr_argument = st_NullArgumentBase
-            self._owns_ptr = False
-        self._last_status = st_ARCH_STATUS_SUCCESS.value
 
     def __del__(self):
         if self._ptr_argument != st_NullArgumentBase and self._owns_ptr:
@@ -362,15 +375,16 @@ class ArgumentBase(object):
     def last_status(self):
         return self._last_status
 
+    @property
+    def last_status_success(self):
+        return self._last_status == st_ARCH_STATUS_SUCCESS.value
+
     def send(self, buffer=st_NullBuffer, remap_buffer=True,
              ptr_raw_arg_begin=st_Null, raw_arg_size=None ):
         ptr_buffer = st_NullBuffer
         if buffer is not None and buffer is not st_NullBuffer:
             if isinstance( buffer, Buffer ):
                 ptr_buffer = buffer.pointer
-            elif isinstance( buffer, CBuffer ):
-                _buffer = Buffer(cbuffer=buffer)
-                ptr_buffer = _buffer.pointer
             else:
                 ptr_buffer = buffer
 
@@ -388,6 +402,10 @@ class ArgumentBase(object):
                 self._ptr_argument, ptr_raw_arg_begin, raw_arg_size )
         else:
             self._last_status = st_Argument_send_again( self._ptr_argument )
+
+        raise_error_if_status_not_success( self._last_status,
+            "unsuccessful send op; status:{0}".format( self._last_status ) )
+
         return self
 
     def send_buffer( self, buffer ):
@@ -428,6 +446,10 @@ class ArgumentBase(object):
         else:
             self._last_status = st_Argument_receive_again(
                 self._ptr_argument )
+
+        raise_error_if_status_not_success( self._last_status,
+            "unsuccessful receive op; status:{0}".format( self._last_status ) )
+
         return self
 
     def receive_buffer( self, buffer ):
@@ -448,6 +470,7 @@ from .stcommon import st_Controller_delete, st_Controller_clear, \
     st_Controller_has_config_string, st_Controller_get_config_string, \
     st_Controller_send_detailed, st_Controller_send_buffer, \
     st_Controller_receive_detailed, st_Controller_receive_buffer, \
+    st_Controller_is_cobjects_buffer_arg_remapped, \
     st_Controller_remap_cobjects_buffer_arg, st_Controller_is_ready_to_send, \
     st_Controller_is_ready_to_remap, st_Controller_is_ready_to_run_kernel, \
     st_Controller_is_ready_to_receive, st_Controller_is_in_debug_mode, \
@@ -488,6 +511,10 @@ class ControllerBase(object):
     @property
     def last_status(self):
         return self._last_status
+
+    @property
+    def last_status_success(self):
+        return self._last_status == st_ARCH_STATUS_SUCCESS.value
 
     @property
     def uses_nodes(self):
@@ -601,6 +628,10 @@ class ControllerBase(object):
                     st_arch_size_t( raw_arg_size ) )
         else:
             self._last_status = st_ARCH_STATUS_GENERAL_FAILURE.value
+
+        raise_error_if_status_not_success( self._last_status,
+            "unsuccessful send op; status:{0}".format( self._last_status ) )
+
         return self
 
     def send_buffer( self, ptr_argument, ptr_buffer ):
@@ -615,6 +646,7 @@ class ControllerBase(object):
                  ptr_raw_arg_begin=st_Null, raw_arg_capacity=None ):
         self._last_status = st_ARCH_STATUS_GENERAL_FAILURE.value
         if ptr_argument != st_NullArgumentBase:
+            prev_last_status = self._last_status
             if ptr_buffer != st_NullBuffer:
                 self._last_status = st_Controller_receive_buffer(
                     self._ptr_ctrl, ptr_buffer, ptr_argument )
@@ -622,6 +654,11 @@ class ControllerBase(object):
                 self._last_status = st_Controller_send_detailed( self._ptr_ctrl,
                     ptr_raw_arg_begin, st_arch_size_t( raw_arg_capacity ),
                         ptr_argument )
+
+            raise_error_if_status_not_success( self._last_status,
+                msg="unsuccessful receive op; status:{0}".format(
+                    self._last_status ), cls=RuntimeError,
+                prev=prev_last_status )
 
         return self
 
@@ -635,9 +672,41 @@ class ControllerBase(object):
             ptr_raw_arg_begin=ptr_raw_arg_begin,
             raw_arg_capacity=raw_arg_capacity )
 
-    def remap_cobjects_buffer_arg(self, ptr_argument ):
-        return st_Controller_remap_cobjects_buffer_arg(
-            self._ptr_ctrl, ptr_argument )
+    def buffer_arg_needs_remapping( self, argument ):
+        needs_remapping = False
+        ptr_argument = st_NullArgumentBase
+        if argument is not None and isinstance( argument, ArgumentBase ):
+            ptr_argument = argument.pointer
+        else:
+            ptr_argument = argument
+        if ptr_argument is not None and ptr_argument != st_NullArgumentBase and \
+            st_Argument_uses_cobjects_buffer( ptr_argument ):
+            needs_remapping = not st_Controller_is_cobjects_buffer_arg_remapped(
+                self._ptr_ctrl, ptr_argument )
+        else:
+            raise ValueError( "illegal argument supplied" )
+        return needs_remapping
+
+
+    def remap_buffer_arg(self, argument ):
+        ptr_argument = st_NullArgumentBase
+        if argument is not None and isinstance( argument, ArgumentBase ):
+            ptr_argument = argument.pointer
+        else:
+            ptr_argument = argument
+
+        if ptr_argument is not None and ptr_argument != st_NullArgumentBase:
+            self._last_status = st_Controller_remap_cobjects_buffer_arg(
+                self._ptr_ctrl, ptr_argument )
+
+            raise_error_if_status_not_success( self._last_status,
+                "unsuccesful mapping op; status:{0}".format(
+                    self._last_status ) )
+        else:
+            raise RuntimeError( "illegal argument supplied" )
+
+        return self
+
 
 
 from .stcommon import \
@@ -683,6 +752,9 @@ from .stcommon import \
 class NodeControllerBase(ControllerBase):
     def __init__(self, ptr_controller=st_NullControllerBase, owns_ptr=True ):
         super().__init__( ptr_controller=ptr_controller, owns_ptr=owns_ptr )
+
+    def __del__(self):
+        super().__del__()
 
     @staticmethod
     def num_available_nodes( ctrl=None ):
@@ -1062,6 +1134,7 @@ class NodeControllerBase(ControllerBase):
 
     def select_node_disp( self, node_id_str=None, node_id=st_NullNodeId,
         node_index=None, platform_id=None, device_id=None ):
+        prev_last_status = self._last_status
         if node_index is not None and \
             node_index != st_NODE_UNDEFINED_INDEX.value:
             self._last_status = st_Controller_select_node_by_index(
@@ -1085,6 +1158,11 @@ class NodeControllerBase(ControllerBase):
                     self._ptr_ctrl, st_node_platform_id_t( platform_id ),
                         st_node_device_id_t( device_id ) )
 
+        raise_error_if_status_not_success( self._last_status,
+            msg="unsuccessful select node op; status:{0}".format(
+                self._last_status ),
+            cls=RuntimeError, prev=prev_last_status )
+
         return self
 
     def select_node( self, node_id_str ):
@@ -1106,10 +1184,17 @@ class NodeControllerBase(ControllerBase):
             self._ptr_ctrl, st_node_index_t( current_node_index ),
                 st_node_index_t( new_selected_index ) )
 
+        raise_error_if_status_not_success( self._last_status,
+            "unsuccessful change selected node op; status:{0}".format(
+                self._last_status ) )
+
+        return self
+
     # ------------------------------------------------------------------------
 
     def unselect_node_disp( self, node_id_str=None, node_id=st_NullNodeId,
         node_index=None, platform_id=None, device_id=None ):
+        prev_last_status = self._last_status
         if node_index is not None and \
             node_index != st_NODE_UNDEFINED_INDEX.value:
             self._last_status = st_Controller_unselect_node_by_index(
@@ -1132,6 +1217,10 @@ class NodeControllerBase(ControllerBase):
                 st_Controller_unselect_node_by_platform_id_and_device_id(
                     self._ptr_ctrl, st_node_platform_id_t( platform_id ),
                         st_node_device_id_t( device_id ) )
+        raise_error_if_status_not_success( self._last_status,
+            msg="unsuccessful unselect node op; status:{0}".format(
+                self._last_status ),
+            cls=RuntimeError, prev=prev_last_status )
 
         return self
 

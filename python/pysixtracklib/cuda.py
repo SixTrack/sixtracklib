@@ -4,8 +4,10 @@
 import ctypes as ct
 from cobjects import CBuffer, CObject
 from .particles import ParticlesSet
+from .buffer import Buffer
 from .config import SIXTRACKLIB_MODULES
 from .control import NodeId, NodeInfoBase, ArgumentBase, NodeControllerBase
+from .control import raise_error_if_status_not_success
 
 if SIXTRACKLIB_MODULES.get('cuda', False):
     from .stcommon import st_Null, st_node_platform_id_t, st_node_device_id_t, \
@@ -53,6 +55,9 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
                 super().__init__(
                     ptr_node_info=_ptr_node_info, owns_ptr=owns_ptr )
 
+        def __del__(self):
+            super().__del__()
+
         @property
         def cuda_device_index(self):
             return st_CudaNodeInfo_get_cuda_device_index( self._ptr_node_info )
@@ -99,8 +104,8 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
         st_CudaController_new_from_cuda_device_index, \
         st_CudaController_select_node_by_cuda_device_index, \
         st_CudaController_select_node_by_cuda_pci_bus_id, \
-        st_CudaController_remap_managed_cobject_buffer, \
         st_CudaController_is_managed_cobject_buffer_remapped, \
+        st_CudaController_remap_managed_cobject_buffer, \
         st_CudaController_send_memory, st_CudaController_receive_memory, \
         st_CudaController_get_ptr_node_info_by_index, \
         st_CudaController_get_ptr_node_info_by_node_id, \
@@ -151,10 +156,19 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
             else:
                 raise ValueError( "unable to create CudaController C-pointer" )
 
+        def __del__(self):
+            super().__del__()
+
         def select_node_by_cuda_device_id( self, cuda_dev_index ):
             self._last_status = \
                 st_CudaController_select_node_by_cuda_device_index(
                     self._ptr_ctrl, st_cuda_dev_index_t( cuda_dev_index ) )
+
+            raise_error_if_status_not_success( self._last_status,
+                "unsuccessful select node by cuda_dev_index op; " + \
+                "cuda_dev_index:{0}, status:{0}".format(
+                    cuda_dev_index, self._last_status ) )
+
             return self
 
         def select_node_by_pci_bus_id( self, pci_bus_id ):
@@ -162,27 +176,49 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
             self._last_status = \
                 st_CudaController_select_node_by_cuda_pci_bus_id(
                     self._ptr_ctrl, ct.c_char_p( pci_bus_id ) )
+
+            raise_error_if_status_not_success( self._last_status,
+                "unsuccessful select node by pci bus id op; " + \
+                "pci_bus_id:{0}, status:{0}".format(
+                    pci_bus_id, self._last_status ) )
+
             return self
+
+        def managed_cobject_buffer_needs_remapping(
+            self, ptr_argument, slot_size):
+            return not st_CudaController_is_managed_cobject_buffer_remapped(
+                self._ptr_ctrl, ptr_argument, st_buffer_size_t( slot_size ) )
 
         def remap_managed_cobject_buffer( self, ptr_argument, slot_size ):
             self._last_status = st_CudaController_remap_managed_cobject_buffer(
                 self._ptr_ctrl, ptr_argument, st_buffer_size_t( slot_size ) )
-            return self
 
-        def is_managed_cobject_buffer_remapped( self, ptr_argument, slot_size):
-            return st_CudaController_is_managed_cobject_buffer_remapped(
-                self._ptr_ctrl, ptr_argument, st_buffer_size_t( slot_size ) )
+            raise_error_if_status_not_success( self._last_status,
+                "unsuccessful remap managed cobject buffer op; status:{0}".format(
+                    self._last_status ) )
+
+            return self
 
         def send_memory( self, ptr_argument, ptr_mem_begin, mem_size ):
             self._last_status = st_CudaController_send_memory(
                 self._ptr_ctrl, ptr_argument, ptr_mem_begin,
                     st_arch_size_t( mem_size ) )
+
+            raise_error_if_status_not_success( self._last_status,
+                "unsuccessful send memory op; status:{0}".format(
+                    self._last_status ) )
+
             return self
 
         def receive_memory( self, ptr_mem_begin, ptr_argument, mem_capacity ):
             self._last_status = st_CudaController_receive_memory(
                 self._ptr_ctrl, ptr_mem_begin, ptr_argument,
                     st_arch_size_t( mem_capacity ) )
+
+            raise_error_if_status_not_success( self._last_status,
+                "unsuccessful receive memory op; status:{0}".format(
+                    self._last_status ) )
+
             return self
 
 
@@ -199,7 +235,7 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
         st_CudaArgument_get_cuda_arg_buffer_as_const_elem_by_elem_config_begin
 
     class CudaArgument(ArgumentBase):
-        def __init__( self, ptr_buffer=None, ctrl=None,
+        def __init__( self, buffer=None, ctrl=None,
                       ptr_raw_arg_begin=None, raw_arg_size=None,
                       ptr_argument=st_NullCudaArgument, owns_ptr=True ):
             ptr_cuda_ctrl = st_NullCudaController
@@ -214,6 +250,11 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
             _ptr_arg = ptr_argument
             if _ptr_arg == st_NullCudaArgument or _ptr_arg is None:
                 owns_ptr = True
+                ptr_buffer = st_NullBuffer
+                if buffer is not None and isinstance( buffer, Buffer ):
+                    ptr_buffer = buffer.pointer
+                else:
+                    ptr_buffer = buffer
                 if ptr_buffer is not None and ptr_buffer != st_NullBuffer:
                     _ptr_arg = st_CudaArgument_new_from_buffer(
                         ptr_buffer, ptr_cuda_ctrl )
@@ -234,13 +275,18 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
             else:
                 raise ValueError( "unable to create CudaArgument C-pointer" )
 
+        def __del__(self):
+            super().__del__()
+
         @property
         def has_cuda_arg_buffer(self):
             return st_Argument_has_cuda_arg_buffer( self._ptr_argument )
 
         @property
         def cuda_arg_buffer(self):
-            return st_CudaArgument_get_cuda_arg_buffer( self._ptr_argument )
+            _cuda_arg_buffer = st_CudaArgument_get_cuda_arg_buffer(
+                self._ptr_argument )
+            return _cuda_arg_buffer
 
         def get_as_buffer_begin( self ):
             return st_CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin(
