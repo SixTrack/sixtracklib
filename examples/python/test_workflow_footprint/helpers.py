@@ -242,8 +242,10 @@ def track_particle_sixtracklib(
 
         part.partid = i_part
         part.state = 1
+        part.elemid = -1
+        part.turn = 0
 
-        p.fromPySixTrack(part, i_part)
+        p.from_pysixtrack(part, i_part)
 
     ps.tofile('particles.buffer')
     if device_opencl is None:

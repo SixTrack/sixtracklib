@@ -109,9 +109,6 @@ class Particles(CObject):
         self.state[particle_index] = inp.state
         return
 
-    def fromPySixTrack(self, inp, particle_index):
-        return self.from_pysixtrack(inp, particle_index)
-
     def to_pysixtrack(self, other, particle_index):
         assert(particle_index < self.num_particles)
         other._update_coordinates = False
@@ -137,9 +134,6 @@ class Particles(CObject):
         other._update_coordinates = True
 
         return
-
-    def toPySixTrack(self, other, particle_index):
-        self.to_pysixtrack(other, particle_index)
 
 
 def makeCopy(orig, cbuffer=None):
@@ -308,7 +302,7 @@ class ParticlesSet(object):
             for jj in range(num_particles):
                 kk = num_particles * ii + jj
                 assert(kk < num_dumps)
-                p.fromPySixTrack(
+                p.from_pysixtrack(
                     pysixtrack.Particles(**sixdump[kk].get_minimal_beam()), jj)
                 p.state[jj] = 1
                 p.at_element[jj] = elem_id
