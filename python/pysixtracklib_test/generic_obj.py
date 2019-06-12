@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from cobjects import CObject, CField
+import numpy as np
 
 
 class GenericObj(CObject):
@@ -10,12 +11,12 @@ class GenericObj(CObject):
     a = CField(1, 'int32', default=0, alignment=8)
     b = CField(2, 'real', default=0.0, alignment=8)
     c = CField(3, 'real', length=4, default=0.0, alignment=8)
-    num_d = CField(4, 'uint64', default=0, alignment=8)
+    num_d = CField(4, 'uint64', const=True, default=0, alignment=8)
     d = CField(5, 'uint8', default=0, pointer=True,
-               length=6, alignment=8)
-    num_e = CField(6, 'uint64', default=0, alignment=8)
+               length='num_d', alignment=8)
+    num_e = CField(6, 'uint64', const=True, default=0, alignment=8)
     e = CField(7, 'real', default=0.0, pointer=True,
-               length=4, alignment=8)
+               length='num_e', alignment=8)
 
     def __init__(self, num_d=0, num_e=0, d=None, e=None, **kwargs):
         in_d_len = d is not None and d and len(d) or 0
@@ -30,7 +31,7 @@ class GenericObj(CObject):
             _d[:len(d)] = d
             d = _d
 
-        if d and len(d) == d_len:
+        if d is not None and len(d) == d_len:
             kwargs["d"] = d
 
         e_len = max(num_e, in_e_len)
@@ -42,13 +43,13 @@ class GenericObj(CObject):
             _e[:len(e)] = e
             e = _e
 
-        if e and len(e) == e_len:
+        if e is not None and len(e) == e_len:
             kwargs["e"] = e
 
         kwargs["num_d"] = d_len
         kwargs["num_e"] = e_len
 
-        CObject.__init__(self, **kwargs)
+        CObject.__init__( self,**kwargs)
 
 
 # end: python/pysixtracklib_test/generic_obj.py
