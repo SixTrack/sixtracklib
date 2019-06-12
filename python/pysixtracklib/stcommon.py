@@ -100,7 +100,7 @@ st_Buffer_get_header_size = sixtracklib.st_Buffer_get_header_size_ext
 st_Buffer_get_header_size.argtypes = [ st_Buffer_p ]
 st_Buffer_get_header_size.restype = st_buffer_size_t
 
-st_Buffer_get_data_begin_addr = sixtracklib.st_Buffer_get_data_begin_addr
+st_Buffer_get_data_begin_addr = sixtracklib.st_Buffer_get_data_begin_addr_ext
 st_Buffer_get_data_begin_addr.argtypes = [ st_Buffer_p ]
 st_Buffer_get_data_begin_addr.restype = st_buffer_addr_t
 
@@ -179,7 +179,7 @@ st_Buffer_reset_detailed.restype = st_arch_status_t
 st_Buffer_reserve = sixtracklib.st_Buffer_reserve_ext
 st_Buffer_reserve.argtypes = [ st_Buffer_p, st_buffer_size_t,
     st_buffer_size_t, st_buffer_size_t, st_buffer_size_t ]
-st_Buffer_reserve.argtypes = st_arch_status_t
+st_Buffer_reserve.restype = st_arch_status_t
 
 st_Buffer_reserve_capacity = sixtracklib.st_Buffer_reserve_capacity_ext
 st_Buffer_reserve_capacity.argtypes =  [ st_Buffer_p, st_buffer_size_t ]
@@ -269,17 +269,18 @@ st_Particles_preset.restype = st_Particles_p
 st_Particles_get_num_of_particles = \
     sixtracklib.st_Particles_get_num_of_particles_ext
 st_Particles_get_num_of_particles.argtypes = [st_Particles_p]
-st_Particles_get_num_of_particles.restype = ct.c_int64
+st_Particles_get_num_of_particles.restype = st_particle_num_elem_t
 
 st_Particles_copy_single = sixtracklib.st_Particles_copy_single_ext
 st_Particles_copy_single.restype = ct.c_bool
 st_Particles_copy_single.argtypes = [
-    st_Particles_p, ct.c_int64, st_Particles_p, ct.c_int64]
+    st_Particles_p, st_particle_num_elem_t,
+    st_Particles_p, st_particle_num_elem_t]
 
 st_Particles_copy_range = sixtracklib.st_Particles_copy_range_ext
 st_Particles_copy_range.restype = ct.c_bool
-st_Particles_copy_range.argtypes = [
-    st_Particles_p, st_Particles_p, ct.c_int64, ct.c_int64, ct.c_int64]
+st_Particles_copy_range.argtypes = [ st_Particles_p, st_Particles_p,
+    st_particle_num_elem_t, st_particle_num_elem_t, st_particle_num_elem_t ]
 
 st_Particles_copy = sixtracklib.st_Particles_copy_ext
 st_Particles_copy.argtypes = [st_Particles_p, st_Particles_p]
@@ -293,18 +294,18 @@ st_Particles_calculate_difference.argtypes = [
 
 st_Particles_buffer_get_total_num_of_particles = \
     sixtracklib.st_Particles_buffer_get_total_num_of_particles_ext
-st_Particles_buffer_get_total_num_of_particles.restype = ct.c_int64
+st_Particles_buffer_get_total_num_of_particles.restype = st_particle_num_elem_t
 st_Particles_buffer_get_total_num_of_particles.argtypes = [st_Buffer_p]
 
 st_Particles_buffer_get_num_of_particle_blocks = \
     sixtracklib.st_Particles_buffer_get_num_of_particle_blocks_ext
-st_Particles_buffer_get_num_of_particle_blocks.restype = ct.c_uint64
+st_Particles_buffer_get_num_of_particle_blocks.restype = st_buffer_size_t
 st_Particles_buffer_get_num_of_particle_blocks.argtypes = [st_Buffer_p]
 
 st_Particles_buffer_get_particles = \
     sixtracklib.st_Particles_buffer_get_particles_ext
 st_Particles_buffer_get_particles.restype = st_Particles_p
-st_Particles_buffer_get_particles.argtypes = [st_Buffer_p, ct.c_uint64]
+st_Particles_buffer_get_particles.argtypes = [st_Buffer_p, st_buffer_size_t]
 
 st_Particles_buffers_have_same_structure = \
     sixtracklib.st_Particles_buffers_have_same_structure_ext
@@ -325,28 +326,28 @@ st_Particles_buffer_clear_particles.argtypes = [st_Buffer_p]
 
 st_Particles_get_required_num_slots = \
     sixtracklib.st_Particles_get_required_num_slots_ext
-st_Particles_get_required_num_slots.restype = ct.c_uint64
-st_Particles_get_required_num_slots.argtypes = [st_Buffer_p, ct.c_uint64]
+st_Particles_get_required_num_slots.restype = st_buffer_size_t
+st_Particles_get_required_num_slots.argtypes = [st_Buffer_p, st_buffer_size_t]
 
 st_Particles_get_required_num_dataptrs = \
     sixtracklib.st_Particles_get_required_num_dataptrs_ext
-st_Particles_get_required_num_dataptrs.restype = ct.c_uint64
-st_Particles_get_required_num_dataptrs.argtypes = [st_Buffer_p, ct.c_uint64]
+st_Particles_get_required_num_dataptrs.restype = st_buffer_size_t
+st_Particles_get_required_num_dataptrs.argtypes = [st_Buffer_p, st_buffer_size_t]
 
 st_Particles_can_be_added = sixtracklib.st_Particles_can_be_added_ext
 st_Particles_can_be_added.restype = ct.c_bool
 st_Particles_can_be_added.argtypes = [
-    st_Buffer_p, ct.c_uint64, st_uint64_p, st_uint64_p, st_uint64_p]
+    st_Buffer_p, st_buffer_size_t, st_uint64_p, st_uint64_p, st_uint64_p]
 
 st_Particles_new = sixtracklib.st_Particles_new_ext
-st_Particles_new.argtypes = [st_Buffer_p, ct.c_uint64]
+st_Particles_new.argtypes = [st_Buffer_p, st_particle_num_elem_t]
 st_Particles_new.restype = st_Particles_p
 
 st_Particles_add = sixtracklib.st_Particles_add_ext
 st_Particles_add.restype = st_Particles_p
 st_Particles_add.argtypes = [
     st_Buffer_p,
-    ct.c_uint64,
+    st_particle_num_elem_t,
     st_double_p,
     st_double_p,
     st_double_p,
@@ -421,6 +422,153 @@ class st_ElemByElemConfig(ct.Structure):
 
 st_ElemByElemConfig_p = ct.POINTER( st_ElemByElemConfig )
 st_NullElemByElemConfig = ct.cast( 0, st_ElemByElemConfig_p )
+
+st_ElemByElemConfig_is_active = \
+    sixtracklib.st_ElemByElemConfig_is_active_ext
+st_ElemByElemConfig_is_active.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_is_active.restype = ct.c_bool
+
+st_ElemByElemConfig_get_out_store_num_particles = \
+    sixtracklib.st_ElemByElemConfig_get_out_store_num_particles_ext
+st_ElemByElemConfig_get_out_store_num_particles.argtypes = [
+    st_ElemByElemConfig_p ]
+st_ElemByElemConfig_get_out_store_num_particles.restype = \
+    st_particle_num_elem_t
+
+st_ElemByElemConfig_get_num_particles_to_store = \
+    sixtracklib.st_ElemByElemConfig_get_num_particles_to_store_ext
+st_ElemByElemConfig_get_num_particles_to_store.argtypes = [
+    st_ElemByElemConfig_p ]
+st_ElemByElemConfig_get_num_particles_to_store.restype = st_particle_num_elem_t
+
+st_ElemByElemConfig_get_num_turns_to_store = \
+    sixtracklib.st_ElemByElemConfig_get_num_turns_to_store_ext
+st_ElemByElemConfig_get_num_turns_to_store.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_get_num_turns_to_store.restype = st_particle_num_elem_t
+
+st_ElemByElemConfig_get_num_elements_to_store = \
+    sixtracklib.st_ElemByElemConfig_get_num_elements_to_store_ext
+st_ElemByElemConfig_get_num_elements_to_store.argtypes = [
+    st_ElemByElemConfig_p ]
+st_ElemByElemConfig_get_num_elements_to_store.restype = st_particle_num_elem_t
+
+st_ElemByElemConfig_get_min_particle_id = \
+    sixtracklib.st_ElemByElemConfig_get_min_particle_id_ext
+st_ElemByElemConfig_get_min_particle_id.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_get_min_particle_id.restype = st_particle_index_t
+
+st_ElemByElemConfig_get_max_particle_id = \
+    sixtracklib.st_ElemByElemConfig_get_max_particle_id_ext
+st_ElemByElemConfig_get_max_particle_id.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_get_max_particle_id.restype = st_particle_index_t
+
+st_ElemByElemConfig_get_min_element_id = \
+    sixtracklib.st_ElemByElemConfig_get_min_element_id_ext
+st_ElemByElemConfig_get_min_element_id.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_get_min_element_id.restype = st_particle_index_t
+
+st_ElemByElemConfig_get_max_element_id = \
+    sixtracklib.st_ElemByElemConfig_get_max_element_id_ext
+st_ElemByElemConfig_get_max_element_id.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_get_max_element_id.restype = st_particle_index_t
+
+st_ElemByElemConfig_get_min_turn = \
+    sixtracklib.st_ElemByElemConfig_get_min_turn_ext
+st_ElemByElemConfig_get_min_turn.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_get_min_turn.restype = st_particle_index_t
+
+st_ElemByElemConfig_get_max_turn = \
+    sixtracklib.st_ElemByElemConfig_get_max_turn_ext
+st_ElemByElemConfig_get_max_turn.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_get_max_turn.restype = st_particle_index_t
+
+st_ElemByElemConfig_is_rolling = sixtracklib.st_ElemByElemConfig_is_rolling_ext
+st_ElemByElemConfig_is_rolling.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_is_rolling.restype = ct.c_bool
+
+st_ElemByElemConfig_get_order = sixtracklib.st_ElemByElemConfig_get_order_ext
+st_ElemByElemConfig_get_order.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_get_order.restype = st_elem_by_elem_order_int_t
+
+st_ElemByElemConfig_get_output_store_address = \
+    sixtracklib.st_ElemByElemConfig_get_output_store_address_ext
+st_ElemByElemConfig_get_output_store_address.argtypes = [
+    st_ElemByElemConfig_p ]
+st_ElemByElemConfig_get_output_store_address.restype = \
+    st_elem_by_elem_out_addr_t
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+st_ElemByElemConfig_get_particles_store_index_details = \
+    sixtracklib.st_ElemByElemConfig_get_particles_store_index_details_ext
+st_ElemByElemConfig_get_particles_store_index_details.argtypes = [
+    st_ElemByElemConfig_p, st_particle_index_t, st_particle_index_t,
+        st_particle_index_t ]
+st_ElemByElemConfig_get_particles_store_index_details.restype = \
+    st_particle_num_elem_t
+
+st_ElemByElemConfig_get_particles_store_index = \
+    sixtracklib.st_ElemByElemConfig_get_particles_store_index_ext
+st_ElemByElemConfig_get_particles_store_index.argtypes = [
+    st_ElemByElemConfig_p, st_Particles_p, st_particle_num_elem_t ]
+st_ElemByElemConfig_get_particles_store_index.restype = st_particle_num_elem_t
+
+st_ElemByElemConfig_get_particle_id_from_store_index = \
+    sixtracklib.st_ElemByElemConfig_get_particle_id_from_store_index_ext
+st_ElemByElemConfig_get_particle_id_from_store_index.argtypes = [
+    st_ElemByElemConfig_p, st_particle_num_elem_t ]
+st_ElemByElemConfig_get_particle_id_from_store_index.restype = \
+    st_particle_num_elem_t
+
+st_ElemByElemConfig_get_at_element_id_from_store_index = \
+    sixtracklib.st_ElemByElemConfig_get_at_element_id_from_store_index_ext
+st_ElemByElemConfig_get_at_element_id_from_store_index.argtypes = [
+    st_ElemByElemConfig_p, st_particle_num_elem_t ]
+st_ElemByElemConfig_get_at_element_id_from_store_index.restype = \
+    st_particle_num_elem_t
+
+st_ElemByElemConfig_get_at_turn_from_store_index = \
+    sixtracklib.st_ElemByElemConfig_get_at_turn_from_store_index_ext
+st_ElemByElemConfig_get_at_turn_from_store_index.argtypes = [
+    st_ElemByElemConfig_p, st_particle_num_elem_t ]
+st_ElemByElemConfig_get_at_turn_from_store_index.restype = st_particle_index_t
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+st_ElemByElemConfig_init_detailed = \
+    sixtracklib.st_ElemByElemConfig_init_detailed_ext
+st_ElemByElemConfig_init_detailed.argtypes = [ st_ElemByElemConfig_p,
+    st_elem_by_elem_order_int_t, st_particle_index_t, st_particle_index_t,
+    st_particle_index_t, st_particle_index_t, st_particle_index_t,
+    st_particle_index_t, ct.c_bool ]
+st_ElemByElemConfig_init_detailed.restype = st_arch_status_t
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+st_ElemByElemConfig_preset = sixtracklib.st_ElemByElemConfig_preset_ext
+st_ElemByElemConfig_preset.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_preset.restype = st_ElemByElemConfig_p
+
+st_ElemByElemConfig_clear = sixtracklib.st_ElemByElemConfig_clear_ext
+st_ElemByElemConfig_clear.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_clear.restype = None
+
+st_ElemByElemConfig_set_order = sixtracklib.st_ElemByElemConfig_set_order_ext
+st_ElemByElemConfig_set_order.argtypes = [
+    st_ElemByElemConfig_p, st_elem_by_elem_order_int_t ]
+st_ElemByElemConfig_set_order.restype = None
+
+st_ElemByElemConfig_set_is_rolling = \
+    sixtracklib.st_ElemByElemConfig_set_is_rolling_ext
+st_ElemByElemConfig_set_is_rolling.argtypes = [
+    st_ElemByElemConfig_p, ct.c_bool ]
+st_ElemByElemConfig_set_is_rolling.restype = None
+
+st_ElemByElemConfig_set_output_store_address = \
+    sixtracklib.st_ElemByElemConfig_set_output_store_address_ext
+st_ElemByElemConfig_set_output_store_address.argtypes = [
+    st_ElemByElemConfig_p, st_elem_by_elem_out_addr_t ]
+st_ElemByElemConfig_set_output_store_address.restype = None
 
 # -----------------------------------------------------------------------------
 # BeamMonitor objects
@@ -1195,6 +1343,12 @@ st_Controller_receive_buffer = sixtracklib.st_Controller_receive_buffer
 st_Controller_receive_buffer.argtypes = [ st_ControllerBase_p, st_Buffer_p,
     st_ArgumentBase_p ]
 st_Controller_receive_buffer.restype = st_arch_status_t
+
+st_Controller_is_cobjects_buffer_arg_remapped = \
+    sixtracklib.st_Controller_is_cobjects_buffer_arg_remapped
+st_Controller_is_cobjects_buffer_arg_remapped.argtypes = [ st_ControllerBase_p,
+    st_ArgumentBase_p ]
+st_Controller_is_cobjects_buffer_arg_remapped.restype = ct.c_bool
 
 st_Controller_remap_cobjects_buffer_arg = \
     sixtracklib.st_Controller_remap_cobjects_buffer_arg
@@ -2327,6 +2481,9 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     # --------------------------------------------------------------------------
     # NS(CudaController):
 
+    st_CudaArgBuffer_p = ct.c_void_p
+    st_NullCudaArgBuffer = ct.cast( 0, st_CudaArgBuffer_p )
+
     st_CudaArgument_p = ct.c_void_p
     st_NullCudaArgument = ct.cast( 0, st_CudaArgument_p )
 
@@ -2452,18 +2609,19 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    st_CudaController_remap_managed_cobject_buffer = \
-        sixtracklib.st_CudaController_remap_managed_cobject_buffer
-    st_CudaController_remap_managed_cobject_buffer.argtypes = [
-        st_CudaController_p, st_CudaArgument_p, st_arch_size_t ]
-    st_CudaController_remap_managed_cobject_buffer.restype = st_arch_status_t
-
-
     st_CudaController_is_managed_cobject_buffer_remapped = \
         sixtracklib.st_CudaController_is_managed_cobject_buffer_remapped
     st_CudaController_is_managed_cobject_buffer_remapped.argtypes = [
-        st_CudaController_p, st_CudaArgument_p, st_arch_size_t ]
+        st_CudaController_p, st_CudaArgBuffer_p, st_arch_size_t ]
     st_CudaController_is_managed_cobject_buffer_remapped.restype = ct.c_bool
+
+    st_CudaController_remap_managed_cobject_buffer = \
+        sixtracklib.st_CudaController_remap_managed_cobject_buffer
+    st_CudaController_remap_managed_cobject_buffer.argtypes = [
+        st_CudaController_p, st_CudaArgBuffer_p, st_arch_size_t ]
+    st_CudaController_remap_managed_cobject_buffer.restype = st_arch_status_t
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     st_CudaController_send_memory = sixtracklib.st_CudaController_send_memory
     st_CudaController_send_memory.argtypes = [ st_CudaController_p,
@@ -2479,8 +2637,6 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     # --------------------------------------------------------------------------
     # NS(CudaArgument):
 
-    st_cuda_arg_buffer_t = ct.c_void_p
-    st_null_cuda_arg_buffer_t = ct.cast( 0, st_cuda_arg_buffer_t )
     st_arch_debugging_t  = ct.c_uint64
     st_arch_debugging_p  = ct.POINTER( st_arch_debugging_t )
 
@@ -2517,12 +2673,12 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     st_CudaArgument_get_cuda_arg_buffer = \
         sixtracklib.st_CudaArgument_get_cuda_arg_buffer
     st_CudaArgument_get_cuda_arg_buffer.argtypes = [ st_CudaArgument_p ]
-    st_CudaArgument_get_cuda_arg_buffer.restype = st_cuda_arg_buffer_t
+    st_CudaArgument_get_cuda_arg_buffer.restype = st_CudaArgBuffer_p
 
     st_CudaArgument_get_const_cuda_arg_buffer = \
         sixtracklib.st_CudaArgument_get_const_cuda_arg_buffer
     st_CudaArgument_get_const_cuda_arg_buffer.argtypes = [ st_CudaArgument_p ]
-    st_CudaArgument_get_const_cuda_arg_buffer.restype = st_cuda_arg_buffer_t
+    st_CudaArgument_get_const_cuda_arg_buffer.restype = st_CudaArgBuffer_p
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
