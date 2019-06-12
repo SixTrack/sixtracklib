@@ -1236,7 +1236,3 @@ class NodeControllerBase(ControllerBase):
     def unselect_node_by_platform_id_and_device_id( self, pid, dev_id ):
         return self.unselect_node_disp( platform_id=pid, device_id=dev_id )
 
-
-
-
-

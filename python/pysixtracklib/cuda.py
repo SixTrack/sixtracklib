@@ -300,6 +300,23 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
             return st_CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin(
                 self._ptr_argument )
 
+    class CudaTrackJob(object):
+        @staticmethod
+        def _get_buffer(obj):
+            if isinstance(obj, CBuffer):
+                return obj
+            elif isinstance(obj, CObject):
+                return obj._buffer
+            elif hasattr(obj, 'cbuffer'):
+                return obj.cbuffer
+            else:
+                raise ValueError("Object {obj} is not or has not a CBuffer")
+
+        def __init__( self, beam_elements_buffer, particles_buffer,
+                     until_turn_elem_by_elem=0, output_buffer=None,
+                     config_str=None )
+
+
 else:
     class CudaNodeInfo(object):
         pass
@@ -308,4 +325,7 @@ else:
         pass
 
     class CudaArgument(object):
+        pass
+
+    class CudaTrackJob(object):
         pass
