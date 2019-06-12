@@ -193,8 +193,8 @@ class BeamBeam4D(CObject):
     data = CField(1, 'float64', default=0.0,
                   length='size', pointer=True)
 
-    def __init__(self, data=None, **kwargs):
-        if data is None:
+    def __init__(self, **kwargs):
+        if 'q_part' in kwargs:
             slots = (
                 'q_part',
                 'N_part',
@@ -219,8 +219,8 @@ class BeamBeam6D(CObject):
     data = CField(1, 'float64', default=0.0,
                   length='size', pointer=True)
 
-    def __init__(self, data=None, **kwargs):
-        if data is None:
+    def __init__(self, **kwargs):
+        if 'q_part' in kwargs:
             import pysixtrack
             data = pysixtrack.BB6Ddata.BB6D_init(
                 **{kk: kwargs[kk] for kk in kwargs.keys() if kk != 'cbuffer'}).tobuffer()
@@ -256,7 +256,9 @@ class Elements(object):
 
     @classmethod
     def fromline(cls, line):
-        self = cls()
+        return cls().append_line(line)
+
+    def append_line(self,line):
         for label, element_name, element in line:
             getattr(self, element_name)(**element._asdict())
         return self
