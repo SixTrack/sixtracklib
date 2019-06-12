@@ -698,7 +698,7 @@ int NS(Buffer_reserve_ext)(
     NS(buffer_size_t) const new_max_num_garbage_ranges )
 {
     return NS(Buffer_reserve)( buffer, new_max_num_objects, new_max_num_slots,
-        new_max_num_dataptrs, new_max_num_garbage_ranges )
+        new_max_num_dataptrs, new_max_num_garbage_ranges );
 }
 
 int NS(Buffer_reserve_capacity_ext)(
