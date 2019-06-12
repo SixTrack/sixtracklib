@@ -616,6 +616,8 @@ st_BeamMonitor_assign_output_buffer_from_offset.argtypes = [
 # -----------------------------------------------------------------------------
 # OutputBuffer bindings
 
+st_out_buffer_flags_t = ct.c_int32
+
 st_OutputBuffer_requires_output_buffer = \
     sixtracklib.st_OutputBuffer_requires_output_buffer_ext
 st_OutputBuffer_requires_output_buffer.restype = ct.c_bool
@@ -2110,7 +2112,8 @@ st_TrackJobNew_clear_all_particle_addresses.restype = st_arch_status_t
 
 st_TrackJobNew_get_particle_addresses = \
     sixtracklib.st_TrackJobNew_get_particle_addresses
-st_TrackJobNew_get_particle_addresses.argtypes = [ st_TrackJobBaseNew_p ]
+st_TrackJobNew_get_particle_addresses.argtypes = [ 
+    st_TrackJobBaseNew_p, st_buffer_size_t ]
 st_TrackJobNew_get_particle_addresses.restype = st_ParticlesAddr_p
 
 st_TrackJobNew_get_ptr_particle_addresses_buffer = \

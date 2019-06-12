@@ -300,7 +300,12 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
             return st_CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin(
                 self._ptr_argument )
 
-    class CudaTrackJob(object):
+    from .buffer import Buffer 
+    from .trackjob import TrackJobBaseNew
+    from .stcommon import st_CudaTrackJob_p, st_NullCudaTrackJob, 
+    
+
+    class CudaTrackJob(TrackJobBaseNew):
         @staticmethod
         def _get_buffer(obj):
             if isinstance(obj, CBuffer):
