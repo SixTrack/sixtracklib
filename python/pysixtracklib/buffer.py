@@ -27,11 +27,11 @@ from .stcommon import st_Buffer, st_Null, st_NullChar, st_NullUChar, \
     st_Buffer_clear, st_Buffer_free, st_Buffer_delete
 
 class Buffer(object):
-    def __init__( self, size=0, ptr_data=st_NullChar, path_to_file=None,
+    def __init__( self, size=0, ptr_data=st_NullUChar, path_to_file=None,
                   cbuffer=None, ptr_ext_buffer=st_NullBuffer, orig=None,
                   owns_ptr=True, slot_size=8 ):
         self._ptr_st_buffer = st_NullBuffer
-        self._last_status = st_ARCH_STATUS_SUCCESS
+        self._last_status = st_ARCH_STATUS_SUCCESS.value
         self._on_del = "delete"
 
         if ptr_ext_buffer is not None and ptr_ext_buffer != st_NullBuffer:
@@ -48,9 +48,9 @@ class Buffer(object):
             self._ptr_st_buffer = st_Buffer_new_on_data(
                     ptr_data, st_buffer_size_t( slot_size ) )
         elif size is not None and size >= 0:
-            self._local_st_buffer = st_Buffer_new( st_buffer_size_t( size ) )
+            self._ptr_st_buffer = st_Buffer_new( st_buffer_size_t( size ) )
         else:
-            self._local_st_buffer = st_Buffer_new( st_buffer_size_t( 0 ) )
+            self._ptr_st_buffer = st_Buffer_new( st_buffer_size_t( 0 ) )
 
     def __del__(self):
         if self._ptr_st_buffer != st_NullBuffer and self._on_del is not None:
@@ -68,6 +68,10 @@ class Buffer(object):
     @property
     def last_status(self):
         return self._last_status.value
+
+    @property
+    def last_status_success(self):
+        return self._last_status == st_ARCH_STATUS_SUCCESS.value
 
     @property
     def slot_size(self):
@@ -142,14 +146,23 @@ class Buffer(object):
     def clear( self, clear_data=False ):
         self._last_status = st_Buffer_clear(
             self._ptr_st_buffer, ct.c_bool( clear_data is True ) )
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError( "unsuccessful clear op; status:{0}".format(
+                self._last_status ) )
         return self
 
     def refresh( self ):
         self._last_status = st_Buffer_refresh( self._ptr_st_buffer )
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError( "unsuccessful refresh op; status:{0}".format(
+                self._last_status ) )
         return self
 
     def remap( self ):
         self._last_status = st_Buffer_remap( self._ptr_st_buffer )
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError( "unsuccessful reamp op; status:{0}".format(
+                self._last_status ) )
         return self
 
     def write_to_file( self, path_to_file, normalized_base_addr=None ):
@@ -162,20 +175,32 @@ class Buffer(object):
             else:
                 self._last_status = st_Buffer_write_to_file(
                     self._ptr_st_buffer, _path_to_file )
+
+            if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+                raise RuntimeError( "unsuccessful write_to_file op; " +
+                    "status:{0}".format( self._last_status ) )
         else:
             self._last_status = st_ARCH_STATUS_GENERAL_FAILURE
+            raise RuntimeError( "illegal path supplied" )
+
         return self
 
     def read_from_file( self, path_to_file ):
         if path_to_file is not None and path_to_file != "":
             self._last_status = st_Buffer_read_from_file( self._ptr_st_buffer,
                 ct.c_char_p( path_to_file.encode('utf-8') ) )
+            if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+                raise RuntimeError( "unsuccessful read_from_file op; " +
+                    "status:{0}".format( self._last_status ) )
         return self
 
     def reserve_capacity( self, capacity ):
         if capacity is not None and capacity >= 0:
             self._last_status = st_Buffer_reserve_capacity(
                 self._ptr_st_buffer, st_buffer_size_t( capacity ) )
+            if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+                raise RuntimeError( "unsuccessful reserve capacity op; " +
+                   "status:{0}".format( self._last_status ) )
         return self
 
     def reserve( self, max_num_objects, max_num_slots, max_num_dataptrs,
@@ -183,6 +208,11 @@ class Buffer(object):
         self._last_status = st_Buffer_reserve( self._ptr_st_buffer,
             max_num_objects, max_num_slots, max_num_dataptrs,
                 max_num_garbage_ranges )
+
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError( "unsuccessful reserve op; status:{0}".format(
+                self._last_status ) )
+
         return self
 
     def reset( self, max_num_objects=None, max_num_slots=None,
@@ -203,6 +233,10 @@ class Buffer(object):
                 st_buffer_size_t( max_num_slots ),
                 st_buffer_size_t( max_num_dataptrs ),
                 st_buffer_size_t( max_num_garbage_ranges ) )
+
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError( "unsuccessful reset op; status:{0}".format(
+                self._last_status ) )
         return self
 
 
