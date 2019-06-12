@@ -27,7 +27,8 @@ option( SIXTRACKL_ENABLE_PYTHON            "Enable Python bindings"       ON  )
 # ------------------------------------------------------------------------------
 # ---- Program logistic options:
 
-option( SIXTRACKL_BUILD_EXAMPLES         "Build sixtracklib examples"     ON  )
+option( SIXTRACKL_BUILD_TOOLS            "Build sixtracklib tools"        OFF )
+option( SIXTRACKL_BUILD_EXAMPLES         "Build sixtracklib examples"     OFF )
 option( SIXTRACKL_ENABLE_PROGRAMM_TESTS  "Enable programmatic unit-tests" OFF )
 option( SIXTRACKL_ENABLE_BENCHMARK_TESTS "Enable benchmark tests"         OFF )
 
@@ -38,11 +39,18 @@ set( SIXTRACKL_CPU_ARCH "sse2" CACHE STRING "CPU/System architecture" )
 set_property( CACHE SIXTRACKL_CPU_ARCH PROPERTY STRINGS sse2 avx avx2 native )
 
 # ------------------------------------------------------------------------------
+# Default compiler flags:
+
+set( SIXTRACKL_DEFAULT_C99_FLAGS
+     "-Wall -Werror -pedantic -ansi -fno-fast-math" )
+
+set( SIXTRACKL_DEFAULT_CXX_FLAGS
+     "-Wall -Werror -pedantic -ansi -fno-fast-math" )
+
+# ------------------------------------------------------------------------------
 # ---- SixTrackLib Features:
 
-option( SIXTRACKL_ENABLE_APERATURE_CHECK   "Enable xy - aperature check" ON )
-
-
+option( SIXTRACKL_ENABLE_APERTURE_CHECK   "Enable xy - aperture check" ON )
 
 
 # ==============================================================================
@@ -51,11 +59,11 @@ option( SIXTRACKL_ENABLE_APERATURE_CHECK   "Enable xy - aperature check" ON )
 # ------------------------------------------------------------------------------
 # ---- SixTrackLib detailed features settings:
 
-set( SIXTRACKL_APERATURE_X_LIMIT_VALUE "1.0"
-     CACHE STRING "Aperature check x limit" FORCE )
+set( SIXTRACKL_APERTURE_X_LIMIT_VALUE "1.0"
+     CACHE STRING "Aperture check x limit" FORCE )
 
-set( SIXTRACKL_APERATURE_Y_LIMIT_VALUE "1.0"
-     CACHE STRING "Aperature check x limit" FORCE )
+set( SIXTRACKL_APERTURE_Y_LIMIT_VALUE "1.0"
+     CACHE STRING "Aperture check y limit" FORCE )
 
 
 # ------------------------------------------------------------------------------

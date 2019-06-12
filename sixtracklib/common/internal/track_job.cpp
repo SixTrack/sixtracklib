@@ -28,7 +28,7 @@
     #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
         ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
 
-    #include "sixtracklib/opencl/track_job_cl.h"
+    #include "sixtracklib/opencl/make_track_job.h"
 
     #endif /* OPENCL */
 
@@ -51,17 +51,16 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
                 ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
-            if( 0 == sanitized_str.compare( TRACK_JOB_CL_STR ) )
+            if( 0 == sanitized_str.compare( SIXTRL_TRACK_JOB_CL_STR ) )
             {
-                using track_job_t = SIXTRL_CXX_NAMESPACE::TrackJobCl;
-
                 std::string const device_id_str =
                     TrackJob_extract_device_id_str( config_str );
 
                 char const* device_id_cstr = ( !device_id_str.empty() )
                     ? device_id_str.c_str() : nullptr;
 
-                ptr_job = new track_job_t( device_id_cstr, config_str );
+                ptr_job = SIXTRL_CXX_NAMESPACE::TrackJobCl_create(
+                    device_id_cstr, config_str );
             }
             else
             #endif /* OpenCL 1.x */
@@ -121,7 +120,7 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
                 ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
-            if( sanitized_str.compare( TRACK_JOB_CL_STR ) == 0 )
+            if( sanitized_str.compare( SIXTRL_TRACK_JOB_CL_STR ) == 0 )
             {
                 std::string const device_id_str =
                     TrackJob_extract_device_id_str( config_str );
@@ -129,9 +128,10 @@ namespace SIXTRL_CXX_NAMESPACE
                 char const* device_id_cstr = ( !device_id_str.empty() )
                     ? device_id_str.c_str() : nullptr;
 
-                ptr_job = new TrackJobCl( device_id_cstr, particles_buffer,
-                    num_particle_sets, pset_indices_begin, belemements_buffer,
-                        output_buffer, dump_elem_by_elem_turns, config_str );
+                ptr_job = SIXTRL_CXX_NAMESPACE::TrackJobCl_create( 
+                    device_id_cstr, particles_buffer, num_particle_sets, 
+                        pset_indices_begin, belemements_buffer, output_buffer, 
+                            dump_elem_by_elem_turns, config_str );
             }
             else
             #endif /* OpenCL 1.x */
@@ -160,12 +160,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
                 ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
-            if( sanitized_str.compare( TRACK_JOB_CL_STR ) == 0 )
+            if( sanitized_str.compare( SIXTRL_TRACK_JOB_CL_STR ) == 0 )
             {
                 std::string const device_id_str =
                     TrackJob_extract_device_id_str( config_str.c_str() );
 
-                ptr_job = new TrackJobCl( device_id_str, config_str );
+                ptr_job = SIXTRL_CXX_NAMESPACE::TrackJobCl_create( 
+                    device_id_str.c_str(), config_str.c_str() );
             }
             else
             #endif /* OpenCL 1.x */
@@ -236,15 +237,15 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
                 ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
-            if( sanitized_str.compare( TRACK_JOB_CL_STR ) == 0 )
+            if( sanitized_str.compare( SIXTRL_TRACK_JOB_CL_STR ) == 0 )
             {
                 std::string const device_id_str =
                     TrackJob_extract_device_id_str( config_str.c_str() );
 
-                ptr_job = new TrackJobCl( device_id_str, particles_buffer,
-                    particle_set_indices_begin, particle_set_indices_end,
-                        beam_elemements_buffer, output_buffer,
-                            dump_elem_by_elem_turns, config_str );
+                ptr_job = SIXTRL_CXX_NAMESPACE::TrackJobCl_create( 
+                    device_id_str, particles_buffer, num_particle_sets, 
+                        particle_set_indices_begin, beam_elemements_buffer, 
+                            output_buffer, dump_elem_by_elem_turns, config_str );
             }
             else
             #endif /* OpenCL 1.x */

@@ -39,6 +39,11 @@
 #include "sixtracklib/common/be_srotation/track.h"
 #include "sixtracklib/common/be_xyshift/be_xyshift.h"
 #include "sixtracklib/common/be_xyshift/track.h"
+#include "sixtracklib/common/be_limit/be_limit_rect.h"
+#include "sixtracklib/common/be_limit/be_limit_ellipse.h"
+#include "sixtracklib/common/be_limit/track.h"
+#include "sixtracklib/common/be_dipedge/be_dipedge.h"
+#include "sixtracklib/common/be_dipedge/track.h"
 #include "sixtracklib/common/context/definitions.h"
 #include "sixtracklib/common/context/argument_base.h"
 #include "sixtracklib/common/context/compute_arch.h"
@@ -57,14 +62,6 @@
 #include "sixtracklib/common/track_job_cpu.h"
 #include "sixtracklib/common/track.h"
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-#if defined( SIXTRACKLIB_ENABLE_MODULE_SIMD ) && \
-           ( SIXTRACKLIB_ENABLE_MODULE_SIMD == 1 )
-
-    #include "sixtracklib/simd/track.h"
-
-#endif /* defined( SIXTRACKLIB_ENABLE_MODULE_SIMD ) */
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 

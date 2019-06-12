@@ -68,7 +68,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_FN size_type getNumDataPtrs() const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN value_type const& getDx() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type const& getDx() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN value_type const& getDy() const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN void preset() SIXTRL_NOEXCEPT;
 
@@ -157,7 +157,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_FN type_id_t getTypeId() const SIXTRL_NOEXCEPT;
         SIXTRL_FN value_type getDx() const SIXTRL_NOEXCEPT;
-        SIXTRL_FN value_type getDx() const SIXTRL_NOEXCEPT;
+        SIXTRL_FN value_type getDy() const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN void preset() SIXTRL_NOEXCEPT;
         SIXTRL_FN void setDx( value_type const dx ) SIXTRL_NOEXCEPT;
@@ -293,7 +293,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     template< typename T >
     SIXTRL_INLINE typename TXYShift< T >::value_type const&
-    TXYShift< T >::getDx() const SIXTRL_NOEXCEPT
+    TXYShift< T >::getDy() const SIXTRL_NOEXCEPT
     {
         return this->dy;
     }
@@ -403,7 +403,7 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_ARGPTR_DEC TXYShift< NS(xyshift_real_t) >::c_api_t const*
     TXYShift< NS(xyshift_real_t) >::getCApiPtr() const SIXTRL_NOEXCEPT
     {
-        using ptr_t = TXYShift< NS(xyshift_real_t) >::::c_api_t const*;
+        using ptr_t = TXYShift< NS(xyshift_real_t) >::c_api_t const*;
         return reinterpret_cast< ptr_t >( this );
     }
 
@@ -432,7 +432,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     SIXTRL_INLINE TXYShift< NS(xyshift_real_t) >::value_type
-    TXYShift< NS(xyshift_real_t) >::getDx() const SIXTRL_NOEXCEPT
+    TXYShift< NS(xyshift_real_t) >::getDy() const SIXTRL_NOEXCEPT
     {
         return ::NS(XYShift_get_dy)( this->getCApiPtr() );
     }

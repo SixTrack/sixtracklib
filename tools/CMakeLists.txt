@@ -1,11 +1,13 @@
+# ============================================================================
 # tools/CMakeLists.txt
+
+message( STATUS "---- processing tools/CMakeLists.txt" )
 
 set( TOOLS_C99_TARGETS )
 set( TOOLS_CXX_TARGETS )
 
 set( TOOLS_LINK_LIBRARIES sixtrack_test sixtrack )
 
-# ============================================================================
 # Tools:
 
 # ----------------------------------------------------------------------------

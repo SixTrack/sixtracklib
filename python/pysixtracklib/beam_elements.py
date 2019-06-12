@@ -229,6 +229,61 @@ class BeamBeam6D(CObject):
             CObject.__init__(self, **kwargs)
 
 
+class LimitRect(CObject):
+    _typeid = 11
+    min_x = CField(0, 'float64', default=-1.0, alignment=8)
+    max_x = CField(1, 'float64', default=+1.0, alignment=8)
+    min_y = CField(2, 'float64', default=-1.0, alignment=8)
+    max_y = CField(3, 'float64', default=+1.0, alignment=8)
+
+
+class LimitEllipse(CObject):
+    _typeid = 12
+    a_squ = CField(0, 'float64', default=+1.0, alignment=8)
+    b_squ = CField(1, 'float64', default=+1.0, alignment=8)
+    a_b_squ = CField(2, 'float64', alignment=8)
+
+    def __init__(self, a_squ=None, b_squ=None, **kwargs):
+        if a is not None:
+            a_squ = a * a
+        if b is not None:
+            b_squ = b * b
+
+        if a_squ is None:
+            a_squ = 1.0
+        if b_squ is None:
+            b_squ = 1.0
+
+        a_b_squ = None
+        if a_squ is not None and b_squ is not None:
+            a_b_squ = a_squ * b_squ
+
+        if a_b_squ is not None:
+            CObject.__init__(
+                self, a_squ=a_squ, b_squ=b_squ, a_b_squ=a_b_squ, **kwargs)
+        else:
+            raise ValueError("a_squ and b_squ have to be positive definite")
+
+    def set_half_axes(self, a, b):
+        return self.set_half_axes_squ(a * a, b * b)
+
+    def set_half_axes_squ(self, a_squ, b_squ):
+        self.a_squ = a_squ
+        self.b_squ = b_squ
+        self.a_b_squ = a_squ * b_squ
+        return self
+
+
+class DipoleEdge(CObject):
+    _typeid = 24
+    r21 = CField(0, 'float64', default=0.0, alignment=8)
+    r43 = CField(1, 'float64', default=0.0, alignment=8)
+
+    def __init__(self, **kwargs):
+        # TODO: Implement conversion schemes, if required
+        CObject.__init__(self, *kwargs)
+
+
 class Elements(object):
     element_types = {'Cavity': Cavity,
                      'Drift': Drift,
@@ -239,6 +294,9 @@ class Elements(object):
                      'XYShift': XYShift,
                      'BeamBeam6D': BeamBeam6D,
                      'BeamBeam4D': BeamBeam4D,
+                     'LimitRect':  LimitRect,
+                     'LimitEllipse': LimitEllipse,
+                     'DipoleEdge': DipoleEdge,
                      #                     'Line': Line,
                      'BeamMonitor': BeamMonitor,
                      }
@@ -258,8 +316,10 @@ class Elements(object):
     def fromline(cls, line):
         return cls().append_line(line)
 
-    def append_line(self,line):
+    def append_line(self, line):
         for label, element_name, element in line:
+            if exact_drift and element_name == 'Drift':
+                element_name = 'DriftExact'
             getattr(self, element_name)(**element._asdict())
         return self
 
@@ -290,9 +350,9 @@ class Elements(object):
         return self.cbuffer.get_object(objid)
 
     @classmethod
-    def from_mad(cls, seq):
+    def from_mad(cls, seq, exact_drift=False):
         line = madseq_to_line(seq)
-        return cls.fromline(line)
+        return cls.fromline(line, exact_drift=exact_drift)
 
     # @classmethod
     # def from_mad2(cls, seq):

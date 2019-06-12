@@ -456,6 +456,21 @@ st_TrackJob_new = sixtracklib.st_TrackJob_new
 st_TrackJob_new.argtypes = [ct.c_char_p, st_Buffer_p, st_Buffer_p, ct.c_char_p]
 st_TrackJob_new.restype = st_TrackJob_p
 
+st_TrackJob_reset = sixtracklib.st_TrackJob_reset_with_output
+st_TrackJob_reset.restype = ct.c_bool
+st_TrackJob_reset.argtypes = [ st_TrackJob_p, st_Buffer, st_Buffer, st_Buffer]
+
+st_TrackJob_reset_with_output = sixtracklib.st_TrackJob_reset_with_output
+st_TrackJob_reset_with_output.restype = ct.c_bool
+st_TrackJob_reset_with_output.argtypes = [
+    st_TrackJob_p, st_Buffer, st_Buffer, st_Buffer, ct.c_uint64]
+
+st_TrackJob_reset_detailed = sixtracklib.st_TrackJob_reset_detailed
+st_TrackJob_reset_detailed.restype = ct.c_bool
+st_TrackJob_reset_detailed.argtypes = [
+    st_TrackJob_p, st_Buffer, ct.c_uint64, st_uint64_p, st_Buffer,
+    st_Buffer, ct.c_uint64]
+
 
 st_TrackJob_new_with_output = sixtracklib.st_TrackJob_new_with_output
 st_TrackJob_new_with_output.argtypes = [

@@ -1,7 +1,8 @@
 # tests/sixtracklib/testlib/common/CMakeLists.txt
 
+add_subdirectory( beam_elements )
+
 set( TESTLIB_COMMON_C99_HEADERS
-     beam_elements.h
      buffer.h
      generic_buffer_obj.h
      gpu_kernel.h
@@ -11,7 +12,6 @@ set( TESTLIB_COMMON_C99_HEADERS
 )
 
 set( TESTLIB_COMMON_C99_SOURCES
-     beam_elements.c
      buffer.c
      generic_buffer_obj.c
      gpu_kernel.c

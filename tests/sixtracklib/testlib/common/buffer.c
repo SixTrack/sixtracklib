@@ -12,7 +12,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/testlib/common/particles.h"
-    #include "sixtracklib/testlib/common/beam_elements.h"
+    #include "sixtracklib/testlib/common/beam_elements/beam_elements.h"
 
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/objects_type_id.h"

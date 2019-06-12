@@ -90,6 +90,8 @@ set( SIXTRACKLIB_TESTDATA_DIR
      "${CMAKE_SOURCE_DIR}/tests/testdata" CACHE STRING "" FORCE )
 
 set( SIXTRACKLIB_CPU_FLAGS )
+set( SIXTRACKLIB_C99_FLAGS )
+set( SIXTRACKLIB_CXX_FLAGS )
 
 # ------------------------------------------------------------------------------
 # place all contributed cmake modules and snipplets into the cmake subdirectory
@@ -102,6 +104,7 @@ message( STATUS "---- cmake_module_path: ${CMAKE_MODULE_PATH}" )
 # Setup language bindings - we have to be first to pull in python (if needed)
 # to prevent any module picking a python version we do not wish to support:
 
+include( SetupC99 )
 include( SetupCxx )
 include( SetupPython )
 
@@ -163,7 +166,9 @@ add_subdirectory( sixtracklib )
 # ------------------------------------------------------------------------------
 # Add tools
 
-add_subdirectory( tools )
+if( SIXTRACKL_BUILD_TOOLS )
+    add_subdirectory( tools )
+endif()
 
 # ------------------------------------------------------------------------------
 # Add pysixtracklib Python 3.x bindings
@@ -183,7 +188,7 @@ endif()
 # tests: unit-tests, benchmarks, testdata generators:
 
 if( SIXTRACKL_ENABLE_PROGRAMM_TESTS OR SIXTRACKL_ENABLE_BENCHMARK_TESTS OR
-    SIXTRACKL_BUILD_EXAMPLES )
+    SIXTRACKL_BUILD_EXAMPLES OR SIXTRACKL_BUILD_TOOLS )
     add_subdirectory( tests )
 endif()
 
