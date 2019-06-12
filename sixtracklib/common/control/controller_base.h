@@ -79,6 +79,13 @@ NS(Controller_receive_buffer)(
     NS(Buffer)* SIXTRL_RESTRICT destination,
     NS(ArgumentBase)* SIXTRL_RESTRICT source );
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(Controller_is_cobjects_buffer_arg_remapped)(
+    NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    NS(ArgumentBase)* SIXTRL_RESTRICT cobject_buffer_arg );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(Controller_remap_cobjects_buffer_arg)(
     NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
@@ -103,10 +110,10 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_is_ready_to_receive)(
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Controller_is_in_debug_mode)(
     const NS(ControllerBase) *const SIXTRL_RESTRICT controller );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(Controller_enable_debug_mode)( NS(ControllerBase)* SIXTRL_RESTRICT ctrl );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(Controller_disable_debug_mode)( NS(ControllerBase)* SIXTRL_RESTRICT ctrl );
 
 /* ========================================================================= */

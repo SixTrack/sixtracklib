@@ -117,6 +117,14 @@ bool NS(Controller_uses_nodes)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+bool NS(Controller_is_cobjects_buffer_arg_remapped)(
+    ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
+    ::NS(ArgumentBase)* SIXTRL_RESTRICT cobject_buffer_arg )
+{
+    return ( ( ctrl != nullptr ) &&
+             ( ctrl->isRemapped( cobject_buffer_arg ) ) );
+}
+
 ::NS(arch_status_t) NS(Controller_remap_cobjects_buffer_arg)(
     ::NS(ControllerBase)* SIXTRL_RESTRICT ctrl,
     ::NS(ArgumentBase)* SIXTRL_RESTRICT arg )
