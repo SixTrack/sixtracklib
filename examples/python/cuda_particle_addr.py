@@ -48,8 +48,7 @@ if __name__ == '__main__':
             track_job.can_fetch_particle_addresses:
         track_job.fetch_particle_addresses()
 
-    pset_index = 0
-    ptr_particles_addr = track_job.get_particle_addresses(pset_index)
+    ptr_particles_addr = track_job.get_particle_addresses(0)
     particles_addr = ptr_particles_addr.contents
 
     print("Particle structure data on the device:")
@@ -63,19 +62,22 @@ if __name__ == '__main__':
 
     pdb.set_trace()
 
-    x = pycuda.gpuarray.GPUArray(
-        particles_addr.num_particles, float, gpudata=particles_addr.x)
+    cuda_x = pycuda.gpuarray.GPUArray(
+        particles_addr.num_particles, np.float64, gpudata=particles_addr.x)
 
-    x = np.linspace(0.0, float(num_particles - 1), num=num_particles,
-                    dtype=np.float64)
+    new_x_values = np.linspace(
+        0.0, float( num_particles - 1 ), num=num_particles, dtype=np.float64 )
 
-    cmp_particles.x = np.linspace(
-        0.0, float(num_particles - 1), num=num_particles, dtype=np.float64)
+    cuda_x = new_x_values
+
+    for ii in range( 0, num_particles ):
+        cmp_particles.x[ ii ] = float( ii )
 
     assert pyst.compareParticlesDifference(
         cmp_particles, particles, abs_treshold=2e-14) != 0
 
     track_job.collectParticles()
+    assert track_job.last_status_success
 
     assert pyst.compareParticlesDifference(
         cmp_particles, particles, abs_treshold=2e-14) == 0
