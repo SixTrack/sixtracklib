@@ -77,7 +77,7 @@ def generate_testdata(pyst_example, pysixtrack_line_from_pickle=True):
 
     for jj in range( npart ):
         track_particles.append( pysixtrack.Particles() )
-        input_particles.toPySixTrack( track_particles[ jj ], jj )
+        input_particles.to_pysixtrack( track_particles[ jj ], jj )
         track_particles[ jj ].turn = 0 #Override turn in case it's not 0
 
     for ii, elem in enumerate( line ):
@@ -85,7 +85,7 @@ def generate_testdata(pyst_example, pysixtrack_line_from_pickle=True):
         before = Particles( num_particles=npart, cbuffer=ebe_particles_buffer )
 
         for jj in range( 0, npart ):
-            before.fromPySixTrack( track_particles[ jj ], jj )
+            before.from_pysixtrack( track_particles[ jj ], jj )
             beam_element.track( track_particles[ jj ] )
 
         before.at_element[:] = ii
@@ -93,7 +93,7 @@ def generate_testdata(pyst_example, pysixtrack_line_from_pickle=True):
     last = Particles( num_particles=npart, cbuffer=ebe_particles_buffer )
 
     for jj in range( npart ):
-        last.fromPySixTrack( track_particles[ jj ], jj )
+        last.from_pysixtrack( track_particles[ jj ], jj )
 
     last.at_turn[:] = 1
     last.at_element[:] = 0
