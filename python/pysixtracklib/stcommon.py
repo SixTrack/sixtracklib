@@ -395,6 +395,10 @@ st_ParticlesAddr_remap_addresses = \
 st_ParticlesAddr_remap_addresses.argtypes = [ st_ParticlesAddr_p, ct.c_int64 ]
 st_ParticlesAddr_remap_addresses.restype  = None
 
+st_Buffer_is_particles_buffer = sixtracklib.st_Buffer_is_particles_buffer_ext
+st_Buffer_is_particles_buffer.argtypes = [ st_Buffer_p ]
+st_Buffer_is_particles_buffer.restype = ct.c_bool
+
 # -----------------------------------------------------------------------------
 # NS(ElemByelemConfig):
 
@@ -2112,7 +2116,7 @@ st_TrackJobNew_clear_all_particle_addresses.restype = st_arch_status_t
 
 st_TrackJobNew_get_particle_addresses = \
     sixtracklib.st_TrackJobNew_get_particle_addresses
-st_TrackJobNew_get_particle_addresses.argtypes = [ 
+st_TrackJobNew_get_particle_addresses.argtypes = [
     st_TrackJobBaseNew_p, st_buffer_size_t ]
 st_TrackJobNew_get_particle_addresses.restype = st_ParticlesAddr_p
 
