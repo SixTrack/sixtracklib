@@ -1,22 +1,29 @@
 #ifndef SIXTRACKLIB_COMMON_DEFINITIONS_H__
 #define SIXTRACKLIB_COMMON_DEFINITIONS_H__
 
+#if !defined(SIXTRL_EXTERN)
+    #if !defined( __cplusplus ) && !defined(_GPUCODE)
+        #define SIXTRL_EXTERN extern
+    #else
+        #define SIXTRL_EXTERN
+    #endif
+#endif
+
 #if !defined( _GPUCODE ) || defined( __CUDACC__ )
     #if defined( __cplusplus )
         #include <cassert>
         #include <cmath>
         #include <cstddef>
-        #include <cstdint>
         #include <cstdlib>
         #include <cstring>
     #else
         #include <assert.h>
         #include <stddef.h>
-        #include <stdint.h>
         #include <stdio.h>
         #include <stdlib.h>
         #include <string.h>
     #endif /* __cplusplus */
+    #include <stdint.h>
 #endif /* !defined( _GPUCODE ) || defined(__CUDACC__ ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
@@ -41,9 +48,14 @@
 #if defined( _GPUCODE )
 
     #if defined( __OPENCL_C_VERSION__ )
-        #if __OPENCL_VERSION__ < 120 || defined( cl_khr_fp64 )
+
+        #if __OPENCL_VERSION__ <= CL_VERSION_1_1
             #pragma OPENCL EXTENSION cl_khr_fp64 : enable
         #endif
+
+//         #if __OPENCL_VERSION__ < 120 || defined( cl_khr_fp64 )
+//             #pragma OPENCL EXTENSION cl_khr_fp64 : enable
+//         #endif
 
         #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
             #define  SIXTRL_NO_SYSTEM_INCLUDES  1
@@ -278,7 +290,7 @@
         #endif /* !defined( SIXTRL_STATIC_VAR ) */
 
         #if !defined( SIXTRL_INLINE )
-            #define SIXTRL_INLINE
+            #define SIXTRL_INLINE inline
         #endif /* !defined( SIXTRL_INLINE ) */
 
         /* ---------------------------------------------------------------- */

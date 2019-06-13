@@ -17,6 +17,12 @@ add_executable( simple_drift_buffer_cxx simple_drift_buffer.cpp )
 list( APPEND EXAMPLE_TARGETS simple_drift_buffer_cxx )
 
 # -----------------------------------------------------------------------------
+# track_job_cpu_cxx:
+
+add_executable( track_job_cpu_cxx track_job_cpu.cpp )
+list( APPEND EXAMPLE_TARGETS track_job_cpu_cxx )
+
+# -----------------------------------------------------------------------------
 # track_lhc_no_bb_cxx:
 
 add_executable( track_lhc_no_bb_cxx track_lhc_no_bb.cpp )
@@ -25,6 +31,12 @@ list( APPEND EXAMPLE_TARGETS track_lhc_no_bb_cxx )
 
 
 if( SIXTRACKL_ENABLE_OPENCL )
+    # -------------------------------------------------------------------------
+    # track_job_cpu_cxx:
+
+    add_executable( track_job_cl_cxx track_job_cl.cpp )
+    list( APPEND EXAMPLE_TARGETS track_job_cl_cxx )
+
     # -------------------------------------------------------------------------
     # run_opencl_kernel_cxx:
     add_executable( run_opencl_kernel_cxx run_opencl_kernel.cpp )

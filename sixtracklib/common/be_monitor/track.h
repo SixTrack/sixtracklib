@@ -37,6 +37,7 @@ SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_monitor)(
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/be_monitor/be_monitor.h"
+//     #include "sixtracklib/common/be_monitor/output_buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -147,7 +148,8 @@ SIXTRL_INLINE int NS(Track_particle_beam_monitor)(
             in_particles, idx );
 
         num_elements_t const out_particle_id =
-            NS(BeamMonitor_get_store_particle_index)( monitor, turn, particle_id );
+            NS(BeamMonitor_get_store_particle_index)(
+                monitor, turn, particle_id );
 
         if( out_particle_id >= ( num_elements_t )0u )
         {
@@ -173,4 +175,4 @@ SIXTRL_INLINE int NS(Track_particle_beam_monitor)(
 
 #endif /* SIXTRACKLIB_COMMON_BE_MONITOR_TRACK_MONITOR_C99_HEADER_H__ */
 
-/* end: sixtracklib/common/be_monitor/track_monitor.h */
+/* end: sixtracklib/common/be_monitor/track.h */

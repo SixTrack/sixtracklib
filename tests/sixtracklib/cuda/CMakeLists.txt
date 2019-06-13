@@ -24,6 +24,50 @@ if( GTEST_FOUND )
         string( APPEND CMAKE_CUDA_FLAGS " -lineinfo" )
     endif()
 
+    # ==========================================================================
+    # test_context_cuda_c99
+
+    add_executable( test_context_cuda_c99 test_context_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_context_cuda_c99 )
+
+    target_link_libraries( test_context_cuda_c99
+        PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
+
+    add_test( C99_CudaContextTests test_context_cuda_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_context_cuda_cxx
+
+    add_executable( test_context_cuda_cxx test_context_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_context_cuda_cxx )
+
+    target_link_libraries( test_context_cuda_cxx
+        PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
+
+    add_test( CXX_CudaContextTests test_context_cuda_cxx )
+
+    # ==========================================================================
+    # test_argument_cuda_c99
+
+    add_executable( test_argument_cuda_c99 test_argument_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_argument_cuda_c99 )
+
+    target_link_libraries( test_argument_cuda_c99
+        PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
+
+    add_test( C99_CudaArgumentTests test_argument_cuda_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_argument_cuda_cxx
+
+    add_executable( test_argument_cuda_cxx test_argument_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_argument_cuda_cxx )
+
+    target_link_libraries( test_argument_cuda_cxx
+        PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
+
+    add_test( CXX_CudaArgumentTests test_argument_cuda_cxx )
+
     # --------------------------------------------------------------------------
     # test_single_file_compilation_cuda_cxx:
 
@@ -65,6 +109,15 @@ if( GTEST_FOUND )
 
     target_link_libraries( test_be_drift_cuda_c99 PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
     add_test( C99_Cuda_BeamElementsDriftTests test_be_drift_cuda_c99 )
+
+    # ==========================================================================
+    # test_track_line_cuda_c99:
+
+    add_executable( test_track_line_cuda_c99 test_track_line_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_line_cuda_c99 )
+
+    target_link_libraries( test_track_line_cuda_c99 PRIVATE ${SIXTRACKL_TEST_LIBRARIES} )
+    add_test( C99_CudaTrackLineTests test_track_line_cuda_c99 )
 
     # --------------------------------------------------------------------------
     # test_single_file_compilation_cuda_cxx:

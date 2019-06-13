@@ -18,56 +18,22 @@
 
 #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
         ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
-    #include "sixtracklib/opencl/buffer.h"
 #endif /* OpenCL */
 
 #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
         ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
-    #include "sixtracklib/cuda/buffer.h"
 #endif /* Cuda */
 
-extern SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new)(
-    NS(buffer_size_t) const buffer_capacity );
+#if !defined( _GPUCODE )
 
-extern SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_detailed)(
-    NS(buffer_size_t)  const initial_max_num_objects,
-    NS(buffer_size_t)  const initial_max_num_slots,
-    NS(buffer_size_t)  const initial_max_num_dataptrs,
-    NS(buffer_size_t)  const initial_max_num_garbage_elements,
-    NS(buffer_flags_t) const buffer_flags );
-
-extern SIXTRL_HOST_FN bool NS(Buffer_read_from_file)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
-
-extern SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_from_file)(
-    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
-
-extern SIXTRL_HOST_FN bool NS(Buffer_write_to_file)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file );
-
-extern SIXTRL_HOST_FN bool NS(Buffer_write_to_file_normalized_addr)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file,
-    NS(buffer_addr_t) const norm_base_addr );
-
-extern SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp );
-
-extern SIXTRL_HOST_FN bool NS(Buffer_write_to_fp_normalized_addr)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    NS(buffer_addr_t) const norm_base_addr );
-
-SIXTRL_HOST_FN static NS(Buffer)* NS(Buffer_allocate_generic)(
+SIXTRL_HOST_FN SIXTRL_STATIC SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
+NS(Buffer_allocate_generic)(
     NS(buffer_size_t) const buffer_capacity,
     NS(buffer_flags_t) const buffer_flags );
 
 /* ------------------------------------------------------------------------- */
 
-NS(Buffer)* NS(Buffer_allocate_generic)(
+SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_allocate_generic)(
     NS(buffer_size_t)  const buffer_capacity,
     NS(buffer_flags_t) const buffer_flags )
 {
@@ -174,7 +140,151 @@ NS(Buffer)* NS(Buffer_allocate_generic)(
     return ptr_buffer;
 }
 
-NS(Buffer)* NS(Buffer_new)( NS(buffer_size_t) const buffer_capacity )
+/* ------------------------------------------------------------------------- */
+
+NS(buffer_size_t) NS(Buffer_get_slot_size_ext)(
+   SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_slot_size)( buffer );
+}
+
+/* -------------------------------------------------------------------------- */
+
+SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_preset_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_preset)( buffer );
+}
+
+/* ------------------------------------------------------------------------- */
+
+NS(buffer_addr_t) NS(Buffer_get_datastore_begin_addr_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_datastore_begin_addr)( buffer );
+}
+
+/* ------------------------------------------------------------------------- */
+
+NS(buffer_size_t) NS(Buffer_get_size_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_size)( buffer );
+}
+
+ NS(buffer_size_t) NS(Buffer_get_capacity_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+ {
+     return NS(Buffer_get_capacity)( buffer );
+ }
+
+ NS(buffer_size_t) NS(Buffer_get_header_size_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+ {
+     return NS(Buffer_get_size)( buffer );
+ }
+
+NS(buffer_addr_t) NS(Buffer_get_data_begin_addr_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_data_begin_addr)( buffer );
+}
+
+NS(buffer_addr_t) NS(Buffer_get_data_end_addr_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_data_end_addr)( buffer );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+NS(buffer_addr_t) NS(Buffer_get_objects_begin_addr_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_objects_begin_addr)( buffer );
+}
+
+NS(buffer_addr_t) NS(Buffer_get_objects_end_addr_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_objects_end_addr)( buffer );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+NS(buffer_size_t) NS(Buffer_get_slots_size_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_slot_size)( buffer );
+}
+
+NS(buffer_size_t) NS(Buffer_get_num_of_slots_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_num_of_slots)( buffer );
+}
+
+NS(buffer_size_t) NS(Buffer_get_max_num_of_slots_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_max_num_of_slots)( buffer );
+}
+
+NS(buffer_size_t) NS(Buffer_get_objects_size_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buf );
+
+NS(buffer_size_t) NS(Buffer_get_num_of_objects_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_num_of_objects)( buffer );
+}
+
+NS(buffer_size_t) NS(Buffer_get_max_num_of_objects_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return  NS(Buffer_get_max_num_of_objects)( buffer );
+}
+
+NS(buffer_size_t) NS(Buffer_get_dataptrs_size_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_dataptrs_size)( buffer );
+}
+
+NS(buffer_size_t) NS(Buffer_get_num_of_dataptrs_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_num_of_dataptrs)( buffer );
+}
+
+NS(buffer_size_t) NS(Buffer_get_max_num_of_dataptrs_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+   return NS(Buffer_get_max_num_of_dataptrs)( buffer );
+}
+
+NS(buffer_size_t) NS(Buffer_get_garbage_size_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_garbage_size)( buffer );
+}
+
+NS(buffer_size_t) NS(Buffer_get_num_of_garbage_ranges_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_num_of_garbage_ranges)( buffer );
+}
+
+NS(buffer_size_t) NS(Buffer_get_max_num_of_garbage_ranges_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_get_max_num_of_garbage_ranges)( buffer );
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new)(
+    NS(buffer_size_t) const buffer_capacity )
 {
     NS(Buffer)* ptr_buffer = NS(Buffer_allocate_generic)(
         buffer_capacity, NS(BUFFER_DATASTORE_MEMPOOL) );
@@ -191,7 +301,7 @@ NS(Buffer)* NS(Buffer_new)( NS(buffer_size_t) const buffer_capacity )
     return ptr_buffer;
 }
 
-NS(Buffer)* NS(Buffer_new_detailed)(
+SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_detailed)(
     NS(buffer_size_t)  const initial_max_num_objects,
     NS(buffer_size_t)  const initial_max_num_slots,
     NS(buffer_size_t)  const initial_max_num_dataptrs,
@@ -241,7 +351,69 @@ NS(Buffer)* NS(Buffer_new_detailed)(
     return ptr_buffer;
 }
 
-SIXTRL_HOST_FN bool NS(Buffer_read_from_file)(
+SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_on_memory)(
+    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT data_buffer_begin,
+    NS(buffer_size_t) const buffer_capacity )
+{
+    typedef SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* ptr_buffer_t;
+
+    ptr_buffer_t ptr_buffer = SIXTRL_NULLPTR;
+
+    if( ( data_buffer_begin != SIXTRL_NULLPTR ) &&
+        ( buffer_capacity > ( NS(buffer_size_t) )0u ) )
+    {
+        ptr_buffer = NS(Buffer_preset)(
+            ( ptr_buffer_t )malloc( sizeof( NS(Buffer) ) ) );
+
+        if( ptr_buffer != SIXTRL_NULLPTR )
+        {
+            if( 0 != NS(Buffer_init)(
+                    ptr_buffer, data_buffer_begin, buffer_capacity ) )
+            {
+                NS(Buffer_delete)( ptr_buffer );
+                ptr_buffer = SIXTRL_NULLPTR;
+            }
+        }
+    }
+
+    return ptr_buffer;
+}
+
+SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_on_data)(
+    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT data_buffer_begin,
+    NS(buffer_size_t) const max_data_buffer_length )
+{
+    typedef NS(Buffer) buf_t;
+    typedef SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* ptr_t;
+
+    ptr_t ptr_buffer = SIXTRL_NULLPTR;
+
+    if( ( data_buffer_begin != SIXTRL_NULLPTR ) &&
+        ( max_data_buffer_length > ( NS(buffer_size_t) )0u ) )
+    {
+        ptr_buffer = NS(Buffer_preset)( ( ptr_t )malloc( sizeof( buf_t ) ) );
+
+        if( 0 != NS(Buffer_init_from_data)( ptr_buffer, data_buffer_begin,
+                max_data_buffer_length ) )
+        {
+            NS(Buffer_delete)( ptr_buffer );
+            ptr_buffer = SIXTRL_NULLPTR;
+        }
+    }
+
+    return ptr_buffer;
+}
+
+int NS(Buffer_init_from_data_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT data_buffer_begin,
+    NS(buffer_size_t) const max_data_buffer_length )
+{
+    return NS(Buffer_init_from_data)(
+        buffer, data_buffer_begin, max_data_buffer_length );
+}
+
+bool NS(Buffer_read_from_file)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file )
 {
@@ -313,7 +485,7 @@ SIXTRL_HOST_FN bool NS(Buffer_read_from_file)(
     return success;
 }
 
-SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_from_file)(
+NS(Buffer)* NS(Buffer_new_from_file)(
     SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file )
 {
     typedef NS(buffer_size_t) buf_size_t;
@@ -375,7 +547,7 @@ SIXTRL_HOST_FN NS(Buffer)* NS(Buffer_new_from_file)(
     return ptr_buffer;
 }
 
-SIXTRL_HOST_FN bool NS(Buffer_write_to_file)(
+bool NS(Buffer_write_to_file)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file )
 {
@@ -400,7 +572,7 @@ SIXTRL_HOST_FN bool NS(Buffer_write_to_file)(
     return success;
 }
 
-SIXTRL_HOST_FN bool NS(Buffer_write_to_file_normalized_addr)(
+bool NS(Buffer_write_to_file_normalized_addr)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC char const* SIXTRL_RESTRICT path_to_file,
     NS(buffer_addr_t) const norm_base_addr )
@@ -427,7 +599,7 @@ SIXTRL_HOST_FN bool NS(Buffer_write_to_file_normalized_addr)(
     return success;
 }
 
-SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
+bool NS(Buffer_write_to_fp)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC FILE* fp )
 {
@@ -448,7 +620,7 @@ SIXTRL_HOST_FN bool NS(Buffer_write_to_fp)(
     return success;
 }
 
-SIXTRL_HOST_FN bool NS(Buffer_write_to_fp_normalized_addr)(
+bool NS(Buffer_write_to_fp_normalized_addr)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC FILE* fp, NS(buffer_addr_t) const norm_base_addr )
 {
@@ -501,5 +673,35 @@ SIXTRL_HOST_FN bool NS(Buffer_write_to_fp_normalized_addr)(
     return success;
 }
 
+int NS(Buffer_remap_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_remap)( buffer );
+}
+
+int NS(Buffer_refresh_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_refresh)( buffer );
+}
+
+void NS(Buffer_free_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    NS(Buffer_free)( buffer );
+    return;
+}
+
+void NS(Buffer_delete)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    NS(Buffer_free)( buffer );
+    free( buffer );
+    buffer = SIXTRL_NULLPTR;
+
+    return;
+}
+
+#endif /* !defined( _GPUCODE ) */
 
 /* end: sixtracklib/common/buffer/buffer.c */

@@ -128,11 +128,11 @@ namespace sixtrack
 
                 if( success )
                 {
-                    success = ::st_Particles_have_same_structure(
-                        cmp_particles, particles );
+                    success = ( ::st_Particles_have_same_structure(
+                        cmp_particles, particles ) ) ? 1 : 0;
 
-                    success &= !( ::st_Particles_map_to_same_memory(
-                        cmp_particles, particles ) );
+                    success &= ( ::st_Particles_map_to_same_memory(
+                        cmp_particles, particles ) ) ? 0 : 1;
                 }
 
                 if( success )
@@ -249,7 +249,7 @@ namespace sixtrack
                         ::st_Particles_copy( particles, cmp_particles );
 
                         int const ret = ::st_Track_all_particles_beam_element(
-                            particles, ii, beam_elements_buffer, ii );
+                            particles, beam_elements_buffer, ii );
 
                         if( ret != 0 )
                         {

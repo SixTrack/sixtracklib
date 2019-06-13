@@ -4,11 +4,9 @@
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #if defined( __cplusplus )
         #include <cstddef>
-        #include <cstdint>
         #include <cstdlib>
     #else /* defined( __cplusplus ) */
         #include <stddef.h>
-        #include <stdint.h>
         #include <stdlib.h>
         #include <limits.h>
     #endif /* defined( __cplusplus ) */
@@ -62,6 +60,10 @@ typedef SIXTRL_UINT64_T NS(object_type_id_t);
     #define   SIXTRL_BUFFER_DATASTORE_ALLOW_RESIZE          0x00000040
 #endif /* !defined( SIXTRL_BUFFER_DATASTORE_ALLOW_RESIZE ) */
 
+#if !defined( SIXTRL_BUFFER_DATASTORE_ALLOW_RESIZE )
+    #define   SIXTRL_BUFFER_DATASTORE_ALLOW_RESIZE          0x00000040
+#endif /* !defined( SIXTRL_BUFFER_DATASTORE_ALLOW_RESIZE ) */
+
 #if !defined( SIXTRL_BUFFER_DATASTORE_MEMPOOL )
     #define   SIXTRL_BUFFER_DATASTORE_MEMPOOL               0x00010000
 #endif /* !defined( SIXTRL_BUFFER_DATASTORE_MEMPOOL ) */
@@ -77,6 +79,14 @@ typedef SIXTRL_UINT64_T NS(object_type_id_t);
 #if !defined( SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_MASK )
     #define   SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_MASK    0xff000000
 #endif /* !defined( SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_MASK ) */
+
+/* --------------------------------------------------------------------- */
+
+#if !defined( SIXTRL_BUFFER_DEVELOPMENT_DEBUG_MODE )
+    #define   SIXTRL_BUFFER_DEVELOPMENT_DEBUG_MODE 0x8000000000000000
+#endif /* !defined( SIXTRL_BUFFER_DEVELOPMENT_DEBUG_MODE ) */
+
+/* --------------------------------------------------------------------- */
 
 #if !defined( SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_BITS )
     #define   SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_BITS    24u
@@ -137,6 +147,11 @@ SIXTRL_STATIC_VAR NS(buffer_flags_t) const NS(BUFFER_DATASTORE_SPECIAL_FLAGS_MAS
 SIXTRL_STATIC_VAR NS(buffer_flags_t) const NS(BUFFER_DATASTORE_SPECIAL_FLAGS_BITS) =
     ( NS(buffer_flags_t) )SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_BITS;
 
+/* --------------------------------------------------------------------- */
+
+SIXTRL_STATIC_VAR NS(buffer_flags_t) const NS(BUFFER_DEVELOPMENT_DEBUG_MDOE) =
+    ( NS(buffer_flags_t) )SIXTRL_BUFFER_DEVELOPMENT_DEBUG_MODE;
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_STATIC_VAR NS(buffer_size_t)  const NS(BUFFER_DEFAULT_SLOT_SIZE) =
@@ -190,10 +205,10 @@ NS(Buffer);
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    using object_type_id_t = NS(object_type_id_t);
-    using buffer_addr_t    = NS(buffer_addr_t);
-    using buffer_size_t    = NS(buffer_size_t);
-    using buffer_flags_t   = NS(buffer_flags_t);
+    typedef NS(object_type_id_t) object_type_id_t;
+    typedef NS(buffer_size_t)    buffer_size_t;
+    typedef NS(buffer_addr_t)    buffer_addr_t;
+    typedef NS(buffer_flags_t)   buffer_flags_t;
 
     /* --------------------------------------------------------------------- */
 
@@ -250,6 +265,12 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST buffer_flags_t
         BUFFER_DATASTORE_SPECIAL_FLAGS_BITS = static_cast< buffer_flags_t >(
             SIXTRL_BUFFER_DATASTORE_SPECIAL_FLAGS_BITS );
+
+    /* --------------------------------------------------------------------- */
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST buffer_flags_t
+        BUFFER_DEVELOPMENT_DEBUG_MDOE = static_cast< buffer_flags_t >(
+            SIXTRL_BUFFER_DEVELOPMENT_DEBUG_MODE );
 
     /* --------------------------------------------------------------------- */
 

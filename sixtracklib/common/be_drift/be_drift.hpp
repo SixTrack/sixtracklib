@@ -85,6 +85,14 @@ namespace SIXTRL_CXX_NAMESPACE
         value_type length SIXTRL_ALIGN( 8 );
     };
 
+    template< typename T > struct ObjectTypeTraits< TDrift< T > >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_DRIFT);
+        }
+    };
+
     template< typename T >
     SIXTRL_BE_ARGPTR_DEC TDrift< T >* TDrift_new( Buffer& buffer );
 
@@ -174,6 +182,14 @@ namespace SIXTRL_CXX_NAMESPACE
         /* ----------------------------------------------------------------- */
 
         value_type length SIXTRL_ALIGN( 8 );
+    };
+
+    template< typename T > struct ObjectTypeTraits< TDriftExact< T > >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_DRIFT_EXACT);
+        }
     };
 
     template< typename T >
@@ -301,6 +317,22 @@ namespace SIXTRL_CXX_NAMESPACE
     };
 
     using Drift = TDrift< NS(drift_real_t) >;
+
+    template<> struct ObjectTypeTraits< ::NS(Drift) >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_DRIFT);
+        }
+    };
+
+    template<> struct ObjectTypeTraits< Drift >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_DRIFT);
+        }
+    };
 
     SIXTRL_BE_ARGPTR_DEC Drift* Drift_new(
         Buffer& SIXTRL_RESTRICT_REF buffer );
@@ -430,6 +462,22 @@ namespace SIXTRL_CXX_NAMESPACE
     /* --------------------------------------------------------------------- */
 
     using DriftExact = TDriftExact< NS(drift_real_t) >;
+
+    template<> struct ObjectTypeTraits< ::NS(DriftExact) >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_DRIFT_EXACT);
+        }
+    };
+
+    template<> struct ObjectTypeTraits< DriftExact >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_DRIFT_EXACT);
+        }
+    };
 
     SIXTRL_BE_ARGPTR_DEC DriftExact*
     DriftExact_new( Buffer& SIXTRL_RESTRICT_REF buffer );

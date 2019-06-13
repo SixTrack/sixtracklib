@@ -1,4 +1,5 @@
-# sitracklib/common/generated/CMakeLists.txt
+# ==============================================================================
+# common/generated sixtracklib submodule
 
 set( GENERATED_INSTALL_PATH "include/sixtracklib/common/generated" )
 set( SIXTRACKL_COMMON_GENERATED_HEADERS )
@@ -9,28 +10,36 @@ set( SIXTRACKL_COMMON_GENERATED_HEADERS )
 
 if( SIXTRACKL_ENABLE_MANUAL_SIMD )
     set( SIXTRACKL_ENABLE_MODULE_SIMD 1 )
+    set( PY_SIXTRACKL_MODULE_SIMD "True" )
 else()
     set( SIXTRACKL_ENABLE_MODULE_SIMD 0 )
+    set( PY_SIXTRACKL_MODULE_SIMD "False" )
 endif()
 
 if( SIXTRACKL_ENABLE_OPENCL )
     set( SIXTRACKL_ENABLE_MODULE_OPENCL 1 )
+    set( PY_SIXTRACKL_MODULE_OPENCL "True" )
 else()
     set( SIXTRACKL_ENABLE_MODULE_OPENCL 0 )
+    set( PY_SIXTRACKL_MODULE_OPENCL "False" )
 endif()
 
 
 if( SIXTRACKL_ENABLE_CUDA )
     set( SIXTRACKL_ENABLE_MODULE_CUDA 1 )
+    set( PY_SIXTRACKL_MODULE_CUDA "True" )
 else()
     set( SIXTRACKL_ENABLE_MODULE_CUDA 0 )
+    set( PY_SIXTRACKL_MODULE_CUDA "False" )
 endif()
 
 
 if( SIXTRACKL_ENABLE_MPFR4 )
     set( SIXTRACKL_ENABLE_MODULE_MPFR4 1 )
+    set( PY_SIXTRACKL_MODULE_MPFRA "True" )
 else()
     set( SIXTRACKL_ENABLE_MODULE_MPFR4 0 )
+    set( PY_SIXTRACKL_MODULE_MPFRA "False" )
 endif()
 
 
@@ -40,6 +49,19 @@ set( MODULES_H_OUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules.h" )
 configure_file( ${MODULES_H_IN_PATH} ${MODULES_H_OUT_PATH} @ONLY )
 set(   SIXTRACKL_COMMON_GENERATED_HEADERS
      ${SIXTRACKL_COMMON_GENERATED_HEADERS} "generated/modules.h" )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# prepare python related module list
+
+if( SIXTRACKL_ENABLE_PYTHON )
+    set( PY_SIXTRACKLIB_MODULES_STR
+        "SIXTRACKLIB_MODULES = {}"
+        "SIXTRACKLIB_MODULES[\"simd\"]   = ${PY_SIXTRACKL_MODULE_SIMD}"
+        "SIXTRACKLIB_MODULES[\"opencl\"] = ${PY_SIXTRACKL_MODULE_OPENCL}"
+        "SIXTRACKLIB_MODULES[\"cuda\"]   = ${PY_SIXTRACKL_MODULE_CUDA}"
+        "SIXTRACKLIB_MODULES[\"mpfr4\"]  = ${PY_SIXTRACKL_MODULE_MPFRA}"
+         CACHE INTERNAL "" FORCE )
+endif()
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install:
@@ -99,10 +121,10 @@ install( CODE "
 # create a header file common/generated/config.h with encoding top-level
 # configuration options from Settings.cmake:
 
-if( SIXTRACKL_ENABLE_APERATURE_CHECK )
-    set( SIXTRACKL_ENABLE_APERATURE_CHECK_FLAG "1" )
+if( SIXTRACKL_ENABLE_APERTURE_CHECK )
+    set( SIXTRACKL_ENABLE_APERTURE_CHECK_FLAG "1" )
 else()
-    set( SIXTRACKL_ENABLE_APERATURE_CHECK_FLAG "0" )
+    set( SIXTRACKL_ENABLE_APERTURE_CHECK_FLAG "0" )
 endif()
 
 set( CONFIG_H_IN_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/config.h.template" )
@@ -113,6 +135,21 @@ configure_file( ${CONFIG_H_IN_PATH} ${CONFIG_H_OUT_PATH} @ONLY )
 set(  SIXTRACKL_COMMON_GENERATED_HEADERS
     ${SIXTRACKL_COMMON_GENERATED_HEADERS} "generated/config.h" )
 
+
+if( SIXTRACKL_ENABLE_PYTHON )
+    if( SIXTRACKL_ENABLE_APERTURE_CHECK )
+        set( PY_SIXTRL_ENABLE_APERTURE_CHECK "True" CACHE INTERNAL "" FORCE )
+    else()
+        set( PY_SIXTRL_ENABLE_APERTURE_CHECK "False" CACHE INTERNAL "" FORCE )
+    endif()
+
+    set( PY_SIXTRL_APERTURE_X_LIMIT "${SIXTRACKL_APERTURE_X_LIMIT_VALUE}"
+         CACHE INTERNAL "" FORCE )
+
+    set( PY_SIXTRL_APERTURE_Y_LIMIT "${SIXTRACKL_APERTURE_Y_LIMIT_VALUE}"
+         CACHE INTERNAL "" FORCE )
+endif()
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install:
 
@@ -120,10 +157,10 @@ set( CONFIG_H_INSTALL_PATH
      "${CMAKE_INSTALL_PREFIX}/${GENERATED_INSTALL_PATH}/config.h" )
 
 install( CODE "
-         set( SIXTRACKL_ENABLE_APERATURE_CHECK_FLAG
-              \"${SIXTRACKL_ENABLE_APERATURE_CHECK_FLAG}\" )
-         set( SIXTRACKL_APERATURE_X_LIMIT_VALUE ${SIXTRACKL_APERATURE_X_LIMIT_VALUE} )
-         set( SIXTRACKL_APERATURE_Y_LIMIT_VALUE ${SIXTRACKL_APERATURE_Y_LIMIT_VALUE} )
+         set( SIXTRACKL_ENABLE_APERTURE_CHECK_FLAG
+              \"${SIXTRACKL_ENABLE_APERTURE_CHECK_FLAG}\" )
+         set( SIXTRACKL_APERTURE_X_LIMIT_VALUE ${SIXTRACKL_APERTURE_X_LIMIT_VALUE} )
+         set( SIXTRACKL_APERTURE_Y_LIMIT_VALUE ${SIXTRACKL_APERTURE_Y_LIMIT_VALUE} )
          message( STATUS \"Generating: ${CONFIG_H_INSTALL_PATH}\" )
          configure_file( \"${CONFIG_H_IN_PATH}\" \"${CONFIG_H_INSTALL_PATH}\" @ONLY ) " )
 
@@ -154,6 +191,23 @@ configure_file( ${NAMESPACE_H_IN_PATH} ${NAMESPACE_H_OUT_PATH} @ONLY )
 
 set(  SIXTRACKL_COMMON_GENERATED_HEADERS
     ${SIXTRACKL_COMMON_GENERATED_HEADERS} "generated/namespace.h" )
+
+
+if( SIXTRACKL_ENABLE_PYTHON )
+
+    set( PY_SIXTRL_C99_NAMESPACE_STR "${SIXTRL_GENERATED_C99_NAMESPACE}"
+         CACHE INTERNAL "" FORCE )
+
+    set( PY_SIXTRL_C99_NAMESPACE_PREFIX_STR "${SIXTRL_GENERATED_C99_NAMESPACE}"
+         CACHE INTERNAL "" FORCE )
+
+    set( PY_SIXTRL_CXX_NAMESPACE_STR "${SIXTRL_GENERATED_CXX_NAMESPACE}"
+         CACHE INTERNAL "" FORCE )
+
+    set( PY_SIXTRL_CXX_NAMESPACE_PREFIX_STR
+         "${SIXTRL_GENERATED_CXX_NAMESPACE}::" CACHE INTERNAL "" FORCE )
+
+endif()
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install:

@@ -15,10 +15,9 @@
 #include <sstream>
 #include <vector>
 
-#include <CL/cl.hpp>
-
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.h"
+#include "sixtracklib/opencl/cl.h"
 #include "sixtracklib/opencl/context.h"
 
 namespace SIXTRL_CXX_NAMESPACE
@@ -543,7 +542,7 @@ SIXTRL_HOST_FN NS(Buffer) const* NS(ClArgument_get_const_ptr_cobj_buffer)(
 }
 
 SIXTRL_HOST_FN NS(Buffer)* NS(ClArgument_get_ptr_cobj_buffer)(
-    const NS(ClArgument) *const SIXTRL_RESTRICT argument )
+    NS(ClArgument)* SIXTRL_RESTRICT argument )
 {
     return ( argument != nullptr ) ? argument->ptrCObjectBuffer() : nullptr;
 }

@@ -2,18 +2,29 @@
 #define SIXTRACKLIB_COMMON_PARTICLES_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #include <stdbool.h>
+    #if !defined( __cplusplus )
+        #include <stdbool.h>
+        #include <stdio.h>
+        #include <stdlib.h>
+        #include <limits.h>
+        #include <math.h>
+    #else /* defined( __cplusplus ) */
+        #include <cstddef>
+        #include <cstdlib>
+        #include <cstdio>
+        #include <limits>
+        #include <cmath>
+    #endif /* !defined( __cplusplus ) */
     #include <stdint.h>
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <math.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/buffer_object_defines.h"
     #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
+    #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -124,6 +135,17 @@ typedef struct NS(ParticlesGenericAddr)
 }
 NS(ParticlesGenericAddr);
 
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC
+NS(ParticlesGenericAddr)* NS(ParticlesAddr_preset)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT paddr );
+
+#endif /* !defined( _GPUCODE ) */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_store_addresses)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT paddr,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
 
 SIXTRL_FN SIXTRL_STATIC int NS(Particles_copy_from_generic_addr_data)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
@@ -187,10 +209,156 @@ NS(Particles_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
 
-SIXTRL_HOST_FN int NS(Particles_get_min_max_particle_id)(
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
-    SIXTRL_ARGPTR_DEC NS(particle_num_elements_t)* SIXTRL_RESTRICT ptr_min_id,
-    SIXTRL_ARGPTR_DEC NS(particle_num_elements_t)* SIXTRL_RESTRICT ptr_max_id );
+
+SIXTRL_STATIC SIXTRL_FN void NS(Particles_init_min_max_attributes_for_find)(
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_turn );
+
+
+SIXTRL_STATIC SIXTRL_FN int NS(Particles_find_min_max_attributes)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_turn );
+
+
+SIXTRL_STATIC SIXTRL_FN int
+NS(Particles_find_min_max_attributes_on_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_turn,
+    NS(buffer_size_t) const slot_size );
+
+
+SIXTRL_STATIC SIXTRL_FN int
+NS(Particles_find_min_max_attributes_of_particles_set_on_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT indices_begin,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_turn,
+    NS(buffer_size_t) const slot_size );
+
+
+SIXTRL_STATIC SIXTRL_FN int
+NS(Particles_buffer_find_min_max_attributes_of_particles_set)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT indices_begin,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_turn );
+
+
+SIXTRL_STATIC SIXTRL_FN int NS(Particles_buffer_find_min_max_attributes)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_turn );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Particles_get_min_max_particle_id)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Particles_get_min_max_attributes)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_element_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_element_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_turn_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int
+NS(Particles_buffer_get_min_max_attributes_of_particles_set)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const  num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT indices_begin,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_element_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_element_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_turn_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Particles_buffer_get_min_max_attributes)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_element_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_element_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_turn_id );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(Particles_get_required_num_slots_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_particles );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(Particles_get_required_num_dataptrs_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_particles );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_can_be_added_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_particles,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_objects,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_slots,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_dataptrs );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)*
+NS(Particles_new_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_particles );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)*
+NS(Particles_add_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const  num_particles,
+    NS(particle_real_ptr_t)  q0_ptr,        NS(particle_real_ptr_t)  mass0_ptr,
+    NS(particle_real_ptr_t)  beta0_ptr,     NS(particle_real_ptr_t)  gamma0_ptr,
+    NS(particle_real_ptr_t)  p0c_ptr,       NS(particle_real_ptr_t)  s_ptr,
+    NS(particle_real_ptr_t)  x_ptr,         NS(particle_real_ptr_t)  y_ptr,
+    NS(particle_real_ptr_t)  px_ptr,        NS(particle_real_ptr_t)  py_ptr,
+    NS(particle_real_ptr_t)  zeta_ptr,      NS(particle_real_ptr_t)  psigma_ptr,
+    NS(particle_real_ptr_t)  delta_ptr,     NS(particle_real_ptr_t)  rpp_ptr,
+    NS(particle_real_ptr_t)  rvv_ptr,       NS(particle_real_ptr_t)  chi_ptr,
+    NS(particle_real_ptr_t)  charge_ratio_ptr,
+    NS(particle_index_ptr_t) particle_id_ptr,
+    NS(particle_index_ptr_t) at_element_id_ptr,
+    NS(particle_index_ptr_t) at_turn_ptr,
+    NS(particle_index_ptr_t) state_ptr );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)*
+NS(Particles_add_copy_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
+
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -204,7 +372,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_preset_values)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles );
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_num_elements_t)
-NS(Particles_get_num_of_particles)( const SIXTRL_PARTICLE_ARGPTR_DEC
+NS(Particles_get_num_of_particles)( SIXTRL_PARTICLE_ARGPTR_DEC const
     NS(Particles) *const SIXTRL_RESTRICT particles );
 
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_num_of_particles)(
@@ -213,6 +381,18 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_num_of_particles)(
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Particles_get_num_dataptrs)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+NS(Particles_preset_ext)( SIXTRL_PARTICLE_ARGPTR_DEC
+    NS(Particles)* SIXTRL_RESTRICT particles );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(particle_num_elements_t)
+NS(Particles_get_num_of_particles_ext)( SIXTRL_PARTICLE_ARGPTR_DEC const
+    NS(Particles) *const SIXTRL_RESTRICT particles );
+
+#endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
@@ -242,6 +422,20 @@ NS(BufferIndex_get_index_object_by_global_index_from_range)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(particle_num_elements_t)*
         SIXTRL_RESTRICT ptr_result_index_offset );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(particle_num_elements_t)
+NS(BufferIndex_get_total_num_of_particles_in_range_ext)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(BufferIndex_get_total_num_of_particle_blocks_in_range_ext)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end );
+
+#endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
@@ -291,6 +485,35 @@ SIXTRL_FN SIXTRL_STATIC void NS( Particles_get_max_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
         *const SIXTRL_RESTRICT source );
 
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_copy_single_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
+    NS(particle_num_elements_t) const destination_index,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT source,
+    NS(particle_num_elements_t) const source_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_copy_range_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+        SIXTRL_RESTRICT destination,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
+        *const SIXTRL_RESTRICT source,
+    NS(particle_num_elements_t) const source_start_index,
+    NS(particle_num_elements_t) const source_end_index,
+    NS(particle_num_elements_t) destination_start_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_copy_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT destination,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles)
+        *const SIXTRL_RESTRICT source );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Particles_calculate_difference_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT diff );
+
+#endif /* !defined( _GPUCODE ) */
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC bool NS(Particles_managed_buffer_is_particles_buffer)(
@@ -322,6 +545,12 @@ SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_is_particles_buffer)(
 SIXTRL_FN SIXTRL_STATIC NS(particle_num_elements_t)
 NS(Particles_buffer_get_total_num_of_particles)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
+SIXTRL_HOST_FN SIXTRL_EXTERN NS(buffer_size_t)
+NS(Particles_buffer_get_total_num_of_particles_on_particle_sets)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const  num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* particle_set_indices_begin );
 
 SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
 NS(Particles_buffer_get_num_of_particle_blocks)(
@@ -356,6 +585,41 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_buffer_clear_particles)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 #endif /* !defined( _GPUCODE ) || defined( __CUDACC__ ) */
+
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(particle_num_elements_t)
+NS(Particles_buffer_get_total_num_of_particles_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(Particles_buffer_get_num_of_particle_blocks_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+NS(Particles_buffer_get_particles_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const particle_obj_index  );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+NS(Particles_buffer_get_const_particles_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const particle_obj_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_buffers_have_same_structure_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Particles_buffers_calculate_difference_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT diff );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Particles_buffer_clear_particles_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
+
+#endif /* !defined( _GPUCODE ) */
 
 /* ------------------------------------------------------------------------- */
 
@@ -1004,6 +1268,14 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_particle_id)(
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_init_particle_ids)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles );
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC int
+NS(Particles_get_min_max_particle_id_value_no_duplicate_check)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
@@ -1040,9 +1312,31 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_all_at_element_id_value)(
 
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_range_at_element_id_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const begin_index,
+    NS(particle_num_elements_t) begin_index,
     NS(particle_num_elements_t) const end_index,
     NS(particle_index_t) const at_element_id_value );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC void NS(Particles_increment_at_element_id_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
+NS(Particles_get_min_at_element_id_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p );
+
+SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
+NS(Particles_get_max_at_element_id_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p );
+
+SIXTRL_FN SIXTRL_STATIC int
+NS(Particles_get_min_max_at_element_id_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_elem,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_elem );
 
 /* ------------------------------------------------------------------------- */
 
@@ -1080,7 +1374,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_all_at_turn_value)(
 
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_range_at_turn_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const begin_index,
+    NS(particle_num_elements_t) begin_index,
     NS(particle_num_elements_t) const end_index,
     NS(particle_index_t) const at_turn_value );
 
@@ -1095,6 +1389,23 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_increment_range_at_turn_values)(
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_increment_at_turn_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const ii );
+
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
+NS(Particles_get_min_at_turn_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p );
+
+SIXTRL_FN SIXTRL_STATIC NS(particle_index_t)
+NS(Particles_get_max_at_turn_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p );
+
+SIXTRL_FN SIXTRL_STATIC int
+NS(Particles_get_min_max_at_turn_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_turn );
 
 /* ------------------------------------------------------------------------- */
 
@@ -1118,9 +1429,25 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_set_state_value)(
     NS(particle_num_elements_t) const ii,
     NS(particle_index_t) const state_value );
 
+SIXTRL_FN SIXTRL_STATIC 
+void NS(Particles_update_state_value_if_not_already_lost)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii,
+    NS(particle_index_t) const new_state );
+
 SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_state)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_index_ptr_t) ptr_to_states );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_FN SIXTRL_STATIC bool NS(Particles_is_lost_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index );
+
+SIXTRL_FN SIXTRL_STATIC bool NS(Particles_is_not_lost_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
@@ -1131,6 +1458,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_state)(
 /* ========================================================================= */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/generated/modules.h"
     #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
 
@@ -1140,9 +1468,53 @@ SIXTRL_FN SIXTRL_STATIC void NS(Particles_assign_ptr_to_state)(
 
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+
+    #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
+        SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 && defined( __CUDACC__ )
+        #include <nppdefs.h>
+    #endif /* defined( __CUDACC__ ) */
+
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+
+SIXTRL_INLINE void NS(Particles_store_addresses)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(ParticlesGenericAddr)* SIXTRL_RESTRICT paddr,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p )
+{
+    typedef NS(buffer_addr_t) addr_t;
+
+    if( ( paddr != SIXTRL_NULLPTR ) && ( p != SIXTRL_NULLPTR ) )
+    {
+        paddr->num_particles      = p->num_particles;
+        paddr->q0_addr            = ( addr_t )( uintptr_t )p->q0;
+        paddr->mass0_addr         = ( addr_t )( uintptr_t )p->mass0;
+        paddr->beta0_addr         = ( addr_t )( uintptr_t )p->beta0;
+        paddr->gamma0_addr        = ( addr_t )( uintptr_t )p->gamma0;
+        paddr->p0c_addr           = ( addr_t )( uintptr_t )p->p0c;
+        paddr->s_addr             = ( addr_t )( uintptr_t )p->s;
+        paddr->x_addr             = ( addr_t )( uintptr_t )p->x;
+        paddr->y_addr             = ( addr_t )( uintptr_t )p->y;
+        paddr->px_addr            = ( addr_t )( uintptr_t )p->px;
+        paddr->py_addr            = ( addr_t )( uintptr_t )p->py;
+        paddr->zeta_addr          = ( addr_t )( uintptr_t )p->zeta;
+        paddr->psigma_addr        = ( addr_t )( uintptr_t )p->psigma;
+        paddr->delta_addr         = ( addr_t )( uintptr_t )p->delta;
+        paddr->rpp_addr           = ( addr_t )( uintptr_t )p->rpp;
+        paddr->rvv_addr           = ( addr_t )( uintptr_t )p->rvv;
+        paddr->chi_addr           = ( addr_t )( uintptr_t )p->chi;
+        paddr->charge_ratio_addr  = ( addr_t )( uintptr_t )p->charge_ratio;
+        paddr->particle_id_addr   = ( addr_t )( uintptr_t )p->particle_id;
+        paddr->at_element_id_addr = ( addr_t )( uintptr_t )p->at_element_id;
+        paddr->at_turn_addr       = ( addr_t )( uintptr_t )p->at_turn;
+        paddr->state_addr         = ( addr_t )( uintptr_t )p->state;
+    }
+
+    return;
+}
 
 SIXTRL_INLINE int NS(Particles_copy_from_generic_addr_data)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT dest,
@@ -1566,8 +1938,6 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)* NS(Particles_new)(
     };
 
     SIXTRL_ASSERT( buffer != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( NS(Buffer_has_datastore)( buffer ) );
-    SIXTRL_ASSERT( NS(Buffer_allow_append_objects)( buffer ) );
     SIXTRL_ASSERT( NS(PARTICLES_NUM_DATAPTRS) == 21u );
 
     NS(Particles) particles;
@@ -1663,8 +2033,6 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Particles)* NS(Particles_add)(
     };
 
     SIXTRL_ASSERT( buffer != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( NS(Buffer_has_datastore)( buffer ) );
-    SIXTRL_ASSERT( NS(Buffer_allow_append_objects)( buffer ) );
     SIXTRL_ASSERT( NS(PARTICLES_NUM_DATAPTRS) == 21u );
 
     NS(Particles) particles;
@@ -1729,6 +2097,336 @@ NS(Particles_add_copy)(
         ( NS(particle_index_ptr_t ) )NS(Particles_get_const_at_element_id)( p ),
         ( NS(particle_index_ptr_t ) )NS(Particles_get_const_at_turn)( p ),
         ( NS(particle_index_ptr_t ) )NS(Particles_get_const_state)( p ) );
+}
+
+#endif /* !defined( _GPUCODE ) */
+
+SIXTRL_INLINE void NS(Particles_init_min_max_attributes_for_find)(
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_turn )
+{
+    typedef NS(particle_index_t) index_t;
+
+    #if defined( __cplusplus )
+        #if defined( __CUDACC__ ) && \
+            defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
+            SIXTRACKLIB_ENABLE_MODULE_CUDA == 1
+
+            index_t const MIN_VALUE = NPP_MIN_64S;
+            index_t const MAX_VALUE = NPP_MAX_64S;
+
+        #elif !defined( _GPUCODE )
+
+            index_t const MIN_VALUE = std::numeric_limits< index_t >::min();
+            index_t const MAX_VALUE = std::numeric_limits< index_t >::max();
+
+        #else /* No idea where we are here, best effort and hope for the best */
+
+            index_t const MIN_VALUE = index_t{ -9223372036854775807LL - 1 };
+            index_t const MAX_VALUE = index_t{ 9223372036854775807LL };
+
+        #endif /* C++ including Cuda and potentially OpenCL 2.x */
+    #else /* !defined( __cplusplus ) */
+
+        #if defined( _GPUCODE ) && defined( __OPENCL_VERSION__ ) && \
+            defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
+            ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
+
+            index_t const MIN_VALUE = ( index_t )( -9223372036854775807L - 1 );
+            index_t const MAX_VALUE = ( index_t )(  9223372036854775807L );
+
+        #else
+
+            index_t const MIN_VALUE = INT64_MIN;
+            index_t const MAX_VALUE = INT64_MAX;
+
+        #endif /* C99, including OpenCL 1.x */
+
+    #endif /* !defined( __cplusplus ) */
+
+    if( ptr_min_part_id != SIXTRL_NULLPTR ) *ptr_min_part_id = MAX_VALUE;
+    if( ptr_max_part_id != SIXTRL_NULLPTR ) *ptr_max_part_id = MIN_VALUE;
+
+    if( ptr_min_at_element != SIXTRL_NULLPTR ) *ptr_min_at_element = MAX_VALUE;
+    if( ptr_max_at_element != SIXTRL_NULLPTR ) *ptr_max_at_element = MIN_VALUE;
+
+    if( ptr_min_turn != SIXTRL_NULLPTR ) *ptr_min_turn = MAX_VALUE;
+    if( ptr_max_turn != SIXTRL_NULLPTR ) *ptr_max_turn = MIN_VALUE;
+
+    return;
+}
+
+#if !defined( _GPUCODE )
+
+SIXTRL_INLINE int NS(Particles_find_min_max_attributes_on_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_turn,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_addr_t) address_t;
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)  const* ptr_obj_t;
+    typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const* ptr_particles_t;
+
+    SIXTRL_STATIC_VAR address_t  const ZERO_ADDR = ( address_t )0u;
+    SIXTRL_STATIC_VAR buf_size_t const PSIZE     = sizeof( NS(Particles) );
+
+    int success = 0;
+
+    ptr_obj_t it  = NS(ManagedBuffer_get_const_objects_index_begin)(
+        pbuffer, slot_size );
+
+    ptr_obj_t end = NS(ManagedBuffer_get_const_objects_index_end)(
+        pbuffer, slot_size );
+
+    buf_size_t num_particle_blocks_found = ( buf_size_t )0u;
+
+    SIXTRL_ASSERT( it  != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( end != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( ( uintptr_t )it ) <= ( ( uintptr_t )end ) );
+
+    for( ; it != end ; ++it )
+    {
+        if( ( NS(Object_get_type_id)( it ) == NS(OBJECT_TYPE_PARTICLE ) ) &&
+            ( NS(Object_get_begin_addr)( it ) > ZERO_ADDR ) &&
+            ( NS(Object_get_size)( it ) >= PSIZE ) )
+        {
+            ptr_particles_t particles = ( ptr_particles_t)( uintptr_t
+                )NS(Object_get_begin_addr)( it );
+
+            success = NS(Particles_find_min_max_attributes)( particles,
+                ptr_min_part_id, ptr_max_part_id, ptr_min_at_element,
+                ptr_max_at_element, ptr_min_turn, ptr_max_turn );
+
+            if( success == 0 )
+            {
+                ++num_particle_blocks_found;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    if( ( success == 0 ) &&
+        ( num_particle_blocks_found == ( buf_size_t )0u ) )
+    {
+        success = -1;
+    }
+
+    return success;
+}
+
+SIXTRL_INLINE int
+NS(Particles_find_min_max_attributes_of_particles_set_on_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT indices_begin,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_turn,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* part_idx_iter_t;
+    typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const* ptr_particles_t;
+
+    int success = -1;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
+
+    SIXTRL_ASSERT( pbuffer != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( slot_size > ZERO );
+    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( pbuffer, slot_size ) );
+
+    buf_size_t const num_particle_objs =
+        NS(ManagedBuffer_get_num_objects)( pbuffer, slot_size );
+
+    if( ( indices_begin != SIXTRL_NULLPTR ) &&
+        ( num_particle_sets > ZERO ) && ( num_particle_objs > ZERO ) )
+    {
+        part_idx_iter_t it  = indices_begin;
+        part_idx_iter_t end = it + num_particle_sets;
+
+        success = 0;
+
+        for( ; it != end ; ++it )
+        {
+            ptr_particles_t particles =
+                NS(Particles_managed_buffer_get_const_particles)(
+                    pbuffer, *it, slot_size );
+
+            if( particles != SIXTRL_NULLPTR )
+            {
+                success = NS(Particles_find_min_max_attributes)( particles,
+                    ptr_min_part_id, ptr_max_part_id, ptr_min_at_element,
+                    ptr_max_at_element, ptr_min_turn, ptr_max_turn );
+            }
+            else
+            {
+                success = -1;
+            }
+
+            if( success != 0 )
+            {
+                break;
+            }
+        }
+    }
+
+    return success;
+}
+
+
+SIXTRL_INLINE int NS(Particles_find_min_max_attributes)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_particle_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_particle_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_turn )
+{
+    typedef NS(particle_num_elements_t) num_elem_t;
+    typedef NS(particle_index_t)        index_t;
+
+    int success = -1;
+    num_elem_t const num_particles = NS(Particles_get_num_of_particles)( p );
+
+    if( ( p != SIXTRL_NULLPTR ) && ( num_particles > ( num_elem_t )0u ) )
+    {
+        SIXTRL_STATIC_VAR index_t const ZERO = ( index_t )0u;
+        SIXTRL_STATIC_VAR num_elem_t const ZERO_IDX = ( num_elem_t )0u;
+
+        index_t temp = NS(Particles_get_particle_id_value)( p, ZERO_IDX );
+        index_t min_particle_id = ( temp >= ZERO ) ? temp : -temp;
+        index_t max_particle_id = ( temp >= ZERO ) ? temp : -temp;
+
+        index_t min_at_element =
+            NS(Particles_get_at_element_id_value)( p, ZERO_IDX );
+
+        index_t min_at_turn = NS(Particles_get_at_turn_value)( p, ZERO_IDX );
+
+        index_t max_at_element = min_at_element;
+        index_t max_at_turn    = min_at_turn;
+
+        num_elem_t ii = ( num_elem_t )1u;
+
+        for( ; ii < num_particles ; ++ii )
+        {
+            temp = NS(Particles_get_particle_id_value)( p, ii );
+            if( temp < ZERO ) temp = -temp;
+
+            if( min_particle_id > temp ) min_particle_id = temp;
+            if( max_particle_id < temp ) max_particle_id = temp;
+
+            temp = NS(Particles_get_at_element_id_value)( p, ii );
+            SIXTRL_ASSERT( temp >= ZERO );
+
+            if( min_at_element  > temp ) min_at_element = temp;
+            if( max_at_element  < temp ) max_at_element = temp;
+
+            temp = NS(Particles_get_at_turn_value)( p, ii );
+            SIXTRL_ASSERT( temp >= ZERO );
+
+            if( min_at_turn > temp ) min_at_turn = temp;
+            if( max_at_turn < temp ) max_at_turn = temp;
+        }
+
+        if( (  ptr_min_particle_id != SIXTRL_NULLPTR  ) &&
+            ( *ptr_min_particle_id  > min_particle_id ) )
+        {
+            *ptr_min_particle_id = min_particle_id;
+        }
+
+        if( (  ptr_max_particle_id != SIXTRL_NULLPTR ) &&
+            ( *ptr_max_particle_id <  max_particle_id ) )
+        {
+            *ptr_max_particle_id = max_particle_id;
+        }
+
+        if( (  ptr_min_at_element != SIXTRL_NULLPTR ) &&
+            ( *ptr_min_at_element >  min_at_element ) )
+        {
+            *ptr_min_at_element  = min_at_element;
+        }
+
+        if( (  ptr_max_at_element != SIXTRL_NULLPTR ) &&
+            ( *ptr_max_at_element  < max_at_element ) )
+        {
+            *ptr_max_at_element  = max_at_element;
+        }
+
+        if( (  ptr_min_at_turn != SIXTRL_NULLPTR ) &&
+            ( *ptr_min_at_turn >  min_at_turn ) )
+        {
+            *ptr_min_at_turn  = min_at_turn;
+        }
+
+        if( (  ptr_max_at_turn != SIXTRL_NULLPTR ) &&
+            ( *ptr_max_at_turn <  max_at_turn ) )
+        {
+            *ptr_max_at_turn  = max_at_turn;
+        }
+
+        success = 0;
+    }
+
+    return success;
+}
+
+
+SIXTRL_INLINE int NS(Particles_buffer_find_min_max_attributes_of_particles_set)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT indices_begin,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_particle_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_particle_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_turn )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* ptr_raw_t;
+
+    return
+    NS(Particles_find_min_max_attributes_of_particles_set_on_managed_buffer)(
+        ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( pbuffer ),
+            num_particle_sets, indices_begin, ptr_min_particle_id,
+                ptr_max_particle_id, ptr_min_at_element, ptr_max_at_element,
+                    ptr_min_at_turn, ptr_max_at_turn,
+                        NS(Buffer_get_slot_size)( pbuffer ) );
+}
+
+SIXTRL_INLINE int NS(Particles_buffer_find_min_max_attributes)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pbuffer,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_particle_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_particle_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_element,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_turn )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* ptr_raw_t;
+
+    return NS(Particles_find_min_max_attributes_on_managed_buffer)(
+        ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( pbuffer ),
+            ptr_min_particle_id, ptr_max_particle_id, ptr_min_at_element,
+                ptr_max_at_element, ptr_min_at_turn, ptr_max_at_turn,
+                        NS(Buffer_get_slot_size)( pbuffer ) );
 }
 
 #endif /* !defined( _GPUCODE ) */
@@ -5141,6 +5839,55 @@ SIXTRL_INLINE void NS(Particles_init_particle_ids)(
     return;
 }
 
+SIXTRL_INLINE int
+NS(Particles_get_min_max_particle_id_value_no_duplicate_check)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_part_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_part_id )
+{
+    int success = -1;
+
+    typedef NS(particle_index_t) index_t;
+    typedef NS(particle_num_elements_t) nelem_t;
+
+    nelem_t const nn = ( nelem_t )NS(Particles_get_num_of_particles)( p );
+
+    if( nn > ( nelem_t )0 )
+    {
+        nelem_t ii = ( nelem_t )0u;
+
+        index_t max_particle_id =
+            NS(Particles_get_at_element_id_value)( p, ii++ );
+
+        index_t min_particle_id = max_particle_id;
+
+        success = 0;
+
+        for( ; ii < nn ; ++ii )
+        {
+            index_t const  temp =
+                NS(Particles_get_particle_id_value)( p, ii );
+
+            SIXTRL_ASSERT( temp >= ( index_t )0u );
+
+            if( min_particle_id > temp ) min_particle_id = temp;
+            if( max_particle_id < temp ) max_particle_id = temp;
+        }
+
+        if(  ptr_min_part_id != SIXTRL_NULLPTR )
+        {
+            *ptr_min_part_id = min_particle_id;
+        }
+
+        if(  ptr_max_part_id != SIXTRL_NULLPTR )
+        {
+            *ptr_max_part_id = max_particle_id;
+        }
+    }
+
+    return success;
+}
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE NS(particle_index_t) NS(Particles_get_at_element_id_value)(
@@ -5225,26 +5972,132 @@ SIXTRL_INLINE void NS(Particles_set_all_at_element_id_value)(
 
 SIXTRL_INLINE void NS(Particles_set_range_at_element_id_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const begin_index,
+    NS(particle_num_elements_t) ii,
     NS(particle_num_elements_t) const end_index,
     NS(particle_index_t) const at_element_id_value )
 {
-    NS(particle_index_t) num_elements = end_index;
+    SIXTRL_ASSERT( ii <= end_index );
+    SIXTRL_ASSERT( NS(Particles_get_num_of_particles)(
+        particles ) >= end_index );
 
-    NS(particle_index_ptr_t) begin_ptr =
-        NS(Particles_get_at_element_id)( particles );
-
-    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( begin_ptr != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( begin_index < end_index );
-    SIXTRL_ASSERT( NS(Particles_get_num_of_particles)( particles ) >= end_index );
-
-    num_elements -= begin_index;
-
-    SIXTRACKLIB_SET_VALUES( NS(particle_index_t), &begin_ptr[ begin_index ],
-                            num_elements, at_element_id_value );
+    for( ; ii < end_index ; ++ii )
+    {
+        NS(Particles_set_at_element_id_value)(
+            particles, ii, at_element_id_value );
+    }
 
     return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE void NS(Particles_increment_at_element_id_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii )
+{
+    SIXTRL_ASSERT( ( particles != SIXTRL_NULLPTR ) &&
+                   ( ii < NS(Particles_get_num_of_particles)( particles ) ) );
+
+    ++particles->at_element_id[ ii ];
+    return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE NS(particle_index_t) NS(Particles_get_min_at_element_id_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p )
+{
+    typedef NS(particle_index_t) index_t;
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const nn =
+        ( num_elem_t )NS(Particles_get_num_of_particles)( p );
+
+    index_t min_at_element_id =
+        NS(Particles_get_at_element_id_value)( p, ii++ );
+
+    for( ; ii < nn ; ++ii )
+    {
+        index_t const  temp = NS(Particles_get_at_element_id_value)( p, ii );
+        SIXTRL_ASSERT( temp >= ( index_t )0u );
+
+        if( min_at_element_id > temp ) min_at_element_id = temp;
+    }
+
+    return min_at_element_id;
+}
+
+SIXTRL_INLINE NS(particle_index_t) NS(Particles_get_max_at_element_id_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p )
+{
+    typedef NS(particle_index_t) index_t;
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const nn =
+        ( num_elem_t )NS(Particles_get_num_of_particles)( p );
+
+    index_t max_at_element_id =
+        NS(Particles_get_at_element_id_value)( p, ii++ );
+
+    for( ; ii < nn ; ++ii )
+    {
+        index_t const  temp = NS(Particles_get_at_element_id_value)( p, ii );
+        SIXTRL_ASSERT( temp >= ( index_t )0u );
+
+        if( max_at_element_id < temp ) max_at_element_id = temp;
+    }
+
+    return max_at_element_id;
+}
+
+SIXTRL_INLINE int NS(Particles_get_min_max_at_element_id_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_elem_id,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_elem_id )
+{
+    int success = -1;
+
+    typedef NS(particle_index_t) index_t;
+    typedef NS(particle_num_elements_t) nelem_t;
+
+    nelem_t const nn = ( nelem_t )NS(Particles_get_num_of_particles)( p );
+
+    if( nn > ( nelem_t )0 )
+    {
+        nelem_t ii = ( nelem_t )0u;
+
+        index_t max_at_element_id =
+            NS(Particles_get_at_element_id_value)( p, ii++ );
+
+        index_t min_at_element_id = max_at_element_id;
+
+        success = 0;
+
+        for( ; ii < nn ; ++ii )
+        {
+            index_t const  temp =
+                NS(Particles_get_at_element_id_value)( p, ii );
+
+            SIXTRL_ASSERT( temp >= ( index_t )0u );
+
+            if( min_at_element_id > temp ) min_at_element_id = temp;
+            if( max_at_element_id < temp ) max_at_element_id = temp;
+        }
+
+        if(  ptr_min_elem_id != SIXTRL_NULLPTR )
+        {
+            *ptr_min_elem_id = min_at_element_id;
+        }
+
+        if(  ptr_max_elem_id != SIXTRL_NULLPTR )
+        {
+            *ptr_max_elem_id = max_at_element_id;
+        }
+    }
+
+    return success;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -5331,26 +6184,23 @@ SIXTRL_INLINE void NS(Particles_set_all_at_turn_value)(
 
 SIXTRL_INLINE void NS(Particles_set_range_at_turn_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const begin_index,
+    NS(particle_num_elements_t) ii,
     NS(particle_num_elements_t) const end_index,
     NS(particle_index_t) const at_turn_value )
 {
-    NS(particle_index_t) num_elements = end_index;
+    SIXTRL_ASSERT( ii <= end_index );
+    SIXTRL_ASSERT( NS(Particles_get_num_of_particles)(
+        particles ) >= end_index );
 
-    NS(particle_index_ptr_t) begin_ptr = NS(Particles_get_at_turn)( particles );
-
-    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( begin_ptr != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( begin_index < end_index );
-    SIXTRL_ASSERT( NS(Particles_get_num_of_particles)( particles ) >= end_index );
-
-    num_elements -= begin_index;
-
-    SIXTRACKLIB_SET_VALUES( NS(particle_index_t), &begin_ptr[ begin_index ],
-                            num_elements, at_turn_value );
+    for( ; ii < end_index ; ++ii )
+    {
+        NS(Particles_set_at_turn_value)( particles, ii, at_turn_value );
+    }
 
     return;
 }
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE void NS(Particles_increment_all_at_turn_values)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles )
@@ -5388,6 +6238,96 @@ SIXTRL_INLINE void NS(Particles_increment_at_turn_value)(
     ++particles->at_turn[ ii ];
 
     return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE NS(particle_index_t) NS(Particles_get_min_at_turn_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p )
+{
+    typedef NS(particle_index_t) index_t;
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const nn = ( num_elem_t )NS(Particles_get_num_of_particles)( p );
+
+    index_t min_at_turn = NS(Particles_get_at_turn_value)( p, ii++ );
+
+    for( ; ii < nn ; ++ii )
+    {
+        index_t const  temp = NS(Particles_get_at_turn_value)( p, ii );
+        SIXTRL_ASSERT( temp >= ( index_t )0u );
+
+        if( min_at_turn > temp ) min_at_turn = temp;
+    }
+
+    return min_at_turn;
+}
+
+SIXTRL_INLINE NS(particle_index_t) NS(Particles_get_max_at_turn_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p )
+{
+    typedef NS(particle_index_t) index_t;
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t ii = ( num_elem_t )0u;
+    num_elem_t const nn = ( num_elem_t )NS(Particles_get_num_of_particles)( p );
+
+    index_t max_at_turn = NS(Particles_get_at_turn_value)( p, ii++ );
+
+    for( ; ii < nn ; ++ii )
+    {
+        index_t const  temp = NS(Particles_get_at_turn_value)( p, ii );
+        SIXTRL_ASSERT( temp >= ( index_t )0u );
+
+        if( max_at_turn < temp ) max_at_turn = temp;
+    }
+
+    return max_at_turn;
+}
+
+SIXTRL_INLINE int NS(Particles_get_min_max_at_turn_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_min_at_turn,
+    SIXTRL_ARGPTR_DEC NS(particle_index_t)* SIXTRL_RESTRICT ptr_max_at_turn )
+{
+    int success = -1;
+
+    typedef NS(particle_index_t) index_t;
+    typedef NS(particle_num_elements_t) num_elem_t;
+
+    num_elem_t const nn = ( num_elem_t )NS(Particles_get_num_of_particles)( p );
+
+    if( nn > ( num_elem_t )0 )
+    {
+        num_elem_t ii = ( num_elem_t )0u;
+
+        index_t max_at_turn = NS(Particles_get_at_turn_value)( p, ii++ );
+        index_t min_at_turn = max_at_turn;
+
+        success = 0;
+
+        for( ; ii < nn ; ++ii )
+        {
+            index_t const  temp = NS(Particles_get_at_turn_value)( p, ii );
+            SIXTRL_ASSERT( temp >= ( index_t )0u );
+
+            if( min_at_turn > temp ) min_at_turn = temp;
+            if( max_at_turn < temp ) max_at_turn = temp;
+        }
+
+        if(  ptr_min_at_turn != SIXTRL_NULLPTR )
+        {
+            *ptr_min_at_turn = min_at_turn;
+        }
+
+        if(  ptr_max_at_turn != SIXTRL_NULLPTR )
+        {
+            *ptr_max_at_turn = max_at_turn;
+        }
+    }
+
+    return success;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -5450,6 +6390,19 @@ SIXTRL_INLINE void NS(Particles_set_state_value)(
     return;
 }
 
+SIXTRL_INLINE void NS(Particles_update_state_value_if_not_already_lost)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii,
+    NS(particle_index_t) const new_state )
+{
+    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ii < particles->num_particles );
+    SIXTRL_ASSERT( ( particles->state[ ii ] == ( NS(particle_index_t) )1u ) ||
+                   ( particles->state[ ii ] == ( NS(particle_index_t) )0u ) );
+    
+    particles->state[ ii ] &= new_state;
+}
+
 SIXTRL_INLINE void NS(Particles_assign_ptr_to_state)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_index_ptr_t) ptr_to_states )
@@ -5457,6 +6410,25 @@ SIXTRL_INLINE void NS(Particles_assign_ptr_to_state)(
     SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
     particles->state = ptr_to_states;
     return;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE bool NS(Particles_is_lost_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index )
+{
+    return !NS(Particles_is_not_lost_value)( particles, particle_index );
+}
+
+SIXTRL_INLINE bool NS(Particles_is_not_lost_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index )
+{
+    SIXTRL_ASSERT( ( particles != SIXTRL_NULLPTR ) &&
+        ( particle_index < NS(Particles_get_num_of_particles)( particles ) ) );
+
+    return ( particles->state[ particle_index ] == ( NS(particle_index_t) )1u );
 }
 
 /* ------------------------------------------------------------------------- */

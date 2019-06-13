@@ -1,24 +1,29 @@
 #ifndef CXX_SIXTRACKLIB_COMMON_PARTICLES_HPP__
 #define CXX_SIXTRACKLIB_COMMON_PARTICLES_HPP__
 
-#if defined( __cplusplus )
-
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-    #include <cstddef>
-    #include <cstdint>
-    #include <cstdlib>
-    #include <utility>
+    #if defined( __cplusplus )
+        #include <cstddef>
+        #include <cstdint>
+        #include <cstdlib>
+        #include <utility>
 
-    #include <type_traits>
-    #include <iterator>
+        #include <type_traits>
+        #include <iterator>
+    #endif /* defined( __cplusplus ) */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/particles.h"
-    #include "sixtracklib/common/buffer.hpp"
+
+    #if defined( __cplusplus )
+        #include "sixtracklib/common/buffer.hpp"
+    #endif /* defined( __cplusplus ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
+#if defined( __cplusplus )
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -510,6 +515,14 @@ namespace SIXTRL_CXX_NAMESPACE
         index_pointer_t at_element_id    SIXTRL_ALIGN( 8 );
         index_pointer_t at_turn          SIXTRL_ALIGN( 8 );
         index_pointer_t state            SIXTRL_ALIGN( 8 );
+    };
+
+    template< typename T > struct ObjectTypeTraits< TParticles< T > >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_PARTICLE);
+        }
     };
 
     /* ===================================================================== */
@@ -1015,6 +1028,22 @@ namespace SIXTRL_CXX_NAMESPACE
     };
 
     using Particles = TParticles< NS(particle_real_t) >;
+
+    template<> struct ObjectTypeTraits< ::NS(Particles) >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_PARTICLE);
+        }
+    };
+
+    template<> struct ObjectTypeTraits< Particles >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_PARTICLE);
+        }
+    };
 
     SIXTRL_FN SIXTRL_STATIC bool Buffer_is_particles_buffer(
         Buffer const& SIXTRL_RESTRICT_REF buffer );
@@ -3027,9 +3056,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    SIXTRL_BUFFER_OBJ_DATAPTR_DEC TParticles< NS(particle_real_t) > const*
-    TParticles< NS(particle_real_t) >::FromBufferObject(
-        SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const
+    SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC
+    TParticles< ::NS(particle_real_t) > const* TParticles<
+        NS(particle_real_t) >::FromBufferObject(
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC const ::NS(Object) *const
             SIXTRL_RESTRICT index_obj ) SIXTRL_NOEXCEPT
     {
         using _this_t        = TParticles< NS(particle_real_t) >;
@@ -3047,7 +3077,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return nullptr;
     }
 
-    SIXTRL_BUFFER_OBJ_DATAPTR_DEC TParticles< NS(particle_real_t) >*
+    SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC TParticles< NS(particle_real_t) >*
     TParticles< NS(particle_real_t) >::FromBufferObject(
         SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
             SIXTRL_RESTRICT index_obj ) SIXTRL_NOEXCEPT
@@ -3091,7 +3121,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return ::NS(Particles_get_num_of_particles)( this->getCApiPtr() );
     }
 
-    void TParticles< NS(particle_real_t) >::setNumParticles(
+    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setNumParticles(
         TParticles< NS(particle_real_t) >::size_type const num_particles
         ) SIXTRL_NOEXCEPT
     {

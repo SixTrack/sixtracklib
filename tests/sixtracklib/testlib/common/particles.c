@@ -13,138 +13,39 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/testlib/common/random.h"
 
-extern void NS(Particles_random_init)(
-    SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p );
-
-extern void NS(Particles_realistic_init)(
-    SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p );
-
-/* ------------------------------------------------------------------------- */
-
-extern int NS(Particles_have_same_structure)(
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
-
-extern int NS(Particles_map_to_same_memory)(
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
-
-extern int NS(Particles_compare_real_values)(
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
-
-extern int NS(Particles_compare_real_values_with_treshold)(
-    SIXTRL_ARGPTR_DEC   const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_ARGPTR_DEC   const NS(Particles) *const SIXTRL_RESTRICT rhs,
-    NS(particle_real_t) const treshold );
-
-extern int NS(Particles_compare_integer_values)(
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
-
-extern int NS(Particles_compare_values)(
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
-
-extern int NS(Particles_compare_values_with_treshold)(
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs,
-    NS(particle_real_t) const treshold );
-
 static int NS(compare_sequences_exact)(
-    SIXTRL_DATAPTR_DEC void const* SIXTRL_RESTRICT lhs_values,
-    SIXTRL_DATAPTR_DEC void const* SIXTRL_RESTRICT rhs_values,
+    SIXTRL_PARTICLE_DATAPTR_DEC void const* SIXTRL_RESTRICT lhs_values,
+    SIXTRL_PARTICLE_DATAPTR_DEC void const* SIXTRL_RESTRICT rhs_values,
     NS(buffer_size_t) const num_values,
     NS(buffer_size_t) const element_size );
 
 static int NS(compare_real_sequences_with_treshold)(
     NS(particle_real_const_ptr_t) SIXTRL_RESTRICT lhs_values,
     NS(particle_real_const_ptr_t) SIXTRL_RESTRICT rhs_values,
-    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_first_out_of_bounds_index,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)*
+        SIXTRL_RESTRICT ptr_first_out_of_bounds_index,
     NS(buffer_size_t) const num_values,
     NS(particle_real_t) const treshold );
 
 static void NS(compare_real_sequences_and_get_max_difference)(
     NS(particle_real_ptr_t)    SIXTRL_RESTRICT ptr_max_diff,
-    NS(buffer_size_t)*         SIXTRL_RESTRICT ptr_max_diff_index,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_max_diff_index,
     NS(particle_real_t) const* SIXTRL_RESTRICT lhs_values,
     NS(particle_real_t) const* SIXTRL_RESTRICT rhs_values,
     NS(buffer_size_t)   const  num_values );
 
 static void NS(compare_int64_sequences_and_get_max_difference)(
     NS(particle_index_ptr_t) SIXTRL_RESTRICT ptr_max_diff,
-    NS(buffer_size_t)*       SIXTRL_RESTRICT ptr_max_diff_index,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_max_diff_index,
     NS(particle_index_const_ptr_t) SIXTRL_RESTRICT lhs_values,
     NS(particle_index_const_ptr_t) SIXTRL_RESTRICT rhs_values,
     NS(buffer_size_t) const num_values );
 
-extern void NS(Particles_get_max_difference)(
-    SIXTRL_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT max_diff,
-    NS(buffer_size_t)* SIXTRL_RESTRICT max_diff_indices,
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs );
-
-
-
-extern void NS(Particles_print)(
-    FILE* SIXTRL_RESTRICT fp,
-    const NS(Particles) *const SIXTRL_RESTRICT particles );
-
-extern void NS(Particles_print_max_diff)(
-    FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT max_diff,
-    NS(buffer_size_t) const* max_diff_indices );
-
-
-extern void NS(Particles_print_out)(
-    const NS(Particles) *const SIXTRL_RESTRICT particles );
-
-extern void NS(Particles_print_max_diff_out)(
-    SIXTRL_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT max_diff,
-    NS(buffer_size_t) const* max_diff_indices );
-
-/* ------------------------------------------------------------------------- */
-
-extern int NS(Particles_buffers_map_to_same_memory)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer );
-
-extern int NS(Particles_buffers_compare_values)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer );
-
-extern int NS(Particles_buffers_compare_values_with_treshold)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer,
-    NS(particle_real_t) const treshold );
-
-extern void NS(Particles_buffer_get_max_difference)(
-    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT max_diff,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT max_diff_indices,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs );
-
-extern void NS(Particles_buffer_print)(
-    FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particle_buffer );
-
-extern void NS(Particles_buffer_print_max_diff)(
-    FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT max_diff_buffer,
-    NS(buffer_size_t) const* max_diff_indices );
-
-extern void NS(Particles_buffer_print_out)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particle_buffer );
-
-extern void NS(Particles_buffer_print_max_diff_out)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT max_diff_buffer,
-    NS(buffer_size_t) const* max_diff_indices );
-
 /* ------------------------------------------------------------------------- */
 
 int NS(compare_sequences_exact)(
-    SIXTRL_DATAPTR_DEC void const* SIXTRL_RESTRICT lhs_values,
-    SIXTRL_DATAPTR_DEC void const* SIXTRL_RESTRICT rhs_values,
+    SIXTRL_PARTICLE_DATAPTR_DEC void const* SIXTRL_RESTRICT lhs_values,
+    SIXTRL_PARTICLE_DATAPTR_DEC void const* SIXTRL_RESTRICT rhs_values,
     NS(buffer_size_t) const num_values,
     NS(buffer_size_t) const element_size )
 {
@@ -174,7 +75,8 @@ int NS(compare_sequences_exact)(
 int NS(compare_real_sequences_with_treshold)(
     NS(particle_real_const_ptr_t) SIXTRL_RESTRICT lhs_values,
     NS(particle_real_const_ptr_t) SIXTRL_RESTRICT rhs_values,
-    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_first_out_of_bounds_index,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)*
+        SIXTRL_RESTRICT ptr_first_out_of_bounds_index,
     NS(buffer_size_t) const num_values,
     NS(particle_real_t) const treshold )
 {
@@ -218,7 +120,7 @@ int NS(compare_real_sequences_with_treshold)(
 
 void NS(compare_real_sequences_and_get_max_difference)(
     NS(particle_real_ptr_t) SIXTRL_RESTRICT ptr_max_diff,
-    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_max_diff_index,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_max_diff_index,
     NS(particle_real_const_ptr_t) SIXTRL_RESTRICT lhs_values,
     NS(particle_real_const_ptr_t) SIXTRL_RESTRICT rhs_values,
     NS(buffer_size_t) const num_values )
@@ -277,10 +179,10 @@ void NS(compare_real_sequences_and_get_max_difference)(
 }
 
 void NS(compare_int64_sequences_and_get_max_difference)(
-    SIXTRL_INT64_T*    SIXTRL_RESTRICT ptr_max_diff,
-    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_max_diff_index,
-    SIXTRL_INT64_T const* SIXTRL_RESTRICT lhs_values,
-    SIXTRL_INT64_T const* SIXTRL_RESTRICT rhs_values,
+    NS(particle_index_ptr_t) SIXTRL_RESTRICT ptr_max_diff,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_max_diff_index,
+    NS(particle_index_const_ptr_t) SIXTRL_RESTRICT lhs_values,
+    NS(particle_index_const_ptr_t) SIXTRL_RESTRICT rhs_values,
     NS(buffer_size_t) const num_values )
 {
     static SIXTRL_INT64_T const ZERO = ( SIXTRL_INT64_T )0u;
@@ -337,7 +239,8 @@ void NS(compare_int64_sequences_and_get_max_difference)(
 
 /* ------------------------------------------------------------------------- */
 
-void NS(Particles_realistic_init)( NS(Particles)* SIXTRL_RESTRICT p )
+void NS(Particles_realistic_init)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p )
 {
     SIXTRL_SIZE_T const NUM_PARTICLES = NS(Particles_get_num_of_particles)( p );
 
@@ -406,7 +309,8 @@ void NS(Particles_realistic_init)( NS(Particles)* SIXTRL_RESTRICT p )
     return;
 }
 
-void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
+void NS(Particles_random_init)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p )
 {
     typedef NS(particle_real_t)    real_t;
     typedef NS(particle_index_t)   index_t;
@@ -450,11 +354,16 @@ void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
 
         for( ii = 0 ; ii < NUM_PARTICLES ; ++ii, ++particle_id )
         {
-            NS(particle_real_t) const ANGLE = NS(Random_genrand64_real1)() * TWO_PI;
+            NS(particle_real_t) const ANGLE =
+                NS(Random_genrand64_real1)() * TWO_PI;
+
             NS(particle_real_t) const PX = P * cos( ANGLE );
             NS(particle_real_t) const PY = sqrt( P * P - PX * PX );
-            NS(particle_real_t) const X  = MIN_X + NS(Random_genrand64_real1)() * DELTA_X;
-            NS(particle_real_t) const Y  = MIN_Y + NS(Random_genrand64_real1)() * DELTA_Y;
+            NS(particle_real_t) const X  =
+                MIN_X + NS(Random_genrand64_real1)() * DELTA_X;
+
+            NS(particle_real_t) const Y  =
+                MIN_Y + NS(Random_genrand64_real1)() * DELTA_Y;
 
 
             NS(Particles_set_q0_value)(            p, ii, Q0 );
@@ -488,22 +397,21 @@ void NS(Particles_random_init)( NS(Particles)* SIXTRL_RESTRICT p )
 }
 
 
-int NS(Particles_have_same_structure)(
-    const st_Particles *const SIXTRL_RESTRICT lhs,
-    const st_Particles *const SIXTRL_RESTRICT rhs )
+bool NS(Particles_have_same_structure)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
 {
     return ( ( lhs != 0 ) && ( rhs != 0 ) &&
              ( NS(Particles_get_num_of_particles)( lhs ) ==
-               NS(Particles_get_num_of_particles)( rhs ) ) )
-        ? 1 : 0;
+               NS(Particles_get_num_of_particles)( rhs ) ) );
 }
 
 
-int NS(Particles_map_to_same_memory)(
-    const st_Particles *const SIXTRL_RESTRICT lhs,
-    const st_Particles *const SIXTRL_RESTRICT rhs )
+bool NS(Particles_map_to_same_memory)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
 {
-    int result = 0;
+    bool result = false;
 
     if( NS(Particles_have_same_structure)( lhs, rhs ) )
     {
@@ -549,8 +457,7 @@ int NS(Particles_map_to_same_memory)(
             ( NS(Particles_get_const_at_turn)( lhs ) ==
               NS(Particles_get_const_at_turn)( rhs ) ) &&
             ( NS(Particles_get_const_state)( lhs ) ==
-              NS(Particles_get_const_state)( rhs ) ) )
-        ? 1 : 0;
+              NS(Particles_get_const_state)( rhs ) ) );
     }
 
     return result;
@@ -558,8 +465,8 @@ int NS(Particles_map_to_same_memory)(
 
 
 int NS(Particles_compare_real_values)(
-    const st_Particles *const SIXTRL_RESTRICT lhs,
-    const st_Particles *const SIXTRL_RESTRICT rhs )
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
 {
     int cmp_result = -1;
 
@@ -733,8 +640,8 @@ int NS(Particles_compare_real_values)(
 
 
 int NS(Particles_compare_integer_values)(
-    const st_Particles *const SIXTRL_RESTRICT lhs,
-    const st_Particles *const SIXTRL_RESTRICT rhs )
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    const NS(Particles) *const SIXTRL_PARTICLE_ARGPTR_DEC SIXTRL_RESTRICT rhs )
 {
     int cmp_result = -1;
 
@@ -789,8 +696,8 @@ int NS(Particles_compare_integer_values)(
 }
 
 int NS(Particles_compare_real_values_with_treshold)(
-    const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    const NS(Particles) *const SIXTRL_RESTRICT rhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs,
     NS(particle_real_t) const treshold )
 {
     int cmp_result = -1;
@@ -948,8 +855,8 @@ int NS(Particles_compare_real_values_with_treshold)(
 }
 
 int NS(Particles_compare_values)(
-    const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    const NS(Particles) *const SIXTRL_RESTRICT rhs )
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
 {
     int cmp_result = NS(Particles_compare_real_values)( lhs, rhs );
 
@@ -963,8 +870,8 @@ int NS(Particles_compare_values)(
 
 
 int NS(Particles_compare_values_with_treshold)(
-    const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    const NS(Particles) *const SIXTRL_RESTRICT rhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs,
     NS(particle_real_t) const treshold )
 {
     int cmp_result = NS(Particles_compare_real_values_with_treshold)(
@@ -979,10 +886,10 @@ int NS(Particles_compare_values_with_treshold)(
 }
 
 void NS(Particles_get_max_difference)(
-    NS(Particles)* SIXTRL_RESTRICT max_diff,
-    NS(buffer_size_t)* SIXTRL_RESTRICT max_diff_indices,
-    const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    const NS(Particles) *const SIXTRL_RESTRICT rhs )
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT max_diff,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT max_diff_indices,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
 {
     if( ( max_diff != 0 ) && ( max_diff_indices != 0 ) &&
         ( NS(Particles_have_same_structure)( lhs, rhs ) ) &&
@@ -1155,9 +1062,88 @@ void NS(Particles_get_max_difference)(
     return;
 }
 
+void NS(Particles_print_single)(
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const
+        SIXTRL_RESTRICT particles, NS(buffer_size_t) const index )
+{
+    NS(buffer_size_t) const num_particles =
+        NS(Particles_get_num_of_particles)( particles );
+
+    if( ( fp != SIXTRL_NULLPTR ) && ( particles != SIXTRL_NULLPTR ) &&
+        ( index < num_particles ) )
+    {
+        fprintf( fp, "q0             = %.16f\r\n",
+                 NS(Particles_get_q0_value)( particles, index ) );
+
+        fprintf( fp, "mass0          = %.16f\r\n",
+                 NS(Particles_get_mass0_value)( particles, index ) );
+
+        fprintf( fp, "beta0          = %.16f\r\n",
+                 NS(Particles_get_beta0_value)( particles, index ) );
+
+        fprintf( fp, "gamma0         = %.16f\r\n",
+                 NS(Particles_get_gamma0_value)( particles, index ) );
+
+        fprintf( fp, "p0c            = %.16f\r\n",
+                 NS(Particles_get_p0c_value)( particles, index ) );
+
+        fprintf( fp, "s              = %.16f\r\n",
+                 NS(Particles_get_s_value)( particles, index ) );
+
+        fprintf( fp, "x              = %.16f\r\n",
+                 NS(Particles_get_x_value)( particles, index ) );
+
+        fprintf( fp, "y              = %.16f\r\n",
+                 NS(Particles_get_y_value)( particles, index ) );
+
+        fprintf( fp, "px             = %.16f\r\n",
+                 NS(Particles_get_px_value)( particles, index ) );
+
+        fprintf( fp, "py             = %.16f\r\n",
+                 NS(Particles_get_py_value)( particles, index ) );
+
+        fprintf( fp, "zeta           = %.16f\r\n",
+                 NS(Particles_get_zeta_value)( particles, index ) );
+
+        fprintf( fp, "psigma         = %.16f\r\n",
+                 NS(Particles_get_psigma_value)( particles, index ) );
+
+        fprintf( fp, "delta          = %.16f\r\n",
+                 NS(Particles_get_delta_value)( particles, index ) );
+
+        fprintf( fp, "rpp            = %.16f\r\n",
+                 NS(Particles_get_rpp_value)( particles, index ) );
+
+        fprintf( fp, "rvv            = %.16f\r\n",
+                 NS(Particles_get_rvv_value)( particles, index ) );
+
+        fprintf( fp, "chi            = %.16f\r\n",
+                 NS(Particles_get_chi_value)( particles, index ) );
+
+        fprintf( fp, "charge_ratio   = %.16f\r\n",
+                 NS(Particles_get_charge_ratio_value)( particles, index ) );
+
+        fprintf( fp, "particle_id    = %18ld\r\n",
+                 NS(Particles_get_particle_id_value)( particles, index ) );
+
+        fprintf( fp, "at_elem_id     = %18ld\r\n",
+                 NS(Particles_get_at_element_id_value)( particles, index ) );
+
+        fprintf( fp, "at_turn        = %18ld\r\n",
+                 NS(Particles_get_at_turn_value)( particles, index ) );
+
+        fprintf( fp, "state          = %18ld\r\n\r\n",
+                 NS(Particles_get_state_value)( particles, index ) );
+    }
+
+    return;
+}
+
 void NS(Particles_print)(
-    FILE* SIXTRL_RESTRICT fp,
-    const NS(Particles) *const SIXTRL_RESTRICT particles )
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const
+        SIXTRL_RESTRICT particles )
 {
     NS(buffer_size_t) const num_particles =
         NS(Particles_get_num_of_particles)( particles );
@@ -1173,85 +1159,35 @@ void NS(Particles_print)(
                 fprintf( fp, "particle id    = %8lu\r\n", ii );
             }
 
-            fprintf( fp, "q0             = %.16f\r\n",
-                     NS(Particles_get_q0_value)( particles, ii ) );
-
-            fprintf( fp, "mass0          = %.16f\r\n",
-                     NS(Particles_get_mass0_value)( particles, ii ) );
-
-            fprintf( fp, "beta0          = %.16f\r\n",
-                     NS(Particles_get_beta0_value)( particles, ii ) );
-
-            fprintf( fp, "gamma0         = %.16f\r\n",
-                     NS(Particles_get_gamma0_value)( particles, ii ) );
-
-            fprintf( fp, "p0c            = %.16f\r\n",
-                     NS(Particles_get_p0c_value)( particles, ii ) );
-
-            fprintf( fp, "s              = %.16f\r\n",
-                     NS(Particles_get_s_value)( particles, ii ) );
-
-            fprintf( fp, "x              = %.16f\r\n",
-                     NS(Particles_get_x_value)( particles, ii ) );
-
-            fprintf( fp, "y              = %.16f\r\n",
-                     NS(Particles_get_y_value)( particles, ii ) );
-
-            fprintf( fp, "px             = %.16f\r\n",
-                     NS(Particles_get_px_value)( particles, ii ) );
-
-            fprintf( fp, "py             = %.16f\r\n",
-                     NS(Particles_get_py_value)( particles, ii ) );
-
-            fprintf( fp, "zeta           = %.16f\r\n",
-                     NS(Particles_get_zeta_value)( particles, ii ) );
-
-            fprintf( fp, "psigma         = %.16f\r\n",
-                     NS(Particles_get_psigma_value)( particles, ii ) );
-
-            fprintf( fp, "delta          = %.16f\r\n",
-                     NS(Particles_get_delta_value)( particles, ii ) );
-
-            fprintf( fp, "rpp            = %.16f\r\n",
-                     NS(Particles_get_rpp_value)( particles, ii ) );
-
-            fprintf( fp, "rvv            = %.16f\r\n",
-                     NS(Particles_get_rvv_value)( particles, ii ) );
-
-            fprintf( fp, "chi            = %.16f\r\n",
-                     NS(Particles_get_chi_value)( particles, ii ) );
-
-            fprintf( fp, "charge_ratio   = %.16f\r\n",
-                     NS(Particles_get_charge_ratio_value)( particles, ii ) );
-
-            fprintf( fp, "particle_id    = %18ld\r\n",
-                     NS(Particles_get_particle_id_value)( particles, ii ) );
-
-            fprintf( fp, "at_elem_id     = %18ld\r\n",
-                     NS(Particles_get_at_element_id_value)( particles, ii ) );
-
-            fprintf( fp, "at_turn        = %18ld\r\n",
-                     NS(Particles_get_at_turn_value)( particles, ii ) );
-
-            fprintf( fp, "state          = %18ld\r\n\r\n",
-                     NS(Particles_get_state_value)( particles, ii ) );
+            NS(Particles_print_single)( fp, particles, ii );
         }
     }
 
     return;
 }
 
+void NS(Particles_print_out_single)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const
+        SIXTRL_RESTRICT particles,
+    NS(buffer_size_t) const index )
+{
+    NS(Particles_print_single)( stdout, particles, index );
+    return;
+}
+
 void NS(Particles_print_out)(
-    const NS(Particles) *const SIXTRL_RESTRICT particles )
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const
+        SIXTRL_RESTRICT particles )
 {
     NS(Particles_print)( stdout, particles );
     return;
 }
 
 void NS(Particles_print_max_diff)(
-    FILE* SIXTRL_RESTRICT fp,
-    const NS(Particles) *const SIXTRL_RESTRICT max_diff,
-    NS(buffer_size_t) const* max_diff_indices )
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const
+        SIXTRL_RESTRICT max_diff,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* max_diff_indices )
 {
     NS(buffer_size_t) const num_particles =
         NS(Particles_get_num_of_particles)( max_diff );
@@ -1379,8 +1315,9 @@ void NS(Particles_print_max_diff)(
 }
 
 void NS(Particles_print_max_diff_out )(
-    const NS(Particles) *const SIXTRL_RESTRICT max_diff,
-    NS(buffer_size_t) const* max_diff_indices )
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const
+        SIXTRL_RESTRICT max_diff,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* max_diff_indices )
 {
     NS(Particles_print_max_diff)( stdout, max_diff, max_diff_indices );
     return;
@@ -1388,20 +1325,21 @@ void NS(Particles_print_max_diff_out )(
 
 /* ------------------------------------------------------------------------- */
 
-int NS(Particles_buffers_map_to_same_memory)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer )
+bool NS(Particles_buffer_have_same_structure)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer
+    )
 {
-    int maps_to_same_memory = 0;
+    bool have_same_structure = false;
 
     if( ( lhs_buffer != SIXTRL_NULLPTR ) &&
         ( rhs_buffer != SIXTRL_NULLPTR ) &&
         ( NS(Buffer_get_num_of_objects)( lhs_buffer ) ==
           NS(Buffer_get_num_of_objects)( rhs_buffer ) ) )
     {
-        typedef NS(Object) info_t;
-        typedef SIXTRL_DATAPTR_DEC info_t        const* ptr_to_info_t;
-        typedef SIXTRL_DATAPTR_DEC NS(Particles) const* ptr_to_particles_t;
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*  ptr_to_info_t;
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+                ptr_to_particles_t;
 
         ptr_to_info_t lhs_it = ( ptr_to_info_t )( uintptr_t
             )NS(Buffer_get_objects_begin_addr)( lhs_buffer );
@@ -1417,7 +1355,63 @@ int NS(Particles_buffers_map_to_same_memory)(
             ( ( lhs_it == SIXTRL_NULLPTR ) && ( lhs_end == SIXTRL_NULLPTR ) &&
               ( rhs_it == SIXTRL_NULLPTR ) ) )
         {
-            maps_to_same_memory = 1;
+            have_same_structure = true;
+
+            for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it )
+            {
+                ptr_to_particles_t lhs_particles = ( ptr_to_particles_t )(
+                    uintptr_t )NS(BufferIndex_get_const_particles)( lhs_it );
+
+                ptr_to_particles_t rhs_particles = ( ptr_to_particles_t )(
+                    uintptr_t )NS(BufferIndex_get_const_particles)( rhs_it );
+
+                if( ( lhs_particles == SIXTRL_NULLPTR ) ||
+                    ( rhs_particles == SIXTRL_NULLPTR ) ||
+                    ( !NS(Particles_have_same_structure)(
+                        lhs_particles, rhs_particles ) ) )
+                {
+                    have_same_structure = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    return have_same_structure;
+}
+
+
+bool NS(Particles_buffers_map_to_same_memory)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer
+    )
+{
+    bool maps_to_same_memory = false;
+
+    if( ( lhs_buffer != SIXTRL_NULLPTR ) &&
+        ( rhs_buffer != SIXTRL_NULLPTR ) &&
+        ( NS(Buffer_get_num_of_objects)( lhs_buffer ) ==
+          NS(Buffer_get_num_of_objects)( rhs_buffer ) ) )
+    {
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*  ptr_to_info_t;
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+                ptr_to_particles_t;
+
+        ptr_to_info_t lhs_it = ( ptr_to_info_t )( uintptr_t
+            )NS(Buffer_get_objects_begin_addr)( lhs_buffer );
+
+        ptr_to_info_t lhs_end = ( ptr_to_info_t )( uintptr_t
+            )NS(Buffer_get_objects_end_addr)( lhs_buffer );
+
+        ptr_to_info_t rhs_it  = ( ptr_to_info_t )( uintptr_t
+            )NS(Buffer_get_objects_begin_addr)( rhs_buffer );
+
+        if( ( ( lhs_it != SIXTRL_NULLPTR ) && ( lhs_end != SIXTRL_NULLPTR ) &&
+              ( rhs_it != SIXTRL_NULLPTR ) ) ||
+            ( ( lhs_it == SIXTRL_NULLPTR ) && ( lhs_end == SIXTRL_NULLPTR ) &&
+              ( rhs_it == SIXTRL_NULLPTR ) ) )
+        {
+            maps_to_same_memory = true;
 
             for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it )
             {
@@ -1432,7 +1426,7 @@ int NS(Particles_buffers_map_to_same_memory)(
                     ( !NS(Particles_map_to_same_memory)(
                         lhs_particles, rhs_particles ) ) )
                 {
-                    maps_to_same_memory = 0;
+                    maps_to_same_memory = false;
                     break;
                 }
             }
@@ -1443,8 +1437,8 @@ int NS(Particles_buffers_map_to_same_memory)(
 }
 
 int NS(Particles_buffers_compare_values)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer )
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer )
 {
     int cmp_result = -1;
 
@@ -1453,9 +1447,9 @@ int NS(Particles_buffers_compare_values)(
         ( NS(Buffer_get_num_of_objects)( lhs_buffer ) ==
           NS(Buffer_get_num_of_objects)( rhs_buffer ) ) )
     {
-        typedef NS(Object) info_t;
-        typedef SIXTRL_DATAPTR_DEC info_t        const* ptr_to_info_t;
-        typedef SIXTRL_DATAPTR_DEC NS(Particles) const* ptr_to_particles_t;
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*  ptr_to_info_t;
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+            ptr_to_particles_t;
 
         ptr_to_info_t lhs_it = ( ptr_to_info_t )( uintptr_t
             )NS(Buffer_get_objects_begin_addr)( lhs_buffer );
@@ -1493,8 +1487,8 @@ int NS(Particles_buffers_compare_values)(
 }
 
 int NS(Particles_buffers_compare_values_with_treshold)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer,
     NS(particle_real_t) const treshold )
 {
     int cmp_result = -1;
@@ -1504,9 +1498,9 @@ int NS(Particles_buffers_compare_values_with_treshold)(
         ( NS(Buffer_get_num_of_objects)( lhs_buffer ) ==
           NS(Buffer_get_num_of_objects)( rhs_buffer ) ) )
     {
-        typedef NS(Object) info_t;
-        typedef SIXTRL_DATAPTR_DEC info_t        const* ptr_to_info_t;
-        typedef SIXTRL_DATAPTR_DEC NS(Particles) const* ptr_to_particles_t;
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*  ptr_to_info_t;
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+            ptr_to_particles_t;
 
         ptr_to_info_t lhs_it = ( ptr_to_info_t )( uintptr_t
             )NS(Buffer_get_objects_begin_addr)( lhs_buffer );
@@ -1544,10 +1538,11 @@ int NS(Particles_buffers_compare_values_with_treshold)(
 }
 
 void NS(Particles_buffers_get_max_difference)(
-    SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT max_diff_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT max_diff_buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT max_diff_indices,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs_buffer )
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT lhs_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT
+        rhs_buffer )
 {
     if( ( lhs_buffer      != SIXTRL_NULLPTR ) &&
         ( rhs_buffer      != SIXTRL_NULLPTR ) &&
@@ -1557,11 +1552,15 @@ void NS(Particles_buffers_get_max_difference)(
         ( NS(Buffer_get_num_of_objects)( max_diff_buffer ) ==
           NS(Buffer_get_num_of_objects)( lhs_buffer ) ) )
     {
-        typedef NS(Object) info_t;
-        typedef SIXTRL_DATAPTR_DEC info_t*              ptr_to_info_t;
-        typedef SIXTRL_DATAPTR_DEC info_t const*        ptr_to_const_info_t;
-        typedef SIXTRL_DATAPTR_DEC NS(Particles)*       ptr_to_particles_t;
-        typedef SIXTRL_DATAPTR_DEC NS(Particles) const* ptr_to_const_particles_t;
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* ptr_to_info_t;
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*
+                ptr_to_const_info_t;
+
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)*
+                ptr_to_particles_t;
+
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+                ptr_to_const_particles_t;
 
         ptr_to_const_info_t lhs_it  = ( ptr_to_const_info_t )( uintptr_t
             )NS(Buffer_get_objects_begin_addr)( lhs_buffer );
@@ -1605,14 +1604,17 @@ void NS(Particles_buffers_get_max_difference)(
 }
 
 void NS(Particles_buffer_print)(
-    FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particles_buffer )
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT particles_buffer )
 {
     if( ( fp != SIXTRL_NULLPTR ) && ( particles_buffer != SIXTRL_NULLPTR ) )
     {
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_to_info_t;
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+                ptr_to_particles_t;
+
         typedef NS(buffer_size_t) buf_size_t;
-        typedef SIXTRL_DATAPTR_DEC NS(Object)    const* ptr_to_info_t;
-        typedef SIXTRL_DATAPTR_DEC NS(Particles) const* ptr_to_particles_t;
 
         buf_size_t const nn = NS(Buffer_get_num_of_objects)( particles_buffer );
 
@@ -1648,15 +1650,17 @@ void NS(Particles_buffer_print)(
 }
 
 void NS(Particles_buffer_print_max_diff)(
-    FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT max_diff_buffer,
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT max_diff_buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* max_diff_indices )
 {
     if( ( fp != SIXTRL_NULLPTR ) && ( max_diff_buffer != SIXTRL_NULLPTR ) )
     {
         typedef NS(buffer_size_t) buf_size_t;
-        typedef SIXTRL_DATAPTR_DEC NS(Object)    const* ptr_to_info_t;
-        typedef SIXTRL_DATAPTR_DEC NS(Particles) const* ptr_to_particles_t;
+        typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_to_info_t;
+        typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+                ptr_to_particles_t;
 
         buf_size_t const nn = NS(Buffer_get_num_of_objects)( max_diff_buffer );
 
@@ -1698,14 +1702,16 @@ void NS(Particles_buffer_print_max_diff)(
 }
 
 void NS(Particles_buffer_print_out)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT particles_buffer )
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT particles_buffer )
 {
     NS(Particles_buffer_print)( stdout, particles_buffer );
     return;
 }
 
 void NS(Particles_buffer_print_max_diff_out)(
-    SIXTRL_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT max_diff_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer)
+        *const SIXTRL_RESTRICT max_diff_buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* max_diff_indices )
 {
     NS(Particles_buffer_print_max_diff)(

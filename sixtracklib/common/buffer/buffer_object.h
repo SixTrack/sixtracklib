@@ -55,6 +55,10 @@ SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_size)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob,
     NS(buffer_size_t) const size );
 
+SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_size_priv)(
+    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob,
+    NS(buffer_size_t) const size );
+
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char const*
 NS(Object_get_const_begin_ptr)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC const
     NS(Object) *const SIXTRL_RESTRICT ob );
@@ -65,6 +69,27 @@ NS(Object_get_begin_ptr)(
 
 SIXTRL_FN SIXTRL_STATIC void NS(Object_set_begin_ptr)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob,
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin_ptr );
+
+/* ========================================================================= */
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(Object)*
+NS(Object_preset_priv)( SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob );
+
+SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_size_priv)(
+    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
+    NS(buffer_size_t) const obj_size );
+
+SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_begin_addr_priv)(
+    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
+    NS(buffer_addr_t) const address );
+
+SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_type_id_priv)(
+    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
+    NS(object_type_id_t) const type_id );
+
+SIXTRL_FN SIXTRL_STATIC void NS(Object_set_begin_ptr_priv)(
+    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob,
     SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin_ptr );
 
 /* ========================================================================= */
@@ -214,6 +239,59 @@ SIXTRL_INLINE void NS(Object_set_begin_ptr)(
     NS(Object_set_begin_addr)( object, ( address_t )( uintptr_t )begin_ptr );
     return;
 }
+
+/* ------------------------------------------------------------------------ */
+
+SIXTRL_INLINE SIXTRL_ARGPTR_DEC NS(Object)*
+NS(Object_preset_priv)( SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object )
+{
+    if( object != SIXTRL_NULLPTR )
+    {
+        NS(Object_set_begin_addr_priv)( object, 0u );
+        NS(Object_set_type_id_priv)( object, 0u );
+        NS(Object_set_size_priv)( object, 0u );
+    }
+
+    return object;
+}
+
+SIXTRL_INLINE  void NS(Object_set_type_id_priv)(
+    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
+    NS(object_type_id_t) const type_id )
+{
+    if( object != SIXTRL_NULLPTR ) object->type_id = type_id;
+    return;
+}
+
+SIXTRL_INLINE  void NS(Object_set_size_priv)(
+    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
+    NS(buffer_size_t) const obj_size )
+{
+    if( object != SIXTRL_NULLPTR ) object->size = obj_size;
+    return;
+}
+
+SIXTRL_INLINE  void NS(Object_set_begin_addr_priv)(
+    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
+    NS(buffer_addr_t) const address )
+{
+    if( object != SIXTRL_NULLPTR ) object->begin_addr = address;
+    return;
+}
+
+SIXTRL_INLINE void NS(Object_set_begin_ptr_priv)(
+    SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
+    SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin_ptr )
+{
+    typedef NS(buffer_addr_t) address_t;
+    NS(Object_set_begin_addr_priv)( object,
+        ( address_t )( uintptr_t )begin_ptr );
+
+    return;
+}
+
+/* ------------------------------------------------------------------------ */
+
 
 SIXTRL_INLINE void NS(Object_print_slots)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj,

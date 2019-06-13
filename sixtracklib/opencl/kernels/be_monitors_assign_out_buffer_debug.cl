@@ -11,6 +11,7 @@
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/be_monitor/be_monitor.h"
     #include "sixtracklib/common/be_monitor/output_buffer.h"
+    #include "sixtracklib/common/output/output_buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #pragma OPENCL_EXTENSION cl_khr_int32_extended_atomics
@@ -18,6 +19,7 @@
 __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
+    SIXTRL_INT64_T  const min_turn_id,
     SIXTRL_UINT64_T const out_particles_block_offset,
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag );
 
@@ -30,6 +32,7 @@ __kernel void NS(BeamMonitor_clear_all_line_obj_debug_opencl)(
 __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
+    SIXTRL_INT64_T  const min_turn_id,
     SIXTRL_UINT64_T const out_particles_block_offset,
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_INT32_T* SIXTRL_RESTRICT ptr_success_flag )
 {
@@ -38,34 +41,41 @@ __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_debug_opencl)(
 
     SIXTRL_INT32_T success_flag = ( SIXTRL_INT32_T )-1;
 
+    size_t const global_id   = get_global_id( 0 );
+    size_t const global_size = get_global_size( 0 );
+
     if( ( !NS(ManagedBuffer_needs_remapping)( beam_elements_buf, slot_size ) ) &&
         ( !NS(ManagedBuffer_needs_remapping)( out_buffer, slot_size ) ) &&
         (  NS(ManagedBuffer_get_num_objects)( out_buffer, slot_size ) >=
-            out_particles_block_offset ) )
+            out_particles_block_offset ) &&
+        ( min_turn_id >= ( SIXTRL_INT64_T )0 ) )
     {
         size_t const gid_to_assign_out_buffer = ( size_t )0u;
-        size_t const global_id = get_global_id( 0 );
-
         success_flag = ( SIXTRL_INT32_T )0u;
 
         if( global_id == gid_to_assign_out_buffer )
         {
-            success_flag = NS(BeamMonitor_assign_managed_particles_out_buffer)(
-                beam_elements_buf, out_buffer, out_particles_block_offset, slot_size );
+            success_flag = NS(BeamMonitor_assign_managed_output_buffer)(
+                beam_elements_buf, out_buffer, min_turn_id,
+                out_particles_block_offset, slot_size );
         }
     }
     else if( NS(ManagedBuffer_needs_remapping)( beam_elements_buf, slot_size ) )
     {
-        success_flag = ( SIXTRL_INT32_T )-2;
+        success_flag |= ( SIXTRL_INT32_T )-2;
     }
     else if( NS(ManagedBuffer_needs_remapping)( out_buffer, slot_size ) )
     {
-        success_flag = ( SIXTRL_INT32_T )-4;
+        success_flag |= ( SIXTRL_INT32_T )-4;
     }
     else if( NS(ManagedBuffer_get_num_objects)( out_buffer, slot_size ) >=
             out_particles_block_offset )
     {
-        success_flag = ( SIXTRL_INT32_T )-8;
+        success_flag |= ( SIXTRL_INT32_T )-8;
+    }
+    else if( min_turn_id < ( SIXTRL_INT64_T )0 )
+    {
+        success_flag |= ( SIXTRL_INT32_T )-16;
     }
 
     if( ( success_flag != 0 ) && ( ptr_success_flag != SIXTRL_NULLPTR ) )

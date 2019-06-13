@@ -19,10 +19,7 @@
 #include "sixtracklib/common/blocks.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/particles.h"
-
-#define __CL_ENABLE_EXCEPTIONS
-#include <CL/cl.hpp>
-
+#include "sixtracklib/opencl/cl.h"
 
 int main(int argc, char** argv)
 {
@@ -278,7 +275,7 @@ queue.enqueueWriteBuffer( B, CL_TRUE, 0, st_Blocks_get_total_num_bytes( &beam_el
    ////////////////////////// Particles ////////////////////////////////
     st_block_size_t const NUM_PARTICLE_BLOCKS     = 1u;
     st_block_size_t const PARTICLES_DATA_CAPACITY = 1048576u*1000*4; //  ~(4 GB)
-    st_block_size_t const NUM_PARTICLES           = atoi(argv[1]); 
+    st_block_size_t const NUM_PARTICLES           = atoi(argv[1]);
 
     st_Blocks particles_buffer;
     st_Blocks_preset( &particles_buffer );
@@ -419,9 +416,9 @@ queue.enqueueWriteBuffer( B, CL_TRUE, 0, st_Blocks_get_total_num_bytes( &beam_el
             track_align_particle.setArg(4,NUM_TURNS);
 
 
-#if 1   
+#if 1
     // SIXTRL_UINT64_T beam_index = 500;
-		clkbegin = rtclock();    
+		clkbegin = rtclock();
 
     for(size_t nt=0; nt < NUM_TURNS; ++nt) {
     st_block_size_t beam_index = 0;
@@ -437,7 +434,7 @@ queue.enqueueWriteBuffer( B, CL_TRUE, 0, st_Blocks_get_total_num_bytes( &beam_el
 
     cl::Event event;
 
-    st_BlockInfo const* belem_it = belem_it_begin; 
+    st_BlockInfo const* belem_it = belem_it_begin;
     st_BlockInfo const* belem_end = belem_it_begin + 250;
     for( ; belem_it != belem_end ; ++belem_it, ++beam_index )
     {
@@ -452,7 +449,7 @@ queue.enqueueWriteBuffer( B, CL_TRUE, 0, st_Blocks_get_total_num_bytes( &beam_el
 
      }
 
-    belem_it = belem_it_begin + 250; 
+    belem_it = belem_it_begin + 250;
     belem_end = belem_it_begin + 500;
     for( ; belem_it != belem_end ; ++belem_it, ++beam_index )
     {
@@ -463,9 +460,9 @@ queue.enqueueWriteBuffer( B, CL_TRUE, 0, st_Blocks_get_total_num_bytes( &beam_el
                 track_drift_exact_particle, cl::NullRange, cl::NDRange( numThreads ),
                 cl::NDRange(blockSize ), nullptr, &event);
             queue.flush();
-        } 
+        }
 
-    belem_it = belem_it_begin + 500; 
+    belem_it = belem_it_begin + 500;
     belem_end = belem_it_begin + 750;
     for( ; belem_it != belem_end ; ++belem_it, ++beam_index )
     {
@@ -477,7 +474,7 @@ queue.enqueueWriteBuffer( B, CL_TRUE, 0, st_Blocks_get_total_num_bytes( &beam_el
             queue.flush();
      }
 
-    belem_it = belem_it_begin + 750; 
+    belem_it = belem_it_begin + 750;
     belem_end = belem_end_finish;
     for( ; belem_it != belem_end ; ++belem_it, ++beam_index )
     {

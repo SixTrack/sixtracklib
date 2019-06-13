@@ -1,6 +1,10 @@
 #ifndef SIXTRACKLIB_COMMON_BEAM_ELEMENTS_H__
 #define SIXTRACKLIB_COMMON_BEAM_ELEMENTS_H__
 
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+    #include <stdbool.h>
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
@@ -12,6 +16,9 @@
     #include "sixtracklib/common/be_srotation/be_srotation.h"
     #include "sixtracklib/common/be_xyshift/be_xyshift.h"
     #include "sixtracklib/common/be_monitor/be_monitor.h"
+    #include "sixtracklib/common/be_limit/be_limit_rect.h"
+    #include "sixtracklib/common/be_limit/be_limit_ellipse.h"
+    #include "sixtracklib/common/be_dipedge/be_dipedge.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -21,32 +28,36 @@ extern "C" {
 
 /* ========================================================================= */
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_calc_buffer_parameters_for_object)(
+SIXTRL_STATIC SIXTRL_FN bool NS(BeamElements_is_beam_element_obj)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj );
+
+SIXTRL_STATIC SIXTRL_FN bool
+NS(BeamElements_objects_range_are_all_beam_elements)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT obj_it,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT obj_end );
+
+SIXTRL_STATIC SIXTRL_FN bool
+NS(BeamElements_managed_buffer_is_beam_elements_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const slot_size );
+
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_calc_buffer_parameters_for_object)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT num_objects,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT num_slots,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT num_dataptrs,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_copy_object)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_copy_object)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT destination,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT src );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_compare_objects)(
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT rhs );
-
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_compare_objects_with_treshold)(
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold );
-
-SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_object)(
+SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_object)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT obj );
 
 /* ------------------------------------------------------------------------ */
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_calc_buffer_parameters_for_line)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_calc_buffer_parameters_for_line)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT num_objects,
@@ -54,46 +65,38 @@ SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_calc_buffer_parameters_for_line)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT num_dataptrs,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_copy_line)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_copy_line)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT destination_begin );
-
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_compare_lines)(
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT rhs_begin );
-
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_compare_lines_with_treshold)(
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT rhs_begin,
-    SIXTRL_REAL_T const treshold );
 
 /* ========================================================================= */
 
 #if !defined( _GPUCODE )
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_add_single_new_to_buffer)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_add_single_new_to_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_copy_single_to_buffer)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_copy_single_to_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_add_new_to_buffer)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_add_new_to_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamElements_copy_to_buffer)(
+SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_copy_to_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end );
 
-SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_buffer)(
+SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
+
+SIXTRL_STATIC SIXTRL_FN bool NS(BeamElements_is_beam_elements_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -125,6 +128,79 @@ SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_buffer)(
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
+
+SIXTRL_INLINE bool NS(BeamElements_is_beam_element_obj)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj )
+{
+    bool is_beam_element = false;
+
+    if( obj!= SIXTRL_NULLPTR )
+    {
+        typedef NS(object_type_id_t) type_id_t;
+        type_id_t const type_id = NS(Object_get_type_id)( obj );
+
+        switch( type_id )
+        {
+            case NS(OBJECT_TYPE_DRIFT):
+            case NS(OBJECT_TYPE_DRIFT_EXACT):
+            case NS(OBJECT_TYPE_MULTIPOLE):
+            case NS(OBJECT_TYPE_XYSHIFT):
+            case NS(OBJECT_TYPE_SROTATION):
+            case NS(OBJECT_TYPE_CAVITY):
+            case NS(OBJECT_TYPE_BEAM_MONITOR):
+            case NS(OBJECT_TYPE_LIMIT_RECT):
+            case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
+            case NS(OBJECT_TYPE_DIPEDGE):
+            {
+                is_beam_element = true;
+                break;
+            }
+
+            #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
+
+            case NS(OBJECT_TYPE_BEAM_BEAM_4D):
+            case NS(OBJECT_TYPE_BEAM_BEAM_6D):
+            {
+                is_beam_element = true;
+                break;
+            }
+
+            #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+
+            default:
+            {
+                is_beam_element = false;
+            }
+        };
+    }
+
+    return is_beam_element;
+}
+
+SIXTRL_INLINE bool NS(BeamElements_objects_range_are_all_beam_elements)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT obj_it,
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT obj_end )
+{
+    bool are_all_beam_elements = false;
+
+    if( ( obj_it != SIXTRL_NULLPTR ) && ( obj_end != SIXTRL_NULLPTR ) &&
+        ( ( ( uintptr_t )obj_it ) <= ( uintptr_t )obj_end ) )
+    {
+        /* NOTE: An empty range evaluates as true, this is to allow use
+         * in context of NS(Track_*particle*_line*) to finish empty/zero
+         * length lines*/
+
+        are_all_beam_elements = true;
+
+        while( ( are_all_beam_elements ) && ( obj_it != obj_end ) )
+        {
+            are_all_beam_elements = NS(BeamElements_is_beam_element_obj)(
+                obj_it++ );
+        }
+    }
+
+    return are_all_beam_elements;
+}
 
 SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj,
@@ -304,6 +380,66 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
                 break;
             }
 
+            case NS(OBJECT_TYPE_LIMIT_RECT):
+            {
+                typedef NS(LimitRect) beam_element_t;
+                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                ++requ_num_objects;
+
+                requ_num_slots =
+                NS(LimitRect_get_required_num_slots_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
+
+                requ_num_dataptrs =
+                NS(LimitRect_get_required_num_dataptrs_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
+
+                break;
+            }
+            
+            case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
+            {
+                typedef NS(LimitEllipse) beam_element_t;
+                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                ++requ_num_objects;
+
+                requ_num_slots =
+                NS(LimitEllipse_get_required_num_slots_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
+
+                requ_num_dataptrs =
+                NS(LimitEllipse_get_required_num_dataptrs_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
+
+                break;
+            }
+            
+            case NS(OBJECT_TYPE_DIPEDGE):
+            {
+                typedef NS(DipoleEdge) beam_element_t;
+                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                ++requ_num_objects;
+
+                requ_num_slots =
+                NS(DipoleEdge_get_required_num_slots_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
+
+                requ_num_dataptrs =
+                NS(DipoleEdge_get_required_num_dataptrs_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
+
+                break;
+            }
+
             default:
             {
                 success = -1;
@@ -478,6 +614,45 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
                     break;
                 }
 
+                case NS(OBJECT_TYPE_LIMIT_RECT):
+                {
+                    typedef NS(LimitRect) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_dest_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_src_t;
+
+                    success = NS(LimitRect_copy)(
+                        ( ptr_dest_t )( uintptr_t )dest_addr,
+                        ( ptr_src_t  )( uintptr_t )src_addr );
+
+                    break;
+                }
+                
+                case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
+                {
+                    typedef NS(LimitEllipse) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_dest_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_src_t;
+
+                    success = NS(LimitEllipse_copy)(
+                        ( ptr_dest_t )( uintptr_t )dest_addr,
+                        ( ptr_src_t  )( uintptr_t )src_addr );
+
+                    break;
+                }
+                
+                case NS(OBJECT_TYPE_DIPEDGE):
+                {
+                    typedef NS(DipoleEdge) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_dest_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_src_t;
+
+                    success = NS(DipoleEdge_copy)(
+                        ( ptr_dest_t )( uintptr_t )dest_addr,
+                        ( ptr_src_t  )( uintptr_t )src_addr );
+
+                    break;
+                }
+
                 default:
                 {
                     success = -1;
@@ -489,337 +664,7 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
     return success;
 }
 
-SIXTRL_INLINE int NS(BeamElements_compare_objects)(
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT rhs )
-{
-    int compare_value = -1;
-
-    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
-    {
-        typedef NS(buffer_addr_t)       address_t;
-        typedef NS(object_type_id_t)    type_id_t;
-
-        type_id_t const lhs_type_id = NS(Object_get_type_id)( lhs );
-
-        type_id_t const rhs_type_id = NS(Object_get_type_id)( rhs );
-
-        if( lhs_type_id == rhs_type_id )
-        {
-            address_t const lhs_addr = NS(Object_get_begin_addr)( lhs );
-            address_t const rhs_addr = NS(Object_get_begin_addr)( rhs );
-
-            if( ( lhs_addr != ( address_t)0u ) &&
-                ( rhs_addr != ( address_t)0u ) && ( lhs_addr != rhs_addr ) )
-            {
-                switch( lhs_type_id )
-                {
-                    case NS(OBJECT_TYPE_DRIFT):
-                    {
-                        typedef NS(Drift)                           belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        compare_value = NS(Drift_compare_values)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_DRIFT_EXACT):
-                    {
-                        typedef NS(DriftExact)                       belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const*  ptr_belem_t;
-
-                        compare_value = NS(DriftExact_compare_values)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_MULTIPOLE):
-                    {
-                        typedef NS(MultiPole)                       belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        compare_value = NS(MultiPole_compare_values)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_XYSHIFT):
-                    {
-                        typedef NS(XYShift)                          belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const*  ptr_belem_t;
-
-                        compare_value = NS(XYShift_compare_values)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_SROTATION):
-                    {
-                        typedef NS(SRotation)                        belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const*  ptr_belem_t;
-
-                        compare_value = NS(SRotation_compare_values)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_CAVITY):
-                    {
-                        typedef NS(Cavity)                           belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const*  ptr_belem_t;
-
-                        compare_value = NS(Cavity_compare_values)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr );
-
-                        break;
-                    }
-
-                    #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-
-                    case NS(OBJECT_TYPE_BEAM_BEAM_4D):
-                    {
-                        typedef NS(BeamBeam4D)                      belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        compare_value = NS(BeamBeam4D_compare_values)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_BEAM_BEAM_6D):
-                    {
-                        typedef NS(BeamBeam6D)                      belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        compare_value = NS(BeamBeam6D_compare_values)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr );
-
-                        break;
-                    }
-
-                    #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
-
-                    case NS(OBJECT_TYPE_BEAM_MONITOR):
-                    {
-                        typedef NS(BeamMonitor)                      belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const*  ptr_belem_t;
-
-                        compare_value = NS(BeamMonitor_compare_values)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr );
-
-                        break;
-                    }
-
-                    default:
-                    {
-                        compare_value = -1;
-                    }
-                };
-            }
-            else if( lhs_addr != ( address_t )0u )
-            {
-                compare_value = ( rhs_addr != lhs_addr ) ? +1 : 0;
-            }
-            else if( rhs_addr != ( address_t )0u )
-            {
-                compare_value = ( rhs_addr != lhs_addr ) ? -1 : 0;
-            }
-        }
-        else if( lhs_type_id > rhs_type_id )
-        {
-            compare_value = +1;
-        }
-    }
-
-    return compare_value;
-}
-
-SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold )
-{
-    int compare_value = -1;
-
-    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
-    {
-        typedef NS(buffer_addr_t)       address_t;
-        typedef NS(object_type_id_t)    type_id_t;
-
-        type_id_t const lhs_type_id = NS(Object_get_type_id)( lhs );
-
-        type_id_t const rhs_type_id = NS(Object_get_type_id)( rhs );
-
-        if( lhs_type_id == rhs_type_id )
-        {
-            address_t const lhs_addr = NS(Object_get_begin_addr)( lhs );
-            address_t const rhs_addr = NS(Object_get_begin_addr)( rhs );
-
-            if( ( lhs_addr != ( address_t)0u ) &&
-                ( rhs_addr != ( address_t)0u ) && ( lhs_addr != rhs_addr ) )
-            {
-                switch( lhs_type_id )
-                {
-                    case NS(OBJECT_TYPE_DRIFT):
-                    {
-                        typedef NS(Drift)                            belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const*  ptr_belem_t;
-
-                        compare_value = NS(Drift_compare_values_with_treshold)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_DRIFT_EXACT):
-                    {
-                        typedef NS(DriftExact)                      belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        compare_value = NS(DriftExact_compare_values_with_treshold)(
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            treshold  );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_MULTIPOLE):
-                    {
-                        typedef NS(MultiPole)                       belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        compare_value = NS(MultiPole_compare_values_with_treshold)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold  );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_XYSHIFT):
-                    {
-                        typedef NS(XYShift)                         belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        compare_value = NS(XYShift_compare_values_with_treshold)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold  );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_SROTATION):
-                    {
-                        typedef NS(SRotation)                       belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        compare_value = NS(SRotation_compare_values_with_treshold)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold  );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_CAVITY):
-                    {
-                        typedef NS(Cavity)                          belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        compare_value = NS(Cavity_compare_values_with_treshold)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold  );
-
-                        break;
-                    }
-
-                    #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-
-                    case NS(OBJECT_TYPE_BEAM_BEAM_4D):
-                    {
-                        typedef NS(BeamBeam4D)                      belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        compare_value = NS(BeamBeam4D_compare_values_with_treshold)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr, treshold );
-
-                        break;
-                    }
-
-                    case NS(OBJECT_TYPE_BEAM_BEAM_6D):
-                    {
-                        typedef NS(BeamBeam6D)                      belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        compare_value = NS(BeamBeam6D_compare_values_with_treshold)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr, treshold );
-
-                        break;
-                    }
-
-                    #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
-
-                    case NS(OBJECT_TYPE_BEAM_MONITOR):
-                    {
-                        typedef NS(BeamMonitor)                          belem_t;
-                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
-
-                        compare_value = NS(BeamMonitor_compare_values_with_treshold)(
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold  );
-
-                        break;
-                    }
-
-                    default:
-                    {
-                        compare_value = -1;
-                    }
-                };
-            }
-            else if( lhs_addr != ( address_t )0u )
-            {
-                compare_value = ( rhs_addr != lhs_addr ) ? +1 : 0;
-            }
-            else if( rhs_addr != ( address_t )0u )
-            {
-                compare_value = ( rhs_addr != lhs_addr ) ? -1 : 0;
-            }
-        }
-        else if( lhs_type_id > rhs_type_id )
-        {
-            compare_value = +1;
-        }
-    }
-
-    return compare_value;
-}
-
-SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_object)(
+SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_object)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT obj )
 {
     if( obj != SIXTRL_NULLPTR )
@@ -912,6 +757,34 @@ SIXTRL_FN SIXTRL_STATIC void NS(BeamElements_clear_object)(
                     break;
                 }
 
+                case NS(OBJECT_TYPE_LIMIT_RECT):
+                {
+                    typedef NS(LimitRect) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(LimitRect_clear)( 
+                        ( ptr_belem_t )( uintptr_t )obj_addr );
+                    
+                    break;
+                }
+                
+                case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
+                {
+                    typedef NS(LimitEllipse) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(LimitEllipse_clear)( 
+                        ( ptr_belem_t )( uintptr_t )obj_addr );
+                    
+                    break;
+                }
+                
+                case NS(OBJECT_TYPE_DIPEDGE):
+                {
+                    typedef NS(DipoleEdge) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(DipoleEdge_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
                 default: {} /* To satisfy compilers that complain if no
                                default section is available */
             };
@@ -980,60 +853,6 @@ SIXTRL_INLINE int NS(BeamElements_copy_line)(
     }
 
     return success;
-}
-
-SIXTRL_INLINE int NS(BeamElements_compare_lines)(
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT lhs_it,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT lhs_end,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT rhs_it )
-{
-    int compare_value = -1;
-
-    if( ( lhs_it != SIXTRL_NULLPTR ) && ( lhs_end != SIXTRL_NULLPTR ) &&
-        ( rhs_it != SIXTRL_NULLPTR ) )
-    {
-        SIXTRL_ASSERT( ( ptrdiff_t )( lhs_end - lhs_it) > 0 );
-
-        for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it )
-        {
-            compare_value = NS(BeamElements_compare_objects)( lhs_it, rhs_it );
-
-            if( 0 != compare_value )
-            {
-                break;
-            }
-        }
-    }
-
-    return compare_value;
-}
-
-SIXTRL_INLINE int NS(BeamElements_compare_lines_with_treshold)(
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT lhs_it,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT lhs_end,
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT rhs_it,
-    SIXTRL_REAL_T const treshold )
-{
-    int compare_value = -1;
-
-    if( ( lhs_it != SIXTRL_NULLPTR ) && ( lhs_end != SIXTRL_NULLPTR ) &&
-        ( rhs_it != SIXTRL_NULLPTR ) )
-    {
-        SIXTRL_ASSERT( ( ptrdiff_t )( lhs_end - lhs_it) > 0 );
-
-        for( ; lhs_it != lhs_end ; ++lhs_it, ++rhs_it )
-        {
-            compare_value = NS(BeamElements_compare_objects_with_treshold)(
-                lhs_it, rhs_it, treshold );
-
-            if( 0 != compare_value )
-            {
-                break;
-            }
-        }
-    }
-
-    return compare_value;
 }
 
 /* ========================================================================= */
@@ -1156,6 +975,24 @@ SIXTRL_INLINE int NS(BeamElements_add_single_new_to_buffer)(
             case NS(OBJECT_TYPE_BEAM_MONITOR):
             {
                 success = ( SIXTRL_NULLPTR != NS(BeamMonitor_new)( buffer ) );
+                break;
+            }
+
+            case NS(OBJECT_TYPE_LIMIT_RECT):
+            {
+                success = ( SIXTRL_NULLPTR != NS(LimitRect_new)( buffer ) );
+                break;
+            }
+            
+            case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
+            {
+                success = ( SIXTRL_NULLPTR != NS(LimitEllipse_new)( buffer ) );
+                break;
+            }
+            
+            case NS(OBJECT_TYPE_DIPEDGE):
+            {
+                success = ( SIXTRL_NULLPTR != NS(DipoleEdge_new)( buffer ) );
                 break;
             }
 
@@ -1285,8 +1122,6 @@ SIXTRL_INLINE int NS(BeamElements_copy_single_to_buffer)(
 
                 success = ( SIXTRL_NULLPTR !=
                     NS(BeamBeam6D_add_copy)( buffer, orig ) );
-
-
                 break;
             }
 
@@ -1301,6 +1136,45 @@ SIXTRL_INLINE int NS(BeamElements_copy_single_to_buffer)(
 
                 success = ( SIXTRL_NULLPTR !=
                     NS(BeamMonitor_add_copy)( buffer, orig ) ) ? 0 : -1;
+
+                break;
+            }
+
+            case NS(OBJECT_TYPE_LIMIT_RECT):
+            {
+                typedef  NS(LimitRect) beam_element_t;
+                typedef  SIXTRL_BE_ARGPTR_DEC  beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t orig = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(LimitRect_add_copy)( buffer, orig ) ) ? 0 : -1;
+
+                break;
+            }
+            
+            case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
+            {
+                typedef  NS(LimitEllipse) beam_element_t;
+                typedef  SIXTRL_BE_ARGPTR_DEC  beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t orig = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(LimitEllipse_add_copy)( buffer, orig ) ) ? 0 : -1;
+
+                break;
+            }
+            
+            case NS(OBJECT_TYPE_DIPEDGE):
+            {
+                typedef  NS(DipoleEdge) beam_element_t;
+                typedef  SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t orig = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(DipoleEdge_add_copy)( buffer, orig ) ) ? 0 : -1;
 
                 break;
             }
@@ -1386,6 +1260,27 @@ SIXTRL_INLINE void NS(BeamElements_clear_buffer)(
     }
 
     return;
+}
+
+SIXTRL_INLINE bool NS(BeamElements_is_beam_elements_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(BeamElements_managed_buffer_is_beam_elements_buffer)(
+        ( unsigned char const* )( uintptr_t )NS(Buffer_get_data_begin_addr)(
+            buffer ), NS(Buffer_get_slot_size)( buffer ) );
+}
+
+SIXTRL_INLINE bool NS(BeamElements_managed_buffer_is_beam_elements_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const slot_size )
+{
+    SIXTRL_ASSERT( buffer != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( slot_size > ( NS(buffer_size_t) )0u );
+    SIXTRL_ASSERT( !NS(ManagedBuffer_needs_remapping)( buffer, slot_size ) );
+
+    return NS(BeamElements_objects_range_are_all_beam_elements)(
+        NS(ManagedBuffer_get_const_objects_index_begin)( buffer, slot_size ),
+        NS(ManagedBuffer_get_const_objects_index_end)( buffer, slot_size ) );
 }
 
 #endif /* !defined( _GPUCODE ) */

@@ -168,7 +168,7 @@ TEST( C99_Cuda_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
     }
 
     ::st_Buffer_delete( lhc_particles_buffer );
-    ::st_Buffer_deletE( lhc_beam_elements_buffer );
+    ::st_Buffer_delete( lhc_beam_elements_buffer );
 
     ::st_Buffer_delete( particles_buffer );
     ::st_Buffer_delete( beam_elements_buffer );

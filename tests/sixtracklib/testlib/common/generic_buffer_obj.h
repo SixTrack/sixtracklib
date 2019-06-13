@@ -49,6 +49,28 @@ SIXTRL_FN SIXTRL_STATIC int NS(GenericObj_compare_values_with_treshold)(
 
 #if !defined( _GPUCODE )
 
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(GenericObj_predict_required_num_dataptrs)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_d_values,
+    NS(buffer_size_t) const num_e_values );
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(GenericObj_predict_required_num_slots)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_d_values,
+    NS(buffer_size_t) const num_e_values );
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(GenericObj_predict_required_num_dataptrs_on_managed_buffer)(
+    NS(buffer_size_t) const num_d_values,
+    NS(buffer_size_t) const num_e_values, NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t)
+NS(GenericObj_predict_required_num_slots_on_managed_buffer)(
+    NS(buffer_size_t) const num_d_values,
+    NS(buffer_size_t) const num_e_values, NS(buffer_size_t) const slot_size );
+
 SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj)*
     NS(GenericObj_new)(
     SIXTRL_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
@@ -106,6 +128,66 @@ extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
 #if !defined( _GPUCODE )
+
+SIXTRL_INLINE NS(buffer_size_t) NS(GenericObj_predict_required_num_dataptrs)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_d_vals, NS(buffer_size_t) const num_e_vals )
+{
+    return NS(GenericObj_predict_required_num_dataptrs_on_managed_buffer)(
+        num_d_vals, num_e_vals, NS(Buffer_get_slot_size)( buffer ) );
+}
+
+SIXTRL_INLINE NS(buffer_size_t) NS(GenericObj_predict_required_num_slots)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const num_d_vals, NS(buffer_size_t) const num_e_vals )
+{
+    return NS(GenericObj_predict_required_num_slots_on_managed_buffer)(
+        num_d_vals, num_e_vals, NS(Buffer_get_slot_size)( buffer ) );
+}
+
+
+SIXTRL_INLINE NS(buffer_size_t)
+NS(GenericObj_predict_required_num_dataptrs_on_managed_buffer)(
+    NS(buffer_size_t) const num_d_vals, NS(buffer_size_t) const num_e_vals,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+
+    ( void )num_d_vals;
+    ( void )num_e_vals;
+    ( void )slot_size;
+
+    return ( buf_size_t )2u;
+}
+
+SIXTRL_INLINE NS(buffer_size_t)
+NS(GenericObj_predict_required_num_slots_on_managed_buffer)(
+    NS(buffer_size_t) const num_d_vals, NS(buffer_size_t) const num_e_vals,
+    NS(buffer_size_t) const slot_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+
+    buf_size_t const num_dataptrs =
+        NS(GenericObj_predict_required_num_dataptrs_on_managed_buffer)(
+            num_d_vals, num_e_vals, slot_size );
+
+    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )2u );
+
+    buf_size_t const sizes[]  =
+    {
+        sizeof( SIXTRL_UINT8_T ), sizeof( SIXTRL_REAL_T )
+    };
+
+    buf_size_t const counts[] =
+    {
+        num_d_vals, num_e_vals
+    };
+
+    return NS(ManagedBuffer_predict_required_num_slots)(
+        SIXTRL_NULLPTR, sizeof( NS(GenericObj) ), num_dataptrs,
+            sizes, counts, slot_size );
+}
+
 
 SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(GenericObj)* NS(GenericObj_new)(
     SIXTRL_ARGPTR_DEC struct NS(Buffer)* SIXTRL_RESTRICT buffer,

@@ -7,8 +7,13 @@ setuptools.setup(
     author='SixTrack',
     author_email='sixtrack.contact@cern.ch',
     url='https://github.com/SixTrack/sixtracklib',
-    packages=['pysixtracklib'],
-    package_dir= { 'pysixtracklib': '@CMAKE_CURRENT_SOURCE_DIR@/pysixtracklib' },
+    packages=['pysixtracklib', 'pysixtracklib_test' ],
+    package_dir= { 'pysixtracklib': 'pysixtracklib',
+                   'pysixtracklib_test': 'pysixtracklib_test', },
+    package_data = {
+        'pysixtracklib': [ 'pysixtracklib/@PYTHON_SIXTRACKLIB_SHARED_LIB@' ],
+        'pysixtracklib_test': [ 'pysixtracklib_test/@PYTHON_SIXTRACKLIB_TEST_SHARED_LIB@' ]
+    },
     install_requires=['numpy','cobjects>=0.0.4','pysixtrack>=0.0.0','sixtracktools>=0.0.2']
 )
 

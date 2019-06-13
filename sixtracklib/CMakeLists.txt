@@ -10,6 +10,8 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
+message( STATUS "---- processing sixtracklib/CMakeLists.txt" )
+
 # ------------------------------------------------------------------------------
 
 set( SIXTRACKL_LINK_LIBRARIES  "" CACHE INTERNAL "" FORCE )
@@ -77,9 +79,50 @@ set_target_properties( sixtrack PROPERTIES C_STANDARD 99 )
 set_target_properties( sixtrack PROPERTIES DEBUG_POSTFIX d )
 set_target_properties( sixtrack PROPERTIES C_STANDARD_REQUIRED ON )
 
-target_compile_options( sixtrack
-                        PRIVATE -Wall -Werror -pedantic -ansi
-                        ${SIXTRACKLIB_CPU_FLAGS} )
+target_compile_options( sixtrack PRIVATE 
+    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
+
+# ------------------------------------------------------------------------------
+# provide a copy of the library to the python module if it is defined!
+
+if( SIXTRACKL_ENABLE_PYTHON )
+
+    set( DEST_PATH "${CMAKE_SOURCE_DIR}/python/pysixtracklib" )
+
+    if( EXISTS ${DEST_PATH} )
+
+        get_target_property( OUT_LIB_NAME_PREFIX  sixtrack PREFIX )
+        get_target_property( OUT_LIB_NAME sixtrack LIBRARY_OUTPUT_NAME )
+        get_target_property( OUT_LIB_NAME_POSTFIX sixtrack RELEASE_POSTFIX )
+
+        if(  NOT OUT_LIB_NAME_PREFIX )
+            set( OUT_LIB_NAME_PREFIX "lib" )
+        endif()
+
+
+        if(  NOT OUT_LIB_NAME_POSTFIX )
+            set( OUT_LIB_NAME_POSTFIX ".so" )
+        endif()
+
+        if(  NOT OUT_LIB_NAME )
+            set( OUT_LIB_NAME "sixtrack" )
+        endif()
+
+        set( LIB_NAME
+             "${OUT_LIB_NAME_PREFIX}${OUT_LIB_NAME}${OUT_LIB_NAME_POSTFIX}" )
+
+        set( IN_PATH   $<TARGET_FILE:sixtrack> )
+        set( DEST_PATH "${DEST_PATH}/${LIB_NAME}" )
+
+        message( STATUS "------ python: providing a copy of "
+                        "library to ${DEST_PATH}" )
+
+        set( PY_SIXTRACKLIB_SHARED_LIB ${LIB_NAME} CACHE INTERNAL "" FORCE )
+
+        add_custom_command( TARGET sixtrack POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy ${IN_PATH} ${DEST_PATH} )
+    endif()
+endif()
 
 # ------------------------------------------------------------------------------
 # install :

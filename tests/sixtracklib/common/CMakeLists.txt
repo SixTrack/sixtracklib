@@ -1,5 +1,7 @@
 # sixtracklib/tests/sixtracklib/common/CMakeLists.txt
 
+add_subdirectory( beam_elements )
+
 # -----------------------------------------------------------------------------
 # ---- Generate testdata:
 
@@ -72,86 +74,45 @@ if( GTEST_FOUND )
     add_test( CXX_CommonParticlesTests            test_particles_common_cxx )
 
     # ==========================================================================
-    # test_particles_aperature_check_enabled_common_c99:
+    # test_particles_aperture_check_enabled_common_c99:
 
-    add_executable( test_particles_aperature_check_enabled_common_c99
-                    test_particles_aperature_c99.cpp )
+    add_executable( test_particles_aperture_check_enabled_common_c99
+                    test_particles_aperture_c99.cpp )
 
-    target_compile_options( test_particles_aperature_check_enabled_common_c99
-        BEFORE PRIVATE -DSIXTRL_ENABLE_APERATURE_CHECK=1
-                       -DSIXTRL_APERATURE_X_LIMIT=1.0
-                       -DSIXTRL_APERATURE_Y_LIMIT=1.0 )
+    target_compile_options( test_particles_aperture_check_enabled_common_c99
+        BEFORE PRIVATE -DSIXTRL_ENABLE_APERTURE_CHECK=1
+                       -DSIXTRL_APERTURE_X_LIMIT=1.0
+                       -DSIXTRL_APERTURE_Y_LIMIT=1.0 )
 
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
-         test_particles_aperature_check_enabled_common_c99 )
+         test_particles_aperture_check_enabled_common_c99 )
 
-    add_test( C99_CommonParticlesAperatureEnabledTests
-              test_particles_aperature_check_enabled_common_c99 )
+    add_test( C99_CommonParticlesApertureEnabledTests
+              test_particles_aperture_check_enabled_common_c99 )
 
     # ------------------------------------------------------------------------
-    # test_particles_aperature_check_disabled_common_c99:
+    # test_particles_aperture_check_disabled_common_c99:
 
-    add_executable( test_particles_aperature_check_disabled_common_c99
-                    test_particles_aperature_c99.cpp )
+    add_executable( test_particles_aperture_check_disabled_common_c99
+                    test_particles_aperture_c99.cpp )
 
-    target_compile_options( test_particles_aperature_check_disabled_common_c99
-        BEFORE PRIVATE -DSIXTRL_ENABLE_APERATURE_CHECK=0 )
+    target_compile_options( test_particles_aperture_check_disabled_common_c99
+        BEFORE PRIVATE -DSIXTRL_ENABLE_APERTURE_CHECK=0 )
 
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
-         test_particles_aperature_check_disabled_common_c99 )
+         test_particles_aperture_check_disabled_common_c99 )
 
-    add_test( C99_CommonParticlesAperatureDisabledTests
-              test_particles_aperature_check_disabled_common_c99 )
-
-
-    # ==========================================================================
-    # test_be_drift_common_c99:
-
-    add_executable( test_be_drift_common_c99      test_be_drift_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_drift_common_c99 )
-    add_test( C99_CommonBeamElementDriftTests     test_be_drift_common_c99 )
+    add_test( C99_CommonParticlesApertureDisabledTests
+              test_particles_aperture_check_disabled_common_c99 )
 
     # --------------------------------------------------------------------------
-    # test_be_multipole_common_c99:
+    # test_elem_by_elem_config_c99:
 
-    add_executable( test_be_multipole_common_c99  test_be_multipole_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_multipole_common_c99 )
-    add_test( C99_CommonBeamElementMultiPoleTests test_be_multipole_common_c99 )
+    add_executable( test_elem_by_elem_config_c99
+                    test_elem_by_elem_config_c99.cpp )
 
-    # --------------------------------------------------------------------------
-    # test_be_xy_shift_common_c99:
-
-    add_executable( test_be_xy_shift_common_c99   test_be_xy_shift_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_xy_shift_common_c99 )
-    add_test( C99_CommonBeamElementXYShiftTests   test_be_xy_shift_common_c99 )
-
-    # --------------------------------------------------------------------------
-    # test_be_srotation_common_c99:
-
-    add_executable( test_be_srotation_common_c99  test_be_srotation_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_srotation_common_c99 )
-    add_test( C99_CommonBeamElementSRotationTests test_be_srotation_common_c99 )
-
-    # --------------------------------------------------------------------------
-    # test_be_cavity_common_c99:
-
-    add_executable( test_be_cavity_common_c99     test_be_cavity_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_cavity_common_c99 )
-    add_test( C99_CommonBeamElementCavityTests    test_be_cavity_common_c99 )
-
-    # --------------------------------------------------------------------------
-    # test_be_monitor_common_c99:
-
-    add_executable( test_be_monitor_common_c99    test_be_monitor_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_monitor_common_c99 )
-    add_test( C99_CommonBeamMonitorTests          test_be_monitor_common_c99 )
-
-    # ==========================================================================
-    # test_be_drift_common_cxx:
-
-    add_executable( test_be_drift_common_cxx    test_be_drift_cxx.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_drift_common_cxx )
-    add_test( CXX_CommonBeamElementDriftTests   test_be_drift_common_cxx )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_elem_by_elem_config_c99 )
+    add_test( C99_CommonElemByElemConfigTests   test_elem_by_elem_config_c99 )
 
     # --------------------------------------------------------------------------
     # test_faddeeva_errf:
@@ -175,11 +136,55 @@ if( GTEST_FOUND )
 #     add_test( CommonBeamElementsTests test_beam_elements_common )
 
     # ==========================================================================
+    # test_output_buffer_common_c99:
+
+    add_executable( test_output_buffer_common_c99 test_output_buffer_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_output_buffer_common_c99 )
+    add_test( C99_CommonOutputBufferTests test_output_buffer_common_c99 )
+
+    # ==========================================================================
     # test_track_common_c99:
 
     add_executable( test_track_common_c99 test_track_c99.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_common_c99 )
     add_test( C99_CommonTrackTests test_track_common_c99 )
+
+    # ==========================================================================
+    # test_track_line_common_c99:
+
+    add_executable( test_track_line_common_c99 test_track_line_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_line_common_c99 )
+    add_test( C99_CommonTrackLineTests test_track_line_common_c99 )
+
+    # ==========================================================================
+    # test_track_job_common_c99:
+
+    add_executable( test_track_job_common_c99 test_track_job_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_common_c99 )
+    add_test( C99_CommonTrackJobTests, test_track_job_common_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_track_job_common_cxx:
+
+    add_executable( test_track_job_common_cxx test_track_job_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_common_cxx )
+    add_test( CXX_CommonTrackJobTests, test_track_job_common_cxx )
+
+    # ==========================================================================
+    # test_track_job_cpu_common_c99:
+
+    add_executable( test_track_job_cpu_common_c99 test_track_job_cpu_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_cpu_common_c99 )
+    add_test( C99_CommonTrackJobCpuTests test_track_job_cpu_common_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_track_job_cpu_cxx:
+
+    add_executable( test_track_job_cpu_common_cxx test_track_job_cpu_cxx.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_job_cpu_common_cxx )
+    add_test( CXX_CommonTrackJobCpuTests test_track_job_cpu_common_cxx )
 
     # --------------------------------------------------------------------------
 
@@ -212,7 +217,7 @@ if( GTEST_FOUND )
 
     set_property( TARGET ${UNIT_TEST_TARGETS}
                   APPEND PROPERTY COMPILE_OPTIONS
-                  ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic )
+                  ${SIXTRACKLIB_CXX_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
 
 endif()
 
