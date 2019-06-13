@@ -8,7 +8,6 @@ import pysixtracklib as pyst
 from pysixtracklib.stcommon import st_NODE_UNDEFINED_INDEX
 import pysixtracklib_test as testlib
 from pysixtracklib_test.generic_obj import GenericObj
-import pdb
 
 if __name__ == '__main__':
     if not pyst.supports('cuda'):

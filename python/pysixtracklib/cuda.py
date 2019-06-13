@@ -30,7 +30,7 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
         def __init__( self, ptr_node_info=st_NullCudaNodeInfo, owns_ptr=False,
                       cuda_dev_index=None, platform_id=None,
                       device_id=None, node_index=None, is_default_node=False,
-                      is_selected_node=False ):
+                      is_selected_node=False, **kwargs ):
             _ptr_node_info = ptr_node_info
             if _ptr_node_info == st_NullCudaNodeInfo:
                 if cuda_dev_index is not None and cuda_dev_index > 0:
@@ -53,7 +53,7 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
 
             if _ptr_node_info != st_NullCudaNodeInfo:
                 super().__init__(
-                    ptr_node_info=_ptr_node_info, owns_ptr=owns_ptr )
+                    ptr_node_info=_ptr_node_info, owns_ptr=owns_ptr, **kwargs )
 
         def __del__(self):
             super().__del__()
@@ -119,14 +119,10 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     class CudaController(NodeControllerBase):
         def __init__(self, config_str=None, node_id=None,
                      node_index=None, platform_id=None, device_id=None,
-                     cuda_dev_index=None, ptr_controller=st_NullControllerBase,
-                     owns_ptr=True ):
+                     cuda_dev_index=None, **kwargs ):
 
-            if ptr_controller is None or \
-                ptr_controller == st_NullControllerBase:
-                    super().__init__(ptr_controller=ptr_controller,
-                                     owns_ptr=owns_ptr)
-            else:
+            if not "ptr_controller" in kwargs or \
+                kwargs["ptr_controller"] == st_NullControllerBase:
                 _ptr_ctrl = st_NullCudaController
 
                 if config_str is None or config_str == st_NullChar:
@@ -159,10 +155,10 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
                     _ptr_ctrl = st_CudaController_new( _config_str )
 
                 if _ptr_ctrl != st_NullCudaController:
-                    super().__init__( ptr_controller=_ptr_ctrl, owns_ptr=True )
-                else:
-                    raise ValueError(
-                        "Unable to create CudaController C-pointer")
+                    kwargs["ptr_controller"] = _ptr_ctrl
+                    kwargs["owns_ptr"]=True
+            super().__init__(**kwargs)
+
 
         def __del__(self):
             super().__del__()
@@ -244,8 +240,7 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
 
     class CudaArgument(ArgumentBase):
         def __init__( self, buffer=None, ctrl=None,
-                      ptr_raw_arg_begin=None, raw_arg_size=None,
-                      ptr_argument=st_NullCudaArgument, owns_ptr=True ):
+                      ptr_raw_arg_begin=None, raw_arg_size=None,**kwargs):
             ptr_cuda_ctrl = st_NullCudaController
             if ctrl is not None and isinstance( ctrl, CudaController ):
                 ptr_cuda_ctrl = ctrl.pointer
@@ -255,8 +250,9 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
             if ptr_cuda_ctrl == st_NullCudaController:
                 raise ValueError( "creating CudaArgument requires a " + \
                                   "CudaController instance" )
-            _ptr_arg = ptr_argument
-            if _ptr_arg == st_NullCudaArgument or _ptr_arg is None:
+            if not "ptr_argument" in kwargs or \
+                kwargs["ptr_argument"]==st_NullCudaArgument:
+                _ptr_arg = st_NullCudaArgument
                 owns_ptr = True
                 ptr_buffer = st_NullBuffer
                 if buffer is not None and isinstance( buffer, Buffer ):
@@ -278,10 +274,12 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
                 else:
                     _ptr_arg = st_CudaArgument_new( ptr_cuda_ctrl )
 
-            if _ptr_arg is not None and _ptr_arg != st_NullCudaArgument:
-                super().__init__( ptr_argument=_ptr_arg, owns_ptr=owns_ptr )
-            else:
-                raise ValueError( "unable to create CudaArgument C-pointer" )
+                if _ptr_arg is not None and _ptr_arg != st_NullCudaArgument:
+                    kwargs["ptr_argument"] = _ptr_arg
+                    kwargs["owns_ptr"]=True
+                else:
+                    raise ValueError( "Error during creation of CudaArgument" )
+            super().__init__(**kwargs)
 
         def __del__(self):
             super().__del__()
@@ -428,6 +426,10 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
             _ptr_argument=st_CudaTrackJob_get_ptr_debug_register_arg(
                 self._ptr_track_job)
             return CudaArgument(ptr_argument=_ptr_argument,owns_ptr=False)
+
+        @property
+        def has_controller(self):
+            return st_CudaTrackJob_has_controller( self._ptr_track_job )
 
         @property
         def controller(self):
