@@ -49,7 +49,7 @@ class GenericObj(CObject):
         kwargs["num_d"] = d_len
         kwargs["num_e"] = e_len
 
-        CObject.__init__( self,**kwargs)
+        CObject.__init__(self, **kwargs)
 
 
 # end: python/pysixtracklib_test/generic_obj.py

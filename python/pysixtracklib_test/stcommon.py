@@ -132,6 +132,6 @@ st_buffer_size_t = pyst.st_buffer_size_t
 st_TestParticlesAddr_are_addresses_consistent_with_particle = \
     testlib.st_TestParticlesAddr_are_addresses_consistent_with_particle
 st_TestParticlesAddr_are_addresses_consistent_with_particle.argtypes = [
-    st_ParticlesAddr_p, st_Particles_p, st_buffer_size_t ]
+    st_ParticlesAddr_p, st_Particles_p, st_buffer_size_t]
 st_TestParticlesAddr_are_addresses_consistent_with_particle.restype = \
     ct.c_bool
