@@ -497,6 +497,9 @@ NS(Particles_managed_buffer_get_particles)(
 SIXTRL_FN SIXTRL_STATIC bool NS(Buffer_is_particles_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const buffer );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Buffer_is_particles_buffer_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const buffer );
+
 SIXTRL_FN SIXTRL_STATIC NS(particle_num_elements_t)
 NS(Particles_buffer_get_total_num_of_particles)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer );

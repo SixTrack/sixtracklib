@@ -100,6 +100,12 @@ void NS(Particles_calculate_difference_ext)(
 
 /* ------------------------------------------------------------------------- */
 
+bool NS(Buffer_is_particles_buffer_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const buffer )
+{
+    return NS(Buffer_is_particles_buffer)( buffer );
+}
+
 NS(particle_num_elements_t)
 NS(Particles_buffer_get_total_num_of_particles_ext)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
