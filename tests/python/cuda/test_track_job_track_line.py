@@ -48,14 +48,14 @@ if __name__ == '__main__':
     assert cmp_eb.pointer != st_NullBuffer
     assert cmp_eb.num_objects == num_beam_elements
 
-    _pset_index = st_buffer_size_t( PSET_INDEX )
+    _pset_index = st_buffer_size_t(PSET_INDEX)
     cmp_particles = st_Particles_buffer_get_particles(
-        cmp_track_pb.pointer, _pset_index )
+        cmp_track_pb.pointer, _pset_index)
     assert cmp_particles != st_NullParticles
 
-    _num_turns  = ct.c_int64( NUM_TURNS )
+    _num_turns = ct.c_int64(NUM_TURNS)
     track_status = st_Track_all_particles_until_turn(
-        cmp_particles, cmp_eb.pointer, _num_turns )
+        cmp_particles, cmp_eb.pointer, _num_turns)
 
     assert track_status == st_TRACK_SUCCESS.value
 
@@ -88,12 +88,12 @@ if __name__ == '__main__':
     if 0 != num_beam_elements % chunk_length:
         ++num_chunks
 
-    for ii in range( 0, NUM_TURNS ):
-        for jj in range( 0, num_chunks + 1 ):
+    for ii in range(0, NUM_TURNS):
+        for jj in range(0, num_chunks + 1):
             be_begin_idx = jj * chunk_length
-            be_end_idx = min( be_begin_idx + chunk_length, num_beam_elements )
-            finish_turn = bool( be_end_idx >= num_beam_elements )
-            track_job.track_line( be_begin_idx, be_end_idx, finish_turn )
+            be_end_idx = min(be_begin_idx + chunk_length, num_beam_elements)
+            finish_turn = bool(be_end_idx >= num_beam_elements)
+            track_job.track_line(be_begin_idx, be_end_idx, finish_turn)
             assert track_job.last_track_status_success
 
     track_job.collectParticles()

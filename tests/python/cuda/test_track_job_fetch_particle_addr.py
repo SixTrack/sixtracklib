@@ -82,23 +82,23 @@ if __name__ == '__main__':
 
     slot_size = pb_buffer.slot_size
     assert slot_size > 0
-    _slot_size = st_buffer_size_t( slot_size )
+    _slot_size = st_buffer_size_t(slot_size)
 
     prev_particle_addr = st_NullParticlesAddr
-    for ii in range( 0, num_particle_sets ):
-        particle_addr = track_job.get_particle_addresses( ii )
+    for ii in range(0, num_particle_sets):
+        particle_addr = track_job.get_particle_addresses(ii)
         assert particle_addr != st_NullParticlesAddr
         assert particle_addr != prev_particle_addr
 
         cmp_particles = st_Particles_buffer_get_particles(
-            pb_buffer.pointer, st_buffer_size_t( ii ) )
+            pb_buffer.pointer, st_buffer_size_t(ii))
 
         assert cmp_particles != st_NullParticles
-        assert st_Particles_get_num_of_particles( cmp_particles ) == \
-               particle_addr.contents.num_particles
+        assert st_Particles_get_num_of_particles(cmp_particles) == \
+            particle_addr.contents.num_particles
 
         assert st_TestParticlesAddr_are_addresses_consistent_with_particle(
-            particle_addr, cmp_particles, _slot_size )
+            particle_addr, cmp_particles, _slot_size)
 
         prev_particle_addr = particle_addr
 
