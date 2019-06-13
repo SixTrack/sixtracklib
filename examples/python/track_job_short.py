@@ -18,7 +18,7 @@ status = job.track(1)
 print(particles.x)
 print(particles.px)
 
-if pyst.supports( 'opencl' ):
+if pyst.supports('opencl'):
     jobcl = pyst.TrackJob(elements, particles, device="opencl:0.0")
     status = jobcl.track(2)
     jobcl.collect()
