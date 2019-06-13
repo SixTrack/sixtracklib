@@ -81,4 +81,4 @@ if __name__ == '__main__':
 
     sys.exit(0)
 
-#end: tests/python/test_cbuffer_st_buffer.py
+# end: tests/python/test_cbuffer_st_buffer.py

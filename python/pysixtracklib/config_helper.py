@@ -3,6 +3,6 @@
 
 from .config import SIXTRACKLIB_MODULES
 
-def supports( architecture ):
-    return bool( SIXTRACKLIB_MODULES.get( architecture, False ) )
 
+def supports(architecture):
+    return bool(SIXTRACKLIB_MODULES.get(architecture, False))

@@ -13,8 +13,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/context/context_base.h"
-    #include "sixtracklib/common/context/context_base_with_nodes.h"
+    #include "sixtracklib/common/context/compute_arch.h"
     #include "sixtracklib/opencl/cl.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -38,17 +37,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
     class ClContextBase
     {
-        private:
-
-        using _base_context_t   = SIXTRL_CXX_NAMESPACE::ContextOnNodesBase;
-
         public:
 
-        using node_id_t         = _base_context_t::node_id_t;
-        using node_info_t       = _base_context_t::node_info_t;
-        using size_type         = _base_context_t::size_type;
-        using platform_id_t     = _base_context_t::platform_id_t;
-        using device_id_t       = _base_context_t::device_id_t;
+        using node_id_t         = ::NS(ComputeNodeId);
+        using node_info_t       = ::NS(ComputeNodeInfo);
+        using size_type         = ::NS(context_size_t);
+        using platform_id_t     = ::NS(comp_node_id_num_t);
+        using device_id_t       = ::NS(comp_node_id_num_t);
 
         using kernel_id_t       = int64_t;
         using program_id_t      = int64_t;
@@ -618,10 +613,13 @@ namespace SIXTRL_CXX_NAMESPACE
     };
 }
 
-using NS(ClContextBase) = SIXTRL_CXX_NAMESPACE::ClContextBase;
+typedef SIXTRL_CXX_NAMESPACE::ClContextBase NS(ClContextBase);
+typedef SIXTRL_CXX_NAMESPACE::ClContextBase::node_id_t NS(context_node_id_t);
+typedef SIXTRL_CXX_NAMESPACE::ClContextBase::node_info_t NS(context_node_info_t);
+typedef SIXTRL_CXX_NAMESPACE::ClContextBase::kernel_arg_type_t
+        NS(kernel_arg_type_t);
 
-using NS(kernel_arg_type_t) =
-    SIXTRL_CXX_NAMESPACE::ClContextBase::kernel_arg_type_t;
+
 
 #else /* defined( __cplusplus ) */
 
@@ -630,7 +628,11 @@ using NS(kernel_arg_type_t) =
     #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 typedef void NS(ClContextBase);
+typedef uint64_t NS(context_size_t);
 typedef uint32_t NS(kernel_arg_type_t);
+
+typedef NS(ComputeNodeId)   NS(context_node_id_t);
+typedef NS(ComputeNodeInfo) NS(context_node_info_t);
 
 #endif /* defined( __cplusplus ) */
 

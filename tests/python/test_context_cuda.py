@@ -17,4 +17,4 @@ if __name__ == '__main__':
     st.st_CudaContext_delete(ptr_context)
     ptr_context = st.st_NullCudaContext
 
-#end: sixtracklib/tests/python/test_context_cuda.py
+# end: sixtracklib/tests/python/test_context_cuda.py

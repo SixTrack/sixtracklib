@@ -10,8 +10,8 @@ set( SIXTRACKLIB_COMMON_C99_HEADERS )
 set( SIXTRACKLIB_COMMON_CXX_HEADERS )
 
 add_subdirectory( generated      )
-
 add_subdirectory( buffer         )
+add_subdirectory( control        )
 add_subdirectory( context        )
 add_subdirectory( internal       )
 add_subdirectory( be_beambeam    )
@@ -25,6 +25,8 @@ add_subdirectory( be_monitor     )
 add_subdirectory( be_limit       )
 add_subdirectory( be_dipedge     )
 add_subdirectory( output         )
+add_subdirectory( particles      )
+add_subdirectory( track          )
 
 set( SIXTRACKLIB_COMMON_INTERNAL_CXX_HEADERS )
 set( SIXTRACKLIB_COMMON_INTERNAL_CXX_SOURCES )
@@ -34,7 +36,7 @@ set(  SIXTRACKLIB_C99_HEADERS
       beam_elements.h
       buffer.h
       constants.h
-      context.h
+      controller.h
       definitions.h
       particles.h
       track.h

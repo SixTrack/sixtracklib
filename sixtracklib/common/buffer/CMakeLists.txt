@@ -9,12 +9,18 @@ set( SIXTRL_COMMON_BUFFER_HEADERS
      managed_buffer_remap.h
      managed_buffer.h
      mem_pool.h
+     managed_buffer_handle.h
+     buffer_string_object.h
+     buffer_array_object.h
 )
 
 set( SIXTRL_COMMON_BUFFER_SOURCES
      alignment.c
      buffer.c
      mem_pool.c
+     managed_buffer_handle.c
+     buffer_string_object.c
+     buffer_array_object.c
 )
 
 add_library( sixtrack_common_buffer OBJECT

@@ -44,12 +44,12 @@
 #include "sixtracklib/common/be_limit/track.h"
 #include "sixtracklib/common/be_dipedge/be_dipedge.h"
 #include "sixtracklib/common/be_dipedge/track.h"
-#include "sixtracklib/common/context/definitions.h"
-#include "sixtracklib/common/context/argument_base.h"
 #include "sixtracklib/common/context/compute_arch.h"
-#include "sixtracklib/common/context/context_base.h"
-#include "sixtracklib/common/context/context_base_with_nodes.h"
-#include "sixtracklib/common/context.h"
+#include "sixtracklib/common/control/definitions.h"
+#include "sixtracklib/common/control/argument_base.h"
+#include "sixtracklib/common/control/controller_base.h"
+#include "sixtracklib/common/control/node_controller_base.h"
+#include "sixtracklib/common/controller.h"
 #include "sixtracklib/common/internal/track_job_base.h"
 #include "sixtracklib/common/output/elem_by_elem_config.h"
 #include "sixtracklib/common/output/elem_by_elem_output_buffer.h"
@@ -61,7 +61,6 @@
 #include "sixtracklib/common/track_job.h"
 #include "sixtracklib/common/track_job_cpu.h"
 #include "sixtracklib/common/track.h"
-
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -81,10 +80,9 @@
            ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
 
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/internal/argument_base.h"
+    #include "sixtracklib/cuda/control/kernel_config.h"
     #include "sixtracklib/cuda/argument.h"
-    #include "sixtracklib/cuda/internal/context_base.h"
-    #include "sixtracklib/cuda/context.h"
+    #include "sixtracklib/cuda/controller.h"
     #include "sixtracklib/cuda/track_particles_kernel_c_wrapper.h"
 
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */

@@ -25,8 +25,10 @@ typedef enum NS(object_type_values_e)
     NS(OBJECT_TYPE_LIMIT_RECT)        =         11,
     NS(OBJECT_TYPE_LIMIT_ELLIPSE)     =         12,
     NS(OBJECT_TYPE_DIPEDGE)           =         24,
+    NS(OBJECT_TYPE_PARTICLES_ADDR)    =        512,
     NS(OBJECT_TYPE_LINE)              =       1024,
     NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) =      65535,
+    NS(OBJECT_TYPE_LAST_AVAILABLE)    =      65535,
     NS(OBJECT_TYPE_INVALID)           = 0x7fffffff
 }
 NS(object_type_values_t);
@@ -94,7 +96,7 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_LIMIT_ELLIPSE = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_LIMIT_ELLIPSE) );
-        
+
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_DIPEDGE = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_DIPEDGE) );
@@ -104,7 +106,15 @@ namespace SIXTRL_CXX_NAMESPACE
             NS(OBJECT_TYPE_LINE) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_INVALID      = static_cast< object_type_id_t >(
+        OBJECT_TYPE_ELEM_BY_ELEM_CONF = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_PARTICLES_ADDR = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_PARTICLES_ADDR) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_INVALID = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_INVALID) );
 
     template< class Elem >
