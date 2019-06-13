@@ -10,7 +10,7 @@ track_with = 'PySixtrack'
 # track_with = 'Sixtrack'
 track_with = 'Sixtracklib'
 #device = 'opencl:1.0'
-device_opencl = None
+device = None
 
 n_turns = 100
 
