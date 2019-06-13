@@ -10,7 +10,6 @@ from pysixtracklib.stcommon import \
     st_Track_all_particles_until_turn, st_Particles_buffer_get_particles, \
     st_NullParticles, st_NullBuffer, st_buffer_size_t, st_TRACK_SUCCESS
 import pysixtracklib_test as testlib
-import pdb
 
 if __name__ == '__main__':
     if not pyst.supports('cuda'):
