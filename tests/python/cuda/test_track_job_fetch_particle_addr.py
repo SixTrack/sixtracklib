@@ -8,9 +8,13 @@ from cobjects import CBuffer
 import pysixtracklib as pyst
 from pysixtracklib.stcommon import \
     st_Particles_p, st_ParticlesAddr_p, \
+    st_Particles_buffer_get_particles, st_Particles_get_num_of_particles, \
     st_NullParticles, st_NullParticlesAddr,\
-    st_NullBuffer, st_ARCH_STATUS_SUCCESS
+    st_NullBuffer, st_ARCH_STATUS_SUCCESS, st_buffer_size_t
 import pysixtracklib_test as testlib
+from pysixtracklib_test.stcommon import \
+    st_TestParticlesAddr_are_addresses_consistent_with_particle
+import pdb
 
 if __name__ == '__main__':
     if not pyst.supports('cuda'):
@@ -72,14 +76,30 @@ if __name__ == '__main__':
 
     assert track_job.has_particle_addresses
 
+    pb_buffer = pyst.Buffer(cbuffer=pb)
+    assert pb_buffer.pointer != st_NullBuffer
+    assert pb_buffer.num_objects == num_particle_sets
+
+    slot_size = pb_buffer.slot_size
+    assert slot_size > 0
+    _slot_size = st_buffer_size_t( slot_size )
+
     prev_particle_addr = st_NullParticlesAddr
     for ii in range( 0, num_particle_sets ):
         particle_addr = track_job.get_particle_addresses( ii )
         assert particle_addr != st_NullParticlesAddr
         assert particle_addr != prev_particle_addr
 
-        cmp_particles = pb.get_object( 0, cls=pyst.Particles )
-        assert cmp_particles.num_particles == particle_addr.contents.num_particles
+        cmp_particles = st_Particles_buffer_get_particles(
+            pb_buffer.pointer, st_buffer_size_t( ii ) )
+
+        assert cmp_particles != st_NullParticles
+        assert st_Particles_get_num_of_particles( cmp_particles ) == \
+               particle_addr.contents.num_particles
+
+        assert st_TestParticlesAddr_are_addresses_consistent_with_particle(
+            particle_addr, cmp_particles, _slot_size )
+
         prev_particle_addr = particle_addr
 
     sys.exit(0)
