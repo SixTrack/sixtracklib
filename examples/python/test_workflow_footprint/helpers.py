@@ -204,7 +204,7 @@ def track_particle_sixtracklib(
                             line, partCO, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
                             Dy_wrt_CO_m, Dpy_wrt_CO_rad,
                             Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns,
-                            device_opencl=None):
+                            device=None):
 
 
     Dx_wrt_CO_m, Dpx_wrt_CO_rad,\
@@ -245,10 +245,10 @@ def track_particle_sixtracklib(
 
         p.from_pysixtrack(part, i_part)
 
-    if device_opencl is None:
+    if device is None:
         job = pysixtracklib.TrackJob(elements, ps)
     else:
-        job = pysixtracklib.TrackJob(elements, ps, device=device_opencl)
+        job = pysixtracklib.TrackJob(elements, ps, device=device)
 
     job.track(n_turns)
     job.collect()

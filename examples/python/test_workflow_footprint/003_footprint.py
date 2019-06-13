@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 track_with = 'PySixtrack'
 # track_with = 'Sixtrack'
 track_with = 'Sixtracklib'
-device_opencl = '0.0'
+#device = 'opencl:1.0'
 device_opencl = None
 
 n_turns = 100
@@ -49,12 +49,12 @@ elif track_with == 'Sixtracklib':
     x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt = hp.track_particle_sixtracklib(
         line=line, partCO=partCO, Dx_wrt_CO_m=0., Dpx_wrt_CO_rad=DpxDpy_wrt_CO[:, :, 0].flatten(),
         Dy_wrt_CO_m=0., Dpy_wrt_CO_rad=DpxDpy_wrt_CO[:, :, 1].flatten(),
-        Dsigma_wrt_CO_m=0., Ddelta_wrt_CO=0., n_turns=n_turns, device_opencl=device_opencl)
+        Dsigma_wrt_CO_m=0., Ddelta_wrt_CO=0., n_turns=n_turns, device=device)
     info = track_with
-    if device_opencl is None:
+    if device is None:
     	info += ' (CPU)'
     else:
-    	info += ' (GPU %s)'%device_opencl
+    	info += ' (GPU %s)'%device
 else:
     raise ValueError('What?!')
 
