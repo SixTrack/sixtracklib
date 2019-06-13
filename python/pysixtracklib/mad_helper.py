@@ -18,8 +18,8 @@ def dispatch(el, classes):
 
     key = el.base_type.name
     if key == 'multipole':
-        knl= el.knl if hasattr(el,'knl') else [0]
-        ksl= el.ksl if hasattr(el,'ksl') else [0]
+        knl = el.knl if hasattr(el, 'knl') else [0]
+        ksl = el.ksl if hasattr(el, 'ksl') else [0]
         el = Multipole(
             knl=knl,
             ksl=ksl,

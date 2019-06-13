@@ -67,7 +67,7 @@ class Particles(CObject):
                  p0c=1e9, q0=1):
         return cls(num_particles=num_particles,
                    particle_id=np.arange(num_particles),
-                   ).set_reference(mass0=mass0,p0c=p0c,q0=q0)
+                   ).set_reference(mass0=mass0, p0c=p0c, q0=q0)
 
     sigma = property(lambda self: (self.beta0 / self.beta) * self.zeta)
     beta = property(lambda p: (1 + p.delta) / (1 / p.beta0 + p.ptau))

@@ -294,7 +294,7 @@ class Elements(object):
                      'XYShift': XYShift,
                      'BeamBeam6D': BeamBeam6D,
                      'BeamBeam4D': BeamBeam4D,
-                     'LimitRect':  LimitRect,
+                     'LimitRect': LimitRect,
                      'LimitEllipse': LimitEllipse,
                      'DipoleEdge': DipoleEdge,
                      #                     'Line': Line,
