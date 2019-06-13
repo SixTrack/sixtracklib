@@ -294,7 +294,7 @@ class Elements(object):
                      'XYShift': XYShift,
                      'BeamBeam6D': BeamBeam6D,
                      'BeamBeam4D': BeamBeam4D,
-                     'LimitRect':  LimitRect,
+                     'LimitRect': LimitRect,
                      'LimitEllipse': LimitEllipse,
                      'DipoleEdge': DipoleEdge,
                      #                     'Line': Line,
@@ -313,10 +313,10 @@ class Elements(object):
         return cls(cbuffer=cbuffer)
 
     @classmethod
-    def fromline(cls, line):
-        return cls().append_line(line)
+    def fromline(cls, line, exact_drift=False):
+        return cls().append_line(line, exact_drift)
 
-    def append_line(self, line):
+    def append_line(self, line, exact_drift=False):
         for label, element_name, element in line:
             if exact_drift and element_name == 'Drift':
                 element_name = 'DriftExact'

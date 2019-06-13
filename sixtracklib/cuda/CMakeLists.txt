@@ -1,5 +1,5 @@
 # ==============================================================================
-# CUDA sixtracklib submodule
+# CUDA sixtracklib architecture
 
 message( STATUS "---- processing sixtracklib/cuda/CMakeLists.txt" )
 
@@ -17,6 +17,7 @@ string( APPEND CMAKE_CUDA_FLAGS " -cudart shared" )
 if( CMAKE_BUILD_TYPE MATCHES "Debug" )
     string( APPEND CMAKE_CUDA_FLAGS " -g -G" )
 else()
+    string( APPEND CMAKE_CUDA_FLAGS " -fmad=false" )
     string( APPEND CMAKE_CUDA_FLAGS " -lineinfo" )
 endif()
 
@@ -29,21 +30,29 @@ endif()
 set( SIXTRACKL_CUDA_HOST_DEFINITIONS )
 list( APPEND SIXTRACKL_CUDA_HOST_DEFINITIONS ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
+# ------------------------------------------------------------------------------
+
+set( SIXTRACKLIB_CUDA_C99_INSTALL_PREFIX
+     "${SIXTRACKLIB_C99_INSTALL_PREFIX}/cuda" )
+
+set( SIXTRACKLIB_CUDA_CXX_INSTALL_PREFIX
+     "${SIXTRACKLIB_CXX_INSTALL_PREFIX}/cuda" )
+
+# -----------------------------------------------------------------------------
+# submodules
+
+add_subdirectory( control )
+add_subdirectory( track )
+
 set( SIXTRACKLIB_CUDA_PART_HOST_HEADERS
-     wrappers/argument_operations.h
-     wrappers/context_operations.h
-     wrappers/extract_particles_address.h
-     wrappers/track_particles.h
+     wrappers/controller_wrappers.h
+     wrappers/track_job_wrappers.h
      cuda_tools.h
-     track_particles_kernel_c_wrapper.h
 )
 
 set( SIXTRACKLIB_CUDA_PART_HOST_SOURCES
-     wrappers/argument_operations.cu
-     wrappers/context_operations.cu
-     wrappers/extract_particles_address.cu
-     wrappers/track_particles.cu
-     internal/track_particles_kernel_c_wrapper.cu
+     wrappers/controller_wrappers.cu
+     wrappers/track_job_wrappers.cu
 )
 
 add_library( sixtrack_cuda_host OBJECT
@@ -88,54 +97,15 @@ set(   SIXTRACKL_LINK_LIBRARIES
 
 set( SIXTRACKL_CUDA_C99_HEADERS
      definitions.h
-     internal/argument_base.h
-     internal/context_base.h
+     control/argument_base.h
      argument.h
-     context.h
+     controller.h
 )
 
 set( SIXTRACKL_CUDA_CXX_HEADERS
-     internal/argument_base.hpp
-     internal/context_base.hpp
      argument.hpp
-     context.hpp
+     controller.hpp
 )
-
-set( SIXTRACKL_CUDA_CXX_SOURCES
-     internal/argument_base.cpp
-     internal/argument_base_c99.cpp
-     internal/argument.cpp
-     internal/argument_c99.cpp
-     internal/context_base.cpp
-     internal/context_base_c99.cpp
-     internal/context.cpp
-     internal/context_c99.cpp
-)
-
-
-add_library( sixtrack_cuda_cxx OBJECT
-             ${SIXTRACKL_CUDA_CXX_HEADERS}
-             ${SIXTRACKL_CUDA_C99_HEADERS}
-             ${SIXTRACKL_CUDA_CXX_SOURCES}
-)
-
-target_compile_definitions( sixtrack_cuda_cxx
-    PUBLIC ${SIXTRACKLIB_NAMESPACE_FLAGS} )
-
-target_include_directories( sixtrack_cuda_cxx
-    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
-
-set_target_properties( sixtrack_cuda_cxx PROPERTIES POSITION_INDEPENDENT_CODE ON )
-set_target_properties( sixtrack_cuda_cxx PROPERTIES LINKER_LANGUAGE C )
-set_target_properties( sixtrack_cuda_cxx PROPERTIES CXX_STANDARD 11 )
-set_target_properties( sixtrack_cuda_cxx PROPERTIES CXX_STANDARD_REQUIRED ON )
-
-# ------------------------------------------------------------------------------
-# pass on sixtrack_cuda_cxx as a module for sixtracklib:
-
-set(  SIXTRACKL_LIBRARY_MODULES
-    ${SIXTRACKL_LIBRARY_MODULES}
-    $<TARGET_OBJECTS:sixtrack_cuda_cxx> CACHE INTERNAL "" FORCE )
 
 # ------------------------------------------------------------------------------
 # --- CUDA Kernel object library:
@@ -146,19 +116,19 @@ list( APPEND SIXTRACKL_CUDA_DEVICE_DEFINITIONS ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
 set( SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS
      cuda_tools.h
+     kernels/be_monitors_assign_out_buffer.cuh
+     kernels/elem_by_elem_assign_out_buffer.cuh
+     kernels/extract_particles_addr.cuh
      kernels/managed_buffer_remap.cuh
-     kernels/managed_buffer_remap_kernel.cuh
-     kernels/track_particles_kernel.cuh
      kernels/track_particles.cuh
-     kernels/extract_particles_address.cuh
 )
 
 set( SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES
+     kernels/be_monitors_assign_out_buffer.cu
+     kernels/elem_by_elem_assign_out_buffer.cu
+     kernels/extract_particles_addr.cu
      kernels/managed_buffer_remap.cu
-     kernels/managed_buffer_remap_kernel.cu
-     kernels/track_particles_kernel.cu
      kernels/track_particles.cu
-     kernels/extract_particles_address.cu
 )
 
 add_library( sixtrack_cuda_device OBJECT

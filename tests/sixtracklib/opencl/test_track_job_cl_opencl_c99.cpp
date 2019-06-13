@@ -15,6 +15,8 @@
 
 #include <gtest/gtest.h>
 
+#include "sixtracklib/testlib.h"
+
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
@@ -26,9 +28,6 @@
 #include "sixtracklib/common/track.h"
 #include "sixtracklib/opencl/context.h"
 #include "sixtracklib/opencl/track_job_cl.h"
-
-#include "sixtracklib/testlib/common/particles.h"
-#include "sixtracklib/testlib/testdata/testdata_files.h"
 
 namespace SIXTRL_CXX_NAMESPACE
 {

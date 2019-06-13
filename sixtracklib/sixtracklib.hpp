@@ -37,11 +37,11 @@
 #if defined( SIXTRACKLIB_ENABLE_MODULE_CUDA ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_CUDA == 1 )
 
-#include "sixtracklib/cuda/internal/argument_base.hpp"
-#include "sixtracklib/cuda/argument.hpp"
+#include "sixtracklib/cuda/control/kernel_config.hpp"
+#include "sixtracklib/cuda/control/node_info.hpp"
 
-#include "sixtracklib/cuda/internal/context_base.hpp"
-#include "sixtracklib/cuda/context.hpp"
+#include "sixtracklib/cuda/argument.hpp"
+#include "sixtracklib/cuda/controller.hpp"
 
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
 
@@ -51,3 +51,4 @@
 #endif /* SIXTRACKLIB_SIXTRACKLIB_HPP__ */
 
 /* end: sixtracklib/sixtracklib.hpp */
+

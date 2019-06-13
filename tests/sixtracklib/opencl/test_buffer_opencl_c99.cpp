@@ -12,6 +12,7 @@
 #include <gtest/gtest.h>
 
 #include "sixtracklib/testlib.h"
+
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"

@@ -9,6 +9,8 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/common/control/debug_register.h"
     #include "sixtracklib/common/be_monitor/be_monitor.h"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/particles.h"
@@ -20,13 +22,14 @@ extern "C" {
 
 #if !defined( _GPUCODE )
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(BeamMonitor_prepare_output_buffer)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(BeamMonitor_prepare_output_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_index_offset );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(BeamMonitor_prepare_output_buffer_for_particle_sets)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
@@ -35,7 +38,7 @@ NS(BeamMonitor_prepare_output_buffer_for_particle_sets)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT indices_begin,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_index_offset );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(BeamMonitor_prepare_output_buffer_detailed)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
@@ -46,7 +49,7 @@ NS(BeamMonitor_prepare_output_buffer_detailed)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(BeamMonitor_calculate_output_buffer_params)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
@@ -56,7 +59,7 @@ NS(BeamMonitor_calculate_output_buffer_params)(
     NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
     NS(buffer_size_t) const output_buffer_slot_size );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(BeamMonitor_calculate_output_buffer_params_for_particle_sets)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT pb,
@@ -68,7 +71,7 @@ NS(BeamMonitor_calculate_output_buffer_params_for_particle_sets)(
     NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
     NS(buffer_size_t) const output_buffer_slot_size );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(BeamMonitor_calculate_output_buffer_params_detailed)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     NS(particle_index_t) const min_particle_id,
@@ -82,20 +85,30 @@ NS(BeamMonitor_calculate_output_buffer_params_detailed)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(BeamMonitor_assign_output_buffer)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(BeamMonitor_assign_output_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
     NS(particle_index_t) const min_turn_id,
     NS(buffer_size_t) const until_turn_elem_by_elem );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(BeamMonitor_assign_output_buffer_from_offset)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
     NS(particle_index_t) const min_turn_id,
     NS(buffer_size_t) const out_buffer_index_offset );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(BeamMonitor_setup_for_particles_all)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(BeamMonitor_assign_output_buffer_from_offset_debug)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT out_buffer,
+    NS(particle_index_t) const min_turn_id,
+    NS(buffer_size_t) const out_buffer_index_offset,
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_reg );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(BeamMonitor_setup_for_particles_all)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT belements_buffer,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
 
@@ -103,22 +116,32 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(BeamMonitor_setup_for_particles_all)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamMonitor_setup_for_particles)(
+SIXTRL_FN SIXTRL_STATIC NS(arch_status_t) NS(BeamMonitor_setup_for_particles)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
 
-SIXTRL_FN SIXTRL_STATIC int
+SIXTRL_FN SIXTRL_STATIC NS(arch_status_t)
 NS(BeamMonitor_setup_managed_buffer_for_particles_all)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belements,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
     NS(buffer_size_t) const slot_size );
 
-SIXTRL_FN SIXTRL_STATIC int NS(BeamMonitor_assign_managed_output_buffer)(
+SIXTRL_FN SIXTRL_STATIC NS(arch_status_t)
+NS(BeamMonitor_assign_managed_output_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
     NS(particle_index_t) const min_turn_id,
     NS(buffer_size_t) const out_buffer_index_offset,
     NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC NS(arch_status_t)
+NS(BeamMonitor_assign_managed_output_buffer_debug)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
+    NS(particle_index_t) const min_turn_id,
+    NS(buffer_size_t) const out_buffer_index_offset,
+    NS(buffer_size_t) const slot_size,
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* ptr_debug_register );
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
@@ -132,11 +155,11 @@ SIXTRL_FN SIXTRL_STATIC int NS(BeamMonitor_assign_managed_output_buffer)(
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_INLINE int NS(BeamMonitor_setup_for_particles)(
+SIXTRL_INLINE NS(arch_status_t) NS(BeamMonitor_setup_for_particles)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* SIXTRL_RESTRICT monitor,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p )
 {
-    int success = -1;
+    NS(arch_status_t) status = -1;
 
     typedef NS(particle_index_t)  index_t;
     typedef NS(be_monitor_addr_t) addr_t;
@@ -156,19 +179,20 @@ SIXTRL_INLINE int NS(BeamMonitor_setup_for_particles)(
             NS(BeamMonitor_set_max_particle_id)( monitor, max_id );
             NS(BeamMonitor_set_out_address)( monitor, ( addr_t )0u );
 
-            success = 0;
+            status = SIXTRL_ARCH_STATUS_SUCCESS;
         }
     }
 
-    return success;
+    return status;
 }
 
-SIXTRL_INLINE int NS(BeamMonitor_setup_managed_buffer_for_particles_all)(
+SIXTRL_INLINE NS(arch_status_t)
+NS(BeamMonitor_setup_managed_buffer_for_particles_all)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belements,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
     NS(buffer_size_t) const slot_size )
 {
-    int success = -1;
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
     typedef NS(particle_index_t)        index_t;
     typedef NS(be_monitor_addr_t)       addr_t;
@@ -207,20 +231,20 @@ SIXTRL_INLINE int NS(BeamMonitor_setup_managed_buffer_for_particles_all)(
             }
         }
 
-        success = 0;
+        status = SIXTRL_ARCH_STATUS_SUCCESS;
     }
 
-    return success;
+    return status;
 }
 
-SIXTRL_INLINE int NS(BeamMonitor_assign_managed_output_buffer)(
+SIXTRL_INLINE NS(arch_status_t) NS(BeamMonitor_assign_managed_output_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
     NS(particle_index_t) const min_turn_id,
     NS(buffer_size_t) const out_buffer_index_offset,
     NS(buffer_size_t) const slot_size )
 {
-    int success = -1;
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
     typedef NS(buffer_size_t)                               buf_size_t;
     typedef NS(be_monitor_turn_t)                           nturn_t;
@@ -266,11 +290,11 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_managed_output_buffer)(
 
     if( ( uintptr_t )out_end >= ( uintptr_t )out_it )
     {
-        success = 0;
+        status = SIXTRL_ARCH_STATUS_SUCCESS;
     }
     else
     {
-        return success;
+        return status;
     }
 
     for( ; be_it != be_end ; ++be_it )
@@ -316,19 +340,72 @@ SIXTRL_INLINE int NS(BeamMonitor_assign_managed_output_buffer)(
                 }
                 else if( ( nn > 0 ) && ( stored_particles_per_turn > ZERO ) )
                 {
-                    success = -1;
+                    status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
                     break;
                 }
             }
             else if( out_it == out_end )
             {
-                success = -1;
+                status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
                 break;
             }
         }
     }
 
-    return success;
+    return status;
+}
+
+
+SIXTRL_INLINE NS(arch_status_t)
+NS(BeamMonitor_assign_managed_output_buffer_debug)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
+    NS(particle_index_t) const min_turn_id,
+    NS(buffer_size_t) const out_buffer_index_offset,
+    NS(buffer_size_t) const slot_size,
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* ptr_debug_register )
+{
+    typedef NS(arch_debugging_t) debug_register_t;
+
+    NS(arch_status_t) const status =
+        NS(BeamMonitor_assign_managed_output_buffer)( beam_elements,
+            output_buffer, min_turn_id, out_buffer_index_offset, slot_size );
+
+    if( ptr_debug_register != SIXTRL_NULLPTR )
+    {
+        debug_register_t dbg = ( debug_register_t )0u;
+
+        if( status != SIXTRL_ARCH_STATUS_SUCCESS )
+        {
+            if( slot_size == ( NS(buffer_size_t) )0u )
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( beam_elements == SIXTRL_NULLPTR )
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( NS(ManagedBuffer_needs_remapping)( beam_elements, slot_size ) )
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( output_buffer == SIXTRL_NULLPTR )
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( NS(ManagedBuffer_needs_remapping)( output_buffer, slot_size ) )
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( min_turn_id < ( NS(particle_index_t) )0 )
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+
+            if( NS(ManagedBuffer_get_num_objects)( output_buffer, slot_size ) <
+                    out_buffer_index_offset )
+            {
+                dbg = NS(DebugReg_raise_next_error_flag)( dbg );
+            }
+        }
+
+        *ptr_debug_register = NS(DebugReg_store_arch_status)( dbg, status );
+    }
+
+    return status;
 }
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )

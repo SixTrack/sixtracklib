@@ -3,7 +3,6 @@
 
 import importlib
 
-import sys
 import ctypes as ct
 import pysixtracklib as pyst
 from pysixtracklib import stcommon as st
@@ -30,28 +29,23 @@ if __name__ == '__main__':
     num_particles = 42
     partset = pyst.ParticlesSet()
     particles = partset.Particles(num_particles=num_particles)
-    pbuffer = st.st_Buffer_new_mapped_on_cbuffer(pset.cbuffer)
 
-    ctx = st.st_CudaContext_create()
-    particles_arg = st.st_CudaArgument_new(ctx)
+    cmp_partset = pyst.ParticlesSet()
+    cmp_particles = cmp_partset.Particles(num_particles=num_particles)
 
-    st.st_CudaArgument_send_buffer(particles_arg, pbuffer)
+    elements = pyst.Elements()
+    elements.Drift(length=1.2)
+    elements.Multipole(knl=[0, 0.001])
 
-    particles_addr = st.st_ParticlesAddr()
-    sizeof_particles_addr = ct.sizeof(st.st_ParticlesAddr)
-    sizeof_particles_addr = ct.c_uint64(sizeof_particles_addr)
+    track_job = pyst.CudaTrackJob(elements, partset)
 
-    ptr_particles_addr = st.st_ParticlesAddr_preset(ct.byref(particles_addr))
-    particles_addr_arg = st.st_CudaArgument_new(ctx)
-    st.st_CudaArgument_send_memory(
-        particles_addr_arg, ptr_particles_addr, sizeof_particles_addr)
+    if not track_job.has_particles_addresses and \
+            track_job.can_fetch_particle_addresses:
+        track_job.fetch_particle_addresses()
 
-    st.st_Particles_extract_addresses_cuda(
-        st.st_CudaArgument_get_arg_buffer(particles_addr_arg),
-        st.st_CudaArgument_get_arg_buffer(particles_arg))
-
-    st.st_CudaArgument_receive_memory(
-        particles_addr_arg, ptr_particles_addr, sizeof_particles_addr)
+    pset_index = 0
+    ptr_particles_addr = track_job.get_particle_addresses(pset_index)
+    particles_addr = ptr_particles_addr.contents
 
     print("Particle structure data on the device:")
     print("num_particles = {0:8d}".format(particles_addr.num_particles))
@@ -65,18 +59,16 @@ if __name__ == '__main__':
     x = pycuda.gpuarray.GPUArray(
         particles_addr.num_particles, float, gpudata=particles_addr.x)
 
-    x = np.array([float(ii) for ii in range(particles_addr.num_particles)])
+    x = np.linspace(0.0, float(num_particles - 1), num=num_particles,
+                    dtype=np.float64)
 
-    st.st_CudaArgument_receive_buffer(particles_arg, pbuffer)
+    cmp_particles.x = np.linspace(
+        0.0, float(num_particles - 1), num=num_particles, dtype=np.float64)
 
-    cmp_particles = pset.cbuffer.get_object(0, pyst.Particles)
+    assert pyst.compareParticlesDifference(
+        cmp_particles, particles, abs_treshold=2e-14) != 0
+
+    track_job.collectParticles()
 
     assert pyst.compareParticlesDifference(
         cmp_particles, particles, abs_treshold=2e-14) == 0
-
-    st.st_CudaContext_delete(ctx)
-    st.st_CudaArgument_delete(particles_arg)
-    st.st_CudaArgument_delete(particles_addr_arg)
-    st.st_Buffer_delete(pbuffer)
-
-    sys.exit(0)

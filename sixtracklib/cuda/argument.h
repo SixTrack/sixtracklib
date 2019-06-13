@@ -7,93 +7,89 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/context/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/common/output/elem_by_elem_config.h"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/cuda/definitions.h"
-    #include "sixtracklib/cuda/internal/argument_base.h"
     #include "sixtracklib/cuda/argument.hpp"
-    #include "sixtracklib/cuda/context.hpp"
+    #include "sixtracklib/cuda/controller.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
-#endif /* C++, Host */
+#endif /* C++ */
+
+#if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)* NS(CudaArgument_new)(
-    NS(CudaContext)* SIXTRL_RESTRICT context );
+    NS(CudaController)* SIXTRL_RESTRICT ctrl );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
-NS(CudaArgument_new_from_buffer)(
-    NS(Buffer)* SIXTRL_RESTRICT buffer, NS(CudaContext)* SIXTRL_RESTRICT ctx );
+NS(CudaArgument_new_from_buffer)( NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(CudaController)* SIXTRL_RESTRICT ctrl );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
-NS(CudaArgument_new_from_size)(
-    NS(context_size_t) const capacity, NS(CudaContext)* SIXTRL_RESTRICT ctx );
+NS(CudaArgument_new_from_size)( NS(ctrl_size_t) const capacity,
+    NS(CudaController)* SIXTRL_RESTRICT ctrl );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaArgument)*
-NS(CudaArgument_new_from_memory)(
+NS(CudaArgument_new_from_raw_argument)(
     void const* SIXTRL_RESTRICT raw_arg_begin,
-    NS(context_size_t) const raw_arg_length,
-    NS(CudaContext)* SIXTRL_RESTRICT ctx );
+    NS(ctrl_size_t) const arg_length, NS(CudaController)* SIXTRL_RESTRICT c );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(CudaArgument_delete)(
-    NS(CudaArgument)* SIXTRL_RESTRICT argument );
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Argument_has_cuda_arg_buffer)(
+    const NS(ArgumentBase) *const SIXTRL_RESTRICT arg );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(cuda_arg_buffer_t)
+NS(CudaArgument_get_cuda_arg_buffer)( NS(CudaArgument)* SIXTRL_RESTRICT arg );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(cuda_const_arg_buffer_t)
+NS(CudaArgument_get_const_cuda_arg_buffer)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT arg );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC unsigned char*
+NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
+    NS(CudaArgument)* SIXTRL_RESTRICT arg );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC unsigned char const*
+NS(CudaArgument_get_cuda_arg_buffer_as_const_cobject_buffer_begin)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT arg );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN
-NS(context_status_t) NS(CudaArgument_send_buffer)(
-    NS(CudaArgument)* SIXTRL_RESTRICT argument,
-    const NS(Buffer) *const SIXTRL_RESTRICT source_buffer );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_status_t) NS(CudaArgument_send_memory)(
-    NS(CudaArgument)* SIXTRL_RESTRICT argument,
-    const void *const SIXTRL_RESTRICT source_arg_begin,
-    NS(context_size_t) const source_arg_length );
+SIXTRL_BUFFER_DATAPTR_DEC NS(arch_debugging_t)*
+NS(CudaArgument_get_cuda_arg_buffer_as_debugging_register_begin)(
+    NS(CudaArgument)* SIXTRL_RESTRICT arg );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN
-NS(context_status_t) NS(CudaArgument_receive_buffer)(
-    NS(CudaArgument)* SIXTRL_RESTRICT argument,
-    NS(Buffer)* SIXTRL_RESTRICT destination_buffer );
+SIXTRL_BUFFER_DATAPTR_DEC NS(arch_debugging_t) const*
+NS(CudaArgument_get_cuda_arg_buffer_as_const_debugging_register_begin)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT arg );
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN
-NS(context_status_t) NS(CudaArgument_receive_memory)(
-    NS(CudaArgument)* SIXTRL_RESTRICT argument,
-    void* SIXTRL_RESTRICT destination_buffer,
-    NS(context_size_t) const destination_capacity );
+SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
+NS(CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin)(
+    NS(CudaArgument)* SIXTRL_RESTRICT arg );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_uses_cobjects_buffer)(
-    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
+SIXTRL_EXTERN SIXTRL_HOST_FN
+SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig) const*
+NS(CudaArgument_get_cuda_arg_buffer_as_const_elem_by_elem_config_begin)(
+    const NS(CudaArgument) *const SIXTRL_RESTRICT arg );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)* NS(CudaArgument_get_cobjects_buffer)(
-    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
+#endif /* !defined( _GPUCODE ) */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_uses_raw_argument)(
-    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_get_ptr_raw_argument)(
-    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t) NS(CudaArgument_get_size)(
-    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t) NS(CudaArgument_get_capacity)(
-    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_has_argument_buffer)(
-    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(CudaArgument_requires_argument_buffer)(
-    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_type_id_t)
-NS(CudaArgument_get_type_id)(
-    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(CudaArgument_get_type_id_str)(
-    const NS(CudaArgument) *const SIXTRL_RESTRICT argument );
-
-#if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 }
-#endif /* C++, Host */
+#endif /* C++ */
 
 #endif /* SIXTRACKLIB_CUDA_ARGUMENT_H__ */
 

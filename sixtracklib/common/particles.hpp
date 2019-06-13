@@ -1,13 +1,16 @@
 #ifndef CXX_SIXTRACKLIB_COMMON_PARTICLES_HPP__
 #define CXX_SIXTRACKLIB_COMMON_PARTICLES_HPP__
 
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/particles.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #if defined( __cplusplus )
         #include <cstddef>
         #include <cstdint>
         #include <cstdlib>
         #include <utility>
-
         #include <type_traits>
         #include <iterator>
     #endif /* defined( __cplusplus ) */
@@ -15,6 +18,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/particles.h"
 
@@ -43,9 +47,11 @@ namespace SIXTRL_CXX_NAMESPACE
         using index_pointer_t       = index_t*;
         using const_index_pointer_t = index_t const*;
 
-        using type_id_t     = NS(object_type_id_t);
-        using size_type     = NS(buffer_size_t);
-        using buffer_t   	= ::NS(Buffer);
+        using buffer_t      = SIXTRL_CXX_NAMESPACE::Buffer;
+        using c_buffer_t   	= buffer_t::c_api_t;
+        using type_id_t     = buffer_t::type_id_t;
+        using size_type     = buffer_t::size_type;
+        using status_t      = ::NS(arch_status_t);
 
         SIXTRL_FN TParticles() = default;
         SIXTRL_FN TParticles( TParticles< T > const& other ) = default;
@@ -61,19 +67,33 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN static bool CanAddToBuffer(
-            buffer_t& SIXTRL_RESTRICT_REF buffer,
+        SIXTRL_STATIC SIXTRL_FN bool CanAddToBuffer(
+            SIXTRL_BUFFER_ARGPTR_DEC buffer_t* SIXTRL_RESTRICT ptr_buffer,
             size_type const num_particles,
-            size_type* SIXTRL_RESTRICT ptr_requ_objects = nullptr,
-            size_type* SIXTRL_RESTRICT ptr_requ_slots = nullptr,
-            size_type* SIXTRL_RESTRICT ptr_requ_dataptrs = nullptr
+            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT req_objects = nullptr,
+            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT req_slots = nullptr,
+            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT req_dataptrs = nullptr
         ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN static TParticles< T >* CreateNewOnBuffer(
-            buffer_t& SIXTRL_RESTRICT_REF buffer, size_type const nparticles );
+        SIXTRL_FN static bool CanAddToBuffer(
+            SIXTRL_BUFFER_ARGPTR_DEC c_buffer_t* SIXTRL_RESTRICT_REF buffer,
+            size_type const num_particles,
+            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT req_objects = nullptr,
+            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT req_slots = nullptr,
+            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT req_dataptrs = nullptr
+        ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN static TParticles< T >* AddToBuffer(
-            buffer_t& SIXTRL_RESTRICT_REF buffer,
+
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >*
+        CreateNewOnBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
+                           size_type const num_particles );
+
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >*
+        CreateNewOnBuffer( c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+                           size_type const num_particles );
+
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >*
+        AddToBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
             size_type const num_particles,
             real_pointer_t  q0_ptr            = nullptr,
             real_pointer_t  mass0_ptr         = nullptr,
@@ -97,15 +117,49 @@ namespace SIXTRL_CXX_NAMESPACE
             index_pointer_t at_turn_ptr       = nullptr,
             index_pointer_t state_ptr         = nullptr );
 
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >*
+        AddToBuffer( c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+            size_type const num_particles,
+            real_pointer_t  q0_ptr            = nullptr,
+            real_pointer_t  mass0_ptr         = nullptr,
+            real_pointer_t  beta0_ptr         = nullptr,
+            real_pointer_t  gamma0_ptr        = nullptr,
+            real_pointer_t  p0c_ptr           = nullptr,
+            real_pointer_t  s_ptr             = nullptr,
+            real_pointer_t  x_ptr             = nullptr,
+            real_pointer_t  y_ptr             = nullptr,
+            real_pointer_t  px_ptr            = nullptr,
+            real_pointer_t  py_ptr            = nullptr,
+            real_pointer_t  zeta_ptr          = nullptr,
+            real_pointer_t  psigma_ptr        = nullptr,
+            real_pointer_t  delta_ptr         = nullptr,
+            real_pointer_t  rpp_ptr           = nullptr,
+            real_pointer_t  rvv_ptr           = nullptr,
+            real_pointer_t  chi_ptr           = nullptr,
+            real_pointer_t  charge_ratio_ptr  = nullptr,
+            index_pointer_t particle_id_ptr   = nullptr,
+            index_pointer_t at_element_id_ptr = nullptr,
+            index_pointer_t at_turn_ptr       = nullptr,
+            index_pointer_t state_ptr         = nullptr );
+
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >*
+        AddCopyToBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
+                         TParticles< T > const& SIXTRL_RESTRICT_REF orig );
+
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >*
+        AddCopyToBuffer( c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+                         TParticles< T > const& SIXTRL_RESTRICT_REF orig );
+
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN bool copy( TParticles< T > const& other ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN status_t copy(
+            TParticles< T > const& other ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN bool copySingle( TParticles< T > const& other,
+        SIXTRL_FN status_t copySingle( TParticles< T > const& other,
             index_t const source_index,
             index_t dest_index = index_t{ -1 } ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN bool copyRange(
+        SIXTRL_FN status_t copyRange(
             TParticles< T > const& other,
             index_t const src_start_idx,
             index_t const src_end_idx,
@@ -114,6 +168,16 @@ namespace SIXTRL_CXX_NAMESPACE
         /* ----------------------------------------------------------------- */
 
         SIXTRL_FN type_id_t getTypeId() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_STATIC SIXTRL_FN size_type RequiredNumDataPtrs(
+            buffer_t const& SIXTRL_RESTRICT_REF buffer,
+            size_type const num_particles ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_STATIC SIXTRL_FN size_type RequiredNumDataPtrs(
+            SIXTRL_BUFFER_ARGPTR_DEC const c_buffer_t *const
+                SIXTRL_RESTRICT ptr_buffer,
+            size_type const num_particles ) SIXTRL_NOEXCEPT;
+
         SIXTRL_FN num_elements_t getNumParticles() const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN void setNumParticles(
@@ -529,7 +593,7 @@ namespace SIXTRL_CXX_NAMESPACE
     /* Specialization for T = SIXTRL_REAL_T: */
     /* ===================================================================== */
 
-    template<> struct TParticles< NS(particle_real_t) > :
+    template<> struct TParticles< ::NS(particle_real_t) > :
         public ::NS(Particles)
     {
         using num_elements_t = NS(particle_num_elements_t);
@@ -546,45 +610,72 @@ namespace SIXTRL_CXX_NAMESPACE
         using index_pointer_t       = index_t*;
         using const_index_pointer_t = index_t const*;
 
-        using type_id_t             = NS(object_type_id_t);
-        using size_type             = NS(buffer_size_t);
-        using buffer_t   	        = ::NS(Buffer);
-        using c_api_t               = ::NS(Particles);
+        using buffer_t   	= SIXTRL_CXX_NAMESPACE::Buffer;
+        using type_id_t     = buffer_t::type_id_t;
+        using size_type     = buffer_t::size_type;
+        using c_buffer_t    = buffer_t::c_api_t;
+        using c_api_t       = ::NS(Particles);
+        using status_t      = ::NS(arch_status_t);
 
         SIXTRL_FN TParticles() = default;
 
         SIXTRL_FN TParticles(
-            TParticles< NS(particle_real_t) > const& other ) = default;
+            TParticles< ::NS(particle_real_t) > const& other ) = default;
 
         SIXTRL_FN TParticles(
-            TParticles< NS(particle_real_t) >&& other ) = default;
+            TParticles< ::NS(particle_real_t) >&& other ) = default;
 
-        SIXTRL_FN TParticles< NS(particle_real_t) >& operator=(
-            TParticles< NS(particle_real_t) > const& rhs ) = default;
+        SIXTRL_FN TParticles< ::NS(particle_real_t) >& operator=(
+            TParticles< ::NS(particle_real_t) > const& rhs ) = default;
 
-        SIXTRL_FN TParticles< NS(particle_real_t) >& operator=(
-            TParticles< NS(particle_real_t) >&& rhs ) = default;
+        SIXTRL_FN TParticles< ::NS(particle_real_t) >& operator=(
+            TParticles< ::NS(particle_real_t) >&& rhs ) = default;
 
         SIXTRL_FN ~TParticles() = default;
 
         SIXTRL_FN type_id_t getTypeId() const SIXTRL_NOEXCEPT;
 
+        SIXTRL_STATIC SIXTRL_FN size_type RequiredNumDataPtrs(
+            buffer_t const& SIXTRL_RESTRICT_REF buffer,
+            size_type const num_particles ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_STATIC SIXTRL_FN size_type RequiredNumDataPtrs(
+            SIXTRL_BUFFER_ARGPTR_DEC const c_buffer_t *const
+                SIXTRL_RESTRICT ptr_buffer,
+            size_type const num_particles ) SIXTRL_NOEXCEPT;
+
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN static bool CanAddToBuffer(
-            buffer_t& SIXTRL_RESTRICT_REF buffer,
+        SIXTRL_STATIC SIXTRL_FN bool CanAddToBuffer(
+            SIXTRL_BUFFER_ARGPTR_DEC buffer_t* SIXTRL_RESTRICT ptr_buffer,
             size_type const num_particles,
-            size_type* SIXTRL_RESTRICT ptr_requ_objects = nullptr,
-            size_type* SIXTRL_RESTRICT ptr_requ_slots = nullptr,
-            size_type* SIXTRL_RESTRICT ptr_requ_dataptrs = nullptr
-            ) SIXTRL_NOEXCEPT;
+            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT req_objects = nullptr,
+            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT req_slots = nullptr,
+            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT req_dataptrs = nullptr
+        ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN SIXTRL_STATIC TParticles< NS(particle_real_t) >*
+        SIXTRL_FN static bool CanAddToBuffer(
+            SIXTRL_BUFFER_ARGPTR_DEC c_buffer_t* SIXTRL_RESTRICT_REF buffer,
+            size_type const num_particles,
+            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT req_objects = nullptr,
+            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT req_slots = nullptr,
+            SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT req_dataptrs = nullptr
+        ) SIXTRL_NOEXCEPT;
+
+
+        SIXTRL_STATIC SIXTRL_FN
+        SIXTRL_PARTICLE_ARGPTR_DEC TParticles< ::NS(particle_real_t) >*
         CreateNewOnBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
-            size_type const num_particles );
+                           size_type const num_particles );
 
-        SIXTRL_FN SIXTRL_STATIC TParticles< NS(particle_real_t) >* AddToBuffer(
-            buffer_t& SIXTRL_RESTRICT_REF buffer,
+        SIXTRL_STATIC SIXTRL_FN
+        SIXTRL_PARTICLE_ARGPTR_DEC TParticles< ::NS(particle_real_t) >*
+        CreateNewOnBuffer( c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+                           size_type const num_particles );
+
+        SIXTRL_STATIC SIXTRL_FN
+        SIXTRL_PARTICLE_ARGPTR_DEC TParticles< ::NS(particle_real_t) >*
+        AddToBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
             size_type const num_particles,
             real_pointer_t  q0_ptr            = nullptr,
             real_pointer_t  mass0_ptr         = nullptr,
@@ -608,31 +699,67 @@ namespace SIXTRL_CXX_NAMESPACE
             index_pointer_t at_turn_ptr       = nullptr,
             index_pointer_t state_ptr         = nullptr );
 
+        SIXTRL_STATIC SIXTRL_FN
+        SIXTRL_PARTICLE_ARGPTR_DEC TParticles< ::NS(particle_real_t) >*
+        AddToBuffer( c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+            size_type const num_particles,
+            real_pointer_t  q0_ptr            = nullptr,
+            real_pointer_t  mass0_ptr         = nullptr,
+            real_pointer_t  beta0_ptr         = nullptr,
+            real_pointer_t  gamma0_ptr        = nullptr,
+            real_pointer_t  p0c_ptr           = nullptr,
+            real_pointer_t  s_ptr             = nullptr,
+            real_pointer_t  x_ptr             = nullptr,
+            real_pointer_t  y_ptr             = nullptr,
+            real_pointer_t  px_ptr            = nullptr,
+            real_pointer_t  py_ptr            = nullptr,
+            real_pointer_t  zeta_ptr          = nullptr,
+            real_pointer_t  psigma_ptr        = nullptr,
+            real_pointer_t  delta_ptr         = nullptr,
+            real_pointer_t  rpp_ptr           = nullptr,
+            real_pointer_t  rvv_ptr           = nullptr,
+            real_pointer_t  chi_ptr           = nullptr,
+            real_pointer_t  charge_ratio_ptr  = nullptr,
+            index_pointer_t particle_id_ptr   = nullptr,
+            index_pointer_t at_element_id_ptr = nullptr,
+            index_pointer_t at_turn_ptr       = nullptr,
+            index_pointer_t state_ptr         = nullptr );
+
+        SIXTRL_STATIC SIXTRL_FN
+        SIXTRL_PARTICLE_ARGPTR_DEC TParticles< ::NS(particle_real_t) >*
+        AddCopyToBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
+            TParticles< ::NS(particle_real_t) > const& SIXTRL_RESTRICT_REF );
+
+        SIXTRL_STATIC SIXTRL_FN
+        SIXTRL_PARTICLE_ARGPTR_DEC TParticles< ::NS(particle_real_t) >*
+        AddCopyToBuffer( c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+            TParticles< ::NS(particle_real_t) > const& SIXTRL_RESTRICT_REF );
+
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN bool copy( TParticles< NS(particle_real_t) > const&
+        SIXTRL_FN status_t copy( TParticles< ::NS(particle_real_t) > const&
             SIXTRL_RESTRICT_REF other ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN bool copy( SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
+        SIXTRL_FN status_t copy( SIXTRL_PARTICLE_ARGPTR_DEC ::NS(Particles) const*
                 SIXTRL_RESTRICT other ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN bool copySingle( SIXTRL_PARTICLE_ARGPTR_DEC
-            TParticles< NS(particle_real_t) > const& SIXTRL_RESTRICT_REF other,
+        SIXTRL_FN status_t copySingle( SIXTRL_PARTICLE_ARGPTR_DEC
+            TParticles< ::NS(particle_real_t) > const& SIXTRL_RESTRICT_REF,
             index_t const source_index,
             index_t dest_index = index_t{ -1 } ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN bool copySingle( SIXTRL_PARTICLE_ARGPTR_DEC
-            NS(Particles) const* SIXTRL_RESTRICT other,
+        SIXTRL_FN status_t copySingle( SIXTRL_PARTICLE_ARGPTR_DEC
+            ::NS(Particles) const* SIXTRL_RESTRICT other,
             index_t const source_index,
             index_t dest_index = index_t{ -1 } ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN bool copyRange(
-            TParticles< NS(particle_real_t) > const& SIXTRL_RESTRICT_REF other,
+        SIXTRL_FN status_t copyRange(
+            TParticles< ::NS(particle_real_t) > const& SIXTRL_RESTRICT_REF,
             index_t const src_start_idx,
             index_t const src_end_idx,
             index_t dst_start_idx = index_t{ -1 } ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN bool copyRange( SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)
+        SIXTRL_FN status_t copyRange( SIXTRL_PARTICLE_ARGPTR_DEC ::NS(Particles)
             const* SIXTRL_RESTRICT other,
             index_t const src_start_idx,
             index_t const src_end_idx,
@@ -640,30 +767,36 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        static SIXTRL_BUFFER_OBJ_DATAPTR_DEC TParticles< NS(particle_real_t) > const*
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_OBJ_DATAPTR_DEC
+        TParticles< ::NS(particle_real_t) > const*
         FromBuffer( Buffer const& SIXTRL_RESTRICT_REF buffer,
                     Buffer::size_type const particle_obj_index ) SIXTRL_NOEXCEPT;
 
-        static SIXTRL_BUFFER_OBJ_DATAPTR_DEC TParticles< NS(particle_real_t) > const*
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_OBJ_DATAPTR_DEC
+        TParticles< ::NS(particle_real_t) > const*
         FromBuffer( SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
             SIXTRL_RESTRICT buffer,
             NS(buffer_size_t) const particle_obj_index ) SIXTRL_NOEXCEPT;
 
-        static SIXTRL_BUFFER_OBJ_DATAPTR_DEC TParticles< NS(particle_real_t) >*
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_OBJ_DATAPTR_DEC
+        TParticles< ::NS(particle_real_t) > *
         FromBuffer( Buffer& SIXTRL_RESTRICT_REF buffer,
                     Buffer::size_type const particle_obj_index ) SIXTRL_NOEXCEPT;
 
-        static SIXTRL_BUFFER_OBJ_DATAPTR_DEC TParticles< NS(particle_real_t) >*
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_OBJ_DATAPTR_DEC
+        TParticles< ::NS(particle_real_t) > *
         FromBuffer( SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*const SIXTRL_RESTRICT buffer,
-            NS(buffer_size_t) const particle_obj_index ) SIXTRL_NOEXCEPT;
+            ::NS(buffer_size_t) const particle_obj_index ) SIXTRL_NOEXCEPT;
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        static SIXTRL_BUFFER_OBJ_DATAPTR_DEC TParticles< NS(particle_real_t) > const*
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_OBJ_DATAPTR_DEC
+        TParticles< ::NS(particle_real_t) >  const*
         FromBufferObject( SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const
             SIXTRL_RESTRICT index_obj ) SIXTRL_NOEXCEPT;
 
-        static SIXTRL_BUFFER_OBJ_DATAPTR_DEC TParticles< NS(particle_real_t) >*
+        SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_OBJ_DATAPTR_DEC
+        TParticles< ::NS(particle_real_t) >*
         FromBufferObject( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
             SIXTRL_RESTRICT index_obj ) SIXTRL_NOEXCEPT;
 
@@ -1027,17 +1160,9 @@ namespace SIXTRL_CXX_NAMESPACE
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
     };
 
-    using Particles = TParticles< NS(particle_real_t) >;
+    using Particles = TParticles< ::NS(particle_real_t) >;
 
     template<> struct ObjectTypeTraits< ::NS(Particles) >
-    {
-        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
-        {
-            return NS(OBJECT_TYPE_PARTICLE);
-        }
-    };
-
-    template<> struct ObjectTypeTraits< Particles >
     {
         SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
         {
@@ -1074,10 +1199,32 @@ namespace SIXTRL_CXX_NAMESPACE
         return NS(OBJECT_TYPE_PARTICLE);
     }
 
+    template< typename T >
+    SIXTRL_INLINE typename TParticles< T >::size_type
+    TParticles< T >::RequiredNumDataPtrs(
+        typename TParticles< T >::buffer_t const& SIXTRL_RESTRICT_REF buffer,
+        TParticles< T >::size_type const num_particles ) SIXTRL_NOEXCEPT
+    {
+        return ::NS(Particles_get_required_num_dataptrs)(
+            buffer.getCApiPtr(), num_particles );
+    }
+
+    template< typename T >
+    SIXTRL_INLINE typename TParticles< T >::size_type
+    TParticles< T >::RequiredNumDataPtrs(
+        SIXTRL_BUFFER_ARGPTR_DEC const typename TParticles< T >::c_buffer_t
+            *const SIXTRL_RESTRICT ptr_buffer,
+        typename TParticles< T >::size_type const num_particles
+    ) SIXTRL_NOEXCEPT
+    {
+        return ::NS(Particles_get_required_num_dataptrs)(
+            ptr_buffer, num_particles );
+    }
+
     /* ----------------------------------------------------------------- */
 
     template< typename T >
-    SIXTRL_INLINE bool TParticles< T >::copy(
+    SIXTRL_INLINE typename TParticles< T >::status_t TParticles< T >::copy(
         TParticles< T > const& other ) SIXTRL_NOEXCEPT
     {
         using index_t = typename TParticles< T >::index_t;
@@ -1087,7 +1234,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE bool TParticles< T >::copyRange(
+    SIXTRL_INLINE typename TParticles< T >::status_t
+    TParticles< T >::copyRange(
         TParticles< T > const& other,
         typename TParticles< T >::index_t const src_start_idx,
         typename TParticles< T >::index_t const src_end_idx,
@@ -1096,7 +1244,8 @@ namespace SIXTRL_CXX_NAMESPACE
         using num_elem_t = typename TParticles< T >::num_elements_t;
         using index_t    = typename TParticles< T >::index_t;
 
-        bool success = false;
+        typename TParticles< T >::status_t status =
+            SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
         num_elem_t const num_to_copy = ( src_start_idx <= src_end_idx )
             ? ( src_end_idx - src_start_idx ) : num_elem_t{ 0 };
@@ -1120,7 +1269,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( dst_start_idx >= index_t{ 0 } ) &&
             ( dest_num_particles >= ( dst_start_idx + num_to_copy ) ) )
         {
-            success = true;
+            status = SIXTRL_ARCH_STATUS_SUCCESS;
 
             SIXTRL_ASSERT( other.q0             != nullptr );
             SIXTRL_ASSERT( other.beta0          != nullptr );
@@ -1233,15 +1382,14 @@ namespace SIXTRL_CXX_NAMESPACE
             std::copy( &other.state[ src_start_idx ],
                        &other.state[ src_end_idx ],
                        &this->state[ dst_start_idx ] );
-
-            success = true;
         }
 
-        return success;
+        return status;
     }
 
     template< typename T >
-    SIXTRL_INLINE bool TParticles< T >::copySingle(
+    SIXTRL_INLINE typename TParticles< T >::status_t
+    TParticles< T >::copySingle(
         TParticles< T > const& other,
         typename TParticles< T >::index_t const src_idx,
         typename TParticles< T >::index_t dst_idx ) SIXTRL_NOEXCEPT
@@ -1249,7 +1397,8 @@ namespace SIXTRL_CXX_NAMESPACE
         using num_elem_t = typename TParticles< T >::num_elements_t;
         using index_t    = typename TParticles< T >::index_t;
 
-        bool success = false;
+        typename TParticles< T >::status_t status =
+            SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
         num_elem_t const src_num_particles = other.getNumParticles();
         num_elem_t const dst_num_particles = this->getNumParticles();
@@ -1295,21 +1444,43 @@ namespace SIXTRL_CXX_NAMESPACE
             this->setAtTurnValue( dst_idx,  other.getAtTurnValue( src_idx ) );
             this->setStateValue(  dst_idx,  other.getStateValue(  src_idx ) );
 
-            success = true;
+            status = SIXTRL_ARCH_STATUS_SUCCESS;
         }
 
-        return success;
+        return status;
     }
 
     /* ----------------------------------------------------------------- */
 
     template< typename T >
     SIXTRL_INLINE  bool TParticles< T >::CanAddToBuffer(
-        typename TParticles< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        SIXTRL_BUFFER_ARGPTR_DEC typename TParticles< T >::buffer_t*
+            SIXTRL_RESTRICT_REF ptr_buffer,
         typename TParticles< T >::size_type const num_particles,
-        typename TParticles< T >::size_type* SIXTRL_RESTRICT ptr_requ_objects,
-        typename TParticles< T >::size_type* SIXTRL_RESTRICT ptr_requ_slots,
-        typename TParticles< T >::size_type* SIXTRL_RESTRICT ptr_requ_dataptrs
+        SIXTRL_ARGPTR_DEC typename TParticles< T >::size_type*
+            SIXTRL_RESTRICT req_objects,
+        SIXTRL_ARGPTR_DEC typename TParticles< T >::size_type*
+            SIXTRL_RESTRICT req_slots,
+        SIXTRL_ARGPTR_DEC typename TParticles< T >::size_type*
+            SIXTRL_RESTRICT req_dataptrs ) SIXTRL_NOEXCEPT
+    {
+        return ( ( ptr_buffer != nullptr ) &&
+            ( TParticles< T >::CanAddToBuffer( ptr_buffer->getCApiPtr(),
+                num_particles, req_objects, req_slots, req_dataptrs ) ) );
+    }
+
+
+    template< typename T >
+    SIXTRL_INLINE  bool TParticles< T >::CanAddToBuffer(
+        SIXTRL_BUFFER_ARGPTR_DEC typename TParticles< T >::c_buffer_t*
+            SIXTRL_RESTRICT_REF ptr_buffer,
+        typename TParticles< T >::size_type const num_particles,
+        SIXTRL_ARGPTR_DEC typename TParticles< T >::size_type*
+            SIXTRL_RESTRICT ptr_requ_objects,
+        SIXTRL_ARGPTR_DEC typename TParticles< T >::size_type*
+            SIXTRL_RESTRICT ptr_requ_slots,
+        SIXTRL_ARGPTR_DEC typename TParticles< T >::size_type*
+            SIXTRL_RESTRICT ptr_requ_dataptrs
         ) SIXTRL_NOEXCEPT
     {
         using _this_t = TParticles< T >;
@@ -1321,7 +1492,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
         size_t const real_size    = sizeof( real_t );
         size_t const index_size   = sizeof( index_t );
-        size_t const num_dataptrs = NS(PARTICLES_NUM_DATAPTRS);
+
+        size_t const num_dataptrs =
+        _this_t::RequiredNumDataPtrs( ptr_buffer, num_particles );
+
+        SIXTRL_ASSERT( num_dataptrs == ::NS(PARTICLES_NUM_DATAPTRS) );
 
         size_t const sizes[] =
         {
@@ -1341,14 +1516,25 @@ namespace SIXTRL_CXX_NAMESPACE
             num_particles, num_particles, num_particles, num_particles
         };
 
-        return ::NS(Buffer_can_add_object)( &buffer, sizeof( _this_t ),
+        return ::NS(Buffer_can_add_object)( ptr_buffer, sizeof( _this_t ),
             num_dataptrs, sizes, counts, ptr_requ_objects, ptr_requ_slots,
                 ptr_requ_dataptrs );
     }
 
     template< typename T >
-    SIXTRL_INLINE  TParticles< T >* TParticles< T >::CreateNewOnBuffer(
+    SIXTRL_INLINE  SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >*
+    TParticles< T >::CreateNewOnBuffer(
         typename TParticles< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        typename TParticles< T >::size_type const num_particles )
+    {
+        return TParticles< T >::CreateNewOnBuffer(
+            *buffer.getCApiPtr(), num_particles );
+    }
+
+    template< typename T >
+    SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >*
+    TParticles< T >::CreateNewOnBuffer(
+        typename TParticles< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
         typename TParticles< T >::size_type const num_particles )
     {
         using _this_t = TParticles< T >;
@@ -1358,7 +1544,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         size_t const real_size    = sizeof( real_t );
         size_t const index_size   = sizeof( index_t );
-        size_t const num_dataptrs = NS(PARTICLES_NUM_DATAPTRS);
+        size_t const num_dataptrs =
+        _this_t::RequiredNumDataPtrs( &buffer, num_particles );
+
+        SIXTRL_ASSERT( num_dataptrs == ::NS(PARTICLES_NUM_DATAPTRS) );
 
         size_t const offsets[] =
         {
@@ -1420,14 +1609,15 @@ namespace SIXTRL_CXX_NAMESPACE
         temp.setNumParticles( num_particles );
         type_id_t const type_id = temp.getTypeId();
 
-        return reinterpret_cast< T* >( static_cast< uintptr_t >(
-            ::NS(Object_get_begin_addr)(
+        return reinterpret_cast< SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >* >(
+            static_cast< uintptr_t >( ::NS(Object_get_begin_addr)(
                 ::NS(Buffer_add_object)( &buffer, &temp, sizeof( _this_t ),
                     type_id, num_dataptrs, offsets, sizes, counts ) ) ) );
     }
 
     template< typename T >
-    SIXTRL_INLINE  TParticles< T >* TParticles< T >::AddToBuffer(
+    SIXTRL_INLINE  SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >*
+    TParticles< T >::AddToBuffer(
         typename TParticles< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         typename TParticles< T >::size_type const num_particles,
         typename TParticles< T >::real_pointer_t  q0_ptr,
@@ -1438,8 +1628,41 @@ namespace SIXTRL_CXX_NAMESPACE
         typename TParticles< T >::real_pointer_t  s_ptr,
         typename TParticles< T >::real_pointer_t  x_ptr,
         typename TParticles< T >::real_pointer_t  y_ptr,
-        typename TParticles< T >::real_pointer_t  py_ptr,
         typename TParticles< T >::real_pointer_t  px_ptr,
+        typename TParticles< T >::real_pointer_t  py_ptr,
+        typename TParticles< T >::real_pointer_t  zeta_ptr,
+        typename TParticles< T >::real_pointer_t  psigma_ptr,
+        typename TParticles< T >::real_pointer_t  delta_ptr,
+        typename TParticles< T >::real_pointer_t  rpp_ptr,
+        typename TParticles< T >::real_pointer_t  rvv_ptr,
+        typename TParticles< T >::real_pointer_t  chi_ptr,
+        typename TParticles< T >::real_pointer_t  charge_ratio_ptr,
+        typename TParticles< T >::index_pointer_t particle_id_ptr  ,
+        typename TParticles< T >::index_pointer_t at_element_id_ptr,
+        typename TParticles< T >::index_pointer_t at_turn_ptr,
+        typename TParticles< T >::index_pointer_t state_ptr )
+    {
+        return TParticles< T >::AddToBuffer( *buffer.getCApiPtr(), num_particles,
+            q0_ptr, mass0_ptr, beta0_ptr, gamma0_ptr, p0c_ptr, s_ptr, x_ptr,
+            y_ptr, px_ptr, py_ptr, zeta_ptr, psigma_ptr, delta_ptr, rpp_ptr,
+            rvv_ptr, chi_ptr, charge_ratio_ptr, particle_id_ptr,
+            at_element_id_ptr, at_turn_ptr, state_ptr );
+    }
+
+    template< typename T >
+    SIXTRL_INLINE  TParticles< T >* TParticles< T >::AddToBuffer(
+        typename TParticles< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+        typename TParticles< T >::size_type const num_particles,
+        typename TParticles< T >::real_pointer_t  q0_ptr,
+        typename TParticles< T >::real_pointer_t  mass0_ptr,
+        typename TParticles< T >::real_pointer_t  beta0_ptr,
+        typename TParticles< T >::real_pointer_t  gamma0_ptr,
+        typename TParticles< T >::real_pointer_t  p0c_ptr,
+        typename TParticles< T >::real_pointer_t  s_ptr,
+        typename TParticles< T >::real_pointer_t  x_ptr,
+        typename TParticles< T >::real_pointer_t  y_ptr,
+        typename TParticles< T >::real_pointer_t  px_ptr,
+        typename TParticles< T >::real_pointer_t  py_ptr,
         typename TParticles< T >::real_pointer_t  zeta_ptr,
         typename TParticles< T >::real_pointer_t  psigma_ptr,
         typename TParticles< T >::real_pointer_t  delta_ptr,
@@ -1459,7 +1682,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         size_t const real_size    = sizeof( real_t );
         size_t const index_size   = sizeof( index_t );
-        size_t const num_dataptrs = NS(PARTICLES_NUM_DATAPTRS);
+        size_t const num_dataptrs =
+            _this_t::RequiredNumDataPtrs( &buffer, num_particles );
+
+        SIXTRL_ASSERT( num_dataptrs == ::NS(PARTICLES_NUM_DATAPTRS) );
 
         size_t const offsets[] =
         {
@@ -1538,10 +1764,36 @@ namespace SIXTRL_CXX_NAMESPACE
 
         type_id_t const type_id = temp.getTypeId();
 
-        return reinterpret_cast< T* >( static_cast< uintptr_t >(
-            ::NS(Object_get_begin_addr)(
+        return reinterpret_cast< SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >* >(
+            static_cast< uintptr_t >( ::NS(Object_get_begin_addr)(
                 ::NS(Buffer_add_object)( &buffer, &temp, sizeof( _this_t ),
                     type_id, num_dataptrs, offsets, sizes, counts ) ) ) );
+    }
+
+    template< typename T >
+    SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >*
+    TParticles< T >::AddCopyToBuffer(
+         typename TParticles< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+         TParticles< T > const& SIXTRL_RESTRICT_REF other )
+    {
+        return TParticles< T >::AddCopyToBuffer(
+            *buffer.getCApiPtr(), other );
+    }
+
+    template< typename T >
+    SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC TParticles< T >*
+    TParticles< T >::AddCopyToBuffer(
+         typename TParticles< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+         TParticles< T > const& SIXTRL_RESTRICT_REF other )
+    {
+        return TParticles< T >::AddToBuffer(
+            buffer, other.getNumParticles(), other.getQ0(), other.getMass0(),
+            other.getBeta0(), other.getGamma0(), other.getP0c(), other.getS(),
+            other.getX(), other.getY(), other.getPx(), other.getPy(),
+            other.getZeta(), other.getPSigma(), other.getDelta(),
+            other.getRpp(), other.getRvv(), other.getChi(),
+            other.getChargeRatio(), other.getParticleId(),
+            other.getAtElementId(), other.getAtTurn(), other.getState() );
     }
 
     /* ----------------------------------------------------------------- */
@@ -2859,67 +3111,140 @@ namespace SIXTRL_CXX_NAMESPACE
     /* Specialization for TParticles< NS(particle_real_t) >: */
     /* ===================================================================== */
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::type_id_t
-    TParticles< NS(particle_real_t) >::getTypeId() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::type_id_t
+    Particles::getTypeId() const SIXTRL_NOEXCEPT
     {
         return NS(OBJECT_TYPE_PARTICLE);
     }
 
+
+    SIXTRL_INLINE Particles::size_type Particles::RequiredNumDataPtrs(
+        Particles::buffer_t const& SIXTRL_RESTRICT_REF buffer,
+        Particles::size_type const num_particles ) SIXTRL_NOEXCEPT
+    {
+        return ::NS(Particles_get_required_num_dataptrs)(
+            buffer.getCApiPtr(), num_particles );
+    }
+
+    SIXTRL_INLINE Particles::size_type Particles::RequiredNumDataPtrs(
+        SIXTRL_BUFFER_ARGPTR_DEC const Particles::c_buffer_t *const
+            SIXTRL_RESTRICT ptr_buffer,
+        Particles::size_type const num_particles ) SIXTRL_NOEXCEPT
+    {
+        return ::NS(Particles_get_required_num_dataptrs)(
+            ptr_buffer, num_particles );
+    }
+
     /* ----------------------------------------------------------------- */
 
-
-    SIXTRL_INLINE bool TParticles< NS(particle_real_t) >::CanAddToBuffer(
-        TParticles< NS(particle_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        TParticles< NS(particle_real_t) >::size_type const num_particles,
-        TParticles< NS(particle_real_t) >::size_type*
-            SIXTRL_RESTRICT ptr_requ_objects,
-        TParticles< NS(particle_real_t) >::size_type*
-            SIXTRL_RESTRICT ptr_requ_slots,
-        TParticles< NS(particle_real_t) >::size_type*
-            SIXTRL_RESTRICT ptr_requ_dataptrs ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE bool Particles::CanAddToBuffer(
+        SIXTRL_BUFFER_ARGPTR_DEC Particles::buffer_t*
+            SIXTRL_RESTRICT ptr_buffer,
+        Particles::size_type const num_particles,
+        SIXTRL_ARGPTR_DEC Particles::size_type* SIXTRL_RESTRICT req_objects,
+        SIXTRL_ARGPTR_DEC Particles::size_type* SIXTRL_RESTRICT req_slots,
+        SIXTRL_ARGPTR_DEC Particles::size_type* SIXTRL_RESTRICT req_dataptrs
+    ) SIXTRL_NOEXCEPT
     {
-        return ::NS(Particles_can_be_added)( &buffer, num_particles,
-                ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
+        return ( ( ptr_buffer != nullptr ) &&
+            ( ::NS(Particles_can_be_added)( ptr_buffer->getCApiPtr(),
+                num_particles, req_objects, req_slots, req_dataptrs ) ) );
+    }
+
+    SIXTRL_INLINE bool Particles::CanAddToBuffer(
+        SIXTRL_BUFFER_ARGPTR_DEC Particles::c_buffer_t*
+            SIXTRL_RESTRICT ptr_buffer,
+        Particles::size_type const num_particles,
+        SIXTRL_ARGPTR_DEC Particles::size_type* SIXTRL_RESTRICT req_objects,
+        SIXTRL_ARGPTR_DEC Particles::size_type* SIXTRL_RESTRICT req_slots,
+        SIXTRL_ARGPTR_DEC Particles::size_type* SIXTRL_RESTRICT req_dataptrs
+    ) SIXTRL_NOEXCEPT
+    {
+        return ::NS(Particles_can_be_added)( ptr_buffer,
+            num_particles, req_objects, req_slots, req_dataptrs );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >*
-    TParticles< NS(particle_real_t) >::CreateNewOnBuffer(
-        TParticles< NS(particle_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        TParticles< NS(particle_real_t) >::size_type const num_particles )
+    SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC Particles*
+    Particles::CreateNewOnBuffer(
+        Particles::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        Particles::size_type const num_particles )
     {
-        return reinterpret_cast< TParticles< NS(particle_real_t) >* >(
+        return static_cast< SIXTRL_PARTICLE_ARGPTR_DEC Particles* >(
+            ::NS(Particles_new)( buffer.getCApiPtr(), num_particles ) );
+    }
+
+    SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC Particles*
+    Particles::CreateNewOnBuffer(
+        Particles::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+        Particles::size_type const num_particles )
+    {
+        return static_cast< SIXTRL_PARTICLE_ARGPTR_DEC Particles* >(
             ::NS(Particles_new)( &buffer, num_particles ) );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >*
-    TParticles< NS(particle_real_t) >::AddToBuffer(
-        TParticles< NS(particle_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        TParticles< NS(particle_real_t) >::size_type const num_particles,
-        TParticles< NS(particle_real_t) >::real_pointer_t  q0_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  mass0_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  beta0_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  gamma0_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  p0c_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  s_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  x_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  y_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  px_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  py_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  zeta_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  psigma_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  delta_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  rpp_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  rvv_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  chi_ptr,
-        TParticles< NS(particle_real_t) >::real_pointer_t  charge_ratio_ptr,
-        TParticles< NS(particle_real_t) >::index_pointer_t particle_id_ptr  ,
-        TParticles< NS(particle_real_t) >::index_pointer_t at_element_id_ptr,
-        TParticles< NS(particle_real_t) >::index_pointer_t at_turn_ptr,
-        TParticles< NS(particle_real_t) >::index_pointer_t state_ptr )
+    SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC Particles*
+    Particles::AddToBuffer(
+        Particles::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        Particles::size_type const num_particles,
+        Particles::real_pointer_t  q0_ptr,
+        Particles::real_pointer_t  mass0_ptr,
+        Particles::real_pointer_t  beta0_ptr,
+        Particles::real_pointer_t  gamma0_ptr,
+        Particles::real_pointer_t  p0c_ptr,
+        Particles::real_pointer_t  s_ptr,
+        Particles::real_pointer_t  x_ptr,
+        Particles::real_pointer_t  y_ptr,
+        Particles::real_pointer_t  px_ptr,
+        Particles::real_pointer_t  py_ptr,
+        Particles::real_pointer_t  zeta_ptr,
+        Particles::real_pointer_t  psigma_ptr,
+        Particles::real_pointer_t  delta_ptr,
+        Particles::real_pointer_t  rpp_ptr,
+        Particles::real_pointer_t  rvv_ptr,
+        Particles::real_pointer_t  chi_ptr,
+        Particles::real_pointer_t  charge_ratio_ptr,
+        Particles::index_pointer_t particle_id_ptr  ,
+        Particles::index_pointer_t at_element_id_ptr,
+        Particles::index_pointer_t at_turn_ptr,
+        Particles::index_pointer_t state_ptr )
     {
-        return reinterpret_cast< TParticles< NS(particle_real_t) >* >(
+        return static_cast< SIXTRL_PARTICLE_ARGPTR_DEC Particles* >(
+            ::NS(Particles_add)( buffer.getCApiPtr(), num_particles,
+                q0_ptr, mass0_ptr, beta0_ptr, gamma0_ptr, p0c_ptr,
+                s_ptr, x_ptr, y_ptr, px_ptr, py_ptr, zeta_ptr,
+                psigma_ptr, delta_ptr, rpp_ptr, rvv_ptr, chi_ptr, charge_ratio_ptr,
+                particle_id_ptr, at_element_id_ptr, at_turn_ptr, state_ptr ) );
+    }
+
+    SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC Particles*
+    Particles::AddToBuffer(
+        Particles::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+        Particles::size_type const num_particles,
+        Particles::real_pointer_t  q0_ptr,
+        Particles::real_pointer_t  mass0_ptr,
+        Particles::real_pointer_t  beta0_ptr,
+        Particles::real_pointer_t  gamma0_ptr,
+        Particles::real_pointer_t  p0c_ptr,
+        Particles::real_pointer_t  s_ptr,
+        Particles::real_pointer_t  x_ptr,
+        Particles::real_pointer_t  y_ptr,
+        Particles::real_pointer_t  px_ptr,
+        Particles::real_pointer_t  py_ptr,
+        Particles::real_pointer_t  zeta_ptr,
+        Particles::real_pointer_t  psigma_ptr,
+        Particles::real_pointer_t  delta_ptr,
+        Particles::real_pointer_t  rpp_ptr,
+        Particles::real_pointer_t  rvv_ptr,
+        Particles::real_pointer_t  chi_ptr,
+        Particles::real_pointer_t  charge_ratio_ptr,
+        Particles::index_pointer_t particle_id_ptr  ,
+        Particles::index_pointer_t at_element_id_ptr,
+        Particles::index_pointer_t at_turn_ptr,
+        Particles::index_pointer_t state_ptr )
+    {
+        return static_cast< SIXTRL_PARTICLE_ARGPTR_DEC Particles* >(
             ::NS(Particles_add)( &buffer, num_particles,
                 q0_ptr, mass0_ptr, beta0_ptr, gamma0_ptr, p0c_ptr,
                 s_ptr, x_ptr, y_ptr, px_ptr, py_ptr, zeta_ptr,
@@ -2927,70 +3252,86 @@ namespace SIXTRL_CXX_NAMESPACE
                 particle_id_ptr, at_element_id_ptr, at_turn_ptr, state_ptr ) );
     }
 
-    /* ----------------------------------------------------------------- */
-
-    SIXTRL_INLINE bool TParticles< NS(particle_real_t) >::copy(
-        TParticles< NS(particle_real_t) > const&
-            SIXTRL_RESTRICT_REF source ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC Particles*
+    Particles::AddCopyToBuffer(
+        Particles::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        Particles const& SIXTRL_RESTRICT_REF other )
     {
-        return NS(Particles_copy)( this->getCApiPtr(), source.getCApiPtr() );
+        return static_cast< SIXTRL_PARTICLE_ARGPTR_DEC Particles* >(
+            ::NS(Particles_add_copy)(
+                buffer.getCApiPtr(), other.getCApiPtr() ) );
     }
 
-    SIXTRL_INLINE bool TParticles< NS(particle_real_t) >::copy(
+    SIXTRL_INLINE SIXTRL_PARTICLE_ARGPTR_DEC Particles*
+    Particles::AddCopyToBuffer(
+        Particles::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+        Particles const& SIXTRL_RESTRICT_REF other )
+    {
+        return static_cast< SIXTRL_PARTICLE_ARGPTR_DEC Particles* >(
+            ::NS(Particles_add_copy)( &buffer, other.getCApiPtr() ) );
+    }
+
+    /* ----------------------------------------------------------------- */
+
+    SIXTRL_INLINE Particles::status_t Particles::copy(
+        Particles const& SIXTRL_RESTRICT_REF source ) SIXTRL_NOEXCEPT
+    {
+        return ::NS(Particles_copy)( this->getCApiPtr(), source.getCApiPtr() );
+    }
+
+    SIXTRL_INLINE Particles::status_t Particles::copy(
         SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const*
             SIXTRL_RESTRICT source ) SIXTRL_NOEXCEPT
     {
-        return NS(Particles_copy)( this->getCApiPtr(), source );
+        return ::NS(Particles_copy)( this->getCApiPtr(), source );
     }
 
-    SIXTRL_INLINE bool TParticles< NS(particle_real_t) >::copySingle(
-        TParticles< NS(particle_real_t) > const& SIXTRL_RESTRICT_REF source,
-        TParticles< NS(particle_real_t) >::index_t const source_index,
-        TParticles< NS(particle_real_t) >::index_t dest_index
+    SIXTRL_INLINE Particles::status_t Particles::copySingle(
+        Particles const& SIXTRL_RESTRICT_REF source,
+        Particles::index_t const source_index, Particles::index_t dest_index
     ) SIXTRL_NOEXCEPT
     {
-        return NS(Particles_copy_single)(
+        return ::NS(Particles_copy_single)(
             this->getCApiPtr(), dest_index, source.getCApiPtr(), source_index );
     }
 
-    SIXTRL_INLINE bool TParticles< NS(particle_real_t) >::copySingle(
-        SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const* SIXTRL_RESTRICT source,
-        TParticles< NS(particle_real_t) >::index_t const source_index,
-        TParticles< NS(particle_real_t) >::index_t dest_index
+    SIXTRL_INLINE Particles::status_t Particles::copySingle(
+        SIXTRL_PARTICLE_ARGPTR_DEC ::NS(Particles) const* SIXTRL_RESTRICT source,
+        Particles::index_t const source_index,
+        Particles::index_t dest_index
     ) SIXTRL_NOEXCEPT
     {
-        return NS(Particles_copy_single)(
+        return ::NS(Particles_copy_single)(
             this->getCApiPtr(), dest_index, source, source_index );
     }
 
-    SIXTRL_INLINE bool TParticles< NS(particle_real_t) >::copyRange(
-        TParticles< NS(particle_real_t) > const& SIXTRL_RESTRICT_REF source,
-        TParticles< NS(particle_real_t) >::index_t const src_start_idx,
-        TParticles< NS(particle_real_t) >::index_t const src_end_idx,
-        TParticles< NS(particle_real_t) >::index_t dst_start_idx
+    SIXTRL_INLINE Particles::status_t Particles::copyRange(
+        Particles const& SIXTRL_RESTRICT_REF source,
+        Particles::index_t const src_start_idx,
+        Particles::index_t const src_end_idx,
+        Particles::index_t dst_start_idx
     ) SIXTRL_NOEXCEPT
     {
-        return NS(Particles_copy_range)( this->getCApiPtr(), source.getCApiPtr(),
-            src_start_idx, src_end_idx, dst_start_idx );
+        return ::NS(Particles_copy_range)( this->getCApiPtr(),
+            source.getCApiPtr(), src_start_idx, src_end_idx, dst_start_idx );
     }
 
 
-    SIXTRL_INLINE bool TParticles< NS(particle_real_t) >::copyRange(
+    SIXTRL_INLINE Particles::status_t Particles::copyRange(
         SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) const* SIXTRL_RESTRICT source,
-        TParticles< NS(particle_real_t) >::index_t const src_start_idx,
-        TParticles< NS(particle_real_t) >::index_t const src_end_idx,
-        TParticles< NS(particle_real_t) >::index_t dst_start_idx
+        Particles::index_t const src_start_idx,
+        Particles::index_t const src_end_idx,
+        Particles::index_t dst_start_idx
     ) SIXTRL_NOEXCEPT
     {
-        return NS(Particles_copy_range)( this->getCApiPtr(), source,
+        return ::NS(Particles_copy_range)( this->getCApiPtr(), source,
             src_start_idx, src_end_idx, dst_start_idx );
     }
 
     /* ----------------------------------------------------------------- */
 
     SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC
-    TParticles< NS(particle_real_t) > const*
-    TParticles< NS(particle_real_t) >::FromBuffer(
+    Particles const* Particles::FromBuffer(
         Buffer const& SIXTRL_RESTRICT_REF buffer,
         Buffer::size_type const particle_obj_index ) SIXTRL_NOEXCEPT
     {
@@ -2999,8 +3340,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC
-    TParticles< NS(particle_real_t) > const*
-    TParticles< NS(particle_real_t) >::FromBuffer(
+    Particles const* Particles::FromBuffer(
         SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
         NS(buffer_size_t) const particle_obj_index ) SIXTRL_NOEXCEPT
     {
@@ -3023,8 +3363,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC
-    TParticles< NS(particle_real_t) >*
-    TParticles< NS(particle_real_t) >::FromBuffer(
+    Particles* Particles::FromBuffer(
         Buffer& SIXTRL_RESTRICT_REF buffer,
         Buffer::size_type const particle_obj_index ) SIXTRL_NOEXCEPT
     {
@@ -3039,8 +3378,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC
-    TParticles< NS(particle_real_t) >*
-    TParticles< NS(particle_real_t) >::FromBuffer(
+    Particles* Particles::FromBuffer(
         SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
         NS(buffer_size_t) const particle_obj_index ) SIXTRL_NOEXCEPT
     {
@@ -3057,8 +3395,7 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC
-    TParticles< ::NS(particle_real_t) > const* TParticles<
-        NS(particle_real_t) >::FromBufferObject(
+    Particles const* Particles::FromBufferObject(
         SIXTRL_BUFFER_OBJ_ARGPTR_DEC const ::NS(Object) *const
             SIXTRL_RESTRICT index_obj ) SIXTRL_NOEXCEPT
     {
@@ -3077,16 +3414,15 @@ namespace SIXTRL_CXX_NAMESPACE
         return nullptr;
     }
 
-    SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC TParticles< NS(particle_real_t) >*
-    TParticles< NS(particle_real_t) >::FromBufferObject(
-        SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
+    SIXTRL_INLINE SIXTRL_BUFFER_OBJ_DATAPTR_DEC Particles*
+    Particles::FromBufferObject(
+        SIXTRL_BUFFER_OBJ_ARGPTR_DEC ::NS(Object)*
             SIXTRL_RESTRICT index_obj ) SIXTRL_NOEXCEPT
     {
         using _this_t           = TParticles< NS(particle_real_t) >;
         using object_t          = NS(Object);
         using ptr_const_obj_t   = SIXTRL_BUFFER_OBJ_ARGPTR_DEC object_t const*;
-        using particle_t        = TParticles< NS(particle_real_t) >;
-        using ptr_particle_t    = SIXTRL_BUFFER_OBJ_DATAPTR_DEC particle_t*;
+        using ptr_particle_t    = SIXTRL_BUFFER_OBJ_DATAPTR_DEC _this_t*;
 
         ptr_const_obj_t const_index_obj = index_obj;
 
@@ -3096,15 +3432,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* ----------------------------------------------------------------- */
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::c_api_t const*
-    TParticles< NS(particle_real_t) >::getCApiPtr() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::c_api_t const*
+    Particles::getCApiPtr() const SIXTRL_NOEXCEPT
     {
-        using ptr_t = TParticles< NS(particle_real_t) >::c_api_t const*;
+        using ptr_t = Particles::c_api_t const*;
         return static_cast< ptr_t >( this );
     }
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::c_api_t*
-    TParticles< NS(particle_real_t) >::getCApiPtr() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::c_api_t*
+    Particles::getCApiPtr() SIXTRL_NOEXCEPT
     {
         using _this_t = TParticles< NS(particle_real_t) >;
         using   ptr_t =  _this_t::c_api_t*;
@@ -3115,14 +3451,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* ----------------------------------------------------------------- */
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::num_elements_t
-    TParticles< NS(particle_real_t) >::getNumParticles() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::num_elements_t
+    Particles::getNumParticles() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_num_of_particles)( this->getCApiPtr() );
     }
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setNumParticles(
-        TParticles< NS(particle_real_t) >::size_type const num_particles
+    SIXTRL_INLINE void Particles::setNumParticles(
+        Particles::size_type const num_particles
         ) SIXTRL_NOEXCEPT
     {
         using _this_t    = TParticles< NS(particle_real_t) >;
@@ -3133,40 +3469,40 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::preset() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::preset() SIXTRL_NOEXCEPT
     {
         ::NS(Particles_preset)( this->getCApiPtr() );
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getQ0() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getQ0() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_beta0)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getQ0() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getQ0() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_beta0)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getQ0Value(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getQ0Value(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_beta0_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setQ0(
+    SIXTRL_INLINE void Particles::setQ0(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3178,17 +3514,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setQ0Value(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setQ0Value(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_beta0_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignQ0Ptr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignQ0Ptr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_beta0)( this->getCApiPtr(), ptr );
         return;
@@ -3197,33 +3533,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getMass0() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getMass0() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_mass0)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getMass0() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getMass0() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_mass0)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getMass0Value(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getMass0Value(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_mass0_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setMass0(
+    SIXTRL_INLINE void Particles::setMass0(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3235,17 +3571,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setMass0Value(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setMass0Value(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_mass0_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignMass0Ptr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignMass0Ptr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_mass0)( this->getCApiPtr(), ptr );
         return;
@@ -3254,33 +3590,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getBeta0() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getBeta0() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_beta0)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getBeta0() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getBeta0() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_beta0)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getBeta0Value(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getBeta0Value(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_beta0_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setBeta0(
+    SIXTRL_INLINE void Particles::setBeta0(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3292,17 +3628,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setBeta0Value(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setBeta0Value(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_beta0_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignBeta0Ptr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignBeta0Ptr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_beta0)( this->getCApiPtr(), ptr );
         return;
@@ -3311,33 +3647,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getGamma0() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getGamma0() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_gamma0)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getGamma0() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getGamma0() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_gamma0)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getGamma0Value(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getGamma0Value(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_gamma0_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setGamma0(
+    SIXTRL_INLINE void Particles::setGamma0(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3349,17 +3685,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setGamma0Value(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setGamma0Value(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_gamma0_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignGamma0Ptr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignGamma0Ptr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_gamma0)( this->getCApiPtr(), ptr );
         return;
@@ -3368,33 +3704,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getP0c() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getP0c() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_p0c)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getP0c() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getP0c() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_p0c)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getP0cValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getP0cValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_p0c_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setP0c(
+    SIXTRL_INLINE void Particles::setP0c(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3406,17 +3742,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setP0cValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setP0cValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_p0c_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignP0cPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignP0cPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_p0c)( this->getCApiPtr(), ptr );
         return;
@@ -3425,33 +3761,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getS() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getS() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_s)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getS() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getS() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_s)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getSValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getSValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_s_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setS(
+    SIXTRL_INLINE void Particles::setS(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3463,17 +3799,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setSValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setSValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_s_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignSPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignSPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_s)( this->getCApiPtr(), ptr );
         return;
@@ -3482,33 +3818,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getX() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getX() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_x)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getX() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getX() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_x)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getXValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getXValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_x_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setX(
+    SIXTRL_INLINE void Particles::setX(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3520,17 +3856,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setXValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setXValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_x_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignXPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignXPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_x)( this->getCApiPtr(), ptr );
         return;
@@ -3539,33 +3875,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getY() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getY() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_y)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getY() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getY() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_y)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getYValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getYValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_y_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setY(
+    SIXTRL_INLINE void Particles::setY(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3577,17 +3913,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setYValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setYValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_y_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignYPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignYPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_y)( this->getCApiPtr(), ptr );
         return;
@@ -3596,33 +3932,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getPx() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getPx() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_px)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getPx() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getPx() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_px)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getPxValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getPxValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_px_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setPx(
+    SIXTRL_INLINE void Particles::setPx(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3634,17 +3970,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setPxValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setPxValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_px_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignPxPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignPxPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_px)( this->getCApiPtr(), ptr );
         return;
@@ -3653,33 +3989,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getPy() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getPy() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_py)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getPy() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getPy() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_py)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getPyValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getPyValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_py_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setPy(
+    SIXTRL_INLINE void Particles::setPy(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3691,17 +4027,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setPyValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setPyValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_py_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignPyPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignPyPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_py)( this->getCApiPtr(), ptr );
         return;
@@ -3710,33 +4046,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getZeta() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getZeta() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_zeta)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getZeta() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getZeta() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_zeta)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getZetaValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getZetaValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_zeta_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setZeta(
+    SIXTRL_INLINE void Particles::setZeta(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3748,17 +4084,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setZetaValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setZetaValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_zeta_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignZetaPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignZetaPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_zeta)( this->getCApiPtr(), ptr );
         return;
@@ -3767,33 +4103,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getPSigma() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getPSigma() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_psigma)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getPSigma() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getPSigma() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_psigma)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getPSigmaValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getPSigmaValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_psigma_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setPSigma(
+    SIXTRL_INLINE void Particles::setPSigma(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3805,17 +4141,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setPSigmaValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setPSigmaValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_psigma_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignPSigmaPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignPSigmaPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_psigma)( this->getCApiPtr(), ptr );
         return;
@@ -3824,33 +4160,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getDelta() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getDelta() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_delta)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getDelta() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getDelta() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_delta)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getDeltaValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getDeltaValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_delta_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setDelta(
+    SIXTRL_INLINE void Particles::setDelta(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3862,17 +4198,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setDeltaValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setDeltaValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_delta_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignDeltaPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignDeltaPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_delta)( this->getCApiPtr(), ptr );
         return;
@@ -3881,33 +4217,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getRpp() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getRpp() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_rpp)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getRpp() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getRpp() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_rpp)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getRppValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getRppValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_rpp_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setRpp(
+    SIXTRL_INLINE void Particles::setRpp(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3919,17 +4255,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setRppValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setRppValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_rpp_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignRppPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignRppPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_rpp)( this->getCApiPtr(), ptr );
         return;
@@ -3938,33 +4274,33 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getRvv() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getRvv() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_rvv)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getRvv() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getRvv() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_rvv)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getRvvValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getRvvValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_rvv_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setRvv(
+    SIXTRL_INLINE void Particles::setRvv(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -3976,17 +4312,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setRvvValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setRvvValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_rvv_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignRvvPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignRvvPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_rvv)( this->getCApiPtr(), ptr );
         return;
@@ -3994,33 +4330,33 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getChi() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getChi() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_chi)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getChi() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getChi() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_chi)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getChiValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getChiValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_chi_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setChi(
+    SIXTRL_INLINE void Particles::setChi(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -4032,17 +4368,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setChiValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setChiValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_chi_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignChiPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignChiPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_chi)( this->getCApiPtr(), ptr );
         return;
@@ -4050,33 +4386,33 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_real_pointer_t
-    TParticles< NS(particle_real_t) >::getChargeRatio() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_real_pointer_t
+    Particles::getChargeRatio() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_charge_ratio)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_pointer_t
-    TParticles< NS(particle_real_t) >::getChargeRatio() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_pointer_t
+    Particles::getChargeRatio() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_charge_ratio)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getChargeRatioValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getChargeRatioValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_charge_ratio_value)( this->getCApiPtr(), index );
     }
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setChargeRatio(
+    SIXTRL_INLINE void Particles::setChargeRatio(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -4088,33 +4424,33 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setChargeRatioValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::real_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setChargeRatioValue(
+        Particles::index_t const index,
+        Particles::real_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_charge_ratio_value)( this->getCApiPtr(), index, value );
         return;
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignChargeRatioPtr(
-        TParticles< NS(particle_real_t) >::real_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignChargeRatioPtr(
+        Particles::real_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_charge_ratio)( this->getCApiPtr(), ptr );
         return;
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getChargeValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getChargeValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_q_value)( this->getCApiPtr(), index );
     }
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::real_t
-    TParticles< NS(particle_real_t) >::getMassValue(
-        TParticles< NS(particle_real_t) >::index_t const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::real_t
+    Particles::getMassValue(
+        Particles::index_t const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_m_value)( this->getCApiPtr(), index );
     }
@@ -4122,23 +4458,23 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_index_pointer_t
-    TParticles< NS(particle_real_t) >::getParticleId() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_index_pointer_t
+    Particles::getParticleId() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_particle_id)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::index_pointer_t
-    TParticles< NS(particle_real_t) >::getParticleId() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::index_pointer_t
+    Particles::getParticleId() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_particle_id)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::index_t
-    TParticles< NS(particle_real_t) >::getParticleIdValue(
-        TParticles< NS(particle_real_t) >::index_t
+    SIXTRL_INLINE Particles::index_t
+    Particles::getParticleIdValue(
+        Particles::index_t
             const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_particle_id_value)(
@@ -4147,10 +4483,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setParticleId(
+    SIXTRL_INLINE void Particles::setParticleId(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -4162,9 +4498,9 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setParticleIdValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::index_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setParticleIdValue(
+        Particles::index_t const index,
+        Particles::index_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_particle_id_value)(
             this->getCApiPtr(), index, value );
@@ -4173,8 +4509,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignParticleIdPtr(
-        TParticles< NS(particle_real_t) >::index_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignParticleIdPtr(
+        Particles::index_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_particle_id)( this->getCApiPtr(), ptr );
         return;
@@ -4183,23 +4519,23 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_index_pointer_t
-    TParticles< NS(particle_real_t) >::getAtElementId() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_index_pointer_t
+    Particles::getAtElementId() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_at_element_id)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::index_pointer_t
-    TParticles< NS(particle_real_t) >::getAtElementId() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::index_pointer_t
+    Particles::getAtElementId() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_at_element_id)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::index_t
-    TParticles< NS(particle_real_t) >::getAtElementIdValue(
-        TParticles< NS(particle_real_t) >::index_t
+    SIXTRL_INLINE Particles::index_t
+    Particles::getAtElementIdValue(
+        Particles::index_t
             const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_at_element_id_value)(
@@ -4208,10 +4544,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setAtElementId(
+    SIXTRL_INLINE void Particles::setAtElementId(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -4223,9 +4559,9 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setAtElementIdValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::index_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setAtElementIdValue(
+        Particles::index_t const index,
+        Particles::index_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_at_element_id_value)(
             this->getCApiPtr(), index, value );
@@ -4234,8 +4570,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignAtElementIdPtr(
-        TParticles< NS(particle_real_t) >::index_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignAtElementIdPtr(
+        Particles::index_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_at_element_id)( this->getCApiPtr(), ptr );
         return;
@@ -4244,23 +4580,23 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_index_pointer_t
-    TParticles< NS(particle_real_t) >::getAtTurn() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_index_pointer_t
+    Particles::getAtTurn() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_at_turn)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::index_pointer_t
-    TParticles< NS(particle_real_t) >::getAtTurn() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::index_pointer_t
+    Particles::getAtTurn() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_at_turn)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::index_t
-    TParticles< NS(particle_real_t) >::getAtTurnValue(
-        TParticles< NS(particle_real_t) >::index_t
+    SIXTRL_INLINE Particles::index_t
+    Particles::getAtTurnValue(
+        Particles::index_t
             const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_at_turn_value)(
@@ -4269,10 +4605,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setAtTurn(
+    SIXTRL_INLINE void Particles::setAtTurn(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -4284,9 +4620,9 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setAtTurnValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::index_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setAtTurnValue(
+        Particles::index_t const index,
+        Particles::index_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_at_turn_value)(
             this->getCApiPtr(), index, value );
@@ -4295,8 +4631,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignAtTurnPtr(
-        TParticles< NS(particle_real_t) >::index_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignAtTurnPtr(
+        Particles::index_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_at_turn)( this->getCApiPtr(), ptr );
         return;
@@ -4305,23 +4641,23 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::const_index_pointer_t
-    TParticles< NS(particle_real_t) >::getState() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::const_index_pointer_t
+    Particles::getState() const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_const_state)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::index_pointer_t
-    TParticles< NS(particle_real_t) >::getState() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Particles::index_pointer_t
+    Particles::getState() SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_state)( this->getCApiPtr() );
     }
 
 
-    SIXTRL_INLINE TParticles< NS(particle_real_t) >::index_t
-    TParticles< NS(particle_real_t) >::getStateValue(
-        TParticles< NS(particle_real_t) >::index_t
+    SIXTRL_INLINE Particles::index_t
+    Particles::getStateValue(
+        Particles::index_t
             const index ) const SIXTRL_NOEXCEPT
     {
         return ::NS(Particles_get_state_value)(
@@ -4330,10 +4666,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
 
     template< typename Iter >
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setState(
+    SIXTRL_INLINE void Particles::setState(
         Iter begin, Iter end ) SIXTRL_NOEXCEPT
     {
-        using elem_t = TParticles< NS(particle_real_t) >::num_elements_t;
+        using elem_t = Particles::num_elements_t;
         elem_t const in_num_particles = std::distance( begin, end );
 
         if( in_num_particles <= this->getNumParticles() )
@@ -4345,9 +4681,9 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::setStateValue(
-        TParticles< NS(particle_real_t) >::index_t const index,
-        TParticles< NS(particle_real_t) >::index_t const value ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::setStateValue(
+        Particles::index_t const index,
+        Particles::index_t const value ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_set_state_value)(
             this->getCApiPtr(), index, value );
@@ -4356,8 +4692,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
 
-    SIXTRL_INLINE void TParticles< NS(particle_real_t) >::assignStatePtr(
-        TParticles< NS(particle_real_t) >::index_pointer_t ptr ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void Particles::assignStatePtr(
+        Particles::index_pointer_t ptr ) SIXTRL_NOEXCEPT
     {
         ::NS(Particles_assign_ptr_to_state)( this->getCApiPtr(), ptr );
         return;

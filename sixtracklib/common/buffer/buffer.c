@@ -673,6 +673,47 @@ bool NS(Buffer_write_to_fp_normalized_addr)(
     return success;
 }
 
+int NS(Buffer_reset_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_reset)( buffer );
+}
+
+int NS(Buffer_reset_detailed_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const max_num_objects,
+    NS(buffer_size_t) const max_num_slots,
+    NS(buffer_size_t) const max_num_dataptrs,
+    NS(buffer_size_t) const max_num_garbage_ranges )
+{
+    return NS(Buffer_reset_detailed)( buffer, max_num_objects, max_num_slots,
+        max_num_dataptrs, max_num_garbage_ranges );
+}
+
+int NS(Buffer_reserve_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const new_max_num_objects,
+    NS(buffer_size_t) const new_max_num_slots,
+    NS(buffer_size_t) const new_max_num_dataptrs,
+    NS(buffer_size_t) const new_max_num_garbage_ranges )
+{
+    return NS(Buffer_reserve)( buffer, new_max_num_objects, new_max_num_slots,
+        new_max_num_dataptrs, new_max_num_garbage_ranges );
+}
+
+int NS(Buffer_reserve_capacity_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const new_buffer_capacity )
+{
+    return NS(Buffer_reserve_capacity)( buffer, new_buffer_capacity );
+}
+
+bool NS(Buffer_needs_remapping_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer )
+{
+    return NS(Buffer_needs_remapping)( buffer );
+}
+
 int NS(Buffer_remap_ext)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
 {
@@ -683,6 +724,13 @@ int NS(Buffer_refresh_ext)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
 {
     return NS(Buffer_refresh)( buffer );
+}
+
+int NS(Buffer_clear_ext)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    bool const set_data_to_zero )
+{
+    return NS(Buffer_clear)( buffer, set_data_to_zero );
 }
 
 void NS(Buffer_free_ext)(

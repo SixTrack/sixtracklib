@@ -14,6 +14,8 @@
 
 #include <gtest/gtest.h>
 
+#include "sixtracklib/testlib.h"
+
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
@@ -25,7 +27,6 @@
 #include "sixtracklib/common/output/output_buffer.h"
 #include "sixtracklib/common/track.h"
 
-#include "sixtracklib/testlib/common/particles.h"
 
 TEST( C99_CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
 {
@@ -942,7 +943,8 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
                         ::st_Particles_get_num_of_particles(
                             elem_by_elem_particles ) );
 
-                    ASSERT_TRUE( ::st_Particles_copy_single( particles, ll,
+                    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
+                    ::st_Particles_copy_single( particles, ll,
                         elem_by_elem_particles, elem_by_elem_index ) );
 
                     num_elem_t const stored_particle_id =
@@ -950,7 +952,8 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
                             mon, kk, particle_id );
 
                     ASSERT_TRUE( stored_particle_id >= num_elem_t{ 0 } );
-                    ASSERT_TRUE( ::st_Particles_copy_single( cmp_particles, ll,
+                    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
+                        ::st_Particles_copy_single( cmp_particles, ll,
                                     out_particles, stored_particle_id ) );
                 }
 

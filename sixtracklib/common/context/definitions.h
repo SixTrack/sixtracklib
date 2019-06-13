@@ -12,7 +12,14 @@ extern "C" {
 typedef SIXTRL_UINT64_T  NS(context_type_id_t);
 typedef SIXTRL_INT32_T   NS(context_status_t);
 typedef SIXTRL_UINT64_T  NS(context_size_t);
-typedef SIXTRL_UINT64_T  NS(context_success_flag_t);
+typedef SIXTRL_UINT64_T  NS(context_debug_flag);
+
+typedef SIXTRL_UINT64_T  NS(arch_id_t);
+typedef SIXTRL_UINT64_T  NS(arch_size_t);
+
+typedef SIXTRL_INT64_T   NS(node_platform_id_t);
+typedef SIXTRL_INT64_T   NS(node_device_id_t);
+typedef SIXTRL_UINT32_T  NS(node_index_t);
 
 /* Predefined  context type id's: limit them to 0x0000 - 0x01FF */
 /* For userdefined type id's, the range 0x0200 - 0x03FF is reserved */
@@ -120,6 +127,18 @@ SIXTRL_STATIC_VAR NS(context_status_t) const
     NS(CONTEXT_STATUS_GENERAL_FAILURE) =
         ( NS(context_status_t) )SIXTRL_CONTEXT_STATUS_GENERAL_FAILURE;
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_STATIC_VAR NS(node_platform_id_t) const NS(NODE_ILLEGAL_PATFORM_ID) =
+    ( NS(node_platform_id_t) )-1;
+
+SIXTRL_STATIC_VAR NS(node_device_id_t) const NS(NODE_ILLEGAL_DEVICE_ID) =
+    ( NS(node_device_id_t) )-1;
+
+SIXTRL_STATIC_VAR NS(node_index_t) const NS(NODE_UNDEFINED_INDEX) =
+    ( NS(node_index_t) )0xFFFFFFFF;
+
+
 #endif /* !defined( _GPUCODE ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
@@ -129,8 +148,15 @@ namespace SIXTRL_CXX_NAMESPACE
 {
     typedef ::NS(context_type_id_t)         context_type_id_t;
     typedef ::NS(context_status_t)          context_status_t;
-    typedef ::NS(context_success_flag_t)    context_success_flag_t;
+    typedef ::NS(context_debug_flag)        context_debug_flag;
     typedef ::NS(context_size_t)            context_size_t;
+
+    typedef ::NS(arch_id_t)                 arch_id_t;
+    typedef ::NS(arch_size_t)               arch_size_t;
+
+    typedef ::NS(node_platform_id_t)        node_platform_id_t;
+    typedef ::NS(node_device_id_t)          node_device_id_t;
+    typedef ::NS(node_index_t)              node_index_t;
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST context_type_id_t
         CONTEXT_TYPE_ID_BITMASK = static_cast< context_type_id_t >(
@@ -177,6 +203,17 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST context_status_t
         CONTEXT_STATUS_GENERAL_FAILURE = static_cast< context_status_t >(
             SIXTRL_CONTEXT_STATUS_GENERAL_FAILURE );
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST node_platform_id_t
+        NODE_ILLEGAL_PATFORM_ID = static_cast< node_platform_id_t >( -1 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST node_device_id_t
+        NODE_ILLEGAL_DEVIVE_ID = static_cast< node_device_id_t <( -1 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST node_index_t
+        NODE_UNDEFINED_INDEX = static_cast< node_index_t >( 0xFFFFFFFF );
 }
 
 #endif /* C++, Host */

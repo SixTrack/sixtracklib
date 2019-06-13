@@ -119,3 +119,19 @@ st_Particles_buffers_compare_values.argtypes = [
 st_Particles_buffer_print_out = testlib.st_Particles_buffer_print_out
 st_Particles_buffer_print_out.restype = None
 st_Particles_buffer_print_out.argtypes = [st_Buffer_p]
+
+# -----------------------------------------------------------------------------
+# ParticlesAddr realted functions and definitions
+
+st_ParticlesAddr = pyst.st_ParticlesAddr
+st_ParticlesAddr_p = pyst.st_ParticlesAddr_p
+st_NullParticlesAddr = pyst.st_NullParticlesAddr
+
+st_buffer_size_t = pyst.st_buffer_size_t
+
+st_TestParticlesAddr_are_addresses_consistent_with_particle = \
+    testlib.st_TestParticlesAddr_are_addresses_consistent_with_particle
+st_TestParticlesAddr_are_addresses_consistent_with_particle.argtypes = [
+    st_ParticlesAddr_p, st_Particles_p, st_buffer_size_t]
+st_TestParticlesAddr_are_addresses_consistent_with_particle.restype = \
+    ct.c_bool
