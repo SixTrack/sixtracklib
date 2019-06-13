@@ -193,8 +193,8 @@ class BeamBeam4D(CObject):
     data = CField(1, 'float64', default=0.0,
                   length='size', pointer=True)
 
-    def __init__(self, data=None, **kwargs):
-        if data is None:
+    def __init__(self, **kwargs):
+        if 'q_part' in kwargs:
             slots = (
                 'q_part',
                 'N_part',
@@ -219,70 +219,71 @@ class BeamBeam6D(CObject):
     data = CField(1, 'float64', default=0.0,
                   length='size', pointer=True)
 
-    def __init__(self, data=None, **kwargs):
-        if data is None:
+    def __init__(self, **kwargs):
+        if 'q_part' in kwargs:
             import pysixtrack
             data = pysixtrack.BB6Ddata.BB6D_init(
                 **{kk: kwargs[kk] for kk in kwargs.keys() if kk != 'cbuffer'}).tobuffer()
             CObject.__init__(self, size=len(data), data=data, **kwargs)
         else:
             CObject.__init__(self, **kwargs)
-            
+
+
 class LimitRect(CObject):
     _typeid = 11
-    min_x = CField( 0, 'float64', default=-1.0, alignment=8 )
-    max_x = CField( 1, 'float64', default=+1.0, alignment=8 )
-    min_y = CField( 2, 'float64', default=-1.0, alignment=8 )
-    max_y = CField( 3, 'float64', default=+1.0, alignment=8 )
-    
-    
+    min_x = CField(0, 'float64', default=-1.0, alignment=8)
+    max_x = CField(1, 'float64', default=+1.0, alignment=8)
+    min_y = CField(2, 'float64', default=-1.0, alignment=8)
+    max_y = CField(3, 'float64', default=+1.0, alignment=8)
+
+
 class LimitEllipse(CObject):
     _typeid = 12
-    a_squ = CField( 0, 'float64', default=+1.0, alignment=8 )
-    b_squ = CField( 1, 'float64', default=+1.0, alignment=8 )
-    a_b_squ = CField( 2, 'float64', alignment=8 )
-    
-    def __init__( self, a_squ=None, b_squ=None, **kwargs ):
+    a_squ = CField(0, 'float64', default=+1.0, alignment=8)
+    b_squ = CField(1, 'float64', default=+1.0, alignment=8)
+    a_b_squ = CField(2, 'float64', alignment=8)
+
+    def __init__(self, a_squ=None, b_squ=None, **kwargs):
         if a is not None:
-            a_squ = a * a 
+            a_squ = a * a
         if b is not None:
             b_squ = b * b
-        
-        if a_squ is None: 
-            a_squ = 1.0 
-        if b_squ is None: 
+
+        if a_squ is None:
+            a_squ = 1.0
+        if b_squ is None:
             b_squ = 1.0
-        
-        a_b_squ = None    
-        if  a_squ is not None and b_squ is not None:
-            a_b_squ = a_squ * b_squ 
-            
-        if a_b_squ is not None:            
+
+        a_b_squ = None
+        if a_squ is not None and b_squ is not None:
+            a_b_squ = a_squ * b_squ
+
+        if a_b_squ is not None:
             CObject.__init__(
                 self, a_squ=a_squ, b_squ=b_squ, a_b_squ=a_b_squ, **kwargs)
         else:
-            raise ValueError( "a_squ and b_squ have to be positive definite" )
-            
-    def set_half_axes( self, a, b ):
-        return self.set_half_axes_squ( a * a, b * b )
-            
-    def set_half_axes_squ( self, a_squ, b_squ ):
+            raise ValueError("a_squ and b_squ have to be positive definite")
+
+    def set_half_axes(self, a, b):
+        return self.set_half_axes_squ(a * a, b * b)
+
+    def set_half_axes_squ(self, a_squ, b_squ):
         self.a_squ = a_squ
-        self.b_squ = b_squ 
-        self.a_b_squ = a_squ * b_squ 
+        self.b_squ = b_squ
+        self.a_b_squ = a_squ * b_squ
         return self
-    
+
 
 class DipoleEdge(CObject):
     _typeid = 24
-    r21 = CField( 0, 'float64', default=0.0, alignment=8 )
-    r43 = CField( 1, 'float64', default=0.0, alignment=8 )
-    
-    def __init__( self, **kwargs ):
-        #TODO: Implement conversion schemes, if required
-        CObject.__init__( self, *kwargs )
-    
-    
+    r21 = CField(0, 'float64', default=0.0, alignment=8)
+    r43 = CField(1, 'float64', default=0.0, alignment=8)
+
+    def __init__(self, **kwargs):
+        # TODO: Implement conversion schemes, if required
+        CObject.__init__(self, *kwargs)
+
+
 class Elements(object):
     element_types = {'Cavity': Cavity,
                      'Drift': Drift,
@@ -312,8 +313,10 @@ class Elements(object):
         return cls(cbuffer=cbuffer)
 
     @classmethod
-    def fromline(cls, line, exact_drift=False):
-        self = cls()
+    def fromline(cls, line):
+        return cls().append_line(line)
+
+    def append_line(self, line):
         for label, element_name, element in line:
             if exact_drift and element_name == 'Drift':
                 element_name = 'DriftExact'
@@ -356,4 +359,3 @@ class Elements(object):
     #    self=cls()
     #    list(madseq_to_line(seq,self._builder))
     #    return self
-
