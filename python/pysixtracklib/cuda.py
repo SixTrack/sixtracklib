@@ -97,6 +97,7 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
                 self._ptr_node_info )
 
     from .stcommon import st_CudaController_p, st_NullCudaController, \
+        st_ControllerBase_p, st_NullControllerBase, \
         st_CudaController_create, st_CudaController_new, \
         st_CudaController_new_from_node_id, \
         st_CudaController_new_from_platform_id_and_device_id, \
@@ -118,43 +119,50 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     class CudaController(NodeControllerBase):
         def __init__(self, config_str=None, node_id=None,
                      node_index=None, platform_id=None, device_id=None,
-                     cuda_dev_index=None ):
+                     cuda_dev_index=None, ptr_controller=st_NullControllerBase,
+                     owns_ptr=True ):
 
-            _ptr_ctrl = st_NullCudaController
-
-            if config_str is None or config_str == st_NullChar:
-                config_str = ''
-            config_str = config_str.encode( 'utf-8' )
-            _config_str = ct.c_char_p( config_str )
-
-            if node_id is not None and isinstance( node_id, NodeId ):
-                _ptr_ctrl = st_CudaController_new_from_node_id(
-                    node_id.pointer, _config_str )
-            elif node_id is not None and node_id != st_NullNodeId:
-                _ptr_ctrl = st_CudaController_new_from_node_id(
-                    node_id, _config_str )
-            elif node_index is not None and \
-                node_index != st_NODE_UNDEFINED_INDEX.value:
-                _ptr_ctrl = st_CudaController_new_from_node_index(
-                    st_node_index_t( node_index ), _config_str )
-            elif cuda_dev_index is not None and cuda_dev_index >= 0:
-                _ptr_ctrl = st_CudaController_new_from_cuda_device_index(
-                    st_cuda_dev_index_t( cuda_dev_index ), _config_str )
-            elif platform_id is not None and \
-                platform_id != st_NODE_ILLEGAL_PLATFORM_ID.value and \
-                device_id is not None and \
-                device_id != st_NODE_ILLEGAL_DEVICE_ID:
-                _ptr_ctrl = \
-                    st_CudaController_new_from_platform_id_and_device_id(
-                        st_node_platform_id_t( platform_id ),
-                        st_node_device_id_t( device_id ), _config_str )
+            if ptr_controller is None or \
+                ptr_controller == st_NullControllerBase:
+                    super().__init__(ptr_controller=ptr_controller,
+                                     owns_ptr=owns_ptr)
             else:
-                _ptr_ctrl = st_CudaController_new( _config_str )
+                _ptr_ctrl = st_NullCudaController
 
-            if _ptr_ctrl != st_NullCudaController:
-                super().__init__( ptr_controller=_ptr_ctrl, owns_ptr=True )
-            else:
-                raise ValueError( "unable to create CudaController C-pointer" )
+                if config_str is None or config_str == st_NullChar:
+                    config_str = ''
+                config_str = config_str.encode( 'utf-8' )
+                _config_str = ct.c_char_p( config_str )
+
+                if node_id is not None and isinstance( node_id, NodeId ):
+                    _ptr_ctrl = st_CudaController_new_from_node_id(
+                        node_id.pointer, _config_str )
+                elif node_id is not None and node_id != st_NullNodeId:
+                    _ptr_ctrl = st_CudaController_new_from_node_id(
+                        node_id, _config_str )
+                elif node_index is not None and \
+                    node_index != st_NODE_UNDEFINED_INDEX.value:
+                    _ptr_ctrl = st_CudaController_new_from_node_index(
+                        st_node_index_t( node_index ), _config_str )
+                elif cuda_dev_index is not None and cuda_dev_index >= 0:
+                    _ptr_ctrl = st_CudaController_new_from_cuda_device_index(
+                        st_cuda_dev_index_t( cuda_dev_index ), _config_str )
+                elif platform_id is not None and \
+                    platform_id != st_NODE_ILLEGAL_PLATFORM_ID.value and \
+                    device_id is not None and \
+                    device_id != st_NODE_ILLEGAL_DEVICE_ID:
+                    _ptr_ctrl = \
+                        st_CudaController_new_from_platform_id_and_device_id(
+                            st_node_platform_id_t( platform_id ),
+                            st_node_device_id_t( device_id ), _config_str )
+                else:
+                    _ptr_ctrl = st_CudaController_new( _config_str )
+
+                if _ptr_ctrl != st_NullCudaController:
+                    super().__init__( ptr_controller=_ptr_ctrl, owns_ptr=True )
+                else:
+                    raise ValueError(
+                        "Unable to create CudaController C-pointer")
 
         def __del__(self):
             super().__del__()
@@ -300,26 +308,136 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
             return st_CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin(
                 self._ptr_argument )
 
-    from .buffer import Buffer 
+    from .buffer import Buffer
     from .trackjob import TrackJobBaseNew
-    from .stcommon import st_CudaTrackJob_p, st_NullCudaTrackJob, 
-    
+    from .stcommon import st_CudaTrackJob_p, st_NullCudaTrackJob, \
+        st_CudaTrackJob_create, st_CudaTrackJob_new_from_config_str, \
+        st_CudaTrackJob_new, st_CudaTrackJob_new_with_output, \
+        st_CudaTrackJob_new_detailed, st_CudaTrackJob_has_controller, \
+        st_CudaTrackJob_get_ptr_controller, st_CudaTrackJob_has_particles_arg, \
+        st_CudaTrackJob_get_ptr_particles_arg, \
+        st_CudaTrackJob_has_beam_elements_arg, \
+        st_CudaTrackJob_get_ptr_beam_elements_arg, \
+        st_CudaTrackJob_has_output_arg, st_CudaTrackJob_get_ptr_output_arg, \
+        st_CudaTrackJob_has_elem_by_elem_config_arg, \
+        st_CudaTrackJob_get_ptr_elem_by_elem_config_arg, \
+        st_CudaTrackJob_has_debug_register_arg, \
+        st_CudaTrackJob_get_ptr_debug_register_arg, \
+        st_CudaTrackJob_has_particles_addr_arg, \
+        st_CudaTrackJob_get_ptr_particles_addr_arg, \
+        st_Controller_select_node
+
 
     class CudaTrackJob(TrackJobBaseNew):
-        @staticmethod
-        def _get_buffer(obj):
-            if isinstance(obj, CBuffer):
-                return obj
-            elif isinstance(obj, CObject):
-                return obj._buffer
-            elif hasattr(obj, 'cbuffer'):
-                return obj.cbuffer
-            else:
-                raise ValueError("Object {obj} is not or has not a CBuffer")
-
         def __init__( self, beam_elements_buffer, particles_buffer,
-                     until_turn_elem_by_elem=0, output_buffer=None,
-                     config_str=None )
+            particle_set_index=0, until_turn_elem_by_elem=0,
+            output_buffer=None, node_id_str=None, config_str=None ):
+            _ptr_track_job = st_NullCudaTrackJob
+
+            if config_str is not None and config_str != "":
+                _config_str = ct.c_char_p(config_str.encode('utf-8'))
+                _ptr_track_job = st_CudaTrackJob_new_from_config_str(
+                    _config_str )
+            else:
+                _ptr_track_job = st_CudaTrackJob_create()
+
+            if _ptr_track_job == st_NullCudaTrackJob:
+                raise RuntimeError("Error while creating CudaTrackJob")
+
+            _last_status = st_ARCH_STATUS_SUCCESS.value
+
+            _ptr_cuda_ctrl = \
+                st_CudaTrackJob_get_ptr_controller( _ptr_track_job )
+
+            if not st_CudaTrackJob_has_controller( _ptr_track_job ) or \
+                _ptr_cuda_ctrl is None or \
+                _ptr_cuda_ctrl == st_NullCudaController:
+                raise RuntimeError("CudaTrackJob requires CudaController")
+
+            if node_id_str is not None and node_id_str != "":
+                _node_id_str = ct.c_char_p(node_id_str.encode('utf-8'))
+                _last_status = st_Controller_select_node(
+                    _ptr_cuda_ctrl, _node_id_str)
+                raise_error_if_status_not_success( _last_status,
+                    "Error selection of node by node_id_str {0} " +
+                    "status:{1}".format( node_id_str, _last_status ) )
+
+            if _last_status == st_ARCH_STATUS_SUCCESS.value:
+                super().__init__(ptr_track_job=_ptr_track_job,owns_ptr=True)
+
+            if self._ptr_track_job is None or \
+                self._ptr_track_job == st_NullCudaTrackJob or \
+                self._last_status != st_ARCH_STATUS_SUCCESS.value:
+                raise RuntimeError("Error during creation of TrackJobBase")
+
+            super()._reset_detailed(beam_elements_buffer,particles_buffer,
+                particle_set_index, until_turn_elem_by_elem, output_buffer)
+
+            if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+                raise RuntimeError("Error during resetting TrackJobBase")
+
+        def __del__(self):
+            super().__del__()
+
+        @property
+        def has_particles_arg(self):
+            return st_CudaTrackJob_has_particles_arg( self._ptr_track_job )
+
+        @property
+        def particles_arg(self):
+            _ptr_argument=st_CudaTrackJob_get_ptr_particles_arg(
+                self._ptr_track_job)
+            return CudaArgument(ptr_argument=_ptr_argument,owns_ptr=False)
+
+        @property
+        def has_beam_elements_arg(self):
+            return st_CudaTrackJob_has_beam_elements_arg( self._ptr_track_job )
+
+        @property
+        def beam_elements_arg(self):
+            _ptr_argument=st_CudaTrackJob_get_ptr_beam_elements_arg(
+                self._ptr_track_job)
+            return CudaArgument(ptr_argument=_ptr_argument,owns_ptr=False)
+
+        @property
+        def has_output_arg(self):
+            return st_CudaTrackJob_has_output_arg( self._ptr_track_job )
+
+        @property
+        def output_arg(self):
+            _ptr_argument=st_CudaTrackJob_get_ptr_output_arg(
+                self._ptr_track_job)
+            return CudaArgument(ptr_argument=_ptr_argument,owns_ptr=False)
+
+        @property
+        def has_particles_addr_arg(self):
+            return st_CudaTrackJob_has_particles_addr_arg( self._ptr_track_job )
+
+        @property
+        def particles_addr_arg(self):
+            _ptr_argument=st_CudaTrackJob_get_ptr_particles_addr_arg(
+                self._ptr_track_job)
+            return CudaArgument(ptr_argument=_ptr_argument,owns_ptr=False)
+
+        @property
+        def has_debug_register_arg(self):
+            return st_CudaTrackJob_has_debug_register_arg( self._ptr_track_job )
+
+        @property
+        def particles_arg(self):
+            _ptr_argument=st_CudaTrackJob_get_ptr_debug_register_arg(
+                self._ptr_track_job)
+            return CudaArgument(ptr_argument=_ptr_argument,owns_ptr=False)
+
+        @property
+        def controller(self):
+            _ptr_cuda_ctrl=st_CudaTrackJob_get_ptr_controller(
+                self._ptr_track_job)
+            return CudaController(ptr_controller=_ptr_cuda_ctrl,owns_ptr=False)
+
+
+
+
 
 
 else:
