@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import importlib
-
+from importlib import util
 import ctypes as ct
 import pysixtracklib as pyst
 from pysixtracklib import stcommon as st
-import numpy as np
+import pdb
 
-pycuda_spec = importlib.util.find_spec('pycuda')
+pycuda_spec = util.find_spec('pycuda')
+numpy_spec = util.find_spec('numpy')
 
 if pycuda_spec is not None:
     import pycuda
@@ -17,7 +18,7 @@ if pycuda_spec is not None:
     import pycuda.autoinit
 
 if numpy_spec is not None:
-
+    import numpy as np
 
 if __name__ == '__main__':
     if not pyst.supports('cuda'):
@@ -25,6 +26,9 @@ if __name__ == '__main__':
 
     if pycuda_spec is None:
         raise SystemExit("Example requires pycuda installation")
+
+    if numpy_spec is None:
+        raise SystemExit("Example requires numpy installation")
 
     num_particles = 42
     partset = pyst.ParticlesSet()
@@ -37,9 +41,10 @@ if __name__ == '__main__':
     elements.Drift(length=1.2)
     elements.Multipole(knl=[0, 0.001])
 
+    pdb.set_trace()
     track_job = pyst.CudaTrackJob(elements, partset)
 
-    if not track_job.has_particles_addresses and \
+    if not track_job.has_particle_addresses and \
             track_job.can_fetch_particle_addresses:
         track_job.fetch_particle_addresses()
 
@@ -48,13 +53,15 @@ if __name__ == '__main__':
     particles_addr = ptr_particles_addr.contents
 
     print("Particle structure data on the device:")
-    print("num_particles = {0:8d}".format(particles_addr.num_particles))
+    print("num_particles  = {0:8d}".format(particles_addr.num_particles))
     print("x     begin at = {0:16x}".format(particles_addr.x))
     print("y     begin at = {0:16x}".format(particles_addr.y))
     print("px    begin at = {0:16x}".format(particles_addr.px))
     print("py    begin at = {0:16x}".format(particles_addr.py))
     print("zeta  begin at = {0:16x}".format(particles_addr.zeta))
     print("delta begin at = {0:16x}".format(particles_addr.delta))
+
+    pdb.set_trace()
 
     x = pycuda.gpuarray.GPUArray(
         particles_addr.num_particles, float, gpudata=particles_addr.x)
