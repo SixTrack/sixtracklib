@@ -200,7 +200,7 @@ def track_particle_pysixtrack(line, part, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
 
     return x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt
 
-def track_particle_sixtracklib_trackjob(
+def track_particle_sixtracklib(
                             line, partCO, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
                             Dy_wrt_CO_m, Dpy_wrt_CO_rad,
                             Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns,
@@ -279,92 +279,6 @@ def track_particle_sixtracklib_trackjob(
     print('Done loading!')
 
     return x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt
-
-def track_particle_sixtracklib(
-                            line, partCO, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
-                            Dy_wrt_CO_m, Dpy_wrt_CO_rad,
-                            Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns,
-                            device_opencl=None):
-
-
-    Dx_wrt_CO_m, Dpx_wrt_CO_rad,\
-        Dy_wrt_CO_m, Dpy_wrt_CO_rad,\
-        Dsigma_wrt_CO_m, Ddelta_wrt_CO = vectorize_all_coords(
-                             Dx_wrt_CO_m, Dpx_wrt_CO_rad,
-                             Dy_wrt_CO_m, Dpy_wrt_CO_rad,
-                             Dsigma_wrt_CO_m, Ddelta_wrt_CO)
-
-    part = pysixtrack.Particles(**partCO)
-
-    import pysixtracklib
-    elements = pysixtracklib.Elements.fromline(line)
-    # for name, etype, ele in line:
-    #     getattr(elements, etype)(**ele._asdict())
-    elements.tofile("elements.buffer")
-
-    n_part = len(Dx_wrt_CO_m)
-
-    # Build PyST particle
-
-    ps = pysixtracklib.ParticlesSet()
-    p = ps.Particles(num_particles=n_part)
-
-    for i_part in range(n_part):
-
-        part = pysixtrack.Particles(**partCO)
-        part.x += Dx_wrt_CO_m[i_part]
-        part.px += Dpx_wrt_CO_rad[i_part]
-        part.y += Dy_wrt_CO_m[i_part]
-        part.py += Dpy_wrt_CO_rad[i_part]
-        part.sigma += Dsigma_wrt_CO_m[i_part]
-        part.delta += Ddelta_wrt_CO[i_part]
-
-        part.partid = i_part
-        part.state = 1
-        part.elemid = 0
-        part.turn = 0
-
-        p.from_pysixtrack(part, i_part)
-
-    ps.tofile('particles.buffer')
-    if device_opencl is None:
-       command = '../../../build/examples/c99/track_io_c99 particles.buffer elements.buffer %d 0 %d 0'%(n_turns, n_turns)
-    else:
-       command = '../../../build/examples/c99/track_io_opencl_c99 %s particles.buffer elements.buffer %d 0 %d 0'%(device_opencl, n_turns, n_turns)
-    print("Start tracking using:")
-    print(command)
-
-    os.system(command)
-
-    print("Done tracking. Loading data")
-    # res = pysixtracklib.ParticlesSet.fromfile('particles.buffer')
-    res = pysixtracklib.ParticlesSet.fromfile('output_particles.bin')
-
-    x_tbt = res.particles[0].x.reshape(n_turns, n_part)
-    px_tbt = res.particles[0].px.reshape(n_turns, n_part)
-    y_tbt = res.particles[0].y.reshape(n_turns, n_part)
-    py_tbt = res.particles[0].py.reshape(n_turns, n_part)
-    sigma_tbt = res.particles[0].sigma.reshape(n_turns, n_part)
-    delta_tbt = res.particles[0].delta.reshape(n_turns, n_part)
-
-    # For now data are saved at the end of the turn by STlib and at the beginning by the others
-    x_tbt[1:, :] = x_tbt[:-1, :]
-    px_tbt[1:, :] = px_tbt[:-1, :]
-    y_tbt[1:, :] = y_tbt[:-1, :]
-    py_tbt[1:, :] = py_tbt[:-1, :]
-    sigma_tbt[1:, :] = sigma_tbt[:-1, :]
-    delta_tbt[1:, :] = delta_tbt[:-1, :]
-    x_tbt[0, :] = p.x
-    px_tbt[0, :] = p.px
-    y_tbt[0, :] = p.y
-    py_tbt[0, :] = p.py
-    sigma_tbt[0, :] = p.sigma
-    delta_tbt[0, :] = p.delta
-
-    print('Done loading!')
-
-    return x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt
-
 
 
 def betafun_from_ellip(x_tbt, px_tbt):

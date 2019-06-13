@@ -31,7 +31,7 @@ x_tbt_ST, px_tbt_ST, y_tbt_ST, py_tbt_ST, sigma_tbt_ST, delta_tbt_ST = hp.track_
 dict_tbt['ST'] = {kk:vv for kk,vv in zip('x y px py sigma delta'.split(), 
          [x_tbt_ST, px_tbt_ST, y_tbt_ST, py_tbt_ST, sigma_tbt_ST, delta_tbt_ST])}
 print('Tracking STlib')
-x_tbt_STl, px_tbt_STl, y_tbt_STl, py_tbt_STl, sigma_tbt_STl, delta_tbt_STl = hp.track_particle_sixtracklib_trackjob(
+x_tbt_STl, px_tbt_STl, y_tbt_STl, py_tbt_STl, sigma_tbt_STl, delta_tbt_STl = hp.track_particle_sixtracklib(
     line, partCO=partCO, Dx_wrt_CO_m=np.array([Dx_m, Dx_m]), Dpx_wrt_CO_rad=Dpx_rad,
     Dy_wrt_CO_m=Dy_m, Dpy_wrt_CO_rad=Dpy_rad,
     Dsigma_wrt_CO_m=Dsigma_m, Ddelta_wrt_CO=Ddelta, n_turns=n_turns)
