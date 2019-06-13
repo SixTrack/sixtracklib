@@ -50,35 +50,35 @@ if __name__ == '__main__':
     assert not st.st_CudaArgument_uses_raw_argument(lattice_arg)
 
     assert st.st_CudaArgument_get_size(lattice_arg) == \
-           st.st_Buffer_get_size(lattice)
+        st.st_Buffer_get_size(lattice)
 
     assert st.st_CudaArgument_get_capacity(lattice_arg) == \
-           st.st_Buffer_get_capacity(lattice)
+        st.st_Buffer_get_capacity(lattice)
 
     assert st.st_CudaArgument_has_argument_buffer(lattice_arg)
     assert st.st_CudaArgument_requires_argument_buffer(lattice_arg)
 
-    success=st.st_CudaArgument_receive_buffer(lattice_arg, lattice)
+    success = st.st_CudaArgument_receive_buffer(lattice_arg, lattice)
     assert success == 0
 
-    pbuffer=st.st_Buffer_new_mapped_on_cbuffer(track_pb)
+    pbuffer = st.st_Buffer_new_mapped_on_cbuffer(track_pb)
     assert pbuffer != st.st_NullBuffer
 
-    particles_arg=st.st_CudaArgument_new(ctx)
+    particles_arg = st.st_CudaArgument_new(ctx)
     assert particles_arg != st.st_NullCudaArgument
 
-    success=st.st_CudaArgument_send_buffer(particles_arg, pbuffer)
+    success = st.st_CudaArgument_send_buffer(particles_arg, pbuffer)
     assert success == 0
 
-    success=st.st_CudaArgument_receive_buffer(particles_arg, pbuffer)
+    success = st.st_CudaArgument_receive_buffer(particles_arg, pbuffer)
     assert success == 0
 
-    line_begin=ct.c_uint64(0)
-    line_middle=ct.c_uint64(num_beam_elements // 2)
-    line_end=ct.c_uint64(num_beam_elements)
+    line_begin = ct.c_uint64(0)
+    line_middle = ct.c_uint64(num_beam_elements // 2)
+    line_end = ct.c_uint64(num_beam_elements)
 
-    num_blocks=ct.c_uint64(32)
-    threads_per_block=ct.c_uint64(32)
+    num_blocks = ct.c_uint64(32)
+    threads_per_block = ct.c_uint64(32)
 
     st.st_Track_particles_line_cuda_on_grid(
         st.st_CudaArgument_get_arg_buffer(particles_arg),
@@ -86,7 +86,7 @@ if __name__ == '__main__':
         line_begin, line_middle, ct.c_bool(False),
         num_blocks, threads_per_block)
 
-    success=st.st_CudaArgument_receive_buffer(particles_arg, pbuffer)
+    success = st.st_CudaArgument_receive_buffer(particles_arg, pbuffer)
     assert success == 0
 
     st.st_Track_particles_line_cuda_on_grid(
@@ -95,12 +95,12 @@ if __name__ == '__main__':
         line_middle, line_end, ct.c_bool(True),
         num_blocks, threads_per_block)
 
-    success=st.st_CudaArgument_receive_buffer(particles_arg, pbuffer)
+    success = st.st_CudaArgument_receive_buffer(particles_arg, pbuffer)
     assert success == 0
 
-    cmp_pb=CBuffer()
-    cmp_particles=pyst.makeCopy(initial_particles, cbuffer=cmp_pb)
-    cmp_pbuffer=st.st_Buffer_new_mapped_on_cbuffer(cmp_pb)
+    cmp_pb = CBuffer()
+    cmp_particles = pyst.makeCopy(initial_particles, cbuffer=cmp_pb)
+    cmp_pbuffer = st.st_Buffer_new_mapped_on_cbuffer(cmp_pb)
     assert cmp_pbuffer != st.st_NullBuffer
 
     st.st_Track_all_particles_until_turn(
