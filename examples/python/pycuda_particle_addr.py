@@ -41,7 +41,6 @@ if __name__ == '__main__':
     elements.Drift(length=1.2)
     elements.Multipole(knl=[0, 0.001])
 
-    pdb.set_trace()
     track_job = pyst.CudaTrackJob(elements, partset)
 
     if not track_job.has_particle_addresses and \
@@ -60,18 +59,18 @@ if __name__ == '__main__':
     print("zeta  begin at = {0:16x}".format(particles_addr.zeta))
     print("delta begin at = {0:16x}".format(particles_addr.delta))
 
-    pdb.set_trace()
-
     cuda_x = pycuda.gpuarray.GPUArray(
         particles_addr.num_particles, np.float64, gpudata=particles_addr.x)
 
     new_x_values = np.linspace(
         0.0, float( num_particles - 1 ), num=num_particles, dtype=np.float64 )
 
-    cuda_x = new_x_values
+    cuda_x[:] = new_x_values
 
     for ii in range( 0, num_particles ):
         cmp_particles.x[ ii ] = float( ii )
+
+    track_job.fetch_particle_addresses()
 
     assert pyst.compareParticlesDifference(
         cmp_particles, particles, abs_treshold=2e-14) != 0
@@ -81,3 +80,7 @@ if __name__ == '__main__':
 
     assert pyst.compareParticlesDifference(
         cmp_particles, particles, abs_treshold=2e-14) == 0
+
+    del track_job
+    del cuda_x
+
