@@ -194,19 +194,19 @@ class BeamBeam4D(CObject):
                   length='size', pointer=True)
 
     def __init__(self, **kwargs):
-        if 'q_part' in kwargs:
-            slots = (
-                'q_part',
-                'N_part',
+        if 'x_bb' in kwargs:
+            slots = ( 
+                'charge',
                 'sigma_x',
                 'sigma_y',
-                'beta_s',
+                'beta_r',
                 'min_sigma_diff',
-                'Delta_x',
-                'Delta_y',
-                'Dpx_sub',
-                'Dpy_sub',
+                'x_bb',
+                'y_bb',
+                'd_px',
+                'd_py',
                 'enabled')
+
             data = [kwargs[ss] for ss in slots]
             CObject.__init__(self, size=len(data), data=data, **kwargs)
         else:
@@ -220,7 +220,7 @@ class BeamBeam6D(CObject):
                   length='size', pointer=True)
 
     def __init__(self, **kwargs):
-        if 'q_part' in kwargs:
+        if 'x_bb_co' in kwargs:
             import pysixtrack
             data = pysixtrack.BB6Ddata.BB6D_init(
                 **{kk: kwargs[kk] for kk in kwargs.keys() if kk != 'cbuffer'}).tobuffer()

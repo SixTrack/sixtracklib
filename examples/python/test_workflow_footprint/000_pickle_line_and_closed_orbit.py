@@ -79,8 +79,8 @@ for bb in listBB6D:
 
 # Add closed orbit to separation for BB4D (as assumed in sixtrack)
 for bb, ibb in zip(listBB4D, ind_BB4D):
-    bb.Delta_x += closed_orbit[ibb].x
-    bb.Delta_y += closed_orbit[ibb].y
+    bb.x_bb += closed_orbit[ibb].x
+    bb.y_bb += closed_orbit[ibb].y
 
 # Evaluate kick at CO location BB4D
 for bb, ibb in zip(listBB4D, ind_BB4D):
@@ -93,30 +93,30 @@ for bb, ibb in zip(listBB4D, ind_BB4D):
     Dpx = ptemp.px - ptempin.px
     Dpy = ptemp.py - ptempin.py
 
-    bb.Dpx_sub = Dpx
-    bb.Dpy_sub = Dpy
+    bb.d_px = Dpx
+    bb.d_py = Dpy
 
 # Provide closed orbit to BB6D
 for bb, ibb in zip(listBB6D, ind_BB6D):
 
-    bb.x_CO = closed_orbit[ibb].x
-    bb.px_CO = closed_orbit[ibb].px
-    bb.y_CO = closed_orbit[ibb].y
-    bb.py_CO = closed_orbit[ibb].py
-    bb.sigma_CO = closed_orbit[ibb].zeta
-    bb.delta_CO = closed_orbit[ibb].delta
+    bb.x_co = closed_orbit[ibb].x
+    bb.px_co = closed_orbit[ibb].px
+    bb.y_co = closed_orbit[ibb].y
+    bb.py_co = closed_orbit[ibb].py
+    bb.zeta_co = closed_orbit[ibb].zeta
+    bb.delta_co = closed_orbit[ibb].delta
 
 
 # Evaluate kick at CO location BB6D
 for bb, ibb in zip(listBB6D, ind_BB6D):
 
     # For debug
-    bb.Dx_sub = 0.
-    bb.Dpx_sub = 0.
-    bb.Dy_sub = 0.
-    bb.Dpy_sub = 0.
-    bb.Dsigma_sub = 0.
-    bb.Ddelta_sub = 0.
+    bb.d_x = 0.
+    bb.d_px = 0.
+    bb.d_y = 0.
+    bb.d_py = 0.
+    bb.d_zeta = 0.
+    bb.d_delta = 0.
     ######
 
     ptemp = closed_orbit[ibb].copy()
@@ -125,12 +125,12 @@ for bb, ibb in zip(listBB6D, ind_BB6D):
     bb.track(ptemp)
     print('Estimated x orbit kick', ptemp.x - ptempin.x)
 
-    bb.Dx_sub = ptemp.x - ptempin.x
-    bb.Dpx_sub = ptemp.px - ptempin.px
-    bb.Dy_sub = ptemp.y - ptempin.y
-    bb.Dpy_sub = ptemp.py - ptempin.py
-    bb.Dsigma_sub = ptemp.zeta - ptempin.zeta
-    bb.Ddelta_sub = ptemp.delta - ptempin.delta
+    bb.d_x = ptemp.x - ptempin.x
+    bb.d_px = ptemp.px - ptempin.px
+    bb.d_y = ptemp.y - ptempin.y
+    bb.d_py = ptemp.py - ptempin.py
+    bb.d_zeta = ptemp.zeta - ptempin.zeta
+    bb.d_delta = ptemp.delta - ptempin.delta
 
 # Check that the closed orbit is not kicked
 for bb, ibb in zip(listBB6D, ind_BB6D):
