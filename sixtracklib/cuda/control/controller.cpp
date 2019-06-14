@@ -360,6 +360,8 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             cudaError_t const err = ::cudaFree( this->m_cuda_debug_register );
             SIXTRL_ASSERT( err == ::cudaSuccess );
+            ( void )err;
+
             this->m_cuda_debug_register = nullptr;
         }
     }
