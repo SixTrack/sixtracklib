@@ -6,6 +6,7 @@ import importlib
 from collections import namedtuple
 
 import numpy as np
+from scipy.constants import e as qe
 from cobjects import CBuffer, CObject, CField
 from .mad_helper import madseq_to_line
 
@@ -223,7 +224,39 @@ class BeamBeam6D(CObject):
         if 'x_bb_co' in kwargs:
             import pysixtrack
             data = pysixtrack.BB6Ddata.BB6D_init(
-                **{kk: kwargs[kk] for kk in kwargs.keys() if kk != 'cbuffer'}).tobuffer()
+                q_part=qe, 
+                phi=kwargs['phi'], 
+                alpha=kwargs['alpha'], 
+                delta_x=kwargs['x_bb_co'], 
+                delta_y=kwargs['y_bb_co'],
+                N_part_per_slice=kwargs['charge_slices'], 
+                z_slices=kwargs['zeta_slices'],
+                Sig_11_0=kwargs['sigma_11'], 
+                Sig_12_0=kwargs['sigma_12'], 
+                Sig_13_0=kwargs['sigma_13'],
+                Sig_14_0=kwargs['sigma_14'],
+                Sig_22_0=kwargs['sigma_22'], 
+                Sig_23_0=kwargs['sigma_23'],
+                Sig_24_0=kwargs['sigma_24'], 
+                Sig_33_0=kwargs['sigma_33'], 
+                Sig_34_0=kwargs['sigma_34'], 
+                Sig_44_0=kwargs['sigma_44'],
+                x_CO=kwargs['x_co'], 
+                px_CO=kwargs['px_co'], 
+                y_CO=kwargs['y_co'], 
+                py_CO=kwargs['py_co'], 
+                sigma_CO=kwargs['zeta_co'], 
+                delta_CO=kwargs['delta_co'],
+                min_sigma_diff=kwargs['min_sigma_diff'], 
+                threshold_singular=kwargs['threshold_singular'],
+                Dx_sub=kwargs['d_x'], 
+                Dpx_sub=kwargs['d_px'], 
+                Dy_sub=kwargs['d_y'], 
+                Dpy_sub=kwargs['d_py'], 
+                Dsigma_sub=kwargs['d_zeta'], 
+                Ddelta_sub=kwargs['d_delta'],
+                enabled = kwargs['enabled']
+                ).tobuffer()
             CObject.__init__(self, size=len(data), data=data, **kwargs)
         else:
             CObject.__init__(self, **kwargs)
