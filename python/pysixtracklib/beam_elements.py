@@ -208,7 +208,7 @@ class BeamBeam4D(CObject):
                 'd_py',
                 'enabled')
 
-            data = [kwargs[ss] for ss in slots]
+            data = [qe] + [kwargs[ss] for ss in slots]
             CObject.__init__(self, size=len(data), data=data, **kwargs)
         else:
             CObject.__init__(self, **kwargs)
