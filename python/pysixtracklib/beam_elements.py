@@ -350,10 +350,32 @@ class Elements(object):
         return cls().append_line(line, exact_drift)
 
     def append_line(self, line, exact_drift=False):
-        for label, element_name, element in line:
-            if exact_drift and element_name == 'Drift':
-                element_name = 'DriftExact'
-            getattr(self, element_name)(**element._asdict())
+        
+        # Understand if we got list of tuples or line object:
+        if not hasattr(line, '__iter__'):
+            got = 'line_object'
+        elif not hasattr(line[0], '__iter__'):
+            # in case we implement __iter__ for Line
+            got = 'line_object'
+        else:
+            got = 'tuples'
+
+        # Append the line
+        if got == 'tuples':
+            for label, element_name, element in line:
+                if exact_drift and element_name == 'Drift':
+                    element_name = 'DriftExact'
+                getattr(self, element_name)(**element._asdict())
+        else:
+            if exact_drift == True:
+                raise(ValueError('Not implemented!'))
+
+            for ee in line.elements:
+                type_name = ee.__class__.__name__
+
+                getattr(self, element_name)(**element._asdict())
+
+
         return self
 
     def tofile(self, filename):
