@@ -196,19 +196,16 @@ class BeamBeam4D(CObject):
 
     def __init__(self, **kwargs):
         if 'x_bb' in kwargs:
-            slots = ( 
-                'charge',
-                'sigma_x',
-                'sigma_y',
-                'beta_r',
-                'min_sigma_diff',
-                'x_bb',
-                'y_bb',
-                'd_px',
-                'd_py',
-                'enabled')
+            import pysixtrack
+            slots = pysixtrack.BeamBeam4D.__slots__
+            defaults = pysixtrack.BeamBeam4D.__defaults__
 
-            data = [qe] + [kwargs[ss] for ss in slots]
+            params = dict(zip(slots, defaults))
+            for ss in slots:
+                if ss in kwargs:
+                    params[ss] = kwargs[ss]
+            
+            data = [qe] + [params[ss] for ss in slots]
             CObject.__init__(self, size=len(data), data=data, **kwargs)
         else:
             CObject.__init__(self, **kwargs)
@@ -223,39 +220,48 @@ class BeamBeam6D(CObject):
     def __init__(self, **kwargs):
         if 'x_bb_co' in kwargs:
             import pysixtrack
+            slots = pysixtrack.BeamBeam6D.__slots__
+            defaults = pysixtrack.BeamBeam6D.__defaults__
+
+            params = dict(zip(slots, defaults))
+            for ss in slots:
+                if ss in kwargs:
+                    params[ss] = kwargs[ss]
+
+
             data = pysixtrack.BB6Ddata.BB6D_init(
                 q_part=qe, 
-                phi=kwargs['phi'], 
-                alpha=kwargs['alpha'], 
-                delta_x=kwargs['x_bb_co'], 
-                delta_y=kwargs['y_bb_co'],
-                N_part_per_slice=kwargs['charge_slices'], 
-                z_slices=kwargs['zeta_slices'],
-                Sig_11_0=kwargs['sigma_11'], 
-                Sig_12_0=kwargs['sigma_12'], 
-                Sig_13_0=kwargs['sigma_13'],
-                Sig_14_0=kwargs['sigma_14'],
-                Sig_22_0=kwargs['sigma_22'], 
-                Sig_23_0=kwargs['sigma_23'],
-                Sig_24_0=kwargs['sigma_24'], 
-                Sig_33_0=kwargs['sigma_33'], 
-                Sig_34_0=kwargs['sigma_34'], 
-                Sig_44_0=kwargs['sigma_44'],
-                x_CO=kwargs['x_co'], 
-                px_CO=kwargs['px_co'], 
-                y_CO=kwargs['y_co'], 
-                py_CO=kwargs['py_co'], 
-                sigma_CO=kwargs['zeta_co'], 
-                delta_CO=kwargs['delta_co'],
-                min_sigma_diff=kwargs['min_sigma_diff'], 
-                threshold_singular=kwargs['threshold_singular'],
-                Dx_sub=kwargs['d_x'], 
-                Dpx_sub=kwargs['d_px'], 
-                Dy_sub=kwargs['d_y'], 
-                Dpy_sub=kwargs['d_py'], 
-                Dsigma_sub=kwargs['d_zeta'], 
-                Ddelta_sub=kwargs['d_delta'],
-                enabled = kwargs['enabled']
+                phi=params['phi'], 
+                alpha=params['alpha'], 
+                delta_x=params['x_bb_co'], 
+                delta_y=params['y_bb_co'],
+                N_part_per_slice=params['charge_slices'], 
+                z_slices=params['zeta_slices'],
+                Sig_11_0=params['sigma_11'], 
+                Sig_12_0=params['sigma_12'], 
+                Sig_13_0=params['sigma_13'],
+                Sig_14_0=params['sigma_14'],
+                Sig_22_0=params['sigma_22'], 
+                Sig_23_0=params['sigma_23'],
+                Sig_24_0=params['sigma_24'], 
+                Sig_33_0=params['sigma_33'], 
+                Sig_34_0=params['sigma_34'], 
+                Sig_44_0=params['sigma_44'],
+                x_CO=params['x_co'], 
+                px_CO=params['px_co'], 
+                y_CO=params['y_co'], 
+                py_CO=params['py_co'], 
+                sigma_CO=params['zeta_co'], 
+                delta_CO=params['delta_co'],
+                min_sigma_diff=params['min_sigma_diff'], 
+                threshold_singular=params['threshold_singular'],
+                Dx_sub=params['d_x'], 
+                Dpx_sub=params['d_px'], 
+                Dy_sub=params['d_y'], 
+                Dpy_sub=params['d_py'], 
+                Dsigma_sub=params['d_zeta'], 
+                Ddelta_sub=params['d_delta'],
+                enabled = params['enabled']
                 ).tobuffer()
             CObject.__init__(self, size=len(data), data=data, **kwargs)
         else:
@@ -351,30 +357,18 @@ class Elements(object):
 
     def append_line(self, line, exact_drift=False):
         
-        # Understand if we got list of tuples or line object:
-        if not hasattr(line, '__iter__'):
-            got = 'line_object'
-        elif not hasattr(line[0], '__iter__'):
-            # in case we implement __iter__ for Line
-            got = 'line_object'
+        if 'Line' in line.__class__.__name__:
+            if exact_drift == True:
+                raise(ValueError('Not implemented!'))
+            
+            for ee in line.elements:
+                type_name = ee.__class__.__name__
+                getattr(self, type_name)(**ee._asdict())
         else:
-            got = 'tuples'
-
-        # Append the line
-        if got == 'tuples':
             for label, element_name, element in line:
                 if exact_drift and element_name == 'Drift':
                     element_name = 'DriftExact'
                 getattr(self, element_name)(**element._asdict())
-        else:
-            if exact_drift == True:
-                raise(ValueError('Not implemented!'))
-
-            for ee in line.elements:
-                type_name = ee.__class__.__name__
-
-                getattr(self, element_name)(**element._asdict())
-
 
         return self
 
