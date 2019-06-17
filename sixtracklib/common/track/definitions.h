@@ -54,7 +54,7 @@ SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
 
 SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
     NS(TRACK_JOB_COLLECT_PARTICLES_ADDR) =
-        ( NS(track_job_collect_flag_t) )0x18;
+        ( NS(track_job_collect_flag_t) )0x10;
 
 SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
     NS(TRACK_JOB_COLLECT_ALL) = ( NS(track_job_collect_flag_t) )0x1F;
@@ -132,14 +132,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
         TRACK_JOB_COLLECT_PARTICLES =
-            static_cast< track_job_collect_flag_t >( 0x01 );
+            static_cast< track_job_collect_flag_t >( 1 );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
         TRACK_JOB_COLLECT_BEAM_ELEMENTS =
             static_cast< track_job_collect_flag_t >( 2 );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
-        TRACK_JOB_COLLECT_OUTPUT = static_cast< track_job_collect_flag_t >( 4 );
+        TRACK_JOB_COLLECT_OUTPUT =
+            static_cast< track_job_collect_flag_t >( 4 );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
         TRACK_JOB_COLLECT_DEBUG_REGISTER =
@@ -147,14 +148,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
         TRACK_JOB_COLLECT_PARTICLES_ADDR =
-            static_cast< track_job_collect_flag_t >( 0x10 );
+            static_cast< track_job_collect_flag_t >( 16 );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
-        TRACK_JOB_COLLECT_ALL = static_cast< track_job_collect_flag_t >( 0x20 );
+        TRACK_JOB_COLLECT_ALL = static_cast< track_job_collect_flag_t >( 31 );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
         TRACK_JOB_COLLECT_DEFAULT_FLAGS =
-            static_cast< track_job_collect_flag_t >( 0x05 );
+            static_cast< track_job_collect_flag_t >( 5 );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_size_t
         TRACK_JOB_DEFAULT_NUM_PARTICLE_SETS =
