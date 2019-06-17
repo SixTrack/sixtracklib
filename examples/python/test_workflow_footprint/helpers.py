@@ -156,6 +156,8 @@ def track_particle_pysixtrack(line, part, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
                               Dy_wrt_CO_m, Dpy_wrt_CO_rad,
                               Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns, verbose=False):
 
+    line = pysixtrack.Line.fromline(line)
+
     Dx_wrt_CO_m, Dpx_wrt_CO_rad,\
         Dy_wrt_CO_m, Dpy_wrt_CO_rad,\
         Dsigma_wrt_CO_m, Ddelta_wrt_CO = vectorize_all_coords(
