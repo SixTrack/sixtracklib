@@ -30,7 +30,8 @@ namespace SIXTRL_CXX_NAMESPACE
         char const* SIXTRL_RESTRICT config_str ) :
         st::TrackJobCtrlArgBase( arch_id, arch_str, config_str )
     {
-
+        this->doSetUsesControllerFlag( true );
+        this->doSetUsesArgumentsFlag( true );
     }
 
     TrackJobNodeCtrlArgBase::node_controller_base_t const*
