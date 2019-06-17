@@ -56,6 +56,7 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
             in_particles_buffer, buf_size_t{ 0 } ) );
 
     SIXTRL_ASSERT( cmp_particles != nullptr );
+    ( void )cmp_particles;
 
     buf_size_t const NUM_PSETS  = buf_size_t{ 1 };
     buf_size_t track_pset_index = buf_size_t{ 0 };
@@ -119,6 +120,7 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
             &elem_by_elem_conf, UNTIL_TURN_ELEM_BY_ELEM );
 
     SIXTRL_ASSERT( track_status == ::NS(TRACK_SUCCESS) );
+    ( void )track_status;
 
     cmp_particles = ::NS(Particles_buffer_get_particles)(
         cmp_track_pb, buf_size_t{ 0 } );

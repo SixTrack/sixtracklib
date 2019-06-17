@@ -79,6 +79,7 @@ TEST( C99_CudaControllerTests, CObjectsBufferRemapping )
         generic_obj_t const* ptr_obj = ::NS(GenericObj_new)(
             obj_buffer.getCApiPtr(), type_id, num_d_values, num_e_values );
         SIXTRL_ASSERT( ptr_obj != nullptr );
+        ( void )ptr_obj;
     }
 
     SIXTRL_ASSERT( obj_buffer.getNumObjects() == num_obj );
@@ -99,6 +100,8 @@ TEST( C99_CudaControllerTests, CObjectsBufferRemapping )
         ::cudaError_t err = ::cudaMalloc(
             &cuda_managed_buffer, obj_buffer.getSize() );
 
+        SIXTRL_ASSERT( err == ::cudaSuccess );
+
         ASSERT_TRUE( st::ARCH_STATUS_SUCCESS ==
             ::NS(CudaController_send_memory)( cuda_ctrl, cuda_managed_buffer,
                 obj_buffer.dataBegin< unsigned char const* >(),
@@ -118,6 +121,7 @@ TEST( C99_CudaControllerTests, CObjectsBufferRemapping )
 
         SIXTRL_ASSERT( err == ::cudaSuccess );
         cuda_managed_buffer = nullptr;
+        ( void )err;
     }
     else
     {

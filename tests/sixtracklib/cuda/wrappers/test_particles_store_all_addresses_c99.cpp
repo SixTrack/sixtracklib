@@ -46,6 +46,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestSingleParticleSetPerBuffer )
 
     size_t const slot_size = ::NS(Buffer_get_slot_size)( particles_buffer );
     SIXTRL_ASSERT( slot_size > size_t{ 0 } );
+    ( void )slot_size;
 
     size_t constexpr prng_seed = size_t{ 20190517 };
 
@@ -208,6 +209,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestMultiParticleSetsPerBuffer )
 
     size_t const slot_size = ::NS(Buffer_get_slot_size)( particles_buffer );
     SIXTRL_ASSERT( slot_size > size_t{ 0 } );
+    ( void )slot_size;
 
     size_t constexpr prng_seed = size_t{ 20190517 };
 
@@ -371,6 +373,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests,
 
     size_t const slot_size = ::NS(Buffer_get_slot_size)( particles_buffer );
     SIXTRL_ASSERT( slot_size > size_t{ 0 } );
+    ( void )slot_size;
 
     size_t constexpr prng_seed = size_t{ 20190517 };
 

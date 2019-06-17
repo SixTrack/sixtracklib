@@ -47,6 +47,7 @@ TEST( C99_Cpu_CpuTrackJobSetupTests, CreateTrackJobNoOutput )
 
     particles_t* particles = ::NS(Particles_add_copy)( pb, orig_particles );
     SIXTRL_ASSERT( particles != nullptr );
+    ( void )particles;
 
     size_t const NUM_ELEM_BY_ELEM_TURNS = size_t{ 0 };
 
