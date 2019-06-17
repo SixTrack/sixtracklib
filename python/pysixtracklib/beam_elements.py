@@ -6,8 +6,9 @@ import importlib
 from collections import namedtuple
 
 import numpy as np
+from scipy.constants import e as qe
 from cobjects import CBuffer, CObject, CField
-from .mad_helper import madseq_to_line
+from .mad_helper import madseq_to_generator
 
 
 class Drift(CObject):
@@ -194,20 +195,17 @@ class BeamBeam4D(CObject):
                   length='size', pointer=True)
 
     def __init__(self, **kwargs):
-        if 'q_part' in kwargs:
-            slots = (
-                'q_part',
-                'N_part',
-                'sigma_x',
-                'sigma_y',
-                'beta_s',
-                'min_sigma_diff',
-                'Delta_x',
-                'Delta_y',
-                'Dpx_sub',
-                'Dpy_sub',
-                'enabled')
-            data = [kwargs[ss] for ss in slots]
+        if 'x_bb' in kwargs:
+            import pysixtrack
+            slots = pysixtrack.BeamBeam4D.__slots__
+            defaults = pysixtrack.BeamBeam4D.__defaults__
+
+            params = dict(zip(slots, defaults))
+            for ss in slots:
+                if ss in kwargs:
+                    params[ss] = kwargs[ss]
+            
+            data = [qe] + [params[ss] for ss in slots]
             CObject.__init__(self, size=len(data), data=data, **kwargs)
         else:
             CObject.__init__(self, **kwargs)
@@ -220,10 +218,51 @@ class BeamBeam6D(CObject):
                   length='size', pointer=True)
 
     def __init__(self, **kwargs):
-        if 'q_part' in kwargs:
+        if 'x_bb_co' in kwargs:
             import pysixtrack
+            slots = pysixtrack.BeamBeam6D.__slots__
+            defaults = pysixtrack.BeamBeam6D.__defaults__
+
+            params = dict(zip(slots, defaults))
+            for ss in slots:
+                if ss in kwargs:
+                    params[ss] = kwargs[ss]
+
+
             data = pysixtrack.BB6Ddata.BB6D_init(
-                **{kk: kwargs[kk] for kk in kwargs.keys() if kk != 'cbuffer'}).tobuffer()
+                q_part=qe, 
+                phi=params['phi'], 
+                alpha=params['alpha'], 
+                delta_x=params['x_bb_co'], 
+                delta_y=params['y_bb_co'],
+                N_part_per_slice=params['charge_slices'], 
+                z_slices=params['zeta_slices'],
+                Sig_11_0=params['sigma_11'], 
+                Sig_12_0=params['sigma_12'], 
+                Sig_13_0=params['sigma_13'],
+                Sig_14_0=params['sigma_14'],
+                Sig_22_0=params['sigma_22'], 
+                Sig_23_0=params['sigma_23'],
+                Sig_24_0=params['sigma_24'], 
+                Sig_33_0=params['sigma_33'], 
+                Sig_34_0=params['sigma_34'], 
+                Sig_44_0=params['sigma_44'],
+                x_CO=params['x_co'], 
+                px_CO=params['px_co'], 
+                y_CO=params['y_co'], 
+                py_CO=params['py_co'], 
+                sigma_CO=params['zeta_co'], 
+                delta_CO=params['delta_co'],
+                min_sigma_diff=params['min_sigma_diff'], 
+                threshold_singular=params['threshold_singular'],
+                Dx_sub=params['d_x'], 
+                Dpx_sub=params['d_px'], 
+                Dy_sub=params['d_y'], 
+                Dpy_sub=params['d_py'], 
+                Dsigma_sub=params['d_zeta'], 
+                Ddelta_sub=params['d_delta'],
+                enabled = params['enabled']
+                ).tobuffer()
             CObject.__init__(self, size=len(data), data=data, **kwargs)
         else:
             CObject.__init__(self, **kwargs)
@@ -313,17 +352,15 @@ class Elements(object):
         return cls(cbuffer=cbuffer)
 
     @classmethod
-    def fromline(cls, line, exact_drift=False):
-        return cls().append_line(line, exact_drift)
+    def from_line(cls, line):
+        return cls().append_line(line)
 
-    def append_line(self, line, exact_drift=False):
-        for label, element_name, element in line:
-            if exact_drift and element_name == 'Drift':
-                element_name = 'DriftExact'
+    def append_line(self, line):
+        for element in line.elements:
+            element_name=element.__class__.__name__
             getattr(self, element_name)(**element._asdict())
-        return self
 
-    def tofile(self, filename):
+    def to_file(self, filename):
         self.cbuffer.tofile(filename)
 
     def __init__(self, cbuffer=None):
@@ -351,8 +388,12 @@ class Elements(object):
 
     @classmethod
     def from_mad(cls, seq, exact_drift=False):
-        line = madseq_to_line(seq)
-        return cls.fromline(line, exact_drift=exact_drift)
+        # temporary
+        for label, element_name, element in madseq_to_generator(seq):
+            if exact_drift and element_name == 'Drift':
+                element_name = 'DriftExact'
+            getattr(self, element_name)(**element._asdict())
+        return self
 
     # @classmethod
     # def from_mad2(cls, seq):

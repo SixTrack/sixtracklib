@@ -11,6 +11,8 @@ from .particles import ParticlesSet
 from .control import raise_error_if_status_not_success
 from .control import ControllerBase, NodeControllerBase, ArgumentBase
 from .buffer import Buffer
+from .particles import ParticlesSet
+from .beam_elements import Elements
 
 from .stcommon import st_TrackJobBaseNew_p, st_NullTrackJobBaseNew, \
     st_ARCH_STATUS_SUCCESS, st_ARCH_STATUS_GENERAL_FAILURE, \
@@ -142,6 +144,10 @@ class TrackJobBaseNew(object):
                 _particles_buffer = particles_buffer._buffer
                 _internal_particles_buffer = Buffer(cbuffer=_particles_buffer)
                 _ptr_c_particles_buffer = _internal_particles_buffer.pointer
+            elif isinstance(particles_buffer, ParticlesSet):
+                _particles_buffer = particles_buffer.cbuffer
+                _internal_particles_buffer = Buffer(cbuffer=_particles_buffer)
+                _ptr_c_particles_buffer = _internal_particles_buffer.pointer
             elif isinstance(particles_buffer, Buffer):
                 _internal_particles_buffer = particles_buffer
                 _ptr_c_particles_buffer = particles_buffer.pointer
@@ -183,6 +189,12 @@ class TrackJobBaseNew(object):
                     cbuffer=_beam_elements_buffer)
                 _ptr_c_beam_elements_buffer = \
                     _internal_beam_elements_buffer.pointer
+            elif isinstance(beam_elements_buffer,Elements):
+                _beam_elements_buffer = beam_elements_buffer.cbuffer
+                _internal_beam_elements_buffer = Buffer(
+                    cbuffer=_beam_elements_buffer )
+                _ptr_c_beam_elements_buffer = \
+                    _internal_beam_elements_buffer.pointer
             elif isinstance(beam_elements_buffer, Buffer):
                 _internal_beam_elements_buffer = beam_elements_buffer
                 _ptr_c_beam_elements_buffer = beam_elements_buffer.pointer
@@ -200,6 +212,8 @@ class TrackJobBaseNew(object):
                 _output_buffer = output_buffer
             elif isinstance(output_buffer, CObject):
                 _output_buffer = output_buffer._buffer
+            elif isinstance(output_buffer, ParticlesSet):
+                _output_buffer = output_buffer.cbuffer
             elif isinstance(output_buffer, Buffer):
                 _internal_output_buffer = output_buffer
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -293,6 +307,14 @@ class TrackJobBaseNew(object):
             self._internal_beam_elements_buffer = _internal_beam_elements_buffer
             self._internal_particles_buffer = _internal_particles_buffer
             self._internal_output_buffer = _internal_output_buffer
+
+            del(self._particles_buffer)
+            del(self._beam_elements_buffer)
+            del(self._output_buffer)
+
+            self._particles_buffer = _particles_buffer
+            self._beam_elements_buffer = beam_elements_buffer
+            self._output_buffer = _output_buffer
         else:
             raise RuntimeError("Error while resetting the trackjob")
 
@@ -484,6 +506,9 @@ class TrackJobBaseNew(object):
         return self
 
     def collectParticles(self):
+        assert self._ptr_c_particles_buffer != st_NullBuffer
+        assert self._internal_particles_buffer.pointer != st_NullBuffer
+
         self._last_status = st_TrackJobNew_collect_particles(
             self._ptr_track_job)
         raise_error_if_status_not_success(

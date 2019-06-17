@@ -41,7 +41,7 @@ def dispatch(el, classes):
     return el
 
 
-def madseq_to_line(seq, convert=classes):
+def madseq_to_generator(seq, convert=classes):
     Drift = convert['Drift']
     oldpos = 0
     poss = seq.element_positions()
