@@ -64,7 +64,8 @@ target_compile_definitions( sixtrack_cuda_host
     PUBLIC ${SIXTRACKL_CUDA_HOST_DEFINITIONS} )
 
 target_include_directories( sixtrack_cuda_host
-    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+    PUBLIC  $<BUILD_INTERFACE:${SIXTRACKL_CUDA_INCLUDE_DIRS}> )
 
 set_target_properties( sixtrack_cuda_host PROPERTIES POSITION_INDEPENDENT_CODE ON )
 set_target_properties( sixtrack_cuda_host PROPERTIES LINKER_LANGUAGE C )
