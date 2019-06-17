@@ -1,27 +1,30 @@
 import sixtracktools
+import pyblep
 import pysixtrack
-import pysixtrack.helpers as hp
 import pickle
 import os
 
 os.system('./runsix')
 
-
-
 import numpy as np
 
 # Read sixtrack input
-six = sixtracktools.SixInput('.')
-p0c_eV = six.initialconditions[-3]*1e6
+sixinput = sixtracktools.SixInput('.')
+p0c_eV = sixinput.initialconditions[-3]*1e6
+
+# Build pyblep line from sixtrack input
+pbline, other_data = pyblep.from_sixtrack_input(sixinput)
+
+iconv = other_data['iconv']
 
 # Build pysixtrack line
-line, rest, iconv = six.expand_struct(convert=pysixtrack.element_types)
+line = pysixtrack.Line.fromline(pbline)
 
 # Disable BB elements
-ind_BB4D, namelistBB4D, listBB4D = hp.get_elems_of_type(line, 'BeamBeam4D')
+ind_BB4D, namelistBB4D, listBB4D = pyblep.tools.get_elems_of_type(line, 'BeamBeam4D')
 for bb in listBB4D:
     bb.enabled = False
-ind_BB6D, namelistBB6D, listBB6D = hp.get_elems_of_type(line, 'BeamBeam6D')
+ind_BB6D, namelistBB6D, listBB6D = pyblep.tools.get_elems_of_type(line, 'BeamBeam6D')
 for bb in listBB6D:
     bb.enabled = False
 
@@ -32,10 +35,9 @@ Nele_st = len(iconv)
 sixdump_CO = sixdump_all[::2][:Nele_st]
 
 # Find closed orbit
-ring = hp.Ring(line, p0c=p0c_eV)
 guess = [getattr(sixdump_CO, att)[0]
          for att in 'x px y py sigma delta'.split()]
-closed_orbit = ring.find_closed_orbit(guess=guess, method='get_guess')
+closed_orbit = line.find_closed_orbit(guess=guess, method='get_guess', p0c=p0c_eV)
 
 print('Closed orbit at start machine:')
 print('x px y py sigma delta:', guess)
@@ -50,8 +52,8 @@ with open('particle_on_CO.pkl', 'wb') as fid:
 
 print('STsigma, Sigma, Stdelta, delta, Stpx, px')
 for iturn in range(10):
-    ring.track(pstart)
-    ring.track(pstart_st)
+    line.track(pstart)
+    line.track(pstart_st)
     print('%e, %e, %e, %e, %e, %e' % (pstart_st.sigma, pstart.sigma,
                                       pstart_st.delta, pstart.delta, pstart_st.px, pstart.px))
 
@@ -79,8 +81,8 @@ for bb in listBB6D:
 
 # Add closed orbit to separation for BB4D (as assumed in sixtrack)
 for bb, ibb in zip(listBB4D, ind_BB4D):
-    bb.Delta_x += closed_orbit[ibb].x
-    bb.Delta_y += closed_orbit[ibb].y
+    bb.x_bb += closed_orbit[ibb].x
+    bb.y_bb += closed_orbit[ibb].y
 
 # Evaluate kick at CO location BB4D
 for bb, ibb in zip(listBB4D, ind_BB4D):
@@ -93,30 +95,30 @@ for bb, ibb in zip(listBB4D, ind_BB4D):
     Dpx = ptemp.px - ptempin.px
     Dpy = ptemp.py - ptempin.py
 
-    bb.Dpx_sub = Dpx
-    bb.Dpy_sub = Dpy
+    bb.d_px = Dpx
+    bb.d_py = Dpy
 
 # Provide closed orbit to BB6D
 for bb, ibb in zip(listBB6D, ind_BB6D):
 
-    bb.x_CO = closed_orbit[ibb].x
-    bb.px_CO = closed_orbit[ibb].px
-    bb.y_CO = closed_orbit[ibb].y
-    bb.py_CO = closed_orbit[ibb].py
-    bb.sigma_CO = closed_orbit[ibb].zeta
-    bb.delta_CO = closed_orbit[ibb].delta
+    bb.x_co = closed_orbit[ibb].x
+    bb.px_co = closed_orbit[ibb].px
+    bb.y_co = closed_orbit[ibb].y
+    bb.py_co = closed_orbit[ibb].py
+    bb.zeta_co = closed_orbit[ibb].zeta
+    bb.delta_co = closed_orbit[ibb].delta
 
 
 # Evaluate kick at CO location BB6D
 for bb, ibb in zip(listBB6D, ind_BB6D):
 
     # For debug
-    bb.Dx_sub = 0.
-    bb.Dpx_sub = 0.
-    bb.Dy_sub = 0.
-    bb.Dpy_sub = 0.
-    bb.Dsigma_sub = 0.
-    bb.Ddelta_sub = 0.
+    bb.d_x = 0.
+    bb.d_px = 0.
+    bb.d_y = 0.
+    bb.d_py = 0.
+    bb.d_zeta = 0.
+    bb.d_delta = 0.
     ######
 
     ptemp = closed_orbit[ibb].copy()
@@ -125,12 +127,12 @@ for bb, ibb in zip(listBB6D, ind_BB6D):
     bb.track(ptemp)
     print('Estimated x orbit kick', ptemp.x - ptempin.x)
 
-    bb.Dx_sub = ptemp.x - ptempin.x
-    bb.Dpx_sub = ptemp.px - ptempin.px
-    bb.Dy_sub = ptemp.y - ptempin.y
-    bb.Dpy_sub = ptemp.py - ptempin.py
-    bb.Dsigma_sub = ptemp.zeta - ptempin.zeta
-    bb.Ddelta_sub = ptemp.delta - ptempin.delta
+    bb.d_x = ptemp.x - ptempin.x
+    bb.d_px = ptemp.px - ptempin.px
+    bb.d_y = ptemp.y - ptempin.y
+    bb.d_py = ptemp.py - ptempin.py
+    bb.d_zeta = ptemp.zeta - ptempin.zeta
+    bb.d_delta = ptemp.delta - ptempin.delta
 
 # Check that the closed orbit is not kicked
 for bb, ibb in zip(listBB6D, ind_BB6D):
@@ -145,11 +147,6 @@ for bb, ibb in zip(listBB6D, ind_BB6D):
 
 with open('line.pkl', 'wb') as fid:
     pickle.dump(line, fid)
-
-
-lineobj=pysixtrack.Line(elements=[elem for label,elem_type,elem in line])
-with open('lineobj.pkl', 'wb') as fid:
-    pickle.dump(lineobj, fid)
 
 
 # Compare tracking results
@@ -206,7 +203,8 @@ for ii in range(1, len(iconv)):
     print(f"\n-----sixtrack={ii} sixtracklib={jja} --------------")
     #print(f"pysixtr {jja}, x={prun.x}, px={prun.px}")
     for jj in range(jja+1, jjb+1):
-        label, elem_type, elem = line[jj]
+        label = line.element_names[jj]
+        elem = line.elements[jj]
         pin = prun.copy()
         elem.track(prun)
         print(f"{jj} {label},{str(elem)[:50]}")
