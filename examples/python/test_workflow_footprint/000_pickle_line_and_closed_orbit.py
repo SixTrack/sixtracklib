@@ -90,7 +90,6 @@ for iturn in range(10):
     print('%e, %e, %e, %e, %e, %e' % (pstart_st.sigma, pstart.sigma,
                                       pstart_st.delta, pstart.delta, pstart_st.px, pstart.px))
 
-prrrrr
 # Compare closed orbit against sixtrack
 for att in 'x px y py delta sigma'.split():
     att_CO = np.array([getattr(pp, att) for pp in closed_orbit])
@@ -98,7 +97,7 @@ for att in 'x px y py delta sigma'.split():
     print('Max C.O. discrepancy in %s %.2e' %
           (att, np.max(np.abs(att_CO_at_st_ele-getattr(sixdump_CO, att)))))
 
-
+prrrrrr
 # Check that the closed orbit is not kicked
 for bb, ibb in zip(listBB6D, ind_BB6D):
 
