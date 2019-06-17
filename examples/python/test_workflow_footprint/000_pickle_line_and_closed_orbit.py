@@ -8,6 +8,10 @@ os.system('./runsix')
 
 import numpy as np
 
+##############
+# Build line #
+##############
+
 # Read sixtrack input
 sixinput = sixtracktools.SixInput('.')
 p0c_eV = sixinput.initialconditions[-3]*1e6
@@ -15,18 +19,16 @@ p0c_eV = sixinput.initialconditions[-3]*1e6
 # Build pyblep line from sixtrack input
 pbline, other_data = pyblep.from_sixtrack_input(sixinput)
 
+# Info on sixtrack->pyblep conversion 
 iconv = other_data['iconv']
 
 # Build pysixtrack line
 line = pysixtrack.Line.fromline(pbline)
 
-# Disable BB elements
-ind_BB4D, namelistBB4D, listBB4D = pyblep.tools.get_elems_of_type(line, 'BeamBeam4D')
-for bb in listBB4D:
-    bb.enabled = False
-ind_BB6D, namelistBB6D, listBB6D = pyblep.tools.get_elems_of_type(line, 'BeamBeam6D')
-for bb in listBB6D:
-    bb.enabled = False
+########################################################
+#                  Search closed orbit                 #
+# (for comparison purposes we the orbit from sixtrack) #
+########################################################
 
 # Load sixtrack tracking data
 sixdump_all = sixtracktools.SixDump101('res/dump3.dat')
@@ -34,13 +36,32 @@ sixdump_all = sixtracktools.SixDump101('res/dump3.dat')
 Nele_st = len(iconv)
 sixdump_CO = sixdump_all[::2][:Nele_st]
 
+# Disable BB elements
+line.disable_beambeam()
+
 # Find closed orbit
-guess = [getattr(sixdump_CO, att)[0]
+guess_from_sixtrack = [getattr(sixdump_CO, att)[0]
          for att in 'x px y py sigma delta'.split()]
-closed_orbit = line.find_closed_orbit(guess=guess, method='get_guess', p0c=p0c_eV)
+part_on_CO = line.find_closed_orbit(
+        guess=guess_from_sixtrack, method='get_guess', p0c=p0c_eV)
 
 print('Closed orbit at start machine:')
-print('x px y py sigma delta:', guess)
+print('x px y py sigma delta:')
+print(part_on_CO)
+
+#######################################################
+#  Store closed orbit and dipole kicks at BB elements #
+#######################################################
+
+line.beambeam_store_closed_orbit_and_dipolar_kicks(
+        part_on_CO,
+        separation_given_wrt_closed_orbit_4D = True,
+        separation_given_wrt_closed_orbit_6D = True)
+
+
+prrrrrr
+
+closed_orbit = line.track_elem_by_elem(part_on_CO)
 
 
 # Check that closed orbit is closed
@@ -58,10 +79,6 @@ for iturn in range(10):
                                       pstart_st.delta, pstart.delta, pstart_st.px, pstart.px))
 
 
-
-
-import matplotlib.pyplot as plt
-
 # Compare closed orbit against sixtrack
 for att in 'x px y py delta sigma'.split():
     att_CO = np.array([getattr(pp, att) for pp in closed_orbit])
@@ -69,70 +86,6 @@ for att in 'x px y py delta sigma'.split():
     print('Max C.O. discrepancy in %s %.2e' %
           (att, np.max(np.abs(att_CO_at_st_ele-getattr(sixdump_CO, att)))))
 
-plt.figure(1)
-plt.plot(sixdump_CO.s, sixdump_CO.x)
-
-
-# Re-enable beam-beam
-for bb in listBB4D:
-    bb.enabled = True
-for bb in listBB6D:
-    bb.enabled = True
-
-# Add closed orbit to separation for BB4D (as assumed in sixtrack)
-for bb, ibb in zip(listBB4D, ind_BB4D):
-    bb.x_bb += closed_orbit[ibb].x
-    bb.y_bb += closed_orbit[ibb].y
-
-# Evaluate kick at CO location BB4D
-for bb, ibb in zip(listBB4D, ind_BB4D):
-
-    ptemp = closed_orbit[ibb].copy()
-    ptempin = ptemp.copy()
-
-    bb.track(ptemp)
-
-    Dpx = ptemp.px - ptempin.px
-    Dpy = ptemp.py - ptempin.py
-
-    bb.d_px = Dpx
-    bb.d_py = Dpy
-
-# Provide closed orbit to BB6D
-for bb, ibb in zip(listBB6D, ind_BB6D):
-
-    bb.x_co = closed_orbit[ibb].x
-    bb.px_co = closed_orbit[ibb].px
-    bb.y_co = closed_orbit[ibb].y
-    bb.py_co = closed_orbit[ibb].py
-    bb.zeta_co = closed_orbit[ibb].zeta
-    bb.delta_co = closed_orbit[ibb].delta
-
-
-# Evaluate kick at CO location BB6D
-for bb, ibb in zip(listBB6D, ind_BB6D):
-
-    # For debug
-    bb.d_x = 0.
-    bb.d_px = 0.
-    bb.d_y = 0.
-    bb.d_py = 0.
-    bb.d_zeta = 0.
-    bb.d_delta = 0.
-    ######
-
-    ptemp = closed_orbit[ibb].copy()
-    ptempin = ptemp.copy()
-
-    bb.track(ptemp)
-    print('Estimated x orbit kick', ptemp.x - ptempin.x)
-
-    bb.d_x = ptemp.x - ptempin.x
-    bb.d_px = ptemp.px - ptempin.px
-    bb.d_y = ptemp.y - ptempin.y
-    bb.d_py = ptemp.py - ptempin.py
-    bb.d_zeta = ptemp.zeta - ptempin.zeta
-    bb.d_delta = ptemp.delta - ptempin.delta
 
 # Check that the closed orbit is not kicked
 for bb, ibb in zip(listBB6D, ind_BB6D):
