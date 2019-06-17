@@ -29,7 +29,6 @@ TEST( CXX_CudaTrackJobTrackElemByElemTests,
 
     using particles_t           = st::Particles;
     using track_job_t           = st::CudaTrackJob;
-    using node_index_t          = track_job_t::node_index_t;
     using buffer_t              = track_job_t::buffer_t;
     using buf_size_t            = track_job_t::size_type;
     using track_status_t        = track_job_t::track_status_t;

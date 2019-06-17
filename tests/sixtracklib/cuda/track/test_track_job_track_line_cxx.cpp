@@ -28,7 +28,6 @@ TEST( CXX_CudaTrackJobTrackUntilTests, TrackUntilSingleParticleSetSimpleTest )
 
     using particles_t    = st::Particles;
     using track_job_t    = st::CudaTrackJob;
-    using node_index_t   = track_job_t::node_index_t;
     using buffer_t       = track_job_t::buffer_t;
     using buf_size_t     = track_job_t::size_type;
     using track_status_t = track_job_t::track_status_t;
@@ -173,14 +172,14 @@ TEST( CXX_CudaTrackJobTrackUntilTests, TrackUntilSingleParticleSetSimpleTest )
         particles = track_pb.get< particles_t >( buf_size_t{ 0 } );
         SIXTRL_ASSERT( particles != nullptr );
 
-        ASSERT_TRUE(
-            ( cmp_particles != nullptr ) && ( particles != nullptr ) &&
-            ( 0 == ::NS(Particles_compare_values)(
-                cmp_particles->getCApiPtr(), particles->getCApiPtr() ) ) ||
-            ( ( ABS_TOLERANCE > real_t{ 0 } ) &&
-              ( 0 == ::NS(Particles_compare_values_with_treshold)(
-                        cmp_particles->getCApiPtr(), particles->getCApiPtr(),
-                            ABS_TOLERANCE ) ) ) );
+        ASSERT_TRUE( ( cmp_particles != nullptr ) &&
+            ( particles != nullptr ) &&
+            ( ( 0 == ::NS(Particles_compare_values)(
+                    cmp_particles->getCApiPtr(), particles->getCApiPtr() ) ) ||
+              ( ( ABS_TOLERANCE > real_t{ 0 } ) &&
+                ( 0 == ::NS(Particles_compare_values_with_treshold)(
+                    cmp_particles->getCApiPtr(), particles->getCApiPtr(),
+                        ABS_TOLERANCE ) ) ) ) );
 
         status = particles->copy(
             in_particles.get< particles_t >( buf_size_t{ 0 } ) );
@@ -247,13 +246,13 @@ TEST( CXX_CudaTrackJobTrackUntilTests, TrackUntilSingleParticleSetSimpleTest )
 
         /* ... compare against the cpu tracking result */
 
-        ASSERT_TRUE( ( particles != nullptr ) &&
-            ( 0 == ::NS(Particles_compare_values)(
-                cmp_particles->getCApiPtr(), particles->getCApiPtr() ) ) ||
-            ( ( ABS_TOLERANCE > real_t{ 0 } ) &&
-              ( 0 == ::NS(Particles_compare_values_with_treshold)(
-                        cmp_particles->getCApiPtr(), particles->getCApiPtr(),
-                            ABS_TOLERANCE ) ) ) );
+        ASSERT_TRUE( ( particles != nullptr ) && ( cmp_particles != nullptr ) &&
+            ( ( 0 == ::NS(Particles_compare_values)(
+                    cmp_particles->getCApiPtr(), particles->getCApiPtr() ) ) ||
+              ( ( ABS_TOLERANCE > real_t{ 0 } ) &&
+                ( 0 == ::NS(Particles_compare_values_with_treshold)(
+                    cmp_particles->getCApiPtr(), particles->getCApiPtr(),
+                        ABS_TOLERANCE ) ) ) ) );
     }
 }
 
