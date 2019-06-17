@@ -8,7 +8,7 @@ from collections import namedtuple
 import numpy as np
 from scipy.constants import e as qe
 from cobjects import CBuffer, CObject, CField
-from .mad_helper import madseq_to_line
+from .mad_helper import madseq_to_generator
 
 
 class Drift(CObject):
@@ -352,13 +352,16 @@ class Elements(object):
         return cls(cbuffer=cbuffer)
 
     @classmethod
-    def from_line(cls,line):
+    def from_line(cls, line):
+        return cls().append_line(line)
+
+    def append_line(self, line):
         for element in line.elements:
             element_name=element.__class__.__name__
             getattr(self, element_name)(**element._asdict())
 
     def to_file(self, filename):
-        self.cbuffer.to_file(filename)
+        self.cbuffer.tofile(filename)
 
     def __init__(self, cbuffer=None):
         if cbuffer is None:
