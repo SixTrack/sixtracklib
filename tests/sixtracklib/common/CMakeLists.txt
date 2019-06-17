@@ -2,6 +2,7 @@
 
 add_subdirectory( control )
 add_subdirectory( beam_elements )
+add_subdirectory( track )
 
 # -----------------------------------------------------------------------------
 # ---- Generate testdata:
