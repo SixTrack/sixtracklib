@@ -313,18 +313,13 @@ class Elements(object):
         return cls(cbuffer=cbuffer)
 
     @classmethod
-    def fromline(cls, line, exact_drift=False):
-        return cls().append_line(line, exact_drift)
-
-    def append_line(self, line, exact_drift=False):
-        for label, element_name, element in line:
-            if exact_drift and element_name == 'Drift':
-                element_name = 'DriftExact'
+    def from_line(cls,line):
+        for element in line.elements:
+            element_name=element.__class__.__name__
             getattr(self, element_name)(**element._asdict())
-        return self
 
-    def tofile(self, filename):
-        self.cbuffer.tofile(filename)
+    def to_file(self, filename):
+        self.cbuffer.to_file(filename)
 
     def __init__(self, cbuffer=None):
         if cbuffer is None:
@@ -351,8 +346,12 @@ class Elements(object):
 
     @classmethod
     def from_mad(cls, seq, exact_drift=False):
-        line = madseq_to_line(seq)
-        return cls.fromline(line, exact_drift=exact_drift)
+        # temporary
+        for label, element_name, element in madseq_to_generator(seq):
+            if exact_drift and element_name == 'Drift':
+                element_name = 'DriftExact'
+            getattr(self, element_name)(**element._asdict())
+        return self
 
     # @classmethod
     # def from_mad2(cls, seq):
