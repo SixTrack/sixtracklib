@@ -97,17 +97,6 @@ for att in 'x px y py delta sigma'.split():
     print('Max C.O. discrepancy in %s %.2e' %
           (att, np.max(np.abs(att_CO_at_st_ele-getattr(sixdump_CO, att)))))
 
-prrrrrr
-# Check that the closed orbit is not kicked
-for bb, ibb in zip(listBB6D, ind_BB6D):
-
-    ptemp = closed_orbit[ibb].copy()
-    ptempin = ptemp.copy()
-
-    bb.track(ptemp)
-
-    print('Again kick', ptemp.x - ptempin.x)
-
 
 
 # Compare tracking results
@@ -120,8 +109,6 @@ p_out_st = pysixtrack.Particles(**sixdump[1].get_minimal_beam())
 p_in_pyst = p_in_st.copy()
 p_out_pyst = p_in_pyst.copy()
 
-if listBB6D:
-    listBB6D[0].track(p_out_pyst)
 
 
 for att in 'x px y py delta sigma'.split():
