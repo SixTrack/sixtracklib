@@ -66,9 +66,15 @@ line.beambeam_store_closed_orbit_and_dipolar_kicks(
 with open('line.pkl', 'wb') as fid:
     pickle.dump(line.to_pyblep_line(), fid)
 
+#########################################
+# Save particle on closed orbit as dict #
+#########################################
+
+with open('particle_on_CO.pkl', 'wb') as fid:
+    pickle.dump(part_on_CO.to_dict(), fid)
 
 
-prrrrr
+
 
 closed_orbit = line.track_elem_by_elem(part_on_CO)
 
@@ -77,9 +83,6 @@ closed_orbit = line.track_elem_by_elem(part_on_CO)
 pstart = closed_orbit[0].copy()
 pstart_st = pysixtrack.Particles(**sixdump_CO[0].get_minimal_beam())
 
-with open('particle_on_CO.pkl', 'wb') as fid:
-    pickle.dump(sixdump_CO[0].get_minimal_beam(), fid)
-
 print('STsigma, Sigma, Stdelta, delta, Stpx, px')
 for iturn in range(10):
     line.track(pstart)
@@ -87,7 +90,7 @@ for iturn in range(10):
     print('%e, %e, %e, %e, %e, %e' % (pstart_st.sigma, pstart.sigma,
                                       pstart_st.delta, pstart.delta, pstart_st.px, pstart.px))
 
-
+prrrrr
 # Compare closed orbit against sixtrack
 for att in 'x px y py delta sigma'.split():
     att_CO = np.array([getattr(pp, att) for pp in closed_orbit])
