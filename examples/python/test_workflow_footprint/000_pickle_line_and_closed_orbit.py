@@ -59,7 +59,16 @@ line.beambeam_store_closed_orbit_and_dipolar_kicks(
         separation_given_wrt_closed_orbit_6D = True)
 
 
-prrrrrr
+#################################
+# Save machine in pyblep format #
+#################################
+
+with open('line.pkl', 'wb') as fid:
+    pickle.dump(line.to_pyblep_line(), fid)
+
+
+
+prrrrr
 
 closed_orbit = line.track_elem_by_elem(part_on_CO)
 
@@ -97,9 +106,6 @@ for bb, ibb in zip(listBB6D, ind_BB6D):
 
     print('Again kick', ptemp.x - ptempin.x)
 
-
-with open('line.pkl', 'wb') as fid:
-    pickle.dump(line, fid)
 
 
 # Compare tracking results
