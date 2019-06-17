@@ -28,10 +28,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestSingleParticleSetPerBuffer )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
-    using particles_t        = ::NS(Particles);
-    using particles_addr_t   = ::NS(ParticlesAddr);
     using c_buffer_t         = ::NS(Buffer);
-
     using cuda_ctrl_t        = ::NS(CudaController);
     using cuda_arg_t         = ::NS(CudaArgument);
     using cuda_kernel_conf_t = ::NS(CudaKernelConfig);
@@ -193,10 +190,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestMultiParticleSetsPerBuffer )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
-    using particles_t        = ::NS(Particles);
-    using particles_addr_t   = ::NS(ParticlesAddr);
     using c_buffer_t         = ::NS(Buffer);
-
     using cuda_ctrl_t        = ::NS(CudaController);
     using cuda_arg_t         = ::NS(CudaArgument);
     using cuda_kernel_conf_t = ::NS(CudaKernelConfig);
@@ -359,10 +353,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests,
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
-    using particles_t        = ::NS(Particles);
-    using particles_addr_t   = ::NS(ParticlesAddr);
     using c_buffer_t         = ::NS(Buffer);
-
     using cuda_ctrl_t        = ::NS(CudaController);
     using cuda_arg_t         = ::NS(CudaArgument);
     using cuda_kernel_conf_t = ::NS(CudaKernelConfig);

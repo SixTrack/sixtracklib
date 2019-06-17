@@ -245,7 +245,6 @@ TEST( C99_CudaWrappersTrackParticlesLineTests,
     using cuda_kernel_conf_t = ::NS(CudaKernelConfig);
     using cuda_node_info_t   = ::NS(CudaNodeInfo);
 
-    using be_monitor_t       = ::NS(BeamMonitor);
     using node_index_t       = ::NS(node_index_t);
     using kernel_id_t        = ::NS(ctrl_kernel_id_t);
     using particles_t        = ::NS(Particles);

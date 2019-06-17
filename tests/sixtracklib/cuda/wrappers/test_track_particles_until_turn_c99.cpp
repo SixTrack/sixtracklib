@@ -93,7 +93,7 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
         for( node_index_t const ii : available_indices )
         {
             c_buffer_t* track_pb = ::NS(Buffer_new)( buf_size_t{ 0 } );
-            
+
             particles_t* particles = ::NS(Particles_add_copy)(
                 track_pb, ::NS(Particles_buffer_get_const_particles)(
                     in_particles_buffer, buf_size_t{ 0 } ) );
@@ -140,7 +140,7 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
 
             cuda_arg_t* particles_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( particles_arg != nullptr );
-            
+
             cuda_arg_t* beam_elements_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( beam_elements_arg != nullptr );
 
@@ -201,8 +201,7 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
     using cuda_arg_t         = ::NS(CudaArgument);
     using cuda_kernel_conf_t = ::NS(CudaKernelConfig);
     using cuda_node_info_t   = ::NS(CudaNodeInfo);
-    
-    using be_monitor_t       = ::NS(BeamMonitor);
+
     using node_index_t       = ::NS(node_index_t);
     using kernel_id_t        = ::NS(ctrl_kernel_id_t);
     using particles_t        = ::NS(Particles);
@@ -230,7 +229,7 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
 
     /* -------------------------------------------------------------------- */
     /* add end-of-turn beam-monitors */
-    
+
     pindex_t const MIN_TURN_ID = pindex_t{ 0 };
     pindex_t const TURN_BY_TURN_START = MIN_TURN_ID;
     pindex_t const UNTIL_TURN_TURN_BY_TURN = pindex_t{ 10 } + MIN_TURN_ID;
@@ -245,33 +244,33 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
 
     buf_size_t const num_beam_monitors = buf_size_t{ 2 };
 
-    SIXTRL_ASSERT( ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) == 
+    SIXTRL_ASSERT( ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) ==
                    num_beam_monitors );
-    
+
     /* -------------------------------------------------------------------- */
     /* assign cmp_output_buffer to beam_monitors */
-    
+
     buf_size_t const NUM_PSETS = buf_size_t{ 1 };
     buf_size_t track_pset_index = buf_size_t{ 0 };
-    
+
     buf_size_t const UNTIL_TURN_ELEM_BY_ELEM = buf_size_t{ 0 };
     buf_size_t elem_by_elem_output_offset_index = buf_size_t{ 0 };
     buf_size_t beam_monitor_output_offset_index = buf_size_t{ 0 };
     pindex_t cmp_min_turn_id = pindex_t{ -1 };
-    
-    status = NS(OutputBuffer_prepare_for_particle_sets)( 
+
+    status = NS(OutputBuffer_prepare_for_particle_sets)(
         eb, cmp_output_buffer, cmp_track_pb, NUM_PSETS, &track_pset_index,
             UNTIL_TURN_ELEM_BY_ELEM, &elem_by_elem_output_offset_index,
                 &beam_monitor_output_offset_index, &cmp_min_turn_id );
-    
+
     SIXTRL_ASSERT( status == NS(ARCH_STATUS_SUCCESS) );
     SIXTRL_ASSERT( cmp_min_turn_id == MIN_TURN_ID );
-    
+
     status = NS(BeamMonitor_assign_output_buffer_from_offset)(
         eb, cmp_output_buffer, MIN_TURN_ID, beam_monitor_output_offset_index );
-    
+
     SIXTRL_ASSERT( status == NS(ARCH_STATUS_SUCCESS) );
-                                       
+
     /* --------------------------------------------------------------------- */
     /* Perform comparison tracking over lattice: */
 
@@ -280,7 +279,7 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
         cmp_track_pb, NUM_PSETS, &track_pset_index, eb, UNTIL_TURN );
 
     SIXTRL_ASSERT( track_status == ::NS(TRACK_SUCCESS) );
-    
+
     /* -------------------------------------------------------------------- */
     /* Init the Cuda controller and arguments for the addresses
      * and the particles */
@@ -306,7 +305,7 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
         {
             c_buffer_t* track_pb = ::NS(Buffer_new)( buf_size_t{ 0 } );
             c_buffer_t* output_buffer = ::NS(Buffer_new)( buf_size_t{ 0 } );
-            
+
             particles_t* particles = ::NS(Particles_add_copy)(
                 track_pb, ::NS(Particles_buffer_get_const_particles)(
                     in_particles_buffer, buf_size_t{ 0 } ) );
@@ -332,14 +331,14 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
 
             std::string kernel_name = SIXTRL_C99_NAMESPACE_PREFIX_STR;
             kernel_name += "BeamMonitor_assign_out_buffer_from_offset_cuda_wrapper";
-            
+
             kernel_id_t const assign_kernel_id =
                 ::NS(CudaController_add_kernel_config_detailed)( ctrl,
-                    kernel_name.c_str(), buf_size_t{ 5 }, buf_size_t{ 1 }, 
+                    kernel_name.c_str(), buf_size_t{ 5 }, buf_size_t{ 1 },
                         buf_size_t{ 0 }, buf_size_t{ 0 }, nullptr );
 
             cuda_kernel_conf_t* ptr_assign_kernel_config =
-                ::NS(CudaController_get_ptr_kernel_config)( 
+                ::NS(CudaController_get_ptr_kernel_config)(
                     ctrl, assign_kernel_id );
 
             status =
@@ -347,7 +346,7 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
                 ptr_assign_kernel_config, ptr_node_info, num_beam_monitors );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
-            
+
             kernel_name.clear();
             kernel_name = SIXTRL_C99_NAMESPACE_PREFIX_STR;
             kernel_name += "Track_particles_until_turn_cuda_wrapper";
@@ -371,70 +370,70 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
 
             cuda_arg_t* particles_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( particles_arg != nullptr );
-            
+
             cuda_arg_t* beam_elements_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( beam_elements_arg != nullptr );
-            
+
             cuda_arg_t* output_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( output_arg != nullptr );
 
             cuda_arg_t* result_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( result_arg != nullptr );
 
-            buf_size_t output_buffer_index_offset = 
+            buf_size_t output_buffer_index_offset =
                 ::NS(Buffer_get_num_of_objects)( output_buffer ) + size_t{ 1 };
-                
-            /* reset the output addresses of the eb beam monitors to prepare a 
+
+            /* reset the output addresses of the eb beam monitors to prepare a
              * clean slate for the gpu tracking */
             NS(BeamMonitor_clear_all)( eb );
-            
+
             status = ::NS(TestTrackCtrlArg_prepare_tracking)(
                 particles_arg, track_pb, beam_elements_arg, eb, result_arg );
-            
+
             SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
-            
-            /* We accept some duplication of work between the preparation 
-             * for the tracking and the preparation for the beam monitor 
+
+            /* We accept some duplication of work between the preparation
+             * for the tracking and the preparation for the beam monitor
              * output assignment: */
-            
+
             status = ::NS(TestBeamMonitorCtrlArg_prepare_assign_output_buffer)(
-                track_pb, NUM_PSETS, &track_pset_index, beam_elements_arg, 
-                eb, output_arg, output_buffer, MIN_TURN_ID, 
+                track_pb, NUM_PSETS, &track_pset_index, beam_elements_arg,
+                eb, output_arg, output_buffer, MIN_TURN_ID,
                     &output_buffer_index_offset, result_arg );
-            
+
             SIXTRL_ASSERT( status == NS(ARCH_STATUS_SUCCESS) );
-            SIXTRL_ASSERT( output_buffer_index_offset == 
+            SIXTRL_ASSERT( output_buffer_index_offset ==
                            beam_monitor_output_offset_index );
-                            
-            
+
+
             SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
 
             /* ************************************************************* */
 
             ::NS(BeamMonitor_assign_out_buffer_from_offset_cuda_wrapper)(
-                ptr_assign_kernel_config, beam_elements_arg, output_arg, 
+                ptr_assign_kernel_config, beam_elements_arg, output_arg,
                     MIN_TURN_ID, output_buffer_index_offset, result_arg );
-            
+
             status = ::NS(TestBeamMonitorCtrlArg_evaluate_assign_output_buffer)(
-                beam_elements_arg, eb, output_arg, output_buffer, 
+                beam_elements_arg, eb, output_arg, output_buffer,
                 output_buffer_index_offset, num_beam_monitors, result_arg );
-            
+
             SIXTRL_ASSERT( status == NS(ARCH_STATUS_SUCCESS) );
-            
+
             ::NS(Track_particles_until_turn_cuda_wrapper)(
                 ptr_kernel_config, particles_arg, track_pset_index,
                     beam_elements_arg, UNTIL_TURN, result_arg );
-            
+
             status = ::NS(TestTrackCtrlArg_evaulate_tracking)(
                 particles_arg, track_pb, NUM_PSETS, &track_pset_index,
                     cmp_track_pb, ABS_TOLERANCE, result_arg );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
-            
+
             status = ::NS(TestTrackCtrlArg_evaluate_tracking_all)(
-                output_arg, output_buffer, cmp_output_buffer, ABS_TOLERANCE, 
+                output_arg, output_buffer, cmp_output_buffer, ABS_TOLERANCE,
                 result_arg );
-            
+
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
             /* ************************************************************* */
@@ -443,15 +442,15 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
             ::NS(Argument_delete)( output_arg );
             ::NS(Argument_delete)( beam_elements_arg );
             ::NS(Argument_delete)( particles_arg );
-            
+
             result_arg = nullptr;
             output_arg = nullptr;
             beam_elements_arg = nullptr;
             particles_arg = nullptr;
-            
+
             ::NS(Buffer_delete)( track_pb );
             ::NS(Buffer_delete)( output_buffer );
-            
+
             track_pb = nullptr;
             output_buffer = nullptr;
 
