@@ -196,16 +196,19 @@ class BeamBeam4D(CObject):
 
     def __init__(self, **kwargs):
         if 'x_bb' in kwargs:
-            import pysixtrack
-            slots = pysixtrack.BeamBeam4D.__slots__
-            defaults = pysixtrack.BeamBeam4D.__defaults__
-
-            params = dict(zip(slots, defaults))
-            for ss in slots:
-                if ss in kwargs:
-                    params[ss] = kwargs[ss]
-            
-            data = [qe] + [params[ss] for ss in slots]
+            slots = ( 
+                'charge',
+                'sigma_x',
+                'sigma_y',
+                'beta_r',
+                'min_sigma_diff',
+                'x_bb',
+                'y_bb',
+                'd_px',
+                'd_py',
+                'enabled')
+        
+            data = [qe] + [kwargs[ss] for ss in slots]
             CObject.__init__(self, size=len(data), data=data, **kwargs)
         else:
             CObject.__init__(self, **kwargs)
@@ -219,15 +222,9 @@ class BeamBeam6D(CObject):
 
     def __init__(self, **kwargs):
         if 'x_bb_co' in kwargs:
+
             import pysixtrack
-            slots = pysixtrack.BeamBeam6D.__slots__
-            defaults = pysixtrack.BeamBeam6D.__defaults__
-
-            params = dict(zip(slots, defaults))
-            for ss in slots:
-                if ss in kwargs:
-                    params[ss] = kwargs[ss]
-
+            params = kwargs
 
             data = pysixtrack.BB6Ddata.BB6D_init(
                 q_part=qe, 
@@ -358,7 +355,7 @@ class Elements(object):
     def append_line(self, line):
         for element in line.elements:
             element_name=element.__class__.__name__
-            getattr(self, element_name)(**element._asdict())
+            getattr(self, element_name)(**element.to_dict(keepextra=True))
 
     def to_file(self, filename):
         self.cbuffer.tofile(filename)
