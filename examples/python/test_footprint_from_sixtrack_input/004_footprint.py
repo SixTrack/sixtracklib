@@ -15,7 +15,7 @@ device = None
 n_turns = 100
 
 with open('line.pkl', 'rb') as fid:
-    line = pickle.load(fid)
+    line = pysixtrack.Line.from_dict(pickle.load(fid))
 
 with open('particle_on_CO.pkl', 'rb') as fid:
     partCO = pickle.load(fid)
