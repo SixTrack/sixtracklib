@@ -6,9 +6,7 @@ import sixtracktools
 
 # Load machine
 with open('line.pkl', 'rb') as fid:
-    pbline = pickle.load(fid)
-
-line = pysixtrack.Line.fromline(pbline)
+    line = pysixtrack.Line.from_dict(pickle.load(fid))
 
 # Load particle on CO
 with open('particle_on_CO.pkl', 'rb') as fid:

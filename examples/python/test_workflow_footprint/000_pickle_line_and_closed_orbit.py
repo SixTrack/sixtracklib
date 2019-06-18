@@ -1,5 +1,4 @@
 import sixtracktools
-import pyblep
 import pysixtrack
 import pickle
 import os
@@ -16,14 +15,12 @@ import numpy as np
 sixinput = sixtracktools.SixInput('.')
 p0c_eV = sixinput.initialconditions[-3]*1e6
 
-# Build pyblep line from sixtrack input
-pbline, other_data = pyblep.from_sixtrack_input(sixinput)
+# Build pysixtrack line from sixtrack input
+line, other_data = pysixtrack.Line.from_sixinput(sixinput)
 
 # Info on sixtrack->pyblep conversion 
 iconv = other_data['iconv']
 
-# Build pysixtrack line
-line = pysixtrack.Line.fromline(pbline)
 
 ########################################################
 #                  Search closed orbit                 #
@@ -64,7 +61,7 @@ line.beambeam_store_closed_orbit_and_dipolar_kicks(
 #################################
 
 with open('line.pkl', 'wb') as fid:
-    pickle.dump(line.to_pyblep_line(), fid)
+    pickle.dump(line.to_dict(keepextra=True), fid)
 
 #########################################
 # Save particle on closed orbit as dict #
