@@ -83,7 +83,7 @@ def compare(prun, pbench, pbench_prev):
         out_rel.append(diffrel)
         print(f"{att:<5} {vrun:22.13e} {vbench:22.13e} {diff:22.13g} {diffrel:22.13g}")
         if diffrel > 1e-8 or np.isnan(diffrel):
-            if diff > 1e-11:
+            if abs(diff) > 1e-11:
                 print('Too large discrepancy!')
                 error = True
     print(f"\nmax {max(out):21.12e} maxrel {max(out_rel):22.12e}")
