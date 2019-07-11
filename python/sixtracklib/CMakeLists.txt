@@ -1,4 +1,4 @@
-# python/pysixtracklib/CMakeLists.txt
+# python/sixtracklib/CMakeLists.txt
 
 # ------------------------------------------------------------------------------
 # Generate config.py
@@ -30,7 +30,7 @@ configure_file( ${SIXTRL_PY_IN_FILE} ${SIXTRL_PY_OUT_FILE} @ONLY )
 # Install
 
 set( SIXTRL_PY_INSTALL_PATH
-     "${CMAKE_INSTALL_PREFIX}/python/pysixtracklib/config.py" )
+     "${CMAKE_INSTALL_PREFIX}/python/sixtracklib/config.py" )
 
 install( CODE
     "set( PYTHON_SIXTRACKLIB_SHARED_LIB  ${PYTHON_SIXTRACKLIB_SHARED_LIB}  )
@@ -51,4 +51,4 @@ install( CODE
      @ONLY ) "
 )
 
-# end: python/pysixtracklib/CMakeLists.txt
+# end: python/sixtracklib/CMakeLists.txt

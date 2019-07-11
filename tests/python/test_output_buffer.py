@@ -3,9 +3,9 @@
 
 import sys
 import os
-import pysixtracklib as pyst
-import pysixtracklib_test as pysixtrl_testlib
-import pysixtracklib.stcommon as st
+import sixtracklib as pyst
+import sixtracklib_test as pysixtrl_testlib
+import sixtracklib.stcommon as st
 import ctypes as ct
 from cobjects import CBuffer
 

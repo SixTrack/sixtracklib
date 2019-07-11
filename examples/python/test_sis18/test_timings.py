@@ -1,5 +1,5 @@
 from cpymad.madx import Madx
-import pysixtracklib as pystlib
+import sixtracklib as pystlib
 import pysixtrack
 
 import time

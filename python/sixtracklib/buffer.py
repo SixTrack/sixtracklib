@@ -247,4 +247,4 @@ class Buffer(object):
         return self
 
 
-# end: python/pysixtracklib/buffer.py
+# end: python/sixtracklib/buffer.py
