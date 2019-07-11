@@ -9,7 +9,7 @@ from pysixtracklib.pysixtrack_helper import BeamElementConverter
 import pysixtrack as pysix
 from pysixtrack.particles import Particles as pysix_Particle
 
-from pysixtrack.track import Drift, DriftExact, Multipole, XYShift, \
+from pysixtrack.elements import Drift, DriftExact, Multipole, XYShift, \
     SRotation, Cavity, RFMultipole, BeamBeam4D, BeamBeam6D, BeamMonitor
 
 
