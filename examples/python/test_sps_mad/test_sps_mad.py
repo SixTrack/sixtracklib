@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as pl
 from cpymad.madx import Madx
-import pysixtracklib as pystlib
+import sixtracklib as pystlib
 import pysixtrack
 
 # prepare madx

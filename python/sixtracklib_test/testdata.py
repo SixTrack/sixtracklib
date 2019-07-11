@@ -3,9 +3,9 @@
 
 import sys
 from cobjects import CBuffer
-import pysixtracklib as st
-from pysixtracklib.particles import Particles as st_Particles
-from pysixtracklib.pysixtrack_helper import BeamElementConverter
+import sixtracklib as st
+from sixtracklib.particles import Particles as st_Particles
+from sixtracklib.pysixtrack_helper import BeamElementConverter
 import pysixtrack as pysix
 from pysixtrack.particles import Particles as pysix_Particle
 
@@ -214,4 +214,4 @@ def track_particles_pysixtrack(
 
     return output_buffer
 
-# end: sixtracklib/python/pysixtracklib_test
+# end: sixtracklib/python/sixtracklib_test

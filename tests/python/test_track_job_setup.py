@@ -1,7 +1,7 @@
 import sys
 import os
-import pysixtracklib as pyst
-import pysixtracklib_test as testlib
+import sixtracklib as pyst
+import sixtracklib_test as testlib
 
 from cobjects import CBuffer
 

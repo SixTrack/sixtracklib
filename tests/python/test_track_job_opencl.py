@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
-import pysixtracklib as pyst
-import pysixtracklib_test as testlib
+import sixtracklib as pyst
+import sixtracklib_test as testlib
 import pdb
 
-from pysixtracklib.stcommon import \
+from sixtracklib.stcommon import \
     st_Buffer_new_mapped_on_cbuffer, st_Buffer_delete, \
     st_OutputBuffer_calculate_output_buffer_params, \
     st_OutputBuffer_prepare, st_Track_all_particles_until_turn, \
@@ -17,7 +17,7 @@ from pysixtracklib.stcommon import \
     st_Particles_cbuffer_get_particles, \
     st_Particles_buffer_get_particles
 
-from pysixtracklib_test.stcommon import st_Particles_print_out, \
+from sixtracklib_test.stcommon import st_Particles_print_out, \
     st_Particles_compare_values_with_treshold,\
     st_Particles_buffers_compare_values_with_treshold
 
