@@ -2,7 +2,7 @@ import importlib
 from importlib import util
 
 if importlib.util.find_spec('pysixtrack') is not None:
-    from pysixtrack import track as pysixelem
+    from pysixtrack import elements as pysixelem
     import numpy as np
     from cobjects import CBuffer, CObject, CField
     from .beam_elements import \
