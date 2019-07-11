@@ -188,8 +188,7 @@ def track_particle_pysixtrack(line, part, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
         sigma_tbt.append(part.sigma.copy())
         delta_tbt.append(part.delta.copy())
 
-        for name, etype, ele in line:
-            ele.track(part)
+        line.track(part)
 
     x_tbt = np.array(x_tbt)
     px_tbt = np.array(px_tbt)

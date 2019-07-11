@@ -309,5 +309,5 @@ class ParticlesSet(object):
 
         return self
 
-    def tofile(self, filename):
+    def to_file(self, filename):
         self.cbuffer.tofile(filename)

@@ -36,7 +36,7 @@ def generate_testdata(pyst_example, pysixtrack_line_from_pickle=True):
     six = sixtracktools.SixInput(input_folder)
     st_line, rest, iconv = six.expand_struct(convert=pysixtrack.element_types)
     st_elements = pystlib.Elements.fromline(st_line)
-    st_elements.tofile(st_beam_elem_dump)
+    st_elements.to_file(st_beam_elem_dump)
 
     # Dump the pysixtrack machine description to CBuffer data file
     if pysixtrack_line_from_pickle:
@@ -47,7 +47,7 @@ def generate_testdata(pyst_example, pysixtrack_line_from_pickle=True):
 
 
     elements = pystlib.Elements.fromline(line)
-    elements.tofile(beam_elem_dump)
+    elements.to_file(beam_elem_dump)
 
     # -------------------------------------------------------------------------
     # Step 2: Dump particle state into an element by element I/O buffer
@@ -57,7 +57,7 @@ def generate_testdata(pyst_example, pysixtrack_line_from_pickle=True):
     st_particles_dump = os.path.join(output_folder, 'particles_dump_sixtrack.bin')
     st_particles = pystlib.ParticlesSet.fromSixDump101(input_folder,
         os.path.join(input_folder, 'dump3.dat'))
-    st_particles.tofile(st_particles_dump)
+    st_particles.to_file(st_particles_dump)
 
 
     # Reload from file
@@ -105,4 +105,4 @@ def generate_testdata(pyst_example, pysixtrack_line_from_pickle=True):
     assert( ( len( line ) + 1 ) == ebe_particles_buffer.n_objects )
     particles_dump = os.path.join( output_folder, 'particles_dump.bin' )
 
-    ebe_particles_buffer.tofile( particles_dump )
+    ebe_particles_buffer.to_file( particles_dump )
