@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import pysixtracklib as pyst
+import sixtracklib as pyst
 
 if __name__ == '__main__':
     elements = pyst.Elements()

@@ -159,7 +159,7 @@ if( SIXTRACKL_CXX_NAMESPACE )
 endif()
 
 # ==============================================================================
-# sixtracklib: C/C++ library ; pysixtracklib python bindings
+# sixtracklib: C/C++ library ; sixtracklib python bindings
 
 add_subdirectory( sixtracklib )
 
@@ -171,7 +171,7 @@ if( SIXTRACKL_BUILD_TOOLS )
 endif()
 
 # ------------------------------------------------------------------------------
-# Add pysixtracklib Python 3.x bindings
+# Add sixtracklib Python 3.x bindings
 
 if( SIXTRACKL_ENABLE_PYTHON )
     add_subdirectory( python )

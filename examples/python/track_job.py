@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import pysixtracklib as pyst
+import sixtracklib as pyst
 
 if __name__ == '__main__':
 

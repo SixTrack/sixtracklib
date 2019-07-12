@@ -1033,4 +1033,4 @@ class TrackJob(object):
 
         return self
 
-# end: python/pysixtracklib/trackjob.py
+# end: python/sixtracklib/trackjob.py

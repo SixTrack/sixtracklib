@@ -4,10 +4,10 @@
 import sys
 import os
 from cobjects import CBuffer
-import pysixtracklib as pyst
+import sixtracklib as pyst
 import ctypes as ct
 
-from pysixtracklib.stcommon import st_NODE_UNDEFINED_INDEX, \
+from sixtracklib.stcommon import st_NODE_UNDEFINED_INDEX, \
     st_ARCH_STATUS_SUCCESS, st_ARCH_STATUS_GENERAL_FAILURE, \
     st_NullCudaController, st_NullCudaArgument, st_NullBuffer, \
     st_CudaArgBuffer_p, st_NullCudaArgBuffer, st_Null, \
@@ -21,11 +21,11 @@ from pysixtracklib.stcommon import st_NODE_UNDEFINED_INDEX, \
     st_Argument_uses_cobjects_buffer, st_Argument_get_cobjects_buffer, \
     st_Argument_get_cobjects_buffer_slot_size
 
-from pysixtracklib.stcommon import st_ElemByElemConfig, st_ElemByElemConfig_p, \
+from sixtracklib.stcommon import st_ElemByElemConfig, st_ElemByElemConfig_p, \
     st_NullElemByElemConfig, st_ElemByElemConfig_preset
 
-import pysixtracklib_test as testlib
-from pysixtracklib_test.generic_obj import GenericObj
+import sixtracklib_test as testlib
+from sixtracklib_test.generic_obj import GenericObj
 
 if __name__ == '__main__':
     if not pyst.supports('cuda'):
