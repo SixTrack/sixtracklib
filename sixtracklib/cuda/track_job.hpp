@@ -560,16 +560,10 @@ namespace SIXTRL_CXX_NAMESPACE
                     beam_elements_buffer.getCApiPtr(), ptr_c_out_buffer,
                         until_turn_elem_by_elem );
 
-        if( status == ::NS(ARCH_STATUS_SUCCESS ) )
+        if( status == SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS )
         {
-            this->doSetPtrParticlesBuffer( &particles_buffer );
-            this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
-
-            if( ( ptr_output_buffer != nullptr ) &&
-                ( this->hasOutputBuffer() ) && ( !this->ownsOutputBuffer() ) )
-            {
-                this->doSetPtrOutputBuffer( ptr_output_buffer );
-            }
+            this->doSetCxxBufferPointers(
+                particles_buffer, beam_elements_buffer, ptr_output_buffer );
         }
 
         return status;

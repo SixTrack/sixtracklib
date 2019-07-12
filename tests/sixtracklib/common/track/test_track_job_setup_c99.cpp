@@ -1,4 +1,4 @@
-#include "sixtracklib/cuda/track_job.h"
+#include "sixtracklib/common/track/track_job_cpu.h"
 
 #include <iomanip>
 #include <cstddef>
@@ -20,11 +20,11 @@
 #include "sixtracklib/common/output/elem_by_elem_config.h"
 #include "sixtracklib/common/output/output_buffer.h"
 
-TEST( C99_CudaTrackJobSetupTests, CreateTrackJobNoOutput )
+TEST( C99_Cpu_CpuTrackJobSetupTests, CreateTrackJobNoOutput )
 {
     namespace st        = SIXTRL_CXX_NAMESPACE;
 
-    using track_job_t   = ::NS(CudaTrackJob);
+    using track_job_t   = ::NS(CpuTrackJob);
     using size_t        = ::NS(ctrl_size_t);
     using c_buffer_t    = ::NS(Buffer);
     using status_t      = ::NS(ctrl_status_t);
@@ -53,42 +53,42 @@ TEST( C99_CudaTrackJobSetupTests, CreateTrackJobNoOutput )
 
     /* ===================================================================== */
 
-    track_job_t* job0 = ::NS(CudaTrackJob_create)();
+    track_job_t* job0 = ::NS(CpuTrackJob_create)();
 
     ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job0 ) ==
-                 st::ARCHITECTURE_CUDA );
+                 st::ARCHITECTURE_CPU );
 
     ASSERT_TRUE( 0 == std::strcmp( ::NS(TrackJobNew_get_arch_string)( job0 ),
-                                   SIXTRL_ARCHITECTURE_CUDA_STR ) );
+                                   SIXTRL_ARCHITECTURE_CPU_STR ) );
 
     status_t status = ::NS(TrackJobNew_reset)( job0, pb, eb, nullptr );
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
     ASSERT_TRUE( ::NS(TestTrackJob_setup_no_required_output)(
-        job0, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr ) );
+        job0, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr ) );
 
     /* --------------------------------------------------------------------- */
 
-    track_job_t* job1 = ::NS(CudaTrackJob_new_with_output)(
-        "0.0", pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
+    track_job_t* job1 = ::NS(CpuTrackJob_new_with_output)(
+        pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job1 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job1 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job1 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     ASSERT_TRUE( ::NS(TestTrackJob_setup_no_required_output)(
-        job1, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr ) );
+        job1, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr ) );
 
     /* --------------------------------------------------------------------- */
 
     size_t const good_particle_sets[] = { size_t{ 0 } };
 
-    track_job_t* job2 = ::NS(CudaTrackJob_create)();
+    track_job_t* job2 = ::NS(CpuTrackJob_create)();
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job2 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job2 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job2 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     status = ::NS(TrackJobNew_reset_particle_set)(
         job2, pb, good_particle_sets[ 0 ], eb, nullptr );
@@ -99,33 +99,33 @@ TEST( C99_CudaTrackJobSetupTests, CreateTrackJobNoOutput )
 
     /* --------------------------------------------------------------------- */
 
-    track_job_t* job3 = ::NS(CudaTrackJob_create)();
+    track_job_t* job3 = ::NS(CpuTrackJob_create)();
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job3 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job3 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job3 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     status = ::NS(TrackJobNew_reset_detailed)( job3, pb,
-        st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(),
+        st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(),
         eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
 
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
     ASSERT_TRUE( ::NS(TestTrackJob_setup_no_required_output)(
-        job3, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-            st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr ) );
+        job3, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+            st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr ) );
 
     /* --------------------------------------------------------------------- */
 
-    track_job_t* job4 = ::NS(CudaTrackJob_new_with_output)( "0.0", pb, eb, my_output_buffer, NUM_ELEM_BY_ELEM_TURNS );
+    track_job_t* job4 = ::NS(CpuTrackJob_new_with_output)( pb, eb, my_output_buffer, NUM_ELEM_BY_ELEM_TURNS );
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job4 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job4 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job4 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     ASSERT_TRUE( ::NS(TestTrackJob_setup_no_required_output)(
-        job4, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-            st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb,
+        job4, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+            st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb,
                 my_output_buffer ) );
 
     /* --------------------------------------------------------------------- */
@@ -143,11 +143,11 @@ TEST( C99_CudaTrackJobSetupTests, CreateTrackJobNoOutput )
     ::NS(Buffer_delete)( in_particle_buffer );
 }
 
-TEST( C99_CudaTrackJobSetupTests, CreateTrackJobElemByElemOutput )
+TEST( C99_Cpu_CpuTrackJobSetupTests, CreateTrackJobElemByElemOutput )
 {
     namespace st        = SIXTRL_CXX_NAMESPACE;
 
-    using track_job_t   = ::NS(CudaTrackJob);
+    using track_job_t   = ::NS(CpuTrackJob);
     using size_t        = ::NS(ctrl_size_t);
     using c_buffer_t      = ::NS(Buffer);
     using status_t      = ::NS(ctrl_status_t);
@@ -180,44 +180,44 @@ TEST( C99_CudaTrackJobSetupTests, CreateTrackJobElemByElemOutput )
 
     /* ===================================================================== */
 
-    track_job_t* job0 = ::NS(CudaTrackJob_create)();
+    track_job_t* job0 = ::NS(CpuTrackJob_create)();
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job0 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job0 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( 0 == std::strcmp( ::NS(TrackJobNew_get_arch_string)( job0 ),
-                                   SIXTRL_ARCHITECTURE_CUDA_STR ) );
+                                   SIXTRL_ARCHITECTURE_CPU_STR ) );
 
     status_t status = ::NS(TrackJobNew_reset_with_output)(
         job0, pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
 
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
     ASSERT_TRUE( ::NS(TestTrackJob_setup_no_beam_monitors_elem_by_elem)(
-        job0, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
+        job0, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
             NUM_ELEM_BY_ELEM_TURNS ) );
 
     /* --------------------------------------------------------------------- */
 
-    track_job_t* job1 = ::NS(CudaTrackJob_new_with_output)(
-        "0.0", pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
+    track_job_t* job1 = ::NS(CpuTrackJob_new_with_output)(
+        pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job1 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job1 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job1 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     ASSERT_TRUE( ::NS(TestTrackJob_setup_no_beam_monitors_elem_by_elem)(
-        job1, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
+        job1, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
             NUM_ELEM_BY_ELEM_TURNS ) );
 
     /* --------------------------------------------------------------------- */
 
     size_t const good_particle_sets[] = { size_t{ 0 } };
 
-    track_job_t* job2 = ::NS(CudaTrackJob_create)();
+    track_job_t* job2 = ::NS(CpuTrackJob_create)();
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job2 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job2 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job2 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     status = ::NS(TrackJobNew_reset_detailed)( job2, pb, size_t{ 1 },
         &good_particle_sets[ 0 ], eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
@@ -229,34 +229,34 @@ TEST( C99_CudaTrackJobSetupTests, CreateTrackJobElemByElemOutput )
 
     /* --------------------------------------------------------------------- */
 
-    track_job_t* job3 = ::NS(CudaTrackJob_create)();
+    track_job_t* job3 = ::NS(CpuTrackJob_create)();
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job3 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job3 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job3 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     status = ::NS(TrackJobNew_reset_detailed)( job3, pb,
-        st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(),
+        st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(),
         eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
 
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
     ASSERT_TRUE( ::NS(TestTrackJob_setup_no_beam_monitors_elem_by_elem)(
-        job3, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-            st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
+        job3, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+            st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
                 NUM_ELEM_BY_ELEM_TURNS ) );
 
     /* --------------------------------------------------------------------- */
 
-    track_job_t* job4 = ::NS(CudaTrackJob_new_with_output)( "0.0", pb, eb, my_output_buffer, NUM_ELEM_BY_ELEM_TURNS );
+    track_job_t* job4 = ::NS(CpuTrackJob_new_with_output)( pb, eb, my_output_buffer, NUM_ELEM_BY_ELEM_TURNS );
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job4 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job4 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job4 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     ASSERT_TRUE( ::NS(TestTrackJob_setup_no_beam_monitors_elem_by_elem)(
-        job4, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-            st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb,
+        job4, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+            st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb,
                 my_output_buffer, NUM_ELEM_BY_ELEM_TURNS ) );
 
     /* --------------------------------------------------------------------- */
@@ -274,11 +274,11 @@ TEST( C99_CudaTrackJobSetupTests, CreateTrackJobElemByElemOutput )
     ::NS(Buffer_delete)( in_particle_buffer );
 }
 
-TEST( C99_CudaTrackJobSetupTests, CreateTrackJobBeamMonitor )
+TEST( C99_Cpu_CpuTrackJobSetupTests, CreateTrackJobBeamMonitor )
 {
     namespace st        = SIXTRL_CXX_NAMESPACE;
 
-    using track_job_t   = ::NS(CudaTrackJob);
+    using track_job_t   = ::NS(CpuTrackJob);
     using size_t        = ::NS(ctrl_size_t);
     using c_buffer_t      = ::NS(Buffer);
     using status_t      = ::NS(ctrl_status_t);
@@ -337,44 +337,44 @@ TEST( C99_CudaTrackJobSetupTests, CreateTrackJobBeamMonitor )
 
     /* ===================================================================== */
 
-    track_job_t* job0 = ::NS(CudaTrackJob_create)();
+    track_job_t* job0 = ::NS(CpuTrackJob_create)();
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job0 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job0 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( 0 == std::strcmp( ::NS(TrackJobNew_get_arch_string)( job0 ),
-                                   SIXTRL_ARCHITECTURE_CUDA_STR ) );
+                                   SIXTRL_ARCHITECTURE_CPU_STR ) );
 
     status_t status = ::NS(TrackJobNew_reset_with_output)(
         job0, pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
 
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
     ASSERT_TRUE( ::NS(TestTrackJob_setup_beam_monitors_and_elem_by_elem)(
-        job0, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
+        job0, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
             NUM_BEAM_MONITORS, NUM_TURNS,  NUM_ELEM_BY_ELEM_TURNS ) );
 
     /* --------------------------------------------------------------------- */
 
-    track_job_t* job1 = ::NS(CudaTrackJob_new_with_output)(
-        "0.0", pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
+    track_job_t* job1 = ::NS(CpuTrackJob_new_with_output)(
+        pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job1 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job1 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job1 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     ASSERT_TRUE( ::NS(TestTrackJob_setup_beam_monitors_and_elem_by_elem)(
-        job1, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
+        job1, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
             NUM_BEAM_MONITORS, NUM_TURNS,  NUM_ELEM_BY_ELEM_TURNS ) );
 
     /* --------------------------------------------------------------------- */
 
     size_t const good_particle_sets[] = { size_t{ 0 } };
 
-    track_job_t* job2 = ::NS(CudaTrackJob_create)();
+    track_job_t* job2 = ::NS(CpuTrackJob_create)();
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job2 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job2 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job2 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     status = ::NS(TrackJobNew_reset_detailed)( job2, pb, size_t{ 1 },
         &good_particle_sets[ 0 ], eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
@@ -386,35 +386,35 @@ TEST( C99_CudaTrackJobSetupTests, CreateTrackJobBeamMonitor )
 
     /* --------------------------------------------------------------------- */
 
-    track_job_t* job3 = ::NS(CudaTrackJob_create)();
+    track_job_t* job3 = ::NS(CpuTrackJob_create)();
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job3 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job3 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job3 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     status = ::NS(TrackJobNew_reset_detailed)( job3, pb,
-        st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(),
+        st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(),
         eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
 
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
     ASSERT_TRUE( ::NS(TestTrackJob_setup_beam_monitors_and_elem_by_elem)(
-        job3, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
+        job3, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
             NUM_BEAM_MONITORS, NUM_TURNS,  NUM_ELEM_BY_ELEM_TURNS ) );
 
     /* --------------------------------------------------------------------- */
 
-    track_job_t* job4 = ::NS(CudaTrackJob_new_with_output)(
-        "0.0", pb, eb, my_output_buffer, NUM_ELEM_BY_ELEM_TURNS );
+    track_job_t* job4 = ::NS(CpuTrackJob_new_with_output)(
+        pb, eb, my_output_buffer, NUM_ELEM_BY_ELEM_TURNS );
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job4 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job4 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job4 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     ASSERT_TRUE( ::NS(TestTrackJob_setup_beam_monitors_and_elem_by_elem)(
-        job4, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, my_output_buffer,
+        job4, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, my_output_buffer,
             NUM_BEAM_MONITORS, NUM_TURNS,  NUM_ELEM_BY_ELEM_TURNS ) );
 
     /* --------------------------------------------------------------------- */
@@ -432,11 +432,11 @@ TEST( C99_CudaTrackJobSetupTests, CreateTrackJobBeamMonitor )
     ::NS(Buffer_delete)( in_particle_buffer );
 }
 
-TEST( C99_CudaTrackJobSetupTests, CreateTrackJobBeamMonitorAndElemByElem )
+TEST( C99_Cpu_CpuTrackJobSetupTests, CreateTrackJobBeamMonitorAndElemByElem )
 {
     namespace st        = SIXTRL_CXX_NAMESPACE;
 
-    using track_job_t   = ::NS(CudaTrackJob);
+    using track_job_t   = ::NS(CpuTrackJob);
     using size_t        = ::NS(ctrl_size_t);
     using c_buffer_t    = ::NS(Buffer);
     using status_t      = ::NS(ctrl_status_t);
@@ -494,44 +494,44 @@ TEST( C99_CudaTrackJobSetupTests, CreateTrackJobBeamMonitorAndElemByElem )
 
     /* ===================================================================== */
 
-    track_job_t* job0 = ::NS(CudaTrackJob_create)();
+    track_job_t* job0 = ::NS(CpuTrackJob_create)();
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job0 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job0 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( 0 == std::strcmp( ::NS(TrackJobNew_get_arch_string)( job0 ),
-                                   SIXTRL_ARCHITECTURE_CUDA_STR ) );
+                                   SIXTRL_ARCHITECTURE_CPU_STR ) );
 
     status_t status = ::NS(TrackJobNew_reset_with_output)(
         job0, pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
 
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
     ASSERT_TRUE( ::NS(TestTrackJob_setup_beam_monitors_and_elem_by_elem)(
-        job0, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
+        job0, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
             NUM_BEAM_MONITORS, NUM_TURNS,  NUM_ELEM_BY_ELEM_TURNS ) );
 
     /* --------------------------------------------------------------------- */
 
-    track_job_t* job1 = ::NS(CudaTrackJob_new_with_output)(
-        "0.0", pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
+    track_job_t* job1 = ::NS(CpuTrackJob_new_with_output)(
+        pb, eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job1 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job1 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job1 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     ASSERT_TRUE( ::NS(TestTrackJob_setup_beam_monitors_and_elem_by_elem)(
-        job1, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
+        job1, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
             NUM_BEAM_MONITORS, NUM_TURNS,  NUM_ELEM_BY_ELEM_TURNS ) );
 
     /* --------------------------------------------------------------------- */
 
     size_t const good_particle_sets[] = { size_t{ 0 } };
 
-    track_job_t* job2 = ::NS(CudaTrackJob_create)();
+    track_job_t* job2 = ::NS(CpuTrackJob_create)();
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job2 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job2 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job2 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     status = ::NS(TrackJobNew_reset_detailed)( job2, pb, size_t{ 1 },
         &good_particle_sets[ 0 ], eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
@@ -543,35 +543,34 @@ TEST( C99_CudaTrackJobSetupTests, CreateTrackJobBeamMonitorAndElemByElem )
 
     /* --------------------------------------------------------------------- */
 
-    track_job_t* job3 = ::NS(CudaTrackJob_create)();
-
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job3 ) == st::ARCHITECTURE_CUDA );
+    track_job_t* job3 = ::NS(CpuTrackJob_create)();
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job3 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job3 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     status = ::NS(TrackJobNew_reset_detailed)( job3, pb,
-        st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(),
+        st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(),
         eb, nullptr, NUM_ELEM_BY_ELEM_TURNS );
 
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
     ASSERT_TRUE( ::NS(TestTrackJob_setup_beam_monitors_and_elem_by_elem)(
-        job3, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
+        job3, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, nullptr,
             NUM_BEAM_MONITORS, NUM_TURNS,  NUM_ELEM_BY_ELEM_TURNS ) );
 
     /* --------------------------------------------------------------------- */
 
-    track_job_t* job4 = ::NS(CudaTrackJob_new_with_output)(
-        "0.0", pb, eb, my_output_buffer, NUM_ELEM_BY_ELEM_TURNS );
+    track_job_t* job4 = ::NS(CpuTrackJob_new_with_output)(
+        pb, eb, my_output_buffer, NUM_ELEM_BY_ELEM_TURNS );
 
-    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job4 ) == st::ARCHITECTURE_CUDA );
+    ASSERT_TRUE( ::NS(TrackJobNew_get_arch_id)( job4 ) == st::ARCHITECTURE_CPU );
     ASSERT_TRUE( std::strcmp( ::NS(TrackJobNew_get_arch_string)( job4 ),
-                              SIXTRL_ARCHITECTURE_CUDA_STR ) == 0 );
+                              SIXTRL_ARCHITECTURE_CPU_STR ) == 0 );
 
     ASSERT_TRUE( ::NS(TestTrackJob_setup_beam_monitors_and_elem_by_elem)(
-        job4, pb, st::CudaTrackJob::DefaultNumParticleSetIndices(),
-        st::CudaTrackJob::DefaultParticleSetIndicesBegin(), eb, my_output_buffer,
+        job4, pb, st::CpuTrackJob::DefaultNumParticleSetIndices(),
+        st::CpuTrackJob::DefaultParticleSetIndicesBegin(), eb, my_output_buffer,
             NUM_BEAM_MONITORS, NUM_TURNS,  NUM_ELEM_BY_ELEM_TURNS ) );
 
     /* --------------------------------------------------------------------- */
@@ -589,4 +588,4 @@ TEST( C99_CudaTrackJobSetupTests, CreateTrackJobBeamMonitorAndElemByElem )
     ::NS(Buffer_delete)( in_particle_buffer );
 }
 
-/* end: tests/sixtracklib/cuda/track/test_track_job_setup_c99.cpp */
+/* end: tests/sixtracklib/common/track/test_track_job_setup_c99.cpp */

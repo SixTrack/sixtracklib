@@ -28,10 +28,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestSingleParticleSetPerBuffer )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
-    using particles_t        = ::NS(Particles);
-    using particles_addr_t   = ::NS(ParticlesAddr);
     using c_buffer_t         = ::NS(Buffer);
-
     using cuda_ctrl_t        = ::NS(CudaController);
     using cuda_arg_t         = ::NS(CudaArgument);
     using cuda_kernel_conf_t = ::NS(CudaKernelConfig);
@@ -49,6 +46,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestSingleParticleSetPerBuffer )
 
     size_t const slot_size = ::NS(Buffer_get_slot_size)( particles_buffer );
     SIXTRL_ASSERT( slot_size > size_t{ 0 } );
+    ( void )slot_size;
 
     size_t constexpr prng_seed = size_t{ 20190517 };
 
@@ -193,10 +191,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestMultiParticleSetsPerBuffer )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
-    using particles_t        = ::NS(Particles);
-    using particles_addr_t   = ::NS(ParticlesAddr);
     using c_buffer_t         = ::NS(Buffer);
-
     using cuda_ctrl_t        = ::NS(CudaController);
     using cuda_arg_t         = ::NS(CudaArgument);
     using cuda_kernel_conf_t = ::NS(CudaKernelConfig);
@@ -214,6 +209,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestMultiParticleSetsPerBuffer )
 
     size_t const slot_size = ::NS(Buffer_get_slot_size)( particles_buffer );
     SIXTRL_ASSERT( slot_size > size_t{ 0 } );
+    ( void )slot_size;
 
     size_t constexpr prng_seed = size_t{ 20190517 };
 
@@ -359,10 +355,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests,
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
-    using particles_t        = ::NS(Particles);
-    using particles_addr_t   = ::NS(ParticlesAddr);
     using c_buffer_t         = ::NS(Buffer);
-
     using cuda_ctrl_t        = ::NS(CudaController);
     using cuda_arg_t         = ::NS(CudaArgument);
     using cuda_kernel_conf_t = ::NS(CudaKernelConfig);
@@ -380,6 +373,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests,
 
     size_t const slot_size = ::NS(Buffer_get_slot_size)( particles_buffer );
     SIXTRL_ASSERT( slot_size > size_t{ 0 } );
+    ( void )slot_size;
 
     size_t constexpr prng_seed = size_t{ 20190517 };
 

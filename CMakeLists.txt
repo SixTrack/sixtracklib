@@ -104,6 +104,8 @@ message( STATUS "---- cmake_module_path: ${CMAKE_MODULE_PATH}" )
 # Setup language bindings - we have to be first to pull in python (if needed)
 # to prevent any module picking a python version we do not wish to support:
 
+include(CheckLanguage)
+
 include( SetupC99 )
 include( SetupCxx )
 include( SetupPython )
@@ -137,8 +139,11 @@ include( SetupOpenCL )
 # Cuda:
 
 if( SIXTRACKL_ENABLE_CUDA )
-    message( STATUS "---- Enabling CUDA languagecmake/SetupCuda.cmake" )
-    enable_language( CUDA )
+    check_language( CUDA )
+    if( CMAKE_CUDA_COMPILER )
+        message( STATUS "---- enabling CUDA language" )
+        enable_language( CUDA )
+    endif()
 endif()
 
 include( SetupCuda )

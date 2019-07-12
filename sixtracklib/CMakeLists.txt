@@ -19,7 +19,7 @@ set( SIXTRACKL_LIBRARY_MODULES "" CACHE INTERNAL "" FORCE )
 
 # ------------------------------------------------------------------------------
 
-set( SIXTRACKLIB_C99_INSTALL_PREFIX 
+set( SIXTRACKLIB_C99_INSTALL_PREFIX
      "${CMAKE_INSTALL_PREFIX}/include/sixtracklib" )
 
 set( SIXTRACKLIB_CXX_INSTALL_PREFIX ${SIXTRACKLIB_C99_INSTALL_PREFIX} )
@@ -80,13 +80,16 @@ target_include_directories(
     sixtrack PUBLIC $<INSTALL_INTERFACE:include>
                     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
 
-set_target_properties( sixtrack PROPERTIES LINKER_LANGUAGE C )
-set_target_properties( sixtrack PROPERTIES POSITION_INDEPENDENT_CODE ON )
-set_target_properties( sixtrack PROPERTIES C_STANDARD 99 )
-set_target_properties( sixtrack PROPERTIES DEBUG_POSTFIX d )
-set_target_properties( sixtrack PROPERTIES C_STANDARD_REQUIRED ON )
+if( SIXTRACKL_ENABLE_CUDA )
+    target_include_directories( sixtrack
+        PUBLIC $<BUILD_INTERFACE:${SIXTRACKL_CUDA_INCLUDE_DIRS}> )
+endif()
 
-target_compile_options( sixtrack PRIVATE 
+set_target_properties( sixtrack PROPERTIES
+    LINKER_LANGUAGE C POSITION_INDEPENDENT_CODE ON C_STANDARD 99
+    DEBUG_POSTFIX d C_STANDARD_REQUIRED ON )
+
+target_compile_options( sixtrack PRIVATE
     ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------

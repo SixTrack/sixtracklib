@@ -31,7 +31,6 @@ TEST( C99_CudaTrackJobTrackElemByElemTests,
     using track_job_t           = ::NS(CudaTrackJob);
     using controller_t          = ::NS(CudaController);
     using node_info_t           = ::NS(CudaNodeInfo);
-    using node_index_t          = ::NS(node_index_t);
     using buffer_t              = ::NS(Buffer);
     using buf_size_t            = ::NS(buffer_size_t);
     using track_status_t        = ::NS(track_status_t);

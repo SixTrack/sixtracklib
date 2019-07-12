@@ -33,7 +33,8 @@ target_compile_definitions( sixtrack_cuda_cxx_control
     PUBLIC ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
 target_include_directories( sixtrack_cuda_cxx_control
-    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+    PUBLIC  $<BUILD_INTERFACE:${SIXTRACKL_CUDA_INCLUDE_DIRS}> )
 
 set_target_properties( sixtrack_cuda_cxx_control PROPERTIES
     POSITION_INDEPENDENT_CODE ON
@@ -55,7 +56,8 @@ target_compile_definitions( sixtrack_cuda_c99_control
     PUBLIC ${SIXTRACKLIB_NAMESPACE_FLAGS} )
 
 target_include_directories( sixtrack_cuda_c99_control
-    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+    PUBLIC  $<BUILD_INTERFACE:${SIXTRACKL_CUDA_INCLUDE_DIRS}> )
 
 set_target_properties( sixtrack_cuda_c99_control PROPERTIES
     POSITION_INDEPENDENT_CODE ON
