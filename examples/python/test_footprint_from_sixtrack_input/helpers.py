@@ -84,16 +84,16 @@ def track_particle_sixtrack(
         if Ddelta_wrt_CO[i_part] != 0.:
             raise ValueError('Not implemented!')
 
-        lines_f13.append('%e\n' % ((Dx_wrt_CO_m[i_part] + temp_part.x) * 1e3))
-        lines_f13.append('%e\n' % ((Dpx_wrt_CO_rad[i_part] + temp_part.px) * temp_part.rpp * 1e3))
-        lines_f13.append('%e\n' % ((Dy_wrt_CO_m[i_part] + temp_part.y) * 1e3))
-        lines_f13.append('%e\n' % ((Dpy_wrt_CO_rad[i_part] + temp_part.py) * temp_part.rpp * 1e3))
-        lines_f13.append('%e\n' % ((Dsigma_wrt_CO_m[i_part] + temp_part.sigma) * 1e3))
-        lines_f13.append('%e\n' % ((Ddelta_wrt_CO[i_part] + temp_part.delta)))
+        lines_f13.append('%.10e\n' % ((Dx_wrt_CO_m[i_part] + temp_part.x) * 1e3))
+        lines_f13.append('%.10e\n' % ((Dpx_wrt_CO_rad[i_part] + temp_part.px) * temp_part.rpp * 1e3))
+        lines_f13.append('%.10e\n' % ((Dy_wrt_CO_m[i_part] + temp_part.y) * 1e3))
+        lines_f13.append('%.10e\n' % ((Dpy_wrt_CO_rad[i_part] + temp_part.py) * temp_part.rpp * 1e3))
+        lines_f13.append('%.10e\n' % ((Dsigma_wrt_CO_m[i_part] + temp_part.sigma) * 1e3))
+        lines_f13.append('%.10e\n' % ((Ddelta_wrt_CO[i_part] + temp_part.delta)))
         if i_part % 2 == 1:
-            lines_f13.append(lines_f3[i_start_ini + 7 + 6 + 1].replace(' ', ''))
-            lines_f13.append('%e\n' % (temp_part.Energy * 1e-6))
-            lines_f13.append('%e\n' % (temp_part.Energy * 1e-6))
+            lines_f13.append('%.10e\n' % (temp_part.energy0 * 1e-6))
+            lines_f13.append('%.10e\n' % (temp_part.Energy * 1e-6))
+            lines_f13.append('%.10e\n' % (temp_part.Energy * 1e-6))
 
     with open(wfold + '/fort.13', 'w') as fid:
         fid.writelines(lines_f13)
@@ -188,8 +188,7 @@ def track_particle_pysixtrack(line, part, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
         sigma_tbt.append(part.sigma.copy())
         delta_tbt.append(part.delta.copy())
 
-        for name, etype, ele in line:
-            ele.track(part)
+        line.track(part)
 
     x_tbt = np.array(x_tbt)
     px_tbt = np.array(px_tbt)

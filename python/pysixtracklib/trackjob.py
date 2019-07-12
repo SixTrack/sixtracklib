@@ -169,7 +169,8 @@ class TrackJobBaseNew(object):
             raise ValueError(
                 "Input particle buffer has {0} blocks, " +
                 "inconsistent with particle set index {1}".format(
-                    st_Particles_buffer_get_num_of_particle_blocks(_ptr_c_particles_buffer),
+                    st_Particles_buffer_get_num_of_particle_blocks(
+                        _ptr_c_particles_buffer),
                     particle_set_index))
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         _beam_elem_buffer = None
@@ -189,10 +190,10 @@ class TrackJobBaseNew(object):
                     cbuffer=_beam_elements_buffer)
                 _ptr_c_beam_elements_buffer = \
                     _internal_beam_elements_buffer.pointer
-            elif isinstance(beam_elements_buffer,Elements):
+            elif isinstance(beam_elements_buffer, Elements):
                 _beam_elements_buffer = beam_elements_buffer.cbuffer
                 _internal_beam_elements_buffer = Buffer(
-                    cbuffer=_beam_elements_buffer )
+                    cbuffer=_beam_elements_buffer)
                 _ptr_c_beam_elements_buffer = \
                     _internal_beam_elements_buffer.pointer
             elif isinstance(beam_elements_buffer, Buffer):
