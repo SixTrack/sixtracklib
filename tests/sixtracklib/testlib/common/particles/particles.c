@@ -13,28 +13,16 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/testlib/common/random.h"
 
-static int NS(compare_sequences_exact)(
-    SIXTRL_PARTICLE_DATAPTR_DEC void const* SIXTRL_RESTRICT lhs_values,
-    SIXTRL_PARTICLE_DATAPTR_DEC void const* SIXTRL_RESTRICT rhs_values,
-    NS(buffer_size_t) const num_values,
-    NS(buffer_size_t) const element_size );
-
-static int NS(compare_real_sequences_with_treshold)(
-    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT lhs_values,
-    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT rhs_values,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)*
-        SIXTRL_RESTRICT ptr_first_out_of_bounds_index,
-    NS(buffer_size_t) const num_values,
-    NS(particle_real_t) const treshold );
-
-static void NS(compare_real_sequences_and_get_max_difference)(
+SIXTRL_STATIC SIXTRL_HOST_FN void
+NS(compare_real_sequences_and_get_max_difference)(
     NS(particle_real_ptr_t)    SIXTRL_RESTRICT ptr_max_diff,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_max_diff_index,
     NS(particle_real_t) const* SIXTRL_RESTRICT lhs_values,
     NS(particle_real_t) const* SIXTRL_RESTRICT rhs_values,
     NS(buffer_size_t)   const  num_values );
 
-static void NS(compare_int64_sequences_and_get_max_difference)(
+SIXTRL_STATIC SIXTRL_HOST_FN void
+NS(compare_int64_sequences_and_get_max_difference)(
     NS(particle_index_ptr_t) SIXTRL_RESTRICT ptr_max_diff,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_max_diff_index,
     NS(particle_index_const_ptr_t) SIXTRL_RESTRICT lhs_values,
@@ -43,80 +31,76 @@ static void NS(compare_int64_sequences_and_get_max_difference)(
 
 /* ------------------------------------------------------------------------- */
 
-int NS(compare_sequences_exact)(
-    SIXTRL_PARTICLE_DATAPTR_DEC void const* SIXTRL_RESTRICT lhs_values,
-    SIXTRL_PARTICLE_DATAPTR_DEC void const* SIXTRL_RESTRICT rhs_values,
-    NS(buffer_size_t) const num_values,
-    NS(buffer_size_t) const element_size )
+void NS(Particles_print_out_single_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(buffer_size_t) const index )
 {
-    int cmp_result = -1;
-
-    NS(buffer_size_t) const ATTR_LENGTH = num_values * element_size;
-
-    if( ATTR_LENGTH > ( NS(buffer_size_t) )0u )
-    {
-        if( ( lhs_values != 0 ) && ( rhs_values != 0 ) )
-        {
-            cmp_result = memcmp( lhs_values, rhs_values, ATTR_LENGTH );
-        }
-        else if( lhs_values != 0 )
-        {
-            cmp_result = +1;
-        }
-        else if( rhs_values != 0 )
-        {
-            cmp_result = -1;
-        }
-    }
-
-    return cmp_result;
+    NS(Particles_print_out_single)( p, index );
 }
 
-int NS(compare_real_sequences_with_treshold)(
-    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT lhs_values,
-    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT rhs_values,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)*
-        SIXTRL_RESTRICT ptr_first_out_of_bounds_index,
-    NS(buffer_size_t) const num_values,
+void NS(Particles_print_out_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p )
+{
+    NS(Particles_print_out)( p );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+bool NS(Particles_have_same_structure_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
+{
+    return NS(Particles_have_same_structure)( lhs, rhs );
+}
+
+bool NS(Particles_map_to_same_memory_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
+{
+    return NS(Particles_map_to_same_memory)( lhs, rhs );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+int NS(Particles_compare_real_values_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
+{
+    return NS(Particles_compare_real_values)( lhs, rhs );
+}
+
+int NS(Particles_compare_real_values_with_treshold_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs,
     NS(particle_real_t) const treshold )
 {
-    int cmp_result = -1;
-
-    if( ( lhs_values != 0 )  && ( rhs_values != 0 ) )
-    {
-        static NS(particle_real_t) const ZERO = ( NS(particle_real_t) )0.0L;
-        NS(buffer_size_t) ii = 0;
-
-        cmp_result = 0;
-
-        for( ; ii < num_values ; ++ii )
-        {
-            NS(particle_real_t) const diff = lhs_values[ ii ] - rhs_values[ ii ];
-
-            if( ( ( diff >= ZERO ) && (  diff > treshold ) ) ||
-                ( ( diff <  ZERO ) && ( -diff > treshold ) ) )
-            {
-                if( ptr_first_out_of_bounds_index != 0 )
-                {
-                    *ptr_first_out_of_bounds_index = ii;
-                }
-
-                cmp_result = ( lhs_values[ ii ] >= rhs_values[ ii ] ) ? +1 : -1;
-                break;
-            }
-        }
-    }
-    else if( lhs_values != 0 )
-    {
-        cmp_result = +1;
-    }
-    else if( rhs_values != 0 )
-    {
-        cmp_result = -1;
-    }
-
-    return cmp_result;
+    return NS(Particles_compare_real_values_with_treshold)(
+        lhs, rhs, treshold );
 }
+
+int NS(Particles_compare_integer_values_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
+{
+    return NS(Particles_compare_integer_values)( lhs, rhs );
+}
+
+int NS(Particles_compare_values_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
+{
+    return NS(Particles_compare_values)( lhs, rhs );
+}
+
+int NS(Particles_compare_values_with_treshold_ext)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs,
+    NS(particle_real_t) const treshold )
+{
+    return NS(Particles_compare_values_with_treshold)( lhs, rhs, treshold );
+}
+
+/* ------------------------------------------------------------------------- */
 
 void NS(compare_real_sequences_and_get_max_difference)(
     NS(particle_real_ptr_t) SIXTRL_RESTRICT ptr_max_diff,
@@ -394,495 +378,6 @@ void NS(Particles_random_init)(
     }
 
     return;
-}
-
-
-bool NS(Particles_have_same_structure)(
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
-{
-    return ( ( lhs != 0 ) && ( rhs != 0 ) &&
-             ( NS(Particles_get_num_of_particles)( lhs ) ==
-               NS(Particles_get_num_of_particles)( rhs ) ) );
-}
-
-
-bool NS(Particles_map_to_same_memory)(
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
-{
-    bool result = false;
-
-    if( NS(Particles_have_same_structure)( lhs, rhs ) )
-    {
-        result = (
-            ( NS(Particles_get_const_q0)( lhs ) ==
-              NS(Particles_get_const_q0)( rhs ) ) &&
-            ( NS(Particles_get_const_mass0)( lhs ) ==
-              NS(Particles_get_const_mass0)( rhs ) ) &&
-            ( NS(Particles_get_const_beta0)( lhs ) ==
-              NS(Particles_get_const_beta0)( rhs ) ) &&
-            ( NS(Particles_get_const_gamma0)( lhs ) ==
-              NS(Particles_get_const_gamma0)( rhs ) ) &&
-            ( NS(Particles_get_const_p0c)( lhs ) ==
-              NS(Particles_get_const_p0c)( rhs ) ) &&
-            ( NS(Particles_get_const_s)( lhs ) ==
-              NS(Particles_get_const_s)( rhs ) ) &&
-            ( NS(Particles_get_const_x)( lhs ) ==
-              NS(Particles_get_const_x)( rhs ) ) &&
-            ( NS(Particles_get_const_y)( lhs ) ==
-              NS(Particles_get_const_y)( rhs ) ) &&
-            ( NS(Particles_get_const_px)( lhs ) ==
-              NS(Particles_get_const_px)( rhs ) ) &&
-            ( NS(Particles_get_const_py)( lhs ) ==
-              NS(Particles_get_const_py)( rhs ) ) &&
-            ( NS(Particles_get_const_zeta)( lhs ) ==
-              NS(Particles_get_const_zeta)( rhs ) ) &&
-            ( NS(Particles_get_const_psigma)( lhs ) ==
-              NS(Particles_get_const_psigma)( rhs ) ) &&
-            ( NS(Particles_get_const_delta)( lhs ) ==
-              NS(Particles_get_const_delta)( rhs ) ) &&
-            ( NS(Particles_get_const_rpp)( lhs ) ==
-              NS(Particles_get_const_rpp)( rhs ) ) &&
-            ( NS(Particles_get_const_rvv)( lhs ) ==
-              NS(Particles_get_const_rvv)( rhs ) ) &&
-            ( NS(Particles_get_const_chi)( lhs ) ==
-              NS(Particles_get_const_chi)( rhs ) ) &&
-            ( NS(Particles_get_const_charge_ratio)( lhs ) ==
-              NS(Particles_get_const_charge_ratio)( rhs ) ) &&
-            ( NS(Particles_get_const_particle_id)( lhs ) ==
-              NS(Particles_get_const_particle_id)( rhs ) ) &&
-            ( NS(Particles_get_const_at_element_id)( lhs ) ==
-              NS(Particles_get_const_at_element_id)( rhs ) ) &&
-            ( NS(Particles_get_const_at_turn)( lhs ) ==
-              NS(Particles_get_const_at_turn)( rhs ) ) &&
-            ( NS(Particles_get_const_state)( lhs ) ==
-              NS(Particles_get_const_state)( rhs ) ) );
-    }
-
-    return result;
-}
-
-
-int NS(Particles_compare_real_values)(
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
-{
-    int cmp_result = -1;
-
-    if( NS(Particles_have_same_structure)( lhs, rhs ) )
-    {
-        NS(buffer_size_t) const NUM_PARTICLES =
-            NS(Particles_get_num_of_particles)( lhs );
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_q0)( lhs ),
-            NS(Particles_get_const_q0)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_mass0)( lhs ),
-            NS(Particles_get_const_mass0)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_beta0)( lhs ),
-            NS(Particles_get_const_beta0)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_gamma0)( lhs ),
-            NS(Particles_get_const_gamma0)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_p0c)( lhs ),
-            NS(Particles_get_const_p0c)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_s)( lhs ),
-            NS(Particles_get_const_s)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_x)( lhs ),
-            NS(Particles_get_const_x)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_y)( lhs ),
-            NS(Particles_get_const_y)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_px)( lhs ),
-            NS(Particles_get_const_px)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_py)( lhs ),
-            NS(Particles_get_const_py)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_zeta)( lhs ),
-            NS(Particles_get_const_zeta)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_psigma)( lhs ),
-            NS(Particles_get_const_psigma)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_delta)( lhs ),
-            NS(Particles_get_const_delta)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_rpp)( lhs ),
-            NS(Particles_get_const_rpp)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_rvv)( lhs ),
-            NS(Particles_get_const_rvv)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_chi)( lhs ),
-            NS(Particles_get_const_chi)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_charge_ratio)( lhs ),
-            NS(Particles_get_const_charge_ratio)( rhs ),
-            NUM_PARTICLES, sizeof( NS(particle_real_t) ) );
-    }
-    else if( ( lhs != 0 ) && ( rhs == 0 ) )
-    {
-        cmp_result = 1;
-    }
-    else
-    {
-        cmp_result = -1;
-    }
-
-    return cmp_result;
-}
-
-
-int NS(Particles_compare_integer_values)(
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    const NS(Particles) *const SIXTRL_PARTICLE_ARGPTR_DEC SIXTRL_RESTRICT rhs )
-{
-    int cmp_result = -1;
-
-    if( NS(Particles_have_same_structure)( lhs, rhs ) )
-    {
-        NS(buffer_size_t) const NUM_PARTICLES =
-            NS(Particles_get_num_of_particles)( lhs );
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_particle_id)( lhs ),
-            NS(Particles_get_const_particle_id)( rhs ),
-            NUM_PARTICLES, sizeof( SIXTRL_INT64_T ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_at_element_id)( lhs ),
-            NS(Particles_get_const_at_element_id)( rhs ),
-            NUM_PARTICLES, sizeof( SIXTRL_INT64_T ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_at_turn)( lhs ),
-            NS(Particles_get_const_at_turn)( rhs ),
-            NUM_PARTICLES, sizeof( SIXTRL_INT64_T ) );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_sequences_exact)(
-            NS(Particles_get_const_state)( lhs ),
-            NS(Particles_get_const_state)( rhs ),
-            NUM_PARTICLES, sizeof( SIXTRL_INT64_T ) );
-    }
-    else if( ( lhs != 0 ) && ( rhs == 0 ) )
-    {
-        cmp_result = 1;
-    }
-    else
-    {
-        cmp_result = -1;
-    }
-
-    return cmp_result;
-}
-
-int NS(Particles_compare_real_values_with_treshold)(
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs,
-    NS(particle_real_t) const treshold )
-{
-    int cmp_result = -1;
-
-    if( NS(Particles_have_same_structure)( lhs, rhs ) )
-    {
-        NS(buffer_size_t) const NUM_PARTICLES =
-            NS(Particles_get_num_of_particles)( lhs );
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_q0)( lhs ),
-            NS(Particles_get_const_q0)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_mass0)( lhs ),
-            NS(Particles_get_const_mass0)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_beta0)( lhs ),
-            NS(Particles_get_const_beta0)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_gamma0)( lhs ),
-            NS(Particles_get_const_gamma0)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_p0c)( lhs ),
-            NS(Particles_get_const_p0c)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_s)( lhs ),
-            NS(Particles_get_const_s)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_x)( lhs ),
-            NS(Particles_get_const_x)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_y)( lhs ),
-            NS(Particles_get_const_y)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_px)( lhs ),
-            NS(Particles_get_const_px)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_py)( lhs ),
-            NS(Particles_get_const_py)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_zeta)( lhs ),
-            NS(Particles_get_const_zeta)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_psigma)( lhs ),
-            NS(Particles_get_const_psigma)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_delta)( lhs ),
-            NS(Particles_get_const_delta)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_rpp)( lhs ),
-            NS(Particles_get_const_rpp)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_rvv)( lhs ),
-            NS(Particles_get_const_rvv)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_chi)( lhs ),
-            NS(Particles_get_const_chi)( rhs ), 0, NUM_PARTICLES, treshold );
-
-        if( cmp_result != 0 ) return cmp_result;
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-        cmp_result = NS(compare_real_sequences_with_treshold)(
-            NS(Particles_get_const_charge_ratio)( lhs ),
-            NS(Particles_get_const_charge_ratio)( rhs ), 0,
-                NUM_PARTICLES, treshold );
-    }
-    else if( ( lhs != 0 ) && ( rhs == 0 ) )
-    {
-        cmp_result = 1;
-    }
-    else
-    {
-        cmp_result = -1;
-    }
-
-    return cmp_result;
-}
-
-int NS(Particles_compare_values)(
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs )
-{
-    int cmp_result = NS(Particles_compare_real_values)( lhs, rhs );
-
-    if( cmp_result == 0 )
-    {
-        cmp_result = NS(Particles_compare_integer_values)( lhs, rhs );
-    }
-
-    return cmp_result;
-}
-
-
-int NS(Particles_compare_values_with_treshold)(
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT rhs,
-    NS(particle_real_t) const treshold )
-{
-    int cmp_result = NS(Particles_compare_real_values_with_treshold)(
-        lhs, rhs, treshold );
-
-    if( cmp_result == 0 )
-    {
-        cmp_result = NS(Particles_compare_integer_values)( lhs, rhs );
-    }
-
-    return cmp_result;
 }
 
 void NS(Particles_get_max_difference)(
