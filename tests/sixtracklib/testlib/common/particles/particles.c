@@ -661,23 +661,6 @@ void NS(Particles_print)(
     return;
 }
 
-void NS(Particles_print_out_single)(
-    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const
-        SIXTRL_RESTRICT particles,
-    NS(buffer_size_t) const index )
-{
-    NS(Particles_print_single)( stdout, particles, index );
-    return;
-}
-
-void NS(Particles_print_out)(
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const
-        SIXTRL_RESTRICT particles )
-{
-    NS(Particles_print)( stdout, particles );
-    return;
-}
-
 void NS(Particles_print_max_diff)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const

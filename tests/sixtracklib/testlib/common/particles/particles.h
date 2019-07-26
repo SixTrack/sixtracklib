@@ -158,11 +158,6 @@ SIXTRL_STATIC SIXTRL_FN void NS(Particles_print_out_single)(
 SIXTRL_STATIC SIXTRL_FN void NS(Particles_print_out)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p );
 
-SIXTRL_STATIC SIXTRL_FN void NS(Particles_print_max_diff_out)(
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const
-        SIXTRL_RESTRICT max_diff,
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(buffer_size_t) const* max_diff_indices );
-
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Particles_buffer_have_same_structure)(
@@ -416,7 +411,7 @@ SIXTRL_INLINE void NS(Particles_print_out_single)(
                  NS(Particles_get_state_value)( particles, index ) );
     }
 
-    #endif /* !defined( _GPUCODE ) */
+    #else /* !defined( _GPUCODE ) */
 
     NS(Particles_print_single)( stdout, particles, index );
 
@@ -432,7 +427,7 @@ SIXTRL_INLINE void NS(Particles_print_out)(
     NS(buffer_size_t) const num_particles =
         NS(Particles_get_num_of_particles)( particles );
 
-    if( ( fp != 0 ) && ( particles != 0 ) && ( num_particles > 0u ) )
+    if( ( particles != 0 ) && ( num_particles > 0u ) )
     {
         NS(buffer_size_t) ii = 0u;
 
@@ -443,7 +438,7 @@ SIXTRL_INLINE void NS(Particles_print_out)(
                 printf( "particle id    = %8lu\r\n", ii );
             }
 
-            NS(Particles_print_out_single)(  particles, ii );
+            NS(Particles_print_out_single)( particles, ii );
         }
     }
 
@@ -536,7 +531,7 @@ SIXTRL_INLINE int NS(Particles_compare_real_values)(
 
         cmp_result = NS(Particles_compare_sequences_exact)(
             NS(Particles_get_const_q0)( lhs ),
-            NS(Particles_get_const_q0)( rhs ), NUM_PARTICLES, REAL_SIZE ) );
+            NS(Particles_get_const_q0)( rhs ), NUM_PARTICLES, REAL_SIZE );
 
         if( cmp_result != 0 ) return cmp_result;
 
@@ -931,6 +926,7 @@ SIXTRL_INLINE int NS(Particles_compare_values_with_treshold)(
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+
 #endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_COMMON_PARTICLES_HEADER_H__ */
 
 /* end: tests/sixtracklib/testlib/common/particles/particles.h */
