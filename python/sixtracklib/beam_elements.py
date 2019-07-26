@@ -226,8 +226,8 @@ class SpaceChargeCoasting(CObject):
                 'sigma_x',
                 'sigma_y',
                 'length',
-                'Delta_x',
-                'Delta_y',
+                'x_co',
+                'y_co',
                 'min_sigma_diff',
                 'enabled')
 
@@ -251,8 +251,8 @@ class SpaceChargeBunched(CObject):
                 'sigma_x',
                 'sigma_y',
                 'length',
-                'Delta_x',
-                'Delta_y',
+                'x_co',
+                'y_co',
                 'min_sigma_diff',
                 'enabled')
 
