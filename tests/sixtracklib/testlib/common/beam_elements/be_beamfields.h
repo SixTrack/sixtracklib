@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_BEAMBEAM_C99_H__
-#define SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_BEAMBEAM_C99_H__
+#ifndef SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_BEAMFIELDS_C99_H__
+#define SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_BEAMFIELDS_C99_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stddef.h>
@@ -515,6 +515,6 @@ SIXTRL_INLINE void NS(BeamBeam6D_print_out)(
     #endif /* !defined( _GPUCODE ) */
 }
 
-#endif /* SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_BEAMBEAM_C99_H__ */
+#endif /* SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_BEAMFIELDS_C99_H__ */
 
-/* end: tests/sixtracklib/testlib/common/beam_elements/be_beambeam.h */
+/* end: tests/sixtracklib/testlib/common/beam_elements/be_beamfields.h */

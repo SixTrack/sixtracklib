@@ -1,4 +1,4 @@
-#include "sixtracklib/testlib/common/beam_elements/be_beambeam.h"
+#include "sixtracklib/testlib/common/beam_elements/be_beamfields.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -154,4 +154,4 @@ void NS(BeamBeam6D_print)(
     return;
 }
 
-/*end: tests/sixtracklib/testlib/common/beam_elements/be_beambeam.c */
+/*end: tests/sixtracklib/testlib/common/beam_elements/be_beamfields.c */
