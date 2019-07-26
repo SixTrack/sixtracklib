@@ -142,18 +142,64 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_space_charge_coasting)(
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT sc )
 {
-//     typedef SIXTRL_REAL_T real_t;
-//     typedef SIXTRL_BE_DATAPTR_DEC NS(SpaceChargeCoasting_data)* data_ptr_t;
-//
-//     data_ptr_t sc_ddata =
-//        ( data_ptr_t )NS(SpaceChargeCoasting_get_const_data)( sc );
+     typedef SIXTRL_REAL_T real_t;
+     typedef SIXTRL_BE_DATAPTR_DEC NS(SpaceChargeCoasting_data)* data_ptr_t;
 
 
-    ( void )particles;
-    ( void )particle_index;
-    ( void )sc;
+    data_ptr_t scdata = ( data_ptr_t )NS(SpaceChargeCoasting_get_const_data)( sc );
+    
+    /*
+    // Test data transfer
+    printf("SCC: line_density = %e\n",scdata->line_density);
+    printf("SCC: sigma_x = %e\n",scdata->sigma_x);
+    printf("SCC: sigma_y = %e\n",scdata->sigma_y);
+    printf("SCC: length = %e\n",scdata->length);
+    printf("SCC: x_co = %e\n",scdata->x_co);
+    printf("SCC: y_co = %e\n",scdata->y_co);
+    printf("SCC: min_sigma_diff = %e\n",scdata->min_sigma_diff);
+    printf("SCC: enabled = %e\n",scdata->enabled);
+    */
+    
+    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index )
+        == ( NS(particle_index_t) )1 );
+    
+    if (scdata->enabled > 0.) {
+
+        real_t px = NS(Particles_get_px_value)( particles, particle_index );
+        real_t py = NS(Particles_get_py_value)( particles, particle_index );
+
+        real_t qratio = 1.;// To be generalized for multi-ion!
+        real_t charge = 
+	   qratio*NS(Particles_get_q0_value)( particles, particle_index )*SIXTRL_QELEM;
+
+        real_t x = NS(Particles_get_x_value)( particles, particle_index )
+	       	- scdata->x_co;
+        real_t y = NS(Particles_get_y_value)( particles, particle_index )
+		- scdata->y_co;
+        
+	real_t chi = NS(Particles_get_chi_value)( particles, particle_index );
+
+        real_t beta = NS(Particles_get_beta0_value)( particles, particle_index ) \
+                        /NS(Particles_get_rvv_value)( particles, particle_index );
+        real_t p0c = NS(Particles_get_p0c_value)( particles, particle_index )
+		*SIXTRL_QELEM;
+
+        real_t Ex, Ey, Gx, Gy;
+        NS(get_Ex_Ey_Gx_Gy_gauss)(x, y, scdata->sigma_x, scdata->sigma_y,
+                scdata->min_sigma_diff, 1,
+                &Ex, &Ey, &Gx, &Gy);
+
+	real_t fact_kick = chi * charge * charge * (1. - beta*beta) / p0c
+		* scdata->line_density * scdata->length;
+        px += (fact_kick*Ex);
+        py += (fact_kick*Ey);
+
+        NS(Particles_set_px_value)( particles, particle_index, px );
+        NS(Particles_set_py_value)( particles, particle_index, py );
+    }
 
     return SIXTRL_TRACK_SUCCESS;
+
 }
 
 /* ************************************************************************* */
@@ -166,19 +212,11 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_space_charge_bunched)(
 {
      typedef SIXTRL_REAL_T real_t;
      typedef SIXTRL_BE_DATAPTR_DEC NS(SpaceChargeBunched_data)* data_ptr_t;
-//
-//     data_ptr_t sc_ddata =
-//          ( data_ptr_t )NS(SpaceChargeBunched_get_const_data)( sc );
-
-    // DEBUG 
-    ( void )particles;
-    ( void )particle_index;
-    ( void )sc;
 
 
     data_ptr_t scdata = ( data_ptr_t )NS(SpaceChargeBunched_get_const_data)( sc );
 
-    
+    /*
     // Test data transfer
     printf("SCB: number_of_particles = %e\n",scdata->number_of_particles);
     printf("SCB: bunchlength_rms = %e\n",scdata->bunchlength_rms);
@@ -189,7 +227,8 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_space_charge_bunched)(
     printf("SCB: y_co = %e\n",scdata->y_co);
     printf("SCB: min_sigma_diff = %e\n",scdata->min_sigma_diff);
     printf("SCB: enabled = %e\n",scdata->enabled);
-    
+    */
+
     SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index )
         == ( NS(particle_index_t) )1 );
     

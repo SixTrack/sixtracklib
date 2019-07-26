@@ -10,16 +10,23 @@ import pysixtrack
 from pysixtrack.particles import Particles
 import pysixtrack.be_beamfields.tools as bt
 
+sc_mode = 'Coasting'
+
+# For bunched
+number_of_particles=2e11 
+bunchlength_rms = 0.22
+
+# For coasting
+line_density = 2e11/0.5
+
 mass = physical_constants['proton mass energy equivalent in MeV'][0]*1e6
 p0c = 25.92e9
-number_of_particles=2e11 
 neps_x=2e-6
 neps_y=2e-6
 delta_rms=1.5e-3
-bunchlength_rms = 0.22
 V_RF_MV = 4.5
 lag_RF_deg = 180.
-n_SCkicks = 50 #216 #80
+n_SCkicks = 10 #216 #80
 length_fuzzy = 1.5
 seq_name = 'sps'
 
@@ -37,7 +44,7 @@ sc_locations, sc_lengths = bt.determine_sc_locations(temp_line, n_SCkicks, lengt
 
 # Install spacecharge place holders
 sc_names = ['sc%d'%number for number in range(len(sc_locations))]
-bt.install_sc_placeholders(mad, seq_name, sc_names, sc_locations, mode='Bunched')
+bt.install_sc_placeholders(mad, seq_name, sc_names, sc_locations, mode=sc_mode)
 
 # twiss
 twtable = mad.twiss()
@@ -46,17 +53,29 @@ twtable = mad.twiss()
 line, other = pysixtrack.Line.from_madx_sequence(mad.sequence.sps)                             
 
 # Get sc info from optics
-mad_sc_names, sc_points, sc_twdata = bt.get_spacecharge_names_madpoints_twdata(mad, seq_name, mode='Bunched')
+mad_sc_names, sc_points, sc_twdata = bt.get_spacecharge_names_madpoints_twdata(
+        mad, seq_name, mode=sc_mode)
 
 # Check consistency
-sc_elements, sc_names = line.get_elements_of_type(pysixtrack.elements.SpaceChargeBunched)
+if sc_mode == 'Bunched':
+    sc_elements, sc_names = line.get_elements_of_type(pysixtrack.elements.SpaceChargeBunched)
+elif sc_mode == 'Coasting':
+    sc_elements, sc_names = line.get_elements_of_type(pysixtrack.elements.SpaceChargeCoasting)
+else:
+    raise ValueError('mode not understood')
 bt.check_spacecharge_consistency(sc_elements, sc_names, sc_lengths, mad_sc_names)
 
 # Setup spacecharge in the line
-bt.setup_spacecharge_bunched_in_line(sc_elements, sc_lengths,
-    sc_twdata, sc_points, p0c, mass, number_of_particles, 
-    bunchlength_rms, delta_rms, neps_x, neps_y)
-
+if sc_mode == 'Bunched':
+    bt.setup_spacecharge_bunched_in_line(sc_elements, sc_lengths,
+        sc_twdata, sc_points, p0c, mass, number_of_particles, 
+        bunchlength_rms, delta_rms, neps_x, neps_y)
+elif sc_mode == 'Coasting':
+    bt.setup_spacecharge_coasting_in_line(sc_elements, sc_lengths,
+        sc_twdata, sc_points, p0c, mass, line_density, 
+        delta_rms, neps_x, neps_y)
+else:
+    raise ValueError('mode not understood')
 # enable RF
 i_cavity = line.element_names.index('acta.31637')
 line.elements[i_cavity].voltage = V_RF_MV * 1e6

@@ -223,7 +223,6 @@ class SpaceChargeCoasting(CObject):
         if 'sigma_x' in kwargs:
             slots = (
                 'line_density',
-                'bunch_length_rms',
                 'sigma_x',
                 'sigma_y',
                 'length',
