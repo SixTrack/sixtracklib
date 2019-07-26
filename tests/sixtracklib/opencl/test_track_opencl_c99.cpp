@@ -562,7 +562,7 @@ namespace SIXTRL_CXX_NAMESPACE
                         for( ; line_it != line_end ; ++line_it )
                         {
                             std::cout << "be id = " << std::setw( 6 ) << jj ;
-                            ::st_BeamElement_print( line_it );
+                            ::st_BeamElement_print_out( line_it );
                         }
 
                         std::cout << "\r\n"
