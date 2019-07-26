@@ -10,7 +10,7 @@ import footprint
 import matplotlib.pyplot as plt
 
 track_with = 'PySixtrack'
-track_with = 'Sixtracklib'
+#track_with = 'Sixtracklib'
 device = '0.0'
 device = None
 

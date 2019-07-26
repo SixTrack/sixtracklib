@@ -19,7 +19,7 @@ delta_rms=1.5e-3
 bunchlength_rms = 0.22
 V_RF_MV = 4.5
 lag_RF_deg = 180.
-n_SCkicks = 1 #216 #80
+n_SCkicks = 50 #216 #80
 length_fuzzy = 1.5
 seq_name = 'sps'
 
