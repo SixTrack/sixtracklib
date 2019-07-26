@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_BE_BEAMBEAM_BE_BEAMBEAM_C99_H__
-#define SIXTRACKLIB_COMMON_BE_BEAMBEAM_BE_BEAMBEAM_C99_H__
+#ifndef SIXTRACKLIB_COMMON_BE_BEAMFIELDS_BE_BEAMFIELDS_C99_H__
+#define SIXTRACKLIB_COMMON_BE_BEAMFIELDS_BE_BEAMFIELDS_C99_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -15,7 +15,7 @@
     #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
-    #include "sixtracklib/common/be_beambeam/gauss_fields.h"
+    #include "sixtracklib/common/be_beamfields/gauss_fields.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #ifndef SIXTRL_BB_GET_PTR
@@ -1527,6 +1527,6 @@ SIXTRL_INLINE int NS(BeamBeam6D_copy)(
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKLIB_COMMON_BE_BEAMBEAM_BE_BEAMBEAM_C99_H__ */
+#endif /* SIXTRACKLIB_COMMON_BE_BEAMFIELDS_BE_BEAMFIELDS_C99_H__ */
 
-/* sixtracklib/common/be_beambeam/be_beambeam.h */
+/* sixtracklib/common/be_beamfields/be_beamfields.h */

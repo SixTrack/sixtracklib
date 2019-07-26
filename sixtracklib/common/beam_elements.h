@@ -119,7 +119,7 @@ SIXTRL_STATIC SIXTRL_FN bool NS(BeamElements_is_beam_elements_buffer)(
     #endif /* !defined( _GPUCODE ) */
 
     #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-        #include "sixtracklib/common/be_beambeam/be_beamfields.h"
+        #include "sixtracklib/common/be_beamfields/be_beamfields.h"
     #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM )  */
 
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */

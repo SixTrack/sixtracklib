@@ -1,5 +1,5 @@
-#ifndef SIXTRACKL_COMMON_BE_BEAMBEAM_GAUSS_FIELDS_H__
-#define SIXTRACKL_COMMON_BE_BEAMBEAM_GAUSS_FIELDS_H__
+#ifndef SIXTRACKL_COMMON_BE_BEAMFIELDS_GAUSS_FIELDS_H__
+#define SIXTRACKL_COMMON_BE_BEAMFIELDS_GAUSS_FIELDS_H__
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
@@ -46,7 +46,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(get_Ex_Ey_Gx_Gy_gauss)(
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/constants.h"
-    #include "sixtracklib/common/be_beambeam/faddeeva_cern.h"
+    #include "sixtracklib/common/be_beamfields/faddeeva_cern.h"
 #endif
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -200,7 +200,7 @@ SIXTRL_INLINE void NS(get_Ex_Ey_Gx_Gy_gauss)(
     *Ex_ptr = Ex;
     *Ey_ptr = Ey;
 
-    if( skip_Gs )
+    if( !skip_Gs )
     {
         *Gx_ptr = Gx;
         *Gy_ptr = Gy;
@@ -211,7 +211,7 @@ SIXTRL_INLINE void NS(get_Ex_Ey_Gx_Gy_gauss)(
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-#endif /* SIXTRACKL_COMMON_BE_BEAMBEAM_GAUSS_FIELDS_H__ */
+#endif /* SIXTRACKL_COMMON_BE_BEAMFIELDS_GAUSS_FIELDS_H__ */
 
-/* end: sixtracklib/common/be_beambeam/gauss_fields.h */
+/* end: sixtracklib/common/be_beamfields/gauss_fields.h */
 

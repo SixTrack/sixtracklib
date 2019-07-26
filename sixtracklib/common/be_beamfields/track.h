@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_BE_BEAMBEAM_TRACK_BEAMBEAM_H__
-#define SIXTRACKLIB_COMMON_BE_BEAMBEAM_TRACK_BEAMBEAM_H__
+#ifndef SIXTRACKLIB_COMMON_BE_BEAMFIELDS_TRACK_BEAMFIELDS_H__
+#define SIXTRACKLIB_COMMON_BE_BEAMFIELDS_TRACK_BEAMFIELDS_H__
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
@@ -62,7 +62,7 @@ NS(Track_particle_beam_beam_6d)(
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/constants.h"
     #include "sixtracklib/common/particles.h"
-    #include "sixtracklib/common/be_beambeam/be_beambeam.h"
+    #include "sixtracklib/common/be_beamfields/be_beamfields.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -288,7 +288,9 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_6d)(
             real_t dS_y_bar_hat_star = -x_bar_star*dS_sintheta +y_bar_star*dS_costheta;
 
             // Get transverse fieds
-            real_t Ex, Ey, Gx, Gy;
+            real_t Ex, Ey;
+            real_t Gx = ( real_t )0.0;
+            real_t Gy = ( real_t )0.0;
             NS(get_Ex_Ey_Gx_Gy_gauss)(x_bar_hat_star, y_bar_hat_star,
                 sqrt(Sig_11_hat_star), sqrt(Sig_33_hat_star), bb6ddata->min_sigma_diff, 0,
                 &Ex, &Ey, &Gx, &Gy);
@@ -350,6 +352,6 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_6d)(
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 
-#endif /* SIXTRACKLIB_COMMON_BE_BEAMBEAM_TRACK_BEAMBEAM_H__ */
+#endif /* SIXTRACKLIB_COMMON_BE_BEAMFIELDS_TRACK_BEAMFIELDS_H__ */
 
-/* end: sixtracklib/common/be_beambeam/track_beambeam.h */
+/* end: sixtracklib/common/be_beamfields/track.h */

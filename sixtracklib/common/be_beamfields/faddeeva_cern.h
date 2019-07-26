@@ -13,8 +13,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef SIXTACKLIB_COMMON_BE_BEAMBEAM_FADDEEVA_CERN_HEADER_H__
-#define SIXTACKLIB_COMMON_BE_BEAMBEAM_FADDEEVA_CERN_HEADER_H__
+#ifndef SIXTACKLIB_COMMON_BE_BEAMFIELDS_FADDEEVA_CERN_HEADER_H__
+#define SIXTACKLIB_COMMON_BE_BEAMFIELDS_FADDEEVA_CERN_HEADER_H__
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
@@ -122,6 +122,6 @@ SIXTRL_INLINE void cerrf( SIXTRL_REAL_T in_real, SIXTRL_REAL_T in_imag,
 }
 #endif /* !defined( __cplusplus ) && !defined( _GPUCODE ) */
 
-#endif /* SIXTACKLIB_COMMON_BE_BEAMBEAM_FADDEEVA_CERN_HEADER_H__ */
+#endif /* SIXTACKLIB_COMMON_BE_BEAMFIELDS_FADDEEVA_CERN_HEADER_H__ */
 
-/* end: sixtracklib/common/be_beambeam/faddeeva_cern.h */
+/* end: sixtracklib/common/be_beamfields/faddeeva_cern.h */

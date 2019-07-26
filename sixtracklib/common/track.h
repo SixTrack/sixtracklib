@@ -577,7 +577,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Track_all_particles_line_ext)(
     #include "sixtracklib/common/be_dipedge/track.h"
 
     #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-        #include "sixtracklib/common/be_beambeam/track.h"
+        #include "sixtracklib/common/be_beamfields/track.h"
     #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 

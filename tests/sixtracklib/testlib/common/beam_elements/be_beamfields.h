@@ -14,7 +14,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
-    #include "sixtracklib/common/be_beambeam/be_beambeam.h"
+    #include "sixtracklib/common/be_beamfields/be_beamfields.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -517,4 +517,4 @@ SIXTRL_INLINE void NS(BeamBeam6D_print_out)(
 
 #endif /* SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_BEAMFIELDS_C99_H__ */
 
-/* end: tests/sixtracklib/testlib/common/beam_elements/be_beamfields.h */
+/* end: tests/sixtracklib/testlib/common/be_beamfields/be_beamfields.h */

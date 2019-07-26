@@ -129,7 +129,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamElement_print)(
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/beam_elements.h"
 
-    #include "sixtracklib/testlib/common/beam_elements/be_beambeam.h"
+    #include "sixtracklib/testlib/common/beam_elements/be_beamfields.h"
     #include "sixtracklib/testlib/common/beam_elements/be_limit_rect.h"
     #include "sixtracklib/testlib/common/beam_elements/be_limit_ellipse.h"
     #include "sixtracklib/testlib/common/beam_elements/be_dipedge.h"

@@ -154,4 +154,4 @@ void NS(BeamBeam6D_print)(
     return;
 }
 
-/*end: tests/sixtracklib/testlib/common/beam_elements/be_beamfields.c */
+/*end: tests/sixtracklib/testlib/common/be_beamfields/be_beamfields.c */

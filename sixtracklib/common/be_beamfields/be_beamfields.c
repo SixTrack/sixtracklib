@@ -1,4 +1,4 @@
-#include "sixtracklib/common/be_beambeam/be_beambeam.h"
+#include "sixtracklib/common/be_beamfields/be_beamfields.h"
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -13,7 +13,7 @@
     #include "sixtracklib/common/internal/beam_elements_defines.h"
     #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
-    #include "sixtracklib/common/be_beambeam/gauss_fields.h"
+    #include "sixtracklib/common/be_beamfields/gauss_fields.h"
     #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -463,4 +463,4 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam6D)* NS(BeamBeam6D_add_copy)(
         NS(BeamBeam6D_get_data)( ( NS(BeamBeam6D)* )orig ) );
 }
 
-/* end: sixtracklib/common/be_beambeam/be_beambeam.c */
+/* end: sixtracklib/common/be_beamfields/be_beamfields.c */
