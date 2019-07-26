@@ -200,12 +200,12 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         TrackJobBaseNew::status_t status = this->doFetchParticleAddresses();
 
-        if( ( status == st::ARCH_STATUS_SUCCESS ) && 
+        if( ( status == st::ARCH_STATUS_SUCCESS ) &&
             ( this->requiresCollecting() ) )
         {
             status = this->collectParticlesAddresses();
         }
-        
+
         if( status == st::ARCH_STATUS_SUCCESS )
         {
             this->doSetHasParticleAddressesFlag( true );
@@ -213,23 +213,23 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return status;
     }
-    
+
     TrackJobBaseNew::status_t TrackJobBaseNew::clearParticleAddresses(
         TrackJobBaseNew::size_type const index )
     {
         return this->doClearParticleAddresses( index );
     }
-    
+
     TrackJobBaseNew::status_t TrackJobBaseNew::clearAllParticleAddresses()
     {
-        return this->doClearAllParticleAddresses();      
+        return this->doClearAllParticleAddresses();
     }
 
     bool TrackJobBaseNew::canFetchParticleAddresses() const SIXTRL_NOEXCEPT
     {
         return ( this->doGetPtrParticlesAddrBuffer() != nullptr );
     }
-    
+
     bool TrackJobBaseNew::hasParticleAddresses() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT( ( !this->m_has_particle_addresses ) ||
@@ -256,18 +256,18 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return ptr_paddr;
     }
-    
-    TrackJobBaseNew::buffer_t const* 
+
+    TrackJobBaseNew::buffer_t const*
     TrackJobBaseNew::ptrParticleAddressesBuffer() const SIXTRL_NOEXCEPT
     {
         return this->doGetPtrParticlesAddrBuffer();
     }
 
-    TrackJobBaseNew::c_buffer_t const* 
+    TrackJobBaseNew::c_buffer_t const*
     TrackJobBaseNew::ptrCParticleAddressesBuffer() const SIXTRL_NOEXCEPT
     {
         return ( this->doGetPtrParticlesAddrBuffer() != nullptr )
-            ? this->doGetPtrParticlesAddrBuffer()->getCApiPtr() 
+            ? this->doGetPtrParticlesAddrBuffer()->getCApiPtr()
             : nullptr;
     }
 
@@ -322,14 +322,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
-            this->doSetPtrParticlesBuffer( &particles_buffer );
-            this->doSetPtrBeamElementsBuffer( &be_buffer );
-
-            if( ( ptr_out != nullptr ) && ( this->hasOutputBuffer() ) &&
-                ( !this->ownsOutputBuffer() ) )
-            {
-                this->doSetPtrOutputBuffer( ptr_output_buffer );
-            }
+            this->doSetCxxBufferPointers(
+                particles_buffer, be_buffer, ptr_output_buffer );
         }
 
         return status;
@@ -352,14 +346,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
-            this->doSetPtrParticlesBuffer( &particles_buffer );
-            this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
-
-            if( ( ptr_out != nullptr ) && ( this->hasOutputBuffer() ) &&
-                ( !this->ownsOutputBuffer() ) )
-            {
-                this->doSetPtrOutputBuffer( ptr_output_buffer );
-            }
+            this->doSetCxxBufferPointers(
+                particles_buffer, beam_elements_buffer, ptr_output_buffer );
         }
 
         return status;
@@ -436,21 +424,21 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* --------------------------------------------------------------------- */
-    
-    /* 
+
+    /*
     TrackJobBaseNew::status_t TrackJobBaseNew::selectParticleSets(
-        TrackJobBaseNew::size_type const num_particle_sets, 
-        TrackJobBaseNew::size_type const* 
+        TrackJobBaseNew::size_type const num_particle_sets,
+        TrackJobBaseNew::size_type const*
             SIXTRL_RESTRICT particle_set_indices_begin )
     {
         TrackJobBaseNew::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-        
+
         if( this->ptrCParticlesBuffer() != nullptr )
         {
-            
-            
+
+
         }
-        
+
         return status;
     }
     */
@@ -533,9 +521,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return status;
     }
-    
-    
-    
+
+
+
     /* --------------------------------------------------------------------- */
 
     TrackJobBaseNew::status_t TrackJobBaseNew::assignOutputBuffer(
@@ -2018,14 +2006,20 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobBaseNew::c_buffer_t* SIXTRL_RESTRICT output_buffer,
         TrackJobBaseNew::size_type const until_turn_elem_by_elem )
     {
-        TrackJobBaseNew::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-
         using output_buffer_flag_t = TrackJobBaseNew::output_buffer_flag_t;
 
-        if( ( this->doPrepareParticlesStructures( particles_buffer ) ) &&
-            ( this->doPrepareBeamElementsStructures( beam_elem_buffer ) ) )
+        TrackJobBaseNew::status_t status =
+            this->doPrepareParticlesStructures( particles_buffer );
+
+        if( status == st::ARCH_STATUS_SUCCESS )
         {
-            status = st::ARCH_STATUS_SUCCESS;
+            status = this->doPrepareBeamElementsStructures( beam_elem_buffer );
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            this->doSetPtrCParticlesBuffer( particles_buffer );
+            this->doSetPtrCBeamElementsBuffer( beam_elem_buffer );
 
             output_buffer_flag_t const out_buffer_flags =
             ::NS(OutputBuffer_required_for_tracking_of_particle_sets)(
@@ -2130,40 +2124,40 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         return st::ARCH_STATUS_GENERAL_FAILURE;
     }
-    
-    TrackJobBaseNew::status_t TrackJobBaseNew::doClearParticleAddresses( 
+
+    TrackJobBaseNew::status_t TrackJobBaseNew::doClearParticleAddresses(
         TrackJobBaseNew::size_type const index )
     {
         using status_t = TrackJobBaseNew::status_t;
-        
+
         status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-        
+
         if( ( this->doGetPtrParticlesAddrBuffer() != nullptr ) &&
             ( this->doGetPtrParticlesAddrBuffer()->getNumObjects() > index ) )
         {
             status = ::NS(ParticlesAddr_buffer_clear_single)(
                 this->doGetPtrParticlesAddrBuffer()->getCApiPtr(), index );
-            
+
             this->doSetHasParticleAddressesFlag( false );
         }
-      
+
         return status;
     }
-    
+
     TrackJobBaseNew::status_t TrackJobBaseNew::doClearAllParticleAddresses()
     {
         using status_t = TrackJobBaseNew::status_t;
-        
+
         status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-        
+
         if( this->doGetPtrParticlesAddrBuffer() != nullptr )
         {
             status = ::NS(ParticlesAddr_buffer_clear_all)(
                 this->doGetPtrParticlesAddrBuffer()->getCApiPtr() );
-            
+
             this->doSetHasParticleAddressesFlag( false );
         }
-      
+
         return status;
     }
 
@@ -2237,6 +2231,25 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         this->m_ptr_output_buffer = ptr_buffer;
+    }
+
+    void TrackJobBaseNew::doSetCxxBufferPointers(
+        TrackJobBaseNew::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+        TrackJobBaseNew::buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
+        TrackJobBaseNew::buffer_t* SIXTRL_RESTRICT ptr_output_buffer
+        ) SIXTRL_NOEXCEPT
+    {
+        this->doSetPtrParticlesBuffer( &particles_buffer );
+        this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
+
+        if( ( ptr_output_buffer != nullptr ) && ( this->hasOutputBuffer() ) &&
+            ( !this->ownsOutputBuffer() ) &&
+            ( ptr_output_buffer->getCApiPtr() == this->ptrCOutputBuffer() ) )
+        {
+            this->doSetPtrOutputBuffer( ptr_output_buffer );
+        }
+
+        return;
     }
 
     void TrackJobBaseNew::doSetPtrCParticlesBuffer( TrackJobBaseNew::c_buffer_t*

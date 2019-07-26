@@ -3,7 +3,7 @@
 
 import sys
 import numpy as np
-import pysixtracklib as pyst
+import sixtracklib as pyst
 
 elements = pyst.Elements()
 elements.Drift(length=1.2)

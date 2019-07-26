@@ -73,10 +73,10 @@ option( SIXTRACKL_REQUIRE_OFFLINE_BUILD "Require offline building" OFF )
 
 if( SIXTRACKL_ENABLE_PYTHON )
     option( SIXTRACKL_INSTALL_PYSIXTRACKLIB
-            "Handle pysixtracklib during make install step" OFF )
+            "Handle Python wrapper during make install step" OFF )
 
     option( SIXTRACKL_INTALL_PYSIXTRACKLIB_TEST
-            "Handle pysixtracklib_test during make install step" OFF )
+            "Handle Python sixtracklib_test during make install step" OFF )
 endif()
 
 if( SIXTRACKL_BUILD_EXAMPLES )

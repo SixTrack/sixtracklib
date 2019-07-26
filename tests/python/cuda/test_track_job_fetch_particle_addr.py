@@ -5,14 +5,14 @@ import sys
 import os
 import ctypes as ct
 from cobjects import CBuffer
-import pysixtracklib as pyst
-from pysixtracklib.stcommon import \
+import sixtracklib as pyst
+from sixtracklib.stcommon import \
     st_Particles_p, st_ParticlesAddr_p, \
     st_Particles_buffer_get_particles, st_Particles_get_num_of_particles, \
     st_NullParticles, st_NullParticlesAddr,\
     st_NullBuffer, st_ARCH_STATUS_SUCCESS, st_buffer_size_t
-import pysixtracklib_test as testlib
-from pysixtracklib_test.stcommon import \
+import sixtracklib_test as testlib
+from sixtracklib_test.stcommon import \
     st_TestParticlesAddr_are_addresses_consistent_with_particle
 import pdb
 

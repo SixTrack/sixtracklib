@@ -215,8 +215,8 @@ def track_particle_sixtracklib(
 
     part = pysixtrack.Particles(**partCO)
 
-    import pysixtracklib
-    elements=pysixtracklib.Elements()
+    import sixtracklib
+    elements=sixtracklib.Elements()
     elements.BeamMonitor(num_stores=n_turns)
     elements.append_line(line)
 
@@ -224,7 +224,7 @@ def track_particle_sixtracklib(
 
     # Build PyST particle
 
-    ps = pysixtracklib.ParticlesSet()
+    ps = sixtracklib.ParticlesSet()
     p = ps.Particles(num_particles=n_part)
 
     for i_part in range(n_part):
@@ -245,9 +245,9 @@ def track_particle_sixtracklib(
         p.from_pysixtrack(part, i_part)
 
     if device is None:
-        job = pysixtracklib.TrackJob(elements, ps)
+        job = sixtracklib.TrackJob(elements, ps)
     else:
-        job = pysixtracklib.TrackJob(elements, ps, device=device)
+        job = sixtracklib.TrackJob(elements, ps, device=device)
 
     job.track(n_turns)
     job.collect()

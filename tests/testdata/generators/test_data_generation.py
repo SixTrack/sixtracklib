@@ -13,9 +13,9 @@ import pysixtrack
 # All objects are converted to CObjects stored in a CBuffer I/O buffer
 from cobjects import CBuffer
 
-# pysixtracklib provides the CObject based beam elements and particle types
-import pysixtracklib as pystlib
-from pysixtracklib.particles import Particles
+# sixtracklib provides the CObject based beam elements and particle types
+import sixtracklib as pystlib
+from sixtracklib.particles import Particles
 
 # the path to the input and output folders are provided by the local testdata.py
 import testdata

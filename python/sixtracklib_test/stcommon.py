@@ -3,8 +3,8 @@
 
 import ctypes as ct
 from . import config as stconf
-from pysixtracklib.particles import Particles as st_Particles
-import pysixtracklib.stcommon as pyst
+from sixtracklib.particles import Particles as st_Particles
+import sixtracklib.stcommon as pyst
 
 testlib = ct.CDLL(stconf.SHARED_LIB)
 

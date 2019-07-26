@@ -94,7 +94,7 @@ if( GTEST_FOUND )
 
         set_property( TARGET ${UNIT_TEST_TARGETS}
                       APPEND PROPERTY COMPILE_OPTIONS
-                      ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic )
+                      ${SIXTRACKLIB_CXX_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
     endif()
 endif()
 

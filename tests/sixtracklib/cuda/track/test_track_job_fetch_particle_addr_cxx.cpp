@@ -29,20 +29,12 @@ TEST( CXX_CudaTrackJobFetchParticleAddr, BasicUsage )
     using ctrl_status_t    = track_job_t::status_t;
     using particles_addr_t = track_job_t::particles_addr_t;
     using particles_t      = st::Particles;
-    using real_t           = particles_t::real_t;
-    using pindex_t         = particles_t::index_t;
-    using address_t        = ::NS(buffer_addr_t);
-    using addr_diff_t      = ::NS(buffer_addr_diff_t);
 
     buffer_t eb( ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
     buffer_t pb( ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP ) );
 
     size_t const num_particle_sets = pb.getNumObjects();
-
     size_t const num_avail_nodes = st::CudaTrackJob::NumAvailableNodes();
-
-    address_t const real_size = sizeof( real_t );
-    address_t const idx_size  = sizeof( pindex_t );
 
     if( num_avail_nodes == size_t{ 0 } )
     {
@@ -85,9 +77,9 @@ TEST( CXX_CudaTrackJobFetchParticleAddr, BasicUsage )
 
         ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
         ASSERT_TRUE( track_job.isInDebugMode() );
-        
+
         ASSERT_TRUE( track_job.canFetchParticleAddresses() );
-        
+
         if( !track_job.hasParticleAddresses() )
         {
             status = track_job.fetchParticleAddresses();
@@ -95,9 +87,9 @@ TEST( CXX_CudaTrackJobFetchParticleAddr, BasicUsage )
 
         ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
         ASSERT_TRUE( track_job.hasParticleAddresses() );
-        ASSERT_TRUE( track_job.ptrParticleAddressesBuffer() != nullptr );        
-        
-        size_t const slot_size = 
+        ASSERT_TRUE( track_job.ptrParticleAddressesBuffer() != nullptr );
+
+        size_t const slot_size =
             track_job.ptrParticleAddressesBuffer()->getSlotSize();
 
         for( size_t ii = size_t{ 0 } ; ii < num_particle_sets ; ++ii )
@@ -116,25 +108,25 @@ TEST( CXX_CudaTrackJobFetchParticleAddr, BasicUsage )
             bool const are_consistent =
                 ::NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
                     particles_addr, cmp_particles->getCApiPtr(), slot_size );
-                
+
             ASSERT_TRUE( are_consistent );
         }
-        
-        status = track_job.clearAllParticleAddresses();        
+
+        status = track_job.clearAllParticleAddresses();
         ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
         ASSERT_TRUE( track_job.canFetchParticleAddresses() );
         ASSERT_TRUE( !track_job.hasParticleAddresses() );
-        
+
         status = track_job.disableDebugMode();
-        
+
         ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
         ASSERT_TRUE( !track_job.isInDebugMode() );
-        
+
         status = track_job.fetchParticleAddresses();
-        
+
         ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
         ASSERT_TRUE( track_job.hasParticleAddresses() );
-        
+
         for( size_t ii = size_t{ 0 } ; ii < num_particle_sets ; ++ii )
         {
             particles_t const* cmp_particles = pb.get< particles_t >( ii );
@@ -151,9 +143,9 @@ TEST( CXX_CudaTrackJobFetchParticleAddr, BasicUsage )
             bool const are_consistent =
                 ::NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
                     particles_addr, cmp_particles->getCApiPtr(), slot_size );
-                
+
             ASSERT_TRUE( are_consistent );
-        }        
+        }
     }
 }
 

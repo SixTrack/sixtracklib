@@ -31,14 +31,33 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_CUDA_FINISHED   )
 
     get_property( SIXTRACKL_ENABLED_LANGS GLOBAL PROPERTY ENABLED_LANGUAGES )
 
-    if( SIXTRACKL_ENABLE_CUDA AND
-        NOT ( SIXTRACKL_ENABLED_LANGS MATCHES "CUDA" ) AND
-        NOT ( CUDA_FOUND ) )
+    if( SIXTRACKL_ENABLE_CUDA AND SIXTRACKL_ENABLED_LANGS MATCHES "CUDA" )
+        set( SIXTRACKL_CUDA_INCLUDE_DIRS ${SIXTRACKL_CUDA_INCLUDE_DIRS}
+             ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} )
 
-        find_package( CUDA REQUIRED )
+        if( CMAKE_CUDA_COMPILER_VERSION )
+            set( SIXTRACKL_CUDA_VERSION_STR "${CMAKE_CUDA_COMPILER_VERSION}" )
+        endif()
+
+        find_library( CUDART_LIBRARY cudart
+            ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES} )
+
+        if( CUDART_LIBRARY )
+            set( SIXTRACKL_CUDA_LIBRARIES
+               ${SIXTRACKL_CUDA_LIBRARIES} ${CUDART_LIBRARY} )
+        else()
+            set( SRC_LIB_DIR ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES} )
+            message( WARNING "------ Unable to find libcudart in ${SRC_LIB_DIR}" )
+            unset( SRC_LIB_DIR )
+        endif()
+
+    elseif( SIXTRACKL_ENABLE_CUDA )
+
+        if( NOT CUDA_FOUND )
+            find_package( CUDA REQUIRED )
+        endif()
 
         if( CUDA_FOUND )
-
             set( SIXTRACKL_CUDA_INCLUDE_DIRS ${SIXTRACKL_CUDA_INCLUDE_DIRS}
                  ${CUDA_INCLUDE_DIRS} )
 
@@ -47,10 +66,11 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_CUDA_FINISHED   )
 
             set( SIXTRACKL_CUDA_VERSION_STR ${SIXTRACKL_CUDA_VERSION_STR}
                  ${CUDA_VERSION_STRING} )
-
+        else()
+            message( WARNING "------ Unable to find cuda environment" )
         endif()
-    endif()
 
+    endif()
 endif()
 
 #end: sixtracklib/cmake/SetupOpenCL.cmake

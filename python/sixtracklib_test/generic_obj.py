@@ -52,4 +52,4 @@ class GenericObj(CObject):
         CObject.__init__(self, **kwargs)
 
 
-# end: python/pysixtracklib_test/generic_obj.py
+# end: python/sixtracklib_test/generic_obj.py

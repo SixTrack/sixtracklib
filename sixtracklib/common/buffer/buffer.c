@@ -480,6 +480,12 @@ bool NS(Buffer_read_from_file)(
                 }
             }
         }
+
+        if( fp != SIXTRL_NULLPTR )
+        {
+            fclose( fp );
+            fp = SIXTRL_NULLPTR;
+        }
     }
 
     return success;
@@ -497,14 +503,14 @@ NS(Buffer)* NS(Buffer_new_from_file)(
     {
         FILE* fp = fopen( path_to_file, "rb" );
 
-        if( fp != 0 )
+        if( fp != SIXTRL_NULLPTR )
         {
             long length = ( long )0u;
 
             fseek( fp, 0, SEEK_END );
             length = ftell( fp );
             fclose( fp );
-            fp = 0;
+            fp = SIXTRL_NULLPTR;
 
             if( length > 0 )
             {
@@ -534,6 +540,9 @@ NS(Buffer)* NS(Buffer_new_from_file)(
                 {
                     success = 0;
                 }
+
+                fclose( fp );
+                fp = SIXTRL_NULLPTR;
             }
 
             if( success != 0 )

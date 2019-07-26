@@ -4,8 +4,8 @@
 import importlib
 from importlib import util
 import ctypes as ct
-import pysixtracklib as pyst
-from pysixtracklib import stcommon as st
+import sixtracklib as pyst
+from sixtracklib import stcommon as st
 import pdb
 
 pycuda_spec = util.find_spec('pycuda')
@@ -22,7 +22,7 @@ if numpy_spec is not None:
 
 if __name__ == '__main__':
     if not pyst.supports('cuda'):
-        raise SystemExit("Example requires cuda support in pysixtracklib")
+        raise SystemExit("Example requires cuda support in sixtracklib")
 
     if pycuda_spec is None:
         raise SystemExit("Example requires pycuda installation")
