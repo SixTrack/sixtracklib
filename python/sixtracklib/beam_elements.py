@@ -218,9 +218,25 @@ class SpaceChargeCoasting(CObject):
     size = CField(0, 'uint64', const=True, default=0)
     data = CField(1, 'float64', default=0.0,
                   length='size', pointer=True)
-
+    
     def __init__(self, **kwargs):
-        pass
+        if 'sigma_x' in kwargs:
+            slots = (
+                'line_density',
+                'bunch_length_rms',
+                'sigma_x',
+                'sigma_y',
+                'length',
+                'Delta_x',
+                'Delta_y',
+                'min_sigma_diff',
+                'enabled')
+
+            data = [kwargs[ss] for ss in slots]
+            CObject.__init__(self, size=len(data), data=data, **kwargs)
+        else:
+            CObject.__init__(self, **kwargs)
+
 
 class SpaceChargeBunched(CObject):
     _typeid = 14
@@ -229,7 +245,22 @@ class SpaceChargeBunched(CObject):
                   length='size', pointer=True)
 
     def __init__(self, **kwargs):
-        pass
+        if 'sigma_x' in kwargs:
+            slots = (
+                'number_of_particles',
+                'bunchlength_rms',
+                'sigma_x',
+                'sigma_y',
+                'length',
+                'Delta_x',
+                'Delta_y',
+                'min_sigma_diff',
+                'enabled')
+
+            data = [kwargs[ss] for ss in slots]
+            CObject.__init__(self, size=len(data), data=data, **kwargs)
+        else:
+            CObject.__init__(self, **kwargs)
 
 
 class BeamBeam6D(CObject):
