@@ -94,8 +94,8 @@ def track_particle_sixtrack(
         lines_f13.append('%.10e\n' % ((temp_part.delta)))
         if i_part % 2 == 1:
             lines_f13.append('%.10e\n' % (temp_part.energy0 * 1e-6))
-            lines_f13.append('%.10e\n' % (prev_part.Energy * 1e-6))
-            lines_f13.append('%.10e\n' % (temp_part.Energy * 1e-6))
+            lines_f13.append('%.10e\n' % (prev_part.energy * 1e-6))
+            lines_f13.append('%.10e\n' % (temp_part.energy * 1e-6))
         prev_part = temp_part
 
     with open(wfold + '/fort.13', 'w') as fid:
