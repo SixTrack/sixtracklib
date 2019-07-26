@@ -87,7 +87,7 @@ int main( int argc, char* argv[] )
                   << ii << "\r\n";
 
         /* Print the be with the generic print helper function */
-        ::st_BeamElement_print( be_object );
+        ::st_BeamElement_print_out( be_object );
 
         /* Try to access the stored drift: */
         st::Drift* stored_drift = st::Drift::FromBuffer( eb, ii );
@@ -104,7 +104,7 @@ int main( int argc, char* argv[] )
         std::cout << "after  changing the length of beam belement "
                   << ii << "\r\n";
 
-        st_BeamElement_print( be_object );
+        st_BeamElement_print_out( be_object );
 
         std::cout << "\r\n";
     }

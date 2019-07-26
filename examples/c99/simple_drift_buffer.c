@@ -23,7 +23,7 @@ int main( int argc, char* argv[] )
      * the resulting drift will have default values, i.e. length == 0 */
 
     st_Drift* drift = st_Drift_new( eb );
-    assert( drift  != 0 );
+    assert( drift != SIXTRL_NULLPTR );
 
     st_Drift_set_length( drift, length );
 
@@ -34,7 +34,7 @@ int main( int argc, char* argv[] )
      * the resulting drift will already have the provided length */
 
     drift = st_Drift_add( eb, length );
-    assert( drift != 0 );
+    assert( drift != SIXTRL_NULLPTR );
 
     length += ( double )1.0L;
     ++ii;
@@ -44,7 +44,7 @@ int main( int argc, char* argv[] )
 
     copy_of_drift = st_Drift_add_copy( eb, drift );
 
-    assert( copy_of_drift != 0 );
+    assert( copy_of_drift != SIXTRL_NULLPTR );
     assert( copy_of_drift != drift  );
     assert( memcmp( copy_of_drift, drift, sizeof( st_Drift ) ) == 0 );
 
@@ -58,7 +58,7 @@ int main( int argc, char* argv[] )
     for( ; ii < NUM_BEAM_ELEMENTS ; ++ii, length += ( double )1.0L )
     {
         drift = st_Drift_add( eb, length );
-        assert( drift != 0 );
+        assert( drift != SIXTRL_NULLPTR );
     }
 
     /* print out all existing beam elements using the convenience
@@ -68,7 +68,7 @@ int main( int argc, char* argv[] )
     {
         /* get the ii-th beam element object from the eb buffer */
         st_Object* be_object = st_Buffer_get_object( eb, ii );
-        assert( be_object != 0 );
+        assert( be_object != SIXTRL_NULLPTR );
 
         /* We are about to modify the length of each drift ->
          * print the current drift before we change the length to have
@@ -78,7 +78,7 @@ int main( int argc, char* argv[] )
                 ( int )ii );
 
         /* Print the be with the generic print helper function */
-        st_BeamElement_print( be_object );
+        st_BeamElement_print_out( be_object );
 
         /* We can get access to actual stored object if we know which type
          * it represents. In our case, that's easy - all stored objects are
@@ -116,7 +116,7 @@ int main( int argc, char* argv[] )
         printf( "after  changing the length of beam belement %d\r\n",
                 ( int )ii );
 
-        st_BeamElement_print( be_object );
+        st_BeamElement_print_out( be_object );
 
         printf( "\r\n" );
     }
