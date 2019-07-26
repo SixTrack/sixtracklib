@@ -470,7 +470,7 @@ SIXTRL_INLINE void NS(BeamElement_print_out)(
                 ptr_to_belem_t beam_element =
                     ( ptr_to_belem_t )( uintptr_t )addr;
 
-                NS(BeamMonitor_print)( beam_element );
+                NS(BeamMonitor_print_out)( beam_element );
                 break;
             }
 
@@ -653,7 +653,7 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects)(
 
                     case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
                     {
-                        typedef NS(SpacheChargeBunched) belem_t;
+                        typedef NS(SpaceChargeBunched) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
 
                         compare_value = NS(SpaceChargeBunched_compare_values)(
@@ -877,7 +877,7 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
 
                     case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
                     {
-                        typedef NS(SpacheChargeBunched) belem_t;
+                        typedef NS(SpaceChargeBunched) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
 
                         compare_value = NS(SpaceChargeBunched_compare_values)(

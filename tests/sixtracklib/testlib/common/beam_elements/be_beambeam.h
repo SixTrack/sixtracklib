@@ -13,8 +13,8 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/be_beambeam/be_beambeam.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
+    #include "sixtracklib/common/be_beambeam/be_beambeam.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -126,9 +126,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamBeam6D_print)(
 
 #endif /* !defined( _GPUCODE ) */
 
-SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam6D_print)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT e );
-
 /* ************************************************************************* */
 /* Helper functions */
 
@@ -142,8 +139,8 @@ SIXTRL_INLINE int NS(BeamBeam_compare_values_generic_with_treshold)(
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT lhs_data,
     NS(buffer_size_t) const lhs_size,
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT rhs_data,
-    NS(buffer_size_t) const rhs_size
-    SIXTRL_REAL_T const treshold )
+    NS(buffer_size_t) const rhs_size,
+    SIXTRL_REAL_T const treshold );
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
@@ -218,11 +215,13 @@ SIXTRL_INLINE int NS(BeamBeam_compare_values_generic_with_treshold)(
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT lhs_data,
     NS(buffer_size_t) const lhs_size,
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT rhs_data,
-    NS(buffer_size_t) const rhs_size
+    NS(buffer_size_t) const rhs_size,
     SIXTRL_REAL_T const treshold )
 {
     typedef NS(buffer_size_t) buf_size_t;
     typedef SIXTRL_REAL_T real_t;
+
+    int cmp_value = -1;
 
     if( ( lhs_data != SIXTRL_NULLPTR  ) && ( rhs_data != SIXTRL_NULLPTR ) )
     {
@@ -511,7 +510,7 @@ SIXTRL_INLINE void NS(BeamBeam6D_print_out)(
 
     #else
 
-    NS(BeamBeam6D_print)( stdout, e );
+    NS(BeamBeam6D_print)( stdout, elem );
 
     #endif /* !defined( _GPUCODE ) */
 }

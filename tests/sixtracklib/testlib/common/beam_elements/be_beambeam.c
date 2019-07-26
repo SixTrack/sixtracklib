@@ -18,7 +18,7 @@ void NS(BeamBeam4D_print)(
     typedef SIXTRL_BE_DATAPTR_DEC NS(BB4D_data)* data_ptr_t;
 
     bb_data_ptr_t data = NS(BeamBeam4D_get_const_data)( e );
-    data_ptr_t bb4ddata = ( NS(BB4D_data_ptr_t) )data;
+    data_ptr_t bb4ddata = ( data_ptr_t )data;
 
     if( ( fp != SIXTRL_NULLPTR ) &&
         ( bb4ddata != SIXTRL_NULLPTR ) )
@@ -52,7 +52,8 @@ void NS(SpaceChargeCoasting_print)(
     SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT e )
 {
     typedef NS(beambeam4d_real_const_ptr_t)  sc_data_ptr_t;
-    sc_data_ptr_t data = NS(SpaceChargeBunched_get_const_data)( e );
+    sc_data_ptr_t data =
+        ( sc_data_ptr_t )NS(SpaceChargeCoasting_get_const_data)( e );
 
     if( ( data != SIXTRL_NULLPTR ) &&
         ( fp != SIXTRL_NULLPTR ) )
@@ -60,7 +61,7 @@ void NS(SpaceChargeCoasting_print)(
         fprintf( fp, "|sc coasting     | \r\n" );
     }
 
-    return,
+    return;
 }
 
 
@@ -80,7 +81,7 @@ void NS(SpaceChargeBunched_print)(
         fprintf( fp, "|sc bunched      | \r\n" );
     }
 
-    return,
+    return;
 }
 
 
@@ -91,13 +92,11 @@ void NS(BeamBeam6D_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT elem )
 {
-    typedef SIXTRL_REAL_T                           real_t;
-    typedef SIXTRL_BE_DATAPTR_DEC real_t const*     ptr_real_t;
-    typedef NS(beambeam6d_real_const_ptr_t)         bb_data_ptr_t;
-    typedef SIXTRL_BE_DATAPTR_DEC NS(BB6D_data)*    data_ptr_t;
+    typedef SIXTRL_REAL_T                               real_t;
+    typedef SIXTRL_BE_DATAPTR_DEC real_t const*         ptr_real_t;
+    typedef SIXTRL_BE_DATAPTR_DEC NS(BB6D_data) const*  data_ptr_t;
 
-    data_ptr_t data = NS(BeamBeam6D_get_const_data)( elem );
-    NS(BB6D_data_ptr_t) bb6ddata = ( NS(BB6D_data_ptr_t) )data;
+    data_ptr_t bb6ddata = ( data_ptr_t )NS(BeamBeam6D_get_const_data)( elem );
 
     if( ( bb6ddata != SIXTRL_NULLPTR ) && ( bb6ddata->enabled ) &&
         ( fp != SIXTRL_NULLPTR ) )
