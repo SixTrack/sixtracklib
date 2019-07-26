@@ -567,7 +567,7 @@ TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
             for( ; line_it != line_end ; ++line_it )
             {
                 std::cout << "be id = " << std::setw( 6 ) << jj ;
-                NS(BeamElement_print)( line_it );
+                NS(BeamElement_print_out)( line_it );
             }
 
             std::cout << "\r\n"
