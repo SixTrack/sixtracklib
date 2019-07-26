@@ -77,23 +77,26 @@ def track_particle_sixtrack(
 
     lines_f13 = []
 
-    temp_part = pysixtrack.Particles(**partCO)
-
     for i_part in range(n_part):
+        temp_part = pysixtrack.Particles(**partCO)
+        temp_part.x     += Dx_wrt_CO_m[i_part]
+        temp_part.px    += Dpx_wrt_CO_rad[i_part]
+        temp_part.y     += Dy_wrt_CO_m[i_part]
+        temp_part.py    += Dpy_wrt_CO_rad[i_part]
+        temp_part.sigma += Dsigma_wrt_CO_m[i_part]
+        temp_part.delta += Ddelta_wrt_CO[i_part]
 
-        if Ddelta_wrt_CO[i_part] != 0.:
-            raise ValueError('Not implemented!')
-
-        lines_f13.append('%.10e\n' % ((Dx_wrt_CO_m[i_part] + temp_part.x) * 1e3))
-        lines_f13.append('%.10e\n' % ((Dpx_wrt_CO_rad[i_part] + temp_part.px) * temp_part.rpp * 1e3))
-        lines_f13.append('%.10e\n' % ((Dy_wrt_CO_m[i_part] + temp_part.y) * 1e3))
-        lines_f13.append('%.10e\n' % ((Dpy_wrt_CO_rad[i_part] + temp_part.py) * temp_part.rpp * 1e3))
-        lines_f13.append('%.10e\n' % ((Dsigma_wrt_CO_m[i_part] + temp_part.sigma) * 1e3))
-        lines_f13.append('%.10e\n' % ((Ddelta_wrt_CO[i_part] + temp_part.delta)))
+        lines_f13.append('%.10e\n' % ((temp_part.x) * 1e3))
+        lines_f13.append('%.10e\n' % ((temp_part.px) * temp_part.rpp * 1e3))
+        lines_f13.append('%.10e\n' % ((temp_part.y) * 1e3))
+        lines_f13.append('%.10e\n' % ((temp_part.py) * temp_part.rpp * 1e3))
+        lines_f13.append('%.10e\n' % ((temp_part.sigma) * 1e3))
+        lines_f13.append('%.10e\n' % ((temp_part.delta)))
         if i_part % 2 == 1:
             lines_f13.append('%.10e\n' % (temp_part.energy0 * 1e-6))
+            lines_f13.append('%.10e\n' % (prev_part.Energy * 1e-6))
             lines_f13.append('%.10e\n' % (temp_part.Energy * 1e-6))
-            lines_f13.append('%.10e\n' % (temp_part.Energy * 1e-6))
+        prev_part = temp_part
 
     with open(wfold + '/fort.13', 'w') as fid:
         fid.writelines(lines_f13)
