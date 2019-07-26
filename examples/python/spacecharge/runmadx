@@ -1,0 +1,2 @@
+(cd madx; madx mk_sps_thinseq.madx);
+(cd madx; madx track_sps.madx);

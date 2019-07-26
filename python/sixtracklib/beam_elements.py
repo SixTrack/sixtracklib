@@ -348,6 +348,8 @@ class Elements(object):
                      'XYShift': XYShift,
                      'BeamBeam6D': BeamBeam6D,
                      'BeamBeam4D': BeamBeam4D,
+                     'SpaceChargeCoasting': SpaceChargeCoasting,
+                     'SpaceChargeBunched': SpaceChargeBunched,
                      'LimitRect': LimitRect,
                      'LimitEllipse': LimitEllipse,
                      'DipoleEdge': DipoleEdge,
