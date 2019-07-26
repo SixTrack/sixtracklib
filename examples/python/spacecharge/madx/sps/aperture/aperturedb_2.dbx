@@ -1,0 +1,11 @@
+
+!!QD,83,83,circular,3.085,,Ramillon
+ QD,   APERTYPE=ELLIPSE, APERTURE={0.0415,0.0415};
+
+ QDA,  APERTYPE=ELLIPSE, APERTURE={0.0755,0.0455};
+
+!!QF,152,38.3,elliptical,3.085,,Ramillon
+ QF,  APERTYPE=ELLIPSE, APERTURE={0.076,0.01915};
+
+
+return;

@@ -577,7 +577,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Track_all_particles_line_ext)(
     #include "sixtracklib/common/be_dipedge/track.h"
 
     #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-        #include "sixtracklib/common/be_beambeam/track.h"
+        #include "sixtracklib/common/be_beamfields/track.h"
     #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -838,6 +838,28 @@ SIXTRL_INLINE int NS(Track_particle_beam_element_obj_dispatcher)(
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
             ret = NS(Track_particle_beam_beam_4d)( particles, index, belem );
+            break;
+        }
+
+        case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+        {
+            typedef NS(SpaceChargeCoasting)   belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_space_charge_coasting)(
+                particles, index, belem );
+            break;
+        }
+
+        case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
+        {
+            typedef NS(SpaceChargeBunched)   belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_space_charge_bunched)(
+                particles, index, belem );
             break;
         }
 

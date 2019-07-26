@@ -22,7 +22,7 @@ NS(buffer_size_t) NS(DipoleEdge_get_required_num_dataptrs)(
     SIXTRL_BE_ARGPTR_DEC const NS(DipoleEdge) *const SIXTRL_RESTRICT dipedge )
 {
     return NS(DipoleEdge_get_required_num_dataptrs_on_managed_buffer)(
-        NS(Buffer_get_const_data_begin)( buffer ), dipedge, 
+        NS(Buffer_get_const_data_begin)( buffer ), dipedge,
         NS(Buffer_get_slot_size)( buffer ) );
 }
 
@@ -31,15 +31,15 @@ NS(buffer_size_t) NS(DipoleEdge_get_required_num_slots)(
     SIXTRL_BE_ARGPTR_DEC  const NS(DipoleEdge) *const SIXTRL_RESTRICT dipedge )
 {
     return NS(DipoleEdge_get_required_num_slots_on_managed_buffer)(
-        NS(Buffer_get_const_data_begin)( buffer ), dipedge, 
+        NS(Buffer_get_const_data_begin)( buffer ), dipedge,
         NS(Buffer_get_slot_size)( buffer ) );
 }
 
 bool NS(DipoleEdge_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_objects,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_slots,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_dataptrs )
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_dataptrs )
 {
     typedef NS(buffer_size_t)  buf_size_t;
     typedef NS(DipoleEdge) elem_t;
@@ -47,9 +47,9 @@ bool NS(DipoleEdge_can_be_added)(
     buf_size_t const num_dataptrs =
         NS(DipoleEdge_get_required_num_dataptrs)( buffer, SIXTRL_NULLPTR );
 
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
-    
+    SIXTRL_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
+    SIXTRL_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
+
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
     return NS(Buffer_can_add_object)( buffer, sizeof( elem_t ),
@@ -69,9 +69,9 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(DipoleEdge)* NS(DipoleEdge_new)(
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
-    
+
     elem_t temp_obj;
-    
+
     NS(DipoleEdge_preset)( &temp_obj );
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
@@ -94,12 +94,12 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(DipoleEdge)* NS(DipoleEdge_add)(
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
-    
+
     elem_t temp_obj;
-    
+
     NS(DipoleEdge_set_r21)( &temp_obj, r21 );
     NS(DipoleEdge_set_r43)( &temp_obj, r43 );
-    
+
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
     return ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
@@ -121,7 +121,7 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(DipoleEdge)* NS(DipoleEdge_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
-    
+
     SIXTRL_ASSERT( dipedge != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
