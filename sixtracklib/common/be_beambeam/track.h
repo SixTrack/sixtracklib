@@ -3,6 +3,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/track/definitions.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
     #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/particles.h"
@@ -13,14 +14,32 @@ extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 struct NS(BeamBeam4D);
+struct NS(SpaceChargeCoasting);
+struct NS(SpaceChargeBunched);
 struct NS(BeamBeam6D);
 
-SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_beam_4d)(
+SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
+NS(Track_particle_beam_beam_4d)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam4D) *const SIXTRL_RESTRICT bb );
 
-SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_beam_6d)(
+SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
+NS(Track_particle_space_charge_coasting)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index,
+    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeCoasting) *const
+        SIXTRL_RESTRICT sc );
+
+SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
+NS(Track_particle_space_charge_bunched)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index,
+    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeBunched) *const
+        SIXTRL_RESTRICT sc );
+
+SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
+NS(Track_particle_beam_beam_6d)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t)  const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT bb );
@@ -43,27 +62,25 @@ SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_beam_beam_6d)(
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/constants.h"
     #include "sixtracklib/common/particles.h"
-    #include "sixtracklib/common/be_beambeam/be_beambeam4d.h"
-    #include "sixtracklib/common/be_beambeam/be_beambeam6d.h"
+    #include "sixtracklib/common/be_beambeam/be_beambeam.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_INLINE int NS(Track_particle_beam_beam_4d)(
+/* ************************************************************************* */
+/* BeamBeam4D: */
+
+SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_4d)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam4D) *const SIXTRL_RESTRICT bb )
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT bb )
 {
-    typedef NS(beambeam4d_real_const_ptr_t)  bb_data_ptr_t;
-    //typedef SIXTRL_UINT64_T u64_t;
     typedef SIXTRL_REAL_T real_t;
-    typedef SIXTRL_BE_DATAPTR_DEC BB4D_data* BB4D_data_ptr_t;
+    typedef SIXTRL_BE_DATAPTR_DEC NS(BB4D_data)* data_ptr_t;
 
-    bb_data_ptr_t data = NS(BeamBeam4D_get_const_data)( bb );
-
-    BB4D_data_ptr_t bb4ddata = (BB4D_data_ptr_t) data;
+    data_ptr_t bb4ddata = ( data_ptr_t )NS(BeamBeam4D_get_const_data)( bb );
 
     /*
     // Test data transfer
@@ -100,7 +117,7 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_4d)(
         real_t p0c = NS(Particles_get_p0c_value)( particles, particle_index )*SIXTRL_QELEM;
 
         real_t Ex, Ey, Gx, Gy;
-        get_Ex_Ey_Gx_Gy_gauss(x, y, bb4ddata->sigma_x, bb4ddata->sigma_y,
+        NS(get_Ex_Ey_Gx_Gy_gauss)(x, y, bb4ddata->sigma_x, bb4ddata->sigma_y,
                 bb4ddata->min_sigma_diff, 1,
                 &Ex, &Ey, &Gx, &Gy);
 
@@ -112,29 +129,69 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_4d)(
 
         NS(Particles_set_px_value)( particles, particle_index, px );
         NS(Particles_set_py_value)( particles, particle_index, py );
-
-
     }
 
-
-    return 0;
+    return SIXTRL_TRACK_SUCCESS;
 }
 
-SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
+/* ************************************************************************* */
+/* SpaceChargeCoasting: */
+
+SIXTRL_INLINE NS(track_status_t) NS(Track_particle_space_charge_coasting)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT sc )
+{
+//     typedef SIXTRL_REAL_T real_t;
+//     typedef SIXTRL_BE_DATAPTR_DEC NS(SpaceChargeCoasting_data)* data_ptr_t;
+//
+//     data_ptr_t sc_ddata =
+//        ( data_ptr_t )NS(SpaceChargeCoasting_get_const_data)( sc );
+
+
+    ( void )particles;
+    ( void )particle_index;
+    ( void )sc;
+
+    return SIXTRL_TRACK_SUCCESS;
+}
+
+/* ************************************************************************* */
+/* SpaceChargeBunched: */
+
+SIXTRL_INLINE NS(track_status_t) NS(Track_particle_space_charge_bunched)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const particle_index,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeBunched) *const SIXTRL_RESTRICT sc )
+{
+//     typedef SIXTRL_REAL_T real_t;
+//     typedef SIXTRL_BE_DATAPTR_DEC NS(SpaceChargeBunched_data)* data_ptr_t;
+//
+//     data_ptr_t sc_ddata =
+//          ( data_ptr_t )NS(SpaceChargeBunched_get_const_data)( sc );
+
+    ( void )particles;
+    ( void )particle_index;
+    ( void )sc;
+
+    return SIXTRL_TRACK_SUCCESS;
+}
+
+/* ************************************************************************* */
+/* BeamBeam6D: */
+
+SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_6d)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t)  const particle_index,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT bb )
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT bb )
 {
     typedef SIXTRL_REAL_T real_t;
-    typedef NS(beambeam6d_real_const_ptr_t)  bb_data_ptr_t;
-    typedef SIXTRL_BE_DATAPTR_DEC BB6D_data* BB6D_data_ptr_t;
+    typedef SIXTRL_BE_DATAPTR_DEC NS(BB6D_data)* data_ptr_t;
 
     int i_slice;
 
-    bb_data_ptr_t data = NS(BeamBeam6D_get_const_data)( bb );
-
     // Start Gianni's part
-    BB6D_data_ptr_t bb6ddata = (BB6D_data_ptr_t) data;
+    data_ptr_t bb6ddata = ( data_ptr_t )NS(BeamBeam6D_get_const_data)( bb );
 
     SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index )
         == ( NS(particle_index_t) )1 );
@@ -187,8 +244,9 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
         real_t delta_star = delta - bb6ddata->delta_CO;
 
         // Boost coordinates of the weak beam
-        BB6D_boost(&(bb6ddata->parboost), &x_star, &px_star, &y_star, &py_star,
-                    &sigma_star, &delta_star);
+        NS(BeamBeam6D_boost)(
+            &(bb6ddata->parboost), &x_star, &px_star, &y_star, &py_star,
+            &sigma_star, &delta_star);
 
 
         // Synchro beam
@@ -209,7 +267,8 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
             real_t dS_Sig_11_hat_star, dS_Sig_33_hat_star, dS_costheta, dS_sintheta;
 
             // Get strong beam shape at the CP
-            BB6D_propagate_Sigma_matrix(&(bb6ddata->Sigmas_0_star),
+            NS(BeamBeam6D_propagate_Sigma_matrix)(
+                &(bb6ddata->Sigmas_0_star),
                 S, bb6ddata->threshold_singular, 1,
                 &Sig_11_hat_star, &Sig_33_hat_star,
                 &costheta, &sintheta,
@@ -230,7 +289,7 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
 
             // Get transverse fieds
             real_t Ex, Ey, Gx, Gy;
-            get_Ex_Ey_Gx_Gy_gauss(x_bar_hat_star, y_bar_hat_star,
+            NS(get_Ex_Ey_Gx_Gy_gauss)(x_bar_hat_star, y_bar_hat_star,
                 sqrt(Sig_11_hat_star), sqrt(Sig_33_hat_star), bb6ddata->min_sigma_diff, 0,
                 &Ex, &Ey, &Gx, &Gy);
 
@@ -261,8 +320,9 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
         }
 
         // Inverse boost on the coordinates of the weak beam
-        BB6D_inv_boost(&(bb6ddata->parboost), &x_star, &px_star, &y_star, &py_star,
-                    &sigma_star, &delta_star);
+        NS(BeamBeam6D_inv_boost)(
+            &(bb6ddata->parboost), &x_star, &px_star, &y_star, &py_star,
+            &sigma_star, &delta_star);
 
 
         // Go back to original reference frame and remove dipolar effect
@@ -282,8 +342,7 @@ SIXTRL_INLINE int NS(Track_particle_beam_beam_6d)(
         NS(Particles_update_delta_value)( particles, particle_index, delta );
     }
 
-
-    return 0;
+    return SIXTRL_TRACK_SUCCESS;
 }
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )

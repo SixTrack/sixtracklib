@@ -90,9 +90,10 @@ NS(BeamBeam4D_get_required_num_slots)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(BeamBeam4D_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs );
+    NS(buffer_size_t) const data_size,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam4D)*
 NS(BeamBeam4D_new)(
@@ -126,7 +127,7 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam4D_set_data)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* SIXTRL_RESTRICT beam_beam,
     SIXTRL_BE_ARGPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT ptr_data );
 
-SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam4D_set_size)(
+SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam4D_set_data_size)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* SIXTRL_RESTRICT beam_beam,
     NS(buffer_size_t) const data_size );
 
@@ -137,11 +138,6 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam4D_assign_data_ptr)(
 SIXTRL_STATIC SIXTRL_FN int NS(BeamBeam4D_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT source );
-
-
-#if !defined(  _GPUCODE ) && defined( __cplusplus )
-}
-#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 /* ************************************************************************* */
 /* SpaceChargeCoasting: */
@@ -157,6 +153,7 @@ typedef struct NS(SpaceChargeCoasting)
 }
 NS(SpaceChargeCoasting);
 
+/*
 typedef struct
 {
     SIXTRL_REAL_T q_part            SIXTRL_ALIGN( 8 );
@@ -171,6 +168,7 @@ typedef struct
     SIXTRL_REAL_T Dpy_sub           SIXTRL_ALIGN( 8 );
     SIXTRL_INT64_T enabled          SIXTRL_ALIGN( 8 );
 }NS(SpaceChargeCoasting_data);
+*/
 
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(SpaceChargeCoasting_get_required_num_dataptrs_on_managed_buffer)(
@@ -205,9 +203,10 @@ NS(SpaceChargeCoasting_get_required_num_slots)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(SpaceChargeCoasting_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs );
+    NS(buffer_size_t) const data_size,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(SpaceChargeCoasting)*
 NS(SpaceChargeCoasting_new)(
@@ -241,7 +240,7 @@ SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeCoasting_set_data)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT beam_beam,
     SIXTRL_BE_ARGPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT ptr_data );
 
-SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeCoasting_set_size)(
+SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeCoasting_set_data_size)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT beam_beam,
     NS(buffer_size_t) const data_size );
 
@@ -252,19 +251,6 @@ SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeCoasting_assign_data_ptr)(
 SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeCoasting_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT source );
-
-SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeCoasting_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT rhs );
-
-SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeCoasting_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold );
-
-#if !defined(  _GPUCODE ) && defined( __cplusplus )
-}
-#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 /* ************************************************************************* */
 /* SpaceChargeBunched: */
@@ -280,6 +266,7 @@ typedef struct NS(SpaceChargeBunched)
 }
 NS(SpaceChargeBunched);
 
+/*
 typedef struct
 {
     SIXTRL_REAL_T q_part            SIXTRL_ALIGN( 8 );
@@ -294,6 +281,7 @@ typedef struct
     SIXTRL_REAL_T Dpy_sub           SIXTRL_ALIGN( 8 );
     SIXTRL_INT64_T enabled          SIXTRL_ALIGN( 8 );
 }NS(SpaceChargeBunched_data);
+*/
 
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(SpaceChargeBunched_get_required_num_dataptrs_on_managed_buffer)(
@@ -328,9 +316,10 @@ NS(SpaceChargeBunched_get_required_num_slots)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(SpaceChargeBunched_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs );
+    NS(buffer_size_t) const data_size,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(SpaceChargeBunched)*
 NS(SpaceChargeBunched_new)(
@@ -364,7 +353,7 @@ SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeBunched_set_data)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeBunched)* SIXTRL_RESTRICT beam_beam,
     SIXTRL_BE_ARGPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT ptr_data );
 
-SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeBunched_set_size)(
+SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeBunched_set_data_size)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeBunched)* SIXTRL_RESTRICT beam_beam,
     NS(buffer_size_t) const data_size );
 
@@ -376,24 +365,12 @@ SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeBunched_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeBunched)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeBunched) *const SIXTRL_RESTRICT source );
 
-SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeBunched_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeBunched) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeBunched) *const SIXTRL_RESTRICT rhs );
-
-SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeBunched_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeBunched) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeBunched) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold );
-
-#if !defined(  _GPUCODE ) && defined( __cplusplus )
-}
-#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
-
 /* ************************************************************************* */
 /* BeamBeam6D: */
 
-typedef SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T*        NS(beambeam6d_real_ptr_t);
-typedef SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const*  NS(beambeam6d_real_const_ptr_t);
+typedef SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T* NS(beambeam6d_real_ptr_t);
+typedef SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const*
+        NS(beambeam6d_real_const_ptr_t);
 
 typedef struct NS(BeamBeam6D)
 {
@@ -487,9 +464,10 @@ NS(BeamBeam6D_get_required_num_slots)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(BeamBeam6D_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs );
+    NS(buffer_size_t) const data_size,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam6D)*
 NS(BeamBeam6D_new)(
@@ -523,7 +501,7 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam6D_set_data)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* SIXTRL_RESTRICT beam_beam,
     SIXTRL_BE_ARGPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT ptr_data );
 
-SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam6D_set_size)(
+SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam6D_set_data_size)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* SIXTRL_RESTRICT beam_beam,
     NS(buffer_size_t) const data_size );
 
@@ -534,15 +512,6 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam6D_assign_data_ptr)(
 SIXTRL_STATIC SIXTRL_FN int NS(BeamBeam6D_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* SIXTRL_RESTRICT destination,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT source );
-
-SIXTRL_STATIC SIXTRL_FN int NS(BeamBeam6D_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT rhs );
-
-SIXTRL_STATIC SIXTRL_FN int NS(BeamBeam6D_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold );
 
 SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam6D_boost)(
     SIXTRL_BE_DATAPTR_DEC NS(BB6D_boost_data)* data,
@@ -606,9 +575,8 @@ NS(BeamBeam4D_get_required_num_dataptrs_on_managed_buffer)(
 
     buf_size_t num_dataptrs = ( buf_size_t )0u;
 
-    if( ( slot_size > ( buf_size_t )0u ) &&
+    if( ( buffer != SIXTRL_NULLPTR ) && ( slot_size > ( buf_size_t )0u ) &&
         ( beam_beam != SIXTRL_NULLPTR ) &&
-        ( NS(BeamBeam4D_get_const_data)( beam_beam ) != SIXTRL_NULLPTR ) &&
         ( NS(BeamBeam4D_get_data_size)( beam_beam ) > ( buf_size_t )0u ) )
     {
         num_dataptrs = ( buf_size_t )1u;
@@ -627,9 +595,8 @@ NS(BeamBeam4D_get_required_num_slots_on_managed_buffer)(
 
     buf_size_t num_slots = ( buf_size_t )0u;
 
-    if( ( slot_size > ( buf_size_t )0u ) &&
+    if( ( buffer != SIXTRL_NULLPTR ) && ( slot_size > ( buf_size_t )0u ) &&
         ( beam_beam != SIXTRL_NULLPTR ) &&
-        ( NS(BeamBeam4D_get_const_data)( beam_beam ) != SIXTRL_NULLPTR ) &&
         ( NS(BeamBeam4D_get_data_size)( beam_beam ) > ( buf_size_t )0u ) )
     {
         num_slots = NS(ManagedBuffer_get_slot_based_length)(
@@ -642,8 +609,7 @@ NS(BeamBeam4D_get_required_num_slots_on_managed_buffer)(
     return num_slots;
 }
 
-SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)*
-NS(BeamBeam4D_preset)(
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* NS(BeamBeam4D_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* SIXTRL_RESTRICT beam_beam )
 {
     if( beam_beam != SIXTRL_NULLPTR )
@@ -683,8 +649,7 @@ NS(BeamBeam4D_get_const_data)(
     return beam_beam->data;
 }
 
-SIXTRL_INLINE NS(beambeam4d_real_ptr_t)
-NS(BeamBeam4D_get_data)(
+SIXTRL_INLINE NS(beambeam4d_real_ptr_t) NS(BeamBeam4D_get_data)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* SIXTRL_RESTRICT beam_beam )
 {
     return ( NS(beambeam4d_real_ptr_t) )NS(BeamBeam4D_get_const_data)( beam_beam );
@@ -718,7 +683,7 @@ SIXTRL_INLINE void NS(BeamBeam4D_set_data)(
     return;
 }
 
-SIXTRL_INLINE void NS(BeamBeam4D_set_size)(
+SIXTRL_INLINE void NS(BeamBeam4D_set_data_size)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* SIXTRL_RESTRICT beam_beam,
     NS(buffer_size_t) const data_size )
 {
@@ -776,9 +741,8 @@ NS(SpaceChargeBunched_get_required_num_dataptrs_on_managed_buffer)(
 
     buf_size_t num_dataptrs = ( buf_size_t )0u;
 
-    if( ( slot_size > ( buf_size_t )0u ) &&
+    if( ( slot_size > ( buf_size_t )0u ) && ( buffer != SIXTRL_NULLPTR ) &&
         ( sc != SIXTRL_NULLPTR ) &&
-        ( NS(SpaceChargeBunched_get_const_data)( sc ) != SIXTRL_NULLPTR ) &&
         ( NS(SpaceChargeBunched_get_data_size)( sc ) > ( buf_size_t )0u ) )
     {
         num_dataptrs = ( buf_size_t )1u;
@@ -797,9 +761,8 @@ NS(SpaceChargeBunched_get_required_num_slots_on_managed_buffer)(
 
     buf_size_t num_slots = ( buf_size_t )0u;
 
-    if( ( slot_size > ( buf_size_t )0u ) &&
+    if( ( slot_size > ( buf_size_t )0u ) && ( buffer != SIXTRL_NULLPTR ) &&
         ( sc != SIXTRL_NULLPTR ) &&
-        ( NS(SpaceChargeBunched_get_const_data)( sc ) != SIXTRL_NULLPTR ) &&
         ( NS(SpaceChargeBunched_get_data_size)( sc ) > ( buf_size_t )0u ) )
     {
         num_slots = NS(ManagedBuffer_get_slot_based_length)(
@@ -888,7 +851,7 @@ SIXTRL_INLINE void NS(SpaceChargeBunched_set_data)(
     return;
 }
 
-SIXTRL_INLINE void NS(SpaceChargeBunched_set_size)(
+SIXTRL_INLINE void NS(SpaceChargeBunched_set_data_size)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeBunched)* SIXTRL_RESTRICT sc,
     NS(buffer_size_t) const data_size )
 {
@@ -933,126 +896,6 @@ SIXTRL_INLINE int NS(SpaceChargeBunched_copy)(
     return success;
 }
 
-SIXTRL_INLINE int NS(SpaceChargeBunched_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeBunched) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeBunched) *const SIXTRL_RESTRICT rhs )
-{
-    typedef NS(buffer_size_t)   buf_size_t;
-    typedef SIXTRL_REAL_T       real_t;
-    typedef SIXTRL_BE_DATAPTR_DEC real_t const* ptr_data_t;
-
-    int cmp_value = -1;
-
-    ptr_data_t lhs_data = NS(SpaceChargeBunched_get_const_data)( lhs );
-    ptr_data_t rhs_data = NS(SpaceChargeBunched_get_const_data)( rhs );
-
-    buf_size_t const lhs_size = NS(SpaceChargeBunched_get_data_size)( lhs );
-    buf_size_t const rhs_size = NS(SpaceChargeBunched_get_data_size)( rhs );
-
-    if( ( lhs_data != SIXTRL_NULLPTR  ) && ( rhs_data != SIXTRL_NULLPTR ) )
-    {
-        if( lhs_size == rhs_size )
-        {
-            cmp_value = 0;
-
-            if( ( lhs_size > ( buf_size_t )0u ) && ( lhs_data != rhs_data ) )
-            {
-                buf_size_t ii = ( buf_size_t )0u;
-
-                for( ; ii < lhs_size ; ++ii )
-                {
-                    if( lhs_data[ ii ] > rhs_data[ ii ] )
-                    {
-                        cmp_value = +1;
-                        break;
-                    }
-                    else if( lhs_data[ ii ] < rhs_data[ ii ] )
-                    {
-                        cmp_value = -1;
-                        break;
-                    }
-                }
-            }
-        }
-        else if( lhs_size > rhs_size )
-        {
-            cmp_value = +1;
-        }
-        else if( rhs_size < lhs_size )
-        {
-            cmp_value = -1;
-        }
-    }
-    else if( lhs_data != SIXTRL_NULLPTR )
-    {
-        SIXTRL_ASSERT( ( rhs_data == SIXTRL_NULLPTR ) &&
-                       ( rhs_size == ( buf_size_t )0u ) );
-        cmp_value = +1;
-    }
-
-    return cmp_value;
-}
-
-SIXTRL_INLINE int NS(SpaceChargeBunched_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeBunched) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeBunched) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold )
-{
-    typedef NS(buffer_size_t)   buf_size_t;
-    typedef SIXTRL_REAL_T       real_t;
-    typedef SIXTRL_BE_DATAPTR_DEC real_t const* ptr_data_t;
-
-    int cmp_value = -1;
-
-    ptr_data_t lhs_data = NS(SpaceChargeBunched_get_const_data)( lhs );
-    ptr_data_t rhs_data = NS(SpaceChargeBunched_get_const_data)( rhs );
-
-    buf_size_t const lhs_size = NS(SpaceChargeBunched_get_data_size)( lhs );
-    buf_size_t const rhs_size = NS(SpaceChargeBunched_get_data_size)( rhs );
-
-    if( ( lhs_data != SIXTRL_NULLPTR  ) && ( rhs_data != SIXTRL_NULLPTR ) )
-    {
-        if( lhs_size == rhs_size )
-        {
-            cmp_value = 0;
-
-            if( ( lhs_size > ( buf_size_t )0u ) && ( lhs_data != rhs_data ) )
-            {
-                buf_size_t ii = ( buf_size_t )0u;
-
-                for( ; ii < lhs_size ; ++ii )
-                {
-                    real_t const diff     = lhs_data[ ii ] - rhs_data[ ii ];
-                    real_t const abs_diff = ( diff >= ( real_t )0 )
-                        ? diff : -diff;
-
-                    if( abs_diff > treshold )
-                    {
-                        cmp_value = ( diff > 0 ) ? +1 : -1;
-                        break;
-                    }
-                }
-            }
-        }
-        else if( lhs_size > rhs_size )
-        {
-            cmp_value = +1;
-        }
-        else if( rhs_size < lhs_size )
-        {
-            cmp_value = -1;
-        }
-    }
-    else if( lhs_data != SIXTRL_NULLPTR )
-    {
-        SIXTRL_ASSERT( ( rhs_data == SIXTRL_NULLPTR ) &&
-                       ( rhs_size == ( buf_size_t )0u ) );
-        cmp_value = +1;
-    }
-
-    return cmp_value;
-}
-
 /* ************************************************************************* */
 /* SpaceChargeCoasting: */
 
@@ -1068,11 +911,12 @@ NS(SpaceChargeCoasting_get_required_num_dataptrs_on_managed_buffer)(
 
     if( ( slot_size > ( buf_size_t )0u ) &&
         ( sc != SIXTRL_NULLPTR ) &&
-        ( NS(SpaceChargeCoasting_get_const_data)( sc ) != SIXTRL_NULLPTR ) &&
         ( NS(SpaceChargeCoasting_get_data_size)( sc ) > ( buf_size_t )0u ) )
     {
         num_dataptrs = ( buf_size_t )1u;
     }
+
+    ( void )buffer;
 
     return num_dataptrs;
 }
@@ -1087,9 +931,7 @@ NS(SpaceChargeCoasting_get_required_num_slots_on_managed_buffer)(
 
     buf_size_t num_slots = ( buf_size_t )0u;
 
-    if( ( slot_size > ( buf_size_t )0u ) &&
-        ( sc != SIXTRL_NULLPTR ) &&
-        ( NS(SpaceChargeCoasting_get_const_data)( sc ) != SIXTRL_NULLPTR ) &&
+    if( ( slot_size > ( buf_size_t )0u ) && ( sc != SIXTRL_NULLPTR ) &&
         ( NS(SpaceChargeCoasting_get_data_size)( sc ) > ( buf_size_t )0u ) )
     {
         num_slots = NS(ManagedBuffer_get_slot_based_length)(
@@ -1098,6 +940,8 @@ NS(SpaceChargeCoasting_get_required_num_slots_on_managed_buffer)(
 
         num_slots /= slot_size;
     }
+
+    ( void )buffer;
 
     return num_slots;
 }
@@ -1178,7 +1022,7 @@ SIXTRL_INLINE void NS(SpaceChargeCoasting_set_data)(
     return;
 }
 
-SIXTRL_INLINE void NS(SpaceChargeCoasting_set_size)(
+SIXTRL_INLINE void NS(SpaceChargeCoasting_set_data_size)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT sc,
     NS(buffer_size_t) const data_size )
 {
@@ -1223,126 +1067,6 @@ SIXTRL_INLINE int NS(SpaceChargeCoasting_copy)(
     return success;
 }
 
-SIXTRL_INLINE int NS(SpaceChargeCoasting_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT rhs )
-{
-    typedef NS(buffer_size_t)   buf_size_t;
-    typedef SIXTRL_REAL_T       real_t;
-    typedef SIXTRL_BE_DATAPTR_DEC real_t const* ptr_data_t;
-
-    int cmp_value = -1;
-
-    ptr_data_t lhs_data = NS(SpaceChargeCoasting_get_const_data)( lhs );
-    ptr_data_t rhs_data = NS(SpaceChargeCoasting_get_const_data)( rhs );
-
-    buf_size_t const lhs_size = NS(SpaceChargeCoasting_get_data_size)( lhs );
-    buf_size_t const rhs_size = NS(SpaceChargeCoasting_get_data_size)( rhs );
-
-    if( ( lhs_data != SIXTRL_NULLPTR  ) && ( rhs_data != SIXTRL_NULLPTR ) )
-    {
-        if( lhs_size == rhs_size )
-        {
-            cmp_value = 0;
-
-            if( ( lhs_size > ( buf_size_t )0u ) && ( lhs_data != rhs_data ) )
-            {
-                buf_size_t ii = ( buf_size_t )0u;
-
-                for( ; ii < lhs_size ; ++ii )
-                {
-                    if( lhs_data[ ii ] > rhs_data[ ii ] )
-                    {
-                        cmp_value = +1;
-                        break;
-                    }
-                    else if( lhs_data[ ii ] < rhs_data[ ii ] )
-                    {
-                        cmp_value = -1;
-                        break;
-                    }
-                }
-            }
-        }
-        else if( lhs_size > rhs_size )
-        {
-            cmp_value = +1;
-        }
-        else if( rhs_size < lhs_size )
-        {
-            cmp_value = -1;
-        }
-    }
-    else if( lhs_data != SIXTRL_NULLPTR )
-    {
-        SIXTRL_ASSERT( ( rhs_data == SIXTRL_NULLPTR ) &&
-                       ( rhs_size == ( buf_size_t )0u ) );
-        cmp_value = +1;
-    }
-
-    return cmp_value;
-}
-
-SIXTRL_INLINE int NS(SpaceChargeCoasting_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold )
-{
-    typedef NS(buffer_size_t)   buf_size_t;
-    typedef SIXTRL_REAL_T       real_t;
-    typedef SIXTRL_BE_DATAPTR_DEC real_t const* ptr_data_t;
-
-    int cmp_value = -1;
-
-    ptr_data_t lhs_data = NS(SpaceChargeCoasting_get_const_data)( lhs );
-    ptr_data_t rhs_data = NS(SpaceChargeCoasting_get_const_data)( rhs );
-
-    buf_size_t const lhs_size = NS(SpaceChargeCoasting_get_data_size)( lhs );
-    buf_size_t const rhs_size = NS(SpaceChargeCoasting_get_data_size)( rhs );
-
-    if( ( lhs_data != SIXTRL_NULLPTR  ) && ( rhs_data != SIXTRL_NULLPTR ) )
-    {
-        if( lhs_size == rhs_size )
-        {
-            cmp_value = 0;
-
-            if( ( lhs_size > ( buf_size_t )0u ) && ( lhs_data != rhs_data ) )
-            {
-                buf_size_t ii = ( buf_size_t )0u;
-
-                for( ; ii < lhs_size ; ++ii )
-                {
-                    real_t const diff     = lhs_data[ ii ] - rhs_data[ ii ];
-                    real_t const abs_diff = ( diff >= ( real_t )0 )
-                        ? diff : -diff;
-
-                    if( abs_diff > treshold )
-                    {
-                        cmp_value = ( diff > 0 ) ? +1 : -1;
-                        break;
-                    }
-                }
-            }
-        }
-        else if( lhs_size > rhs_size )
-        {
-            cmp_value = +1;
-        }
-        else if( rhs_size < lhs_size )
-        {
-            cmp_value = -1;
-        }
-    }
-    else if( lhs_data != SIXTRL_NULLPTR )
-    {
-        SIXTRL_ASSERT( ( rhs_data == SIXTRL_NULLPTR ) &&
-                       ( rhs_size == ( buf_size_t )0u ) );
-        cmp_value = +1;
-    }
-
-    return cmp_value;
-}
-
 /* ************************************************************************* */
 /* BeamBeam6D: */
 
@@ -1356,13 +1080,13 @@ NS(BeamBeam6D_get_required_num_dataptrs_on_managed_buffer)(
 
     buf_size_t num_dataptrs = ( buf_size_t )0u;
 
-    if( ( slot_size > ( buf_size_t )0u ) &&
-        ( beam_beam != SIXTRL_NULLPTR ) &&
-        ( NS(BeamBeam6D_get_const_data)( beam_beam ) != SIXTRL_NULLPTR ) &&
+    if( ( slot_size > ( buf_size_t )0u ) && ( beam_beam != SIXTRL_NULLPTR ) &&
         ( NS(BeamBeam6D_get_data_size)( beam_beam ) > ( buf_size_t )0u ) )
     {
         num_dataptrs = ( buf_size_t )1u;
     }
+
+    ( void )buffer;
 
     return num_dataptrs;
 }
@@ -1377,9 +1101,7 @@ NS(BeamBeam6D_get_required_num_slots_on_managed_buffer)(
 
     buf_size_t num_slots = ( buf_size_t )0u;
 
-    if( ( slot_size > ( buf_size_t )0u ) &&
-        ( beam_beam != SIXTRL_NULLPTR ) &&
-        ( NS(BeamBeam6D_get_const_data)( beam_beam ) != SIXTRL_NULLPTR ) &&
+    if( ( slot_size > ( buf_size_t )0u ) && ( beam_beam != SIXTRL_NULLPTR ) &&
         ( NS(BeamBeam6D_get_data_size)( beam_beam ) > ( buf_size_t )0u ) )
     {
         num_slots = NS(ManagedBuffer_get_slot_based_length)(
@@ -1388,6 +1110,8 @@ NS(BeamBeam6D_get_required_num_slots_on_managed_buffer)(
 
         num_slots /= slot_size;
     }
+
+    ( void )buffer;
 
     return num_slots;
 }
@@ -1398,7 +1122,8 @@ NS(BeamBeam6D_preset)(
 {
     if( beam_beam != SIXTRL_NULLPTR )
     {
-        NS(BeamBeam6D_clear)( beam_beam );
+        beam_beam->size = ( NS(buffer_size_t) )0u;
+        beam_beam->data = SIXTRL_NULLPTR;
     }
 
     return beam_beam;
@@ -1645,7 +1370,7 @@ SIXTRL_INLINE void NS(BeamBeam6D_propagate_Sigma_matrix)(
         SIXTRL_REAL_T const c = Sig_14+Sig_23;
         SIXTRL_REAL_T const d = Sig_24;
 
-        SIXTRL_REAL_T const sqrt_a2_c2 = sqrt(a*a+c*c);
+        SIXTRL_REAL_T sqrt_a2_c2 = sqrt(a*a+c*c);
 
         if (sqrt_a2_c2*sqrt_a2_c2*sqrt_a2_c2 < threshold_singular){
         //equivalent to: if np.abs(c)<threshold_singular and np.abs(a)<threshold_singular:
@@ -1753,7 +1478,7 @@ SIXTRL_INLINE void NS(BeamBeam6D_set_data)(
     return;
 }
 
-SIXTRL_INLINE void NS(BeamBeam6D_set_size)(
+SIXTRL_INLINE void NS(BeamBeam6D_set_data_size)(
     SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* SIXTRL_RESTRICT beam_beam,
     NS(buffer_size_t) const data_size )
 {
@@ -1796,126 +1521,6 @@ SIXTRL_INLINE int NS(BeamBeam6D_copy)(
     }
 
     return success;
-}
-
-SIXTRL_INLINE int NS(BeamBeam6D_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT rhs )
-{
-    typedef NS(buffer_size_t)   buf_size_t;
-    typedef SIXTRL_REAL_T       real_t;
-    typedef SIXTRL_BE_DATAPTR_DEC real_t const* ptr_data_t;
-
-    int cmp_value = -1;
-
-    ptr_data_t lhs_data = NS(BeamBeam6D_get_const_data)( lhs );
-    ptr_data_t rhs_data = NS(BeamBeam6D_get_const_data)( rhs );
-
-    buf_size_t const lhs_size = NS(BeamBeam6D_get_data_size)( lhs );
-    buf_size_t const rhs_size = NS(BeamBeam6D_get_data_size)( rhs );
-
-    if( ( lhs_data != SIXTRL_NULLPTR  ) && ( rhs_data != SIXTRL_NULLPTR ) )
-    {
-        if( lhs_size == rhs_size )
-        {
-            cmp_value = 0;
-
-            if( ( lhs_size > ( buf_size_t )0u ) && ( lhs_data != rhs_data ) )
-            {
-                buf_size_t ii = ( buf_size_t )0u;
-
-                for( ; ii < lhs_size ; ++ii )
-                {
-                    if( lhs_data[ ii ] > rhs_data[ ii ] )
-                    {
-                        cmp_value = +1;
-                        break;
-                    }
-                    else if( lhs_data[ ii ] < rhs_data[ ii ] )
-                    {
-                        cmp_value = -1;
-                        break;
-                    }
-                }
-            }
-        }
-        else if( lhs_size > rhs_size )
-        {
-            cmp_value = +1;
-        }
-        else if( rhs_size < lhs_size )
-        {
-            cmp_value = -1;
-        }
-    }
-    else if( lhs_data != SIXTRL_NULLPTR )
-    {
-        SIXTRL_ASSERT( ( rhs_data == SIXTRL_NULLPTR ) &&
-                       ( rhs_size == ( buf_size_t )0u ) );
-        cmp_value = +1;
-    }
-
-    return cmp_value;
-}
-
-SIXTRL_INLINE int NS(BeamBeam6D_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold )
-{
-    typedef NS(buffer_size_t)   buf_size_t;
-    typedef SIXTRL_REAL_T       real_t;
-    typedef SIXTRL_BE_DATAPTR_DEC real_t const* ptr_data_t;
-
-    int cmp_value = -1;
-
-    ptr_data_t lhs_data = NS(BeamBeam6D_get_const_data)( lhs );
-    ptr_data_t rhs_data = NS(BeamBeam6D_get_const_data)( rhs );
-
-    buf_size_t const lhs_size = NS(BeamBeam6D_get_data_size)( lhs );
-    buf_size_t const rhs_size = NS(BeamBeam6D_get_data_size)( rhs );
-
-    if( ( lhs_data != SIXTRL_NULLPTR  ) && ( rhs_data != SIXTRL_NULLPTR ) )
-    {
-        if( lhs_size == rhs_size )
-        {
-            cmp_value = 0;
-
-            if( ( lhs_size > ( buf_size_t )0u ) && ( lhs_data != rhs_data ) )
-            {
-                buf_size_t ii = ( buf_size_t )0u;
-
-                for( ; ii < lhs_size ; ++ii )
-                {
-                    real_t const diff     = lhs_data[ ii ] - rhs_data[ ii ];
-                    real_t const abs_diff = ( diff >= ( real_t )0 )
-                        ? diff : -diff;
-
-                    if( abs_diff > treshold )
-                    {
-                        cmp_value = ( diff > 0 ) ? +1 : -1;
-                        break;
-                    }
-                }
-            }
-        }
-        else if( lhs_size > rhs_size )
-        {
-            cmp_value = +1;
-        }
-        else if( rhs_size < lhs_size )
-        {
-            cmp_value = -1;
-        }
-    }
-    else if( lhs_data != SIXTRL_NULLPTR )
-    {
-        SIXTRL_ASSERT( ( rhs_data == SIXTRL_NULLPTR ) &&
-                       ( rhs_size == ( buf_size_t )0u ) );
-        cmp_value = +1;
-    }
-
-    return cmp_value;
 }
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )

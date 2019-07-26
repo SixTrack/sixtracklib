@@ -1,11 +1,9 @@
 set( SIXTRL_COMMON_BE_BEAMBEAM_SOURCES
-    be_beambeam4d.c
-    be_beambeam6d.c
+    be_beambeam.c
 )
 
 set( SIXTRL_COMMON_BE_BEAMBEAM_HEADERS
-     be_beambeam4d.h
-     be_beambeam6d.h
+     be_beambeam.h
      track.h
      faddeeva_cern.h
      gauss_fields.h
