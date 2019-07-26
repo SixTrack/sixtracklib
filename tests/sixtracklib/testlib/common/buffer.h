@@ -18,6 +18,11 @@ extern "C" {
 
 struct NS(Object);
 
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Buffer_object_print_out_typeid)(
+    NS(object_type_id_t) const type_id );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Buffer_object_typeid_to_string)(
     NS(object_type_id_t) const type_id,
     char* SIXTRL_RESTRICT type_str,
@@ -26,10 +31,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Buffer_object_typeid_to_string)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Buffer_object_print_typeid)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
     NS(object_type_id_t) const type_id );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Buffer_object_print_out_typeid)(
-    NS(object_type_id_t) const type_id );
-
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Buffer_object_print)(
     SIXTRL_ARGPTR_DEC FILE* fp,
@@ -40,6 +41,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Buffer_object_print_out)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const struct NS(Object) *const
         SIXTRL_RESTRICT obj );
 
+#endif /* !defined( _GPUCODE ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }

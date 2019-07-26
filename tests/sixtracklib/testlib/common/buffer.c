@@ -232,7 +232,7 @@ void NS(Buffer_object_print)( SIXTRL_ARGPTR_DEC FILE* fp,
         }
         else
         {
-            NS(BeamElement_fprint)( fp, obj );
+            NS(BeamElement_print)( fp, obj );
         }
     }
 
