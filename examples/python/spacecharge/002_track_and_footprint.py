@@ -1,16 +1,16 @@
+import matplotlib.pyplot as plt
+import footprint
+import example_helpers as hp
+import NAFFlib
+import numpy as np
+import pysixtrack
+import pickle
 import sys
 sys.path.append('../../../NAFFlib/')
 
-import pickle
-import pysixtrack
-import numpy as np
-import NAFFlib
-import example_helpers as hp
-import footprint
-import matplotlib.pyplot as plt
 
 track_with = 'PySixtrack'
-track_with = 'Sixtracklib'
+#track_with = 'Sixtracklib'
 device = '0.0'
 device = None
 
@@ -28,8 +28,8 @@ with open('DpxDpy_for_footprint.pkl', 'rb') as fid:
 xy_norm = temp_data['xy_norm']
 DpxDpy_wrt_CO = temp_data['DpxDpy_wrt_CO']
 
-part = partCO.copy() # pysixtrack.Particles(**partCO)
-part._m = pysixtrack.Particles()._m # to be sorted out later
+part = partCO.copy()  # pysixtrack.Particles(**partCO)
+part._m = pysixtrack.Particles()._m  # to be sorted out later
 part.sigma += 0.05
 
 if track_with == 'PySixtrack':
@@ -48,9 +48,9 @@ elif track_with == 'Sixtracklib':
         Dsigma_wrt_CO_m=0., Ddelta_wrt_CO=0., n_turns=n_turns, device=device)
     info = track_with
     if device is None:
-    	info += ' (CPU)'
+        info += ' (CPU)'
     else:
-    	info += ' (GPU %s)'%device
+        info += ' (GPU %s)' % device
 else:
     raise ValueError('What?!')
 
@@ -89,21 +89,20 @@ Qxy_fp[:, :, 1] = np.reshape(Qy, Qxy_fp[:, :, 1].shape)
 
 plt.close('all')
 
-fig3 = plt.figure(3, figsize=(5,5))
+fig3 = plt.figure(3, figsize=(5, 5))
 axcoord = fig3.add_subplot(1, 1, 1)
-footprint.draw_footprint(xy_norm, axis_object=axcoord, linewidth = 1)
+footprint.draw_footprint(xy_norm, axis_object=axcoord, linewidth=1)
 axcoord.set_xlim(right=np.max(xy_norm[:, :, 0]))
 axcoord.set_ylim(top=np.max(xy_norm[:, :, 1]))
 axcoord.set_xlabel('px (sigma)')
 axcoord.set_ylabel('py (sigma)')
 
-fig4 = plt.figure(4, figsize=(5,5))
+fig4 = plt.figure(4, figsize=(5, 5))
 axFP = fig4.add_subplot(1, 1, 1)
-footprint.draw_footprint(Qxy_fp, axis_object=axFP, linewidth = 1)
+footprint.draw_footprint(Qxy_fp, axis_object=axFP, linewidth=1)
 # fig4.suptitle(info)
 axFP.set_xlabel('Qx')
 axFP.set_ylabel('Qy')
-axFP.set_xlim(0,0.25)
-axFP.set_ylim(0,0.25)
+axFP.set_xlim(0, 0.25)
+axFP.set_ylim(0, 0.25)
 plt.show()
-

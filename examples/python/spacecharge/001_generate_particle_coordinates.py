@@ -18,8 +18,8 @@ with open('line.pkl', 'rb') as fid:
 with open('particle_on_CO.pkl', 'rb') as fid:
     partCO = pysixtrack.Particles.from_dict(pickle.load(fid))
 
-part = partCO.copy() # pysixtrack.Particles(**partCO)
-part._m = pysixtrack.Particles()._m # to be sorted out later
+part = partCO.copy()  # pysixtrack.Particles(**partCO)
+part._m = pysixtrack.Particles()._m  # to be sorted out later
 
 '''
 # get beta functions from tracking
@@ -80,12 +80,13 @@ DpxDpy_wrt_CO = np.zeros_like(xy_norm)
 for ii in range(xy_norm.shape[0]):
     for jj in range(xy_norm.shape[1]):
 
-        DpxDpy_wrt_CO[ii, jj, 0] = xy_norm[ii, jj, 0] * np.sqrt(epsn_x / part.beta0 / part.gamma0 / beta_x)
-        DpxDpy_wrt_CO[ii, jj, 1] = xy_norm[ii, jj, 1] * np.sqrt(epsn_y / part.beta0 / part.gamma0 / beta_y)
+        DpxDpy_wrt_CO[ii, jj, 0] = xy_norm[ii, jj, 0] * \
+            np.sqrt(epsn_x / part.beta0 / part.gamma0 / beta_x)
+        DpxDpy_wrt_CO[ii, jj, 1] = xy_norm[ii, jj, 1] * \
+            np.sqrt(epsn_y / part.beta0 / part.gamma0 / beta_y)
 
 with open('DpxDpy_for_footprint.pkl', 'wb') as fid:
     pickle.dump({
                 'DpxDpy_wrt_CO': DpxDpy_wrt_CO,
                 'xy_norm': xy_norm,
                 }, fid)
-
