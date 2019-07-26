@@ -54,7 +54,7 @@ typedef struct
     SIXTRL_REAL_T Delta_y           SIXTRL_ALIGN( 8 );
     SIXTRL_REAL_T Dpx_sub           SIXTRL_ALIGN( 8 );
     SIXTRL_REAL_T Dpy_sub           SIXTRL_ALIGN( 8 );
-    SIXTRL_INT64_T enabled          SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T enabled           SIXTRL_ALIGN( 8 );
 }NS(BB4D_data);
 
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
@@ -153,22 +153,18 @@ typedef struct NS(SpaceChargeCoasting)
 }
 NS(SpaceChargeCoasting);
 
-/*
 typedef struct
 {
-    SIXTRL_REAL_T q_part            SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T N_part            SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T sigma_x           SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T sigma_y           SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T beta_s            SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T min_sigma_diff    SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T Delta_x           SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T Delta_y           SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T Dpx_sub           SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T Dpy_sub           SIXTRL_ALIGN( 8 );
-    SIXTRL_INT64_T enabled          SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T line_density        SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T sigma_x             SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T sigma_y             SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T length              SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T x_co                SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T y_co                SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T min_sigma_diff      SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T enabled             SIXTRL_ALIGN( 8 );
 }NS(SpaceChargeCoasting_data);
-*/
+
 
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(SpaceChargeCoasting_get_required_num_dataptrs_on_managed_buffer)(
@@ -266,22 +262,19 @@ typedef struct NS(SpaceChargeBunched)
 }
 NS(SpaceChargeBunched);
 
-/*
 typedef struct
 {
-    SIXTRL_REAL_T q_part            SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T N_part            SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T sigma_x           SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T sigma_y           SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T beta_s            SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T min_sigma_diff    SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T Delta_x           SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T Delta_y           SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T Dpx_sub           SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T Dpy_sub           SIXTRL_ALIGN( 8 );
-    SIXTRL_INT64_T enabled          SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T number_of_particles SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T bunchlength_rms     SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T sigma_x             SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T sigma_y             SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T length              SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T x_co                SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T y_co                SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T min_sigma_diff      SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T enabled             SIXTRL_ALIGN( 8 );
 }NS(SpaceChargeBunched_data);
-*/
+
 
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(SpaceChargeBunched_get_required_num_dataptrs_on_managed_buffer)(
@@ -422,7 +415,7 @@ typedef struct{
     SIXTRL_REAL_T Dpy_sub            SIXTRL_ALIGN( 8 );
     SIXTRL_REAL_T Dsigma_sub         SIXTRL_ALIGN( 8 );
     SIXTRL_REAL_T Ddelta_sub         SIXTRL_ALIGN( 8 );
-    SIXTRL_INT64_T enabled           SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T enabled            SIXTRL_ALIGN( 8 );
 
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T* N_part_per_slice   SIXTRL_ALIGN( 8 );
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T* x_slices_star      SIXTRL_ALIGN( 8 );
