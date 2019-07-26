@@ -9,7 +9,7 @@ set( SIXTRL_COMMON_BE_BEAMFIELDS_HEADERS
      gauss_fields.h
 )
 
-add_library( sixtrack_common_be_beambeam OBJECT
+add_library( sixtrack_common_be_beamfields OBJECT
     ${SIXTRL_COMMON_BE_BEAMFIELDS_HEADERS}
     ${SIXTRL_COMMON_BE_BEAMFIELDS_SOURCES}
 )
