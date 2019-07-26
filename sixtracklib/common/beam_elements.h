@@ -119,8 +119,7 @@ SIXTRL_STATIC SIXTRL_FN bool NS(BeamElements_is_beam_elements_buffer)(
     #endif /* !defined( _GPUCODE ) */
 
     #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-        #include "sixtracklib/common/be_beambeam/be_beambeam4d.h"
-        #include "sixtracklib/common/be_beambeam/be_beambeam6d.h"
+        #include "sixtracklib/common/be_beambeam/be_beambeam.h"
     #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM )  */
 
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -160,6 +159,8 @@ SIXTRL_INLINE bool NS(BeamElements_is_beam_element_obj)(
 
             case NS(OBJECT_TYPE_BEAM_BEAM_4D):
             case NS(OBJECT_TYPE_BEAM_BEAM_6D):
+            case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+            case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
             {
                 is_beam_element = true;
                 break;
@@ -337,10 +338,54 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
 
                 ++requ_num_objects;
 
-                requ_num_slots = NS(BeamBeam4D_get_num_slots)(
-                    ptr_begin, slot_size );
+                requ_num_slots =
+                NS(BeamBeam4D_get_required_num_slots_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
 
-                requ_num_dataptrs = NS(BeamBeam4D_get_num_dataptrs)( ptr_begin );
+                requ_num_dataptrs =
+                NS(BeamBeam4D_get_required_num_dataptrs_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
+
+                break;
+            }
+
+            case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+            {
+                typedef NS(SpaceChargeCoasting) beam_element_t;
+                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                ++requ_num_objects;
+
+                requ_num_slots =
+                NS(SpaceChargeCoasting_get_required_num_slots_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
+
+                requ_num_dataptrs =
+                NS(SpaceChargeCoasting_get_required_num_dataptrs_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
+
+                break;
+            }
+
+            case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
+            {
+                typedef NS(SpaceChargeBunched) beam_element_t;
+                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                ++requ_num_objects;
+
+                requ_num_slots =
+                NS(SpaceChargeBunched_get_required_num_slots_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
+
+                requ_num_dataptrs =
+                NS(SpaceChargeBunched_get_required_num_dataptrs_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
+
                 break;
             }
 
@@ -353,10 +398,14 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
 
                 ++requ_num_objects;
 
-                requ_num_slots = NS(BeamBeam6D_get_num_slots)(
-                    ptr_begin, slot_size );
+                requ_num_slots =
+                NS(BeamBeam6D_get_required_num_slots_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
 
-                requ_num_dataptrs = NS(BeamBeam6D_get_num_dataptrs)( ptr_begin );
+                requ_num_dataptrs =
+                NS(BeamBeam6D_get_required_num_dataptrs_on_managed_buffer)(
+                    SIXTRL_NULLPTR, ptr_begin, slot_size );
+
                 break;
             }
 
@@ -399,7 +448,7 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
 
                 break;
             }
-            
+
             case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
             {
                 typedef NS(LimitEllipse) beam_element_t;
@@ -419,7 +468,7 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
 
                 break;
             }
-            
+
             case NS(OBJECT_TYPE_DIPEDGE):
             {
                 typedef NS(DipoleEdge) beam_element_t;
@@ -586,6 +635,32 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
                     break;
                 }
 
+                case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+                {
+                    typedef NS(SpaceChargeCoasting)             belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t*       ptr_dest_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_src_t;
+
+                    success = NS(SpaceChargeCoasting_copy)(
+                        ( ptr_dest_t )( uintptr_t )dest_addr,
+                        ( ptr_src_t  )( uintptr_t )src_addr );
+
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
+                {
+                    typedef NS(SpaceChargeBunched)              belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t*       ptr_dest_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_src_t;
+
+                    success = NS(SpaceChargeBunched_copy)(
+                        ( ptr_dest_t )( uintptr_t )dest_addr,
+                        ( ptr_src_t  )( uintptr_t )src_addr );
+
+                    break;
+                }
+
                 case NS(OBJECT_TYPE_BEAM_BEAM_6D):
                 {
                     typedef NS(BeamBeam6D)                     belem_t;
@@ -626,7 +701,7 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
 
                     break;
                 }
-                
+
                 case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
                 {
                     typedef NS(LimitEllipse) belem_t;
@@ -639,7 +714,7 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
 
                     break;
                 }
-                
+
                 case NS(OBJECT_TYPE_DIPEDGE):
                 {
                     typedef NS(DipoleEdge) belem_t;
@@ -738,6 +813,26 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_object)(
                     break;
                 }
 
+                case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+                {
+                    typedef NS(SpaceChargeCoasting)       belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+
+                    NS(SpaceChargeCoasting_clear)(
+                        ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
+                {
+                    typedef NS(SpaceChargeBunched)       belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+
+                    NS(SpaceChargeBunched_clear)(
+                        ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
                 case NS(OBJECT_TYPE_BEAM_BEAM_6D):
                 {
                     typedef NS(BeamBeam6D)                belem_t;
@@ -761,22 +856,22 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_object)(
                 {
                     typedef NS(LimitRect) belem_t;
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
-                    NS(LimitRect_clear)( 
+                    NS(LimitRect_clear)(
                         ( ptr_belem_t )( uintptr_t )obj_addr );
-                    
+
                     break;
                 }
-                
+
                 case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
                 {
                     typedef NS(LimitEllipse) belem_t;
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
-                    NS(LimitEllipse_clear)( 
+                    NS(LimitEllipse_clear)(
                         ( ptr_belem_t )( uintptr_t )obj_addr );
-                    
+
                     break;
                 }
-                
+
                 case NS(OBJECT_TYPE_DIPEDGE):
                 {
                     typedef NS(DipoleEdge) belem_t;
@@ -951,6 +1046,46 @@ SIXTRL_INLINE int NS(BeamElements_add_single_new_to_buffer)(
                 break;
             }
 
+            case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+            {
+                typedef NS(SpaceChargeCoasting) sc_coasting_t;
+                typedef SIXTRL_BE_ARGPTR_DEC sc_coasting_t const*
+                        ptr_sc_coasting_t;
+
+                ptr_sc_coasting_t ptr_sc_coasting =
+                    ( ptr_sc_coasting_t )( uintptr_t )begin_addr;
+
+                NS(buffer_size_t) const data_size =
+                    NS(SpaceChargeCoasting_get_data_size)( ptr_sc_coasting );
+
+                SIXTRL_ASSERT( ptr_sc_coasting != SIXTRL_NULLPTR );
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(SpaceChargeCoasting_new)( buffer, data_size ) );
+
+                break;
+            }
+
+            case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
+            {
+                typedef NS(SpaceChargeBunched) sc_bunched_t;
+                typedef SIXTRL_BE_ARGPTR_DEC sc_bunched_t const*
+                        ptr_sc_bunched_t;
+
+                ptr_sc_bunched_t ptr_sc_bunched =
+                    ( ptr_sc_bunched_t )( uintptr_t )begin_addr;
+
+                NS(buffer_size_t) const data_size =
+                    NS(SpaceChargeBunched_get_data_size)( ptr_sc_bunched );
+
+                SIXTRL_ASSERT( ptr_sc_bunched != SIXTRL_NULLPTR );
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(SpaceChargeBunched_new)( buffer, data_size ) );
+
+                break;
+            }
+
             case NS(OBJECT_TYPE_BEAM_BEAM_6D):
             {
                 typedef NS(BeamBeam6D)                          beam_beam_t;
@@ -983,13 +1118,13 @@ SIXTRL_INLINE int NS(BeamElements_add_single_new_to_buffer)(
                 success = ( SIXTRL_NULLPTR != NS(LimitRect_new)( buffer ) );
                 break;
             }
-            
+
             case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
             {
                 success = ( SIXTRL_NULLPTR != NS(LimitEllipse_new)( buffer ) );
                 break;
             }
-            
+
             case NS(OBJECT_TYPE_DIPEDGE):
             {
                 success = ( SIXTRL_NULLPTR != NS(DipoleEdge_new)( buffer ) );
@@ -1113,6 +1248,36 @@ SIXTRL_INLINE int NS(BeamElements_copy_single_to_buffer)(
                 break;
             }
 
+            case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+            {
+                typedef NS(SpaceChargeCoasting) sc_coasting_t;
+                typedef SIXTRL_BE_ARGPTR_DEC sc_coasting_t const*
+                        ptr_sc_coasting_t;
+
+                ptr_sc_coasting_t orig =
+                    ( ptr_sc_coasting_t )( uintptr_t )begin_addr;
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(SpaceChargeCoasting_add_copy)( buffer, orig ) );
+
+                break;
+            }
+
+            case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
+            {
+                typedef NS(SpaceChargeBunched) sc_bunched_t;
+                typedef SIXTRL_BE_ARGPTR_DEC sc_bunched_t const*
+                        ptr_sc_bunched_t;
+
+                ptr_sc_bunched_t orig =
+                    ( ptr_sc_bunched_t )( uintptr_t )begin_addr;
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(SpaceChargeBunched_add_copy)( buffer, orig ) );
+
+                break;
+            }
+
             case NS(OBJECT_TYPE_BEAM_BEAM_6D):
             {
                 typedef NS(BeamBeam6D)                          beam_beam_t;
@@ -1152,7 +1317,7 @@ SIXTRL_INLINE int NS(BeamElements_copy_single_to_buffer)(
 
                 break;
             }
-            
+
             case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
             {
                 typedef  NS(LimitEllipse) beam_element_t;
@@ -1165,7 +1330,7 @@ SIXTRL_INLINE int NS(BeamElements_copy_single_to_buffer)(
 
                 break;
             }
-            
+
             case NS(OBJECT_TYPE_DIPEDGE):
             {
                 typedef  NS(DipoleEdge) beam_element_t;
