@@ -213,6 +213,24 @@ class BeamBeam4D(CObject):
         else:
             CObject.__init__(self, **kwargs)
 
+class SpaceChargeCoasting(CObject):
+    _typeid = 13
+    size = CField(0, 'uint64', const=True, default=0)
+    data = CField(1, 'float64', default=0.0,
+                  length='size', pointer=True)
+
+    def __init__(self, **kwargs):
+        pass
+
+class SpaceChargeBunched(CObject):
+    _typeid = 14
+    size = CField(0, 'uint64', const=True, default=0)
+    data = CField(1, 'float64', default=0.0,
+                  length='size', pointer=True)
+
+    def __init__(self, **kwargs):
+        pass
+
 
 class BeamBeam6D(CObject):
     _typeid = 9
