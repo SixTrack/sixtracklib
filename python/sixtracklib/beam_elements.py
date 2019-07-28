@@ -213,6 +213,54 @@ class BeamBeam4D(CObject):
         else:
             CObject.__init__(self, **kwargs)
 
+class SpaceChargeCoasting(CObject):
+    _typeid = 13
+    size = CField(0, 'uint64', const=True, default=0)
+    data = CField(1, 'float64', default=0.0,
+                  length='size', pointer=True)
+    
+    def __init__(self, **kwargs):
+        if 'sigma_x' in kwargs:
+            slots = (
+                'line_density',
+                'sigma_x',
+                'sigma_y',
+                'length',
+                'x_co',
+                'y_co',
+                'min_sigma_diff',
+                'enabled')
+
+            data = [kwargs[ss] for ss in slots]
+            CObject.__init__(self, size=len(data), data=data, **kwargs)
+        else:
+            CObject.__init__(self, **kwargs)
+
+
+class SpaceChargeBunched(CObject):
+    _typeid = 14
+    size = CField(0, 'uint64', const=True, default=0)
+    data = CField(1, 'float64', default=0.0,
+                  length='size', pointer=True)
+
+    def __init__(self, **kwargs):
+        if 'sigma_x' in kwargs:
+            slots = (
+                'number_of_particles',
+                'bunchlength_rms',
+                'sigma_x',
+                'sigma_y',
+                'length',
+                'x_co',
+                'y_co',
+                'min_sigma_diff',
+                'enabled')
+
+            data = [kwargs[ss] for ss in slots]
+            CObject.__init__(self, size=len(data), data=data, **kwargs)
+        else:
+            CObject.__init__(self, **kwargs)
+
 
 class BeamBeam6D(CObject):
     _typeid = 9
@@ -330,6 +378,8 @@ class Elements(object):
                      'XYShift': XYShift,
                      'BeamBeam6D': BeamBeam6D,
                      'BeamBeam4D': BeamBeam4D,
+                     'SpaceChargeCoasting': SpaceChargeCoasting,
+                     'SpaceChargeBunched': SpaceChargeBunched,
                      'LimitRect': LimitRect,
                      'LimitEllipse': LimitEllipse,
                      'DipoleEdge': DipoleEdge,

@@ -1,0 +1,34 @@
+option, -echo;
+! Qh=20.13, QV=20.18 - no qsplit - chromaticity (0.0/0.0)  - SPS units
+! LHC settings 2010 for the Q20 lattice
+
+
+kMBA  :=  8.445141542E-03;
+kMBB  :=  8.445141542E-03;
+
+
+kLSDA  =        -0.040896;
+kLSDB  =  -0.063333733;
+kLSFA  =    0.04516855;
+kLSFB  =   0.026760516;
+kLSFC  := kLSFA;
+
+
+kQD   := -0.01158097147;
+kQDA  :=  kQD*9./11.;
+kQF1  :=  0.01157957644;
+kQF1A :=  kQF1*9./11.;
+kQF2  :=  kQF1;
+kQF2A :=  kQF2*9./11.;
+
+
+kQFC2  =  kQF1;
+kQFC3  =  kQF1;
+kQDC2  =  kQD;
+kQDC3  =  kQD;
+
+
+option, echo;
+
+return;
+

@@ -11,25 +11,27 @@ extern "C" {
 
 typedef enum NS(object_type_values_e)
 {
-    NS(OBJECT_TYPE_NONE)              =          0,
-    NS(OBJECT_TYPE_PARTICLE)          =          1,
-    NS(OBJECT_TYPE_DRIFT)             =          2,
-    NS(OBJECT_TYPE_DRIFT_EXACT)       =          3,
-    NS(OBJECT_TYPE_MULTIPOLE)         =          4,
-    NS(OBJECT_TYPE_CAVITY)            =          5,
-    NS(OBJECT_TYPE_XYSHIFT)           =          6,
-    NS(OBJECT_TYPE_SROTATION)         =          7,
-    NS(OBJECT_TYPE_BEAM_BEAM_4D)      =          8,
-    NS(OBJECT_TYPE_BEAM_BEAM_6D)      =          9,
-    NS(OBJECT_TYPE_BEAM_MONITOR)      =         10,
-    NS(OBJECT_TYPE_LIMIT_RECT)        =         11,
-    NS(OBJECT_TYPE_LIMIT_ELLIPSE)     =         12,
-    NS(OBJECT_TYPE_DIPEDGE)           =         24,
-    NS(OBJECT_TYPE_PARTICLES_ADDR)    =        512,
-    NS(OBJECT_TYPE_LINE)              =       1024,
-    NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) =      65535,
-    NS(OBJECT_TYPE_LAST_AVAILABLE)    =      65535,
-    NS(OBJECT_TYPE_INVALID)           = 0x7fffffff
+    NS(OBJECT_TYPE_NONE)                  =          0,
+    NS(OBJECT_TYPE_PARTICLE)              =          1,
+    NS(OBJECT_TYPE_DRIFT)                 =          2,
+    NS(OBJECT_TYPE_DRIFT_EXACT)           =          3,
+    NS(OBJECT_TYPE_MULTIPOLE)             =          4,
+    NS(OBJECT_TYPE_CAVITY)                =          5,
+    NS(OBJECT_TYPE_XYSHIFT)               =          6,
+    NS(OBJECT_TYPE_SROTATION)             =          7,
+    NS(OBJECT_TYPE_BEAM_BEAM_4D)          =          8,
+    NS(OBJECT_TYPE_BEAM_BEAM_6D)          =          9,
+    NS(OBJECT_TYPE_BEAM_MONITOR)          =         10,
+    NS(OBJECT_TYPE_LIMIT_RECT)            =         11,
+    NS(OBJECT_TYPE_LIMIT_ELLIPSE)         =         12,
+    NS(OBJECT_TYPE_SPACE_CHARGE_COASTING) =         13,
+    NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED)  =         14,
+    NS(OBJECT_TYPE_DIPEDGE)               =         24,
+    NS(OBJECT_TYPE_PARTICLES_ADDR)        =        512,
+    NS(OBJECT_TYPE_LINE)                  =       1024,
+    NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF)     =      65535,
+    NS(OBJECT_TYPE_LAST_AVAILABLE)        =      65535,
+    NS(OBJECT_TYPE_INVALID)               = 0x7fffffff
 }
 NS(object_type_values_t);
 
