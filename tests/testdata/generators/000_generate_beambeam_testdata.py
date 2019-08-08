@@ -13,8 +13,9 @@ from compare import compare
 binary_dump_folder = '../'
 
 tests = [
-    {'name':'lhcbeambeam_from_sixtrack', 'reltol': 1e-8, 'abstol': 1e-11},
+    #{'name':'lhcbeambeam_from_sixtrack', 'reltol': 1e-8, 'abstol': 1e-11},
     {'name':'simplebb_from_sixtrack', 'reltol': 1e-5, 'abstol': 9e-10},
+    {'name':'lhc_no_beambeam_from_sixtrack', 'reltol': 1e-10, 'abstol': 55555e-14},
     ]
 
 for test in tests:
@@ -23,7 +24,6 @@ for test in tests:
     reltol = test['reltol']
     abstol = test['abstol']
     
-    
     # Clean up
     shutil.rmtree(testname+'/res', ignore_errors=True)
     
@@ -31,6 +31,18 @@ for test in tests:
     os.mkdir(testname+'/res')
     for ff in ['fort.2', 'fort.3']:
         shutil.copyfile(testname+'/'+ff, testname+'/res/'+ff)
+    
+    try:
+        shutil.copyfile(testname+'/fort.8', testname+'/res/fort.8')
+    except IOError:
+        print('fort.8 not present')
+
+    try:
+        shutil.copyfile(testname+'/fort.16', testname+'/res/fort.16')
+    except IOError:
+        print('fort.16 not present')
+
+
     # Run sixtrack
     os.system(f"""
     (cd {testname}/res; sixtrack >fort.6)""")
