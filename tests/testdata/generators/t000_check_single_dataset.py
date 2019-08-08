@@ -4,11 +4,24 @@ import cobjects
 
 from compare import compare
 
+binary_folder = '../'
+
 testname = 'lhcbeambeam_from_sixtrack_trackedbypysixtrack'
+reltol = 1e-8; abstol = 1e-11
+
+testname = 'lhcbeambeam_from_sixtrack_trackedbysixtrack'
+reltol = 1e-8; abstol = 1e-11
+
+testname = 'simplebb_from_sixtrack_trackedbypysixtrack'
+reltol = 1e-5; abstol = 9e-10
+
+testname = 'simplebb_from_sixtrack_trackedbysixtrack'
+reltol = 1e-5; abstol = 9e-10
+
 
 # Load testdata
-ebuf = cobjects.CBuffer.fromfile(testname + '_elements.bin')
-pbuf = cobjects.CBuffer.fromfile(testname + '_particles.bin')
+ebuf = cobjects.CBuffer.fromfile(binary_folder + '/' + testname + '_elements.bin')
+pbuf = cobjects.CBuffer.fromfile(binary_folder + '/' + testname + '_particles.bin')
 
 # Build particle for tracking 
 trackbuf = cobjects.CBuffer()
@@ -44,7 +57,7 @@ for ii in range(1, N_part_test):
 
     print("-----------------------")
     print(f"element {ii}")
-    error = compare(ptest, pref_end, pref_start)
+    error = compare(ptest, pref_end, pref_start, reltol, abstol)
     print("-----------------------\n\n")
 
     if error:

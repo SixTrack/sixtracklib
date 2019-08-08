@@ -10,6 +10,8 @@ import sixtracklib
 
 from compare import compare
 
+binary_dump_folder = '../'
+
 tests = [
     {'name':'lhcbeambeam_from_sixtrack', 'reltol': 1e-8, 'abstol': 1e-11},
     {'name':'simplebb_from_sixtrack', 'reltol': 1e-5, 'abstol': 9e-10},
@@ -21,7 +23,6 @@ for test in tests:
     reltol = test['reltol']
     abstol = test['abstol']
     
-    binary_dump_folder = '../'
     
     # Clean up
     shutil.rmtree(testname+'/res', ignore_errors=True)
