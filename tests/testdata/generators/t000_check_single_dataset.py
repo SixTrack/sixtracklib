@@ -9,14 +9,20 @@ binary_folder = '../'
 testname = 'lhcbeambeam_from_sixtrack_trackedbypysixtrack'
 reltol = 1e-8; abstol = 1e-11
 
-testname = 'lhcbeambeam_from_sixtrack_trackedbysixtrack'
-reltol = 1e-8; abstol = 1e-11
+# testname = 'lhcbeambeam_from_sixtrack_trackedbysixtrack'
+# reltol = 1e-8; abstol = 1e-11
 
-testname = 'simplebb_from_sixtrack_trackedbypysixtrack'
-reltol = 1e-5; abstol = 9e-10
+# testname = 'simplebb_from_sixtrack_trackedbypysixtrack'
+# reltol = 1e-5; abstol = 9e-10
 
-testname = 'simplebb_from_sixtrack_trackedbysixtrack'
-reltol = 1e-5; abstol = 9e-10
+# testname = 'simplebb_from_sixtrack_trackedbysixtrack'
+# reltol = 1e-5; abstol = 9e-10
+
+# testname = 'lhc_no_beambeam_from_sixtrack_trackedbypysixtrack'
+# reltol = 1e-10; abstol = 5e-14
+
+# testname = 'lhc_no_beambeam_from_sixtrack_trackedbypysixtrack'
+# reltol = 1e-10; abstol = 5e-14
 
 
 # Load testdata

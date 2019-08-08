@@ -13,7 +13,7 @@ from compare import compare
 binary_dump_folder = '../'
 
 tests = [
-    #{'name':'lhcbeambeam_from_sixtrack', 'reltol': 1e-8, 'abstol': 1e-11},
+    {'name':'lhcbeambeam_from_sixtrack', 'reltol': 1e-8, 'abstol': 1e-11},
     {'name':'simplebb_from_sixtrack', 'reltol': 1e-5, 'abstol': 9e-10},
     {'name':'lhc_no_beambeam_from_sixtrack', 'reltol': 1e-10, 'abstol': 55555e-14},
     ]
