@@ -1,18 +1,34 @@
-import sixtracktools
-import pysixtrack
 import pickle
 import os
-
-os.system('./runsix')
+import shutil
 
 import numpy as np
+
+import pysixtrack
+import sixtracktools
+import sixtracklib
+
+from compare import compare
+
+testname = 'lhcbeambeam_from_sixtrack'
+
+# Clean up
+shutil.rmtree(testname+'/res', ignore_errors=True)
+
+# Prepare for sixtrack run
+os.mkdir(testname+'/res')
+for ff in ['fort.2', 'fort.3']:
+    shutil.copyfile(testname+'/'+ff, testname+'/res/'+ff)
+# Run sixtrack
+os.system(f"""
+(cd {testname}/res; sixtrack >fort.6)""")
 
 ##############
 # Build line #
 ##############
 
 # Read sixtrack input
-sixinput = sixtracktools.SixInput('./sixtrackinput')
+sixinput = sixtracktools.SixInput(testname)
 p0c_eV = sixinput.initialconditions[-3]*1e6
 
 # Build pysixtrack line from sixtrack input
@@ -28,7 +44,7 @@ iconv = other_data['iconv']
 ########################################################
 
 # Load sixtrack tracking data
-sixdump_all = sixtracktools.SixDump101('res/dump3.dat')
+sixdump_all = sixtracktools.SixDump101(testname + '/res/dump3.dat')
 # Assume first particle to be on the closed orbit
 Nele_st = len(iconv)
 sixdump_CO = sixdump_all[::2][:Nele_st]
@@ -56,4 +72,39 @@ line.beambeam_store_closed_orbit_and_dipolar_kicks(
         separation_given_wrt_closed_orbit_6D = True)
 
 
+# Dump line to binary file
+elements=sixtracklib.Elements()
+elements.append_line(line)
+elements.cbuffer.tofile(testname+'_elements.bin')
+
+##########################################################
+# Compare sixtrack against pysixtrack and dump particles #
+##########################################################
+
+sixdump = sixdump_all[1::2]
+
+
+print("")
+for ii in range(1, len(iconv)):
+    jja = iconv[ii-1]
+    jjb = iconv[ii]
+    prun = pysixtrack.Particles(**sixdump[ii-1].get_minimal_beam())
+    pbench_prev = prun.copy()
+    print(f"\n-----sixtrack={ii} sixtracklib={jja} --------------")
+    #print(f"pysixtr {jja}, x={prun.x}, px={prun.px}")
+    for jj in range(jja+1, jjb+1):
+        label = line.element_names[jj]
+        elem = line.elements[jj]
+        pin = prun.copy()
+        elem.track(prun)
+        print(f"{jj} {label},{str(elem)[:50]}")
+    pbench = pysixtrack.Particles(**sixdump[ii].get_minimal_beam())
+    #print(f"sixdump {ii}, x={pbench.x}, px={pbench.px}")
+    print("-----------------------")
+    error = compare(prun, pbench, pbench_prev)
+    print("-----------------------\n\n")
+
+    if error:
+        print('Error detected')
+        break
 
