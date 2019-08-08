@@ -72,30 +72,45 @@ line.beambeam_store_closed_orbit_and_dipolar_kicks(
         separation_given_wrt_closed_orbit_6D = True)
 
 
-# Dump line to binary file
-elements=sixtracklib.Elements()
-elements.append_line(line)
-elements.cbuffer.tofile(testname+'_elements.bin')
-
 ##########################################################
 # Compare sixtrack against pysixtrack and dump particles #
 ##########################################################
 
 sixdump = sixdump_all[1::2]
 
+# Create the two particle sets
+pset_pysixtrack = sixtracklib.ParticlesSet()
+pset_sixtrack = sixtracklib.ParticlesSet()
 
 print("")
 for ii in range(1, len(iconv)):
+    
     jja = iconv[ii-1]
     jjb = iconv[ii]
+    
     prun = pysixtrack.Particles(**sixdump[ii-1].get_minimal_beam())
+   
+    # Some extra info needed by sixtracklib
+    prun.partid = 0
+    prun.state = 1 
+    prun.elemid = 0 
+    prun.turn = 0 
+
+    # Dump sixtrack particle
+    part_sixtrack = pset_sixtrack.Particles(num_particles=1)
+    part_sixtrack.from_pysixtrack(prun, 0)
+    
     pbench_prev = prun.copy()
+    
     print(f"\n-----sixtrack={ii} sixtracklib={jja} --------------")
     #print(f"pysixtr {jja}, x={prun.x}, px={prun.px}")
     for jj in range(jja+1, jjb+1):
         label = line.element_names[jj]
         elem = line.elements[jj]
-        pin = prun.copy()
+        
+        part_pysixtrack = pset_pysixtrack.Particles(num_particles=1)
+        part_pysixtrack.from_pysixtrack(prun, 0)
+        
         elem.track(prun)
         print(f"{jj} {label},{str(elem)[:50]}")
     pbench = pysixtrack.Particles(**sixdump[ii].get_minimal_beam())
@@ -107,4 +122,16 @@ for ii in range(1, len(iconv)):
     if error:
         print('Error detected')
         break
+
+# Build elements buffer
+elements=sixtracklib.Elements()
+elements.append_line(line)
+
+# Dump first test
+elements.cbuffer.tofile(testname+'_trackedbysixtrack_elements.bin')
+pset_sixtrack.cbuffer.tofile(testname+'_trackedbysixtrack_particles.bin')
+
+# Dump second test
+elements.cbuffer.tofile(testname+'_trackedbypysixtrack_elements.bin')
+pset_pysixtrack.cbuffer.tofile(testname+'_trackedbypysixtrack_particles.bin')
 
