@@ -83,6 +83,7 @@ pset_pysixtrack = sixtracklib.ParticlesSet()
 pset_sixtrack = sixtracklib.ParticlesSet()
 
 print("")
+i_ele = 0
 for ii in range(1, len(iconv)):
     
     jja = iconv[ii-1]
@@ -93,7 +94,7 @@ for ii in range(1, len(iconv)):
     # Some extra info needed by sixtracklib
     prun.partid = 0
     prun.state = 1 
-    prun.elemid = 0 
+    prun.elemid = i_ele 
     prun.turn = 0 
 
     # Dump sixtrack particle
@@ -110,8 +111,10 @@ for ii in range(1, len(iconv)):
         
         part_pysixtrack = pset_pysixtrack.Particles(num_particles=1)
         part_pysixtrack.from_pysixtrack(prun, 0)
-        
+
         elem.track(prun)
+        i_ele += 1
+        prun.elemid = i_ele
         print(f"{jj} {label},{str(elem)[:50]}")
     pbench = pysixtrack.Particles(**sixdump[ii].get_minimal_beam())
     #print(f"sixdump {ii}, x={pbench.x}, px={pbench.px}")
