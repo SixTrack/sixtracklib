@@ -4,7 +4,7 @@ import cobjects
 
 from compare import compare
 
-testname = 'lhcbeambeam_from_sixtrack_trackedbypysixtrack'
+testname = 'lhcbeambeam_from_sixtrack_trackedbysixtrack'
 
 # Load testdata
 ebuf = cobjects.CBuffer.fromfile(testname + '_elements.bin')
@@ -17,40 +17,37 @@ sixtracklib.particles.makeCopy(
 ptrack = trackbuf.get_object(0, cls=sixtracklib.Particles)
 
 # Build the job
-job = sixtracklib.TrackJob(ebuf, trackbuf, until_turn_elem_by_elem=1)
-
-# Track and collect
-job.track_elem_by_elem(until_turn=1)
-job.collect()
-
-ebe_outp = job.output_buffer.get_object(
-        job.elem_by_elem_output_offset(), cls=sixtracklib.Particles)
-
+job = sixtracklib.TrackJob(ebuf, trackbuf)
 
 # Comparison
 N_part_test = pbuf.n_objects
-pref = pysixtrack.Particles()
+pref_start = pysixtrack.Particles()
+pref_end = pysixtrack.Particles()
 ptest = pysixtrack.Particles()
-for ii in range(N_part_test):
-    # Copy reference to pref
-    pp = pbuf.get_object(ii, cls=sixtracklib.Particles)
-    eleid = pp.at_element[0]
+for ii in range(1, N_part_test):
     
-    pp.to_pysixtrack(pref, 0)
+    i_ele_start = pbuf.get_object(ii-1, cls=sixtracklib.Particles).at_element
+    i_ele_end = pbuf.get_object(ii, cls=sixtracklib.Particles).at_element
+    
+    # Copy reference to pref
+    pbuf.get_object(ii-1, cls=sixtracklib.Particles).to_pysixtrack(pref_start, 0)
+    pbuf.get_object(ii, cls=sixtracklib.Particles).to_pysixtrack(pref_end, 0)
 
+    job.particles_buffer.get_object(0, cls=sixtracklib.Particles).from_pysixtrack(pref_start, 0)
+    job.particles_buffer.get_object(0, cls=sixtracklib.Particles).at_element[0] = i_ele_start
+    
+    # job.push_particles() # New API to come
+    job.track_line(i_ele_start, i_ele_end)
+    # job.collet_particles() # New API to come
 
-    # Copy job outp to ptest
-    ebe_outp.to_pysixtrack(ptest, eleid)
-
-    if ii == 0:
-        p_prev = pref.copy()
+    job.particles_buffer.get_object(0, cls=sixtracklib.Particles).to_pysixtrack(ptest, 0)
 
     print("-----------------------")
-    error = compare(ptest, pref, p_prev)
+    print(f"element {ii}")
+    error = compare(ptest, pref_end, pref_start)
     print("-----------------------\n\n")
 
     if error:
         print('Error detected')
         break
 
-    p_prev = pref.copy()

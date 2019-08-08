@@ -100,11 +100,16 @@ for ii in range(1, len(iconv)):
     # Dump sixtrack particle
     part_sixtrack = pset_sixtrack.Particles(num_particles=1)
     part_sixtrack.from_pysixtrack(prun, 0)
-    
+
+    if i_ele == 0:
+        part_pysixtrack = pset_pysixtrack.Particles(num_particles=1)
+        part_pysixtrack.from_pysixtrack(prun, 0)
+        i_ele +=1
+
     pbench_prev = prun.copy()
     
     print(f"\n-----sixtrack={ii} sixtracklib={jja} --------------")
-    #print(f"pysixtr {jja}, x={prun.x}, px={prun.px}")
+    print(f"jja: {jja},jjb {jjb}")
     for jj in range(jja+1, jjb+1):
         label = line.element_names[jj]
         elem = line.elements[jj]
@@ -121,21 +126,10 @@ for ii in range(1, len(iconv)):
     print("-----------------------")
     error = compare(prun, pbench, pbench_prev)
     print("-----------------------\n\n")
-
+    
     if error:
         print('Error detected')
         break
-
-for jj in range(jjb, len(line)):
-    label = line.element_names[jj]
-    elem = line.elements[jj]
-    
-    part_pysixtrack = pset_pysixtrack.Particles(num_particles=1)
-    part_pysixtrack.from_pysixtrack(prun, 0)
-    
-    elem.track(prun)
-    i_ele += 1
-    prun.elemid = i_ele
 
 # Build elements buffer
 elements=sixtracklib.Elements()
