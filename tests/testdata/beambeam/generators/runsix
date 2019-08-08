@@ -1,0 +1,5 @@
+#!/bin/bash
+
+test -d res || mkdir res
+cp sixtrackinput/fort.2 sixtrackinput/fort.3 res
+(cd res; sixtrack >fort.6)
