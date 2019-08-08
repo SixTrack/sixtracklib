@@ -4,7 +4,7 @@ import cobjects
 
 from compare import compare
 
-testname = 'lhcbeambeam_from_sixtrack_trackedbysixtrack'
+testname = 'lhcbeambeam_from_sixtrack_trackedbypysixtrack'
 
 # Load testdata
 ebuf = cobjects.CBuffer.fromfile(testname + '_elements.bin')
