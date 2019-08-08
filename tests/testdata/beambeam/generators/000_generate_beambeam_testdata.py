@@ -126,6 +126,17 @@ for ii in range(1, len(iconv)):
         print('Error detected')
         break
 
+for jj in range(jjb, len(line)):
+    label = line.element_names[jj]
+    elem = line.elements[jj]
+    
+    part_pysixtrack = pset_pysixtrack.Particles(num_particles=1)
+    part_pysixtrack.from_pysixtrack(prun, 0)
+    
+    elem.track(prun)
+    i_ele += 1
+    prun.elemid = i_ele
+
 # Build elements buffer
 elements=sixtracklib.Elements()
 elements.append_line(line)
