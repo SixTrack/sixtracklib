@@ -436,6 +436,7 @@ class Elements(object):
     @classmethod
     def from_mad(cls, seq, exact_drift=False):
         # temporary
+        self = cls()
         for label, element_name, element in madseq_to_generator(seq):
             if exact_drift and element_name == 'Drift':
                 element_name = 'DriftExact'
