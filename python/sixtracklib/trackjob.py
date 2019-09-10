@@ -4,6 +4,7 @@
 import ctypes as ct
 import cobjects
 from cobjects import CBuffer, CObject
+import warnings
 
 from . import stcommon as st
 from . import config as stconf
@@ -41,6 +42,8 @@ from .stcommon import st_TrackJobBaseNew_p, st_NullTrackJobBaseNew, \
     st_TrackJobNew_enable_collect_output, st_TrackJobNew_disable_collect_output, \
     st_TrackJobNew_is_collecting_output, st_TrackJobNew_get_collect_flags, \
     st_TrackJobNew_set_collect_flags, st_TrackJobNew_requires_collecting, \
+    st_TrackJobNew_push, st_TrackJobNew_push_particles, \
+    st_TrackJobNew_push_beam_elements, st_TrackJobNew_push_output, \
     st_TrackJobNew_can_fetch_particle_addresses, \
     st_TrackJobNew_has_particle_addresses, \
     st_TrackJobNew_fetch_particle_addresses, \
@@ -507,6 +510,11 @@ class TrackJobBaseNew(object):
         return self
 
     def collectParticles(self):
+        warnings.DepreciationWarning("collectParticles() is depreciated; " +
+                                     "use collect_particles instead")
+        self.collect_particles(self)
+
+    def collect_particles(self):
         assert self._ptr_c_particles_buffer != st_NullBuffer
         assert self._internal_particles_buffer.pointer != st_NullBuffer
 
@@ -537,6 +545,11 @@ class TrackJobBaseNew(object):
         return self
 
     def collectBeamElements(self):
+        warnings.DepreciationWarning("collectBeamElements() is depreciated; " +
+                                     "use collect_beam_elements() instead")
+        self.collect_beam_elements()
+
+    def collect_beam_elements(self):
         self._last_status = st_TrackJobNew_collect_beam_elements(
             self._ptr_track_job)
         raise_error_if_status_not_success(
@@ -566,6 +579,11 @@ class TrackJobBaseNew(object):
         return self
 
     def collectOutput(self):
+        warnings.DeprecationWarning("collectOutput() is depreciated; " +
+                                    "use collect_output instead")
+        self.collect_output()
+
+    def collect_output(self):
         self._last_status = st_TrackJobNew_collect_output(
             self._ptr_track_job)
         raise_error_if_status_not_success(
@@ -593,6 +611,12 @@ class TrackJobBaseNew(object):
         return self
 
     def collectParticlesAddresses(self):
+        warnings.DeprecationWarning(
+            "collectParticleAddresses() is depreciated; " +
+            "use collect_particle_addresses() instead")
+        self.collect_particle_addresses()
+
+    def collect_particle_addresses(self):
         self._last_status = st_TrackJobNew_collect_particles_addresses(
             self._ptr_track_job)
         raise_error_if_status_not_success(
@@ -603,11 +627,59 @@ class TrackJobBaseNew(object):
         return self
 
     def collectDebugFlag(self):
+        warnings.DeprecationWarning("collectDebugFlag() is depreciated; " +
+                                    "use collect_debug_flag() instead")
+        self.collect_debug_flag()
+
+    def collect_debug_flag(self):
         self._last_status = st_TrackJobNew_collect_debug_flag(
             self._ptr_track_job)
         raise_error_if_status_not_success(
             self._last_status,
             "unsuccessful debug flag collection op; status:{0}".format(
+                self._last_status))
+        return self
+
+    # -------------------------------------------------------------------------
+
+    def push(self, flags):
+        ret_flags = flags
+        if flags != 0:
+            ret_flags = st_TrackJobNew_push(self._ptr_track_job,
+                                            ct.c_uint16(flags))
+            if ret_flags != flags:
+                self._last_status = st_ARCH_STATUS_GENERAL_FAILURE
+                raise_error_if_status_not_success(
+                    self._last_status,
+                    "unsuccessful push op; input flags: " +
+                    "{0}, returned flags: {1}".format(
+                        flags,
+                        ret_flags))
+        return self
+
+    def push_particles(self):
+        self._last_status = st_TrackJobNew_push_particles(self._ptr_track_job)
+        raise_error_if_status_not_success(
+            self._last_status,
+            "unsuccessful particles push op; status: {0}".format(
+                self._last_status))
+        return self
+
+    def push_beam_elements(self):
+        self._last_status = st_TrackJobNew_push_beam_elements(
+            self._ptr_track_job)
+        raise_error_if_status_not_success(
+            self._last_status,
+            "unsuccessful beam elements push op; status: {0}".format(
+                self._last_status))
+        return self
+
+    def push_output(self):
+        self._last_status = st_TrackJobNew_push_output(
+            self._ptr_track_job)
+        raise_error_if_status_not_success(
+            self._last_status,
+            "unsuccessful output push op; status: {0}".format(
                 self._last_status))
         return self
 
@@ -870,6 +942,11 @@ class TrackJob(object):
         return self._beam_elements_buffer
 
     def track(self, until_turn):
+        warnings.DeprecationWarning("track(until_turn) is depreciated; " +
+                                    "use track_until(until_turn) instead")
+        return self.track_until(until_turn)
+
+    def track_until(self, until_turn):
         return st.st_TrackJob_track_until(
             self.ptr_st_track_job, ct.c_uint64(until_turn))
 
@@ -887,6 +964,45 @@ class TrackJob(object):
     def collect(self):
         st.st_TrackJob_collect(self.ptr_st_track_job)
         return
+
+    def collect_particles(self):
+        st.st_TrackJob_collect_particles(self.ptr_st_track_job)
+        return
+
+    def collect_beam_elements(self):
+        st.st_TrackJob_collect_beam_elements(self.ptr_st_track_job)
+        return
+
+    def collect_output(self):
+        st.st_TrackJob_collect_output(self.ptr_st_track_job)
+
+    @property
+    def requires_collecting(self):
+        return st.st_TrackJob_requires_collect(self.ptr_st_track_job)
+
+    def push(self, flags):
+        st.st_TrackJob_push(self.ptr_st_track_job, ct.c_uint16(flags))
+        return
+
+    def push_particles(self):
+        st.st_TrackJob_push_particles(self.ptr_st_track_job)
+        return
+
+    def push_beam_elements(self):
+        st.st_TrackJob_push_beam_elements(self.ptr_st_track_job)
+        return
+
+    def push_output(self):
+        st.st_TrackJob_push_output(self.ptr_st_track_job)
+
+    @property
+    def can_fetch_particle_addresses(self):
+        return st.st_TrackJob_can_fetch_particle_addresses(
+            self.ptr_st_track_job)
+
+    @property
+    def has_particle_addresses(self):
+        return st.st_TrackJob_has_particle_addresses(self.ptr_st_track_job)
 
     def type(self):
         return st.st_TrackJob_get_type_id(self.ptr_st_track_job)
