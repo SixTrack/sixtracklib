@@ -25,22 +25,22 @@ def vectorize_all_coords(Dx_wrt_CO_m, Dpx_wrt_CO_rad,
     Ddelta_wrt_CO = Ddelta_wrt_CO + np.zeros(n_part)
 
     return Dx_wrt_CO_m, Dpx_wrt_CO_rad,\
-     Dy_wrt_CO_m, Dpy_wrt_CO_rad,\
-     Dsigma_wrt_CO_m, Ddelta_wrt_CO
+        Dy_wrt_CO_m, Dpy_wrt_CO_rad,\
+        Dsigma_wrt_CO_m, Ddelta_wrt_CO
 
 
 def track_particle_sixtrack(
-                            partCO, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
-                            Dy_wrt_CO_m, Dpy_wrt_CO_rad,
-                            Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns
-                            ):
+    partCO, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
+    Dy_wrt_CO_m, Dpy_wrt_CO_rad,
+    Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns
+):
 
     Dx_wrt_CO_m, Dpx_wrt_CO_rad,\
-    Dy_wrt_CO_m, Dpy_wrt_CO_rad,\
-    Dsigma_wrt_CO_m, Ddelta_wrt_CO = vectorize_all_coords(
-                         Dx_wrt_CO_m, Dpx_wrt_CO_rad,
-                         Dy_wrt_CO_m, Dpy_wrt_CO_rad,
-                         Dsigma_wrt_CO_m, Ddelta_wrt_CO)
+        Dy_wrt_CO_m, Dpy_wrt_CO_rad,\
+        Dsigma_wrt_CO_m, Ddelta_wrt_CO = vectorize_all_coords(
+            Dx_wrt_CO_m, Dpx_wrt_CO_rad,
+            Dy_wrt_CO_m, Dpy_wrt_CO_rad,
+            Dsigma_wrt_CO_m, Ddelta_wrt_CO)
 
     n_part = len(Dx_wrt_CO_m)
 
@@ -79,10 +79,10 @@ def track_particle_sixtrack(
 
     for i_part in range(n_part):
         temp_part = pysixtrack.Particles(**partCO)
-        temp_part.x     += Dx_wrt_CO_m[i_part]
-        temp_part.px    += Dpx_wrt_CO_rad[i_part]
-        temp_part.y     += Dy_wrt_CO_m[i_part]
-        temp_part.py    += Dpy_wrt_CO_rad[i_part]
+        temp_part.x += Dx_wrt_CO_m[i_part]
+        temp_part.px += Dpx_wrt_CO_rad[i_part]
+        temp_part.y += Dy_wrt_CO_m[i_part]
+        temp_part.py += Dpy_wrt_CO_rad[i_part]
         temp_part.sigma += Dsigma_wrt_CO_m[i_part]
         temp_part.delta += Ddelta_wrt_CO[i_part]
 
@@ -155,16 +155,24 @@ def track_particle_sixtrack(
     return x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt
 
 
-def track_particle_pysixtrack(line, part, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
-                              Dy_wrt_CO_m, Dpy_wrt_CO_rad,
-                              Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns, verbose=False):
+def track_particle_pysixtrack(
+        line,
+        part,
+        Dx_wrt_CO_m,
+        Dpx_wrt_CO_rad,
+        Dy_wrt_CO_m,
+        Dpy_wrt_CO_rad,
+        Dsigma_wrt_CO_m,
+        Ddelta_wrt_CO,
+        n_turns,
+        verbose=False):
 
     Dx_wrt_CO_m, Dpx_wrt_CO_rad,\
         Dy_wrt_CO_m, Dpy_wrt_CO_rad,\
         Dsigma_wrt_CO_m, Ddelta_wrt_CO = vectorize_all_coords(
-                             Dx_wrt_CO_m, Dpx_wrt_CO_rad,
-                             Dy_wrt_CO_m, Dpy_wrt_CO_rad,
-                             Dsigma_wrt_CO_m, Ddelta_wrt_CO)
+            Dx_wrt_CO_m, Dpx_wrt_CO_rad,
+            Dy_wrt_CO_m, Dpy_wrt_CO_rad,
+            Dsigma_wrt_CO_m, Ddelta_wrt_CO)
 
     part.x += Dx_wrt_CO_m
     part.px += Dpx_wrt_CO_rad
@@ -202,24 +210,24 @@ def track_particle_pysixtrack(line, part, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
 
     return x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt
 
-def track_particle_sixtracklib(
-                            line, partCO, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
-                            Dy_wrt_CO_m, Dpy_wrt_CO_rad,
-                            Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns,
-                            device=None):
 
+def track_particle_sixtracklib(
+        line, partCO, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
+        Dy_wrt_CO_m, Dpy_wrt_CO_rad,
+        Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns,
+        device=None):
 
     Dx_wrt_CO_m, Dpx_wrt_CO_rad,\
         Dy_wrt_CO_m, Dpy_wrt_CO_rad,\
         Dsigma_wrt_CO_m, Ddelta_wrt_CO = vectorize_all_coords(
-                             Dx_wrt_CO_m, Dpx_wrt_CO_rad,
-                             Dy_wrt_CO_m, Dpy_wrt_CO_rad,
-                             Dsigma_wrt_CO_m, Ddelta_wrt_CO)
+            Dx_wrt_CO_m, Dpx_wrt_CO_rad,
+            Dy_wrt_CO_m, Dpy_wrt_CO_rad,
+            Dsigma_wrt_CO_m, Ddelta_wrt_CO)
 
     part = pysixtrack.Particles(**partCO)
 
     import sixtracklib
-    elements=sixtracklib.Elements()
+    elements = sixtracklib.Elements()
     elements.BeamMonitor(num_stores=n_turns)
     elements.append_line(line)
 
@@ -252,7 +260,7 @@ def track_particle_sixtracklib(
     else:
         job = sixtracklib.TrackJob(elements, ps, device=device)
 
-    job.track(n_turns)
+    job.track_until(n_turns)
     job.collect()
 
     res = job.output
