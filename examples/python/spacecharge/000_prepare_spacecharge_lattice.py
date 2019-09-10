@@ -19,9 +19,9 @@ number_of_particles = 2e11
 bunchlength_rms = 0.22
 
 # For coasting
-line_density = 2e11/0.5
+line_density = 2e11 / 0.5
 
-mass = physical_constants['proton mass energy equivalent in MeV'][0]*1e6
+mass = physical_constants['proton mass energy equivalent in MeV'][0] * 1e6
 p0c = 25.92e9
 neps_x = 2e-6
 neps_y = 2e-6
@@ -73,13 +73,30 @@ bt.check_spacecharge_consistency(
 
 # Setup spacecharge in the line
 if sc_mode == 'Bunched':
-    bt.setup_spacecharge_bunched_in_line(sc_elements, sc_lengths,
-                                         sc_twdata, sc_points, p0c, mass, number_of_particles,
-                                         bunchlength_rms, delta_rms, neps_x, neps_y)
+    bt.setup_spacecharge_bunched_in_line(
+        sc_elements,
+        sc_lengths,
+        sc_twdata,
+        sc_points,
+        p0c,
+        mass,
+        number_of_particles,
+        bunchlength_rms,
+        delta_rms,
+        neps_x,
+        neps_y)
 elif sc_mode == 'Coasting':
-    bt.setup_spacecharge_coasting_in_line(sc_elements, sc_lengths,
-                                          sc_twdata, sc_points, p0c, mass, line_density,
-                                          delta_rms, neps_x, neps_y)
+    bt.setup_spacecharge_coasting_in_line(
+        sc_elements,
+        sc_lengths,
+        sc_twdata,
+        sc_points,
+        p0c,
+        mass,
+        line_density,
+        delta_rms,
+        neps_x,
+        neps_y)
 else:
     raise ValueError('mode not understood')
 # enable RF
@@ -91,8 +108,16 @@ line.elements[i_cavity].lag = lag_RF_deg
 with open('line.pkl', 'wb') as fid:
     pickle.dump(line.to_dict(keepextra=True), fid)
 
-part_on_CO = line.find_closed_orbit(guess=[twtable['x'][0], twtable['px'][0],
-                                           twtable['y'][0], twtable['py'][0], 0., 0.], p0c=p0c, method='get_guess')
+part_on_CO = line.find_closed_orbit(
+    guess=[
+        twtable['x'][0],
+        twtable['px'][0],
+        twtable['y'][0],
+        twtable['py'][0],
+        0.,
+        0.],
+    p0c=p0c,
+    method='get_guess')
 
 # Save particle on CO
 with open('particle_on_CO.pkl', 'wb') as fid:
@@ -110,7 +135,7 @@ if 0:
     plt.close('all')
 
     f, ax = plt.subplots()
-    ax.hist(sc_lengths, bins=np.linspace(0, max(sc_lengths)+0.1, 100))
+    ax.hist(sc_lengths, bins=np.linspace(0, max(sc_lengths) + 0.1, 100))
     ax.set_xlabel('length of SC kick (m)')
     ax.set_ylabel('counts')
     ax.set_xlim(left=0)

@@ -64,10 +64,10 @@ else:
 # Dpy = np.mean(py_tbt*delta_tbt,axis=0)/np.mean(delta_tbt*delta_tbt,axis=0)
 # y_tbt -= Dy*delta_tbt
 # py_tbt -= Dpy*delta_tbt
-Dx = np.mean(x_tbt*delta_tbt)/np.mean(delta_tbt*delta_tbt)
-Dpx = np.mean(px_tbt*delta_tbt)/np.mean(delta_tbt*delta_tbt)
-x_tbt -= Dx*delta_tbt
-px_tbt -= Dpx*delta_tbt
+Dx = np.mean(x_tbt * delta_tbt) / np.mean(delta_tbt * delta_tbt)
+Dpx = np.mean(px_tbt * delta_tbt) / np.mean(delta_tbt * delta_tbt)
+x_tbt -= Dx * delta_tbt
+px_tbt -= Dpx * delta_tbt
 # Dy = np.mean(y_tbt*delta_tbt)/np.mean(delta_tbt*delta_tbt)
 # Dpy = np.mean(py_tbt*delta_tbt)/np.mean(delta_tbt*delta_tbt)
 # y_tbt -= Dy*delta_tbt

@@ -71,9 +71,13 @@ beta_y = twiss_at_start['bety']
 sigmax = np.sqrt(beta_x * epsn_x / part.beta0 / part.gamma0)
 sigmay = np.sqrt(beta_y * epsn_y / part.beta0 / part.gamma0)
 
-xy_norm = footprint.initial_xy_polar(r_min=5e-2, r_max=r_max_sigma, r_N=N_r_footp + 1,
-                                     theta_min=np.pi / 100, theta_max=np.pi / 2 - np.pi / 100,
-                                     theta_N=N_theta_footp)
+xy_norm = footprint.initial_xy_polar(
+    r_min=5e-2,
+    r_max=r_max_sigma,
+    r_N=N_r_footp + 1,
+    theta_min=np.pi / 100,
+    theta_max=np.pi / 2 - np.pi / 100,
+    theta_N=N_theta_footp)
 
 DpxDpy_wrt_CO = np.zeros_like(xy_norm)
 
