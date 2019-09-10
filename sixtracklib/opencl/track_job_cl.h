@@ -53,6 +53,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using type_t                = _base_t::type_t;
         using output_buffer_flag_t  = _base_t::output_buffer_flag_t;
         using collect_flag_t        = _base_t::collect_flag_t;
+        using push_flag_t           = _base_t::push_flag_t;
 
         using cl_arg_t              = SIXTRL_CXX_NAMESPACE::ClArgument;
         using cl_context_t          = SIXTRL_CXX_NAMESPACE::ClContext;
@@ -206,6 +207,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual void doCollect(
             collect_flag_t const flags ) override;
 
+        SIXTRL_HOST_FN virtual void doPush( push_flag_t const flags ) override;
+
         SIXTRL_HOST_FN virtual void doParseConfigStr(
             const char *const SIXTRL_RESTRICT config_str ) override;
 
@@ -279,6 +282,9 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCl& SIXTRL_RESTRICT_REF track_job ) SIXTRL_NOEXCEPT;
 
     SIXTRL_HOST_FN void collect( TrackJobCl& SIXTRL_RESTRICT_REF track_job,
+        track_job_collect_flag_t const flags ) SIXTRL_NOEXCEPT;
+
+    SIXTRL_HOST_FN void push( TrackJobCl& SIXTRL_RESTRICT_REF track_job,
         track_job_collect_flag_t const flags ) SIXTRL_NOEXCEPT;
 
     SIXTRL_HOST_FN TrackJobCl::track_status_t track(
@@ -399,6 +405,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobCl_collect)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJobCl_collect_detailed)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
     NS(track_job_collect_flag_t) const flags );
+
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClContext)*
 NS(TrackJobCl_get_context)( NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
