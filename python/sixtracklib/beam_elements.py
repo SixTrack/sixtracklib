@@ -141,7 +141,7 @@ class Multipole(CObject):
             kwargs["bal"] = bal
             kwargs["order"] = (len(bal) - 2) / 2
 
-        CObject.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
     @property
     def knl(self):
@@ -176,8 +176,7 @@ class SRotation(CObject):
         anglerad = angle / 180 * np.pi
         cos_z = np.cos(anglerad)
         sin_z = np.sin(anglerad)
-        CObject.__init__(self,
-                         cos_z=cos_z, sin_z=sin_z, **nargs)
+        super().__init__(cos_z=cos_z, sin_z=sin_z, **nargs)
 
     @property
     def angle(self):
@@ -209,16 +208,17 @@ class BeamBeam4D(CObject):
                 'enabled')
 
             data = [qe] + [kwargs[ss] for ss in slots]
-            CObject.__init__(self, size=len(data), data=data, **kwargs)
+            super().__init__(size=len(data), data=data, **kwargs)
         else:
-            CObject.__init__(self, **kwargs)
+            super().__init__(**kwargs)
+
 
 class SpaceChargeCoasting(CObject):
     _typeid = 13
     size = CField(0, 'uint64', const=True, default=0)
     data = CField(1, 'float64', default=0.0,
                   length='size', pointer=True)
-    
+
     def __init__(self, **kwargs):
         if 'sigma_x' in kwargs:
             slots = (
@@ -232,9 +232,9 @@ class SpaceChargeCoasting(CObject):
                 'enabled')
 
             data = [kwargs[ss] for ss in slots]
-            CObject.__init__(self, size=len(data), data=data, **kwargs)
+            super().__init__(size=len(data), data=data, **kwargs)
         else:
-            CObject.__init__(self, **kwargs)
+            super().__init__(**kwargs)
 
 
 class SpaceChargeBunched(CObject):
@@ -257,9 +257,9 @@ class SpaceChargeBunched(CObject):
                 'enabled')
 
             data = [kwargs[ss] for ss in slots]
-            CObject.__init__(self, size=len(data), data=data, **kwargs)
+            super().__init__(size=len(data), data=data, **kwargs)
         else:
-            CObject.__init__(self, **kwargs)
+            super().__init__(**kwargs)
 
 
 class BeamBeam6D(CObject):
@@ -308,9 +308,9 @@ class BeamBeam6D(CObject):
                 Ddelta_sub=params['d_delta'],
                 enabled=params['enabled']
             ).tobuffer()
-            CObject.__init__(self, size=len(data), data=data, **kwargs)
+            super().__init__(size=len(data), data=data, **kwargs)
         else:
-            CObject.__init__(self, **kwargs)
+            super().__init__(**kwargs)
 
 
 class LimitRect(CObject):
@@ -320,6 +320,51 @@ class LimitRect(CObject):
     min_y = CField(2, 'float64', default=-1.0, alignment=8)
     max_y = CField(3, 'float64', default=+1.0, alignment=8)
 
+    def __init__(self, min_x=None, max_x=None, min_y=None, max_y=None,
+                 min_coord=-1.0, max_coord=1.0, **kwargs):
+        if min_x is None and min_coord is not None:
+            min_x = min_coord
+        if min_y is None and min_coord is not None:
+            min_y = min_coord
+        if max_x is None and max_coord is not None:
+            max_x = max_coord
+        if max_y is None and max_coord is not None:
+            max_y = max_coord
+
+        if min_x is None:
+            min_x = -1.0
+        if max_x is None:
+            max_x = 1.0
+        if min_y is None:
+            min_y = -1.0
+        if max_y is None:
+            max_y = 1.0
+
+        delta_x = 0.0
+        delta_y = 0.0
+
+        if min_x is not None and max_x is not None:
+            if min_x > max_x:
+                min_x, max_x = max_x, min_x
+            delta_x = max_x - min_x
+
+        if min_y is not None and max_y is not None:
+            if min_y > max_y:
+                min_y, max_y = max_y, min_y
+            delta_y = max_y - min_y
+
+        if delta_x * delta_y > 0.0:
+            super().__init__(min_x=min_x, max_x=max_x,
+                             min_y=min_y, max_y=max_y, **kwargs)
+        else:
+            raise ValueError(
+                "min_x, max_x, min_y, max_y have to delimit " +
+                "a non-vanishing rectangle; values = [{0},{1},{2},{3}]".format(
+                    min_x,
+                    max_x,
+                    min_y,
+                    max_x))
+
 
 class LimitEllipse(CObject):
     _typeid = 12
@@ -328,23 +373,24 @@ class LimitEllipse(CObject):
     a_b_squ = CField(2, 'float64', alignment=8)
 
     def __init__(self, a_squ=None, b_squ=None, **kwargs):
-        if a is not None:
-            a_squ = a * a
-        if b is not None:
-            b_squ = b * b
-
+        if a_squ is None and 'a' in kwargs:
+            a = kwargs.get('a')
+            if a is not None and a > 0.0:
+                a_squ = a * a
         if a_squ is None:
             a_squ = 1.0
+
+        if b_squ is None and 'b' in kwargs:
+            b = kwargs.get('b')
+            if b is not None and b > 0.0:
+                b_squ = b * b
         if b_squ is None:
             b_squ = 1.0
 
-        a_b_squ = None
-        if a_squ is not None and b_squ is not None:
+        if a_squ > 0.0 and b_squ > 0.0:
             a_b_squ = a_squ * b_squ
-
-        if a_b_squ is not None:
-            CObject.__init__(
-                self, a_squ=a_squ, b_squ=b_squ, a_b_squ=a_b_squ, **kwargs)
+            super().__init__(a_squ=a_squ, b_squ=b_squ, a_b_squ=a_squ * b_squ,
+                             **kwargs)
         else:
             raise ValueError("a_squ and b_squ have to be positive definite")
 
@@ -365,7 +411,7 @@ class DipoleEdge(CObject):
 
     def __init__(self, **kwargs):
         # TODO: Implement conversion schemes, if required
-        CObject.__init__(self, *kwargs)
+        super().__init__(**kwargs)
 
 
 class Elements(object):
