@@ -138,7 +138,7 @@ if __name__ == '__main__':
         print("\r\ntracking until turn {0} ... ".format(
             args.until_turn_output))
 
-        status = job.track(args.until_turn_output)
+        status = job.track_until(args.until_turn_output)
         print(status)
         success = bool(status == 0)
 
