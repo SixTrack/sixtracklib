@@ -537,7 +537,7 @@ void NS(TrackJob_set_collect_flags)(
     if( job != nullptr ) job->setCollectFlags( flags );
 }
 
-bool NS(TrackJob_requires_collecting)(
+bool NS(TrackJob_requires_collect)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->requiresCollecting() : false;

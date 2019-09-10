@@ -226,6 +226,33 @@ bool NS(TrackJobNew_requires_collecting)(
 
 /* ------------------------------------------------------------------------- */
 
+::NS(track_job_push_flag_t) NS(TrackJobNew_push)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    ::NS(track_job_push_flag_t) const flag )
+{
+    return ( job != nullptr ) ? job->push( flag ) : st::TRACK_JOB_IO_NONE;
+}
+
+::NS(track_job_push_flag_t) NS(TrackJobNew_push_particles)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->pushParticles() : st::TRACK_JOB_IO_NONE;
+}
+
+::NS(track_job_push_flag_t) NS(TrackJobNew_push_beam_elements)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->pushBeamElements() : st::TRACK_JOB_IO_NONE;
+}
+
+::NS(track_job_push_flag_t) NS(TrackJobNew_push_output)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->pushOutput() : st::TRACK_JOB_IO_NONE;
+}
+
+/* ------------------------------------------------------------------------- */
+
 bool NS(TrackJobNew_can_fetch_particle_addresses)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
