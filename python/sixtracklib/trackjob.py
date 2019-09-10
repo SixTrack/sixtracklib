@@ -510,8 +510,8 @@ class TrackJobBaseNew(object):
         return self
 
     def collectParticles(self):
-        warnings.DepreciationWarning("collectParticles() is depreciated; " +
-                                     "use collect_particles instead")
+        warnings.warn("collectParticles() is depreciated;" +
+                      "use collect_particles instead", DeprecationWarning)
         self.collect_particles(self)
 
     def collect_particles(self):
@@ -545,8 +545,8 @@ class TrackJobBaseNew(object):
         return self
 
     def collectBeamElements(self):
-        warnings.DepreciationWarning("collectBeamElements() is depreciated; " +
-                                     "use collect_beam_elements() instead")
+        warnings.warn("collectBeamElements() is depreciated; " +
+                      "use collect_beam_elements() instead", DeprecationWarning)
         self.collect_beam_elements()
 
     def collect_beam_elements(self):
@@ -579,8 +579,8 @@ class TrackJobBaseNew(object):
         return self
 
     def collectOutput(self):
-        warnings.DeprecationWarning("collectOutput() is depreciated; " +
-                                    "use collect_output instead")
+        warnings.warn("collectOutput() is depreciated; " +
+                      "use collect_output instead", DeprecationWarning)
         self.collect_output()
 
     def collect_output(self):
@@ -611,9 +611,10 @@ class TrackJobBaseNew(object):
         return self
 
     def collectParticlesAddresses(self):
-        warnings.DeprecationWarning(
-            "collectParticleAddresses() is depreciated; " +
-            "use collect_particle_addresses() instead")
+        warnings.warn(
+            "collectParticleAddresses() is depreciated;" +
+            " use collect_particle_addresses() instead",
+            DeprecationWarning)
         self.collect_particle_addresses()
 
     def collect_particle_addresses(self):
@@ -627,8 +628,8 @@ class TrackJobBaseNew(object):
         return self
 
     def collectDebugFlag(self):
-        warnings.DeprecationWarning("collectDebugFlag() is depreciated; " +
-                                    "use collect_debug_flag() instead")
+        warnings.warn("collectDebugFlag() is depreciated; " +
+                      "use collect_debug_flag() instead", DeprecationWarning)
         self.collect_debug_flag()
 
     def collect_debug_flag(self):
@@ -942,8 +943,8 @@ class TrackJob(object):
         return self._beam_elements_buffer
 
     def track(self, until_turn):
-        warnings.DeprecationWarning("track(until_turn) is depreciated; " +
-                                    "use track_until(until_turn) instead")
+        warnings.warn("track(until_turn) is depreciated; " +
+                      "use track_until(until_turn) instead", DeprecationWarning)
         return self.track_until(until_turn)
 
     def track_until(self, until_turn):
