@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
     print("elem by elem tracking finished")
 
-    status = job.track(until_turn)
+    status = job.track_until(until_turn)
     assert(status == 0)
 
     print("tracking finished")

@@ -113,7 +113,7 @@ if __name__ == '__main__':
     status = job.track_elem_by_elem(until_turn_elem_by_elem)
     assert(status == 0)
 
-    status = job.track(until_turn)
+    status = job.track_until(until_turn)
     assert(status == 0)
 
     job.collect()
