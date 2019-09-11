@@ -313,6 +313,10 @@ NS(Buffer_new_on_data)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT data_buffer_begin,
     NS(buffer_size_t) const max_data_buffer_length );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
+NS(Buffer_new_from_copy)( SIXTRL_BUFFER_ARGPTR_DEC const
+    NS(Buffer) *const SIXTRL_RESTRICT original );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Buffer_init_from_data_ext)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT data_buffer_begin,
