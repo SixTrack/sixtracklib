@@ -434,6 +434,14 @@ namespace SIXTRL_CXX_NAMESPACE
             orig.getVoltage(), orig.getFrequency(), orig.getLag() );
     }
 
+    template< typename T > struct ObjectTypeTraits< TCavity< T > >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_CAVITY);
+        }
+    };
+
     /* ===================================================================== *
      * ====  Specialization TCavity< SIXTRL_REAL_T > :
      * ===================================================================== */
@@ -588,6 +596,22 @@ namespace SIXTRL_CXX_NAMESPACE
         return Cavity_add( ptr_buffer,
            orig.getVoltage(), orig.getFrequency(), orig.getLag() );
     }
+
+    template<> struct ObjectTypeTraits< Cavity >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_CAVITY);
+        }
+    };
+
+    template<> struct ObjectTypeTraits< ::NS(Cavity) >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_CAVITY);
+        }
+    };
 }
 
 #endif /* defined( __cplusplus ) */
