@@ -42,6 +42,7 @@ namespace SIXTRL_CXX_NAMESPACE
             this->doParseConfigStrOclImpl(  this->ptrConfigStr() );
         }
 
+        this->doSetRequiresCollectFlag( true );
         this->doSetDeviceIdStr( device_id_str.c_str() );
 
         this->doPrepareContextOclImpl(
@@ -66,6 +67,7 @@ namespace SIXTRL_CXX_NAMESPACE
             this->doParseConfigStrOclImpl(  this->ptrConfigStr() );
         }
 
+        this->doSetRequiresCollectFlag( true );
         this->doSetDeviceIdStr( device_id_str );
         this->doPrepareContextOclImpl( device_id_str, this->ptrConfigStr() );
     }

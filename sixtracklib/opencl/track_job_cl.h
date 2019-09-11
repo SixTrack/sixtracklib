@@ -472,6 +472,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         bool success  = false;
 
+        this->doSetRequiresCollectFlag( true );
+
         if( config_str != nullptr )
         {
             this->doSetConfigStr( config_str );
