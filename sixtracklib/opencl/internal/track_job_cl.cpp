@@ -758,13 +758,14 @@ namespace SIXTRL_CXX_NAMESPACE
         st::track_job_collect_flag_t const flags ) SIXTRL_NOEXCEPT
     {
         namespace st = SIXTRL_CXX_NAMESPACE;
+        bool success = true;
 
          if( ( TrackJobCl::IsCollectFlagSet(
                 flags, st::TRACK_JOB_IO_PARTICLES ) ) &&
             ( job.ptrParticlesArg() != nullptr ) &&
             ( job.ptrCParticlesBuffer() != nullptr ) )
         {
-            job.particlesArg().write( job.ptrCParticlesBuffer() );
+            success &= job.particlesArg().write( job.ptrCParticlesBuffer() );
         }
 
         if( ( TrackJobCl::IsCollectFlagSet(
@@ -772,7 +773,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( job.ptrOutputBufferArg() != nullptr ) &&
             ( job.ptrCOutputBuffer() != nullptr ) )
         {
-            job.outputBufferArg().read( job.ptrCOutputBuffer() );
+            success &= job.outputBufferArg().write( job.ptrCOutputBuffer() );
         }
 
         if( ( TrackJobCl::IsCollectFlagSet(
@@ -780,8 +781,11 @@ namespace SIXTRL_CXX_NAMESPACE
             ( job.ptrBeamElementsArg() != nullptr ) &&
             ( job.ptrCBeamElementsBuffer() != nullptr ) )
         {
-            job.beamElementsArg().read( job.ptrCBeamElementsBuffer() );
+            success &= job.beamElementsArg().write(
+                job.ptrCBeamElementsBuffer() );
         }
+
+        ( void )success;
     }
 
     TrackJobCl::track_status_t track(
