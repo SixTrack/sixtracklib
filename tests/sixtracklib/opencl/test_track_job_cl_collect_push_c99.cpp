@@ -8,9 +8,11 @@
 #include <gtest/gtest.h>
 
 #include "sixtracklib/testlib.h"
+#include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/track_job.h"
 
 TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
 {
@@ -23,9 +25,8 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
     using be_monitor_t       = ::NS(BeamMonitor);
     using limit_rect_t       = ::NS(LimitRect);
     using limit_ellipse_t    = ::NS(LimitEllipse);
-    using node_info_t        = ::NS(node_info_t);
-    using node_id_t          = ::NS(node_id_t);
-    using node_info_iter_t   = ::NS(node_info_t) const*;
+    using node_id_t          = ::NS(context_node_id_t);
+    using node_info_iter_t   = ::NS(context_node_info_t) const*;
     using size_t             = ::NS(buffer_size_t);
     using be_monitor_turn_t  = ::NS(be_monitor_turn_t);
     using be_monitor_addr_t  = ::NS(be_monitor_addr_t);
@@ -44,8 +45,8 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
 
     /* Create particles buffers */
 
-    ::NS(buffer_t) init_eb = ::NS(Buffer_new)( size_t{ 0 } );
-    ::NS(buffer_t) init_pb = ::NS(Buffer_new)( size_t{ 0 } );
+    buffer_t* init_eb = ::NS(Buffer_new)( size_t{ 0 } );
+    buffer_t* init_pb = ::NS(Buffer_new)( size_t{ 0 } );
 
     size_t constexpr NUM_PARTICLES = size_t{ 100 };
 
@@ -98,7 +99,7 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
     bool const e09_monitor_is_rolling = true;
     bool const e09_monitor_is_turn_ordered = false;
 
-    be_monitor_t* e09_monitor = :NS(BeamMonitor_add)( init_eb,
+    be_monitor_t* e09_monitor = ::NS(BeamMonitor_add)( init_eb,
         e09_num_stores, e09_start_turn, e09_skip_turns, out_addr,
         particle_index_t{ 0 }, particle_index_t{ 0 },
         e09_monitor_is_rolling, e09_monitor_is_turn_ordered );
@@ -108,14 +109,22 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
     /* ---------------------------------------------------------------------- */
     /* Prepare device index to device_id_str map */
 
-    cl_context_t context;
-    size_t const num_nodes = context.numAvailableNodes();
+    cl_context_t* context  = ::NS(ClContext_create)();
+    SIXTRL_ASSERT( context != nullptr );
+
+    size_t const num_nodes =
+        ::NS(ClContextBase_get_num_available_nodes)( context );
 
     /* ===================================================================== */
 
-    node_info_iter_t node_it  = context.availableNodesInfoBegin();
-    node_info_iter_t node_end = context.availableNodesInfoEnd();
-    node_id_t default_node_id = context.defaultNodeId();
+    node_info_iter_t node_it  =
+        ::NS(ClContextBase_get_available_nodes_info_begin)( context );
+
+    node_info_iter_t node_end =
+        ::NS(ClContextBase_get_available_nodes_info_end)( context );
+
+    node_id_t default_node_id =
+        ::NS(ClContextBase_get_default_node_id)( context );
 
     for( size_t kk = size_t{ 0 } ; node_it != node_end ; ++node_it, ++kk )
     {
@@ -140,20 +149,20 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
         /* ----------------------------------------------------------------- */
         /* Create per-device copies of the particle and beam elements buffer */
 
-        buffer_t pb( init_pb );
-        particles = pb.get< particles_t >( 0 );
+        buffer_t* pb = ::NS(Buffer_new_from_copy)( init_pb );
+        particles = ::NS(Particles_buffer_get_particles)( pb, 0 );
         SIXTRL_ASSERT( particles != nullptr );
 
-        buffer_t eb( init_eb );
-        e01_drift      = eb.get< drift_t >( 0 );
-        e02_cavity     = eb.get< cavity_t >( 1 );
-        e03_drift      = eb.get< drift_t >( 2 );
-        e04_limit_rect = eb.get< limit_rect_t >( 3 );
-        e05_drift      = eb.get< drift_t >( 4 );
-        e06_monitor    = eb.get< be_monitor_t >( 5 );
-        e07_drift      = eb.get< drift_t >( 6 );
-        e08_limit_ell  = eb.get< limit_ellipse_t >( 7 );
-        e09_monitor    = eb.get< be_monitor_t >( 8 );
+        buffer_t* eb = ::NS(Buffer_new_from_copy)( init_eb );
+        e01_drift  = ::NS(BeamElements_buffer_get_drift)( eb, 0 );
+        e02_cavity = ::NS(BeamElements_buffer_get_cavity)( eb, 1 );
+        e03_drift  = ::NS(BeamElements_buffer_get_drift)( eb, 2 );
+        e04_limit_rect = ::NS(BeamElements_buffer_get_limit_rect)( eb, 3 );
+        e05_drift  = ::NS(BeamElements_buffer_get_drift)( eb, 4 );
+        e06_monitor = ::NS(BeamElements_buffer_get_beam_monitor)( eb, 5 );
+        e07_drift  = ::NS(BeamElements_buffer_get_drift)( eb, 6 );
+        e08_limit_ell = ::NS(BeamElements_buffer_get_limit_ellipse)( eb, 7 );
+        e09_monitor = ::NS(BeamElements_buffer_get_beam_monitor)( eb, 8 );
 
         SIXTRL_ASSERT( e01_drift      != nullptr );
         SIXTRL_ASSERT( e02_cavity     != nullptr );
@@ -165,60 +174,66 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
         SIXTRL_ASSERT( e08_limit_ell  != nullptr );
         SIXTRL_ASSERT( e09_monitor    != nullptr );
 
-        track_job_t  job( device_id_str, pb, eb );
-        ASSERT_TRUE( job.hasOutputBuffer() );
-        ASSERT_TRUE( job.hasBeamMonitorOutput() );
-        ASSERT_TRUE( job.ptrParticlesBuffer() == &pb );
-        ASSERT_TRUE( job.ptrBeamElementsBuffer() == &eb );
-        ASSERT_TRUE( job.ptrOutputBuffer() != nullptr );
+        track_job_t* job = ::NS(TrackJobCl_new)( device_id_str.c_str(), pb, eb );
+        ASSERT_TRUE( job != nullptr );
+        ASSERT_TRUE( ::NS(TrackJob_requires_collect)( job ) );
+        ASSERT_TRUE( ::NS(TrackJob_has_output_buffer)( job ) );
+        ASSERT_TRUE( ::NS(TrackJob_has_beam_monitor_output)( job ) );
+        ASSERT_TRUE( ::NS(TrackJob_get_particles_buffer)( job ) == pb );
+        ASSERT_TRUE( ::NS(TrackJob_get_beam_elements_buffer)( job ) == eb );
+        ASSERT_TRUE( ::NS(TrackJob_get_output_buffer)( job ) != nullptr );
 
-        buffer_t copy_of_eb( eb );
-        SIXTRL_ASSERT( copy_of_eb.getNumObjects() == eb.getNumObjects() );
-        SIXTRL_ASSERT( copy_of_eb.get< drift_t >( 0 ) != nullptr );
-        SIXTRL_ASSERT( copy_of_eb.get< drift_t >( 0 ) != e01_drift );
-        SIXTRL_ASSERT( copy_of_eb.get< cavity_t >( 1 ) != nullptr );
-        SIXTRL_ASSERT( copy_of_eb.get< cavity_t >( 1 ) != e02_cavity );
-        SIXTRL_ASSERT( copy_of_eb.get< drift_t >( 2 ) != nullptr );
-        SIXTRL_ASSERT( copy_of_eb.get< drift_t >( 2 ) != e03_drift );
-        SIXTRL_ASSERT( copy_of_eb.get< limit_rect_t >( 3 ) != nullptr );
-        SIXTRL_ASSERT( copy_of_eb.get< limit_rect_t >( 3 ) != e04_limit_rect );
-        SIXTRL_ASSERT( copy_of_eb.get< drift_t >( 4 ) != nullptr );
-        SIXTRL_ASSERT( copy_of_eb.get< drift_t >( 4 ) != e05_drift );
-        SIXTRL_ASSERT( copy_of_eb.get< be_monitor_t >( 5 ) != nullptr );
-        SIXTRL_ASSERT( copy_of_eb.get< be_monitor_t >( 5 ) != e06_monitor );
+        buffer_t* copy_of_eb = ::NS(Buffer_new_from_copy)( eb );
+        SIXTRL_ASSERT( ::NS(Buffer_get_num_of_objects)( copy_of_eb ) == ::NS(Buffer_get_num_of_objects)( eb ) );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 0 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 0 ) != e01_drift );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) != e02_cavity );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 2 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 2 ) != e03_drift );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) != e04_limit_rect );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 4 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 4 ) != e05_drift );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ) != e06_monitor );
 
-        SIXTRL_ASSERT( copy_of_eb.get< drift_t >( 6 ) != nullptr );
-        SIXTRL_ASSERT( copy_of_eb.get< drift_t >( 6 ) != e07_drift );
-        SIXTRL_ASSERT( copy_of_eb.get< limit_ellipse_t >( 7 ) != nullptr );
-        SIXTRL_ASSERT( copy_of_eb.get< limit_ellipse_t >( 7 ) != e08_limit_ell );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 6 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 6 ) != e07_drift );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_limit_ellipse)( copy_of_eb, 7 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_limit_ellipse)( copy_of_eb, 7 ) != e08_limit_ell );
 
-        SIXTRL_ASSERT( copy_of_eb.get< be_monitor_t >( 8 ) != nullptr );
-        SIXTRL_ASSERT( copy_of_eb.get< be_monitor_t >( 8 ) != e09_monitor );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ) != e09_monitor );
 
         /* The beam monitors on the host side should have output adddr == 0: */
-        SIXTRL_ASSERT( e06_monitor->getOutAddress() != be_monitor_addr_t{ 0 } );
-        SIXTRL_ASSERT( e09_monitor->getOutAddress() != be_monitor_addr_t{ 0 } );
+        SIXTRL_ASSERT( ::NS(BeamMonitor_get_out_address)( e06_monitor ) != be_monitor_addr_t{ 0 } );
+        SIXTRL_ASSERT( ::NS(BeamMonitor_get_out_address)( e09_monitor ) != be_monitor_addr_t{ 0 } );
 
-        SIXTRL_ASSERT( copy_of_eb.get< be_monitor_t >( 5 )->getOutAddress() ==
-                       e06_monitor->getOutAddress() );
+        SIXTRL_ASSERT( ::NS(BeamMonitor_get_out_address)(
+            ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ) ) ==
+                       ::NS(BeamMonitor_get_out_address)( e06_monitor ) );
 
-        SIXTRL_ASSERT( copy_of_eb.get< be_monitor_t >( 8 )->getOutAddress() ==
-                       e09_monitor->getOutAddress() );
+        SIXTRL_ASSERT( ::NS(BeamMonitor_get_out_address)(
+            ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ) ) ==
+                       ::NS(BeamMonitor_get_out_address)( e09_monitor ) );
 
-        buffer_t copy_of_pb( pb );
-        SIXTRL_ASSERT( copy_of_pb.getNumObjects() == pb.getNumObjects() );
-        SIXTRL_ASSERT( copy_of_pb.get< particles_t >( 0 ) != nullptr );
-        SIXTRL_ASSERT( copy_of_pb.get< particles_t >( 0 ) != particles );
+        buffer_t* copy_of_pb = ::NS(Buffer_new_from_copy)( pb );
+        SIXTRL_ASSERT( ::NS(Buffer_get_num_of_objects)( copy_of_pb ) == ::NS(Buffer_get_num_of_objects)( pb ) );
+        SIXTRL_ASSERT( ::NS(Particles_buffer_get_particles)( copy_of_pb, 0 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(Particles_buffer_get_particles)( copy_of_pb, 0 ) != particles );
 
-        buffer_t* ptr_output_buffer = job.ptrOutputBuffer();
+        buffer_t* ptr_output_buffer = ::NS(TrackJob_get_output_buffer)( job );
         ASSERT_TRUE( ptr_output_buffer != nullptr );
-        ASSERT_TRUE( ptr_output_buffer->getNumObjects() > size_t{ 0 } );
-        ASSERT_TRUE( ptr_output_buffer->getNumObjects() ==
-                     job.numBeamMonitors() );
+        ASSERT_TRUE( ::NS(Buffer_get_num_of_objects)( ptr_output_buffer ) > size_t{ 0 } );
+        ASSERT_TRUE( ::NS(Buffer_get_num_of_objects)( ptr_output_buffer ) ==
+                     ::NS(TrackJob_get_num_beam_monitors)( job ) );
 
-        buffer_t copy_of_output_buffer( *ptr_output_buffer );
-        SIXTRL_ASSERT( copy_of_output_buffer.getNumObjects() ==
-                       ptr_output_buffer->getNumObjects() );
+        buffer_t* copy_of_output_buffer =
+            ::NS(Buffer_new_from_copy)( ptr_output_buffer );
+
+        SIXTRL_ASSERT( ::NS(Buffer_get_num_of_objects)( copy_of_output_buffer ) ==
+                       ::NS(Buffer_get_num_of_objects)( ptr_output_buffer ) );
 
         /* ----------------------------------------------------------------- */
         /* Set some parameters on the host side to different values. These will
@@ -226,48 +241,50 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* particles: */
-        SIXTRL_ASSERT( ::NS(Particles_compare_values)( particles->getCApiPtr(),
-            copy_of_pb.get< particles_t >( 0 )->getCApiPtr() ) == 0 );
-        std::generate( particles->getX(), particles->getX() + NUM_PARTICLES, gen );
-        SIXTRL_ASSERT( ::NS(Particles_compare_values)( particles->getCApiPtr(),
-            copy_of_pb.get< particles_t >( 0 ) ) != 0 );
+        SIXTRL_ASSERT( ::NS(Particles_compare_values)( particles,
+            ::NS(Particles_buffer_get_particles)( copy_of_pb, 0 ) ) == 0 );
+        std::generate( particles->x, particles->x + NUM_PARTICLES, gen );
+        SIXTRL_ASSERT( ::NS(Particles_compare_values)( particles,
+            ::NS(Particles_buffer_get_particles)( copy_of_pb, 0 ) ) != 0 );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* beam elements: */
-        SIXTRL_ASSERT( ::NS(Drift_compare_values)( e01_drift->getCApiPtr(),
-            copy_of_eb.get< drift_t >( 0 )->getCApiPtr() ) == 0 );
-        e01_drift->setLength( double{0.5} * e01_drift->getLength() );
-        SIXTRL_ASSERT( ::NS(Drift_compare_values)( e01_drift->getCApiPtr(),
-            copy_of_eb.get< drift_t >( 0 )->getCApiPtr() ) != 0 );
+        SIXTRL_ASSERT( ::NS(Drift_compare_values)( e01_drift,
+            ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 0 ) ) == 0 );
+        ::NS(Drift_set_length)( e01_drift,
+            double{0.5} * ::NS(Drift_get_length)( e01_drift ) );
 
-        SIXTRL_ASSERT( ::NS(Cavity_compare_values)( e02_cavity->getCApiPtr(),
-            copy_of_eb.get< cavity_t >( 1 )->getCApiPtr() ) == 0 );
-        e02_cavity->setVoltage( double{2.0} * e02_cavity->getVoltage() );
-        e02_cavity->setFrequency( double{2.0} * e02_cavity->getFrequency() );
-        e02_cavity->setLag( double{ 1.0 } );
-        SIXTRL_ASSERT( ::NS(Cavity_compare_values)( e02_cavity->getCApiPtr(),
-            copy_of_eb.get< cavity_t >( 1 )->getCApiPtr() ) != 0 );
+        SIXTRL_ASSERT( ::NS(Drift_compare_values)( e01_drift,
+            ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 0 ) ) != 0 );
 
-        SIXTRL_ASSERT( ::NS(Drift_compare_values)( e03_drift->getCApiPtr(),
-            copy_of_eb.get< drift_t >( 2 )->getCApiPtr() ) == 0 );
-        e03_drift->setLength( double{ 0.0 } );
-        SIXTRL_ASSERT( ::NS(Drift_compare_values)( e03_drift->getCApiPtr(),
-            copy_of_eb.get< drift_t >( 2 )->getCApiPtr() ) != 0 );
+        SIXTRL_ASSERT( ::NS(Cavity_compare_values)( e02_cavity,
+            ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) ) == 0 );
+        ::NS(Cavity_set_voltage)( e02_cavity, double{2.0} * ::NS(Cavity_get_voltage)( e02_cavity ) );
+        ::NS(Cavity_set_frequency)( e02_cavity, double{2.0} * ::NS(Cavity_get_frequency)( e02_cavity ) );
+        ::NS(Cavity_set_lag)( e02_cavity, double{ 1.0 } );
+        SIXTRL_ASSERT( ::NS(Cavity_compare_values)( e02_cavity,
+            ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) ) != 0 );
+
+        SIXTRL_ASSERT( ::NS(Drift_compare_values)( e03_drift,
+            ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 2 ) ) == 0 );
+        ::NS(Drift_set_length)( e03_drift, double{ 0.0 } );
+        SIXTRL_ASSERT( ::NS(Drift_compare_values)( e03_drift,
+            ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 2 ) ) != 0 );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* output: */
-        for( size_t ii = 0u ; ii < ptr_output_buffer->getNumObjects() ; ++ii )
+        for( size_t ii = 0u ; ii < ::NS(Buffer_get_num_of_objects)( ptr_output_buffer ) ; ++ii )
         {
             SIXTRL_ASSERT( 0 == ::NS(Particles_compare_values)(
-                ptr_output_buffer->get< particles_t >( ii )->getCApiPtr(),
-                copy_of_output_buffer.get< particles_t >( ii )->getCApiPtr() ) );
+                ::NS(Particles_buffer_get_particles)( ptr_output_buffer, ii ),
+                ::NS(Particles_buffer_get_particles)( copy_of_output_buffer, ii ) ) );
 
             ::NS(Particles_random_init)(
-                ptr_output_buffer->get< particles_t >( ii )->getCApiPtr() );
+                ::NS(Particles_buffer_get_particles)( ptr_output_buffer, ii ) );
 
             SIXTRL_ASSERT( 0 != ::NS(Particles_compare_values)(
-                ptr_output_buffer->get< particles_t >( ii )->getCApiPtr(),
-                copy_of_output_buffer.get< particles_t >( ii )->getCApiPtr() ) );
+                ::NS(Particles_buffer_get_particles)( ptr_output_buffer, ii ),
+                ::NS(Particles_buffer_get_particles)( copy_of_output_buffer, ii ) ) );
         }
 
         /* ----------------------------------------------------------------- */
@@ -276,70 +293,73 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* particles: */
 
-        job.collectParticles();
-        ASSERT_TRUE( particles ==
-            job.ptrParticlesBuffer()->get< particles_t >( 0 ) );
+        ::NS(TrackJob_collect_particles)( job );
+        ASSERT_TRUE( particles == ::NS(Particles_buffer_get_particles)(
+            ::NS(TrackJob_get_particles_buffer)( job ), 0 ) );
 
-        particles_t* ptr_copy_particles = copy_of_pb.get< particles_t >( 0 );
+        particles_t* ptr_copy_particles =
+            ::NS(Particles_buffer_get_particles)( copy_of_pb, 0 );
         SIXTRL_ASSERT( ptr_copy_particles != nullptr );
 
-        double const x0 = particles->getXValue( 0 );
-        double const copy_x0 = ptr_copy_particles->getXValue( 0 );
+        double const x0 = particles->x[ 0 ];
+        double const copy_x0 = ptr_copy_particles->x[ 0 ];
         ASSERT_TRUE( EPS > std::fabs( x0 - copy_x0 ) );
 
-        ASSERT_TRUE( ::NS(Particles_compare_values)( particles->getCApiPtr(),
-            copy_of_pb.get< particles_t >( 0 )->getCApiPtr() ) == 0 );
+        ASSERT_TRUE( ::NS(Particles_compare_values)( particles,
+            ::NS(Particles_buffer_get_particles)( copy_of_pb, 0 ) ) == 0 );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* beam elements: */
 
-        job.collectBeamElements();
+        ::NS(TrackJob_collect_beam_elements)( job );
 
-        ASSERT_TRUE( e01_drift ==
-            job.ptrBeamElementsBuffer()->get< drift_t >( 0 ) );
+        ASSERT_TRUE( e01_drift == ::NS(BeamElements_buffer_get_drift)(
+            ::NS(TrackJob_get_beam_elements_buffer)( job ), 0 ) );
 
-        ASSERT_TRUE( ::NS(Drift_compare_values)( e01_drift->getCApiPtr(),
-            copy_of_eb.get< drift_t >( 0 )->getCApiPtr() ) == 0 );
+        ASSERT_TRUE( ::NS(Drift_compare_values)( e01_drift,
+            ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 0 ) ) == 0 );
 
         ASSERT_TRUE( e02_cavity ==
-            job.ptrBeamElementsBuffer()->get< cavity_t >( 1 ) );
+            ::NS(BeamElements_buffer_get_cavity)( ::NS(TrackJob_get_beam_elements_buffer)( job ), 1 ) );
 
-        ASSERT_TRUE( ::NS(Cavity_compare_values)( e02_cavity->getCApiPtr(),
-            copy_of_eb.get< cavity_t >( 1 )->getCApiPtr() ) == 0 );
+        ASSERT_TRUE( ::NS(Cavity_compare_values)( e02_cavity,
+            ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) ) == 0 );
 
         ASSERT_TRUE( e03_drift ==
-            job.ptrBeamElementsBuffer()->get< drift_t >( 2 ) );
+            ::NS(BeamElements_buffer_get_drift)( ::NS(TrackJob_get_beam_elements_buffer)( job ), 2 ) );
 
-        ASSERT_TRUE( ::NS(Drift_compare_values)( e03_drift->getCApiPtr(),
-            copy_of_eb.get< drift_t >( 2 )->getCApiPtr() ) == 0 );
+        ASSERT_TRUE( ::NS(Drift_compare_values)( e03_drift,
+            ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 2 ) ) == 0 );
 
         /* Check that the collected output has output addresses */
 
         ASSERT_TRUE( e06_monitor ==
-            job.ptrBeamElementsBuffer()->get< be_monitor_t >( 5 ) );
+            ::NS(BeamElements_buffer_get_beam_monitor)( ::NS(TrackJob_get_beam_elements_buffer)( job ), 5 ) );
 
         ASSERT_TRUE( e09_monitor ==
-            job.ptrBeamElementsBuffer()->get< be_monitor_t >( 8 ) );
+            ::NS(BeamElements_buffer_get_beam_monitor)( ::NS(TrackJob_get_beam_elements_buffer)( job ), 8 ) );
 
-        ASSERT_TRUE( e06_monitor->getOutAddress() != be_monitor_addr_t{ 0 } );
-        ASSERT_TRUE( e09_monitor->getOutAddress() != be_monitor_addr_t{ 0 } );
+        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( e06_monitor ) != be_monitor_addr_t{ 0 } );
+        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( e09_monitor ) != be_monitor_addr_t{ 0 } );
 
-        ASSERT_TRUE( copy_of_eb.get< be_monitor_t >( 5 )->getOutAddress() !=
-                     e06_monitor->getOutAddress() );
+        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)(
+                ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ) ) !=
+            ::NS(BeamMonitor_get_out_address)( e06_monitor ) );
 
-        ASSERT_TRUE( copy_of_eb.get< be_monitor_t >( 8 )->getOutAddress() !=
-                     e09_monitor->getOutAddress() );
+        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)(
+                ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ) ) !=
+            ::NS(BeamMonitor_get_out_address)( e09_monitor ) );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* output buffer: */
 
-        job.collectOutput();
+        ::NS(TrackJob_collect_output)( job );
 
-        for( size_t ii = 0u ; ii < ptr_output_buffer->getNumObjects() ; ++ii )
+        for( size_t ii = 0u ; ii < ::NS(Buffer_get_num_of_objects)( ptr_output_buffer ) ; ++ii )
         {
             ASSERT_TRUE( 0 == ::NS(Particles_compare_values)(
-                ptr_output_buffer->get< particles_t >( ii )->getCApiPtr(),
-                copy_of_output_buffer.get< particles_t >( ii )->getCApiPtr() ) );
+                ::NS(Particles_buffer_get_particles)( ptr_output_buffer, ii ),
+                ::NS(Particles_buffer_get_particles)( copy_of_output_buffer, ii ) ) );
         }
 
         /* ----------------------------------------------------------------- */
@@ -348,55 +368,55 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* particles: */
 
-        std::fill( particles->getAtElementId(),
-                   particles->getAtElementId() + NUM_PARTICLES,
-                   particle_index_t{ 42 } );
+        std::fill( particles->at_element_id,
+            particles->at_element_id + NUM_PARTICLES, particle_index_t{ 42 } );
 
-        SIXTRL_ASSERT( 0 != ::NS(Particles_compare_values)(
-            particles->getCApiPtr(),
-            copy_of_pb.get< particles_t >( 0 )->getCApiPtr() ) );
+        SIXTRL_ASSERT( 0 != ::NS(Particles_compare_values)( particles,
+            ::NS(Particles_buffer_get_particles)( copy_of_pb, 0 ) ) );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* beam elements: */
 
-        e02_cavity->setLag( double{ 2.0 } );
-        SIXTRL_ASSERT( ::NS(Cavity_compare_values)( e02_cavity->getCApiPtr(),
-            copy_of_eb.get< cavity_t >( 1 ) ) != 0 );
+        ::NS(Cavity_set_lag)( e02_cavity, double{ 2.0 } );
+        SIXTRL_ASSERT( ::NS(Cavity_compare_values)( e02_cavity,
+            ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) ) != 0 );
 
-        SIXTRL_ASSERT( 0 == ::NS(LimitRect_compare_values)(
-            e04_limit_rect->getCApiPtr(),
-            copy_of_eb.get< limit_rect_t >( 3 )->getCApiPtr() ) );
+        SIXTRL_ASSERT( 0 == ::NS(LimitRect_compare_values)( e04_limit_rect,
+            ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) ) );
 
-        e04_limit_rect->setMinY( double{ 0.0 } );
-        e04_limit_rect->setMaxY( double{ 0.5 } );
-        SIXTRL_ASSERT( 0 != ::NS(LimitRect_compare_values)(
-            e04_limit_rect->getCApiPtr(),
-            copy_of_eb.get< limit_rect_t >( 3 ) ) );
+        ::NS(LimitRect_set_min_y)( e04_limit_rect, double{ 0.0 } );
+        ::NS(LimitRect_set_max_y)( e04_limit_rect, double{ 0.5 } );
+        SIXTRL_ASSERT( 0 != ::NS(LimitRect_compare_values)( e04_limit_rect,
+            ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) ) );
 
-        e06_monitor->setOutAddress( ::NS(be_monitor_addr_t){  42u } );
-        e09_monitor->setOutAddress( ::NS(be_monitor_addr_t){ 137u } );
+        ::NS(BeamMonitor_set_out_address)(
+            e06_monitor, ::NS(be_monitor_addr_t){  42u } );
+
+        ::NS(BeamMonitor_set_out_address)(
+            e09_monitor, ::NS(be_monitor_addr_t){ 137u } );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* output buffer: */
 
-        for( size_t ii = 0u ; ii < ptr_output_buffer->getNumObjects() ; ++ii )
+        for( size_t ii = 0u ; ii < ::NS(Buffer_get_num_of_objects)( ptr_output_buffer ) ; ++ii )
         {
-            auto ptr = ptr_output_buffer->get< particles_t >( ii )->getState();
+            auto ptr = ::NS(Particles_get_state)(
+                ::NS(Particles_buffer_get_particles)( ptr_output_buffer, ii ) );
             particle_index_t const state_val =
                 -( static_cast< particle_index_t >( ii + 1 ) );
 
             std::fill( ptr, ptr + NUM_PARTICLES, state_val );
             SIXTRL_ASSERT( 0 != ::NS(Particles_compare_values)(
-                ptr_output_buffer->get< particles_t >( ii )->getCApiPtr(),
-                copy_of_output_buffer.get< particles_t >( ii )->getCApiPtr() ) );
+                ::NS(Particles_buffer_get_particles)( ptr_output_buffer, ii ),
+                ::NS(Particles_buffer_get_particles)( copy_of_output_buffer, ii ) ) );
         }
 
         /* ----------------------------------------------------------------- */
         /* Push buffers to the device */
 
-        job.pushParticles();
-        job.pushBeamElements();
-        job.pushOutput();
+        ::NS(TrackJob_push_particles)( job );
+        ::NS(TrackJob_push_beam_elements)( job );
+        ::NS(TrackJob_push_output)( job );
 
         /* ----------------------------------------------------------------- */
         /* Reset the changes on the host side so we can verify that the push
@@ -405,27 +425,32 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* particles: */
 
-        std::fill( particles->getAtElementId(),
-                   particles->getAtElementId() + NUM_PARTICLES,
+        std::fill( particles->at_element_id,
+                   particles->at_element_id + NUM_PARTICLES,
                    particle_index_t{ 0 } );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* beam elements: */
 
-        e02_cavity->setLag( copy_of_eb.get< cavity_t >( 1 )->getLag() );
+        ::NS(Cavity_set_lag)( e02_cavity, ::NS(Cavity_get_lag)(
+            ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) ) );
 
-        e04_limit_rect->setMinY( copy_of_eb.get< limit_rect_t >( 3 )->getMinY() );
-        e04_limit_rect->setMaxY( copy_of_eb.get< limit_rect_t >( 3 )->getMaxY() );
+        ::NS(LimitRect_set_min_y)( e04_limit_rect, ::NS(LimitRect_get_min_y)(
+            ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) ) );
 
-        e06_monitor->setOutAddress( 0u );
-        e09_monitor->setOutAddress( 0u );
+        ::NS(LimitRect_set_max_y)( e04_limit_rect, ::NS(LimitRect_get_max_y)(
+            ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) ) );
+
+        ::NS(BeamMonitor_set_out_address)( e06_monitor, 0u );
+        ::NS(BeamMonitor_set_out_address)( e09_monitor, 0u );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* beam elements: */
 
-        for( size_t ii = 0u ; ii < ptr_output_buffer->getNumObjects() ; ++ii )
+        for( size_t ii = 0u ; ii < ::NS(Buffer_get_num_of_objects)( ptr_output_buffer ) ; ++ii )
         {
-            auto ptr = ptr_output_buffer->get< particles_t >( ii )->getState();
+            auto ptr = ::NS(Particles_get_state)(
+                ::NS(Particles_buffer_get_particles)( ptr_output_buffer, ii ) );
             particle_index_t const state_val = particle_index_t{ 0 };
             std::fill( ptr, ptr + NUM_PARTICLES, state_val );
         }
@@ -437,92 +462,105 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* particles: */
 
-        job.collectParticles();
-        ASSERT_TRUE( particles ==
-            job.ptrParticlesBuffer()->get< particles_t >( 0 ) );
+        ::NS(TrackJob_collect_particles)( job );
+        ASSERT_TRUE( particles == ::NS(Particles_buffer_get_particles)(
+            ::NS(TrackJob_get_particles_buffer)( job ), 0 ) );
 
-        ASSERT_TRUE( std::all_of( particles->getAtElementId(),
-            particles->getAtElementId() + NUM_PARTICLES,
+        ASSERT_TRUE( std::all_of( particles->at_element_id,
+            particles->at_element_id + NUM_PARTICLES,
             []( particle_index_t const elem_id ){
                 return ( elem_id == particle_index_t{ 42 } ); } ) );
 
-        std::fill( copy_of_pb.get< particles_t >( 0 )->getAtElementId(),
-           copy_of_pb.get< particles_t >( 0 )->getAtElementId() + NUM_PARTICLES,
+        ptr_copy_particles =
+            ::NS(Particles_buffer_get_particles)( copy_of_pb, 0 );
+
+        SIXTRL_ASSERT( ptr_copy_particles != nullptr );
+
+        std::fill(
+           ::NS(Particles_get_at_element_id)( ptr_copy_particles ),
+           ::NS(Particles_get_at_element_id)( ptr_copy_particles ) + NUM_PARTICLES,
            particle_index_t{ 42 } );
 
         ASSERT_TRUE( 0 == ::NS(Particles_compare_values)(
-            particles->getCApiPtr(),
-            copy_of_pb.get< particles_t >( 0 )->getCApiPtr() ) );
+            particles,
+            ::NS(Particles_buffer_get_particles)( copy_of_pb, 0 ) ) );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* beam elements: */
 
-        job.collectBeamElements();
+        ::NS(TrackJob_collect_beam_elements)( job );
 
-        ASSERT_TRUE( e02_cavity ==
-            job.ptrBeamElementsBuffer()->get< cavity_t >( 1 ) );
-
-        ASSERT_TRUE( EPS > std::fabs( e02_cavity->getLag() - double{ 2.0 } ) );
-
-        copy_of_eb.get< cavity_t >( 1 )->setLag( double{ 2.0 } );
-
-        ASSERT_TRUE( 0 == ::NS(Cavity_compare_values)(
-            e02_cavity->getCApiPtr(),
-            copy_of_eb.get< cavity_t >( 1 )->getCApiPtr() ) );
-
-
-        ASSERT_TRUE( e04_limit_rect ==
-            job.ptrBeamElementsBuffer()->get< limit_rect_t >( 3 ) );
+        ASSERT_TRUE( e02_cavity == ::NS(BeamElements_buffer_get_cavity)(
+            ::NS(TrackJob_get_beam_elements_buffer)( job ), 1 ) );
 
         ASSERT_TRUE( EPS > std::fabs(
-            e04_limit_rect->getMinY() - double{ 0.0 } ) );
+            ::NS(Cavity_get_lag)( e02_cavity ) - double{ 2.0 } ) );
+
+        ::NS(Cavity_set_lag)( ::NS(BeamElements_buffer_get_cavity)(
+            copy_of_eb, 1 ), double{ 2.0 } );
+
+        ASSERT_TRUE( 0 == ::NS(Cavity_compare_values)( e02_cavity,
+            ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) ) );
+
+
+        ASSERT_TRUE( e04_limit_rect == ::NS(BeamElements_buffer_get_limit_rect)(
+            ::NS(TrackJob_get_beam_elements_buffer)( job ), 3 ) );
 
         ASSERT_TRUE( EPS > std::fabs(
-            e04_limit_rect->getMaxY() - double{ 0.5 } ) );
+            ::NS(LimitRect_get_min_y)( e04_limit_rect ) - double{ 0.0 } ) );
 
-        copy_of_eb.get< limit_rect_t >( 3 )->setMinY( double{ 0.0 } );
-        copy_of_eb.get< limit_rect_t >( 3 )->setMaxY( double{ 0.5 } );
+        ASSERT_TRUE( EPS > std::fabs(
+            ::NS(LimitRect_get_max_y)( e04_limit_rect ) - double{ 0.5 } ) );
 
-        ASSERT_TRUE( 0 == ::NS(LimitRect_compare_values)(
-            e04_limit_rect->getCApiPtr(),
-            copy_of_eb.get< limit_rect_t >( 3 )->getCApiPtr() ) );
+        ::NS(LimitRect_set_min_y)( ::NS(BeamElements_buffer_get_limit_rect)(
+            copy_of_eb, 3 ), double{ 0.0 } );
+
+        ::NS(LimitRect_set_max_y)( ::NS(BeamElements_buffer_get_limit_rect)(
+            copy_of_eb, 3 ), double{ 0.5 } );
+
+        ASSERT_TRUE( 0 == ::NS(LimitRect_compare_values)( e04_limit_rect,
+            ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) ) );
 
         /* Check that the collected output has output addresses */
 
-        ASSERT_TRUE( e06_monitor ==
-            job.ptrBeamElementsBuffer()->get< be_monitor_t >( 5 ) );
+        ASSERT_TRUE( e06_monitor == ::NS(BeamElements_buffer_get_beam_monitor)(
+            ::NS(TrackJob_get_beam_elements_buffer)( job ), 5 ) );
 
-        ASSERT_TRUE( e06_monitor->getOutAddress() ==
+        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( e06_monitor ) ==
             ::NS(be_monitor_addr_t){ 42 } );
 
-        copy_of_eb.get< be_monitor_t >( 5 )->setOutAddress(
+        ::NS(BeamMonitor_set_out_address)(
+            ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ),
             ::NS(be_monitor_addr_t){ 42 } );
 
         ASSERT_TRUE( 0 == ::NS(BeamMonitor_compare_values)(
-            e06_monitor->getCApiPtr(),
-            copy_of_eb.get< be_monitor_t >( 5 )->getCApiPtr() ) );
+            e06_monitor,
+            ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ) ) );
 
-        ASSERT_TRUE( e09_monitor ==
-            job.ptrBeamElementsBuffer()->get< be_monitor_t >( 8 ) );
+        ASSERT_TRUE( e09_monitor == ::NS(BeamElements_buffer_get_beam_monitor)(
+            ::NS(TrackJob_get_beam_elements_buffer)( job ), 8 ) );
 
-        ASSERT_TRUE( e09_monitor->getOutAddress() ==
+        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( e09_monitor ) ==
             ::NS(be_monitor_addr_t){ 137 } );
 
-        copy_of_eb.get< be_monitor_t >( 8 )->setOutAddress(
+        ::NS(BeamMonitor_set_out_address)(
+            ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ),
             ::NS(be_monitor_addr_t){ 137 } );
 
         ASSERT_TRUE( 0 == ::NS(BeamMonitor_compare_values)(
-            e09_monitor->getCApiPtr(),
-            copy_of_eb.get< be_monitor_t >( 8 )->getCApiPtr() ) );
+            e09_monitor,
+            ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ) ) );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* output buffer: */
 
-        job.collectOutput();
+        ::NS(TrackJob_collect_output)( job );
 
-        for( size_t ii = 0u ; ii < ptr_output_buffer->getNumObjects() ; ++ii )
+        for( size_t ii = 0u ; ii < ::NS(Buffer_get_num_of_objects)( ptr_output_buffer ) ; ++ii )
         {
-            auto ptr = ptr_output_buffer->get< particles_t >( ii )->getState();
+            auto ptr = ::NS(Particles_get_state)(
+                ::NS(Particles_buffer_get_particles)( ptr_output_buffer, ii ) );
+
             particle_index_t const state_val =
                 -( static_cast< particle_index_t >( ii + 1 ) );
 
@@ -530,7 +568,20 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
                 [state_val]( particle_index_t const state )
                 { return state == state_val; } ) );
         }
+
+        /* Local cleanup */
+
+        ::NS(TrackJobCl_delete)( job );
+        ::NS(Buffer_delete)( eb );
+        ::NS(Buffer_delete)( copy_of_eb );
+        ::NS(Buffer_delete)( pb );
+        ::NS(Buffer_delete)( copy_of_pb );
+        ::NS(Buffer_delete)( copy_of_output_buffer );
     }
+
+    ::NS(ClContext_delete)( context );
+    ::NS(Buffer_delete)( init_eb );
+    ::NS(Buffer_delete)( init_pb );
 }
 
 /* end: tests/sixtracklib/opencl/test_track_job_cl_collect_push_cxx.cpp */

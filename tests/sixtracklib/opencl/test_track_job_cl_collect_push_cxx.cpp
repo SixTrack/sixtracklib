@@ -168,6 +168,7 @@ TEST( CXX_TrackJobClCollectPushTests, TestCollectAndPush )
         SIXTRL_ASSERT( e09_monitor    != nullptr );
 
         track_job_t  job( device_id_str, pb, eb );
+        ASSERT_TRUE( job.requiresCollecting() );
         ASSERT_TRUE( job.hasOutputBuffer() );
         ASSERT_TRUE( job.hasBeamMonitorOutput() );
         ASSERT_TRUE( job.ptrParticlesBuffer() == &pb );
