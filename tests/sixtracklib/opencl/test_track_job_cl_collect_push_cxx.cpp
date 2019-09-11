@@ -229,9 +229,8 @@ TEST( CXX_TrackJobClCollectPushTests, TestCollectAndPush )
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* particles: */
         SIXTRL_ASSERT( ::NS(Particles_compare_values)( particles->getCApiPtr(),
-            copy_of_pb.get< particles_t >( 0 ) ) == 0 );
-        std::generate( copy_of_pb.get< particles_t >( 0 )->getX(),
-            copy_of_pb.get< particles_t >( 0 )->getX() + NUM_PARTICLES, gen );
+            copy_of_pb.get< particles_t >( 0 )->getCApiPtr() ) == 0 );
+        std::generate( particles->getX(), particles->getX() + NUM_PARTICLES, gen );
         SIXTRL_ASSERT( ::NS(Particles_compare_values)( particles->getCApiPtr(),
             copy_of_pb.get< particles_t >( 0 ) ) != 0 );
 
@@ -282,6 +281,13 @@ TEST( CXX_TrackJobClCollectPushTests, TestCollectAndPush )
         job.collectParticles();
         ASSERT_TRUE( particles ==
             job.ptrParticlesBuffer()->get< particles_t >( 0 ) );
+
+        particles_t* ptr_copy_particles = copy_of_pb.get< particles_t >( 0 );
+        SIXTRL_ASSERT( ptr_copy_particles != nullptr );
+
+        double const x0 = particles->getXValue( 0 );
+        double const copy_x0 = ptr_copy_particles->getXValue( 0 );
+        ASSERT_TRUE( EPS > std::fabs( x0 - copy_x0 ) );
 
         ASSERT_TRUE( ::NS(Particles_compare_values)( particles->getCApiPtr(),
             copy_of_pb.get< particles_t >( 0 )->getCApiPtr() ) == 0 );
@@ -369,8 +375,8 @@ TEST( CXX_TrackJobClCollectPushTests, TestCollectAndPush )
             e04_limit_rect->getCApiPtr(),
             copy_of_eb.get< limit_rect_t >( 3 ) ) );
 
-        e06_monitor->setOutAddress( 42u );
-        e09_monitor->setOutAddress( 137u );
+        e06_monitor->setOutAddress( ::NS(be_monitor_addr_t){  42u } );
+        e09_monitor->setOutAddress( ::NS(be_monitor_addr_t){ 137u } );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* output buffer: */
@@ -379,7 +385,7 @@ TEST( CXX_TrackJobClCollectPushTests, TestCollectAndPush )
         {
             auto ptr = ptr_output_buffer->get< particles_t >( ii )->getState();
             particle_index_t const state_val =
-                -( static_cast< particle_index_t >( ii ) );
+                -( static_cast< particle_index_t >( ii + 1 ) );
 
             std::fill( ptr, ptr + NUM_PARTICLES, state_val );
             SIXTRL_ASSERT( 0 != ::NS(Particles_compare_values)(
@@ -437,10 +443,18 @@ TEST( CXX_TrackJobClCollectPushTests, TestCollectAndPush )
         ASSERT_TRUE( particles ==
             job.ptrParticlesBuffer()->get< particles_t >( 0 ) );
 
-        ASSERT_TRUE( std::all_of( particles->getState(),
-            particles->getState() + NUM_PARTICLES,
-            []( particle_index_t const state ){
-                return state == particle_index_t{ 42 }; } ) );
+        ASSERT_TRUE( std::all_of( particles->getAtElementId(),
+            particles->getAtElementId() + NUM_PARTICLES,
+            []( particle_index_t const elem_id ){
+                return ( elem_id == particle_index_t{ 42 } ); } ) );
+
+        std::fill( copy_of_pb.get< particles_t >( 0 )->getAtElementId(),
+           copy_of_pb.get< particles_t >( 0 )->getAtElementId() + NUM_PARTICLES,
+           particle_index_t{ 42 } );
+
+        ASSERT_TRUE( 0 == ::NS(Particles_compare_values)(
+            particles->getCApiPtr(),
+            copy_of_pb.get< particles_t >( 0 )->getCApiPtr() ) );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* beam elements: */
@@ -452,28 +466,56 @@ TEST( CXX_TrackJobClCollectPushTests, TestCollectAndPush )
 
         ASSERT_TRUE( EPS > std::fabs( e02_cavity->getLag() - double{ 2.0 } ) );
 
+        copy_of_eb.get< cavity_t >( 1 )->setLag( double{ 2.0 } );
+
+        ASSERT_TRUE( 0 == ::NS(Cavity_compare_values)(
+            e02_cavity->getCApiPtr(),
+            copy_of_eb.get< cavity_t >( 1 )->getCApiPtr() ) );
+
+
         ASSERT_TRUE( e04_limit_rect ==
             job.ptrBeamElementsBuffer()->get< limit_rect_t >( 3 ) );
 
         ASSERT_TRUE( EPS > std::fabs(
-            e04_limit_rect->getMinX() - double{ 0.0 } ) );
+            e04_limit_rect->getMinY() - double{ 0.0 } ) );
 
         ASSERT_TRUE( EPS > std::fabs(
             e04_limit_rect->getMaxY() - double{ 0.5 } ) );
+
+        copy_of_eb.get< limit_rect_t >( 3 )->setMinY( double{ 0.0 } );
+        copy_of_eb.get< limit_rect_t >( 3 )->setMaxY( double{ 0.5 } );
+
+        ASSERT_TRUE( 0 == ::NS(LimitRect_compare_values)(
+            e04_limit_rect->getCApiPtr(),
+            copy_of_eb.get< limit_rect_t >( 3 )->getCApiPtr() ) );
 
         /* Check that the collected output has output addresses */
 
         ASSERT_TRUE( e06_monitor ==
             job.ptrBeamElementsBuffer()->get< be_monitor_t >( 5 ) );
 
+        ASSERT_TRUE( e06_monitor->getOutAddress() ==
+            ::NS(be_monitor_addr_t){ 42 } );
+
+        copy_of_eb.get< be_monitor_t >( 5 )->setOutAddress(
+            ::NS(be_monitor_addr_t){ 42 } );
+
+        ASSERT_TRUE( 0 == ::NS(BeamMonitor_compare_values)(
+            e06_monitor->getCApiPtr(),
+            copy_of_eb.get< be_monitor_t >( 5 )->getCApiPtr() ) );
+
         ASSERT_TRUE( e09_monitor ==
             job.ptrBeamElementsBuffer()->get< be_monitor_t >( 8 ) );
 
-        ASSERT_TRUE( e06_monitor->getOutAddress() ==
-            st_be_monitor_addr_t{ 42 } );
-
         ASSERT_TRUE( e09_monitor->getOutAddress() ==
-            st_be_monitor_addr_t{ 137 } );
+            ::NS(be_monitor_addr_t){ 137 } );
+
+        copy_of_eb.get< be_monitor_t >( 8 )->setOutAddress(
+            ::NS(be_monitor_addr_t){ 137 } );
+
+        ASSERT_TRUE( 0 == ::NS(BeamMonitor_compare_values)(
+            e09_monitor->getCApiPtr(),
+            copy_of_eb.get< be_monitor_t >( 8 )->getCApiPtr() ) );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* output buffer: */
@@ -484,7 +526,7 @@ TEST( CXX_TrackJobClCollectPushTests, TestCollectAndPush )
         {
             auto ptr = ptr_output_buffer->get< particles_t >( ii )->getState();
             particle_index_t const state_val =
-                -( static_cast< particle_index_t >( ii ) );
+                -( static_cast< particle_index_t >( ii + 1 ) );
 
             ASSERT_TRUE( std::all_of( ptr, ptr + NUM_PARTICLES,
                 [state_val]( particle_index_t const state )

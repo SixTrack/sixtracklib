@@ -102,17 +102,17 @@ if( GTEST_FOUND )
     # ==========================================================================
     # test_track_job_cl_collect_push_opencl_c99:
 
-#     add_executable( test_track_job_cl_collect_push_opencl_c99
-#                     test_track_job_cl_collect_push_c99.cpp )
-#
-#     set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS}
-#          test_track_job_cl_collect_push_opencl_c99 )
-#
-#     add_test( C99_TrackJobClCollectPushTests
-#               test_track_job_cl_collect_push_opencl_c99 )
-#
-#     set_property( TEST C99_TrackJobClCollectPushTests APPEND PROPERTY
-#         DEPENDS C99_OpenCL_TrackJobClTests )
+    add_executable( test_track_job_cl_collect_push_opencl_c99
+                    test_track_job_cl_collect_push_c99.cpp )
+
+    set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS}
+         test_track_job_cl_collect_push_opencl_c99 )
+
+    add_test( C99_TrackJobClCollectPushTests
+              test_track_job_cl_collect_push_opencl_c99 )
+
+    set_property( TEST C99_TrackJobClCollectPushTests APPEND PROPERTY
+        DEPENDS C99_OpenCL_TrackJobClTests )
 
     # --------------------------------------------------------------------------
     # test_track_job_cl_collect_push_opencl_cxx:
