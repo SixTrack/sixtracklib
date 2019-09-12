@@ -236,7 +236,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_set_collect_flags)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job,
     NS(track_job_collect_flag_t) const flag );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_requires_collect)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_requires_collecting)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
 
 
