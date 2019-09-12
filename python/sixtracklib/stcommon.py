@@ -878,9 +878,9 @@ st_TrackJob_collect_output = sixtracklib.st_TrackJob_collect_output
 st_TrackJob_collect_output.argtypes = [st_TrackJob_p]
 st_TrackJob_collect_output.restype = None
 
-st_TrackJob_requires_collect = sixtracklib.st_TrackJob_requires_collect
-st_TrackJob_requires_collect.argtypes = [st_TrackJob_p]
-st_TrackJob_requires_collect.restype = ct.c_bool
+st_TrackJob_requires_collecting = sixtracklib.st_TrackJob_requires_collecting
+st_TrackJob_requires_collecting.argtypes = [st_TrackJob_p]
+st_TrackJob_requires_collecting.restype = ct.c_bool
 
 st_TrackJob_push = sixtracklib.st_TrackJob_push
 st_TrackJob_push.argtypes = [st_TrackJob_p, ct.c_uint16]

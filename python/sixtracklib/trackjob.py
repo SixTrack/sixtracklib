@@ -979,7 +979,7 @@ class TrackJob(object):
 
     @property
     def requires_collecting(self):
-        return st.st_TrackJob_requires_collect(self.ptr_st_track_job)
+        return st.st_TrackJob_requires_collecting(self.ptr_st_track_job)
 
     def push(self, flags):
         st.st_TrackJob_push(self.ptr_st_track_job, ct.c_uint16(flags))
