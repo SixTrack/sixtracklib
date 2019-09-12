@@ -4,7 +4,6 @@ import sys
 import os
 import sixtracklib as pyst
 import sixtracklib_test as testlib
-import pdb
 
 from sixtracklib.stcommon import \
     st_Buffer_new_mapped_on_cbuffer, st_Buffer_delete, \
@@ -25,7 +24,6 @@ import ctypes as ct
 from cobjects import CBuffer
 
 if __name__ == '__main__':
-
     path_to_testdir = testlib.config.PATH_TO_TESTDATA_DIR
     assert(path_to_testdir is not None)
     assert(os.path.exists(path_to_testdir))
