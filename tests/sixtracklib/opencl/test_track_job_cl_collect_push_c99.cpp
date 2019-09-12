@@ -176,7 +176,7 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
 
         track_job_t* job = ::NS(TrackJobCl_new)( device_id_str.c_str(), pb, eb );
         ASSERT_TRUE( job != nullptr );
-        ASSERT_TRUE( ::NS(TrackJob_requires_collect)( job ) );
+        ASSERT_TRUE( ::NS(TrackJob_requires_collecting)( job ) );
         ASSERT_TRUE( ::NS(TrackJob_has_output_buffer)( job ) );
         ASSERT_TRUE( ::NS(TrackJob_has_beam_monitor_output)( job ) );
         ASSERT_TRUE( ::NS(TrackJob_get_particles_buffer)( job ) == pb );
@@ -584,4 +584,4 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
     ::NS(Buffer_delete)( init_pb );
 }
 
-/* end: tests/sixtracklib/opencl/test_track_job_cl_collect_push_cxx.cpp */
+/* end: tests/sixtracklib/opencl/test_track_job_cl_collect_push_c99.cpp */
