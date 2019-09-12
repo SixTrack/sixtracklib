@@ -157,15 +157,15 @@ TEST( CXX_TrackJobClCollectPushTests, TestCollectAndPush )
         e08_limit_ell  = eb.get< limit_ellipse_t >( 7 );
         e09_monitor    = eb.get< be_monitor_t >( 8 );
 
-        SIXTRL_ASSERT( e01_drift      != nullptr );
-        SIXTRL_ASSERT( e02_cavity     != nullptr );
-        SIXTRL_ASSERT( e03_drift      != nullptr );
-        SIXTRL_ASSERT( e04_limit_rect != nullptr );
-        SIXTRL_ASSERT( e05_drift      != nullptr );
-        SIXTRL_ASSERT( e06_monitor    != nullptr );
-        SIXTRL_ASSERT( e07_drift      != nullptr );
-        SIXTRL_ASSERT( e08_limit_ell  != nullptr );
-        SIXTRL_ASSERT( e09_monitor    != nullptr );
+        ASSERT_TRUE( e01_drift      != nullptr );
+        ASSERT_TRUE( e02_cavity     != nullptr );
+        ASSERT_TRUE( e03_drift      != nullptr );
+        ASSERT_TRUE( e04_limit_rect != nullptr );
+        ASSERT_TRUE( e05_drift      != nullptr );
+        ASSERT_TRUE( e06_monitor    != nullptr );
+        ASSERT_TRUE( e07_drift      != nullptr );
+        ASSERT_TRUE( e08_limit_ell  != nullptr );
+        ASSERT_TRUE( e09_monitor    != nullptr );
 
         track_job_t  job( device_id_str, pb, eb );
         ASSERT_TRUE( job.requiresCollecting() );

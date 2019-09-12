@@ -325,7 +325,6 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         using  _this_t = TSRotation< T >;
         using    ptr_t = SIXTRL_ARGPTR_DEC _this_t*;
-        using  value_t = typename _this_t::value_type;
         using   size_t = typename _this_t::size_type;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
@@ -339,7 +338,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
 
         SIXTRL_ASSERT( std::fabs( ( cos_z * cos_z + sin_z * sin_z ) -
-            value_t{ 1 } ) <= std::numeric_limits< value_t >::epsilon() );
+            typename _this_t::value_type{ 1 } ) <=
+            std::numeric_limits< typename _this_t::value_type >::epsilon() );
 
         _this_t temp;
         temp.cos_z = cos_z;

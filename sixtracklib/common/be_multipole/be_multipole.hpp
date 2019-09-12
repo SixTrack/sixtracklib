@@ -1212,21 +1212,12 @@ namespace SIXTRL_CXX_NAMESPACE
     template< typename CPtr > SIXTRL_INLINE CPtr
     TMultiPole< SIXTRL_REAL_T >::getBalBegin() const SIXTRL_NOEXCEPT
     {
-        using size_t  = TMultiPole< SIXTRL_REAL_T >::size_type;
-//         using value_t = TMultiPole< SIXTRL_REAL_T >::value_type;
-
         static_assert( sizeof( typename std::iterator_traits<
             CPtr >::value_type ) == sizeof( value_type ), "" );
 
-//         static_assert( std::is_trivially_assignable<
-//             typename std::iterator_traits< CPtr >::value_type,
-//             value_t >::value, "" );
-
-        size_t const bal_size = this->getBalSize();
-
         SIXTRL_ASSERT(
-            ( ( bal_size == 0u ) && ( this->bal == nullptr ) ) ||
-            ( ( bal_size >  0u ) && ( this->bal != nullptr ) ) );
+            ( ( this->getBalSize() == 0u ) && ( this->bal == nullptr ) ) ||
+            ( ( this->getBalSize() >  0u ) && ( this->bal != nullptr ) ) );
 
         return reinterpret_cast< CPtr >( this->bal );
     }
