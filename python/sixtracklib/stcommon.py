@@ -67,6 +67,10 @@ st_Buffer_new_on_data = sixtracklib.st_Buffer_new_on_data
 st_Buffer_new_on_data.argtypes = [st_uchar_p, ct.c_uint64]
 st_Buffer_new_on_data.restype = st_Buffer_p
 
+st_Buffer_new_from_copy = sixtracklib.st_Buffer_new_from_copy
+st_Buffer_new_from_copy.argtypes = [st_Buffer_p]
+st_Buffer_new_from_copy.restype = st_Buffer_p
+
 st_Buffer_new_from_file = sixtracklib.st_Buffer_new_from_file
 st_Buffer_new_from_file.argtypes = [ct.c_char_p]
 st_Buffer_new_from_file.restype = st_Buffer_p
