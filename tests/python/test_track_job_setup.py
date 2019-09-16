@@ -38,16 +38,16 @@ if __name__ == '__main__':
 
     job = pyst.TrackJob(eb, pb)
 
-    assert(job.type_str() == 'cpu')
+    assert(job.arch_str == 'cpu')
     assert(job.particles_buffer == pb)
     assert(job.beam_elements_buffer == eb)
-    assert(not job.has_output_buffer())
+    assert(not job.has_output_buffer)
     assert(job.output_buffer is None)
-    assert(not job.has_elem_by_elem_output())
-    assert(not job.has_beam_monitor_output())
-    assert(job.num_beam_monitors() == 0)
-    assert(job.elem_by_elem_output_offset() == 0)
-    assert(job.beam_monitor_output_offset() == 0)
+    assert(not job.has_elem_by_elem_output)
+    assert(not job.has_beam_monitor_output)
+    assert(job.num_beam_monitors == 0)
+    assert(job.elem_by_elem_output_offset == 0)
+    assert(job.beam_monitor_output_offset == 0)
 
     del job
     job = None
@@ -67,25 +67,25 @@ if __name__ == '__main__':
 
     job = pyst.TrackJob(eb, pb, until_turn_elem_by_elem)
 
-    assert(job.type_str() == 'cpu')
+    assert(job.arch_str == 'cpu')
     assert(job.particles_buffer == pb)
     assert(job.beam_elements_buffer == eb)
-    assert(job.has_output_buffer())
+    assert(job.has_output_buffer)
     assert(job.output_buffer is not None)
     assert(job.output_buffer.n_objects == 1)
 
-    assert(job.has_elem_by_elem_output())
-    assert(job.elem_by_elem_output_offset() < job.output_buffer.n_objects)
-    elem_by_elem_offset = job.elem_by_elem_output_offset()
+    assert(job.has_elem_by_elem_output)
+    assert(job.elem_by_elem_output_offset < job.output_buffer.n_objects)
+    elem_by_elem_offset = job.elem_by_elem_output_offset
 
     assert(job.output_buffer.get_object_typeid(elem_by_elem_offset) ==
            particle_type_id)
 
-    assert(not job.has_beam_monitor_output())
-    assert(job.num_beam_monitors() == 0)
-    assert(job.elem_by_elem_output_offset() == 0)
-    assert(job.beam_monitor_output_offset() >
-           job.elem_by_elem_output_offset())
+    assert(not job.has_beam_monitor_output)
+    assert(job.num_beam_monitors == 0)
+    assert(job.elem_by_elem_output_offset == 0)
+    assert(job.beam_monitor_output_offset >
+           job.elem_by_elem_output_offset)
 
     del job
     job = None
@@ -122,23 +122,23 @@ if __name__ == '__main__':
 
     job = pyst.TrackJob(eb, pb, until_turn_elem_by_elem)
 
-    assert(job.type_str() == 'cpu')
+    assert(job.arch_str == 'cpu')
     assert(job.particles_buffer == pb)
     assert(job.beam_elements_buffer == eb)
-    assert(job.has_output_buffer())
+    assert(job.has_output_buffer)
     assert(job.output_buffer is not None)
     assert(job.output_buffer.n_objects == num_beam_monitors)
 
-    assert(not job.has_elem_by_elem_output())
-    assert(job.elem_by_elem_output_offset() == 0)
-    assert(job.beam_monitor_output_offset() == 0)
-    beam_monitor_output_offset = job.beam_monitor_output_offset()
+    assert(not job.has_elem_by_elem_output)
+    assert(job.elem_by_elem_output_offset == 0)
+    assert(job.beam_monitor_output_offset == 0)
+    beam_monitor_output_offset = job.beam_monitor_output_offset
 
     assert(job.output_buffer.get_object_typeid(beam_monitor_output_offset) ==
            particle_type_id)
 
-    assert(job.has_beam_monitor_output())
-    assert(job.num_beam_monitors() == num_beam_monitors)
+    assert(job.has_beam_monitor_output)
+    assert(job.num_beam_monitors == num_beam_monitors)
 
     del job
     job = None
@@ -161,18 +161,18 @@ if __name__ == '__main__':
 
     job = pyst.TrackJob(eb, pb, until_turn_elem_by_elem)
 
-    assert(job.type_str() == 'cpu')
+    assert(job.arch_str == 'cpu')
     assert(job.particles_buffer == pb)
     assert(job.beam_elements_buffer == eb)
-    assert(job.has_output_buffer())
+    assert(job.has_output_buffer)
     assert(job.output_buffer is not None)
     assert(job.output_buffer.n_objects == (num_beam_monitors + 1))
 
-    assert(job.has_elem_by_elem_output())
-    assert(job.has_beam_monitor_output())
+    assert(job.has_elem_by_elem_output)
+    assert(job.has_beam_monitor_output)
 
-    elem_by_elem_output_offset = job.elem_by_elem_output_offset()
-    beam_monitor_output_offset = job.beam_monitor_output_offset()
+    elem_by_elem_output_offset = job.elem_by_elem_output_offset
+    beam_monitor_output_offset = job.beam_monitor_output_offset
     assert(elem_by_elem_output_offset == 0)
     assert(elem_by_elem_output_offset < beam_monitor_output_offset)
     assert(beam_monitor_output_offset + num_beam_monitors <=
@@ -185,8 +185,8 @@ if __name__ == '__main__':
         jj = ii + beam_monitor_output_offset
         assert(job.output_buffer.get_object_typeid(jj) == particle_type_id)
 
-    assert(job.has_beam_monitor_output())
-    assert(job.num_beam_monitors() == num_beam_monitors)
+    assert(job.has_beam_monitor_output)
+    assert(job.num_beam_monitors == num_beam_monitors)
 
     del job
     job = None

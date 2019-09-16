@@ -54,10 +54,10 @@ if __name__ == '__main__':
     job = pyst.TrackJob(line, pb, 0, "opencl", "0.0")
     assert job.type_str() == 'opencl'
     assert job.requires_collecting
-    assert job.has_output_buffer()
-    assert not job.has_elem_by_elem_output()
-    assert job.has_beam_monitor_output()
-    assert job.num_beam_monitors() == 2
+    assert job.has_output_buffer
+    assert not job.has_elem_by_elem_output
+    assert job.has_beam_monitor_output
+    assert job.num_beam_monitors == 2
 
     # Copy the original contents of the line, the particle buffer and the out-
     # put buffer to a set of different buffers -> so we can keep track of them
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     st_Particles_random_init(ptr_particles)
     assert st_Particles_compare_values(ptr_particles, ptr_init_particles) != 0
 
-    for ii in range(0, job.num_beam_monitors()):
+    for ii in range(0, job.num_beam_monitors):
         ptr_be_mon_output = st_Particles_cbuffer_get_particles(
             job.output.cbuffer, ii)
         ptr_init_be_mon_output = st_Particles_buffer_get_particles(
@@ -170,7 +170,7 @@ if __name__ == '__main__':
 
     job.push_particles()
     job.push_beam_elements()
-    job.push_output()
+    job._push_output()
 
     # Modify the local buffers again  and verify that they are different from
     # the saved contents
@@ -199,7 +199,7 @@ if __name__ == '__main__':
 
     line.cbuffer.get_object(8, cls=pyst.BeamMonitor).out_address = 0
 
-    for ii in range(0, job.num_beam_monitors()):
+    for ii in range(0, job.num_beam_monitors):
         ptr_be_mon_output = st_Particles_cbuffer_get_particles(
             job.output.cbuffer, ii)
         ptr_init_be_mon_output = st_Particles_buffer_get_particles(
@@ -258,7 +258,7 @@ if __name__ == '__main__':
 
     job.collect_output()
 
-    for ii in range(0, job.num_beam_monitors()):
+    for ii in range(0, job.num_beam_monitors):
         ptr_be_mon_output = st_Particles_cbuffer_get_particles(
             job.output.cbuffer, ii)
         ptr_init_be_mon_output = st_Particles_buffer_get_particles(

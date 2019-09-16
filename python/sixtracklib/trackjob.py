@@ -526,24 +526,6 @@ class TrackJobBaseNew(object):
                 self._last_status))
         return self
 
-    def enable_collect_particles(self):
-        self._last_status = st_TrackJobNew_enable_collect_particles(
-            self._ptr_track_job)
-        raise_error_if_status_not_success(
-            self._last_status,
-            "unsuccessful enable collection of particles op; status:{0}".format(
-                self._last_status))
-        return self
-
-    def disable_collect_particles(self):
-        self._last_status = st_TrackJobNew_disable_collect_particles(
-            self._ptr_track_job)
-        raise_error_if_status_not_success(
-            self._last_status,
-            "unsuccessful disable collection of particles op; status:{0}".format(
-                self._last_status))
-        return self
-
     def collectBeamElements(self):
         warnings.warn("collectBeamElements() is depreciated; " +
                       "use collect_beam_elements() instead", DeprecationWarning)
@@ -558,25 +540,6 @@ class TrackJobBaseNew(object):
                 self._last_status))
         return self
 
-    def enable_collect_beam_elements(self):
-        self._last_status = st_TrackJobNew_enable_collect_beam_elements(
-            self._ptr_track_job)
-        raise_error_if_status_not_success(
-            self._last_status,
-            "unsuccessful enable collection of beam elements op; " +
-            "status:{0}".format(
-                self._last_status))
-        return self
-
-    def disable_collect_beam_elements(self):
-        self._last_status = st_TrackJobNew_disable_collect_beam_elements(
-            self._ptr_track_job)
-        raise_error_if_status_not_success(
-            self._last_status,
-            "unsuccessful disable collection of beam elements op; " +
-            "status:{0}".format(
-                self._last_status))
-        return self
 
     def collectOutput(self):
         warnings.warn("collectOutput() is depreciated; " +
@@ -589,24 +552,6 @@ class TrackJobBaseNew(object):
         raise_error_if_status_not_success(
             self._last_status,
             "unsuccessful output collection op; status:{0}".format(
-                self._last_status))
-        return self
-
-    def enable_collect_output(self):
-        self._last_status = st_TrackJobNew_enable_collect_output(
-            self._ptr_track_job)
-        raise_error_if_status_not_success(
-            self._last_status,
-            "unsuccessful enable collection of output op; status:{0}".format(
-                self._last_status))
-        return self
-
-    def disable_collect_output(self):
-        self._last_status = st_TrackJobNew_disable_collect_output(
-            self._ptr_track_job)
-        raise_error_if_status_not_success(
-            self._last_status,
-            "unsuccessful disable collection of output op; status:{0}".format(
                 self._last_status))
         return self
 
@@ -643,21 +588,6 @@ class TrackJobBaseNew(object):
 
     # -------------------------------------------------------------------------
 
-    def push(self, flags):
-        ret_flags = flags
-        if flags != 0:
-            ret_flags = st_TrackJobNew_push(self._ptr_track_job,
-                                            ct.c_uint16(flags))
-            if ret_flags != flags:
-                self._last_status = st_ARCH_STATUS_GENERAL_FAILURE
-                raise_error_if_status_not_success(
-                    self._last_status,
-                    "unsuccessful push op; input flags: " +
-                    "{0}, returned flags: {1}".format(
-                        flags,
-                        ret_flags))
-        return self
-
     def push_particles(self):
         self._last_status = st_TrackJobNew_push_particles(self._ptr_track_job)
         raise_error_if_status_not_success(
@@ -675,7 +605,7 @@ class TrackJobBaseNew(object):
                 self._last_status))
         return self
 
-    def push_output(self):
+    def _push_output(self):
         self._last_status = st_TrackJobNew_push_output(
             self._ptr_track_job)
         raise_error_if_status_not_success(
@@ -981,10 +911,6 @@ class TrackJob(object):
     def requires_collecting(self):
         return st.st_TrackJob_requires_collecting(self.ptr_st_track_job)
 
-    def push(self, flags):
-        st.st_TrackJob_push(self.ptr_st_track_job, ct.c_uint16(flags))
-        return
-
     def push_particles(self):
         st.st_TrackJob_push_particles(self.ptr_st_track_job)
         return
@@ -993,7 +919,7 @@ class TrackJob(object):
         st.st_TrackJob_push_beam_elements(self.ptr_st_track_job)
         return
 
-    def push_output(self):
+    def _push_output(self):
         st.st_TrackJob_push_output(self.ptr_st_track_job)
 
     @property
@@ -1012,23 +938,38 @@ class TrackJob(object):
         str = st.st_TrackJob_get_type_str(self.ptr_st_track_job)
         return str.decode('utf-8')
 
+    @property
+    def arch_id(self):
+        return st.st_TrackJob_get_type_id(self.ptr_st_track_job)
+
+    @property
+    def arch_str(self):
+        str = st.st_TrackJob_get_type_str(self.ptr_st_track_job)
+        return str.decode('utf-8')
+
+    @property
     def num_beam_monitors(self):
         return st.st_TrackJob_get_num_beam_monitors(self.ptr_st_track_job)
 
+    @property
     def has_elem_by_elem_output(self):
         return st.st_TrackJob_has_elem_by_elem_output(self.ptr_st_track_job)
 
+    @property
     def has_beam_monitor_output(self):
         return st.st_TrackJob_has_beam_monitor_output(self.ptr_st_track_job)
 
+    @property
     def elem_by_elem_output_offset(self):
         return st.st_TrackJob_get_elem_by_elem_output_buffer_offset(
             self.ptr_st_track_job)
 
+    @property
     def beam_monitor_output_offset(self):
         return st.st_TrackJob_get_beam_monitor_output_buffer_offset(
             self.ptr_st_track_job)
 
+    @property
     def has_output_buffer(self):
         return st.st_TrackJob_has_output_buffer(self.ptr_st_track_job) and \
             bool(self._output_buffer is not None)
