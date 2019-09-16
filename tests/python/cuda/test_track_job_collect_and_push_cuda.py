@@ -170,7 +170,7 @@ if __name__ == '__main__':
 
     job.push_particles()
     job.push_beam_elements()
-    job.push_output()
+    job._push_output()
 
     # Modify the local buffers again  and verify that they are different from
     # the saved contents
