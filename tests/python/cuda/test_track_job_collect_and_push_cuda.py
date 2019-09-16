@@ -256,7 +256,7 @@ if __name__ == '__main__':
     bemon9 = line.cbuffer.get_object(8, cls=pyst.BeamMonitor)
     assert bemon9.out_address == 137
 
-    job._collect_output()
+    job.collect_output()
 
     for ii in range(0, job.num_beam_monitors):
         ptr_be_mon_output = st_Particles_cbuffer_get_particles(
