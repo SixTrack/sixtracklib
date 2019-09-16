@@ -155,9 +155,17 @@ def track_particle_sixtrack(
     return x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt
 
 
-def track_particle_pysixtrack(line, part, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
-                              Dy_wrt_CO_m, Dpy_wrt_CO_rad,
-                              Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns, verbose=False):
+def track_particle_pysixtrack(
+        line,
+        part,
+        Dx_wrt_CO_m,
+        Dpx_wrt_CO_rad,
+        Dy_wrt_CO_m,
+        Dpy_wrt_CO_rad,
+        Dsigma_wrt_CO_m,
+        Ddelta_wrt_CO,
+        n_turns,
+        verbose=False):
 
     Dx_wrt_CO_m, Dpx_wrt_CO_rad,\
         Dy_wrt_CO_m, Dpy_wrt_CO_rad,\
@@ -250,7 +258,7 @@ def track_particle_sixtracklib(
     else:
         job = sixtracklib.TrackJob(elements, ps, device=device)
 
-    job.track(n_turns)
+    job.track_until(n_turns)
     job.collect()
 
     res = job.output

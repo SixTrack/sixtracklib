@@ -85,7 +85,37 @@ SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(LimitEllipse_copy)(
     SIXTRL_BE_ARGPTR_DEC const NS(LimitEllipse) *const
         SIXTRL_RESTRICT source );
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse) const*
+NS(BufferIndex_get_const_limit_ellipse)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const index_obj );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)*
+NS(BufferIndex_get_limit_ellipse)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* index_obj );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse) const*
+NS(BeamElements_managed_buffer_get_const_limit_ellipse)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)*
+NS(BeamElements_managed_buffer_get_limit_ellipse)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size );
+
 #if !defined( _GPUCODE )
+
+SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse) const*
+NS(BeamElements_buffer_get_const_limit_ellipse)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index );
+
+SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)*
+NS(BeamElements_buffer_get_limit_ellipse)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
 NS(LimitEllipse_get_required_num_dataptrs)(
@@ -127,6 +157,12 @@ NS(LimitEllipse_add_copy)(
 /* ========================================================================= */
 /*        Implementation of inline functions for NS(LimitEllipse)               */
 /* ========================================================================= */
+
+#if !defined( _GPUCODE )
+    #if !defined( SIXTRL_NO_INCLUDES )
+        #include "sixtracklib/common/buffer.h"
+    #endif /* !defined( SIXTRL_NO_INCLUDES ) */
+#endif /* !defined( _GPUCODE ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 extern "C" {
@@ -277,6 +313,78 @@ SIXTRL_INLINE NS(arch_status_t) NS(LimitEllipse_copy)(
 
     return status;
 }
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse) const*
+NS(BufferIndex_get_const_limit_ellipse)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const index_obj )
+{
+    typedef NS(LimitEllipse) beam_element_t;
+    typedef SIXTRL_BUFFER_OBJ_DATAPTR_DEC beam_element_t const* ptr_to_be_t;
+    ptr_to_be_t ptr_to_be = SIXTRL_NULLPTR;
+
+    if( ( index_obj != SIXTRL_NULLPTR ) &&
+        ( NS(Object_get_type_id)( index_obj ) == NS(OBJECT_TYPE_LIMIT_ELLIPSE) ) &&
+        ( NS(Object_get_size)( index_obj ) >= sizeof( beam_element_t ) ) )
+    {
+        ptr_to_be = ( ptr_to_be_t )( uintptr_t
+            )NS(Object_get_begin_addr)( index_obj );
+    }
+
+    return ptr_to_be;
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)*
+NS(BufferIndex_get_limit_ellipse)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* index_obj )
+{
+    return ( SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)*
+        )NS(BufferIndex_get_const_limit_ellipse)( index_obj );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse) const*
+NS(BeamElements_managed_buffer_get_const_limit_ellipse)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size )
+{
+    return NS(BufferIndex_get_const_limit_ellipse)(
+        NS(ManagedBuffer_get_const_object)( pbuffer, be_index, slot_size ) );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)*
+NS(BeamElements_managed_buffer_get_limit_ellipse)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size )
+{
+    return NS(BufferIndex_get_limit_ellipse)(
+        NS(ManagedBuffer_get_object)( pbuffer, be_index, slot_size ) );
+}
+
+#if !defined( _GPUCODE )
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse) const*
+NS(BeamElements_buffer_get_const_limit_ellipse)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* ptr_raw_t;
+    return NS(BeamElements_managed_buffer_get_const_limit_ellipse)(
+        ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ),
+        be_index, NS(Buffer_get_slot_size)( buffer ) );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(LimitEllipse)*
+NS(BeamElements_buffer_get_limit_ellipse)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char* ptr_raw_t;
+    return NS(BeamElements_managed_buffer_get_limit_ellipse)(
+        ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ),
+        be_index, NS(Buffer_get_slot_size)( buffer ) );
+}
+
+#endif /* !defined( _GPUCODE ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }

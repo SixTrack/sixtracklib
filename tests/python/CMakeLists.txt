@@ -8,6 +8,10 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
         add_subdirectory( cuda )
     endif()
 
+    if( SIXTRACKL_ENABLE_OPENCL )
+        add_subdirectory( opencl )
+    endif()
+
     # -------------------------------------------------------------------------
     # test_cbuffer_st_buffer:
 
@@ -39,16 +43,6 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
         COMMAND ${PYTHON_EXECUTABLE}
                 ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cpu.py
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
-
-    if( SIXTRACKL_ENABLE_OPENCL )
-        # ---------------------------------------------------------------------
-        # test_track_job_opencl:
-
-         add_test( NAME Python_TrackJobOpenClTests
-             COMMAND ${PYTHON_EXECUTABLE}
-                     ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_opencl.py
-             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
-    endif()
 
 endif()
 

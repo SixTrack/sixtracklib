@@ -18,6 +18,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/track/definitions.h"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/internal/track_job_base.h"
 
@@ -235,8 +236,29 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_set_collect_flags)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job,
     NS(track_job_collect_flag_t) const flag );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool requiresCollect(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_requires_collecting)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_push)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT track_job,
+    NS(track_job_push_flag_t) const flags );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_push_particles)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_push_beam_elements)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_push_output)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT track_job );
+
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_can_fetch_particle_addresses)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_particle_addresses)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT track_job );
 
 /* ------------------------------------------------------------------------- */
 

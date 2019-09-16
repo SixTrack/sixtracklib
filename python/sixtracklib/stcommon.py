@@ -67,6 +67,10 @@ st_Buffer_new_on_data = sixtracklib.st_Buffer_new_on_data
 st_Buffer_new_on_data.argtypes = [st_uchar_p, ct.c_uint64]
 st_Buffer_new_on_data.restype = st_Buffer_p
 
+st_Buffer_new_from_copy = sixtracklib.st_Buffer_new_from_copy
+st_Buffer_new_from_copy.argtypes = [st_Buffer_p]
+st_Buffer_new_from_copy.restype = st_Buffer_p
+
 st_Buffer_new_from_file = sixtracklib.st_Buffer_new_from_file
 st_Buffer_new_from_file.argtypes = [ct.c_char_p]
 st_Buffer_new_from_file.restype = st_Buffer_p
@@ -858,6 +862,51 @@ st_TrackJob_collect = sixtracklib.st_TrackJob_collect
 st_TrackJob_collect.argtypes = [st_TrackJob_p]
 st_TrackJob_collect.restype = None
 
+st_TrackJob_collect_detailed = sixtracklib.st_TrackJob_collect_detailed
+st_TrackJob_collect_detailed.argtypes = [st_TrackJob_p, ct.c_uint16]
+st_TrackJob_collect_detailed.restype = None
+
+st_TrackJob_collect_particles = sixtracklib.st_TrackJob_collect_particles
+st_TrackJob_collect_particles.argtypes = [st_TrackJob_p]
+st_TrackJob_collect_particles.restype = None
+
+st_TrackJob_collect_beam_elements = sixtracklib.st_TrackJob_collect_beam_elements
+st_TrackJob_collect_beam_elements.argtypes = [st_TrackJob_p]
+st_TrackJob_collect_beam_elements.restype = None
+
+st_TrackJob_collect_output = sixtracklib.st_TrackJob_collect_output
+st_TrackJob_collect_output.argtypes = [st_TrackJob_p]
+st_TrackJob_collect_output.restype = None
+
+st_TrackJob_requires_collecting = sixtracklib.st_TrackJob_requires_collecting
+st_TrackJob_requires_collecting.argtypes = [st_TrackJob_p]
+st_TrackJob_requires_collecting.restype = ct.c_bool
+
+st_TrackJob_push = sixtracklib.st_TrackJob_push
+st_TrackJob_push.argtypes = [st_TrackJob_p, ct.c_uint16]
+st_TrackJob_push.restype = None
+
+st_TrackJob_push_particles = sixtracklib.st_TrackJob_push_particles
+st_TrackJob_push_particles.argtypes = [st_TrackJob_p]
+st_TrackJob_push_particles.restype = None
+
+st_TrackJob_push_beam_elements = sixtracklib.st_TrackJob_push_beam_elements
+st_TrackJob_push_beam_elements.argtypes = [st_TrackJob_p]
+st_TrackJob_push_beam_elements.restype = None
+
+st_TrackJob_push_output = sixtracklib.st_TrackJob_push_output
+st_TrackJob_push_output.argtypes = [st_TrackJob_p]
+st_TrackJob_push_output.restype = None
+
+st_TrackJob_can_fetch_particle_addresses = \
+    sixtracklib.st_TrackJob_can_fetch_particle_addresses
+st_TrackJob_can_fetch_particle_addresses.argtypes = [st_TrackJob_p]
+st_TrackJob_can_fetch_particle_addresses.restype = ct.c_bool
+
+st_TrackJob_has_particle_addresses = \
+    sixtracklib.st_TrackJob_has_particle_addresses
+st_TrackJob_has_particle_addresses.argtypes = [st_TrackJob_p]
+st_TrackJob_has_particle_addresses.restype = ct.c_bool
 
 st_TrackJob_get_type_id = sixtracklib.st_TrackJob_get_type_id
 st_TrackJob_get_type_id.argtypes = [st_TrackJob_p]
@@ -2127,6 +2176,25 @@ st_TrackJobNew_requires_collecting = \
     sixtracklib.st_TrackJobNew_requires_collecting
 st_TrackJobNew_requires_collecting.argtypes = [st_TrackJobBaseNew_p]
 st_TrackJobNew_requires_collecting.restype = ct.c_bool
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+st_TrackJobNew_push = sixtracklib.st_TrackJobNew_push
+st_TrackJobNew_push.argtypes = [st_TrackJobBaseNew_p, ct.c_uint16]
+st_TrackJobNew_push.restype = ct.c_uint16
+
+st_TrackJobNew_push_particles = sixtracklib.st_TrackJobNew_push_particles
+st_TrackJobNew_push_particles.argtypes = [st_TrackJobBaseNew_p]
+st_TrackJobNew_push_particles.restype = st_arch_status_t
+
+st_TrackJobNew_push_beam_elements = \
+    sixtracklib.st_TrackJobNew_push_beam_elements
+st_TrackJobNew_push_beam_elements.argtypes = [st_TrackJobBaseNew_p]
+st_TrackJobNew_push_beam_elements.restype = st_arch_status_t
+
+st_TrackJobNew_push_output = sixtracklib.st_TrackJobNew_push_output
+st_TrackJobNew_push_output.argtypes = [st_TrackJobBaseNew_p]
+st_TrackJobNew_push_output.restype = st_arch_status_t
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

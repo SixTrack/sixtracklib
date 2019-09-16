@@ -66,7 +66,35 @@ SIXTRL_FN SIXTRL_STATIC int NS(Drift_compare_values_with_treshold)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Drift) const*
+NS(BufferIndex_get_const_drift)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const index_obj );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Drift)*
+NS(BufferIndex_get_drift)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* index_obj );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Drift) const*
+NS(BeamElements_managed_buffer_get_const_drift)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index,
+    NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Drift)*
+NS(BeamElements_managed_buffer_get_drift)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size );
+
 #if !defined( _GPUCODE )
+
+SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(Drift) const*
+NS(BeamElements_buffer_get_const_drift)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index );
+
+SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(Drift)*
+NS(BeamElements_buffer_get_drift)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index );
 
 SIXTRL_FN SIXTRL_STATIC bool NS(Drift_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
@@ -132,7 +160,38 @@ SIXTRL_FN SIXTRL_STATIC int NS(DriftExact_compare_values_with_treshold)(
     SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT rhs,
     NS(drift_real_t) const treshold );
 
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact) const*
+NS(BufferIndex_get_const_drift_exact)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const index_obj );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact)*
+NS(BufferIndex_get_drift_exact)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* index_obj );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact) const*
+NS(BeamElements_managed_buffer_get_const_drift_exact)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index,
+    NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact)*
+NS(BeamElements_managed_buffer_get_drift_exact)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index,
+    NS(buffer_size_t) const slot_size );
+
 #if !defined( _GPUCODE )
+
+SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact) const*
+NS(BeamElements_buffer_get_const_drift_exact)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index );
+
+SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact)*
+NS(BeamElements_buffer_get_drift_exact)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index );
 
 SIXTRL_FN SIXTRL_STATIC bool NS(DriftExact_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
@@ -314,8 +373,76 @@ SIXTRL_INLINE int NS(Drift_compare_values_with_treshold)(
 
     return compare_value;
 }
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Drift) const*
+NS(BufferIndex_get_const_drift)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const index_obj )
+{
+    typedef NS(Drift) beam_element_t;
+    typedef SIXTRL_BUFFER_OBJ_DATAPTR_DEC beam_element_t const* ptr_to_be_t;
+    ptr_to_be_t ptr_to_be = SIXTRL_NULLPTR;
+
+    if( ( index_obj != SIXTRL_NULLPTR ) &&
+        ( NS(Object_get_type_id)( index_obj ) == NS(OBJECT_TYPE_DRIFT) ) &&
+        ( NS(Object_get_size)( index_obj ) >= sizeof( beam_element_t ) ) )
+    {
+        ptr_to_be = ( ptr_to_be_t )( uintptr_t
+            )NS(Object_get_begin_addr)( index_obj );
+    }
+
+    return ptr_to_be;
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Drift)*
+NS(BufferIndex_get_drift)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* index_obj )
+{
+    return ( SIXTRL_BUFFER_OBJ_DATAPTR_DEC NS(Drift)*
+        )NS(BufferIndex_get_const_drift)( index_obj );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Drift) const*
+NS(BeamElements_managed_buffer_get_const_drift)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size )
+{
+    return NS(BufferIndex_get_const_drift)(
+        NS(ManagedBuffer_get_const_object)( pbuffer, be_index, slot_size ) );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Drift)*
+NS(BeamElements_managed_buffer_get_drift)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index,
+    NS(buffer_size_t) const slot_size )
+{
+    return NS(BufferIndex_get_drift)( NS(ManagedBuffer_get_object)(
+        pbuffer, be_index, slot_size ) );
+}
 
 #if !defined( _GPUCODE )
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Drift) const*
+NS(BeamElements_buffer_get_const_drift)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* ptr_raw_t;
+    return NS(BeamElements_managed_buffer_get_const_drift)(
+        ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ),
+        be_index, NS(Buffer_get_slot_size)( buffer ) );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Drift)*
+NS(BeamElements_buffer_get_drift)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char* ptr_raw_t;
+    return NS(BeamElements_managed_buffer_get_drift)(
+        ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ),
+        be_index, NS(Buffer_get_slot_size)( buffer ) );
+}
 
 SIXTRL_INLINE  bool NS(Drift_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
@@ -541,7 +668,78 @@ SIXTRL_INLINE int NS(DriftExact_compare_values_with_treshold)(
     return compare_value;
 }
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact) const*
+NS(BufferIndex_get_const_drift_exact)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const index_obj )
+{
+    typedef NS(DriftExact) beam_element_t;
+    typedef SIXTRL_BUFFER_OBJ_DATAPTR_DEC beam_element_t const* ptr_to_be_t;
+    ptr_to_be_t ptr_to_be = SIXTRL_NULLPTR;
+
+    if( ( index_obj != SIXTRL_NULLPTR ) &&
+        ( NS(Object_get_type_id)( index_obj ) == NS(OBJECT_TYPE_DRIFT_EXACT) ) &&
+        ( NS(Object_get_size)( index_obj ) >= sizeof( beam_element_t ) ) )
+    {
+        ptr_to_be = ( ptr_to_be_t )( uintptr_t
+            )NS(Object_get_begin_addr)( index_obj );
+    }
+
+    return ptr_to_be;
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact)*
+NS(BufferIndex_get_drift_exact)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* index_obj )
+{
+    return ( SIXTRL_BUFFER_OBJ_DATAPTR_DEC NS(DriftExact)*
+        )NS(BufferIndex_get_const_drift_exact)( index_obj );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact) const*
+NS(BeamElements_managed_buffer_get_const_drift_exact)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index,
+    NS(buffer_size_t) const slot_size )
+{
+    return NS(BufferIndex_get_const_drift_exact)(
+        NS(ManagedBuffer_get_const_object)( pbuffer, be_index, slot_size ) );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact)*
+NS(BeamElements_managed_buffer_get_drift_exact)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index,
+    NS(buffer_size_t) const slot_size )
+{
+    return NS(BufferIndex_get_drift_exact)( NS(ManagedBuffer_get_object)(
+        pbuffer, be_index, slot_size ) );
+}
+
 #if !defined( _GPUCODE )
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact) const*
+NS(BeamElements_buffer_get_const_drift_exact)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* ptr_raw_t;
+    return NS(BeamElements_managed_buffer_get_const_drift_exact)(
+        ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ),
+        be_index, NS(Buffer_get_slot_size)( buffer ) );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(DriftExact)*
+NS(BeamElements_buffer_get_drift_exact)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char* ptr_raw_t;
+    return NS(BeamElements_managed_buffer_get_drift_exact)(
+        ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ),
+        be_index, NS(Buffer_get_slot_size)( buffer ) );
+}
 
 SIXTRL_INLINE  bool NS(DriftExact_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,

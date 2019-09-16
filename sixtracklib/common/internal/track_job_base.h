@@ -51,6 +51,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using output_buffer_flag_t  = ::NS(output_buffer_flag_t);
 
         using collect_flag_t = SIXTRL_CXX_NAMESPACE::track_job_collect_flag_t;
+        using push_flag_t    = SIXTRL_CXX_NAMESPACE::track_job_push_flag_t;
 
         /* ----------------------------------------------------------------- */
 
@@ -97,6 +98,13 @@ namespace SIXTRL_CXX_NAMESPACE
             collect_flag_t const flag ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool requiresCollecting() const SIXTRL_NOEXCEPT;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN void push( push_flag_t const flags );
+        SIXTRL_HOST_FN void pushParticles();
+        SIXTRL_HOST_FN void pushBeamElements();
+        SIXTRL_HOST_FN void pushOutput();
 
         /* ----------------------------------------------------------------- */
 
@@ -334,6 +342,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual void doClear();
 
         SIXTRL_HOST_FN virtual void doCollect( collect_flag_t const flags );
+        SIXTRL_HOST_FN virtual void doPush( push_flag_t const flags );
 
         /* ----------------------------------------------------------------- */
 

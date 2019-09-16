@@ -16,11 +16,11 @@ print(q1mad, q2mad)
 
 # Build elements for SixTrackLib
 elements = pystlib.Elements.from_line(
-        pysixtrack.Line.from_madx_sequence(mad.sequence.sps)[0])
+    pysixtrack.Line.from_madx_sequence(mad.sequence.sps)[0])
 nturns = 2**14
 
 ps_line, _ = pysixtrack.Line.from_madx_sequence(mad.sequence.sps)
-elements=pystlib.Elements()
+elements = pystlib.Elements()
 elements.append_line(ps_line)
 bpm = elements.BeamMonitor(num_stores=nturns)
 
@@ -37,15 +37,15 @@ npart = 10
 particles = pystlib.Particles.from_ref(npart, p0c=26e6)
 particles.x += np.linspace(0, 1e-6, npart)
 job = pystlib.TrackJob(elements, particles)
-job.track(nturns)
+job.track_until(nturns)
 
 # Find tunes
-ff = np.linspace(0, 0.5, nturns//2+1)
+ff = np.linspace(0, 0.5, nturns // 2 + 1)
 x = job.output.particles[0].x[1::npart]
 xf = abs(np.fft.rfft(x))
 pl.plot(ff, xf)
 q1st = ff[xf.argmax()]
-print((q1mad-20)-q1st)
+print((q1mad - 20) - q1st)
 
 # Track many particles few turns GPU
 npart = 5000
@@ -53,8 +53,8 @@ nturns = 256
 bpm.num_stores = nturns
 particles = pystlib.Particles.from_ref(npart, p0c=26e6)
 particles.x += np.linspace(0, 1e-1, npart)
-job = pystlib.TrackJob(elements, particles)#, device="opencl:0.0")
-job.track(nturns)
+job = pystlib.TrackJob(elements, particles)  # , device="opencl:0.0")
+job.track_until(nturns)
 job.collect()
 
 

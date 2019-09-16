@@ -95,21 +95,21 @@ if __name__ == '__main__':
 
     print("TrackJob:")
     print("----------------------------------------------------------------")
-    print("architecture                 : {0}".format(job.type_str()))
+    print("architecture                 : {0}".format(job.arch_str))
 
-    if job.has_elem_by_elem_output():
+    if job.has_elem_by_elem_output:
         print("has elem_by_elem output      : yes")
     else:
         print("has elem_by_elem output      : no")
 
-    if job.has_beam_monitor_output():
+    if job.has_beam_monitor_output:
         print("has beam monitor output      : yes")
         print("num beam monitors            : {0}".format(
-            job.num_beam_monitors()))
+            job.num_beam_monitors))
     else:
         print("has beam monitor output      : no")
 
-    if job.has_output_buffer():
+    if job.has_output_buffer:
         print("has output buffer            : yes")
     else:
         print("has output buffer            : no")
@@ -138,7 +138,7 @@ if __name__ == '__main__':
         print("\r\ntracking until turn {0} ... ".format(
             args.until_turn_output))
 
-        status = job.track(args.until_turn_output)
+        status = job.track_until(args.until_turn_output)
         print(status)
         success = bool(status == 0)
 
@@ -155,18 +155,18 @@ if __name__ == '__main__':
 
     output_buffer = None
 
-    if success and job.has_output_buffer():
+    if success and job.has_output_buffer:
         output_buffer = job.output_buffer
 
-        if job.has_elem_by_elem_output():
-            assert(output_buffer.n_objects > job.elem_by_elem_output_offset())
+        if job.has_elem_by_elem_output:
+            assert(output_buffer.n_objects > job.elem_by_elem_output_offset)
             # These are the particles containing the elem by elem information
             elem_by_elem_particles = output_buffer.get_object(
-                job.elem_by_elem_output_offset(), cls=pyst.Particles)
+                job.elem_by_elem_output_offset, cls=pyst.Particles)
 
-        if job.has_beam_monitor_output():
-            out_offset = job.beam_monitor_output_offset()
-            num_monitors = job.num_beam_monitors()
+        if job.has_beam_monitor_output:
+            out_offset = job.beam_monitor_output_offset
+            num_monitors = job.num_beam_monitors
             for ii in range(out_offset, num_monitors + out_offset):
                 assert(ii < output_buffer.n_objects)
                 out_particles = output_buffer.get_object(

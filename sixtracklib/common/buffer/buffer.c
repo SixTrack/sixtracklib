@@ -404,6 +404,55 @@ SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_on_data)(
     return ptr_buffer;
 }
 
+SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* NS(Buffer_new_from_copy)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT original )
+{
+    typedef NS(buffer_size_t) size_t;
+    typedef unsigned char raw_t;
+
+    NS(Buffer)* buffer = SIXTRL_NULLPTR;
+    size_t const orig_capacity = NS(Buffer_get_capacity)( original );
+
+    if( ( original != SIXTRL_NULLPTR ) &&
+        ( NS(Buffer_get_slot_size)( original ) != ( size_t )0u ) &&
+        ( orig_capacity > ( size_t )0u ) &&
+        ( NS(Buffer_get_data_begin_addr)( original ) != 0u ) )
+    {
+        int status = -1;
+        size_t const orig_size = NS(Buffer_get_size)( original );
+        buffer = NS(Buffer_new)( orig_capacity );
+
+        if( ( buffer != SIXTRL_NULLPTR ) && ( orig_size > ( size_t )0u ) )
+        {
+            typedef SIXTRL_BUFFER_DATAPTR_DEC raw_t const* ptr_const_raw_t;
+            typedef SIXTRL_BUFFER_DATAPTR_DEC raw_t* ptr_raw_t;
+
+            ptr_const_raw_t orig_begin = ( ptr_const_raw_t )( uintptr_t
+                )NS(Buffer_get_data_begin_addr)( original );
+
+            ptr_raw_t dest_begin = ( ptr_raw_t )( uintptr_t
+                )NS(Buffer_get_data_begin_addr)( buffer );
+
+            if( ( orig_begin != SIXTRL_NULLPTR ) &&
+                ( dest_begin != SIXTRL_NULLPTR ) )
+            {
+                SIXTRACKLIB_COPY_VALUES(
+                    unsigned char, dest_begin, orig_begin, orig_size );
+
+                status = NS(Buffer_refresh)( buffer );
+            }
+
+            if( status != 0 )
+            {
+                NS(Buffer_delete)( buffer );
+                buffer = SIXTRL_NULLPTR;
+            }
+        }
+    }
+
+    return buffer;
+}
+
 int NS(Buffer_init_from_data_ext)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC unsigned char* SIXTRL_RESTRICT data_buffer_begin,

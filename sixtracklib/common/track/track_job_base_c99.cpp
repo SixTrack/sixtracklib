@@ -78,7 +78,7 @@ void NS(TrackJobNew_delete)( ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
     ::NS(buffer_size_t) const until_turn )
 {
     return ( job != nullptr )
-        ? job->trackUntil( until_turn ) : ::NS(TRACK_STATUS_GENERAL_FAILURE);
+        ? job->trackUntil( until_turn ) : st::TRACK_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(track_status_t) NS(TrackJobNew_track_elem_by_elem)(
@@ -86,8 +86,7 @@ void NS(TrackJobNew_delete)( ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
     ::NS(buffer_size_t) const until_turn )
 {
     return ( job != nullptr )
-        ? job->trackElemByElem( until_turn )
-        : ::NS(TRACK_STATUS_GENERAL_FAILURE);
+        ? job->trackElemByElem( until_turn ) : st::TRACK_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(track_status_t) NS(TrackJobNew_track_line)(
@@ -98,7 +97,7 @@ void NS(TrackJobNew_delete)( ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
         ? job->trackLine( belem_begin_index, belem_end_index, finish_turn )
-        : ::NS(TRACK_STATUS_GENERAL_FAILURE);
+        : st::TRACK_STATUS_GENERAL_FAILURE;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -106,50 +105,49 @@ void NS(TrackJobNew_delete)( ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 ::NS(track_job_collect_flag_t) NS(TrackJobNew_collect)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) ? job->collect() : ::NS(TRACK_JOB_COLLECT_NONE);
+    return ( job != nullptr ) ? job->collect() : st::TRACK_JOB_IO_NONE;
 }
 
 ::NS(track_job_collect_flag_t) NS(TrackJobNew_collect_detailed)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     ::NS(track_job_collect_flag_t) const flags )
 {
-    return ( job != nullptr )
-        ? job->collect( flags ) : ::NS(TRACK_JOB_COLLECT_NONE);
+    return ( job != nullptr ) ? job->collect( flags ) : st::TRACK_JOB_IO_NONE;
 }
 
 ::NS(arch_status_t) NS(TrackJobNew_collect_particles)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->collectParticles() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+        ? job->collectParticles() : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(TrackJobNew_collect_beam_elements)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->collectBeamElements() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+        ? job->collectBeamElements() : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(TrackJobNew_collect_output)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->collectOutput() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+        ? job->collectOutput() : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(TrackJobNew_collect_debug_flag)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->collectDebugFlag() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+        ? job->collectDebugFlag() : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(TrackJobNew_collect_particles_addresses)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->collectParticlesAddresses() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+        ? job->collectParticlesAddresses() : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 void NS(TrackJobNew_enable_collect_particles)(
@@ -210,7 +208,7 @@ bool NS(TrackJobNew_is_collecting_output)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->collectFlags() : ::NS(TRACK_JOB_COLLECT_DEFAULT_FLAGS);
+        ? job->collectFlags() : st::TRACK_JOB_IO_DEFAULT_FLAGS;
 }
 
 void NS(TrackJobNew_set_collect_flags)(
@@ -224,6 +222,33 @@ bool NS(TrackJobNew_requires_collecting)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->requiresCollecting() : false;
+}
+
+/* ------------------------------------------------------------------------- */
+
+::NS(track_job_push_flag_t) NS(TrackJobNew_push)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    ::NS(track_job_push_flag_t) const flag )
+{
+    return ( job != nullptr ) ? job->push( flag ) : st::TRACK_JOB_IO_NONE;
+}
+
+::NS(track_job_push_flag_t) NS(TrackJobNew_push_particles)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->pushParticles() : st::TRACK_JOB_IO_NONE;
+}
+
+::NS(track_job_push_flag_t) NS(TrackJobNew_push_beam_elements)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->pushBeamElements() : st::TRACK_JOB_IO_NONE;
+}
+
+::NS(track_job_push_flag_t) NS(TrackJobNew_push_output)(
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->pushOutput() : st::TRACK_JOB_IO_NONE;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -243,8 +268,8 @@ bool NS(TrackJobNew_has_particle_addresses)(
 ::NS(arch_status_t) NS(TrackJobNew_fetch_particle_addresses)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr )
-        ? job->fetchParticleAddresses() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+    return ( job != nullptr ) ? job->fetchParticleAddresses()
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(TrackJobNew_clear_particle_addresses)(
@@ -253,15 +278,14 @@ bool NS(TrackJobNew_has_particle_addresses)(
 {
     return ( job != nullptr )
         ? job->clearParticleAddresses( particle_set_index )
-        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(TrackJobNew_clear_all_particle_addresses)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr )
-        ? job->clearAllParticleAddresses()
-        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+    return ( job != nullptr ) ? job->clearAllParticleAddresses()
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(ParticlesAddr) const* NS(TrackJobNew_get_particle_addresses)(
@@ -288,15 +312,15 @@ bool NS(TrackJobNew_is_in_debug_mode)(
 ::NS(arch_status_t) NS(TrackJobNew_enable_debug_mode)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr )
-        ? job->enableDebugMode() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+    return ( job != nullptr ) ? job->enableDebugMode()
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(TrackJobNew_disable_debug_mode)(
     NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr )
-        ? job->disableDebugMode() : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+    return ( job != nullptr ) ? job->disableDebugMode()
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -314,7 +338,7 @@ void NS(TrackJobNew_clear)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
         ? job->reset( particles_buffer, beam_elem_buffer, ptr_output_buffer )
-        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(TrackJobNew_reset_particle_set)(
@@ -326,7 +350,7 @@ void NS(TrackJobNew_clear)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->reset( particles_buffer,
             particle_set_index, beam_elem_buffer, output_buffer )
-        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 
@@ -337,10 +361,9 @@ void NS(TrackJobNew_clear)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
     ::NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     ::NS(buffer_size_t) const dump_elem_by_elem_turns )
 {
-    return ( job != nullptr )
-        ? job->reset( particles_buffer, beam_elem_buffer, output_buffer,
-                      dump_elem_by_elem_turns )
-        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+    return ( job != nullptr ) ? job->reset( particles_buffer, beam_elem_buffer,
+                output_buffer, dump_elem_by_elem_turns )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t)  NS(TrackJobNew_reset_detailed)(
@@ -355,25 +378,23 @@ void NS(TrackJobNew_clear)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
     return ( job != nullptr ) ? job->reset( particles_buffer, num_particle_sets,
             particle_set_indices_begin, beam_elem_buffer, output_buffer,
                 dump_elem_by_elem_turns )
-        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t)  NS(TrackJobNew_select_particle_set)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     ::NS(buffer_size_t) const particle_set_index )
 {
-    return ( job != nullptr )
-        ? job->selectParticleSet( particle_set_index )
-        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+    return ( job != nullptr ) ? job->selectParticleSet( particle_set_index )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(TrackJobNew_assign_output_buffer)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
     ::NS(Buffer)* SIXTRL_RESTRICT ptr_output_buffer )
 {
-    return ( job != nullptr )
-        ? job->assignOutputBuffer( ptr_output_buffer )
-        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+    return ( job != nullptr ) ? job->assignOutputBuffer( ptr_output_buffer )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -381,7 +402,7 @@ void NS(TrackJobNew_clear)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 ::NS(arch_id_t) NS(TrackJobNew_get_arch_id)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) ? job->archId() : ::NS(ARCHITECTURE_ILLEGAL);
+    return ( job != nullptr ) ? job->archId() : st::ARCHITECTURE_ILLEGAL;
 }
 
 bool NS(TrackJobNew_has_arch_string)(
@@ -399,7 +420,7 @@ char const* NS(TrackJobNew_get_arch_string)(
 bool NS(TrackJobNew_has_config_str)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) ? job->hasConfigStr() : false;
+    return ( ( job != nullptr ) && ( job->hasConfigStr() ) );
 }
 
 char const* NS(TrackJobNew_get_config_str)(
@@ -410,31 +431,30 @@ char const* NS(TrackJobNew_get_config_str)(
 
 /* ------------------------------------------------------------------------- */
 
-NS(buffer_size_t) NS(TrackJobNew_get_num_particle_sets)(
+::NS(buffer_size_t) NS(TrackJobNew_get_num_particle_sets)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr )
-        ? job->numParticleSets() : ::NS(buffer_size_t){ 0 };
+    return ( job != nullptr ) ? job->numParticleSets() : st::buffer_size_t{ 0 };
 }
 
-NS(buffer_size_t) const* NS(TrackJobNew_get_particle_set_indices_begin)(
+::NS(buffer_size_t) const* NS(TrackJobNew_get_particle_set_indices_begin)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->particleSetIndicesBegin() : nullptr;
 }
 
-NS(buffer_size_t) const* NS(TrackJobNew_get_particle_set_indices_end)(
+::NS(buffer_size_t) const* NS(TrackJobNew_get_particle_set_indices_end)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->particleSetIndicesEnd() : nullptr;
 }
 
-NS(buffer_size_t) NS(TrackJobNew_get_particle_set_index)(
+::NS(buffer_size_t) NS(TrackJobNew_get_particle_set_index)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
     ::NS(buffer_size_t) const n )
 {
-    SIXTRL_ASSERT( job != nullptr );
-    return job->particleSetIndex( n );
+    return ( job != nullptr )
+        ? job->particleSetIndex( n ) : st::buffer_size_t{ 0 };
 }
 
 /* ------------------------------------------------------------------------- */
@@ -443,45 +463,45 @@ NS(buffer_size_t) NS(TrackJobNew_get_particle_set_index)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->totalNumParticles() : ::NS(buffer_size_t){ 0 };
+        ? job->totalNumParticles() : st::buffer_size_t{ 0 };
 }
 
-NS(particle_index_t) NS(TrackJobNew_get_min_particle_id)(
+::NS(particle_index_t) NS(TrackJobNew_get_min_particle_id)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     using index_t = ::NS(particle_index_t);
     return ( job != nullptr ) ? job->minParticleId() : index_t{ -1 };
 }
 
-NS(particle_index_t) NS(TrackJobNew_get_max_particle_id)(
+::NS(particle_index_t) NS(TrackJobNew_get_max_particle_id)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     using index_t = ::NS(particle_index_t);
     return ( job != nullptr ) ? job->maxParticleId() : index_t{ -1 };
 }
 
-NS(particle_index_t) NS(TrackJobNew_get_min_element_id)(
+::NS(particle_index_t) NS(TrackJobNew_get_min_element_id)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     using index_t = ::NS(particle_index_t);
     return ( job != nullptr ) ? job->minElementId() : index_t{ -1 };
 }
 
-NS(particle_index_t) NS(TrackJobNew_get_max_element_id)(
+::NS(particle_index_t) NS(TrackJobNew_get_max_element_id)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     using index_t = ::NS(particle_index_t);
     return ( job != nullptr ) ? job->maxElementId() : index_t{ -1 };
 }
 
-NS(particle_index_t) NS(TrackJobNew_get_min_initial_turn_id)(
+::NS(particle_index_t) NS(TrackJobNew_get_min_initial_turn_id)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     using index_t = ::NS(particle_index_t);
     return ( job != nullptr ) ? job->minInitialTurnId() : index_t{ -1 };
 }
 
-NS(particle_index_t) NS(TrackJobNew_get_max_initial_turn_id)(
+::NS(particle_index_t) NS(TrackJobNew_get_max_initial_turn_id)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     using index_t = ::NS(particle_index_t);
@@ -490,13 +510,13 @@ NS(particle_index_t) NS(TrackJobNew_get_max_initial_turn_id)(
 
 /* ------------------------------------------------------------------------- */
 
-NS(Buffer)* NS(TrackJobNew_get_particles_buffer)(
+::NS(Buffer)* NS(TrackJobNew_get_particles_buffer)(
     ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->ptrCParticlesBuffer() : nullptr;
 }
 
-NS(Buffer) const* NS(TrackJobNew_get_const_particles_buffer)(
+::NS(Buffer) const* NS(TrackJobNew_get_const_particles_buffer)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->ptrCParticlesBuffer() : nullptr;
@@ -519,25 +539,25 @@ NS(Buffer) const* NS(TrackJobNew_get_const_particles_buffer)(
 bool NS(TrackJobNew_has_output_buffer)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) ? job->hasOutputBuffer() : false;
+    return ( ( job != nullptr ) && ( job->hasOutputBuffer() ) );
 }
 
 bool NS(TrackJobNew_owns_output_buffer)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) ? job->ownsOutputBuffer() : false;
+    return ( ( job != nullptr ) && ( job->ownsOutputBuffer() ) );
 }
 
 bool NS(TrackJobNew_has_elem_by_elem_output)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) ? job->hasElemByElemOutput() : false;
+    return ( ( job != nullptr ) && ( job->hasElemByElemOutput() ) );
 }
 
 bool NS(TrackJobNew_has_beam_monitor_output)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) ? job->hasBeamMonitorOutput() : false;
+    return ( ( job != nullptr ) && ( job->hasBeamMonitorOutput() ) );
 }
 
 ::NS(buffer_size_t) NS(TrackJobNew_get_beam_monitor_output_buffer_offset)(
@@ -558,7 +578,7 @@ bool NS(TrackJobNew_has_beam_monitor_output)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->numElemByElemTurns() : ::NS(buffer_size_t){ 0 };
+        ? job->numElemByElemTurns() : st::buffer_size_t{ 0 };
 }
 
 ::NS(Buffer)* NS(TrackJobNew_get_output_buffer)(
@@ -578,14 +598,14 @@ bool NS(TrackJobNew_has_beam_monitor_output)(
 bool NS(TrackJobNew_has_beam_monitors)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) ? job->hasBeamMonitors() : false;
+    return ( ( job != nullptr ) && ( job->hasBeamMonitors() ) );
 }
 
 ::NS(buffer_size_t) NS(TrackJobNew_get_num_beam_monitors)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->numBeamMonitors() : ::NS(buffer_size_t){ 0 };
+        ? job->numBeamMonitors() : st::buffer_size_t{ 0 };
 }
 
 ::NS(buffer_size_t) const* NS(TrackJobNew_get_beam_monitor_indices_begin)(
@@ -602,10 +622,10 @@ bool NS(TrackJobNew_has_beam_monitors)(
 
 ::NS(buffer_size_t) NS(TrackJobNew_get_beam_monitor_index)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
-    NS(buffer_size_t) const n )
+    ::NS(buffer_size_t) const n )
 {
     return ( job != nullptr )
-        ? job->beamMonitorIndex( n ) : ::NS(buffer_size_t){ 0 };
+        ? job->beamMonitorIndex( n ) : st::buffer_size_t{ 0 };
 }
 
 /* ------------------------------------------------------------------------- */
@@ -613,7 +633,7 @@ bool NS(TrackJobNew_has_beam_monitors)(
 bool NS(TrackJobNew_has_elem_by_elem_config)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) ? job->hasElemByElemConfig() : false;
+    return ( ( job != nullptr ) && ( job->hasElemByElemConfig() ) );
 }
 
 NS(ElemByElemConfig) const* NS(TrackJobNew_get_elem_by_elem_config)(
@@ -625,51 +645,41 @@ NS(ElemByElemConfig) const* NS(TrackJobNew_get_elem_by_elem_config)(
 bool NS(TrackJobNew_is_elem_by_elem_config_rolling)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) ? job->elemByElemRolling() : false;
+    return ( ( job != nullptr ) && ( job->elemByElemRolling() ) );
 }
 
 bool NS(TrackJobNew_get_default_elem_by_elem_config_rolling_flag)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr ) ? job->defaultElemByElemRolling() : false;
+    return ( ( job != nullptr ) && ( job->defaultElemByElemRolling() ) );
 }
 
 void NS(TrackJobNew_set_default_elem_by_elem_config_rolling_flag)(
-    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job, bool const is_rolling_flag )
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job, bool const is_rolling_flag )
 {
-    if( job != nullptr )
-    {
-        job->setDefaultElemByElemRolling( is_rolling_flag );
-    }
-
-    return;
+    if( job != nullptr ) job->setDefaultElemByElemRolling( is_rolling_flag );
 }
 
-NS(elem_by_elem_order_t) NS(TrackJobNew_get_elem_by_elem_config_order)(
+::NS(elem_by_elem_order_t) NS(TrackJobNew_get_elem_by_elem_config_order)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr )
-        ? job->elemByElemOrder() : ::NS(ELEM_BY_ELEM_ORDER_INVALID);
+    return ( job != nullptr ) ? job->elemByElemOrder()
+        : ::NS(ELEM_BY_ELEM_ORDER_INVALID);
 }
 
-NS(elem_by_elem_order_t) NS(TrackJobNew_get_default_elem_by_elem_config_order)(
+::NS(elem_by_elem_order_t)
+NS(TrackJobNew_get_default_elem_by_elem_config_order)(
     const ::NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job )
 {
-    return ( job != nullptr )
-        ? job->defaultElemByElemOrder()
+    return ( job != nullptr ) ? job->defaultElemByElemOrder()
         : ::NS(ELEM_BY_ELEM_ORDER_INVALID);
 }
 
 void NS(TrackJobNew_set_default_elem_by_elem_config_order)(
-    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
-    NS(elem_by_elem_order_t) const order )
+    ::NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    ::NS(elem_by_elem_order_t) const order )
 {
-    if( job != nullptr )
-    {
-        job->setDefaultElemByElemOrder( order );
-    }
-
-    return;
+    if( job != nullptr ) job->setDefaultElemByElemOrder( order );
 }
 
 /* ------------------------------------------------------------------------- */

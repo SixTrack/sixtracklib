@@ -96,7 +96,7 @@ if __name__ == '__main__':
             track_job.track_line(be_begin_idx, be_end_idx, finish_turn)
             assert track_job.last_track_status_success
 
-    track_job.collectParticles()
+    track_job.collect_particles()
     assert track_job.last_status_success
 
     # ==========================================================================
