@@ -12,6 +12,6 @@ if( SIXTRACKL_ENABLE_PYTHON )
 endif()
 
 # Enable benchmarking tests
-if( SIXTRACKL_ENABLE_TIMING_TESTS )
+if( SIXTRACKL_ENABLE_BENCHMARK_TESTS )
     add_subdirectory( benchmark )
 endif()
