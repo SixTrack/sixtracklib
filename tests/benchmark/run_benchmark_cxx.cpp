@@ -81,7 +81,7 @@ namespace SIXTRL_CXX_NAMESPACE
                         {
                             if( 0 != ::toml_rtos( raw_str, &this->git_hash_str ) )
                             {
-                                success = true;
+                                success = false;
                             }
                         }
 
@@ -338,14 +338,20 @@ namespace SIXTRL_CXX_NAMESPACE
         struct TrackConfig
         {
             TrackConfig() : track_items(), track_config( nullptr ),
-                path_particle_dump( nullptr ),  path_lattice_dump( nullptr )
+                path_particle_dump( nullptr ),  path_lattice_dump( nullptr ),
+                x_stddev( 0.0 ), y_stddev( 0.0 ), px_stddev( 0.0 ),
+                py_stddev( 0.0 ), zeta_stddev( 0.0 ), delta_stddev( 0.0 ),
+                add_noise_to_particle( false )
             {
 
             }
 
             TrackConfig( MainConfig& main ) :
                 track_items(), track_config( nullptr ),
-                path_particle_dump( nullptr ),  path_lattice_dump( nullptr )
+                path_particle_dump( nullptr ),  path_lattice_dump( nullptr ),
+                x_stddev( 0.0 ), y_stddev( 0.0 ), px_stddev( 0.0 ),
+                py_stddev( 0.0 ), zeta_stddev( 0.0 ), delta_stddev( 0.0 ),
+                add_noise_to_particle( false )
             {
                 bool const success = this->init( main );
                 SIXTRL_ASSERT( success );
@@ -406,6 +412,39 @@ namespace SIXTRL_CXX_NAMESPACE
                     else
                     {
                         success = false;
+                    }
+
+                    if( success )
+                    {
+                        success &= TrackConfig::GetDoubleValue(
+                            "x_stddev", this->track_config, this->x_stddev );
+
+                        success &= TrackConfig::GetDoubleValue(
+                            "y_stddev", this->track_config, this->y_stddev );
+
+                        success &= TrackConfig::GetDoubleValue(
+                            "px_stddev", this->track_config, this->px_stddev );
+
+                        success &= TrackConfig::GetDoubleValue(
+                            "py_stddev", this->track_config, this->py_stddev );
+
+                        success &= TrackConfig::GetDoubleValue(
+                            "zeta_stddev", this->track_config,
+                                this->zeta_stddev );
+
+                        success &= TrackConfig::GetDoubleValue(
+                            "delta_stddev", this->track_config,
+                                this->delta_stddev );
+
+                        if( ( this->x_stddev     > double{ 0.0 } ) ||
+                            ( this->y_stddev     > double{ 0.0 } ) ||
+                            ( this->px_stddev    > double{ 0.0 } ) ||
+                            ( this->py_stddev    > double{ 0.0 } ) ||
+                            ( this->delta_stddev > double{ 0.0 } ) ||
+                            ( this->zeta_stddev  > double{ 0.0 } ) )
+                        {
+                            this->add_noise_to_particle = true;
+                        }
                     }
 
                     if( success )
@@ -539,12 +578,52 @@ namespace SIXTRL_CXX_NAMESPACE
                 }
 
                 this->track_items.clear();
+
+                this->x_stddev     = this->y_stddev  = double{ 0.0 };
+                this->px_stddev    = this->py_stddev = double{ 0.0 };
+
+                this->zeta_stddev  = double{ 0.0 };
+                this->delta_stddev = double{ 0.0 };
+                this->add_noise_to_particle = false;
+            }
+
+            static bool GetDoubleValue( char const* key_str,
+                ::toml_table_t* target_conf, double& dest )
+            {
+                bool success = false;
+
+                if( ( key_str != nullptr ) &&
+                    ( std::strlen( key_str ) > 0u ) )
+                {
+                    char const* raw_str = ::toml_raw_in( target_conf, key_str );
+                    success = true;
+
+                    if( raw_str != nullptr )
+                    {
+                        if( 0 == ::toml_rtod( raw_str, &dest ) )
+                        {
+                            if( dest < double{ 0.0 } ) dest = double{ 0.0 };
+                        }
+                        else success = false;
+                    }
+                }
+
+                return success;
             }
 
             std::vector< TrackItem > track_items;
             ::toml_table_t* track_config;
             char* path_particle_dump;
             char* path_lattice_dump;
+
+            double x_stddev;
+            double y_stddev;
+            double px_stddev;
+            double py_stddev;
+            double zeta_stddev;
+            double delta_stddev;
+
+            bool add_noise_to_particle;
         };
 
 
@@ -553,6 +632,8 @@ namespace SIXTRL_CXX_NAMESPACE
             MainConfig const& main_config, TargetConfig const& target_conf,
             TrackConfig const& track_config )
         {
+            using param_t = std::normal_distribution< double >::param_type;
+
             bool success = false;
 
             namespace st = SIXTRL_CXX_NAMESPACE;
@@ -560,6 +641,9 @@ namespace SIXTRL_CXX_NAMESPACE
             auto const start_of_benchmark = std::chrono::system_clock::now();
             auto const begin_time = std::chrono::system_clock::to_time_t(
                 start_of_benchmark );
+
+            st::Buffer init_pb( track_config.path_particle_dump );
+            st::Buffer eb( track_config.path_lattice_dump );
 
             std::ostringstream a2str;
 
@@ -586,12 +670,26 @@ namespace SIXTRL_CXX_NAMESPACE
                 name = std::string{ main_config.name_str };
             }
 
-            a2str << name << "_" << begin_time_str << ".log";
+            a2str << name << "_" << target_conf.arch_str;
+
+            if( target_conf.node_id_str != nullptr )
+            {
+                a2str << "_node" << target_conf.node_id_str;
+            }
+
+            a2str << "_" << begin_time_str << "_cxx.log";
             std::string const path_log_file( a2str.str() );
             std::ofstream log_file( path_log_file.c_str() );
 
-            a2str.str( output_dir.c_str() );
-            a2str << name << "_" << begin_time_str << ".times";
+            a2str.str( "" );
+            a2str << output_dir << name << "_" << target_conf.arch_str;
+
+            if( target_conf.node_id_str != nullptr )
+            {
+                a2str << "_node" << target_conf.node_id_str;
+            }
+
+            a2str << "_" << begin_time_str << "_cxx.times";
 
             std::string const path_timing_file( a2str.str() );
             std::ofstream time_file( path_timing_file.c_str() );
@@ -625,7 +723,7 @@ namespace SIXTRL_CXX_NAMESPACE
             if( target_conf.config_str != nullptr )
             {
                 log_file  << target_conf.config_str << "\r\n";
-                time_file << "#config_str : " << target_conf.config_str << "\r\n";
+                time_file << "# config_str : " << target_conf.config_str << "\r\n";
             }
 
             log_file << "git branch  : ";
@@ -654,13 +752,17 @@ namespace SIXTRL_CXX_NAMESPACE
                       << track_config.path_particle_dump << "\r\n"
                       << "lattice     : "
                       << track_config.path_lattice_dump << "\r\n"
+                      << "beam elems  : "
+                      << eb.getNumObjects() << "\r\n"
                       << "timings in  : " << path_timing_file << "\r\n\r\n";
 
-            time_file << "#particles = "
+            time_file << "# particles = "
                       << track_config.path_particle_dump << "\r\n"
-                      << "#lattice = "
+                      << "# lattice = "
                       << track_config.path_lattice_dump << "\r\n"
-                      << "#log file = " << path_log_file << "\r\n"
+                      << "# beam elems  : "
+                      << eb.getNumObjects() << "\r\n"
+                      << "# log file = " << path_log_file << "\r\n"
                       << "#\r\n" << "#"
                       << std::setw( 19 ) << "Num Part"
                       << std::setw( 20 ) << "Num Turns"
@@ -686,11 +788,9 @@ namespace SIXTRL_CXX_NAMESPACE
                       << std::setw( 20 ) << "[sec]"
                       <<"\r\n";
 
-            SIXTRL_ASSERT( job.ptrParticlesBuffer() != nullptr );
-            SIXTRL_ASSERT( job.ptrBeamElementsBuffer() != nullptr );
+            SIXTRL_ASSERT( init_pb.getNumObjects() > 0u );
+            SIXTRL_ASSERT( eb.getNumObjects() > 0u );
 
-            st::Buffer init_pb( *job.ptrParticlesBuffer() );
-            st::Buffer eb( *job.ptrBeamElementsBuffer() );
             st::Particles const* init_particles =
                 init_pb.get< st::Particles >( 0 );
 
@@ -700,24 +800,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
             std::random_device rdev;
             std::mt19937_64 prng( rdev() );
-
-            std::normal_distribution< double > x_dist(
-                init_particles->getXValue( 0 ), 1e-9 );
-
-            std::normal_distribution< double > y_dist(
-                init_particles->getYValue( 0 ), 1e-9 );
-
-            std::normal_distribution< double > px_dist(
-                init_particles->getPxValue( 0 ), 1e-12 );
-
-            std::normal_distribution< double > py_dist(
-                init_particles->getPyValue( 0 ), 1e-12 );
-
-            std::normal_distribution< double > delta_dist(
-                init_particles->getDeltaValue( 0 ), 1e-14 );
-
-            std::normal_distribution< double > zeta_dist(
-                init_particles->getZetaValue( 0 ), 1e-14 );
 
             auto track_it  = track_config.track_items.begin();
             auto track_end = track_config.track_items.end();
@@ -758,34 +840,85 @@ namespace SIXTRL_CXX_NAMESPACE
                 SIXTRL_ASSERT( particles != nullptr );
                 for( int64_t ii = 0 ; ii < num_particles ; ++ii )
                 {
-                    using param_t =
-                        std::normal_distribution< double >::param_type;
-
                     particles->copySingle( *init_particles,
                         ii % init_num_particles, ii );
-
-                    particles->setXValue( ii, x_dist( prng, param_t(
-                        particles->getXValue( ii ), x_dist.stddev() ) ) );
-
-                    particles->setYValue( ii, y_dist( prng, param_t(
-                        particles->getYValue( ii ), y_dist.stddev() ) ) );
-
-                    particles->setPxValue( ii, px_dist( prng, param_t(
-                        particles->getXValue( ii ), px_dist.stddev() ) ) );
-
-                    particles->setPyValue( ii, py_dist( prng, param_t(
-                        particles->getYValue( ii ), py_dist.stddev() ) ) );
-
-                    particles->setDeltaValue( ii, px_dist( prng, param_t(
-                        particles->getXValue( ii ), delta_dist.stddev() ) ) );
-
-                    particles->setZetaValue( ii, py_dist( prng, param_t(
-                        particles->getZetaValue( ii ), zeta_dist.stddev() ) ) );
 
                     particles->setParticleIdValue( ii, ii );
                     particles->setStateValue( ii, 1 );
                     particles->setAtElementIdValue( ii, 0 );
                     particles->setAtTurnValue( ii, 0 );
+                }
+
+                std::normal_distribution< double > dist;
+
+                if( track_config.x_stddev > double{ 0.0 } )
+                {
+                    for( int64_t ii = 0 ; ii < num_particles ; ++ii )
+                    {
+                        double const val = particles->getXValue( ii );
+                        param_t const param( val, val * track_config.x_stddev );
+                        particles->setXValue( ii, dist( prng, param ) );
+                    }
+                }
+
+                if( track_config.y_stddev > double{ 0.0 } )
+                {
+                    dist.reset();
+
+                    for( int64_t ii = 0 ; ii < num_particles ; ++ii )
+                    {
+                        double const val = particles->getYValue( ii );
+                        param_t const param( val, val * track_config.y_stddev );
+                        particles->setYValue( ii, dist( prng, param ) );
+                    }
+                }
+
+                if( track_config.px_stddev > double{ 0.0 } )
+                {
+                    dist.reset();
+
+                    for( int64_t ii = 0 ; ii < num_particles ; ++ii )
+                    {
+                        double const val = particles->getPxValue( ii );
+                        param_t const param( val, val * track_config.px_stddev );
+                        particles->setPxValue( ii, dist( prng, param ) );
+                    }
+                }
+
+                if( track_config.py_stddev > double{ 0.0 } )
+                {
+                    dist.reset();
+
+                    for( int64_t ii = 0 ; ii < num_particles ; ++ii )
+                    {
+                        double const val = particles->getPyValue( ii );
+                        param_t const param( val, val * track_config.py_stddev );
+                        particles->setPyValue( ii, dist( prng, param ) );
+                    }
+                }
+
+                if( track_config.zeta_stddev > double{ 0.0 } )
+                {
+                    dist.reset();
+
+                    for( int64_t ii = 0 ; ii < num_particles ; ++ii )
+                    {
+                        double const val = particles->getZetaValue( ii );
+                        param_t const param( val, val * track_config.zeta_stddev );
+                        particles->setZetaValue( ii, dist( prng, param ) );
+                    }
+                }
+
+                if( track_config.delta_stddev > double{ 0.0 } )
+                {
+                    dist.reset();
+
+                    for( int64_t ii = 0 ; ii < num_particles ; ++ii )
+                    {
+                        double const val = particles->getDeltaValue( ii );
+                        param_t const param( val, val * track_config.delta_stddev );
+                        particles->setDeltaValue( ii, dist( prng, param ) );
+                    }
                 }
 
                 auto end_setup_time = std::chrono::system_clock::now();
@@ -812,41 +945,76 @@ namespace SIXTRL_CXX_NAMESPACE
                         diff_setup = end_setup_time - start_setup_time;
                         start_setup_time = end_setup_time;
 
-                        log_file << " took " << std::chrono::duration< double >(
-                            diff_setup ).count() << " sec\r\n";
+                        log_file << " took "
+                            << std::chrono::duration< double >(
+                                diff_setup ).count()
+                            << " sec\r\n" << "                   ";
                     }
 
                     st::Buffer pb( run_pb );
-                    log_file << "resetting the track job with particles ... ";
-
-                    start_setup_time = std::chrono::system_clock::now();
                     success = job.reset( pb, eb );
-                    end_setup_time = std::chrono::system_clock::now();
+                    st::Particles const* track_particles =
+                        pb.get< st::Particles >( 0 );
 
-                    diff_setup = end_setup_time - start_setup_time;
+                    SIXTRL_ASSERT( success );
+                    SIXTRL_ASSERT( &pb == job.ptrParticlesBuffer() );
+                    SIXTRL_ASSERT( &eb == job.ptrBeamElementsBuffer() );
 
-                    log_file << " finished at " << a2str.str() << "(took "
-                        << std::chrono::duration< double >( diff_setup ).count()
-                        << " sec)\r\n";
+                    SIXTRL_ASSERT( track_particles != nullptr );
+                    SIXTRL_ASSERT( track_particles->getNumParticles() ==
+                                   num_particles );
+
+                    SIXTRL_ASSERT( std::all_of( track_particles->getAtTurn(),
+                        track_particles->getAtTurn() + num_particles,
+                        []( int64_t const turn ) -> bool
+                        { return turn == 0; } ) );
+
+                    SIXTRL_ASSERT( std::all_of( track_particles->getState(),
+                        track_particles->getState() + num_particles,
+                        []( int64_t const state ) -> bool
+                        { return state == 1; } ) );
+
+                    SIXTRL_ASSERT( std::all_of(
+                        track_particles->getAtElementId(),
+                        track_particles->getAtElementId() + num_particles,
+                        []( int64_t const at_element ) -> bool
+                        { return at_element == 0; } ) );
 
                     auto start_track_time = std::chrono::steady_clock::now();
                     job.trackUntil( track_it->num_turns );
                     auto end_track_time = std::chrono::steady_clock::now();
 
+                    job.collectParticles();
+
+                    track_particles = pb.get< st::Particles >( 0 );
+                    SIXTRL_ASSERT( track_particles != nullptr );
+                    SIXTRL_ASSERT( track_particles->getNumParticles() ==
+                                   num_particles );
+
                     auto diff_track = end_track_time - start_track_time;
-                    results[ ii ].first =
-                        std::chrono::duration< double >( diff_track ).count();
+                    results[ ii ].first = std::chrono::duration<
+                        double >( diff_track ).count();
 
                     for( int64_t jj = 0 ; jj < num_particles ; ++jj )
                     {
-                        if( particles->getStateValue( jj ) == 0 )
+                        if( track_particles->getStateValue( jj ) == 1 )
                         {
-                            ++results[ ii ].second;
+                            if( ( track_particles->getAtTurnValue( jj ) !=
+                                  track_it->num_turns ) ||
+                                ( track_particles->getAtElementIdValue( jj ) !=
+                                  int64_t{ 0 } ) )
+                            {
+                                success = false;
+                                break;
+                            }
                         }
                     }
 
+                    if( !success ) break;
                     log_file << "*";
                 }
+
+                if( !success ) break;
 
                 auto end_repetitions_time = std::chrono::system_clock::now();
                 diff_setup = end_repetitions_time - start_repetitions_time;
@@ -886,7 +1054,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     result_pair.first /= norm_factor;
                 }
 
-                auto const median = ( results.size() + 1 ) >> 1;
+                std::size_t const median = results.size() >> 1;
 
                 time_file << std::setw( 20 ) << num_particles
                           << std::setw( 20 ) << track_it->num_turns
