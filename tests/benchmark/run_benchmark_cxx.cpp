@@ -778,37 +778,39 @@ namespace SIXTRL_CXX_NAMESPACE
                       << eb.getNumObjects() << "\r\n"
                       << "timings in  : " << path_timing_file << "\r\n\r\n";
 
-            time_file << "# particles = "
-                      << track_config.path_particle_dump << "\r\n"
-                      << "# lattice = "
-                      << track_config.path_lattice_dump << "\r\n"
-                      << "# beam elems  : "
-                      << eb.getNumObjects() << "\r\n"
-                      << "# log file = " << path_log_file << "\r\n"
-                      << "#\r\n" << "#"
-                      << std::setw( 19 ) << "Num Part"
-                      << std::setw( 20 ) << "Num Turns"
-                      << std::setw( 20 ) << "Repetitions"
-                      << std::setw( 20 ) << "Time/Part/Turn"
-                      << std::setw( 20 ) << "Lost Particles"
-                      << std::setw( 20 ) << "Min Time/Part/Turn"
-                      << std::setw( 20 ) << "Lost Particles"
-                      << std::setw( 20 ) << "Max Time/Part/Turn"
-                      << std::setw( 20 ) << "Lost Particles"
-                      << std::setw( 20 ) << "Total Time"
-                      << "\r\n"
-                      << "#"
-                      << std::setw( 19 ) << "[#particles]"
-                      << std::setw( 20 ) << "[#turns]"
-                      << std::setw( 20 ) << "[#repetitions]"
-                      << std::setw( 20 ) << "[sec]"
-                      << std::setw( 20 ) << "[#particles]"
-                      << std::setw( 20 ) << "[sec]"
-                      << std::setw( 20 ) << "[#particles]"
-                      << std::setw( 20 ) << "[sec]"
-                      << std::setw( 20 ) << "[#particles]"
-                      << std::setw( 20 ) << "[sec]"
-                      <<"\r\n";
+            a2str.str( "" );
+            a2str << "# particles = "
+                  << track_config.path_particle_dump << "\r\n"
+                  << "# lattice = "
+                  << track_config.path_lattice_dump << "\r\n"
+                  << "# beam elems  : "
+                  << eb.getNumObjects() << "\r\n"
+                  << "# log file = " << path_log_file << "\r\n"
+                  << "#\r\n" << "#"
+                  << std::setw( 19 ) << "Num Part"
+                  << std::setw( 20 ) << "Num Turns"
+                  << std::setw( 20 ) << "Repetitions"
+                  << std::setw( 20 ) << "Time/Part/Turn"
+                  << std::setw( 20 ) << "Lost Particles"
+                  << std::setw( 20 ) << "Min Time/Part/Turn"
+                  << std::setw( 20 ) << "Lost Particles"
+                  << std::setw( 20 ) << "Max Time/Part/Turn"
+                  << std::setw( 20 ) << "Lost Particles"
+                  << std::setw( 20 ) << "Total Time"
+                  << "\r\n" << "#"
+                  << std::setw( 19 ) << "[#particles]"
+                  << std::setw( 20 ) << "[#turns]"
+                  << std::setw( 20 ) << "[#repetitions]"
+                  << std::setw( 20 ) << "[sec]"
+                  << std::setw( 20 ) << "[#particles]"
+                  << std::setw( 20 ) << "[sec]"
+                  << std::setw( 20 ) << "[#particles]"
+                  << std::setw( 20 ) << "[sec]"
+                  << std::setw( 20 ) << "[#particles]"
+                  << std::setw( 20 ) << "[sec]" <<"\r\n";
+
+            time_file << a2str.str();
+            std::cout << a2str.str();
 
             SIXTRL_ASSERT( init_pb.getNumObjects() > 0u );
             SIXTRL_ASSERT( eb.getNumObjects() > 0u );
@@ -1078,17 +1080,20 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 std::size_t const median = results.size() >> 1;
 
-                time_file << std::setw( 20 ) << num_particles
-                          << std::setw( 20 ) << track_it->num_turns
-                          << std::setw( 20 ) << track_it->num_repetitions
-                          << std::setw( 20 ) << results[ median ].first
-                          << std::setw( 20 ) << results[ median ].second
-                          << std::setw( 20 ) << results[ 0 ].first
-                          << std::setw( 20 ) << results[ 0 ].second
-                          << std::setw( 20 ) << results.back().first
-                          << std::setw( 20 ) << results.back().second
-                          << std::setw( 20 ) << total_time
-                          << std::endl;
+                a2str.str( "" );
+                a2str << std::setw( 20 ) << num_particles
+                      << std::setw( 20 ) << track_it->num_turns
+                      << std::setw( 20 ) << track_it->num_repetitions
+                      << std::setw( 20 ) << results[ median ].first
+                      << std::setw( 20 ) << results[ median ].second
+                      << std::setw( 20 ) << results[ 0 ].first
+                      << std::setw( 20 ) << results[ 0 ].second
+                      << std::setw( 20 ) << results.back().first
+                      << std::setw( 20 ) << results.back().second
+                      << std::setw( 20 ) << total_time;
+
+                time_file << a2str.str() << "\r\n";
+                std::cout << a2str.str() << std::endl;
             }
 
             return success;
