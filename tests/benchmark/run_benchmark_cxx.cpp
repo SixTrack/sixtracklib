@@ -172,14 +172,16 @@ namespace SIXTRL_CXX_NAMESPACE
         struct TargetConfig
         {
             TargetConfig() : target_conf( nullptr ), arch_str( nullptr ),
-                node_id_str( nullptr ), config_str( nullptr )
+                node_id_str( nullptr ), config_str( nullptr ),
+                optimized( false )
             {
 
             }
 
             TargetConfig( MainConfig& main ) :
                 target_conf( nullptr ), arch_str( nullptr ),
-                node_id_str( nullptr ), config_str( nullptr )
+                node_id_str( nullptr ), config_str( nullptr ),
+                optimized( false )
             {
                 bool const success = this->init( main );
                 SIXTRL_ASSERT( success );
@@ -218,6 +220,8 @@ namespace SIXTRL_CXX_NAMESPACE
                     free( this->config_str  );
                     this->config_str = nullptr;
                 }
+
+                this->optimized = false;
             }
 
             bool init( MainConfig& main )
@@ -264,6 +268,23 @@ namespace SIXTRL_CXX_NAMESPACE
                             success = false;
                         }
                     }
+
+                    raw_str = ::toml_raw_in( this->target_conf, "optimized" );
+
+                    if( raw_str != nullptr )
+                    {
+                        this->optimized = false;
+                        int64_t temp_optimized = 0;
+
+                        if( 0 == ::toml_rtoi( raw_str, &temp_optimized ) )
+                        {
+                            this->optimized = ( temp_optimized == 1 );
+                        }
+                        else
+                        {
+                            success = false;
+                        }
+                    }
                 }
 
                 if( success )
@@ -285,6 +306,7 @@ namespace SIXTRL_CXX_NAMESPACE
             char* arch_str;
             char* node_id_str;
             char* config_str;
+            bool  optimized;
         };
 
         struct TrackItem
@@ -1144,6 +1166,15 @@ int main( int argc, char* argv[] )
             st::TrackJobCl job( node_id_str, particle_buffer,
                 beam_elements_buffer, nullptr, std::size_t{ 0 },
                 target_config.config_str );
+
+            if( target_config.optimized )
+            {
+                job.ptrContext()->enableOptimizedtrackingByDefault();
+            }
+            else
+            {
+                job.ptrContext()->disableOptimizedTrackingByDefault();
+            }
 
             success = st::benchmark::TrackJob_run_benchmark(
                 job, main_config, target_config, track_config );
