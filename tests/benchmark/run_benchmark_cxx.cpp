@@ -1106,7 +1106,7 @@ namespace SIXTRL_CXX_NAMESPACE
                       << std::setw( 20 ) << results.back().second
                       << std::setw( 20 ) << total_time;
 
-                time_file << a2str.str() << "\r\n";
+                time_file << a2str.str() << std::endl;
                 std::cout << a2str.str() << std::endl;
             }
 
