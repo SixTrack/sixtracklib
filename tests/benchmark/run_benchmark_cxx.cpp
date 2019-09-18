@@ -733,11 +733,13 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 log_file  << target_conf.node_id_str << "\r\n";
                 time_file << target_conf.node_id_str << "\r\n";
+                std::cout << target_conf.node_id_str << "\r\n";
             }
             else
             {
                 log_file  << "n/a\r\n";
                 time_file << "n/a\r\n";
+                std::cout << "n/a\r\n";
             }
 
             log_file  << "config_str  : ";
@@ -746,6 +748,24 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 log_file  << target_conf.config_str << "\r\n";
                 time_file << "# config_str : " << target_conf.config_str << "\r\n";
+                std::cout << "# config_str : " << target_conf.config_str << "\r\n";
+            }
+
+            log_file  << "optimized   : ";
+            time_file << "# optimized : ";
+            std::cout << "# optimized : ";
+
+            if( target_conf.optimized )
+            {
+                log_file  << "true\r\n";
+                time_file << "true\r\n";
+                std::cout << "true\r\n";
+            }
+            else
+            {
+                log_file  << "false\r\n";
+                time_file << "false\r\n";
+                std::cout << "false\r\n";
             }
 
             log_file << "git branch  : ";
