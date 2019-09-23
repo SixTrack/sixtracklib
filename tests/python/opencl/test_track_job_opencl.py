@@ -115,9 +115,6 @@ if __name__ == '__main__':
 
     status = job.track_elem_by_elem(until_turn_elem_by_elem)
     assert(status == 0)
-
-    import pdb
-    pdb.set_trace()
     print("elem by elem tracking finished")
 
     status = job.track_until(until_turn)
