@@ -13,7 +13,7 @@ from sixtracklib.stcommon import \
     st_BeamMonitor_assign_output_cbuffer, \
     st_Track_all_particles_element_by_element_until_turn, st_NullBuffer, \
     st_BeamMonitor_assign_output_buffer, st_Buffer_new_mapped_on_cbuffer, \
-    st_Particles_cbuffer_get_particles, \
+    st_Buffer_new_from_copy, st_Particles_cbuffer_get_particles, \
     st_Particles_buffer_get_particles
 
 from sixtracklib_test.stcommon import st_Particles_print_out, \
@@ -58,6 +58,9 @@ if __name__ == '__main__':
     assert(num_beam_elements ==
            (initial_num_beam_elements + num_beam_monitors))
 
+    lattice = st_Buffer_new_from_copy(eb)
+    assert(lattice != st_NullBuffer)
+
     # ------------------------------------------------------------------------
     initial_particles = pb.get_object(0, cls=pyst.Particles)
 
@@ -75,6 +78,9 @@ if __name__ == '__main__':
 
     ret = st_BeamMonitor_assign_output_cbuffer(
         eb, cmp_output_buffer, min_turn_id, until_turn_elem_by_elem)
+
+    ret = st_BeamMonitor_assign_output_cbuffer(
+        lattice, cmp_output_buffer, min_turn_id, until_turn_elem_by_elem)
 
     ptr_belem_buffer = st_Buffer_new_mapped_on_cbuffer(eb)
     ptr_particles = st_Particles_cbuffer_get_particles(cmp_track_pb, 0)
@@ -116,6 +122,8 @@ if __name__ == '__main__':
     status = job.track_elem_by_elem(until_turn_elem_by_elem)
     assert(status == 0)
 
+    import pdb
+    pdb.set_trace()
     print("elem by elem tracking finished")
 
     status = job.track_until(until_turn)
@@ -162,13 +170,13 @@ if __name__ == '__main__':
     cmp_pbuffer = st_Buffer_new_mapped_on_cbuffer(cmp_pb)
     assert(cmp_pbuffer != st_NullBuffer)
 
-    lattice = st_Buffer_new_mapped_on_cbuffer(eb)
-    assert(lattice != st_NullBuffer)
-
     until_turn = 10
 
-    st_Track_all_particles_until_turn(st_Particles_buffer_get_particles(
-        cmp_pbuffer, 0), lattice, ct.c_int64(until_turn))
+    cmp_particles = st_Particles_buffer_get_particles(
+        cmp_pbuffer, ct.c_uint64(0))
+
+    st_Track_all_particles_until_turn(
+        cmp_particles, lattice, ct.c_int64(until_turn))
 
     st_Buffer_delete(lattice)
     lattice = st_NullBuffer
