@@ -343,11 +343,11 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
         ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( e09_monitor ) != be_monitor_addr_t{ 0 } );
 
         ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)(
-                ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ) ) !=
+                ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ) ) ==
             ::NS(BeamMonitor_get_out_address)( e06_monitor ) );
 
         ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)(
-                ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ) ) !=
+                ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ) ) ==
             ::NS(BeamMonitor_get_out_address)( e09_monitor ) );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

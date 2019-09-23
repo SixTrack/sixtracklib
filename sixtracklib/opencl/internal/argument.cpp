@@ -238,6 +238,24 @@ namespace SIXTRL_CXX_NAMESPACE
         return ( 0 == this->doReadAndRemapCObjBuffer( buffer ) );
     }
 
+    ClArgument::status_t ClArgument::updateRegion(
+        ClArgument::size_type const offset, ClArgument::size_type const length,
+        void const* SIXTRL_RESTRICT new_value )
+    {
+        return this->doUpdateRegions( ClArgument::size_type{ 1 },
+            &offset, &length, &new_value );
+    }
+
+    ClArgument::status_t ClArgument::updateRegions(
+        ClArgument::size_type const num_regions_to_update,
+        ClArgument::size_type const* SIXTRL_RESTRICT offsets,
+        ClArgument::size_type const* SIXTRL_RESTRICT lengths,
+        void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_values )
+    {
+        return this->doUpdateRegions(
+            num_regions_to_update, offsets, lengths, new_values );
+    }
+
     bool ClArgument::usesCObjectBuffer() const SIXTRL_NOEXCEPT
     {
         return ( this->m_ptr_cobj_buffer != nullptr );
@@ -292,6 +310,56 @@ namespace SIXTRL_CXX_NAMESPACE
         ClArgument::cobj_buffer_t* SIXTRL_RESTRICT buffer )
     {
         return this->doReadAndRemapCObjBufferBaseImpl( buffer );
+    }
+
+    ClArgument::status_t ClArgument::doUpdateRegions(
+        ClArgument::size_type const num_regions_to_update,
+        ClArgument::size_type const* SIXTRL_RESTRICT offsets,
+        ClArgument::size_type const* SIXTRL_RESTRICT lengths,
+        void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_values )
+    {
+        using size_t = ClArgument::size_type;
+
+        ClArgument::status_t status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
+        cl::CommandQueue* ptr_queue = ( this->m_ptr_context != nullptr )
+            ? this->m_ptr_context->openClQueue() : nullptr;
+
+        size_t const arg_size = this->m_arg_size;
+
+        if( ( offsets != nullptr ) && ( lengths != nullptr ) &&
+            ( new_values != nullptr ) && ( arg_size > size_t{ 0 } ) &&
+            ( num_regions_to_update > ClArgument::size_type{ 0 } ) &&
+            ( ptr_queue != nullptr ) &&
+            ( this->m_ptr_context != nullptr ) &&
+            ( this->m_ptr_context->hasSelectedNode() ) )
+        {
+            status = ::NS(ARCH_STATUS_SUCCESS);
+
+            for( size_t ii = size_t{ 0 }; ii < num_regions_to_update ; ++ii )
+            {
+                size_t const offset = offsets[ ii ];
+                size_t const length = lengths[ ii ];
+                void const* SIXTRL_RESTRICT new_value = new_values[ ii ];
+
+                if( ( new_value == nullptr ) || ( length == size_t{ 0 } ) ||
+                    ( ( offset + length ) > arg_size ) )
+                {
+                    status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
+                    break;
+                }
+
+                cl_int ret = ptr_queue->enqueueWriteBuffer(
+                    this->m_cl_buffer, CL_TRUE, offset, length, new_value );
+
+                if( ret != CL_SUCCESS )
+                {
+                    status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
+                    break;
+                }
+            }
+        }
+
+        return status;
     }
 
     int ClArgument::doWriteAndRemapCObjBufferBaseImpl(
@@ -527,6 +595,28 @@ SIXTRL_HOST_FN bool NS(ClArgument_read_memory)(
 {
     return ( argument != nullptr )
         ? argument->read( arg_buffer_begin, arg_length ) : false;
+}
+
+SIXTRL_HOST_FN NS(arch_status_t) NS(ClArgument_update_region)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument,
+    NS(context_size_t) const offset, NS(context_size_t) const length,
+    void const* SIXTRL_RESTRICT new_value )
+{
+    return ( argument != nullptr )
+        ? argument->updateRegion( offset, length, new_value )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+
+SIXTRL_HOST_FN NS(arch_status_t) NS(ClArgument_update_regions)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument,
+    NS(context_size_t) const num_regions_to_update,
+    NS(context_size_t) const* SIXTRL_RESTRICT offsets,
+    NS(context_size_t) const* SIXTRL_RESTRICT lengths,
+    void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_values )
+{
+    return ( argument != nullptr ) ? argument->updateRegions(
+        num_regions_to_update, offsets, lengths, new_values )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 SIXTRL_HOST_FN bool NS(ClArgument_uses_cobj_buffer)(

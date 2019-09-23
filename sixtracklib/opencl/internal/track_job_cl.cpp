@@ -302,6 +302,28 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_ptr_cl_elem_by_elem_config_buffer.get();
     }
 
+    TrackJobCl::status_t TrackJobCl::updateBeamElementsRegion(
+        TrackJobCl::size_type const offset, TrackJobCl::size_type const length,
+        void const* SIXTRL_RESTRICT new_value )
+    {
+        return ( this->m_ptr_beam_elements_buffer_arg != nullptr )
+            ? this->m_ptr_beam_elements_buffer_arg->updateRegion(
+                offset, length, new_value )
+            : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+    }
+
+    TrackJobCl::status_t TrackJobCl::updateBeamElementsRegions(
+        TrackJobCl::size_type const num_regions_to_update,
+        TrackJobCl::size_type const* SIXTRL_RESTRICT offsets,
+        TrackJobCl::size_type const* SIXTRL_RESTRICT lengths,
+        void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_values )
+    {
+        return ( this->m_ptr_beam_elements_buffer_arg != nullptr )
+            ? this->m_ptr_beam_elements_buffer_arg->updateRegions(
+                num_regions_to_update, offsets, lengths, new_values )
+            : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+    }
+
 
     bool TrackJobCl::doPrepareParticlesStructures(
         TrackJobCl::c_buffer_t* SIXTRL_RESTRICT pb )
@@ -1065,6 +1087,28 @@ NS(TrackJobCl_get_const_output_buffer_arg)(
     const NS(TrackJobCl) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->ptrOutputBufferArg() : nullptr;
+}
+
+::NS(arch_status_t) NS(TrackJobCl_update_beam_elements_region)(
+    ::NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
+    ::NS(context_size_t) const offset, NS(context_size_t) const length,
+    void const* SIXTRL_RESTRICT new_value )
+{
+    return ( track_job != nullptr )
+        ? track_job->updateBeamElementsRegion( offset, length, new_value )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+
+::NS(arch_status_t) NS(TrackJobCl_update_beam_elements_regions)(
+    ::NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
+    ::NS(context_size_t) const num_regions_to_update,
+    ::NS(context_size_t) const* offsets, NS(context_size_t) const* lengths,
+    void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_value )
+{
+    return ( track_job != nullptr )
+        ? track_job->updateBeamElementsRegions(
+            num_regions_to_update, offsets, lengths, new_value )
+        : ::NS(ARCH_STATUS_GENERAL_FAILURE);
 }
 
 /* end: /opencl/internal/track_job_cl.cpp */

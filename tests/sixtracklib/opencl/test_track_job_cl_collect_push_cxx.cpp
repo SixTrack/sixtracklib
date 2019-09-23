@@ -327,10 +327,10 @@ TEST( CXX_TrackJobClCollectPushTests, TestCollectAndPush )
         ASSERT_TRUE( e06_monitor->getOutAddress() != be_monitor_addr_t{ 0 } );
         ASSERT_TRUE( e09_monitor->getOutAddress() != be_monitor_addr_t{ 0 } );
 
-        ASSERT_TRUE( copy_of_eb.get< be_monitor_t >( 5 )->getOutAddress() !=
+        ASSERT_TRUE( copy_of_eb.get< be_monitor_t >( 5 )->getOutAddress() ==
                      e06_monitor->getOutAddress() );
 
-        ASSERT_TRUE( copy_of_eb.get< be_monitor_t >( 8 )->getOutAddress() !=
+        ASSERT_TRUE( copy_of_eb.get< be_monitor_t >( 8 )->getOutAddress() ==
                      e09_monitor->getOutAddress() );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

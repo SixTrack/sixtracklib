@@ -273,7 +273,7 @@ SIXTRL_INLINE int NS(Cavity_compare_values)(
         {
             compare_value = +1;
         }
-        else if( NS(Cavity_get_voltage)( lhs ) >
+        else if( NS(Cavity_get_voltage)( lhs ) <
                  NS(Cavity_get_voltage)( rhs ) )
         {
             compare_value = -1;

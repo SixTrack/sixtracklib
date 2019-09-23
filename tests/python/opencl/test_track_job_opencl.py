@@ -115,7 +115,6 @@ if __name__ == '__main__':
 
     status = job.track_elem_by_elem(until_turn_elem_by_elem)
     assert(status == 0)
-
     print("elem by elem tracking finished")
 
     status = job.track_until(until_turn)
@@ -161,6 +160,9 @@ if __name__ == '__main__':
     cmp_particles = pyst.makeCopy(initial_particles, cbuffer=cmp_pb)
     cmp_pbuffer = st_Buffer_new_mapped_on_cbuffer(cmp_pb)
     assert(cmp_pbuffer != st_NullBuffer)
+
+    ret = st_BeamMonitor_assign_output_cbuffer(
+        eb, cmp_output_buffer, min_turn_id, until_turn_elem_by_elem)
 
     lattice = st_Buffer_new_mapped_on_cbuffer(eb)
     assert(lattice != st_NullBuffer)
