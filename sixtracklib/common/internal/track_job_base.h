@@ -48,6 +48,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using size_type             = SIXTRL_CXX_NAMESPACE::track_job_size_t;
         using type_t                = SIXTRL_CXX_NAMESPACE::track_job_type_t;
         using track_status_t        = SIXTRL_CXX_NAMESPACE::track_status_t;
+        using status_t              = SIXTRL_CXX_NAMESPACE::arch_status_t;
         using output_buffer_flag_t  = ::NS(output_buffer_flag_t);
 
         using collect_flag_t = SIXTRL_CXX_NAMESPACE::track_job_collect_flag_t;
