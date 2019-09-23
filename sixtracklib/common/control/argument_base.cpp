@@ -21,10 +21,12 @@ namespace st = SIXTRL_CXX_NAMESPACE;
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    ArgumentBase::status_t ArgumentBase::send(
-        ArgumentBase::perform_remap_flag_t const perform_remap_flag )
+    using _base_t = st::ArgumentBase;
+
+    _base_t::status_t ArgumentBase::send(
+        _base_t::perform_remap_flag_t const perform_remap_flag )
     {
-        ArgumentBase::status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
+        _base_t::status_t success = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( this->usesCObjectsCxxBuffer() )
         {
@@ -44,20 +46,19 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    ArgumentBase::status_t ArgumentBase::send(
-        ArgumentBase::buffer_t const& SIXTRL_RESTRICT_REF buffer,
-        ArgumentBase::perform_remap_flag_t const perform_remap_flag )
+    _base_t::status_t ArgumentBase::send(
+        _base_t::buffer_t const& SIXTRL_RESTRICT_REF buffer,
+        _base_t::perform_remap_flag_t const perform_remap_flag )
     {
-        using status_t = ArgumentBase::status_t;
-        using size_t = ArgumentBase::size_type;
-        using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
+        using size_t = _base_t::size_type;
+        using ptr_base_controller_t = _base_t::ptr_base_controller_t;
 
-        status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
+        _base_t::status_t success = st::ARCH_STATUS_GENERAL_FAILURE;
         ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ptr_controller != nullptr )
         {
-            success = ArgumentBase::STATUS_SUCCESS;
+            success = st::ARCH_STATUS_SUCCESS;
 
             if( this->usesRawArgument() )
             {
@@ -79,14 +80,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
                     if( !reserved_success )
                     {
-                        success = ArgumentBase::STATUS_GENERAL_FAILURE;
+                        success = st::ARCH_STATUS_GENERAL_FAILURE;
                     }
                 }
 
                 SIXTRL_ASSERT( requ_capacity <= this->capacity() );
             }
 
-            if( ( success == ArgumentBase::STATUS_SUCCESS ) &&
+            if( ( success == st::ARCH_STATUS_SUCCESS ) &&
                 ( ( updated_argument_buffer ) ||
                   ( !this->usesCObjectsCxxBuffer() ) ||
                   ( !this->usesCObjectsBuffer() ) ) )
@@ -94,38 +95,37 @@ namespace SIXTRL_CXX_NAMESPACE
                 this->doSetBufferRef( buffer );
             }
 
-            if( success == ArgumentBase::STATUS_SUCCESS )
+            if( success == st::ARCH_STATUS_SUCCESS )
             {
                 success = ptr_controller->send(
                     this, buffer, perform_remap_flag );
 
-                if( success == ArgumentBase::STATUS_SUCCESS )
+                if( success == st::ARCH_STATUS_SUCCESS )
                 {
                     this->doSetArgSize( buffer.size() );
                 }
             }
 
-            SIXTRL_ASSERT( ( success != ArgumentBase::STATUS_SUCCESS ) ||
+            SIXTRL_ASSERT( ( success != st::ARCH_STATUS_SUCCESS ) ||
                            ( buffer.size() == this->size() ) );
         }
 
         return success;
     }
 
-    ArgumentBase::status_t ArgumentBase::send(
-        const ArgumentBase::c_buffer_t *const SIXTRL_RESTRICT buffer,
-        ArgumentBase::perform_remap_flag_t const perform_remap_flag )
+    _base_t::status_t ArgumentBase::send(
+        const _base_t::c_buffer_t *const SIXTRL_RESTRICT buffer,
+        _base_t::perform_remap_flag_t const perform_remap_flag )
     {
-        using status_t = ArgumentBase::status_t;
-        using size_t = ArgumentBase::size_type;
-        using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
+        using size_t = _base_t::size_type;
+        using ptr_base_controller_t = _base_t::ptr_base_controller_t;
 
-        status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
+        _base_t::status_t success = st::ARCH_STATUS_GENERAL_FAILURE;
         ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ptr_controller != nullptr )
         {
-            success = ArgumentBase::STATUS_SUCCESS;
+            success = st::ARCH_STATUS_SUCCESS;
 
             if( this->usesRawArgument() )
             {
@@ -147,48 +147,47 @@ namespace SIXTRL_CXX_NAMESPACE
 
                     if( !reserved_success )
                     {
-                        success = ArgumentBase::STATUS_GENERAL_FAILURE;
+                        success = st::ARCH_STATUS_GENERAL_FAILURE;
                     }
                 }
 
                 SIXTRL_ASSERT( requ_capacity <= this->capacity() );
             }
 
-            if( ( success == ArgumentBase::STATUS_SUCCESS ) &&
+            if( ( success == st::ARCH_STATUS_SUCCESS ) &&
                 ( ( updated_argument_buffer ) ||
                   ( !this->usesCObjectsBuffer() ) ) )
             {
                 this->doSetPtrCBuffer( buffer );
             }
 
-            if( success == ArgumentBase::STATUS_SUCCESS )
+            if( success == st::ARCH_STATUS_SUCCESS )
             {
                 success = ptr_controller->send(
                     this, buffer, perform_remap_flag );
 
-                if( success == ArgumentBase::STATUS_SUCCESS )
+                if( success == st::ARCH_STATUS_SUCCESS )
                 {
                     this->doSetArgSize( ::NS(Buffer_get_size)( buffer ) );
                 }
             }
 
             SIXTRL_ASSERT(
-                ( success != ArgumentBase::STATUS_SUCCESS ) ||
+                ( success != st::ARCH_STATUS_SUCCESS ) ||
                 ( ::NS(Buffer_get_size)( buffer ) == this->size() ) );
         }
 
         return success;
     }
 
-    ArgumentBase::status_t ArgumentBase::send(
+    _base_t::status_t ArgumentBase::send(
         void const* SIXTRL_RESTRICT raw_arg_begin,
-        ArgumentBase::size_type const raw_arg_len )
+        _base_t::size_type const raw_arg_len )
     {
-        using status_t = ArgumentBase::status_t;
-        using size_t = ArgumentBase::size_type;
-        using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
+        using size_t = _base_t::size_type;
+        using ptr_base_controller_t = _base_t::ptr_base_controller_t;
 
-        status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
+        _base_t::status_t success = st::ARCH_STATUS_GENERAL_FAILURE;
         ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ( ptr_controller != nullptr ) && ( raw_arg_begin != nullptr ) &&
@@ -215,22 +214,22 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( raw_arg_len <= this->capacity() )
                 {
-                    success = ArgumentBase::STATUS_SUCCESS;
+                    success = st::ARCH_STATUS_SUCCESS;
                 }
             }
             else
             {
-                success = ArgumentBase::STATUS_SUCCESS;
+                success = st::ARCH_STATUS_SUCCESS;
             }
 
-            if( ( success == ArgumentBase::STATUS_SUCCESS ) &&
+            if( ( success == st::ARCH_STATUS_SUCCESS ) &&
                 ( ( updated_argument_buffer ) ||
                   ( !this->usesRawArgument() ) ) )
             {
                 this->doSetPtrRawArgument( raw_arg_begin );
             }
 
-            if( success == ArgumentBase::STATUS_SUCCESS )
+            if( success == st::ARCH_STATUS_SUCCESS )
             {
                 SIXTRL_ASSERT( ( !this->usesCObjectsBuffer() ) &&
                                ( !this->usesCObjectsCxxBuffer() ) );
@@ -238,13 +237,13 @@ namespace SIXTRL_CXX_NAMESPACE
                 success = ptr_controller->send(
                     this, raw_arg_begin, raw_arg_len );
 
-                if( success == ArgumentBase::STATUS_SUCCESS )
+                if( success == st::ARCH_STATUS_SUCCESS )
                 {
                     this->doSetArgSize( raw_arg_len );
                 }
             }
 
-            SIXTRL_ASSERT( ( success != ArgumentBase::STATUS_SUCCESS ) ||
+            SIXTRL_ASSERT( ( success != st::ARCH_STATUS_SUCCESS ) ||
                            ( this->size() == raw_arg_len ) );
 
         }
@@ -252,10 +251,10 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    ArgumentBase::status_t ArgumentBase::receive(
-        ArgumentBase::perform_remap_flag_t const perform_remap_flag )
+    _base_t::status_t ArgumentBase::receive(
+        _base_t::perform_remap_flag_t const perform_remap_flag )
     {
-        ArgumentBase::status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
+        _base_t::status_t success = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( this->usesCObjectsCxxBuffer() )
         {
@@ -275,15 +274,12 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    ArgumentBase::status_t ArgumentBase::receive(
-        ArgumentBase::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        ArgumentBase::perform_remap_flag_t const perform_remap_flag )
+    _base_t::status_t ArgumentBase::receive(
+        _base_t::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        _base_t::perform_remap_flag_t const perform_remap_flag )
     {
-
-        using status_t = ArgumentBase::status_t;
-        using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
-
-        status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
+        using ptr_base_controller_t = _base_t::ptr_base_controller_t;
+        _base_t::status_t success = st::ARCH_STATUS_GENERAL_FAILURE;
         ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ( ptr_controller != nullptr ) && ( this->usesCObjectsBuffer() ) )
@@ -295,15 +291,12 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    ArgumentBase::status_t ArgumentBase::receive(
-        ArgumentBase::c_buffer_t* SIXTRL_RESTRICT buf,
-        ArgumentBase::perform_remap_flag_t const perform_remap_flag )
+    _base_t::status_t ArgumentBase::receive(
+        _base_t::c_buffer_t* SIXTRL_RESTRICT buf,
+        _base_t::perform_remap_flag_t const perform_remap_flag )
     {
-
-        using status_t = ArgumentBase::status_t;
-        using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
-
-        status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
+        using ptr_base_controller_t = _base_t::ptr_base_controller_t;
+        _base_t::status_t success = st::ARCH_STATUS_GENERAL_FAILURE;
         ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ( ptr_controller != nullptr ) && ( this->usesCObjectsBuffer() ) )
@@ -314,14 +307,12 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    ArgumentBase::status_t ArgumentBase::receive(
+    _base_t::status_t ArgumentBase::receive(
         void* SIXTRL_RESTRICT raw_arg_begin,
-        ArgumentBase::size_type const raw_arg_capacity )
+        _base_t::size_type const raw_arg_capacity )
     {
-        using status_t = ArgumentBase::status_t;
-        using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
-
-        status_t success = ArgumentBase::STATUS_GENERAL_FAILURE;
+        using ptr_base_controller_t = _base_t::ptr_base_controller_t;
+        _base_t::status_t success = st::ARCH_STATUS_GENERAL_FAILURE;
         ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ( ptr_controller != nullptr ) &&
@@ -334,12 +325,10 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    ArgumentBase::status_t ArgumentBase::remap()
+    _base_t::status_t ArgumentBase::remap()
     {
-        using status_t = ArgumentBase::status_t;
-        using ptr_base_controller_t = ArgumentBase::ptr_base_controller_t;
-
-        status_t status = ArgumentBase::STATUS_GENERAL_FAILURE;
+        using ptr_base_controller_t = _base_t::ptr_base_controller_t;
+        _base_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
         ptr_base_controller_t ptr_controller = this->ptrControllerBase();
 
         if( ( ptr_controller != nullptr ) &&
@@ -363,13 +352,12 @@ namespace SIXTRL_CXX_NAMESPACE
         return ( this->m_ptr_cobj_cxx_buffer != nullptr );
     }
 
-    ArgumentBase::buffer_t*
-    ArgumentBase::ptrCObjectsCxxBuffer() const SIXTRL_NOEXCEPT
+    _base_t::buffer_t* ArgumentBase::ptrCObjectsCxxBuffer() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_cobj_cxx_buffer;
     }
 
-    ArgumentBase::buffer_t& ArgumentBase::cobjectsCxxBuffer() const
+    _base_t::buffer_t& ArgumentBase::cobjectsCxxBuffer() const
     {
         if( this->m_ptr_cobj_cxx_buffer == nullptr )
         {
@@ -389,18 +377,16 @@ namespace SIXTRL_CXX_NAMESPACE
         return ( this->m_ptr_cobj_c99_buffer != nullptr );
     }
 
-    ArgumentBase::c_buffer_t*
-    ArgumentBase::ptrCObjectsBuffer() const SIXTRL_NOEXCEPT
+    _base_t::c_buffer_t* ArgumentBase::ptrCObjectsBuffer() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_cobj_c99_buffer;
     }
 
-    ArgumentBase::size_type
-    ArgumentBase::cobjectsBufferSlotSize() const SIXTRL_NOEXCEPT
+    _base_t::size_type ArgumentBase::cobjectsBufferSlotSize() const SIXTRL_NOEXCEPT
     {
         return ( this->usesCObjectsBuffer() )
             ? ::NS(Buffer_get_slot_size)( this->ptrCObjectsBuffer() )
-            : ArgumentBase::size_type{ 0 };
+            : _base_t::size_type{ 0 };
     }
 
     bool ArgumentBase::usesRawArgument() const SIXTRL_NOEXCEPT
@@ -413,12 +399,12 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_ptr_raw_arg_begin;
     }
 
-    ArgumentBase::size_type ArgumentBase::size() const SIXTRL_NOEXCEPT
+    _base_t::size_type ArgumentBase::size() const SIXTRL_NOEXCEPT
     {
         return this->m_arg_size;
     }
 
-    ArgumentBase::size_type ArgumentBase::capacity() const SIXTRL_NOEXCEPT
+    _base_t::size_type ArgumentBase::capacity() const SIXTRL_NOEXCEPT
     {
         return this->m_arg_capacity;
     }
@@ -433,31 +419,31 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_needs_arg_buffer;
     }
 
-    ArgumentBase::ptr_base_controller_t
+    _base_t::ptr_base_controller_t
     ArgumentBase::ptrControllerBase() SIXTRL_NOEXCEPT
     {
         return this->m_ptr_base_controller;
     }
 
-    ArgumentBase::ptr_const_base_controller_t
+    _base_t::ptr_const_base_controller_t
     ArgumentBase::ptrControllerBase() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_base_controller;
     }
 
     ArgumentBase::ArgumentBase(
-        ArgumentBase::arch_id_t const arch_id,
+        _base_t::arch_id_t const arch_id,
         char const* SIXTRL_RESTRICT arch_str,
         char const* SIXTRL_RESTRICT config_str,
         bool const needs_argument_buffer,
-        ArgumentBase::ptr_base_controller_t SIXTRL_RESTRICT controller ) :
+        _base_t::ptr_base_controller_t SIXTRL_RESTRICT controller ) :
         st::ArchBase( arch_id, arch_str, config_str ),
         m_ptr_raw_arg_begin( nullptr ),
         m_ptr_cobj_cxx_buffer( nullptr ),
         m_ptr_cobj_c99_buffer( nullptr ),
         m_ptr_base_controller( controller ),
-        m_arg_size( ArgumentBase::size_type{ 0 } ),
-        m_arg_capacity( ArgumentBase::size_type{ 0 } ),
+        m_arg_size( _base_t::size_type{ 0 } ),
+        m_arg_capacity( _base_t::size_type{ 0 } ),
         m_needs_arg_buffer( needs_argument_buffer ),
         m_has_arg_buffer( false )
     {
@@ -467,37 +453,105 @@ namespace SIXTRL_CXX_NAMESPACE
     /* --------------------------------------------------------------------- */
 
     bool ArgumentBase::doReserveArgumentBuffer(
-        ArgumentBase::size_type const required_arg_buffer_capacity )
+        _base_t::size_type const required_arg_buffer_capacity )
     {
         return ( this->capacity() >= required_arg_buffer_capacity );
+    }
+
+    _base_t::status_t ArgumentBase::doUpdateRegions(
+        _base_t::size_type const num_regions_to_update,
+        _base_t::size_type const* SIXTRL_RESTRICT offsets,
+        _base_t::size_type const* SIXTRL_RESTRICT lengths,
+        void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_values )
+    {
+        using size_t = _base_t::size_type;
+
+        _base_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        if( ( num_regions_to_update > _base_t::size_type{ 0 } ) &&
+            ( offsets != nullptr ) && ( lengths != nullptr ) &&
+            ( new_values != nullptr ) )
+        {
+            status = st::ARCH_STATUS_SUCCESS;
+            size_t const arg_size = this->m_arg_size;
+
+            size_t ii = size_t{ 0 };
+            for( ; ii < num_regions_to_update ; ++ii )
+            {
+                size_t const offset = offsets[ ii ];
+                size_t const length = lengths[ ii ];
+                void const* SIXTRL_RESTRICT new_value = new_values[ ii ];
+
+                if( ( new_value == nullptr ) || ( length == size_t{ 0 } ) ||
+                    ( ( offset + length ) > arg_size ) )
+                {
+                    status = st::ARCH_STATUS_GENERAL_FAILURE;
+                    break;
+                }
+
+                unsigned char* dest = nullptr;
+
+                if( this->usesCObjectsCxxBuffer() )
+                {
+                    dest = reinterpret_cast< unsigned char* >( static_cast<
+                        uintptr_t >( this->ptrCObjectsCxxBuffer(
+                            )->getDataBeginAddr() ) );
+                }
+                else if( this->usesCObjectsBuffer() )
+                {
+                    dest = reinterpret_cast< unsigned char* >( static_cast<
+                    uintptr_t >( ::NS(Buffer_get_data_begin_addr)(
+                        this->ptrCObjectsBuffer() ) ) );
+
+                }
+                else if( this->usesRawArgument() )
+                {
+                    dest = reinterpret_cast< unsigned char* >(
+                        this->m_ptr_raw_arg_begin );
+                }
+
+                if( dest != nullptr )
+                {
+                    std::advance( dest, offset );
+                    std::memcpy( dest, new_value, length );
+                }
+                else
+                {
+                    status = st::ARCH_STATUS_GENERAL_FAILURE;
+                    break;
+                }
+            }
+        }
+
+        return status;
     }
 
     /* ----------------------------------------------------------------- */
 
     void ArgumentBase::doSetArgSize(
-        ArgumentBase::size_type const arg_size ) SIXTRL_NOEXCEPT
+        _base_t::size_type const arg_size ) SIXTRL_NOEXCEPT
     {
         this->m_arg_size = arg_size;
     }
 
     void ArgumentBase::doSetArgCapacity(
-        ArgumentBase::size_type const arg_capacity ) SIXTRL_NOEXCEPT
+        _base_t::size_type const arg_capacity ) SIXTRL_NOEXCEPT
     {
         this->m_arg_capacity = arg_capacity;
     }
 
     void ArgumentBase::doSetPtrControllerBase(
-        ArgumentBase::ptr_base_controller_t SIXTRL_RESTRICT ctrl
+        _base_t::ptr_base_controller_t SIXTRL_RESTRICT ctrl
     ) SIXTRL_NOEXCEPT
     {
         this->m_ptr_base_controller = ctrl;
     }
 
-    void ArgumentBase::doSetBufferRef( ArgumentBase::buffer_t const&
+    void ArgumentBase::doSetBufferRef( _base_t::buffer_t const&
         SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT
     {
-        using c_buffer_t = ArgumentBase::c_buffer_t;
-        using buffer_t   = ArgumentBase::buffer_t;
+        using c_buffer_t = _base_t::c_buffer_t;
+        using buffer_t   = _base_t::buffer_t;
 
         c_buffer_t* _ptr_cobj_c99_buffer =
             const_cast< c_buffer_t* >( buffer.getCApiPtr() );
@@ -516,10 +570,10 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     void ArgumentBase::doSetPtrCBuffer(
-        const ArgumentBase::c_buffer_t *const
+        const _base_t::c_buffer_t *const
         SIXTRL_RESTRICT ptr_c_buffer ) SIXTRL_NOEXCEPT
     {
-        using c_buffer_t = ArgumentBase::c_buffer_t;
+        using c_buffer_t = _base_t::c_buffer_t;
 
         c_buffer_t* non_const_ptr = const_cast< c_buffer_t* >( ptr_c_buffer );
 
