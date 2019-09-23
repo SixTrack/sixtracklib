@@ -28,7 +28,8 @@ namespace SIXTRL_CXX_NAMESPACE
         using value_type = T;
         using type_id_t  = NS(object_type_id_t);
         using size_type  = NS(buffer_size_t);
-        using buffer_t   = ::NS(Buffer);
+        using buffer_t   = SIXTRL_CXX_NAMESPACE::Buffer;
+        using c_buffer_t = buffer_t::c_api_t;
 
         SIXTRL_FN TCavity() = default;
         SIXTRL_FN TCavity( TCavity< T > const& other ) = default;
@@ -53,7 +54,7 @@ namespace SIXTRL_CXX_NAMESPACE
         CreateNewOnBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer );
 
         SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC TCavity< T >* AddToBuffer(
-            buffer_t& SIXTRL_RESTRICT_REF buffer,
+            c_buffer_t& SIXTRL_RESTRICT_REF buffer,
             value_type const voltage   = value_type{},
             value_type const frequency = value_type{},
             value_type const lag       = value_type{} );
@@ -69,13 +70,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_FN void preset() SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN void setVoltage(
-            value_type const& voltage ) const SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN void setFrequency(
-            value_type const& frequency ) const SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN void setLag( value_type const& lag ) const SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setVoltage( value_type const& voltage ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setFrequency( value_type const& frequency ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setLag( value_type const& lag ) SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -133,7 +130,8 @@ namespace SIXTRL_CXX_NAMESPACE
         using value_type = SIXTRL_REAL_T;
         using type_id_t  = NS(object_type_id_t);
         using size_type  = NS(buffer_size_t);
-        using buffer_t   = ::NS(Buffer);
+        using buffer_t   = SIXTRL_CXX_NAMESPACE::Buffer;
+        using c_buffer_t = buffer_t::c_api_t;
         using c_api_t    = ::NS(Cavity);
 
         SIXTRL_FN TCavity() = default;
@@ -165,7 +163,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC TCavity< SIXTRL_REAL_T >*
         AddToBuffer(
-            buffer_t& SIXTRL_RESTRICT_REF buffer,
+            c_buffer_t& SIXTRL_RESTRICT_REF buffer,
             value_type const voltage, value_type const frequency,
             value_type const lag );
 
@@ -184,13 +182,9 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_FN value_type getLag() const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN void preset() SIXTRL_NOEXCEPT;
-        SIXTRL_FN void setVoltage(
-            value_type const voltage ) const SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN void setFrequency(
-            value_type const frequency ) const SIXTRL_NOEXCEPT;
-
-        SIXTRL_FN void setLag( value_type const lag ) const SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setVoltage( value_type const voltage ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setFrequency( value_type const frequ ) SIXTRL_NOEXCEPT;
+        SIXTRL_FN void setLag( value_type const lag ) SIXTRL_NOEXCEPT;
     };
 
     /* --------------------------------------------------------------------- */
@@ -262,9 +256,9 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE SIXTRL_STATIC SIXTRL_ARGPTR_DEC TCavity< SIXTRL_REAL_T >*
-    TCavity< SIXTRL_REAL_T >::CreateNewOnBuffer(
-        TCavity< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer )
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TCavity< T >*
+    TCavity< T >::CreateNewOnBuffer(
+        typename TCavity< T >::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
         using _this_t = TCavity< T >;
         using  size_t = typename _this_t::size_type;
@@ -286,15 +280,15 @@ namespace SIXTRL_CXX_NAMESPACE
         return static_cast< ptr_t >( static_cast< uintptr_t >(
             ::NS(Object_get_begin_addr)( ::NS(Buffer_add_object)(
                 &buffer, &temp, sizeof( _this_t ), temp.getTypeId(),
-                    num_dataptrs, offsets, sizes, counts ) ) );
+                    num_dataptrs, offsets, sizes, counts ) ) ) );
     }
 
-    SIXTRL_INLINE SIXTRL_STATIC SIXTRL_ARGPTR_DEC TCavity< SIXTRL_REAL_T >*
-    TCavity< SIXTRL_REAL_T >::AddToBuffer(
-        TCavity< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        TCavity< SIXTRL_REAL_T >::value_type const voltage,
-        TCavity< SIXTRL_REAL_T >::value_type const frequency,
-        TCavity< SIXTRL_REAL_T >::value_type const lag )
+    template< typename T >
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TCavity< T >* TCavity< T >::AddToBuffer(
+        typename TCavity< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
+        typename TCavity< T >::value_type const voltage,
+        typename TCavity< T >::value_type const frequency,
+        typename TCavity< T >::value_type const lag )
     {
         using _this_t = TCavity< T >;
         using  size_t = typename _this_t::size_type;
@@ -359,32 +353,27 @@ namespace SIXTRL_CXX_NAMESPACE
         this->setVoltage( value_t{} );
         this->setFrequency( value_t{} );
         this->setLag( value_t{} );
-
-        return;
     }
 
     template< typename T >
     SIXTRL_INLINE void TCavity< T >::setVoltage(
-        typename TCavity< T >::value_type const& v ) const SIXTRL_NOEXCEPT
+        typename TCavity< T >::value_type const& v ) SIXTRL_NOEXCEPT
     {
         this->voltage = v;
-        return;
     }
 
     template< typename T >
     SIXTRL_INLINE void TCavity< T >::setFrequency(
-        typename TCavity< T >::value_type const& frequ ) const SIXTRL_NOEXCEPT
+        typename TCavity< T >::value_type const& frequ ) SIXTRL_NOEXCEPT
     {
         this->frequency = frequ;
-        return;
     }
 
     template< typename T >
     SIXTRL_INLINE void TCavity< T >::setLag(
-        typename TCavity< T >::value_type const& lag ) const SIXTRL_NOEXCEPT
+        typename TCavity< T >::value_type const& lag ) SIXTRL_NOEXCEPT
     {
         this->lag = lag;
-        return;
     }
 
     /* ----------------------------------------------------------------- */
@@ -445,6 +434,14 @@ namespace SIXTRL_CXX_NAMESPACE
             orig.getVoltage(), orig.getFrequency(), orig.getLag() );
     }
 
+    template< typename T > struct ObjectTypeTraits< TCavity< T > >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_CAVITY);
+        }
+    };
+
     /* ===================================================================== *
      * ====  Specialization TCavity< SIXTRL_REAL_T > :
      * ===================================================================== */
@@ -467,19 +464,19 @@ namespace SIXTRL_CXX_NAMESPACE
         TCavity< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
         using ptr_t   = SIXTRL_ARGPTR_DEC TCavity< SIXTRL_REAL_T >*;
-        return static_cast< ptr_t >( ::NS(Cavity_new)( buffer.getCApiPtr() );
+        return static_cast< ptr_t >( ::NS(Cavity_new)( buffer.getCApiPtr() ) );
     }
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC TCavity< SIXTRL_REAL_T >*
     TCavity< SIXTRL_REAL_T >::AddToBuffer(
-        TCavity< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        TCavity< SIXTRL_REAL_T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
         TCavity< SIXTRL_REAL_T >::value_type const voltage,
         TCavity< SIXTRL_REAL_T >::value_type const frequency,
         TCavity< SIXTRL_REAL_T >::value_type const lag )
     {
         using ptr_t = SIXTRL_ARGPTR_DEC TCavity< SIXTRL_REAL_T >*;
         return static_cast< ptr_t >( ::NS(Cavity_add)(
-            buffer.getCApiPtr(), voltage, frequency, lag ) );
+            &buffer, voltage, frequency, lag ) );
     }
 
     SIXTRL_ARGPTR_DEC TCavity< SIXTRL_REAL_T >::c_api_t const*
@@ -495,7 +492,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using _this_t = TCavity< SIXTRL_REAL_T >;
         using   ptr_t = SIXTRL_ARGPTR_DEC _this_t::c_api_t*;
 
-        return const_cat< ptr_t >( static_cast< _this_t const& >(
+        return const_cast< ptr_t >( static_cast< _this_t const& >(
             *this ).getCApiPtr() );
     }
 
@@ -530,21 +527,21 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     SIXTRL_INLINE void TCavity< SIXTRL_REAL_T >::setVoltage(
-        TCavity< SIXTRL_REAL_T >::value_type const v ) const SIXTRL_NOEXCEPT
+        TCavity< SIXTRL_REAL_T >::value_type const v ) SIXTRL_NOEXCEPT
     {
         ::NS(Cavity_set_voltage)( this->getCApiPtr(), v );
         return;
     }
 
     SIXTRL_INLINE void TCavity< SIXTRL_REAL_T >::setFrequency(
-        TCavity< SIXTRL_REAL_T >::value_type const freq ) const SIXTRL_NOEXCEPT
+        TCavity< SIXTRL_REAL_T >::value_type const freq ) SIXTRL_NOEXCEPT
     {
         ::NS(Cavity_set_frequency)( this->getCApiPtr(), freq );
         return;
     }
 
     SIXTRL_INLINE void TCavity< SIXTRL_REAL_T >::setLag(
-        TCavity< SIXTRL_REAL_T >::value_type const lag ) const SIXTRL_NOEXCEPT
+        TCavity< SIXTRL_REAL_T >::value_type const lag ) SIXTRL_NOEXCEPT
     {
         ::NS(Cavity_set_lag)( this->getCApiPtr(), lag );
         return;
@@ -555,7 +552,7 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_ARGPTR_DEC Cavity* Cavity_new( Buffer& SIXTRL_RESTRICT_REF buffer )
     {
         using ptr_t = SIXTRL_ARGPTR_DEC TCavity< SIXTRL_REAL_T >*;
-        return static_cast< ptr_t >( ::NS(Cavity_new)( buffer.getCApiPtr() );
+        return static_cast< ptr_t >( ::NS(Cavity_new)( buffer.getCApiPtr() ) );
     }
 
     SIXTRL_ARGPTR_DEC Cavity*
@@ -599,6 +596,22 @@ namespace SIXTRL_CXX_NAMESPACE
         return Cavity_add( ptr_buffer,
            orig.getVoltage(), orig.getFrequency(), orig.getLag() );
     }
+
+    template<> struct ObjectTypeTraits< Cavity >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_CAVITY);
+        }
+    };
+
+    template<> struct ObjectTypeTraits< ::NS(Cavity) >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_CAVITY);
+        }
+    };
 }
 
 #endif /* defined( __cplusplus ) */

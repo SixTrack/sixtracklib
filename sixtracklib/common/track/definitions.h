@@ -20,14 +20,16 @@
 extern "C" {
 #endif /* defined( __cplusplus ) && ( !defined( _GPUCODE ) */
 
-typedef SIXTRL_INT32_T      NS(track_status_t);
+typedef SIXTRL_INT32_T              NS(track_status_t);
 
 #if !defined( _GPUCODE )
-typedef SIXTRL_UINT16_T     NS(track_job_collect_flag_t);
-typedef SIXTRL_UINT16_T     NS(track_job_clear_flag_t);
+typedef SIXTRL_UINT16_T             NS(track_job_io_flag_t);
+typedef SIXTRL_UINT16_T             NS(track_job_clear_flag_t);
 
-typedef NS(buffer_size_t)   NS(track_job_size_t);
-typedef SIXTRL_INT64_T      NS(track_job_type_t);
+typedef NS(buffer_size_t)           NS(track_job_size_t);
+typedef SIXTRL_INT64_T              NS(track_job_type_t);
+typedef NS(track_job_io_flag_t)     NS(track_job_collect_flag_t);
+typedef NS(track_job_io_flag_t)     NS(track_job_push_flag_t);
 
 /* ------------------------------------------------------------------------- */
 
@@ -37,30 +39,35 @@ SIXTRL_STATIC_VAR NS(track_status_t) const
 SIXTRL_STATIC_VAR NS(track_status_t) const
     NS(TRACK_STATUS_GENERAL_FAILURE) = ( NS(track_status_t) )-1;
 
-SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
-    NS(TRACK_JOB_COLLECT_NONE) = ( NS(track_job_collect_flag_t) )0x00;
+SIXTRL_STATIC_VAR NS(track_job_io_flag_t) const
+    NS(TRACK_JOB_IO_NONE) = ( NS(track_job_io_flag_t) )0x00;
 
-SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
-    NS(TRACK_JOB_COLLECT_PARTICLES) = ( NS(track_job_collect_flag_t) )0x01;
+SIXTRL_STATIC_VAR NS(track_job_io_flag_t) const
+    NS(TRACK_JOB_IO_PARTICLES) = ( NS(track_job_io_flag_t) )0x01;
 
-SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
-    NS(TRACK_JOB_COLLECT_BEAM_ELEMENTS) = ( NS(track_job_collect_flag_t) )0x02;
+SIXTRL_STATIC_VAR NS(track_job_io_flag_t) const
+    NS(TRACK_JOB_IO_BEAM_ELEMENTS) = ( NS(track_job_io_flag_t) )0x02;
 
-SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
-    NS(TRACK_JOB_COLLECT_OUTPUT) = ( NS(track_job_collect_flag_t) )0x04;
+SIXTRL_STATIC_VAR NS(track_job_io_flag_t) const
+    NS(TRACK_JOB_IO_OUTPUT) = ( NS(track_job_io_flag_t) )0x04;
 
-SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
-    NS(TRACK_JOB_COLLECT_DEBUG_REGISTER) = ( NS(track_job_collect_flag_t) )0x08;
+SIXTRL_STATIC_VAR NS(track_job_io_flag_t) const
+    NS(TRACK_JOB_IO_DEBUG_REGISTER) = ( NS(track_job_io_flag_t) )0x08;
 
-SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
-    NS(TRACK_JOB_COLLECT_PARTICLES_ADDR) =
-        ( NS(track_job_collect_flag_t) )0x10;
+SIXTRL_STATIC_VAR NS(track_job_io_flag_t) const
+    NS(TRACK_JOB_IO_PARTICLES_ADDR) = ( NS(track_job_io_flag_t) )0x10;
 
-SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
-    NS(TRACK_JOB_COLLECT_ALL) = ( NS(track_job_collect_flag_t) )0x1F;
+SIXTRL_STATIC_VAR NS(track_job_io_flag_t) const NS(TRACK_JOB_COLLECT_ALL) =
+    ( NS(track_job_io_flag_t) )0x1f;
 
-SIXTRL_STATIC_VAR NS(track_job_collect_flag_t) const
-    NS(TRACK_JOB_COLLECT_DEFAULT_FLAGS) = ( NS(track_job_collect_flag_t) )0x05;
+SIXTRL_STATIC_VAR NS(track_job_io_flag_t) const NS(TRACK_JOB_PUSH_ALL) =
+    ( NS(track_job_push_flag_t) )0x0f;
+
+SIXTRL_STATIC_VAR NS(track_job_io_flag_t) const
+    NS(TRACK_JOB_COLLECT_DEFAULT_FLAGS) = ( NS(track_job_io_flag_t) )0x05;
+
+SIXTRL_STATIC_VAR NS(track_job_io_flag_t) const
+    NS(TRACK_JOB_PUSH_DEFAULT_FLAGS) = ( NS(track_job_io_flag_t) )0x02;
 
 SIXTRL_STATIC_VAR NS(track_job_size_t) const
     NS(TRACK_JOB_DEFAULT_NUM_PARTICLE_SETS) = ( NS(track_job_size_t) )1u;
@@ -121,41 +128,43 @@ namespace SIXTRL_CXX_NAMESPACE
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 namespace SIXTRL_CXX_NAMESPACE
 {
-    typedef ::NS(track_job_collect_flag_t)  track_job_collect_flag_t;
+    typedef ::NS(track_job_io_flag_t)       track_job_io_flag_t;
+    typedef ::NS(track_job_io_flag_t)       track_job_collect_flag_t;
+    typedef ::NS(track_job_io_flag_t)       track_job_push_flag_t;
     typedef ::NS(track_job_clear_flag_t)    track_job_clear_flag_t;
 
     typedef ::NS(track_job_size_t)          track_job_size_t;
     typedef ::NS(track_job_type_t)          track_job_type_t;
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
-        TRACK_JOB_COLLECT_NONE = static_cast< track_job_collect_flag_t >( 0 );
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_io_flag_t
+        TRACK_JOB_IO_NONE = static_cast< track_job_io_flag_t >( 0 );
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
-        TRACK_JOB_COLLECT_PARTICLES =
-            static_cast< track_job_collect_flag_t >( 1 );
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_io_flag_t
+        TRACK_JOB_IO_PARTICLES = static_cast< track_job_io_flag_t >( 1 );
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
-        TRACK_JOB_COLLECT_BEAM_ELEMENTS =
-            static_cast< track_job_collect_flag_t >( 2 );
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_io_flag_t
+        TRACK_JOB_IO_BEAM_ELEMENTS = static_cast< track_job_io_flag_t >( 2 );
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
-        TRACK_JOB_COLLECT_OUTPUT =
-            static_cast< track_job_collect_flag_t >( 4 );
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_io_flag_t
+        TRACK_JOB_IO_OUTPUT = static_cast< track_job_io_flag_t >( 4 );
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
-        TRACK_JOB_COLLECT_DEBUG_REGISTER =
-            static_cast< track_job_collect_flag_t >( 8 );
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_io_flag_t
+        TRACK_JOB_IO_DEBUG_REGISTER = static_cast< track_job_io_flag_t >( 8 );
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
-        TRACK_JOB_COLLECT_PARTICLES_ADDR =
-            static_cast< track_job_collect_flag_t >( 16 );
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_io_flag_t
+        TRACK_JOB_IO_PARTICLES_ADDR = static_cast< track_job_io_flag_t >( 16 );
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
-        TRACK_JOB_COLLECT_ALL = static_cast< track_job_collect_flag_t >( 31 );
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_io_flag_t
+        TRACK_JOB_COLLECT_ALL = static_cast< track_job_io_flag_t >( 31 );
 
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_collect_flag_t
-        TRACK_JOB_COLLECT_DEFAULT_FLAGS =
-            static_cast< track_job_collect_flag_t >( 5 );
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_io_flag_t
+        TRACK_JOB_PUSH_ALL = static_cast< track_job_io_flag_t >( 15 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_io_flag_t
+        TRACK_JOB_IO_DEFAULT_FLAGS = static_cast< track_job_io_flag_t >( 5 );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_io_flag_t
+        TRACK_JOB_PUSH_DEFAULT_FLAGS = static_cast< track_job_io_flag_t >( 2 );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST track_job_size_t
         TRACK_JOB_DEFAULT_NUM_PARTICLE_SETS =

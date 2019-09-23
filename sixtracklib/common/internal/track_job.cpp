@@ -37,6 +37,7 @@
 #if !defined( _GPUCODE )
 #if defined( __cplusplus )
 
+namespace st = SIXTRL_CXX_NAMESPACE;
 namespace SIXTRL_CXX_NAMESPACE
 {
     TrackJobBase* TrackJob_create( const char *const SIXTRL_RESTRICT arch_str,
@@ -128,9 +129,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 char const* device_id_cstr = ( !device_id_str.empty() )
                     ? device_id_str.c_str() : nullptr;
 
-                ptr_job = SIXTRL_CXX_NAMESPACE::TrackJobCl_create( 
-                    device_id_cstr, particles_buffer, num_particle_sets, 
-                        pset_indices_begin, belemements_buffer, output_buffer, 
+                ptr_job = SIXTRL_CXX_NAMESPACE::TrackJobCl_create(
+                    device_id_cstr, particles_buffer, num_particle_sets,
+                        pset_indices_begin, belemements_buffer, output_buffer,
                             dump_elem_by_elem_turns, config_str );
             }
             else
@@ -165,7 +166,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 std::string const device_id_str =
                     TrackJob_extract_device_id_str( config_str.c_str() );
 
-                ptr_job = SIXTRL_CXX_NAMESPACE::TrackJobCl_create( 
+                ptr_job = SIXTRL_CXX_NAMESPACE::TrackJobCl_create(
                     device_id_str.c_str(), config_str.c_str() );
             }
             else
@@ -242,9 +243,9 @@ namespace SIXTRL_CXX_NAMESPACE
                 std::string const device_id_str =
                     TrackJob_extract_device_id_str( config_str.c_str() );
 
-                ptr_job = SIXTRL_CXX_NAMESPACE::TrackJobCl_create( 
-                    device_id_str, particles_buffer, num_particle_sets, 
-                        particle_set_indices_begin, beam_elemements_buffer, 
+                ptr_job = SIXTRL_CXX_NAMESPACE::TrackJobCl_create(
+                    device_id_str, particles_buffer, num_particle_sets,
+                        particle_set_indices_begin, beam_elemements_buffer,
                             output_buffer, dump_elem_by_elem_turns, config_str );
             }
             else
@@ -540,6 +541,45 @@ bool NS(TrackJob_requires_collecting)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr ) ? job->requiresCollecting() : false;
+}
+
+
+void NS(TrackJob_push)( ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job,
+    ::NS(track_job_push_flag_t) const flags )
+{
+    if( track_job != nullptr ) track_job->push( flags );
+}
+
+void NS(TrackJob_push_particles)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job )
+{
+    if( track_job != nullptr ) track_job->push( st::TRACK_JOB_IO_PARTICLES );
+}
+
+void NS(TrackJob_push_beam_elements)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job )
+{
+    if( track_job != nullptr ) track_job->push( st::TRACK_JOB_IO_BEAM_ELEMENTS );
+}
+
+void NS(TrackJob_push_output)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job )
+{
+    if( track_job != nullptr ) track_job->push( st::TRACK_JOB_IO_OUTPUT );
+}
+
+bool NS(TrackJob_can_fetch_particle_addresses)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT track_job )
+{
+    ( void )track_job; /* not supported by track jobs based on this API */
+    return false;
+}
+
+bool NS(TrackJob_has_particle_addresses)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT track_job )
+{
+    ( void )track_job; /* not supported by track jobs based on this API */
+    return false;
 }
 
 /* ------------------------------------------------------------------------- */

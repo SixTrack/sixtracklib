@@ -100,7 +100,7 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_ARGPTR_DEC TSRotation< T >*
     TSRotation_add(
         Buffer& SIXTRL_RESTRICT_REF buffer,
-        typename TSrotation< T >::value_type const& SIXTRL_RESTRICT_REF angle );
+        typename TSRotation< T >::value_type const& SIXTRL_RESTRICT_REF angle );
 
     template< typename T >
     SIXTRL_ARGPTR_DEC TSRotation< T >*
@@ -128,10 +128,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
     template<> struct TSRotation< SIXTRL_REAL_T > : public ::NS(SRotation)
     {
-        using value_type = T;
+        using value_type = SIXTRL_REAL_T;
         using type_id_t  = NS(object_type_id_t);
         using size_type  = NS(buffer_size_t);
         using buffer_t   = ::NS(Buffer);
+        using c_api_t    = ::NS(SRotation);
 
         SIXTRL_FN TSRotation() = default;
         SIXTRL_FN TSRotation( TSRotation< SIXTRL_REAL_T > const& other ) = default;
@@ -192,7 +193,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    using SRotation = TSRotation< NS(srot_real_t) >;
+    using SRotation = TSRotation< SIXTRL_REAL_T >;
 
     SIXTRL_ARGPTR_DEC SRotation* SRotation_new( Buffer& buffer );
 
@@ -259,7 +260,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE SIXTRL_STATIC SIXTRL_ARGPTR_DEC TSRotation< T >*
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TSRotation< T >*
     TSRotation< T >::CreateNewOnBuffer(
         typename TSRotation< T >::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
@@ -283,17 +284,17 @@ namespace SIXTRL_CXX_NAMESPACE
         return static_cast< ptr_t >( static_cast< uintptr_t >(
             ::NS(Object_get_begin_addr)( ::NS(Buffer_add_object)(
                 &buffer, &temp, sizeof( _this_t ), temp.getTypeId(),
-                    num_dataptrs, offsets, sizes, counts ) ) );
+                    num_dataptrs, offsets, sizes, counts ) ) ) );
     }
 
     template< typename T >
-    SIXTRL_INLINE SIXTRL_STATIC SIXTRL_ARGPTR_DEC TSRotation< T >*
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TSRotation< T >*
     TSRotation< T >::AddToBuffer(
         typename TSRotation< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         typename TSRotation< T >::value_type const& SIXTRL_RESTRICT_REF angle )
     {
         using _this_t = TSRotation< T >;
-        using   ptr_t = typename SIXTRL_ARGPTR_DEC _this_t*;
+        using   ptr_t = SIXTRL_ARGPTR_DEC _this_t*;
         using  size_t = typename _this_t::size_type;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
@@ -316,15 +317,14 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE SIXTRL_STATIC SIXTRL_ARGPTR_DEC TSRotation< T >*
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TSRotation< T >*
     TSRotation< T >::AddToBuffer(
         typename TSRotation< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         typename TSRotation< T >::value_type const& SIXTRL_RESTRICT_REF cos_z,
         typename TSRotation< T >::value_type const& SIXTRL_RESTRICT_REF sin_z )
     {
         using  _this_t = TSRotation< T >;
-        using    ptr_t = typename SIXTRL_ARGPTR_DEC _this_t*;
-        using  value_t = typename _this_t::value_type;
+        using    ptr_t = SIXTRL_ARGPTR_DEC _this_t*;
         using   size_t = typename _this_t::size_type;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
@@ -338,7 +338,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ARGPTR_DEC size_t const* counts  = nullptr;
 
         SIXTRL_ASSERT( std::fabs( ( cos_z * cos_z + sin_z * sin_z ) -
-            value_t{ 1 } ) <= std::numeric_limits< value_t >::epsilon() );
+            typename _this_t::value_type{ 1 } ) <=
+            std::numeric_limits< typename _this_t::value_type >::epsilon() );
 
         _this_t temp;
         temp.cos_z = cos_z;
@@ -420,7 +421,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE void setAngleDeg(
+    SIXTRL_INLINE void TSRotation< T >::setAngleDeg(
         typename TSRotation< T >::value_type const& angle_deg ) SIXTRL_NOEXCEPT
     {
         using value_t = typename TSRotation< T >::value_type;
@@ -447,34 +448,39 @@ namespace SIXTRL_CXX_NAMESPACE
             &buffer, ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
     }
 
-    SIXTRL_INLINE SIXTRL_STATIC SIXTRL_ARGPTR_DEC TSRotation< SIXTRL_REAL_T >*
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TSRotation< SIXTRL_REAL_T >*
     TSRotation< SIXTRL_REAL_T >::CreateNewOnBuffer(
         TSRotation< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer )
     {
         using ptr_t = SIXTRL_ARGPTR_DEC TSRotation< SIXTRL_REAL_T >*;
-        return static_cast< ptr_t >(
-            ::NS(SRotation_new)( buffer.getCApiPtr() ) );
+        return static_cast< ptr_t >( ::NS(SRotation_new)( &buffer ) );
     }
 
-    SIXTRL_INLINE SIXTRL_STATIC SIXTRL_ARGPTR_DEC TSRotation< SIXTRL_REAL_T >*
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TSRotation< SIXTRL_REAL_T >*
     TSRotation< SIXTRL_REAL_T >::AddToBuffer(
         TSRotation< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         TSRotation< SIXTRL_REAL_T >::value_type const angle )
     {
         using ptr_t = SIXTRL_ARGPTR_DEC TSRotation< SIXTRL_REAL_T >*;
-        return static_cast< ptr_t >(
-            ::NS(SRotation_add)( buffer.getCApiPtr(), angle ) );
+        return static_cast< ptr_t >( ::NS(SRotation_add)( &buffer, angle ) );
     }
 
-    SIXTRL_INLINE SIXTRL_STATIC SIXTRL_ARGPTR_DEC TSRotation< SIXTRL_REAL_T >*
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TSRotation< SIXTRL_REAL_T >*
     TSRotation< SIXTRL_REAL_T >::AddToBuffer(
         TSRotation< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         TSRotation< SIXTRL_REAL_T >::value_type const cos_z,
         TSRotation< SIXTRL_REAL_T >::value_type const sin_z )
     {
         using ptr_t = SIXTRL_ARGPTR_DEC TSRotation< SIXTRL_REAL_T >*;
-        return static_cast< ptr_t >(
-            ::NS(SRotation_add)( buffer.getCApiPtr(), angle ) );
+        ptr_t srot = static_cast< ptr_t >( ::NS(SRotation_new)( &buffer ) );
+
+        if( srot != nullptr )
+        {
+            srot->cos_z = cos_z;
+            srot->sin_z = sin_z;
+        }
+
+        return srot;
     }
 
     /* ----------------------------------------------------------------- */
@@ -489,7 +495,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return static_cast< ptr_t >( this );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC c_api_t*
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TSRotation< SIXTRL_REAL_T >::c_api_t*
     TSRotation< SIXTRL_REAL_T >::getCApiPtr() SIXTRL_NOEXCEPT
     {
         using ptr_t = SIXTRL_ARGPTR_DEC
@@ -548,7 +554,7 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE void TSRotation< SIXTRL_REAL_T >::setAngleDeg(
         TSRotation< SIXTRL_REAL_T >::value_type const angle_deg ) SIXTRL_NOEXCEPT
     {
-        ::NS(SRotation_set_angle_deg)( this->getCApiPtr(), angle );
+        ::NS(SRotation_set_angle_deg)( this->getCApiPtr(), angle_deg );
         return;
     }
 

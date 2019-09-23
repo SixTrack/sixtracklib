@@ -4,7 +4,6 @@ import sys
 import os
 import sixtracklib as pyst
 import sixtracklib_test as testlib
-import pdb
 
 from sixtracklib.stcommon import \
     st_Buffer_new_mapped_on_cbuffer, st_Buffer_delete, \
@@ -25,7 +24,6 @@ import ctypes as ct
 from cobjects import CBuffer
 
 if __name__ == '__main__':
-
     path_to_testdir = testlib.config.PATH_TO_TESTDATA_DIR
     assert(path_to_testdir is not None)
     assert(os.path.exists(path_to_testdir))
@@ -109,18 +107,18 @@ if __name__ == '__main__':
 
     print("job setup complete")
 
-    assert(job.type_str() == 'opencl')
-    assert(job.has_output_buffer())
-    assert(job.num_beam_monitors() > 0)
-    assert(job.has_elem_by_elem_output())
-    assert(job.has_beam_monitor_output())
+    assert(job.arch_str == 'opencl')
+    assert(job.has_output_buffer)
+    assert(job.num_beam_monitors > 0)
+    assert(job.has_elem_by_elem_output)
+    assert(job.has_beam_monitor_output)
 
     status = job.track_elem_by_elem(until_turn_elem_by_elem)
     assert(status == 0)
 
     print("elem by elem tracking finished")
 
-    status = job.track(until_turn)
+    status = job.track_until(until_turn)
     assert(status == 0)
 
     print("tracking finished")

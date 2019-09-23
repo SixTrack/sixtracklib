@@ -26,10 +26,10 @@ if __name__ == '__main__':
     job = pyst.TrackJob(elements.cbuffer, partset.cbuffer)
 
     # Track until every particle is at the begin of turn 5:
-    status = job.track(5)  # status should be 0 if successful, otherwise < 0
+    status = job.track_until(5)  # status should be 0 if success, otherwise < 0
 
     # Track until every particle is at the begin of turn 10:
-    status = job.track(10)  # status should be 0 if successful, otherwise < 0
+    status = job.track_until(10)  # status should be 0 if success, otherwise < 0
 
     # prepare the particles buffer for read-out:
     job.collect()
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         # The particles are still at turn 11 and at element 0 after tracking them
         # with the CPU based track-job; continue tracking!
 
-        status = job.track(100)  # track until turn 100
+        status = job.track_until(100)  # track until turn 100
         status = job.track_line(0, 1)
         status = job.track_line(1, 2, finish_turn=True)
 

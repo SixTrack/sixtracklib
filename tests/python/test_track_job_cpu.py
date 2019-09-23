@@ -104,16 +104,16 @@ if __name__ == '__main__':
 
     job = pyst.TrackJob(eb, track_pb, until_turn_elem_by_elem)
 
-    assert(job.type_str() == 'cpu')
-    assert(job.has_output_buffer())
-    assert(job.num_beam_monitors() > 0)
-    assert(job.has_elem_by_elem_output())
-    assert(job.has_beam_monitor_output())
+    assert(job.arch_str == 'cpu')
+    assert(job.has_output_buffer)
+    assert(job.num_beam_monitors > 0)
+    assert(job.has_elem_by_elem_output)
+    assert(job.has_beam_monitor_output)
 
     status = job.track_elem_by_elem(until_turn_elem_by_elem)
     assert(status == 0)
 
-    status = job.track(until_turn)
+    status = job.track_until(until_turn)
     assert(status == 0)
 
     job.collect()
