@@ -133,7 +133,7 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_slots    = nullptr,
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
-                ptr_requ_dataptrs = nullptr );
+                ptr_requ_dataptrs = nullptr ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN SIXTRL_STATIC
         SIXTRL_ARGPTR_DEC TXYShift< NS(xyshift_real_t) >*
@@ -144,8 +144,8 @@ namespace SIXTRL_CXX_NAMESPACE
             buffer_t& SIXTRL_RESTRICT_REF buffer,
             value_type const dx, value_type const dy )
         {
-            return reinterpret_cast< RetPtr >(
-                ::NS(XYShift_add)( &buffer, dx, dy ) );
+            using ptr_t = SIXTRL_ARGPTR_DEC TXYShift< ::NS(xyshift_real_t) >*;
+            return static_cast< ptr_t >( ::NS(XYShift_add)( &buffer, dx, dy ) );
         }
 
         /* ----------------------------------------------------------------- */
@@ -200,7 +200,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ARGPTR_DEC typename TXYShift< T >::size_type*
             SIXTRL_RESTRICT ptr_req_dataptrs ) SIXTRL_NOEXCEPT
     {
-        using _this_t = XYShift< T >;
+        using _this_t = TXYShift< T >;
         using  size_t = typename _this_t::size_type;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
@@ -224,7 +224,6 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         using _this_t = TXYShift< T >;
         using size_t  = typename _this_t::size_type;
-        using value_t = typename _this_t::value_type;
         using ptr_t   = SIXTRL_ARGPTR_DEC _this_t*;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
@@ -251,9 +250,8 @@ namespace SIXTRL_CXX_NAMESPACE
         typename TXYShift< T >::value_type const& SIXTRL_RESTRICT_REF dx,
         typename TXYShift< T >::value_type const& SIXTRL_RESTRICT_REF dy )
     {
-        using _this_t = XYShift< T >;
+        using _this_t = TXYShift< T >;
         using size_t  = typename _this_t::size_type;
-        using value_t = typename _this_t::value_type;
         using ptr_t   = SIXTRL_ARGPTR_DEC _this_t*;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
@@ -365,8 +363,8 @@ namespace SIXTRL_CXX_NAMESPACE
      * ====  Specialization TXYShift<  > :
      * ===================================================================== */
 
-    SIXTRL_INLINE bool TXYShift< NS(xyshift_real_t) >::CanAddToBuffer(
-        TXYShift< NS(xyshift_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+    SIXTRL_INLINE bool TXYShift< ::NS(xyshift_real_t) >::CanAddToBuffer(
+        TXYShift< ::NS(xyshift_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer,
         SIXTRL_ARGPTR_DEC TXYShift< NS(xyshift_real_t) >::size_type*
             SIXTRL_RESTRICT ptr_requ_objects,
         SIXTRL_ARGPTR_DEC TXYShift< NS(xyshift_real_t) >::size_type*
@@ -386,18 +384,6 @@ namespace SIXTRL_CXX_NAMESPACE
         return static_cast< ptr_t >( ::NS(XYShift_new)( &buffer ) );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TXYShift< NS(xyshift_real_t) >*
-    TXYShift< NS(xyshift_real_t) >::AddToBuffer(
-        TXYShift< NS(xyshift_real_t) >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        TXYShift< NS(xyshift_real_t) >::value_type const dx,
-        TXYShift< NS(xyshift_real_t) >::value_type const dy )
-    {
-        using ptr_t = SIXTRL_ARGPTR_DEC TXYShift< NS(xyshift_real_t) >*;
-
-        return reinterpret_cast< ptr_t >(
-            ::NS(XYShift_add)( &buffer, dx, dy ) );
-    }
-
     /* ----------------------------------------------------------------- */
 
     SIXTRL_ARGPTR_DEC TXYShift< NS(xyshift_real_t) >::c_api_t const*
@@ -413,7 +399,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using _this_t = TXYShift< NS(xyshift_real_t) >;
         using   ptr_t = _this_t::c_api_t*;
 
-        return const_cat< ptr_t >( static_cast< _this_t const& >(
+        return const_cast< ptr_t >( static_cast< _this_t const& >(
             *this ).getCApiPtr() );
     }
 
@@ -439,7 +425,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_INLINE void TXYShift< NS(xyshift_real_t) >::preset() SIXTRL_NOEXCEPT
     {
-        return ::NS(XYShift_preset)( this->getCApiPtr() );
+        ::NS(XYShift_preset)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE void TXYShift< NS(xyshift_real_t) >::setDx(

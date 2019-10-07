@@ -132,6 +132,21 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_requires_collecting)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_job_push_flag_t) NS(TrackJobNew_push)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(track_job_push_flag_t) const flag );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_job_push_flag_t)
+NS(TrackJobNew_push_particles)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_job_push_flag_t)
+NS(TrackJobNew_push_beam_elements)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_job_push_flag_t)
+NS(TrackJobNew_push_output)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN bool
 NS(TrackJobNew_can_fetch_particle_addresses)(
     const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job );

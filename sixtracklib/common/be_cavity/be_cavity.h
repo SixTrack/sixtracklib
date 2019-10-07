@@ -78,7 +78,37 @@ SIXTRL_FN SIXTRL_STATIC int NS(Cavity_compare_values_with_treshold)(
     SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT rhs,
     SIXTRL_REAL_T const treshold );
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity) const*
+NS(BufferIndex_get_const_cavity)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const index_obj );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
+NS(BufferIndex_get_cavity)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* index_obj );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity) const*
+NS(BeamElements_managed_buffer_get_const_cavity)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index,
+    NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
+NS(BeamElements_managed_buffer_get_cavity)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size );
+
 #if !defined( _GPUCODE )
+
+SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity) const*
+NS(BeamElements_buffer_get_const_cavity)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index );
+
+SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
+NS(BeamElements_buffer_get_cavity)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index );
 
 SIXTRL_FN SIXTRL_STATIC bool NS(Cavity_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
@@ -367,7 +397,75 @@ SIXTRL_INLINE int NS(Cavity_compare_values_with_treshold)(
     return compare_value;
 }
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity) const*
+NS(BufferIndex_get_const_cavity)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const index_obj )
+{
+    typedef NS(Cavity) beam_element_t;
+    typedef SIXTRL_BUFFER_OBJ_DATAPTR_DEC beam_element_t const* ptr_to_be_t;
+    ptr_to_be_t ptr_to_be = SIXTRL_NULLPTR;
+
+    if( ( index_obj != SIXTRL_NULLPTR ) &&
+        ( NS(Object_get_type_id)( index_obj ) == NS(OBJECT_TYPE_CAVITY) ) &&
+        ( NS(Object_get_size)( index_obj ) >= sizeof( beam_element_t ) ) )
+    {
+        ptr_to_be = ( ptr_to_be_t )( uintptr_t
+            )NS(Object_get_begin_addr)( index_obj );
+    }
+
+    return ptr_to_be;
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
+NS(BufferIndex_get_cavity)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* index_obj )
+{
+    return ( SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
+        )NS(BufferIndex_get_const_cavity)( index_obj );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity) const*
+NS(BeamElements_managed_buffer_get_const_cavity)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size )
+{
+    return NS(BufferIndex_get_const_cavity)(
+        NS(ManagedBuffer_get_const_object)( pbuffer, be_index, slot_size ) );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
+NS(BeamElements_managed_buffer_get_cavity)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size )
+{
+    return NS(BufferIndex_get_cavity)(
+        NS(ManagedBuffer_get_object)( pbuffer, be_index, slot_size ) );
+}
+
 #if !defined( _GPUCODE )
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity) const*
+NS(BeamElements_buffer_get_const_cavity)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* ptr_raw_t;
+    return NS(BeamElements_managed_buffer_get_const_cavity)(
+        ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ),
+        be_index, NS(Buffer_get_slot_size)( buffer ) );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
+NS(BeamElements_buffer_get_cavity)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const be_index )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char* ptr_raw_t;
+    return NS(BeamElements_managed_buffer_get_cavity)(
+        ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ),
+        be_index, NS(Buffer_get_slot_size)( buffer ) );
+}
 
 SIXTRL_INLINE bool NS(Cavity_can_be_added)(
     SIXTRL_BE_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,

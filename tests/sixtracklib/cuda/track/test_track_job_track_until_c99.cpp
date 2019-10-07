@@ -30,7 +30,6 @@ TEST( C99_CudaTrackJobTrackUntilTests, TrackUntilSingleParticleSetSimpleTest )
     using track_job_t    = ::NS(CudaTrackJob);
     using controller_t   = ::NS(CudaController);
     using node_info_t    = ::NS(CudaNodeInfo);
-    using node_index_t   = ::NS(node_index_t);
     using buffer_t       = ::NS(Buffer);
     using buf_size_t     = ::NS(buffer_size_t);
     using track_status_t = ::NS(track_status_t);
@@ -155,12 +154,13 @@ TEST( C99_CudaTrackJobTrackUntilTests, TrackUntilSingleParticleSetSimpleTest )
 
         SIXTRL_ASSERT( particles != nullptr );
 
-        ASSERT_TRUE(
-            ( 0 == ::NS(Particles_compare_values)(
+        ASSERT_TRUE( ( cmp_particles != nullptr ) &&
+            ( particles != nullptr ) &&
+            ( ( 0 == ::NS(Particles_compare_values)(
                 cmp_particles, particles ) ) ||
-            ( ( ABS_TOLERANCE > real_t{ 0 } ) &&
-              ( 0 == ::NS(Particles_compare_values_with_treshold)(
-                        cmp_particles, particles, ABS_TOLERANCE ) ) ) );
+              ( ( ABS_TOLERANCE > real_t{ 0 } ) &&
+                ( 0 == ::NS(Particles_compare_values_with_treshold)(
+                    cmp_particles, particles, ABS_TOLERANCE ) ) ) ) );
 
         status = ::NS(Particles_copy)( particles,
             ::NS(Particles_buffer_get_const_particles)( in_particles,
@@ -203,12 +203,13 @@ TEST( C99_CudaTrackJobTrackUntilTests, TrackUntilSingleParticleSetSimpleTest )
 
         /* ... compare against the cpu tracking result */
 
-        ASSERT_TRUE( ( particles != nullptr ) &&
-            ( 0 == ::NS(Particles_compare_values)(
-                cmp_particles, particles ) ) ||
-            ( ( ABS_TOLERANCE > real_t{ 0 } ) &&
-              ( 0 == ::NS(Particles_compare_values_with_treshold)(
-                        cmp_particles, particles, ABS_TOLERANCE ) ) ) );
+        ASSERT_TRUE( ( cmp_particles != nullptr ) &&
+            ( particles != nullptr ) &&
+            ( ( ( 0 == ::NS(Particles_compare_values)(
+                  cmp_particles, particles ) ) ||
+                ( ( ABS_TOLERANCE > real_t{ 0 } ) &&
+                  ( 0 == ::NS(Particles_compare_values_with_treshold)(
+                        cmp_particles, particles, ABS_TOLERANCE ) ) ) ) ) );
 
         ::NS(TrackJobNew_delete)( track_job );
         ::NS(Buffer_delete)( track_pb );

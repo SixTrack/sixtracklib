@@ -54,6 +54,9 @@ TEST( CXX_CudaArgumentTests, BasicUsage )
         SIXTRL_ASSERT( ptr_c_obj != nullptr );
         SIXTRL_ASSERT( ptr_cxx_obj != nullptr );
         SIXTRL_ASSERT( ptr_cxx_obj != ptr_c_obj );
+
+        ( void )ptr_c_obj;
+        ( void )ptr_cxx_obj;
     }
 
     size_t const slot_size = ::NS(Buffer_get_slot_size)( c_obj_buffer );

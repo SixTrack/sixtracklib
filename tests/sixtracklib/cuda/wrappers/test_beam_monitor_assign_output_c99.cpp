@@ -31,8 +31,6 @@ TEST( C99_CudaWrappersBeamMonitorAssignOutputTests,
 
     using particles_t           = ::NS(Particles);
     using c_buffer_t            = ::NS(Buffer);
-    using be_monitor_t          = ::NS(BeamMonitor);
-    using be_monitor_out_addr_t = ::NS(be_monitor_addr_t);
 
     using cuda_ctrl_t           = ::NS(CudaController);
     using cuda_arg_t            = ::NS(CudaArgument);

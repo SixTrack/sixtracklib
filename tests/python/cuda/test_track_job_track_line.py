@@ -5,11 +5,11 @@ import sys
 import os
 import ctypes as ct
 from cobjects import CBuffer
-import pysixtracklib as pyst
-from pysixtracklib.stcommon import \
+import sixtracklib as pyst
+from sixtracklib.stcommon import \
     st_Track_all_particles_until_turn, st_Particles_buffer_get_particles, \
     st_NullParticles, st_NullBuffer, st_buffer_size_t, st_TRACK_SUCCESS
-import pysixtracklib_test as testlib
+import sixtracklib_test as testlib
 
 if __name__ == '__main__':
     if not pyst.supports('cuda'):
@@ -96,7 +96,7 @@ if __name__ == '__main__':
             track_job.track_line(be_begin_idx, be_end_idx, finish_turn)
             assert track_job.last_track_status_success
 
-    track_job.collectParticles()
+    track_job.collect_particles()
     assert track_job.last_status_success
 
     # ==========================================================================

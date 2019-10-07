@@ -62,6 +62,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using elem_by_elem_config_t = _base_track_job_t::elem_by_elem_config_t;
         using output_buffer_flag_t  = _base_track_job_t::output_buffer_flag_t;
         using collect_flag_t        = _base_track_job_t::collect_flag_t;
+        using push_flag_t           = _base_track_job_t::push_flag_t;
         using particles_addr_t      = _base_track_job_t::particles_addr_t;
 
         using node_index_t          = cuda_controller_t::node_index_t;
@@ -447,6 +448,11 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_id_t const id ) SIXTRL_HOST_FN;
     };
 
+    CudaTrackJob::push_flag_t push(
+        CudaTrackJob& SIXTRL_RESTRICT_REF track_job,
+        CudaTrackJob::push_flag_t const flag =
+            SIXTRL_CXX_NAMESPACE::TRACK_JOB_IO_BEAM_ELEMENTS );
+
     CudaTrackJob::collect_flag_t collect(
         CudaTrackJob& SIXTRL_RESTRICT_REF track_job );
 
@@ -560,16 +566,10 @@ namespace SIXTRL_CXX_NAMESPACE
                     beam_elements_buffer.getCApiPtr(), ptr_c_out_buffer,
                         until_turn_elem_by_elem );
 
-        if( status == ::NS(ARCH_STATUS_SUCCESS ) )
+        if( status == SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS )
         {
-            this->doSetPtrParticlesBuffer( &particles_buffer );
-            this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
-
-            if( ( ptr_output_buffer != nullptr ) &&
-                ( this->hasOutputBuffer() ) && ( !this->ownsOutputBuffer() ) )
-            {
-                this->doSetPtrOutputBuffer( ptr_output_buffer );
-            }
+            this->doSetCxxBufferPointers(
+                particles_buffer, beam_elements_buffer, ptr_output_buffer );
         }
 
         return status;

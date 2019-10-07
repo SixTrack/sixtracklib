@@ -354,13 +354,13 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* --------------------------------------------------------------------- */
-    
-    TrackJobCtrlArgBase::status_t 
+
+    TrackJobCtrlArgBase::status_t
     TrackJobCtrlArgBase::doClearParticleAddresses(
             TrackJobCtrlArgBase::size_type const index )
     {
         TrackJobCtrlArgBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-        
+
         if( ( this->ptrParticlesAddrArgBase() != nullptr ) &&
             ( this->ptrParticlesAddrArgBase()->usesCObjectsCxxBuffer() ) &&
             ( this->doGetPtrParticlesAddrBuffer() != nullptr ) &&
@@ -369,45 +369,45 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             using _this_t = TrackJobCtrlArgBase;
             using _base_t = _this_t::_base_track_job_t;
-            
+
             /* NOTE: If the architecture we are working on requires collecting,
-             *       we collect first *all* particle addresses before 
-             *       attempting to clear the single particle address that is 
-             *       pertinent to this call. Then, we (always) send the 
+             *       we collect first *all* particle addresses before
+             *       attempting to clear the single particle address that is
+             *       pertinent to this call. Then, we (always) send the
              *       result via the argument.
-             * 
-             *       This is obviously not optimal but should work in most 
-             *       circumstances. If not suitable for a deriving implementation, 
-             *       onus is on the corresponding implementation to specialize 
+             *
+             *       This is obviously not optimal but should work in most
+             *       circumstances. If not suitable for a deriving implementation,
+             *       onus is on the corresponding implementation to specialize
              *       this function accordingly */
-            
+
             status = st::ARCH_STATUS_SUCCESS;
-            
+
             if( this->requiresCollecting() )
             {
                 status = this->collectParticlesAddresses();
             }
-            
+
             if( status == st::ARCH_STATUS_SUCCESS )
             {
                 status = _base_t::doClearParticleAddresses( index );
             }
-            
+
             if( status == st::ARCH_STATUS_SUCCESS )
             {
                 status = this->ptrParticlesAddrArgBase()->send(
                     *this->doGetPtrParticlesAddrBuffer() );
             }
         }
-        
+
         return status;
     }
-            
-    TrackJobCtrlArgBase::status_t 
+
+    TrackJobCtrlArgBase::status_t
     TrackJobCtrlArgBase::doClearAllParticleAddresses()
     {
         TrackJobCtrlArgBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-        
+
         if( ( this->ptrParticlesAddrArgBase() != nullptr ) &&
             ( this->ptrParticlesAddrArgBase()->usesCObjectsCxxBuffer() ) &&
             ( this->doGetPtrParticlesAddrBuffer() != nullptr ) &&
@@ -416,19 +416,19 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             using _this_t = TrackJobCtrlArgBase;
             using _base_t = _this_t::_base_track_job_t;
-            
+
             status = _base_t::doClearAllParticleAddresses();
-            
+
             if( status == st::ARCH_STATUS_SUCCESS )
             {
                 status = this->ptrParticlesAddrArgBase()->send(
                     *this->doGetPtrParticlesAddrBuffer() );
             }
         }
-        
+
         return status;
     }
-    
+
     /* --------------------------------------------------------------------- */
 
     void TrackJobCtrlArgBase::doClear(
@@ -491,10 +491,10 @@ namespace SIXTRL_CXX_NAMESPACE
         using collect_flag_t = _this_t::collect_flag_t;
         using status_t = _this_t::status_t;
 
-        collect_flag_t result = st::TRACK_JOB_COLLECT_NONE;
+        collect_flag_t result = st::TRACK_JOB_IO_NONE;
 
         if( ( _base_t::IsCollectFlagSet(
-                flags, st::TRACK_JOB_COLLECT_PARTICLES ) ) &&
+                flags, st::TRACK_JOB_IO_PARTICLES ) ) &&
             ( this->ptrParticlesArgBase() != nullptr ) &&
             ( this->ptrParticlesArgBase()->usesCObjectsBuffer() ) &&
             ( this->ptrCParticlesBuffer() != nullptr ) )
@@ -504,12 +504,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( status == st::ARCH_STATUS_SUCCESS )
             {
-                result |= st::TRACK_JOB_COLLECT_PARTICLES;
+                result |= st::TRACK_JOB_IO_PARTICLES;
             }
         }
 
         if( ( _base_t::IsCollectFlagSet(
-                flags, st::TRACK_JOB_COLLECT_BEAM_ELEMENTS ) ) &&
+                flags, st::TRACK_JOB_IO_BEAM_ELEMENTS ) ) &&
             ( this->ptrBeamElementsArgBase() != nullptr ) &&
             ( this->ptrBeamElementsArgBase()->usesCObjectsBuffer() ) &&
             ( this->ptrCBeamElementsBuffer() != nullptr ) )
@@ -519,12 +519,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( status == st::ARCH_STATUS_SUCCESS )
             {
-                result |= st::TRACK_JOB_COLLECT_BEAM_ELEMENTS;
+                result |= st::TRACK_JOB_IO_BEAM_ELEMENTS;
             }
         }
 
         if( ( _base_t::IsCollectFlagSet(
-                flags, st::TRACK_JOB_COLLECT_OUTPUT ) ) &&
+                flags, st::TRACK_JOB_IO_OUTPUT ) ) &&
             ( this->ptrOutputArgBase() != nullptr ) &&
             ( this->ptrOutputArgBase()->usesCObjectsBuffer() ) &&
             ( this->ptrCOutputBuffer() != nullptr ) )
@@ -534,12 +534,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( status == st::ARCH_STATUS_SUCCESS )
             {
-                result |= st::TRACK_JOB_COLLECT_OUTPUT;
+                result |= st::TRACK_JOB_IO_OUTPUT;
             }
         }
 
         if( ( _base_t::IsCollectFlagSet(
-                flags, st::TRACK_JOB_COLLECT_DEBUG_REGISTER ) ) &&
+                flags, st::TRACK_JOB_IO_DEBUG_REGISTER ) ) &&
             ( this->ptrDebugRegisterArgBase() != nullptr ) &&
             ( this->ptrDebugRegisterArgBase()->usesRawArgument() ) &&
             ( this->doGetPtrLocalDebugRegister() != nullptr ) )
@@ -552,27 +552,103 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( status == st::ARCH_STATUS_SUCCESS )
             {
-                result |= st::TRACK_JOB_COLLECT_DEBUG_REGISTER;
+                result |= st::TRACK_JOB_IO_DEBUG_REGISTER;
             }
         }
 
         if( ( _base_t::IsCollectFlagSet(
-                flags, st::TRACK_JOB_COLLECT_PARTICLES_ADDR ) ) &&
+                flags, st::TRACK_JOB_IO_PARTICLES_ADDR ) ) &&
             ( this->ptrParticlesAddrArgBase() != nullptr ) &&
             ( this->ptrParticlesAddrArgBase()->usesCObjectsCxxBuffer() ) &&
             ( this->doGetPtrParticlesAddrBuffer() != nullptr ) &&
             ( this->doGetPtrParticlesAddrBuffer() ==
               this->ptrParticlesAddrArgBase()->ptrCObjectsCxxBuffer() ) )
         {
-            _base_t::buffer_t& particles_addr_buffer = 
+            _base_t::buffer_t& particles_addr_buffer =
                 *this->doGetPtrParticlesAddrBuffer();
-            
+
             status_t const status = this->ptrParticlesAddrArgBase()->receive(
                 particles_addr_buffer );
 
             if( status == st::ARCH_STATUS_SUCCESS )
             {
-                result |= st::TRACK_JOB_COLLECT_PARTICLES_ADDR;
+                result |= st::TRACK_JOB_IO_PARTICLES_ADDR;
+            }
+        }
+
+        return result;
+    }
+
+    TrackJobCtrlArgBase::push_flag_t TrackJobCtrlArgBase::doPush(
+        TrackJobCtrlArgBase::push_flag_t const flags )
+    {
+        using _this_t = st::TrackJobCtrlArgBase;
+        using _base_t = st::TrackJobBaseNew;
+        using push_flag_t = _this_t::push_flag_t;
+        using status_t = _this_t::status_t;
+
+        push_flag_t result = st::TRACK_JOB_IO_NONE;
+
+        if( ( _base_t::IsCollectFlagSet(
+                flags, st::TRACK_JOB_IO_PARTICLES ) ) &&
+            ( this->ptrParticlesArgBase() != nullptr ) &&
+            ( this->ptrParticlesArgBase()->usesCObjectsBuffer() ) &&
+            ( this->ptrCParticlesBuffer() != nullptr ) )
+        {
+            status_t const status = this->ptrParticlesArgBase()->send(
+                this->ptrCParticlesBuffer() );
+
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                result |= st::TRACK_JOB_IO_PARTICLES;
+            }
+        }
+
+        if( ( _base_t::IsCollectFlagSet(
+                flags, st::TRACK_JOB_IO_BEAM_ELEMENTS ) ) &&
+            ( this->ptrBeamElementsArgBase() != nullptr ) &&
+            ( this->ptrBeamElementsArgBase()->usesCObjectsBuffer() ) &&
+            ( this->ptrCBeamElementsBuffer() != nullptr ) )
+        {
+            status_t const status = this->ptrBeamElementsArgBase()->send(
+                this->ptrCBeamElementsBuffer() );
+
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                result |= st::TRACK_JOB_IO_BEAM_ELEMENTS;
+            }
+        }
+
+        if( ( _base_t::IsCollectFlagSet(
+                flags, st::TRACK_JOB_IO_OUTPUT ) ) &&
+            ( this->ptrOutputArgBase() != nullptr ) &&
+            ( this->ptrOutputArgBase()->usesCObjectsBuffer() ) &&
+            ( this->ptrCOutputBuffer() != nullptr ) )
+        {
+            status_t const status = this->ptrOutputArgBase()->send(
+                this->ptrCOutputBuffer() );
+
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                result |= st::TRACK_JOB_IO_OUTPUT;
+            }
+        }
+
+        if( ( _base_t::IsCollectFlagSet(
+                flags, st::TRACK_JOB_IO_DEBUG_REGISTER ) ) &&
+            ( this->ptrDebugRegisterArgBase() != nullptr ) &&
+            ( this->ptrDebugRegisterArgBase()->usesRawArgument() ) &&
+            ( this->doGetPtrLocalDebugRegister() != nullptr ) )
+        {
+            using debug_register_t = _base_t::debug_register_t;
+
+            status_t const status = this->ptrDebugRegisterArgBase()->send(
+                this->doGetPtrLocalDebugRegister(),
+                    sizeof( debug_register_t ) );
+
+            if( status == st::ARCH_STATUS_SUCCESS )
+            {
+                result |= st::TRACK_JOB_IO_DEBUG_REGISTER;
             }
         }
 

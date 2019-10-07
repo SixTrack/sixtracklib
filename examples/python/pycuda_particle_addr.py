@@ -4,8 +4,8 @@
 import importlib
 from importlib import util
 import ctypes as ct
-import pysixtracklib as pyst
-from pysixtracklib import stcommon as st
+import sixtracklib as pyst
+from sixtracklib import stcommon as st
 import pdb
 
 pycuda_spec = util.find_spec('pycuda')
@@ -22,7 +22,7 @@ if numpy_spec is not None:
 
 if __name__ == '__main__':
     if not pyst.supports('cuda'):
-        raise SystemExit("Example requires cuda support in pysixtracklib")
+        raise SystemExit("Example requires cuda support in sixtracklib")
 
     if pycuda_spec is None:
         raise SystemExit("Example requires pycuda installation")
@@ -63,12 +63,12 @@ if __name__ == '__main__':
         particles_addr.num_particles, np.float64, gpudata=particles_addr.x)
 
     new_x_values = np.linspace(
-        0.0, float( num_particles - 1 ), num=num_particles, dtype=np.float64 )
+        0.0, float(num_particles - 1), num=num_particles, dtype=np.float64)
 
     cuda_x[:] = new_x_values
 
-    for ii in range( 0, num_particles ):
-        cmp_particles.x[ ii ] = float( ii )
+    for ii in range(0, num_particles):
+        cmp_particles.x[ii] = float(ii)
 
     track_job.fetch_particle_addresses()
 
@@ -83,4 +83,3 @@ if __name__ == '__main__':
 
     del track_job
     del cuda_x
-

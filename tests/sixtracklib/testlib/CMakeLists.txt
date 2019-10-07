@@ -66,7 +66,7 @@ target_compile_options( sixtrack_test
 
 if( SIXTRACKL_ENABLE_PYTHON )
 
-    set( DEST_PATH "${CMAKE_SOURCE_DIR}/python/pysixtracklib_test" )
+    set( DEST_PATH "${CMAKE_SOURCE_DIR}/python/sixtracklib_test" )
 
     if( EXISTS ${DEST_PATH} )
 

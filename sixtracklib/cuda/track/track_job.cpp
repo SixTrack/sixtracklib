@@ -1793,6 +1793,13 @@ namespace SIXTRL_CXX_NAMESPACE
         return track_job.collect();
     }
 
+    CudaTrackJob::push_flag_t push(
+        CudaTrackJob& SIXTRL_RESTRICT_REF track_job,
+        CudaTrackJob::push_flag_t const flag )
+    {
+        return track_job.push( flag );
+    }
+
     CudaTrackJob::track_status_t trackUntilTurn(
         CudaTrackJob& SIXTRL_RESTRICT_REF trackjob,
         CudaTrackJob::size_type const until_turn )

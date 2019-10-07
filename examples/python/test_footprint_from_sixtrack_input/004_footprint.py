@@ -52,9 +52,9 @@ elif track_with == 'Sixtracklib':
         Dsigma_wrt_CO_m=0., Ddelta_wrt_CO=0., n_turns=n_turns, device=device)
     info = track_with
     if device is None:
-    	info += ' (CPU)'
+        info += ' (CPU)'
     else:
-    	info += ' (GPU %s)'%device
+        info += ' (GPU %s)' % device
 else:
     raise ValueError('What?!')
 
@@ -75,13 +75,13 @@ plt.close('all')
 
 fig3 = plt.figure(3)
 axcoord = fig3.add_subplot(1, 1, 1)
-footprint.draw_footprint(xy_norm, axis_object=axcoord, linewidth = 1)
+footprint.draw_footprint(xy_norm, axis_object=axcoord, linewidth=1)
 axcoord.set_xlim(right=np.max(xy_norm[:, :, 0]))
 axcoord.set_ylim(top=np.max(xy_norm[:, :, 1]))
 
 fig4 = plt.figure(4)
 axFP = fig4.add_subplot(1, 1, 1)
-footprint.draw_footprint(Qxy_fp, axis_object=axFP, linewidth = 1)
+footprint.draw_footprint(Qxy_fp, axis_object=axFP, linewidth=1)
 # axFP.set_xlim(right=np.max(Qxy_fp[:, :, 0]))
 # axFP.set_ylim(top=np.max(Qxy_fp[:, :, 1]))
 fig4.suptitle(info)

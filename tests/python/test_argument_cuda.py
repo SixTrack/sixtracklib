@@ -4,9 +4,9 @@
 import sys
 import os
 from cobjects import CBuffer
-import pysixtracklib as pyst
-from pysixtracklib import stcommon as st
-import pysixtracklib_test as testlib
+import sixtracklib as pyst
+from sixtracklib import stcommon as st
+import sixtracklib_test as testlib
 import ctypes as ct
 
 if __name__ == '__main__':

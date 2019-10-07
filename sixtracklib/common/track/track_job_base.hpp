@@ -57,6 +57,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using elem_by_elem_order_t  = ::NS(elem_by_elem_order_t);
         using particle_index_t      = ::NS(particle_index_t);
         using collect_flag_t        = ::NS(track_job_collect_flag_t);
+        using push_flag_t           = ::NS(track_job_push_flag_t);
         using output_buffer_flag_t  = ::NS(output_buffer_flag_t);
         using particles_addr_t      = ::NS(ParticlesAddr);
         using num_particles_t       = ::NS(particle_num_elements_t);
@@ -114,26 +115,33 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
+        SIXTRL_HOST_FN push_flag_t push( push_flag_t const push_flag );
+        SIXTRL_HOST_FN status_t pushParticles();
+        SIXTRL_HOST_FN status_t pushBeamElements();
+        SIXTRL_HOST_FN status_t pushOutput();
+
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_HOST_FN bool canFetchParticleAddresses() const SIXTRL_NOEXCEPT;
-    
+
         SIXTRL_HOST_FN bool hasParticleAddresses() const SIXTRL_NOEXCEPT;
-        
+
         SIXTRL_HOST_FN status_t fetchParticleAddresses();
-        
+
         SIXTRL_HOST_FN status_t clearParticleAddresses(
             size_type const index = size_type{ 0 } );
-        
+
         SIXTRL_HOST_FN status_t clearAllParticleAddresses();
 
         SIXTRL_HOST_FN particles_addr_t const* particleAddresses(
             size_type const index = size_type{ 0 } ) const SIXTRL_NOEXCEPT;
-            
-        SIXTRL_HOST_FN buffer_t const* 
+
+        SIXTRL_HOST_FN buffer_t const*
         ptrParticleAddressesBuffer() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN c_buffer_t const* 
+        SIXTRL_HOST_FN c_buffer_t const*
         ptrCParticleAddressesBuffer() const SIXTRL_NOEXCEPT;
-        
+
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN track_status_t trackUntil(
@@ -206,23 +214,23 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const until_turn_elem_by_elem = size_type{ 0 } );
 
         /* ----------------------------------------------------------------- */
-        
+
         SIXTRL_HOST_FN status_t selectParticleSet(
             size_type const particle_set_index );
-        
+
         /*
         SIXTRL_HOST_FN status_t selectParticleSets(
-            size_type const num_particle_sets, 
+            size_type const num_particle_sets,
             size_type const* SIXTRL_RESTRICT particle_set_indices_begin );
-        
+
         template< typename ParSetIndexIter >
         SIXTRL_HOST_FN status_t selectParticleSets(
-            ParSetIndexIter particle_set_indices_begin, 
+            ParSetIndexIter particle_set_indices_begin,
             ParSetIndexIter particle_set_indices_end );
         */
 
         /* ----------------------------------------------------------------- */
-        
+
         SIXTRL_HOST_FN status_t assignOutputBuffer(
             buffer_t& SIXTRL_RESTRICT_REF output_buffer );
 
@@ -433,6 +441,9 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual collect_flag_t doCollect(
             collect_flag_t const flags );
 
+        SIXTRL_HOST_FN virtual push_flag_t doPush(
+            push_flag_t const flags );
+
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN virtual status_t doPrepareParticlesStructures(
@@ -486,12 +497,12 @@ namespace SIXTRL_CXX_NAMESPACE
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN virtual status_t doFetchParticleAddresses();
-        
-        SIXTRL_HOST_FN virtual status_t doClearParticleAddresses( 
+
+        SIXTRL_HOST_FN virtual status_t doClearParticleAddresses(
             size_type const index );
 
         SIXTRL_HOST_FN virtual status_t doClearAllParticleAddresses();
-        
+
         SIXTRL_HOST_FN virtual track_status_t doTrackUntilTurn(
             size_type const until_turn );
 
@@ -512,6 +523,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN void doSetPtrOutputBuffer(
             buffer_t* SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void doSetCxxBufferPointers(
+            buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+            buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
+            buffer_t* SIXTRL_RESTRICT ptr_output_buffer ) SIXTRL_NOEXCEPT;
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 
         SIXTRL_HOST_FN void doSetPtrCParticlesBuffer(
             c_buffer_t* SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT;
@@ -898,16 +917,10 @@ namespace SIXTRL_CXX_NAMESPACE
                 particle_set_indices_end, beam_elements_buffer.getCApiPtr(),
                     ptr_out, until_turn_elem_by_elem );
 
-        if( status == ::NS(ARCH_STATUS_SUCCESS) )
+        if( status == SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS )
         {
-            this->doSetPtrParticlesBuffer( &particles_buffer );
-            this->doSetPtrBeamElementsBuffer( &beam_elements_buffer );
-
-            if( ( ptr_out != nullptr ) && ( this->hasOutputBuffer() ) &&
-                ( !this->ownsOutputBuffer() ) )
-            {
-                this->doSetPtrOutputBuffer( ptr_output_buffer );
-            }
+            this->doSetCxxBufferPointers(
+                particles_buffer, beam_elements_buffer, ptr_output_buffer );
         }
 
         return status;

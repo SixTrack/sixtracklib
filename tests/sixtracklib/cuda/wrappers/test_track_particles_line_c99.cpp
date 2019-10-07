@@ -57,6 +57,7 @@ TEST( C99_CudaWrappersTrackParticlesLineTests,
             in_particles_buffer, buf_size_t{ 0 } ) );
 
     SIXTRL_ASSERT( cmp_particles != nullptr );
+    ( void )cmp_particles;
 
     /* --------------------------------------------------------------------- */
     /* Perform comparison tracking over lattice: */
@@ -69,6 +70,7 @@ TEST( C99_CudaWrappersTrackParticlesLineTests,
         cmp_track_pb, buf_size_t{ 1 }, &track_pset_index, eb, UNTIL_TURN );
 
     SIXTRL_ASSERT( track_status == ::NS(TRACK_SUCCESS) );
+    ( void )track_status;
 
     /* -------------------------------------------------------------------- */
     /* Init the Cuda controller and arguments for the addresses
@@ -245,7 +247,6 @@ TEST( C99_CudaWrappersTrackParticlesLineTests,
     using cuda_kernel_conf_t = ::NS(CudaKernelConfig);
     using cuda_node_info_t   = ::NS(CudaNodeInfo);
 
-    using be_monitor_t       = ::NS(BeamMonitor);
     using node_index_t       = ::NS(node_index_t);
     using kernel_id_t        = ::NS(ctrl_kernel_id_t);
     using particles_t        = ::NS(Particles);
@@ -270,6 +271,7 @@ TEST( C99_CudaWrappersTrackParticlesLineTests,
             in_particles_buffer, buf_size_t{ 0 } ) );
 
     SIXTRL_ASSERT( cmp_particles != nullptr );
+    ( void )cmp_particles;
 
     /* -------------------------------------------------------------------- */
     /* add end-of-turn beam-monitors */
@@ -323,6 +325,7 @@ TEST( C99_CudaWrappersTrackParticlesLineTests,
         cmp_track_pb, NUM_PSETS, &track_pset_index, eb, UNTIL_TURN );
 
     SIXTRL_ASSERT( track_status == ::NS(TRACK_SUCCESS) );
+    ( void )track_status;
 
     /* -------------------------------------------------------------------- */
     /* Init the Cuda controller and arguments for the addresses

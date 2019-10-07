@@ -4,10 +4,10 @@
 import sys
 import os
 from cobjects import CBuffer
-import pysixtracklib as pyst
-from pysixtracklib.stcommon import st_NODE_UNDEFINED_INDEX
-import pysixtracklib_test as testlib
-from pysixtracklib_test.generic_obj import GenericObj
+import sixtracklib as pyst
+from sixtracklib.stcommon import st_NODE_UNDEFINED_INDEX
+import sixtracklib_test as testlib
+from sixtracklib_test.generic_obj import GenericObj
 
 if __name__ == '__main__':
     if not pyst.supports('cuda'):

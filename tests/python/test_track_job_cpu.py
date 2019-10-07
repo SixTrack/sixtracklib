@@ -3,10 +3,10 @@
 
 import sys
 import os
-import pysixtracklib as pyst
-import pysixtracklib_test as testlib
+import sixtracklib as pyst
+import sixtracklib_test as testlib
 
-from pysixtracklib.stcommon import \
+from sixtracklib.stcommon import \
     st_Buffer_new_mapped_on_cbuffer, st_Buffer_delete, \
     st_OutputBuffer_calculate_output_buffer_params, \
     st_OutputBuffer_prepare, st_Track_all_particles_until_turn, \
@@ -17,7 +17,7 @@ from pysixtracklib.stcommon import \
     st_BeamMonitor_assign_output_buffer, st_Buffer_new_mapped_on_cbuffer, \
     st_Particles_cbuffer_get_particles, st_NullBuffer
 
-from pysixtracklib_test.stcommon import st_Particles_print_out, \
+from sixtracklib_test.stcommon import st_Particles_print_out, \
     st_Particles_compare_values_with_treshold,\
     st_Particles_buffers_compare_values_with_treshold
 
@@ -104,16 +104,16 @@ if __name__ == '__main__':
 
     job = pyst.TrackJob(eb, track_pb, until_turn_elem_by_elem)
 
-    assert(job.type_str() == 'cpu')
-    assert(job.has_output_buffer())
-    assert(job.num_beam_monitors() > 0)
-    assert(job.has_elem_by_elem_output())
-    assert(job.has_beam_monitor_output())
+    assert(job.arch_str == 'cpu')
+    assert(job.has_output_buffer)
+    assert(job.num_beam_monitors > 0)
+    assert(job.has_elem_by_elem_output)
+    assert(job.has_beam_monitor_output)
 
     status = job.track_elem_by_elem(until_turn_elem_by_elem)
     assert(status == 0)
 
-    status = job.track(until_turn)
+    status = job.track_until(until_turn)
     assert(status == 0)
 
     job.collect()
