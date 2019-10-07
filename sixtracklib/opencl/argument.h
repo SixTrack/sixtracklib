@@ -13,6 +13,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -59,6 +60,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using size_type          = std::size_t;
         using cobj_buffer_t      = struct NS(Buffer);
         using cxx_cobj_buffer_t  = SIXTRL_CXX_NAMESPACE::Buffer;
+        using status_t           = SIXTRL_CXX_NAMESPACE::arch_status_t;
 
         explicit ClArgument(
             context_base_t* SIXTRL_RESTRICT ptr_context = nullptr );
@@ -99,6 +101,14 @@ namespace SIXTRL_CXX_NAMESPACE
         bool read(  void* SIXTRL_RESTRICT arg_buffer_begin,
                     size_type const arg_length );
 
+        status_t updateRegion( size_type const offset, size_type length,
+            void const* SIXTRL_RESTRICT new_value );
+
+        status_t updateRegions( size_type const num_regions_to_update,
+            size_type const* SIXTRL_RESTRICT offsets,
+            size_type const* SIXTRL_RESTRICT lengths,
+            void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_values );
+
         bool usesCObjectBuffer() const SIXTRL_NOEXCEPT;
         cobj_buffer_t* ptrCObjectBuffer() const SIXTRL_NOEXCEPT;
 
@@ -117,6 +127,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
         virtual int doReadAndRemapCObjBuffer(
             cobj_buffer_t* SIXTRL_RESTRICT buffer );
+
+        virtual status_t doUpdateRegions( size_type const num_regions_to_update,
+            size_type const* SIXTRL_RESTRICT offsets,
+            size_type const* SIXTRL_RESTRICT lengths,
+            void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_values );
 
         void doSetCObjBuffer(
             cobj_buffer_t* SIXTRL_RESTRICT buffer ) const SIXTRL_NOEXCEPT;
@@ -203,6 +218,18 @@ SIXTRL_HOST_FN bool NS(ClArgument_read)(
 SIXTRL_HOST_FN bool NS(ClArgument_read_memory)(
     NS(ClArgument)* SIXTRL_RESTRICT argument,
     void* arg_buffer_begin, NS(context_size_t) const arg_length );
+
+SIXTRL_HOST_FN NS(arch_status_t) NS(ClArgument_update_region)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument,
+    NS(context_size_t) const offset, NS(context_size_t) const length,
+    void const* SIXTRL_RESTRICT new_value );
+
+SIXTRL_HOST_FN NS(arch_status_t) NS(ClArgument_update_regions)(
+    NS(ClArgument)* SIXTRL_RESTRICT argument,
+    NS(context_size_t) const num_regions_to_update,
+    NS(context_size_t) const* SIXTRL_RESTRICT offset,
+    NS(context_size_t) const* SIXTRL_RESTRICT length,
+    void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_values );
 
 SIXTRL_HOST_FN bool NS(ClArgument_uses_cobj_buffer)(
     const NS(ClArgument) *const SIXTRL_RESTRICT argument );

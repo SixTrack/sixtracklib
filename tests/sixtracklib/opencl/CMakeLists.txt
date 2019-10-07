@@ -33,6 +33,30 @@ if( GTEST_FOUND )
     add_test( CXX_OpenCL_ContextTests test_context_opencl_cxx )
 
     # ==========================================================================
+    # test_argument_update_region_opencl_c99:
+
+    add_executable( test_argument_update_region_opencl_c99
+                    test_argument_update_region_c99.cpp )
+
+    set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS}
+         test_argument_update_region_opencl_c99 )
+
+    add_test( C99_OpenCL_ClArgumentUpdateRegionTest
+              test_argument_update_region_opencl_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_argument_update_region_opencl_cxx:
+
+    add_executable( test_argument_update_region_opencl_cxx
+                    test_argument_update_region_cxx.cpp )
+
+    set( CXX_UNIT_TEST_TARGETS ${CXX_UNIT_TEST_TARGETS}
+         test_argument_update_region_opencl_cxx )
+
+    add_test( CXX_OpenCL_ClArgumentUpdateRegionTest
+              test_argument_update_region_opencl_cxx )
+
+    # ==========================================================================
     # test_buffer_opencl_c99:
 
     add_executable( test_buffer_opencl_c99 test_buffer_opencl_c99.cpp )
@@ -128,6 +152,30 @@ if( GTEST_FOUND )
 
     set_property( TEST CXX_TrackJobClCollectPushTests APPEND PROPERTY
         DEPENDS CXX_OpenCL_TrackJobClTests )
+
+    # ==========================================================================
+    # test_track_job_update_region_opencl_c99:
+
+    add_executable( test_track_job_update_region_opencl_c99
+                    test_track_job_update_region_c99.cpp )
+
+    set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS}
+         test_track_job_update_region_opencl_c99 )
+
+    add_test( C99_OpenCL_ClTrackJobUpdateBeamElementsRegionTest
+              test_track_job_update_region_opencl_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_track_job_update_region_opencl_cxx:
+
+    add_executable( test_track_job_update_region_opencl_cxx
+                    test_track_job_update_region_cxx.cpp )
+
+    set( CXX_UNIT_TEST_TARGETS ${CXX_UNIT_TEST_TARGETS}
+         test_track_job_update_region_opencl_cxx )
+
+    add_test( CXX_OpenCL_ClTrackJobUpdateBeamElementsRegionTest
+              test_track_job_update_region_opencl_cxx )
 
     # *************************************************************************
     # Set all properties:
