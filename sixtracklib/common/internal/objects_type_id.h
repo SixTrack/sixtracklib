@@ -29,6 +29,7 @@ typedef enum NS(object_type_values_e)
     NS(OBJECT_TYPE_DIPEDGE)               =         24,
     NS(OBJECT_TYPE_PARTICLES_ADDR)        =        512,
     NS(OBJECT_TYPE_LINE)                  =       1024,
+    NS(OBJECT_TYPE_TRICUB)                =      32768,
     NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF)     =      65535,
     NS(OBJECT_TYPE_LAST_AVAILABLE)        =      65535,
     NS(OBJECT_TYPE_INVALID)               = 0x7fffffff
@@ -102,6 +103,10 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_DIPEDGE = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_DIPEDGE) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_TRICUB = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_TRICUB) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_LINE         = static_cast< object_type_id_t >(

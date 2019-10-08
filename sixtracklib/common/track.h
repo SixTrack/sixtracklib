@@ -575,6 +575,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(Track_all_particles_line_ext)(
     #include "sixtracklib/common/be_xyshift/track.h"
     #include "sixtracklib/common/be_limit/track.h"
     #include "sixtracklib/common/be_dipedge/track.h"
+    #include "sixtracklib/common/be_tricub/track.h"
 
     #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
         #include "sixtracklib/common/be_beamfields/track.h"
@@ -874,6 +875,16 @@ SIXTRL_INLINE int NS(Track_particle_beam_element_obj_dispatcher)(
         }
 
         #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+
+        case NS(OBJECT_TYPE_TRICUB):
+        {
+            typedef NS(TriCub)   belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_tricub)( particles, index, belem );
+            break;
+        }
 
         default:
         {

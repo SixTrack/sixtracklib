@@ -43,6 +43,8 @@
 #include "sixtracklib/common/be_limit/track.h"
 #include "sixtracklib/common/be_dipedge/be_dipedge.h"
 #include "sixtracklib/common/be_dipedge/track.h"
+#include "sixtracklib/common/be_tricub/be_tricub.h"
+#include "sixtracklib/common/be_tricub/track.h"
 #include "sixtracklib/common/context/compute_arch.h"
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/control/argument_base.h"
