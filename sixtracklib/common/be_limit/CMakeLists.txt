@@ -1,25 +1,25 @@
 # =============================================================================
 # end: sixtracklib/common/be_limit/CMakeLitst.txt
 
-set( SIXTRL_COMMON_BE_LIMIT_CXX_HEADERS 
+set( SIXTRL_COMMON_BE_LIMIT_CXX_HEADERS
      be_limit_rect.hpp
      be_limit_ellipse.hpp
 )
 
-set( SIXTRL_COMMON_BE_LIMIT_C99_HEADERS 
+set( SIXTRL_COMMON_BE_LIMIT_C99_HEADERS
      be_limit_rect.h
      be_limit_ellipse.h
      track.h
 )
-set( SIXTRL_COMMON_BE_LIMIT_C99_SOURCES 
+set( SIXTRL_COMMON_BE_LIMIT_C99_SOURCES
      be_limit_rect.c
      be_limit_ellipse.c
 )
 
 add_library( sixtrack_common_be_limit OBJECT
     ${SIXTRL_COMMON_BE_LIMIT_C99_HEADERS}
-    ${SIXTRL_COMMON_BE_LIMIT_CXX_HEADERS}
     ${SIXTRL_COMMON_BE_LIMIT_C99_SOURCES}
+    ${SIXTRL_COMMON_BE_LIMIT_CXX_HEADERS}
 )
 
 target_include_directories( sixtrack_common_be_limit PRIVATE
@@ -41,20 +41,14 @@ set(  SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
 # ==============================================================================
 # Installation:
 
-set( SIXTRL_COMMON_BE_LIMIT_C99_INSTALL_PATH
-     "${CMAKE_INSTALL_PREFIX}/include/sixtracklib/common/be_limit" )
-
 if( SIXTRL_COMMON_BE_LIMIT_C99_HEADERS )
     install( FILES ${SIXTRL_COMMON_BE_LIMIT_C99_HEADERS}
-             DESTINATION ${SIXTRL_COMMON_BE_LIMIT_C99_INSTALL_PATH} )
+             DESTINATION "${SIXTRACKLIB_C99_INSTALL_PREFIX}/be_limit" )
 endif()
 
 if( SIXTRACKL_ENABLE_CXX AND SIXTRL_COMMON_BE_LIMIT_CXX_HEADERS )
-    set( SIXTRL_COMMON_BE_LIMIT_CXX_INSTALL_PATH
-       ${SIXTRL_COMMON_BE_LIMIT_C99_INSTALL_PATH} )
-
     install( FILES ${SIXTRL_COMMON_BE_LIMIT_CXX_HEADERS}
-             DESTINATION ${SIXTRL_COMMON_BE_LIMIT_CXX_INSTALL_PATH} )
+             DESTINATION "${SIXTRACKLIB_CXX_INSTALL_PREFIX}/be_limit" )
 endif()
 
 #end: sixtracklib/common/be_limit/CMakeLists.txt
