@@ -21,7 +21,7 @@
 #include "sixtracklib/common/be_drift/be_drift.h"
 #include "sixtracklib/common/output/elem_by_elem_config.h"
 #include "sixtracklib/common/output/output_buffer.h"
-#include "sixtracklib/common/track.h"
+#include "sixtracklib/common/track/track.h"
 
 #include "sixtracklib/opencl/context.h"
 #include "sixtracklib/opencl/argument.h"
@@ -126,7 +126,7 @@ TEST( C99_OpenCLTrackElemByElemTests, TrackElemByElemHostAndDeviceCompareDrifts)
     /* Track element by element on the host: */
 
     ASSERT_TRUE( 0 == ::NS(Track_all_particles_element_by_element_until_turn)(
-        particles, eb, NUM_TURNS, elem_by_elem_particles ) );
+        particles, &elem_by_elem_config, eb, NUM_TURNS ) );
 
     ASSERT_TRUE( ::NS(Particles_copy)( final_state, particles ) ==
                  ::NS(ARCH_STATUS_SUCCESS) );

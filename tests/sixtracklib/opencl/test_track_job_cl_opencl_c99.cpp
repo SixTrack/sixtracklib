@@ -25,7 +25,8 @@
 #include "sixtracklib/common/be_monitor/output_buffer.h"
 #include "sixtracklib/common/output/output_buffer.h"
 #include "sixtracklib/common/output/elem_by_elem_config.h"
-#include "sixtracklib/common/track.h"
+#include "sixtracklib/common/track/definitions.h"
+#include "sixtracklib/common/track/track.h"
 #include "sixtracklib/opencl/context.h"
 #include "sixtracklib/opencl/track_job_cl.h"
 
@@ -992,6 +993,7 @@ TEST( C99_TrackJobClTests, TrackParticles )
     using node_info_t      = ::NS(context_node_info_t);
     using node_id_t        = ::NS(context_node_id_t);
     using node_info_iter_t = node_info_t const*;
+    using num_elem_t       = ::NS(particle_num_elements_t);
 
     namespace st_test  = SIXTRL_CXX_NAMESPACE::tests;
 
@@ -1110,15 +1112,56 @@ TEST( C99_TrackJobClTests, TrackParticles )
 
         ASSERT_TRUE( elem_by_elem_out != nullptr );
 
+        part_index_t max_turn_id, min_particle_id, max_particle_id,
+                     min_at_element_id, max_at_element_id;
+
+        ret = ::NS(Particles_get_min_max_attributes)( particles,
+            &min_particle_id, &max_particle_id, &min_at_element_id,
+            &max_at_element_id, &min_turn_id, &max_turn_id );
+
+        ASSERT_TRUE( ret == NS(TRACK_SUCCESS) );
+
+        NS(ElemByElemConfig) config;
+        NS(ElemByElemConfig_preset)( &config );
+
+        if( ret == NS(TRACK_SUCCESS) )
+        {
+            num_elem_t const num_beam_elements =
+                NS(Buffer_get_num_of_objects)( eb );
+
+            if( ( num_beam_elements >= ( num_elem_t )0u ) &&
+                ( num_beam_elements >  ( num_elem_t )(
+                    max_at_element_id + ( part_index_t )1u ) ) )
+            {
+                max_at_element_id = ( part_index_t )(
+                    num_beam_elements - ( num_elem_t )1u );
+            }
+
+            SIXTRL_ASSERT( max_turn_id >= ( part_index_t )0u );
+            SIXTRL_ASSERT( max_turn_id >= min_turn_id );
+
+            ret = NS(ElemByElemConfig_init_detailed)(
+                &config, NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES),
+                min_particle_id, max_particle_id, min_at_element_id,
+                max_at_element_id, min_turn_id, max_turn_id, true );
+        }
+
+        if( ret == NS(TRACK_SUCCESS) )
+        {
+            NS(ElemByElemConfig_set_output_store_address)(
+                &config, ( uintptr_t )elem_by_elem_out );
+        }
+
+
         ASSERT_TRUE( ( ( NUM_BEAM_ELEMENTS + NUM_BEAM_MONITORS ) *
             NUM_PARTICLES * DUMP_ELEM_BY_ELEM_TURNS ) <=
                 static_cast< size_t >( ::NS(Particles_get_num_of_particles)(
                     elem_by_elem_out ) ) );
 
         ret = ::NS(Track_all_particles_element_by_element_until_turn)(
-            cmp_particles, eb, DUMP_ELEM_BY_ELEM_TURNS, elem_by_elem_out );
+            cmp_particles, &config, eb, DUMP_ELEM_BY_ELEM_TURNS );
 
-        ASSERT_TRUE( ret == 0 );
+        ASSERT_TRUE( ret == NS(TRACK_SUCCESS) );
     }
 
     if( NUM_TURNS > DUMP_ELEM_BY_ELEM_TURNS )
