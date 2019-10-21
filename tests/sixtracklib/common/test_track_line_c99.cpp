@@ -19,7 +19,7 @@
 
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/beam_elements.h"
-#include "sixtracklib/common/track.h"
+#include "sixtracklib/common/track/track.h"
 
 TEST( C99_CommonTrackLineTests, TrackParticlesOverLatticeCompare )
 {
@@ -65,7 +65,7 @@ TEST( C99_CommonTrackLineTests, TrackParticlesOverLatticeCompare )
             buf_size_t const end_idx   = ( !is_last_in_turn ) ?
                 begin_idx + num_elem_per_part : num_beam_elements;
 
-            status = NS(Track_all_particles_line_ext)(
+            status = NS(Track_all_particles_line)(
                 particles, eb, begin_idx, end_idx, is_last_in_turn );
 
             ASSERT_TRUE( status == 0 );

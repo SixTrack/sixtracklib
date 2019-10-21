@@ -17,7 +17,7 @@
 
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/beam_elements.h"
-#include "sixtracklib/common/track.h"
+#include "sixtracklib/common/track/track.h"
 #include "sixtracklib/testlib.h"
 
 namespace sixtrack
@@ -28,20 +28,20 @@ namespace sixtrack
             std::string const& path_to_datafile,
             SIXTRL_REAL_T const treshold = SIXTRL_REAL_T{ 0.0 } )
         {
-            using real_t          = SIXTRL_REAL_T;
-            using buffer_t        = ::st_Buffer;
-            using particles_t     = ::st_Particles;
-            using object_t        = ::st_Object;
-            using size_t          = ::st_buffer_size_t;
-            using num_particles_t = ::st_particle_num_elements_t;
+            using real_t          = ::NS(particle_real_t);
+            using buffer_t        = ::NS(Buffer);
+            using particles_t     = ::NS(Particles);
+            using object_t        = ::NS(Object);
+            using size_t          = ::NS(buffer_size_t);
+            using num_particles_t = ::NS(particle_num_elements_t);
 
             bool success = false;
 
-            buffer_t* buffer =
-                ::st_Buffer_new_from_file( path_to_datafile.c_str() );
+            buffer_t* buffer = ::NS(Buffer_new_from_file)(
+                path_to_datafile.c_str() );
 
-            size_t const buffer_size = ::st_Buffer_get_size( buffer );
-            size_t const num_objs = ::st_Buffer_get_num_of_objects( buffer );
+            size_t const buffer_size = ::NS(Buffer_get_size)( buffer );
+            size_t const num_objs = ::NS(Buffer_get_num_of_objects)( buffer );
 
             success  = ( buffer != nullptr );
             success &= ( buffer_size > size_t{ 0 } );
@@ -52,8 +52,8 @@ namespace sixtrack
 
             if( success )
             {
-                object_t* obj_it  = ::st_Buffer_get_objects_begin( buffer );
-                object_t* obj_end = ::st_Buffer_get_objects_end( buffer );
+                object_t* obj_it  = ::NS(Buffer_get_objects_begin)( buffer );
+                object_t* obj_end = ::NS(Buffer_get_objects_end)( buffer );
 
                 success  = ( obj_it  != nullptr );
                 success &= ( obj_end != nullptr );
@@ -66,24 +66,23 @@ namespace sixtrack
                 if( success )
                 {
                     object_t* init_particle_obj = nullptr;
-
                     init_particle_obj = obj_it++;
 
-                    success = ( ::st_Object_get_type_id( init_particle_obj ) ==
-                                 ::st_OBJECT_TYPE_PARTICLE );
+                    success = ( ::NS(Object_get_type_id)( init_particle_obj ) ==
+                                 ::NS(OBJECT_TYPE_PARTICLE) );
 
-                    success &= ( ::st_Object_get_begin_addr(
+                    success &= ( ::NS(Object_get_begin_addr)(
                         init_particle_obj ) != uintptr_t{ 0 } );
 
                     if( success )
                     {
                         particles = reinterpret_cast< particles_t* >(
-                            static_cast< uintptr_t >( ::st_Object_get_begin_addr(
+                            static_cast< uintptr_t >( ::NS(Object_get_begin_addr)(
                                 init_particle_obj ) ) );
 
                         success = ( particles != nullptr );
 
-                        num_particles = ::st_Particles_get_num_of_particles(
+                        num_particles = ::NS(Particles_get_num_of_particles)(
                             particles );
 
                         success &= ( num_particles > num_particles_t{ 0 } );
@@ -107,71 +106,79 @@ namespace sixtrack
                 {
                     object_t const* cmp_particles_obj = obj_it;
 
-                    success = ( ::st_Object_get_type_id( cmp_particles_obj ) ==
-                                 ::st_OBJECT_TYPE_PARTICLE );
+                    success = ( ::NS(Object_get_type_id)( cmp_particles_obj ) ==
+                                 ::NS(OBJECT_TYPE_PARTICLE) );
 
-                    success &= ( ::st_Object_get_begin_addr(
+                    success &= ( ::NS(Object_get_begin_addr)(
                         cmp_particles_obj ) != uintptr_t{ 0 } );
 
                     if( success )
                     {
                         cmp_particles = reinterpret_cast< particles_t const* >(
-                            static_cast< uintptr_t >( ::st_Object_get_begin_addr(
+                            static_cast< uintptr_t >( ::NS(Object_get_begin_addr)(
                                 cmp_particles_obj ) ) );
 
                         success  = ( cmp_particles != nullptr );
                         success &= ( num_particles ==
-                            ::st_Particles_get_num_of_particles(
+                            ::NS(Particles_get_num_of_particles)(
                                 cmp_particles ) );
                     }
                 }
 
                 if( success )
                 {
-                    success = ( ::st_Particles_have_same_structure(
+                    success = ( ::NS(Particles_have_same_structure)(
                         cmp_particles, particles ) ) ? 1 : 0;
 
-                    success &= ( ::st_Particles_map_to_same_memory(
+                    success &= ( ::NS(Particles_map_to_same_memory)(
                         cmp_particles, particles ) ) ? 0 : 1;
                 }
 
                 if( success )
                 {
-                    success = ( 0 == ::st_Track_all_particles_beam_elements_obj(
-                        particles, be_begin, be_end ) );
+                    num_particles_t const npart =
+                        ::NS(Particles_get_num_of_particles)( particles );
+
+                    for( num_particles_t idx = num_particles_t{ 0 } ;
+                            idx < npart ; ++idx )
+                    {
+                        success = ( ::NS(TRACK_SUCCESS) ==
+                            NS(Track_particle_until_turn_objs)(
+                                particles, idx, be_begin, be_end, 1u ) );
+                    }
                 }
 
                 if( success )
                 {
                     success =
-                    ( ( ::st_Particles_compare_values( cmp_particles,
+                    ( ( ::NS(Particles_compare_values)( cmp_particles,
                                                        particles ) == 0 ) ||
                       ( ( treshold > ( real_t )0.0 ) &&
-                        ( 0 == ::st_Particles_compare_values_with_treshold(
+                        ( 0 == ::NS(Particles_compare_values_with_treshold)(
                             cmp_particles, particles, treshold ) ) ) );
                 }
             }
 
-            ::st_Buffer_delete( buffer );
+            ::NS(Buffer_delete)( buffer );
             return success;
 
         }
 
         bool performElementByElementTrackCheck(
-            ::st_Buffer* SIXTRL_RESTRICT cmp_particles_buffer,
-            ::st_Buffer* SIXTRL_RESTRICT beam_elements_buffer,
+            ::NS(Buffer)* SIXTRL_RESTRICT cmp_particles_buffer,
+            ::NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
             double const abs_tolerance )
         {
-            using buf_size_t = ::st_buffer_size_t;
+            using buf_size_t = ::NS(buffer_size_t);
 
             buf_size_t const num_particle_blocks =
-                ::st_Buffer_get_num_of_objects( cmp_particles_buffer );
+                ::NS(Buffer_get_num_of_objects)( cmp_particles_buffer );
 
             buf_size_t const num_beam_elements =
-                ::st_Buffer_get_num_of_objects( beam_elements_buffer );
+                ::NS(Buffer_get_num_of_objects)( beam_elements_buffer );
 
             bool success = false;
-            ::st_Buffer* particles_buffer = ::st_Buffer_new( 0u );
+            ::NS(Buffer)* particles_buffer = ::NS(Buffer_new)( 0u );
 
             if( ( cmp_particles_buffer != nullptr ) &&
                 ( beam_elements_buffer != nullptr ) &&
@@ -182,19 +189,19 @@ namespace sixtrack
                     num_beam_elements + buf_size_t{ 1 } ) ) &&
                 ( abs_tolerance > double{ 0 } ) )
             {
-                ::st_Particles* particles = nullptr;
+                ::NS(Particles)* particles = nullptr;
 
-                ::st_Particles const* input_particles =
-                    ::st_Particles_buffer_get_const_particles(
+                ::NS(Particles) const* input_particles =
+                    ::NS(Particles_buffer_get_const_particles)(
                         cmp_particles_buffer, 0u );
 
                 buf_size_t const input_num_particles =
-                    ::st_Particles_get_num_of_particles( input_particles );
+                    ::NS(Particles_get_num_of_particles)( input_particles );
 
                 if( ( input_particles != nullptr ) &&
                     ( input_num_particles > buf_size_t{ 0 } ) )
                 {
-                    particles = ::st_Particles_add_copy(
+                    particles = ::NS(Particles_add_copy)(
                         particles_buffer, input_particles );
                 }
 
@@ -205,76 +212,82 @@ namespace sixtrack
 
                     for(  ; ii < num_beam_elements ; ++ii )
                     {
-                        ::st_Particles const* cmp_particles =
-                            ::st_Particles_buffer_get_const_particles(
+                        ::NS(Particles) const* cmp_particles =
+                            ::NS(Particles_buffer_get_const_particles)(
                                 cmp_particles_buffer, ii );
 
-                        if( ( 0 != ::st_Particles_compare_real_values(
+                        if( ( 0 != ::NS(Particles_compare_real_values)(
                                 particles, cmp_particles ) ) &&
-                            ( 0 != ::st_Particles_compare_real_values_with_treshold(
+                            ( 0 != ::NS(Particles_compare_real_values_with_treshold)(
                                 particles, cmp_particles, abs_tolerance ) ) )
                         {
-                            ::st_Buffer* diff_buffer = ::st_Buffer_new( 0u );
-                            ::st_Particles* diff = ::st_Particles_new( diff_buffer,
-                                ::st_Particles_get_num_of_particles( particles ) );
+                            ::NS(Buffer)* diff_buffer = ::NS(Buffer_new)( 0u );
+                            ::NS(Particles)* diff = ::NS(Particles_new)( diff_buffer,
+                                ::NS(Particles_get_num_of_particles)( particles ) );
 
-                            ::st_Particles_calculate_difference(
+                            ::NS(Particles_calculate_difference)(
                                 particles, cmp_particles, diff );
 
-                            ::st_Object const* ptr_obj = ::st_Buffer_get_const_object(
+                            ::NS(Object) const* ptr_obj = ::NS(Buffer_get_const_object)(
                                 beam_elements_buffer, ii - 1 );
 
                             std::cout << "ii = " << ii - 1 << std::endl;
-                            std::cout << "type_id = " << ::st_Object_get_type_id( ptr_obj ) << std::endl;
+                            std::cout << "type_id = " << ::NS(Object_get_type_id)( ptr_obj ) << std::endl;
 
 
                             std::cout << "particles: " << std::endl;
-                            ::st_Particles_print_out( particles );
+                            ::NS(Particles_print_out)( particles );
                             std::cout << std::endl;
 
                             std::cout << "cmp_particles: " << std::endl;
-                            ::st_Particles_print_out( cmp_particles );
+                            ::NS(Particles_print_out)( cmp_particles );
                             std::cout << std::endl;
 
                             std::cout << "diff = " << std::endl;
-                            ::st_Particles_print_out( diff );
+                            ::NS(Particles_print_out)( diff );
                             std::cout << std::endl;
 
-                            ::st_Buffer_delete( diff_buffer );
+                            ::NS(Buffer_delete)( diff_buffer );
 
                             success = false;
                             break;
                         }
 
-                        ::st_Particles_copy( particles, cmp_particles );
+                        ::NS(Particles_copy)( particles, cmp_particles );
 
-                        int const ret = ::st_Track_all_particles_beam_element(
-                            particles, beam_elements_buffer, ii );
+                        ::NS(particle_num_elements_t) const npart =
+                            ::NS(Particles_get_num_of_particles)( particles );
 
-                        if( ret != 0 )
+                        ::NS(particle_num_elements_t) idx = 0;
+
+                        while( ( success ) && ( idx < npart ) )
                         {
-                            success = false;
-                            break;
+                            ::NS(track_status_t) const status =
+                            ::NS(Track_particle_beam_element_obj)(
+                                particles, idx++, ::NS(Buffer_get_const_object)(
+                                    beam_elements_buffer, ii ) );
+
+                            success = ( status == ::NS(TRACK_SUCCESS) );
                         }
                     }
                 }
 
                 if( success )
                 {
-                    ::st_Particles const* cmp_particles =
-                        ::st_Particles_buffer_get_const_particles(
+                    ::NS(Particles) const* cmp_particles =
+                        ::NS(Particles_buffer_get_const_particles)(
                             cmp_particles_buffer, num_beam_elements );
 
                     success = (
                         ( cmp_particles != nullptr ) &&
-                        ( ( 0 == ::st_Particles_compare_real_values(
+                        ( ( 0 == ::NS(Particles_compare_real_values)(
                                 particles, cmp_particles ) ) ||
-                          ( 0 == ::st_Particles_compare_real_values_with_treshold(
+                          ( 0 == ::NS(Particles_compare_real_values_with_treshold)(
                                 particles, cmp_particles, abs_tolerance ) ) ) );
                 }
             }
 
-            ::st_Buffer_delete( particles_buffer );
+            ::NS(Buffer_delete)( particles_buffer );
 
             return success;
         }
@@ -290,7 +303,7 @@ TEST( C99_CommonTrackTests, TrackParticlesOverDriftBeamElements )
 
 
     std::string const path_to_datafile =
-        ::st_PATH_TO_TEST_TRACKING_BE_DRIFT_DATA;
+        ::NS(PATH_TO_TEST_TRACKING_BE_DRIFT_DATA);
 
     ::FILE* fp = fopen( path_to_datafile.c_str(), "rb" );
 
@@ -320,7 +333,7 @@ TEST( C99_CommonTrackTests, TrackParticlesOverDriftExactBeamElements )
     static real_t const EPS  = 5e-14; //std::numeric_limits< real_t >::epsilon();
 
     std::string const path_to_datafile =
-        ::st_PATH_TO_TEST_TRACKING_BE_DRIFTEXACT_DATA;
+        ::NS(PATH_TO_TEST_TRACKING_BE_DRIFTEXACT_DATA);
 
     ::FILE* fp = fopen( path_to_datafile.c_str(), "rb" );
 
@@ -350,7 +363,7 @@ TEST( C99_CommonTrackTests, TrackParticlesOverMultiPoleBeamElements )
     static real_t const EPS  = std::numeric_limits< real_t >::epsilon();
 
     std::string const path_to_datafile =
-        ::st_PATH_TO_TEST_TRACKING_BE_MULTIPOLE_DATA;
+        ::NS(PATH_TO_TEST_TRACKING_BE_MULTIPOLE_DATA);
 
     ::FILE* fp = fopen( path_to_datafile.c_str(), "rb" );
 
@@ -375,41 +388,41 @@ TEST( C99_CommonTrackTests, TrackParticlesOverMultiPoleBeamElements )
 
 TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
 {
-    using size_t   = ::st_buffer_size_t;
-    using object_t = ::st_Object;
+    using size_t   = ::NS(buffer_size_t);
+    using object_t = ::NS(Object);
 
-    using ptr_to_cpart_t  = ::st_Particles const*;
-    using ptr_to_part_t   = ::st_Particles*;
-    using num_particles_t = ::st_particle_num_elements_t;
-    using real_t          = ::st_particle_real_t;
-    using index_t         = ::st_particle_index_t;
+    using ptr_to_cpart_t  = ::NS(Particles) const*;
+    using ptr_to_part_t   = ::NS(Particles)*;
+    using num_particles_t = ::NS(particle_num_elements_t);
+    using real_t          = ::NS(particle_real_t);
+    using index_t         = ::NS(particle_index_t);
 
     static real_t const ABS_TOLERANCE = real_t{ 1e-13 };
 
-    ::st_Buffer* pb = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_LHC_NO_BB_PARTICLES_SIXTRACK_DUMP );
+    ::NS(Buffer)* pb = ::NS(Buffer_new_from_file)(
+        ::NS(PATH_TO_LHC_NO_BB_PARTICLES_SIXTRACK_DUMP) );
 
-    ::st_Buffer* eb = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_LHC_NO_BB_BEAM_ELEMENTS_SIXTRACK );
+    ::NS(Buffer)* eb = ::NS(Buffer_new_from_file)(
+        ::NS(PATH_TO_LHC_NO_BB_BEAM_ELEMENTS_SIXTRACK) );
 
-    ::st_Buffer* track_pb   = ::st_Buffer_new( size_t{ 1u << 20u } );
-    ::st_Buffer* compare_pb = ::st_Buffer_new( size_t{ 1u << 20u } );
-    ::st_Buffer* diff_pb    = ::st_Buffer_new( size_t{ 1u << 20u } );
+    ::NS(Buffer)* track_pb   = ::NS(Buffer_new)( size_t{ 1u << 20u } );
+    ::NS(Buffer)* compare_pb = ::NS(Buffer_new)( size_t{ 1u << 20u } );
+    ::NS(Buffer)* diff_pb    = ::NS(Buffer_new)( size_t{ 1u << 20u } );
 
     ASSERT_TRUE( pb != nullptr );
     ASSERT_TRUE( eb != nullptr );
 
-    index_t const num_beam_elements = ::st_Buffer_get_num_of_objects( eb );
-    index_t const num_particle_sets = ::st_Buffer_get_num_of_objects( pb );
+    index_t const num_beam_elements = ::NS(Buffer_get_num_of_objects)( eb );
+    index_t const num_particle_sets = ::NS(Buffer_get_num_of_objects)( pb );
 
     ASSERT_TRUE( num_beam_elements > index_t{ 0 } );
     ASSERT_TRUE( num_particle_sets > index_t{ 0 } );
 
-    object_t const* be_begin = ::st_Buffer_get_const_objects_begin( eb );
-    object_t const* be_end   = ::st_Buffer_get_const_objects_end( eb );
+    object_t const* be_begin = ::NS(Buffer_get_const_objects_begin)( eb );
+    object_t const* be_end   = ::NS(Buffer_get_const_objects_end)( eb );
 
-    object_t const* pb_begin = ::st_Buffer_get_const_objects_begin( pb );
-    object_t const* pb_end   = ::st_Buffer_get_const_objects_end( pb );
+    object_t const* pb_begin = ::NS(Buffer_get_const_objects_begin)( pb );
+    object_t const* pb_end   = ::NS(Buffer_get_const_objects_end)( pb );
 
     ASSERT_TRUE( be_begin != nullptr );
     ASSERT_TRUE( be_end   != nullptr );
@@ -419,38 +432,38 @@ TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
 
     object_t const* pb_it = pb_begin;
 
-    ASSERT_TRUE( ::st_Object_get_type_id( pb_it ) == ::st_OBJECT_TYPE_PARTICLE );
+    ASSERT_TRUE( ::NS(Object_get_type_id)( pb_it ) == ::NS(OBJECT_TYPE_PARTICLE) );
 
     ptr_to_cpart_t in_particles = reinterpret_cast< ptr_to_cpart_t >(
-        ::st_Object_get_const_begin_ptr( pb_it ) );
+        ::NS(Object_get_const_begin_ptr)( pb_it ) );
 
     ASSERT_TRUE( in_particles != nullptr );
 
     num_particles_t const in_num_particles =
-        ::st_Particles_get_num_of_particles( in_particles );
+        ::NS(Particles_get_num_of_particles)( in_particles );
 
     ASSERT_TRUE( in_num_particles > num_particles_t{ 0 } );
 
     ptr_to_part_t particles =
-        ::st_Particles_new( track_pb, in_num_particles );
+        ::NS(Particles_new)( track_pb, in_num_particles );
 
     ptr_to_part_t cmp_particles =
-        ::st_Particles_new( compare_pb, in_num_particles );
+        ::NS(Particles_new)( compare_pb, in_num_particles );
 
     ptr_to_part_t diff_particles =
-        ::st_Particles_new( diff_pb, in_num_particles );
+        ::NS(Particles_new)( diff_pb, in_num_particles );
 
     ASSERT_TRUE( particles      != nullptr );
     ASSERT_TRUE( cmp_particles  != nullptr );
     ASSERT_TRUE( diff_particles != nullptr );
 
-    ASSERT_TRUE( ::st_Particles_get_num_of_particles( particles ) ==
+    ASSERT_TRUE( ::NS(Particles_get_num_of_particles)( particles ) ==
                  in_num_particles );
 
-    ASSERT_TRUE( ::st_Particles_get_num_of_particles( cmp_particles ) ==
+    ASSERT_TRUE( ::NS(Particles_get_num_of_particles)( cmp_particles ) ==
                  in_num_particles );
 
-    ASSERT_TRUE( ::st_Particles_get_num_of_particles( diff_particles ) ==
+    ASSERT_TRUE( ::NS(Particles_get_num_of_particles)( diff_particles ) ==
                  in_num_particles );
 
     object_t const* prev_pb = pb_it++;
@@ -460,58 +473,58 @@ TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
 
     for( ; pb_it != pb_end ; ++pb_it, ++prev_pb, ++cnt )
     {
-        ASSERT_TRUE( ::st_Object_get_const_begin_ptr( pb_it ) != nullptr );
-        ASSERT_TRUE( ::st_Object_get_size( pb_it ) >= sizeof( ::st_Particles ) );
-        ASSERT_TRUE( ::st_Object_get_type_id( pb_it ) ==
-                     ::st_OBJECT_TYPE_PARTICLE );
+        ASSERT_TRUE( ::NS(Object_get_const_begin_ptr)( pb_it ) != nullptr );
+        ASSERT_TRUE( ::NS(Object_get_size)( pb_it ) >= sizeof( ::NS(Particles) ) );
+        ASSERT_TRUE( ::NS(Object_get_type_id)( pb_it ) ==
+                     ::NS(OBJECT_TYPE_PARTICLE) );
 
         prev_in_particles = in_particles;
 
         in_particles = reinterpret_cast< ptr_to_cpart_t >(
-            ::st_Object_get_const_begin_ptr( pb_it ) );
+            ::NS(Object_get_const_begin_ptr)( pb_it ) );
 
-        ASSERT_TRUE( ::st_Particles_get_num_of_particles( in_particles ) ==
+        ASSERT_TRUE( ::NS(Particles_get_num_of_particles)( in_particles ) ==
                      in_num_particles );
 
-        ::st_Particles_copy( particles, prev_in_particles );
-        ::st_Particles_copy( cmp_particles,  in_particles );
+        ::NS(Particles_copy)( particles, prev_in_particles );
+        ::NS(Particles_copy)( cmp_particles,  in_particles );
 
         for( num_particles_t ii = 0 ; ii < in_num_particles ; ++ii )
         {
             ASSERT_TRUE(
                 ( ii == 0 ) ||
-                ( ::st_Particles_get_particle_id_value( particles,  0 ) !=
-                  ::st_Particles_get_particle_id_value( particles, ii ) ) );
+                ( ::NS(Particles_get_particle_id_value)( particles,  0 ) !=
+                  ::NS(Particles_get_particle_id_value)( particles, ii ) ) );
 
             ASSERT_TRUE(
-                ::st_Particles_get_at_element_id_value( particles,  0 ) ==
-                ::st_Particles_get_at_element_id_value( particles, ii ) );
+                ::NS(Particles_get_at_element_id_value)( particles,  0 ) ==
+                ::NS(Particles_get_at_element_id_value)( particles, ii ) );
 
             ASSERT_TRUE(
-                ::st_Particles_get_at_element_id_value( cmp_particles, 0 ) ==
-                ::st_Particles_get_at_element_id_value( cmp_particles, ii ) );
+                ::NS(Particles_get_at_element_id_value)( cmp_particles, 0 ) ==
+                ::NS(Particles_get_at_element_id_value)( cmp_particles, ii ) );
 
 
-            ASSERT_TRUE( ::st_Particles_get_at_turn_value( particles,  0 ) ==
-                         ::st_Particles_get_at_turn_value( particles, ii ) );
-
-            ASSERT_TRUE(
-                ::st_Particles_get_particle_id_value( particles, ii ) ==
-                ::st_Particles_get_particle_id_value( cmp_particles, ii ) );
+            ASSERT_TRUE( ::NS(Particles_get_at_turn_value)( particles,  0 ) ==
+                         ::NS(Particles_get_at_turn_value)( particles, ii ) );
 
             ASSERT_TRUE(
-                ::st_Particles_get_at_turn_value( particles, 0 ) ==
-                ::st_Particles_get_at_turn_value( cmp_particles, ii ) );
+                ::NS(Particles_get_particle_id_value)( particles, ii ) ==
+                ::NS(Particles_get_particle_id_value)( cmp_particles, ii ) );
 
             ASSERT_TRUE(
-                ::st_Particles_get_at_turn_value( cmp_particles, 0 ) ==
-                ::st_Particles_get_at_turn_value( cmp_particles, ii ) );
+                ::NS(Particles_get_at_turn_value)( particles, 0 ) ==
+                ::NS(Particles_get_at_turn_value)( cmp_particles, ii ) );
+
+            ASSERT_TRUE(
+                ::NS(Particles_get_at_turn_value)( cmp_particles, 0 ) ==
+                ::NS(Particles_get_at_turn_value)( cmp_particles, ii ) );
         }
 
-        index_t const begin_elem_id = ::st_Particles_get_at_element_id_value(
+        index_t const begin_elem_id = ::NS(Particles_get_at_element_id_value)(
             particles, num_particles_t{ 0 } );
 
-        index_t const end_elem_id   = ::st_Particles_get_at_element_id_value(
+        index_t const end_elem_id   = ::NS(Particles_get_at_element_id_value)(
             cmp_particles, num_particles_t{ 0 } );
 
         object_t const* line_begin = be_begin;
@@ -520,29 +533,35 @@ TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
         object_t const* line_end = be_begin;
         std::advance( line_end, end_elem_id + index_t{ 1 } );
 
-        int success = ::st_Track_all_particles_beam_elements_obj(
-            particles, line_begin, line_end );
+        ::NS(particle_num_elements_t) const npart =
+            ::NS(Particles_get_num_of_particles)( particles );
 
-        ASSERT_TRUE( success == 0 );
+        for( ::NS(particle_num_elements_t) idx = 0 ; idx < npart ; ++idx )
+        {
+            ::NS(track_status_t) const status = ::NS(Track_particle_line_objs)(
+                particles, idx, line_begin, line_end, false );
 
-        ::st_Particles_calculate_difference(
+            ASSERT_TRUE( status == ::NS(TRACK_SUCCESS) );
+        }
+
+        ::NS(Particles_calculate_difference)(
             cmp_particles, particles, diff_particles );
 
         bool is_equal = true;
 
         for( num_particles_t ii = 0 ; ii < in_num_particles ; ++ii )
         {
-            if( ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_s_value( diff_particles, ii ) ) ) ||
-                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_x_value( diff_particles, ii ) ) ) ||
-                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_y_value( diff_particles, ii ) ) ) ||
-                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_px_value( diff_particles, ii ) ) ) ||
-                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_py_value( diff_particles, ii ) ) ) ||
-                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_zeta_value( diff_particles, ii ) ) ) ||
-                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_psigma_value( diff_particles, ii ) ) ) ||
-                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_delta_value( diff_particles, ii ) ) ) ||
-                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_rpp_value( diff_particles, ii ) ) ) ||
-                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_rvv_value( diff_particles, ii ) ) ) ||
-                ( ABS_TOLERANCE < std::fabs( ::st_Particles_get_chi_value( diff_particles, ii ) ) ) )
+            if( ( ABS_TOLERANCE < std::fabs( ::NS(Particles_get_s_value)( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::NS(Particles_get_x_value)( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::NS(Particles_get_y_value)( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::NS(Particles_get_px_value)( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::NS(Particles_get_py_value)( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::NS(Particles_get_zeta_value)( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::NS(Particles_get_psigma_value)( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::NS(Particles_get_delta_value)( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::NS(Particles_get_rpp_value)( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::NS(Particles_get_rvv_value)( diff_particles, ii ) ) ) ||
+                ( ABS_TOLERANCE < std::fabs( ::NS(Particles_get_chi_value)( diff_particles, ii ) ) ) )
             {
                 is_equal = false;
                 break;
@@ -581,108 +600,108 @@ TEST( C99_CommonTrackTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
         for( num_particles_t ii = 0 ; ii < in_num_particles ; ++ii )
         {
             ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
-                ::st_Particles_get_s_value( diff_particles, ii ) ) );
+                ::NS(Particles_get_s_value)( diff_particles, ii ) ) );
 
             ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
-                ::st_Particles_get_x_value( diff_particles, ii ) ) );
+                ::NS(Particles_get_x_value)( diff_particles, ii ) ) );
 
             ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
-                ::st_Particles_get_y_value( diff_particles, ii ) ) );
+                ::NS(Particles_get_y_value)( diff_particles, ii ) ) );
 
             ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
-                ::st_Particles_get_px_value( diff_particles, ii ) ) );
+                ::NS(Particles_get_px_value)( diff_particles, ii ) ) );
 
             ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
-                ::st_Particles_get_py_value( diff_particles, ii ) ) );
+                ::NS(Particles_get_py_value)( diff_particles, ii ) ) );
 
             ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
-                ::st_Particles_get_zeta_value( diff_particles, ii ) ) );
+                ::NS(Particles_get_zeta_value)( diff_particles, ii ) ) );
 
             ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
-                ::st_Particles_get_psigma_value( diff_particles, ii ) ) );
+                ::NS(Particles_get_psigma_value)( diff_particles, ii ) ) );
 
             ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
-                ::st_Particles_get_delta_value( diff_particles, ii ) ) );
+                ::NS(Particles_get_delta_value)( diff_particles, ii ) ) );
 
             ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
-                ::st_Particles_get_rpp_value( diff_particles, ii ) ) );
+                ::NS(Particles_get_rpp_value)( diff_particles, ii ) ) );
 
             ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
-                ::st_Particles_get_rvv_value( diff_particles, ii ) ) );
+                ::NS(Particles_get_rvv_value)( diff_particles, ii ) ) );
 
             ASSERT_TRUE( ABS_TOLERANCE > std::fabs(
-                ::st_Particles_get_chi_value( diff_particles, ii ) ) );
+                ::NS(Particles_get_chi_value)( diff_particles, ii ) ) );
 
-            ASSERT_TRUE( ::st_Particles_get_particle_id_value(
+            ASSERT_TRUE( ::NS(Particles_get_particle_id_value)(
                 diff_particles, ii ) == index_t{ 0 } );
         }
     }
 
-    ::st_Buffer_delete( pb );
-    ::st_Buffer_delete( eb );
-    ::st_Buffer_delete( diff_pb );
-    ::st_Buffer_delete( track_pb );
-    ::st_Buffer_delete( compare_pb );
+    ::NS(Buffer_delete)( pb );
+    ::NS(Buffer_delete)( eb );
+    ::NS(Buffer_delete)( diff_pb );
+    ::NS(Buffer_delete)( track_pb );
+    ::NS(Buffer_delete)( compare_pb );
 }
 
 TEST( C99_CommonTrackTests, LHCReproducePySixTrackSingleTurnBBSimple )
 {
-    using real_t = ::st_particle_real_t;
+    using real_t = ::NS(particle_real_t);
     namespace stests = sixtrack::tests;
 
     static real_t const ABS_TOLERANCE = real_t{ 1e-15 };
 
-    ::st_Buffer* cmp_particles_buffer =
-        ::st_Buffer_new_from_file( ::st_PATH_TO_BBSIMPLE_PARTICLES_DUMP );
+    ::NS(Buffer)* cmp_particles_buffer =
+        ::NS(Buffer_new_from_file)( ::NS(PATH_TO_BBSIMPLE_PARTICLES_DUMP) );
 
-    ::st_Buffer* beam_elements_buffer =
-        ::st_Buffer_new_from_file( ::st_PATH_TO_BBSIMPLE_BEAM_ELEMENTS );
+    ::NS(Buffer)* beam_elements_buffer =
+        ::NS(Buffer_new_from_file)( ::NS(PATH_TO_BBSIMPLE_BEAM_ELEMENTS) );
 
     ASSERT_TRUE( sixtrack::tests::performElementByElementTrackCheck(
         cmp_particles_buffer, beam_elements_buffer, ABS_TOLERANCE ) );
 
-    ::st_Buffer_delete( cmp_particles_buffer );
-    ::st_Buffer_delete( beam_elements_buffer );
+    ::NS(Buffer_delete)( cmp_particles_buffer );
+    ::NS(Buffer_delete)( beam_elements_buffer );
 }
 
 TEST( C99_CommonTrackTests, LHCReproducePySixTrackSingleTurnBeamBeam )
 {
-    using real_t = ::st_particle_real_t;
+    using real_t = ::NS(particle_real_t);
     namespace stests = SIXTRL_CXX_NAMESPACE::tests;
 
     static real_t const ABS_TOLERANCE = real_t{ 1e-15 };
 
-    ::st_Buffer* cmp_particles_buffer =
-        ::st_Buffer_new_from_file( ::st_PATH_TO_BEAMBEAM_PARTICLES_DUMP );
+    ::NS(Buffer)* cmp_particles_buffer =
+        ::NS(Buffer_new_from_file)( ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
 
-    ::st_Buffer* beam_elements_buffer =
-        ::st_Buffer_new_from_file( ::st_PATH_TO_BEAMBEAM_BEAM_ELEMENTS );
+    ::NS(Buffer)* beam_elements_buffer =
+        ::NS(Buffer_new_from_file)( ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
 
     ASSERT_TRUE( sixtrack::tests::performElementByElementTrackCheck(
         cmp_particles_buffer, beam_elements_buffer, ABS_TOLERANCE ) );
 
-    ::st_Buffer_delete( cmp_particles_buffer );
-    ::st_Buffer_delete( beam_elements_buffer );
+    ::NS(Buffer_delete)( cmp_particles_buffer );
+    ::NS(Buffer_delete)( beam_elements_buffer );
 }
 
 TEST( C99_CommonTrackTests, LHCReproducePySixTrackSingleTurnLhcNoBB )
 {
-    using real_t = ::st_particle_real_t;
+    using real_t = ::NS(particle_real_t);
     namespace stests = SIXTRL_CXX_NAMESPACE::tests;
 
     static real_t const ABS_TOLERANCE = real_t{ 1e-15 };
 
-    ::st_Buffer* cmp_particles_buffer =
-        ::st_Buffer_new_from_file( ::st_PATH_TO_LHC_NO_BB_PARTICLES_DUMP );
+    ::NS(Buffer)* cmp_particles_buffer =
+        ::NS(Buffer_new_from_file)( ::NS(PATH_TO_LHC_NO_BB_PARTICLES_DUMP) );
 
-    ::st_Buffer* beam_elements_buffer =
-        ::st_Buffer_new_from_file( ::st_PATH_TO_LHC_NO_BB_BEAM_ELEMENTS );
+    ::NS(Buffer)* beam_elements_buffer =
+        ::NS(Buffer_new_from_file)( ::NS(PATH_TO_LHC_NO_BB_BEAM_ELEMENTS) );
 
     ASSERT_TRUE( sixtrack::tests::performElementByElementTrackCheck(
         cmp_particles_buffer, beam_elements_buffer, ABS_TOLERANCE ) );
 
-    ::st_Buffer_delete( cmp_particles_buffer );
-    ::st_Buffer_delete( beam_elements_buffer );
+    ::NS(Buffer_delete)( cmp_particles_buffer );
+    ::NS(Buffer_delete)( beam_elements_buffer );
 }
 
 /* end: tests/sixtracklib/common/test_track_c99.cpp */
