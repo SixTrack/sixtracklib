@@ -652,6 +652,8 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( !this->hasSelectedNode() ) &&
             ( index < this->numAvailableNodes() ) )
         {
+            typedef NS(arch_debugging_t) status_flag_t;
+
             SIXTRL_ASSERT( this->m_cl_programs.empty() );
             SIXTRL_ASSERT( this->m_selected_node_index < int64_t{ 0 } );
             SIXTRL_ASSERT( this->m_available_devices.size() ==
@@ -663,9 +665,9 @@ namespace SIXTRL_CXX_NAMESPACE
                                     CL_QUEUE_PROFILING_ENABLE );
 
             this->m_cl_success_flag = cl::Buffer(
-                context, CL_MEM_READ_WRITE, sizeof( int32_t ), nullptr );
+                context, CL_MEM_READ_WRITE, sizeof( status_flag_t ), nullptr );
 
-            int32_t init_success_flag = int32_t{ 0 };
+            status_flag_t init_success_flag = status_flag_t{ 0 };
 
             cl_int cl_ret = queue.enqueueWriteBuffer(
                 this->m_cl_success_flag, true, size_type{ 0 },

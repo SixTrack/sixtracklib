@@ -16,6 +16,8 @@
 #include <vector>
 
 #include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/control/definitions.h"
+#include "sixtracklib/common/control/debug_register.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/opencl/cl.h"
 #include "sixtracklib/opencl/context.h"
@@ -379,6 +381,8 @@ namespace SIXTRL_CXX_NAMESPACE
             ( buffer_size > size_type{ 0 } ) &&
             ( buffer_size <= this->m_arg_size ) )
         {
+            typedef NS(arch_debugging_t) status_flag_t;
+
             ClContextBase::kernel_id_t remap_kernel_id =
                 this->m_ptr_context->remappingKernelId();
 
@@ -390,32 +394,28 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( num_args > size_type{ 0 } )
             {
-                success    = 0;
+                status_flag_t success_flag = status_flag_t{ 0u };
+
+                success = ( num_args >= size_type{ 2 } ) ? 0 : -1;
                 cl_int ret = CL_SUCCESS ;
 
-                if( num_args > size_type{ 1 } )
+                if( success == 0 )
                 {
-                    int32_t success_flag = 0;
-                    success = ( num_args == size_type{ 2 } ) ? 0 : -1;
+                    ret = ptr_queue->enqueueWriteBuffer(
+                        this->m_ptr_context->internalSuccessFlagBuffer(),
+                        CL_TRUE, 0, sizeof( success_flag ), &success_flag );
 
-                    if( success == 0 )
-                    {
-                        ret = ptr_queue->enqueueWriteBuffer(
-                            this->m_ptr_context->internalSuccessFlagBuffer(),
-                            CL_TRUE, 0, sizeof( success_flag ), &success_flag );
-
-                        success = ( ret == CL_SUCCESS ) ? 0 : -2;
-                    }
-
-                    if( success == 0 )
-                    {
-                        this->m_ptr_context->assignKernelArgumentClBuffer(
-                            remap_kernel_id, 1u,
-                            this->m_ptr_context->internalSuccessFlagBuffer() );
-                    }
+                    success = ( ret == CL_SUCCESS ) ? 0 : -2;
                 }
 
-                if( ( success == 0 ) && ( num_args > size_type{ 0 } ) )
+                if( success == 0 )
+                {
+                    this->m_ptr_context->assignKernelArgumentClBuffer(
+                        remap_kernel_id, 1u,
+                        this->m_ptr_context->internalSuccessFlagBuffer() );
+                }
+
+                if( ( success == 0 ) && ( num_args >= size_type{ 2 } ) )
                 {
                     ret = ptr_queue->enqueueWriteBuffer(
                         this->m_cl_buffer, CL_TRUE, 0, buffer_size,
@@ -425,6 +425,11 @@ namespace SIXTRL_CXX_NAMESPACE
                     {
                         this->m_ptr_context->assignKernelArgumentClBuffer(
                             remap_kernel_id, 0u, this->m_cl_buffer );
+
+                        uint64_t slot_size = uint64_t{ 8 };
+
+                        this->m_ptr_context->assignKernelArgumentValue(
+                            remap_kernel_id, 1u, slot_size );
                     }
                     else
                     {
@@ -442,9 +447,9 @@ namespace SIXTRL_CXX_NAMESPACE
                         remap_kernel_id, num_worker_items ) ) ? 0 : -8;
                 }
 
-                if( ( success == 0 ) && ( num_args > size_type{ 1 } ) )
+                if( ( success == 0 ) && ( num_args > size_type{ 2 } ) )
                 {
-                    int32_t success_flag = int32_t{ 0 };
+                    success_flag = status_flag_t{ 0u };
 
                     ret = ptr_queue->enqueueReadBuffer(
                         this->m_ptr_context->internalSuccessFlagBuffer(),
