@@ -41,14 +41,10 @@ __global__ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_debug)(
     NS(buffer_size_t) const slot_size,
     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register )
 {
-    typedef NS(arch_debugging_t)  debug_register_t;
-    typedef NS(arch_status_t)     status_t;
-    typedef NS(buffer_size_t)     buf_size_t;
-
-    debug_register_t dbg = SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE;
-
     if( NS(Cuda_get_1d_thread_id_in_kernel)() == ( size_t )0u )
     {
+        NS(arch_debugging_t) dbg = SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE;
+
         NS(ElemByElemConfig_assign_managed_output_buffer_debug)(
             elem_by_elem_config, output_buffer, out_buffer_offset_index,
                 slot_size, &dbg );
