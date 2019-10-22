@@ -430,45 +430,38 @@ namespace SIXTRL_CXX_NAMESPACE
 
         _this_t::track_status_t status = st::TRACK_STATUS_GENERAL_FAILURE;
 
-        if( ( job.hasOutputBuffer() ) && ( job.hasElemByElemOutput() ) &&
-            ( job.hasElemByElemConfig() ) )
+        size_t const slot_size = ::NS(Buffer_get_slot_size)(
+                job.ptrCParticlesBuffer() );
+
+        if( job.numParticleSets() == size_t{ 1 } )
         {
-            SIXTRL_ASSERT( job.ptrCParticlesBuffer()    != nullptr );
-            SIXTRL_ASSERT( job.ptrCBeamElementsBuffer() != nullptr );
+            SIXTRL_ASSERT( job.particleSetIndicesBegin() != nullptr );
 
-            size_t const slot_size = ::NS(Buffer_get_slot_size)(
-                    job.ptrCParticlesBuffer() );
+            status = NS(Track_particles_line_kernel_impl)(
+                ::NS(Buffer_get_data_begin)( job.ptrCParticlesBuffer() ),
+                *job.particleSetIndicesBegin(), pindex_t{ 0 }, pindex_t{ 1 },
+                ::NS(Buffer_get_data_begin)( job.ptrCBeamElementsBuffer() ),
+                begin_idx, end_idx, finish_turn, slot_size );
+        }
+        else if( job.numParticleSets() > size_t{ 1 } )
+        {
+            TrackJobCpu const& cjob = job;
+            size_t const* pset_it   = cjob.particleSetIndicesBegin();
+            size_t const* pset_end  = cjob.particleSetIndicesEnd();
 
-            if( job.numParticleSets() == size_t{ 1 } )
+            SIXTRL_ASSERT( pset_it  != nullptr );
+            SIXTRL_ASSERT( pset_end != nullptr );
+            SIXTRL_ASSERT( std::distance( pset_it, pset_end ) >= 0 );
+
+            status = st::TRACK_SUCCESS;
+
+            for( ; pset_it != pset_end ; ++pset_it )
             {
-                SIXTRL_ASSERT( job.particleSetIndicesBegin() != nullptr );
-
-                status = NS(Track_particles_line_kernel_impl)(
-                    ::NS(Buffer_get_data_begin)( job.ptrCParticlesBuffer() ),
-                    *job.particleSetIndicesBegin(), pindex_t{ 0 }, pindex_t{ 1 },
-                    ::NS(Buffer_get_data_begin)( job.ptrCBeamElementsBuffer() ),
-                    begin_idx, end_idx, finish_turn, slot_size );
-            }
-            else if( job.numParticleSets() > size_t{ 1 } )
-            {
-                TrackJobCpu const& cjob = job;
-                size_t const* pset_it   = cjob.particleSetIndicesBegin();
-                size_t const* pset_end  = cjob.particleSetIndicesEnd();
-
-                SIXTRL_ASSERT( pset_it  != nullptr );
-                SIXTRL_ASSERT( pset_end != nullptr );
-                SIXTRL_ASSERT( std::distance( pset_it, pset_end ) >= 0 );
-
-                status = st::TRACK_SUCCESS;
-
-                for( ; pset_it != pset_end ; ++pset_it )
-                {
-                    status |= status = NS(Track_particles_line_kernel_impl)(
-                    ::NS(Buffer_get_data_begin)( job.ptrCParticlesBuffer() ),
-                    *pset_it, pindex_t{ 0 }, pindex_t{ 1 },
-                    ::NS(Buffer_get_data_begin)( job.ptrCBeamElementsBuffer() ),
-                    begin_idx, end_idx, finish_turn, slot_size );
-                }
+                status |= status = NS(Track_particles_line_kernel_impl)(
+                ::NS(Buffer_get_data_begin)( job.ptrCParticlesBuffer() ),
+                *pset_it, pindex_t{ 0 }, pindex_t{ 1 },
+                ::NS(Buffer_get_data_begin)( job.ptrCBeamElementsBuffer() ),
+                begin_idx, end_idx, finish_turn, slot_size );
             }
         }
 
