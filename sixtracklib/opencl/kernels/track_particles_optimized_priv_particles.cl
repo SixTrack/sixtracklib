@@ -39,13 +39,13 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_opencl)(
     nelements_t const part_idx_stride = ( nelements_t )get_global_size( 0 );
 
     NS(Track_particles_elem_by_elem_until_turn_opt_kernel_impl)( pbuffer,
-        part_set_index, part_set_index, part_idx, part_idx_stride, belem_buffer,
+        part_set_index, part_idx, part_idx_stride, belem_buffer,
             elem_by_elem_config, until_turn, slot_size );
 }
 
 __kernel void NS(Track_particles_line_opt_pp_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
-    SIXTRL_UINT64_T const particle_set_index,
+    SIXTRL_UINT64_T const part_set_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
     SIXTRL_UINT64_T const line_begin_idx, SIXTRL_UINT64_T const line_end_idx,
     SIXTRL_UINT64_T const finish_turn_value, SIXTRL_UINT64_T const slot_size )
@@ -55,8 +55,8 @@ __kernel void NS(Track_particles_line_opt_pp_opencl)(
     nelements_t const part_idx_stride = ( nelements_t )get_global_size( 0 );
 
     NS(Track_particles_line_opt_kernel_impl)( pbuffer, part_set_index, part_idx,
-        part_idx_stride, belem_begin_id, belem_end_id,
-            ( bool )( finish_turn_value == ( SIXTRL_UINT64_T )1u ) );
+        part_idx_stride, belem_buffer, line_begin_idx, line_end_idx,
+            ( bool )( finish_turn_value == ( SIXTRL_UINT64_T )1u ), slot_size );
 }
 
 #endif /* SIXTRACKLIB_OPENCL_INTERNAL_TRACK_PARTICLES_OPTIMIZED_PRIV_PARTICLES_KERNEL_CL__ */

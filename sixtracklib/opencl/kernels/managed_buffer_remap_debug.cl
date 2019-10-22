@@ -7,13 +7,14 @@
 
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/common/control/debug_register.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #include "sixtracklib/common/buffer/managed_buffer_remap.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __kernel void NS(ManagedBuffer_remap_debug_opencl)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer,
     SIXTRL_UINT64_T const slot_size,
     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flag )
 {
@@ -24,7 +25,7 @@ __kernel void NS(ManagedBuffer_remap_debug_opencl)(
         NS(arch_status_t) const status =
             NS(ManagedBuffer_remap)( buffer, slot_size );
 
-        if( ptr_success_flag != SIXTRL_NULLPTR )
+        if( ptr_status_flag != SIXTRL_NULLPTR )
         {
             NS(arch_debugging_t) flags = ( NS(arch_debugging_t) )0u;
 
@@ -40,7 +41,7 @@ __kernel void NS(ManagedBuffer_remap_debug_opencl)(
                     flags = NS(DebugReg_raise_next_error_flag)( flags );
             }
 
-            *ptr_status_flag = ::NS(DebugReg_store_arch_status)( flags, status );
+            *ptr_status_flag = NS(DebugReg_store_arch_status)( flags, status );
         }
     }
 }
@@ -71,7 +72,7 @@ __kernel void NS(ManagedBuffer_remap_io_buffers_debug_opencl)(
                 if( in_buffer_begin == SIXTRL_NULLPTR )
                     flags = NS(DebugReg_raise_next_error_flag)( flags );
 
-                if( slot_size == ( buf_size_t )0u )
+                if( slot_size == ( size_t )0u )
                     flags = NS(DebugReg_raise_next_error_flag)( flags );
 
                 if( NS(ManagedBuffer_needs_remapping)(
@@ -91,7 +92,7 @@ __kernel void NS(ManagedBuffer_remap_io_buffers_debug_opencl)(
                 if( out_buffer_begin == SIXTRL_NULLPTR )
                     flags = NS(DebugReg_raise_next_error_flag)( flags );
 
-                if( slot_size == ( buf_size_t )0u )
+                if( slot_size == ( size_t )0u )
                     flags = NS(DebugReg_raise_next_error_flag)( flags );
 
                 if( NS(ManagedBuffer_needs_remapping)(
@@ -102,7 +103,7 @@ __kernel void NS(ManagedBuffer_remap_io_buffers_debug_opencl)(
             }
         }
 
-        if ptr_status_flag != SIXTRL_NULLPTR )
+        if( ptr_status_flag != SIXTRL_NULLPTR )
         {
             NS(OpenCl1x_collect_status_flag_value)( ptr_status_flag, flags );
         }
