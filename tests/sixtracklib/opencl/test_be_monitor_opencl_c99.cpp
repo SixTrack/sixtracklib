@@ -866,8 +866,8 @@ namespace sixtrack
 
             if( success )
             {
-                ret = ::NS(ClContext_track)( context, particles_buffer_arg,
-                                            beam_elements_arg, num_turns );
+                ret = ::NS(ClContext_track_until)( context,
+                    particles_buffer_arg, beam_elements_arg, num_turns );
 
                 if( ret != 0 )
                 {
@@ -951,8 +951,8 @@ namespace sixtrack
 
             if( success )
             {
-                ret = ::NS(ClContext_track)( context, particles_buffer_arg,
-                                            beam_elements_arg, num_turns );
+                ret = ::NS(ClContext_track_until)( context,
+                    particles_buffer_arg, beam_elements_arg, num_turns );
 
                 if( ret != 0 )
                 {
