@@ -70,7 +70,7 @@ NS(Track_particles_line_opt_kernel_impl)(
     NS(buffer_size_t) const particle_set_index,
     NS(particle_num_elements_t) particle_idx,
     NS(particle_num_elements_t) const particle_idx_stride,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
     NS(buffer_size_t) const belem_begin_id,
     NS(buffer_size_t) const belem_end_id,
     bool const finish_turn, NS(buffer_size_t) const slot_size );
@@ -81,7 +81,7 @@ NS(Track_particles_line_debug_opt_kernel_impl)(
     NS(buffer_size_t) const particle_set_index,
     NS(particle_num_elements_t) particle_idx,
     NS(particle_num_elements_t) const particle_idx_stride,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
     NS(buffer_size_t) const belem_begin_id,
     NS(buffer_size_t) const belem_end_id,
     bool const finish_turn, NS(buffer_size_t) const slot_size,
@@ -556,7 +556,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particles_line_opt_kernel_impl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const particle_set_index,
     NS(particle_num_elements_t) pidx, NS(particle_num_elements_t) const stride,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
     NS(buffer_size_t) const belem_begin_id,
     NS(buffer_size_t) const belem_end_id,
     bool const finish_turn, NS(buffer_size_t) const slot_size )
@@ -599,8 +599,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particles_line_opt_kernel_impl)(
     be_iter_t belem_begin = NS(ManagedBuffer_get_const_objects_index_begin)(
         belem_buffer, slot_size );
 
-    be_iter_t belem_end = NS(ManagedBuffer_get_const_objects_index_end)(
-        belem_buffer, slot_size );
+    be_iter_t belem_end = belem_begin;
 
     NS(track_status_t) status = SIXTRL_TRACK_SUCCESS;
 
@@ -644,7 +643,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particles_line_debug_opt_kernel_impl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const particle_set_index,
     NS(particle_num_elements_t) pidx, NS(particle_num_elements_t) const stride,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buffer,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
     NS(buffer_size_t) const belem_begin_id, NS(buffer_size_t) const belem_end_id,
     bool const finish_turn, NS(buffer_size_t) const slot_size,
     SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flags )
@@ -685,14 +684,15 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particles_line_debug_opt_kernel_impl)(
             ( in_particles != SIXTRL_NULLPTR ) )
             ? in_particles->num_particles : ( nelements_t )0u;
 
-        be_iter_t belem_begin = NS(ManagedBuffer_get_objects_index_begin)(
+        be_iter_t belem_begin = NS(ManagedBuffer_get_const_objects_index_begin)(
             belem_buffer, slot_size );
 
         be_iter_t belem_end = belem_begin;
 
         if( ( !NS(ManagedBuffer_needs_remapping)( pbuffer, slot_size ) ) &&
             ( !NS(ManagedBuffer_needs_remapping)( belem_buffer, slot_size ) ) &&
-            ( in_particles != SIXTRL_NULLPTR ) && ( belem_begin != SIXTRL_NULLPTR ) &&
+            ( in_particles != SIXTRL_NULLPTR ) &&
+            ( belem_begin != SIXTRL_NULLPTR ) &&
             ( belem_begin_id <= belem_end_id ) &&
             ( belem_begin_id <= NS(ManagedBuffer_get_num_objects)(
                 belem_buffer, slot_size ) ) )

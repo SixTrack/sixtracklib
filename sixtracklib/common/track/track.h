@@ -40,7 +40,7 @@ SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
 NS(Track_particle_beam_element_obj)(
     SIXTRL_PARTICLE_ARGPTR_DEC struct NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BUFFER_ARGPTR_DEC const struct NS(Object)
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const struct NS(Object)
         *const SIXTRL_RESTRICT be_obj );
 
 /* ------------------------------------------------------------------------- */
@@ -404,7 +404,7 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
 SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_element_obj)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT be_obj )
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT be_obj )
 {
     bool const was_not_lost = NS(Particles_is_not_lost_value)(
         particles, particle_index );
