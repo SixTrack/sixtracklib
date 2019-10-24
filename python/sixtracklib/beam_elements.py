@@ -446,6 +446,7 @@ class Elements(object):
 
     @classmethod
     def from_line(cls, line):
+        self = cls()
         return self.append_line(line)
 
     def append_line(self, line):
