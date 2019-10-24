@@ -51,7 +51,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( ptr_ocl_ctx != nullptr ) && ( ptr_context != nullptr ) &&
             ( ptr_context->openClQueue() != nullptr ) &&
             ( ptr_context->hasSelectedNode() ) &&
-            ( ptr_context->hasRemappingKernel() ) )
+            ( ptr_context->has_remapping_kernel() ) )
         {
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
@@ -83,7 +83,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( ptr_ocl_ctx != nullptr ) && ( ptr_context != nullptr ) &&
             ( ptr_context->openClQueue() != nullptr ) &&
             ( ptr_context->hasSelectedNode() ) &&
-            ( ptr_context->hasRemappingKernel() ) )
+            ( ptr_context->has_remapping_kernel() ) )
         {
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
@@ -115,7 +115,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( ptr_ocl_ctx != nullptr ) && ( ptr_ocl_queue != nullptr ) &&
             ( ptr_context != nullptr ) &&
             ( ptr_context->hasSelectedNode() ) &&
-            ( ptr_context->hasRemappingKernel() ) )
+            ( ptr_context->has_remapping_kernel() ) )
         {
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
@@ -143,7 +143,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( ptr_ocl_ctx != nullptr ) && ( ptr_ocl_queue != nullptr ) &&
             ( ptr_context != nullptr ) &&
             ( ptr_context->hasSelectedNode() ) &&
-            ( ptr_context->hasRemappingKernel() ) )
+            ( ptr_context->has_remapping_kernel() ) )
         {
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
@@ -377,14 +377,14 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( this->m_ptr_context != nullptr ) &&
             ( buffer != nullptr ) && ( ptr_queue != nullptr ) &&
             ( this->m_ptr_context->hasSelectedNode() ) &&
-            ( this->m_ptr_context->hasRemappingKernel() ) &&
+            ( this->m_ptr_context->has_remapping_kernel() ) &&
             ( buffer_size > size_type{ 0 } ) &&
             ( buffer_size <= this->m_arg_size ) )
         {
             typedef NS(arch_debugging_t) status_flag_t;
 
             ClContextBase::kernel_id_t remap_kernel_id =
-                this->m_ptr_context->remappingKernelId();
+                this->m_ptr_context->remapping_kernel_id();
 
             SIXTRL_ASSERT( this->m_ptr_context->openClKernel( remap_kernel_id )
                 != nullptr );
@@ -402,7 +402,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 if( success == 0 )
                 {
                     ret = ptr_queue->enqueueWriteBuffer(
-                        this->m_ptr_context->internalSuccessFlagBuffer(),
+                        this->m_ptr_context->internalStatusFlagsBuffer(),
                         CL_TRUE, 0, sizeof( success_flag ), &success_flag );
 
                     success = ( ret == CL_SUCCESS ) ? 0 : -2;
@@ -412,7 +412,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 {
                     this->m_ptr_context->assignKernelArgumentClBuffer(
                         remap_kernel_id, 1u,
-                        this->m_ptr_context->internalSuccessFlagBuffer() );
+                        this->m_ptr_context->internalStatusFlagsBuffer() );
                 }
 
                 if( ( success == 0 ) && ( num_args >= size_type{ 2 } ) )
@@ -452,7 +452,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     success_flag = status_flag_t{ 0u };
 
                     ret = ptr_queue->enqueueReadBuffer(
-                        this->m_ptr_context->internalSuccessFlagBuffer(),
+                        this->m_ptr_context->internalStatusFlagsBuffer(),
                         CL_TRUE, 0, sizeof( success_flag ), &success_flag );
 
                     success = ( ret == CL_SUCCESS ) ? 0 : -2;
