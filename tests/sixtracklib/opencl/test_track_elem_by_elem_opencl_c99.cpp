@@ -218,8 +218,7 @@ TEST( C99_OpenCLTrackElemByElemTests, TrackElemByElemHostAndDeviceCompareDrifts)
 
                 ASSERT_TRUE( node_info != nullptr );
                 ASSERT_TRUE( ::NS(ClContextBase_has_remapping_kernel)( ctx ) );
-                ASSERT_TRUE( ::NS(ClContext_has_element_by_element_tracking_kernel)(
-                    ctx ) );
+                ASSERT_TRUE( ::NS(ClContext_has_track_elem_by_elem_kernel)( ctx ) );
 
                 char id_str[ 32 ];
 
@@ -288,6 +287,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ::NS(buffer_size_t) const num_turns,
             double const abs_tolerance )
         {
+            namespace st = SIXTRL_CXX_NAMESPACE;
             using size_t = ::NS(buffer_size_t);
 
             bool success = false;
@@ -383,11 +383,54 @@ namespace SIXTRL_CXX_NAMESPACE
             /* Track for num-turns without assigned beam-monitors -> should
              * not change the correctness of tracking at all */
 
+            ::NS(ElemByElemConfig) elem_by_elem_config;
+            ::NS(ElemByElemConfig_preset)( &elem_by_elem_config );
+
+            cl_command_queue queue = ::NS(ClContextBase_get_queue)( context );
+
+            cl_context cl_context =
+                ::NS(ClContextBase_get_opencl_context)( context );
+
+            cl_int cl_ret = CL_SUCCESS;
+            bool free_elem_by_elem_config_arg = false;
+            cl_mem elem_by_elem_config_arg = ::clCreateBuffer( cl_context,
+                CL_MEM_READ_WRITE, sizeof( ::NS(ElemByElemConfig) ), nullptr,
+                    &cl_ret );
+
+            if( cl_ret == CL_SUCCESS )
+            {
+                free_elem_by_elem_config_arg = true;
+            }
+
+            cl::Buffer elem_by_elem_config_arg
+
             if( success )
             {
-                ret = ::NS(ClContext_track_element_by_element)(
-                    context, particles_buffer_arg, beam_elements_arg,
-                    elem_by_elem_buffer_arg, num_turns, 0 );
+                ret = ::NS(ClContext_assign_particles_arg)(
+                    context, particles_arg );
+
+                success = ( ret == st::ARCH_STATUS_SUCCESS );
+
+                ret = ::NS(ClContext_assign_particle_set_arg)( context, 0u,
+                    ::NS(Particles_get_num_of_particles)( particles ) );
+
+                success &= ( ret == st::ARCH_STATUS_SUCCESS );
+
+                ret = ::NS(ClContext_assign_beam_elements_arg)(
+                    context, beam_elements_arg );
+
+                success = ( ret == st::ARCH_STATUS_SUCCESS );
+
+                ret = ::NS(assign_output_buffer_arg)(
+                    context, elem_by_elem_buffer_arg );
+
+                particles_buffer_arg, beam_elements_arg,
+                    elem_by_elem_buffer_arg,
+            }
+
+            if( success )
+            {
+                ret = ::NS(ClContext_track_elem_by_elem)( context, num_turns );
 
                 if( ret != 0 )
                 {
