@@ -446,14 +446,13 @@ class Elements(object):
 
     @classmethod
     def from_line(cls, line):
-        self = cls()
-        self.append_line(line)
-        return self
+        return self.append_line(line)
 
     def append_line(self, line):
         for element in line.elements:
             element_name = element.__class__.__name__
             getattr(self, element_name)(**element.to_dict(keepextra=True))
+        return self
 
     def to_file(self, filename):
         self.cbuffer.tofile(filename)
