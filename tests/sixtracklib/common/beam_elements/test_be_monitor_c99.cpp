@@ -52,8 +52,9 @@ TEST( C99_CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
     part_index_t min_particle_id = std::numeric_limits< part_index_t >::max();
     part_index_t max_particle_id = std::numeric_limits< part_index_t >::min();
 
-    ASSERT_TRUE( 0 == ::NS(Particles_get_min_max_particle_id)(
-        particles, &min_particle_id, &max_particle_id ) );
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
+        ::NS(Particles_get_min_max_particle_id)( particles,
+            &min_particle_id, &max_particle_id ) );
 
     ASSERT_TRUE( min_particle_id <= max_particle_id );
 
@@ -180,8 +181,8 @@ TEST( C99_CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
     ::NS(Buffer) cmp_eb;
     ::NS(Buffer_preset)( &cmp_eb );
 
-    ASSERT_TRUE( 0 == ::NS(Buffer_init_from_data)( &cmp_eb,
-        copy_raw_buffer.data(), copy_raw_buffer.size() ) );
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) == ::NS(Buffer_init_from_data)(
+        &cmp_eb, copy_raw_buffer.data(), copy_raw_buffer.size() ) );
 
     ASSERT_TRUE( !::NS(Buffer_needs_remapping)( &cmp_eb ) );
     ASSERT_TRUE(  ::NS(Buffer_get_num_of_objects)( &cmp_eb ) ==
@@ -347,13 +348,14 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     part_index_t min_particle_id = std::numeric_limits< part_index_t >::max();
     part_index_t max_particle_id = std::numeric_limits< part_index_t >::min();
 
-    ASSERT_TRUE( 0 == ::NS(Particles_get_min_max_particle_id)(
-        particles, &min_particle_id, &max_particle_id ) );
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
+        ::NS(Particles_get_min_max_particle_id)( particles,
+            &min_particle_id, &max_particle_id ) );
 
     ASSERT_TRUE( min_particle_id <= max_particle_id );
     ASSERT_TRUE( min_particle_id >= part_index_t{ 0 } );
 
-    ASSERT_TRUE( 0 == ::NS(OutputBuffer_prepare)(
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) == ::NS(OutputBuffer_prepare)(
         eb, out_buffer, particles, num_elem_by_elem_turns,
         &elem_by_elem_index_offset, &beam_monitor_index_offset,
         &min_turn_id ) );
@@ -368,8 +370,9 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     ASSERT_TRUE( ( sum_num_of_stores * NUM_PARTICLES ) == static_cast< size_t >(
         ::NS(Particles_buffer_get_total_num_of_particles)( out_buffer ) ) );
 
-    ASSERT_TRUE( 0 == ::NS(BeamMonitor_assign_output_buffer)(
-        eb, out_buffer, min_turn_id, num_elem_by_elem_turns ) );
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
+        ::NS(BeamMonitor_assign_output_buffer)( eb, out_buffer,
+            min_turn_id, num_elem_by_elem_turns ) );
 
     ::NS(Object) const* eb_begin = ::NS(Buffer_get_const_objects_begin)( eb );
     ::NS(Object) const* eb_end   = ::NS(Buffer_get_const_objects_end)( eb );
@@ -437,7 +440,7 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     beam_monitor_index_offset = size_t{ 0 };
     min_turn_id = index_t{ 0 };
 
-    ASSERT_TRUE( 0 == ::NS(OutputBuffer_prepare)(
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) == ::NS(OutputBuffer_prepare)(
         eb, out_buffer, particles, num_elem_by_elem_turns,
         &elem_by_elem_index_offset, &beam_monitor_index_offset,
         &min_turn_id ) );
@@ -452,8 +455,9 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     ASSERT_TRUE( num_out_particles_block ==
         ( size_t{ 1 } + NUM_BEAM_MONITORS ) );
 
-    ASSERT_TRUE( 0 == ::NS(BeamMonitor_assign_output_buffer)(
-        eb, out_buffer, min_turn_id, num_elem_by_elem_turns ) );
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
+        ::NS(BeamMonitor_assign_output_buffer)( eb, out_buffer, min_turn_id,
+                num_elem_by_elem_turns ) );
 
     eb_it = eb_begin;
     out_particles_offset = size_t{ 1 };
@@ -525,8 +529,9 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
 
     index_t max_turn_id = index_t{ -1 };
 
-    ASSERT_TRUE( 0 == NS(Particles_get_min_max_at_turn_value)(
-        particles, &min_turn_id, &max_turn_id ) );
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
+        ::NS(Particles_get_min_max_at_turn_value)( particles,
+            &min_turn_id, &max_turn_id ) );
 
     ASSERT_TRUE( min_turn_id >= index_t{ 0 } );
     ASSERT_TRUE( min_turn_id <= max_turn_id  );
@@ -569,9 +574,12 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
 
     ASSERT_TRUE( num_out_particles_block == target_num_out_blocks );
 
-    ASSERT_TRUE( 0 == ::NS(BeamMonitor_setup_for_particles_all)( eb, particles ) );
-    ASSERT_TRUE( 0 == ::NS(BeamMonitor_assign_output_buffer_from_offset)(
-        eb, out_buffer, min_turn_id, num_elem_by_elem_blocks ) );
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
+        ::NS(BeamMonitor_setup_for_particles_all)( eb, particles ) );
+
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
+        ::NS(BeamMonitor_assign_output_buffer_from_offset)( eb, out_buffer,
+            min_turn_id, num_elem_by_elem_blocks ) );
 
     eb_it = eb_begin;
     out_particles_offset = num_elem_by_elem_blocks;
@@ -640,6 +648,7 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
 TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
 {
     using real_t          = ::NS(particle_real_t);
+    using status_t        = ::NS(arch_status_t);
     using part_index_t    = ::NS(particle_index_t);
     using mon_index_t     = ::NS(be_monitor_index_t);
     using size_t          = ::NS(buffer_size_t);
@@ -724,11 +733,13 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
     part_index_t min_turn_id = std::numeric_limits< part_index_t >::max();
     part_index_t max_turn_id = std::numeric_limits< part_index_t >::min();
 
-    ASSERT_TRUE( 0 == ::NS(Particles_get_min_max_particle_id)(
-        particles, &min_particle_id, &max_particle_id ) );
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
+        ::NS(Particles_get_min_max_particle_id)( particles,
+            &min_particle_id, &max_particle_id ) );
 
-    ASSERT_TRUE( 0 == ::NS(Particles_get_min_max_at_turn_value)(
-        particles, &min_turn_id, &max_turn_id ) );
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
+        ::NS(Particles_get_min_max_at_turn_value)( particles,
+            &min_turn_id, &max_turn_id ) );
 
     ASSERT_TRUE( min_particle_id <= max_particle_id );
     size_t num_stored_particles = size_t{ 1 } +
@@ -751,24 +762,19 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
 
     /* --------------------------------------------------------------------- */
 
-    ASSERT_TRUE( NUM_TURNS > nturn_t{ 0 } );
-    part_index_t const max_turn =
-        static_cast< part_index_t >( NUM_TURNS - nturn_t{ 1 }  );
-
     ::NS(ElemByElemConfig) elem_by_elem_config;
     ::NS(ElemByElemConfig_preset)( &elem_by_elem_config );
 
-    ASSERT_TRUE( 0 == ::NS(ElemByElemConfig_init)( &elem_by_elem_config,
-        ::NS(ELEM_BY_ELEM_ORDER_DEFAULT), eb, particles,
-            part_index_t{ 0 }, max_turn ) );
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) == ::NS(ElemByElemConfig_init)(
+        &elem_by_elem_config, particles, eb, part_index_t{ 0 }, NUM_TURNS ) );
 
     size_t elem_by_elem_index_offset = size_t{ 0 };
 
-    int ret = ::NS(ElemByElemConfig_prepare_output_buffer_from_conf)(
+    status_t status = ::NS(ElemByElemConfig_prepare_output_buffer_from_conf)(
         &elem_by_elem_config, elem_by_elem_buffer,
             &elem_by_elem_index_offset );
 
-    ASSERT_TRUE( ret == 0 );
+    ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
     ASSERT_TRUE( elem_by_elem_index_offset == size_t{ 2 } );
     ASSERT_TRUE( ::NS(Buffer_get_num_of_objects)( elem_by_elem_buffer ) ==
                  size_t{ 3 } );
@@ -783,19 +789,19 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
     final_state   = ::NS(Particles_buffer_get_particles)(
         elem_by_elem_buffer, 1u );
 
-    ret = ::NS(ElemByElemConfig_assign_output_buffer)(
+    status = ::NS(ElemByElemConfig_assign_output_buffer)(
         &elem_by_elem_config, elem_by_elem_buffer, elem_by_elem_index_offset );
 
-    ASSERT_TRUE( 0 == ret );
+    ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
     ASSERT_TRUE( elem_by_elem_particles != nullptr );
     ASSERT_TRUE( initial_state != nullptr );
     ASSERT_TRUE( final_state   != nullptr );
 
-    ret = ::NS(Track_all_particles_element_by_element_until_turn)(
+    status = ::NS(Track_all_particles_element_by_element_until_turn)(
         particles, &elem_by_elem_config, eb, NUM_TURNS );
 
-    ASSERT_TRUE( ret == 0 );
+    ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
     ::NS(Particles_copy)( final_state, particles );
     ::NS(Particles_copy)( particles, initial_state );
@@ -806,9 +812,9 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
     size_t beam_monitor_index_offset = size_t{ 0 };
     min_turn_id         = part_index_t{ -1 };
 
-    ASSERT_TRUE( 0 == ::NS(OutputBuffer_prepare)( eb, out_buffer, particles,
-        num_elem_by_elem_turns, nullptr, &beam_monitor_index_offset,
-        &min_turn_id ) );
+    ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) == ::NS(OutputBuffer_prepare)(
+        eb, out_buffer, particles, num_elem_by_elem_turns, nullptr,
+            &beam_monitor_index_offset, &min_turn_id ) );
 
     ::NS(Object) const* obj = ::NS(Buffer_get_const_object)( eb, 10 );
 
@@ -817,9 +823,9 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
         ( ::NS(BeamMonitor) const* )::NS(Object_get_const_begin_ptr)( obj );
 
     ASSERT_TRUE( monitor != nullptr );
-
-    ASSERT_TRUE( 0 == ::NS(BeamMonitor_assign_output_buffer_from_offset)(
-        eb, out_buffer, min_turn_id, beam_monitor_index_offset ) );
+    ASSERT_TRUE( NS(ARCH_STATUS_SUCCESS) ==
+        ::NS(BeamMonitor_assign_output_buffer_from_offset)( eb, out_buffer,
+            min_turn_id, beam_monitor_index_offset ) );
 
     size_t out_particle_block_index = size_t{ 0 };
 
@@ -892,7 +898,7 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
         ::NS(Buffer_delete)( diff_buffer );
     }
 
-    ASSERT_TRUE( 0 == st_Particles_compare_values_with_treshold(
+    ASSERT_TRUE( 0 == ::NS(Particles_compare_values_with_treshold)(
             particles, final_state, ABS_TOLERANCE ) );
 
     for( nturn_t kk = nturn_t{ 0 } ; kk < NUM_TURNS ; ++kk )
@@ -986,8 +992,8 @@ TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
                     diff_buffer = nullptr;
                 }
 
-                ASSERT_TRUE( ::NS(Particles_compare_values_with_treshold)(
-                    cmp_particles, particles, ABS_TOLERANCE ) == 0 );
+                ASSERT_TRUE( 0 == ::NS(Particles_compare_values_with_treshold)(
+                    cmp_particles, particles, ABS_TOLERANCE ) );
             }
         }
     }
