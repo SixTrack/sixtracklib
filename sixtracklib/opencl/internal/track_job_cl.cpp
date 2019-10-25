@@ -597,20 +597,14 @@ namespace SIXTRL_CXX_NAMESPACE
         using _this_t = TrackJobCl;
 
         using arg_t         = _this_t::cl_arg_t;
-        using size_t        = _this_t::size_type;
-        using cl_buffer_t   = _this_t::cl_buffer_t;
         using ptr_arg_t     = _this_t::ptr_cl_arg_t;
         using ptr_buffer_t  = _this_t::ptr_cl_buffer_t;
-        using elem_config_t = _this_t::elem_by_elem_config_t;
 
         bool success = true;
         ( void )until_turn_elem_by_elem;
 
         if( ( ptr_out_buffer != nullptr ) && ( pb != nullptr ) )
         {
-            cl::CommandQueue* ptr_queue = ( this->ptrContext() != nullptr )
-                ? this->context().openClQueue() : nullptr;
-
             ptr_arg_t ptr( new arg_t( ptr_out_buffer, this->ptrContext() ) );
             this->doUpdateStoredOutputArg( std::move( ptr ) );
 
@@ -623,14 +617,14 @@ namespace SIXTRL_CXX_NAMESPACE
                     this->outputBufferArg() );
             }
 
+            /* TODO: Update this region as soon as the OpenCL argument
+             *       can handle raw data rather than only CObject buffers */
+
             if( ( success ) && ( this->ptrContext()   != nullptr ) &&
-                ( this->ptrContext()->openClContext() != nullptr ) &&
-                ( ptr_queue != nullptr ) &&
                 ( this->ptrElemByElemConfig() != nullptr ) )
             {
-                ptr_buffer_t ptr_buffer( new cl_buffer_t(
-                    *( this->ptrContext()->openClContext() ), CL_MEM_READ_WRITE,
-                    sizeof( elem_config_t ), nullptr ) );
+                ptr_buffer_t ptr_buffer =
+                    this->ptrContext( )->create_elem_by_elem_config_arg();
 
                 this->doUpdateStoredClElemByElemConfigBuffer(
                     std::move( ptr_buffer ) );
@@ -639,16 +633,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( success )
                 {
-                    cl_buffer_t& conf = this->clElemByElemConfigBuffer();
+                    success = ( st::ARCH_STATUS_SUCCESS ==
+                        this->ptrContext()->push_elem_by_elem_config_arg(
+                            *this->ptrClElemByElemConfigBuffer(),
+                            *this->ptrElemByElemConfig() ) );
+                }
 
-                    cl_int const ret = ptr_queue->enqueueWriteBuffer(
-                        conf, CL_TRUE, size_t{ 0 }, sizeof( elem_config_t ),
-                            this->ptrElemByElemConfig() );
-
-                    success = ( ( ret == CL_SUCCESS ) &&
-                        ( ( !this->context().hasSelectedNode() ) ||
-                          ( ( this->context().assign_elem_by_elem_config_arg(
-                                conf ) == st::ARCH_STATUS_SUCCESS ) ) ) );
+                if( success )
+                {
+                    success = ( st::ARCH_STATUS_SUCCESS ==
+                        this->ptrContext()->assign_elem_by_elem_config_arg(
+                            *this->ptrClElemByElemConfigBuffer() ) );
                 }
             }
         }

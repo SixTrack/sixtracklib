@@ -24,6 +24,7 @@
 #include "sixtracklib/common/output/elem_by_elem_config.h"
 #include "sixtracklib/common/output/output_buffer.h"
 #include "sixtracklib/opencl/internal/base_context.h"
+#include "sixtracklib/opencl/cl.h"
 
 #if defined( __cplusplus )
 
@@ -1362,6 +1363,119 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
+    /* --------------------------------------------------------------------- */
+
+    std::unique_ptr< _this_t::cl_buffer_t >
+    ClContext::create_elem_by_elem_config_arg()
+    {
+        if( ( this->hasSelectedNode() ) &&
+            ( this->openClContext() != nullptr ) &&
+            ( this->openClQueue() != nullptr ) )
+        {
+            _size_t const type_size = sizeof( _this_t::elem_by_elem_config_t );
+
+            return std::unique_ptr< _this_t::cl_buffer_t >(
+                new _this_t::cl_buffer_t( *this->openClContext(),
+                    CL_MEM_READ_WRITE, type_size , nullptr ) );
+        }
+
+        return std::unique_ptr< _this_t::cl_buffer_t >( nullptr );
+    }
+
+    _this_t::status_t ClContext::init_elem_by_elem_config_arg(
+        _this_t::cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
+        _this_t::elem_by_elem_config_t& SIXTRL_RESTRICT_REF elem_by_elem_config,
+        const ::NS(Buffer) *const SIXTRL_RESTRICT pbuffer,
+        _this_t::size_type const num_psets,
+        _this_t::size_type const* SIXTRL_RESTRICT pset_indices_begin,
+        const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
+        _this_t::size_type const until_turn_elem_by_elem,
+        _this_t::particle_index_t const start_elem_id  )
+    {
+        _this_t::status_t status = ::st::ARCH_STATUS_GENERAL_FAILURE;
+
+        if( ( !this->hasSelectedNode() ) ||
+            (  this->openClQueue() == nullptr ) ||
+            (  this->openClContext() == nullptr ) )
+        {
+            return status;
+        }
+
+        status = ::NS(ElemByElemConfig_init_on_particle_sets)(
+            &elem_by_elem_config, pbuffer, num_psets, pset_indices_begin,
+                beam_elements_buffer, start_elem_id,
+                    until_turn_elem_by_elem );
+
+        if( status == ::NS(ARCH_STATUS_SUCCESS) )
+        {
+            ::NS(ElemByElemConfig_set_output_store_address)(
+                &elem_by_elem_config, uintptr_t{ 0 } );
+
+            _size_t const type_size = sizeof( _this_t::elem_by_elem_config_t );
+
+            cl_int const cl_ret = this->openClQueue()->enqueueWriteBuffer(
+                elem_by_elem_config_arg, CL_TRUE, _size_t{ 0 }, type_size,
+                    &elem_by_elem_config );
+
+            if( cl_ret != CL_SUCCESS )
+            {
+                status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
+            }
+        }
+
+        return status;
+    }
+
+    _this_t::status_t ClContext::collect_elem_by_elem_config_arg(
+        _this_t::cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
+        _this_t::elem_by_elem_config_t& SIXTRL_RESTRICT_REF
+            elem_by_elem_config )
+    {
+        _this_t::status_t status = ::st::ARCH_STATUS_GENERAL_FAILURE;
+
+        if( ( !this->hasSelectedNode() ) ||
+            (  this->openClQueue() == nullptr ) ||
+            (  this->openClContext() == nullptr ) )
+        {
+            return status;
+        }
+
+        _size_t const type_size = sizeof( _this_t::elem_by_elem_config_t );
+        cl_int const cl_ret = this->openClQueue()->enqueueReadBuffer(
+            elem_by_elem_config_arg, CL_TRUE, _size_t{ 0 }, type_size,
+                &elem_by_elem_config );
+
+        if( cl_ret == CL_SUCCESS ) status = st::ARCH_STATUS_SUCCESS;
+
+        return status;
+    }
+
+    _this_t::status_t ClContext::push_elem_by_elem_config_arg(
+        _this_t::cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
+        _this_t::elem_by_elem_config_t const& SIXTRL_RESTRICT_REF
+            elem_by_elem_config )
+    {
+        _this_t::status_t status = ::st::ARCH_STATUS_GENERAL_FAILURE;
+
+        if( ( !this->hasSelectedNode() ) ||
+            (  this->openClQueue() == nullptr ) ||
+            (  this->openClContext() == nullptr ) )
+        {
+            return status;
+        }
+
+        _size_t const type_size = sizeof( _this_t::elem_by_elem_config_t );
+        cl_int const cl_ret = this->openClQueue()->enqueueWriteBuffer(
+            elem_by_elem_config_arg, CL_TRUE, _size_t{ 0 }, type_size,
+                &elem_by_elem_config );
+
+        if( cl_ret == CL_SUCCESS ) status = st::ARCH_STATUS_SUCCESS;
+
+        return status;
+    }
+
+    /* --------------------------------------------------------------------- */
+
     bool ClContext::doInitDefaultPrograms()
     {
         return ( ( ClContextBase::doInitDefaultPrograms() ) &&
@@ -2037,7 +2151,7 @@ bool NS(ClContext_has_track_elem_by_elem_kernel)(
 
 ::NS(track_status_t) NS(ClContext_track_elem_by_elem)(
     ::NS(ClContext)* SIXTRL_RESTRICT ctx,
-    ::NS(context_num_turns_t) const until_turn )
+    ::NS(buffer_size_t) const until_turn )
 {
     return ( ctx != nullptr ) ? ctx->track_elem_by_elem( until_turn )
         : st::TRACK_STATUS_GENERAL_FAILURE;
@@ -2153,10 +2267,9 @@ bool NS(ClContext_has_clear_beam_monitor_output_kernel)(
 }
 
 ::NS(ctrl_status_t) NS(ClContext_clear_beam_monitor_output)(
-    ::NS(ClContext)*  SIXTRL_RESTRICT ctx,
-    ::NS(ClArgument)* SIXTRL_RESTRICT beam_elem_arg )
+    ::NS(ClContext)*  SIXTRL_RESTRICT ctx )
 {
-    return ( ( ctx != nullptr ) && ( beam_elem_arg != nullptr ) )
+    return ( ctx != nullptr )
         ? ctx->clear_beam_monitor_output() : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
@@ -2216,6 +2329,160 @@ void NS(ClContext_disable_beam_beam_tracking)(
     ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     if( ctx != nullptr ) ctx->disableBeamBeamTracking();
+}
+
+/* ------------------------------------------------------------------------- */
+
+cl_mem NS(ClContext_create_elem_by_elem_config_arg)(
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx )
+{
+    if( ( ctx != nullptr ) && ( ctx->hasSelectedNode() ) &&
+        ( ctx->openClQueue()   != nullptr ) &&
+        ( ctx->openClContext() != nullptr ) )
+    {
+        cl_context& ocl_ctx = ( *ctx->openClContext() )();
+        cl_int cl_ret = CL_SUCCESS;
+
+        cl_mem arg_buffer = ::clCreateBuffer( ocl_ctx, CL_MEM_READ_WRITE,
+            sizeof( ::NS(ElemByElemConfig) ), nullptr, &cl_ret );
+
+        if( cl_ret == CL_SUCCESS )
+        {
+            cl_uint ref_cnt = cl_uint{ 10000 };
+            cl_ret = ::clGetMemObjectInfo( arg_buffer, CL_MEM_REFERENCE_COUNT,
+                sizeof( cl_uint ), &ref_cnt, nullptr );
+
+            if( cl_ret == CL_SUCCESS )
+            {
+                printf( "st_ClContext_create_elem_by_elem_config_arg() :: "
+                        "ref_cnt = %u\r\n", ( unsigned int )ref_cnt );
+
+                return arg_buffer;
+            }
+        }
+    }
+
+    return cl_mem{};
+}
+
+::NS(arch_status_t) NS(ClContext_init_elem_by_elem_config_arg)(
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    cl_mem elem_by_elem_config_arg,
+    ::NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
+    const ::NS(Buffer) *const SIXTRL_RESTRICT pbuffer,
+    ::NS(buffer_size_t) const num_psets,
+    ::NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
+    const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
+    ::NS(buffer_size_t) const until_turn_elem_by_elem,
+    ::NS(particle_index_t) const start_elem_id )
+{
+    ::NS(arch_status_t) status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
+
+    if( ( elem_by_elem_config == nullptr ) || ( ctx == nullptr ) ||
+        ( !ctx->hasSelectedNode() ) ||
+        ( ctx->openClQueue() == nullptr ) ||
+        ( ctx->openClContext() == nullptr ) )
+    {
+        return status;
+    }
+
+    cl_int cl_ret = ::clRetainMemObject( elem_by_elem_config_arg );
+
+    if( cl_ret == CL_SUCCESS )
+    {
+        ::cl_command_queue& ocl_queue = ( *ctx->openClQueue() )();
+
+        status = ::NS(ElemByElemConfig_init_on_particle_sets)(
+            elem_by_elem_config, pbuffer, num_psets, pset_indices_begin,
+                beam_elements_buffer, start_elem_id,
+                    until_turn_elem_by_elem );
+
+        if( status == ::NS(ARCH_STATUS_SUCCESS) )
+        {
+            ::NS(ElemByElemConfig_set_output_store_address)(
+                elem_by_elem_config, uintptr_t{ 0 } );
+
+            size_t const type_size = sizeof( ::NS(ElemByElemConfig) );
+
+            cl_ret = ::clEnqueueWriteBuffer( ocl_queue, elem_by_elem_config_arg,
+                CL_TRUE, size_t { 0 }, type_size, elem_by_elem_config,
+                    cl_uint{ 0 }, nullptr, nullptr );
+
+            if( cl_ret != CL_SUCCESS )
+            {
+                status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
+            }
+        }
+
+        ::clReleaseMemObject( elem_by_elem_config_arg );
+    }
+
+    return status;
+}
+
+::NS(arch_status_t) NS(ClContext_collect_elem_by_elem_config_arg)(
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg,
+    ::NS(ElemByElemConfig)* SIXTRL_RESTRICT config )
+{
+    ::NS(arch_status_t) status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
+
+    if( ( config == nullptr ) || ( ctx == nullptr ) ||
+        ( !ctx->hasSelectedNode() ) ||
+        ( ctx->openClQueue() == nullptr ) ||
+        ( ctx->openClContext() == nullptr ) )
+    {
+        return status;
+    }
+
+    cl_int cl_ret = ::clRetainMemObject( elem_by_elem_config_arg );
+
+    if( cl_ret == CL_SUCCESS )
+    {
+        ::cl_command_queue& ocl_queue = ( *ctx->openClQueue() )();
+        size_t const type_size = sizeof( ::NS(ElemByElemConfig) );
+
+        cl_ret = ::clEnqueueReadBuffer( ocl_queue,
+            elem_by_elem_config_arg, CL_TRUE, size_t{ 0 }, type_size,
+                config, cl_uint{ 0 }, nullptr, nullptr );
+
+
+        if( cl_ret != CL_SUCCESS ) status = ::NS(ARCH_STATUS_SUCCESS);
+        ::clReleaseMemObject( elem_by_elem_config_arg );
+    }
+
+    return status;
+}
+
+::NS(arch_status_t) NS(ClContext_push_elem_by_elem_config_arg)(
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg,
+    const ::NS(ElemByElemConfig) *const SIXTRL_RESTRICT config )
+{
+    ::NS(arch_status_t) status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
+
+    if( ( config == nullptr ) || ( ctx == nullptr ) ||
+        ( !ctx->hasSelectedNode() ) ||
+        ( ctx->openClQueue() == nullptr ) ||
+        ( ctx->openClContext() == nullptr ) )
+    {
+        return status;
+    }
+
+    cl_int cl_ret = ::clRetainMemObject( elem_by_elem_config_arg );
+
+    if( cl_ret == CL_SUCCESS )
+    {
+        ::cl_command_queue& ocl_queue = ( *ctx->openClQueue() )();
+        size_t const type_size = sizeof( ::NS(ElemByElemConfig) );
+
+        cl_ret = ::clEnqueueWriteBuffer( ocl_queue,
+            elem_by_elem_config_arg, CL_TRUE, size_t { 0 }, type_size,
+                config, cl_uint{ 0 }, nullptr, nullptr );
+
+        if( cl_ret != CL_SUCCESS ) status = ::NS(ARCH_STATUS_SUCCESS);
+        ::clReleaseMemObject( elem_by_elem_config_arg );
+    }
+
+    return status;
 }
 
 #endif /* !defined( __CUDACC__ ) */
