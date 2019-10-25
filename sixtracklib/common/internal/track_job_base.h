@@ -650,6 +650,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using diff_t   = std::ptrdiff_t;
         using size_t   = TrackJobBase::size_type;
         using obj_it_t = SIXTRL_BUFFER_DATAPTR_DEC ::NS(Object) const*;
+        using nparticles_t = ::NS(particle_num_elements_t);
 
         diff_t const temp_len = std::distance( begin, end );
 
@@ -706,11 +707,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
                         SIXTRL_ASSERT( pset != nullptr );
 
-                        auto const nparticles =
+                        nparticles_t const nparticles =
                             ::NS(Particles_get_num_of_particles)( pset );
 
-                        SIXTRL_ASSERT( nparticles >=
-                            decltype{ nparticles }{ 0 } );
+                        SIXTRL_ASSERT( nparticles >= nparticles_t{ 0 } );
 
                         this->m_num_particles_in_sets.push_back( nparticles );
                         total_num_particles_in_sets += nparticles;

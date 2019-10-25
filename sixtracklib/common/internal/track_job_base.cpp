@@ -693,8 +693,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_has_beam_monitor_output;
     }
 
-    _size_t
-    TrackJobBase::beamMonitorsOutputBufferOffset() const SIXTRL_NOEXCEPT
+    _size_t TrackJobBase::beamMonitorsOutputBufferOffset() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT(
             ( ( this->hasOutputBuffer() ) &&
@@ -706,8 +705,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_be_mon_output_buffer_offset;
     }
 
-    _size_t
-    TrackJobBase::elemByElemOutputBufferOffset() const SIXTRL_NOEXCEPT
+    _size_t TrackJobBase::elemByElemOutputBufferOffset() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT(
             ( ( this->hasOutputBuffer() ) &&
@@ -1916,6 +1914,9 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         this->m_particle_set_indices.clear();
         this->m_particle_set_indices.push_back( _size_t{ 0 } );
+
+        this->m_num_particles_in_sets.clear();
+        this->m_num_particles_in_sets.push_back( _size_t{ 0 } );
     }
 
     void TrackJobBase::doInitDefaultBeamMonitorIndices()
