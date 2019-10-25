@@ -299,7 +299,6 @@ NS(arch_status_t) NS(ElemByElemConfig_init_on_particle_sets)(
     NS(particle_index_t) const until_turn_elem_by_elem )
 {
     typedef NS(particle_index_t) _index_t;
-    typedef NS(buffer_size_t)    _size_t;
 
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
     SIXTRL_STATIC_VAR _index_t const ZERO = ( _index_t )0u;
