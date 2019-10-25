@@ -77,7 +77,7 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeamDe
             ::NS(ClContextBase_get_selected_node_info)( context );
 
         ASSERT_TRUE( node_info != nullptr );
-        ASSERT_TRUE( ::NS(ClContext_has_tracking_kernel)( context ) );
+        ASSERT_TRUE( ::NS(ClContext_has_track_until_kernel)( context ) );
         ASSERT_TRUE( ::NS(ClContextBase_has_remapping_kernel)( context ) );
 
         char id_str[ 32 ];
@@ -156,7 +156,7 @@ TEST( C99_OpenCL_TrackParticlesTests,
             ::NS(ClContextBase_get_selected_node_info)( context );
 
         ASSERT_TRUE( node_info != nullptr );
-        ASSERT_TRUE( ::NS(ClContext_has_tracking_kernel)( context ) );
+        ASSERT_TRUE( ::NS(ClContext_has_track_until_kernel)( context ) );
         ASSERT_TRUE( ::NS(ClContextBase_has_remapping_kernel)( context ) );
 
         char id_str[ 32 ];
@@ -233,7 +233,7 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
             ::NS(ClContextBase_get_selected_node_info)( context );
 
         ASSERT_TRUE( node_info != nullptr );
-        ASSERT_TRUE( ::NS(ClContext_has_tracking_kernel)( context ) );
+        ASSERT_TRUE( ::NS(ClContext_has_track_until_kernel)( context ) );
         ASSERT_TRUE( ::NS(ClContextBase_has_remapping_kernel)( context ) );
 
         char id_str[ 32 ];
@@ -312,7 +312,7 @@ TEST( C99_OpenCL_TrackParticlesTests,
             ::NS(ClContextBase_get_selected_node_info)( context );
 
         ASSERT_TRUE( node_info != nullptr );
-        ASSERT_TRUE( ::NS(ClContext_has_tracking_kernel)( context ) );
+        ASSERT_TRUE( ::NS(ClContext_has_track_until_kernel)( context ) );
         ASSERT_TRUE( ::NS(ClContextBase_has_remapping_kernel)( context ) );
 
         char id_str[ 32 ];
@@ -395,7 +395,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 ( in_particles_buffer != nullptr ) &&
                 ( in_beam_elements_buffer != nullptr ) &&
                 ( ::NS(ClContextBase_has_selected_node)(  context ) ) &&
-                ( ::NS(ClContext_has_tracking_kernel)( context ) ) &&
+                ( ::NS(ClContext_has_track_until_kernel)( context ) ) &&
                 ( in_num_sequences > index_t{ 0 } ) &&
                 ( in_num_beam_elements > index_t{ 0 } ) &&
                 ( be_begin != nullptr ) &&
@@ -516,9 +516,8 @@ namespace SIXTRL_CXX_NAMESPACE
                     /* ------------------------------------------------- */
                     /* Perform tracking of particles over line: */
 
-                    success &= ( 0 == ::NS(ClContext_track_until)(
-                        context, particles_arg, beam_elements_arg,
-                            at_turn + 1 ) );
+                    success &= ( ::NS(TRACK_SUCCESS) ==
+                        ::NS(ClContext_track_until)( context, at_turn + 1 ) );
 
                     if( !success )  break;
 

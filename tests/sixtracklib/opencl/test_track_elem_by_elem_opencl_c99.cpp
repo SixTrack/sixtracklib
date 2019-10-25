@@ -85,8 +85,7 @@ TEST( C99_OpenCLTrackElemByElemTests, TrackElemByElemHostAndDeviceCompareDrifts)
     ::NS(ElemByElemConfig_preset)( &elem_by_elem_config );
 
     ASSERT_TRUE( 0 == ::NS(ElemByElemConfig_init)( &elem_by_elem_config,
-        NS(ELEM_BY_ELEM_ORDER_DEFAULT), eb, particles,
-        part_index_t{ 0 }, NUM_TURNS ) );
+        particles, eb, part_index_t{ 0 }, NUM_TURNS ) );
 
     size_t elem_by_elem_index_offset = size_t{ 0 };
 
@@ -292,12 +291,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
             bool success = false;
 
-            int ret = 0;
+            ::NS(arch_status_t) status = ::NS(ARCH_STATUS_SUCCESS);
             size_t const num_elem_by_elem_objects =
                 ::NS(Buffer_get_num_of_objects)( cmp_elem_by_elem_buffer );
 
             ::NS(Buffer)* pb = ::NS(Buffer_new)( 0u );
-            ::NS(Buffer)* elem_by_elem_buffer  = ::NS(Buffer_new)( 0u );
+            ::NS(Buffer)* output_buffer = ::NS(Buffer_new)( 0u );
 
             if( ( num_elem_by_elem_objects >= size_t{ 3 } ) &&
                 ( pb != nullptr ) && ( beam_elements_buffer != nullptr ) &&
@@ -339,22 +338,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( success )
             {
-                elem_by_elem_particles =
-                    ::NS(Particles_new)( elem_by_elem_buffer, ebe_size );
-
-                if( elem_by_elem_particles == nullptr )
-                {
-                    std::cout << "ret 01 : " << ret << std::endl;
-                    success = false;
-                }
+                std::cout << "success 01 : " << ( int )success << std::endl;
             }
 
             /* ------------------------------------------------------------- */
             /* Create ClArguments for beam elements & the particles buffer   */
 
-            ::NS(ClArgument)* particles_buffer_arg    = nullptr;
-            ::NS(ClArgument)* beam_elements_arg       = nullptr;
-            ::NS(ClArgument)* elem_by_elem_buffer_arg = nullptr;
+            ::NS(ClArgument)* particles_buffer_arg = nullptr;
+            ::NS(ClArgument)* beam_elements_arg    = nullptr;
+            ::NS(ClArgument)* output_buffer_arg    = nullptr;
 
             if( success )
             {
@@ -365,76 +357,128 @@ namespace SIXTRL_CXX_NAMESPACE
                     ::NS(ClArgument_new_from_buffer)(
                         beam_elements_buffer, context );
 
-                elem_by_elem_buffer_arg =
-                    ::NS(ClArgument_new_from_buffer)(
-                        elem_by_elem_buffer, context );
+                output_buffer_arg = ::NS(ClArgument_new_from_buffer)(
+                        output_buffer, context );
             }
 
-            success = ( ( particles_buffer_arg    != nullptr ) &&
-                        ( beam_elements_arg       != nullptr ) &&
-                        ( elem_by_elem_buffer_arg != nullptr ) );
+            success = ( ( particles_buffer_arg != nullptr ) &&
+                        ( beam_elements_arg    != nullptr ) &&
+                        ( output_buffer_arg    != nullptr ) );
 
             if( !success )
             {
-                std::cout << "ret 02" << std::endl;
+                std::cout << "status 02" << std::endl;
             }
 
             /* ------------------------------------------------------------- */
             /* Track for num-turns without assigned beam-monitors -> should
              * not change the correctness of tracking at all */
 
+            cl_mem elem_by_elem_config_arg =
+                ::NS(ClContext_create_elem_by_elem_config_arg)( context );
+
+            size_t const pset_indices[] = { size_t{ 0 } };
+
             ::NS(ElemByElemConfig) elem_by_elem_config;
-            ::NS(ElemByElemConfig_preset)( &elem_by_elem_config );
-
-            cl_command_queue queue = ::NS(ClContextBase_get_queue)( context );
-
-            cl_context cl_context =
-                ::NS(ClContextBase_get_opencl_context)( context );
-
-            cl_int cl_ret = CL_SUCCESS;
-            bool free_elem_by_elem_config_arg = false;
-            cl_mem elem_by_elem_config_arg = ::clCreateBuffer( cl_context,
-                CL_MEM_READ_WRITE, sizeof( ::NS(ElemByElemConfig) ), nullptr,
-                    &cl_ret );
-
-            if( cl_ret == CL_SUCCESS )
-            {
-                free_elem_by_elem_config_arg = true;
-            }
-
-            cl::Buffer elem_by_elem_config_arg
 
             if( success )
             {
-                ret = ::NS(ClContext_assign_particles_arg)(
-                    context, particles_arg );
+                status = ::NS(ClContext_init_elem_by_elem_config_arg)(
+                    context, elem_by_elem_config_arg, &elem_by_elem_config,
+                    ::NS(ClArgument_get_ptr_cobj_buffer)( particles_buffer_arg ),
+                    size_t{ 1 }, &pset_indices[ 0 ],
+                    ::NS(ClArgument_get_ptr_cobj_buffer)( beam_elements_arg ),
+                    num_turns, 0u );
 
-                success = ( ret == st::ARCH_STATUS_SUCCESS );
+                if( status != ::NS(ARCH_STATUS_SUCCESS) )
+                {
+                    std::cout << "status 02b" << std::endl;
+                    success = false;
+                }
+            }
 
-                ret = ::NS(ClContext_assign_particle_set_arg)( context, 0u,
+            size_t elem_by_elem_output_offset = size_t{ 0 };
+            size_t beam_monitor_output_offset = size_t{ 0 };
+            ::NS(particle_index_t) min_turn_id = -1;
+
+            if( success )
+            {
+                status = NS(OutputBuffer_prepare)(
+                    ::NS(ClArgument_get_ptr_cobj_buffer)( beam_elements_arg ),
+                    ::NS(ClArgument_get_ptr_cobj_buffer)( output_buffer_arg ),
+                    particles, num_turns, &elem_by_elem_output_offset,
+                    &beam_monitor_output_offset, &min_turn_id );
+            }
+
+            if( success )
+            {
+                status = ::NS(ClContext_assign_particles_arg)(
+                    context, particles_buffer_arg );
+
+                success = ( status == st::ARCH_STATUS_SUCCESS );
+
+                status = ::NS(ClContext_assign_particle_set_arg)( context, 0u,
                     ::NS(Particles_get_num_of_particles)( particles ) );
 
-                success &= ( ret == st::ARCH_STATUS_SUCCESS );
+                success &= ( status == st::ARCH_STATUS_SUCCESS );
 
-                ret = ::NS(ClContext_assign_beam_elements_arg)(
+                status = ::NS(ClContext_assign_beam_elements_arg)(
                     context, beam_elements_arg );
 
-                success = ( ret == st::ARCH_STATUS_SUCCESS );
+                success &= ( status == st::ARCH_STATUS_SUCCESS );
 
-                ret = ::NS(assign_output_buffer_arg)(
-                    context, elem_by_elem_buffer_arg );
+                status = ::NS(ClContext_assign_output_buffer_arg)(
+                    context, output_buffer_arg );
 
-                particles_buffer_arg, beam_elements_arg,
-                    elem_by_elem_buffer_arg,
+                success &= ( status == st::ARCH_STATUS_SUCCESS );
+
+                status = ::NS(ClContext_assign_elem_by_elem_config_arg)(
+                    context, elem_by_elem_config_arg );
+
+                success &= ( status == st::ARCH_STATUS_SUCCESS );
+
+                if( !success )
+                {
+                    std::cout << "status 03 : " << status << std::endl;
+                }
             }
 
             if( success )
             {
-                ret = ::NS(ClContext_track_elem_by_elem)( context, num_turns );
+                elem_by_elem_particles = ::NS(Particles_buffer_get_particles)(
+                    output_buffer, elem_by_elem_output_offset );
 
-                if( ret != 0 )
+                success  = ( elem_by_elem_particles != nullptr );
+                success &= ( ::NS(Particles_get_num_of_particles)(
+                    elem_by_elem_particles ) == static_cast<
+                        ::NS(particle_num_elements_t) >( ebe_size ) );
+
+                if( !success )
                 {
-                    std::cout << "ret 03 : " << ret << std::endl;
+                    std::cout << "status 03b : " << status << std::endl;
+                }
+            }
+
+            if( success )
+            {
+                status = ::NS(ClContext_assign_elem_by_elem_output)(
+                    context, elem_by_elem_output_offset );
+
+                if( status != st::ARCH_STATUS_SUCCESS )
+                {
+                    success = false;
+                    std::cout << "status 04 : " << status << std::endl;
+                }
+            }
+
+            if( success )
+            {
+                ::NS(track_status_t) const track_status =
+                    ::NS(ClContext_track_elem_by_elem)( context, num_turns );
+
+                if( track_status != ::NS(TRACK_SUCCESS) )
+                {
+                    std::cout << "track_status 05 : " << track_status << std::endl;
                     success = false;
                 }
             }
@@ -448,34 +492,34 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( !success )
             {
-                std::cout << "ret 04" << std::endl;
+                std::cout << "status 06" << std::endl;
             }
 
             if( success )
             {
                 success = ::NS(ClArgument_read)(
-                    elem_by_elem_buffer_arg, elem_by_elem_buffer );
+                    output_buffer_arg, output_buffer );
 
                 elem_by_elem_particles = ::NS(Particles_buffer_get_particles)(
-                    elem_by_elem_buffer, 0u );
+                    output_buffer, elem_by_elem_output_offset );
 
                 success &= ( elem_by_elem_particles != nullptr );
             }
 
             if( !success )
             {
-                std::cout << "ret 05" << std::endl;
+                std::cout << "status 07" << std::endl;
             }
 
             if( success )
             {
-                ret = ::NS(Particles_compare_values_with_treshold)(
+                int const cmp_result = ::NS(Particles_compare_values_with_treshold)(
                     cmp_elem_by_elem_particles, elem_by_elem_particles,
                     abs_tolerance );
 
-                if( ret != 0 )
+                if( cmp_result != 0 )
                 {
-                    std::cout << "ret 06 : " << ret << std::endl;
+                    std::cout << "cmp_result 08 : " << cmp_result << std::endl;
                     success = false;
                 }
 
@@ -504,10 +548,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
             ::NS(ClArgument_delete)( particles_buffer_arg );
             ::NS(ClArgument_delete)( beam_elements_arg );
-            ::NS(ClArgument_delete)( elem_by_elem_buffer_arg );
+            ::NS(ClArgument_delete)( output_buffer_arg );
 
             ::NS(Buffer_delete)( pb );
-            ::NS(Buffer_delete)( elem_by_elem_buffer );
+            ::NS(Buffer_delete)( output_buffer );
 
             return success;
         }
