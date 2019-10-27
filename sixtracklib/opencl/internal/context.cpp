@@ -1165,7 +1165,7 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( this->hasSelectedNode() ) &&
             ( num_kernel_args >= _this_t::MIN_NUM_ASSIGN_ELEM_ARGS ) )
         {
-            SIXTRL_ASSERT( _this_t::MIN_NUM_ASSIGN_ELEM_ARGS >= _size_t{ 5 } );
+            SIXTRL_ASSERT( _this_t::MIN_NUM_ASSIGN_ELEM_ARGS >= _size_t{ 4 } );
             SIXTRL_ASSERT( kernel_id >= _kernel_id_t{ 0 } );
             SIXTRL_ASSERT( static_cast< _size_t >( kernel_id ) <
                            this->numAvailableKernels() );
@@ -1800,7 +1800,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( kernel_id >= kernel_id_t{ 0 } )
                 {
-                    success = this->set_track_until_kernel_id( kernel_id );
+                    success = ( this->set_track_until_kernel_id( kernel_id ) ==
+                        st::ARCH_STATUS_SUCCESS );
                 }
             }
 
@@ -1828,7 +1829,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( kernel_id >= kernel_id_t{ 0 } )
                 {
-                    success = this->set_track_elem_by_elem_kernel_id( kernel_id );
+                    success = ( this->set_track_elem_by_elem_kernel_id(
+                        kernel_id ) == st::ARCH_STATUS_SUCCESS );
                 }
             }
 
@@ -1856,7 +1858,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( kernel_id >= kernel_id_t{ 0 } )
                 {
-                    success = this->set_track_line_kernel_id( kernel_id );
+                    success = ( this->set_track_line_kernel_id( kernel_id ) ==
+                        st::ARCH_STATUS_SUCCESS );
                 }
             }
 
@@ -1879,7 +1882,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( kernel_id >= kernel_id_t{ 0 } )
                 {
-                    success = this->set_assign_beam_monitor_output_kernel_id( kernel_id );
+                    success = ( this->set_assign_beam_monitor_output_kernel_id(
+                        kernel_id ) == st::ARCH_STATUS_SUCCESS );
                 }
             }
 
@@ -1902,8 +1906,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( kernel_id >= kernel_id_t{ 0 } )
                 {
-                    success = this->set_clear_beam_monitor_output_kernel_id(
-                        kernel_id );
+                    success = ( this->set_clear_beam_monitor_output_kernel_id(
+                        kernel_id ) == st::ARCH_STATUS_SUCCESS );
                 }
             }
 
@@ -1929,8 +1933,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( kernel_id >= kernel_id_t{ 0 } )
                 {
-                    success = this->set_assign_elem_by_elem_output_kernel_id(
-                        kernel_id );
+                    success = ( this->set_assign_elem_by_elem_output_kernel_id(
+                        kernel_id ) == st::ARCH_STATUS_SUCCESS );
                 }
             }
         }
