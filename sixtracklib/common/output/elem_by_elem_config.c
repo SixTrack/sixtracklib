@@ -323,9 +323,9 @@ NS(arch_status_t) NS(ElemByElemConfig_init_on_particle_sets)(
     if( status == NS(ARCH_STATUS_SUCCESS) )
     {
         SIXTRL_ASSERT( particles_buffer != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( num_particle_sets > ( ( NS(buffer_size_t) )0u ) );
         SIXTRL_ASSERT( pset_indices_begin != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( beam_elements_buffer != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( num_particle_sets == ( _size_t )0u );
 
         if( ( min_part_id <= max_part_id   ) && ( min_part_id >= ZERO ) &&
             ( min_elem_id <= max_elem_id   ) &&

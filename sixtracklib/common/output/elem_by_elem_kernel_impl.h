@@ -69,7 +69,7 @@ NS(ElemByElemConfig_assign_output_buffer_kernel_impl)(
         SIXTRL_RESTRICT elem_by_elem_config,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT out_buffer,
     NS(buffer_size_t) const output_buffer_index_offset,
-    NS(buffer_size_t) const slot_size );
+    NS(buffer_size_t) const slot_size )
 {
     typedef NS(particle_num_elements_t) nelements_t;
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* out_iter_t;
@@ -79,7 +79,7 @@ NS(ElemByElemConfig_assign_output_buffer_kernel_impl)(
         NS(ElemByElemConfig_get_out_store_num_particles)( elem_by_elem_config );
 
     uintptr_t out_addr = ( uintptr_t )0u;
-    out_iter_t out_it  = NS(ManagedBuffer_get_objects_index_begin)(
+    out_iter_t out_it  = NS(ManagedBuffer_get_const_objects_index_begin)(
         out_buffer, slot_size );
 
     SIXTRL_ASSERT( elem_by_elem_config != SIXTRL_NULLPTR );
@@ -126,7 +126,7 @@ NS(ElemByElemConfig_assign_output_buffer_debug_kernel_impl)(
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* out_iter_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Particles) const* ptr_out_particles_t;
 
-    NS(arch_status_t) status = SIXTRL_ARCH_GENERAL_FAILURE;
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
     NS(arch_debugging_t) flags = SIXTRL_ARCH_DEBUGGING_MIN_FLAG;
 
     NS(arch_debugging_t) const ELEM_BY_ELEM_CONF_ILLEGAL_FLAG   = flags;
@@ -147,7 +147,7 @@ NS(ElemByElemConfig_assign_output_buffer_debug_kernel_impl)(
             NS(ElemByElemConfig_get_out_store_num_particles)(
                 elem_by_elem_config );
 
-        out_iter_t out_it  = NS(ManagedBuffer_get_objects_index_begin)(
+        out_iter_t out_it  = NS(ManagedBuffer_get_const_objects_index_begin)(
             out_buffer, slot_size );
 
         if( ( out_it != SIXTRL_NULLPTR ) &&
@@ -192,24 +192,6 @@ NS(ElemByElemConfig_assign_output_buffer_debug_kernel_impl)(
 
             if( out_it == SIXTRL_NULLPTR ) flags |= OUT_PARTICLES_ILLEGAL_FLAG;
         }
-
-        out_it = out_it + output_buffer_index_offset;
-
-        if( ( out_it != SIXTRL_NULLPTR ) &&
-            ( NS(Object_get_type_id)( out_it ) == NS(OBJECT_TYPE_PARTICLE) ) &&
-            ( out_addr != ( uintptr_t )0u ) &&
-            ( NS(Particles_get_num_of_particles)( ( ptr_out_particles_t )out_addr )
-                >= required_num_out_particles ) )
-        {
-            NS(ElemByElemConfig_set_output_store_address)(
-                elem_by_elem_config, out_addr );
-        }
-        else
-        {
-            NS(ElemByElemConfig_set_output_store_address)(
-                elem_by_elem_config, ( uintptr_t )0u );
-        }
-
     }
     else
     {
@@ -264,7 +246,7 @@ NS(ElemByElemConfig_set_output_buffer_addr_debug_kernel_impl)(
     SIXTRL_UINT64_T const out_buffer_addr,
     SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flags )
 {
-    NS(arch_status_t) status = SIXTRL_ARCH_GENERAL_FAILURE;
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
     NS(arch_debugging_t) flags = ( NS(arch_debugging_t) )0u;
 
     NS(arch_debugging_t) const ELEM_BY_ELEM_CONF_ILLEGAL_FLAG =
@@ -275,7 +257,7 @@ NS(ElemByElemConfig_set_output_buffer_addr_debug_kernel_impl)(
         NS(ElemByElemConfig_set_output_store_address)(
             elem_by_elem_config, out_buffer_addr );
 
-        status = NS(SIXTRL_ARCH_STATUS_SUCCESS);
+        status = SIXTRL_ARCH_STATUS_SUCCESS;
     }
     else
     {
