@@ -9,6 +9,7 @@
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/output/elem_by_elem_config.h"
+    #include "sixtracklib/common/output/elem_by_elem_kernel_impl.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __kernel void NS(ElemByElem_assign_out_buffer_from_offset_debug_opencl)(
@@ -24,17 +25,12 @@ __kernel void NS(ElemByElem_assign_out_buffer_from_offset_debug_opencl)(
     if( ( buf_size_t )get_global_id( 0 ) == ( buf_size_t )0u )
     {
         NS(arch_debugging_t) dbg = SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE;
-        NS(ElemByElemConfig_assign_managed_output_buffer_debug)(
+        NS(ElemByElemConfig_assign_output_buffer_debug_kernel_impl)(
             elem_by_elem_config, out_buffer, out_buffer_index_offset,
                 slot_size, &dbg );
 
-        if( ptr_status_flag != SIXTRL_NULLPTR )
-        {
-            *ptr_status_flag = dbg;
-        }
+        if( ptr_status_flag != SIXTRL_NULLPTR ) *ptr_status_flag = dbg;
     }
-
-    return;
 }
 
 #endif /* SIXTRACKLIB_OPENCL_KERNELS_ELEM_BY_ELEM_ASSIGN_OUT_BUFFER_DEBUG_CL__*/

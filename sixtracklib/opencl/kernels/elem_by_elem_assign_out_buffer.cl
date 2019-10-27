@@ -10,12 +10,12 @@
     #include "sixtracklib/common/internal/particles_defines.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/output/elem_by_elem_config.h"
-    #include "sixtracklib/common/output/output_buffer.h"
+    #include "sixtracklib/common/output/elem_by_elem_kernel_impl.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __kernel void NS(ElemByElem_assign_out_buffer_from_offset_opencl)(
      SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
-        SIXTRL_RESTRICT elem_by_elem_config,
+        SIXTRL_RESTRICT config,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
     SIXTRL_UINT64_T const out_buffer_index_offset,
     SIXTRL_UINT64_T const slot_size )
@@ -24,8 +24,8 @@ __kernel void NS(ElemByElem_assign_out_buffer_from_offset_opencl)(
 
     if( ( buf_size_t )get_global_id( 0 ) == ( buf_size_t )0u )
     {
-        NS(ElemByElemConfig_assign_managed_output_buffer)( elem_by_elem_config,
-            out_buffer, out_buffer_index_offset, slot_size );
+        NS(ElemByElemConfig_assign_output_buffer_kernel_impl)(
+            config, out_buffer, out_buffer_index_offset, slot_size );
     }
 }
 

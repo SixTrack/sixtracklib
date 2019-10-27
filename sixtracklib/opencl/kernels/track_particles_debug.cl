@@ -17,7 +17,7 @@
 
 __kernel void NS(Track_particles_until_turn_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
-    SIXTRL_UINT64_T const particle_set_index,
+    SIXTRL_UINT64_T const part_set_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
     SIXTRL_INT64_T const until_turn, SIXTRL_UINT64_T const slot_size,
     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flags )
@@ -42,7 +42,7 @@ __kernel void NS(Track_particles_elem_by_elem_debug_opencl)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig) *const
         SIXTRL_RESTRICT elem_by_elem_config,
     SIXTRL_INT64_T const until_turn, SIXTRL_UINT64_T const slot_size,
-    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flag )
+    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flags )
 {
     typedef NS(particle_num_elements_t) nelements_t;
     nelements_t const part_idx = ( nelements_t )get_global_id( 0 );
@@ -59,11 +59,11 @@ __kernel void NS(Track_particles_elem_by_elem_debug_opencl)(
 
 __kernel void NS(Track_particles_line_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
-    SIXTRL_UINT64_T const particle_set_index,
+    SIXTRL_UINT64_T const part_set_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
     SIXTRL_UINT64_T const line_begin_idx, SIXTRL_UINT64_T const line_end_idx,
     SIXTRL_UINT64_T const finish_turn_value, SIXTRL_UINT64_T const slot_size,
-    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flag )
+    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flags )
 {
     typedef NS(particle_num_elements_t) nelements_t;
     nelements_t const part_idx = ( nelements_t )get_global_id( 0 );

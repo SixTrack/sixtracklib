@@ -3,6 +3,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/opencl/internal/default_compile_options.h"
+
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/be_monitor/be_monitor.h"
     #include "sixtracklib/common/be_monitor/output_buffer.h"

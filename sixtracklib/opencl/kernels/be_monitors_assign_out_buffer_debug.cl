@@ -2,9 +2,10 @@
 #define SIXTRACKLIB_OPENCL_KERNELS_BE_MONITORS_ASSIGN_OUT_BUFFER_DEBUG_KERNEL_CL__
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/opencl/internal/default_compile_options.h"
+
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
-    #include "sixtracklib/opencl/internal/default_compile_options.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #include "sixtracklib/common/be_monitor/output_buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
