@@ -1327,7 +1327,7 @@ SIXTRL_INLINE void NS(BeamMonitor_clear_all_on_managed_buffer_debug)(
         }
     }
 
-    return;
+    if( ptr_status_flags != SIXTRL_NULLPTR ) *ptr_status_flags = flags;
 }
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
