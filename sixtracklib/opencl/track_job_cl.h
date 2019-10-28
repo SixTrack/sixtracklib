@@ -508,6 +508,7 @@ namespace SIXTRL_CXX_NAMESPACE
         const char *const SIXTRL_RESTRICT config_str )
     {
         using _base_t = SIXTRL_CXX_NAMESPACE::TrackJobBase;
+        using _size_t = _base_t::size_type;
         using flags_t = ::NS(output_buffer_flag_t);
 
         bool success  = false;
@@ -524,6 +525,24 @@ namespace SIXTRL_CXX_NAMESPACE
             device_id_str, this->ptrConfigStr() );
 
         if( this->ptrContext() == nullptr ) success = false;
+        if( particles_buffer == nullptr ) success = false;
+
+        if( ( success ) && ( pset_begin != pset_end ) &&
+            ( std::distance( pset_begin, pset_end ) > std::ptrdiff_t{ 0 } ) )
+        {
+            this->doSetParticleSetIndices(
+                pset_begin, pset_end, particles_buffer );
+        }
+        else if( success )
+        {
+            _size_t const fallback_pset_indices[] =
+            {
+                _size_t{ 0 }, _size_t{ 0 }
+            };
+
+            this->doSetParticleSetIndices( &fallback_pset_indices[ 0 ],
+                    &fallback_pset_indices[ 1 ], particles_buffer );
+        }
 
         if( success )
         {
@@ -537,17 +556,6 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         if( success ) this->doSetPtrCParticleBuffer( particles_buffer );
-
-        if( ( success ) && ( pset_begin != pset_end ) &&
-            ( std::distance( pset_begin, pset_end ) > std::ptrdiff_t{ 0 } ) )
-        {
-            this->doSetParticleSetIndices( pset_begin, pset_end,
-                                           particles_buffer );
-        }
-        else if( success )
-        {
-            success = false;
-        }
 
         if( success )
         {
@@ -579,7 +587,13 @@ namespace SIXTRL_CXX_NAMESPACE
                 success = _base_t::doPrepareOutputStructures( particles_buffer,
                     belements_buffer, output_buffer, until_turn_elem_by_elem );
 
-                if( success )
+                if( ( success ) && ( output_buffer != nullptr ) &&
+                    ( !this->ownsOutputBuffer() ) )
+                {
+                    this->doSetPtrCOutputBuffer( output_buffer );
+                }
+
+                if( ( success ) && ( this->hasOutputBuffer() ) )
                 {
                     success = this->doPrepareOutputStructuresOclImpl(
                         particles_buffer, belements_buffer,

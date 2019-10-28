@@ -603,7 +603,7 @@ namespace SIXTRL_CXX_NAMESPACE
         bool success = true;
         ( void )until_turn_elem_by_elem;
 
-        if( ( ptr_out_buffer != nullptr ) && ( pb != nullptr ) )
+        if( ptr_out_buffer != nullptr )
         {
             ptr_arg_t ptr( new arg_t( ptr_out_buffer, this->ptrContext() ) );
             this->doUpdateStoredOutputArg( std::move( ptr ) );
@@ -613,10 +613,13 @@ namespace SIXTRL_CXX_NAMESPACE
             if( ( success ) && ( this->ptrContext() != nullptr ) &&
                 ( this->context().hasSelectedNode() ) )
             {
-                success &= this->context().assign_output_buffer_arg(
-                    this->outputBufferArg() );
+                success &= ( this->context().assign_output_buffer_arg(
+                    this->outputBufferArg() ) == st::ARCH_STATUS_SUCCESS );
             }
+        }
 
+        if( ( success ) && ( ptr_out_buffer != nullptr ) && ( pb != nullptr ) )
+        {
             /* TODO: Update this region as soon as the OpenCL argument
              *       can handle raw data rather than only CObject buffers */
 
@@ -682,6 +685,11 @@ namespace SIXTRL_CXX_NAMESPACE
                     this->context().assign_beam_monitor_output(
                         min_turn_id, output_buffer_index_offset ) );
             }
+
+            if( success )
+            {
+                success = this->beamElementsArg().read( belem_buffer );
+            }
         }
 
         return success;
@@ -696,8 +704,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ( this->ptrContext() != nullptr ) &&
             ( this->context().hasSelectedNode() ) &&
-            ( this->context().has_assign_beam_monitor_output_kernel() ) &&
-            ( this->hasBeamMonitorOutput() ) &&
+            ( this->context().has_assign_elem_by_elem_output_kernel() ) &&
+            ( this->hasElemByElemOutput() ) &&
+            ( this->ptrClElemByElemConfigBuffer() != nullptr ) &&
+            ( this->ptrElemByElemConfig() != nullptr ) &&
+            ( this->ptrElemByElemConfig() == elem_by_elem_conf ) &&
             ( this->ptrBeamElementsArg() != nullptr ) &&
             ( this->ptrOutputBufferArg() != nullptr ) &&
             ( this->outputBufferArg().context() == this->ptrContext() ) &&
@@ -713,6 +724,13 @@ namespace SIXTRL_CXX_NAMESPACE
                 success = ( st::ARCH_STATUS_SUCCESS ==
                     this->context().assign_elem_by_elem_output(
                         output_buffer_index_offset ) );
+            }
+
+            if( success )
+            {
+                success = ( this->context().collect_elem_by_elem_config_arg(
+                    *this->ptrClElemByElemConfigBuffer(), *elem_by_elem_conf )
+                        == st::ARCH_STATUS_SUCCESS );
             }
         }
 
@@ -767,21 +785,23 @@ namespace SIXTRL_CXX_NAMESPACE
                 success = _base_t::doPrepareOutputStructures( pbuffer,
                     belem_buffer, out_buffer, until_turn_elem_by_elem );
 
+                if( ( success ) && ( out_buffer != nullptr ) &&
+                    ( !this->ownsOutputBuffer() ) )
+                {
+                    this->doSetPtrCOutputBuffer( out_buffer );
+                }
+
                 if( ( success ) && ( this->hasOutputBuffer() ) )
                 {
                     success = this->doPrepareOutputStructuresOclImpl( pbuffer,
                         belem_buffer, this->ptrCOutputBuffer(),
                             until_turn_elem_by_elem );
                 }
-                else if( !this->hasOutputBuffer() )
-                {
-                    success = false;
-                }
             }
         }
 
-        if( ( success ) &&
-            ( this->hasOutputBuffer() ) && ( requires_output_buffer ) )
+        if( ( success ) && ( this->hasOutputBuffer() ) &&
+            ( requires_output_buffer ) )
         {
             if( ::NS(OutputBuffer_requires_elem_by_elem_output)( out_buffer_flags ) )
             {
@@ -819,10 +839,7 @@ namespace SIXTRL_CXX_NAMESPACE
         }
         else if( ( success) && ( requires_output_buffer ) )
         {
-            if( !this->hasOutputBuffer() )
-            {
-                success = false;
-            }
+            if( !this->hasOutputBuffer() ) success = false;
         }
 
         return success;
@@ -1033,11 +1050,6 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( job.ptrContext() != nullptr );
         SIXTRL_ASSERT( job.ptrParticlesArg() != nullptr );
         SIXTRL_ASSERT( job.ptrBeamElementsArg() != nullptr );
-        SIXTRL_ASSERT( job.hasOutputBuffer() );
-        SIXTRL_ASSERT( job.ptrOutputBufferArg() != nullptr );
-        SIXTRL_ASSERT( job.hasElemByElemOutput() );
-        SIXTRL_ASSERT( job.ptrElemByElemConfig() != nullptr );
-        SIXTRL_ASSERT( job.ptrClElemByElemConfigBuffer() != nullptr );
         SIXTRL_ASSERT( job.ptrContext()->hasSelectedNode() );
         SIXTRL_ASSERT( job.context().has_track_elem_by_elem_kernel() );
         SIXTRL_ASSERT( job.particleSetIndicesBegin() != nullptr );
