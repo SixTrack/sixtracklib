@@ -387,9 +387,11 @@ namespace SIXTRL_CXX_NAMESPACE
             object_t const* pb_end = ::NS(Buffer_get_const_objects_end)(
                 in_particles_buffer );
 
-            ::NS(Buffer)* pb      = ::NS(Buffer_new)( size_t{ 0xffff } );
-            ::NS(Buffer)* eb      = ::NS(Buffer_new)( size_t{ 0xffff } );
-            ::NS(Buffer)* diff_pb = ::NS(Buffer_new)( size_t{ 0xffff } );
+            ::NS(Buffer)* diff_pb = ::NS(Buffer_new)( size_t{ 0 } );
+
+            ::NS(Buffer)* pb = ::NS(Buffer_new)( size_t{ 0 } );
+            ::NS(Buffer)* eb = ::NS(Buffer_new_from_copy)(
+                in_beam_elements_buffer );
 
             if( ( context != nullptr ) &&
                 ( in_particles_buffer != nullptr ) &&
@@ -402,6 +404,8 @@ namespace SIXTRL_CXX_NAMESPACE
                 ( pb_begin != nullptr ) && ( pb_end != nullptr ) &&
                 ( pb_begin != pb_end  ) &&
                 ( pb != nullptr ) && ( eb != nullptr ) &&
+                ( ::NS(Buffer_get_num_of_objects)( eb ) ==
+                  ::NS(Buffer_get_num_of_objects)( in_beam_elements_buffer ) ) &&
                 ( diff_pb != nullptr ) )
             {
                 object_t const* pb_it = pb_begin;
@@ -409,7 +413,8 @@ namespace SIXTRL_CXX_NAMESPACE
                 particles_t const* in_particles =
                     ::NS(BufferIndex_get_const_particles)( pb_it );
 
-                object_t const* prev_pb = pb_it++;
+                particles_t* track_particles =
+                    ::NS(Particles_add_copy)( pb, in_particles );
 
                 particles_t const* prev_in_particles = nullptr;
 
@@ -419,12 +424,53 @@ namespace SIXTRL_CXX_NAMESPACE
                 num_particles_t prev_num_particles = num_particles_t{ 0 };
                 size_t cnt = size_t{ 0 };
 
-                success = true;
+                ::NS(ClArgument)* particles_arg =
+                    ::NS(ClArgument_new_from_buffer)( pb, context );
 
-                for( ; pb_it != pb_end ; ++pb_it, ++prev_pb, ++cnt )
+                success = ( particles_arg != nullptr );
+                success &= ( ::NS(ClArgument_uses_cobj_buffer)( particles_arg ) );
+                success &= ( ::NS(ClArgument_get_ptr_cobj_buffer)(
+                    particles_arg ) == pb );
+
+                success &= ( ::NS(ClArgument_get_argument_size)( particles_arg )
+                    == ::NS(Buffer_get_size)( pb ) );
+
+                success &= ( ::NS(ClArgument_get_ptr_to_context)(
+                    particles_arg ) == context );
+
+                ::NS(ClArgument)* beam_elements_arg =
+                    ::NS(ClArgument_new_from_buffer)( eb, context );
+
+                success &= ( beam_elements_arg != nullptr );
+                success &= ( ::NS(ClArgument_uses_cobj_buffer)(
+                    beam_elements_arg ) );
+                success &= ( ::NS(ClArgument_get_ptr_cobj_buffer)(
+                    beam_elements_arg ) == eb );
+
+                success &= ( ::NS(ClArgument_get_argument_size)(
+                    beam_elements_arg ) == ::NS(Buffer_get_size)( eb ) );
+
+                success &= ( ::NS(ClArgument_get_ptr_to_context)(
+                    beam_elements_arg ) == context );
+
+                success &= ( ::NS(ARCH_STATUS_SUCCESS) ==
+                    ::NS(ClContext_assign_particles_arg)( context,
+                        particles_arg ) );
+
+                success &= ( ::NS(ARCH_STATUS_SUCCESS) ==
+                    ::NS(ClContext_assign_particle_set_arg)(
+                        context, 0u, num_particles ) );
+
+                success &= ( ::NS(ARCH_STATUS_SUCCESS) ==
+                    ::NS(ClContext_assign_beam_elements_arg)(
+                        context, beam_elements_arg ) );
+
+
+                while( ( success ) && ( pb_it != pb_end ) )
                 {
                     prev_in_particles  = in_particles;
-                    in_particles = ::NS(BufferIndex_get_const_particles)( pb_it );
+                    in_particles = ::NS(BufferIndex_get_const_particles)(
+                        pb_it++ );
 
                     prev_num_particles = num_particles;
                     num_particles = ::NS(Particles_get_num_of_particles)(
@@ -436,80 +482,31 @@ namespace SIXTRL_CXX_NAMESPACE
                     if( !success ) break;
 
                     /* ------------------------------------------------- */
-                    /* build OpenCL argument from particles buffer: */
+                    /* init track_particles: */
 
-                    ::NS(Buffer_reset)( pb );
+                    success = ( ::NS(Particles_copy)( track_particles,
+                        prev_in_particles ) == ::NS(ARCH_STATUS_SUCCESS) );
 
-                    particles_t* particles =
-                        ::NS(Particles_add_copy)( pb, prev_in_particles );
-
-                    success  = ( ::NS(Buffer_get_num_of_objects)( pb ) == 1u );
-                    success &= ( ::NS(Buffer_get_size)( pb ) > size_t{ 0 } );
-
-                    ::NS(ClArgument)* particles_arg =
-                        ::NS(ClArgument_new_from_buffer)( pb, context );
-
-                    success &= ( particles_arg != nullptr );
-                    success &= ( ::NS(ClArgument_uses_cobj_buffer)( particles_arg ) );
-
-                    success &= ( ::NS(ClArgument_get_ptr_cobj_buffer)(
-                        particles_arg ) == pb );
-
-                    success &= ( ::NS(ClArgument_get_argument_size)( particles_arg )
-                        == ::NS(Buffer_get_size)( pb ) );
-
-                    success &= ( ::NS(ClArgument_get_ptr_to_context)(
-                        particles_arg ) == context );
-
-                    if( !success ) break;
+                    success &= ::NS(ClArgument_write)( particles_arg, pb );
 
                     /* ------------------------------------------------- */
                     /* build Ocl arg from line in beam-elements buffer: */
 
                     index_t const begin_elem_id =
                         ::NS(Particles_get_at_element_id_value)(
-                            particles, num_particles_t{ 0 } );
+                            track_particles, num_particles_t{ 0 } ) + index_t{ 1 };
 
                     index_t const end_elem_id =
                         ::NS(Particles_get_at_element_id_value)(
-                            in_particles, num_particles_t{ 0 } );
+                            in_particles, num_particles_t{ 0 } ) + index_t{ 1 };
 
-                    index_t const at_turn = ::NS(Particles_get_at_turn_value)(
-                        particles, num_particles_t{ 0 } );
-
-                    SIXTRL_ASSERT( ::NS(Particles_get_at_turn_value)(
-                        in_particles, num_particles_t{ 0 } ) );
-
-                    object_t const* line_begin = be_begin;
-                    object_t const* line_end   = be_begin;
-
-                    std::advance( line_begin, begin_elem_id + index_t{ 1 } );
-                    std::advance( line_end,   end_elem_id   + index_t{ 1 } );
-
-                    ::NS(Buffer_reset)( eb );
-                    ::NS(BeamElements_copy_to_buffer)( eb, line_begin, line_end );
-
-                    success &= ( static_cast< std::ptrdiff_t >(
-                        ::NS(Buffer_get_num_of_objects)( eb ) ) ==
-                        std::distance( line_begin, line_end ) );
-
-                    success &= ( ::NS(Buffer_get_size)( eb ) > size_t{ 0 } );
-
-                    ::NS(ClArgument)* beam_elements_arg =
-                        ::NS(ClArgument_new_from_buffer)( eb, context );
-
-                    success &= ( beam_elements_arg != nullptr );
-                    success &= ( ::NS(ClArgument_uses_cobj_buffer)(
-                        beam_elements_arg ) );
-
-                    success &= ( ::NS(ClArgument_get_ptr_cobj_buffer)(
-                        beam_elements_arg ) == eb );
-
-                    success &= ( ::NS(ClArgument_get_argument_size)(
-                        beam_elements_arg ) == ::NS(Buffer_get_size)( eb ) );
-
-                    success &= ( ::NS(ClArgument_get_ptr_to_context)(
-                        beam_elements_arg ) == context );
+                    for( index_t ii = index_t{ 0 } ; ii < num_particles ; ++ii )
+                    {
+                        success &= ( ::NS(Particles_get_at_turn_value)(
+                            track_particles, ii ) ==
+                            ::NS(Particles_get_at_turn_value)(
+                                in_particles, ii ) );
+                    }
 
                     if( !success ) break;
 
@@ -517,7 +514,8 @@ namespace SIXTRL_CXX_NAMESPACE
                     /* Perform tracking of particles over line: */
 
                     success &= ( ::NS(TRACK_SUCCESS) ==
-                        ::NS(ClContext_track_until)( context, at_turn + 1 ) );
+                        ::NS(ClContext_track_line)(
+                            context, begin_elem_id, end_elem_id, false ) );
 
                     if( !success )  break;
 
@@ -528,16 +526,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
                     if( !success )  break;
 
-                    success &= ( 0 == ::NS(Buffer_remap)( pb ) );
-
                     particles_t const* cmp_particles = in_particles;
-                    particles = ::NS(Particles_buffer_get_particles)( pb, 0u );
+                    track_particles = ::NS(Particles_buffer_get_particles)(
+                        pb, 0u );
 
-                    success &= ( particles != nullptr );
+                    success &= ( track_particles != nullptr );
                     if( !success ) break;
 
                     if( 0 != ::NS(Particles_compare_real_values_with_treshold)(
-                            cmp_particles, particles, abs_treshold ) )
+                            cmp_particles, track_particles, abs_treshold ) )
                     {
                         ::NS(Buffer_reset)( diff_pb );
 
@@ -547,11 +544,11 @@ namespace SIXTRL_CXX_NAMESPACE
                         success &= ( diff_particles != nullptr );
 
                         ::NS(Particles_calculate_difference)(
-                            cmp_particles, particles, diff_particles );
+                            cmp_particles, track_particles, diff_particles );
 
-                        std::cout << "Diff. between tracked particles and "
+                        std::cout << "Diff. between track_particles and "
                                      "reference particle data detected: \r\n"
-                                  << "at beam-element block #" << cnt
+                                  << "at beam-element block #" << cnt++
                                   << ", concerning beam-elements [ "
                                   << std::setw( 6 ) << begin_elem_id + 1
                                   << " - "
@@ -562,8 +559,12 @@ namespace SIXTRL_CXX_NAMESPACE
                                   << "\r\n"
                                   << "beam-elements: \r\n";
 
-                        object_t const* line_it  = line_begin;
-                        size_t jj = begin_elem_id + index_t{ 1 };
+                        object_t const* line_it = be_begin;
+                        object_t const* line_end   = be_begin;
+                        size_t jj = begin_elem_id;
+
+                        std::advance( line_it,  begin_elem_id );
+                        std::advance( line_end, end_elem_id );
 
                         for( ; line_it != line_end ; ++line_it )
                         {
@@ -581,13 +582,11 @@ namespace SIXTRL_CXX_NAMESPACE
                     }
 
                     success &= ( ::NS(Particles_compare_real_values_with_treshold)(
-                            cmp_particles, particles, abs_treshold ) == 0 );
-
-                    ::NS(ClArgument_delete)( particles_arg );
-                    ::NS(ClArgument_delete)( beam_elements_arg );
-
-                    if( !success ) break;
+                            cmp_particles, track_particles, abs_treshold ) == 0 );
                 }
+
+                ::NS(ClArgument_delete)( particles_arg );
+                ::NS(ClArgument_delete)( beam_elements_arg );
             }
 
             ::NS(Buffer_delete)( pb );

@@ -827,7 +827,6 @@ TEST( CXX_TrackJobClTests, TrackParticles )
     using part_index_t     = particles_t::index_t;
     using beam_monitor_t   = st::BeamMonitor;
     using status_t         = particles_t::status_t;
-    using num_elem_t       = particles_t::num_elements_t;
 
     buffer_t eb( ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
     buffer_t in_particle_buffer( ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
@@ -859,41 +858,41 @@ TEST( CXX_TrackJobClTests, TrackParticles )
 
     size_t const NUM_BEAM_ELEMENTS       = eb.getNumObjects();
     size_t const NUM_PARTICLES           = particles->getNumParticles();
-    size_t const NUM_TURNS               = size_t{ 100 };
+    size_t const UNTIL_TURN              = size_t{ 100 };
     size_t const SKIP_TURNS              = size_t{ 10 };
-    size_t const DUMP_ELEM_BY_ELEM_TURNS = size_t{ 5 };
-    size_t const NUM_TURN_BY_TURN_TURNS  = size_t{ 10 };
+    size_t const UNTIL_TURN_ELEM_BY_ELEM = size_t{ 5 };
+    size_t const UNTIL_TURN_TURN_BY_TURN = size_t{ 10 };
     size_t NUM_BEAM_MONITORS             = size_t{ 0 };
 
     ASSERT_TRUE( NUM_PARTICLES > size_t{ 0 } );
     ASSERT_TRUE( NUM_BEAM_ELEMENTS > size_t{ 0 } );
 
-    if( ( NUM_TURNS > DUMP_ELEM_BY_ELEM_TURNS  ) &&
-        ( NUM_TURN_BY_TURN_TURNS > size_t{ 0 } ) )
+    if( ( UNTIL_TURN_TURN_BY_TURN > UNTIL_TURN_ELEM_BY_ELEM ) &&
+        ( UNTIL_TURN_TURN_BY_TURN > size_t{ 0 } ) )
     {
         beam_monitor_t* turn_by_turn_monitor = eb.createNew< beam_monitor_t >();
         ASSERT_TRUE( turn_by_turn_monitor != nullptr );
 
         turn_by_turn_monitor->setIsRolling( false );
-        turn_by_turn_monitor->setStart( DUMP_ELEM_BY_ELEM_TURNS );
-        turn_by_turn_monitor->setNumStores( NUM_TURN_BY_TURN_TURNS );
+        turn_by_turn_monitor->setStart( UNTIL_TURN_ELEM_BY_ELEM );
+        turn_by_turn_monitor->setNumStores(
+            UNTIL_TURN_TURN_BY_TURN - UNTIL_TURN_ELEM_BY_ELEM );
         turn_by_turn_monitor->setSkip( size_t{ 1 } );
 
         ++NUM_BEAM_MONITORS;
     }
 
-    if( NUM_TURNS > ( NUM_TURN_BY_TURN_TURNS + DUMP_ELEM_BY_ELEM_TURNS ) )
+    if( UNTIL_TURN > UNTIL_TURN_TURN_BY_TURN )
     {
         beam_monitor_t* eot_monitor = eb.createNew< beam_monitor_t >();
         ASSERT_TRUE( eot_monitor != nullptr );
 
         eot_monitor->setIsRolling( false );
-        eot_monitor->setStart( DUMP_ELEM_BY_ELEM_TURNS + NUM_TURN_BY_TURN_TURNS );
-        eot_monitor->setSkip( size_t{ 1 } );
+        eot_monitor->setStart( UNTIL_TURN_TURN_BY_TURN );
+        eot_monitor->setSkip( SKIP_TURNS );
 
         eot_monitor->setNumStores(
-            ( NUM_TURNS - ( DUMP_ELEM_BY_ELEM_TURNS + NUM_TURN_BY_TURN_TURNS ) /
-                SKIP_TURNS ) );
+            ( UNTIL_TURN - UNTIL_TURN_TURN_BY_TURN ) / SKIP_TURNS );
 
         ++NUM_BEAM_MONITORS;
     }
@@ -907,7 +906,7 @@ TEST( CXX_TrackJobClTests, TrackParticles )
 
     int ret = ::NS(OutputBuffer_prepare)(
         eb.getCApiPtr(), cmp_output_buffer.getCApiPtr(),
-        cmp_particles->getCApiPtr(), DUMP_ELEM_BY_ELEM_TURNS,
+        cmp_particles->getCApiPtr(), UNTIL_TURN_ELEM_BY_ELEM,
         &elem_by_elem_offset, &beam_monitor_offset, &min_turn_id );
 
     SIXTRL_ASSERT( ret == 0 );
@@ -923,67 +922,33 @@ TEST( CXX_TrackJobClTests, TrackParticles )
 
     SIXTRL_ASSERT( ret == 0 );
 
-    if( DUMP_ELEM_BY_ELEM_TURNS > size_t{ 0 } )
+    if( UNTIL_TURN_ELEM_BY_ELEM > size_t{ 0 } )
     {
-        part_index_t max_turn_id, min_particle_id, max_particle_id,
-                     min_at_element_id, max_at_element_id;
-
-        ret = ::NS(Particles_get_min_max_attributes)( particles,
-            &min_particle_id, &max_particle_id, &min_at_element_id,
-            &max_at_element_id, &min_turn_id, &max_turn_id );
-
-        ASSERT_TRUE( ret == ::NS(TRACK_SUCCESS) );
-
         ::NS(ElemByElemConfig) config;
         ::NS(ElemByElemConfig_preset)( &config );
 
-        if( ret == ::NS(TRACK_SUCCESS) )
-        {
-            num_elem_t const num_beam_elements = eb.getNumObjects();
+        ret = ::NS(ElemByElemConfig_init)( &config,
+            cmp_particles->getCApiPtr(), eb.getCApiPtr(),
+                part_index_t{ 0 }, UNTIL_TURN_ELEM_BY_ELEM );
 
-            if( ( num_beam_elements >= ( num_elem_t )0u ) &&
-                ( num_beam_elements >  ( num_elem_t )(
-                    max_at_element_id + ( part_index_t )1u ) ) )
-            {
-                max_at_element_id = ( part_index_t )(
-                    num_beam_elements - ( num_elem_t )1u );
-            }
+        ASSERT_TRUE( ret == ::NS(ARCH_STATUS_SUCCESS) );
 
-            SIXTRL_ASSERT( max_turn_id >= ( part_index_t )0u );
-            SIXTRL_ASSERT( max_turn_id >= min_turn_id );
+        ret = ::NS(ElemByElemConfig_assign_output_buffer)(
+            &config, cmp_output_buffer.getCApiPtr(), elem_by_elem_offset );
 
-            ret = ::NS(ElemByElemConfig_init_detailed)(
-                &config, NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES),
-                min_particle_id, max_particle_id, min_at_element_id,
-                max_at_element_id, min_turn_id, max_turn_id, true );
-        }
-
-        particles_t* elem_by_elem_out =
-            particles_t::FromBuffer( cmp_output_buffer, elem_by_elem_offset );
-
-        ASSERT_TRUE( elem_by_elem_out != nullptr );
-
-        if( ret == NS(TRACK_SUCCESS) )
-        {
-            ::NS(ElemByElemConfig_set_output_store_address)(
-                &config, ( uintptr_t )elem_by_elem_out->getCApiPtr() );
-        }
-
-        ASSERT_TRUE( ( ( NUM_BEAM_ELEMENTS + NUM_BEAM_MONITORS ) *
-            NUM_PARTICLES * DUMP_ELEM_BY_ELEM_TURNS ) <=
-                static_cast< size_t >( elem_by_elem_out->getNumParticles() ) );
+        ASSERT_TRUE( ret == ::NS(ARCH_STATUS_SUCCESS) );
 
         ret = ::NS(Track_all_particles_element_by_element_until_turn)(
             cmp_particles->getCApiPtr(), &config, eb.getCApiPtr(),
-                DUMP_ELEM_BY_ELEM_TURNS );
+                UNTIL_TURN_ELEM_BY_ELEM );
 
         ASSERT_TRUE( ret == 0 );
     }
 
-    if( NUM_TURNS > DUMP_ELEM_BY_ELEM_TURNS )
+    if( UNTIL_TURN > UNTIL_TURN_ELEM_BY_ELEM )
     {
         ret = ::NS(Track_all_particles_until_turn)(
-            cmp_particles->getCApiPtr(), eb.getCApiPtr(), NUM_TURNS );
+            cmp_particles->getCApiPtr(), eb.getCApiPtr(), UNTIL_TURN );
 
         SIXTRL_ASSERT( ret == 0 );
     }
@@ -1029,7 +994,7 @@ TEST( CXX_TrackJobClTests, TrackParticles )
         ::NS(ComputeNodeInfo_print_out)( node_it, &default_node_id );
 
         track_job_t job( device_id_str, pb, eb, nullptr,
-                         DUMP_ELEM_BY_ELEM_TURNS );
+                         UNTIL_TURN_ELEM_BY_ELEM );
 
         SIXTRL_ASSERT( job.ptrContext() != nullptr );
         SIXTRL_ASSERT( job.context().hasSelectedNode() );
@@ -1046,19 +1011,19 @@ TEST( CXX_TrackJobClTests, TrackParticles )
                      ( NUM_BEAM_MONITORS > size_t{ 0 } ) );
 
         ASSERT_TRUE( job.hasElemByElemOutput() ==
-                     ( DUMP_ELEM_BY_ELEM_TURNS > size_t{ 0 } ) );
+                     ( UNTIL_TURN_ELEM_BY_ELEM > size_t{ 0 } ) );
 
         ASSERT_TRUE( job.ptrElemByElemConfig() != nullptr );
 
-        if( DUMP_ELEM_BY_ELEM_TURNS > size_t{ 0 } )
+        if( UNTIL_TURN_ELEM_BY_ELEM > size_t{ 0 } )
         {
-            ret = st::trackElemByElem( job, DUMP_ELEM_BY_ELEM_TURNS );
+            ret = st::trackElemByElem( job, UNTIL_TURN_ELEM_BY_ELEM );
             ASSERT_TRUE( ret == 0 );
         }
 
-        if( NUM_TURNS > DUMP_ELEM_BY_ELEM_TURNS )
+        if( UNTIL_TURN > UNTIL_TURN_ELEM_BY_ELEM )
         {
-            ret = st::track( job, NUM_TURNS );
+            ret = st::track( job, UNTIL_TURN );
             ASSERT_TRUE( ret == 0 );
         }
 

@@ -262,6 +262,12 @@ TEST( C99_OpenCLBeamMonitorTests, AssignIoBufferToBeamMonitors )
         ASSERT_TRUE( beam_elements_arg != nullptr );
         ASSERT_TRUE( out_buffer_arg    != nullptr );
 
+        ASSERT_TRUE( ::NS(ClContext_assign_beam_elements_arg)(
+            context, beam_elements_arg ) == ::NS(ARCH_STATUS_SUCCESS) );
+
+        ASSERT_TRUE( ::NS(ClContext_assign_output_buffer_arg)(
+            context, out_buffer_arg ) == ::NS(ARCH_STATUS_SUCCESS) );
+
         ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
             ::NS(ClContext_assign_beam_monitor_output)(
                 context, min_turn_id, beam_monitor_index_offset ) );
@@ -861,6 +867,34 @@ namespace sixtrack
                         ( beam_elements_arg    != nullptr ) &&
                         ( out_buffer_arg       != nullptr ) );
 
+            if( success )
+            {
+                status = ::NS(ClContext_assign_particles_arg)(
+                    context, particles_buffer_arg );
+
+                success = ( status == ::NS(ARCH_STATUS_SUCCESS) );
+                if( !success ) std::cout << "status 03a = " << status << std::endl;
+
+                status = ::NS(ClContext_assign_particle_set_arg)(
+                    context, 0u, ::NS(Particles_get_num_of_particles)(
+                        initial_state ) );
+
+                success = ( status == ::NS(ARCH_STATUS_SUCCESS) );
+                if( !success ) std::cout << "status 03b = " << status << std::endl;
+
+                status = ::NS(ClContext_assign_beam_elements_arg)(
+                    context, beam_elements_arg );
+
+                success = ( status == ::NS(ARCH_STATUS_SUCCESS) );
+                if( !success ) std::cout << "status 03c = " << status << std::endl;
+
+                status = ::NS(ClContext_assign_output_buffer_arg)(
+                    context, out_buffer_arg );
+
+                success = ( status == ::NS(ARCH_STATUS_SUCCESS) );
+                if( !success ) std::cout << "status 03d = " << status << std::endl;
+            }
+
             /* ------------------------------------------------------------- */
             /* Track for num-turns without assigned beam-monitors -> should
              * not change the correctness of tracking at all */
@@ -869,13 +903,11 @@ namespace sixtrack
             {
                 ::NS(track_status_t) const track_status =
                 ::NS(ClContext_track_until)( context, num_turns );
+                success = ( track_status == ::NS(TRACK_SUCCESS) );
 
-                if( track_status != ::NS(TRACK_SUCCESS) )
+                if( !success )
                 {
-                    std::cout << "track_status 03 : "
-                              << track_status << std::endl;
-
-                    success = false;
+                    std::cout << "track_status 04 = " << track_status << std::endl;
                 }
             }
 
@@ -884,6 +916,8 @@ namespace sixtrack
                 success = ::NS(ClArgument_read)( particles_buffer_arg, pb );
                 particles = ::NS(Particles_buffer_get_particles)( pb, 0u );
                 success &= ( particles != nullptr );
+
+                if( !success ) std::cout << "status 05" << std::endl;
             }
 
             if( success )
@@ -891,14 +925,12 @@ namespace sixtrack
                 int const cmp_result = ::NS(Particles_compare_values_with_treshold)(
                     particles, final_state, abs_tolerance );
 
-                if( cmp_result != 0 )
-                {
-                    std::cout << "cmp_result 04 : " << cmp_result << std::endl;
-                    success = false;
-                }
+                success = ( cmp_result == 0 );
 
                 if( !success )
                 {
+                    std::cout << "cmp_result 06 : " << cmp_result << std::endl;
+
                     ::NS(Buffer)* diff_buffer = ::NS(Buffer_new)( 0u );
                     ::NS(Particles)* diff = ::NS(Particles_new)( diff_buffer,
                         ::NS(Particles_get_num_of_particles)( particles ) );
@@ -925,11 +957,15 @@ namespace sixtrack
                 success = ( ::NS(ARCH_STATUS_SUCCESS) == ::NS(Particles_copy)(
                     ::NS(Particles_buffer_get_particles)( pb, 0u ),
                          initial_state ) );
+
+                if( !success ) std::cout << "status 07" << std::endl;
             }
 
             if( success )
             {
                 success = ::NS(ClArgument_write)( particles_buffer_arg, pb );
+
+                if( !success ) std::cout << "status 08" << std::endl;
             }
 
             /* ------------------------------------------------------------- */
@@ -940,11 +976,8 @@ namespace sixtrack
                 status = ::NS(ClContext_assign_beam_monitor_output)(
                     context, min_turn_id, beam_monitor_index_offset );
 
-                if( status != ::NS(ARCH_STATUS_SUCCESS) )
-                {
-                    std::cout << "status 05 : " << status << std::endl;
-                    success = false;
-                }
+                success = ( status == ::NS(ARCH_STATUS_SUCCESS) );
+                if( !success ) std::cout << "status 09 : " << status << std::endl;
             }
 
             /* ------------------------------------------------------------- */
@@ -956,21 +989,25 @@ namespace sixtrack
                 ::NS(track_status_t) track_status =
                 ::NS(ClContext_track_until)( context, num_turns );
 
-                if( track_status != ::NS(TRACK_SUCCESS) )
-                {
-                    std::cout << "track_status 06 : "
-                              << track_status << std::endl;
-                    success = false;
-                }
-                else
-                {
-                    success  = ::NS(ClArgument_read)( particles_buffer_arg, pb );
-                    success &= ::NS(ClArgument_read)( out_buffer_arg, out_buffer );
-                    success &= ::NS(ClArgument_read)( beam_elements_arg, eb );
+                success = ( track_status == ::NS(TRACK_SUCCESS) );
 
-                    particles = ::NS(Particles_buffer_get_particles)( pb, 0u );
-                    success  &= ( particles != nullptr );
+                if( !success )
+                {
+                    std::cout << "track_status 10 : "
+                              << track_status << std::endl;
                 }
+            }
+
+            if( success )
+            {
+                success  = ::NS(ClArgument_read)( particles_buffer_arg, pb );
+                success &= ::NS(ClArgument_read)( out_buffer_arg, out_buffer );
+                success &= ::NS(ClArgument_read)( beam_elements_arg, eb );
+
+                particles = ::NS(Particles_buffer_get_particles)( pb, 0u );
+                success  &= ( particles != nullptr );
+
+                if( !success ) std::cout << "status 11" << std::endl;
             }
 
             if( success )
@@ -978,9 +1015,11 @@ namespace sixtrack
                 int const cmp_result = ::NS(Particles_compare_values_with_treshold)(
                     particles, final_state, abs_tolerance );
 
-                if( 0 != cmp_result  )
+                success = ( cmp_result == 0 );
+
+                if( !success  )
                 {
-                    std::cout << "cmp_result 07: " << cmp_result << std::endl;
+                    std::cout << "cmp_result 12: " << cmp_result << std::endl;
 
                     ::NS(Buffer)* diff_buffer = ::NS(Buffer_new)( 0u );
                     ::NS(Particles)* diff = ::NS(Particles_new)( diff_buffer,
@@ -1001,8 +1040,6 @@ namespace sixtrack
 
                     ::NS(Buffer_delete)( diff_buffer );
                     diff_buffer = nullptr;
-
-                    success = false;
                 }
             }
 
@@ -1015,11 +1052,8 @@ namespace sixtrack
                 status = ::NS(BeamMonitor_assign_output_buffer)(
                     eb, out_buffer, min_turn_id, num_elem_by_elem_turns );
 
-                if( status != ::NS(ARCH_STATUS_SUCCESS) )
-                {
-                    std::cout << "status 08 : " << status << std::endl;
-                    success = false;
-                }
+                success = ( status == ::NS(ARCH_STATUS_SUCCESS) );
+                if( !success ) std::cout << "status 13 : " << status << std::endl;
             }
 
             /* ------------------------------------------------------------- */
@@ -1032,15 +1066,14 @@ namespace sixtrack
             {
                 cmp_particles = ::NS(Particles_new)( cmp_particles_buffer,
                     ::NS(Particles_get_num_of_particles)( initial_state ) );
+
+                success &= ( cmp_particles != nullptr );
+                success &= ( NUM_BEAM_ELEMENTS > size_t{ 0 } );
+
+                if( !success ) std::cout << "status 14" << std::endl;
             }
 
-            success &= ( cmp_particles != nullptr );
-            success &= ( NUM_BEAM_ELEMENTS > size_t{ 0 } );
-
-            if( !success )
-            {
-                return success;
-            }
+            if( !success ) return success;
 
             ::NS(Object) const* obj_end =
                 ::NS(Buffer_get_const_objects_end)( eb );
@@ -1143,7 +1176,7 @@ namespace sixtrack
 
                             if( cmp_result != 0 )
                             {
-                                std::cout << "cmp_result 09: "
+                                std::cout << "cmp_result 15: "
                                           << cmp_result << std::endl
                                           << "jj = " << jj << " / kk = "
                                           << kk << std::endl;
@@ -1194,7 +1227,7 @@ namespace sixtrack
 
                 if( status != 0 )
                 {
-                    std::cout << "status 10: " << status << std::endl;
+                    std::cout << "status 16: " << status << std::endl;
                     success = false;
                 }
 
