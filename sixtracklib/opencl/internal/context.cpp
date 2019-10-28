@@ -421,9 +421,7 @@ namespace SIXTRL_CXX_NAMESPACE
         _status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( ( !out_buffer_arg.usesCObjectBuffer() ) ||
-            (  out_buffer_arg.ptrCObjectBuffer() == nullptr ) ||
-            ( size_t{ 1 } > ::NS(Buffer_get_num_of_objects)(
-                out_buffer_arg.ptrCObjectBuffer() ) ) )
+            (  out_buffer_arg.ptrCObjectBuffer() == nullptr ) )
         {
             return status;
         }
@@ -1158,7 +1156,7 @@ namespace SIXTRL_CXX_NAMESPACE
         _status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         _kernel_id_t const kernel_id =
-            this->assign_beam_monitor_output_kernel_id();
+            this->assign_elem_by_elem_output_kernel_id();
 
         _size_t const num_kernel_args = this->kernelNumArgs( kernel_id );
 
@@ -1382,6 +1380,15 @@ namespace SIXTRL_CXX_NAMESPACE
         return std::unique_ptr< _this_t::cl_buffer_t >( nullptr );
     }
 
+    void ClContext::delete_elem_by_elem_config_arg(
+        std::unique_ptr< SIXTRL_CXX_NAMESPACE::ClContext::cl_buffer_t >&& ptr )
+    {
+        std::unique_ptr< SIXTRL_CXX_NAMESPACE::ClContext::cl_buffer_t >
+            _local_ptr = std::move( ptr );
+
+        _local_ptr.reset( nullptr );
+    }
+
     _this_t::status_t ClContext::init_elem_by_elem_config_arg(
         _this_t::cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
         _this_t::elem_by_elem_config_t& SIXTRL_RESTRICT_REF elem_by_elem_config,
@@ -1574,8 +1581,6 @@ namespace SIXTRL_CXX_NAMESPACE
         using kernel_id_t = _kernel_id_t;
 
         _status_t status = st::ARCH_STATUS_SUCCESS;
-        if( !this->debugMode() ) return status;
-
         constexpr size_t NUM_KERNELS = size_t{ 6 };
 
         kernel_id_t kernel_ids[ NUM_KERNELS ];
@@ -2358,15 +2363,29 @@ cl_mem NS(ClContext_create_elem_by_elem_config_arg)(
 
             if( cl_ret == CL_SUCCESS )
             {
-                printf( "st_ClContext_create_elem_by_elem_config_arg() :: "
-                        "ref_cnt = %u\r\n", ( unsigned int )ref_cnt );
-
+                ::clRetainMemObject( arg_buffer );
                 return arg_buffer;
             }
         }
     }
 
     return cl_mem{};
+}
+
+void NS(ClContext_delete_elem_by_elem_config_arg)(
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg )
+{
+    cl_uint ref_cnt = cl_uint{ 10000 };
+    cl_int cl_ret = ::clGetMemObjectInfo( elem_by_elem_config_arg,
+        CL_MEM_REFERENCE_COUNT, sizeof( cl_uint ), &ref_cnt, nullptr );
+
+    if( ( cl_ret == CL_SUCCESS ) && ( ref_cnt > cl_uint{ 0 } ) )
+    {
+        ::clReleaseMemObject( elem_by_elem_config_arg );
+    }
+
+    ( void )ctx;
+    return;
 }
 
 ::NS(arch_status_t) NS(ClContext_init_elem_by_elem_config_arg)(

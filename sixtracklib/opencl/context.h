@@ -196,6 +196,9 @@ namespace SIXTRL_CXX_NAMESPACE
         std::unique_ptr< SIXTRL_CXX_NAMESPACE::ClContext::cl_buffer_t >
         create_elem_by_elem_config_arg();
 
+        void delete_elem_by_elem_config_arg(
+            std::unique_ptr< SIXTRL_CXX_NAMESPACE::ClContext::cl_buffer_t >&& );
+
         status_t init_elem_by_elem_config_arg(
             cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
             elem_by_elem_config_t& SIXTRL_RESTRICT_REF elem_by_elem_config,
@@ -497,6 +500,9 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContext_disable_beam_beam_tracking)(
 
 cl_mem NS(ClContext_create_elem_by_elem_config_arg)(
     NS(ClContext)* SIXTRL_RESTRICT ctx );
+
+void NS(ClContext_delete_elem_by_elem_config_arg)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg );
 
 NS(arch_status_t) NS(ClContext_init_elem_by_elem_config_arg)(
     NS(ClContext)* SIXTRL_RESTRICT ctx,
