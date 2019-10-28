@@ -498,7 +498,8 @@ NS(Track_particle_element_by_element_until_turn_objs)(
     NS(track_status_t) success = SIXTRL_TRACK_SUCCESS;
 
     typedef NS(particle_index_t) index_t;
-    typedef SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* ptr_out_particles_t;
+    typedef NS(ParticlesGenericAddr) out_particle_t;
+    typedef SIXTRL_BUFFER_DATAPTR_DEC out_particle_t* ptr_out_particles_t;
 
     ptr_out_particles_t out_particles = ( ptr_out_particles_t )(
             uintptr_t )NS(ElemByElemConfig_get_output_store_address)( config );
@@ -518,8 +519,8 @@ NS(Track_particle_element_by_element_until_turn_objs)(
         index_t at_element_id = start_at_element_id;
         index_t at_turn = NS(Particles_get_at_turn_value)( p, idx );
 
-        nelem_t const out_nn =
-            NS(Particles_get_num_of_particles)( out_particles );
+        nelem_t const out_nn = ( out_particles != SIXTRL_NULLPTR )
+            ? out_particles->num_particles : ( nelem_t )0u;
 
         bool continue_tracking = ( ( be_begin != be_end ) &&
             ( until_turn > at_turn ) && ( at_turn >= ( index_t )0u ) &&
@@ -542,8 +543,8 @@ NS(Track_particle_element_by_element_until_turn_objs)(
                 if( ( out_idx >= ( nelem_t )0u ) && ( out_idx < out_nn ) )
                 {
                     continue_tracking = ( SIXTRL_ARCH_STATUS_SUCCESS ==
-                        NS(Particles_copy_single)( out_particles,
-                            out_idx, p, idx ) );
+                        NS(Particles_copy_to_generic_addr_data)(
+                            out_particles, out_idx, p, idx ) );
                 }
 
                 if( continue_tracking )

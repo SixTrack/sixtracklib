@@ -151,7 +151,7 @@ NS(Track_particles_until_turn_opt_kernel_impl)(
     NS(track_status_t) status = SIXTRL_TRACK_SUCCESS;
 
     NS(Particles_init_from_flat_arrays)(
-        &particles, num_particles, &reals[ 0 ], &indices[ 0 ] );
+        &particles, ( nelements_t )1u, &reals[ 0 ], &indices[ 0 ] );
 
     SIXTRL_ASSERT( slot_size > ( SIXTRL_UINT64_T )0u );
     SIXTRL_ASSERT( in_particles != SIXTRL_NULLPTR );
@@ -261,7 +261,7 @@ NS(Track_particles_until_turn_debug_opt_kernel_impl)(
             status = SIXTRL_TRACK_SUCCESS;
 
             NS(Particles_init_from_flat_arrays)(
-                &particles, num_particles, &reals[ 0 ], &indices[ 0 ] );
+                &particles, ( nelements_t )1u, &reals[ 0 ], &indices[ 0 ] );
 
             for( ; pidx < num_particles ; pidx += stride )
             {
@@ -374,7 +374,7 @@ NS(Track_particles_elem_by_elem_until_turn_opt_kernel_impl)(
     NS(track_status_t) status = SIXTRL_TRACK_SUCCESS;
 
     NS(Particles_init_from_flat_arrays)(
-        &particles, num_particles, &reals[ 0 ], &indices[ 0 ] );
+        &particles, ( nelements_t )1u, &reals[ 0 ], &indices[ 0 ] );
 
     SIXTRL_ASSERT( slot_size > ( SIXTRL_UINT64_T )0u );
     SIXTRL_ASSERT( in_particles != SIXTRL_NULLPTR );
@@ -487,7 +487,7 @@ NS(Track_particles_elem_by_elem_until_turn_debug_opt_kernel_impl)(
             };
 
             NS(Particles_init_from_flat_arrays)(
-                &particles, num_particles, &reals[ 0 ], &indices[ 0 ] );
+                &particles, ( nelements_t )1u, &reals[ 0 ], &indices[ 0 ] );
 
             status = SIXTRL_TRACK_SUCCESS;
 
@@ -604,7 +604,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particles_line_opt_kernel_impl)(
     NS(track_status_t) status = SIXTRL_TRACK_SUCCESS;
 
     NS(Particles_init_from_flat_arrays)(
-        &particles, num_particles, &reals[ 0 ], &indices[ 0 ] );
+        &particles, ( nelements_t )1u, &reals[ 0 ], &indices[ 0 ] );
 
     SIXTRL_ASSERT( slot_size > ( SIXTRL_UINT64_T )0u );
     SIXTRL_ASSERT( in_particles != SIXTRL_NULLPTR );
@@ -715,7 +715,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particles_line_debug_opt_kernel_impl)(
             };
 
             NS(Particles_init_from_flat_arrays)(
-                &particles, num_particles, &reals[ 0 ], &indices[ 0 ] );
+                &particles, ( nelements_t )1u, &reals[ 0 ], &indices[ 0 ] );
 
             belem_begin = belem_begin + belem_begin_id;
             belem_end   = belem_end   + belem_end_id;
