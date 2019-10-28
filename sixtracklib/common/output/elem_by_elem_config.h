@@ -349,6 +349,12 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ElemByElemConfig_set_output_store_address_e
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ElemByElemConfig)*
+NS(ElemByElemConfig_create)( void );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ElemByElemConfig_delete)(
+    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ElemByElemConfig_init)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,

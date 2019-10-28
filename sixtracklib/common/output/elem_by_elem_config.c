@@ -225,6 +225,18 @@ void NS(ElemByElemConfig_set_output_store_address_ext)(
 
 /* ------------------------------------------------------------------------- */
 
+NS(ElemByElemConfig)* NS(ElemByElemConfig_create)( void )
+{
+    return NS(ElemByElemConfig_preset)( ( NS(ElemByElemConfig)* )malloc(
+        sizeof( NS(ElemByElemConfig) ) ) );
+}
+
+void NS(ElemByElemConfig_delete)(
+    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config )
+{
+    free( elem_by_elem_config );
+}
+
 NS(arch_status_t) NS(ElemByElemConfig_init)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
