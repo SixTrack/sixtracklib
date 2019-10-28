@@ -3,7 +3,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/opencl/internal/default_compile_options.h"
-    #include "sixtracklib/opencl/internal/success_flag.h"
+    #include "sixtracklib/opencl/internal/status_flag.h"
 
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
