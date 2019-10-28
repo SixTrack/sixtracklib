@@ -64,6 +64,12 @@ namespace SIXTRL_CXX_NAMESPACE
         static constexpr kernel_arg_type_t ARG_TYPE_RAW_PTR =
             kernel_arg_type_t{ 0x00000002 };
 
+        static constexpr kernel_arg_type_t ARG_TYPE_CL_ARGUMENT =
+            kernel_arg_type_t{ 0x00000010 };
+
+        static constexpr kernel_arg_type_t ARG_TYPE_CL_BUFFER =
+            kernel_arg_type_t{ 0x00000020 };
+
         static constexpr kernel_arg_type_t ARG_TYPE_INVALID =
             kernel_arg_type_t{ 0xffffffff };
 
@@ -447,13 +453,6 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             using arg_type_t = kernel_arg_type_t;
 
-            static const arg_type_t
-                ARG_TYPE_CL_ARGUMENT = arg_type_t{ 0x00000010 };
-
-            static const arg_type_t
-                ARG_TYPE_CL_BUFFER   = arg_type_t{ 0x00000020 };
-
-
             KernelData() :
                 m_kernel_name(),
                 m_program_id( -1 ),
@@ -662,7 +661,8 @@ namespace SIXTRL_CXX_NAMESPACE
             std::vector< node_id_t>& available_nodes_id,
             std::vector< node_info_t >&  available_nodes_info,
             std::vector< cl::Device  >&  available_devices,
-            const char *const filter_str = nullptr );
+            const char *const filter_str = nullptr,
+            bool const debug_mode = false );
 
         void doParseConfigStringBaseImpl(
             const char *const SIXTRL_RESTRICT config_str );

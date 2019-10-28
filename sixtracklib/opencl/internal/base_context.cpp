@@ -38,6 +38,8 @@ namespace SIXTRL_CXX_NAMESPACE
     constexpr _this_t::kernel_arg_type_t _this_t::ARG_TYPE_NONE;
     constexpr _this_t::kernel_arg_type_t _this_t::ARG_TYPE_VALUE;
     constexpr _this_t::kernel_arg_type_t _this_t::ARG_TYPE_RAW_PTR;
+    constexpr _this_t::kernel_arg_type_t _this_t::ARG_TYPE_CL_ARGUMENT;
+    constexpr _this_t::kernel_arg_type_t _this_t::ARG_TYPE_CL_BUFFER;
     constexpr _this_t::kernel_arg_type_t _this_t::ARG_TYPE_INVALID;
     constexpr _this_t::size_type _this_t::MIN_NUM_REMAP_BUFFER_ARGS;
 
@@ -107,7 +109,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         _this_t::UpdateAvailableNodes(
             this->m_available_nodes_id, this->m_available_nodes_info,
-            this->m_available_devices );
+            this->m_available_devices, nullptr, this->debugMode() );
 
         this->doSetConfigStr( config_str );
 
@@ -160,7 +162,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         _this_t::UpdateAvailableNodes(
             this->m_available_nodes_id, this->m_available_nodes_info,
-            this->m_available_devices );
+            this->m_available_devices, nullptr, this->debugMode() );
 
         SIXTRL_ASSERT( this->m_available_nodes_id.size() ==
                        this->m_available_nodes_info.size() );
@@ -217,7 +219,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         _this_t::UpdateAvailableNodes(
             this->m_available_nodes_id, this->m_available_nodes_info,
-            this->m_available_devices );
+            this->m_available_devices, nullptr, this->debugMode() );
 
         SIXTRL_ASSERT( this->m_available_nodes_id.size() ==
                        this->m_available_nodes_info.size() );
@@ -274,7 +276,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         _this_t::UpdateAvailableNodes(
             this->m_available_nodes_id, this->m_available_nodes_info,
-            this->m_available_devices );
+            this->m_available_devices, nullptr, this->debugMode() );
 
         SIXTRL_ASSERT( this->m_available_nodes_id.size() ==
                        this->m_available_nodes_info.size() );
@@ -1505,7 +1507,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( arg.size() > _this_t::size_type{ 0 } );
 
         this->m_kernel_data.at( kernel_id ).setKernelArg(
-            ClContextBase::kernel_data_t::ARG_TYPE_CL_ARGUMENT, index, &arg );
+            _this_t::ARG_TYPE_CL_ARGUMENT, index, &arg );
 
         cl::Kernel* kernel = this->openClKernel( kernel_id );
         if( kernel != nullptr ) kernel->setArg( index, arg.openClBuffer() );
@@ -1518,7 +1520,7 @@ namespace SIXTRL_CXX_NAMESPACE
             cl::Buffer& SIXTRL_RESTRICT_REF cl_buffer_arg )
     {
         this->m_kernel_data.at( kernel_id ).setKernelArg(
-            _this_t::kernel_data_t::ARG_TYPE_CL_BUFFER, arg_index, nullptr );
+            _this_t::ARG_TYPE_CL_BUFFER, arg_index, &cl_buffer_arg );
 
         cl::Kernel* kernel = this->openClKernel( kernel_id );
         if( kernel != nullptr ) kernel->setArg( arg_index, cl_buffer_arg );
@@ -2165,10 +2167,38 @@ namespace SIXTRL_CXX_NAMESPACE
             auto& build_device =
                 this->m_available_devices.at( this->m_selected_node_index );
 
-            cl_int ret = cl_program.build( program_data.m_compile_options.c_str() );
+            cl_int ret = CL_SUCCESS;
+            cl_build_status build_status = CL_BUILD_NONE;
 
-            cl_build_status const build_status =
-                cl_program.getBuildInfo< CL_PROGRAM_BUILD_STATUS >( build_device );
+            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
+                         SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+            try
+            {
+            #endif /* OpenCL 1.x C++ Host Exceptions enabled */
+
+                ret = cl_program.build( program_data.m_compile_options.c_str() );
+                build_status = cl_program.getBuildInfo<
+                        CL_PROGRAM_BUILD_STATUS >( build_device );
+
+            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
+                         SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+            }
+            catch( cl::Error& e )
+            {
+                if( ( this->debugMode() ) &&
+                    ( e.err() == CL_BUILD_PROGRAM_FAILURE ) )
+                {
+                    std::string name = build_device.getInfo< CL_DEVICE_NAME >();
+                    std::string buildlog = cl_program.getBuildInfo<
+                        CL_PROGRAM_BUILD_LOG >( build_device );
+
+                    std::cerr << "Build log for " << name << ":" << std::endl
+                              << buildlog << std::endl;
+                }
+
+                throw e;
+            }
+            #endif /* OpenCL 1.x C++ Host Exceptions enabled */
 
             if( ( build_status != CL_BUILD_NONE ) || ( ret == CL_SUCCESS ) )
             {
@@ -2222,18 +2252,11 @@ namespace SIXTRL_CXX_NAMESPACE
                 program_data.m_compile_report.clear();
             }
 
-            #if !defined( NDEBUG )
-
-            if( ( !program_data.m_compile_report.empty() ) ||
-                ( !program_data.m_compiled ) )
-            #else /* defined( NDEBUG ) */
-
             if( ( this->debugMode() ) &&
                 ( ( !program_data.m_compile_report.empty() ) ||
                   ( !program_data.m_compiled ) ) )
-            #endif /* !defined( NDEBUG ) */
             {
-                std::cout << "program_name    : "
+                std::cerr << "program_name    : "
                           << program_data.m_file_path << "\r\n"
                           << "compiled        : "
                           << std::boolalpha   << program_data.m_compiled
@@ -2253,15 +2276,20 @@ namespace SIXTRL_CXX_NAMESPACE
         std::vector< _this_t::node_id_t>& available_nodes_id,
         std::vector< _this_t::node_info_t >& available_nodes_info,
         std::vector< cl::Device >& available_devices,
-        const char *const filter_str )
+        const char *const filter_str, bool const debug_mode )
     {
-        ( void )filter_str;
-
         platform_id_t platform_index = 0;
         device_id_t   device_index   = 0;
 
         std::vector< cl::Device > devices;
         std::vector< cl::Platform > platforms;
+
+        #if !defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) || \
+                      SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 0
+        ( void )debug_mode;
+        #endif /* OpenCL 1.x C++ Host Exceptions enabled */
+
+        ( void )filter_str;
 
         available_nodes_id.clear();
         available_nodes_info.clear();
@@ -2283,7 +2311,7 @@ namespace SIXTRL_CXX_NAMESPACE
             std::string platform_name = platform.getInfo< CL_PLATFORM_NAME >();
 
             #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
-                SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+                         SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
             try
             {
             #endif /* OpenCL 1.x C++ Host Exceptions enabled */
@@ -2291,15 +2319,16 @@ namespace SIXTRL_CXX_NAMESPACE
             platform.getDevices( CL_DEVICE_TYPE_ALL, &devices );
 
             #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
-                SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+                         SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
             }
             catch( cl::Error const& e )
             {
-                #if !defined( NDEBUG )
-                std::cerr << "Error while probing devices for platform "
-                          << platform_name << " --> skipping"
-                          << std::endl;
-                #endif /* !defined( NDEBUG ) */
+                if( debug_mode )
+                {
+                    std::cerr << "Error while probing devices for platform "
+                              << platform_name << " --> skipping"
+                              << std::endl;
+                }
             }
             #endif /* OpenCL 1.x C++ Host Exceptions enabled */
 
