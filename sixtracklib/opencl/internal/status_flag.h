@@ -14,7 +14,11 @@
 
     SIXTRL_STATIC SIXTRL_DEVICE_FN
     void NS(OpenCl1x_collect_status_flag_value)(
-        SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flag,
+        volatile SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* ptr_status_flag,
+        NS(arch_debugging_t) const local_status_flag );
+
+    SIXTRL_INLINE void NS(OpenCl1x_collect_status_flag_value)(
+        volatile SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* ptr_status_flag,
         NS(arch_debugging_t) const local_status_flag )
     {
         if( ( ptr_status_flag   != SIXTRL_NULLPTR ) &&
