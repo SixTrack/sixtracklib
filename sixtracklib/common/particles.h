@@ -1535,41 +1535,38 @@ SIXTRL_INLINE void NS(Particles_init_from_flat_arrays)(
         ( index_array != SIXTRL_NULLPTR ) &&
         ( num_particles > ( NS(particle_num_elements_t) )0u ) )
     {
-        uintptr_t const real_offset =
-            sizeof( NS(particle_real_t) ) * num_particles;
+        SIXTRL_ASSERT( ( ( sizeof( NS(particle_real_t) ) *
+            num_particles ) % 8u ) == 0u );
 
-        uintptr_t const index_offset =
-            sizeof( NS(particle_index_t) ) * num_particles;
+        SIXTRL_ASSERT( ( (  sizeof( NS(particle_index_t) ) *
+            num_particles ) % 8u ) == 0u );
 
-        SIXTRL_ASSERT( ( real_offset  % 8u ) == 0u );
-        SIXTRL_ASSERT( ( ( ( uintptr_t )real_array ) % 8u ) == 0u );
-
-        SIXTRL_ASSERT( ( index_offset % 8u ) == 0u );
-        SIXTRL_ASSERT( ( ( ( uintptr_t )index_offset ) % 8u ) == 0u );
+        SIXTRL_ASSERT( ( ( ( uintptr_t )real_array  ) % 8u ) == 0u );
+        SIXTRL_ASSERT( ( ( ( uintptr_t )index_array ) % 8u ) == 0u );
 
         p->num_particles = num_particles;
         p->q0            = &real_array[  0 ];
-        p->mass0         = &real_array[  real_offset ];
-        p->beta0         = &real_array[  2 * real_offset ];
-        p->gamma0        = &real_array[  3 * real_offset ];
-        p->p0c           = &real_array[  4 * real_offset ];
-        p->s             = &real_array[  5 * real_offset ];
-        p->x             = &real_array[  6 * real_offset ];
-        p->y             = &real_array[  7 * real_offset ];
-        p->px            = &real_array[  8 * real_offset ];
-        p->py            = &real_array[  9 * real_offset ];
-        p->zeta          = &real_array[ 10 * real_offset ];
-        p->psigma        = &real_array[ 11 * real_offset ];
-        p->delta         = &real_array[ 12 * real_offset ];
-        p->rpp           = &real_array[ 13 * real_offset ];
-        p->rvv           = &real_array[ 14 * real_offset ];
-        p->chi           = &real_array[ 15 * real_offset ];
-        p->charge_ratio  = &real_array[ 16 * real_offset ];
+        p->mass0         = &real_array[  num_particles ];
+        p->beta0         = &real_array[  2 * num_particles ];
+        p->gamma0        = &real_array[  3 * num_particles ];
+        p->p0c           = &real_array[  4 * num_particles ];
+        p->s             = &real_array[  5 * num_particles ];
+        p->x             = &real_array[  6 * num_particles ];
+        p->y             = &real_array[  7 * num_particles ];
+        p->px            = &real_array[  8 * num_particles ];
+        p->py            = &real_array[  9 * num_particles ];
+        p->zeta          = &real_array[ 10 * num_particles ];
+        p->psigma        = &real_array[ 11 * num_particles ];
+        p->delta         = &real_array[ 12 * num_particles ];
+        p->rpp           = &real_array[ 13 * num_particles ];
+        p->rvv           = &real_array[ 14 * num_particles ];
+        p->chi           = &real_array[ 15 * num_particles ];
+        p->charge_ratio  = &real_array[ 16 * num_particles ];
 
         p->particle_id   = &index_array[ 0 ];
-        p->at_element_id = &index_array[ index_offset ];
-        p->at_turn       = &index_array[ 2 * index_offset ];
-        p->state         = &index_array[ 3 * index_offset ];
+        p->at_element_id = &index_array[ num_particles ];
+        p->at_turn       = &index_array[ 2 * num_particles ];
+        p->state         = &index_array[ 3 * num_particles ];
     }
 }
 
