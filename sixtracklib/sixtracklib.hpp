@@ -42,6 +42,7 @@
 
 #include "sixtracklib/cuda/argument.hpp"
 #include "sixtracklib/cuda/controller.hpp"
+#include "sixtracklib/cuda/track_job.hpp"
 
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
 
