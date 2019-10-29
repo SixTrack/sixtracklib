@@ -30,10 +30,7 @@ namespace st = SIXTRL_CXX_NAMESPACE;
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    namespace
-    {
-        using _this_t = st::ClContextBase;
-    }
+    using  _this_t = st::ClContextBase;
 
     constexpr _this_t::kernel_arg_type_t _this_t::ARG_TYPE_NONE;
     constexpr _this_t::kernel_arg_type_t _this_t::ARG_TYPE_VALUE;
@@ -499,6 +496,30 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return ( index < this->numAvailableNodes() )
                ? &this->m_available_nodes_info[ index ] : nullptr;
+    }
+
+    bool ClContextBase::isAvailableNodeAMDPlatform(
+        _this_t::size_type const index ) const SIXTRL_NOEXCEPT
+    {
+        bool is_amd_platform = false;
+
+        _this_t::node_info_t const* node_info =
+            this->ptrAvailableNodesInfo( index );
+
+        if( node_info != nullptr )
+        {
+            char _temp[ 5 ] = { '\0', '\0', '\0', '\0', '\0' };
+
+            std::strncpy( &_temp[ 0 ], ::NS(ComputeNodeInfo_get_platform)(
+                node_info ), 5u );
+
+            std::transform( &_temp[ 0 ], &_temp[ 5 ], &_temp[ 0 ],
+                [](unsigned char c){ return std::tolower(c); } );
+
+            is_amd_platform = ( 0 == std::strncmp( &_temp[ 0 ], "amd ", 4u ) );
+        }
+
+        return is_amd_platform;
     }
 
     bool ClContextBase::hasSelectedNode() const SIXTRL_NOEXCEPT
@@ -2452,6 +2473,14 @@ NS(ClContextBase_get_available_node_info_by_index)(
 {
     return ( ctx != nullptr )
         ? ctx->ptrAvailableNodesInfo( node_index ) : nullptr;
+}
+
+bool NS(ClContextBase_is_available_node_amd_platform)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    ::NS(context_size_t) const node_index )
+{
+    return ( ( ctx != nullptr ) &&
+             ( ctx->isAvailableNodeAMDPlatform( node_index ) ) );
 }
 
 ::NS(context_node_info_t) const*

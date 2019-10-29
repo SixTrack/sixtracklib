@@ -159,6 +159,9 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN node_info_t const*  ptrAvailableNodesInfo(
             char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN bool isAvailableNodeAMDPlatform(
+            size_type const index ) const SIXTRL_NOEXCEPT;
+
         SIXTRL_HOST_FN bool hasSelectedNode() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN cl::Device const*
@@ -760,6 +763,11 @@ NS(ClContextBase_get_available_nodes_info_end)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_node_info_t) const*
 NS(ClContextBase_get_available_node_info_by_index)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT context,
+    NS(context_size_t) const node_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(ClContextBase_is_available_node_amd_platform)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT context,
     NS(context_size_t) const node_index );
 
