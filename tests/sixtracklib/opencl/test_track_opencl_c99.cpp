@@ -65,10 +65,10 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeamDe
     {
         context = ::NS(ClContext_create)();
         ::NS(ClContextBase_enable_debug_mode)( context );
-        ::NS(ClContext_disable_optimized_tracking_by_default)( context );
+        ::NS(ClContext_disable_optimized_tracking)( context );
 
         ASSERT_TRUE(  ::NS(ClContextBase_is_debug_mode_enabled)( context ) );
-        ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking_by_default)( context ) );
+        ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking)( context ) );
 
         ASSERT_TRUE(  ::NS(ClContextBase_select_node_by_index)( context, nn ) );
         ASSERT_TRUE(  ::NS(ClContextBase_has_selected_node)( context ) );
@@ -144,10 +144,23 @@ TEST( C99_OpenCL_TrackParticlesTests,
     {
         context = ::NS(ClContext_create)();
         ::NS(ClContextBase_enable_debug_mode)( context );
-        ::NS(ClContext_enable_optimized_tracking_by_default)( context );
+
+        if( !::NS(ClContextBase_is_available_node_amd_platform)( context, nn ) )
+        {
+            ::NS(ClContext_enable_optimized_tracking)( context );
+            ASSERT_TRUE( ::NS(ClContext_uses_optimized_tracking)( context ) );
+        }
+        else
+        {
+            /* WARNING: Workaround */
+            std::cout << "WORKAROUND: Skipping optimized tracking for AMD"
+                      << " platforms\r\n";
+
+            ::NS(ClContext_disable_optimized_tracking)( context );
+            ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking)( context ) );
+        }
 
         ASSERT_TRUE( ::NS(ClContextBase_is_debug_mode_enabled)( context ) );
-        ASSERT_TRUE( ::NS(ClContext_uses_optimized_tracking_by_default)( context ) );
 
         ASSERT_TRUE( ::NS(ClContextBase_select_node_by_index)( context, nn ) );
         ASSERT_TRUE( ::NS(ClContextBase_has_selected_node)( context ) );
@@ -221,10 +234,10 @@ TEST( C99_OpenCL_TrackParticlesTests, LHCReproduceSixTrackSingleTurnNoBeamBeam )
     {
         context = ::NS(ClContext_create)();
         ::NS(ClContextBase_disable_debug_mode)( context );
-        ::NS(ClContext_disable_optimized_tracking_by_default)( context );
+        ::NS(ClContext_disable_optimized_tracking)( context );
 
         ASSERT_TRUE( !::NS(ClContextBase_is_debug_mode_enabled)( context ) );
-        ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking_by_default)( context ) );
+        ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking)( context ) );
 
         ASSERT_TRUE(  ::NS(ClContextBase_select_node_by_index)( context, nn ) );
         ASSERT_TRUE(  ::NS(ClContextBase_has_selected_node)( context ) );
@@ -300,11 +313,23 @@ TEST( C99_OpenCL_TrackParticlesTests,
     {
         context = ::NS(ClContext_create)();
         ::NS(ClContextBase_disable_debug_mode)( context );
-        ::NS(ClContext_enable_optimized_tracking_by_default)( context );
+
+        if( !::NS(ClContextBase_is_available_node_amd_platform)( context, nn ) )
+        {
+            ::NS(ClContext_enable_optimized_tracking)( context );
+            ASSERT_TRUE( ::NS(ClContext_uses_optimized_tracking)( context ) );
+        }
+        else
+        {
+            /* WARNING: Workaround */
+            std::cout << "WORKAROUND: Skipping optimized tracking for AMD"
+                      << " platforms\r\n";
+
+            ::NS(ClContext_disable_optimized_tracking)( context );
+            ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking)( context ) );
+        }
 
         ASSERT_TRUE( !::NS(ClContextBase_is_debug_mode_enabled)( context ) );
-        ASSERT_TRUE(  ::NS(ClContext_uses_optimized_tracking_by_default)( context ) );
-
         ASSERT_TRUE(  ::NS(ClContextBase_select_node_by_index)( context, nn ) );
         ASSERT_TRUE(  ::NS(ClContextBase_has_selected_node)( context ) );
 

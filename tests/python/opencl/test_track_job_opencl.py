@@ -80,8 +80,12 @@ if __name__ == '__main__':
     ptr_belem_buffer = st_Buffer_new_mapped_on_cbuffer(eb)
     ptr_particles = st_Particles_cbuffer_get_particles(cmp_track_pb, 0)
 
-    status = st_ElemByElemConfig_init(elem_by_elem_config, ptr_particles,
-        ptr_belem_buffer, start_elem_idx_arg, until_turn_elem_by_elem_arg)
+    status = st_ElemByElemConfig_init(
+        elem_by_elem_config,
+        ptr_particles,
+        ptr_belem_buffer,
+        start_elem_idx_arg,
+        until_turn_elem_by_elem_arg)
     assert status == 0
 
     assert cmp_output_buffer.n_objects == 3
@@ -101,7 +105,7 @@ if __name__ == '__main__':
 
     status = st_Track_all_particles_element_by_element_until_turn(
         ptr_particles, elem_by_elem_config, ptr_belem_buffer,
-            until_turn_elem_by_elem_arg)
+        until_turn_elem_by_elem_arg)
 
     assert status == 0
 

@@ -181,15 +181,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        bool useOptimizedTrackingByDefault() const SIXTRL_NOEXCEPT;
-        void enableOptimizedtrackingByDefault();
-        void disableOptimizedTrackingByDefault();
+        bool use_optimized_tracking() const SIXTRL_NOEXCEPT;
+        void enable_optimized_tracking();
+        void disable_optimized_tracking();
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        bool isBeamBeamTrackingEnabled() const SIXTRL_NOEXCEPT;
-        void enableBeamBeamTracking();
-        void disableBeamBeamTracking();
+        bool is_beam_beam_tracking_enabled() const SIXTRL_NOEXCEPT;
+        void enable_beam_beam_tracking();
+        void disable_beam_beam_tracking();
 
         /* ----------------------------------------------------------------- */
 
@@ -220,6 +220,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
+        bool doSelectNode( size_type node_index ) override;
         bool doInitDefaultPrograms() override;
         bool doInitDefaultKernels()  override;
 
@@ -473,17 +474,14 @@ NS(ClContext_num_particles_in_selected_set)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool
-NS(ClContext_uses_optimized_tracking_by_default)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContext_uses_optimized_tracking)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void
-NS(ClContext_enable_optimized_tracking_by_default)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx );
+NS(ClContext_enable_optimized_tracking)( NS(ClContext)* SIXTRL_RESTRICT ctx );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void
-NS(ClContext_disable_optimized_tracking_by_default)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx );
+NS(ClContext_disable_optimized_tracking)( NS(ClContext)* SIXTRL_RESTRICT ctx );
 
 /* ------------------------------------------------------------------------- */
 
