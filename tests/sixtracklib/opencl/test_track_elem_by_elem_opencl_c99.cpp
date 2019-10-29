@@ -1,8 +1,10 @@
 #include <algorithm>
+#include <cctype>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <cstdio>
+#include <cstring>
 #include <chrono>
 #include <cmath>
 #include <fstream>
@@ -166,12 +168,9 @@ TEST( C99_OpenCLTrackElemByElemTests, TrackElemByElemHostAndDeviceCompareDrifts)
     {
         bool const debug_mode[] = { false, true, false, true };
         bool const optimized[]  = { false, false, true, true };
-        size_t jj = size_t{ 0 };
 
         for( size_t const node_index : nodes )
         {
-            std::cout << "jj = " << jj << std::endl;
-
             for( size_t ii = size_t{ 0 } ; ii < size_t{ 4 } ; ++ii )
             {
                 auto start_create = std::chrono::system_clock::now();
@@ -192,18 +191,31 @@ TEST( C99_OpenCLTrackElemByElemTests, TrackElemByElemHostAndDeviceCompareDrifts)
 
                 if( optimized[ ii ] )
                 {
-                    ::NS(ClContext_enable_optimized_tracking_by_default)( ctx );
+                    if( !::NS(ClContextBase_is_available_node_amd_platform)(
+                            ctx, node_index ) )
+                    {
+                        ::NS(ClContext_enable_optimized_tracking)( ctx );
+                        ASSERT_TRUE( ::NS(ClContext_uses_optimized_tracking)(
+                            ctx ) );
+                    }
+                    else
+                    {
+                        /* WARNING: Workaround */
+                        std::cout << "WORKAROUND: Skipping optimized tracking "
+                                  << " for AMD platforms\r\n";
+
+                        ::NS(ClContext_disable_optimized_tracking)( ctx );
+                        ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking)(
+                            ctx ) );
+                    }
                 }
                 else
                 {
-                    ::NS(ClContext_disable_optimized_tracking_by_default)( ctx );
+                    ::NS(ClContext_disable_optimized_tracking)( ctx );
                 }
 
                 ASSERT_TRUE( debug_mode[ ii ] ==
                     ::NS(ClContextBase_is_debug_mode_enabled)( ctx ) );
-
-                ASSERT_TRUE( optimized[ ii ] ==
-                    ::NS(ClContext_uses_optimized_tracking_by_default)( ctx ) );
 
                 auto start_select = std::chrono::system_clock::now();
                 bool success = ::NS(ClContextBase_select_node_by_index)(
@@ -241,7 +253,7 @@ TEST( C99_OpenCLTrackElemByElemTests, TrackElemByElemHostAndDeviceCompareDrifts)
                       << "\r\n" << "# Debug mode  :: " << std::boolalpha
                       << ::NS(ClContextBase_is_debug_mode_enabled)( ctx )
                       << "\r\n" << "# Optimized   :: "
-                      << ::NS(ClContext_uses_optimized_tracking_by_default)(
+                      << ::NS(ClContext_uses_optimized_tracking)(
                         ctx ) << "\r\n" << std::noboolalpha << "# "
                       << std::endl;
 

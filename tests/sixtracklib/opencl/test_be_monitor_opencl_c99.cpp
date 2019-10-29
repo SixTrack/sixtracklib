@@ -131,8 +131,8 @@ TEST( C99_OpenCLBeamMonitorTests, AssignIoBufferToBeamMonitors )
     for( size_t const node_index : nodes )
     {
         context = ::NS(ClContext_create)();
-        ::NS(ClContextBase_enable_debug_mode)( context );
 
+        ::NS(ClContextBase_enable_debug_mode)( context );
         ASSERT_TRUE( ::NS(ClContextBase_is_debug_mode_enabled)( context ) );
         ASSERT_TRUE( ::NS(ClContextBase_select_node_by_index)(
             context, node_index ) );
@@ -513,10 +513,10 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
         {
             ctx = ::NS(ClContext_create)();
             ::NS(ClContextBase_enable_debug_mode)( ctx );
-            ::NS(ClContext_disable_optimized_tracking_by_default)( ctx );
+            ::NS(ClContext_disable_optimized_tracking)( ctx );
 
             ASSERT_TRUE(  ::NS(ClContextBase_is_debug_mode_enabled)( ctx ) );
-            ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking_by_default)(
+            ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking)(
                 ctx ) );
             ASSERT_TRUE(  ::NS(ClContextBase_select_node_by_index)(
                 ctx, node_index ) );
@@ -545,7 +545,7 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
                       << std::boolalpha
                       << ::NS(ClContextBase_is_debug_mode_enabled)( ctx )
                       << "\r\n" << "# Optimized   :: "
-                      << ::NS(ClContext_uses_optimized_tracking_by_default)(
+                      << ::NS(ClContext_uses_optimized_tracking)(
                         ctx ) << "\r\n"
                       << std::noboolalpha
                       << "# "
@@ -567,11 +567,11 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
         {
             ctx = ::NS(ClContext_create)();
             ::NS(ClContextBase_disable_debug_mode)( ctx );
-            ::NS(ClContext_disable_optimized_tracking_by_default)( ctx );
+            ::NS(ClContext_disable_optimized_tracking)( ctx );
 
             ASSERT_TRUE( !::NS(ClContextBase_is_debug_mode_enabled)( ctx ) );
 
-            ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking_by_default)(
+            ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking)(
                 ctx ) );
 
             ASSERT_TRUE(  ::NS(ClContextBase_select_node_by_index)(
@@ -601,7 +601,7 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
                       << std::boolalpha
                       << ::NS(ClContextBase_is_debug_mode_enabled)( ctx )
                       << "\r\n" << "# Optimized   :: "
-                      << ::NS(ClContext_uses_optimized_tracking_by_default)(
+                      << ::NS(ClContext_uses_optimized_tracking)(
                         ctx ) << "\r\n"
                       << std::noboolalpha << "# " << std::endl;
 
@@ -621,11 +621,25 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
 
             ctx = ::NS(ClContext_create)();
             ::NS(ClContextBase_enable_debug_mode)( ctx );
-            ::NS(ClContext_enable_optimized_tracking_by_default)( ctx );
+
+            if( !::NS(ClContextBase_is_available_node_amd_platform)(
+                ctx, node_index ) )
+            {
+                ::NS(ClContext_enable_optimized_tracking)( ctx );
+                ASSERT_TRUE( ::NS(ClContext_uses_optimized_tracking)( ctx ) );
+            }
+            else
+            {
+                /* WARNING: Workaround */
+                std::cout << "WORKAROUND: Skipping optimized tracking for AMD"
+                          << " platforms\r\n";
+
+                ::NS(ClContext_disable_optimized_tracking)( ctx );
+                ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking)( ctx ) );
+            }
 
             ASSERT_TRUE(  ::NS(ClContextBase_is_debug_mode_enabled)( ctx ) );
-            ASSERT_TRUE(  ::NS(ClContext_uses_optimized_tracking_by_default)(
-                ctx ) );
+
             ASSERT_TRUE(  ::NS(ClContextBase_select_node_by_index)(
                 ctx, node_index ) );
 
@@ -653,7 +667,7 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
                       << std::boolalpha
                       << ::NS(ClContextBase_is_debug_mode_enabled)( ctx )
                       << "\r\n" << "# Optimized   :: "
-                      << ::NS(ClContext_uses_optimized_tracking_by_default)(
+                      << ::NS(ClContext_uses_optimized_tracking)(
                         ctx ) << "\r\n"
                       << std::noboolalpha << "# " << std::endl;
 
@@ -671,13 +685,23 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
         {
             ctx = ::NS(ClContext_create)();
             ::NS(ClContextBase_disable_debug_mode)( ctx );
-            ::NS(ClContext_enable_optimized_tracking_by_default)( ctx );
+
+            if( !::NS(ClContextBase_is_available_node_amd_platform)( ctx, node_index ) )
+            {
+                ::NS(ClContext_enable_optimized_tracking)( ctx );
+                ASSERT_TRUE(  ::NS(ClContext_uses_optimized_tracking)( ctx ) );
+            }
+            else
+            {
+                /* WARNING: Workaround */
+                std::cout << "WORKAROUND: Skipping optimized tracking for AMD"
+                          << " platforms\r\n";
+
+                ::NS(ClContext_disable_optimized_tracking)( ctx );
+                ASSERT_TRUE( !::NS(ClContext_uses_optimized_tracking)( ctx ) );
+            }
 
             ASSERT_TRUE( !::NS(ClContextBase_is_debug_mode_enabled)( ctx ) );
-
-            ASSERT_TRUE(  ::NS(ClContext_uses_optimized_tracking_by_default)(
-                ctx ) );
-
             ASSERT_TRUE(  ::NS(ClContextBase_select_node_by_index)(
                 ctx, node_index ) );
 
@@ -705,7 +729,7 @@ TEST( C99_OpenCLBeamMonitorTests, TrackingAndTurnByTurnIODebug )
                       << std::boolalpha
                       << ::NS(ClContextBase_is_debug_mode_enabled)( ctx )
                       << "\r\n" << "# Optimized   :: "
-                      << ::NS(ClContext_uses_optimized_tracking_by_default)(
+                      << ::NS(ClContext_uses_optimized_tracking)(
                         ctx ) << "\r\n" << std::noboolalpha << "# "
                       << std::endl;
 
