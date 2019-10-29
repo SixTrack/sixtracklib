@@ -94,7 +94,7 @@ namespace SIXTRL_CXX_NAMESPACE
         operator=( CudaArgument const& rhs ) = delete;
         SIXTRL_HOST_FN CudaArgument& operator=( CudaArgument&& rhs ) = delete;
 
-        SIXTRL_HOST_FN virtual ~CudaArgument() = default;
+        SIXTRL_HOST_FN virtual ~CudaArgument();
 
         /* ----------------------------------------------------------------- */
 
