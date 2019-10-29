@@ -456,7 +456,7 @@ st_ElemByElemConfig_create.restype = st_ElemByElemConfig_p
 st_ElemByElemConfig_create.argtypes = None
 
 st_ElemByElemConfig_delete = sixtracklib.st_ElemByElemConfig_delete
-st_ElemByElemConfig_delete.argtypes = [ st_ElemByElemConfig_p ]
+st_ElemByElemConfig_delete.argtypes = [st_ElemByElemConfig_p]
 st_ElemByElemConfig_delete.restype = None
 
 st_ElemByElemConfig_is_active = \
@@ -572,15 +572,24 @@ st_ElemByElemConfig_get_at_turn_from_store_index.restype = st_particle_index_t
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 st_ElemByElemConfig_init = sixtracklib.st_ElemByElemConfig_init
-st_ElemByElemConfig_init.argtypes = [ st_ElemByElemConfig_p, st_Particles_p,
-    st_Buffer_p, st_particle_index_t, st_particle_index_t ]
+st_ElemByElemConfig_init.argtypes = [
+    st_ElemByElemConfig_p,
+    st_Particles_p,
+    st_Buffer_p,
+    st_particle_index_t,
+    st_particle_index_t]
 st_ElemByElemConfig_init.restype = st_arch_status_t
 
 st_ElemByElemConfig_init_on_particle_sets = \
     sixtracklib.st_ElemByElemConfig_init_on_particle_sets
-st_ElemByElemConfig_init_on_particle_sets.argtypes = [ st_ElemByElemConfig_p,
-    st_Buffer_p, st_buffer_size_t, st_buffer_size_p, st_Buffer_p,
-    st_particle_index_t, st_particle_index_t ]
+st_ElemByElemConfig_init_on_particle_sets.argtypes = [
+    st_ElemByElemConfig_p,
+    st_Buffer_p,
+    st_buffer_size_t,
+    st_buffer_size_p,
+    st_Buffer_p,
+    st_particle_index_t,
+    st_particle_index_t]
 st_ElemByElemConfig_init_on_particle_sets.restype = st_arch_status_t
 
 st_ElemByElemConfig_init_detailed = \
@@ -600,13 +609,14 @@ st_ElemByElemConfig_init_detailed.restype = st_arch_status_t
 st_ElemByElemConfig_assign_output_buffer = \
     sixtracklib.st_ElemByElemConfig_assign_output_buffer
 st_ElemByElemConfig_assign_output_buffer.restype = st_arch_status_t
-st_ElemByElemConfig_assign_output_buffer.argtypes = [ st_ElemByElemConfig_p,
-    st_Buffer_p, st_buffer_size_t ]
+st_ElemByElemConfig_assign_output_buffer.argtypes = [
+    st_ElemByElemConfig_p, st_Buffer_p, st_buffer_size_t]
+
 
 def st_ElemByElemConfig_assign_output_cbuffer(
         elem_by_elem_config,
         output_buffer,
-        out_buffer_offset_index ):
+        out_buffer_offset_index):
     ptr_output_buffer = st_Buffer_new_mapped_on_cbuffer(output_buffer)
 
     out_buffer_offset_index_arg = st_buffer_size_t(out_buffer_offset_index)
@@ -619,6 +629,7 @@ def st_ElemByElemConfig_assign_output_cbuffer(
     return ret
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 
 st_ElemByElemConfig_preset = sixtracklib.st_ElemByElemConfig_preset_ext
 st_ElemByElemConfig_preset.argtypes = [st_ElemByElemConfig_p]
@@ -3133,10 +3144,10 @@ st_Track_all_particles_until_turn = \
     sixtracklib.st_Track_all_particles_until_turn
 st_Track_all_particles_until_turn.restype = st_track_status_t
 st_Track_all_particles_until_turn.argtypes = [
-    st_Particles_p, st_Buffer_p, st_particle_index_t ]
+    st_Particles_p, st_Buffer_p, st_particle_index_t]
 
 st_Track_all_particles_element_by_element_until_turn = \
     sixtracklib.st_Track_all_particles_element_by_element_until_turn
 st_Track_all_particles_element_by_element_until_turn.restype = st_track_status_t
 st_Track_all_particles_element_by_element_until_turn.argtypes = [
-    st_Particles_p, st_ElemByElemConfig_p, st_Buffer_p, ct.c_int64 ]
+    st_Particles_p, st_ElemByElemConfig_p, st_Buffer_p, ct.c_int64]
