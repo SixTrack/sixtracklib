@@ -9,8 +9,8 @@
 
 int main( int const argc, char* argv[] )
 {
-    st_Buffer* buffer = SIXTRL_NULLPTR;
-    st_buffer_addr_t target_base_addr = ( st_buffer_addr_t )0x1000;
+    NS(Buffer)* buffer = SIXTRL_NULLPTR;
+    NS(buffer_addr_t) target_base_addr = ( NS(buffer_addr_t) )0x1000;
     char path_to_output_file[ 1024 ];
 
     memset( path_to_output_file, ( int )'\0', 1024 );
@@ -22,15 +22,15 @@ int main( int const argc, char* argv[] )
                 argv[ 0 ], target_base_addr );
     }
 
-    if( argc == 2 )
+    if( argc >= 2 )
     {
-        buffer = st_Buffer_new_from_file( argv[ 1 ] );
+        buffer = NS(Buffer_new_from_file)( argv[ 1 ] );
     }
 
     if( argc >= 3 )
     {
         int64_t const temp = atoi( argv[ 2 ] );
-        if( temp > 0 ) target_base_addr = ( st_buffer_addr_t )temp;
+        if( temp > 0 ) target_base_addr = ( NS(buffer_addr_t) )temp;
     }
 
     if( argc >= 4 )
@@ -42,7 +42,7 @@ int main( int const argc, char* argv[] )
         strncpy( path_to_output_file, argv[ 1 ], 1023 );
     }
 
-    if( st_Buffer_write_to_file_normalized_addr(
+    if( NS(Buffer_write_to_file_normalized_addr)(
             buffer, path_to_output_file, target_base_addr ) )
     {
         printf( "Successfully normalized and written to %s\r\n",
@@ -53,8 +53,7 @@ int main( int const argc, char* argv[] )
         printf( "Error -> stopping\r\n" );
     }
 
-    st_Buffer_delete( buffer );
-
+    NS(Buffer_delete)( buffer );
     return 0;
 }
 
