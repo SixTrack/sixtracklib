@@ -446,7 +446,8 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_until_turn_objs)(
     SIXTRL_ASSERT( be_begin != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( p != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( NS(Particles_get_num_of_particles)( p ) > idx );
-    SIXTRL_ASSERT( NS(Particles_is_not_lost_value)( p, idx ) );
+    SIXTRL_ASSERT( ( NS(Particles_is_not_lost_value)( p, idx ) ) ||
+                   ( !continue_tracking ) );
 
     while( continue_tracking )
     {
@@ -506,7 +507,6 @@ NS(Track_particle_element_by_element_until_turn_objs)(
 
     SIXTRL_ASSERT( p != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( NS(Particles_get_num_of_particles)( p ) > idx );
-    SIXTRL_ASSERT( NS(Particles_is_not_lost_value)( p, idx ) );
 
     if( out_particles != SIXTRL_NULLPTR )
     {
@@ -529,6 +529,8 @@ NS(Track_particle_element_by_element_until_turn_objs)(
 
         SIXTRL_ASSERT( be_begin != SIXTRL_NULLPTR );
         SIXTRL_ASSERT( ( ( uintptr_t )be_end ) >= ( ( uintptr_t )be_begin ) );
+        SIXTRL_ASSERT( ( NS(Particles_is_not_lost_value)( p, idx ) ) ||
+                       ( !continue_tracking ) );
 
         while( continue_tracking )
         {
@@ -605,7 +607,8 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_line_objs)(
     SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( ( ( uintptr_t )line_it ) <= ( ( uintptr_t )line_end ) );
     SIXTRL_ASSERT( NS(Particles_get_num_of_particles)( particles ) > index );
-    SIXTRL_ASSERT( NS(Particles_is_not_lost_value)( particles, index ) );
+    SIXTRL_ASSERT( ( NS(Particles_is_not_lost_value)( particles, index ) ) ||
+                   ( !continue_tracking ) );
 
     while( continue_tracking )
     {
