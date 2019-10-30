@@ -6462,7 +6462,7 @@ SIXTRL_INLINE void NS(Particles_mark_as_lost_value)(
     NS(particle_num_elements_t) const index )
 {
     SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( NS(Particles_get_num_of_particles)( particles ) < index );
+    SIXTRL_ASSERT( NS(Particles_get_num_of_particles)( particles ) > index );
     particles->state[ index ] = 0;
 }
 
