@@ -2000,7 +2000,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( env_variable_name != nullptr )
         {
-            env_var_begin = std::getenv( env_var_begin );
+            env_var_begin = std::getenv( env_variable_name );
         }
         else
         {
