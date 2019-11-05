@@ -22,7 +22,7 @@ int main( int const argc, char* argv[] )
                 argv[ 0 ], target_base_addr );
     }
 
-    if( argc == 2 )
+    if( argc >= 2 )
     {
         buffer = st_Buffer_new_from_file( argv[ 1 ] );
     }
