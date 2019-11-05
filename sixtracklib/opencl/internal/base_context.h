@@ -773,308 +773,340 @@ extern "C" {
 typedef SIXTRL_INT64_T      NS(context_kernel_id_t);
 typedef SIXTRL_INT64_T      NS(context_buffer_id_t);
 
-SIXTRL_HOST_FN NS(ClContextBase)* NS(ClContextBase_create)();
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(OpenCL_num_available_nodes)( void );
 
-SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_num_available_nodes)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(OpenCL_get_available_nodes)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT out_node_ids_begin,
+    NS(arch_size_t) const max_num_node_ids );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void
+NS(OpenCL_print_available_nodes)( void );
+
+/* ************************************************************************* */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClContextBase)* NS(ClContextBase_create)();
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
+NS(ClContextBase_get_num_available_nodes)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_node_info_t) const*
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_node_info_t) const*
 NS(ClContextBase_get_available_nodes_info_begin)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_node_info_t) const*
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_node_info_t) const*
 NS(ClContextBase_get_available_nodes_info_end)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_node_info_t) const*
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_node_info_t) const*
 NS(ClContextBase_get_available_node_info_by_index)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT context,
     NS(context_size_t) const node_index );
 
-SIXTRL_HOST_FN NS(context_node_info_t) const*
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_node_info_t) const*
 NS(ClContextBase_get_default_node_info)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT context );
 
-SIXTRL_HOST_FN NS(context_node_id_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_node_id_t)
 NS(ClContextBase_get_default_node_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT context );
 
-SIXTRL_HOST_FN NS(context_node_info_t) const*
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_node_info_t) const*
 NS(ClContextBase_get_available_node_info_by_node_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT context,
     const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_is_node_id_str_available)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_is_node_id_str_available)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     char const* SIXTRL_RESTRICT node_id_str );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_is_node_id_available)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_is_node_id_available)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_is_node_index_available)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_is_node_index_available)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     NS(context_size_t) const node_index );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_is_platform_device_tuple_available)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(ClContextBase_is_platform_device_tuple_available)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     NS(comp_node_id_num_t) const platform_idx,
     NS(comp_node_id_num_t) const device_idx );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_is_node_id_default_node)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_is_node_id_default_node)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_is_node_id_str_default_node)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_is_node_id_str_default_node)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     char const* SIXTRL_RESTRICT node_id_str );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_is_platform_device_tuple_default_node)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(ClContextBase_is_platform_device_tuple_default_node)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     NS(comp_node_id_num_t) const platform_idx,
     NS(comp_node_id_num_t) const device_idx );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_is_node_index_default_node)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_is_node_index_default_node)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     NS(context_size_t) const node_index );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_has_selected_node)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_has_selected_node)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN cl_device_id NS(ClContextBase_get_selected_node_device)(
+SIXTRL_EXTERN SIXTRL_HOST_FN cl_device_id
+NS(ClContextBase_get_selected_node_device)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_node_info_t) const*
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_node_info_t) const*
 NS(ClContextBase_get_selected_node_info)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_node_id_t) const*
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_node_id_t) const*
 NS(ClContextBase_get_selected_node_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_selected_node_index)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
+NS(ClContextBase_get_selected_node_index)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_get_selected_node_id_str)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_get_selected_node_id_str)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     char* SIXTRL_RESTRICT node_id_str,
     NS(context_size_t) const max_str_length );
 
-SIXTRL_HOST_FN void NS(ClContextBase_print_nodes_info)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_print_nodes_info)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN void NS(ClContextBase_clear)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_clear)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_select_node)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_select_node)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* node_id_str );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_node_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_node_id)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     const NS(context_node_id_t) *const SIXTRL_RESTRICT node_id );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_index)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_index)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     NS(context_size_t) const index );
 
-SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_num_available_programs)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
+NS(ClContextBase_get_num_available_programs)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN int NS(ClContextBase_add_program_file)(
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContextBase_add_program_file)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* SIXTRL_RESTRICT path_to_program_file,
     char const* SIXTRL_RESTRICT compile_options );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_compile_program)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_compile_program)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const program_id );
 
-SIXTRL_HOST_FN char const* NS(ClContextBase_get_program_source_code)(
+SIXTRL_EXTERN SIXTRL_HOST_FN char const*
+NS(ClContextBase_get_program_source_code)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const program_id );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_has_program_file_path)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_has_program_file_path)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const program_id );
 
-SIXTRL_HOST_FN char const* NS(ClContextBase_get_program_path_to_file)(
+SIXTRL_EXTERN SIXTRL_HOST_FN char const*
+NS(ClContextBase_get_program_path_to_file)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const program_id );
 
-SIXTRL_HOST_FN char const* NS(ClContextBase_get_program_compile_options)(
+SIXTRL_EXTERN SIXTRL_HOST_FN char const*
+NS(ClContextBase_get_program_compile_options)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const program_id );
 
-SIXTRL_HOST_FN char const* NS(ClContextBase_get_program_compile_report)(
+SIXTRL_EXTERN SIXTRL_HOST_FN char const*
+NS(ClContextBase_get_program_compile_report)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const program_id );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_is_program_compiled)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_is_program_compiled)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const program_id );
 
-SIXTRL_HOST_FN int NS(ClContextBase_enable_kernel)(
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContextBase_enable_kernel)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* kernel_name, int const program_id );
 
-SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_num_available_kernels)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
+NS(ClContextBase_get_num_available_kernels)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN int NS(ClContextBase_find_kernel_id_by_name)(
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContextBase_find_kernel_id_by_name)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* SIXTRL_RESTRICT kernel_name );
 
-SIXTRL_HOST_FN char const* NS(ClContextBase_get_kernel_function_name)(
+SIXTRL_EXTERN SIXTRL_HOST_FN char const*
+NS(ClContextBase_get_kernel_function_name)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_local_mem_size)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
+NS(ClContextBase_get_kernel_local_mem_size)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_num_args)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
+NS(ClContextBase_get_kernel_num_args)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_work_group_size)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
+NS(ClContextBase_get_kernel_work_group_size)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_max_work_group_size)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
+NS(ClContextBase_get_kernel_max_work_group_size)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_set_kernel_work_group_size)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_set_kernel_work_group_size)(
     NS(ClContextBase)* SIXTRL_RESTRICT context,
     int const kernel_id, NS(context_size_t) const work_group_size );
 
-SIXTRL_HOST_FN NS(context_size_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_exec_counter)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_exec_counter)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN NS(ClArgument)* NS(ClContextBase_get_ptr_kernel_argument)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)* NS(ClContextBase_get_ptr_kernel_argument)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
     NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
 
-SIXTRL_HOST_FN NS(kernel_arg_type_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(kernel_arg_type_t)
 NS(ClContextBase_get_kernel_argument_type)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
     NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
 
-SIXTRL_HOST_FN NS(ClArgument) const*
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
 NS(ClContextBase_get_const_ptr_kernel_argument)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id,
     NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
 
-SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
     NS(context_size_t) const arg_index, NS(ClArgument)* SIXTRL_RESTRICT arg );
 
-SIXTRL_HOST_FN void NS(ClContextBase_reset_single_kernel_argument)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void
+NS(ClContextBase_reset_single_kernel_argument)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
     NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
 
-SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_ptr)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_ptr)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
     NS(context_size_t) const arg_index,
     void* SIXTRL_RESTRICT ptr ) SIXTRL_NOEXCEPT;
 
-SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_value)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void
+NS(ClContextBase_assign_kernel_argument_value)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
     NS(context_size_t) const arg_index, void* SIXTRL_RESTRICT arg_data,
     NS(context_size_t) const arg_data_size ) SIXTRL_NOEXCEPT;
 
-SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_arguments)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_arguments)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     int const kernel_id ) SIXTRL_NOEXCEPT;
 
-SIXTRL_HOST_FN NS(context_size_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_calculate_kernel_num_work_items)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     int const kernel_id, NS(context_size_t) const min_num_work_items );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_run_kernel)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_run_kernel)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     int const kernel_id, NS(context_size_t) num_work_items );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_run_kernel_wgsize)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_run_kernel_wgsize)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
     NS(context_size_t) const num_work_items,
     NS(context_size_t) const work_group_size );
 
-SIXTRL_HOST_FN double NS(ClContextBase_get_last_exec_time)(
+SIXTRL_EXTERN SIXTRL_HOST_FN double NS(ClContextBase_get_last_exec_time)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN double NS(ClContextBase_get_min_exec_time)(
+SIXTRL_EXTERN SIXTRL_HOST_FN double NS(ClContextBase_get_min_exec_time)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN double NS(ClContextBase_get_max_exec_time)(
+SIXTRL_EXTERN SIXTRL_HOST_FN double NS(ClContextBase_get_max_exec_time)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN double NS(ClContextBase_get_avg_exec_time)(
+SIXTRL_EXTERN SIXTRL_HOST_FN double NS(ClContextBase_get_avg_exec_time)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN NS(context_size_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_get_last_exec_work_group_size)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN NS(context_size_t)
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_get_last_exec_num_work_items)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_exec_timing)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_exec_timing)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN int  NS(ClContextBase_get_program_id_by_kernel_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN int  NS(ClContextBase_get_program_id_by_kernel_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_has_remapping_program)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_has_remapping_program)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN int NS(ClContextBase_get_remapping_program_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContextBase_get_remapping_program_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_has_remapping_kernel)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_has_remapping_kernel)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN int NS(ClContextBase_get_remapping_kernel_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContextBase_get_remapping_kernel_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_set_remapping_kernel_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_set_remapping_kernel_id)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id );
 
-SIXTRL_HOST_FN cl_program NS(ClContextBase_get_program)(
+SIXTRL_EXTERN SIXTRL_HOST_FN cl_program NS(ClContextBase_get_program)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     int const program_id );
 
-SIXTRL_HOST_FN cl_kernel NS(ClContextBase_get_kernel)(
+SIXTRL_EXTERN SIXTRL_HOST_FN cl_kernel NS(ClContextBase_get_kernel)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     int const kernel_id );
 
-SIXTRL_HOST_FN cl_command_queue NS(ClContextBase_get_queue)(
+SIXTRL_EXTERN SIXTRL_HOST_FN cl_command_queue NS(ClContextBase_get_queue)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN cl_context NS(ClContextBase_get_opencl_context)(
+SIXTRL_EXTERN SIXTRL_HOST_FN cl_context NS(ClContextBase_get_opencl_context)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN NS(ClContextBase)*
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClContextBase)*
 NS(ClContextBase_new_on_selected_node_id_str)(
     char const* SIXTRL_RESTRICT node_id_str );
 
-SIXTRL_HOST_FN NS(ClContextBase)*
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClContextBase)*
 NS(ClContextBase_new_on_selected_node_id)(
     const NS(context_node_id_t) *const node_id );
 
-SIXTRL_HOST_FN NS(ClContextBase)* NS(ClContextBase_new)( void );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClContextBase)* NS(ClContextBase_new)( void );
 
-SIXTRL_HOST_FN void NS(ClContextBase_free)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_free)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN void NS(ClContextBase_delete)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_delete)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN cl_mem NS(ClContextBase_get_internal_opencl_success_flag_buffer)(
+SIXTRL_EXTERN SIXTRL_HOST_FN cl_mem
+NS(ClContextBase_get_internal_opencl_success_flag_buffer)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN bool NS(ClContextBase_is_debug_mode_enabled)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_is_debug_mode_enabled)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN void NS(ClContextBase_enable_debug_mode)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_enable_debug_mode)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
-SIXTRL_HOST_FN void NS(ClContextBase_disable_debug_mode)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_disable_debug_mode)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
