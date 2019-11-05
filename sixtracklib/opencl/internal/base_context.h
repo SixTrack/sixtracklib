@@ -13,6 +13,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/context/compute_arch.h"
     #include "sixtracklib/opencl/cl.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -24,9 +25,11 @@
         #include <cstdint>
         #include <cstdlib>
         #include <iterator>
+        #include <iostream>
         #include <string>
         #include <map>
         #include <vector>
+        #include <regex>
     #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 using NS(context_size_t) = std::size_t;
@@ -44,6 +47,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using size_type         = ::NS(context_size_t);
         using platform_id_t     = ::NS(comp_node_id_num_t);
         using device_id_t       = ::NS(comp_node_id_num_t);
+        using ctrl_status_t     = ::NS(arch_status_t);
 
         using kernel_id_t       = int64_t;
         using program_id_t      = int64_t;
@@ -54,6 +58,123 @@ namespace SIXTRL_CXX_NAMESPACE
         static kernel_arg_type_t const ARG_TYPE_VALUE;
         static kernel_arg_type_t const ARG_TYPE_RAW_PTR;
         static kernel_arg_type_t const ARG_TYPE_INVALID;
+
+        /* ***************************************************************** */
+
+        static size_type NUM_AVAILABLE_NODES(
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr )
+        {
+            using _this_t = SIXTRL_CXX_NAMESPACE::ClContextBase;
+            ClContextBase::size_type num_avail_nodes = 0u;
+
+            std::vector< _this_t::node_id_t   > available_node_ids;
+            std::vector< _this_t::node_info_t > available_node_infos;
+            std::vector< cl::Device > available_devices;
+
+            if( SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS ==
+                _this_t::GetAvailableNodes( available_node_ids,
+                    available_node_infos, available_devices,
+                        env_variable_name, filter_str ) )
+            {
+                num_avail_nodes = available_node_ids.size();
+            }
+
+            return num_avail_nodes;
+        }
+
+        static size_type GET_AVAILABLE_NODES(
+            node_id_t* SIXTRL_RESTRICT out_node_ids_begin,
+            size_type const max_num_node_ids,
+            size_type const skip_first_num_nodes = size_type{ 0 },
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr )
+        {
+            using _this_t = SIXTRL_CXX_NAMESPACE::ClContextBase;
+            _this_t::size_type num_avail_nodes = 0u;
+
+            if( ( out_node_ids_begin != nullptr ) &&
+                ( max_num_node_ids > _this_t::size_type{ 0 } ) )
+            {
+                std::vector< _this_t::node_id_t   > available_node_ids;
+                std::vector< _this_t::node_info_t > available_node_infos;
+                std::vector< cl::Device > available_devices;
+
+                if( SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS ==
+                    _this_t::GetAvailableNodes( available_node_ids,
+                        available_node_infos, available_devices,
+                            env_variable_name, filter_str ) )
+                {
+                    num_avail_nodes = available_node_ids.size();
+
+                    if( num_avail_nodes >= skip_first_num_nodes )
+                    {
+                        num_avail_nodes -= skip_first_num_nodes;
+                    }
+                    else
+                    {
+                        num_avail_nodes = _this_t::size_type{ 0 };
+                    }
+
+                    if( num_avail_nodes > max_num_node_ids )
+                    {
+                        num_avail_nodes = max_num_node_ids;
+                    }
+
+                    if( num_avail_nodes > _this_t::size_type{ 0 } )
+                    {
+                        auto in_node_begin = available_node_ids.begin();
+                        auto in_node_end = in_node_begin;
+                        std::advance( in_node_end, num_avail_nodes );
+
+                        std::copy( in_node_begin, in_node_end,
+                                   &out_node_ids_begin[ 0 ] );
+                    }
+                }
+            }
+
+            return num_avail_nodes;
+        }
+
+        static void PRINT_AVAILABLE_NODES(
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr )
+        {
+            using _this_t = SIXTRL_CXX_NAMESPACE::ClContextBase;
+
+            bool printed_any_nodes = false;
+
+            std::vector< _this_t::node_id_t   > available_node_ids;
+            std::vector< _this_t::node_info_t > available_node_infos;
+            std::vector< cl::Device > available_devices;
+
+            if( SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS ==
+                _this_t::GetAvailableNodes( available_node_ids,
+                    available_node_infos, available_devices,
+                        env_variable_name, filter_str ) )
+            {
+                if( !available_node_infos.empty() )
+                {
+                    auto node_it  = available_node_infos.data();
+                    auto node_end = node_it;
+                    SIXTRL_ASSERT( node_end != nullptr );
+                    std::advance( node_end, available_node_infos.size() );
+
+                    for( ; node_it != node_end ; ++node_it )
+                    {
+                        printed_any_nodes = true;
+                        ::NS(ComputeNodeInfo_print_out)( node_it, nullptr );
+                    }
+                }
+            }
+
+            if( !printed_any_nodes )
+            {
+                printf( "No OpenCL Devices found\r\n" );
+            }
+        }
+
+        /* ***************************************************************** */
 
         explicit ClContextBase(
             const char *const SIXTRL_RESTRICT config_str = nullptr );
@@ -334,6 +455,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
+        static ctrl_status_t GetAvailableNodes(
+            std::vector< ClContextBase::node_id_t>& available_nodes_id,
+            std::vector< ClContextBase::node_info_t >& available_nodes_info,
+            std::vector< cl::Device >& available_devices,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr ,
+            char const* SIXTRL_RESTRICT filter_str = nullptr );
+
+        static ctrl_status_t GetAllowedNodesFromEnvVariable(
+            std::vector< node_id_t >& allowed_node_ids,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr );
+
         using program_data_t = struct ProgramData
         {
             ProgramData() :
@@ -567,12 +699,6 @@ namespace SIXTRL_CXX_NAMESPACE
 //         int32_t handleKernelSuccessFlag();
 
         private:
-
-        static void UpdateAvailableNodes(
-            std::vector< node_id_t>& available_nodes_id,
-            std::vector< node_info_t >&  available_nodes_info,
-            std::vector< cl::Device  >&  available_devices,
-            const char *const filter_str = nullptr );
 
         void doParseConfigStringBaseImpl(
             const char *const SIXTRL_RESTRICT config_str );
