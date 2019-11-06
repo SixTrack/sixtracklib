@@ -188,7 +188,7 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
 
             status =
             ::NS(CudaKernelConfig_configure_assign_output_to_elem_by_elem_config_kernel)(
-                ptr_assign_kernel_config, ptr_node_info );
+                ptr_assign_kernel_config, ptr_node_info, size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -208,7 +208,8 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
             status =
             ::NS(CudaKernelConfig_configure_track_elem_by_elem_until_turn_kernel)(
                 ptr_track_kernel_config, ptr_node_info,
-                    ::NS(Particles_get_num_of_particles)( particles ) );
+                    ::NS(Particles_get_num_of_particles)( particles ),
+                        size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
