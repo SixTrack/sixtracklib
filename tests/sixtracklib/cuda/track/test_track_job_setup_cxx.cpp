@@ -481,4 +481,54 @@ TEST( CXX_CudaTrackJobSetupTests, CreateTrackJobBeamMonitorAndElemByElem )
             NUM_BEAM_MONITORS, NUM_TURNS,  NUM_ELEM_BY_ELEM_TURNS ) );
 }
 
+TEST( CXX_CudaTrackJobSetupTests, CreateTrackJobConfigStrParsing )
+{
+    namespace st = SIXTRL_CXX_NAMESPACE;
+    using track_job_t = st::CudaTrackJob;
+
+    track_job_t job0;
+
+    ASSERT_TRUE( job0.default_threads_per_block() ==
+                 track_job_t::DEFAULT_THREADS_PER_BLOCK );
+
+    ASSERT_TRUE( job0.default_track_threads_per_block() ==
+                 track_job_t::DEFAULT_TRACK_THREADS_PER_BLOCK );
+
+    std::string const config_str_a(
+        "cuda.threads_per_block = 32\r\n"
+        "cuda.track_threads_per_block = 512\r\n" );
+
+    track_job_t job1( config_str_a );
+
+    ASSERT_TRUE( job1.default_threads_per_block() ==
+                 track_job_t::size_type{ 32 } );
+
+    ASSERT_TRUE( job1.default_track_threads_per_block() ==
+                 track_job_t::size_type{ 512 } );
+
+    std::string const config_str_b(
+        "cuda.threads_per_block = 16\r\n"
+        "cuda.track_threads_per_block = 80\r\n" );
+
+    track_job_t job2( config_str_b );
+
+    ASSERT_TRUE( job1.default_threads_per_block() ==
+                 track_job_t::DEFAULT_THREADS_PER_BLOCK );
+
+    ASSERT_TRUE( job1.default_track_threads_per_block() ==
+                 track_job_t::DEFAULT_TRACK_THREADS_PER_BLOCK );
+
+    std::string const config_str_b( "cuda.threads_per_block = 256" );
+
+    track_job_t job2( config_str_b );
+
+    ASSERT_TRUE( job1.default_threads_per_block() ==
+                 track_job_t::size_type{ 256 } );
+
+    ASSERT_TRUE( job1.default_track_threads_per_block() ==
+                 job1.default_threads_per_block() );
+
+
+}
+
 /* end: tests/sixtracklib/cuda/track/test_track_job_setup_cxx.cpp */
