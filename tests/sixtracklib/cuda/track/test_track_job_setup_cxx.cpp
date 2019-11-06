@@ -512,21 +512,21 @@ TEST( CXX_CudaTrackJobSetupTests, CreateTrackJobConfigStrParsing )
 
     track_job_t job2( config_str_b );
 
-    ASSERT_TRUE( job1.default_threads_per_block() ==
+    ASSERT_TRUE( job2.default_threads_per_block() ==
                  track_job_t::DEFAULT_THREADS_PER_BLOCK );
 
-    ASSERT_TRUE( job1.default_track_threads_per_block() ==
+    ASSERT_TRUE( job2.default_track_threads_per_block() ==
                  track_job_t::DEFAULT_TRACK_THREADS_PER_BLOCK );
 
-    std::string const config_str_b( "cuda.threads_per_block = 256" );
+    std::string const config_str_c( "cuda.threads_per_block = 256" );
 
-    track_job_t job2( config_str_b );
+    track_job_t job3( config_str_c );
 
-    ASSERT_TRUE( job1.default_threads_per_block() ==
+    ASSERT_TRUE( job3.default_threads_per_block() ==
                  track_job_t::size_type{ 256 } );
 
-    ASSERT_TRUE( job1.default_track_threads_per_block() ==
-                 job1.default_threads_per_block() );
+    ASSERT_TRUE( job3.default_track_threads_per_block() ==
+                 job3.default_threads_per_block() );
 
 
 }
