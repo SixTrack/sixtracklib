@@ -19,6 +19,22 @@ if( GTEST_FOUND )
          ${SIXTRACKL_GTEST_LIBRARIES} sixtrack_test sixtrack m dl )
 
     # ==========================================================================
+    # test_context_setup_cxx:
+
+    add_executable( test_context_setup_opencl_c99 test_context_setup_c99.cpp )
+    set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS}
+         test_context_setup_opencl_c99 )
+    add_test( C99_OpenCL_ContextSetupTests test_context_setup_opencl_c99 )
+
+    # --------------------------------------------------------------------------
+    # test_context_setup_cxx:
+
+    add_executable( test_context_setup_opencl_cxx test_context_setup_cxx.cpp )
+    set( CXX_UNIT_TEST_TARGETS ${CXX_UNIT_TEST_TARGETS}
+         test_context_setup_opencl_cxx )
+    add_test( CXX_OpenCL_ContextSetupTests test_context_setup_opencl_cxx )
+
+    # ==========================================================================
     # test_context_opencl_c99:
 
     add_executable( test_context_opencl_c99 test_context_opencl_c99.cpp )
