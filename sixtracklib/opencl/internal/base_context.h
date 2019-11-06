@@ -75,6 +75,22 @@ namespace SIXTRL_CXX_NAMESPACE
 
         static constexpr size_type MIN_NUM_REMAP_BUFFER_ARGS = size_type{ 2 };
 
+        static SIXTRL_HOST_FN size_type NUM_AVAILABLE_NODES(
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr );
+
+        static SIXTRL_HOST_FN size_type GET_AVAILABLE_NODES(
+            node_id_t* SIXTRL_RESTRICT out_node_ids_begin,
+            size_type const max_num_node_ids,
+            size_type const skip_first_num_nodes = size_type{ 0 },
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr );
+
+        static SIXTRL_HOST_FN void PRINT_AVAILABLE_NODES(
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr );
+
+        /* ***************************************************************** */
 
         SIXTRL_HOST_FN explicit ClContextBase(
             const char *const SIXTRL_RESTRICT config_str = nullptr );
@@ -423,6 +439,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
+        SIXTRL_HOST_FN static status_t GetAvailableNodes(
+            std::vector< ClContextBase::node_id_t>& available_nodes_id,
+            std::vector< ClContextBase::node_info_t >& available_nodes_info,
+            std::vector< cl::Device >& available_devices,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr,
+            char const* SIXTRL_RESTRICT filter_str = nullptr );
+
+        SIXTRL_HOST_FN static status_t GetAllowedNodesFromEnvVariable(
+            std::vector< node_id_t >& allowed_node_ids,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr );
+
         using program_data_t = struct ProgramData
         {
             ProgramData() :
@@ -660,13 +687,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         private:
 
-        static void UpdateAvailableNodes(
-            std::vector< node_id_t>& available_nodes_id,
-            std::vector< node_info_t >&  available_nodes_info,
-            std::vector< cl::Device  >&  available_devices,
-            const char *const filter_str = nullptr,
-            bool const debug_mode = false );
-
         void doParseConfigStringBaseImpl(
             const char *const SIXTRL_RESTRICT config_str );
 
@@ -746,6 +766,21 @@ extern "C" {
 
 typedef SIXTRL_INT64_T      NS(context_kernel_id_t);
 typedef SIXTRL_INT64_T      NS(context_buffer_id_t);
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(OpenCL_num_available_nodes)( void );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(OpenCL_get_available_nodes)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT out_node_ids_begin,
+    NS(arch_size_t) const max_num_node_ids );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void
+NS(OpenCL_print_available_nodes)( void );
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClContextBase)* NS(ClContextBase_create)();
 
