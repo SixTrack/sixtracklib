@@ -2180,6 +2180,7 @@ namespace SIXTRL_CXX_NAMESPACE
                         { return ( ::NS(ComputeNodeId_compare)(
                             &lhs, &rhs ) < 0 ); } ) ) )
                 {
+                    added_at_least_one_device = true;
                     continue;
                 }
 
