@@ -638,7 +638,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ( status == st::ARCH_STATUS_SUCCESS ) && ( config_str != nullptr ) )
         {
-            status = _base_t::doParseConfigStr( config_str );
+            if( !_base_t::doParseConfigStr( config_str ) )
+                status = st::ARCH_STATUS_GENERAL_FAILURE;
 
             if( status == st::ARCH_STATUS_SUCCESS )
             {

@@ -67,16 +67,14 @@ target_include_directories( sixtrack_cuda_host
     PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
     PUBLIC  $<BUILD_INTERFACE:${SIXTRACKL_CUDA_INCLUDE_DIRS}> )
 
-set_target_properties( sixtrack_cuda_host PROPERTIES POSITION_INDEPENDENT_CODE ON )
-set_target_properties( sixtrack_cuda_host PROPERTIES LINKER_LANGUAGE C )
-set_target_properties( sixtrack_cuda_host PROPERTIES CXX_STANDARD 11 )
-set_target_properties( sixtrack_cuda_host PROPERTIES CXX_STANDARD_REQUIRED ON )
+set_target_properties( sixtrack_cuda_host PROPERTIES
+    POSITION_INDEPENDENT_CODE ON LINKER_LANGUAGE C CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_cuda_host as a module for sixtracklib:
 
-set(  SIXTRACKL_LIBRARY_MODULES
-    ${SIXTRACKL_LIBRARY_MODULES}
+set(  SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
     $<TARGET_OBJECTS:sixtrack_cuda_host> CACHE INTERNAL "" FORCE )
 
 find_library( CUDA_LIBRARY cuda ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES} )
@@ -88,8 +86,7 @@ else()
     set( CUDA_NVRTC_LIBRARY )
 endif()
 
-set(   SIXTRACKL_LINK_LIBRARIES
-     ${SIXTRACKL_LINK_LIBRARIES}
+set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES}
      ${CUDA_NVRTC_LIBRARY} ${CUDA_LIBRARY} ${CUDART_LIBRARY}
      CACHE INTERNAL "" FORCE )
 
@@ -140,22 +137,18 @@ add_library( sixtrack_cuda_device OBJECT
 target_compile_definitions( sixtrack_cuda_device
     PUBLIC ${SIXTRACKL_CUDA_DEVICE_DEFINITIONS} )
 
-set_target_properties( sixtrack_cuda_device PROPERTIES POSITION_INDEPENDENT_CODE ON )
-set_target_properties( sixtrack_cuda_device PROPERTIES LINKER_LANGUAGE C )
-set_target_properties( sixtrack_cuda_device PROPERTIES CXX_STANDARD 11 )
-set_target_properties( sixtrack_cuda_device PROPERTIES CXX_STANDARD_REQUIRED ON )
-set_target_properties( sixtrack_cuda_device PROPERTIES CUDA_SEPARABLE_COMPILATION  ON  )
-set_target_properties( sixtrack_cuda_device PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS OFF )
-set_target_properties( sixtrack_cuda_device PROPERTIES CUDA_STANDARD 11 )
-set_target_properties( sixtrack_cuda_device PROPERTIES CUDA_STANDARD_REQUIRED 11 )
+set_target_properties( sixtrack_cuda_device PROPERTIES
+    POSITION_INDEPENDENT_CODE ON LINKER_LANGUAGE C
+    CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON
+    CUDA_SEPARABLE_COMPILATION  ON CUDA_RESOLVE_DEVICE_SYMBOLS OFF
+    CUDA_STANDARD 11 CUDA_STANDARD_REQUIRED 11 )
 
 target_include_directories( sixtrack_cuda_device PRIVATE ${CMAKE_SOURCE_DIR} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_cuda_device as a module for sixtracklib:
 
-set(  SIXTRACKL_LIBRARY_MODULES
-    ${SIXTRACKL_LIBRARY_MODULES}
+set(  SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
     $<TARGET_OBJECTS:sixtrack_cuda_device> CACHE INTERNAL "" FORCE )
 
 # ------------------------------------------------------------------------------
