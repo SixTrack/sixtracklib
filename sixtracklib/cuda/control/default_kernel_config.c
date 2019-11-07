@@ -67,10 +67,6 @@ NS(arch_status_t) NS(CudaKernelConfig_configure_fetch_particles_addresses_kernel
         NS(buffer_size_t) const warp_size =
             NS(CudaNodeInfo_get_warp_size)( node_info );
 
-        NS(buffer_size_t) threads_per_block =
-            ( NS(buffer_size_t) )threads_per_block;
-
-
         NS(buffer_size_t) num_blocks = num_particle_sets / threads_per_block;
 
         if( ( num_blocks * threads_per_block ) < num_particle_sets )
