@@ -106,6 +106,7 @@ message( STATUS "---- cmake_module_path: ${CMAKE_MODULE_PATH}" )
 
 include(CheckLanguage)
 
+include( SetupGit )
 include( SetupC99 )
 include( SetupCxx )
 include( SetupPython )
@@ -114,6 +115,11 @@ include( SetupPython )
 # Unit-testing:
 
 include( SetupUnitTesting )
+
+# ------------------------------------------------------------------------------
+# toml:
+
+include( SetupToml )
 
 # ------------------------------------------------------------------------------
 # MPFR4:
@@ -166,6 +172,7 @@ endif()
 # ==============================================================================
 # sixtracklib: C/C++ library ; sixtracklib python bindings
 
+add_subdirectory( external )
 add_subdirectory( sixtracklib )
 
 # ------------------------------------------------------------------------------
