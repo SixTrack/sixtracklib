@@ -989,19 +989,19 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_exec
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)* NS(ClContextBase_get_ptr_kernel_argument)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     NS(arch_kernel_id_t) const kernel_id,
-    NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
+    NS(context_size_t) const arg_index );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(kernel_arg_type_t)
 NS(ClContextBase_get_kernel_argument_type)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     NS(arch_kernel_id_t) const kernel_id,
-    NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
+    NS(context_size_t) const arg_index );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
 NS(ClContextBase_get_const_ptr_kernel_argument)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     NS(arch_kernel_id_t) const kernel_id,
-    NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
+    NS(context_size_t) const arg_index );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
@@ -1011,23 +1011,23 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_reset_single_kernel_argument)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     NS(arch_kernel_id_t) const kernel_id,
-    NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
+    NS(context_size_t) const arg_index );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_ptr)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     NS(arch_kernel_id_t) const kernel_id,
     NS(context_size_t) const arg_index,
-    void* SIXTRL_RESTRICT ptr ) SIXTRL_NOEXCEPT;
+    void* SIXTRL_RESTRICT ptr );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_value)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     NS(arch_kernel_id_t) const kernel_id,
     NS(context_size_t) const arg_index, void* SIXTRL_RESTRICT arg_data,
-    NS(context_size_t) const arg_data_size ) SIXTRL_NOEXCEPT;
+    NS(context_size_t) const arg_data_size );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_arguments)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
-    NS(arch_kernel_id_t) const kernel_id ) SIXTRL_NOEXCEPT;
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_calculate_kernel_num_work_items)(
