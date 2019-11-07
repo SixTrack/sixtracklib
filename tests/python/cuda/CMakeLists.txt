@@ -43,6 +43,14 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
                       ${PRG_DIR}/test_track_job_collect_and_push_cuda.py
               WORKING_DIRECTORY ${WORK_DIR} )
 
+    # ==========================================================================
+    # test_track_job_collect_and_push_cuda.py:
+
+    add_test( NAME Python_Cuda_CudaTrackJobThreadsPerBlockTests
+              COMMAND ${PYTHON_EXECUTABLE}
+                      ${PRG_DIR}/test_track_job_threads_per_block.py
+              WORKING_DIRECTORY ${WORK_DIR} )
+
 endif()
 
 #end: tests/python/cuda/CMakeLists.txt
