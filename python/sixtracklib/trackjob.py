@@ -540,7 +540,6 @@ class TrackJobBaseNew(object):
                 self._last_status))
         return self
 
-
     def collectOutput(self):
         warnings.warn("collectOutput() is depreciated; " +
                       "use collect_output instead", DeprecationWarning)

@@ -30,10 +30,10 @@ TEST( CXX_OpenCL_ContextSetupTests, ClContextEnvVariablesSetupTests )
 
     context_t context;
 
-    ASSERT_TRUE( context.hasRemappingProgram() );
-    ASSERT_TRUE( context.remappingProgramId() >= 0 );
+    ASSERT_TRUE( context.has_remapping_program() );
+    ASSERT_TRUE( context.remapping_program_id() >= 0 );
 
-    std::cout << context.programCompileOptions( context.remappingProgramId() )
+    std::cout << context.programCompileOptions( context.remapping_program_id() )
               << std::endl;
 }
 

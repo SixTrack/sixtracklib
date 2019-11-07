@@ -14,6 +14,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/common/track/definitions.h"
     #include "sixtracklib/common/context/compute_arch.h"
     #include "sixtracklib/opencl/cl.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -49,330 +50,287 @@ namespace SIXTRL_CXX_NAMESPACE
         using device_id_t       = ::NS(comp_node_id_num_t);
         using ctrl_status_t     = ::NS(arch_status_t);
 
-        using kernel_id_t       = int64_t;
-        using program_id_t      = int64_t;
+        using kernel_id_t       = ::NS(ctrl_kernel_id_t);
+        using program_id_t      = ::NS(ctrl_kernel_id_t);
         using kernel_arg_id_t   = int64_t;
         using kernel_arg_type_t = uint32_t;
+        using status_flag_t     = SIXTRL_CXX_NAMESPACE::arch_debugging_t;
+        using status_t          = SIXTRL_CXX_NAMESPACE::ctrl_status_t;
+        using cl_buffer_t       = cl::Buffer;
 
-        static kernel_arg_type_t const ARG_TYPE_NONE;
-        static kernel_arg_type_t const ARG_TYPE_VALUE;
-        static kernel_arg_type_t const ARG_TYPE_RAW_PTR;
-        static kernel_arg_type_t const ARG_TYPE_INVALID;
+        static constexpr kernel_arg_type_t ARG_TYPE_NONE =
+            kernel_arg_type_t{ 0x00000000 };
 
-        /* ***************************************************************** */
+        static constexpr kernel_arg_type_t ARG_TYPE_VALUE =
+            kernel_arg_type_t{ 0x00000001 };
 
-        static size_type NUM_AVAILABLE_NODES(
+        static constexpr kernel_arg_type_t ARG_TYPE_RAW_PTR =
+            kernel_arg_type_t{ 0x00000002 };
+
+        static constexpr kernel_arg_type_t ARG_TYPE_CL_ARGUMENT =
+            kernel_arg_type_t{ 0x00000010 };
+
+        static constexpr kernel_arg_type_t ARG_TYPE_CL_BUFFER =
+            kernel_arg_type_t{ 0x00000020 };
+
+        static constexpr kernel_arg_type_t ARG_TYPE_INVALID =
+            kernel_arg_type_t{ 0xffffffff };
+
+        static constexpr size_type MIN_NUM_REMAP_BUFFER_ARGS = size_type{ 2 };
+
+        static SIXTRL_HOST_FN size_type NUM_AVAILABLE_NODES(
             char const* SIXTRL_RESTRICT filter_str = nullptr,
-            char const* SIXTRL_RESTRICT env_variable_name = nullptr )
-        {
-            using _this_t = SIXTRL_CXX_NAMESPACE::ClContextBase;
-            ClContextBase::size_type num_avail_nodes = 0u;
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr );
 
-            std::vector< _this_t::node_id_t   > available_node_ids;
-            std::vector< _this_t::node_info_t > available_node_infos;
-            std::vector< cl::Device > available_devices;
-
-            if( SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS ==
-                _this_t::GetAvailableNodes( available_node_ids,
-                    available_node_infos, available_devices,
-                        env_variable_name, filter_str ) )
-            {
-                num_avail_nodes = available_node_ids.size();
-            }
-
-            return num_avail_nodes;
-        }
-
-        static size_type GET_AVAILABLE_NODES(
+        static SIXTRL_HOST_FN size_type GET_AVAILABLE_NODES(
             node_id_t* SIXTRL_RESTRICT out_node_ids_begin,
             size_type const max_num_node_ids,
             size_type const skip_first_num_nodes = size_type{ 0 },
             char const* SIXTRL_RESTRICT filter_str = nullptr,
-            char const* SIXTRL_RESTRICT env_variable_name = nullptr )
-        {
-            using _this_t = SIXTRL_CXX_NAMESPACE::ClContextBase;
-            _this_t::size_type num_avail_nodes = 0u;
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr );
 
-            if( ( out_node_ids_begin != nullptr ) &&
-                ( max_num_node_ids > _this_t::size_type{ 0 } ) )
-            {
-                std::vector< _this_t::node_id_t   > available_node_ids;
-                std::vector< _this_t::node_info_t > available_node_infos;
-                std::vector< cl::Device > available_devices;
-
-                if( SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS ==
-                    _this_t::GetAvailableNodes( available_node_ids,
-                        available_node_infos, available_devices,
-                            env_variable_name, filter_str ) )
-                {
-                    num_avail_nodes = available_node_ids.size();
-
-                    if( num_avail_nodes >= skip_first_num_nodes )
-                    {
-                        num_avail_nodes -= skip_first_num_nodes;
-                    }
-                    else
-                    {
-                        num_avail_nodes = _this_t::size_type{ 0 };
-                    }
-
-                    if( num_avail_nodes > max_num_node_ids )
-                    {
-                        num_avail_nodes = max_num_node_ids;
-                    }
-
-                    if( num_avail_nodes > _this_t::size_type{ 0 } )
-                    {
-                        auto in_node_begin = available_node_ids.begin();
-                        auto in_node_end = in_node_begin;
-                        std::advance( in_node_end, num_avail_nodes );
-
-                        std::copy( in_node_begin, in_node_end,
-                                   &out_node_ids_begin[ 0 ] );
-                    }
-                }
-            }
-
-            return num_avail_nodes;
-        }
-
-        static void PRINT_AVAILABLE_NODES(
+        static SIXTRL_HOST_FN void PRINT_AVAILABLE_NODES(
             char const* SIXTRL_RESTRICT filter_str = nullptr,
-            char const* SIXTRL_RESTRICT env_variable_name = nullptr )
-        {
-            using _this_t = SIXTRL_CXX_NAMESPACE::ClContextBase;
-
-            bool printed_any_nodes = false;
-
-            std::vector< _this_t::node_id_t   > available_node_ids;
-            std::vector< _this_t::node_info_t > available_node_infos;
-            std::vector< cl::Device > available_devices;
-
-            if( SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS ==
-                _this_t::GetAvailableNodes( available_node_ids,
-                    available_node_infos, available_devices,
-                        env_variable_name, filter_str ) )
-            {
-                if( !available_node_infos.empty() )
-                {
-                    auto node_it  = available_node_infos.data();
-                    auto node_end = node_it;
-                    SIXTRL_ASSERT( node_end != nullptr );
-                    std::advance( node_end, available_node_infos.size() );
-
-                    for( ; node_it != node_end ; ++node_it )
-                    {
-                        printed_any_nodes = true;
-                        ::NS(ComputeNodeInfo_print_out)( node_it, nullptr );
-                    }
-                }
-            }
-
-            if( !printed_any_nodes )
-            {
-                printf( "No OpenCL Devices found\r\n" );
-            }
-        }
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr );
 
         /* ***************************************************************** */
 
-        explicit ClContextBase(
+        SIXTRL_HOST_FN explicit ClContextBase(
             const char *const SIXTRL_RESTRICT config_str = nullptr );
 
-        explicit ClContextBase(
+        SIXTRL_HOST_FN explicit ClContextBase(
             size_type const node_index,
             const char *const SIXTRL_RESTRICT config_str = nullptr  );
 
-        explicit ClContextBase( node_id_t const node_id,
+        SIXTRL_HOST_FN explicit ClContextBase( node_id_t const node_id,
             const char *const SIXTRL_RESTRICT config_str = nullptr   );
 
-        ClContextBase( char const* node_id_str,
+        SIXTRL_HOST_FN ClContextBase( char const* node_id_str,
             const char *const SIXTRL_RESTRICT config_str  );
 
-        ClContextBase(
+        SIXTRL_HOST_FN ClContextBase(
             platform_id_t const platform_idx,
             device_id_t const device_idx,
             const char *const SIXTRL_RESTRICT config_str = nullptr   );
 
-        ClContextBase( ClContextBase const& other ) = delete;
-        ClContextBase( ClContextBase&& other ) = delete;
+        SIXTRL_HOST_FN ClContextBase( ClContextBase const& other ) = delete;
+        SIXTRL_HOST_FN ClContextBase( ClContextBase&& other ) = delete;
 
-        ClContextBase& operator=( ClContextBase const& other ) = delete;
-        ClContextBase& operator=( ClContextBase&& other ) = delete;
+        SIXTRL_HOST_FN ClContextBase& operator=( ClContextBase const& other ) = delete;
+        SIXTRL_HOST_FN ClContextBase& operator=( ClContextBase&& other ) = delete;
 
-        virtual ~ClContextBase() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN virtual ~ClContextBase() SIXTRL_NOEXCEPT;
 
-        size_type numAvailableNodes() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN size_type numAvailableNodes() const SIXTRL_NOEXCEPT;
 
-        node_info_t const*  availableNodesInfoBegin() const SIXTRL_NOEXCEPT;
-        node_info_t const*  availableNodesInfoEnd()   const SIXTRL_NOEXCEPT;
-        node_info_t const*  defaultNodeInfo()         const SIXTRL_NOEXCEPT;
-        node_id_t defaultNodeId() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN node_info_t const*
+            availableNodesInfoBegin() const SIXTRL_NOEXCEPT;
 
-        bool isNodeIndexAvailable(
+        SIXTRL_HOST_FN node_info_t const*
+            availableNodesInfoEnd() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN node_info_t const*
+            defaultNodeInfo() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN node_id_t defaultNodeId() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN bool isNodeIndexAvailable(
             size_type const node_index ) const SIXTRL_RESTRICT;
 
-        bool isNodeIdAvailable(
+        SIXTRL_HOST_FN bool isNodeIdAvailable(
             node_id_t const node_id ) const SIXTRL_NOEXCEPT;
 
-        bool isNodeIdAvailable(
+        SIXTRL_HOST_FN bool isNodeIdAvailable(
             platform_id_t const platform_index,
             device_id_t const device_index ) const SIXTRL_NOEXCEPT;
 
-        bool isNodeIdAvailable(
+        SIXTRL_HOST_FN bool isNodeIdAvailable(
             char const* node_id_str ) const SIXTRL_NOEXCEPT;
 
-        bool isDefaultNode( char const* node_id_str    ) const SIXTRL_NOEXCEPT;
-        bool isDefaultNode( node_id_t const node_id    ) const SIXTRL_NOEXCEPT;
-        bool isDefaultNode( size_type const node_index ) const SIXTRL_NOEXCEPT;
-        bool isDefaultNode( platform_id_t const platform_index,
-                            device_id_t const device_index
-                          ) const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool isDefaultNode(
+            char const* node_id_str ) const SIXTRL_NOEXCEPT;
 
-        node_id_t const*   ptrAvailableNodesId(
+        SIXTRL_HOST_FN bool isDefaultNode(
+            node_id_t const node_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN bool isDefaultNode(
+            size_type const node_index ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN bool isDefaultNode( platform_id_t const platform_index,
+            device_id_t const device_index ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN node_id_t const*   ptrAvailableNodesId(
             size_type const index ) const SIXTRL_NOEXCEPT;
 
-        node_id_t const*   ptrAvailableNodesId(
+        SIXTRL_HOST_FN node_id_t const*   ptrAvailableNodesId(
             platform_id_t const platform_index,
             device_id_t   const device_index ) const SIXTRL_NOEXCEPT;
 
-        node_id_t const*   ptrAvailableNodesId(
+        SIXTRL_HOST_FN node_id_t const*   ptrAvailableNodesId(
             char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT;
 
-
-        node_info_t const*  ptrAvailableNodesInfo(
+        SIXTRL_HOST_FN node_info_t const*  ptrAvailableNodesInfo(
             size_type const index ) const SIXTRL_NOEXCEPT;
 
-        node_info_t const*  ptrAvailableNodesInfo(
+        SIXTRL_HOST_FN node_info_t const*  ptrAvailableNodesInfo(
             node_id_t const node_id ) const SIXTRL_NOEXCEPT;
 
-        node_info_t const*  ptrAvailableNodesInfo(
+        SIXTRL_HOST_FN node_info_t const*  ptrAvailableNodesInfo(
             char const* SIXTRL_RESTRICT node_id_str ) const SIXTRL_NOEXCEPT;
 
-        bool hasSelectedNode() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool isAvailableNodeAMDPlatform(
+            size_type const index ) const SIXTRL_NOEXCEPT;
 
-        cl::Device const* selectedNodeDevice() const SIXTRL_NOEXCEPT;
-        cl::Device* selectedNodeDevice() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool hasSelectedNode() const SIXTRL_NOEXCEPT;
 
-        node_id_t const*    ptrSelectedNodeId()     const SIXTRL_NOEXCEPT;
-        node_info_t const*  ptrSelectedNodeInfo()   const SIXTRL_NOEXCEPT;
-        size_type           selectedNodeIndex()     const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cl::Device const*
+            selectedNodeDevice() const SIXTRL_NOEXCEPT;
 
-        std::string selectedNodeIdStr() const SIXTRL_NOEXCEPT;
-        bool selectedNodeIdStr( char* SIXTRL_RESTRICT node_id_str,
-                size_type const max_str_length ) const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cl::Device* selectedNodeDevice() SIXTRL_NOEXCEPT;
 
-        bool selectNode( node_id_t const node_id );
-        bool selectNode( platform_id_t const platform_idx,
+        SIXTRL_HOST_FN node_id_t const*
+            ptrSelectedNodeId() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN node_info_t const*
+            ptrSelectedNodeInfo() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN size_type selectedNodeIndex() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN std::string selectedNodeIdStr() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN bool selectedNodeIdStr(
+            char* SIXTRL_RESTRICT node_id_str,
+            size_type const max_str_length ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN bool selectNode( node_id_t const node_id );
+        SIXTRL_HOST_FN bool selectNode( platform_id_t const platform_idx,
                          device_id_t const device_idx );
 
-        bool selectNode( char const* node_id_str );
-        bool selectNode( size_type const index );
+        SIXTRL_HOST_FN bool selectNode( char const* node_id_str );
+        SIXTRL_HOST_FN bool selectNode( size_type const index );
 
-        void printNodesInfo() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void printNodesInfo() const SIXTRL_NOEXCEPT;
 
-        void clear();
+        SIXTRL_HOST_FN void clear();
 
-        char const* configStr() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN char const* configStr() const SIXTRL_NOEXCEPT;
 
-        void setDefaultCompileOptions( std::string const& compile_options_str );
-        void setDefaultCompileOptions( char const* compile_options_str );
+        SIXTRL_HOST_FN void setDefaultCompileOptions(
+            std::string const& compile_options_str );
 
-        char const* defaultCompileOptions() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void setDefaultCompileOptions(
+            char const* compile_options_str );
 
-        program_id_t addProgramCode( std::string const& source_code );
-        program_id_t addProgramCode( char const* source_code );
+        SIXTRL_HOST_FN char const*
+            defaultCompileOptions() const SIXTRL_NOEXCEPT;
 
-        program_id_t addProgramCode( std::string const& source_code,
-                                     std::string const& compile_options );
+        SIXTRL_HOST_FN program_id_t addProgramCode(
+            std::string const& source_code );
 
-        program_id_t addProgramCode( char const* source_code,
+        SIXTRL_HOST_FN program_id_t addProgramCode( char const* source_code );
+
+        SIXTRL_HOST_FN program_id_t addProgramCode(
+            std::string const& source_code,
+            std::string const& compile_options );
+
+        SIXTRL_HOST_FN program_id_t addProgramCode( char const* source_code,
                                      char const* compile_options );
 
-        program_id_t addProgramFile( std::string const& path_to_program );
-        program_id_t addProgramFile( char const* path_to_program );
+        SIXTRL_HOST_FN program_id_t addProgramFile(
+            std::string const& path_to_program );
 
-        program_id_t addProgramFile( std::string const& path_to_program,
-                                     std::string const& compile_options );
+        SIXTRL_HOST_FN program_id_t addProgramFile(
+            char const* path_to_program );
 
-        program_id_t addProgramFile( char const* path_to_program,
-                                     char const* compile_options );
+        SIXTRL_HOST_FN program_id_t addProgramFile(
+            std::string const& path_to_program,
+            std::string const& compile_options );
 
-        bool compileProgram( program_id_t const program_id );
+        SIXTRL_HOST_FN program_id_t addProgramFile( char const* path_to_program,
+            char const* compile_options );
 
-        char const* programSourceCode(
+        SIXTRL_HOST_FN bool compileProgram( program_id_t const program_id );
+
+        SIXTRL_HOST_FN char const* programSourceCode(
             program_id_t const program_id ) const SIXTRL_NOEXCEPT;
 
-        bool programHasFilePath(
+        SIXTRL_HOST_FN bool programHasFilePath(
             program_id_t const program_id ) const SIXTRL_NOEXCEPT;
 
-        char const* programPathToFile(
+        SIXTRL_HOST_FN char const* programPathToFile(
             program_id_t const program_id ) const SIXTRL_NOEXCEPT;
 
-        char const* programCompileOptions(
+        SIXTRL_HOST_FN char const* programCompileOptions(
             program_id_t const program_id ) const SIXTRL_NOEXCEPT;
 
-        char const* programCompileReport(
+        SIXTRL_HOST_FN char const* programCompileReport(
             program_id_t const program_id ) const SIXTRL_NOEXCEPT;
 
-        bool isProgramCompiled(
+        SIXTRL_HOST_FN bool isProgramCompiled(
             program_id_t const program_id ) const SIXTRL_NOEXCEPT;
 
-        size_type    numAvailablePrograms() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN size_type numAvailablePrograms() const SIXTRL_NOEXCEPT;
 
-        kernel_id_t  enableKernel( std::string const& kernel_name,
-                                   program_id_t const program_id );
+        SIXTRL_HOST_FN kernel_id_t enableKernel(
+            std::string const& kernel_name, program_id_t const program_id );
 
-        kernel_id_t  enableKernel( char const* kernel_name,
-                                   program_id_t const program_id );
+        SIXTRL_HOST_FN kernel_id_t  enableKernel( char const* kernel_name,
+            program_id_t const program_id );
 
-        kernel_id_t findKernelByName(
+        SIXTRL_HOST_FN kernel_id_t findKernelByName(
             const char* SIXTRL_RESTRICT kernel_name ) const SIXTRL_NOEXCEPT;
 
-        char const* kernelFunctionName(
+        SIXTRL_HOST_FN char const* kernelFunctionName(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        size_type kernelLocalMemSize(
+        SIXTRL_HOST_FN size_type kernelLocalMemSize(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        size_type kernelNumArgs(
+        SIXTRL_HOST_FN size_type kernelNumArgs(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        size_type kernelWorkGroupSize(
+        SIXTRL_HOST_FN size_type kernelWorkGroupSize(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        size_type kernelMaxWorkGroupSize(
+        SIXTRL_HOST_FN size_type kernelMaxWorkGroupSize(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        size_type kernelPreferredWorkGroupSizeMultiple(
+        SIXTRL_HOST_FN size_type kernelPreferredWorkGroupSizeMultiple(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        bool setKernelWorkGroupSize(
-            kernel_id_t const kernel_id, size_type work_group_size ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool setKernelWorkGroupSize(
+            kernel_id_t const kernel_id,
+            size_type work_group_size ) SIXTRL_NOEXCEPT;
 
-        size_type kernelExecCounter(
+        SIXTRL_HOST_FN size_type kernelExecCounter(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        ClArgument* ptrKernelArgument( kernel_id_t const kernel_id,
+        SIXTRL_HOST_FN ClArgument* ptrKernelArgument(
+            kernel_id_t const kernel_id,
             size_type const arg_index ) SIXTRL_NOEXCEPT;
 
-        kernel_arg_type_t kernelArgumentType( kernel_id_t const kernel_id,
+        SIXTRL_HOST_FN kernel_arg_type_t kernelArgumentType(
+            kernel_id_t const kernel_id,
             size_type const arg_index) const SIXTRL_NOEXCEPT;
 
-        ClArgument const* ptrKernelArgument( kernel_id_t const kernel_id,
+        SIXTRL_HOST_FN ClArgument const* ptrKernelArgument(
+            kernel_id_t const kernel_id,
             size_type const arg_index ) const SIXTRL_NOEXCEPT;
 
-        void resetSingleKernelArgument( kernel_id_t const kernel_id,
+        SIXTRL_HOST_FN void resetSingleKernelArgument(
+            kernel_id_t const kernel_id,
             size_type const arg_index ) SIXTRL_NOEXCEPT;
 
-        void resetKernelArguments( kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void resetKernelArguments(
+            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
 
-        void assignKernelArgument( kernel_id_t const kernel_id,
+        SIXTRL_HOST_FN void assignKernelArgument( kernel_id_t const kernel_id,
             size_type const arg_index, ClArgument& SIXTRL_RESTRICT_REF arg );
 
         template< typename T >
-        void assignKernelArgumentPtr( kernel_id_t const kernel_id,
-            size_type const arg_index, T* SIXTRL_RESTRICT ptr ) SIXTRL_NOEXCEPT
+        SIXTRL_HOST_FN void assignKernelArgumentPtr(
+            kernel_id_t const kernel_id, size_type const arg_index,
+                T* SIXTRL_RESTRICT ptr ) SIXTRL_NOEXCEPT
         {
             using _this_t = ClContextBase;
 
@@ -388,8 +346,9 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         template< typename T >
-        void assignKernelArgumentValue( kernel_id_t const kernel_id,
-            size_type const arg_index, T& SIXTRL_RESTRICT_REF ref ) SIXTRL_NOEXCEPT
+        SIXTRL_HOST_FN void assignKernelArgumentValue(
+            kernel_id_t const kernel_id, size_type const arg_index,
+                T& SIXTRL_RESTRICT_REF ref ) SIXTRL_NOEXCEPT
         {
             using _this_t = ClContextBase;
 
@@ -404,65 +363,93 @@ namespace SIXTRL_CXX_NAMESPACE
             if( kernel != nullptr ) kernel->setArg( arg_index, ref );
         }
 
-        void assignKernelArgumentClBuffer(
+        SIXTRL_HOST_FN void assignKernelArgumentClBuffer(
             kernel_id_t const kernel_id, size_type const arg_index,
-            cl::Buffer& SIXTRL_RESTRICT_REF cl_buffer_arg );
+            cl_buffer_t& SIXTRL_RESTRICT_REF cl_buffer_arg );
 
-        size_type calculateKernelNumWorkItems(
+        SIXTRL_HOST_FN size_type calculateKernelNumWorkItems(
             kernel_id_t const kernel_id,
             size_type const min_num_work_items ) const SIXTRL_NOEXCEPT;
 
-        bool runKernel( kernel_id_t const kernel_id, size_type min_num_work_items );
-        bool runKernel( kernel_id_t const kernel_id,
-                        size_type min_num_work_items, size_type work_group_size );
+        SIXTRL_HOST_FN bool runKernel(
+            kernel_id_t const kernel_id, size_type min_num_work_items );
 
-        double lastExecTime( kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
-        double minExecTime(  kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
-        double maxExecTime(  kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
-        double avgExecTime(  kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool runKernel(
+            kernel_id_t const kernel_id, size_type min_num_work_items,
+            size_type work_group_size );
 
-        size_type lastExecWorkGroupSize(
+        SIXTRL_HOST_FN double lastExecTime( kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN double minExecTime(  kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN double maxExecTime(  kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN double avgExecTime(  kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN size_type lastExecWorkGroupSize(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        size_type lastExecNumWorkItems(
+        SIXTRL_HOST_FN size_type lastExecNumWorkItems(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        void resetKernelExecTiming( kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void resetKernelExecTiming(
+            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
 
-        program_id_t programIdByKernelId(
+        SIXTRL_HOST_FN program_id_t programIdByKernelId(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        bool hasRemappingProgram() const SIXTRL_NOEXCEPT;
-        program_id_t remappingProgramId() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool has_remapping_program() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN program_id_t remapping_program_id() const SIXTRL_NOEXCEPT;
 
-        bool hasRemappingKernel()  const SIXTRL_NOEXCEPT;
-        kernel_id_t remappingKernelId() const SIXTRL_NOEXCEPT;
-        bool setRemappingKernelId( kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+        /* ----------------------------------------------------------------- */
 
-        size_type   numAvailableKernels() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool has_remapping_kernel()  const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN kernel_id_t remapping_kernel_id() const SIXTRL_NOEXCEPT;
 
-        cl::Program* openClProgram( program_id_t const program_id ) SIXTRL_NOEXCEPT;
-        cl::Kernel* openClKernel( kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
-        cl::CommandQueue* openClQueue() SIXTRL_NOEXCEPT;
-        cl::Context* openClContext() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool set_remapping_kernel_id(
+            kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
 
-        cl::Buffer const& internalSuccessFlagBuffer() const SIXTRL_NOEXCEPT;
-        cl::Buffer& internalSuccessFlagBuffer() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN size_type   numAvailableKernels() const SIXTRL_NOEXCEPT;
 
-        bool debugMode() const  SIXTRL_NOEXCEPT;
-        void enableDebugMode()  SIXTRL_NOEXCEPT;
-        void disableDebugMode() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cl::Program*
+        openClProgram( program_id_t const program_id ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN cl::Kernel*
+        openClKernel( kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN cl::CommandQueue* openClQueue() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cl::Context* openClContext() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN cl_buffer_t const&
+        internalStatusFlagsBuffer() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN cl_buffer_t& internalStatusFlagsBuffer() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN bool debugMode() const  SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void enableDebugMode()  SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN void disableDebugMode() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN status_flag_t status_flags();
+
+        SIXTRL_HOST_FN status_flag_t set_status_flags(
+            status_flag_t const status_flags );
+
+        SIXTRL_HOST_FN status_t prepare_status_flags_for_use();
+        SIXTRL_HOST_FN status_t eval_status_flags_after_use();
+
+        SIXTRL_HOST_FN status_t assign_slot_size_arg(
+            size_type const slot_size );
+
+        SIXTRL_HOST_FN status_t assign_status_flags_arg(
+            cl_buffer_t& SIXTRL_RESTRICT_REF success_flag_arg );
 
         protected:
 
-        static ctrl_status_t GetAvailableNodes(
+        SIXTRL_HOST_FN static status_t GetAvailableNodes(
             std::vector< ClContextBase::node_id_t>& available_nodes_id,
             std::vector< ClContextBase::node_info_t >& available_nodes_info,
             std::vector< cl::Device >& available_devices,
-            char const* SIXTRL_RESTRICT env_variable_name = nullptr ,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr,
             char const* SIXTRL_RESTRICT filter_str = nullptr );
 
-        static ctrl_status_t GetAllowedNodesFromEnvVariable(
+        SIXTRL_HOST_FN static status_t GetAllowedNodesFromEnvVariable(
             std::vector< node_id_t >& allowed_node_ids,
             char const* SIXTRL_RESTRICT env_variable_name = nullptr );
 
@@ -498,13 +485,6 @@ namespace SIXTRL_CXX_NAMESPACE
         using kernel_data_t = struct KernelData
         {
             using arg_type_t = kernel_arg_type_t;
-
-            static const arg_type_t
-                ARG_TYPE_CL_ARGUMENT = arg_type_t{ 0x00000010 };
-
-            static const arg_type_t
-                ARG_TYPE_CL_BUFFER   = arg_type_t{ 0x00000020 };
-
 
             KernelData() :
                 m_kernel_name(),
@@ -676,6 +656,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         virtual bool doSelectNode( size_type node_index );
 
+        virtual status_t doSetStatusFlags( status_flag_t const value );
+        virtual status_t doFetchStatusFlags(
+            status_flag_t* SIXTRL_RESTRICT ptr_status_flags );
+
+        virtual status_t doAssignStatusFlagsArg(
+            cl_buffer_t& SIXTRL_RESTRICT_REF status_flags_arg );
+
+        virtual status_t doAssignSlotSizeArg( size_type const slot_size );
+
         void doSetConfigStr( const char *const SIXTRL_RESTRICT config_str );
 
         void addKernelExecTime(
@@ -696,7 +685,8 @@ namespace SIXTRL_CXX_NAMESPACE
         size_type findAvailableNodesIndex( char const* node_id_str
             ) const SIXTRL_NOEXCEPT;
 
-//         int32_t handleKernelSuccessFlag();
+        status_flag_t* doGetPtrLocalStatusFlags() SIXTRL_NOEXCEPT;
+        status_flag_t const* doGetPtrLocalStatusFlags() const SIXTRL_NOEXCEPT;
 
         private:
 
@@ -713,9 +703,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         void doClearBaseImpl() SIXTRL_NOEXCEPT;
 
+        status_t doAssignStatusFlagsArgBaseImpl(
+            cl_buffer_t& SIXTRL_RESTRICT_REF status_flags_arg );
+
+        status_t doAssignSlotSizeArgBaseImpl(
+            size_type const slot_size );
+
         std::vector< cl::Program >      m_cl_programs;
         std::vector< cl::Kernel  >      m_cl_kernels;
-        std::vector< cl::Buffer  >      m_cl_buffers;
+        std::vector< cl_buffer_t >      m_cl_buffers;
         std::vector< node_id_t >        m_available_nodes_id;
         std::vector< node_info_t>       m_available_nodes_info;
         std::vector< cl::Device >       m_available_devices;
@@ -728,12 +724,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         cl::Context                     m_cl_context;
         cl::CommandQueue                m_cl_queue;
-        cl::Buffer                      m_cl_success_flag;
+        cl_buffer_t                     m_cl_success_flag;
 
         program_id_t                    m_remap_program_id;
         kernel_id_t                     m_remap_kernel_id;
         int64_t                         m_selected_node_index;
         uint64_t                        m_default_kernel_arg;
+        status_flag_t                   m_local_status_flags;
 
         bool                            m_debug_mode;
     };
@@ -773,6 +770,8 @@ extern "C" {
 typedef SIXTRL_INT64_T      NS(context_kernel_id_t);
 typedef SIXTRL_INT64_T      NS(context_buffer_id_t);
 
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
 NS(OpenCL_num_available_nodes)( void );
 
@@ -802,6 +801,11 @@ NS(ClContextBase_get_available_nodes_info_end)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_node_info_t) const*
 NS(ClContextBase_get_available_node_info_by_index)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT context,
+    NS(context_size_t) const node_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(ClContextBase_is_available_node_amd_platform)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT context,
     NS(context_size_t) const node_index );
 
@@ -900,171 +904,201 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_get_num_available_programs)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContextBase_add_program_file)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_program_id_t)
+NS(ClContextBase_add_program_file)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* SIXTRL_RESTRICT path_to_program_file,
     char const* SIXTRL_RESTRICT compile_options );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_compile_program)(
-    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const program_id );
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    NS(arch_program_id_t) const program_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN char const*
 NS(ClContextBase_get_program_source_code)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const program_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_program_id_t) const program_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_has_program_file_path)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const program_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_program_id_t) const program_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN char const*
 NS(ClContextBase_get_program_path_to_file)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const program_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_program_id_t) const program_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN char const*
 NS(ClContextBase_get_program_compile_options)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const program_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_program_id_t) const program_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN char const*
-NS(ClContextBase_get_program_compile_report)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const program_id );
+SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(ClContextBase_get_program_compile_report)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_program_id_t) const program_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_is_program_compiled)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const program_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_program_id_t) const program_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContextBase_enable_kernel)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_kernel_id_t) NS(ClContextBase_enable_kernel)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
-    char const* kernel_name, int const program_id );
+    char const* kernel_name, NS(arch_program_id_t) const program_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
-NS(ClContextBase_get_num_available_kernels)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_num_available_kernels)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContextBase_find_kernel_id_by_name)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_kernel_id_t) NS(ClContextBase_find_kernel_id_by_name)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* SIXTRL_RESTRICT kernel_name );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN char const*
-NS(ClContextBase_get_kernel_function_name)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(ClContextBase_get_kernel_function_name)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
-NS(ClContextBase_get_kernel_local_mem_size)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_local_mem_size)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
-NS(ClContextBase_get_kernel_num_args)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_num_args)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
-NS(ClContextBase_get_kernel_work_group_size)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_work_group_size)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
-NS(ClContextBase_get_kernel_max_work_group_size)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_max_work_group_size)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_set_kernel_work_group_size)(
     NS(ClContextBase)* SIXTRL_RESTRICT context,
-    int const kernel_id, NS(context_size_t) const work_group_size );
+    NS(arch_kernel_id_t) const kernel_id,
+    NS(context_size_t) const work_group_size );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t) NS(ClContextBase_get_kernel_exec_counter)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)* NS(ClContextBase_get_ptr_kernel_argument)(
-    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id,
     NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(kernel_arg_type_t)
 NS(ClContextBase_get_kernel_argument_type)(
-    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id,
     NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
 NS(ClContextBase_get_const_ptr_kernel_argument)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id,
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id,
     NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument)(
-    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id,
     NS(context_size_t) const arg_index, NS(ClArgument)* SIXTRL_RESTRICT arg );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void
-NS(ClContextBase_reset_single_kernel_argument)(
-    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_reset_single_kernel_argument)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id,
     NS(context_size_t) const arg_index ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_ptr)(
-    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id,
     NS(context_size_t) const arg_index,
     void* SIXTRL_RESTRICT ptr ) SIXTRL_NOEXCEPT;
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void
-NS(ClContextBase_assign_kernel_argument_value)(
-    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_value)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id,
     NS(context_size_t) const arg_index, void* SIXTRL_RESTRICT arg_data,
     NS(context_size_t) const arg_data_size ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_arguments)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
-    int const kernel_id ) SIXTRL_NOEXCEPT;
+    NS(arch_kernel_id_t) const kernel_id ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_calculate_kernel_num_work_items)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
-    int const kernel_id, NS(context_size_t) const min_num_work_items );
+    NS(arch_kernel_id_t) const kernel_id,
+    NS(context_size_t) const min_num_work_items );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_run_kernel)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
-    int const kernel_id, NS(context_size_t) num_work_items );
+    NS(arch_kernel_id_t) const kernel_id, NS(context_size_t) num_work_items );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_run_kernel_wgsize)(
-    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id,
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id,
     NS(context_size_t) const num_work_items,
     NS(context_size_t) const work_group_size );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN double NS(ClContextBase_get_last_exec_time)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN double NS(ClContextBase_get_min_exec_time)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN double NS(ClContextBase_get_max_exec_time)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN double NS(ClContextBase_get_avg_exec_time)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_get_last_exec_work_group_size)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(context_size_t)
 NS(ClContextBase_get_last_exec_num_work_items)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_reset_kernel_exec_timing)(
-    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id );
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int  NS(ClContextBase_get_program_id_by_kernel_id)(
-    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx, int const kernel_id );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_program_id_t)
+NS(ClContextBase_get_program_id_by_kernel_id)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_has_remapping_program)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContextBase_get_remapping_program_id)(
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_program_id_t) NS(ClContextBase_remapping_program_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_has_remapping_kernel)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContextBase_get_remapping_kernel_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_kernel_id_t) NS(ClContextBase_remapping_kernel_id)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_set_remapping_kernel_id)(
-    NS(ClContextBase)* SIXTRL_RESTRICT ctx, int const kernel_id );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ClContextBase_set_remapping_kernel_id)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const kernel_id );
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN cl_program NS(ClContextBase_get_program)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
@@ -1072,7 +1106,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN cl_program NS(ClContextBase_get_program)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN cl_kernel NS(ClContextBase_get_kernel)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
-    int const kernel_id );
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN cl_command_queue NS(ClContextBase_get_queue)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
@@ -1096,8 +1130,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_free)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_delete)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN cl_mem
-NS(ClContextBase_get_internal_opencl_success_flag_buffer)(
+SIXTRL_EXTERN SIXTRL_HOST_FN cl_mem NS(ClContextBase_get_internal_status_flags_buffer)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_is_debug_mode_enabled)(

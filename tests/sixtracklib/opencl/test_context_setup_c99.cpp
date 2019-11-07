@@ -30,10 +30,10 @@ TEST( C99_OpenCL_ContextSetupTests, ClContextEnvVariablesSetupTests )
     context_t* context = NS(ClContext_create)();
 
     ASSERT_TRUE( ::NS(ClContextBase_has_remapping_program)( context ) );
-    ASSERT_TRUE( ::NS(ClContextBase_get_remapping_program_id)( context ) >= 0 );
+    ASSERT_TRUE( ::NS(ClContextBase_remapping_program_id)( context ) >= 0 );
 
     std::cout << ::NS(ClContextBase_get_program_compile_options)( context,
-                    ::NS(ClContextBase_get_remapping_program_id)( context ) )
+                    ::NS(ClContextBase_remapping_program_id)( context ) )
               << std::endl;
 
     ::NS(ClContextBase_delete)( context );

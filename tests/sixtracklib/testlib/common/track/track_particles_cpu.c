@@ -7,153 +7,117 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/track/definitions.h"
-#include "sixtracklib/common/track.h"
+#include "sixtracklib/common/track/track.h"
 
 NS(track_status_t) NS(TestTrackCpu_track_particles_until_turn_cpu)(
-    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
-    NS(buffer_size_t) const num_particle_sets,
-    NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,
-    const NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
+    NS(Buffer)* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const num_psets,
+    NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
+    const NS(Buffer) *const SIXTRL_RESTRICT belems_buffer,
     NS(particle_index_t) const until_turn )
 {
-    typedef NS(buffer_size_t) buf_size_t;
-
+    typedef NS(buffer_size_t) size_t;
     NS(track_status_t) status = NS(TRACK_STATUS_GENERAL_FAILURE);
 
-    if( ( particles_buffer != SIXTRL_NULLPTR ) &&
-        ( num_particle_sets > ( buf_size_t )0u ) &&
-        ( particle_set_indices_begin != SIXTRL_NULLPTR ) &&
-        ( NS(Buffer_is_particles_buffer)( particles_buffer ) ) &&
-        ( beam_elements_buffer != SIXTRL_NULLPTR ) )
+    if( ( pbuffer != SIXTRL_NULLPTR ) && ( num_psets > ( size_t )0u ) &&
+        ( pset_indices_begin != SIXTRL_NULLPTR ) &&
+        ( NS(Buffer_is_particles_buffer)( pbuffer ) ) &&
+        ( belems_buffer != SIXTRL_NULLPTR ) )
     {
-        buf_size_t const* pset_it = particle_set_indices_begin;
-        buf_size_t const* pset_end = pset_it + num_particle_sets;
+        size_t const* pset_it  = pset_indices_begin;
+        size_t const* pset_end = pset_it + num_psets;
 
         status = NS(TRACK_SUCCESS);
 
         for( ; pset_it != pset_end ; ++pset_it )
         {
-            NS(Particles)* particles = NS(Particles_buffer_get_particles)(
-                particles_buffer, *pset_it );
-
-            if( particles == SIXTRL_NULLPTR )
-            {
-                status = NS(TRACK_STATUS_GENERAL_FAILURE);
-                break;
-            }
-
-            status = NS(Track_all_particles_until_turn)(
-                particles, beam_elements_buffer, until_turn );
-
-            if( status != NS(TRACK_SUCCESS) )
-            {
-                break;
-            }
+            status |= NS(Track_all_particles_until_turn)(
+                NS(Particles_buffer_get_particles)( pbuffer, *pset_it ),
+                    belems_buffer, until_turn );
         }
     }
 
     return status;
 }
 
-
 NS(track_status_t) NS(TestTrackCpu_track_particles_elem_by_elem_until_turn_cpu)(
-    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
-    NS(buffer_size_t) const num_particle_sets,
-    NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,
-    const NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
-    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_conf,
-    NS(particle_index_t) const until_turn_elem_by_elem )
+    NS(Buffer)* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const num_psets,
+    NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
+    const NS(Buffer) *const SIXTRL_RESTRICT belems_buffer,
+    NS(ElemByElemConfig)* SIXTRL_RESTRICT e_by_e_conf,
+    NS(particle_index_t) const until_turn )
 {
-    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(buffer_size_t) size_t;
     typedef NS(track_status_t) track_status_t;
     typedef NS(elem_by_elem_out_addr_t) address_t;
 
     track_status_t status = NS(TRACK_STATUS_GENERAL_FAILURE);
 
-    if( ( particles_buffer != SIXTRL_NULLPTR ) &&
-        ( num_particle_sets > ( buf_size_t )0u ) &&
-        ( particle_set_indices_begin != SIXTRL_NULLPTR ) &&
-        ( NS(Buffer_is_particles_buffer)( particles_buffer ) ) &&
-        ( beam_elements_buffer != SIXTRL_NULLPTR ) &&
-        ( NS(Buffer_get_num_of_objects)( beam_elements_buffer ) >
-            ( buf_size_t )0u ) &&
-        ( elem_by_elem_conf  != SIXTRL_NULLPTR ) &&
-        ( NS(ElemByElemConfig_get_output_store_address)( elem_by_elem_conf ) !=
+    if( ( pbuffer != SIXTRL_NULLPTR ) && ( num_psets > ( size_t )0u ) &&
+        ( pset_indices_begin != SIXTRL_NULLPTR ) &&
+        ( NS(Buffer_is_particles_buffer)( pbuffer ) ) &&
+        ( belems_buffer != SIXTRL_NULLPTR ) &&
+        ( NS(Buffer_get_num_of_objects)( belems_buffer ) > ( size_t )0u ) &&
+        ( e_by_e_conf  != SIXTRL_NULLPTR ) &&
+        ( NS(ElemByElemConfig_get_output_store_address)( e_by_e_conf ) !=
           ( address_t )0u ) )
     {
-        buf_size_t const* pset_it = particle_set_indices_begin;
-        buf_size_t const* pset_end = pset_it + num_particle_sets;
+        size_t const* pset_it = pset_indices_begin;
+        size_t const* pset_end = pset_it + num_psets;
 
         status = NS(TRACK_SUCCESS);
 
         for( ; pset_it != pset_end ; ++pset_it )
         {
-            NS(Particles)* particles = NS(Particles_buffer_get_particles)(
-                particles_buffer, *pset_it );
-
-            if( particles == SIXTRL_NULLPTR )
-            {
-                status = NS(TRACK_STATUS_GENERAL_FAILURE);
-                break;
-            }
-
-            status = NS(Track_all_particles_element_by_element_until_turn_details)(
-                particles, elem_by_elem_conf, beam_elements_buffer,
-                    until_turn_elem_by_elem );
-
-            if( status != NS(TRACK_SUCCESS) )
-            {
-                break;
-            }
+            status |= NS(Track_all_particles_element_by_element_until_turn)(
+                NS(Particles_buffer_get_particles)( pbuffer, *pset_it ),
+                    e_by_e_conf, belems_buffer, until_turn );
         }
     }
 
     return status;
 }
 
-
 NS(track_status_t) NS(TestTrackCpu_track_particles_line_until_turn_cpu)(
-    NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
-    NS(buffer_size_t) const num_particle_sets,
-    NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,
-    const NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
+    NS(Buffer)* SIXTRL_RESTRICT pbuffer,
+    NS(buffer_size_t) const num_psets,
+    NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
+    const NS(Buffer) *const SIXTRL_RESTRICT belems_buffer,
     NS(buffer_size_t) const num_line_segments,
     NS(buffer_size_t) const* SIXTRL_RESTRICT line_segments_begin_index_begin,
     NS(buffer_size_t) const* SIXTRL_RESTRICT line_segments_end_index_begin,
     NS(particle_index_t) const until_turn, bool const always_finish_line )
 {
-    typedef NS(buffer_size_t)  buf_size_t;
+    typedef NS(buffer_size_t)  size_t;
     typedef NS(track_status_t) track_status_t;
 
     track_status_t status = NS(TRACK_STATUS_GENERAL_FAILURE);
 
-    buf_size_t const num_beam_elements =
-        NS(Buffer_get_num_of_objects)( beam_elements_buffer );
+    size_t const num_beam_elements =
+        NS(Buffer_get_num_of_objects)( belems_buffer );
 
-    if( ( particles_buffer != SIXTRL_NULLPTR ) &&
-        ( num_particle_sets > ( buf_size_t )0u ) &&
-        ( particle_set_indices_begin != SIXTRL_NULLPTR ) &&
-        ( NS(Buffer_is_particles_buffer)( particles_buffer ) ) &&
-        ( beam_elements_buffer != SIXTRL_NULLPTR ) &&
-        ( num_beam_elements > ( buf_size_t )0u ) &&
-        ( num_line_segments > ( buf_size_t )0u ) &&
+    if( ( pbuffer != SIXTRL_NULLPTR ) && ( num_psets > ( size_t )0u ) &&
+        ( pset_indices_begin != SIXTRL_NULLPTR ) &&
+        ( NS(Buffer_is_particles_buffer)( pbuffer ) ) &&
+        ( belems_buffer != SIXTRL_NULLPTR ) &&
+        ( num_beam_elements > ( size_t )0u ) &&
+        ( num_line_segments > ( size_t )0u ) &&
         ( line_segments_begin_index_begin != SIXTRL_NULLPTR ) &&
         ( line_segments_end_index_begin   != SIXTRL_NULLPTR ) )
     {
-        buf_size_t const* pset_it = particle_set_indices_begin;
-        buf_size_t const* pset_end = pset_it + num_particle_sets;
+        size_t const* pset_it = pset_indices_begin;
+        size_t const* pset_end = pset_it + num_psets;
 
-        buf_size_t const* line_begin_idx_it  = line_segments_begin_index_begin;
-        buf_size_t const* line_begin_idx_end =
+        size_t const* line_begin_idx_it  = line_segments_begin_index_begin;
+        size_t const* line_begin_idx_end =
             line_begin_idx_it + num_line_segments;
 
-        buf_size_t const* line_end_idx_it = line_segments_end_index_begin;
-
-        buf_size_t prev_line_begin_idx = ( buf_size_t )0u;
-        buf_size_t prev_line_end_idx = ( buf_size_t )0u;
+        size_t const* line_end_idx_it = line_segments_end_index_begin;
+        size_t prev_line_begin_idx = ( size_t )0u;
+        size_t prev_line_end_idx = ( size_t )0u;
 
         bool first_segment = true;
-
         status = NS(TRACK_SUCCESS);
 
         for( ; line_begin_idx_it != line_begin_idx_end ;
@@ -184,7 +148,7 @@ NS(track_status_t) NS(TestTrackCpu_track_particles_line_until_turn_cpu)(
         if( status != NS(TRACK_SUCCESS) ) return status;
 
         if( *( line_segments_end_index_begin +
-                ( num_line_segments - ( ( buf_size_t )1u ) ) ) !=
+                ( num_line_segments - ( ( size_t )1u ) ) ) !=
             num_beam_elements )
         {
             status = NS(TRACK_STATUS_GENERAL_FAILURE);
@@ -200,12 +164,12 @@ NS(track_status_t) NS(TestTrackCpu_track_particles_line_until_turn_cpu)(
             NS(particle_index_t) at_turn = ( NS(particle_index_t) )-1;
             NS(particle_index_t) at_element_id = ( NS(particle_index_t) )-1;
 
-            buf_size_t particle_idx = ( buf_size_t )0u;
+            size_t particle_idx = ( size_t )0u;
 
             NS(Particles)* particles = NS(Particles_buffer_get_particles)(
-                particles_buffer, *pset_it );
+                pbuffer, *pset_it );
 
-            buf_size_t const num_particles =
+            size_t const num_particles =
                 NS(Particles_get_num_of_particles)( particles );
 
             if( particles == SIXTRL_NULLPTR )
@@ -257,8 +221,8 @@ NS(track_status_t) NS(TestTrackCpu_track_particles_line_until_turn_cpu)(
                 {
                     finish_line = ( *line_end_idx_it == num_beam_elements );
 
-                    status = NS(Track_all_particles_line_ext)( particles,
-                        beam_elements_buffer, *line_begin_idx_it,
+                    status = NS(Track_all_particles_line)( particles,
+                        belems_buffer, *line_begin_idx_it,
                             *line_end_idx_it, finish_line );
 
                     prev_line_begin_idx = *line_begin_idx_it;
@@ -280,8 +244,8 @@ NS(track_status_t) NS(TestTrackCpu_track_particles_line_until_turn_cpu)(
                 {
                     SIXTRL_ASSERT( prev_line_end_idx < num_beam_elements );
 
-                    status = NS(Track_all_particles_line_ext)(
-                        particles, beam_elements_buffer, prev_line_end_idx,
+                    status = NS(Track_all_particles_line)(
+                        particles, belems_buffer, prev_line_end_idx,
                             num_beam_elements, true );
 
                     ++at_turn;

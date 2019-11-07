@@ -22,28 +22,30 @@
 
 TEST( C99_OpenCL_Context, BaseOpenCLContext )
 {
-    using context_t     = ::st_ClContextBase;
-    using con_size_t    = ::st_context_size_t;
-    using node_id_t     = ::st_context_node_id_t;
-    using node_info_t   = ::st_context_node_info_t;
-    using kernel_id_t   = int;
-    using program_id_t  = int;
-    using argument_t    = ::st_ClArgument;
+    namespace st = SIXTRL_CXX_NAMESPACE;
 
-    context_t* context = ::st_ClContextBase_create();
+    using context_t     = ::NS(ClContextBase);
+    using con_size_t    = ::NS(context_size_t);
+    using node_id_t     = ::NS(context_node_id_t);
+    using node_info_t   = ::NS(context_node_info_t);
+    using kernel_id_t   = ::NS(arch_kernel_id_t);
+    using program_id_t  = ::NS(arch_program_id_t);
+    using argument_t    = ::NS(ClArgument);
+
+    context_t* context = ::NS(ClContextBase_create)();
 
     con_size_t const num_nodes =
-        ::st_ClContextBase_get_num_available_nodes( context );
+        ::NS(ClContextBase_get_num_available_nodes)( context );
 
     ASSERT_TRUE( context != nullptr );
 
     if( num_nodes > 0u )
     {
         node_info_t const* node_info_it  =
-            ::st_ClContextBase_get_available_nodes_info_begin( context );
+            ::NS(ClContextBase_get_available_nodes_info_begin)( context );
 
         node_info_t const* node_info_end =
-            ::st_ClContextBase_get_available_nodes_info_end( context );
+            ::NS(ClContextBase_get_available_nodes_info_end)( context );
 
         ASSERT_TRUE( std::distance( node_info_it, node_info_end ) ==
                      static_cast< std::ptrdiff_t >( num_nodes ) );
@@ -51,7 +53,7 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
         node_id_t const default_node_id =
             NS(ClContextBase_get_default_node_id)( context );
 
-        ASSERT_TRUE( ::st_ComputeNodeId_is_valid( &default_node_id ) );
+        ASSERT_TRUE( ::NS(ComputeNodeId_is_valid)( &default_node_id ) );
 
         for( ; node_info_it != node_info_end ; ++node_info_it )
         {
@@ -61,32 +63,32 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
             std::memset( &default_str[ 0 ], ( int )'\0', 16 );
             std::memset( &node_id_str[ 0 ], ( int )'\0', 16 );
 
-            node_id_t const node_id = st_ComputeNodeInfo_get_id( node_info_it );
-            ASSERT_TRUE( ::st_ComputeNodeId_is_valid( &node_id ) );
+            node_id_t const node_id = NS(ComputeNodeInfo_get_id)( node_info_it );
+            ASSERT_TRUE( ::NS(ComputeNodeId_is_valid)( &node_id ) );
 
-            ASSERT_TRUE( 0 == ::st_ComputeNodeId_to_string(
+            ASSERT_TRUE( 0 == ::NS(ComputeNodeId_to_string)(
                 &node_id, &node_id_str[ 0 ], 16 ) );
 
-            if( ::st_ClContextBase_is_node_id_default_node( context, &node_id ) )
+            if( ::NS(ClContextBase_is_node_id_default_node)( context, &node_id ) )
             {
                 strncpy( &default_str[ 0 ], " [DEFAULT]", 16 );
             }
 
-            ASSERT_TRUE( ::st_ComputeNodeInfo_get_arch( node_info_it ) != nullptr );
-            ASSERT_TRUE( ::st_ComputeNodeInfo_get_name( node_info_it ) != nullptr );
-            ASSERT_TRUE( ::st_ComputeNodeInfo_get_platform( node_info_it ) != nullptr );
-            ASSERT_TRUE( ::st_ComputeNodeInfo_get_description( node_info_it ) != nullptr );
+            ASSERT_TRUE( ::NS(ComputeNodeInfo_get_arch)( node_info_it ) != nullptr );
+            ASSERT_TRUE( ::NS(ComputeNodeInfo_get_name)( node_info_it ) != nullptr );
+            ASSERT_TRUE( ::NS(ComputeNodeInfo_get_platform)( node_info_it ) != nullptr );
+            ASSERT_TRUE( ::NS(ComputeNodeInfo_get_description)( node_info_it ) != nullptr );
 
             std::cout << "INFO  ::    Device Id = "
                       << node_id_str << default_str
                       << "\r\n         Architecture = "
-                      << ::st_ComputeNodeInfo_get_arch( node_info_it )
+                      << ::NS(ComputeNodeInfo_get_arch)( node_info_it )
                       << "\r\n             Platform = "
-                      << ::st_ComputeNodeInfo_get_platform( node_info_it )
+                      << ::NS(ComputeNodeInfo_get_platform)( node_info_it )
                       << "\r\n          Device Name = "
-                      << ::st_ComputeNodeInfo_get_name( node_info_it )
+                      << ::NS(ComputeNodeInfo_get_name)( node_info_it )
                       << "\r\n          Description = "
-                      << ::st_ComputeNodeInfo_get_description( node_info_it )
+                      << ::NS(ComputeNodeInfo_get_description)( node_info_it )
                       << "\r\n"
                       << std::endl;
 
@@ -94,101 +96,98 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
             /* Verify that the context has a remapping program but not a
              * remapping kernel before device selection */
 
-            ASSERT_TRUE( !::st_ClContextBase_has_selected_node( context ) );
-            ASSERT_TRUE(  ::st_ClContextBase_has_remapping_program( context ) );
+            ASSERT_TRUE( !::NS(ClContextBase_has_selected_node)( context ) );
+            ASSERT_TRUE(  ::NS(ClContextBase_has_remapping_program)( context ) );
 
             con_size_t const initial_num_programs =
-                ::st_ClContextBase_get_num_available_programs( context );
+                ::NS(ClContextBase_get_num_available_programs)( context );
 
             program_id_t remap_program_id =
-                ::st_ClContextBase_get_remapping_program_id( context );
+                ::NS(ClContextBase_remapping_program_id)( context );
 
+            ASSERT_TRUE( remap_program_id != st::ARCH_ILLEGAL_PROGRAM_ID );
             ASSERT_TRUE( initial_num_programs >= con_size_t{ 0 } );
 
-            ASSERT_TRUE(  ::st_ClContextBase_get_num_available_kernels(
+            ASSERT_TRUE(  ::NS(ClContextBase_get_num_available_kernels)(
                 context ) == con_size_t{ 0 } );
 
-            ASSERT_TRUE(  ::st_ClContextBase_get_remapping_program_id(
-                context ) != -1 );
-
-            ASSERT_TRUE( !::st_ClContextBase_has_remapping_kernel( context ) );
-            ASSERT_TRUE(  ::st_ClContextBase_get_remapping_kernel_id(
-                context ) == -1 );
+            ASSERT_TRUE( !::NS(ClContextBase_has_remapping_kernel)( context ) );
+            ASSERT_TRUE(  ::NS(ClContextBase_remapping_kernel_id)( context ) ==
+                          st::ARCH_ILLEGAL_KERNEL_ID );
 
             /* ------------------------------------------------------------- */
             /* Select current node by node_id */
 
-            ASSERT_TRUE( ::st_ClContextBase_select_node_by_node_id(
+            ASSERT_TRUE( ::NS(ClContextBase_select_node_by_node_id)(
                 context, &node_id ) );
 
-            ASSERT_TRUE( ::st_ClContextBase_has_selected_node( context ) );
-            ASSERT_TRUE( ::st_ComputeNodeId_are_equal( &node_id,
-                ::st_ClContextBase_get_selected_node_id( context ) ) );
+            ASSERT_TRUE( ::NS(ClContextBase_has_selected_node)( context ) );
+            ASSERT_TRUE( ::NS(ComputeNodeId_are_equal)( &node_id,
+                ::NS(ClContextBase_get_selected_node_id)( context ) ) );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_selected_node_info( context )
+            ASSERT_TRUE( ::NS(ClContextBase_get_selected_node_info)( context )
                          == node_info_it );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_num_available_programs(
+            ASSERT_TRUE( ::NS(ClContextBase_get_num_available_programs)(
                 context ) == initial_num_programs );
 
             con_size_t const initial_num_kernels =
-                ::st_ClContextBase_get_num_available_kernels( context );
+                ::NS(ClContextBase_get_num_available_kernels)( context );
 
             ASSERT_TRUE( initial_num_kernels >= initial_num_programs );
 
-            ASSERT_TRUE( ::st_ClContextBase_has_remapping_program( context ) );
-            ASSERT_TRUE( ::st_ClContextBase_get_remapping_program_id(
-                         context ) == remap_program_id );
+            ASSERT_TRUE( ::NS(ClContextBase_has_remapping_program)( context ) );
+            ASSERT_TRUE( ::NS(ClContextBase_remapping_program_id)( context ) ==
+                         remap_program_id );
 
-            ASSERT_TRUE( ::st_ClContextBase_has_remapping_kernel( context ) );
+            ASSERT_TRUE( ::NS(ClContextBase_has_remapping_kernel)( context ) );
 
             kernel_id_t const remap_kernel_id =
-                ::st_ClContextBase_get_remapping_kernel_id( context );
+                ::NS(ClContextBase_remapping_kernel_id)( context );
 
-            ASSERT_TRUE( remap_kernel_id != kernel_id_t{ -1 } );
-            ASSERT_TRUE( remap_program_id ==
-                ::st_ClContextBase_get_program_id_by_kernel_id(
-                    context, remap_kernel_id ) );
+            ASSERT_TRUE( remap_kernel_id != st::ARCH_ILLEGAL_KERNEL_ID );
+            ASSERT_TRUE( ::NS(ClContextBase_get_program_id_by_kernel_id)(
+                    context, remap_kernel_id ) == remap_program_id );
 
             /* ------------------------------------------------------------- */
             /* Create ClArgument from st::Buffer */
 
-            ::st_Buffer* orig_buffer = ::st_Buffer_new_from_file(
-                ::st_PATH_TO_TEST_GENERIC_OBJ_BUFFER_DATA );
+            ::NS(Buffer)* orig_buffer = ::NS(Buffer_new_from_file)(
+                ::NS(PATH_TO_TEST_GENERIC_OBJ_BUFFER_DATA) );
 
-            ::st_Buffer* copy_buffer = ::st_Buffer_new_detailed(
-                ::st_Buffer_get_num_of_objects( orig_buffer ),
-                ::st_Buffer_get_num_of_slots( orig_buffer ),
-                ::st_Buffer_get_num_of_dataptrs( orig_buffer ),
-                ::st_Buffer_get_num_of_garbage_ranges( orig_buffer ),
-                ::st_Buffer_get_flags( orig_buffer ) );
+            ::NS(Buffer)* copy_buffer = ::NS(Buffer_new_detailed)(
+                ::NS(Buffer_get_num_of_objects)( orig_buffer ),
+                ::NS(Buffer_get_num_of_slots)( orig_buffer ),
+                ::NS(Buffer_get_num_of_dataptrs)( orig_buffer ),
+                ::NS(Buffer_get_num_of_garbage_ranges)( orig_buffer ),
+                ::NS(Buffer_get_flags)( orig_buffer ) );
 
-            argument_t* orig_arg = ::st_ClArgument_new_from_buffer(
+            argument_t* orig_arg = ::NS(ClArgument_new_from_buffer)(
                 orig_buffer, context );
 
-            SIXTRL_ASSERT( ::st_ClArgument_get_ptr_to_context( orig_arg ) ==
+            SIXTRL_ASSERT( ::NS(ClArgument_get_ptr_to_context)( orig_arg ) ==
                            context );
 
             SIXTRL_ASSERT( orig_arg != nullptr );
-            SIXTRL_ASSERT( ::st_ClArgument_get_argument_size( orig_arg ) ==
-                           ::st_Buffer_get_size( orig_buffer ) );
+            SIXTRL_ASSERT( ::NS(ClArgument_get_argument_size)( orig_arg ) ==
+                           ::NS(Buffer_get_size)( orig_buffer ) );
 
-            SIXTRL_ASSERT( ::st_ClArgument_uses_cobj_buffer( orig_arg ) );
-            SIXTRL_ASSERT( ::st_ClArgument_get_ptr_cobj_buffer( orig_arg ) ==
+            SIXTRL_ASSERT( ::NS(ClArgument_uses_cobj_buffer)( orig_arg ) );
+            SIXTRL_ASSERT( ::NS(ClArgument_get_ptr_cobj_buffer)( orig_arg ) ==
                            orig_buffer );
 
             argument_t* copy_arg =
-                ::st_ClArgument_new_from_buffer( copy_buffer, context );
+                ::NS(ClArgument_new_from_buffer)( copy_buffer, context );
 
-            SIXTRL_ASSERT( ::st_ClArgument_get_ptr_to_context( copy_arg ) ==
+            SIXTRL_ASSERT( ::NS(ClArgument_get_ptr_to_context)( copy_arg ) ==
                            context );
 
             SIXTRL_ASSERT( orig_arg != nullptr );
-            SIXTRL_ASSERT( ::st_ClArgument_get_argument_size( copy_arg ) ==
-                           ::st_Buffer_get_size( copy_buffer ) );
+            SIXTRL_ASSERT( ::NS(ClArgument_get_argument_size)( copy_arg ) ==
+                           ::NS(Buffer_get_size)( copy_buffer ) );
 
-            SIXTRL_ASSERT( ::st_ClArgument_uses_cobj_buffer( copy_arg ) );
-            SIXTRL_ASSERT( ::st_ClArgument_get_ptr_cobj_buffer( copy_arg ) ==
+            SIXTRL_ASSERT( ::NS(ClArgument_uses_cobj_buffer)( copy_arg ) );
+            SIXTRL_ASSERT( ::NS(ClArgument_get_ptr_cobj_buffer)( copy_arg ) ==
                            copy_buffer );
 
             /* ------------------------------------------------------------- */
@@ -222,7 +221,7 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
                               copy_program_compile_options.data() ) );
 
             if( std::strcmp( ::st_PATH_TO_SIXTRL_INCLUDE_DIR,
-                             ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR ) != 0 )
+                             ::NS(PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR) ) != 0 )
             {
                 std::strncat( copy_program_compile_options.data(), " -I",
                     N - std::strlen( copy_program_compile_options.data() ) );
@@ -232,90 +231,90 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
                     N - std::strlen( copy_program_compile_options.data() ) );
             }
 
-            program_id_t copy_program_id = ::st_ClContextBase_add_program_file(
+            program_id_t copy_program_id = ::NS(ClContextBase_add_program_file)(
                 context, path_to_copy_kernel_program.data(),
                     copy_program_compile_options.data() );
 
-            ASSERT_TRUE( copy_program_id != program_id_t{ -1 } );
+            ASSERT_TRUE( copy_program_id != st::ARCH_ILLEGAL_PROGRAM_ID );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_num_available_programs(
+            ASSERT_TRUE( ::NS(ClContextBase_get_num_available_programs)(
                 context ) == ( initial_num_programs + con_size_t{ 1 } ) );
 
             ASSERT_TRUE( copy_program_id != remap_program_id );
 
-            ASSERT_TRUE( ::st_ClContextBase_has_program_file_path(
+            ASSERT_TRUE( ::NS(ClContextBase_has_program_file_path)(
                 context, copy_program_id ) );
 
             ASSERT_TRUE( 0 == std::strcmp( path_to_copy_kernel_program.data(),
-                ::st_ClContextBase_get_program_path_to_file(
+                ::NS(ClContextBase_get_program_path_to_file)(
                     context, copy_program_id ) ) );
 
-            if( !::st_ClContextBase_is_program_compiled(
+            if( !::NS(ClContextBase_is_program_compiled)(
                     context, copy_program_id ) )
             {
                 std::cout << "ERROR :: unable to compile copy program -> "
                           << "error report \r\n"
-                          << ::st_ClContextBase_get_program_compile_report(
+                          << ::NS(ClContextBase_get_program_compile_report)(
                               context, copy_program_id ) << std::endl;
             }
 
-            ASSERT_TRUE( ::st_ClContextBase_is_program_compiled(
+            ASSERT_TRUE( ::NS(ClContextBase_is_program_compiled)(
                     context, copy_program_id ) );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_num_available_kernels(
+            ASSERT_TRUE( ::NS(ClContextBase_get_num_available_kernels)(
                     context ) == initial_num_kernels );
 
             std::string kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
             kernel_name += "copy_orig_buffer";
 
-            kernel_id_t const copy_kernel_id = ::st_ClContextBase_enable_kernel(
+            kernel_id_t const copy_kernel_id = ::NS(ClContextBase_enable_kernel)(
                 context, kernel_name.c_str(), copy_program_id );
 
-            ASSERT_TRUE( copy_kernel_id != kernel_id_t{ -1 } );
+            ASSERT_TRUE( copy_kernel_id != st::ARCH_ILLEGAL_KERNEL_ID );
             ASSERT_TRUE( copy_kernel_id != remap_kernel_id );
-            ASSERT_TRUE( ::st_ClContextBase_get_num_available_kernels(
+            ASSERT_TRUE( ::NS(ClContextBase_get_num_available_kernels)(
                     context ) == ( initial_num_kernels + con_size_t{ 1 } ) );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_program_id_by_kernel_id(
+            ASSERT_TRUE( ::NS(ClContextBase_get_program_id_by_kernel_id)(
                 context, copy_kernel_id ) == copy_program_id );
 
-            ASSERT_TRUE( ::st_ClContextBase_find_kernel_id_by_name( context,
+            ASSERT_TRUE( ::NS(ClContextBase_find_kernel_id_by_name)( context,
                 kernel_name.c_str() ) == copy_kernel_id );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_kernel_num_args(
+            ASSERT_TRUE( ::NS(ClContextBase_get_kernel_num_args)(
                 context, copy_kernel_id ) == con_size_t{ 3u } );
 
             /* ------------------------------------------------------------- */
             /* clear context to prepare it for the next node, if available   */
 
-            ::st_ClContextBase_clear( context );
+            ::NS(ClContextBase_clear)( context );
 
-            ASSERT_TRUE( !::st_ClContextBase_has_selected_node( context ) );
+            ASSERT_TRUE( !::NS(ClContextBase_has_selected_node)( context ) );
 
-            ASSERT_TRUE( !::st_ClContextBase_has_selected_node( context ) );
-            ASSERT_TRUE(  ::st_ClContextBase_get_num_available_programs(
+            ASSERT_TRUE( !::NS(ClContextBase_has_selected_node)( context ) );
+            ASSERT_TRUE(  ::NS(ClContextBase_get_num_available_programs)(
                 context ) == initial_num_programs );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_num_available_kernels(
+            ASSERT_TRUE( ::NS(ClContextBase_get_num_available_kernels)(
                 context ) == con_size_t{ 0 } );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_remapping_program_id(
+            ASSERT_TRUE( ::NS(ClContextBase_remapping_program_id)(
                 context ) == remap_program_id );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_remapping_kernel_id(
-                context ) == kernel_id_t{ -1 } );
+            ASSERT_TRUE( ::NS(ClContextBase_remapping_kernel_id)(
+                context ) == st::ARCH_ILLEGAL_KERNEL_ID );
 
             /* ------------------------------------------------------------- */
             /* Clean-up and ressource deallocation */
 
-            ::st_ClArgument_delete( orig_arg );
-            ::st_ClArgument_delete( copy_arg );
+            ::NS(ClArgument_delete)( orig_arg );
+            ::NS(ClArgument_delete)( copy_arg );
 
             orig_arg = nullptr;
             copy_arg = nullptr;
 
-            ::st_Buffer_delete( orig_buffer );
-            ::st_Buffer_delete( copy_buffer );
+            ::NS(Buffer_delete)( orig_buffer );
+            ::NS(Buffer_delete)( copy_buffer );
 
             orig_buffer = nullptr;
             copy_buffer = nullptr;
@@ -324,11 +323,10 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
     else
     {
         std::cout << "INFO  :: No suitable OpenCL platforms found -> "
-                  << "skipping unit-test"
-                  << std::endl;
+                  << "skipping unit-test" << std::endl;
     }
 
-    ::st_ClContextBase_delete( context );
+    ::NS(ClContextBase_delete)( context );
 }
 
 /* end: tests/sixtracklib/opencl/test_opencl_context_c99.cpp */

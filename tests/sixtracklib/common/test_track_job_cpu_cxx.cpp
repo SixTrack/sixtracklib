@@ -19,7 +19,8 @@
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
-#include "sixtracklib/common/track.h"
+#include "sixtracklib/common/track/definitions.h"
+#include "sixtracklib/common/track/track.h"
 #include "sixtracklib/common/track_job_cpu.h"
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/particles.hpp"
@@ -522,36 +523,68 @@ TEST( CXX_TrackJobCpuTests, TrackParticles )
 
     size_t elem_by_elem_offset = size_t{ 0 };
     size_t beam_monitor_offset = size_t{ 0 };
-    part_index_t min_turn_id   = part_index_t{ 0 };
+    size_t num_elem_by_elem_objs = size_t{ 0 };
 
-    int ret = ::NS(OutputBuffer_prepare)( eb.getCApiPtr(),
-        cmp_output_buffer.getCApiPtr(), cmp_particles,
-        NUM_ELEM_BY_ELEM_TURNS, &elem_by_elem_offset,
-        &beam_monitor_offset, &min_turn_id );
+    part_index_t const start_elem = part_index_t{ 0u };
+    part_index_t min_part_id, max_part_id, min_elem_id, max_elem_id,
+                 min_turn_id, max_turn_id;
 
-    SIXTRL_ASSERT( ret == 0 );
+    int ret = ::NS(OutputBuffer_get_min_max_attributes)(
+        cmp_particles->getCApiPtr(), eb.getCApiPtr(),
+        &min_part_id, &max_part_id, &min_elem_id, &max_elem_id,
+        &min_turn_id, &max_turn_id, &num_elem_by_elem_objs, start_elem );
 
-    ret = ::NS(BeamMonitor_assign_output_buffer_from_offset)(
-        eb.getCApiPtr(), cmp_output_buffer.getCApiPtr(),
-        min_turn_id, beam_monitor_offset );
+    part_index_t const max_elem_by_elem_turn_id = (
+        ( NUM_ELEM_BY_ELEM_TURNS > static_cast< size_t >( min_turn_id ) ) &&
+        ( min_turn_id >= part_index_t{ 0 } ) )
+        ? ( NUM_ELEM_BY_ELEM_TURNS - 1 ) : min_turn_id;
 
-    SIXTRL_ASSERT( ret == 0 );
+    ::NS(ElemByElemConfig) config;
+    ::NS(ElemByElemConfig_preset)( &config );
 
-    particles_t* elem_by_elem_out =
-        particles_t::FromBuffer( cmp_output_buffer, elem_by_elem_offset );
+    if( ( NS(TRACK_SUCCESS) == ret ) &&
+        ( static_cast< size_t >( min_turn_id ) < NUM_ELEM_BY_ELEM_TURNS ) &&
+        ( num_elem_by_elem_objs > size_t{ 0 } ) )
+    {
+        ret = ::NS(ElemByElemConfig_init_detailed)( &config,
+            NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES), min_part_id,
+                max_part_id, min_elem_id, max_elem_id,
+                    min_turn_id, max_elem_by_elem_turn_id, true );
+    }
+    else if( ret == NS(TRACK_SUCCESS) )
+    {
+        ret = ::NS(TRACK_STATUS_GENERAL_FAILURE);
+    }
 
-    SIXTRL_ASSERT( elem_by_elem_out != nullptr );
+    ret = ::NS(OutputBuffer_prepare)( eb.getCApiPtr(),
+        cmp_output_buffer.getCApiPtr(), cmp_particles->getCApiPtr(),
+            NUM_ELEM_BY_ELEM_TURNS, &elem_by_elem_offset,
+                &beam_monitor_offset, &min_turn_id );
+
+    if( ret == ::NS(TRACK_SUCCESS) )
+    {
+        ret = ::NS(BeamMonitor_assign_output_buffer_from_offset)(
+            eb.getCApiPtr(), cmp_output_buffer.getCApiPtr(),
+                min_turn_id, beam_monitor_offset );
+    }
+
+    if( ret == ::NS(TRACK_SUCCESS) )
+    {
+        ::NS(ElemByElemConfig_set_output_store_address)(
+            &config, ( uintptr_t )::NS(Particles_buffer_get_const_particles)(
+                cmp_output_buffer.getCApiPtr(), elem_by_elem_offset ) );
+    }
 
     ret = ::NS(Track_all_particles_element_by_element_until_turn)(
-        cmp_particles->getCApiPtr(), eb.getCApiPtr(),
-        NUM_ELEM_BY_ELEM_TURNS, elem_by_elem_out );
+        cmp_particles->getCApiPtr(), &config, eb.getCApiPtr(),
+        NUM_ELEM_BY_ELEM_TURNS );
 
-    SIXTRL_ASSERT( ret == 0 );
+    SIXTRL_ASSERT( ret == NS(TRACK_SUCCESS) );
 
     ret = ::NS(Track_all_particles_until_turn)(
         cmp_particles->getCApiPtr(), eb.getCApiPtr(), NUM_TURNS );
 
-    SIXTRL_ASSERT( ret == 0 );
+    SIXTRL_ASSERT( ret == NS(TRACK_SUCCESS) );
 
     st::BeamMonitor::clearAll( eb );
 
@@ -572,7 +605,7 @@ TEST( CXX_TrackJobCpuTests, TrackParticles )
     ret = st::trackElemByElem( job, NUM_ELEM_BY_ELEM_TURNS );
     ASSERT_TRUE( ret == 0 );
 
-    ret = st::track( job, NUM_TURNS );
+    ret = st::trackUntil( job, NUM_TURNS );
     ASSERT_TRUE( ret == 0 );
 
     st::collect( job );
