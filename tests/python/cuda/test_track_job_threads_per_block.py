@@ -48,7 +48,7 @@ if __name__ == '__main__':
     cuda.default_threads_per_block = {default_threads_per_block}\r\n
     cuda.default_track_threads_per_block = {default_track_threads_per_block}\r\n
     """
-    track_job = pyst.CudaTrackJob(eb, pb, PSET_INDEX, config_str=config_str )
+    track_job = pyst.CudaTrackJob(eb, pb, PSET_INDEX, config_str=config_str)
 
     assert track_job.arch_str == "cuda"
     assert track_job.requires_collecting
@@ -64,8 +64,8 @@ if __name__ == '__main__':
     assert not track_job.has_elem_by_elem_output
     assert track_job.num_particle_sets == 1
     assert track_job.default_track_threads_per_block == \
-           default_track_threads_per_block
+        default_track_threads_per_block
     assert track_job.default_threads_per_block == \
-            default_threads_per_block
+        default_threads_per_block
 
     sys.exit(0)

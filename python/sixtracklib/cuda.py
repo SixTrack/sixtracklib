@@ -454,12 +454,12 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
         @property
         def default_threads_per_block(self):
             return st_CudaTrackJob_default_threads_per_block(
-                self._ptr_track_job )
+                self._ptr_track_job)
 
         @property
         def default_track_threads_per_block(self):
             return st_CudaTrackJob_default_track_threads_per_block(
-                self._ptr_track_job )
+                self._ptr_track_job)
 
 
 else:
