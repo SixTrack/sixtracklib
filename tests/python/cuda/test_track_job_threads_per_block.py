@@ -45,8 +45,8 @@ if __name__ == '__main__':
     default_track_threads_per_block = 512
 
     config_str = f"""
-    cuda.default_threads_per_block = {default_threads_per_block}\r\n
-    cuda.default_track_threads_per_block = {default_track_threads_per_block}\r\n
+    cuda.threads_per_block = {default_threads_per_block}\r\n
+    cuda.track_threads_per_block = {default_track_threads_per_block}\r\n
     """
     track_job = pyst.CudaTrackJob(eb, pb, PSET_INDEX, config_str=config_str)
 
