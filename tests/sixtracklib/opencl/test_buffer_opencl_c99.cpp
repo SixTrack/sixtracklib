@@ -24,6 +24,7 @@ TEST( C99_OpenCL_Buffer,
 {
     using buffer_t      = ::NS(Buffer);
     using size_t        = ::NS(buffer_size_t);
+    using context_t     = SIXTRL_CXX_NAMESPACE::ClContextBase;
 
     size_t const NUM_OPENCL_NODES = ::NS(OpenCL_get_num_all_nodes)();
 
@@ -33,14 +34,20 @@ TEST( C99_OpenCL_Buffer,
         return;
     }
 
-    SIXTRL_CXX_NAMESPACE::ClContext st_context;
-    size_t const NUM_NODES = st_context.numAvailableNodes();
+    size_t const NUM_NODES = context_t::NUM_AVAILABLE_NODES(
+        nullptr, "SIXTRACKLIB_DEVICES" );
 
     if( NUM_NODES == size_t{ 0 } )
     {
         std::cout << "No OpenCL nodes available -> skipping test" << std::endl;
         return;
     }
+
+    std::vector< context_t::node_id_t > node_ids(
+        NUM_NODES, context_t::node_id_t{} );
+
+    ASSERT_TRUE( NUM_NODES == context_t::GET_AVAILABLE_NODES( node_ids.data(),
+        NUM_NODES, size_t{ 0 }, nullptr, "SIXTRACKLIB_DEVICES" ) );
 
     buffer_t* orig_buffer = ::NS(Buffer_new_from_file)(
         ::NS(PATH_TO_TEST_GENERIC_OBJ_BUFFER_DATA) );
@@ -77,10 +84,11 @@ TEST( C99_OpenCL_Buffer,
 
     /* --------------------------------------------------------------------- */
 
-    for( size_t node_idx = size_t{ 0 } ; node_idx < NUM_NODES ; ++node_idx )
+    for( auto const& node_id : node_ids )
     {
-        bool const selected = st_context.selectNode( node_idx );
-        ASSERT_TRUE( selected );
+        context_t st_context( node_id );
+
+        ASSERT_TRUE( st_context.hasSelectedNode() );
         ASSERT_TRUE( st_context.selectedNodeDevice() != nullptr );
         ASSERT_TRUE( st_context.openClContext() != nullptr );
         ASSERT_TRUE( st_context.openClQueue() != nullptr );
@@ -119,7 +127,7 @@ TEST( C99_OpenCL_Buffer,
         cl::CommandQueue& queue = *st_context.openClQueue();
 
         auto ptr_node_info = st_context.ptrSelectedNodeInfo();
-        auto ptr_default_info = ( st_context.isDefaultNode( node_idx ) )
+        auto ptr_default_info = ( st_context.isDefaultNode( node_id ) )
             ? st_context.ptrSelectedNodeId() : nullptr;
 
         std::cout << "Perform test for device: \r\n";
