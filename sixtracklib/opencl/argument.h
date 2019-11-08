@@ -188,18 +188,18 @@ SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_buffer)(
     NS(ClContextBase)* SIXTRL_RESTRICT ptr_context );
 
 SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_size)(
-    NS(context_size_t) const arg_size,
+    NS(arch_size_t) const arg_size,
     NS(ClContextBase)* SIXTRL_RESTRICT ptr_context );
 
 SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_memory)(
     void const* SIXTRL_RESTRICT arg_buffer_begin,
-    NS(context_size_t) const arg_size,
+    NS(arch_size_t) const arg_size,
     NS(ClContextBase)* SIXTRL_RESTRICT ptr_context );
 
 SIXTRL_HOST_FN void NS(ClArgument_delete)(
     NS(ClArgument)* SIXTRL_RESTRICT argument );
 
-SIXTRL_HOST_FN NS(context_size_t) NS(ClArgument_get_argument_size)(
+SIXTRL_HOST_FN NS(arch_size_t) NS(ClArgument_get_argument_size)(
     const NS(ClArgument) *const SIXTRL_RESTRICT argument );
 
 SIXTRL_HOST_FN bool NS(ClArgument_write)(
@@ -209,7 +209,7 @@ SIXTRL_HOST_FN bool NS(ClArgument_write)(
 SIXTRL_HOST_FN bool NS(ClArgument_write_memory)(
     NS(ClArgument)* SIXTRL_RESTRICT argument,
     void const* SIXTRL_RESTRICT arg_buffer_begin,
-    NS(context_size_t) const arg_length );
+    NS(arch_size_t) const arg_length );
 
 SIXTRL_HOST_FN bool NS(ClArgument_read)(
     NS(ClArgument)* SIXTRL_RESTRICT argument,
@@ -217,18 +217,18 @@ SIXTRL_HOST_FN bool NS(ClArgument_read)(
 
 SIXTRL_HOST_FN bool NS(ClArgument_read_memory)(
     NS(ClArgument)* SIXTRL_RESTRICT argument,
-    void* arg_buffer_begin, NS(context_size_t) const arg_length );
+    void* arg_buffer_begin, NS(arch_size_t) const arg_length );
 
 SIXTRL_HOST_FN NS(arch_status_t) NS(ClArgument_update_region)(
     NS(ClArgument)* SIXTRL_RESTRICT argument,
-    NS(context_size_t) const offset, NS(context_size_t) const length,
+    NS(arch_size_t) const offset, NS(arch_size_t) const length,
     void const* SIXTRL_RESTRICT new_value );
 
 SIXTRL_HOST_FN NS(arch_status_t) NS(ClArgument_update_regions)(
     NS(ClArgument)* SIXTRL_RESTRICT argument,
-    NS(context_size_t) const num_regions_to_update,
-    NS(context_size_t) const* SIXTRL_RESTRICT offset,
-    NS(context_size_t) const* SIXTRL_RESTRICT length,
+    NS(arch_size_t) const num_regions_to_update,
+    NS(arch_size_t) const* SIXTRL_RESTRICT offset,
+    NS(arch_size_t) const* SIXTRL_RESTRICT length,
     void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_values );
 
 SIXTRL_HOST_FN bool NS(ClArgument_uses_cobj_buffer)(

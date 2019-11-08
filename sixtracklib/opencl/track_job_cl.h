@@ -455,14 +455,14 @@ NS(TrackJobCl_get_const_output_buffer_arg)(
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TrackJobCl_update_beam_elements_region)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
-    NS(context_size_t) const offset, NS(context_size_t) const length,
+    NS(arch_size_t) const offset, NS(arch_size_t) const length,
     void const* SIXTRL_RESTRICT new_value );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TrackJobCl_update_beam_elements_regions)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
-    NS(context_size_t) const num_regions_to_update,
-    NS(context_size_t) const* offsets, NS(context_size_t) const* lengths,
+    NS(arch_size_t) const num_regions_to_update,
+    NS(arch_size_t) const* offsets, NS(arch_size_t) const* lengths,
     void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_value );
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )

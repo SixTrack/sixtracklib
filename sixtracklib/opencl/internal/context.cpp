@@ -26,6 +26,7 @@
 
 #if defined( __cplusplus )
 
+namespace st = SIXTRL_CXX_NAMESPACE;
 namespace SIXTRL_CXX_NAMESPACE
 {
     ClContext::ClContext( const char *const SIXTRL_RESTRICT config_str ) :
@@ -35,17 +36,17 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_num_particles(),
         m_particle_set_index_begins(),
         m_total_num_particles( ClContext::size_type{ 0 } ),
-        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_line_program_id( ClContext::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_track_line_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_single_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_assign_be_mon_out_buffer_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_clear_be_mon_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_single_turn_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_track_elem_by_elem_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_track_line_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
@@ -61,17 +62,17 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_num_particles(),
         m_particle_set_index_begins(),
         m_total_num_particles( ClContext::size_type{ 0 } ),
-        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_line_program_id( ClContext::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_track_line_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_single_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_assign_be_mon_out_buffer_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_clear_be_mon_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_single_turn_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_track_elem_by_elem_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_track_line_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
@@ -102,17 +103,17 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_num_particles(),
         m_particle_set_index_begins(),
         m_total_num_particles( ClContext::size_type{ 0 } ),
-        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_line_program_id( ClContext::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_track_line_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_single_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_assign_be_mon_out_buffer_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_clear_be_mon_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_single_turn_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_track_elem_by_elem_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_track_line_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
@@ -143,17 +144,17 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_num_particles(),
         m_particle_set_index_begins(),
         m_total_num_particles( ClContext::size_type{ 0 } ),
-        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_line_program_id( ClContext::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_track_line_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_single_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_assign_be_mon_out_buffer_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_clear_be_mon_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_single_turn_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_track_elem_by_elem_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_track_line_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
@@ -198,17 +199,17 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_num_particles(),
         m_particle_set_index_begins(),
         m_total_num_particles( ClContext::size_type{ 0 } ),
-        m_track_until_turn_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_single_turn_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_elem_by_elem_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_line_program_id( ClContext::program_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_program_id( ClContext::program_id_t{ -1 } ),
-        m_clear_be_mon_program_id( ClContext::program_id_t{ -1 } ),
-        m_track_single_turn_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_track_elem_by_elem_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_track_line_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_assign_be_mon_out_buffer_kernel_id( ClContext::kernel_id_t{ -1 } ),
-        m_clear_be_mon_kernel_id( ClContext::kernel_id_t{ -1 } ),
+        m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_single_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_assign_be_mon_out_buffer_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_clear_be_mon_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_track_single_turn_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_track_elem_by_elem_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_track_line_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_use_optimized_tracking( true ),
         m_enable_beam_beam( true )
     {
@@ -485,7 +486,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContext::kernel_id_t ClContext::trackingKernelId() const SIXTRL_NOEXCEPT
     {
         return ( this->hasTrackingKernel() )
-            ? this->m_track_until_turn_kernel_id : kernel_id_t{ - 1 };
+            ? this->m_track_until_turn_kernel_id : st::ARCH_ILLEGAL_KERNEL_ID;
     }
 
     bool ClContext::setTrackingKernelId(
@@ -651,7 +652,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContext::lineTrackingKernelId() const SIXTRL_NOEXCEPT
     {
         return ( this->hasTrackingKernel() )
-            ? this->m_track_line_kernel_id : ClContext::kernel_id_t{ -1 };
+            ? this->m_track_line_kernel_id : st::ARCH_ILLEGAL_KERNEL_ID;
     }
 
     bool ClContext::setTrackLineKernelId(
@@ -831,7 +832,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContext::singleTurnTackingKernelId() const SIXTRL_NOEXCEPT
     {
         return ( this->hasSingleTurnTrackingKernel() )
-            ? this->m_track_single_turn_kernel_id : kernel_id_t{ -1 };
+            ? this->m_track_single_turn_kernel_id : st::ARCH_ILLEGAL_KERNEL_ID;
     }
 
     bool ClContext::setSingleTurnTrackingKernelId(
@@ -927,6 +928,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT( beam_elements_arg.usesCObjectBuffer() );
         SIXTRL_ASSERT( beam_elements_arg.ptrCObjectBuffer() != nullptr );
         SIXTRL_ASSERT( !NS(Buffer_needs_remapping)(
+
             beam_elements_arg.ptrCObjectBuffer() ) );
 
         size_t const num_kernel_args = this->kernelNumArgs( kernel_id );
@@ -988,7 +990,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContext::elementByElementTrackingKernelId() const SIXTRL_NOEXCEPT
     {
         return ( this->hasElementByElementTrackingKernel() )
-            ? this->m_track_elem_by_elem_kernel_id : kernel_id_t{ -1 };
+            ? this->m_track_elem_by_elem_kernel_id : st::ARCH_ILLEGAL_KERNEL_ID;
     }
 
     bool ClContext::setElementByElementTrackingKernelId(
@@ -1228,7 +1230,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContext::assignBeamMonitorIoBufferKernelId() const SIXTRL_NOEXCEPT
     {
         return ( this->hasAssignBeamMonitorIoBufferKernel() )
-            ? this->m_assign_be_mon_out_buffer_kernel_id : kernel_id_t{ -1 };
+            ? this->m_assign_be_mon_out_buffer_kernel_id : st::ARCH_ILLEGAL_KERNEL_ID;
     }
 
     bool ClContext::setAssignBeamMonitorIoBufferKernelId(
@@ -1358,7 +1360,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContext::clearBeamMonitorIoBufferAssignmentKernelId() const SIXTRL_NOEXCEPT
     {
         return ( this->hasClearBeamMonitorIoBufferAssignmentKernel() )
-            ? this->m_clear_be_mon_kernel_id : kernel_id_t{ -1 };
+            ? this->m_clear_be_mon_kernel_id : st::ARCH_ILLEGAL_KERNEL_ID;
     }
 
     bool ClContext::setClearBeamMonitorIoBufferAssignmentKernelId(
@@ -1882,68 +1884,71 @@ namespace SIXTRL_CXX_NAMESPACE
 
 /* ========================================================================= */
 
-NS(ClContext)* NS(ClContext_create)()
+::NS(ClContext)* NS(ClContext_create)()
 {
-    return new SIXTRL_CXX_NAMESPACE::ClContext;
+    return new st::ClContext;
 }
 
-NS(ClContext)* NS(ClContext_new)( const char* node_id_str )
+::NS(ClContext)* NS(ClContext_new)( const char* node_id_str )
 {
-    return new SIXTRL_CXX_NAMESPACE::ClContext( node_id_str, nullptr );
+    return new st::ClContext( node_id_str, nullptr );
 }
 
-void NS(ClContext_delete)( NS(ClContext)* SIXTRL_RESTRICT ctx )
+void NS(ClContext_delete)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     delete ctx;
 }
 
-void NS(ClContext_clear)( NS(ClContext)* SIXTRL_RESTRICT ctx )
+void NS(ClContext_clear)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     if( ctx != nullptr ) ctx->clear();
-    return;
 }
 
 bool NS(ClContext_has_tracking_kernel)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->hasTrackingKernel() : false;
+    return ( ( ctx != nullptr ) && ( ctx->hasTrackingKernel() ) );
 }
 
 
-int NS(ClContext_get_tracking_kernel_id)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+::NS(arch_kernel_id_t) NS(ClContext_get_tracking_kernel_id)(
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->trackingKernelId() : -1;
+    return ( ctx != nullptr ) ? ctx->trackingKernelId()
+        : st::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 bool NS(ClContext_set_tracking_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const tracking_kernel_id )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(arch_kernel_id_t) const tracking_kernel_id )
 {
-    return ( ctx != nullptr )
-        ? ctx->setTrackingKernelId( tracking_kernel_id ) : false;
+    return ( ( ctx != nullptr ) &&
+             ( ctx->setTrackingKernelId( tracking_kernel_id ) ) );
 }
 
 /* ------------------------------------------------------------------------- */
 
 int NS(ClContext_continue_tracking)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    NS(context_num_turns_t) const until_turn )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(context_num_turns_t) const until_turn )
 {
     return ( ctx != nullptr ) ? ctx->track( until_turn ) : -1;
 }
 
 int NS(ClContext_continue_tracking_with_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const track_kernel_id,
-    NS(context_num_turns_t) const until_turn )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(arch_kernel_id_t) const track_kernel_id,
+    ::NS(context_num_turns_t) const until_turn )
 {
-    return ( ctx != nullptr ) ? ctx->track( until_turn, track_kernel_id ) : -1;
+    return ( ctx != nullptr ) ? ctx->track( until_turn, track_kernel_id )
+        : st::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 int NS(ClContext_track)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
-    NS(context_num_turns_t) const until_turn )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
+    ::NS(context_num_turns_t) const until_turn )
 {
     return ( ( ctx != nullptr ) && ( ptr_particles_arg != nullptr ) &&
              ( ptr_beam_elements_arg != nullptr ) )
@@ -1952,10 +1957,11 @@ int NS(ClContext_track)(
 }
 
 int NS(ClContext_track_with_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
-    NS(context_num_turns_t) const until_turn, int const tracking_kernel_id )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
+    ::NS(context_num_turns_t) const until_turn,
+    ::NS(arch_kernel_id_t) const tracking_kernel_id )
 {
     return ( ( ctx != nullptr ) && ( ptr_particles_arg != nullptr ) &&
              ( ptr_beam_elements_arg != nullptr ) )
@@ -1967,29 +1973,30 @@ int NS(ClContext_track_with_kernel_id)(
 /* ------------------------------------------------------------------------- */
 
 bool NS(ClContext_has_line_tracking_kernel)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->hasLineTrackingKernel() : false;
+    return ( ( ctx != nullptr ) && ( ctx->hasLineTrackingKernel() ) );
 }
 
-int NS(ClContext_get_line_tracking_kernel_id)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+::NS(arch_kernel_id_t) NS(ClContext_get_line_tracking_kernel_id)(
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
     SIXTRL_ASSERT( ctx != nullptr );
     return ctx->lineTrackingKernelId();
 }
 
 bool NS(ClContext_set_line_tracking_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const kernel_id )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(arch_kernel_id_t) const kernel_id )
 {
-    return ( ctx != nullptr ) ? ctx->setTrackLineKernelId( kernel_id ) : false;
+    return ( ( ctx != nullptr ) && ( ctx->setTrackLineKernelId( kernel_id ) ) );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-int NS(ClContext_continue_line_tracking)( NS(ClContext)* SIXTRL_RESTRICT ctx,
-    NS(buffer_size_t) const line_begin_idx,
-    NS(buffer_size_t) const line_end_idx, bool const finish_turn )
+int NS(ClContext_continue_line_tracking)( ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(buffer_size_t) const line_begin_idx,
+    ::NS(buffer_size_t) const line_end_idx, bool const finish_turn )
 {
     SIXTRL_ASSERT( ctx != nullptr );
     return ctx->trackLine( line_begin_idx, line_end_idx, finish_turn,
@@ -1997,10 +2004,10 @@ int NS(ClContext_continue_line_tracking)( NS(ClContext)* SIXTRL_RESTRICT ctx,
 }
 
 int NS(ClContext_continue_line_tracking_with_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    NS(buffer_size_t) const line_begin_idx,
-    NS(buffer_size_t) const line_end_idx,
-    bool const finish_turn, int const line_tracking_kernel_id )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(buffer_size_t) const line_begin_idx,
+    ::NS(buffer_size_t) const line_end_idx,
+    bool const finish_turn, NS(arch_kernel_id_t) const line_tracking_kernel_id )
 {
     SIXTRL_ASSERT( ctx != nullptr );
     return ctx->trackLine( line_begin_idx, line_end_idx, finish_turn,
@@ -2008,12 +2015,12 @@ int NS(ClContext_continue_line_tracking_with_kernel_id)(
 }
 
 int NS(ClContext_track_line)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
-    NS(buffer_size_t) const particle_set_index,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
-    NS(buffer_size_t) const line_begin_idx,
-    NS(buffer_size_t) const line_end_idx, bool const finish_turn )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
+    ::NS(buffer_size_t) const particle_set_index,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
+    ::NS(buffer_size_t) const line_begin_idx,
+    ::NS(buffer_size_t) const line_end_idx, bool const finish_turn )
 {
     SIXTRL_ASSERT( ctx != nullptr );
     SIXTRL_ASSERT( ptr_particles_arg != SIXTRL_NULLPTR );
@@ -2024,13 +2031,13 @@ int NS(ClContext_track_line)(
 }
 
 int NS(ClContext_track_line_with_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
-    NS(buffer_size_t) const particle_set_index,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
-    NS(buffer_size_t) const line_begin_idx,
-    NS(buffer_size_t) const line_end_idx, bool const finish_turn,
-    int const line_tracking_kernel_id )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
+    ::NS(buffer_size_t) const particle_set_index,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
+    ::NS(buffer_size_t) const line_begin_idx,
+    ::NS(buffer_size_t) const line_end_idx, bool const finish_turn,
+    ::NS(arch_kernel_id_t) const line_tracking_kernel_id )
 {
     SIXTRL_ASSERT( ctx != nullptr );
     SIXTRL_ASSERT( ctx != nullptr );
@@ -2046,42 +2053,45 @@ int NS(ClContext_track_line_with_kernel_id)(
 /* ------------------------------------------------------------------------- */
 
 bool NS(ClContext_has_single_turn_tracking_kernel)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->hasSingleTurnTrackingKernel() : false;
+    return ( ( ctx != nullptr ) && ( ctx->hasSingleTurnTrackingKernel() ) );
 }
 
-int NS(ClContext_get_single_turn_tracking_kernel_id)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+::NS(arch_kernel_id_t) NS(ClContext_get_single_turn_tracking_kernel_id)(
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->singleTurnTackingKernelId() : -1;
+    return ( ctx != nullptr ) ? ctx->singleTurnTackingKernelId()
+        : st::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 bool NS(ClContext_set_single_turn_tracking_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const tracking_kernel_id )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(arch_kernel_id_t) const tracking_kernel_id )
 {
-    return ( ctx != nullptr )
-        ? ctx->setSingleTurnTrackingKernelId( tracking_kernel_id ) : false;
+    return ( ( ctx != nullptr ) &&
+             ( ctx->setSingleTurnTrackingKernelId( tracking_kernel_id ) ) );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 int NS(ClContext_continue_tracking_single_turn)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr ) ? ctx->trackSingleTurn() : -1;
 }
 
 int NS(ClContext_continue_tracking_single_turn_with_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const kernel_id )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(arch_kernel_id_t) const kernel_id )
 {
     return ( ctx != nullptr ) ? ctx->trackSingleTurn( kernel_id ) : -1;
 }
 
 int NS(ClContext_track_single_turn)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg )
 {
     return ( ( ctx != nullptr ) && ( ptr_particles_arg != nullptr ) &&
              ( ptr_beam_elements_arg != nullptr ) )
@@ -2090,10 +2100,10 @@ int NS(ClContext_track_single_turn)(
 }
 
 int NS(ClContext_track_single_turn_with_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
-    int const tracking_kernel_id )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
+    ::NS(arch_kernel_id_t) const tracking_kernel_id )
 {
     return ( ( ctx != nullptr ) && ( ptr_particles_arg != nullptr ) &&
              ( ptr_beam_elements_arg != nullptr ) )
@@ -2104,19 +2114,22 @@ int NS(ClContext_track_single_turn_with_kernel_id)(
 /* ------------------------------------------------------------------------- */
 
 bool NS(ClContext_has_element_by_element_tracking_kernel)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->hasElementByElementTrackingKernel() : false;
+    return ( ( ctx != nullptr ) &&
+             ( ctx->hasElementByElementTrackingKernel() ) );
 }
 
-int NS(ClContext_get_element_by_element_tracking_kernel_id)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+::NS(arch_kernel_id_t) NS(ClContext_get_element_by_element_tracking_kernel_id)(
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
-    return (ctx != nullptr ) ? ctx->elementByElementTrackingKernelId() : -1;
+    return (ctx != nullptr ) ? ctx->elementByElementTrackingKernelId()
+        : -st::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 bool NS(ClContext_set_element_by_element_tracking_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const tracking_kernel_id )
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(arch_kernel_id_t) const tracking_kernel_id )
 {
     return ( ctx != nullptr )
         ? ctx->setElementByElementTrackingKernelId( tracking_kernel_id )
@@ -2126,9 +2139,9 @@ bool NS(ClContext_set_element_by_element_tracking_kernel_id)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 int NS(ClContext_continue_tracking_element_by_element)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    NS(buffer_size_t) const until_turn,
-    NS(buffer_size_t) const out_buffer_index_offset )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(buffer_size_t) const until_turn,
+    ::NS(buffer_size_t) const out_buffer_index_offset )
 {
     return ( ctx != nullptr )
         ? ctx->trackElementByElement( until_turn, out_buffer_index_offset )
@@ -2136,24 +2149,24 @@ int NS(ClContext_continue_tracking_element_by_element)(
 }
 
 int NS(ClContext_continue_tracking_element_by_element_with_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    NS(buffer_size_t) const until_turn,
-    NS(buffer_size_t) const out_buffer_index_offset,
-    int const kernel_id )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(buffer_size_t) const until_turn,
+    ::NS(buffer_size_t) const out_buffer_index_offset,
+    ::NS(arch_kernel_id_t) const kernel_id )
 {
     return ( ctx != nullptr )
         ? ctx->trackElementByElement(
             until_turn, out_buffer_index_offset, kernel_id )
-        : -1;
+        : st::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 int NS(ClContext_track_element_by_element)(
-    NS(ClContext)*  SIXTRL_RESTRICT ctx,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_elem_by_elem_buffer_arg,
-    NS(buffer_size_t) const until_turn,
-    NS(buffer_size_t) const out_buffer_index_offset )
+    ::NS(ClContext)*  SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_elem_by_elem_buffer_arg,
+    ::NS(buffer_size_t) const until_turn,
+    ::NS(buffer_size_t) const out_buffer_index_offset )
 {
     return ( ( ctx != nullptr ) && ( ptr_particles_arg != nullptr ) &&
              ( ptr_beam_elements_arg != nullptr ) &&
@@ -2165,13 +2178,13 @@ int NS(ClContext_track_element_by_element)(
 }
 
 int NS(ClContext_track_element_by_element_with_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_elem_by_elem_buffer_arg,
-    NS(buffer_size_t) const out_buffer_index_offset,
-    NS(buffer_size_t) const until_turn,
-    int const tracking_kernel_id )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_elem_by_elem_buffer_arg,
+    ::NS(buffer_size_t) const out_buffer_index_offset,
+    ::NS(buffer_size_t) const until_turn,
+    ::NS(arch_kernel_id_t) const tracking_kernel_id )
 {
     return ( ( ctx != nullptr ) && ( ptr_particles_arg != nullptr ) &&
              ( ptr_beam_elements_arg != nullptr ) &&
@@ -2186,33 +2199,35 @@ int NS(ClContext_track_element_by_element_with_kernel_id)(
 /* ------------------------------------------------------------------------- */
 
 bool NS(ClContext_has_assign_beam_monitor_out_buffer_kernel)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
-    return (ctx != nullptr ) ? ctx->hasAssignBeamMonitorIoBufferKernel() : false;
+    return ( ( ctx != nullptr ) &&
+             ( ctx->hasAssignBeamMonitorIoBufferKernel() ) );
 }
 
-int NS(ClContext_get_assign_beam_monitor_out_buffer_kernel_id)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+::NS(arch_kernel_id_t)
+NS(ClContext_get_assign_beam_monitor_out_buffer_kernel_id)(
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->assignBeamMonitorIoBufferKernelId() : -1;
+    return ( ctx != nullptr )
+        ? ctx->assignBeamMonitorIoBufferKernelId() : st::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 bool NS(ClContext_set_assign_beam_monitor_out_buffer_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const assign_kernel_id )
+    NS(ClContext)* SIXTRL_RESTRICT ctx, NS(arch_kernel_id_t) const assign_kernel_id )
 {
-    return ( ctx != nullptr )
-        ? ctx->setAssignBeamMonitorIoBufferKernelId( assign_kernel_id )
-        : false;
+    return ( ( ctx != nullptr ) &&
+        ( ctx->setAssignBeamMonitorIoBufferKernelId( assign_kernel_id ) ) );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 int NS(ClContext_assign_beam_monitor_out_buffer)(
-    NS(ClContext)*  SIXTRL_RESTRICT ctx,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_out_buffer_arg,
-    NS(buffer_size_t) const min_turn_id,
-    NS(buffer_size_t) const out_particle_block_offset )
+    ::NS(ClContext)*  SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_out_buffer_arg,
+    ::NS(buffer_size_t) const min_turn_id,
+    ::NS(buffer_size_t) const out_particle_block_offset )
 {
     return ( ( ctx != nullptr ) && ( ptr_beam_elements_arg != nullptr ) &&
              ( ptr_out_buffer_arg != nullptr ) )
@@ -2222,12 +2237,12 @@ int NS(ClContext_assign_beam_monitor_out_buffer)(
 }
 
 int NS(ClContext_assign_beam_monitor_out_buffer_with_kernel_id)(
-    NS(ClContext)*  SIXTRL_RESTRICT ctx,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
-    NS(ClArgument)* SIXTRL_RESTRICT ptr_out_buffer_arg,
-    NS(buffer_size_t) const min_turn_id,
-    NS(buffer_size_t) const out_particle_block_offset,
-    int const assign_kernel_id )
+    ::NS(ClContext)*  SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
+    ::NS(ClArgument)* SIXTRL_RESTRICT ptr_out_buffer_arg,
+    ::NS(buffer_size_t) const min_turn_id,
+    ::NS(buffer_size_t) const out_particle_block_offset,
+    ::NS(arch_kernel_id_t) const assign_kernel_id )
 {
     return ( ( ctx != nullptr ) && ( ptr_beam_elements_arg != nullptr ) &&
              ( ptr_out_buffer_arg != nullptr ) )
@@ -2238,106 +2253,89 @@ int NS(ClContext_assign_beam_monitor_out_buffer_with_kernel_id)(
 }
 
 bool NS(ClContext_has_clear_beam_monitor_out_assignment_kernel)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr )
-        ? ctx->hasClearBeamMonitorIoBufferAssignmentKernel()
-        : false;
+    return ( ( ctx != nullptr ) &&
+             ( ctx->hasClearBeamMonitorIoBufferAssignmentKernel() ) );
 }
 
-int NS(ClContext_get_clear_beam_monitor_out_assignment_kernel_id)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+::NS(arch_kernel_id_t)
+NS(ClContext_get_clear_beam_monitor_out_assignment_kernel_id)(
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
     return (ctx != nullptr )
-        ? ctx->clearBeamMonitorIoBufferAssignmentKernelId() : -1;
+        ? ctx->clearBeamMonitorIoBufferAssignmentKernelId()
+        : st::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 bool NS(ClContext_set_clear_beam_monitor_out_assignment_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const kernel_id )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(arch_kernel_id_t) const kernel_id )
 {
-    bool success = false;
-
-    if( ctx != nullptr )
-    {
-        success = ctx->setClearBeamMonitorIoBufferAssignmentKernelId( kernel_id );
-    }
-
-    return success;
+    return ( ( ctx != nullptr ) &&
+             ( ctx->setClearBeamMonitorIoBufferAssignmentKernelId( kernel_id ) ) );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 int NS(ClContext_clear_beam_monitor_out_assignment)(
-    NS(ClContext)*  SIXTRL_RESTRICT ctx,
-    NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg )
+    ::NS(ClContext)*  SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg )
 {
     return ( ( ctx != nullptr ) && ( beam_elements_arg != nullptr ) )
-        ? ctx->clearBeamMonitorIoBufferAssignment( *beam_elements_arg )
-        : -1;
+        ? ctx->clearBeamMonitorIoBufferAssignment( *beam_elements_arg ) : -1;
 }
 
 int NS(ClContext_clear_beam_monitor_out_assignment_with_kernel)(
-    NS(ClContext)*  SIXTRL_RESTRICT ctx,
-    NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg,
-    int const kernel_id )
+    ::NS(ClContext)*  SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg,
+    ::NS(arch_kernel_id_t) const kernel_id )
 {
     return ( ( ctx != nullptr ) && ( beam_elements_arg != nullptr ) )
         ? ctx->clearBeamMonitorIoBufferAssignment(
-            *beam_elements_arg, kernel_id )
-        : -1;
+            *beam_elements_arg, kernel_id ) : -1;
 }
 
 /* ------------------------------------------------------------------------- */
 
 bool NS(ClContext_uses_optimized_tracking_by_default)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->useOptimizedTrackingByDefault() : false;
+    return ( ( ctx != nullptr ) &&
+             ( ctx->useOptimizedTrackingByDefault() ) );
 }
 
 void NS(ClContext_enable_optimized_tracking_by_default)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     if( ctx != nullptr ) ctx->enableOptimizedtrackingByDefault();
-    return;
 }
 
 void NS(ClContext_disable_optimized_tracking_by_default)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     if( ctx != nullptr ) ctx->disableOptimizedTrackingByDefault();
-    return;
 }
 
 /* ------------------------------------------------------------------------- */
 
 bool NS(ClContext_is_beam_beam_tracking_enabled)(
-    const NS(ClContext) *const SIXTRL_RESTRICT ctx )
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->isBeamBeamTrackingEnabled() : false;
+    return ( ( ctx != nullptr ) && ( ctx->isBeamBeamTrackingEnabled() ) );
 }
 
 
 void NS(ClContext_enable_beam_beam_tracking)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
-    if( ctx != nullptr )
-    {
-        ctx->enableBeamBeamTracking();
-    }
-
-    return;
+    if( ctx != nullptr ) ctx->enableBeamBeamTracking();
 }
 
 void NS(ClContext_disable_beam_beam_tracking)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx )
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
-    if( ctx != nullptr )
-    {
-        ctx->disableBeamBeamTracking();
-    }
-
-    return;
+    if( ctx != nullptr ) ctx->disableBeamBeamTracking();
 }
 
 #endif /* !defined( __CUDACC__ ) */
