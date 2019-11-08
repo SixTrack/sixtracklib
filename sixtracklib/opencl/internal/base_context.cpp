@@ -2296,20 +2296,22 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( ext_list_of_nodes )
             {
+                auto cmp_node_ids = [](
+                    node_id_t const& SIXTRL_RESTRICT_REF lhs,
+                    node_id_t const& SIXTRL_RESTRICT_REF rhs )
+                {
+                    return (
+                        ( ::NS(ComputeNodeId_get_platform_id)( &lhs ) <
+                          ::NS(ComputeNodeId_get_platform_id)( &rhs ) ) ||
+                        ( ( ::NS(ComputeNodeId_get_platform_id)( &lhs ) ==
+                            ::NS(ComputeNodeId_get_platform_id)( &rhs ) ) &&
+                          ( ::NS(ComputeNodeId_get_device_id)( &lhs ) <
+                            ::NS(ComputeNodeId_get_device_id)( &rhs ) ) ) );
+                };
+
                 SIXTRL_ASSERT( !allowed_node_ids.empty() );
-                SIXTRL_ASSERT( std::is_sorted(
-                    allowed_node_ids.begin(), allowed_node_ids.end(),
-                    []( node_id_t const& SIXTRL_RESTRICT_REF lhs,
-                        node_id_t const& SIXTRL_RESTRICT_REF rhs )
-                    {
-                        return (
-                            ( ::NS(ComputeNodeId_get_platform_id)( &lhs ) <
-                              ::NS(ComputeNodeId_get_platform_id)( &rhs ) ) ||
-                            ( ( ::NS(ComputeNodeId_get_platform_id)( &lhs ) ==
-                                ::NS(ComputeNodeId_get_platform_id)( &rhs ) ) &&
-                              ( ::NS(ComputeNodeId_get_device_id)( &lhs ) <
-                                ::NS(ComputeNodeId_get_device_id)( &rhs ) ) ) );
-                    } ) );
+                SIXTRL_ASSERT( std::is_sorted( allowed_node_ids.begin(),
+                       allowed_node_ids.end(), cmp_node_ids ) );
 
                 _this_t::size_type const num_available_nodes =
                     all_available_devices.size();
@@ -2321,12 +2323,7 @@ namespace SIXTRL_CXX_NAMESPACE
                         all_available_nodes_id[ ii ];
 
                     if( std::binary_search( allowed_node_ids.begin(),
-                            allowed_node_ids.end(), node_id,
-                            []( node_id_t const& SIXTRL_RESTRICT_REF lhs,
-                                node_id_t const& SIXTRL_RESTRICT_REF rhs )
-                            {
-                                return ::NS(ComputeNodeId_are_equal)(
-                                    &lhs, &rhs ); } ) )
+                            allowed_node_ids.end(), node_id, cmp_node_ids ) )
                     {
                         if( ptr_available_nodes_info != nullptr )
                         {
