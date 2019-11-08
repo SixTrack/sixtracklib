@@ -87,7 +87,7 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
 
                             if( EXISTS "${khr_cxx_ocl_DIR}/README.md" )
                                 configure_file( "${khr_cxx_ocl_DIR}/README.md"
-                                                "${khr_cxx_ocl_EXT_DIR}/khr_cxx_ocl_README.md" COPYONLY )
+                                                "${khr_cxx_ocl_EXT_DIR}/OpenCL-CLHPP_README.md" COPYONLY )
                             endif()
 
                             if( EXISTS "${khr_cxx_ocl_DIR}/CODE_OF_CONDUCT.md" )
