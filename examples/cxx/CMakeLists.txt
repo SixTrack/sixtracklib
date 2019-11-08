@@ -2,6 +2,10 @@
 
 message( STATUS "---- processing examples/cxx/CMakeLists.txt" )
 
+if( SIXTRACKL_ENABLE_OPENCL )
+    include_directories( ${SIXTRACKL_OPENCL_INCLUDE_DIR} )
+endif()
+
 set( EXAMPLE_TARGETS )
 set( EXAMPLE_CUDA_TARGETS )
 set( EXAMPLE_OPENCL_TARGETS )
@@ -27,8 +31,6 @@ list( APPEND EXAMPLE_TARGETS track_job_cpu_cxx )
 
 add_executable( track_lhc_no_bb_cxx track_lhc_no_bb.cpp )
 list( APPEND EXAMPLE_TARGETS track_lhc_no_bb_cxx )
-
-
 
 if( SIXTRACKL_ENABLE_OPENCL )
     # -------------------------------------------------------------------------
