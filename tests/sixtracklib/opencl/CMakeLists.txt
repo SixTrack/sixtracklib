@@ -3,10 +3,6 @@
 # ==============================================================================
 # Handle special case if OpenCL headers have been downloaded by cmake:
 
-if( SIXTRACKL_ENABLE_OPENCL )
-    include_directories( ${SIXTRACKL_OPENCL_INCLUDE_DIR} )
-endif()
-
 if( GTEST_FOUND )
 
     set(   C99_UNIT_TEST_TARGETS )

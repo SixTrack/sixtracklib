@@ -142,8 +142,7 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
 
                 if( EXISTS "${CMAKE_SOURCE_DIR}/external/CL" )
                     set( CXX_OPENCL_HEADER "${CMAKE_SOURCE_DIR}/external/CL/${CXX_OPENCL_HEADER_NAME}" )
-                    set( SIXTRACKL_OPENCL_INCLUDE_DIR ${SIXTRACKL_OPENCL_INCLUDE_DIR}
-                        "${CMAKE_SOURCE_DIR}/external" )
+                    set( SIXTRACKL_OPENCL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/external" )
                 endif()
             endif()
 

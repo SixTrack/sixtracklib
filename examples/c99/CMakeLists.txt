@@ -2,10 +2,6 @@
 
 message( STATUS "---- processing examples/c99/CMakeLists.txt" )
 
-if( SIXTRACKL_ENABLE_OPENCL )
-    include_directories( ${SIXTRACKL_OPENCL_INCLUDE_DIR} )
-endif()
-
 set( EXAMPLE_TARGETS )
 set( EXAMPLE_CUDA_TARGETS )
 set( EXAMPLE_OPENCL_TARGETS )
