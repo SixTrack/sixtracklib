@@ -126,7 +126,7 @@ class Multipole(CObject):
             idx = np.array([ii for ii in range(0, len(knl))])
             inv_factorial = 1.0 / factorial(idx, exact=True)
             bal[0::2] = knl * inv_factorial[idx // 2]
-            bal[1::2] = ksl * inv_factorial[idx // 2 + 1]
+            bal[1::2] = ksl * inv_factorial[idx // 2]
 
             kwargs["bal"] = bal
             kwargs["order"] = order
@@ -145,7 +145,7 @@ class Multipole(CObject):
     @property
     def ksl(self):
         idx = np.array([ii for ii in range(0, len(self.bal), 2)])
-        return self.bal[idx + 1] * factorial(idx // 2 + 1, exact=True)
+        return self.bal[idx + 1] * factorial(idx // 2, exact=True)
 
     def set_knl(self, value, order):
         assert order <= self.order
