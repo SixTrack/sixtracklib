@@ -1349,7 +1349,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ClContextBase_set_remapping_ke
 
 SIXTRL_EXTERN SIXTRL_HOST_FN cl_program NS(ClContextBase_get_program)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
-    int const program_id );
+    NS(arch_program_id_t) const program_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN cl_kernel NS(ClContextBase_get_kernel)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
