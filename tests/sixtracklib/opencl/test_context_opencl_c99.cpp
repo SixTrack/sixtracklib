@@ -25,7 +25,7 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
     namespace st = SIXTRL_CXX_NAMESPACE;
 
     using context_t     = ::NS(ClContextBase);
-    using con_size_t    = ::NS(context_size_t);
+    using con_size_t    = ::NS(arch_size_t);
     using node_id_t     = ::NS(context_node_id_t);
     using node_info_t   = ::NS(context_node_info_t);
     using kernel_id_t   = ::NS(arch_kernel_id_t);
