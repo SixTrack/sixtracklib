@@ -6,6 +6,7 @@ import importlib
 from collections import namedtuple
 
 import numpy as np
+from scipy.special import factorial
 from scipy.constants import e as qe
 from cobjects import CBuffer, CObject, CField
 from .mad_helper import madseq_to_generator
@@ -92,12 +93,6 @@ class Multipole(CObject):
     bal = CField(4, 'real', default=0.0, alignment=8, pointer=True,
                     length='2 * order + 2')
 
-    @staticmethod
-    def _factorial(x):
-        if not isinstance(x, int):
-            return 0
-        return (x > 0) and (x * Multipole._factorial(x - 1)) or 1
-
     def __init__(self, order=None, knl=None, ksl=None, bal=None, **kwargs):
         if bal is None and \
                 (knl is not None or ksl is not None or order is not None):
@@ -128,11 +123,10 @@ class Multipole(CObject):
             order = n - 1
             bal = np.zeros(2 * order + 2)
 
-            for ii in range(0, len(knl)):
-                inv_factorial = 1.0 / float(Multipole._factorial(ii))
-                jj = 2 * ii
-                bal[jj] = knl[ii] * inv_factorial
-                bal[jj + 1] = ksl[ii] * inv_factorial
+            idx = np.array([ii for ii in range(0, len(knl))])
+            inv_factorial = 1.0 / factorial(idx, exact=True)
+            bal[0::2] = knl * inv_factorial[idx // 2]
+            bal[1::2] = ksl * inv_factorial[idx // 2 + 1]
 
             kwargs["bal"] = bal
             kwargs["order"] = order
@@ -145,13 +139,21 @@ class Multipole(CObject):
 
     @property
     def knl(self):
-        return [self.bal[ii] * Multipole._factorial(ii // 2)
-                for ii in range(0, len(self.bal), 2)]
+        idx = np.array([ii for ii in range(0, len(self.bal), 2)])
+        return self.bal[idx] * factorial(idx, exact=True)
 
     @property
     def ksl(self):
-        return [self.bal[ii + 1] * Multipole._factorial(ii // 2 + 1)
-                for ii in range(0, len(self.bal), 2)]
+        idx = np.array([ii for ii in range(0, len(self.bal), 2)])
+        return self.bal[idx + 1] * factorial(idx // 2 + 1, exact=True)
+
+    def set_knl(self, value, order):
+        assert order <= self.order
+        self.bal[order * 2] = value / factorial(order, exact=True)
+
+    def set_ksl(self, value, order):
+        assert order <= self.order
+        self.bal[order * 2 + 1] = value / factorial(order, exact=True)
 
 
 class Cavity(CObject):
