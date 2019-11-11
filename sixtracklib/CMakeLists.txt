@@ -78,11 +78,16 @@ endif()
 
 target_include_directories(
     sixtrack PUBLIC $<INSTALL_INTERFACE:include>
-                    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
+             PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> )
 
-if( SIXTRACKL_ENABLE_CUDA )
+if( TARGET sixtrack_cuda_host )
     target_include_directories( sixtrack
         PUBLIC $<BUILD_INTERFACE:${SIXTRACKL_CUDA_INCLUDE_DIRS}> )
+endif()
+
+if( TARGET sixtrack_opencl )
+    target_include_directories( sixtrack
+        PUBLIC $<BUILD_INTERFACE:${SIXTRACKL_OPENCL_INCLUDE_DIR}> )
 endif()
 
 set_target_properties( sixtrack PROPERTIES
