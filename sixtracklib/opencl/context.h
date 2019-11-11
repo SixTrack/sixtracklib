@@ -472,11 +472,12 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContext_clear)(
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContext_has_tracking_kernel)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContext_get_tracking_kernel_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_kernel_id_t)
+NS(ClContext_get_tracking_kernel_id)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContext_set_tracking_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const kernel_id );
+    NS(ClContext)* SIXTRL_RESTRICT ctx, NS(arch_kernel_id_t) const kernel_id );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -485,7 +486,8 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContext_continue_tracking)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int
 NS(ClContext_continue_tracking_with_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const track_kernel_id,
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const track_kernel_id,
     NS(context_num_turns_t) const turn );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContext_track)(
@@ -498,7 +500,8 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContext_track_with_kernel_id)(
     NS(ClContext)* SIXTRL_RESTRICT ctx,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
-    NS(context_num_turns_t) const turn, int const tracking_kernel_id );
+    NS(context_num_turns_t) const turn,
+    NS(arch_kernel_id_t) const tracking_kernel_id );
 
 /* ------------------------------------------------------------------------- */
 
@@ -506,11 +509,12 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContext_track_with_kernel_id)(
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContext_has_line_tracking_kernel)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContext_get_line_tracking_kernel_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_kernel_id_t)
+NS(ClContext_get_line_tracking_kernel_id)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContext_set_line_tracking_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const kernel_id );
+    NS(ClContext)* SIXTRL_RESTRICT ctx, NS(arch_kernel_id_t) const kernel_id );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -524,7 +528,8 @@ NS(ClContext_continue_line_tracking_with_kernel_id)(
     NS(ClContext)* SIXTRL_RESTRICT ctx,
     NS(buffer_size_t) const line_begin_idx,
     NS(buffer_size_t) const line_end_idx,
-    bool const finish_turn, int const line_tracking_kernel_id );
+    bool const finish_turn,
+    NS(arch_kernel_id_t) const line_tracking_kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContext_track_line)(
     NS(ClContext)* SIXTRL_RESTRICT ctx,
@@ -541,7 +546,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContext_track_line_with_kernel_id)(
     NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
     NS(buffer_size_t) const line_begin_idx,
     NS(buffer_size_t) const line_end_idx, bool const finish_turn,
-    int const line_tracking_kernel_id );
+    NS(arch_kernel_id_t) const line_tracking_kernel_id );
 
 /* ------------------------------------------------------------------------- */
 
@@ -549,13 +554,14 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool
 NS(ClContext_has_single_turn_tracking_kernel)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_kernel_id_t)
 NS(ClContext_get_single_turn_tracking_kernel_id)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool
 NS(ClContext_set_single_turn_tracking_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const tracking_kernel_id );
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const tracking_kernel_id );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -564,7 +570,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContext_continue_tracking_single_turn)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int
 NS(ClContext_continue_tracking_single_turn_with_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const kernel_id );
+    NS(ClContext)* SIXTRL_RESTRICT ctx, NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContext_track_single_turn)(
     NS(ClContext)* SIXTRL_RESTRICT ctx,
@@ -576,7 +582,7 @@ NS(ClContext_track_single_turn_with_kernel_id)(
     NS(ClContext)* SIXTRL_RESTRICT ctx,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_particles_arg,
     NS(ClArgument)* SIXTRL_RESTRICT ptr_beam_elements_arg,
-    int const tracking_kernel_id );
+    NS(arch_kernel_id_t) const tracking_kernel_id );
 
 /* ------------------------------------------------------------------------- */
 
@@ -584,13 +590,14 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool
 NS(ClContext_has_element_by_element_tracking_kernel)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_kernel_id_t)
 NS(ClContext_get_element_by_element_tracking_kernel_id)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool
 NS(ClContext_set_element_by_element_tracking_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const tracking_kernel_id );
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const tracking_kernel_id );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -603,7 +610,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int
 NS(ClContext_continue_tracking_element_by_element_with_kernel_id)(
     NS(ClContext)* SIXTRL_RESTRICT ctx, NS(buffer_size_t) const until_turn,
     NS(buffer_size_t) const out_particle_block_offset,
-    int const kernel_id );
+    NS(arch_kernel_id_t) const kernel_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ClContext_track_element_by_element)(
     NS(ClContext)* SIXTRL_RESTRICT ctx,
@@ -621,7 +628,7 @@ NS(ClContext_track_element_by_element_with_kernel_id)(
     NS(ClArgument)* SIXTRL_RESTRICT ptr_elem_by_elem_buffer_arg,
     NS(buffer_size_t) const until_turn,
     NS(buffer_size_t) const out_particle_block_offset,
-    int const tracking_kernel_id );
+    NS(arch_kernel_id_t) const tracking_kernel_id );
 
 /* ------------------------------------------------------------------------- */
 
@@ -629,13 +636,14 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool
 NS(ClContext_has_assign_beam_monitor_out_buffer_kernel)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_kernel_id_t)
 NS(ClContext_get_assign_beam_monitor_out_buffer_kernel_id)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool
 NS(ClContext_set_assign_beam_monitor_out_buffer_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const assign_kernel_id );
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    NS(arch_kernel_id_t) const assign_kernel_id );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -653,7 +661,7 @@ NS(ClContext_assign_beam_monitor_out_buffer_with_kernel_id)(
     NS(ClArgument)* SIXTRL_RESTRICT out_buffer,
     NS(buffer_size_t) const min_turn_id,
     NS(buffer_size_t) const out_particle_block_offset,
-    int const assign_kernel_id );
+    NS(arch_kernel_id_t) const assign_kernel_id );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -661,13 +669,13 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool
 NS(ClContext_has_clear_beam_monitor_out_assignment_kernel)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_kernel_id_t)
 NS(ClContext_get_clear_beam_monitor_out_assignment_kernel_id)(
     const NS(ClContext) *const SIXTRL_RESTRICT ctx );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool
 NS(ClContext_set_clear_beam_monitor_out_assignment_kernel_id)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, int const kernel_id );
+    NS(ClContext)* SIXTRL_RESTRICT ctx, NS(arch_kernel_id_t) const kernel_id );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -679,7 +687,8 @@ NS(ClContext_clear_beam_monitor_out_assignment)(
 SIXTRL_EXTERN SIXTRL_HOST_FN int
 NS(ClContext_clear_beam_monitor_out_assignment_with_kernel)(
     NS(ClContext)*  SIXTRL_RESTRICT context,
-    NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg, int const kernel_id );
+    NS(ClArgument)* SIXTRL_RESTRICT beam_elements_arg,
+    NS(arch_kernel_id_t) const kernel_id );
 
 /* ------------------------------------------------------------------------- */
 
