@@ -29,7 +29,6 @@
 #if defined( __cplusplus )
 
 namespace st = SIXTRL_CXX_NAMESPACE;
-
 namespace SIXTRL_CXX_NAMESPACE
 {
     using _base_t       = st::ClContextBase;

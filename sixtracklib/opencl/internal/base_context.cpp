@@ -40,118 +40,6 @@ namespace SIXTRL_CXX_NAMESPACE
     constexpr _this_t::kernel_arg_type_t _this_t::ARG_TYPE_INVALID;
     constexpr _this_t::size_type _this_t::MIN_NUM_REMAP_BUFFER_ARGS;
 
-    _this_t::size_type ClContextBase::NUM_AVAILABLE_NODES(
-        char const* SIXTRL_RESTRICT filter_str,
-        char const* SIXTRL_RESTRICT env_variable_name )
-    {
-        _this_t::size_type num_avail_nodes = 0u;
-
-        std::vector< _this_t::node_id_t   > available_node_ids;
-        std::vector< _this_t::node_info_t > available_node_infos;
-        std::vector< cl::Device > available_devices;
-
-        if( SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS ==
-            _this_t::GetAvailableNodes( available_node_ids,
-                available_node_infos, available_devices,
-                    env_variable_name, filter_str ) )
-        {
-            num_avail_nodes = available_node_ids.size();
-        }
-
-        return num_avail_nodes;
-    }
-
-    _this_t::size_type ClContextBase::GET_AVAILABLE_NODES(
-        _this_t::node_id_t* SIXTRL_RESTRICT out_node_ids_begin,
-        _this_t::size_type const max_num_node_ids,
-        _this_t::size_type const skip_first_num_nodes,
-        char const* SIXTRL_RESTRICT filter_str,
-        char const* SIXTRL_RESTRICT env_variable_name )
-    {
-        using _this_t = SIXTRL_CXX_NAMESPACE::ClContextBase;
-        _this_t::size_type num_avail_nodes = 0u;
-
-        if( ( out_node_ids_begin != nullptr ) &&
-            ( max_num_node_ids > _this_t::size_type{ 0 } ) )
-        {
-            std::vector< _this_t::node_id_t   > available_node_ids;
-            std::vector< _this_t::node_info_t > available_node_infos;
-            std::vector< cl::Device > available_devices;
-
-            if( SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS ==
-                _this_t::GetAvailableNodes( available_node_ids,
-                    available_node_infos, available_devices,
-                        env_variable_name, filter_str ) )
-            {
-                num_avail_nodes = available_node_ids.size();
-
-                if( num_avail_nodes >= skip_first_num_nodes )
-                {
-                    num_avail_nodes -= skip_first_num_nodes;
-                }
-                else
-                {
-                    num_avail_nodes = _this_t::size_type{ 0 };
-                }
-
-                if( num_avail_nodes > max_num_node_ids )
-                {
-                    num_avail_nodes = max_num_node_ids;
-                }
-
-                if( num_avail_nodes > _this_t::size_type{ 0 } )
-                {
-                    auto in_node_begin = available_node_ids.begin();
-                    auto in_node_end = in_node_begin;
-                    std::advance( in_node_end, num_avail_nodes );
-
-                    std::copy( in_node_begin, in_node_end,
-                                &out_node_ids_begin[ 0 ] );
-                }
-            }
-        }
-
-        return num_avail_nodes;
-    }
-
-    void ClContextBase::PRINT_AVAILABLE_NODES(
-        char const* SIXTRL_RESTRICT filter_str,
-        char const* SIXTRL_RESTRICT env_variable_name )
-    {
-        bool printed_any_nodes = false;
-
-        std::vector< _this_t::node_id_t   > available_node_ids;
-        std::vector< _this_t::node_info_t > available_node_infos;
-        std::vector< cl::Device > available_devices;
-
-        if( SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS ==
-            _this_t::GetAvailableNodes( available_node_ids,
-                available_node_infos, available_devices,
-                    env_variable_name, filter_str ) )
-        {
-            if( !available_node_infos.empty() )
-            {
-                auto node_it  = available_node_infos.data();
-                auto node_end = node_it;
-                SIXTRL_ASSERT( node_end != nullptr );
-                std::advance( node_end, available_node_infos.size() );
-
-                for( ; node_it != node_end ; ++node_it )
-                {
-                    printed_any_nodes = true;
-                    ::NS(ComputeNodeInfo_print_out)( node_it, nullptr );
-                }
-            }
-        }
-
-        if( !printed_any_nodes )
-        {
-            printf( "No OpenCL Devices found\r\n" );
-        }
-    }
-
-    /* ********************************************************************* */
-
     ClContextBase::ClContextBase(
         const char *const SIXTRL_RESTRICT config_str ) :
         m_cl_programs(),
@@ -181,8 +69,8 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         _this_t::status_t const status = _this_t::GetAvailableNodes(
-            this->m_available_nodes_id, this->m_available_nodes_info,
-            this->m_available_devices );
+            this->m_available_nodes_id, &this->m_available_nodes_info,
+            &this->m_available_devices );
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
@@ -220,8 +108,8 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         _this_t::status_t const status = _this_t::GetAvailableNodes(
-            this->m_available_nodes_id, this->m_available_nodes_info,
-            this->m_available_devices );
+            this->m_available_nodes_id, &this->m_available_nodes_info,
+            &this->m_available_devices );
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
@@ -268,8 +156,8 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         _this_t::status_t const status = _this_t::GetAvailableNodes(
-            this->m_available_nodes_id, this->m_available_nodes_info,
-            this->m_available_devices );
+            this->m_available_nodes_id, &this->m_available_nodes_info,
+            &this->m_available_devices );
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
@@ -320,8 +208,8 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         _this_t::status_t const status = _this_t::GetAvailableNodes(
-            this->m_available_nodes_id, this->m_available_nodes_info,
-            this->m_available_devices );
+            this->m_available_nodes_id, &this->m_available_nodes_info,
+            &this->m_available_devices );
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
@@ -372,8 +260,8 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         _this_t::status_t const status = _this_t::GetAvailableNodes(
-            this->m_available_nodes_id, this->m_available_nodes_info,
-            this->m_available_devices );
+            this->m_available_nodes_id, &this->m_available_nodes_info,
+            &this->m_available_devices );
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
@@ -2031,7 +1919,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    _this_t::status_t ClContextBase::GetAllowedNodesFromEnvVariable(
+    ClContextBase::status_t ClContextBase::GetAllowedNodesFromEnvVariable(
         std::vector< ClContextBase::node_id_t >& allowed_node_ids,
         char const* SIXTRL_RESTRICT env_variable_name )
     {
@@ -2076,10 +1964,21 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( !allowed_node_ids.empty() )
             {
+                auto cmp_node_ids =
+                []( _this_t::node_id_t const& SIXTRL_RESTRICT_REF lhs,
+                    _this_t::node_id_t const& SIXTRL_RESTRICT_REF rhs )
+                {
+                    return (
+                        ( ::NS(ComputeNodeId_get_platform_id)( &lhs ) <
+                            ::NS(ComputeNodeId_get_platform_id)( &rhs ) ) ||
+                        ( ( ::NS(ComputeNodeId_get_platform_id)( &lhs ) ==
+                            ::NS(ComputeNodeId_get_platform_id)( &rhs ) ) &&
+                            ( ::NS(ComputeNodeId_get_device_id)( &lhs ) <
+                            ::NS(ComputeNodeId_get_device_id)( &rhs ) ) ) );
+                };
+
                 std::sort( allowed_node_ids.begin(), allowed_node_ids.end(),
-                    []( _this_t::node_id_t const& SIXTRL_RESTRICT_REF lhs,
-                        _this_t::node_id_t const& SIXTRL_RESTRICT_REF rhs )
-                    { return ( ::NS(ComputeNodeId_compare)( &lhs, &rhs ) < 0 ); } );
+                           cmp_node_ids );
 
                 allowed_node_ids.erase(
                     std::unique( allowed_node_ids.begin(), allowed_node_ids.end(),
@@ -2089,12 +1988,151 @@ namespace SIXTRL_CXX_NAMESPACE
                         return ::NS(ComputeNodeId_are_equal)( &lhs, &rhs );
                     } ), allowed_node_ids.end() );
 
-                SIXTRL_ASSERT( std::is_sorted(
-                    allowed_node_ids.begin(), allowed_node_ids.end(),
-                    []( _this_t::node_id_t const& SIXTRL_RESTRICT_REF lhs,
-                        _this_t::node_id_t const& SIXTRL_RESTRICT_REF rhs )
-                    { return ( ::NS(ComputeNodeId_compare)( &lhs, &rhs ) < 0 ); } ) );
+                SIXTRL_ASSERT( std::is_sorted( allowed_node_ids.begin(),
+                                allowed_node_ids.end(), cmp_node_ids ) );
             }
+        }
+
+        return status;
+    }
+
+    _this_t::status_t ClContextBase::GetAllAvailableNodes(
+            std::vector< cl::Platform>& available_platforms,
+            std::vector< cl::Device >&  available_devices,
+            std::vector< _this_t::node_id_t >* ptr_available_nodes_id,
+            std::vector< _this_t::node_info_t >* ptr_available_nodes_info )
+    {
+        _this_t::status_t status = st::ARCH_STATUS_SUCCESS;
+
+        if( ptr_available_nodes_id != nullptr )
+        {
+            ptr_available_nodes_id->clear();
+            ptr_available_nodes_id->reserve( 100 );
+        }
+
+        if( ptr_available_nodes_info != nullptr )
+        {
+            ptr_available_nodes_info->clear();
+            ptr_available_nodes_info->reserve( 100 );
+        }
+
+        available_platforms.clear();
+        available_platforms.reserve( 10 );
+
+        available_devices.clear();
+        available_devices.reserve( 100 );
+
+        std::vector< cl::Device > temp_devices;
+        temp_devices.clear();
+        temp_devices.reserve( 100 );
+
+        _this_t::platform_id_t platform_idx = _this_t::platform_id_t{ 0 };
+        _this_t::device_id_t device_idx = _this_t::device_id_t{ 0 };
+
+        cl::Platform::get( &available_platforms );
+        std::string const arch_str( "opencl" );
+
+        for( auto const& platform : available_platforms )
+        {
+            temp_devices.clear();
+            device_idx = 0;
+
+            std::string const platform_name =
+                platform.getInfo< CL_PLATFORM_NAME >();
+
+            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
+                         SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+            try
+            {
+            #endif /* OpenCL 1.x C++ Host Exceptions enabled */
+
+            platform.getDevices( CL_DEVICE_TYPE_ALL, &temp_devices );
+
+            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
+                         SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+            }
+            catch( cl::Error const& e )
+            {
+                #if !defined( NDEBUG )
+                std::cerr << "Error while probing devices for platform "
+                          << platform_name << " --> skipping"
+                          << std::endl;
+                #endif /* !defined( NDEBUG ) */
+            }
+            #endif /* OpenCL 1.x C++ Host Exceptions enabled */
+
+            bool added_at_least_one_device = false;
+
+            for( auto const& device : temp_devices )
+            {
+                _this_t::node_id_t temp_node_id;
+
+                ::NS(ComputeNodeId_preset)( &temp_node_id );
+
+                ::NS(ComputeNodeId_set_platform_id)(
+                    &temp_node_id, platform_idx );
+
+                ::NS(ComputeNodeId_set_device_id)(
+                    &temp_node_id, device_idx++ );
+
+                available_devices.push_back( device );
+                added_at_least_one_device = true;
+
+                if( ptr_available_nodes_id != nullptr )
+                {
+                    ptr_available_nodes_id->push_back( temp_node_id );
+
+                    SIXTRL_ASSERT( ptr_available_nodes_id->size() ==
+                                   available_devices.size() );
+                }
+
+                if( ptr_available_nodes_info != nullptr )
+                {
+                    std::string name;
+                    std::string description;
+
+                    cl_int ret = device.getInfo( CL_DEVICE_NAME, &name );
+                    ret |= device.getInfo( CL_DEVICE_EXTENSIONS, &description );
+
+                    ptr_available_nodes_info->push_back(
+                        _this_t::node_info_t{} );
+
+                    _this_t::node_info_t* ptr_node_info =
+                        &ptr_available_nodes_info->back();
+
+                    ::NS(ComputeNodeInfo_preset)( ptr_node_info );
+
+                    if( nullptr != NS(ComputeNodeInfo_reserve)( ptr_node_info,
+                        arch_str.size(), platform_name.size(), name.size(),
+                            description.size() ) )
+                    {
+                        ptr_node_info->id = temp_node_id;
+
+                        std::strncpy( ptr_node_info->arch,
+                                      arch_str.c_str(), arch_str.size() );
+
+                        std::strncpy( ptr_node_info->name,
+                                      name.c_str(), name.size() );
+
+                        if( !platform_name.empty() )
+                        {
+                            std::strncpy( ptr_node_info->platform,
+                                platform_name.c_str(), platform_name.size() );
+                        }
+
+                        if( !description.empty() )
+                        {
+                            std::strncpy( ptr_node_info->description,
+                                        description.c_str(), description.size() );
+                        }
+
+                        SIXTRL_ASSERT( ptr_available_nodes_info->size() ==
+                                       available_devices.size() );
+                    }
+                }
+            }
+
+            if( added_at_least_one_device ) ++platform_idx;
         }
 
         return status;
@@ -2102,12 +2140,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
     _this_t::status_t ClContextBase::GetAvailableNodes(
             std::vector< ClContextBase::node_id_t>& available_nodes_id,
-            std::vector< ClContextBase::node_info_t >& available_nodes_info,
-            std::vector< cl::Device >& available_devices,
+            std::vector< ClContextBase::node_info_t >* ptr_available_nodes_info,
+            std::vector< cl::Device >* ptr_available_devices,
             char const* SIXTRL_RESTRICT env_variable_name,
             char const* SIXTRL_RESTRICT filter_str )
     {
-        _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        using node_id_t = _this_t::node_id_t;
+
         ( void )filter_str;
 
         char const* env_var_begin = nullptr;
@@ -2122,11 +2161,35 @@ namespace SIXTRL_CXX_NAMESPACE
             env_var_begin = std::getenv( "SIXTRACKLIB_DEVICES" );
         }
 
-        platform_id_t platform_idx = platform_id_t{ 0 };
-        device_id_t device_idx = device_id_t{ 0 };
+        available_nodes_id.clear();
 
-        std::vector< cl::Device > devices;
-        std::vector< cl::Platform > platforms;
+        if( ptr_available_nodes_info != nullptr )
+                ptr_available_nodes_info->clear();
+
+        if( ptr_available_devices != nullptr )
+            ptr_available_devices->clear();
+
+        std::vector< cl::Device > all_available_devices;
+        std::vector< cl::Platform > all_available_platforms;
+        std::vector< node_id_t > all_available_nodes_id;
+        std::vector< _this_t::node_info_t > all_available_nodes_info;
+
+        _this_t::status_t status = _this_t::GetAllAvailableNodes(
+            all_available_platforms, all_available_devices,
+                &all_available_nodes_id, &all_available_nodes_info );
+
+        if( status != st::ARCH_STATUS_SUCCESS ) return status;
+        if( all_available_devices.empty() ) return status;
+
+        SIXTRL_ASSERT( all_available_devices.size() >=
+                       all_available_platforms.size() );
+
+        SIXTRL_ASSERT( all_available_devices.size() ==
+                       all_available_nodes_id.size() );
+
+        SIXTRL_ASSERT( all_available_devices.size() ==
+                       all_available_nodes_info.size() );
+
         std::vector< _this_t::node_id_t > allowed_node_ids;
 
         bool first_available_node = false;
@@ -2150,136 +2213,128 @@ namespace SIXTRL_CXX_NAMESPACE
             status = _this_t::GetAllowedNodesFromEnvVariable(
                 allowed_node_ids, env_variable_name );
         }
-        else
-        {
-            status = st::ARCH_STATUS_SUCCESS;
-        }
 
         if( status != st::ARCH_STATUS_SUCCESS ) return status;
 
-        available_nodes_id.clear();
-        available_nodes_info.clear();
-        available_devices.clear();
+        _this_t::size_type const max_expected_num_nodes = ( ext_list_of_nodes )
+            ? allowed_node_ids.size() : all_available_devices.size();
 
-        platforms.clear();
-        platforms.reserve( 10 );
-
-        devices.clear();
-        devices.reserve( 100 );
-
-        cl::Platform::get( &platforms );
-
-        std::string const arch_str( "opencl" );
-
-        for( auto const& platform : platforms )
+        if( max_expected_num_nodes > _this_t::size_type{ 0 } )
         {
-            devices.clear();
-            device_idx = 0;
+            available_nodes_id.reserve( max_expected_num_nodes );
 
-            if( ( ext_list_of_nodes ) && ( allowed_node_ids.empty() ) ) break;
-            std::string platform_name = platform.getInfo< CL_PLATFORM_NAME >();
+            if( ptr_available_nodes_info != nullptr )
+                ptr_available_nodes_info->reserve( max_expected_num_nodes );
 
-            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
-                SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
-            try
+            if( ptr_available_devices != nullptr )
+                ptr_available_devices->reserve( max_expected_num_nodes );
+
+            if( ext_list_of_nodes )
             {
-            #endif /* OpenCL 1.x C++ Host Exceptions enabled */
-
-            platform.getDevices( CL_DEVICE_TYPE_ALL, &devices );
-
-            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
-                SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
-            }
-            catch( cl::Error const& e )
-            {
-                #if !defined( NDEBUG )
-                std::cerr << "Error while probing devices for platform "
-                          << platform_name << " --> skipping"
-                          << std::endl;
-                #endif /* !defined( NDEBUG ) */
-            }
-            #endif /* OpenCL 1.x C++ Host Exceptions enabled */
-
-            bool added_at_least_one_device = false;
-
-            for( auto const& device : devices )
-            {
-                std::string name;
-                std::string description;
-
-                cl_int ret = device.getInfo( CL_DEVICE_NAME, &name );
-                ret |= device.getInfo( CL_DEVICE_EXTENSIONS, &description );
-
-                node_id_t temp_node_id;
-                NS(ComputeNodeId_set_platform_id)( &temp_node_id, platform_idx );
-                NS(ComputeNodeId_set_device_id)( &temp_node_id, device_idx++ );
-
-                if( ( ext_list_of_nodes ) &&
-                    ( !std::binary_search( allowed_node_ids.begin(),
-                        allowed_node_ids.end(), temp_node_id,
-                        []( node_id_t const& SIXTRL_RESTRICT_REF lhs,
-                            node_id_t const& SIXTRL_RESTRICT_REF rhs )
-                        { return ( ::NS(ComputeNodeId_compare)(
-                            &lhs, &rhs ) < 0 ); } ) ) )
+                auto cmp_node_ids = [](
+                    node_id_t const& SIXTRL_RESTRICT_REF lhs,
+                    node_id_t const& SIXTRL_RESTRICT_REF rhs )
                 {
-                    added_at_least_one_device = true;
-                    continue;
-                }
+                    return (
+                        ( ::NS(ComputeNodeId_get_platform_id)( &lhs ) <
+                          ::NS(ComputeNodeId_get_platform_id)( &rhs ) ) ||
+                        ( ( ::NS(ComputeNodeId_get_platform_id)( &lhs ) ==
+                            ::NS(ComputeNodeId_get_platform_id)( &rhs ) ) &&
+                          ( ::NS(ComputeNodeId_get_device_id)( &lhs ) <
+                            ::NS(ComputeNodeId_get_device_id)( &rhs ) ) ) );
+                };
 
-                available_nodes_id.push_back( temp_node_id );
-                available_nodes_info.push_back( node_info_t {} );
-                node_info_t* ptr_node_info = &available_nodes_info.back();
-                NS(ComputeNodeInfo_preset)( ptr_node_info );
+                SIXTRL_ASSERT( !allowed_node_ids.empty() );
+                SIXTRL_ASSERT( std::is_sorted( allowed_node_ids.begin(),
+                       allowed_node_ids.end(), cmp_node_ids ) );
 
-                if( nullptr != NS(ComputeNodeInfo_reserve)(
-                            ptr_node_info, arch_str.size(), platform_name.size(),
-                            name.size(), description.size() ) )
+                _this_t::size_type const num_available_nodes =
+                    all_available_devices.size();
+
+                for( _this_t::size_type ii = _this_t::size_type{ 0 } ;
+                        ii < num_available_nodes ; ++ii )
                 {
-                    ptr_node_info->id = temp_node_id;
+                    _this_t::node_id_t const& node_id =
+                        all_available_nodes_id[ ii ];
 
-                    std::strncpy( ptr_node_info->arch,
-                                  arch_str.c_str(), arch_str.size() );
-
-                    std::strncpy( ptr_node_info->name,
-                                name.c_str(), name.size() );
-
-                    if( !platform_name.empty() )
+                    if( std::binary_search( allowed_node_ids.begin(),
+                            allowed_node_ids.end(), node_id, cmp_node_ids ) )
                     {
-                        std::strncpy( ptr_node_info->platform,
-                            platform_name.c_str(), platform_name.size() );
-                    }
+                        if( ptr_available_nodes_info != nullptr )
+                        {
+                            ptr_available_nodes_info->push_back(
+                                all_available_nodes_info[ ii ] );
 
-                    if( !description.empty() )
-                    {
-                        std::strncpy( ptr_node_info->description,
-                                      description.c_str(), description.size() );
+                            ::NS(ComputeNodeInfo_preset)(
+                                &all_available_nodes_info[ ii ] );
+
+                        }
+
+                        if( ptr_available_devices != nullptr )
+                        {
+                            ptr_available_devices->push_back(
+                                all_available_devices[ ii ] );
+                        }
+
+                        available_nodes_id.push_back( node_id );
                     }
                 }
 
-                available_devices.push_back( device );
+                SIXTRL_ASSERT( available_nodes_id.size() <=
+                    allowed_node_ids.size() );
 
-                SIXTRL_ASSERT( available_nodes_id.size() ==
-                               available_devices.size() );
+            }
+            else if( first_available_node )
+            {
+                SIXTRL_ASSERT( !all_available_devices.empty() );
+                SIXTRL_ASSERT( !all_available_nodes_id.empty() );
+                SIXTRL_ASSERT( !all_available_nodes_info.empty() );
 
-                SIXTRL_ASSERT( available_nodes_info.size() ==
-                               available_devices.size() );
+                available_nodes_id.push_back( all_available_nodes_id.front() );
 
-                if( ( first_available_node ) &&
-                    ( available_nodes_id.size() >= std::size_t{ 1 }  ) )
+                if( ptr_available_nodes_info != nullptr )
                 {
-                    break;
+                    ptr_available_nodes_info->push_back(
+                        all_available_nodes_info.front() );
+
+                    ::NS(ComputeNodeInfo_preset)(
+                        &all_available_nodes_info.front() );
                 }
 
-                added_at_least_one_device = true;
+                if( ptr_available_devices != nullptr )
+                {
+                    ptr_available_devices->push_back(
+                        all_available_devices.front() );
+                }
             }
-
-            if( ( first_available_node ) &&
-                ( available_nodes_id.size() >= std::size_t{ 1 }  ) )
+            else
             {
-                break;
-            }
+                available_nodes_id.swap( all_available_nodes_id );
 
-            if( added_at_least_one_device ) ++platform_idx;
+                if( ptr_available_nodes_info != nullptr )
+                {
+                    ptr_available_nodes_info->swap( all_available_nodes_info );
+                }
+
+                if( ptr_available_devices != nullptr )
+                {
+                    ptr_available_devices->swap( all_available_devices );
+                }
+            }
+        }
+
+        SIXTRL_ASSERT( ( ptr_available_devices == nullptr ) ||
+            ( ptr_available_devices->size() == available_nodes_id.size() ) );
+
+        SIXTRL_ASSERT( ( ptr_available_nodes_info == nullptr ) ||
+            ( ptr_available_nodes_info->size() == available_nodes_id.size() ) );
+
+        if( !all_available_nodes_info.empty() )
+        {
+            for( auto& node_info : all_available_nodes_info )
+            {
+                ::NS(ComputeNodeInfo_free)( &node_info );
+            }
         }
 
         return status;
@@ -2642,9 +2697,38 @@ namespace SIXTRL_CXX_NAMESPACE
 /* -----             Implementation of C Wrapper functions              ---- */
 /* ------------------------------------------------------------------------- */
 
-::NS(arch_size_t) NS(OpenCL_num_available_nodes)( void )
+::NS(arch_size_t) NS(OpenCL_get_num_all_nodes)( void )
 {
-    return st::ClContextBase::NUM_AVAILABLE_NODES();
+    return st::ClContextBase::NUM_ALL_NODES();
+}
+
+::NS(arch_size_t) NS(OpenCL_get_all_nodes)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT out_node_ids_begin,
+    NS(arch_size_t) const max_num_node_ids )
+{
+    return st::ClContextBase::GET_ALL_NODES(
+        out_node_ids_begin, max_num_node_ids );
+}
+
+void NS(OpenCL_print_all_nodes)( void )
+{
+    st::ClContextBase::PRINT_ALL_NODES();
+}
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+::NS(arch_size_t) NS(OpenCL_num_available_nodes)(
+    char const* SIXTRL_RESTRICT env_variable_name )
+{
+    return st::ClContextBase::NUM_AVAILABLE_NODES( nullptr, env_variable_name );
+}
+
+::NS(arch_size_t) NS(OpenCL_num_available_nodes_detailed)(
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name )
+{
+    return st::ClContextBase::NUM_AVAILABLE_NODES(
+        filter_str, env_variable_name );
 }
 
 ::NS(arch_size_t) NS(OpenCL_get_available_nodes)(
@@ -2655,10 +2739,31 @@ namespace SIXTRL_CXX_NAMESPACE
         out_node_ids_begin, max_num_node_ids );
 }
 
+::NS(arch_size_t) NS(OpenCL_get_available_nodes_detailed)(
+    ::NS(ComputeNodeId)* SIXTRL_RESTRICT out_node_ids_begin,
+    ::NS(arch_size_t) const max_num_node_ids,
+    ::NS(arch_size_t) const skip_first_num_nodes,
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name )
+{
+    return st::ClContextBase::GET_AVAILABLE_NODES(
+        out_node_ids_begin, max_num_node_ids, skip_first_num_nodes,
+            filter_str, env_variable_name );
+}
+
 void NS(OpenCL_print_available_nodes)( void )
 {
     st::ClContextBase::PRINT_AVAILABLE_NODES();
 }
+
+void NS(OpenCL_print_available_nodes_detailed)(
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name )
+{
+    st::ClContextBase::PRINT_AVAILABLE_NODES( filter_str, env_variable_name );
+}
+
+/* ************************************************************************* */
 
 ::NS(ClContextBase)* NS(ClContextBase_create)()
 {
@@ -2666,11 +2771,11 @@ void NS(OpenCL_print_available_nodes)( void )
     return ptr_base_ctx;
 }
 
-::NS(context_size_t) NS(ClContextBase_get_num_available_nodes)(
+::NS(arch_size_t) NS(ClContextBase_get_num_available_nodes)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr )
-        ? ctx->numAvailableNodes() : ::NS(context_size_t){ 0 };
+        ? ctx->numAvailableNodes() : ::NS(arch_size_t){ 0 };
 }
 
 ::NS(context_node_info_t) const*
@@ -2712,7 +2817,7 @@ NS(ClContextBase_get_available_nodes_info_begin)(
 ::NS(context_node_info_t) const*
 NS(ClContextBase_get_available_node_info_by_index)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
-    ::NS(context_size_t) const node_index )
+    ::NS(arch_size_t) const node_index )
 {
     return ( ctx != nullptr )
         ? ctx->ptrAvailableNodesInfo( node_index ) : nullptr;
@@ -2720,7 +2825,7 @@ NS(ClContextBase_get_available_node_info_by_index)(
 
 bool NS(ClContextBase_is_available_node_amd_platform)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
-    ::NS(context_size_t) const node_index )
+    ::NS(arch_size_t) const node_index )
 {
     return ( ( ctx != nullptr ) &&
              ( ctx->isAvailableNodeAMDPlatform( node_index ) ) );
@@ -2753,7 +2858,7 @@ bool NS(ClContextBase_is_node_id_str_available)(
 
 bool NS(ClContextBase_is_node_index_available)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
-    ::NS(context_size_t) const node_index )
+    ::NS(arch_size_t) const node_index )
 {
     return ( ctx != nullptr )
         ? ctx->isNodeIndexAvailable( node_index ) : false;
@@ -2794,7 +2899,7 @@ bool NS(ClContextBase_is_platform_device_tuple_default_node)(
 
 bool NS(ClContextBase_is_node_index_default_node)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
-    ::NS(context_size_t) const node_index )
+    ::NS(arch_size_t) const node_index )
 {
     return ( ctx != nullptr ) ? ctx->isDefaultNode( node_index ) : false;
 }
@@ -2831,10 +2936,10 @@ cl_device_id NS(ClContextBase_get_selected_node_device)(
     return ( ctx != nullptr ) ? ctx->ptrSelectedNodeId() : nullptr;
 }
 
-::NS(context_size_t) NS(ClContextBase_get_selected_node_index)(
+::NS(arch_size_t) NS(ClContextBase_get_selected_node_index)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
 {
-    using size_type = ::NS(context_size_t);
+    using size_type = ::NS(arch_size_t);
     using limits_t  = std::numeric_limits< size_type >;
 
     return ( ctx != nullptr ) ? ctx->selectedNodeIndex() : limits_t::max();
@@ -2842,7 +2947,7 @@ cl_device_id NS(ClContextBase_get_selected_node_device)(
 
 bool NS(ClContextBase_get_selected_node_id_str)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
-    char* SIXTRL_RESTRICT node_id_str, ::NS(context_size_t) const max_length )
+    char* SIXTRL_RESTRICT node_id_str, ::NS(arch_size_t) const max_length )
 {
     return ( ctx != nullptr )
         ? ctx->selectedNodeIdStr( node_id_str, max_length ) : false;
@@ -2874,7 +2979,7 @@ bool NS(ClContextBase_select_node_by_node_id)(
 
 bool NS(ClContextBase_select_node_by_index)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
-    ::NS(context_size_t) const index )
+    ::NS(arch_size_t) const index )
 {
     return ( ctx != nullptr ) ? ctx->selectNode( index ) : false;
 }
@@ -2941,11 +3046,11 @@ bool NS(ClContextBase_select_node_by_index)(
     return ::NS(ClContextBase_new_on_selected_node_id)( nullptr );
 }
 
-::NS(context_size_t) NS(ClContextBase_get_num_available_programs)(
+::NS(arch_size_t) NS(ClContextBase_get_num_available_programs)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr )
-        ? ctx->numAvailablePrograms() : ( ::NS(context_size_t) )0u;
+        ? ctx->numAvailablePrograms() : ( ::NS(arch_size_t) )0u;
 }
 
 ::NS(arch_program_id_t) NS(ClContextBase_add_program_file)(
@@ -3018,11 +3123,11 @@ bool NS(ClContextBase_is_program_compiled)(
         : st::ARCH_ILLEGAL_KERNEL_ID;
 }
 
-::NS(context_size_t) NS(ClContextBase_get_num_available_kernels)(
+::NS(arch_size_t) NS(ClContextBase_get_num_available_kernels)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr )
-        ? ctx->numAvailableKernels() : ( ::NS(context_size_t) )0u;
+        ? ctx->numAvailableKernels() : ( ::NS(arch_size_t) )0u;
 }
 
 ::NS(arch_kernel_id_t) NS(ClContextBase_find_kernel_id_by_name)(
@@ -3040,69 +3145,69 @@ char const* NS(ClContextBase_get_kernel_function_name)(
     return ( ctx != nullptr ) ? ctx->kernelFunctionName( kernel_id ) : nullptr;
 }
 
-::NS(context_size_t) NS(ClContextBase_get_kernel_local_mem_size)(
+::NS(arch_size_t) NS(ClContextBase_get_kernel_local_mem_size)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id )
 {
     return ( ctx != nullptr ) ? ctx->kernelLocalMemSize( kernel_id )
-        : NS(context_size_t){ 0 };
+        : NS(arch_size_t){ 0 };
 }
 
-::NS(context_size_t) NS(ClContextBase_get_kernel_num_args)(
+::NS(arch_size_t) NS(ClContextBase_get_kernel_num_args)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id )
 {
     return ( ctx != nullptr )
-        ? ctx->kernelNumArgs( kernel_id ) : ::NS(context_size_t){ 0 };
+        ? ctx->kernelNumArgs( kernel_id ) : ::NS(arch_size_t){ 0 };
 }
 
-::NS(context_size_t) NS(ClContextBase_get_kernel_work_group_size)(
+::NS(arch_size_t) NS(ClContextBase_get_kernel_work_group_size)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id )
 {
     return ( ctx != nullptr )
-        ? ctx->kernelWorkGroupSize( kernel_id ) : ::NS(context_size_t){ 0 };
+        ? ctx->kernelWorkGroupSize( kernel_id ) : ::NS(arch_size_t){ 0 };
 }
 
-::NS(context_size_t) NS(ClContextBase_get_kernel_max_work_group_size)(
+::NS(arch_size_t) NS(ClContextBase_get_kernel_max_work_group_size)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id )
 {
     return ( ctx != nullptr )
-        ? ctx->kernelMaxWorkGroupSize( kernel_id ) : ::NS(context_size_t){ 0 };
+        ? ctx->kernelMaxWorkGroupSize( kernel_id ) : ::NS(arch_size_t){ 0 };
 }
 
 bool NS(ClContextBase_set_kernel_work_group_size)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id,
-    ::NS(context_size_t) const work_group_size )
+    ::NS(arch_size_t) const work_group_size )
 {
     return ( ctx != nullptr )
         ? ctx->setKernelWorkGroupSize( kernel_id, work_group_size ) : false;
 }
 
-::NS(context_size_t)
+::NS(arch_size_t)
 NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id )
 {
     return ( ctx != nullptr )
         ? ctx->kernelPreferredWorkGroupSizeMultiple( kernel_id )
-        : ::NS(context_size_t){ 0 };
+        : ::NS(arch_size_t){ 0 };
 }
 
-::NS(context_size_t) NS(ClContextBase_get_kernel_exec_counter)(
+::NS(arch_size_t) NS(ClContextBase_get_kernel_exec_counter)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id )
 {
     return ( ctx != nullptr )
-        ? ctx->kernelExecCounter( kernel_id ) : ::NS(context_size_t){ 0 };
+        ? ctx->kernelExecCounter( kernel_id ) : ::NS(arch_size_t){ 0 };
 }
 
 ::NS(ClArgument)* NS(ClContextBase_get_ptr_kernel_argument)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id,
-    ::NS(context_size_t) const arg_index )
+    ::NS(arch_size_t) const arg_index )
 {
     return ( ctx != nullptr )
         ? ctx->ptrKernelArgument( kernel_id, arg_index ) : nullptr;
@@ -3111,7 +3216,7 @@ NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
 ::NS(kernel_arg_type_t) NS(ClContextBase_get_kernel_argument_type)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id,
-    ::NS(context_size_t) const arg_index )
+    ::NS(arch_size_t) const arg_index )
 {
     return ( ctx != nullptr ) ? ctx->kernelArgumentType( kernel_id, arg_index )
         : st::ClContextBase::ARG_TYPE_INVALID;
@@ -3120,7 +3225,7 @@ NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
 ::NS(ClArgument) const* NS(ClContextBase_get_const_ptr_kernel_argument)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id,
-    ::NS(context_size_t) const arg_index )
+    ::NS(arch_size_t) const arg_index )
 {
     return ( ctx != nullptr )
         ? ctx->ptrKernelArgument( kernel_id, arg_index ) : nullptr;
@@ -3128,7 +3233,7 @@ NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
 
 void NS(ClContextBase_assign_kernel_argument)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx, ::NS(arch_kernel_id_t) const kernel_id,
-    ::NS(context_size_t) const arg_index,
+    ::NS(arch_size_t) const arg_index,
     ::NS(ClArgument)* SIXTRL_RESTRICT ptr_arg )
 {
     if( ( ctx != nullptr ) && ( ptr_arg != nullptr ) )
@@ -3147,14 +3252,14 @@ void NS(ClContextBase_reset_kernel_arguments)(
 void NS(ClContextBase_reset_single_kernel_argument)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id,
-    ::NS(context_size_t) const arg_index )
+    ::NS(arch_size_t) const arg_index )
 {
     if( ctx != nullptr ) ctx->resetSingleKernelArgument( kernel_id, arg_index );
 }
 
 void NS(ClContextBase_assign_kernel_argument_ptr)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
-    ::NS(arch_kernel_id_t) const kernel_id, ::NS(context_size_t) const arg_idx,
+    ::NS(arch_kernel_id_t) const kernel_id, ::NS(arch_size_t) const arg_idx,
     void* SIXTRL_RESTRICT ptr )
 {
     if( ctx != nullptr ) ctx->assignKernelArgumentPtr( kernel_id, arg_idx, ptr );
@@ -3163,8 +3268,8 @@ void NS(ClContextBase_assign_kernel_argument_ptr)(
 void NS(ClContextBase_assign_kernel_argument_value)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id,
-    ::NS(context_size_t) const arg_index, void* SIXTRL_RESTRICT arg_data,
-    ::NS(context_size_t) const arg_data_size )
+    ::NS(arch_size_t) const arg_index, void* SIXTRL_RESTRICT arg_data,
+    ::NS(arch_size_t) const arg_data_size )
 {
     if( arg_index < NS(ClContextBase_get_kernel_num_args)( ctx, kernel_id ) )
     {
@@ -3180,10 +3285,10 @@ void NS(ClContextBase_assign_kernel_argument_value)(
     }
 }
 
-::NS(context_size_t) NS(ClContextBase_calculate_kernel_num_work_items)(
+::NS(arch_size_t) NS(ClContextBase_calculate_kernel_num_work_items)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id,
-    ::NS(context_size_t) const min_num_work_items )
+    ::NS(arch_size_t) const min_num_work_items )
 {
     return ( ctx != nullptr )
         ? ctx->calculateKernelNumWorkItems( kernel_id, min_num_work_items )
@@ -3192,7 +3297,7 @@ void NS(ClContextBase_assign_kernel_argument_value)(
 
 bool NS(ClContextBase_run_kernel)( ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id,
-    ::NS(context_size_t) num_work_items )
+    ::NS(arch_size_t) num_work_items )
 {
     return ( ctx != nullptr )
         ? ctx->runKernel( kernel_id, num_work_items ) : false;
@@ -3201,8 +3306,8 @@ bool NS(ClContextBase_run_kernel)( ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
 bool NS(ClContextBase_run_kernel_wgsize)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id,
-    ::NS(context_size_t) const num_work_items,
-    ::NS(context_size_t) const work_group_size )
+    ::NS(arch_size_t) const num_work_items,
+    ::NS(arch_size_t) const work_group_size )
 {
     return ( ctx != nullptr )
         ? ctx->runKernel( kernel_id, num_work_items, work_group_size )
@@ -3237,20 +3342,20 @@ double NS(ClContextBase_get_avg_exec_time)(
     return ( ctx != nullptr ) ? ctx->avgExecTime( kernel_id ) : double{ 0 };
 }
 
-NS(context_size_t) NS(ClContextBase_get_last_exec_work_group_size)(
+NS(arch_size_t) NS(ClContextBase_get_last_exec_work_group_size)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id )
 {
     return ( ctx != nullptr ) ? ctx->lastExecWorkGroupSize( kernel_id )
-        : ::NS(context_size_t){ 0 };
+        : ::NS(arch_size_t){ 0 };
 }
 
-NS(context_size_t) NS(ClContextBase_get_last_exec_num_work_items)(
+NS(arch_size_t) NS(ClContextBase_get_last_exec_num_work_items)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id )
 {
     return ( ctx != nullptr ) ? ctx->lastExecNumWorkItems( kernel_id )
-        : ::NS(context_size_t){ 0 };
+        : ::NS(arch_size_t){ 0 };
 }
 
 void NS(ClContextBase_reset_kernel_exec_timing)(
@@ -3296,7 +3401,7 @@ bool NS(ClContextBase_has_remapping_kernel)(
 bool NS(ClContextBase_has_remapping_program)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->has_remapping_program() : false;
+    return ( ( ctx != nullptr ) && ( ctx->has_remapping_program() ) );
 }
 
 ::NS(arch_program_id_t) NS(ClContextBase_remapping_program_id)(
@@ -3358,7 +3463,7 @@ cl_context NS(ClContextBase_get_opencl_context)(
 
     if( ptr_context != nullptr )
     {
-        ptr_context->operator()();
+        return ptr_context->operator()();
     }
 
     return cl_context{};
@@ -3369,27 +3474,24 @@ void NS(ClContextBase_delete)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx )
 {
     delete ctx;
-    return;
 }
 
 bool NS(ClContextBase_is_debug_mode_enabled)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
 {
-    return ( ctx != nullptr ) ? ctx->debugMode() : false;
+    return ( ( ctx != nullptr ) && ( ctx->debugMode() ) );
 }
 
 void NS(ClContextBase_enable_debug_mode)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx )
 {
     if( ctx != nullptr ) ctx->enableDebugMode();
-    return;
 }
 
 void NS(ClContextBase_disable_debug_mode)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx )
 {
     if( ctx != nullptr ) ctx->disableDebugMode();
-    return;
 }
 
 #endif /* !defined( __CUDACC__ )  */

@@ -22,6 +22,7 @@
     #include "sixtracklib/common/control/debug_register.h"
     #include "sixtracklib/common/output/elem_by_elem_config.h"
     #include "sixtracklib/common/output/output_buffer.h"
+    #include "sixtracklib/common/track/definitions.h"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/particles.h"
 

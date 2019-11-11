@@ -6,45 +6,8 @@ message( STATUS "---- processing sixtracklib/opencl/CMakeLists.txt" )
 set( C99_HEADERS_INSTALL_PATH "include/sixtracklib/opencl" )
 set( CXX_HEADERS_INSTALL_PATH ${C99_HEADERS_INSTALL_PATH}  )
 
-#-------------------------------------------------------------------------------
-# Prepare the internal cl.h header according to entries from Settings
-
-set( SIXTRL_OPENCL_ENABLE_EXCEPTION_STR "" )
-set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG 0 )
-
-if( SIXTRACKL_USE_LEGACY_CL_HPP )
-    set( SIXTRL_OPENCL_CL_HPP "CL/cl.hpp" )
-    set( SIXTRL_USES_CL2_HPP 0 )
-    set( SIXTRL_USES_CL_HPP  1 )
-
-    if( SIXTRL_OPENCL_ENABLE_HOST_EXCEPTIONS )
-        set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG 1 )
-        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                "    #if !defined( __CL_ENABLE_EXCEPTIONS )\r\n" )
-        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                "        #define __CL_ENABLE_EXCEPTIONS  \r\n" )
-        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                "    #endif /* !defined( __CL_ENABLE_EXCEPTIONS ) */ \r\n" )
-    endif()
-else()
-    set( SIXTRL_OPENCL_CL_HPP "CL/cl2.hpp" )
-    set( SIXTRL_USES_CL2_HPP 1 )
-    set( SIXTRL_USES_CL_HPP  0 )
-
-    if( SIXTRACKL_OPENCL_CXX_ENABLE_EXCEPTIONS )
-        set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG 1 )
-        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                "    #if !defined( CL_HPP_ENABLE_EXCEPTIONS )\r\n" )
-        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                "        #define CL_HPP_ENABLE_EXCEPTIONS \r\n" )
-        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                "    #endif /* !defined( CL_HPP_ENABLE_EXCEPTIONS ) */ \r\n" )
-    endif()
-endif()
-
 set( CL_H_IN_FILE  "${CMAKE_CURRENT_SOURCE_DIR}/cl.h.template" )
 set( CL_H_OUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cl.h" )
-
 configure_file( ${CL_H_IN_FILE} ${CL_H_OUT_FILE} @ONLY )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -72,25 +35,13 @@ install( CODE "
 # ------------------------------------------------------------------------------
 
 set( SIXTRACKLIB_OPENCL_HEADERS
-     ${CL_H_OUT_FILE}
-     argument.h
-     context.h
-     track_job_cl.h
-     make_track_job.h
-)
+     ${CL_H_OUT_FILE} argument.h context.h track_job_cl.h make_track_job.h )
 
 set( SIXTRACKLIB_OPENCL_INTERNAL_HEADERS
-     internal/default_compile_options.h
-     internal/base_context.h
-)
+     internal/default_compile_options.h internal/base_context.h )
 
-set( SIXTRACKLIB_OPENCL_SOURCES
-     internal/argument.cpp
-     internal/base_context.cpp
-     internal/context.cpp
-     internal/track_job_cl.cpp
-     internal/make_track_job.cpp
-)
+set( SIXTRACKLIB_OPENCL_SOURCES internal/argument.cpp internal/base_context.cpp
+    internal/context.cpp internal/track_job_cl.cpp internal/make_track_job.cpp )
 
 set( SIXTRACKLIB_OPENCL_C99_HEADERS )
 set( SIXTRACKLIB_OPENCL_C99_SOURCES )
@@ -122,17 +73,6 @@ target_compile_definitions( sixtrack_opencl PUBLIC
 
 target_compile_options( sixtrack_opencl BEFORE PUBLIC
         ${SIXTRACKLIB_CPU_FLAGS} ${SIXTRACKLIB_CXX_FLAGS} )
-
-# ------------------------------------------------------------------------------
-# Handle special case if OpenCL headers have been downloaded by cmake:
-
-if( CONTRIBUTED_CXX_HEADER AND EXT_OCLCXX_DIR AND
-    EXISTS ${CONTRIBUTED_CXX_HEADER} )
-
-    target_include_directories( sixtrack_opencl PRIVATE
-        $<BUILD_INTERFACE:${EXT_OCLCXX_DIR}>
-    )
-endif()
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_opencl as a module for sixtracklib:
