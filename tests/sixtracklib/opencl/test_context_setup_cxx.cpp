@@ -56,13 +56,13 @@ TEST( CXX_OpenCL_ContextSetupTests, ClContextEnvVariablesSetupTests )
     context_t context;
 
     ASSERT_TRUE( context.numAvailableNodes() == NUM_AVAILABLE_NODES );
-    ASSERT_TRUE( context.hasRemappingProgram() );
-    ASSERT_TRUE( context.remappingProgramId() >= 0 );
+    ASSERT_TRUE( context.has_remapping_program() );
+    ASSERT_TRUE( context.remapping_program_id() >= 0 );
 
     std::cout << "remapping buffer program_id     : "
-              << context.remappingProgramId() << "\r\n"
+              << context.remapping_program_id() << "\r\n"
               << "remapping buffer program options: "
-              << context.programCompileOptions( context.remappingProgramId() )
+              << context.programCompileOptions( context.remapping_program_id() )
               << "\r\n" << std::endl;
 }
 

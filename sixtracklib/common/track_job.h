@@ -341,6 +341,23 @@ NS(TrackJob_get_particle_set_index)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
     NS(buffer_size_t) const n );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t) const*
+NS(TrackJob_get_num_particles_in_sets_begin)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t) const*
+NS(TrackJob_get_num_particles_in_sets_end)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(TrackJob_get_num_particles_in_set)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const n );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(TrackJob_get_total_num_particles_in_sets)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(particle_index_t)

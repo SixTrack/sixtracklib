@@ -197,7 +197,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual bool doAssignOutputBufferToBeamMonitors(
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
-            c_buffer_t* SIXTRL_RESTRICT output_buffer ) override;
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
+            particle_index_t const min_turn_id,
+            size_type const output_buffer_index_offset ) override;
+
+        SIXTRL_HOST_FN virtual bool doAssignOutputBufferToElemByElemConfig(
+            elem_by_elem_config_t* SIXTRL_RESTRICT elem_by_elem_config,
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
+            size_type const output_buffer_offset_index ) override;
 
         SIXTRL_HOST_FN virtual bool doReset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
@@ -272,13 +279,22 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN bool doAssignOutputBufferToBeamMonitorsOclImp(
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
-            c_buffer_t* SIXTRL_RESTRICT output_buffer );
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
+            particle_index_t const min_turn_id,
+            size_type const output_buffer_index_offset );
+
+        SIXTRL_HOST_FN bool doAssignOutputBufferToElemByElemConfigOclImpl(
+            elem_by_elem_config_t* SIXTRL_RESTRICT elem_by_elem_config,
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
+            size_type const output_buffer_offset_index );
 
         SIXTRL_HOST_FN bool doResetOclImp(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
             size_type const until_turn_elem_by_elem );
+
+        std::vector< size_type > m_num_particles_in_pset;
 
         ptr_cl_context_t m_ptr_context;
         ptr_cl_arg_t     m_ptr_particles_buffer_arg;
@@ -491,11 +507,11 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCl::size_type const until_turn_elem_by_elem,
         const char *const SIXTRL_RESTRICT config_str )
     {
-        using _base_t = TrackJobBase;
+        using _base_t = SIXTRL_CXX_NAMESPACE::TrackJobBase;
+        using _size_t = _base_t::size_type;
         using flags_t = ::NS(output_buffer_flag_t);
 
         bool success  = false;
-
         this->doSetRequiresCollectFlag( true );
 
         if( config_str != nullptr )
@@ -505,68 +521,121 @@ namespace SIXTRL_CXX_NAMESPACE
             this->doParseConfigStrOclImpl( this->ptrConfigStr() );
         }
 
-        this->doPrepareContextOclImpl( device_id_str, this->ptrConfigStr() );
+        success = this->doPrepareContextOclImpl(
+            device_id_str, this->ptrConfigStr() );
 
-        if( ( this->ptrContext() != nullptr ) &&
-            ( this->ptrContext()->hasSelectedNode() ) )
+        if( this->ptrContext() == nullptr ) success = false;
+        if( particles_buffer == nullptr ) success = false;
+
+        if( ( success ) && ( pset_begin != pset_end ) &&
+            ( std::distance( pset_begin, pset_end ) > std::ptrdiff_t{ 0 } ) )
         {
-            SIXTRL_STATIC_VAR std::ptrdiff_t const ZERO = std::ptrdiff_t{ 0 };
-
-            success = true;
-
-            _base_t::doPrepareParticlesStructures( particles_buffer );
-            this->doPrepareParticlesStructuresOclImp( particles_buffer );
-            this->doSetPtrCParticleBuffer( particles_buffer );
-
-            if( ( pset_begin != nullptr ) && ( pset_end != nullptr ) &&
-                ( pset_begin != pset_end ) &&
-                ( std::distance( pset_begin, pset_end ) > ZERO ) )
+            this->doSetParticleSetIndices(
+                pset_begin, pset_end, particles_buffer );
+        }
+        else if( success )
+        {
+            _size_t const fallback_pset_indices[] =
             {
-                this->doSetParticleSetIndices(
-                    pset_begin, pset_end, particles_buffer );
-            }
+                _size_t{ 0 }, _size_t{ 0 }
+            };
 
-            _base_t::doPrepareBeamElementsStructures( belements_buffer );
-            this->doPrepareBeamElementsStructuresOclImp( belements_buffer );
-            this->doSetPtrCBeamElementsBuffer( belements_buffer );
+            this->doSetParticleSetIndices( &fallback_pset_indices[ 0 ],
+                    &fallback_pset_indices[ 1 ], particles_buffer );
+        }
 
-            flags_t const flags =
+        if( success )
+        {
+            success = _base_t::doPrepareParticlesStructures( particles_buffer );
+        }
+
+        if( success )
+        {
+            success = this->doPrepareParticlesStructuresOclImp(
+                particles_buffer );
+        }
+
+        if( success ) this->doSetPtrCParticleBuffer( particles_buffer );
+
+        if( success )
+        {
+            success = _base_t::doPrepareBeamElementsStructures(
+                belements_buffer );
+        }
+
+        if( success )
+        {
+            success = this->doPrepareBeamElementsStructuresOclImp(
+                belements_buffer );
+        }
+
+        if( success ) this->doSetPtrCBeamElementsBuffer( belements_buffer );
+
+        flags_t const out_buffer_flags =
             ::NS(OutputBuffer_required_for_tracking_of_particle_sets)(
                 particles_buffer, this->numParticleSets(),
                     this->particleSetIndicesBegin(), belements_buffer,
                         until_turn_elem_by_elem );
 
-            bool const requires_output_buffer =
-                ::NS(OutputBuffer_requires_output_buffer)( flags );
+        bool const requires_output_buffer =
+            ::NS(OutputBuffer_requires_output_buffer)( out_buffer_flags );
 
+        if( success )
+        {
             if( ( requires_output_buffer ) || ( output_buffer != nullptr ) )
             {
                 success = _base_t::doPrepareOutputStructures( particles_buffer,
                     belements_buffer, output_buffer, until_turn_elem_by_elem );
 
-                if( success )
+                if( ( success ) && ( output_buffer != nullptr ) &&
+                    ( !this->ownsOutputBuffer() ) )
+                {
+                    this->doSetPtrCOutputBuffer( output_buffer );
+                }
+
+                if( ( success ) && ( this->hasOutputBuffer() ) )
                 {
                     success = this->doPrepareOutputStructuresOclImpl(
-                    particles_buffer, belements_buffer,
-                    this->ptrCOutputBuffer(), until_turn_elem_by_elem );
+                        particles_buffer, belements_buffer,
+                            this->ptrCOutputBuffer(), until_turn_elem_by_elem );
+                }
+            }
+        }
+
+        if( ( success ) && ( this->hasOutputBuffer() ) &&
+            ( requires_output_buffer ) )
+        {
+            if( ::NS(OutputBuffer_requires_elem_by_elem_output)(
+                    out_buffer_flags ) )
+            {
+                success = _base_t::doAssignOutputBufferToElemByElemConfig(
+                    this->ptrElemByElemConfig(), this->ptrCOutputBuffer(),
+                        this->elemByElemOutputBufferOffset() );
+
+                if( success )
+                {
+                    success = this->doAssignOutputBufferToElemByElemConfigOclImpl(
+                        this->ptrElemByElemConfig(), this->ptrCOutputBuffer(),
+                            this->elemByElemOutputBufferOffset() );
                 }
             }
 
-            if( ( success ) && ( this->hasOutputBuffer() ) &&
-                ( requires_output_buffer ) )
+            if( ( success ) &&
+                ( ::NS(OutputBuffer_requires_beam_monitor_output)(
+                    out_buffer_flags ) ) )
             {
                 success = _base_t::doAssignOutputBufferToBeamMonitors(
-                    belements_buffer, this->ptrCOutputBuffer() );
+                    belements_buffer, this->ptrCOutputBuffer(),
+                        this->minInitialTurnId(),
+                            this->beamMonitorsOutputBufferOffset() );
 
-                if( ( success ) && ( this->hasOutputBuffer() ) &&
-                    ( ::NS(OutputBuffer_requires_beam_monitor_output)(
-                        flags ) ) )
+                if( success )
                 {
-                    this->doAssignOutputBufferToBeamMonitorsOclImp(
-                        belements_buffer, this->ptrCOutputBuffer() );
+                    success = this->doAssignOutputBufferToBeamMonitorsOclImp(
+                        belements_buffer, this->ptrCOutputBuffer(),
+                            this->minInitialTurnId(),
+                                this->beamMonitorsOutputBufferOffset() );
                 }
-
-                this->collectBeamElements();
             }
         }
 

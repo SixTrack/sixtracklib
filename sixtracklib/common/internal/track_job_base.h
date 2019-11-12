@@ -213,6 +213,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN size_type particleSetIndex( size_type const n ) const;
 
+        SIXTRL_HOST_FN size_type const*
+        numParticlesInSetsBegin() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN size_type const*
+        numParticlesInSetsEnd() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN size_type numParticlesInSet( size_type const n ) const;
+        SIXTRL_HOST_FN size_type totalNumParticlesInSets() const;
+
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN particle_index_t minParticleId() const SIXTRL_NOEXCEPT;
@@ -315,6 +324,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ---------------------------------------------------------------- */
 
+        SIXTRL_HOST_FN bool debugMode() const SIXTRL_NOEXCEPT;
+
         protected:
 
         using ptr_output_buffer_t =
@@ -361,7 +372,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual bool doAssignOutputBufferToBeamMonitors(
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
-            c_buffer_t* SIXTRL_RESTRICT output_buffer );
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
+            particle_index_t const min_turn_id,
+            size_type const output_buffer_offset_index );
+
+        SIXTRL_HOST_FN virtual bool doAssignOutputBufferToElemByElemConfig(
+            elem_by_elem_config_t* SIXTRL_RESTRICT elem_by_elem_config,
+            c_buffer_t* SIXTRL_RESTRICT output_buffer,
+            size_type const output_buffer_offset_index );
 
         SIXTRL_HOST_FN virtual bool doReset(
             c_buffer_t* SIXTRL_RESTRICT particles_buffer,
@@ -479,6 +497,7 @@ namespace SIXTRL_CXX_NAMESPACE
         std::string                     m_config_str;
 
         std::vector< size_type >        m_particle_set_indices;
+        std::vector< size_type >        m_num_particles_in_sets;
         std::vector< size_type >        m_beam_monitor_indices;
 
         ptr_output_buffer_t             m_my_output_buffer;
@@ -494,6 +513,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         size_type                       m_be_mon_output_buffer_offset;
         size_type                       m_elem_by_elem_output_offset;
+        size_type                       m_total_num_particles_in_sets;
 
         type_t                          m_type_id;
         elem_by_elem_order_t            m_default_elem_by_elem_order;
@@ -513,6 +533,7 @@ namespace SIXTRL_CXX_NAMESPACE
         bool                            m_default_elem_by_elem_rolling;
         bool                            m_has_beam_monitor_output;
         bool                            m_has_elem_by_elem_output;
+        bool                            m_debug_mode;
     };
 }
 
@@ -629,12 +650,15 @@ namespace SIXTRL_CXX_NAMESPACE
         using diff_t   = std::ptrdiff_t;
         using size_t   = TrackJobBase::size_type;
         using obj_it_t = SIXTRL_BUFFER_DATAPTR_DEC ::NS(Object) const*;
+        using nparticles_t = ::NS(particle_num_elements_t);
 
         diff_t const temp_len = std::distance( begin, end );
 
         if( temp_len >= diff_t{ 0 } )
         {
+            size_t total_num_particles_in_sets = size_t{ 0 };
             this->m_particle_set_indices.clear();
+            this->m_num_particles_in_sets.clear();
 
             if( temp_len > diff_t{ 0 } )
             {
@@ -673,6 +697,31 @@ namespace SIXTRL_CXX_NAMESPACE
                     this->m_particle_set_indices.begin(),
                     this->m_particle_set_indices.end() ),
                     this->m_particle_set_indices.end() );
+
+                if( !this->m_particle_set_indices.empty() )
+                {
+                    for( auto const pset_idx : this->m_particle_set_indices )
+                    {
+                        auto pset = ::NS(Particles_buffer_get_const_particles)(
+                            pbuffer, pset_idx );
+
+                        SIXTRL_ASSERT( pset != nullptr );
+
+                        nparticles_t const nparticles =
+                            ::NS(Particles_get_num_of_particles)( pset );
+
+                        SIXTRL_ASSERT( nparticles >= nparticles_t{ 0 } );
+
+                        this->m_num_particles_in_sets.push_back( nparticles );
+                        total_num_particles_in_sets += nparticles;
+                    }
+
+                    SIXTRL_ASSERT( this->m_num_particles_in_sets.size() ==
+                                   this->m_particle_set_indices.size() );
+
+                    this->m_total_num_particles_in_sets =
+                        total_num_particles_in_sets;
+                }
             }
         }
 

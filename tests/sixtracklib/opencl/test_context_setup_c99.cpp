@@ -58,13 +58,13 @@ TEST( C99_OpenCL_ContextSetupTests, ClContextEnvVariablesSetupTests )
                  NUM_AVAILABLE_NODES );
 
     ASSERT_TRUE( ::NS(ClContextBase_has_remapping_program)( context ) );
-    ASSERT_TRUE( ::NS(ClContextBase_get_remapping_program_id)( context ) >= 0 );
+    ASSERT_TRUE( ::NS(ClContextBase_remapping_program_id)( context ) >= 0 );
 
     std::cout << "remapping buffer program_id     : "
-              << ::NS(ClContextBase_get_remapping_program_id)( context )
+              << ::NS(ClContextBase_remapping_program_id)( context )
               << "\r\n" << "remapping buffer program options: "
               << ::NS(ClContextBase_get_program_compile_options)( context,
-                 ::NS(ClContextBase_get_remapping_program_id)( context ) )
+                 ::NS(ClContextBase_remapping_program_id)( context ) )
               << "\r\n" << std::endl;
 
     ::NS(ClContext_delete)( context );
