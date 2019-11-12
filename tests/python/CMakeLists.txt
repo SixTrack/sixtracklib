@@ -3,6 +3,7 @@
 message( STATUS "---- processing tests/python/CMakeLists.txt" )
 
 if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
+    add_subdirectory( beam_elements )
 
     if( SIXTRACKL_ENABLE_CUDA )
         add_subdirectory( cuda )

@@ -1,6 +1,10 @@
 # ============================================================================
 # external/CMakeLists.txt
 
+message( STATUS "---- processing external/CMakeLists.txt" )
+
 add_subdirectory( toml11 )
 
-# end: external/CMakeLists.txt
+if( SIXTRACKL_ENABLE_OPENCL )
+    add_subdirectory( CL )
+endif()

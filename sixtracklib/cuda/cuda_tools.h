@@ -209,43 +209,44 @@ NS(Cuda_get_total_num_threads_in_kernel)()
 }
 
 
-// SIXTRL_INLINE SIXTRL_DEVICE_FN void NS(Cuda_handle_debug_flag_in_kernel)(
-//     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* ptr_dbg_register,
-//     NS(arch_debugging_t) const dbg_register )
-// {
-//     if( ( dbg_register != SIXTRL_ARCH_DEBUGGING_REGISTER_EMPTY ) &&
-//         ( ptr_dbg_register != SIXTRL_NULLPTR ) )
-//     {
-//         #if ( defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 350 ) )
-//             /* sm_35 or larger defines atomicOr also for
-//              * 64Bit variables -> this is the only clean solution */
-//             ::atomicOr( ptr_dbg_register, dbg_register );
-//
+SIXTRL_INLINE SIXTRL_DEVICE_FN void NS(Cuda_collect_status_flag_value)(
+    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* ptr_status_flags,
+    NS(arch_debugging_t) const status_flags )
+{
+    if( ( status_flags != SIXTRL_ARCH_DEBUGGING_REGISTER_EMPTY ) &&
+        ( ptr_status_flags != SIXTRL_NULLPTR ) )
+    {
+        #if ( defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 350 ) )
+            /* sm_35 or larger defines atomicOr also for
+             * 64Bit variables -> this is the only clean solution */
+            ::atomicOr( ptr_status_flags, status_flags );
+
 //         #elif defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 120 )
-//             /* NOTE: 64 bit atomic support is available but not atomicOr ->
-//              * use a spin-lock + copy&swap to emulate proper atomics.
-//              * this is not exactly a clean solution but since this is
-//              * intended to be used only in the debug kernels, it should not
-//              * be a big problem. */
-//
+            /* NOTE: 64 bit atomic support is available but not atomicOr ->
+             * use a spin-lock + copy&swap to emulate proper atomics.
+             * this is not exactly a clean solution but since this is
+             * intended to be used only in the debug kernels, it should not
+             * be a big problem. */
+
 //             SIXTRL_UINT64_T old;
-//             SIXTRL_UINT64_T ret = *ptr_dbg_register;
+//             SIXTRL_UINT64_T ret = *ptr_status_flags;
 //
 //             do
 //             {
 //                 old = ret;
 //             }
-//             while( ( ret = atomicCAS( ptr_dbg_register, old,
-//                     old | dbg_register ) ) != old );
-//         #else
-//
-//             /* No integer atomic support. We do not support devices with this
-//             * limitations -> terminate compilation of device code */
-//             #error __CUDA_ARCH__
-//             #error "__CUDA_ARCH__ >= 120 required for atomic integer functions"
-//         #endif /* defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 350 ) */
-//     }
-// }
+//             while( ( ret = ::atomicCAS( ptr_status_flags, old,
+//                     ( SIXTRL_UINT64_T )( old | status_flags ) ) ) != old );
+        #else
+
+            /* No integer atomic support. let's cross fingers and hope for the
+             * best -> this is should never be run in production, though! */
+
+            *ptr_status_flags |= status_flags;
+
+        #endif /* defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 350 ) */
+    }
+}
 
 #endif /* defined( _GPUCODE ) */
 

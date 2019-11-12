@@ -16,6 +16,18 @@
     #define SIXTRL_TRACK_STATUS_GENERAL_FAILURE -1
 #endif /* !defined( SIXTRL_TRACK_STATUS_GENERAL_FAILURE ) */
 
+#if !defined( SIXTRL_GLOBAL_APERTURE_CHECK_NEVER )
+    #define SIXTRL_GLOBAL_APERTURE_CHECK_NEVER 0
+#endif /* !defined( SIXTRL_GLOBAL_APERTURE_CHECK_NEVER ) */
+
+#if !defined( SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL )
+    #define SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL 1
+#endif /* !defined( SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL ) */
+
+#if !defined( SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS )
+    #define SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS 2
+#endif /* !defined( SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS ) */
+
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
 #endif /* defined( __cplusplus ) && ( !defined( _GPUCODE ) */

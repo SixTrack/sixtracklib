@@ -110,6 +110,7 @@ include( SetupGit )
 include( SetupC99 )
 include( SetupCxx )
 include( SetupPython )
+include( SetupGit )
 
 # ------------------------------------------------------------------------------
 # Unit-testing:

@@ -1,14 +1,20 @@
 # ==============================================================================
-# common sixtracklib submodule
+# sixtracklib/common/CMakeLists.txt
 
 message( STATUS "---- processing sixtracklib/common/CMakeLists.txt" )
 
-set(  SIXTRACKL_LINK_LIBRARIES
-    ${SIXTRACKL_LINK_LIBRARIES}  PARENT_SCOPE )
+set( SIXTRL_COMMON_C99_INSTALL_PREFIX
+     "${SIXTRACKLIB_C99_INSTALL_PREFIX}/common" )
+
+set( SIXTRL_COMMON_CXX_INSTALL_PREFIX
+     "${SIXTRACKLIB_CXX_INSTALL_PREFIX}/common" )
+
+set(  SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES} PARENT_SCOPE )
 
 set( SIXTRACKLIB_COMMON_C99_HEADERS )
 set( SIXTRACKLIB_COMMON_CXX_HEADERS )
 
+# add_subdirectory( architecture   )
 add_subdirectory( generated      )
 add_subdirectory( buffer         )
 add_subdirectory( control        )
@@ -28,48 +34,26 @@ add_subdirectory( output         )
 add_subdirectory( particles      )
 add_subdirectory( track          )
 
-set( SIXTRACKLIB_COMMON_INTERNAL_CXX_HEADERS )
-set( SIXTRACKLIB_COMMON_INTERNAL_CXX_SOURCES )
+set(  SIXTRACKLIB_C99_HEADERS ${SIXTRACKLIB_C99_HEADERS}
+      beam_elements.h buffer.h constants.h controller.h definitions.h
+      particles.h track_job.h track_job_cpu.h )
 
-set(  SIXTRACKLIB_C99_HEADERS
-    ${SIXTRACKLIB_C99_HEADERS}
-      beam_elements.h
-      buffer.h
-      constants.h
-      controller.h
-      definitions.h
-      particles.h
-      track.h
-      track_job.h
-      track_job_cpu.h
-)
-
-set(  SIXTRACKLIB_CXX_HEADERS
-    ${SIXTRACKLIB_CXX_HEADERS}
-      beam_elements.hpp
-      buffer.hpp
-      particles.hpp
-)
+set(  SIXTRACKLIB_CXX_HEADERS ${SIXTRACKLIB_CXX_HEADERS}
+      beam_elements.hpp buffer.hpp particles.hpp )
 
 # ------------------------------------------------------------------------------
 # install :
 
-if( SIXTRACKLIB_C99_HEADERS )
-
-    set( SIXTRACKLIB_COMMON_C99_INSTALL_PATH
-         include/sixtracklib/common )
-
-    install( FILES ${SIXTRACKLIB_C99_HEADERS}
-             DESTINATION ${SIXTRACKLIB_COMMON_C99_INSTALL_PATH} )
+if( SIXTRACKLIB_C99_HEADERS OR SIXTRACKLIB_COMMON_C99_HEADERS )
+    install( FILES ${SIXTRACKLIB_C99_HEADERS} ${SIXTRACKLIB_COMMON_C99_HEADERS}
+             DESTINATION ${SIXTRL_COMMON_C99_INSTALL_PREFIX} )
 endif()
 
-if( SIXTRACKLIB_CXX_HEADERS )
+if( SIXTRACKL_ENABLE_CXX AND
+    ( SIXTRACKLIB_CXX_HEADERS OR SIXTRACKLIB_COMMON_CXX_HEADERS ) )
 
-    set( SIXTRACKLIB_COMMON_CXX_INSTALL_PATH
-         include/sixtracklib/common )
-
-    install( FILES ${SIXTRACKLIB_CXX_HEADERS}
-             DESTINATION ${SIXTRACKLIB_COMMON_CXX_INSTALL_PATH} )
+    install( FILES ${SIXTRACKLIB_CXX_HEADERS} ${SIXTRACKLIB_COMMON_CXX_HEADERS}
+             DESTINATION ${SIXTRL_COMMON_CXX_INSTALL_PREFIX} )
 endif()
 
-#end sixtracklib/common/CMakeLists.txt
+# end: sixtracklib/common/CMakeLists.txt

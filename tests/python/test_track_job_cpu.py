@@ -11,11 +11,15 @@ from sixtracklib.stcommon import \
     st_OutputBuffer_calculate_output_buffer_params, \
     st_OutputBuffer_prepare, st_Track_all_particles_until_turn, \
     st_OutputBuffer_create_output_cbuffer, \
+    st_ElemByElemConfig, st_ElemByElemConfig_p, st_NullElemByElemConfig, \
+    st_ElemByElemConfig_create, st_ElemByElemConfig_delete, \
+    st_ElemByElemConfig_init, st_ElemByElemConfig_assign_output_cbuffer, \
     st_BeamMonitor_assign_output_cbuffer, \
     st_Track_all_particles_element_by_element_until_turn, \
     st_Particles_buffer_get_particles, \
     st_BeamMonitor_assign_output_buffer, st_Buffer_new_mapped_on_cbuffer, \
-    st_Particles_cbuffer_get_particles, st_NullBuffer
+    st_Particles_cbuffer_get_particles, st_NullBuffer, \
+    st_ARCH_STATUS_SUCCESS, st_particle_index_t
 
 from sixtracklib_test.stcommon import st_Particles_print_out, \
     st_Particles_compare_values_with_treshold,\
@@ -25,19 +29,18 @@ import ctypes as ct
 from cobjects import CBuffer
 
 if __name__ == '__main__':
-
     path_to_testdir = testlib.config.PATH_TO_TESTDATA_DIR
-    assert(path_to_testdir is not None)
-    assert(os.path.exists(path_to_testdir))
-    assert(os.path.isdir(path_to_testdir))
+    assert path_to_testdir is not None
+    assert os.path.exists(path_to_testdir)
+    assert os.path.isdir(path_to_testdir)
 
     path_to_particle_data = os.path.join(
         path_to_testdir, "beambeam", "particles_dump.bin")
-    assert(os.path.exists(path_to_particle_data))
+    assert os.path.exists(path_to_particle_data)
 
     path_to_beam_elements_data = os.path.join(
         path_to_testdir, "beambeam", "beam_elements.bin")
-    assert(os.path.exists(path_to_beam_elements_data))
+    assert os.path.exists(path_to_beam_elements_data)
 
     pb = CBuffer.fromfile(path_to_particle_data)
 
@@ -57,8 +60,7 @@ if __name__ == '__main__':
         until_turn, skip_turns)
 
     num_beam_elements = eb.n_objects
-    assert(num_beam_elements ==
-           (initial_num_beam_elements + num_beam_monitors))
+    assert num_beam_elements == (initial_num_beam_elements + num_beam_monitors)
 
     # ------------------------------------------------------------------------
     initial_particles = pb.get_object(0, cls=pyst.Particles)
@@ -68,34 +70,57 @@ if __name__ == '__main__':
 
     cmp_output_buffer, elem_by_elem_offset, output_offset, min_turn_id = \
         st_OutputBuffer_create_output_cbuffer(eb,
-                                              cmp_track_pb, until_turn_elem_by_elem=until_turn_elem_by_elem)
+                                              cmp_track_pb,
+                                              until_turn_elem_by_elem=until_turn_elem_by_elem)
 
-    assert(cmp_output_buffer.n_objects == 3)
-    assert(elem_by_elem_offset == 0)
-    assert(output_offset == 1)
-    assert(min_turn_id == 0)
+    elem_by_elem_config = st_ElemByElemConfig_create()
+    assert elem_by_elem_config != st_NullElemByElemConfig
 
-    ret = st_BeamMonitor_assign_output_cbuffer(
-        eb, cmp_output_buffer, min_turn_id, until_turn_elem_by_elem)
+    start_elem_idx_arg = st_particle_index_t(0)
+    until_turn_elem_by_elem_arg = st_particle_index_t(until_turn_elem_by_elem)
 
     ptr_belem_buffer = st_Buffer_new_mapped_on_cbuffer(eb)
     ptr_particles = st_Particles_cbuffer_get_particles(cmp_track_pb, 0)
-    ptr_elem_by_elem_output = st_Particles_cbuffer_get_particles(
-        cmp_output_buffer, elem_by_elem_offset)
+
+    status = st_ElemByElemConfig_init(
+        elem_by_elem_config,
+        ptr_particles,
+        ptr_belem_buffer,
+        start_elem_idx_arg,
+        until_turn_elem_by_elem_arg)
+    assert status == 0
+
+    assert cmp_output_buffer.n_objects == 3
+    assert elem_by_elem_offset == 0
+    assert output_offset == 1
+    assert min_turn_id == 0
+
+    status = st_ElemByElemConfig_assign_output_cbuffer(
+        elem_by_elem_config, cmp_output_buffer, elem_by_elem_offset)
+
+    assert status == 0
+
+    status = st_BeamMonitor_assign_output_cbuffer(
+        eb, cmp_output_buffer, min_turn_id, until_turn_elem_by_elem)
+
+    assert status == 0
 
     status = st_Track_all_particles_element_by_element_until_turn(
-        ptr_particles, ptr_belem_buffer, ct.c_int64(
-            until_turn_elem_by_elem), ptr_elem_by_elem_output)
+        ptr_particles, elem_by_elem_config, ptr_belem_buffer,
+        until_turn_elem_by_elem_arg)
 
-    assert(status == 0)
+    assert status == 0
 
     status = st_Track_all_particles_until_turn(
-        ptr_particles, ptr_belem_buffer, ct.c_int64(until_turn))
+        ptr_particles, ptr_belem_buffer, st_particle_index_t(until_turn))
 
-    assert(status == 0)
+    assert status == 0
 
     st_Buffer_delete(ptr_belem_buffer)
+    st_ElemByElemConfig_delete(elem_by_elem_config)
+
     ptr_belem_buffer = st_NullBuffer
+    elem_by_elem_config = st_NullElemByElemConfig
 
     # -------------------------------------------------------------------------
 
@@ -104,28 +129,28 @@ if __name__ == '__main__':
 
     job = pyst.TrackJob(eb, track_pb, until_turn_elem_by_elem)
 
-    assert(job.arch_str == 'cpu')
-    assert(job.has_output_buffer)
-    assert(job.num_beam_monitors > 0)
-    assert(job.has_elem_by_elem_output)
-    assert(job.has_beam_monitor_output)
+    assert job.arch_str == 'cpu'
+    assert job.has_output_buffer
+    assert job.num_beam_monitors > 0
+    assert job.has_elem_by_elem_output
+    assert job.has_beam_monitor_output
 
     status = job.track_elem_by_elem(until_turn_elem_by_elem)
-    assert(status == 0)
+    assert status == 0
 
     status = job.track_until(until_turn)
-    assert(status == 0)
+    assert status == 0
 
     job.collect()
 
     output_buffer = job.output_buffer
     particles_buffer = job.particles_buffer
 
-    assert(output_buffer.size > 0)
-    assert(output_buffer.n_objects > 0)
+    assert output_buffer.size > 0
+    assert output_buffer.n_objects > 0
 
-    assert(cmp_output_buffer.n_objects == output_buffer.n_objects)
-    assert(cmp_output_buffer.base != output_buffer.base)
+    assert cmp_output_buffer.n_objects == output_buffer.n_objects
+    assert cmp_output_buffer.base != output_buffer.base
 
     nn = cmp_output_buffer.n_objects
     ABS_DIFF = 2e-14
@@ -141,6 +166,7 @@ if __name__ == '__main__':
     del cmp_track_pb
     del particles
     del cmp_particles
+    del elem_by_elem_config
 
     # -------------------------------------------------------------------------
     # track line:

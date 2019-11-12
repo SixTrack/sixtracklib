@@ -717,6 +717,35 @@ NS(buffer_size_t) NS(TrackJob_get_particle_set_index)(
     return job->particleSetIndex( n );
 }
 
+NS(buffer_size_t) const* NS(TrackJob_get_num_particles_in_sets_begin)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    SIXTRL_ASSERT( job != nullptr );
+    return job->numParticlesInSetsBegin();
+}
+
+NS(buffer_size_t) const* NS(TrackJob_get_num_particles_in_sets_end)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    SIXTRL_ASSERT( job != nullptr );
+    return job->numParticlesInSetsEnd();
+}
+
+NS(buffer_size_t) NS(TrackJob_get_num_particles_in_set)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const n )
+{
+    SIXTRL_ASSERT( job != nullptr );
+    return job->numParticlesInSet( n );
+}
+
+NS(buffer_size_t) NS(TrackJob_get_total_num_particles_in_sets)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    SIXTRL_ASSERT( job != nullptr );
+    return job->totalNumParticlesInSets();
+}
+
 /* ------------------------------------------------------------------------- */
 
 NS(particle_index_t) NS(TrackJob_get_min_particle_id)(

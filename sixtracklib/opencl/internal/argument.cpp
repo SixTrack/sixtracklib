@@ -16,6 +16,8 @@
 #include <vector>
 
 #include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/control/definitions.h"
+#include "sixtracklib/common/control/debug_register.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/opencl/cl.h"
 #include "sixtracklib/opencl/context.h"
@@ -49,7 +51,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( ptr_ocl_ctx != nullptr ) && ( ptr_context != nullptr ) &&
             ( ptr_context->openClQueue() != nullptr ) &&
             ( ptr_context->hasSelectedNode() ) &&
-            ( ptr_context->hasRemappingKernel() ) )
+            ( ptr_context->has_remapping_kernel() ) )
         {
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
@@ -81,7 +83,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( ptr_ocl_ctx != nullptr ) && ( ptr_context != nullptr ) &&
             ( ptr_context->openClQueue() != nullptr ) &&
             ( ptr_context->hasSelectedNode() ) &&
-            ( ptr_context->hasRemappingKernel() ) )
+            ( ptr_context->has_remapping_kernel() ) )
         {
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
@@ -113,7 +115,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( ptr_ocl_ctx != nullptr ) && ( ptr_ocl_queue != nullptr ) &&
             ( ptr_context != nullptr ) &&
             ( ptr_context->hasSelectedNode() ) &&
-            ( ptr_context->hasRemappingKernel() ) )
+            ( ptr_context->has_remapping_kernel() ) )
         {
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
@@ -141,7 +143,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( ptr_ocl_ctx != nullptr ) && ( ptr_ocl_queue != nullptr ) &&
             ( ptr_context != nullptr ) &&
             ( ptr_context->hasSelectedNode() ) &&
-            ( ptr_context->hasRemappingKernel() ) )
+            ( ptr_context->has_remapping_kernel() ) )
         {
             this->m_cl_buffer = cl::Buffer(
                 *ptr_ocl_ctx, CL_MEM_READ_WRITE, arg_size, nullptr );
@@ -375,12 +377,14 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( this->m_ptr_context != nullptr ) &&
             ( buffer != nullptr ) && ( ptr_queue != nullptr ) &&
             ( this->m_ptr_context->hasSelectedNode() ) &&
-            ( this->m_ptr_context->hasRemappingKernel() ) &&
+            ( this->m_ptr_context->has_remapping_kernel() ) &&
             ( buffer_size > size_type{ 0 } ) &&
             ( buffer_size <= this->m_arg_size ) )
         {
+            typedef NS(arch_debugging_t) status_flag_t;
+
             ClContextBase::kernel_id_t remap_kernel_id =
-                this->m_ptr_context->remappingKernelId();
+                this->m_ptr_context->remapping_kernel_id();
 
             SIXTRL_ASSERT( this->m_ptr_context->openClKernel( remap_kernel_id )
                 != nullptr );
@@ -390,32 +394,28 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( num_args > size_type{ 0 } )
             {
-                success    = 0;
+                status_flag_t success_flag = status_flag_t{ 0u };
+
+                success = ( num_args >= size_type{ 2 } ) ? 0 : -1;
                 cl_int ret = CL_SUCCESS ;
 
-                if( num_args > size_type{ 1 } )
+                if( success == 0 )
                 {
-                    int32_t success_flag = 0;
-                    success = ( num_args == size_type{ 2 } ) ? 0 : -1;
+                    ret = ptr_queue->enqueueWriteBuffer(
+                        this->m_ptr_context->internalStatusFlagsBuffer(),
+                        CL_TRUE, 0, sizeof( success_flag ), &success_flag );
 
-                    if( success == 0 )
-                    {
-                        ret = ptr_queue->enqueueWriteBuffer(
-                            this->m_ptr_context->internalSuccessFlagBuffer(),
-                            CL_TRUE, 0, sizeof( success_flag ), &success_flag );
-
-                        success = ( ret == CL_SUCCESS ) ? 0 : -2;
-                    }
-
-                    if( success == 0 )
-                    {
-                        this->m_ptr_context->assignKernelArgumentClBuffer(
-                            remap_kernel_id, 1u,
-                            this->m_ptr_context->internalSuccessFlagBuffer() );
-                    }
+                    success = ( ret == CL_SUCCESS ) ? 0 : -2;
                 }
 
-                if( ( success == 0 ) && ( num_args > size_type{ 0 } ) )
+                if( success == 0 )
+                {
+                    this->m_ptr_context->assignKernelArgumentClBuffer(
+                        remap_kernel_id, 1u,
+                        this->m_ptr_context->internalStatusFlagsBuffer() );
+                }
+
+                if( ( success == 0 ) && ( num_args >= size_type{ 2 } ) )
                 {
                     ret = ptr_queue->enqueueWriteBuffer(
                         this->m_cl_buffer, CL_TRUE, 0, buffer_size,
@@ -425,6 +425,11 @@ namespace SIXTRL_CXX_NAMESPACE
                     {
                         this->m_ptr_context->assignKernelArgumentClBuffer(
                             remap_kernel_id, 0u, this->m_cl_buffer );
+
+                        uint64_t slot_size = uint64_t{ 8 };
+
+                        this->m_ptr_context->assignKernelArgumentValue(
+                            remap_kernel_id, 1u, slot_size );
                     }
                     else
                     {
@@ -442,12 +447,12 @@ namespace SIXTRL_CXX_NAMESPACE
                         remap_kernel_id, num_worker_items ) ) ? 0 : -8;
                 }
 
-                if( ( success == 0 ) && ( num_args > size_type{ 1 } ) )
+                if( ( success == 0 ) && ( num_args > size_type{ 2 } ) )
                 {
-                    int32_t success_flag = int32_t{ 0 };
+                    success_flag = status_flag_t{ 0u };
 
                     ret = ptr_queue->enqueueReadBuffer(
-                        this->m_ptr_context->internalSuccessFlagBuffer(),
+                        this->m_ptr_context->internalStatusFlagsBuffer(),
                         CL_TRUE, 0, sizeof( success_flag ), &success_flag );
 
                     success = ( ret == CL_SUCCESS ) ? 0 : -2;
@@ -535,7 +540,7 @@ SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_buffer)(
 }
 
 SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_size)(
-    NS(context_size_t) const arg_size,
+    NS(arch_size_t) const arg_size,
     NS(ClContextBase)* SIXTRL_RESTRICT ptr_context )
 {
     return new SIXTRL_CXX_NAMESPACE::ClArgument( arg_size, ptr_context );
@@ -543,7 +548,7 @@ SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_size)(
 
 SIXTRL_HOST_FN NS(ClArgument)* NS(ClArgument_new_from_memory)(
     void const* SIXTRL_RESTRICT arg_buffer_begin,
-    NS(context_size_t) const arg_size,
+    NS(arch_size_t) const arg_size,
     NS(ClContextBase)* SIXTRL_RESTRICT ptr_context )
 {
     return new SIXTRL_CXX_NAMESPACE::ClArgument(
@@ -556,11 +561,11 @@ SIXTRL_HOST_FN void NS(ClArgument_delete)(
     delete argument;
 }
 
-SIXTRL_HOST_FN NS(context_size_t) NS(ClArgument_get_argument_size)(
+SIXTRL_HOST_FN NS(arch_size_t) NS(ClArgument_get_argument_size)(
     const NS(ClArgument) *const SIXTRL_RESTRICT argument )
 {
     return ( argument != nullptr )
-        ? argument->size() : NS(context_size_t){ 0 };
+        ? argument->size() : NS(arch_size_t){ 0 };
 }
 
 SIXTRL_HOST_FN bool NS(ClArgument_write)(
@@ -574,7 +579,7 @@ SIXTRL_HOST_FN bool NS(ClArgument_write)(
 SIXTRL_HOST_FN bool NS(ClArgument_write_memory)(
     NS(ClArgument)* SIXTRL_RESTRICT argument,
     void const* SIXTRL_RESTRICT arg_buffer_begin,
-    NS(context_size_t) const arg_length )
+    NS(arch_size_t) const arg_length )
 {
     return ( argument != nullptr )
         ? argument->write( arg_buffer_begin, arg_length ) : false;
@@ -591,7 +596,7 @@ SIXTRL_HOST_FN bool NS(ClArgument_read)(
 SIXTRL_HOST_FN bool NS(ClArgument_read_memory)(
     NS(ClArgument)* SIXTRL_RESTRICT argument,
     void* SIXTRL_RESTRICT arg_buffer_begin,
-    NS(context_size_t) const arg_length )
+    NS(arch_size_t) const arg_length )
 {
     return ( argument != nullptr )
         ? argument->read( arg_buffer_begin, arg_length ) : false;
@@ -599,7 +604,7 @@ SIXTRL_HOST_FN bool NS(ClArgument_read_memory)(
 
 SIXTRL_HOST_FN NS(arch_status_t) NS(ClArgument_update_region)(
     NS(ClArgument)* SIXTRL_RESTRICT argument,
-    NS(context_size_t) const offset, NS(context_size_t) const length,
+    NS(arch_size_t) const offset, NS(arch_size_t) const length,
     void const* SIXTRL_RESTRICT new_value )
 {
     return ( argument != nullptr )
@@ -609,9 +614,9 @@ SIXTRL_HOST_FN NS(arch_status_t) NS(ClArgument_update_region)(
 
 SIXTRL_HOST_FN NS(arch_status_t) NS(ClArgument_update_regions)(
     NS(ClArgument)* SIXTRL_RESTRICT argument,
-    NS(context_size_t) const num_regions_to_update,
-    NS(context_size_t) const* SIXTRL_RESTRICT offsets,
-    NS(context_size_t) const* SIXTRL_RESTRICT lengths,
+    NS(arch_size_t) const num_regions_to_update,
+    NS(arch_size_t) const* SIXTRL_RESTRICT offsets,
+    NS(arch_size_t) const* SIXTRL_RESTRICT lengths,
     void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_values )
 {
     return ( argument != nullptr ) ? argument->updateRegions(

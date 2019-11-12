@@ -16,150 +16,142 @@
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
+#include "sixtracklib/opencl/context.h"
 #include "sixtracklib/opencl/cl.h"
 
 TEST( C99_OpenCL_Buffer,
       InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThread )
 {
-    using buffer_t      = ::st_Buffer;
-    using size_t        = ::st_buffer_size_t;
+    using buffer_t      = ::NS(Buffer);
+    using size_t        = ::NS(buffer_size_t);
+    using context_t     = SIXTRL_CXX_NAMESPACE::ClContextBase;
 
-    buffer_t* orig_buffer = ::st_Buffer_new_from_file(
-        ::st_PATH_TO_TEST_GENERIC_OBJ_BUFFER_DATA );
+    size_t const NUM_OPENCL_NODES = ::NS(OpenCL_get_num_all_nodes)();
+
+    if( NUM_OPENCL_NODES == size_t{ 0 } )
+    {
+        std::cout << "No OpenCL nodes -> skipping test" << std::endl;
+        return;
+    }
+
+    size_t const NUM_NODES = context_t::NUM_AVAILABLE_NODES(
+        nullptr, "SIXTRACKLIB_DEVICES" );
+
+    if( NUM_NODES == size_t{ 0 } )
+    {
+        std::cout << "No OpenCL nodes available -> skipping test" << std::endl;
+        return;
+    }
+
+    std::vector< context_t::node_id_t > node_ids(
+        NUM_NODES, context_t::node_id_t{} );
+
+    ASSERT_TRUE( NUM_NODES == context_t::GET_AVAILABLE_NODES( node_ids.data(),
+        NUM_NODES, size_t{ 0 }, nullptr, "SIXTRACKLIB_DEVICES" ) );
+
+    buffer_t* orig_buffer = ::NS(Buffer_new_from_file)(
+        ::NS(PATH_TO_TEST_GENERIC_OBJ_BUFFER_DATA) );
     ASSERT_TRUE( orig_buffer != nullptr );
-    ASSERT_TRUE( ::st_Buffer_get_num_of_objects( orig_buffer ) > size_t{ 0 } );
+    ASSERT_TRUE( ::NS(Buffer_get_num_of_objects)( orig_buffer ) > size_t{ 0 } );
 
-    size_t const orig_buffer_size = ::st_Buffer_get_size( orig_buffer );
+    size_t const orig_buffer_size = ::NS(Buffer_get_size)( orig_buffer );
     ASSERT_TRUE( orig_buffer_size > size_t{ 0 } );
 
-    buffer_t* copy_buffer = ::st_Buffer_new( 4096u );
+    buffer_t* copy_buffer = ::NS(Buffer_new)( 4096u );
     ASSERT_TRUE( copy_buffer != nullptr );
     ASSERT_TRUE( copy_buffer != orig_buffer );
     ASSERT_TRUE( st_Buffer_get_data_begin_addr( orig_buffer ) !=
                  st_Buffer_get_data_begin_addr( copy_buffer ) );
 
-    int success = ::st_Buffer_reserve( copy_buffer,
-        ::st_Buffer_get_max_num_of_objects( orig_buffer ),
-        ::st_Buffer_get_max_num_of_slots( orig_buffer ),
-        ::st_Buffer_get_max_num_of_dataptrs( orig_buffer ),
-        ::st_Buffer_get_max_num_of_garbage_ranges( orig_buffer ) );
+    int success = ::NS(Buffer_reserve)( copy_buffer,
+        ::NS(Buffer_get_max_num_of_objects)( orig_buffer ),
+        ::NS(Buffer_get_max_num_of_slots)( orig_buffer ),
+        ::NS(Buffer_get_max_num_of_dataptrs)( orig_buffer ),
+        ::NS(Buffer_get_max_num_of_garbage_ranges)( orig_buffer ) );
 
     ASSERT_TRUE( success == 0 );
 
     unsigned char const* orig_buffer_begin =
-        ::st_Buffer_get_const_data_begin( orig_buffer );
+        ::NS(Buffer_get_const_data_begin)( orig_buffer );
 
     ASSERT_TRUE( orig_buffer_begin != nullptr );
 
     unsigned char* copy_buffer_begin =
-        ::st_Buffer_get_data_begin( copy_buffer );
+        ::NS(Buffer_get_data_begin)( copy_buffer );
 
     ASSERT_TRUE( copy_buffer_begin != nullptr );
     ASSERT_TRUE( copy_buffer_begin != orig_buffer_begin );
 
     /* --------------------------------------------------------------------- */
 
-    std::vector< cl::Platform > platforms;
-    cl::Platform::get( &platforms );
-
-    if( platforms.empty() )
+    for( auto const& node_id : node_ids )
     {
-        std::cout << "Unable to perform unit-test as no OpenCL "
-                  << "platforms have been found."
-                  << std::endl;
-    }
+        context_t st_context( node_id );
 
-    ASSERT_TRUE( !platforms.empty() );
+        ASSERT_TRUE( st_context.hasSelectedNode() );
+        ASSERT_TRUE( st_context.selectedNodeDevice() != nullptr );
+        ASSERT_TRUE( st_context.openClContext() != nullptr );
+        ASSERT_TRUE( st_context.openClQueue() != nullptr );
+        ASSERT_TRUE( st_context.ptrSelectedNodeInfo() != nullptr );
 
-    std::vector< cl::Device > devices;
+        std::ostringstream a2str;
 
-    for( auto const& p : platforms )
-    {
-        std::vector< cl::Device > temp_devices;
+        a2str << " -D_GPUCODE=1"
+            << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
+            << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
+            << " -I" << ::NS(PATH_TO_SIXTRL_INCLUDE_DIR);
 
-        try
+        if( std::strcmp( ::NS(PATH_TO_SIXTRL_INCLUDE_DIR),
+                        ::NS(PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR) ) != 0 )
         {
-            p.getDevices( CL_DEVICE_TYPE_ALL, &temp_devices );
-        }
-        catch( cl::Error const& e )
-        {
-            std::cout << "Error :: " << e.what()  << std::endl;
-            std::cout << "Skipping plattform -> " << std::endl;
-
-            temp_devices.clear();
+            a2str << " -I"
+                << ::NS(PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR);
         }
 
-        for( auto const& d : temp_devices )
-        {
-            if( !d.getInfo< CL_DEVICE_AVAILABLE >() ) continue;
-            devices.push_back( d );
-        }
-    }
+        std::string const COMPILE_OPTIONS = a2str.str();
 
-    if( devices.empty() )
-    {
-        std::cout << "Unable to perform unit-test as no valid OpenCL "
-                  << "devices have been found."
-                  << std::endl;
-    }
+        std::string path_to_kernel_source = ::NS(PATH_TO_BASE_DIR);
+        path_to_kernel_source += "tests/sixtracklib/testlib/opencl/kernels/";
+        path_to_kernel_source += "opencl_buffer_generic_obj_kernel.cl";
 
-    ASSERT_TRUE( !devices.empty() );
+        std::ifstream kernel_file( path_to_kernel_source, std::ios::in );
 
-    std::ostringstream a2str;
+        std::string const PROGRAM_SOURCE_CODE(
+            ( std::istreambuf_iterator< char >( kernel_file ) ),
+            std::istreambuf_iterator< char >() );
 
-    a2str << " -D_GPUCODE=1"
-          << " -DSIXTRL_BUFFER_ARGPTR_DEC=__private"
-          << " -DSIXTRL_BUFFER_DATAPTR_DEC=__global"
-          << " -I" << ::st_PATH_TO_SIXTRL_INCLUDE_DIR;
+        kernel_file.close();
 
-    if( std::strcmp( ::st_PATH_TO_SIXTRL_INCLUDE_DIR,
-                     ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR ) != 0 )
-    {
-        a2str << " -I"
-              << ::st_PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR;
-    }
+        cl::Device& device = *st_context.selectedNodeDevice();
+        cl::Context& context = *st_context.openClContext();
+        cl::CommandQueue& queue = *st_context.openClQueue();
 
-    std::string const COMPILE_OPTIONS = a2str.str();
+        auto ptr_node_info = st_context.ptrSelectedNodeInfo();
+        auto ptr_default_info = ( st_context.isDefaultNode( node_id ) )
+            ? st_context.ptrSelectedNodeId() : nullptr;
 
-    std::string path_to_kernel_source = ::st_PATH_TO_BASE_DIR;
-    path_to_kernel_source += "tests/sixtracklib/testlib/opencl/kernels/";
-    path_to_kernel_source += "opencl_buffer_generic_obj_kernel.cl";
-
-    std::ifstream kernel_file( path_to_kernel_source, std::ios::in );
-
-    std::string const PROGRAM_SOURCE_CODE(
-        ( std::istreambuf_iterator< char >( kernel_file ) ),
-          std::istreambuf_iterator< char >() );
-
-    kernel_file.close();
-
-    for( auto& device : devices )
-    {
-        std::cout << "Perform test for device : "
-                  << device.getInfo< CL_DEVICE_NAME >() << "\r\n"
-                  << "Platform                : "
-                  << device.getInfo< CL_DEVICE_PLATFORM >()
-                  << std::endl;
+        std::cout << "Perform test for device: \r\n";
+        ::NS(ComputeNodeInfo_print_out)( ptr_node_info, ptr_default_info );
 
         /* ---------------------------------------------------------------- */
         /* prepare copy buffer */
 
-        ::st_Buffer_clear( copy_buffer, true );
+        ::NS(Buffer_clear)( copy_buffer, true );
 
         auto obj_it  = st_Buffer_get_const_objects_begin( orig_buffer );
         auto obj_end = st_Buffer_get_const_objects_end( orig_buffer );
 
         for( ; obj_it != obj_end ; ++obj_it )
         {
-            ::st_GenericObj const* orig_obj = reinterpret_cast<
-                ::st_GenericObj const* >( static_cast< uintptr_t >(
-                    ::st_Object_get_begin_addr( obj_it ) ) );
+            ::NS(GenericObj) const* orig_obj = reinterpret_cast<
+                ::NS(GenericObj) const* >( static_cast< uintptr_t >(
+                    ::NS(Object_get_begin_addr)( obj_it ) ) );
 
             ASSERT_TRUE( orig_obj != nullptr );
             ASSERT_TRUE( orig_obj->type_id ==
-                         ::st_Object_get_type_id( obj_it ) );
+                         ::NS(Object_get_type_id)( obj_it ) );
 
-            ::st_GenericObj* copy_obj = ::st_GenericObj_new( copy_buffer,
+            ::NS(GenericObj)* copy_obj = ::NS(GenericObj_new)( copy_buffer,
                 orig_obj->type_id, orig_obj->num_d, orig_obj->num_e );
 
             ASSERT_TRUE( copy_obj != nullptr );
@@ -170,15 +162,13 @@ TEST( C99_OpenCL_Buffer,
             ASSERT_TRUE( copy_obj->e != nullptr );
         }
 
-        ASSERT_TRUE( ::st_Buffer_get_num_of_objects( copy_buffer ) ==
-                     ::st_Buffer_get_num_of_objects( orig_buffer ) );
+        ASSERT_TRUE( ::NS(Buffer_get_num_of_objects)( copy_buffer ) ==
+                     ::NS(Buffer_get_num_of_objects)( orig_buffer ) );
 
         /* ---------------------------------------------------------------- */
 
         cl_int cl_ret = CL_SUCCESS;
 
-        cl::Context context( device );
-        cl::CommandQueue queue( context, device, CL_QUEUE_PROFILING_ENABLE );
         cl::Program program( context, PROGRAM_SOURCE_CODE );
 
         try
@@ -385,11 +375,11 @@ TEST( C99_OpenCL_Buffer,
 
         /* ----------------------------------------------------------------- */
 
-        success = ::st_Buffer_remap( copy_buffer );
+        success = ::NS(Buffer_remap)( copy_buffer );
         ASSERT_TRUE( success == 0 );
 
-        ASSERT_TRUE( ::st_Buffer_get_num_of_objects( copy_buffer ) ==
-                     ::st_Buffer_get_num_of_objects( orig_buffer ) );
+        ASSERT_TRUE( ::NS(Buffer_get_num_of_objects)( copy_buffer ) ==
+                     ::NS(Buffer_get_num_of_objects)( orig_buffer ) );
 
         obj_it       = st_Buffer_get_const_objects_begin( orig_buffer );
         obj_end      = st_Buffer_get_const_objects_end( orig_buffer );
@@ -397,13 +387,13 @@ TEST( C99_OpenCL_Buffer,
 
         for( ; obj_it != obj_end ; ++obj_it, ++cmp_it )
         {
-            ::st_GenericObj const* orig_obj = reinterpret_cast<
-                ::st_GenericObj const* >( static_cast< uintptr_t >(
-                    ::st_Object_get_begin_addr( obj_it ) ) );
+            ::NS(GenericObj) const* orig_obj = reinterpret_cast<
+                ::NS(GenericObj) const* >( static_cast< uintptr_t >(
+                    ::NS(Object_get_begin_addr)( obj_it ) ) );
 
-            ::st_GenericObj const* cmp_obj = reinterpret_cast<
-                ::st_GenericObj const* >( static_cast< uintptr_t >(
-                    ::st_Object_get_begin_addr( cmp_it ) ) );
+            ::NS(GenericObj) const* cmp_obj = reinterpret_cast<
+                ::NS(GenericObj) const* >( static_cast< uintptr_t >(
+                    ::NS(Object_get_begin_addr)( cmp_it ) ) );
 
             ASSERT_TRUE( orig_obj != nullptr );
             ASSERT_TRUE( cmp_obj  != nullptr );
@@ -442,8 +432,8 @@ TEST( C99_OpenCL_Buffer,
         }
     }
 
-    ::st_Buffer_delete( orig_buffer );
-    ::st_Buffer_delete( copy_buffer );
+    ::NS(Buffer_delete)( orig_buffer );
+    ::NS(Buffer_delete)( copy_buffer );
 }
 
 /* end: tests/sixtracklib/opencl/test_buffer_opencl_c99.cpp */
