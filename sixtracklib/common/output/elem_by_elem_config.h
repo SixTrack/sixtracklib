@@ -349,13 +349,37 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ElemByElemConfig_set_output_store_address_e
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ElemByElemConfig)*
+NS(ElemByElemConfig_create)( void );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ElemByElemConfig_delete)(
+    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ElemByElemConfig_init)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
-    NS(elem_by_elem_order_t) const order,
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const beam_elements_buffer,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
-    NS(particle_index_t) const min_turn, NS(particle_index_t) const max_turn );
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const
+        SIXTRL_RESTRICT particle_set,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT beam_elements_buffer,
+    NS(particle_index_t) const start_elem_id,
+    NS(particle_index_t) const until_turn_elem_by_elem );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ElemByElemConfig_init_on_particle_sets)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+        NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT particles_buffer,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const*
+        SIXTRL_RESTRICT pset_indices_begin,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT beam_elements_buffer,
+    NS(particle_index_t) const start_elem_id,
+    NS(particle_index_t) const until_turn_elem_by_elem );
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
 NS(ElemByElemConfig_get_num_elem_by_elem_objects)(

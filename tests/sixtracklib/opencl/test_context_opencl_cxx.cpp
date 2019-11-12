@@ -94,13 +94,15 @@ TEST( CXX_OpenCL_Context, BaseOpenCLContextClArgument )
             ASSERT_TRUE(  initial_num_programs > con_size_t{ 0 } );
             ASSERT_TRUE(  context.numAvailableKernels() == con_size_t{ 0 } );
 
-            ASSERT_TRUE(  context.hasRemappingProgram() );
+            ASSERT_TRUE(  context.has_remapping_program() );
 
-            program_id_t const remap_program_id = context.remappingProgramId();
+            program_id_t const remap_program_id =
+                context.remapping_program_id();
+
             ASSERT_TRUE( remap_program_id >= program_id_t{ 0 } );
 
-            ASSERT_TRUE( !context.hasRemappingKernel() );
-            ASSERT_TRUE(  context.remappingKernelId() ==
+            ASSERT_TRUE( !context.has_remapping_kernel() );
+            ASSERT_TRUE(  context.remapping_kernel_id() ==
                           st::ARCH_ILLEGAL_KERNEL_ID );
 
             /* ------------------------------------------------------------- */
@@ -119,12 +121,11 @@ TEST( CXX_OpenCL_Context, BaseOpenCLContextClArgument )
             con_size_t const initial_num_kernels =
                 context.numAvailableKernels();
 
-            ASSERT_TRUE( context.hasRemappingProgram() );
-            ASSERT_TRUE( context.remappingProgramId() == remap_program_id );
+            ASSERT_TRUE( context.has_remapping_program() );
+            ASSERT_TRUE( context.remapping_program_id() == remap_program_id );
+            ASSERT_TRUE( context.has_remapping_kernel() );
 
-            ASSERT_TRUE( context.hasRemappingKernel() );
-
-            kernel_id_t const remap_kernel_id = context.remappingKernelId();
+            kernel_id_t const remap_kernel_id = context.remapping_kernel_id();
             ASSERT_TRUE(  remap_kernel_id >= kernel_id_t{ 0 } );
 
             ASSERT_TRUE( nullptr != context.openClKernel( remap_kernel_id ) );
@@ -197,7 +198,7 @@ TEST( CXX_OpenCL_Context, BaseOpenCLContextClArgument )
                 kernel_name.c_str(), copy_program_id );
 
             ASSERT_TRUE( copy_kernel_id != st::ARCH_ILLEGAL_KERNEL_ID );
-            ASSERT_TRUE( copy_kernel_id != context.remappingKernelId() );
+            ASSERT_TRUE( copy_kernel_id != context.remapping_kernel_id() );
             ASSERT_TRUE( context.numAvailableKernels() ==
                 ( initial_num_kernels + con_size_t{ 1 } ) );
 
@@ -215,10 +216,12 @@ TEST( CXX_OpenCL_Context, BaseOpenCLContextClArgument )
 
             context.clear();
             ASSERT_TRUE( !context.hasSelectedNode() );
-            ASSERT_TRUE(  context.numAvailablePrograms() == initial_num_programs );
+            ASSERT_TRUE(  context.numAvailablePrograms() ==
+                          initial_num_programs );
+
             ASSERT_TRUE(  context.numAvailableKernels()  == con_size_t{ 0 } );
-            ASSERT_TRUE(  context.remappingProgramId()   == remap_program_id );
-            ASSERT_TRUE(  context.remappingKernelId()    ==
+            ASSERT_TRUE(  context.remapping_program_id() == remap_program_id );
+            ASSERT_TRUE(  context.remapping_kernel_id() ==
                           st::ARCH_ILLEGAL_KERNEL_ID );
 
             ASSERT_TRUE( nullptr == context.openClKernel( remap_kernel_id ) );

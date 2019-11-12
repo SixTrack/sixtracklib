@@ -35,33 +35,16 @@ install( CODE "
 # ------------------------------------------------------------------------------
 
 set( SIXTRACKLIB_OPENCL_HEADERS
-     ${CL_H_OUT_FILE}
-     argument.h
-     context.h
-     track_job_cl.h
-     make_track_job.h
-)
+     ${CL_H_OUT_FILE} argument.h context.h track_job_cl.h make_track_job.h )
 
 set( SIXTRACKLIB_OPENCL_INTERNAL_HEADERS
-     internal/default_compile_options.h
-     internal/base_context.h
-)
+     internal/default_compile_options.h internal/base_context.h )
 
-set( SIXTRACKLIB_OPENCL_SOURCES
-     internal/argument.cpp
-     internal/base_context.cpp
-     internal/context.cpp
-     internal/track_job_cl.cpp
-     internal/make_track_job.cpp
-)
+set( SIXTRACKLIB_OPENCL_SOURCES internal/argument.cpp internal/base_context.cpp
+    internal/context.cpp internal/track_job_cl.cpp internal/make_track_job.cpp )
 
-set( SIXTRACKLIB_OPENCL_C99_HEADERS
-     track.h
-)
-
-set( SIXTRACKLIB_OPENCL_C99_SOURCES
-     internal/track.c
-)
+set( SIXTRACKLIB_OPENCL_C99_HEADERS )
+set( SIXTRACKLIB_OPENCL_C99_SOURCES )
 
 set( SIXTRACKLIB_OPENCL_KERNEL_SOURCES
      kernels/track_particles.cl
@@ -89,49 +72,13 @@ target_compile_definitions( sixtrack_opencl PUBLIC
         ${SIXTRACKLIB_NAMESPACE_FLAGS} -DCL_USE_DEPRECATED_OPENCL_1_2_APIS )
 
 target_compile_options( sixtrack_opencl BEFORE PUBLIC
-        ${SIXTRACKLIB_CXX_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-add_library(
-    sixtrack_opencl_c99 OBJECT
-    ${SIXTRACKLIB_OPENCL_C99_HEADERS}
-    ${SIXTRACKLIB_OPENCL_C99_SOURCES}
-)
-
-target_include_directories( sixtrack_opencl_c99
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
-    PUBLIC $<BUILD_INTERFACE:${SIXTRACKL_OPENCL_INCLUDE_DIR}> )
-
-set_target_properties( sixtrack_opencl_c99 PROPERTIES LINKER_LANGUAGE C
-    POSITION_INDEPENDENT_CODE True C_STANDARD 99 C_STANDARD_REQUIRED ON )
-
-target_compile_options( sixtrack_opencl_c99 BEFORE PUBLIC
-        ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
-
-
-# ------------------------------------------------------------------------------
-# Handle special case if OpenCL headers have been downloaded by cmake:
-#
-# if( CONTRIBUTED_CXX_HEADER AND EXT_OCLCXX_DIR AND
-#     EXISTS ${CONTRIBUTED_CXX_HEADER} )
-#
-#     target_include_directories( sixtrack_opencl PRIVATE
-#         $<BUILD_INTERFACE:${EXT_OCLCXX_DIR}>
-#     )
-#
-#     target_include_directories( sixtrack_opencl_c99 PRIVATE
-#         $<BUILD_INTERFACE:${EXT_OCLCXX_DIR}>
-#     )
-#
-# endif()
+        ${SIXTRACKLIB_CPU_FLAGS} ${SIXTRACKLIB_CXX_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_opencl as a module for sixtracklib:
 
 set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
-     $<TARGET_OBJECTS:sixtrack_opencl>
-     $<TARGET_OBJECTS:sixtrack_opencl_c99> CACHE INTERNAL "" FORCE )
+     $<TARGET_OBJECTS:sixtrack_opencl> CACHE INTERNAL "" FORCE )
 
 set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES}
      ${SIXTRACKL_OPENCL_LIBRARY} CACHE INTERNAL "" FORCE )
@@ -147,8 +94,5 @@ install( FILES ${SIXTRACKLIB_OPENCL_INTERNAL_HEADERS}
 
 install( FILES ${SIXTRACKLIB_OPENCL_KERNEL_SOURCES}
          DESTINATION "${C99_HEADERS_INSTALL_PATH}/kernels" )
-
-install( FILES ${SIXTRACKLIB_OPENCL_C99_HEADERS}
-         DESTINATION ${C99_HEADERS_INSTALL_PATH} )
 
 # end: sixtracklib/opencl/CMakeLists.txt

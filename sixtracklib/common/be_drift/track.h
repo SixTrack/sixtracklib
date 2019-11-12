@@ -56,46 +56,14 @@ SIXTRL_INLINE int NS(Track_particle_drift)(
     real_t const dzeta  = NS(Particles_get_rvv_value)( p, ii ) -
                           ( ( real_t )1 + ( xp*xp + yp*yp ) / ( real_t )2 );
 
-    #if defined( SIXTRL_ENABLE_APERTURE_CHECK ) && \
-               ( SIXTRL_ENABLE_APERTURE_CHECK == 1 )
-
-    typedef NS(particle_index_t) index_t;
-
-    SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0;
-
-    real_t const x = NS(Particles_get_x_value)( p, ii ) + length * xp;
-    real_t const y = NS(Particles_get_y_value)( p, ii ) + length * yp;
-
-    real_t const sign_x = ( real_t )( ( ZERO < x ) - ( real_t )( x < ZERO ) );
-    real_t const sign_y = ( real_t )( ( ZERO < y ) - ( real_t )( y < ZERO ) );
-
-    index_t const new_state =
-        ( index_t )( ( ( sign_x * x ) < SIXTRL_APERTURE_X_LIMIT ) &
-                     ( ( sign_y * y ) < SIXTRL_APERTURE_Y_LIMIT ) );
-
-    int const ret = ( int )new_state - 1;
-
-    SIXTRL_ASSERT( NS(Particles_get_state_value)( p, ii ) == ( index_t )1 );
-
-    NS(Particles_set_x_value)( p, ii, x );
-    NS(Particles_set_y_value)( p, ii, y );
-    NS(Particles_set_state_value)( p, ii, new_state );
-
-    #else /* SIXTRL_ENABLE_APERTURE_CHECK */
-
-    int const ret = 0;
+    SIXTRL_ASSERT( NS(Particles_get_beta0_value)( p, ii ) > ( real_t )0 );
 
     NS(Particles_add_to_x_value)( p, ii, xp * length );
     NS(Particles_add_to_y_value)( p, ii, yp * length );
-
-    #endif /* SIXTRL_ENABLE_APERTURE_CHECK */
-
-    SIXTRL_ASSERT( NS(Particles_get_beta0_value)( p, ii ) > ( real_t )0 );
-
     NS(Particles_add_to_s_value)( p, ii, length );
     NS(Particles_add_to_zeta_value)( p, ii, length * dzeta );
 
-    return ret;
+    return SIXTRL_TRACK_SUCCESS;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -110,55 +78,22 @@ SIXTRL_INLINE int NS(Track_particle_drift_exact)(
     real_t const length = NS(DriftExact_get_length)( drift );
     real_t const px     = NS(Particles_get_px_value)( p, ii );
     real_t const py     = NS(Particles_get_py_value)( p, ii );
-
     real_t const opd    = NS(Particles_get_delta_value)( p, ii ) + ( real_t )1;
     real_t const lpzi   = length / sqrt( opd * opd - ( px * px + py * py ) );
-
     real_t const dzeta  = NS(Particles_get_rvv_value)( p, ii ) * length
                         - opd * lpzi;
 
-    #if defined( SIXTRL_ENABLE_APERTURE_CHECK      ) && \
-               ( SIXTRL_ENABLE_APERTURE_CHECK == 1 )
-
-    typedef NS(particle_index_t) index_t;
-
-    SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0;
-
-    real_t const x = NS(Particles_get_x_value)( p, ii ) + px * lpzi;
-    real_t const y = NS(Particles_get_y_value)( p, ii ) + py * lpzi;
-
-    real_t const sign_x = ( real_t )( ( ZERO < x ) - ( real_t )( x < ZERO ) );
-    real_t const sign_y = ( real_t )( ( ZERO < y ) - ( real_t )( y < ZERO ) );
-
-    index_t const new_state =
-        ( index_t )( ( ( sign_x * x ) < SIXTRL_APERTURE_X_LIMIT ) &
-                     ( ( sign_y * y ) < SIXTRL_APERTURE_Y_LIMIT ) );
-
-    int const ret = ( int )new_state - 1;
-
-    SIXTRL_ASSERT( NS(Particles_get_state_value)( p, ii ) == ( index_t )1 );
-
-    NS(Particles_set_x_value)( p, ii, x );
-    NS(Particles_set_y_value)( p, ii, y );
-    NS(Particles_set_state_value)( p, ii, new_state );
-
-    #else /* SIXTRL_ENABLE_APERTURE_CHECK */
-
-    int const ret = 0;
-
     NS(Particles_add_to_x_value)( p, ii, px * lpzi );
     NS(Particles_add_to_y_value)( p, ii, py * lpzi );
-
-    #endif /* SIXTRL_ENABLE_APERTURE_CHECK */
 
     SIXTRL_ASSERT( NS(Particles_get_beta0_value)( p, ii ) > ( real_t )0 );
     SIXTRL_ASSERT( ( opd * opd ) >   ( px * px + py * py ) );
     SIXTRL_ASSERT( sqrt( opd * opd - ( px * px + py * py ) ) > ( real_t )0 );
 
-    NS(Particles_add_to_s_value)(    p, ii, length );
+    NS(Particles_add_to_s_value)( p, ii, length );
     NS(Particles_add_to_zeta_value)( p, ii, dzeta );
 
-    return ret;
+    return SIXTRL_TRACK_SUCCESS;
 }
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )

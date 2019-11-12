@@ -29,6 +29,10 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
         set( SIXTRACKL_OPENCL_VERSION_STR "" )
     endif()
 
+    set( khr_cxx_ocl_UPDATED 0 )
+    set( khr_cxx_ocl_SYNC 0 )
+    set( khr_cxx_ocl_EXT_DIR "${CMAKE_SOURCE_DIR}/external/CL" )
+
     if( SIXTRACKL_ENABLE_OPENCL )
         if( NOT OpenCL_FOUND )
             find_package( OpenCL REQUIRED )
@@ -62,7 +66,6 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
                     message( STATUS "------ Attempt to download headers ... " )
                     set( khr_cxx_ocl_GIT_REPOSITORY https://github.com/KhronosGroup/OpenCL-CLHPP.git )
                     set( khr_cxx_ocl_GIT_BRANCH master )
-                    set( khr_cxx_ocl_EXT_DIR "${CMAKE_SOURCE_DIR}/external/CL" )
 
                     Git_sync_with_repo( TARGET khr_cxx_ocl
                         GIT_REPOSITORY ${khr_cxx_ocl_GIT_REPOSITORY}
@@ -140,8 +143,9 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
                     endif()
                 endif()
 
-                if( EXISTS "${CMAKE_SOURCE_DIR}/external/CL" )
-                    set( CXX_OPENCL_HEADER "${CMAKE_SOURCE_DIR}/external/CL/${CXX_OPENCL_HEADER_NAME}" )
+                if( ${khr_cxx_ocl_SYNC} EQUAL 1 AND
+                    EXISTS "${khr_cxx_ocl_EXT_DIR}/${CXX_OPENCL_HEADER_NAME}" )
+                    set( CXX_OPENCL_HEADER "${khr_cxx_ocl_EXT_DIR}/${CXX_OPENCL_HEADER_NAME}" )
                     set( SIXTRACKL_OPENCL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/external" )
                 endif()
             endif()

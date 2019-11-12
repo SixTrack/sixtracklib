@@ -40,8 +40,6 @@ __global__ void NS(BeamMonitor_assign_out_buffer_from_offset_cuda_debug)(
     NS(buffer_size_t) const slot_size,
     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register )
 {
-    typedef NS(arch_debugging_t) debug_register_t;
-
     if( NS(Cuda_get_1d_thread_id_in_kernel)() == ( NS(buffer_size_t) )0u )
     {
         NS(arch_debugging_t) dbg = SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE;

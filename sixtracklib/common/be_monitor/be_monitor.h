@@ -10,6 +10,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/common/control/debug_register.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/buffer_object_defines.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
@@ -287,6 +288,12 @@ NS(BeamMonitor_get_num_of_beam_monitor_objects_from_managed_buffer)(
 SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_clear_all_on_managed_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT
         beam_elements_buffer, NS(buffer_size_t) const slot_size );
+
+SIXTRL_FN SIXTRL_STATIC void NS(BeamMonitor_clear_all_on_managed_buffer_debug)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT
+        beam_elements_buffer,
+    NS(buffer_size_t) const slot_size,
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flags );
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
@@ -1247,6 +1254,80 @@ SIXTRL_INLINE void NS(BeamMonitor_clear_all_on_managed_buffer)(
     }
 
     return;
+}
+
+SIXTRL_INLINE void NS(BeamMonitor_clear_all_on_managed_buffer_debug)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements,
+    NS(buffer_size_t) const slot_size,
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flags )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* ptr_obj_t;
+    typedef SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* ptr_beam_monitor_t;
+
+    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
+
+    NS(arch_debugging_t) flags = SIXTRL_ARCH_DEBUGGING_MIN_FLAG;
+
+    NS(arch_debugging_t) const BELEM_BUFFER_NULL_FLAG           = flags;
+    NS(arch_debugging_t) const SLOT_SIZE_ILLEGAL_FLAG           = flags <<  1u;
+    NS(arch_debugging_t) const BELEM_BUFFER_REQUIRES_REMAP_FLAG = flags <<  2u;
+    NS(arch_debugging_t) const BELEM_BUFFER_EMPTY_FLAG          = flags <<  3u;
+
+    flags = ( NS(arch_debugging_t) )0u;
+
+    if( ( beam_elements != SIXTRL_NULLPTR ) && ( slot_size > ZERO ) &&
+        ( NS(ManagedBuffer_get_num_objects)(
+            beam_elements, slot_size ) ) > ZERO )
+    {
+        ptr_obj_t be_it  = NS(ManagedBuffer_get_objects_index_begin)(
+            beam_elements, slot_size );
+
+        ptr_obj_t be_end = NS(ManagedBuffer_get_objects_index_end)(
+            beam_elements, slot_size );
+
+        for( ; be_it != be_end ; ++be_it )
+        {
+            NS(object_type_id_t) const type_id =
+                NS(Object_get_type_id)( be_it );
+
+            if( type_id == NS(OBJECT_TYPE_BEAM_MONITOR) )
+            {
+                ptr_beam_monitor_t monitor = ( ptr_beam_monitor_t
+                    )NS(Object_get_begin_ptr)( be_it );
+
+                if( monitor != SIXTRL_NULLPTR )
+                {
+                    NS(BeamMonitor_clear)( monitor );
+                }
+            }
+        }
+    }
+    else
+    {
+        if( beam_elements == SIXTRL_NULLPTR )
+        {
+            flags |= BELEM_BUFFER_NULL_FLAG;
+        }
+
+        if( slot_size == ( buf_size_t )0u )
+        {
+            flags |= SLOT_SIZE_ILLEGAL_FLAG;
+        }
+
+        if( NS(ManagedBuffer_needs_remapping)( beam_elements, slot_size ) )
+        {
+            flags |= BELEM_BUFFER_REQUIRES_REMAP_FLAG;
+        }
+
+        if( NS(ManagedBuffer_get_num_objects)( beam_elements, slot_size ) ==
+            ZERO )
+        {
+            flags |= BELEM_BUFFER_EMPTY_FLAG;
+        }
+    }
+
+    if( ptr_status_flags != SIXTRL_NULLPTR ) *ptr_status_flags = flags;
 }
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )

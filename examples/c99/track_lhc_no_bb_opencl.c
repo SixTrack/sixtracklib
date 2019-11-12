@@ -9,20 +9,20 @@
 
 int main( int argc, char* argv[] )
 {
-    st_ClContext* context                   = SIXTRL_NULLPTR;
+    NS(ClContext)* ctx                       = SIXTRL_NULLPTR;
 
-    st_Buffer* particle_dump                = SIXTRL_NULLPTR;
-    st_Buffer* lhc_beam_elements_buffer     = SIXTRL_NULLPTR;
-    st_Buffer* pb                           = SIXTRL_NULLPTR;
+    NS(Buffer)* particle_dump                = SIXTRL_NULLPTR;
+    NS(Buffer)* lhc_beam_elements_buffer     = SIXTRL_NULLPTR;
+    NS(Buffer)* pb                           = SIXTRL_NULLPTR;
 
-    st_buffer_size_t NUM_PARTICLES          = 20000;
-    st_buffer_size_t NUM_TURNS              = 20;
+    NS(buffer_size_t) NUM_PARTICLES          = 20000;
+    NS(buffer_size_t) NUM_TURNS              = 20;
 
-    st_Particles*       particles           = SIXTRL_NULLPTR;
-    st_Particles const* input_particles     = SIXTRL_NULLPTR;
-    st_buffer_size_t    num_input_particles = 0;
+    NS(Particles)*       particles           = SIXTRL_NULLPTR;
+    NS(Particles) const* input_particles     = SIXTRL_NULLPTR;
+    NS(buffer_size_t)    num_input_particles = 0;
 
-    st_buffer_size_t ii                     = 0u;
+    NS(buffer_size_t) ii                     = 0u;
 
     int tracking_kernel_id                  = -1;
     double tracking_time                    = 0.0;
@@ -37,10 +37,10 @@ int main( int argc, char* argv[] )
 
         printf( "Usage: %s [ID] [NUM_PARTICLES] [NUM_TURNS]\r\n", argv[ 0 ] );
 
-        context     = st_ClContext_create();
-        num_devices = st_ClContextBase_get_num_available_nodes( context );
+        ctx     = NS(ClContext_create)();
+        num_devices = NS(ClContextBase_get_num_available_nodes)( ctx );
 
-        st_ClContextBase_print_nodes_info( context );
+        NS(ClContextBase_print_nodes_info)( ctx );
 
         if( num_devices == 0u )
         {
@@ -64,9 +64,9 @@ int main( int argc, char* argv[] )
 
     if( argc >= 2 )
     {
-        context = st_ClContext_new( argv[ 1 ] );
+        ctx = NS(ClContext_new)( argv[ 1 ] );
 
-        if( context == SIXTRL_NULLPTR )
+        if( ctx == SIXTRL_NULLPTR )
         {
             printf( "Warning         : Provided ID %s not found "
                     "-> use default device instead\r\n",
@@ -74,13 +74,13 @@ int main( int argc, char* argv[] )
         }
     }
 
-    if( !st_ClContextBase_has_selected_node( context ) )
+    if( !NS(ClContextBase_has_selected_node)( ctx ) )
     {
         /* select default node */
-        st_context_node_id_t const default_node_id =
-            st_ClContextBase_get_default_node_id( context );
+        NS(context_node_id_t) const default_node_id =
+            NS(ClContextBase_get_default_node_id)( ctx );
 
-        st_ClContextBase_select_node_by_node_id( context, &default_node_id );
+        NS(ClContextBase_select_node_by_node_id)( ctx, &default_node_id );
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -107,25 +107,25 @@ int main( int argc, char* argv[] )
 
     /* Give a summary of the provided parameters */
 
-    if( ( context != SIXTRL_NULLPTR ) &&
-        ( st_ClContextBase_has_selected_node( context ) ) &&
+    if( ( ctx != SIXTRL_NULLPTR ) &&
+        ( NS(ClContextBase_has_selected_node)( ctx ) ) &&
         ( NUM_TURNS > 0 ) && ( NUM_PARTICLES > 0 ) )
     {
-        st_context_node_id_t const* node_id =
-            st_ClContextBase_get_selected_node_id( context );
+        NS(context_node_id_t) const* node_id =
+            NS(ClContextBase_get_selected_node_id)( ctx );
 
-        st_context_node_info_t const* node_info =
-            st_ClContextBase_get_selected_node_info( context );
+        NS(context_node_info_t) const* node_info =
+            NS(ClContextBase_get_selected_node_info)( ctx );
 
         char id_str[ 16 ];
-        st_ComputeNodeId_to_string( node_id, &id_str[ 0 ], 16  );
+        NS(ComputeNodeId_to_string)( node_id, &id_str[ 0 ], 16  );
 
         printf( "\r\n"
                 "Selected [ID]            = %s (%s/%s)\r\n"
                 "         [NUM_PARTICLES] = %d\r\n"
                 "         [NUM_TURNS]     = %d\r\n"
-                "\r\n", id_str, st_ComputeNodeInfo_get_name( node_info ),
-                st_ComputeNodeInfo_get_platform( node_info ),
+                "\r\n", id_str, NS(ComputeNodeInfo_get_name)( node_info ),
+                NS(ComputeNodeInfo_get_platform)( node_info ),
                 ( int )NUM_PARTICLES, ( int )NUM_TURNS );
 
     }
@@ -141,39 +141,46 @@ int main( int argc, char* argv[] )
     /* Prepare the buffers: */
     /* ---------------------------------------------------------------------- */
 
-    particle_dump = st_Buffer_new_from_file(
-        st_PATH_TO_LHC_NO_BB_PARTICLES_DUMP );
+    particle_dump = NS(Buffer_new_from_file)(
+        NS(PATH_TO_LHC_NO_BB_PARTICLES_DUMP) );
 
-    lhc_beam_elements_buffer = st_Buffer_new_from_file(
-        st_PATH_TO_LHC_NO_BB_BEAM_ELEMENTS );
+    lhc_beam_elements_buffer = NS(Buffer_new_from_file)(
+        NS(PATH_TO_LHC_NO_BB_BEAM_ELEMENTS) );
 
-    pb = st_Buffer_new( ( st_buffer_size_t )( 1u << 24u ) );
+    pb = NS(Buffer_new)( ( NS(buffer_size_t) )( 1u << 24u ) );
 
-    particles = st_Particles_new( pb, NUM_PARTICLES );
-    input_particles = st_Particles_buffer_get_const_particles( particle_dump, 0u );
-    num_input_particles = st_Particles_get_num_of_particles( input_particles );
+    particles = NS(Particles_new)( pb, NUM_PARTICLES );
+    input_particles = NS(Particles_buffer_get_const_particles)(
+        particle_dump, 0u );
+
+    num_input_particles = NS(Particles_get_num_of_particles)( input_particles );
 
     for( ii = 0 ; ii < NUM_PARTICLES ; ++ii )
     {
-        st_buffer_size_t const jj = ii % num_input_particles;
-        st_Particles_copy_single( particles, ii, input_particles, jj );
+        NS(buffer_size_t) const jj = ii % num_input_particles;
+        NS(Particles_copy_single)( particles, ii, input_particles, jj );
     }
 
-    st_ClArgument* particles_arg =
-        st_ClArgument_new_from_buffer( pb, context );
+    NS(ClArgument)* particles_arg =
+        NS(ClArgument_new_from_buffer)( pb, ctx );
 
-    st_ClArgument* beam_elements_arg =
-        st_ClArgument_new_from_buffer( lhc_beam_elements_buffer, context );
+    NS(ClArgument)* beam_elements_arg =
+        NS(ClArgument_new_from_buffer)( lhc_beam_elements_buffer, ctx );
 
-    tracking_kernel_id = st_ClContext_get_tracking_kernel_id( context );
+    tracking_kernel_id = NS(ClContext_track_until_kernel_id)( ctx );
 
     /* --------------------------------------------------------------------- */
     /* Perform tracking over NUM_TURNS */
     /* --------------------------------------------------------------------- */
 
-    st_ClContext_track( context, particles_arg, beam_elements_arg, NUM_TURNS );
+    NS(ClContext_assign_particles_arg)( ctx, particles_arg );
+    NS(ClContext_assign_particle_set_arg)( ctx, 0u, NUM_PARTICLES );
+    NS(ClContext_assign_beam_elements_arg)( ctx, beam_elements_arg );
 
-    tracking_time = st_ClContextBase_get_last_exec_time( context, tracking_kernel_id );
+    NS(ClContext_track_until)( ctx, NUM_TURNS );
+
+    tracking_time = NS(ClContextBase_get_last_exec_time)(
+        ctx, tracking_kernel_id );
 
     printf( "Tracking time : %10.6f \r\n"
             "              : %10.6f / turn \r\n"
@@ -185,13 +192,13 @@ int main( int argc, char* argv[] )
     /* Clean-up */
     /* --------------------------------------------------------------------- */
 
-    st_ClContextBase_delete( context );
-    st_ClArgument_delete( particles_arg );
-    st_ClArgument_delete( beam_elements_arg );
+    NS(ClContextBase_delete)( ctx );
+    NS(ClArgument_delete)( particles_arg );
+    NS(ClArgument_delete)( beam_elements_arg );
 
-    st_Buffer_delete( particle_dump );
-    st_Buffer_delete( lhc_beam_elements_buffer );
-    st_Buffer_delete( pb );
+    NS(Buffer_delete)( particle_dump );
+    NS(Buffer_delete)( lhc_beam_elements_buffer );
+    NS(Buffer_delete)( pb );
 
     return 0;
 }

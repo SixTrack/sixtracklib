@@ -1,9 +1,8 @@
 # sixtracklib/common/output/CMakeLists.txt
 
 set( SIXTRACKLIB_COMMON_OUTPUT_C99_HEADERS
-     elem_by_elem_config.h
-     elem_by_elem_output_buffer.h
-     output_buffer.h
+     elem_by_elem_config.h elem_by_elem_output_buffer.h
+     elem_by_elem_kernel_impl.h output_buffer.h
 )
 
 set( SIXTRACKLIB_COMMON_OUTPUT_C99_SOURCES
@@ -12,11 +11,10 @@ set( SIXTRACKLIB_COMMON_OUTPUT_C99_SOURCES
      output_buffer.c
 )
 
+set( SIXTRACKLIB_COMMON_OUTPUT_CXX_SOURCES )
 set( SIXTRACKLIB_COMMON_OUTPUT_CXX_HEADERS
      output_buffer.hpp
 )
-
-set( SIXTRACKLIB_COMMON_OUTPUT_CXX_SOURCES )
 
 # ------------------------------------------------------------------------------
 # build sixtrack_common_output  submodule object library
@@ -24,62 +22,34 @@ set( SIXTRACKLIB_COMMON_OUTPUT_CXX_SOURCES )
 add_library( sixtrack_common_output OBJECT
              ${SIXTRACKLIB_COMMON_OUTPUT_C99_HEADERS}
              ${SIXTRACKLIB_COMMON_OUTPUT_C99_SOURCES}
-)
+             ${SIXTRACKLIB_COMMON_OUTPUT_CXX_HEADERS} )
 
 target_include_directories( sixtrack_common_output PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include> )
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> $<INSTALL_INTERFACE:include> )
 
-set_target_properties( sixtrack_common_output PROPERTIES LINKER_LANGUAGE C )
-set_target_properties( sixtrack_common_output
-                       PROPERTIES POSITION_INDEPENDENT_CODE ON )
-
-set_target_properties( sixtrack_common_output PROPERTIES C_STANDARD 99 )
-set_target_properties( sixtrack_common_output
-                       PROPERTIES C_STANDARD_REQUIRED ON )
+set_target_properties( sixtrack_common_output PROPERTIES LINKER_LANGUAGE C
+    POSITION_INDEPENDENT_CODE ON C_STANDARD 99 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_common_output PRIVATE
-                        -Wall -Werror -pedantic -ansi ${SIXTRACKLIB_CPU_FLAGS} )
+                        ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_common_output as a module for sixtracklib:
 
-set(  SIXTRACKL_LIBRARY_MODULES
-    ${SIXTRACKL_LIBRARY_MODULES}
+set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
     $<TARGET_OBJECTS:sixtrack_common_output> CACHE INTERNAL "" FORCE )
-
-# ------------------------------------------------------------------------------
-# Pass in C++ headers to parent scope to track as a depenency for the whole lib
-
-if( SIXTRACKLIB_COMMON_OUTPUT_CXX_HEADERS )
-    string( REGEX REPLACE "([^;]+)" "output/\\1" LOCAL_CXX_HEADERS
-            "${SIXTRACKLIB_COMMON_OUTPUT_CXX_HEADERS}" )
-
-    set(  SIXTRACKLIB_COMMON_CXX_HEADERS
-        ${SIXTRACKLIB_COMMON_CXX_HEADERS}
-        ${LOCAL_CXX_HEADERS} PARENT_SCOPE )
-endif()
 
 # ==============================================================================
 # install :
 
 if( SIXTRACKLIB_COMMON_OUTPUT_C99_HEADERS )
-
-    set( SIXTRACKLIB_COMMON_OUTPUT_C99_INSTALL_PATH
-         include/sixtracklib/common/output )
-
     install( FILES ${SIXTRACKLIB_COMMON_OUTPUT_C99_HEADERS}
-             DESTINATION ${SIXTRACKLIB_COMMON_OUTPUT_C99_INSTALL_PATH} )
+             DESTINATION "${SIXTRL_COMMON_C99_INSTALL_PREFIX}/output" )
 endif()
 
-
-if( SIXTRACKLIB_COMMON_OUTPUT_CXX_HEADERS )
-
-    set( SIXTRACKLIB_COMMON_OUTPUT_CXX_INSTALL_PATH
-         include/sixtracklib/common/output )
-
+if( SIXTRACKL_ENABLE_CXX AND SIXTRACKLIB_COMMON_OUTPUT_CXX_HEADERS )
     install( FILES ${SIXTRACKLIB_COMMON_OUTPUT_CXX_HEADERS}
-             DESTINATION ${SIXTRACKLIB_COMMON_OUTPUT_CXX_INSTALL_PATH} )
+             DESTINATION "${SIXTRL_COMMON_CXX_INSTALL_PREFIX}/output" )
 endif()
 
 # end: sixtracklib/common/output/CMakeLists.txt

@@ -22,13 +22,15 @@
 
 TEST( C99_OpenCL_Context, BaseOpenCLContext )
 {
+    namespace st = SIXTRL_CXX_NAMESPACE;
+
     using context_t     = ::NS(ClContextBase);
-    using argument_t    = ::NS(ClArgument);
     using con_size_t    = ::NS(arch_size_t);
     using node_id_t     = ::NS(context_node_id_t);
     using node_info_t   = ::NS(context_node_info_t);
     using kernel_id_t   = ::NS(arch_kernel_id_t);
     using program_id_t  = ::NS(arch_program_id_t);
+    using argument_t    = ::NS(ClArgument);
 
     context_t* context = ::NS(ClContextBase_create)();
 
@@ -61,7 +63,7 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
             std::memset( &default_str[ 0 ], ( int )'\0', 16 );
             std::memset( &node_id_str[ 0 ], ( int )'\0', 16 );
 
-            node_id_t const node_id = st_ComputeNodeInfo_get_id( node_info_it );
+            node_id_t const node_id = NS(ComputeNodeInfo_get_id)( node_info_it );
             ASSERT_TRUE( ::NS(ComputeNodeId_is_valid)( &node_id ) );
 
             ASSERT_TRUE( 0 == ::NS(ComputeNodeId_to_string)(
@@ -101,19 +103,20 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
                 ::NS(ClContextBase_get_num_available_programs)( context );
 
             program_id_t remap_program_id =
-                ::NS(ClContextBase_get_remapping_program_id)( context );
+                ::NS(ClContextBase_remapping_program_id)( context );
 
+            ASSERT_TRUE( remap_program_id != st::ARCH_ILLEGAL_PROGRAM_ID );
             ASSERT_TRUE( initial_num_programs >= con_size_t{ 0 } );
 
             ASSERT_TRUE(  ::NS(ClContextBase_get_num_available_kernels)(
                 context ) == con_size_t{ 0 } );
 
-            ASSERT_TRUE(  ::NS(ClContextBase_get_remapping_program_id)(
-                context ) != ::NS(ARCH_ILLEGAL_PROGRAM_ID) );
+            ASSERT_TRUE( ::NS(ClContextBase_remapping_program_id)( context ) !=
+                         st::ARCH_ILLEGAL_PROGRAM_ID );
 
             ASSERT_TRUE( !::NS(ClContextBase_has_remapping_kernel)( context ) );
-            ASSERT_TRUE(  ::NS(ClContextBase_get_remapping_kernel_id)(
-                context ) == ::NS(ARCH_ILLEGAL_KERNEL_ID) );
+            ASSERT_TRUE( ::NS(ClContextBase_remapping_kernel_id)( context ) ==
+                         st::ARCH_ILLEGAL_KERNEL_ID );
 
             /* ------------------------------------------------------------- */
             /* Select current node by node_id */
@@ -137,18 +140,17 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
             ASSERT_TRUE( initial_num_kernels >= initial_num_programs );
 
             ASSERT_TRUE( ::NS(ClContextBase_has_remapping_program)( context ) );
-            ASSERT_TRUE( ::NS(ClContextBase_get_remapping_program_id)(
-                         context ) == remap_program_id );
+            ASSERT_TRUE( ::NS(ClContextBase_remapping_program_id)( context ) ==
+                         remap_program_id );
 
             ASSERT_TRUE( ::NS(ClContextBase_has_remapping_kernel)( context ) );
 
             kernel_id_t const remap_kernel_id =
-                ::NS(ClContextBase_get_remapping_kernel_id)( context );
+                ::NS(ClContextBase_remapping_kernel_id)( context );
 
-            ASSERT_TRUE( remap_kernel_id != ::NS(ARCH_ILLEGAL_KERNEL_ID) );
-            ASSERT_TRUE( remap_program_id ==
-                ::NS(ClContextBase_get_program_id_by_kernel_id)(
-                    context, remap_kernel_id ) );
+            ASSERT_TRUE( remap_kernel_id != st::ARCH_ILLEGAL_KERNEL_ID );
+            ASSERT_TRUE( ::NS(ClContextBase_get_program_id_by_kernel_id)(
+                    context, remap_kernel_id ) == remap_program_id );
 
             /* ------------------------------------------------------------- */
             /* Create ClArgument from st::Buffer */
@@ -221,7 +223,7 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
                           ::NS(PATH_TO_SIXTRL_INCLUDE_DIR), N - std::strlen(
                               copy_program_compile_options.data() ) );
 
-            if( std::strcmp( ::NS(PATH_TO_SIXTRL_INCLUDE_DIR),
+            if( std::strcmp( ::st_PATH_TO_SIXTRL_INCLUDE_DIR,
                              ::NS(PATH_TO_SIXTRL_TESTLIB_INCLUDE_DIR) ) != 0 )
             {
                 std::strncat( copy_program_compile_options.data(), " -I",
@@ -236,7 +238,7 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
                 context, path_to_copy_kernel_program.data(),
                     copy_program_compile_options.data() );
 
-            ASSERT_TRUE( copy_program_id != ::NS(ARCH_ILLEGAL_PROGRAM_ID) );
+            ASSERT_TRUE( copy_program_id != st::ARCH_ILLEGAL_PROGRAM_ID );
 
             ASSERT_TRUE( ::NS(ClContextBase_get_num_available_programs)(
                 context ) == ( initial_num_programs + con_size_t{ 1 } ) );
@@ -268,54 +270,54 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
             std::string kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
             kernel_name += "copy_orig_buffer";
 
-            kernel_id_t const copy_kernel_id = ::st_ClContextBase_enable_kernel(
+            kernel_id_t const copy_kernel_id = ::NS(ClContextBase_enable_kernel)(
                 context, kernel_name.c_str(), copy_program_id );
 
-            ASSERT_TRUE( copy_kernel_id != ::NS(ARCH_ILLEGAL_KERNEL_ID) );
+            ASSERT_TRUE( copy_kernel_id != st::ARCH_ILLEGAL_KERNEL_ID );
             ASSERT_TRUE( copy_kernel_id != remap_kernel_id );
-            ASSERT_TRUE( ::st_ClContextBase_get_num_available_kernels(
+            ASSERT_TRUE( ::NS(ClContextBase_get_num_available_kernels)(
                     context ) == ( initial_num_kernels + con_size_t{ 1 } ) );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_program_id_by_kernel_id(
+            ASSERT_TRUE( ::NS(ClContextBase_get_program_id_by_kernel_id)(
                 context, copy_kernel_id ) == copy_program_id );
 
-            ASSERT_TRUE( ::st_ClContextBase_find_kernel_id_by_name( context,
+            ASSERT_TRUE( ::NS(ClContextBase_find_kernel_id_by_name)( context,
                 kernel_name.c_str() ) == copy_kernel_id );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_kernel_num_args(
+            ASSERT_TRUE( ::NS(ClContextBase_get_kernel_num_args)(
                 context, copy_kernel_id ) == con_size_t{ 3u } );
 
             /* ------------------------------------------------------------- */
             /* clear context to prepare it for the next node, if available   */
 
-            ::st_ClContextBase_clear( context );
+            ::NS(ClContextBase_clear)( context );
 
-            ASSERT_TRUE( !::st_ClContextBase_has_selected_node( context ) );
+            ASSERT_TRUE( !::NS(ClContextBase_has_selected_node)( context ) );
 
-            ASSERT_TRUE( !::st_ClContextBase_has_selected_node( context ) );
-            ASSERT_TRUE(  ::st_ClContextBase_get_num_available_programs(
+            ASSERT_TRUE( !::NS(ClContextBase_has_selected_node)( context ) );
+            ASSERT_TRUE(  ::NS(ClContextBase_get_num_available_programs)(
                 context ) == initial_num_programs );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_num_available_kernels(
+            ASSERT_TRUE( ::NS(ClContextBase_get_num_available_kernels)(
                 context ) == con_size_t{ 0 } );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_remapping_program_id(
+            ASSERT_TRUE( ::NS(ClContextBase_remapping_program_id)(
                 context ) == remap_program_id );
 
-            ASSERT_TRUE( ::st_ClContextBase_get_remapping_kernel_id(
-                context ) == ::NS(ARCH_ILLEGAL_KERNEL_ID) );
+            ASSERT_TRUE( ::NS(ClContextBase_remapping_kernel_id)(
+                context ) == st::ARCH_ILLEGAL_KERNEL_ID );
 
             /* ------------------------------------------------------------- */
             /* Clean-up and ressource deallocation */
 
-            ::st_ClArgument_delete( orig_arg );
-            ::st_ClArgument_delete( copy_arg );
+            ::NS(ClArgument_delete)( orig_arg );
+            ::NS(ClArgument_delete)( copy_arg );
 
             orig_arg = nullptr;
             copy_arg = nullptr;
 
-            ::st_Buffer_delete( orig_buffer );
-            ::st_Buffer_delete( copy_buffer );
+            ::NS(Buffer_delete)( orig_buffer );
+            ::NS(Buffer_delete)( copy_buffer );
 
             orig_buffer = nullptr;
             copy_buffer = nullptr;
@@ -324,11 +326,10 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
     else
     {
         std::cout << "INFO  :: No suitable OpenCL platforms found -> "
-                  << "skipping unit-test"
-                  << std::endl;
+                  << "skipping unit-test" << std::endl;
     }
 
-    ::st_ClContextBase_delete( context );
+    ::NS(ClContextBase_delete)( context );
 }
 
 /* end: tests/sixtracklib/opencl/test_opencl_context_c99.cpp */

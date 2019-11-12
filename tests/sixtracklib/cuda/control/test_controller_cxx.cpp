@@ -21,7 +21,9 @@ TEST( CXX_CudaControllerTests, BasicUsage )
 
     cuda_ctrl_t cuda_controller;
 
-    if( cuda_controller.numAvailableNodes() > size_t{ 0 } )
+    size_t const num_available_nodes = cuda_controller.numAvailableNodes();
+
+    if( num_available_nodes > size_t{ 0 } )
     {
         ASSERT_TRUE( cuda_controller.hasDefaultNode() );
 
