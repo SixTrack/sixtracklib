@@ -115,7 +115,7 @@ TEST( C99_OpenCL_Context, BaseOpenCLContext )
                          st::ARCH_ILLEGAL_PROGRAM_ID );
 
             ASSERT_TRUE( !::NS(ClContextBase_has_remapping_kernel)( context ) );
-            ASSERT_TRUE( ::NS(ClContextBase_remapping_kernel_id)( context ) !=
+            ASSERT_TRUE( ::NS(ClContextBase_remapping_kernel_id)( context ) ==
                          st::ARCH_ILLEGAL_KERNEL_ID );
 
             /* ------------------------------------------------------------- */
