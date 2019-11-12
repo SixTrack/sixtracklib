@@ -54,7 +54,6 @@ namespace SIXTRL_CXX_NAMESPACE
         using kernel_arg_id_t   = int64_t;
         using kernel_arg_type_t = uint32_t;
         using status_flag_t     = SIXTRL_CXX_NAMESPACE::arch_debugging_t;
-        using status_t          = SIXTRL_CXX_NAMESPACE::ctrl_status_t;
         using cl_buffer_t       = cl::Buffer;
 
         static constexpr kernel_arg_type_t ARG_TYPE_NONE =
