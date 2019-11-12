@@ -109,6 +109,7 @@ include(CheckLanguage)
 include( SetupC99 )
 include( SetupCxx )
 include( SetupPython )
+include( SetupGit )
 
 # ------------------------------------------------------------------------------
 # Unit-testing:
@@ -166,6 +167,7 @@ endif()
 # ==============================================================================
 # sixtracklib: C/C++ library ; sixtracklib python bindings
 
+add_subdirectory( external )
 add_subdirectory( sixtracklib )
 
 # ------------------------------------------------------------------------------

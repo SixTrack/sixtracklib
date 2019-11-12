@@ -55,13 +55,16 @@
 #include "sixtracklib/common/output/elem_by_elem_config.h"
 #include "sixtracklib/common/output/elem_by_elem_output_buffer.h"
 #include "sixtracklib/common/output/output_buffer.h"
+#include "sixtracklib/common/track/definitions.h"
+#include "sixtracklib/common/track/track.h"
+#include "sixtracklib/common/track/track_kernel_impl.h"
+#include "sixtracklib/common/track/track_kernel_opt_impl.h"
 #include "sixtracklib/common/beam_elements.h"
 #include "sixtracklib/common/constants.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/track_job.h"
 #include "sixtracklib/common/track_job_cpu.h"
-#include "sixtracklib/common/track.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 

@@ -58,6 +58,8 @@ NS(ElemByElemConfig_calculate_output_buffer_params_detailed)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
     NS(buffer_size_t) const output_buffer_slot_size );
 
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ElemByElemConfig_prepare_output_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT output_buffer,
@@ -85,6 +87,8 @@ NS(ElemByElemConfig_prepare_output_buffer_detailed)(
     NS(particle_index_t) const min_turn_id,
     NS(particle_index_t) const max_elem_by_elem_turn_id,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_index_offset );
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN int
 NS(ElemByElemConfig_prepare_output_buffer_from_conf)(

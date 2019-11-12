@@ -28,8 +28,6 @@ list( APPEND EXAMPLE_TARGETS track_job_cpu_cxx )
 add_executable( track_lhc_no_bb_cxx track_lhc_no_bb.cpp )
 list( APPEND EXAMPLE_TARGETS track_lhc_no_bb_cxx )
 
-
-
 if( SIXTRACKL_ENABLE_OPENCL )
     # -------------------------------------------------------------------------
     # track_job_cpu_cxx:

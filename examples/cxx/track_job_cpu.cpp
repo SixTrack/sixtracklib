@@ -90,7 +90,7 @@ int main( int argc, char* argv[] )
 
         if( NUM_TURNS > NUM_TURNS_ELEM_BY_ELEM )
         {
-            track_status |= st::track( job, NUM_TURNS );
+            track_status |= st::trackUntil( job, NUM_TURNS );
         }
 
         /* ****************************************************************** */

@@ -225,27 +225,139 @@ void NS(ElemByElemConfig_set_output_store_address_ext)(
 
 /* ------------------------------------------------------------------------- */
 
+NS(ElemByElemConfig)* NS(ElemByElemConfig_create)( void )
+{
+    return NS(ElemByElemConfig_preset)( ( NS(ElemByElemConfig)* )malloc(
+        sizeof( NS(ElemByElemConfig) ) ) );
+}
+
+void NS(ElemByElemConfig_delete)(
+    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config )
+{
+    free( elem_by_elem_config );
+}
 
 NS(arch_status_t) NS(ElemByElemConfig_init)(
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
-        SIXTRL_RESTRICT conf,
-    NS(elem_by_elem_order_t) const order,
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
-    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
-    NS(particle_index_t) min_turn, NS(particle_index_t) max_turn )
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+        NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const
+        SIXTRL_RESTRICT particle_set,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT beam_elements_buffer,
+    NS(particle_index_t) const start_elem_id,
+    NS(particle_index_t) const until_turn_elem_by_elem )
 {
-    NS(particle_index_t) const start_elem_id = ( NS(particle_index_t) )0u;
-    NS(particle_index_t) min_part_id, max_part_id, min_elem_id, max_elem_id,
-                         min_turn_id, max_turn_id;
+    typedef NS(particle_index_t) _index_t;
 
-    NS(arch_status_t) status = NS(OutputBuffer_get_min_max_attributes)( p,
-        belements, &min_part_id, &max_part_id, &min_elem_id, &max_elem_id,
-            &min_turn_id, &max_turn_id, SIXTRL_NULLPTR, start_elem_id );
+    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
+    SIXTRL_STATIC_VAR _index_t const ZERO = ( _index_t )0u;
+
+    _index_t min_part_id, max_part_id, min_elem_id, max_elem_id,
+             min_turn_id, max_turn_id;
+
+    NS(ElemByElemConfig_preset)( config );
+
+    if( ( config == SIXTRL_NULLPTR ) ||
+        ( until_turn_elem_by_elem < ZERO ) || ( start_elem_id < ZERO ) )
+    {
+        return status;
+    }
+
+    status = NS(OutputBuffer_get_min_max_attributes)( particle_set,
+        beam_elements_buffer, &min_part_id, &max_part_id, &min_elem_id,
+            &max_elem_id, &min_turn_id, &max_turn_id,
+                SIXTRL_NULLPTR, start_elem_id );
 
     if( status == NS(ARCH_STATUS_SUCCESS) )
     {
-        status = NS(ElemByElemConfig_init_detailed)( conf, order, min_part_id,
-            max_part_id, min_elem_id, max_elem_id, min_turn, max_turn, true );
+        SIXTRL_ASSERT( particle_set != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( beam_elements_buffer != SIXTRL_NULLPTR );
+
+        if( ( min_part_id <= max_part_id   ) && ( min_part_id >= ZERO ) &&
+            ( min_elem_id <= max_elem_id   ) &&
+            ( min_elem_id >= start_elem_id ) &&
+            ( min_turn_id <= max_turn_id   ) && ( min_turn_id >= ZERO ) )
+        {
+            if( until_turn_elem_by_elem >= min_elem_id )
+            {
+                if( until_turn_elem_by_elem > min_elem_id )
+                {
+                    SIXTRL_ASSERT( until_turn_elem_by_elem > ZERO );
+                    max_turn_id = until_turn_elem_by_elem - ( _index_t )1u;
+                }
+            }
+
+            status = NS(ElemByElemConfig_init_detailed)(
+                config, NS(ELEM_BY_ELEM_ORDER_DEFAULT),
+                    min_part_id, max_part_id, min_elem_id, max_elem_id,
+                        min_turn_id, max_turn_id, true );
+        }
+    }
+
+    return status;
+}
+
+NS(arch_status_t) NS(ElemByElemConfig_init_on_particle_sets)(
+    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC
+        NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT particles_buffer,
+    NS(buffer_size_t) const num_particle_sets,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t) const*
+        SIXTRL_RESTRICT pset_indices_begin,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT beam_elements_buffer,
+    NS(particle_index_t) const start_elem_id,
+    NS(particle_index_t) const until_turn_elem_by_elem )
+{
+    typedef NS(particle_index_t) _index_t;
+
+    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
+    SIXTRL_STATIC_VAR _index_t const ZERO = ( _index_t )0u;
+
+    _index_t min_part_id, max_part_id, min_elem_id, max_elem_id,
+             min_turn_id, max_turn_id;
+
+    NS(ElemByElemConfig_preset)( config );
+
+    if( ( config == SIXTRL_NULLPTR ) ||
+        ( until_turn_elem_by_elem < ZERO ) || ( start_elem_id < ZERO ) )
+    {
+        return status;
+    }
+
+    status = NS(OutputBuffer_get_min_max_attributes_on_particle_sets)(
+        particles_buffer, num_particle_sets, pset_indices_begin,
+        beam_elements_buffer, &min_part_id, &max_part_id, &min_elem_id,
+            &max_elem_id, &min_turn_id, &max_turn_id,
+                SIXTRL_NULLPTR, start_elem_id );
+
+    if( status == NS(ARCH_STATUS_SUCCESS) )
+    {
+        SIXTRL_ASSERT( particles_buffer != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( num_particle_sets > ( ( NS(buffer_size_t) )0u ) );
+        SIXTRL_ASSERT( pset_indices_begin != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( beam_elements_buffer != SIXTRL_NULLPTR );
+
+        if( ( min_part_id <= max_part_id   ) && ( min_part_id >= ZERO ) &&
+            ( min_elem_id <= max_elem_id   ) &&
+            ( min_elem_id >= start_elem_id ) &&
+            ( min_turn_id <= max_turn_id   ) && ( min_turn_id >= ZERO ) )
+        {
+            if( until_turn_elem_by_elem >= min_elem_id )
+            {
+                if( until_turn_elem_by_elem > min_elem_id )
+                {
+                    SIXTRL_ASSERT( until_turn_elem_by_elem > ZERO );
+                    max_turn_id = until_turn_elem_by_elem - ( _index_t )1u;
+                }
+            }
+
+            status = NS(ElemByElemConfig_init_detailed)(
+                config, NS(ELEM_BY_ELEM_ORDER_DEFAULT),
+                    min_part_id, max_part_id, min_elem_id, max_elem_id,
+                        min_turn_id, max_turn_id, true );
+        }
     }
 
     return status;

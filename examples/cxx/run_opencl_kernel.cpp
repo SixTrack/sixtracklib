@@ -17,13 +17,13 @@
 int main( int argc, char* argv[] )
 {
     namespace st = sixtrack;
-    using buf_size_t    = ::st_buffer_size_t;
     using context_t     = st::ClContextBase;
+    using buf_size_t    = ::NS(buffer_size_t);
     using program_id_t  = context_t::kernel_id_t;
     using kernel_id_t   = context_t::kernel_id_t;
 
     int64_t VECTOR_SIZE = int64_t{ 1000 };
-    std::unique_ptr< context_t > ptr_context = nullptr;
+    std::unique_ptr< context_t > ptr_ctx = nullptr;
 
     /* --------------------------------------------------------------------- */
     /* Handle command line arguments: */
@@ -31,14 +31,14 @@ int main( int argc, char* argv[] )
 
     if( argc < 2  )
     {
-        ptr_context.reset( new context_t );
+        ptr_ctx.reset( new context_t );
 
         std::cout << "Usage: " << argv[ 0 ]
                   << " [ID] [VECTOR_SIZE] \r\n";
 
-        ptr_context->printNodesInfo();
+        ptr_ctx->printNodesInfo();
 
-        if( ptr_context->numAvailableNodes() > buf_size_t{ 0 } )
+        if( ptr_ctx->numAvailableNodes() > buf_size_t{ 0 } )
         {
             std::cout << "INFO            :: "
                       << "Selecting default node\r\n";
@@ -64,9 +64,9 @@ int main( int argc, char* argv[] )
 
     if( argc >= 2 )
     {
-        ptr_context.reset( new context_t( argv[ 1 ] ) );
+        ptr_ctx.reset( new context_t( argv[ 1 ] ) );
 
-        if( !ptr_context->hasSelectedNode() )
+        if( !ptr_ctx->hasSelectedNode() )
         {
             std::cout << "Warning         : Provided ID " << argv[ 1 ]
                       << " not found -> use default device instead\r\n";
@@ -79,29 +79,26 @@ int main( int argc, char* argv[] )
         if( temp > 0 ) VECTOR_SIZE = temp;
     }
 
-    if( (  ptr_context.get() != nullptr ) &&
-        ( !ptr_context->hasSelectedNode() ) )
+    if( (  ptr_ctx.get() != nullptr ) && ( !ptr_ctx->hasSelectedNode() ) )
     {
-        st::ClContext::node_id_t const default_node_id =
-            ptr_context->defaultNodeId();
-
-        ptr_context->selectNode( default_node_id );
+        context_t::node_id_t const default_node_id = ptr_ctx->defaultNodeId();
+        ptr_ctx->selectNode( default_node_id );
     }
 
-    if( (  ptr_context.get() == nullptr ) ||
-        ( !ptr_context->hasSelectedNode() ) )
+    if( (  ptr_ctx.get() == nullptr ) ||
+        ( !ptr_ctx->hasSelectedNode() ) )
     {
         return 0;
     }
 
-    context_t& context = *ptr_context;
+    context_t& ctx = *ptr_ctx;
 
     std::cout << "Selected Node     [ID] = "
-              << context.selectedNodeIdStr()
+              << ctx.selectedNodeIdStr()
               << " ( "
-              << ::st_ComputeNodeInfo_get_name( context.ptrSelectedNodeInfo() )
+              << ::NS(ComputeNodeInfo_get_name)( ctx.ptrSelectedNodeInfo() )
               << " / "
-              << ::st_ComputeNodeInfo_get_platform( context.ptrSelectedNodeInfo() )
+              << ::NS(ComputeNodeInfo_get_platform)( ctx.ptrSelectedNodeInfo() )
               << " ) \r\n"
               << "Selected VECTOR_SIZE = "
               << std::setw( 10 ) << VECTOR_SIZE << "\r\n\r\n"
@@ -130,13 +127,13 @@ int main( int argc, char* argv[] )
 
     /* **** NOTE: The kernel is located in the examples/c99/ directory ->
      * ****       ensure that the C99 examples are present as well! */
-    std::string path_to_program( ::st_PATH_TO_BASE_DIR );
+    std::string path_to_program( ::NS(PATH_TO_BASE_DIR) );
     path_to_program += "examples/c99/run_opencl_kernel.cl";
 
     std::string compile_options( "-D_GPUCODE=1 -I" );
     compile_options += st_PATH_TO_BASE_DIR;
 
-    program_id_t const program_id = context.addProgramFile(
+    program_id_t const program_id = ctx.addProgramFile(
         path_to_program, compile_options );
 
     if( program_id < program_id_t{ 0 } )
@@ -153,11 +150,11 @@ int main( int argc, char* argv[] )
     kernel_name += "Add_vectors_kernel";
 
     kernel_id_t const add_kernel_id =
-        context.enableKernel( kernel_name, program_id );
+        ctx.enableKernel( kernel_name, program_id );
 
     if( add_kernel_id < kernel_id_t{ 0 } )
     {
-        if( context.isProgramCompiled( program_id ) )
+        if( ctx.isProgramCompiled( program_id ) )
         {
             std::cout << "Error: unknown kernel name " << kernel_name
                       << " -> stopping" << std::endl;
@@ -167,10 +164,10 @@ int main( int argc, char* argv[] )
             std::cout << "Error: problems during compilation of program: "
                       << "\r\n\r\n"
                       << "Compile report:\r\n"
-                      << context.programCompileReport( program_id )
+                      << ctx.programCompileReport( program_id )
                       << "\r\n"
                       << "Compile options: "
-                      << context.programCompileOptions( program_id )
+                      << ctx.programCompileOptions( program_id )
                       << "\r\n"
                       << "-> stopping"
                       << std::endl;
@@ -181,21 +178,21 @@ int main( int argc, char* argv[] )
 
     /* Init kernel arguments */
 
-    st::ClArgument vec_a_arg( vector_a.data(), data_size, &context );
-    st::ClArgument vec_b_arg( vector_b.data(), data_size, &context );
-    st::ClArgument result_arg( result.data(),  data_size, &context );
+    st::ClArgument vec_a_arg( vector_a.data(), data_size, &ctx );
+    st::ClArgument vec_b_arg( vector_b.data(), data_size, &ctx );
+    st::ClArgument result_arg( result.data(),  data_size, &ctx );
 
     /* Assign kernel arguments to addition kernel */
 
-    context.assignKernelArgument( add_kernel_id, 0u, vec_a_arg );
-    context.assignKernelArgument( add_kernel_id, 1u, vec_b_arg );
-    context.assignKernelArgument( add_kernel_id, 2u, result_arg );
+    ctx.assignKernelArgument( add_kernel_id, 0u, vec_a_arg );
+    ctx.assignKernelArgument( add_kernel_id, 1u, vec_b_arg );
+    ctx.assignKernelArgument( add_kernel_id, 2u, result_arg );
 
-    context.assignKernelArgumentValue( add_kernel_id, 3u, VECTOR_SIZE );
+    ctx.assignKernelArgumentValue( add_kernel_id, 3u, VECTOR_SIZE );
 
     /* run addition kernel */
 
-    bool success = context.runKernel( add_kernel_id, VECTOR_SIZE );
+    bool success = ctx.runKernel( add_kernel_id, VECTOR_SIZE );
 
     /* Read-back the result and print it out */
 
@@ -233,9 +230,9 @@ int main( int argc, char* argv[] )
     if( success )
     {
         buf_size_t const max_wg_size =
-            context.kernelMaxWorkGroupSize( add_kernel_id );
+            ctx.kernelMaxWorkGroupSize( add_kernel_id );
 
-        success  = context.runKernel( add_kernel_id, VECTOR_SIZE, max_wg_size );
+        success  = ctx.runKernel( add_kernel_id, VECTOR_SIZE, max_wg_size );
         success &= result_arg.read( result.data(), data_size );
     }
 
