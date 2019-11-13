@@ -347,13 +347,13 @@ TEST( C99_Common_Buffer_MemPoolTests, AppendFailures )
     {
         ASSERT_TRUE( !::NS(AllocResult_valid)( &result ) );
         ASSERT_TRUE( ::NS(AllocResult_get_pointer)( &result ) == nullptr );
-        ASSERT_TRUE( ::NS(AllocResult_get_offset)( &result )  == uint64_t{0} );
-        ASSERT_TRUE( ::NS(AllocResult_get_length)( &result )  == uint64_t{0} );
+        ASSERT_TRUE( ::NS(AllocResult_get_offset)( &result ) == uint64_t{0} );
+        ASSERT_TRUE( ::NS(AllocResult_get_length)( &result ) == uint64_t{0} );
 
-        ASSERT_TRUE( ::NS(MemPool_get_begin_pos)( &mem_pool )  != nullptr );
-        ASSERT_TRUE( ::NS(MemPool_get_capacity)(  &mem_pool )  >= capacity );
+        ASSERT_TRUE( ::NS(MemPool_get_begin_pos)( &mem_pool ) != nullptr );
+        ASSERT_TRUE( ::NS(MemPool_get_capacity)(  &mem_pool ) >= capacity );
         ASSERT_TRUE( ::NS(MemPool_get_chunk_size)( &mem_pool ) == chunk_size );
-        ASSERT_TRUE( ::NS(MemPool_get_size)( &mem_pool )       == current_size );
+        ASSERT_TRUE( ::NS(MemPool_get_size)( &mem_pool ) == current_size );
     }
 
     /* Verify that non-aligned insert would work, however: */
@@ -365,13 +365,13 @@ TEST( C99_Common_Buffer_MemPoolTests, AppendFailures )
     ASSERT_TRUE( ::NS(AllocResult_get_offset)( &result ) == current_size );
     ASSERT_TRUE( ::NS(AllocResult_get_length)( &result ) == remaining_bytes );
 
-    ASSERT_TRUE( ::NS(MemPool_get_begin_pos)( &mem_pool )  != nullptr );
-    ASSERT_TRUE( ::NS(MemPool_get_capacity)( &mem_pool )   >= capacity );
+    ASSERT_TRUE( ::NS(MemPool_get_begin_pos)( &mem_pool )!= nullptr );
+    ASSERT_TRUE( ::NS(MemPool_get_capacity)( &mem_pool ) >= capacity );
     ASSERT_TRUE( ::NS(MemPool_get_chunk_size)( &mem_pool ) == chunk_size );
-    ASSERT_TRUE( ::NS(MemPool_get_size)( &mem_pool )       >= capacity );
-    ASSERT_TRUE( ::NS(MemPool_get_size)( &mem_pool )       ==
-                 ::NS(MemPool_get_capacity)( &mem_pool )  );
+    ASSERT_TRUE( ::NS(MemPool_get_size)( &mem_pool ) >= capacity );
     ASSERT_TRUE( ::NS(MemPool_get_remaining_bytes)( &mem_pool ) == ZERO_SIZE );
+    ASSERT_TRUE( ::NS(MemPool_get_size)( &mem_pool ) ==
+                 ::NS(MemPool_get_capacity)( &mem_pool ) );
 
     /* --------------------------------------------------------------------- */
 
