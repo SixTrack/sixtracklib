@@ -90,8 +90,7 @@ SIXTRL_STATIC SIXTRL_FN void NS(AssignAddressItem_set_dest_elem_type_id)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* SIXTRL_RESTRICT item,
     NS(object_type_id_t) const type_id );
 
-SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
-NS(AssignAddressItem_set_dest_buffer_id)( SIXTRL_BUFFER_DATAPTR_DEC const
+SIXTRL_STATIC SIXTRL_FN void NS(AssignAddressItem_set_dest_buffer_id)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* SIXTRL_RESTRICT item,
     NS(buffer_size_t) const dest_buffer_id );
 
@@ -108,8 +107,7 @@ SIXTRL_STATIC SIXTRL_FN void NS(AssignAddressItem_set_src_elem_type_id)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* SIXTRL_RESTRICT item,
     NS(object_type_id_t) const type_id );
 
-SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
-NS(AssignAddressItem_set_src_buffer_id)( SIXTRL_BUFFER_DATAPTR_DEC const
+SIXTRL_STATIC SIXTRL_FN void NS(AssignAddressItem_set_src_buffer_id)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* SIXTRL_RESTRICT item,
     NS(buffer_size_t) const src_buffer_id );
 
@@ -257,6 +255,8 @@ NS(AssignAddressItem_add_copy)(
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
+    #include "sixtracklib/common/buffer/managed_buffer_remap.h"
+    #include "sixtracklib/common/internal/objects_type_id.h"
     #if !defined( _GPUCODE )
     #include "sixtracklib/common/buffer.h"
     #endif /* !defined( _GPUCODE ) */
@@ -465,13 +465,8 @@ NS(AssignAddressItem_managed_buffer_assign_fixed_addr)(
     NS(buffer_size_t) const dest_slot_size,
     NS(buffer_addr_t) const src_address )
 {
-    typedef NS(buffer_addr_t) addr_t;
-    typedef NS(buffer_size_t) buf_size_t;
-    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* ptr_dest_obj_t;
-
     NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
-
-    SIXTRL_BUFFER_DATAPTR_DEC addr_t* dest_ptr =
+    SIXTRL_BUFFER_DATAPTR_DEC NS(buffer_addr_t)* dest_ptr =
         NS(AssignAddressItem_managed_buffer_dest_ptr)(
             item, dest_buffer_begin, dest_slot_size );
 
@@ -492,17 +487,17 @@ NS(AssignAddressItem_managed_buffer_remap_assignment)(
     NS(buffer_size_t) const dest_slot_size,
     NS(buffer_addr_diff_t) const remap_offset )
 {
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
     SIXTRL_BUFFER_DATAPTR_DEC NS(buffer_addr_t)* dest_ptr =
-        NS(AssignAddressItem_managed_buffer_dest_ptr)(
-            item, dest_buffer_begin, dest_slot_size );
+    NS(AssignAddressItem_managed_buffer_dest_ptr)(
+        item, dest_buffer_begin, dest_slot_size );
 
-        if( ( dest_ptr != SIXTRL_NULLPTR )&&
-            ( NS(ManagedBuffer_check_addr_arithmetic)(
-                *dest_ptr, remap_offset, dest_slot_size ) ) )
-        {
-            *dest_ptr += remap_offset;
-            status = SIXTRL_ARCH_STATUS_SUCCESS;
-        }
+    if( ( dest_ptr != SIXTRL_NULLPTR )&&
+        ( NS(ManagedBuffer_check_addr_arithmetic)(
+            *dest_ptr, remap_offset, dest_slot_size ) ) )
+    {
+        *dest_ptr += remap_offset;
+        status = SIXTRL_ARCH_STATUS_SUCCESS;
     }
 
     return status;
@@ -523,11 +518,11 @@ NS(BufferIndex_get_const_assign_address_item)(
           NS(OBJECT_TYPE_ASSIGN_ADDRESS_ITEM) ) &&
         ( NS(Object_get_size)( index_obj ) >= sizeof( item_t ) ) )
     {
-        ptr_to_be = ( ptr_to_item_t )( uintptr_t
+        ptr_to_item = ( ptr_to_item_t )( uintptr_t
             )NS(Object_get_begin_addr)( index_obj );
     }
 
-    return ptr_to_be;
+    return ptr_to_item;
 }
 
 SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)*
@@ -554,7 +549,7 @@ NS(AssignAddressItem_managed_buffer_get_item)(
     NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size )
 {
     return NS(BufferIndex_get_assign_address_item)(
-        NS(ManagedBuffer_get_object)( pbuffer, index, slot_size ) );
+        NS(ManagedBuffer_get_object)( pbuffer, be_index, slot_size ) );
 }
 
 SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(buffer_addr_t)*
@@ -649,16 +644,20 @@ NS(AssignAddressItem_managed_buffer_src_pointer_addr)(
         SIXTRL_RESTRICT src_buffer_begin,
     NS(buffer_size_t) const src_slot_size )
 {
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(buffer_addr_t) addr_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_src_obj_t;
+
     NS(buffer_addr_t) src_address = ( NS(buffer_addr_t) )0u;
 
     if( ( item != SIXTRL_NULLPTR ) && ( src_buffer_begin != SIXTRL_NULLPTR ) )
     {
+        SIXTRL_STATIC_VAR buf_size_t const ADDR_SIZE =
+            ( buf_size_t )sizeof( addr_t );
+
         if( ( NS(AssignAddressItem_src_buffer_id)( item ) !=
                 SIXTRL_ASSIGN_ADDRESS_ITEM_NO_BUFFER_ID ) )
         {
-            SIXTRL_STATIC_VAR buf_size_t const ADDR_SIZE =
-                ( buf_size_t )sizeof( addr_t );
-
             buf_size_t const src_elem_idx =
                 NS(AssignAddressItem_src_elem_index)( item );
 
@@ -742,7 +741,7 @@ NS(AssignAddressItem)* NS(AssignAddressItem_buffer_get_item)(
     typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char* ptr_raw_t;
     return NS(AssignAddressItem_managed_buffer_get_item)(
         ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ),
-        index, NS(Buffer_get_slot_size)( buffer ) );
+        be_index, NS(Buffer_get_slot_size)( buffer ) );
 }
 
 /* ------------------------------------------------------------------------- */
@@ -795,7 +794,7 @@ NS(AssignAddressItem_remap_assignment)(
     dest_buffer_t dest_buffer_begin = ( dest_buffer_t )( uintptr_t
         )NS(Buffer_get_data_begin_addr)( dest_buffer );
 
-    return NS(AssignAddressItem_assign_fixed_addr)(
+    return NS(AssignAddressItem_managed_buffer_remap_assignment)(
         item, dest_buffer_begin, NS(Buffer_get_slot_size)( dest_buffer ),
             remap_offset );
 }
@@ -812,7 +811,7 @@ SIXTRL_INLINE bool NS(AssignAddressItem_can_be_added)(
     typedef NS(buffer_size_t) buf_size_t;
 
     buf_size_t const num_dataptrs =
-        NS(AssignAddressItem_get_num_dataptrs)( SIXTRL_NULLPTR );
+        NS(AssignAddressItem_num_dataptrs)( SIXTRL_NULLPTR );
 
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts = SIXTRL_NULLPTR;
@@ -831,7 +830,7 @@ NS(AssignAddressItem_new)(
     typedef NS(buffer_size_t) buf_size_t;
 
     buf_size_t const num_dataptrs =
-        NS(AssignAddressItem_get_num_dataptrs)( SIXTRL_NULLPTR );
+        NS(AssignAddressItem_num_dataptrs)( SIXTRL_NULLPTR );
 
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
@@ -865,7 +864,7 @@ NS(AssignAddressItem_add)(
     typedef NS(buffer_size_t) buf_size_t;
 
     buf_size_t const num_dataptrs =
-        NS(AssignAddressItem_get_num_dataptrs)( SIXTRL_NULLPTR );
+        NS(AssignAddressItem_num_dataptrs)( SIXTRL_NULLPTR );
 
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
     SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
