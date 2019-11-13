@@ -37,6 +37,7 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
 
     std::vector< buf_size_t > out_buffer_indices(
         NUM_BEAM_MONITORS,  buf_size_t{ 0 } );
+    out_buffer_indices.clear();
 
     particle_set_t* pset_dummy = ::NS(Particles_new)(
         output_buffer, buf_size_t{ 100 } );
@@ -146,7 +147,7 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
         ASSERT_TRUE( ::NS(AssignAddressItem_src_elem_index)(
             assign_item ) == out_pset_idx );
 
-        ASSERT_TRUE( ::NS(AssignAddressItem_dest_pointer_offset)(
+        ASSERT_TRUE( ::NS(AssignAddressItem_src_pointer_offset)(
             assign_item ) == ::NS(buffer_addr_t){ 0 } );
     }
 
@@ -154,6 +155,9 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
         map_buffer ) == NUM_BEAM_MONITORS );
 
     /* ********************************************************************* */
+
+    buf_size_t const dest_slot_size =
+        ::NS(Buffer_get_slot_size)( beam_elements );
 
     for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_BEAM_MONITORS ; ++ii )
     {
@@ -173,22 +177,23 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
 
         ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
             NS(AssignAddressItem_assign_fixed_addr)( assign_item,
-                beam_elements, static_cast< ::NS(buffer_addr_t) >( ii ) ) );
+                beam_elements, static_cast< ::NS(buffer_addr_t) >(
+                    ii * dest_slot_size ) ) );
 
         ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_mon ) ==
-            static_cast< ::NS(buffer_addr_t) >( ii ) );
+            static_cast< ::NS(buffer_addr_t) >( ii * dest_slot_size ) );
 
         ASSERT_TRUE( ::NS(AssignAddressItem_remap_assignment)( assign_item,
-            beam_elements, ::NS(buffer_addr_t){ 100 } ) ==
+            beam_elements, ::NS(buffer_addr_t){ 192 } ) ==
                 ::NS(ARCH_STATUS_SUCCESS) );
 
         ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_mon ) ==
-            static_cast< ::NS(buffer_addr_t) >( ii + 100 ) );
+            static_cast< ::NS(buffer_addr_t) >( ii * dest_slot_size + 192 ) );
 
         ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
             ::NS(AssignAddressItem_remap_assignment)( assign_item,
                 beam_elements, -( static_cast< ::NS(buffer_addr_diff_t) >(
-                    ii + 100 ) ) ) );
+                    ii * dest_slot_size + 192 ) ) ) );
 
         ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_mon ) ==
             ::NS(buffer_addr_t){ 0 } );

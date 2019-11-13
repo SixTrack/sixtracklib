@@ -326,7 +326,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(AssignAddressItem_dest_buffer_id)(
         *const SIXTRL_RESTRICT item )
 {
     return ( item != SIXTRL_NULLPTR )
-        ? item->dest_elem_type_id : SIXTRL_ASSIGN_ADDRESS_ITEM_NO_BUFFER_ID;
+        ? item->dest_buffer_id : SIXTRL_ASSIGN_ADDRESS_ITEM_NO_BUFFER_ID;
 }
 
 SIXTRL_INLINE NS(buffer_size_t)
@@ -358,7 +358,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(AssignAddressItem_src_buffer_id)(
         *const SIXTRL_RESTRICT item )
 {
     return ( item != SIXTRL_NULLPTR )
-        ? item->src_elem_type_id : SIXTRL_ASSIGN_ADDRESS_ITEM_NO_BUFFER_ID;
+        ? item->src_buffer_id : SIXTRL_ASSIGN_ADDRESS_ITEM_NO_BUFFER_ID;
 }
 
 SIXTRL_INLINE NS(buffer_size_t)
@@ -492,9 +492,10 @@ NS(AssignAddressItem_managed_buffer_remap_assignment)(
     NS(AssignAddressItem_managed_buffer_dest_ptr)(
         item, dest_buffer_begin, dest_slot_size );
 
-    if( ( dest_ptr != SIXTRL_NULLPTR )&&
-        ( NS(ManagedBuffer_check_addr_arithmetic)(
-            *dest_ptr, remap_offset, dest_slot_size ) ) )
+    if( ( dest_ptr != SIXTRL_NULLPTR ) &&
+        ( ( NS(ManagedBuffer_check_addr_arithmetic)(
+              *dest_ptr, remap_offset, dest_slot_size ) ) ||
+          ( *dest_ptr == ::NS(buffer_addr_t){ 0 } ) ) )
     {
         *dest_ptr += remap_offset;
         status = SIXTRL_ARCH_STATUS_SUCCESS;
