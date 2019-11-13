@@ -132,51 +132,51 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_BINARY_ARRAY = static_cast< object_type_id_t >(
-            OBJECT_TYPE_BINARY_ARRAY );
+            NS(OBJECT_TYPE_BINARY_ARRAY ) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_REAL_ARRAY = static_cast< object_type_id_t >(
-            OBJECT_TYPE_REAL_ARRAY );
+            NS(OBJECT_TYPE_REAL_ARRAY) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_UINT64_ARRAY = static_cast< object_type_id_t >(
-            OBJECT_TYPE_UINT64_ARRAY );
+            NS(OBJECT_TYPE_UINT64_ARRAY) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_INT64_ARRAY = static_cast< object_type_id_t >(
-            OBJECT_TYPE_INT64_ARRAY );
+            NS(OBJECT_TYPE_INT64_ARRAY) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_UINT32_ARRAY = static_cast< object_type_id_t >(
-            OBJECT_TYPE_UINT32_ARRAY );
+            NS(OBJECT_TYPE_UINT32_ARRAY) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_INT32_ARRAY = static_cast< object_type_id_t >(
-            OBJECT_TYPE_INT32_ARRAY );
+            NS(OBJECT_TYPE_INT32_ARRAY) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_UINT16_ARRAY = static_cast< object_type_id_t >(
-            OBJECT_TYPE_UINT16_ARRAY );
+            NS(OBJECT_TYPE_UINT16_ARRAY) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_INT16_ARRAY = static_cast< object_type_id_t >(
-            OBJECT_TYPE_INT16_ARRAY );
+            NS(OBJECT_TYPE_INT16_ARRAY) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_UINT8_ARRAY = static_cast< object_type_id_t >(
-            OBJECT_TYPE_UINT8_ARRAY );
+            NS(OBJECT_TYPE_UINT8_ARRAY) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_INT8_ARRAY = static_cast< object_type_id_t >(
-            OBJECT_TYPE_INT8_ARRAY );
+            NS(OBJECT_TYPE_INT8_ARRAY) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_CSTRING = static_cast< object_type_id_t >(
-            OBJECT_TYPE_CSTRING );
+            NS(OBJECT_TYPE_CSTRING) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_BINARY_VECTOR = static_cast< object_type_id_t >(
-            OBJECT_TYPE_BINARY_VECTOR );
+            NS(OBJECT_TYPE_BINARY_VECTOR) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_NODE_ID = static_cast< object_type_id_t >(

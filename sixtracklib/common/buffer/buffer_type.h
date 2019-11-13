@@ -123,12 +123,6 @@ SIXTRL_STATIC_VAR NS(object_type_id_t) const
 SIXTRL_STATIC_VAR NS(object_type_id_t) const
     NS(OBJECT_TYPE_MANAGED_BUFFER_HANDLE) = ( NS(object_type_id_t) )0x40000000;
 
-SIXTRL_STATIC_VAR NS(object_type_id_t) const
-    NS(OBJECT_TYPE_CSTRING) = ( NS(object_type_id_t) )0x40000001;
-
-SIXTRL_STATIC_VAR NS(object_type_id_t) const
-    NS(OBJECT_TYPE_ARRAY) = ( NS(object_type_id_t) )0x40000002;
-
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_STATIC_VAR NS(buffer_flags_t) const NS(BUFFER_FLAGS_NONE) =
@@ -246,12 +240,6 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_MANAGED_BUFFER_HANDLE =
             static_cast< object_type_id_t >( 0x40000000 );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_CSTRING = static_cast< object_type_id_t >( 0x40000001 );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_ARRAY = static_cast< object_type_id_t >( 0x40000002 );
 
     /* --------------------------------------------------------------------- */
 
