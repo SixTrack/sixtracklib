@@ -28,6 +28,7 @@ typedef enum NS(object_type_values_e)
     NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED)  =         14,
     NS(OBJECT_TYPE_DIPEDGE)               =         24,
     NS(OBJECT_TYPE_PARTICLES_ADDR)        =        512,
+    NS(OBJECT_TYPE_ASSIGN_ADDRESS_ITEM)   =        513,
     NS(OBJECT_TYPE_LINE)                  =       1024,
     NS(OBJECT_TYPE_BINARY_ARRAY)          =       8192,
     NS(OBJECT_TYPE_REAL_ARRAY)            =       8193,
@@ -118,6 +119,14 @@ namespace SIXTRL_CXX_NAMESPACE
             NS(OBJECT_TYPE_DIPEDGE) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_PARTICLES_ADDR = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_PARTICLES_ADDR) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_ASSIGN_ADDRESS_ITEM = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_ASSIGN_ADDRESS_ITEM) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_LINE         = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_LINE) );
 
@@ -176,10 +185,6 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_ELEM_BY_ELEM_CONF = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_PARTICLES_ADDR = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_PARTICLES_ADDR) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_INVALID = static_cast< object_type_id_t >(
