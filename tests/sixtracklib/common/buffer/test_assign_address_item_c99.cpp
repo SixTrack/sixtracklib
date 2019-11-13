@@ -9,9 +9,11 @@
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/control/definitions.h"
-#include "sixtracklib/common/be_monitor/be_monitor.h"
+#include "sixtracklib/common/internal/objects_type_id.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
+#include "sixtracklib/common/be_drift/be_drift.h"
+#include "sixtracklib/common/be_monitor/be_monitor.h"
 
 #include "sixtracklib/testlib.h"
 
@@ -36,18 +38,20 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
     std::vector< buf_size_t > out_buffer_indices(
         NUM_BEAM_MONITORS,  buf_size_t{ 0 } );
 
-    particles_t* pset_dummy = ::NS(Particles_new)(
+    particle_set_t* pset_dummy = ::NS(Particles_new)(
         output_buffer, buf_size_t{ 100 } );
     SIXTRL_ASSERT( pset_dummy != nullptr );
 
     pset_dummy = ::NS(Particles_new)(
         output_buffer, buf_size_t{ 100 } );
     SIXTRL_ASSERT( pset_dummy != nullptr );
+    ( void )pset_dummy;
 
     for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_BEAM_MONITORS ; ++ii )
     {
-        ::NS(Drift)* drift = ::NS(Drift_new)( beam_elements, 0.1 * ii );
+        ::NS(Drift)* drift = ::NS(Drift_add)( beam_elements, 0.1 * ii );
         SIXTRL_ASSERT( drift != nullptr );
+        ( void )drift;
 
         be_mon_indices.push_back( ::NS(Buffer_get_num_of_objects)(
             beam_elements ) );
@@ -64,6 +68,7 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
             output_buffer, buf_size_t{ 1 } );
 
         SIXTRL_ASSERT( out_pset != nullptr );
+        ( void )out_pset;
     }
 
     SIXTRL_ASSERT( out_buffer_indices.size() == be_mon_indices.size() );
