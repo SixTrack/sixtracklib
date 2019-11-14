@@ -176,6 +176,13 @@ NS(AssignAddressItem_managed_buffer_remap_assignment)(
     NS(buffer_size_t) const dest_slot_size,
     NS(buffer_addr_diff_t) const remap_offset );
 
+SIXTRL_STATIC SIXTRL_FN bool  NS(AssignAddressItem_dest_is_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(AssignAddressItem) *const
+        SIXTRL_RESTRICT item );
+
+SIXTRL_STATIC SIXTRL_FN bool  NS(AssignAddressItem_dest_is_on_raw_memory)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(AssignAddressItem) *const
+        SIXTRL_RESTRICT item );
 
 #if !defined( _GPUCODE )
 
@@ -493,7 +500,8 @@ NS(AssignAddressItem_managed_buffer_remap_assignment)(
         item, dest_buffer_begin, dest_slot_size );
 
     if( ( dest_ptr != SIXTRL_NULLPTR ) &&
-        ( ( NS(ManagedBuffer_check_addr_arithmetic)(
+        ( ( NS(AssignAddressItem_dest_is_on_raw_memory)( item ) ) ||
+          ( NS(ManagedBuffer_check_addr_arithmetic)(
               *dest_ptr, remap_offset, dest_slot_size ) ) ||
           ( *dest_ptr == ::NS(buffer_addr_t){ 0 } ) ) )
     {
@@ -502,6 +510,27 @@ NS(AssignAddressItem_managed_buffer_remap_assignment)(
     }
 
     return status;
+}
+
+SIXTRL_INLINE bool NS(AssignAddressItem_dest_is_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(AssignAddressItem) *const
+        SIXTRL_RESTRICT item )
+{
+    return ( ( item != SIXTRL_NULLPTR) &&
+             ( !NS(AssignAddressItem_dest_is_on_raw_memory)( item ) ) );
+}
+
+SIXTRL_INLINE bool NS(AssignAddressItem_dest_is_on_raw_memory)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(AssignAddressItem) *const
+        SIXTRL_RESTRICT item )
+{
+    return ( ( item != SIXTRL_NULLPTR ) &&
+             ( NS(AssignAddressItem_dest_buffer_id)( item ) ==
+               SIXTRL_ASSIGN_ADDRESS_ITEM_NO_BUFFER_ID ) &&
+             ( NS(AssignAddressItem_dest_elem_type_id)( item ) ==
+               NS(OBJECT_TYPE_NONE) ) &&
+             ( NS(AssignAddressItem_dest_elem_index)( item ) ==
+               ( NS(buffer_size_t) )0u ) );
 }
 
 /* ------------------------------------------------------------------------- */
