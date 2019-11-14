@@ -8,7 +8,7 @@
 
 int main( int argc, char* argv[] )
 {
-    st_Buffer* buffer = SIXTRL_NULLPTR;
+    NS(Buffer)* buffer = SIXTRL_NULLPTR;
 
     if( argc < 2 )
     {
@@ -16,35 +16,35 @@ int main( int argc, char* argv[] )
         return 0;
     }
 
-    buffer = st_Buffer_new_from_file( argv[ 1 ] );
+    buffer = NS(Buffer_new_from_file)( argv[ 1 ] );
 
     if( buffer != SIXTRL_NULLPTR )
     {
-        st_buffer_size_t ii = ( st_buffer_size_t )0u;
+        NS(buffer_size_t) ii = ( NS(buffer_size_t) )0u;
 
-        st_buffer_size_t const num_objects =
-            st_Buffer_get_num_of_objects( buffer );
+        NS(buffer_size_t) const num_objects =
+            NS(Buffer_get_num_of_objects)( buffer );
 
-        st_buffer_size_t const num_slots =
-            st_Buffer_get_num_of_slots( buffer );
+        NS(buffer_size_t) const num_slots =
+            NS(Buffer_get_num_of_slots)( buffer );
 
-        st_buffer_size_t const num_dataptrs =
-            st_Buffer_get_num_of_dataptrs( buffer );
+        NS(buffer_size_t) const num_dataptrs =
+            NS(Buffer_get_num_of_dataptrs)( buffer );
 
-        st_buffer_size_t const num_garbage =
-            st_Buffer_get_num_of_garbage_ranges( buffer );
+        NS(buffer_size_t) const num_garbage =
+            NS(Buffer_get_num_of_garbage_ranges)( buffer );
 
-        st_buffer_size_t const buffer_size =
-            st_Buffer_get_size( buffer );
+        NS(buffer_size_t) const buffer_size =
+            NS(Buffer_get_size)( buffer );
 
-        st_buffer_size_t const buffer_capacity =
-            st_Buffer_get_capacity( buffer );
+        NS(buffer_size_t) const buffer_capacity =
+            NS(Buffer_get_capacity)( buffer );
 
-        st_buffer_addr_t const addr =
-            st_Buffer_get_data_begin_addr( buffer );
+        NS(buffer_addr_t) const addr =
+            NS(Buffer_get_data_begin_addr)( buffer );
 
-        st_Object const* it  = st_Buffer_get_const_objects_begin( buffer );
-        st_Object const* end = st_Buffer_get_const_objects_end( buffer );
+        NS(Object) const* it  = NS(Buffer_get_const_objects_begin)( buffer );
+        NS(Object) const* end = NS(Buffer_get_const_objects_end)( buffer );
 
         printf( "Contents of %s\r\n", argv[ 1 ] );
         printf( "  num_objects  = %16lu\r\n"
@@ -64,15 +64,15 @@ int main( int argc, char* argv[] )
             printf( "Object %9lu / %9lu:\r\n",
                     ( uint64_t )ii, ( uint64_t )num_objects );
 
-            st_Buffer_object_print_out_typeid( st_Object_get_type_id( it ) );
+            NS(Buffer_object_print_out_typeid)( NS(Object_get_type_id)( it ) );
             printf( "\r\n" );
 
-            st_Buffer_object_print_out( it );
+            NS(Buffer_object_print_out)( it );
             printf( "\r\n" );
         }
     }
 
-    st_Buffer_delete( buffer );
+    NS(Buffer_delete)( buffer );
     buffer = SIXTRL_NULLPTR;
 
     return 0;
