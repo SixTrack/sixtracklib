@@ -29,6 +29,7 @@ from .stcommon import st_Buffer, st_Null, st_NullChar, st_NullUChar, \
 
 
 class AssignAddressItem(CObject):
+    _typeid=513
     dest_elem_type_id = CField(0, 'uint64', default=0, alignment=8)
     dest_buffer_id = CField(1, 'uint64', default=0, alignment=8)
     dest_elem_index = CField(2, 'uint64', default=1, alignment=8)
