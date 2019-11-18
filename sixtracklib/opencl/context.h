@@ -177,6 +177,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+        bool has_assign_addresses_kernel() const SIXTRL_NOEXCEPT;
+        kernel_id_t assign_addresses_kernel_id() const SIXTRL_NOEXCEPT;
+        status_t set_assign_addresses_kernel_id( kernel_id_t const kernel_id );
+
+        status_t assign_addresses(
+            SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT map_buffer,
+            SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT dest_buffer,
+            SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT src_buffer );
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
         size_type selected_particle_set() const SIXTRL_NOEXCEPT;
         size_type num_particles_in_selected_set() const SIXTRL_NOEXCEPT;
 
@@ -250,6 +261,7 @@ namespace SIXTRL_CXX_NAMESPACE
         program_id_t m_assign_elem_by_elem_out_buffer_program_id;
         program_id_t m_assign_be_mon_out_buffer_program_id;
         program_id_t m_clear_be_mon_program_id;
+        program_id_t m_assign_addr_program_id;
 
         kernel_id_t  m_track_until_turn_kernel_id;
         kernel_id_t  m_track_elem_by_elem_kernel_id;
@@ -257,6 +269,7 @@ namespace SIXTRL_CXX_NAMESPACE
         kernel_id_t  m_assign_elem_by_elem_out_buffer_kernel_id;
         kernel_id_t  m_assign_be_mon_out_buffer_kernel_id;
         kernel_id_t  m_clear_be_mon_kernel_id;
+        kernel_id_t  m_assign_addr_kernel_id;
 
         bool         m_use_optimized_tracking;
         bool         m_enable_beam_beam;
@@ -461,6 +474,25 @@ NS(ClContext_set_clear_beam_monitor_output_kernel_id)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(ClContext_clear_beam_monitor_output)( NS(ClContext)*  SIXTRL_RESTRICT ctx );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContext_has_assign_addresses_kernel)(
+    const NS(ClContext) *const SIXTRL_RESTRICT ctx );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_kernel_id_t)
+NS(ClContext_assign_addresses_kernel_id)(
+    const NS(ClContext) *const SIXTRL_RESTRICT ctx );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ClContext_set_assign_addresses_kernel_id)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx, NS(ctrl_kernel_id_t) const kernel_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ClContext_assign_addresses)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT map_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT dest_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT src_buffer );
 
 /* ========================================================================= */
 
