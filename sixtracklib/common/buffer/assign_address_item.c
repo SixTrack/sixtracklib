@@ -113,12 +113,10 @@ bool NS(AssignAddressItem_can_be_added)(
 SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* NS(AssignAddressItem_new)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
 {
-    typedef NS(buffer_size_t) buf_size_t;
-
     NS(AssignAddressItem) item;
     NS(AssignAddressItem_preset)( &item );
 
-    SIXTRL_ASSERT( ( buf_size_t )0u ==
+    SIXTRL_ASSERT( ( NS(buffer_size_t) )0u ==
         NS(AssignAddressItem_num_dataptrs)( &item ) );
 
     return ( SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* )( uintptr_t
@@ -137,8 +135,6 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* NS(AssignAddressItem_add)(
     NS(buffer_size_t) const src_elem_index,
     NS(buffer_size_t) const src_pointer_offset )
 {
-    typedef NS(buffer_size_t) buf_size_t;
-
     NS(AssignAddressItem) item;
     NS(AssignAddressItem_preset)( &item );
     NS(AssignAddressItem_set_dest_elem_type_id)( &item, dest_elem_type_id );
@@ -150,7 +146,7 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* NS(AssignAddressItem_add)(
     NS(AssignAddressItem_set_src_elem_index)( &item, src_elem_index );
     NS(AssignAddressItem_set_src_pointer_offset)( &item, src_pointer_offset );
 
-    SIXTRL_ASSERT( ( buf_size_t )0u ==
+    SIXTRL_ASSERT( ( NS(buffer_size_t) )0u ==
         NS(AssignAddressItem_num_dataptrs)( &item ) );
 
     return ( SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* )( uintptr_t
@@ -162,9 +158,7 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* NS(AssignAddressItem_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC const NS(AssignAddressItem) *const SIXTRL_RESTRICT item )
 {
-    typedef NS(buffer_size_t) buf_size_t;
-
-    SIXTRL_ASSERT( ( buf_size_t )0u ==
+    SIXTRL_ASSERT( ( NS(buffer_size_t) )0u ==
         NS(AssignAddressItem_num_dataptrs)( item ) );
 
     return ( SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* )( uintptr_t

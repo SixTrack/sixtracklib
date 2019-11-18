@@ -53,7 +53,7 @@ SIXTRL_STATIC SIXTRL_FN SIXTRL_DATAPTR_DEC NS(AssignAddressItem)*
 NS(AssignAddressItem_preset)( SIXTRL_BUFFER_DATAPTR_DEC
     NS(AssignAddressItem)* SIXTRL_RESTRICT item );
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_DATAPTR_DEC void NS(AssignAddressItem_clear)(
+SIXTRL_STATIC SIXTRL_FN void NS(AssignAddressItem_clear)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* SIXTRL_RESTRICT item );
 
 /* ------------------------------------------------------------------------- */
@@ -413,7 +413,7 @@ NS(AssignAddressItem_preset)( SIXTRL_BUFFER_DATAPTR_DEC
     return item;
 }
 
-SIXTRL_INLINE SIXTRL_DATAPTR_DEC void NS(AssignAddressItem_clear)(
+SIXTRL_INLINE void NS(AssignAddressItem_clear)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* SIXTRL_RESTRICT item )
 {
     SIXTRL_ASSERT( item != SIXTRL_NULLPTR );
