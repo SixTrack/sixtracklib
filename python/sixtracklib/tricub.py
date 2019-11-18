@@ -45,7 +45,9 @@ class TriCubData(CObject):
     z0 = CField(6, 'real',  default=0.0, alignment=8)
     dz = CField(7, 'real',  default=0.0, alignment=8)
     nz = CField(8, 'int64', default=0,   alignment=8, const=True)
-    table_addr = CField(9, 'uint64', default=0, pointer=True,
+    sign_x = CField(9, 'real',  default=0.0, alignment=8)
+    sign_y = CField(10, 'real',  default=0.0, alignment=8)
+    table_addr = CField(11, 'uint64', default=0, pointer=True,
                            length='nx * ny * nz * 8', alignment=8 )
 
     def __init__(self, nx=0, ny=0, nz=0, **kwargs ):
