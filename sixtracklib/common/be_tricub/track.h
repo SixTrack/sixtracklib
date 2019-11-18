@@ -20,6 +20,14 @@ SIXTRL_STATIC SIXTRL_FN NS(track_status_t) NS(Track_particle_tricub)(
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(TriCub) *const SIXTRL_RESTRICT tricub );
 
+SIXTRL_STATIC SIXTRL_FN void NS(construct_b_vector)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT tricub_data,
+    SIXTRL_ARGPTR_DEC NS(be_tricub_real_t)* SIXTRL_RESTRICT b_vector);
+
+SIXTRL_STATIC SIXTRL_FN void NS(construct_coefs)(
+    SIXTRL_ARGPTR_DEC NS(be_tricub_real_t) const* SIXTRL_RESTRICT b_vector,
+    SIXTRL_ARGPTR_DEC NS(be_tricub_real_t)* coefs);
+
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
@@ -68,6 +76,39 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_tricub)(
     real_t const z_closed_orbit = NS(TriCub_z)( tricub );
     real_t const length         = NS(TriCub_length)( tricub );
     */
+    
+    const real_t fx = (x - NS(TriCubData_x0) / NS(TriCubData_dx;
+    const real_t fy = (y - NS(TriCubData_y0) / NS(TriCubData_dy;
+    const real_t fz = (z - NS(TriCubData_z0) / NS(TriCubData_dz;
+
+    const real_t ixf = floor(fx);
+    const real_t iyf = floor(fy);
+    const real_t izf = floor(fz);
+
+    const int_t ix = (int_t)ixf;
+    const int_t iy = (int_t)iyf;
+    const int_t iz = (int_t)izf;
+
+    const real_t xn = fx - ixf;
+    const real_t yn = fy - iyf;
+    const real_t zn = fz - izf;
+
+    int_t inside_box = 1;
+    if      ( ix < 0 || ix > NS(TriCubData_nx)( tricub_data ) - 2 )
+        inside_box = 0;
+    else if ( iy < 0 || iy > NS(TriCubData_ny)( tricub_data ) - 2 )
+        inside_box = 0;
+    else if ( iz < 0 || iz > NS(TriCubData_nz)( tricub_data ) - 2 )
+        inside_box = 0;
+
+    real_t b_vector[64];
+    NS(construct_b_vector)(tricub_data, b_vector);
+    real_t coefs[64];
+    NS(construct_coefs)(b_vector, coefs);
+
+    real_t x_powers[4];
+    real_t y_powers[4];
+    real_t z_powers[4];
 
     /* How to access the data members of NS(TriCubData) element */
     /*
