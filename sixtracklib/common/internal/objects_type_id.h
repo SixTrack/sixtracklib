@@ -46,6 +46,8 @@ typedef enum NS(object_type_values_e)
     NS(OBJECT_TYPE_CSTRING)               =       8202,
     NS(OBJECT_TYPE_BINARY_VECTOR)         =       8203,
     NS(OBJECT_TYPE_MIN_USERDEFINED)       =      32768,
+    NS(OBJECT_TYPE_TRICUB)                =      32768,
+    NS(OBJECT_TYPE_TRICUB_DATA)           =      32769,
     NS(OBJECT_TYPE_MAX_USERDEFINED)       =      65535,
     NS(OBJECT_TYPE_LAST_AVAILABLE)        =      65535,
     NS(OBJECT_TYPE_INVALID)               = 0x7fffffff
