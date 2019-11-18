@@ -334,6 +334,21 @@ NS(AssignAddressItem_add_copy)(
     SIXTRL_ARGPTR_DEC const NS(AssignAddressItem) *const
         SIXTRL_RESTRICT item );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(AssignAddressItem_assign_all_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* assign_item_buffer,
+    NS(buffer_size_t) const assign_slot_size,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* dest_buffer,
+    NS(buffer_size_t) const dest_slot_size,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* src_buffer,
+    NS(buffer_size_t) const src_slot_size );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(AssignAddressItem_assign_all)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT map_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT dest_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT src_buffer );
+
 #endif /* !defined( _GPUCODE ) */
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(AssignAddressItem_copy)(
