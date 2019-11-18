@@ -5,6 +5,10 @@ import numpy as np
 from cobjects import CBuffer, CObject, CField
 import ctypes as ct
 
+from .stcommon import sixtracklib
+from .stcommon import st_Buffer_p, st_NullBuffer, st_buffer_size_t, \
+      st_AssignAddressItem_p, st_NullAssignAddressItem
+
 from .buffer import AssignAddressItem
 
 st_OBJECT_TYPE_TRICUB = 32768
