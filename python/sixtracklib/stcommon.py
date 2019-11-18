@@ -3192,6 +3192,26 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
 # Cl-Context methods
 
 if SIXTRACKLIB_MODULES.get('opencl', False):
+    st_ClArgument_p = ct.c_void_p
+    st_NullClArgument = ct.cast( 0, st_ClArgument_p )
+
+    st_ClArgument_new_from_buffer = sixtracklib.st_ClArgument_new_from_buffer
+    st_ClArgument_new_from_buffer.argtypes = [ st_Buffer_p, st_Context_p ]
+    st_ClArgument_new_from_buffer.restype = st_ClArgument_p
+
+    st_ClArgument_delete = sixtracklib.st_ClArgument_delete
+    st_ClArgument_delete.argtypes = [ st_ClArgument_p ]
+    st_ClArgument_delete.restype = None
+
+    st_ClArgument_write = sixtracklib.st_ClArgument_write
+    st_ClArgument_write.argtypes = [ st_ClArgument_p, st_Buffer_p ]
+    st_ClArgument_write.restype = ct.c_bool
+
+    st_ClArgument_read = sixtracklib.st_ClArgument_write
+    st_ClArgument_read.argtypes = [ st_ClArgument_p, st_Buffer_p ]
+    st_ClArgument_read.restype = ct.c_bool
+
+    # --------------------------------------------------------------------------
 
     st_ClContext_create = sixtracklib.st_ClContext_create
     st_ClContext_create.restype = st_Context_p
@@ -3208,6 +3228,48 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContextBase_delete = sixtracklib.st_ClContextBase_delete
     st_ClContextBase_delete.argtypes = [st_Context_p]
     st_ClContextBase_delete.restype = None
+
+    st_ClContextBase_add_program_file = \
+        sixtracklib.st_ClContextBase_add_program_file
+    st_ClContextBase_add_program_file.argtypes = [
+            st_Context_p, ct.c_char_p, ct.c_char_p ]
+    st_ClContextBase_add_program_file.restype = ct.c_uint32
+
+    st_ClContextBase_compile_program = \
+        sixtracklib.st_ClContextBase_compile_program
+    st_ClContextBase_compile_program.argtypes = [
+        st_Context_p, ct.c_uint32 ]
+    st_ClContextBase_compile_program.restype = ct.c_bool
+
+    st_ClContextBase_enable_kernel = \
+        sixtracklib.st_ClContextBase_enable_kernel
+    st_ClContextBase_enable_kernel.argtypes = [
+        st_Context_p, ct.c_char_p, ct.c_uint32 ]
+    st_ClContextBase_enable_kernel.restype = ct.c_uint32
+
+    st_ClContextBase_find_kernel_id_by_name = \
+        sixtracklib.st_ClContextBase_find_kernel_id_by_name
+    st_ClContextBase_find_kernel_id_by_name.argtypes = [
+        st_Context_p, ct.c_char_p ]
+    st_ClContextBase_find_kernel_id_by_name.restype = ct.c_uint32
+
+    st_ClContextBase_assign_kernel_argument = \
+        sixtracklib.st_ClContextBase_assign_kernel_argument
+    st_ClContextBase_assign_kernel_argument.argtypes = [
+        st_Context_p, ct.c_uint32, st_arch_size_t, st_ClArgument_p ]
+    st_ClContextBase_assign_kernel_argument.restype = None
+
+    st_ClContextBase_assign_kernel_argument_value = \
+        sixtracklib.st_ClContextBase_assign_kernel_argument_value
+    st_ClContextBase_assign_kernel_argument_value.argtypes = [
+        st_Context_p, ct.c_uint32, st_arch_size_t, ct.c_void_p,
+        st_arch_size_t ]
+
+    st_TrackJobCl_p = ct.c_void_p
+    st_NullTrackJobCl = ct.cast(0, st_TrackJobCl_p)
+    st_TrackJobCl_get_context = sixtracklib.st_TrackJobCl_get_context
+    st_TrackJobCl_get_context.argtypes = [ st_TrackJobCl_p ]
+    st_TrackJobCl_get_context.restype = st_Context_p
 
 # ------------------------------------------------------------------------------
 # Stand-alone tracking functions (CPU only)
