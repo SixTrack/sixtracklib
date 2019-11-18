@@ -55,10 +55,10 @@ class TriCubData(CObject):
 class TriCub(CObject):
     _typeid = st_OBJECT_TYPE_TRICUB
     x = CField(0, 'real', default=0.0, alignment=8)
-    y = CField(0, 'real', default=0.0, alignment=8)
-    z = CField(0, 'real', default=0.0, alignment=8)
-    length = CField(0, 'real', default=0.0, alignment=8)
-    data_addr = CField(0, 'uint64', default=0, alignment=8)
+    y = CField(1, 'real', default=0.0, alignment=8)
+    z = CField(2, 'real', default=0.0, alignment=8)
+    length = CField(3, 'real', default=0.0, alignment=8)
+    data_addr = CField(4, 'uint64', default=0, alignment=8)
 
 
 
