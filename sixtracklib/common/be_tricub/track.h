@@ -53,27 +53,56 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_tricub)(
     typedef NS(be_tricub_real_t) real_t;
     typedef NS(be_tricub_int_t)  int_t;
 
-    SIXTRL_ASSERT(  tricub != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT(  NS(TriCub_get_phi_size)( tricub ) > ( int_t )0u );
-    SIXTRL_ASSERT(  NS(TriCub_get_ptr_const_phi)( tricub ) != SIXTRL_NULLPTR );
+    SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData) const* tricub_data =
+        NS(TriCub_const_data)( tricub );
 
-    SIXTRL_ASSERT(  NS(TriCub_get_dx)( tricub ) > ( real_t )0.0 );
-    SIXTRL_ASSERT(  NS(TriCub_get_dy)( tricub ) > ( real_t )0.0 );
-    SIXTRL_ASSERT(  NS(TriCub_get_dz)( tricub ) > ( real_t )0.0 );
+    SIXTRL_BUFFER_DATAPTR_DEC real_t const* lookup_table_begin =
+        NS(TriCubData_const_table_begin)( tricub_data );
 
-    SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, ii )
-        == ( NS(particle_index_t) )1 );
+    int_t const lookup_table_size = NS(TriCubData_table_size)( tricub_data );
 
-    real_t const x  = NS(Particles_get_x_value)( particles, ii );
-    real_t const y  = NS(Particles_get_y_value)( particles, ii );
-    real_t const zeta = NS(Particles_get_zeta_value)( particles, ii );
+    /* How to access the data members of the NS(TriCub) beam element */
+    /*
+    real_t const x_closed_orbit = NS(TriCub_x)( tricub );
+    real_t const y_closed_orbit = NS(TriCub_y)( tricub );
+    real_t const z_closed_orbit = NS(TriCub_z)( tricub );
+    real_t const length         = NS(TriCub_length)( tricub );
+    */
+
+    /* How to access the data members of NS(TriCubData) element */
+    /*
+     real_t const x0 = NS(TriCubData_x0)( tricub_data );
+     real_t const dx = NS(TriCubData_dx)( tricub_data );
+     int_t  const nx = NS(TriCubData_nx)( tricub_data );
+
+     real_t const y0 = NS(TriCubData_x0)( tricub_data );
+     real_t const dy = NS(TriCubData_dx)( tricub_data );
+     int_t  const ny = NS(TriCubData_nx)( tricub_data );
+
+     real_t const z0 = NS(TriCubData_x0)( tricub_data );
+     real_t const dz = NS(TriCubData_dx)( tricub_data );
+     int_t  const nz = NS(TriCubData_nx)( tricub_data );
+    */
+
+    /* how to mark a particle in a particle set as lost */
+    /*
+    NS(Particles_mark_as_lost_value)( particles, ii );
+    */
 
     /* ..... */
 
-    NS(Particles_set_x_value)( particles, ii, x );
-    NS(Particles_set_y_value)( particles, ii, y );
-    NS(Particles_set_zeta_value)( particles, ii, zeta );
+    /* How to update the particles state at the end of *
+     * applying the tracking map */
+    /*
+    NS(Particles_set_x_value)( particles, ii, new_x_value );
+    NS(Particles_set_y_value)( particles, ii, new_y_value );
+    NS(Particles_set_zeta_value)( particles, ii, new_zeta_value );
+    */
+
+    ( void )particles;
+    ( void )ii;
+    ( void )lookup_table_begin;
+    ( void )lookup_table_size;
 
     return SIXTRL_TRACK_SUCCESS;
 }

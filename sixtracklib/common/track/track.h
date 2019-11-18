@@ -166,6 +166,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t) NS(Track_all_particles_line)(
     #include "sixtracklib/common/be_xyshift/track.h"
     #include "sixtracklib/common/be_limit/track.h"
     #include "sixtracklib/common/be_dipedge/track.h"
+    #include "sixtracklib/common/be_tricub/track.h"
 
     #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
         #include "sixtracklib/common/be_beamfields/track.h"

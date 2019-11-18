@@ -69,95 +69,31 @@ SIXTRL_INLINE int NS(TriCub_compare_values)(
 
         if( lhs != rhs )
         {
-            typedef NS(be_tricub_int_t)  int_t;
+            cmp_result = NS(TestLibCompare_real_attribute)(
+                NS(TriCub_x)( lhs ), NS(TriCub_x)( rhs ) );
 
-            NS(be_tricub_ptr_const_real_t) lhs_phi =
-                NS(TriCub_get_ptr_const_phi)( lhs );
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(TestLibCompare_real_attribute)(
+                    NS(TriCub_y)( lhs ), NS(TriCub_y)( rhs ) );
+            }
 
-            NS(be_tricub_ptr_const_real_t) rhs_phi =
-                NS(TriCub_get_ptr_const_phi)( lhs );
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(TestLibCompare_real_attribute)(
+                    NS(TriCub_z)( lhs ), NS(TriCub_z)( rhs ) );
+            }
 
-            cmp_result = NS(TestLibCompare_int64_attribute)(
-                NS(TriCub_get_nx)( lhs ), NS(TriCub_get_nx)( rhs ) );
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(TestLibCompare_real_attribute)(
+                    NS(TriCub_length)( lhs ), NS(TriCub_length)( rhs ) );
+            }
 
             if( cmp_result == 0 )
             {
                 cmp_result = NS(TestLibCompare_int64_attribute)(
-                    NS(TriCub_get_ny)( lhs ), NS(TriCub_get_ny)( rhs ) );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_int64_attribute)(
-                    NS(TriCub_get_nz)( lhs ), NS(TriCub_get_nz)( rhs ) );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute)(
-                    NS(TriCub_get_x0)( lhs ), NS(TriCub_get_x0)( rhs ) );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute)(
-                    NS(TriCub_get_y0)( lhs ), NS(TriCub_get_y0)( rhs ) );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute)(
-                    NS(TriCub_get_z0)( lhs ), NS(TriCub_get_z0)( rhs ) );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute)(
-                    NS(TriCub_get_dx)( lhs ), NS(TriCub_get_dx)( rhs ) );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute)(
-                    NS(TriCub_get_dy)( lhs ), NS(TriCub_get_dy)( rhs ) );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute)(
-                    NS(TriCub_get_dz)( lhs ), NS(TriCub_get_dz)( rhs ) );
-            }
-
-            if( ( cmp_result == 0 ) && ( lhs_phi != SIXTRL_NULLPTR  ) &&
-                ( rhs_phi != SIXTRL_NULLPTR ) )
-            {
-                int_t const phi_size = NS(TriCub_get_phi_size)( lhs );
-                SIXTRL_ASSERT( phi_size == NS(TriCub_get_phi_size)( lhs ) );
-
-                if( ( phi_size > ( int_t )0u ) && ( lhs_phi != rhs_phi ) )
-                {
-                    NS(be_tricub_int_t) ii = ( int_t )0u;
-                    for( ; ii < phi_size ; ++ii )
-                    {
-                        if( lhs_phi[ ii ] > rhs_phi[ ii ] )
-                        {
-                            cmp_result = +1;
-                            break;
-                        }
-                        else if( lhs_phi[ ii ] < rhs_phi[ ii ] )
-                        {
-                            cmp_result = -1;
-                            break;
-                        }
-                    }
-                }
-            }
-            else if( ( cmp_result == 0 ) && ( lhs_phi != SIXTRL_NULLPTR ) )
-            {
-                SIXTRL_ASSERT( ( rhs_phi == SIXTRL_NULLPTR ) &&
-                    ( NS(TriCub_get_phi_size)( rhs ) == ( int_t )0u ) );
-
-                cmp_result = +1;
+                    NS(TriCub_data_addr)( lhs ), NS(TriCub_data_addr)( rhs ) );
             }
         }
     }
@@ -182,105 +118,32 @@ SIXTRL_INLINE int NS(TriCub_compare_values_with_treshold)(
 
         if( lhs != rhs )
         {
-            typedef NS(be_tricub_int_t)  int_t;
+            cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
+                NS(TriCub_x)( lhs ), NS(TriCub_x)( rhs ), treshold );
 
-            NS(be_tricub_ptr_const_real_t) lhs_phi =
-                NS(TriCub_get_ptr_const_phi)( lhs );
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
+                    NS(TriCub_y)( lhs ), NS(TriCub_y)( rhs ), treshold );
+            }
 
-            NS(be_tricub_ptr_const_real_t) rhs_phi =
-                NS(TriCub_get_ptr_const_phi)( lhs );
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
+                    NS(TriCub_z)( lhs ), NS(TriCub_z)( rhs ), treshold );
+            }
 
-            cmp_result = NS(TestLibCompare_int64_attribute)(
-                NS(TriCub_get_nx)( lhs ), NS(TriCub_get_nx)( rhs ) );
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
+                    NS(TriCub_length)( lhs ), NS(TriCub_length)( rhs ),
+                        treshold );
+            }
 
             if( cmp_result == 0 )
             {
                 cmp_result = NS(TestLibCompare_int64_attribute)(
-                    NS(TriCub_get_ny)( lhs ), NS(TriCub_get_ny)( rhs ) );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_int64_attribute)(
-                    NS(TriCub_get_nz)( lhs ), NS(TriCub_get_nz)( rhs ) );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                    NS(TriCub_get_x0)( lhs ), NS(TriCub_get_x0)( rhs ),
-                    treshold );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                    NS(TriCub_get_y0)( lhs ), NS(TriCub_get_y0)( rhs ),
-                    treshold );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                    NS(TriCub_get_z0)( lhs ), NS(TriCub_get_z0)( rhs ),
-                    treshold );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                    NS(TriCub_get_dx)( lhs ), NS(TriCub_get_dx)( rhs ),
-                    treshold );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                    NS(TriCub_get_dy)( lhs ), NS(TriCub_get_dy)( rhs ),
-                    treshold );
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                    NS(TriCub_get_dz)( lhs ), NS(TriCub_get_dz)( rhs ),
-                    treshold );
-            }
-
-            if( ( cmp_result == 0 ) && ( lhs_phi != SIXTRL_NULLPTR  ) &&
-                ( rhs_phi != SIXTRL_NULLPTR ) )
-            {
-                NS(be_tricub_int_t) const phi_size =
-                    NS(TriCub_get_phi_size)( lhs );
-
-                SIXTRL_ASSERT( phi_size == NS(TriCub_get_phi_size)( lhs ) );
-
-                if( ( phi_size > ( NS(be_tricub_int_t) )0u ) &&
-                    ( lhs_phi != rhs_phi ) )
-                {
-                    typedef NS(be_tricub_real_t) real_t;
-                    int_t ii = ( int_t )0u;
-
-                    for( ; ii < phi_size ; ++ii )
-                    {
-                        real_t const diff     = lhs_phi[ ii ] - rhs_phi[ ii ];
-                        real_t const abs_diff = ( diff >= ( real_t )0 )
-                            ? diff : -diff;
-
-                        if( abs_diff > treshold )
-                        {
-                            cmp_result = ( diff > 0 ) ? +1 : -1;
-                            break;
-                        }
-                    }
-                }
-            }
-            else if( ( cmp_result == 0 ) && ( lhs_phi != SIXTRL_NULLPTR ) )
-            {
-                SIXTRL_ASSERT( ( rhs_phi == SIXTRL_NULLPTR ) &&
-                    ( NS(TriCub_get_phi_size)( rhs ) == ( int_t )0u ) );
-
-                cmp_result = +1;
+                    NS(TriCub_data_addr)( lhs ), NS(TriCub_data_addr)( rhs ) );
             }
         }
     }
@@ -299,21 +162,13 @@ SIXTRL_INLINE void NS(TriCub_print_out)(
 
     SIXTRL_ASSERT( e != SIXTRL_NULLPTR );
 
-    printf( "|tricub          | nx             = %+20ld\r\n"
-            "                 | ny             = %+20ld\r\n"
-            "                 | nz             = %+20ld\r\n"
-            "                 | x0             = %+20.12f\r\n"
-            "                 | y0             = %+20.12f\r\n"
-            "                 | z0             = %+20.12f\r\n"
-            "                 | dx             = %+20.12f\r\n"
-            "                 | dy             = %+20.12f\r\n"
-            "                 | dz             = %+20.12f\r\n",
-            NS(TriCub_get_nx)( e ), NS(TriCub_get_ny)( e ),
-            NS(TriCub_get_nz)( e ),
-            NS(TriCub_get_x0)( e ), NS(TriCub_get_y0)( e ),
-            NS(TriCub_get_z0)( e ),
-            NS(TriCub_get_dx)( e ), NS(TriCub_get_dy)( e ),
-            NS(TriCub_get_dz)( e ) );
+    printf( "|tricub          | x              = %+20.12f\r\n"
+            "                 | y              = %+20.12f\r\n"
+            "                 | z              = %+20.12f\r\n"
+            "                 | length         = %+20.12f\r\n"
+            "                 | table_addr     = %+20lu\r\n",
+            NS(TriCub_x)( e ), NS(TriCub_y)( e ), NS(TriCub_z)( e ),
+            NS(TriCub_length)( e ), ( long unsigned )NS(TriCub_data_addr)( e ) );
 
     #else
 

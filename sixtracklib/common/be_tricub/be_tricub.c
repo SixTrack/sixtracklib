@@ -5,27 +5,30 @@
 #include <stdlib.h>
 
 #include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/control/definitions.h"
+#include "sixtracklib/common/buffer/assign_address_item.h"
 #include "sixtracklib/common/buffer.h"
 
-NS(buffer_size_t) NS(TriCub_get_required_num_dataptrs)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const buffer,
-    SIXTRL_BE_ARGPTR_DEC const NS(TriCub) *const tricub )
+SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData) const*
+NS(TriCubData_const_from_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const index )
 {
-    return NS(TriCub_get_required_num_dataptrs_on_managed_buffer)(
-        NS(Buffer_get_const_data_begin)( buffer ), tricub,
-        NS(Buffer_get_slot_size)( buffer ) );
+    return NS(TriCubData_const_from_obj_index)(
+        NS(Buffer_get_const_object)( buffer, index ) );
 }
 
-NS(buffer_size_t) NS(TriCub_get_required_num_slots)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const buffer,
-    SIXTRL_BE_ARGPTR_DEC const NS(TriCub) *const tricub )
+SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* NS(TriCubData_from_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const index )
 {
-    return NS(TriCub_get_required_num_slots_on_managed_buffer)(
-        NS(Buffer_get_const_data_begin)( buffer ), tricub,
-        NS(Buffer_get_slot_size)( buffer ) );
+    return NS(TriCubData_from_obj_index)(
+        NS(Buffer_get_object)( buffer, index ) );
 }
 
-bool NS(TriCub_can_be_added)(
+/* ------------------------------------------------------------------------- */
+
+bool NS(TriCubData_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     NS(be_tricub_int_t) const nx, NS(be_tricub_int_t) const ny,
     NS(be_tricub_int_t) const nz,
@@ -33,146 +36,290 @@ bool NS(TriCub_can_be_added)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs )
 {
-    typedef NS(buffer_size_t)  buf_size_t;
-    typedef NS(TriCub)      elem_t;
+    typedef NS(buffer_size_t) buf_size_t;
 
     bool can_be_added = false;
-    NS(be_tricub_int_t) const temp_data_size =
-        nx * ny * nz * SIXTRL_BE_TRICUBMAP_MATRIX_DIM;
+    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
-    if( temp_data_size > ( NS(be_tricub_int_t) )0u )
+    NS(TriCubData) tricub_data;
+    buf_size_t const num_dataptrs = NS(TriCubData_num_dataptrs)( &tricub_data );
+    buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+
+    buf_size_t sizes[]  = { ( buf_size_t )0u };
+    buf_size_t counts[] = { ( buf_size_t )0u };
+
+    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )1u );
+
+    NS(TriCubData_preset)( &tricub_data );
+    NS(TriCubData_set_nx)( &tricub_data, nx );
+    NS(TriCubData_set_ny)( &tricub_data, ny );
+    NS(TriCubData_set_nz)( &tricub_data, nz );
+
+    status = NS(TriCubData_attributes_sizes)(
+        &sizes[ 0 ], num_dataptrs, &tricub_data, slot_size );
+
+    if( status == NS(ARCH_STATUS_SUCCESS) )
     {
-        buf_size_t const data_size = ( buf_size_t )temp_data_size;
-        buf_size_t const sizes[]   = { sizeof( SIXTRL_REAL_T ) };
-        buf_size_t const counts[]  = { data_size };
-        buf_size_t num_dataptrs    = ( buf_size_t )0u;
+        status = NS(TriCubData_attributes_counts)(
+            &counts[ 0 ], num_dataptrs, &tricub_data );
+    }
 
-        elem_t temp_obj;
-        NS(TriCub_preset)( &temp_obj );
-        NS(TriCub_init)( &temp_obj, nx, ny, nz );
-
-        num_dataptrs = NS(TriCub_get_required_num_dataptrs)(
-            buffer, &temp_obj );
-
-        SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )1u );
-
-        can_be_added = NS(Buffer_can_add_object)( buffer, sizeof( elem_t ),
-            num_dataptrs, &sizes[ 0 ], &counts[ 0 ], ptr_requ_objects,
-                ptr_requ_slots, ptr_requ_dataptrs );
+    if( status == NS(ARCH_STATUS_SUCCESS) )
+    {
+        can_be_added = NS(Buffer_can_add_object)( buffer,
+            sizeof( NS(TriCubData) ), num_dataptrs, sizes, counts,
+                ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
     }
 
     return can_be_added;
 }
 
-SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_new)(
+SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* NS(TriCubData_new)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(be_tricub_int_t) const nx, NS(be_tricub_int_t) const ny,
     NS(be_tricub_int_t) const nz )
 {
-    typedef NS(buffer_size_t)  buf_size_t;
-    typedef NS(TriCub)  elem_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC elem_t* ptr_to_elem_t;
+    typedef NS(buffer_size_t) buf_size_t;
+    SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* ptr_tricub_data = SIXTRL_NULLPTR;
+    NS(arch_size_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
-    ptr_to_elem_t ptr_elem = SIXTRL_NULLPTR;
+    NS(TriCubData) tricub_data;
+    buf_size_t const num_dataptrs = NS(TriCubData_num_dataptrs)( &tricub_data );
 
-    NS(be_tricub_int_t) const temp_data_size =
-        nx * ny * nz * SIXTRL_BE_TRICUBMAP_MATRIX_DIM;
+    buf_size_t offsets[] = { ( buf_size_t )0u };
+    buf_size_t sizes[]   = { ( buf_size_t )0u };
+    buf_size_t counts[]  = { ( buf_size_t )0u };
+    buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
 
-    if( ( buffer != SIXTRL_NULLPTR ) &&
-        ( temp_data_size > ( NS(be_tricub_int_t) )0u ) )
+    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )1u );
+
+    NS(TriCubData_preset)( &tricub_data );
+    NS(TriCubData_set_nx)( &tricub_data, nx );
+    NS(TriCubData_set_ny)( &tricub_data, ny );
+    NS(TriCubData_set_nz)( &tricub_data, nz );
+
+    status = NS(TriCubData_attributes_offsets)(
+        &offsets[ 0 ], num_dataptrs, &tricub_data, slot_size );
+
+    if( status == NS(ARCH_STATUS_SUCCESS) )
     {
-        buf_size_t const data_size = ( buf_size_t )temp_data_size;
-        buf_size_t const sizes[]   = { sizeof( SIXTRL_REAL_T ) };
-        buf_size_t const counts[]  = { data_size };
-        buf_size_t const offsets[] = { offsetof( elem_t, phi ) };
-        buf_size_t num_dataptrs    = ( buf_size_t )0u;
+        status = NS(TriCubData_attributes_counts)(
+            &counts[ 0 ], num_dataptrs, &tricub_data );
 
-        elem_t temp_obj;
-        NS(TriCub_preset)( &temp_obj );
-        NS(TriCub_init)( &temp_obj, nx, ny, nz );
-
-        num_dataptrs = NS(TriCub_get_required_num_dataptrs)(
-            buffer, &temp_obj );
-
-        SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )1u );
-
-        ptr_elem = ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
-        NS(Buffer_add_object)( buffer, &temp_obj, sizeof( elem_t ),
-            NS(OBJECT_TYPE_TRICUB), num_dataptrs,
-                &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
+        if( status == NS(ARCH_STATUS_SUCCESS) )
+        {
+            status = NS(TriCubData_attributes_sizes)(
+                &sizes[ 0 ], num_dataptrs, &tricub_data, slot_size );
+        }
     }
 
-    return ptr_elem;
+    if( status == NS(ARCH_STATUS_SUCCESS) )
+    {
+        ptr_tricub_data = ( SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* )(
+            uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
+                buffer, &tricub_data, sizeof( tricub_data ),
+                    NS(TriCubData_type_id)( &tricub_data ), num_dataptrs,
+                        &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
+    }
+
+    return ptr_tricub_data;
+}
+
+SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)*
+NS(TriCubData_add)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(be_tricub_real_t) const x0, NS(be_tricub_real_t) const dx,
+    NS(be_tricub_int_t)  const nx,
+    NS(be_tricub_real_t) const y0, NS(be_tricub_real_t) const dy,
+    NS(be_tricub_int_t)  const ny,
+    NS(be_tricub_real_t) const z0, NS(be_tricub_real_t) const dz,
+    NS(be_tricub_int_t)  const nz,
+    NS(buffer_addr_t) const table_addr )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* ptr_tricub_data = SIXTRL_NULLPTR;
+    NS(arch_size_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+
+    NS(TriCubData) tricub_data;
+    buf_size_t const num_dataptrs = NS(TriCubData_num_dataptrs)( &tricub_data );
+
+    buf_size_t offsets[] = { ( buf_size_t )0u };
+    buf_size_t sizes[]   = { ( buf_size_t )0u };
+    buf_size_t counts[]  = { ( buf_size_t )0u };
+    buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+
+    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )1u );
+    NS(TriCubData_preset)( &tricub_data );
+
+    NS(TriCubData_set_x0)( &tricub_data, x0 );
+    NS(TriCubData_set_dx)( &tricub_data, dx );
+    NS(TriCubData_set_nx)( &tricub_data, nx );
+
+    NS(TriCubData_set_y0)( &tricub_data, y0 );
+    NS(TriCubData_set_dy)( &tricub_data, dy );
+    NS(TriCubData_set_ny)( &tricub_data, ny );
+
+    NS(TriCubData_set_z0)( &tricub_data, z0 );
+    NS(TriCubData_set_dz)( &tricub_data, dz );
+    NS(TriCubData_set_nz)( &tricub_data, nz );
+
+    NS(TriCubData_set_table_addr)( &tricub_data, table_addr );
+
+    status = NS(TriCubData_attributes_offsets)(
+        &offsets[ 0 ], num_dataptrs, &tricub_data, slot_size );
+
+    if( status == NS(ARCH_STATUS_SUCCESS) )
+    {
+        status = NS(TriCubData_attributes_counts)(
+            &counts[ 0 ], num_dataptrs, &tricub_data );
+
+        if( status == NS(ARCH_STATUS_SUCCESS) )
+        {
+            status = NS(TriCubData_attributes_sizes)(
+                &sizes[ 0 ], num_dataptrs, &tricub_data, slot_size );
+        }
+    }
+
+    if( status == NS(ARCH_STATUS_SUCCESS) )
+    {
+        ptr_tricub_data = ( SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* )(
+            uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
+                buffer, &tricub_data, sizeof( tricub_data ),
+                    NS(TriCubData_type_id)( &tricub_data ), num_dataptrs,
+                        &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
+    }
+
+    return ptr_tricub_data;
+}
+
+SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* NS(TriCubData_add_copy)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data )
+{
+    return NS(TriCubData_add)( buffer,
+        NS(TriCubData_x0)( data ), NS(TriCubData_dx)( data ),
+        NS(TriCubData_nx)( data ), NS(TriCubData_y0)( data ),
+        NS(TriCubData_dy)( data ), NS(TriCubData_ny)( data ),
+        NS(TriCubData_z0)( data ), NS(TriCubData_dz)( data ),
+        NS(TriCubData_nz)( data ), NS(TriCubData_table_addr)( data ) );
+}
+
+/* ========================================================================= */
+
+SIXTRL_BE_ARGPTR_DEC NS(TriCub) const* NS(TriCub_const_from_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const index )
+{
+    return NS(TriCub_const_from_obj_index)(
+        NS(Buffer_get_const_object)( buffer, index ) );
+}
+
+SIXTRL_BE_ARGPTR_DEC NS(TriCub)* NS(TriCub_from_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const index )
+{
+    return NS(TriCub_from_obj_index)(
+        NS(Buffer_get_object)( buffer, index ) );
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool NS(TriCub_can_be_added)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+
+    NS(TriCub) tricub;
+    NS(TriCub_preset)( &tricub );
+
+    SIXTRL_ASSERT( ( buf_size_t )0u == NS(TriCub_num_dataptrs)( &tricub ) );
+    ( void )ptr_requ_dataptrs;
+
+    return NS(Buffer_can_add_trivial_object)( buffer, sizeof( tricub ),
+        ptr_requ_objects, ptr_requ_slots );
+}
+
+SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_new)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+
+    NS(TriCub) tricub;
+    NS(TriCub_preset)( &tricub );
+
+    SIXTRL_ASSERT( ( buf_size_t )0u == NS(TriCub_num_dataptrs)( &tricub ) );
+
+    return ( SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* )( uintptr_t
+        )NS(Object_get_begin_addr)( NS(Buffer_add_trivial_object)( buffer,
+            &tricub, sizeof( tricub ), NS(TriCub_type_id)( &tricub ) ) );
 }
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(be_tricub_int_t) const nx, NS(be_tricub_int_t) const ny,
-    NS(be_tricub_int_t) const nz,
-    NS(be_tricub_real_t) const x0,
-    NS(be_tricub_real_t) const y0, NS(be_tricub_real_t) const z0,
-    NS(be_tricub_real_t) const dx, NS(be_tricub_real_t) const dy,
-    NS(be_tricub_real_t) const dz,
-    NS(be_tricub_ptr_real_t) ptr_to_phi_data )
+    NS(be_tricub_real_t) const x, NS(be_tricub_real_t) const y,
+    NS(be_tricub_real_t) const z, NS(be_tricub_real_t) const length,
+    NS(buffer_addr_t) const data_addr )
 {
-    typedef NS(buffer_size_t)  buf_size_t;
-    typedef NS(TriCub)  elem_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC elem_t* ptr_to_elem_t;
+    typedef NS(buffer_size_t) buf_size_t;
 
-    ptr_to_elem_t ptr_elem = SIXTRL_NULLPTR;
+    NS(TriCub) tricub;
+    NS(TriCub_preset)( &tricub );
+    NS(TriCub_set_x)( &tricub, x );
+    NS(TriCub_set_y)( &tricub, y );
+    NS(TriCub_set_z)( &tricub, z );
+    NS(TriCub_set_length)( &tricub, length );
+    NS(TriCub_set_data_addr)( &tricub, data_addr );
 
-    NS(be_tricub_int_t) const temp_data_size =
-        nx * ny * nz * SIXTRL_BE_TRICUBMAP_MATRIX_DIM;
+    SIXTRL_ASSERT( ( buf_size_t )0u == NS(TriCub_num_dataptrs)( &tricub ) );
 
-    if( ( buffer != SIXTRL_NULLPTR ) &&
-        ( temp_data_size > ( NS(be_tricub_int_t) )0u ) )
-    {
-        buf_size_t const data_size = ( buf_size_t )temp_data_size;
-        buf_size_t const sizes[]   = { sizeof( SIXTRL_REAL_T ) };
-        buf_size_t const counts[]  = { data_size };
-        buf_size_t const offsets[] = { offsetof( elem_t, phi ) };
-        buf_size_t num_dataptrs    = ( buf_size_t )0u;
-
-        elem_t temp_obj;
-        NS(TriCub_preset)( &temp_obj );
-        NS(TriCub_init)( &temp_obj, nx, ny, nz );
-
-        NS(TriCub_set_x0)( &temp_obj, x0 );
-        NS(TriCub_set_y0)( &temp_obj, y0 );
-        NS(TriCub_set_z0)( &temp_obj, z0 );
-
-        NS(TriCub_set_dx)( &temp_obj, dx );
-        NS(TriCub_set_dy)( &temp_obj, dy );
-        NS(TriCub_set_dz)( &temp_obj, dz );
-
-        NS(TriCub_assign_ptr_phi)( &temp_obj, ptr_to_phi_data );
-
-        num_dataptrs = NS(TriCub_get_required_num_dataptrs)(
-            buffer, &temp_obj );
-
-        SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )1u );
-
-        ptr_elem = ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
-        NS(Buffer_add_object)( buffer, &temp_obj, sizeof( elem_t ),
-            NS(OBJECT_TYPE_TRICUB), num_dataptrs,
-                &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
-    }
-
-    return ptr_elem;
+    return ( SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* )( uintptr_t
+        )NS(Object_get_begin_addr)( NS(Buffer_add_trivial_object)( buffer,
+            &tricub, sizeof( tricub ), NS(TriCub_type_id)( &tricub ) ) );
 }
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_BE_ARGPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT orig )
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub )
 {
-    return NS(TriCub_add)( buffer,
-        NS(TriCub_get_nx)( orig ), NS(TriCub_get_ny)( orig ),
-        NS(TriCub_get_nz)( orig ),
-        NS(TriCub_get_x0)( orig ), NS(TriCub_get_y0)( orig ),
-        NS(TriCub_get_z0)( orig ),
-        NS(TriCub_get_dx)( orig ), NS(TriCub_get_dy)( orig ),
-        NS(TriCub_get_dz)( orig ),
-        ( NS(be_tricub_ptr_real_t) )NS(TriCub_get_ptr_const_phi)( orig ) );
+    typedef NS(buffer_size_t) buf_size_t;
+    SIXTRL_ASSERT( ( buf_size_t )0u == NS(TriCub_num_dataptrs)( tricub ) );
+
+    return ( SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* )( uintptr_t
+        )NS(Object_get_begin_addr)( NS(Buffer_add_trivial_object)( buffer,
+            tricub, sizeof( NS(TriCub) ), NS(TriCub_type_id)( tricub ) ) );
+}
+
+/* ------------------------------------------------------------------------ */
+
+SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem) const*
+NS(TriCub_buffer_create_assign_address_item)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT assign_items_buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT belements,
+    NS(buffer_size_t) const belements_index,
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const
+        SIXTRL_RESTRICT tricub_data_buffer,
+    NS(buffer_size_t) const tricub_data_index )
+{
+    SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem) const*
+        assign_item = SIXTRL_NULLPTR;
+
+    if( ( assign_items_buffer != SIXTRL_NULLPTR ) &&
+        ( NS(TriCub_const_from_buffer)(
+            belements, belements_index ) != SIXTRL_NULLPTR ) &&
+        ( NS(TriCubData_const_from_buffer)(
+            tricub_data_buffer, tricub_data_index ) != SIXTRL_NULLPTR ) )
+    {
+        assign_item = NS(AssignAddressItem_add)( assign_items_buffer,
+            NS(OBJECT_TYPE_TRICUB), NS(ARCH_BEAM_ELEMENTS_BUFFER_ID),
+                belements_index, offsetof( NS(TriCub), data_addr ),
+            NS(OBJECT_TYPE_TRICUB_DATA), NS(ARCH_MIN_USER_DEFINED_BUFFER_ID),
+                tricub_data_index, ( NS(buffer_size_t) )0u );
+    }
+
+    return assign_item;
 }
 
 /* end: sixtracklib/common/be_tricub/be_tricub.c */

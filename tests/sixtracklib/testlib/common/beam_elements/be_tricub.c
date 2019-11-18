@@ -26,21 +26,15 @@ void NS(TriCub_print)( SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
 {
     if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
     {
-        printf( "|tricub          | nx             = %+20ld\r\n"
-                "                 | ny             = %+20ld\r\n"
-                "                 | nz             = %+20ld\r\n"
-                "                 | x0             = %+20.12f\r\n"
-                "                 | y0             = %+20.12f\r\n"
-                "                 | z0             = %+20.12f\r\n"
-                "                 | dx             = %+20.12f\r\n"
-                "                 | dy             = %+20.12f\r\n"
-                "                 | dz             = %+20.12f\r\n",
-                NS(TriCub_get_nx)( e ), NS(TriCub_get_ny)( e ),
-                NS(TriCub_get_nz)( e ),
-                NS(TriCub_get_x0)( e ), NS(TriCub_get_y0)( e ),
-                NS(TriCub_get_z0)( e ),
-                NS(TriCub_get_dx)( e ), NS(TriCub_get_dy)( e ),
-                NS(TriCub_get_dz)( e ) );
+        fprintf( fp,
+            "|tricub          | x              = %+20.12f\r\n"
+            "                 | y              = %+20.12f\r\n"
+            "                 | z              = %+20.12f\r\n"
+            "                 | length         = %+20.12f\r\n"
+            "                 | table_addr     = %20lu\r\n",
+            NS(TriCub_x)( e ), NS(TriCub_y)( e ), NS(TriCub_z)( e ),
+            NS(TriCub_length)( e ),
+            ( long unsigned )NS(TriCub_data_addr)( e ) );
     }
 }
 
