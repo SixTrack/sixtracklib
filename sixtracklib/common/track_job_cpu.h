@@ -112,7 +112,7 @@ namespace SIXTRL_CXX_NAMESPACE
             buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
             buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
             size_type const until_turn_elem_by_elem = size_type{ 0 },
-            std::string const& config_str = std::string{} );
+            std::string const& SIXTRL_RESTRICT_REF config_str = std::string{} );
 
         template< typename PartSetIndexIter >
         SIXTRL_HOST_FN TrackJobCpu(
@@ -122,7 +122,7 @@ namespace SIXTRL_CXX_NAMESPACE
             buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
             buffer_t* SIXTRL_RESTRICT ptr_output_buffer = nullptr,
             size_type const until_turn_elem_by_elem = size_type{ 0 },
-            std::string SIXTRL_RESTRICT_REF config_str = std::string{} );
+            std::string const& SIXTRL_RESTRICT_REF config_str = std::string{} );
 
         SIXTRL_HOST_FN TrackJobCpu( TrackJobCpu const& other ) = default;
         SIXTRL_HOST_FN TrackJobCpu( TrackJobCpu&& other ) = default;
@@ -156,7 +156,7 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_HOST_FN void collect( TrackJobCpu& job,
         track_job_collect_flag_t const flags ) SIXTRL_NOEXCEPT;
 
-    SIXTRL_HOST_FN TrackJobCpu::track_status_t track(
+    SIXTRL_HOST_FN TrackJobCpu::track_status_t trackUntil(
         TrackJobCpu& SIXTRL_RESTRICT_REF job,
         TrackJobCpu::size_type const until_turn ) SIXTRL_NOEXCEPT;
 
@@ -332,7 +332,7 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCpu::buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
         TrackJobCpu::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         TrackJobCpu::size_type const until_turn_elem_by_elem,
-        std::string SIXTRL_RESTRICT_REF config_str ) :
+        std::string const& SIXTRL_RESTRICT_REF config_str ) :
         TrackJobBase( SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_STR,
                       SIXTRL_CXX_NAMESPACE::TRACK_JOB_CPU_ID )
     {

@@ -140,11 +140,11 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC CpuTrackJob::collect_flag_t collect(
         CpuTrackJob& SIXTRL_RESTRICT_REF track_job );
 
-    CpuTrackJob::track_status_t trackUntilTurn(
+    CpuTrackJob::track_status_t trackUntil(
         CpuTrackJob& SIXTRL_RESTRICT_REF track_job,
         CpuTrackJob::size_type const until_turn );
 
-    CpuTrackJob::track_status_t trackElemByElemUntilTurn(
+    CpuTrackJob::track_status_t trackElemByElem(
         CpuTrackJob& SIXTRL_RESTRICT_REF track_job,
         CpuTrackJob::size_type const until_turn );
 

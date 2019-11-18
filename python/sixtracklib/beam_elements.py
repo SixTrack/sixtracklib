@@ -6,6 +6,7 @@ import importlib
 from collections import namedtuple
 
 import numpy as np
+from scipy.special import factorial
 from scipy.constants import e as qe
 from cobjects import CBuffer, CObject, CField
 from .mad_helper import madseq_to_generator
@@ -92,12 +93,6 @@ class Multipole(CObject):
     bal = CField(4, 'real', default=0.0, alignment=8, pointer=True,
                     length='2 * order + 2')
 
-    @staticmethod
-    def _factorial(x):
-        if not isinstance(x, int):
-            return 0
-        return (x > 0) and (x * Multipole._factorial(x - 1)) or 1
-
     def __init__(self, order=None, knl=None, ksl=None, bal=None, **kwargs):
         if bal is None and \
                 (knl is not None or ksl is not None or order is not None):
@@ -128,11 +123,10 @@ class Multipole(CObject):
             order = n - 1
             bal = np.zeros(2 * order + 2)
 
-            for ii in range(0, len(knl)):
-                inv_factorial = 1.0 / float(Multipole._factorial(ii))
-                jj = 2 * ii
-                bal[jj] = knl[ii] * inv_factorial
-                bal[jj + 1] = ksl[ii] * inv_factorial
+            idx = np.array([ii for ii in range(0, len(knl))])
+            inv_factorial = 1.0 / factorial(idx, exact=True)
+            bal[0::2] = knl * inv_factorial
+            bal[1::2] = ksl * inv_factorial
 
             kwargs["bal"] = bal
             kwargs["order"] = order
@@ -145,13 +139,21 @@ class Multipole(CObject):
 
     @property
     def knl(self):
-        return [self.bal[ii] * Multipole._factorial(ii // 2)
-                for ii in range(0, len(self.bal), 2)]
+        idx = np.array([ii for ii in range(0, len(self.bal), 2)])
+        return self.bal[idx] * factorial(idx // 2, exact=True)
 
     @property
     def ksl(self):
-        return [self.bal[ii + 1] * Multipole._factorial(ii // 2 + 1)
-                for ii in range(0, len(self.bal), 2)]
+        idx = np.array([ii for ii in range(0, len(self.bal), 2)])
+        return self.bal[idx + 1] * factorial(idx // 2, exact=True)
+
+    def set_knl(self, value, order):
+        assert order <= self.order
+        self.bal[order * 2] = value / factorial(order, exact=True)
+
+    def set_ksl(self, value, order):
+        assert order <= self.order
+        self.bal[order * 2 + 1] = value / factorial(order, exact=True)
 
 
 class Cavity(CObject):
@@ -409,9 +411,39 @@ class DipoleEdge(CObject):
     r21 = CField(0, 'float64', default=0.0, alignment=8)
     r43 = CField(1, 'float64', default=0.0, alignment=8)
 
-    def __init__(self, **kwargs):
-        # TODO: Implement conversion schemes, if required
-        super().__init__(**kwargs)
+    def __init__(self, r21=None, r43=None,
+                 h=None, e1=None, hgap=None, fint=None, **kwargs):
+        if r21 is None and r43 is None:
+            ZERO = np.float64(0.0)
+            if hgap is None:
+                hgap = ZERO
+            if h is None:
+                h = ZERO
+            if e1 is None:
+                e1 = ZERO
+            if fint is None:
+                fint = ZERO
+
+            # Check that the argument e1 is not too close to ( 2k + 1 ) * pi/2
+            # so that the cos in the denominator of the r43 calculation and
+            # the tan in the r21 calculations blow up
+            assert not np.isclose(np.absolute(np.cos(e1)), ZERO)
+
+            corr = np.float64(2.0) * h * hgap * fint
+            r21 = h * np.tan(e1)
+            temp = corr / np.cos(e1) * (np.float64(1) +
+                                        np.sin(e1) * np.sin(e1))
+
+            # again, the argument to the tan calculation should be limited
+            assert not np.isclose(np.absolute(np.cos(e1 - temp)), ZERO)
+            r43 = -h * np.tan(e1 - temp)
+
+        if r21 is not None and r43 is not None:
+            super().__init__(r21=r21, r43=r43, **kwargs)
+        else:
+            raise ValueError(
+                "DipoleEdge needs either coefficiants r21 and r43"
+                " or suitable values for h, e1, hgap, and fint provided")
 
 
 class Elements(object):
@@ -446,15 +478,18 @@ class Elements(object):
 
     @classmethod
     def from_line(cls, line):
-        return cls().append_line(line)
+        self = cls()
+        return self.append_line(line)
 
     def append_line(self, line):
         for element in line.elements:
             element_name = element.__class__.__name__
             getattr(self, element_name)(**element.to_dict(keepextra=True))
+        return self
 
     def to_file(self, filename):
         self.cbuffer.tofile(filename)
+        return self
 
     def __init__(self, cbuffer=None):
         if cbuffer is None:

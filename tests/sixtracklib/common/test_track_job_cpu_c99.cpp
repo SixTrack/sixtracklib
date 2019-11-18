@@ -24,7 +24,7 @@
 #include "sixtracklib/common/be_monitor/output_buffer.h"
 #include "sixtracklib/common/output/output_buffer.h"
 #include "sixtracklib/common/output/elem_by_elem_config.h"
-#include "sixtracklib/common/track.h"
+#include "sixtracklib/common/track/track.h"
 #include "sixtracklib/common/track_job_cpu.h"
 
 
@@ -779,28 +779,59 @@ TEST( C99_TrackJobCpuTests, TrackParticles )
 
     size_t elem_by_elem_offset = size_t{ 0 };
     size_t beam_monitor_offset = size_t{ 0 };
-    part_index_t min_turn_id   = part_index_t{ 0 };
+    size_t num_elem_by_elem_objs = size_t{ 0 };
+
+    part_index_t const start_elem = part_index_t{ 0u };
+    part_index_t min_part_id, max_part_id, min_elem_id, max_elem_id,
+                 min_turn_id, max_turn_id;
+
+    ret = ::NS(OutputBuffer_get_min_max_attributes)( cmp_particles, eb,
+        &min_part_id, &max_part_id, &min_elem_id, &max_elem_id,
+        &min_turn_id, &max_turn_id, &num_elem_by_elem_objs, start_elem );
+
+    part_index_t const max_elem_by_elem_turn_id = (
+        ( DUMP_ELEM_BY_ELEM_TURNS > static_cast< size_t >( min_turn_id ) ) &&
+        ( min_turn_id >= part_index_t{ 0 } ) )
+        ? ( DUMP_ELEM_BY_ELEM_TURNS - 1 ) : min_turn_id;
+
+    ::NS(ElemByElemConfig) config;
+    ::NS(ElemByElemConfig_preset)( &config );
+
+    if( ( NS(TRACK_SUCCESS) == ret ) &&
+        ( static_cast< size_t >( min_turn_id ) < DUMP_ELEM_BY_ELEM_TURNS ) &&
+        ( num_elem_by_elem_objs > size_t{ 0 } ) )
+    {
+        ret = ::NS(ElemByElemConfig_init_detailed)( &config,
+            NS(ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES), min_part_id,
+                max_part_id, min_elem_id, max_elem_id,
+                    min_turn_id, max_elem_by_elem_turn_id, true );
+    }
+    else if( ret == ::NS(TRACK_SUCCESS) )
+    {
+        ret = ::NS(TRACK_STATUS_GENERAL_FAILURE);
+    }
 
     ret = ::NS(OutputBuffer_prepare)( eb, cmp_output_buffer, cmp_particles,
-        DUMP_ELEM_BY_ELEM_TURNS, &elem_by_elem_offset, &beam_monitor_offset,
-        &min_turn_id );
+            DUMP_ELEM_BY_ELEM_TURNS, &elem_by_elem_offset,
+                &beam_monitor_offset, &min_turn_id );
 
-    SIXTRL_ASSERT( ret == 0 );
+    if( ret == ::NS(TRACK_SUCCESS) )
+    {
+        ret = ::NS(BeamMonitor_assign_output_buffer_from_offset)(
+            eb, cmp_output_buffer, min_turn_id, beam_monitor_offset );
+    }
 
-    ret = ::NS(BeamMonitor_assign_output_buffer_from_offset)(
-        eb, cmp_output_buffer, min_turn_id, beam_monitor_offset );
-
-    SIXTRL_ASSERT( ret == 0 );
-
-    particles_t* elem_by_elem_out = ::NS(Particles_buffer_get_particles)(
-        cmp_output_buffer, elem_by_elem_offset );
-
-    SIXTRL_ASSERT( elem_by_elem_out != nullptr );
+    if( ret == NS(TRACK_SUCCESS) )
+    {
+        ::NS(ElemByElemConfig_set_output_store_address)(
+            &config, ( uintptr_t )::NS(Particles_buffer_get_const_particles)(
+                cmp_output_buffer, elem_by_elem_offset ) );
+    }
 
     ret = ::NS(Track_all_particles_element_by_element_until_turn)(
-        cmp_particles, eb, DUMP_ELEM_BY_ELEM_TURNS, elem_by_elem_out );
+        cmp_particles, &config, eb, DUMP_ELEM_BY_ELEM_TURNS );
 
-    SIXTRL_ASSERT( ret == 0 );
+    SIXTRL_ASSERT( ret == ::NS(TRACK_SUCCESS) );
 
     ret = ::NS(Track_all_particles_until_turn)( cmp_particles, eb, NUM_TURNS );
 
