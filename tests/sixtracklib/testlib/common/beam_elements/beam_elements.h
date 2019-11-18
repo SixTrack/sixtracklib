@@ -133,6 +133,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamElement_print)(
     #include "sixtracklib/testlib/common/beam_elements/be_limit_rect.h"
     #include "sixtracklib/testlib/common/beam_elements/be_limit_ellipse.h"
     #include "sixtracklib/testlib/common/beam_elements/be_dipedge.h"
+    #include "sixtracklib/testlib/common/beam_elements/be_tricub.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -509,6 +510,18 @@ SIXTRL_INLINE void NS(BeamElement_print_out)(
                 break;
             }
 
+            case NS(OBJECT_TYPE_TRICUB):
+            {
+                typedef SIXTRL_DATAPTR_DEC NS(TriCub) const*
+                    ptr_to_belem_t;
+
+                ptr_to_belem_t beam_element =
+                    ( ptr_to_belem_t )( uintptr_t )addr;
+
+                NS(TriCub_print_out)( beam_element );
+                break;
+            }
+
             default:
             {
                 printf( "|unknown          | type_id  = %3d;\r\n"
@@ -723,6 +736,18 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects)(
                         break;
                     }
 
+                    case NS(OBJECT_TYPE_TRICUB):
+                    {
+                        typedef NS(TriCub) belem_t;
+                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const*  ptr_belem_t;
+
+                        compare_value = NS(TriCub_compare_values)(
+                            ( ptr_belem_t )( uintptr_t )lhs_addr,
+                            ( ptr_belem_t )( uintptr_t )rhs_addr );
+
+                        break;
+                    }
+
                     default:
                     {
                         compare_value = -1;
@@ -780,8 +805,7 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
 
                         compare_value = NS(Drift_compare_values_with_treshold)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold );
+                            ( ptr_belem_t )( uintptr_t )rhs_addr, treshold );
 
                         break;
                     }
@@ -793,8 +817,7 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
 
                         compare_value = NS(DriftExact_compare_values_with_treshold)(
                             ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            treshold  );
+                            ( ptr_belem_t )( uintptr_t )lhs_addr, treshold  );
 
                         break;
                     }
@@ -806,8 +829,7 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
 
                         compare_value = NS(MultiPole_compare_values_with_treshold)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold  );
+                            ( ptr_belem_t )( uintptr_t )rhs_addr, treshold  );
 
                         break;
                     }
@@ -819,8 +841,7 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
 
                         compare_value = NS(XYShift_compare_values_with_treshold)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold  );
+                            ( ptr_belem_t )( uintptr_t )rhs_addr, treshold  );
 
                         break;
                     }
@@ -832,8 +853,7 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
 
                         compare_value = NS(SRotation_compare_values_with_treshold)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold  );
+                            ( ptr_belem_t )( uintptr_t )rhs_addr, treshold  );
 
                         break;
                     }
@@ -845,8 +865,7 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
 
                         compare_value = NS(Cavity_compare_values_with_treshold)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold  );
+                            ( ptr_belem_t )( uintptr_t )rhs_addr, treshold  );
 
                         break;
                     }
@@ -901,13 +920,12 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
 
                     case NS(OBJECT_TYPE_BEAM_MONITOR):
                     {
-                        typedef NS(BeamMonitor)                          belem_t;
+                        typedef NS(BeamMonitor) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
 
                         compare_value = NS(BeamMonitor_compare_values_with_treshold)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold  );
+                            ( ptr_belem_t )( uintptr_t )rhs_addr, treshold  );
 
                         break;
                     }
@@ -946,8 +964,20 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
                         compare_value =
                         NS(DipoleEdge_compare_values_with_treshold)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
-                            ( ptr_belem_t )( uintptr_t )rhs_addr,
-                            treshold  );
+                            ( ptr_belem_t )( uintptr_t )rhs_addr, treshold );
+
+                        break;
+                    }
+
+                    case NS(OBJECT_TYPE_TRICUB):
+                    {
+                        typedef NS(TriCub) belem_t;
+                        typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
+
+                        compare_value =
+                        NS(TriCub_compare_values_with_treshold)(
+                            ( ptr_belem_t )( uintptr_t )lhs_addr,
+                            ( ptr_belem_t )( uintptr_t )rhs_addr, treshold );
 
                         break;
                     }

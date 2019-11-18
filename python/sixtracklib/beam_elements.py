@@ -445,6 +445,26 @@ class DipoleEdge(CObject):
                 "DipoleEdge needs either coefficiants r21 and r43"
                 " or suitable values for h, e1, hgap, and fint provided")
 
+class TriCub(CObject):
+    _typeid = 32768
+    nx = CField(0, 'int64', default=1, const=True, alignment=8)
+    ny = CField(1, 'int64', default=1, const=True, alignment=8)
+    nz = CField(2, 'int64', default=1, const=True, alignment=8)
+    x0 = CField(3, 'float64', default=0.0, alignment=8)
+    y0 = CField(4, 'float64', default=0.0, alignment=8)
+    z0 = CField(5, 'float64', default=0.0, alignment=8)
+    dx = CField(6, 'float64', default=1.0, alignment=8)
+    dy = CField(7, 'float64', default=1.0, alignment=8)
+    dz = CField(8, 'float64', default=1.0, alignment=8)
+    phi = CField(9, 'float64', default=0.0, pointer=True,
+                    length='nx * ny * nz * 8', alignment=8)
+
+    def __init__(self, nx=None, ny=None, nz=None, **kwargs):
+        if nx is None: nx = 1
+        if ny is None: ny = 1
+        if nz is None: nz = 1
+        super().__init__(nx=nx, ny=ny, nz=nz, **kwargs)
+
 
 class Elements(object):
     element_types = {'Cavity': Cavity,
@@ -463,6 +483,7 @@ class Elements(object):
                      'DipoleEdge': DipoleEdge,
                      #                     'Line': Line,
                      'BeamMonitor': BeamMonitor,
+                     'TriCub': TriCub,
                      }
 
     def _mk_fun(self, buff, cls):
