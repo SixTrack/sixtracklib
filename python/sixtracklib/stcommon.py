@@ -227,12 +227,84 @@ st_Buffer_delete.restype = None
 
 # Helper Classes
 
-
 def st_Buffer_new_mapped_on_cbuffer(cbuffer):
     data_ptr = ct.POINTER(ct.c_ubyte)
     ptr_data = ct.cast(cbuffer.base, data_ptr)
     size = ct.c_uint64(cbuffer.size)
     return st_Buffer_new_on_data(ptr_data, size)
+
+# ------------------------------------------------------------------------------
+# AssignAddressItem C-API functions
+
+class st_AssignAddressItem(ct.Structure):
+    _fields_ = [("dest_elem_type_id", ct.c_uint64),
+                ("dest_buffer_id", ct.c_uint64),
+                ("dest_elem_index", ct.c_uint64),
+                ("dest_pointer_offset", ct.c_uint64),
+                ("src_elem_type_id", ct.c_uint64),
+                ("src_buffer_id", ct.c_uint64),
+                ("src_elem_index", ct.c_uint64),
+                ("src_pointer_offset", ct.c_uint64)]
+
+st_AssignAddressItem_p = ct.POINTER(st_AssignAddressItem)
+st_NullAssignAddressItem = ct.cast(0, st_AssignAddressItem_p)
+
+st_AssignAddressItem_perform_assignment = \
+    sixtracklib.st_AssignAddressItem_perform_assignment
+st_AssignAddressItem_perform_assignment.argtypes = [
+    st_AssignAddressItem_p, st_Buffer_p, st_Buffer_p ]
+st_AssignAddressItem_perform_assignment.restype = st_arch_status_t
+
+st_AssignAddressItem_assign_fixed_addr = \
+    sixtracklib.st_AssignAddressItem_assign_fixed_addr
+st_AssignAddressItem_assign_fixed_addr.argtypes = [
+    st_AssignAddressItem_p, st_Buffer_p, ct.c_uint64 ]
+st_AssignAddressItem_assign_fixed_addr.restype = st_arch_status_t
+
+st_AssignAddressItem_remap_assignment = \
+    sixtracklib.st_AssignAddressItem_remap_assignment
+st_AssignAddressItem_remap_assignment.argtypes = [
+    st_AssignAddressItem_p, st_Buffer_p, ct.c_int64 ]
+st_AssignAddressItem_remap_assignment.restype = st_arch_status_t
+
+st_AssignAddressItem_dest_pointer_from_buffer = \
+    sixtracklib.st_AssignAddressItem_dest_pointer_from_buffer
+st_AssignAddressItem_dest_pointer_from_buffer.argtypes = [
+    st_AssignAddressItem_p, st_Buffer_p ]
+st_AssignAddressItem_dest_pointer_from_buffer.restype = st_uint64_p
+
+st_AssignAddressItem_src_pointer_addr_from_buffer = \
+    sixtracklib.st_AssignAddressItem_src_pointer_addr_from_buffer
+st_AssignAddressItem_src_pointer_addr_from_buffer.argtypes = [
+    st_AssignAddressItem_p, st_Buffer_p ]
+st_AssignAddressItem_src_pointer_addr_from_buffer.restype = ct.c_uint64
+
+st_AssignAddressItem_from_buffer = \
+    sixtracklib.st_AssignAddressItem_from_buffer
+st_AssignAddressItem_from_buffer.argtypes = [
+    st_AssignAddressItem_p, st_Buffer_p, st_buffer_size_t ]
+st_AssignAddressItem_from_buffer.restype = st_AssignAddressItem_p
+
+st_AssignAddressItem_can_be_added = \
+    sixtracklib.st_AssignAddressItem_can_be_added
+st_AssignAddressItem_can_be_added.restype = ct.c_bool
+st_AssignAddressItem_can_be_added.argtypes = [
+    st_Buffer_p, st_buffer_size_p, st_buffer_size_p, st_buffer_size_p ]
+
+st_AssignAddressItem_new = sixtracklib.st_AssignAddressItem_new
+st_AssignAddressItem_new.argtypes = [ st_Buffer_p ]
+st_AssignAddressItem_new.restype = st_AssignAddressItem_p
+
+st_AssignAddressItem_add = sixtracklib.st_AssignAddressItem_add
+st_AssignAddressItem_add.argtypes = [ st_Buffer_p,
+    ct.c_uint64, st_buffer_size_t, st_buffer_size_t, st_buffer_size_t,
+    ct.c_uint64, st_buffer_size_t, st_buffer_size_t, st_buffer_size_t ]
+st_AssignAddressItem_add.restype = st_AssignAddressItem_p
+
+st_AssignAddressItem_add_copy = sixtracklib.st_AssignAddressItem_add_copy
+st_AssignAddressItem_add_copy.argtypes = [
+    st_Buffer_p, st_AssignAddressItem_p ]
+st_AssignAddressItem_add_copy.restype = st_AssignAddressItem_p
 
 # ------------------------------------------------------------------------------
 # st_Particles C-API functions

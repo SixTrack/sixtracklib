@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import cobjects
-from cobjects import CBuffer
+from cobjects import CBuffer, CObject, CField
 
 import ctypes as ct
 
@@ -24,7 +24,19 @@ from .stcommon import st_Buffer, st_Null, st_NullChar, st_NullUChar, \
     st_Buffer_write_to_file_normalized_addr, st_Buffer_reset, \
     st_Buffer_reset_detailed, st_Buffer_reserve, st_Buffer_reserve_capacity, \
     st_Buffer_needs_remapping, st_Buffer_remap, st_Buffer_refresh, \
-    st_Buffer_clear, st_Buffer_free, st_Buffer_delete
+    st_Buffer_clear, st_Buffer_free, st_Buffer_delete, \
+    st_AssignAddressItem_p, st_NullAssignAddressItem
+
+
+class AssignAddressItem(CObject):
+    dest_elem_type_id = CField(0, 'uint64', default=0, alignment=8)
+    dest_buffer_id = CField(1, 'uint64', default=0, alignment=8)
+    dest_elem_index = CField(2, 'uint64', default=1, alignment=8)
+    dest_pointer_offset = CField(3, 'uint64', default=0, alignment=8)
+    src_elem_type_id = CField(4, 'uint64', default=0, alignment=8)
+    src_buffer_id = CField(5, 'uint64', default=0, alignment=8)
+    src_elem_index = CField(6, 'uint64', default=1, alignment=8)
+    src_pointer_offset = CField(7, 'uint64', default=0, alignment=8)
 
 
 class Buffer(object):
