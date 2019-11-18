@@ -164,7 +164,7 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
     for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_BEAM_MONITORS ; ++ii )
     {
         assign_item_t const* assign_item =
-            ::NS(AssignAddressItem_buffer_get_const_item)( map_buffer, ii );
+            ::NS(AssignAddressItem_const_from_buffer)( map_buffer, ii );
 
         ASSERT_TRUE( assign_item != nullptr );
 
@@ -204,7 +204,7 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
     for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_BEAM_MONITORS ; ++ii )
     {
         assign_item_t const* assign_item =
-            ::NS(AssignAddressItem_buffer_get_const_item)( map_buffer, ii );
+            ::NS(AssignAddressItem_const_from_buffer)( map_buffer, ii );
 
         particle_set_t const* pset = ::NS(Particles_buffer_get_const_particles)(
             output_buffer, out_buffer_indices[ ii ] );
@@ -317,7 +317,7 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, ElemByElemConfigTest )
     /* --------------------------------------------------------------------- */
     /* Perform assignments and remappings for elem-by-elem config on stack */
 
-    assign_item_stack = ::NS(AssignAddressItem_buffer_get_item)( map_buffer, 0 );
+    assign_item_stack = ::NS(AssignAddressItem_from_buffer)( map_buffer, 0 );
     ASSERT_TRUE( assign_item_stack != nullptr );
 
     ASSERT_TRUE( ::NS(AssignAddressItem_dest_buffer_id)(
@@ -347,38 +347,37 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, ElemByElemConfigTest )
     unsigned char* ptr_stack_begin = reinterpret_cast< unsigned char* >(
         reinterpret_cast< uintptr_t >( &config_on_stack ) );
 
-    ASSERT_TRUE( ::NS(AssignAddressItem_managed_buffer_assign_fixed_addr)(
-        assign_item_stack, ptr_stack_begin, buf_size_t{ 0 }, addr_t{ 42 } ) ==
+    ASSERT_TRUE( ::NS(AssignAddressItem_assign_fixed_addr_on_raw_memory)(
+        assign_item_stack, ptr_stack_begin, addr_t{ 42 } ) ==
             ::NS(ARCH_STATUS_SUCCESS) );
 
     ASSERT_TRUE( ::NS(ElemByElemConfig_get_output_store_address)(
         &config_on_stack ) == addr_t{ 42 } );
 
-    ASSERT_TRUE( ::NS(AssignAddressItem_managed_buffer_remap_assignment)(
-        assign_item_stack, ptr_stack_begin, buf_size_t{ 0 },
+    ASSERT_TRUE( ::NS(AssignAddressItem_remap_assignment_on_raw_memory)(
+        assign_item_stack, ptr_stack_begin,
             ::NS(buffer_addr_diff_t){ 214 } ) == ::NS(ARCH_STATUS_SUCCESS) );
 
     ASSERT_TRUE( ::NS(ElemByElemConfig_get_output_store_address)(
         &config_on_stack ) == addr_t{ 256 } );
 
-    ASSERT_TRUE( ::NS(AssignAddressItem_managed_buffer_remap_assignment)(
-        assign_item_stack, ptr_stack_begin, buf_size_t{ 0 },
+    ASSERT_TRUE( ::NS(AssignAddressItem_remap_assignment_on_raw_memory)(
+        assign_item_stack, ptr_stack_begin,
             ::NS(buffer_addr_diff_t){ -214 } ) == ::NS(ARCH_STATUS_SUCCESS) );
 
     ASSERT_TRUE( ::NS(ElemByElemConfig_get_output_store_address)(
         &config_on_stack ) == addr_t{ 42 } );
 
-    ASSERT_TRUE( ::NS(AssignAddressItem_managed_buffer_assign_fixed_addr)(
-        assign_item_stack, ptr_stack_begin, buf_size_t{ 0 }, addr_t{ 0 } ) ==
+    ASSERT_TRUE( ::NS(AssignAddressItem_assign_fixed_addr_on_raw_memory)(
+        assign_item_stack, ptr_stack_begin, addr_t{ 0 } ) ==
             ::NS(ARCH_STATUS_SUCCESS) );
 
     ASSERT_TRUE( ::NS(ElemByElemConfig_get_output_store_address)(
         &config_on_stack ) == addr_t{ 0 } );
 
-    ASSERT_TRUE( ::NS(AssignAddressItem_managed_buffer_perform_assignment)(
-        assign_item_stack, ptr_stack_begin, buf_size_t{ 0 },
-            ::NS(Buffer_get_data_begin)( output_buffer ),
-                ::NS(Buffer_get_slot_size)( output_buffer ) ) ==
+    ASSERT_TRUE( ::NS(AssignAddressItem_assign_fixed_addr_on_raw_memory)(
+        assign_item_stack, ptr_stack_begin,
+                reinterpret_cast< uintptr_t >( output_pset ) ) ==
                     ::NS(ARCH_STATUS_SUCCESS) );
 
     ASSERT_TRUE( ::NS(ElemByElemConfig_get_output_store_address)(
@@ -388,7 +387,7 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, ElemByElemConfigTest )
     /* --------------------------------------------------------------------- */
     /* Perform assignments and remappings for elem-by-elem config in buffer  */
 
-    assign_item_buffer = ::NS(AssignAddressItem_buffer_get_item)(
+    assign_item_buffer = ::NS(AssignAddressItem_from_buffer)(
         map_buffer, 1 );
 
     ASSERT_TRUE( assign_item_buffer != nullptr );
@@ -429,10 +428,9 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, ElemByElemConfigTest )
     addr_t const remapped_fixed_addr = static_cast< addr_t >(
         10 * dest_slot_size );
 
-    ASSERT_TRUE( ::NS(AssignAddressItem_managed_buffer_assign_fixed_addr)(
-        assign_item_buffer, ptr_buffer_begin, dest_slot_size,
-            static_cast< addr_t >( dest_slot_size ) ) ==
-                ::NS(ARCH_STATUS_SUCCESS) );
+    ASSERT_TRUE( ::NS(AssignAddressItem_assign_fixed_addr_on_managed_buffer)(
+        assign_item_buffer, ptr_buffer_begin, dest_slot_size, static_cast< addr_t >(
+            dest_slot_size ) ) == ::NS(ARCH_STATUS_SUCCESS) );
 
     ASSERT_TRUE( ::NS(ElemByElemConfig_get_output_store_address)(
         config_in_buffer ) == static_cast< addr_t >( dest_slot_size ) );
@@ -440,28 +438,28 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, ElemByElemConfigTest )
     ::NS(buffer_addr_diff_t) dist = static_cast< addr_t >(
         9 * dest_slot_size );
 
-    ASSERT_TRUE( ::NS(AssignAddressItem_managed_buffer_remap_assignment)(
+    ASSERT_TRUE( ::NS(AssignAddressItem_remap_assignment_on_managed_buffer)(
         assign_item_buffer, ptr_buffer_begin, dest_slot_size, dist ) ==
             ::NS(ARCH_STATUS_SUCCESS) );
 
     ASSERT_TRUE( ::NS(ElemByElemConfig_get_output_store_address)(
         config_in_buffer ) == remapped_fixed_addr );
 
-    ASSERT_TRUE( ::NS(AssignAddressItem_managed_buffer_remap_assignment)(
+    ASSERT_TRUE( ::NS(AssignAddressItem_remap_assignment_on_managed_buffer)(
         assign_item_buffer, ptr_buffer_begin, dest_slot_size, -dist ) ==
             ::NS(ARCH_STATUS_SUCCESS) );
 
     ASSERT_TRUE( ::NS(ElemByElemConfig_get_output_store_address)(
         config_in_buffer ) == fixed_addr );
 
-    ASSERT_TRUE( ::NS(AssignAddressItem_managed_buffer_assign_fixed_addr)(
+    ASSERT_TRUE( ::NS(AssignAddressItem_assign_fixed_addr_on_managed_buffer)(
         assign_item_buffer, ptr_buffer_begin, dest_slot_size, addr_t{ 0 } ) ==
             ::NS(ARCH_STATUS_SUCCESS) );
 
     ASSERT_TRUE( ::NS(ElemByElemConfig_get_output_store_address)(
         config_in_buffer ) == addr_t{ 0 } );
 
-    ASSERT_TRUE( ::NS(AssignAddressItem_managed_buffer_perform_assignment)(
+    ASSERT_TRUE( ::NS(AssignAddressItem_perform_assignment_on_managed_buffer)(
         assign_item_buffer, ptr_buffer_begin, dest_slot_size,
             ::NS(Buffer_get_data_begin)( output_buffer ),
                 ::NS(Buffer_get_slot_size)( output_buffer ) ) ==
