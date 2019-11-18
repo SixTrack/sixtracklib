@@ -109,11 +109,10 @@ SIXTRL_STATIC SIXTRL_FN void NS(ManagedBuffer_clear)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin,
     bool const set_data_to_zero, NS(buffer_size_t) const slot_size );
 
-/* ========================================================================= */
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+}
+#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
-NS(Buffer_num_slots_for_trivial_object)( NS(buffer_size_t) const
-    obj_handle_size, NS(buffer_size_t) const slot_size );
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(Buffer_set_attr_arrays_for_trivial_object)(
@@ -121,9 +120,9 @@ NS(Buffer_set_attr_arrays_for_trivial_object)(
     NS(buffer_size_t) const max_num_attributes,
     NS(buffer_size_t) const slot_size );
 
-#if !defined( _GPUCODE ) && defined( __cplusplus )
-}
-#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t)
+NS(Buffer_num_slots_for_trivial_object)( NS(buffer_size_t) const
+    obj_handle_size, NS(buffer_size_t) const slot_size );
 
 /* ========================================================================= *
  * ======== INLINE IMPLEMENTATION                                            *
@@ -1099,6 +1098,10 @@ SIXTRL_INLINE void NS(ManagedBuffer_clear)(
     return;
 }
 
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+}
+#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
+
 SIXTRL_INLINE NS(buffer_size_t) NS(Buffer_num_slots_for_trivial_object)(
     NS(buffer_size_t) const obj_handle_size, NS(buffer_size_t) const slot_size )
 {
@@ -1137,10 +1140,6 @@ SIXTRL_INLINE NS(arch_status_t) NS(Buffer_set_attr_arrays_for_trivial_object)(
 
     return SIXTRL_ARCH_STATUS_SUCCESS;
 }
-
-#if !defined( _GPUCODE ) && defined( __cplusplus )
-}
-#endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
 #endif /* SIXTRL_COMMON_BUFFER_BUFFER_MEM_H__ */
 
