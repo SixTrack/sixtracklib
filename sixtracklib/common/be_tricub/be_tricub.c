@@ -340,15 +340,15 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_new)(
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(be_tricub_real_t) const x, NS(be_tricub_real_t) const y,
-    NS(be_tricub_real_t) const z, NS(be_tricub_real_t) const length,
+    NS(be_tricub_real_t) const x_shift, NS(be_tricub_real_t) const y_shift,
+    NS(be_tricub_real_t) const zeta_shift, NS(be_tricub_real_t) const length,
     NS(buffer_addr_t) const data_addr )
 {
     NS(TriCub) tricub;
     NS(TriCub_preset)( &tricub );
-    NS(TriCub_set_x)( &tricub, x );
-    NS(TriCub_set_y)( &tricub, y );
-    NS(TriCub_set_z)( &tricub, z );
+    NS(TriCub_set_x_shift)( &tricub, x_shift );
+    NS(TriCub_set_y_shift)( &tricub, y_shift );
+    NS(TriCub_set_zeta_shift)( &tricub, zeta_shift );
     NS(TriCub_set_length)( &tricub, length );
     NS(TriCub_set_data_addr)( &tricub, data_addr );
 

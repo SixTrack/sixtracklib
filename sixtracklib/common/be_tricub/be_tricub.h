@@ -267,9 +267,9 @@ SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(TriCubData_copy)(
 
 typedef struct NS(TriCub)
 {
-    NS(be_tricub_real_t)    x               SIXTRL_ALIGN( 8 );
-    NS(be_tricub_real_t)    y               SIXTRL_ALIGN( 8 );
-    NS(be_tricub_real_t)    z               SIXTRL_ALIGN( 8 );
+    NS(be_tricub_real_t)    x_shift         SIXTRL_ALIGN( 8 );
+    NS(be_tricub_real_t)    y_shift         SIXTRL_ALIGN( 8 );
+    NS(be_tricub_real_t)    zeta_shift      SIXTRL_ALIGN( 8 );
     NS(be_tricub_real_t)    length          SIXTRL_ALIGN( 8 );
     NS(buffer_addr_t)       data_addr       SIXTRL_ALIGN( 8 );
 }
@@ -283,13 +283,13 @@ SIXTRL_STATIC SIXTRL_FN void NS(TriCub_clear)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_FN NS(be_tricub_real_t) NS(TriCub_x)(
+SIXTRL_STATIC SIXTRL_FN NS(be_tricub_real_t) NS(TriCub_x_shift)(
     SIXTRL_BE_ARGPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub );
 
-SIXTRL_STATIC SIXTRL_FN NS(be_tricub_real_t) NS(TriCub_y)(
+SIXTRL_STATIC SIXTRL_FN NS(be_tricub_real_t) NS(TriCub_y_shift)(
     SIXTRL_BE_ARGPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub );
 
-SIXTRL_STATIC SIXTRL_FN NS(be_tricub_real_t) NS(TriCub_z)(
+SIXTRL_STATIC SIXTRL_FN NS(be_tricub_real_t) NS(TriCub_zeta_shift)(
     SIXTRL_BE_ARGPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub );
 
 SIXTRL_STATIC SIXTRL_FN NS(be_tricub_real_t) NS(TriCub_length)(
@@ -308,17 +308,17 @@ NS(TriCub_data)( SIXTRL_BE_ARGPTR_DEC NS(TriCub)* SIXTRL_RESTRICT tricub );
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_FN void NS(TriCub_set_x)(
+SIXTRL_STATIC SIXTRL_FN void NS(TriCub_set_x_shift)(
     SIXTRL_BE_ARGPTR_DEC NS(TriCub)* SIXTRL_RESTRICT tricub,
-    NS(be_tricub_real_t) const x );
+    NS(be_tricub_real_t) const x_shift );
 
-SIXTRL_STATIC SIXTRL_FN void NS(TriCub_set_y)(
+SIXTRL_STATIC SIXTRL_FN void NS(TriCub_set_y_shift)(
     SIXTRL_BE_ARGPTR_DEC NS(TriCub)* SIXTRL_RESTRICT tricub,
-    NS(be_tricub_real_t) const y );
+    NS(be_tricub_real_t) const y_shift );
 
-SIXTRL_STATIC SIXTRL_FN void NS(TriCub_set_z)(
+SIXTRL_STATIC SIXTRL_FN void NS(TriCub_set_zeta_shift)(
     SIXTRL_BE_ARGPTR_DEC NS(TriCub)* SIXTRL_RESTRICT tricub,
-    NS(be_tricub_real_t) const z );
+    NS(be_tricub_real_t) const zeta_shift );
 
 SIXTRL_STATIC SIXTRL_FN void NS(TriCub_set_length)(
     SIXTRL_BE_ARGPTR_DEC NS(TriCub)* SIXTRL_RESTRICT tricub,
@@ -401,8 +401,8 @@ NS(TriCub_new)( SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)*
 NS(TriCub_add)( SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(be_tricub_real_t) const x, NS(be_tricub_real_t) const y,
-    NS(be_tricub_real_t) const z, NS(be_tricub_real_t) const length,
+    NS(be_tricub_real_t) const x_shift, NS(be_tricub_real_t) const y_shift,
+    NS(be_tricub_real_t) const zeta_shift, NS(be_tricub_real_t) const length,
     NS(buffer_addr_t) const data_addr );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)*
@@ -902,34 +902,34 @@ SIXTRL_INLINE void NS(TriCub_clear)(
 {
     if( tricub != SIXTRL_NULLPTR )
     {
-        NS(TriCub_set_x)( tricub, ( NS(be_tricub_real_t) )0.0 );
-        NS(TriCub_set_y)( tricub, ( NS(be_tricub_real_t) )0.0 );
-        NS(TriCub_set_z)( tricub, ( NS(be_tricub_real_t) )0.0 );
+        NS(TriCub_set_x_shift)( tricub, ( NS(be_tricub_real_t) )0.0 );
+        NS(TriCub_set_y_shift)( tricub, ( NS(be_tricub_real_t) )0.0 );
+        NS(TriCub_set_zeta_shift)( tricub, ( NS(be_tricub_real_t) )0.0 );
         NS(TriCub_set_length)( tricub, ( NS(be_tricub_real_t) )0.0 );
     }
 }
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE NS(be_tricub_real_t) NS(TriCub_x)(
+SIXTRL_INLINE NS(be_tricub_real_t) NS(TriCub_x_shift)(
     SIXTRL_BE_ARGPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub )
 {
     SIXTRL_ASSERT( tricub != SIXTRL_NULLPTR );
-    return tricub->x;
+    return tricub->x_shift;
 }
 
-SIXTRL_INLINE NS(be_tricub_real_t) NS(TriCub_y)(
+SIXTRL_INLINE NS(be_tricub_real_t) NS(TriCub_y_shift)(
     SIXTRL_BE_ARGPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub )
 {
     SIXTRL_ASSERT( tricub != SIXTRL_NULLPTR );
-    return tricub->y;
+    return tricub->y_shift;
 }
 
-SIXTRL_INLINE NS(be_tricub_real_t) NS(TriCub_z)(
+SIXTRL_INLINE NS(be_tricub_real_t) NS(TriCub_zeta_shift)(
     SIXTRL_BE_ARGPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub )
 {
     SIXTRL_ASSERT( tricub != SIXTRL_NULLPTR );
-    return tricub->z;
+    return tricub->zeta_shift;
 }
 
 SIXTRL_INLINE NS(be_tricub_real_t) NS(TriCub_length)(
