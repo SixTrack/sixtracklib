@@ -248,13 +248,13 @@ SIXTRL_INLINE void NS(tricub_construct_b_vector)(
     SIXTRL_ARGPTR_DEC NS(be_tricub_real_t)* SIXTRL_RESTRICT b_vector)
 {
 
-    SIXTRL_BUFFER_DATAPTR_DEC real_t const* lookup_table_begin =
+    SIXTRL_BUFFER_DATAPTR_DEC NS(be_tricub_real_t) const* lookup_table_begin =
         NS(TriCubData_const_table_begin)( tricub_data );
 
-    int_t const lookup_table_size = NS(TriCubData_table_size)( tricub_data );
-    int_t const nx = NS(TriCubData_nx)( tricub_data );
-    int_t const ny = NS(TriCubData_ny)( tricub_data );
-    int_t const nz = NS(TriCubData_nz)( tricub_data );
+    NS(be_tricub_int_t) const lookup_table_size = NS(TriCubData_table_size)( tricub_data );
+    NS(be_tricub_int_t) const nx = NS(TriCubData_nx)( tricub_data );
+    NS(be_tricub_int_t) const ny = NS(TriCubData_ny)( tricub_data );
+    NS(be_tricub_int_t) const nz = NS(TriCubData_nz)( tricub_data );
 
     for(int l = 0; l < 8; l++)
     {
