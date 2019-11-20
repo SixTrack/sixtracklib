@@ -682,6 +682,16 @@ def _get_buffer(obj):
         raise ValueError("Object {obj} is not or has not a CBuffer")
 
 
+from .stcommon import \
+    st_ClArgument_p, st_NullClArgument, \
+    st_ClArgument_new_from_buffer, st_ClArgument_write, st_ClArgument_delete, \
+    st_ClContextBase_add_program_file, st_ClContextBase_compile_program, \
+    st_ClContextBase_enable_kernel, st_ClContextBase_find_kernel_id_by_name, \
+    st_ClContext_assign_addresses, st_ClContextBase_assign_kernel_argument, \
+    st_ClContextBase_assign_kernel_argument_value, \
+    st_TrackJobCl_p, st_NullTrackJob, st_TrackJobCl_get_context, \
+    st_AssignAddressItem_assign_all
+
 class TrackJob(object):
     @staticmethod
     def enabled_archs():
@@ -972,6 +982,95 @@ class TrackJob(object):
     def has_output_buffer(self):
         return st.st_TrackJob_has_output_buffer(self.ptr_st_track_job) and \
             bool(self._output_buffer is not None)
+
+    @property
+    def allows_add_program(self):
+        return self.arch_str() == 'opencl'
+
+    @property
+    def allows_enable_kernel(self):
+        return self.arch_str() == 'opencl'
+
+    @property
+    def controller(self):
+        if self.arch_str != 'opencl':
+            raise RuntimeError("TrackJob has no controller for this architecture" )
+        if self._ptr_track_job == st_NullTrackJob:
+            raise RuntimeError("TrackJob is not initialized yet")
+        return st_TrackJobCl_get_context( self._ptr_track_job )
+
+    def add_program(self, path_to_program_file, compile_options):
+        if not self.allows_add_program:
+            raise RuntimeError("Can not add a program to this TrackJob")
+        path_to_program_file = path_to_program_file.strip()
+        path_to_program_file.encode( 'utf-8')
+        compile_options = compile_options.strip()
+        compile_options.encode('utf-8')
+
+        _controller = st_TrackJobCl_get_context(self._ptr_track_job)
+        program_id = st_ClContextBase_add_program_file( _controller,
+            ct.c_char_p(path_to_program_file), ct.c_char_p(compile_options))
+
+        if program_id == 0xffffffff:
+            raise RuntimeError("Unable to load program")
+
+        success = st_ClContextBase_compile_program(
+                _controller, ct.c_uint32(program_id))
+
+        if not success:
+            raise RuntimeError("Unable to compile program")
+
+        return program_id
+
+    def enable_kernel(self, program_id, kernel_name):
+        if not self.allows_enable_kernel:
+            raise RuntimeError("Can not enable a kernel at this TrackJob")
+        kernel_name = kernel_name.strip()
+        kernel_name.encode( 'utf-8')
+
+        _controller = st_TrackJobCl_get_context(self._ptr_track_job)
+        kernel_id = st_ClContextBase_enable_kernel( _controller,
+            ct.c_char_p(kernel_name), program_id)
+
+        if kernel_id == 0xffffffff:
+            raise RuntimeError("Unable to enable kernel")
+
+        return kernel_id
+
+    def assign_addresses(self, assignment_buffer, dest_buffer, source_buffer):
+        _assign_buffer = st.st_Buffer_new_mapped_on_cbuffer( assignment_buffer )
+        _dest_buffer   = st.st_Buffer_new_mapped_on_cbuffer( dest_buffer )
+        _src_buffer    = st.st_Buffer_new_mapped_on_cbuffer( src_buffer )
+
+        if self.arch_str == 'opencl':
+            _controller = st_TrackJobCl_get_context(self._ptr_track_job)
+            _assign_arg = st_ClArgument_new_from_buffer( _controller, _assign_buffer)
+            _dest_arg = st_ClArgument_new_from_buffer( _controller, _dest_buffer )
+            _src_arg = st_ClArgument_new_from_buffer( _controller, _src_buffer)
+
+            success = st_ClContext_assign_addresses( _controller,
+                    _assign_arg, _dest_arg, _src_arg )
+
+            st_ClArgument_delete( _assign_arg )
+            st_ClArgument_delete( _dest_arg )
+            st_ClArgument_delete( _src_arg )
+
+        elif self.arch_str == 'cpu':
+            success = st_AssignAddressItem_assign_all(
+                _assign_buffer, _dest_buffer, _src_buffer )
+
+        if _assign_buffer != st_NullBuffer:
+            st.st_Buffer_delete( _assign_buffer )
+
+        if _dest_buffer != st_NullBuffer:
+            st.st_Buffer_delete( _dest_buffer )
+
+        if _src_buffer != st_NullBuffer:
+            st.st_Buffer_delete( _src_buffer )
+
+        self._last_status = raise_error_if_status_not_success(
+            success, "Unable to assign addresses" )
+
 
     def reset(self, beam_elements_buffer, particles_buffer,
               until_turn_elem_by_elem=0, output_buffer=None):

@@ -306,6 +306,18 @@ st_AssignAddressItem_add_copy.argtypes = [
     st_Buffer_p, st_AssignAddressItem_p ]
 st_AssignAddressItem_add_copy.restype = st_AssignAddressItem_p
 
+st_AssignAddressItem_assign_all_managed_buffer = \
+    sixtracklib.st_AssignAddressItem_assign_all_managed_buffer
+st_AssignAddressItem_assign_all_managed_buffer.argtypes = [
+    ct.c_char_p, st_buffer_size_t, ct.c_char_p, st_buffer_size_t,
+    ct.c_char_p, st_buffer_size_t ]
+st_AssignAddressItem_assign_all_managed_buffer.restype = st_arch_status_t
+
+st_AssignAddressItem_assign_all = sixtracklib.st_AssignAddressItem_assign_all
+st_AssignAddressItem_assign_all.argtypes = [
+    st_Buffer_p, st_Buffer_p, st_Buffer_p ]
+st_AssignAddressItem_assign_all.restype = st_arch_status_t
+
 # ------------------------------------------------------------------------------
 # st_Particles C-API functions
 
@@ -3264,6 +3276,28 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContextBase_assign_kernel_argument_value.argtypes = [
         st_Context_p, ct.c_uint32, st_arch_size_t, ct.c_void_p,
         st_arch_size_t ]
+
+    st_ClContext_has_assign_addresses_kernel = \
+        sixtracklib.st_ClContext_has_assign_addresses_kernel
+    st_ClContext_has_assign_addresses_kernel.argtypes = [ st_Context_p ]
+    st_ClContext_has_assign_addresses_kernel.restype = ct.c_bool
+
+    st_ClContext_assign_addresses_kernel_id = \
+        sixtracklib.st_ClContext_assign_addresses_kernel_id
+    st_ClContext_assign_addresses_kernel_id.argtypes = [ st_Context_p ]
+    st_ClContext_assign_addresses_kernel_id.restype = ct.c_uint32
+
+    st_ClContext_set_assign_addresses_kernel_id = \
+        sixtracklib.st_ClContext_set_assign_addresses_kernel_id
+    st_ClContext_set_assign_addresses_kernel_id.argtypes = [
+        st_Context_p, ct.c_uint32 ]
+    st_ClContext_set_assign_addresses_kernel_id.restype = st_arch_status_t
+
+    st_ClContext_assign_addresses = sixtracklib.st_ClContext_assign_addresses
+    st_ClContext_assign_addresses.argtypes = [
+        st_Context_p, st_Buffer_p, st_Buffer_p, st_Buffer_p ]
+    st_ClContext_assign_addresses.restype = st_arch_status_t
+
 
     st_TrackJobCl_p = ct.c_void_p
     st_NullTrackJobCl = ct.cast(0, st_TrackJobCl_p)
