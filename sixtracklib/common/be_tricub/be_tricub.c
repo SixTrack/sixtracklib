@@ -210,7 +210,7 @@ NS(TriCubData_add)(
     NS(be_tricub_int_t)  const ny,
     NS(be_tricub_real_t) const z0, NS(be_tricub_real_t) const dz,
     NS(be_tricub_int_t)  const nz,
-    NS(be_tricub_real_t) const sign_x, NS(be_tricub_real_t) const sign_y,
+    NS(be_tricub_int_t)  const method,
     NS(buffer_addr_t) const table_addr )
 {
     typedef NS(buffer_size_t) buf_size_t;
@@ -240,8 +240,7 @@ NS(TriCubData_add)(
     NS(TriCubData_set_dz)( &tricub_data, dz );
     NS(TriCubData_set_nz)( &tricub_data, nz );
 
-    NS(TriCubData_set_sign_x)( &tricub_data, sign_x );
-    NS(TriCubData_set_sign_y)( &tricub_data, sign_y );
+    NS(TriCubData_set_method)( &tricub_data, method );
 
     NS(TriCubData_set_table_addr)( &tricub_data, table_addr );
 
@@ -281,8 +280,8 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* NS(TriCubData_add_copy)(
         NS(TriCubData_nx)( data ), NS(TriCubData_y0)( data ),
         NS(TriCubData_dy)( data ), NS(TriCubData_ny)( data ),
         NS(TriCubData_z0)( data ), NS(TriCubData_dz)( data ),
-        NS(TriCubData_nz)( data ), NS(TriCubData_sign_x)( data ),
-        NS(TriCubData_sign_y)( data ), NS(TriCubData_table_addr)( data ) );
+        NS(TriCubData_nz)( data ), NS(TriCubData_method)( data ),
+        NS(TriCubData_table_addr)( data ) );
 }
 
 /* ========================================================================= */

@@ -44,8 +44,7 @@ typedef struct NS(TriCubData)
     NS(be_tricub_real_t)    dz              SIXTRL_ALIGN( 8 );
     NS(be_tricub_int_t)     nz              SIXTRL_ALIGN( 8 );
 
-    NS(be_tricub_real_t)    sign_x          SIXTRL_ALIGN( 8 );
-    NS(be_tricub_real_t)    sign_y          SIXTRL_ALIGN( 8 );
+    NS(be_tricub_int_t)     method          SIXTRL_ALIGN( 8 );
 
     NS(buffer_addr_t)       table_addr      SIXTRL_ALIGN( 8 );
 }
@@ -87,10 +86,7 @@ SIXTRL_STATIC SIXTRL_FN NS(be_tricub_real_t) NS(TriCubData_dz)(
 SIXTRL_STATIC SIXTRL_FN NS(be_tricub_int_t) NS(TriCubData_nz)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data );
 
-SIXTRL_STATIC SIXTRL_FN NS(be_tricub_real_t) NS(TriCubData_sign_x)(
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data );
-
-SIXTRL_STATIC SIXTRL_FN NS(be_tricub_real_t) NS(TriCubData_sign_y)(
+SIXTRL_STATIC SIXTRL_FN NS(be_tricub_int_t) NS(TriCubData_method)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data );
 
 SIXTRL_STATIC SIXTRL_FN NS(be_tricub_int_t) NS(TriCubData_table_size)(
@@ -145,13 +141,9 @@ SIXTRL_STATIC SIXTRL_FN void NS(TriCubData_set_nz)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
     NS(be_tricub_int_t)  const nz );
 
-SIXTRL_STATIC SIXTRL_FN void NS(TriCubData_set_sign_x)(
+SIXTRL_STATIC SIXTRL_FN void NS(TriCubData_set_method)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
-    NS(be_tricub_real_t) const sign_x );
-
-SIXTRL_STATIC SIXTRL_FN void NS(TriCubData_set_sign_y)(
-    SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
-    NS(be_tricub_real_t) const sign_y );
+    NS(be_tricub_int_t) const method );
 
 SIXTRL_STATIC SIXTRL_FN void NS(TriCubData_set_table_addr)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
@@ -472,8 +464,7 @@ SIXTRL_INLINE void NS(TriCubData_clear)(
         NS(TriCubData_set_z0)( data, ( NS(be_tricub_real_t) )0.0 );
         NS(TriCubData_set_dz)( data, ( NS(be_tricub_real_t) )0.0 );
 
-        NS(TriCubData_set_sign_x)( data, ( NS(be_tricub_real_t) )0.0 );
-        NS(TriCubData_set_sign_y)( data, ( NS(be_tricub_real_t) )0.0 );
+        NS(TriCubData_set_method)( data, ( NS(be_tricub_int_t) )0 );
 
         if( ( NS(TriCubData_table_size)( data ) > ( NS(be_tricub_int_t) )0u ) &&
             ( NS(TriCubData_table_addr)( data ) != ( NS(buffer_addr_t) )0u ) )
@@ -562,18 +553,11 @@ SIXTRL_INLINE NS(be_tricub_int_t) NS(TriCubData_nz)(
     return data->nz;
 }
 
-SIXTRL_INLINE NS(be_tricub_real_t) NS(TriCubData_sign_x)(
+SIXTRL_INLINE NS(be_tricub_int_t) NS(TriCubData_method)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data )
 {
     SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
-    return data->sign_x;
-}
-
-SIXTRL_INLINE NS(be_tricub_real_t) NS(TriCubData_sign_y)(
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data )
-{
-    SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
-    return data->sign_y;
+    return data->method;
 }
 
 SIXTRL_INLINE NS(be_tricub_int_t) NS(TriCubData_table_size)(
@@ -681,18 +665,11 @@ SIXTRL_INLINE void NS(TriCubData_set_nz)(
     if( data != SIXTRL_NULLPTR ) data->nz = nz;
 }
 
-SIXTRL_INLINE void NS(TriCubData_set_sign_x)(
+SIXTRL_INLINE void NS(TriCubData_set_method)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
-     NS(be_tricub_real_t) const sign_x )
+     NS(be_tricub_int_t) const method )
 {
-    if( data != SIXTRL_NULLPTR ) data->sign_x = sign_x;
-}
-
-SIXTRL_INLINE void NS(TriCubData_set_sign_y)(
-    SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
-     NS(be_tricub_real_t) const sign_y )
-{
-    if( data != SIXTRL_NULLPTR ) data->sign_y = sign_y;
+    if( data != SIXTRL_NULLPTR ) data->method = method;
 }
 
 SIXTRL_INLINE void NS(TriCubData_set_table_addr)(
@@ -846,8 +823,7 @@ SIXTRL_INLINE NS(arch_status_t) NS(TriCubData_copy)(
             NS(TriCubData_set_dz)( dest, NS(TriCubData_dz)( src ) );
             NS(TriCubData_set_nz)( dest, NS(TriCubData_nz)( src ) );
 
-            NS(TriCubData_set_sign_x)( dest, NS(TriCubData_sign_x)( src ) );
-            NS(TriCubData_set_sign_y)( dest, NS(TriCubData_sign_y)( src ) );
+            NS(TriCubData_set_method)( dest, NS(TriCubData_method)( src ) );
         }
     }
     else if( ( dest == src ) && ( dest != SIXTRL_NULLPTR ) )
