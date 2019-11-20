@@ -44,7 +44,9 @@ typedef struct NS(TriCubData)
     NS(be_tricub_real_t)    dz              SIXTRL_ALIGN( 8 );
     NS(be_tricub_int_t)     nz              SIXTRL_ALIGN( 8 );
 
-    NS(be_tricub_int_t)     method          SIXTRL_ALIGN( 8 );
+    NS(be_tricub_int_t)     mirror_x        SIXTRL_ALIGN( 8 );
+    NS(be_tricub_int_t)     mirror_y        SIXTRL_ALIGN( 8 );
+    NS(be_tricub_int_t)     mirror_z        SIXTRL_ALIGN( 8 );
 
     NS(buffer_addr_t)       table_addr      SIXTRL_ALIGN( 8 );
 }
@@ -86,7 +88,13 @@ SIXTRL_STATIC SIXTRL_FN NS(be_tricub_real_t) NS(TriCubData_dz)(
 SIXTRL_STATIC SIXTRL_FN NS(be_tricub_int_t) NS(TriCubData_nz)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data );
 
-SIXTRL_STATIC SIXTRL_FN NS(be_tricub_int_t) NS(TriCubData_method)(
+SIXTRL_STATIC SIXTRL_FN NS(be_tricub_int_t) NS(TriCubData_mirror_x)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data );
+
+SIXTRL_STATIC SIXTRL_FN NS(be_tricub_int_t) NS(TriCubData_mirror_y)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data );
+
+SIXTRL_STATIC SIXTRL_FN NS(be_tricub_int_t) NS(TriCubData_mirror_z)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data );
 
 SIXTRL_STATIC SIXTRL_FN NS(be_tricub_int_t) NS(TriCubData_table_size)(
@@ -141,9 +149,17 @@ SIXTRL_STATIC SIXTRL_FN void NS(TriCubData_set_nz)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
     NS(be_tricub_int_t)  const nz );
 
-SIXTRL_STATIC SIXTRL_FN void NS(TriCubData_set_method)(
+SIXTRL_STATIC SIXTRL_FN void NS(TriCubData_set_mirror_x)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
-    NS(be_tricub_int_t) const method );
+    NS(be_tricub_int_t) const mirror_x );
+
+SIXTRL_STATIC SIXTRL_FN void NS(TriCubData_set_mirror_y)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
+    NS(be_tricub_int_t) const mirror_y );
+
+SIXTRL_STATIC SIXTRL_FN void NS(TriCubData_set_mirror_z)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
+    NS(be_tricub_int_t) const mirror_z );
 
 SIXTRL_STATIC SIXTRL_FN void NS(TriCubData_set_table_addr)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
@@ -464,7 +480,9 @@ SIXTRL_INLINE void NS(TriCubData_clear)(
         NS(TriCubData_set_z0)( data, ( NS(be_tricub_real_t) )0.0 );
         NS(TriCubData_set_dz)( data, ( NS(be_tricub_real_t) )0.0 );
 
-        NS(TriCubData_set_method)( data, ( NS(be_tricub_int_t) )0 );
+        NS(TriCubData_set_mirror_x)( data, ( NS(be_tricub_int_t) )0 );
+        NS(TriCubData_set_mirror_y)( data, ( NS(be_tricub_int_t) )0 );
+        NS(TriCubData_set_mirror_z)( data, ( NS(be_tricub_int_t) )0 );
 
         if( ( NS(TriCubData_table_size)( data ) > ( NS(be_tricub_int_t) )0u ) &&
             ( NS(TriCubData_table_addr)( data ) != ( NS(buffer_addr_t) )0u ) )
@@ -553,11 +571,25 @@ SIXTRL_INLINE NS(be_tricub_int_t) NS(TriCubData_nz)(
     return data->nz;
 }
 
-SIXTRL_INLINE NS(be_tricub_int_t) NS(TriCubData_method)(
+SIXTRL_INLINE NS(be_tricub_int_t) NS(TriCubData_mirror_x)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data )
 {
     SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
-    return data->method;
+    return data->mirror_x;
+}
+
+SIXTRL_INLINE NS(be_tricub_int_t) NS(TriCubData_mirror_y)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data )
+{
+    SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
+    return data->mirror_y;
+}
+
+SIXTRL_INLINE NS(be_tricub_int_t) NS(TriCubData_mirror_z)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data )
+{
+    SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
+    return data->mirror_z;
 }
 
 SIXTRL_INLINE NS(be_tricub_int_t) NS(TriCubData_table_size)(
@@ -665,11 +697,25 @@ SIXTRL_INLINE void NS(TriCubData_set_nz)(
     if( data != SIXTRL_NULLPTR ) data->nz = nz;
 }
 
-SIXTRL_INLINE void NS(TriCubData_set_method)(
+SIXTRL_INLINE void NS(TriCubData_set_mirror_x)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
-     NS(be_tricub_int_t) const method )
+     NS(be_tricub_int_t) const mirror_x )
 {
-    if( data != SIXTRL_NULLPTR ) data->method = method;
+    if( data != SIXTRL_NULLPTR ) data->mirror_x = mirror_x;
+}
+
+SIXTRL_INLINE void NS(TriCubData_set_mirror_y)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
+     NS(be_tricub_int_t) const mirror_y )
+{
+    if( data != SIXTRL_NULLPTR ) data->mirror_y = mirror_y;
+}
+
+SIXTRL_INLINE void NS(TriCubData_set_mirror_z)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* SIXTRL_RESTRICT data,
+     NS(be_tricub_int_t) const mirror_z )
+{
+    if( data != SIXTRL_NULLPTR ) data->mirror_z = mirror_z;
 }
 
 SIXTRL_INLINE void NS(TriCubData_set_table_addr)(
@@ -823,7 +869,9 @@ SIXTRL_INLINE NS(arch_status_t) NS(TriCubData_copy)(
             NS(TriCubData_set_dz)( dest, NS(TriCubData_dz)( src ) );
             NS(TriCubData_set_nz)( dest, NS(TriCubData_nz)( src ) );
 
-            NS(TriCubData_set_method)( dest, NS(TriCubData_method)( src ) );
+            NS(TriCubData_set_mirror_x)( dest, NS(TriCubData_mirror_x)( src ) );
+            NS(TriCubData_set_mirror_y)( dest, NS(TriCubData_mirror_y)( src ) );
+            NS(TriCubData_set_mirror_z)( dest, NS(TriCubData_mirror_z)( src ) );
         }
     }
     else if( ( dest == src ) && ( dest != SIXTRL_NULLPTR ) )
