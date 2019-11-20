@@ -258,14 +258,14 @@ SIXTRL_INLINE void NS(tricub_construct_b_vector)(
 
     for(int l = 0; l < 8; l++)
     {
-        b_vector[8 * l    ] = lookup_table_size[ (ix  ) + ny * ( (iy  ) + nz * ( (iz  ) + 8 * l) ) ]
-        b_vector[8 * l + 1] = lookup_table_size[ (ix+1) + ny * ( (iy  ) + nz * ( (iz  ) + 8 * l) ) ]
-        b_vector[8 * l + 2] = lookup_table_size[ (ix  ) + ny * ( (iy+1) + nz * ( (iz  ) + 8 * l) ) ]
-        b_vector[8 * l + 3] = lookup_table_size[ (ix+1) + ny * ( (iy+1) + nz * ( (iz  ) + 8 * l) ) ]
-        b_vector[8 * l + 4] = lookup_table_size[ (ix  ) + ny * ( (iy  ) + nz * ( (iz+1) + 8 * l) ) ]
-        b_vector[8 * l + 5] = lookup_table_size[ (ix+1) + ny * ( (iy  ) + nz * ( (iz+1) + 8 * l) ) ]
-        b_vector[8 * l + 6] = lookup_table_size[ (ix  ) + ny * ( (iy+1) + nz * ( (iz+1) + 8 * l) ) ]
-        b_vector[8 * l + 7] = lookup_table_size[ (ix+1) + ny * ( (iy+1) + nz * ( (iz+1) + 8 * l) ) ]
+        b_vector[8 * l    ] = lookup_table_size[ (ix  ) + nx * ( (iy  ) + ny * ( (iz  ) + nz * l) ) ]
+        b_vector[8 * l + 1] = lookup_table_size[ (ix+1) + nx * ( (iy  ) + ny * ( (iz  ) + nz * l) ) ]
+        b_vector[8 * l + 2] = lookup_table_size[ (ix  ) + nx * ( (iy+1) + ny * ( (iz  ) + nz * l) ) ]
+        b_vector[8 * l + 3] = lookup_table_size[ (ix+1) + nx * ( (iy+1) + ny * ( (iz  ) + nz * l) ) ]
+        b_vector[8 * l + 4] = lookup_table_size[ (ix  ) + nx * ( (iy  ) + ny * ( (iz+1) + nz * l) ) ]
+        b_vector[8 * l + 5] = lookup_table_size[ (ix+1) + nx * ( (iy  ) + ny * ( (iz+1) + nz * l) ) ]
+        b_vector[8 * l + 6] = lookup_table_size[ (ix  ) + nx * ( (iy+1) + ny * ( (iz+1) + nz * l) ) ]
+        b_vector[8 * l + 7] = lookup_table_size[ (ix+1) + nx * ( (iy+1) + ny * ( (iz+1) + nz * l) ) ]
     }
 
     return;
