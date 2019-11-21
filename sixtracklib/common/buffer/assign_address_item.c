@@ -20,8 +20,8 @@
 
 NS(arch_status_t) NS(AssignAddressItem_next_buffer_id)( void )
 {
-    static NS(arch_status_t) next_buffer_id =
-        NS(ARCH_MIN_USER_DEFINED_BUFFER_ID);
+    static NS(arch_size_t) next_buffer_id =
+        ( NS(arch_size_t) )SIXTRL_ARCH_MIN_USER_DEFINED_BUFFER_ID;
 
     return ( next_buffer_id < NS(ARCH_MAX_USER_DEFINED_BUFFER_ID) )
         ? next_buffer_id++ : NS(ARCH_ILLEGAL_BUFFER_ID);

@@ -5,6 +5,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -375,9 +376,29 @@ SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_dest_src_are_not_equal)(
 
 #endif /* defined( _GPUCODE ) */
 
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(AssignAddressItem_copy)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* SIXTRL_RESTRICT dest,
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(AssignAddressItem)
+        *const SIXTRL_RESTRICT source );
+
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+
+#if defined( __cplusplus )
+
+namespace SIXTRL_CXX_NAMESPACE
+{
+    template<> struct ObjectTypeTraits< ::NS(AssignAddressItem) >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_ASSIGN_ADDRESS_ITEM);
+        }
+    };
+}
+
+#endif /* defined( __cplusplus ) */
 
 /* ************************************************************************* */
 /* *****          Implementation of C inline functions                   *** */
@@ -963,7 +984,8 @@ NS(AssignAddressItem_src_pointer_addr_from_managed_buffer)(
     return address;
 }
 
-NS(buffer_addr_t) NS(AssignAddressItem_src_pointer_addr_from_raw_memory)(
+SIXTRL_INLINE NS(buffer_addr_t)
+NS(AssignAddressItem_src_pointer_addr_from_raw_memory)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(AssignAddressItem)
         *const SIXTRL_RESTRICT item,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const*

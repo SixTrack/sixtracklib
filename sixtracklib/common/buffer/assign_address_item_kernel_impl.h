@@ -42,7 +42,7 @@ NS(AssignAddressItem_assign_all_managed_buffer_kernel_impl)(
     NS(buffer_size_t) idx = start_item_idx;
     NS(arch_status_t) status = SIXTRL_ARCH_STATUS_SUCCESS;
 
-    SIXTRL_ASSERT( assign_item_buffer != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( assign_buffer != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( assign_slot_size > ( NS(buffer_size_t) )0u );
     SIXTRL_ASSERT( item_idx_stride  > ( NS(buffer_size_t) )0u );
 
