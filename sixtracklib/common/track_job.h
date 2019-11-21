@@ -532,31 +532,47 @@ NS(TrackJob_perform_managed_assignments_detailed)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_managed_buffers)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_ext_stored_buffers)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TrackJob_num_managed_buffers)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJob_num_ext_stored_buffers)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TrackJob_min_managed_buffer_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJob_min_ext_stored_buffer_id)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TrackJob_max_managed_buffer_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJob_max_ext_stored_buffer_id)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TrackJob_add_managed_buffer)(
-    NS(TrackJobBase)* SIXTRL_RESTRICT job );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJob_create_ext_stored_buffer)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const buffer_capacity );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJob_add_ext_stored_buffer)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(Buffer)* SIXTRL_RESTRICT buffer, bool const take_ownership,
+    bool const delete_ptr_after_move );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_owns_ext_stored_buffer)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(arch_size_t) const buffer_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(TrackJob_remove_managed_buffer)(
-    NS(TrackJobBase)* SIXTRL_RESTRICT job, NS(arch_size_t) const buffer_index );
+NS(TrackJob_remove_ext_stored_buffer)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(arch_size_t) const buffer_index );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)* NS(TrackJob_managed_cbuffer)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)* NS(TrackJob_ext_stored_buffer)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job,
     NS(arch_size_t) const buffer_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer) const*
-NS(TrackJob_const_managed_cbuffer)(
+NS(TrackJob_const_ext_stored_buffer)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
     NS(arch_size_t) const buffer_id );
 
