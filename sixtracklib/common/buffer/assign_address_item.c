@@ -18,6 +18,15 @@
     #include "sixtracklib/common/buffer/assign_address_item_kernel_impl.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
+NS(arch_status_t) NS(AssignAddressItem_next_buffer_id)( void )
+{
+    static NS(arch_status_t) next_buffer_id =
+        NS(ARCH_MIN_USER_DEFINED_BUFFER_ID);
+
+    return ( next_buffer_id < NS(ARCH_MAX_USER_DEFINED_BUFFER_ID) )
+        ? next_buffer_id++ : NS(ARCH_ILLEGAL_BUFFER_ID);
+}
+
 NS(arch_status_t) NS(AssignAddressItem_perform_assignment)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(AssignAddressItem)
         *const SIXTRL_RESTRICT item,
@@ -166,33 +175,6 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* NS(AssignAddressItem_add_copy)(
         )NS(Object_get_begin_addr)( NS(Buffer_add_trivial_object)( buffer,
             item, sizeof( NS(AssignAddressItem) ),
                 NS(AssignAddressItem_type_id)( item ) ) );
-}
-
-NS(arch_status_t) NS(AssignAddressItem_assign_all_managed_buffer)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* assign_item_buffer,
-    NS(buffer_size_t) const assign_slot_size,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* dest_buffer,
-    NS(buffer_size_t) const dest_slot_size,
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* src_buffer,
-    NS(buffer_size_t) const src_slot_size )
-{
-    return NS(AssignAddressItem_assign_all_managed_buffer_kernel_impl)(
-        assign_item_buffer, assign_slot_size, 0u, 1u,
-            dest_buffer, dest_slot_size, src_buffer, src_slot_size );
-}
-
-NS(arch_status_t) NS(AssignAddressItem_assign_all)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT map_buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT dest_buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT src_buffer )
-{
-    return NS(AssignAddressItem_assign_all_managed_buffer)(
-        NS(Buffer_get_const_data_begin)( map_buffer ),
-        NS(Buffer_get_slot_size)( map_buffer ),
-        NS(Buffer_get_data_begin)( dest_buffer ),
-        NS(Buffer_get_slot_size)( dest_buffer ),
-        NS(Buffer_get_const_data_begin)( src_buffer ),
-        NS(Buffer_get_slot_size)( src_buffer ) );
 }
 
 /* end: sixtracklib/common/buffer/assign_address_item.c */
