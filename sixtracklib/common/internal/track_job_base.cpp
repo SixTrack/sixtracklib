@@ -34,6 +34,8 @@
     #include "sixtracklib/common/be_monitor/output_buffer.h"
     #include "sixtracklib/common/output/elem_by_elem_config.h"
     #include "sixtracklib/common/output/output_buffer.h"
+    #include "sixtracklib/common/particles/particles_addr.h"
+    #include "sixtracklib/common/internal/stl_buffer_helper.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
@@ -41,12 +43,53 @@
 namespace st = SIXTRL_CXX_NAMESPACE;
 namespace SIXTRL_CXX_NAMESPACE
 {
-    namespace
+    using _this_t   = st::TrackJobBase;
+    using _size_t   = _this_t::size_type;
+    using _status_t = _this_t::status_t;
+
+    void TrackJobBase::COPY_PTR_BUFFER(
+        _this_t::ptr_buffer_t& SIXTRL_RESTRICT_REF dest_ptr_buffer,
+        _this_t::ptr_buffer_t const& SIXTRL_RESTRICT_REF src_ptr_buffer )
     {
-        using _this_t   = st::TrackJobBase;
-        using _size_t   = _this_t::size_type;
-        using _status_t = _this_t::status_t;
+        if( src_ptr_buffer.get() != nullptr )
+        {
+            dest_ptr_buffer.reset(
+                new _this_t::buffer_t( *src_ptr_buffer.get() ) );
+        }
+        else
+        {
+            dest_ptr_buffer.reset( nullptr );
+        }
     }
+
+    void TrackJobBase::COPY_VECTOR_OF_PTR_BUFFER(
+        std::vector< _this_t::ptr_buffer_t >&
+            SIXTRL_RESTRICT_REF dest_vector,
+        std::vector< _this_t::ptr_buffer_t > const&
+            SIXTRL_RESTRICT_REF src_vector )
+    {
+        using size_t = _this_t::size_type;
+        dest_vector.clear();
+
+        if( !src_vector.empty() )
+        {
+            size_t const nn = src_vector.size();
+            dest_vector.reserve( nn );
+
+            for( size_t ii = size_t{ 0 } ; ii < nn ; ++ii )
+            {
+                dest_vector.emplace_back( nullptr );
+
+                if( src_vector[ ii ].get() != nullptr )
+                {
+                    _this_t::COPY_PTR_BUFFER(
+                        dest_vector.back(), src_vector[ ii ] );
+                }
+            }
+        }
+    }
+
+    /* --------------------------------------------------------------------- */
 
     _size_t TrackJobBase::DefaultNumParticleSetIndices() SIXTRL_NOEXCEPT
     {
@@ -440,7 +483,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_type_str.c_str();
     }
 
-    bool TrackJobBase::hasDeviceIdStr() const SIXTRL_RESTRICT
+    bool TrackJobBase::hasDeviceIdStr() const SIXTRL_NOEXCEPT
     {
         return ( !this->m_device_id_str.empty() );
     }
@@ -660,6 +703,601 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
+    bool TrackJobBase::can_fetch_particles_addr() const SIXTRL_NOEXCEPT
+    {
+        return false;
+    }
+
+    bool TrackJobBase::has_particles_addr() const SIXTRL_NOEXCEPT
+    {
+        return false;
+    }
+
+    _this_t::status_t TrackJobBase::fetch_particles_addr()
+    {
+        return st::ARCH_STATUS_GENERAL_FAILURE;
+    }
+
+    _this_t::status_t TrackJobBase::clear_all_particles_addr()
+    {
+        return st::ARCH_STATUS_GENERAL_FAILURE;
+    }
+
+    _this_t::status_t TrackJobBase::clear_particles_addr(
+        _this_t::size_type const )
+    {
+        return st::ARCH_STATUS_GENERAL_FAILURE;
+    }
+
+    _this_t::particles_addr_t const* TrackJobBase::particles_addr(
+        _this_t::size_type const ) const SIXTRL_NOEXCEPT
+    {
+        return nullptr;
+    }
+
+    _this_t::buffer_t const*
+    TrackJobBase::ptr_particles_addr_buffer() const SIXTRL_NOEXCEPT
+    {
+        return nullptr;
+    }
+
+    _this_t::c_buffer_t const*
+    TrackJobBase::ptr_particles_addr_cbuffer() const SIXTRL_NOEXCEPT
+    {
+        return nullptr;
+    }
+
+    /* ----------------------------------------------------------------- */
+
+    _this_t::assign_item_t* TrackJobBase::add_assign_address_item(
+        _this_t::assign_item_t const& SIXTRL_RESTRICT_REF assign_item_to_add )
+    {
+        using item_t = _this_t::assign_item_t;
+        item_t* item = nullptr;
+
+        auto cmp_fn = []( item_t const& SIXTRL_RESTRICT_REF lhs,
+                          item_t const& SIXTRL_RESTRICT_REF rhs ) -> bool
+        {
+            return ::NS(AssignAddressItem_compare_less)( &lhs, &rhs );
+        };
+
+        SIXTRL_ASSERT( std::is_sorted( this->m_assign_items_buffer.begin(),
+                        this->m_assign_items_buffer.end(), cmp_fn ) );
+
+        if( ( this->m_assign_items_buffer.empty() ) ||
+            ( ::NS(AssignAddressItem_compare_less)(
+                std::addressof( this->m_assign_items_buffer.back() ),
+                std::addressof( assign_item_to_add ) ) ) )
+        {
+            this->m_assign_items_buffer.push_back( assign_item_to_add );
+            item = std::addressof( this->m_assign_items_buffer.back() );
+        }
+        else if( !std::binary_search( this->m_assign_items_buffer.begin(),
+            this->m_assign_items_buffer.end(), assign_item_to_add, cmp_fn ) )
+        {
+            this->m_assign_items_buffer.push_back( assign_item_to_add );
+            std::sort( this->m_assign_items_buffer.begin(),
+                       this->m_assign_items_buffer.end(), cmp_fn );
+
+            auto it = std::lower_bound( this->m_assign_items_buffer.begin(),
+                                        this->m_assign_items_buffer.end(),
+                                        assign_item_to_add, cmp_fn );
+
+            if( it != this->m_assign_items_buffer.end() )
+            {
+                item = std::addressof( *it );
+            }
+        }
+
+        return item;
+    }
+
+    _this_t::assign_item_t* TrackJobBase::add_assign_address_item(
+        _this_t::object_type_id_t const dest_type_id,
+        _this_t::size_type const dest_buffer_id,
+        _this_t::size_type const dest_elem_index,
+        _this_t::size_type const dest_pointer_offset,
+        _this_t::object_type_id_t const src_type_id,
+        _this_t::size_type const src_buffer_id,
+        _this_t::size_type const src_elem_index,
+        _this_t::size_type const src_pointer_offset )
+    {
+        return this->add_assign_address_item( _this_t::assign_item_t{
+            dest_type_id, dest_buffer_id, dest_elem_index, dest_pointer_offset,
+            src_type_id, src_buffer_id, src_elem_index, src_pointer_offset } );
+    }
+
+    bool TrackJobBase::has_assign_address_item( _this_t::assign_item_t const&
+        SIXTRL_RESTRICT_REF assign_item ) const SIXTRL_NOEXCEPT
+    {
+        using item_t = _this_t::assign_item_t;
+
+        auto cmp_fn = []( item_t const& SIXTRL_RESTRICT_REF lhs,
+                          item_t const& SIXTRL_RESTRICT_REF rhs ) -> bool
+        {
+            return ::NS(AssignAddressItem_compare_less)( &lhs, &rhs );
+        };
+
+        SIXTRL_ASSERT( std::is_sorted( this->m_assign_items_buffer.begin(),
+                    this->m_assign_items_buffer.end(), cmp_fn ) );
+
+        return ( std::binary_search( this->m_assign_items_buffer.begin(),
+                    this->m_assign_items_buffer.end(), assign_item, cmp_fn ) );
+    }
+
+    bool TrackJobBase::has_assign_address_item(
+        _this_t::object_type_id_t const dest_type_id,
+        _this_t::size_type const dest_buffer_id,
+        _this_t::size_type const dest_elem_index,
+        _this_t::size_type const dest_pointer_offset,
+        _this_t::object_type_id_t const src_type_id,
+        _this_t::size_type const src_buffer_id,
+        _this_t::size_type const src_elem_index,
+        _this_t::size_type const src_pointer_offset ) const SIXTRL_NOEXCEPT
+    {
+        return this->has_assign_address_item( _this_t::assign_item_t{
+            dest_type_id, dest_buffer_id, dest_elem_index, dest_pointer_offset,
+            src_type_id, src_buffer_id, src_elem_index, src_pointer_offset } );
+    }
+
+    _this_t::size_type TrackJobBase::assign_address_item_index(
+        _this_t::object_type_id_t const dest_type_id,
+        _this_t::size_type const dest_buffer_id,
+        _this_t::size_type const dest_elem_index,
+        _this_t::size_type const dest_pointer_offset,
+        _this_t::object_type_id_t const src_type_id,
+        _this_t::size_type const src_buffer_id,
+        _this_t::size_type const src_elem_index,
+        _this_t::size_type const src_pointer_offset ) const SIXTRL_NOEXCEPT
+    {
+        return this->assign_address_item_index( _this_t::assign_item_t{
+            dest_type_id, dest_buffer_id, dest_elem_index, dest_pointer_offset,
+            src_type_id, src_buffer_id, src_elem_index, src_pointer_offset } );
+    }
+
+    _this_t::size_type TrackJobBase::assign_address_item_index(
+        _this_t::assign_item_t const& SIXTRL_RESTRICT_REF
+            assign_item )  const SIXTRL_NOEXCEPT
+    {
+        using item_t = _this_t::assign_item_t;
+        _this_t::size_type index = this->m_assign_items_buffer.size();
+
+        SIXTRL_ASSERT( std::is_sorted( this->m_assign_items_buffer.begin(),
+            this->m_assign_items_buffer.end(),
+            []( item_t const& SIXTRL_RESTRICT_REF lhs,
+                item_t const& SIXTRL_RESTRICT_REF rhs ) -> bool
+            {
+                return ::NS(AssignAddressItem_compare_less)( &lhs, &rhs );
+            } ) );
+
+        auto it = std::find_if( this->m_assign_items_buffer.begin(),
+            this->m_assign_items_buffer.end(),
+            [&assign_item]( item_t const& SIXTRL_RESTRICT_REF cmp ) -> bool
+            {
+                return ::NS(AssignAddressItem_are_equal)( &assign_item, &cmp );
+            } );
+
+        if( it != this->m_assign_items_buffer.end() )
+        {
+            std::ptrdiff_t const temp = std::distance(
+                this->m_assign_items_buffer.begin(), it );
+
+            index = ( temp >= std::ptrdiff_t{ 0 } )
+                ? std::min( static_cast< _this_t::size_type >( temp ),
+                            this->m_assign_items_buffer.size() )
+                : this->m_assign_items_buffer.size();
+        }
+
+        return index;
+    }
+
+    bool TrackJobBase::has_assign_items(
+        _this_t::size_type const dest_buffer_id,
+        _this_t::size_type const src_buffer_id ) const SIXTRL_NOEXCEPT
+    {
+        _this_t::assign_item_t const* begin = this->assign_items_dest_src_begin(
+            dest_buffer_id, src_buffer_id );
+
+        _this_t::assign_item_t const* end = this->assign_items_dest_src_end(
+            dest_buffer_id, src_buffer_id );
+
+        return ( ( begin != nullptr ) && ( end != nullptr ) &&
+                 ( reinterpret_cast< uintptr_t >( end ) >
+                   reinterpret_cast< uintptr_t >( begin ) ) );
+    }
+
+    _this_t::size_type TrackJobBase::num_assign_items(
+        _this_t::size_type const dest_buffer_id,
+        _this_t::size_type const src_buffer_id ) const SIXTRL_NOEXCEPT
+    {
+        _this_t::assign_item_t const* begin = this->assign_items_dest_src_begin(
+            dest_buffer_id, src_buffer_id );
+
+        _this_t::assign_item_t const* end = this->assign_items_dest_src_end(
+            dest_buffer_id, src_buffer_id );
+
+        SIXTRL_ASSERT( reinterpret_cast< uintptr_t >( end ) >=
+                       reinterpret_cast< uintptr_t >( begin ) );
+
+        return ( ( begin != nullptr ) && ( end != nullptr ) )
+            ? static_cast< _this_t::size_type >( std::distance( begin, end ) )
+            : _this_t::size_type{ 0 };
+    }
+
+    _this_t::size_type
+    TrackJobBase::num_distinct_assign_items_dest_src_pairs() const SIXTRL_NOEXCEPT
+    {
+        using size_t = _this_t::size_type;
+
+        SIXTRL_ASSERT( std::is_sorted( this->m_assign_items_buffer.begin(),
+            this->m_assign_items_buffer.end(),
+            []( _this_t::assign_item_t const& SIXTRL_RESTRICT_REF lhs,
+                _this_t::assign_item_t const& SIXTRL_RESTRICT_REF rhs ) -> bool
+            {
+                return ::NS(AssignAddressItem_compare_less)( &lhs, &rhs );
+            } ) );
+
+        size_t num_pairs = size_t{ 0 };
+        auto it = this->m_assign_items_buffer.begin();
+        auto end = this->m_assign_items_buffer.end();
+        auto prev = end;
+
+        for( ; it != end ; prev = it++ )
+        {
+            if( ( prev == end ) ||
+                ( prev->dest_buffer_id != it->dest_buffer_id ) ||
+                ( prev->src_buffer_id  != it->src_buffer_id  ) )
+            {
+                ++num_pairs;
+            }
+        }
+
+        return num_pairs;
+    }
+
+    _this_t::size_type TrackJobBase::assign_items_dest_src_pairs(
+        _this_t::size_type const max_num_pairs,
+        _this_t::assign_item_dest_src_pair_t* pairs_begin ) const SIXTRL_NOEXCEPT
+    {
+        using size_t = _this_t::size_type;
+        size_t num_pairs = size_t{ 0 };
+
+        if( ( max_num_pairs > size_t{ 0 } ) && ( pairs_begin != nullptr ) &&
+            ( !this->m_assign_items_buffer.empty() ) )
+        {
+            SIXTRL_ASSERT( std::is_sorted( this->m_assign_items_buffer.begin(),
+                this->m_assign_items_buffer.end(),
+                []( _this_t::assign_item_t const& SIXTRL_RESTRICT_REF lhs,
+                    _this_t::assign_item_t const& SIXTRL_RESTRICT_REF rhs ) -> bool
+                {
+                    return ::NS(AssignAddressItem_compare_less)( &lhs, &rhs );
+                } ) );
+
+            auto it = this->m_assign_items_buffer.begin();
+            auto end = this->m_assign_items_buffer.end();
+            auto prev = end;
+            auto out_it = pairs_begin;
+
+            while( ( it != end  ) && ( num_pairs < max_num_pairs ) )
+            {
+                if( ( prev == end ) ||
+                    ( prev->dest_buffer_id != it->dest_buffer_id ) ||
+                    ( prev->src_buffer_id  != it->src_buffer_id  ) )
+                {
+
+                    out_it->dest_buffer_id = it->dest_buffer_id;
+                    out_it->src_buffer_id  = it->src_buffer_id;
+
+                    ++out_it;
+                    ++num_pairs;
+                }
+
+                prev = it++;
+            }
+        }
+
+        return num_pairs;
+
+    }
+
+    _this_t::c_buffer_t* TrackJobBase::buffer_by_buffer_id(
+        _this_t::size_type const buffer_id ) SIXTRL_NOEXCEPT
+    {
+        using ptr_t = _this_t::c_buffer_t*;
+        return const_cast< ptr_t >( static_cast< _this_t const& >(
+            *this ).buffer_by_buffer_id( buffer_id ) );
+    }
+
+    _this_t::c_buffer_t const* TrackJobBase::buffer_by_buffer_id(
+        _this_t::size_type const buffer_id ) const SIXTRL_NOEXCEPT
+    {
+        _this_t::c_buffer_t const* ptr_buffer = nullptr;
+
+        switch( buffer_id )
+        {
+            case st::ARCH_PARTICLES_BUFFER_ID:
+            {
+                ptr_buffer = this->ptrCParticlesBuffer();
+                break;
+            }
+
+            case st::ARCH_BEAM_ELEMENTS_BUFFER_ID:
+            {
+                ptr_buffer = this->ptrCBeamElementsBuffer();
+                break;
+            }
+
+            case st::ARCH_OUTPUT_BUFFER_ID:
+            {
+                ptr_buffer = this->ptrCOutputBuffer();
+                break;
+            }
+
+            case st::ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID:
+            {
+                ptr_buffer = this->m_elem_by_elem_buffer.get();
+                break;
+            }
+
+            case st::ARCH_PARTICLE_ADDR_BUFFER_ID:
+            {
+                ptr_buffer = this->m_particles_addr_buffer.get();
+                break;
+            }
+
+            default:
+            {
+                if( ( buffer_id >= st::ARCH_MIN_USER_DEFINED_BUFFER_ID ) &&
+                    ( buffer_id <= st::ARCH_MAX_USER_DEFINED_BUFFER_ID ) )
+                {
+                    ptr_buffer = this->ptr_managed_cbuffer( buffer_id );
+                }
+            }
+        };
+
+        return ptr_buffer;
+    }
+
+    _this_t::assign_item_t const*
+    TrackJobBase::assign_items_begin() const SIXTRL_NOEXCEPT
+    {
+        return ( this->m_assign_items_buffer.empty() )
+            ? this->m_assign_items_buffer.data() : nullptr;
+    }
+
+    _this_t::assign_item_t const*
+    TrackJobBase::assign_items_end() const SIXTRL_NOEXCEPT
+    {
+        auto begin_ptr = this->assign_items_begin();
+        if( begin_ptr != nullptr )
+        {
+            std::advance( begin_ptr, this->m_assign_items_buffer.size() );
+        }
+
+        return begin_ptr;
+    }
+
+    _this_t::assign_item_t const* TrackJobBase::assign_items_dest_src_begin(
+        _this_t::size_type const dest_buffer_id,
+        _this_t::size_type const src_buffer_id ) const SIXTRL_NOEXCEPT
+    {
+        SIXTRL_ASSERT( std::is_sorted( this->m_assign_items_buffer.begin(),
+            this->m_assign_items_buffer.end(),
+            []( _this_t::assign_item_t const& SIXTRL_RESTRICT_REF lhs,
+                _this_t::assign_item_t const& SIXTRL_RESTRICT_REF rhs ) -> bool
+            {
+                return ::NS(AssignAddressItem_compare_less)( &lhs, &rhs );
+            } ) );
+
+        auto it = std::find_if( this->m_assign_items_buffer.begin(),
+            this->m_assign_items_buffer.end(),
+            [dest_buffer_id, src_buffer_id](
+                _this_t::assign_item_t const& SIXTRL_RESTRICT_REF item )
+            {
+                return ( ( item.dest_buffer_id == dest_buffer_id ) &&
+                         ( item.src_buffer_id  == src_buffer_id ) );
+            } );
+
+        if( it != this->m_assign_items_buffer.end() )
+        {
+            return std::addressof( *it );
+        }
+
+        return nullptr;
+    }
+
+    _this_t::assign_item_t const* TrackJobBase::assign_items_dest_src_end(
+        _this_t::size_type const dest_buffer_id,
+        _this_t::size_type const src_buffer_id ) const SIXTRL_NOEXCEPT
+    {
+        using item_t = _this_t::assign_item_t;
+
+        SIXTRL_ASSERT( std::is_sorted( this->m_assign_items_buffer.begin(),
+            this->m_assign_items_buffer.end(),
+            []( item_t const& SIXTRL_RESTRICT_REF lhs,
+                item_t const& SIXTRL_RESTRICT_REF rhs ) -> bool
+            {
+                return ::NS(AssignAddressItem_compare_less)( &lhs, &rhs );
+            } ) );
+
+        auto cmp_fn = [dest_buffer_id, src_buffer_id](
+            item_t const& SIXTRL_RESTRICT_REF item )
+        {
+            return ( ( item.dest_buffer_id == dest_buffer_id ) &&
+                     ( item.src_buffer_id  == src_buffer_id ) );
+        };
+
+        auto begin = std::find_if( this->m_assign_items_buffer.begin(),
+            this->m_assign_items_buffer.end(), cmp_fn );
+
+        if( begin != this->m_assign_items_buffer.end() )
+        {
+            auto end = std::find_if_not( begin,
+                this->m_assign_items_buffer.end(), cmp_fn );
+
+            if( end != this->m_assign_items_buffer.end() )
+            {
+                return std::addressof( *end );
+            }
+            else
+            {
+                return this->assign_items_end();
+            }
+        }
+
+        return nullptr;
+    }
+
+    _this_t::status_t TrackJobBase::perform_managed_assignments()
+    {
+        _this_t::status_t status = st::ARCH_STATUS_SUCCESS;
+
+        SIXTRL_ASSERT( std::is_sorted( this->m_assign_items_buffer.begin(),
+            this->m_assign_items_buffer.end(),
+            []( _this_t::assign_item_t const& SIXTRL_RESTRICT_REF lhs,
+                _this_t::assign_item_t const& SIXTRL_RESTRICT_REF rhs ) -> bool
+            {
+                return ::NS(AssignAddressItem_compare_less)( &lhs, &rhs );
+            } ) );
+
+        auto it = this->m_assign_items_buffer.begin();
+        auto end = this->m_assign_items_buffer.end();
+        auto prev = end;
+
+        for( ; it != end ; prev = it++ )
+        {
+            if( ( prev == end ) ||
+                ( prev->dest_buffer_id != it->dest_buffer_id ) ||
+                ( prev->src_buffer_id  != it->src_buffer_id  ) )
+            {
+                status = this->doPerformManagedAssignments(
+                    it->dest_buffer_id, it->src_buffer_id );
+
+                if( status != st::ARCH_STATUS_SUCCESS ) break;
+            }
+        }
+
+        return status;
+    }
+
+    _this_t::status_t TrackJobBase::perform_managed_assignments(
+        _this_t::size_type const dest_buffer_id,
+        _this_t::size_type const src_buffer_id )
+    {
+        return this->doPerformManagedAssignments(
+            dest_buffer_id, src_buffer_id );
+    }
+
+    /* ---------------------------------------------------------------- */
+
+    bool TrackJobBase::has_managed_buffers() const SIXTRL_NOEXCEPT
+    {
+        return ( this->num_managed_buffers() > _this_t::size_type{ 0 } );
+    }
+
+    _this_t::size_type TrackJobBase::num_managed_buffers() const SIXTRL_NOEXCEPT
+    {
+        SIXTRL_ASSERT( std::count_if(
+            this->m_managed_buffers.begin(), this->m_managed_buffers.end(),
+            []( _this_t::ptr_buffer_t const& ptr ) {
+                return ( ptr.get() != nullptr ); } ) == static_cast<
+                    std::ptrdiff_t >( this->m_num_managed_buffers ) );
+
+        SIXTRL_ASSERT( this->m_managed_buffers.size() >=
+                       this->m_num_managed_buffers );
+
+        return this->m_num_managed_buffers;
+    }
+
+    _this_t::size_type TrackJobBase::min_managed_buffer_id() const SIXTRL_NOEXCEPT
+    {
+        return ( this->has_managed_buffers() )
+            ? st::ARCH_MIN_USER_DEFINED_BUFFER_ID : st::ARCH_ILLEGAL_BUFFER_ID;
+    }
+
+    _this_t::size_type TrackJobBase::max_managed_buffer_id() const SIXTRL_NOEXCEPT
+    {
+        _this_t::size_type max_managed_buffer_id =
+            this->min_managed_buffer_id();
+
+        if( max_managed_buffer_id != st::ARCH_ILLEGAL_BUFFER_ID )
+        {
+            SIXTRL_ASSERT( !this->m_managed_buffers.empty() );
+            SIXTRL_ASSERT(  this->m_managed_buffers.size() >
+                _this_t::size_type{ 1 } );
+
+            max_managed_buffer_id += this->m_managed_buffers.size();
+            max_managed_buffer_id -= _this_t::size_type{ 1 };
+        }
+
+        return max_managed_buffer_id;
+    }
+
+    _this_t::size_type TrackJobBase::add_managed_buffer()
+    {
+        _this_t::ptr_buffer_t ptr_managed_buffer(
+            new _this_t::buffer_t );
+
+        return this->doAddManagedBuffer( std::move( ptr_managed_buffer ) );
+    }
+
+    _this_t::size_type TrackJobBase::add_managed_buffer(
+        std::unique_ptr< _this_t::buffer_t >&& ptr_managed_buffer )
+    {
+        return this->doAddManagedBuffer( std::move( ptr_managed_buffer ) );
+    }
+
+    _this_t::status_t TrackJobBase::remove_managed_buffer(
+        _this_t::size_type const buffer_index )
+    {
+        return this->doRemoveManagedBuffer( buffer_index );
+    }
+
+    _this_t::buffer_t* TrackJobBase::ptr_managed_buffer(
+        _this_t::size_type const buffer_id ) SIXTRL_NOEXCEPT
+    {
+        using ptr_t = _this_t::buffer_t*;
+        return const_cast< ptr_t >( static_cast< _this_t const& >(
+            *this ).ptr_managed_buffer( buffer_id ) );
+    }
+
+    _this_t::buffer_t const* TrackJobBase::ptr_managed_buffer(
+        _this_t::size_type const buffer_id ) const SIXTRL_NOEXCEPT
+    {
+        _this_t::buffer_t const* ptr_buffer = nullptr;
+        _this_t::size_type const min_buffer_id = this->min_managed_buffer_id();
+
+        if( ( min_buffer_id != st::ARCH_ILLEGAL_BUFFER_ID ) &&
+            ( buffer_id != st::ARCH_ILLEGAL_BUFFER_ID ) &&
+            ( buffer_id >= min_buffer_id ) &&
+            ( buffer_id <= min_buffer_id + this->m_managed_buffers.size() ) )
+        {
+            SIXTRL_ASSERT( this->m_managed_buffers.size() >=
+                           this->m_num_managed_buffers );
+
+            ptr_buffer = this->m_managed_buffers[
+                buffer_id - min_buffer_id ].get();
+        }
+
+        return ptr_buffer;
+    }
+
+    _this_t::c_buffer_t* TrackJobBase::ptr_managed_cbuffer(
+        _this_t::size_type const buffer_id ) SIXTRL_NOEXCEPT
+    {
+        auto ptr_buffer = this->ptr_managed_buffer( buffer_id );
+        return ( ptr_buffer != nullptr ) ? ptr_buffer->getCApiPtr() : nullptr;
+    }
+
+    _this_t::c_buffer_t const* TrackJobBase::ptr_managed_cbuffer(
+        _this_t::size_type const buffer_id ) const SIXTRL_NOEXCEPT
+    {
+        auto ptr_buffer = this->ptr_managed_buffer( buffer_id );
+        return ( ptr_buffer != nullptr ) ? ptr_buffer->getCApiPtr() : nullptr;
+    }
+
+    /* --------------------------------------------------------------------- */
+
     bool TrackJobBase::hasOutputBuffer() const SIXTRL_NOEXCEPT
     {
         return ( this->ptrCOutputBuffer() != nullptr );
@@ -723,8 +1361,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_until_turn_elem_by_elem;
     }
 
-    _size_t
-    TrackJobBase::numElemByElemTurns() const SIXTRL_NOEXCEPT
+    _size_t TrackJobBase::numElemByElemTurns() const SIXTRL_NOEXCEPT
     {
         using index_t = _this_t::particle_index_t;
         using size_t  = _size_t;
@@ -739,7 +1376,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return size_t{ 0 };
     }
 
-    _this_t::buffer_t* TrackJobBase::ptrOutputBuffer() SIXTRL_RESTRICT
+    _this_t::buffer_t* TrackJobBase::ptrOutputBuffer() SIXTRL_NOEXCEPT
     {
         using ptr_t   = _this_t::buffer_t*;
 
@@ -747,7 +1384,7 @@ namespace SIXTRL_CXX_NAMESPACE
             *this ).ptrOutputBuffer() );
     }
 
-    _this_t::buffer_t* TrackJobBase::ptrOutputBuffer() const SIXTRL_RESTRICT
+    _this_t::buffer_t* TrackJobBase::ptrOutputBuffer() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT(
             ( this->m_ptr_output_buffer == nullptr ) ||
@@ -757,8 +1394,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_ptr_output_buffer;
     }
 
-    _this_t::c_buffer_t*
-    TrackJobBase::ptrCOutputBuffer() SIXTRL_RESTRICT
+    _this_t::c_buffer_t* TrackJobBase::ptrCOutputBuffer() SIXTRL_NOEXCEPT
     {
         using ptr_t   = _this_t::c_buffer_t*;
 
@@ -767,7 +1403,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     _this_t::c_buffer_t const*
-    TrackJobBase::ptrCOutputBuffer() const SIXTRL_RESTRICT
+    TrackJobBase::ptrCOutputBuffer() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT(
             ( this->m_ptr_output_buffer == nullptr ) ||
@@ -784,25 +1420,20 @@ namespace SIXTRL_CXX_NAMESPACE
         return !this->m_beam_monitor_indices.empty();
     }
 
-    _size_t
-    TrackJobBase::numBeamMonitors() const SIXTRL_NOEXCEPT
+    _size_t TrackJobBase::numBeamMonitors() const SIXTRL_NOEXCEPT
     {
         return this->m_beam_monitor_indices.size();
     }
 
 
-    _size_t const*
-    TrackJobBase::beamMonitorIndicesBegin() const SIXTRL_NOEXCEPT
+    _size_t const* TrackJobBase::beamMonitorIndicesBegin() const SIXTRL_NOEXCEPT
     {
         return this->m_beam_monitor_indices.data();
     }
 
-    _size_t const*
-    TrackJobBase::beamMonitorIndicesEnd() const SIXTRL_NOEXCEPT
+    _size_t const* TrackJobBase::beamMonitorIndicesEnd() const SIXTRL_NOEXCEPT
     {
-        _size_t const* end_ptr =
-            this->beamMonitorIndicesBegin();
-
+        _size_t const* end_ptr = this->beamMonitorIndicesBegin();
         if( end_ptr != nullptr )
         {
             std::advance( end_ptr, this->numBeamMonitors() );
@@ -811,30 +1442,52 @@ namespace SIXTRL_CXX_NAMESPACE
         return end_ptr;
     }
 
-    _size_t
-    TrackJobBase::beamMonitorIndex( _size_t const n ) const
+    _size_t TrackJobBase::beamMonitorIndex( _size_t const n ) const
     {
         return this->m_beam_monitor_indices.at( n );
     }
 
     /* --------------------------------------------------------------------- */
 
-    bool
-    TrackJobBase::hasElemByElemConfig() const SIXTRL_NOEXCEPT
+    bool TrackJobBase::hasElemByElemConfig() const SIXTRL_NOEXCEPT
     {
-        SIXTRL_ASSERT(
-            ( this->m_my_elem_by_elem_config.get() == nullptr ) ||
-            ( this->m_ptr_c_output_buffer != nullptr ) );
+        _this_t::elem_by_elem_config_t const* conf =
+            this->ptrElemByElemConfig();
 
-        return ( ::NS(ElemByElemConfig_is_active)(
-            this->m_my_elem_by_elem_config.get() ) );
+        return ( ( conf != nullptr ) &&
+                 ( ::NS(ElemByElemConfig_is_active)( conf ) ) );
+    }
+
+    _this_t::c_buffer_t const*
+    TrackJobBase::ptrElemByElemConfigCBuffer() const SIXTRL_NOEXCEPT
+    {
+        return ( this->m_elem_by_elem_buffer.get() != nullptr )
+            ? this->m_elem_by_elem_buffer->getCApiPtr() : nullptr;
+    }
+
+    _this_t::c_buffer_t*
+    TrackJobBase::ptrElemByElemConfigCBuffer() SIXTRL_NOEXCEPT
+    {
+        return ( this->m_elem_by_elem_buffer.get() != nullptr )
+            ? this->m_elem_by_elem_buffer->getCApiPtr() : nullptr;
+    }
+
+    _this_t::buffer_t const*
+    TrackJobBase::ptrElemByElemConfigBuffer() const SIXTRL_NOEXCEPT
+    {
+        return this->m_elem_by_elem_buffer.get();
+    }
+
+    _this_t::buffer_t*
+    TrackJobBase::ptrElemByElemConfigBuffer() SIXTRL_NOEXCEPT
+    {
+        return this->m_elem_by_elem_buffer.get();
     }
 
     _this_t::elem_by_elem_config_t*
     TrackJobBase::ptrElemByElemConfig() SIXTRL_NOEXCEPT
     {
-        using  ptr_t  = _this_t::elem_by_elem_config_t*;
-
+        using  ptr_t = _this_t::elem_by_elem_config_t*;
         return const_cast< ptr_t >( static_cast< _this_t const& >(
             *this ).ptrElemByElemConfig() );
     }
@@ -842,8 +1495,7 @@ namespace SIXTRL_CXX_NAMESPACE
     _this_t::elem_by_elem_order_t
     TrackJobBase::elemByElemOrder() const SIXTRL_NOEXCEPT
     {
-        return ::NS(ElemByElemConfig_get_order)(
-            this->m_my_elem_by_elem_config.get() );
+        return ::NS(ElemByElemConfig_get_order)( this->ptrElemByElemConfig() );
     }
 
     _this_t::elem_by_elem_order_t
@@ -866,7 +1518,12 @@ namespace SIXTRL_CXX_NAMESPACE
     _this_t::elem_by_elem_config_t const*
     TrackJobBase::ptrElemByElemConfig() const SIXTRL_NOEXCEPT
     {
-        return this->m_my_elem_by_elem_config.get();
+        return ( ( this->m_elem_by_elem_buffer.get() != nullptr ) &&
+                 ( this->m_elem_by_elem_buffer->getNumObjects() >
+                    _this_t::size_type{ 0 } ) )
+            ? this->m_elem_by_elem_buffer->get<
+                _this_t::elem_by_elem_config_t >( _size_t{ 0 } )
+            : nullptr;
     }
 
     bool
@@ -899,8 +1556,11 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_indices(),
         m_num_particles_in_sets(),
         m_beam_monitor_indices(),
+        m_managed_buffers(),
+        m_assign_items_buffer(),
         m_my_output_buffer( nullptr ),
-        m_my_elem_by_elem_config( nullptr ),
+        m_elem_by_elem_buffer( nullptr ),
+        m_particles_addr_buffer( nullptr ),
         m_ptr_particles_buffer( nullptr ),
         m_ptr_beam_elem_buffer( nullptr ),
         m_ptr_output_buffer( nullptr ),
@@ -927,10 +1587,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_has_elem_by_elem_output( false ),
         m_debug_mode( false )
     {
-        if( type_str != nullptr )
-        {
-            this->m_type_str = type_str;
-        }
+        if( type_str != nullptr ) this->m_type_str = type_str;
 
         this->doInitDefaultParticleSetIndices();
         this->doInitDefaultBeamMonitorIndices();
@@ -943,8 +1600,11 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_indices( other.m_particle_set_indices ),
         m_num_particles_in_sets( other.m_num_particles_in_sets ),
         m_beam_monitor_indices( other.m_beam_monitor_indices ),
-        m_my_output_buffer( nullptr  ),
-        m_my_elem_by_elem_config( nullptr ),
+        m_managed_buffers(),
+        m_assign_items_buffer( other.m_assign_items_buffer ),
+        m_my_output_buffer( nullptr ),
+        m_elem_by_elem_buffer( nullptr ),
+        m_particles_addr_buffer( nullptr ),
         m_ptr_particles_buffer( other.m_ptr_particles_buffer  ),
         m_ptr_beam_elem_buffer( other.m_ptr_beam_elem_buffer ),
         m_ptr_output_buffer( nullptr ),
@@ -970,20 +1630,28 @@ namespace SIXTRL_CXX_NAMESPACE
         m_has_elem_by_elem_output( other.m_has_elem_by_elem_output ),
         m_debug_mode( other.m_debug_mode )
     {
-        using elem_by_elem_config_t = _this_t::elem_by_elem_config_t;
+        _this_t::COPY_VECTOR_OF_PTR_BUFFER(
+            this->m_managed_buffers, other.m_managed_buffers );
+
 
         if( other.ownsOutputBuffer() )
         {
+            _this_t::COPY_PTR_BUFFER(
+                this->m_my_output_buffer, other.m_my_output_buffer );
 
+            this->m_ptr_output_buffer = this->m_my_output_buffer.get();
+            if( this->m_ptr_output_buffer != nullptr )
+            {
+                this->m_ptr_c_output_buffer =
+                    this->m_ptr_output_buffer->getCApiPtr();
+            }
         }
 
-        if( other.m_my_elem_by_elem_config.get() != nullptr )
-        {
-            this->m_my_elem_by_elem_config.reset(
-                new elem_by_elem_config_t );
+        _this_t::COPY_PTR_BUFFER(
+            this->m_elem_by_elem_buffer, other.m_elem_by_elem_buffer );
 
-            *this->m_my_elem_by_elem_config =  *other.ptrElemByElemConfig();
-        }
+        _this_t::COPY_PTR_BUFFER(
+            this->m_particles_addr_buffer, other.m_particles_addr_buffer );
     }
 
     TrackJobBase::TrackJobBase(
@@ -994,8 +1662,11 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_indices( std::move( o.m_particle_set_indices ) ),
         m_num_particles_in_sets( std::move( o.m_num_particles_in_sets ) ),
         m_beam_monitor_indices( std::move( o.m_beam_monitor_indices ) ),
+        m_managed_buffers( std::move( o.m_managed_buffers ) ),
+        m_assign_items_buffer( std::move( o.m_assign_items_buffer ) ),
         m_my_output_buffer( std::move( o.m_my_output_buffer ) ),
-        m_my_elem_by_elem_config( std::move( o.m_my_elem_by_elem_config ) ),
+        m_elem_by_elem_buffer( std::move( o.m_elem_by_elem_buffer ) ),
+        m_particles_addr_buffer( std::move( o.m_particles_addr_buffer ) ),
         m_ptr_particles_buffer( std::move( o.m_ptr_particles_buffer  ) ),
         m_ptr_beam_elem_buffer( std::move( o.m_ptr_beam_elem_buffer ) ),
         m_ptr_output_buffer( std::move( o.m_ptr_output_buffer ) ),
@@ -1077,11 +1748,22 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_has_elem_by_elem_output = rhs.m_has_elem_by_elem_output;
             this->m_requires_collect        = rhs.m_requires_collect;
             this->m_collect_flags           = rhs.m_collect_flags;
+            this->m_assign_items_buffer     = rhs.m_assign_items_buffer;
+
+            _this_t::COPY_VECTOR_OF_PTR_BUFFER(
+                this->m_managed_buffers, rhs.m_managed_buffers );
 
             if( rhs.ownsOutputBuffer() )
             {
-               this->m_ptr_output_buffer    = nullptr;
-               this->m_ptr_c_output_buffer  = nullptr;
+                _this_t::COPY_PTR_BUFFER(
+                    this->m_my_output_buffer, rhs.m_my_output_buffer );
+
+               this->m_ptr_output_buffer = this->m_my_output_buffer.get();
+               if( this->m_ptr_output_buffer != nullptr )
+               {
+                   this->m_ptr_c_output_buffer =
+                    this->m_ptr_output_buffer->getCApiPtr();
+               }
             }
             else
             {
@@ -1089,17 +1771,11 @@ namespace SIXTRL_CXX_NAMESPACE
                 this->m_ptr_c_output_buffer = rhs.m_ptr_c_output_buffer;
             }
 
-            if( rhs.m_my_elem_by_elem_config.get() != nullptr )
-            {
-                this->m_my_elem_by_elem_config.reset(
-                    new elem_by_elem_config_t );
+            _this_t::COPY_PTR_BUFFER(
+                this->m_elem_by_elem_buffer, rhs.m_elem_by_elem_buffer );
 
-                *this->m_my_elem_by_elem_config =  *rhs.ptrElemByElemConfig();
-            }
-            else
-            {
-                this->m_my_elem_by_elem_config.reset( nullptr );
-            }
+            _this_t::COPY_PTR_BUFFER(
+                this->m_particles_addr_buffer, rhs.m_particles_addr_buffer );
 
             this->m_debug_mode = rhs.m_debug_mode;
         }
@@ -1125,10 +1801,17 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_beam_monitor_indices =
                 std::move( rhs.m_beam_monitor_indices );
 
+            this->m_managed_buffers = std::move( rhs.m_managed_buffers );
             this->m_my_output_buffer = std::move( rhs.m_my_output_buffer );
 
-            this->m_my_elem_by_elem_config =
-                std::move( rhs.m_my_elem_by_elem_config );
+            this->m_elem_by_elem_buffer =
+                std::move( rhs.m_elem_by_elem_buffer );
+
+            this->m_particles_addr_buffer =
+                std::move( rhs.m_particles_addr_buffer );
+
+            this->m_assign_items_buffer =
+                std::move( rhs.m_assign_items_buffer );
 
             this->m_ptr_particles_buffer =
                 std::move( rhs.m_ptr_particles_buffer );
@@ -1278,6 +1961,25 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 success = true;
             }
+
+            if( success )
+            {
+                if( this->m_particles_addr_buffer.get() == nullptr )
+                {
+                    _this_t::ptr_buffer_t particles_addr_buffer(
+                        new _this_t::buffer_t );
+
+                    this->doUpdateStoredParticlesAddrBuffer(
+                        std::move( particles_addr_buffer ) );
+                }
+
+                if( this->m_particles_addr_buffer.get() != nullptr )
+                {
+                    success = ( st::ARCH_STATUS_SUCCESS ==
+                    ::NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
+                        this->m_particles_addr_buffer->getCApiPtr(), pb ) );
+                }
+            }
         }
 
         return success;
@@ -1385,15 +2087,13 @@ namespace SIXTRL_CXX_NAMESPACE
         bool success = false;
 
         using size_t                    = _size_t;
-        using buffer_t                  = _this_t::buffer_t;
         using c_buffer_t                = _this_t::c_buffer_t;
         using buf_size_t                = ::NS(buffer_size_t);
         using elem_by_elem_config_t     = _this_t::elem_by_elem_config_t;
-        using ptr_output_buffer_t       = _this_t::ptr_output_buffer_t;
+        using ptr_output_buffer_t       = _this_t::ptr_buffer_t;
         using par_index_t               = _this_t::particle_index_t;
 
-        using ptr_elem_by_elem_config_t =
-            _this_t::ptr_elem_by_elem_config_t;
+        ( void )particles_buffer;
 
         SIXTRL_ASSERT( particles_buffer != nullptr );
         SIXTRL_ASSERT( !::NS(Buffer_needs_remapping)( particles_buffer ) );
@@ -1418,7 +2118,8 @@ namespace SIXTRL_CXX_NAMESPACE
             if( !this->hasOutputBuffer() )
             {
                 SIXTRL_ASSERT( !this->ownsOutputBuffer() );
-                ptr_output_buffer_t managed_output_buffer( new buffer_t );
+                _this_t::ptr_buffer_t managed_output_buffer(
+                    new _this_t::buffer_t );
 
                 SIXTRL_ASSERT(  managed_output_buffer.get() != nullptr );
                 output_buffer = managed_output_buffer.get()->getCApiPtr();
@@ -1484,17 +2185,37 @@ namespace SIXTRL_CXX_NAMESPACE
                 &elem_by_elem_out_idx_offset, &be_monitor_out_idx_offset,
                 &max_elem_by_elem_turn_id );
 
+            if( this->m_elem_by_elem_buffer.get() == nullptr )
+            {
+                _this_t::ptr_buffer_t elem_by_elem_buffer(
+                    new _this_t::buffer_t );
+
+                this->doUpdateStoredElemByElemConfig(
+                    std::move( elem_by_elem_buffer ) );
+            }
+            else
+            {
+                this->m_elem_by_elem_buffer->reset();
+            }
+
+            SIXTRL_ASSERT( this->m_elem_by_elem_buffer.get() != nullptr );
+            SIXTRL_ASSERT( this->m_elem_by_elem_buffer->getNumOfObjects() ==
+                           _this_t::size_type{ 0 } );
+
             if( ( ret == 0 ) && ( until_turn_elem_by_elem > ZERO ) &&
                 ( this->minInitialTurnId() >= par_index_t{ 0 } ) &&
                 ( max_elem_by_elem_turn_id >= this->minInitialTurnId() ) &&
                 ( until_turn_elem_by_elem > static_cast< buf_size_t >(
                     this->minInitialTurnId() ) ) )
             {
-                ptr_elem_by_elem_config_t conf( new elem_by_elem_config_t );
-                ::NS(ElemByElemConfig_preset)( conf.get() );
+                elem_by_elem_config_t* conf = ::NS(ElemByElemConfig_preset)(
+                    ::NS(ElemByElemConfig_new)(
+                        this->m_elem_by_elem_buffer->getCApiPtr() ) );
 
-                ret = ::NS(ElemByElemConfig_init_detailed)(
-                    conf.get(), this->defaultElemByElemOrder(),
+                SIXTRL_ASSERT( conf != nullptr );
+
+                ret = ::NS(ElemByElemConfig_init_detailed)( conf,
+                    this->defaultElemByElemOrder(),
                     this->minParticleId(), this->maxParticleId(),
                     this->minElementId(),  this->maxElementId(),
                     this->minInitialTurnId(), max_elem_by_elem_turn_id,
@@ -1502,19 +2223,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
                 if( ret == 0 )
                 {
-                    this->doUpdateStoredElemByElemConfig( std::move( conf ) );
-                    this->doSetUntilTurnElemByElem(
-                        until_turn_elem_by_elem );
-
+                    this->doSetUntilTurnElemByElem( until_turn_elem_by_elem );
                     SIXTRL_ASSERT( this->hasElemByElemConfig() );
                 }
             }
             else if( ret == 0 )
             {
-                ptr_elem_by_elem_config_t dummy( nullptr );
-                this->doUpdateStoredElemByElemConfig( std::move( dummy ) );
                 this->doSetUntilTurnElemByElem( ZERO );
-
                 ret = ( !this->hasElemByElemConfig() ) ? 0 : -1;
             }
 
@@ -1691,7 +2406,6 @@ namespace SIXTRL_CXX_NAMESPACE
             if( ( success ) && ( output_buffer != nullptr ) &&
                 ( !this->hasOutputBuffer() ) )
             {
-                /* ( !this->ownsOutputBuffer() ) */
                 this->doSetPtrCOutputBuffer( output_buffer );
             }
         }
@@ -1744,6 +2458,113 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return success;
+    }
+
+    _this_t::size_type TrackJobBase::doAddManagedBuffer(
+        std::unique_ptr< _this_t::buffer_t >&& ptr_managed_buffer )
+    {
+        _this_t::size_type buffer_index = st::ARCH_ILLEGAL_BUFFER_ID;
+
+        if( ptr_managed_buffer.get() != nullptr )
+        {
+            buffer_index = st::ARCH_MIN_USER_DEFINED_BUFFER_ID +
+                this->m_managed_buffers.size();
+
+            this->m_managed_buffers.emplace_back(
+                std::move( ptr_managed_buffer ) );
+        }
+
+        return buffer_index;
+    }
+
+    _this_t::status_t TrackJobBase::doRemoveManagedBuffer(
+        _this_t::size_type const buffer_index )
+    {
+        _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        _this_t::size_type const min_buffer_id = this->min_managed_buffer_id();
+
+        if( ( min_buffer_id != st::ARCH_ILLEGAL_BUFFER_ID ) &&
+            ( buffer_index != st::ARCH_ILLEGAL_BUFFER_ID ) &&
+            ( buffer_index >= min_buffer_id ) &&
+            ( buffer_index <  min_buffer_id + this->m_managed_buffers.size() ) )
+        {
+            _this_t::size_type const ii = buffer_index - min_buffer_id;
+
+            if( this->m_managed_buffers[ ii ].get() != nullptr )
+            {
+                this->m_managed_buffers[ ii ].reset( nullptr );
+            }
+
+            status = st::ARCH_STATUS_SUCCESS;
+        }
+
+        return status;
+    }
+
+    _this_t::status_t TrackJobBase::doPerformManagedAssignments(
+        _this_t::size_type const dest_buffer_id,
+        _this_t::size_type const src_buffer_id )
+    {
+        _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        SIXTRL_ASSERT( std::is_sorted( this->m_assign_items_buffer.begin(),
+                                       this->m_assign_items_buffer.end(),
+            []( _this_t::assign_item_t const& SIXTRL_RESTRICT_REF lhs,
+                _this_t::assign_item_t const& SIXTRL_RESTRICT_REF rhs ) -> bool
+            {
+                return ::NS(AssignAddressItem_compare_less)( &lhs, &rhs );
+            } ) );
+
+        _this_t::c_buffer_t* dest_buffer =
+            this->buffer_by_buffer_id( dest_buffer_id );
+
+        _this_t::c_buffer_t const* src_buffer =
+            this->buffer_by_buffer_id( src_buffer_id );
+
+        if( ( dest_buffer != nullptr ) && ( src_buffer != nullptr ) )
+        {
+            status = st::ARCH_STATUS_SUCCESS;
+
+            _this_t::size_type const dest_slot_size =
+                ::NS(Buffer_get_slot_size)( dest_buffer );
+
+            _this_t::size_type const src_slot_size =
+                ::NS(Buffer_get_slot_size)( src_buffer );
+
+            unsigned char* dest_buffer_begin =
+                ::NS(Buffer_get_data_begin)( dest_buffer );
+
+            unsigned char const* src_buffer_begin =
+                ::NS(Buffer_get_const_data_begin)( src_buffer );
+
+            auto it = std::find_if( this->m_assign_items_buffer.begin(),
+                                    this->m_assign_items_buffer.end(),
+                [dest_buffer_id, src_buffer_id](
+                    _this_t::assign_item_t const& SIXTRL_RESTRICT_REF item )
+                {
+                    return ( ( dest_buffer_id == item.dest_buffer_id ) &&
+                             ( src_buffer_id  == item.src_buffer_id ) );
+                } );
+
+            auto end = this->m_assign_items_buffer.end();
+
+            while( ( status == st::ARCH_STATUS_SUCCESS ) && ( it != end ) &&
+                   ( it->dest_buffer_id == dest_buffer_id ) &&
+                   ( it->src_buffer_id == src_buffer_id ) )
+            {
+                status =
+                ::NS(AssignAddressItem_perform_assignment_on_managed_buffer)(
+                    std::addressof( *it++ ), dest_buffer_begin, dest_slot_size,
+                        src_buffer_begin, src_slot_size );
+            }
+        }
+
+        return status;
+    }
+
+    _this_t::status_t TrackJobBase::doRebuildAssignItemsBufferArg()
+    {
+        return st::ARCH_STATUS_SUCCESS;
     }
 
     /* --------------------------------------------------------------------- */
@@ -1961,16 +2782,22 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     void TrackJobBase::doUpdateStoredOutputBuffer(
-        _this_t::ptr_output_buffer_t&& ptr_output_buffer ) SIXTRL_NOEXCEPT
+        _this_t::ptr_buffer_t&& ptr_output_buffer ) SIXTRL_NOEXCEPT
     {
         this->doSetPtrOutputBuffer( ptr_output_buffer.get() );
         this->m_my_output_buffer = std::move( ptr_output_buffer );
     }
 
     void TrackJobBase::doUpdateStoredElemByElemConfig(
-        _this_t::ptr_elem_by_elem_config_t&& ptr_config ) SIXTRL_NOEXCEPT
+        _this_t::ptr_buffer_t&& ptr_elem_by_elem_buffer ) SIXTRL_NOEXCEPT
     {
-        this->m_my_elem_by_elem_config = std::move( ptr_config );
+        this->m_elem_by_elem_buffer = std::move( ptr_elem_by_elem_buffer );
+    }
+
+    void TrackJobBase::doUpdateStoredParticlesAddrBuffer(
+        _this_t::ptr_buffer_t&& ptr_particles_addr_buffer ) SIXTRL_NOEXCEPT
+    {
+        this->m_particles_addr_buffer = std::move( ptr_particles_addr_buffer );
     }
 
     void TrackJobBase::doClearBaseImpl() SIXTRL_NOEXCEPT
@@ -1979,7 +2806,9 @@ namespace SIXTRL_CXX_NAMESPACE
         this->doInitDefaultBeamMonitorIndices();
 
         this->m_my_output_buffer.reset( nullptr );
-        this->m_my_elem_by_elem_config.reset( nullptr );
+        this->m_elem_by_elem_buffer.reset( nullptr );
+        this->m_particles_addr_buffer.reset( nullptr );
+        this->m_assign_items_buffer.clear();
 
         this->m_ptr_particles_buffer         = nullptr;
         this->m_ptr_beam_elem_buffer         = nullptr;

@@ -435,6 +435,133 @@ NS(TrackJob_get_const_output_buffer)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_can_fetch_particles_addr)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_particles_addr)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJob_fetch_particles_addr)( NS(TrackJobBase)* SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJob_clear_particles_addr)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const particle_set_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJob_clear_all_particles_addr)( NS(TrackJobBase)* SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN struct NS(ParticlesAddr) const*
+NS(TrackJob_particles_addr)( const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const particle_set_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer) const*
+NS(TrackJob_particles_addr_buffer)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem)*
+NS(TrackJob_add_assign_address_item)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT assign_item_to_add );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem)*
+NS(TrackJob_add_assign_address_item_detail)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(object_type_id_t) const dest_type_id,
+    NS(arch_size_t) const dest_buffer_id, NS(arch_size_t) const dest_elem_index,
+    NS(arch_size_t) const dest_pointer_offset,
+    NS(object_type_id_t) const src_type_id,
+    NS(arch_size_t) const src_buffer_id, NS(arch_size_t) const src_elem_index,
+    NS(arch_size_t) const src_pointer_offset );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_assign_items)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(arch_size_t) const dest_buffer_id, NS(arch_size_t) const src_buffer_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TrackJob_num_assign_items)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(arch_size_t) const dest_buffer_id, NS(arch_size_t) const src_buffer_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)* NS(TrackJob_buffer_by_buffer_id)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job, NS(arch_size_t) const buffer_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer) const*
+NS(TrackJob_const_buffer_by_buffer_id)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(arch_size_t) const buffer_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJob_num_distinct_assign_items_dest_src_pairs)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN
+NS(arch_size_t) NS(TrackJob_assign_items_dest_src_pairs)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(arch_size_t) const max_num_pairs,
+    NS(AssignAddressItemDestSrcPair)* pairs_begin );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem) const*
+NS(TrackJob_assign_items_begin)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem) const*
+NS(TrackJob_assign_items_end)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem) const*
+NS(TrackJob_assign_items_dest_src_begin)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(arch_size_t) const dest_buffer_id, NS(arch_size_t) const src_buffer_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem) const*
+NS(TrackJob_assign_items_dest_src_end)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(arch_size_t) const dest_buffer_id, NS(arch_size_t) const src_buffer_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJob_perform_managed_assignments)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJob_perform_managed_assignments_detailed)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(arch_size_t) const dest_buffer_id, NS(arch_size_t) const src_buffer_id );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_managed_buffers)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TrackJob_num_managed_buffers)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TrackJob_min_managed_buffer_id)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TrackJob_max_managed_buffer_id)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TrackJob_add_managed_buffer)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJob_remove_managed_buffer)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job, NS(arch_size_t) const buffer_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)* NS(TrackJob_managed_cbuffer)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    NS(arch_size_t) const buffer_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer) const*
+NS(TrackJob_const_managed_cbuffer)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(arch_size_t) const buffer_id );
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_beam_monitors)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
 
