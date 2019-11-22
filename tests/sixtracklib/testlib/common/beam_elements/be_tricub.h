@@ -70,18 +70,36 @@ SIXTRL_INLINE int NS(TriCub_compare_values)(
         if( lhs != rhs )
         {
             cmp_result = NS(TestLibCompare_real_attribute)(
-                NS(TriCub_x)( lhs ), NS(TriCub_x)( rhs ) );
+                NS(TriCub_x_shift)( lhs ), NS(TriCub_x_shift)( rhs ) );
 
             if( cmp_result == 0 )
             {
                 cmp_result = NS(TestLibCompare_real_attribute)(
-                    NS(TriCub_y)( lhs ), NS(TriCub_y)( rhs ) );
+                    NS(TriCub_y_shift)( lhs ), NS(TriCub_y_shift)( rhs ) );
             }
 
             if( cmp_result == 0 )
             {
                 cmp_result = NS(TestLibCompare_real_attribute)(
-                    NS(TriCub_z)( lhs ), NS(TriCub_z)( rhs ) );
+                    NS(TriCub_zeta_shift)( lhs ), NS(TriCub_zeta_shift)( rhs ) );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(TestLibCompare_real_attribute)(
+                    NS(TriCub_dipolar_kick_px)( lhs ), NS(TriCub_dipolar_kick_px)( rhs ) );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(TestLibCompare_real_attribute)(
+                    NS(TriCub_dipolar_kick_py)( lhs ), NS(TriCub_dipolar_kick_py)( rhs ) );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(TestLibCompare_real_attribute)(
+                    NS(TriCub_dipolar_kick_delta)( lhs ), NS(TriCub_dipolar_kick_delta)( rhs ) );
             }
 
             if( cmp_result == 0 )
@@ -119,18 +137,36 @@ SIXTRL_INLINE int NS(TriCub_compare_values_with_treshold)(
         if( lhs != rhs )
         {
             cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                NS(TriCub_x)( lhs ), NS(TriCub_x)( rhs ), treshold );
+                NS(TriCub_x_shift)( lhs ), NS(TriCub_x_shift)( rhs ), treshold );
 
             if( cmp_result == 0 )
             {
                 cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                    NS(TriCub_y)( lhs ), NS(TriCub_y)( rhs ), treshold );
+                    NS(TriCub_y_shift)( lhs ), NS(TriCub_y_shift)( rhs ), treshold );
             }
 
             if( cmp_result == 0 )
             {
                 cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
-                    NS(TriCub_z)( lhs ), NS(TriCub_z)( rhs ), treshold );
+                    NS(TriCub_zeta_shift)( lhs ), NS(TriCub_zeta_shift)( rhs ), treshold );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
+                    NS(TriCub_dipolar_kick_px)( lhs ), NS(TriCub_dipolar_kick_px)( rhs ), treshold );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
+                    NS(TriCub_dipolar_kick_py)( lhs ), NS(TriCub_dipolar_kick_py)( rhs ), treshold );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(TestLibCompare_real_attribute_with_treshold)(
+                    NS(TriCub_dipolar_kick_delta)( lhs ), NS(TriCub_dipolar_kick_delta)( rhs ), treshold );
             }
 
             if( cmp_result == 0 )
@@ -162,13 +198,19 @@ SIXTRL_INLINE void NS(TriCub_print_out)(
 
     SIXTRL_ASSERT( e != SIXTRL_NULLPTR );
 
-    printf( "|tricub          | x              = %+20.12f\r\n"
-            "                 | y              = %+20.12f\r\n"
-            "                 | z              = %+20.12f\r\n"
-            "                 | length         = %+20.12f\r\n"
-            "                 | table_addr     = %+20lu\r\n",
-            NS(TriCub_x)( e ), NS(TriCub_y)( e ), NS(TriCub_z)( e ),
-            NS(TriCub_length)( e ), ( long unsigned )NS(TriCub_data_addr)( e ) );
+    printf( "|tricub          | x_shift             = %+20.12f\r\n"
+            "                 | y_shift             = %+20.12f\r\n"
+            "                 | zeta_shift          = %+20.12f\r\n"
+            "                 | dipolar_kick_px     = %+20.12f\r\n"
+            "                 | dipolar_kick_py     = %+20.12f\r\n"
+            "                 | dipolar_kick_pdelta = %+20.12f\r\n"
+            "                 | length              = %+20.12f\r\n"
+            "                 | table_addr          = %20lu\r\n",
+            NS(TriCub_x_shift)( e ), NS(TriCub_y_shift)( e ),
+            NS(TriCub_zeta_shift)( e ), NS(TriCub_dipolar_kick_px)( e ),
+            NS(TriCub_dipolar_kick_py)( e ), NS(TriCub_dipolar_kick_delta)( e ),
+            NS(TriCub_length)( e ),
+            ( long unsigned )NS(TriCub_data_addr)( e ) );
 
     #else
 

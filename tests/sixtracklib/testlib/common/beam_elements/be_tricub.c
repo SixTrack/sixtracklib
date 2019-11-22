@@ -27,12 +27,17 @@ void NS(TriCub_print)( SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
     if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
     {
         fprintf( fp,
-            "|tricub          | x              = %+20.12f\r\n"
-            "                 | y              = %+20.12f\r\n"
-            "                 | z              = %+20.12f\r\n"
-            "                 | length         = %+20.12f\r\n"
-            "                 | table_addr     = %20lu\r\n",
-            NS(TriCub_x)( e ), NS(TriCub_y)( e ), NS(TriCub_z)( e ),
+            "|tricub          | x_shift             = %+20.12f\r\n"
+            "                 | y_shift             = %+20.12f\r\n"
+            "                 | zeta_shift          = %+20.12f\r\n"
+            "                 | dipolar_kick_px     = %+20.12f\r\n"
+            "                 | dipolar_kick_py     = %+20.12f\r\n"
+            "                 | dipolar_kick_pdelta = %+20.12f\r\n"
+            "                 | length              = %+20.12f\r\n"
+            "                 | table_addr          = %20lu\r\n",
+            NS(TriCub_x_shift)( e ), NS(TriCub_y_shift)( e ),
+            NS(TriCub_zeta_shift)( e ), NS(TriCub_dipolar_kick_px)( e ),
+            NS(TriCub_dipolar_kick_py)( e ), NS(TriCub_dipolar_kick_delta)( e ),
             NS(TriCub_length)( e ),
             ( long unsigned )NS(TriCub_data_addr)( e ) );
     }
