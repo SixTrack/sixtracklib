@@ -1371,9 +1371,6 @@ NS(ClContextBase_new_on_selected_node_id)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClContextBase)* NS(ClContextBase_new)( void );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_free)(
-    NS(ClContextBase)* SIXTRL_RESTRICT ctx );
-
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_delete)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
