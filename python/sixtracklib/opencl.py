@@ -466,7 +466,12 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     def receive_raw_argument(self, ptr_raw_arg_begin, raw_arg_capacity):
         return self.receive(ptr_raw_arg_begin=ptr_raw_arg_begin,
                             raw_arg_capacity=raw_arg_capacity)
+else:
 
+    class ClController(object):
+        pass
 
+    class ClArgument(object):
+        pass
 
 
