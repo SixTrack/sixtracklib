@@ -47,11 +47,13 @@ class Buffer(object):
         self._ptr_st_buffer = st_NullBuffer
         self._last_status = st_ARCH_STATUS_SUCCESS.value
         self._on_del = "delete"
+        self._owns_buffer = owns_ptr
 
         if ptr_ext_buffer is not None and ptr_ext_buffer != st_NullBuffer:
             self._ptr_st_buffer = ptr_ext_buffer
             if owns_ptr is None or not(owns_ptr is True):
                 self._on_del = None
+                self._owns_buffer = False
         elif cbuffer is not None and isinstance(cbuffer, CBuffer):
             self._ptr_st_buffer = st_Buffer_new_mapped_on_cbuffer(cbuffer)
         elif path_to_file is not None and path_to_file != "":
@@ -86,6 +88,10 @@ class Buffer(object):
     @property
     def last_status_success(self):
         return self._last_status == st_ARCH_STATUS_SUCCESS.value
+
+    @property
+    def is_owner(self):
+        return self._owns_buffer
 
     @property
     def slot_size(self):
