@@ -445,6 +445,7 @@ class DipoleEdge(CObject):
                 "DipoleEdge needs either coefficiants r21 and r43"
                 " or suitable values for h, e1, hgap, and fint provided")
 
+
 class TriCub(CObject):
     _typeid = 32768
     nx = CField(0, 'int64', default=1, const=True, alignment=8)
@@ -460,9 +461,12 @@ class TriCub(CObject):
                     length='nx * ny * nz * 8', alignment=8)
 
     def __init__(self, nx=None, ny=None, nz=None, **kwargs):
-        if nx is None: nx = 1
-        if ny is None: ny = 1
-        if nz is None: nz = 1
+        if nx is None:
+            nx = 1
+        if ny is None:
+            ny = 1
+        if nz is None:
+            nz = 1
         super().__init__(nx=nx, ny=ny, nz=nz, **kwargs)
 
 
