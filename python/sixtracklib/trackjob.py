@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from .stcommon import \
+    st_ClArgument_p, st_NullClArgument, \
+    st_ClArgument_new_from_buffer, st_ClArgument_write, st_ClArgument_delete, \
+    st_ClContextBase_add_program_file, st_ClContextBase_compile_program, \
+    st_ClContextBase_enable_kernel, st_ClContextBase_find_kernel_id_by_name, \
+    st_ClContext_assign_addresses, st_ClContextBase_assign_kernel_argument, \
+    st_ClContextBase_assign_kernel_argument_value, \
+    st_TrackJobCl_p, st_NullTrackJob, st_TrackJobCl_get_context
 import ctypes as ct
 import cobjects
 from cobjects import CBuffer, CObject
@@ -102,6 +110,7 @@ def _get_buffer(obj):
         return obj.cbuffer
     else:
         raise ValueError("Object {obj} is not or has not a CBuffer")
+
 
 class TrackJobBaseNew(object):
     def __init__(self, ptr_track_job=None, owns_ptr=True):
@@ -800,6 +809,8 @@ class TrackJob(object):
         self._ptr_c_beam_elements_buffer = st.st_NullBuffer
         self._output_buffer = None
         self._ptr_c_output_buffer = st.st_NullBuffer
+        self._ext_stored_buffers = {}
+        self._ext_stored_st_buffers = {}
 
         base_addr_t = ct.POINTER(ct.c_ubyte)
         success = False
@@ -933,6 +944,9 @@ class TrackJob(object):
         if self._ptr_c_output_buffer != st.st_NullBuffer:
             st.st_Buffer_delete(self._ptr_c_output_buffer)
             self._ptr_c_output_buffer = st.st_NullBuffer
+
+        if len(self._ext_stored_st_buffers) > 0:
+            self._ext_stored_st_buffers = None
 
     @property
     def output_buffer(self):
