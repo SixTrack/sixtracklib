@@ -18,6 +18,8 @@ from .beam_elements import Elements
 from .stcommon import st_TrackJobBaseNew_p, st_NullTrackJobBaseNew, \
     st_ARCH_STATUS_SUCCESS, st_ARCH_STATUS_GENERAL_FAILURE, \
     st_TRACK_SUCCESS, st_TRACK_STATUS_GENERAL_FAILURE, \
+    st_buffer_flags_t, st_arch_size_t, st_BUFFER_DEFAULT_CAPACITY, \
+    st_BUFFER_DEFAULT_DATASTORE_FLAGS, \
     st_Particles_p, st_NullParticles, st_ParticlesAddr, st_NullParticlesAddr, \
     st_track_status_t, st_track_job_collect_flag_t, st_track_job_clear_flag_t,\
     st_out_buffer_flags_t, st_track_job_size_t, \
@@ -91,6 +93,16 @@ from .stcommon import st_TrackJobBaseNew_p, st_NullTrackJobBaseNew, \
     st_TrackJobNew_uses_controller, st_TrackJobNew_uses_arguments
 
 
+def _get_buffer(obj):
+    if isinstance(obj, CBuffer):
+        return obj
+    elif isinstance(obj, CObject):
+        return obj._buffer
+    elif hasattr(obj, 'cbuffer'):
+        return obj.cbuffer
+    else:
+        raise ValueError("Object {obj} is not or has not a CBuffer")
+
 class TrackJobBaseNew(object):
     def __init__(self, ptr_track_job=None, owns_ptr=True):
         self._ptr_track_job = st_NullTrackJobBaseNew
@@ -109,6 +121,7 @@ class TrackJobBaseNew(object):
         self._ptr_c_particles_buffer = st_NullBuffer
         self._ptr_c_beam_elements_buffer = st_NullBuffer
         self._ptr_c_output_buffer = st_NullBuffer
+        self._ext_stored_buffers = {}
 
         if ptr_track_job is not None and ptr_track_job != st_NullTrackJobBaseNew:
             self._ptr_track_job = ptr_track_job
@@ -466,6 +479,22 @@ class TrackJobBaseNew(object):
     def beam_elements_buffer(self):
         return self._beam_elements_buffer
 
+    @property
+    def has_ext_stored_buffers(self):
+        return st.st_TrackJob_has_ext_stored_buffers( self._ptr_track_job )
+
+    @property
+    def num_ext_stored_buffers(self):
+        return st.st_TrackJob_num_ext_stored_buffers( self._ptr_track_job )
+
+    @property
+    def min_ext_stored_buffer_id(self):
+        return st.st_TrackJob_min_ext_stored_buffer_id( self._ptr_track_job )
+
+    @property
+    def max_ext_stored_buffer_id(self):
+        return st.st_TrackJob_max_ext_stored_buffer_id( self._ptr_track_job )
+
     # -------------------------------------------------------------------------
 
     def track_until(self, until_turn):
@@ -636,7 +665,7 @@ class TrackJobBaseNew(object):
     # -------------------------------------------------------------------------
 
     def fetch_particle_addresses(self):
-        self._last_status = st_TrackJobNew_fetch_particle_addresses(
+        self._last_status = st.st_TrackJob_fetch_particle_addresses(
             self._ptr_track_job)
         raise_error_if_status_not_success(
             self._last_status,
@@ -646,7 +675,7 @@ class TrackJobBaseNew(object):
         return self
 
     def clear_particle_addresses(self, particle_set_index=0):
-        self._last_status = st_TrackJobNew_clear_particle_addresses(
+        self._last_status = st.st_TrackJob_clear_particle_addresses(
             self._ptr_track_job, st_buffer_size_t(particle_set_index))
         raise_error_if_status_not_success(
             self._last_status,
@@ -657,7 +686,7 @@ class TrackJobBaseNew(object):
         return self
 
     def clear_all_particle_addresses(self):
-        self._last_status = st_TrackJobNew_clear_all_particle_addresses(
+        self._last_status = st.st_TrackJob_clear_all_particle_addresses(
             self._ptr_track_job)
         raise_error_if_status_not_success(
             self._last_status,
@@ -667,19 +696,60 @@ class TrackJobBaseNew(object):
         return self
 
     def get_particle_addresses(self, particle_set_index=0):
-        return st_TrackJobNew_get_particle_addresses(
+        return st.st_TrackJob_get_particle_addresses(
             self._ptr_track_job, st_buffer_size_t(particle_set_index))
 
+    # -------------------------------------------------------------------------
 
-def _get_buffer(obj):
-    if isinstance(obj, CBuffer):
-        return obj
-    elif isinstance(obj, CObject):
-        return obj._buffer
-    elif hasattr(obj, 'cbuffer'):
-        return obj.cbuffer
-    else:
-        raise ValueError("Object {obj} is not or has not a CBuffer")
+    def add_ext_stored_buffer(self, buffer=None,
+        capacity=st_BUFFER_DEFAULT_CAPACITY.value,
+        flags=st_BUFFER_DEFAULT_DATASTORE_FLAGS.value,
+        ptr_c_buffer_t=None,
+        take_ownership=False,
+        delete_ptr_after_move=False ):
+        buffer_id = st.st_ARCH_ILLEGAL_BUFFER_ID.value
+        if buffer is not None:
+            _cbuffer = _get_buffer(buffer)
+            _ptr_buffer = st.st_Buffer_new_mapped_on_cbuffer(_cbuffer)
+            if _ptr_buffer != st_NullBuffer:
+                buffer_id = st.st_TrackJob_add_ext_stored_buffer(
+                    self._ptr_track_job, _ptr_buffer,
+                        ct.c_bool(False), ct.c_bool(False))
+                if buffer_id != st.st_ARCH_ILLEGAL_BUFFER_ID.value:
+                    self._ext_stored_buffers[ buffer_id ] = _cbuffer
+
+        if buffer_id == st.st_ARCH_ILLEGAL_BUFFER_ID.value:
+            raise ValueError("Unable to add external buffer to TrackJob")
+
+        return buffer_id
+
+
+    def remove_ext_stored_buffer(self, buffer_id):
+        return st.st_TrackJob_remove_ext_stored_buffer(
+            self._ptr_track_job, st_arch_size_t(buffer_id))
+
+    def owns_ext_stored_buffer(self, buffer_id):
+        return st.st_TrackJob_owns_ext_stored_buffer(
+                self._ptr_track_job, st_arch_size_t(buffer_id))
+
+    def ext_stored_buffer(self, buffer_id):
+        return self._ext_stored_buffers.get(buffer_id, None)
+
+    def ptr_ext_stored_buffer(self, buffer_id):
+        _ptr_buffer = st.st_TrackJob_ext_stored_buffer(
+            self._ptr_buffer, st_arch_size_t(buffer_id))
+        if _ptr_buffer != st_NullBuffer:
+            return Buffer(ptr_ext_buffer=_ptr_buffer, owns_ptr=False)
+
+        raise RuntimeError("Unable to retrieve ptr to ext stored buffer")
+        return st_NullBuffer
+
+
+
+
+
+
+
 
 
 from .stcommon import \
@@ -689,8 +759,7 @@ from .stcommon import \
     st_ClContextBase_enable_kernel, st_ClContextBase_find_kernel_id_by_name, \
     st_ClContext_assign_addresses, st_ClContextBase_assign_kernel_argument, \
     st_ClContextBase_assign_kernel_argument_value, \
-    st_TrackJobCl_p, st_NullTrackJob, st_TrackJobCl_get_context, \
-    st_AssignAddressItem_assign_all
+    st_TrackJobCl_p, st_NullTrackJob, st_TrackJobCl_get_context
 
 class TrackJob(object):
     @staticmethod
@@ -933,12 +1002,11 @@ class TrackJob(object):
 
     @property
     def can_fetch_particle_addresses(self):
-        return st.st_TrackJob_can_fetch_particle_addresses(
-            self.ptr_st_track_job)
+        return st.st_TrackJob_can_fetch_particles_addr( self.ptr_st_track_job)
 
     @property
     def has_particle_addresses(self):
-        return st.st_TrackJob_has_particle_addresses(self.ptr_st_track_job)
+        return st.st_TrackJob_has_particles_addr(self.ptr_st_track_job)
 
     def type(self):
         return st.st_TrackJob_get_type_id(self.ptr_st_track_job)
@@ -1056,8 +1124,9 @@ class TrackJob(object):
             st_ClArgument_delete( _src_arg )
 
         elif self.arch_str == 'cpu':
-            success = st_AssignAddressItem_assign_all(
-                _assign_buffer, _dest_buffer, _src_buffer )
+            pass
+            #success = st_AssignAddressItem_assign_all(
+                #_assign_buffer, _dest_buffer, _src_buffer )
 
         if _assign_buffer != st_NullBuffer:
             st.st_Buffer_delete( _assign_buffer )
