@@ -253,11 +253,12 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_push_beam_elements)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_push_output)(
     NS(TrackJobBase)* SIXTRL_RESTRICT track_job );
 
+/* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_can_fetch_particle_addresses)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_can_fetch_particles_addr)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_particle_addresses)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_particles_addr)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT track_job );
 
 /* ------------------------------------------------------------------------- */
@@ -531,6 +532,14 @@ NS(TrackJob_perform_managed_assignments_detailed)(
     NS(arch_size_t) const dest_buffer_id, NS(arch_size_t) const src_buffer_id );
 
 /* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJob_ext_stored_buffers_capacity)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJob_reserve_ext_stored_buffers_capacity)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job, NS(arch_size_t) const capacity );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_ext_stored_buffers)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job );

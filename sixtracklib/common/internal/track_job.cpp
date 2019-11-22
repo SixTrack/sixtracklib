@@ -749,6 +749,21 @@ bool NS(TrackJob_has_assign_items)(
 
 /* ------------------------------------------------------------------------- */
 
+::NS(arch_size_t) NS(TrackJob_ext_stored_buffers_capacity)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->ext_stored_buffers_capacity() : ::NS(arch_size_t){ 0 };
+}
+
+::NS(arch_status_t) NS(TrackJob_reserve_ext_stored_buffers_capacity)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job, ::NS(arch_size_t) const capacity )
+{
+    return ( job != nullptr )
+        ? job->reserve_ext_stored_buffers_capacity( capacity )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
 bool NS(TrackJob_has_ext_stored_buffers)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
 {
