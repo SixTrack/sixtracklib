@@ -997,30 +997,47 @@ class TrackJob(object):
         return self.arch_str() == 'opencl'
 
     @property
+    def has_ext_stored_buffers(self):
+        return st.st_TrackJob_has_ext_stored_buffers(self.ptr_st_track_job)
+
+    @property
+    def num_ext_stored_buffers(self):
+        return st.st_TrackJob_num_ext_stored_buffers(self.ptr_st_track_job)
+
+    @property
+    def min_ext_stored_buffer_id(self):
+        return st.st_TrackJob_min_ext_stored_buffer_id(self.ptr_st_track_job)
+
+    @property
+    def max_ext_stored_buffer_id(self):
+        return st.st_TrackJob_max_ext_stored_buffer_id(self.ptr_st_track_job)
+
+    @property
     def controller(self):
         if self.arch_str != 'opencl':
-            raise RuntimeError("TrackJob has no controller for this architecture" )
-        if self._ptr_track_job == st_NullTrackJob:
+            raise RuntimeError(
+                "TrackJob has no controller for this architecture")
+        if self.ptr_st_track_job == st_NullTrackJob:
             raise RuntimeError("TrackJob is not initialized yet")
-        return st_TrackJobCl_get_context( self._ptr_track_job )
+        return st_TrackJobCl_get_context(self.ptr_st_track_job)
 
     def add_program(self, path_to_program_file, compile_options):
         if not self.allows_add_program:
             raise RuntimeError("Can not add a program to this TrackJob")
         path_to_program_file = path_to_program_file.strip()
-        path_to_program_file.encode( 'utf-8')
+        path_to_program_file.encode('utf-8')
         compile_options = compile_options.strip()
         compile_options.encode('utf-8')
 
-        _controller = st_TrackJobCl_get_context(self._ptr_track_job)
-        program_id = st_ClContextBase_add_program_file( _controller,
-            ct.c_char_p(path_to_program_file), ct.c_char_p(compile_options))
+        _controller = st_TrackJobCl_get_context(self.ptr_st_track_job)
+        program_id = st_ClContextBase_add_program_file(
+            _controller, ct.c_char_p(path_to_program_file), ct.c_char_p(compile_options))
 
         if program_id == 0xffffffff:
             raise RuntimeError("Unable to load program")
 
         success = st_ClContextBase_compile_program(
-                _controller, ct.c_uint32(program_id))
+            _controller, ct.c_uint32(program_id))
 
         if not success:
             raise RuntimeError("Unable to compile program")
@@ -1031,11 +1048,11 @@ class TrackJob(object):
         if not self.allows_enable_kernel:
             raise RuntimeError("Can not enable a kernel at this TrackJob")
         kernel_name = kernel_name.strip()
-        kernel_name.encode( 'utf-8')
+        kernel_name.encode('utf-8')
 
-        _controller = st_TrackJobCl_get_context(self._ptr_track_job)
-        kernel_id = st_ClContextBase_enable_kernel( _controller,
-            ct.c_char_p(kernel_name), program_id)
+        _controller = st_TrackJobCl_get_context(self.ptr_st_track_job)
+        kernel_id = st_ClContextBase_enable_kernel(
+            _controller, ct.c_char_p(kernel_name), program_id)
 
         if kernel_id == 0xffffffff:
             raise RuntimeError("Unable to enable kernel")
@@ -1043,40 +1060,40 @@ class TrackJob(object):
         return kernel_id
 
     def assign_addresses(self, assignment_buffer, dest_buffer, source_buffer):
-        _assign_buffer = st.st_Buffer_new_mapped_on_cbuffer( assignment_buffer )
-        _dest_buffer   = st.st_Buffer_new_mapped_on_cbuffer( dest_buffer )
-        _src_buffer    = st.st_Buffer_new_mapped_on_cbuffer( src_buffer )
+        _assign_buffer = st.st_Buffer_new_mapped_on_cbuffer(assignment_buffer)
+        _dest_buffer = st.st_Buffer_new_mapped_on_cbuffer(dest_buffer)
+        _src_buffer = st.st_Buffer_new_mapped_on_cbuffer(src_buffer)
 
         if self.arch_str == 'opencl':
-            _controller = st_TrackJobCl_get_context(self._ptr_track_job)
-            _assign_arg = st_ClArgument_new_from_buffer( _controller, _assign_buffer)
-            _dest_arg = st_ClArgument_new_from_buffer( _controller, _dest_buffer )
-            _src_arg = st_ClArgument_new_from_buffer( _controller, _src_buffer)
+            _controller = st_TrackJobCl_get_context(self.ptr_st_track_job)
+            _assign_arg = st_ClArgument_new_from_buffer(
+                _controller, _assign_buffer)
+            _dest_arg = st_ClArgument_new_from_buffer(_controller, _dest_buffer)
+            _src_arg = st_ClArgument_new_from_buffer(_controller, _src_buffer)
 
-            success = st_ClContext_assign_addresses( _controller,
-                    _assign_arg, _dest_arg, _src_arg )
+            success = st_ClContext_assign_addresses(
+                _controller, _assign_arg, _dest_arg, _src_arg)
 
-            st_ClArgument_delete( _assign_arg )
-            st_ClArgument_delete( _dest_arg )
-            st_ClArgument_delete( _src_arg )
+            st_ClArgument_delete(_assign_arg)
+            st_ClArgument_delete(_dest_arg)
+            st_ClArgument_delete(_src_arg)
 
         elif self.arch_str == 'cpu':
             pass
-            #success = st_AssignAddressItem_assign_all(
-                #_assign_buffer, _dest_buffer, _src_buffer )
+            # success = st_AssignAddressItem_assign_all(
+            # _assign_buffer, _dest_buffer, _src_buffer )
 
         if _assign_buffer != st_NullBuffer:
-            st.st_Buffer_delete( _assign_buffer )
+            st.st_Buffer_delete(_assign_buffer)
 
         if _dest_buffer != st_NullBuffer:
-            st.st_Buffer_delete( _dest_buffer )
+            st.st_Buffer_delete(_dest_buffer)
 
         if _src_buffer != st_NullBuffer:
-            st.st_Buffer_delete( _src_buffer )
+            st.st_Buffer_delete(_src_buffer)
 
         self._last_status = raise_error_if_status_not_success(
-            success, "Unable to assign addresses" )
-
+            success, "Unable to assign addresses")
 
     def reset(self, beam_elements_buffer, particles_buffer,
               until_turn_elem_by_elem=0, output_buffer=None):
@@ -1194,5 +1211,60 @@ class TrackJob(object):
                     st.st_Buffer_delete(_new_ptr_c_beam_elements_buffer)
 
         return self
+
+    # -------------------------------------------------------------------------
+
+    def add_ext_stored_buffer(self, cbuffer=None,
+                              capacity=st_BUFFER_DEFAULT_CAPACITY.value,
+                              flags=st_BUFFER_DEFAULT_DATASTORE_FLAGS.value,
+                              ptr_c_buffer_t=None,
+                              take_ownership=False,
+                              delete_ptr_after_move=False):
+        buffer_id = st.st_ARCH_ILLEGAL_BUFFER_ID.value
+        if cbuffer is not None:
+            _cbuffer = _get_buffer(cbuffer)
+            _ptr_buffer = st.st_Buffer_new_mapped_on_cbuffer(_cbuffer)
+            if _ptr_buffer != st_NullBuffer:
+                buffer_id = st.st_TrackJob_add_ext_stored_buffer(
+                    self.ptr_st_track_job, _ptr_buffer,
+                    ct.c_bool(False), ct.c_bool(False))
+                if buffer_id != st.st_ARCH_ILLEGAL_BUFFER_ID.value:
+                    assert buffer_id not in self._ext_stored_buffers
+                    assert buffer_id not in self._ext_stored_st_buffers
+                    self._ext_stored_st_buffers[buffer_id] = Buffer(
+                        ptr_ext_buffer=_ptr_buffer, owns_ptr=True)
+                    self._ext_stored_buffers[buffer_id] = _cbuffer
+
+        if buffer_id == st.st_ARCH_ILLEGAL_BUFFER_ID.value:
+            raise ValueError("Unable to add external buffer to TrackJob")
+
+        return buffer_id
+
+    def remove_ext_stored_buffer(self, buffer_id):
+        return st.st_TrackJob_remove_ext_stored_buffer(
+            self.ptr_st_track_job, st_arch_size_t(buffer_id))
+
+    def owns_ext_stored_buffer(self, buffer_id):
+        return st.st_TrackJob_owns_ext_stored_buffer(
+            self.ptr_st_track_job, st_arch_size_t(buffer_id))
+
+    def ext_stored_buffer(self, buffer_id):
+        return self._ext_stored_buffers.get(buffer_id, None)
+
+    def ptr_ext_stored_buffer(self, buffer_id):
+        return st.st_TrackJob_ext_stored_buffer(
+            self.ptr_st_track_job, st_arch_size_t(buffer_id))
+
+    def ext_stored_st_buffer(self, buffer_id):
+        if buffer_id in self._ext_stored_st_buffers:
+            return self._ext_stored_st_buffers[buffer_id]
+        else:
+            _ptr_buffer = st.st_TrackJob_ext_stored_buffer(
+                self    .ptr_st_track_job, st_arch_size_t(buffer_id))
+            if _ptr_buffer != st_NullBuffer:
+                return Buffer(ptr_ext_buffer=_ptr_buffer,
+                              owns_ptr=False)
+
+        raise RuntimeError("Unable to retrieve ptr to ext stored buffer")
 
 # end: python/sixtracklib/trackjob.py
