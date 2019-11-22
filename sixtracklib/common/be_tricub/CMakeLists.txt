@@ -1,5 +1,5 @@
 set( SIXTRL_COMMON_BE_TRICUB_SOURCES be_tricub.c )
-set( SIXTRL_COMMON_BE_TRICUB_HEADERS be_tricub.h track.h )
+set( SIXTRL_COMMON_BE_TRICUB_HEADERS be_tricub.h track.h coefficients.h)
 
 add_library( sixtrack_common_be_tricub OBJECT
     ${SIXTRL_COMMON_BE_TRICUB_HEADERS} ${SIXTRL_COMMON_BE_TRICUB_SOURCES}
