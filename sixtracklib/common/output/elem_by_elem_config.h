@@ -16,6 +16,7 @@
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
     #include "sixtracklib/common/internal/elem_by_elem_config_defines.h"
+    #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -466,9 +467,32 @@ NS(ElemByElemConfig_get_stored_num_particles_detailed)(
     NS(particle_index_t) const min_turn_id,
     NS(particle_index_t) const max_elem_by_elem_turn_id );
 
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+}
+#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+
+#if defined( __cplusplus )
+
+namespace SIXTRL_CXX_NAMESPACE
+{
+    template<> struct ObjectTypeTraits< ::NS(ElemByElemConfig) >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF);
+        }
+    };
+}
+
+#endif /* defined( __cplusplus ) */
+
  /* ------------------------------------------------------------------------ */
  /*  Implementation of inline functions: */
  /* ------------------------------------------------------------------------ */
+
+#if !defined( _GPUCODE ) && defined( __cplusplus )
+extern "C" {
+#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 SIXTRL_INLINE bool NS(ElemByElemConfig_is_active)(
     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const

@@ -5,6 +5,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -22,6 +23,13 @@ extern "C" {
     NS(ASSIGN_ADDRESS_ITEM_NO_BUFFER_ID) =
         ( NS(buffer_size_t) )SIXTRL_ASSIGN_ADDRESS_ITEM_NO_BUFFER_ID;
 #endif /* !defined( _GPUCODE ) */
+
+typedef struct NS(AssignAddressItemDestSrcPair)
+{
+    NS(buffer_size_t) dest_buffer_id;
+    NS(buffer_size_t) src_buffer_id;
+}
+NS(AssignAddressItemDestSrcPair);
 
 typedef struct NS(AssignAddressItem)
 {
@@ -256,6 +264,9 @@ NS(AssignAddressItem_remap_assignment_on_managed_buffer)(
 #if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(AssignAddressItem_next_buffer_id)( void );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(AssignAddressItem_perform_assignment)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(AssignAddressItem)
         *const SIXTRL_RESTRICT item,
@@ -343,13 +354,27 @@ NS(AssignAddressItem_assign_all_managed_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* src_buffer,
     NS(buffer_size_t) const src_slot_size );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(AssignAddressItem_assign_all)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT map_buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT dest_buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT src_buffer );
+SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_compare_less)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
 
-#endif /* !defined( _GPUCODE ) */
+SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_are_equal)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_are_not_equal)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_dest_src_are_equal)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_dest_src_are_not_equal)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
+
+#endif /* defined( _GPUCODE ) */
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(AssignAddressItem_copy)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* SIXTRL_RESTRICT dest,
@@ -360,6 +385,21 @@ SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(AssignAddressItem_copy)(
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
+#if defined( __cplusplus )
+
+namespace SIXTRL_CXX_NAMESPACE
+{
+    template<> struct ObjectTypeTraits< ::NS(AssignAddressItem) >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_ASSIGN_ADDRESS_ITEM);
+        }
+    };
+}
+
+#endif /* defined( __cplusplus ) */
+
 /* ************************************************************************* */
 /* *****          Implementation of C inline functions                   *** */
 /* ************************************************************************* */
@@ -369,7 +409,7 @@ SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(AssignAddressItem_copy)(
     #include "sixtracklib/common/buffer/managed_buffer_remap.h"
     #include "sixtracklib/common/internal/objects_type_id.h"
     #if !defined( _GPUCODE )
-    #include "sixtracklib/common/buffer.h"
+        #include "sixtracklib/common/buffer.h"
     #endif /* !defined( _GPUCODE ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -944,7 +984,8 @@ NS(AssignAddressItem_src_pointer_addr_from_managed_buffer)(
     return address;
 }
 
-NS(buffer_addr_t) NS(AssignAddressItem_src_pointer_addr_from_raw_memory)(
+SIXTRL_INLINE NS(buffer_addr_t)
+NS(AssignAddressItem_src_pointer_addr_from_raw_memory)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(AssignAddressItem)
         *const SIXTRL_RESTRICT item,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const*
@@ -1000,9 +1041,118 @@ SIXTRL_INLINE NS(arch_status_t) NS(AssignAddressItem_copy)(
     return status;
 }
 
+SIXTRL_INLINE bool NS(AssignAddressItem_compare_less)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs )
+{
+    SIXTRL_ASSERT( lhs != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( rhs != SIXTRL_NULLPTR );
+
+    bool is_equal_so_far = false;
+    bool is_smaller_than = ( lhs->dest_buffer_id < rhs->dest_buffer_id );
+
+    if( ( !is_smaller_than ) &&
+        ( lhs->dest_buffer_id == rhs->dest_buffer_id ) )
+    {
+        is_smaller_than = ( lhs->src_buffer_id < rhs->src_buffer_id );
+
+        if( ( !is_smaller_than ) && ( lhs->src_buffer_id == rhs->src_buffer_id ) )
+        {
+            is_smaller_than = ( lhs->dest_elem_type_id < rhs->dest_elem_type_id );
+
+            if( ( !is_smaller_than ) &&
+                ( lhs->dest_elem_type_id == rhs->dest_elem_type_id ) )
+            {
+                is_smaller_than = (
+                    lhs->src_elem_type_id < rhs->src_elem_type_id );
+
+                if( ( !is_smaller_than ) &&
+                    ( lhs->src_elem_type_id == rhs->src_elem_type_id ) )
+                {
+                    is_equal_so_far = true;
+                }
+            }
+        }
+    }
+
+    if( ( !is_smaller_than ) && ( is_equal_so_far ) )
+    {
+        is_smaller_than = ( lhs->dest_elem_index < rhs->dest_elem_index );
+
+        if( ( !is_smaller_than ) &&
+            (  lhs->dest_elem_index == rhs->dest_elem_index ) )
+        {
+            is_smaller_than = ( lhs->src_elem_index < rhs->src_elem_index );
+
+            if( ( !is_smaller_than ) &&
+                ( lhs->src_elem_index == rhs->src_elem_index ) )
+            {
+                is_smaller_than = (
+                    lhs->dest_pointer_offset < rhs->dest_pointer_offset );
+
+                if( ( !is_smaller_than ) &&
+                    ( lhs->dest_pointer_offset == rhs->dest_pointer_offset ) )
+                {
+                    is_smaller_than = (
+                        lhs->src_pointer_offset < rhs->src_pointer_offset );
+                }
+            }
+        }
+    }
+
+    return is_smaller_than;
+}
+
+SIXTRL_INLINE bool NS(AssignAddressItem_are_equal)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs )
+{
+    SIXTRL_ASSERT( lhs != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( rhs != SIXTRL_NULLPTR );
+
+    return ( ( lhs->dest_buffer_id      == rhs->dest_buffer_id ) &&
+             ( lhs->src_buffer_id       == rhs->src_buffer_id ) &&
+             ( lhs->dest_elem_type_id   == rhs->dest_elem_type_id ) &&
+             ( lhs->src_elem_type_id    == rhs->src_elem_type_id ) &&
+             ( lhs->dest_elem_index     == rhs->dest_elem_index ) &&
+             ( lhs->src_elem_index      == rhs->src_elem_index ) &&
+             ( lhs->dest_pointer_offset == rhs->dest_pointer_offset ) &&
+             ( lhs->src_pointer_offset  == rhs->src_pointer_offset ) );
+}
+
+SIXTRL_INLINE bool NS(AssignAddressItem_are_not_equal)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs )
+{
+    return !NS(AssignAddressItem_are_equal)( lhs, rhs );
+}
+
+SIXTRL_INLINE bool NS(AssignAddressItem_dest_src_are_equal)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs )
+{
+    SIXTRL_ASSERT( lhs != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( rhs != SIXTRL_NULLPTR );
+
+    return ( ( lhs->dest_buffer_id == rhs->dest_buffer_id ) &&
+             ( lhs->src_buffer_id  == rhs->src_buffer_id ) );
+}
+
+SIXTRL_INLINE bool NS(AssignAddressItem_dest_src_are_not_equal)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs )
+{
+    SIXTRL_ASSERT( lhs != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( rhs != SIXTRL_NULLPTR );
+
+    return ( ( lhs->dest_buffer_id != rhs->dest_buffer_id ) ||
+             ( lhs->src_buffer_id  != rhs->src_buffer_id ) );
+}
+
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
+
 
 #endif /* SIXTRACKLIB_COMMON_BUFFER_ADDR_ASSIGNMENT_C99_H__ */
 
