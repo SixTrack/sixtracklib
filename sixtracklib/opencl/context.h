@@ -412,7 +412,8 @@ NS(ClContext_track_elem_by_elem)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t)
 NS(ClContext_track_elem_by_elem_for_particle_set)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, NS(buffer_size_t) const until_turn,
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    NS(context_num_turns_t) const until_turn,
     NS(buffer_size_t) const particle_set_index,
     NS(buffer_size_t) const num_particles_in_set,
     bool const restore_particle_set_index );
