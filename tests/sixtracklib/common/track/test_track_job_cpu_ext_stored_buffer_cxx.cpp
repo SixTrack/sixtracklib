@@ -349,12 +349,13 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
 
     ext_buffer_07_capacity = ext_buffer_07.getCapacity();
 
-    size_t const ext_buffer_07_id = job.add_ext_stored_buffer(
-        std::move( ext_buffer_07 ) );
-
     size_t const ext_buffer_07_size = ext_buffer_07.getSize();
+
     buffer_addr_t const ext_buffer_07_begin_addr =
         ext_buffer_07.getDataBeginAddr();
+
+    size_t const ext_buffer_07_id = job.add_ext_stored_buffer(
+        std::move( ext_buffer_07 ) );
 
     ASSERT_TRUE(  ext_buffer_07_id != st::ARCH_ILLEGAL_BUFFER_ID );
     ASSERT_TRUE(  job.num_ext_stored_buffers() == size_t{ 7 } );
