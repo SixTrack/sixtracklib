@@ -249,7 +249,8 @@ NS(TriCubData_add)(
     NS(be_tricub_real_t) const y0, NS(be_tricub_real_t) const dy,
     NS(be_tricub_int_t)  const ny,
     NS(be_tricub_real_t) const z0, NS(be_tricub_real_t) const dz,
-    NS(be_tricub_int_t)  const nz,
+    NS(be_tricub_int_t)  const nz, NS(be_tricub_int_t) const mirror_x,
+    NS(be_tricub_int_t) const mirror_y, NS(be_tricub_int_t) const mirror_z,
     NS(buffer_addr_t) const table_addr );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)*
