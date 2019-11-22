@@ -62,10 +62,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_tricub)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData) const* tricub_data =
         NS(TriCub_const_data)( tricub );
 
-    /* How to access the data members of the NS(TriCub) beam element */
-    /*
-    real_t const length         = NS(TriCub_length)( tricub );
-    */
+    real_t const length = NS(TriCub_length)( tricub );
     
     real_t const x_shift = NS(TriCub_x_shift)( tricub );
     real_t const y_shift = NS(TriCub_y_shift)( tricub );
@@ -91,9 +88,9 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_tricub)(
     real_t const fy = ( (y - y_shift) - y0 ) * inv_dy;
     real_t const fz = ( (z - z_shift) - z0 ) * inv_dz;
 
-    real_t const sign_x = ( mirror_x == 1 && fx < 0.0 ) ? -1. : 1.;
-    real_t const sign_y = ( mirror_y == 1 && fy < 0.0 ) ? -1. : 1.;
-    real_t const sign_z = ( mirror_z == 1 && fz < 0.0 ) ? -1. : 1.;
+    real_t const sign_x = ( NS(TriCubData_mirror_x)( tricub_data ) == 1 && fx < 0.0 ) ? -1. : 1.;
+    real_t const sign_y = ( NS(TriCubData_mirror_y)( tricub_data ) == 1 && fy < 0.0 ) ? -1. : 1.;
+    real_t const sign_z = ( NS(TriCubData_mirror_z)( tricub_data ) == 1 && fz < 0.0 ) ? -1. : 1.;
 
     real_t const sfx = sign_x * fx;
     real_t const sfy = sign_y * fy;
@@ -233,8 +230,8 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_tricub)(
 
     ( void )particles;
     ( void )ii;
-    ( void )lookup_table_begin;
-    ( void )lookup_table_size;
+    //( void )lookup_table_begin;
+    //( void )lookup_table_size;
 
     return SIXTRL_TRACK_SUCCESS;
 }
@@ -257,7 +254,7 @@ SIXTRL_INLINE void NS(tricub_construct_b_vector)(
     NS(be_tricub_real_t) const dy = NS(TriCubData_dy)( tricub_data );
     NS(be_tricub_real_t) const dz = NS(TriCubData_dz)( tricub_data );
 
-    NS(be_tricube_real_t) const scale = { 1., dx, dy, dz, 
+    NS(be_tricub_real_t) const scale[8] = { 1., dx, dy, dz, 
                                           dx * dy, dx * dz, dy * dz, 
                                           (dx * dy) * dz };
     for(int l = 0; l < 8; l++)

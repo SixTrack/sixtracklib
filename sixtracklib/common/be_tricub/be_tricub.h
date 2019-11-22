@@ -1018,24 +1018,45 @@ NS(TriCub_data)( SIXTRL_BE_ARGPTR_DEC NS(TriCub)* SIXTRL_RESTRICT tricub )
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE void NS(TriCub_set_x)( SIXTRL_BE_ARGPTR_DEC NS(TriCub)*
-    SIXTRL_RESTRICT tricub, NS(be_tricub_real_t) const x )
+SIXTRL_INLINE void NS(TriCub_set_x_shift)( SIXTRL_BE_ARGPTR_DEC NS(TriCub)*
+    SIXTRL_RESTRICT tricub, NS(be_tricub_real_t) const x_shift )
 {
-    if( tricub != SIXTRL_NULLPTR ) tricub->x = x;
+    if( tricub != SIXTRL_NULLPTR ) tricub->x_shift = x_shift;
 }
 
-SIXTRL_INLINE void NS(TriCub_set_y)(
+SIXTRL_INLINE void NS(TriCub_set_y_shift)(
     SIXTRL_BE_ARGPTR_DEC NS(TriCub)* SIXTRL_RESTRICT tricub,
-    NS(be_tricub_real_t) const y )
+    NS(be_tricub_real_t) const y_shift )
 {
-    if( tricub != SIXTRL_NULLPTR ) tricub->y = y;
+    if( tricub != SIXTRL_NULLPTR ) tricub->y_shift = y_shift;
 }
 
-SIXTRL_INLINE void NS(TriCub_set_z)(
+SIXTRL_INLINE void NS(TriCub_set_zeta_shift)(
     SIXTRL_BE_ARGPTR_DEC NS(TriCub)* SIXTRL_RESTRICT tricub,
-    NS(be_tricub_real_t) const z )
+    NS(be_tricub_real_t) const zeta_shift )
 {
-    if( tricub != SIXTRL_NULLPTR ) tricub->z = z;
+    if( tricub != SIXTRL_NULLPTR ) tricub->zeta_shift = zeta_shift;
+}
+
+SIXTRL_INLINE void NS(TriCub_set_dipolar_kick_px)(
+    SIXTRL_BE_ARGPTR_DEC NS(TriCub)* SIXTRL_RESTRICT tricub,
+    NS(be_tricub_real_t) const dipolar_kick_px )
+{
+    if( tricub != SIXTRL_NULLPTR ) tricub->dipolar_kick_px = dipolar_kick_px;
+}
+
+SIXTRL_INLINE void NS(TriCub_set_dipolar_kick_py)(
+    SIXTRL_BE_ARGPTR_DEC NS(TriCub)* SIXTRL_RESTRICT tricub,
+    NS(be_tricub_real_t) const dipolar_kick_py )
+{
+    if( tricub != SIXTRL_NULLPTR ) tricub->dipolar_kick_py = dipolar_kick_py;
+}
+
+SIXTRL_INLINE void NS(TriCub_set_dipolar_kick_delta)(
+    SIXTRL_BE_ARGPTR_DEC NS(TriCub)* SIXTRL_RESTRICT tricub,
+    NS(be_tricub_real_t) const dipolar_kick_delta )
+{
+    if( tricub != SIXTRL_NULLPTR ) tricub->dipolar_kick_delta = dipolar_kick_delta;
 }
 
 SIXTRL_INLINE void NS(TriCub_set_length)(
