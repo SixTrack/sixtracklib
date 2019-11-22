@@ -48,6 +48,7 @@ SIXTRL_STATIC SIXTRL_FN void NS(tricub_construct_coefs)(
     #include "sixtracklib/common/constants.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/be_tricub/be_tricub.h"
+    #include "sixtracklib/common/be_tricub/coefficients.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
