@@ -197,23 +197,23 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     _store_t::c_buffer_t const*
-    TrackJobBufferStore::ptr_cbuffer() const SIXTRL_NOEXCEPT
+    TrackJobBufferStore::ptr_buffer() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_c99_buffer;
     }
 
-    _store_t::c_buffer_t* TrackJobBufferStore::ptr_cbuffer() SIXTRL_NOEXCEPT
+    _store_t::c_buffer_t* TrackJobBufferStore::ptr_buffer() SIXTRL_NOEXCEPT
     {
         return this->m_ptr_c99_buffer;
     }
 
     _store_t::buffer_t const*
-    TrackJobBufferStore::ptr_buffer() const SIXTRL_NOEXCEPT
+    TrackJobBufferStore::ptr_cxx_buffer() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_cxx_buffer;
     }
 
-    _store_t::buffer_t* TrackJobBufferStore::ptr_buffer() SIXTRL_NOEXCEPT
+    _store_t::buffer_t* TrackJobBufferStore::ptr_cxx_buffer() SIXTRL_NOEXCEPT
     {
         return this->m_ptr_cxx_buffer;
     }
@@ -1441,106 +1441,143 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* ---------------------------------------------------------------- */
 
-    _size_t TrackJobBase::ext_stored_buffers_capacity() const SIXTRL_NOEXCEPT
+    _size_t TrackJobBase::stored_buffers_capacity() const SIXTRL_NOEXCEPT
     {
-        return this->m_ext_stored_buffers.capacity();
+        return this->m_stored_buffers.capacity();
     }
 
-    _this_t::status_t TrackJobBase::reserve_ext_stored_buffers_capacity(
+    _this_t::status_t TrackJobBase::reserve_stored_buffers_capacity(
         _size_t const capacity )
     {
         _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
-        if( capacity < this->m_ext_stored_buffers.capacity() )
+        if( capacity < this->m_stored_buffers.capacity() )
         {
-            this->m_ext_stored_buffers.reserve( capacity );
+            this->m_stored_buffers.reserve( capacity );
             status = st::ARCH_STATUS_SUCCESS;
         }
 
         return status;
     }
 
-    bool TrackJobBase::has_ext_stored_buffers() const SIXTRL_NOEXCEPT
+    bool TrackJobBase::has_stored_buffers() const SIXTRL_NOEXCEPT
     {
-        return ( this->num_ext_stored_buffers() > _this_t::size_type{ 0 } );
+        return ( this->num_stored_buffers() > _this_t::size_type{ 0 } );
     }
 
-    _this_t::size_type TrackJobBase::num_ext_stored_buffers() const SIXTRL_NOEXCEPT
+    _this_t::size_type TrackJobBase::num_stored_buffers() const SIXTRL_NOEXCEPT
     {
-        SIXTRL_ASSERT( std::count_if( this->m_ext_stored_buffers.begin(),
-            this->m_ext_stored_buffers.end(),
+        SIXTRL_ASSERT( std::count_if( this->m_stored_buffers.begin(),
+            this->m_stored_buffers.end(),
             []( _this_t::buffer_store_t const& s) { return s.active(); } ) ==
-            static_cast< std::ptrdiff_t >( this->m_num_ext_stored_buffers ) );
+            static_cast< std::ptrdiff_t >( this->m_num_stored_buffers ) );
 
-        SIXTRL_ASSERT( this->m_ext_stored_buffers.size() >=
-                       this->m_num_ext_stored_buffers );
+        SIXTRL_ASSERT( this->m_stored_buffers.size() >=
+                       this->m_num_stored_buffers );
 
-        return this->m_num_ext_stored_buffers;
+        return this->m_num_stored_buffers;
     }
 
-    _this_t::size_type TrackJobBase::min_ext_stored_buffer_id() const SIXTRL_NOEXCEPT
+    _this_t::size_type TrackJobBase::min_stored_buffer_id() const SIXTRL_NOEXCEPT
     {
-        return ( this->has_ext_stored_buffers() )
+        return ( this->has_stored_buffers() )
             ? st::ARCH_MIN_USER_DEFINED_BUFFER_ID : st::ARCH_ILLEGAL_BUFFER_ID;
     }
 
-    _this_t::size_type TrackJobBase::max_ext_stored_buffer_id() const SIXTRL_NOEXCEPT
+    _this_t::size_type TrackJobBase::max_stored_buffer_id() const SIXTRL_NOEXCEPT
     {
-        _this_t::size_type max_ext_stored_buffers_id =
-            this->min_ext_stored_buffer_id();
+        _this_t::size_type max_stored_buffers_id = this->min_stored_buffer_id();
 
-        if( max_ext_stored_buffers_id != st::ARCH_ILLEGAL_BUFFER_ID )
+        if( max_stored_buffers_id != st::ARCH_ILLEGAL_BUFFER_ID )
         {
-            SIXTRL_ASSERT( this->m_ext_stored_buffers.size() >= _size_t{ 1 } );
-            max_ext_stored_buffers_id += this->m_ext_stored_buffers.size();
-            max_ext_stored_buffers_id -= _this_t::size_type{ 1 };
+            SIXTRL_ASSERT( this->m_stored_buffers.size() >= _size_t{ 1 } );
+            max_stored_buffers_id += this->m_stored_buffers.size();
+            max_stored_buffers_id -= _this_t::size_type{ 1 };
         }
 
-        return max_ext_stored_buffers_id;
+        return max_stored_buffers_id;
     }
 
-    bool TrackJobBase::owns_ext_stored_buffer(
+    bool TrackJobBase::owns_stored_buffer(
         _this_t::size_type const buffer_id ) const SIXTRL_NOEXCEPT
     {
-        auto ptr_buffer_store = this->doGetPtrExtBufferStore( buffer_id );
+        auto ptr_buffer_store = this->doGetPtrBufferStore( buffer_id );
         return ( ( ptr_buffer_store != nullptr ) &&
                  ( ptr_buffer_store->owns_buffer() ) );
     }
 
-    _this_t::status_t TrackJobBase::remove_ext_stored_buffer(
+    _this_t::status_t TrackJobBase::remove_stored_buffer(
         _this_t::size_type const buffer_index )
     {
-        return this->doRemoveExtStoredBuffer( buffer_index );
+        return this->doRemoveStoredBuffer( buffer_index );
     }
 
-    _this_t::buffer_t* TrackJobBase::ptr_ext_stored_buffer(
+    _this_t::buffer_t& TrackJobBase::stored_cxx_buffer(
+        _this_t::size_type const buffer_id )
+    {
+        return const_cast< _this_t::buffer_t& >( static_cast< _this_t const& >(
+            *this ).stored_cxx_buffer( buffer_id ) );
+    }
+
+    _this_t::buffer_t const& TrackJobBase::stored_cxx_buffer(
+        _this_t::size_type const buffer_id ) const
+    {
+        _this_t::buffer_t const* ptr_buffer =
+            this->ptr_stored_cxx_buffer( buffer_id );
+
+        if( ptr_buffer == nullptr )
+        {
+            throw std::runtime_error(
+                "stored buffer does not have a c++ representation" );
+        }
+
+        return *ptr_buffer;
+    }
+
+    _this_t::buffer_t* TrackJobBase::ptr_stored_cxx_buffer(
         _this_t::size_type const buffer_id ) SIXTRL_NOEXCEPT
     {
         return const_cast< _this_t::buffer_t* >( static_cast< _this_t const& >(
-            *this ).ptr_ext_stored_buffer( buffer_id ) );
+            *this ).ptr_stored_cxx_buffer( buffer_id ) );
     }
 
-    _this_t::buffer_t const* TrackJobBase::ptr_ext_stored_buffer(
+    _this_t::buffer_t const* TrackJobBase::ptr_stored_cxx_buffer(
         _this_t::size_type const buffer_id ) const SIXTRL_NOEXCEPT
     {
-        auto ptr_buffer_store = this->doGetPtrExtBufferStore( buffer_id );
-        return ( ptr_buffer_store != nullptr )
-            ? ptr_buffer_store->ptr_buffer() : nullptr;
+        _this_t::buffer_store_t const* ptr_stored_buffer =
+            this->doGetPtrBufferStore( buffer_id );
+
+        return ( ptr_stored_buffer != nullptr )
+            ? ptr_stored_buffer->ptr_cxx_buffer() : nullptr;
     }
 
-    _this_t::c_buffer_t* TrackJobBase::ptr_ext_stored_cbuffer(
+    _this_t::c_buffer_t* TrackJobBase::ptr_stored_buffer(
         _this_t::size_type const buffer_id ) SIXTRL_NOEXCEPT
     {
-        return const_cast< _this_t::c_buffer_t* >( static_cast< _this_t const& >(
-            *this ).ptr_ext_stored_cbuffer( buffer_id ) );
+        return const_cast< _this_t::c_buffer_t* >( static_cast<
+            _this_t const& >( *this ).ptr_stored_buffer( buffer_id ) );
     }
 
-    _this_t::c_buffer_t const* TrackJobBase::ptr_ext_stored_cbuffer(
+    _this_t::c_buffer_t const* TrackJobBase::ptr_stored_buffer(
         _this_t::size_type const buffer_id ) const SIXTRL_NOEXCEPT
     {
-        auto ptr_buffer_store = this->doGetPtrExtBufferStore( buffer_id );
-        return ( ptr_buffer_store != nullptr )
-            ? ptr_buffer_store->ptr_cbuffer() : nullptr;
+        _this_t::buffer_store_t const* ptr_stored_buffer =
+            this->doGetPtrBufferStore( buffer_id );
+
+        return ( ptr_stored_buffer == nullptr )
+            ? ptr_stored_buffer->ptr_buffer() : nullptr;
+    }
+
+    _this_t::status_t TrackJobBase::push_stored_buffer(
+        _this_t::size_type const buffer_id )
+    {
+
+    }
+
+    _this_t::status_t TrackJobBase::collect_stored_buffer(
+        _this_t::size_type const buffer_id )
+    {
+
     }
 
     /* --------------------------------------------------------------------- */
@@ -1800,7 +1837,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_indices(),
         m_num_particles_in_sets(),
         m_beam_monitor_indices(),
-        m_ext_stored_buffers(),
+        m_stored_buffers(),
         m_assign_items_buffer(),
         m_my_output_buffer( nullptr ),
         m_elem_by_elem_buffer( nullptr ),
@@ -1814,7 +1851,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_be_mon_output_buffer_offset( _size_t{ 0 } ),
         m_elem_by_elem_output_offset( _size_t{ 0 } ),
         m_total_num_particles_in_sets( _size_t{ 0 } ),
-        m_num_ext_stored_buffers( _size_t{ 0 } ),
+        m_num_stored_buffers( _size_t{ 0 } ),
         m_type_id( type_id ),
         m_default_elem_by_elem_order( ::NS(ELEM_BY_ELEM_ORDER_DEFAULT) ),
         m_min_particle_id( _this_t::particle_index_t{ 0 } ),
@@ -1845,7 +1882,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_indices( other.m_particle_set_indices ),
         m_num_particles_in_sets( other.m_num_particles_in_sets ),
         m_beam_monitor_indices( other.m_beam_monitor_indices ),
-        m_ext_stored_buffers( other.m_ext_stored_buffers ),
+        m_stored_buffers( other.m_stored_buffers ),
         m_assign_items_buffer( other.m_assign_items_buffer ),
         m_my_output_buffer( nullptr ),
         m_elem_by_elem_buffer( nullptr ),
@@ -1859,7 +1896,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_be_mon_output_buffer_offset( other.m_be_mon_output_buffer_offset ),
         m_elem_by_elem_output_offset( other.m_elem_by_elem_output_offset ),
         m_total_num_particles_in_sets( other.m_total_num_particles_in_sets ),
-        m_num_ext_stored_buffers( other.m_num_ext_stored_buffers ),
+        m_num_stored_buffers( other.m_num_stored_buffers ),
         m_type_id( other.m_type_id ),
         m_default_elem_by_elem_order( other.m_default_elem_by_elem_order ),
         m_min_particle_id( other.m_min_particle_id ),
@@ -1904,7 +1941,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_indices( std::move( o.m_particle_set_indices ) ),
         m_num_particles_in_sets( std::move( o.m_num_particles_in_sets ) ),
         m_beam_monitor_indices( std::move( o.m_beam_monitor_indices ) ),
-        m_ext_stored_buffers( std::move( o.m_ext_stored_buffers ) ),
+        m_stored_buffers( std::move( o.m_stored_buffers ) ),
         m_assign_items_buffer( std::move( o.m_assign_items_buffer ) ),
         m_my_output_buffer( std::move( o.m_my_output_buffer ) ),
         m_elem_by_elem_buffer( std::move( o.m_elem_by_elem_buffer ) ),
@@ -1921,7 +1958,7 @@ namespace SIXTRL_CXX_NAMESPACE
             o.m_elem_by_elem_output_offset ) ),
         m_total_num_particles_in_sets( std::move(
             o.m_total_num_particles_in_sets ) ),
-        m_num_ext_stored_buffers( std::move( o.m_num_ext_stored_buffers ) ),
+        m_num_stored_buffers( std::move( o.m_num_stored_buffers ) ),
         m_type_id( std::move( o.m_type_id ) ),
         m_default_elem_by_elem_order( std::move(
             o.m_default_elem_by_elem_order ) ),
@@ -1972,8 +2009,7 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_total_num_particles_in_sets =
                 rhs.m_total_num_particles_in_sets;
 
-            this->m_num_ext_stored_buffers     = rhs.m_num_ext_stored_buffers;
-
+            this->m_num_stored_buffers         = rhs.m_num_stored_buffers;
             this->m_default_elem_by_elem_order =
                 rhs.m_default_elem_by_elem_order;
 
@@ -1994,7 +2030,7 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_requires_collect        = rhs.m_requires_collect;
             this->m_collect_flags           = rhs.m_collect_flags;
             this->m_assign_items_buffer     = rhs.m_assign_items_buffer;
-            this->m_ext_stored_buffers      = rhs.m_ext_stored_buffers;
+            this->m_stored_buffers          = rhs.m_stored_buffers;
 
             if( rhs.ownsOutputBuffer() )
             {
@@ -2044,7 +2080,7 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_beam_monitor_indices =
                 std::move( rhs.m_beam_monitor_indices );
 
-            this->m_ext_stored_buffers = std::move( rhs.m_ext_stored_buffers );
+            this->m_stored_buffers   = std::move( rhs.m_stored_buffers );
             this->m_my_output_buffer = std::move( rhs.m_my_output_buffer );
 
             this->m_elem_by_elem_buffer =
@@ -2082,8 +2118,8 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_total_num_particles_in_sets =
                 std::move( rhs.m_total_num_particles_in_sets );
 
-            this->m_num_ext_stored_buffers =
-                std::move( rhs.m_num_ext_stored_buffers );
+            this->m_num_stored_buffers =
+                std::move( rhs.m_num_stored_buffers );
 
             this->m_type_id = std::move( rhs.m_type_id );
 
@@ -2706,32 +2742,32 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 
-    _this_t::size_type TrackJobBase::doAddExtStoredBuffer(
+    _this_t::size_type TrackJobBase::doAddStoredBuffer(
         _this_t::buffer_store_t&& buffer_store_handle )
     {
         _this_t::size_type buffer_index = st::ARCH_MIN_USER_DEFINED_BUFFER_ID +
-            this->m_ext_stored_buffers.size();
+            this->m_stored_buffers.size();
 
         _this_t::c_buffer_t* ptr_cbuffer_null = nullptr;
 
         if( buffer_store_handle.active() )
         {
-            ++this->m_num_ext_stored_buffers;
+            ++this->m_num_stored_buffers;
         }
 
-        this->m_ext_stored_buffers.emplace_back( ptr_cbuffer_null, false );
-        this->m_ext_stored_buffers.back() = std::move( buffer_store_handle );
+        this->m_stored_buffers.emplace_back( ptr_cbuffer_null, false );
+        this->m_stored_buffers.back() = std::move( buffer_store_handle );
 
         return buffer_index;
     }
 
-    _this_t::status_t TrackJobBase::doRemoveExtStoredBuffer(
+    _this_t::status_t TrackJobBase::doRemoveStoredBuffer(
         _this_t::size_type const buffer_index )
     {
         _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-        _size_t const min_buffer_id = this->min_ext_stored_buffer_id();
+        _size_t const min_buffer_id = this->min_stored_buffer_id();
         _size_t const max_buffer_id_plus_one =
-            min_buffer_id + this->m_ext_stored_buffers.size();
+            min_buffer_id + this->m_stored_buffers.size();
 
         if( ( min_buffer_id != st::ARCH_ILLEGAL_BUFFER_ID ) &&
             ( buffer_index != st::ARCH_ILLEGAL_BUFFER_ID ) &&
@@ -2740,17 +2776,37 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             _size_t const ii = buffer_index - min_buffer_id;
 
-            if( this->m_ext_stored_buffers[ ii ].active() )
+            if( this->m_stored_buffers[ ii ].active() )
             {
-                SIXTRL_ASSERT( this->m_num_ext_stored_buffers > _size_t{ 0 } );
-                this->m_ext_stored_buffers[ ii ].clear();
-                --this->m_num_ext_stored_buffers;
+                SIXTRL_ASSERT( this->m_num_stored_buffers > _size_t{ 0 } );
+                this->m_stored_buffers[ ii ].clear();
+                --this->m_num_stored_buffers;
             }
 
             status = st::ARCH_STATUS_SUCCESS;
         }
 
         return status;
+    }
+
+    _this_t::status_t TrackJobBase::doPushStoredBuffer(
+        _this_t::size_type const buffer_id )
+    {
+        _this_t::buffer_store_t const* ptr_stored_buffer =
+            this->doGetPtrBufferStore( buffer_id );
+
+        return ( ptr_stored_buffer != nullptr )
+            ? st::ARCH_STATUS_SUCCESS : st::ARCH_STATUS_GENERAL_FAILURE;
+    }
+
+    _this_t::status_t TrackJobBase::doCollectStoredBuffer(
+        _this_t::size_type const buffer_id )
+    {
+        _this_t::buffer_store_t const* ptr_stored_buffer =
+            this->doGetPtrBufferStore( buffer_id );
+
+        return ( ptr_stored_buffer != nullptr )
+            ? st::ARCH_STATUS_SUCCESS : st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
     _this_t::status_t TrackJobBase::doPerformManagedAssignments(
@@ -3052,31 +3108,31 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_particles_addr_buffer = std::move( ptr_particles_addr_buffer );
     }
 
-    _this_t::buffer_store_t* TrackJobBase::doGetPtrExtBufferStore(
+    _this_t::buffer_store_t* TrackJobBase::doGetPtrBufferStore(
         _this_t::size_type const buffer_id ) SIXTRL_NOEXCEPT
     {
         return const_cast< _this_t::buffer_store_t* >( static_cast<
-            _this_t const& >( *this ).doGetPtrExtBufferStore( buffer_id ) );
+            _this_t const& >( *this ).doGetPtrBufferStore( buffer_id ) );
     }
 
-    _this_t::buffer_store_t const* TrackJobBase::doGetPtrExtBufferStore(
+    _this_t::buffer_store_t const* TrackJobBase::doGetPtrBufferStore(
         _this_t::size_type const buffer_id ) const SIXTRL_NOEXCEPT
     {
         _this_t::buffer_store_t const* ptr_buffer_store = nullptr;
 
-        _size_t const min_buffer_id = this->min_ext_stored_buffer_id();
+        _size_t const min_buffer_id = this->min_stored_buffer_id();
         _size_t const max_buffer_id_plus_one =
-            min_buffer_id + this->m_ext_stored_buffers.size();
+            min_buffer_id + this->m_stored_buffers.size();
 
         if( ( min_buffer_id != st::ARCH_ILLEGAL_BUFFER_ID ) &&
             ( buffer_id != st::ARCH_ILLEGAL_BUFFER_ID ) &&
             ( buffer_id >= min_buffer_id ) &&
             ( buffer_id <  max_buffer_id_plus_one ) )
         {
-            SIXTRL_ASSERT( this->m_ext_stored_buffers.size() >=
-                           this->m_num_ext_stored_buffers );
+            SIXTRL_ASSERT( this->m_stored_buffers.size() >=
+                           this->m_num_stored_buffers );
 
-            ptr_buffer_store = &this->m_ext_stored_buffers[
+            ptr_buffer_store = &this->m_stored_buffers[
                 buffer_id - min_buffer_id ];
         }
 
@@ -3090,7 +3146,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
 
         this->m_my_output_buffer.reset( nullptr );
-        this->m_ext_stored_buffers.clear();
+        this->m_stored_buffers.clear();
         this->m_assign_items_buffer.clear();
 
         this->m_elem_by_elem_buffer.reset( nullptr );
@@ -3107,7 +3163,7 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_be_mon_output_buffer_offset  = _size_t{ 0 };
         this->m_elem_by_elem_output_offset   = _size_t{ 0 };
         this->m_default_elem_by_elem_order   = ::NS(ELEM_BY_ELEM_ORDER_DEFAULT);
-        this->m_num_ext_stored_buffers       = _size_t{ 0 };
+        this->m_num_stored_buffers           = _size_t{ 0 };
 
         ::NS(Particles_init_min_max_attributes_for_find)(
             &this->m_min_particle_id, &this->m_max_particle_id,

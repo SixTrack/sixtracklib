@@ -86,11 +86,11 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN bool active() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN bool owns_buffer() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN c_buffer_t const* ptr_cbuffer() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN c_buffer_t* ptr_cbuffer() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN c_buffer_t const* ptr_buffer() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN c_buffer_t* ptr_buffer() SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN buffer_t const* ptr_buffer() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN buffer_t* ptr_buffer() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN buffer_t const* ptr_cxx_buffer() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN buffer_t* ptr_cxx_buffer() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void clear() SIXTRL_NOEXCEPT;
 
@@ -454,42 +454,54 @@ namespace SIXTRL_CXX_NAMESPACE
         /* ---------------------------------------------------------------- */
 
         SIXTRL_HOST_FN size_type
-        ext_stored_buffers_capacity() const SIXTRL_NOEXCEPT;
+        stored_buffers_capacity() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN status_t reserve_ext_stored_buffers_capacity(
+        SIXTRL_HOST_FN status_t reserve_stored_buffers_capacity(
             size_type const capacity );
 
-        SIXTRL_HOST_FN bool has_ext_stored_buffers() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool has_stored_buffers() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN size_type
-            num_ext_stored_buffers() const SIXTRL_NOEXCEPT;
+            num_stored_buffers() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN size_type
-            min_ext_stored_buffer_id() const SIXTRL_NOEXCEPT;
+            min_stored_buffer_id() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN size_type
-            max_ext_stored_buffer_id() const SIXTRL_NOEXCEPT;
+            max_stored_buffer_id() const SIXTRL_NOEXCEPT;
 
         template< typename... Args >
-        SIXTRL_HOST_FN size_type add_ext_stored_buffer( Args&&... args );
+        SIXTRL_HOST_FN size_type add_stored_buffer( Args&&... args );
 
-        SIXTRL_HOST_FN bool owns_ext_stored_buffer(
+        SIXTRL_HOST_FN bool owns_stored_buffer(
             size_type const buffer_id ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN status_t remove_ext_stored_buffer(
+        SIXTRL_HOST_FN status_t remove_stored_buffer(
             size_type const buffer_index );
 
-        SIXTRL_HOST_FN buffer_t* ptr_ext_stored_buffer(
+        SIXTRL_HOST_FN buffer_t& stored_cxx_buffer(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN buffer_t const& stored_cxx_buffer(
+            size_type const buffer_id ) const;
+
+        SIXTRL_HOST_FN buffer_t* ptr_stored_cxx_buffer(
             size_type const buffer_id ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN buffer_t const* ptr_ext_stored_buffer(
+        SIXTRL_HOST_FN buffer_t const* ptr_stored_cxx_buffer(
             size_type const buffer_id ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN c_buffer_t* ptr_ext_stored_cbuffer(
+        SIXTRL_HOST_FN c_buffer_t* ptr_stored_buffer(
             size_type const buffer_id ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN c_buffer_t const* ptr_ext_stored_cbuffer(
+        SIXTRL_HOST_FN c_buffer_t const* ptr_stored_buffer(
             size_type const buffer_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN status_t push_stored_buffer(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN status_t collect_stored_buffer(
+            size_type const buffer_id );
 
         /* ---------------------------------------------------------------- */
 
@@ -639,11 +651,17 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual bool doAssignNewOutputBuffer(
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer );
 
-        SIXTRL_HOST_FN virtual size_type doAddExtStoredBuffer(
+        SIXTRL_HOST_FN virtual size_type doAddStoredBuffer(
             buffer_store_t&& assigned_buffer_handle );
 
-        SIXTRL_HOST_FN virtual status_t doRemoveExtStoredBuffer(
-            size_type const buffer_index );
+        SIXTRL_HOST_FN virtual status_t doRemoveStoredBuffer(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN virtual status_t doPushStoredBuffer(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN virtual status_t doCollectStoredBuffer(
+            size_type const buffer_id );
 
         SIXTRL_HOST_FN virtual status_t doPerformManagedAssignments(
             size_type const dest_buffer_id, size_type const src_buffer_id );
@@ -748,10 +766,10 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doUpdateStoredParticlesAddrBuffer(
             ptr_buffer_t&& ptr_particles_addr_buffer ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN buffer_store_t* doGetPtrExtBufferStore(
+        SIXTRL_HOST_FN buffer_store_t* doGetPtrBufferStore(
             size_type const buffer_id ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN buffer_store_t const* doGetPtrExtBufferStore(
+        SIXTRL_HOST_FN buffer_store_t const* doGetPtrBufferStore(
             size_type const buffer_id ) const SIXTRL_NOEXCEPT;
 
         private:
@@ -768,7 +786,7 @@ namespace SIXTRL_CXX_NAMESPACE
         std::vector< size_type >        m_particle_set_indices;
         std::vector< size_type >        m_num_particles_in_sets;
         std::vector< size_type >        m_beam_monitor_indices;
-        std::vector< buffer_store_t >   m_ext_stored_buffers;
+        std::vector< buffer_store_t >   m_stored_buffers;
         std::vector< assign_item_t >    m_assign_items_buffer;
 
         ptr_buffer_t                    m_my_output_buffer;
@@ -786,7 +804,7 @@ namespace SIXTRL_CXX_NAMESPACE
         size_type                       m_be_mon_output_buffer_offset;
         size_type                       m_elem_by_elem_output_offset;
         size_type                       m_total_num_particles_in_sets;
-        size_type                       m_num_ext_stored_buffers;
+        size_type                       m_num_stored_buffers;
 
         type_t                          m_type_id;
         elem_by_elem_order_t            m_default_elem_by_elem_order;
@@ -916,7 +934,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename... Args >
-    TrackJobBase::size_type TrackJobBase::add_ext_stored_buffer( Args&&... args )
+    TrackJobBase::size_type TrackJobBase::add_stored_buffer( Args&&... args )
     {
         namespace st = SIXTRL_CXX_NAMESPACE;
         using _this_t = st::TrackJobBase;
@@ -924,8 +942,8 @@ namespace SIXTRL_CXX_NAMESPACE
         _this_t::buffer_store_t temp_buffer_store(
             std::forward< Args >( args )... );
 
-        _this_t::size_type const buffer_id = this->doAddExtStoredBuffer(
-            std::move( temp_buffer_store ) );
+        _this_t::size_type const buffer_id =
+            this->doAddStoredBuffer( std::move( temp_buffer_store ) );
 
         return buffer_id;
     }

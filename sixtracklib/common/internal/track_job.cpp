@@ -749,98 +749,112 @@ bool NS(TrackJob_has_assign_items)(
 
 /* ------------------------------------------------------------------------- */
 
-::NS(arch_size_t) NS(TrackJob_ext_stored_buffers_capacity)(
+::NS(arch_size_t) NS(TrackJob_stored_buffers_capacity)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->ext_stored_buffers_capacity() : ::NS(arch_size_t){ 0 };
+        ? job->stored_buffers_capacity() : ::NS(arch_size_t){ 0 };
 }
 
-::NS(arch_status_t) NS(TrackJob_reserve_ext_stored_buffers_capacity)(
+::NS(arch_status_t) NS(TrackJob_reserve_stored_buffers_capacity)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT job, ::NS(arch_size_t) const capacity )
 {
     return ( job != nullptr )
-        ? job->reserve_ext_stored_buffers_capacity( capacity )
+        ? job->reserve_stored_buffers_capacity( capacity )
         : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
-bool NS(TrackJob_has_ext_stored_buffers)(
+bool NS(TrackJob_has_stored_buffers)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
 {
-    return ( ( job != nullptr ) && ( job->has_ext_stored_buffers() ) );
+    return ( ( job != nullptr ) && ( job->has_stored_buffers() ) );
 }
 
-::NS(arch_size_t) NS(TrackJob_num_ext_stored_buffers)(
-    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
-{
-    return ( job != nullptr )
-        ? job->num_ext_stored_buffers() : ::NS(arch_size_t){ 0 };
-}
-
-::NS(arch_size_t) NS(TrackJob_min_ext_stored_buffer_id)(
+::NS(arch_size_t) NS(TrackJob_num_stored_buffers)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->min_ext_stored_buffer_id() : st::ARCH_ILLEGAL_BUFFER_ID;
+        ? job->num_stored_buffers() : ::NS(arch_size_t){ 0 };
 }
 
-::NS(arch_size_t) NS(TrackJob_max_ext_stored_buffer_id)(
+::NS(arch_size_t) NS(TrackJob_min_stored_buffer_id)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->max_ext_stored_buffer_id() : st::ARCH_ILLEGAL_BUFFER_ID;
+        ? job->min_stored_buffer_id() : st::ARCH_ILLEGAL_BUFFER_ID;
 }
 
-::NS(arch_size_t) NS(TrackJob_create_ext_stored_buffer)(
+::NS(arch_size_t) NS(TrackJob_max_stored_buffer_id)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->max_stored_buffer_id() : st::ARCH_ILLEGAL_BUFFER_ID;
+}
+
+::NS(arch_size_t) NS(TrackJob_create_stored_buffer)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
     ::NS(buffer_size_t) const buffer_capacity )
 {
     return ( job != nullptr )
-        ? job->add_ext_stored_buffer( buffer_capacity )
+        ? job->add_stored_buffer( buffer_capacity )
         : st::ARCH_ILLEGAL_BUFFER_ID;
 }
 
-::NS(arch_size_t) NS(TrackJob_add_ext_stored_buffer)(
+::NS(arch_size_t) NS(TrackJob_add_stored_buffer)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
     ::NS(Buffer)* SIXTRL_RESTRICT buffer, bool const take_ownership,
     bool const delete_ptr_after_move )
 {
     return ( job != nullptr )
-        ? job->add_ext_stored_buffer(
+        ? job->add_stored_buffer(
                 buffer, take_ownership, delete_ptr_after_move )
         : st::ARCH_ILLEGAL_BUFFER_ID;
 }
 
-bool NS(TrackJob_owns_ext_stored_buffer)(
+bool NS(TrackJob_owns_stored_buffer)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
     ::NS(arch_size_t) const buffer_id )
 {
     return ( ( job != nullptr ) &&
-             ( job->owns_ext_stored_buffer( buffer_id ) ) );
+             ( job->owns_stored_buffer( buffer_id ) ) );
 }
 
-::NS(arch_status_t) NS(TrackJob_remove_ext_stored_buffer)(
+::NS(arch_status_t) NS(TrackJob_remove_stored_buffer)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
     ::NS(arch_size_t) const buffer_index )
 {
     return ( job != nullptr )
-        ? job->remove_ext_stored_buffer( buffer_index )
+        ? job->remove_stored_buffer( buffer_index )
         : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
-::NS(Buffer)* NS(TrackJob_ext_stored_buffer)(
+::NS(Buffer)* NS(TrackJob_stored_buffer)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT job, ::NS(arch_size_t) const buffer_id )
 {
-    return ( job != nullptr )
-        ? job->ptr_ext_stored_cbuffer( buffer_id ) : nullptr;
+    return ( job != nullptr ) ? job->ptr_stored_buffer( buffer_id ) : nullptr;
 }
 
-::NS(Buffer) const* NS(TrackJob_const_ext_stored_buffer)(
+::NS(Buffer) const* NS(TrackJob_const_stored_buffer)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
     ::NS(arch_size_t) const buffer_id )
 {
+    return ( job != nullptr ) ? job->ptr_stored_buffer( buffer_id ) : nullptr;
+}
+
+::NS(arch_status_t) NS(TrackJob_push_stored_buffer)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job, ::NS(arch_size_t) const buffer_id )
+{
     return ( job != nullptr )
-        ? job->ptr_ext_stored_cbuffer( buffer_id ) : nullptr;
+        ? job->push_stored_buffer( buffer_id )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(TrackJob_collect_stored_buffer)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job, ::NS(arch_size_t) const buffer_id )
+{
+    return ( job != nullptr )
+        ? job->collect_stored_buffer( buffer_id )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 /* ------------------------------------------------------------------------- */
