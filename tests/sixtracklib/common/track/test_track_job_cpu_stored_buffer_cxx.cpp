@@ -18,7 +18,7 @@
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/buffer.h"
 
-TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
+TEST( CXX_Cpu_CpuTrackJobStoredBufferTests, MinimalUsage )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
     using track_job_t = st::TrackJobCpu;
@@ -31,34 +31,33 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
 
     track_job_t job;
 
-    ASSERT_TRUE( !job.has_ext_stored_buffers() );
-    ASSERT_TRUE(  job.num_ext_stored_buffers() == size_t{ 0 } );
-    ASSERT_TRUE(  job.min_ext_stored_buffer_id() == st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.max_ext_stored_buffer_id() == st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE( !job.has_stored_buffers() );
+    ASSERT_TRUE(  job.num_stored_buffers() == size_t{ 0 } );
+    ASSERT_TRUE(  job.min_stored_buffer_id() == st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.max_stored_buffer_id() == st::ARCH_ILLEGAL_BUFFER_ID );
 
     /* --------------------------------------------------------------------- */
     /* Create a buffer that is directly managed by the job */
 
     size_t const ext_buffer_01_capacity = size_t{ 1024 };
-    size_t const ext_buffer_01_id =
-        job.add_ext_stored_buffer( ext_buffer_01_capacity );
+    size_t const ext_buffer_01_id = job.add_stored_buffer( ext_buffer_01_capacity );
 
     ASSERT_TRUE(  ext_buffer_01_id != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.num_ext_stored_buffers() == size_t{ 1 } );
-    ASSERT_TRUE(  job.min_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.max_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.num_stored_buffers() == size_t{ 1 } );
+    ASSERT_TRUE(  job.min_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.max_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
 
-    ASSERT_TRUE(  ext_buffer_01_id == job.min_ext_stored_buffer_id() );
-    ASSERT_TRUE(  ext_buffer_01_id == job.max_ext_stored_buffer_id() );
-    ASSERT_TRUE(  job.owns_ext_stored_buffer( ext_buffer_01_id ) );
+    ASSERT_TRUE(  ext_buffer_01_id == job.min_stored_buffer_id() );
+    ASSERT_TRUE(  ext_buffer_01_id == job.max_stored_buffer_id() );
+    ASSERT_TRUE(  job.owns_stored_buffer( ext_buffer_01_id ) );
 
-    ASSERT_TRUE(  job.ptr_ext_stored_buffer( ext_buffer_01_id ) != nullptr );
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_01_id ) != nullptr );
+    ASSERT_TRUE(  job.ptr_stored_cxx_buffer( ext_buffer_01_id ) != nullptr );
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_01_id ) != nullptr );
 
-    ASSERT_TRUE(  job.ptr_ext_stored_buffer( ext_buffer_01_id )->getCApiPtr()
-                    == job.ptr_ext_stored_cbuffer( ext_buffer_01_id ) );
+    ASSERT_TRUE(  job.ptr_stored_cxx_buffer( ext_buffer_01_id )->getCApiPtr()
+                    == job.ptr_stored_buffer( ext_buffer_01_id ) );
 
-    ASSERT_TRUE(  job.ptr_ext_stored_buffer( ext_buffer_01_id )->getCapacity()
+    ASSERT_TRUE(  job.ptr_stored_cxx_buffer( ext_buffer_01_id )->getCapacity()
                     == ext_buffer_01_capacity );
 
     /* --------------------------------------------------------------------- */
@@ -72,40 +71,40 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
     SIXTRL_ASSERT( ::NS(Buffer_get_capacity)( ext_buffer_02 ) >=
                     ext_buffer_02_capacity );
 
-    size_t const ext_buffer_02_id = job.add_ext_stored_buffer(
+    size_t const ext_buffer_02_id = job.add_stored_buffer(
         ext_buffer_02, false ); /* false == take no ownership */
 
     ASSERT_TRUE(  ext_buffer_02_id != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.num_ext_stored_buffers() == size_t{ 2 } );
-    ASSERT_TRUE(  job.min_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.max_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.num_stored_buffers() == size_t{ 2 } );
+    ASSERT_TRUE(  job.min_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.max_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
 
-    ASSERT_TRUE(  ext_buffer_01_id == job.min_ext_stored_buffer_id() );
-    ASSERT_TRUE(  ext_buffer_02_id == job.max_ext_stored_buffer_id() );
-    ASSERT_TRUE( !job.owns_ext_stored_buffer( ext_buffer_02_id ) );
+    ASSERT_TRUE(  ext_buffer_01_id == job.min_stored_buffer_id() );
+    ASSERT_TRUE(  ext_buffer_02_id == job.max_stored_buffer_id() );
+    ASSERT_TRUE( !job.owns_stored_buffer( ext_buffer_02_id ) );
 
     /* This is a C99 buffer -> it is not possible to access it as a C++ buffer*/
-    ASSERT_TRUE(  job.ptr_ext_stored_buffer( ext_buffer_02_id ) == nullptr );
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_02_id ) != nullptr );
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_02_id ) == ext_buffer_02 );
+    ASSERT_TRUE(  job.ptr_stored_cxx_buffer( ext_buffer_02_id ) == nullptr );
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_02_id ) != nullptr );
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_02_id ) == ext_buffer_02 );
 
     /* --------------------------------------------------------------------- */
     /* Remove ext_buffer_02 again from the track job: */
 
-    ASSERT_TRUE( st::ARCH_STATUS_SUCCESS == job.remove_ext_stored_buffer(
+    ASSERT_TRUE( st::ARCH_STATUS_SUCCESS == job.remove_stored_buffer(
         ext_buffer_02_id ) );
 
-    ASSERT_TRUE(  job.num_ext_stored_buffers() == size_t{ 1 } );
-    ASSERT_TRUE(  job.min_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.max_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.num_stored_buffers() == size_t{ 1 } );
+    ASSERT_TRUE(  job.min_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.max_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
 
-    ASSERT_TRUE(  ext_buffer_01_id == job.min_ext_stored_buffer_id() );
-    ASSERT_TRUE(  ext_buffer_02_id == job.max_ext_stored_buffer_id() );
-    ASSERT_TRUE( !job.owns_ext_stored_buffer( ext_buffer_02_id ) );
+    ASSERT_TRUE(  ext_buffer_01_id == job.min_stored_buffer_id() );
+    ASSERT_TRUE(  ext_buffer_02_id == job.max_stored_buffer_id() );
+    ASSERT_TRUE( !job.owns_stored_buffer( ext_buffer_02_id ) );
 
     /* This is a C99 buffer -> it is not possible to access it as a C++ buffer*/
-    ASSERT_TRUE(  job.ptr_ext_stored_buffer( ext_buffer_02_id ) == nullptr );
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_02_id ) == nullptr );
+    ASSERT_TRUE(  job.ptr_stored_cxx_buffer( ext_buffer_02_id ) == nullptr );
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_02_id ) == nullptr );
 
     /* --------------------------------------------------------------------- */
     /* Add ext_buffer_02 again, but this time let the job take ownership: */
@@ -118,20 +117,20 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
 
     ext_buffer_02_capacity = ::NS(Buffer_get_capacity)( ext_buffer_02 );
 
-    size_t const ext_buffer_02_id_b = job.add_ext_stored_buffer(
+    size_t const ext_buffer_02_id_b = job.add_stored_buffer(
         ext_buffer_02, true ); /* true == takes ownership */
 
     uintptr_t const ptr_ext_buffer_02_addr =
         reinterpret_cast< uintptr_t >( ext_buffer_02 );
 
     ASSERT_TRUE(  ext_buffer_02_id_b != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.num_ext_stored_buffers() == size_t{ 2 } );
-    ASSERT_TRUE(  job.min_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.max_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.num_stored_buffers() == size_t{ 2 } );
+    ASSERT_TRUE(  job.min_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.max_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
 
-    ASSERT_TRUE(  ext_buffer_01_id   == job.min_ext_stored_buffer_id() );
-    ASSERT_TRUE(  ext_buffer_02_id_b == job.max_ext_stored_buffer_id() );
-    ASSERT_TRUE(  job.owns_ext_stored_buffer( ext_buffer_02_id_b ) );
+    ASSERT_TRUE(  ext_buffer_01_id   == job.min_stored_buffer_id() );
+    ASSERT_TRUE(  ext_buffer_02_id_b == job.max_stored_buffer_id() );
+    ASSERT_TRUE(  job.owns_stored_buffer( ext_buffer_02_id_b ) );
 
     /* After taking ownership, the buffer is accessible also as a C++ buffer;
        but taking ownership creates a new c99 pointer as well -> you can no
@@ -139,9 +138,9 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
 
     ext_buffer_02 = nullptr;
 
-    ASSERT_TRUE(  job.ptr_ext_stored_buffer( ext_buffer_02_id_b )  != nullptr );
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_02_id_b ) != nullptr );
-    ASSERT_TRUE(  reinterpret_cast< uintptr_t >( job.ptr_ext_stored_cbuffer(
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_02_id_b )  != nullptr );
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_02_id_b ) != nullptr );
+    ASSERT_TRUE(  reinterpret_cast< uintptr_t >( job.ptr_stored_buffer(
                     ext_buffer_02_id_b ) ) != ptr_ext_buffer_02_addr );
 
     /* Transfering of ownership not only invalidates the old ext_buffer_02
@@ -153,9 +152,7 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
     /* The values, i.e. start address, capacity and size, should still be
      * available via the new handle */
 
-    c_buffer_t* ext_buffer_02_b = job.ptr_ext_stored_cbuffer(
-        ext_buffer_02_id_b );
-
+    c_buffer_t* ext_buffer_02_b = job.ptr_stored_buffer( ext_buffer_02_id_b );
     ASSERT_TRUE( ::NS(Buffer_get_data_begin_addr)( ext_buffer_02_b ) ==
                  ext_buffer_02_begin_addr );
 
@@ -165,7 +162,7 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
     ASSERT_TRUE( ::NS(Buffer_get_capacity)( ext_buffer_02_b ) ==
                  ext_buffer_02_capacity );
 
-    ASSERT_TRUE( job.ptr_ext_stored_buffer( ext_buffer_02_id_b )->getCApiPtr()
+    ASSERT_TRUE( job.ptr_stored_cxx_buffer( ext_buffer_02_id_b )->getCApiPtr()
                  == ext_buffer_02_b );
 
     /* --------------------------------------------------------------------- */
@@ -193,22 +190,22 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
     SIXTRL_ASSERT( ::NS(Buffer_get_capacity)( &ext_buffer_03 ) >=
         ext_buffer_03_capacity );
 
-    size_t const ext_buffer_03_id = job.add_ext_stored_buffer(
+    size_t const ext_buffer_03_id = job.add_stored_buffer(
         &ext_buffer_03, false ); /* false == take no ownership */
 
     ASSERT_TRUE(  ext_buffer_03_id != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.num_ext_stored_buffers() == size_t{ 3 } );
-    ASSERT_TRUE(  job.min_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.max_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.num_stored_buffers() == size_t{ 3 } );
+    ASSERT_TRUE(  job.min_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.max_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
 
-    ASSERT_TRUE(  ext_buffer_01_id == job.min_ext_stored_buffer_id() );
-    ASSERT_TRUE(  ext_buffer_03_id == job.max_ext_stored_buffer_id() );
-    ASSERT_TRUE( !job.owns_ext_stored_buffer( ext_buffer_03_id ) );
+    ASSERT_TRUE(  ext_buffer_01_id == job.min_stored_buffer_id() );
+    ASSERT_TRUE(  ext_buffer_03_id == job.max_stored_buffer_id() );
+    ASSERT_TRUE( !job.owns_stored_buffer( ext_buffer_03_id ) );
 
     /* This is a C99 buffer -> it is not possible to access it as a C++ buffer*/
-    ASSERT_TRUE(  job.ptr_ext_stored_buffer( ext_buffer_03_id ) == nullptr );
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_03_id ) != nullptr );
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_03_id ) ==
+    ASSERT_TRUE(  job.ptr_stored_cxx_buffer( ext_buffer_03_id ) == nullptr );
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_03_id ) != nullptr );
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_03_id ) ==
                   &ext_buffer_03 );
 
     /* --------------------------------------------------------------------- */
@@ -240,22 +237,22 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
     SIXTRL_ASSERT( reinterpret_cast< uintptr_t >(
         ext_buffer_04_data_store.data() ) == ext_buffer_04_begin_addr );
 
-    size_t const ext_buffer_04_id = job.add_ext_stored_buffer(
+    size_t const ext_buffer_04_id = job.add_stored_buffer(
         &ext_buffer_04, true, false ); /* true: take ownership,
             false: do not delete as ext_buffer_04 is on the stack */
 
     ASSERT_TRUE(  ext_buffer_04_id != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.num_ext_stored_buffers() == size_t{ 4 } );
-    ASSERT_TRUE(  job.min_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.max_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.num_stored_buffers() == size_t{ 4 } );
+    ASSERT_TRUE(  job.min_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.max_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
 
-    ASSERT_TRUE(  ext_buffer_01_id == job.min_ext_stored_buffer_id() );
-    ASSERT_TRUE(  ext_buffer_04_id == job.max_ext_stored_buffer_id() );
-    ASSERT_TRUE(  job.owns_ext_stored_buffer( ext_buffer_04_id ) );
+    ASSERT_TRUE(  ext_buffer_01_id == job.min_stored_buffer_id() );
+    ASSERT_TRUE(  ext_buffer_04_id == job.max_stored_buffer_id() );
+    ASSERT_TRUE(  job.owns_stored_buffer( ext_buffer_04_id ) );
 
-    ASSERT_TRUE(  job.ptr_ext_stored_buffer( ext_buffer_04_id ) != nullptr );
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_04_id ) != nullptr );
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_04_id ) !=
+    ASSERT_TRUE(  job.ptr_stored_cxx_buffer( ext_buffer_04_id ) != nullptr );
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_04_id ) != nullptr );
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_04_id ) !=
                   &ext_buffer_04 );
 
     ASSERT_TRUE( ::NS(Buffer_get_data_begin_addr)( &ext_buffer_04 ) ==
@@ -265,7 +262,7 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
     ASSERT_TRUE( ::NS(Buffer_get_size)( &ext_buffer_04 ) == size_t{ 0 } );
 
     c_buffer_t* ptr_ext_buffer_04 =
-        job.ptr_ext_stored_buffer( ext_buffer_04_id );
+        job.ptr_stored_buffer( ext_buffer_04_id );
 
     ASSERT_TRUE( ptr_ext_buffer_04 != nullptr );
 
@@ -288,25 +285,25 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
 
     ext_buffer_05_capacity = ext_buffer_05.getCapacity();
 
-    size_t const ext_buffer_05_id = job.add_ext_stored_buffer(
+    size_t const ext_buffer_05_id = job.add_stored_buffer(
         &ext_buffer_05, false ); /* false == take no ownership */
 
     ASSERT_TRUE(  ext_buffer_05_id != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.num_ext_stored_buffers() == size_t{ 5 } );
-    ASSERT_TRUE(  job.min_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.max_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.num_stored_buffers() == size_t{ 5 } );
+    ASSERT_TRUE(  job.min_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.max_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
 
-    ASSERT_TRUE(  ext_buffer_01_id == job.min_ext_stored_buffer_id() );
-    ASSERT_TRUE(  ext_buffer_05_id == job.max_ext_stored_buffer_id() );
-    ASSERT_TRUE( !job.owns_ext_stored_buffer( ext_buffer_05_id ) );
+    ASSERT_TRUE(  ext_buffer_01_id == job.min_stored_buffer_id() );
+    ASSERT_TRUE(  ext_buffer_05_id == job.max_stored_buffer_id() );
+    ASSERT_TRUE( !job.owns_stored_buffer( ext_buffer_05_id ) );
 
-    ASSERT_TRUE(  job.ptr_ext_stored_buffer( ext_buffer_05_id ) ==
+    ASSERT_TRUE(  job.ptr_stored_cxx_buffer( ext_buffer_05_id ) ==
                   &ext_buffer_05 );
 
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_05_id ) ==
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_05_id ) ==
                   ext_buffer_05_cptr );
 
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_05_id ) ==
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_05_id ) ==
                   ext_buffer_05.getCApiPtr() );
 
     /* --------------------------------------------------------------------- */
@@ -320,25 +317,25 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
 
     ext_buffer_06_capacity = ext_buffer_06.getCapacity();
 
-    size_t const ext_buffer_06_id = job.add_ext_stored_buffer(
+    size_t const ext_buffer_06_id = job.add_stored_buffer(
         ext_buffer_06_cptr, false ); /* false == take no ownership */
 
     ASSERT_TRUE(  ext_buffer_06_id != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.num_ext_stored_buffers() == size_t{ 6 } );
-    ASSERT_TRUE(  job.min_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.max_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.num_stored_buffers() == size_t{ 6 } );
+    ASSERT_TRUE(  job.min_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.max_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
 
-    ASSERT_TRUE(  ext_buffer_01_id == job.min_ext_stored_buffer_id() );
-    ASSERT_TRUE(  ext_buffer_06_id == job.max_ext_stored_buffer_id() );
-    ASSERT_TRUE( !job.owns_ext_stored_buffer( ext_buffer_06_id ) );
+    ASSERT_TRUE(  ext_buffer_01_id == job.min_stored_buffer_id() );
+    ASSERT_TRUE(  ext_buffer_06_id == job.max_stored_buffer_id() );
+    ASSERT_TRUE( !job.owns_stored_buffer( ext_buffer_06_id ) );
 
     /* Added as a non-owning C99 pointer -> can not access via C++ interface */
-    ASSERT_TRUE(  job.ptr_ext_stored_buffer( ext_buffer_06_id ) == nullptr );
+    ASSERT_TRUE(  job.ptr_stored_cxx_buffer( ext_buffer_06_id ) == nullptr );
 
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_06_id ) ==
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_06_id ) ==
                   ext_buffer_06_cptr );
 
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_06_id ) ==
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_06_id ) ==
                   ext_buffer_06.getCApiPtr() );
 
     /* --------------------------------------------------------------------- */
@@ -354,23 +351,23 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
     buffer_addr_t const ext_buffer_07_begin_addr =
         ext_buffer_07.getDataBeginAddr();
 
-    size_t const ext_buffer_07_id = job.add_ext_stored_buffer(
+    size_t const ext_buffer_07_id = job.add_stored_buffer(
         std::move( ext_buffer_07 ) );
 
     ASSERT_TRUE(  ext_buffer_07_id != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.num_ext_stored_buffers() == size_t{ 7 } );
-    ASSERT_TRUE(  job.min_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.max_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.num_stored_buffers() == size_t{ 7 } );
+    ASSERT_TRUE(  job.min_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.max_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
 
-    ASSERT_TRUE(  ext_buffer_01_id == job.min_ext_stored_buffer_id() );
-    ASSERT_TRUE(  ext_buffer_07_id == job.max_ext_stored_buffer_id() );
-    ASSERT_TRUE(  job.owns_ext_stored_buffer( ext_buffer_07_id ) );
+    ASSERT_TRUE(  ext_buffer_01_id == job.min_stored_buffer_id() );
+    ASSERT_TRUE(  ext_buffer_07_id == job.max_stored_buffer_id() );
+    ASSERT_TRUE(  job.owns_stored_buffer( ext_buffer_07_id ) );
 
     /* Added as a non-owning C99 pointer -> can not access via C++ interface */
-    ASSERT_TRUE(  job.ptr_ext_stored_buffer( ext_buffer_07_id ) != nullptr );
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_07_id ) != nullptr );
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_07_id ) != nullptr );
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_07_id ) != nullptr );
 
-    buffer_t* ptr_ext_buffer_07 = job.ptr_ext_stored_buffer( ext_buffer_07_id );
+    buffer_t* ptr_ext_buffer_07 = job.ptr_stored_cxx_buffer( ext_buffer_07_id );
     ASSERT_TRUE( ptr_ext_buffer_07 != nullptr );
     ASSERT_TRUE( ptr_ext_buffer_07->getCapacity() == ext_buffer_07_capacity );
     ASSERT_TRUE( ptr_ext_buffer_07->getSize() == ext_buffer_07_size );
@@ -387,22 +384,22 @@ TEST( CXX_Cpu_CpuTrackJobExtStoredBufferTests, MinimalUsage )
     ext_buffer_08_capacity = ext_buffer_08->getCapacity();
 
     size_t const ext_buffer_08_id =
-        job.add_ext_stored_buffer( ext_buffer_08, true );
+        job.add_stored_buffer( ext_buffer_08, true );
 
     ASSERT_TRUE(  ext_buffer_08_id != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.num_ext_stored_buffers() == size_t{ 8 } );
-    ASSERT_TRUE(  job.min_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
-    ASSERT_TRUE(  job.max_ext_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.num_stored_buffers() == size_t{ 8 } );
+    ASSERT_TRUE(  job.min_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
+    ASSERT_TRUE(  job.max_stored_buffer_id() != st::ARCH_ILLEGAL_BUFFER_ID );
 
-    ASSERT_TRUE(  ext_buffer_01_id == job.min_ext_stored_buffer_id() );
-    ASSERT_TRUE(  ext_buffer_08_id == job.max_ext_stored_buffer_id() );
-    ASSERT_TRUE(  job.owns_ext_stored_buffer( ext_buffer_08_id ) );
+    ASSERT_TRUE(  ext_buffer_01_id == job.min_stored_buffer_id() );
+    ASSERT_TRUE(  ext_buffer_08_id == job.max_stored_buffer_id() );
+    ASSERT_TRUE(  job.owns_stored_buffer( ext_buffer_08_id ) );
 
     ext_buffer_08 = nullptr;
 
     /* Added as a non-owning C99 pointer -> can not access via C++ interface */
-    ASSERT_TRUE(  job.ptr_ext_stored_buffer( ext_buffer_08_id ) != nullptr );
-    ASSERT_TRUE(  job.ptr_ext_stored_cbuffer( ext_buffer_08_id ) != nullptr );
+    ASSERT_TRUE(  job.ptr_stored_cxx_buffer( ext_buffer_08_id ) != nullptr );
+    ASSERT_TRUE(  job.ptr_stored_buffer( ext_buffer_08_id ) != nullptr );
 }
 
-/* end: tests/sixtracklib/common/track/test_track_job_cpu_ext_stored_buffer_cxx.cpp */
+/* end: tests/sixtracklib/common/track/test_track_job_cpu_stored_buffer_cxx.cpp */
