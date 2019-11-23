@@ -50,7 +50,7 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
 
     add_test( NAME Python_TrackJobCpuExtStoredBufferTests
         COMMAND ${PYTHON_EXECUTABLE}
-                ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cpu_ext_stored_buffer.py
+                ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cpu_stored_buffer.py
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
 
 endif()
