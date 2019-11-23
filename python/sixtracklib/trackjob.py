@@ -19,7 +19,7 @@ from . import config as stconf
 from .particles import ParticlesSet
 from .control import raise_error_if_status_not_success
 from .control import ControllerBase, NodeControllerBase, ArgumentBase
-from .buffer import Buffer
+from .buffer import Buffer, get_cbuffer_from_obj
 from .particles import ParticlesSet
 from .beam_elements import Elements
 
@@ -101,17 +101,6 @@ from .stcommon import st_TrackJobBaseNew_p, st_NullTrackJobBaseNew, \
     st_TrackJobNew_uses_controller, st_TrackJobNew_uses_arguments
 
 
-def _get_buffer(obj):
-    if isinstance(obj, CBuffer):
-        return obj
-    elif isinstance(obj, CObject):
-        return obj._buffer
-    elif hasattr(obj, 'cbuffer'):
-        return obj.cbuffer
-    else:
-        raise ValueError("Object {obj} is not or has not a CBuffer")
-
-
 class TrackJobBaseNew(object):
     def __init__(self, ptr_track_job=None, owns_ptr=True):
         self._ptr_track_job = st_NullTrackJobBaseNew
@@ -130,7 +119,7 @@ class TrackJobBaseNew(object):
         self._ptr_c_particles_buffer = st_NullBuffer
         self._ptr_c_beam_elements_buffer = st_NullBuffer
         self._ptr_c_output_buffer = st_NullBuffer
-        self._ext_stored_buffers = {}
+        self._stored_buffers = {}
 
         if ptr_track_job is not None and ptr_track_job != st_NullTrackJobBaseNew:
             self._ptr_track_job = ptr_track_job
@@ -732,14 +721,14 @@ class TrackJob(object):
         self._ptr_c_beam_elements_buffer = st.st_NullBuffer
         self._output_buffer = None
         self._ptr_c_output_buffer = st.st_NullBuffer
-        self._ext_stored_buffers = {}
+        self._stored_buffers = {}
         self._ext_stored_st_buffers = {}
 
         base_addr_t = ct.POINTER(ct.c_ubyte)
         success = False
 
         if particles_buffer is not None:
-            particles_buffer = _get_buffer(particles_buffer)
+            particles_buffer = get_cbuffer_from_obj(particles_buffer)
             self._particles_buffer = particles_buffer
             self._ptr_c_particles_buffer = \
                 st.st_Buffer_new_mapped_on_cbuffer(particles_buffer)
@@ -747,7 +736,7 @@ class TrackJob(object):
                 raise ValueError("Issues with input particles buffer")
 
         if beam_elements_buffer is not None:
-            beam_elements_buffer = _get_buffer(beam_elements_buffer)
+            beam_elements_buffer = get_cbuffer_from_obj(beam_elements_buffer)
             self._beam_elements_buffer = beam_elements_buffer
             self._ptr_c_beam_elements_buffer = \
                 st.st_Buffer_new_mapped_on_cbuffer(beam_elements_buffer)
@@ -997,20 +986,20 @@ class TrackJob(object):
         return self.arch_str() == 'opencl'
 
     @property
-    def has_ext_stored_buffers(self):
-        return st.st_TrackJob_has_ext_stored_buffers(self.ptr_st_track_job)
+    def has_stored_buffers(self):
+        return st.st_TrackJob_has_stored_buffers(self.ptr_st_track_job)
 
     @property
-    def num_ext_stored_buffers(self):
-        return st.st_TrackJob_num_ext_stored_buffers(self.ptr_st_track_job)
+    def num_stored_buffers(self):
+        return st.st_TrackJob_num_stored_buffers(self.ptr_st_track_job)
 
     @property
-    def min_ext_stored_buffer_id(self):
-        return st.st_TrackJob_min_ext_stored_buffer_id(self.ptr_st_track_job)
+    def min_stored_buffer_id(self):
+        return st.st_TrackJob_min_stored_buffer_id(self.ptr_st_track_job)
 
     @property
-    def max_ext_stored_buffer_id(self):
-        return st.st_TrackJob_max_ext_stored_buffer_id(self.ptr_st_track_job)
+    def max_stored_buffer_id(self):
+        return st.st_TrackJob_max_stored_buffer_id(self.ptr_st_track_job)
 
     @property
     def controller(self):
@@ -1102,14 +1091,14 @@ class TrackJob(object):
         _new_ptr_c_output_buffer = st.st_NullBuffer
 
         if particles_buffer is not None:
-            particles_buffer = _get_buffer(particles_buffer)
+            particles_buffer = get_cbuffer_from_obj(particles_buffer)
             _new_ptr_c_particles_buffer = \
                 st.st_Buffer_new_mapped_on_cbuffer(particles_buffer)
             if _new_ptr_c_particles_buffer == st.st_NullBuffer:
                 raise ValueError("Issues with input particles buffer")
 
         if beam_elements_buffer is not None:
-            beam_elements_buffer = _get_buffer(beam_elements_buffer)
+            beam_elements_buffer = get_cbuffer_from_obj(beam_elements_buffer)
             _new_ptr_c_beam_elements_buffer = \
                 st.st_Buffer_new_mapped_on_cbuffer(beam_elements_buffer)
             if _new_ptr_c_beam_elements_buffer == st.st_NullBuffer:
@@ -1214,57 +1203,58 @@ class TrackJob(object):
 
     # -------------------------------------------------------------------------
 
-    def add_ext_stored_buffer(self, cbuffer=None,
-                              capacity=st_BUFFER_DEFAULT_CAPACITY.value,
-                              flags=st_BUFFER_DEFAULT_DATASTORE_FLAGS.value,
-                              ptr_c_buffer_t=None,
-                              take_ownership=False,
-                              delete_ptr_after_move=False):
+    def add_stored_buffer(
+            self,
+            cbuffer=None,
+            size=None,
+            ptr_c_buffer=None,
+            take_ownership=False,
+            delete_ptr_after_move=False):
+        _st_buffer = None
         buffer_id = st.st_ARCH_ILLEGAL_BUFFER_ID.value
-        if cbuffer is not None:
-            _cbuffer = _get_buffer(cbuffer)
-            _ptr_buffer = st.st_Buffer_new_mapped_on_cbuffer(_cbuffer)
-            if _ptr_buffer != st_NullBuffer:
-                buffer_id = st.st_TrackJob_add_ext_stored_buffer(
-                    self.ptr_st_track_job, _ptr_buffer,
-                    ct.c_bool(False), ct.c_bool(False))
-                if buffer_id != st.st_ARCH_ILLEGAL_BUFFER_ID.value:
-                    assert buffer_id not in self._ext_stored_buffers
-                    assert buffer_id not in self._ext_stored_st_buffers
-                    self._ext_stored_st_buffers[buffer_id] = Buffer(
-                        ptr_ext_buffer=_ptr_buffer, owns_ptr=True)
-                    self._ext_stored_buffers[buffer_id] = _cbuffer
-
-        if buffer_id == st.st_ARCH_ILLEGAL_BUFFER_ID.value:
-            raise ValueError("Unable to add external buffer to TrackJob")
-
+        if not(cbuffer is None):
+            _st_buffer = Buffer.from_cbuffer(cbuffer)
+        elif not(size is None) and size > 0:
+            _st_buffer = Buffer(size=size)
+        elif not(ptr_c_buffer is None) and ptr_c_buffer != st_NullBuffer:
+            owns_buffer = take_ownership
+            owns_pointer = take_ownership and delete_ptr_after_move
+            _st_buffer = Buffer(ptr_ext_buffer=ptr_c_buffer,
+                                owns_buffer=owns_buffer,
+                                owns_pointer=owns_pointer)
+        if not(_st_buffer is None) and _st_buffer.pointer != st_NullBuffer:
+            buffer_id = st.st_TrackJob_add_stored_buffer(
+                self.ptr_st_track_job, _st_buffer.pointer,
+                ct.c_bool(False), ct.c_bool(False))
+            if buffer_id != st.st_ARCH_ILLEGAL_BUFFER_ID.value:
+                assert buffer_id not in self._stored_buffers
+                self._stored_buffers[buffer_id] = _st_buffer
         return buffer_id
 
-    def remove_ext_stored_buffer(self, buffer_id):
-        return st.st_TrackJob_remove_ext_stored_buffer(
+    def remove_stored_buffer(self, buffer_id):
+        return st.st_TrackJob_remove_stored_buffer(
             self.ptr_st_track_job, st_arch_size_t(buffer_id))
 
-    def owns_ext_stored_buffer(self, buffer_id):
-        return st.st_TrackJob_owns_ext_stored_buffer(
+    def owns_stored_buffer(self, buffer_id):
+        return st.st_TrackJob_owns_stored_buffer(
             self.ptr_st_track_job, st_arch_size_t(buffer_id))
 
-    def ext_stored_buffer(self, buffer_id):
-        return self._ext_stored_buffers.get(buffer_id, None)
+    @property
+    def stored_buffer_is_cbuffer(self, buffer_id):
+        return buffer_id in self._stored_buffers and \
+            self._stored_buffers[buffer_id].maps_to_cbuffer
 
-    def ptr_ext_stored_buffer(self, buffer_id):
-        return st.st_TrackJob_ext_stored_buffer(
+    def stored_buffer_cbuffer(self, buffer_id):
+        if not self.stored_buffer_is_cbuffer:
+            raise RuntimeError(
+                f"Unable to retrieve CBuffer for buffer_id={buffer_id}")
+        return self._stored_buffers[buffer_id].cbuffer
+
+    def ptr_stored_buffer(self, buffer_id):
+        return st.st_TrackJob_stored_buffer(
             self.ptr_st_track_job, st_arch_size_t(buffer_id))
 
-    def ext_stored_st_buffer(self, buffer_id):
-        if buffer_id in self._ext_stored_st_buffers:
-            return self._ext_stored_st_buffers[buffer_id]
-        else:
-            _ptr_buffer = st.st_TrackJob_ext_stored_buffer(
-                self    .ptr_st_track_job, st_arch_size_t(buffer_id))
-            if _ptr_buffer != st_NullBuffer:
-                return Buffer(ptr_ext_buffer=_ptr_buffer,
-                              owns_ptr=False)
-
-        raise RuntimeError("Unable to retrieve ptr to ext stored buffer")
+    def stored_buffer(self, buffer_id):
+        return self._stored_buffers.get(buffer_id, None)
 
 # end: python/sixtracklib/trackjob.py
