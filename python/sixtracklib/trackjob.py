@@ -7,7 +7,7 @@ from .stcommon import \
     st_ClContextBase_add_program_file, st_ClContextBase_compile_program, \
     st_ClContextBase_enable_kernel, st_ClContextBase_find_kernel_id_by_name, \
     st_ClContext_assign_addresses, st_ClContextBase_assign_kernel_argument, \
-    st_ClContextBase_assign_kernel_argument_value, \
+    st_ClContextBase_assign_kernel_argument_value, st_object_type_id_t, \
     st_TrackJobCl_p, st_NullTrackJob, st_TrackJobCl_get_context
 import ctypes as ct
 import cobjects
@@ -278,7 +278,8 @@ class TrackJobBaseNew(object):
                     _internal_output_buffer = Buffer(cbuffer=_output_buffer)
                 elif _internal_output_buffer is not None:
                     _internal_output_buffer.reserve(
-                        num_objects.value, num_slots.value, num_dataptrs.value, num_garbage.value)
+                        num_objects.value, num_slots.value, num_dataptrs.value,
+                        num_garbage.value)
                 else:
                     raise ValueError("No valid output buffer available")
 
@@ -1052,83 +1053,186 @@ class TrackJob(object):
 
     @property
     def total_num_assign_items(self):
-        return st.st_TrackJob_total_num_assign_items( self.ptr_st_track_job )
+        return st.st_TrackJob_total_num_assign_items(self.ptr_st_track_job)
+
+    def ptr_assign_address_item(
+            self,
+            item=None,
+            dest_elem_type_id=None,
+            dest_buffer_id=None,
+            dest_elem_index=None,
+            dest_pointer_offset=None,
+            src_elem_type_id=None,
+            src_buffer_id=None,
+            src_elem_index=None,
+            src_pointer_offset=None,
+            index=None):
+        _ptr_found = st.st_NullAssignAddressItem
+        if not(item is None):
+            if isinstance(item, AssignAddressItem):
+                # TODO: Figure out a way to do this without relying on
+                #      internal API for cobjects
+                _ptr_found = st.st_TrackJob_ptr_assign_address_item(
+                    self.ptr_st_track_job, ct.cast(item._get_address(),
+                                                   st.st_AssignAddressItem_p))
+            elif item != st.st_NullAssignAddressItem:
+                _ptr_found = st.st_TrackJob_ptr_assign_address_item(
+                    self.ptr_st_track_job, item)
+        elif not(dest_buffer_id is None) and not(src_buffer_id is None):
+            if not(index is None) and index >= 0:
+                _ptr_found = st.st_TrackJob_ptr_assign_address_item_by_index(
+                    self.ptr_st_track_job, st_buffer_size_t(dest_buffer_id),
+                    st_buffer_size_t(src_buffer_id), st_buffer_size_t(index))
+            elif not(dest_elem_type_id is None) and \
+                    not(dest_elem_index is None) and \
+                    not(dest_pointer_offset is None) and \
+                    not(src_elem_type_id is None) and \
+                    not(src_elem_index is None) and \
+                    not(src_pointer_offset is None):
+                _ptr_found = st.st_TrackJob_ptr_assign_address_item_detailed(
+                    self.ptr_st_track_job,
+                    st_object_type_id_t(dest_elem_type_id),
+                    st_buffer_size_t(dest_buffer_id),
+                    st_buffer_size_t(dest_elem_index),
+                    st_buffer_size_t(dest_pointer_offset),
+                    st_object_type_id_t(src_elem_type_id),
+                    st_buffer_size_t(src_buffer_id),
+                    st_buffer_size_t(src_elem_index),
+                    st_buffer_size_t(src_pointer_offset))
+        return _ptr_found
 
     def has_assign_items(self, dest_buffer_id, src_buffer_id):
-        return st.st_TrackJob_has_assign_items( self.ptr_st_track_job,
-            st_buffer_size_t(dest_buffer_id), st_buffer_size_t(src_buffer_id))
+        return st.st_TrackJob_has_assign_items(
+            self.ptr_st_track_job,
+            st_buffer_size_t(dest_buffer_id),
+            st_buffer_size_t(src_buffer_id))
 
     def num_assign_items(self, dest_buffer_id, src_buffer_id):
-        return st.st_TrackJob_num_assign_items( self.ptr_st_track_job,
-            st_buffer_size_t(dest_buffer_id), st_buffer_size_t(src_buffer_id))
+        return st.st_TrackJob_num_assign_items(
+            self.ptr_st_track_job,
+            st_buffer_size_t(dest_buffer_id),
+            st_buffer_size_t(src_buffer_id))
 
-    def has_assign_item(self, item=None,
-        dest_elem_type_id=None, dest_buffer_id=None, dest_elem_index=None,
-        dest_pointer_offset=None,
-        src_elem_type_id=None, src_buffer_id=None, src_elem_index=None,
-        src_pointer_offset=None):
-        has_assign_item_val = False
-        if not( item is None ):
-            _ptr_item = st.st_NullAssignAddressItem
-            if isinstance( item, AssignAddressItem ):
-                #TODO: Figure out a way to do this without relying on
+    def has_assign_item(
+            self,
+            item=None,
+            dest_buffer_id=None,
+            src_buffer_id=None,
+            index=None,
+            dest_elem_type_id=None,
+            dest_elem_index=None,
+            dest_pointer_offset=None,
+            src_elem_type_id=None,
+            src_elem_index=None,
+            src_pointer_offset=None):
+        has_item = False
+        if not(item is None):
+            if isinstance(item, AssignAddressItem):
+                # TODO: Figure out a way to do this without relying on
                 #      internal API for cobjects
-                _ptr_item = ct.cast(
-                    item._get_address(), st.st_AssignAddressItem_p )
-                has_assign_item_val = st.st_TrackJob_has_assign_address_item(
-                    self.ptr_st_track_job, _ptr_item )
+                has_item = st.st_TrackJob_has_assign_address_item(
+                    self.ptr_st_track_job, ct.cast(item._get_address(),
+                                                   st.st_AssignAddressItem_p))
             elif item != st.st_NullAssignAddressItem:
-                has_assign_item_val = st.st_TrackJob_has_assign_address_item(
-                    self.ptr_st_track_job, _ptr_item )
-        elif not( dest_elem_type_id is None ) and \
-             not( dest_buffer_id is None ) and \
-             not( dest_elem_index is None ) and \
-             not( dest_pointer_offset is None ) and \
-             not( src_elem_type_id is None ) and \
-             not( src_buffer_id is None ) and \
-             not( src_elem_index is None ) and \
-             not( src_pointer_offset is None ):
-            temp_item = AssignAddressItem(
-                dest_elem_type_id=dest_elem_type_id,
-                dest_buffer_id=dest_buffer_id,
-                dest_elem_index=dest_elem_index,
-                dest_pointer_offset=dest_pointer_offset,
-                src_elem_type_id=src_elem_type_id,
-                src_buffer_id=src_buffer_id,
-                src_elem_index=src_elem_index,
-                src_pointer_offset=src_pointer_offset)
-            has_assign_item_val = self.has_assign_item(temp_item)
-            temp_item = None
-            del temp_item
-        return has_assign_item_val
+                has_item = st.st_TrackJob_has_assign_address_item(
+                    self.ptr_st_track_job, item)
+        elif not(dest_buffer_id is None) and not(src_buffer_id is None):
+            if not(index is None) and index >= 0:
+                has_item = st.st_TrackJob_has_assign_item_by_index(
+                    self.ptr_st_track_job, st_buffer_size_t(dest_buffer_id),
+                    st_buffer_size_t(src_buffer_id), st_buffer_size_t(index))
+            elif not(dest_elem_type_id is None) and \
+                    not(dest_elem_index is None) and \
+                    not(dest_pointer_offset is None) and \
+                    not(src_elem_type_id is None) and \
+                    not(src_elem_index is None) and \
+                    not(src_pointer_offset is None):
+                has_item = st.st_TrackJob_has_assign_address_item_detailed(
+                    self.ptr_st_track_job,
+                    st_object_type_id_t(dest_elem_type_id),
+                    st_buffer_size_t(dest_buffer_id),
+                    st_buffer_size_t(dest_elem_index),
+                    st_buffer_size_t(dest_pointer_offset),
+                    st_object_type_id_t(src_elem_type_id),
+                    st_buffer_size_t(src_buffer_id),
+                    st_buffer_size_t(src_elem_index),
+                    st_buffer_size_t(src_pointer_offset))
+        return has_item
 
+    def index_of_assign_address_item(
+            self,
+            item=None,
+            dest_buffer_id=None,
+            src_buffer_id=None,
+            dest_elem_type_id=None,
+            dest_elem_index=None,
+            dest_pointer_offset=None,
+            src_elem_type_id=None,
+            src_elem_index=None,
+            src_pointer_offset=None):
+        index_of_item = None
+        if not(item is None):
+            if isinstance(item, AssignAddressItem):
+                # TODO: Figure out a way to do this without relying on
+                #      internal API for cobjects
+                index_of_item = st.st_TrackJob_index_of_assign_address_item(
+                    self.ptr_st_track_job, ct.cast(item._get_address(),
+                                                   st.st_AssignAddressItem_p))
+            elif item != st.st_NullAssignAddressItem:
+                index_of_item = st.st_TrackJob_index_of_assign_address_item(
+                    self.ptr_st_track_job, item)
+        elif not(dest_buffer_id is None) and not(src_buffer_id is None) and\
+                not(dest_elem_type_id is None) and \
+                not(dest_elem_index is None) and \
+                not(dest_pointer_offset is None) and \
+                not(src_elem_type_id is None) and \
+                not(src_elem_index is None) and \
+                not(src_pointer_offset is None):
+            index_of_item = \
+                st.st_TrackJob_index_of_assign_address_item_detailed(
+                    self.ptr_st_track_job,
+                    st_object_type_id_t(dest_elem_type_id),
+                    st_buffer_size_t(dest_buffer_id),
+                    st_buffer_size_t(dest_elem_index),
+                    st_buffer_size_t(dest_pointer_offset),
+                    st_object_type_id_t(src_elem_type_id),
+                    st_buffer_size_t(src_buffer_id),
+                    st_buffer_size_t(src_elem_index),
+                    st_buffer_size_t(src_pointer_offset))
+        return index_of_item
 
-    def add_assign_address_item(self, item=None,
-        dest_elem_type_id=None, dest_buffer_id=None, dest_elem_index=None,
-        dest_pointer_offset=None,
-        src_elem_type_id=None, src_buffer_id=None, src_elem_index=None,
-        src_pointer_offset=None):
+    def add_assign_address_item(
+            self,
+            item=None,
+            dest_elem_type_id=None,
+            dest_buffer_id=None,
+            dest_elem_index=None,
+            dest_pointer_offset=None,
+            src_elem_type_id=None,
+            src_buffer_id=None,
+            src_elem_index=None,
+            src_pointer_offset=None):
         ptr_added_item = st.st_NullAssignAddressItem
-        if not( item is None ):
-            if isinstance( item, AssignAddressItem ):
-                #TODO: Figure out a way to do this without relying on
+        if not(item is None):
+            if isinstance(item, AssignAddressItem):
+                # TODO: Figure out a way to do this without relying on
                 #      internal API for cobjects
                 _ptr_item = ct.cast(
-                    item._get_address(), st.st_AssignAddressItem_p )
+                    item._get_address(), st.st_AssignAddressItem_p)
 
                 ptr_added_item = st.st_TrackJob_add_assign_address_item(
-                    self.ptr_st_track_job, _ptr_item )
+                    self.ptr_st_track_job, _ptr_item)
             elif item != st.st_NullAssignAddressItem:
                 ptr_added_item = st.st_TrackJob_add_assign_address_item(
-                    self.ptr_st_track_job, item )
-        elif not( dest_elem_type_id is None ) and \
-             not( dest_buffer_id is None ) and \
-             not( dest_elem_index is None ) and \
-             not( dest_pointer_offset is None ) and \
-             not( src_elem_type_id is None ) and \
-             not( src_buffer_id is None ) and \
-             not( src_elem_index is None ) and \
-             not( src_pointer_offset is None ):
+                    self.ptr_st_track_job, item)
+        elif not(dest_elem_type_id is None) and \
+                not(dest_buffer_id is None) and \
+                not(dest_elem_index is None) and \
+                not(dest_pointer_offset is None) and \
+                not(src_elem_type_id is None) and \
+                not(src_buffer_id is None) and \
+                not(src_elem_index is None) and \
+                not(src_pointer_offset is None):
             ptr_added_item = st.st_TrackJob_add_assign_address_item_detailed(
                 self.ptr_st_track_job,
                 st.st_object_type_id_t(dest_elem_type_id),
@@ -1141,24 +1245,29 @@ class TrackJob(object):
                 st_buffer_size_t(src_pointer_offset))
 
         if ptr_added_item == st.st_NullAssignAddressItem:
-            raise ValueError("unable to add AssignAddressItem given by these parameters")
+            raise ValueError(
+                "unable to add AssignAddressItem given by these parameters")
         return ptr_added_item
 
     def push_assign_address_items(self):
-        #TODO: IMplement pushing!
+        # TODO: IMplement pushing!
         return self
 
-    def perform_managed_assignments(self,dest_buffer_id=None, src_buffer_id=None):
+    def perform_managed_assignments(
+            self,
+            dest_buffer_id=None,
+            src_buffer_id=None):
         if dest_buffer_id is None and src_buffer_id is None:
             self._last_status = st.st_TrackJob_perform_all_managed_assignments(
-                self.ptr_st_track_job );
-        elif not( dest_buffer_id is None ) and not( src_buffer_id is None ):
+                self.ptr_st_track_job)
+        elif not(dest_buffer_id is None) and not(src_buffer_id is None):
             self._last_status = st.st_TrackJob_perform_managed_assignments(
-                self.ptr_st_track_job, st_buffer_size_t( dest_buffer_id),
+                self.ptr_st_track_job, st_buffer_size_t(dest_buffer_id),
                 st_buffer_size_t(src_buffer_id))
         else:
-            raise ValueError("inconsistent dest_buffer_id and src_buffer_id parameters")
-            self._last_status = st_ARCH_STATUS_GENERAL_FAILURE.value;
+            raise ValueError(
+                "inconsistent dest_buffer_id and src_buffer_id parameters")
+            self._last_status = st_ARCH_STATUS_GENERAL_FAILURE.value
 
         if self._last_status != st_ARCH_STATUS_SUCCESS.value:
             raise RuntimeError("Unable to perform assignment of address items")
