@@ -273,6 +273,28 @@ NS(AssignAddressItem_remap_assignment_on_managed_buffer)(
     NS(buffer_size_t) const dest_slot_size,
     NS(buffer_addr_diff_t) const remap_offset );
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_compare_less)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_are_equal)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_are_not_equal)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_dest_src_are_equal)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_dest_src_are_not_equal)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
+
 #if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
@@ -366,23 +388,26 @@ NS(AssignAddressItem_assign_all_managed_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* src_buffer,
     NS(buffer_size_t) const src_slot_size );
 
-SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_compare_less)(
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(AssignAddressItem_compare_less_ext)(
     const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
     const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
 
-SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_are_equal)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(AssignAddressItem_are_equal_ext)(
     const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
     const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
 
-SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_are_not_equal)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(AssignAddressItem_are_not_equal_ext)(
     const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
     const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
 
-SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_dest_src_are_equal)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(AssignAddressItem_dest_src_are_equal_ext)(
     const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
     const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
 
-SIXTRL_STATIC SIXTRL_FN bool NS(AssignAddressItem_dest_src_are_not_equal)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool
+NS(AssignAddressItem_dest_src_are_not_equal_ext)(
     const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
     const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs );
 

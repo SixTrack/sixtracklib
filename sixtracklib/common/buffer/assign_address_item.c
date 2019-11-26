@@ -177,4 +177,41 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(AssignAddressItem)* NS(AssignAddressItem_add_copy)(
                 NS(AssignAddressItem_type_id)( item ) ) );
 }
 
+/* ------------------------------------------------------------------------- */
+
+bool NS(AssignAddressItem_compare_less_ext)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs )
+{
+    return NS(AssignAddressItem_compare_less)( lhs, rhs );
+}
+
+bool NS(AssignAddressItem_are_equal_ext)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs )
+{
+    return NS(AssignAddressItem_are_equal)( lhs, rhs );
+}
+
+bool NS(AssignAddressItem_are_not_equal_ext)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs )
+{
+    return NS(AssignAddressItem_are_not_equal)( lhs, rhs );
+}
+
+bool NS(AssignAddressItem_dest_src_are_equal_ext)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs )
+{
+    return NS(AssignAddressItem_dest_src_are_equal)( lhs, rhs );
+}
+
+bool NS(AssignAddressItem_dest_src_are_not_equal_ext)(
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT lhs,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT rhs )
+{
+    return NS(AssignAddressItem_dest_src_are_not_equal)( lhs, rhs );
+}
+
 /* end: sixtracklib/common/buffer/assign_address_item.c */
