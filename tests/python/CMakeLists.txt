@@ -40,18 +40,28 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     # -------------------------------------------------------------------------
     # test_track_job_cpu:
 
-    add_test( NAME Python_TrackJobCpuTests
+    add_test( NAME Python_TrackJobCpu_SetupTests
         COMMAND ${PYTHON_EXECUTABLE}
                 ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cpu.py
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
 
     # -------------------------------------------------------------------------
-    # test_track_job_cpu:
+    # test_track_job_cpu_stored_buffer:
 
-    add_test( NAME Python_TrackJobCpuExtStoredBufferTests
-        COMMAND ${PYTHON_EXECUTABLE}
-                ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cpu_stored_buffer.py
+    add_test( NAME Python_TrackJobCpu_StoredBufferTests
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cpu_stored_buffer.py
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python )
+
+    # -------------------------------------------------------------------------
+    # test_track_job_cpu_assign_address_items:
+
+    add_test( NAME Python_TrackJobCpu_AssignAddressItemsTests
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cpu_assign_address_items.py
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python
+    )
+
+
+
 
 endif()
 

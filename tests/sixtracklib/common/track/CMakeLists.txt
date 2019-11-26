@@ -29,7 +29,7 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
          test_track_job_cpu_stored_buffer_cxx )
 
-    add_test( CXX_Cpu_CpuTrackJobStoredBufferTests
+    add_test( CXX_Cpu_CpuTrackJob_StoredBufferTests
               test_track_job_cpu_stored_buffer_cxx )
 
     # --------------------------------------------------------------------------
@@ -41,8 +41,32 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
             test_track_job_cpu_stored_buffer_c99 )
 
-    add_test( C99_Cpu_CpuTrackJobStoredBufferTests
+    add_test( C99_Cpu_CpuTrackJob_StoredBufferTests
               test_track_job_cpu_stored_buffer_c99 )
+
+    # ==========================================================================
+    # test_track_job_cpu_assign_address_item_cxx:
+
+    add_executable( test_track_job_cpu_assign_address_item_cxx
+                    test_track_job_cpu_assign_address_item_cxx.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+         test_track_job_cpu_assign_address_item_cxx )
+
+    add_test( CXX_Cpu_CpuTrackJob_AssignAddressItemTests
+              test_track_job_cpu_assign_address_item_cxx )
+
+    # --------------------------------------------------------------------------
+    # test_track_job_cpu_assign_address_item_c99:
+
+#     add_executable( test_track_job_cpu_assign_address_item_c99
+#                     test_track_job_cpu_assign_address_item_c99.cpp )
+#
+#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+#             test_track_job_cpu_assign_address_item_c99 )
+#
+#     add_test( C99_Cpu_CpuTrackJob_AssignAddressItemTests
+#               test_track_job_cpu_assign_address_item_c99 )
 
     # ==========================================================================
     # test_track_job_cpu_fetch_particle_addr_cxx:

@@ -11,7 +11,7 @@
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/buffer.h"
 
-TEST( C99_Cpu_CpuTrackJobStoredBufferTests, MinimalUsage )
+TEST( C99_Cpu_CpuTrackJob_StoredBufferTests, MinimalUsage )
 {
     using track_job_t   = ::NS(TrackJobCpu);
     using c_buffer_t    = ::NS(Buffer);

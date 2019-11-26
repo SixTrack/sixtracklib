@@ -18,7 +18,7 @@
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/buffer.h"
 
-TEST( CXX_Cpu_CpuTrackJobStoredBufferTests, MinimalUsage )
+TEST( CXX_Cpu_CpuTrackJob_StoredBufferTests, MinimalUsage )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
     using track_job_t = st::TrackJobCpu;
