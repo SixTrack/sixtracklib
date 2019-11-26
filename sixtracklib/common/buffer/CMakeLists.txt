@@ -1,3 +1,8 @@
+set( SIXTRL_COMMON_BUFFER_CXX_HEADERS
+     assign_address_item.hpp )
+
+# -----------------------------------------------------------------------------
+
 set( SIXTRL_COMMON_BUFFER_HEADERS
      alignment.h
      assign_address_item.h
@@ -50,6 +55,11 @@ set(  SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
 if( SIXTRL_COMMON_BUFFER_HEADERS )
     install( FILES ${SIXTRL_COMMON_BUFFER_HEADERS}
              DESTINATION "${SIXTRL_COMMON_C99_INSTALL_PREFIX}/buffer" )
+endif()
+
+if( SIXTRACKL_ENABLE_CXX AND SIXTRL_COMMON_BUFFER_CXX_HEADERS )
+    install( FILES ${SIXTRL_COMMON_BUFFER_CXX_HEADERS}
+             DESTINATION "${SIXTRL_COMMON_CXX_INSTALL_PREFIX}/buffer" )
 endif()
 
 #end: sixtracklib/common/buffer/CMakeLists.txt

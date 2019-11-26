@@ -8,7 +8,7 @@
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
-NS(AssignAddressItem_assign_all_managed_buffer_kernel_impl)(
+NS(AssignAddressItem_perform_address_assignment_kernel_impl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT assign_buffer,
     NS(buffer_size_t) const assign_slot_size,
     NS(buffer_size_t) const start_item_idx,
@@ -24,7 +24,7 @@ NS(AssignAddressItem_assign_all_managed_buffer_kernel_impl)(
 /* ************************************************************************* */
 
 SIXTRL_INLINE NS(arch_status_t)
-NS(AssignAddressItem_assign_all_managed_buffer_kernel_impl)(
+NS(AssignAddressItem_perform_address_assignment_kernel_impl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT assign_buffer,
     NS(buffer_size_t) const assign_slot_size,
     NS(buffer_size_t) const start_item_idx,
@@ -47,11 +47,9 @@ NS(AssignAddressItem_assign_all_managed_buffer_kernel_impl)(
     SIXTRL_ASSERT( item_idx_stride  > ( NS(buffer_size_t) )0u );
 
     SIXTRL_ASSERT( dest_buffer != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( dest_slot_size > ( NS(buffer_size_t) )0u );
     SIXTRL_ASSERT( dest_buffer_id != SIXTRL_ARCH_ILLEGAL_BUFFER_ID );
 
     SIXTRL_ASSERT( src_buffer != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( src_slot_size > ( NS(buffer_size_t) )0u );
     SIXTRL_ASSERT( src_buffer_id != SIXTRL_ARCH_ILLEGAL_BUFFER_ID );
 
     for( ; idx < num_assign_items ; idx += item_idx_stride )
@@ -65,8 +63,27 @@ NS(AssignAddressItem_assign_all_managed_buffer_kernel_impl)(
             ( NS(AssignAddressItem_dest_buffer_id)( item ) ==
                 dest_buffer_id ) )
         {
-            status |= NS(AssignAddressItem_perform_assignment_on_managed_buffer)(
-                item, dest_buffer, dest_slot_size, src_buffer, src_slot_size );
+            NS(buffer_addr_t) const src_addr = (
+                NS(AssignAddressItem_src_is_on_buffer)( item ) )
+                ? NS(AssignAddressItem_src_pointer_addr_from_managed_buffer)(
+                    item, src_buffer, src_slot_size )
+                : NS(AssignAddressItem_src_pointer_addr_from_raw_memory)(
+                    item, src_buffer );
+
+            if( NS(AssignAddressItem_dest_is_on_buffer)( item ) )
+            {
+                status |= NS(AssignAddressItem_assign_fixed_addr_on_managed_buffer)(
+                    item, dest_buffer, dest_slot_size, src_addr );
+            }
+            else if( NS(AssignAddressItem_dest_is_on_raw_memory)( item ) )
+            {
+                status |= NS(AssignAddressItem_assign_fixed_addr_on_raw_memory)(
+                    item, dest_buffer, src_addr );
+            }
+            else
+            {
+                status |= SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+            }
         }
     }
 
