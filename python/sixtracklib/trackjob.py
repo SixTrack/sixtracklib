@@ -19,7 +19,7 @@ from . import config as stconf
 from .particles import ParticlesSet
 from .control import raise_error_if_status_not_success
 from .control import ControllerBase, NodeControllerBase, ArgumentBase
-from .buffer import Buffer, get_cbuffer_from_obj
+from .buffer import Buffer, get_cbuffer_from_obj, AssignAddressItem
 from .particles import ParticlesSet
 from .beam_elements import Elements
 
@@ -1048,41 +1048,123 @@ class TrackJob(object):
 
         return kernel_id
 
-    def assign_addresses(self, assignment_buffer, dest_buffer, source_buffer):
-        _assign_buffer = st.st_Buffer_new_mapped_on_cbuffer(assignment_buffer)
-        _dest_buffer = st.st_Buffer_new_mapped_on_cbuffer(dest_buffer)
-        _src_buffer = st.st_Buffer_new_mapped_on_cbuffer(src_buffer)
+    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-        if self.arch_str == 'opencl':
-            _controller = st_TrackJobCl_get_context(self.ptr_st_track_job)
-            _assign_arg = st_ClArgument_new_from_buffer(
-                _controller, _assign_buffer)
-            _dest_arg = st_ClArgument_new_from_buffer(_controller, _dest_buffer)
-            _src_arg = st_ClArgument_new_from_buffer(_controller, _src_buffer)
+    @property
+    def total_num_assign_items(self):
+        return st.st_TrackJob_total_num_assign_items( self.ptr_st_track_job )
 
-            success = st_ClContext_assign_addresses(
-                _controller, _assign_arg, _dest_arg, _src_arg)
+    def has_assign_items(self, dest_buffer_id, src_buffer_id):
+        return st.st_TrackJob_has_assign_items( self.ptr_st_track_job,
+            st_buffer_size_t(dest_buffer_id), st_buffer_size_t(src_buffer_id))
 
-            st_ClArgument_delete(_assign_arg)
-            st_ClArgument_delete(_dest_arg)
-            st_ClArgument_delete(_src_arg)
+    def num_assign_items(self, dest_buffer_id, src_buffer_id):
+        return st.st_TrackJob_num_assign_items( self.ptr_st_track_job,
+            st_buffer_size_t(dest_buffer_id), st_buffer_size_t(src_buffer_id))
 
-        elif self.arch_str == 'cpu':
-            pass
-            # success = st_AssignAddressItem_assign_all(
-            # _assign_buffer, _dest_buffer, _src_buffer )
+    def has_assign_item(self, item=None,
+        dest_elem_type_id=None, dest_buffer_id=None, dest_elem_index=None,
+        dest_pointer_offset=None,
+        src_elem_type_id=None, src_buffer_id=None, src_elem_index=None,
+        src_pointer_offset=None):
+        has_assign_item_val = False
+        if not( item is None ):
+            _ptr_item = st.st_NullAssignAddressItem
+            if isinstance( item, AssignAddressItem ):
+                #TODO: Figure out a way to do this without relying on
+                #      internal API for cobjects
+                _ptr_item = ct.cast(
+                    item._get_address(), st.st_AssignAddressItem_p )
+                has_assign_item_val = st.st_TrackJob_has_assign_address_item(
+                    self.ptr_st_track_job, _ptr_item )
+            elif item != st.st_NullAssignAddressItem:
+                has_assign_item_val = st.st_TrackJob_has_assign_address_item(
+                    self.ptr_st_track_job, _ptr_item )
+        elif not( dest_elem_type_id is None ) and \
+             not( dest_buffer_id is None ) and \
+             not( dest_elem_index is None ) and \
+             not( dest_pointer_offset is None ) and \
+             not( src_elem_type_id is None ) and \
+             not( src_buffer_id is None ) and \
+             not( src_elem_index is None ) and \
+             not( src_pointer_offset is None ):
+            temp_item = AssignAddressItem(
+                dest_elem_type_id=dest_elem_type_id,
+                dest_buffer_id=dest_buffer_id,
+                dest_elem_index=dest_elem_index,
+                dest_pointer_offset=dest_pointer_offset,
+                src_elem_type_id=src_elem_type_id,
+                src_buffer_id=src_buffer_id,
+                src_elem_index=src_elem_index,
+                src_pointer_offset=src_pointer_offset)
+            has_assign_item_val = self.has_assign_item(temp_item)
+            temp_item = None
+            del temp_item
+        return has_assign_item_val
 
-        if _assign_buffer != st_NullBuffer:
-            st.st_Buffer_delete(_assign_buffer)
 
-        if _dest_buffer != st_NullBuffer:
-            st.st_Buffer_delete(_dest_buffer)
+    def add_assign_address_item(self, item=None,
+        dest_elem_type_id=None, dest_buffer_id=None, dest_elem_index=None,
+        dest_pointer_offset=None,
+        src_elem_type_id=None, src_buffer_id=None, src_elem_index=None,
+        src_pointer_offset=None):
+        ptr_added_item = st.st_NullAssignAddressItem
+        if not( item is None ):
+            if isinstance( item, AssignAddressItem ):
+                #TODO: Figure out a way to do this without relying on
+                #      internal API for cobjects
+                _ptr_item = ct.cast(
+                    item._get_address(), st.st_AssignAddressItem_p )
 
-        if _src_buffer != st_NullBuffer:
-            st.st_Buffer_delete(_src_buffer)
+                ptr_added_item = st.st_TrackJob_add_assign_address_item(
+                    self.ptr_st_track_job, _ptr_item )
+            elif item != st.st_NullAssignAddressItem:
+                ptr_added_item = st.st_TrackJob_add_assign_address_item(
+                    self.ptr_st_track_job, item )
+        elif not( dest_elem_type_id is None ) and \
+             not( dest_buffer_id is None ) and \
+             not( dest_elem_index is None ) and \
+             not( dest_pointer_offset is None ) and \
+             not( src_elem_type_id is None ) and \
+             not( src_buffer_id is None ) and \
+             not( src_elem_index is None ) and \
+             not( src_pointer_offset is None ):
+            ptr_added_item = st.st_TrackJob_add_assign_address_item_detailed(
+                self.ptr_st_track_job,
+                st.st_object_type_id_t(dest_elem_type_id),
+                st_buffer_size_t(dest_buffer_id),
+                st_buffer_size_t(dest_elem_index),
+                st_buffer_size_t(dest_pointer_offset),
+                st.st_object_type_id_t(src_elem_type_id),
+                st_buffer_size_t(src_buffer_id),
+                st_buffer_size_t(src_elem_index),
+                st_buffer_size_t(src_pointer_offset))
 
-        self._last_status = raise_error_if_status_not_success(
-            success, "Unable to assign addresses")
+        if ptr_added_item == st.st_NullAssignAddressItem:
+            raise ValueError("unable to add AssignAddressItem given by these parameters")
+        return ptr_added_item
+
+    def push_assign_address_items(self):
+        #TODO: IMplement pushing!
+        return self
+
+    def perform_managed_assignments(self,dest_buffer_id=None, src_buffer_id=None):
+        if dest_buffer_id is None and src_buffer_id is None:
+            self._last_status = st.st_TrackJob_perform_all_managed_assignments(
+                self.ptr_st_track_job );
+        elif not( dest_buffer_id is None ) and not( src_buffer_id is None ):
+            self._last_status = st.st_TrackJob_perform_managed_assignments(
+                self.ptr_st_track_job, st_buffer_size_t( dest_buffer_id),
+                st_buffer_size_t(src_buffer_id))
+        else:
+            raise ValueError("inconsistent dest_buffer_id and src_buffer_id parameters")
+            self._last_status = st_ARCH_STATUS_GENERAL_FAILURE.value;
+
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError("Unable to perform assignment of address items")
+        return self
+
+    # --------------------------------------------------------------------------
 
     def reset(self, beam_elements_buffer, particles_buffer,
               until_turn_elem_by_elem=0, output_buffer=None):
