@@ -2,7 +2,6 @@ import cobjects
 from cobjects import CBuffer, CObject
 import sixtracklib as st
 from sixtracklib.tricub import TriCub, TriCubData
-import pdb
 
 if __name__ == '__main__':
     lattice = st.Elements()
