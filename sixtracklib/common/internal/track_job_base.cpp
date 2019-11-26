@@ -1303,6 +1303,45 @@ namespace SIXTRL_CXX_NAMESPACE
         return total_num_items;
     }
 
+    _this_t::assign_item_t const* TrackJobBase::ptr_assign_address_item(
+        _this_t::assign_item_t const& SIXTRL_RESTRICT_REF
+            assign_address_item ) const SIXTRL_NOEXCEPT
+    {
+        _this_t::size_type const assign_item_idx =
+            this->doFindAssingAddressItem( assign_address_item );
+
+        return this->doGetAssignAddressItem( _this_t::assign_item_key_t{
+                assign_address_item.getDestBufferId(),
+                assign_address_item.getSrcBufferId() }, assign_item_idx );
+    }
+
+
+    _this_t::assign_item_t const* TrackJobBase::ptr_assign_address_item(
+        _this_t::size_type const dest_buffer_id,
+        _this_t::size_type const src_buffer_id,
+        _this_t::size_type const assign_item_index ) const SIXTRL_NOEXCEPT
+    {
+        return this->doGetAssignAddressItem(
+            _this_t::assign_item_key_t{ dest_buffer_id, src_buffer_id },
+                assign_item_index );
+    }
+
+    _this_t::assign_item_t const* TrackJobBase::ptr_assign_address_item(
+        _this_t::object_type_id_t const dest_type_id,
+        _this_t::size_type const dest_buffer_id,
+        _this_t::size_type const dest_elem_index,
+        _this_t::size_type const dest_pointer_offset,
+        _this_t::object_type_id_t const src_type_id,
+        _this_t::size_type const src_buffer_id,
+        _this_t::size_type const src_elem_index,
+        _this_t::size_type const src_pointer_offset ) const SIXTRL_NOEXCEPT
+    {
+        return this->ptr_assign_address_item(
+            _this_t::assign_item_t{ dest_type_id, dest_buffer_id,
+                dest_elem_index, dest_pointer_offset, src_type_id,
+                    src_buffer_id, src_elem_index, src_pointer_offset } );
+    }
+
     _this_t::status_t TrackJobBase::perform_managed_assignments()
     {
         _this_t::status_t status = st::ARCH_STATUS_SUCCESS;
@@ -1313,11 +1352,7 @@ namespace SIXTRL_CXX_NAMESPACE
         for( ; it != end ; ++it )
         {
             status = this->doPerformManagedAssignments( it->first );
-
-            if( status != st::ARCH_STATUS_SUCCESS )
-            {
-                break;
-            }
+            if( status != st::ARCH_STATUS_SUCCESS ) break;
         }
 
         return status;

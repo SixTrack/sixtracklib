@@ -456,6 +456,24 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN size_type total_num_assign_items() const SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN assign_item_t const* ptr_assign_address_item(
+            assign_item_t const& SIXTRL_RESTRICT_REF
+                assign_address_item ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN assign_item_t const* ptr_assign_address_item(
+            size_type const dest_buffer_id,  size_type const src_buffer_id,
+            size_type const assign_item_index ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN assign_item_t const* ptr_assign_address_item(
+            object_type_id_t const dest_type_id,
+            size_type const dest_buffer_id,
+            size_type const dest_elem_index,
+            size_type const dest_pointer_offset,
+            object_type_id_t const src_type_id,
+            size_type const src_buffer_id,
+            size_type const src_elem_index,
+            size_type const src_pointer_offset ) const SIXTRL_NOEXCEPT;
+
         SIXTRL_HOST_FN size_type
             num_distinct_available_assign_address_items_dest_src_pairs() const SIXTRL_NOEXCEPT;
 

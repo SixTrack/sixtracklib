@@ -494,6 +494,12 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_assign_address_item)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
     const NS(AssignAddressItem) *const SIXTRL_RESTRICT_REF assign_item_to_add );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_assign_item_by_index)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const src_buffer_id,
+    NS(buffer_size_t) const assign_item_index );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_assign_address_item_detailed)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
     NS(object_type_id_t) const dest_type_id,
@@ -536,6 +542,29 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
 NS(TrackJob_total_num_assign_items)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem) const*
+NS(TrackJob_ptr_assign_address_item)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT assign_address_item );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem) const*
+NS(TrackJob_ptr_assign_address_item_detailed)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(object_type_id_t) const dest_type_id,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const dest_elem_index,
+    NS(buffer_size_t) const dest_pointer_offset,
+    NS(object_type_id_t) const src_type_id,
+    NS(buffer_size_t) const src_buffer_id,
+    NS(buffer_size_t) const src_elem_index,
+    NS(buffer_size_t) const src_pointer_offset );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem) const*
+NS(TrackJob_ptr_assign_address_item_by_index)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const src_buffer_id,
+    NS(buffer_size_t) const assign_address_item_index );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
 NS(TrackJob_num_distinct_available_assign_address_items_dest_src_pairs)(

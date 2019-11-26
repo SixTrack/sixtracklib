@@ -683,6 +683,16 @@ bool NS(TrackJob_has_assign_address_item)(
              ( job->has_assign_address_item( *ptr_cxx_item ) ) );
 }
 
+bool NS(TrackJob_has_assign_item_by_index)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const src_buffer_id,
+    ::NS(buffer_size_t) const assign_item_index )
+{
+    return ( ( job != nullptr ) && ( job->num_assign_items(
+                dest_buffer_id, src_buffer_id ) > assign_item_index ) );
+}
+
 bool NS(TrackJob_has_assign_address_item_detailed)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
     ::NS(object_type_id_t) const dest_type_id,
@@ -756,6 +766,90 @@ bool NS(TrackJob_has_assign_items)(
 {
     return ( job != nullptr )
         ? job->total_num_assign_items() : ::NS(buffer_size_t){ 0 };
+}
+
+::NS(AssignAddressItem) const* NS(TrackJob_ptr_assign_address_item)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    const ::NS(AssignAddressItem) *const SIXTRL_RESTRICT assign_address_item )
+{
+    ::NS(AssignAddressItem) const* ptr_item = nullptr;
+
+    if( ( job != nullptr ) && ( assign_address_item != nullptr ) )
+    {
+        st::AssignAddressItem const* _ptr = job->ptr_assign_address_item(
+            *( reinterpret_cast< st::AssignAddressItem const* >(
+                assign_address_item ) ) );
+
+        if( _ptr != nullptr ) ptr_item = _ptr->getCApiPtr();
+    }
+
+    return ptr_item;
+}
+
+::NS(AssignAddressItem) const* NS(TrackJob_ptr_assign_address_item_detailed)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(object_type_id_t) const dest_type_id,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const dest_elem_index,
+    ::NS(buffer_size_t) const dest_pointer_offset,
+    ::NS(object_type_id_t) const src_type_id,
+    ::NS(buffer_size_t) const src_buffer_id,
+    ::NS(buffer_size_t) const src_elem_index,
+    ::NS(buffer_size_t) const src_pointer_offset )
+{
+    ::NS(AssignAddressItem) const* ptr_item = nullptr;
+
+    if( job != nullptr )
+    {
+        st::TrackJobBase::size_type const assign_address_item_index =
+            job->index_of_assign_address_item( dest_type_id, dest_buffer_id,
+                dest_elem_index, dest_pointer_offset, src_type_id,
+                    src_buffer_id, src_elem_index, src_pointer_offset );
+
+        std::cout << "dest_buffer_id = " << dest_buffer_id << "\r\n"
+                  << "src_buffer_id  = " << src_buffer_id << "\r\n"
+                  << "assign_address_item_index = "
+                  << assign_address_item_index << std::endl;
+
+        ptr_item = job->ptr_assign_address_item(
+            dest_buffer_id, src_buffer_id, assign_address_item_index );
+
+        std::cout << "ptr_item = " << std::hex << reinterpret_cast< uintptr_t >(
+            ptr_item ) << std::endl;
+
+        if( ptr_item != nullptr )
+        {
+            std::cout << ::NS(AssignAddressItem_dest_elem_type_id)( ptr_item ) << "\r\n"
+                      << ::NS(AssignAddressItem_dest_buffer_id)( ptr_item ) << "\r\n"
+                      << ::NS(AssignAddressItem_dest_elem_index)( ptr_item ) << "\r\n"
+                      << ::NS(AssignAddressItem_dest_pointer_offset)( ptr_item ) << "\r\n"
+                      << ::NS(AssignAddressItem_src_elem_type_id)( ptr_item ) << "\r\n"
+                      << ::NS(AssignAddressItem_src_buffer_id)( ptr_item ) << "\r\n"
+                      << ::NS(AssignAddressItem_src_elem_index)( ptr_item ) << "\r\n"
+                      << ::NS(AssignAddressItem_src_pointer_offset)( ptr_item ) << std::endl;
+        }
+    }
+
+    return ptr_item;
+}
+
+::NS(AssignAddressItem) const* NS(TrackJob_ptr_assign_address_item_by_index)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const src_buffer_id,
+    ::NS(buffer_size_t) const assign_address_item_index )
+{
+    ::NS(AssignAddressItem) const* ptr_item = nullptr;
+
+    if( job != nullptr )
+    {
+        st::AssignAddressItem const* _ptr = job->ptr_assign_address_item(
+            dest_buffer_id, src_buffer_id, assign_address_item_index );
+
+        if( _ptr != nullptr ) ptr_item = _ptr->getCApiPtr();
+    }
+
+    return ptr_item;
 }
 
 ::NS(buffer_size_t)
