@@ -128,6 +128,24 @@ namespace SIXTRL_CXX_NAMESPACE
         std::map< Key, std::vector< T, VecAlloc >, Cmp, Alloc >&
             SIXTRL_RESTRICT_REF map, Key const& SIXTRL_RESTRICT_REF key );
 
+    template< typename Key, typename T, class Cmp, class Alloc, class VecAlloc>
+    SIXTRL_STATIC SIXTRL_HOST_FN std::size_t Map_ordered_vec_get_value_index(
+        std::map< Key, std::vector< T, VecAlloc >, Cmp, Alloc > const&
+            SIXTRL_RESTRICT_REF map, Key const& SIXTRL_RESTRICT_REF key,
+                T const& SIXTRL_RESTRICT_REF value );
+
+    template< typename Key, typename T, class Cmp, class Alloc, class VecAlloc>
+    SIXTRL_STATIC SIXTRL_HOST_FN T* Map_ordered_vec_get_ptr_value(
+        std::map< Key, std::vector< T, VecAlloc >, Cmp, Alloc >&
+            SIXTRL_RESTRICT_REF map, Key const& SIXTRL_RESTRICT_REF key,
+                T const& SIXTRL_RESTRICT_REF value );
+
+    template< typename Key, typename T, class Cmp, class Alloc, class VecAlloc>
+    SIXTRL_STATIC SIXTRL_HOST_FN T const* Map_ordered_vec_get_ptr_const_value(
+        std::map< Key, std::vector< T, VecAlloc >, Cmp, Alloc > const&
+            SIXTRL_RESTRICT_REF map, Key const& SIXTRL_RESTRICT_REF key,
+                T const& SIXTRL_RESTRICT_REF value );
+
     /* --------------------------------------------------------------------- */
 
     template< typename Key, typename Value, class Hash,
@@ -221,6 +239,29 @@ namespace SIXTRL_CXX_NAMESPACE
             KeyEqual, Alloc >& SIXTRL_RESTRICT_REF map,
         Key const& SIXTRL_RESTRICT_REF key );
 
+    template< typename Key, typename T, class Hash,
+              class KeyEqual, class Alloc, class VecAlloc >
+    SIXTRL_STATIC SIXTRL_HOST_FN std::size_t Map_ordered_vec_get_value_index(
+        std::unordered_map< Key, std::vector< T, VecAlloc >, Hash,
+            KeyEqual, Alloc > const& SIXTRL_RESTRICT_REF map,
+        Key const& SIXTRL_RESTRICT_REF key,
+        T const& SIXTRL_RESTRICT_REF value );
+
+    template< typename Key, typename T, class Hash,
+              class KeyEqual, class Alloc, class VecAlloc >
+    SIXTRL_STATIC SIXTRL_HOST_FN T* Map_ordered_vec_get_ptr_value(
+        std::unordered_map< Key, std::vector< T, VecAlloc >, Hash,
+            KeyEqual, Alloc >& SIXTRL_RESTRICT_REF map,
+        Key const& SIXTRL_RESTRICT_REF key,
+        T const& SIXTRL_RESTRICT_REF value );
+
+    template< typename Key, typename T, class Hash,
+              class KeyEqual, class Alloc, class VecAlloc >
+    SIXTRL_STATIC SIXTRL_HOST_FN T const* Map_ordered_vec_get_ptr_const_value(
+        std::unordered_map< Key, std::vector< T, VecAlloc >, Hash,
+            KeyEqual, Alloc > const& SIXTRL_RESTRICT_REF map,
+        Key const& SIXTRL_RESTRICT_REF key,
+        T const& SIXTRL_RESTRICT_REF value );
 }
 
 #endif /* SIXTRACKLIB_COMMON_INTERNAL_STL_BUFFER_HELPER_CXX_HPP__ */
@@ -508,6 +549,69 @@ namespace SIXTRL_CXX_NAMESPACE
             static_cast< map_t const& >( map ), key ) );
     }
 
+    template< typename Key, typename T, class Cmp, class Alloc, class VecAlloc>
+    SIXTRL_STATIC SIXTRL_HOST_FN std::size_t Map_ordered_vec_get_value_index(
+        std::map< Key, std::vector< T, VecAlloc >, Cmp, Alloc > const&
+            SIXTRL_RESTRICT_REF map, Key const& SIXTRL_RESTRICT_REF key,
+                T const& SIXTRL_RESTRICT_REF value )
+    {
+        auto it = map.find( key );
+        if( ( it != map.end() ) && ( !it->second.empty() ) )
+        {
+            SIXTRL_ASSERT( std::is_sorted(
+                it->second.begin(), it->second.end() ) );
+
+            auto val_it = std::lower_bound(
+                it->second.begin(), it->second.end(), value );
+
+            if( val_it != it->second.end() )
+            {
+                return static_cast< std::size_t >( std::distance(
+                    it->second.begin(), val_it ) );
+            }
+
+            return it->second.size();
+        }
+
+        return std::numeric_limits< std::size_t >::max();
+    }
+
+    template< typename Key, typename T, class Cmp, class Alloc, class VecAlloc>
+    SIXTRL_STATIC SIXTRL_HOST_FN T* Map_ordered_vec_get_ptr_value(
+        std::map< Key, std::vector< T, VecAlloc >, Cmp, Alloc >&
+            SIXTRL_RESTRICT_REF map, Key const& SIXTRL_RESTRICT_REF key,
+                T const& SIXTRL_RESTRICT_REF value )
+    {
+        namespace st = SIXTRL_CXX_NAMESPACE;
+        return const_cast< T* >( st::Map_ordered_vec_get_ptr_const_value(
+            map, key, value ) );
+    }
+
+    template< typename Key, typename T, class Cmp, class Alloc, class VecAlloc>
+    SIXTRL_STATIC SIXTRL_HOST_FN T const* Map_ordered_vec_get_ptr_const_value(
+        std::map< Key, std::vector< T, VecAlloc >, Cmp, Alloc > const&
+            SIXTRL_RESTRICT_REF map, Key const& SIXTRL_RESTRICT_REF key,
+                T const& SIXTRL_RESTRICT_REF value )
+    {
+        auto it = map.find( key );
+
+        if( ( it != map.end() ) && ( !it->second.empty() ) )
+        {
+            SIXTRL_ASSERT( std::is_sorted(
+                it->second.begin(), it->second.end() ) );
+
+            auto val_it = std::lower_bound(
+                it->second.begin(), it->second.end(), value );
+
+            if( val_it != it->second.end() )
+            {
+                return std::addressof( *val_it );
+            }
+        }
+
+        return nullptr;
+    }
+
     /* --------------------------------------------------------------------- */
 
     template< typename Key, typename Value, class Hash,
@@ -742,6 +846,71 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return const_cast< T* >( SIXTRL_CXX_NAMESPACE::Map_ordered_vec_end(
             static_cast< map_t const& >( map ), key ) );
+    }
+
+    template< typename Key, typename T, class Hash,
+              class KeyEqual, class Alloc, class VecAlloc >
+    SIXTRL_STATIC SIXTRL_HOST_FN std::size_t Map_ordered_vec_get_value_index(
+        std::unordered_map< Key, std::vector< T, VecAlloc >, Hash, KeyEqual,
+            Alloc >& SIXTRL_RESTRICT_REF map,
+        Key const& SIXTRL_RESTRICT_REF key, T const& SIXTRL_RESTRICT_REF value )
+    {
+        auto it = map.find( key );
+        if( ( it != map.end() ) && ( !it->second.empty() ) )
+        {
+            SIXTRL_ASSERT( std::is_sorted(
+                it->second.begin(), it->second.end() ) );
+
+            auto val_it = std::lower_bound(
+                it->second.begin(), it->second.end(), value );
+
+            if( val_it != it->second.end() )
+            {
+                return static_cast< std::size_t >( std::distance(
+                    it->second.begin(), val_it ) );
+            }
+
+            return it->second.size();
+        }
+
+        return std::numeric_limits< std::size_t >::max();
+    }
+
+    template< typename Key, typename T, class Hash,
+              class KeyEqual, class Alloc, class VecAlloc >
+    SIXTRL_STATIC SIXTRL_HOST_FN T* Map_ordered_vec_get_ptr_value(
+        std::unordered_map< Key, std::vector< T, VecAlloc >, Hash, KeyEqual,
+            Alloc >& SIXTRL_RESTRICT_REF map,
+        Key const& SIXTRL_RESTRICT_REF key, T const& SIXTRL_RESTRICT_REF value )
+    {
+        namespace st = SIXTRL_CXX_NAMESPACE;
+        return const_cast< T* >( st::Map_ordered_vec_get_ptr_const_value(
+            map, key, value ) );
+    }
+
+    template< typename Key, typename T, class Hash,
+              class KeyEqual, class Alloc, class VecAlloc >
+    SIXTRL_STATIC SIXTRL_HOST_FN T const* Map_ordered_vec_get_ptr_const_value(
+        std::unordered_map< Key, std::vector< T, VecAlloc >, Hash, KeyEqual,
+            Alloc >& SIXTRL_RESTRICT_REF map,
+        Key const& SIXTRL_RESTRICT_REF key, T const& SIXTRL_RESTRICT_REF value )
+    {
+        auto it = map.find( key );
+        if( ( it != map.end() ) && ( !it->second.empty() ) )
+        {
+            SIXTRL_ASSERT( std::is_sorted(
+                it->second.begin(), it->second.end() ) );
+
+            auto val_it = std::lower_bound(
+                it->second.begin(), it->second.end(), value );
+
+            if( val_it != it->second.end() )
+            {
+                return std::addressof( *val_it );
+            }
+        }
+
+        return nullptr;
     }
 }
 
