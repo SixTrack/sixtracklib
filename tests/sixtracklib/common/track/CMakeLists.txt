@@ -59,14 +59,14 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_track_job_cpu_assign_address_item_c99:
 
-#     add_executable( test_track_job_cpu_assign_address_item_c99
-#                     test_track_job_cpu_assign_address_item_c99.cpp )
-#
-#     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
-#             test_track_job_cpu_assign_address_item_c99 )
-#
-#     add_test( C99_Cpu_CpuTrackJob_AssignAddressItemTests
-#               test_track_job_cpu_assign_address_item_c99 )
+    add_executable( test_track_job_cpu_assign_address_item_c99
+                    test_track_job_cpu_assign_address_item_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+            test_track_job_cpu_assign_address_item_c99 )
+
+    add_test( C99_Cpu_CpuTrackJob_AssignAddressItemTests
+              test_track_job_cpu_assign_address_item_c99 )
 
     # ==========================================================================
     # test_track_job_cpu_fetch_particle_addr_cxx:

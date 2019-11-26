@@ -89,7 +89,7 @@ TEST( CXX_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
         my_output_buffer.createNew< st::Particles >( size_t{ 512 } );
     SIXTRL_ASSERT( out_buffer1 );
 
-//     c_buffer_t* ptr_my_lattice_buffer = my_lattice.getCApiPtr();
+    c_buffer_t* ptr_my_lattice_buffer = my_lattice.getCApiPtr();
     SIXTRL_ASSERT( ptr_my_lattice_buffer != nullptr );
 
     buffer_t::address_t const my_lattice_buffer_addr =
