@@ -32,13 +32,13 @@ from .stcommon import st_Buffer, st_Null, st_NullChar, st_NullUChar, \
 
 class AssignAddressItem(CObject):
     _typeid = 513
-    dest_elem_type_id = CField(0, 'uint64', default=0, alignment=8)
-    dest_buffer_id = CField(1, 'uint64', default=0, alignment=8)
-    dest_elem_index = CField(2, 'uint64', default=1, alignment=8)
-    dest_pointer_offset = CField(3, 'uint64', default=0, alignment=8)
-    src_elem_type_id = CField(4, 'uint64', default=0, alignment=8)
-    src_buffer_id = CField(5, 'uint64', default=0, alignment=8)
-    src_elem_index = CField(6, 'uint64', default=1, alignment=8)
+    dest_buffer_id = CField(0, 'uint64', default=0, alignment=8)
+    src_buffer_id = CField(1, 'uint64', default=0, alignment=8)
+    dest_elem_type_id = CField(2, 'uint64', default=0, alignment=8)
+    src_elem_type_id = CField(3, 'uint64', default=0, alignment=8)
+    dest_elem_index = CField(4, 'uint64', default=1, alignment=8)
+    src_elem_index = CField(5, 'uint64', default=1, alignment=8)
+    dest_pointer_offset = CField(6, 'uint64', default=0, alignment=8)
     src_pointer_offset = CField(7, 'uint64', default=0, alignment=8)
 
 
