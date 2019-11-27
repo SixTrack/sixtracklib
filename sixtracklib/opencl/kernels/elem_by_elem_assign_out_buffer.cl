@@ -14,8 +14,8 @@
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __kernel void NS(ElemByElem_assign_out_buffer_from_offset_opencl)(
-     SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
-        SIXTRL_RESTRICT config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT out_buffer,
     SIXTRL_UINT64_T const out_buffer_index_offset,
     SIXTRL_UINT64_T const slot_size )
@@ -25,7 +25,8 @@ __kernel void NS(ElemByElem_assign_out_buffer_from_offset_opencl)(
     if( ( buf_size_t )get_global_id( 0 ) == ( buf_size_t )0u )
     {
         NS(ElemByElemConfig_assign_output_buffer_kernel_impl)(
-            config, out_buffer, out_buffer_index_offset, slot_size );
+            config_buffer, elem_by_elem_config_index, out_buffer,
+                out_buffer_index_offset, slot_size );
     }
 }
 
