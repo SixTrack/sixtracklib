@@ -10,3 +10,5 @@ from .cuda import CudaArgument, CudaController, CudaNodeInfo, CudaTrackJob
 from .opencl import ClController, ClArgument
 from .trackjob import TrackJob
 from .config_helper import supports
+
+from .tricub import TriCub, TriCubData, TriCub_buffer_create_assign_address_item

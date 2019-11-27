@@ -19,7 +19,7 @@ def TriCub_buffer_create_assign_address_item(
     assert tricub_data_buffer_id != st_ARCH_ILLEGAL_BUFFER_ID.value
     assert track_job.min_stored_buffer_id <= tricub_data_buffer_id
     assert track_job.max_stored_buffer_id >= tricub_data_buffer_id
-    assert track_job.stored_buffer( tricub_data_index ).getNumObjects() > \
+    assert track_job.stored_buffer( tricub_data_buffer_id ).num_objects > \
            tricub_data_index
 
     dest_buffer_id = st_ARCH_BEAM_ELEMENTS_BUFFER_ID.value
