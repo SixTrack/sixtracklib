@@ -695,13 +695,20 @@ namespace SIXTRL_CXX_NAMESPACE
                     success = this->ptrElemByElemConfigBufferArg()->write(
                         this->ptrElemByElemConfigCBuffer() );
                 }
-// BUG: FIX THIS
-//                 if( success )
-//                 {
-//                     success = ( st::ARCH_STATUS_SUCCESS ==
-//                         this->ptrContext()->assign_elem_by_elem_config_arg(
-//                             *this->ptrElemByElemConfigBufferArg() ) );
-//                 }
+
+                if( success )
+                {
+                    success = ( st::ARCH_STATUS_SUCCESS ==
+                        this->ptrContext()->assign_elem_by_elem_config_buffer_arg(
+                            *this->ptrElemByElemConfigBufferArg() ) );
+                }
+
+                if( success )
+                {
+                    success = ( st::ARCH_STATUS_SUCCESS ==
+                        this->ptrContext()->assign_elem_by_elem_config_index_arg(
+                            _size_t{ 0 } ) );
+                }
             }
         }
 
@@ -769,24 +776,27 @@ namespace SIXTRL_CXX_NAMESPACE
             ( this->outputBufferArg().usesCObjectBuffer() ) &&
             ( this->outputBufferArg().ptrCObjectBuffer() == out_buffer ) )
         {
-// TODO: FIX THIS
-//             success = ( st::ARCH_STATUS_SUCCESS ==
-//                 this->context().assign_output_buffer_arg(
-//                     this->outputBufferArg() ) );
-//
-//             if( success )
-//             {
-//                 success = ( st::ARCH_STATUS_SUCCESS ==
-//                     this->context().assign_elem_by_elem_output(
-//                         output_buffer_index_offset ) );
-//             }
-//
-//             if( success )
-//             {
-//                 success = ( this->context().collect_elem_by_elem_config_arg(
-//                     *this->ptrElemByElemConfigBufferArg(), *elem_by_elem_conf )
-//                         == st::ARCH_STATUS_SUCCESS );
-//             }
+            success = ( st::ARCH_STATUS_SUCCESS ==
+                this->context().assign_output_buffer_arg(
+                    this->outputBufferArg() ) );
+
+            if( success )
+            {
+                success = ( st::ARCH_STATUS_SUCCESS ==
+                    this->context().assign_elem_by_elem_output(
+                        output_buffer_index_offset ) );
+            }
+
+            if( success )
+            {
+                _this_t::c_buffer_t* elem_by_elem_buffer =
+                    this->buffer_by_buffer_id(
+                        st::ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID );
+
+                success = ( ( elem_by_elem_buffer != nullptr ) &&
+                            ( this->ptrElemByElemConfigBufferArg()->read(
+                                elem_by_elem_buffer ) ) );
+            }
 
             success = true;
         }
