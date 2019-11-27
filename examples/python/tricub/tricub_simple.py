@@ -1,7 +1,4 @@
 import sixtracklib as st
-from sixtracklib.tricub import TriCub, TriCubData, \
-    TriCub_buffer_create_assign_address_item
-
 import cobjects
 from cobjects import CBuffer
 
@@ -10,22 +7,22 @@ from cobjects import CBuffer
 # a) the lattice
 lattice = st.Elements()
 elem = lattice.Drift(length=1.0)
-elem = lattice.MultiPole(knl=[0.0, 1.0])
+elem = lattice.Multipole(knl=[0.0, 1.0])
 
 tc2_index = lattice.cbuffer.n_objects  # First TriCub element: index 2
-tc = TriCub(cbuffer=lattice.cbuffer)
+tc = st.TriCub(cbuffer=lattice.cbuffer)
 
 elem = lattice.Drift(length=2.0)
 elem = lattice.LimitRect(xmin=-1.0, xmax=1.0, ymin=-1.0, ymax=1.0)
 
 tc5_index = lattice.cbuffer.n_objects  # Second TriCub element: index 5
-tc = TriCub(cbuffer=lattice.cbuffer)
+tc = st.TriCub(cbuffer=lattice.cbuffer)
 
 elem = lattice.Drift(length=0.5)
 elem = lattice.LimitRect(xmin=-0.5, xmax=1.5, ymin=-1.5, ymax=0.5)
 
 tc8_index = lattice.cbuffer.n_objects  # Third TriCub element: index 8
-tc = TriCub(cbuffer=lattice.cbuffer)
+tc = st.TriCub(cbuffer=lattice.cbuffer)
 
 # b) the particle set
 particle_sets = st.ParticlesSet()
@@ -43,10 +40,10 @@ job = st.TrackJob(lattice, particle_sets)
 tricub_data_buffer = CBuffer()
 
 tc_data_0_index = tricub_data_buffer.n_objects
-tc_data_0 = TriCubData(cbuffer=tricub_data_buffer, nx=100, ny=100, nz=100)
+tc_data_0 = st.TriCubData(cbuffer=tricub_data_buffer, nx=100, ny=100, nz=100)
 
 tc_data_1_index = tricub_data_buffer.n_objects
-tc_data_1 = TriCubData(cbuffer=tricub_data_buffer, nx=10, ny=16, nz=8)
+tc_data_1 = st.TriCubData(cbuffer=tricub_data_buffer, nx=10, ny=16, nz=8)
 
 tricub_data_buffer_id = job.add_stored_buffer(cbuffer=tricub_data_buffer)
 
@@ -58,11 +55,11 @@ tricub_data_buffer_id = job.add_stored_buffer(cbuffer=tricub_data_buffer)
 #    tc_data_1 -> tc5
 #    tc_data_0 -> tc8
 
-TriCub_buffer_create_assign_address_item(
+st.TriCub_buffer_create_assign_address_item(
     job, tc2_index, tricub_data_buffer_id, tc_data_0_index)
-TriCub_buffer_create_assign_address_item(
+st.TriCub_buffer_create_assign_address_item(
     job, tc5_index, tricub_data_buffer_id, tc_data_1_index)
-TriCub_buffer_create_assign_address_item(
+st.TriCub_buffer_create_assign_address_item(
     job, tc8_index, tricub_data_buffer_id, tc_data_0_index)
 
 # commit the mappings:
