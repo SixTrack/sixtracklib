@@ -1448,4 +1448,18 @@ class TrackJob(object):
     def stored_buffer(self, buffer_id):
         return self._stored_buffers.get(buffer_id, None)
 
+    def push_stored_buffer(self, buffer_id):
+        self._last_status = st.st_TrackJob_push_stored_buffer(
+            self.ptr_st_track_job, st_buffer_size_t(buffer_id))
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError(f"Unable to push stored buffer {buffer_id}")
+        return self
+
+    def collect_stored_buffer(self, buffer_id):
+        self._last_status = st.st_TrackJob_collect_stored_buffer(
+            self.ptr_st_track_job, st_buffer_size_t(buffer_id))
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError(f"Unable to collect stored buffer {buffer_id}")
+        return self
+
 # end: python/sixtracklib/trackjob.py
