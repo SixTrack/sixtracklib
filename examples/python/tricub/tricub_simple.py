@@ -91,8 +91,7 @@ if job.arch_str == 'cpu':
 
     print_str = f"""
     tc2.data_addr = {tc2_data_addr:#018x} <- tc_data_0 @ {tc_data_0_addr:#018x}
-    tc5.data_addr = {tc2_data_addr:#018x} <- tc_data_1 @ {tc_data_0_addr:#018x}
-    tc8.data_addr = {tc2_data_addr:#018x} <- tc_data_0 @ {tc_data_0_addr:#018x}
+    tc5.data_addr = {tc5_data_addr:#018x} <- tc_data_1 @ {tc_data_1_addr:#018x}
+    tc8.data_addr = {tc8_data_addr:#018x} <- tc_data_0 @ {tc_data_0_addr:#018x}
     """
     print(print_str)
-
