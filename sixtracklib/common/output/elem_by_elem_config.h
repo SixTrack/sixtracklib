@@ -200,6 +200,28 @@ SIXTRL_STATIC SIXTRL_FN void NS(ElemByElemConfig_set_output_store_address)(
         NS(ElemByElemConfig)* SIXTRL_RESTRICT config,
     NS(elem_by_elem_out_addr_t) const out_address );
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig) const*
+NS(ElemByElemConfig_const_from_obj_index)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj );
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig)*
+NS(ElemByElemConfig_from_obj_index)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT obj );
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig) const*
+NS(ElemByElemConfig_const_from_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const elem_by_elem_index,
+    NS(buffer_size_t) const slot_size );
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig)*
+NS(ElemByElemConfig_from_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const elem_by_elem_index,
+    NS(buffer_size_t) const slot_size );
+
 #if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ElemByElemConfig_is_active_ext)(
@@ -444,6 +466,19 @@ NS(ElemByElemConfig_assign_output_buffer_debug)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* output_buffer,
     NS(buffer_size_t) const out_buffer_index_offset,
     SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN
+SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig) const*
+NS(ElemByElemConfig_const_from_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const elem_by_elem_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig)*
+NS(ElemByElemConfig_from_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const elem_by_elem_index );
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -1148,6 +1183,56 @@ SIXTRL_INLINE void NS(ElemByElemConfig_set_output_store_address)(
 {
     if( config != SIXTRL_NULLPTR ) config->out_store_addr = out_address;
     return;
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig) const*
+NS(ElemByElemConfig_const_from_obj_index)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj )
+{
+    typedef SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig) const*
+            ptr_const_elem_by_elem_conf_t;
+
+    ptr_const_elem_by_elem_conf_t ptr = SIXTRL_NULLPTR;
+
+    if( ( obj != SIXTRL_NULLPTR ) &&
+        ( NS(Object_get_type_id)( obj ) == NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) ) &&
+        ( NS(Object_get_begin_addr)( obj ) != ( NS(buffer_addr_t) )0u ) &&
+        ( NS(Object_get_size)( obj ) >= sizeof( NS(ElemByElemConfig) ) ) )
+    {
+        ptr = ( ptr_const_elem_by_elem_conf_t )( uintptr_t
+            )NS(Object_get_begin_addr)( obj );
+    }
+
+    return ptr;
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig)*
+NS(ElemByElemConfig_from_obj_index)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT obj )
+{
+    return ( SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig)*
+                )NS(ElemByElemConfig_const_from_obj_index)( obj );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig) const*
+NS(ElemByElemConfig_const_from_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const elem_by_elem_index,
+    NS(buffer_size_t) const slot_size )
+{
+    return NS(ElemByElemConfig_const_from_obj_index)(
+        NS(ManagedBuffer_get_const_object)(
+            buffer_begin, elem_by_elem_index, slot_size ) );
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig)*
+NS(ElemByElemConfig_from_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const elem_by_elem_index,
+    NS(buffer_size_t) const slot_size )
+{
+    return NS(ElemByElemConfig_from_obj_index)( NS(ManagedBuffer_get_object)(
+            buffer_begin, elem_by_elem_index, slot_size ) );
 }
 
 #if !defined( _GPUCODE )
