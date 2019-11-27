@@ -4,10 +4,10 @@
 # c99 object library
 
 set( SIXTRL_TESTLIB_COMMON_BUFFER_HEADERS
-     buffer.h generic_buffer_obj.h binary_array_buffer.h )
+     buffer.h generic_buffer_obj.h binary_array_buffer.h assign_address_item.h )
 
 set( SIXTRL_TESTLIB_COMMON_BUFFER_SOURCES
-     buffer.c generic_buffer_obj.c )
+     buffer.c generic_buffer_obj.c assign_address_item.c )
 
 add_library( sixtrack_test_common_buffer_c99 OBJECT
              ${SIXTRL_TESTLIB_COMMON_BUFFER_HEADERS}

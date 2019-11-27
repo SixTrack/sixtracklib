@@ -99,16 +99,16 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                 if device_id.startswith("opencl:"):
                     device_id = device_id[7:]
                 elif ":" in device_id:
-                    device_id=None
+                    device_id = None
 
-            if device_id is not None and len( device_id ) > 0:
+            if device_id is not None and len(device_id) > 0:
                 device_id.encode('utf-8')
                 st_ClContextBase_select_node(
                     self._ptr_ctrl, ct.c_char_p(device_id))
 
         def __del__(self):
             if self._owns_ctrl and self._ptr_ctrl != st_NullClContextBase:
-                st_ClContextBase_delete( self._ptr_ctrl )
+                st_ClContextBase_delete(self._ptr_ctrl)
             self._ptr_ctrl = st_NullClContextBase
 
         @property
@@ -125,40 +125,40 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
         @property
         def has_selected_node(self):
-            return st_ClContextBase_has_selected_node( self._ptr_ctrl )
+            return st_ClContextBase_has_selected_node(self._ptr_ctrl)
 
         @property
         def selected_node_platform_id(self):
             platform_id = None
-            _info = st_ClContextBase_get_selected_node_info( self._ptr_ctrl )
+            _info = st_ClContextBase_get_selected_node_info(self._ptr_ctrl)
             if _info != st_NullClNodeInfo:
-                platform_id = st_ComputeNodeInfo_get_platform_id( _info )
+                platform_id = st_ComputeNodeInfo_get_platform_id(_info)
             return platform_id
 
         @property
         def selected_node_device_id(self):
             device_id = None
-            _info = st_ClContextBase_get_selected_node_info( self._ptr_ctrl )
+            _info = st_ClContextBase_get_selected_node_info(self._ptr_ctrl)
             if _info != st_NullClNodeInfo:
-                device_id = st_ComputeNodeInfo_get_device_id( _info )
+                device_id = st_ComputeNodeInfo_get_device_id(_info)
             return device_id
 
         @property
         def selected_node_id_str(self):
             node_id_str = None
-            _info = st_ClContextBase_get_selected_node_info( self._ptr_ctrl )
+            _info = st_ClContextBase_get_selected_node_info(self._ptr_ctrl)
             if _info != st_NullClNodeInfo:
-                platform_id = st_ComputeNodeInfo_get_platform_id( _info )
-                device_id = st_ComputeNodeInfo_get_device_id( _info )
+                platform_id = st_ComputeNodeInfo_get_platform_id(_info)
+                device_id = st_ComputeNodeInfo_get_device_id(_info)
                 node_id_str = f"opencl:{platform_id}.{device_id}"
             return node_id_str
 
         @property
         def selected_node_platform(self):
             node_platform_str = None
-            _info = st_ClContextBase_get_selected_node_info( self._ptr_ctrl )
+            _info = st_ClContextBase_get_selected_node_info(self._ptr_ctrl)
             if _info != st_NullClNodeInfo:
-                _platform_c_str = st_ComputeNodeInfo_get_platform( _info )
+                _platform_c_str = st_ComputeNodeInfo_get_platform(_info)
                 if _platform_c_str != st_NullChar:
                     node_platform_str = bytes(
                         _platform_c_str.value).decode('utf-8')
@@ -167,23 +167,22 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         @property
         def selected_node_name(self):
             node_name = None
-            _info = st_ClContextBase_get_selected_node_info( self._ptr_ctrl )
+            _info = st_ClContextBase_get_selected_node_info(self._ptr_ctrl)
             if _info != st_NullClNodeInfo:
-                _name_c_str = st_ComputeNodeInfo_get_name( _info )
+                _name_c_str = st_ComputeNodeInfo_get_name(_info)
                 if _name_c_str != st_NullChar:
-                    node_name = bytes( _name_c_str.value).decode('utf-8')
+                    node_name = bytes(_name_c_str.value).decode('utf-8')
             return node_name
 
         @property
         def selected_node_description(self):
             description = None
-            _info = st_ClContextBase_get_selected_node_info( self._ptr_ctrl )
+            _info = st_ClContextBase_get_selected_node_info(self._ptr_ctrl)
             if _info != st_NullClNodeInfo:
-                _desc_c_str = st_ComputeNodeInfo_get_name( _info )
+                _desc_c_str = st_ComputeNodeInfo_get_name(_info)
                 if _desc_c_str != st_NullChar:
-                    description = bytes( _desc_c_str.value).decode('utf-8')
+                    description = bytes(_desc_c_str.value).decode('utf-8')
             return description
-
 
         def add_program_file(self, path_to_program, compile_defs, compile=True):
             program_id = st_ARCH_ILLEGAL_PROGRAM_ID
@@ -194,7 +193,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                 compile_defs.encode('utf-8')
                 program_id = st_ClContextBase_add_program_file(
                     self._ptr_ctrl, ct.c_char_p(path_to_program),
-                        ct.c_char_p(compile_defs))
+                    ct.c_char_p(compile_defs))
                 if compile:
                     if not self.compile_program(program_id):
                         raise RuntimeError("Error while compiling program")
@@ -203,7 +202,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         def compile_program(self, program_id):
             success = False
             if self._ptr_ctrl != st_NullClContextBase and \
-                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
+                    program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
                 success = st_ClContextBase_compile_program(
                     self._ptr_ctrl, st_arch_program_id(program_id))
             return success
@@ -213,10 +212,10 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
             kernel_name = kernel_name.strip()
             kernel_name.encode('utf-8')
             if self._ptr_ctrl != st_NullClContextBase and \
-                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
+                    program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
                 kernel_id = st_ClContextBase_enable_kernel(
                     self._ptr_ctrl, ct.c_char_p(kernel_name),
-                        st_arch_program_id(program_id))
+                    st_arch_program_id(program_id))
             return kernel_id
 
         def find_kernel_by_name(self, kernel_name):
@@ -230,22 +229,23 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
         def set_kernel_arg(self, kernel_id, arg_index, arg):
             if kernel_id != st_ARCH_ILLEGAL_KERNEL_ID.value and \
-                self._ptr_ctrl != st_NullClContextBase:
+                    self._ptr_ctrl != st_NullClContextBase:
                 if isinstance(arg, ClArgument):
                     st_ClContextBase_assign_kernel_argument(
                         self._ptr_ctrl, st_arch_kernel_id(kernel_id),
-                        st_arch_size_t(arg_index), arg.ptr_argument )
-                elif type(arg) is type(st_ClArgument_p):
+                        st_arch_size_t(arg_index), arg.ptr_argument)
+                elif isinstance(arg, type(st_ClArgument_p)):
                     st_ClContextBase_assign_kernel_argument(
                         self._ptr_ctrl, st_arch_kernel_id(kernel_id),
-                        st_arch_size_t(arg_index), arg )
+                        st_arch_size_t(arg_index), arg)
                 else:
-                    raise ValueError("arg expected to be an instance of ClArgument")
+                    raise ValueError(
+                        "arg expected to be an instance of ClArgument")
             return self
 
-        def set_kernel_arg_value(self, kernel_id, arg_index, val_p, val_size ):
+        def set_kernel_arg_value(self, kernel_id, arg_index, val_p, val_size):
             if kernel_id != st_ARCH_ILLEGAL_KERNEL_ID.value and \
-                type(val_p) is type(ct.c_void_p) and val_size > 0:
+                    isinstance(val_p, type(ct.c_void_p)) and val_size > 0:
                 st_ClContextBase_assign_kernel_argument_value(
                     self._ptr_ctrl, st_arch_kernel_id(kernel_id),
                     st_arch_size_t(arg_index), val_p, st_arch_size_t(val_size))
@@ -260,15 +260,15 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                 status = st_ARCH_STATUS_SUCCESS.value
             else:
                 st_ClContextBase_reset_kernel_arguments(
-                    self._ptr_ctrl, _kernel_id )
+                    self._ptr_ctrl, _kernel_id)
                 status = st_ARCH_STATUS_SUCCESS.value
             self._last_status = status
             return self
 
         def has_kernel(self, kernel_id):
             return kernel_id != st_ARCH_ILLEGAL_KERNEL_ID.value and \
-                   kernel_id < st_ClContextBase_get_num_available_kernels(
-                       self._ptr_ctrl )
+                kernel_id < st_ClContextBase_get_num_available_kernels(
+                    self._ptr_ctrl)
 
         def kernel_local_mem_size(self, kernel_id):
             return st_ClContextBase_get_kernel_local_mem_size(
@@ -293,7 +293,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         def argument_of_kernel(self, kernel_id, arg_index):
             _ptr_arg = st_ClContextBase_get_ptr_kernel_argument(
                 self._ptr_ctrl, st_arch_kernel_id_t(kernel_id),
-                    st_arch_size_t(arg_index))
+                st_arch_size_t(arg_index))
             if _ptr_arg != st_NullClArgument:
                 return ClArgument(ext_ptr_arg=_ptr_arg, owns_ptr=False)
             else:
@@ -307,12 +307,12 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         def argument_type_of_kernel(self, kernel_id, arg_index):
             return st_ClContextBase_get_kernel_argument_type(
                 self._ptr_ctrl, st_arch_kernel_id_t(kernel_id),
-                    st_arch_size_t(arg_index))
+                st_arch_size_t(arg_index))
 
         def set_kernel_workgroup_size(self, kernel_id, wgsize):
             ret = st_ClContextBase_set_kernel_work_group_size(
                 self._ptr_ctrl, st_arch_kernel_id_t(kernel_id),
-                    st_arch_kernel_id_t(wgsize))
+                st_arch_kernel_id_t(wgsize))
             if not ret:
                 self._last_status = st_ARCH_STATUS_GENERAL_FAILURE.value
                 error_msg = f"""
@@ -321,7 +321,6 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                 """
                 raise RuntimeError(error_msg)
             return self
-
 
         def run_kernel(self, kernel_id, num_work_items, work_group_size=None):
             _kernel_id = st_arch_kernel_id_t(kernel_id)
@@ -333,7 +332,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
             else:
                 ret = st_ClContextBase_run_kernel_wgsize(
                     self._ptr_ctrl, _kernel_id, _num_work_items,
-                        st_arch_size_t(work_group_size))
+                    st_arch_size_t(work_group_size))
             if ret:
                 self._last_status = st_ARCH_STATUS_SUCCESS.value
             else:
@@ -353,7 +352,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
         def __del__(self):
             if self._owns_arg and self._ptr_arg != st_NullClArgument:
-                st_ClArgument_delete( self._ptr_arg )
+                st_ClArgument_delete(self._ptr_arg)
             self._ptr_arg = st_NullClArgument
 
         @property
@@ -377,7 +376,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         def ptr_buffer(self):
             _ptr_buffer = st_NullBuffer
             if st_ClArgument_uses_cobj_buffer(self._ptr_arg):
-                _ptr_buffer=st_ClArgument_get_ptr_cobj_buffer(self._ptr_arg)
+                _ptr_buffer = st_ClArgument_get_ptr_cobj_buffer(self._ptr_arg)
             if _ptr_buffer is st_NullBuffer:
                 raise RuntimeError("Unable to retrieve buffer from argument")
             return Buffer(ptr_ext_buffer=_ptr_buffer, owns_ptr=False)
@@ -391,7 +390,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
             return st_ClArgument_get_argument_size(self._ptr_arg)
 
         def send(self, buffer=st_NullBuffer, remap_buffer=True,
-             ptr_raw_arg_begin=st_Null, raw_arg_size=None):
+                 ptr_raw_arg_begin=st_Null, raw_arg_size=None):
             status = st_ARCH_STATUS_GENERAL_FAILURE.value
             ptr_buffer = st_NullBuffer
             if buffer is not None and buffer is not st_NullBuffer:
@@ -402,14 +401,14 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
             if ptr_buffer is not st_NullBuffer:
                 if remap_buffer:
-                    if st_ClArgument_write( self._ptr_argument, ptr_buffer):
+                    if st_ClArgument_write(self._ptr_argument, ptr_buffer):
                         status = st_ARCH_STATUS_SUCCESS.value
                 else:
                     raise ValueError(
-                        "sending with remap_buffer=False not yet implemented" )
+                        "sending with remap_buffer=False not yet implemented")
             elif raw_arg_size is not None:
                 raise ValueError(
-                    "sending raw-memory based ClArguments not yet implemented" )
+                    "sending raw-memory based ClArguments not yet implemented")
 
             self._last_status = status
             raise_error_if_status_not_success(
@@ -426,7 +425,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
         def send_raw_argument(self, ptr_raw_arg_begin, raw_arg_size):
             return self.send(ptr_raw_arg_begin=ptr_raw_arg_begin,
-                            raw_arg_size=raw_arg_size)
+                             raw_arg_size=raw_arg_size)
 
     def receive(self, buffer=st_NullBuffer, remap_buffer=True,
                 ptr_raw_arg_begin=st_Null, raw_arg_capacity=None):
@@ -443,7 +442,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
         if ptr_buffer != st_NullBuffer:
             if remap_buffer:
-                status = st_ClArgument_read( self._ptr_arg, ptr_buffer)
+                status = st_ClArgument_read(self._ptr_arg, ptr_buffer)
             else:
                 raise RuntimeError(
                     "receiving with remap_buffer=False not yet implemented")
@@ -452,7 +451,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                 "receiving raw-memory based ClArguments not yet implemented")
 
         raise_error_if_status_not_success(
-            status, "unsuccessful receive op; status:{0}".format( status ) )
+            status, "unsuccessful receive op; status:{0}".format(status))
         self._last_status = status
 
         return self
@@ -473,5 +472,3 @@ else:
 
     class ClArgument(object):
         pass
-
-

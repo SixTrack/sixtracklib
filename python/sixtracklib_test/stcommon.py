@@ -4,30 +4,30 @@
 import ctypes as ct
 from . import config as stconf
 from sixtracklib.particles import Particles as st_Particles
-import sixtracklib.stcommon as pyst
+import sixtracklib.stcommon as stcom
 
 testlib = ct.CDLL(stconf.SHARED_LIB)
 
 # C-API Types
 
-st_Null = pyst.st_Null
-st_NullChar = pyst.st_NullChar
+st_Null = stcom.st_Null
+st_NullChar = stcom.st_NullChar
 
-st_uint64_p = pyst.st_uint64_p
-st_uchar_p = pyst.st_uchar_p
+st_uint64_p = stcom.st_uint64_p
+st_uchar_p = stcom.st_uchar_p
 
-st_double_p = pyst.st_double_p
-st_int64_p = pyst.st_int64_p
+st_double_p = stcom.st_double_p
+st_int64_p = stcom.st_int64_p
 
-st_Buffer = pyst.st_Buffer
-st_Buffer_p = pyst.st_Buffer_p
+st_Buffer = stcom.st_Buffer
+st_Buffer_p = stcom.st_Buffer_p
 
 # -----------------------------------------------------------------------------
 # Particles realted functions and definitions
 
-st_Particles = pyst.st_Particles
-st_Particles_p = pyst.st_Particles_p
-st_NullParticles = pyst.st_NullParticles
+st_Particles = stcom.st_Particles
+st_Particles_p = stcom.st_Particles_p
+st_NullParticles = stcom.st_NullParticles
 
 
 st_Particles_realistic_init = testlib.st_Particles_realistic_init
@@ -123,11 +123,11 @@ st_Particles_buffer_print_out.argtypes = [st_Buffer_p]
 # -----------------------------------------------------------------------------
 # ParticlesAddr realted functions and definitions
 
-st_ParticlesAddr = pyst.st_ParticlesAddr
-st_ParticlesAddr_p = pyst.st_ParticlesAddr_p
-st_NullParticlesAddr = pyst.st_NullParticlesAddr
+st_ParticlesAddr = stcom.st_ParticlesAddr
+st_ParticlesAddr_p = stcom.st_ParticlesAddr_p
+st_NullParticlesAddr = stcom.st_NullParticlesAddr
 
-st_buffer_size_t = pyst.st_buffer_size_t
+st_buffer_size_t = stcom.st_buffer_size_t
 
 st_TestParticlesAddr_are_addresses_consistent_with_particle = \
     testlib.st_TestParticlesAddr_are_addresses_consistent_with_particle
@@ -135,3 +135,14 @@ st_TestParticlesAddr_are_addresses_consistent_with_particle.argtypes = [
     st_ParticlesAddr_p, st_Particles_p, st_buffer_size_t]
 st_TestParticlesAddr_are_addresses_consistent_with_particle.restype = \
     ct.c_bool
+
+# -------------------------------------------------------------------------------
+# AssignAddressItem:
+
+st_AssignAddressItem = stcom.st_AssignAddressItem
+st_AssignAddressItem_p = stcom.st_AssignAddressItem_p
+st_NullAssignAddressItem = stcom.st_NullAssignAddressItem
+
+st_AssignAddressItem_print_out = testlib.st_AssignAddressItem_print_out_ext
+st_AssignAddressItem_print_out.argtypes = [st_AssignAddressItem_p]
+st_AssignAddressItem_print_out.restype = None

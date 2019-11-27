@@ -11,8 +11,9 @@
 #include "sixtracklib/testlib/common/particles/particles.h"
 #include "sixtracklib/testlib/common/particles/particles_addr.h"
 
-#include "sixtracklib/testlib/common/buffer/generic_buffer_obj.h"
 #include "sixtracklib/testlib/common/buffer/buffer.h"
+#include "sixtracklib/testlib/common/buffer/assign_address_item.h"
+#include "sixtracklib/testlib/common/buffer/generic_buffer_obj.h"
 // #include "sixtracklib/testlib/common/buffer/binary_array_buffer.h"
 
 #include "sixtracklib/testlib/common/output/assign_be_monitor_ctrl_arg.h"
