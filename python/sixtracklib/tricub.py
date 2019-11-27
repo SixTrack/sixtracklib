@@ -69,8 +69,11 @@ class TriCubData(CObject):
 
 class TriCub(CObject):
     _typeid = st_OBJECT_TYPE_TRICUB
-    x = CField(0, 'real', default=0.0, alignment=8)
-    y = CField(1, 'real', default=0.0, alignment=8)
-    z = CField(2, 'real', default=0.0, alignment=8)
-    length = CField(3, 'real', default=0.0, alignment=8)
-    data_addr = CField(4, 'uint64', default=0, alignment=8)
+    x_shift = CField(0, 'real', default=0.0, alignment=8)
+    y_shift = CField(1, 'real', default=0.0, alignment=8)
+    zeta_shift = CField(2, 'real', default=0.0, alignment=8)
+    dipolar_kick_px = CField(3, 'real', default=0.0, alignment=8)
+    dipolar_kick_py = CField(4, 'real', default=0.0, alignment=8)
+    dipolar_kick_delta = CField(5, 'real', default=0.0, alignment=8)
+    length = CField(6, 'real', default=0.0, alignment=8)
+    data_addr = CField(7, 'uint64', default=0, alignment=8)
