@@ -37,7 +37,6 @@ namespace SIXTRL_CXX_NAMESPACE
         m_ptr_beam_elements_buffer_arg( nullptr ),
         m_ptr_output_buffer_arg( nullptr ),
         m_ptr_particles_addr_buffer_arg( nullptr ),
-        m_ptr_assign_items_buffer_arg( nullptr ),
         m_ptr_elem_by_elem_config_arg( nullptr ),
         m_total_num_particles( TrackJobBase::size_type{ 0 } )
     {
@@ -64,7 +63,6 @@ namespace SIXTRL_CXX_NAMESPACE
         m_ptr_beam_elements_buffer_arg( nullptr ),
         m_ptr_output_buffer_arg( nullptr ),
         m_ptr_particles_addr_buffer_arg( nullptr ),
-        m_ptr_assign_items_buffer_arg( nullptr ),
         m_ptr_elem_by_elem_config_arg( nullptr ),
         m_total_num_particles( TrackJobBase::size_type{ 0 } )
     {
@@ -93,7 +91,6 @@ namespace SIXTRL_CXX_NAMESPACE
         m_ptr_beam_elements_buffer_arg( nullptr ),
         m_ptr_output_buffer_arg( nullptr ),
         m_ptr_particles_addr_buffer_arg( nullptr ),
-        m_ptr_assign_items_buffer_arg( nullptr ),
         m_ptr_elem_by_elem_config_arg( nullptr ),
         m_total_num_particles( TrackJobBase::size_type{ 0 } )
     {
@@ -118,7 +115,6 @@ namespace SIXTRL_CXX_NAMESPACE
         m_ptr_beam_elements_buffer_arg( nullptr ),
         m_ptr_output_buffer_arg( nullptr ),
         m_ptr_particles_addr_buffer_arg( nullptr ),
-        m_ptr_assign_items_buffer_arg( nullptr ),
         m_ptr_elem_by_elem_config_arg( nullptr ),
         m_total_num_particles( TrackJobBase::size_type{ 0 } )
     {
@@ -148,7 +144,6 @@ namespace SIXTRL_CXX_NAMESPACE
         m_ptr_beam_elements_buffer_arg( nullptr ),
         m_ptr_output_buffer_arg( nullptr ),
         m_ptr_particles_addr_buffer_arg( nullptr ),
-        m_ptr_assign_items_buffer_arg( nullptr ),
         m_ptr_elem_by_elem_config_arg( nullptr ),
         m_total_num_particles( TrackJobBase::size_type{ 0 } )
     {
@@ -179,25 +174,25 @@ namespace SIXTRL_CXX_NAMESPACE
 
     TrackJobCl::~TrackJobCl() SIXTRL_NOEXCEPT {}
 
-    _this_t::cl_context_t& TrackJobCl::context() SIXTRL_RESTRICT
+    _this_t::cl_context_t& TrackJobCl::context() SIXTRL_NOEXCEPT
     {
         return const_cast< _this_t::cl_context_t& >(
             static_cast< _this_t const& >( *this ).context() );
     }
 
 
-    _this_t::cl_context_t const& TrackJobCl::context() const SIXTRL_RESTRICT
+    _this_t::cl_context_t const& TrackJobCl::context() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT( this->ptrContext() != nullptr );
         return *( this->ptrContext() );
     }
 
-    ::NS(ClContext)* TrackJobCl::ptrContext() SIXTRL_RESTRICT
+    ::NS(ClContext)* TrackJobCl::ptrContext() SIXTRL_NOEXCEPT
     {
         return this->m_ptr_context.get();
     }
 
-    ::NS(ClContext) const* TrackJobCl::ptrContext() const SIXTRL_RESTRICT
+    ::NS(ClContext) const* TrackJobCl::ptrContext() const SIXTRL_NOEXCEPT
     {
         return this->m_ptr_context.get();
     }
@@ -297,30 +292,6 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_ptr_particles_addr_buffer_arg.get();
     }
 
-    _this_t::cl_arg_t& TrackJobCl::assignItemsBufferArg() SIXTRL_NOEXCEPT
-    {
-        SIXTRL_ASSERT( this->ptrAssignItemsBufferArg() != nullptr );
-        return *this->m_ptr_assign_items_buffer_arg;
-    }
-
-    _this_t::cl_arg_t const&
-    TrackJobCl::assignItemsBufferArg() const SIXTRL_NOEXCEPT
-    {
-        SIXTRL_ASSERT( this->ptrAssignItemsBufferArg() != nullptr );
-        return *this->m_ptr_assign_items_buffer_arg;
-    }
-
-    _this_t::cl_arg_t* TrackJobCl::ptrAssignItemsBufferArg() SIXTRL_NOEXCEPT
-    {
-        return this->m_ptr_assign_items_buffer_arg.get();
-    }
-
-    _this_t::cl_arg_t const*
-    TrackJobCl::ptrAssignItemsBufferArg() const SIXTRL_NOEXCEPT
-    {
-        return this->m_ptr_assign_items_buffer_arg.get();
-    }
-
     /* --------------------------------------------------------------------- */
 
     _this_t::cl_arg_t const&
@@ -370,6 +341,147 @@ namespace SIXTRL_CXX_NAMESPACE
                 num_regions_to_update, offsets, lengths, new_values )
             : ::NS(ARCH_STATUS_GENERAL_FAILURE);
     }
+
+    /* --------------------------------------------------------------------- */
+
+    _this_t::cl_arg_t const* TrackJobCl::ptr_const_argument_by_buffer_id(
+        _this_t::size_type const buffer_id ) const SIXTRL_NOEXCEPT
+    {
+         _this_t::cl_arg_t const* ptr_arg = nullptr;
+
+        switch( buffer_id )
+        {
+            case st::ARCH_PARTICLES_BUFFER_ID:
+            {
+                ptr_arg = this->ptrParticlesArg();
+                break;
+            }
+
+            case st::ARCH_BEAM_ELEMENTS_BUFFER_ID:
+            {
+                ptr_arg = this->ptrBeamElementsArg();
+                break;
+            }
+
+            case st::ARCH_OUTPUT_BUFFER_ID:
+            {
+                ptr_arg = this->ptrOutputBufferArg();
+                break;
+            }
+
+            case st::ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID:
+            {
+                ptr_arg = this->ptrElemByElemConfigBufferArg();
+                break;
+            }
+
+            case st::ARCH_PARTICLE_ADDR_BUFFER_ID:
+            {
+                ptr_arg = this->ptrParticlesAddrBufferArg();
+                break;
+            }
+
+            default:
+            {
+                ptr_arg = this->ptr_const_stored_buffer_argument( buffer_id );
+            }
+        };
+
+        return ptr_arg;
+    }
+
+    _this_t::cl_arg_t* TrackJobCl::ptr_argument_by_buffer_id(
+        _this_t::size_type const buffer_id ) SIXTRL_NOEXCEPT
+    {
+        return const_cast< _this_t::cl_arg_t* >(
+            this->ptr_const_argument_by_buffer_id( buffer_id ) );
+    }
+
+    _this_t::cl_arg_t const& TrackJobCl::argument_by_buffer_id(
+        _this_t::size_type const buffer_id ) const
+    {
+        _this_t::cl_arg_t const* ptr_arg =
+            this->ptr_const_argument_by_buffer_id( buffer_id );
+
+        if( ptr_arg == nullptr )
+        {
+            std::ostringstream a2str;
+            a2str << "unable to get buffer argument for buffer_id="
+                  << buffer_id;
+
+            throw std::runtime_error( a2str.str() );
+        }
+
+        return *ptr_arg;
+    }
+
+    _this_t::cl_arg_t& TrackJobCl::argument_by_buffer_id(
+        _this_t::size_type const buffer_id )
+    {
+        return const_cast< _this_t::cl_arg_t& >( static_cast< _this_t const& >(
+            *this ).argument_by_buffer_id( buffer_id ) );
+    }
+
+    /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- */
+
+    _this_t::cl_arg_t const* TrackJobCl::ptr_const_stored_buffer_argument(
+        _this_t::size_type const buffer_id ) const SIXTRL_NOEXCEPT
+    {
+        _this_t::cl_arg_t const* ptr_arg = nullptr;
+
+        _size_t const min_buffer_id = this->min_stored_buffer_id();
+        _size_t const max_buffer_id_plus_one =
+            this->max_stored_buffer_id() + _size_t{ 1 };
+
+        if( ( min_buffer_id != st::ARCH_ILLEGAL_BUFFER_ID ) &&
+            ( buffer_id != st::ARCH_ILLEGAL_BUFFER_ID ) &&
+            ( buffer_id >= min_buffer_id ) &&
+            ( buffer_id <  max_buffer_id_plus_one ) )
+        {
+            _size_t const stored_buffer_id = buffer_id - min_buffer_id;
+
+            if( stored_buffer_id < this->m_stored_buffers_args.size() )
+            {
+                ptr_arg = this->m_stored_buffers_args[ stored_buffer_id ].get();
+            }
+        }
+
+        return ptr_arg;
+    }
+
+    _this_t::cl_arg_t* TrackJobCl::ptr_stored_buffer_argument(
+        _this_t::size_type const buffer_id ) SIXTRL_NOEXCEPT
+    {
+        return const_cast< _this_t::cl_arg_t* >(
+            this->ptr_const_stored_buffer_argument( buffer_id ) );
+    }
+
+    _this_t::cl_arg_t const& TrackJobCl::stored_buffer_argument(
+        _this_t::size_type const buffer_id ) const
+    {
+        _this_t::cl_arg_t const* ptr_arg =
+            this->ptr_const_stored_buffer_argument( buffer_id );
+
+        if( ptr_arg == nullptr )
+        {
+            std::ostringstream a2str;
+            a2str << "unable to get stored buffer argument for buffer_id="
+                  << buffer_id;
+
+            throw std::runtime_error( a2str.str() );
+        }
+
+        return *ptr_arg;
+    }
+
+    _this_t::cl_arg_t& TrackJobCl::stored_buffer_argument(
+        _this_t::size_type const buffer_id )
+    {
+        return const_cast< _this_t::cl_arg_t& >( static_cast<
+            _this_t const& >( *this ).stored_buffer_argument( buffer_id ) );
+    }
+
+    /* --------------------------------------------------------------------- */
 
 
     bool TrackJobCl::doPrepareParticlesStructures(
@@ -452,6 +564,56 @@ namespace SIXTRL_CXX_NAMESPACE
                 ptr_output_buffer, until_turn_elem_by_elem );
     }
 
+    /* --------------------------------------------------------------------- */
+
+    _this_t::size_type TrackJobCl::doAddStoredBuffer(
+        _this_t::buffer_store_t&& assigned_buffer_handle )
+    {
+        _this_t::size_type buffer_id = _base_t::doAddStoredBuffer(
+            std::move( assigned_buffer_handle ) );
+
+        if( buffer_id != st::ARCH_ILLEGAL_BUFFER_ID )
+        {
+            if( st::ARCH_STATUS_SUCCESS != this->doAddStoredBufferOclImpl(
+                    buffer_id ) )
+            {
+                this->doRemoveStoredBufferOclImpl( buffer_id );
+                buffer_id = st::ARCH_ILLEGAL_BUFFER_ID;
+            }
+        }
+
+        return buffer_id;
+    }
+
+    _this_t::status_t TrackJobCl::doRemoveStoredBuffer(
+        _this_t::size_type const buffer_id )
+    {
+        _this_t::status_t status = _base_t::doRemoveStoredBuffer( buffer_id );
+        status |= this->doRemoveStoredBufferOclImpl( buffer_id );
+
+        return status;
+    }
+
+    _this_t::status_t TrackJobCl::doPushStoredBuffer(
+        _this_t::size_type const buffer_id )
+    {
+        return this->doPushStoredBufferOclImpl( buffer_id );
+    }
+
+    _this_t::status_t TrackJobCl::doCollectStoredBuffer(
+        _this_t::size_type const buffer_id )
+    {
+        return this->doCollectStoredBufferOclImpl( buffer_id );
+    }
+
+    _this_t::status_t TrackJobCl::doPerformManagedAssignments(
+        _this_t::assign_item_key_t const& SIXTRL_RESTRICT_REF assign_item_key )
+    {
+        return this->doPerformManagedAssignmentsOclImpl( assign_item_key );
+    }
+
+    /* --------------------------------------------------------------------- */
+
     _this_t::track_status_t TrackJobCl::doTrackUntilTurn(
         _size_t const until_turn )
     {
@@ -533,6 +695,8 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         return this->doPrepareContextOclImpl( device_id_str, ptr_config_str );
     }
+
+    /* --------------------------------------------------------------------- */
 
     bool TrackJobCl::doPrepareContextOclImpl(
         const char *const SIXTRL_RESTRICT device_id_str,
@@ -911,6 +1075,153 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return success;
     }
+
+    /* --------------------------------------------------------------------- */
+
+    _this_t::status_t TrackJobCl::doAddStoredBufferOclImpl(
+        _this_t::size_type const buffer_id )
+    {
+        _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        _this_t::buffer_store_t* ptr_stored_buffer =
+                this->doGetPtrBufferStore( buffer_id );
+
+        _this_t::context_t* ptr_context = this->ptrContext();
+
+        if( ( ptr_context != nullptr ) && ( ptr_stored_buffer != nullptr ) &&
+            ( buffer_id >= st::ARCH_MIN_USER_DEFINED_BUFFER_ID ) )
+        {
+            _this_t::size_type const stored_buffer_id =
+                buffer_id - st::ARCH_MIN_USER_DEFINED_BUFFER_ID;
+
+            _this_t::size_type const nn = this->doGetStoredBufferSize();
+            _this_t::size_type ii = this->m_stored_buffers_args.size();
+
+            for( ; ii < nn ; ++ii )
+            {
+                this->m_stored_buffers_args.emplace_back( nullptr );
+            }
+
+            SIXTRL_ASSERT( this->m_stored_buffers_args.size() >= nn );
+            SIXTRL_ASSERT( this->m_stored_buffers_args.size() >
+                           stored_buffer_id );
+
+            if( ptr_stored_buffer->ptr_cxx_buffer() != nullptr )
+            {
+                this->m_stored_buffers_args[ stored_buffer_id ].reset(
+                    new _this_t::cl_arg_t( *ptr_stored_buffer->ptr_cxx_buffer(),
+                            ptr_context ) );
+
+                status = st::ARCH_STATUS_SUCCESS;
+
+            }
+            else if( ptr_stored_buffer->ptr_buffer() != nullptr )
+            {
+                this->m_stored_buffers_args[ stored_buffer_id ].reset(
+                    new _this_t::cl_arg_t( ptr_stored_buffer->ptr_buffer(),
+                            ptr_context ) );
+
+                status = st::ARCH_STATUS_SUCCESS;
+            }
+        }
+
+        return status;
+    }
+
+    _this_t::status_t TrackJobCl::doRemoveStoredBufferOclImpl(
+        _this_t::size_type const buffer_id )
+    {
+        _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        if( buffer_id >= st::ARCH_MIN_USER_DEFINED_BUFFER_ID )
+        {
+            _this_t::size_type const stored_buffer_id =
+                buffer_id - st::ARCH_MIN_USER_DEFINED_BUFFER_ID;
+
+            SIXTRL_ASSERT( this->m_stored_buffers_args.size() >
+                           stored_buffer_id );
+
+            this->m_stored_buffers_args[ stored_buffer_id ].reset( nullptr );
+            status = st::ARCH_STATUS_SUCCESS;
+        }
+
+        return status;
+    }
+
+    _this_t::status_t TrackJobCl::doPushStoredBufferOclImpl(
+        _this_t::size_type const buffer_id )
+    {
+        _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        _this_t::buffer_store_t* ptr_stored_buffer =
+                this->doGetPtrBufferStore( buffer_id );
+
+        _this_t::cl_arg_t* ptr_arg =
+            this->ptr_stored_buffer_argument( buffer_id );
+
+        if( ( ptr_stored_buffer != nullptr ) && ( ptr_arg != nullptr ) )
+        {
+            SIXTRL_ASSERT( ptr_arg->context() == this->ptrContext() );
+
+            if( ptr_stored_buffer->ptr_cxx_buffer() != nullptr )
+            {
+                status = ptr_arg->write( *ptr_stored_buffer->ptr_cxx_buffer() );
+            }
+            else if( ptr_stored_buffer->ptr_buffer() != nullptr )
+            {
+                status = ptr_arg->write( ptr_stored_buffer->ptr_buffer() );
+            }
+        }
+
+        return status;
+    }
+
+    _this_t::status_t TrackJobCl::doCollectStoredBufferOclImpl(
+        _this_t::size_type const buffer_id )
+    {
+        _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        _this_t::buffer_store_t* ptr_stored_buffer =
+                this->doGetPtrBufferStore( buffer_id );
+
+        _this_t::cl_arg_t* ptr_arg =
+            this->ptr_stored_buffer_argument( buffer_id );
+
+        if( ( ptr_stored_buffer != nullptr ) && ( ptr_arg != nullptr ) )
+        {
+            SIXTRL_ASSERT( ptr_arg->context() == this->ptrContext() );
+
+            if( ptr_stored_buffer->ptr_cxx_buffer() != nullptr )
+            {
+                status = ptr_arg->read( *ptr_stored_buffer->ptr_cxx_buffer() );
+            }
+            else if( ptr_stored_buffer->ptr_buffer() != nullptr )
+            {
+                status = ptr_arg->read( ptr_stored_buffer->ptr_buffer() );
+            }
+        }
+
+        return status;
+    }
+
+    _this_t::status_t TrackJobCl::doAddAssignAddressItemOclImpl(
+        _this_t::assign_item_t const& SIXTRL_RESTRICT_REF assign_item,
+        _this_t::size_type* SIXTRL_RESTRICT ptr_item_index )
+    {
+        ( void )assign_item;
+        ( void )ptr_item_index;
+
+        return st::ARCH_STATUS_SUCCESS;
+    }
+
+    _this_t::status_t TrackJobCl::doPerformManagedAssignmentsOclImpl(
+        _this_t::assign_item_key_t const& SIXTRL_RESTRICT_REF assign_item_key )
+    {
+        ( void )assign_item_key;
+        return st::ARCH_STATUS_SUCCESS;
+    }
+
+    /* ********************************************************************* */
 
     void collect( TrackJobCl& SIXTRL_RESTRICT_REF job ) SIXTRL_NOEXCEPT
     {
@@ -1395,25 +1706,6 @@ bool NS(TrackJobCl_has_particles_addr_buffer_arg)(
     return ( job != nullptr ) ? job->ptrParticlesAddrBufferArg() : nullptr;
 }
 
-bool NS(TrackJobCl_has_assign_items_buffer_arg)(
-    const ::NS(TrackJobCl) *const SIXTRL_RESTRICT job )
-{
-    return ( ( job != nullptr ) &&
-             ( job->ptrAssignItemsBufferArg() != nullptr ) );
-}
-
-::NS(ClArgument)* NS(TrackJobCl_get_assign_items_buffer_arg)(
-    ::NS(TrackJobCl)* SIXTRL_RESTRICT job )
-{
-    return ( job != nullptr ) ? job->ptrAssignItemsBufferArg() : nullptr;
-}
-
-::NS(ClArgument) const* NS(TrackJobCl_get_const_assign_items_buffer_arg)(
-    const ::NS(TrackJobCl) *const SIXTRL_RESTRICT job )
-{
-    return ( job != nullptr ) ? job->ptrAssignItemsBufferArg() : nullptr;
-}
-
 ::NS(arch_status_t) NS(TrackJobCl_update_beam_elements_region)(
     ::NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
     ::NS(arch_size_t) const offset, NS(arch_size_t) const length,
@@ -1434,6 +1726,38 @@ bool NS(TrackJobCl_has_assign_items_buffer_arg)(
         ? track_job->updateBeamElementsRegions(
             num_regions_to_update, offsets, lengths, new_value )
         : ::NS(ARCH_STATUS_GENERAL_FAILURE);
+}
+
+/* ------------------------------------------------------------------------- */
+
+::NS(ClArgument) const* NS(TrackJobCl_const_argument_by_buffer_id)(
+    const ::NS(TrackJobCl) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const buffer_id )
+{
+    return ( job != nullptr )
+        ? job->ptr_const_argument_by_buffer_id( buffer_id ) : nullptr;
+}
+
+::NS(ClArgument)* NS(TrackJobCl_argument_by_buffer_id)(
+    ::NS(TrackJobCl)* SIXTRL_RESTRICT job, ::NS(buffer_size_t) const buffer_id )
+{
+    return ( job != nullptr )
+        ? job->ptr_argument_by_buffer_id( buffer_id ) : nullptr;
+}
+
+::NS(ClArgument) const* NS(TrackJobCl_const_stored_buffer_argument)(
+    const ::NS(TrackJobCl) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const buffer_id )
+{
+    return ( job != nullptr )
+        ? job->ptr_const_stored_buffer_argument( buffer_id ) : nullptr;
+}
+
+::NS(ClArgument)* NS(TrackJobCl_stored_buffer_argument)(
+    ::NS(TrackJobCl)* SIXTRL_RESTRICT job, ::NS(buffer_size_t) const buffer_id )
+{
+    return ( job != nullptr )
+        ? job->ptr_stored_buffer_argument( buffer_id ) : nullptr;
 }
 
 /* end: /opencl/internal/track_job_cl.cpp */
