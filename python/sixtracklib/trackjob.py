@@ -685,6 +685,60 @@ class TrackJobBaseNew(object):
 
 class TrackJob(object):
     @staticmethod
+    def num_all_nodes(arch_str=None):
+        if not( arch_str is None ) and arch_str == 'opencl' and \
+            stconf.SIXTRACKLIB_MODULES.get( 'opencl', False ):
+            return st.st_OpenCL_get_num_all_nodes()
+        else:
+            return 0
+
+    @staticmethod
+    def num_available_nodes(arch_str=None, env_var_name=None, filter_str=None):
+        if not( arch_str is None ) and arch_str == 'opencl' and \
+            stconf.SIXTRACKLIB_MODULES.get( 'opencl', False ):
+            if not( env_var_name is None ) and not( filter_str is None ):
+                env_var_name.encode('utf-8')
+                filter_str.encode('utf-8')
+                return st.st_OpenCL_num_available_nodes_detailed(
+                    ct.c_char_p(env_var_name), ct.c_char_p(filter_str))
+            else:
+                return st.st_OpenCL_num_available_nodes()
+        else:
+            return 0
+
+    @staticmethod
+    def available_nodes(arch_str=None, env_var_name=None,
+                        skip_first_num_nodes=0, filter_str=None):
+        nodes = []
+        num_nodes = TrackJob.num_available_nodes( arch_str=arch_str,
+            env_var_name=env_var_name, filter_str=filter_str)
+        if num_nodes > 0:
+
+            if arch_str == 'opencl' and \
+                stconf.SIXTRACKLIB_MODULES.get('opencl',False):
+                _temp_array = st.st_ClNodeId * num_nodes
+                _env_var_name = ct.cast( 0, ct.c_char_p )
+                _filter_str = ct.cast( 0, ct.c_char_p )
+                _skip_first_num_nodes = st_arch_size_t(0)
+                if not( env_var_name is None ):
+                    env_var_name.encode('utf-8')
+                    _env_var_name = ct.c_char_p(env_var_name)
+                if not( filter_str is None):
+                    filter_str.encode('utf-8')
+                    _filter_str = ct.c_char_p(filter_str)
+                if not( skip_first_num_nodes is None):
+                    _skip_first_num_nodes=st_arch_size_t(skip_first_num_nodes)
+
+                _num_retrieved_nodes = st.st_OpenCL_get_available_nodes_detailed(
+                    _temp_array, st_arch_size_t(num_nodes),
+                    _skip_first_num_nodes, _filter_str, _env_var_name )
+                if _num_retrieved_nodes > 0:
+
+                st.st_ComputeNodeId_free_array( _temp_array )
+
+
+
+    @staticmethod
     def enabled_archs():
         enabled_archs = [arch_str for arch_str, flag in
                          stconf.SIXTRACKLIB_MODULES.items() if flag]
@@ -1461,5 +1515,29 @@ class TrackJob(object):
         if self._last_status != st_ARCH_STATUS_SUCCESS.value:
             raise RuntimeError(f"Unable to collect stored buffer {buffer_id}")
         return self
+
+    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+    def argument_by_buffer_id(self, buffer_id):
+        ptr_arg = st_NullClArgument.value
+        if self.arch_str == 'opencl':
+            ptr_arg = st.st_TrackJobCl_argument_by_buffer_id(
+                self.ptr_st_track_job, st_buffer_size_t(buffer_id))
+        else:
+            arch_str = self.arch_str
+            raise RuntimeError(
+                f"unable to get argument for buffer on arch {arch_str}" )
+        return ptr_arg
+
+    def stored_buffer_argument(self, buffer_id):
+        ptr_arg = st_NullClArgument.value
+        if self.arch_str == 'opencl':
+            ptr_arg = st.st_TrackJobCl_stored_buffer_argument(
+                self.ptr_st_track_job, st_buffer_size_t(buffer_id))
+        else:
+            arch_str = self.arch_str
+            raise RuntimeError(
+                f"unable to get argument for stored buffer on arch {arch_str}" )
+        return ptr_arg
 
 # end: python/sixtracklib/trackjob.py

@@ -51,6 +51,7 @@ st_ARCH_MAX_USER_DEFINED_BUFFER_ID = st_arch_status_t(0xFFFFFFFFFFFFFFFE)
 
 
 class st_Buffer(ct.Structure):
+    _pack_ = 8
     _fields_ = [("data_addr", ct.c_uint64),
                 ("data_size", ct.c_uint64),
                 ("header_size", ct.c_uint64),
@@ -257,6 +258,7 @@ st_object_type_id_t = ct.c_uint64
 
 
 class st_AssignAddressItem(ct.Structure):
+    _pack_ = 8
     _fields_ = [("dest_elem_type_id", st_object_type_id_t),
                 ("dest_buffer_id", st_buffer_size_t),
                 ("dest_elem_index", st_buffer_size_t),
@@ -371,6 +373,7 @@ st_AssignAddressItem_add_copy.restype = st_AssignAddressItem_p
 
 
 class st_Particles(ct.Structure):
+    _pack_ = 8
     _fields_ = [("num_particles", ct.c_int64), ("q0", st_double_p),
                 ("mass0", st_double_p), ("beta0", st_double_p),
                 ("gamma0", st_double_p), ("p0C", st_double_p),
@@ -384,6 +387,7 @@ class st_Particles(ct.Structure):
 
 
 class st_ParticlesAddr(ct.Structure):
+    _pack_ = 8
     _fields_ = [("num_particles", ct.c_int64), ("q0", ct.c_uint64),
                 ("mass0", ct.c_uint64), ("beta0", ct.c_uint64),
                 ("gamma0", ct.c_uint64), ("p0C", ct.c_uint64),
@@ -565,6 +569,7 @@ st_ELEM_BY_ELEM_ORDER_DEFAULT = st_ELEM_BY_ELEM_ORDER_TURN_ELEM_PARTICLES
 
 
 class st_ElemByElemConfig(ct.Structure):
+    _pack_ = 8
     _fields_ = [("order", st_elem_by_elem_order_int_t),
                 ("num_particles_to_store", st_particle_num_elem_t),
                 ("num_elements_to_store", st_particle_num_elem_t),
@@ -985,6 +990,7 @@ def st_OutputBuffer_create_output_cbuffer(
 
 
 class st_TrackJobDestSrcBufferIds(ct.Structure):
+    _pack_ = 8
     _fields_ = [("dest_buffer_id", st_buffer_size_t),
                 ("src_buffer_id", st_buffer_size_t)]
 
@@ -3521,6 +3527,185 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContextBase_p = ct.c_void_p
     st_NullClContextBase = ct.cast(0, st_ClContextBase_p)
 
+    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+    class st_ClNodeId(ct.Structure):
+        _fields_ = [('platform_id', ct.c_int64), ('device_id', ct.c_int64)]
+
+    st_cl_node_id_t = st_ClNodeId
+    st_ClNodeId_p = ct.POINTER(st_ClNodeId)
+    st_NullClNodeId = ct.cast(0, st_ClNodeId_p)
+
+    st_ComputeNodeId_allocate_array = sixtracklib.st_ComputeNodeId_allocate_array
+    st_ComputeNodeId_allocate_array.argtypes = [ st_arch_size_t ]
+    st_ComputeNodeId_allocate_array.restype = st_ClNodeId_p
+
+    st_ComputeNodeId_free_array = sixtracklib.st_ComputeNodeId_free_array
+    st_ComputeNodeId_free_array.argtypes = [ st_ClNodeId_p ]
+    st_ComputeNodeId_free_array.restype = None
+
+    st_ComputeNodeId_get_platform_id = \
+        sixtracklib.st_ComputeNodeId_get_platform_id_ext
+    st_ComputeNodeId_get_platform_id.argtypes = [st_ClNodeId_p]
+    st_ComputeNodeId_get_platform_id.restype = st_node_platform_id_t
+
+    st_ComputeNodeId_get_device_id = \
+        sixtracklib.st_ComputeNodeId_get_device_id_ext
+    st_ComputeNodeId_get_device_id.argtypes = [st_ClNodeId_p]
+    st_ComputeNodeId_get_device_id.restype = st_node_device_id_t
+
+    st_ComputeNodeId_set_platform_id = \
+        sixtracklib.st_ComputeNodeId_set_platform_id_ext
+    st_ComputeNodeId_set_platform_id.argtypes = [
+        st_ClNodeId_p, st_node_platform_id_t]
+    st_ComputeNodeId_set_platform_id.restype = None
+
+    st_ComputeNodeId_set_device_id = \
+        sixtracklib.st_ComputeNodeId_set_device_id_ext
+    st_ComputeNodeId_set_device_id.argtypes = [
+        st_ClNodeId_p, st_node_device_id_t]
+    st_ComputeNodeId_set_device_id.restype = None
+
+    st_ComputeNodeId_is_valid = sixtracklib.st_ComputeNodeId_is_valid_ext
+    st_ComputeNodeId_is_valid.argtypes = [st_ClNodeId_p]
+    st_ComputeNodeId_is_valid.restype = ct.c_bool
+
+    st_ComputeNodeId_compare = sixtracklib.st_ComputeNodeId_compare_ext
+    st_ComputeNodeId_compare.argtypes = [st_ClNodeId_p, st_ClNodeId_p]
+    st_ComputeNodeId_compare.restype = ct.c_int
+
+    st_ComputeNodeId_are_equal = sixtracklib.st_ComputeNodeId_are_equal_ext
+    st_ComputeNodeId_are_equal.argtypes = [st_ClNodeId_p, st_ClNodeId_p]
+    st_ComputeNodeId_are_equal.restype = ct.c_bool
+
+    st_ComputeNodeId_from_string = sixtracklib.st_ComputeNodeId_from_string
+    st_ComputeNodeId_from_string.argtypes = [st_ClNodeId_p, ct.c_char_p]
+    st_ComputeNodeId_from_string.restype = ct.c_int
+
+    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+    class st_ClNodeInfo(ct.Structure):
+        _pack_ = 8
+        _fields_ = [('id', st_ClNodeId), ('arch', ct.c_char_p),
+                    ('platform', ct.c_char_p), ('name', ct.c_char_p),
+                    ('description', ct.c_char_p)]
+
+    st_cl_node_info_t = st_ClNodeInfo
+    st_ClNodeInfo_p = ct.POINTER(st_ClNodeInfo)
+    st_NullClNodeInfo = ct.cast(0, st_ClNodeInfo_p)
+
+    st_ClNodeInfo_preset = sixtracklib.st_ComputeNodeInfo_preset_ext
+    st_ClNodeInfo_preset.argtypes = [st_ClNodeInfo_p]
+    st_ClNodeInfo_preset.restype = st_ClNodeInfo_p
+
+    st_ClNodeInfo_print_out = sixtracklib.st_ComputeNodeInfo_print_out
+    st_ClNodeInfo_print_out.argtypes = [st_ClNodeInfo_p, st_ClNodeId_p]
+    st_ClNodeInfo_print_out.restype = None
+
+    st_ComputeNodeInfo_free = sixtracklib.st_ComputeNodeInfo_free
+    st_ComputeNodeInfo_free.argtypes = [st_ClNodeInfo_p]
+    st_ComputeNodeInfo_free.restype = None
+
+    st_ComputeNodeInfo_delete = sixtracklib.st_ComputeNodeInfo_delete
+    st_ComputeNodeInfo_delete.argtypes = [st_ClNodeInfo_p]
+    st_ComputeNodeInfo_delete.restype = None
+
+    st_ComputeNodeInfo_reserve = sixtracklib.st_ComputeNodeInfo_reserve
+    st_ComputeNodeInfo_reserve.argtypes = [
+        st_ClNodeInfo_p, st_arch_size_t, st_arch_size_t, st_arch_size_t,
+        st_arch_size_t]
+    st_ComputeNodeInfo_reserve.restype = st_ClNodeInfo_p
+
+    st_ComputeNodeInfo_make = sixtracklib.st_ComputeNodeInfo_make
+    st_ComputeNodeInfo_make.argtypes = [
+        st_ClNodeInfo_p,
+        st_ClNodeId,
+        ct.c_char_p,
+        ct.c_char_p,
+        ct.c_char_p,
+        ct.c_char_p]
+    st_ComputeNodeInfo_make.restype = ct.c_int
+
+    st_ComputeNodeInfo_is_valid = sixtracklib.st_ComputeNodeInfo_is_valid_ext
+    st_ComputeNodeInfo_is_valid.argtypes = [st_ClNodeInfo_p]
+    st_ComputeNodeInfo_is_valid.restype = ct.c_bool
+
+    st_ComputeNodeInfo_get_id = sixtracklib.st_ComputeNodeInfo_get_id_ext
+    st_ComputeNodeInfo_get_id.argtypes = [st_ClNodeInfo_p]
+    st_ComputeNodeInfo_get_id.restype = st_ClNodeId
+
+    st_ComputeNodeInfo_get_platform_id = \
+        sixtracklib.st_ComputeNodeInfo_get_platform_id_ext
+    st_ComputeNodeInfo_get_platform_id.argtypes = [st_ClNodeInfo_p]
+    st_ComputeNodeInfo_get_platform_id.restype = st_node_platform_id_t
+
+    st_ComputeNodeInfo_get_device_id = \
+        sixtracklib.st_ComputeNodeInfo_get_device_id_ext
+    st_ComputeNodeInfo_get_device_id.argtypes = [st_ClNodeInfo_p]
+    st_ComputeNodeInfo_get_device_id.restype = st_node_device_id_t
+
+    st_ComputeNodeInfo_get_arch = sixtracklib.st_ComputeNodeInfo_get_arch_ext
+    st_ComputeNodeInfo_get_arch.argtypes = [st_ClNodeInfo_p]
+    st_ComputeNodeInfo_get_arch.restype = ct.c_char_p
+
+    st_ComputeNodeInfo_get_platform = \
+        sixtracklib.st_ComputeNodeInfo_get_platform_ext
+    st_ComputeNodeInfo_get_platform.argtypes = [st_ClNodeInfo_p]
+    st_ComputeNodeInfo_get_platform.restype = ct.c_char_p
+
+    st_ComputeNodeInfo_get_name = sixtracklib.st_ComputeNodeInfo_get_name_ext
+    st_ComputeNodeInfo_get_name.argtypes = [st_ClNodeInfo_p]
+    st_ComputeNodeInfo_get_name.restype = ct.c_char_p
+
+    st_ComputeNodeInfo_get_description = \
+        sixtracklib.st_ComputeNodeInfo_get_description_ext
+    st_ComputeNodeInfo_get_description.argtypes = [st_ClNodeInfo_p]
+    st_ComputeNodeInfo_get_description.restype = ct.c_char_p
+
+    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+    st_OpenCL_get_num_all_nodes = sixtracklib.st_OpenCL_get_num_all_nodes
+    st_OpenCL_get_num_all_nodes.argtypes = None
+    st_OpenCL_get_num_all_nodes.restype = st_arch_size_t
+
+    st_OpenCL_get_all_nodes = sixtracklib.st_OpenCL_get_all_nodes
+    st_OpenCL_get_all_nodes.argtypes = [ st_ClNodeInfo_p, st_arch_size_t ]
+    st_OpenCL_get_all_nodes.restype = st_arch_size_t
+
+    st_OpenCL_print_all_nodes = sixtracklib.st_OpenCL_print_all_nodes
+    st_OpenCL_print_all_nodes.argtypes = None
+    st_OpenCL_print_all_nodes.restype = None
+
+    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+    st_OpenCL_num_available_nodes = sixtracklib.st_OpenCL_num_available_nodes
+    st_OpenCL_num_available_nodes.argtypes = [ ct.c_char_p ]
+    st_OpenCL_num_available_nodes.restype = st_arch_size_t
+
+    st_OpenCL_num_available_nodes_detailed = sixtracklib.st_OpenCL_num_available_nodes_detailed
+    st_OpenCL_num_available_nodes_detailed.argtypes = [ ct.c_char_p, ct.c_char_p ]
+    st_OpenCL_num_available_nodes_detailed.restype = st_arch_size_t
+
+    st_OpenCL_get_available_nodes = sixtracklib.st_OpenCL_get_available_nodes
+    st_OpenCL_get_available_nodes.argtypes = [ st_ClNodeId_p, st_arch_size_t ]
+    st_OpenCL_get_available_nodes.restype = st_arch_size_t
+
+    st_OpenCL_get_available_nodes_detailed = sixtracklib.st_OpenCL_get_available_nodes_detailed
+    st_OpenCL_get_available_nodes_detailed.argtypes = [ st_ClNodeId_p, st_arch_size_t, st_arch_size_t, ct.c_char_p, ct.c_char_p ]
+    st_OpenCL_get_available_nodes_detailed.restype = st_arch_size_t
+
+    st_OpenCL_print_available_nodes = sixtracklib.st_OpenCL_print_available_nodes
+    st_OpenCL_print_available_nodes.argtypes = None
+    st_OpenCL_print_available_nodes.restype = None
+
+    st_OpenCL_print_available_nodes_detailed = sixtracklib.st_OpenCL_print_available_nodes_detailed
+    st_OpenCL_print_available_nodes_detailed.argtypes = [ ct.c_char_p, ct.c_char_p ]
+    st_OpenCL_print_available_nodes_detailed.restype = None
+
+    # --------------------------------------------------------------------------
+
     st_ClArgument_new = sixtracklib.st_ClArgument_new
     st_ClArgument_new.argtypes = [st_ClContextBase_p]
     st_ClArgument_new.restype = st_ClArgument_p
@@ -3602,132 +3787,6 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_arch_kernel_id_t = ct.c_uint32
     st_ARCH_ILLEGAL_KERNEL_ID = st_arch_kernel_id_t(0xFFFFFFFF)
     st_ARCH_ILLEGAL_PROGRAM_ID = st_arch_program_id_t(0xFFFFFFFF)
-
-    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-
-    class st_ClNodeId(ct.Structure):
-        _fields_ = [('platform_id', ct.c_int64), ('device_id', ct.c_int64)]
-
-    st_cl_node_id_t = st_ClNodeId
-    st_ClNodeId_p = ct.POINTER(st_cl_node_id_t)
-    st_NullClNodeId = ct.cast(0, st_ClNodeId_p)
-
-    st_ComputeNodeId_get_platform_id = \
-        sixtracklib.st_ComputeNodeId_get_platform_id_ext
-    st_ComputeNodeId_get_platform_id.argtypes = [st_ClNodeId_p]
-    st_ComputeNodeId_get_platform_id.restype = st_node_platform_id_t
-
-    st_ComputeNodeId_get_device_id = \
-        sixtracklib.st_ComputeNodeId_get_device_id_ext
-    st_ComputeNodeId_get_device_id.argtypes = [st_ClNodeId_p]
-    st_ComputeNodeId_get_device_id.restype = st_node_device_id_t
-
-    st_ComputeNodeId_set_platform_id = \
-        sixtracklib.st_ComputeNodeId_set_platform_id_ext
-    st_ComputeNodeId_set_platform_id.argtypes = [
-        st_ClNodeId_p, st_node_platform_id_t]
-    st_ComputeNodeId_set_platform_id.restype = None
-
-    st_ComputeNodeId_set_device_id = \
-        sixtracklib.st_ComputeNodeId_set_device_id_ext
-    st_ComputeNodeId_set_device_id.argtypes = [
-        st_ClNodeId_p, st_node_device_id_t]
-    st_ComputeNodeId_set_device_id.restype = None
-
-    st_ComputeNodeId_is_valid = sixtracklib.st_ComputeNodeId_is_valid_ext
-    st_ComputeNodeId_is_valid.argtypes = [st_ClNodeId_p]
-    st_ComputeNodeId_is_valid.restype = ct.c_bool
-
-    st_ComputeNodeId_compare = sixtracklib.st_ComputeNodeId_compare_ext
-    st_ComputeNodeId_compare.argtypes = [st_ClNodeId_p, st_ClNodeId_p]
-    st_ComputeNodeId_compare.restype = ct.c_int
-
-    st_ComputeNodeId_are_equal = sixtracklib.st_ComputeNodeId_are_equal_ext
-    st_ComputeNodeId_are_equal.argtypes = [st_ClNodeId_p, st_ClNodeId_p]
-    st_ComputeNodeId_are_equal.restype = ct.c_bool
-
-    st_ComputeNodeId_from_string = sixtracklib.st_ComputeNodeId_from_string
-    st_ComputeNodeId_from_string.argtypes = [st_ClNodeId_p, ct.c_char_p]
-    st_ComputeNodeId_from_string.restype = ct.c_int
-
-    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-
-    class st_ClNodeInfo(ct.Structure):
-        _fields_ = [('id', st_ClNodeId), ('arch', ct.c_char_p),
-                    ('platform', ct.c_char_p), ('name', ct.c_char_p),
-                    ('description', ct.c_char_p)]
-
-    st_cl_node_info_t = st_ClNodeInfo
-    st_ClNodeInfo_p = ct.POINTER(st_ClNodeInfo)
-    st_NullClNodeInfo = ct.cast(0, st_ClNodeInfo_p)
-
-    st_ComputeNodeInfo_preset = sixtracklib.st_ComputeNodeInfo_preset_ext
-    st_ComputeNodeInfo_preset.argtypes = [st_ClNodeInfo_p]
-    st_ComputeNodeInfo_preset.restype = st_ClNodeInfo_p
-
-    st_ComputeNodeInfo_print_out = sixtracklib.st_ComputeNodeInfo_print_out
-    st_ComputeNodeInfo_print_out.argtypes = [st_ClNodeInfo_p, st_ClNodeId_p]
-    st_ComputeNodeInfo_print_out.restype = None
-
-    st_ComputeNodeInfo_free = sixtracklib.st_ComputeNodeInfo_free
-    st_ComputeNodeInfo_free.argtypes = [st_ClNodeInfo_p]
-    st_ComputeNodeInfo_free.restype = None
-
-    st_ComputeNodeInfo_delete = sixtracklib.st_ComputeNodeInfo_delete
-    st_ComputeNodeInfo_delete.argtypes = [st_ClNodeInfo_p]
-    st_ComputeNodeInfo_delete.restype = None
-
-    st_ComputeNodeInfo_reserve = sixtracklib.st_ComputeNodeInfo_reserve
-    st_ComputeNodeInfo_reserve.argtypes = [
-        st_ClNodeInfo_p, st_arch_size_t, st_arch_size_t, st_arch_size_t,
-        st_arch_size_t]
-    st_ComputeNodeInfo_reserve.restype = st_ClNodeInfo_p
-
-    st_ComputeNodeInfo_make = sixtracklib.st_ComputeNodeInfo_make
-    st_ComputeNodeInfo_make.argtypes = [
-        st_ClNodeInfo_p,
-        st_ClNodeId,
-        ct.c_char_p,
-        ct.c_char_p,
-        ct.c_char_p,
-        ct.c_char_p]
-    st_ComputeNodeInfo_make.restype = ct.c_int
-
-    st_ComputeNodeInfo_is_valid = sixtracklib.st_ComputeNodeInfo_is_valid_ext
-    st_ComputeNodeInfo_is_valid.argtypes = [st_ClNodeInfo_p]
-    st_ComputeNodeInfo_is_valid.restype = ct.c_bool
-
-    st_ComputeNodeInfo_get_id = sixtracklib.st_ComputeNodeInfo_get_id_ext
-    st_ComputeNodeInfo_get_id.argtypes = [st_ClNodeInfo_p]
-    st_ComputeNodeInfo_get_id.restype = st_ClNodeId
-
-    st_ComputeNodeInfo_get_platform_id = \
-        sixtracklib.st_ComputeNodeInfo_get_platform_id_ext
-    st_ComputeNodeInfo_get_platform_id.argtypes = [st_ClNodeInfo_p]
-    st_ComputeNodeInfo_get_platform_id.restype = st_node_platform_id_t
-
-    st_ComputeNodeInfo_get_device_id = \
-        sixtracklib.st_ComputeNodeInfo_get_device_id_ext
-    st_ComputeNodeInfo_get_device_id.argtypes = [st_ClNodeInfo_p]
-    st_ComputeNodeInfo_get_device_id.restype = st_node_device_id_t
-
-    st_ComputeNodeInfo_get_arch = sixtracklib.st_ComputeNodeInfo_get_arch_ext
-    st_ComputeNodeInfo_get_arch.argtypes = [st_ClNodeInfo_p]
-    st_ComputeNodeInfo_get_arch.restype = ct.c_char_p
-
-    st_ComputeNodeInfo_get_platform = \
-        sixtracklib.st_ComputeNodeInfo_get_platform_ext
-    st_ComputeNodeInfo_get_platform.argtypes = [st_ClNodeInfo_p]
-    st_ComputeNodeInfo_get_platform.restype = ct.c_char_p
-
-    st_ComputeNodeInfo_get_name = sixtracklib.st_ComputeNodeInfo_get_name_ext
-    st_ComputeNodeInfo_get_name.argtypes = [st_ClNodeInfo_p]
-    st_ComputeNodeInfo_get_name.restype = ct.c_char_p
-
-    st_ComputeNodeInfo_get_description = \
-        sixtracklib.st_ComputeNodeInfo_get_description_ext
-    st_ComputeNodeInfo_get_description.argtypes = [st_ClNodeInfo_p]
-    st_ComputeNodeInfo_get_description.restype = ct.c_char_p
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
@@ -4479,38 +4538,27 @@ sixtracklib.st_ClContext_clear_beam_monitor_output_kernel_id
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-    # cl_mem st_ClContext_create_elem_by_elem_config_arg(
-    # st_ClContext* SIXTRL_RESTRICT ctx );
-
-    # void st_ClContext_delete_elem_by_elem_config_arg(
-    # st_ClContext* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg );
-
-    # st_arch_status_t st_ClContext_init_elem_by_elem_config_arg(
-    # st_ClContext* SIXTRL_RESTRICT ctx,
-    # cl_mem elem_by_elem_config_arg,
-    # st_ElemByElemConfig* SIXTRL_RESTRICT elem_by_elem_config,
-    # const st_Buffer *const SIXTRL_RESTRICT particles_buffer,
-    # st_buffer_size_t const num_particle_sets,
-    # st_buffer_size_t const* SIXTRL_RESTRICT pset_indices_begin,
-    # const st_Buffer *const SIXTRL_RESTRICT beam_elements_buffer,
-    # st_buffer_size_t const until_turn_elem_by_elem,
-    # st_particle_index_t const start_elem_id );
-
-    # st_arch_status_t st_ClContext_collect_elem_by_elem_config_arg(
-    # st_ClContext* SIXTRL_RESTRICT ctx,
-    # cl_mem elem_by_elem_config_arg,
-    # st_ElemByElemConfig* SIXTRL_RESTRICT elem_by_elem_config );
-
-    # st_arch_status_t st_ClContext_push_elem_by_elem_config_arg(
-    # st_ClContext* SIXTRL_RESTRICT ctx,
-    # cl_mem elem_by_elem_config_arg,
-    # const st_ElemByElemConfig *const SIXTRL_RESTRICT elem_by_elem_config );
-
     st_TrackJobCl_p = ct.c_void_p
     st_NullTrackJobCl = ct.cast(0, st_TrackJobCl_p)
     st_TrackJobCl_get_context = sixtracklib.st_TrackJobCl_get_context
     st_TrackJobCl_get_context.argtypes = [st_TrackJobCl_p]
     st_TrackJobCl_get_context.restype = st_ClContext_p
+
+    st_TrackJobCl_const_argument_by_buffer_id = sixtracklib.st_TrackJobCl_const_argument_by_buffer_id
+    st_TrackJobCl_const_argument_by_buffer_id.argtypes = [ st_TrackJobCl_p, st_buffer_size_t ]
+    st_TrackJobCl_const_argument_by_buffer_id.restype = st_ClArgument_p
+
+    st_TrackJobCl_argument_by_buffer_id = sixtracklib.st_TrackJobCl_argument_by_buffer_id
+    st_TrackJobCl_argument_by_buffer_id.argtypes = [ st_TrackJobCl_p, st_buffer_size_t ]
+    st_TrackJobCl_argument_by_buffer_id.restype = st_ClArgument_p
+
+    st_TrackJobCl_const_stored_buffer_argument = sixtracklib.st_TrackJobCl_const_stored_buffer_argument
+    st_TrackJobCl_const_stored_buffer_argument.argtypes = [ st_TrackJobCl_p, st_buffer_size_t ]
+    st_TrackJobCl_const_stored_buffer_argument.restype = st_ClArgument_p
+
+    st_TrackJobCl_stored_buffer_argument = sixtracklib.st_TrackJobCl_stored_buffer_argument
+    st_TrackJobCl_stored_buffer_argument.argtypes = [ st_TrackJobCl_p, st_buffer_size_t ]
+    st_TrackJobCl_stored_buffer_argument.restype = st_ClArgument_p
 
 # ------------------------------------------------------------------------------
 # Stand-alone tracking functions (CPU only)

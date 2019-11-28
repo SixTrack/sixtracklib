@@ -1,6 +1,9 @@
-import cobjects
-from cobjects import CBuffer, CObject
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import sys
+import os
 import sixtracklib as st
+import sixtracklib_test as testlib
 
 if __name__ == '__main__':
     lattice = st.Elements()
