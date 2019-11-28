@@ -844,6 +844,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN buffer_store_t const* doGetPtrBufferStore(
             size_type const buffer_id ) const SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN size_type doGetStoredBufferSize() const SIXTRL_NOEXCEPT;
+
         SIXTRL_HOST_FN size_type doFindAssingAddressItem( assign_item_t const&
             SIXTRL_RESTRICT_REF item_to_search ) const SIXTRL_NOEXCEPT;
 
