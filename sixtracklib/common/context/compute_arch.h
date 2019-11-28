@@ -76,6 +76,12 @@ SIXTRL_STATIC SIXTRL_FN bool NS(ComputeNodeId_are_equal)(
 
 #if !defined( GPUCODE )
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ComputeNodeId)*
+NS(ComputeNodeId_allocate_array)( NS(arch_size_t) const num_nodes );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void
+NS(ComputeNodeId_free_array)( NS(ComputeNodeId)* SIXTRL_RESTRICT array_begin );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(comp_node_id_num_t)
 NS(ComputeNodeId_get_platform_id_ext)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id );
