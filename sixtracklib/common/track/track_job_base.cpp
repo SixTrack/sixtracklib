@@ -981,26 +981,23 @@ namespace SIXTRL_CXX_NAMESPACE
 
     bool TrackJobBaseNew::hasElemByElemConfig() const SIXTRL_NOEXCEPT
     {
-        SIXTRL_ASSERT(
-            ( this->m_my_elem_by_elem_config.get() == nullptr ) ||
-            ( this->m_ptr_c_output_buffer != nullptr ) );
-
-        return ( ::NS(ElemByElemConfig_is_active)(
-            this->m_my_elem_by_elem_config.get() ) );
+        return ( this->ptrElemByElemConfig() != nullptr );
     }
 
     _this_t::elem_by_elem_config_t const*
     TrackJobBaseNew::ptrElemByElemConfig() const SIXTRL_NOEXCEPT
     {
-        return this->m_my_elem_by_elem_config.get();
+        return ::NS(ElemByElemConfig_const_from_buffer)(
+            this->m_elem_by_elem_config_buffer.getCApiPtr(),
+                this->m_elem_by_elem_config_index );
     }
 
     _this_t::elem_by_elem_config_t*
     TrackJobBaseNew::ptrElemByElemConfig() SIXTRL_NOEXCEPT
     {
-        return const_cast< st::TrackJobBaseNew::elem_by_elem_config_t* >(
-            static_cast< st::TrackJobBaseNew const& >(
-                *this ).ptrElemByElemConfig() );
+        return ::NS(ElemByElemConfig_from_buffer)(
+            this->m_elem_by_elem_config_buffer.getCApiPtr(),
+                this->m_elem_by_elem_config_index );
     }
 
     bool TrackJobBaseNew::elemByElemRolling() const SIXTRL_NOEXCEPT
@@ -1047,11 +1044,41 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
+    _this_t::buffer_t const&
+    TrackJobBaseNew::elem_by_elem_config_cxx_buffer() const SIXTRL_NOEXCEPT
+    {
+        return this->m_elem_by_elem_config_buffer;
+    }
+
+    _this_t::buffer_t&
+    TrackJobBaseNew::elem_by_elem_config_cxx_buffer() SIXTRL_NOEXCEPT
+    {
+        return this->m_elem_by_elem_config_buffer;
+    }
+
+    _this_t::c_buffer_t const*
+    TrackJobBaseNew::elem_by_elem_config_buffer() const SIXTRL_NOEXCEPT
+    {
+        return this->m_elem_by_elem_config_buffer.getCApiPtr();
+    }
+
+    _this_t::c_buffer_t*
+    TrackJobBaseNew::elem_by_elem_config_buffer() SIXTRL_NOEXCEPT
+    {
+        return this->m_elem_by_elem_config_buffer.getCApiPtr();
+    }
+
+    _this_t::size_type TrackJobBaseNew::elem_by_elem_config_index() const SIXTRL_NOEXCEPT
+    {
+        return this->m_elem_by_elem_config_index;
+    }
+
+    /* --------------------------------------------------------------------- */
+
     _this_t::elem_by_elem_order_t
     TrackJobBaseNew::elemByElemOrder() const SIXTRL_NOEXCEPT
     {
-        return ::NS(ElemByElemConfig_get_order)(
-            this->m_my_elem_by_elem_config.get() );
+        return ::NS(ElemByElemConfig_get_order)( this->ptrElemByElemConfig() );
     }
 
     _this_t::elem_by_elem_order_t
@@ -1077,9 +1104,9 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_begin_offsets(),
         m_particle_set_end_offsets(),
         m_beam_monitor_indices(),
+        m_elem_by_elem_config_buffer(),
         m_my_output_buffer( nullptr ),
         m_my_particles_addr_buffer( new _this_t::buffer_t ),
-        m_my_elem_by_elem_config( nullptr ),
         m_ptr_particles_buffer( nullptr ),
         m_ptr_beam_elem_buffer( nullptr ), m_ptr_output_buffer( nullptr ),
         m_ptr_c_particles_buffer( nullptr ),
@@ -1088,6 +1115,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_elem_by_elem_output_offset( _this_t::size_type{ 0 } ),
         m_num_particle_sets_in_buffer( _this_t::size_type{ 0 } ),
         m_num_beam_elements_in_buffer( _this_t::size_type{ 0 } ),
+        m_elem_by_elem_config_index( _this_t::size_type{ 0 } ),
         m_default_elem_by_elem_order( ::NS(ELEM_BY_ELEM_ORDER_DEFAULT) ),
         m_total_num_particles( _this_t::num_particles_t{ 0 } ),
         m_total_num_particles_in_sets( _this_t::num_particles_t{ 0 } ),
@@ -1116,9 +1144,9 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_begin_offsets( other.m_particle_set_begin_offsets ),
         m_particle_set_end_offsets( other.m_particle_set_end_offsets ),
         m_beam_monitor_indices( other.m_beam_monitor_indices ),
+        m_elem_by_elem_config_buffer( other.m_elem_by_elem_config_buffer ),
         m_my_output_buffer( nullptr ),
         m_my_particles_addr_buffer( nullptr ),
-        m_my_elem_by_elem_config( nullptr ),
         m_ptr_particles_buffer( other.m_ptr_particles_buffer ),
         m_ptr_beam_elem_buffer( other.m_ptr_beam_elem_buffer ),
         m_ptr_output_buffer( nullptr ),
@@ -1129,6 +1157,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_elem_by_elem_output_offset( other.m_elem_by_elem_output_offset ),
         m_num_particle_sets_in_buffer( other.m_num_particle_sets_in_buffer ),
         m_num_beam_elements_in_buffer( other.m_num_beam_elements_in_buffer ),
+        m_elem_by_elem_config_index( other.m_elem_by_elem_config_index ),
         m_default_elem_by_elem_order( other.m_default_elem_by_elem_order ),
         m_total_num_particles( other.m_total_num_particles ),
         m_total_num_particles_in_sets( other.m_total_num_particles_in_sets ),
@@ -1150,8 +1179,6 @@ namespace SIXTRL_CXX_NAMESPACE
         m_uses_controller( other.m_uses_controller ),
         m_uses_arguments( other.m_uses_arguments )
     {
-        using elem_by_elem_config_t = TrackJobBaseNew::elem_by_elem_config_t;
-
         if( other.ownsOutputBuffer() )
         {
             this->m_my_output_buffer.reset( new
@@ -1179,14 +1206,6 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_my_particles_addr_buffer.reset(
                 new _this_t::buffer_t );
         }
-
-        if( other.m_my_elem_by_elem_config.get() != nullptr )
-        {
-            this->m_my_elem_by_elem_config.reset(
-                new elem_by_elem_config_t );
-
-            *this->m_my_elem_by_elem_config =  *other.ptrElemByElemConfig();
-        }
     }
 
     TrackJobBaseNew::TrackJobBaseNew(
@@ -1198,10 +1217,11 @@ namespace SIXTRL_CXX_NAMESPACE
         m_particle_set_end_offsets(
             std::move( other.m_particle_set_end_offsets ) ),
         m_beam_monitor_indices( std::move( other.m_beam_monitor_indices ) ),
+        m_elem_by_elem_config_buffer(
+            std::move( other.m_elem_by_elem_config_buffer ) ),
         m_my_output_buffer( std::move( other.m_my_output_buffer ) ),
         m_my_particles_addr_buffer(
             std::move( other.m_my_particles_addr_buffer ) ),
-        m_my_elem_by_elem_config( std::move( other.m_my_elem_by_elem_config ) ),
         m_ptr_particles_buffer( std::move( other.m_ptr_particles_buffer ) ),
         m_ptr_beam_elem_buffer( std::move( other.m_ptr_beam_elem_buffer ) ),
         m_ptr_output_buffer( std::move( other.m_ptr_output_buffer ) ),
@@ -1216,6 +1236,8 @@ namespace SIXTRL_CXX_NAMESPACE
             std::move( other.m_num_particle_sets_in_buffer ) ),
         m_num_beam_elements_in_buffer(
             std::move( other.m_num_beam_elements_in_buffer ) ),
+        m_elem_by_elem_config_index(
+            std::move( other.m_elem_by_elem_config_index ) ),
         m_default_elem_by_elem_order(
             std::move( other.m_default_elem_by_elem_order ) ),
         m_total_num_particles( std::move( other.m_total_num_particles ) ),
@@ -1314,18 +1336,6 @@ namespace SIXTRL_CXX_NAMESPACE
                     new _this_t::buffer_t );
             }
 
-            if( rhs.m_my_elem_by_elem_config.get() != nullptr )
-            {
-                this->m_my_elem_by_elem_config.reset(
-                    new elem_by_elem_config_t );
-
-                *this->m_my_elem_by_elem_config = *rhs.ptrElemByElemConfig();
-            }
-            else if( this->m_my_elem_by_elem_config.get() != nullptr )
-            {
-                this->m_my_elem_by_elem_config.reset( nullptr );
-            }
-
             this->m_ptr_particles_buffer = rhs.m_ptr_particles_buffer;
             this->m_ptr_beam_elem_buffer = rhs.m_ptr_beam_elem_buffer;
 
@@ -1343,6 +1353,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->m_num_beam_elements_in_buffer =
                 rhs.m_num_beam_elements_in_buffer;
+
+            this->m_elem_by_elem_config_index =
+                rhs.m_elem_by_elem_config_index;
 
             this->m_default_elem_by_elem_order =
                 rhs.m_default_elem_by_elem_order;
@@ -1405,8 +1418,8 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_my_particles_addr_buffer =
                 std::move( rhs.m_my_particles_addr_buffer );
 
-            this->m_my_elem_by_elem_config =
-                std::move( rhs.m_my_elem_by_elem_config );
+            this->m_elem_by_elem_config_buffer =
+                std::move( rhs.m_elem_by_elem_config_buffer );
 
             this->m_ptr_particles_buffer =
                 std::move( rhs.m_ptr_particles_buffer );
@@ -1433,6 +1446,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->m_num_beam_elements_in_buffer =
                 std::move( rhs.m_num_beam_elements_in_buffer );
+
+            this->m_elem_by_elem_config_index =
+                std::move( rhs.m_elem_by_elem_config_index );
 
             this->m_default_elem_by_elem_order = std::move(
                 rhs.m_default_elem_by_elem_order );
@@ -1712,12 +1728,9 @@ namespace SIXTRL_CXX_NAMESPACE
         using buffer_t               = _this_t::buffer_t;
         using c_buffer_t             = _this_t::c_buffer_t;
         using buf_size_t             = ::NS(buffer_size_t);
-        using elem_by_elem_config_t  = TrackJobBaseNew::elem_by_elem_config_t;
-        using ptr_output_buffer_t    = TrackJobBaseNew::ptr_output_buffer_t;
+        using elem_by_elem_config_t  = _this_t::elem_by_elem_config_t;
+        using ptr_output_buffer_t    = _this_t::ptr_output_buffer_t;
         using par_index_t            = _this_t::particle_index_t;
-
-        using ptr_elem_by_elem_config_t =
-            TrackJobBaseNew::ptr_elem_by_elem_config_t;
 
         SIXTRL_ASSERT( particles_buffer != nullptr );
         SIXTRL_ASSERT( !::NS(Buffer_needs_remapping)( particles_buffer ) );
@@ -1808,6 +1821,8 @@ namespace SIXTRL_CXX_NAMESPACE
                 &elem_by_elem_out_idx_offset, &be_monitor_out_idx_offset,
                 &max_elem_by_elem_turn_id );
 
+            this->m_elem_by_elem_config_buffer.reset();
+
             if( ( status == st::ARCH_STATUS_SUCCESS ) &&
                 ( until_turn_elem_by_elem > ZERO ) &&
                 ( this->minInitialTurnId() >= par_index_t{ 0 } ) &&
@@ -1815,31 +1830,30 @@ namespace SIXTRL_CXX_NAMESPACE
                 ( until_turn_elem_by_elem > static_cast< buf_size_t >(
                     this->minInitialTurnId() ) ) )
             {
-                ptr_elem_by_elem_config_t conf( new elem_by_elem_config_t );
-                ::NS(ElemByElemConfig_preset)( conf.get() );
+                elem_by_elem_config_t* conf = ::NS(ElemByElemConfig_preset)(
+                    ::NS(ElemByElemConfig_new)(
+                        this->m_elem_by_elem_config_buffer.getCApiPtr() ) );
 
-                status = ::NS(ElemByElemConfig_init_detailed)(
-                    conf.get(), this->defaultElemByElemOrder(),
+                SIXTRL_ASSERT( conf != nullptr );
+
+                status = ::NS(ElemByElemConfig_init_detailed)( conf,
+                    this->defaultElemByElemOrder(),
                     this->minParticleId(), this->maxParticleId(),
                     this->minElementId(),  this->maxElementId(),
                     this->minInitialTurnId(), max_elem_by_elem_turn_id,
                     this->defaultElemByElemRolling() );
 
+                this->m_elem_by_elem_config_index = size_t{ 0 };
+
                 if( status == st::ARCH_STATUS_SUCCESS )
                 {
-                    this->doUpdateStoredElemByElemConfig( std::move( conf ) );
-                    this->doSetUntilTurnElemByElem(
-                        until_turn_elem_by_elem );
-
+                    this->doSetUntilTurnElemByElem( until_turn_elem_by_elem );
                     SIXTRL_ASSERT( this->hasElemByElemConfig() );
                 }
             }
             else if( status == st::ARCH_STATUS_SUCCESS )
             {
-                ptr_elem_by_elem_config_t dummy( nullptr );
-                this->doUpdateStoredElemByElemConfig( std::move( dummy ) );
                 this->doSetUntilTurnElemByElem( ZERO );
-
                 status = ( !this->hasElemByElemConfig() )
                     ? st::ARCH_STATUS_SUCCESS : st::ARCH_STATUS_GENERAL_FAILURE;
             }
@@ -2177,6 +2191,7 @@ namespace SIXTRL_CXX_NAMESPACE
     TrackJobBaseNew::track_status_t TrackJobBaseNew::doTrackElemByElem(
         _this_t::size_type const until_turn_elem_by_elem )
     {
+        ( void )until_turn_elem_by_elem;
         return st::TRACK_STATUS_GENERAL_FAILURE;
     }
 
@@ -2461,12 +2476,6 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_my_output_buffer = std::move( ptr_out_buffer );
     }
 
-    void TrackJobBaseNew::doUpdateStoredElemByElemConfig(
-        TrackJobBaseNew::ptr_elem_by_elem_config_t&& ptr_conf ) SIXTRL_NOEXCEPT
-    {
-        this->m_my_elem_by_elem_config = std::move( ptr_conf );
-    }
-
     void TrackJobBaseNew::doSetUsesControllerFlag(
         bool const uses_controller_flag ) SIXTRL_NOEXCEPT
     {
@@ -2536,8 +2545,10 @@ namespace SIXTRL_CXX_NAMESPACE
         this->doSetElemByElemOutputIndexOffset( size_t{ 0 } );
         this->doSetUntilTurnElemByElem( size_t{ 0 } );
 
+        this->m_elem_by_elem_config_buffer.reset();
+        this->m_elem_by_elem_config_index = size_t{ 0 };
+
         this->m_my_output_buffer.reset( nullptr );
-        this->m_my_elem_by_elem_config.reset( nullptr );
 
         this->m_default_elem_by_elem_order   =
             ::NS(ELEM_BY_ELEM_ORDER_DEFAULT);

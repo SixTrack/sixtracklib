@@ -36,7 +36,8 @@ __global__ void NS(Track_track_elem_by_elem_until_turn_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer_begin,
     NS(buffer_size_t) const pset_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT be_buffer_begin,
-    SIXTRL_DATAPTR_DEC const NS(ElemByElemConfig) *const SIXTRL_RESTRICT conf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer_begin,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(buffer_size_t) const until_turn_elem_by_elem,
     NS(buffer_size_t) const slot_size );
 
@@ -44,7 +45,8 @@ __global__ void NS(Track_track_elem_by_elem_until_turn_cuda_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer_begin,
     NS(buffer_size_t) const pset_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT be_buffer_begin,
-    SIXTRL_DATAPTR_DEC const NS(ElemByElemConfig) *const SIXTRL_RESTRICT conf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer_begin,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(buffer_size_t) const until_turn_elem_by_elem,
     NS(buffer_size_t) const slot_size,
     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_dbg_register);

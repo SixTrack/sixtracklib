@@ -13,16 +13,16 @@ extern "C" {
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(ElemByElemConfig_assign_output_buffer_kernel_impl)(
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
-        SIXTRL_RESTRICT elem_by_elem_config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT out_buffer,
     NS(buffer_size_t) const output_buffer_index_offset,
     NS(buffer_size_t) const slot_size );
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(ElemByElemConfig_assign_output_buffer_debug_kernel_impl)(
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
-        SIXTRL_RESTRICT elem_by_elem_config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT out_buffer,
     NS(buffer_size_t) const output_buffer_index_offset,
     NS(buffer_size_t) const slot_size,
@@ -65,8 +65,8 @@ extern "C" {
 
 SIXTRL_INLINE NS(arch_status_t)
 NS(ElemByElemConfig_assign_output_buffer_kernel_impl)(
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
-        SIXTRL_RESTRICT elem_by_elem_config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT out_buffer,
     NS(buffer_size_t) const output_buffer_index_offset,
     NS(buffer_size_t) const slot_size )
@@ -74,6 +74,12 @@ NS(ElemByElemConfig_assign_output_buffer_kernel_impl)(
     typedef NS(particle_num_elements_t) nelements_t;
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* out_iter_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Particles) const* ptr_out_particles_t;
+    typedef SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
+            ptr_elem_by_elem_config_t;
+
+    ptr_elem_by_elem_config_t elem_by_elem_config =
+    NS(ElemByElemConfig_from_managed_buffer)( config_buffer,
+        elem_by_elem_config_index, slot_size );
 
     nelements_t const required_num_out_particles =
         NS(ElemByElemConfig_get_out_store_num_particles)( elem_by_elem_config );
@@ -115,8 +121,8 @@ NS(ElemByElemConfig_assign_output_buffer_kernel_impl)(
 
 SIXTRL_INLINE NS(arch_status_t)
 NS(ElemByElemConfig_assign_output_buffer_debug_kernel_impl)(
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
-        SIXTRL_RESTRICT elem_by_elem_config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT out_buffer,
     NS(buffer_size_t) const output_buffer_index_offset,
     NS(buffer_size_t) const slot_size,
@@ -125,6 +131,8 @@ NS(ElemByElemConfig_assign_output_buffer_debug_kernel_impl)(
     typedef NS(particle_num_elements_t) nelements_t;
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* out_iter_t;
     typedef SIXTRL_BUFFER_DATAPTR_DEC NS(Particles) const* ptr_out_particles_t;
+    typedef SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
+            ptr_elem_by_elem_config_t;
 
     NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
     NS(arch_debugging_t) flags = SIXTRL_ARCH_DEBUGGING_MIN_FLAG;
@@ -135,6 +143,10 @@ NS(ElemByElemConfig_assign_output_buffer_debug_kernel_impl)(
     NS(arch_debugging_t) const OUT_INDEX_OFFSET_ILLEGAL_FLAG    = flags <<  3u;
     NS(arch_debugging_t) const OUT_PARTICLES_ILLEGAL_FLAG       = flags <<  4u;
     NS(arch_debugging_t) const OUT_BUFFER_REQUIRES_REMAP_FLAG   = flags <<  5u;
+
+    ptr_elem_by_elem_config_t elem_by_elem_config =
+    NS(ElemByElemConfig_from_managed_buffer)( config_buffer,
+        elem_by_elem_config_index, slot_size );
 
     flags = ( NS(arch_debugging_t) )0u;
 

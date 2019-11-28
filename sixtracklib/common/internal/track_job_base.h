@@ -7,6 +7,7 @@
         #include <cstddef>
         #include <cstdint>
         #include <cstdlib>
+        #include <map>
         #include <memory>
         #include <string>
         #include <vector>
@@ -27,7 +28,7 @@
     #endif /* defined( __cplusplus ) */
 
     #include "sixtracklib/common/buffer.h"
-    #include "sixtracklib/common/buffer/assign_address_item.h"
+    #include "sixtracklib/common/buffer/assign_address_item.hpp"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/particles/particles_addr.h"
     #include "sixtracklib/common/output/output_buffer.h"
@@ -35,9 +36,36 @@
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
+extern "C" {
+#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+
+typedef struct NS(TrackJobDestSrcBufferIds)
+{
+    NS(buffer_size_t)   dest_buffer_id;
+    NS(buffer_size_t)   src_buffer_id;
+}
+NS(TrackJobDestSrcBufferIds);
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+}
 
 namespace SIXTRL_CXX_NAMESPACE
 {
+    struct TrackJobDestSrcBufferIdsLessCmp
+    {
+        bool operator()(
+            ::NS(TrackJobDestSrcBufferIds) const& SIXTRL_RESTRICT_REF lhs,
+            ::NS(TrackJobDestSrcBufferIds) const& SIXTRL_RESTRICT_REF rhs
+        ) const SIXTRL_NOEXCEPT
+        {
+            return ( ( lhs.dest_buffer_id < rhs.dest_buffer_id ) ||
+                     ( ( lhs.dest_buffer_id == rhs.dest_buffer_id ) &&
+                       ( lhs.src_buffer_id < rhs.src_buffer_id ) ) );
+        }
+    };
+
+    /* ********************************************************************* */
+
     class TrackJobBufferStore
     {
         public:
@@ -86,11 +114,11 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN bool active() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN bool owns_buffer() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN c_buffer_t const* ptr_cbuffer() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN c_buffer_t* ptr_cbuffer() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN c_buffer_t const* ptr_buffer() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN c_buffer_t* ptr_buffer() SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN buffer_t const* ptr_buffer() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN buffer_t* ptr_buffer() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN buffer_t const* ptr_cxx_buffer() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN buffer_t* ptr_cxx_buffer() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void clear() SIXTRL_NOEXCEPT;
 
@@ -132,15 +160,19 @@ namespace SIXTRL_CXX_NAMESPACE
         using type_t                 = SIXTRL_CXX_NAMESPACE::track_job_type_t;
         using track_status_t         = SIXTRL_CXX_NAMESPACE::track_status_t;
         using status_t               = SIXTRL_CXX_NAMESPACE::arch_status_t;
+        using assign_item_t          = SIXTRL_CXX_NAMESPACE::AssignAddressItem;
+        using assign_item_key_t      = ::NS(TrackJobDestSrcBufferIds);
         using output_buffer_flag_t   = ::NS(output_buffer_flag_t);
         using object_type_id_t       = ::NS(object_type_id_t);
         using particles_addr_t       = ::NS(ParticlesAddr);
-        using assign_item_t          = ::NS(AssignAddressItem);
-
-        using assign_item_dest_src_pair_t = ::NS(AssignAddressItemDestSrcPair);
 
         using collect_flag_t = SIXTRL_CXX_NAMESPACE::track_job_collect_flag_t;
         using push_flag_t    = SIXTRL_CXX_NAMESPACE::track_job_push_flag_t;
+
+        /* ----------------------------------------------------------------- */
+
+        static constexpr size_type ILLEGAL_BUFFER_ID =
+                    SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_BUFFER_ID;
 
         /* ----------------------------------------------------------------- */
 
@@ -380,8 +412,15 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const src_elem_index,
             size_type const src_pointer_offset );
 
+        SIXTRL_HOST_FN status_t remove_assign_address_item(
+            assign_item_key_t const& SIXTRL_RESTRICT_REF key,
+            size_type const index_of_item_to_remove );
+
+        SIXTRL_HOST_FN status_t remove_assign_address_item(
+            assign_item_t const& SIXTRL_RESTRICT_REF item_to_remove );
+
         SIXTRL_HOST_FN bool has_assign_address_item( assign_item_t const&
-            SIXTRL_RESTRICT_REF assign_item_to_add ) const SIXTRL_NOEXCEPT;
+            SIXTRL_RESTRICT_REF assign_item ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool has_assign_address_item(
             object_type_id_t const dest_type_id,
@@ -393,7 +432,7 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const src_elem_index,
             size_type const src_pointer_offset ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN size_type assign_address_item_index(
+        SIXTRL_HOST_FN size_type index_of_assign_address_item(
             object_type_id_t const dest_type_id,
             size_type const dest_buffer_id,
             size_type const dest_elem_index,
@@ -403,8 +442,9 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const src_elem_index,
             size_type const src_pointer_offset ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN size_type assign_address_item_index( assign_item_t const&
-            SIXTRL_RESTRICT_REF assign_item_to_add )  const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN size_type index_of_assign_address_item(
+            assign_item_t const& SIXTRL_RESTRICT_REF
+                assign_item ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool has_assign_items(
             size_type const dest_buffer_id,
@@ -414,15 +454,35 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const dest_buffer_id,
             size_type const src_buffer_id ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN size_type
-            num_distinct_assign_items_dest_src_pairs() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN size_type total_num_assign_items() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN size_type assign_items_dest_src_pairs(
+        SIXTRL_HOST_FN assign_item_t const* ptr_assign_address_item(
+            assign_item_t const& SIXTRL_RESTRICT_REF
+                assign_address_item ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN assign_item_t const* ptr_assign_address_item(
+            size_type const dest_buffer_id,  size_type const src_buffer_id,
+            size_type const assign_item_index ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN assign_item_t const* ptr_assign_address_item(
+            object_type_id_t const dest_type_id,
+            size_type const dest_buffer_id,
+            size_type const dest_elem_index,
+            size_type const dest_pointer_offset,
+            object_type_id_t const src_type_id,
+            size_type const src_buffer_id,
+            size_type const src_elem_index,
+            size_type const src_pointer_offset ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN size_type
+            num_distinct_available_assign_address_items_dest_src_pairs() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN size_type available_assign_address_items_dest_src_pairs(
             size_type const max_num_pairs,
-            assign_item_dest_src_pair_t* pairs_begin ) const SIXTRL_NOEXCEPT;
+            assign_item_key_t* pairs_begin ) const SIXTRL_NOEXCEPT;
 
         template< typename PairIter >
-        SIXTRL_HOST_FN size_type assign_items_dest_src_pairs(
+        SIXTRL_HOST_FN size_type available_assign_address_items_dest_src_pairs(
             PairIter pairs_begin, PairIter pairs_end ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN c_buffer_t* buffer_by_buffer_id(
@@ -431,21 +491,25 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN c_buffer_t const* buffer_by_buffer_id(
             size_type const buffer_id ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN assign_item_t const*
-        assign_items_begin() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool is_buffer_by_buffer_id(
+            size_type const buffer_id ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN assign_item_t const*
-        assign_items_end() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool is_raw_memory_by_buffer_id(
+            size_type const buffer_id ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN assign_item_t const*
-        assign_items_dest_src_begin(
-            size_type const dest_buffer_id,
+        SIXTRL_HOST_FN SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*
+        assign_items_begin( size_type const dest_buffer_id,
             size_type const src_buffer_id ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN assign_item_t const*
-        assign_items_dest_src_end(
-            size_type const dest_buffer_id,
+        SIXTRL_HOST_FN SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*
+        assign_items_end( size_type const dest_buffer_id,
             size_type const src_buffer_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN assign_item_key_t const*
+        assign_item_dest_src_begin() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN assign_item_key_t const*
+        assign_item_dest_src_end() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN status_t perform_managed_assignments();
         SIXTRL_HOST_FN status_t perform_managed_assignments(
@@ -454,42 +518,54 @@ namespace SIXTRL_CXX_NAMESPACE
         /* ---------------------------------------------------------------- */
 
         SIXTRL_HOST_FN size_type
-        ext_stored_buffers_capacity() const SIXTRL_NOEXCEPT;
+        stored_buffers_capacity() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN status_t reserve_ext_stored_buffers_capacity(
+        SIXTRL_HOST_FN status_t reserve_stored_buffers_capacity(
             size_type const capacity );
 
-        SIXTRL_HOST_FN bool has_ext_stored_buffers() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN bool has_stored_buffers() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN size_type
-            num_ext_stored_buffers() const SIXTRL_NOEXCEPT;
+            num_stored_buffers() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN size_type
-            min_ext_stored_buffer_id() const SIXTRL_NOEXCEPT;
+            min_stored_buffer_id() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN size_type
-            max_ext_stored_buffer_id() const SIXTRL_NOEXCEPT;
+            max_stored_buffer_id() const SIXTRL_NOEXCEPT;
 
         template< typename... Args >
-        SIXTRL_HOST_FN size_type add_ext_stored_buffer( Args&&... args );
+        SIXTRL_HOST_FN size_type add_stored_buffer( Args&&... args );
 
-        SIXTRL_HOST_FN bool owns_ext_stored_buffer(
+        SIXTRL_HOST_FN bool owns_stored_buffer(
             size_type const buffer_id ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN status_t remove_ext_stored_buffer(
+        SIXTRL_HOST_FN status_t remove_stored_buffer(
             size_type const buffer_index );
 
-        SIXTRL_HOST_FN buffer_t* ptr_ext_stored_buffer(
+        SIXTRL_HOST_FN buffer_t& stored_cxx_buffer(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN buffer_t const& stored_cxx_buffer(
+            size_type const buffer_id ) const;
+
+        SIXTRL_HOST_FN buffer_t* ptr_stored_cxx_buffer(
             size_type const buffer_id ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN buffer_t const* ptr_ext_stored_buffer(
+        SIXTRL_HOST_FN buffer_t const* ptr_stored_cxx_buffer(
             size_type const buffer_id ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN c_buffer_t* ptr_ext_stored_cbuffer(
+        SIXTRL_HOST_FN c_buffer_t* ptr_stored_buffer(
             size_type const buffer_id ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN c_buffer_t const* ptr_ext_stored_cbuffer(
+        SIXTRL_HOST_FN c_buffer_t const* ptr_stored_buffer(
             size_type const buffer_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN status_t push_stored_buffer(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN status_t collect_stored_buffer(
+            size_type const buffer_id );
 
         /* ---------------------------------------------------------------- */
 
@@ -639,14 +715,28 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual bool doAssignNewOutputBuffer(
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer );
 
-        SIXTRL_HOST_FN virtual size_type doAddExtStoredBuffer(
+        SIXTRL_HOST_FN virtual size_type doAddStoredBuffer(
             buffer_store_t&& assigned_buffer_handle );
 
-        SIXTRL_HOST_FN virtual status_t doRemoveExtStoredBuffer(
-            size_type const buffer_index );
+        SIXTRL_HOST_FN virtual status_t doRemoveStoredBuffer(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN virtual status_t doPushStoredBuffer(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN virtual status_t doCollectStoredBuffer(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN virtual status_t doAddAssignAddressItem(
+            assign_item_t const& SIXTRL_RESTRICT_REF assign_item,
+            size_type* SIXTRL_RESTRICT ptr_item_index );
+
+        SIXTRL_HOST_FN virtual status_t doRemoveAssignAddressItem(
+            assign_item_key_t const& SIXTRL_RESTRICT_REF assign_item_key,
+            size_type const index_of_item_to_remove );
 
         SIXTRL_HOST_FN virtual status_t doPerformManagedAssignments(
-            size_type const dest_buffer_id, size_type const src_buffer_id );
+            assign_item_key_t const& SIXTRL_RESTRICT_REF assign_item_key );
 
         SIXTRL_HOST_FN virtual status_t doRebuildAssignItemsBufferArg();
 
@@ -748,13 +838,29 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doUpdateStoredParticlesAddrBuffer(
             ptr_buffer_t&& ptr_particles_addr_buffer ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN buffer_store_t* doGetPtrExtBufferStore(
+        SIXTRL_HOST_FN buffer_store_t* doGetPtrBufferStore(
             size_type const buffer_id ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN buffer_store_t const* doGetPtrExtBufferStore(
+        SIXTRL_HOST_FN buffer_store_t const* doGetPtrBufferStore(
             size_type const buffer_id ) const SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN size_type doFindAssingAddressItem( assign_item_t const&
+            SIXTRL_RESTRICT_REF item_to_search ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN assign_item_t const* doGetAssignAddressItem(
+            assign_item_key_t const& SIXTRL_RESTRICT_REF key,
+            size_type const item_index ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN assign_item_t* doGetAssignAddressItem(
+            assign_item_key_t const& SIXTRL_RESTRICT_REF key,
+            size_type const item_index ) SIXTRL_NOEXCEPT;
+
+
         private:
+
+        using assing_item_map_t = std::map< assign_item_key_t, buffer_t,
+            SIXTRL_CXX_NAMESPACE::TrackJobDestSrcBufferIdsLessCmp >;
+        using assign_item_keys_list_t = std::vector< assign_item_key_t >;
 
         SIXTRL_HOST_FN void doClearBaseImpl() SIXTRL_NOEXCEPT;
 
@@ -765,11 +871,12 @@ namespace SIXTRL_CXX_NAMESPACE
         std::string                     m_device_id_str;
         std::string                     m_config_str;
 
+        assing_item_map_t               m_assign_address_items;
         std::vector< size_type >        m_particle_set_indices;
         std::vector< size_type >        m_num_particles_in_sets;
         std::vector< size_type >        m_beam_monitor_indices;
-        std::vector< buffer_store_t >   m_ext_stored_buffers;
-        std::vector< assign_item_t >    m_assign_items_buffer;
+        std::vector< buffer_store_t >   m_stored_buffers;
+        assign_item_keys_list_t         m_assign_item_keys;
 
         ptr_buffer_t                    m_my_output_buffer;
         ptr_buffer_t                    m_elem_by_elem_buffer;
@@ -786,7 +893,7 @@ namespace SIXTRL_CXX_NAMESPACE
         size_type                       m_be_mon_output_buffer_offset;
         size_type                       m_elem_by_elem_output_offset;
         size_type                       m_total_num_particles_in_sets;
-        size_type                       m_num_ext_stored_buffers;
+        size_type                       m_num_stored_buffers;
 
         type_t                          m_type_id;
         elem_by_elem_order_t            m_default_elem_by_elem_order;
@@ -816,7 +923,7 @@ typedef SIXTRL_CXX_NAMESPACE::TrackJobBase NS(TrackJobBase);
 
 typedef void NS(TrackJobBase);
 
-#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+#endif /* de<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<fined( __cplusplus ) && !defined( _GPUCODE ) */
 
 #if !defined( _GPUCODE )
 #if defined( __cplusplus )
@@ -916,7 +1023,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename... Args >
-    TrackJobBase::size_type TrackJobBase::add_ext_stored_buffer( Args&&... args )
+    TrackJobBase::size_type TrackJobBase::add_stored_buffer( Args&&... args )
     {
         namespace st = SIXTRL_CXX_NAMESPACE;
         using _this_t = st::TrackJobBase;
@@ -924,50 +1031,41 @@ namespace SIXTRL_CXX_NAMESPACE
         _this_t::buffer_store_t temp_buffer_store(
             std::forward< Args >( args )... );
 
-        _this_t::size_type const buffer_id = this->doAddExtStoredBuffer(
-            std::move( temp_buffer_store ) );
+        _this_t::size_type const buffer_id =
+            this->doAddStoredBuffer( std::move( temp_buffer_store ) );
 
         return buffer_id;
     }
 
     template< typename PairIter >
     SIXTRL_HOST_FN TrackJobBase::size_type
-    TrackJobBase::assign_items_dest_src_pairs(
-        PairIter pairs_begin, PairIter pairs_end ) const SIXTRL_NOEXCEPT
+    TrackJobBase::available_assign_address_items_dest_src_pairs(
+        PairIter out_it, PairIter out_end ) const SIXTRL_NOEXCEPT
     {
         namespace st = SIXTRL_CXX_NAMESPACE;
         using _this_t = st::TrackJobBase;
         using size_t = _this_t::size_type;
         size_t num_pairs = size_t{ 0 };
-        PairIter out_it = pairs_begin;
 
-        if( ( std::distance( pairs_begin, pairs_end ) > std::ptrdiff_t{ 0 } ) &&
-            ( !this->m_assign_items_buffer.empty() ) )
+        if( !this->m_assign_address_items.empty() )
         {
-            SIXTRL_ASSERT( std::is_sorted( this->m_assign_items_buffer.begin(),
-                this->m_assign_items_buffer.end() ) );
+            SIXTRL_ASSERT( this->m_assign_address_items.size() ==
+                           this->m_assign_item_keys.size() );
 
-            auto it = this->m_assign_items_buffer.begin();
-            auto end = this->m_assign_items_buffer.end();
-            auto prev = end;
+            auto it = this->m_assign_item_keys.begin();
+            auto end = this->m_assign_item_keys.end();
 
-            while( ( it != end  ) && ( out_it != pairs_end ) )
+            while( ( out_it != out_end ) && ( it != end ) )
             {
-                if( ( prev == end ) ||
-                    ( prev->dest_buffer_id != it->dest_buffer_id ) ||
-                    ( prev->src_buffer_id  != it->src_buffer_id  ) )
-                {
-
-                    out_it->dest_buffer_id = it->dest_buffer_id;
-                    out_it->src_buffer_id  = it->src_buffer_id;
-
-                    ++out_it;
-                    ++num_pairs;
-                }
-
-                prev = it++;
+                *out_it = *it;
+                ++num_pairs;
+                ++out_it;
+                ++it;
             }
         }
+
+        std::fill( out_it, out_end, _this_t::assign_item_key_t{
+            _this_t::ILLEGAL_BUFFER_ID, _this_t::ILLEGAL_BUFFER_ID } );
 
         return num_pairs;
     }

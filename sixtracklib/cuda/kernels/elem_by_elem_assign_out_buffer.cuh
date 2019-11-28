@@ -14,15 +14,15 @@ extern "C" {
 #endif /* defined( __cplusplus ) */
 
 __global__ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda)(
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
-        SIXTRL_RESTRICT config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const out_buffer_offset_index,
     NS(buffer_size_t) const slot_size );
 
 __global__ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_debug)(
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
-        SIXTRL_RESTRICT config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const out_buffer_offset_index,
     NS(buffer_size_t) const slot_size,

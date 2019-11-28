@@ -49,6 +49,7 @@ st_ARCH_MIN_USER_DEFINED_BUFFER_ID = st_arch_status_t(1024)
 st_ARCH_EXTERNAL_BUFFER_ID = st_arch_status_t(1024)
 st_ARCH_MAX_USER_DEFINED_BUFFER_ID = st_arch_status_t(0xFFFFFFFFFFFFFFFE)
 
+
 class st_Buffer(ct.Structure):
     _fields_ = [("data_addr", ct.c_uint64),
                 ("data_size", ct.c_uint64),
@@ -95,7 +96,7 @@ st_Buffer_new_detailed.argtypes = [
     st_buffer_size_t,
     st_buffer_size_t,
     st_buffer_size_t,
-    ct.c_uint64]
+    st_buffer_flags_t]
 st_Buffer_new_detailed.restype = st_Buffer_p
 
 st_Buffer_init_from_data = sixtracklib.st_Buffer_init_from_data_ext
@@ -103,11 +104,11 @@ st_Buffer_init_from_data.argtypes = [st_Buffer_p, st_uchar_p, ct.c_uint64]
 st_Buffer_init_from_data.restypes = ct.c_int32
 
 st_Buffer_get_slot_size = sixtracklib.st_Buffer_get_slot_size_ext
-st_Buffer_get_slot_size.argtypes = [st_Buffer_p, ]
+st_Buffer_get_slot_size.argtypes = [st_Buffer_p]
 st_Buffer_get_slot_size.restype = ct.c_uint64
 
 st_Buffer_get_num_of_objects = sixtracklib.st_Buffer_get_num_of_objects_ext
-st_Buffer_get_num_of_objects.argtypes = [st_Buffer_p, ]
+st_Buffer_get_num_of_objects.argtypes = [st_Buffer_p]
 st_Buffer_get_num_of_objects.restype = ct.c_uint64
 
 st_Buffer_get_size = sixtracklib.st_Buffer_get_size_ext
@@ -241,6 +242,7 @@ st_Buffer_delete.restype = None
 
 # Helper Classes
 
+
 def st_Buffer_new_mapped_on_cbuffer(cbuffer):
     data_ptr = ct.POINTER(ct.c_ubyte)
     ptr_data = ct.cast(cbuffer.base, data_ptr)
@@ -250,15 +252,20 @@ def st_Buffer_new_mapped_on_cbuffer(cbuffer):
 # ------------------------------------------------------------------------------
 # AssignAddressItem C-API functions
 
+
+st_object_type_id_t = ct.c_uint64
+
+
 class st_AssignAddressItem(ct.Structure):
-    _fields_ = [("dest_elem_type_id", ct.c_uint64),
-                ("dest_buffer_id", ct.c_uint64),
-                ("dest_elem_index", ct.c_uint64),
-                ("dest_pointer_offset", ct.c_uint64),
-                ("src_elem_type_id", ct.c_uint64),
-                ("src_buffer_id", ct.c_uint64),
-                ("src_elem_index", ct.c_uint64),
-                ("src_pointer_offset", ct.c_uint64)]
+    _fields_ = [("dest_elem_type_id", st_object_type_id_t),
+                ("dest_buffer_id", st_buffer_size_t),
+                ("dest_elem_index", st_buffer_size_t),
+                ("dest_pointer_offset", st_buffer_size_t),
+                ("src_elem_type_id", st_object_type_id_t),
+                ("src_buffer_id", st_buffer_size_t),
+                ("src_elem_index", st_buffer_size_t),
+                ("src_pointer_offset", st_buffer_size_t)]
+
 
 st_AssignAddressItem_p = ct.POINTER(st_AssignAddressItem)
 st_NullAssignAddressItem = ct.cast(0, st_AssignAddressItem_p)
@@ -266,58 +273,97 @@ st_NullAssignAddressItem = ct.cast(0, st_AssignAddressItem_p)
 st_AssignAddressItem_perform_assignment = \
     sixtracklib.st_AssignAddressItem_perform_assignment
 st_AssignAddressItem_perform_assignment.argtypes = [
-    st_AssignAddressItem_p, st_Buffer_p, st_Buffer_p ]
+    st_AssignAddressItem_p, st_Buffer_p, st_Buffer_p]
 st_AssignAddressItem_perform_assignment.restype = st_arch_status_t
 
 st_AssignAddressItem_assign_fixed_addr = \
     sixtracklib.st_AssignAddressItem_assign_fixed_addr
 st_AssignAddressItem_assign_fixed_addr.argtypes = [
-    st_AssignAddressItem_p, st_Buffer_p, ct.c_uint64 ]
+    st_AssignAddressItem_p, st_Buffer_p, ct.c_uint64]
 st_AssignAddressItem_assign_fixed_addr.restype = st_arch_status_t
 
 st_AssignAddressItem_remap_assignment = \
     sixtracklib.st_AssignAddressItem_remap_assignment
 st_AssignAddressItem_remap_assignment.argtypes = [
-    st_AssignAddressItem_p, st_Buffer_p, ct.c_int64 ]
+    st_AssignAddressItem_p, st_Buffer_p, ct.c_int64]
 st_AssignAddressItem_remap_assignment.restype = st_arch_status_t
 
 st_AssignAddressItem_dest_pointer_from_buffer = \
     sixtracklib.st_AssignAddressItem_dest_pointer_from_buffer
 st_AssignAddressItem_dest_pointer_from_buffer.argtypes = [
-    st_AssignAddressItem_p, st_Buffer_p ]
+    st_AssignAddressItem_p, st_Buffer_p]
 st_AssignAddressItem_dest_pointer_from_buffer.restype = st_uint64_p
 
 st_AssignAddressItem_src_pointer_addr_from_buffer = \
     sixtracklib.st_AssignAddressItem_src_pointer_addr_from_buffer
 st_AssignAddressItem_src_pointer_addr_from_buffer.argtypes = [
-    st_AssignAddressItem_p, st_Buffer_p ]
+    st_AssignAddressItem_p, st_Buffer_p]
 st_AssignAddressItem_src_pointer_addr_from_buffer.restype = ct.c_uint64
 
 st_AssignAddressItem_from_buffer = \
     sixtracklib.st_AssignAddressItem_from_buffer
 st_AssignAddressItem_from_buffer.argtypes = [
-    st_AssignAddressItem_p, st_Buffer_p, st_buffer_size_t ]
+    st_AssignAddressItem_p, st_Buffer_p, st_buffer_size_t]
 st_AssignAddressItem_from_buffer.restype = st_AssignAddressItem_p
 
 st_AssignAddressItem_can_be_added = \
     sixtracklib.st_AssignAddressItem_can_be_added
 st_AssignAddressItem_can_be_added.restype = ct.c_bool
 st_AssignAddressItem_can_be_added.argtypes = [
-    st_Buffer_p, st_buffer_size_p, st_buffer_size_p, st_buffer_size_p ]
+    st_Buffer_p, st_buffer_size_p, st_buffer_size_p, st_buffer_size_p]
+
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+st_AssignAddressItem_compare_less = \
+    sixtracklib.st_AssignAddressItem_compare_less_ext
+st_AssignAddressItem_compare_less.argtypes = [
+    st_AssignAddressItem_p, st_AssignAddressItem_p]
+st_AssignAddressItem_compare_less.restype = ct.c_bool
+
+st_AssignAddressItem_are_equal = \
+    sixtracklib.st_AssignAddressItem_are_equal_ext
+st_AssignAddressItem_are_equal.argtypes = [
+    st_AssignAddressItem_p, st_AssignAddressItem_p]
+st_AssignAddressItem_are_equal.restype = ct.c_bool
+
+st_AssignAddressItem_are_not_equal = \
+    sixtracklib.st_AssignAddressItem_are_not_equal_ext
+st_AssignAddressItem_are_not_equal.argtypes = [
+    st_AssignAddressItem_p, st_AssignAddressItem_p]
+st_AssignAddressItem_are_not_equal.restype = ct.c_bool
+
+st_AssignAddressItem_dest_src_are_equal = \
+    sixtracklib.st_AssignAddressItem_dest_src_are_equal_ext
+st_AssignAddressItem_dest_src_are_equal.argtypes = [
+    st_AssignAddressItem_p, st_AssignAddressItem_p]
+st_AssignAddressItem_dest_src_are_equal.restype = ct.c_bool
+
+st_AssignAddressItem_dest_src_are_not_equal =  \
+    sixtracklib.st_AssignAddressItem_dest_src_are_not_equal_ext
+st_AssignAddressItem_dest_src_are_not_equal.argtypes = [
+    st_AssignAddressItem_p, st_AssignAddressItem_p]
+st_AssignAddressItem_dest_src_are_not_equal.restype = ct.c_bool
 
 st_AssignAddressItem_new = sixtracklib.st_AssignAddressItem_new
-st_AssignAddressItem_new.argtypes = [ st_Buffer_p ]
+st_AssignAddressItem_new.argtypes = [st_Buffer_p]
 st_AssignAddressItem_new.restype = st_AssignAddressItem_p
 
 st_AssignAddressItem_add = sixtracklib.st_AssignAddressItem_add
-st_AssignAddressItem_add.argtypes = [ st_Buffer_p,
-    ct.c_uint64, st_buffer_size_t, st_buffer_size_t, st_buffer_size_t,
-    ct.c_uint64, st_buffer_size_t, st_buffer_size_t, st_buffer_size_t ]
+st_AssignAddressItem_add.argtypes = [
+    st_Buffer_p,
+    ct.c_uint64,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    ct.c_uint64,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_buffer_size_t]
 st_AssignAddressItem_add.restype = st_AssignAddressItem_p
 
 st_AssignAddressItem_add_copy = sixtracklib.st_AssignAddressItem_add_copy
 st_AssignAddressItem_add_copy.argtypes = [
-    st_Buffer_p, st_AssignAddressItem_p ]
+    st_Buffer_p, st_AssignAddressItem_p]
 st_AssignAddressItem_add_copy.restype = st_AssignAddressItem_p
 
 # ------------------------------------------------------------------------------
@@ -937,6 +983,15 @@ def st_OutputBuffer_create_output_cbuffer(
 # -----------------------------------------------------------------------------
 # TrackJob objects
 
+
+class st_TrackJobDestSrcBufferIds(ct.Structure):
+    _fields_ = [("dest_buffer_id", st_buffer_size_t),
+                ("src_buffer_id", st_buffer_size_t)]
+
+
+st_TrackJobDestSrcBufferIds_p = ct.POINTER(st_TrackJobDestSrcBufferIds)
+st_NullTrackJobDestSrcBufferIds = ct.cast(0, st_TrackJobDestSrcBufferIds_p)
+
 st_TrackJob_p = ct.c_void_p
 st_NullTrackJob = ct.cast(0, st_TrackJob_p)
 
@@ -1008,7 +1063,8 @@ st_TrackJob_collect_particles = sixtracklib.st_TrackJob_collect_particles
 st_TrackJob_collect_particles.argtypes = [st_TrackJob_p]
 st_TrackJob_collect_particles.restype = None
 
-st_TrackJob_collect_beam_elements = sixtracklib.st_TrackJob_collect_beam_elements
+st_TrackJob_collect_beam_elements = \
+    sixtracklib.st_TrackJob_collect_beam_elements
 st_TrackJob_collect_beam_elements.argtypes = [st_TrackJob_p]
 st_TrackJob_collect_beam_elements.restype = None
 
@@ -1092,83 +1148,266 @@ st_TrackJob_get_beam_monitor_output_buffer_offset.restype = ct.c_uint64
 
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-st_TrackJob_can_fetch_particles_addr = sixtracklib.st_TrackJob_can_fetch_particles_addr
-st_TrackJob_can_fetch_particles_addr.argtypes = [ st_TrackJob_p ]
+st_TrackJob_can_fetch_particles_addr = \
+    sixtracklib.st_TrackJob_can_fetch_particles_addr
+st_TrackJob_can_fetch_particles_addr.argtypes = [st_TrackJob_p]
 st_TrackJob_can_fetch_particles_addr.restype = ct.c_bool
 
 st_TrackJob_has_particles_addr = sixtracklib.st_TrackJob_has_particles_addr
-st_TrackJob_has_particles_addr.argtypes = [ st_TrackJob_p ]
+st_TrackJob_has_particles_addr.argtypes = [st_TrackJob_p]
 st_TrackJob_has_particles_addr.restype = ct.c_bool
 
 st_TrackJob_fetch_particles_addr = sixtracklib.st_TrackJob_fetch_particles_addr
-st_TrackJob_fetch_particles_addr.argtypes = [ st_TrackJob_p ]
-st_TrackJob_fetch_particles_addr.restype  = st_arch_status_t
+st_TrackJob_fetch_particles_addr.argtypes = [st_TrackJob_p]
+st_TrackJob_fetch_particles_addr.restype = st_arch_status_t
 
 st_TrackJob_clear_particles_addr = sixtracklib.st_TrackJob_clear_particles_addr
-st_TrackJob_clear_particles_addr.argtypes = [ st_TrackJob_p, st_buffer_size_t ]
+st_TrackJob_clear_particles_addr.argtypes = [st_TrackJob_p, st_buffer_size_t]
 st_TrackJob_clear_particles_addr.restype = st_arch_status_t
 
-st_TrackJob_clear_all_particles_addr = sixtracklib.st_TrackJob_clear_all_particles_addr
-st_TrackJob_clear_all_particles_addr.argtypes = [ st_TrackJob_p ]
+st_TrackJob_clear_all_particles_addr = \
+    sixtracklib.st_TrackJob_clear_all_particles_addr
+st_TrackJob_clear_all_particles_addr.argtypes = [st_TrackJob_p]
 st_TrackJob_clear_all_particles_addr.restype = st_arch_status_t
 
 st_TrackJob_particles_addr = sixtracklib.st_TrackJob_particles_addr
-st_TrackJob_particles_addr.argtypes = [ st_TrackJob_p, st_buffer_size_t ]
+st_TrackJob_particles_addr.argtypes = [st_TrackJob_p, st_buffer_size_t]
 st_TrackJob_particles_addr.restype = st_ParticlesAddr_p
 
-st_TrackJob_particles_addr_buffer = sixtracklib.st_TrackJob_particles_addr_buffer
-st_TrackJob_particles_addr_buffer.argtypes = [ st_TrackJob_p ]
+st_TrackJob_particles_addr_buffer = \
+    sixtracklib.st_TrackJob_particles_addr_buffer
+st_TrackJob_particles_addr_buffer.argtypes = [st_TrackJob_p]
 st_TrackJob_particles_addr_buffer.restype = st_Buffer_p
 
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-st_TrackJob_ext_stored_buffers_capacity = sixtracklib.st_TrackJob_ext_stored_buffers_capacity
-st_TrackJob_ext_stored_buffers_capacity.argtypes = [ st_TrackJob_p ]
-st_TrackJob_ext_stored_buffers_capacity.restype = st_arch_size_t
+st_TrackJob_stored_buffers_capacity = \
+    sixtracklib.st_TrackJob_stored_buffers_capacity
+st_TrackJob_stored_buffers_capacity.argtypes = [st_TrackJob_p]
+st_TrackJob_stored_buffers_capacity.restype = st_arch_size_t
 
-st_TrackJob_reserve_ext_stored_buffers_capacity = sixtracklib.st_TrackJob_reserve_ext_stored_buffers_capacity
-st_TrackJob_reserve_ext_stored_buffers_capacity.argtypes = [ st_TrackJob_p ]
-st_TrackJob_reserve_ext_stored_buffers_capacity.restype = st_arch_status_t
+st_TrackJob_reserve_stored_buffers_capacity = \
+    sixtracklib.st_TrackJob_reserve_stored_buffers_capacity
+st_TrackJob_reserve_stored_buffers_capacity.argtypes = [st_TrackJob_p]
+st_TrackJob_reserve_stored_buffers_capacity.restype = st_arch_status_t
 
-st_TrackJob_has_ext_stored_buffers = sixtracklib.st_TrackJob_has_ext_stored_buffers
-st_TrackJob_has_ext_stored_buffers.argtypes = [ st_TrackJob_p ]
-st_TrackJob_has_ext_stored_buffers.restype = ct.c_bool
+st_TrackJob_has_stored_buffers = sixtracklib.st_TrackJob_has_stored_buffers
+st_TrackJob_has_stored_buffers.argtypes = [st_TrackJob_p]
+st_TrackJob_has_stored_buffers.restype = ct.c_bool
 
-st_TrackJob_num_ext_stored_buffers = sixtracklib.st_TrackJob_num_ext_stored_buffers
-st_TrackJob_num_ext_stored_buffers.argtypes = [ st_TrackJob_p ]
-st_TrackJob_num_ext_stored_buffers.restype = st_arch_size_t
+st_TrackJob_num_stored_buffers = sixtracklib.st_TrackJob_num_stored_buffers
+st_TrackJob_num_stored_buffers.argtypes = [st_TrackJob_p]
+st_TrackJob_num_stored_buffers.restype = st_arch_size_t
 
-st_TrackJob_min_ext_stored_buffer_id = sixtracklib.st_TrackJob_min_ext_stored_buffer_id
-st_TrackJob_min_ext_stored_buffer_id.argtypes = [ st_TrackJob_p ]
-st_TrackJob_min_ext_stored_buffer_id.restype = st_arch_size_t
+st_TrackJob_min_stored_buffer_id = sixtracklib.st_TrackJob_min_stored_buffer_id
+st_TrackJob_min_stored_buffer_id.argtypes = [st_TrackJob_p]
+st_TrackJob_min_stored_buffer_id.restype = st_arch_size_t
 
-st_TrackJob_max_ext_stored_buffer_id = sixtracklib.st_TrackJob_max_ext_stored_buffer_id
-st_TrackJob_max_ext_stored_buffer_id.argtypes = [ st_TrackJob_p ]
-st_TrackJob_max_ext_stored_buffer_id.restype = st_arch_size_t
+st_TrackJob_max_stored_buffer_id = sixtracklib.st_TrackJob_max_stored_buffer_id
+st_TrackJob_max_stored_buffer_id.argtypes = [st_TrackJob_p]
+st_TrackJob_max_stored_buffer_id.restype = st_arch_size_t
 
-st_TrackJob_create_ext_stored_buffer = sixtracklib.st_TrackJob_create_ext_stored_buffer
-st_TrackJob_create_ext_stored_buffer.argtypes = [ st_TrackJob_p, st_buffer_size_t ]
-st_TrackJob_create_ext_stored_buffer.restype = st_arch_size_t
+st_TrackJob_create_stored_buffer = sixtracklib.st_TrackJob_create_stored_buffer
+st_TrackJob_create_stored_buffer.argtypes = [
+    st_TrackJob_p, st_buffer_size_t]
+st_TrackJob_create_stored_buffer.restype = st_arch_size_t
 
-st_TrackJob_add_ext_stored_buffer = sixtracklib.st_TrackJob_add_ext_stored_buffer
-st_TrackJob_add_ext_stored_buffer.argtypes = [ st_TrackJob_p, st_Buffer_p, ct.c_bool, ct.c_bool ]
-st_TrackJob_add_ext_stored_buffer.restype = st_arch_size_t
+st_TrackJob_add_stored_buffer = sixtracklib.st_TrackJob_add_stored_buffer
+st_TrackJob_add_stored_buffer.argtypes = [
+    st_TrackJob_p, st_Buffer_p, ct.c_bool, ct.c_bool]
+st_TrackJob_add_stored_buffer.restype = st_arch_size_t
 
-st_TrackJob_owns_ext_stored_buffer = sixtracklib.st_TrackJob_owns_ext_stored_buffer
-st_TrackJob_owns_ext_stored_buffer.argtypes = [ st_TrackJob_p, st_arch_size_t ]
-st_TrackJob_owns_ext_stored_buffer.restype = ct.c_bool
+st_TrackJob_owns_stored_buffer = sixtracklib.st_TrackJob_owns_stored_buffer
+st_TrackJob_owns_stored_buffer.argtypes = [st_TrackJob_p, st_arch_size_t]
+st_TrackJob_owns_stored_buffer.restype = ct.c_bool
 
-st_TrackJob_remove_ext_stored_buffer = sixtracklib.st_TrackJob_remove_ext_stored_buffer
-st_TrackJob_remove_ext_stored_buffer.argtypes = [ st_TrackJob_p, st_arch_size_t ]
-st_TrackJob_remove_ext_stored_buffer.restype = st_arch_status_t
+st_TrackJob_remove_stored_buffer = sixtracklib.st_TrackJob_remove_stored_buffer
+st_TrackJob_remove_stored_buffer.argtypes = [st_TrackJob_p, st_arch_size_t]
+st_TrackJob_remove_stored_buffer.restype = st_arch_status_t
 
-st_TrackJob_ext_stored_buffer = sixtracklib.st_TrackJob_ext_stored_buffer
-st_TrackJob_ext_stored_buffer.argtypes = [ st_TrackJob_p, st_arch_size_t ]
-st_TrackJob_ext_stored_buffer.restype = st_Buffer_p
+st_TrackJob_stored_buffer = sixtracklib.st_TrackJob_stored_buffer
+st_TrackJob_stored_buffer.argtypes = [st_TrackJob_p, st_arch_size_t]
+st_TrackJob_stored_buffer.restype = st_Buffer_p
 
-st_TrackJob_const_ext_stored_buffer = sixtracklib.st_TrackJob_const_ext_stored_buffer
-st_TrackJob_const_ext_stored_buffer.argtypes = [ st_TrackJob_p, st_arch_size_t ]
-st_TrackJob_const_ext_stored_buffer.restype = st_Buffer_p
+st_TrackJob_const_stored_buffer = sixtracklib.st_TrackJob_const_stored_buffer
+st_TrackJob_const_stored_buffer.argtypes = [st_TrackJob_p, st_arch_size_t]
+st_TrackJob_const_stored_buffer.restype = st_Buffer_p
+
+st_TrackJob_push_stored_buffer = sixtracklib.st_TrackJob_push_stored_buffer
+st_TrackJob_push_stored_buffer.argtypes = [st_TrackJob_p, st_arch_size_t]
+st_TrackJob_push_stored_buffer.restype = st_arch_status_t
+
+st_TrackJob_collect_stored_buffer = \
+    sixtracklib.st_TrackJob_collect_stored_buffer
+st_TrackJob_collect_stored_buffer.argtypes = [st_TrackJob_p, st_arch_size_t]
+st_TrackJob_collect_stored_buffer.restype = st_arch_status_t
+
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+st_TrackJob_add_assign_address_item = \
+    sixtracklib.st_TrackJob_add_assign_address_item
+st_TrackJob_add_assign_address_item.argtypes = [
+    st_TrackJob_p, st_AssignAddressItem_p]
+st_TrackJob_add_assign_address_item.restype = st_AssignAddressItem_p
+
+st_TrackJob_add_assign_address_item_detailed = \
+    sixtracklib.st_TrackJob_add_assign_address_item_detailed
+st_TrackJob_add_assign_address_item_detailed.argtypes = [
+    st_TrackJob_p,
+    st_object_type_id_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_object_type_id_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_buffer_size_t]
+st_TrackJob_add_assign_address_item_detailed.restype = st_AssignAddressItem_p
+
+#st_TrackJob_remove_assign_address_item = sixtracklib.st_TrackJob_remove_assign_address_item
+#st_TrackJob_remove_assign_address_item.argtypes = [ st_TrackJob_p, st_AssignAddressItem_p ]
+#st_TrackJob_remove_assign_address_item.restype = st_arch_status_t
+
+#st_TrackJob_remove_assign_address_item_by_key_and_index = sixtracklib.st_TrackJob_remove_assign_address_item_by_key_and_index
+# st_TrackJob_remove_assign_address_item_by_key_and_index.argtypes = [
+# st_TrackJob_p, st_TrackJobDestSrcBufferIds_p, st_buffer_size_t ]
+#st_TrackJob_remove_assign_address_item_by_key_and_index.restype = st_arch_status_t
+
+st_TrackJob_has_assign_address_item = \
+    sixtracklib.st_TrackJob_has_assign_address_item
+st_TrackJob_has_assign_address_item.argtypes = [
+    st_TrackJob_p, st_AssignAddressItem_p]
+st_TrackJob_has_assign_address_item.restype = ct.c_bool
+
+st_TrackJob_has_assign_item_by_index = \
+    sixtracklib.st_TrackJob_has_assign_item_by_index
+st_TrackJob_has_assign_item_by_index.argtypes = [
+    st_TrackJob_p, st_buffer_size_t, st_buffer_size_t, st_buffer_size_t]
+st_TrackJob_has_assign_item_by_index.restype = ct.c_bool
+
+st_TrackJob_has_assign_address_item_detailed = \
+    sixtracklib.st_TrackJob_has_assign_address_item_detailed
+st_TrackJob_has_assign_address_item_detailed.argtypes = [
+    st_TrackJob_p,
+    st_object_type_id_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_object_type_id_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+]
+st_TrackJob_has_assign_address_item_detailed.restype = ct.c_bool
+
+
+st_TrackJob_index_of_assign_address_item_detailed = \
+    sixtracklib.st_TrackJob_index_of_assign_address_item_detailed
+st_TrackJob_index_of_assign_address_item_detailed.argtypes = [
+    st_TrackJob_p,
+    st_object_type_id_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_object_type_id_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+]
+st_TrackJob_index_of_assign_address_item_detailed.restype = st_buffer_size_t
+
+st_TrackJob_index_of_assign_address_item = \
+    sixtracklib.st_TrackJob_index_of_assign_address_item
+st_TrackJob_index_of_assign_address_item.argtypes = [
+    st_TrackJob_p, st_AssignAddressItem_p]
+st_TrackJob_index_of_assign_address_item.restype = st_buffer_size_t
+
+st_TrackJob_has_assign_items = sixtracklib.st_TrackJob_has_assign_items
+st_TrackJob_has_assign_items.argtypes = [
+    st_TrackJob_p, st_buffer_size_t, st_buffer_size_t]
+st_TrackJob_has_assign_items.restype = ct.c_bool
+
+st_TrackJob_num_assign_items = sixtracklib.st_TrackJob_num_assign_items
+st_TrackJob_num_assign_items.argtypes = [
+    st_TrackJob_p, st_buffer_size_t, st_buffer_size_t]
+st_TrackJob_num_assign_items.restype = st_buffer_size_t
+
+st_TrackJob_total_num_assign_items = \
+    sixtracklib.st_TrackJob_total_num_assign_items
+st_TrackJob_total_num_assign_items.argtypes = [st_TrackJob_p]
+st_TrackJob_total_num_assign_items.restype = st_buffer_size_t
+
+st_TrackJob_ptr_assign_address_item = \
+    sixtracklib.st_TrackJob_ptr_assign_address_item
+st_TrackJob_ptr_assign_address_item.argtypes = [
+    st_TrackJob_p, st_AssignAddressItem_p]
+st_TrackJob_ptr_assign_address_item.restype = st_AssignAddressItem_p
+
+st_TrackJob_ptr_assign_address_item_by_index = \
+    sixtracklib.st_TrackJob_ptr_assign_address_item_by_index
+st_TrackJob_ptr_assign_address_item_by_index.argtypes = [
+    st_TrackJob_p, st_buffer_size_t, st_buffer_size_t, st_buffer_size_t]
+st_TrackJob_ptr_assign_address_item_by_index.restype = st_AssignAddressItem_p
+
+st_TrackJob_ptr_assign_address_item_detailed = \
+    sixtracklib.st_TrackJob_ptr_assign_address_item_detailed
+st_TrackJob_ptr_assign_address_item_detailed.argtypes = [
+    st_TrackJob_p,
+    st_object_type_id_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_object_type_id_t,
+    st_buffer_size_t,
+    st_buffer_size_t,
+    st_buffer_size_t]
+st_TrackJob_ptr_assign_address_item_detailed.restype = st_AssignAddressItem_p
+
+st_TrackJob_num_distinct_available_assign_address_items_dest_src_pairs = \
+    sixtracklib.st_TrackJob_num_distinct_available_assign_address_items_dest_src_pairs
+st_TrackJob_num_distinct_available_assign_address_items_dest_src_pairs.argtypes \
+    = [ st_TrackJob_p ]
+st_TrackJob_num_distinct_available_assign_address_items_dest_src_pairs.restype \
+    = st_buffer_size_t
+
+st_TrackJob_available_assign_address_items_dest_src_pairs = \
+    sixtracklib.st_TrackJob_available_assign_address_items_dest_src_pairs
+st_TrackJob_available_assign_address_items_dest_src_pairs.argtypes = [
+    st_TrackJob_p, st_buffer_size_t, st_TrackJobDestSrcBufferIds_p]
+st_TrackJob_available_assign_address_items_dest_src_pairs.restype = \
+    st_buffer_size_t
+
+st_TrackJob_buffer_by_buffer_id = sixtracklib.st_TrackJob_buffer_by_buffer_id
+st_TrackJob_buffer_by_buffer_id.argtypes = [st_TrackJob_p, st_buffer_size_t]
+st_TrackJob_buffer_by_buffer_id.restype = st_Buffer_p
+
+st_TrackJob_const_buffer_by_buffer_id = \
+    sixtracklib.st_TrackJob_const_buffer_by_buffer_id
+st_TrackJob_const_buffer_by_buffer_id.argtypes = [
+    st_TrackJob_p, st_buffer_size_t]
+st_TrackJob_const_buffer_by_buffer_id.restype = st_Buffer_p
+
+st_TrackJob_is_buffer_by_buffer_id = \
+    sixtracklib.st_TrackJob_is_buffer_by_buffer_id
+st_TrackJob_is_buffer_by_buffer_id.argtypes = [st_TrackJob_p, st_buffer_size_t]
+st_TrackJob_is_buffer_by_buffer_id.restype = ct.c_bool
+
+st_TrackJob_is_raw_memory_by_buffer_id = \
+    sixtracklib.st_TrackJob_is_raw_memory_by_buffer_id
+st_TrackJob_is_raw_memory_by_buffer_id.argtypes = [
+    st_TrackJob_p, st_buffer_size_t]
+st_TrackJob_is_raw_memory_by_buffer_id.restype = ct.c_bool
+
+st_TrackJob_perform_all_managed_assignments = \
+    sixtracklib.st_TrackJob_perform_all_managed_assignments
+st_TrackJob_perform_all_managed_assignments.argtypes = [st_TrackJob_p]
+st_TrackJob_perform_all_managed_assignments.restype = st_arch_status_t
+
+st_TrackJob_perform_managed_assignments = \
+    sixtracklib.st_TrackJob_perform_managed_assignments
+st_TrackJob_perform_managed_assignments.argtypes = [
+    st_TrackJob_p, st_buffer_size_t, st_buffer_size_t]
+st_TrackJob_perform_managed_assignments.restype = st_arch_status_t
 
 # ==============================================================================
 # sixtracklib/control, sixtracklib/track API:
@@ -1740,7 +1979,8 @@ st_Controller_get_ptr_kernel_config_base_by_name = \
     sixtracklib.st_Controller_get_ptr_kernel_config_base_by_name
 st_Controller_get_ptr_kernel_config_base_by_name.argtypes = [
     st_ControllerBase_p, ct.c_char_p]
-st_Controller_get_ptr_kernel_config_base_by_name.restype = st_KernelConfigBase_p
+st_Controller_get_ptr_kernel_config_base_by_name.restype = \
+    st_KernelConfigBase_p
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -3276,83 +3516,84 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
 
 if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClArgument_p = ct.c_void_p
-    st_NullClArgument = ct.cast( 0, st_ClArgument_p )
+    st_NullClArgument = ct.cast(0, st_ClArgument_p)
 
     st_ClContextBase_p = ct.c_void_p
-    st_NullClContextBase = ct.cast( 0, st_ClContextBase_p )
+    st_NullClContextBase = ct.cast(0, st_ClContextBase_p)
 
     st_ClArgument_new = sixtracklib.st_ClArgument_new
-    st_ClArgument_new.argtypes = [ st_ClContextBase_p ]
+    st_ClArgument_new.argtypes = [st_ClContextBase_p]
     st_ClArgument_new.restype = st_ClArgument_p
 
     st_ClArgument_new_from_buffer = sixtracklib.st_ClArgument_new_from_buffer
-    st_ClArgument_new_from_buffer.argtypes = [ st_Buffer_p, st_ClContextBase_p ]
+    st_ClArgument_new_from_buffer.argtypes = [st_Buffer_p, st_ClContextBase_p]
     st_ClArgument_new_from_buffer.restype = st_ClArgument_p
 
     st_ClArgument_new_from_size = sixtracklib.st_ClArgument_new_from_size
-    st_ClArgument_new_from_size.argtypes = [ st_arch_size_t, st_ClContextBase_p ]
+    st_ClArgument_new_from_size.argtypes = [st_arch_size_t, st_ClContextBase_p]
     st_ClArgument_new_from_size.restype = st_ClArgument_p
 
     st_ClArgument_new_from_memory = sixtracklib.st_ClArgument_new_from_memory
     st_ClArgument_new_from_memory.argtypes = [
-            ct.c_void_p, st_arch_size_t, st_ClContextBase_p ]
+        ct.c_void_p, st_arch_size_t, st_ClContextBase_p]
     st_ClArgument_new_from_memory.restype = st_ClArgument_p
 
     st_ClArgument_delete = sixtracklib.st_ClArgument_delete
-    st_ClArgument_delete.argtypes = [ st_ClArgument_p ]
+    st_ClArgument_delete.argtypes = [st_ClArgument_p]
     st_ClArgument_delete.restype = None
 
     st_ClArgument_write = sixtracklib.st_ClArgument_write
-    st_ClArgument_write.argtypes = [ st_ClArgument_p, st_Buffer_p ]
+    st_ClArgument_write.argtypes = [st_ClArgument_p, st_Buffer_p]
     st_ClArgument_write.restype = ct.c_bool
 
     st_ClArgument_write_memory = sixtracklib.st_ClArgument_write_memory
     st_ClArgument_write_memory.argtypes = [
-        st_ClArgument_p, ct.c_void_p, st_arch_size_t ]
+        st_ClArgument_p, ct.c_void_p, st_arch_size_t]
     st_ClArgument_write_memory.restype = ct.c_bool
 
     st_ClArgument_read = sixtracklib.st_ClArgument_write
-    st_ClArgument_read.argtypes = [ st_ClArgument_p, st_Buffer_p ]
+    st_ClArgument_read.argtypes = [st_ClArgument_p, st_Buffer_p]
     st_ClArgument_read.restype = ct.c_bool
 
     st_ClArgument_read_memory = sixtracklib.st_ClArgument_read_memory
     st_ClArgument_read_memory.argtypes = [
-        st_ClArgument_p, ct.c_void_p, st_arch_size_t ]
+        st_ClArgument_p, ct.c_void_p, st_arch_size_t]
     st_ClArgument_read_memory.restype = ct.c_bool
 
     st_ClArgument_get_argument_size = \
         sixtracklib.st_ClArgument_get_argument_size
-    st_ClArgument_get_argument_size.argtypes = [ st_ClArgument_p ]
+    st_ClArgument_get_argument_size.argtypes = [st_ClArgument_p]
     st_ClArgument_get_argument_size.restype = st_arch_size_t
 
     st_ClArgument_update_region = sixtracklib.st_ClArgument_update_region
     st_ClArgument_update_region.argtypes = [
-        st_ClArgument_p, st_arch_size_t, st_arch_size_t, ct.c_void_p ]
+        st_ClArgument_p, st_arch_size_t, st_arch_size_t, ct.c_void_p]
     st_ClArgument_update_region.restype = st_arch_status_t
 
     st_ClArgument_update_regions = sixtracklib.st_ClArgument_update_regions
     st_ClArgument_update_regions.argtypes = [
         st_ClArgument_p, st_arch_size_t, st_arch_size_t_p, st_arch_size_t_p,
-        ct.POINTER( ct.c_void_p ) ]
+        ct.POINTER(ct.c_void_p)]
     st_ClArgument_update_regions.restype = st_arch_status_t
 
     st_ClArgument_uses_cobj_buffer = sixtracklib.st_ClArgument_uses_cobj_buffer
-    st_ClArgument_uses_cobj_buffer.argtypes = [ st_ClArgument_p ]
+    st_ClArgument_uses_cobj_buffer.argtypes = [st_ClArgument_p]
     st_ClArgument_uses_cobj_buffer.restype = ct.c_bool
 
     st_ClArgument_get_ptr_cobj_buffer = \
         sixtracklib.st_ClArgument_get_ptr_cobj_buffer
-    st_ClArgument_get_ptr_cobj_buffer.argtypes = [ st_ClArgument_p ]
+    st_ClArgument_get_ptr_cobj_buffer.argtypes = [st_ClArgument_p]
     st_ClArgument_get_ptr_cobj_buffer.restype = st_Buffer_p
 
     st_ClArgument_get_ptr_to_context = \
         sixtracklib.st_ClArgument_get_ptr_to_context
-    st_ClArgument_get_ptr_to_context.argtypes = [ st_ClArgument_p ]
+    st_ClArgument_get_ptr_to_context.argtypes = [st_ClArgument_p]
     st_ClArgument_get_ptr_to_context.restype = st_ClContextBase_p
 
     st_ClArgument_attach_to_context = \
         sixtracklib.st_ClArgument_attach_to_context
-    st_ClArgument_attach_to_context.argtypes = [ st_ClArgument_p, st_ClContextBase_p ]
+    st_ClArgument_attach_to_context.argtypes = [
+        st_ClArgument_p, st_ClContextBase_p]
     st_ClArgument_attach_to_context.restype = ct.c_bool
 
     # --------------------------------------------------------------------------
@@ -3365,7 +3606,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
     class st_ClNodeId(ct.Structure):
-        _fields_ = [('platform_id',ct.c_int64),('device_id',ct.c_int64)]
+        _fields_ = [('platform_id', ct.c_int64), ('device_id', ct.c_int64)]
 
     st_cl_node_id_t = st_ClNodeId
     st_ClNodeId_p = ct.POINTER(st_cl_node_id_t)
@@ -3373,40 +3614,40 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
     st_ComputeNodeId_get_platform_id = \
         sixtracklib.st_ComputeNodeId_get_platform_id_ext
-    st_ComputeNodeId_get_platform_id.argtypes = [ st_ClNodeId_p ]
+    st_ComputeNodeId_get_platform_id.argtypes = [st_ClNodeId_p]
     st_ComputeNodeId_get_platform_id.restype = st_node_platform_id_t
 
     st_ComputeNodeId_get_device_id = \
         sixtracklib.st_ComputeNodeId_get_device_id_ext
-    st_ComputeNodeId_get_device_id.argtypes = [ st_ClNodeId_p ]
+    st_ComputeNodeId_get_device_id.argtypes = [st_ClNodeId_p]
     st_ComputeNodeId_get_device_id.restype = st_node_device_id_t
 
     st_ComputeNodeId_set_platform_id = \
         sixtracklib.st_ComputeNodeId_set_platform_id_ext
     st_ComputeNodeId_set_platform_id.argtypes = [
-        st_ClNodeId_p, st_node_platform_id_t ]
+        st_ClNodeId_p, st_node_platform_id_t]
     st_ComputeNodeId_set_platform_id.restype = None
 
     st_ComputeNodeId_set_device_id = \
         sixtracklib.st_ComputeNodeId_set_device_id_ext
     st_ComputeNodeId_set_device_id.argtypes = [
-        st_ClNodeId_p, st_node_device_id_t ]
+        st_ClNodeId_p, st_node_device_id_t]
     st_ComputeNodeId_set_device_id.restype = None
 
     st_ComputeNodeId_is_valid = sixtracklib.st_ComputeNodeId_is_valid_ext
-    st_ComputeNodeId_is_valid.argtypes = [ st_ClNodeId_p ]
+    st_ComputeNodeId_is_valid.argtypes = [st_ClNodeId_p]
     st_ComputeNodeId_is_valid.restype = ct.c_bool
 
     st_ComputeNodeId_compare = sixtracklib.st_ComputeNodeId_compare_ext
-    st_ComputeNodeId_compare.argtypes = [ st_ClNodeId_p, st_ClNodeId_p ]
+    st_ComputeNodeId_compare.argtypes = [st_ClNodeId_p, st_ClNodeId_p]
     st_ComputeNodeId_compare.restype = ct.c_int
 
     st_ComputeNodeId_are_equal = sixtracklib.st_ComputeNodeId_are_equal_ext
-    st_ComputeNodeId_are_equal.argtypes = [ st_ClNodeId_p, st_ClNodeId_p ]
+    st_ComputeNodeId_are_equal.argtypes = [st_ClNodeId_p, st_ClNodeId_p]
     st_ComputeNodeId_are_equal.restype = ct.c_bool
 
     st_ComputeNodeId_from_string = sixtracklib.st_ComputeNodeId_from_string
-    st_ComputeNodeId_from_string.argtypes = [ st_ClNodeId_p, ct.c_char_p ]
+    st_ComputeNodeId_from_string.argtypes = [st_ClNodeId_p, ct.c_char_p]
     st_ComputeNodeId_from_string.restype = ct.c_int
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -3421,66 +3662,71 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_NullClNodeInfo = ct.cast(0, st_ClNodeInfo_p)
 
     st_ComputeNodeInfo_preset = sixtracklib.st_ComputeNodeInfo_preset_ext
-    st_ComputeNodeInfo_preset.argtypes = [ st_ClNodeInfo_p ]
+    st_ComputeNodeInfo_preset.argtypes = [st_ClNodeInfo_p]
     st_ComputeNodeInfo_preset.restype = st_ClNodeInfo_p
 
     st_ComputeNodeInfo_print_out = sixtracklib.st_ComputeNodeInfo_print_out
-    st_ComputeNodeInfo_print_out.argtypes = [ st_ClNodeInfo_p, st_ClNodeId_p ]
+    st_ComputeNodeInfo_print_out.argtypes = [st_ClNodeInfo_p, st_ClNodeId_p]
     st_ComputeNodeInfo_print_out.restype = None
 
     st_ComputeNodeInfo_free = sixtracklib.st_ComputeNodeInfo_free
-    st_ComputeNodeInfo_free.argtypes = [ st_ClNodeInfo_p ]
+    st_ComputeNodeInfo_free.argtypes = [st_ClNodeInfo_p]
     st_ComputeNodeInfo_free.restype = None
 
     st_ComputeNodeInfo_delete = sixtracklib.st_ComputeNodeInfo_delete
-    st_ComputeNodeInfo_delete.argtypes = [ st_ClNodeInfo_p ]
+    st_ComputeNodeInfo_delete.argtypes = [st_ClNodeInfo_p]
     st_ComputeNodeInfo_delete.restype = None
 
     st_ComputeNodeInfo_reserve = sixtracklib.st_ComputeNodeInfo_reserve
     st_ComputeNodeInfo_reserve.argtypes = [
-            st_ClNodeInfo_p, st_arch_size_t, st_arch_size_t, st_arch_size_t,
-            st_arch_size_t ]
+        st_ClNodeInfo_p, st_arch_size_t, st_arch_size_t, st_arch_size_t,
+        st_arch_size_t]
     st_ComputeNodeInfo_reserve.restype = st_ClNodeInfo_p
 
     st_ComputeNodeInfo_make = sixtracklib.st_ComputeNodeInfo_make
-    st_ComputeNodeInfo_make.argtypes = [ st_ClNodeInfo_p, st_ClNodeId,
-        ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p ]
+    st_ComputeNodeInfo_make.argtypes = [
+        st_ClNodeInfo_p,
+        st_ClNodeId,
+        ct.c_char_p,
+        ct.c_char_p,
+        ct.c_char_p,
+        ct.c_char_p]
     st_ComputeNodeInfo_make.restype = ct.c_int
 
     st_ComputeNodeInfo_is_valid = sixtracklib.st_ComputeNodeInfo_is_valid_ext
-    st_ComputeNodeInfo_is_valid.argtypes = [ st_ClNodeInfo_p ]
+    st_ComputeNodeInfo_is_valid.argtypes = [st_ClNodeInfo_p]
     st_ComputeNodeInfo_is_valid.restype = ct.c_bool
 
     st_ComputeNodeInfo_get_id = sixtracklib.st_ComputeNodeInfo_get_id_ext
-    st_ComputeNodeInfo_get_id.argtypes = [ st_ClNodeInfo_p ]
+    st_ComputeNodeInfo_get_id.argtypes = [st_ClNodeInfo_p]
     st_ComputeNodeInfo_get_id.restype = st_ClNodeId
 
     st_ComputeNodeInfo_get_platform_id = \
         sixtracklib.st_ComputeNodeInfo_get_platform_id_ext
-    st_ComputeNodeInfo_get_platform_id.argtypes = [ st_ClNodeInfo_p ]
+    st_ComputeNodeInfo_get_platform_id.argtypes = [st_ClNodeInfo_p]
     st_ComputeNodeInfo_get_platform_id.restype = st_node_platform_id_t
 
     st_ComputeNodeInfo_get_device_id = \
         sixtracklib.st_ComputeNodeInfo_get_device_id_ext
-    st_ComputeNodeInfo_get_device_id.argtypes = [ st_ClNodeInfo_p ]
+    st_ComputeNodeInfo_get_device_id.argtypes = [st_ClNodeInfo_p]
     st_ComputeNodeInfo_get_device_id.restype = st_node_device_id_t
 
     st_ComputeNodeInfo_get_arch = sixtracklib.st_ComputeNodeInfo_get_arch_ext
-    st_ComputeNodeInfo_get_arch.argtypes = [ st_ClNodeInfo_p ]
+    st_ComputeNodeInfo_get_arch.argtypes = [st_ClNodeInfo_p]
     st_ComputeNodeInfo_get_arch.restype = ct.c_char_p
 
     st_ComputeNodeInfo_get_platform = \
         sixtracklib.st_ComputeNodeInfo_get_platform_ext
-    st_ComputeNodeInfo_get_platform.argtypes = [ st_ClNodeInfo_p ]
+    st_ComputeNodeInfo_get_platform.argtypes = [st_ClNodeInfo_p]
     st_ComputeNodeInfo_get_platform.restype = ct.c_char_p
 
     st_ComputeNodeInfo_get_name = sixtracklib.st_ComputeNodeInfo_get_name_ext
-    st_ComputeNodeInfo_get_name.argtypes = [ st_ClNodeInfo_p ]
+    st_ComputeNodeInfo_get_name.argtypes = [st_ClNodeInfo_p]
     st_ComputeNodeInfo_get_name.restype = ct.c_char_p
 
     st_ComputeNodeInfo_get_description = \
         sixtracklib.st_ComputeNodeInfo_get_description_ext
-    st_ComputeNodeInfo_get_description.argtypes = [ st_ClNodeInfo_p ]
+    st_ComputeNodeInfo_get_description.argtypes = [st_ClNodeInfo_p]
     st_ComputeNodeInfo_get_description.restype = ct.c_char_p
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -3489,7 +3735,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_KERNEL_ARG_TYPE_NONE = st_kernel_arg_type_t(0x00000000)
     st_KERNEL_ARG_TYPE_VALUE = st_kernel_arg_type_t(0x00000001)
     st_KERNEL_ARG_TYPE_RAW_PTR = st_kernel_arg_type_t(0x00000002)
-    st_KERNEL_ARG_TYPE_CL_ARGUMENT = st_kernel_arg_type_t( 0x00000010)
+    st_KERNEL_ARG_TYPE_CL_ARGUMENT = st_kernel_arg_type_t(0x00000010)
     st_KERNEL_ARG_TYPE_CL_BUFFER = st_kernel_arg_type_t(0x00000020)
     st_KERNEL_ARG_TYPE_NONE = st_kernel_arg_type_t(0xffffffff)
 
@@ -3499,129 +3745,129 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
     st_ClContextBase_new_on_selected_node_id_str = \
         sixtracklib.st_ClContextBase_new_on_selected_node_id_str
-    st_ClContextBase_new_on_selected_node_id_str.argtypes = [ ct.c_char_p ]
+    st_ClContextBase_new_on_selected_node_id_str.argtypes = [ct.c_char_p]
     st_ClContextBase_new_on_selected_node_id_str.restype = st_ClContextBase_p
 
     st_ClContextBase_new_on_selected_node_id = \
         sixtracklib.st_ClContextBase_new_on_selected_node_id
-    st_ClContextBase_new_on_selected_node_id.argtypes = [ st_ClNodeId_p ]
+    st_ClContextBase_new_on_selected_node_id.argtypes = [st_ClNodeId_p]
     st_ClContextBase_new_on_selected_node_id.restype = st_ClContextBase_p
 
     st_ClContextBase_delete = sixtracklib.st_ClContextBase_delete
-    st_ClContextBase_delete.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_delete.argtypes = [st_ClContextBase_p]
     st_ClContextBase_delete.restype = None
 
     st_ClContextBase_clear = sixtracklib.st_ClContextBase_clear
-    st_ClContextBase_clear.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_clear.argtypes = [st_ClContextBase_p]
     st_ClContextBase_clear.restyp = None
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
     st_ClContextBase_get_num_available_nodes = \
         sixtracklib.st_ClContextBase_get_num_available_nodes
-    st_ClContextBase_get_num_available_nodes.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_get_num_available_nodes.argtypes = [st_ClContextBase_p]
     st_ClContextBase_get_num_available_nodes.restype = st_arch_size_t
 
     st_ClContextBase_get_available_node_info_by_index = \
         sixtracklib.st_ClContextBase_get_available_node_info_by_index
     st_ClContextBase_get_available_node_info_by_index.argtypes = [
-        st_ClContextBase_p, st_arch_size_t ]
+        st_ClContextBase_p, st_arch_size_t]
     st_ClContextBase_get_available_node_info_by_index.restype = st_ClNodeInfo_p
 
     st_ClContextBase_is_available_node_amd_platform = \
         sixtracklib.st_ClContextBase_is_available_node_amd_platform
     st_ClContextBase_is_available_node_amd_platform.argtypes = [
-        st_ClContextBase_p, st_arch_size_t ]
+        st_ClContextBase_p, st_arch_size_t]
     st_ClContextBase_is_available_node_amd_platform.restype = ct.c_bool
 
     st_ClContextBase_get_default_node_info = \
         sixtracklib.st_ClContextBase_get_default_node_info
-    st_ClContextBase_get_default_node_info.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_get_default_node_info.argtypes = [st_ClContextBase_p]
     st_ClContextBase_get_default_node_info.restype = st_ClNodeInfo_p
 
     st_ClContextBase_get_default_node_id = \
         sixtracklib.st_ClContextBase_get_default_node_id
-    st_ClContextBase_get_default_node_id.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_get_default_node_id.argtypes = [st_ClContextBase_p]
     st_ClContextBase_get_default_node_id.restype = st_ClNodeId
 
     st_ClContextBase_get_available_node_info_by_node_id = \
         sixtracklib.st_ClContextBase_get_available_node_info_by_node_id
     st_ClContextBase_get_available_node_info_by_node_id.argtypes = [
-        st_ClContextBase_p, st_ClNodeId_p ]
+        st_ClContextBase_p, st_ClNodeId_p]
     st_ClContextBase_get_available_node_info_by_node_id.restype = \
         st_ClNodeInfo_p
 
     st_ClContextBase_is_node_id_str_available = \
         sixtracklib.st_ClContextBase_is_node_id_str_available
     st_ClContextBase_is_node_id_str_available.argtypes = [
-            st_ClContextBase_p, ct.c_char_p ]
+        st_ClContextBase_p, ct.c_char_p]
     st_ClContextBase_is_node_id_str_available.restype = ct.c_bool
 
     st_ClContextBase_is_node_id_available = \
         sixtracklib.st_ClContextBase_is_node_id_available
-    st_ClContextBase_is_node_id_available.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_is_node_id_available.argtypes = [st_ClContextBase_p]
     st_ClContextBase_is_node_id_available.restype = ct.c_bool
 
     st_ClContextBase_is_node_index_available = \
         sixtracklib.st_ClContextBase_is_node_index_available
     st_ClContextBase_is_node_index_available.argtypes = [
-        st_ClContextBase_p, st_arch_size_t ]
+        st_ClContextBase_p, st_arch_size_t]
     st_ClContextBase_is_node_index_available.restype = ct.c_bool
 
     st_ClContextBase_is_platform_device_tuple_available = \
         sixtracklib.st_ClContextBase_is_platform_device_tuple_available
     st_ClContextBase_is_platform_device_tuple_available.argtypes = [
-        st_ClContextBase_p, st_node_platform_id_t, st_node_device_id_t ]
+        st_ClContextBase_p, st_node_platform_id_t, st_node_device_id_t]
     st_ClContextBase_is_platform_device_tuple_available.restype = ct.c_bool
 
     st_ClContextBase_is_node_id_default_node = \
         sixtracklib.st_ClContextBase_is_node_id_default_node
     st_ClContextBase_is_node_id_default_node.argtypes = [
-        st_ClContextBase_p, st_ClNodeId_p ]
+        st_ClContextBase_p, st_ClNodeId_p]
     st_ClContextBase_is_node_id_default_node.restype = ct.c_bool
 
     st_ClContextBase_is_node_id_str_default_node = \
         sixtracklib.st_ClContextBase_is_node_id_str_default_node
     st_ClContextBase_is_node_id_str_default_node.argtypes = [
-        st_ClContextBase_p, ct.c_char_p ]
+        st_ClContextBase_p, ct.c_char_p]
     st_ClContextBase_is_node_id_str_default_node.restype = ct.c_bool
 
     st_ClContextBase_is_platform_device_tuple_default_node = \
         sixtracklib.st_ClContextBase_is_platform_device_tuple_default_node
     st_ClContextBase_is_platform_device_tuple_default_node.argtypes = [
-        st_ClContextBase_p, st_node_platform_id_t, st_node_device_id_t ]
+        st_ClContextBase_p, st_node_platform_id_t, st_node_device_id_t]
     st_ClContextBase_is_platform_device_tuple_default_node.restype = ct.c_bool
 
     st_ClContextBase_is_node_index_default_node = \
         sixtracklib.st_ClContextBase_is_node_index_default_node
     st_ClContextBase_is_node_index_default_node.argtypes = [
-        st_ClContextBase_p, st_arch_size_t ]
+        st_ClContextBase_p, st_arch_size_t]
     st_ClContextBase_is_node_index_default_node.restype = ct.c_bool
 
     st_ClContextBase_has_selected_node = \
         sixtracklib.st_ClContextBase_has_selected_node
-    st_ClContextBase_has_selected_node.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_has_selected_node.argtypes = [st_ClContextBase_p]
     st_ClContextBase_has_selected_node.restype = ct.c_bool
 
     st_ClContextBase_get_selected_node_info = \
         sixtracklib.st_ClContextBase_get_selected_node_info
-    st_ClContextBase_get_selected_node_info.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_get_selected_node_info.argtypes = [st_ClContextBase_p]
     st_ClContextBase_get_selected_node_info.restype = st_ClNodeInfo_p
 
     st_ClContextBase_get_selected_node_id = \
         sixtracklib.st_ClContextBase_get_selected_node_id
-    st_ClContextBase_get_selected_node_id.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_get_selected_node_id.argtypes = [st_ClContextBase_p]
     st_ClContextBase_get_selected_node_id.restype = st_ClNodeId_p
 
     st_ClContextBase_get_selected_node_index = \
         sixtracklib.st_ClContextBase_get_selected_node_index
-    st_ClContextBase_get_selected_node_index.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_get_selected_node_index.argtypes = [st_ClContextBase_p]
     st_ClContextBase_get_selected_node_index.restype = st_arch_size_t
 
     st_ClContextBase_get_selected_node_id_str = \
         sixtracklib.st_ClContextBase_get_selected_node_id_str
     st_ClContextBase_get_selected_node_id_str.argtypes = [
-        st_ClContextBase_p, ct.c_char_p, st_arch_size_t ]
+        st_ClContextBase_p, ct.c_char_p, st_arch_size_t]
     st_ClContextBase_get_selected_node_id_str.restype = ct.c_bool
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -3629,13 +3875,13 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContextBase_select_node_by_node_id = \
         sixtracklib.st_ClContextBase_select_node_by_node_id
     st_ClContextBase_select_node_by_node_id.argtypes = [
-        st_ClContextBase_p, st_ClNodeId_p ]
+        st_ClContextBase_p, st_ClNodeId_p]
     st_ClContextBase_select_node_by_node_id.restype = ct.c_bool
 
     st_ClContextBase_select_node_by_index = \
         sixtracklib.st_ClContextBase_select_node_by_index
     st_ClContextBase_select_node_by_index.argtypes = [
-        st_ClContextBase_p, st_arch_size_t ]
+        st_ClContextBase_p, st_arch_size_t]
     st_ClContextBase_select_node_by_index.restype = ct.c_bool
 
     st_ClContextBase_select_node = sixtracklib.st_ClContextBase_select_node
@@ -3644,14 +3890,14 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
     st_ClContextBase_get_num_available_programs = \
         sixtracklib.st_ClContextBase_get_num_available_programs
-    st_ClContextBase_get_num_available_programs.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_get_num_available_programs.argtypes = [st_ClContextBase_p]
     st_ClContextBase_get_num_available_programs.restype = st_arch_size_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
     st_ClContextBase_print_nodes_info = \
         sixtracklib.st_ClContextBase_print_nodes_info
-    st_ClContextBase_print_nodes_info.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_print_nodes_info.argtypes = [st_ClContextBase_p]
     st_ClContextBase_print_nodes_info.restype = None
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -3659,251 +3905,251 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContextBase_add_program_file = \
         sixtracklib.st_ClContextBase_add_program_file
     st_ClContextBase_add_program_file.argtypes = [
-            st_ClContextBase_p, ct.c_char_p, ct.c_char_p ]
+        st_ClContextBase_p, ct.c_char_p, ct.c_char_p]
     st_ClContextBase_add_program_file.restype = st_arch_program_id_t
 
     st_ClContextBase_compile_program = \
         sixtracklib.st_ClContextBase_compile_program
     st_ClContextBase_compile_program.argtypes = [
-        st_ClContextBase_p, st_arch_program_id_t ]
+        st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_compile_program.restype = ct.c_bool
 
     st_ClContextBase_get_program_source_code = \
         sixtracklib.st_ClContextBase_get_program_source_code
     st_ClContextBase_get_program_source_code.argtypes = [
-        st_ClContextBase_p, st_arch_program_id_t ]
+        st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_get_program_source_code.restype = ct.c_char_p
 
     st_ClContextBase_has_program_file_path = \
         sixtracklib.st_ClContextBase_has_program_file_path
     st_ClContextBase_has_program_file_path.argtypes = [
-        st_ClContextBase_p, st_arch_program_id_t ]
+        st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_has_program_file_path.restype = ct.c_bool
 
     st_ClContextBase_get_program_path_to_file = \
         sixtracklib.st_ClContextBase_get_program_path_to_file
     st_ClContextBase_get_program_path_to_file.argtypes = [
-        st_ClContextBase_p, st_arch_program_id_t ]
+        st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_get_program_path_to_file.restype = ct.c_char_p
 
     st_ClContextBase_get_program_compile_options = \
         sixtracklib.st_ClContextBase_get_program_compile_options
     st_ClContextBase_get_program_compile_options.argtypes = [
-        st_ClContextBase_p, st_arch_program_id_t ]
+        st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_get_program_compile_options.restype = ct.c_char_p
 
     st_ClContextBase_get_program_compile_report = \
         sixtracklib.st_ClContextBase_get_program_compile_report
     st_ClContextBase_get_program_compile_report.argtypes = [
-        st_ClContextBase_p, st_arch_program_id_t ]
+        st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_get_program_compile_report.restype = ct.c_char_p
 
     st_ClContextBase_is_program_compiled = \
         sixtracklib.st_ClContextBase_is_program_compiled
     st_ClContextBase_is_program_compiled.argtypes = [
-        st_ClContextBase_p, st_arch_program_id_t ]
+        st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_is_program_compiled.restype = ct.c_bool
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
     st_ClContextBase_get_num_available_kernels = \
         sixtracklib.st_ClContextBase_get_num_available_kernels
-    st_ClContextBase_get_num_available_kernels.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_get_num_available_kernels.argtypes = [st_ClContextBase_p]
     st_ClContextBase_get_num_available_kernels.restype = st_arch_size_t
 
     st_ClContextBase_enable_kernel = \
         sixtracklib.st_ClContextBase_enable_kernel
     st_ClContextBase_enable_kernel.argtypes = [
-        st_ClContextBase_p, ct.c_char_p, st_arch_program_id_t ]
+        st_ClContextBase_p, ct.c_char_p, st_arch_program_id_t]
     st_ClContextBase_enable_kernel.restype = st_arch_kernel_id_t
 
     st_ClContextBase_find_kernel_id_by_name = \
         sixtracklib.st_ClContextBase_find_kernel_id_by_name
     st_ClContextBase_find_kernel_id_by_name.argtypes = [
-        st_ClContextBase_p, ct.c_char_p ]
+        st_ClContextBase_p, ct.c_char_p]
     st_ClContextBase_find_kernel_id_by_name.restype = st_arch_kernel_id_t
 
     st_ClContextBase_get_kernel_function_name = \
         sixtracklib.st_ClContextBase_get_kernel_function_name
     st_ClContextBase_get_kernel_function_name.argtypes = [
-            st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_kernel_function_name.restype = ct.c_char_p
 
     st_ClContextBase_get_kernel_local_mem_size = \
         sixtracklib.st_ClContextBase_get_kernel_local_mem_size
     st_ClContextBase_get_kernel_local_mem_size.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_kernel_local_mem_size.restype = st_arch_size_t
 
     st_ClContextBase_get_kernel_num_args = \
         sixtracklib.st_ClContextBase_get_kernel_num_args
     st_ClContextBase_get_kernel_num_args.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_kernel_num_args.restype = st_arch_size_t
 
     st_ClContextBase_get_kernel_work_group_size = \
         sixtracklib.st_ClContextBase_get_kernel_work_group_size
     st_ClContextBase_get_kernel_work_group_size.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
 
     st_ClContextBase_get_kernel_max_work_group_size = \
         sixtracklib.st_ClContextBase_get_kernel_max_work_group_size
     st_ClContextBase_get_kernel_max_work_group_size.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_kernel_max_work_group_size.restype = st_arch_size_t
 
     st_ClContextBase_set_kernel_work_group_size = \
         sixtracklib.st_ClContextBase_set_kernel_work_group_size
     st_ClContextBase_set_kernel_work_group_size.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t]
     st_ClContextBase_set_kernel_work_group_size.restype = ct.c_bool
 
     st_ClContextBase_get_kernel_preferred_work_group_size_multiple = \
         sixtracklib.st_ClContextBase_get_kernel_preferred_work_group_size_multiple
     st_ClContextBase_get_kernel_preferred_work_group_size_multiple.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_kernel_preferred_work_group_size_multiple.restype = \
         st_arch_size_t
 
     st_ClContextBase_get_ptr_kernel_argument = \
         sixtracklib.st_ClContextBase_get_ptr_kernel_argument
     st_ClContextBase_get_ptr_kernel_argument.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t]
     st_ClContextBase_get_ptr_kernel_argument.restype = st_ClArgument_p
 
     st_ClContextBase_get_kernel_argument_type = \
         sixtracklib.st_ClContextBase_get_kernel_argument_type
     st_ClContextBase_get_kernel_argument_type.argtypes = [
-            st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t]
     st_ClContextBase_get_kernel_argument_type.restype = st_kernel_arg_type_t
 
     st_ClContextBase_reset_single_kernel_argument = \
         sixtracklib.st_ClContextBase_reset_single_kernel_argument
     st_ClContextBase_reset_single_kernel_argument.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t]
     st_ClContextBase_reset_single_kernel_argument.restype = None
 
     st_ClContextBase_reset_kernel_arguments = \
         sixtracklib.st_ClContextBase_reset_kernel_arguments
     st_ClContextBase_reset_kernel_arguments.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_reset_kernel_arguments.restype = None
 
     st_ClContextBase_assign_kernel_argument = \
         sixtracklib.st_ClContextBase_assign_kernel_argument
     st_ClContextBase_assign_kernel_argument.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t, st_ClArgument_p ]
+        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t, st_ClArgument_p]
     st_ClContextBase_assign_kernel_argument.restype = None
 
     st_ClContextBase_assign_kernel_argument_value = \
         sixtracklib.st_ClContextBase_assign_kernel_argument_value
     st_ClContextBase_assign_kernel_argument_value.argtypes = [
         st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t, ct.c_void_p,
-        st_arch_size_t ]
+        st_arch_size_t]
 
     st_ClContextBase_assign_kernel_argument_ptr = \
         sixtracklib.st_ClContextBase_assign_kernel_argument_ptr
     st_ClContextBase_assign_kernel_argument_ptr.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t, ct.c_void_p ]
+        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t, ct.c_void_p]
     st_ClContextBase_assign_kernel_argument_ptr.restype = None
 
     st_ClContextBase_calculate_kernel_num_work_items = \
         sixtracklib.st_ClContextBase_calculate_kernel_num_work_items
     st_ClContextBase_calculate_kernel_num_work_items.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t]
     st_ClContextBase_calculate_kernel_num_work_items.restype = st_arch_size_t
 
     st_ClContextBase_run_kernel = sixtracklib.st_ClContextBase_run_kernel
     st_ClContextBase_run_kernel.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t]
     st_ClContextBase_run_kernel.restype = ct.c_bool
 
     st_ClContextBase_run_kernel_wgsize = \
         sixtracklib.st_ClContextBase_run_kernel_wgsize
     st_ClContextBase_run_kernel_wgsize.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t, st_arch_size_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t, st_arch_size_t, st_arch_size_t]
     st_ClContextBase_run_kernel_wgsize.restype = ct.c_bool
 
     st_ClContextBase_get_kernel_exec_counter = \
         sixtracklib.st_ClContextBase_get_kernel_exec_counter
     st_ClContextBase_get_kernel_exec_counter.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_kernel_exec_counter.restype = st_arch_size_t
 
     st_ClContextBase_get_last_exec_time = \
         sixtracklib.st_ClContextBase_get_last_exec_time
     st_ClContextBase_get_last_exec_time.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_last_exec_time.restype = ct.c_double
 
     st_ClContextBase_get_min_exec_time = \
         sixtracklib.st_ClContextBase_get_min_exec_time
     st_ClContextBase_get_min_exec_time.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_min_exec_time.restype = ct.c_double
 
     st_ClContextBase_get_max_exec_time = \
         sixtracklib.st_ClContextBase_get_max_exec_time
     st_ClContextBase_get_max_exec_time.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_max_exec_time.restype = ct.c_double
 
     st_ClContextBase_get_avg_exec_time = \
         sixtracklib.st_ClContextBase_get_avg_exec_time
     st_ClContextBase_get_avg_exec_time.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_avg_exec_time.restype = ct.c_double
 
     st_ClContextBase_get_last_exec_work_group_size = \
         sixtracklib.st_ClContextBase_get_last_exec_work_group_size
     st_ClContextBase_get_last_exec_work_group_size.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_last_exec_work_group_size.restype = st_arch_size_t
 
     st_ClContextBase_get_last_exec_num_work_items = \
         sixtracklib.st_ClContextBase_get_last_exec_num_work_items
     st_ClContextBase_get_last_exec_num_work_items.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_last_exec_num_work_items.restype = st_arch_size_t
 
     st_ClContextBase_reset_kernel_exec_timing = \
         sixtracklib.st_ClContextBase_reset_kernel_exec_timing
     st_ClContextBase_reset_kernel_exec_timing.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_reset_kernel_exec_timing.restype = None
 
     st_ClContextBase_get_program_id_by_kernel_id = \
         sixtracklib.st_ClContextBase_get_program_id_by_kernel_id
     st_ClContextBase_get_program_id_by_kernel_id.argtypes = [
-        st_ClContextBase_p, st_arch_kernel_id_t ]
+        st_ClContextBase_p, st_arch_kernel_id_t]
     st_ClContextBase_get_program_id_by_kernel_id.restype = st_arch_program_id_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
     st_ClContextBase_has_remapping_program = \
         sixtracklib.st_ClContextBase_has_remapping_program
-    st_ClContextBase_has_remapping_program.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_has_remapping_program.argtypes = [st_ClContextBase_p]
     st_ClContextBase_has_remapping_program.restype = ct.c_bool
 
     st_ClContextBase_remapping_program_id = \
         sixtracklib.st_ClContextBase_remapping_program_id
-    st_ClContextBase_remapping_program_id.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_remapping_program_id.argtypes = [st_ClContextBase_p]
     st_ClContextBase_remapping_program_id.restype = st_arch_program_id_t
 
     st_ClContextBase_has_remapping_kernel = \
         sixtracklib.st_ClContextBase_has_remapping_kernel
-    st_ClContextBase_has_remapping_kernel.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_has_remapping_kernel.argtypes = [st_ClContextBase_p]
     st_ClContextBase_has_remapping_kernel.restype = ct.c_bool
 
     st_ClContextBase_remapping_kernel_id = \
         sixtracklib.st_ClContextBase_remapping_kernel_id
-    st_ClContextBase_remapping_kernel_id.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_remapping_kernel_id.argtypes = [st_ClContextBase_p]
     st_ClContextBase_remapping_kernel_id.restype = st_arch_kernel_id_t
 
     st_ClContextBase_set_remapping_kernel_id = \
         sixtracklib.st_ClContextBase_set_remapping_kernel_id
     st_ClContextBase_set_remapping_kernel_id.argtypes = [
-        st_ClContextBase_p, st_arch_program_id_t ]
+        st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_set_remapping_kernel_id.restype = st_arch_status_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -3911,37 +4157,37 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContextBase_is_debug_mode_enabled = \
         sixtracklib.st_ClContextBase_is_debug_mode_enabled
     st_ClContextBase_is_debug_mode_enabled.argtypes = [
-        st_ClContextBase_p ]
+        st_ClContextBase_p]
     st_ClContextBase_is_debug_mode_enabled.restype = ct.c_bool
 
     st_ClContextBase_enable_debug_mode = \
         sixtracklib.st_ClContextBase_enable_debug_mode
-    st_ClContextBase_enable_debug_mode.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_enable_debug_mode.argtypes = [st_ClContextBase_p]
     st_ClContextBase_enable_debug_mode.restype = None
 
     st_ClContextBase_disable_debug_mode = \
         sixtracklib.st_ClContextBase_disable_debug_mode
-    st_ClContextBase_disable_debug_mode.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_disable_debug_mode.argtypes = [st_ClContextBase_p]
     st_ClContextBase_disable_debug_mode.restype = None
 
     # --------------------------------------------------------------------------
     st_context_num_turns_t = ct.c_int64
-    st_ClContext_p   = ct.c_void_p
+    st_ClContext_p = ct.c_void_p
     st_NullClContext = ct.cast(0, st_ClContext_p)
 
     st_ClContext_create = sixtracklib.st_ClContext_create
     st_ClContext_create.restype = st_ClContext_p
 
     st_ClContext_new = sixtracklib.st_ClContext_new
-    st_ClContext_new.argtypes = [ ct.c_char_p ]
+    st_ClContext_new.argtypes = [ct.c_char_p]
     st_ClContext_new.restype = st_ClContext_p
 
     st_ClContext_clear = sixtracklib.st_ClContext_clear
-    st_ClContext_clear.argtypes = [ st_ClContext_p ]
+    st_ClContext_clear.argtypes = [st_ClContext_p]
     st_ClContext_clear.restype = None
 
     st_ClContext_delete = sixtracklib.st_ClContext_delete
-    st_ClContext_delete.argtypes = [ st_ClContext_p ]
+    st_ClContext_delete.argtypes = [st_ClContext_p]
     st_ClContext_delete.restype = None
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -3949,266 +4195,321 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContext_assign_particles_arg = \
         sixtracklib.st_ClContext_assign_particles_arg
     st_ClContext_assign_particles_arg.argtypes = [
-        st_ClContext_p, st_ClArgument_p ]
+        st_ClContext_p, st_ClArgument_p]
     st_ClContext_assign_particles_arg.restype = st_arch_status_t
 
     st_ClContext_assign_particle_set_arg = \
         sixtracklib.st_ClContext_assign_particle_set_arg
     st_ClContext_assign_particle_set_arg.argtypes = [
-        st_ClContext_p, st_buffer_size_t, st_buffer_size_t ]
+        st_ClContext_p, st_buffer_size_t, st_buffer_size_t]
     st_ClContext_assign_particle_set_arg.restype = st_arch_status_t
 
     st_ClContext_assign_beam_elements_arg = \
         sixtracklib.st_ClContext_assign_beam_elements_arg
     st_ClContext_assign_beam_elements_arg.argtypes = [
-        st_ClContext_p, st_ClArgument_p ]
+        st_ClContext_p, st_ClArgument_p]
     st_ClContext_assign_beam_elements_arg.restype = st_arch_status_t
 
     st_ClContext_assign_output_buffer_arg = \
         sixtracklib.st_ClContext_assign_output_buffer_arg
     st_ClContext_assign_output_buffer_arg.argtypes = [
-        st_ClContext_p, st_ClArgument_p ]
+        st_ClContext_p, st_ClArgument_p]
     st_ClContext_assign_output_buffer_arg.restype = st_arch_status_t
 
-    #st_arch_status_t st_ClContext_assign_elem_by_elem_config_arg(
-        #st_ClContext* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg  );
+    # st_arch_status_t st_ClContext_assign_elem_by_elem_config_arg(
+    # st_ClContext* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg  );
 
     st_ClContext_assign_slot_size_arg = \
         sixtracklib.st_ClContext_assign_slot_size_arg
     st_ClContext_assign_slot_size_arg.argtypes = [
-        st_ClContext_p, st_buffer_size_t ]
+        st_ClContext_p, st_buffer_size_t]
     st_ClContext_assign_slot_size_arg.restype = st_arch_status_t
 
-    #st_arch_status_t st_ClContext_assign_status_flags_arg(
-        #st_ClContext* SIXTRL_RESTRICT ctx, cl_mem status_flags_arg );
+    # st_arch_status_t st_ClContext_assign_status_flags_arg(
+    # st_ClContext* SIXTRL_RESTRICT ctx, cl_mem status_flags_arg );
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
     st_ClContext_has_track_until_kernel = \
         sixtracklib.st_ClContext_has_track_until_kernel
-    st_ClContext_has_track_until_kernel.argtypes = [ st_ClContext_p ]
+    st_ClContext_has_track_until_kernel.argtypes = [st_ClContext_p]
     st_ClContext_has_track_until_kernel.restype = ct.c_bool
 
     st_ClContext_track_until_kernel_id = \
         sixtracklib.st_ClContext_track_until_kernel_id
-    st_ClContext_track_until_kernel_id.argtypes = [ st_ClContext_p ]
+    st_ClContext_track_until_kernel_id.argtypes = [st_ClContext_p]
     st_ClContext_track_until_kernel_id.restype = st_arch_kernel_id_t
 
     st_ClContext_set_track_until_kernel_id = \
         sixtracklib.st_ClContext_set_track_until_kernel_id
     st_ClContext_set_track_until_kernel_id.argtypes = [
-        st_ClContext_p, st_arch_kernel_id_t ]
+        st_ClContext_p, st_arch_kernel_id_t]
     st_ClContext_set_track_until_kernel_id.restype = st_arch_status_t
 
     st_ClContext_track_until = sixtracklib.st_ClContext_track_until
     st_ClContext_track_until.argtypes = [
-        st_ClContext_p, st_context_num_turns_t ]
+        st_ClContext_p, st_context_num_turns_t]
     st_ClContext_track_until.restype = st_track_status_t
 
     st_ClContext_track_until_for_particle_set = \
         sixtracklib.st_ClContext_track_until_for_particle_set
     st_ClContext_track_until_for_particle_set.argtypes = [
         st_ClContext_p, st_context_num_turns_t, st_buffer_size_t,
-            st_buffer_size_t, ct.c_bool ]
+        st_buffer_size_t, ct.c_bool]
     st_ClContext_track_until_for_particle_set.restype = st_track_status_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-    st_ClContext_has_track_line_kernel = sixtracklib.st_ClContext_has_track_line_kernel
-    st_ClContext_has_track_line_kernel.argtypes = [ st_ClContext_p ]
+    st_ClContext_has_track_line_kernel = \
+        sixtracklib.st_ClContext_has_track_line_kernel
+    st_ClContext_has_track_line_kernel.argtypes = [st_ClContext_p]
     st_ClContext_has_track_line_kernel.restype = ct.c_bool
 
-    st_ClContext_track_line_kernel_id = sixtracklib.st_ClContext_track_line_kernel_id
-    st_ClContext_track_line_kernel_id.argtypes = [ st_ClContext_p ]
+    st_ClContext_track_line_kernel_id = \
+        sixtracklib.st_ClContext_track_line_kernel_id
+    st_ClContext_track_line_kernel_id.argtypes = [st_ClContext_p]
     st_ClContext_track_line_kernel_id.restype = st_arch_kernel_id_t
 
-    st_ClContext_set_track_line_kernel_id = sixtracklib.st_ClContext_set_track_line_kernel_id
-    st_ClContext_set_track_line_kernel_id.argtypes = [ st_ClContext_p, st_arch_kernel_id_t ]
+    st_ClContext_set_track_line_kernel_id = \
+        sixtracklib.st_ClContext_set_track_line_kernel_id
+    st_ClContext_set_track_line_kernel_id.argtypes = [
+        st_ClContext_p, st_arch_kernel_id_t]
     st_ClContext_set_track_line_kernel_id.restype = st_arch_status_t
 
     st_ClContext_track_line = sixtracklib.st_ClContext_track_line
-    st_ClContext_track_line.argtypes = [ st_ClContext_p, st_buffer_size_t, st_buffer_size_t, ct.c_bool ]
+    st_ClContext_track_line.argtypes = [
+        st_ClContext_p,
+        st_buffer_size_t,
+        st_buffer_size_t,
+        ct.c_bool]
     st_ClContext_track_line.restype = st_track_status_t
 
-    st_ClContext_track_line_for_particle_set = sixtracklib.st_ClContext_track_line_for_particle_set
+    st_ClContext_track_line_for_particle_set = \
+        sixtracklib.st_ClContext_track_line_for_particle_set
     st_ClContext_track_line_for_particle_set.argtypes = [
         st_ClContext_p, st_buffer_size_t, st_buffer_size_t, ct.c_bool,
-        st_buffer_size_t, st_buffer_size_t, ct.c_bool ]
+        st_buffer_size_t, st_buffer_size_t, ct.c_bool]
     st_ClContext_track_line_for_particle_set.restype = st_track_status_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-    st_ClContext_has_track_elem_by_elem_kernel = sixtracklib.st_ClContext_has_track_elem_by_elem_kernel
-    st_ClContext_has_track_elem_by_elem_kernel.argtypes = [ st_ClContext_p ]
+    st_ClContext_has_track_elem_by_elem_kernel = \
+        sixtracklib.st_ClContext_has_track_elem_by_elem_kernel
+    st_ClContext_has_track_elem_by_elem_kernel.argtypes = [st_ClContext_p]
     st_ClContext_has_track_elem_by_elem_kernel.restype = ct.c_bool
 
-    st_ClContext_track_elem_by_elem_kernel_id = sixtracklib.st_ClContext_track_elem_by_elem_kernel_id
-    st_ClContext_track_elem_by_elem_kernel_id.argtypes = [ st_ClContext_p ]
+    st_ClContext_track_elem_by_elem_kernel_id = \
+        sixtracklib.st_ClContext_track_elem_by_elem_kernel_id
+    st_ClContext_track_elem_by_elem_kernel_id.argtypes = [st_ClContext_p]
     st_ClContext_track_elem_by_elem_kernel_id.restype = st_arch_kernel_id_t
 
-    st_ClContext_set_track_elem_by_elem_kernel_id = sixtracklib.st_ClContext_set_track_elem_by_elem_kernel_id
-    st_ClContext_set_track_elem_by_elem_kernel_id.argtypes = [ st_ClContext_p, st_arch_kernel_id_t ]
+    st_ClContext_set_track_elem_by_elem_kernel_id = \
+        sixtracklib.st_ClContext_set_track_elem_by_elem_kernel_id
+    st_ClContext_set_track_elem_by_elem_kernel_id.argtypes = [
+        st_ClContext_p, st_arch_kernel_id_t]
     st_ClContext_set_track_elem_by_elem_kernel_id.restype = st_arch_status_t
 
-    st_ClContext_track_elem_by_elem = sixtracklib.st_ClContext_track_elem_by_elem
-    st_ClContext_track_elem_by_elem.argtypes = [ st_ClContext_p, st_buffer_size_t ]
+    st_ClContext_track_elem_by_elem = \
+        sixtracklib.st_ClContext_track_elem_by_elem
+    st_ClContext_track_elem_by_elem.argtypes = [
+        st_ClContext_p, st_buffer_size_t]
     st_ClContext_track_elem_by_elem.restype = st_track_status_t
 
-    st_ClContext_track_elem_by_elem_for_particle_set = sixtracklib.st_ClContext_track_elem_by_elem_for_particle_set
+    st_ClContext_track_elem_by_elem_for_particle_set = \
+        sixtracklib.st_ClContext_track_elem_by_elem_for_particle_set
     st_ClContext_track_elem_by_elem_for_particle_set.argtypes = [
-        st_ClContext_p, st_context_num_turns_t, st_buffer_size_t, st_buffer_size_t, ct.c_bool ]
-    st_ClContext_track_elem_by_elem_for_particle_set.restype = st_track_status_t
+        st_ClContext_p,
+        st_context_num_turns_t,
+        st_buffer_size_t,
+        st_buffer_size_t,
+        ct.c_bool]
+    st_ClContext_track_elem_by_elem_for_particle_set.restype = \
+        st_track_status_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-    st_ClContext_has_assign_beam_monitor_output_kernel = sixtracklib.st_ClContext_has_assign_beam_monitor_output_kernel
+    st_ClContext_has_assign_beam_monitor_output_kernel = \
+        sixtracklib.st_ClContext_has_assign_beam_monitor_output_kernel
     st_ClContext_has_assign_beam_monitor_output_kernel.argtypes = [
-        st_ClContext_p ]
+        st_ClContext_p]
     st_ClContext_has_assign_beam_monitor_output_kernel.restype = ct.c_bool
 
-    st_ClContext_assign_beam_monitor_output_kernel_id = sixtracklib.st_ClContext_assign_beam_monitor_output_kernel_id
-    st_ClContext_assign_beam_monitor_output_kernel_id.argtypes = [ st_ClContext_p ]
-    st_ClContext_assign_beam_monitor_output_kernel_id.restype = st_arch_kernel_id_t
+    st_ClContext_assign_beam_monitor_output_kernel_id = \
+        sixtracklib.st_ClContext_assign_beam_monitor_output_kernel_id
+    st_ClContext_assign_beam_monitor_output_kernel_id.argtypes = [
+        st_ClContext_p]
+    st_ClContext_assign_beam_monitor_output_kernel_id.restype = \
+        st_arch_kernel_id_t
 
-    st_ClContext_set_assign_beam_monitor_output_kernel_id = sixtracklib.st_ClContext_set_assign_beam_monitor_output_kernel_id
-    st_ClContext_set_assign_beam_monitor_output_kernel_id.argtypes = [ st_ClContext_p, st_arch_kernel_id_t ]
-    st_ClContext_set_assign_beam_monitor_output_kernel_id.restype = st_arch_status_t
+    st_ClContext_set_assign_beam_monitor_output_kernel_id = \
+        sixtracklib.st_ClContext_set_assign_beam_monitor_output_kernel_id
+    st_ClContext_set_assign_beam_monitor_output_kernel_id.argtypes = [
+        st_ClContext_p, st_arch_kernel_id_t]
+    st_ClContext_set_assign_beam_monitor_output_kernel_id.restype = \
+        st_arch_status_t
 
-    st_ClContext_assign_beam_monitor_output = sixtracklib.st_ClContext_assign_beam_monitor_output
-    st_ClContext_assign_beam_monitor_output.argtypes = [ st_ClContext_p, st_particle_index_t, st_buffer_size_t ]
+    st_ClContext_assign_beam_monitor_output = \
+        sixtracklib.st_ClContext_assign_beam_monitor_output
+    st_ClContext_assign_beam_monitor_output.argtypes = [
+        st_ClContext_p, st_particle_index_t, st_buffer_size_t]
     st_ClContext_assign_beam_monitor_output.restype = st_arch_status_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-    st_ClContext_has_assign_elem_by_elem_output_kernel = sixtracklib.st_ClContext_has_assign_elem_by_elem_output_kernel
-    st_ClContext_has_assign_elem_by_elem_output_kernel.argtypes = [ st_ClContext_p ]
+    st_ClContext_has_assign_elem_by_elem_output_kernel = \
+        sixtracklib.st_ClContext_has_assign_elem_by_elem_output_kernel
+    st_ClContext_has_assign_elem_by_elem_output_kernel.argtypes = [
+        st_ClContext_p]
     st_ClContext_has_assign_elem_by_elem_output_kernel.restype = ct.c_bool
 
-    st_ClContext_assign_elem_by_elem_output_kernel_id = sixtracklib.st_ClContext_assign_elem_by_elem_output_kernel_id
-    st_ClContext_assign_elem_by_elem_output_kernel_id.argtypes = [ st_ClContext_p ]
+    st_ClContext_assign_elem_by_elem_output_kernel_id = \
+        sixtracklib.st_ClContext_assign_elem_by_elem_output_kernel_id
+    st_ClContext_assign_elem_by_elem_output_kernel_id.argtypes = [
+        st_ClContext_p]
     st_ClContext_assign_elem_by_elem_output_kernel_id.restype = ct.c_bool
 
-    st_ClContext_set_assign_elem_by_elem_output_kernel_id = sixtracklib.st_ClContext_set_assign_elem_by_elem_output_kernel_id
-    st_ClContext_set_assign_elem_by_elem_output_kernel_id.argtypes = [ st_ClContext_p, st_arch_kernel_id_t ]
-    st_ClContext_set_assign_elem_by_elem_output_kernel_id.restype = st_arch_status_t
+    st_ClContext_set_assign_elem_by_elem_output_kernel_id = \
+        sixtracklib.st_ClContext_set_assign_elem_by_elem_output_kernel_id
+    st_ClContext_set_assign_elem_by_elem_output_kernel_id.argtypes = [
+        st_ClContext_p, st_arch_kernel_id_t]
+    st_ClContext_set_assign_elem_by_elem_output_kernel_id.restype = \
+        st_arch_status_t
 
-    st_ClContext_assign_elem_by_elem_output = sixtracklib.st_ClContext_assign_elem_by_elem_output
-    st_ClContext_assign_elem_by_elem_output.argtypes = [ st_ClContext_p, st_buffer_size_t ]
+    st_ClContext_assign_elem_by_elem_output = \
+        sixtracklib.st_ClContext_assign_elem_by_elem_output
+    st_ClContext_assign_elem_by_elem_output.argtypes = [
+        st_ClContext_p, st_buffer_size_t]
     st_ClContext_assign_elem_by_elem_output.restype = st_arch_status_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-    st_ClContext_has_clear_beam_monitor_output_kernel = sixtracklib.st_ClContext_has_clear_beam_monitor_output_kernel
-    st_ClContext_has_clear_beam_monitor_output_kernel.argtypes = [ st_ClContext_p ]
+    st_ClContext_has_clear_beam_monitor_output_kernel = \
+        sixtracklib.st_ClContext_has_clear_beam_monitor_output_kernel
+    st_ClContext_has_clear_beam_monitor_output_kernel.argtypes = [
+        st_ClContext_p]
     st_ClContext_has_clear_beam_monitor_output_kernel.restype = ct.c_bool
 
-    st_ClContext_clear_beam_monitor_output_kernel_id = sixtracklib.st_ClContext_clear_beam_monitor_output_kernel_id
-    st_ClContext_clear_beam_monitor_output_kernel_id.argtypes = [ st_ClContext_p ]
-    st_ClContext_clear_beam_monitor_output_kernel_id.restype = st_arch_kernel_id_t
+    st_ClContext_clear_beam_monitor_output_kernel_id = \
+sixtracklib.st_ClContext_clear_beam_monitor_output_kernel_id
+    st_ClContext_clear_beam_monitor_output_kernel_id.argtypes = \
+        [st_ClContext_p]
+    st_ClContext_clear_beam_monitor_output_kernel_id.restype = \
+        st_arch_kernel_id_t
 
-    st_ClContext_set_clear_beam_monitor_output_kernel_id = sixtracklib.st_ClContext_set_clear_beam_monitor_output_kernel_id
-    st_ClContext_set_clear_beam_monitor_output_kernel_id.argtypes = [ st_ClContext_p, st_arch_kernel_id_t ]
-    st_ClContext_set_clear_beam_monitor_output_kernel_id.restype = st_arch_status_t
+    st_ClContext_set_clear_beam_monitor_output_kernel_id = \
+        sixtracklib.st_ClContext_set_clear_beam_monitor_output_kernel_id
+    st_ClContext_set_clear_beam_monitor_output_kernel_id.argtypes = [
+        st_ClContext_p, st_arch_kernel_id_t]
+    st_ClContext_set_clear_beam_monitor_output_kernel_id.restype = \
+        st_arch_status_t
 
-    st_ClContext_clear_beam_monitor_output = sixtracklib.st_ClContext_clear_beam_monitor_output
-    st_ClContext_clear_beam_monitor_output.argtypes = [ st_ClContext_p ]
+    st_ClContext_clear_beam_monitor_output = \
+        sixtracklib.st_ClContext_clear_beam_monitor_output
+    st_ClContext_clear_beam_monitor_output.argtypes = [st_ClContext_p]
     st_ClContext_clear_beam_monitor_output.restype = st_arch_status_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
     st_ClContext_has_assign_addresses_kernel = \
         sixtracklib.st_ClContext_has_assign_addresses_kernel
-    st_ClContext_has_assign_addresses_kernel.argtypes = [ st_ClContext_p ]
+    st_ClContext_has_assign_addresses_kernel.argtypes = [st_ClContext_p]
     st_ClContext_has_assign_addresses_kernel.restype = ct.c_bool
 
     st_ClContext_assign_addresses_kernel_id = \
         sixtracklib.st_ClContext_assign_addresses_kernel_id
-    st_ClContext_assign_addresses_kernel_id.argtypes = [ st_ClContext_p ]
+    st_ClContext_assign_addresses_kernel_id.argtypes = [st_ClContext_p]
     st_ClContext_assign_addresses_kernel_id.restype = st_arch_kernel_id_t
 
     st_ClContext_set_assign_addresses_kernel_id = \
         sixtracklib.st_ClContext_set_assign_addresses_kernel_id
     st_ClContext_set_assign_addresses_kernel_id.argtypes = [
-        st_ClContext_p, st_arch_kernel_id_t ]
+        st_ClContext_p, st_arch_kernel_id_t]
     st_ClContext_set_assign_addresses_kernel_id.restype = st_arch_status_t
 
     st_ClContext_assign_addresses = sixtracklib.st_ClContext_assign_addresses
     st_ClContext_assign_addresses.argtypes = [
-        st_ClContext_p, st_Buffer_p, st_Buffer_p, st_Buffer_p ]
+        st_ClContext_p, st_Buffer_p, st_Buffer_p, st_Buffer_p]
     st_ClContext_assign_addresses.restype = st_arch_status_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-    st_ClContext_selected_particle_set = sixtracklib.st_ClContext_selected_particle_set
-    st_ClContext_selected_particle_set.argtypes = [ st_ClContext_p ]
+    st_ClContext_selected_particle_set = \
+        sixtracklib.st_ClContext_selected_particle_set
+    st_ClContext_selected_particle_set.argtypes = [st_ClContext_p]
     st_ClContext_selected_particle_set.restype = st_buffer_size_t
 
-    st_ClContext_num_particles_in_selected_set = sixtracklib.st_ClContext_num_particles_in_selected_set
-    st_ClContext_num_particles_in_selected_set.argtypes = [ st_ClContext_p ]
+    st_ClContext_num_particles_in_selected_set = \
+        sixtracklib.st_ClContext_num_particles_in_selected_set
+    st_ClContext_num_particles_in_selected_set.argtypes = [st_ClContext_p]
     st_ClContext_num_particles_in_selected_set.restype = st_buffer_size_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-    st_ClContext_uses_optimized_tracking = sixtracklib.st_ClContext_uses_optimized_tracking
-    st_ClContext_uses_optimized_tracking.argtypes = [ st_ClContext_p ]
+    st_ClContext_uses_optimized_tracking = \
+        sixtracklib.st_ClContext_uses_optimized_tracking
+    st_ClContext_uses_optimized_tracking.argtypes = [st_ClContext_p]
     st_ClContext_uses_optimized_tracking.restype = ct.c_bool
 
-    st_ClContext_enable_optimized_tracking = sixtracklib.st_ClContext_enable_optimized_tracking
-    st_ClContext_enable_optimized_tracking.argtypes = [ st_ClContext_p ]
+    st_ClContext_enable_optimized_tracking = \
+        sixtracklib.st_ClContext_enable_optimized_tracking
+    st_ClContext_enable_optimized_tracking.argtypes = [st_ClContext_p]
     st_ClContext_enable_optimized_tracking.restype = None
 
-    st_ClContext_disable_optimized_tracking = sixtracklib.st_ClContext_disable_optimized_tracking
-    st_ClContext_disable_optimized_tracking.argtypes = [ st_ClContext_p ]
+    st_ClContext_disable_optimized_tracking = \
+        sixtracklib.st_ClContext_disable_optimized_tracking
+    st_ClContext_disable_optimized_tracking.argtypes = [st_ClContext_p]
     st_ClContext_disable_optimized_tracking.restype = None
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-    st_ClContext_is_beam_beam_tracking_enabled = sixtracklib.st_ClContext_is_beam_beam_tracking_enabled
-    st_ClContext_is_beam_beam_tracking_enabled.argtypes = [ st_ClContext_p ]
+    st_ClContext_is_beam_beam_tracking_enabled = \
+        sixtracklib.st_ClContext_is_beam_beam_tracking_enabled
+    st_ClContext_is_beam_beam_tracking_enabled.argtypes = [st_ClContext_p]
     st_ClContext_is_beam_beam_tracking_enabled.restype = ct.c_bool
 
-    st_ClContext_disable_beam_beam_tracking = sixtracklib.st_ClContext_disable_beam_beam_tracking
-    st_ClContext_disable_beam_beam_tracking.argtypes = [ st_ClContext_p ]
+    st_ClContext_disable_beam_beam_tracking = \
+        sixtracklib.st_ClContext_disable_beam_beam_tracking
+    st_ClContext_disable_beam_beam_tracking.argtypes = [st_ClContext_p]
     st_ClContext_disable_beam_beam_tracking.restype = None
 
-    st_ClContext_enable_beam_beam_tracking = sixtracklib.st_ClContext_enable_beam_beam_tracking
-    st_ClContext_enable_beam_beam_tracking.argtypes = [ st_ClContext_p ]
+    st_ClContext_enable_beam_beam_tracking = \
+        sixtracklib.st_ClContext_enable_beam_beam_tracking
+    st_ClContext_enable_beam_beam_tracking.argtypes = [st_ClContext_p]
     st_ClContext_enable_beam_beam_tracking.restype = None
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-    #cl_mem st_ClContext_create_elem_by_elem_config_arg(
-        #st_ClContext* SIXTRL_RESTRICT ctx );
+    # cl_mem st_ClContext_create_elem_by_elem_config_arg(
+    # st_ClContext* SIXTRL_RESTRICT ctx );
 
-    #void st_ClContext_delete_elem_by_elem_config_arg(
-        #st_ClContext* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg );
+    # void st_ClContext_delete_elem_by_elem_config_arg(
+    # st_ClContext* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg );
 
-    #st_arch_status_t st_ClContext_init_elem_by_elem_config_arg(
-        #st_ClContext* SIXTRL_RESTRICT ctx,
-        #cl_mem elem_by_elem_config_arg,
-        #st_ElemByElemConfig* SIXTRL_RESTRICT elem_by_elem_config,
-        #const st_Buffer *const SIXTRL_RESTRICT particles_buffer,
-        #st_buffer_size_t const num_particle_sets,
-        #st_buffer_size_t const* SIXTRL_RESTRICT pset_indices_begin,
-        #const st_Buffer *const SIXTRL_RESTRICT beam_elements_buffer,
-        #st_buffer_size_t const until_turn_elem_by_elem,
-        #st_particle_index_t const start_elem_id );
+    # st_arch_status_t st_ClContext_init_elem_by_elem_config_arg(
+    # st_ClContext* SIXTRL_RESTRICT ctx,
+    # cl_mem elem_by_elem_config_arg,
+    # st_ElemByElemConfig* SIXTRL_RESTRICT elem_by_elem_config,
+    # const st_Buffer *const SIXTRL_RESTRICT particles_buffer,
+    # st_buffer_size_t const num_particle_sets,
+    # st_buffer_size_t const* SIXTRL_RESTRICT pset_indices_begin,
+    # const st_Buffer *const SIXTRL_RESTRICT beam_elements_buffer,
+    # st_buffer_size_t const until_turn_elem_by_elem,
+    # st_particle_index_t const start_elem_id );
 
-    #st_arch_status_t st_ClContext_collect_elem_by_elem_config_arg(
-        #st_ClContext* SIXTRL_RESTRICT ctx,
-        #cl_mem elem_by_elem_config_arg,
-        #st_ElemByElemConfig* SIXTRL_RESTRICT elem_by_elem_config );
+    # st_arch_status_t st_ClContext_collect_elem_by_elem_config_arg(
+    # st_ClContext* SIXTRL_RESTRICT ctx,
+    # cl_mem elem_by_elem_config_arg,
+    # st_ElemByElemConfig* SIXTRL_RESTRICT elem_by_elem_config );
 
-    #st_arch_status_t st_ClContext_push_elem_by_elem_config_arg(
-        #st_ClContext* SIXTRL_RESTRICT ctx,
-        #cl_mem elem_by_elem_config_arg,
-        #const st_ElemByElemConfig *const SIXTRL_RESTRICT elem_by_elem_config );
-
+    # st_arch_status_t st_ClContext_push_elem_by_elem_config_arg(
+    # st_ClContext* SIXTRL_RESTRICT ctx,
+    # cl_mem elem_by_elem_config_arg,
+    # const st_ElemByElemConfig *const SIXTRL_RESTRICT elem_by_elem_config );
 
     st_TrackJobCl_p = ct.c_void_p
     st_NullTrackJobCl = ct.cast(0, st_TrackJobCl_p)
     st_TrackJobCl_get_context = sixtracklib.st_TrackJobCl_get_context
-    st_TrackJobCl_get_context.argtypes = [ st_TrackJobCl_p ]
+    st_TrackJobCl_get_context.argtypes = [st_TrackJobCl_p]
     st_TrackJobCl_get_context.restype = st_ClContext_p
 
 # ------------------------------------------------------------------------------

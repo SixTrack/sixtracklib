@@ -113,6 +113,22 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_FN virtual ~Buffer();
 
+        friend void swap( Buffer& SIXTRL_RESTRICT_REF lhs,
+                          Buffer& SIXTRL_RESTRICT_REF rhs ) SIXTRL_NOEXCEPT
+        {
+            using std::swap;
+
+            swap( lhs.data_addr,       rhs.data_addr       );
+            swap( lhs.data_size,       rhs.data_size       );
+            swap( lhs.header_size,     rhs.header_size     );
+            swap( lhs.data_capacity,   rhs.data_capacity   );
+            swap( lhs.slot_length,     rhs.slot_length     );
+            swap( lhs.object_addr,     rhs.object_addr     );
+            swap( lhs.num_objects,     rhs.num_objects     );
+            swap( lhs.datastore_flags, rhs.datastore_flags );
+            swap( lhs.datastore_addr,  rhs.datastore_addr  );
+        }
+
         /* ----------------------------------------------------------------- */
 
         #if !defined( _GPUCODE )

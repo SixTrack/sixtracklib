@@ -313,6 +313,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             ::NS(Buffer)* pb = ::NS(Buffer_new)( 0u );
             ::NS(Buffer)* output_buffer = ::NS(Buffer_new)( 0u );
+            ::NS(Buffer)* elem_by_elem_config_buffer = ::NS(Buffer_new)( 0u );
 
             if( ( num_elem_by_elem_objects >= size_t{ 3 } ) &&
                 ( pb != nullptr ) && ( beam_elements_buffer != nullptr ) &&
@@ -380,9 +381,10 @@ namespace SIXTRL_CXX_NAMESPACE
             /* ------------------------------------------------------------- */
             /* Create ClArguments for beam elements & the particles buffer   */
 
-            ::NS(ClArgument)* particles_buffer_arg = nullptr;
-            ::NS(ClArgument)* beam_elements_arg    = nullptr;
-            ::NS(ClArgument)* output_buffer_arg    = nullptr;
+            ::NS(ClArgument)* particles_buffer_arg    = nullptr;
+            ::NS(ClArgument)* beam_elements_arg       = nullptr;
+            ::NS(ClArgument)* output_buffer_arg       = nullptr;
+            ::NS(ClArgument)* elem_by_elem_config_arg = nullptr;
 
             if( success )
             {
@@ -410,23 +412,35 @@ namespace SIXTRL_CXX_NAMESPACE
             /* Track for num-turns without assigned beam-monitors -> should
              * not change the correctness of tracking at all */
 
-            cl_mem elem_by_elem_config_arg =
-                ::NS(ClContext_create_elem_by_elem_config_arg)( context );
+            ::NS(ElemByElemConfig)* elem_by_elem_config =
+                ::NS(ElemByElemConfig_new)( elem_by_elem_config_buffer );
+
+            ::NS(ElemByElemConfig_preset)( elem_by_elem_config );
 
             size_t const pset_indices[] = { size_t{ 0 } };
 
-            ::NS(ElemByElemConfig) elem_by_elem_config;
-
             if( success )
             {
-                status = ::NS(ClContext_init_elem_by_elem_config_arg)(
-                    context, elem_by_elem_config_arg, &elem_by_elem_config,
-                    ::NS(ClArgument_get_ptr_cobj_buffer)( particles_buffer_arg ),
-                    size_t{ 1 }, &pset_indices[ 0 ],
-                    ::NS(ClArgument_get_ptr_cobj_buffer)( beam_elements_arg ),
-                    num_turns, 0u );
+                elem_by_elem_config_arg = ::NS(ClArgument_new_from_buffer)(
+                    elem_by_elem_config_buffer, context );
 
-                success = ( status == ::NS(ARCH_STATUS_SUCCESS) );
+                status = ::NS(ElemByElemConfig_init_on_particle_sets)(
+                    elem_by_elem_config, pb, 1u, &pset_indices[ 0 ],
+                        beam_elements_buffer, 0, num_turns );
+
+                if( ( elem_by_elem_config_arg != nullptr ) &&
+                    ( status == st::ARCH_STATUS_SUCCESS ) )
+                {
+                    ::NS(ElemByElemConfig_set_output_store_address)(
+                        elem_by_elem_config, uintptr_t{ 0 } );
+
+                    success = ::NS(ClArgument_write)(
+                        elem_by_elem_config_arg, elem_by_elem_config_buffer );
+                }
+                else
+                {
+                    success = false;
+                }
 
                 if( !success )
                 {
@@ -481,8 +495,14 @@ namespace SIXTRL_CXX_NAMESPACE
                     std::cout << "status 05e : " << status << std::endl;
                 }
 
-                status = ::NS(ClContext_assign_elem_by_elem_config_arg)(
+                status = ::NS(ClContext_assign_elem_by_elem_config_buffer_arg)(
                     context, elem_by_elem_config_arg );
+
+                if( status == st::ARCH_STATUS_SUCCESS )
+                {
+                    status = ::NS(ClContext_assign_elem_by_elem_config_index_arg)(
+                        context, size_t{ 0 } );
+                }
 
                 success &= ( status == st::ARCH_STATUS_SUCCESS );
 
@@ -597,15 +617,14 @@ namespace SIXTRL_CXX_NAMESPACE
                 }
             }
 
-            ::NS(ClContext_delete_elem_by_elem_config_arg)(
-                context, elem_by_elem_config_arg );
-
             ::NS(ClArgument_delete)( particles_buffer_arg );
             ::NS(ClArgument_delete)( beam_elements_arg );
             ::NS(ClArgument_delete)( output_buffer_arg );
+            ::NS(ClArgument_delete)( elem_by_elem_config_arg );
 
             ::NS(Buffer_delete)( pb );
             ::NS(Buffer_delete)( output_buffer );
+            ::NS(Buffer_delete)( elem_by_elem_config_buffer );
 
             return success;
         }

@@ -44,10 +44,13 @@ namespace SIXTRL_CXX_NAMESPACE
     constexpr _size_t _this_t::MIN_NUM_ASSIGN_BE_MON_ARGS;
     constexpr _size_t _this_t::MIN_NUM_CLEAR_BE_MON_ARGS;
     constexpr _size_t _this_t::MIN_NUM_ASSIGN_ELEM_ARGS;
+    constexpr _size_t _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX;
 
     ClContext::ClContext( const char *const SIXTRL_RESTRICT config_str ) :
         _base_t( config_str ),
         m_num_particles_in_pset( _size_t{ 0 } ), m_pset_index( _size_t{ 0 } ),
+        m_elem_by_elem_config_index(
+            _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX ),
         m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
@@ -68,6 +71,8 @@ namespace SIXTRL_CXX_NAMESPACE
                           const char *const SIXTRL_RESTRICT config_str ) :
         _base_t( config_str ),
         m_num_particles_in_pset( _size_t{ 0 } ), m_pset_index( _size_t{ 0 } ),
+        m_elem_by_elem_config_index(
+            _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX ),
         m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
@@ -100,7 +105,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             ClContextBase::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
-            this->doAssignSlotSizeArgPrivImpl( st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignSlotSizeArgPrivImpl(
+                st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignElemByElemConfigIndexArgPrivImpl(
+                _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX );
+
             this->doAssignStatusFlagsArgPrivImpl(
                 this->internalStatusFlagsBuffer() );
         }
@@ -110,6 +121,8 @@ namespace SIXTRL_CXX_NAMESPACE
                           const char *const SIXTRL_RESTRICT config_str ) :
         _base_t( config_str ),
         m_num_particles_in_pset( _size_t{ 0 } ), m_pset_index( _size_t{ 0 } ),
+        m_elem_by_elem_config_index(
+            _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX ),
         m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
@@ -142,7 +155,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             _base_t::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
-            this->doAssignSlotSizeArgPrivImpl( st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignSlotSizeArgPrivImpl(
+                st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignElemByElemConfigIndexArgPrivImpl(
+                _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX );
+
             this->doAssignStatusFlagsArgPrivImpl(
                 this->internalStatusFlagsBuffer() );
         }
@@ -152,6 +171,8 @@ namespace SIXTRL_CXX_NAMESPACE
                           const char *const SIXTRL_RESTRICT config_str ) :
         _base_t( config_str ),
         m_num_particles_in_pset( _size_t{ 0 } ), m_pset_index( _size_t{ 0 } ),
+        m_elem_by_elem_config_index(
+            _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX ),
         m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
@@ -196,7 +217,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             _base_t::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
-            this->doAssignSlotSizeArgPrivImpl( st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignSlotSizeArgPrivImpl(
+                st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignElemByElemConfigIndexArgPrivImpl(
+                _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX );
+
             this->doAssignStatusFlagsArgPrivImpl(
                 this->internalStatusFlagsBuffer() );
         }
@@ -208,6 +235,8 @@ namespace SIXTRL_CXX_NAMESPACE
         const char *const SIXTRL_RESTRICT config_str ) :
         _base_t( config_str ),
         m_num_particles_in_pset( _size_t{ 0 } ), m_pset_index( _size_t{ 0 } ),
+        m_elem_by_elem_config_index(
+            _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX ),
         m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
@@ -239,7 +268,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             _base_t::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
-            this->doAssignSlotSizeArgPrivImpl( st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignSlotSizeArgPrivImpl(
+                st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignElemByElemConfigIndexArgPrivImpl(
+                this->m_elem_by_elem_config_index );
+
             this->doAssignStatusFlagsArgPrivImpl(
                 this->internalStatusFlagsBuffer() );
         }
@@ -470,8 +505,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         size_t const out_buffer_arg_idx[ NUM_KERNELS ] =
         {
-            size_t{ 1 }, // assign_be_mon
-            size_t{ 1 }, // clear_be_mon
+            size_t{ 1 }, // assign_beam_monitor_output_kernel
+            size_t{ 2 }, // assign_elem_by_elem_output_kernel
         };
 
         for( size_t ii = size_t{ 0 } ; ii < NUM_KERNELS ; ++ii )
@@ -497,14 +532,22 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
-    _status_t ClContext::assign_elem_by_elem_config_arg(
-        _this_t::cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg )
+    _status_t ClContext::assign_elem_by_elem_config_buffer_arg(
+            ClArgument& SIXTRL_RESTRICT_REF config_buffer_arg )
     {
         using size_t       = _size_t;
         using kernel_id_t  = _kernel_id_t;
 
-        _status_t status = st::ARCH_STATUS_SUCCESS;
+        _status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
         constexpr size_t NUM_KERNELS = size_t{ 2 };
+
+        if( ( !config_buffer_arg.usesCObjectBuffer() ) ||
+            (  config_buffer_arg.ptrCObjectBuffer() == nullptr ) )
+        {
+            return status;
+        }
+
+        status = st::ARCH_STATUS_SUCCESS;
 
         kernel_id_t kernel_ids[ NUM_KERNELS ] =
         {
@@ -522,8 +565,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         size_t const elem_by_elem_arg_idx[ NUM_KERNELS ] =
         {
-            size_t{ 3 }, // assign_be_mon
-            size_t{ 0 }, // clear_be_mon
+            size_t{ 3 }, // track_elem_by_elem_kernel
+            size_t{ 0 }, // assign_elem_by_elem_output_kernel
         };
 
         for( size_t ii = size_t{ 0 } ; ii < NUM_KERNELS ; ++ii )
@@ -543,11 +586,17 @@ namespace SIXTRL_CXX_NAMESPACE
                 continue;
             }
 
-            this->assignKernelArgumentClBuffer(
-                kernel_id, arg_idx, elem_by_elem_config_arg );
+            this->assignKernelArgument( kernel_id, arg_idx, config_buffer_arg );
         }
 
         return status;
+    }
+
+    _status_t ClContext::assign_elem_by_elem_config_index_arg(
+        _size_t const elem_by_elem_config_index )
+    {
+        return this->doAssignElemByElemConfigIndexArg(
+            elem_by_elem_config_index );
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -941,7 +990,7 @@ namespace SIXTRL_CXX_NAMESPACE
             int64_t const until_turn_arg = static_cast< int64_t >( until_turn );
 
             this->assignKernelArgumentValue(
-                kernel_id, _size_t{ 4 }, until_turn_arg );
+                kernel_id, _size_t{ 5 }, until_turn_arg );
 
             if( !this->debugMode() )
             {
@@ -998,7 +1047,7 @@ namespace SIXTRL_CXX_NAMESPACE
             int64_t const until_turn_arg = static_cast< int64_t >( until_turn );
 
             this->assignKernelArgumentValue(
-                kernel_id, _size_t{ 4 }, until_turn_arg );
+                kernel_id, _size_t{ 5 }, until_turn_arg );
 
             if( !this->debugMode() )
             {
@@ -1193,11 +1242,17 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ASSERT( static_cast< _size_t >( kernel_id ) <
                            this->numAvailableKernels() );
 
+            uint64_t const elem_by_elem_config_index_arg =
+                static_cast< uint64_t >( this->m_elem_by_elem_config_index );
+
+            this->assignKernelArgumentValue(
+                kernel_id, _size_t{ 1 }, elem_by_elem_config_index_arg );
+
             uint64_t const out_buffer_index_offset_arg =
                 static_cast< uint64_t >( out_buffer_index_offset );
 
             this->assignKernelArgumentValue(
-                kernel_id, _size_t{ 2 }, out_buffer_index_offset_arg );
+                kernel_id, _size_t{ 3 }, out_buffer_index_offset_arg );
 
             if( !this->debugMode() )
             {
@@ -1467,126 +1522,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    std::unique_ptr< _this_t::cl_buffer_t >
-    ClContext::create_elem_by_elem_config_arg()
-    {
-        if( ( this->hasSelectedNode() ) &&
-            ( this->openClContext() != nullptr ) &&
-            ( this->openClQueue() != nullptr ) )
-        {
-            _size_t const type_size = sizeof( _this_t::elem_by_elem_config_t );
-
-            return std::unique_ptr< _this_t::cl_buffer_t >(
-                new _this_t::cl_buffer_t( *this->openClContext(),
-                    CL_MEM_READ_WRITE, type_size , nullptr ) );
-        }
-
-        return std::unique_ptr< _this_t::cl_buffer_t >( nullptr );
-    }
-
-    void ClContext::delete_elem_by_elem_config_arg(
-        std::unique_ptr< SIXTRL_CXX_NAMESPACE::ClContext::cl_buffer_t >&& ptr )
-    {
-        std::unique_ptr< SIXTRL_CXX_NAMESPACE::ClContext::cl_buffer_t >
-            _local_ptr = std::move( ptr );
-
-        _local_ptr.reset( nullptr );
-    }
-
-    _this_t::status_t ClContext::init_elem_by_elem_config_arg(
-        _this_t::cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
-        _this_t::elem_by_elem_config_t& SIXTRL_RESTRICT_REF elem_by_elem_config,
-        const ::NS(Buffer) *const SIXTRL_RESTRICT pbuffer,
-        _this_t::size_type const num_psets,
-        _this_t::size_type const* SIXTRL_RESTRICT pset_indices_begin,
-        const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
-        _this_t::size_type const until_turn_elem_by_elem,
-        _this_t::particle_index_t const start_elem_id  )
-    {
-        _this_t::status_t status = ::st::ARCH_STATUS_GENERAL_FAILURE;
-
-        if( ( !this->hasSelectedNode() ) ||
-            (  this->openClQueue() == nullptr ) ||
-            (  this->openClContext() == nullptr ) )
-        {
-            return status;
-        }
-
-        status = ::NS(ElemByElemConfig_init_on_particle_sets)(
-            &elem_by_elem_config, pbuffer, num_psets, pset_indices_begin,
-                beam_elements_buffer, start_elem_id,
-                    until_turn_elem_by_elem );
-
-        if( status == ::NS(ARCH_STATUS_SUCCESS) )
-        {
-            ::NS(ElemByElemConfig_set_output_store_address)(
-                &elem_by_elem_config, uintptr_t{ 0 } );
-
-            _size_t const type_size = sizeof( _this_t::elem_by_elem_config_t );
-
-            cl_int const cl_ret = this->openClQueue()->enqueueWriteBuffer(
-                elem_by_elem_config_arg, CL_TRUE, _size_t{ 0 }, type_size,
-                    &elem_by_elem_config );
-
-            if( cl_ret != CL_SUCCESS )
-            {
-                status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
-            }
-        }
-
-        return status;
-    }
-
-    _this_t::status_t ClContext::collect_elem_by_elem_config_arg(
-        _this_t::cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
-        _this_t::elem_by_elem_config_t& SIXTRL_RESTRICT_REF
-            elem_by_elem_config )
-    {
-        _this_t::status_t status = ::st::ARCH_STATUS_GENERAL_FAILURE;
-
-        if( ( !this->hasSelectedNode() ) ||
-            (  this->openClQueue() == nullptr ) ||
-            (  this->openClContext() == nullptr ) )
-        {
-            return status;
-        }
-
-        _size_t const type_size = sizeof( _this_t::elem_by_elem_config_t );
-        cl_int const cl_ret = this->openClQueue()->enqueueReadBuffer(
-            elem_by_elem_config_arg, CL_TRUE, _size_t{ 0 }, type_size,
-                &elem_by_elem_config );
-
-        if( cl_ret == CL_SUCCESS ) status = st::ARCH_STATUS_SUCCESS;
-
-        return status;
-    }
-
-    _this_t::status_t ClContext::push_elem_by_elem_config_arg(
-        _this_t::cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
-        _this_t::elem_by_elem_config_t const& SIXTRL_RESTRICT_REF
-            elem_by_elem_config )
-    {
-        _this_t::status_t status = ::st::ARCH_STATUS_GENERAL_FAILURE;
-
-        if( ( !this->hasSelectedNode() ) ||
-            (  this->openClQueue() == nullptr ) ||
-            (  this->openClContext() == nullptr ) )
-        {
-            return status;
-        }
-
-        _size_t const type_size = sizeof( _this_t::elem_by_elem_config_t );
-        cl_int const cl_ret = this->openClQueue()->enqueueWriteBuffer(
-            elem_by_elem_config_arg, CL_TRUE, _size_t{ 0 }, type_size,
-                &elem_by_elem_config );
-
-        if( cl_ret == CL_SUCCESS ) status = st::ARCH_STATUS_SUCCESS;
-
-        return status;
-    }
-
-    /* --------------------------------------------------------------------- */
-
     bool ClContext::doSelectNode( _this_t::size_type node_index )
     {
         /* WARNING: Workaround for AMD Heisenbug */
@@ -1647,10 +1582,10 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             size_t{ 5 }, // track_until
             size_t{ 7 }, // track_line
-            size_t{ 6 }, // track_elem_elem
+            size_t{ 7 }, // track_elem_elem
             size_t{ 5 }, // assign_be_mon
             size_t{ 2 }, // clear_be_mon
-            size_t{ 4 }  // assign_elem_by_elem
+            size_t{ 5 }  // assign_elem_by_elem
         };
 
         for( size_t ii = size_t{ 0 } ; ii < NUM_KERNELS ; ++ii )
@@ -1724,10 +1659,10 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             size_t{ 4 }, // track_until
             size_t{ 6 }, // track_line
-            size_t{ 5 }, // track_elem_elem
+            size_t{ 6 }, // track_elem_elem
             size_t{ 4 }, // assign_be_mon
             size_t{ 1 }, // clear_be_mon
-            size_t{ 3 }  // assign_elem_by_elem
+            size_t{ 4 }  // assign_elem_by_elem
         };
 
         uint64_t const slot_size_arg = static_cast< uint64_t >( slot_size );
@@ -1755,6 +1690,64 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
+    _status_t ClContext::doAssignElemByElemConfigIndexArgPrivImpl(
+        _size_t const elem_by_elem_config_index )
+    {
+        _status_t status = st::ARCH_STATUS_SUCCESS;
+        constexpr size_t NUM_KERNELS = size_t{ 2 };
+
+        kernel_id_t kernel_ids[ NUM_KERNELS ] =
+        {
+            st::ARCH_ILLEGAL_KERNEL_ID, st::ARCH_ILLEGAL_KERNEL_ID
+        };
+
+        kernel_ids[ 0 ] = this->track_elem_by_elem_kernel_id();
+        kernel_ids[ 1 ] = this->assign_elem_by_elem_output_kernel_id();
+
+        size_t const min_num_kernel_args[ NUM_KERNELS ] =
+        {
+            _this_t::MIN_NUM_TRACK_ELEM_ARGS,
+            _this_t::MIN_NUM_ASSIGN_ELEM_ARGS
+        };
+
+        size_t const elem_by_elem_config_index_arg_idx[ NUM_KERNELS ] =
+        {
+            size_t{ 4 }, // track_elem_by_elem_kernel
+            size_t{ 1 }, // assign_elem_by_elem_output_kernel
+        };
+
+        uint64_t const conf_idx_arg =
+            static_cast< uint64_t >( elem_by_elem_config_index );
+
+        for( _size_t ii = _size_t{ 0 } ; ii < NUM_KERNELS ; ++ii )
+        {
+            _kernel_id_t const kernel_id = kernel_ids[ ii ];
+            _size_t const min_num_args = min_num_kernel_args[ ii ];
+
+            if( kernel_id == st::ARCH_ILLEGAL_KERNEL_ID ) continue;
+            if( min_num_args == _size_t{ 0 } ) continue;
+
+            _size_t const num_args = this->kernelNumArgs( kernel_id );
+            _size_t const arg_idx  = elem_by_elem_config_index_arg_idx[ ii ];
+
+            if( ( num_args <= arg_idx ) || ( num_args < min_num_args ) )
+            {
+                status |= st::ARCH_STATUS_GENERAL_FAILURE;
+                continue;
+            }
+
+            this->assignKernelArgumentValue(
+                kernel_id, arg_idx, conf_idx_arg );
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            this->m_elem_by_elem_config_index = elem_by_elem_config_index;
+        }
+
+        return status;
+    }
+
     _status_t ClContext::doAssignSlotSizeArg( _size_t const slot_size )
     {
         _status_t status = _base_t::doAssignSlotSizeArg( slot_size );
@@ -1765,6 +1758,13 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return status;
+    }
+
+    _status_t ClContext::doAssignElemByElemConfigIndexArg(
+        _size_t const elem_by_elem_config_index )
+    {
+        return this->doAssignElemByElemConfigIndexArgPrivImpl(
+            elem_by_elem_config_index );
     }
 
     bool ClContext::doInitDefaultProgramsPrivImpl()
@@ -2160,13 +2160,23 @@ void NS(ClContext_clear)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
         : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
-::NS(ctrl_status_t) NS(ClContext_assign_elem_by_elem_config_arg)(
-    ::NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg  )
+::NS(ctrl_status_t) NS(ClContext_assign_elem_by_elem_config_buffer_arg)(
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT elem_by_elem_config_buffer_arg )
 {
-    cl::Buffer temp_buffer( elem_by_elem_config_arg );
+    return ( ( ctx != nullptr ) &&
+             ( elem_by_elem_config_buffer_arg != nullptr ) )
+        ? ctx->assign_elem_by_elem_config_buffer_arg(
+            *elem_by_elem_config_buffer_arg )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
+}
 
+::NS(ctrl_status_t) NS(ClContext_assign_elem_by_elem_config_index_arg)(
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(buffer_size_t) const elem_by_elem_config_index )
+{
     return ( ctx != nullptr )
-        ? ctx->assign_elem_by_elem_config_arg( temp_buffer )
+        ? ctx->assign_elem_by_elem_config_index_arg( elem_by_elem_config_index )
         : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
@@ -2518,173 +2528,6 @@ void NS(ClContext_disable_beam_beam_tracking)(
     ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     if( ctx != nullptr ) ctx->disable_beam_beam_tracking();
-}
-
-/* ------------------------------------------------------------------------- */
-
-cl_mem NS(ClContext_create_elem_by_elem_config_arg)(
-    ::NS(ClContext)* SIXTRL_RESTRICT ctx )
-{
-    if( ( ctx != nullptr ) && ( ctx->hasSelectedNode() ) &&
-        ( ctx->openClQueue()   != nullptr ) &&
-        ( ctx->openClContext() != nullptr ) )
-    {
-        cl_context& ocl_ctx = ( *ctx->openClContext() )();
-        cl_int cl_ret = CL_SUCCESS;
-
-        cl_mem arg_buffer = ::clCreateBuffer( ocl_ctx, CL_MEM_READ_WRITE,
-            sizeof( ::NS(ElemByElemConfig) ), nullptr, &cl_ret );
-
-        if( cl_ret == CL_SUCCESS )
-        {
-            cl_uint ref_cnt = cl_uint{ 10000 };
-            cl_ret = ::clGetMemObjectInfo( arg_buffer, CL_MEM_REFERENCE_COUNT,
-                sizeof( cl_uint ), &ref_cnt, nullptr );
-
-            if( cl_ret == CL_SUCCESS )
-            {
-                ::clRetainMemObject( arg_buffer );
-                return arg_buffer;
-            }
-        }
-    }
-
-    return cl_mem{};
-}
-
-void NS(ClContext_delete_elem_by_elem_config_arg)(
-    ::NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg )
-{
-    cl_uint ref_cnt = cl_uint{ 10000 };
-    cl_int cl_ret = ::clGetMemObjectInfo( elem_by_elem_config_arg,
-        CL_MEM_REFERENCE_COUNT, sizeof( cl_uint ), &ref_cnt, nullptr );
-
-    if( ( cl_ret == CL_SUCCESS ) && ( ref_cnt > cl_uint{ 0 } ) )
-    {
-        ::clReleaseMemObject( elem_by_elem_config_arg );
-    }
-
-    ( void )ctx;
-}
-
-::NS(arch_status_t) NS(ClContext_init_elem_by_elem_config_arg)(
-    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
-    cl_mem elem_by_elem_config_arg,
-    ::NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
-    const ::NS(Buffer) *const SIXTRL_RESTRICT pbuffer,
-    ::NS(buffer_size_t) const num_psets,
-    ::NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
-    const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
-    ::NS(buffer_size_t) const until_turn_elem_by_elem,
-    ::NS(particle_index_t) const start_elem_id )
-{
-    ::NS(arch_status_t) status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
-
-    if( ( elem_by_elem_config == nullptr ) || ( ctx == nullptr ) ||
-        ( !ctx->hasSelectedNode() ) ||
-        ( ctx->openClQueue() == nullptr ) ||
-        ( ctx->openClContext() == nullptr ) )
-    {
-        return status;
-    }
-
-    cl_int cl_ret = ::clRetainMemObject( elem_by_elem_config_arg );
-
-    if( cl_ret == CL_SUCCESS )
-    {
-        ::cl_command_queue& ocl_queue = ( *ctx->openClQueue() )();
-
-        status = ::NS(ElemByElemConfig_init_on_particle_sets)(
-            elem_by_elem_config, pbuffer, num_psets, pset_indices_begin,
-                beam_elements_buffer, start_elem_id,
-                    until_turn_elem_by_elem );
-
-        if( status == ::NS(ARCH_STATUS_SUCCESS) )
-        {
-            ::NS(ElemByElemConfig_set_output_store_address)(
-                elem_by_elem_config, uintptr_t{ 0 } );
-
-            size_t const type_size = sizeof( ::NS(ElemByElemConfig) );
-
-            cl_ret = ::clEnqueueWriteBuffer( ocl_queue, elem_by_elem_config_arg,
-                CL_TRUE, size_t { 0 }, type_size, elem_by_elem_config,
-                    cl_uint{ 0 }, nullptr, nullptr );
-
-            if( cl_ret != CL_SUCCESS )
-            {
-                status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
-            }
-        }
-
-        ::clReleaseMemObject( elem_by_elem_config_arg );
-    }
-
-    return status;
-}
-
-::NS(arch_status_t) NS(ClContext_collect_elem_by_elem_config_arg)(
-    ::NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg,
-    ::NS(ElemByElemConfig)* SIXTRL_RESTRICT config )
-{
-    ::NS(arch_status_t) status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
-
-    if( ( config == nullptr ) || ( ctx == nullptr ) ||
-        ( !ctx->hasSelectedNode() ) ||
-        ( ctx->openClQueue() == nullptr ) ||
-        ( ctx->openClContext() == nullptr ) )
-    {
-        return status;
-    }
-
-    cl_int cl_ret = ::clRetainMemObject( elem_by_elem_config_arg );
-
-    if( cl_ret == CL_SUCCESS )
-    {
-        ::cl_command_queue& ocl_queue = ( *ctx->openClQueue() )();
-        size_t const type_size = sizeof( ::NS(ElemByElemConfig) );
-
-        cl_ret = ::clEnqueueReadBuffer( ocl_queue,
-            elem_by_elem_config_arg, CL_TRUE, size_t{ 0 }, type_size,
-                config, cl_uint{ 0 }, nullptr, nullptr );
-
-
-        if( cl_ret != CL_SUCCESS ) status = ::NS(ARCH_STATUS_SUCCESS);
-        ::clReleaseMemObject( elem_by_elem_config_arg );
-    }
-
-    return status;
-}
-
-::NS(arch_status_t) NS(ClContext_push_elem_by_elem_config_arg)(
-    ::NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg,
-    const ::NS(ElemByElemConfig) *const SIXTRL_RESTRICT config )
-{
-    ::NS(arch_status_t) status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
-
-    if( ( config == nullptr ) || ( ctx == nullptr ) ||
-        ( !ctx->hasSelectedNode() ) ||
-        ( ctx->openClQueue() == nullptr ) ||
-        ( ctx->openClContext() == nullptr ) )
-    {
-        return status;
-    }
-
-    cl_int cl_ret = ::clRetainMemObject( elem_by_elem_config_arg );
-
-    if( cl_ret == CL_SUCCESS )
-    {
-        ::cl_command_queue& ocl_queue = ( *ctx->openClQueue() )();
-        size_t const type_size = sizeof( ::NS(ElemByElemConfig) );
-
-        cl_ret = ::clEnqueueWriteBuffer( ocl_queue,
-            elem_by_elem_config_arg, CL_TRUE, size_t { 0 }, type_size,
-                config, cl_uint{ 0 }, nullptr, nullptr );
-
-        if( cl_ret != CL_SUCCESS ) status = ::NS(ARCH_STATUS_SUCCESS);
-        ::clReleaseMemObject( elem_by_elem_config_arg );
-    }
-
-    return status;
 }
 
 #endif /* !defined( __CUDACC__ ) */
