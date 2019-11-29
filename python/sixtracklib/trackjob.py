@@ -700,38 +700,6 @@ class TrackJob(object):
             return 0
 
     @staticmethod
-    def available_nodes(arch_str=None, env_var_name=None,
-                        skip_first_num_nodes=0, filter_str=None):
-        nodes = []
-        num_nodes = TrackJob.num_available_nodes( arch_str=arch_str,
-            env_var_name=env_var_name, filter_str=filter_str)
-        if num_nodes > 0:
-
-            if arch_str == 'opencl' and \
-                stconf.SIXTRACKLIB_MODULES.get('opencl',False):
-                _temp_array = st.st_ClNodeId * num_nodes
-                _env_var_name = ct.cast( 0, ct.c_char_p )
-                _filter_str = ct.cast( 0, ct.c_char_p )
-                _skip_first_num_nodes = st_arch_size_t(0)
-                if not( env_var_name is None ):
-                    env_var_name.encode('utf-8')
-                    _env_var_name = ct.c_char_p(env_var_name)
-                if not( filter_str is None):
-                    filter_str.encode('utf-8')
-                    _filter_str = ct.c_char_p(filter_str)
-                if not( skip_first_num_nodes is None):
-                    _skip_first_num_nodes=st_arch_size_t(skip_first_num_nodes)
-
-                _num_retrieved_nodes = st.st_OpenCL_get_available_nodes_detailed(
-                    _temp_array, st_arch_size_t(num_nodes),
-                    _skip_first_num_nodes, _filter_str, _env_var_name )
-                if _num_retrieved_nodes > 0:
-
-                st.st_ComputeNodeId_free_array( _temp_array )
-
-
-
-    @staticmethod
     def enabled_archs():
         enabled_archs = [
             arch_str for arch_str, flag in SIXTRACKLIB_MODULES.items() if flag]
@@ -1055,7 +1023,7 @@ class TrackJob(object):
                 SIXTRACKLIB_MODULES.get(self.arch_str, False):
             if self.ptr_st_track_job == st_NullTrackJob:
                 raise RuntimeError("TrackJob is not initialized yet")
-            return st_TrackJobCl_get_context(self.ptr_st_track_job)
+            return st.st_TrackJobCl_get_context(self.ptr_st_track_job)
         else:
             raise RuntimeError(
                 "TrackJob has no controller for this architecture")
@@ -1074,13 +1042,13 @@ class TrackJob(object):
 
         if self.arch_str == 'opencl' and \
                 SIXTRACKLIB_MODULES.get(self.arch_str, False):
-            _controller = st_TrackJobCl_get_context(self.ptr_st_track_job)
-            program_id = st_ClContextBase_add_program_file(
+            _controller = st.st_TrackJobCl_get_context(self.ptr_st_track_job)
+            program_id = st.st_ClContextBase_add_program_file(
                 _controller, ct.c_char_p(path_to_program_file),
                 ct.c_char_p(compile_options))
 
             if program_id != st.st_ARCH_ILLEGAL_PROGRAM_ID.value:
-                success = st_ClContextBase_compile_program(
+                success = st.st_ClContextBase_compile_program(
                     _controller, ct.c_uint32(program_id))
                 if not(success):
                     program_id = st.st_ARCH_ILLEGAL_PROGRAM_ID.value
@@ -1104,8 +1072,8 @@ class TrackJob(object):
 
         if self.arch_str == 'opencl' and \
                 SIXTRACKLIB_MODULES.get(self.arch_str, False):
-            _controller = st_TrackJobCl_get_context(self.ptr_st_track_job)
-            kernel_id = st_ClContextBase_enable_kernel(
+            _controller = st.st_TrackJobCl_get_context(self.ptr_st_track_job)
+            kernel_id = st.st_ClContextBase_enable_kernel(
                 _controller, ct.c_char_p(kernel_name), program_id)
 
         if kernel_id == st.st_ARCH_ILLEGAL_KERNEL_ID.value:
@@ -1528,7 +1496,7 @@ class TrackJob(object):
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
     def argument_by_buffer_id(self, buffer_id):
-        ptr_arg = st_NullClArgument.value
+        ptr_arg = st.st_NullClArgument.value
         if self.arch_str == 'opencl':
             ptr_arg = st.st_TrackJobCl_argument_by_buffer_id(
                 self.ptr_st_track_job, st_buffer_size_t(buffer_id))
@@ -1539,7 +1507,7 @@ class TrackJob(object):
         return ptr_arg
 
     def stored_buffer_argument(self, buffer_id):
-        ptr_arg = st_NullClArgument.value
+        ptr_arg = st.st_NullClArgument.value
         if self.arch_str == 'opencl':
             ptr_arg = st.st_TrackJobCl_stored_buffer_argument(
                 self.ptr_st_track_job, st_buffer_size_t(buffer_id))
