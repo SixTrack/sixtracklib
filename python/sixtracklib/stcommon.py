@@ -3596,13 +3596,13 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClNodeInfo_p = ct.POINTER(st_ClNodeInfo)
     st_NullClNodeInfo = ct.cast(0, st_ClNodeInfo_p)
 
-    st_ClNodeInfo_preset = sixtracklib.st_ComputeNodeInfo_preset_ext
-    st_ClNodeInfo_preset.argtypes = [st_ClNodeInfo_p]
-    st_ClNodeInfo_preset.restype = st_ClNodeInfo_p
+    st_ComputeNodeInfo_preset = sixtracklib.st_ComputeNodeInfo_preset_ext
+    st_ComputeNodeInfo_preset.argtypes = [st_ClNodeInfo_p]
+    st_ComputeNodeInfo_preset.restype = st_ClNodeInfo_p
 
-    st_ClNodeInfo_print_out = sixtracklib.st_ComputeNodeInfo_print_out
-    st_ClNodeInfo_print_out.argtypes = [st_ClNodeInfo_p, st_ClNodeId_p]
-    st_ClNodeInfo_print_out.restype = None
+    st_ComputeNodeInfo_print_out = sixtracklib.st_ComputeNodeInfo_print_out
+    st_ComputeNodeInfo_print_out.argtypes = [st_ClNodeInfo_p, st_ClNodeId_p]
+    st_ComputeNodeInfo_print_out.restype = None
 
     st_ComputeNodeInfo_free = sixtracklib.st_ComputeNodeInfo_free
     st_ComputeNodeInfo_free.argtypes = [st_ClNodeInfo_p]
