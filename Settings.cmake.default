@@ -50,7 +50,10 @@ set( SIXTRACKL_DEFAULT_CXX_FLAGS
 # ------------------------------------------------------------------------------
 # ---- SixTrackLib Features:
 
-option( SIXTRACKL_ENABLE_APERTURE_CHECK   "Enable xy - aperture check" ON )
+option( SIXTRACKL_ENABLE_APERTURE_CHECK "Enable xy - aperture check" ON )
+option( SIXTRACKL_ENABLE_BEAM_FIELDS    "Enable beam-fields (BB4D, BB6D) maps" ON )
+option( SIXTRACKL_ENABLE_SPACE_CHARGE   "Enable space-charge maps" ON )
+option( SIXTRACKL_ENABLE_BE_TRICUB      "Enable be_tricub map" OFF )
 
 
 # ==============================================================================
