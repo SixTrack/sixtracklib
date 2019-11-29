@@ -1,17 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .stcommon import \
-    st_ClArgument_p, st_NullClArgument, \
-    st_ClArgument_new_from_buffer, st_ClArgument_write, st_ClArgument_delete, \
-    st_ClContextBase_add_program_file, st_ClContextBase_compile_program, \
-    st_ClContextBase_enable_kernel, st_ClContextBase_find_kernel_id_by_name, \
-    st_ClContext_assign_addresses, st_ClContextBase_assign_kernel_argument, \
-    st_ClContextBase_assign_kernel_argument_value, st_object_type_id_t, \
-    st_TrackJobCl_p, st_NullTrackJob, st_TrackJobCl_get_context
 import ctypes as ct
 import cobjects
 from cobjects import CBuffer, CObject
+from .config import SIXTRACKLIB_MODULES
 import warnings
 
 from . import stcommon as st
@@ -26,11 +19,11 @@ from .beam_elements import Elements
 from .stcommon import st_TrackJobBaseNew_p, st_NullTrackJobBaseNew, \
     st_ARCH_STATUS_SUCCESS, st_ARCH_STATUS_GENERAL_FAILURE, \
     st_TRACK_SUCCESS, st_TRACK_STATUS_GENERAL_FAILURE, \
-    st_buffer_flags_t, st_arch_size_t, st_BUFFER_DEFAULT_CAPACITY, \
-    st_BUFFER_DEFAULT_DATASTORE_FLAGS, \
+    st_buffer_flags_t, st_arch_size_t, st_object_type_id_t, \
+    st_BUFFER_DEFAULT_CAPACITY, st_BUFFER_DEFAULT_DATASTORE_FLAGS, \
     st_Particles_p, st_NullParticles, st_ParticlesAddr, st_NullParticlesAddr, \
     st_track_status_t, st_track_job_collect_flag_t, st_track_job_clear_flag_t,\
-    st_out_buffer_flags_t, st_track_job_size_t, \
+    st_out_buffer_flags_t, st_track_job_size_t, st_NullTrackJob, \
     st_TrackJobNew_delete, st_TrackJobNew_track_until, \
     st_buffer_size_t, st_NullBuffer, st_Buffer_is_particles_buffer, \
     st_Particles_buffer_get_num_of_particle_blocks, \
@@ -686,16 +679,16 @@ class TrackJobBaseNew(object):
 class TrackJob(object):
     @staticmethod
     def enabled_archs():
-        enabled_archs = [arch_str for arch_str, flag in
-                         stconf.SIXTRACKLIB_MODULES.items() if flag]
-        if 'cpu' not in stconf.SIXTRACKLIB_MODULES:
+        enabled_archs = [
+            arch_str for arch_str, flag in SIXTRACKLIB_MODULES.items() if flag]
+        if 'cpu' not in SIXTRACKLIB_MODULES:
             enabled_archs.append("cpu")
         return enabled_archs
 
     @staticmethod
     def print_nodes(arch_str):
         arch_str = arch_str.strip().lower()
-        if stconf.SIXTRACKLIB_MODULES.get(arch_str, False):
+        if SIXTRACKLIB_MODULES.get(arch_str, False):
             if arch_str == "opencl":
                 context = st.st_ClContext_create()
                 st.st_ClContextBase_print_nodes_info(context)
@@ -1004,49 +997,65 @@ class TrackJob(object):
 
     @property
     def controller(self):
-        if self.arch_str != 'opencl':
+        if self.arch_str == 'opencl' and \
+                SIXTRACKLIB_MODULES.get(self.arch_str, False):
+            if self.ptr_st_track_job == st_NullTrackJob:
+                raise RuntimeError("TrackJob is not initialized yet")
+            return st_TrackJobCl_get_context(self.ptr_st_track_job)
+        else:
             raise RuntimeError(
                 "TrackJob has no controller for this architecture")
-        if self.ptr_st_track_job == st_NullTrackJob:
-            raise RuntimeError("TrackJob is not initialized yet")
-        return st_TrackJobCl_get_context(self.ptr_st_track_job)
+        return None
 
     def add_program(self, path_to_program_file, compile_options):
         if not self.allows_add_program:
             raise RuntimeError("Can not add a program to this TrackJob")
+        success = False
+        program_id = st.st_ARCH_ILLEGAL_PROGRAM_ID.value
+
         path_to_program_file = path_to_program_file.strip()
         path_to_program_file.encode('utf-8')
         compile_options = compile_options.strip()
         compile_options.encode('utf-8')
 
-        _controller = st_TrackJobCl_get_context(self.ptr_st_track_job)
-        program_id = st_ClContextBase_add_program_file(
-            _controller, ct.c_char_p(path_to_program_file), ct.c_char_p(compile_options))
+        if self.arch_str == 'opencl' and \
+                SIXTRACKLIB_MODULES.get(self.arch_str, False):
+            _controller = st_TrackJobCl_get_context(self.ptr_st_track_job)
+            program_id = st_ClContextBase_add_program_file(
+                _controller, ct.c_char_p(path_to_program_file),
+                ct.c_char_p(compile_options))
 
-        if program_id == 0xffffffff:
-            raise RuntimeError("Unable to load program")
+            if program_id != st.st_ARCH_ILLEGAL_PROGRAM_ID.value:
+                success = st_ClContextBase_compile_program(
+                    _controller, ct.c_uint32(program_id))
+                if not(success):
+                    program_id = st.st_ARCH_ILLEGAL_PROGRAM_ID.value
+            else:
+                raise RuntimeError("Unable to load program")
 
-        success = st_ClContextBase_compile_program(
-            _controller, ct.c_uint32(program_id))
-
-        if not success:
+        if program_id == st.st_ARCH_ILLEGAL_PROGRAM_ID.value:
             raise RuntimeError("Unable to compile program")
-
         return program_id
 
     def enable_kernel(self, program_id, kernel_name):
         if not self.allows_enable_kernel:
             raise RuntimeError("Can not enable a kernel at this TrackJob")
+
+        if program_id == st.st_ARCH_ILLEGAL_PROGRAM_ID.value:
+            raise ValueError("Illegal program_id provided")
+
+        kernel_id = st.st_ARCH_ILLEGAL_KERNEL_ID.value
         kernel_name = kernel_name.strip()
         kernel_name.encode('utf-8')
 
-        _controller = st_TrackJobCl_get_context(self.ptr_st_track_job)
-        kernel_id = st_ClContextBase_enable_kernel(
-            _controller, ct.c_char_p(kernel_name), program_id)
+        if self.arch_str == 'opencl' and \
+                SIXTRACKLIB_MODULES.get(self.arch_str, False):
+            _controller = st_TrackJobCl_get_context(self.ptr_st_track_job)
+            kernel_id = st_ClContextBase_enable_kernel(
+                _controller, ct.c_char_p(kernel_name), program_id)
 
-        if kernel_id == 0xffffffff:
+        if kernel_id == st.st_ARCH_ILLEGAL_KERNEL_ID.value:
             raise RuntimeError("Unable to enable kernel")
-
         return kernel_id
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
