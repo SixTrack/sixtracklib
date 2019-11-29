@@ -204,7 +204,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
             if self._ptr_ctrl != st_NullClContextBase and \
                     program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
                 success = st_ClContextBase_compile_program(
-                    self._ptr_ctrl, st_arch_program_id(program_id))
+                    self._ptr_ctrl, st_arch_program_id_t(program_id))
             return success
 
         def enable_kernel(self, program_id, kernel_name):
@@ -215,7 +215,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                     program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
                 kernel_id = st_ClContextBase_enable_kernel(
                     self._ptr_ctrl, ct.c_char_p(kernel_name),
-                    st_arch_program_id(program_id))
+                    st_arch_program_id_t(program_id))
             return kernel_id
 
         def find_kernel_by_name(self, kernel_name):
@@ -232,11 +232,11 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                     self._ptr_ctrl != st_NullClContextBase:
                 if isinstance(arg, ClArgument):
                     st_ClContextBase_assign_kernel_argument(
-                        self._ptr_ctrl, st_arch_kernel_id(kernel_id),
+                        self._ptr_ctrl, st_arch_kernel_id_t(kernel_id),
                         st_arch_size_t(arg_index), arg.ptr_argument)
                 elif isinstance(arg, type(st_ClArgument_p)):
                     st_ClContextBase_assign_kernel_argument(
-                        self._ptr_ctrl, st_arch_kernel_id(kernel_id),
+                        self._ptr_ctrl, st_arch_kernel_id_t(kernel_id),
                         st_arch_size_t(arg_index), arg)
                 else:
                     raise ValueError(
@@ -247,7 +247,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
             if kernel_id != st_ARCH_ILLEGAL_KERNEL_ID.value and \
                     isinstance(val_p, type(ct.c_void_p)) and val_size > 0:
                 st_ClContextBase_assign_kernel_argument_value(
-                    self._ptr_ctrl, st_arch_kernel_id(kernel_id),
+                    self._ptr_ctrl, st_arch_kernel_id_t(kernel_id),
                     st_arch_size_t(arg_index), val_p, st_arch_size_t(val_size))
             return self
 

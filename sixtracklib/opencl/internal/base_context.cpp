@@ -353,7 +353,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     bool ClContextBase::isNodeIndexAvailable(
-         _this_t::size_type const node_index ) const SIXTRL_RESTRICT
+         _this_t::size_type const node_index ) const SIXTRL_NOEXCEPT
     {
         return ( node_index < this->numAvailableNodes() );
     }
@@ -489,9 +489,9 @@ namespace SIXTRL_CXX_NAMESPACE
             char _temp[ 5 ] = { '\0', '\0', '\0', '\0', '\0' };
 
             std::strncpy( &_temp[ 0 ], ::NS(ComputeNodeInfo_get_platform)(
-                node_info ), 5u );
+                node_info ), 4u );
 
-            std::transform( &_temp[ 0 ], &_temp[ 5 ], &_temp[ 0 ],
+            std::transform( &_temp[ 0 ], &_temp[ 4 ], &_temp[ 0 ],
                 [](unsigned char c){ return std::tolower(c); } );
 
             is_amd_platform = ( 0 == std::strncmp( &_temp[ 0 ], "amd ", 4u ) );

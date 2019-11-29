@@ -298,6 +298,7 @@ bool NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
 
     using size_t      = ::NS(buffer_size_t);
     using particles_t = ::NS(Particles);
+    using nelements_t = ::NS(particle_num_elements_t);
     using paddr_t     = ::NS(ParticlesAddr);
     using object_t    = ::NS(Object);
 
@@ -345,7 +346,7 @@ bool NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
                 object_t const* obj =
                     ::NS(Buffer_get_const_object)( particles_buffer, ii );
 
-                if( ( paddr->num_particles != size_t{ 0 } ) ||
+                if( ( paddr->num_particles != nelements_t{ 0 } ) ||
                     ( obj == nullptr ) || ( ::NS(Object_get_type_id)( obj ) !=
                       ::NS(OBJECT_TYPE_LAST_AVAILABLE) ) )
                 {
@@ -369,6 +370,7 @@ bool NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
     using particles_t = ::NS(Particles);
     using paddr_t     = ::NS(ParticlesAddr);
     using object_t    = ::NS(Object);
+    using nelements_t = ::NS(particle_num_elements_t);
 
     if( ( particles_buffer != nullptr ) &&
         ( !::NS(Buffer_needs_remapping)( particles_buffer ) ) )
@@ -427,7 +429,7 @@ bool NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
                 object_t const* obj =
                     ::NS(Buffer_get_const_object)( particles_buffer, ii );
 
-                if( ( paddr->num_particles != size_t{ 0 } ) ||
+                if( ( paddr->num_particles != nelements_t{ 0 } ) ||
                     ( obj == nullptr ) ||
                     ( ::NS(Object_get_type_id)( obj ) !=
                       ::NS(OBJECT_TYPE_LAST_AVAILABLE) ) )
