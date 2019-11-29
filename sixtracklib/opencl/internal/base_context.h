@@ -348,7 +348,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN node_id_t defaultNodeId() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool isNodeIndexAvailable(
-            size_type const node_index ) const SIXTRL_RESTRICT;
+            size_type const node_index ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool isNodeIdAvailable(
             node_id_t const node_id ) const SIXTRL_NOEXCEPT;

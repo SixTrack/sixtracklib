@@ -353,7 +353,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     bool ClContextBase::isNodeIndexAvailable(
-         _this_t::size_type const node_index ) const SIXTRL_RESTRICT
+         _this_t::size_type const node_index ) const SIXTRL_NOEXCEPT
     {
         return ( node_index < this->numAvailableNodes() );
     }
