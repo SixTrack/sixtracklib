@@ -689,13 +689,20 @@ class TrackJob(object):
     def num_available_nodes(arch_str=None, env_var_name=None, filter_str=None):
         if not( arch_str is None ) and arch_str == 'opencl' and \
             stconf.SIXTRACKLIB_MODULES.get( 'opencl', False ):
-            if not( env_var_name is None ) and not( filter_str is None ):
-                env_var_name.encode('utf-8')
-                filter_str.encode('utf-8')
-                return st.st_OpenCL_num_available_nodes_detailed(
-                    ct.c_char_p(env_var_name), ct.c_char_p(filter_str))
+            if not( filter_str is None ):
+                filter_str = filter_str.strip().encode('utf-8')
+                _filter_str = ct.c_char_p( filter_str )
             else:
-                return st.st_OpenCL_num_available_nodes()
+                _filter_str = ct.cast( 0, ct.c_char_p)
+
+            if not( env_var_name is None ):
+                env_var_name = env_var_name.strip().encode('utf-8')
+                _env_var_name = ct.c_char_p( env_var_name )
+            else:
+                _env_var_name = ct.cast( 0, ct.c_char_p )
+
+            return st.st_OpenCL_num_available_nodes_detailed(
+                    _filter_str, _env_var_name )
         else:
             return 0
 
@@ -1035,10 +1042,8 @@ class TrackJob(object):
         success = False
         program_id = st.st_ARCH_ILLEGAL_PROGRAM_ID.value
 
-        path_to_program_file = path_to_program_file.strip()
-        path_to_program_file.encode('utf-8')
-        compile_options = compile_options.strip()
-        compile_options.encode('utf-8')
+        path_to_program_file = path_to_program_file.strip().encode('utf-8')
+        compile_options = compile_options.strip().encode('utf-8')
 
         if self.arch_str == 'opencl' and \
                 SIXTRACKLIB_MODULES.get(self.arch_str, False):
@@ -1067,8 +1072,7 @@ class TrackJob(object):
             raise ValueError("Illegal program_id provided")
 
         kernel_id = st.st_ARCH_ILLEGAL_KERNEL_ID.value
-        kernel_name = kernel_name.strip()
-        kernel_name.encode('utf-8')
+        kernel_name = kernel_name.strip().encode('utf-8')
 
         if self.arch_str == 'opencl' and \
                 SIXTRACKLIB_MODULES.get(self.arch_str, False):
