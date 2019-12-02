@@ -3342,6 +3342,21 @@ namespace SIXTRL_CXX_NAMESPACE
             *this ).doGetAssignAddressItem( key, item_index ) );
     }
 
+    _this_t::c_buffer_t* TrackJobBase::doGetPtrAssignAddressItemsBuffer(
+        _this_t::assign_item_key_t const& SIXTRL_RESTRICT_REF
+            key ) SIXTRL_NOEXCEPT
+    {
+        _this_t::c_buffer_t* ptr_assign_address_items_buffer = nullptr;
+        auto it = this->m_assign_address_items.find( key );
+
+        if( it != this->m_assign_address_items.end() )
+        {
+            ptr_assign_address_items_buffer = it->second.getCApiPtr();
+        }
+
+        return ptr_assign_address_items_buffer;
+    }
+
     void TrackJobBase::doClearBaseImpl() SIXTRL_NOEXCEPT
     {
         this->doInitDefaultParticleSetIndices();

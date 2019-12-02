@@ -857,6 +857,9 @@ namespace SIXTRL_CXX_NAMESPACE
             assign_item_key_t const& SIXTRL_RESTRICT_REF key,
             size_type const item_index ) SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN c_buffer_t* doGetPtrAssignAddressItemsBuffer(
+            assign_item_key_t const& SIXTRL_RESTRICT_REF key ) SIXTRL_NOEXCEPT;
+
 
         private:
 
