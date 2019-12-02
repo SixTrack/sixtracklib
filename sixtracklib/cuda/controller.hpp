@@ -53,6 +53,45 @@ namespace SIXTRL_CXX_NAMESPACE
         static SIXTRL_CONSTEXPR_OR_CONST size_type DEFAULT_WARP_SIZE =
                 SIXTRL_CXX_NAMESPACE::ARCH_CUDA_DEFAULT_WARP_SIZE;
 
+        /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- */
+
+        static SIXTRL_HOST_FN size_type NUM_ALL_NODES();
+
+        static SIXTRL_HOST_FN size_type GET_ALL_NODES(
+            node_id_t* SIXTRL_RESTRICT out_node_ids_begin,
+            size_type const max_num_node_ids );
+
+        static SIXTRL_HOST_FN void PRINT_ALL_NODES();
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        static SIXTRL_HOST_FN size_type NUM_AVAILABLE_NODES(
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr );
+
+        static SIXTRL_HOST_FN size_type GET_AVAILABLE_NODES(
+            node_id_t* SIXTRL_RESTRICT out_node_ids_begin,
+            size_type const max_num_node_ids,
+            size_type const skip_first_num_nodes = size_type{ 0 },
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr );
+
+        static SIXTRL_HOST_FN void PRINT_AVAILABLE_NODES(
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr );
+
+        static SIXTRL_HOST_FN size_type GET_AVAILABLE_NODE_ID_STR(
+            char** SIXTRL_RESTRICT out_node_id_strs,
+            size_type const max_num_node_ids,
+            size_type const node_id_str_capacity,
+            ::NS(node_id_str_fmt_t) const node_id_str_format =
+                ::NS(NODE_ID_STR_FORMAT_DEFAULT),
+            size_type const skip_first_num_nodes = size_type{ 0 },
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr );
+
+        /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- */
+
         SIXTRL_HOST_FN explicit CudaController(
             char const* config_str = nullptr );
 
