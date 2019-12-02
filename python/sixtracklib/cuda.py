@@ -19,6 +19,7 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
 
     from .stcommon import st_CudaNodeInfo_p, st_NullCudaNodeInfo, \
         st_cuda_dev_index_t, st_CudaNodeInfo_new, st_CudaNodeInfo_new_detailed,\
+        st_NodeId_create, st_NodeId_delete, \
         st_CudaNodeInfo_get_cuda_device_index, \
         st_CudaNodeInfo_get_pci_bus_id_str, st_CudaNodeInfo_get_warp_size, \
         st_CudaNodeInfo_get_compute_capability, \
@@ -96,7 +97,9 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
             st_CudaNodeInfo_get_max_threads_per_multiprocessor(
                 self._ptr_node_info)
 
-    from .stcommon import st_CudaController_p, st_NullCudaController, \
+    from .stcommon import \
+        st_node_id_str_fmt_t, \
+        st_CudaController_p, st_NullCudaController, \
         st_ControllerBase_p, st_NullControllerBase, \
         st_CudaController_create, st_CudaController_new, \
         st_CudaController_new_from_node_id, \
@@ -113,9 +116,155 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
         st_CudaController_get_ptr_node_info, \
         st_CudaController_get_ptr_node_info_by_platform_id_and_device_id, \
         st_CudaController_get_ptr_node_info_by_cuda_dev_index, \
-        st_CudaController_get_ptr_node_info_by_pci_bus_id
+        st_CudaController_get_ptr_node_info_by_pci_bus_id, \
+        st_Cuda_get_num_all_nodes, st_Cuda_print_all_nodes, \
+        st_Cuda_num_available_nodes, \
+        st_Cuda_num_available_nodes_detailed, \
+        st_Cuda_print_available_nodes_detailed, \
+        st_Cuda_get_available_nodes_detailed, \
+        st_Cuda_get_available_node_id_strs, \
+        st_Cuda_get_available_node_id_strs_detailed, \
+        st_NodeId_p, st_NullNodeId, st_NodeId_get_platform_id, \
+        st_NodeId_get_device_id, st_NodeId_has_node_index, \
+        st_NodeId_get_node_index, st_NODE_ID_STR_FORMAT_ARCHSTR
 
     class CudaController(NodeControllerBase):
+        @staticmethod
+        def NUM_ALL_NODES():
+            return st_Cuda_get_num_all_nodes()
+
+        @staticmethod
+        def PRINT_ALL_NODES():
+            st_Cuda_print_all_nodes()
+
+        @staticmethod
+        def NUM_AVAILABLE_NODES(filter_str=None, env_var_name=None):
+            if not( filter_str is None ):
+                _filter_str_bytes = filter_str.strip().encode('utf-8')
+                _filter_str = ct.c_char_p( filter_str )
+            else:
+                _filter_str = None
+
+            if not( env_var_name is None):
+                _env_var_name_bytes = env_var_name.strip().encode('utf-8')
+                _env_var_name = ct.c_char_p(_env_var_name_bytes)
+            else:
+                _env_var_name = None
+
+            return st_Cuda_num_available_nodes_detailed(
+                _filter_str, _env_var_name )
+
+        @staticmethod
+        def PRINT_AVAILABLE_NODES(filter_str=None, env_var_name=None):
+            if not( filter_str is None ):
+                _filter_str_bytes = filter_str.strip().encode('utf-8')
+                _filter_str = ct.c_char_p(_filter_str_bytes)
+            else:
+                _filter_str = None
+
+            if not( env_var_name is None):
+                _env_var_name_bytes=env_var_name.strip().encode('utf-8')
+                _env_var_name = ct.c_char_p(_env_var_name_bytes)
+            else:
+                _env_var_name = None
+
+            st_Cuda_print_available_nodes_detailed(
+                _filter_str, _env_var_name )
+
+        @staticmethod
+        def GET_AVAILABLE_NODES(filter_str=None,
+                env_var_name=None, skip_first_num_nodes=0):
+
+            nodes = []
+            if not( filter_str is None ):
+                _filter_str_bytes = filter_str.strip().encode('utf-8')
+                _filter_str = ct.c_char_p(_filter_str_bytes)
+            else:
+                _filter_str = None
+
+            if not( env_var_name is None):
+                _env_var_name_bytes = env_var_name.strip().encode('utf-8')
+                _env_var_name = ct.c_char_p(_env_var_name_bytes)
+            else:
+                _env_var_name = None
+
+            _num_avail_nodes = st_Cuda_num_available_nodes_detailed(
+                _filter_str, _env_var_name )
+
+            if _num_avail_nodes > 0:
+                node_ids_array_t = st_NodeId_p * _num_avail_nodes
+                _node_ids = node_ids_array_t()
+                for ii in range(0, _num_avail_nodes):
+                    _node_ids[ ii ] = ct.cast( st_NodeId_create, st_NodeId_p )
+
+                _num_nodes = st_Cuda_get_available_nodes_detailed(_node_ids,
+                    st_arch_size_t(_num_avail_nodes),
+                        st_arch_size_t(skip_first_num_nodes),
+                            _filter_str, _env_var_name)
+
+                for ii in range(0, _num_nodes):
+                    platform_id = st_NodeId_get_platform_id(
+                        ct.byref(_node_ids[ii]))
+                    device_id = st_NodeId_get_platform_id(
+                        ct.byref(_node_ids[ii]))
+                    node_index = st_NodeId_get_node_index(
+                        ct.byref(_node_ids[ii]))
+                    nodes.append( NodeId(platform_id=platform_id,
+                        device_id=device_id, node_index=node_index))
+
+                for ii in range(0, _num_avail_nodes):
+                    st_NodeId_delete( _node_ids[ ii ] )
+                    _node_ids[ ii ] = st_NullNodeId
+
+            return nodes
+
+        @staticmethod
+        def GET_AVAILABLE_NODE_ID_STRS( filter_str=None,
+            env_var_name=None, skip_first_num_nodes=0,
+            node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value ):
+
+            node_id_strs = []
+            if not( filter_str is None ):
+                _filter_str_bytes = filter_str.strip().encode('utf-8')
+                _filter_str = ct.c_char_p(_filter_str_bytes)
+            else:
+                _filter_str = None
+
+            if not( env_var_name is None):
+                _env_var_name_bytes = env_var_name.strip().encode('utf-8')
+                _env_var_name = ct.c_char_p(_env_var_name_bytes)
+            else:
+                _env_var_name = None
+
+            _num_avail_nodes = st_Cuda_num_available_nodes_detailed(
+                _filter_str, _env_var_name )
+
+            if _num_avail_nodes > 0:
+                _node_id_str_capacity = 64
+                node_id_str_buffer = [
+                    ct.create_string_buffer(_node_id_str_capacity) ]
+
+                node_id_str_array_t = ct.c_char_p * _num_avail_nodes
+                _tmp_node_id_strs = node_id_str_array_t()
+
+                for ii in range(0,_num_avail_nodes):
+                    _tmp_node_id_strs[ii] = ct.cast(
+                        node_id_str_buffer[ii], ct.c_char_p)
+
+                _num_node_id_strs = \
+                st_Cuda_get_available_node_id_strs_detailed(
+                    _tmp_node_id_strs, st_arch_size_t(_num_avail_nodes),
+                        st_arch_size_t(_node_id_str_capacity),
+                        st_node_id_str_fmt_t(node_id_str_fmt),
+                            st_arch_size_t(skip_first_num_nodes),
+                                _filter_str, _env_var_name )
+
+                node_id_strs = [ bytes( _tmp_node_id_strs[ii] ).decode('utf-8')
+                        for ii in range( 0, _num_node_id_strs) ]
+            return node_id_strs
+
+        # *********************************************************************
+
         def __init__(self, config_str=None, node_id=None,
                      node_index=None, platform_id=None, device_id=None,
                      cuda_dev_index=None, **kwargs):
@@ -455,7 +604,37 @@ else:
         pass
 
     class CudaController(object):
-        pass
+        @staticmethod
+        def NUM_ALL_NODES():
+            raise RuntimeError("Cuda module disabled, no nodes present")
+            return 0
+
+        @staticmethod
+        def PRINT_ALL_NODES():
+            raise RuntimeError("Cuda module disabled, no nodes to print")
+            st_Cuda_print_all_nodes()
+
+        @staticmethod
+        def NUM_AVAILABLE_NODES(filter_str=None, env_var_name=None):
+            raise RuntimeError("Cuda module disabled, no nodes available")
+            return 0
+
+        @staticmethod
+        def PRINT_AVAILABLE_NODES(filter_str=None, env_var_name=None):
+            raise RuntimeError("Cuda module disabled, no nodes to print")
+
+        @staticmethod
+        def GET_AVAILABLE_NODES(filter_str=None,
+                env_var_name=None, skip_first_num_nodes=0):
+            raise RuntimeError("Cuda module disabled, no nodes available")
+            return []
+
+        @staticmethod
+        def GET_AVAILABLE_NODE_ID_STRS( filter_str=None,
+            env_var_name=None, skip_first_num_nodes=0,
+            node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value ):
+            raise RuntimeError("Cuda module disabled, no nodes available")
+            return []
 
     class CudaArgument(object):
         pass
