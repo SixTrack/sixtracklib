@@ -1215,10 +1215,47 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     _this_t::status_t TrackJobCl::doPerformManagedAssignmentsOclImpl(
-        _this_t::assign_item_key_t const& SIXTRL_RESTRICT_REF assign_item_key )
+        _this_t::assign_item_key_t const& SIXTRL_RESTRICT_REF key )
     {
-        ( void )assign_item_key;
-        return st::ARCH_STATUS_SUCCESS;
+        using size_t = _this_t::size_type;
+        using c_buffer_t = _this_t::c_buffer_t;
+        using cl_arg_t = _this_t::cl_arg_t;
+
+        _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        size_t const dest_buffer_id = key.dest_buffer_id;
+        c_buffer_t* dest_buffer = this->buffer_by_buffer_id( dest_buffer_id );
+        cl_arg_t* dest_arg = this->ptr_argument_by_buffer_id( dest_buffer_id );
+
+        size_t const src_buffer_id = key.src_buffer_id;
+        c_buffer_t const* src_buffer =
+            this->buffer_by_buffer_id( src_buffer_id );
+        cl_arg_t* src_arg = this->ptr_argument_by_buffer_id( src_buffer_id );
+
+        c_buffer_t* assign_buffer =
+            this->doGetPtrAssignAddressItemsBuffer( key );
+
+        if( ( this->has_assign_items( dest_buffer_id, src_buffer_id ) ) &&
+            ( this->ptrContext() != nullptr ) && ( assign_buffer != nullptr ) &&
+            ( src_buffer != nullptr ) && ( dest_buffer != nullptr ) &&
+            ( src_arg != nullptr ) && ( src_arg->usesCObjectBuffer() ) &&
+            ( src_arg->ptrCObjectBuffer() == src_buffer ) &&
+            ( src_arg->context() == this->ptrContext() ) &&
+            ( dest_arg != nullptr ) && ( dest_arg->usesCObjectBuffer() ) &&
+            ( dest_arg->ptrCObjectBuffer() == dest_buffer ) &&
+            ( dest_arg->context() == this->ptrContext() ) )
+        {
+            status = st::ARCH_STATUS_SUCCESS;
+
+            if( ::NS(Buffer_get_num_of_objects)( assign_buffer ) > size_t{ 0 } )
+            {
+                cl_arg_t assign_items_arg( assign_buffer, this->ptrContext() );
+                status = this->ptrContext()->assign_addresses( assign_items_arg,
+                    *dest_arg, dest_buffer_id, *src_arg, src_buffer_id );
+            }
+        }
+
+        return status;
     }
 
     /* ********************************************************************* */
