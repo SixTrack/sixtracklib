@@ -16,73 +16,9 @@ class Drift(CObject):
     _typeid = 2
     length = CField(0, 'real', default=0.0, alignment=8)
 
-
 class DriftExact(CObject):
     _typeid = 3
     length = CField(0, 'real', default=0.0, alignment=8)
-
-
-class BeamMonitor(CObject):
-    _typeid = 10
-    num_stores = CField(0, 'int64', default=0, alignment=8)
-    start = CField(1, 'int64', default=0, alignment=8)
-    skip = CField(2, 'int64', default=1, alignment=8)
-    out_address = CField(3, 'uint64', default=0, alignment=8)
-    max_particle_id = CField(4, 'int64', default=0, alignment=8)
-    min_particle_id = CField(5, 'int64', default=0, alignment=8)
-    is_rolling = CField(6, 'int64', default=0, alignment=8)
-    is_turn_ordered = CField(7, 'int64', default=1, alignment=8)
-
-
-def append_beam_monitors_to_lattice(
-        beam_elements_buffer, until_turn_elem_by_elem, until_turn_turn_by_turn,
-        until_turn, skip_turns=1, min_particle_id=0, max_particle_id=0,
-        initial_at_turn=0):
-    num_beam_monitors_added = 0
-    start_turn_by_turn = max(initial_at_turn, until_turn_elem_by_elem)
-
-    if until_turn_turn_by_turn > start_turn_by_turn:
-        bm_turn_by_turn = BeamMonitor(
-            start=start_turn_by_turn,
-            num_stores=(
-                until_turn_turn_by_turn -
-                start_turn_by_turn),
-            skip=1,
-            out_address=0,
-            min_particle_id=min_particle_id,
-            max_particle_id=max_particle_id,
-            is_rolling=False,
-            is_turn_ordered=True,
-            cbuffer=beam_elements_buffer)
-        num_beam_monitors_added += 1
-
-    start_output_turn = max(start_turn_by_turn, until_turn_turn_by_turn)
-
-    if until_turn > start_output_turn:
-        if skip_turns <= 0:
-            skip_turns = 1
-
-        num_stores = until_turn - start_output_turn
-        remainder = num_stores % skip_turns
-        num_stores = num_stores // skip_turns
-
-        if remainder > 0:
-            num_stores += 1
-
-        bm_output = BeamMonitor(
-            start=start_output_turn,
-            num_stores=num_stores,
-            skip=skip_turns,
-            out_address=0,
-            min_particle_id=min_particle_id,
-            max_particle_id=max_particle_id,
-            is_rolling=True,
-            is_turn_ordered=True,
-            cbuffer=beam_elements_buffer)
-        num_beam_monitors_added += 1
-
-    return num_beam_monitors_added
-
 
 class Multipole(CObject):
     _typeid = 4
@@ -155,6 +91,17 @@ class Multipole(CObject):
         assert order <= self.order
         self.bal[order * 2 + 1] = value / factorial(order, exact=True)
 
+class RFMultipole(CObject):
+    _typeid = 128
+    order = CField(0, 'int64', default=0, const=True, alignment=8)
+    voltage = CField(1, 'real', default=0.0, alignment=8)
+    frequency = CField(2, 'real', default=0.0, alignment=8)
+    lag = CField(3, 'real', default=0.0, alignment=8)
+    knl = CField(4, 'real', pointer=True, length='order+1', alignment=8)
+    ksl = CField(5, 'real', pointer=True, length='order+1', alignment=8)
+    pn = CField(6, 'real', pointer=True, length='order+1', alignment=8),
+    ps = CField(7, 'real', pointer=True, length='order+1', alignment=8),
+
 
 class Cavity(CObject):
     _typeid = 5
@@ -189,131 +136,67 @@ class SRotation(CObject):
         return self.angle * (180.0 / np.pi)
 
 
-class BeamBeam4D(CObject):
-    _typeid = 8
-    size = CField(0, 'uint64', const=True, default=0)
-    data = CField(1, 'float64', default=0.0,
-                  length='size', pointer=True)
-
-    def __init__(self, **kwargs):
-        if 'x_bb' in kwargs:
-            slots = (
-                'charge',
-                'sigma_x',
-                'sigma_y',
-                'beta_r',
-                'min_sigma_diff',
-                'x_bb',
-                'y_bb',
-                'd_px',
-                'd_py',
-                'enabled')
-
-            data = [qe] + [kwargs[ss] for ss in slots]
-            super().__init__(size=len(data), data=data, **kwargs)
-        else:
-            super().__init__(**kwargs)
 
 
-class SpaceChargeCoasting(CObject):
-    _typeid = 13
-    size = CField(0, 'uint64', const=True, default=0)
-    data = CField(1, 'float64', default=0.0,
-                  length='size', pointer=True)
+class BeamMonitor(CObject):
+    _typeid = 10
+    num_stores = CField(0, 'int64', default=0, alignment=8)
+    start = CField(1, 'int64', default=0, alignment=8)
+    skip = CField(2, 'int64', default=1, alignment=8)
+    out_address = CField(3, 'uint64', default=0, alignment=8)
+    max_particle_id = CField(4, 'int64', default=0, alignment=8)
+    min_particle_id = CField(5, 'int64', default=0, alignment=8)
+    is_rolling = CField(6, 'int64', default=0, alignment=8)
+    is_turn_ordered = CField(7, 'int64', default=1, alignment=8)
 
-    def __init__(self, **kwargs):
-        if 'sigma_x' in kwargs:
-            slots = (
-                'line_density',
-                'sigma_x',
-                'sigma_y',
-                'length',
-                'x_co',
-                'y_co',
-                'min_sigma_diff',
-                'enabled')
+def append_beam_monitors_to_lattice(
+        beam_elements_buffer, until_turn_elem_by_elem, until_turn_turn_by_turn,
+        until_turn, skip_turns=1, min_particle_id=0, max_particle_id=0,
+        initial_at_turn=0):
+    num_beam_monitors_added = 0
+    start_turn_by_turn = max(initial_at_turn, until_turn_elem_by_elem)
 
-            data = [kwargs[ss] for ss in slots]
-            super().__init__(size=len(data), data=data, **kwargs)
-        else:
-            super().__init__(**kwargs)
+    if until_turn_turn_by_turn > start_turn_by_turn:
+        bm_turn_by_turn = BeamMonitor(
+            start=start_turn_by_turn,
+            num_stores=(
+                until_turn_turn_by_turn -
+                start_turn_by_turn),
+            skip=1,
+            out_address=0,
+            min_particle_id=min_particle_id,
+            max_particle_id=max_particle_id,
+            is_rolling=False,
+            is_turn_ordered=True,
+            cbuffer=beam_elements_buffer)
+        num_beam_monitors_added += 1
 
+    start_output_turn = max(start_turn_by_turn, until_turn_turn_by_turn)
 
-class SpaceChargeBunched(CObject):
-    _typeid = 14
-    size = CField(0, 'uint64', const=True, default=0)
-    data = CField(1, 'float64', default=0.0,
-                  length='size', pointer=True)
+    if until_turn > start_output_turn:
+        if skip_turns <= 0:
+            skip_turns = 1
 
-    def __init__(self, **kwargs):
-        if 'sigma_x' in kwargs:
-            slots = (
-                'number_of_particles',
-                'bunchlength_rms',
-                'sigma_x',
-                'sigma_y',
-                'length',
-                'x_co',
-                'y_co',
-                'min_sigma_diff',
-                'enabled')
+        num_stores = until_turn - start_output_turn
+        remainder = num_stores % skip_turns
+        num_stores = num_stores // skip_turns
 
-            data = [kwargs[ss] for ss in slots]
-            super().__init__(size=len(data), data=data, **kwargs)
-        else:
-            super().__init__(**kwargs)
+        if remainder > 0:
+            num_stores += 1
 
+        bm_output = BeamMonitor(
+            start=start_output_turn,
+            num_stores=num_stores,
+            skip=skip_turns,
+            out_address=0,
+            min_particle_id=min_particle_id,
+            max_particle_id=max_particle_id,
+            is_rolling=True,
+            is_turn_ordered=True,
+            cbuffer=beam_elements_buffer)
+        num_beam_monitors_added += 1
 
-class BeamBeam6D(CObject):
-    _typeid = 9
-    size = CField(0, 'uint64', const=True, default=0)
-    data = CField(1, 'float64', default=0.0,
-                  length='size', pointer=True)
-
-    def __init__(self, **kwargs):
-        if 'x_bb_co' in kwargs:
-
-            import pysixtrack
-            params = kwargs
-
-            data = pysixtrack.BB6Ddata.BB6D_init(
-                q_part=qe,
-                phi=params['phi'],
-                alpha=params['alpha'],
-                delta_x=params['x_bb_co'],
-                delta_y=params['y_bb_co'],
-                N_part_per_slice=params['charge_slices'],
-                z_slices=params['zeta_slices'],
-                Sig_11_0=params['sigma_11'],
-                Sig_12_0=params['sigma_12'],
-                Sig_13_0=params['sigma_13'],
-                Sig_14_0=params['sigma_14'],
-                Sig_22_0=params['sigma_22'],
-                Sig_23_0=params['sigma_23'],
-                Sig_24_0=params['sigma_24'],
-                Sig_33_0=params['sigma_33'],
-                Sig_34_0=params['sigma_34'],
-                Sig_44_0=params['sigma_44'],
-                x_CO=params['x_co'],
-                px_CO=params['px_co'],
-                y_CO=params['y_co'],
-                py_CO=params['py_co'],
-                sigma_CO=params['zeta_co'],
-                delta_CO=params['delta_co'],
-                min_sigma_diff=params['min_sigma_diff'],
-                threshold_singular=params['threshold_singular'],
-                Dx_sub=params['d_x'],
-                Dpx_sub=params['d_px'],
-                Dy_sub=params['d_y'],
-                Dpy_sub=params['d_py'],
-                Dsigma_sub=params['d_zeta'],
-                Ddelta_sub=params['d_delta'],
-                enabled=params['enabled']
-            ).tobuffer()
-            super().__init__(size=len(data), data=data, **kwargs)
-        else:
-            super().__init__(**kwargs)
-
+    return num_beam_monitors_added
 
 class LimitRect(CObject):
     _typeid = 11
@@ -405,9 +288,155 @@ class LimitEllipse(CObject):
         self.a_b_squ = a_squ * b_squ
         return self
 
+class LimitZeta(CObject):
+    _typeid = 13
+    min_zeta = CField(0, 'float64', default=-1e18, alignment=8)
+    max_zeta = CField(1, 'float64', default=+1e18, alignment=8)
+
+    def __init__(self, min_zeta=None, max_zeta=None, **kwargs):
+        if min_zeta is None:
+            min_zeta = -1e18
+        if max_zeta is None:
+            max_zeta = +1e16
+        super().__init__(min_zeta=min_zeta, max_zeta=max_zeta, **kwargs)
+
+class LimitDelta(CObject):
+    _typeid = 14
+    min_delta = CField(0, 'float64', default=-1e18, alignment=8)
+    max_delta = CField(1, 'float64', default=+1e18, alignment=8)
+
+    def __init__(self, min_delta=None, max_delta=None, **kwargs):
+        if min_delta is None:
+            min_delta = -1e18
+        if max_delta is None:
+            max_delta = +1e18
+        super().__init__(min_delta=min_delta, max_delta=max_delta, **kwargs)
+
+
+class BeamBeam4D(CObject):
+    _typeid = 8
+    size = CField(0, 'uint64', const=True, default=0)
+    data = CField(1, 'float64', default=0.0,
+                  length='size', pointer=True)
+
+    def __init__(self, **kwargs):
+        if 'x_bb' in kwargs:
+            slots = (
+                'charge',
+                'sigma_x',
+                'sigma_y',
+                'beta_r',
+                'min_sigma_diff',
+                'x_bb',
+                'y_bb',
+                'd_px',
+                'd_py',
+                'enabled')
+
+            data = [qe] + [kwargs[ss] for ss in slots]
+            super().__init__(size=len(data), data=data, **kwargs)
+        else:
+            super().__init__(**kwargs)
+
+class BeamBeam6D(CObject):
+    _typeid = 9
+    size = CField(0, 'uint64', const=True, default=0)
+    data = CField(1, 'float64', default=0.0,
+                  length='size', pointer=True)
+
+    def __init__(self, **kwargs):
+        if 'x_bb_co' in kwargs:
+
+            import pysixtrack
+            params = kwargs
+
+            data = pysixtrack.BB6Ddata.BB6D_init(
+                q_part=qe,
+                phi=params['phi'],
+                alpha=params['alpha'],
+                delta_x=params['x_bb_co'],
+                delta_y=params['y_bb_co'],
+                N_part_per_slice=params['charge_slices'],
+                z_slices=params['zeta_slices'],
+                Sig_11_0=params['sigma_11'],
+                Sig_12_0=params['sigma_12'],
+                Sig_13_0=params['sigma_13'],
+                Sig_14_0=params['sigma_14'],
+                Sig_22_0=params['sigma_22'],
+                Sig_23_0=params['sigma_23'],
+                Sig_24_0=params['sigma_24'],
+                Sig_33_0=params['sigma_33'],
+                Sig_34_0=params['sigma_34'],
+                Sig_44_0=params['sigma_44'],
+                x_CO=params['x_co'],
+                px_CO=params['px_co'],
+                y_CO=params['y_co'],
+                py_CO=params['py_co'],
+                sigma_CO=params['zeta_co'],
+                delta_CO=params['delta_co'],
+                min_sigma_diff=params['min_sigma_diff'],
+                threshold_singular=params['threshold_singular'],
+                Dx_sub=params['d_x'],
+                Dpx_sub=params['d_px'],
+                Dy_sub=params['d_y'],
+                Dpy_sub=params['d_py'],
+                Dsigma_sub=params['d_zeta'],
+                Ddelta_sub=params['d_delta'],
+                enabled=params['enabled']
+            ).tobuffer()
+            super().__init__(size=len(data), data=data, **kwargs)
+        else:
+            super().__init__(**kwargs)
+
+class SpaceChargeCoasting(CObject):
+    _typeid = 34
+    size = CField(0, 'uint64', const=True, default=0)
+    data = CField(1, 'float64', default=0.0,
+                  length='size', pointer=True)
+
+    def __init__(self, **kwargs):
+        if 'sigma_x' in kwargs:
+            slots = (
+                'line_density',
+                'sigma_x',
+                'sigma_y',
+                'length',
+                'x_co',
+                'y_co',
+                'min_sigma_diff',
+                'enabled')
+
+            data = [kwargs[ss] for ss in slots]
+            super().__init__(size=len(data), data=data, **kwargs)
+        else:
+            super().__init__(**kwargs)
+
+class SpaceChargeBunched(CObject):
+    _typeid = 35
+    size = CField(0, 'uint64', const=True, default=0)
+    data = CField(1, 'float64', default=0.0,
+                  length='size', pointer=True)
+
+    def __init__(self, **kwargs):
+        if 'sigma_x' in kwargs:
+            slots = (
+                'number_of_particles',
+                'bunchlength_rms',
+                'sigma_x',
+                'sigma_y',
+                'length',
+                'x_co',
+                'y_co',
+                'min_sigma_diff',
+                'enabled')
+
+            data = [kwargs[ss] for ss in slots]
+            super().__init__(size=len(data), data=data, **kwargs)
+        else:
+            super().__init__(**kwargs)
 
 class DipoleEdge(CObject):
-    _typeid = 24
+    _typeid = 64
     r21 = CField(0, 'float64', default=0.0, alignment=8)
     r43 = CField(1, 'float64', default=0.0, alignment=8)
 
@@ -450,19 +479,22 @@ class Elements(object):
                      'Drift': Drift,
                      'DriftExact': DriftExact,
                      'Multipole': Multipole,
-                     #                     'RFMultipole': RFMultipole,
+                     'RFMultipole': RFMultipole,
                      'SRotation': SRotation,
                      'XYShift': XYShift,
-                     'BeamBeam6D': BeamBeam6D,
-                     'BeamBeam4D': BeamBeam4D,
-                     'SpaceChargeCoasting': SpaceChargeCoasting,
-                     'SpaceChargeBunched': SpaceChargeBunched,
+                     'BeamMonitor': BeamMonitor,
                      'LimitRect': LimitRect,
                      'LimitEllipse': LimitEllipse,
+                     'LimitZeta' : LimitZeta,
+                     'BeamBeam4D': BeamBeam4D,
+                     'BeamBeam6D': BeamBeam6D,
+                     'SpaceChargeCoasting': SpaceChargeCoasting,
+                     'SpaceChargeBunched': SpaceChargeBunched,
                      'DipoleEdge': DipoleEdge,
                      #                     'Line': Line,
-                     'BeamMonitor': BeamMonitor,
                      #'TriCub': TriCub,
+                     #'Solenoid': Solenoid,
+                     #'Wire': Wire,
                      }
 
     def _mk_fun(self, buff, cls):
