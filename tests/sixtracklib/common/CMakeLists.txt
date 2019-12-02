@@ -55,7 +55,7 @@ if( GTEST_FOUND )
                     test_particles_aperture_c99.cpp )
 
     target_compile_options( test_particles_aperture_check_enabled_common_c99
-        BEFORE PRIVATE -DSIXTRL_ENABLE_APERTURE_CHECK=1
+        BEFORE PRIVATE -DSIXTRL_ENABLE_GLOBAL_APERTURE_CHECK=2
                        -DSIXTRL_APERTURE_X_LIMIT=1.0
                        -DSIXTRL_APERTURE_Y_LIMIT=1.0 )
 

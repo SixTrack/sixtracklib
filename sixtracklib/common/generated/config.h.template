@@ -5,9 +5,39 @@
  * ******             SixTrackLib Feature configuration                ****** *
  * ************************************************************************** */
 
-#if !defined( SIXTRL_ENABLE_APERTURE_CHECK )
-    #define SIXTRL_ENABLE_APERTURE_CHECK @SIXTRACKL_ENABLE_APERTURE_CHECK_FLAG@
-#endif /* !defined( SIXTRL_ENABLE_APERTURE_CHECK ) */
+ #if !defined( SIXTRL_TRACK_MAP_ENABLED )
+    #define SIXTRL_TRACK_MAP_ENABLED @SIXTRACKL_TRACK_MAP_ENABLED_VALUE@
+ #endif /* !defined( SIXTRL_TRACK_MAP_ENABLED ) */
+
+ #if !defined( SIXTRL_TRACK_MAP_DISABLED_SKIP )
+    #define SIXTRL_TRACK_MAP_DISABLED_SKIP @SIXTRACKL_TRACK_MAP_DISABLED_SKIP_VALUE@
+ #endif /* !defined( SIXTRL_TRACK_MAP_DISABLED_SKIP ) */
+
+ #if !defined( SIXTRL_TRACK_MAP_DISABLED_ERROR )
+    #define SIXTRL_TRACK_MAP_DISABLED_ERROR @SIXTRACKL_TRACK_MAP_DISABLED_ERROR@
+ #endif /* !defined( SIXTRL_TRACK_MAP_DISABLED_ERROR ) */
+
+/* ------------------------------------------------------------------------- */
+/* ----                     global aperture check                       ---- */
+/* ------------------------------------------------------------------------- */
+
+#if !defined( SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS )
+    #define SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS @SIXTRACKL_GLOBAL_APERATURE_CHECK_ALWAYS_VALUE@
+#endif /* !defined( SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS ) */
+
+#if !defined( SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL )
+    #define SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL @SIXTRACKL_GLOBAL_APERATURE_CHECK_CONDITIONAL_VALUE@
+#endif /* !defined( SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL ) */
+
+#if !defined( SIXTRL_GLOBAL_APERTURE_CHECK_NEVER )
+    #define SIXTRL_GLOBAL_APERTURE_CHECK_NEVER @SIXTRACKL_GLOBAL_APERATURE_CHECK_NEVER_VALUE@
+#endif /* !defined( SIXTRL_GLOBAL_APERTURE_CHECK_NEVER ) */
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+#if !defined( SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK )
+    #define SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK @SIXTRACKL_ENABLE_GLOBAL_APERTURE_CHECK_FLAG@
+#endif /* !defined( SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK ) */
 
 #if !defined( SIXTRL_APERTURE_X_LIMIT )
     #define SIXTRL_APERTURE_X_LIMIT @SIXTRACKL_APERTURE_X_LIMIT_VALUE@
@@ -16,6 +46,34 @@
 #if !defined( SIXTRL_APERTURE_Y_LIMIT )
     #define SIXTRL_APERTURE_Y_LIMIT @SIXTRACKL_APERTURE_Y_LIMIT_VALUE@
 #endif /* SIXTRL_APERTURE_Y_LIMIT */
+
+/* ------------------------------------------------------------------------- */
+/* ----                beam-fields: BB6D, BB4D, space charge            ---- */
+/* ------------------------------------------------------------------------- */
+
+#if !defined( SIXTRL_ENABLE_BEAM_FIELDS_BEAM_BEAM_4D )
+    #define SIXTRL_ENABLE_BEAM_FIELDS_BEAM_BEAM_4D @SIXTRACKL_ENABLE_BEAM_FIELDS_4D_VALUE@
+#endif /* !defined( SIXTRL_ENABLE_BEAM_FIELDS_BEAM_BEAM_4D ) */
+
+#if !defined( SIXTRL_ENABLE_BEAM_FIELDS_BEAM_BEAM_6D )
+    #define SIXTRL_ENABLE_BEAM_FIELDS_BEAM_BEAM_6D @SIXTRACKL_ENABLE_BEAM_FIELDS_6D_VALUE@
+#endif /* !defined( SIXTRL_ENABLE_BEAM_FIELDS_BEAM_BEAM_6D ) */
+
+#if !defined( SIXTRL_ENABLE_SPACE_CHARGE_COASTING )
+    #define SIXTRL_ENABLE_SPACE_CHARGE_COASTING @SIXTRACKL_ENABLE_BEAM_FIELDS_SPACE_CHARGE_COASTING_VALUE@
+#endif /* !defined( SIXTRL_ENABLE_SPACE_CHARGE_COASTING ) */
+
+#if !defined( SIXTRL_ENABLE_SPACE_CHARGE_BUNCHED )
+    #define SIXTRL_ENABLE_SPACE_CHARGE_BUNCHED @SIXTRACKL_ENABLE_BEAM_FIELDS_SPACE_CHARGE_BUNCHED_VALUE@
+#endif /* !defined( SIXTRL_ENABLE_SPACE_CHARGE_BUNCHED ) */
+
+/* ------------------------------------------------------------------------- */
+/* ----                        tricub beam-element                      ---- */
+/* ------------------------------------------------------------------------- */
+
+#if !defined( SIXTRL_ENABLE_BE_TRICUB_MAP )
+    #define SIXTRL_ENABLE_BE_TRICUB_MAP @SIXTRACKL_ENABLE_BE_TRICUB_MAP_VALUE@
+#endif /* !defined( SIXTRL_ENABLE_BE_TRICUB_MAP ) */
 
 #endif /* SIXTRACKLIB_COMMON_GENERATED_CONFIGURATION_HEADER_H__ */
 
