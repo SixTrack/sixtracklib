@@ -15,6 +15,39 @@
     #include "sixtracklib/common/control/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
+NS(ComputeNodeId)* NS(ComputeNodeId_allocate_array)(
+    NS(arch_size_t) const num_nodes )
+{
+    NS(ComputeNodeId)* array = SIXTRL_NULLPTR;
+
+    if( num_nodes > ( NS(arch_size_t) )0u )
+    {
+        array = ( NS(ComputeNodeId)* )malloc(
+            sizeof( NS(ComputeNodeId) ) * num_nodes );
+
+        if( array != SIXTRL_NULLPTR )
+        {
+            NS(arch_size_t) ii = ( NS(arch_size_t) )0u;
+
+            for( ; ii < num_nodes ; ++ii )
+            {
+                NS(ComputeNodeId_preset)( &array[ ii ] );
+            }
+        }
+    }
+
+    return array;
+}
+
+void NS(ComputeNodeId_free_array)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT array_begin )
+{
+    if( array_begin != SIXTRL_NULLPTR )
+    {
+        free( array_begin );
+    }
+}
+
 NS(comp_node_id_num_t) NS(ComputeNodeId_get_platform_id_ext)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id )
 {

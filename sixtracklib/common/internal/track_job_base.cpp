@@ -3239,7 +3239,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ( buffer_id >= min_buffer_id ) &&
             ( buffer_id <  max_buffer_id_plus_one ) )
         {
-            SIXTRL_ASSERT( this->m_stored_buffers.size() >=
+            SIXTRL_ASSERT( this->doGetStoredBufferSize() >=
                            this->m_num_stored_buffers );
 
             ptr_buffer_store = &this->m_stored_buffers[
@@ -3247,6 +3247,12 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return ptr_buffer_store;
+    }
+
+    _this_t::size_type
+    TrackJobBase::doGetStoredBufferSize() const SIXTRL_NOEXCEPT
+    {
+        return this->m_stored_buffers.size();
     }
 
     _this_t::size_type TrackJobBase::doFindAssingAddressItem(

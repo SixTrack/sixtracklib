@@ -120,21 +120,13 @@ int main( int argc, char* argv[] )
 
     if( ( argc >= 8 ) && ( argv[ 7 ] != SIXTRL_NULLPTR ) )
     {
-        size_t const output_path_len = strlen( argv[ 7 ] );
+        size_t const output_path_len = strlen( argv[ 7 ] ) + ( size_t )2u;
+        path_output_particles = ( char* )calloc(
+            output_path_len, sizeof( char ) );
 
-        if( output_path_len > 0u )
+        if( path_output_particles != SIXTRL_NULLPTR )
         {
-            path_output_particles = ( char* )malloc(
-                sizeof( char ) * ( output_path_len + 1u ) );
-
-            if( path_output_particles != SIXTRL_NULLPTR )
-            {
-                memset(  path_output_particles, ( int )'\0',
-                         output_path_len );
-
-                strncpy( path_output_particles, argv[ 7 ],
-                         output_path_len );
-            }
+            strcpy( path_output_particles, argv[ 7 ] );
         }
     }
 

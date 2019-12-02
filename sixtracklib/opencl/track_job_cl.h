@@ -126,10 +126,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN size_type totalNumParticles() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN cl_context_t& context() SIXTRL_RESTRICT;
-        SIXTRL_HOST_FN cl_context_t const& context() const SIXTRL_RESTRICT;
-        SIXTRL_HOST_FN NS(ClContext)* ptrContext() SIXTRL_RESTRICT;
-        SIXTRL_HOST_FN NS(ClContext) const* ptrContext() const SIXTRL_RESTRICT;
+        SIXTRL_HOST_FN cl_context_t& context() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cl_context_t const& context() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN NS(ClContext)* ptrContext() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN NS(ClContext) const* ptrContext() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN cl_arg_t& particlesArg() SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN cl_arg_t const& particlesArg() const SIXTRL_NOEXCEPT;
@@ -155,13 +155,6 @@ namespace SIXTRL_CXX_NAMESPACE
             ptrParticlesAddrBufferArg() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN cl_arg_t* ptrParticlesAddrBufferArg() SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN cl_arg_t& assignItemsBufferArg() SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN cl_arg_t const&
-            assignItemsBufferArg() const SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN cl_arg_t* ptrAssignItemsBufferArg() SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN cl_arg_t const*
-            ptrAssignItemsBufferArg() const SIXTRL_NOEXCEPT;
-
         SIXTRL_HOST_FN cl_arg_t const&
         elemByelemConfigBufferArg() const SIXTRL_NOEXCEPT;
 
@@ -182,6 +175,36 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const* SIXTRL_RESTRICT offsets,
             size_type const* SIXTRL_RESTRICT lengths,
             void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_values );
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN cl_arg_t const* ptr_const_argument_by_buffer_id(
+            size_type const buffer_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN cl_arg_t* ptr_argument_by_buffer_id(
+            size_type const buffer_id ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN cl_arg_t const& argument_by_buffer_id(
+            size_type const buffer_id ) const;
+
+        SIXTRL_HOST_FN cl_arg_t& argument_by_buffer_id(
+            size_type const buffer_id );
+
+        /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- */
+
+        SIXTRL_HOST_FN cl_arg_t const* ptr_const_stored_buffer_argument(
+            size_type const buffer_id ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN cl_arg_t* ptr_stored_buffer_argument(
+            size_type const buffer_id ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN cl_arg_t const& stored_buffer_argument(
+            size_type const buffer_id ) const;
+
+        SIXTRL_HOST_FN cl_arg_t& stored_buffer_argument(
+            size_type const buffer_id );
+
+        /* ----------------------------------------------------------------- */
 
         protected:
 
@@ -224,6 +247,26 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT beam_elem_buffer,
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
             size_type const until_turn_elem_by_elem ) override;
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN size_type doAddStoredBuffer(
+            buffer_store_t&& assigned_buffer_handle ) override;
+
+        SIXTRL_HOST_FN status_t doRemoveStoredBuffer(
+            size_type const buffer_id ) override;
+
+        SIXTRL_HOST_FN status_t doPushStoredBuffer(
+            size_type const buffer_id ) override;
+
+        SIXTRL_HOST_FN status_t doCollectStoredBuffer(
+            size_type const buffer_id ) override;
+
+        SIXTRL_HOST_FN status_t doPerformManagedAssignments(
+            assign_item_key_t const& SIXTRL_RESTRICT_REF
+                assign_item_key ) override;
+
+        /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN track_status_t doTrackUntilTurn(
             size_type const until_turn ) override;
@@ -314,15 +357,35 @@ namespace SIXTRL_CXX_NAMESPACE
             c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
             size_type const until_turn_elem_by_elem );
 
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN status_t doAddStoredBufferOclImpl(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN status_t doRemoveStoredBufferOclImpl(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN status_t doPushStoredBufferOclImpl(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN status_t doCollectStoredBufferOclImpl(
+            size_type const buffer_id );
+
+        SIXTRL_HOST_FN status_t doAddAssignAddressItemOclImpl(
+            assign_item_t const& SIXTRL_RESTRICT_REF assign_item,
+            size_type* SIXTRL_RESTRICT ptr_item_index );
+
+        SIXTRL_HOST_FN status_t doPerformManagedAssignmentsOclImpl(
+            assign_item_key_t const& SIXTRL_RESTRICT_REF assign_item_key );
+
         std::vector< size_type >    m_num_particles_in_pset;
-        std::vector< ptr_cl_arg_t > m_managed_buffers_args;
+        std::vector< ptr_cl_arg_t > m_stored_buffers_args;
 
         ptr_cl_context_t m_ptr_context;
         ptr_cl_arg_t     m_ptr_particles_buffer_arg;
         ptr_cl_arg_t     m_ptr_beam_elements_buffer_arg;
         ptr_cl_arg_t     m_ptr_output_buffer_arg;
         ptr_cl_arg_t     m_ptr_particles_addr_buffer_arg;
-        ptr_cl_arg_t     m_ptr_assign_items_buffer_arg;
         ptr_cl_arg_t     m_ptr_elem_by_elem_config_arg;
 
         size_type        m_total_num_particles;
@@ -502,17 +565,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
 NS(TrackJobCl_get_const_particles_addr_arg)(
     const NS(TrackJobCl) *const SIXTRL_RESTRICT track_job );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobCl_has_assign_items_buffer_arg)(
-    const NS(TrackJobCl) *const SIXTRL_RESTRICT track_job );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
-NS(TrackJobCl_get_assign_items_buffer_arg)(
-    NS(TrackJobCl)* SIXTRL_RESTRICT track_job );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
-NS(TrackJobCl_get_const_assign_items_buffer_arg)(
-    const NS(TrackJobCl) *const SIXTRL_RESTRICT track_job );
-
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TrackJobCl_update_beam_elements_region)(
     NS(TrackJobCl)* SIXTRL_RESTRICT track_job,
@@ -525,6 +577,30 @@ NS(TrackJobCl_update_beam_elements_regions)(
     NS(arch_size_t) const num_regions_to_update,
     NS(arch_size_t) const* offsets, NS(arch_size_t) const* lengths,
     void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_value );
+
+/* ----------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
+NS(TrackJobCl_const_argument_by_buffer_id)(
+    const NS(TrackJobCl) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const buffer_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
+NS(TrackJobCl_argument_by_buffer_id)(
+    NS(TrackJobCl)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const buffer_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
+NS(TrackJobCl_const_stored_buffer_argument)(
+    const NS(TrackJobCl) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const buffer_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
+NS(TrackJobCl_stored_buffer_argument)(
+    NS(TrackJobCl)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const buffer_id );
+
+/* ----------------------------------------------------------------- */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }
@@ -703,7 +779,6 @@ namespace SIXTRL_CXX_NAMESPACE
         m_ptr_beam_elements_buffer_arg( nullptr ),
         m_ptr_output_buffer_arg( nullptr ),
         m_ptr_particles_addr_buffer_arg( nullptr ),
-        m_ptr_assign_items_buffer_arg( nullptr ),
         m_ptr_elem_by_elem_config_arg( nullptr),
         m_total_num_particles( TrackJobBase::size_type{ 0 } )
     {
@@ -728,7 +803,6 @@ namespace SIXTRL_CXX_NAMESPACE
         m_ptr_beam_elements_buffer_arg( nullptr ),
         m_ptr_output_buffer_arg( nullptr ),
         m_ptr_particles_addr_buffer_arg( nullptr ),
-        m_ptr_assign_items_buffer_arg( nullptr ),
         m_ptr_elem_by_elem_config_arg( nullptr),
         m_total_num_particles( TrackJobBase::size_type{ 0 } )
     {
