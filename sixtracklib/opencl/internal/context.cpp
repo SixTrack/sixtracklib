@@ -283,7 +283,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContext::~ClContext() SIXTRL_NOEXCEPT {}
 
     _status_t ClContext::assign_particles_arg(
-        ClArgument& SIXTRL_RESTRICT_REF particles_arg )
+        _this_t::cl_argument_t& SIXTRL_RESTRICT_REF particles_arg )
     {
         _status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
@@ -403,7 +403,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     _status_t ClContext::assign_beam_elements_arg(
-        ClArgument& SIXTRL_RESTRICT_REF beam_elements_arg )
+        _this_t::cl_argument_t& SIXTRL_RESTRICT_REF beam_elements_arg )
     {
         using size_t       = _size_t;
         using kernel_id_t  = _kernel_id_t;
@@ -473,7 +473,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     _status_t ClContext::assign_output_buffer_arg(
-        ClArgument& SIXTRL_RESTRICT_REF out_buffer_arg )
+        _this_t::cl_argument_t& SIXTRL_RESTRICT_REF out_buffer_arg )
     {
         using size_t       = _size_t;
         using kernel_id_t  = _kernel_id_t;
@@ -533,7 +533,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     _status_t ClContext::assign_elem_by_elem_config_buffer_arg(
-            ClArgument& SIXTRL_RESTRICT_REF config_buffer_arg )
+            _this_t::cl_argument_t& SIXTRL_RESTRICT_REF config_buffer_arg )
     {
         using size_t       = _size_t;
         using kernel_id_t  = _kernel_id_t;
@@ -1402,43 +1402,81 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     _this_t::status_t ClContext::assign_addresses(
-        SIXTRL_BUFFER_ARGPTR_DEC const ::NS(Buffer) *const SIXTRL_RESTRICT map_buffer,
-        SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT dest_buffer,
-        SIXTRL_BUFFER_ARGPTR_DEC const ::NS(Buffer) *const SIXTRL_RESTRICT src_buffer )
+        _this_t::cl_argument_t& SIXTRL_RESTRICT_REF assign_items_arg,
+        _this_t::cl_argument_t& SIXTRL_RESTRICT_REF dest_buffer_arg,
+        _this_t::size_type const dest_buffer_id,
+        _this_t::cl_argument_t& SIXTRL_RESTRICT_REF src_buffer_arg,
+        _this_t::size_type const src_buffer_id )
     {
+        using _size_t = _this_t::size_type;
+
         _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-
-        st::ClArgument map_arg( const_cast< ::NS(Buffer)* >( map_buffer ), this );
-        st::ClArgument dest_arg( dest_buffer, this );
-        st::ClArgument src_arg( const_cast< ::NS(Buffer)* >( src_buffer ), this );
-
-        _this_t::kernel_id_t const kernel_id = this->assign_addresses_kernel_id();
+        _this_t::kernel_id_t const kernel_id =
+            this->assign_addresses_kernel_id();
 
         if( ( kernel_id != st::ARCH_ILLEGAL_KERNEL_ID ) &&
-            ( kernel_id <  this->numAvailableKernels() ) )
+            ( dest_buffer_id != st::ARCH_ILLEGAL_BUFFER_ID ) &&
+            ( src_buffer_id  != st::ARCH_ILLEGAL_BUFFER_ID ) &&
+            ( assign_items_arg.context() == this ) &&
+            ( assign_items_arg.usesCObjectBuffer() ) &&
+            ( assign_items_arg.ptrCObjectBuffer() != nullptr ) &&
+            ( dest_buffer_arg.context() == this ) &&
+            ( dest_buffer_arg.usesCObjectBuffer() ) &&
+            ( dest_buffer_arg.ptrCObjectBuffer() != nullptr ) &&
+            ( src_buffer_arg.context() == this ) &&
+            ( src_buffer_arg.usesCObjectBuffer() ) &&
+            ( src_buffer_arg.ptrCObjectBuffer() != nullptr ) )
         {
-            _this_t::size_type const map_slot_size =
-                ::NS(Buffer_get_slot_size)( map_buffer );
+            _size_t const num_items = ::NS(Buffer_get_num_of_objects)(
+                assign_items_arg.ptrCObjectBuffer() );
 
-            _this_t::size_type const dest_slot_size =
-                ::NS(Buffer_get_slot_size)( dest_buffer );
-
-            _this_t::size_type const src_slot_size =
-                ::NS(Buffer_get_slot_size)( src_buffer );
-
-            _this_t::size_type const num_assign_items =
-                ::NS(Buffer_get_num_of_objects)( map_buffer );
-
-            this->assignKernelArgument( kernel_id, 0, map_arg );
-            this->assignKernelArgumentValue( kernel_id, 1, map_slot_size );
-            this->assignKernelArgument( kernel_id, 2, dest_arg );
-            this->assignKernelArgumentValue( kernel_id, 3, dest_slot_size );
-            this->assignKernelArgument( kernel_id, 4, src_arg );
-            this->assignKernelArgumentValue( kernel_id, 5, src_slot_size );
-
-            if( this->runKernel( kernel_id, num_assign_items ) )
+            if( num_items == _size_t{ 0 } )
             {
-                status = st::ARCH_STATUS_SUCCESS;
+                return st::ARCH_STATUS_SUCCESS;
+            }
+
+            _size_t const assign_slot_size = ::NS(Buffer_get_slot_size)(
+                assign_items_arg.ptrCObjectBuffer() );
+
+            _size_t const dest_slot_size = ::NS(Buffer_get_slot_size)(
+                dest_buffer_arg.ptrCObjectBuffer() );
+
+            _size_t const src_slot_size = ::NS(Buffer_get_slot_size)(
+                dest_buffer_arg.ptrCObjectBuffer() );
+
+            if( ( assign_slot_size > _size_t{ 0 } ) &&
+                ( dest_slot_size > _size_t{ 0 } ) &&
+                ( src_slot_size > _size_t{ 0 } ) &&
+                ( this->kernelNumArgs( kernel_id ) >= _size_t{ 8 } ) )
+            {
+                this->assignKernelArgument(
+                    kernel_id, _size_t{ 0 }, assign_items_arg );
+
+                this->assignKernelArgumentValue(
+                    kernel_id, size_t{ 1 }, assign_slot_size );
+
+                this->assignKernelArgument(
+                    kernel_id, size_t{ 2 }, dest_buffer_arg );
+
+                this->assignKernelArgumentValue(
+                    kernel_id, size_t{ 3 }, dest_slot_size );
+
+                this->assignKernelArgumentValue(
+                    kernel_id, size_t{ 4 }, dest_buffer_id );
+
+                this->assignKernelArgument(
+                    kernel_id, size_t{ 5 }, src_buffer_arg );
+
+                this->assignKernelArgumentValue(
+                    kernel_id, size_t{ 6 }, src_slot_size );
+
+                this->assignKernelArgumentValue(
+                    kernel_id, size_t{ 7 }, src_buffer_id );
+
+                if( this->runKernel( kernel_id, num_items ) )
+                {
+                    status = st::ARCH_STATUS_SUCCESS;
+                }
             }
         }
 
@@ -2465,12 +2503,16 @@ bool NS(ClContext_has_assign_addresses_kernel)(
 
 NS(arch_status_t) NS(ClContext_assign_addresses)(
     ::NS(ClContext)* SIXTRL_RESTRICT ctx,
-    SIXTRL_BUFFER_ARGPTR_DEC const ::NS(Buffer) *const SIXTRL_RESTRICT map_buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT dest_buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC const ::NS(Buffer) *const SIXTRL_RESTRICT src_buffer )
+    ::NS(ClArgument)* SIXTRL_RESTRICT assign_items_arg,
+    ::NS(ClArgument)* SIXTRL_RESTRICT dest_buffer_arg,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(ClArgument)* SIXTRL_RESTRICT src_buffer_arg,
+    ::NS(buffer_size_t) const src_buffer_id )
 {
-    return ( ctx != nullptr )
-        ? ctx->assign_addresses( map_buffer, dest_buffer, src_buffer )
+    return ( ( ctx != nullptr ) && ( assign_items_arg != nullptr ) &&
+             ( dest_buffer_arg != nullptr ) && ( src_buffer_arg != nullptr ) )
+        ? ctx->assign_addresses( *assign_items_arg,
+            *dest_buffer_arg, dest_buffer_id, *src_buffer_arg, src_buffer_id )
         : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 

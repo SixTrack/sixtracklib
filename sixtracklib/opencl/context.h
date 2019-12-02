@@ -94,20 +94,20 @@ namespace SIXTRL_CXX_NAMESPACE
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         status_t assign_particles_arg(
-            ClArgument& SIXTRL_RESTRICT_REF particles_arg );
+            cl_argument_t& SIXTRL_RESTRICT_REF particles_arg );
 
         status_t assign_particle_set_arg(
             size_type const particle_set_index,
             size_type const num_particles_in_set );
 
         status_t assign_beam_elements_arg(
-            ClArgument& SIXTRL_RESTRICT_REF beam_elements_arg );
+            cl_argument_t& SIXTRL_RESTRICT_REF beam_elements_arg );
 
         status_t assign_output_buffer_arg(
-            ClArgument& SIXTRL_RESTRICT_REF output_buffer_arg );
+            cl_argument_t& SIXTRL_RESTRICT_REF output_buffer_arg );
 
         status_t assign_elem_by_elem_config_buffer_arg(
-            ClArgument& SIXTRL_RESTRICT_REF elem_by_elem_config_buffer_arg );
+            cl_argument_t& SIXTRL_RESTRICT_REF elem_by_elem_config_buffer_arg );
 
         status_t assign_elem_by_elem_config_index_arg(
             size_type const elem_by_elem_config_index );
@@ -188,9 +188,11 @@ namespace SIXTRL_CXX_NAMESPACE
         status_t set_assign_addresses_kernel_id( kernel_id_t const kernel_id );
 
         status_t assign_addresses(
-            SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT map_buffer,
-            SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT dest_buffer,
-            SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT src_buffer );
+            cl_argument_t& SIXTRL_RESTRICT_REF assign_items_arg,
+            cl_argument_t& SIXTRL_RESTRICT_REF dest_buffer_arg,
+            size_type const dest_buffer_id,
+            cl_argument_t& SIXTRL_RESTRICT_REF src_buffer_arg,
+            size_type const src_buffer_id );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -483,9 +485,11 @@ NS(ClContext_set_assign_addresses_kernel_id)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ClContext_assign_addresses)(
     NS(ClContext)* SIXTRL_RESTRICT ctx,
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT map_buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT dest_buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT src_buffer );
+    NS(ClArgument)* SIXTRL_RESTRICT assign_items_arg,
+    NS(ClArgument)* SIXTRL_RESTRICT dest_buffer_arg,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(ClArgument)* SIXTRL_RESTRICT src_buffer_arg,
+    NS(buffer_size_t) const src_buffer_id );
 
 /* ========================================================================= */
 
