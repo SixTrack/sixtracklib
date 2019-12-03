@@ -940,20 +940,27 @@ NS(TrackJob_assign_item_dest_src_end)(
         ? job->assign_item_dest_src_end() : nullptr;
 }
 
-::NS(arch_status_t) NS(TrackJob_perform_all_managed_assignments)(
+::NS(arch_status_t) NS(TrackJob_commit_address_assignments)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->perform_managed_assignments() : st::ARCH_STATUS_GENERAL_FAILURE;
+        ? job->commit_address_assignments() : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
-::NS(arch_status_t) NS(TrackJob_perform_managed_assignments)(
+::NS(arch_status_t) NS(TrackJob_assign_all_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->assign_all_addresses() : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(TrackJob_assign_addresses)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
     ::NS(buffer_size_t) const dest_buffer_id,
     ::NS(buffer_size_t) const src_buffer_id )
 {
     return ( job != nullptr )
-        ? job->perform_managed_assignments( dest_buffer_id, src_buffer_id )
+        ? job->assign_addresses( dest_buffer_id, src_buffer_id )
         : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 

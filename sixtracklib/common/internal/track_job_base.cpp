@@ -1342,7 +1342,12 @@ namespace SIXTRL_CXX_NAMESPACE
                     src_buffer_id, src_elem_index, src_pointer_offset } );
     }
 
-    _this_t::status_t TrackJobBase::perform_managed_assignments()
+    _this_t::status_t TrackJobBase::commit_address_assignments()
+    {
+        return this->doCommitAddressAssignments();
+    }
+
+    _this_t::status_t TrackJobBase::assign_all_addresses()
     {
         _this_t::status_t status = st::ARCH_STATUS_SUCCESS;
 
@@ -1351,18 +1356,18 @@ namespace SIXTRL_CXX_NAMESPACE
 
         for( ; it != end ; ++it )
         {
-            status = this->doPerformManagedAssignments( it->first );
+            status = this->doPerformAddressAssignments( it->first );
             if( status != st::ARCH_STATUS_SUCCESS ) break;
         }
 
         return status;
     }
 
-    _this_t::status_t TrackJobBase::perform_managed_assignments(
+    _this_t::status_t TrackJobBase::assign_addresses(
         _this_t::size_type const dest_buffer_id,
         _this_t::size_type const src_buffer_id )
     {
-        return this->doPerformManagedAssignments(
+        return this->doPerformAddressAssignments(
             _this_t::assign_item_key_t{ dest_buffer_id, src_buffer_id } );
     }
 
@@ -2933,7 +2938,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
-    _this_t::status_t TrackJobBase::doPerformManagedAssignments(
+    _this_t::status_t TrackJobBase::doPerformAddressAssignments(
         _this_t::assign_item_key_t const& SIXTRL_RESTRICT_REF key )
     {
         using size_t = _this_t::size_type;
@@ -2981,6 +2986,11 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     _this_t::status_t TrackJobBase::doRebuildAssignItemsBufferArg()
+    {
+        return st::ARCH_STATUS_SUCCESS;
+    }
+
+    _this_t::status_t TrackJobBase::doCommitAddressAssignments()
     {
         return st::ARCH_STATUS_SUCCESS;
     }
