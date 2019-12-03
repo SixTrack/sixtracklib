@@ -15,6 +15,7 @@ from .control import ControllerBase, NodeControllerBase, ArgumentBase
 from .buffer import Buffer, get_cbuffer_from_obj, AssignAddressItem
 from .particles import ParticlesSet
 from .beam_elements import Elements
+from .opencl import ClController
 
 from .stcommon import st_TrackJobBaseNew_p, st_NullTrackJobBaseNew, \
     st_ARCH_STATUS_SUCCESS, st_ARCH_STATUS_GENERAL_FAILURE, \
@@ -746,6 +747,8 @@ class TrackJob(object):
         self._ptr_c_output_buffer = st.st_NullBuffer
         self._stored_buffers = {}
         self._ext_stored_st_buffers = {}
+        self._last_status = st_ARCH_STATUS_SUCCESS.value
+        self._last_track_status = st_TRACK_SUCCESS.value
 
         base_addr_t = ct.POINTER(ct.c_ubyte)
         success = False
@@ -884,6 +887,14 @@ class TrackJob(object):
             self._ext_stored_st_buffers = None
 
     @property
+    def last_status(self):
+        return self._last_status
+
+    @property
+    def last_track_status(self):
+        return self._last_track_status
+
+    @property
     def output_buffer(self):
         return self._output_buffer
 
@@ -905,19 +916,31 @@ class TrackJob(object):
         return self.track_until(until_turn)
 
     def track_until(self, until_turn):
-        return st.st_TrackJob_track_until(
+        self._last_track_status = st.st_TrackJob_track_until(
             self.ptr_st_track_job, ct.c_uint64(until_turn))
+        if self._last_track_status != st.st_TRACK_SUCCESS.value:
+            raise RuntimeError(
+                f"Error during performing track_until({until_turn})")
+        return self
 
     def track_elem_by_elem(self, until_turn):
-        return st.st_TrackJob_track_elem_by_elem(
+        self._last_track_status = st.st_TrackJob_track_elem_by_elem(
             self.ptr_st_track_job, ct.c_uint64(until_turn))
+        if self._last_track_status != st.st_TRACK_SUCCESS.value:
+            raise RuntimeError(
+                f"Error during performing track_elem_by_elem({until_turn})")
+        return self
 
     def track_line(self, begin_idx, end_idx, finish_turn=False):
-        return st.st_TrackJob_track_line(
+        self._last_track_status = st.st_TrackJob_track_line(
             self.ptr_st_track_job,
             ct.c_uint64(begin_idx),
             ct.c_uint64(end_idx),
             ct.c_bool(finish_turn))
+        if self._last_track_status != st.st_TRACK_SUCCESS.value:
+            raise RuntimeError(
+                f"Error during performing track_line({until_turn})")
+        return self
 
     def collect(self):
         st.st_TrackJob_collect(self.ptr_st_track_job)
@@ -1030,7 +1053,8 @@ class TrackJob(object):
                 SIXTRACKLIB_MODULES.get(self.arch_str, False):
             if self.ptr_st_track_job == st_NullTrackJob:
                 raise RuntimeError("TrackJob is not initialized yet")
-            return st.st_TrackJobCl_get_context(self.ptr_st_track_job)
+            return ClController(ext_ptr_ctrl=st.st_TrackJobCl_get_context(
+                self.ptr_st_track_job), owns_ptr=False)
         else:
             raise RuntimeError(
                 "TrackJob has no controller for this architecture")
