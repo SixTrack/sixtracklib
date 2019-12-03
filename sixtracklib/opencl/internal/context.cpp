@@ -2111,9 +2111,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( ( success ) &&
                 ( this->m_assign_addr_program_id != st::ARCH_ILLEGAL_PROGRAM_ID ) &&
-                ( this->m_assign_addr_program_id <  this->numAvailablePrograms() ) &&
-                ( this->m_assign_addr_kernel_id  != st::ARCH_ILLEGAL_KERNEL_ID ) &&
-                ( this->m_assign_addr_kernel_id  <  this->numAvailableKernels() ) )
+                ( this->m_assign_addr_program_id <  this->numAvailablePrograms() ) )
             {
                 std::string kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
                 kernel_name += "AssignAddressItem_process_managed_buffer";

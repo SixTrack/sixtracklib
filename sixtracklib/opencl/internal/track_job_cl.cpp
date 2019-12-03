@@ -1165,11 +1165,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( ptr_stored_buffer->ptr_cxx_buffer() != nullptr )
             {
-                status = ptr_arg->write( *ptr_stored_buffer->ptr_cxx_buffer() );
+                status = ( ptr_arg->write(
+                    *ptr_stored_buffer->ptr_cxx_buffer() ) )
+                    ? st::ARCH_STATUS_SUCCESS
+                    : st::ARCH_STATUS_GENERAL_FAILURE;
             }
             else if( ptr_stored_buffer->ptr_buffer() != nullptr )
             {
-                status = ptr_arg->write( ptr_stored_buffer->ptr_buffer() );
+                status = ( ptr_arg->write(
+                    ptr_stored_buffer->ptr_buffer() ) )
+                    ? st::ARCH_STATUS_SUCCESS
+                    : st::ARCH_STATUS_GENERAL_FAILURE;
             }
         }
 
@@ -1193,11 +1199,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( ptr_stored_buffer->ptr_cxx_buffer() != nullptr )
             {
-                status = ptr_arg->read( *ptr_stored_buffer->ptr_cxx_buffer() );
+                status = ( ptr_arg->read( *ptr_stored_buffer->ptr_cxx_buffer() ) )
+                    ? st::ARCH_STATUS_SUCCESS
+                    : st::ARCH_STATUS_GENERAL_FAILURE;
             }
             else if( ptr_stored_buffer->ptr_buffer() != nullptr )
             {
-                status = ptr_arg->read( ptr_stored_buffer->ptr_buffer() );
+                status = ( ptr_arg->read( ptr_stored_buffer->ptr_buffer() ) )
+                    ? st::ARCH_STATUS_SUCCESS
+                    : st::ARCH_STATUS_GENERAL_FAILURE;
             }
         }
 
