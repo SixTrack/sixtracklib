@@ -1422,16 +1422,21 @@ st_TrackJob_is_raw_memory_by_buffer_id.argtypes = [
     st_TrackJob_p, st_buffer_size_t]
 st_TrackJob_is_raw_memory_by_buffer_id.restype = ct.c_bool
 
-st_TrackJob_perform_all_managed_assignments = \
-    sixtracklib.st_TrackJob_perform_all_managed_assignments
-st_TrackJob_perform_all_managed_assignments.argtypes = [st_TrackJob_p]
-st_TrackJob_perform_all_managed_assignments.restype = st_arch_status_t
+st_TrackJob_commit_address_assignments = \
+    sixtracklib.st_TrackJob_commit_address_assignments
+st_TrackJob_commit_address_assignments.argtypes = [st_TrackJob_p]
+st_TrackJob_commit_address_assignments.restype = st_arch_status_t
 
-st_TrackJob_perform_managed_assignments = \
-    sixtracklib.st_TrackJob_perform_managed_assignments
-st_TrackJob_perform_managed_assignments.argtypes = [
+st_TrackJob_assign_all_addresses = \
+    sixtracklib.st_TrackJob_assign_all_addresses
+st_TrackJob_assign_all_addresses.argtypes = [st_TrackJob_p]
+st_TrackJob_assign_all_addresses.restype = st_arch_status_t
+
+st_TrackJob_assign_addresses = \
+    sixtracklib.st_TrackJob_assign_addresses
+st_TrackJob_assign_addresses.argtypes = [
     st_TrackJob_p, st_buffer_size_t, st_buffer_size_t]
-st_TrackJob_perform_managed_assignments.restype = st_arch_status_t
+st_TrackJob_assign_addresses.restype = st_arch_status_t
 
 # ==============================================================================
 # sixtracklib/control, sixtracklib/track API:

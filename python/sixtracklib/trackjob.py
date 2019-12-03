@@ -1284,19 +1284,31 @@ class TrackJob(object):
                 "unable to add AssignAddressItem given by these parameters")
         return ptr_added_item
 
-    def push_assign_address_items(self):
-        # TODO: IMplement pushing!
+    def commit_address_assignments(self):
+        self._last_status = st.st_TrackJob_commit_address_assignments(
+            self.ptr_st_track_job)
+
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError("Unable to commit address assignment items")
+
         return self
 
-    def perform_managed_assignments(
-            self,
-            dest_buffer_id=None,
-            src_buffer_id=None):
+    def assign_all_addresses(self):
+        self._last_status = st.st_TrackJob_assign_all_addresses(
+            self.ptr_st_track_job)
+
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError(
+                "Unable to perform assignment of all address items")
+
+        return self
+
+    def assign_addresses(self, dest_buffer_id, src_buffer_id):
         if dest_buffer_id is None and src_buffer_id is None:
-            self._last_status = st.st_TrackJob_perform_all_managed_assignments(
+            self._last_status = st.st_TrackJob_assign_all_addresses(
                 self.ptr_st_track_job)
         elif not(dest_buffer_id is None) and not(src_buffer_id is None):
-            self._last_status = st.st_TrackJob_perform_managed_assignments(
+            self._last_status = st.st_TrackJob_assign_addresses(
                 self.ptr_st_track_job, st_buffer_size_t(dest_buffer_id),
                 st_buffer_size_t(src_buffer_id))
         else:
