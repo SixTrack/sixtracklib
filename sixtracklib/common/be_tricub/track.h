@@ -77,8 +77,8 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_tricub)(
     real_t const inv_dz = 1./( NS(TriCubData_dz)( tricub_data ) );
 
     real_t const x0 = NS(TriCubData_x0)( tricub_data );
-    real_t const y0 = NS(TriCubData_x0)( tricub_data );
-    real_t const z0 = NS(TriCubData_x0)( tricub_data );
+    real_t const y0 = NS(TriCubData_y0)( tricub_data );
+    real_t const z0 = NS(TriCubData_z0)( tricub_data );
 
     real_t const x = NS(Particles_get_x_value)( particles, ii );
     real_t const y = NS(Particles_get_y_value)( particles, ii );
