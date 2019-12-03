@@ -409,7 +409,11 @@ TEST( C99_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
     /* --------------------------------------------------------------------- */
 
     ::NS(arch_status_t) status =
-        ::NS(TrackJob_perform_all_managed_assignments)( job );
+        ::NS(TrackJob_commit_address_assignments)( job );
+
+    ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
+
+    status = ::NS(TrackJob_assign_all_addresses)( job );
 
     ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 

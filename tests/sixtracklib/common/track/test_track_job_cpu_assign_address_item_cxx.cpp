@@ -294,7 +294,10 @@ TEST( CXX_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
     ASSERT_TRUE(  job.num_assign_items(
         my_lattice_buffer_id, st::ARCH_OUTPUT_BUFFER_ID ) == size_t{ 0 } );
 
-    st::arch_status_t status = job.perform_managed_assignments();
+    st::arch_status_t status = job.commit_address_assignments();
+    ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
+
+    status = job.assign_all_addresses();
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
 
     bm0 = reinterpret_cast< be_monitor_t* >(
