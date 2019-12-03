@@ -234,10 +234,10 @@ if __name__ == '__main__':
 
     # --------------------------------------------------------------------------
     # finish assembly of assign items:
-    job.push_assign_address_items()
+    job.commit_address_assignments()
 
     # perform assignment of address items:
-    job.perform_managed_assignments()
+    job.assign_all_addresses()
 
     job.collect_beam_elements()
     assert lattice.cbuffer.get_object(bm0_index).out_address != 0
