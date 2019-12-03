@@ -679,30 +679,30 @@ class TrackJobBaseNew(object):
 class TrackJob(object):
     @staticmethod
     def num_all_nodes(arch_str=None):
-        if not( arch_str is None ) and arch_str == 'opencl' and \
-            stconf.SIXTRACKLIB_MODULES.get( 'opencl', False ):
+        if not(arch_str is None) and arch_str == 'opencl' and \
+                stconf.SIXTRACKLIB_MODULES.get('opencl', False):
             return st.st_OpenCL_get_num_all_nodes()
         else:
             return 0
 
     @staticmethod
     def num_available_nodes(arch_str=None, env_var_name=None, filter_str=None):
-        if not( arch_str is None ) and arch_str == 'opencl' and \
-            stconf.SIXTRACKLIB_MODULES.get( 'opencl', False ):
-            if not( filter_str is None ):
+        if not(arch_str is None) and arch_str == 'opencl' and \
+                stconf.SIXTRACKLIB_MODULES.get('opencl', False):
+            if not(filter_str is None):
                 filter_str = filter_str.strip().encode('utf-8')
-                _filter_str = ct.c_char_p( filter_str )
+                _filter_str = ct.c_char_p(filter_str)
             else:
-                _filter_str = ct.cast( 0, ct.c_char_p)
+                _filter_str = ct.cast(0, ct.c_char_p)
 
-            if not( env_var_name is None ):
+            if not(env_var_name is None):
                 env_var_name = env_var_name.strip().encode('utf-8')
-                _env_var_name = ct.c_char_p( env_var_name )
+                _env_var_name = ct.c_char_p(env_var_name)
             else:
-                _env_var_name = ct.cast( 0, ct.c_char_p )
+                _env_var_name = ct.cast(0, ct.c_char_p)
 
             return st.st_OpenCL_num_available_nodes_detailed(
-                    _filter_str, _env_var_name )
+                _filter_str, _env_var_name)
         else:
             return 0
 
@@ -1519,7 +1519,7 @@ class TrackJob(object):
         else:
             arch_str = self.arch_str
             raise RuntimeError(
-                f"unable to get argument for buffer on arch {arch_str}" )
+                f"unable to get argument for buffer on arch {arch_str}")
         return ptr_arg
 
     def stored_buffer_argument(self, buffer_id):
@@ -1530,7 +1530,7 @@ class TrackJob(object):
         else:
             arch_str = self.arch_str
             raise RuntimeError(
-                f"unable to get argument for stored buffer on arch {arch_str}" )
+                f"unable to get argument for stored buffer on arch {arch_str}")
         return ptr_arg
 
 # end: python/sixtracklib/trackjob.py
