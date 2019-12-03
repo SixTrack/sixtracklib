@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -298,6 +297,9 @@ TEST( CXX_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
 
     status = job.assign_all_addresses();
+    ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
+
+    status = job.collect_stored_buffer( my_lattice_buffer_id );
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
 
     bm0 = reinterpret_cast< be_monitor_t* >(
