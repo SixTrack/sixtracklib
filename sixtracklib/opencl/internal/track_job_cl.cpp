@@ -606,10 +606,10 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->doCollectStoredBufferOclImpl( buffer_id );
     }
 
-    _this_t::status_t TrackJobCl::doPerformManagedAssignments(
+    _this_t::status_t TrackJobCl::doPerformAddressAssignments(
         _this_t::assign_item_key_t const& SIXTRL_RESTRICT_REF assign_item_key )
     {
-        return this->doPerformManagedAssignmentsOclImpl( assign_item_key );
+        return this->doPerformAddressAssignmentsOclImpl( assign_item_key );
     }
 
     /* --------------------------------------------------------------------- */
@@ -1214,7 +1214,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return st::ARCH_STATUS_SUCCESS;
     }
 
-    _this_t::status_t TrackJobCl::doPerformManagedAssignmentsOclImpl(
+    _this_t::status_t TrackJobCl::doPerformAddressAssignmentsOclImpl(
         _this_t::assign_item_key_t const& SIXTRL_RESTRICT_REF key )
     {
         using size_t = _this_t::size_type;
