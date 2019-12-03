@@ -6,7 +6,6 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/buffer/assign_address_item_kernel_impl.h"
-    #include "sixtracklib/opencl/internal/status_flag.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __kernel void NS(AssignAddressItem_process_managed_buffer_opencl)(
