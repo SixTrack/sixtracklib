@@ -139,68 +139,70 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
 
         @staticmethod
         def NUM_AVAILABLE_NODES(filter_str=None, env_var_name=None):
-            if not( filter_str is None ):
+            if not(filter_str is None):
                 _filter_str_bytes = filter_str.strip().encode('utf-8')
-                _filter_str = ct.c_char_p( filter_str )
+                _filter_str = ct.c_char_p(filter_str)
             else:
                 _filter_str = None
 
-            if not( env_var_name is None):
+            if not(env_var_name is None):
                 _env_var_name_bytes = env_var_name.strip().encode('utf-8')
                 _env_var_name = ct.c_char_p(_env_var_name_bytes)
             else:
                 _env_var_name = None
 
             return st_Cuda_num_available_nodes_detailed(
-                _filter_str, _env_var_name )
+                _filter_str, _env_var_name)
 
         @staticmethod
         def PRINT_AVAILABLE_NODES(filter_str=None, env_var_name=None):
-            if not( filter_str is None ):
+            if not(filter_str is None):
                 _filter_str_bytes = filter_str.strip().encode('utf-8')
                 _filter_str = ct.c_char_p(_filter_str_bytes)
             else:
                 _filter_str = None
 
-            if not( env_var_name is None):
-                _env_var_name_bytes=env_var_name.strip().encode('utf-8')
+            if not(env_var_name is None):
+                _env_var_name_bytes = env_var_name.strip().encode('utf-8')
                 _env_var_name = ct.c_char_p(_env_var_name_bytes)
             else:
                 _env_var_name = None
 
             st_Cuda_print_available_nodes_detailed(
-                _filter_str, _env_var_name )
+                _filter_str, _env_var_name)
 
         @staticmethod
         def GET_AVAILABLE_NODES(filter_str=None,
-                env_var_name=None, skip_first_num_nodes=0):
+                                env_var_name=None, skip_first_num_nodes=0):
 
             nodes = []
-            if not( filter_str is None ):
+            if not(filter_str is None):
                 _filter_str_bytes = filter_str.strip().encode('utf-8')
                 _filter_str = ct.c_char_p(_filter_str_bytes)
             else:
                 _filter_str = None
 
-            if not( env_var_name is None):
+            if not(env_var_name is None):
                 _env_var_name_bytes = env_var_name.strip().encode('utf-8')
                 _env_var_name = ct.c_char_p(_env_var_name_bytes)
             else:
                 _env_var_name = None
 
             _num_avail_nodes = st_Cuda_num_available_nodes_detailed(
-                _filter_str, _env_var_name )
+                _filter_str, _env_var_name)
 
             if _num_avail_nodes > 0:
                 node_ids_array_t = st_NodeId_p * _num_avail_nodes
                 _node_ids = node_ids_array_t()
                 for ii in range(0, _num_avail_nodes):
-                    _node_ids[ ii ] = ct.cast( st_NodeId_create, st_NodeId_p )
+                    _node_ids[ii] = ct.cast(st_NodeId_create, st_NodeId_p)
 
-                _num_nodes = st_Cuda_get_available_nodes_detailed(_node_ids,
+                _num_nodes = st_Cuda_get_available_nodes_detailed(
+                    _node_ids,
                     st_arch_size_t(_num_avail_nodes),
-                        st_arch_size_t(skip_first_num_nodes),
-                            _filter_str, _env_var_name)
+                    st_arch_size_t(skip_first_num_nodes),
+                    _filter_str,
+                    _env_var_name)
 
                 for ii in range(0, _num_nodes):
                     platform_id = st_NodeId_get_platform_id(
@@ -209,58 +211,63 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
                         ct.byref(_node_ids[ii]))
                     node_index = st_NodeId_get_node_index(
                         ct.byref(_node_ids[ii]))
-                    nodes.append( NodeId(platform_id=platform_id,
-                        device_id=device_id, node_index=node_index))
+                    nodes.append(
+                        NodeId(
+                            platform_id=platform_id,
+                            device_id=device_id,
+                            node_index=node_index))
 
                 for ii in range(0, _num_avail_nodes):
-                    st_NodeId_delete( _node_ids[ ii ] )
-                    _node_ids[ ii ] = st_NullNodeId
+                    st_NodeId_delete(_node_ids[ii])
+                    _node_ids[ii] = st_NullNodeId
 
             return nodes
 
         @staticmethod
-        def GET_AVAILABLE_NODE_ID_STRS( filter_str=None,
-            env_var_name=None, skip_first_num_nodes=0,
-            node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value ):
+        def GET_AVAILABLE_NODE_ID_STRS(
+                filter_str=None,
+                env_var_name=None,
+                skip_first_num_nodes=0,
+                node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value):
 
             node_id_strs = []
-            if not( filter_str is None ):
+            if not(filter_str is None):
                 _filter_str_bytes = filter_str.strip().encode('utf-8')
                 _filter_str = ct.c_char_p(_filter_str_bytes)
             else:
                 _filter_str = None
 
-            if not( env_var_name is None):
+            if not(env_var_name is None):
                 _env_var_name_bytes = env_var_name.strip().encode('utf-8')
                 _env_var_name = ct.c_char_p(_env_var_name_bytes)
             else:
                 _env_var_name = None
 
             _num_avail_nodes = st_Cuda_num_available_nodes_detailed(
-                _filter_str, _env_var_name )
+                _filter_str, _env_var_name)
 
             if _num_avail_nodes > 0:
                 _node_id_str_capacity = 64
                 node_id_str_buffer = [
-                    ct.create_string_buffer(_node_id_str_capacity) ]
+                    ct.create_string_buffer(_node_id_str_capacity)]
 
                 node_id_str_array_t = ct.c_char_p * _num_avail_nodes
                 _tmp_node_id_strs = node_id_str_array_t()
 
-                for ii in range(0,_num_avail_nodes):
+                for ii in range(0, _num_avail_nodes):
                     _tmp_node_id_strs[ii] = ct.cast(
                         node_id_str_buffer[ii], ct.c_char_p)
 
                 _num_node_id_strs = \
-                st_Cuda_get_available_node_id_strs_detailed(
-                    _tmp_node_id_strs, st_arch_size_t(_num_avail_nodes),
+                    st_Cuda_get_available_node_id_strs_detailed(
+                        _tmp_node_id_strs, st_arch_size_t(_num_avail_nodes),
                         st_arch_size_t(_node_id_str_capacity),
                         st_node_id_str_fmt_t(node_id_str_fmt),
-                            st_arch_size_t(skip_first_num_nodes),
-                                _filter_str, _env_var_name )
+                        st_arch_size_t(skip_first_num_nodes),
+                        _filter_str, _env_var_name)
 
-                node_id_strs = [ bytes( _tmp_node_id_strs[ii] ).decode('utf-8')
-                        for ii in range( 0, _num_node_id_strs) ]
+                node_id_strs = [bytes(_tmp_node_id_strs[ii]).decode('utf-8')
+                                for ii in range(0, _num_node_id_strs)]
             return node_id_strs
 
         # *********************************************************************
@@ -625,14 +632,16 @@ else:
 
         @staticmethod
         def GET_AVAILABLE_NODES(filter_str=None,
-                env_var_name=None, skip_first_num_nodes=0):
+                                env_var_name=None, skip_first_num_nodes=0):
             raise RuntimeError("Cuda module disabled, no nodes available")
             return []
 
         @staticmethod
-        def GET_AVAILABLE_NODE_ID_STRS( filter_str=None,
-            env_var_name=None, skip_first_num_nodes=0,
-            node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value ):
+        def GET_AVAILABLE_NODE_ID_STRS(
+                filter_str=None,
+                env_var_name=None,
+                skip_first_num_nodes=0,
+                node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value):
             raise RuntimeError("Cuda module disabled, no nodes available")
             return []
 

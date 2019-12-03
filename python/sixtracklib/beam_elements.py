@@ -16,9 +16,11 @@ class Drift(CObject):
     _typeid = 2
     length = CField(0, 'real', default=0.0, alignment=8)
 
+
 class DriftExact(CObject):
     _typeid = 3
     length = CField(0, 'real', default=0.0, alignment=8)
+
 
 class Multipole(CObject):
     _typeid = 4
@@ -91,6 +93,7 @@ class Multipole(CObject):
         assert order <= self.order
         self.bal[order * 2 + 1] = value / factorial(order, exact=True)
 
+
 class RFMultipole(CObject):
     _typeid = 128
     order = CField(0, 'int64', default=0, const=True, alignment=8)
@@ -136,8 +139,6 @@ class SRotation(CObject):
         return self.angle * (180.0 / np.pi)
 
 
-
-
 class BeamMonitor(CObject):
     _typeid = 10
     num_stores = CField(0, 'int64', default=0, alignment=8)
@@ -148,6 +149,7 @@ class BeamMonitor(CObject):
     min_particle_id = CField(5, 'int64', default=0, alignment=8)
     is_rolling = CField(6, 'int64', default=0, alignment=8)
     is_turn_ordered = CField(7, 'int64', default=1, alignment=8)
+
 
 def append_beam_monitors_to_lattice(
         beam_elements_buffer, until_turn_elem_by_elem, until_turn_turn_by_turn,
@@ -197,6 +199,7 @@ def append_beam_monitors_to_lattice(
         num_beam_monitors_added += 1
 
     return num_beam_monitors_added
+
 
 class LimitRect(CObject):
     _typeid = 11
@@ -288,6 +291,7 @@ class LimitEllipse(CObject):
         self.a_b_squ = a_squ * b_squ
         return self
 
+
 class LimitZeta(CObject):
     _typeid = 13
     min_zeta = CField(0, 'float64', default=-1e18, alignment=8)
@@ -299,6 +303,7 @@ class LimitZeta(CObject):
         if max_zeta is None:
             max_zeta = +1e16
         super().__init__(min_zeta=min_zeta, max_zeta=max_zeta, **kwargs)
+
 
 class LimitDelta(CObject):
     _typeid = 14
@@ -337,6 +342,7 @@ class BeamBeam4D(CObject):
             super().__init__(size=len(data), data=data, **kwargs)
         else:
             super().__init__(**kwargs)
+
 
 class BeamBeam6D(CObject):
     _typeid = 9
@@ -388,6 +394,7 @@ class BeamBeam6D(CObject):
         else:
             super().__init__(**kwargs)
 
+
 class SpaceChargeCoasting(CObject):
     _typeid = 34
     size = CField(0, 'uint64', const=True, default=0)
@@ -410,6 +417,7 @@ class SpaceChargeCoasting(CObject):
             super().__init__(size=len(data), data=data, **kwargs)
         else:
             super().__init__(**kwargs)
+
 
 class SpaceChargeBunched(CObject):
     _typeid = 35
@@ -434,6 +442,7 @@ class SpaceChargeBunched(CObject):
             super().__init__(size=len(data), data=data, **kwargs)
         else:
             super().__init__(**kwargs)
+
 
 class DipoleEdge(CObject):
     _typeid = 64
@@ -474,6 +483,7 @@ class DipoleEdge(CObject):
                 "DipoleEdge needs either coefficiants r21 and r43"
                 " or suitable values for h, e1, hgap, and fint provided")
 
+
 class Elements(object):
     element_types = {'Cavity': Cavity,
                      'Drift': Drift,
@@ -485,16 +495,16 @@ class Elements(object):
                      'BeamMonitor': BeamMonitor,
                      'LimitRect': LimitRect,
                      'LimitEllipse': LimitEllipse,
-                     'LimitZeta' : LimitZeta,
+                     'LimitZeta': LimitZeta,
                      'BeamBeam4D': BeamBeam4D,
                      'BeamBeam6D': BeamBeam6D,
                      'SpaceChargeCoasting': SpaceChargeCoasting,
                      'SpaceChargeBunched': SpaceChargeBunched,
                      'DipoleEdge': DipoleEdge,
                      #                     'Line': Line,
-                     #'TriCub': TriCub,
-                     #'Solenoid': Solenoid,
-                     #'Wire': Wire,
+                     # 'TriCub': TriCub,
+                     # 'Solenoid': Solenoid,
+                     # 'Wire': Wire,
                      }
 
     def _mk_fun(self, buff, cls):

@@ -91,11 +91,11 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         st_OpenCL_get_available_node_id_strs_detailed
 
     class ClNodeId(object):
-        def __init__( self,
+        def __init__(self,
                      ext_ptr_node_id=st_NullClNodeId, owns_ptr=True,
                      node_id_str=None,
                      node_id_str_fmt=st_NODE_ID_STR_FORMAT_NOARCH.value,
-                     platform_id=None, device_id=None ):
+                     platform_id=None, device_id=None):
             self._arch_id = st_ARCHITECTURE_OPENCL.value
             self._ptr_node_id = st_NullClNodeId
             self._owns_node = True
@@ -108,27 +108,26 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                 self._ptr_node_id = st_ComputeNodeId_create()
                 _temp_arch_id = st_ARCHITECTURE_OPENCL
 
-                if not( node_id_str is None ):
+                if not(node_id_str is None):
                     node_id_str = node_id_str.strip().encode('utf-8')
                     self._last_status = st_ComputeNodeId_from_string_with_format(
                         self._ptr_node_id, ct.c_char_p(node_id_str),
-                            st_node_id_str_fmt_t(node_id_str_fmt),
-                                ct.byref( _temp_arch_id ) )
+                        st_node_id_str_fmt_t(node_id_str_fmt),
+                        ct.byref(_temp_arch_id))
                     if self._last_status != st_ARCH_STATUS_SUCCESS.value:
                         error_msg = f"""
                         "Unable to initialize a ClNodeId from node_id_str=\"
                         {node_id_str}, format={node_id_str_fmt}"""
                         raise ValueError(error_msg)
-                elif not( platform_id is None ) and not( device_id is None ):
+                elif not(platform_id is None) and not(device_id is None):
                     st_ComputeNodeId_set_platform_id(
-                        self._ptr_node_id, st_node_platform_id_t( platform_id ) )
+                        self._ptr_node_id, st_node_platform_id_t(platform_id))
                     st_ComputeNodeId_set_device_id(
-                        self._ptr_node_id, st_node_device_id_t(device_id ) )
-
+                        self._ptr_node_id, st_node_device_id_t(device_id))
 
         def __del__(self):
             if self._owns_node and self._ptr_node_id != st_NullClNodeId:
-                st_ComputeNodeId_delete( self._ptr_node_id )
+                st_ComputeNodeId_delete(self._ptr_node_id)
                 self._ptr_node_id = st_NullClNodeId
 
         @property
@@ -149,11 +148,11 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
         @property
         def platform_id(self):
-            return st_ComputeNodeId_get_platform_id( self._ptr_node_id )
+            return st_ComputeNodeId_get_platform_id(self._ptr_node_id)
 
         @property
         def device_id(self):
-            return st_ComputeNodeId_get_device_id( self._ptr_node_id )
+            return st_ComputeNodeId_get_device_id(self._ptr_node_id)
 
         def set_platform_id(self, platform_id):
             if self._owns_node:
@@ -173,10 +172,10 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
         def to_string(self, format=st_NODE_ID_STR_FORMAT_ARCHSTR.value):
             node_id_str = None
-            _str = ct.create_string_buffer( 64 )
+            _str = ct.create_string_buffer(64)
             self._last_status = st_ComputeNodeId_to_string_with_format(
-                self._ptr_node_id, _str, 64, st_arch_id_t( self._arch_id ),
-                    st_node_id_str_fmt_t( format ) )
+                self._ptr_node_id, _str, 64, st_arch_id_t(self._arch_id),
+                st_node_id_str_fmt_t(format))
             if self._last_status == st_ARCH_STATUS_SUCCESS.value:
                 node_id_str = bytes(_str.value).decode('utf-8')
             else:
@@ -193,7 +192,6 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         def __str__(self):
             return self.to_string(format=st_NODE_ID_STR_FORMAT_ARCHSTR.value)
 
-
     class ClController(object):
         @staticmethod
         def NUM_ALL_NODES():
@@ -205,37 +203,37 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
         @staticmethod
         def NUM_AVAILABLE_NODES(filter_str=None, env_var_name=None):
-            if not( filter_str is None ):
+            if not(filter_str is None):
                 _filter_str_bytes = filter_str.strip().encode('utf-8')
-                _filter_str = ct.c_char_p( filter_str )
+                _filter_str = ct.c_char_p(filter_str)
             else:
                 _filter_str = None
 
-            if not( env_var_name is None):
+            if not(env_var_name is None):
                 _env_var_name_bytes = env_var_name.strip().encode('utf-8')
                 _env_var_name = ct.c_char_p(_env_var_name_bytes)
             else:
                 _env_var_name = None
 
             return st_OpenCL_num_available_nodes_detailed(
-                _filter_str, _env_var_name )
+                _filter_str, _env_var_name)
 
         @staticmethod
         def PRINT_AVAILABLE_NODES(filter_str=None, env_var_name=None):
-            if not( filter_str is None ):
+            if not(filter_str is None):
                 _filter_str_bytes = filter_str.strip().encode('utf-8')
                 _filter_str = ct.c_char_p(_filter_str_bytes)
             else:
                 _filter_str = None
 
-            if not( env_var_name is None):
-                _env_var_name_bytes=env_var_name.strip().encode('utf-8')
+            if not(env_var_name is None):
+                _env_var_name_bytes = env_var_name.strip().encode('utf-8')
                 _env_var_name = ct.c_char_p(_env_var_name_bytes)
             else:
                 _env_var_name = None
 
             st_OpenCL_print_available_nodes_detailed(
-                _filter_str, _env_var_name )
+                _filter_str, _env_var_name)
 
         @staticmethod
         def GET_AVAILABLE_NODES(filter_str=None, env_var_name=None,
@@ -244,13 +242,13 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                 filter_str=filter_str, env_var_name=env_var_name)
             nodes = []
             if _num_avail_nodes > 0:
-                if not( filter_str is None ):
+                if not(filter_str is None):
                     _filter_str_bytes = filter_str.strip().encode('utf-8')
                     _filter_str = ct.c_char_p(_filter_str_bytes)
                 else:
                     _filter_str = None
 
-                if not( env_var_name is None):
+                if not(env_var_name is None):
                     _env_var_name_bytes = env_var_name.strip().encode('utf-8')
                     _env_var_name = ct.c_char_p(_env_var_name_bytes)
                 else:
@@ -265,57 +263,59 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
                 for ii in range(0, _num_nodes):
                     platform_id = st_ComputeNodeId_get_platform_id(
-                        ct.byref( _node_ids[ ii ] ) )
+                        ct.byref(_node_ids[ii]))
                     device_id = st_ComputeNodeId_get_device_id(
-                        ct.byref( _node_ids[ ii ] ) )
-                    nodes.append( ClNodeId(platform_id=platform_id,
-                                device_id=device_id, owns_ptr=True))
+                        ct.byref(_node_ids[ii]))
+                    nodes.append(ClNodeId(platform_id=platform_id,
+                                          device_id=device_id, owns_ptr=True))
             return nodes
 
         @staticmethod
-        def GET_AVAILABLE_NODE_ID_STRS( filter_str=None,
-            env_var_name=None, skip_first_num_nodes=0,
-            node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value ):
+        def GET_AVAILABLE_NODE_ID_STRS(
+                filter_str=None,
+                env_var_name=None,
+                skip_first_num_nodes=0,
+                node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value):
 
             node_id_strs = []
-            if not( filter_str is None ):
+            if not(filter_str is None):
                 _filter_str_bytes = filter_str.strip().encode('utf-8')
                 _filter_str = ct.c_char_p(_filter_str_bytes)
             else:
                 _filter_str = None
 
-            if not( env_var_name is None):
+            if not(env_var_name is None):
                 _env_var_name_bytes = env_var_name.strip().encode('utf-8')
                 _env_var_name = ct.c_char_p(_env_var_name_bytes)
             else:
                 _env_var_name = None
 
             _num_avail_nodes = st_OpenCL_num_available_nodes_detailed(
-                _filter_str, _env_var_name )
+                _filter_str, _env_var_name)
 
             if _num_avail_nodes > 0:
                 _node_id_str_capacity = 64
-                node_id_str_buffer = [ ct.create_string_buffer(_node_id_str_capacity) ]
+                node_id_str_buffer = [
+                    ct.create_string_buffer(_node_id_str_capacity)]
 
                 node_id_str_array_t = ct.c_char_p * _num_avail_nodes
                 _tmp_node_id_strs = node_id_str_array_t()
 
-                for ii in range(0,_num_avail_nodes):
+                for ii in range(0, _num_avail_nodes):
                     _tmp_node_id_strs[ii] = ct.cast(
                         node_id_str_buffer[ii], ct.c_char_p)
 
                 _num_node_id_strs = \
-                st_OpenCL_get_available_node_id_strs_detailed(
-                    _tmp_node_id_strs, st_arch_size_t(_num_avail_nodes),
+                    st_OpenCL_get_available_node_id_strs_detailed(
+                        _tmp_node_id_strs, st_arch_size_t(_num_avail_nodes),
                         st_arch_size_t(_node_id_str_capacity),
                         st_node_id_str_fmt_t(node_id_str_fmt),
-                            st_arch_size_t(skip_first_num_nodes),
-                                _filter_str, _env_var_name )
+                        st_arch_size_t(skip_first_num_nodes),
+                        _filter_str, _env_var_name)
 
-                node_id_strs = [ bytes( _tmp_node_id_strs[ii] ).decode('utf-8')
-                        for ii in range( 0, _num_node_id_strs) ]
+                node_id_strs = [bytes(_tmp_node_id_strs[ii]).decode('utf-8')
+                                for ii in range(0, _num_node_id_strs)]
             return node_id_strs
-
 
         def __init__(self, config_str=None, device_id=None,
                      ext_ptr_ctrl=st_NullClContextBase, owns_ptr=True):
@@ -734,9 +734,11 @@ else:
             return []
 
         @staticmethod
-        def GET_AVAILABLE_NODE_ID_STRS( filter_str=None,
-            env_var_name=None, skip_first_num_nodes=0,
-            node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value ):
+        def GET_AVAILABLE_NODE_ID_STRS(
+                filter_str=None,
+                env_var_name=None,
+                skip_first_num_nodes=0,
+                node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value):
             raise RuntimeError("OpenCL module disabled, no nodes available")
             return []
 
