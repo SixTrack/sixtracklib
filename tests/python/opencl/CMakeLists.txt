@@ -37,3 +37,11 @@ add_test( NAME Python_OpenCL_TrackJob_InitTests
     COMMAND ${PYTHON_EXECUTABLE}
         ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cl_stored_buffer.py
     WORKING_DIRECTORY ${PYTHON_TESTS_WORKDIR} )
+
+# ------------------------------------------------------------------------------
+# test_track_job_cl_assign_addresses_opencl:
+
+ add_test( NAME Python_OpenCL_TrackJob_AssignAddressItemsTests
+    COMMAND ${PYTHON_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cl_assign_addresses.py
+    WORKING_DIRECTORY ${PYTHON_TESTS_WORKDIR} )
