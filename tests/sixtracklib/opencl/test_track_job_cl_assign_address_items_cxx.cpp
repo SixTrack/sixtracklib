@@ -1,7 +1,9 @@
-#include "sixtracklib/common/track_job_cpu.h"
+#include "sixtracklib/opencl/track_job_cl.h"
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -13,22 +15,31 @@
 #include "sixtracklib/common/be_drift/be_drift.hpp"
 #include "sixtracklib/common/be_monitor/be_monitor.hpp"
 #include "sixtracklib/common/particles.hpp"
+#include "sixtracklib/common/context/compute_arch.h"
+#include "sixtracklib/opencl/internal/base_context.h"
 
-
-TEST( CXX_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
+TEST( CXXOpenCLTrackJobClAssignAddressItemsTests, MinimalUsage )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
-    using track_job_t    = st::TrackJobCpu;
+    using track_job_t    = st::TrackJobCl;
     using size_t         = track_job_t::size_type;
     using assign_item_t  = track_job_t::assign_item_t;
     using buffer_t       = track_job_t::buffer_t;
     using c_buffer_t     = track_job_t::c_buffer_t;
+    using controller_t   = track_job_t::context_t;
     using particle_set_t = st::Particles;
     using be_monitor_t   = st::BeamMonitor;
     using drift_t        = st::Drift;
+    using addr_t         = st::buffer_addr_t;
 
     buffer_t my_lattice;
     buffer_t my_output_buffer;
+
+    if( controller_t::NUM_AVAILABLE_NODES() == 0u )
+    {
+        std::cout << "No OpenCL nodes available -> skipping test\r\n";
+        return;
+    }
 
     st::Drift* dr = my_lattice.add< drift_t >( 0.0 );
     SIXTRL_ASSERT( dr != nullptr );
@@ -116,7 +127,32 @@ TEST( CXX_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
     out_buffer0 = my_output_buffer.get< particle_set_t >( out_buffer0_index );
     out_buffer1 = my_output_buffer.get< particle_set_t >( out_buffer1_index );
 
-    track_job_t job;
+    /* --------------------------------------------------------------------- */
+
+    char NODE_ID_STR[ 32 ] =
+    {
+        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
+    };
+
+    char* NODE_ID_STR_ARRAY[ 1 ] = { &NODE_ID_STR[ 0 ] };
+
+    size_t const num_nodes =
+        controller_t::GET_AVAILABLE_NODE_ID_STR( NODE_ID_STR_ARRAY,
+            size_t{ 1 }, size_t{ 32 }, st::NODE_ID_STR_FORMAT_NOARCH );
+
+    ASSERT_TRUE( num_nodes == size_t{ 1 } );
+
+    track_job_t job( std::string{ NODE_ID_STR } );
+
+    ASSERT_TRUE( job.ptrContext() != nullptr );
+    ASSERT_TRUE( job.ptrContext()->hasSelectedNode() );
+    ASSERT_TRUE( job.ptrContext()->selectedNodeIdStr().compare(
+        NODE_ID_STR ) == 0 );
+
+    /* -------------------------------------------------------------------- */
 
     size_t const my_lattice_buffer_id = job.add_stored_buffer(
         std::move( my_lattice ) );
@@ -300,7 +336,7 @@ TEST( CXX_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
 
     status = job.collect_stored_buffer( my_lattice_buffer_id );
-    ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
+    ASSERT_TRUE(status == st::ARCH_STATUS_SUCCESS );
 
     bm0 = reinterpret_cast< be_monitor_t* >(
         ::NS(BeamElements_buffer_get_beam_monitor)( ptr_my_lattice_buffer,
@@ -318,12 +354,16 @@ TEST( CXX_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
     SIXTRL_ASSERT( bm1 != nullptr );
     SIXTRL_ASSERT( bm2 != nullptr );
 
-    ASSERT_TRUE( bm0->out_address == reinterpret_cast< uintptr_t >(
-        out_buffer0 ) );
+    ASSERT_TRUE( bm0->out_address != addr_t{ 0 } );
+    ASSERT_TRUE( bm1->out_address != addr_t{ 0 } );
+    ASSERT_TRUE( bm2->out_address != addr_t{ 0 } );
 
-    ASSERT_TRUE( bm1->out_address == reinterpret_cast< uintptr_t >(
-        out_buffer1 ) );
+    ASSERT_TRUE( bm0->out_address == bm2->out_address );
+    ASSERT_TRUE( bm1->out_address != bm0->out_address );
+    ASSERT_TRUE( bm0->out_address <  bm1->out_address );
 
-    ASSERT_TRUE( bm2->out_address == reinterpret_cast< uintptr_t >(
-        out_buffer0 ) );
+    ASSERT_TRUE( ( bm1->out_address - bm0->out_address ) ==
+        static_cast< addr_t >(
+            reinterpret_cast< uintptr_t >( out_buffer1 ) -
+            reinterpret_cast< uintptr_t >( out_buffer0 ) ) );
 }

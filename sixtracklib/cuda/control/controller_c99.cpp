@@ -12,6 +12,106 @@
 
 namespace st = SIXTRL_CXX_NAMESPACE;
 
+/* ------------------------------------------------------------------------- */
+
+::NS(arch_size_t) NS(Cuda_get_num_all_nodes)( void )
+{
+    return st::CudaController::NUM_ALL_NODES();
+}
+
+::NS(arch_size_t) NS(Cuda_get_all_nodes)(
+    ::NS(NodeId)* SIXTRL_RESTRICT out_node_ids_begin,
+    ::NS(arch_size_t) const max_num_node_ids )
+{
+    return st::CudaController::GET_ALL_NODES(
+        out_node_ids_begin, max_num_node_ids );
+}
+
+void NS(Cuda_print_all_nodes)( void )
+{
+    return st::CudaController::PRINT_ALL_NODES();
+}
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+::NS(arch_size_t) NS(Cuda_num_available_nodes)(
+    char const* SIXTRL_RESTRICT env_variable_name )
+{
+    return st::CudaController::NUM_AVAILABLE_NODES(
+        nullptr, env_variable_name );
+}
+
+::NS(arch_size_t) NS(Cuda_num_available_nodes_detailed)(
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name )
+{
+    return st::CudaController::NUM_AVAILABLE_NODES(
+        filter_str, env_variable_name );
+}
+
+::NS(arch_size_t) NS(Cuda_get_available_nodes)(
+    ::NS(NodeId)* SIXTRL_RESTRICT out_node_ids_begin,
+    ::NS(arch_size_t) const max_num_node_ids )
+{
+    return st::CudaController::GET_AVAILABLE_NODES(
+        out_node_ids_begin, max_num_node_ids );
+}
+
+::NS(arch_size_t) NS(Cuda_get_available_nodes_detailed)(
+    ::NS(NodeId)* SIXTRL_RESTRICT out_node_ids_begin,
+    ::NS(arch_size_t) const max_num_node_ids,
+    ::NS(arch_size_t) const skip_first_num_nodes,
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name )
+{
+    return st::CudaController::GET_AVAILABLE_NODES(
+        out_node_ids_begin, max_num_node_ids, skip_first_num_nodes,
+            filter_str, env_variable_name );
+}
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+void NS(Cuda_print_available_nodes)( void )
+{
+    return st::CudaController::PRINT_AVAILABLE_NODES( nullptr, nullptr );
+}
+
+void NS(Cuda_print_available_nodes_detailed)(
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name )
+{
+    return st::CudaController::PRINT_AVAILABLE_NODES(
+        filter_str, env_variable_name );
+}
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+::NS(arch_size_t) NS(Cuda_get_available_node_id_strs)(
+    char** SIXTRL_RESTRICT out_node_id_strs,
+    ::NS(arch_size_t) const max_num_node_ids,
+    ::NS(arch_size_t) const node_id_str_capacity )
+{
+    return st::CudaController::GET_AVAILABLE_NODE_ID_STR(
+        out_node_id_strs, max_num_node_ids, node_id_str_capacity );
+}
+
+::NS(arch_size_t) NS(Cuda_get_available_node_id_strs_detailed)(
+    char** SIXTRL_RESTRICT out_node_id_strs,
+    ::NS(arch_size_t) const max_num_node_ids,
+    ::NS(arch_size_t) const node_id_str_capacity,
+    ::NS(node_id_str_fmt_t) const node_id_str_format,
+    ::NS(arch_size_t) const skip_first_num_nodes,
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name )
+{
+    return st::CudaController::GET_AVAILABLE_NODE_ID_STR(
+        out_node_id_strs, max_num_node_ids, node_id_str_capacity,
+            node_id_str_format, skip_first_num_nodes, filter_str,
+                env_variable_name );
+}
+
+/* ------------------------------------------------------------------------- */
+
 ::NS(CudaController)* NS(CudaController_create)( void )
 {
     return new st::CudaController( "" );

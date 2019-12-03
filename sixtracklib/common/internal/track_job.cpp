@@ -806,28 +806,8 @@ bool NS(TrackJob_has_assign_items)(
                 dest_elem_index, dest_pointer_offset, src_type_id,
                     src_buffer_id, src_elem_index, src_pointer_offset );
 
-        std::cout << "dest_buffer_id = " << dest_buffer_id << "\r\n"
-                  << "src_buffer_id  = " << src_buffer_id << "\r\n"
-                  << "assign_address_item_index = "
-                  << assign_address_item_index << std::endl;
-
         ptr_item = job->ptr_assign_address_item(
             dest_buffer_id, src_buffer_id, assign_address_item_index );
-
-        std::cout << "ptr_item = " << std::hex << reinterpret_cast< uintptr_t >(
-            ptr_item ) << std::endl;
-
-        if( ptr_item != nullptr )
-        {
-            std::cout << ::NS(AssignAddressItem_dest_elem_type_id)( ptr_item ) << "\r\n"
-                      << ::NS(AssignAddressItem_dest_buffer_id)( ptr_item ) << "\r\n"
-                      << ::NS(AssignAddressItem_dest_elem_index)( ptr_item ) << "\r\n"
-                      << ::NS(AssignAddressItem_dest_pointer_offset)( ptr_item ) << "\r\n"
-                      << ::NS(AssignAddressItem_src_elem_type_id)( ptr_item ) << "\r\n"
-                      << ::NS(AssignAddressItem_src_buffer_id)( ptr_item ) << "\r\n"
-                      << ::NS(AssignAddressItem_src_elem_index)( ptr_item ) << "\r\n"
-                      << ::NS(AssignAddressItem_src_pointer_offset)( ptr_item ) << std::endl;
-        }
     }
 
     return ptr_item;
@@ -940,20 +920,27 @@ NS(TrackJob_assign_item_dest_src_end)(
         ? job->assign_item_dest_src_end() : nullptr;
 }
 
-::NS(arch_status_t) NS(TrackJob_perform_all_managed_assignments)(
+::NS(arch_status_t) NS(TrackJob_commit_address_assignments)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
 {
     return ( job != nullptr )
-        ? job->perform_managed_assignments() : st::ARCH_STATUS_GENERAL_FAILURE;
+        ? job->commit_address_assignments() : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
-::NS(arch_status_t) NS(TrackJob_perform_managed_assignments)(
+::NS(arch_status_t) NS(TrackJob_assign_all_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->assign_all_addresses() : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(TrackJob_assign_addresses)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
     ::NS(buffer_size_t) const dest_buffer_id,
     ::NS(buffer_size_t) const src_buffer_id )
 {
     return ( job != nullptr )
-        ? job->perform_managed_assignments( dest_buffer_id, src_buffer_id )
+        ? job->assign_addresses( dest_buffer_id, src_buffer_id )
         : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 

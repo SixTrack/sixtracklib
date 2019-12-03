@@ -64,12 +64,12 @@ st.TriCub_buffer_create_assign_address_item(
 
 # commit the mappings:
 
-job.push_assign_address_items()
+job.commit_address_assignments()
 
 # ------------------------------------------------------------------------------
 # 5) Perform the assignments
 
-job.perform_managed_assignments()
+job.assign_all_addresses()
 
 # ------------------------------------------------------------------------------
 # 6) Check whether the assignments actually worked

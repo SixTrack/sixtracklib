@@ -511,8 +511,10 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN assign_item_key_t const*
         assign_item_dest_src_end() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN status_t perform_managed_assignments();
-        SIXTRL_HOST_FN status_t perform_managed_assignments(
+        SIXTRL_HOST_FN status_t commit_address_assignments();
+
+        SIXTRL_HOST_FN status_t assign_all_addresses();
+        SIXTRL_HOST_FN status_t assign_addresses(
             size_type const dest_buffer_id, size_type const src_buffer_id );
 
         /* ---------------------------------------------------------------- */
@@ -735,8 +737,10 @@ namespace SIXTRL_CXX_NAMESPACE
             assign_item_key_t const& SIXTRL_RESTRICT_REF assign_item_key,
             size_type const index_of_item_to_remove );
 
-        SIXTRL_HOST_FN virtual status_t doPerformManagedAssignments(
+        SIXTRL_HOST_FN virtual status_t doPerformAddressAssignments(
             assign_item_key_t const& SIXTRL_RESTRICT_REF assign_item_key );
+
+        SIXTRL_HOST_FN virtual status_t doCommitAddressAssignments();
 
         SIXTRL_HOST_FN virtual status_t doRebuildAssignItemsBufferArg();
 
@@ -857,6 +861,9 @@ namespace SIXTRL_CXX_NAMESPACE
             assign_item_key_t const& SIXTRL_RESTRICT_REF key,
             size_type const item_index ) SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN c_buffer_t* doGetPtrAssignAddressItemsBuffer(
+            assign_item_key_t const& SIXTRL_RESTRICT_REF key ) SIXTRL_NOEXCEPT;
+
 
         private:
 
@@ -925,7 +932,7 @@ typedef SIXTRL_CXX_NAMESPACE::TrackJobBase NS(TrackJobBase);
 
 typedef void NS(TrackJobBase);
 
-#endif /* de<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<fined( __cplusplus ) && !defined( _GPUCODE ) */
+#endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
 
 #if !defined( _GPUCODE )
 #if defined( __cplusplus )

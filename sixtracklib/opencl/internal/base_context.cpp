@@ -2763,6 +2763,32 @@ void NS(OpenCL_print_available_nodes_detailed)(
     st::ClContextBase::PRINT_AVAILABLE_NODES( filter_str, env_variable_name );
 }
 
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+::NS(arch_size_t) NS(OpenCL_get_available_node_id_strs)(
+    char** SIXTRL_RESTRICT out_node_id_strs,
+    ::NS(arch_size_t) const max_num_node_ids,
+    ::NS(arch_size_t) const node_id_str_capacity )
+{
+    return st::ClContextBase::GET_AVAILABLE_NODE_ID_STR(
+        out_node_id_strs, max_num_node_ids, node_id_str_capacity );
+}
+
+::NS(arch_size_t) NS(OpenCL_get_available_node_id_strs_detailed)(
+    char** SIXTRL_RESTRICT out_node_id_strs,
+    ::NS(arch_size_t) const max_num_node_ids,
+    ::NS(arch_size_t) const node_id_str_capacity,
+    ::NS(node_id_str_fmt_t) const node_id_str_format,
+    ::NS(arch_size_t) const skip_first_num_nodes,
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name )
+{
+    return st::ClContextBase::GET_AVAILABLE_NODE_ID_STR(
+        out_node_id_strs, max_num_node_ids, node_id_str_capacity,
+            node_id_str_format, skip_first_num_nodes, filter_str,
+                env_variable_name );
+}
+
 /* ************************************************************************* */
 
 ::NS(ClContextBase)* NS(ClContextBase_create)()

@@ -16,10 +16,10 @@ if __name__ == '__main__':
     assert job.max_stored_buffer_id == 0
 
     data_buffer = st.ParticlesSet()
-    out_data_index = data_buffer.buffer.n_objects
+    out_data_index = data_buffer.cbuffer.n_objects
     out_data = data_buffer.Particles(num_particles=1000)
-    assert data_buffer.buffer.n_objects == 1
-    assert data_buffer.buffer.size > 0
+    assert data_buffer.cbuffer.n_objects == 1
+    assert data_buffer.cbuffer.size > 0
 
     data_buffer_id = job.add_stored_buffer(cbuffer=data_buffer)
     assert data_buffer_id != st.stcommon.st_ARCH_ILLEGAL_BUFFER_ID.value
@@ -30,12 +30,12 @@ if __name__ == '__main__':
 
     st_data_buffer = job.stored_buffer(data_buffer_id)
     assert st_data_buffer.pointer != st.stcommon.st_NullBuffer
-    assert st_data_buffer.num_objects == data_buffer.buffer.n_objects
-    assert st_data_buffer.size == data_buffer.buffer.size
+    assert st_data_buffer.num_objects == data_buffer.cbuffer.n_objects
+    assert st_data_buffer.size == data_buffer.cbuffer.size
 
     ptr_data_buffer = job.ptr_stored_buffer(data_buffer_id)
     assert ptr_data_buffer != st.stcommon.st_NullBuffer
     assert st.stcommon.st_Buffer_get_size(
-        ptr_data_buffer) == data_buffer.buffer.size
+        ptr_data_buffer) == data_buffer.cbuffer.size
     assert st.stcommon.st_Buffer_get_num_of_objects(
-        ptr_data_buffer) == data_buffer.buffer.n_objects
+        ptr_data_buffer) == data_buffer.cbuffer.n_objects

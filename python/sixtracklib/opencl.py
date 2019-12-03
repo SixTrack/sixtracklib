@@ -13,13 +13,19 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         st_NullBuffer, st_Buffer_p, st_Null, st_NullChar, \
         st_ARCH_ILLEGAL_PROGRAM_ID, st_ARCH_ILLEGAL_KERNEL_ID, \
         st_ARCH_STATUS_GENERAL_FAILURE, st_ARCH_STATUS_SUCCESS, \
+        st_ARCHITECTURE_OPENCL, st_NODE_ID_STR_FORMAT_ARCHSTR, \
+        st_NODE_ID_STR_FORMAT_NOARCH, st_node_id_str_fmt_t, st_arch_id_t, \
         st_arch_program_id_t, st_arch_kernel_id_t, st_arch_status_t, \
         st_arch_size_t, st_node_platform_id_t, st_node_device_id_t, \
-        st_ClNodeId_p, st_NullClNodeId, st_ClNodeInfo_p, st_NullClNodeInfo, \
+        st_ClNodeId, st_ClNodeId_p, st_NullClNodeId, \
+        st_ClNodeInfo_p, st_NullClNodeInfo, \
+        st_ComputeNodeId_create, st_ComputeNodeId_delete, \
         st_ComputeNodeId_get_platform_id, st_ComputeNodeId_get_device_id, \
         st_ComputeNodeId_set_platform_id, st_ComputeNodeId_set_device_id, \
         st_ComputeNodeId_is_valid, st_ComputeNodeId_compare, \
         st_ComputeNodeId_are_equal, st_ComputeNodeId_from_string, \
+        st_ComputeNodeId_from_string_with_format, \
+        st_ComputeNodeId_to_string, st_ComputeNodeId_to_string_with_format, \
         st_ComputeNodeInfo_preset, st_ComputeNodeInfo_print_out, \
         st_ComputeNodeInfo_free, st_ComputeNodeInfo_delete, \
         st_ComputeNodeInfo_reserve, st_ComputeNodeInfo_make, \
@@ -76,9 +82,241 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         st_ClArgument_write_memory, st_ClArgument_read_memory, \
         st_ClArgument_get_argument_size, st_ClArgument_uses_cobj_buffer, \
         st_ClArgument_get_ptr_cobj_buffer, st_ClArgument_get_ptr_to_context, \
-        st_ClArgument_attach_to_context
+        st_ClArgument_attach_to_context, \
+        st_OpenCL_get_num_all_nodes, st_OpenCL_get_all_nodes, \
+        st_OpenCL_print_all_nodes, st_OpenCL_num_available_nodes, \
+        st_OpenCL_num_available_nodes_detailed, \
+        st_OpenCL_get_available_nodes_detailed, \
+        st_OpenCL_print_available_nodes_detailed, \
+        st_OpenCL_get_available_node_id_strs_detailed
+
+    class ClNodeId(object):
+        def __init__(self,
+                     ext_ptr_node_id=st_NullClNodeId, owns_ptr=True,
+                     node_id_str=None,
+                     node_id_str_fmt=st_NODE_ID_STR_FORMAT_NOARCH.value,
+                     platform_id=None, device_id=None):
+            self._arch_id = st_ARCHITECTURE_OPENCL.value
+            self._ptr_node_id = st_NullClNodeId
+            self._owns_node = True
+            self._last_status = st_ARCH_STATUS_SUCCESS.value
+
+            if ext_ptr_node_id != st_NullClNodeId:
+                self._ptr_node_id = ext_ptr_node_id
+                self._owns_node = owns_ptr
+            else:
+                self._ptr_node_id = st_ComputeNodeId_create()
+                _temp_arch_id = st_ARCHITECTURE_OPENCL
+
+                if not(node_id_str is None):
+                    node_id_str = node_id_str.strip().encode('utf-8')
+                    self._last_status = st_ComputeNodeId_from_string_with_format(
+                        self._ptr_node_id, ct.c_char_p(node_id_str),
+                        st_node_id_str_fmt_t(node_id_str_fmt),
+                        ct.byref(_temp_arch_id))
+                    if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+                        error_msg = f"""
+                        "Unable to initialize a ClNodeId from node_id_str=\"
+                        {node_id_str}, format={node_id_str_fmt}"""
+                        raise ValueError(error_msg)
+                elif not(platform_id is None) and not(device_id is None):
+                    st_ComputeNodeId_set_platform_id(
+                        self._ptr_node_id, st_node_platform_id_t(platform_id))
+                    st_ComputeNodeId_set_device_id(
+                        self._ptr_node_id, st_node_device_id_t(device_id))
+
+        def __del__(self):
+            if self._owns_node and self._ptr_node_id != st_NullClNodeId:
+                st_ComputeNodeId_delete(self._ptr_node_id)
+                self._ptr_node_id = st_NullClNodeId
+
+        @property
+        def last_status(self):
+            return self._last_status
+
+        @property
+        def pointer(self):
+            return self._ptr_node_id
+
+        @property
+        def owns_node(self):
+            return self._owns_node
+
+        @property
+        def arch_id(self):
+            return self._arch_id
+
+        @property
+        def platform_id(self):
+            return st_ComputeNodeId_get_platform_id(self._ptr_node_id)
+
+        @property
+        def device_id(self):
+            return st_ComputeNodeId_get_device_id(self._ptr_node_id)
+
+        def set_platform_id(self, platform_id):
+            if self._owns_node:
+                st_ComputeNodeId_set_platform_id(
+                    self._ptr_node_id, st_node_platform_id_t(platform_id))
+            else:
+                raise RuntimeError("Can't update ClNodeId via a non-owning obj")
+            return self
+
+        def set_device_id(self, device_id):
+            if self._owns_node:
+                st_ComputeNodeId_set_device_id(
+                    self._ptr_node_id, st_node_device_id_t(device_id))
+            else:
+                raise RuntimeError("Can't update ClNodeId via a non-owning obj")
+            return self
+
+        def to_string(self, format=st_NODE_ID_STR_FORMAT_ARCHSTR.value):
+            node_id_str = None
+            _str = ct.create_string_buffer(64)
+            self._last_status = st_ComputeNodeId_to_string_with_format(
+                self._ptr_node_id, _str, 64, st_arch_id_t(self._arch_id),
+                st_node_id_str_fmt_t(format))
+            if self._last_status == st_ARCH_STATUS_SUCCESS.value:
+                node_id_str = bytes(_str.value).decode('utf-8')
+            else:
+                raise RuntimeError("Unable to create node_id_str from ClNodeId")
+            return node_id_str
+
+        def __repr__(self):
+            a_id = self.arch_id
+            p_id = self.platform_id
+            d_id = self.device_id
+            msg = f"<ClNodeId:arch_id={a_id},platform_id={p_id},device_id={d_id}>\r\n"
+            return msg
+
+        def __str__(self):
+            return self.to_string(format=st_NODE_ID_STR_FORMAT_ARCHSTR.value)
 
     class ClController(object):
+        @staticmethod
+        def NUM_ALL_NODES():
+            return st_OpenCL_get_num_all_nodes()
+
+        @staticmethod
+        def PRINT_ALL_NODES():
+            st_OpenCL_print_all_nodes()
+
+        @staticmethod
+        def NUM_AVAILABLE_NODES(filter_str=None, env_var_name=None):
+            if not(filter_str is None):
+                _filter_str_bytes = filter_str.strip().encode('utf-8')
+                _filter_str = ct.c_char_p(filter_str)
+            else:
+                _filter_str = None
+
+            if not(env_var_name is None):
+                _env_var_name_bytes = env_var_name.strip().encode('utf-8')
+                _env_var_name = ct.c_char_p(_env_var_name_bytes)
+            else:
+                _env_var_name = None
+
+            return st_OpenCL_num_available_nodes_detailed(
+                _filter_str, _env_var_name)
+
+        @staticmethod
+        def PRINT_AVAILABLE_NODES(filter_str=None, env_var_name=None):
+            if not(filter_str is None):
+                _filter_str_bytes = filter_str.strip().encode('utf-8')
+                _filter_str = ct.c_char_p(_filter_str_bytes)
+            else:
+                _filter_str = None
+
+            if not(env_var_name is None):
+                _env_var_name_bytes = env_var_name.strip().encode('utf-8')
+                _env_var_name = ct.c_char_p(_env_var_name_bytes)
+            else:
+                _env_var_name = None
+
+            st_OpenCL_print_available_nodes_detailed(
+                _filter_str, _env_var_name)
+
+        @staticmethod
+        def GET_AVAILABLE_NODES(filter_str=None, env_var_name=None,
+                                skip_first_num_nodes=0):
+            _num_avail_nodes = ClController.NUM_AVAILABLE_NODES(
+                filter_str=filter_str, env_var_name=env_var_name)
+            nodes = []
+            if _num_avail_nodes > 0:
+                if not(filter_str is None):
+                    _filter_str_bytes = filter_str.strip().encode('utf-8')
+                    _filter_str = ct.c_char_p(_filter_str_bytes)
+                else:
+                    _filter_str = None
+
+                if not(env_var_name is None):
+                    _env_var_name_bytes = env_var_name.strip().encode('utf-8')
+                    _env_var_name = ct.c_char_p(_env_var_name_bytes)
+                else:
+                    _env_var_name = None
+
+                node_ids_array_t = st_ClNodeId * _num_avail_nodes
+                _node_ids = node_ids_array_t()
+                _num_nodes = st_OpenCL_get_available_nodes_detailed(
+                    _node_ids, st_arch_size_t(_num_avail_nodes),
+                    st_arch_size_t(skip_first_num_nodes),
+                    _filter_str, _env_var_name)
+
+                for ii in range(0, _num_nodes):
+                    platform_id = st_ComputeNodeId_get_platform_id(
+                        ct.byref(_node_ids[ii]))
+                    device_id = st_ComputeNodeId_get_device_id(
+                        ct.byref(_node_ids[ii]))
+                    nodes.append(ClNodeId(platform_id=platform_id,
+                                          device_id=device_id, owns_ptr=True))
+            return nodes
+
+        @staticmethod
+        def GET_AVAILABLE_NODE_ID_STRS(
+                filter_str=None,
+                env_var_name=None,
+                skip_first_num_nodes=0,
+                node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value):
+
+            node_id_strs = []
+            if not(filter_str is None):
+                _filter_str_bytes = filter_str.strip().encode('utf-8')
+                _filter_str = ct.c_char_p(_filter_str_bytes)
+            else:
+                _filter_str = None
+
+            if not(env_var_name is None):
+                _env_var_name_bytes = env_var_name.strip().encode('utf-8')
+                _env_var_name = ct.c_char_p(_env_var_name_bytes)
+            else:
+                _env_var_name = None
+
+            _num_avail_nodes = st_OpenCL_num_available_nodes_detailed(
+                _filter_str, _env_var_name)
+
+            if _num_avail_nodes > 0:
+                _node_id_str_capacity = 64
+                node_id_str_buffer = [
+                    ct.create_string_buffer(_node_id_str_capacity)]
+
+                node_id_str_array_t = ct.c_char_p * _num_avail_nodes
+                _tmp_node_id_strs = node_id_str_array_t()
+
+                for ii in range(0, _num_avail_nodes):
+                    _tmp_node_id_strs[ii] = ct.cast(
+                        node_id_str_buffer[ii], ct.c_char_p)
+
+                _num_node_id_strs = \
+                    st_OpenCL_get_available_node_id_strs_detailed(
+                        _tmp_node_id_strs, st_arch_size_t(_num_avail_nodes),
+                        st_arch_size_t(_node_id_str_capacity),
+                        st_node_id_str_fmt_t(node_id_str_fmt),
+                        st_arch_size_t(skip_first_num_nodes),
+                        _filter_str, _env_var_name)
+
+                node_id_strs = [bytes(_tmp_node_id_strs[ii]).decode('utf-8')
+                                for ii in range(0, _num_node_id_strs)]
+            return node_id_strs
+
         def __init__(self, config_str=None, device_id=None,
                      ext_ptr_ctrl=st_NullClContextBase, owns_ptr=True):
             self._ptr_ctrl = st_NullClContextBase
@@ -467,8 +705,42 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                             raw_arg_capacity=raw_arg_capacity)
 else:
 
-    class ClController(object):
+    class ClNodeId(object):
         pass
+
+    class ClController(object):
+        @staticmethod
+        def NUM_ALL_NODES():
+            raise RuntimeError("OpenCL module disabled, no nodes present")
+            return 0
+
+        @staticmethod
+        def PRINT_ALL_NODES():
+            raise RuntimeError("OpenCL module disabled, no nodes to print")
+
+        @staticmethod
+        def NUM_AVAILABLE_NODES(filter_str=None, env_var_name=None):
+            raise RuntimeError("OpenCL module disabled, no nodes available")
+            return 0
+
+        @staticmethod
+        def PRINT_AVAILABLE_NODES(filter_str=None, env_var_name=None):
+            raise RuntimeError("OpenCL module disabled, no nodes to print")
+
+        @staticmethod
+        def GET_AVAILABLE_NODES(filter_str=None, env_var_name=None,
+                                skip_first_num_nodes=0):
+            raise RuntimeError("OpenCL module disabled, no nodes available")
+            return []
+
+        @staticmethod
+        def GET_AVAILABLE_NODE_ID_STRS(
+                filter_str=None,
+                env_var_name=None,
+                skip_first_num_nodes=0,
+                node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value):
+            raise RuntimeError("OpenCL module disabled, no nodes available")
+            return []
 
     class ClArgument(object):
         pass

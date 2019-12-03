@@ -262,7 +262,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN status_t doCollectStoredBuffer(
             size_type const buffer_id ) override;
 
-        SIXTRL_HOST_FN status_t doPerformManagedAssignments(
+        SIXTRL_HOST_FN status_t doPerformAddressAssignments(
             assign_item_key_t const& SIXTRL_RESTRICT_REF
                 assign_item_key ) override;
 
@@ -375,7 +375,7 @@ namespace SIXTRL_CXX_NAMESPACE
             assign_item_t const& SIXTRL_RESTRICT_REF assign_item,
             size_type* SIXTRL_RESTRICT ptr_item_index );
 
-        SIXTRL_HOST_FN status_t doPerformManagedAssignmentsOclImpl(
+        SIXTRL_HOST_FN status_t doPerformAddressAssignmentsOclImpl(
             assign_item_key_t const& SIXTRL_RESTRICT_REF assign_item_key );
 
         std::vector< size_type >    m_num_particles_in_pset;

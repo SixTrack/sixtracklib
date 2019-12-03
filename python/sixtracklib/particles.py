@@ -18,7 +18,7 @@ class Particles(CObject):
         self.rvv = beta / self.beta0
 
     _typeid = 1
-    num_particles = CField(0, 'int64', const=True)
+    num_particles = CField(0, 'int64', const=True, alignment=8)
     q0 = CField(1, 'real', length='num_particles',
                 default=0.0, pointer=True, alignment=8)
     mass0 = CField(2, 'real', length='num_particles',
@@ -311,3 +311,29 @@ class ParticlesSet(object):
 
     def to_file(self, filename):
         self.cbuffer.tofile(filename)
+
+
+class ParticlesAddr(CObject):
+    _typeid = 512
+    num_particles = CField(0, 'int64', default=0, alignment=8)
+    q0 = CField(1, 'uint64', default=0, alignment=8)
+    mass0 = CField(2, 'uint64', default=0, alignment=8)
+    beta0 = CField(3, 'uint64', default=0, alignment=8)
+    gamma0 = CField(4, 'uint64', default=0, alignment=8)
+    p0c = CField(5, 'uint64', default=0, alignment=8)
+    s = CField(6, 'uint64', default=0, alignment=8)
+    x = CField(7, 'uint64', default=0, alignment=8)
+    y = CField(8, 'uint64', default=0, alignment=8)
+    px = CField(9, 'uint64', default=0, alignment=8)
+    py = CField(10, 'uint64', default=0, alignment=8)
+    zeta = CField(11, 'uint64', default=0, alignment=8)
+    psigma = CField(12, 'uint64', default=0, alignment=8)
+    delta = CField(13, 'uint64', default=0, alignment=8)
+    rpp = CField(14, 'uint64', default=0, alignment=8)
+    rvv = CField(15, 'uint64', default=0, alignment=8)
+    chi = CField(16, 'uint64', default=0, alignment=8)
+    charge_ratio = CField(17, 'uint64', default=0, alignment=8)
+    particle_id = CField(18, 'uint64', default=0, alignment=8)
+    at_element = CField(19, 'uint64', default=0, alignment=8)
+    at_turn = CField(20, 'uint64', default=0, alignment=8)
+    state = CField(21, 'uint64', default=0, alignment=8)

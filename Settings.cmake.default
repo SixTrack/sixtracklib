@@ -33,6 +33,22 @@ option( SIXTRACKL_ENABLE_PROGRAMM_TESTS  "Enable programmatic unit-tests" OFF )
 option( SIXTRACKL_ENABLE_BENCHMARK_TESTS "Enable benchmark tests"         OFF )
 
 # ------------------------------------------------------------------------------
+# ---- SixTrackLib Features:
+
+option( SIXTRACKL_ERROR_ON_TRACK_DISABLED_MAP  "Error on disabled maps"   ON  )
+option( SIXTRACKL_ENABLE_BEAM_FIELDS_4D_MAP    "Enable beam-beam-4D map"  ON  )
+option( SIXTRACKL_ENABLE_BEAM_FIELDS_6D_MAP    "Enable beam-beam-6D map"  ON  )
+option( SIXTRACKL_ENABLE_SC_BUNCHED_MAP        "Enable space-charge maps" ON  )
+option( SIXTRACKL_ENABLE_SC_COASTING_MAP       "Enable space-charge maps" ON  )
+option( SIXTRACKL_ENABLE_BE_TRICUB_MAP         "Enable be_tricub map"     OFF )
+
+set( SIXTRACKL_ENABLE_GLOBAL_APERTURE_CHECK "always" CACHE STRING
+     "Enable xy-aperture check" )
+
+set_property( CACHE SIXTRACKL_ENABLE_GLOBAL_APERTURE_CHECK
+              PROPERTY STRINGS always conditional never )
+
+# ------------------------------------------------------------------------------
 # CPU/System architecture settings:
 
 set( SIXTRACKL_CPU_ARCH "sse2" CACHE STRING "CPU/System architecture" )
@@ -46,15 +62,6 @@ set( SIXTRACKL_DEFAULT_C99_FLAGS
 
 set( SIXTRACKL_DEFAULT_CXX_FLAGS
      "-Wall -Werror -pedantic -ansi -fno-fast-math" )
-
-# ------------------------------------------------------------------------------
-# ---- SixTrackLib Features:
-
-option( SIXTRACKL_ENABLE_APERTURE_CHECK "Enable xy - aperture check" ON )
-option( SIXTRACKL_ENABLE_BEAM_FIELDS    "Enable beam-fields (BB4D, BB6D) maps" ON )
-option( SIXTRACKL_ENABLE_SPACE_CHARGE   "Enable space-charge maps" ON )
-option( SIXTRACKL_ENABLE_BE_TRICUB      "Enable be_tricub map" OFF )
-
 
 # ==============================================================================
 # ====  Detailed settings:
