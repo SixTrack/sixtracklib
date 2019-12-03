@@ -69,11 +69,11 @@ if __name__ == '__main__':
         dest_elem_type_id=beam_monitor_type_id,
         dest_buffer_id=lattice_buffer_id,
         dest_elem_index=bm0_index,
-        dest_pointer_offset=24, #Magic number, offset of out_address from begin
+        dest_pointer_offset=24,  # Magic number, offset of out_address from begin
         src_elem_type_id=particle_set_type_id,
         src_buffer_id=output_buffer_id,
         src_elem_index=out_buffer0_index,
-        src_pointer_offset=0 #We assign the starting address of the particle set
+        src_pointer_offset=0  # We assign the starting address of the particle set
     )
 
     assert out0_to_bm0_addr_assign_item.dest_elem_type_id == \
@@ -171,7 +171,7 @@ if __name__ == '__main__':
     out0_to_bm2_addr_assign_item = st.AssignAddressItem(
         **{k != '_buffer' and k or 'cbuffer':
                 getattr(out0_to_bm0_addr_assign_item, k) for k in [*[f[0]
-                    for f in st.AssignAddressItem.get_fields()], '_buffer']})
+                                                                     for f in st.AssignAddressItem.get_fields()], '_buffer']})
 
     # out0_to_bm2_addr_assign_item is actually the same as
     # out0_to_bm0_addr_assign_item  -> if we try to add this item unmodified,
