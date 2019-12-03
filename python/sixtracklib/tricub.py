@@ -60,7 +60,7 @@ class TriCubData(CObject):
     mirror_x = CField(9, 'int64', default=0.0, alignment=8)
     mirror_y = CField(10, 'int64', default=0.0, alignment=8)
     mirror_z = CField(11, 'int64', default=0.0, alignment=8)
-    table_addr = CField(12, 'uint64', default=0, pointer=True,
+    table_addr = CField(12, 'real', default=0, pointer=True,
                         length='nx * ny * nz * 8', alignment=8)
 
     def __init__(self, nx=0, ny=0, nz=0, **kwargs):
