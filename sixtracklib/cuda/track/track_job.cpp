@@ -1111,7 +1111,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 if( status == st::ARCH_STATUS_SUCCESS )
                 {
                     status = this->ptrElemByElemConfigArgBase()->send(
-                        this->ptrElemByElemConfig(), sizeof( elem_config_t ) );
+                        this->elem_by_elem_config_cxx_buffer() );
 
                     if( status == st::ARCH_STATUS_SUCCESS )
                     {
@@ -1294,9 +1294,9 @@ namespace SIXTRL_CXX_NAMESPACE
             ( elem_by_elem_conf_arg != nullptr ) &&
             ( elem_by_elem_config != nullptr ) &&
             ( elem_by_elem_conf_arg->ptrControllerBase() == ptr_cuda_ctrl ) &&
-            ( elem_by_elem_conf_arg->usesRawArgument() ) &&
-            ( elem_by_elem_conf_arg->ptrRawArgument() ==
-                elem_by_elem_config ) );
+            ( elem_by_elem_conf_arg->usesCObjectsCxxBuffer() ) &&
+            ( elem_by_elem_conf_arg->ptrCObjectsCxxBuffer() ==
+                std::addressof( this->elem_by_elem_config_cxx_buffer() ) ) );
 
         cuda_kernel_conf_t const* kernel_conf = ( controller_ready )
             ? ptr_cuda_ctrl->ptrKernelConfig( kid ) : nullptr;
