@@ -1,3 +1,4 @@
+import sys
 import cobjects
 from cobjects import CBuffer, CObject
 import sixtracklib as st
@@ -5,6 +6,7 @@ from sixtracklib.stcommon import st_ARCH_BEAM_ELEMENTS_BUFFER_ID, \
     st_NullAssignAddressItem, st_AssignAddressItem_p, \
     st_buffer_size_t, st_object_type_id_t, st_arch_status_t, st_arch_size_t, \
     st_ARCH_STATUS_SUCCESS, st_ARCH_ILLEGAL_BUFFER_ID, \
+    st_NODE_ID_STR_FORMAT_ARCHSTR, \
     st_AssignAddressItem_are_equal, st_AssignAddressItem_are_not_equal, \
     st_AssignAddressItem_compare_less
 
@@ -12,6 +14,29 @@ import sixtracklib_test as testlib
 from sixtracklib_test.stcommon import st_AssignAddressItem_print_out
 
 if __name__ == '__main__':
+    try:
+        total_num_nodes = st.ClController.NUM_ALL_NODES()
+    except RuntimeError as e:
+        total_num_nodes = 0
+
+    try:
+        num_available_nodes = st.ClController.NUM_AVAILABLE_NODES()
+    except RuntimeError as e:
+        num_available_nodes = 0
+
+    if num_available_nodes <= 0:
+        if total_num_nodes > 0:
+            print("OpenCL nodes present, but no available for selection!")
+            print("--> Check SIXTRACKLIB_DEVICES environment variable!")
+        else:
+            print("No OpenCL nodes available, skip test case")
+        sys.exit(0)
+
+    node_id_strs = st.ClController.GET_AVAILABLE_NODE_ID_STRS(
+        node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value)
+
+    assert node_id_strs and len(node_id_strs) > 0
+
     lattice = st.Elements()
     lattice.Drift(length=0.0)
     lattice.Drift(length=0.1)
@@ -42,7 +67,11 @@ if __name__ == '__main__':
     out_buffer1_index = output_buffer.cbuffer.n_objects
     output_buffer.Particles(num_particles=512)
 
-    job = st.TrackJob(lattice, pset)
+    job = st.TrackJob(lattice, pset, device=node_id_strs[0])
+    controller = job.controller
+
+    assert controller.has_selected_node
+    assert controller.selected_node_id_str == node_id_strs[0]
 
     # hand the output_buffer over to the track job:
     output_buffer_id = job.add_stored_buffer(cbuffer=output_buffer)
@@ -171,7 +200,7 @@ if __name__ == '__main__':
     out0_to_bm2_addr_assign_item = st.AssignAddressItem(
         **{k != '_buffer' and k or 'cbuffer':
                 getattr(out0_to_bm0_addr_assign_item, k) for k in [*[f[0]
-                                                                     for f in st.AssignAddressItem.get_fields()], '_buffer']})
+                for f in st.AssignAddressItem.get_fields()], '_buffer']})
 
     # out0_to_bm2_addr_assign_item is actually the same as
     # out0_to_bm0_addr_assign_item  -> if we try to add this item unmodified,
@@ -235,19 +264,30 @@ if __name__ == '__main__':
     # --------------------------------------------------------------------------
     # finish assembly of assign items:
     job.commit_address_assignments()
+    assert job.last_status == st_ARCH_STATUS_SUCCESS.value
 
     # perform assignment of address items:
     job.assign_all_addresses()
+    assert job.last_status == st_ARCH_STATUS_SUCCESS.value
 
     job.collect_beam_elements()
+    assert job.last_status == st_ARCH_STATUS_SUCCESS.value
     assert lattice.cbuffer.get_object(bm0_index).out_address != 0
     assert lattice.cbuffer.get_object(bm1_index).out_address != 0
     assert lattice.cbuffer.get_object(bm2_index).out_address != 0
 
-    # this only works on the CPU:
     assert lattice.cbuffer.get_object(bm0_index).out_address == \
-        output_buffer.cbuffer.get_object(out_buffer0_index)._get_address()
-    assert lattice.cbuffer.get_object(bm1_index).out_address == \
-        output_buffer.cbuffer.get_object(out_buffer1_index)._get_address()
-    assert lattice.cbuffer.get_object(bm2_index).out_address == \
-        output_buffer.cbuffer.get_object(out_buffer0_index)._get_address()
+        lattice.cbuffer.get_object(bm2_index).out_address
+
+    assert lattice.cbuffer.get_object(bm0_index).out_address != \
+        lattice.cbuffer.get_object(bm1_index).out_address
+
+    assert lattice.cbuffer.get_object(bm0_index).out_address < \
+        lattice.cbuffer.get_object(bm1_index).out_address
+
+    assert ((lattice.cbuffer.get_object(bm1_index).out_address -
+             lattice.cbuffer.get_object(bm0_index).out_address) ==
+            (output_buffer.cbuffer.get_object(
+                out_buffer1_index)._get_address() -
+             output_buffer.cbuffer.get_object(
+                out_buffer0_index)._get_address()))

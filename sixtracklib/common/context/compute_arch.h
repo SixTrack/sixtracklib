@@ -77,10 +77,10 @@ SIXTRL_STATIC SIXTRL_FN bool NS(ComputeNodeId_are_equal)(
 #if !defined( GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ComputeNodeId)*
-NS(ComputeNodeId_allocate_array)( NS(arch_size_t) const num_nodes );
+    NS(ComputeNodeId_create)( void );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void
-NS(ComputeNodeId_free_array)( NS(ComputeNodeId)* SIXTRL_RESTRICT array_begin );
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeId_delete)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT node_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(comp_node_id_num_t)
 NS(ComputeNodeId_get_platform_id_ext)(
@@ -109,14 +109,28 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ComputeNodeId_are_equal_ext)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT lhs,
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT rhs );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ComputeNodeId_from_string)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ComputeNodeId_from_string)(
     NS(ComputeNodeId)* SIXTRL_RESTRICT id,
     char const* SIXTRL_RESTRICT str_buffer );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ComputeNodeId_to_string)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ComputeNodeId_to_string)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT node_id,
     char* SIXTRL_RESTRICT out_string_begin,
     NS(arch_size_t) const max_out_string_capacity );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ComputeNodeId_to_string_with_format)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT node_id,
+    char* SIXTRL_RESTRICT out_string_begin,
+    NS(arch_size_t) const out_string_capacity,
+    NS(arch_id_t) const arch_id, NS(node_id_str_fmt_t) const node_id_str_fmt );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ComputeNodeId_from_string_with_format)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT id,
+    char const* SIXTRL_RESTRICT str_buffer,
+    NS(node_id_str_fmt_t) const node_id_str_fmt,
+    NS(arch_id_t)* SIXTRL_RESTRICT ptr_arch_id );
 
 #endif /* !defined( _GPUCODE ) */
 

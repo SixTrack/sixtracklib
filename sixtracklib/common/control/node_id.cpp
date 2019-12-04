@@ -15,6 +15,8 @@ namespace st = SIXTRL_CXX_NAMESPACE;
 
 namespace SIXTRL_CXX_NAMESPACE
 {
+    using _this_t = st::NodeId;
+
     NodeId::NodeId(
         NodeId::platform_id_t const platform_id,
         NodeId::device_id_t const device_id,
@@ -119,6 +121,84 @@ namespace SIXTRL_CXX_NAMESPACE
             if( str.size() < node_id_str_capacity )
             {
                 std::copy( str.begin(), str.end(), node_id_str );
+                status = st::ARCH_STATUS_SUCCESS;
+            }
+        }
+
+        return status;
+    }
+
+    NodeId::status_t NodeId::to_string( char* SIXTRL_RESTRICT node_id_str,
+        _this_t::size_type const node_id_str_capacity,
+        _this_t::arch_id_t const arch_id,
+        _this_t::str_format_t const format ) const SIXTRL_NOEXCEPT
+    {
+        _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        if( ( node_id_str != nullptr ) &&
+            ( node_id_str_capacity > _this_t::size_type{ 0 } ) &&
+            ( format != st::NODE_ID_STR_FORMAT_ILLEGAL ) &&
+            ( this->valid() ) )
+        {
+            int ret = int{ 0 };
+            _this_t::size_type const nn =
+                node_id_str_capacity - _this_t::size_type{ 1 };
+
+            if( format == st::NODE_ID_STR_FORMAT_NOARCH )
+            {
+                ret = std::snprintf( node_id_str, nn, "%d.%d",
+                    static_cast< int >( this->platformId() ),
+                    static_cast< int >( this->deviceId() ) );
+            }
+            else if( ( arch_id != st::ARCHITECTURE_ILLEGAL ) &&
+                     ( arch_id != st::ARCHITECTURE_NONE ) )
+            {
+                if( format == st::NODE_ID_STR_FORMAT_ARCHID )
+                {
+                    ret = std::snprintf( node_id_str, nn, "%u:%d.%d",
+                        static_cast< unsigned >( arch_id ),
+                        static_cast< int >( this->platformId() ),
+                        static_cast< int >( this->deviceId() ) );
+
+                }
+                else if( format == st::NODE_ID_STR_FORMAT_ARCHSTR )
+                {
+                    char TEMP_ARCH_NAME[ 32 ] =
+                    {
+                        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+                        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+                        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+                        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
+                    };
+
+                    if( arch_id == st::ARCHITECTURE_CPU )
+                    {
+                        strncpy( TEMP_ARCH_NAME,
+                                 SIXTRL_ARCHITECTURE_CPU_STR, 31 );
+                    }
+                    else if( arch_id == st::ARCHITECTURE_OPENCL )
+                    {
+                        strncpy( TEMP_ARCH_NAME,
+                                 SIXTRL_ARCHITECTURE_OPENCL_STR, 31 );
+                    }
+                    else if( arch_id == st::ARCHITECTURE_CUDA )
+                    {
+                        strncpy( TEMP_ARCH_NAME,
+                                 SIXTRL_ARCHITECTURE_CUDA_STR, 31 );
+                    }
+
+                    if( std::strlen( TEMP_ARCH_NAME ) > 0u )
+                    {
+                        ret = std::snprintf( node_id_str, nn, "%s:%d.%d",
+                            TEMP_ARCH_NAME,
+                            static_cast< int >( this->platformId() ),
+                            static_cast< int >( this->deviceId() ) );
+                    }
+                }
+            }
+
+            if( ( ret > 0 ) && ( ret <= static_cast< int >( nn ) ) )
+            {
                 status = st::ARCH_STATUS_SUCCESS;
             }
         }

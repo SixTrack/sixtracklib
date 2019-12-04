@@ -21,8 +21,9 @@
 #include "sixtracklib/common/generated/config.h"
 #include "sixtracklib/testlib.h"
 
-#if defined( SIXTRL_ENABLE_APERTURE_CHECK ) && \
-    SIXTRL_ENABLE_APERTURE_CHECK == 1
+#if defined( SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK ) && \
+             SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK > \
+             SIXTRL_GLOBAL_APERTURE_CHECK_NEVER
 
 TEST( C99_CommonParticlesApertureTests,
       TrackParticlesOverDriftEnabledApertureCheck )
@@ -34,7 +35,7 @@ TEST( C99_CommonParticlesApertureTests,
       TrackParticlesOverDriftDisabledApertureCheck )
 {
 
-#endif /* SIXTRL_ENABLE_APERTURE_CHECK */
+#endif /* SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK */
 
     using nelem_t = ::NS(particle_num_elements_t);
     using size_t  = size_t;
@@ -79,8 +80,9 @@ TEST( C99_CommonParticlesApertureTests,
 
             ASSERT_TRUE( status == ::NS(TRACK_SUCCESS) );
 
-            #if defined( SIXTRL_ENABLE_APERTURE_CHECK ) && \
-                         SIXTRL_ENABLE_APERTURE_CHECK == 1
+            #if defined( SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK ) && \
+                         SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK > \
+                         SIXTRL_GLOBAL_APERTURE_CHECK_NEVER
 
             double const x = ::NS(Particles_get_x_value)( particles, idx );
             double const y = ::NS(Particles_get_y_value)( particles, idx );
@@ -99,7 +101,7 @@ TEST( C99_CommonParticlesApertureTests,
 
             ASSERT_TRUE( ::NS(Particles_is_not_lost_value)( particles, idx ) );
 
-            #endif /* SIXTRL_ENABLE_APERTURE_CHECK */
+            #endif /* SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK */
         }
     }
 
@@ -110,8 +112,9 @@ TEST( C99_CommonParticlesApertureTests,
     eb = nullptr;
 }
 
-#if defined( SIXTRL_ENABLE_APERTURE_CHECK ) && \
-             SIXTRL_ENABLE_APERTURE_CHECK == 1
+#if defined( SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK ) && \
+             SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK > \
+             SIXTRL_GLOBAL_APERTURE_CHECK_NEVER
 
 TEST( C99_CommonParticlesApertureTests,
       TrackParticlesOverDriftExactEnabledApertureCheck )
@@ -122,7 +125,7 @@ TEST( C99_CommonParticlesApertureTests,
 TEST( C99_CommonParticlesApertureTests,
       TrackParticlesOverDriftExactDisabledApertureCheck )
 {
-#endif /* SIXTRL_ENABLE_APERTURE_CHECK */
+#endif /* SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK */
     using nelem_t = ::NS(particle_num_elements_t);
     using size_t  = size_t;
 
@@ -165,8 +168,9 @@ TEST( C99_CommonParticlesApertureTests,
 
             ASSERT_TRUE( status == ::NS(TRACK_SUCCESS) );
 
-            #if defined( SIXTRL_ENABLE_APERTURE_CHECK ) && \
-                SIXTRL_ENABLE_APERTURE_CHECK == 1
+            #if defined( SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK ) && \
+                         SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK > \
+                         SIXTRL_GLOBAL_APERTURE_CHECK_NEVER
 
             double const x = ::NS(Particles_get_x_value)( particles, idx );
             double const y = ::NS(Particles_get_y_value)( particles, idx );
@@ -185,7 +189,7 @@ TEST( C99_CommonParticlesApertureTests,
 
             ASSERT_TRUE( ::NS(Particles_is_not_lost_value)( particles, idx ) );
 
-            #endif /* SIXTRL_ENABLE_APERTURE_CHECK */
+            #endif /* SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK */
         }
     }
 

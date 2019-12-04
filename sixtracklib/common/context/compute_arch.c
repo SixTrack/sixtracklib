@@ -15,37 +15,15 @@
     #include "sixtracklib/common/control/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-NS(ComputeNodeId)* NS(ComputeNodeId_allocate_array)(
-    NS(arch_size_t) const num_nodes )
+NS(ComputeNodeId)* NS(ComputeNodeId_create)( void )
 {
-    NS(ComputeNodeId)* array = SIXTRL_NULLPTR;
-
-    if( num_nodes > ( NS(arch_size_t) )0u )
-    {
-        array = ( NS(ComputeNodeId)* )malloc(
-            sizeof( NS(ComputeNodeId) ) * num_nodes );
-
-        if( array != SIXTRL_NULLPTR )
-        {
-            NS(arch_size_t) ii = ( NS(arch_size_t) )0u;
-
-            for( ; ii < num_nodes ; ++ii )
-            {
-                NS(ComputeNodeId_preset)( &array[ ii ] );
-            }
-        }
-    }
-
-    return array;
+    return NS(ComputeNodeId_preset)( ( NS(ComputeNodeId)* )malloc(
+        sizeof( NS(ComputeNodeId) ) ) );
 }
 
-void NS(ComputeNodeId_free_array)(
-    NS(ComputeNodeId)* SIXTRL_RESTRICT array_begin )
+void NS(ComputeNodeId_delete)( NS(ComputeNodeId)* SIXTRL_RESTRICT node_id )
 {
-    if( array_begin != SIXTRL_NULLPTR )
-    {
-        free( array_begin );
-    }
+    free( node_id );
 }
 
 NS(comp_node_id_num_t) NS(ComputeNodeId_get_platform_id_ext)(
@@ -96,45 +74,131 @@ bool NS(ComputeNodeId_are_equal_ext)(
 
 #if !defined( GPUCODE )
 
-int NS(ComputeNodeId_from_string)( NS(ComputeNodeId)* SIXTRL_RESTRICT id,
+NS(arch_status_t) NS(ComputeNodeId_from_string)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT node_id,
     char const* SIXTRL_RESTRICT str_buffer )
 {
-    int success = -1;
+    return NS(ComputeNodeId_from_string_with_format)(
+        node_id, str_buffer, NS(NODE_ID_STR_FORMAT_NOARCH), SIXTRL_NULLPTR );
+}
+
+NS(arch_status_t) NS(ComputeNodeId_from_string_with_format)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT id,
+    char const* SIXTRL_RESTRICT str_buffer,
+    NS(node_id_str_fmt_t) const node_id_str_fmt,
+    NS(arch_id_t)* SIXTRL_RESTRICT ptr_arch_id )
+{
+    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
     if( ( str_buffer != SIXTRL_NULLPTR ) &&
         ( strlen( str_buffer ) > 0u ) &&
-        ( id != SIXTRL_NULLPTR ) )
+        ( id != SIXTRL_NULLPTR ) &&
+        ( node_id_str_fmt != NS(NODE_ID_STR_FORMAT_ILLEGAL) ) )
     {
+        int num_parsed_elem = 0;
+        int required_num_parsed_elem = 1;
+
         int temp_platform_idx = -1;
         int temp_device_idx   = -1;
 
-        int const ret = sscanf( str_buffer, "%d.%d",
-                                &temp_platform_idx, &temp_device_idx );
+        long long unsigned temp_arch_id =
+            ( long long unsigned )SIXTRL_ARCHITECTURE_ILLEGAL;
 
-        if( ( ret == 2 ) && ( temp_platform_idx >= 0 ) &&
-            ( temp_device_idx >= 0 ) )
+        if( node_id_str_fmt == NS(NODE_ID_STR_FORMAT_NOARCH) )
+        {
+            required_num_parsed_elem = 2;
+            num_parsed_elem = sscanf( str_buffer, "%d.%d",
+                &temp_platform_idx, &temp_device_idx );
+        }
+        else if( node_id_str_fmt == NS(NODE_ID_STR_FORMAT_ARCHID) )
+        {
+            required_num_parsed_elem = 3;
+            num_parsed_elem = sscanf( str_buffer, "%llu:%d.%d",
+                &temp_arch_id, &temp_platform_idx, &temp_device_idx );
+        }
+        else if( node_id_str_fmt == NS(NODE_ID_STR_FORMAT_ARCHSTR) )
+        {
+            char TEMP_ARCH_NAME[ 32 ] =
+            {
+                '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+                '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+                '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+                '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
+            };
+
+            required_num_parsed_elem = 3;
+            num_parsed_elem = sscanf( str_buffer, "%31[^:]:%d.%d",
+                TEMP_ARCH_NAME, &temp_platform_idx, &temp_device_idx );
+
+            if( num_parsed_elem > 0 )
+            {
+                if( strncmp( TEMP_ARCH_NAME,
+                             SIXTRL_ARCHITECTURE_CPU_STR, 31 ) == 0 )
+                {
+                    temp_arch_id = ( long long unsigned
+                        )SIXTRL_ARCHITECTURE_CPU;
+                }
+                else if( strncmp( TEMP_ARCH_NAME,
+                        SIXTRL_ARCHITECTURE_OPENCL_STR, 31 ) == 0 )
+                {
+                    temp_arch_id = ( long long unsigned
+                        )SIXTRL_ARCHITECTURE_OPENCL;
+                }
+                else if( strncmp( TEMP_ARCH_NAME,
+                        SIXTRL_ARCHITECTURE_CUDA_STR, 31 ) == 0 )
+                {
+                    temp_arch_id = ( long long unsigned
+                        )SIXTRL_ARCHITECTURE_CUDA;
+                }
+                else
+                {
+                    temp_arch_id = ( long long unsigned
+                        )SIXTRL_ARCHITECTURE_ILLEGAL;
+                }
+            }
+        }
+
+        if( ( num_parsed_elem == required_num_parsed_elem ) &&
+            ( temp_platform_idx >= 0 ) && ( temp_device_idx >= 0 ) )
         {
             NS(ComputeNodeId_set_platform_id)( id, temp_platform_idx );
             NS(ComputeNodeId_set_device_id)( id, temp_device_idx );
 
-            success = 0;
+            if( ptr_arch_id != SIXTRL_NULLPTR )
+            {
+                *ptr_arch_id = ( NS(arch_id_t) )temp_arch_id;
+            }
+
+            status = NS(ARCH_STATUS_SUCCESS);
         }
     }
 
-    return success;
+    return status;
 }
 
-int NS(ComputeNodeId_to_string)(
+NS(arch_status_t) NS(ComputeNodeId_to_string)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT node_id,
     char* SIXTRL_RESTRICT out_string_begin,
     NS(arch_size_t) const out_string_capacity )
 {
-    int success = -1;
+    return NS(ComputeNodeId_to_string_with_format)(
+        node_id, out_string_begin, out_string_capacity, NS(ARCHITECTURE_NONE),
+            NS(NODE_ID_STR_FORMAT_NOARCH) );
+}
+
+NS(arch_status_t) NS(ComputeNodeId_to_string_with_format)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT node_id,
+    char* SIXTRL_RESTRICT out_string_begin,
+    NS(arch_size_t) const out_string_capacity,
+    NS(arch_id_t) const arch_id, NS(node_id_str_fmt_t) const node_id_str_fmt )
+{
+    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
     if( ( node_id != SIXTRL_NULLPTR ) &&
         ( NS(ComputeNodeId_is_valid)( node_id ) ) &&
         ( out_string_begin != SIXTRL_NULLPTR ) &&
-        ( out_string_capacity > ( NS(arch_size_t) )0u ) )
+        ( out_string_capacity > ( NS(arch_size_t) )0u ) &&
+        ( node_id_str_fmt != NS(NODE_ID_STR_FORMAT_ILLEGAL) ) )
     {
         int ret = 0;
         memset( out_string_begin, ( int )'\0', out_string_capacity );
@@ -142,17 +206,72 @@ int NS(ComputeNodeId_to_string)(
         SIXTRL_ASSERT( NS(ComputeNodeId_get_platform_id)( node_id ) >= 0 );
         SIXTRL_ASSERT( NS(ComputeNodeId_get_device_id)( node_id ) >= 0 );
 
-        ret = snprintf( out_string_begin, out_string_capacity, "%u.%u",
+        if( node_id_str_fmt == NS(NODE_ID_STR_FORMAT_NOARCH) )
+        {
+            ret = snprintf( out_string_begin, out_string_capacity, "%u.%u",
                 ( unsigned )NS(ComputeNodeId_get_platform_id)( node_id ),
                 ( unsigned )NS(ComputeNodeId_get_device_id)( node_id ) );
 
-        if( ( ret >= 0 ) && ( out_string_capacity > ( NS(arch_size_t) )ret ) )
+            if( ( ret >= 0 ) &&
+                ( out_string_capacity > ( NS(arch_size_t) )ret ) )
+            {
+                status = NS(ARCH_STATUS_SUCCESS);
+            }
+        }
+        else if( ( node_id_str_fmt == NS(NODE_ID_STR_FORMAT_ARCHID) ) &&
+                 ( arch_id != NS(ARCHITECTURE_ILLEGAL) ) &&
+                 ( arch_id != NS(ARCHITECTURE_NONE) ) )
         {
-            success = 0;
+            ret = snprintf( out_string_begin, out_string_capacity, "%llu:%u.%u",
+                ( long long unsigned )arch_id,
+                ( unsigned )NS(ComputeNodeId_get_platform_id)( node_id ),
+                ( unsigned )NS(ComputeNodeId_get_device_id)( node_id ) );
+
+            if( ( ret >= 0 ) &&
+                ( out_string_capacity > ( NS(arch_size_t) )ret ) )
+            {
+                status = NS(ARCH_STATUS_SUCCESS);
+            }
+        }
+        else if( ( node_id_str_fmt == NS(NODE_ID_STR_FORMAT_ARCHSTR) ) &&
+                 ( arch_id != NS(ARCHITECTURE_ILLEGAL) ) &&
+                 ( arch_id != NS(ARCHITECTURE_NONE) ) )
+        {
+            char TEMP_ARCH_NAME[ 32 ] =
+            {
+                '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+                '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+                '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+                '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
+            };
+
+            if( arch_id == NS(ARCHITECTURE_CPU) )
+            {
+                strcpy( TEMP_ARCH_NAME, SIXTRL_ARCHITECTURE_CPU_STR );
+            }
+            else if( arch_id == NS(ARCHITECTURE_OPENCL) )
+            {
+                strcpy( TEMP_ARCH_NAME, SIXTRL_ARCHITECTURE_OPENCL_STR );
+            }
+            else if( arch_id == NS(ARCHITECTURE_CUDA) )
+            {
+                strcpy( TEMP_ARCH_NAME, SIXTRL_ARCHITECTURE_CUDA_STR );
+            }
+
+            ret = snprintf( out_string_begin, out_string_capacity, "%s:%u.%u",
+                    TEMP_ARCH_NAME,
+                    ( unsigned )NS(ComputeNodeId_get_platform_id)( node_id ),
+                    ( unsigned )NS(ComputeNodeId_get_device_id)( node_id ) );
+
+            if( ( ret >= 0 ) &&
+                ( out_string_capacity > ( NS(arch_size_t) )ret ) )
+            {
+                status = NS(ARCH_STATUS_SUCCESS);
+            }
         }
     }
 
-    return success;
+    return status;
 }
 
 #endif /* !defined( _GPUCODE ) */

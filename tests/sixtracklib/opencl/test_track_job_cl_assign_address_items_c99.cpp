@@ -1,8 +1,10 @@
-#include "sixtracklib/common/track_job_cpu.h"
+#include "sixtracklib/opencl/track_job_cl.h"
 
 #include <cstddef>
 #include <cstdint>
-#include <vector>
+#include <cstring>
+#include <iostream>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -14,15 +16,24 @@
 #include "sixtracklib/common/be_drift/be_drift.h"
 #include "sixtracklib/common/be_monitor/be_monitor.h"
 #include "sixtracklib/common/particles.h"
+#include "sixtracklib/opencl/internal/base_context.h"
 
 
-TEST( C99_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
+TEST( C99OpenCLTrackJobClAssignAddressItemsTests, MinimalUsage )
 {
-    using track_job_t    = ::NS(TrackJobCpu);
+    using track_job_t    = ::NS(TrackJobCl);
     using size_t         = ::NS(arch_size_t);
     using assign_item_t  = ::NS(AssignAddressItem);
     using c_buffer_t     = ::NS(Buffer);
     using particle_set_t = ::NS(Particles);
+    using addr_t         = ::NS(buffer_addr_t);
+    using controller_t   = ::NS(ClContextBase);
+
+    if( ::NS(OpenCL_num_available_nodes)( nullptr ) == 0 )
+    {
+        std::cout << "No OpenCL nodes available -> skipping test\r\n";
+        return;
+    }
 
     c_buffer_t* my_lattice = ::NS(Buffer_new)( size_t{ 0 } );
     c_buffer_t* my_output_buffer = ::NS(Buffer_new)( size_t{ 0 } );
@@ -120,7 +131,45 @@ TEST( C99_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
     out_buffer1 = ::NS(Particles_buffer_get_particles)(
         my_output_buffer, out_buffer1_index );
 
-    track_job_t* job = ::NS(TrackJobCpu_create)();
+    /* --------------------------------------------------------------------- */
+
+    char NODE_ID_STR[ 32 ] =
+    {
+        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
+    };
+
+    char* NODE_ID_STR_ARRAY[ 1 ] = { &NODE_ID_STR[ 0 ] };
+
+    size_t const num_nodes = ::NS(OpenCL_get_available_node_id_strs_detailed)(
+        NODE_ID_STR_ARRAY, size_t{ 1 }, size_t{ 32 },
+            ::NS(NODE_ID_STR_FORMAT_NOARCH), size_t{ 0 }, nullptr,
+                nullptr );
+
+    ASSERT_TRUE( num_nodes == size_t{ 1 } );
+
+    track_job_t* job = ::NS(TrackJobCl_create)( NODE_ID_STR );
+    controller_t* controller = ::NS(TrackJobCl_get_context)( job );
+
+    ASSERT_TRUE( controller != nullptr );
+    ASSERT_TRUE( ::NS(ClContextBase_has_selected_node)( controller ) );
+
+    char SELECTED_NODE_ID_STR[ 32 ] =
+    {
+        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+        '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
+    };
+
+    ASSERT_TRUE( ::NS(ClContextBase_get_selected_node_id_str)( controller,
+        SELECTED_NODE_ID_STR, 32 ) );
+
+    ASSERT_TRUE( std::strcmp( NODE_ID_STR, SELECTED_NODE_ID_STR ) == 0 );
+
+    /* --------------------------------------------------------------------- */
 
     size_t const my_lattice_buffer_id = ::NS(TrackJob_add_stored_buffer)(
         job, my_lattice, false, false );
@@ -410,11 +459,12 @@ TEST( C99_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
 
     ::NS(arch_status_t) status =
         ::NS(TrackJob_commit_address_assignments)( job );
-
     ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
     status = ::NS(TrackJob_assign_all_addresses)( job );
+    ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
+    status = ::NS(TrackJob_collect_stored_buffer)( job, my_lattice_buffer_id );
     ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
     bm0 = ::NS(BeamElements_buffer_get_beam_monitor)(
@@ -430,14 +480,18 @@ TEST( C99_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
     SIXTRL_ASSERT( bm1 != nullptr );
     SIXTRL_ASSERT( bm2 != nullptr );
 
-    ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( bm0 ) ==
-                        reinterpret_cast< uintptr_t >( out_buffer0 ) );
+    ASSERT_TRUE( bm0->out_address != addr_t{ 0 } );
+    ASSERT_TRUE( bm1->out_address != addr_t{ 0 } );
+    ASSERT_TRUE( bm2->out_address != addr_t{ 0 } );
 
-    ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( bm1 ) ==
-                        reinterpret_cast< uintptr_t >( out_buffer1 ) );
+    ASSERT_TRUE( bm0->out_address == bm2->out_address );
+    ASSERT_TRUE( bm1->out_address != bm0->out_address );
+    ASSERT_TRUE( bm0->out_address <  bm1->out_address );
 
-    ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( bm2 ) ==
-                        reinterpret_cast< uintptr_t >( out_buffer0 ) );
+    ASSERT_TRUE( ( bm1->out_address - bm0->out_address ) ==
+        static_cast< addr_t >(
+            reinterpret_cast< uintptr_t >( out_buffer1 ) -
+            reinterpret_cast< uintptr_t >( out_buffer0 ) ) );
 
     /* --------------------------------------------------------------------- */
 

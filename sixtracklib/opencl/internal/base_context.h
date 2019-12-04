@@ -55,6 +55,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using kernel_arg_type_t = uint32_t;
         using status_flag_t     = SIXTRL_CXX_NAMESPACE::arch_debugging_t;
         using cl_buffer_t       = cl::Buffer;
+        using cl_argument_t     = SIXTRL_CXX_NAMESPACE::ClArgument;
 
         static constexpr kernel_arg_type_t ARG_TYPE_NONE =
             kernel_arg_type_t{ 0x00000000 };
@@ -105,7 +106,7 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         static SIXTRL_HOST_FN size_type GET_ALL_NODES(
-            node_id_t* SIXTRL_RESTRICT_REF out_node_ids_begin,
+            node_id_t* SIXTRL_RESTRICT out_node_ids_begin,
             size_type const max_num_node_ids )
         {
             namespace  st = SIXTRL_CXX_NAMESPACE;
@@ -253,8 +254,13 @@ namespace SIXTRL_CXX_NAMESPACE
                     if( num_avail_nodes > _this_t::size_type{ 0 } )
                     {
                         auto in_node_begin = available_node_ids.begin();
+                        std::advance( in_node_begin, skip_first_num_nodes );
+
                         auto in_node_end = in_node_begin;
                         std::advance( in_node_end, num_avail_nodes );
+
+                        SIXTRL_ASSERT( std::distance(
+                            in_node_end, available_node_ids.end() ) >= 0 );
 
                         std::copy( in_node_begin, in_node_end,
                                    &out_node_ids_begin[ 0 ] );
@@ -304,6 +310,76 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 std::cout << "No OpenCL Devices found\r\n";
             }
+        }
+
+        static SIXTRL_HOST_FN size_type GET_AVAILABLE_NODE_ID_STR(
+            char** SIXTRL_RESTRICT out_node_id_strs,
+            size_type const max_num_node_ids,
+            size_type const node_id_str_capacity,
+            ::NS(node_id_str_fmt_t) const node_id_str_format =
+                ::NS(NODE_ID_STR_FORMAT_DEFAULT),
+            size_type const skip_first_num_nodes = size_type{ 0 },
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr )
+        {
+            namespace st = SIXTRL_CXX_NAMESPACE;
+            using _this_t = st::ClContextBase;
+            using _size_t = _this_t::size_type;
+
+            _size_t num_node_id_str = 0u;
+
+            if( ( out_node_id_strs != nullptr ) &&
+                ( max_num_node_ids > _size_t{ 0 } ) &&
+                ( node_id_str_capacity > _size_t{ 0 } ) )
+            {
+                std::vector< _this_t::node_id_t > available_node_ids;
+
+                if( st::ARCH_STATUS_SUCCESS == _this_t::GetAvailableNodes(
+                        available_node_ids, nullptr, nullptr, env_variable_name,
+                            filter_str ) )
+                {
+                    _size_t num_avail_nodes = available_node_ids.size();
+
+                    if( num_avail_nodes >= skip_first_num_nodes )
+                    {
+                        num_avail_nodes -= skip_first_num_nodes;
+                    }
+                    else
+                    {
+                        num_avail_nodes = _size_t{ 0 };
+                    }
+
+                    if( num_avail_nodes > max_num_node_ids )
+                    {
+                        num_avail_nodes = max_num_node_ids;
+                    }
+
+                    if( num_avail_nodes > _this_t::size_type{ 0 } )
+                    {
+                        auto in_node_it = available_node_ids.begin();
+                        std::advance( in_node_it, skip_first_num_nodes );
+
+                        auto in_node_end = in_node_it;
+                        std::advance( in_node_end, num_avail_nodes );
+
+                        for( _size_t ii = _size_t{ 0 } ;
+                             in_node_it != in_node_end ; ++in_node_it, ++ii )
+                        {
+                            if( st::ARCH_STATUS_SUCCESS ==
+                                ::NS(ComputeNodeId_to_string_with_format)(
+                                    std::addressof( *in_node_it ),
+                                    out_node_id_strs[ ii ], node_id_str_capacity,
+                                    st::ARCHITECTURE_OPENCL,
+                                    node_id_str_format ) )
+                            {
+                                ++num_node_id_str;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return num_node_id_str;
         }
 
         /* ***************************************************************** */
@@ -518,7 +594,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN size_type kernelExecCounter(
             kernel_id_t const kernel_id ) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN ClArgument* ptrKernelArgument(
+        SIXTRL_HOST_FN cl_argument_t* ptrKernelArgument(
             kernel_id_t const kernel_id,
             size_type const arg_index ) SIXTRL_NOEXCEPT;
 
@@ -526,7 +602,7 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_id_t const kernel_id,
             size_type const arg_index) const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN ClArgument const* ptrKernelArgument(
+        SIXTRL_HOST_FN cl_argument_t const* ptrKernelArgument(
             kernel_id_t const kernel_id,
             size_type const arg_index ) const SIXTRL_NOEXCEPT;
 
@@ -538,7 +614,7 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void assignKernelArgument( kernel_id_t const kernel_id,
-            size_type const arg_index, ClArgument& SIXTRL_RESTRICT_REF arg );
+            size_type const arg_index, cl_argument_t& SIXTRL_RESTRICT_REF arg );
 
         template< typename T >
         SIXTRL_HOST_FN void assignKernelArgumentPtr(
@@ -761,7 +837,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 {
                     this->m_arg_types[ index ] = type;
                     this->m_arguments[ index ] =
-                        reinterpret_cast< ClArgument* >( ptr );
+                        reinterpret_cast< cl_argument_t* >( ptr );
                 }
             }
 
@@ -801,7 +877,7 @@ namespace SIXTRL_CXX_NAMESPACE
                       static_cast< double >( this->m_exec_count ) : double{ 0 };
             }
 
-            ClArgument const* argument(
+            cl_argument_t const* argument(
                 size_type const arg_index ) const SIXTRL_NOEXCEPT
             {
                 SIXTRL_ASSERT( arg_index < this->m_num_args );
@@ -809,7 +885,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 return this->m_arguments[ arg_index ];
             }
 
-            ClArgument* argument( size_type const arg_index ) SIXTRL_NOEXCEPT
+            cl_argument_t* argument( size_type const arg_index ) SIXTRL_NOEXCEPT
             {
                 SIXTRL_ASSERT( arg_index < this->m_num_args );
                 SIXTRL_ASSERT( this->m_arguments.size() > arg_index );
@@ -817,7 +893,7 @@ namespace SIXTRL_CXX_NAMESPACE
             }
 
             void assignArgument( size_type const arg_index,
-                                 ClArgument* ptr_to_arg )
+                                 cl_argument_t* ptr_to_arg )
             {
                 SIXTRL_ASSERT( arg_index < this->m_num_args );
                 SIXTRL_ASSERT( this->m_arguments.size() > arg_index );
@@ -855,7 +931,7 @@ namespace SIXTRL_CXX_NAMESPACE
             double        m_last_exec_time;
             double        m_sum_exec_time;
 
-            std::vector< ClArgument* >       m_arguments;
+            std::vector< cl_argument_t* >       m_arguments;
             std::vector< kernel_arg_type_t > m_arg_types;
         };
 
@@ -1026,6 +1102,24 @@ NS(OpenCL_print_available_nodes)( void );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void
 NS(OpenCL_print_available_nodes_detailed)(
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name );
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(OpenCL_get_available_node_id_strs)(
+    char** SIXTRL_RESTRICT out_node_id_strs,
+    NS(arch_size_t) const max_num_node_ids,
+    NS(arch_size_t) const node_id_str_capacity );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(OpenCL_get_available_node_id_strs_detailed)(
+    char** SIXTRL_RESTRICT out_node_id_strs,
+    NS(arch_size_t) const max_num_node_ids,
+    NS(arch_size_t) const node_id_str_capacity,
+    NS(node_id_str_fmt_t) const node_id_str_format,
+    NS(arch_size_t) const skip_first_num_nodes,
     char const* SIXTRL_RESTRICT filter_str,
     char const* SIXTRL_RESTRICT env_variable_name );
 
@@ -1228,11 +1322,13 @@ NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     NS(arch_kernel_id_t) const kernel_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(ClContextBase_get_kernel_exec_counter)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(ClContextBase_get_kernel_exec_counter)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     NS(arch_kernel_id_t) const kernel_id );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)* NS(ClContextBase_get_ptr_kernel_argument)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
+NS(ClContextBase_get_ptr_kernel_argument)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     NS(arch_kernel_id_t) const kernel_id,
     NS(arch_size_t) const arg_index );

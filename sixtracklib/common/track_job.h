@@ -613,12 +613,14 @@ NS(TrackJob_assign_item_dest_src_end)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(TrackJob_perform_all_managed_assignments)(
+NS(TrackJob_commit_address_assignments)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(TrackJob_perform_managed_assignments)(
-    NS(TrackJobBase)* SIXTRL_RESTRICT job,
+NS(TrackJob_assign_all_addresses)( NS(TrackJobBase)* SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJob_assign_addresses)( NS(TrackJobBase)* SIXTRL_RESTRICT job,
     NS(buffer_size_t) const dest_buffer_id,
     NS(buffer_size_t) const src_buffer_id );
 

@@ -64,12 +64,12 @@ st.TriCub_buffer_create_assign_address_item(
 
 # commit the mappings:
 
-job.push_assign_address_items()
+job.commit_address_assignments()
 
 # ------------------------------------------------------------------------------
 # 5) Perform the assignments
 
-job.perform_managed_assignments()
+job.assign_all_addresses()
 
 # ------------------------------------------------------------------------------
 # 6) Check whether the assignments actually worked
@@ -81,11 +81,11 @@ tc2 = job.beam_elements_buffer.get_object(tc2_index)
 tc5 = job.beam_elements_buffer.get_object(tc5_index)
 tc8 = job.beam_elements_buffer.get_object(tc8_index)
 
-if job.arch_str == 'cpu':
-    tc2_data_addr = tc2.data_addr
-    tc5_data_addr = tc5.data_addr
-    tc8_data_addr = tc8.data_addr
+tc2_data_addr = tc2.data_addr
+tc5_data_addr = tc5.data_addr
+tc8_data_addr = tc8.data_addr
 
+if job.arch_str == 'cpu':
     tc_data_0_addr = tc_data_0._get_address()
     tc_data_1_addr = tc_data_1._get_address()
 
@@ -94,4 +94,11 @@ if job.arch_str == 'cpu':
     tc5.data_addr = {tc5_data_addr:#018x} <- tc_data_1 @ {tc_data_1_addr:#018x}
     tc8.data_addr = {tc8_data_addr:#018x} <- tc_data_0 @ {tc_data_0_addr:#018x}
     """
-    print(print_str)
+else:
+    print_str = f"""
+    tc2.data_addr = {tc2_data_addr:#018x}
+    tc5.data_addr = {tc5_data_addr:#018x}
+    tc8.data_addr = {tc8_data_addr:#018x}
+    """
+
+print(print_str)

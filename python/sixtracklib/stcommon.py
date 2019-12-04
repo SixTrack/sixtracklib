@@ -11,6 +11,7 @@ sixtracklib = ct.CDLL(stconf.SHARED_LIB)
 
 st_Null = ct.cast(0, ct.c_void_p)
 st_NullChar = ct.cast(0, ct.c_char_p)
+st_char_pp = ct.POINTER(ct.c_char_p)
 
 st_Context_p = ct.c_void_p
 st_uint64_p = ct.POINTER(ct.c_uint64)
@@ -30,6 +31,23 @@ st_arch_size_t_p = ct.POINTER(st_arch_size_t)
 
 st_ARCH_STATUS_SUCCESS = st_arch_status_t(0)
 st_ARCH_STATUS_GENERAL_FAILURE = st_arch_status_t(-1)
+
+st_arch_id_t = ct.c_uint64
+st_arch_id_p = ct.POINTER(st_arch_id_t)
+
+st_ARCHITECTURE_ILLEGAL = st_arch_id_t(0x000003FF)
+st_ARCHITECTURE_NONE = st_arch_id_t(0)
+st_ARCHITECTURE_CPU = st_arch_id_t(1)
+st_ARCHITECTURE_OPENCL = st_arch_id_t(2)
+st_ARCHITECTURE_CUDA = st_arch_id_t(3)
+
+st_node_id_str_fmt_t = ct.c_uint16
+
+st_NODE_ID_STR_FORMAT_NOARCH = st_node_id_str_fmt_t(0)
+st_NODE_ID_STR_FORMAT_ARCHID = st_node_id_str_fmt_t(1)
+st_NODE_ID_STR_FORMAT_ARCHSTR = st_node_id_str_fmt_t(2)
+st_NODE_ID_STR_FORMAT_DEFAULT = st_node_id_str_fmt_t(0)
+st_NODE_ID_STR_FORMAT_ILLEGAL = st_node_id_str_fmt_t(0xffff)
 
 # ------------------------------------------------------------------------------
 # st_Buffer C-API functions
@@ -1372,7 +1390,7 @@ st_TrackJob_ptr_assign_address_item_detailed.restype = st_AssignAddressItem_p
 st_TrackJob_num_distinct_available_assign_address_items_dest_src_pairs = \
     sixtracklib.st_TrackJob_num_distinct_available_assign_address_items_dest_src_pairs
 st_TrackJob_num_distinct_available_assign_address_items_dest_src_pairs.argtypes \
-    = [ st_TrackJob_p ]
+    = [st_TrackJob_p]
 st_TrackJob_num_distinct_available_assign_address_items_dest_src_pairs.restype \
     = st_buffer_size_t
 
@@ -1404,21 +1422,25 @@ st_TrackJob_is_raw_memory_by_buffer_id.argtypes = [
     st_TrackJob_p, st_buffer_size_t]
 st_TrackJob_is_raw_memory_by_buffer_id.restype = ct.c_bool
 
-st_TrackJob_perform_all_managed_assignments = \
-    sixtracklib.st_TrackJob_perform_all_managed_assignments
-st_TrackJob_perform_all_managed_assignments.argtypes = [st_TrackJob_p]
-st_TrackJob_perform_all_managed_assignments.restype = st_arch_status_t
+st_TrackJob_commit_address_assignments = \
+    sixtracklib.st_TrackJob_commit_address_assignments
+st_TrackJob_commit_address_assignments.argtypes = [st_TrackJob_p]
+st_TrackJob_commit_address_assignments.restype = st_arch_status_t
 
-st_TrackJob_perform_managed_assignments = \
-    sixtracklib.st_TrackJob_perform_managed_assignments
-st_TrackJob_perform_managed_assignments.argtypes = [
+st_TrackJob_assign_all_addresses = \
+    sixtracklib.st_TrackJob_assign_all_addresses
+st_TrackJob_assign_all_addresses.argtypes = [st_TrackJob_p]
+st_TrackJob_assign_all_addresses.restype = st_arch_status_t
+
+st_TrackJob_assign_addresses = \
+    sixtracklib.st_TrackJob_assign_addresses
+st_TrackJob_assign_addresses.argtypes = [
     st_TrackJob_p, st_buffer_size_t, st_buffer_size_t]
-st_TrackJob_perform_managed_assignments.restype = st_arch_status_t
+st_TrackJob_assign_addresses.restype = st_arch_status_t
 
 # ==============================================================================
 # sixtracklib/control, sixtracklib/track API:
 
-st_arch_id_t = ct.c_uint64
 st_node_platform_id_t = ct.c_int64
 st_node_device_id_t = ct.c_int64
 st_node_index_t = ct.c_uint32
@@ -3067,6 +3089,66 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
     # --------------------------------------------------------------------------
     # NS(CudaController):
 
+    st_Cuda_get_num_all_nodes = sixtracklib.st_Cuda_get_num_all_nodes
+    st_Cuda_get_num_all_nodes.argtypes = None
+    st_Cuda_get_num_all_nodes.restype = st_arch_size_t
+
+    st_Cuda_get_all_nodes = sixtracklib.st_Cuda_get_all_nodes
+    st_Cuda_get_all_nodes.argtypes = [st_NodeId_p, st_arch_size_t]
+    st_Cuda_get_all_nodes.restype = st_arch_size_t
+
+    st_Cuda_print_all_nodes = sixtracklib.st_Cuda_print_all_nodes
+    st_Cuda_print_all_nodes.argtypes = None
+    st_Cuda_print_all_nodes.restype = None
+
+    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+    st_Cuda_num_available_nodes = sixtracklib.st_Cuda_num_available_nodes
+    st_Cuda_num_available_nodes.argtypes = [ct.c_char_p]
+    st_Cuda_num_available_nodes.restype = st_arch_size_t
+
+    st_Cuda_num_available_nodes_detailed = \
+        sixtracklib.st_Cuda_num_available_nodes_detailed
+    st_Cuda_num_available_nodes_detailed.argtypes = [ct.c_char_p, ct.c_char_p]
+    st_Cuda_num_available_nodes_detailed.restype = st_arch_size_t
+
+    st_Cuda_get_available_nodes = sixtracklib.st_Cuda_get_available_nodes
+    st_Cuda_get_available_nodes.argtypes = [st_NodeId_p, st_arch_size_t]
+    st_Cuda_get_available_nodes.restype = st_arch_size_t
+
+    st_Cuda_get_available_nodes_detailed = \
+        sixtracklib.st_Cuda_get_available_nodes_detailed
+    st_Cuda_get_available_nodes_detailed.argtypes = [
+        st_NodeId_p, st_arch_size_t, st_arch_size_t, ct.c_char_p, ct.c_char_p]
+    st_Cuda_get_available_nodes_detailed.restpye = st_arch_size_t
+
+    st_Cuda_print_available_nodes = sixtracklib.st_Cuda_print_available_nodes
+    st_Cuda_print_available_nodes.argtypes = None
+    st_Cuda_print_available_nodes.restype = None
+
+    st_Cuda_print_available_nodes_detailed = \
+        sixtracklib.st_Cuda_print_available_nodes_detailed
+    st_Cuda_print_available_nodes_detailed.argtypes = [
+        ct.c_char_p, ct.c_char_p]
+    st_Cuda_print_available_nodes_detailed.restype = None
+
+    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+    st_Cuda_get_available_node_id_strs = \
+        sixtracklib.st_Cuda_get_available_node_id_strs
+    st_Cuda_get_available_node_id_strs.argtypes = [
+        st_char_pp, st_arch_size_t, st_arch_size_t]
+    st_Cuda_get_available_node_id_strs.restype = st_arch_size_t
+
+    st_Cuda_get_available_node_id_strs_detailed = \
+        sixtracklib.st_Cuda_get_available_node_id_strs_detailed
+    st_Cuda_get_available_node_id_strs_detailed.argtypes = [
+        st_char_pp, st_arch_size_t, st_arch_size_t, st_node_id_str_fmt_t,
+        st_arch_size_t, ct.c_char_p, ct.c_char_p]
+    st_Cuda_get_available_node_id_strs_detailed.restype = st_arch_size_t
+
+    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
     st_CudaArgBuffer_p = ct.c_void_p
     st_NullCudaArgBuffer = ct.cast(0, st_CudaArgBuffer_p)
 
@@ -3529,8 +3611,6 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-
     class st_ClNodeId(ct.Structure):
         _fields_ = [('platform_id', ct.c_int64), ('device_id', ct.c_int64)]
 
@@ -3538,13 +3618,13 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClNodeId_p = ct.POINTER(st_ClNodeId)
     st_NullClNodeId = ct.cast(0, st_ClNodeId_p)
 
-    st_ComputeNodeId_allocate_array = sixtracklib.st_ComputeNodeId_allocate_array
-    st_ComputeNodeId_allocate_array.argtypes = [ st_arch_size_t ]
-    st_ComputeNodeId_allocate_array.restype = st_ClNodeId_p
+    st_ComputeNodeId_create = sixtracklib.st_ComputeNodeId_create
+    st_ComputeNodeId_create.argtypes = None
+    st_ComputeNodeId_create.restype = st_ClNodeId_p
 
-    st_ComputeNodeId_free_array = sixtracklib.st_ComputeNodeId_free_array
-    st_ComputeNodeId_free_array.argtypes = [ st_ClNodeId_p ]
-    st_ComputeNodeId_free_array.restype = None
+    st_ComputeNodeId_delete = sixtracklib.st_ComputeNodeId_delete
+    st_ComputeNodeId_delete.argtypes = [st_ClNodeId_p]
+    st_ComputeNodeId_delete.restype = None
 
     st_ComputeNodeId_get_platform_id = \
         sixtracklib.st_ComputeNodeId_get_platform_id_ext
@@ -3580,9 +3660,26 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ComputeNodeId_are_equal.argtypes = [st_ClNodeId_p, st_ClNodeId_p]
     st_ComputeNodeId_are_equal.restype = ct.c_bool
 
+    st_ComputeNodeId_to_string = sixtracklib.st_ComputeNodeId_to_string
+    st_ComputeNodeId_to_string.argtypes = [
+        st_ClNodeId_p, ct.c_char_p, st_arch_size_t]
+    st_ComputeNodeId_to_string.restype = st_arch_status_t
+
     st_ComputeNodeId_from_string = sixtracklib.st_ComputeNodeId_from_string
     st_ComputeNodeId_from_string.argtypes = [st_ClNodeId_p, ct.c_char_p]
-    st_ComputeNodeId_from_string.restype = ct.c_int
+    st_ComputeNodeId_from_string.restype = st_arch_status_t
+
+    st_ComputeNodeId_to_string_with_format = \
+        sixtracklib.st_ComputeNodeId_to_string_with_format
+    st_ComputeNodeId_to_string_with_format.argtypes = [
+        st_NodeId_p, ct.c_char_p, st_arch_size_t, st_arch_id_t, st_node_id_str_fmt_t]
+    st_ComputeNodeId_to_string_with_format.restype = st_arch_status_t
+
+    st_ComputeNodeId_from_string_with_format = \
+        sixtracklib.st_ComputeNodeId_from_string_with_format
+    st_ComputeNodeId_from_string_with_format.argtypes = [
+        st_ClNodeId_p, ct.c_char_p, st_node_id_str_fmt_t, st_arch_id_p]
+    st_ComputeNodeId_from_string_with_format.restype = st_arch_status_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
@@ -3671,7 +3768,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_OpenCL_get_num_all_nodes.restype = st_arch_size_t
 
     st_OpenCL_get_all_nodes = sixtracklib.st_OpenCL_get_all_nodes
-    st_OpenCL_get_all_nodes.argtypes = [ st_ClNodeInfo_p, st_arch_size_t ]
+    st_OpenCL_get_all_nodes.argtypes = [st_ClNodeInfo_p, st_arch_size_t]
     st_OpenCL_get_all_nodes.restype = st_arch_size_t
 
     st_OpenCL_print_all_nodes = sixtracklib.st_OpenCL_print_all_nodes
@@ -3681,19 +3778,20 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
     st_OpenCL_num_available_nodes = sixtracklib.st_OpenCL_num_available_nodes
-    st_OpenCL_num_available_nodes.argtypes = [ ct.c_char_p ]
+    st_OpenCL_num_available_nodes.argtypes = [ct.c_char_p]
     st_OpenCL_num_available_nodes.restype = st_arch_size_t
 
     st_OpenCL_num_available_nodes_detailed = sixtracklib.st_OpenCL_num_available_nodes_detailed
-    st_OpenCL_num_available_nodes_detailed.argtypes = [ ct.c_char_p, ct.c_char_p ]
+    st_OpenCL_num_available_nodes_detailed.argtypes = [ct.c_char_p, ct.c_char_p]
     st_OpenCL_num_available_nodes_detailed.restype = st_arch_size_t
 
     st_OpenCL_get_available_nodes = sixtracklib.st_OpenCL_get_available_nodes
-    st_OpenCL_get_available_nodes.argtypes = [ st_ClNodeId_p, st_arch_size_t ]
+    st_OpenCL_get_available_nodes.argtypes = [st_ClNodeId_p, st_arch_size_t]
     st_OpenCL_get_available_nodes.restype = st_arch_size_t
 
     st_OpenCL_get_available_nodes_detailed = sixtracklib.st_OpenCL_get_available_nodes_detailed
-    st_OpenCL_get_available_nodes_detailed.argtypes = [ st_ClNodeId_p, st_arch_size_t, st_arch_size_t, ct.c_char_p, ct.c_char_p ]
+    st_OpenCL_get_available_nodes_detailed.argtypes = [
+        st_ClNodeId_p, st_arch_size_t, st_arch_size_t, ct.c_char_p, ct.c_char_p]
     st_OpenCL_get_available_nodes_detailed.restype = st_arch_size_t
 
     st_OpenCL_print_available_nodes = sixtracklib.st_OpenCL_print_available_nodes
@@ -3701,8 +3799,22 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_OpenCL_print_available_nodes.restype = None
 
     st_OpenCL_print_available_nodes_detailed = sixtracklib.st_OpenCL_print_available_nodes_detailed
-    st_OpenCL_print_available_nodes_detailed.argtypes = [ ct.c_char_p, ct.c_char_p ]
+    st_OpenCL_print_available_nodes_detailed.argtypes = [
+        ct.c_char_p, ct.c_char_p]
     st_OpenCL_print_available_nodes_detailed.restype = None
+
+    st_OpenCL_get_available_node_id_strs = \
+        sixtracklib.st_OpenCL_get_available_node_id_strs
+    st_OpenCL_get_available_node_id_strs.argyptes = [
+        st_char_pp, st_arch_size_t, st_arch_size_t]
+    st_OpenCL_get_available_node_id_strs.restype = st_arch_size_t
+
+    st_OpenCL_get_available_node_id_strs_detailed = \
+        sixtracklib.st_OpenCL_get_available_node_id_strs_detailed
+    st_OpenCL_get_available_node_id_strs_detailed.argyptes = [
+        st_char_pp, st_arch_size_t, st_arch_size_t,
+        st_node_id_str_fmt_t, st_arch_size_t, ct.c_char_p, ct.c_char_p]
+    st_OpenCL_get_available_node_id_strs_detailed.restype = st_arch_size_t
 
     # --------------------------------------------------------------------------
 
@@ -4449,7 +4561,7 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContext_has_clear_beam_monitor_output_kernel.restype = ct.c_bool
 
     st_ClContext_clear_beam_monitor_output_kernel_id = \
-sixtracklib.st_ClContext_clear_beam_monitor_output_kernel_id
+        sixtracklib.st_ClContext_clear_beam_monitor_output_kernel_id
     st_ClContext_clear_beam_monitor_output_kernel_id.argtypes = \
         [st_ClContext_p]
     st_ClContext_clear_beam_monitor_output_kernel_id.restype = \
@@ -4545,19 +4657,23 @@ sixtracklib.st_ClContext_clear_beam_monitor_output_kernel_id
     st_TrackJobCl_get_context.restype = st_ClContext_p
 
     st_TrackJobCl_const_argument_by_buffer_id = sixtracklib.st_TrackJobCl_const_argument_by_buffer_id
-    st_TrackJobCl_const_argument_by_buffer_id.argtypes = [ st_TrackJobCl_p, st_buffer_size_t ]
+    st_TrackJobCl_const_argument_by_buffer_id.argtypes = [
+        st_TrackJobCl_p, st_buffer_size_t]
     st_TrackJobCl_const_argument_by_buffer_id.restype = st_ClArgument_p
 
     st_TrackJobCl_argument_by_buffer_id = sixtracklib.st_TrackJobCl_argument_by_buffer_id
-    st_TrackJobCl_argument_by_buffer_id.argtypes = [ st_TrackJobCl_p, st_buffer_size_t ]
+    st_TrackJobCl_argument_by_buffer_id.argtypes = [
+        st_TrackJobCl_p, st_buffer_size_t]
     st_TrackJobCl_argument_by_buffer_id.restype = st_ClArgument_p
 
     st_TrackJobCl_const_stored_buffer_argument = sixtracklib.st_TrackJobCl_const_stored_buffer_argument
-    st_TrackJobCl_const_stored_buffer_argument.argtypes = [ st_TrackJobCl_p, st_buffer_size_t ]
+    st_TrackJobCl_const_stored_buffer_argument.argtypes = [
+        st_TrackJobCl_p, st_buffer_size_t]
     st_TrackJobCl_const_stored_buffer_argument.restype = st_ClArgument_p
 
     st_TrackJobCl_stored_buffer_argument = sixtracklib.st_TrackJobCl_stored_buffer_argument
-    st_TrackJobCl_stored_buffer_argument.argtypes = [ st_TrackJobCl_p, st_buffer_size_t ]
+    st_TrackJobCl_stored_buffer_argument.argtypes = [
+        st_TrackJobCl_p, st_buffer_size_t]
     st_TrackJobCl_stored_buffer_argument.restype = st_ClArgument_p
 
 # ------------------------------------------------------------------------------

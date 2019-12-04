@@ -5,7 +5,7 @@ import sys
 import os
 import ctypes as ct
 from cobjects import CBuffer
-import sixtracklib as pyst
+import sixtracklib as st
 from sixtracklib.stcommon import \
     st_Particles_p, st_ParticlesAddr_p, \
     st_Particles_buffer_get_particles, st_Particles_get_num_of_particles, \
@@ -17,8 +17,17 @@ from sixtracklib_test.stcommon import \
 import pdb
 
 if __name__ == '__main__':
-    if not pyst.supports('cuda'):
+    if not st.supports('cuda'):
         raise SystemExit("cuda support required for this test")
+
+    try:
+        num_nodes = st.CudaController.NUM_AVAILABLE_NODES()
+    except RuntimeError as e:
+        num_nodes = 0
+
+    if num_nodes <= 0:
+        print("No CUDA nodes available -> skip test")
+        sys.exit(0)
 
     path_to_testdir = testlib.config.PATH_TO_TESTDATA_DIR
     assert path_to_testdir is not None
@@ -43,7 +52,7 @@ if __name__ == '__main__':
     # =========================================================================
     # Setup CudaTrackJob to extract device particle addresses:
 
-    track_job = pyst.CudaTrackJob(eb, pb)
+    track_job = st.CudaTrackJob(eb, pb)
 
     assert track_job.arch_str == "cuda"
     assert track_job.requires_collecting
@@ -76,7 +85,7 @@ if __name__ == '__main__':
 
     assert track_job.has_particle_addresses
 
-    pb_buffer = pyst.Buffer(cbuffer=pb)
+    pb_buffer = st.Buffer(cbuffer=pb)
     assert pb_buffer.pointer != st_NullBuffer
     assert pb_buffer.num_objects == num_particle_sets
 

@@ -34,6 +34,8 @@ namespace SIXTRL_CXX_NAMESPACE
         using device_id_t   = SIXTRL_CXX_NAMESPACE::node_device_id_t;
         using index_t       = SIXTRL_CXX_NAMESPACE::node_index_t;
         using status_t      = SIXTRL_CXX_NAMESPACE::arch_status_t;
+        using str_format_t  = SIXTRL_CXX_NAMESPACE::node_id_str_fmt_t;
+        using arch_id_t     = SIXTRL_CXX_NAMESPACE::arch_id_t;
 
         static SIXTRL_CONSTEXPR_OR_CONST platform_id_t ILLEGAL_PLATFORM_ID =
             SIXTRL_CXX_NAMESPACE::NODE_ILLEGAL_PATFORM_ID;
@@ -87,6 +89,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_FN status_t toString( char* SIXTRL_RESTRICT node_id_str,
             size_type const node_id_str_capacity ) const SIXTRL_NOEXCEPT;
+
+        SIXTRL_FN status_t to_string( char* SIXTRL_RESTRICT node_id_str,
+            size_type const node_id_str_capacity,
+            arch_id_t const arch_id, str_format_t const format =
+                SIXTRL_CXX_NAMESPACE::NODE_ID_STR_FORMAT_DEFAULT
+        ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_FN bool operator<(
             NodeId const& SIXTRL_RESTRICT_REF rhs ) const SIXTRL_NOEXCEPT;

@@ -15,6 +15,7 @@ from .control import ControllerBase, NodeControllerBase, ArgumentBase
 from .buffer import Buffer, get_cbuffer_from_obj, AssignAddressItem
 from .particles import ParticlesSet
 from .beam_elements import Elements
+from .opencl import ClController
 
 from .stcommon import st_TrackJobBaseNew_p, st_NullTrackJobBaseNew, \
     st_ARCH_STATUS_SUCCESS, st_ARCH_STATUS_GENERAL_FAILURE, \
@@ -679,23 +680,30 @@ class TrackJobBaseNew(object):
 class TrackJob(object):
     @staticmethod
     def num_all_nodes(arch_str=None):
-        if not( arch_str is None ) and arch_str == 'opencl' and \
-            stconf.SIXTRACKLIB_MODULES.get( 'opencl', False ):
+        if not(arch_str is None) and arch_str == 'opencl' and \
+                stconf.SIXTRACKLIB_MODULES.get('opencl', False):
             return st.st_OpenCL_get_num_all_nodes()
         else:
             return 0
 
     @staticmethod
     def num_available_nodes(arch_str=None, env_var_name=None, filter_str=None):
-        if not( arch_str is None ) and arch_str == 'opencl' and \
-            stconf.SIXTRACKLIB_MODULES.get( 'opencl', False ):
-            if not( env_var_name is None ) and not( filter_str is None ):
-                env_var_name.encode('utf-8')
-                filter_str.encode('utf-8')
-                return st.st_OpenCL_num_available_nodes_detailed(
-                    ct.c_char_p(env_var_name), ct.c_char_p(filter_str))
+        if not(arch_str is None) and arch_str == 'opencl' and \
+                stconf.SIXTRACKLIB_MODULES.get('opencl', False):
+            if not(filter_str is None):
+                filter_str = filter_str.strip().encode('utf-8')
+                _filter_str = ct.c_char_p(filter_str)
             else:
-                return st.st_OpenCL_num_available_nodes()
+                _filter_str = ct.cast(0, ct.c_char_p)
+
+            if not(env_var_name is None):
+                env_var_name = env_var_name.strip().encode('utf-8')
+                _env_var_name = ct.c_char_p(env_var_name)
+            else:
+                _env_var_name = ct.cast(0, ct.c_char_p)
+
+            return st.st_OpenCL_num_available_nodes_detailed(
+                _filter_str, _env_var_name)
         else:
             return 0
 
@@ -739,6 +747,8 @@ class TrackJob(object):
         self._ptr_c_output_buffer = st.st_NullBuffer
         self._stored_buffers = {}
         self._ext_stored_st_buffers = {}
+        self._last_status = st_ARCH_STATUS_SUCCESS.value
+        self._last_track_status = st_TRACK_SUCCESS.value
 
         base_addr_t = ct.POINTER(ct.c_ubyte)
         success = False
@@ -877,6 +887,14 @@ class TrackJob(object):
             self._ext_stored_st_buffers = None
 
     @property
+    def last_status(self):
+        return self._last_status
+
+    @property
+    def last_track_status(self):
+        return self._last_track_status
+
+    @property
     def output_buffer(self):
         return self._output_buffer
 
@@ -898,19 +916,31 @@ class TrackJob(object):
         return self.track_until(until_turn)
 
     def track_until(self, until_turn):
-        return st.st_TrackJob_track_until(
+        self._last_track_status = st.st_TrackJob_track_until(
             self.ptr_st_track_job, ct.c_uint64(until_turn))
+        if self._last_track_status != st.st_TRACK_SUCCESS.value:
+            raise RuntimeError(
+                f"Error during performing track_until({until_turn})")
+        return self
 
     def track_elem_by_elem(self, until_turn):
-        return st.st_TrackJob_track_elem_by_elem(
+        self._last_track_status = st.st_TrackJob_track_elem_by_elem(
             self.ptr_st_track_job, ct.c_uint64(until_turn))
+        if self._last_track_status != st.st_TRACK_SUCCESS.value:
+            raise RuntimeError(
+                f"Error during performing track_elem_by_elem({until_turn})")
+        return self
 
     def track_line(self, begin_idx, end_idx, finish_turn=False):
-        return st.st_TrackJob_track_line(
+        self._last_track_status = st.st_TrackJob_track_line(
             self.ptr_st_track_job,
             ct.c_uint64(begin_idx),
             ct.c_uint64(end_idx),
             ct.c_bool(finish_turn))
+        if self._last_track_status != st.st_TRACK_SUCCESS.value:
+            raise RuntimeError(
+                f"Error during performing track_line({until_turn})")
+        return self
 
     def collect(self):
         st.st_TrackJob_collect(self.ptr_st_track_job)
@@ -1023,7 +1053,8 @@ class TrackJob(object):
                 SIXTRACKLIB_MODULES.get(self.arch_str, False):
             if self.ptr_st_track_job == st_NullTrackJob:
                 raise RuntimeError("TrackJob is not initialized yet")
-            return st.st_TrackJobCl_get_context(self.ptr_st_track_job)
+            return ClController(ext_ptr_ctrl=st.st_TrackJobCl_get_context(
+                self.ptr_st_track_job), owns_ptr=False)
         else:
             raise RuntimeError(
                 "TrackJob has no controller for this architecture")
@@ -1035,10 +1066,8 @@ class TrackJob(object):
         success = False
         program_id = st.st_ARCH_ILLEGAL_PROGRAM_ID.value
 
-        path_to_program_file = path_to_program_file.strip()
-        path_to_program_file.encode('utf-8')
-        compile_options = compile_options.strip()
-        compile_options.encode('utf-8')
+        path_to_program_file = path_to_program_file.strip().encode('utf-8')
+        compile_options = compile_options.strip().encode('utf-8')
 
         if self.arch_str == 'opencl' and \
                 SIXTRACKLIB_MODULES.get(self.arch_str, False):
@@ -1067,8 +1096,7 @@ class TrackJob(object):
             raise ValueError("Illegal program_id provided")
 
         kernel_id = st.st_ARCH_ILLEGAL_KERNEL_ID.value
-        kernel_name = kernel_name.strip()
-        kernel_name.encode('utf-8')
+        kernel_name = kernel_name.strip().encode('utf-8')
 
         if self.arch_str == 'opencl' and \
                 SIXTRACKLIB_MODULES.get(self.arch_str, False):
@@ -1280,19 +1308,31 @@ class TrackJob(object):
                 "unable to add AssignAddressItem given by these parameters")
         return ptr_added_item
 
-    def push_assign_address_items(self):
-        # TODO: IMplement pushing!
+    def commit_address_assignments(self):
+        self._last_status = st.st_TrackJob_commit_address_assignments(
+            self.ptr_st_track_job)
+
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError("Unable to commit address assignment items")
+
         return self
 
-    def perform_managed_assignments(
-            self,
-            dest_buffer_id=None,
-            src_buffer_id=None):
+    def assign_all_addresses(self):
+        self._last_status = st.st_TrackJob_assign_all_addresses(
+            self.ptr_st_track_job)
+
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError(
+                "Unable to perform assignment of all address items")
+
+        return self
+
+    def assign_addresses(self, dest_buffer_id, src_buffer_id):
         if dest_buffer_id is None and src_buffer_id is None:
-            self._last_status = st.st_TrackJob_perform_all_managed_assignments(
+            self._last_status = st.st_TrackJob_assign_all_addresses(
                 self.ptr_st_track_job)
         elif not(dest_buffer_id is None) and not(src_buffer_id is None):
-            self._last_status = st.st_TrackJob_perform_managed_assignments(
+            self._last_status = st.st_TrackJob_assign_addresses(
                 self.ptr_st_track_job, st_buffer_size_t(dest_buffer_id),
                 st_buffer_size_t(src_buffer_id))
         else:
@@ -1503,7 +1543,7 @@ class TrackJob(object):
         else:
             arch_str = self.arch_str
             raise RuntimeError(
-                f"unable to get argument for buffer on arch {arch_str}" )
+                f"unable to get argument for buffer on arch {arch_str}")
         return ptr_arg
 
     def stored_buffer_argument(self, buffer_id):
@@ -1514,7 +1554,7 @@ class TrackJob(object):
         else:
             arch_str = self.arch_str
             raise RuntimeError(
-                f"unable to get argument for stored buffer on arch {arch_str}" )
+                f"unable to get argument for stored buffer on arch {arch_str}")
         return ptr_arg
 
 # end: python/sixtracklib/trackjob.py
