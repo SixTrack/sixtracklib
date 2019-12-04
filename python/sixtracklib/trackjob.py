@@ -673,7 +673,7 @@ class TrackJobBaseNew(object):
         return self
 
     def get_particle_addresses(self, particle_set_index=0):
-        return st.st_TrackJob_get_particle_addresses(
+        return st.st_TrackJobNew_get_particle_addresses(
             self._ptr_track_job, st_buffer_size_t(particle_set_index))
 
 
