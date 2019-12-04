@@ -295,11 +295,14 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
             if _num_avail_nodes > 0:
                 _node_id_str_capacity = 64
-                node_id_str_buffer = [
-                    ct.create_string_buffer(_node_id_str_capacity)]
+                node_id_str_buffer = []
+                for ii in range(0, _num_avail_nodes):
+                    node_id_str_buffer.append(
+                        ct.create_string_buffer(_node_id_str_capacity))
 
                 node_id_str_array_t = ct.c_char_p * _num_avail_nodes
                 _tmp_node_id_strs = node_id_str_array_t()
+                assert len(_tmp_node_id_strs) == len(node_id_str_buffer)
 
                 for ii in range(0, _num_avail_nodes):
                     _tmp_node_id_strs[ii] = ct.cast(
@@ -313,8 +316,10 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                         st_arch_size_t(skip_first_num_nodes),
                         _filter_str, _env_var_name)
 
-                node_id_strs = [bytes(_tmp_node_id_strs[ii]).decode('utf-8')
-                                for ii in range(0, _num_node_id_strs)]
+                for ii in range(0, _num_avail_nodes):
+                    node_id_strs.append(
+                        bytes(_tmp_node_id_strs[ii]).decode('utf-8'))
+
             return node_id_strs
 
         def __init__(self, config_str=None, device_id=None,
