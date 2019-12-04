@@ -35,12 +35,12 @@ option( SIXTRACKL_ENABLE_BENCHMARK_TESTS "Enable benchmark tests"         OFF )
 # ------------------------------------------------------------------------------
 # ---- SixTrackLib Features:
 
-option( SIXTRACKL_ERROR_ON_TRACK_DISABLED_MAP  "Error on disabled maps"   ON  )
-option( SIXTRACKL_ENABLE_BEAM_FIELDS_4D_MAP    "Enable beam-beam-4D map"  ON  )
-option( SIXTRACKL_ENABLE_BEAM_FIELDS_6D_MAP    "Enable beam-beam-6D map"  ON  )
-option( SIXTRACKL_ENABLE_SC_BUNCHED_MAP        "Enable space-charge maps" ON  )
-option( SIXTRACKL_ENABLE_SC_COASTING_MAP       "Enable space-charge maps" ON  )
-option( SIXTRACKL_ENABLE_BE_TRICUB_MAP         "Enable be_tricub map"     OFF )
+option( SIXTRACKL_ERROR_ON_TRACK_DISABLED_MAP  ""    ON  )
+option( SIXTRACKL_ENABLE_BEAM_FIELDS_4D_MAP    ""    ON  )
+option( SIXTRACKL_ENABLE_BEAM_FIELDS_6D_MAP    ""    ON  )
+option( SIXTRACKL_ENABLE_SC_BUNCHED_MAP        ""    ON  )
+option( SIXTRACKL_ENABLE_SC_COASTING_MAP       ""    ON  )
+option( SIXTRACKL_ENABLE_BE_TRICUB_MAP         ""    OFF )
 
 set( SIXTRACKL_ENABLE_GLOBAL_APERTURE_CHECK "always" CACHE STRING
      "Enable xy-aperture check" )
@@ -172,6 +172,26 @@ set( SIXTRACKL_CXX_NAMESPACE "sixtrack" CACHE STRING
 set( SIXTRACKL_C_NAMESPACE_PREFIX "st_" CACHE STRING
      "SixTrackLib C-Namespace prefix (default: st_)" )
 
+# ==============================================================================
+# Help strings omitted because of line-length issues above:
+
+set_property( CACHE SIXTRACKL_ERROR_ON_TRACK_DISABLED_MAP
+    PROPERTY HELPSTRING "Error on tracking disabled maps" )
+
+set_property( CACHE SIXTRACKL_ENABLE_BEAM_FIELDS_4D_MAP
+    PROPERTY HELPSTRING "Enable tracking beam-beam-4D map" )
+
+set_property( CACHE SIXTRACKL_ENABLE_BEAM_FIELDS_6D_MAP
+    PROPERTY HELPSTRING "Enable tracking beam-beam-6D map" )
+
+set_property( CACHE SIXTRACKL_ENABLE_SC_BUNCHED_MAP
+    PROPERTY HELPSTRING "Enable tracking bunched  space-charge maps" )
+
+set_property( CACHE SIXTRACKL_ENABLE_SC_COASTING_MAP
+    PROPERTY HELPSTRING "Enable tracking coasting space-charge maps" )
+
+set_property( CACHE SIXTRACKL_ENABLE_BE_TRICUB_MAP
+    PROPERTY HELPSTRING "Enable tracking bunched  space-charge maps" )
 
 # ==============================================================================
 # end: Settings.cmake.default | Settings.cmake
