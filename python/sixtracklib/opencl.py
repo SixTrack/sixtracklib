@@ -738,7 +738,7 @@ else:
                 filter_str=None,
                 env_var_name=None,
                 skip_first_num_nodes=0,
-                node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value):
+                node_id_str_fmt=None):
             raise RuntimeError("OpenCL module disabled, no nodes available")
             return []
 
