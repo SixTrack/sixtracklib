@@ -1855,6 +1855,16 @@ namespace SIXTRL_CXX_NAMESPACE
         track_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__global";
         track_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global";
 
+        #if defined( SIXTRL_ENABLE_BE_TRICUB_MAP ) && \
+            defined( SIXTRL_TRACK_MAP_ENABLED ) && \
+            SIXTRL_ENABLE_BE_TRICUB_MAP >= SIXTRL_TRACK_MAP_ENABLED
+
+        std::ostringstream a2str;
+        a2str << " -DSIXTRL_TRACK_MAP_ENABLED=" << SIXTRL_ENABLE_BE_TRICUB_MAP;
+        track_compile_options += a2str.str();
+
+        #endif /* defined( SIXTRL_ENABLE_BE_TRICUB_MAP ) */
+
         if( !this->is_beam_beam_tracking_enabled() )
         {
             track_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
@@ -1868,6 +1878,14 @@ namespace SIXTRL_CXX_NAMESPACE
         track_optimized_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
         track_optimized_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private";
         track_optimized_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__private";
+
+        #if defined( SIXTRL_ENABLE_BE_TRICUB_MAP ) && \
+            defined( SIXTRL_TRACK_MAP_ENABLED ) && \
+            SIXTRL_ENABLE_BE_TRICUB_MAP >= SIXTRL_TRACK_MAP_ENABLED
+
+        track_optimized_compile_options += a2str.str();
+
+        #endif /* defined( SIXTRL_ENABLE_BE_TRICUB_MAP ) */
 
         if( !this->is_beam_beam_tracking_enabled() )
         {
