@@ -4,6 +4,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
+    #include "sixtracklib/common/internal/beam_elements_defines.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
     #include "sixtracklib/common/internal/objects_type_id.h"
@@ -35,6 +36,16 @@ typedef struct NS(RFMultiPole)
     NS(buffer_addr_t)         p_addr              SIXTRL_ALIGN( 8 );
 }
 NS(RFMultiPole);
+
+/* ************************************************************************* */
+
+SIXTRL_STATIC SIXTRL_FN NS(rf_multipole_int_t)
+NS(RFMultiPole_calculate_factorial)( NS(rf_multipole_int_t) const n );
+
+SIXTRL_STATIC SIXTRL_FN NS(rf_multipole_real_t)
+NS(RFMultiPole_calculate_factorial_real)( NS(rf_multipole_int_t) const n );
+
+/* ************************************************************************* */
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)*
 NS(RFMultiPole_preset)(
@@ -81,6 +92,8 @@ SIXTRL_STATIC SIXTRL_FN NS(buffer_addr_t) NS(RFMultiPole_bal_addr)(
 SIXTRL_STATIC SIXTRL_FN NS(buffer_addr_t) NS(RFMultiPole_p_addr)(
     SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole );
 
+
+
 SIXTRL_STATIC SIXTRL_FN NS(rf_multipole_int_t) NS(RFMultiPole_num_bal_elements)(
     SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole );
 
@@ -100,6 +113,23 @@ NS(RFMultiPole_const_p)( SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole)
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_DATAPTR_DEC NS(rf_multipole_real_t)*
 NS(RFMultiPole_p)( SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* SIXTRL_RESTRICT mpole );
+
+
+SIXTRL_STATIC SIXTRL_FN NS(rf_multipole_real_t) NS(RFMultiPole_knl_value)(
+    SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole,
+    NS(rf_multipole_int_t) const index );
+
+SIXTRL_FN SIXTRL_STATIC NS(rf_multipole_real_t) NS(RFMultiPole_ksl_value)(
+    SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole,
+    NS(rf_multipole_int_t) const index );
+
+SIXTRL_STATIC SIXTRL_FN NS(rf_multipole_real_t) NS(RFMultiPole_pn_value)(
+    SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole,
+    NS(rf_multipole_int_t) const index );
+
+SIXTRL_FN SIXTRL_STATIC NS(rf_multipole_real_t) NS(RFMultiPole_ps_value)(
+    SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole,
+    NS(rf_multipole_int_t) const index );
 
 /* ------------------------------------------------------------------- */
 
@@ -219,6 +249,26 @@ SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(RFMultiPole_copy)(
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
 #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+
+SIXTRL_INLINE NS(rf_multipole_int_t) NS(RFMultiPole_calculate_factorial)(
+    NS(rf_multipole_int_t) const n )
+{
+    NS(rf_multipole_int_t) result = ( NS(rf_multipole_int_t) )1u;
+    NS(rf_multipole_int_t) ii     = ( NS(rf_multipole_int_t) )1u;
+
+    for( ; ii <= n ; ++ii ) result *= ii;
+    return result;
+}
+
+SIXTRL_INLINE NS(rf_multipole_real_t) NS(RFMultiPole_calculate_factorial_real)(
+    NS(rf_multipole_int_t) const n )
+{
+    NS(rf_multipole_real_t) result = ( NS(rf_multipole_real_t) )1.0;
+    NS(rf_multipole_int_t) ii = ( NS(rf_multipole_int_t) )1u;
+
+    for( ; ii <= n ; ++ii ) result *= ( NS(rf_multipole_real_t) )ii;
+    return result;
+}
 
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)*
 NS(RFMultiPole_preset)(
@@ -415,6 +465,54 @@ NS(RFMultiPole_p)( SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* SIXTRL_RESTRICT mpole )
 {
     return ( SIXTRL_BE_DATAPTR_DEC NS(rf_multipole_real_t)*
         )NS(RFMultiPole_const_p)( mpole );
+}
+
+SIXTRL_INLINE NS(rf_multipole_real_t) NS(RFMultiPole_knl_value)(
+    SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole,
+    NS(rf_multipole_int_t) const index )
+{
+    SIXTRL_ASSERT( mpole != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( mpole->order + ( NS(rf_multipole_int_t) )1u ) >= index );
+    SIXTRL_ASSERT( mpole->bal_addr != ( NS(buffer_addr_t) )0u );
+
+    return NS(RFMultiPole_const_bal)( mpole )[ 2 * index ] *
+        NS(RFMultiPole_calculate_factorial_real)( index );
+}
+
+SIXTRL_INLINE NS(rf_multipole_real_t) NS(RFMultiPole_ksl_value)(
+    SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole,
+    NS(rf_multipole_int_t) const index )
+{
+    SIXTRL_ASSERT( mpole != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( mpole->order + ( NS(rf_multipole_int_t) )1u ) >= index );
+    SIXTRL_ASSERT( mpole->bal_addr != ( NS(buffer_addr_t) )0u );
+
+    return NS(RFMultiPole_const_bal)( mpole )[ 2 * index + 1 ] *
+        NS(RFMultiPole_calculate_factorial_real)( index );
+}
+
+SIXTRL_INLINE NS(rf_multipole_real_t) NS(RFMultiPole_pn_value)(
+    SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole,
+    NS(rf_multipole_int_t) const index )
+{
+    /* TODO: Implement accessor function for pn: */
+    SIXTRL_ASSERT( mpole != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( mpole->order + ( NS(rf_multipole_int_t) )1u ) >= index );
+    SIXTRL_ASSERT( mpole->p_addr != ( NS(buffer_addr_t) )0u );
+
+    return NS(RFMultiPole_const_p)( mpole )[ 2 * index ];
+}
+
+SIXTRL_INLINE NS(rf_multipole_real_t) NS(RFMultiPole_ps_value)(
+    SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole,
+    NS(rf_multipole_int_t) const index )
+{
+    /* TODO: Implement accessor function for pn: */
+    SIXTRL_ASSERT( mpole != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ( mpole->order + ( NS(rf_multipole_int_t) )1u ) >= index );
+    SIXTRL_ASSERT( mpole->p_addr != ( NS(buffer_addr_t) )0u );
+
+    return NS(RFMultiPole_const_p)( mpole )[ 2 * index + 1 ];
 }
 
 /* ------------------------------------------------------------------- */

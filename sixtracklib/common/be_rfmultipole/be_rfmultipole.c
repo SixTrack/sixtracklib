@@ -1,4 +1,4 @@
-#include "sixtracklib/common/be_rfmultipole.h"
+#include "sixtracklib/common/be_rfmultipole/be_rfmultipole.h"
 #include "sixtracklib/common/buffer.h"
 
 SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole) const* NS(RFMultiPole_const_from_buffer)(
@@ -32,8 +32,8 @@ NS(arch_status_t) NS(RFMultiPole_attributes_offsets)(
     {
         SIXTRL_ASSERT( NS(RFMultiPole_num_dataptrs)( mpole ) == 2u );
 
-        offsets_begin[ 0 ] = offsetof( NS(RFMultiPole), bal );
-        offsets_begin[ 1 ] = offsetof( NS(RFMultiPole), p );
+        offsets_begin[ 0 ] = offsetof( NS(RFMultiPole), bal_addr );
+        offsets_begin[ 1 ] = offsetof( NS(RFMultiPole), p_addr );
 
         status = NS(ARCH_STATUS_SUCCESS);
     }
@@ -210,8 +210,8 @@ SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* NS(RFMultiPole_add)(
     multipole.voltage = voltage;
     multipole.frequency = frequency;
     multipole.lag = lag;
-    multipole.bal = ( NS(buffer_addr_t) )( uintptr_t )bal_values;
-    multipole.p = ( NS(buffer_addr_t) )( uintptr_t )p_values;
+    multipole.bal_addr = ( NS(buffer_addr_t) )( uintptr_t )bal_values;
+    multipole.p_addr = ( NS(buffer_addr_t) )( uintptr_t )p_values;
 
     status = NS(RFMultiPole_attributes_offsets)(
         &offsets[ 0 ], num_dataptrs, &multipole, slot_size );
@@ -246,7 +246,7 @@ SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* NS(RFMultiPole_add_copy)(
 {
     SIXTRL_ASSERT( mpole != SIXTRL_NULLPTR );
     return NS(RFMultiPole_add)( buffer,
-        NS(RFMultiPole_order)( mpole ), NS(RFMultiPole_volatage)( mpole ),
+        NS(RFMultiPole_order)( mpole ), NS(RFMultiPole_voltage)( mpole ),
         NS(RFMultiPole_frequency)( mpole ), NS(RFMultiPole_lag)( mpole ),
         NS(RFMultiPole_const_bal)( mpole ), NS(RFMultiPole_const_p)( mpole ) );
 }
