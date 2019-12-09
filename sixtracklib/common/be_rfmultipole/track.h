@@ -38,7 +38,11 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_rf_multipole)(
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole )
 {
+    ( void )particles;
+    ( void )particle_index;
+    ( void )mpole;
 
+    return SIXTRL_TRACK_SUCCESS;
 }
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
