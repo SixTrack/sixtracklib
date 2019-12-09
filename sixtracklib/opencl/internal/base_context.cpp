@@ -488,8 +488,8 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             char _temp[ 5 ] = { '\0', '\0', '\0', '\0', '\0' };
 
-            std::strncpy( &_temp[ 0 ], ::NS(ComputeNodeInfo_get_platform)(
-                node_info ), 5u );
+            std::strcpy( &_temp[ 0 ], ::NS(ComputeNodeInfo_get_platform)(
+                node_info ) );
 
             std::transform( &_temp[ 0 ], &_temp[ 5 ], &_temp[ 0 ],
                 [](unsigned char c){ return std::tolower(c); } );
