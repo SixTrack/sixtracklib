@@ -28,6 +28,18 @@ if( GTEST_FOUND )
     add_test( C99_CommonBeamElementMultiPoleTests test_be_multipole_common_c99 )
 
     # ==========================================================================
+    # test_be_rf_multipole_common_c99:
+
+    add_executable( test_be_rf_multipole_common_c99
+            test_be_rf_multipole_c99.cpp )
+
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+            test_be_rf_multipole_common_c99 )
+
+    add_test( C99_Common_BeamElements_RFMultiPoleTests
+            test_be_rf_multipole_common_c99 )
+
+    # ==========================================================================
     # test_be_xy_shift_common_c99:
 
     add_executable( test_be_xy_shift_common_c99   test_be_xy_shift_c99.cpp )
