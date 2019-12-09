@@ -220,8 +220,7 @@ int main( int argc, char* argv[] )
                 memset(  path_output_particles, ( int )'\0',
                          output_path_len );
 
-                strncpy( path_output_particles, argv[ 8 ],
-                         output_path_len );
+                strcpy( path_output_particles, argv[ 8 ] );
             }
         }
     }
