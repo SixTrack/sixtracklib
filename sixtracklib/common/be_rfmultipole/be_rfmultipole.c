@@ -71,16 +71,17 @@ NS(arch_status_t) NS(RFMultiPole_attributes_counts)(
 {
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( mpole != SIXTRL_NULLPTR ) && ( counts_begin != SIXTRL_NULLPTR ) &&
-        ( max_num_counts >= NS(RFMultiPole_num_dataptrs)( mpole ) ) )
+    if( ( counts_begin != SIXTRL_NULLPTR ) &&
+        ( max_num_counts >= NS(RFMultiPole_num_dataptrs)( mpole ) ) &&
+        ( NS(RFMultiPole_order)( mpole ) >= ( NS(rf_multipole_int_t) )0u ) )
     {
-        NS(buffer_size_t) const bal_size =
-            ( NS(buffer_size_t) )( 2u * mpole->order + 1u );
-
         SIXTRL_ASSERT( NS(RFMultiPole_num_dataptrs)( mpole ) == 2u );
 
-        counts_begin[ 0 ] = bal_size;
-        counts_begin[ 1 ] = bal_size;
+        counts_begin[ 0 ] = ( NS(buffer_size_t)
+            )NS(RFMultiPole_num_bal_elements)( mpole );
+
+        counts_begin[ 1 ] = ( NS(buffer_size_t)
+            )NS(RFMultiPole_num_p_elements)( mpole );
 
         status = NS(ARCH_STATUS_SUCCESS);
     }

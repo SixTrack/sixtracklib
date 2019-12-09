@@ -299,11 +299,11 @@ SIXTRL_INLINE NS(buffer_size_t) NS(RFMultiPole_num_slots)(
 
         if( ( mpole != SIXTRL_NULLPTR ) && ( mpole->order > 0 ) )
         {
-            NS(buffer_size_t) const bal_size = ( NS(buffer_size_t) )(
-                2u * mpole->order + 1u );
+            NS(buffer_size_t) const bal_size = ( NS(buffer_size_t)
+                )NS(RFMultiPole_num_bal_elements)( mpole );
 
-            NS(buffer_size_t) const p_size = ( NS(buffer_size_t) )(
-                2u * mpole->order + 1u );
+            NS(buffer_size_t) const p_size = ( NS(buffer_size_t)
+                )NS(RFMultiPole_num_p_elements)( mpole );
 
             required_size += NS(ManagedBuffer_get_slot_based_length)(
                 sizeof( NS(rf_multipole_real_t) ) * bal_size, slot_size );
@@ -360,7 +360,7 @@ SIXTRL_INLINE NS(rf_multipole_int_t) NS(RFMultiPole_num_bal_elements)(
 {
     SIXTRL_ASSERT( mpole != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( mpole->order >= ( NS(rf_multipole_int_t) )0u );
-    return ( NS(rf_multipole_int_t) )( 2u * mpole->order + 1u );
+    return ( NS(rf_multipole_int_t) )( 2u * mpole->order + 2u );
 }
 
 SIXTRL_INLINE NS(rf_multipole_int_t) NS(RFMultiPole_num_p_elements)(
@@ -368,7 +368,7 @@ SIXTRL_INLINE NS(rf_multipole_int_t) NS(RFMultiPole_num_p_elements)(
 {
     SIXTRL_ASSERT( mpole != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( mpole->order >= ( NS(rf_multipole_int_t) )0u );
-    return ( NS(rf_multipole_int_t) )( 2u * mpole->order + 1u );
+    return ( NS(rf_multipole_int_t) )( 2u * mpole->order + 2u );
 }
 
 SIXTRL_INLINE NS(buffer_addr_t) NS(RFMultiPole_bal_addr)(
