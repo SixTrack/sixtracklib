@@ -632,8 +632,9 @@ NS(ElemByElemConfig_get_particles_store_index_details)(
         ( NS(ElemByElemConfig_get_max_particle_id)( config ) >= particle_id ) &&
         ( NS(ElemByElemConfig_get_min_element_id)( config )  <= at_element  ) &&
         ( NS(ElemByElemConfig_get_max_element_id)( config )  >= at_element  ) &&
-        ( NS(ElemByElemConfig_get_min_turn)( config )        <= at_turn ) &&
-        ( NS(ElemByElemConfig_get_max_turn)( config )        >= at_turn ) )
+        ( NS(ElemByElemConfig_get_min_turn)( config )   <= at_turn ) &&
+        ( ( NS(ElemByElemConfig_get_max_turn)( config ) >= at_turn ) ||
+          ( NS(ElemByElemConfig_is_rolling)( config ) ) ) )
     {
         num_elem_t const particle_id_offset = ( num_elem_t )( particle_id -
             NS(ElemByElemConfig_get_min_particle_id)( config ) );
