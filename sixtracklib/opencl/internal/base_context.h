@@ -27,6 +27,7 @@
         #include <iterator>
         #include <iostream>
         #include <string>
+        #include <sstream>
         #include <map>
         #include <vector>
         #include <regex>
@@ -193,6 +194,69 @@ namespace SIXTRL_CXX_NAMESPACE
             }
         }
 
+        static SIXTRL_HOST_FN std::string PRINT_ALL_NODES_TO_STRING()
+        {
+            namespace  st = SIXTRL_CXX_NAMESPACE;
+            using _this_t = st::ClContextBase;
+
+            bool printed_any_nodes = false;
+
+            std::ostringstream a2str;
+
+            std::vector< cl::Platform > available_platforms;
+            std::vector< cl::Device > available_devices;
+            std::vector< _this_t::node_id_t   > available_node_ids;
+            std::vector< _this_t::node_info_t > available_node_infos;
+
+            if( st::ARCH_STATUS_SUCCESS == _this_t::GetAllAvailableNodes(
+                    available_platforms, available_devices,
+                        &available_node_ids, &available_node_infos ) )
+            {
+                if( !available_node_infos.empty() )
+                {
+                    std::vector< char > temp_string;
+                    temp_string.resize( 2048, '\0' );
+
+                    for( auto& node_info : available_node_infos )
+                    {
+                        if( printed_any_nodes )
+                        {
+                            a2str << "\r\n";
+                        }
+                        _this_t::status_t const status =
+                            ::NS(ComputeNodeInfo_print_to_str)(
+                                temp_string.data(), temp_string.size(),
+                                &node_info, nullptr );
+
+                        ::NS(ComputeNodeInfo_free)( &node_info );
+
+                        if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+                            ( std::strlen( temp_string.data() ) > 0u ) )
+                        {
+                            a2str << temp_string.data();
+                            printed_any_nodes = true;
+                        }
+                    }
+                }
+            }
+
+            if( !printed_any_nodes )
+            {
+                a2str << "No OpenCL Devices found\r\n";
+            }
+
+            return a2str.str();
+        }
+
+        static SIXTRL_HOST_FN size_type GET_ALL_NODES_REQUIRED_STRING_CAPACITY()
+        {
+             namespace  st = SIXTRL_CXX_NAMESPACE;
+            using _this_t = st::ClContextBase;
+
+            std::string const temp_str( _this_t::PRINT_ALL_NODES_TO_STRING() );
+            return _this_t::size_type{ 1 } + temp_str.size();
+        }
+
         /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- */
 
         static SIXTRL_HOST_FN size_type NUM_AVAILABLE_NODES(
@@ -304,6 +368,74 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 std::cout << "No OpenCL Devices found\r\n";
             }
+        }
+
+        static SIXTRL_HOST_FN std::string PRINT_AVAILABLE_NODES_TO_STRING(
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr )
+        {
+            namespace  st = SIXTRL_CXX_NAMESPACE;
+            using _this_t = st::ClContextBase;
+
+            bool printed_any_nodes = false;
+
+            std::ostringstream a2str;
+            std::vector< _this_t::node_id_t   > available_node_ids;
+            std::vector< _this_t::node_info_t > available_node_infos;
+
+            if( st::ARCH_STATUS_SUCCESS == _this_t::GetAvailableNodes(
+                    available_node_ids, &available_node_infos, nullptr,
+                        env_variable_name, filter_str ) )
+            {
+                if( !available_node_infos.empty() )
+                {
+                    std::vector< char > temp_string;
+                    temp_string.resize( 2048, '\0' );
+
+                    for( auto& node_info : available_node_infos )
+                    {
+                        if( printed_any_nodes )
+                        {
+                            a2str << "\r\n";
+                        }
+                        _this_t::status_t const status =
+                            ::NS(ComputeNodeInfo_print_to_str)(
+                                temp_string.data(), temp_string.size(),
+                                &node_info, nullptr );
+
+                        ::NS(ComputeNodeInfo_free)( &node_info );
+
+                        if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+                            ( std::strlen( temp_string.data() ) > 0u ) )
+                        {
+                            a2str << temp_string.data();
+                            printed_any_nodes = true;
+                        }
+                    }
+                }
+            }
+
+            if( !printed_any_nodes )
+            {
+                a2str << "No OpenCL Devices found\r\n";
+            }
+
+            return a2str.str();
+        }
+
+        static SIXTRL_HOST_FN size_type
+        GET_AVAILABLE_NODES_REQUIRED_STRING_CAPACITY(
+            char const* SIXTRL_RESTRICT filter_str = nullptr,
+            char const* SIXTRL_RESTRICT env_variable_name = nullptr )
+        {
+             namespace  st = SIXTRL_CXX_NAMESPACE;
+            using _this_t = st::ClContextBase;
+
+            std::string const temp_str(
+                _this_t::PRINT_AVAILABLE_NODES_TO_STRING(
+                    filter_str, env_variable_name ) );
+
+            return _this_t::size_type{ 1 } + temp_str.size();
         }
 
         /* ***************************************************************** */
@@ -998,6 +1130,14 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(OpenCL_get_all_nodes)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(OpenCL_print_all_nodes)( void );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(OpenCL_get_all_nodes_required_str_capacity)( void );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(OpenCL_get_all_nodes_as_string)(
+    char* SIXTRL_RESTRICT out_node_info_str,
+    NS(arch_size_t) const out_node_info_str_capacity );
+
 /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
@@ -1026,6 +1166,18 @@ NS(OpenCL_print_available_nodes)( void );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void
 NS(OpenCL_print_available_nodes_detailed)(
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(OpenCL_get_available_nodes_required_str_capacity)(
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(OpenCL_get_available_nodes_as_string)(
+    char* SIXTRL_RESTRICT out_node_info_str,
+    NS(arch_size_t) const out_node_info_str_capacity,
     char const* SIXTRL_RESTRICT filter_str,
     char const* SIXTRL_RESTRICT env_variable_name );
 

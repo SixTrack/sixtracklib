@@ -3125,9 +3125,31 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_OpenCL_print_all_nodes.argtypes = None
     st_OpenCL_print_all_nodes.restype = None
 
-    st_OpenCL_print_available_nodes = sixtracklib.st_OpenCL_print_available_nodes
+    st_OpenCL_print_available_nodes = \
+        sixtracklib.st_OpenCL_print_available_nodes
     st_OpenCL_print_available_nodes.argtypes = None
     st_OpenCL_print_available_nodes.restype = None
+
+    st_OpenCL_get_all_nodes_required_str_capacity = \
+        sixtracklib.st_OpenCL_get_all_nodes_required_str_capacity
+    st_OpenCL_get_all_nodes_required_str_capacity.argtypes = None
+    st_OpenCL_get_all_nodes_required_str_capacity.restype = st_arch_size_t
+
+    st_OpenCL_get_all_nodes_as_string = \
+        sixtracklib.st_OpenCL_get_all_nodes_as_string
+    st_OpenCL_get_all_nodes_as_string.argtypes = [ct.c_char_p, st_arch_size_t]
+
+    st_OpenCL_get_available_nodes_required_str_capacity = \
+        sixtracklib.st_OpenCL_get_available_nodes_required_str_capacity
+    st_OpenCL_get_available_nodes_required_str_capacity.argtypes = [
+        ct.c_char_p, ct.c_char_p]
+    st_OpenCL_get_available_nodes_required_str_capacity.restype = st_arch_size_t
+
+    st_OpenCL_get_available_nodes_as_string = \
+        sixtracklib.st_OpenCL_get_available_nodes_as_string
+    st_OpenCL_get_available_nodes_as_string.argtypes = [
+        ct.c_char_p, st_arch_size_t, ct.c_char_p, ct.c_char_p]
+    st_OpenCL_get_available_nodes_as_string.restype = st_arch_status_t
 
     st_ClContext_create = sixtracklib.st_ClContext_create
     st_ClContext_create.restype = st_Context_p
