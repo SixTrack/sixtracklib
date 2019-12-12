@@ -3121,6 +3121,14 @@ if SIXTRACKLIB_MODULES.get('cuda', False):
 
 if SIXTRACKLIB_MODULES.get('opencl', False):
 
+    st_OpenCL_print_all_nodes = sixtracklib.st_OpenCL_print_all_nodes
+    st_OpenCL_print_all_nodes.argtypes = None
+    st_OpenCL_print_all_nodes.restype = None
+
+    st_OpenCL_print_available_nodes = sixtracklib.st_OpenCL_print_available_nodes
+    st_OpenCL_print_available_nodes.argtypes = None
+    st_OpenCL_print_available_nodes.restype = None
+
     st_ClContext_create = sixtracklib.st_ClContext_create
     st_ClContext_create.restype = st_Context_p
 
