@@ -262,7 +262,7 @@ SIXTRL_HOST_FN int NS(ComputeNodeInfo_make)(
 
 #if !defined( _GPUCODE )
 
-SIXTRL_HOST_FN void NS(ComputeNodeInfo_print)(
+void NS(ComputeNodeInfo_print)(
     FILE* SIXTRL_RESTRICT fp,
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
     const NS(ComputeNodeId)   *const SIXTRL_RESTRICT default_node_id )
@@ -326,12 +326,66 @@ SIXTRL_HOST_FN void NS(ComputeNodeInfo_print)(
     return;
 }
 
-SIXTRL_HOST_FN void NS(ComputeNodeInfo_print_out)(
+void NS(ComputeNodeInfo_print_out)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
     const NS(ComputeNodeId)   *const SIXTRL_RESTRICT default_node_id )
 {
     NS(ComputeNodeInfo_print)( stdout, node_info, default_node_id );
     return;
+}
+
+NS(arch_status_t) NS(ComputeNodeInfo_print_to_str)(
+    char* SIXTRL_RESTRICT node_info_out_str,
+    NS(arch_size_t) const node_info_out_str_capacity,
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id )
+{
+    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
+
+    if( ( node_info_out_str != SIXTRL_NULLPTR ) &&
+        ( node_info_out_str_capacity > ( NS(arch_size_t) )0u ) )
+    {
+        FILE* fp = tmpfile();
+        memset( node_info_out_str, ( int )'\0', node_info_out_str_capacity );
+
+        if( fp != SIXTRL_NULLPTR )
+        {
+            int ret = 0;
+            long int end_pos = ( long int )0u;
+            long int begin_pos = ( long int )0u;
+
+            NS(ComputeNodeInfo_print)( fp, node_info, default_node_id );
+            fflush( fp );
+            end_pos = ftell( fp );
+            ret = fseek( fp, 0, SEEK_SET );
+
+            if( ret == 0 )
+            {
+                begin_pos = ftell( fp );
+
+                if( begin_pos < end_pos )
+                {
+                    NS(arch_size_t) const required_size = end_pos - begin_pos;
+
+                    if( required_size <= node_info_out_str_capacity )
+                    {
+                        size_t const num_objs_read = fread(
+                            node_info_out_str, required_size, 1u, fp );
+
+                        if( num_objs_read > 0u )
+                        {
+                            status = NS(ARCH_STATUS_SUCCESS);
+                        }
+                    }
+                }
+            }
+
+            fclose( fp );
+            fp = SIXTRL_NULLPTR;
+        }
+    }
+
+    return status;
 }
 
 #endif /* !defined( _GPUCODE ) */
