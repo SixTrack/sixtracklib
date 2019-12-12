@@ -692,13 +692,14 @@ class TrackJob(object):
         return enabled_archs
 
     @staticmethod
-    def print_nodes(arch_str):
+    def print_nodes(arch_str, all=False):
         arch_str = arch_str.strip().lower()
         if stconf.SIXTRACKLIB_MODULES.get(arch_str, False):
             if arch_str == "opencl":
-                context = st.st_ClContext_create()
-                st.st_ClContextBase_print_nodes_info(context)
-                st.st_ClContextBase_delete(context)
+                if not all:
+                    st.st_OpenCL_print_available_nodes()
+                else:
+                    st.st_OpenCL_print_all_nodes()
             else:
                 print("nodes not available for architecture {0}".format(
                     arch_str))
@@ -808,8 +809,8 @@ class TrackJob(object):
             arch, device_id = device.split(':')
 
         arch = arch.strip().lower()
-        if not(stconf.SIXTRACKLIB_MODULES.get(arch, False) is not False
-                or arch == 'cpu'):
+        if not(stconf.SIXTRACKLIB_MODULES.get(arch, False) is not False or
+               arch == 'cpu'):
             raise ValueError("Unknown architecture {0}".format(arch, ))
 
         if device_id is not None:
