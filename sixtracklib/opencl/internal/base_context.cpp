@@ -2715,6 +2715,34 @@ void NS(OpenCL_print_all_nodes)( void )
     st::ClContextBase::PRINT_ALL_NODES();
 }
 
+::NS(arch_size_t) NS(OpenCL_get_all_nodes_required_str_capacity)( void )
+{
+    return st::ClContextBase::GET_ALL_NODES_REQUIRED_STRING_CAPACITY();
+}
+
+::NS(arch_status_t) NS(OpenCL_get_all_nodes_as_string)(
+    char* SIXTRL_RESTRICT out_node_info_str,
+    ::NS(arch_size_t) const out_node_info_str_capacity )
+{
+    using _this_t = st::ClContextBase;
+    _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+    if( ( out_node_info_str != nullptr ) &&
+        ( out_node_info_str_capacity > _this_t::size_type{ 0 } ) )
+    {
+        std::memset( out_node_info_str, ( int )'\0',
+                     out_node_info_str_capacity );
+
+        std::string const temp_str( _this_t::PRINT_ALL_NODES_TO_STRING() );
+        std::strncpy( out_node_info_str, temp_str.c_str(),
+                      out_node_info_str_capacity - _this_t::size_type{ 1 } );
+
+        status = st::ARCH_STATUS_SUCCESS;
+    }
+
+    return status;
+}
+
 /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
 
 ::NS(arch_size_t) NS(OpenCL_num_available_nodes)(
@@ -2761,6 +2789,41 @@ void NS(OpenCL_print_available_nodes_detailed)(
     char const* SIXTRL_RESTRICT env_variable_name )
 {
     st::ClContextBase::PRINT_AVAILABLE_NODES( filter_str, env_variable_name );
+}
+
+::NS(arch_size_t) NS(OpenCL_get_available_nodes_required_str_capacity)(
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name )
+{
+    return st::ClContextBase::GET_AVAILABLE_NODES_REQUIRED_STRING_CAPACITY(
+        filter_str, env_variable_name );
+}
+
+::NS(arch_status_t) NS(OpenCL_get_available_nodes_as_string)(
+    char* SIXTRL_RESTRICT out_node_info_str,
+    ::NS(arch_size_t) const out_node_info_str_capacity,
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name )
+{
+    using _this_t = st::ClContextBase;
+    _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+    if( ( out_node_info_str != nullptr ) &&
+        ( out_node_info_str_capacity > _this_t::size_type{ 0 } ) )
+    {
+        std::memset( out_node_info_str, ( int )'\0',
+                     out_node_info_str_capacity );
+
+        std::string const temp_str( _this_t::PRINT_AVAILABLE_NODES_TO_STRING(
+            filter_str, env_variable_name ) );
+
+        std::strncpy( out_node_info_str, temp_str.c_str(),
+                      out_node_info_str_capacity - _this_t::size_type{ 1 } );
+
+        status = st::ARCH_STATUS_SUCCESS;
+    }
+
+    return status;
 }
 
 /* ************************************************************************* */

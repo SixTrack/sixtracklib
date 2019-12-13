@@ -12,6 +12,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -155,6 +156,12 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_print)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_print_out)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ComputeNodeInfo_print_to_str)(
+    char* SIXTRL_RESTRICT node_info_out_str,
+    NS(arch_size_t) const node_info_out_str_capacity,
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
 
