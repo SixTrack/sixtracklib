@@ -16,6 +16,8 @@ class Particles(CObject):
         self.rpp = 1 / irpp
         beta = irpp / rep
         self.rvv = beta / self.beta0
+        self.psigma = np.sqrt(self.delta**2 + 2 * self.delta + 1/self.beta0**2)/self.beta0 - 1/self.beta0**2
+
 
     _typeid = 1
     num_particles = CField(0, 'int64', const=True)
