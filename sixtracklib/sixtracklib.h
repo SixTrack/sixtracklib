@@ -40,6 +40,7 @@
 #include "sixtracklib/common/be_xyshift/track.h"
 #include "sixtracklib/common/be_limit/be_limit_rect.h"
 #include "sixtracklib/common/be_limit/be_limit_ellipse.h"
+#include "sixtracklib/common/be_limit/be_limit_rect_ellipse.h"
 #include "sixtracklib/common/be_limit/track.h"
 #include "sixtracklib/common/be_dipedge/be_dipedge.h"
 #include "sixtracklib/common/be_dipedge/track.h"
