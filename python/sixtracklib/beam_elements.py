@@ -155,22 +155,31 @@ class Multipole(CObject):
         assert order <= self.order
         self.bal[order * 2 + 1] = value / factorial(order, exact=True)
 
+
 class RFMultipole(CObject):
-    _typeid = 256 # This is subject to change
+    _typeid = 256  # This is subject to change
     order = CField(0, 'int64', default=0, const=True, alignment=8)
-    voltage = CField(1, 'real', default=0.0, alignment=8 )
-    frequency = CField(2, 'real', default=0.0, alignment=8 )
-    lag = CField(3, 'real', default=0.0, alignment=8 )
+    voltage = CField(1, 'real', default=0.0, alignment=8)
+    frequency = CField(2, 'real', default=0.0, alignment=8)
+    lag = CField(3, 'real', default=0.0, alignment=8)
     bal = CField(4, 'real', pointer=True, length='2*order+2',
-                    default=0.0, alignment=8 )
+                    default=0.0, alignment=8)
     p = CField(5, 'real', pointer=True, length='2*order+2',
-               default=0.0, alignment=8 )
+               default=0.0, alignment=8)
 
-
-    def __init__(self, order=None, knl=None, ksl=None, pn=None, ps=None, bal=None, p=None, **kwargs):
+    def __init__(
+            self,
+            order=None,
+            knl=None,
+            ksl=None,
+            pn=None,
+            ps=None,
+            bal=None,
+            p=None,
+            **kwargs):
         if bal is None and \
-                (knl is not None or ksl is not None or \
-                pn is not None or ps is not None or order is not None):
+                (knl is not None or ksl is not None or
+                 pn is not None or ps is not None or order is not None):
             if knl is None:
                 knl = []
             if ksl is None:
@@ -205,7 +214,7 @@ class RFMultipole(CObject):
             pn = npn
             del(_pn)
             assert(len(pn) == n)
-            
+
             _ps = np.array(ps)
             nps = np.zeros(n, dtype=_ps.dtype)
             nps[:len(ps)] = ps
@@ -523,6 +532,7 @@ class LimitEllipse(CObject):
         self.a_b_squ = a_squ * b_squ
         return self
 
+
 class LimitRectEllipse(CObject):
     _typeid = 16
     max_x = CField(0, 'float64', default=+1.0, alignment=8)
@@ -531,7 +541,13 @@ class LimitRectEllipse(CObject):
     b_squ = CField(3, 'float64', default=+1.0, alignment=8)
     a_b_squ = CField(4, 'float64', alignment=8)
 
-    def __init__(self, max_x=None, max_y=None, a_squ=None, b_squ=None, **kwargs):
+    def __init__(
+            self,
+            max_x=None,
+            max_y=None,
+            a_squ=None,
+            b_squ=None,
+            **kwargs):
         if max_x is None:
             max_x = 1.0
         if max_y is None:
@@ -551,10 +567,10 @@ class LimitRectEllipse(CObject):
             b_squ = 1.0
 
         if max_x < 0.0:
-            raise ValueError("max_x has to be positive definite" )
+            raise ValueError("max_x has to be positive definite")
 
         if max_y < 0.0:
-            raise ValueError("max_y has to be_positive definite" )
+            raise ValueError("max_y has to be_positive definite")
 
         if a_squ < 0.0 or b_squ < 0.0:
             raise ValueError("a_squ and b_squ have to be positive definite")
