@@ -642,6 +642,7 @@ class Elements(object):
                      'SpaceChargeBunched': SpaceChargeBunched,
                      'LimitRect': LimitRect,
                      'LimitEllipse': LimitEllipse,
+                     'LimitRectEllipse': LimitRectEllipse,
                      'DipoleEdge': DipoleEdge,
                      #                     'Line': Line,
                      'BeamMonitor': BeamMonitor,
