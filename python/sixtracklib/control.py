@@ -1,6 +1,93 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from .stcommon import st_Controller_delete, st_Controller_clear, \
+    st_Controller_get_arch_id, st_Controller_uses_nodes, \
+    st_Controller_has_arch_string, st_Controller_get_arch_string, \
+    st_Controller_has_config_string, st_Controller_get_config_string, \
+    st_Controller_send_detailed, st_Controller_send_buffer, \
+    st_Controller_receive_detailed, st_Controller_receive_buffer, \
+    st_Controller_is_cobjects_buffer_arg_remapped, \
+    st_Controller_remap_cobjects_buffer_arg, st_Controller_is_ready_to_send, \
+    st_Controller_is_ready_to_remap, st_Controller_is_ready_to_run_kernel, \
+    st_Controller_is_ready_to_receive, st_Controller_is_in_debug_mode, \
+    st_Controller_enable_debug_mode, st_Controller_disable_debug_mode, \
+    st_Controller_get_num_of_kernels, st_Controller_get_kernel_work_items_dim, \
+    st_Controller_get_kernel_work_groups_dim, st_Controller_kernel_has_name, \
+    st_Controller_get_num_of_kernel_arguments, st_Controller_has_kernel_id, \
+    st_Controller_get_kernel_name_string, st_Controller_has_kernel_by_name, \
+    st_Controller_get_ptr_kernel_config_base, \
+    st_Controller_get_ptr_kernel_config_base_by_name, \
+    st_Controller_has_remap_cobject_buffer_kernel, \
+    st_Controller_get_remap_cobject_buffer_kernel_id, \
+    st_Controller_set_remap_cobject_buffer_kernel_id, \
+    st_Controller_has_remap_cobject_buffer_debug_kernel, \
+    st_Controller_get_remap_cobject_buffer_debug_kernel_id, \
+    st_Controller_set_remap_cobject_buffer_debug_kernel_id, \
+    st_Controller_get_num_available_nodes, \
+    st_Controller_get_available_node_indices, \
+    st_Controller_is_node_available_by_index, \
+    st_Controller_get_ptr_node_id_by_index, \
+    st_Controller_get_ptr_node_info_base_by_index, \
+    st_Controller_get_min_available_node_index, \
+    st_Controller_get_max_available_node_index, \
+    st_Controller_has_default_node, st_Controller_get_default_node_id, \
+    st_Controller_get_default_node_index, \
+    st_Controller_get_default_node_info_base, \
+    st_Controller_has_selected_node, \
+    st_Controller_get_ptr_selected_node_id, \
+    st_Controller_get_selected_node_index, \
+    st_Controller_get_ptr_selected_node_info_base, \
+    st_Controller_can_change_selected_node, \
+    st_Controller_can_directly_change_selected_node, \
+    st_Controller_can_unselect_node, st_Controller_is_default_node_id, \
+    st_Controller_is_default_node, st_Controller_is_default_node_index, \
+    st_Controller_is_default_platform_id_and_device_id, \
+    st_Controller_get_ptr_node_info_base, \
+    st_Controller_get_ptr_node_info_base_by_node_id, \
+    st_Controller_get_ptr_node_info_base_by_platform_id_and_device_id, \
+    st_Controller_get_node_index_by_node_id, st_Controller_get_node_index, \
+    st_Controller_get_node_index_by_platform_id_and_device_id, \
+    st_Controller_is_node_available_by_node_id, \
+    st_Controller_is_node_available, \
+    st_Controller_is_node_available_by_platform_id_and_device_id, \
+    st_Controller_select_node_by_index, st_Controller_select_node_by_node_id, \
+    st_Controller_select_node, \
+    st_Controller_select_node_by_plaform_id_and_device_id, \
+    st_Controller_change_selected_node, st_Controller_unselect_node, \
+    st_Controller_unselect_node_by_index, \
+    st_Controller_unselect_node_by_node_id, \
+    st_Controller_unselect_node_by_platform_id_and_device_id
+
+
+
+from .stcommon import st_Argument_delete, \
+    st_Argument_get_arch_id, st_Argument_has_arch_string, \
+    st_Argument_get_arch_string, st_Argument_send_again, \
+    st_Argument_send_buffer, st_Argument_send_buffer_without_remap, \
+    st_Argument_send_raw_argument, \
+    st_Argument_receive_again, st_Argument_receive_buffer, \
+    st_Argument_receive_buffer_without_remap, \
+    st_Argument_receive_raw_argument, st_Argument_remap_cobjects_buffer, \
+    st_Argument_uses_cobjects_buffer, st_Argument_get_cobjects_buffer, \
+    st_Argument_get_cobjects_buffer_slot_size, \
+    st_Argument_uses_raw_argument, st_Argument_get_const_ptr_raw_argument, \
+    st_Argument_get_ptr_raw_argument, st_Argument_get_size, \
+    st_Argument_get_capacity, st_Argument_has_argument_buffer, \
+    st_Argument_requires_argument_buffer, \
+    st_Argument_get_ptr_base_controller
+from .stcommon import \
+    st_NodeInfoBase_p, st_NullNodeInfoBase, st_NodeInfo_delete, \
+    st_NodeInfo_get_ptr_const_node_id, st_NodeInfo_get_platform_id, \
+    st_NodeInfo_get_device_id, st_NodeInfo_has_node_index, \
+    st_NodeInfo_get_node_index, st_NodeInfo_is_default_node, \
+    st_NodeInfo_is_selected_node, st_NodeInfo_get_arch_id, \
+    st_NodeInfo_has_arch_string, st_NodeInfo_get_arch_string, \
+    st_NodeInfo_has_platform_name, st_NodeInfo_get_platform_name, \
+    st_NodeInfo_has_device_name, st_NodeInfo_get_device_name, \
+    st_NodeInfo_has_description, st_NodeInfo_get_description, \
+    st_NodeInfo_print_out, st_NodeInfo_get_required_output_str_length, \
+    _st_NodeInfo_convert_to_string
 import ctypes as ct
 import cobjects
 from cobjects import CBuffer
@@ -127,20 +214,6 @@ class NodeId(object):
 
     def __str__(self):
         return NodeId.to_string(self.pointer)
-
-
-from .stcommon import \
-    st_NodeInfoBase_p, st_NullNodeInfoBase, st_NodeInfo_delete, \
-    st_NodeInfo_get_ptr_const_node_id, st_NodeInfo_get_platform_id, \
-    st_NodeInfo_get_device_id, st_NodeInfo_has_node_index, \
-    st_NodeInfo_get_node_index, st_NodeInfo_is_default_node, \
-    st_NodeInfo_is_selected_node, st_NodeInfo_get_arch_id, \
-    st_NodeInfo_has_arch_string, st_NodeInfo_get_arch_string, \
-    st_NodeInfo_has_platform_name, st_NodeInfo_get_platform_name, \
-    st_NodeInfo_has_device_name, st_NodeInfo_get_device_name, \
-    st_NodeInfo_has_description, st_NodeInfo_get_description, \
-    st_NodeInfo_print_out, st_NodeInfo_get_required_output_str_length, \
-    _st_NodeInfo_convert_to_string
 
 
 class NodeInfoBase(object):
@@ -274,23 +347,6 @@ class NodeInfoBase(object):
 
     def __str__(self):
         return NodeInfoBase.to_string(self.pointer)
-
-
-from .stcommon import st_Argument_delete, \
-    st_Argument_get_arch_id, st_Argument_has_arch_string, \
-    st_Argument_get_arch_string, st_Argument_send_again, \
-    st_Argument_send_buffer, st_Argument_send_buffer_without_remap, \
-    st_Argument_send_raw_argument, \
-    st_Argument_receive_again, st_Argument_receive_buffer, \
-    st_Argument_receive_buffer_without_remap, \
-    st_Argument_receive_raw_argument, st_Argument_remap_cobjects_buffer, \
-    st_Argument_uses_cobjects_buffer, st_Argument_get_cobjects_buffer, \
-    st_Argument_get_cobjects_buffer_slot_size, \
-    st_Argument_uses_raw_argument, st_Argument_get_const_ptr_raw_argument, \
-    st_Argument_get_ptr_raw_argument, st_Argument_get_size, \
-    st_Argument_get_capacity, st_Argument_has_argument_buffer, \
-    st_Argument_requires_argument_buffer, \
-    st_Argument_get_ptr_base_controller
 
 
 class ArgumentBase(object):
@@ -464,31 +520,6 @@ class ArgumentBase(object):
     def receive_raw_argument(self, ptr_raw_arg_begin, raw_arg_capacity):
         return self.receive(ptr_raw_arg_begin=ptr_raw_arg_begin,
                             raw_arg_capacity=raw_arg_capacity)
-
-
-from .stcommon import st_Controller_delete, st_Controller_clear, \
-    st_Controller_get_arch_id, st_Controller_uses_nodes, \
-    st_Controller_has_arch_string, st_Controller_get_arch_string, \
-    st_Controller_has_config_string, st_Controller_get_config_string, \
-    st_Controller_send_detailed, st_Controller_send_buffer, \
-    st_Controller_receive_detailed, st_Controller_receive_buffer, \
-    st_Controller_is_cobjects_buffer_arg_remapped, \
-    st_Controller_remap_cobjects_buffer_arg, st_Controller_is_ready_to_send, \
-    st_Controller_is_ready_to_remap, st_Controller_is_ready_to_run_kernel, \
-    st_Controller_is_ready_to_receive, st_Controller_is_in_debug_mode, \
-    st_Controller_enable_debug_mode, st_Controller_disable_debug_mode, \
-    st_Controller_get_num_of_kernels, st_Controller_get_kernel_work_items_dim, \
-    st_Controller_get_kernel_work_groups_dim, st_Controller_kernel_has_name, \
-    st_Controller_get_num_of_kernel_arguments, st_Controller_has_kernel_id, \
-    st_Controller_get_kernel_name_string, st_Controller_has_kernel_by_name, \
-    st_Controller_get_ptr_kernel_config_base, \
-    st_Controller_get_ptr_kernel_config_base_by_name, \
-    st_Controller_has_remap_cobject_buffer_kernel, \
-    st_Controller_get_remap_cobject_buffer_kernel_id, \
-    st_Controller_set_remap_cobject_buffer_kernel_id, \
-    st_Controller_has_remap_cobject_buffer_debug_kernel, \
-    st_Controller_get_remap_cobject_buffer_debug_kernel_id, \
-    st_Controller_set_remap_cobject_buffer_debug_kernel_id
 
 
 class ControllerBase(object):
@@ -709,47 +740,6 @@ class ControllerBase(object):
             raise RuntimeError("illegal argument supplied")
 
         return self
-
-
-from .stcommon import \
-    st_Controller_get_num_available_nodes, st_Controller_has_default_node, \
-    st_Controller_get_default_node_index, st_Controller_get_default_node_id, \
-    st_Controller_get_default_node_info_base, st_Controller_is_default_node_id,\
-    st_Controller_is_default_node_index, \
-    st_Controller_is_default_platform_id_and_device_id, \
-    st_Controller_is_default_node, st_Controller_is_node_available_by_index, \
-    st_Controller_is_node_available_by_node_id, \
-    st_Controller_is_node_available_by_platform_id_and_device_id, \
-    st_Controller_is_node_available, \
-    st_Controller_get_max_available_node_index, \
-    st_Controller_get_min_available_node_index, \
-    st_Controller_get_available_node_indices, \
-    st_Controller_get_available_node_ids, \
-    st_Controller_get_available_base_node_infos, \
-    st_Controller_get_node_index_by_node_id, \
-    st_Controller_get_node_index_by_platform_id_and_device_id, \
-    st_Controller_get_node_index_by_node_info, st_Controller_get_node_index, \
-    st_Controller_get_ptr_node_id_by_index, st_Controller_get_ptr_node_id, \
-    st_Controller_get_ptr_node_id_by_platform_id_and_device_id, \
-    st_Controller_get_ptr_node_info_base_by_index, \
-    st_Controller_get_ptr_node_info_base_by_node_id, \
-    st_Controller_get_ptr_node_info_base_by_platform_id_and_device_id, \
-    st_Controller_get_ptr_node_info_base, st_Controller_has_selected_node, \
-    st_Controller_get_selected_node_index, \
-    st_Controller_get_ptr_selected_node_id, \
-    st_Controller_get_ptr_selected_node_info_base, \
-    st_Controller_select_node, \
-    st_Controller_select_node_by_node_id, st_Controller_select_node_by_index, \
-    st_Controller_select_node_by_plaform_id_and_device_id, \
-    st_Controller_can_change_selected_node, st_Controller_change_selected_node,\
-    st_Controller_can_directly_change_selected_node, \
-    st_Controller_can_unselect_node, st_Controller_unselect_node, \
-    st_Controller_unselect_node_by_index, \
-    st_Controller_unselect_node_by_node_id,\
-    st_Controller_unselect_node_by_platform_id_and_device_id, \
-    st_Controller_unselect_node_by_node_id_str, \
-    st_Controller_print_out_available_nodes_info, \
-    st_Controller_store_available_nodes_info_to_string
 
 
 class NodeControllerBase(ControllerBase):

@@ -155,16 +155,132 @@ class Multipole(CObject):
         assert order <= self.order
         self.bal[order * 2 + 1] = value / factorial(order, exact=True)
 
+
 class RFMultipole(CObject):
-    _typeid = 256 # This is subject to change
+    _typeid = 256  # This is subject to change
     order = CField(0, 'int64', default=0, const=True, alignment=8)
-    voltage = CField(1, 'real', default=0.0, alignment=8 )
-    frequency = CField(2, 'real', default=0.0, alignment=8 )
-    lag = CField(3, 'real', default=0.0, alignment=8 )
+    voltage = CField(1, 'real', default=0.0, alignment=8)
+    frequency = CField(2, 'real', default=0.0, alignment=8)
+    lag = CField(3, 'real', default=0.0, alignment=8)
     bal = CField(4, 'real', pointer=True, length='2*order+2',
-                    default=0.0, alignment=8 )
-    p = CField(5, 'real', pointer=True, length='2*order+2',
-               default=0.0, alignment=8 )
+                    default=0.0, alignment=8)
+    phase = CField(5, 'real', pointer=True, length='2*order+2',
+                    default=0.0, alignment=8)
+
+    def __init__(
+            self,
+            order=None,
+            knl=None,
+            ksl=None,
+            pn=None,
+            ps=None,
+            bal=None,
+            p=None,
+            **kwargs):
+        if bal is None and \
+                (knl is not None or ksl is not None or
+                 pn is not None or ps is not None or order is not None):
+            if knl is None:
+                knl = []
+            if ksl is None:
+                ksl = []
+            if pn is None:
+                pn = []
+            if ps is None:
+                ps = []
+            if order is None:
+                order = 0
+
+            n = max((order + 1), max(len(knl), len(ksl), len(pn), len(ps)))
+            assert(n > 0)
+
+            _knl = np.array(knl)
+            nknl = np.zeros(n, dtype=_knl.dtype)
+            nknl[:len(knl)] = knl
+            knl = nknl
+            del(_knl)
+            assert(len(knl) == n)
+
+            _ksl = np.array(ksl)
+            nksl = np.zeros(n, dtype=_ksl.dtype)
+            nksl[:len(ksl)] = ksl
+            ksl = nksl
+            del(_ksl)
+            assert(len(ksl) == n)
+
+            _pn = np.array(pn)
+            npn = np.zeros(n, dtype=_pn.dtype)
+            npn[:len(pn)] = pn
+            pn = npn
+            del(_pn)
+            assert(len(pn) == n)
+
+            _ps = np.array(ps)
+            nps = np.zeros(n, dtype=_ps.dtype)
+            nps[:len(ps)] = ps
+            ps = nps
+            del(_ps)
+            assert(len(ps) == n)
+
+            order = n - 1
+            bal = np.zeros(2 * order + 2)
+            p = np.zeros(2 * order + 2)
+
+            idx = np.array([ii for ii in range(0, len(knl))])
+            inv_factorial = 1.0 / factorial(idx, exact=True)
+            bal[0::2] = knl * inv_factorial
+            bal[1::2] = ksl * inv_factorial
+
+            p[0::2] = pn
+            p[1::2] = ps
+
+            kwargs["bal"] = bal
+            kwargs["phase"] = p
+            kwargs["order"] = order
+
+        elif bal is not None and bal and len(bal) > 2 and ((len(bal) % 2) == 0)\
+                and p is not None and p and len(p) > 2 and ((len(p) % 2) == 0):
+            kwargs["bal"] = bal
+            kwargs["phase"] = p
+            kwargs["order"] = (len(bal) - 2) / 2
+
+        super().__init__(**kwargs)
+
+    @property
+    def knl(self):
+        idx = np.array([ii for ii in range(0, len(self.bal), 2)])
+        return self.bal[idx] * factorial(idx // 2, exact=True)
+
+    @property
+    def ksl(self):
+        idx = np.array([ii for ii in range(0, len(self.bal), 2)])
+        return self.bal[idx + 1] * factorial(idx // 2, exact=True)
+
+    def set_knl(self, value, order):
+        assert order <= self.order
+        self.bal[order * 2] = value / factorial(order, exact=True)
+
+    def set_ksl(self, value, order):
+        assert order <= self.order
+        self.bal[order * 2 + 1] = value / factorial(order, exact=True)
+
+    @property
+    def pn(self):
+        idx = np.array([ii for ii in range(0, len(self.p), 2)])
+        return self.p[idx]
+
+    @property
+    def ps(self):
+        idx = np.array([ii for ii in range(0, len(self.p), 2)])
+        return self.p[idx + 1]
+
+    def set_pn(self, value, order):
+        assert order <= self.order
+        self.p[order * 2] = value
+
+    def set_ps(self, value, order):
+        assert order <= self.order
+        self.p[order * 2 + 1] = value
 
 
 class Cavity(CObject):
@@ -417,6 +533,61 @@ class LimitEllipse(CObject):
         return self
 
 
+class LimitRectEllipse(CObject):
+    _typeid = 16
+    max_x = CField(0, 'float64', default=+1.0, alignment=8)
+    max_y = CField(1, 'float64', default=+1.0, alignment=8)
+    a_squ = CField(2, 'float64', default=+1.0, alignment=8)
+    b_squ = CField(3, 'float64', default=+1.0, alignment=8)
+    a_b_squ = CField(4, 'float64', alignment=8)
+
+    def __init__(
+            self,
+            max_x=None,
+            max_y=None,
+            a_squ=None,
+            b_squ=None,
+            **kwargs):
+        if max_x is None:
+            max_x = 1.0
+        if max_y is None:
+            max_y = 1.0
+        if a_squ is None and 'a' in kwargs:
+            a = kwargs.get('a')
+            if a is not None and a > 0.0:
+                a_squ = a * a
+        if a_squ is None:
+            a_squ = 1.0
+
+        if b_squ is None and 'b' in kwargs:
+            b = kwargs.get('b')
+            if b is not None and b > 0.0:
+                b_squ = b * b
+        if b_squ is None:
+            b_squ = 1.0
+
+        if max_x < 0.0:
+            raise ValueError("max_x has to be positive definite")
+
+        if max_y < 0.0:
+            raise ValueError("max_y has to be_positive definite")
+
+        if a_squ < 0.0 or b_squ < 0.0:
+            raise ValueError("a_squ and b_squ have to be positive definite")
+
+        super().__init__(max_x=max_x, max_y=max_y, a_squ=a_squ, b_squ=b_squ,
+                         a_b_squ=a_squ * b_squ, **kwargs)
+
+    def set_half_axes(self, a, b):
+        return self.set_half_axes_squ(a * a, b * b)
+
+    def set_half_axes_squ(self, a_squ, b_squ):
+        self.a_squ = a_squ
+        self.b_squ = b_squ
+        self.a_b_squ = a_squ * b_squ
+        return self
+
+
 class DipoleEdge(CObject):
     _typeid = 24
     r21 = CField(0, 'float64', default=0.0, alignment=8)
@@ -471,6 +642,7 @@ class Elements(object):
                      'SpaceChargeBunched': SpaceChargeBunched,
                      'LimitRect': LimitRect,
                      'LimitEllipse': LimitEllipse,
+                     'LimitRectEllipse': LimitRectEllipse,
                      'DipoleEdge': DipoleEdge,
                      #                     'Line': Line,
                      'BeamMonitor': BeamMonitor,

@@ -13,11 +13,13 @@
     #include "sixtracklib/common/be_drift/be_drift.h"
     #include "sixtracklib/common/be_cavity/be_cavity.h"
     #include "sixtracklib/common/be_multipole/be_multipole.h"
+    #include "sixtracklib/common/be_rfmultipole/be_rfmultipole.h"
     #include "sixtracklib/common/be_srotation/be_srotation.h"
     #include "sixtracklib/common/be_xyshift/be_xyshift.h"
     #include "sixtracklib/common/be_monitor/be_monitor.h"
     #include "sixtracklib/common/be_limit/be_limit_rect.h"
     #include "sixtracklib/common/be_limit/be_limit_ellipse.h"
+    #include "sixtracklib/common/be_limit/be_limit_rect_ellipse.h"
     #include "sixtracklib/common/be_dipedge/be_dipedge.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -149,7 +151,9 @@ SIXTRL_INLINE bool NS(BeamElements_is_beam_element_obj)(
             case NS(OBJECT_TYPE_BEAM_MONITOR):
             case NS(OBJECT_TYPE_LIMIT_RECT):
             case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
+            case NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE):
             case NS(OBJECT_TYPE_DIPEDGE):
+            case NS(OBJECT_TYPE_RF_MULTIPOLE):
             {
                 is_beam_element = true;
                 break;
@@ -275,6 +279,18 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
 
                 requ_num_dataptrs =
                     NS(MultiPole_get_num_dataptrs)( ptr_begin );
+                break;
+            }
+
+            case NS(OBJECT_TYPE_RF_MULTIPOLE):
+            {
+                typedef NS(RFMultiPole) beam_element_t;
+                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+                ++requ_num_objects;
+                requ_num_slots = NS(RFMultiPole_num_slots)( ptr_begin, slot_size );
+                requ_num_dataptrs = NS(RFMultiPole_num_dataptrs)( ptr_begin );
                 break;
             }
 
@@ -469,6 +485,24 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
                 break;
             }
 
+            case NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE):
+            {
+                typedef NS(LimitRectEllipse) beam_element_t;
+                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                ++requ_num_objects;
+
+                requ_num_slots = NS(LimitRectEllipse_num_slots)(
+                    ptr_begin, slot_size );
+
+                requ_num_dataptrs =
+                    NS(LimitRectEllipse_num_dataptrs)( ptr_begin );
+
+                break;
+            }
+
             case NS(OBJECT_TYPE_DIPEDGE):
             {
                 typedef NS(DipoleEdge) beam_element_t;
@@ -575,6 +609,19 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t const*     ptr_src_t;
 
                     success = NS(MultiPole_copy)(
+                        ( ptr_dest_t )( uintptr_t )dest_addr,
+                        ( ptr_src_t  )( uintptr_t )src_addr );
+
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_RF_MULTIPOLE):
+                {
+                    typedef NS(RFMultiPole) beam_element_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC beam_element_t* ptr_dest_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_src_t;
+
+                    success = NS(RFMultiPole_copy)(
                         ( ptr_dest_t )( uintptr_t )dest_addr,
                         ( ptr_src_t  )( uintptr_t )src_addr );
 
@@ -715,6 +762,19 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
                     break;
                 }
 
+                case NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE):
+                {
+                    typedef NS(LimitRectEllipse) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_dest_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_src_t;
+
+                    success = NS(LimitRectEllipse_copy)(
+                        ( ptr_dest_t )( uintptr_t )dest_addr,
+                        ( ptr_src_t  )( uintptr_t )src_addr );
+
+                    break;
+                }
+
                 case NS(OBJECT_TYPE_DIPEDGE):
                 {
                     typedef NS(DipoleEdge) belem_t;
@@ -775,6 +835,14 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_object)(
                     typedef NS(MultiPole)                 belem_t;
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
                     NS(MultiPole_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_RF_MULTIPOLE):
+                {
+                    typedef NS(RFMultiPole) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(RFMultiPole_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
                     break;
                 }
 
@@ -867,6 +935,16 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_object)(
                     typedef NS(LimitEllipse) belem_t;
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
                     NS(LimitEllipse_clear)(
+                        ( ptr_belem_t )( uintptr_t )obj_addr );
+
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE):
+                {
+                    typedef NS(LimitRectEllipse) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(LimitRectEllipse_clear)(
                         ( ptr_belem_t )( uintptr_t )obj_addr );
 
                     break;
@@ -1001,6 +1079,21 @@ SIXTRL_INLINE int NS(BeamElements_add_single_new_to_buffer)(
                 break;
             }
 
+            case NS(OBJECT_TYPE_RF_MULTIPOLE):
+            {
+                typedef NS(RFMultiPole)                  mp_t;
+                typedef NS(rf_multipole_int_t)           mp_order_t;
+                typedef SIXTRL_BE_ARGPTR_DEC mp_t const* ptr_mp_t;
+
+                ptr_mp_t ptr_mp = ( ptr_mp_t )( uintptr_t )begin_addr;
+                mp_order_t const order = NS(RFMultiPole_order)( ptr_mp );
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(RFMultiPole_new)( buffer, order ) ) ? 0 : -1;
+
+                break;
+            }
+
             case NS(OBJECT_TYPE_XYSHIFT):
             {
                 success = ( SIXTRL_NULLPTR !=
@@ -1125,6 +1218,13 @@ SIXTRL_INLINE int NS(BeamElements_add_single_new_to_buffer)(
                 break;
             }
 
+            case NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE):
+            {
+                success = ( SIXTRL_NULLPTR != NS(LimitRectEllipse_new)(
+                    buffer ) );
+                break;
+            }
+
             case NS(OBJECT_TYPE_DIPEDGE):
             {
                 success = ( SIXTRL_NULLPTR != NS(DipoleEdge_new)( buffer ) );
@@ -1190,6 +1290,19 @@ SIXTRL_INLINE int NS(BeamElements_copy_single_to_buffer)(
 
                 success = ( SIXTRL_NULLPTR !=
                     NS(MultiPole_add_copy)( buffer, ptr_mp ) ) ? 0 : -1;
+
+                break;
+            }
+
+            case NS(OBJECT_TYPE_RF_MULTIPOLE):
+            {
+                typedef NS(RFMultiPole) mp_t;
+                typedef SIXTRL_BE_ARGPTR_DEC mp_t const* ptr_mp_t;
+
+                ptr_mp_t ptr_mp = ( ptr_mp_t )( uintptr_t )begin_addr;
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(RFMultiPole_add_copy)( buffer, ptr_mp ) ) ? 0 : -1;
 
                 break;
             }
@@ -1327,6 +1440,19 @@ SIXTRL_INLINE int NS(BeamElements_copy_single_to_buffer)(
 
                 success = ( SIXTRL_NULLPTR !=
                     NS(LimitEllipse_add_copy)( buffer, orig ) ) ? 0 : -1;
+
+                break;
+            }
+
+            case NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE):
+            {
+                typedef  NS(LimitRectEllipse) beam_element_t;
+                typedef  SIXTRL_BE_ARGPTR_DEC  beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t orig = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(LimitRectEllipse_add_copy)( buffer, orig ) ) ? 0 : -1;
 
                 break;
             }

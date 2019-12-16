@@ -37,7 +37,7 @@ TEST( C99CommonBeamElementsRFMultiPoleTests, StoreAndRestoreTests )
     ASSERT_TRUE( ::NS(RFMultiPole_num_bal_elements)( rfmp_01 ) ==
         static_cast< rf_mp_int_t >( 2 * rfmp_01_order + 2 ) );
 
-    ASSERT_TRUE( ::NS(RFMultiPole_num_p_elements)( rfmp_01 ) ==
+    ASSERT_TRUE( ::NS(RFMultiPole_num_phase_elements)( rfmp_01 ) ==
         static_cast< rf_mp_int_t >( 2 * rfmp_01_order + 2 ) );
 
     ASSERT_TRUE( std::fabs( ::NS(RFMultiPole_voltage)( rfmp_01 ) -
@@ -50,7 +50,7 @@ TEST( C99CommonBeamElementsRFMultiPoleTests, StoreAndRestoreTests )
         rf_mp_real_t{ 0.0 } ) < REAL_EPS );
 
     ASSERT_TRUE( ::NS(RFMultiPole_const_bal)( rfmp_01 ) != nullptr );
-    ASSERT_TRUE( ::NS(RFMultiPole_const_p)( rfmp_01 ) != nullptr );
+    ASSERT_TRUE( ::NS(RFMultiPole_const_phase)( rfmp_01 ) != nullptr );
 
     /* --------------------------------------------------------------------- */
 
@@ -79,7 +79,7 @@ TEST( C99CommonBeamElementsRFMultiPoleTests, StoreAndRestoreTests )
     ASSERT_TRUE( ::NS(RFMultiPole_num_bal_elements)( rfmp_02 ) ==
         static_cast< rf_mp_int_t >( 2u * rfmp_02_order + 2u ) );
 
-    ASSERT_TRUE( ::NS(RFMultiPole_num_p_elements)( rfmp_02 ) ==
+    ASSERT_TRUE( ::NS(RFMultiPole_num_phase_elements)( rfmp_02 ) ==
         static_cast< rf_mp_int_t >( 2u * rfmp_02_order + 2u ) );
 
     ASSERT_TRUE( std::fabs( ::NS(RFMultiPole_voltage)(
@@ -92,7 +92,7 @@ TEST( C99CommonBeamElementsRFMultiPoleTests, StoreAndRestoreTests )
         rfmp_02 ) - rfmp_02_lag ) < REAL_EPS );
 
     ASSERT_TRUE( ::NS(RFMultiPole_const_bal)( rfmp_02 ) != nullptr );
-    ASSERT_TRUE( ::NS(RFMultiPole_const_p)( rfmp_02 ) != nullptr );
+    ASSERT_TRUE( ::NS(RFMultiPole_const_phase)( rfmp_02 ) != nullptr );
 
     ASSERT_TRUE( std::memcmp( &bal_values[ 0 ], ::NS(RFMultiPole_const_bal)(
         rfmp_02 ), sizeof( rf_mp_real_t ) * ::NS(RFMultiPole_num_bal_elements)(
@@ -121,11 +121,11 @@ TEST( C99CommonBeamElementsRFMultiPoleTests, StoreAndRestoreTests )
     ASSERT_TRUE( ::NS(RFMultiPole_num_bal_elements)( rfmp_02_copy ) ==
         static_cast< rf_mp_int_t >( 2u * rfmp_02_order + 2u ) );
 
-    ASSERT_TRUE( ::NS(RFMultiPole_num_p_elements)( rfmp_02_copy ) ==
+    ASSERT_TRUE( ::NS(RFMultiPole_num_phase_elements)( rfmp_02_copy ) ==
         static_cast< rf_mp_int_t >( 2u * rfmp_02_order + 2u ) );
 
     ASSERT_TRUE( ::NS(RFMultiPole_const_bal)( rfmp_02_copy ) != nullptr );
-    ASSERT_TRUE( ::NS(RFMultiPole_const_p)( rfmp_02_copy ) != nullptr );
+    ASSERT_TRUE( ::NS(RFMultiPole_const_phase)( rfmp_02_copy ) != nullptr );
 
     ASSERT_TRUE( ::NS(RFMultiPole_copy)( rfmp_02_copy, rfmp_02 ) ==
                  ::NS(ARCH_STATUS_SUCCESS) );
@@ -147,9 +147,9 @@ TEST( C99CommonBeamElementsRFMultiPoleTests, StoreAndRestoreTests )
         ::NS(RFMultiPole_const_bal)( rfmp_02_copy ), sizeof( rf_mp_real_t ) *
             ::NS(RFMultiPole_num_bal_elements)( rfmp_02 ) ) == 0 );
 
-    ASSERT_TRUE( std::memcmp( ::NS(RFMultiPole_const_p)( rfmp_02 ),
-        ::NS(RFMultiPole_const_p)( rfmp_02_copy ), sizeof( rf_mp_real_t ) *
-            ::NS(RFMultiPole_num_p_elements)( rfmp_02 ) ) == 0 );
+    ASSERT_TRUE( std::memcmp( ::NS(RFMultiPole_const_phase)( rfmp_02 ),
+        ::NS(RFMultiPole_const_phase)( rfmp_02_copy ), sizeof( rf_mp_real_t ) *
+            ::NS(RFMultiPole_num_phase_elements)( rfmp_02 ) ) == 0 );
 
     /* --------------------------------------------------------------------- */
 

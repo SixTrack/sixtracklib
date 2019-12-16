@@ -33,7 +33,7 @@ NS(arch_status_t) NS(RFMultiPole_attributes_offsets)(
         SIXTRL_ASSERT( NS(RFMultiPole_num_dataptrs)( mpole ) == 2u );
 
         offsets_begin[ 0 ] = offsetof( NS(RFMultiPole), bal_addr );
-        offsets_begin[ 1 ] = offsetof( NS(RFMultiPole), p_addr );
+        offsets_begin[ 1 ] = offsetof( NS(RFMultiPole), phase_addr );
 
         status = NS(ARCH_STATUS_SUCCESS);
     }
@@ -81,7 +81,7 @@ NS(arch_status_t) NS(RFMultiPole_attributes_counts)(
             )NS(RFMultiPole_num_bal_elements)( mpole );
 
         counts_begin[ 1 ] = ( NS(buffer_size_t)
-            )NS(RFMultiPole_num_p_elements)( mpole );
+            )NS(RFMultiPole_num_phase_elements)( mpole );
 
         status = NS(ARCH_STATUS_SUCCESS);
     }
@@ -189,7 +189,8 @@ SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* NS(RFMultiPole_add)(
     NS(rf_multipole_real_t) const frequency,
     NS(rf_multipole_real_t) const lag,
     SIXTRL_ARGPTR_DEC NS(rf_multipole_real_t) const* SIXTRL_RESTRICT bal_values,
-    SIXTRL_ARGPTR_DEC NS(rf_multipole_real_t) const* SIXTRL_RESTRICT p_values )
+    SIXTRL_ARGPTR_DEC NS(rf_multipole_real_t) const*
+        SIXTRL_RESTRICT phase_values )
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* ptr_multipole = SIXTRL_NULLPTR;
@@ -211,7 +212,7 @@ SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* NS(RFMultiPole_add)(
     multipole.frequency = frequency;
     multipole.lag = lag;
     multipole.bal_addr = ( NS(buffer_addr_t) )( uintptr_t )bal_values;
-    multipole.p_addr = ( NS(buffer_addr_t) )( uintptr_t )p_values;
+    multipole.phase_addr = ( NS(buffer_addr_t) )( uintptr_t )phase_values;
 
     status = NS(RFMultiPole_attributes_offsets)(
         &offsets[ 0 ], num_dataptrs, &multipole, slot_size );
@@ -248,5 +249,6 @@ SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* NS(RFMultiPole_add_copy)(
     return NS(RFMultiPole_add)( buffer,
         NS(RFMultiPole_order)( mpole ), NS(RFMultiPole_voltage)( mpole ),
         NS(RFMultiPole_frequency)( mpole ), NS(RFMultiPole_lag)( mpole ),
-        NS(RFMultiPole_const_bal)( mpole ), NS(RFMultiPole_const_p)( mpole ) );
+        NS(RFMultiPole_const_bal)( mpole ),
+        NS(RFMultiPole_const_phase)( mpole ) );
 }
