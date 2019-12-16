@@ -346,6 +346,18 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             break;
         }
 
+        case NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE):
+        {
+            typedef NS(LimitRectEllipse) belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_limit_rect_ellipse)(
+                particles, index, belem );
+            break;
+        }
+
+
         case NS(OBJECT_TYPE_DIPEDGE):
         {
             typedef NS(DipoleEdge) belem_t;
