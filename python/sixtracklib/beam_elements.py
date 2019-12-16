@@ -267,20 +267,20 @@ class RFMultipole(CObject):
     @property
     def pn(self):
         idx = np.array([ii for ii in range(0, len(self.p), 2)])
-        return self.p[idx]
+        return self.phase[idx]
 
     @property
     def ps(self):
         idx = np.array([ii for ii in range(0, len(self.p), 2)])
-        return self.p[idx + 1]
+        return self.phase[idx + 1]
 
     def set_pn(self, value, order):
         assert order <= self.order
-        self.p[order * 2] = value
+        self.phase[order * 2] = value
 
     def set_ps(self, value, order):
         assert order <= self.order
-        self.p[order * 2 + 1] = value
+        self.phase[order * 2 + 1] = value
 
 
 class Cavity(CObject):
