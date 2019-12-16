@@ -150,6 +150,7 @@ SIXTRL_INLINE bool NS(BeamElements_is_beam_element_obj)(
             case NS(OBJECT_TYPE_LIMIT_RECT):
             case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
             case NS(OBJECT_TYPE_DIPEDGE):
+            case NS(OBJECT_TYPE_RF_MULTIPOLE):
             {
                 is_beam_element = true;
                 break;
