@@ -281,6 +281,18 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
                 break;
             }
 
+            case NS(OBJECT_TYPE_RF_MULTIPOLE):
+            {
+                typedef NS(RFMultiPole) beam_element_t;
+                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+                ++requ_num_objects;
+                requ_num_slots = NS(RFMultiPole_num_slots)( ptr_begin, slot_size );
+                requ_num_dataptrs = NS(RFMultiPole_num_dataptrs)( ptr_begin );
+                break;
+            }
+
             case NS(OBJECT_TYPE_XYSHIFT):
             {
                 typedef NS(XYShift) beam_element_t;
@@ -602,6 +614,19 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
                     break;
                 }
 
+                case NS(OBJECT_TYPE_RF_MULTIPOLE):
+                {
+                    typedef NS(RFMultiPole) beam_element_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC beam_element_t* ptr_dest_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_src_t;
+
+                    success = NS(RFMultiPole_copy)(
+                        ( ptr_dest_t )( uintptr_t )dest_addr,
+                        ( ptr_src_t  )( uintptr_t )src_addr );
+
+                    break;
+                }
+
                 case NS(OBJECT_TYPE_XYSHIFT):
                 {
                     typedef NS(XYShift)                             belem_t;
@@ -809,6 +834,14 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_object)(
                     typedef NS(MultiPole)                 belem_t;
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
                     NS(MultiPole_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_RF_MULTIPOLE):
+                {
+                    typedef NS(RFMultiPole) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(RFMultiPole_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
                     break;
                 }
 
@@ -1045,6 +1078,21 @@ SIXTRL_INLINE int NS(BeamElements_add_single_new_to_buffer)(
                 break;
             }
 
+            case NS(OBJECT_TYPE_RF_MULTIPOLE):
+            {
+                typedef NS(RFMultiPole)                  mp_t;
+                typedef NS(rf_multipole_int_t)           mp_order_t;
+                typedef SIXTRL_BE_ARGPTR_DEC mp_t const* ptr_mp_t;
+
+                ptr_mp_t ptr_mp = ( ptr_mp_t )( uintptr_t )begin_addr;
+                mp_order_t const order = NS(RFMultiPole_order)( ptr_mp );
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(RFMultiPole_new)( buffer, order ) ) ? 0 : -1;
+
+                break;
+            }
+
             case NS(OBJECT_TYPE_XYSHIFT):
             {
                 success = ( SIXTRL_NULLPTR !=
@@ -1241,6 +1289,19 @@ SIXTRL_INLINE int NS(BeamElements_copy_single_to_buffer)(
 
                 success = ( SIXTRL_NULLPTR !=
                     NS(MultiPole_add_copy)( buffer, ptr_mp ) ) ? 0 : -1;
+
+                break;
+            }
+
+            case NS(OBJECT_TYPE_RF_MULTIPOLE):
+            {
+                typedef NS(RFMultiPole) mp_t;
+                typedef SIXTRL_BE_ARGPTR_DEC mp_t const* ptr_mp_t;
+
+                ptr_mp_t ptr_mp = ( ptr_mp_t )( uintptr_t )begin_addr;
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(RFMultiPole_add_copy)( buffer, ptr_mp ) ) ? 0 : -1;
 
                 break;
             }
