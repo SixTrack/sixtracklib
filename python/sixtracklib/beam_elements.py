@@ -164,8 +164,8 @@ class RFMultipole(CObject):
     lag = CField(3, 'real', default=0.0, alignment=8)
     bal = CField(4, 'real', pointer=True, length='2*order+2',
                     default=0.0, alignment=8)
-    p = CField(5, 'real', pointer=True, length='2*order+2',
-               default=0.0, alignment=8)
+    phase = CField(5, 'real', pointer=True, length='2*order+2',
+                    default=0.0, alignment=8)
 
     def __init__(
             self,
@@ -235,13 +235,13 @@ class RFMultipole(CObject):
             p[1::2] = ps
 
             kwargs["bal"] = bal
-            kwargs["p"] = p
+            kwargs["phase"] = p
             kwargs["order"] = order
 
         elif bal is not None and bal and len(bal) > 2 and ((len(bal) % 2) == 0)\
                 and p is not None and p and len(p) > 2 and ((len(p) % 2) == 0):
             kwargs["bal"] = bal
-            kwargs["p"] = p
+            kwargs["phase"] = p
             kwargs["order"] = (len(bal) - 2) / 2
 
         super().__init__(**kwargs)
