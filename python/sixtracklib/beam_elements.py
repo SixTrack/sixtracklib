@@ -416,6 +416,54 @@ class LimitEllipse(CObject):
         self.a_b_squ = a_squ * b_squ
         return self
 
+class LimitRectEllipse(CObject):
+    _typeid = 16
+    max_x = CField(0, 'float64', default=+1.0, alignment=8)
+    max_y = CField(1, 'float64', default=+1.0, alignment=8)
+    a_squ = CField(2, 'float64', default=+1.0, alignment=8)
+    b_squ = CField(3, 'float64', default=+1.0, alignment=8)
+    a_b_squ = CField(4, 'float64', alignment=8)
+
+    def __init__(self, max_x=None, max_y=None, a_squ=None, b_squ=None, **kwargs):
+        if max_x is None:
+            max_x = 1.0
+        if max_y is None:
+            max_y = 1.0
+        if a_squ is None and 'a' in kwargs:
+            a = kwargs.get('a')
+            if a is not None and a > 0.0:
+                a_squ = a * a
+        if a_squ is None:
+            a_squ = 1.0
+
+        if b_squ is None and 'b' in kwargs:
+            b = kwargs.get('b')
+            if b is not None and b > 0.0:
+                b_squ = b * b
+        if b_squ is None:
+            b_squ = 1.0
+
+        if max_x < 0.0:
+            raise ValueError("max_x has to be positive definite" )
+
+        if max_y < 0.0:
+            raise ValueError("max_y has to be_positive definite" )
+
+        if a_squ < 0.0 or b_squ < 0.0:
+            raise ValueError("a_squ and b_squ have to be positive definite")
+
+        super().__init__(max_x=max_x, max_y=max_y, a_squ=a_squ, b_squ=b_squ,
+                         a_b_squ=a_squ * b_squ, **kwargs)
+
+    def set_half_axes(self, a, b):
+        return self.set_half_axes_squ(a * a, b * b)
+
+    def set_half_axes_squ(self, a_squ, b_squ):
+        self.a_squ = a_squ
+        self.b_squ = b_squ
+        self.a_b_squ = a_squ * b_squ
+        return self
+
 
 class DipoleEdge(CObject):
     _typeid = 24
