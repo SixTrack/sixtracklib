@@ -948,6 +948,10 @@ SIXTRL_STATIC SIXTRL_FN void NS(Particles_set_zeta_value)(
     NS(particle_num_elements_t) const ii,
     NS(particle_real_t) const zeta_value );
 
+SIXTRL_STATIC SIXTRL_FN void NS(Particles_scale_zeta_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii, NS(particle_real_t) const factor );
+
 SIXTRL_STATIC SIXTRL_FN void NS(Particles_assign_ptr_to_zeta)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_real_ptr_t) ptr_to_zetas );
@@ -1010,17 +1014,13 @@ SIXTRL_STATIC SIXTRL_FN void NS(Particles_add_to_psigma)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(Particles_get_energy_value)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
+SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(Particles_get_energy0_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
     NS(particle_num_elements_t) const index );
 
-SIXTRL_STATIC SIXTRL_FN void NS(Particles_set_energy_value)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
-    NS(particle_num_elements_t) const index, NS(particle_real_t) const energy );
-
-SIXTRL_STATIC SIXTRL_FN void NS(Particles_set_energy)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
-    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT ptr_to_energies );
+SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(Particles_get_energy_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(particle_num_elements_t) const index );
 
 SIXTRL_STATIC SIXTRL_FN void NS(Particles_add_to_energy_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
@@ -1206,6 +1206,17 @@ SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(Particles_get_q_value)(
 SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(Particles_get_m_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
     NS(particle_num_elements_t) const ii );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC SIXTRL_FN NS(particle_real_t) NS(Particles_get_mass_ratio_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(particle_num_elements_t) const ii );
+
+SIXTRL_STATIC SIXTRL_FN void NS(Particles_set_mass_ratio_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii,
+    NS(particle_real_t) const mass_ratio_value );
 
 /* ------------------------------------------------------------------------- */
 
@@ -5010,6 +5021,16 @@ SIXTRL_INLINE void NS(Particles_set_zeta_value)(
     return;
 }
 
+SIXTRL_INLINE void NS(Particles_scale_zeta_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii, NS(particle_real_t) const scale )
+{
+    SIXTRL_ASSERT( ( particles != SIXTRL_NULLPTR ) &&
+                   ( ii < NS(Particles_get_num_of_particles)( particles ) ) );
+
+    particles->zeta[ ii ] *= scale;
+}
+
 SIXTRL_INLINE void NS(Particles_assign_ptr_to_zeta)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_real_ptr_t) ptr_to_zetas )
@@ -5196,86 +5217,76 @@ SIXTRL_INLINE void NS(Particles_add_to_psigma)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE NS(particle_real_t) NS(Particles_get_energy_value)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
+SIXTRL_INLINE NS(particle_real_t) NS(Particles_get_energy0_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
     NS(particle_num_elements_t) const index )
 {
     typedef NS(particle_real_t) real_t;
 
-    real_t const p0c    = NS(Particles_get_p0c_value)( p, index );
-    real_t const beta0  = NS(Particles_get_beta0_value)( p, index );
-    real_t const psigma = NS(Particles_get_psigma_value)( p, index );
-    real_t const ptau   = psigma * beta0;
-    real_t const energy = ptau * p0c;
+    #if defined( __cplusplus ) && !defined( _GPUCODE )
+    using std::sqrt;
+    #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
 
-    return energy;
+    real_t const p0c = NS(Particles_get_p0c_value)( p, index );
+    real_t const m0  = NS(Particles_get_mass0_value)( p, index );
 
+    return sqrt( p0c * p0c + m0 * m0 );
 }
 
-SIXTRL_INLINE void NS(Particles_set_energy_value)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
-    NS(particle_num_elements_t) const index, NS(particle_real_t) const energy )
+SIXTRL_INLINE NS(particle_real_t) NS(Particles_get_energy_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(particle_num_elements_t) const index )
 {
     typedef NS(particle_real_t) real_t;
 
-    real_t const beta0       = NS(Particles_get_beta0_value)( p, index );
-    real_t const p0c         = NS(Particles_get_p0c_value)( p, index );
+    #if defined( __cplusplus ) && !defined( _GPUCODE )
+    using std::sqrt;
+    #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
 
-    real_t const ptau_beta0  = ( beta0 * energy ) / p0c;
-    real_t const beta0_squ   = beta0 * beta0;
-    real_t const beta0_plus_delta_beta0 = sqrt(
-        ptau_beta0 * ptau_beta0 + ( real_t )2 * ptau_beta0 + beta0_squ );
+    real_t const p0c   = NS(Particles_get_p0c_value)( p, index );
+    real_t const mass0 = NS(Particles_get_mass0_value)( p, index );
 
-    real_t const psigma = ptau_beta0 / beta0_squ;
-    real_t const delta  = ( beta0_plus_delta_beta0 - beta0 ) / beta0;
-    real_t const rpp    = beta0 / beta0_plus_delta_beta0;
-    real_t const rvv    = ( beta0_plus_delta_beta0 ) /
-                          ( beta0 + ptau_beta0 * beta0 );
-
-    SIXTRL_ASSERT( beta0     > ( real_t )0 );
-    SIXTRL_ASSERT( p0c       > ( real_t )0 );
-    SIXTRL_ASSERT( beta0_squ > ( real_t )0 );
-    SIXTRL_ASSERT( ( ptau_beta0 * ptau_beta0 +
-        ( real_t )2 * ptau_beta0 + beta0_squ ) > ( real_t )0 );
-
-    NS(Particles_set_delta_value)(  p, index, delta  );
-    NS(Particles_set_rpp_value)(    p, index, rpp    );
-    NS(Particles_set_rvv_value)(    p, index, rvv    );
-    NS(Particles_set_psigma_value)( p, index, psigma );
-
-    return;
-}
-
-SIXTRL_INLINE void NS(Particles_set_energy)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
-    NS(particle_real_const_ptr_t) SIXTRL_RESTRICT ptr_to_energies )
-{
-    NS(particle_num_elements_t) const num_particles =
-        NS(Particles_get_num_of_particles)( p );
-
-    NS(particle_num_elements_t) ii = ( NS(particle_num_elements_t) )0u;
-
-    SIXTRL_ASSERT( ptr_to_energies != SIXTRL_NULLPTR );
-
-    for( ; ii < num_particles ; ++ii )
-    {
-        NS(Particles_set_energy_value)( p, ii, ptr_to_energies[ ii ] );
-    }
-
-    return;
+    return ( NS(Particles_get_psigma_value)( p, index ) *
+             NS(Particles_get_beta0_value)(  p, index ) * p0c +
+                sqrt( p0c * p0c + mass0 * mass0 ) ) *
+                    NS(Particles_get_mass_ratio_value)( p, index );
 }
 
 SIXTRL_INLINE void NS(Particles_add_to_energy_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
-    NS(particle_num_elements_t) const index,
+    NS(particle_num_elements_t) const ii,
     NS(particle_real_t) const delta_energy )
 {
     typedef NS(particle_real_t) real_t;
 
-    real_t const current_energy = NS(Particles_get_energy_value)( p, index );
-    NS(Particles_set_energy_value)( p, index, current_energy + delta_energy );
+    #if !defined( _GPUCODE ) && defined( __cplusplus )
+    using std::sqrt;
+    #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
 
-    return;
+    SIXTRL_STATIC_VAR real_t const ONE = ( real_t )1.0;
+
+    real_t const beta0 = NS(Particles_get_beta0_value)( p, ii );
+    real_t const delta_beta0 = NS(Particles_get_delta_value)( p, ii ) * beta0;
+
+    real_t const ptau_beta0 =
+        delta_energy / NS(Particles_get_energy0_value)( p, ii ) +
+        sqrt( delta_beta0 * delta_beta0 + ( real_t )2.0 * delta_beta0 * beta0
+                + ONE ) - ONE;
+
+    real_t const ptau   = ptau_beta0 / beta0;
+    real_t const psigma = ptau / beta0;
+    real_t const delta = sqrt( ptau * ptau + ( real_t )2 * psigma + ONE ) - ONE;
+
+    real_t const one_plus_delta = delta + ONE;
+    real_t const rvv = one_plus_delta / ( ONE + ptau_beta0 );
+
+    NS(Particles_set_delta_value)(  p, ii, delta );
+    NS(Particles_set_psigma_value)( p, ii, psigma );
+    NS(Particles_scale_zeta_value)( p, ii,
+        rvv / NS(Particles_get_rvv_value)( p, ii ) );
+
+    NS(Particles_set_rvv_value)( p, ii, rvv );
+    NS(Particles_set_rpp_value)( p, ii, ONE / one_plus_delta );
 }
 
 SIXTRL_INLINE void NS(Particles_add_to_energy_detailed)(
@@ -5803,6 +5814,34 @@ SIXTRL_INLINE NS(particle_real_t) NS(Particles_get_m_value)(
     SIXTRL_ASSERT( qratio > ( real_t )0 );
 
     return ( NS(Particles_get_mass0_value)( p, ii ) * qratio ) / chi;
+}
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_INLINE NS(particle_real_t) NS(Particles_get_mass_ratio_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  const NS(Particles) *const SIXTRL_RESTRICT p,
+    NS(particle_num_elements_t) const ii )
+{
+    SIXTRL_ASSERT( p != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( NS(Particles_get_num_of_particles)( p ) > ii );
+
+    return NS(Particles_get_charge_ratio_value)( p, ii ) /
+           NS(Particles_get_chi_value)( p, ii );
+}
+
+SIXTRL_INLINE void NS(Particles_set_mass_ratio_value)(
+    SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT p,
+    NS(particle_num_elements_t) const ii,
+    NS(particle_real_t) const mass_ratio_value )
+{
+    SIXTRL_ASSERT( p != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( NS(Particles_get_num_of_particles)( p ) > ii );
+
+    NS(particle_real_t) const charge_ratio_value =
+        NS(Particles_get_charge_ratio_value)( p, ii );
+
+    NS(Particles_set_chi_value)(
+        p, ii, charge_ratio_value / mass_ratio_value );
 }
 
 /* ------------------------------------------------------------------------- */
