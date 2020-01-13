@@ -66,7 +66,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_tricub)(
     
     real_t const x_shift = NS(TriCub_x_shift)( tricub );
     real_t const y_shift = NS(TriCub_y_shift)( tricub );
-    real_t const z_shift = NS(TriCub_zeta_shift)( tricub );
+    real_t const z_shift = NS(TriCub_tau_shift)( tricub );
 
     // method = 1 -> Finite Differences for derivatives (Do not use)
     // method = 2 -> Exact derivatives
@@ -80,9 +80,13 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_tricub)(
     real_t const y0 = NS(TriCubData_y0)( tricub_data );
     real_t const z0 = NS(TriCubData_z0)( tricub_data );
 
+    real_t const zeta  = NS(Particles_get_zeta_value)( particles, ii );
+    real_t const rvv   = NS(Particles_get_rvv_value)( particles, ii );
+    real_t const beta0 = NS(Particles_get_beta0_value)( particles, ii );
+
     real_t const x = NS(Particles_get_x_value)( particles, ii );
     real_t const y = NS(Particles_get_y_value)( particles, ii );
-    real_t const z = NS(Particles_get_zeta_value)( particles, ii );
+    real_t const z = zeta / ( beta0 * rvv);
 
     real_t const fx = ( (x - x_shift) - x0 ) * inv_dx;
     real_t const fy = ( (y - y_shift) - y0 ) * inv_dy;
@@ -178,54 +182,35 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_tricub)(
     kick_py *= -sign_y;
     kick_py -= NS(TriCub_dipolar_kick_py)( tricub );
 
-    real_t kick_delta = 0.;
+    real_t kick_ptau = 0.;
     for( int i = 0; i < 4; i++ )
     {
         for( int j = 0; j < 4; j++ )
         {
             for( int k = 1; k < 4; k++ )
             {
-                kick_delta += k * ( ( ( coefs[i + 4 * j + 16 * k] * x_power[i] ) 
+                kick_ptau += k * ( ( ( coefs[i + 4 * j + 16 * k] * x_power[i] ) 
                             * y_power[j] ) * z_power[k-1] ) ;
             }
         }
     }
-    kick_delta *= ( length * inv_dz );
-    kick_delta *= -sign_z;
-    kick_delta -= NS(TriCub_dipolar_kick_delta)( tricub );
+    kick_ptau *= ( length * inv_dz );
+    kick_ptau *= -sign_z;
+    kick_ptau -= NS(TriCub_dipolar_kick_ptau)( tricub );
+
+    real_t const q = NS(Particles_get_q0_value)( particles, ii ) * 
+                     NS(Particles_get_charge_ratio_value)( particles, ii );
+    real_t const p0c = NS(Particles_get_p0c_value)( particles, ii );
+    real_t const energy_kick = q * ( p0c * kick_ptau );
 
     NS(Particles_add_to_px_value)( particles, ii, kick_px );
     NS(Particles_add_to_py_value)( particles, ii, kick_py );
-    NS(Particles_add_to_delta_value)( particles, ii, kick_delta );
+    NS(Particles_add_to_energy_value)( particles, ii, energy_kick );
 
-    /* How to access the data members of NS(TriCubData) element */
-    /*
-     real_t const x0 = NS(TriCubData_x0)( tricub_data );
-     real_t const dx = NS(TriCubData_dx)( tricub_data );
-     int_t  const nx = NS(TriCubData_nx)( tricub_data );
-
-     real_t const y0 = NS(TriCubData_x0)( tricub_data );
-     real_t const dy = NS(TriCubData_dx)( tricub_data );
-     int_t  const ny = NS(TriCubData_nx)( tricub_data );
-
-     real_t const z0 = NS(TriCubData_x0)( tricub_data );
-     real_t const dz = NS(TriCubData_dx)( tricub_data );
-     int_t  const nz = NS(TriCubData_nx)( tricub_data );
-    */
 
     /* how to mark a particle in a particle set as lost */
     /*
     NS(Particles_mark_as_lost_value)( particles, ii );
-    */
-
-    /* ..... */
-
-    /* How to update the particles state at the end of *
-     * applying the tracking map */
-    /*
-    NS(Particles_set_x_value)( particles, ii, new_x_value );
-    NS(Particles_set_y_value)( particles, ii, new_y_value );
-    NS(Particles_set_zeta_value)( particles, ii, new_zeta_value );
     */
 
     ( void )particles;

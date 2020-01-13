@@ -341,10 +341,10 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_new)(
 SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(be_tricub_real_t) const x_shift, NS(be_tricub_real_t) const y_shift,
-    NS(be_tricub_real_t) const zeta_shift, 
+    NS(be_tricub_real_t) const tau_shift, 
     NS(be_tricub_real_t) const dipolar_kick_px, 
     NS(be_tricub_real_t) const dipolar_kick_py, 
-    NS(be_tricub_real_t) const dipolar_kick_delta, 
+    NS(be_tricub_real_t) const dipolar_kick_ptau, 
     NS(be_tricub_real_t) const length,
     NS(buffer_addr_t) const data_addr )
 {
@@ -352,10 +352,10 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_add)(
     NS(TriCub_preset)( &tricub );
     NS(TriCub_set_x_shift)( &tricub, x_shift );
     NS(TriCub_set_y_shift)( &tricub, y_shift );
-    NS(TriCub_set_zeta_shift)( &tricub, zeta_shift );
+    NS(TriCub_set_tau_shift)( &tricub, tau_shift );
     NS(TriCub_set_dipolar_kick_px)( &tricub, dipolar_kick_px );
     NS(TriCub_set_dipolar_kick_py)( &tricub, dipolar_kick_py );
-    NS(TriCub_set_dipolar_kick_delta)( &tricub, dipolar_kick_delta );
+    NS(TriCub_set_dipolar_kick_ptau)( &tricub, dipolar_kick_ptau );
     NS(TriCub_set_length)( &tricub, length );
     NS(TriCub_set_data_addr)( &tricub, data_addr );
 
