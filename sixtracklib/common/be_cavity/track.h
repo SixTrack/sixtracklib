@@ -14,7 +14,7 @@ extern "C" {
 
 struct NS(Cavity);
 
-SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_cavity)(
+SIXTRL_FN SIXTRL_STATIC NS(track_status_t) NS(Track_particle_cavity)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(Cavity) *const SIXTRL_RESTRICT cavity );
@@ -36,34 +36,34 @@ SIXTRL_FN SIXTRL_STATIC int NS(Track_particle_cavity)(
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_INLINE int NS(Track_particle_cavity)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const index,
+SIXTRL_INLINE NS(track_status_t) NS(Track_particle_cavity)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
+    NS(particle_num_elements_t) const ii,
     SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cavity )
 {
     typedef NS(particle_real_t) real_t;
 
-    real_t const DEG2RAD  = SIXTRL_PI / ( real_t )180.0;
-    real_t const K_FACTOR = ( ( real_t )2.0 * SIXTRL_PI ) / SIXTRL_C_LIGHT;
+    SIXTRL_STATIC_VAR real_t const DEG2RAD  = SIXTRL_PI / ( real_t )180.0;
+    SIXTRL_STATIC_VAR real_t const K_FACTOR =
+        ( ( real_t )2.0 * SIXTRL_PI ) / SIXTRL_C_LIGHT;
 
-    real_t const   beta0  = NS(Particles_get_beta0_value)(        particles, index );
-    real_t const   zeta   = NS(Particles_get_zeta_value)(         particles, index );
-    real_t const   q      = NS(Particles_get_q0_value)(           particles, index ) *
-                            NS(Particles_get_charge_ratio_value)( particles, index );
-    real_t         rvv    = NS(Particles_get_rvv_value)(          particles, index );
-    real_t const   tau    = zeta / ( beta0 * rvv );
+    real_t const tau = NS(Particles_get_zeta_value)( p, ii ) /
+                     ( NS(Particles_get_beta0_value)( p, ii ) *
+                       NS(Particles_get_rvv_value)( p, ii ) );
 
-    real_t const   phase  = DEG2RAD  * NS(Cavity_get_lag)( cavity ) -
-                            K_FACTOR * NS(Cavity_get_frequency)( cavity ) * tau;
+    real_t const phase = DEG2RAD * NS(Cavity_get_lag)( cavity ) -
+                         K_FACTOR * NS(Cavity_get_frequency)( cavity ) * tau;
 
-    real_t const energy   = q * NS(Cavity_get_voltage)( cavity ) * sin( phase );
+    real_t const energy = NS(Particles_get_q0_value)( p, ii ) *
+                          NS(Particles_get_charge_ratio_value)( p, ii ) *
+                          NS(Cavity_get_voltage)( cavity ) * sin( phase );
 
     SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, index ) ==
                    ( NS(particle_index_t) )1 );
 
-    NS(Particles_add_to_energy_value)( particles, index, energy );
+    NS(Particles_add_to_energy_value)( p, ii, energy );
 
-    return 0;
+    return SIXTRL_TRACK_SUCCESS;
 }
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
