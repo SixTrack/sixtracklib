@@ -109,9 +109,10 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                 _temp_arch_id = st_ARCHITECTURE_OPENCL
 
                 if not(node_id_str is None):
-                    node_id_str = node_id_str.strip().encode('utf-8')
-                    self._last_status = st_ComputeNodeId_from_string_with_format(
-                        self._ptr_node_id, ct.c_char_p(node_id_str),
+                    _node_id_str_bytes = node_id_str.strip().encode('utf-8')
+                    self._last_status = \
+                    st_ComputeNodeId_from_string_with_format(
+                        self._ptr_node_id, ct.c_char_p(_node_id_str_bytes),
                         st_node_id_str_fmt_t(node_id_str_fmt),
                         ct.byref(_temp_arch_id))
                     if self._last_status != st_ARCH_STATUS_SUCCESS.value:
@@ -345,9 +346,9 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
                     device_id = None
 
             if device_id is not None and len(device_id) > 0:
-                device_id.encode('utf-8')
+                _device_id_bytes = device_id.encode('utf-8')
                 st_ClContextBase_select_node(
-                    self._ptr_ctrl, ct.c_char_p(device_id))
+                    self._ptr_ctrl, ct.c_char_p(_device_id_bytes))
 
         def __del__(self):
             if self._owns_ctrl and self._ptr_ctrl != st_NullClContextBase:
@@ -430,13 +431,11 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         def add_program_file(self, path_to_program, compile_defs, compile=True):
             program_id = st_ARCH_ILLEGAL_PROGRAM_ID
             if self._ptr_ctrl != st_NullClContextBase:
-                path_to_program = path_to_program.strip()
-                path_to_program.encode('utf-8')
-                compile_defs = compile_defs.strip()
-                compile_defs.encode('utf-8')
+                _path_to_prog_bytes = path_to_program.strip().encode('utf-8')
+                _compile_defs_bytes = compile_defs.strip().encode('utf-8')
                 program_id = st_ClContextBase_add_program_file(
-                    self._ptr_ctrl, ct.c_char_p(path_to_program),
-                    ct.c_char_p(compile_defs))
+                    self._ptr_ctrl, ct.c_char_p(_path_to_prog_bytes),
+                    ct.c_char_p(_compile_defs_bytes))
                 if compile:
                     if not self.compile_program(program_id):
                         raise RuntimeError("Error while compiling program")
@@ -452,22 +451,20 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
 
         def enable_kernel(self, program_id, kernel_name):
             kernel_id = st_ARCH_ILLEGAL_KERNEL_ID.value
-            kernel_name = kernel_name.strip()
-            kernel_name.encode('utf-8')
+            _kernel_name_bytes = kernel_name.strip().encode('utf-8')
             if self._ptr_ctrl != st_NullClContextBase and \
                     program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
                 kernel_id = st_ClContextBase_enable_kernel(
-                    self._ptr_ctrl, ct.c_char_p(kernel_name),
+                    self._ptr_ctrl, ct.c_char_p(_kernel_name_bytes),
                     st_arch_program_id_t(program_id))
             return kernel_id
 
         def find_kernel_by_name(self, kernel_name):
             kernel_id = st_ARCH_ILLEGAL_KERNEL_ID.value
-            if self._ptr_ctrl is st_NullClContextBase:
-                kernel_name = kernel_name.strip()
-                kernel_name.encode('utf-8')
+            if self._ptr_ctrl is not st_NullClContextBase:
+                _kernel_name_bytes = kernel_name.strip().encode('utf-8')
                 kernel_id = st_ClContextBase_find_kernel_id_by_name(
-                    self._ptr_ctrl, ct.c_char_p(kernel_name))
+                    self._ptr_ctrl, ct.c_char_p(_kernel_name_bytes))
             return kernel_id
 
         def set_kernel_arg(self, kernel_id, arg_index, arg):
