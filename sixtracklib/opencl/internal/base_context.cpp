@@ -3106,7 +3106,7 @@ NS(ClContextBase_get_required_program_source_code_capacity)(
     {
         char const* ptr_code = ctx->programSourceCode( program_id );
 
-        if( ptr_options != nullptr )
+        if( ptr_code != nullptr )
         {
             capacity = ::NS(arch_size_t){ 1 } + std::strlen( ptr_code );
         }
@@ -3139,7 +3139,7 @@ bool NS(ClContextBase_has_program_file_path)(
     {
         char const* ptr_path = ctx->programPathToFile( program_id );
 
-        if( ptr_options != nullptr )
+        if( ptr_path != nullptr )
         {
             capacity = ::NS(arch_size_t){ 1 } + std::strlen( ptr_path );
         }
