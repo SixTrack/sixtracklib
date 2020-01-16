@@ -23,7 +23,40 @@ from .stcommon import st_Controller_delete, st_Controller_clear, \
     st_Controller_set_remap_cobject_buffer_kernel_id, \
     st_Controller_has_remap_cobject_buffer_debug_kernel, \
     st_Controller_get_remap_cobject_buffer_debug_kernel_id, \
-    st_Controller_set_remap_cobject_buffer_debug_kernel_id
+    st_Controller_set_remap_cobject_buffer_debug_kernel_id, \
+    st_Controller_get_num_available_nodes, \
+    st_Controller_has_selected_node, st_Controller_get_default_node_info_base, \
+    st_Controller_get_default_node_index, st_Controller_get_default_node_id, \
+    st_Controller_has_default_node, \
+    st_Controller_get_max_available_node_index, \
+    st_Controller_get_min_available_node_index, \
+    st_Controller_get_ptr_node_info_base_by_index, \
+    st_Controller_get_ptr_node_id_by_index, \
+    st_Controller_get_ptr_selected_node_id, \
+    st_Controller_get_selected_node_index, st_Controller_is_default_node, \
+    st_Controller_get_ptr_selected_node_info_base, \
+    st_Controller_can_change_selected_node, st_Controller_is_default_node_id, \
+    st_Controller_can_directly_change_selected_node, \
+    st_Controller_can_unselect_node, st_Controller_is_node_available_by_index, \
+    st_Controller_get_available_node_indices, \
+    st_Controller_is_default_node_index, \
+    st_Controller_get_ptr_node_info_base, \
+    st_Controller_get_ptr_node_info_base_by_index, \
+    st_Controller_get_ptr_node_info_base_by_node_id, \
+    st_Controller_get_ptr_node_info_base_by_platform_id_and_device_id, \
+    st_Controller_get_node_index, st_Controller_get_node_index_by_node_id, \
+    st_Controller_get_node_index_by_platform_id_and_device_id, \
+    st_Controller_is_default_platform_id_and_device_id, \
+    st_Controller_is_node_available, st_Controller_is_node_available_by_index, \
+    st_Controller_is_node_available_by_node_id, \
+    st_Controller_is_node_available_by_platform_id_and_device_id, \
+    st_Controller_select_node, \
+    st_Controller_select_node_by_index, st_Controller_select_node_by_node_id, \
+    st_Controller_select_node_by_plaform_id_and_device_id, \
+    st_Controller_unselect_node, st_Controller_unselect_node_by_index, \
+    st_Controller_unselect_node_by_node_id, \
+    st_Controller_unselect_node_by_platform_id_and_device_id, \
+    st_Controller_change_selected_node
 from .stcommon import st_Argument_delete, \
     st_Argument_get_arch_id, st_Argument_has_arch_string, \
     st_Argument_get_arch_string, st_Argument_send_again, \
