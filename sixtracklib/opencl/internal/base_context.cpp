@@ -3095,6 +3095,26 @@ bool NS(ClContextBase_compile_program)(
     return ( ctx != nullptr ) ? ctx->compileProgram( program_id ) : false;
 }
 
+::NS(arch_size_t)
+NS(ClContextBase_get_required_program_source_code_capacity)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    ::NS(arch_program_id_t) const program_id )
+{
+    ::NS(arch_size_t) capacity = ::NS(arch_size_t){ 0 };
+
+    if( ctx != nullptr )
+    {
+        char const* ptr_code = ctx->programSourceCode( program_id );
+
+        if( ptr_options != nullptr )
+        {
+            capacity = ::NS(arch_size_t){ 1 } + std::strlen( ptr_code );
+        }
+    }
+
+    return capacity;
+}
+
 char const* NS(ClContextBase_get_program_source_code)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_program_id_t) const program_id )
@@ -3109,11 +3129,50 @@ bool NS(ClContextBase_has_program_file_path)(
     return ( ctx != nullptr ) ? ctx->programHasFilePath( program_id ) : false;
 }
 
+::NS(arch_size_t) NS(ClContextBase_get_required_program_path_capacity)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    ::NS(arch_program_id_t) const program_id )
+{
+    ::NS(arch_size_t) capacity = ::NS(arch_size_t){ 0 };
+
+    if( ctx != nullptr )
+    {
+        char const* ptr_path = ctx->programPathToFile( program_id );
+
+        if( ptr_options != nullptr )
+        {
+            capacity = ::NS(arch_size_t){ 1 } + std::strlen( ptr_path );
+        }
+    }
+
+    return capacity;
+}
+
 char const* NS(ClContextBase_get_program_path_to_file)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_program_id_t) const program_id )
 {
     return ( ctx != nullptr ) ? ctx->programPathToFile( program_id ) : nullptr;
+}
+
+::NS(arch_size_t)
+NS(ClContextBase_get_required_program_compile_options_capacity)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    ::NS(arch_program_id_t) const program_id )
+{
+    ::NS(arch_size_t) capacity = ::NS(arch_size_t){ 0 };
+
+    if( ctx != nullptr )
+    {
+        char const* ptr_options = ctx->programCompileOptions( program_id );
+
+        if( ptr_options != nullptr )
+        {
+            capacity = ::NS(arch_size_t){ 1 } + std::strlen( ptr_options );
+        }
+    }
+
+    return capacity;
 }
 
 char const* NS(ClContextBase_get_program_compile_options)(
@@ -3122,6 +3181,25 @@ char const* NS(ClContextBase_get_program_compile_options)(
 {
     return ( ctx != nullptr )
         ? ctx->programCompileOptions( program_id ) : nullptr;
+}
+
+::NS(arch_size_t) NS(ClContextBase_get_required_program_compile_report_capacity)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    ::NS(arch_program_id_t) const program_id )
+{
+    ::NS(arch_size_t) capacity = ::NS(arch_size_t){ 0 };
+
+    if( ctx != nullptr )
+    {
+        char const* ptr_report = ctx->programCompileReport( program_id );
+
+        if( ptr_report != nullptr )
+        {
+            capacity = ::NS(arch_size_t){ 1 } + std::strlen( ptr_report );
+        }
+    }
+
+    return capacity;
 }
 
 char const* NS(ClContextBase_get_program_compile_report)(

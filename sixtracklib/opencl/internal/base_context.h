@@ -1254,6 +1254,11 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_compile_program)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     NS(arch_program_id_t) const program_id );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(ClContextBase_get_required_program_source_code_capacity)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_program_id_t) const program_id );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN char const*
 NS(ClContextBase_get_program_source_code)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
@@ -1263,13 +1268,28 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_has_program_file_path)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     NS(arch_program_id_t) const program_id );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(ClContextBase_get_required_program_path_capacity)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_program_id_t) const program_id );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN char const*
 NS(ClContextBase_get_program_path_to_file)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     NS(arch_program_id_t) const program_id );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(ClContextBase_get_required_program_compile_options_capacity)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_program_id_t) const program_id );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN char const*
 NS(ClContextBase_get_program_compile_options)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    NS(arch_program_id_t) const program_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(ClContextBase_get_required_program_compile_report_capacity)(
     const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     NS(arch_program_id_t) const program_id );
 
