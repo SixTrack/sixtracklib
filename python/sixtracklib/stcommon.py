@@ -4085,6 +4085,12 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_compile_program.restype = ct.c_bool
 
+    st_ClContextBase_get_required_program_source_code_capacity = \
+        sixtracklib.st_ClContextBase_get_required_program_source_code_capacity
+    st_ClContextBase_get_required_program_source_code_capacity.argtypes = [
+        st_ClContextBase_p, st_arch_program_id_t]
+    st_ClContextBase_get_required_program_source_code_capacity.restype = st_arch_size_t
+
     st_ClContextBase_get_program_source_code = \
         sixtracklib.st_ClContextBase_get_program_source_code
     st_ClContextBase_get_program_source_code.argtypes = [
@@ -4097,17 +4103,35 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_has_program_file_path.restype = ct.c_bool
 
+    st_ClContextBase_get_required_program_path_capacity = \
+        sixtracklib.st_ClContextBase_get_required_program_path_capacity
+    st_ClContextBase_get_required_program_path_capacity.argtypes = [
+        st_ClContextBase_p, st_arch_program_id_t ]
+    st_ClContextBase_get_required_program_path_capacity.restype = st_arch_size_t
+
     st_ClContextBase_get_program_path_to_file = \
         sixtracklib.st_ClContextBase_get_program_path_to_file
     st_ClContextBase_get_program_path_to_file.argtypes = [
         st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_get_program_path_to_file.restype = ct.c_char_p
 
+    st_ClContextBase_get_required_program_compile_options_capacity = \
+        sixtracklib.st_ClContextBase_get_required_program_compile_options_capacity
+    st_ClContextBase_get_required_program_compile_options_capacity.argtypes = [
+        st_ClContextBase_p, st_arch_program_id_t ]
+    st_ClContextBase_get_required_program_compile_options_capacity.restype = st_arch_size_t
+
     st_ClContextBase_get_program_compile_options = \
         sixtracklib.st_ClContextBase_get_program_compile_options
     st_ClContextBase_get_program_compile_options.argtypes = [
         st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_get_program_compile_options.restype = ct.c_char_p
+
+    st_ClContextBase_get_required_program_compile_report_capacity = \
+        sixtracklib.st_ClContextBase_get_required_program_compile_report_capacity
+    st_ClContextBase_get_required_program_compile_report_capacity.argtypes = [
+        st_ClContextBase_p, st_arch_program_id_t ]
+    st_ClContextBase_get_required_program_compile_report_capacity.restype = st_arch_size_t
 
     st_ClContextBase_get_program_compile_report = \
         sixtracklib.st_ClContextBase_get_program_compile_report
