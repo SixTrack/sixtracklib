@@ -105,6 +105,16 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
         st_ClContextBase_get_last_exec_num_work_items,
         st_ClContextBase_reset_kernel_exec_timing,
         st_ClContextBase_get_program_id_by_kernel_id,
+        st_ClContextBase_get_required_program_compile_options_capacity,
+        st_ClContextBase_get_program_compile_options,
+        st_ClContextBase_get_required_program_path_capacity,
+        st_ClContextBase_get_program_path_to_file,
+        st_ClContextBase_get_required_program_source_code_capacity,
+        st_ClContextBase_get_program_source_code,
+        st_ClContextBase_has_program_file_path,
+        st_ClContextBase_get_required_program_compile_report_capacity,
+        st_ClContextBase_get_program_compile_report,
+        st_ClContextBase_is_program_compiled,
         st_ClContextBase_has_remapping_program,
         st_ClContextBase_remapping_program_id,
         st_ClContextBase_has_remapping_kernel,
@@ -549,6 +559,12 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
                 )
             return success
 
+        def is_program_compiled(self,program_id):
+            return self._ptr_ctrl != st_NullClContextBase and \
+                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value and \
+                st_ClContextBase_is_program_compiled(
+                    self._ptr_ctrl, st_arch_program_id_t(program_id))
+
         def enable_kernel(self, program_id, kernel_name):
             kernel_id = st_ARCH_ILLEGAL_KERNEL_ID.value
             _kernel_name_bytes = kernel_name.strip().encode("utf-8")
@@ -571,6 +587,60 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
                     self._ptr_ctrl, ct.c_char_p(_kernel_name_bytes)
                 )
             return kernel_id
+
+        def program_id_by_kernel_id(self, kernel_id):
+            program_id = st_ARCH_ILLEGAL_PROGRAM_ID.value
+            if self._ptr_ctrl is not st_NullClContextBase and \
+                self.has_kernel(kernel_id):
+                program_id = st_ClContextBase_get_program_id_by_kernel_id(
+                    self._ptr_ctrl, st_arch_kernel_id_t(kernel_id))
+            return program_id
+
+        def program_compile_report(self, program_id):
+            report = ""
+            if self._ptr_ctrl is not st_NullClContextBase and \
+                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
+                _report_cstr = st_ClContextBase_get_program_compile_report(
+                    self._ptr_ctrl, st_arch_program_id_t(program_id))
+                if _report_cstr != st_NullChar:
+                    report = bytes(_report_cstr).decode('utf-8')
+            return report
+
+        def program_compile_options(self, program_id):
+            options = ""
+            if self._ptr_ctrl is not st_NullClContextBase and \
+                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
+                _options_cstr = st_ClContextBase_get_program_compile_options(
+                    self._ptr_ctrl, st_arch_program_id_t(program_id))
+                if _options_cstr != st_NullChar:
+                    options = bytes(_options_cstr).decode('utf-8')
+            return options
+
+        def program_source_code(self, program_id):
+            src_code = ""
+            if self._ptr_ctrl is not st_NullClContextBase and \
+                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
+                _src_code_cstr = st_ClContextBase_get_program_source_code(
+                    self._ptr_ctrl, st_arch_program_id_t(program_id))
+                if _src_code_cstr != st_NullChar:
+                    src_code = bytes( _src_code_cstr ).decode('utf-8')
+            return src_code
+
+        def has_program_file_path(self, program_id):
+            return self._ptr_ctrl is not st_NullClContextBase and \
+                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value and \
+                st_ClContextBase_has_program_file_path(
+                    self._ptr_ctrl, st_arch_program_id_t(program_id))
+
+        def program_path_to_file(self, program_id):
+            path_to_program = ""
+            if self._ptr_ctrl is not st_NullClContextBase and \
+                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
+                _path_to_prog = st_ClContextBase_get_program_path_to_file(
+                    self._ptr_ctrl, st_arch_program_id_t(program_id))
+                if _path_to_prog != st_NullChar:
+                    path_to_program = bytes( _path_to_prog ).decode('utf-8')
+            return path_to_program
 
         def set_kernel_arg(self, kernel_id, arg_index, arg):
             if (
