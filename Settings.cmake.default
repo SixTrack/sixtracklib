@@ -127,6 +127,9 @@ endif()
 # OpenCL 1.x related detailed settings
 
 if( SIXTRACKL_ENABLE_OPENCL )
+    set( SIXTRACKL_OPENCL_DEFAULT_COMPILER_FLAGS "" CACHE STRING
+         "Default run-time compiler options for OpenCL" )
+
     set( SIXTRACKL_MIN_OPENCL_VERSION "110" CACHE STRING
         "Minimal expected OpenCL 1.x version" )
 
