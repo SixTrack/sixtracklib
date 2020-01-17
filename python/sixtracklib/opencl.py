@@ -64,6 +64,15 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
         st_ComputeNodeInfo_get_name,
         st_ComputeNodeInfo_get_description,
         st_ClContext_create,
+        st_ClContextBase_set_default_compile_options,
+        st_ClContextBase_default_compile_options,
+        st_ClContextBase_num_feature_flags,
+        st_ClContextBase_has_feature_flag,
+        st_ClContextBase_feature_flag,
+        st_ClContextBase_set_feature_flag,
+        st_ClContextBase_feature_flag_repr_required_capacity,
+        st_ClContextBase_feature_flag_repr_as_cstr,
+        st_ClContextBase_reinit_default_programs,
         st_ClContextBase_delete,
         st_ClContextBase_has_selected_node,
         st_ClContextBase_get_selected_node_id,
@@ -790,6 +799,74 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
                 error_msg = f"Unable to run OpenCL kernel id={kernel_id}"
                 raise RuntimeError(error_msg)
             return self
+
+        def num_feature_flags(self):
+            num_feature_flags = 0
+            if self._ptr_ctrl is not st_NullClContextBase:
+                num_feature_flags = st_ClContextBase_num_feature_flags(
+                    self._ptr_ctrl )
+            return num_feature_flags
+
+        def has_feature_flag(self, feature_flag_key):
+            _feature_flag_key_bytes = feature_flag_key.strip.encode('utf-8')
+            return self._ptr_ctrl is not st_NullClContextBase and \
+                st_ClContextBase_has_feature_flag( self._ptr_ctrl,
+                    ct.c_char_p( _feature_flag_key_bytes ) )
+
+        def feature_flag(self, feature_flag_key):
+            feature = None
+            _feature_flag_key_bytes = feature_flag_key.strip.encode('utf-8')
+            if self._ptr_ctrl is not st_NullClContextBase:
+                _ptr_feature = st_ClContextBase_feature_flag(
+                    self._ptr_ctrl, ct.c_char_p( _feature_flag_key_bytes) )
+                if _ptr_feature is not st_NullChar:
+                    feature = bytes(_ptr_feature).decode('utf-8')
+            return feature
+
+        def feature_flag_repr(self, feature_flag_key, prefix="-D", sep="="):
+            feature_repr = None
+            _feature_flag_key_bytes = feature_flag_key.strip.encode('utf-8')
+            _prefix_bytes = prefix.encode('utf-8')
+            _sep_bytes = sep.encode('utf-8')
+            if self._ptr_ctrl is not st_NullClContextBase:
+                _requ_capacity = \
+                    st_ClContextBase_feature_flag_repr_required_capacity(
+                        self._ptr_ctrl, ct.c_char_p(_feature_flag_key_bytes),
+                            ct.c_char_p(_prefix_bytes),
+                                ct.c_char_p(_sep_bytes) )
+                if _requ_capacity > 0:
+                    _temp_buffer = ct.create_string_buffer(_requ_capacity)
+                    ret = st_ClContextBase_feature_flag_repr_as_cstr(
+                        self._ptr_ctrl, _temp_buffer,
+                            st_arch_size_t(_requ_capacity),
+                            ct.c_char_p(_feature_flag_key_bytes),
+                            ct.c_char_p(_prefix_bytes), ct.c_char_p(_sep_bytes))
+                    if ret == st_ARCH_STATUS_SUCCESS.value:
+                        feature_repr = bytes(_temp_buffer.value).decode('utf-8')
+            return feature_repr
+
+        def set_feature_flag(self, feature_flag_key, feature_flag_value):
+            _feature_flag_key_bytes = feature_flag_key.strip.encode('utf-8')
+            _feature_flag_val_bytes = feature_flag_value.strip.encode('utf-8')
+            if self._ptr_ctrl is not st_NullClContextBase:
+                st_ClContextBase_set_feature_flag( self._ptr_ctrl,
+                    ct.c_char_p( _feature_flag_key_bytes ),
+                    ct.c_char_p( _feature_flag_val_bytes ) )
+
+        def default_compile_options(self):
+            options = None
+            if self._ptr_ctrl is not st_NullClContextBase:
+                _ptr_options = st_ClContextBase_default_compile_options(
+                    self._ptr_ctrl )
+                if _ptr_options is not st_NullChar:
+                    options = bytes(_ptr_options).decode('utf-8')
+            return options
+
+        def set_default_compile_options(self, new_compile_options):
+            _compile_options_bytes = new_compile_options.strip().ecode('utf-8')
+            if self._ptr_ctrl is not st_NullClContextBase:
+                st_ClContextBase_set_default_compile_options(
+                    self._ptr_ctrl, ct.c_char_p( _compile_options_bytes ) )
 
     # -------------------------------------------------------------------------
 
