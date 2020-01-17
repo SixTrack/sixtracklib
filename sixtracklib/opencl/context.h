@@ -12,6 +12,8 @@
 
     #if defined( __cplusplus )
         #include <algorithm>
+        #include <string>
+        #include <map>
     #endif /* !defined( __cplusplus ) */
 
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
@@ -56,6 +58,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using  track_status_t        = SIXTRL_CXX_NAMESPACE::track_status_t;
         using  elem_by_elem_config_t = ::NS(ElemByElemConfig);
         using  num_turns_t           = ::NS(particle_index_t);
+        using  feature_flag_t        = uint16_t;
 
         static constexpr size_type MIN_NUM_TRACK_UNTIL_ARGS   = size_type{ 5 };
         static constexpr size_type MIN_NUM_TRACK_LINE_ARGS    = size_type{ 7 };
@@ -207,13 +210,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        bool is_beam_beam_tracking_enabled() const SIXTRL_NOEXCEPT;
+        bool is_beam_beam_tracking_enabled() const;
         void enable_beam_beam_tracking();
         void disable_beam_beam_tracking();
+        void skip_beam_beam_tracking();
 
         protected:
 
         bool doSelectNode( size_type node_index ) override;
+        status_t doInitDefaultFeatureFlags() override;
         bool doInitDefaultPrograms() override;
         bool doInitDefaultKernels()  override;
 
@@ -229,6 +234,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         bool doInitDefaultProgramsPrivImpl();
         bool doInitDefaultKernelsPrivImpl();
+        status_t doInitDefaultFeatureFlagsPrivImpl();
 
         status_t doAssignElemByElemConfigIndexArgPrivImpl(
             size_type const elem_by_elem_config_index );
@@ -260,7 +266,7 @@ namespace SIXTRL_CXX_NAMESPACE
         kernel_id_t  m_assign_addr_kernel_id;
 
         bool         m_use_optimized_tracking;
-        bool         m_enable_beam_beam;
+
     };
 }
 
@@ -521,6 +527,9 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContext_enable_beam_beam_tracking)(
     NS(ClContext)* SIXTRL_RESTRICT ctx );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContext_disable_beam_beam_tracking)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContext_skip_beam_beam_tracking)(
     NS(ClContext)* SIXTRL_RESTRICT ctx );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
