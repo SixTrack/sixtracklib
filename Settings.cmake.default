@@ -35,18 +35,17 @@ option( SIXTRACKL_ENABLE_BENCHMARK_TESTS "Enable benchmark tests"         OFF )
 # ------------------------------------------------------------------------------
 # ---- SixTrackLib Features:
 
-option( SIXTRACKL_ERROR_ON_TRACK_DISABLED_MAP  ""    ON  )
-option( SIXTRACKL_ENABLE_BEAM_FIELDS_4D_MAP    ""    ON  )
-option( SIXTRACKL_ENABLE_BEAM_FIELDS_6D_MAP    ""    ON  )
-option( SIXTRACKL_ENABLE_SC_BUNCHED_MAP        ""    ON  )
-option( SIXTRACKL_ENABLE_SC_COASTING_MAP       ""    ON  )
-option( SIXTRACKL_ENABLE_BE_TRICUB_MAP         ""    OFF )
+# Track features: allowed values are enabled, disabled, or skip:
 
-set( SIXTRACKL_ENABLE_GLOBAL_APERTURE_CHECK "always" CACHE STRING
-     "Enable xy-aperture check" )
+set( SIXTRACKL_TRACK_BEAMBEAM4D             "enabled" CACHE STRING "" )
+set( SIXTRACKL_TRACK_BEAMBEAM6D             "enabled" CACHE STRING "" )
+set( SIXTRACKL_TRACK_SPACECHARGE_COASTING   "enabled" CACHE STRING "" )
+set( SIXTRACKL_TRACK_SPACECHARGE_BUNCHED    "enabled" CACHE STRING "" )
+set( SIXTRACKL_TRACK_TRICUB                 "skip"    CACHE STRING "" )
 
-set_property( CACHE SIXTRACKL_ENABLE_GLOBAL_APERTURE_CHECK
-              PROPERTY STRINGS always conditional never )
+# Aperture check features: allowed values are always, never, conditional
+
+set( SIXTRACKL_APERTURE_CHECK_AT_DRIFT      "always"  CACHE STRING "" )
 
 # ------------------------------------------------------------------------------
 # CPU/System architecture settings:
@@ -69,12 +68,9 @@ set( SIXTRACKL_DEFAULT_CXX_FLAGS
 # ------------------------------------------------------------------------------
 # ---- SixTrackLib detailed features settings:
 
-set( SIXTRACKL_APERTURE_X_LIMIT_VALUE "1.0"
-     CACHE STRING "Aperture check x limit" FORCE )
-
-set( SIXTRACKL_APERTURE_Y_LIMIT_VALUE "1.0"
-     CACHE STRING "Aperture check y limit" FORCE )
-
+set( SIXTRACKL_APERTURE_X_LIMIT_VALUE "1.0" CACHE STRING "" )
+set( SIXTRACKL_APERTURE_Y_LIMIT_VALUE "1.0" CACHE STRING "" )
+set( SIXTRACKL_APERTURE_CHECK_MIN_DRIFT_LENGTH "0.0" CACHE STRING "" )
 
 # ------------------------------------------------------------------------------
 # Installation detailed setings
@@ -127,7 +123,7 @@ endif()
 # OpenCL 1.x related detailed settings
 
 if( SIXTRACKL_ENABLE_OPENCL )
-    set( SIXTRACKL_OPENCL_DEFAULT_COMPILER_FLAGS "" CACHE STRING
+    set( SIXTRACKL_OPENCL_DEFAULT_COMPILER_FLAGS "-w -Werror" CACHE STRING
          "Default run-time compiler options for OpenCL" )
 
     set( SIXTRACKL_MIN_OPENCL_VERSION "110" CACHE STRING
@@ -174,27 +170,6 @@ set( SIXTRACKL_CXX_NAMESPACE "sixtrack" CACHE STRING
 
 set( SIXTRACKL_C_NAMESPACE_PREFIX "st_" CACHE STRING
      "SixTrackLib C-Namespace prefix (default: st_)" )
-
-# ==============================================================================
-# Help strings omitted because of line-length issues above:
-
-set_property( CACHE SIXTRACKL_ERROR_ON_TRACK_DISABLED_MAP
-    PROPERTY HELPSTRING "Error on tracking disabled maps" )
-
-set_property( CACHE SIXTRACKL_ENABLE_BEAM_FIELDS_4D_MAP
-    PROPERTY HELPSTRING "Enable tracking beam-beam-4D map" )
-
-set_property( CACHE SIXTRACKL_ENABLE_BEAM_FIELDS_6D_MAP
-    PROPERTY HELPSTRING "Enable tracking beam-beam-6D map" )
-
-set_property( CACHE SIXTRACKL_ENABLE_SC_BUNCHED_MAP
-    PROPERTY HELPSTRING "Enable tracking bunched  space-charge maps" )
-
-set_property( CACHE SIXTRACKL_ENABLE_SC_COASTING_MAP
-    PROPERTY HELPSTRING "Enable tracking coasting space-charge maps" )
-
-set_property( CACHE SIXTRACKL_ENABLE_BE_TRICUB_MAP
-    PROPERTY HELPSTRING "Enable tracking bunched  space-charge maps" )
 
 # ==============================================================================
 # end: Settings.cmake.default | Settings.cmake
