@@ -57,6 +57,12 @@ namespace SIXTRL_CXX_NAMESPACE
         using cl_buffer_t       = cl::Buffer;
         using cl_argument_t     = SIXTRL_CXX_NAMESPACE::ClArgument;
 
+        protected:
+        using feature_flags_map_t  = std::map< std::string, std::string >;
+
+        public:
+        using feature_flags_iter_t = feature_flags_map_t::const_iterator;
+
         static constexpr kernel_arg_type_t ARG_TYPE_NONE =
             kernel_arg_type_t{ 0x00000000 };
 
@@ -501,6 +507,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void printNodesInfo() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN void clear();
+        SIXTRL_HOST_FN status_t reinit_default_programs();
 
         SIXTRL_HOST_FN char const* configStr() const SIXTRL_NOEXCEPT;
 
@@ -729,6 +736,59 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN status_t assign_status_flags_arg(
             cl_buffer_t& SIXTRL_RESTRICT_REF success_flag_arg );
 
+        /* ----------------------------------------------------------------- */
+
+        size_type num_feature_flags() const SIXTRL_NOEXCEPT;
+
+        feature_flags_iter_t feature_flags_begin() const SIXTRL_NOEXCEPT;
+        feature_flags_iter_t feature_flags_end() const SIXTRL_NOEXCEPT;
+
+        bool has_feature_flag(
+            std::string const& SIXTRL_RESTRICT_REF str ) const SIXTRL_NOEXCEPT;
+
+        bool has_feature_flag(
+            char const* SIXTRL_RESTRICT str ) const SIXTRL_NOEXCEPT;
+
+        std::string const& feature_flag_str(
+            std::string const& SIXTRL_RESTRICT_REF str ) const;
+
+        std::string const& feature_flag_str(
+            char const* SIXTRL_RESTRICT str ) const;
+
+        char const* feature_flag(
+            std::string const& SIXTRL_RESTRICT_REF str ) const SIXTRL_NOEXCEPT;
+
+        char const* feature_flag(
+            char const* SIXTRL_RESTRICT str ) const SIXTRL_NOEXCEPT;
+
+        void set_feature_flag( std::string const& SIXTRL_RESTRICT_REF str,
+            std::string const& SIXTRL_RESTRICT_REF flag_value );
+
+        void set_feature_flag( char const* SIXTRL_RESTRICT str,
+            char const* SIXTRL_RESTRICT flag_value );
+
+        std::string feature_flag_repr(
+            std::string const& SIXTRL_RESTRICT_REF str,
+            std::string const& SIXTRL_RESTRICT_REF prefix = std::string{ "-D" },
+            std::string const& SIXTRL_RESTRICT_REF sep =
+                std::string{"="} ) const;
+
+        std::string feature_flag_repr(
+            char const* SIXTRL_RESTRICT str,
+            char const* SIXTRL_RESTRICT prefix = nullptr,
+            char const* SIXTRL_RESTRICT sep = nullptr ) const;
+
+        size_type feature_flag_repr_required_capacity(
+            char const* SIXTRL_RESTRICT str,
+            char const* SIXTRL_RESTRICT prefix = nullptr,
+            char const* SIXTRL_RESTRICT sep = nullptr ) const;
+
+        status_t feature_flag_repr_as_cstr(
+            char* out_str, size_type out_str_capacity,
+            char const* SIXTRL_RESTRICT str,
+            char const* SIXTRL_RESTRICT prefix = nullptr,
+            char const* SIXTRL_RESTRICT sep = nullptr ) const;
+
         protected:
 
         static SIXTRL_HOST_FN status_t GetAllAvailableNodes(
@@ -943,6 +1003,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         virtual void doClear();
 
+        virtual status_t doInitDefaultFeatureFlags();
         virtual bool doInitDefaultPrograms();
         virtual bool doInitDefaultKernels();
 
@@ -988,6 +1049,7 @@ namespace SIXTRL_CXX_NAMESPACE
         void doParseConfigStringBaseImpl(
             const char *const SIXTRL_RESTRICT config_str );
 
+        status_t doInitDefaultFeatureFlagsBaseImpl();
         bool doInitDefaultProgramsBaseImpl();
         bool doInitDefaultKernelsBaseImpl();
 
@@ -1004,6 +1066,7 @@ namespace SIXTRL_CXX_NAMESPACE
         status_t doAssignSlotSizeArgBaseImpl(
             size_type const slot_size );
 
+        feature_flags_map_t             m_feature_flags;
         std::vector< cl::Program >      m_cl_programs;
         std::vector< cl::Kernel  >      m_cl_kernels;
         std::vector< cl_buffer_t >      m_cl_buffers;
@@ -1036,8 +1099,6 @@ typedef SIXTRL_CXX_NAMESPACE::ClContextBase::node_id_t NS(context_node_id_t);
 typedef SIXTRL_CXX_NAMESPACE::ClContextBase::node_info_t NS(context_node_info_t);
 typedef SIXTRL_CXX_NAMESPACE::ClContextBase::kernel_arg_type_t
         NS(kernel_arg_type_t);
-
-
 
 #else /* defined( __cplusplus ) */
 
@@ -1228,6 +1289,10 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_print_nodes_info)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_clear)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ClContextBase_reinit_default_programs)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_select_node)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* node_id_str );
@@ -1239,6 +1304,15 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_node_id)(
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_select_node_by_index)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     NS(arch_size_t) const index );
+
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_set_default_compile_options)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT default_compile_options );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN char const*
+NS(ClContextBase_default_compile_options)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
 NS(ClContextBase_get_num_available_programs)(
@@ -1501,6 +1575,38 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_enable_debug_mode)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_disable_debug_mode)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
+
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(ClContextBase_num_feature_flags)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx )SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContextBase_has_feature_flag)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT str ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(ClContextBase_feature_flag)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT str ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_set_feature_flag)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT str, char const* flag_val );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(ClContextBase_feature_flag_repr_required_capacity)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT str,
+    char const* SIXTRL_RESTRICT prefix,
+    char const* SIXTRL_RESTRICT sep );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ClContextBase_feature_flag_repr_as_cstr)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    char* out_str, NS(arch_size_t) const out_str_capacity,
+    char const* SIXTRL_RESTRICT str,
+    char const* SIXTRL_RESTRICT prefix,
+    char const* SIXTRL_RESTRICT sep );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
