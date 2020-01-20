@@ -55,18 +55,21 @@ st_Particles_compare_real_values.restype = ct.c_int32
 st_Particles_compare_real_values.argtypes = [st_Particles_p, st_Particles_p]
 
 
-st_Particles_compare_real_values_with_treshold = \
+st_Particles_compare_real_values_with_treshold = (
     testlib.st_Particles_compare_real_values_with_treshold_ext
+)
 st_Particles_compare_real_values_with_treshold.restype = ct.c_int32
 st_Particles_compare_real_values_with_treshold.argtypes = [
-    st_Particles_p, st_Particles_p]
+    st_Particles_p,
+    st_Particles_p,
+]
 
 
-st_Particles_compare_integer_values = \
+st_Particles_compare_integer_values = (
     testlib.st_Particles_compare_integer_values_ext
+)
 st_Particles_compare_integer_values.restype = ct.c_int32
-st_Particles_compare_integer_values.argtypes = [
-    st_Particles_p, st_Particles_p]
+st_Particles_compare_integer_values.argtypes = [st_Particles_p, st_Particles_p]
 
 
 st_Particles_compare_values = testlib.st_Particles_compare_values_ext
@@ -74,11 +77,15 @@ st_Particles_compare_values.argtypes = [st_Particles_p, st_Particles_p]
 st_Particles_compare_values.restypes = ct.c_int32
 
 
-st_Particles_compare_values_with_treshold = \
+st_Particles_compare_values_with_treshold = (
     testlib.st_Particles_compare_values_with_treshold_ext
+)
 st_Particles_compare_values_with_treshold.restype = ct.c_int32
 st_Particles_compare_values_with_treshold.argtypes = [
-    st_Particles_p, st_Particles_p, ct.c_double]
+    st_Particles_p,
+    st_Particles_p,
+    ct.c_double,
+]
 
 
 st_Particles_print_out_single = testlib.st_Particles_print_out_single_ext
@@ -91,29 +98,36 @@ st_Particles_print_out.restype = None
 st_Particles_print_out.argtypes = [st_Particles_p]
 
 
-st_Particles_buffers_map_to_same_memory = \
+st_Particles_buffers_map_to_same_memory = (
     testlib.st_Particles_buffers_map_to_same_memory
+)
 st_Particles_buffers_map_to_same_memory.restype = ct.c_bool
 st_Particles_buffers_map_to_same_memory.argtypes = [st_Buffer_p, st_Buffer_p]
 
 
-st_Particles_buffer_have_same_structure = \
+st_Particles_buffer_have_same_structure = (
     testlib.st_Particles_buffer_have_same_structure
+)
 st_Particles_buffer_have_same_structure.restype = ct.c_bool
 st_Particles_buffer_have_same_structure.argtypes = [st_Buffer_p, st_Buffer_p]
 
 
-st_Particles_buffers_compare_values = \
+st_Particles_buffers_compare_values = (
     testlib.st_Particles_buffers_compare_values
+)
 st_Particles_buffers_compare_values.restype = ct.c_int32
 st_Particles_buffers_compare_values.argtypes = [st_Buffer_p, st_Buffer_p]
 
 
-st_Particles_buffers_compare_values_with_treshold = \
+st_Particles_buffers_compare_values_with_treshold = (
     testlib.st_Particles_buffers_compare_values_with_treshold
+)
 st_Particles_buffers_compare_values.restype = ct.c_int32
 st_Particles_buffers_compare_values.argtypes = [
-    st_Buffer_p, st_Buffer_p, ct.c_double]
+    st_Buffer_p,
+    st_Buffer_p,
+    ct.c_double,
+]
 
 
 st_Particles_buffer_print_out = testlib.st_Particles_buffer_print_out
@@ -129,12 +143,15 @@ st_NullParticlesAddr = stcom.st_NullParticlesAddr
 
 st_buffer_size_t = stcom.st_buffer_size_t
 
-st_TestParticlesAddr_are_addresses_consistent_with_particle = \
+st_TestParticlesAddr_are_addresses_consistent_with_particle = (
     testlib.st_TestParticlesAddr_are_addresses_consistent_with_particle
+)
 st_TestParticlesAddr_are_addresses_consistent_with_particle.argtypes = [
-    st_ParticlesAddr_p, st_Particles_p, st_buffer_size_t]
-st_TestParticlesAddr_are_addresses_consistent_with_particle.restype = \
-    ct.c_bool
+    st_ParticlesAddr_p,
+    st_Particles_p,
+    st_buffer_size_t,
+]
+st_TestParticlesAddr_are_addresses_consistent_with_particle.restype = ct.c_bool
 
 # -------------------------------------------------------------------------------
 # AssignAddressItem:
