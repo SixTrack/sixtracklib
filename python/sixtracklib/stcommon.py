@@ -28,17 +28,27 @@ st_NullUChar = ct.cast(0, st_uchar_p)
 def string_to_encoded_ctypes_str(s, encoding="utf-8", strip=True):
     if s is not None:
         if strip:
-            _temp_bytes = bytes(s).strip().encode(encoding)
-        else:
-            _temp_bytes = bytes(s).encode(encoding)
-        return ct.c_char_p(_temp_bytes)
+            s = s.strip()
+        _temp_str = s.encode(encoding)
+        return ct.c_char_p( _temp_str )
     else:
         return None
 
 
 def ctypes_str_to_decoded_string(bstr, encoding="utf-8", strip=True):
-    if bstr is not None and bstr is not st_NullChar:
-        _bstr_bytes = bytes(bstr.value)
+    _bstr_bytes = None
+    if bstr is not None:
+        if isinstance( bstr, ct.Array):
+            _bstr_bytes=bytes(bstr.value)
+        elif isinstance( bstr, bytes ):
+            _bstr_bytes = bstr
+        else:
+            raise RuntimeError(f"""
+                Illegal type for parameter bstr {type(bstr)}, required
+                ctypes.Array or bytes
+                """
+            )
+    if _bstr_bytes is not None:
         if b"\0" in _bstr_bytes:
             _bstr_bytes = _bstr_bytes.split(b"\0", 1)[0]
         if strip:
