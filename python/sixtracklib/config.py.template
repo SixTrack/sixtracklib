@@ -23,7 +23,7 @@ SHARED_LIB = os.path.join( os.path.dirname( os.path.realpath( __file__ ) ),
 
 TRACK_BEAMBEAM4D  = "@SIXTRL_TRACK_BEAMBEAM4D_FLAG_STR@"
 TRACK_BEAMBEAM6D  = "@SIXTRL_TRACK_BEAMBEAM6D_FLAG_STR@"
-TRACK_SPACECHARGE = "@SIXTRL_TRACK_SPACECHARGE_FLAG_STR@"
+TRACK_SPACECHARGE = "@SIXTRL_TRACK_SC_FLAG_STR@"
 TRACK_TRICUB      = "@SIXTRL_TRACK_TRICUB_FLAG_STR@"
 
 # -----------------------------------------------------------------------------
