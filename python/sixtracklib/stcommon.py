@@ -4774,3 +4774,29 @@ st_Track_all_particles_element_by_element_until_turn = \
 st_Track_all_particles_element_by_element_until_turn.restype = st_track_status_t
 st_Track_all_particles_element_by_element_until_turn.argtypes = [
     st_Particles_p, st_ElemByElemConfig_p, st_Buffer_p, ct.c_int64]
+
+
+# TriCub related methods:
+
+st_TriCubData_p = ct.c_void_p
+st_NullTriCubData = ct.cast( 0, st_TriCubData_p )
+
+st_TriCubData_type_id = sixtracklib.st_TriCubData_type_id_ext
+st_TriCubData_type_id.argtypes = [ st_TriCubData_p ]
+st_TriCubData_type_id.restype = st_object_type_id_t
+
+st_TriCubData_ptr_offset = sixtracklib.st_TriCubData_ptr_offset
+st_TriCubData_ptr_offset.argtypes = [ st_TriCubData_p ]
+st_TriCubData_ptr_offset.restype = st_arch_size_t
+
+st_TriCub_p = ct.c_void_p
+st_NullTriCub = ct.cast( 0, st_TriCubData_p )
+
+st_TriCub_type_id = sixtracklib.st_TriCub_type_id_ext
+st_TriCub_type_id.argtypes = [ st_TriCub_p ]
+st_TriCub_type_id.restype = st_object_type_id_t
+
+st_TriCub_data_addr_offset = sixtracklib.st_TriCub_data_addr_offset
+st_TriCub_data_addr_offset.argtypes = [ st_TriCub_p ]
+st_TriCub_data_addr_offset.restype = st_arch_size_t
+
