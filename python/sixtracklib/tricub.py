@@ -18,7 +18,6 @@ from .stcommon import (
     st_TriCub_data_addr_offset,
 )
 
-
 class TriCubData(CObject):
     _typeid = st_TriCubData_type_id(st_NullTriCubData)
     x0 = CField(0, "real", default=0.0, alignment=8)
@@ -47,8 +46,7 @@ class TriCubData(CObject):
 
     @staticmethod
     def ptr_offset():
-        return st_TriCubData_ptr_offset(st_NullTriCubData)
-
+        return 0
 
 class TriCub(CObject):
     _typeid = st_TriCub_type_id(st_NullTriCub)
