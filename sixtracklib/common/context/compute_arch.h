@@ -236,8 +236,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN char const*
 NS(ComputeNodeInfo_get_description_ext)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
 
-#if !defined( _GPUCODE )
-
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_print)(
     FILE* SIXTRL_RESTRICT fp,
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
