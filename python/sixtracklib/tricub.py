@@ -33,7 +33,7 @@ class TriCubData(CObject):
 
     @staticmethod
     def ptr_offset():
-        return st_TriCubData_ptr_offset( st_NullTriCubData )
+        return 0
 
 
 
