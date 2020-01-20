@@ -25,6 +25,8 @@ typedef enum NS(object_type_values_e)
     NS(OBJECT_TYPE_BEAM_MONITOR)          =         10,
     NS(OBJECT_TYPE_LIMIT_RECT)            =         11,
     NS(OBJECT_TYPE_LIMIT_ELLIPSE)         =         12,
+    NS(OBJECT_TYPE_LIMIT_ZETA)            =         13,
+    NS(OBJECT_TYPE_LIMIT_DELTA)           =         14,
     NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE)    =         16,
     NS(OBJECT_TYPE_SPACE_CHARGE_COASTING) =         13,
     NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED)  =         14,
