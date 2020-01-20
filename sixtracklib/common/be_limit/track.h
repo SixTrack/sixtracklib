@@ -53,17 +53,17 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit_global)(
 
     SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0;
 
-    #if defined( SIXTRL_APERTURE_X_LIMIT ) && defined( SIXTRL_APERTURE_Y_LIMIT )
-
+    #if defined( SIXTRL_APERTURE_X_LIMIT )
     SIXTRL_STATIC_VAR real_t const X_LIMIT = ( real_t )SIXTRL_APERTURE_X_LIMIT;
-    SIXTRL_STATIC_VAR real_t const Y_LIMIT = ( real_t )SIXTRL_APERTURE_Y_LIMIT;
-
-    #else /* SIXTRL_APERTURE_X_LIMIT && SIXTRL_APERTURE_Y_LIMIT  */
-
+    #else /* defined( SIXTRL_APERTURE_X_LIMIT )  */
     SIXTRL_STATIC_VAR real_t const X_LIMIT = ( real_t )1.0;
-    SIXTRL_STATIC_VAR real_t const Y_LIMIT = ( real_t )1.0;
+    #endif /* defined( SIXTRL_APERTURE_X_LIMIT ) */
 
-    #endif /* SIXTRL_APERTURE_X_LIMIT && SIXTRL_APERTURE_Y_LIMIT  */
+    #if defined( SIXTRL_APERTURE_Y_LIMIT )
+    SIXTRL_STATIC_VAR real_t const Y_LIMIT = ( real_t )SIXTRL_APERTURE_Y_LIMIT;
+    #else /* defined( SIXTRL_APERTURE_Y_LIMIT ) */
+    SIXTRL_STATIC_VAR real_t const Y_LIMIT = ( real_t )1.0;
+    #endif /* defined( SIXTRL_APERTURE_Y_LIMIT ) */
 
     real_t const x = NS(Particles_get_x_value)( p, idx );
     real_t const y = NS(Particles_get_y_value)( p, idx );

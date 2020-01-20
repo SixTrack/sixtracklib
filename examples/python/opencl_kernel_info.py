@@ -24,3 +24,13 @@ if __name__ == '__main__':
           max workgroup size                : {ctrl.kernel_max_workgroup_size(k_id )}
           preferred workgroup size multiple : {ctrl.kernel_preferred_workgroup_size_multiple(k_id)}
           """ )
+
+    prog_id = ctrl.program_id_by_kernel_id( k_id )
+    used_compile_options = ctrl.program_compile_options( prog_id )
+    prog_compile_report  = ctrl.program_compile_report( prog_id )
+
+    print( f"""
+          used compile options               : {used_compile_options}
+          compile report / output            : {prog_compile_report}
+          """ )
+

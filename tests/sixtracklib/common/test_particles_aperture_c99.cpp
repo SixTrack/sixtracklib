@@ -21,9 +21,11 @@
 #include "sixtracklib/common/generated/config.h"
 #include "sixtracklib/testlib.h"
 
-#if defined( SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK ) && \
-             SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK > \
-             SIXTRL_GLOBAL_APERTURE_CHECK_NEVER
+#if !defined( SIXTRL_APERTURE_CHECK_AT_DRIFT ) || \
+                ( SIXTRL_APERTURE_CHECK_AT_DRIFT == \
+                  SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS ) || \
+                ( SIXTRL_APERTURE_CHECK_AT_DRIFT == \
+                  SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL )
 
 TEST( C99_CommonParticlesApertureTests,
       TrackParticlesOverDriftEnabledApertureCheck )
@@ -80,9 +82,11 @@ TEST( C99_CommonParticlesApertureTests,
 
             ASSERT_TRUE( status == ::NS(TRACK_SUCCESS) );
 
-            #if defined( SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK ) && \
-                         SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK > \
-                         SIXTRL_GLOBAL_APERTURE_CHECK_NEVER
+            #if !defined( SIXTRL_APERTURE_CHECK_AT_DRIFT ) || \
+                ( SIXTRL_APERTURE_CHECK_AT_DRIFT == \
+                  SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS ) || \
+                ( SIXTRL_APERTURE_CHECK_AT_DRIFT == \
+                  SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL )
 
             double const x = ::NS(Particles_get_x_value)( particles, idx );
             double const y = ::NS(Particles_get_y_value)( particles, idx );
@@ -168,9 +172,11 @@ TEST( C99_CommonParticlesApertureTests,
 
             ASSERT_TRUE( status == ::NS(TRACK_SUCCESS) );
 
-            #if defined( SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK ) && \
-                         SIXTRL_ENABLE_GLOBAL_APERTURE_CHECK > \
-                         SIXTRL_GLOBAL_APERTURE_CHECK_NEVER
+            #if !defined( SIXTRL_APERTURE_CHECK_AT_DRIFT ) || \
+                ( SIXTRL_APERTURE_CHECK_AT_DRIFT == \
+                  SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS ) || \
+                ( SIXTRL_APERTURE_CHECK_AT_DRIFT == \
+                  SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL )
 
             double const x = ::NS(Particles_get_x_value)( particles, idx );
             double const y = ::NS(Particles_get_y_value)( particles, idx );

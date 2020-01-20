@@ -62,8 +62,13 @@ namespace SIXTRL_CXX_NAMESPACE
         m_assign_elem_by_elem_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
-        m_use_optimized_tracking( false ), m_enable_beam_beam( true )
+        m_use_optimized_tracking( false )
     {
+        _this_t::status_t const status =
+            this->doInitDefaultFeatureFlagsPrivImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+
         this->doInitDefaultProgramsPrivImpl();
     }
 
@@ -84,7 +89,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_assign_elem_by_elem_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
-        m_use_optimized_tracking( false ), m_enable_beam_beam( true )
+        m_use_optimized_tracking( false )
     {
         if( config_str != nullptr )
         {
@@ -97,6 +102,11 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             this->m_use_optimized_tracking = true;
         }
+
+        _this_t::status_t const status =
+            this->doInitDefaultFeatureFlagsPrivImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
 
         this->doInitDefaultProgramsPrivImpl();
 
@@ -136,8 +146,13 @@ namespace SIXTRL_CXX_NAMESPACE
         m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_addr_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
-        m_use_optimized_tracking( false ), m_enable_beam_beam( true )
+        m_use_optimized_tracking( false )
     {
+        _this_t::status_t const status =
+            this->doInitDefaultFeatureFlagsPrivImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+
         this->doInitDefaultProgramsPrivImpl();
 
         _size_t  const node_index = this->findAvailableNodesIndex(
@@ -186,7 +201,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_addr_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
-        m_use_optimized_tracking( false ), m_enable_beam_beam( true )
+        m_use_optimized_tracking( false )
     {
         _size_t  node_index = this->findAvailableNodesIndex( node_id_str );
 
@@ -195,6 +210,11 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             this->m_use_optimized_tracking = true;
         }
+
+        _this_t::status_t const status =
+            this->doInitDefaultFeatureFlagsPrivImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
 
         this->doInitDefaultProgramsPrivImpl();
 
@@ -250,7 +270,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_addr_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
-        m_use_optimized_tracking( false ), m_enable_beam_beam( true )
+        m_use_optimized_tracking( false )
     {
         _size_t const node_index =
             this->findAvailableNodesIndex( platform_idx, device_idx );
@@ -260,6 +280,11 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             this->m_use_optimized_tracking = true;
         }
+
+        _this_t::status_t const status =
+            this->doInitDefaultFeatureFlagsPrivImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
 
         this->doInitDefaultProgramsPrivImpl();
 
@@ -1527,34 +1552,57 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    bool ClContext::is_beam_beam_tracking_enabled() const SIXTRL_NOEXCEPT
+    /* --------------------------------------------------------------------- */
+
+    bool ClContext::is_beam_beam_tracking_enabled() const
     {
-        return this->m_enable_beam_beam;
+        return (
+            ( ( !this->has_feature_flag( "SIXTRL_TRACK_BEAMBEAM4D" ) ) ||
+              (  this->feature_flag_str( "SIXTRL_TRACK_BEAMBEAM4D" ).compare(
+                  SIXTRL_TRACK_MAP_ENABLED_STR ) == 0 ) ) &&
+            ( ( !this->has_feature_flag( "SIXTRL_TRACK_BEAMBEAM6D" ) ) ||
+              (  this->feature_flag_str( "SIXTRL_TRACK_BEAMBEAM6D" ).compare(
+                  SIXTRL_TRACK_MAP_ENABLED_STR ) == 0 ) ) );
     }
 
     void ClContext::enable_beam_beam_tracking()
     {
-        if( ( !this->is_beam_beam_tracking_enabled() ) &&
-            ( !this->hasSelectedNode() ) )
+        if( !this->hasSelectedNode() )
         {
-            this->clear();
+            this->set_feature_flag(
+                "SIXTRL_TRACK_BEAMBEAM4D", SIXTRL_TRACK_MAP_ENABLED_STR );
+            this->set_feature_flag(
+                "SIXTRL_TRACK_BEAMBEAM6D", SIXTRL_TRACK_MAP_ENABLED_STR );
 
-            this->m_enable_beam_beam = true;
-            this->doInitDefaultPrograms();
-            this->doInitDefaultKernels();
+            this->reinit_default_programs();
+        }
+    }
+
+    void ClContext::skip_beam_beam_tracking()
+    {
+        if( !this->hasSelectedNode() )
+        {
+            this->set_feature_flag(
+                "SIXTRL_TRACK_BEAMBEAM4D", SIXTRL_TRACK_MAP_SKIP_STR );
+
+            this->set_feature_flag(
+                "SIXTRL_TRACK_BEAMBEAM6D", SIXTRL_TRACK_MAP_SKIP_STR );
+
+            this->reinit_default_programs();
         }
     }
 
     void ClContext::disable_beam_beam_tracking()
     {
-        if( (  this->is_beam_beam_tracking_enabled() ) &&
-            ( !this->hasSelectedNode() ) )
+        if( !this->hasSelectedNode() )
         {
-            this->clear();
+            this->set_feature_flag(
+                "SIXTRL_TRACK_BEAMBEAM4D", SIXTRL_TRACK_MAP_DISABLED_STR );
 
-            this->m_enable_beam_beam = false;
-            this->doInitDefaultPrograms();
-            this->doInitDefaultKernels();
+            this->set_feature_flag(
+                "SIXTRL_TRACK_BEAMBEAM6D", SIXTRL_TRACK_MAP_DISABLED_STR );
+
+            this->reinit_default_programs();
         }
     }
 
@@ -1570,6 +1618,68 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return _base_t::doSelectNode( node_index );
+    }
+
+    _status_t ClContext::doInitDefaultFeatureFlags()
+    {
+        _status_t status = _base_t::doInitDefaultFeatureFlags();
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doInitDefaultFeatureFlagsPrivImpl();
+        }
+
+        return status;
+    }
+
+    _status_t ClContext::doInitDefaultFeatureFlagsPrivImpl()
+    {
+        #if defined( SIXTRL_TRACK_BEAMBEAM4D )
+        this->set_feature_flag( "SIXTRL_TRACK_BEAMBEAM4D",
+            SIXTRL_TRACK_BEAMBEAM4D_STR );
+        #endif /* SIXTRL_TRACK_BEAMBEAM4D */
+
+        #if defined( SIXTRL_TRACK_BEAMBEAM6D )
+        this->set_feature_flag( "SIXTRL_TRACK_BEAMBEAM6D",
+            SIXTRL_TRACK_BEAMBEAM6D_STR );
+        #endif /* SIXTRL_TRACK_BEAMBEAM6D */
+
+        #if defined( SIXTRL_TRACK_SC_COASTING )
+        this->set_feature_flag( "SIXTRL_TRACK_SC_COASTING",
+            SIXTRL_TRACK_SC_COASTING_STR );
+        #endif /* SIXTRL_TRACK_SC_COASTING */
+
+        #if defined( SIXTRL_TRACK_SC_BUNCHED )
+        this->set_feature_flag( "SIXTRL_TRACK_SC_BUNCHED",
+            SIXTRL_TRACK_SC_BUNCHED_STR );
+        #endif /* SIXTRL_TRACK_SC_BUNCHED */
+
+        #if defined( SIXTRL_TRACK_TRICUB )
+        this->set_feature_flag( "SIXTRL_TRACK_TRICUB",
+            SIXTRL_TRACK_TRICUB_STR );
+        #endif /* SIXTRL_TRACK_TRICUB */
+
+        #if defined( SIXTRL_APERTURE_CHECK_AT_DRIFT )
+        this->set_feature_flag( "SIXTRL_APERTURE_CHECK_AT_DRIFT",
+            SIXTRL_APERTURE_CHECK_AT_DRIFT_STR );
+        #endif /* defined( SIXTRL_APERTURE_CHECK_AT_DRIFT ) */
+
+        #if defined( SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH )
+        this->set_feature_flag( "SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH",
+            SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH_STR );
+        #endif /* SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH */
+
+        #if defined( SIXTRL_APERTURE_X_LIMIT )
+        this->set_feature_flag( "SIXTRL_APERTURE_X_LIMIT",
+            SIXTRL_APERTURE_X_LIMIT_STR );
+        #endif /* SIXTRL_APERTURE_X_LIMIT */
+
+        #if defined( SIXTRL_APERTURE_Y_LIMIT )
+        this->set_feature_flag( "SIXTRL_APERTURE_Y_LIMIT",
+            SIXTRL_APERTURE_Y_LIMIT_STR );
+        #endif /* SIXTRL_APERTURE_Y_LIMIT */
+
+        return st::ARCH_STATUS_SUCCESS;
     }
 
     bool ClContext::doInitDefaultPrograms()
@@ -1849,59 +1959,65 @@ namespace SIXTRL_CXX_NAMESPACE
             path_to_assign_addr_prog += "assign_address_item.cl";
         }
 
-        std::string track_compile_options = "-D_GPUCODE=1";
-        track_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
-        track_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
-        track_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__global";
-        track_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global";
+        std::ostringstream compile_options;
 
-        #if defined( SIXTRL_ENABLE_BE_TRICUB_MAP ) && \
-            defined( SIXTRL_TRACK_MAP_ENABLED ) && \
-            SIXTRL_ENABLE_BE_TRICUB_MAP >= SIXTRL_TRACK_MAP_ENABLED
-
-        std::ostringstream a2str;
-        a2str << " -DSIXTRL_TRACK_MAP_ENABLED=" << SIXTRL_ENABLE_BE_TRICUB_MAP;
-        track_compile_options += a2str.str();
-
-        #endif /* defined( SIXTRL_ENABLE_BE_TRICUB_MAP ) */
-
-        if( !this->is_beam_beam_tracking_enabled() )
+        if( ( this->defaultCompileOptions() != nullptr ) &&
+            ( std::strlen( this->defaultCompileOptions() ) > 0u ) )
         {
-            track_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
+            compile_options << this->defaultCompileOptions() << " ";
         }
 
-        track_compile_options += " -I";
-        track_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
+        compile_options << this->feature_flag_repr( "_GPUCODE" ) << " "
+            << this->feature_flag_repr( "SIXTRL_BUFFER_ARGPTR_DEC" ) << " "
+            << this->feature_flag_repr( "SIXTRL_BUFFER_DATAPTR_DEC" ) << " "
+            << "-I" << NS(PATH_TO_SIXTRL_INCLUDE_DIR);
 
-        std::string track_optimized_compile_options = "-D_GPUCODE=1";
-        track_optimized_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
-        track_optimized_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
-        track_optimized_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private";
-        track_optimized_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__private";
+        std::string const common_compile_options( compile_options.str() );
 
-        #if defined( SIXTRL_ENABLE_BE_TRICUB_MAP ) && \
-            defined( SIXTRL_TRACK_MAP_ENABLED ) && \
-            SIXTRL_ENABLE_BE_TRICUB_MAP >= SIXTRL_TRACK_MAP_ENABLED
-
-        track_optimized_compile_options += a2str.str();
-
-        #endif /* defined( SIXTRL_ENABLE_BE_TRICUB_MAP ) */
-
-        if( !this->is_beam_beam_tracking_enabled() )
+        compile_options.str( "" );
+        std::vector< std::string > const OPTIONAL_FEATURES =
         {
-            track_optimized_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
+            "SIXTRL_TRACK_BEAMBEAM4D", "SIXTRL_TRACK_BEAMBEAM6D",
+            "SIXTRL_TRACK_SC_COASTING", "SIXTRL_TRACK_SC_BUNCHED",
+            "SIXTRL_TRACK_TRICUB", "SIXTRL_APERTURE_CHECK_AT_DRIFT",
+            "SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH",
+            "SIXTRL_APERTURE_X_LIMIT", "SIXTRL_APERTURE_Y_LIMIT"
+        };
+
+        for( auto const& feature_key : OPTIONAL_FEATURES )
+        {
+            if( this->has_feature_flag( feature_key ) )
+            {
+                compile_options
+                    << this->feature_flag_repr( feature_key ) << " ";
+            }
         }
 
-        track_optimized_compile_options += " -I";
-        track_optimized_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
+        std::string const feature_compile_options( compile_options.str() );
+        compile_options.str( "" );
 
-        std::string assign_out_buffer_compile_options = " -D_GPUCODE=1";
-        assign_out_buffer_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
-        assign_out_buffer_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
-        assign_out_buffer_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__global";
-        assign_out_buffer_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global";
-        assign_out_buffer_compile_options += " -I";
-        assign_out_buffer_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
+        compile_options << common_compile_options << " "
+                        << feature_compile_options << " "
+                        << "-DSIXTRL_PARTICLE_ARGPTR_DEC=__private "
+                        << "-DSIXTRL_PARTICLE_DATAPTR_DEC=__private ";
+
+        std::string const track_optimized_compile_options( compile_options.str() );
+
+        compile_options.str( "" );
+        compile_options << common_compile_options  << " "
+                        << feature_compile_options << " "
+                        << "-DSIXTRL_PARTICLE_ARGPTR_DEC=__global "
+                        << "-DSIXTRL_PARTICLE_DATAPTR_DEC=__global ";
+
+        std::string const track_compile_options( compile_options.str() );
+
+        compile_options.str( "" );
+        compile_options << common_compile_options << " "
+            << "-DSIXTRL_PARTICLE_ARGPTR_DEC=__global "
+            << "-DSIXTRL_PARTICLE_DATAPTR_DEC=__global ";
+
+        std::string const assign_out_buffer_compile_options(
+            compile_options.str() );
 
         program_id_t const track_program_id = this->addProgramFile(
             path_to_particles_track_prog, track_compile_options );
@@ -2586,6 +2702,12 @@ void NS(ClContext_disable_beam_beam_tracking)(
     ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     if( ctx != nullptr ) ctx->disable_beam_beam_tracking();
+}
+
+void NS(ClContext_skip_beam_beam_tracking)(
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx )
+{
+    if( ctx != nullptr ) ctx->skip_beam_beam_tracking();
 }
 
 #endif /* !defined( __CUDACC__ ) */

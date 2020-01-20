@@ -15,6 +15,7 @@
 #include <locale>
 #include <regex>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -42,6 +43,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     ClContextBase::ClContextBase(
         const char *const SIXTRL_RESTRICT config_str ) :
+        m_feature_flags(),
         m_cl_programs(),
         m_cl_kernels(),
         m_cl_buffers(),
@@ -50,7 +52,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_available_devices(),
         m_program_data(),
         m_kernel_data(),
-        m_default_compile_options(),
+        m_default_compile_options( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS ),
         m_config_str(),
         m_cl_context(),
         m_cl_queue(),
@@ -67,9 +69,11 @@ namespace SIXTRL_CXX_NAMESPACE
             this->doParseConfigStringBaseImpl( this->configStr() );
         }
 
-        _this_t::status_t const status = _this_t::GetAvailableNodes(
-            this->m_available_nodes_id, &this->m_available_nodes_info,
-            &this->m_available_devices );
+        _this_t::status_t status = this->doInitDefaultFeatureFlagsBaseImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+
+        status = _this_t::GetAvailableNodes( this->m_available_nodes_id,
+            &this->m_available_nodes_info, &this->m_available_devices );
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
@@ -80,6 +84,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContextBase::ClContextBase(
         _this_t::size_type const node_index,
         const char *const SIXTRL_RESTRICT config_str ) :
+        m_feature_flags(),
         m_cl_programs(),
         m_cl_kernels(),
         m_cl_buffers(),
@@ -88,7 +93,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_available_devices(),
         m_program_data(),
         m_kernel_data(),
-        m_default_compile_options(),
+        m_default_compile_options( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS ),
         m_config_str(),
         m_cl_context(),
         m_cl_queue(),
@@ -106,9 +111,11 @@ namespace SIXTRL_CXX_NAMESPACE
             this->doParseConfigStringBaseImpl( this->configStr() );
         }
 
-        _this_t::status_t const status = _this_t::GetAvailableNodes(
-            this->m_available_nodes_id, &this->m_available_nodes_info,
-            &this->m_available_devices );
+        _this_t::status_t status = this->doInitDefaultFeatureFlagsBaseImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+
+        status = _this_t::GetAvailableNodes( this->m_available_nodes_id,
+            &this->m_available_nodes_info, &this->m_available_devices );
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
@@ -128,6 +135,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContextBase::ClContextBase(
         _this_t::node_id_t const node_id,
         const char *const SIXTRL_RESTRICT config_str ) :
+        m_feature_flags(),
         m_cl_programs(),
         m_cl_kernels(),
         m_cl_buffers(),
@@ -136,7 +144,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_available_devices(),
         m_program_data(),
         m_kernel_data(),
-        m_default_compile_options(),
+        m_default_compile_options( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS ),
         m_config_str(),
         m_cl_context(),
         m_cl_queue(),
@@ -154,9 +162,11 @@ namespace SIXTRL_CXX_NAMESPACE
             this->doParseConfigStringBaseImpl( this->configStr() );
         }
 
-        _this_t::status_t const status = _this_t::GetAvailableNodes(
-            this->m_available_nodes_id, &this->m_available_nodes_info,
-            &this->m_available_devices );
+        _this_t::status_t status = this->doInitDefaultFeatureFlagsBaseImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+
+        status = _this_t::GetAvailableNodes( this->m_available_nodes_id,
+            &this->m_available_nodes_info, &this->m_available_devices );
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
@@ -180,6 +190,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContextBase::ClContextBase(
         char const* node_id_str,
         const char *const SIXTRL_RESTRICT config_str ) :
+        m_feature_flags(),
         m_cl_programs(),
         m_cl_kernels(),
         m_cl_buffers(),
@@ -188,7 +199,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_available_devices(),
         m_program_data(),
         m_kernel_data(),
-        m_default_compile_options(),
+        m_default_compile_options( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS ),
         m_config_str(),
         m_cl_context(),
         m_cl_queue(),
@@ -206,9 +217,11 @@ namespace SIXTRL_CXX_NAMESPACE
             this->doParseConfigStringBaseImpl( this->configStr() );
         }
 
-        _this_t::status_t const status = _this_t::GetAvailableNodes(
-            this->m_available_nodes_id, &this->m_available_nodes_info,
-            &this->m_available_devices );
+        _this_t::status_t status = this->doInitDefaultFeatureFlagsBaseImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+
+        status = _this_t::GetAvailableNodes( this->m_available_nodes_id,
+            &this->m_available_nodes_info, &this->m_available_devices );
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
@@ -232,6 +245,7 @@ namespace SIXTRL_CXX_NAMESPACE
         _this_t::platform_id_t const platform_idx,
         _this_t::device_id_t const device_idx,
         const char *const SIXTRL_RESTRICT config_str ) :
+        m_feature_flags(),
         m_cl_programs(),
         m_cl_kernels(),
         m_cl_buffers(),
@@ -240,7 +254,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_available_devices(),
         m_program_data(),
         m_kernel_data(),
-        m_default_compile_options(),
+        m_default_compile_options( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS ),
         m_config_str(),
         m_cl_context(),
         m_cl_queue(),
@@ -258,9 +272,11 @@ namespace SIXTRL_CXX_NAMESPACE
             this->doParseConfigStringBaseImpl( this->configStr() );
         }
 
-        _this_t::status_t const status = _this_t::GetAvailableNodes(
-            this->m_available_nodes_id, &this->m_available_nodes_info,
-            &this->m_available_devices );
+        _this_t::status_t status = this->doInitDefaultFeatureFlagsBaseImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+
+        status = _this_t::GetAvailableNodes( this->m_available_nodes_id,
+            &this->m_available_nodes_info, &this->m_available_devices );
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
@@ -904,6 +920,22 @@ namespace SIXTRL_CXX_NAMESPACE
     char const* ClContextBase::configStr() const SIXTRL_NOEXCEPT
     {
         return this->m_config_str.c_str();
+    }
+
+    _this_t::status_t ClContextBase::reinit_default_programs()
+    {
+        _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        if( !this->hasSelectedNode() )
+        {
+            this->clear();
+            this->doInitDefaultPrograms();
+            this->doInitDefaultKernels();
+
+            status = st::ARCH_STATUS_SUCCESS;
+        }
+
+        return status;
     }
 
     void ClContextBase::clear()
@@ -1919,6 +1951,225 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
+    _this_t::size_type ClContextBase::num_feature_flags() const SIXTRL_NOEXCEPT
+    {
+        return this->m_feature_flags.size();
+    }
+
+    _this_t::feature_flags_iter_t
+    ClContextBase::feature_flags_begin() const SIXTRL_NOEXCEPT
+    {
+        return this->m_feature_flags.begin();
+    }
+
+    _this_t::feature_flags_iter_t
+    ClContextBase::feature_flags_end() const SIXTRL_NOEXCEPT
+    {
+        return this->m_feature_flags.end();
+    }
+
+    bool ClContextBase::has_feature_flag(
+        std::string const& SIXTRL_RESTRICT_REF str ) const SIXTRL_NOEXCEPT
+    {
+        return ( ( !str.empty() ) &&
+                 ( this->m_feature_flags.find( str ) !=
+                   this->m_feature_flags.end() ) );
+    }
+
+    bool ClContextBase::has_feature_flag(
+        char const* SIXTRL_RESTRICT str ) const SIXTRL_NOEXCEPT
+    {
+        return ( ( str != nullptr ) && ( std::strlen( str ) > 0u ) &&
+                 ( this->m_feature_flags.find( str ) !=
+                   this->m_feature_flags.end() ) );
+    }
+
+    std::string const& ClContextBase::feature_flag_str(
+        std::string const& SIXTRL_RESTRICT_REF str ) const
+    {
+        auto it = this->m_feature_flags.end();
+
+        if( !str.empty() )
+        {
+            it = this->m_feature_flags.find( str );
+        }
+
+        if( it == this->m_feature_flags.end() )
+        {
+            std::string error_msg( "feature_flag \"" );
+            error_msg += str;
+            error_msg += "\" not found";
+
+            throw std::runtime_error( error_msg.c_str() );
+        }
+
+        return it->second;
+    }
+
+    std::string const& ClContextBase::feature_flag_str(
+        char const* SIXTRL_RESTRICT str ) const
+    {
+        auto it = this->m_feature_flags.end();
+        bool valid_str = false;
+
+        if( ( str != nullptr ) && ( std::strlen( str ) > 0 ) )
+        {
+            valid_str = true;
+            it = this->m_feature_flags.find( str );
+        }
+
+        if( it == this->m_feature_flags.end() )
+        {
+            std::string error_msg( "feature_flag " );
+
+            if( valid_str )
+            {
+                error_msg += "\"";
+                error_msg += str;
+                error_msg += "\" not found";
+            }
+            else
+            {
+                error_msg += " not found, input str empty / illegal";
+            }
+
+            throw std::runtime_error( error_msg.c_str() );
+        }
+
+        return it->second;
+    }
+
+    char const* ClContextBase::feature_flag(
+        std::string const& SIXTRL_RESTRICT_REF str ) const SIXTRL_NOEXCEPT
+    {
+        char const* flag_value = nullptr;
+
+        if( !str.empty() )
+        {
+            auto it = this->m_feature_flags.find( str );
+
+            if( it != this->m_feature_flags.end() )
+            {
+                flag_value = it->second.c_str();
+            }
+        }
+
+        return flag_value;
+    }
+
+    char const* ClContextBase::feature_flag(
+        char const* SIXTRL_RESTRICT str ) const SIXTRL_NOEXCEPT
+    {
+        char const* flag_value = nullptr;
+
+        if( ( str != nullptr ) && ( std::strlen( str ) > 0u ) )
+        {
+            auto it = this->m_feature_flags.find( str );
+
+            if( it != this->m_feature_flags.end() )
+            {
+                flag_value = it->second.c_str();
+            }
+        }
+
+        return flag_value;
+    }
+
+    void ClContextBase::set_feature_flag(
+        std::string const& SIXTRL_RESTRICT_REF str,
+        std::string const& SIXTRL_RESTRICT_REF flag_value )
+    {
+        if( !str.empty() )
+        {
+            this->m_feature_flags.emplace( std::make_pair( str, flag_value ) );
+        }
+    }
+
+    void ClContextBase::set_feature_flag( char const* SIXTRL_RESTRICT str,
+        char const* SIXTRL_RESTRICT flag_value )
+    {
+        if( ( str != nullptr ) && ( std::strlen( str ) > 0u ) &&
+            ( flag_value != nullptr ) )
+        {
+            this->m_feature_flags.emplace( std::make_pair( str, flag_value ) );
+        }
+    }
+
+    std::string ClContextBase::feature_flag_repr(
+        std::string const& SIXTRL_RESTRICT_REF str,
+        std::string const& SIXTRL_RESTRICT_REF prefix,
+        std::string const& SIXTRL_RESTRICT_REF sep  ) const
+    {
+        std::ostringstream a2str;
+
+        if( this->has_feature_flag( str ) )
+        {
+            a2str << prefix << str << sep << this->feature_flag_str( str );
+        }
+
+        return a2str.str();
+    }
+
+    std::string ClContextBase::feature_flag_repr(
+        char const* SIXTRL_RESTRICT str,
+        char const* SIXTRL_RESTRICT prefix,
+        char const* SIXTRL_RESTRICT sep ) const
+    {
+        if( ( str != nullptr ) && ( std::strlen( str ) > 0u ) )
+        {
+            std::string const prefix_str = ( prefix != nullptr )
+                ? std::string{ prefix } : std::string{ "-D" };
+
+            std::string const sep_str = ( sep != nullptr )
+                ? std::string{ sep } : std::string{ "=" };
+
+            return this->feature_flag_repr(
+                std::string{ str }, prefix_str, sep_str );
+        }
+
+        return std::string{};
+    }
+
+    ClContextBase::size_type ClContextBase::feature_flag_repr_required_capacity(
+        char const* SIXTRL_RESTRICT str, char const* SIXTRL_RESTRICT prefix,
+        char const* SIXTRL_RESTRICT sep ) const
+    {
+        std::string const temp_str_repr(
+            this->feature_flag_repr( str, prefix, sep ) );
+
+        return ( !temp_str_repr.empty() ) ? ( temp_str_repr.size() + 1u ) : 0u;
+    }
+
+    ClContextBase::status_t ClContextBase::feature_flag_repr_as_cstr(
+        char* out_str, size_type out_str_capacity,
+        char const* SIXTRL_RESTRICT str,
+        char const* SIXTRL_RESTRICT prefix,
+        char const* SIXTRL_RESTRICT sep ) const
+    {
+        ClContextBase::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        if( ( out_str != nullptr ) && ( out_str_capacity > 0u ) )
+        {
+            std::string const temp_str_repr(
+                this->feature_flag_repr( str, prefix, sep ) );
+
+            std::memset( out_str, ( int )'\0', out_str_capacity );
+
+            if( ( !temp_str_repr.empty() ) &&
+                ( temp_str_repr.size() < out_str_capacity ) )
+            {
+                std::strncpy( out_str, temp_str_repr.c_str(),
+                              out_str_capacity - 1u );
+
+                status = st::ARCH_STATUS_SUCCESS;
+            }
+        }
+
+        return status;
+    }
+
+    /* --------------------------------------------------------------------- */
+
     ClContextBase::status_t ClContextBase::GetAllowedNodesFromEnvVariable(
         std::vector< ClContextBase::node_id_t >& allowed_node_ids,
         char const* SIXTRL_RESTRICT env_variable_name )
@@ -2487,6 +2738,27 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
+    _this_t::status_t ClContextBase::doInitDefaultFeatureFlags()
+    {
+        return this->doInitDefaultFeatureFlagsBaseImpl();
+    }
+
+    _this_t::status_t ClContextBase::doInitDefaultFeatureFlagsBaseImpl()
+    {
+        _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        this->set_feature_flag( "_GPUCODE", "1" );
+        this->set_feature_flag( "SIXTRL_BUFFER_ARGPTR_DEC", "__private" );
+        this->set_feature_flag( "SIXTRL_BUFFER_DATAPTR_DEC", "__global" );
+
+        if( this->num_feature_flags() >= _this_t::size_type{ 2 } )
+        {
+            status = st::ARCH_STATUS_SUCCESS;
+        }
+
+        return status;
+    }
+
     bool ClContextBase::doInitDefaultPrograms()
     {
         return this->doInitDefaultProgramsBaseImpl();
@@ -2508,17 +2780,22 @@ namespace SIXTRL_CXX_NAMESPACE
             path_to_remap_kernel_program += "managed_buffer_remap_debug.cl";
         }
 
-        std::string remap_program_compile_options = "-D_GPUCODE=1";
-        remap_program_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
-        remap_program_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
-        #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-        remap_program_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
-        #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
-        remap_program_compile_options += " -I";
-        remap_program_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
+        std::ostringstream remap_program_compile_options;
+
+        if( !this->m_default_compile_options.empty() )
+        {
+            remap_program_compile_options <<
+                this->defaultCompileOptions() << " ";
+        }
+
+        remap_program_compile_options
+            << this->feature_flag_repr( "_GPUCODE" ) << " "
+            << this->feature_flag_repr( "SIXTRL_BUFFER_ARGPTR_DEC" ) << " "
+            << this->feature_flag_repr( "SIXTRL_BUFFER_DATAPTR_DEC" ) << " "
+            << "-I " << NS(PATH_TO_SIXTRL_INCLUDE_DIR);
 
         program_id_t const remap_program_id = this->addProgramFile(
-            path_to_remap_kernel_program, remap_program_compile_options );
+            path_to_remap_kernel_program, remap_program_compile_options.str() );
 
         if( remap_program_id >= program_id_t{ 0 } )
         {
@@ -2989,6 +3266,13 @@ void NS(ClContextBase_clear)( ::NS(ClContextBase)* SIXTRL_RESTRICT ctx )
     if( ctx != nullptr ) ctx->clear();
 }
 
+::NS(arch_status_t) NS(ClContextBase_reinit_default_programs)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx )
+{
+    return ( ctx != nullptr )
+        ? ctx->reinit_default_programs() : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
 bool NS(ClContextBase_select_node)( ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     char const* SIXTRL_RESTRICT node_id_str )
 {
@@ -3071,6 +3355,20 @@ bool NS(ClContextBase_select_node_by_index)(
     return ::NS(ClContextBase_new_on_selected_node_id)( nullptr );
 }
 
+void NS(ClContextBase_set_default_compile_options)(
+    ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT default_compile_options )
+{
+    if( ctx != nullptr ) ctx->setDefaultCompileOptions(
+            default_compile_options );
+}
+
+char const* NS(ClContextBase_default_compile_options)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx ) SIXTRL_NOEXCEPT
+{
+    return ( ctx != nullptr ) ? ctx->defaultCompileOptions() : nullptr;
+}
+
 ::NS(arch_size_t) NS(ClContextBase_get_num_available_programs)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
 {
@@ -3095,6 +3393,26 @@ bool NS(ClContextBase_compile_program)(
     return ( ctx != nullptr ) ? ctx->compileProgram( program_id ) : false;
 }
 
+::NS(arch_size_t)
+NS(ClContextBase_get_required_program_source_code_capacity)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    ::NS(arch_program_id_t) const program_id )
+{
+    ::NS(arch_size_t) capacity = ::NS(arch_size_t){ 0 };
+
+    if( ctx != nullptr )
+    {
+        char const* ptr_code = ctx->programSourceCode( program_id );
+
+        if( ptr_code != nullptr )
+        {
+            capacity = ::NS(arch_size_t){ 1 } + std::strlen( ptr_code );
+        }
+    }
+
+    return capacity;
+}
+
 char const* NS(ClContextBase_get_program_source_code)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_program_id_t) const program_id )
@@ -3109,11 +3427,50 @@ bool NS(ClContextBase_has_program_file_path)(
     return ( ctx != nullptr ) ? ctx->programHasFilePath( program_id ) : false;
 }
 
+::NS(arch_size_t) NS(ClContextBase_get_required_program_path_capacity)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    ::NS(arch_program_id_t) const program_id )
+{
+    ::NS(arch_size_t) capacity = ::NS(arch_size_t){ 0 };
+
+    if( ctx != nullptr )
+    {
+        char const* ptr_path = ctx->programPathToFile( program_id );
+
+        if( ptr_path != nullptr )
+        {
+            capacity = ::NS(arch_size_t){ 1 } + std::strlen( ptr_path );
+        }
+    }
+
+    return capacity;
+}
+
 char const* NS(ClContextBase_get_program_path_to_file)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
     ::NS(arch_program_id_t) const program_id )
 {
     return ( ctx != nullptr ) ? ctx->programPathToFile( program_id ) : nullptr;
+}
+
+::NS(arch_size_t)
+NS(ClContextBase_get_required_program_compile_options_capacity)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    ::NS(arch_program_id_t) const program_id )
+{
+    ::NS(arch_size_t) capacity = ::NS(arch_size_t){ 0 };
+
+    if( ctx != nullptr )
+    {
+        char const* ptr_options = ctx->programCompileOptions( program_id );
+
+        if( ptr_options != nullptr )
+        {
+            capacity = ::NS(arch_size_t){ 1 } + std::strlen( ptr_options );
+        }
+    }
+
+    return capacity;
 }
 
 char const* NS(ClContextBase_get_program_compile_options)(
@@ -3122,6 +3479,25 @@ char const* NS(ClContextBase_get_program_compile_options)(
 {
     return ( ctx != nullptr )
         ? ctx->programCompileOptions( program_id ) : nullptr;
+}
+
+::NS(arch_size_t) NS(ClContextBase_get_required_program_compile_report_capacity)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    ::NS(arch_program_id_t) const program_id )
+{
+    ::NS(arch_size_t) capacity = ::NS(arch_size_t){ 0 };
+
+    if( ctx != nullptr )
+    {
+        char const* ptr_report = ctx->programCompileReport( program_id );
+
+        if( ptr_report != nullptr )
+        {
+            capacity = ::NS(arch_size_t){ 1 } + std::strlen( ptr_report );
+        }
+    }
+
+    return capacity;
 }
 
 char const* NS(ClContextBase_get_program_compile_report)(
@@ -3516,6 +3892,59 @@ void NS(ClContextBase_disable_debug_mode)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx )
 {
     if( ctx != nullptr ) ctx->disableDebugMode();
+}
+
+
+::NS(arch_size_t) NS(ClContextBase_num_feature_flags)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx )SIXTRL_NOEXCEPT
+{
+    return ( ctx != nullptr )
+        ? ctx->num_feature_flags() : ::NS(arch_size_t){ 0 };
+}
+
+bool NS(ClContextBase_has_feature_flag)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT str ) SIXTRL_NOEXCEPT
+{
+    return ( ( ctx != nullptr ) && ( ctx->has_feature_flag)( str ) );
+}
+
+char const* NS(ClContextBase_feature_flag)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT str ) SIXTRL_NOEXCEPT
+{
+    return ( ctx != nullptr ) ? ctx->feature_flag( str ) : SIXTRL_NULLPTR;
+}
+
+void NS(ClContextBase_set_feature_flag)(
+    ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT str, char const* flag_val )
+{
+    if( ctx != nullptr ) ctx->set_feature_flag( str, flag_val );
+}
+
+::NS(arch_size_t) NS(ClContextBase_feature_flag_repr_required_capacity)(
+    const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT str,
+    char const* SIXTRL_RESTRICT prefix,
+    char const* SIXTRL_RESTRICT sep )
+{
+    return ( ctx != nullptr )
+        ? ctx->feature_flag_repr_required_capacity( str, prefix, sep )
+        : ::NS(arch_size_t){ 0 };
+}
+
+::NS(arch_status_t)  NS(ClContextBase_feature_flag_repr_as_cstr)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx,
+    char* out_str, NS(arch_size_t) const out_str_capacity,
+    char const* SIXTRL_RESTRICT str,
+    char const* SIXTRL_RESTRICT prefix,
+    char const* SIXTRL_RESTRICT sep )
+{
+    return ( ctx != nullptr )
+        ? ctx->feature_flag_repr_as_cstr(
+            out_str, out_str_capacity, str, prefix, sep )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 #endif /* !defined( __CUDACC__ )  */

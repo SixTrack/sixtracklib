@@ -3914,6 +3914,17 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContextBase_new.argtypes = None
     st_ClContextBase_new.restype = st_ClContextBase_p
 
+    st_ClContextBase_set_default_compile_options = \
+        sixtracklib.st_ClContextBase_set_default_compile_options
+    st_ClContextBase_set_default_compile_options.argtypes = [
+        st_ClContextBase_p, ct.c_char_p ]
+    st_ClContextBase_set_default_compile_options.restype = None
+
+    st_ClContextBase_default_compile_options = \
+        sixtracklib.st_ClContextBase_default_compile_options
+    st_ClContextBase_default_compile_options.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_default_compile_options.restype = ct.c_char_p
+
     st_ClContextBase_new_on_selected_node_id_str = \
         sixtracklib.st_ClContextBase_new_on_selected_node_id_str
     st_ClContextBase_new_on_selected_node_id_str.argtypes = [ct.c_char_p]
@@ -3931,6 +3942,11 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContextBase_clear = sixtracklib.st_ClContextBase_clear
     st_ClContextBase_clear.argtypes = [st_ClContextBase_p]
     st_ClContextBase_clear.restyp = None
+
+    st_ClContextBase_reinit_default_programs = \
+        sixtracklib.st_ClContextBase_reinit_default_programs
+    st_ClContextBase_reinit_default_programs.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_reinit_default_programs.restype = st_arch_status_t
 
     # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
@@ -4085,6 +4101,12 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_compile_program.restype = ct.c_bool
 
+    st_ClContextBase_get_required_program_source_code_capacity = \
+        sixtracklib.st_ClContextBase_get_required_program_source_code_capacity
+    st_ClContextBase_get_required_program_source_code_capacity.argtypes = [
+        st_ClContextBase_p, st_arch_program_id_t]
+    st_ClContextBase_get_required_program_source_code_capacity.restype = st_arch_size_t
+
     st_ClContextBase_get_program_source_code = \
         sixtracklib.st_ClContextBase_get_program_source_code
     st_ClContextBase_get_program_source_code.argtypes = [
@@ -4097,17 +4119,35 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_has_program_file_path.restype = ct.c_bool
 
+    st_ClContextBase_get_required_program_path_capacity = \
+        sixtracklib.st_ClContextBase_get_required_program_path_capacity
+    st_ClContextBase_get_required_program_path_capacity.argtypes = [
+        st_ClContextBase_p, st_arch_program_id_t ]
+    st_ClContextBase_get_required_program_path_capacity.restype = st_arch_size_t
+
     st_ClContextBase_get_program_path_to_file = \
         sixtracklib.st_ClContextBase_get_program_path_to_file
     st_ClContextBase_get_program_path_to_file.argtypes = [
         st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_get_program_path_to_file.restype = ct.c_char_p
 
+    st_ClContextBase_get_required_program_compile_options_capacity = \
+        sixtracklib.st_ClContextBase_get_required_program_compile_options_capacity
+    st_ClContextBase_get_required_program_compile_options_capacity.argtypes = [
+        st_ClContextBase_p, st_arch_program_id_t ]
+    st_ClContextBase_get_required_program_compile_options_capacity.restype = st_arch_size_t
+
     st_ClContextBase_get_program_compile_options = \
         sixtracklib.st_ClContextBase_get_program_compile_options
     st_ClContextBase_get_program_compile_options.argtypes = [
         st_ClContextBase_p, st_arch_program_id_t]
     st_ClContextBase_get_program_compile_options.restype = ct.c_char_p
+
+    st_ClContextBase_get_required_program_compile_report_capacity = \
+        sixtracklib.st_ClContextBase_get_required_program_compile_report_capacity
+    st_ClContextBase_get_required_program_compile_report_capacity.argtypes = [
+        st_ClContextBase_p, st_arch_program_id_t ]
+    st_ClContextBase_get_required_program_compile_report_capacity.restype = st_arch_size_t
 
     st_ClContextBase_get_program_compile_report = \
         sixtracklib.st_ClContextBase_get_program_compile_report
@@ -4340,6 +4380,41 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         sixtracklib.st_ClContextBase_disable_debug_mode
     st_ClContextBase_disable_debug_mode.argtypes = [st_ClContextBase_p]
     st_ClContextBase_disable_debug_mode.restype = None
+
+    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+    st_ClContextBase_num_feature_flags = \
+        sixtracklib.st_ClContextBase_num_feature_flags
+    st_ClContextBase_num_feature_flags.argtypes = [ st_ClContextBase_p ]
+    st_ClContextBase_num_feature_flags.restype = st_arch_size_t
+
+    st_ClContextBase_has_feature_flag = \
+        sixtracklib.st_ClContextBase_has_feature_flag
+    st_ClContextBase_has_feature_flag.argtypes = [ st_ClContextBase_p, ct.c_char_p ]
+    st_ClContextBase_has_feature_flag.restype = ct.c_bool
+
+    st_ClContextBase_feature_flag = \
+        sixtracklib.st_ClContextBase_feature_flag
+    st_ClContextBase_feature_flag.argtypes = [ st_ClContextBase_p, ct.c_char_p ]
+    st_ClContextBase_feature_flag.restype = ct.c_char_p
+
+    st_ClContextBase_set_feature_flag = \
+        sixtracklib.st_ClContextBase_set_feature_flag
+    st_ClContextBase_set_feature_flag.argtypes = [
+        st_ClContextBase_p, ct.c_char_p, ct.c_char_p ]
+    st_ClContextBase_set_feature_flag.restype = None
+
+    st_ClContextBase_feature_flag_repr_required_capacity = \
+        sixtracklib.st_ClContextBase_feature_flag_repr_required_capacity
+    st_ClContextBase_feature_flag_repr_required_capacity.argtypes = [
+        st_ClContextBase_p, ct.c_char_p, ct.c_char_p, ct.c_char_p ]
+    st_ClContextBase_feature_flag_repr_required_capacity.restype = st_arch_size_t
+
+    st_ClContextBase_feature_flag_repr_as_cstr = \
+        sixtracklib.st_ClContextBase_feature_flag_repr_as_cstr
+    st_ClContextBase_feature_flag_repr_as_cstr.argtypes = [
+        st_ClContextBase_p, ct.c_char_p, st_arch_size_t,
+        ct.c_char_p, ct.c_char_p, ct.c_char_p ]
+    st_ClContextBase_feature_flag_repr_as_cstr.restype = st_arch_status_t
 
     # --------------------------------------------------------------------------
     st_context_num_turns_t = ct.c_int64
