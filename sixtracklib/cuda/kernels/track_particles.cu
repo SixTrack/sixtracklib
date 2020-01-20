@@ -63,8 +63,8 @@ __global__ void NS(Track_track_elem_by_elem_until_turn_cuda)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const part_set_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buffer,
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig) *const
-        SIXTRL_RESTRICT elem_by_elem_config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer_begin,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(buffer_size_t) const until_turn, NS(buffer_size_t) const slot_size )
 {
     typedef NS(particle_num_elements_t) nelements_t;
@@ -74,15 +74,16 @@ __global__ void NS(Track_track_elem_by_elem_until_turn_cuda)(
 
     NS(Track_particles_elem_by_elem_until_turn_kernel_impl)( pbuffer,
         part_set_index, part_idx, part_idx_stride, belem_buffer,
-            elem_by_elem_config, until_turn, slot_size );
+            config_buffer_begin, elem_by_elem_config_index,
+                until_turn, slot_size );
 }
 
 __global__ void NS(Track_track_elem_by_elem_until_turn_cuda_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const part_set_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belem_buffer,
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig) *const
-        SIXTRL_RESTRICT elem_by_elem_config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer_begin,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(buffer_size_t) const until_turn, NS(buffer_size_t) const slot_size,
     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flags )
 {
@@ -95,7 +96,8 @@ __global__ void NS(Track_track_elem_by_elem_until_turn_cuda_debug)(
 
     NS(Track_particles_elem_by_elem_until_turn_debug_kernel_impl)( pbuffer,
         part_set_index, part_idx, part_idx_stride, belem_buffer,
-            elem_by_elem_config, until_turn, slot_size, &status_flags );
+            config_buffer_begin, elem_by_elem_config_index, until_turn,
+                slot_size, &status_flags );
 
     NS(Cuda_collect_status_flag_value)( ptr_status_flags, status_flags );
 }

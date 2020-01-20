@@ -49,6 +49,8 @@ TEST( C99_CudaWrappersElemByElemAssignOutputTests,
     c_buffer_t* beam_elements_buffer = ::NS(Buffer_new_from_file)(
         ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
 
+    c_buffer_t* elem_by_elem_config_buffer = ::NS(Buffer_new)( size_t{ 0 } );
+
     SIXTRL_ASSERT( beam_elements_buffer != nullptr );
     SIXTRL_ASSERT( ::NS(Buffer_get_num_of_objects)( beam_elements_buffer ) >
         size_t{ 0 } );
@@ -67,6 +69,10 @@ TEST( C99_CudaWrappersElemByElemAssignOutputTests,
     ::NS(Particles_set_all_at_turn_value)( particles, min_at_turn_id );
 
     size_t const UNTIL_TURN_ELEM_BY_ELEM = size_t{ 5 };
+
+    elem_by_elem_config_t* elem_by_elem_conf =
+        ::NS(ElemByElemConfig_new)( elem_by_elem_config_buffer );
+    SIXTRL_ASSERT( elem_by_elem_conf != nullptr );
 
     /* -------------------------------------------------------------------- */
     /* Init the Cuda controller and arguments for the addresses
@@ -128,11 +134,11 @@ TEST( C99_CudaWrappersElemByElemAssignOutputTests,
 
             /* ************************************************************* */
 
-            elem_by_elem_config_t elem_by_elem_conf;
-            ::NS(ElemByElemConfig_preset)( &elem_by_elem_conf );
+            ::NS(ElemByElemConfig_preset)( elem_by_elem_conf );
 
-            cuda_arg_t* elem_by_elem_conf_arg = ::NS(CudaArgument_new)( ctrl );
-            SIXTRL_ASSERT( elem_by_elem_conf_arg != nullptr );
+            cuda_arg_t* elem_by_elem_conf_buffer_arg =
+                ::NS(CudaArgument_new)( ctrl );
+            SIXTRL_ASSERT( elem_by_elem_conf_buffer_arg != nullptr );
 
             cuda_arg_t* output_arg = ::NS(CudaArgument_new)( ctrl );
             SIXTRL_ASSERT( output_arg != nullptr );
@@ -148,29 +154,31 @@ TEST( C99_CudaWrappersElemByElemAssignOutputTests,
 
             status = ::NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
                 particles_buffer, num_particle_sets, &pset_indices_begin[ 0 ],
-                beam_elements_buffer, elem_by_elem_conf_arg, &elem_by_elem_conf,
+                beam_elements_buffer, elem_by_elem_conf_buffer_arg,
+                elem_by_elem_config_buffer, size_t{ 0 },
                 output_arg, output_buffer, &output_buffer_index_offset,
                 UNTIL_TURN_ELEM_BY_ELEM, result_arg );
 
             SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
 
             ::NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
-                ptr_kernel_config, elem_by_elem_conf_arg, output_arg,
-                    output_buffer_index_offset, result_arg );
+                ptr_kernel_config, elem_by_elem_conf_buffer_arg, size_t{ 0 },
+                    output_arg, output_buffer_index_offset, result_arg );
 
             status = ::NS(TestElemByElemConfigCtrlArg_evaluate_assign_output_buffer)(
-                elem_by_elem_conf_arg, &elem_by_elem_conf, output_arg,
-                output_buffer, output_buffer_index_offset, result_arg );
+                elem_by_elem_conf_buffer_arg, elem_by_elem_config_buffer,
+                    size_t{ 0 }, output_arg, output_buffer,
+                        output_buffer_index_offset, result_arg );
 
             ASSERT_TRUE( status == NS(ARCH_STATUS_SUCCESS) );
 
             /* ************************************************************* */
 
-            ::NS(Argument_delete)( elem_by_elem_conf_arg );
+            ::NS(Argument_delete)( elem_by_elem_conf_buffer_arg );
             ::NS(Argument_delete)( output_arg );
             ::NS(Argument_delete)( result_arg );
 
-            elem_by_elem_conf_arg = nullptr;
+            elem_by_elem_conf_buffer_arg = nullptr;
             result_arg = nullptr;
             output_arg = nullptr;
 
@@ -188,6 +196,7 @@ TEST( C99_CudaWrappersElemByElemAssignOutputTests,
     ::NS(Buffer_delete)( particles_buffer );
     ::NS(Buffer_delete)( output_buffer );
     ::NS(Buffer_delete)( beam_elements_buffer );
+    ::NS(Buffer_delete)( elem_by_elem_config_buffer );
 
     ::NS(Controller_delete)( ctrl );
 }

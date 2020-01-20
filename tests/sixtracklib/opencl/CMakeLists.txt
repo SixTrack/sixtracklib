@@ -160,6 +160,66 @@ if( GTEST_FOUND )
         DEPENDS CXX_OpenCL_TrackJobClTests )
 
     # ==========================================================================
+    # test_track_job_cl_stored_buffer_opencl_c99:
+
+    add_executable( test_track_job_cl_stored_buffer_opencl_c99
+                    test_track_job_cl_stored_buffer_c99.cpp )
+
+    set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS}
+         test_track_job_cl_stored_buffer_opencl_c99 )
+
+    add_test( C99_OpenCL_TrackJobCl_StoredBufferTests
+              test_track_job_cl_stored_buffer_opencl_c99 )
+
+    set_property( TEST C99_OpenCL_TrackJobCl_StoredBufferTests APPEND PROPERTY
+        DEPENDS C99_OpenCL_TrackJobClTests )
+
+    # --------------------------------------------------------------------------
+    # test_track_job_cl_stored_buffer_opencl_cxx:
+
+    add_executable( test_track_job_cl_stored_buffer_opencl_cxx
+                    test_track_job_cl_stored_buffer_cxx.cpp )
+
+    set( CXX_UNIT_TEST_TARGETS ${CXX_UNIT_TEST_TARGETS}
+         test_track_job_cl_stored_buffer_opencl_cxx )
+
+    add_test( CXX_OpenCL_TrackJobCl_StoredBufferTests
+              test_track_job_cl_stored_buffer_opencl_cxx )
+
+    set_property( TEST CXX_OpenCL_TrackJobCl_StoredBufferTests APPEND PROPERTY
+        DEPENDS CXX_OpenCL_TrackJobClTests )
+
+    # ==========================================================================
+    # test_track_job_cl_assign_address_items_opencl_c99:
+
+    add_executable( test_track_job_cl_assign_address_items_opencl_c99
+                    test_track_job_cl_assign_address_items_c99.cpp )
+
+    set( C99_UNIT_TEST_TARGETS ${C99_UNIT_TEST_TARGETS}
+         test_track_job_cl_assign_address_items_opencl_c99 )
+
+    add_test( C99_OpenCL_TrackJobCl_AssignAddressItemsTests
+              test_track_job_cl_assign_address_items_opencl_c99 )
+
+    set_property( TEST C99_OpenCL_TrackJobCl_AssignAddressItemsTests
+        APPEND PROPERTY DEPENDS C99_OpenCL_TrackJobClTests )
+
+    # --------------------------------------------------------------------------
+    # test_track_job_cl_assign_address_items_opencl_cxx:
+
+    add_executable( test_track_job_cl_assign_address_items_opencl_cxx
+                    test_track_job_cl_assign_address_items_cxx.cpp )
+
+    set( CXX_UNIT_TEST_TARGETS ${CXX_UNIT_TEST_TARGETS}
+         test_track_job_cl_assign_address_items_opencl_cxx )
+
+    add_test( CXX_OpenCL_TrackJobCl_AssignAddressItemsTests
+              test_track_job_cl_assign_address_items_opencl_cxx )
+
+    set_property( TEST CXX_OpenCL_TrackJobCl_AssignAddressItemsTests
+        APPEND PROPERTY DEPENDS CXX_OpenCL_TrackJobClTests )
+
+    # ==========================================================================
     # test_track_job_update_region_opencl_c99:
 
     add_executable( test_track_job_update_region_opencl_c99

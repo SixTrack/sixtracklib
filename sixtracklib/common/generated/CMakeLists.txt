@@ -121,12 +121,6 @@ install( CODE "
 # create a header file common/generated/config.h with encoding top-level
 # configuration options from Settings.cmake:
 
-if( SIXTRACKL_ENABLE_APERTURE_CHECK )
-    set( SIXTRACKL_ENABLE_APERTURE_CHECK_FLAG "1" )
-else()
-    set( SIXTRACKL_ENABLE_APERTURE_CHECK_FLAG "0" )
-endif()
-
 set( CONFIG_H_IN_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/config.h.template" )
 set( CONFIG_H_OUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/config.h" )
 
@@ -135,34 +129,16 @@ configure_file( ${CONFIG_H_IN_PATH} ${CONFIG_H_OUT_PATH} @ONLY )
 set(  SIXTRACKL_COMMON_GENERATED_HEADERS
     ${SIXTRACKL_COMMON_GENERATED_HEADERS} "generated/config.h" )
 
-
-if( SIXTRACKL_ENABLE_PYTHON )
-    if( SIXTRACKL_ENABLE_APERTURE_CHECK )
-        set( PY_SIXTRL_ENABLE_APERTURE_CHECK "True" CACHE INTERNAL "" FORCE )
-    else()
-        set( PY_SIXTRL_ENABLE_APERTURE_CHECK "False" CACHE INTERNAL "" FORCE )
-    endif()
-
-    set( PY_SIXTRL_APERTURE_X_LIMIT "${SIXTRACKL_APERTURE_X_LIMIT_VALUE}"
-         CACHE INTERNAL "" FORCE )
-
-    set( PY_SIXTRL_APERTURE_Y_LIMIT "${SIXTRACKL_APERTURE_Y_LIMIT_VALUE}"
-         CACHE INTERNAL "" FORCE )
-endif()
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install:
 
 set( CONFIG_H_INSTALL_PATH
      "${CMAKE_INSTALL_PREFIX}/${GENERATED_INSTALL_PATH}/config.h" )
 
-install( CODE "
-         set( SIXTRACKL_ENABLE_APERTURE_CHECK_FLAG
-              \"${SIXTRACKL_ENABLE_APERTURE_CHECK_FLAG}\" )
-         set( SIXTRACKL_APERTURE_X_LIMIT_VALUE ${SIXTRACKL_APERTURE_X_LIMIT_VALUE} )
-         set( SIXTRACKL_APERTURE_Y_LIMIT_VALUE ${SIXTRACKL_APERTURE_Y_LIMIT_VALUE} )
-         message( STATUS \"Generating: ${CONFIG_H_INSTALL_PATH}\" )
-         configure_file( \"${CONFIG_H_IN_PATH}\" \"${CONFIG_H_INSTALL_PATH}\" @ONLY ) " )
+install( CODE "${SIXTRL_TRACK_FEATURES_INSTALL_STR}
+               ${SIXTRL_APERTURE_CHECK_FEATURES_INSTALL_STR}
+               message( STATUS \"Generating: ${CONFIG_H_INSTALL_PATH}\" )
+               configure_file( \"${CONFIG_H_IN_PATH}\" \"${CONFIG_H_INSTALL_PATH}\" @ONLY ) " )
 
 # ------------------------------------------------------------------------------
 # Create a header file encapsulating the choices for the C and C++

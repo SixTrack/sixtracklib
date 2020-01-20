@@ -14,7 +14,7 @@
 #include "sixtracklib/common/buffer/buffer_string_object.hpp"
 #include "sixtracklib/testlib.h"
 
-TEST( CXX_CommonBufferStringObjectTests, BasicUsage )
+TEST( CXX_Common_Buffer_BufferStringObjectTests, BasicUsage )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
@@ -166,4 +166,4 @@ TEST( CXX_CommonBufferStringObjectTests, BasicUsage )
 }
 
 
-/* end: tests/sixtracklib/common/test_buffer_string_object_cxx.cpp */
+/* end: tests/sixtracklib/common/buffer/test_buffer_string_object_cxx.cpp */

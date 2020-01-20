@@ -8,6 +8,42 @@ import os
 SHARED_LIB = os.path.join( os.path.dirname( os.path.realpath( __file__ ) ),
                            "@PYTHON_SIXTRACKLIB_SHARED_LIB@" )
 
+# -----------------------------------------------------------------------------
+# ------                 List of enabled / disabled modules              ------
+# -----------------------------------------------------------------------------
+@PYTHON_SIXTRACKLIB_MODULES_STR@
+
+# -----------------------------------------------------------------------------
+# ------  Enable / disable / skip tracking over specific beam elements   ------
+# -----------------------------------------------------------------------------
+
+# "enabled" : Unconditionally enable tracking of beam-elements
+# "skip"    : Ignore beam-elements of this type and silently "skip" it
+# "disable" : Like "skip", but generate error if encountered during tracking
+
+TRACK_BEAMBEAM4D  = "@SIXTRL_TRACK_BEAMBEAM4D_FLAG_STR@"
+TRACK_BEAMBEAM6D  = "@SIXTRL_TRACK_BEAMBEAM6D_FLAG_STR@"
+TRACK_SPACECHARGE = "@SIXTRL_TRACK_SC_FLAG_STR@"
+TRACK_TRICUB      = "@SIXTRL_TRACK_TRICUB_FLAG_STR@"
+
+# -----------------------------------------------------------------------------
+# ------                     Global aperture check                       ------
+# -----------------------------------------------------------------------------
+
+# "always"     : Perform aperture check with at Drifts, DriftExacts
+#"conditional" : Perform if beam element meets certain conditions
+#"never"       : No global check, only at Limit* beam-elements (if any)
+
+APERTURE_CHECK_AT_DRIFT = "@SIXTRL_APERTURE_CHECK_AT_DRIFT_FLAG_STR@"
+APERTURE_CHECK_MIN_DRIFT_LENGTH = @SIXTRACKL_APERTURE_CHECK_MIN_DRIFT_LENGTH@ # [m]
+
+APERTURE_X_LIMIT = @SIXTRACKL_APERTURE_X_LIMIT_VALUE@ # [m]
+APERTURE_Y_LIMIT = @SIXTRACKL_APERTURE_Y_LIMIT_VALUE@ # [m]
+
+# -----------------------------------------------------------------------------
+# ------              Namespace and Namespace - Prefix Settings          ------
+# -----------------------------------------------------------------------------
+
 # Namespace constants for C99
 C99_NAMESPACE_STR = "@PYTHON_SIXTRL_C99_NAMESPACE_STR@"
 C99_NAMESPACE_PREFIX_STR = "@PYTHON_SIXTRL_C99_NAMESPACE_PREFIX_STR@"
@@ -15,13 +51,5 @@ C99_NAMESPACE_PREFIX_STR = "@PYTHON_SIXTRL_C99_NAMESPACE_PREFIX_STR@"
 # Namespace constants for C++
 CXX_NAMESPACE_STR = "@PYTHON_SIXTRL_CXX_NAMESPACE_STR@"
 CXX_NAMESPACE_PREFIX_STR = "@PYTHON_SIXTRL_CXX_NAMESPACE_PREFIX_STR@"
-
-# Config options
-ENABLE_APERATURE_CHECK = @PYTHON_SIXTRL_ENABLE_APERTURE_CHECK@
-APERTURE_X_LIMIT = @PYTHON_SIXTRL_APERTURE_X_LIMIT@
-APERTURE_Y_LIMIT = @PYTHON_SIXTRL_APERTURE_Y_LIMIT@
-
-# List of modules for sixtracklib:
-@PYTHON_SIXTRACKLIB_MODULES_STR@
 
 # end: config.py

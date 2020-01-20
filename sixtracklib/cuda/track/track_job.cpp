@@ -920,7 +920,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             /* trackElemByElemKernelId() */
 
-            num_kernel_args = size_t{ 6 };
+            num_kernel_args = size_t{ 7 };
             kernel_name.clear();
             kernel_name += kernel_prefix;
             kernel_name +=
@@ -961,7 +961,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             /* assignOutputToElemByElemConfigKernelId() */
 
-            num_kernel_args = size_t{ 4 };
+            num_kernel_args = size_t{ 5 };
             kernel_name.clear();
             kernel_name += kernel_prefix;
             kernel_name +=
@@ -1150,8 +1150,7 @@ namespace SIXTRL_CXX_NAMESPACE
             else
             {
                 cuda_elem_by_elem_conf_arg.reset( new cuda_arg_t(
-                    this->ptrElemByElemConfig(), sizeof( elem_config_t ),
-                        ptr_cuda_ctrl ) );
+                    this->elem_by_elem_config_cxx_buffer(), ptr_cuda_ctrl ) );
 
                 status = ( ( cuda_elem_by_elem_conf_arg.get() != nullptr ) &&
                     ( cuda_elem_by_elem_conf_arg->ptrControllerBase() ==
@@ -1168,30 +1167,32 @@ namespace SIXTRL_CXX_NAMESPACE
                         ( this->ptrElemByElemConfigArgBase(
                             )->ptrControllerBase() == ptr_cuda_ctrl ) )
                     {
-                        status == st::ARCH_STATUS_SUCCESS;
+                        status = st::ARCH_STATUS_SUCCESS;
                     }
                     else
                     {
-                        status == st::ARCH_STATUS_GENERAL_FAILURE;
+                        status = st::ARCH_STATUS_GENERAL_FAILURE;
                     }
                 }
 
                 if( status == st::ARCH_STATUS_SUCCESS )
                 {
                     status = this->ptrElemByElemConfigArgBase()->send(
-                        this->ptrElemByElemConfig(), sizeof( elem_config_t ) );
+                        this->elem_by_elem_config_cxx_buffer() );
 
                     if( status == st::ARCH_STATUS_SUCCESS )
                     {
-                        if( ( this->ptrElemByElemConfigArgBase()->usesRawArgument() ) &&
-                            ( this->ptrElemByElemConfigArgBase()->ptrRawArgument()
-                              == this->ptrElemByElemConfig() ) )
+                        if( ( this->ptrElemByElemConfigArgBase(
+                            )->usesCObjectsCxxBuffer() ) &&
+                            ( this->ptrElemByElemConfigArgBase(
+                                )->ptrCObjectsCxxBuffer() == std::addressof(
+                                this->elem_by_elem_config_cxx_buffer() ) ) )
                         {
-                            status == st::ARCH_STATUS_SUCCESS;
+                            status = st::ARCH_STATUS_SUCCESS;
                         }
                         else
                         {
-                            status == st::ARCH_STATUS_GENERAL_FAILURE;
+                            status = st::ARCH_STATUS_GENERAL_FAILURE;
                         }
                     }
                 }
@@ -1360,9 +1361,9 @@ namespace SIXTRL_CXX_NAMESPACE
             ( elem_by_elem_conf_arg != nullptr ) &&
             ( elem_by_elem_config != nullptr ) &&
             ( elem_by_elem_conf_arg->ptrControllerBase() == ptr_cuda_ctrl ) &&
-            ( elem_by_elem_conf_arg->usesRawArgument() ) &&
-            ( elem_by_elem_conf_arg->ptrRawArgument() ==
-                elem_by_elem_config ) );
+            ( elem_by_elem_conf_arg->usesCObjectsCxxBuffer() ) &&
+            ( elem_by_elem_conf_arg->ptrCObjectsCxxBuffer() ==
+                std::addressof( this->elem_by_elem_config_cxx_buffer() ) ) );
 
         cuda_kernel_conf_t const* kernel_conf = ( controller_ready )
             ? ptr_cuda_ctrl->ptrKernelConfig( kid ) : nullptr;
@@ -1373,8 +1374,9 @@ namespace SIXTRL_CXX_NAMESPACE
             if( !this->isInDebugMode() )
             {
                 ::NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
-                    kernel_conf, elem_by_elem_conf_arg, output_arg,
-                        output_buffer_offset_index, nullptr );
+                    kernel_conf, elem_by_elem_conf_arg,
+                        this->elem_by_elem_config_index(), output_arg,
+                            output_buffer_offset_index, nullptr );
 
                 status = st::ARCH_STATUS_SUCCESS;
             }
@@ -1384,9 +1386,10 @@ namespace SIXTRL_CXX_NAMESPACE
                     st::ARCH_STATUS_SUCCESS )
                 {
                     ::NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
-                        kernel_conf, elem_by_elem_conf_arg, output_arg,
-                        output_buffer_offset_index,
-                        this->ptrCudaDebugRegisterArg() );
+                        kernel_conf, elem_by_elem_conf_arg,
+                            this->elem_by_elem_config_index(), output_arg,
+                                output_buffer_offset_index,
+                                    this->ptrCudaDebugRegisterArg() );
 
                     status = this->evaluateDebugRegisterAfterUse();
                 }
@@ -2061,7 +2064,8 @@ namespace SIXTRL_CXX_NAMESPACE
             ::NS(Track_particles_elem_by_elem_until_turn_cuda_wrapper)(
                 kernel_conf, trackjob.ptrCudaParticlesArg(), pset_index,
                 trackjob.ptrCudaBeamElementsArg(),
-                trackjob.ptrCudaElemByElemConfigArg(), until_turn_elem_by_elem,
+                trackjob.ptrCudaElemByElemConfigArg(),
+                trackjob.elem_by_elem_config_index(), until_turn_elem_by_elem,
                 nullptr );
 
             status = st::TRACK_SUCCESS;
@@ -2078,6 +2082,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     kernel_conf, trackjob.ptrCudaParticlesArg(), pset_index,
                     trackjob.ptrCudaBeamElementsArg(),
                     trackjob.ptrCudaElemByElemConfigArg(),
+                    trackjob.elem_by_elem_config_index(),
                     until_turn_elem_by_elem,
                     trackjob.ptrCudaDebugRegisterArg() );
 

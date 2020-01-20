@@ -166,10 +166,9 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t) NS(Track_all_particles_line)(
     #include "sixtracklib/common/be_xyshift/track.h"
     #include "sixtracklib/common/be_limit/track.h"
     #include "sixtracklib/common/be_dipedge/track.h"
-
-    #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-        #include "sixtracklib/common/be_beamfields/track.h"
-    #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+    #include "sixtracklib/common/be_rfmultipole/track.h"
+    #include "sixtracklib/common/be_beamfields/track.h"
+    #include "sixtracklib/common/be_tricub/track.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -182,33 +181,29 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_element_obj_dispatcher)(
     NS(particle_num_elements_t) const index,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT be_info )
 {
-    #if defined( SIXTRL_ENABLE_APERTURE_CHECK ) && \
-        ( defined( SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL ) || \
-          defined( SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS ) || \
-          defined( SIXTRL_GLOBAL_APERTURE_CHECK_NEVER ) )
+    #if defined( SIXTRL_APERTURE_CHECK_AT_DRIFT )
 
-        #if ( SIXTRL_ENABLE_APERTURE_CHECK == \
-              SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL ) || \
-            ( SIXTRL_ENABLE_APERTURE_CHECK == \
-              SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS )
+        #if ( SIXTRL_APERTURE_CHECK_AT_DRIFT == \
+              SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS ) || \
+            ( SIXTRL_APERTURE_CHECK_AT_DRIFT == \
+              SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL )
 
         return NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             particles, index, be_info, true );
 
-        #elif SIXTRL_ENABLE_APERTURE_CHECK == \
-              SIXTRL_GLOBAL_APERTURE_CHECK_NEVER
+        # else
 
         return NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             particles, index, be_info, false );
 
-        #endif /* SIXTRL_ENABLE_APERTURE_CHECK */
+        #endif /* SIXTRL_APERTURE_CHECK_AT_DRIFT */
 
-    #else  /* !defined( SIXTRL_ENABLE_APERTURE_CHECK ) */
+    #else  /* !defined( SIXTRL_APERTURE_CHECK_AT_DRIFT ) */
 
         return NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             particles, index, be_info, true );
 
-    #endif /*  defined( SIXTRL_ENABLE_APERTURE_CHECK ) */
+    #endif /*  defined( SIXTRL_APERTURE_CHECK_AT_DRIFT ) */
 }
 
 SIXTRL_INLINE NS(track_status_t)
@@ -241,10 +236,38 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
 
             ret = NS(Track_particle_drift)( particles, index, belem );
 
+            #if !defined( SIXTRL_APERTURE_CHECK_AT_DRIFT ) || \
+                ( SIXTRL_APERTURE_CHECK_AT_DRIFT == \
+                  SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS )
+
             if( perform_global_aperture_check )
             {
                 ret |= NS(Track_particle_limit_global)( particles, index );
             }
+
+            #elif defined( SIXTRL_APERTURE_CHECK_AT_DRIFT ) && \
+                  ( SIXTRL_APERTURE_CHECK_AT_DRIFT == \
+                    SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL )
+
+            if( perform_global_aperture_check )
+            {
+                #if defined( SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH )
+
+                if( ( belem != SIXTRL_NULLPTR ) &&
+                    ( NS(Drift_get_length)( belem ) >=
+                        ( SIXTRL_REAL_T )SIXTRL_APERTURE_CHECK_AT_DRIFT ) )
+                {
+                    ret |= NS(Track_particle_limit_global)( particles, index );
+                }
+
+                #else
+
+                ret |= NS(Track_particle_limit_global)( particles, index );
+
+                #endif /* defined( SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH ) */
+            }
+
+            #endif
 
             break;
         }
@@ -257,10 +280,38 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
 
             ret = NS(Track_particle_drift_exact)( particles, index, belem );
 
+            #if !defined( SIXTRL_APERTURE_CHECK_AT_DRIFT ) || \
+                ( SIXTRL_APERTURE_CHECK_AT_DRIFT == \
+                  SIXTRL_GLOBAL_APERTURE_CHECK_ALWAYS )
+
             if( perform_global_aperture_check )
             {
                 ret |= NS(Track_particle_limit_global)( particles, index );
             }
+
+            #elif defined( SIXTRL_APERTURE_CHECK_AT_DRIFT ) && \
+                  ( SIXTRL_APERTURE_CHECK_AT_DRIFT == \
+                    SIXTRL_GLOBAL_APERTURE_CHECK_CONDITIONAL )
+
+            if( perform_global_aperture_check )
+            {
+                #if defined( SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH )
+
+                if( ( belem != SIXTRL_NULLPTR ) &&
+                    ( NS(Drift_get_length)( belem ) >=
+                        ( SIXTRL_REAL_T )SIXTRL_APERTURE_CHECK_AT_DRIFT ) )
+                {
+                    ret |= NS(Track_particle_limit_global)( particles, index );
+                }
+
+                #else
+
+                ret |= NS(Track_particle_limit_global)( particles, index );
+
+                #endif /* defined( SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH ) */
+            }
+
+            #endif
 
             break;
         }
@@ -272,6 +323,16 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
             ret = NS(Track_particle_multipole)( particles, index, belem );
+            break;
+        }
+
+        case NS(OBJECT_TYPE_RF_MULTIPOLE):
+        {
+            typedef NS(RFMultiPole) belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_rf_multipole)( particles, index, belem );
             break;
         }
 
@@ -335,6 +396,18 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             break;
         }
 
+        case NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE):
+        {
+            typedef NS(LimitRectEllipse) belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_limit_rect_ellipse)(
+                particles, index, belem );
+            break;
+        }
+
+
         case NS(OBJECT_TYPE_DIPEDGE):
         {
             typedef NS(DipoleEdge) belem_t;
@@ -345,51 +418,150 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             break;
         }
 
-        #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
+        case NS(OBJECT_TYPE_TRICUB):
+        {
+            #if !defined( SIXTRL_TRACK_TRICUB ) || \
+                ( SIXTRL_TRACK_TRICUB == SIXTRL_TRACK_MAP_ENABLED )
+
+            typedef NS(TriCub)  belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_tricub)( particles, index, belem );
+
+            #elif defined( SIXTRL_TRACK_TRICUB ) && \
+                  ( SIXTRL_TRACK_TRICUB == SIXTRL_TRACK_MAP_SKIP )
+
+            /* Skip particle and do nothing! */
+            ret = SIXTRL_TRACK_SUCCESS;
+
+            #else
+
+            ret = SIXTRL_TRACK_STATUS_GENERAL_FAILURE;
+
+            #endif /* SIXTRL_TRACK_TRICUB */
+            break;
+        }
+
+        case NS(OBJECT_TYPE_TRICUB_DATA):
+        {
+            #if defined( SIXTRL_TRACK_TRICUB ) && \
+                SIXTRL_TRACK_TRICUB != SIXTRL_TRACK_MAP_DISABLED
+
+            /* Always skip the tricub data part, which should probably not be
+             * in the lattice anyway */
+            ret = SIXTRL_TRACK_SUCCESS;
+
+            #else /* explicitly disabled the TriCub map! */
+
+            ret = SIXTRL_TRACK_STATUS_GENERAL_FAILURE;
+
+            #endif /* defined( SIXTRL_TRACK_TRICUB ) */
+            break;
+        }
 
         case NS(OBJECT_TYPE_BEAM_BEAM_4D):
         {
+            #if !defined( SIXTRL_TRACK_BEAMBEAM4D ) || \
+                ( SIXTRL_TRACK_BEAMBEAM4D == SIXTRL_TRACK_MAP_ENABLED )
+
             typedef NS(BeamBeam4D)   belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
             ret = NS(Track_particle_beam_beam_4d)( particles, index, belem );
+
+            #elif defined( SIXTRL_TRACK_BEAMBEAM4D ) && \
+                  ( SIXTRL_TRACK_BEAMBEAM4D == SIXTRL_TRACK_MAP_SKIP )
+
+            /* Skip particle and do nothing! */
+            ret = SIXTRL_TRACK_SUCCESS;
+
+            #else
+
+            ret = SIXTRL_TRACK_STATUS_GENERAL_FAILURE;
+
+            #endif /* defined( SIXTRL_ENABLE_BEAM_FIELDS_BEAM_BEAM_4D ) */
+            break;
+        }
+
+        case NS(OBJECT_TYPE_BEAM_BEAM_6D):
+        {
+            #if !defined( SIXTRL_TRACK_BEAMBEAM6D ) || \
+                ( SIXTRL_TRACK_BEAMBEAM6D == SIXTRL_TRACK_MAP_ENABLED )
+
+            typedef NS(BeamBeam6D)   belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_beam_beam_6d)( particles, index, belem );
+
+            #elif defined( SIXTRL_TRACK_BEAMBEAM6D ) && \
+                  ( SIXTRL_TRACK_BEAMBEAM6D == SIXTRL_TRACK_MAP_SKIP )
+
+
+            /* Skip particle and do nothing! */
+            ret = SIXTRL_TRACK_SUCCESS;
+
+            #else
+
+            ret = SIXTRL_TRACK_STATUS_GENERAL_FAILURE;
+
+            #endif /* SIXTRL_ENABLE_BEAM_FIELDS_BEAM_BEAM_6D */
             break;
         }
 
         case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
         {
+            #if !defined( SIXTRL_TRACK_SPACECHARGE ) || \
+                ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_ENABLED )
+
             typedef NS(SpaceChargeCoasting)   belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
             ret = NS(Track_particle_space_charge_coasting)(
                 particles, index, belem );
+
+            #elif defined( SIXTRL_TRACK_SPACECHARGE ) && \
+                  ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_SKIP )
+
+            /* Skip particle and do nothing! */
+            ret = SIXTRL_TRACK_SUCCESS;
+
+            #else
+
+            ret = SIXTRL_TRACK_STATUS_GENERAL_FAILURE;
+
+            #endif /* SIXTRL_ENABLE_SPACE_CHARGE_COASTING */
             break;
         }
 
         case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
         {
+            #if !defined( SIXTRL_TRACK_SPACECHARGE ) || \
+                ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_ENABLED )
+
             typedef NS(SpaceChargeBunched)   belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
             ret = NS(Track_particle_space_charge_bunched)(
                 particles, index, belem );
+
+            #elif defined( SIXTRL_TRACK_SPACECHARGE ) && \
+                  ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_SKIP )
+
+            /* Skip particle and do nothing! */
+            ret = SIXTRL_TRACK_SUCCESS;
+
+            #else
+
+            ret = SIXTRL_TRACK_STATUS_GENERAL_FAILURE;
+
+            #endif /* SIXTRL_ENABLE_SPACE_CHARGE_BUNCHED */
             break;
         }
-
-        case NS(OBJECT_TYPE_BEAM_BEAM_6D):
-        {
-            typedef NS(BeamBeam6D)   belem_t;
-            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
-            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
-
-            ret = NS(Track_particle_beam_beam_6d)( particles, index, belem );
-            break;
-        }
-
-        #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 
         default:
         {

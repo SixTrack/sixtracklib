@@ -12,6 +12,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -43,50 +44,95 @@ SIXTRL_FN SIXTRL_STATIC bool operator<(
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ComputeNodeId)* NS(ComputeNodeId_preset)(
+SIXTRL_STATIC SIXTRL_FN NS(ComputeNodeId)* NS(ComputeNodeId_preset)(
     NS(ComputeNodeId)* SIXTRL_RESTRICT id );
 
-SIXTRL_HOST_FN SIXTRL_STATIC NS(comp_node_id_num_t)
+SIXTRL_STATIC SIXTRL_FN NS(comp_node_id_num_t)
 NS(ComputeNodeId_get_platform_id)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id );
 
-SIXTRL_HOST_FN SIXTRL_STATIC NS(comp_node_id_num_t)
+SIXTRL_STATIC SIXTRL_FN NS(comp_node_id_num_t)
 NS(ComputeNodeId_get_device_id)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id );
 
-SIXTRL_HOST_FN SIXTRL_STATIC void NS(ComputeNodeId_set_platform_id)(
+SIXTRL_STATIC SIXTRL_FN void NS(ComputeNodeId_set_platform_id)(
     NS(ComputeNodeId)* SIXTRL_RESTRICT id,
     NS(comp_node_id_num_t) const platform_id );
 
-SIXTRL_HOST_FN SIXTRL_STATIC void NS(ComputeNodeId_set_device_id)(
+SIXTRL_STATIC SIXTRL_FN void NS(ComputeNodeId_set_device_id)(
     NS(ComputeNodeId)* SIXTRL_RESTRICT id,
     NS(comp_node_id_num_t) const device_id );
 
-SIXTRL_HOST_FN SIXTRL_STATIC int NS(ComputeNodeId_is_valid)(
+SIXTRL_STATIC SIXTRL_FN bool NS(ComputeNodeId_is_valid)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id );
 
-SIXTRL_HOST_FN SIXTRL_STATIC int NS(ComputeNodeId_compare)(
+SIXTRL_STATIC SIXTRL_FN int NS(ComputeNodeId_compare)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT lhs,
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT rhs );
 
-SIXTRL_HOST_FN SIXTRL_STATIC bool NS(ComputeNodeId_are_equal)(
+SIXTRL_STATIC SIXTRL_FN bool NS(ComputeNodeId_are_equal)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT lhs,
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT rhs );
 
 #if !defined( GPUCODE )
 
-SIXTRL_HOST_FN int NS(ComputeNodeId_to_string)(
-    const NS(ComputeNodeId) *const SIXTRL_RESTRICT id,
-    char* SIXTRL_RESTRICT str_buffer,
-    SIXTRL_UINT64_T const str_buffer_capacity );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ComputeNodeId)*
+    NS(ComputeNodeId_create)( void );
 
-SIXTRL_HOST_FN int NS(ComputeNodeId_from_string)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeId_delete)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT node_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(comp_node_id_num_t)
+NS(ComputeNodeId_get_platform_id_ext)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(comp_node_id_num_t)
+NS(ComputeNodeId_get_device_id_ext)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeId_set_platform_id_ext)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT id,
+    NS(comp_node_id_num_t) const platform_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeId_set_device_id_ext)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT id,
+    NS(comp_node_id_num_t) const device_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ComputeNodeId_is_valid_ext)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ComputeNodeId_compare_ext)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT lhs,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ComputeNodeId_are_equal_ext)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT lhs,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT rhs );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ComputeNodeId_from_string)(
     NS(ComputeNodeId)* SIXTRL_RESTRICT id,
     char const* SIXTRL_RESTRICT str_buffer );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ComputeNodeId_to_string)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT node_id,
+    char* SIXTRL_RESTRICT out_string_begin,
+    NS(arch_size_t) const max_out_string_capacity );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ComputeNodeId_to_string_with_format)(
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT node_id,
+    char* SIXTRL_RESTRICT out_string_begin,
+    NS(arch_size_t) const out_string_capacity,
+    NS(arch_id_t) const arch_id, NS(node_id_str_fmt_t) const node_id_str_fmt );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ComputeNodeId_from_string_with_format)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT id,
+    char const* SIXTRL_RESTRICT str_buffer,
+    NS(node_id_str_fmt_t) const node_id_str_fmt,
+    NS(arch_id_t)* SIXTRL_RESTRICT ptr_arch_id );
+
 #endif /* !defined( _GPUCODE ) */
-
-
 
 typedef struct NS(ComputeNodeInfo)
 {
@@ -98,10 +144,54 @@ typedef struct NS(ComputeNodeInfo)
 }
 NS(ComputeNodeInfo);
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(ComputeNodeInfo)* NS(ComputeNodeInfo_preset)(
+SIXTRL_STATIC SIXTRL_FN NS(ComputeNodeInfo)* NS(ComputeNodeInfo_preset)(
+    NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info );
+
+SIXTRL_STATIC SIXTRL_FN bool NS(ComputeNodeInfo_is_valid)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
+
+SIXTRL_STATIC SIXTRL_FN NS(ComputeNodeId) NS(ComputeNodeInfo_get_id)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
+
+SIXTRL_STATIC SIXTRL_FN NS(comp_node_id_num_t)
+NS(ComputeNodeInfo_get_platform_id)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
+
+SIXTRL_STATIC SIXTRL_FN NS(comp_node_id_num_t)
+NS(ComputeNodeInfo_get_device_id)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
+
+SIXTRL_STATIC SIXTRL_FN char const* NS(ComputeNodeInfo_get_arch)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
+
+SIXTRL_STATIC SIXTRL_FN char const* NS(ComputeNodeInfo_get_platform)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
+
+SIXTRL_STATIC SIXTRL_FN char const* NS(ComputeNodeInfo_get_name)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
+
+SIXTRL_STATIC SIXTRL_FN char const* NS(ComputeNodeInfo_get_description)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_print)(
+    FILE* SIXTRL_RESTRICT fp,
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_print_out)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ComputeNodeInfo)*
+NS(ComputeNodeInfo_preset_ext)(
     NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_free)(
+    NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_delete)(
     NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ComputeNodeInfo)* NS(ComputeNodeInfo_reserve)(
@@ -119,35 +209,32 @@ SIXTRL_EXTERN SIXTRL_HOST_FN int NS(ComputeNodeInfo_make)(
     const char *const SIXTRL_RESTRICT name_str,
     const char *const SIXTRL_RESTRICT description_str );
 
-SIXTRL_HOST_FN SIXTRL_STATIC int NS(ComputeNodeInfo_is_valid)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ComputeNodeInfo_is_valid_ext)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
 
-SIXTRL_HOST_FN SIXTRL_STATIC NS(ComputeNodeId)
-NS(ComputeNodeInfo_get_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ComputeNodeId) NS(ComputeNodeInfo_get_id_ext)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
 
-SIXTRL_HOST_FN SIXTRL_STATIC NS(comp_node_id_num_t)
-NS(ComputeNodeInfo_get_platform_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(comp_node_id_num_t)
+NS(ComputeNodeInfo_get_platform_id_ext)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
 
-SIXTRL_HOST_FN SIXTRL_STATIC NS(comp_node_id_num_t)
-NS(ComputeNodeInfo_get_device_id)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(comp_node_id_num_t)
+NS(ComputeNodeInfo_get_device_id_ext)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
 
-SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_arch)(
+SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(ComputeNodeInfo_get_arch_ext)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
 
-SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_platform)(
+SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(ComputeNodeInfo_get_platform_ext)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
 
-SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_name)(
+SIXTRL_EXTERN SIXTRL_HOST_FN char const* NS(ComputeNodeInfo_get_name_ext)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
 
-SIXTRL_HOST_FN SIXTRL_STATIC char const* NS(ComputeNodeInfo_get_description)(
+SIXTRL_EXTERN SIXTRL_HOST_FN char const*
+NS(ComputeNodeInfo_get_description_ext)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
-
-
-#if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_print)(
     FILE* SIXTRL_RESTRICT fp,
@@ -158,9 +245,15 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_print_out)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ComputeNodeInfo_print_to_str)(
+    char* SIXTRL_RESTRICT node_info_out_str,
+    NS(arch_size_t) const node_info_out_str_capacity,
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
 #else /* !defined( _GPUCODE ) */
 
-SIXTRL_FN SIXTRL_STATIC void NS(ComputeNodeInfo_print_out)(
+SIXTRL_STATIC SIXTRL_FN void NS(ComputeNodeInfo_print_out)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
 
@@ -192,23 +285,37 @@ SIXTRL_INLINE bool operator<( NS(ComputeNodeId) const& lhs,
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
+SIXTRL_INLINE NS(ComputeNodeId)* NS(ComputeNodeId_preset)(
+    NS(ComputeNodeId)* SIXTRL_RESTRICT node_id )
+{
+    if( node_id != SIXTRL_NULLPTR )
+    {
+        node_id->platform_id = ( NS(comp_node_id_num_t) )-1;
+        node_id->device_id = ( NS(comp_node_id_num_t) )-1;
+    }
+
+    return node_id;
+}
+
 SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeId_get_platform_id)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id )
 {
-    return ( id != 0 ) ? id->platform_id : -1;
+    return ( id != SIXTRL_NULLPTR )
+        ? id->platform_id : ( NS(comp_node_id_num_t) )-1;
 }
 
 SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeId_get_device_id)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id )
 {
-    return ( id != 0 ) ? id->device_id : -1;
+    return ( id != SIXTRL_NULLPTR )
+        ? id->device_id : ( NS(comp_node_id_num_t) )-1;
 }
 
 SIXTRL_INLINE void NS(ComputeNodeId_set_platform_id)(
     NS(ComputeNodeId)* SIXTRL_RESTRICT id,
     NS(comp_node_id_num_t) const platform_id )
 {
-    SIXTRL_ASSERT( id != 0 );
+    SIXTRL_ASSERT( id != SIXTRL_NULLPTR );
     id->platform_id = platform_id;
     return;
 }
@@ -217,17 +324,16 @@ SIXTRL_INLINE void NS(ComputeNodeId_set_device_id)(
     NS(ComputeNodeId)* SIXTRL_RESTRICT id,
     NS(comp_node_id_num_t) const dev_id )
 {
-    SIXTRL_ASSERT( id != 0 );
+    SIXTRL_ASSERT( id != SIXTRL_NULLPTR );
     id->device_id = dev_id;
-    return;
 }
 
-SIXTRL_INLINE int NS(ComputeNodeId_is_valid)(
+SIXTRL_INLINE bool NS(ComputeNodeId_is_valid)(
     const NS(ComputeNodeId) *const SIXTRL_RESTRICT id )
 {
-    return ( ( id != 0 ) &&
-             ( id->platform_id != -1 ) &&
-             ( id->device_id   != -1 ) );
+    return ( ( id != SIXTRL_NULLPTR ) &&
+             ( id->platform_id != ( NS(comp_node_id_num_t) )-1 ) &&
+             ( id->device_id   != ( NS(comp_node_id_num_t) )-1 ) );
 }
 
 SIXTRL_INLINE int NS(ComputeNodeId_compare)(
@@ -283,11 +389,27 @@ SIXTRL_INLINE bool NS(ComputeNodeId_are_equal)(
     return ( NS(ComputeNodeId_compare)( lhs, rhs ) == 0 );
 }
 
+/* ************************************************************************* */
 
-SIXTRL_INLINE int NS(ComputeNodeInfo_is_valid)(
+SIXTRL_INLINE NS(ComputeNodeInfo)* NS(ComputeNodeInfo_preset)(
+    NS(ComputeNodeInfo)* SIXTRL_RESTRICT node_info )
+{
+    if( node_info != SIXTRL_NULLPTR )
+    {
+        NS(ComputeNodeId_preset)( &node_info->id );
+        node_info->arch = SIXTRL_NULLPTR;
+        node_info->platform = SIXTRL_NULLPTR;
+        node_info->name = SIXTRL_NULLPTR;
+        node_info->description = SIXTRL_NULLPTR;
+    }
+
+    return node_info;
+}
+
+SIXTRL_INLINE bool NS(ComputeNodeInfo_is_valid)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info )
 {
-    return ( ( node_info != 0 ) &&
+    return ( ( node_info != SIXTRL_NULLPTR ) &&
              ( NS(ComputeNodeId_is_valid)( &node_info->id ) ) &&
              ( NS(ComputeNodeInfo_get_arch)( node_info ) != 0 ) &&
              ( strlen( NS(ComputeNodeInfo_get_arch)( node_info ) ) > 0u ) &&
@@ -311,7 +433,7 @@ SIXTRL_INLINE NS(ComputeNodeId) NS(ComputeNodeInfo_get_id)(
 SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeInfo_get_platform_id)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info )
 {
-    return ( node_info != 0 )
+    return ( node_info != SIXTRL_NULLPTR )
         ? NS(ComputeNodeId_get_platform_id)( &node_info->id )
         : NS(ComputeNodeId_get_platform_id)( 0 );
 }
@@ -319,7 +441,7 @@ SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeInfo_get_platform_id)(
 SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeInfo_get_device_id)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info )
 {
-    return ( node_info != 0 )
+    return ( node_info != SIXTRL_NULLPTR )
         ? NS(ComputeNodeId_get_device_id)( &node_info->id )
         : NS(ComputeNodeId_get_device_id)( 0 );
 }
@@ -327,25 +449,27 @@ SIXTRL_INLINE NS(comp_node_id_num_t) NS(ComputeNodeInfo_get_device_id)(
 SIXTRL_INLINE char const* NS(ComputeNodeInfo_get_arch)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info )
 {
-    return ( node_info != 0 ) ? node_info->arch : 0;
+    return ( node_info != SIXTRL_NULLPTR ) ? node_info->arch : SIXTRL_NULLPTR;
 }
 
 SIXTRL_INLINE char const* NS(ComputeNodeInfo_get_platform)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info )
 {
-    return ( node_info != 0 ) ? node_info->platform : 0;
+    return ( node_info != SIXTRL_NULLPTR )
+        ? node_info->platform : SIXTRL_NULLPTR;
 }
 
 SIXTRL_INLINE char const* NS(ComputeNodeInfo_get_name)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info )
 {
-    return ( node_info != 0 ) ? node_info->name : 0;
+    return ( node_info != SIXTRL_NULLPTR ) ? node_info->name : SIXTRL_NULLPTR;
 }
 
 SIXTRL_INLINE char const* NS(ComputeNodeInfo_get_description)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info )
 {
-    return ( node_info != 0 ) ? node_info->description : 0;
+    return ( node_info != SIXTRL_NULLPTR )
+        ? node_info->description : SIXTRL_NULLPTR;
 }
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )

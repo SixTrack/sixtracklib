@@ -37,11 +37,12 @@ __kernel void NS(Track_particles_until_turn_opt_pp_debug_opencl)(
 
 __kernel void NS(Track_particles_elem_by_elem_opt_pp_debug_opencl)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
-    SIXTRL_UINT64_T const pset_index,
+    NS(buffer_size_t) const pset_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig) *const
-        SIXTRL_RESTRICT elem_by_elem_config,
-    SIXTRL_INT64_T const until_turn, SIXTRL_UINT64_T const slot_size,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
+    NS(particle_num_elements_t) const until_turn,
+    NS(buffer_size_t) const slot_size,
     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flags )
 {
     typedef NS(particle_num_elements_t) nelements_t;
@@ -52,7 +53,8 @@ __kernel void NS(Track_particles_elem_by_elem_opt_pp_debug_opencl)(
 
     NS(Track_particles_elem_by_elem_until_turn_debug_opt_kernel_impl)(
         pbuffer, pset_index, part_idx, part_idx_stride, belem_buffer,
-            elem_by_elem_config, until_turn, slot_size, &status_flags );
+            config_buffer, elem_by_elem_config_index, until_turn, slot_size,
+                &status_flags );
 
     NS(OpenCl1x_collect_status_flag_value)( ptr_status_flags, status_flags );
 }

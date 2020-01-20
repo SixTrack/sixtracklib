@@ -4,7 +4,7 @@
 import sys
 import os
 from cobjects import CBuffer
-import sixtracklib as pyst
+import sixtracklib as st
 import ctypes as ct
 
 from sixtracklib.stcommon import st_NODE_UNDEFINED_INDEX, \
@@ -28,8 +28,17 @@ import sixtracklib_test as testlib
 from sixtracklib_test.generic_obj import GenericObj
 
 if __name__ == '__main__':
-    if not pyst.supports('cuda'):
+    if not st.supports('cuda'):
         raise SystemExit("cuda support required for this test")
+
+    try:
+        num_nodes = st.CudaController.NUM_AVAILABLE_NODES()
+    except RuntimeError as e:
+        num_nodes = 0
+
+    if num_nodes <= 0:
+        print("No CUDA nodes available -> skip test")
+        sys.exit(0)
 
     num_d_values = 10
     num_e_values = 10
@@ -41,26 +50,26 @@ if __name__ == '__main__':
                          c=[1.0, 2.0, 3.0, 4.0],
                          num_d=num_d_values, num_e=num_e_values)
 
-    c_obj_buffer = pyst.Buffer(cbuffer=obj_buffer)
+    c_obj_buffer = st.Buffer(cbuffer=obj_buffer)
     assert c_obj_buffer.pointer != st_NullBuffer
     assert c_obj_buffer.slot_size > 0
     assert c_obj_buffer.capacity > 0
     assert c_obj_buffer.size > 0 and c_obj_buffer.size <= c_obj_buffer.capacity
     assert c_obj_buffer.num_objects == obj_buffer.n_objects
 
-    c_cpy_buffer = pyst.Buffer(size=c_obj_buffer.capacity)
+    c_cpy_buffer = st.Buffer(size=c_obj_buffer.capacity)
     assert c_cpy_buffer.pointer != st_NullBuffer
     assert c_cpy_buffer.slot_size > 0
     assert c_cpy_buffer.capacity > 0
     assert c_cpy_buffer.size <= c_obj_buffer.size
     assert c_cpy_buffer.capacity >= c_obj_buffer.capacity
 
-    ctrl = pyst.CudaController()
+    ctrl = st.CudaController()
     assert ctrl.num_nodes > 0
     assert ctrl.has_selected_node
     assert ctrl.selected_node_index != st_NODE_UNDEFINED_INDEX.value
 
-    arg1 = pyst.CudaArgument(ctrl=ctrl)
+    arg1 = st.CudaArgument(ctrl=ctrl)
     assert arg1.controller.pointer != st_NullCudaController
     assert arg1.controller.pointer == ctrl.pointer
     assert not arg1.has_argument_buffer
@@ -116,7 +125,7 @@ if __name__ == '__main__':
 
     # --------------------------------------------------------------------------
 
-    arg2 = pyst.CudaArgument(buffer=c_obj_buffer, ctrl=ctrl)
+    arg2 = st.CudaArgument(buffer=c_obj_buffer, ctrl=ctrl)
 
     assert arg2.has_argument_buffer
     assert arg2.has_cuda_arg_buffer
@@ -158,7 +167,7 @@ if __name__ == '__main__':
     assert config_orig.min_particle_id != config_copy.min_particle_id
     assert config_orig.max_particle_id != config_copy.max_particle_id
 
-    arg3 = pyst.CudaArgument(ptr_raw_arg_begin=ct.byref(config_orig),
+    arg3 = st.CudaArgument(ptr_raw_arg_begin=ct.byref(config_orig),
                              raw_arg_size=ct.sizeof(config_orig), ctrl=ctrl)
 
     assert arg3.has_argument_buffer
@@ -198,7 +207,7 @@ if __name__ == '__main__':
 
     # --------------------------------------------------------------------------
 
-    arg4 = pyst.CudaArgument(ctrl=ctrl)
+    arg4 = st.CudaArgument(ctrl=ctrl)
     assert arg4.controller.pointer != st_NullCudaController
     assert arg4.controller.pointer == ctrl.pointer
     assert not arg4.has_argument_buffer

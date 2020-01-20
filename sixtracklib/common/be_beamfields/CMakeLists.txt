@@ -24,8 +24,7 @@ set_target_properties( sixtrack_common_be_beamfields PROPERTIES
     C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_common_be_beamfields PRIVATE
-                        -Wall -Werror -pedantic -ansi
-                        ${SIXTRACKLIB_CPU_FLAGS} )
+                        ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_common_be_beamfields as a module for sixtracklib:

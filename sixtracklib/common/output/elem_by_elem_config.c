@@ -387,4 +387,26 @@ NS(arch_status_t) NS(ElemByElemConfig_assign_output_buffer_debug)(
         ptr_dbg_register );
 }
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig) const*
+NS(ElemByElemConfig_const_from_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const elem_by_elem_index )
+{
+    return NS(ElemByElemConfig_const_from_managed_buffer)(
+        NS(Buffer_get_const_data_begin)( buffer ),
+        elem_by_elem_index, NS(Buffer_get_slot_size)( buffer ) );
+}
+
+SIXTRL_BUFFER_DATAPTR_DEC NS(ElemByElemConfig)*
+NS(ElemByElemConfig_from_buffer)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const elem_by_elem_index )
+{
+    return NS(ElemByElemConfig_from_managed_buffer)(
+        NS(Buffer_get_data_begin)( buffer ),
+        elem_by_elem_index, NS(Buffer_get_slot_size)( buffer ) );
+}
+
 /* end: sixtracklib/common/output/elem_by_elem_config.c */

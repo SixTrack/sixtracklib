@@ -5,15 +5,24 @@ import sys
 import os
 import ctypes as ct
 from cobjects import CBuffer
-import sixtracklib as pyst
+import sixtracklib as st
 from sixtracklib.stcommon import \
     st_Track_all_particles_until_turn, st_Particles_buffer_get_particles, \
     st_NullParticles, st_NullBuffer, st_buffer_size_t, st_TRACK_SUCCESS
 import sixtracklib_test as testlib
 
 if __name__ == '__main__':
-    if not pyst.supports('cuda'):
+    if not st.supports('cuda'):
         raise SystemExit("cuda support required for this test")
+
+    try:
+        num_nodes = st.CudaController.NUM_AVAILABLE_NODES()
+    except RuntimeError as e:
+        num_nodes = 0
+
+    if num_nodes <= 0:
+        print("No CUDA nodes available -> skip test")
+        sys.exit(0)
 
     path_to_testdir = testlib.config.PATH_TO_TESTDATA_DIR
     assert path_to_testdir is not None
@@ -40,11 +49,11 @@ if __name__ == '__main__':
     # ==========================================================================
     # Perform "regular" tracking over NUM_TURNS
 
-    cmp_track_pb = pyst.Buffer(cbuffer=cmp_pb)
+    cmp_track_pb = st.Buffer(cbuffer=cmp_pb)
     assert cmp_track_pb.pointer != st_NullBuffer
     assert cmp_track_pb.num_objects == cmp_pb.n_objects
 
-    cmp_eb = pyst.Buffer(cbuffer=eb)
+    cmp_eb = st.Buffer(cbuffer=eb)
     assert cmp_eb.pointer != st_NullBuffer
     assert cmp_eb.num_objects == num_beam_elements
 
@@ -63,7 +72,7 @@ if __name__ == '__main__':
     # Setup CudaTrackJob to perform the same tracking on the same data but
     # line by line wise:
 
-    track_job = pyst.CudaTrackJob(eb, pb, PSET_INDEX)
+    track_job = st.CudaTrackJob(eb, pb, PSET_INDEX)
 
     assert track_job.arch_str == "cuda"
     assert track_job.requires_collecting
@@ -102,10 +111,10 @@ if __name__ == '__main__':
     # ==========================================================================
     # Compare Results from CPU based and CudaTrackJob based line tracking
 
-    tracked_particles = pb.get_object(PSET_INDEX, cls=pyst.Particles)
-    cmp_particles = cmp_pb.get_object(PSET_INDEX, cls=pyst.Particles)
+    tracked_particles = pb.get_object(PSET_INDEX, cls=st.Particles)
+    cmp_particles = cmp_pb.get_object(PSET_INDEX, cls=st.Particles)
 
-    assert pyst.compareParticlesDifference(
+    assert st.compareParticlesDifference(
         tracked_particles, cmp_particles, abs_treshold=2e-14) == 0
 
     sys.exit(0)

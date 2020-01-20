@@ -31,70 +31,70 @@ NS(Object);
 
 /* ========================================================================= */
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
 NS(Object_preset)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob );
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_addr_t) NS(Object_get_begin_addr)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_addr_t) NS(Object_get_begin_addr)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT ob );
 
-SIXTRL_FN SIXTRL_STATIC void NS(Object_set_begin_addr)(
+SIXTRL_STATIC SIXTRL_FN void NS(Object_set_begin_addr)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
     NS(buffer_addr_t) const begin_addr );
 
-SIXTRL_FN SIXTRL_STATIC  NS(object_type_id_t) NS(Object_get_type_id)(
+SIXTRL_STATIC SIXTRL_FN  NS(object_type_id_t) NS(Object_get_type_id)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT ob );
 
-SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_type_id)(
+SIXTRL_STATIC SIXTRL_FN  void NS(Object_set_type_id)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
     NS(object_type_id_t) const type_id );
 
-SIXTRL_FN SIXTRL_STATIC  NS(buffer_size_t) NS(Object_get_size)(
+SIXTRL_STATIC SIXTRL_FN  NS(buffer_size_t) NS(Object_get_size)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT ob );
 
-SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_size)(
+SIXTRL_STATIC SIXTRL_FN  void NS(Object_set_size)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob,
     NS(buffer_size_t) const size );
 
-SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_size_priv)(
+SIXTRL_STATIC SIXTRL_FN  void NS(Object_set_size_priv)(
     SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob,
     NS(buffer_size_t) const size );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char const*
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char const*
 NS(Object_get_const_begin_ptr)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC const
     NS(Object) *const SIXTRL_RESTRICT ob );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char*
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char*
 NS(Object_get_begin_ptr)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob );
 
-SIXTRL_FN SIXTRL_STATIC void NS(Object_set_begin_ptr)(
+SIXTRL_STATIC SIXTRL_FN void NS(Object_set_begin_ptr)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob,
     SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin_ptr );
 
 /* ========================================================================= */
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC NS(Object)*
+SIXTRL_STATIC SIXTRL_FN SIXTRL_ARGPTR_DEC NS(Object)*
 NS(Object_preset_priv)( SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob );
 
-SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_size_priv)(
+SIXTRL_STATIC SIXTRL_FN  void NS(Object_set_size_priv)(
     SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
     NS(buffer_size_t) const obj_size );
 
-SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_begin_addr_priv)(
+SIXTRL_STATIC SIXTRL_FN  void NS(Object_set_begin_addr_priv)(
     SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
     NS(buffer_addr_t) const address );
 
-SIXTRL_FN SIXTRL_STATIC  void NS(Object_set_type_id_priv)(
+SIXTRL_STATIC SIXTRL_FN  void NS(Object_set_type_id_priv)(
     SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT object,
     NS(object_type_id_t) const type_id );
 
-SIXTRL_FN SIXTRL_STATIC void NS(Object_set_begin_ptr_priv)(
+SIXTRL_STATIC SIXTRL_FN void NS(Object_set_begin_ptr_priv)(
     SIXTRL_ARGPTR_DEC NS(Object)* SIXTRL_RESTRICT ob,
     SIXTRL_BUFFER_OBJ_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT begin_ptr );
 
 /* ========================================================================= */
 
-SIXTRL_FN SIXTRL_STATIC void NS(Object_print_slots)(
+SIXTRL_STATIC SIXTRL_FN void NS(Object_print_slots)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const SIXTRL_RESTRICT obj,
     NS(buffer_size_t) const num_slots_to_print );
 

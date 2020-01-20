@@ -1,3 +1,5 @@
+#include "sixtracklib/common/buffer.hpp"
+
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
@@ -12,9 +14,8 @@
 #include <gtest/gtest.h>
 
 #include "sixtracklib/common/definitions.h"
-#include "sixtracklib/testlib/common/generic_buffer_obj.h"
+#include "sixtracklib/testlib/common/buffer/generic_buffer_obj.h"
 #include "sixtracklib/testlib/testdata/testdata_files.h"
-#include "sixtracklib/common/buffer.hpp"
 
 #include "sixtracklib/testlib.h"
 
@@ -22,15 +23,15 @@ namespace sixtrack
 {
     struct MyObj
     {
-        st_object_type_id_t      type_id  SIXTRL_ALIGN( 8u );
+        ::NS(object_type_id_t)   type_id  SIXTRL_ALIGN( 8u );
         int32_t                  a        SIXTRL_ALIGN( 8u );
         double                   b        SIXTRL_ALIGN( 8u );
         double                   c[ 4 ]   SIXTRL_ALIGN( 8u );
         uint8_t* SIXTRL_RESTRICT d        SIXTRL_ALIGN( 8u );
         double*  SIXTRL_RESTRICT e        SIXTRL_ALIGN( 8u );
 
-        void preset( st_object_type_id_t const type_id =
-            st_object_type_id_t{ 0 } ) SIXTRL_NOEXCEPT
+        void preset( ::NS(object_type_id_t) const type_id =
+            ::NS(object_type_id_t){ 0 } ) SIXTRL_NOEXCEPT
         {
             this->type_id = type_id;
             this->a       = int32_t{ 0 };
@@ -170,7 +171,7 @@ namespace sixtrack
 
 /* ************************************************************************* */
 
-TEST( CXX_CommonBufferTests, InitOnExistingFlatMemory)
+TEST( CXX_Common_Buffer_BufferTests, InitOnExistingFlatMemory)
 {
     namespace st = sixtrack;
 
@@ -194,12 +195,13 @@ TEST( CXX_CommonBufferTests, InitOnExistingFlatMemory)
 
 /* ************************************************************************* */
 
-TEST( CXX_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
+TEST( CXX_Common_Buffer_BufferTests,
+      InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 {
     namespace st = sixtrack;
 
     using my_obj_t  = st::MyObj;
-    using type_id_t = ::st_object_type_id_t;
+    using type_id_t = ::NS(object_type_id_t);
 
     using buffer_t  = st::Buffer;
     using obj_t     = buffer_t::object_t;
@@ -279,11 +281,11 @@ TEST( CXX_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 
 
     ASSERT_TRUE( ptr_object != nullptr );
-    ASSERT_TRUE( st_Object_get_type_id( ptr_object ) == obj1.type_id );
-    ASSERT_TRUE( st_Object_get_size( ptr_object ) > sizeof( obj1 ) );
+    ASSERT_TRUE( ::NS(Object_get_type_id)( ptr_object ) == obj1.type_id );
+    ASSERT_TRUE( ::NS(Object_get_size)( ptr_object ) > sizeof( obj1 ) );
 
     sixtrack::MyObj* ptr_stored_obj = reinterpret_cast< sixtrack::MyObj* >(
-       st_Object_get_begin_ptr( ptr_object ) );
+       ::NS(Object_get_begin_ptr)( ptr_object ) );
 
     ASSERT_TRUE( ptr_stored_obj != nullptr );
     ASSERT_TRUE( ptr_stored_obj != &obj1 );
@@ -293,20 +295,20 @@ TEST( CXX_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
     ASSERT_TRUE( std::fabs( ptr_stored_obj->b - obj1.b ) <=
                  std::numeric_limits< double >::epsilon() );
 
-    for( st_buffer_size_t ii = 0u ; ii < num_c_values ; ++ii )
+    for( ::NS(buffer_size_t) ii = 0u ; ii < num_c_values ; ++ii )
     {
         ASSERT_TRUE( &ptr_stored_obj->c[ ii ] != &obj1.c[ ii ] );
         ASSERT_TRUE( std::fabs( ptr_stored_obj->c[ ii ] - obj1.c[ ii ] )
             <= std::numeric_limits< double >::epsilon() );
     }
 
-    for( st_buffer_size_t ii = 0 ; ii < num_d_values ; ++ii )
+    for( ::NS(buffer_size_t) ii = 0 ; ii < num_d_values ; ++ii )
     {
         ASSERT_TRUE( &ptr_stored_obj->d[ ii ] != &obj1.d[ ii ] );
         ASSERT_TRUE(  ptr_stored_obj->d[ ii ] ==  obj1.d[ ii ] );
     }
 
-    for( st_buffer_size_t ii = 0 ; ii < num_e_values ; ++ii )
+    for( ::NS(buffer_size_t) ii = 0 ; ii < num_e_values ; ++ii )
     {
         ASSERT_TRUE( &ptr_stored_obj->e[ ii ] != &obj1.e[ ii ] );
         ASSERT_TRUE( std::fabs( ptr_stored_obj->e[ ii ] - obj1.e[ ii ] )
@@ -380,7 +382,7 @@ TEST( CXX_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 
     ASSERT_TRUE( &ptr_stored_obj->c[ 0 ] != &cmp_obj.c[ 0 ] );
 
-    for( st_buffer_size_t ii = 0u ; ii < num_c_values ; ++ii )
+    for( ::NS(buffer_size_t) ii = 0u ; ii < num_c_values ; ++ii )
     {
         ASSERT_TRUE( std::fabs( ptr_stored_obj->c[ ii ] -
             cmp_obj.c[ ii ] ) <= std::numeric_limits< double >::epsilon() );
@@ -389,12 +391,12 @@ TEST( CXX_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
     ASSERT_TRUE( ptr_stored_obj->d != nullptr );
     ASSERT_TRUE( ptr_stored_obj->e != nullptr );
 
-    for( st_buffer_size_t ii = 0 ; ii < num_d_values ; ++ii )
+    for( ::NS(buffer_size_t) ii = 0 ; ii < num_d_values ; ++ii )
     {
         ASSERT_TRUE(  ptr_stored_obj->d[ ii ] ==  uint8_t{ 0 } );
     }
 
-    for( st_buffer_size_t ii = 0 ; ii < num_e_values ; ++ii )
+    for( ::NS(buffer_size_t) ii = 0 ; ii < num_e_values ; ++ii )
     {
         ASSERT_TRUE( std::fabs( ptr_stored_obj->e[ ii ] - double{ 0.0 } )
             <= std::numeric_limits< double >::epsilon() );
@@ -475,22 +477,22 @@ TEST( CXX_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 
     for( ; obj_it != obj_end ; ++obj_it, ++cmp_obj_it )
     {
-        ASSERT_TRUE( st_Object_get_type_id( obj_it ) ==
-                     st_Object_get_type_id( cmp_obj_it ) );
+        ASSERT_TRUE( ::NS(Object_get_type_id)( obj_it ) ==
+                     ::NS(Object_get_type_id)( cmp_obj_it ) );
 
-        ASSERT_TRUE( st_Object_get_size( obj_it ) ==
-                     st_Object_get_size( cmp_obj_it ) );
+        ASSERT_TRUE( ::NS(Object_get_size)( obj_it ) ==
+                     ::NS(Object_get_size)( cmp_obj_it ) );
 
-        ASSERT_TRUE( st_Object_get_size( obj_it ) > sizeof( st::MyObj ) );
+        ASSERT_TRUE( ::NS(Object_get_size)( obj_it ) > sizeof( st::MyObj ) );
 
-        ASSERT_TRUE( st_Object_get_const_begin_ptr( obj_it ) !=
-                     st_Object_get_const_begin_ptr( cmp_obj_it ) );
+        ASSERT_TRUE( ::NS(Object_get_const_begin_ptr)( obj_it ) !=
+                     ::NS(Object_get_const_begin_ptr)( cmp_obj_it ) );
 
         my_obj_t const* ptr_my_obj = reinterpret_cast< my_obj_t const* >(
-            st_Object_get_const_begin_ptr( obj_it ) );
+            ::NS(Object_get_const_begin_ptr)( obj_it ) );
 
         my_obj_t const* ptr_cmp_obj = reinterpret_cast< my_obj_t const* >(
-            st_Object_get_const_begin_ptr( cmp_obj_it ) );
+            ::NS(Object_get_const_begin_ptr)( cmp_obj_it ) );
 
         ASSERT_TRUE( ptr_my_obj  != nullptr );
         ASSERT_TRUE( ptr_cmp_obj != nullptr );
@@ -501,7 +503,7 @@ TEST( CXX_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
         ASSERT_TRUE( std::fabs( ptr_cmp_obj->b - ptr_my_obj->b ) <=
                         std::numeric_limits< double >::epsilon() );
 
-        for( st_buffer_size_t ii = 0u ; ii < num_c_values ; ++ii )
+        for( ::NS(buffer_size_t) ii = 0u ; ii < num_c_values ; ++ii )
         {
             ASSERT_TRUE( &ptr_cmp_obj->c[ ii ] != &ptr_my_obj->c[ ii ] );
             ASSERT_TRUE( std::fabs( ptr_cmp_obj->c[ ii ] - ptr_my_obj->c[ ii ] )
@@ -512,7 +514,7 @@ TEST( CXX_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
         ASSERT_TRUE( ptr_cmp_obj->d != nullptr );
         ASSERT_TRUE( ptr_my_obj->d  != nullptr );
 
-        for( st_buffer_size_t ii = 0 ; ii < num_d_values ; ++ii )
+        for( ::NS(buffer_size_t) ii = 0 ; ii < num_d_values ; ++ii )
         {
             ASSERT_TRUE( ptr_cmp_obj->d[ ii ] == ptr_my_obj->d[ ii ] );
         }
@@ -521,7 +523,7 @@ TEST( CXX_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
         ASSERT_TRUE( ptr_cmp_obj->e != nullptr );
         ASSERT_TRUE( ptr_my_obj->e  != nullptr );
 
-        for( st_buffer_size_t ii = 0 ; ii < num_e_values ; ++ii )
+        for( ::NS(buffer_size_t) ii = 0 ; ii < num_e_values ; ++ii )
         {
             ASSERT_TRUE( std::fabs( ptr_cmp_obj->e[ ii ] - ptr_my_obj->e[ ii ] )
                 <= std::numeric_limits< double >::epsilon() );
@@ -589,12 +591,12 @@ TEST( CXX_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 
 /* ************************************************************************* */
 
-TEST( CXX_CommonBufferTests, ReconstructFromCObjectFile )
+TEST( CXX_Common_Buffer_BufferTests, ReconstructFromCObjectFile )
 {
     namespace st = sixtrack;
 
     using my_obj_t  = st::MyObj;
-    using type_id_t = ::st_object_type_id_t;
+    using type_id_t = ::NS(object_type_id_t);
 
     using buffer_t  = st::Buffer;
     using obj_t     = buffer_t::object_t;
@@ -645,10 +647,10 @@ TEST( CXX_CommonBufferTests, ReconstructFromCObjectFile )
         ASSERT_TRUE( fp != nullptr );
 
         constexpr size_t NUM_DATAPTRS_PER_OBJ = size_t{ 2u };
-        constexpr size_t NUM_SLOTS            = size_t{ 48u };
-        constexpr size_t NUM_OBJECTS          = size_t{ 3u };
-        constexpr size_t NUM_DATAPTRS         = NUM_OBJECTS * NUM_DATAPTRS_PER_OBJ;
-        constexpr size_t NUM_GARBAGE_RANGES   = size_t{ 1u };
+        constexpr size_t NUM_SLOTS    = size_t{ 48u };
+        constexpr size_t NUM_OBJECTS  = size_t{ 3u };
+        constexpr size_t NUM_DATAPTRS = NUM_OBJECTS * NUM_DATAPTRS_PER_OBJ;
+        constexpr size_t NUM_GARBAGE_RANGES = size_t{ 1u };
 
         size_t const buffer_capacity = st::Buffer::CalculateBufferSize(
             NUM_OBJECTS, NUM_SLOTS, NUM_DATAPTRS, NUM_GARBAGE_RANGES );
@@ -658,7 +660,7 @@ TEST( CXX_CommonBufferTests, ReconstructFromCObjectFile )
         st::Buffer buffer( data_buffer.data(), NUM_OBJECTS, NUM_SLOTS,
                         NUM_DATAPTRS, NUM_GARBAGE_RANGES, data_buffer.size() );
 
-        /* --------------------------------------------------------------------- */
+        /* ----------------------------------------------------------------- */
 
         my_obj_t* ptr_obj1 = buffer.add< my_obj_t >( obj1_type_id,
             num_d_values, num_e_values, obj1_a, obj1_b, obj1_c, obj1_d, obj1_e );
@@ -666,7 +668,7 @@ TEST( CXX_CommonBufferTests, ReconstructFromCObjectFile )
         ASSERT_TRUE( ptr_obj1 != SIXTRL_NULLPTR );
         ASSERT_TRUE( ptr_obj1->type_id == obj1_type_id );
 
-        /* --------------------------------------------------------------------- */
+        /* ----------------------------------------------------------------- */
 
         my_obj_t* ptr_obj2 = buffer.add< my_obj_t >( obj2_type_id,
             num_d_values, num_e_values, obj2_a, obj2_b, obj2_c, obj2_d, obj2_e );
@@ -674,7 +676,7 @@ TEST( CXX_CommonBufferTests, ReconstructFromCObjectFile )
         ASSERT_TRUE( ptr_obj2 != SIXTRL_NULLPTR );
         ASSERT_TRUE( ptr_obj2->type_id == obj2_type_id );
 
-        /* --------------------------------------------------------------------- */
+        /* ----------------------------------------------------------------- */
 
         my_obj_t* ptr_obj3 = buffer.createNew< my_obj_t >(
             obj3_type_id, num_d_values, num_e_values );
@@ -682,12 +684,12 @@ TEST( CXX_CommonBufferTests, ReconstructFromCObjectFile )
         ASSERT_TRUE( ptr_obj3 != SIXTRL_NULLPTR );
         ASSERT_TRUE( ptr_obj3->type_id == obj3_type_id );
 
-        /* --------------------------------------------------------------------- */
+        /* ----------------------------------------------------------------- */
 
-        st_buffer_size_t const cnt = std::fwrite(
+        ::NS(buffer_size_t) const cnt = std::fwrite(
             buffer.dataBegin< raw_t const* >(), buffer.size(), size_t{ 1 }, fp );
 
-        ASSERT_TRUE( cnt == st_buffer_size_t{ 1 } );
+        ASSERT_TRUE( cnt == ::NS(buffer_size_t){ 1 } );
 
         std::fclose( fp );
         fp = nullptr;
@@ -769,15 +771,15 @@ TEST( CXX_CommonBufferTests, ReconstructFromCObjectFile )
 
     for( ; obj_it != obj_end ; ++obj_it, ++cmp_obj_it )
     {
-        ASSERT_TRUE( st_Object_get_type_id( obj_it ) == cmp_obj_it->type_id );
-        ASSERT_TRUE( st_Object_get_size( obj_it ) > sizeof( st::MyObj ) );
-        ASSERT_TRUE( st_Object_get_const_begin_ptr( obj_it ) != nullptr );
+        ASSERT_TRUE( ::NS(Object_get_type_id)( obj_it ) == cmp_obj_it->type_id );
+        ASSERT_TRUE( ::NS(Object_get_size)( obj_it ) > sizeof( st::MyObj ) );
+        ASSERT_TRUE( ::NS(Object_get_const_begin_ptr)( obj_it ) != nullptr );
 
         st::MyObj const* ptr_my_obj = reinterpret_cast< st::MyObj const* >(
-                st_Object_get_const_begin_ptr( obj_it ) );
+                ::NS(Object_get_const_begin_ptr)( obj_it ) );
 
         ASSERT_TRUE( ptr_my_obj != nullptr );
-        ASSERT_TRUE( ptr_my_obj->type_id == st_Object_get_type_id( obj_it ) );
+        ASSERT_TRUE( ptr_my_obj->type_id == ::NS(Object_get_type_id)( obj_it ) );
 
         ASSERT_TRUE( ptr_my_obj->a == cmp_obj_it->a );
         ASSERT_TRUE( std::fabs( ( ptr_my_obj->b - cmp_obj_it->b ) <
@@ -829,11 +831,11 @@ TEST( CXX_CommonBufferTests, ReconstructFromCObjectFile )
     }
 }
 
-TEST( CXX_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
+TEST( CXX_Common_Buffer_BufferTests, NewBufferAndGrowingWithinCapacity )
 {
     namespace st = sixtrack;
 
-    using type_id_t = ::st_object_type_id_t;
+    using type_id_t = ::NS(object_type_id_t);
     using buffer_t  = st::Buffer;
     using size_t    = buffer_t::size_type;
 
@@ -908,9 +910,10 @@ TEST( CXX_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
     ASSERT_TRUE( ptr_obj2->type_id == obj2_type_id );
     ASSERT_TRUE( ptr_obj2->a       == obj2_a );
 
+    ASSERT_TRUE( buffer.getNumSlots() > num_slots_after_obj1 );
     ASSERT_TRUE( buffer.getNumObjects()  == size_t{ 2 } );
-    ASSERT_TRUE( buffer.getNumDataptrs() == size_t{ 2 } * NUM_DATAPTRS_PER_OBJ );
-    ASSERT_TRUE( buffer.getNumSlots()    >  num_slots_after_obj1 );
+    ASSERT_TRUE( buffer.getNumDataptrs() == size_t{ 2 } *
+        NUM_DATAPTRS_PER_OBJ );
 
     size_t const num_slots_after_obj2 = buffer.getNumSlots();
 
@@ -924,19 +927,20 @@ TEST( CXX_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
     ASSERT_TRUE( ptr_obj3 != nullptr );
     ASSERT_TRUE( ptr_obj3->type_id == obj3_type_id );
 
-    ASSERT_TRUE( buffer.getNumObjects()  == size_t{ 3 } );
-    ASSERT_TRUE( buffer.getNumDataptrs() == size_t{ 3 } * NUM_DATAPTRS_PER_OBJ );
-    ASSERT_TRUE( buffer.getNumSlots()    >  num_slots_after_obj2 );
+    ASSERT_TRUE( buffer.getNumObjects() == size_t{ 3 } );
+    ASSERT_TRUE( buffer.getNumDataptrs() ==
+                 size_t{ 3 } * NUM_DATAPTRS_PER_OBJ );
+    ASSERT_TRUE( buffer.getNumSlots() >  num_slots_after_obj2 );
 }
 
-TEST( CXX_CommonBufferTests, AddGenericObjectsTestAutoGrowingOfBuffer )
+TEST( CXX_Common_Buffer_BufferTests, AddGenericObjectsTestAutoGrowingOfBuffer )
 {
     namespace st = sixtrack;
 
     using buf_size_t    = st::Buffer::size_type;
     using type_id_t     = st::Buffer::type_id_t;
-    using generic_obj_t = ::st_GenericObj;
-    using index_obj_t   = ::st_Object;
+    using generic_obj_t = ::NS(GenericObj);
+    using index_obj_t   = ::NS(Object);
 
     st::Buffer buffer;
 
@@ -994,8 +998,8 @@ TEST( CXX_CommonBufferTests, AddGenericObjectsTestAutoGrowingOfBuffer )
                 NUM_DATAPTRS, offsets, sizes, counts );
 
         ASSERT_TRUE( index_obj != nullptr );
-        ASSERT_TRUE( ::st_Object_get_type_id( index_obj )   == temp.type_id );
-        ASSERT_TRUE( ::st_Object_get_begin_ptr( index_obj ) != nullptr );
+        ASSERT_TRUE( ::NS(Object_get_type_id)( index_obj )   == temp.type_id );
+        ASSERT_TRUE( ::NS(Object_get_begin_ptr)( index_obj ) != nullptr );
 
         buf_size_t const capacity = buffer.capacity();
         buf_size_t const size     = buffer.size();
@@ -1023,7 +1027,7 @@ TEST( CXX_CommonBufferTests, AddGenericObjectsTestAutoGrowingOfBuffer )
     ASSERT_TRUE( buffer.getNumObjects() == NUM_OBJECTS_TO_ADD );
 }
 
-TEST( CXX_CommonBufferTests, DumpToFileConstructFromDumpCompare)
+TEST( CXX_Common_Buffer_BufferTests, DumpToFileConstructFromDumpCompare)
 {
     namespace st = sixtrack;
 
@@ -1031,7 +1035,7 @@ TEST( CXX_CommonBufferTests, DumpToFileConstructFromDumpCompare)
     using prng_seed_t = unsigned long long;
 
     prng_seed_t const seed = prng_seed_t{ 20181105 };
-    ::st_Random_init_genrand64( seed );
+    ::NS(Random_init_genrand64)( seed );
 
     st::Buffer buffer;
 
@@ -1041,14 +1045,14 @@ TEST( CXX_CommonBufferTests, DumpToFileConstructFromDumpCompare)
 
     for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_OBJECTS ; ++ii )
     {
-        ::st_object_type_id_t const type_id =
-            static_cast< ::st_object_type_id_t >( ii );
+        ::NS(object_type_id_t) const type_id =
+            static_cast< ::NS(object_type_id_t) >( ii );
 
-        ::st_GenericObj* obj = ::st_GenericObj_new(
+        ::NS(GenericObj)* obj = ::NS(GenericObj_new)(
                 &buffer, type_id, num_d_values, num_e_values );
 
         ASSERT_TRUE( obj != nullptr );
-        ::st_GenericObj_init_random( obj );
+        ::NS(GenericObj_init_random)( obj );
     }
 
     ASSERT_TRUE( buffer.size()           >  buf_size_t{ 0 } );
@@ -1072,11 +1076,12 @@ TEST( CXX_CommonBufferTests, DumpToFileConstructFromDumpCompare)
         ASSERT_TRUE( restored_ptr != nullptr );
         ASSERT_TRUE( restored_ptr != orig_ptr );
 
-        ::st_GenericObj const* orig_obj = reinterpret_cast<
-            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( orig_ptr ) );
+        ::NS(GenericObj) const* orig_obj = reinterpret_cast<
+            ::NS(GenericObj) const* >(
+                ::NS(Object_get_const_begin_ptr)( orig_ptr ) );
 
-        ::st_GenericObj const* restored_obj = reinterpret_cast<
-            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr(
+        ::NS(GenericObj) const* restored_obj = reinterpret_cast<
+            ::NS(GenericObj) const* >( ::NS(Object_get_const_begin_ptr)(
                 restored_ptr ) );
 
         ASSERT_TRUE( orig_obj != nullptr );
@@ -1084,8 +1089,9 @@ TEST( CXX_CommonBufferTests, DumpToFileConstructFromDumpCompare)
         ASSERT_TRUE( restored_obj != orig_obj );
 
         ASSERT_TRUE(
-            ( 0 == ::st_GenericObj_compare_values( orig_obj, restored_obj ) ) ||
-            ( 0 == ::st_GenericObj_compare_values_with_treshold(
+            ( 0 == ::NS(GenericObj_compare_values)(
+                orig_obj, restored_obj ) ) ||
+            ( 0 == ::NS(GenericObj_compare_values_with_treshold)(
                 orig_obj, restored_obj, ABS_TRESHOLD ) ) );
     }
 
@@ -1093,7 +1099,7 @@ TEST( CXX_CommonBufferTests, DumpToFileConstructFromDumpCompare)
 }
 
 
-TEST( CXX_CommonBufferTests, WriteBufferNormalizedAddrRestoreVerify )
+TEST( CXX_Common_Buffer_BufferTests, WriteBufferNormalizedAddrRestoreVerify )
 {
     namespace st = sixtrack;
 
@@ -1102,7 +1108,7 @@ TEST( CXX_CommonBufferTests, WriteBufferNormalizedAddrRestoreVerify )
     using prng_seed_t = unsigned long long;
 
     prng_seed_t const seed = prng_seed_t{ 20181105 };
-    ::st_Random_init_genrand64( seed );
+    ::NS(Random_init_genrand64)( seed );
 
     st::Buffer cmp_buffer;
     st::Buffer temp_buffer;
@@ -1113,16 +1119,16 @@ TEST( CXX_CommonBufferTests, WriteBufferNormalizedAddrRestoreVerify )
 
     for( buf_size_t ii = buf_size_t{ 0 } ; ii < NUM_OBJECTS ; ++ii )
     {
-        ::st_object_type_id_t const type_id =
-            static_cast< ::st_object_type_id_t >( ii );
+        ::NS(object_type_id_t) const type_id =
+            static_cast< ::NS(object_type_id_t) >( ii );
 
-        ::st_GenericObj* obj = ::st_GenericObj_new(
+        ::NS(GenericObj)* obj = ::NS(GenericObj_new)(
                 &cmp_buffer, type_id, num_d_values, num_e_values );
 
         ASSERT_TRUE( obj != nullptr );
-        ::st_GenericObj_init_random( obj );
+        ::NS(GenericObj_init_random)( obj );
 
-        ::st_GenericObj* copy_obj = ::st_GenericObj_add_copy(
+        ::NS(GenericObj)* copy_obj = ::NS(GenericObj_add_copy)(
                 &temp_buffer, obj );
 
         ASSERT_TRUE( copy_obj != nullptr );
@@ -1144,19 +1150,21 @@ TEST( CXX_CommonBufferTests, WriteBufferNormalizedAddrRestoreVerify )
         ASSERT_TRUE( copy_ptr != nullptr );
         ASSERT_TRUE( copy_ptr != orig_ptr );
 
-        ::st_GenericObj const* orig_obj = reinterpret_cast<
-            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( orig_ptr ) );
+        ::NS(GenericObj) const* orig_obj = reinterpret_cast<
+            ::NS(GenericObj) const* >(
+                ::NS(Object_get_const_begin_ptr)( orig_ptr ) );
 
-        ::st_GenericObj const* copy_obj = reinterpret_cast<
-            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( copy_ptr ) );
+        ::NS(GenericObj) const* copy_obj = reinterpret_cast<
+            ::NS(GenericObj) const* >(
+                ::NS(Object_get_const_begin_ptr)( copy_ptr ) );
 
         ASSERT_TRUE( orig_obj != nullptr );
         ASSERT_TRUE( copy_obj != nullptr );
         ASSERT_TRUE( copy_obj != orig_obj );
 
         ASSERT_TRUE(
-            ( 0 == ::st_GenericObj_compare_values( orig_obj, copy_obj ) ) ||
-            ( 0 == ::st_GenericObj_compare_values_with_treshold(
+            ( 0 == ::NS(GenericObj_compare_values)( orig_obj, copy_obj ) ) ||
+            ( 0 == ::NS(GenericObj_compare_values_with_treshold)(
                 orig_obj, copy_obj, ABS_TRESHOLD ) ) );
     }
 
@@ -1188,19 +1196,21 @@ TEST( CXX_CommonBufferTests, WriteBufferNormalizedAddrRestoreVerify )
         ASSERT_TRUE( copy_ptr != nullptr );
         ASSERT_TRUE( copy_ptr != orig_ptr );
 
-        ::st_GenericObj const* orig_obj = reinterpret_cast<
-            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( orig_ptr ) );
+        ::NS(GenericObj) const* orig_obj = reinterpret_cast<
+            ::NS(GenericObj) const* >(
+                ::NS(Object_get_const_begin_ptr)( orig_ptr ) );
 
-        ::st_GenericObj const* copy_obj = reinterpret_cast<
-            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( copy_ptr ) );
+        ::NS(GenericObj) const* copy_obj = reinterpret_cast<
+            ::NS(GenericObj) const* >(
+                ::NS(Object_get_const_begin_ptr)( copy_ptr ) );
 
         ASSERT_TRUE( orig_obj != nullptr );
         ASSERT_TRUE( copy_obj != nullptr );
         ASSERT_TRUE( copy_obj != orig_obj );
 
         ASSERT_TRUE(
-            ( 0 == ::st_GenericObj_compare_values( orig_obj, copy_obj ) ) ||
-            ( 0 == ::st_GenericObj_compare_values_with_treshold(
+            ( 0 == ::NS(GenericObj_compare_values)( orig_obj, copy_obj ) ) ||
+            ( 0 == ::NS(GenericObj_compare_values_with_treshold)(
                 orig_obj, copy_obj, ABS_TRESHOLD ) ) );
     }
 
@@ -1240,23 +1250,25 @@ TEST( CXX_CommonBufferTests, WriteBufferNormalizedAddrRestoreVerify )
         ASSERT_TRUE( rest_ptr != nullptr );
         ASSERT_TRUE( rest_ptr != orig_ptr );
 
-        ::st_GenericObj const* orig_obj = reinterpret_cast<
-            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( orig_ptr ) );
+        ::NS(GenericObj) const* orig_obj = reinterpret_cast<
+            ::NS(GenericObj) const* >(
+                ::NS(Object_get_const_begin_ptr)( orig_ptr ) );
 
-        ::st_GenericObj const* rest_obj = reinterpret_cast<
-            ::st_GenericObj const* >( ::st_Object_get_const_begin_ptr( rest_ptr ) );
+        ::NS(GenericObj) const* rest_obj = reinterpret_cast<
+            ::NS(GenericObj) const* >(
+                ::NS(Object_get_const_begin_ptr)( rest_ptr ) );
 
         ASSERT_TRUE( orig_obj != nullptr );
         ASSERT_TRUE( rest_obj != nullptr );
         ASSERT_TRUE( rest_obj != orig_obj );
 
         ASSERT_TRUE(
-            ( 0 == ::st_GenericObj_compare_values( orig_obj, rest_obj ) ) ||
-            ( 0 == ::st_GenericObj_compare_values_with_treshold(
+            ( 0 == ::NS(GenericObj_compare_values)( orig_obj, rest_obj ) ) ||
+            ( 0 == ::NS(GenericObj_compare_values_with_treshold)(
                 orig_obj, rest_obj, ABS_TRESHOLD ) ) );
     }
 }
 
 /* ************************************************************************* */
 
-/* end: tests/sixtracklib/common/test_buffer_cxx.cpp */
+/* end: tests/sixtracklib/common/buffer/test_buffer_cxx.cpp */
