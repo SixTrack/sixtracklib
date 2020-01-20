@@ -347,7 +347,7 @@ SIXTRL_INLINE NS(particle_real_t) NS(LimitRectEllipse_a)(
     #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
 
     SIXTRL_ASSERT( limit != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( limit->a_sqrt >= ( NS(particle_real_t) )0.0 );
+    SIXTRL_ASSERT( limit->a_squ >= ( NS(particle_real_t) )0.0 );
     return sqrt( limit->a_squ );
 }
 
@@ -360,7 +360,7 @@ SIXTRL_INLINE NS(particle_real_t) NS(LimitRectEllipse_b)(
     #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
 
     SIXTRL_ASSERT( limit != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( limit->b_sqrt >= ( NS(particle_real_t) )0.0 );
+    SIXTRL_ASSERT( limit->b_squ >= ( NS(particle_real_t) )0.0 );
     return sqrt( limit->b_squ );
 }
 
