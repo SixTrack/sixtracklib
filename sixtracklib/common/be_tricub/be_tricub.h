@@ -225,6 +225,14 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(TriCubData_attributes_counts)(
     NS(buffer_size_t) const max_num_counts,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data );
 
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t) NS(TriCubData_type_id_ext)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT d );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TriCubData_ptr_offset)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT d );
+
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TriCubData_can_be_added)(
@@ -412,6 +420,14 @@ SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(TriCub)*
 NS(TriCub_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const index );
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t) NS(TriCub_type_id_ext)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TriCub_data_addr_offset)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub );
 
 /* ------------------------------------------------------------------------- */
 
