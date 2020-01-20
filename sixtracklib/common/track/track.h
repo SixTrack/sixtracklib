@@ -513,8 +513,8 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
 
         case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
         {
-            #if !defined( SIXTRL_TRACK_SC_COASTING ) || \
-                ( SIXTRL_TRACK_SC_COASTING == SIXTRL_TRACK_MAP_ENABLED )
+            #if !defined( SIXTRL_TRACK_SPACECHARGE ) || \
+                ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_ENABLED )
 
             typedef NS(SpaceChargeCoasting)   belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
@@ -523,8 +523,8 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             ret = NS(Track_particle_space_charge_coasting)(
                 particles, index, belem );
 
-            #elif defined( SIXTRL_TRACK_SC_COASTING ) && \
-                  ( SIXTRL_TRACK_SC_COASTING == SIXTRL_TRACK_MAP_SKIP )
+            #elif defined( SIXTRL_TRACK_SPACECHARGE ) && \
+                  ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_SKIP )
 
             /* Skip particle and do nothing! */
             ret = SIXTRL_TRACK_SUCCESS;
@@ -539,8 +539,8 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
 
         case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
         {
-            #if !defined( SIXTRL_TRACK_SC_BUNCHED ) || \
-                ( SIXTRL_TRACK_SC_BUNCHED == SIXTRL_TRACK_MAP_ENABLED )
+            #if !defined( SIXTRL_TRACK_SPACECHARGE ) || \
+                ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_ENABLED )
 
             typedef NS(SpaceChargeBunched)   belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
@@ -549,8 +549,8 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             ret = NS(Track_particle_space_charge_bunched)(
                 particles, index, belem );
 
-            #elif defined( SIXTRL_TRACK_SC_BUNCHED ) && \
-                  ( SIXTRL_TRACK_SC_BUNCHED == SIXTRL_TRACK_MAP_SKIP )
+            #elif defined( SIXTRL_TRACK_SPACECHARGE ) && \
+                  ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_SKIP )
 
             /* Skip particle and do nothing! */
             ret = SIXTRL_TRACK_SUCCESS;

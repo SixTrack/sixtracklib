@@ -8,7 +8,7 @@
 /* ------------------------------------------------------------------------- */
 /* ----  Enable / disable / skip tracking over specific beam elements   ---- */
 /* ------------------------------------------------------------------------- */
- 
+
  #if !defined( SIXTRL_TRACK_MAP_ENABLED )
     #define SIXTRL_TRACK_MAP_ENABLED @SIXTRL_TRACK_MAP_ENABLED_VALUE@
     #define SIXTRL_TRACK_MAP_ENABLED_STR "@SIXTRL_TRACK_MAP_ENABLED_VALUE@"
@@ -36,21 +36,16 @@
     #define SIXTRL_TRACK_BEAMBEAM6D_STR "@SIXTRL_TRACK_BEAMBEAM6D_FLAG@"
 #endif /* !defined( SIXTRL_TRACK_BEAMBEAM6D ) */
 
-#if !defined( SIXTRL_TRACK_SC_COASTING )
-    #define SIXTRL_TRACK_SC_COASTING @SIXTRL_TRACK_SC_COASTING_FLAG@
-    #define SIXTRL_TRACK_SC_COASTING_STR "@SIXTRL_TRACK_SC_COASTING_FLAG@"
-#endif /* !defined( SIXTRL_TRACK_SC_COASTING ) */
-
-#if !defined( SIXTRL_TRACK_SC_BUNCHED )
-    #define SIXTRL_TRACK_SC_BUNCHED @SIXTRL_TRACK_SC_BUNCHED_FLAG@
-    #define SIXTRL_TRACK_SC_BUNCHED_STR "@SIXTRL_TRACK_SC_BUNCHED_FLAG@"
-#endif /* !defined( SIXTRL_TRACK_SC_BUNCHED ) */
+#if !defined( SIXTRL_TRACK_SPACECHARGE )
+    #define SIXTRL_TRACK_SPACECHARGE @SIXTRL_TRACK_SC_FLAG@
+    #define SIXTRL_TRACK_SPACECHARGE_STR "@SIXTRL_TRACK_SC_FLAG@"
+#endif /* !defined( SIXTRL_TRACK_SPACECHARGE ) */
 
 #if !defined( SIXTRL_TRACK_TRICUB )
     #define SIXTRL_TRACK_TRICUB @SIXTRL_TRACK_TRICUB_FLAG@
     #define SIXTRL_TRACK_TRICUB_STR "@SIXTRL_TRACK_TRICUB_FLAG@"
 #endif /* !defined( SIXTRL_TRACK_TRICUB ) */
- 
+
 /* ------------------------------------------------------------------------- */
 /* ----                     Global aperture check                       ---- */
 /* ------------------------------------------------------------------------- */
