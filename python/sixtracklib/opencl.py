@@ -151,11 +151,36 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
         st_OpenCL_num_available_nodes,
         st_OpenCL_num_available_nodes_detailed,
         st_OpenCL_get_available_nodes_detailed,
-        st_OpenCL_print_available_nodes_detailed,
-        st_OpenCL_get_available_node_id_strs_detailed,
+        st_OpenCL_print_available_nodes_detailed
     )
 
     class ClNodeId(object):
+
+        @staticmethod
+        def PTR_TO_STRING(ptr_node_id,
+            arch_id = st_ARCHITECTURE_OPENCL.value,
+            format=st_NODE_ID_STR_FORMAT_ARCHSTR.value,
+            node_id_cstr = None, capacity=64 ):
+            node_id_str = None
+            if capacity is None or capacity <= 0:
+                capacity = 64
+            if node_id_cstr is None:
+                node_id_cstr = ct.create_string_buffer(capacity)
+
+            status = st_ComputeNodeId_to_string_with_format(
+                ptr_node_id, node_id_cstr, st_arch_size_t(capacity),
+                st_arch_id_t(arch_id), st_node_id_str_fmt_t(format))
+
+            if status == st_ARCH_STATUS_SUCCESS.value:
+                _node_id_str_bytes = bytes(node_id_cstr.value)
+                if b'\0' in _node_id_str_bytes:
+                    _node_id_str_bytes = _node_id_str_bytes.split(b'\0',1)[0]
+                node_id_str = _node_id_str_bytes.strip().decode("utf-8")
+            else:
+                raise RuntimeError(
+                    "Unable to create node_id_str from pointer to ClNodeId")
+            return node_id_str
+
         def __init__(
             self,
             ext_ptr_node_id=st_NullClNodeId,
@@ -250,22 +275,8 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
             return self
 
         def to_string(self, format=st_NODE_ID_STR_FORMAT_ARCHSTR.value):
-            node_id_str = None
-            _str = ct.create_string_buffer(64)
-            self._last_status = st_ComputeNodeId_to_string_with_format(
-                self._ptr_node_id,
-                _str,
-                64,
-                st_arch_id_t(self._arch_id),
-                st_node_id_str_fmt_t(format),
-            )
-            if self._last_status == st_ARCH_STATUS_SUCCESS.value:
-                node_id_str = bytes(_str.value).decode("utf-8")
-            else:
-                raise RuntimeError(
-                    "Unable to create node_id_str from ClNodeId"
-                )
-            return node_id_str
+            node_id_str = ClNodeId.PTR_TO_STRING(
+                self._ptr_node_id, arch_id=self.arch_id, format=format)
 
         def __repr__(self):
             a_id = self.arch_id
@@ -376,7 +387,6 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
             skip_first_num_nodes=0,
             node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value,
         ):
-
             node_id_strs = []
             if not (filter_str is None):
                 _filter_str_bytes = filter_str.strip().encode("utf-8")
@@ -391,41 +401,33 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
                 _env_var_name = None
 
             _num_avail_nodes = st_OpenCL_num_available_nodes_detailed(
-                _filter_str, _env_var_name
-            )
+                _filter_str, _env_var_name )
 
-            if _num_avail_nodes > 0:
-                _node_id_str_capacity = 64
-                node_id_str_buffer = []
-                for ii in range(0, _num_avail_nodes):
-                    node_id_str_buffer.append(
-                        ct.create_string_buffer(_node_id_str_capacity)
-                    )
+            if _num_avail_nodes > skip_first_num_nodes:
+                _num_nodes = ( _num_avail_nodes - skip_first_num_nodes )
+                node_id_array_t = st_ClNodeId * _num_nodes
+                _tmp_node_ids = node_id_array_t()
 
-                node_id_str_array_t = ct.c_char_p * _num_avail_nodes
-                _tmp_node_id_strs = node_id_str_array_t()
-                assert len(_tmp_node_id_strs) == len(node_id_str_buffer)
+                _num_retrieved_nodes = st_OpenCL_get_available_nodes_detailed(
+                    _tmp_node_ids, st_arch_size_t(_num_nodes),
+                        st_arch_size_t(skip_first_num_nodes),
+                            _filter_str, _env_var_name )
 
-                for ii in range(0, _num_avail_nodes):
-                    _tmp_node_id_strs[ii] = ct.cast(
-                        node_id_str_buffer[ii], ct.c_char_p
-                    )
+                if _num_retrieved_nodes > 0:
+                    assert _num_nodes >= _num_retrieved_nodes
+                    _node_id_cstr_cap = 64
+                    _node_id_cstr = ct.create_string_buffer(_node_id_cstr_cap)
 
-                _num_node_id_strs = st_OpenCL_get_available_node_id_strs_detailed(
-                    _tmp_node_id_strs,
-                    st_arch_size_t(_num_avail_nodes),
-                    st_arch_size_t(_node_id_str_capacity),
-                    st_node_id_str_fmt_t(node_id_str_fmt),
-                    st_arch_size_t(skip_first_num_nodes),
-                    _filter_str,
-                    _env_var_name,
-                )
+                    for ii in range( 0, _num_retrieved_nodes):
+                        tmp_node_id_str = ClNodeId.PTR_TO_STRING(
+                            ct.byref(_tmp_node_ids[ii]),
+                            arch_id=st_ARCHITECTURE_OPENCL.value,
+                            format=node_id_str_fmt,
+                            node_id_cstr=_node_id_cstr,
+                            capacity=_node_id_cstr_cap)
+                        node_id_strs.append( tmp_node_id_str )
 
-                for ii in range(0, _num_avail_nodes):
-                    node_id_strs.append(
-                        bytes(_tmp_node_id_strs[ii]).decode("utf-8")
-                    )
-
+            assert len( node_id_strs ) <= _num_avail_nodes
             return node_id_strs
 
         def __init__(

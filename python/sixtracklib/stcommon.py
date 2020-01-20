@@ -3803,19 +3803,6 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         ct.c_char_p, ct.c_char_p]
     st_OpenCL_print_available_nodes_detailed.restype = None
 
-    st_OpenCL_get_available_node_id_strs = \
-        sixtracklib.st_OpenCL_get_available_node_id_strs
-    st_OpenCL_get_available_node_id_strs.argyptes = [
-        st_char_pp, st_arch_size_t, st_arch_size_t]
-    st_OpenCL_get_available_node_id_strs.restype = st_arch_size_t
-
-    st_OpenCL_get_available_node_id_strs_detailed = \
-        sixtracklib.st_OpenCL_get_available_node_id_strs_detailed
-    st_OpenCL_get_available_node_id_strs_detailed.argyptes = [
-        st_char_pp, st_arch_size_t, st_arch_size_t,
-        st_node_id_str_fmt_t, st_arch_size_t, ct.c_char_p, ct.c_char_p]
-    st_OpenCL_get_available_node_id_strs_detailed.restype = st_arch_size_t
-
     # --------------------------------------------------------------------------
 
     st_ClArgument_new = sixtracklib.st_ClArgument_new
