@@ -10,6 +10,8 @@ from .control import raise_error_if_status_not_success
 
 if SIXTRACKLIB_MODULES.get("opencl", False):
     from .stcommon import (
+        string_to_encoded_ctypes_str,
+        ctypes_str_to_decoded_string,
         st_ClContextBase_p,
         st_NullClContextBase,
         st_NullBuffer,
@@ -151,16 +153,18 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
         st_OpenCL_num_available_nodes,
         st_OpenCL_num_available_nodes_detailed,
         st_OpenCL_get_available_nodes_detailed,
-        st_OpenCL_print_available_nodes_detailed
+        st_OpenCL_print_available_nodes_detailed,
     )
 
     class ClNodeId(object):
-
         @staticmethod
-        def PTR_TO_STRING(ptr_node_id,
-            arch_id = st_ARCHITECTURE_OPENCL.value,
+        def PTR_TO_STRING(
+            ptr_node_id,
+            arch_id=st_ARCHITECTURE_OPENCL.value,
             format=st_NODE_ID_STR_FORMAT_ARCHSTR.value,
-            node_id_cstr = None, capacity=64 ):
+            node_id_cstr=None,
+            capacity=64,
+        ):
             node_id_str = None
             if capacity is None or capacity <= 0:
                 capacity = 64
@@ -168,17 +172,19 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
                 node_id_cstr = ct.create_string_buffer(capacity)
 
             status = st_ComputeNodeId_to_string_with_format(
-                ptr_node_id, node_id_cstr, st_arch_size_t(capacity),
-                st_arch_id_t(arch_id), st_node_id_str_fmt_t(format))
+                ptr_node_id,
+                node_id_cstr,
+                st_arch_size_t(capacity),
+                st_arch_id_t(arch_id),
+                st_node_id_str_fmt_t(format),
+            )
 
             if status == st_ARCH_STATUS_SUCCESS.value:
-                _node_id_str_bytes = bytes(node_id_cstr.value)
-                if b'\0' in _node_id_str_bytes:
-                    _node_id_str_bytes = _node_id_str_bytes.split(b'\0',1)[0]
-                node_id_str = _node_id_str_bytes.strip().decode("utf-8")
+                node_id_str = ctypes_str_to_decoded_string(node_id_cstr.value)
             else:
                 raise RuntimeError(
-                    "Unable to create node_id_str from pointer to ClNodeId")
+                    "Unable to create node_id_str from pointer to ClNodeId"
+                )
             return node_id_str
 
         def __init__(
@@ -203,10 +209,9 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
                 _temp_arch_id = st_ARCHITECTURE_OPENCL
 
                 if not (node_id_str is None):
-                    _node_id_str_bytes = node_id_str.strip().encode("utf-8")
                     self._last_status = st_ComputeNodeId_from_string_with_format(
                         self._ptr_node_id,
-                        ct.c_char_p(_node_id_str_bytes),
+                        string_to_encoded_ctypes_str(node_id_str),
                         st_node_id_str_fmt_t(node_id_str_fmt),
                         ct.byref(_temp_arch_id),
                     )
@@ -276,7 +281,8 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
 
         def to_string(self, format=st_NODE_ID_STR_FORMAT_ARCHSTR.value):
             return ClNodeId.PTR_TO_STRING(
-                self._ptr_node_id, arch_id=self.arch_id, format=format)
+                self._ptr_node_id, arch_id=self.arch_id, format=format
+            )
 
         def __repr__(self):
             a_id = self.arch_id
@@ -299,61 +305,29 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
 
         @staticmethod
         def NUM_AVAILABLE_NODES(filter_str=None, env_var_name=None):
-            if not (filter_str is None):
-                _filter_str_bytes = filter_str.strip().encode("utf-8")
-                _filter_str = ct.c_char_p(filter_str)
-            else:
-                _filter_str = None
-
-            if not (env_var_name is None):
-                _env_var_name_bytes = env_var_name.strip().encode("utf-8")
-                _env_var_name = ct.c_char_p(_env_var_name_bytes)
-            else:
-                _env_var_name = None
-
             return st_OpenCL_num_available_nodes_detailed(
-                _filter_str, _env_var_name
+                string_to_encoded_ctypes_str(filter_str),
+                string_to_encoded_ctypes_str(env_var_name),
             )
 
         @staticmethod
         def PRINT_AVAILABLE_NODES(filter_str=None, env_var_name=None):
-            if not (filter_str is None):
-                _filter_str_bytes = filter_str.strip().encode("utf-8")
-                _filter_str = ct.c_char_p(_filter_str_bytes)
-            else:
-                _filter_str = None
-
-            if not (env_var_name is None):
-                _env_var_name_bytes = env_var_name.strip().encode("utf-8")
-                _env_var_name = ct.c_char_p(_env_var_name_bytes)
-            else:
-                _env_var_name = None
-
             st_OpenCL_print_available_nodes_detailed(
-                _filter_str, _env_var_name
+                string_to_encoded_ctypes_str(filter_str),
+                string_to_encoded_ctypes_str(env_var_name),
             )
 
         @staticmethod
         def GET_AVAILABLE_NODES(
             filter_str=None, env_var_name=None, skip_first_num_nodes=0
         ):
+            _filter_str = string_to_encoded_ctypes_str(filter_str)
+            _env_var_name = string_to_encoded_ctypes_str(env_var_name)
             _num_avail_nodes = ClController.NUM_AVAILABLE_NODES(
-                filter_str=filter_str, env_var_name=env_var_name
+                filter_str=_filter_str, env_var_name=_env_var_name
             )
             nodes = []
             if _num_avail_nodes > 0:
-                if not (filter_str is None):
-                    _filter_str_bytes = filter_str.strip().encode("utf-8")
-                    _filter_str = ct.c_char_p(_filter_str_bytes)
-                else:
-                    _filter_str = None
-
-                if not (env_var_name is None):
-                    _env_var_name_bytes = env_var_name.strip().encode("utf-8")
-                    _env_var_name = ct.c_char_p(_env_var_name_bytes)
-                else:
-                    _env_var_name = None
-
                 node_ids_array_t = st_ClNodeId * _num_avail_nodes
                 _node_ids = node_ids_array_t()
                 _num_nodes = st_OpenCL_get_available_nodes_detailed(
@@ -388,46 +362,41 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
             node_id_str_fmt=st_NODE_ID_STR_FORMAT_ARCHSTR.value,
         ):
             node_id_strs = []
-            if not (filter_str is None):
-                _filter_str_bytes = filter_str.strip().encode("utf-8")
-                _filter_str = ct.c_char_p(_filter_str_bytes)
-            else:
-                _filter_str = None
-
-            if not (env_var_name is None):
-                _env_var_name_bytes = env_var_name.strip().encode("utf-8")
-                _env_var_name = ct.c_char_p(_env_var_name_bytes)
-            else:
-                _env_var_name = None
-
+            _filter_str = string_to_encoded_ctypes_str(filter_str)
+            _env_var_name = string_to_encoded_ctypes_str(env_var_name)
             _num_avail_nodes = st_OpenCL_num_available_nodes_detailed(
-                _filter_str, _env_var_name )
+                _filter_str, _env_var_name
+            )
 
             if _num_avail_nodes > skip_first_num_nodes:
-                _num_nodes = ( _num_avail_nodes - skip_first_num_nodes )
+                _num_nodes = _num_avail_nodes - skip_first_num_nodes
                 node_id_array_t = st_ClNodeId * _num_nodes
                 _tmp_node_ids = node_id_array_t()
 
                 _num_retrieved_nodes = st_OpenCL_get_available_nodes_detailed(
-                    _tmp_node_ids, st_arch_size_t(_num_nodes),
-                        st_arch_size_t(skip_first_num_nodes),
-                            _filter_str, _env_var_name )
+                    _tmp_node_ids,
+                    st_arch_size_t(_num_nodes),
+                    st_arch_size_t(skip_first_num_nodes),
+                    _filter_str,
+                    _env_var_name,
+                )
 
                 if _num_retrieved_nodes > 0:
                     assert _num_nodes >= _num_retrieved_nodes
                     _node_id_cstr_cap = 64
                     _node_id_cstr = ct.create_string_buffer(_node_id_cstr_cap)
 
-                    for ii in range( 0, _num_retrieved_nodes):
+                    for ii in range(0, _num_retrieved_nodes):
                         tmp_node_id_str = ClNodeId.PTR_TO_STRING(
                             ct.byref(_tmp_node_ids[ii]),
                             arch_id=st_ARCHITECTURE_OPENCL.value,
                             format=node_id_str_fmt,
                             node_id_cstr=_node_id_cstr,
-                            capacity=_node_id_cstr_cap)
-                        node_id_strs.append( tmp_node_id_str )
+                            capacity=_node_id_cstr_cap,
+                        )
+                        node_id_strs.append(tmp_node_id_str)
 
-            assert len( node_id_strs ) <= _num_avail_nodes
+            assert len(node_id_strs) <= _num_avail_nodes
             return node_id_strs
 
         def __init__(
@@ -458,9 +427,8 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
                     device_id = None
 
             if device_id is not None and len(device_id) > 0:
-                _device_id_bytes = device_id.encode("utf-8")
                 st_ClContextBase_select_node(
-                    self._ptr_ctrl, ct.c_char_p(_device_id_bytes)
+                    self._ptr_ctrl, string_to_encoded_ctypes_str(device_id)
                 )
 
         def __del__(self):
@@ -488,7 +456,7 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
         def selected_node_platform_id(self):
             platform_id = None
             _info = st_ClContextBase_get_selected_node_info(self._ptr_ctrl)
-            if _info != st_NullClNodeInfo:
+            if _info is not st_NullClNodeInfo:
                 platform_id = st_ComputeNodeInfo_get_platform_id(_info)
             return platform_id
 
@@ -496,7 +464,7 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
         def selected_node_device_id(self):
             device_id = None
             _info = st_ClContextBase_get_selected_node_info(self._ptr_ctrl)
-            if _info != st_NullClNodeInfo:
+            if _info is not st_NullClNodeInfo:
                 device_id = st_ComputeNodeInfo_get_device_id(_info)
             return device_id
 
@@ -504,7 +472,7 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
         def selected_node_id_str(self):
             node_id_str = None
             _info = st_ClContextBase_get_selected_node_info(self._ptr_ctrl)
-            if _info != st_NullClNodeInfo:
+            if _info is not st_NullClNodeInfo:
                 platform_id = st_ComputeNodeInfo_get_platform_id(_info)
                 device_id = st_ComputeNodeInfo_get_device_id(_info)
                 node_id_str = f"opencl:{platform_id}.{device_id}"
@@ -514,45 +482,41 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
         def selected_node_platform(self):
             node_platform_str = None
             _info = st_ClContextBase_get_selected_node_info(self._ptr_ctrl)
-            if _info != st_NullClNodeInfo:
-                _platform_c_str = st_ComputeNodeInfo_get_platform(_info)
-                if _platform_c_str != st_NullChar:
-                    node_platform_str = bytes(_platform_c_str.value).decode(
-                        "utf-8"
-                    )
+            if _info is not st_NullClNodeInfo:
+                node_platform_str = ctypes_str_to_decoded_string(
+                    st_ComputeNodeInfo_get_platform(_info)
+                )
             return node_platform_str
 
         @property
         def selected_node_name(self):
             node_name = None
             _info = st_ClContextBase_get_selected_node_info(self._ptr_ctrl)
-            if _info != st_NullClNodeInfo:
-                _name_c_str = st_ComputeNodeInfo_get_name(_info)
-                if _name_c_str != st_NullChar:
-                    node_name = bytes(_name_c_str.value).decode("utf-8")
+            if _info is not st_NullClNodeInfo:
+                node_name = ctypes_str_to_decoded_string(
+                    st_ComputeNodeInfo_get_name(_info)
+                )
             return node_name
 
         @property
         def selected_node_description(self):
             description = None
             _info = st_ClContextBase_get_selected_node_info(self._ptr_ctrl)
-            if _info != st_NullClNodeInfo:
-                _desc_c_str = st_ComputeNodeInfo_get_name(_info)
-                if _desc_c_str != st_NullChar:
-                    description = bytes(_desc_c_str.value).decode("utf-8")
+            if _info is not st_NullClNodeInfo:
+                description = ctypes_str_to_decoded_string(
+                    st_ComputeNodeInfo_get_description(_info)
+                )
             return description
 
         def add_program_file(
             self, path_to_program, compile_defs, compile=True
         ):
             program_id = st_ARCH_ILLEGAL_PROGRAM_ID
-            if self._ptr_ctrl != st_NullClContextBase:
-                _path_to_prog_bytes = path_to_program.strip().encode("utf-8")
-                _compile_defs_bytes = compile_defs.strip().encode("utf-8")
+            if self._ptr_ctrl is not st_NullClContextBase:
                 program_id = st_ClContextBase_add_program_file(
                     self._ptr_ctrl,
-                    ct.c_char_p(_path_to_prog_bytes),
-                    ct.c_char_p(_compile_defs_bytes),
+                    string_to_encoded_ctypes_str(path_to_program),
+                    string_to_encoded_ctypes_str(compile_defs),
                 )
                 if compile:
                     if not self.compile_program(program_id):
@@ -562,30 +526,32 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
         def compile_program(self, program_id):
             success = False
             if (
-                self._ptr_ctrl != st_NullClContextBase
-                and program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value
+                self._ptr_ctrl is not st_NullClContextBase
+                and program_id is not st_ARCH_ILLEGAL_PROGRAM_ID.value
             ):
                 success = st_ClContextBase_compile_program(
                     self._ptr_ctrl, st_arch_program_id_t(program_id)
                 )
             return success
 
-        def is_program_compiled(self,program_id):
-            return self._ptr_ctrl != st_NullClContextBase and \
-                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value and \
-                st_ClContextBase_is_program_compiled(
-                    self._ptr_ctrl, st_arch_program_id_t(program_id))
+        def is_program_compiled(self, program_id):
+            return (
+                self._ptr_ctrl is not st_NullClContextBase
+                and program_id is not st_ARCH_ILLEGAL_PROGRAM_ID.value
+                and st_ClContextBase_is_program_compiled(
+                    self._ptr_ctrl, st_arch_program_id_t(program_id)
+                )
+            )
 
         def enable_kernel(self, program_id, kernel_name):
             kernel_id = st_ARCH_ILLEGAL_KERNEL_ID.value
-            _kernel_name_bytes = kernel_name.strip().encode("utf-8")
             if (
-                self._ptr_ctrl != st_NullClContextBase
-                and program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value
+                self._ptr_ctrl is not st_NullClContextBase
+                and program_id is not st_ARCH_ILLEGAL_PROGRAM_ID.value
             ):
                 kernel_id = st_ClContextBase_enable_kernel(
                     self._ptr_ctrl,
-                    ct.c_char_p(_kernel_name_bytes),
+                    string_to_encoded_ctypes_str(kernel_name),
                     st_arch_program_id_t(program_id),
                 )
             return kernel_id
@@ -593,64 +559,80 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
         def find_kernel_by_name(self, kernel_name):
             kernel_id = st_ARCH_ILLEGAL_KERNEL_ID.value
             if self._ptr_ctrl is not st_NullClContextBase:
-                _kernel_name_bytes = kernel_name.strip().encode("utf-8")
                 kernel_id = st_ClContextBase_find_kernel_id_by_name(
-                    self._ptr_ctrl, ct.c_char_p(_kernel_name_bytes)
+                    self._ptr_ctrl, string_to_encoded_ctypes_str(kernel_name)
                 )
             return kernel_id
 
         def program_id_by_kernel_id(self, kernel_id):
             program_id = st_ARCH_ILLEGAL_PROGRAM_ID.value
-            if self._ptr_ctrl is not st_NullClContextBase and \
-                self.has_kernel(kernel_id):
+            if self._ptr_ctrl is not st_NullClContextBase and self.has_kernel(
+                kernel_id
+            ):
                 program_id = st_ClContextBase_get_program_id_by_kernel_id(
-                    self._ptr_ctrl, st_arch_kernel_id_t(kernel_id))
+                    self._ptr_ctrl, st_arch_kernel_id_t(kernel_id)
+                )
             return program_id
 
         def program_compile_report(self, program_id):
             report = ""
-            if self._ptr_ctrl is not st_NullClContextBase and \
-                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
-                _report_cstr = st_ClContextBase_get_program_compile_report(
-                    self._ptr_ctrl, st_arch_program_id_t(program_id))
-                if _report_cstr != st_NullChar:
-                    report = bytes(_report_cstr).decode('utf-8')
+            if (
+                self._ptr_ctrl is not st_NullClContextBase
+                and program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value
+            ):
+                report = ctypes_str_to_decoded_string(
+                    st_ClContextBase_get_program_compile_report(
+                        self._ptr_ctrl, st_arch_program_id_t(program_id)
+                    )
+                )
             return report
 
         def program_compile_options(self, program_id):
             options = ""
-            if self._ptr_ctrl is not st_NullClContextBase and \
-                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
-                _options_cstr = st_ClContextBase_get_program_compile_options(
-                    self._ptr_ctrl, st_arch_program_id_t(program_id))
-                if _options_cstr != st_NullChar:
-                    options = bytes(_options_cstr).decode('utf-8')
+            if (
+                self._ptr_ctrl is not st_NullClContextBase
+                and program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value
+            ):
+                options = ctypes_str_to_decoded_string(
+                    st_ClContextBase_get_program_compile_options(
+                        self._ptr_ctrl, st_arch_program_id_t(program_id)
+                    )
+                )
             return options
 
         def program_source_code(self, program_id):
             src_code = ""
-            if self._ptr_ctrl is not st_NullClContextBase and \
-                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
-                _src_code_cstr = st_ClContextBase_get_program_source_code(
-                    self._ptr_ctrl, st_arch_program_id_t(program_id))
-                if _src_code_cstr != st_NullChar:
-                    src_code = bytes( _src_code_cstr ).decode('utf-8')
+            if (
+                self._ptr_ctrl is not st_NullClContextBase
+                and program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value
+            ):
+                src_code = ctypes_str_to_decoded_string(
+                    st_ClContextBase_get_program_source_code(
+                        self._ptr_ctrl, st_arch_program_id_t(program_id)
+                    )
+                )
             return src_code
 
         def has_program_file_path(self, program_id):
-            return self._ptr_ctrl is not st_NullClContextBase and \
-                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value and \
-                st_ClContextBase_has_program_file_path(
-                    self._ptr_ctrl, st_arch_program_id_t(program_id))
+            return (
+                self._ptr_ctrl is not st_NullClContextBase
+                and program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value
+                and st_ClContextBase_has_program_file_path(
+                    self._ptr_ctrl, st_arch_program_id_t(program_id)
+                )
+            )
 
         def program_path_to_file(self, program_id):
             path_to_program = ""
-            if self._ptr_ctrl is not st_NullClContextBase and \
-                program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value:
-                _path_to_prog = st_ClContextBase_get_program_path_to_file(
-                    self._ptr_ctrl, st_arch_program_id_t(program_id))
-                if _path_to_prog != st_NullChar:
-                    path_to_program = bytes( _path_to_prog ).decode('utf-8')
+            if (
+                self._ptr_ctrl is not st_NullClContextBase
+                and program_id != st_ARCH_ILLEGAL_PROGRAM_ID.value
+            ):
+                path_to_program = ctypes_str_to_decoded_string(
+                    st_ClContextBase_get_program_path_to_file(
+                        self._ptr_ctrl, st_arch_program_id_t(program_id)
+                    )
+                )
             return path_to_program
 
         def set_kernel_arg(self, kernel_id, arg_index, arg):
@@ -806,69 +788,77 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
             num_feature_flags = 0
             if self._ptr_ctrl is not st_NullClContextBase:
                 num_feature_flags = st_ClContextBase_num_feature_flags(
-                    self._ptr_ctrl )
+                    self._ptr_ctrl
+                )
             return num_feature_flags
 
         def has_feature_flag(self, feature_flag_key):
-            _feature_flag_key_bytes = feature_flag_key.strip.encode('utf-8')
-            return self._ptr_ctrl is not st_NullClContextBase and \
-                st_ClContextBase_has_feature_flag( self._ptr_ctrl,
-                    ct.c_char_p( _feature_flag_key_bytes ) )
+            return (
+                self._ptr_ctrl is not st_NullClContextBase
+                and st_ClContextBase_has_feature_flag(
+                    self._ptr_ctrl,
+                    string_to_encoded_ctypes_str(feature_flag_key),
+                )
+            )
 
         def feature_flag(self, feature_flag_key):
             feature = None
-            _feature_flag_key_bytes = feature_flag_key.strip.encode('utf-8')
             if self._ptr_ctrl is not st_NullClContextBase:
-                _ptr_feature = st_ClContextBase_feature_flag(
-                    self._ptr_ctrl, ct.c_char_p( _feature_flag_key_bytes) )
-                if _ptr_feature is not st_NullChar:
-                    feature = bytes(_ptr_feature).decode('utf-8')
+                feature = ctypes_str_to_decoded_string(
+                    st_ClContextBase_feature_flag(
+                        self._ptr_ctrl,
+                        string_to_encoded_ctypes_str(feature_flag_key),
+                    )
+                )
             return feature
 
         def feature_flag_repr(self, feature_flag_key, prefix="-D", sep="="):
             feature_repr = None
-            _feature_flag_key_bytes = feature_flag_key.strip.encode('utf-8')
-            _prefix_bytes = prefix.encode('utf-8')
-            _sep_bytes = sep.encode('utf-8')
+            _key = string_to_encoded_ctypes_str(feature_flag_key)
+            _prefix = string_to_encoded_ctypes_str(prefix)
+            _sep = string_to_encoded_ctypes_str(sep)
             if self._ptr_ctrl is not st_NullClContextBase:
-                _requ_capacity = \
-                    st_ClContextBase_feature_flag_repr_required_capacity(
-                        self._ptr_ctrl, ct.c_char_p(_feature_flag_key_bytes),
-                            ct.c_char_p(_prefix_bytes),
-                                ct.c_char_p(_sep_bytes) )
+                _requ_capacity = st_ClContextBase_feature_flag_repr_required_capacity(
+                    self._ptr_ctrl, _key, _prefix, _sep,
+                )
                 if _requ_capacity > 0:
                     _temp_buffer = ct.create_string_buffer(_requ_capacity)
                     ret = st_ClContextBase_feature_flag_repr_as_cstr(
-                        self._ptr_ctrl, _temp_buffer,
-                            st_arch_size_t(_requ_capacity),
-                            ct.c_char_p(_feature_flag_key_bytes),
-                            ct.c_char_p(_prefix_bytes), ct.c_char_p(_sep_bytes))
+                        self._ptr_ctrl,
+                        _temp_buffer,
+                        st_arch_size_t(_requ_capacity),
+                        _key,
+                        _prefix,
+                        _sep,
+                    )
                     if ret == st_ARCH_STATUS_SUCCESS.value:
-                        feature_repr = bytes(_temp_buffer.value).decode('utf-8')
+                        feature_repr = ctypes_str_to_decoded_string(
+                            _temp_buffer
+                        )
             return feature_repr
 
         def set_feature_flag(self, feature_flag_key, feature_flag_value):
-            _feature_flag_key_bytes = feature_flag_key.strip.encode('utf-8')
-            _feature_flag_val_bytes = feature_flag_value.strip.encode('utf-8')
             if self._ptr_ctrl is not st_NullClContextBase:
-                st_ClContextBase_set_feature_flag( self._ptr_ctrl,
-                    ct.c_char_p( _feature_flag_key_bytes ),
-                    ct.c_char_p( _feature_flag_val_bytes ) )
+                st_ClContextBase_set_feature_flag(
+                    self._ptr_ctrl,
+                    string_to_encoded_ctypes_str(feature_flag_key),
+                    string_to_encoded_ctypes_str(feature_flag_value),
+                )
 
         def default_compile_options(self):
             options = None
             if self._ptr_ctrl is not st_NullClContextBase:
-                _ptr_options = st_ClContextBase_default_compile_options(
-                    self._ptr_ctrl )
-                if _ptr_options is not st_NullChar:
-                    options = bytes(_ptr_options).decode('utf-8')
+                options = ctypes_str_to_decoded_string(
+                    st_ClContextBase_default_compile_options(self._ptr_ctrl)
+                )
             return options
 
         def set_default_compile_options(self, new_compile_options):
-            _compile_options_bytes = new_compile_options.strip().ecode('utf-8')
             if self._ptr_ctrl is not st_NullClContextBase:
                 st_ClContextBase_set_default_compile_options(
-                    self._ptr_ctrl, ct.c_char_p( _compile_options_bytes ) )
+                    self._ptr_ctrl,
+                    string_to_encoded_ctypes_str(new_compile_options),
+                )
 
     # -------------------------------------------------------------------------
 
