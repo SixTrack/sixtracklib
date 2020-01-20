@@ -28,6 +28,8 @@ TEST( C99OpenCLTrackJobClAssignAddressItemsTests, MinimalUsage )
     using particle_set_t = ::NS(Particles);
     using addr_t         = ::NS(buffer_addr_t);
     using controller_t   = ::NS(ClContextBase);
+    using node_id_t      = ::NS(ComputeNodeId);
+    using status_t       = ::NS(arch_status_t);
 
     if( ::NS(OpenCL_num_available_nodes)( nullptr ) == 0 )
     {
@@ -133,6 +135,13 @@ TEST( C99OpenCLTrackJobClAssignAddressItemsTests, MinimalUsage )
 
     /* --------------------------------------------------------------------- */
 
+    node_id_t node_id;
+
+    size_t const num_nodes = ::NS(OpenCL_get_available_nodes)(
+        &node_id, size_t{ 1 } );
+
+    ASSERT_TRUE( num_nodes == size_t{ 1 } );
+
     char NODE_ID_STR[ 32 ] =
     {
         '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
@@ -141,14 +150,11 @@ TEST( C99OpenCLTrackJobClAssignAddressItemsTests, MinimalUsage )
         '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
     };
 
-    char* NODE_ID_STR_ARRAY[ 1 ] = { &NODE_ID_STR[ 0 ] };
+    status_t status = ::NS(ComputeNodeId_to_string_with_format)(
+        &node_id, &NODE_ID_STR[ 0 ], size_t{ 32 }, ::NS(ARCHITECTURE_OPENCL),
+            ::NS(NODE_ID_STR_FORMAT_NOARCH) );
 
-    size_t const num_nodes = ::NS(OpenCL_get_available_node_id_strs_detailed)(
-        NODE_ID_STR_ARRAY, size_t{ 1 }, size_t{ 32 },
-            ::NS(NODE_ID_STR_FORMAT_NOARCH), size_t{ 0 }, nullptr,
-                nullptr );
-
-    ASSERT_TRUE( num_nodes == size_t{ 1 } );
+    SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
 
     track_job_t* job = ::NS(TrackJobCl_create)( NODE_ID_STR );
     controller_t* controller = ::NS(TrackJobCl_get_context)( job );
@@ -457,8 +463,7 @@ TEST( C99OpenCLTrackJobClAssignAddressItemsTests, MinimalUsage )
 
     /* --------------------------------------------------------------------- */
 
-    ::NS(arch_status_t) status =
-        ::NS(TrackJob_commit_address_assignments)( job );
+    status = ::NS(TrackJob_commit_address_assignments)( job );
     ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
     status = ::NS(TrackJob_assign_all_addresses)( job );

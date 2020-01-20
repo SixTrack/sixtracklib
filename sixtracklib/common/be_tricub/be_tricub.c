@@ -27,7 +27,7 @@ NS(arch_status_t) NS(TriCubData_attributes_offsets)(
     if( ( offsets != SIXTRL_NULLPTR ) && ( max_num_offsets >= num_dataptrs ) )
     {
         SIXTRACKLIB_SET_VALUES( buf_size_t, offsets, max_num_offsets, ZERO );
-        offsets[ 0 ] = offsetof( NS(TriCubData), table_addr );
+        offsets[ 0 ] = NS(TriCubData_ptr_offset)( data );
 
         SIXTRL_ASSERT( slot_size > ZERO );
         SIXTRL_ASSERT( ( offsets[ 0 ] % slot_size ) == ZERO );
@@ -100,6 +100,21 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* NS(TriCubData_from_buffer)(
 {
     return NS(TriCubData_from_obj_index)(
         NS(Buffer_get_object)( buffer, index ) );
+}
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+NS(object_type_id_t) NS(TriCubData_type_id_ext)( SIXTRL_BUFFER_DATAPTR_DEC
+    const NS(TriCubData) *const SIXTRL_RESTRICT data )
+{
+    return NS(TriCubData_type_id)( data );
+}
+
+NS(arch_size_t) NS(TriCubData_ptr_offset)( SIXTRL_BUFFER_DATAPTR_DEC const
+    NS(TriCubData) *const SIXTRL_RESTRICT data )
+{
+    ( void )data;
+    return ( NS(arch_size_t) )offsetof( NS(TriCubData), table_addr );
 }
 
 /* ------------------------------------------------------------------------- */
@@ -305,6 +320,20 @@ SIXTRL_BE_ARGPTR_DEC NS(TriCub)* NS(TriCub_from_buffer)(
         NS(Buffer_get_object)( buffer, index ) );
 }
 
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+NS(object_type_id_t) NS(TriCub_type_id_ext)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub )
+{
+    return NS(TriCub_type_id)( tricub );
+}
+
+NS(arch_size_t) NS(TriCub_data_addr_offset)(
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub )
+{
+    return ( NS(arch_size_t) )offsetof( NS(TriCub), data_addr );
+}
+
 /* ------------------------------------------------------------------------- */
 
 bool NS(TriCub_can_be_added)(
@@ -341,10 +370,10 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_new)(
 SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(be_tricub_real_t) const x_shift, NS(be_tricub_real_t) const y_shift,
-    NS(be_tricub_real_t) const tau_shift, 
-    NS(be_tricub_real_t) const dipolar_kick_px, 
-    NS(be_tricub_real_t) const dipolar_kick_py, 
-    NS(be_tricub_real_t) const dipolar_kick_ptau, 
+    NS(be_tricub_real_t) const tau_shift,
+    NS(be_tricub_real_t) const dipolar_kick_px,
+    NS(be_tricub_real_t) const dipolar_kick_py,
+    NS(be_tricub_real_t) const dipolar_kick_ptau,
     NS(be_tricub_real_t) const length,
     NS(buffer_addr_t) const data_addr )
 {

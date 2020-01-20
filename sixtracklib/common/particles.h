@@ -948,7 +948,6 @@ SIXTRL_STATIC SIXTRL_FN void NS(Particles_set_zeta_value)(
     NS(particle_num_elements_t) const ii,
     NS(particle_real_t) const zeta_value );
 
-
 SIXTRL_STATIC SIXTRL_FN void NS(Particles_scale_zeta_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC  NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const ii, NS(particle_real_t) const factor );
@@ -5217,6 +5216,7 @@ SIXTRL_INLINE void NS(Particles_add_to_psigma)(
 }
 
 /* ------------------------------------------------------------------------- */
+
 SIXTRL_INLINE NS(particle_real_t) NS(Particles_get_energy0_value)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(Particles) *const SIXTRL_RESTRICT p,
     NS(particle_num_elements_t) const index )
@@ -5279,6 +5279,13 @@ SIXTRL_INLINE void NS(Particles_add_to_energy_value)(
 
     real_t const one_plus_delta = delta + ONE;
     real_t const rvv = one_plus_delta / ( ONE + ptau_beta0 );
+
+    SIXTRL_ASSERT( NS(Particles_get_rvv_value)( p, ii ) > ( real_t )0.0 );
+    SIXTRL_ASSERT( beta0 >  ( real_t )0.0 );
+    SIXTRL_ASSERT( beta0 <= ( real_t )1.0 );
+    SIXTRL_ASSERT( one_plus_delta > ( real_t )0.0 );
+    SIXTRL_ASSERT( ( ( ONE + ptau_beta0 ) > ( real_t )0.0 ) ||
+                   ( ( ONE + ptau_beta0 ) < ( real_t )0.0 ) );
 
     NS(Particles_set_delta_value)(  p, ii, delta );
     NS(Particles_set_psigma_value)( p, ii, psigma );

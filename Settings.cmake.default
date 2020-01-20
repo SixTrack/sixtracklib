@@ -39,8 +39,7 @@ option( SIXTRACKL_ENABLE_BENCHMARK_TESTS "Enable benchmark tests"         OFF )
 
 set( SIXTRACKL_TRACK_BEAMBEAM4D             "enabled" CACHE STRING "" )
 set( SIXTRACKL_TRACK_BEAMBEAM6D             "enabled" CACHE STRING "" )
-set( SIXTRACKL_TRACK_SPACECHARGE_COASTING   "enabled" CACHE STRING "" )
-set( SIXTRACKL_TRACK_SPACECHARGE_BUNCHED    "enabled" CACHE STRING "" )
+set( SIXTRACKL_TRACK_SPACECHARGE            "enabled" CACHE STRING "" )
 set( SIXTRACKL_TRACK_TRICUB                 "skip"    CACHE STRING "" )
 
 # Aperture check features: allowed values are always, never, conditional

@@ -27,6 +27,8 @@ TEST( CXXOpenCLTrackJobClAssignAddressItemsTests, MinimalUsage )
     using buffer_t       = track_job_t::buffer_t;
     using c_buffer_t     = track_job_t::c_buffer_t;
     using controller_t   = track_job_t::context_t;
+    using node_id_t      = controller_t::node_id_t;
+    using status_t       = controller_t::status_t;
     using particle_set_t = st::Particles;
     using be_monitor_t   = st::BeamMonitor;
     using drift_t        = st::Drift;
@@ -129,6 +131,12 @@ TEST( CXXOpenCLTrackJobClAssignAddressItemsTests, MinimalUsage )
 
     /* --------------------------------------------------------------------- */
 
+    node_id_t node_id;
+
+    size_t const num_nodes = controller_t::GET_AVAILABLE_NODES(
+        &node_id, size_t{ 1 } );
+    ASSERT_TRUE( num_nodes == size_t{ 1 } );
+
     char NODE_ID_STR[ 32 ] =
     {
         '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
@@ -137,13 +145,11 @@ TEST( CXXOpenCLTrackJobClAssignAddressItemsTests, MinimalUsage )
         '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
     };
 
-    char* NODE_ID_STR_ARRAY[ 1 ] = { &NODE_ID_STR[ 0 ] };
+    status_t status = ::NS(ComputeNodeId_to_string_with_format)(
+        &node_id, &NODE_ID_STR[ 0 ], size_t{ 32 }, st::ARCHITECTURE_OPENCL,
+            st::NODE_ID_STR_FORMAT_NOARCH );
 
-    size_t const num_nodes =
-        controller_t::GET_AVAILABLE_NODE_ID_STR( NODE_ID_STR_ARRAY,
-            size_t{ 1 }, size_t{ 32 }, st::NODE_ID_STR_FORMAT_NOARCH );
-
-    ASSERT_TRUE( num_nodes == size_t{ 1 } );
+    SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
 
     track_job_t job( std::string{ NODE_ID_STR } );
 
@@ -329,7 +335,7 @@ TEST( CXXOpenCLTrackJobClAssignAddressItemsTests, MinimalUsage )
     ASSERT_TRUE(  job.num_assign_items(
         my_lattice_buffer_id, st::ARCH_OUTPUT_BUFFER_ID ) == size_t{ 0 } );
 
-    st::arch_status_t status = job.commit_address_assignments();
+    status = job.commit_address_assignments();
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
 
     status = job.assign_all_addresses();

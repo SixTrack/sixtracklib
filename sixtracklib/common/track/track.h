@@ -166,11 +166,9 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t) NS(Track_all_particles_line)(
     #include "sixtracklib/common/be_xyshift/track.h"
     #include "sixtracklib/common/be_limit/track.h"
     #include "sixtracklib/common/be_dipedge/track.h"
+    #include "sixtracklib/common/be_rfmultipole/track.h"
+    #include "sixtracklib/common/be_beamfields/track.h"
     #include "sixtracklib/common/be_tricub/track.h"
-
-    #if !defined( SIXTRL_DISABLE_BEAM_BEAM )
-        #include "sixtracklib/common/be_beamfields/track.h"
-    #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -328,6 +326,16 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             break;
         }
 
+        case NS(OBJECT_TYPE_RF_MULTIPOLE):
+        {
+            typedef NS(RFMultiPole) belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_rf_multipole)( particles, index, belem );
+            break;
+        }
+
         case NS(OBJECT_TYPE_CAVITY):
         {
             typedef NS(Cavity)   belem_t;
@@ -387,6 +395,18 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             ret = NS(Track_particle_limit_ellipse)( particles, index, belem );
             break;
         }
+
+        case NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE):
+        {
+            typedef NS(LimitRectEllipse) belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_limit_rect_ellipse)(
+                particles, index, belem );
+            break;
+        }
+
 
         case NS(OBJECT_TYPE_DIPEDGE):
         {
@@ -493,8 +513,8 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
 
         case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
         {
-            #if !defined( SIXTRL_TRACK_SC_COASTING ) || \
-                ( SIXTRL_TRACK_SC_COASTING == SIXTRL_TRACK_MAP_ENABLED )
+            #if !defined( SIXTRL_TRACK_SPACECHARGE ) || \
+                ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_ENABLED )
 
             typedef NS(SpaceChargeCoasting)   belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
@@ -503,8 +523,8 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             ret = NS(Track_particle_space_charge_coasting)(
                 particles, index, belem );
 
-            #elif defined( SIXTRL_TRACK_SC_COASTING ) && \
-                  ( SIXTRL_TRACK_SC_COASTING == SIXTRL_TRACK_MAP_SKIP )
+            #elif defined( SIXTRL_TRACK_SPACECHARGE ) && \
+                  ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_SKIP )
 
             /* Skip particle and do nothing! */
             ret = SIXTRL_TRACK_SUCCESS;
@@ -519,8 +539,8 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
 
         case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
         {
-            #if !defined( SIXTRL_TRACK_SC_BUNCHED ) || \
-                ( SIXTRL_TRACK_SC_BUNCHED == SIXTRL_TRACK_MAP_ENABLED )
+            #if !defined( SIXTRL_TRACK_SPACECHARGE ) || \
+                ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_ENABLED )
 
             typedef NS(SpaceChargeBunched)   belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
@@ -529,8 +549,8 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             ret = NS(Track_particle_space_charge_bunched)(
                 particles, index, belem );
 
-            #elif defined( SIXTRL_TRACK_SC_BUNCHED ) && \
-                  ( SIXTRL_TRACK_SC_BUNCHED == SIXTRL_TRACK_MAP_SKIP )
+            #elif defined( SIXTRL_TRACK_SPACECHARGE ) && \
+                  ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_SKIP )
 
             /* Skip particle and do nothing! */
             ret = SIXTRL_TRACK_SUCCESS;

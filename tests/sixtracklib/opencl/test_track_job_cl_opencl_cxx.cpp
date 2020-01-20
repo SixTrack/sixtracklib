@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+#include <iostream>
 #include <fstream>
 #include <iterator>
 #include <limits>
@@ -64,7 +65,98 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 }
 
-TEST( CXX_TrackJobClTests, CreateTrackJobNoOutputDelete )
+TEST( CXXOpenCLTrackJobClTests, ElemByElemTracking )
+{
+    namespace st = SIXTRL_CXX_NAMESPACE;
+
+    using particle_set_t        = st::Particles;
+    using track_job_t           = st::TrackJobCl;
+    using buffer_t              = track_job_t::buffer_t;
+    using elem_by_elem_config_t = track_job_t::elem_by_elem_config_t;
+    using size_t                = track_job_t::size_type;
+    using status_t              = track_job_t::status_t;
+    using controller_t          = track_job_t::context_t;
+    using node_id_t             = controller_t::node_id_t;
+    using node_info_t           = controller_t::node_info_t;
+
+    buffer_t eb( ::NS(PATH_TO_BEAMBEAM_BEAM_ELEMENTS) );
+    buffer_t in_particle_buffer( ::NS(PATH_TO_BEAMBEAM_PARTICLES_DUMP) );
+
+    size_t const NUM_AVAILABLE_NODES = controller_t::NUM_AVAILABLE_NODES();
+
+    if( NUM_AVAILABLE_NODES == size_t{ 0 } )
+    {
+        std::cout << "No OpenCL nodes available -> skipping tests\r\n";
+        return;
+    }
+
+    std::vector< node_id_t > AVAILABLE_NODES(
+        NUM_AVAILABLE_NODES, node_id_t{} );
+
+    size_t const NUM_NODES = controller_t::GET_AVAILABLE_NODES(
+        AVAILABLE_NODES.data(), AVAILABLE_NODES.size(), size_t{ 0 } );
+
+    ASSERT_TRUE( NUM_NODES > size_t{ 0 } );
+
+    particle_set_t const* orig_particles =
+        particle_set_t::FromBuffer( in_particle_buffer, size_t{ 0 } );
+    SIXTRL_ASSERT( orig_particles != nullptr );
+
+    for( auto const& node_id : AVAILABLE_NODES )
+    {
+        char tmp_device_id_str[] =
+        {
+            '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+            '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'
+        };
+
+        ASSERT_TRUE( 0 == ::NS(ComputeNodeId_to_string)(
+            &node_id, tmp_device_id_str, 16u ) );
+
+        track_job_t job( tmp_device_id_str );
+        controller_t* controller = job.ptrContext();
+
+        ASSERT_TRUE( controller != nullptr );
+        ASSERT_TRUE( controller->hasSelectedNode() );
+
+        node_info_t const* selected_node_info =
+            controller->ptrSelectedNodeInfo();
+
+        node_id_t const default_node_id = controller->defaultNodeId();
+
+        ASSERT_TRUE( selected_node_info != nullptr );
+        ::NS(ComputeNodeInfo_print_out)( selected_node_info, &default_node_id );
+        std::cout << "\r\n";
+
+        buffer_t pb;
+        particle_set_t* particles = pb.createNew< particle_set_t >(
+            orig_particles->getNumParticles() );
+        SIXTRL_ASSERT( particles != nullptr );
+
+        status_t status = particles->copy( *orig_particles );
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+
+        size_t const until_turn_elem_by_elem = size_t{ 1 };
+        ASSERT_TRUE( job.reset( pb, eb, nullptr, until_turn_elem_by_elem ) );
+
+        ASSERT_TRUE( job.hasOutputBuffer() );
+        ASSERT_TRUE( job.ownsOutputBuffer() );
+        ASSERT_TRUE( job.hasElemByElemOutput() );
+
+        elem_by_elem_config_t const* elem_by_elem_conf =
+            job.ptrElemByElemConfig();
+
+        ASSERT_TRUE( elem_by_elem_conf != nullptr );
+
+        st::track_status_t const track_status =
+            job.trackElemByElem( size_t{ 1 } );
+
+        ASSERT_TRUE( track_status == st::TRACK_SUCCESS );
+    }
+}
+
+TEST( CXXOpenCLTrackJobClTests, CreateTrackJobNoOutputDelete )
 {
     namespace st      = SIXTRL_CXX_NAMESPACE;
     namespace st_test = SIXTRL_CXX_NAMESPACE::tests;
@@ -208,7 +300,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobNoOutputDelete )
     std::cout << std::endl;
 }
 
-TEST( CXX_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
+TEST( CXXOpenCLTrackJobClTests, CreateTrackJobElemByElemOutputDelete )
 {
     namespace st      = SIXTRL_CXX_NAMESPACE;
     namespace st_test = SIXTRL_CXX_NAMESPACE::tests;
@@ -343,7 +435,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobElemByElemOutputDelete )
     std::cout << std::endl;
 }
 
-TEST( CXX_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
+TEST( CXXOpenCLTrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
 {
     namespace st      = SIXTRL_CXX_NAMESPACE;
     namespace st_test = SIXTRL_CXX_NAMESPACE::tests;
@@ -504,7 +596,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobBeamMonitorOutputDelete )
     std::cout << std::endl;
 }
 
-TEST( CXX_TrackJobClTests, CreateTrackJobFullDelete )
+TEST( CXXOpenCLTrackJobClTests, CreateTrackJobFullDelete )
 {
     namespace st      = SIXTRL_CXX_NAMESPACE;
     namespace st_test = SIXTRL_CXX_NAMESPACE::tests;
@@ -673,7 +765,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobFullDelete )
     std::cout << std::endl;
 }
 
-TEST( CXX_TrackJobClTests, CreateTrackJobTrackLineCompare )
+TEST( CXXOpenCLTrackJobClTests, CreateTrackJobTrackLineCompare )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
@@ -811,7 +903,7 @@ TEST( CXX_TrackJobClTests, CreateTrackJobTrackLineCompare )
     }
 }
 
-TEST( CXX_TrackJobClTests, TrackParticles )
+TEST( CXXOpenCLTrackJobClTests, TrackParticles )
 {
     namespace st      = SIXTRL_CXX_NAMESPACE;
     namespace st_test = SIXTRL_CXX_NAMESPACE::tests;

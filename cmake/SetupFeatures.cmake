@@ -6,8 +6,7 @@ if(  NOT SETUP_SIXTRL_FEATURES_FINISHED )
 
     set_property( CACHE SIXTRACKL_TRACK_BEAMBEAM4D
                         SIXTRACKL_TRACK_BEAMBEAM6D
-                        SIXTRACKL_TRACK_SPACECHARGE_COASTING
-                        SIXTRACKL_TRACK_SPACECHARGE_BUNCHED
+                        SIXTRACKL_TRACK_SPACECHARGE
                         SIXTRACKL_TRACK_TRICUB
                   PROPERTY STRINGS enabled disabled skip )
 
@@ -47,37 +46,19 @@ if(  NOT SETUP_SIXTRL_FEATURES_FINISHED )
         endif()
     endif()
 
-    set_property( CACHE SIXTRACKL_TRACK_SPACECHARGE_COASTING
-                  PROPERTY HELPSTRING
-                  "Track over coasting space-charge beam element" )
+    set_property( CACHE SIXTRACKL_TRACK_SPACECHARGE PROPERTY HELPSTRING
+                  "Track over frozen space-charge beam element" )
 
-    if( SIXTRACKL_TRACK_SPACECHARGE_COASTING )
-        if( "${SIXTRACKL_TRACK_SPACECHARGE_COASTING}" STREQUAL "skip" )
-            set( SIXTRL_TRACK_SC_COASTING_FLAG "${SIXTRL_TRACK_MAP_SKIP_VALUE}" )
-            set( SIXTRL_TRACK_SC_COASTING_FLAG_STR "skip" )
-        elseif( "${SIXTRACKL_TRACK_SPACECHARGE_COASTING}" STREQUAL "disabled" )
-            set( SIXTRL_TRACK_SC_COASTING_FLAG "${SIXTRL_TRACK_MAP_DISABLED_VALUE}" )
-            set( SIXTRL_TRACK_SC_COASTING_FLAG_STR "disabled" )
+    if( SIXTRACKL_TRACK_SPACECHARGE )
+        if( "${SIXTRACKL_TRACK_SPACECHARGE}" STREQUAL "skip" )
+            set( SIXTRL_TRACK_SC_FLAG "${SIXTRL_TRACK_MAP_SKIP_VALUE}" )
+            set( SIXTRL_TRACK_SC_FLAG_STR "skip" )
+        elseif( "${SIXTRACKL_TRACK_SPACECHARGE}" STREQUAL "disabled" )
+            set( SIXTRL_TRACK_SC_FLAG "${SIXTRL_TRACK_MAP_DISABLED_VALUE}" )
+            set( SIXTRL_TRACK_SC_FLAG_STR "disabled" )
         else()
-            set( SIXTRL_TRACK_SC_COASTING_FLAG "${SIXTRL_TRACK_MAP_ENABLED_VALUE}" )
-            set( SIXTRL_TRACK_SC_COASTING_FLAG_STR "enabled" )
-        endif()
-    endif()
-
-    set_property( CACHE SIXTRACKL_TRACK_SPACECHARGE_BUNCHED
-                  PROPERTY HELPSTRING
-                  "Track over bunched space-charge beam element" )
-
-    if( SIXTRACKL_TRACK_SPACECHARGE_BUNCHED )
-        if( "${SIXTRACKL_TRACK_SPACECHARGE_BUNCHED}" STREQUAL "skip" )
-            set( SIXTRL_TRACK_SC_BUNCHED_FLAG "${SIXTRL_TRACK_MAP_SKIP_VALUE}" )
-            set( SIXTRL_TRACK_SC_BUNCHED_FLAG_STR "skip" )
-        elseif( "${SIXTRACKL_TRACK_SPACECHARGE_BUNCHED}" STREQUAL "disabled" )
-            set( SIXTRL_TRACK_SC_BUNCHED_FLAG "${SIXTRL_TRACK_MAP_DISABLED_VALUE}" )
-            set( SIXTRL_TRACK_SC_BUNCHED_FLAG_STR "disabled" )
-        else()
-            set( SIXTRL_TRACK_SC_BUNCHED_FLAG "${SIXTRL_TRACK_MAP_ENABLED_VALUE}" )
-            set( SIXTRL_TRACK_SC_BUNCHED_FLAG_STR "enabled" )
+            set( SIXTRL_TRACK_SC_FLAG "${SIXTRL_TRACK_MAP_ENABLED_VALUE}" )
+            set( SIXTRL_TRACK_SC_FLAG_STR "enabled" )
         endif()
     endif()
 
@@ -105,10 +86,8 @@ if(  NOT SETUP_SIXTRL_FEATURES_FINISHED )
           set( SIXTRL_TRACK_BEAMBEAM4D_FLAG_STR  \"${SIXTRL_TRACK_BEAMBEAM4D_FLAG_STR}\" )
           set( SIXTRL_TRACK_BEAMBEAM6D_FLAG      \"${SIXTRL_TRACK_BEAMBEAM4D_FLAG}\" )
           set( SIXTRL_TRACK_BEAMBEAM6D_FLAG_STR  \"${SIXTRL_TRACK_BEAMBEAM4D_FLAG_STR}\" )
-          set( SIXTRL_TRACK_SC_COASTING_FLAG     \"${SIXTRL_TRACK_SC_COASTING_FLAG}\" )
-          set( SIXTRL_TRACK_SC_COASTING_FLAG_STR \"${SIXTRL_TRACK_SC_COASTING_FLAG_STR}\" )
-          set( SIXTRL_TRACK_SC_BUNCHED_FLAG      \"${SIXTRL_TRACK_SC_BUNCHED_FLAG}\" )
-          set( SIXTRL_TRACK_SC_BUNCHED_FLAG_STR  \"${SIXTRL_TRACK_SC_BUNCHED_FLAG_STR}\" )
+          set( SIXTRL_TRACK_SPACECHARGE_FLAG     \"${SIXTRL_TRACK_SPACECHARGE_FLAG}\" )
+          set( SIXTRL_TRACK_SPACECHARGE_FLAG_STR \"${SIXTRL_TRACK_SPACECHARGE_FLAG_STR}\" )
           set( SIXTRL_TRACK_TRICUB_FLAG          \"${SIXTRL_TRACK_TRICUB_FLAG}\"
           set( SIXTRL_TRACK_TRICUB_FLAG_STR      \"${SIXTRL_TRACK_TRICUB_FLAG_STR}\" )" )
 

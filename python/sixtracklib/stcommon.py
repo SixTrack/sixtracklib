@@ -3803,19 +3803,6 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
         ct.c_char_p, ct.c_char_p]
     st_OpenCL_print_available_nodes_detailed.restype = None
 
-    st_OpenCL_get_available_node_id_strs = \
-        sixtracklib.st_OpenCL_get_available_node_id_strs
-    st_OpenCL_get_available_node_id_strs.argyptes = [
-        st_char_pp, st_arch_size_t, st_arch_size_t]
-    st_OpenCL_get_available_node_id_strs.restype = st_arch_size_t
-
-    st_OpenCL_get_available_node_id_strs_detailed = \
-        sixtracklib.st_OpenCL_get_available_node_id_strs_detailed
-    st_OpenCL_get_available_node_id_strs_detailed.argyptes = [
-        st_char_pp, st_arch_size_t, st_arch_size_t,
-        st_node_id_str_fmt_t, st_arch_size_t, ct.c_char_p, ct.c_char_p]
-    st_OpenCL_get_available_node_id_strs_detailed.restype = st_arch_size_t
-
     # --------------------------------------------------------------------------
 
     st_ClArgument_new = sixtracklib.st_ClArgument_new
@@ -4070,6 +4057,31 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContextBase_select_node_by_index.argtypes = [
         st_ClContextBase_p, st_arch_size_t]
     st_ClContextBase_select_node_by_index.restype = ct.c_bool
+
+    st_OpenCL_get_all_nodes_required_str_capacity = \
+        sixtracklib.st_OpenCL_get_all_nodes_required_str_capacity
+    st_OpenCL_get_all_nodes_required_str_capacity.argtypes = None
+    st_OpenCL_get_all_nodes_required_str_capacity.restype = st_arch_size_t
+
+    st_OpenCL_get_all_nodes_as_string = \
+        sixtracklib.st_OpenCL_get_all_nodes_as_string
+    st_OpenCL_get_all_nodes_as_string.argtypes = [ct.c_char_p, st_arch_size_t]
+    st_OpenCL_get_all_nodes_as_string.restype = st_arch_status_t
+
+    st_OpenCL_get_available_nodes_required_str_capacity = \
+        sixtracklib.st_OpenCL_get_available_nodes_required_str_capacity
+    st_OpenCL_get_available_nodes_required_str_capacity.argtypes = [
+        ct.c_char_p, ct.c_char_p]
+    st_OpenCL_get_available_nodes_required_str_capacity.restype = st_arch_size_t
+
+    st_OpenCL_get_available_nodes_as_string = \
+        sixtracklib.st_OpenCL_get_available_nodes_as_string
+    st_OpenCL_get_available_nodes_as_string.argtypes = [
+        ct.c_char_p, st_arch_size_t, ct.c_char_p, ct.c_char_p]
+    st_OpenCL_get_available_nodes_as_string.restype = st_arch_status_t
+
+    st_ClContext_create = sixtracklib.st_ClContext_create
+    st_ClContext_create.restype = st_Context_p
 
     st_ClContextBase_select_node = sixtracklib.st_ClContextBase_select_node
     st_ClContextBase_select_node.argtypes = [st_ClContextBase_p, ct.c_char_p]
@@ -4421,9 +4433,6 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContext_p = ct.c_void_p
     st_NullClContext = ct.cast(0, st_ClContext_p)
 
-    st_ClContext_create = sixtracklib.st_ClContext_create
-    st_ClContext_create.restype = st_ClContext_p
-
     st_ClContext_new = sixtracklib.st_ClContext_new
     st_ClContext_new.argtypes = [ct.c_char_p]
     st_ClContext_new.restype = st_ClContext_p
@@ -4765,3 +4774,29 @@ st_Track_all_particles_element_by_element_until_turn = \
 st_Track_all_particles_element_by_element_until_turn.restype = st_track_status_t
 st_Track_all_particles_element_by_element_until_turn.argtypes = [
     st_Particles_p, st_ElemByElemConfig_p, st_Buffer_p, ct.c_int64]
+
+
+# TriCub related methods:
+
+st_TriCubData_p = ct.c_void_p
+st_NullTriCubData = ct.cast( 0, st_TriCubData_p )
+
+st_TriCubData_type_id = sixtracklib.st_TriCubData_type_id_ext
+st_TriCubData_type_id.argtypes = [ st_TriCubData_p ]
+st_TriCubData_type_id.restype = st_object_type_id_t
+
+st_TriCubData_ptr_offset = sixtracklib.st_TriCubData_ptr_offset
+st_TriCubData_ptr_offset.argtypes = [ st_TriCubData_p ]
+st_TriCubData_ptr_offset.restype = st_arch_size_t
+
+st_TriCub_p = ct.c_void_p
+st_NullTriCub = ct.cast( 0, st_TriCubData_p )
+
+st_TriCub_type_id = sixtracklib.st_TriCub_type_id_ext
+st_TriCub_type_id.argtypes = [ st_TriCub_p ]
+st_TriCub_type_id.restype = st_object_type_id_t
+
+st_TriCub_data_addr_offset = sixtracklib.st_TriCub_data_addr_offset
+st_TriCub_data_addr_offset.argtypes = [ st_TriCub_p ]
+st_TriCub_data_addr_offset.restype = st_arch_size_t
+

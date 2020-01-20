@@ -716,13 +716,44 @@ class TrackJob(object):
         return enabled_archs
 
     @staticmethod
-    def print_nodes(arch_str):
+    def print_nodes(arch_str, all=False, filter_str=None, env_var_name=None):
         arch_str = arch_str.strip().lower()
-        if SIXTRACKLIB_MODULES.get(arch_str, False):
+        if not(filter_str is None):
+            _filter_str_bytes = filter_str.strip().encode('utf-8')
+            _filter_str = ct.c_char_p(_filter_str_bytes)
+        else:
+            _filter_str = None
+
+        if not(env_var_name is None):
+            _env_var_name_bytes = env_var_name.strip().encode('utf-8')
+            _env_var_name = ct.c_char_p(_env_var_name_bytes)
+        else:
+            _env_var_name = None
+
+        if stconf.SIXTRACKLIB_MODULES.get(arch_str, False):
             if arch_str == "opencl":
-                context = st.st_ClContext_create()
-                st.st_ClContextBase_print_nodes_info(context)
-                st.st_ClContextBase_delete(context)
+                if not all:
+                    capacity = \
+                        st.st_OpenCL_get_available_nodes_required_str_capacity(
+                            _filter_str, _env_var_name)
+                else:
+                    capacity = \
+                        st.st_OpenCL_get_all_nodes_required_str_capacity()
+
+                _nodes_str = ct.create_string_buffer(capacity)
+
+                if not all:
+                    _status = st.st_OpenCL_get_available_nodes_as_string(
+                        _nodes_str, st.st_arch_size_t(capacity),
+                        _filter_str, _env_var_name)
+                else:
+                    _status = st.st_OpenCL_get_all_nodes_as_string(
+                        _nodes_str, st.st_arch_size_t(capacity))
+
+                if _status == st.st_ARCH_STATUS_SUCCESS.value and capacity > 0:
+                    print(bytes(_nodes_str).decode('utf-8'))
+                else:
+                    raise RuntimeError("unable to print opencl nodes")
             else:
                 print("nodes not available for architecture {0}".format(
                     arch_str))
@@ -836,8 +867,8 @@ class TrackJob(object):
             arch, device_id = device.split(':')
 
         arch = arch.strip().lower()
-        if not(stconf.SIXTRACKLIB_MODULES.get(arch, False) is not False
-                or arch == 'cpu'):
+        if not(stconf.SIXTRACKLIB_MODULES.get(arch, False) is not False or
+               arch == 'cpu'):
             raise ValueError("Unknown architecture {0}".format(arch, ))
 
         if device_id is not None:
