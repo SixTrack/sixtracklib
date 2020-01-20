@@ -253,7 +253,7 @@ class NodeId(object):
         else:
             _ptr_node_id = node_id
         _max_str_len = 64
-        _int_str = ct.create_string_buffer(_max_str_len.value)
+        _int_str = ct.create_string_buffer(_max_str_len)
         _status = _st_NodeId_to_string(
             _ptr_node_id, _int_str, st_arch_size_t(_max_str_len)
         )
