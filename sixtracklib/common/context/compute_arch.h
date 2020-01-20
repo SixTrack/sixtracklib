@@ -236,6 +236,23 @@ SIXTRL_EXTERN SIXTRL_HOST_FN char const*
 NS(ComputeNodeInfo_get_description_ext)(
     const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info );
 
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_print)(
+    FILE* SIXTRL_RESTRICT fp,
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ComputeNodeInfo_print_out)(
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ComputeNodeInfo_print_to_str)(
+    char* SIXTRL_RESTRICT node_info_out_str,
+    NS(arch_size_t) const node_info_out_str_capacity,
+    const NS(ComputeNodeInfo) *const SIXTRL_RESTRICT node_info,
+    const NS(ComputeNodeId) *const SIXTRL_RESTRICT default_node_id );
+
 #else /* !defined( _GPUCODE ) */
 
 SIXTRL_STATIC SIXTRL_FN void NS(ComputeNodeInfo_print_out)(

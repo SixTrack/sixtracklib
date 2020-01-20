@@ -91,43 +91,43 @@ namespace SIXTRL_CXX_NAMESPACE
 
 
 bool NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
-    const ::NS(ParticlesAddr) *const SIXTRL_RESTRICT particles_addr, 
-    const ::NS(Particles) *const SIXTRL_RESTRICT particles, 
+    const ::NS(ParticlesAddr) *const SIXTRL_RESTRICT particles_addr,
+    const ::NS(Particles) *const SIXTRL_RESTRICT particles,
     NS(buffer_size_t) slot_size )
 {
     bool is_consistent = false;
-    
+
     using address_t  = ::NS(buffer_addr_t);
     using buf_size_t = ::NS(buffer_size_t);
-    
+
     if( slot_size == ::NS(buffer_size_t){ 0 } )
     {
         slot_size = ::NS(BUFFER_DEFAULT_SLOT_SIZE);
     }
-                
+
     if( ( particles_addr != nullptr ) && ( particles != nullptr ) &&
         ( ::NS(Particles_get_num_of_particles)( particles ) ==
-          particles_addr->num_particles ) ) 
+          particles_addr->num_particles ) )
     {
         is_consistent = true;
-        
-        if( particles_addr->num_particles > 
+
+        if( particles_addr->num_particles >
             ::NS(particle_num_elements_t){ 0 } )
         {
             buf_size_t const real_size  = sizeof( ::NS(particle_real_t) );
             buf_size_t const index_size = sizeof( ::NS(particle_index_t) );
-            
+
              address_t const real_offset = static_cast< address_t >(
-             ::NS(ManagedBuffer_get_slot_based_length)( 
+             ::NS(ManagedBuffer_get_slot_based_length)(
                  real_size * particles_addr->num_particles, slot_size ) );
-             
+
              address_t const index_offset = static_cast< address_t >(
-             ::NS(ManagedBuffer_get_slot_based_length)( 
+             ::NS(ManagedBuffer_get_slot_based_length)(
                  index_size * particles_addr->num_particles, slot_size ) );
-             
+
              is_consistent &= ( real_offset  > address_t{ 0 } );
              is_consistent &= ( index_offset > address_t{ 0 } );
-             
+
              is_consistent &= ( particles_addr->q0_addr != address_t{ 0 } );
 
              is_consistent &= ( particles_addr->mass0_addr >=
@@ -140,7 +140,7 @@ bool NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
                                 ( particles_addr->beta0_addr + real_offset ) );
 
              is_consistent &= ( particles_addr->p0c_addr >=
-                                ( particles_addr->gamma0_addr + 
+                                ( particles_addr->gamma0_addr +
                                   real_offset ) );
 
              is_consistent &= ( particles_addr->s_addr >=
@@ -180,23 +180,23 @@ bool NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
                                 ( particles_addr->chi_addr + real_offset ) );
 
              is_consistent &= ( particles_addr->particle_id_addr >=
-                                ( particles_addr->charge_ratio_addr + 
+                                ( particles_addr->charge_ratio_addr +
                                 real_offset ) );
 
              is_consistent &= ( particles_addr->at_element_id_addr >=
-                                ( particles_addr->particle_id_addr + 
+                                ( particles_addr->particle_id_addr +
                                   index_offset ) );
 
              is_consistent &= ( particles_addr->at_turn_addr >=
-                                ( particles_addr->at_element_id_addr + 
+                                ( particles_addr->at_element_id_addr +
                                   index_offset ) );
 
              is_consistent &= ( particles_addr->state_addr >=
-                                ( particles_addr->at_turn_addr + 
+                                ( particles_addr->at_turn_addr +
                                   index_offset ) );
         }
     }
-    
+
     return is_consistent;
 }
 
@@ -298,7 +298,6 @@ bool NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
 
     using size_t      = ::NS(buffer_size_t);
     using particles_t = ::NS(Particles);
-    using nelements_t = ::NS(particle_num_elements_t);
     using paddr_t     = ::NS(ParticlesAddr);
     using object_t    = ::NS(Object);
 
@@ -346,7 +345,7 @@ bool NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
                 object_t const* obj =
                     ::NS(Buffer_get_const_object)( particles_buffer, ii );
 
-                if( ( paddr->num_particles != nelements_t{ 0 } ) ||
+                if( ( paddr->num_particles != st::particle_num_elements_t{ 0 } ) ||
                     ( obj == nullptr ) || ( ::NS(Object_get_type_id)( obj ) !=
                       ::NS(OBJECT_TYPE_LAST_AVAILABLE) ) )
                 {
@@ -370,7 +369,6 @@ bool NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
     using particles_t = ::NS(Particles);
     using paddr_t     = ::NS(ParticlesAddr);
     using object_t    = ::NS(Object);
-    using nelements_t = ::NS(particle_num_elements_t);
 
     if( ( particles_buffer != nullptr ) &&
         ( !::NS(Buffer_needs_remapping)( particles_buffer ) ) )
@@ -429,7 +427,7 @@ bool NS(TestParticlesAddr_are_addresses_consistent_with_particle)(
                 object_t const* obj =
                     ::NS(Buffer_get_const_object)( particles_buffer, ii );
 
-                if( ( paddr->num_particles != nelements_t{ 0 } ) ||
+                if( ( paddr->num_particles != st::particle_num_elements_t{ 0 } ) ||
                     ( obj == nullptr ) ||
                     ( ::NS(Object_get_type_id)( obj ) !=
                       ::NS(OBJECT_TYPE_LAST_AVAILABLE) ) )

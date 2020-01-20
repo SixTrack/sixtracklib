@@ -515,71 +515,36 @@ namespace SIXTRL_CXX_NAMESPACE
         _this_t::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         _size_t const until_turn_elem_by_elem )
     {
-        using c_buffer_t = _this_t::c_buffer_t;
-        this->doClear();
+        _size_t const particle_set_indices[] = { _size_t{ 0 }, _size_t{ 0 } };
 
-        c_buffer_t* ptr_pb  = particles_buffer.getCApiPtr();
-        c_buffer_t* ptr_eb  = be_buffer.getCApiPtr();
-        c_buffer_t* ptr_out = ( ptr_output_buffer != nullptr ) ?
-            ptr_output_buffer->getCApiPtr() : nullptr;
-
-        bool const success = this->doReset(
-            ptr_pb, ptr_eb, ptr_out, until_turn_elem_by_elem );
-
-        if( success )
-        {
-            this->doSetPtrParticleBuffer( &particles_buffer );
-            this->doSetPtrBeamElementsBuffer( &be_buffer );
-
-            if( ( ptr_out != nullptr ) && ( this->hasOutputBuffer() ) )
-            {
-                this->doSetPtrOutputBuffer( ptr_output_buffer );
-            }
-        }
-
-        return success;
-    }
-
-    bool TrackJobBase::reset(
-        _this_t::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
-        _size_t const particle_set_index,
-        _this_t::buffer_t& SIXTRL_RESTRICT_REF be_buffer,
-        _this_t::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
-        _size_t const until_turn_elem_by_elem )
-    {
-        using size_t = _size_t;
-
-        size_t particle_set_indices[] = { size_t{ 0 } };
-        particle_set_indices[ 0 ] = particle_set_index;
-
-        return TrackJobBase::reset( particles_buffer,
+        return this->reset( particles_buffer,
             &particle_set_indices[ 0 ], &particle_set_indices[ 1 ], be_buffer,
                 ptr_output_buffer, until_turn_elem_by_elem );
     }
 
     bool TrackJobBase::reset(
+        _this_t::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
+        _size_t const pset_index,
+        _this_t::buffer_t& SIXTRL_RESTRICT_REF be_buffer,
+        _this_t::buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
+        _size_t const until_turn_elem_by_elem )
+    {
+        _size_t const particle_set_indices[] = { pset_index, _size_t{ 0 } };
+
+        return this->reset( particles_buffer, &particle_set_indices[ 0 ],
+            &particle_set_indices[ 1 ], be_buffer, ptr_output_buffer,
+                until_turn_elem_by_elem );
+    }
+
+    bool TrackJobBase::reset(
         _this_t::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         _this_t::c_buffer_t* SIXTRL_RESTRICT be_buffer,
         _this_t::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         _size_t const until_turn_elem_by_elem )
     {
-        this->doClear();
-
-        bool const success = this->doReset( particles_buffer, be_buffer,
-                ptr_output_buffer, until_turn_elem_by_elem );
-
-        if( success )
-        {
-            this->doSetPtrCParticleBuffer( particles_buffer );
-            this->doSetPtrCBeamElementsBuffer( be_buffer );
-
-            if( ( ptr_output_buffer != nullptr ) && ( this->hasOutputBuffer() ) )
-            {
-                this->doSetPtrCOutputBuffer( ptr_output_buffer );
-            }
-        }
-
-        return success;
+        _size_t const pset_index = _size_t{ 0 };
+        return this->reset( particles_buffer, _size_t{ 1 }, &pset_index,
+            be_buffer, ptr_output_buffer, until_turn_elem_by_elem );
     }
 
     bool TrackJobBase::reset(
@@ -589,7 +554,7 @@ namespace SIXTRL_CXX_NAMESPACE
         _this_t::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         _size_t const until_turn_elem_by_elem )
     {
-        return TrackJobBase::reset( particles_buffer,
+        return this->reset( particles_buffer,
             _size_t{ 1 }, &particle_set_index, be_buffer,
                 ptr_output_buffer, until_turn_elem_by_elem );
     }
