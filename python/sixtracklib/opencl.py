@@ -275,7 +275,7 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
             return self
 
         def to_string(self, format=st_NODE_ID_STR_FORMAT_ARCHSTR.value):
-            node_id_str = ClNodeId.PTR_TO_STRING(
+            return ClNodeId.PTR_TO_STRING(
                 self._ptr_node_id, arch_id=self.arch_id, format=format)
 
         def __repr__(self):
