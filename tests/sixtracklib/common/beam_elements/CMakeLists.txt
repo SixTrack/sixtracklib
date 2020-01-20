@@ -11,21 +11,22 @@ if( GTEST_FOUND )
 
     add_executable( test_be_drift_common_c99      test_be_drift_c99.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_drift_common_c99 )
-    add_test( C99_CommonBeamElementDriftTests     test_be_drift_common_c99 )
+    add_test( C99_Common_BeamElements_Drift_Tests test_be_drift_common_c99 )
 
     # --------------------------------------------------------------------------
     # test_be_drift_common_cxx:
 
-    add_executable( test_be_drift_common_cxx    test_be_drift_cxx.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_drift_common_cxx )
-    add_test( CXX_CommonBeamElementDriftTests   test_be_drift_common_cxx )
+    add_executable( test_be_drift_common_cxx      test_be_drift_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_drift_common_cxx )
+    add_test( CXX_Common_BeamElements_Drift_Tests test_be_drift_common_cxx )
 
     # ==========================================================================
     # test_be_multipole_common_c99:
 
     add_executable( test_be_multipole_common_c99  test_be_multipole_c99.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_multipole_common_c99 )
-    add_test( C99_CommonBeamElementMultiPoleTests test_be_multipole_common_c99 )
+    add_test( C99_Common_BeamElements_MultiPole_Tests
+              test_be_multipole_common_c99 )
 
     # ==========================================================================
     # test_be_rf_multipole_common_c99:
@@ -36,7 +37,7 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
             test_be_rf_multipole_common_c99 )
 
-    add_test( C99_Common_BeamElements_RFMultiPoleTests
+    add_test( C99_Common_BeamElements_RFMultiPole_Tests
             test_be_rf_multipole_common_c99 )
 
     # ==========================================================================
@@ -44,28 +45,32 @@ if( GTEST_FOUND )
 
     add_executable( test_be_xy_shift_common_c99   test_be_xy_shift_c99.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_xy_shift_common_c99 )
-    add_test( C99_CommonBeamElementXYShiftTests   test_be_xy_shift_common_c99 )
+    add_test( C99_Common_BeamElements_XYShift_Tests
+              test_be_xy_shift_common_c99 )
 
     # ==========================================================================
     # test_be_srotation_common_c99:
 
     add_executable( test_be_srotation_common_c99  test_be_srotation_c99.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_srotation_common_c99 )
-    add_test( C99_CommonBeamElementSRotationTests test_be_srotation_common_c99 )
+    add_test( C99_Common_BeamElements_SRotation_Tests
+              test_be_srotation_common_c99 )
 
     # ==========================================================================
     # test_be_cavity_common_c99:
 
     add_executable( test_be_cavity_common_c99   test_be_cavity_c99.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_cavity_common_c99 )
-    add_test( C99_CommonBeamElementCavityTests  test_be_cavity_common_c99 )
+    add_test( C99_Common_BeamElements_Cavity_Tests
+              test_be_cavity_common_c99 )
 
     # ==========================================================================
     # test_be_monitor_common_c99:
 
     add_executable( test_be_monitor_common_c99   test_be_monitor_c99.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}  test_be_monitor_common_c99 )
-    add_test( C99_CommonBeamMonitorTests         test_be_monitor_common_c99 )
+    add_test( C99_Common_BeamElements_BeamMonitor_Tests
+              test_be_monitor_common_c99 )
 
     # ==========================================================================
     # test_be_limit_rect_common_c99:
@@ -73,7 +78,7 @@ if( GTEST_FOUND )
     add_executable( test_be_limit_rect_common_c99  test_be_limit_rect_c99.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_limit_rect_common_c99 )
 
-    add_test( C99_CommonBeamElementLimitRectTests
+    add_test( C99_Common_BeamElements_LimitRect_Tests
               test_be_limit_rect_common_c99 )
 
     # --------------------------------------------------------------------------
@@ -82,7 +87,7 @@ if( GTEST_FOUND )
     add_executable( test_be_limit_rect_common_cxx  test_be_limit_rect_cxx.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_limit_rect_common_cxx )
 
-    add_test( CXX_CommonBeamElementLimitRectTests
+    add_test( CXX_Common_BeamElements_LimitRect_Tests
               test_be_limit_rect_common_cxx )
 
     # ==========================================================================
@@ -94,7 +99,7 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
          test_be_limit_ellipse_common_c99 )
 
-    add_test( C99_CommonBeamElementLimitEllipseTests
+    add_test( C99_Common_BeamElements_LimitEllipse_Tests
               test_be_limit_ellipse_common_c99 )
 
     # --------------------------------------------------------------------------
@@ -106,7 +111,7 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
          test_be_limit_ellipse_common_cxx )
 
-    add_test( CXX_CommonBeamElementLimitEllipseTests
+    add_test( CXX_Common_BeamElements_LimitEllipse_Tests
               test_be_limit_ellipse_common_cxx )
 
     # ==========================================================================
@@ -114,14 +119,16 @@ if( GTEST_FOUND )
 
     add_executable( test_be_dipedge_common_c99     test_be_dipedge_c99.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}    test_be_dipedge_common_c99 )
-    add_test( C99_CommonBeamElementDipoleEdgeTests test_be_dipedge_common_c99 )
+    add_test( C99_Common_BeamElements_DipoleEdge_Tests
+              test_be_dipedge_common_c99 )
 
     # --------------------------------------------------------------------------
     # test_be_dipedge_common_cxx:
 
     add_executable( test_be_dipedge_common_cxx     test_be_dipedge_cxx.cpp )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}    test_be_dipedge_common_cxx )
-    add_test( CXX_CommonBeamElementDipoleEdgeTests test_be_dipedge_common_cxx )
+    add_test( CXX_Common_BeamElements_DipoleEdge_Tests
+              test_be_dipedge_common_cxx )
 
     # *************************************************************************
     # Set all properties:
