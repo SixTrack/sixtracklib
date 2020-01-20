@@ -19,7 +19,7 @@
  * ******  sixtrack::Drift:
  * ************************************************************************* */
 
-TEST( CXX_CommonBeamElementDriftTests, MinimalAddToBufferCopyRemapRead )
+TEST( CXXCommonBeamElementDriftTests, MinimalAddToBufferCopyRemapRead )
 {
     namespace st    = sixtrack;
 
@@ -171,7 +171,7 @@ TEST( CXX_CommonBeamElementDriftTests, MinimalAddToBufferCopyRemapRead )
  * ******  st_DriftExact:
  * ************************************************************************* */
 
-TEST( CXX_CommonBeamElementDriftExactTests, MinimalAddToBufferCopyRemapRead )
+TEST( CXXCommonBeamElementDriftExactTests, MinimalAddToBufferCopyRemapRead )
 {
     namespace st    = sixtrack;
 

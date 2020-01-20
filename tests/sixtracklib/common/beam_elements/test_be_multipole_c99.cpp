@@ -22,7 +22,7 @@
  * ******  st_MultiPole:
  * ************************************************************************* */
 
-TEST( C99_CommonBeamElementMultiPoleTests, MinimalAddToBufferCopyRemapRead )
+TEST( C99CommonBeamElementMultiPoleTests, MinimalAddToBufferCopyRemapRead )
 {
     using    belem_t = ::st_MultiPole;
     using     size_t = ::st_buffer_size_t;

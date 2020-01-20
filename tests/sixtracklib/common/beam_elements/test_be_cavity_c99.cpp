@@ -22,7 +22,7 @@
  * ******  st_Cavity:
  * ************************************************************************* */
 
-TEST( C99_CommonBeamElementCavityTests, MinimalAddToBufferCopyRemapRead )
+TEST( C99CommonBeamElementCavityTests, MinimalAddToBufferCopyRemapRead )
 {
     using size_t   = ::st_buffer_size_t;
     using object_t = ::st_Object;

@@ -21,7 +21,7 @@
  * ******  st_Drift:
  * ************************************************************************* */
 
-TEST( C99_CommonBeamElementDriftTests, MinimalAddToBufferCopyRemapRead )
+TEST( C99CommonBeamElementDriftTests, MinimalAddToBufferCopyRemapRead )
 {
     using size_t   = ::st_buffer_size_t;
     using object_t = ::st_Object;
@@ -201,7 +201,7 @@ TEST( C99_CommonBeamElementDriftTests, MinimalAddToBufferCopyRemapRead )
  * ******  st_DriftExact:
  * ************************************************************************* */
 
-TEST( C99_CommonBeamElementDriftExactTests, MinimalAddToBufferCopyRemapRead )
+TEST( C99CommonBeamElementDriftExactTests, MinimalAddToBufferCopyRemapRead )
 {
     using size_t   = ::st_buffer_size_t;
     using object_t = ::st_Object;

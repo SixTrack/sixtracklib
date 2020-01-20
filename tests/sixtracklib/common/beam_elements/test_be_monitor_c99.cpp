@@ -28,7 +28,7 @@
 #include "sixtracklib/common/track/track.h"
 
 
-TEST( C99_CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
+TEST( C99CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
 {
     using size_t        = ::NS(buffer_size_t);
     using raw_t         = unsigned char;
@@ -274,7 +274,7 @@ TEST( C99_CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
     ::NS(Buffer_free)( &cmp_eb );
 }
 
-TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
+TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
 {
     using real_t        = ::NS(particle_real_t);
     using size_t        = ::NS(buffer_size_t);
@@ -645,7 +645,7 @@ TEST( C99_CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     ::NS(Buffer_delete)( out_buffer );
 }
 
-TEST( C99_CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
+TEST( C99CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
 {
     using real_t          = ::NS(particle_real_t);
     using status_t        = ::NS(arch_status_t);

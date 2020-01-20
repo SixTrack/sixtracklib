@@ -21,7 +21,7 @@
 /* ************************************************************************* *
  * ******  st_SRotation:
  * ************************************************************************* */
-TEST( C99_CommonBeamElementDriftTests, MinimalAddToBufferCopyRemapRead )
+TEST( C99CommonBeamElementDriftTests, MinimalAddToBufferCopyRemapRead )
 {
     using size_t   = ::st_buffer_size_t;
     using object_t = ::st_Object;
