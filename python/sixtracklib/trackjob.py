@@ -52,10 +52,6 @@ from .stcommon import (
     st_OutputBuffer_required_for_tracking,
     st_OutputBuffer_requires_output_buffer,
     st_OutputBuffer_calculate_output_buffer_params,
-    st_OpenCL_get_available_nodes_required_str_capacity,
-    st_OpenCL_get_all_nodes_required_str_capacity,
-    st_OpenCL_get_available_nodes_as_string,
-    st_OpenCL_get_all_nodes_as_string,
     st_TrackJob_get_type_str,
     st_TrackJobNew_track_elem_by_elem,
     st_TrackJobNew_track_line,
@@ -141,6 +137,14 @@ from .stcommon import (
     st_TrackJobNew_uses_controller,
     st_TrackJobNew_uses_arguments,
 )
+
+if stconf.SIXTRACKLIB_MODULES.get("opencl", False):
+    from .stcommon import (
+        st_OpenCL_get_available_nodes_required_str_capacity,
+        st_OpenCL_get_all_nodes_required_str_capacity,
+        st_OpenCL_get_available_nodes_as_string,
+        st_OpenCL_get_all_nodes_as_string,
+    )
 
 
 class TrackJobBaseNew(object):
