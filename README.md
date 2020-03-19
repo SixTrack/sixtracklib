@@ -66,7 +66,18 @@ If you configured sixtracklib with unit-test support enabled in the previous ste
 pwd # verify that we are in the build directory
 make test
 ```
-Alternatively, you can run the unit-tests individually from the `tests/sixtracklib/` and `tests/python` sub-directories within build. Please ensure to always have a proper set of testdata ready before running any test. If in doubt, please run `make testdata`.
+In case tests fail, you can get a (more) detailed output by setting the `CTEST_OUTPUT_ON_FAILURE` variable to `1` and execute only specific tests by using the following procedure:
+```
+export CTEST_OUTPUT_ON_FAILURE=1
+pwd # verify we are somewhere under the build directory
+echo "run only the test you are interested in"
+
+ctest -R C99_CommonGpuKernelTools
+Test project /home/mschwinz/git/sixtracklib/build
+    Start 2: C99_CommonGpuKernelTools
+1/1 Test #2: C99_CommonGpuKernelTools .........   Passed    0.00 sec
+```
+Another alternative is to run the unit-tests individually from the `tests/sixtracklib/` and `tests/python` sub-directories within build. Regardless of the way to launch the tests, please ensure to always have a proper set of testdata ready before running any test. If in doubt, please run `make testdata`.
 
 ## Documentation
 
