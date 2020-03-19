@@ -656,7 +656,7 @@ class LimitRectEllipse(CObject):
 
 
 class DipoleEdge(CObject):
-    _typeid = 64
+    _typeid = 24
     r21 = CField(0, "float64", default=0.0, alignment=8)
     r43 = CField(1, "float64", default=0.0, alignment=8)
 
