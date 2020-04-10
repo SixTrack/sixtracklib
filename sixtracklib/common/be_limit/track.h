@@ -72,17 +72,16 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit_global)(
 
     #endif /* SIXTRL_APERTURE_X_LIMIT && SIXTRL_APERTURE_Y_LIMIT  */
 
+    index_t state = NS(Particles_get_state_value)( p, idx );
+
     real_t const x = NS(Particles_get_x_value)( p, idx );
     real_t const y = NS(Particles_get_y_value)( p, idx );
 
     real_t const sign_x = ( real_t )( ( ZERO < x ) - ( real_t )( x < ZERO ) );
     real_t const sign_y = ( real_t )( ( ZERO < y ) - ( real_t )( y < ZERO ) );
 
-    index_t const new_state = ( index_t )(
-        ( ( sign_x * x ) < X_LIMIT ) & ( ( sign_y * y ) < Y_LIMIT ) );
-
-    SIXTRL_ASSERT( NS(Particles_is_not_lost_value)( p, idx ) );
-    NS(Particles_set_state_value)( p, idx, new_state );
+    state &= ( index_t )( ( ( sign_x * x ) < X_LIMIT ) &
+                          ( ( sign_y * y ) < Y_LIMIT ) );
 
     return SIXTRL_TRACK_SUCCESS;
 }
