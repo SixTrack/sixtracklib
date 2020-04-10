@@ -83,6 +83,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit_global)(
     state &= ( index_t )( ( ( sign_x * x ) < X_LIMIT ) &
                           ( ( sign_y * y ) < Y_LIMIT ) );
 
+    NS(Particles_set_state_value)( p, idx, state );
     return SIXTRL_TRACK_SUCCESS;
 }
 
