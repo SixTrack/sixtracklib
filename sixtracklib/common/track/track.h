@@ -624,7 +624,8 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_line_objs)(
     bool const finish_turn )
 {
     NS(track_status_t) success = SIXTRL_TRACK_SUCCESS;
-    bool continue_tracking = ( line_it != line_end );
+    bool continue_tracking = ( ( line_it != line_end ) &&
+        ( NS(Particles_is_not_lost_value)( particles, index ) ) );
 
     SIXTRL_ASSERT( line_it != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( particles != SIXTRL_NULLPTR );

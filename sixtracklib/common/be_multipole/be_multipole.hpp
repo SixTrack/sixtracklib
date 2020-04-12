@@ -364,6 +364,22 @@ namespace SIXTRL_CXX_NAMESPACE
         ::NS(multipole_real_t) const length = ::NS(multipole_real_t){ 0.0 },
         ::NS(multipole_real_t) const hxl    = ::NS(multipole_real_t){ 0.0 },
         ::NS(multipole_real_t) const hyl    = ::NS(multipole_real_t){ 0.0 } );
+
+    template<> struct ObjectTypeTraits< ::NS(MultiPole) >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_MULTIPOLE);
+        }
+    };
+
+    template<> struct ObjectTypeTraits< MultiPole >
+    {
+        SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
+        {
+            return NS(OBJECT_TYPE_MULTIPOLE);
+        }
+    };
 }
 
 /* ************************************************************************* *
