@@ -196,6 +196,12 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->doTrackUntilTurn( until_turn );
     }
 
+    _this_t::track_status_t TrackJobBase::trackUntil(
+        _this_t::size_type const until_turn )
+    {
+        return this->doTrackUntilTurn( until_turn );
+    }
+
     _this_t::track_status_t TrackJobBase::trackElemByElem(
         _size_t const until_turn )
     {
@@ -405,7 +411,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_type_str.c_str();
     }
 
-    bool TrackJobBase::hasDeviceIdStr() const SIXTRL_RESTRICT
+    bool TrackJobBase::hasDeviceIdStr() const SIXTRL_NOEXCEPT
     {
         return ( !this->m_device_id_str.empty() );
     }
@@ -704,7 +710,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return size_t{ 0 };
     }
 
-    _this_t::buffer_t* TrackJobBase::ptrOutputBuffer() SIXTRL_RESTRICT
+    _this_t::buffer_t* TrackJobBase::ptrOutputBuffer() SIXTRL_NOEXCEPT
     {
         using ptr_t   = _this_t::buffer_t*;
 
@@ -712,7 +718,7 @@ namespace SIXTRL_CXX_NAMESPACE
             *this ).ptrOutputBuffer() );
     }
 
-    _this_t::buffer_t* TrackJobBase::ptrOutputBuffer() const SIXTRL_RESTRICT
+    _this_t::buffer_t* TrackJobBase::ptrOutputBuffer() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT(
             ( this->m_ptr_output_buffer == nullptr ) ||
@@ -723,7 +729,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     _this_t::c_buffer_t*
-    TrackJobBase::ptrCOutputBuffer() SIXTRL_RESTRICT
+    TrackJobBase::ptrCOutputBuffer() SIXTRL_NOEXCEPT
     {
         using ptr_t   = _this_t::c_buffer_t*;
 
@@ -732,7 +738,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     _this_t::c_buffer_t const*
-    TrackJobBase::ptrCOutputBuffer() const SIXTRL_RESTRICT
+    TrackJobBase::ptrCOutputBuffer() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT(
             ( this->m_ptr_output_buffer == nullptr ) ||
@@ -1361,6 +1367,8 @@ namespace SIXTRL_CXX_NAMESPACE
             _this_t::ptr_elem_by_elem_config_t;
 
         SIXTRL_ASSERT( particles_buffer != nullptr );
+        ( void )particles_buffer;
+
         SIXTRL_ASSERT( !::NS(Buffer_needs_remapping)( particles_buffer ) );
 
         SIXTRL_ASSERT( ( ::NS(Buffer_get_num_of_objects)( particles_buffer ) ==

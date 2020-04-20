@@ -1,19 +1,17 @@
 # tests/benchmark/CMakeLists.txt
 
-if( SIXTRACKL_ENABLE_TIMING_TESTS )
+set( TOMLC99_HEADERS toml.h )
+set( TOMLC99_SOURCES toml.c )
 
-    set( BENCHMARK_LINK_LIBRARIES sixtrack_test sixtrack m dl )
+add_library( ext_tomlc99 OBJECT ${TOMLC99_HEADERS} ${TOMLC99_SOURCES} )
 
-    add_subdirectory( common )
+set( RUN_BENCHMARK_CXX_HEADERS )
+set( RUN_BENCHMARK_CXX_SOURCES run_benchmark_cxx.cpp )
 
-    if( SIXTRACKL_ENABLE_OPENCL )
-        add_subdirectory( opencl )
-    endif()
+add_executable( run_benchmark_cxx
+    ${RUN_BENCHMARK_CXX_HEADERS} ${RUN_BENCHMARK_CXX_SOURCES}
+    $<TARGET_OBJECTS:ext_tomlc99> )
 
-    if( SIXTRACKL_ENABLE_CUDA )
-        add_subdirectory( cuda )
-    endif()
-
-endif()
+target_link_libraries( run_benchmark_cxx sixtrack_test sixtrack )
 
 #end: tests/benchmark/CMakeLists.txt

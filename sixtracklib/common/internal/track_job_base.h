@@ -112,6 +112,9 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN track_status_t track(
             size_type const until_turn );
 
+        SIXTRL_HOST_FN track_status_t trackUntil(
+            size_type const until_turn );
+
         SIXTRL_HOST_FN track_status_t trackElemByElem(
             size_type const until_turn_elem_by_elem );
 
@@ -193,7 +196,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN std::string const& typeStr()     const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN char const* ptrTypeStr()         const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN bool hasDeviceIdStr()            const SIXTRL_RESTRICT;
+        SIXTRL_HOST_FN bool hasDeviceIdStr()            const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN std::string const& deviceIdStr() const SIXTRL_NOEXCEPT;
         SIXTRL_HOST_FN char const* ptrDeviceIdStr()     const SIXTRL_NOEXCEPT;
 
@@ -276,13 +279,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN size_type numElemByElemTurns() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN buffer_t* ptrOutputBuffer() SIXTRL_RESTRICT;
-        SIXTRL_HOST_FN buffer_t* ptrOutputBuffer() const SIXTRL_RESTRICT;
+        SIXTRL_HOST_FN buffer_t* ptrOutputBuffer() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN buffer_t* ptrOutputBuffer() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN c_buffer_t* ptrCOutputBuffer() SIXTRL_RESTRICT;
+        SIXTRL_HOST_FN c_buffer_t* ptrCOutputBuffer() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN c_buffer_t const*
-        ptrCOutputBuffer() const SIXTRL_RESTRICT;
+        ptrCOutputBuffer() const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
