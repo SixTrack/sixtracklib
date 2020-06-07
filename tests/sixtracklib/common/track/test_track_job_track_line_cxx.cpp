@@ -1,5 +1,6 @@
 #include "sixtracklib/common/track/track_job_cpu.hpp"
 
+#include <algorithm>
 #include <iomanip>
 #include <cstddef>
 #include <cstdint>
@@ -15,13 +16,17 @@
 #include "sixtracklib/testlib.h"
 
 #include "sixtracklib/common/definitions.h"
+#include "sixtracklib/common/be_drift/be_drift.hpp"
+#include "sixtracklib/common/be_multipole/be_multipole.hpp"
+#include "sixtracklib/common/be_limit/be_limit_rect.hpp"
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/track/definitions.h"
 #include "sixtracklib/common/buffer.hpp"
 #include "sixtracklib/common/particles.hpp"
 #include "sixtracklib/common/be_monitor/be_monitor.hpp"
+#include "sixtracklib/common/track/track.h"
 
-TEST( CXX_Cpu_CpuTrackJobTrackLineTests, TrackUntilSingleParticleSetSimpleTest )
+TEST( CXXCpuCpuTrackJobTrackLineTests, CmpWithTrackUntilTest )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
@@ -208,6 +213,147 @@ TEST( CXX_Cpu_CpuTrackJobTrackLineTests, TrackUntilSingleParticleSetSimpleTest )
             ( 0 == ::NS(Particles_compare_values_with_treshold)(
                 cmp_particles->getCApiPtr(), particles->getCApiPtr(),
                         ABS_TOLERANCE ) ) ) ) );
+}
+
+TEST( CXXCpuCpuTrackJobTrackLineTests, LostParticleBehaviour )
+{
+    namespace  st = SIXTRL_CXX_NAMESPACE;
+    using npart_t = st::particle_num_elements_t;
+
+    st::Buffer elements;
+
+    elements.createNew< st::DriftExact >();
+    elements.createNew< st::MultiPole >( 2 );
+    elements.createNew< st::LimitRect >();
+    elements.createNew< st::DriftExact >();
+
+    st::DriftExact*  dr0 = elements.get< st::DriftExact >( 0 );
+    st::MultiPole*  quad = elements.get< st::MultiPole >( 1 );
+    st::LimitRect* limit = elements.get< st::LimitRect >( 2 );
+    st::DriftExact*  dr1 = elements.get< st::DriftExact >( 3 );
+
+    SIXTRL_ASSERT( dr0   != nullptr );
+    SIXTRL_ASSERT( dr1   != nullptr );
+    SIXTRL_ASSERT( quad  != nullptr );
+    SIXTRL_ASSERT( limit != nullptr );
+
+    dr0->setLength( double{ 5 } );
+
+    quad->setKnlValue(  0.0, 0 );
+    quad->setKnlValue( 1e-2, 1 );
+    quad->setLength( 1.0 );
+
+    limit->setMaxX(  0.1 );
+    limit->setMinX( -0.1 );
+    limit->setMaxY(  0.1 );
+    limit->setMinY( -0.1 );
+
+    dr1->setLength( double{ 5 } );
+
+    st::Buffer cmp_pbuffer;
+    st::Buffer track_pbuffer;
+
+    constexpr npart_t NUM_PARTICLES = npart_t{ 100 };
+    cmp_pbuffer.createNew< st::Particles >( NUM_PARTICLES );
+    track_pbuffer.createNew< st::Particles >( NUM_PARTICLES );
+
+    double const pc0   = double{ 10e9 };
+    double const mass0 = double{ 1e9 };
+    double const q0    = double{ 1 };
+
+    double const energy0 = std::sqrt( mass0 * mass0 + pc0 * pc0 );
+    double const gamma0  = energy0 / mass0;
+    double const beta0   = std::sqrt( double{ 1 } -
+        double{ 1 }  / ( gamma0 * gamma0 ) );
+
+    st::Particles* cmp_particles =  cmp_pbuffer.get< st::Particles >( 0 );
+
+    for( npart_t ii = npart_t{ 0 } ; ii < NUM_PARTICLES ; ++ii )
+    {
+        cmp_particles->setQ0Value( ii, q0 );
+        cmp_particles->setMass0Value( ii, mass0 );
+        cmp_particles->setBeta0Value( ii, beta0 );
+        cmp_particles->setGamma0Value( ii, gamma0 );
+        cmp_particles->setP0cValue( ii, pc0 );
+        cmp_particles->setXValue( ii, static_cast< double >( ii * 0.002 ) );
+
+        cmp_particles->setRvvValue( ii, 1.0 );
+        cmp_particles->setRppValue( ii, 1.0);
+        cmp_particles->setChiValue( ii, 1.0 );
+        cmp_particles->setChargeRatioValue( ii, 1.0 );
+
+        cmp_particles->setParticleIdValue( ii, ii );
+        cmp_particles->setStateValue( ii, 1 );
+    }
+
+    st::Particles* track_particles = track_pbuffer.get< st::Particles >( 0 );
+    ::NS(Particles_copy)( track_particles, cmp_particles );
+
+    ::NS(track_status_t) track_status = ::NS(Track_all_particles_until_turn)(
+        cmp_particles, elements.getCApiPtr(), 2 );
+
+    SIXTRL_ASSERT( track_status == st::TRACK_SUCCESS );
+
+
+    /* ********************************************************************* */
+    /* Start track_line test */
+
+    st::CpuTrackJob job( track_pbuffer, elements );
+    track_status = job.trackLine( 0, 1, false );
+    ASSERT_TRUE( track_status == st::TRACK_SUCCESS );
+
+    auto states_begin = track_particles->getState();
+    auto states_end   = states_begin;
+    std::advance( states_end, NUM_PARTICLES );
+
+    job.collectParticles();
+
+    /* Check all states are equal to 1 after the first drift */
+    ASSERT_TRUE( std::find_if( states_begin, states_end,
+        []( st::particle_index_t const& SIXTRL_RESTRICT x )
+        { return x != 1; } ) == states_end );
+
+    /* Track until the end of turn */
+    track_status = job.trackLine( 1, elements.getNumObjects(), true );
+    ASSERT_TRUE( track_status == st::TRACK_SUCCESS );
+    job.collectParticles();
+
+    /* Verify that we now have lost particles due to the aperture check */
+    ASSERT_TRUE( std::find_if( states_begin, states_end,
+        []( st::particle_index_t const& SIXTRL_RESTRICT x )
+        { return x != 1; } ) != states_end );
+
+    std::vector< st::particle_index_t > const saved_states_after_first_turn(
+        states_begin, states_end );
+
+    SIXTRL_ASSERT( std::equal( states_begin, states_end,
+                        saved_states_after_first_turn.begin() ) );
+
+    /* track over the first drift for the second turn */
+    track_status = job.trackLine( 0, 1, false );
+    ASSERT_TRUE( track_status == st::TRACK_SUCCESS );
+    job.collectParticles();
+
+    /* Since no apertures have been encountered and the global aperture
+     * limit should be much much larger than the current x/y values,
+     * the states should not have changed compared to the end of turn 1 */
+
+    ASSERT_TRUE( std::equal( states_begin, states_end,
+                    saved_states_after_first_turn.begin() ) );
+
+    /* Finish second turn */
+    track_status = job.trackLine( 1, elements.getNumObjects(), true );
+    ASSERT_TRUE( track_status == st::TRACK_SUCCESS );
+    job.collectParticles();
+
+    /* Compare against the results obtained by performing
+     * NS(Track_all_particles_until_turn) for the whole two turns
+     * in one go */
+
+    double const ABS_TOLERANCE = double{ 1e-14 };
+
+    ASSERT_TRUE( ::NS(Particles_compare_real_values_with_treshold)(
+        cmp_particles, track_particles, ABS_TOLERANCE ) == 0 );
 }
 
 /* end: tests/sixtracklib/common/track/test_track_job_track_line_cxx.cpp */
