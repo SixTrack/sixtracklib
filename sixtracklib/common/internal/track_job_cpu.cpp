@@ -289,6 +289,21 @@ namespace SIXTRL_CXX_NAMESPACE
 
     TrackJobCpu::~TrackJobCpu() SIXTRL_NOEXCEPT {}
 
+    TrackJobCpu::status_t TrackJobCpu::doFetchParticleAddresses()
+    {
+        TrackJobCpu::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        TrackJobCpu::buffer_t* ptr_addr_buffer =
+            this->doGetPtrParticlesAddrBuffer();
+
+        if( ptr_addr_buffer != nullptr )
+        {
+            status = ::NS(ParticlesAddr_buffer_store_all_addresses)(
+                ptr_addr_buffer->getCApiPtr(), this->ptrCParticlesBuffer() );
+        }
+
+        return status;
+    }
+
     TrackJobCpu::track_status_t TrackJobCpu::doTrackUntilTurn(
         TrackJobCpu::size_type const until_turn )
     {
