@@ -177,7 +177,7 @@ NS(Particles_managed_buffer_store_all_addresses_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const slot_size,
-    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_error_flag );
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_error_flag );
 
 
 /* ------------------------------------------------------------------------- */
