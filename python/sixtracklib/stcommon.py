@@ -254,7 +254,7 @@ class st_Particles(ct.Structure):
 class st_ParticlesAddr(ct.Structure):
     _fields_ = [("num_particles", ct.c_int64), ("q0", ct.c_uint64),
                 ("mass0", ct.c_uint64), ("beta0", ct.c_uint64),
-                ("gamma0", ct.c_uint64), ("p0C", ct.c_uint64),
+                ("gamma0", ct.c_uint64), ("p0c", ct.c_uint64),
                 ("s", ct.c_uint64), ("x", ct.c_uint64), ("y", ct.c_uint64),
                 ("px", ct.c_uint64), ("py", ct.c_uint64), ("zeta", ct.c_uint64),
                 ("psigma", ct.c_uint64), ("delta", ct.c_uint64),
@@ -931,6 +931,11 @@ st_TrackJob_collect_output = sixtracklib.st_TrackJob_collect_output
 st_TrackJob_collect_output.argtypes = [st_TrackJob_p]
 st_TrackJob_collect_output.restype = None
 
+st_TrackJob_collect_particles_addresses = \
+    sixtracklib.st_TrackJob_collect_particles_addresses
+st_TrackJob_collect_particles_addresses.argtypes = [st_TrackJob_p]
+st_TrackJob_collect_particles_addresses.restype = None
+
 st_TrackJob_requires_collecting = sixtracklib.st_TrackJob_requires_collecting
 st_TrackJob_requires_collecting.argtypes = [st_TrackJob_p]
 st_TrackJob_requires_collecting.restype = ct.c_bool
@@ -951,6 +956,15 @@ st_TrackJob_push_output = sixtracklib.st_TrackJob_push_output
 st_TrackJob_push_output.argtypes = [st_TrackJob_p]
 st_TrackJob_push_output.restype = None
 
+st_TrackJob_push_particles_addresses = \
+    sixtracklib.st_TrackJob_push_particles_addresses
+st_TrackJob_push_particles_addresses.argtypes = [st_TrackJob_p]
+st_TrackJob_push_particles_addresses.restype = None
+
+st_TrackJob_particle_addresses = sixtracklib.st_TrackJob_particle_addresses
+st_TrackJob_particle_addresses.argtypes = [st_TrackJob_p,st_buffer_size_t]
+st_TrackJob_particle_addresses.restype = st_ParticlesAddr_p
+
 st_TrackJob_can_fetch_particle_addresses = \
     sixtracklib.st_TrackJob_can_fetch_particle_addresses
 st_TrackJob_can_fetch_particle_addresses.argtypes = [st_TrackJob_p]
@@ -960,6 +974,36 @@ st_TrackJob_has_particle_addresses = \
     sixtracklib.st_TrackJob_has_particle_addresses
 st_TrackJob_has_particle_addresses.argtypes = [st_TrackJob_p]
 st_TrackJob_has_particle_addresses.restype = ct.c_bool
+
+st_TrackJob_fetch_particle_addresses = \
+    sixtracklib.st_TrackJob_fetch_particle_addresses
+st_TrackJob_fetch_particle_addresses.argtypes = [st_TrackJob_p]
+st_TrackJob_fetch_particle_addresses.restype  = st_arch_status_t
+
+st_TrackJob_clear_particle_addresses = \
+    sixtracklib.st_TrackJob_clear_particle_addresses
+st_TrackJob_clear_particle_addresses.argtypes = [st_TrackJob_p, st_arch_size_t]
+st_TrackJob_clear_particle_addresses.restype  = st_arch_status_t
+
+st_TrackJob_clear_all_particle_addresses = \
+    sixtracklib.st_TrackJob_clear_all_particle_addresses
+st_TrackJob_clear_all_particle_addresses.argtypes = [st_TrackJob_p]
+st_TrackJob_clear_all_particle_addresses.restype = st_arch_status_t
+
+st_TrackJob_particle_addresses = sixtracklib.st_TrackJob_particle_addresses
+st_TrackJob_particle_addresses.argtypes = [ st_TrackJob_p, st_arch_size_t]
+st_TrackJob_particle_addresses.restype = st_ParticlesAddr_p
+
+st_TrackJob_get_particles_addr_buffer = \
+    sixtracklib.st_TrackJob_get_particles_addr_buffer
+st_TrackJob_get_particles_addr_buffer.argtypes = [st_TrackJob_p]
+st_TrackJob_get_particles_addr_buffer.restype = st_Buffer_p
+
+st_TrackJob_get_const_particles_addr_buffer = \
+    sixtracklib.st_TrackJob_get_const_particles_addr_buffer
+st_TrackJob_get_const_particles_addr_buffer.argtypes = [st_TrackJob_p]
+st_TrackJob_get_const_particles_addr_buffer.restype = st_Buffer_p
+
 
 st_TrackJob_get_type_id = sixtracklib.st_TrackJob_get_type_id
 st_TrackJob_get_type_id.argtypes = [st_TrackJob_p]
@@ -3166,6 +3210,21 @@ if SIXTRACKLIB_MODULES.get('opencl', False):
     st_ClContextBase_delete = sixtracklib.st_ClContextBase_delete
     st_ClContextBase_delete.argtypes = [st_Context_p]
     st_ClContextBase_delete.restype = None
+
+    st_TrackJobCl_p = ct.c_void_p
+    st_NullTrackJobCl = ct.cast( 0, st_TrackJobCl_p )
+
+    st_TrackJobCl_get_opencl_context_addr = \
+        sixtracklib.st_TrackJobCl_get_opencl_context_addr
+    st_TrackJobCl_get_opencl_context_addr.argtypes = [st_TrackJobCl_p]
+    st_TrackJobCl_get_opencl_context_addr.restype  = ct.c_uint64
+
+    st_TrackJobCl_get_opencl_queue_addr = \
+        sixtracklib.st_TrackJobCl_get_opencl_queue_addr
+    st_TrackJobCl_get_opencl_queue_addr.argtypes = [st_TrackJobCl_p]
+    st_TrackJobCl_get_opencl_queue_addr.restype  = ct.c_uint64
+
+
 
 # ------------------------------------------------------------------------------
 # Stand-alone tracking functions (CPU only)
