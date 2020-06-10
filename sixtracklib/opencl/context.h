@@ -63,6 +63,8 @@ namespace SIXTRL_CXX_NAMESPACE
         static constexpr size_type MIN_NUM_ASSIGN_BE_MON_ARGS = size_type{ 5 };
         static constexpr size_type MIN_NUM_CLEAR_BE_MON_ARGS  = size_type{ 2 };
         static constexpr size_type MIN_NUM_ASSIGN_ELEM_ARGS   = size_type{ 4 };
+        static constexpr size_type MIN_NUM_FETCH_PARTICLES_ADDR_ARGS =
+            size_type{ 3 };
 
         explicit ClContext(
             const char *const SIXTRL_RESTRICT config_str = nullptr );
@@ -105,6 +107,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
         status_t assign_elem_by_elem_config_arg(
             cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg );
+
+        status_t assign_particles_addr_buffer_arg(
+            ClArgument& SIXTRL_RESTRICT_REF particles_addr_arg );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -219,6 +224,14 @@ namespace SIXTRL_CXX_NAMESPACE
             elem_by_elem_config_t const& SIXTRL_RESTRICT_REF
                 elem_by_elem_config );
 
+        /* ----------------------------------------------------------------- */
+
+        bool has_fetch_particles_addr_kernel() const SIXTRL_NOEXCEPT;
+        kernel_id_t fetch_particles_addr_kernel_id() const SIXTRL_NOEXCEPT;
+        status_t set_fetch_particles_addr_kernel_id(
+            kernel_id_t const kernel_id );
+        status_t fetch_particles_addr();
+
         protected:
 
         bool doSelectNode( size_type node_index ) override;
@@ -249,6 +262,7 @@ namespace SIXTRL_CXX_NAMESPACE
         program_id_t m_track_line_program_id;
         program_id_t m_assign_elem_by_elem_out_buffer_program_id;
         program_id_t m_assign_be_mon_out_buffer_program_id;
+        program_id_t m_fetch_particles_addr_program_id;
         program_id_t m_clear_be_mon_program_id;
 
         kernel_id_t  m_track_until_turn_kernel_id;
@@ -256,6 +270,7 @@ namespace SIXTRL_CXX_NAMESPACE
         kernel_id_t  m_track_line_kernel_id;
         kernel_id_t  m_assign_elem_by_elem_out_buffer_kernel_id;
         kernel_id_t  m_assign_be_mon_out_buffer_kernel_id;
+        kernel_id_t  m_fetch_particles_addr_kernel_id;
         kernel_id_t  m_clear_be_mon_kernel_id;
 
         bool         m_use_optimized_tracking;
