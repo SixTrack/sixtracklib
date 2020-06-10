@@ -201,6 +201,11 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_collect_beam_elements)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_collect_output)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_collect_particles_addresses)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job );
+
+/* ------------------------------------------------------------------------- */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_enable_collect_particles)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job );
 
@@ -253,12 +258,42 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_push_beam_elements)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_push_output)(
     NS(TrackJobBase)* SIXTRL_RESTRICT track_job );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackJob_push_particles_addresses)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job );
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_can_fetch_particle_addresses)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT track_job );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_particle_addresses)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJob_fetch_particle_addresses)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJob_clear_particle_addresses)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT track_job,
+    NS(arch_size_t) const index ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJob_clear_all_particle_addresses)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT track_job ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ParticlesAddr) const*
+NS(TrackJob_particle_addresses)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    NS(arch_size_t) const index ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)*
+NS(TrackJob_get_particles_addr_buffer)(
+    NS(TrackJobBase)* SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer) const*
+NS(TrackJob_get_const_particles_addr_buffer)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT;
 
 /* ------------------------------------------------------------------------- */
 
@@ -488,7 +523,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void
 NS(TrackJob_set_default_elem_by_elem_config_order)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job,
     NS(elem_by_elem_order_t) const order );
-
 
 #if defined( __cplusplus )
 } /* extern "C" { */

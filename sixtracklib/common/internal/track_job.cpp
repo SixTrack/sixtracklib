@@ -469,6 +469,14 @@ void NS(TrackJob_collect_output)( ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
     if( job != nullptr ) job->collectOutput();
 }
 
+void NS(TrackJob_collect_particles_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
+{
+    if( job != nullptr ) job->collectParticlesAddresses();
+}
+
+/* ------------------------------------------------------------------------- */
+
 void NS(TrackJob_enable_collect_particles)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
 {
@@ -543,6 +551,7 @@ bool NS(TrackJob_requires_collecting)(
     return ( job != nullptr ) ? job->requiresCollecting() : false;
 }
 
+/* ------------------------------------------------------------------------- */
 
 void NS(TrackJob_push)( ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job,
     ::NS(track_job_push_flag_t) const flags )
@@ -559,7 +568,8 @@ void NS(TrackJob_push_particles)(
 void NS(TrackJob_push_beam_elements)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job )
 {
-    if( track_job != nullptr ) track_job->push( st::TRACK_JOB_IO_BEAM_ELEMENTS );
+    if( track_job != nullptr ) track_job->push(
+        st::TRACK_JOB_IO_BEAM_ELEMENTS );
 }
 
 void NS(TrackJob_push_output)(
@@ -568,18 +578,70 @@ void NS(TrackJob_push_output)(
     if( track_job != nullptr ) track_job->push( st::TRACK_JOB_IO_OUTPUT );
 }
 
+void NS(TrackJob_push_particles_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
+{
+    if( job != nullptr ) job->push( st::TRACK_JOB_IO_PARTICLES_ADDR );
+}
+
+/* ------------------------------------------------------------------------- */
+
 bool NS(TrackJob_can_fetch_particle_addresses)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT track_job )
 {
-    ( void )track_job; /* not supported by track jobs based on this API */
-    return false;
+    return ( ( track_job != nullptr ) &&
+             ( track_job->canFetchParticleAddresses() ) );
 }
 
 bool NS(TrackJob_has_particle_addresses)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT track_job )
 {
-    ( void )track_job; /* not supported by track jobs based on this API */
-    return false;
+    return ( ( track_job != nullptr ) &&
+             ( track_job->hasParticleAddresses() ) );
+}
+
+::NS(arch_status_t) NS(TrackJob_fetch_particle_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job )
+{
+    return ( track_job != nullptr )
+        ? track_job->fetchParticleAddresses()
+        : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(TrackJob_clear_particle_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job,
+    ::NS(arch_size_t) const index ) SIXTRL_NOEXCEPT
+{
+    return ( track_job != nullptr )
+        ? track_job->clearParticleAddresses( index )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(TrackJob_clear_all_particle_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job ) SIXTRL_NOEXCEPT
+{
+    return ( track_job != nullptr )
+        ? track_job->clearAllParticleAddresses()
+        : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(ParticlesAddr) const* NS(TrackJob_particle_addresses)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(arch_size_t) const index ) SIXTRL_NOEXCEPT
+{
+    return ( job != nullptr ) ? job->particleAddresses( index ) : nullptr;
+}
+
+::NS(Buffer)* NS(TrackJob_get_particles_addr_buffer)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT
+{
+    return ( job != nullptr ) ? job->ptrParticleAddressesBuffer() : nullptr;
+}
+
+::NS(Buffer) const* NS(TrackJob_get_const_particles_addr_buffer)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT
+{
+    return ( job != nullptr ) ? job->ptrParticleAddressesBuffer() : nullptr;
 }
 
 /* ------------------------------------------------------------------------- */
