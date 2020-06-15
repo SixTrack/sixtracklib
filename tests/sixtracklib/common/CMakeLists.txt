@@ -1,6 +1,7 @@
 # sixtracklib/tests/sixtracklib/common/CMakeLists.txt
 
 add_subdirectory( control )
+add_subdirectory( math )
 add_subdirectory( beam_elements )
 add_subdirectory( track )
 
