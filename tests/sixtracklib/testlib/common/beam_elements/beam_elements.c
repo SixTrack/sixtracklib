@@ -248,7 +248,7 @@ void NS(BeamElement_print)(
                 break;
             }
 
-            case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+            case NS(OBJECT_TYPE_SC_COASTING):
             {
                 typedef SIXTRL_DATAPTR_DEC NS(SpaceChargeCoasting) const*
                         ptr_to_belem_t;
@@ -260,15 +260,15 @@ void NS(BeamElement_print)(
                 break;
             }
 
-            case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
+            case NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF):
             {
-                typedef SIXTRL_DATAPTR_DEC NS(SpaceChargeBunched) const*
+                typedef SIXTRL_DATAPTR_DEC NS(SpaceChargeQGaussianProfile) const*
                         ptr_to_belem_t;
 
                 ptr_to_belem_t beam_element =
                     ( ptr_to_belem_t )( uintptr_t )addr;
 
-                NS(SpaceChargeBunched_print)( fp, beam_element );
+                NS(SpaceChargeQGaussianProfile_print)( fp, beam_element );
                 break;
             }
 

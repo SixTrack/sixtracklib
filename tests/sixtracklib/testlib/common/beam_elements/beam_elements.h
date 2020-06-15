@@ -426,7 +426,7 @@ SIXTRL_INLINE void NS(BeamElement_print_out)(
                 break;
             }
 
-            case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+            case NS(OBJECT_TYPE_SC_COASTING):
             {
                 typedef SIXTRL_DATAPTR_DEC NS(SpaceChargeCoasting) const*
                         ptr_to_belem_t;
@@ -438,15 +438,15 @@ SIXTRL_INLINE void NS(BeamElement_print_out)(
                 break;
             }
 
-            case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
+            case NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF):
             {
-                typedef SIXTRL_DATAPTR_DEC NS(SpaceChargeBunched) const*
+                typedef SIXTRL_DATAPTR_DEC NS(SpaceChargeQGaussianProfile) const*
                         ptr_to_belem_t;
 
                 ptr_to_belem_t beam_element =
                     ( ptr_to_belem_t )( uintptr_t )addr;
 
-                NS(SpaceChargeBunched_print_out)( beam_element );
+                NS(SpaceChargeQGaussianProfile_print_out)( beam_element );
                 break;
             }
 
@@ -639,7 +639,7 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects)(
                         break;
                     }
 
-                    case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+                    case NS(OBJECT_TYPE_SC_COASTING):
                     {
                         typedef NS(SpaceChargeCoasting) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
@@ -651,12 +651,12 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects)(
                         break;
                     }
 
-                    case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
+                    case NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF):
                     {
-                        typedef NS(SpaceChargeBunched) belem_t;
+                        typedef NS(SpaceChargeQGaussianProfile) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
 
-                        compare_value = NS(SpaceChargeBunched_compare_values)(
+                        compare_value = NS(SpaceChargeQGaussianProfile_compare_values)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
                             ( ptr_belem_t )( uintptr_t )rhs_addr );
 
@@ -863,7 +863,7 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
                         break;
                     }
 
-                    case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+                    case NS(OBJECT_TYPE_SC_COASTING):
                     {
                         typedef NS(SpaceChargeCoasting) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
@@ -875,12 +875,12 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
                         break;
                     }
 
-                    case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
+                    case NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF):
                     {
-                        typedef NS(SpaceChargeBunched) belem_t;
+                        typedef NS(SpaceChargeQGaussianProfile) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
 
-                        compare_value = NS(SpaceChargeBunched_compare_values)(
+                        compare_value = NS(SpaceChargeQGaussianProfile_compare_values)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
                             ( ptr_belem_t )( uintptr_t )rhs_addr );
 
