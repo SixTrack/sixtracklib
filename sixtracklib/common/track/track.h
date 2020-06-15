@@ -380,9 +380,9 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             break;
         }
 
-        case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+        case NS(OBJECT_TYPE_SC_COASTING):
         {
-            typedef NS(SpaceChargeCoasting)   belem_t;
+            typedef NS(SpaceChargeCoasting) belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
@@ -391,13 +391,24 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             break;
         }
 
-        case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
+        case NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF):
         {
-            typedef NS(SpaceChargeBunched)   belem_t;
+            typedef NS(SpaceChargeQGaussianProfile) belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
-            ret = NS(Track_particle_space_charge_bunched)(
+            ret = NS(Track_particle_space_charge_qgaussian_profile)(
+                particles, index, belem );
+            break;
+        }
+
+        case NS(OBJECT_TYPE_SC_INTERPOLATED_PROF):
+        {
+            typedef NS(SpaceChargeInterpolatedProfile) belem_t;
+            typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
+            ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
+
+            ret = NS(Track_particle_space_charge_interpolated_profile)(
                 particles, index, belem );
             break;
         }
