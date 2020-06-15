@@ -11,30 +11,33 @@ extern "C" {
 
 typedef enum NS(object_type_values_e)
 {
-    NS(OBJECT_TYPE_NONE)                  =          0,
-    NS(OBJECT_TYPE_PARTICLE)              =          1,
-    NS(OBJECT_TYPE_DRIFT)                 =          2,
-    NS(OBJECT_TYPE_DRIFT_EXACT)           =          3,
-    NS(OBJECT_TYPE_MULTIPOLE)             =          4,
-    NS(OBJECT_TYPE_RF_MULTIPOLE)          =        256,
-    NS(OBJECT_TYPE_CAVITY)                =          5,
-    NS(OBJECT_TYPE_XYSHIFT)               =          6,
-    NS(OBJECT_TYPE_SROTATION)             =          7,
-    NS(OBJECT_TYPE_BEAM_BEAM_4D)          =          8,
-    NS(OBJECT_TYPE_BEAM_BEAM_6D)          =          9,
-    NS(OBJECT_TYPE_BEAM_MONITOR)          =         10,
-    NS(OBJECT_TYPE_LIMIT_RECT)            =         11,
-    NS(OBJECT_TYPE_LIMIT_ELLIPSE)         =         12,
-    NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE)    =         16,
-    NS(OBJECT_TYPE_SPACE_CHARGE_COASTING) =         13,
-    NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED)  =         14,
-    NS(OBJECT_TYPE_DIPEDGE)               =         24,
-    NS(OBJECT_TYPE_PARTICLES_ADDR)        =        512,
-    NS(OBJECT_TYPE_LINE)                  =       1024,
-    NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF)     =      65534,
-    NS(OBJECT_TYPE_NODE_ID)               =      65535,
-    NS(OBJECT_TYPE_LAST_AVAILABLE)        =      65535,
-    NS(OBJECT_TYPE_INVALID)               = 0x7fffffff
+    NS(OBJECT_TYPE_NONE)                      =          0,
+    NS(OBJECT_TYPE_PARTICLE)                  =          1,
+    NS(OBJECT_TYPE_DRIFT)                     =          2,
+    NS(OBJECT_TYPE_DRIFT_EXACT)               =          3,
+    NS(OBJECT_TYPE_MULTIPOLE)                 =          4,
+    NS(OBJECT_TYPE_RF_MULTIPOLE)              =        256,
+    NS(OBJECT_TYPE_CAVITY)                    =          5,
+    NS(OBJECT_TYPE_XYSHIFT)                   =          6,
+    NS(OBJECT_TYPE_SROTATION)                 =          7,
+    NS(OBJECT_TYPE_LIN_DECOUPLED_ROTATION)    =        259,
+    NS(OBJECT_TYPE_BEAM_BEAM_4D)              =          8,
+    NS(OBJECT_TYPE_BEAM_BEAM_6D)              =          9,
+    NS(OBJECT_TYPE_BEAM_MONITOR)              =         10,
+    NS(OBJECT_TYPE_LIMIT_RECT)                =         11,
+    NS(OBJECT_TYPE_LIMIT_ELLIPSE)             =         12,
+    NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE)        =         16,
+    NS(OBJECT_TYPE_SC_COASTING)               =         13,
+    NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF)         =         14,
+    NS(OBJECT_TYPE_SC_INTERPOLATED_PROF)      =        257,
+    NS(OBJECT_TYPE_LINE_DENSITY_PROF_DATA)    =        258,
+    NS(OBJECT_TYPE_DIPEDGE)                   =         24,
+    NS(OBJECT_TYPE_PARTICLES_ADDR)            =        512,
+    NS(OBJECT_TYPE_LINE)                      =       1024,
+    NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF)         =      65534,
+    NS(OBJECT_TYPE_NODE_ID)                   =      65535,
+    NS(OBJECT_TYPE_LAST_AVAILABLE)            =      65535,
+    NS(OBJECT_TYPE_INVALID)                   = 0x7fffffff
 }
 NS(object_type_values_t);
 
@@ -105,6 +108,22 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_LIMIT_ELLIPSE = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_LIMIT_ELLIPSE) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_LIMIT_RECT_ELLIPSE = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_SC_COASTING = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_SC_COASTING) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_SC_QGAUSSIAN_PROF = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_SC_INTERPOLATED_PROF = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_SC_INTERPOLATED_PROF) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_DIPEDGE = static_cast< object_type_id_t >(
