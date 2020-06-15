@@ -156,7 +156,7 @@ NS(LimitRectEllipse_new)( SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
     NS(LimitRectEllipse_preset)( &limit );
 
     num_dataptrs = NS(LimitRectEllipse_num_dataptrs)( &limit );
-    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )1u );
+    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
     ptr_limit = ( SIXTRL_BUFFER_DATAPTR_DEC NS(LimitRectEllipse)* )(
         uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
@@ -185,7 +185,7 @@ SIXTRL_BE_ARGPTR_DEC NS(LimitRectEllipse)* NS(LimitRectEllipse_add)(
     NS(LimitRectEllipse_set_a_squ_b_squ)( &limit, a_squ * b_squ );
 
     num_dataptrs = NS(LimitRectEllipse_num_dataptrs)( &limit );
-    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )1u );
+    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
     ptr_limit = ( SIXTRL_BUFFER_DATAPTR_DEC NS(LimitRectEllipse)* )(
         uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
