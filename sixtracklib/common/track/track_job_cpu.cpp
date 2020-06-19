@@ -100,6 +100,15 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( job.hasOutputBuffer() ) && ( job.hasElemByElemOutput() ) &&
             ( job.hasElemByElemConfig() ) )
         {
+            _this_t::c_buffer_t* elem_by_elem_config_buffer =
+                job.elem_by_elem_config_buffer();
+
+            unsigned char* elem_by_elem_config_buffer_begin =
+                ::NS(Buffer_get_data_begin)( elem_by_elem_config_buffer );
+
+            _this_t::size_type const elem_by_elem_config_index =
+                _this_t::size_type{ 0 };
+
             SIXTRL_ASSERT( job.ptrCParticlesBuffer()    != nullptr );
             SIXTRL_ASSERT( job.ptrCBeamElementsBuffer() != nullptr );
             SIXTRL_ASSERT( job.ptrElemByElemConfig()    != nullptr );
@@ -115,7 +124,8 @@ namespace SIXTRL_CXX_NAMESPACE
                     ::NS(Buffer_get_data_begin)( job.ptrCParticlesBuffer() ),
                     *job.particleSetIndicesBegin(), pindex_t{ 0 }, pindex_t{ 1 },
                     ::NS(Buffer_get_data_begin)( job.ptrCBeamElementsBuffer() ),
-                    job.ptrElemByElemConfig(), _until_turn_num, slot_size );
+                    elem_by_elem_config_buffer_begin,
+                        elem_by_elem_config_index, _until_turn_num, slot_size );
             }
             else if( job.numParticleSets() > size_t{ 1 } )
             {
@@ -137,7 +147,9 @@ namespace SIXTRL_CXX_NAMESPACE
                         *pset_it, pindex_t{ 0 }, pindex_t{ 1 },
                         ::NS(Buffer_get_data_begin)(
                             job.ptrCBeamElementsBuffer() ),
-                        job.ptrElemByElemConfig(), _until_turn_num, slot_size );
+                        elem_by_elem_config_buffer_begin,
+                            elem_by_elem_config_index, _until_turn_num,
+                                slot_size );
                 }
             }
         }

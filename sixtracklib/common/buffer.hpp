@@ -8,10 +8,11 @@
         #include <cstdint>
         #include <cstdlib>
         #include <cstdio>
-        #include <stdexcept>
         #include <limits>
-        #include <utility>
+        #include <memory>
+        #include <stdexcept>
         #include <string>
+        #include <utility>
     #endif /* defined( __cplusplus ) */
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
@@ -44,6 +45,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST flags_t
             DEFAULT_DATASTORE_FLAGS = ::NS(BUFFER_DATASTORE_MEMPOOL);
+
+        #if !defined( _GPUCODE )
+
+        SIXTRL_STATIC std::unique_ptr< Buffer >
+        MAKE_FROM_CBUFFER_AND_TAKE_OWNERSHIP(
+            ::NS(Buffer)* SIXTRL_RESTRICT ptr_to_take_ownership,
+            bool const delete_ptr_after_move = true );
+
+        #endif /* !defined( _GPUCODE ) */
 
         SIXTRL_FN SIXTRL_STATIC size_type CalculateBufferSize(
             size_type max_num_objects, size_type max_num_slots,
@@ -102,6 +112,22 @@ namespace SIXTRL_CXX_NAMESPACE
         #endif /* !defined( _GPUCODE ) */
 
         SIXTRL_FN virtual ~Buffer();
+
+        friend void swap( Buffer& SIXTRL_RESTRICT_REF lhs,
+                          Buffer& SIXTRL_RESTRICT_REF rhs ) SIXTRL_NOEXCEPT
+        {
+            using std::swap;
+
+            swap( lhs.data_addr,       rhs.data_addr       );
+            swap( lhs.data_size,       rhs.data_size       );
+            swap( lhs.header_size,     rhs.header_size     );
+            swap( lhs.data_capacity,   rhs.data_capacity   );
+            swap( lhs.slot_length,     rhs.slot_length     );
+            swap( lhs.object_addr,     rhs.object_addr     );
+            swap( lhs.num_objects,     rhs.num_objects     );
+            swap( lhs.datastore_flags, rhs.datastore_flags );
+            swap( lhs.datastore_addr,  rhs.datastore_addr  );
+        }
 
         /* ----------------------------------------------------------------- */
 
@@ -240,13 +266,13 @@ namespace SIXTRL_CXX_NAMESPACE
         get( size_type const object_index ) SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
-        
+
         SIXTRL_FN bool reset(
             size_type const max_num_objects = size_type{ 0 },
             size_type const max_num_slots = size_type{ 0 },
             size_type const max_num_dataptrs = size_type{ 0 },
             size_type const max_num_garbage_ranges = size_type{ 0 } );
-        
+
         /* ----------------------------------------------------------------- */
 
         SIXTRL_FN bool needsRemapping() const SIXTRL_NOEXCEPT;
@@ -288,7 +314,7 @@ namespace SIXTRL_CXX_NAMESPACE
             return T::AddToBuffer(
                 *this->getCApiPtr(), std::forward< Args >( args )... );
         }
-        
+
         template< class T >
         SIXTRL_FN T* addCopy( T const& SIXTRL_RESTRICT_REF other )
         {
@@ -341,6 +367,42 @@ namespace SIXTRL_CXX_NAMESPACE
 
 namespace SIXTRL_CXX_NAMESPACE
 {
+    #if !defined( _GPUCODE )
+
+    SIXTRL_INLINE std::unique_ptr< Buffer >
+    Buffer::MAKE_FROM_CBUFFER_AND_TAKE_OWNERSHIP(
+            ::NS(Buffer)* SIXTRL_RESTRICT ptr_to_take_ownership,
+            bool const delete_ptr_after_move )
+    {
+        namespace st = SIXTRL_CXX_NAMESPACE;
+        std::unique_ptr< st::Buffer > ptr_cxx_buffer( nullptr );
+
+        if( ptr_to_take_ownership != nullptr )
+        {
+            using  size_t = st::Buffer::size_type;
+            using ptr_to_raw_t = SIXTRL_ARGPTR_DEC unsigned char*;
+
+            ptr_cxx_buffer.reset( new st::Buffer(
+                ptr_to_raw_t{ nullptr }, size_t{ 0u } ) );
+            SIXTRL_ASSERT( ptr_cxx_buffer.get() != nullptr );
+
+            ::NS(Buffer)* ptr_c_buffer = ptr_cxx_buffer->getCApiPtr();
+            SIXTRL_ASSERT( ptr_c_buffer != nullptr );
+
+            *ptr_c_buffer = *ptr_to_take_ownership;
+            ::NS(Buffer_preset)( ptr_to_take_ownership );
+
+            if( delete_ptr_after_move )
+            {
+                ::NS(Buffer_delete)( ptr_to_take_ownership );
+            }
+        }
+
+        return ptr_cxx_buffer;
+    }
+
+    #endif /* !defined( _GPUCODE ) */
+
     SIXTRL_INLINE Buffer::size_type Buffer::CalculateBufferSize(
         Buffer::size_type const max_num_objects,
         Buffer::size_type const max_num_slots,
@@ -413,14 +475,20 @@ namespace SIXTRL_CXX_NAMESPACE
         ::NS(Buffer)()
     {
         using c_api_t       = Buffer::c_api_t;
+        using size_t        = Buffer::size_type;
         using ptr_to_raw_t  = SIXTRL_ARGPTR_DEC unsigned char*;
 
         c_api_t* _buffer = ::NS(Buffer_preset)( this->getCApiPtr() );
+        ptr_to_raw_t _data_begin = reinterpret_cast< ptr_to_raw_t >(
+            data_buffer_begin );
 
-        if( 0 != ::NS(Buffer_init)( _buffer, reinterpret_cast< ptr_to_raw_t >(
-            data_buffer_begin ), max_buffer_size ) )
+        if( ( _data_begin != nullptr ) || ( max_buffer_size > size_t{ 0 } ) )
         {
-            ::NS(Buffer_free)( _buffer );
+            if( 0 != ::NS(Buffer_init)(
+                    _buffer, _data_begin, max_buffer_size ) )
+            {
+                ::NS(Buffer_free)( _buffer );
+            }
         }
     }
 
@@ -1096,7 +1164,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* ----------------------------------------------------------------- */
-    
+
     SIXTRL_INLINE bool Buffer::reset(
             Buffer::size_type const max_num_objects,
             Buffer::size_type const max_num_slots,
@@ -1104,10 +1172,10 @@ namespace SIXTRL_CXX_NAMESPACE
             Buffer::size_type const max_num_garbage_ranges  )
     {
         return ( ::NS(Buffer_reset_detailed)( this->getCApiPtr(),
-            max_num_objects, max_num_slots, max_num_dataptrs, 
+            max_num_objects, max_num_slots, max_num_dataptrs,
                 max_num_garbage_ranges ) == 0 );
     }
-    
+
     /* ----------------------------------------------------------------- */
 
     SIXTRL_INLINE bool Buffer::needsRemapping() const SIXTRL_NOEXCEPT

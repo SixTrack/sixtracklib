@@ -44,10 +44,13 @@ namespace SIXTRL_CXX_NAMESPACE
     constexpr _size_t _this_t::MIN_NUM_ASSIGN_BE_MON_ARGS;
     constexpr _size_t _this_t::MIN_NUM_CLEAR_BE_MON_ARGS;
     constexpr _size_t _this_t::MIN_NUM_ASSIGN_ELEM_ARGS;
+    constexpr _size_t _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX;
 
     ClContext::ClContext( const char *const SIXTRL_RESTRICT config_str ) :
         _base_t( config_str ),
         m_num_particles_in_pset( _size_t{ 0 } ), m_pset_index( _size_t{ 0 } ),
+        m_elem_by_elem_config_index(
+            _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX ),
         m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
@@ -59,8 +62,13 @@ namespace SIXTRL_CXX_NAMESPACE
         m_assign_elem_by_elem_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
-        m_use_optimized_tracking( false ), m_enable_beam_beam( true )
+        m_use_optimized_tracking( false )
     {
+        _this_t::status_t const status =
+            this->doInitDefaultFeatureFlagsPrivImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+
         this->doInitDefaultProgramsPrivImpl();
     }
 
@@ -68,6 +76,8 @@ namespace SIXTRL_CXX_NAMESPACE
                           const char *const SIXTRL_RESTRICT config_str ) :
         _base_t( config_str ),
         m_num_particles_in_pset( _size_t{ 0 } ), m_pset_index( _size_t{ 0 } ),
+        m_elem_by_elem_config_index(
+            _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX ),
         m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
@@ -79,7 +89,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_assign_elem_by_elem_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
-        m_use_optimized_tracking( false ), m_enable_beam_beam( true )
+        m_use_optimized_tracking( false )
     {
         if( config_str != nullptr )
         {
@@ -93,6 +103,11 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_use_optimized_tracking = true;
         }
 
+        _this_t::status_t const status =
+            this->doInitDefaultFeatureFlagsPrivImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+
         this->doInitDefaultProgramsPrivImpl();
 
         if( ( node_index < this->numAvailableNodes() ) &&
@@ -100,7 +115,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             ClContextBase::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
-            this->doAssignSlotSizeArgPrivImpl( st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignSlotSizeArgPrivImpl(
+                st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignElemByElemConfigIndexArgPrivImpl(
+                _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX );
+
             this->doAssignStatusFlagsArgPrivImpl(
                 this->internalStatusFlagsBuffer() );
         }
@@ -110,19 +131,28 @@ namespace SIXTRL_CXX_NAMESPACE
                           const char *const SIXTRL_RESTRICT config_str ) :
         _base_t( config_str ),
         m_num_particles_in_pset( _size_t{ 0 } ), m_pset_index( _size_t{ 0 } ),
+        m_elem_by_elem_config_index(
+            _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX ),
         m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_assign_elem_by_elem_out_buffer_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_assign_be_mon_out_buffer_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_clear_be_mon_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_assign_addr_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_track_line_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_elem_by_elem_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
-        m_use_optimized_tracking( false ), m_enable_beam_beam( true )
+        m_assign_addr_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_use_optimized_tracking( false )
     {
+        _this_t::status_t const status =
+            this->doInitDefaultFeatureFlagsPrivImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+
         this->doInitDefaultProgramsPrivImpl();
 
         _size_t  const node_index = this->findAvailableNodesIndex(
@@ -140,7 +170,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             _base_t::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
-            this->doAssignSlotSizeArgPrivImpl( st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignSlotSizeArgPrivImpl(
+                st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignElemByElemConfigIndexArgPrivImpl(
+                _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX );
+
             this->doAssignStatusFlagsArgPrivImpl(
                 this->internalStatusFlagsBuffer() );
         }
@@ -150,18 +186,22 @@ namespace SIXTRL_CXX_NAMESPACE
                           const char *const SIXTRL_RESTRICT config_str ) :
         _base_t( config_str ),
         m_num_particles_in_pset( _size_t{ 0 } ), m_pset_index( _size_t{ 0 } ),
+        m_elem_by_elem_config_index(
+            _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX ),
         m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_assign_elem_by_elem_out_buffer_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_assign_be_mon_out_buffer_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_clear_be_mon_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_assign_addr_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_track_line_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_elem_by_elem_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
-        m_use_optimized_tracking( false ), m_enable_beam_beam( true )
+        m_assign_addr_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_use_optimized_tracking( false )
     {
         _size_t  node_index = this->findAvailableNodesIndex( node_id_str );
 
@@ -170,6 +210,11 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             this->m_use_optimized_tracking = true;
         }
+
+        _this_t::status_t const status =
+            this->doInitDefaultFeatureFlagsPrivImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
 
         this->doInitDefaultProgramsPrivImpl();
 
@@ -192,7 +237,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             _base_t::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
-            this->doAssignSlotSizeArgPrivImpl( st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignSlotSizeArgPrivImpl(
+                st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignElemByElemConfigIndexArgPrivImpl(
+                _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX );
+
             this->doAssignStatusFlagsArgPrivImpl(
                 this->internalStatusFlagsBuffer() );
         }
@@ -204,18 +255,22 @@ namespace SIXTRL_CXX_NAMESPACE
         const char *const SIXTRL_RESTRICT config_str ) :
         _base_t( config_str ),
         m_num_particles_in_pset( _size_t{ 0 } ), m_pset_index( _size_t{ 0 } ),
+        m_elem_by_elem_config_index(
+            _this_t::DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX ),
         m_track_until_turn_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_line_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_assign_elem_by_elem_out_buffer_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_assign_be_mon_out_buffer_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_clear_be_mon_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
+        m_assign_addr_program_id( st::ARCH_ILLEGAL_PROGRAM_ID ),
         m_track_elem_by_elem_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_track_line_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_elem_by_elem_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_assign_be_mon_out_buffer_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
         m_clear_be_mon_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
-        m_use_optimized_tracking( false ), m_enable_beam_beam( true )
+        m_assign_addr_kernel_id( st::ARCH_ILLEGAL_KERNEL_ID ),
+        m_use_optimized_tracking( false )
     {
         _size_t const node_index =
             this->findAvailableNodesIndex( platform_idx, device_idx );
@@ -226,6 +281,11 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_use_optimized_tracking = true;
         }
 
+        _this_t::status_t const status =
+            this->doInitDefaultFeatureFlagsPrivImpl();
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
+
         this->doInitDefaultProgramsPrivImpl();
 
         if( ( node_index < this->numAvailableNodes() ) &&
@@ -233,7 +293,13 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             _base_t::doInitDefaultKernels();
             this->doInitDefaultKernelsPrivImpl();
-            this->doAssignSlotSizeArgPrivImpl( st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignSlotSizeArgPrivImpl(
+                st::BUFFER_DEFAULT_SLOT_SIZE );
+
+            this->doAssignElemByElemConfigIndexArgPrivImpl(
+                this->m_elem_by_elem_config_index );
+
             this->doAssignStatusFlagsArgPrivImpl(
                 this->internalStatusFlagsBuffer() );
         }
@@ -242,7 +308,7 @@ namespace SIXTRL_CXX_NAMESPACE
     ClContext::~ClContext() SIXTRL_NOEXCEPT {}
 
     _status_t ClContext::assign_particles_arg(
-        ClArgument& SIXTRL_RESTRICT_REF particles_arg )
+        _this_t::cl_argument_t& SIXTRL_RESTRICT_REF particles_arg )
     {
         _status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
@@ -362,7 +428,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     _status_t ClContext::assign_beam_elements_arg(
-        ClArgument& SIXTRL_RESTRICT_REF beam_elements_arg )
+        _this_t::cl_argument_t& SIXTRL_RESTRICT_REF beam_elements_arg )
     {
         using size_t       = _size_t;
         using kernel_id_t  = _kernel_id_t;
@@ -432,7 +498,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     _status_t ClContext::assign_output_buffer_arg(
-        ClArgument& SIXTRL_RESTRICT_REF out_buffer_arg )
+        _this_t::cl_argument_t& SIXTRL_RESTRICT_REF out_buffer_arg )
     {
         using size_t       = _size_t;
         using kernel_id_t  = _kernel_id_t;
@@ -464,8 +530,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         size_t const out_buffer_arg_idx[ NUM_KERNELS ] =
         {
-            size_t{ 1 }, // assign_be_mon
-            size_t{ 1 }, // clear_be_mon
+            size_t{ 1 }, // assign_beam_monitor_output_kernel
+            size_t{ 2 }, // assign_elem_by_elem_output_kernel
         };
 
         for( size_t ii = size_t{ 0 } ; ii < NUM_KERNELS ; ++ii )
@@ -491,14 +557,22 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
-    _status_t ClContext::assign_elem_by_elem_config_arg(
-        _this_t::cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg )
+    _status_t ClContext::assign_elem_by_elem_config_buffer_arg(
+            _this_t::cl_argument_t& SIXTRL_RESTRICT_REF config_buffer_arg )
     {
         using size_t       = _size_t;
         using kernel_id_t  = _kernel_id_t;
 
-        _status_t status = st::ARCH_STATUS_SUCCESS;
+        _status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
         constexpr size_t NUM_KERNELS = size_t{ 2 };
+
+        if( ( !config_buffer_arg.usesCObjectBuffer() ) ||
+            (  config_buffer_arg.ptrCObjectBuffer() == nullptr ) )
+        {
+            return status;
+        }
+
+        status = st::ARCH_STATUS_SUCCESS;
 
         kernel_id_t kernel_ids[ NUM_KERNELS ] =
         {
@@ -516,8 +590,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         size_t const elem_by_elem_arg_idx[ NUM_KERNELS ] =
         {
-            size_t{ 3 }, // assign_be_mon
-            size_t{ 0 }, // clear_be_mon
+            size_t{ 3 }, // track_elem_by_elem_kernel
+            size_t{ 0 }, // assign_elem_by_elem_output_kernel
         };
 
         for( size_t ii = size_t{ 0 } ; ii < NUM_KERNELS ; ++ii )
@@ -537,11 +611,17 @@ namespace SIXTRL_CXX_NAMESPACE
                 continue;
             }
 
-            this->assignKernelArgumentClBuffer(
-                kernel_id, arg_idx, elem_by_elem_config_arg );
+            this->assignKernelArgument( kernel_id, arg_idx, config_buffer_arg );
         }
 
         return status;
+    }
+
+    _status_t ClContext::assign_elem_by_elem_config_index_arg(
+        _size_t const elem_by_elem_config_index )
+    {
+        return this->doAssignElemByElemConfigIndexArg(
+            elem_by_elem_config_index );
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -935,7 +1015,7 @@ namespace SIXTRL_CXX_NAMESPACE
             int64_t const until_turn_arg = static_cast< int64_t >( until_turn );
 
             this->assignKernelArgumentValue(
-                kernel_id, _size_t{ 4 }, until_turn_arg );
+                kernel_id, _size_t{ 5 }, until_turn_arg );
 
             if( !this->debugMode() )
             {
@@ -992,7 +1072,7 @@ namespace SIXTRL_CXX_NAMESPACE
             int64_t const until_turn_arg = static_cast< int64_t >( until_turn );
 
             this->assignKernelArgumentValue(
-                kernel_id, _size_t{ 4 }, until_turn_arg );
+                kernel_id, _size_t{ 5 }, until_turn_arg );
 
             if( !this->debugMode() )
             {
@@ -1187,11 +1267,17 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ASSERT( static_cast< _size_t >( kernel_id ) <
                            this->numAvailableKernels() );
 
+            uint64_t const elem_by_elem_config_index_arg =
+                static_cast< uint64_t >( this->m_elem_by_elem_config_index );
+
+            this->assignKernelArgumentValue(
+                kernel_id, _size_t{ 1 }, elem_by_elem_config_index_arg );
+
             uint64_t const out_buffer_index_offset_arg =
                 static_cast< uint64_t >( out_buffer_index_offset );
 
             this->assignKernelArgumentValue(
-                kernel_id, _size_t{ 2 }, out_buffer_index_offset_arg );
+                kernel_id, _size_t{ 3 }, out_buffer_index_offset_arg );
 
             if( !this->debugMode() )
             {
@@ -1299,6 +1385,131 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
+    bool ClContext::has_assign_addresses_kernel() const SIXTRL_NOEXCEPT
+    {
+        return ( ( this->m_assign_addr_kernel_id !=
+            st::ARCH_ILLEGAL_KERNEL_ID ) &&
+                 ( this->m_assign_addr_kernel_id <
+                   this->numAvailableKernels() ) );
+    }
+
+    _this_t::kernel_id_t
+    ClContext::assign_addresses_kernel_id() const SIXTRL_NOEXCEPT
+    {
+        return this->m_assign_addr_kernel_id;
+    }
+
+    _this_t::status_t ClContext::set_assign_addresses_kernel_id(
+        ClContext::kernel_id_t const kernel_id )
+    {
+        using size_t = _size_t;
+        using kernel_id_t = _kernel_id_t;
+
+        _status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        if( ( this->hasSelectedNode() ) && ( kernel_id >= kernel_id_t{ 0 } ) &&
+            ( static_cast< size_t >( kernel_id ) < this->numAvailableKernels() ) )
+        {
+            _program_id_t const program_id =
+                this->programIdByKernelId( kernel_id );
+
+            if( ( program_id >= _program_id_t{ 0 } ) &&
+                ( static_cast< _size_t >( program_id ) <
+                  this->numAvailablePrograms() ) )
+            {
+                this->m_assign_addr_kernel_id  = kernel_id;
+                this->m_assign_addr_program_id = program_id;
+                status = st::ARCH_STATUS_SUCCESS;
+            }
+        }
+
+        return status;
+    }
+
+    _this_t::status_t ClContext::assign_addresses(
+        _this_t::cl_argument_t& SIXTRL_RESTRICT_REF assign_items_arg,
+        _this_t::cl_argument_t& SIXTRL_RESTRICT_REF dest_buffer_arg,
+        _this_t::size_type const dest_buffer_id,
+        _this_t::cl_argument_t& SIXTRL_RESTRICT_REF src_buffer_arg,
+        _this_t::size_type const src_buffer_id )
+    {
+        using _size_t = _this_t::size_type;
+
+        _this_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        _this_t::kernel_id_t const kernel_id =
+            this->assign_addresses_kernel_id();
+
+        if( ( kernel_id != st::ARCH_ILLEGAL_KERNEL_ID ) &&
+            ( dest_buffer_id != st::ARCH_ILLEGAL_BUFFER_ID ) &&
+            ( src_buffer_id  != st::ARCH_ILLEGAL_BUFFER_ID ) &&
+            ( assign_items_arg.context() == this ) &&
+            ( assign_items_arg.usesCObjectBuffer() ) &&
+            ( assign_items_arg.ptrCObjectBuffer() != nullptr ) &&
+            ( dest_buffer_arg.context() == this ) &&
+            ( dest_buffer_arg.usesCObjectBuffer() ) &&
+            ( dest_buffer_arg.ptrCObjectBuffer() != nullptr ) &&
+            ( src_buffer_arg.context() == this ) &&
+            ( src_buffer_arg.usesCObjectBuffer() ) &&
+            ( src_buffer_arg.ptrCObjectBuffer() != nullptr ) )
+        {
+            _size_t const num_items = ::NS(Buffer_get_num_of_objects)(
+                assign_items_arg.ptrCObjectBuffer() );
+
+            if( num_items == _size_t{ 0 } )
+            {
+                return st::ARCH_STATUS_SUCCESS;
+            }
+
+            _size_t const assign_slot_size = ::NS(Buffer_get_slot_size)(
+                assign_items_arg.ptrCObjectBuffer() );
+
+            _size_t const dest_slot_size = ::NS(Buffer_get_slot_size)(
+                dest_buffer_arg.ptrCObjectBuffer() );
+
+            _size_t const src_slot_size = ::NS(Buffer_get_slot_size)(
+                dest_buffer_arg.ptrCObjectBuffer() );
+
+            if( ( assign_slot_size > _size_t{ 0 } ) &&
+                ( dest_slot_size > _size_t{ 0 } ) &&
+                ( src_slot_size > _size_t{ 0 } ) &&
+                ( this->kernelNumArgs( kernel_id ) >= _size_t{ 8 } ) )
+            {
+                this->assignKernelArgument(
+                    kernel_id, _size_t{ 0 }, assign_items_arg );
+
+                this->assignKernelArgumentValue(
+                    kernel_id, size_t{ 1 }, assign_slot_size );
+
+                this->assignKernelArgument(
+                    kernel_id, size_t{ 2 }, dest_buffer_arg );
+
+                this->assignKernelArgumentValue(
+                    kernel_id, size_t{ 3 }, dest_slot_size );
+
+                this->assignKernelArgumentValue(
+                    kernel_id, size_t{ 4 }, dest_buffer_id );
+
+                this->assignKernelArgument(
+                    kernel_id, size_t{ 5 }, src_buffer_arg );
+
+                this->assignKernelArgumentValue(
+                    kernel_id, size_t{ 6 }, src_slot_size );
+
+                this->assignKernelArgumentValue(
+                    kernel_id, size_t{ 7 }, src_buffer_id );
+
+                if( this->runKernel( kernel_id, num_items ) )
+                {
+                    status = st::ARCH_STATUS_SUCCESS;
+                }
+            }
+        }
+
+        return status;
+    }
+
+    /* --------------------------------------------------------------------- */
+
     _size_t ClContext::selected_particle_set() const SIXTRL_NOEXCEPT
     {
         return this->m_pset_index;
@@ -1341,155 +1552,58 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    bool ClContext::is_beam_beam_tracking_enabled() const SIXTRL_NOEXCEPT
+    /* --------------------------------------------------------------------- */
+
+    bool ClContext::is_beam_beam_tracking_enabled() const
     {
-        return this->m_enable_beam_beam;
+        return (
+            ( ( !this->has_feature_flag( "SIXTRL_TRACK_BEAMBEAM4D" ) ) ||
+              (  this->feature_flag_str( "SIXTRL_TRACK_BEAMBEAM4D" ).compare(
+                  SIXTRL_TRACK_MAP_ENABLED_STR ) == 0 ) ) &&
+            ( ( !this->has_feature_flag( "SIXTRL_TRACK_BEAMBEAM6D" ) ) ||
+              (  this->feature_flag_str( "SIXTRL_TRACK_BEAMBEAM6D" ).compare(
+                  SIXTRL_TRACK_MAP_ENABLED_STR ) == 0 ) ) );
     }
 
     void ClContext::enable_beam_beam_tracking()
     {
-        if( ( !this->is_beam_beam_tracking_enabled() ) &&
-            ( !this->hasSelectedNode() ) )
+        if( !this->hasSelectedNode() )
         {
-            this->clear();
+            this->set_feature_flag(
+                "SIXTRL_TRACK_BEAMBEAM4D", SIXTRL_TRACK_MAP_ENABLED_STR );
+            this->set_feature_flag(
+                "SIXTRL_TRACK_BEAMBEAM6D", SIXTRL_TRACK_MAP_ENABLED_STR );
 
-            this->m_enable_beam_beam = true;
-            this->doInitDefaultPrograms();
-            this->doInitDefaultKernels();
+            this->reinit_default_programs();
+        }
+    }
+
+    void ClContext::skip_beam_beam_tracking()
+    {
+        if( !this->hasSelectedNode() )
+        {
+            this->set_feature_flag(
+                "SIXTRL_TRACK_BEAMBEAM4D", SIXTRL_TRACK_MAP_SKIP_STR );
+
+            this->set_feature_flag(
+                "SIXTRL_TRACK_BEAMBEAM6D", SIXTRL_TRACK_MAP_SKIP_STR );
+
+            this->reinit_default_programs();
         }
     }
 
     void ClContext::disable_beam_beam_tracking()
     {
-        if( (  this->is_beam_beam_tracking_enabled() ) &&
-            ( !this->hasSelectedNode() ) )
+        if( !this->hasSelectedNode() )
         {
-            this->clear();
+            this->set_feature_flag(
+                "SIXTRL_TRACK_BEAMBEAM4D", SIXTRL_TRACK_MAP_DISABLED_STR );
 
-            this->m_enable_beam_beam = false;
-            this->doInitDefaultPrograms();
-            this->doInitDefaultKernels();
+            this->set_feature_flag(
+                "SIXTRL_TRACK_BEAMBEAM6D", SIXTRL_TRACK_MAP_DISABLED_STR );
+
+            this->reinit_default_programs();
         }
-    }
-
-    /* --------------------------------------------------------------------- */
-
-    std::unique_ptr< _this_t::cl_buffer_t >
-    ClContext::create_elem_by_elem_config_arg()
-    {
-        if( ( this->hasSelectedNode() ) &&
-            ( this->openClContext() != nullptr ) &&
-            ( this->openClQueue() != nullptr ) )
-        {
-            _size_t const type_size = sizeof( _this_t::elem_by_elem_config_t );
-
-            return std::unique_ptr< _this_t::cl_buffer_t >(
-                new _this_t::cl_buffer_t( *this->openClContext(),
-                    CL_MEM_READ_WRITE, type_size , nullptr ) );
-        }
-
-        return std::unique_ptr< _this_t::cl_buffer_t >( nullptr );
-    }
-
-    void ClContext::delete_elem_by_elem_config_arg(
-        std::unique_ptr< SIXTRL_CXX_NAMESPACE::ClContext::cl_buffer_t >&& ptr )
-    {
-        std::unique_ptr< SIXTRL_CXX_NAMESPACE::ClContext::cl_buffer_t >
-            _local_ptr = std::move( ptr );
-
-        _local_ptr.reset( nullptr );
-    }
-
-    _this_t::status_t ClContext::init_elem_by_elem_config_arg(
-        _this_t::cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
-        _this_t::elem_by_elem_config_t& SIXTRL_RESTRICT_REF elem_by_elem_config,
-        const ::NS(Buffer) *const SIXTRL_RESTRICT pbuffer,
-        _this_t::size_type const num_psets,
-        _this_t::size_type const* SIXTRL_RESTRICT pset_indices_begin,
-        const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
-        _this_t::size_type const until_turn_elem_by_elem,
-        _this_t::particle_index_t const start_elem_id  )
-    {
-        _this_t::status_t status = ::st::ARCH_STATUS_GENERAL_FAILURE;
-
-        if( ( !this->hasSelectedNode() ) ||
-            (  this->openClQueue() == nullptr ) ||
-            (  this->openClContext() == nullptr ) )
-        {
-            return status;
-        }
-
-        status = ::NS(ElemByElemConfig_init_on_particle_sets)(
-            &elem_by_elem_config, pbuffer, num_psets, pset_indices_begin,
-                beam_elements_buffer, start_elem_id,
-                    until_turn_elem_by_elem );
-
-        if( status == ::NS(ARCH_STATUS_SUCCESS) )
-        {
-            ::NS(ElemByElemConfig_set_output_store_address)(
-                &elem_by_elem_config, uintptr_t{ 0 } );
-
-            _size_t const type_size = sizeof( _this_t::elem_by_elem_config_t );
-
-            cl_int const cl_ret = this->openClQueue()->enqueueWriteBuffer(
-                elem_by_elem_config_arg, CL_TRUE, _size_t{ 0 }, type_size,
-                    &elem_by_elem_config );
-
-            if( cl_ret != CL_SUCCESS )
-            {
-                status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
-            }
-        }
-
-        return status;
-    }
-
-    _this_t::status_t ClContext::collect_elem_by_elem_config_arg(
-        _this_t::cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
-        _this_t::elem_by_elem_config_t& SIXTRL_RESTRICT_REF
-            elem_by_elem_config )
-    {
-        _this_t::status_t status = ::st::ARCH_STATUS_GENERAL_FAILURE;
-
-        if( ( !this->hasSelectedNode() ) ||
-            (  this->openClQueue() == nullptr ) ||
-            (  this->openClContext() == nullptr ) )
-        {
-            return status;
-        }
-
-        _size_t const type_size = sizeof( _this_t::elem_by_elem_config_t );
-        cl_int const cl_ret = this->openClQueue()->enqueueReadBuffer(
-            elem_by_elem_config_arg, CL_TRUE, _size_t{ 0 }, type_size,
-                &elem_by_elem_config );
-
-        if( cl_ret == CL_SUCCESS ) status = st::ARCH_STATUS_SUCCESS;
-
-        return status;
-    }
-
-    _this_t::status_t ClContext::push_elem_by_elem_config_arg(
-        _this_t::cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
-        _this_t::elem_by_elem_config_t const& SIXTRL_RESTRICT_REF
-            elem_by_elem_config )
-    {
-        _this_t::status_t status = ::st::ARCH_STATUS_GENERAL_FAILURE;
-
-        if( ( !this->hasSelectedNode() ) ||
-            (  this->openClQueue() == nullptr ) ||
-            (  this->openClContext() == nullptr ) )
-        {
-            return status;
-        }
-
-        _size_t const type_size = sizeof( _this_t::elem_by_elem_config_t );
-        cl_int const cl_ret = this->openClQueue()->enqueueWriteBuffer(
-            elem_by_elem_config_arg, CL_TRUE, _size_t{ 0 }, type_size,
-                &elem_by_elem_config );
-
-        if( cl_ret == CL_SUCCESS ) status = st::ARCH_STATUS_SUCCESS;
-
-        return status;
     }
 
     /* --------------------------------------------------------------------- */
@@ -1504,6 +1618,68 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return _base_t::doSelectNode( node_index );
+    }
+
+    _status_t ClContext::doInitDefaultFeatureFlags()
+    {
+        _status_t status = _base_t::doInitDefaultFeatureFlags();
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doInitDefaultFeatureFlagsPrivImpl();
+        }
+
+        return status;
+    }
+
+    _status_t ClContext::doInitDefaultFeatureFlagsPrivImpl()
+    {
+        #if defined( SIXTRL_TRACK_BEAMBEAM4D )
+        this->set_feature_flag( "SIXTRL_TRACK_BEAMBEAM4D",
+            SIXTRL_TRACK_BEAMBEAM4D_STR );
+        #endif /* SIXTRL_TRACK_BEAMBEAM4D */
+
+        #if defined( SIXTRL_TRACK_BEAMBEAM6D )
+        this->set_feature_flag( "SIXTRL_TRACK_BEAMBEAM6D",
+            SIXTRL_TRACK_BEAMBEAM6D_STR );
+        #endif /* SIXTRL_TRACK_BEAMBEAM6D */
+
+        #if defined( SIXTRL_TRACK_SC_COASTING )
+        this->set_feature_flag( "SIXTRL_TRACK_SC_COASTING",
+            SIXTRL_TRACK_SC_COASTING_STR );
+        #endif /* SIXTRL_TRACK_SC_COASTING */
+
+        #if defined( SIXTRL_TRACK_SC_BUNCHED )
+        this->set_feature_flag( "SIXTRL_TRACK_SC_BUNCHED",
+            SIXTRL_TRACK_SC_BUNCHED_STR );
+        #endif /* SIXTRL_TRACK_SC_BUNCHED */
+
+        #if defined( SIXTRL_TRACK_TRICUB )
+        this->set_feature_flag( "SIXTRL_TRACK_TRICUB",
+            SIXTRL_TRACK_TRICUB_STR );
+        #endif /* SIXTRL_TRACK_TRICUB */
+
+        #if defined( SIXTRL_APERTURE_CHECK_AT_DRIFT )
+        this->set_feature_flag( "SIXTRL_APERTURE_CHECK_AT_DRIFT",
+            SIXTRL_APERTURE_CHECK_AT_DRIFT_STR );
+        #endif /* defined( SIXTRL_APERTURE_CHECK_AT_DRIFT ) */
+
+        #if defined( SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH )
+        this->set_feature_flag( "SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH",
+            SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH_STR );
+        #endif /* SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH */
+
+        #if defined( SIXTRL_APERTURE_X_LIMIT )
+        this->set_feature_flag( "SIXTRL_APERTURE_X_LIMIT",
+            SIXTRL_APERTURE_X_LIMIT_STR );
+        #endif /* SIXTRL_APERTURE_X_LIMIT */
+
+        #if defined( SIXTRL_APERTURE_Y_LIMIT )
+        this->set_feature_flag( "SIXTRL_APERTURE_Y_LIMIT",
+            SIXTRL_APERTURE_Y_LIMIT_STR );
+        #endif /* SIXTRL_APERTURE_Y_LIMIT */
+
+        return st::ARCH_STATUS_SUCCESS;
     }
 
     bool ClContext::doInitDefaultPrograms()
@@ -1554,10 +1730,10 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             size_t{ 5 }, // track_until
             size_t{ 7 }, // track_line
-            size_t{ 6 }, // track_elem_elem
+            size_t{ 7 }, // track_elem_elem
             size_t{ 5 }, // assign_be_mon
             size_t{ 2 }, // clear_be_mon
-            size_t{ 4 }  // assign_elem_by_elem
+            size_t{ 5 }  // assign_elem_by_elem
         };
 
         for( size_t ii = size_t{ 0 } ; ii < NUM_KERNELS ; ++ii )
@@ -1631,10 +1807,10 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             size_t{ 4 }, // track_until
             size_t{ 6 }, // track_line
-            size_t{ 5 }, // track_elem_elem
+            size_t{ 6 }, // track_elem_elem
             size_t{ 4 }, // assign_be_mon
             size_t{ 1 }, // clear_be_mon
-            size_t{ 3 }  // assign_elem_by_elem
+            size_t{ 4 }  // assign_elem_by_elem
         };
 
         uint64_t const slot_size_arg = static_cast< uint64_t >( slot_size );
@@ -1662,6 +1838,64 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
+    _status_t ClContext::doAssignElemByElemConfigIndexArgPrivImpl(
+        _size_t const elem_by_elem_config_index )
+    {
+        _status_t status = st::ARCH_STATUS_SUCCESS;
+        constexpr size_t NUM_KERNELS = size_t{ 2 };
+
+        kernel_id_t kernel_ids[ NUM_KERNELS ] =
+        {
+            st::ARCH_ILLEGAL_KERNEL_ID, st::ARCH_ILLEGAL_KERNEL_ID
+        };
+
+        kernel_ids[ 0 ] = this->track_elem_by_elem_kernel_id();
+        kernel_ids[ 1 ] = this->assign_elem_by_elem_output_kernel_id();
+
+        size_t const min_num_kernel_args[ NUM_KERNELS ] =
+        {
+            _this_t::MIN_NUM_TRACK_ELEM_ARGS,
+            _this_t::MIN_NUM_ASSIGN_ELEM_ARGS
+        };
+
+        size_t const elem_by_elem_config_index_arg_idx[ NUM_KERNELS ] =
+        {
+            size_t{ 4 }, // track_elem_by_elem_kernel
+            size_t{ 1 }, // assign_elem_by_elem_output_kernel
+        };
+
+        uint64_t const conf_idx_arg =
+            static_cast< uint64_t >( elem_by_elem_config_index );
+
+        for( _size_t ii = _size_t{ 0 } ; ii < NUM_KERNELS ; ++ii )
+        {
+            _kernel_id_t const kernel_id = kernel_ids[ ii ];
+            _size_t const min_num_args = min_num_kernel_args[ ii ];
+
+            if( kernel_id == st::ARCH_ILLEGAL_KERNEL_ID ) continue;
+            if( min_num_args == _size_t{ 0 } ) continue;
+
+            _size_t const num_args = this->kernelNumArgs( kernel_id );
+            _size_t const arg_idx  = elem_by_elem_config_index_arg_idx[ ii ];
+
+            if( ( num_args <= arg_idx ) || ( num_args < min_num_args ) )
+            {
+                status |= st::ARCH_STATUS_GENERAL_FAILURE;
+                continue;
+            }
+
+            this->assignKernelArgumentValue(
+                kernel_id, arg_idx, conf_idx_arg );
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            this->m_elem_by_elem_config_index = elem_by_elem_config_index;
+        }
+
+        return status;
+    }
+
     _status_t ClContext::doAssignSlotSizeArg( _size_t const slot_size )
     {
         _status_t status = _base_t::doAssignSlotSizeArg( slot_size );
@@ -1672,6 +1906,13 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         return status;
+    }
+
+    _status_t ClContext::doAssignElemByElemConfigIndexArg(
+        _size_t const elem_by_elem_config_index )
+    {
+        return this->doAssignElemByElemConfigIndexArgPrivImpl(
+            elem_by_elem_config_index );
     }
 
     bool ClContext::doInitDefaultProgramsPrivImpl()
@@ -1685,6 +1926,7 @@ namespace SIXTRL_CXX_NAMESPACE
         std::string path_to_particles_track_opt_prog      = path_to_kernel_dir;
         std::string path_to_assign_be_mon_out_buffer_prog = path_to_kernel_dir;
         std::string path_to_assign_elem_out_buffer_prog   = path_to_kernel_dir;
+        std::string path_to_assign_addr_prog = path_to_kernel_dir;
 
         if( !this->debugMode() )
         {
@@ -1698,6 +1940,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
             path_to_assign_elem_out_buffer_prog +=
                 "elem_by_elem_assign_out_buffer.cl";
+
+            path_to_assign_addr_prog += "assign_address_item.cl";
         }
         else
         {
@@ -1711,43 +1955,69 @@ namespace SIXTRL_CXX_NAMESPACE
 
             path_to_assign_elem_out_buffer_prog +=
                 "elem_by_elem_assign_out_buffer_debug.cl";
+
+            path_to_assign_addr_prog += "assign_address_item.cl";
         }
 
-        std::string track_compile_options = "-D_GPUCODE=1";
-        track_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
-        track_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
-        track_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__global";
-        track_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global";
+        std::ostringstream compile_options;
 
-        if( !this->is_beam_beam_tracking_enabled() )
+        if( ( this->defaultCompileOptions() != nullptr ) &&
+            ( std::strlen( this->defaultCompileOptions() ) > 0u ) )
         {
-            track_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
+            compile_options << this->defaultCompileOptions() << " ";
         }
 
-        track_compile_options += " -I";
-        track_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
+        compile_options << this->feature_flag_repr( "_GPUCODE" ) << " "
+            << this->feature_flag_repr( "SIXTRL_BUFFER_ARGPTR_DEC" ) << " "
+            << this->feature_flag_repr( "SIXTRL_BUFFER_DATAPTR_DEC" ) << " "
+            << "-I" << NS(PATH_TO_SIXTRL_INCLUDE_DIR);
 
-        std::string track_optimized_compile_options = "-D_GPUCODE=1";
-        track_optimized_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
-        track_optimized_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
-        track_optimized_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__private";
-        track_optimized_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__private";
+        std::string const common_compile_options( compile_options.str() );
 
-        if( !this->is_beam_beam_tracking_enabled() )
+        compile_options.str( "" );
+        std::vector< std::string > const OPTIONAL_FEATURES =
         {
-            track_optimized_compile_options += " -DSIXTRL_DISABLE_BEAM_BEAM=1";
+            "SIXTRL_TRACK_BEAMBEAM4D", "SIXTRL_TRACK_BEAMBEAM6D",
+            "SIXTRL_TRACK_SPACECHARGE", "SIXTRL_TRACK_TRICUB",
+            "SIXTRL_APERTURE_CHECK_AT_DRIFT",
+            "SIXTRL_APERTURE_CHECK_MIN_DRIFT_LENGTH",
+            "SIXTRL_APERTURE_X_LIMIT", "SIXTRL_APERTURE_Y_LIMIT"
+        };
+
+        for( auto const& feature_key : OPTIONAL_FEATURES )
+        {
+            if( this->has_feature_flag( feature_key ) )
+            {
+                compile_options
+                    << this->feature_flag_repr( feature_key ) << " ";
+            }
         }
 
-        track_optimized_compile_options += " -I";
-        track_optimized_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
+        std::string const feature_compile_options( compile_options.str() );
+        compile_options.str( "" );
 
-        std::string assign_out_buffer_compile_options = " -D_GPUCODE=1";
-        assign_out_buffer_compile_options += " -DSIXTRL_BUFFER_ARGPTR_DEC=__private";
-        assign_out_buffer_compile_options += " -DSIXTRL_BUFFER_DATAPTR_DEC=__global";
-        assign_out_buffer_compile_options += " -DSIXTRL_PARTICLE_ARGPTR_DEC=__global";
-        assign_out_buffer_compile_options += " -DSIXTRL_PARTICLE_DATAPTR_DEC=__global";
-        assign_out_buffer_compile_options += " -I";
-        assign_out_buffer_compile_options += NS(PATH_TO_SIXTRL_INCLUDE_DIR);
+        compile_options << common_compile_options << " "
+                        << feature_compile_options << " "
+                        << "-DSIXTRL_PARTICLE_ARGPTR_DEC=__private "
+                        << "-DSIXTRL_PARTICLE_DATAPTR_DEC=__private ";
+
+        std::string const track_optimized_compile_options( compile_options.str() );
+
+        compile_options.str( "" );
+        compile_options << common_compile_options  << " "
+                        << feature_compile_options << " "
+                        << "-DSIXTRL_PARTICLE_ARGPTR_DEC=__global "
+                        << "-DSIXTRL_PARTICLE_DATAPTR_DEC=__global ";
+
+        std::string const track_compile_options( compile_options.str() );
+
+        compile_options.str( "" );
+        compile_options << common_compile_options << " "
+            << "-DSIXTRL_PARTICLE_ARGPTR_DEC=__global "
+            << "-DSIXTRL_PARTICLE_DATAPTR_DEC=__global ";
+
+        std::string const assign_out_buffer_compile_options(
+            compile_options.str() );
 
         program_id_t const track_program_id = this->addProgramFile(
             path_to_particles_track_prog, track_compile_options );
@@ -1763,10 +2033,15 @@ namespace SIXTRL_CXX_NAMESPACE
             this->addProgramFile( path_to_assign_elem_out_buffer_prog,
                                   assign_out_buffer_compile_options );
 
-        if( ( track_program_id            >= program_id_t{ 0 } ) &&
-            ( track_optimized_program_id  >= program_id_t{ 0 } ) &&
-            ( assign_be_mon_out_buffer_program_id >= program_id_t{ 0 } ) &&
-            ( assign_elem_by_elem_out_buffer_program_id >= program_id_t{ 0 } ) )
+        program_id_t const assign_addr_program_id =
+            this->addProgramFile( path_to_assign_addr_prog,
+                                  assign_out_buffer_compile_options );
+
+        if( ( track_program_id != st::ARCH_ILLEGAL_PROGRAM_ID ) &&
+            ( track_optimized_program_id  != st::ARCH_ILLEGAL_PROGRAM_ID ) &&
+            ( assign_be_mon_out_buffer_program_id != st::ARCH_ILLEGAL_PROGRAM_ID ) &&
+            ( assign_elem_by_elem_out_buffer_program_id != st::ARCH_ILLEGAL_PROGRAM_ID ) &&
+            ( assign_addr_program_id != st::ARCH_ILLEGAL_PROGRAM_ID ) )
         {
             if( !this->use_optimized_tracking() )
             {
@@ -1789,6 +2064,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->m_assign_elem_by_elem_out_buffer_program_id =
                 assign_elem_by_elem_out_buffer_program_id;
+
+            this->m_assign_addr_program_id = assign_addr_program_id;
 
             success = true;
         }
@@ -1965,6 +2242,24 @@ namespace SIXTRL_CXX_NAMESPACE
                         kernel_id ) == st::ARCH_STATUS_SUCCESS );
                 }
             }
+
+            if( ( success ) &&
+                ( this->m_assign_addr_program_id != st::ARCH_ILLEGAL_PROGRAM_ID ) &&
+                ( this->m_assign_addr_program_id <  this->numAvailablePrograms() ) )
+            {
+                std::string kernel_name( SIXTRL_C99_NAMESPACE_PREFIX_STR );
+                kernel_name += "AssignAddressItem_process_managed_buffer";
+                kernel_name += "_opencl";
+
+                kernel_id_t const kernel_id = this->enableKernel(
+                    kernel_name.c_str(), this->m_assign_addr_program_id );
+
+                if( kernel_id != st::ARCH_ILLEGAL_KERNEL_ID )
+                {
+                    success = ( this->set_assign_addresses_kernel_id(
+                        kernel_id ) == st::ARCH_STATUS_SUCCESS );
+                }
+            }
         }
 
         return success;
@@ -2035,13 +2330,23 @@ void NS(ClContext_clear)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
         : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
-::NS(ctrl_status_t) NS(ClContext_assign_elem_by_elem_config_arg)(
-    ::NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg  )
+::NS(ctrl_status_t) NS(ClContext_assign_elem_by_elem_config_buffer_arg)(
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT elem_by_elem_config_buffer_arg )
 {
-    cl::Buffer temp_buffer( elem_by_elem_config_arg );
+    return ( ( ctx != nullptr ) &&
+             ( elem_by_elem_config_buffer_arg != nullptr ) )
+        ? ctx->assign_elem_by_elem_config_buffer_arg(
+            *elem_by_elem_config_buffer_arg )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
+}
 
+::NS(ctrl_status_t) NS(ClContext_assign_elem_by_elem_config_index_arg)(
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(buffer_size_t) const elem_by_elem_config_index )
+{
     return ( ctx != nullptr )
-        ? ctx->assign_elem_by_elem_config_arg( temp_buffer )
+        ? ctx->assign_elem_by_elem_config_index_arg( elem_by_elem_config_index )
         : st::ARCH_STATUS_GENERAL_FAILURE;
 }
 
@@ -2306,6 +2611,45 @@ bool NS(ClContext_has_clear_beam_monitor_output_kernel)(
 
 /* ========================================================================= */
 
+bool NS(ClContext_has_assign_addresses_kernel)(
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
+{
+    return ( ( ctx != nullptr ) && ( ctx->has_assign_addresses_kernel() ) );
+}
+
+::NS(ctrl_kernel_id_t) NS(ClContext_assign_addresses_kernel_id)(
+    const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
+{
+    return ( ctx != nullptr ) ? ctx->assign_addresses_kernel_id()
+        : st::ARCH_ILLEGAL_KERNEL_ID;
+}
+
+::NS(arch_status_t) NS(ClContext_set_assign_addresses_kernel_id)(
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(ctrl_kernel_id_t) const kernel_id )
+{
+    return ( ctx != nullptr )
+        ? ctx->set_assign_addresses_kernel_id( kernel_id )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+NS(arch_status_t) NS(ClContext_assign_addresses)(
+    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
+    ::NS(ClArgument)* SIXTRL_RESTRICT assign_items_arg,
+    ::NS(ClArgument)* SIXTRL_RESTRICT dest_buffer_arg,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(ClArgument)* SIXTRL_RESTRICT src_buffer_arg,
+    ::NS(buffer_size_t) const src_buffer_id )
+{
+    return ( ( ctx != nullptr ) && ( assign_items_arg != nullptr ) &&
+             ( dest_buffer_arg != nullptr ) && ( src_buffer_arg != nullptr ) )
+        ? ctx->assign_addresses( *assign_items_arg,
+            *dest_buffer_arg, dest_buffer_id, *src_buffer_arg, src_buffer_id )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+/* ========================================================================= */
+
 ::NS(buffer_size_t) NS(ClContext_selected_particle_set)(
     const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
@@ -2360,171 +2704,10 @@ void NS(ClContext_disable_beam_beam_tracking)(
     if( ctx != nullptr ) ctx->disable_beam_beam_tracking();
 }
 
-/* ------------------------------------------------------------------------- */
-
-cl_mem NS(ClContext_create_elem_by_elem_config_arg)(
+void NS(ClContext_skip_beam_beam_tracking)(
     ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
-    if( ( ctx != nullptr ) && ( ctx->hasSelectedNode() ) &&
-        ( ctx->openClQueue()   != nullptr ) &&
-        ( ctx->openClContext() != nullptr ) )
-    {
-        cl_context& ocl_ctx = ( *ctx->openClContext() )();
-        cl_int cl_ret = CL_SUCCESS;
-
-        cl_mem arg_buffer = ::clCreateBuffer( ocl_ctx, CL_MEM_READ_WRITE,
-            sizeof( ::NS(ElemByElemConfig) ), nullptr, &cl_ret );
-
-        if( cl_ret == CL_SUCCESS )
-        {
-            cl_uint ref_cnt = cl_uint{ 10000 };
-            cl_ret = ::clGetMemObjectInfo( arg_buffer, CL_MEM_REFERENCE_COUNT,
-                sizeof( cl_uint ), &ref_cnt, nullptr );
-
-            if( cl_ret == CL_SUCCESS )
-            {
-                ::clRetainMemObject( arg_buffer );
-                return arg_buffer;
-            }
-        }
-    }
-
-    return cl_mem{};
-}
-
-void NS(ClContext_delete_elem_by_elem_config_arg)(
-    ::NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg )
-{
-    cl_uint ref_cnt = cl_uint{ 10000 };
-    cl_int cl_ret = ::clGetMemObjectInfo( elem_by_elem_config_arg,
-        CL_MEM_REFERENCE_COUNT, sizeof( cl_uint ), &ref_cnt, nullptr );
-
-    if( ( cl_ret == CL_SUCCESS ) && ( ref_cnt > cl_uint{ 0 } ) )
-    {
-        ::clReleaseMemObject( elem_by_elem_config_arg );
-    }
-
-    ( void )ctx;
-}
-
-::NS(arch_status_t) NS(ClContext_init_elem_by_elem_config_arg)(
-    ::NS(ClContext)* SIXTRL_RESTRICT ctx,
-    cl_mem elem_by_elem_config_arg,
-    ::NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
-    const ::NS(Buffer) *const SIXTRL_RESTRICT pbuffer,
-    ::NS(buffer_size_t) const num_psets,
-    ::NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
-    const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
-    ::NS(buffer_size_t) const until_turn_elem_by_elem,
-    ::NS(particle_index_t) const start_elem_id )
-{
-    ::NS(arch_status_t) status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
-
-    if( ( elem_by_elem_config == nullptr ) || ( ctx == nullptr ) ||
-        ( !ctx->hasSelectedNode() ) ||
-        ( ctx->openClQueue() == nullptr ) ||
-        ( ctx->openClContext() == nullptr ) )
-    {
-        return status;
-    }
-
-    cl_int cl_ret = ::clRetainMemObject( elem_by_elem_config_arg );
-
-    if( cl_ret == CL_SUCCESS )
-    {
-        ::cl_command_queue& ocl_queue = ( *ctx->openClQueue() )();
-
-        status = ::NS(ElemByElemConfig_init_on_particle_sets)(
-            elem_by_elem_config, pbuffer, num_psets, pset_indices_begin,
-                beam_elements_buffer, start_elem_id,
-                    until_turn_elem_by_elem );
-
-        if( status == ::NS(ARCH_STATUS_SUCCESS) )
-        {
-            ::NS(ElemByElemConfig_set_output_store_address)(
-                elem_by_elem_config, uintptr_t{ 0 } );
-
-            size_t const type_size = sizeof( ::NS(ElemByElemConfig) );
-
-            cl_ret = ::clEnqueueWriteBuffer( ocl_queue, elem_by_elem_config_arg,
-                CL_TRUE, size_t { 0 }, type_size, elem_by_elem_config,
-                    cl_uint{ 0 }, nullptr, nullptr );
-
-            if( cl_ret != CL_SUCCESS )
-            {
-                status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
-            }
-        }
-
-        ::clReleaseMemObject( elem_by_elem_config_arg );
-    }
-
-    return status;
-}
-
-::NS(arch_status_t) NS(ClContext_collect_elem_by_elem_config_arg)(
-    ::NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg,
-    ::NS(ElemByElemConfig)* SIXTRL_RESTRICT config )
-{
-    ::NS(arch_status_t) status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
-
-    if( ( config == nullptr ) || ( ctx == nullptr ) ||
-        ( !ctx->hasSelectedNode() ) ||
-        ( ctx->openClQueue() == nullptr ) ||
-        ( ctx->openClContext() == nullptr ) )
-    {
-        return status;
-    }
-
-    cl_int cl_ret = ::clRetainMemObject( elem_by_elem_config_arg );
-
-    if( cl_ret == CL_SUCCESS )
-    {
-        ::cl_command_queue& ocl_queue = ( *ctx->openClQueue() )();
-        size_t const type_size = sizeof( ::NS(ElemByElemConfig) );
-
-        cl_ret = ::clEnqueueReadBuffer( ocl_queue,
-            elem_by_elem_config_arg, CL_TRUE, size_t{ 0 }, type_size,
-                config, cl_uint{ 0 }, nullptr, nullptr );
-
-
-        if( cl_ret != CL_SUCCESS ) status = ::NS(ARCH_STATUS_SUCCESS);
-        ::clReleaseMemObject( elem_by_elem_config_arg );
-    }
-
-    return status;
-}
-
-::NS(arch_status_t) NS(ClContext_push_elem_by_elem_config_arg)(
-    ::NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg,
-    const ::NS(ElemByElemConfig) *const SIXTRL_RESTRICT config )
-{
-    ::NS(arch_status_t) status = ::NS(ARCH_STATUS_GENERAL_FAILURE);
-
-    if( ( config == nullptr ) || ( ctx == nullptr ) ||
-        ( !ctx->hasSelectedNode() ) ||
-        ( ctx->openClQueue() == nullptr ) ||
-        ( ctx->openClContext() == nullptr ) )
-    {
-        return status;
-    }
-
-    cl_int cl_ret = ::clRetainMemObject( elem_by_elem_config_arg );
-
-    if( cl_ret == CL_SUCCESS )
-    {
-        ::cl_command_queue& ocl_queue = ( *ctx->openClQueue() )();
-        size_t const type_size = sizeof( ::NS(ElemByElemConfig) );
-
-        cl_ret = ::clEnqueueWriteBuffer( ocl_queue,
-            elem_by_elem_config_arg, CL_TRUE, size_t { 0 }, type_size,
-                config, cl_uint{ 0 }, nullptr, nullptr );
-
-        if( cl_ret != CL_SUCCESS ) status = ::NS(ARCH_STATUS_SUCCESS);
-        ::clReleaseMemObject( elem_by_elem_config_arg );
-    }
-
-    return status;
+    if( ctx != nullptr ) ctx->skip_beam_beam_tracking();
 }
 
 #endif /* !defined( __CUDACC__ ) */

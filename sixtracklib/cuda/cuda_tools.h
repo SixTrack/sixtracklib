@@ -219,7 +219,8 @@ SIXTRL_INLINE SIXTRL_DEVICE_FN void NS(Cuda_collect_status_flag_value)(
         #if ( defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 350 ) )
             /* sm_35 or larger defines atomicOr also for
              * 64Bit variables -> this is the only clean solution */
-            ::atomicOr( ptr_status_flags, status_flags );
+            ::atomicOr( ( unsigned long long* )ptr_status_flags, 
+			( unsigned long long )status_flags );
 
 //         #elif defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 120 )
             /* NOTE: 64 bit atomic support is available but not atomicOr ->

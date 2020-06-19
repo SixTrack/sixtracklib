@@ -1,5 +1,6 @@
 # sixtracklib/tests/sixtracklib/common/CMakeLists.txt
 
+add_subdirectory( buffer )
 add_subdirectory( control )
 add_subdirectory( math )
 add_subdirectory( beam_elements )
@@ -22,51 +23,6 @@ if( GTEST_FOUND )
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_tools_common_c99 )
     add_test( C99_CommonToolTests test_tools_common_c99 )
 
-    # --------------------------------------------------------------------------
-    # test_managed_buffer_common_c99:
-
-    add_executable( test_managed_buffer_common_c99 test_managed_buffer_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_managed_buffer_common_c99 )
-    add_test( C99_CommonManagedBufferTest test_managed_buffer_common_c99 )
-
-    # --------------------------------------------------------------------------
-    # test_buffer_common_c99:
-
-    add_executable( test_buffer_common_c99 test_buffer_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_buffer_common_c99 )
-    add_test( C99_CommonBufferTest test_buffer_common_c99 )
-
-    # --------------------------------------------------------------------------
-    # test_buffer_common_cxx:
-
-    add_executable( test_buffer_common_cxx test_buffer_cxx.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_buffer_common_cxx )
-    add_test( CXX_CommonBufferTest test_buffer_common_cxx )
-
-    # ==========================================================================
-    # test_buffer_string_object_common_c99:
-
-    add_executable( test_buffer_string_object_common_c99
-                    test_buffer_string_object_c99.cpp )
-
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
-         test_buffer_string_object_common_c99 )
-
-    add_test( C99_CommonBufferStringObjectTests
-              test_buffer_string_object_common_c99 )
-
-    # -------------------------------------------------------------------------
-    # test_buffer_string_object_common_cxx:
-
-    add_executable( test_buffer_string_object_common_cxx
-                    test_buffer_string_object_cxx.cpp )
-
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
-         test_buffer_string_object_common_cxx )
-
-    add_test( CXX_CommonBufferStringObjectTests
-              test_buffer_string_object_common_cxx )
-
     # ==========================================================================
     # test_gpu_kernel_tools_common_c99:
 
@@ -78,13 +34,6 @@ if( GTEST_FOUND )
 
     add_test( C99_CommonGpuKernelTools
               test_gpu_kernel_tools_common_c99 )
-
-    # --------------------------------------------------------------------------
-    # test_mem_pool_common_c99:
-
-    add_executable( test_mem_pool_common_c99      test_mem_pool_c99.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_mem_pool_common_c99 )
-    add_test( C99_CommonMemPoolTests              test_mem_pool_common_c99 )
 
     # ==========================================================================
     # test_particles_common_c99:
@@ -107,7 +56,7 @@ if( GTEST_FOUND )
                     test_particles_aperture_c99.cpp )
 
     target_compile_options( test_particles_aperture_check_enabled_common_c99
-        BEFORE PRIVATE -DSIXTRL_ENABLE_APERTURE_CHECK=1
+        BEFORE PRIVATE -DSIXTRL_APERTURE_CHECK_AT_DRIFT=2
                        -DSIXTRL_APERTURE_X_LIMIT=1.0
                        -DSIXTRL_APERTURE_Y_LIMIT=1.0 )
 
@@ -124,7 +73,7 @@ if( GTEST_FOUND )
                     test_particles_aperture_c99.cpp )
 
     target_compile_options( test_particles_aperture_check_disabled_common_c99
-        BEFORE PRIVATE -DSIXTRL_ENABLE_APERTURE_CHECK=0 )
+        BEFORE PRIVATE -DSIXTRL_APERTURE_CHECK_AT_DRIFT=0 )
 
     set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
          test_particles_aperture_check_disabled_common_c99 )
@@ -217,7 +166,8 @@ if( GTEST_FOUND )
 
     if( SIXTRACKL_ENABLE_AUTOVECTORIZATION )
         add_executable( test_track_common_autovec_c99 test_track_c99.cpp )
-        set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_track_common_autovec_c99 )
+        set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
+             test_track_common_autovec_c99 )
 
         target_compile_options( test_track_common_autovec_c99 BEFORE PRIVATE
             -ftree-vectorize -ftree-vectorizer-verbose=6 -fopt-info-loop
@@ -248,10 +198,4 @@ if( GTEST_FOUND )
 
 endif()
 
-# ------------------------------------------------------------------------------
-# --- benchmark drifts:
-
-if( SIXTRACKL_ENABLE_BENCHMARKS )
-
-
-endif()
+# end: tests/sixtracklib/common/CMakeLists.txt

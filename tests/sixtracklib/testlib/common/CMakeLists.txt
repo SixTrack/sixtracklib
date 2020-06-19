@@ -12,6 +12,7 @@ set( SIXTRL_TESTLIB_COMMON_INSTALL_CXX_PATH
 # ------------------------------------------------------------------------------
 
 add_subdirectory( beam_elements )
+add_subdirectory( buffer )
 add_subdirectory( particles )
 add_subdirectory( track )
 add_subdirectory( output )
@@ -19,16 +20,12 @@ add_subdirectory( output )
 # ------------------------------------------------------------------------------
 
 set( TESTLIB_COMMON_C99_HEADERS
-     buffer.h
-     generic_buffer_obj.h
      gpu_kernel.h
      random.h
      time.h
 )
 
 set( TESTLIB_COMMON_C99_SOURCES
-     buffer.c
-     generic_buffer_obj.c
      gpu_kernel.c
      random.c
      time.c
@@ -48,7 +45,7 @@ set_target_properties( sixtrack_test_common_c99 PROPERTIES
     C_STANDARD 99 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_test_common_c99 PRIVATE
-        -Wall -Werror -pedantic -ansi ${SIXTRACKLIB_CPU_FLAGS} )
+        ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_test_common as a module for sixtrack_test:

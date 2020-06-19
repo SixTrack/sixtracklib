@@ -25,8 +25,9 @@ NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
     NS(buffer_size_t) const num_particle_sets,
     NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
-    NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_arg,
-    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
+    NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_buffer_arg,
+    NS(Buffer)* SIXTRL_RESTRICT elem_by_elem_config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t)* SIXTRL_RESTRICT ptr_output_buffer_index_offset,
@@ -35,8 +36,9 @@ NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TestElemByElemConfigCtrlArg_evaluate_assign_output_buffer)(
-    NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_arg,
-    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
+    NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_buffer_arg,
+    NS(Buffer)* SIXTRL_RESTRICT elem_by_elem_config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const output_buffer_index_offset,

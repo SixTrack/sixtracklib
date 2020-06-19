@@ -19,7 +19,7 @@ from sixtracklib.stcommon import \
     st_Particles_buffer_get_particles, \
     st_BeamMonitor_assign_output_buffer, st_Buffer_new_mapped_on_cbuffer, \
     st_Particles_cbuffer_get_particles, st_NullBuffer, \
-    st_ARCH_STATUS_SUCCESS, st_particle_index_t
+    st_ARCH_STATUS_SUCCESS, st_TRACK_SUCCESS, st_particle_index_t
 
 from sixtracklib_test.stcommon import st_Particles_print_out, \
     st_Particles_compare_values_with_treshold,\
@@ -135,11 +135,11 @@ if __name__ == '__main__':
     assert job.has_elem_by_elem_output
     assert job.has_beam_monitor_output
 
-    status = job.track_elem_by_elem(until_turn_elem_by_elem)
-    assert status == 0
+    job.track_elem_by_elem(until_turn_elem_by_elem)
+    assert job.last_track_status == st_TRACK_SUCCESS.value
 
-    status = job.track_until(until_turn)
-    assert status == 0
+    job.track_until(until_turn)
+    assert job.last_track_status == st_TRACK_SUCCESS.value
 
     job.collect()
 
@@ -204,7 +204,8 @@ if __name__ == '__main__':
                 and begin_idx + num_elem_per_part \
                 or num_beam_elements
 
-            status = job.track_line(begin_idx, end_idx, is_last_in_turn)
+            job.track_line(begin_idx, end_idx, is_last_in_turn)
+            assert job.last_track_status == st_TRACK_SUCCESS.value
 
     job.collect()
 

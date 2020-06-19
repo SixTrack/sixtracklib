@@ -84,6 +84,12 @@ namespace SIXTRL_CXX_NAMESPACE
         Key const& SIXTRL_RESTRICT_REF key );
 
     template< typename Key, typename T, class Cmp, class Alloc, class VecAlloc>
+    SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_CXX_NAMESPACE::arch_size_t
+    Map_ordered_vec_size( std::map< Key, std::vector< T, VecAlloc >,
+            Cmp, Alloc > const& SIXTRL_RESTRICT_REF map,
+        Key const& SIXTRL_RESTRICT_REF key );
+
+    template< typename Key, typename T, class Cmp, class Alloc, class VecAlloc>
     SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_CXX_NAMESPACE::arch_status_t
     Map_remove_if_ordered_vec_empty( std::map< Key, std::vector< T, VecAlloc >,
             Cmp, Alloc >& SIXTRL_RESTRICT_REF map,
@@ -364,7 +370,6 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* --------------------------------------------------------------------- */
-
 
     template< typename Key, typename Value, class Cmp, class Allocator >
     SIXTRL_INLINE bool Map_has_key(

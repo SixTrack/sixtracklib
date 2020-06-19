@@ -46,6 +46,7 @@ TEST( C99_Cpu_CpuTrackJobTrackElemByElemTests,
 
     buffer_t* cmp_track_pb = ::NS(Buffer_new)( buf_size_t{ 0 } );
     buffer_t* cmp_output_buffer = ::NS(Buffer_new)( buf_size_t{ 0 } );
+    buffer_t* elem_by_elem_config_buffer = ::NS(Buffer_new)( buf_size_t{ 0 } );
 
     SIXTRL_ASSERT( ::NS(Particles_buffer_get_const_particles)(
         in_particles, buf_size_t{ 0 } ) != nullptr );
@@ -53,6 +54,10 @@ TEST( C99_Cpu_CpuTrackJobTrackElemByElemTests,
     particles_t* cmp_particles = ::NS(Particles_add_copy)( cmp_track_pb,
         ::NS(Particles_buffer_get_const_particles)(
             in_particles, buf_size_t{ 0 } ) );
+
+    elem_by_elem_config_t* elem_by_elem_config =
+        ::NS(ElemByElemConfig_new)( elem_by_elem_config_buffer );
+    SIXTRL_ASSERT( elem_by_elem_config != nullptr );
 
     SIXTRL_ASSERT( cmp_particles != nullptr );
 
@@ -92,10 +97,9 @@ TEST( C99_Cpu_CpuTrackJobTrackElemByElemTests,
     SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
     SIXTRL_ASSERT( max_elem_by_elem_turn_id >= pindex_t{ 0 } );
 
-    elem_by_elem_config_t elem_by_elem_config;
-    ::NS(ElemByElemConfig_preset)( &elem_by_elem_config );
+    ::NS(ElemByElemConfig_preset)( elem_by_elem_config );
 
-    status = ::NS(ElemByElemConfig_init_detailed)( &elem_by_elem_config,
+    status = ::NS(ElemByElemConfig_init_detailed)( elem_by_elem_config,
         ::NS(ELEM_BY_ELEM_ORDER_DEFAULT), min_particle_id, max_particle_id,
         min_at_element_id, max_at_element_id, min_at_turn,
         max_elem_by_elem_turn_id, true );
@@ -103,15 +107,14 @@ TEST( C99_Cpu_CpuTrackJobTrackElemByElemTests,
     SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
 
     status = ::NS(ElemByElemConfig_assign_output_buffer)(
-        &elem_by_elem_config, cmp_output_buffer,
-            elem_by_elem_out_offset_index );
+        elem_by_elem_config, cmp_output_buffer, elem_by_elem_out_offset_index );
 
     SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
 
     track_status_t track_status =
     ::NS(TestTrackCpu_track_particles_elem_by_elem_until_turn_cpu)(
         cmp_track_pb, NUM_PSETS, &track_pset_index,
-            beam_elem_buffer, &elem_by_elem_config, UNTIL_TURN_ELEM_BY_ELEM );
+            beam_elem_buffer, elem_by_elem_config, UNTIL_TURN_ELEM_BY_ELEM );
 
     SIXTRL_ASSERT( track_status == st::TRACK_SUCCESS );
 
@@ -278,6 +281,7 @@ TEST( C99_Cpu_CpuTrackJobTrackElemByElemTests,
     ::NS(Buffer_delete)( cmp_output_buffer );
     ::NS(Buffer_delete)( beam_elem_buffer );
     ::NS(Buffer_delete)( in_particles );
+    ::NS(Buffer_delete)( elem_by_elem_config_buffer );
 }
 
 /* end: tests/sixtracklib/common/track/test_track_job_track_elem_by_elem_c99.cpp */

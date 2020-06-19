@@ -90,14 +90,6 @@ namespace SIXTRL_CXX_NAMESPACE
             NS(OBJECT_TYPE_SROTATION) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_BEAM_BEAM_4D = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_BEAM_BEAM_4D) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_BEAM_BEAM_6D = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_BEAM_BEAM_6D) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_BEAM_MONITOR = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_BEAM_MONITOR) );
 
@@ -130,6 +122,18 @@ namespace SIXTRL_CXX_NAMESPACE
             NS(OBJECT_TYPE_DIPEDGE) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_PARTICLES_ADDR = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_PARTICLES_ADDR) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_ASSIGN_ADDRESS_ITEM = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_ASSIGN_ADDRESS_ITEM) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_BINARY_PATCH_ITEM = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_BINARY_PATCH_ITEM) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_LINE         = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_LINE) );
 
@@ -142,8 +146,24 @@ namespace SIXTRL_CXX_NAMESPACE
             NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_PARTICLES_ADDR = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_PARTICLES_ADDR) );
+        OBJECT_TYPE_MIN_USERDEFINED = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_MIN_USERDEFINED) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_TRICUB = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_TRICUB) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_TRICUB_DATA = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_TRICUB_DATA) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_MAX_USERDEFINED = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_MAX_USERDEFINED) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_LAST_AVAILABLE = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_LAST_AVAILABLE) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_INVALID = static_cast< object_type_id_t >(

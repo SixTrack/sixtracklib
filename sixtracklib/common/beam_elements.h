@@ -21,6 +21,7 @@
     #include "sixtracklib/common/be_limit/be_limit_ellipse.h"
     #include "sixtracklib/common/be_limit/be_limit_rect_ellipse.h"
     #include "sixtracklib/common/be_dipedge/be_dipedge.h"
+    #include "sixtracklib/common/be_tricub/be_tricub.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -172,6 +173,12 @@ SIXTRL_INLINE bool NS(BeamElements_is_beam_element_obj)(
             }
 
             #endif /* !defined( SIXTRL_DISABLE_BEAM_BEAM ) */
+
+            case NS(OBJECT_TYPE_TRICUB):
+            {
+                is_beam_element = true;
+                break;
+            }
 
             default:
             {
@@ -537,6 +544,30 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
                 break;
             }
 
+            case NS(OBJECT_TYPE_TRICUB):
+            {
+                ++requ_num_objects;
+                requ_num_slots = NS(TriCub_num_slots)(
+                    SIXTRL_NULLPTR, slot_size );
+
+                requ_num_dataptrs = NS(TriCub_num_dataptrs)( SIXTRL_NULLPTR );
+
+                break;
+            }
+
+            case NS(OBJECT_TYPE_TRICUB_DATA):
+            {
+                ++requ_num_objects;
+
+                requ_num_slots = NS(TriCubData_num_slots)(
+                    SIXTRL_NULLPTR, slot_size );
+
+                requ_num_dataptrs =
+                    NS(TriCubData_num_dataptrs)( SIXTRL_NULLPTR );
+
+                break;
+            }
+
             default:
             {
                 success = -1;
@@ -802,6 +833,32 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
                     break;
                 }
 
+                case NS(OBJECT_TYPE_TRICUB):
+                {
+                    typedef NS(TriCub) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_dest_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_src_t;
+
+                    success = NS(TriCub_copy)(
+                        ( ptr_dest_t )( uintptr_t )dest_addr,
+                        ( ptr_src_t  )( uintptr_t )src_addr );
+
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_TRICUB_DATA):
+                {
+                    typedef NS(TriCubData) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_dest_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_src_t;
+
+                    success = NS(TriCubData_copy)(
+                        ( ptr_dest_t )( uintptr_t )dest_addr,
+                        ( ptr_src_t  )( uintptr_t )src_addr );
+
+                    break;
+                }
+
                 default:
                 {
                     success = -1;
@@ -969,6 +1026,22 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_object)(
                     typedef NS(DipoleEdge) belem_t;
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
                     NS(DipoleEdge_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_TRICUB):
+                {
+                    typedef NS(TriCub) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(TriCub_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    break;
+                }
+
+                case NS(OBJECT_TYPE_TRICUB_DATA):
+                {
+                    typedef NS(TriCubData) belem_t;
+                    typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
+                    NS(TriCubData_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
                     break;
                 }
 
@@ -1239,6 +1312,32 @@ SIXTRL_INLINE int NS(BeamElements_add_single_new_to_buffer)(
                 break;
             }
 
+            case NS(OBJECT_TYPE_TRICUB):
+            {
+                success = ( SIXTRL_NULLPTR != NS(TriCub_new)( buffer ) )
+                    ? 0 : -1;
+                break;
+            }
+
+            case NS(OBJECT_TYPE_TRICUB_DATA):
+            {
+                typedef NS(TriCubData) tricub_data_t;
+                typedef SIXTRL_BUFFER_DATAPTR_DEC
+                    tricub_data_t const* ptr_tricub_data_t;
+
+                ptr_tricub_data_t ptr_tricub = ( ptr_tricub_data_t )(
+                    uintptr_t )begin_addr;
+
+                NS(be_tricub_int_t) const nx = NS(TriCubData_nx)( ptr_tricub );
+                NS(be_tricub_int_t) const ny = NS(TriCubData_ny)( ptr_tricub );
+                NS(be_tricub_int_t) const nz = NS(TriCubData_nz)( ptr_tricub );
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(TriCubData_new)( buffer, nx, ny, nz ) ) ? 0 : -1;
+
+                break;
+            }
+
             default:
             {
                 success = -1;
@@ -1474,6 +1573,32 @@ SIXTRL_INLINE int NS(BeamElements_copy_single_to_buffer)(
 
                 success = ( SIXTRL_NULLPTR !=
                     NS(DipoleEdge_add_copy)( buffer, orig ) ) ? 0 : -1;
+
+                break;
+            }
+
+            case NS(OBJECT_TYPE_TRICUB):
+            {
+                typedef  NS(TriCub) beam_element_t;
+                typedef  SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t orig = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(TriCub_add_copy)( buffer, orig ) ) ? 0 : -1;
+
+                break;
+            }
+
+            case NS(OBJECT_TYPE_TRICUB_DATA):
+            {
+                typedef  NS(TriCubData) beam_element_t;
+                typedef  SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+
+                ptr_belem_t orig = ( ptr_belem_t )( uintptr_t )begin_addr;
+
+                success = ( SIXTRL_NULLPTR !=
+                    NS(TriCubData_add_copy)( buffer, orig ) ) ? 0 : -1;
 
                 break;
             }

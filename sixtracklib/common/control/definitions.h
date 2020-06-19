@@ -24,6 +24,7 @@ typedef NS(arch_program_id_t) NS(ctrl_program_id_t);
 typedef SIXTRL_INT64_T        NS(node_platform_id_t);
 typedef SIXTRL_INT64_T        NS(node_device_id_t);
 typedef SIXTRL_UINT32_T       NS(node_index_t);
+typedef SIXTRL_UINT16_T       NS(node_id_str_fmt_t);
 
 typedef enum NS(ctrl_perform_remap_flag_e)
 {
@@ -128,6 +129,66 @@ NS(ctrl_perform_remap_flag_t);
     #define SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE 0xFFFFFFFF00000000
 #endif /* !defined( SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE ) */
 
+/* ------------------------------------------------------------------------- */
+
+#if !defined( SIXTRL_ARCH_ILLEGAL_BUFFER_ID)
+    #define SIXTRL_ARCH_ILLEGAL_BUFFER_ID 0
+#endif /* !defined( SIXTRL_ARCH_ILLEGAL_BUFFER_ID) */
+
+#if !defined( SIXTRL_ARCH_PARTICLES_BUFFER_ID )
+    #define SIXTRL_ARCH_PARTICLES_BUFFER_ID 1
+#endif /* !defined( SIXTRL_ARCH_PARTICLES_BUFFER_ID ) */
+
+#if !defined( SIXTRL_ARCH_BEAM_ELEMENTS_BUFFER_ID )
+    #define SIXTRL_ARCH_BEAM_ELEMENTS_BUFFER_ID 2
+#endif /* !defined( SIXTRL_ARCH_BEAM_ELEMENTS_BUFFER_ID ) */
+
+#if !defined( SIXTRL_ARCH_OUTPUT_BUFFER_ID )
+    #define SIXTRL_ARCH_OUTPUT_BUFFER_ID 3
+#endif /* !defined( SIXTRL_ARCH_OUTPUT_BUFFER_ID ) */
+
+#if !defined( SIXTRL_ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID )
+    #define SIXTRL_ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID 4
+#endif /* !defined( SIXTRL_ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID ) */
+
+#if !defined( SIXTRL_ARCH_PARTICLE_ADDR_BUFFER_ID )
+    #define SIXTRL_ARCH_PARTICLE_ADDR_BUFFER_ID 5
+#endif /* !defined( SIXTRL_ARCH_PARTICLE_ADDR_BUFFER_ID ) */
+
+#if !defined( SIXTRL_ARCH_MIN_USER_DEFINED_BUFFER_ID )
+    #define SIXTRL_ARCH_MIN_USER_DEFINED_BUFFER_ID 1024
+#endif /* !defined( SIXTRL_ARCH_MIN_USER_DEFINED_BUFFER_ID ) */
+
+#if !defined( SIXTRL_ARCH_EXTERNAL_BUFFER_ID )
+    #define SIXTRL_ARCH_EXTERNAL_BUFFER_ID 1024
+#endif /* !defined( SIXTRL_ARCH_EXTERNAL_BUFFER_ID ) */
+
+#if !defined( SIXTRL_ARCH_MAX_USER_DEFINED_BUFFER_ID )
+    #define SIXTRL_ARCH_MAX_USER_DEFINED_BUFFER_ID 0xFFFFFFFFFFFFFFFE
+#endif /* !defined( SIXTRL_ARCH_MAX_USER_DEFINED_BUFFER_ID ) */
+
+/* ------------------------------------------------------------------------- */
+
+#if !defined( SIXTRL_NODE_ID_STR_FORMAT_NOARCH)
+    #define SIXTRL_NODE_ID_STR_FORMAT_NOARCH 0
+#endif /* !defined( SIXTRL_NODE_ID_STR_FORMAT_NOARCH) */
+
+#if !defined( SIXTRL_NODE_ID_STR_FORMAT_ARCHID)
+    #define SIXTRL_NODE_ID_STR_FORMAT_ARCHID 1
+#endif /* !defined( SIXTRL_NODE_ID_STR_FORMAT_ARCHID) */
+
+#if !defined( SIXTRL_NODE_ID_STR_FORMAT_ARCHSTR)
+    #define SIXTRL_NODE_ID_STR_FORMAT_ARCHSTR 2
+#endif /* !defined( SIXTRL_NODE_ID_STR_FORMAT_ARCHSTR) */
+
+#if !defined( SIXTRL_NODE_ID_STR_FORMAT_DEFAULT)
+    #define SIXTRL_NODE_ID_STR_FORMAT_DEFAULT 0
+#endif /* !defined( SIXTRL_NODE_ID_STR_FORMAT_DEFAULT) */
+
+#if !defined( SIXTRL_NODE_ID_STR_FORMAT_ILLEGAL)
+    #define SIXTRL_NODE_ID_STR_FORMAT_ILLEGAL 0xffff
+#endif /* !defined( SIXTRL_NODE_ID_STR_FORMAT_ILLEGAL) */
+
 #if !defined( _GPUCODE )
 
 SIXTRL_STATIC_VAR NS(arch_id_t) const NS(ARCHITECTURE_ID_BITMASK) =
@@ -212,6 +273,54 @@ SIXTRL_STATIC_VAR NS(node_device_id_t) const NS(NODE_ILLEGAL_DEVICE_ID) =
 SIXTRL_STATIC_VAR NS(node_index_t) const NS(NODE_UNDEFINED_INDEX) =
     ( NS(node_index_t) )0xFFFFFFFF;
 
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+SIXTRL_STATIC_VAR NS(arch_size_t) const NS(ARCH_ILLEGAL_BUFFER_ID) =
+    ( NS(arch_size_t) )SIXTRL_ARCH_ILLEGAL_BUFFER_ID;
+
+SIXTRL_STATIC_VAR NS(arch_size_t) const NS(ARCH_PARTICLES_BUFFER_ID) =
+    ( NS(arch_size_t) )SIXTRL_ARCH_PARTICLES_BUFFER_ID;
+
+SIXTRL_STATIC_VAR NS(arch_size_t) const NS(ARCH_BEAM_ELEMENTS_BUFFER_ID) =
+    ( NS(arch_size_t) )SIXTRL_ARCH_BEAM_ELEMENTS_BUFFER_ID;
+
+SIXTRL_STATIC_VAR NS(arch_size_t) const NS(ARCH_OUTPUT_BUFFER_ID) =
+    ( NS(arch_size_t) )SIXTRL_ARCH_OUTPUT_BUFFER_ID;
+
+SIXTRL_STATIC_VAR NS(arch_size_t) const NS(ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID) =
+    ( NS(arch_size_t) )SIXTRL_ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID;
+
+SIXTRL_STATIC_VAR NS(arch_size_t) const NS(ARCH_PARTICLE_ADDR_BUFFER_ID) =
+    ( NS(arch_size_t) )SIXTRL_ARCH_PARTICLE_ADDR_BUFFER_ID;
+
+SIXTRL_STATIC_VAR NS(arch_size_t) const NS(ARCH_MIN_USER_DEFINED_BUFFER_ID) =
+    ( NS(arch_size_t) )SIXTRL_ARCH_MIN_USER_DEFINED_BUFFER_ID;
+
+SIXTRL_STATIC_VAR NS(arch_size_t) const NS(ARCH_EXTERNAL_BUFFER_ID) =
+    ( NS(arch_size_t) )SIXTRL_ARCH_EXTERNAL_BUFFER_ID;
+
+SIXTRL_STATIC_VAR NS(arch_size_t) const NS(ARCH_MAX_USER_DEFINED_BUFFER_ID) =
+    ( NS(arch_size_t) )SIXTRL_ARCH_MAX_USER_DEFINED_BUFFER_ID;
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+SIXTRL_STATIC_VAR NS(node_id_str_fmt_t) const NS(NODE_ID_STR_FORMAT_NOARCH) =
+    ( NS(node_id_str_fmt_t) )SIXTRL_NODE_ID_STR_FORMAT_NOARCH;
+
+SIXTRL_STATIC_VAR NS(node_id_str_fmt_t) const NS(NODE_ID_STR_FORMAT_ARCHID) =
+    ( NS(node_id_str_fmt_t) )SIXTRL_NODE_ID_STR_FORMAT_ARCHID;
+
+SIXTRL_STATIC_VAR NS(node_id_str_fmt_t) const NS(NODE_ID_STR_FORMAT_ARCHSTR) =
+    ( NS(node_id_str_fmt_t) )SIXTRL_NODE_ID_STR_FORMAT_ARCHSTR;
+
+SIXTRL_STATIC_VAR NS(node_id_str_fmt_t) const NS(NODE_ID_STR_FORMAT_DEFAULT) =
+    ( NS(node_id_str_fmt_t) )SIXTRL_NODE_ID_STR_FORMAT_DEFAULT;
+
+
+SIXTRL_STATIC_VAR NS(node_id_str_fmt_t) const NS(NODE_ID_STR_FORMAT_ILLEGAL) =
+    ( NS(node_id_str_fmt_t) )SIXTRL_NODE_ID_STR_FORMAT_ILLEGAL;
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
 
 #endif /* !defined( _GPUCODE ) */
 
@@ -235,6 +344,7 @@ namespace SIXTRL_CXX_NAMESPACE
     typedef ::NS(node_platform_id_t)  node_platform_id_t;
     typedef ::NS(node_device_id_t)    node_device_id_t;
     typedef ::NS(node_index_t)        node_index_t;
+    typedef ::NS(node_id_str_fmt_t)   node_id_str_fmt_t;
 
     typedef enum
     {
@@ -332,6 +442,58 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST node_index_t
         NODE_UNDEFINED_INDEX = static_cast< node_index_t >( 0xFFFFFFFF );
+
+    /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --  */
+
+    SIXTRL_STATIC_VAR NS(arch_size_t) const ARCH_ILLEGAL_BUFFER_ID =
+        ::NS(ARCH_ILLEGAL_BUFFER_ID);
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
+        ARCH_PARTICLES_BUFFER_ID = ::NS(ARCH_PARTICLES_BUFFER_ID);
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
+        ARCH_BEAM_ELEMENTS_BUFFER_ID = ::NS(ARCH_BEAM_ELEMENTS_BUFFER_ID);
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
+        ARCH_OUTPUT_BUFFER_ID = ::NS(ARCH_OUTPUT_BUFFER_ID);
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
+        ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID =
+            ::NS(ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID);
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
+        ARCH_PARTICLE_ADDR_BUFFER_ID = ::NS(ARCH_PARTICLE_ADDR_BUFFER_ID);
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
+        ARCH_MIN_USER_DEFINED_BUFFER_ID = NS(ARCH_MIN_USER_DEFINED_BUFFER_ID);
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
+        ARCH_EXTERNAL_BUFFER_ID = ::NS(ARCH_EXTERNAL_BUFFER_ID);
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
+        ARCH_MAX_USER_DEFINED_BUFFER_ID = ::NS(ARCH_MAX_USER_DEFINED_BUFFER_ID);
+
+    /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --  */
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST node_id_str_fmt_t
+        NODE_ID_STR_FORMAT_NOARCH = static_cast< node_id_str_fmt_t >(
+            SIXTRL_NODE_ID_STR_FORMAT_NOARCH );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST node_id_str_fmt_t
+        NODE_ID_STR_FORMAT_ARCHID = static_cast< node_id_str_fmt_t >(
+            SIXTRL_NODE_ID_STR_FORMAT_ARCHID );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST node_id_str_fmt_t
+        NODE_ID_STR_FORMAT_ARCHSTR = static_cast< node_id_str_fmt_t >(
+            SIXTRL_NODE_ID_STR_FORMAT_ARCHSTR );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST node_id_str_fmt_t
+        NODE_ID_STR_FORMAT_ILLEGAL = static_cast< node_id_str_fmt_t >(
+            SIXTRL_NODE_ID_STR_FORMAT_ILLEGAL );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST node_id_str_fmt_t
+        NODE_ID_STR_FORMAT_DEFAULT = static_cast< node_id_str_fmt_t >(
+            SIXTRL_NODE_ID_STR_FORMAT_DEFAULT );
 }
 
 #endif /* C++, Host */

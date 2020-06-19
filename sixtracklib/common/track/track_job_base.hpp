@@ -390,6 +390,20 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void setDefaultElemByElemOrder(
             elem_by_elem_order_t const order ) SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN buffer_t const&
+        elem_by_elem_config_cxx_buffer() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN buffer_t&
+        elem_by_elem_config_cxx_buffer() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN c_buffer_t const*
+        elem_by_elem_config_buffer() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN c_buffer_t* elem_by_elem_config_buffer() SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN size_type
+            elem_by_elem_config_index() const SIXTRL_NOEXCEPT;
+
         /* ================================================================ */
 
         template< class Derived >
@@ -408,7 +422,6 @@ namespace SIXTRL_CXX_NAMESPACE
         using el_by_el_conf_t = elem_by_elem_config_t;
         using ptr_output_buffer_t = std::unique_ptr< buffer_t >;
         using ptr_particles_addr_buffer_t = std::unique_ptr< buffer_t >;
-        using ptr_elem_by_elem_config_t = std::unique_ptr< el_by_el_conf_t >;
 
         SIXTRL_HOST_FN static bool IsClearFlagSet( clear_flag_t const haystack,
             clear_flag_t const needle ) SIXTRL_NOEXCEPT;
@@ -625,9 +638,6 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doUpdateStoredOutputBuffer(
             ptr_output_buffer_t&& ptr_output_buffer ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN void doUpdateStoredElemByElemConfig(
-            ptr_elem_by_elem_config_t&& ptr_config ) SIXTRL_NOEXCEPT;
-
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN void doSetUsesControllerFlag(
@@ -650,8 +660,6 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void doSetDefaultPrepareResetClearFlags(
             clear_flag_t const flags ) SIXTRL_NOEXCEPT;
 
-        /* ----------------------------------------------------------------- */
-
         private:
 
         SIXTRL_HOST_FN void
@@ -670,9 +678,10 @@ namespace SIXTRL_CXX_NAMESPACE
         std::vector< num_particles_t >  m_particle_set_end_offsets;
         std::vector< size_type >        m_beam_monitor_indices;
 
+        buffer_t                        m_elem_by_elem_config_buffer;
+
         ptr_output_buffer_t             m_my_output_buffer;
         ptr_particles_addr_buffer_t     m_my_particles_addr_buffer;
-        ptr_elem_by_elem_config_t       m_my_elem_by_elem_config;
 
         buffer_t*   SIXTRL_RESTRICT     m_ptr_particles_buffer;
         buffer_t*   SIXTRL_RESTRICT     m_ptr_beam_elem_buffer;
@@ -686,6 +695,7 @@ namespace SIXTRL_CXX_NAMESPACE
         size_type                       m_elem_by_elem_output_offset;
         size_type                       m_num_particle_sets_in_buffer;
         size_type                       m_num_beam_elements_in_buffer;
+        size_type                       m_elem_by_elem_config_index;
 
         elem_by_elem_order_t            m_default_elem_by_elem_order;
         num_particles_t                 m_total_num_particles;

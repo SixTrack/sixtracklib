@@ -315,13 +315,21 @@ void NS(BeamElement_print)(
 
             case NS(OBJECT_TYPE_DIPEDGE):
             {
-                typedef SIXTRL_DATAPTR_DEC NS(DipoleEdge) const*
-                        ptr_to_belem_t;
-
+                typedef SIXTRL_DATAPTR_DEC NS(DipoleEdge) const* ptr_to_belem_t;
                 ptr_to_belem_t beam_element =
                     ( ptr_to_belem_t )( uintptr_t )addr;
 
                 NS(DipoleEdge_print)( fp, beam_element );
+                break;
+            }
+
+            case NS(OBJECT_TYPE_TRICUB):
+            {
+                typedef SIXTRL_DATAPTR_DEC NS(TriCub) const* ptr_to_belem_t;
+                ptr_to_belem_t beam_element =
+                    ( ptr_to_belem_t )( uintptr_t )addr;
+
+                NS(TriCub_print)( fp, beam_element );
                 break;
             }
 

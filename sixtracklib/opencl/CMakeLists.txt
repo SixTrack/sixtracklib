@@ -5,6 +5,12 @@ message( STATUS "---- processing sixtracklib/opencl/CMakeLists.txt" )
 
 set( C99_HEADERS_INSTALL_PATH "include/sixtracklib/opencl" )
 set( CXX_HEADERS_INSTALL_PATH ${C99_HEADERS_INSTALL_PATH}  )
+set( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS "" )
+
+if( SIXTRACKL_OPENCL_DEFAULT_COMPILER_FLAGS )
+    set( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS
+         "${SIXTRACKL_OPENCL_DEFAULT_COMPILER_FLAGS}" )
+endif()
 
 set( CL_H_IN_FILE  "${CMAKE_CURRENT_SOURCE_DIR}/cl.h.template" )
 set( CL_H_OUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cl.h" )
@@ -53,6 +59,7 @@ set( SIXTRACKLIB_OPENCL_KERNEL_SOURCES
      kernels/track_particles_optimized_priv_particles_debug.cl
      kernels/be_monitors_assign_out_buffer.cl
      kernels/be_monitors_assign_out_buffer_debug.cl
+     kernels/assign_address_item.cl
 )
 
 add_library( sixtrack_opencl OBJECT
