@@ -51,7 +51,7 @@ NS(BufferArrayObj_get_const_data_end_ext)( SIXTRL_BUFFER_DATAPTR_DEC const
 SIXTRL_BUFFER_DATAPTR_DEC void* NS(BufferArrayObj_get_data_begin_ext)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(BufferArrayObj)* SIXTRL_RESTRICT array )
 {
-    return NS(BufferArrayObj_get_data_begin_ext)( array );
+    return NS(BufferArrayObj_get_data_begin)( array );
 }
 
 SIXTRL_BUFFER_DATAPTR_DEC void* NS(BufferArrayObj_get_data_end_ext)(
@@ -66,7 +66,7 @@ NS(BufferArrayObj_get_element_offset_list_begin_ext)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(BufferArrayObj)
         *const SIXTRL_RESTRICT array )
 {
-    return NS(BufferArrayObj_get_element_offset_list_begin_ext)( array );
+    return NS(BufferArrayObj_get_element_offset_list_begin)( array );
 }
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(buffer_size_t) const*
@@ -81,7 +81,7 @@ NS(buffer_size_t) NS(BufferArrayObj_get_element_offset_ext)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(BufferArrayObj) *const
         SIXTRL_RESTRICT array, NS(buffer_size_t) const index )
 {
-    return NS(BufferArrayObj_get_element_offset_ext)( array, index );
+    return NS(BufferArrayObj_get_element_offset)( array, index );
 }
 
 

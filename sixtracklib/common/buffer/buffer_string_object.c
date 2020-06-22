@@ -99,7 +99,7 @@ NS(buffer_size_t) NS(BufferStringObj_get_available_length_ext)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(BufferStringObj) *const
         SIXTRL_RESTRICT str_obj )
 {
-    return NS(BufferStringObj_get_available_length_ext)( str_obj );
+    return NS(BufferStringObj_get_available_length)( str_obj );
 }
 
 void NS(BufferStringObj_clear_ext)(
