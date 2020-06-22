@@ -63,14 +63,11 @@ set( SIXTRACKLIB_OPENCL_KERNEL_SOURCES
 )
 
 add_library( sixtrack_opencl OBJECT
-             ${SIXTRACKLIB_OPENCL_HEADERS}
-             ${SIXTRACKLIB_OPENCL_SOURCES}
-)
+    ${SIXTRACKLIB_OPENCL_HEADERS} ${SIXTRACKLIB_OPENCL_SOURCES} )
 
 target_include_directories( sixtrack_opencl
     PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
-    PUBLIC $<BUILD_INTERFACE:${SIXTRACKL_OPENCL_INCLUDE_DIR}>
-)
+    PUBLIC $<BUILD_INTERFACE:${SIXTRACKL_OPENCL_INCLUDE_DIR}> )
 
 set_target_properties( sixtrack_opencl PROPERTIES LINKER_LANGUAGE C
     POSITION_INDEPENDENT_CODE True CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON )
@@ -79,7 +76,8 @@ target_compile_definitions( sixtrack_opencl PUBLIC
         ${SIXTRACKLIB_NAMESPACE_FLAGS} -DCL_USE_DEPRECATED_OPENCL_1_2_APIS )
 
 target_compile_options( sixtrack_opencl BEFORE PUBLIC
-        ${SIXTRACKLIB_CPU_FLAGS} ${SIXTRACKLIB_CXX_FLAGS} )
+        ${SIXTRACKLIB_CPU_FLAGS} ${SIXTRACKLIB_CXX_FLAGS}
+        ${SIXTRACKL_CXX_AUTOVEC_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_opencl as a module for sixtracklib:
