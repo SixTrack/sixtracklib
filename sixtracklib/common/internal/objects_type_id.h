@@ -5,6 +5,10 @@
     #include "sixtracklib/common/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
+#if !defined( SIXTRL_OBJECT_TYPE_UNDEFINED )
+    #define SIXTRL_OBJECT_TYPE_UNDEFINED 0
+#endif /* !defined( SIXTRL_OBJECT_TYPE_UNDEFINED ) */
+
 #if defined( __cplusplus )
 extern "C" {
 #endif /* defined( __cplusplus ) */
@@ -12,6 +16,7 @@ extern "C" {
 typedef enum NS(object_type_values_e)
 {
     NS(OBJECT_TYPE_NONE)                      =          0,
+    NS(OBJECT_TYPE_UNDEFINED)                 =          0,
     NS(OBJECT_TYPE_PARTICLE)                  =          1,
     NS(OBJECT_TYPE_DRIFT)                     =          2,
     NS(OBJECT_TYPE_DRIFT_EXACT)               =          3,
@@ -31,12 +36,20 @@ typedef enum NS(object_type_values_e)
     NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF)         =         14,
     NS(OBJECT_TYPE_SC_INTERPOLATED_PROF)      =        257,
     NS(OBJECT_TYPE_LINE_DENSITY_PROF_DATA)    =        258,
+    NS(OBJECT_TYPE_TRICUB_DATA)               =        260,
+    NS(OBJECT_TYPE_TRICUB)                    =        261,
     NS(OBJECT_TYPE_DIPEDGE)                   =         24,
     NS(OBJECT_TYPE_PARTICLES_ADDR)            =        512,
     NS(OBJECT_TYPE_LINE)                      =       1024,
     NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF)         =      65534,
     NS(OBJECT_TYPE_NODE_ID)                   =      65535,
-    NS(OBJECT_TYPE_LAST_AVAILABLE)            =      65535,
+    NS(OBJECT_TYPE_ASSIGN_ADDRESS_ITEM)       =      65536,
+    NS(OBJECT_TYPE_BINARY_PATCH_ITEM)         =      65537,
+    NS(OBJECT_TYPE_CSTRING)                   =      65538,
+    NS(OBJECT_TYPE_BINARY_ARRAY)              =      65539,
+    NS(OBJECT_TYPE_LAST_AVAILABLE)            =      65538,
+    NS(OBJECT_TYPE_MIN_USERDEFINED)           = 0x10000000,
+    NS(OBJECT_TYPE_MAX_USERDEFINED)           = 0x7ffffffe,
     NS(OBJECT_TYPE_INVALID)                   = 0x7fffffff
 }
 NS(object_type_values_t);
@@ -56,6 +69,10 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_NONE = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_NONE) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_UNDEFINED = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_UNDEFINED) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_PARTICLE     = static_cast< object_type_id_t >(
@@ -152,6 +169,14 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_TRICUB = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_TRICUB) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_CSTRING = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_CSTRING) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_BINARY_ARRAY = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_BINARY_ARRAY) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_TRICUB_DATA = static_cast< object_type_id_t >(
