@@ -1546,19 +1546,44 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     void ClContextBase::assignKernelArgumentClBuffer(
-            _this_t::kernel_id_t const kernel_id,
-            _this_t::size_type const arg_index,
+            this_t::kernel_id_t const kernel_id,
+            this_t::size_type const arg_index,
             cl::Buffer& SIXTRL_RESTRICT_REF cl_buffer_arg )
     {
         this->m_kernel_data.at( kernel_id ).setKernelArg(
-            _this_t::ARG_TYPE_CL_BUFFER, arg_index, &cl_buffer_arg );
+            this_t::ARG_TYPE_CL_BUFFER, arg_index, &cl_buffer_arg );
 
         cl::Kernel* kernel = this->openClKernel( kernel_id );
         if( kernel != nullptr ) kernel->setArg( arg_index, cl_buffer_arg );
     }
 
+    void ClContextBase::assignKernelArgumentRawPtr(
+            this_t::kernel_id_t const kernel_id, st_size_t const arg_index,
+            st_size_t const arg_size,
+            SIXTRL_ARGPTR_DEC void const* ptr ) SIXTRL_NOEXCEPT
+        {
+            SIXTRL_ASSERT( kernel_id >= ClContextBase::kernel_id_t{ 0 } );
+            SIXTRL_ASSERT( static_cast< ClContextBase::size_type >(
+                kernel_id ) < this->numAvailableKernels() );
+
+            this->m_kernel_data[ kernel_id ].setKernelArg(
+                    ClContextBase::ARG_TYPE_RAW_PTR, arg_index, nullptr );
+
+            cl::Kernel* cxx_kernel = this->openClKernel( kernel_id );
+
+            if( cxx_kernel != nullptr )
+            {
+                ::cl_kernel kernel = cxx_kernel->operator()();
+                cl_int const ret = ::clSetKernelArg(
+                    kernel, arg_index, arg_size, ptr );
+
+                SIXTRL_ASSERT( ret == CL_SUCCESS );
+                ( void )ret;
+            }
+        }
+
     void ClContextBase::resetKernelArguments(
-        _this_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
+        this_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
         if( ( kernel_id >= kernel_id_t{ 0 } ) && ( static_cast< size_type >(
               kernel_id ) < this->numAvailableKernels() ) )
@@ -3695,12 +3720,13 @@ void NS(ClContextBase_reset_single_kernel_argument)(
     if( ctx != nullptr ) ctx->resetSingleKernelArgument( kernel_id, arg_index );
 }
 
-void NS(ClContextBase_assign_kernel_argument_ptr)(
+void NS(ClContextBase_assign_kernel_argument_raw_ptr)(
     ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
     ::NS(arch_kernel_id_t) const kernel_id, ::NS(arch_size_t) const arg_idx,
-    void* SIXTRL_RESTRICT ptr )
+    ::NS(arch_size_t) const arg_size, void const* ptr )
 {
-    if( ctx != nullptr ) ctx->assignKernelArgumentPtr( kernel_id, arg_idx, ptr );
+    if( ctx != nullptr ) ctx->assignKernelArgumentRawPtr(
+            kernel_id, arg_idx, arg_size, ptr );
 }
 
 void NS(ClContextBase_assign_kernel_argument_value)(
