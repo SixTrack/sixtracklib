@@ -68,7 +68,7 @@ namespace SIXTRL_CXX_NAMESPACE
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         SIXTRL_HOST_FN bool isNodeAvailable(
-            node_index_t const node_index ) const SIXTRL_RESTRICT;
+            node_index_t const node_index ) const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN bool isNodeAvailable(
             node_id_t const& node_id ) const SIXTRL_NOEXCEPT;
@@ -371,7 +371,7 @@ namespace SIXTRL_CXX_NAMESPACE
         node_index_t m_max_available_node_index;
 
         bool m_can_directly_change_selected_node;
-        bool m_node_change_requires_kernels;
+        //bool m_node_change_requires_kernels;
         bool m_can_unselect_node;
         bool m_use_autoselect;
     };
