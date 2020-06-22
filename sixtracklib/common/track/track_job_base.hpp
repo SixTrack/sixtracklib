@@ -344,13 +344,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        SIXTRL_HOST_FN buffer_t* ptrOutputBuffer() SIXTRL_RESTRICT;
-        SIXTRL_HOST_FN buffer_t const* ptrOutputBuffer() const SIXTRL_RESTRICT;
+        SIXTRL_HOST_FN buffer_t* ptrOutputBuffer() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN buffer_t const* ptrOutputBuffer() const SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN c_buffer_t* ptrCOutputBuffer() SIXTRL_RESTRICT;
+        SIXTRL_HOST_FN c_buffer_t* ptrCOutputBuffer() SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN c_buffer_t const*
-        ptrCOutputBuffer() const SIXTRL_RESTRICT;
+        ptrCOutputBuffer() const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -776,7 +776,7 @@ namespace SIXTRL_CXX_NAMESPACE
         char const* SIXTRL_RESTRICT config_str );
 
     SIXTRL_HOST_FN TrackJobBaseNew* TrackJobNew_new(
-        ::NS(arch_id_t) const SIXTRL_RESTRICT arch_str,
+        ::NS(arch_id_t) const arch_id,
         ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
         ::NS(buffer_size_t) const num_particle_sets,
         ::NS(buffer_size_t) const* SIXTRL_RESTRICT particle_set_indices_begin,

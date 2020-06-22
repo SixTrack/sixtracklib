@@ -913,14 +913,14 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    _this_t::buffer_t* TrackJobBaseNew::ptrOutputBuffer() SIXTRL_RESTRICT
+    _this_t::buffer_t* TrackJobBaseNew::ptrOutputBuffer() SIXTRL_NOEXCEPT
     {
         return const_cast< st::_this_t::buffer_t* >( static_cast<
             st::TrackJobBaseNew const& >( *this ).ptrOutputBuffer() );
     }
 
     _this_t::buffer_t const*
-    TrackJobBaseNew::ptrOutputBuffer() const SIXTRL_RESTRICT
+    TrackJobBaseNew::ptrOutputBuffer() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT( ( this->m_ptr_output_buffer == nullptr ) ||
             ( this->m_ptr_output_buffer->getCApiPtr() ==
@@ -929,14 +929,14 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_ptr_output_buffer;
     }
 
-    _this_t::c_buffer_t* TrackJobBaseNew::ptrCOutputBuffer() SIXTRL_RESTRICT
+    _this_t::c_buffer_t* TrackJobBaseNew::ptrCOutputBuffer() SIXTRL_NOEXCEPT
     {
         return const_cast< st::_this_t::c_buffer_t* >( static_cast<
             st::TrackJobBaseNew const& >( *this ).ptrCOutputBuffer() );
     }
 
     _this_t::c_buffer_t const*
-    TrackJobBaseNew::ptrCOutputBuffer() const SIXTRL_RESTRICT
+    TrackJobBaseNew::ptrCOutputBuffer() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT( ( this->m_ptr_output_buffer == nullptr ) ||
             ( this->m_ptr_output_buffer->getCApiPtr() ==
@@ -2681,8 +2681,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     output_buffer, until_turn_elem_by_elem, config_str );
     }
 
-    TrackJobBaseNew* TrackJobNew_new(
-        ::NS(arch_id_t) const SIXTRL_RESTRICT arch_id,
+    TrackJobBaseNew* TrackJobNew_new( ::NS(arch_id_t) const arch_id,
         ::NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
         ::NS(buffer_size_t) const num_psets,
         ::NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
