@@ -469,7 +469,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             for( ; pset_it != pset_end ; ++pset_it )
             {
-                status |= status = NS(Track_particles_line_kernel_impl)(
+                status |= NS(Track_particles_line_kernel_impl)(
                 ::NS(Buffer_get_data_begin)( job.ptrCParticlesBuffer() ),
                 *pset_it, pindex_t{ 0 }, pindex_t{ 1 },
                 ::NS(Buffer_get_data_begin)( job.ptrCBeamElementsBuffer() ),
