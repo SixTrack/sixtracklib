@@ -1,20 +1,13 @@
 # sixtracklib/common/output/CMakeLists.txt
 
-set( SIXTRACKLIB_COMMON_OUTPUT_C99_HEADERS
-     elem_by_elem_config.h elem_by_elem_output_buffer.h
-     elem_by_elem_kernel_impl.h output_buffer.h
-)
+set( SIXTRACKLIB_COMMON_OUTPUT_C99_HEADERS elem_by_elem_config.h
+    elem_by_elem_output_buffer.h elem_by_elem_kernel_impl.h output_buffer.h )
 
-set( SIXTRACKLIB_COMMON_OUTPUT_C99_SOURCES
-     elem_by_elem_config.c
-     elem_by_elem_output_buffer.c
-     output_buffer.c
-)
+set( SIXTRACKLIB_COMMON_OUTPUT_C99_SOURCES elem_by_elem_config.c
+     elem_by_elem_output_buffer.c output_buffer.c )
 
 set( SIXTRACKLIB_COMMON_OUTPUT_CXX_SOURCES )
-set( SIXTRACKLIB_COMMON_OUTPUT_CXX_HEADERS
-     output_buffer.hpp
-)
+set( SIXTRACKLIB_COMMON_OUTPUT_CXX_HEADERS output_buffer.hpp )
 
 # ------------------------------------------------------------------------------
 # build sixtrack_common_output  submodule object library
@@ -31,7 +24,8 @@ set_target_properties( sixtrack_common_output PROPERTIES LINKER_LANGUAGE C
     POSITION_INDEPENDENT_CODE ON C_STANDARD 99 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_common_output PRIVATE
-                        ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
+    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS}
+    ${SIXTRACKL_C99_AUTOVEC_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_common_output as a module for sixtracklib:
