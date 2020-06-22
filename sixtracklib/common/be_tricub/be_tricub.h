@@ -198,6 +198,8 @@ NS(TriCubData_from_managed_buffer)(
 
 #if !defined( _GPUCODE )
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t) NS(TriCubData_type_id_ext)( void );
+
 SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData) const*
 NS(TriCubData_const_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
@@ -227,8 +229,8 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(TriCubData_attributes_counts)(
 
 /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t) NS(TriCubData_type_id_ext)(
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT d );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t)
+    NS(TriCubData_type_id_ext)( void );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TriCubData_ptr_offset)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT d );
@@ -411,6 +413,9 @@ NS(TriCub_from_managed_buffer)(
 
 #if !defined( _GPUCODE )
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t)
+NS(TypeCub_type_id_ext)( void ) SIXTRL_NOEXCEPT;
+
 SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(TriCub) const*
 NS(TriCub_const_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
@@ -423,8 +428,8 @@ NS(TriCub_from_buffer)(
 
 /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t) NS(TriCub_type_id_ext)(
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub );
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t)
+    NS(TriCub_type_id_ext)( void );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TriCub_data_addr_offset)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub );
@@ -1183,7 +1188,8 @@ NS(TriCub_const_from_obj_index)(
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(TriCub)*
 NS(TriCub_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* obj )
 {
-    return ( SIXTRL_BE_ARGPTR_DEC NS(TriCub)* )NS(TriCub_from_obj_index)( obj );
+    return ( SIXTRL_BE_ARGPTR_DEC NS(TriCub)*
+        )NS(TriCub_const_from_obj_index)( obj );
 }
 
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(TriCub) const*

@@ -6,6 +6,7 @@
 
 #include "sixtracklib/common/definitions.h"
 #include "sixtracklib/common/control/definitions.h"
+#include "sixtracklib/common/internal/objects_type_id.h"
 #include "sixtracklib/common/buffer/assign_address_item.h"
 #include "sixtracklib/common/buffer.h"
 
@@ -104,10 +105,9 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* NS(TriCubData_from_buffer)(
 
 /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
 
-NS(object_type_id_t) NS(TriCubData_type_id_ext)( SIXTRL_BUFFER_DATAPTR_DEC
-    const NS(TriCubData) *const SIXTRL_RESTRICT data )
+NS(object_type_id_t) NS(TypeCubData_type_id_ext)( void ) SIXTRL_NOEXCEPT
 {
-    return NS(TriCubData_type_id)( data );
+    return ( NS(object_type_id_t) )NS(OBJECT_TYPE_TRICUB_DATA);
 }
 
 NS(arch_size_t) NS(TriCubData_ptr_offset)( SIXTRL_BUFFER_DATAPTR_DEC const
@@ -322,10 +322,9 @@ SIXTRL_BE_ARGPTR_DEC NS(TriCub)* NS(TriCub_from_buffer)(
 
 /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
 
-NS(object_type_id_t) NS(TriCub_type_id_ext)(
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub )
+NS(object_type_id_t) NS(TriCub_type_id_ext)( void ) SIXTRL_NOEXCEPT
 {
-    return NS(TriCub_type_id)( tricub );
+    return ( NS(object_type_id_t) )NS(OBJECT_TYPE_TRICUB);
 }
 
 NS(arch_size_t) NS(TriCub_data_addr_offset)(
