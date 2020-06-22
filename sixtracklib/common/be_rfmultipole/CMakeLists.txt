@@ -1,10 +1,5 @@
-set( SIXTRACKLIB_COMMON_BE_RF_MULTIPOLE_C99_HEADERS
-    be_rfmultipole.h track.h
-)
-
-set( SIXTRACKLIB_COMMON_BE_RF_MULTIPOLE_C99_SOURCES
-    be_rfmultipole.c )
-
+set( SIXTRACKLIB_COMMON_BE_RF_MULTIPOLE_C99_HEADERS be_rfmultipole.h track.h )
+set( SIXTRACKLIB_COMMON_BE_RF_MULTIPOLE_C99_SOURCES be_rfmultipole.c )
 
 add_library( sixtrack_common_be_rfmultipole_c99 OBJECT
     ${SIXTRACKLIB_COMMON_BE_RF_MULTIPOLE_C99_HEADERS}
@@ -18,7 +13,8 @@ set_target_properties( sixtrack_common_be_rfmultipole_c99 PROPERTIES
     C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_common_be_rfmultipole_c99 PRIVATE
-    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
+    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS}
+    ${SIXTRACKL_C99_AUTOVEC_FLAGS} )
 
 # ------------------------------------------------------------------------------
 
