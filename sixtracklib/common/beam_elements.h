@@ -1228,15 +1228,6 @@ SIXTRL_INLINE int NS(BeamElements_add_single_new_to_buffer)(
 
             case NS(OBJECT_TYPE_SC_COASTING):
             {
-                typedef NS(SpaceChargeCoasting) sc_coasting_t;
-                typedef SIXTRL_BE_ARGPTR_DEC sc_coasting_t const*
-                        ptr_sc_coasting_t;
-
-                ptr_sc_coasting_t ptr_sc_coasting =
-                    ( ptr_sc_coasting_t )( uintptr_t )begin_addr;
-
-                SIXTRL_ASSERT( ptr_sc_coasting != SIXTRL_NULLPTR );
-
                 success = ( SIXTRL_NULLPTR !=
                     NS(SpaceChargeCoasting_new)( buffer ) );
 
@@ -1245,24 +1236,23 @@ SIXTRL_INLINE int NS(BeamElements_add_single_new_to_buffer)(
 
             case NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF):
             {
-                typedef NS(SpaceChargeQGaussianProfile) sc_bunched_t;
-                typedef SIXTRL_BE_ARGPTR_DEC sc_bunched_t const*
-                        ptr_sc_bunched_t;
-
-                ptr_sc_bunched_t ptr_sc_bunched =
-                    ( ptr_sc_bunched_t )( uintptr_t )begin_addr;
-
-                SIXTRL_ASSERT( ptr_sc_bunched != SIXTRL_NULLPTR );
-
                 success = ( SIXTRL_NULLPTR !=
                     NS(SpaceChargeQGaussianProfile_new)( buffer ) );
 
                 break;
             }
 
+            case NS(OBJECT_TYPE_SC_INTERPOLATED_PROF):
+            {
+                success = ( SIXTRL_NULLPTR !=
+                    NS(SpaceChargeInterpolatedProfile_new)( buffer ) );
+
+                break;
+            }
+
             case NS(OBJECT_TYPE_BEAM_BEAM_6D):
             {
-                typedef NS(BeamBeam6D)                          beam_beam_t;
+                typedef NS(BeamBeam6D) beam_beam_t;
                 typedef SIXTRL_BE_ARGPTR_DEC beam_beam_t const* ptr_beam_beam_t;
 
                 ptr_beam_beam_t ptr_beam_beam =
