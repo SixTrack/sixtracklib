@@ -89,7 +89,5 @@ namespace SIXTRL_CXX_NAMESPACE
 }
 
 #endif /* C++, Host  */
-
 #endif /* SIXTRACKLIB_COMMON_PARTICLES_DEFINITIONS_H__ */
-
 /* end: sixtracklib/common/particles/definitions.h */
