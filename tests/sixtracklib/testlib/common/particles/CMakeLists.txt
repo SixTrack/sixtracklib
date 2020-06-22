@@ -22,7 +22,8 @@ set_target_properties( sixtrack_test_common_particle_c99 PROPERTIES
     C_STANDARD 99 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_test_common_particle_c99 PRIVATE
-        -Wall -Werror -pedantic -ansi ${SIXTRACKLIB_CPU_FLAGS} )
+    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS}
+    ${SIXTRACKL_C99_AUTOVEC_FLAGS} )
 
 # ------------------------------------------------------------------------------
 
@@ -46,10 +47,11 @@ set_target_properties( sixtrack_test_common_particle_cxx PROPERTIES
     CXX_STANDARD 11 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_test_common_particle_cxx PRIVATE
-        ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
+    ${SIXTRACKLIB_CXX_FLAGS} ${SIXTRACKLIB_CPU_FLAGS}
+    ${SIXTRACKL_C99_AUTOVEC_FLAGS} )
 
 # ------------------------------------------------------------------------------
-# pass on sixtrack_test_common_particle_c99 and 
+# pass on sixtrack_test_common_particle_c99 and
 # sixtrack_test_common_particle_cxx as a module for sixtrack_test:
 
 set(  SIXTRACKL_TESTLIB_LIBRARY_MODULES
