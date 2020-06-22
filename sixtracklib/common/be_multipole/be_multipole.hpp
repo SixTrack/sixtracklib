@@ -795,6 +795,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT(
             ( ( bal_size == 0u ) && ( this->bal == nullptr ) ) ||
             ( ( bal_size >  0u ) && ( this->bal != nullptr ) ) );
+        ( void )bal_size;
 
         return reinterpret_cast< CPtr >( this->bal );
     }
