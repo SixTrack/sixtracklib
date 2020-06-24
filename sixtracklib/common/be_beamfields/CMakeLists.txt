@@ -27,8 +27,7 @@ set(  SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
 # ------------------------------------------------------------------------------
 # install :
 
-set( SIXTRACKLIB_COMMON_BE_BEAMFIELDS_C99_INSTALL_PATH
-     include/sixtracklib/common/be_beamfields )
-
-install( FILES ${SIXTRL_COMMON_BE_BEAMFIELDS_HEADERS}
-         DESTINATION ${SIXTRACKLIB_COMMON_BE_BEAMFIELDS_C99_INSTALL_PATH} )
+if( SIXTRL_COMMON_BE_BEAMFIELDS_HEADERS )
+    install( FILES ${SIXTRL_COMMON_BE_BEAMFIELDS_HEADERS}
+             DESTINATION "${SIXTRL_COMMON_C99_INSTALL_PREFIX}/be_beamfields" )
+endif()
