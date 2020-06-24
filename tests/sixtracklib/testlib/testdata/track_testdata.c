@@ -312,7 +312,7 @@ SIXTRL_HOST_FN NS(Buffer)*
                     case NS(OBJECT_TYPE_DRIFT):
                     {
                         typedef NS(Drift) belem_t;
-                        num_dataptrs += NS(Drift_get_num_dataptrs)(
+                        num_dataptrs += NS(Drift_num_dataptrs)(
                             ( belem_t const* )( uintptr_t )beginaddr );
 
                         break;
@@ -321,7 +321,7 @@ SIXTRL_HOST_FN NS(Buffer)*
                     case NS(OBJECT_TYPE_DRIFT_EXACT):
                     {
                         typedef NS(DriftExact) belem_t;
-                        num_dataptrs += NS(DriftExact_get_num_dataptrs)(
+                        num_dataptrs += NS(DriftExact_num_dataptrs)(
                             ( belem_t const* )( uintptr_t )beginaddr );
 
                         break;
@@ -408,31 +408,28 @@ SIXTRL_HOST_FN NS(Buffer)*
                     {
                         case NS(OBJECT_TYPE_DRIFT):
                         {
-                            typedef NS(Drift) belem_t;
+                            SIXTRL_BE_ARGPTR_DEC NS(Drift) const* orig = (
+                                SIXTRL_BE_ARGPTR_DEC NS(Drift) const* )(
+                                    uintptr_t )beginaddr;
 
-                            belem_t const* orig_belem =
-                                ( belem_t const* )( uintptr_t )beginaddr;
+                            SIXTRL_BE_ARGPTR_DEC NS(Drift)* copied_elem =
+                                NS(Drift_add_copy)( beam_elements_buffer, orig );
 
-                            belem_t* copied_belem = NS(Drift_add)(
-                                beam_elements_buffer,
-                                NS(Drift_get_length)( orig_belem ) );
-
-                            if( copied_belem == SIXTRL_NULLPTR ) success = -1;
+                            if( copied_elem == SIXTRL_NULLPTR ) success = -1;
                             break;
                         }
 
                         case NS(OBJECT_TYPE_DRIFT_EXACT):
                         {
-                            typedef NS(DriftExact) belem_t;
+                            SIXTRL_BE_ARGPTR_DEC NS(DriftExact) const* orig = (
+                                SIXTRL_BE_ARGPTR_DEC NS(DriftExact) const* )(
+                                    uintptr_t )beginaddr;
 
-                            belem_t const* orig_belem =
-                                ( belem_t const* )( uintptr_t )beginaddr;
+                            SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* copied_elem =
+                                NS(DriftExact_add_copy)(
+                                    beam_elements_buffer, orig );
 
-                            belem_t* copied_belem = NS(DriftExact_add)(
-                                beam_elements_buffer,
-                                NS(DriftExact_get_length)( orig_belem ) );
-
-                            if( copied_belem == SIXTRL_NULLPTR ) success = -1;
+                            if( copied_elem == SIXTRL_NULLPTR ) success = -1;
                             break;
                         }
 
