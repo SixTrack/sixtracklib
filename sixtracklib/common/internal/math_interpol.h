@@ -1,19 +1,19 @@
 #ifndef SIXTRACKLIB_COMMON_INTERNAL_MATH_INTERPOL_H__
 #define SIXTRACKLIB_COMMON_INTERNAL_MATH_INTERPOL_H__
 
-#if !defined( SIXTRL_NO_SYSTEM_INCLUDE )
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stddef.h>
     #include <stdint.h>
     #include <stdlib.h>
     #include <math.h>
-#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDE ) */
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
-#if !defined( SIXTRL_NO_INCLUDE )
+#if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
     #include "sixtracklib/common/internal/math_functions.h"
-#endif /* !defined( SIXTRL_NO_INCLUDE ) */
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 extern "C" {
@@ -75,7 +75,7 @@ SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Math_interpol_linear_prepare_equ)(
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Math_interpol_cubic_prepare_equ)(
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT yp_begin,
-    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT temp_values_begin,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT temp_values_begin,
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT y_begin,
     SIXTRL_REAL_T const x0, SIXTRL_REAL_T const dx,
     NS(math_abscissa_idx_t) const num_values,
@@ -86,7 +86,7 @@ SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Math_interpol_cubic_prepare_equ)(
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Math_interpol_prepare_equ)(
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT derivatives_begin,
-    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT temp_values_begin,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT temp_values_begin,
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT y_begin,
     SIXTRL_REAL_T const x0, SIXTRL_REAL_T const dx,
     NS(math_abscissa_idx_t) const num_values,
@@ -366,7 +366,7 @@ SIXTRL_INLINE NS(arch_status_t) NS(Math_interpol_linear_prepare_equ)(
 
 SIXTRL_INLINE NS(arch_status_t) NS(Math_interpol_cubic_prepare_equ)(
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT ypp,
-    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT temp_values,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT temp_values,
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT y,
     SIXTRL_REAL_T const x0, SIXTRL_REAL_T const dx,
     NS(math_abscissa_idx_t) const num_values,
@@ -380,7 +380,9 @@ SIXTRL_INLINE NS(arch_status_t) NS(Math_interpol_cubic_prepare_equ)(
 
     if( ( ypp != SIXTRL_NULLPTR ) && ( y  != SIXTRL_NULLPTR ) &&
         ( temp_values != SIXTRL_NULLPTR ) &&
-        ( ypp != y ) && ( ypp != temp_values ) && ( y != temp_values ) &&
+        ( ypp != y ) &&
+        ( ( uintptr_t )ypp != ( uintptr_t )temp_values ) &&
+        ( ( uintptr_t )y   != ( uintptr_t )temp_values ) &&
         ( !isnan( x0 ) ) && ( !isinf( x0 ) ) &&
         ( !isnan( dx ) ) && ( !isinf( dx ) ) && ( dx > ( SIXTRL_REAL_T )0 ) &&
         ( num_values > ( NS(math_abscissa_idx_t) )3 ) )
@@ -389,11 +391,11 @@ SIXTRL_INLINE NS(arch_status_t) NS(Math_interpol_cubic_prepare_equ)(
         NS(math_abscissa_idx_t) const n_minus_2 = num_values - 2;
         NS(math_abscissa_idx_t) const n_minus_3 = num_values - 3;
 
-        SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* l  = temp_values;
-        SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* d  = l  + num_values;
-        SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* h  = d  + num_values;
-        SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* g  = h  + num_values;
-        SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* dy = g  + num_values;
+        SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* l  = temp_values;
+        SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* d  = l  + num_values;
+        SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* h  = d  + num_values;
+        SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* g  = h  + num_values;
+        SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* dy = g  + num_values;
 
         NS(math_abscissa_idx_t) ii = ( NS(math_abscissa_idx_t) )0;
         status = ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
@@ -599,7 +601,7 @@ SIXTRL_INLINE NS(arch_status_t) NS(Math_interpol_cubic_prepare_equ)(
 
 SIXTRL_INLINE NS(arch_status_t) NS(Math_interpol_prepare_equ)(
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT yp,
-    SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT temp_values,
+    SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT temp_values,
     SIXTRL_BUFFER_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT y,
     SIXTRL_REAL_T const x0, SIXTRL_REAL_T const dx,
     NS(math_abscissa_idx_t) const num_values,
