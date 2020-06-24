@@ -21,7 +21,7 @@
  * ******  st_XYShift:
  * ************************************************************************* */
 
-TEST( C99_CommonBeamElementXYShiftTests, MinimalAddToBufferCopyRemapRead )
+TEST( C99CommonBeamElementXYShift, MinimalAddToBufferCopyRemapRead )
 {
     using size_t   = ::st_buffer_size_t;
     using object_t = ::st_Object;

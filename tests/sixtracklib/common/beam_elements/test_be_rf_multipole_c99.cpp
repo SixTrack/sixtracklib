@@ -9,9 +9,7 @@
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/common/particles.h"
 
-
-
-TEST( C99CommonBeamElementsRFMultiPoleTests, StoreAndRestoreTests )
+TEST( C99CommonBeamElementsRFMultiPole, StoreAndRestoreTests )
 {
     using rf_multipole_t = ::NS(RFMultiPole);
     using rf_mp_int_t = ::NS(rf_multipole_int_t);
