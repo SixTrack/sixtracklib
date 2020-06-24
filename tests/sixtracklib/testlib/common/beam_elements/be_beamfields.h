@@ -276,8 +276,10 @@ SIXTRL_INLINE int NS(BeamBeam4D_compare_values)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT rhs )
 {
     return NS(BeamBeam_compare_values_generic)(
-       NS(BeamBeam4D_get_const_data)( lhs ), NS(BeamBeam4D_get_data_size)( lhs ),
-       NS(BeamBeam4D_get_const_data)( rhs ), NS(BeamBeam4D_get_data_size)( rhs ) );
+       ( SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* )( uintptr_t
+           )NS(BeamBeam4D_data_addr)( lhs ), NS(BeamBeam4D_data_size)( lhs ),
+       ( SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* )( uintptr_t
+           )NS(BeamBeam4D_data_addr)( rhs ), NS(BeamBeam4D_data_size)( rhs ) );
 }
 
 SIXTRL_INLINE int NS(BeamBeam4D_compare_values_with_treshold)(
@@ -286,8 +288,10 @@ SIXTRL_INLINE int NS(BeamBeam4D_compare_values_with_treshold)(
     SIXTRL_REAL_T const treshold )
 {
     return NS(BeamBeam_compare_values_generic_with_treshold)(
-       NS(BeamBeam4D_get_const_data)( lhs ), NS(BeamBeam4D_get_data_size)( lhs ),
-       NS(BeamBeam4D_get_const_data)( rhs ), NS(BeamBeam4D_get_data_size)( rhs ),
+       ( SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* )( uintptr_t
+           )NS(BeamBeam4D_data_addr)( lhs ), NS(BeamBeam4D_data_size)( lhs ),
+       ( SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* )( uintptr_t
+           )NS(BeamBeam4D_data_addr)( rhs ), NS(BeamBeam4D_data_size)( rhs ),
        treshold );
 }
 
@@ -300,7 +304,7 @@ SIXTRL_INLINE void NS(BeamBeam4D_print_out)(
     typedef NS(beambeam4d_real_const_ptr_t)  bb_data_ptr_t;
     typedef SIXTRL_BE_DATAPTR_DEC NS(BB4D_data)* data_ptr_t;
 
-    bb_data_ptr_t data = NS(BeamBeam4D_get_const_data)( e );
+    bb_data_ptr_t data = NS(BeamBeam4D_const_data)( e );
     data_ptr_t bb4ddata = ( NS(BB4D_data_ptr_t) )data;
 
     SIXTRL_ASSERT( bb4ddata != SIXTRL_NULLPTR );
@@ -769,8 +773,10 @@ SIXTRL_INLINE int NS(BeamBeam6D_compare_values)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT rhs )
 {
     return NS(BeamBeam_compare_values_generic)(
-       NS(BeamBeam6D_get_const_data)( lhs ), NS(BeamBeam6D_get_data_size)( lhs ),
-       NS(BeamBeam6D_get_const_data)( rhs ), NS(BeamBeam6D_get_data_size)( rhs ) );
+       ( SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* )( uintptr_t
+           )NS(BeamBeam6D_data_addr)( lhs ), NS(BeamBeam6D_data_size)( lhs ),
+       ( SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* )( uintptr_t
+           )NS(BeamBeam6D_data_addr)( rhs ), NS(BeamBeam6D_data_size)( rhs ) );
 }
 
 SIXTRL_INLINE int NS(BeamBeam6D_compare_values_with_treshold)(
@@ -779,8 +785,10 @@ SIXTRL_INLINE int NS(BeamBeam6D_compare_values_with_treshold)(
     SIXTRL_REAL_T const treshold )
 {
     return NS(BeamBeam_compare_values_generic_with_treshold)(
-       NS(BeamBeam6D_get_const_data)( lhs ), NS(BeamBeam6D_get_data_size)( lhs ),
-       NS(BeamBeam6D_get_const_data)( rhs ), NS(BeamBeam6D_get_data_size)( rhs ),
+       ( SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* )( uintptr_t
+           )NS(BeamBeam6D_data_addr)( lhs ), NS(BeamBeam6D_data_size)( lhs ),
+       ( SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* )( uintptr_t
+           )NS(BeamBeam6D_data_addr)( rhs ), NS(BeamBeam6D_data_size)( rhs ),
        treshold );
 }
 
@@ -795,7 +803,7 @@ SIXTRL_INLINE void NS(BeamBeam6D_print_out)(
     typedef NS(beambeam6d_real_const_ptr_t)         bb_data_ptr_t;
     typedef SIXTRL_BE_DATAPTR_DEC NS(BB6D_data)*    data_ptr_t;
 
-    data_ptr_t data = NS(BeamBeam6D_get_const_data)( elem );
+    data_ptr_t data = NS(BeamBeam6D_const_data)( elem );
     NS(BB6D_data_ptr_t) bb6ddata = ( NS(BB6D_data_ptr_t) )data;
 
     if( ( bb6ddata != SIXTRL_NULLPTR ) && ( bb6ddata->enabled ) )
