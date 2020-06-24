@@ -14,7 +14,7 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/track_job.h"
 
-TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
+TEST( C99TrackJobClCollectPush, TestCollectAndPush )
 {
     using track_job_t        = ::NS(TrackJobCl);
     using buffer_t           = ::NS(Buffer);
