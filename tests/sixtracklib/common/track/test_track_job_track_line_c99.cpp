@@ -26,7 +26,7 @@
 #include "sixtracklib/common/be_monitor/be_monitor.h"
 #include "sixtracklib/common/track/track.h"
 
-TEST( C99CpuCpuTrackJobTrackLineTests, CmpWithTrackUntilTest )
+TEST( C99CpuCpuTrackJobTrackLine, CmpWithTrackUntilTest )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
@@ -234,7 +234,7 @@ TEST( C99CpuCpuTrackJobTrackLineTests, CmpWithTrackUntilTest )
 }
 
 
-TEST( C99CpuCpuTrackJobTrackLineTests, LostParticleBehaviour )
+TEST( C99CpuCpuTrackJobTrackLine, LostParticleBehaviour )
 {
     using npart_t = ::NS(particle_num_elements_t);
 
