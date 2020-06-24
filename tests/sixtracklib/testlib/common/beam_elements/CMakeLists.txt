@@ -2,11 +2,15 @@
 # tests/sixtracklib/testlib/common/beam_elements/CMakeLists.txt
 
 set( SIXTRL_TESTLIB_COMMON_BEAM_ELEMENTS_CXX_HEADERS )
-set( SIXTRL_TESTLIB_COMMON_BEAM_ELEMENTS_C99_HEADERS be_beamfields.h
-    be_limit_rect.h be_limit_ellipse.h be_dipedge.h be_tricub.h beam_elements.h )
+set( SIXTRL_TESTLIB_COMMON_BEAM_ELEMENTS_C99_HEADERS
+     be_drift.h
+     be_limit_rect.h be_limit_ellipse.h be_dipedge.h be_tricub.h
+     be_beamfields.h beam_elements.h )
 
-set( SIXTRL_TESTLIB_COMMON_BEAM_ELEMENTS_C99_SOURCES be_beamfields.c
-     be_limit_rect.c be_limit_ellipse.c be_dipedge.c be_tricub.c beam_elements.c )
+set( SIXTRL_TESTLIB_COMMON_BEAM_ELEMENTS_C99_SOURCES
+     be_drift.c
+     be_limit_rect.c be_limit_ellipse.c be_dipedge.c be_tricub.c
+     be_beamfields.c beam_elements.c )
 
 add_library( sixtrack_test_common_belems_c99 OBJECT
     ${SIXTRL_TESTLIB_COMMON_BEAM_ELEMENTS_CXX_HEADERS}

@@ -15,8 +15,6 @@
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-struct NS(Drift);
-struct NS(DriftExact);
 struct NS(MultiPole);
 struct NS(XYShift);
 struct NS(SRotation);
@@ -28,12 +26,6 @@ struct NS(BeamMonitor);
 struct NS(Object);
 
 /* ------------------------------------------------------------------------- */
-
-SIXTRL_STATIC SIXTRL_FN void NS(Drift_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Drift) *const SIXTRL_RESTRICT e );
-
-SIXTRL_STATIC SIXTRL_FN void NS(DriftExact_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(DriftExact) *const SIXTRL_RESTRICT e );
 
 SIXTRL_STATIC SIXTRL_FN void NS(MultiPole_print_out)(
     SIXTRL_BE_ARGPTR_DEC const struct NS(MultiPole) *const SIXTRL_RESTRICT e );
@@ -81,14 +73,6 @@ SIXTRL_STATIC SIXTRL_FN int NS(BeamElements_compare_lines_with_treshold)(
 
 #if !defined( _GPUCODE )
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Drift_print)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(Drift) *const SIXTRL_RESTRICT e );
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(DriftExact_print)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(DriftExact) *const SIXTRL_RESTRICT e );
-
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(MultiPole_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
     SIXTRL_BE_ARGPTR_DEC const struct NS(MultiPole) *const SIXTRL_RESTRICT e );
@@ -129,6 +113,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamElement_print)(
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/beam_elements.h"
 
+    #include "sixtracklib/testlib/common/beam_elements/be_drift.h"
     #include "sixtracklib/testlib/common/beam_elements/be_beamfields.h"
     #include "sixtracklib/testlib/common/beam_elements/be_limit_rect.h"
     #include "sixtracklib/testlib/common/beam_elements/be_limit_ellipse.h"
@@ -139,39 +124,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamElement_print)(
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
-
-SIXTRL_INLINE void NS(Drift_print_out)(
-    SIXTRL_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift )
-{
-    #if !defined( _GPUCODE )
-
-    printf( "|drift            | length   = %+16.12f m;\r\n",
-            NS(Drift_get_length)( drift ) );
-
-    #else
-
-    NS(Drift_print)( stdout, drift );
-
-    #endif /* !defined( _GPUCODE ) */
-
-    return;
-}
-
-SIXTRL_INLINE void NS(DriftExact_print_out)(
-    SIXTRL_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift )
-{
-    #if !defined( _GPUCODE )
-
-    printf( "|drift exact      | length   = %+16.12f m;\r\n",
-            NS(DriftExact_get_length)( drift ) );
-    #else
-
-    NS(DriftExact_print)( stdout, drift );
-
-    #endif /* !defined( _GPUCODE ) */
-
-    return;
-}
 
 SIXTRL_INLINE void NS(MultiPole_print_out)(
     SIXTRL_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT mp )

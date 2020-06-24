@@ -14,25 +14,6 @@
 /* =====           BEAM_ELEMENTS_TOOLS IMPLEMENTATION                  ===== */
 /* ========================================================================= */
 
-void NS(Drift_print)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift )
-{
-    SIXTRL_ASSERT( fp != SIXTRL_NULLPTR );
-    fprintf( fp, "|drift            | length   = %+16.12f m;\r\n",
-            NS(Drift_get_length)( drift ) );
-}
-
-void NS(DriftExact_print)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift )
-{
-    SIXTRL_ASSERT( fp != SIXTRL_NULLPTR );
-
-    fprintf( fp, "|drift exact      | length   = %+16.12f m;\r\n",
-            NS(DriftExact_get_length)( drift ) );
-}
-
 void NS(MultiPole_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
     SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT mp )
