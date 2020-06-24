@@ -52,7 +52,7 @@ SIXTRL_INLINE int NS(Track_particle_drift)(
     real_t const rpp    = NS(Particles_get_rpp_value)( p, ii );
     real_t const xp     = NS(Particles_get_px_value )( p, ii ) * rpp;
     real_t const yp     = NS(Particles_get_py_value )( p, ii ) * rpp;
-    real_t const length = NS(Drift_get_length)( drift );
+    real_t const length = NS(Drift_length)( drift );
     real_t const dzeta  = NS(Particles_get_rvv_value)( p, ii ) -
                           ( ( real_t )1 + ( xp*xp + yp*yp ) / ( real_t )2 );
 
@@ -75,7 +75,7 @@ SIXTRL_INLINE int NS(Track_particle_drift_exact)(
 {
     typedef NS(particle_real_t) real_t;
 
-    real_t const length = NS(DriftExact_get_length)( drift );
+    real_t const length = NS(DriftExact_length)( drift );
     real_t const px     = NS(Particles_get_px_value)( p, ii );
     real_t const py     = NS(Particles_get_py_value)( p, ii );
     real_t const opd    = NS(Particles_get_delta_value)( p, ii ) + ( real_t )1;
