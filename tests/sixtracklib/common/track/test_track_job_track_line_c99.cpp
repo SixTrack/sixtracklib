@@ -245,10 +245,10 @@ TEST( C99CpuCpuTrackJobTrackLineTests, LostParticleBehaviour )
     ::NS(LimitRect)*  limit  = ::NS(LimitRect_new)( elements );
     ::NS(DriftExact)* drift1 = ::NS(DriftExact_new)( elements );
 
-    drift0 = ::NS(BeamElements_buffer_get_drift_exact)( elements, 0 );
+    drift0 = ::NS(DriftExact_from_buffer)( elements, 0 );
     quad   = ::NS(BeamElements_buffer_get_multipole)( elements, 1 );
     limit  = ::NS(BeamElements_buffer_get_limit_rect)( elements, 2 );
-    drift1 = ::NS(BeamElements_buffer_get_drift_exact)( elements, 3 );
+    drift1 = ::NS(DriftExact_from_buffer)( elements, 3 );
 
     SIXTRL_ASSERT( drift0 != nullptr );
     SIXTRL_ASSERT( quad   != nullptr );
