@@ -21,24 +21,103 @@
 /* ************************************************************************* */
 /* BeamBeam4D: */
 
-NS(buffer_size_t) NS(BeamBeam4D_get_required_num_dataptrs)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const buffer,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const beam_beam )
+NS(object_type_id_t) NS(BeamBeam4D_type_id_ext)( void ) SIXTRL_NOEXCEPT
 {
-    return NS(BeamBeam4D_get_required_num_dataptrs_on_managed_buffer)(
-        NS(Buffer_get_const_data_begin)( buffer ),
-        beam_beam, NS(Buffer_get_slot_size)( buffer ) );
+    return NS(BeamBeam4D_type_id)();
 }
 
-NS(buffer_size_t)
-NS(BeamBeam4D_get_required_num_slots)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const buffer,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const beam_beam )
+NS(buffer_size_t) NS(BeamBeam4D_data_addr_offset_ext)( SIXTRL_BE_ARGPTR_DEC
+    const NS(BeamBeam4D) *const SIXTRL_RESTRICT bb_elem ) SIXTRL_NOEXCEPT
 {
-    return NS(BeamBeam4D_get_required_num_slots_on_managed_buffer)(
-        NS(Buffer_get_const_data_begin)( buffer ),
-        beam_beam, NS(Buffer_get_slot_size)( buffer ) );
+    return NS(BeamBeam4D_data_addr_offset)( bb_elem );
 }
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+NS(arch_status_t) NS(BeamBeam4D_attributes_offsets)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets,
+    NS(buffer_size_t) const max_num_offsets,
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT elem,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
+{
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+
+    if( ( elem != SIXTRL_NULLPTR ) && ( offsets != SIXTRL_NULLPTR ) &&
+        ( max_num_offsets >= ( NS(buffer_size_t) )1 ) &&
+        ( slot_size > ( NS(buffer_size_t) )0 ) )
+    {
+        offsets[ 0 ] = offsetof( NS(BeamBeam4D), data_addr );
+        SIXTRL_ASSERT( offsets[ 0 ] % slot_size == ( NS(buffer_size_t) )0u );
+
+        if( max_num_offsets > ( NS(buffer_size_t) )1 )
+        {
+            NS(buffer_size_t) ii = ( NS(buffer_size_t) )1u;
+            for( ; ii < max_num_offsets ; ++ii )
+                    offsets[ ii ] = ( NS(buffer_size_t) )0u;
+        }
+
+        status = ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
+    }
+
+    return status;
+}
+
+NS(arch_status_t) NS(BeamBeam4D_attributes_sizes)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes,
+    NS(buffer_size_t) const max_num_sizes,
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT elem,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
+{
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+
+    if( ( elem != SIXTRL_NULLPTR ) && ( sizes != SIXTRL_NULLPTR ) &&
+        ( max_num_sizes >= ( NS(buffer_size_t) )1 ) &&
+        ( slot_size > ( NS(buffer_size_t) )0 ) )
+    {
+        sizes[ 0 ] = sizeof( SIXTRL_REAL_T );
+        if( max_num_sizes > ( NS(buffer_size_t) )1 )
+        {
+            NS(buffer_size_t) ii = ( NS(buffer_size_t) )1u;
+            for( ; ii < max_num_sizes ; ++ii )
+                sizes[ ii ] = ( NS(buffer_size_t) )0u;
+        }
+
+        status = ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
+    }
+
+    return status;
+}
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(BeamBeam4D_attributes_counts)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts,
+    NS(buffer_size_t) const max_num_counts,
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT elem,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
+{
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+
+    if( ( elem != SIXTRL_NULLPTR ) && ( counts != SIXTRL_NULLPTR ) &&
+        ( max_num_counts >= ( NS(buffer_size_t) )1 ) &&
+        ( slot_size > ( NS(buffer_size_t) )0 ) )
+    {
+        counts[ 0 ] = NS(BeamBeam4D_data_size)( elem );
+        if( max_num_counts > ( NS(buffer_size_t) )1 )
+        {
+            NS(buffer_size_t) ii = ( NS(buffer_size_t) )1u;
+            for( ; ii < max_num_counts ; ++ii )
+                counts[ ii ] = ( NS(buffer_size_t) )0u;
+        }
+
+        status = ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
+    }
+
+    return status;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 bool NS(BeamBeam4D_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
@@ -48,88 +127,501 @@ bool NS(BeamBeam4D_can_be_added)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs )
 {
     typedef NS(buffer_size_t)  buf_size_t;
-    typedef NS(BeamBeam4D) elem_t;
 
-    buf_size_t const sizes[]  = { sizeof( SIXTRL_REAL_T ) };
-    buf_size_t const counts[] = { data_size };
-    buf_size_t num_dataptrs   = ( buf_size_t )0u;
+    bool can_be_added = false;
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
-    elem_t temp_obj;
-    NS(BeamBeam4D_preset)( &temp_obj );
-    NS(BeamBeam4D_set_data_size)( &temp_obj, data_size );
+    NS(BeamBeam4D) temp;
+    NS(BeamBeam4D_preset)( &temp );
+    status = NS(BeamBeam4D_set_data_size)( &temp, data_size );
 
-    num_dataptrs = NS(BeamBeam4D_get_required_num_dataptrs)( buffer, &temp_obj );
-    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )1u );
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
 
-    return NS(Buffer_can_add_object)( buffer, sizeof( elem_t ),
-        num_dataptrs, &sizes[ 0 ], &counts[ 0 ], ptr_requ_objects,
-            ptr_requ_slots, ptr_requ_dataptrs );
+        SIXTRL_ARGPTR_DEC buf_size_t sizes[ 1 ];
+        SIXTRL_ARGPTR_DEC buf_size_t counts[ 1 ];
+
+        status = NS(BeamBeam4D_attributes_sizes)(
+            &sizes[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+
+        if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+        {
+            status = NS(BeamBeam4D_attributes_counts)(
+                &counts[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+        }
+
+        if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+        {
+            buf_size_t const ndataptrs = NS(BeamBeam4D_num_dataptrs)( &temp );
+            if( ndataptrs == ( buf_size_t )1 )
+            {
+                can_be_added = NS(Buffer_can_add_object)( buffer, sizeof(
+                    NS(BeamBeam4D) ), ndataptrs, &sizes[ 0 ], &counts[ 0 ],
+                        ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
+            }
+        }
+    }
+
+    return can_be_added;
 }
 
-SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam4D)* NS(BeamBeam4D_new)(
+SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* NS(BeamBeam4D_new)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_UINT64_T const data_size )
+    NS(buffer_size_t) const data_size )
 {
     typedef NS(buffer_size_t) buf_size_t;
-    typedef NS(BeamBeam4D) elem_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC elem_t* ptr_to_elem_t;
 
-    buf_size_t const offsets[] = { offsetof( elem_t, data ) };
-    buf_size_t const sizes[]   = { sizeof( SIXTRL_REAL_T ) };
-    buf_size_t const counts[]  = { data_size };
-    buf_size_t num_dataptrs    = ( buf_size_t )0u;
+    SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* added_elem = SIXTRL_NULLPTR;
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
-    elem_t temp_obj;
-    NS(BeamBeam4D_preset)( &temp_obj );
-    NS(BeamBeam4D_set_data_size)( &temp_obj, data_size );
+    SIXTRL_ARGPTR_DEC buf_size_t offsets[ 1 ] = { ( buf_size_t )0 };
+    SIXTRL_ARGPTR_DEC buf_size_t sizes[ 1 ]   = { ( buf_size_t )0 };
+    SIXTRL_ARGPTR_DEC buf_size_t counts[ 1 ]  = { ( buf_size_t )0 };
 
-    num_dataptrs = NS(BeamBeam4D_get_required_num_dataptrs)( buffer, &temp_obj );
-    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )1u );
+    buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+    NS(BeamBeam4D) temp;
+    NS(BeamBeam4D_preset)( &temp );
+    status = NS(BeamBeam4D_set_data_size)( &temp, data_size );
 
-    return ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
-        NS(Buffer_add_object)( buffer, &temp_obj, sizeof( elem_t ),
-            NS(OBJECT_TYPE_BEAM_BEAM_4D), num_dataptrs,
-                &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam4D_attributes_sizes)(
+            &sizes[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam4D_attributes_offsets)(
+            &offsets[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam4D_attributes_counts)(
+            &counts[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        buf_size_t const ndataptrs = NS(BeamBeam4D_num_dataptrs)( &temp );
+        if( ndataptrs == ( buf_size_t )1 )
+        {
+            added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* )( uintptr_t
+                )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
+                    &temp, sizeof( NS(BeamBeam4D) ), NS(BeamBeam4D_type_id)(),
+                        ndataptrs, &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
+        }
+    }
+
+    return added_elem;
 }
 
-SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam4D)* NS(BeamBeam4D_add)(
+SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* NS(BeamBeam4D_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_UINT64_T const  data_size,
-    NS(beambeam4d_real_ptr_t) SIXTRL_RESTRICT input_data )
+    NS(buffer_size_t) const  data_size,
+    NS(buffer_addr_t) data_addr )
 {
     typedef NS(buffer_size_t) buf_size_t;
-    typedef NS(BeamBeam4D) elem_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC elem_t* ptr_to_elem_t;
 
-    buf_size_t const offsets[] = { offsetof( elem_t, data ) };
-    buf_size_t const sizes[]   = { sizeof( SIXTRL_REAL_T ) };
-    buf_size_t const counts[]  = { data_size };
-    buf_size_t num_dataptrs    = ( buf_size_t )0u;
+    SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* added_elem = SIXTRL_NULLPTR;
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
-    elem_t temp_obj;
-    NS(BeamBeam4D_preset)( &temp_obj );
-    NS(BeamBeam4D_set_data_size)( &temp_obj, data_size );
-    NS(BeamBeam4D_assign_data_ptr)( &temp_obj, input_data );
-    num_dataptrs = NS(BeamBeam4D_get_required_num_dataptrs)(
-        buffer, SIXTRL_NULLPTR );
+    SIXTRL_ARGPTR_DEC buf_size_t offsets[ 1 ] = { ( buf_size_t )0 };
+    SIXTRL_ARGPTR_DEC buf_size_t sizes[ 1 ]   = { ( buf_size_t )0 };
+    SIXTRL_ARGPTR_DEC buf_size_t counts[ 1 ]  = { ( buf_size_t )0 };
 
-    return ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
-        NS(Buffer_add_object)( buffer, &temp_obj, sizeof( elem_t ),
-            NS(OBJECT_TYPE_BEAM_BEAM_4D), num_dataptrs,
-                &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
+    buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+
+    NS(BeamBeam4D) temp;
+    NS(BeamBeam4D_preset)( &temp );
+    status  = NS(BeamBeam4D_set_data_size)( &temp, data_size );
+    status |= NS(BeamBeam4D_set_data_addr)( &temp, data_addr );
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam4D_attributes_sizes)(
+            &sizes[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam4D_attributes_offsets)(
+            &offsets[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam4D_attributes_counts)(
+            &counts[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        buf_size_t const ndataptrs = NS(BeamBeam4D_num_dataptrs)( &temp );
+        if( ndataptrs == ( buf_size_t )1 )
+        {
+            added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* )( uintptr_t
+                )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
+                    &temp, sizeof( NS(BeamBeam4D) ), NS(BeamBeam4D_type_id)(),
+                        ndataptrs, &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
+        }
+    }
+
+    return added_elem;
 }
 
-SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam4D)* NS(BeamBeam4D_add_copy)(
+SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* NS(BeamBeam4D_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT orig )
 {
-    return NS(BeamBeam4D_add)( buffer, NS(BeamBeam4D_get_data_size)( orig ),
-        NS(BeamBeam4D_get_data)( ( NS(BeamBeam4D)* )orig ) );
+    typedef NS(buffer_size_t) buf_size_t;
+    SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* added_elem = SIXTRL_NULLPTR;
+
+    SIXTRL_ARGPTR_DEC buf_size_t offsets[ 1 ] = { ( buf_size_t )0 };
+    SIXTRL_ARGPTR_DEC buf_size_t sizes[ 1 ]   = { ( buf_size_t )0 };
+    SIXTRL_ARGPTR_DEC buf_size_t counts[ 1 ]  = { ( buf_size_t )0 };
+
+    buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+
+    NS(arch_status_t) status = NS(BeamBeam4D_attributes_sizes)(
+            &sizes[ 0 ], ( buf_size_t )1u, orig, slot_size );
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam4D_attributes_offsets)(
+            &offsets[ 0 ], ( buf_size_t )1u, orig, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam4D_attributes_counts)(
+            &counts[ 0 ], ( buf_size_t )1u, orig, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        buf_size_t const ndataptrs = NS(BeamBeam4D_num_dataptrs)( orig );
+
+        if( ndataptrs == ( buf_size_t )1 )
+        {
+            added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(BeamBeam4D)* )( uintptr_t
+                )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer, orig,
+                    sizeof( NS(BeamBeam4D) ), NS(BeamBeam4D_type_id)(),
+                        ndataptrs, &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
+        }
+    }
+
+    return added_elem;
+}
+
+/* ************************************************************************* */
+/* NS(BeamBeam6D) */
+
+NS(object_type_id_t) NS(BeamBeam6D_type_id_ext)( void ) SIXTRL_NOEXCEPT
+{
+    return NS(BeamBeam6D_type_id)();
+}
+
+NS(buffer_size_t) NS(BeamBeam6D_data_addr_offset_ext)( SIXTRL_BE_ARGPTR_DEC
+    const NS(BeamBeam6D) *const SIXTRL_RESTRICT bb_elem ) SIXTRL_NOEXCEPT
+{
+    return NS(BeamBeam6D_data_addr_offset)( bb_elem );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+NS(arch_status_t) NS(BeamBeam6D_attributes_offsets)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets,
+    NS(buffer_size_t) const max_num_offsets,
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT elem,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
+{
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+
+    if( ( elem != SIXTRL_NULLPTR ) && ( offsets != SIXTRL_NULLPTR ) &&
+        ( max_num_offsets >= ( NS(buffer_size_t) )1 ) &&
+        ( slot_size > ( NS(buffer_size_t) )0 ) )
+    {
+        offsets[ 0 ] = offsetof( NS(BeamBeam6D), data_addr );
+        SIXTRL_ASSERT( offsets[ 0 ] % slot_size == ( NS(buffer_size_t) )0u );
+
+        if( max_num_offsets > ( NS(buffer_size_t) )1 )
+        {
+            NS(buffer_size_t) ii = ( NS(buffer_size_t) )1u;
+            for( ; ii < max_num_offsets ; ++ii )
+                    offsets[ ii ] = ( NS(buffer_size_t) )0u;
+        }
+
+        status = ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
+    }
+
+    return status;
+}
+
+NS(arch_status_t) NS(BeamBeam6D_attributes_sizes)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes,
+    NS(buffer_size_t) const max_num_sizes,
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT elem,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
+{
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+
+    if( ( elem != SIXTRL_NULLPTR ) && ( sizes != SIXTRL_NULLPTR ) &&
+        ( max_num_sizes >= ( NS(buffer_size_t) )1 ) &&
+        ( slot_size > ( NS(buffer_size_t) )0 ) )
+    {
+        sizes[ 0 ] = sizeof( SIXTRL_REAL_T );
+
+        if( max_num_sizes > ( NS(buffer_size_t) )1 )
+        {
+            NS(buffer_size_t) ii = ( NS(buffer_size_t) )1u;
+            for( ; ii < max_num_sizes ; ++ii )
+                sizes[ ii ] = ( NS(buffer_size_t) )0u;
+        }
+
+        status = ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
+    }
+
+    return status;
+}
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(BeamBeam6D_attributes_counts)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts,
+    NS(buffer_size_t) const max_num_counts,
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT elem,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
+{
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+
+    if( ( elem != SIXTRL_NULLPTR ) && ( counts != SIXTRL_NULLPTR ) &&
+        ( max_num_counts >= ( NS(buffer_size_t) )1 ) &&
+        ( slot_size > ( NS(buffer_size_t) )0 ) )
+    {
+        counts[ 0 ] = NS(BeamBeam6D_data_size)( elem );
+        if( max_num_counts > ( NS(buffer_size_t) )1 )
+        {
+            NS(buffer_size_t) ii = ( NS(buffer_size_t) )1u;
+            for( ; ii < max_num_counts ; ++ii )
+                counts[ ii ] = ( NS(buffer_size_t) )0u;
+        }
+
+        status = ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
+    }
+
+    return status;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+bool NS(BeamBeam6D_can_be_added)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const data_size,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs )
+{
+    typedef NS(buffer_size_t)  buf_size_t;
+
+    bool can_be_added = false;
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+
+    NS(BeamBeam6D) temp;
+    NS(BeamBeam6D_preset)( &temp );
+    status = NS(BeamBeam6D_set_data_size)( &temp, data_size );
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+
+        SIXTRL_ARGPTR_DEC buf_size_t sizes[ 1 ];
+        SIXTRL_ARGPTR_DEC buf_size_t counts[ 1 ];
+
+        status = NS(BeamBeam6D_attributes_sizes)(
+            &sizes[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+
+        if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+        {
+            status = NS(BeamBeam6D_attributes_counts)(
+                &counts[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+        }
+
+        if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+        {
+            buf_size_t const ndataptrs = NS(BeamBeam6D_num_dataptrs)( &temp );
+
+            if( ndataptrs == ( buf_size_t )1 )
+            {
+                can_be_added = NS(Buffer_can_add_object)( buffer, sizeof(
+                    NS(BeamBeam6D) ), ndataptrs, &sizes[ 0 ], &counts[ 0 ],
+                        ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
+            }
+        }
+    }
+
+    return can_be_added;
+}
+
+SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* NS(BeamBeam6D_new)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const data_size )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+
+    SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* added_elem = SIXTRL_NULLPTR;
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+
+    SIXTRL_ARGPTR_DEC buf_size_t offsets[ 1 ] = { ( buf_size_t )0 };
+    SIXTRL_ARGPTR_DEC buf_size_t sizes[ 1 ]   = { ( buf_size_t )0 };
+    SIXTRL_ARGPTR_DEC buf_size_t counts[ 1 ]  = { ( buf_size_t )0 };
+
+    buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+
+    NS(BeamBeam6D) temp;
+    NS(BeamBeam6D_preset)( &temp );
+    status = NS(BeamBeam6D_set_data_size)( &temp, data_size );
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam6D_attributes_sizes)(
+            &sizes[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam6D_attributes_offsets)(
+            &offsets[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam6D_attributes_counts)(
+            &counts[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        buf_size_t const ndataptrs = NS(BeamBeam6D_num_dataptrs)( &temp );
+        if( ndataptrs == ( buf_size_t )1 )
+        {
+            added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* )( uintptr_t
+                )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
+                    &temp, sizeof( NS(BeamBeam6D) ), NS(BeamBeam6D_type_id)(),
+                        ndataptrs, &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
+        }
+    }
+
+    return added_elem;
+}
+
+SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* NS(BeamBeam6D_add)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const data_size,
+    NS(buffer_addr_t) const data_addr )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+
+    SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* added_elem = SIXTRL_NULLPTR;
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+
+    SIXTRL_ARGPTR_DEC buf_size_t offsets[ 1 ] = { ( buf_size_t )0 };
+    SIXTRL_ARGPTR_DEC buf_size_t sizes[ 1 ]   = { ( buf_size_t )0 };
+    SIXTRL_ARGPTR_DEC buf_size_t counts[ 1 ]  = { ( buf_size_t )0 };
+
+    buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+
+    NS(BeamBeam6D) temp;
+    NS(BeamBeam6D_preset)( &temp );
+    status  = NS(BeamBeam6D_set_data_size)( &temp, data_size );
+    status |= NS(BeamBeam6D_set_data_addr)( &temp, data_addr );
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam6D_attributes_sizes)(
+            &sizes[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam6D_attributes_offsets)(
+            &offsets[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam6D_attributes_counts)(
+            &counts[ 0 ], ( buf_size_t )1u, &temp, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        buf_size_t const ndataptrs = NS(BeamBeam6D_num_dataptrs)( &temp );
+        if( ndataptrs == ( buf_size_t )1 )
+        {
+            added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* )( uintptr_t
+                )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
+                    &temp, sizeof( NS(BeamBeam6D) ), NS(BeamBeam6D_type_id)(),
+                        ndataptrs, &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
+        }
+    }
+
+    return added_elem;
+}
+
+SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* NS(BeamBeam6D_add_copy)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT orig )
+{
+    typedef NS(buffer_size_t) buf_size_t;
+    SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* added_elem = SIXTRL_NULLPTR;
+
+    SIXTRL_ARGPTR_DEC buf_size_t offsets[ 1 ] = { ( buf_size_t )0 };
+    SIXTRL_ARGPTR_DEC buf_size_t sizes[ 1 ]   = { ( buf_size_t )0 };
+    SIXTRL_ARGPTR_DEC buf_size_t counts[ 1 ]  = { ( buf_size_t )0 };
+
+    buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+
+    NS(arch_status_t) status = NS(BeamBeam6D_attributes_sizes)(
+            &sizes[ 0 ], ( buf_size_t )1u, orig, slot_size );
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam6D_attributes_offsets)(
+            &offsets[ 0 ], ( buf_size_t )1u, orig, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        status = NS(BeamBeam6D_attributes_counts)(
+            &counts[ 0 ], ( buf_size_t )1u, orig, slot_size );
+    }
+
+    if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+    {
+        buf_size_t const ndataptrs = NS(BeamBeam6D_num_dataptrs)( orig );
+        if( ndataptrs == ( buf_size_t )1 )
+        {
+            added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(BeamBeam6D)* )( uintptr_t
+                )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer, orig,
+                    sizeof( NS(BeamBeam6D) ), NS(BeamBeam6D_type_id)(),
+                        ndataptrs, &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
+        }
+    }
+
+    return added_elem;
 }
 
 /* ************************************************************************* */
 /* SpaceChargeCoasting: */
-
 
 NS(object_type_id_t) NS(SpaceChargeCoasting_type_id_ext)( void ) SIXTRL_NOEXCEPT
 {
@@ -212,13 +704,15 @@ NS(arch_status_t) NS(SpaceChargeCoasting_attributes_counts)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
     NS(buffer_size_t) const max_num_counts,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeCoasting)
-        *const SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
+        *const SIXTRL_RESTRICT sc_elem,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( counts_begin != SIXTRL_NULLPTR ) && ( sc_elem != SIXTRL_NULLPTR ) )
+    if( ( counts_begin != SIXTRL_NULLPTR ) && ( sc_elem != SIXTRL_NULLPTR ) &&
+        ( slot_size > ( NS(buffer_size_t) )0 ) )
     {
         status = NS(ARCH_STATUS_SUCCESS);
 
@@ -416,13 +910,15 @@ NS(arch_status_t) NS(SpaceChargeQGaussianProfile_attributes_counts)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
     NS(buffer_size_t) const max_num_counts,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeQGaussianProfile)
-        *const SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
+        *const SIXTRL_RESTRICT sc_elem,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( counts_begin != SIXTRL_NULLPTR ) && ( sc_elem != SIXTRL_NULLPTR ) )
+    if( ( counts_begin != SIXTRL_NULLPTR ) && ( sc_elem != SIXTRL_NULLPTR ) &&
+        ( slot_size > ( NS(buffer_size_t) )0 ) )
     {
         status = NS(ARCH_STATUS_SUCCESS);
 
@@ -554,6 +1050,12 @@ NS(SpaceChargeQGaussianProfile_add_copy)(
 /* ************************************************************************* */
 /* NS(LineDensityProfileData) */
 
+NS(object_type_id_t) NS(LineDensityProfileData_type_id_ext)(
+    void ) SIXTRL_NOEXCEPT
+{
+    return NS(LineDensityProfileData_type_id)();
+}
+
 NS(buffer_size_t) NS(LineDensityProfileData_values_offset_ext)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)*
         SIXTRL_RESTRICT data ) SIXTRL_NOEXCEPT
@@ -608,12 +1110,6 @@ NS(arch_status_t) NS(LineDensityProfileData_prepare_interpolation_ext)(
     }
 
     return status;
-}
-
-NS(object_type_id_t)
-NS(LineDensityProfileData_type_id_ext)( void ) SIXTRL_NOEXCEPT
-{
-    return ( NS(object_type_id_t) )NS(OBJECT_TYPE_LINE_DENSITY_PROF_DATA);
 }
 
 SIXTRL_REAL_T NS(LineDensityProfileData_z0_ext)( SIXTRL_BUFFER_DATAPTR_DEC
@@ -802,7 +1298,8 @@ NS(arch_status_t) NS(LineDensityProfileData_attributes_counts)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
     NS(buffer_size_t) const max_num_counts,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(LineDensityProfileData)
-        *const SIXTRL_RESTRICT data ) SIXTRL_NOEXCEPT
+        *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
@@ -810,6 +1307,7 @@ NS(arch_status_t) NS(LineDensityProfileData_attributes_counts)(
 
     if( ( counts_begin != SIXTRL_NULLPTR ) && ( data != SIXTRL_NULLPTR ) &&
         ( max_num_counts > ( buf_size_t )2u ) &&
+        ( slot_size > ( NS(buffer_size_t) )0u ) &&
         ( NS(LineDensityProfileData_capacity)( data ) >=
           ( NS(math_abscissa_idx_t) )0u ) )
     {
@@ -902,7 +1400,7 @@ NS(LineDensityProfileData_new)(
             if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
             {
                 status = NS(LineDensityProfileData_attributes_counts)(
-                    &counts[ 0 ], ( buf_size_t )2u, &data );
+                    &counts[ 0 ], ( buf_size_t )2u, &data, slot_size );
             }
         }
 
@@ -911,9 +1409,8 @@ NS(LineDensityProfileData_new)(
             added_elem = ( SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)*
                 )( uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
                     buffer, &data, sizeof( data ),
-                        NS(LineDensityProfileData_type_id)( &data ),
-                            num_dataptrs, &offsets[ 0 ], &sizes[ 0 ],
-                                &counts[ 0 ] ) );
+                        NS(LineDensityProfileData_type_id)(), num_dataptrs,
+                            &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
         }
     }
 
@@ -983,7 +1480,7 @@ SIXTRL_BE_ARGPTR_DEC NS(LineDensityProfileData)* NS(LineDensityProfileData_add)(
             if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
             {
                 status = NS(LineDensityProfileData_attributes_counts)(
-                    &counts[ 0 ], ( buf_size_t )2u, &data );
+                    &counts[ 0 ], ( buf_size_t )2u, &data, slot_size );
             }
         }
 
@@ -992,9 +1489,8 @@ SIXTRL_BE_ARGPTR_DEC NS(LineDensityProfileData)* NS(LineDensityProfileData_add)(
             added_elem = ( SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)*
                 )( uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
                     buffer, &data, sizeof( data ),
-                        NS(LineDensityProfileData_type_id)( &data ),
-                            num_dataptrs, &offsets[ 0 ], &sizes[ 0 ],
-                                &counts[ 0 ] ) );
+                        NS(LineDensityProfileData_type_id)(), num_dataptrs,
+                            &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
         }
     }
 
@@ -1039,7 +1535,7 @@ NS(LineDensityProfileData_add_copy)(
             if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
             {
                 status = NS(LineDensityProfileData_attributes_counts)(
-                    &counts[ 0 ], ( buf_size_t )2u, data );
+                    &counts[ 0 ], ( buf_size_t )2u, data, slot_size );
             }
         }
 
@@ -1048,9 +1544,8 @@ NS(LineDensityProfileData_add_copy)(
             added_elem = ( SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)*
                 )( uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
                     buffer, data, sizeof( NS(LineDensityProfileData) ),
-                        NS(LineDensityProfileData_type_id)( data ),
-                            num_dataptrs, &offsets[ 0 ], &sizes[ 0 ],
-                                &counts[ 0 ] ) );
+                        NS(LineDensityProfileData_type_id)(), num_dataptrs,
+                            &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
         }
     }
 
@@ -1059,6 +1554,23 @@ NS(LineDensityProfileData_add_copy)(
 
 /* ************************************************************************* */
 /* NS(SpaceChargeInterpolatedProfile): */
+
+NS(object_type_id_t) NS(SpaceChargeInterpolatedProfile_type_id_ext)(
+    void ) SIXTRL_NOEXCEPT
+{
+    return NS(SpaceChargeInterpolatedProfile_type_id)();
+}
+
+NS(buffer_size_t)
+NS(SpaceChargeInterpolatedProfile_interpol_data_addr_offset_ext)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+        SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
+{
+    return NS(SpaceChargeInterpolatedProfile_interpol_data_addr_offset)(
+        sc_elem );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile) const*
 NS(SpaceChargeInterpolatedProfile_const_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
@@ -1133,13 +1645,15 @@ NS(arch_status_t) NS(SpaceChargeInterpolatedProfile_attributes_counts)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
     NS(buffer_size_t) const max_num_counts,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeInterpolatedProfile)
-        *const SIXTRL_RESTRICT data ) SIXTRL_NOEXCEPT
+        *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( counts_begin != SIXTRL_NULLPTR ) && ( data != SIXTRL_NULLPTR ) )
+    if( ( counts_begin != SIXTRL_NULLPTR ) && ( data != SIXTRL_NULLPTR ) &&
+        ( slot_size > ( NS(buffer_size_t) )0u ) )
     {
         status = NS(ARCH_STATUS_SUCCESS);
 
@@ -1197,10 +1711,10 @@ NS(SpaceChargeInterpolatedProfile)* NS(SpaceChargeInterpolatedProfile_new)(
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
     added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile)*
-        )( uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
-            buffer, &sc_elem, sizeof( sc_elem ),
-                NS(SpaceChargeInterpolatedProfile_type_id)( &sc_elem ),
-                num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
+        )( uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
+            &sc_elem, sizeof( sc_elem ),
+                NS(SpaceChargeInterpolatedProfile_type_id)(), num_dataptrs,
+                    SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
 
     return added_elem;
 }
@@ -1248,9 +1762,8 @@ NS(SpaceChargeInterpolatedProfile)* NS(SpaceChargeInterpolatedProfile_add)(
 
     added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile)*
         )( uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
-        &sc_elem, sizeof( sc_elem ), NS(SpaceChargeInterpolatedProfile_type_id)(
-            &sc_elem ), num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR,
-                SIXTRL_NULLPTR ) );
+        &sc_elem, sizeof( sc_elem ), NS(SpaceChargeInterpolatedProfile_type_id)(),
+            num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
 
     return added_elem;
 }
@@ -1272,120 +1785,10 @@ NS(SpaceChargeInterpolatedProfile)* NS(SpaceChargeInterpolatedProfile_add_copy)(
     added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile)*
         )( uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
         sc_elem, sizeof( NS(SpaceChargeInterpolatedProfile) ),
-            NS(SpaceChargeInterpolatedProfile_type_id)( sc_elem ),
-                num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
+            NS(SpaceChargeInterpolatedProfile_type_id)(), num_dataptrs,
+                SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
 
     return added_elem;
-}
-
-/* ************************************************************************* */
-/* NS(BeamBeam6D) */
-
-NS(buffer_size_t) NS(BeamBeam6D_get_required_num_dataptrs)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const buffer,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const beam_beam )
-{
-    return NS(BeamBeam6D_get_required_num_dataptrs_on_managed_buffer)(
-        NS(Buffer_get_const_data_begin)( buffer ),
-        beam_beam, NS(Buffer_get_slot_size)( buffer ) );
-}
-
-NS(buffer_size_t)
-NS(BeamBeam6D_get_required_num_slots)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const buffer,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const beam_beam )
-{
-    return NS(BeamBeam6D_get_required_num_slots_on_managed_buffer)(
-        NS(Buffer_get_const_data_begin)( buffer ),
-        beam_beam, NS(Buffer_get_slot_size)( buffer ) );
-}
-
-bool NS(BeamBeam6D_can_be_added)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    NS(buffer_size_t) const data_size,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs )
-{
-    typedef NS(buffer_size_t)  buf_size_t;
-    typedef NS(BeamBeam6D) elem_t;
-
-    buf_size_t const sizes[]  = { sizeof( SIXTRL_REAL_T ) };
-    buf_size_t const counts[] = { data_size };
-    buf_size_t num_dataptrs   = ( buf_size_t )0u;
-
-    elem_t temp_obj;
-    NS(BeamBeam6D_preset)( &temp_obj );
-    NS(BeamBeam6D_set_data_size)( &temp_obj, data_size );
-
-    num_dataptrs = NS(BeamBeam6D_get_required_num_dataptrs)( buffer, &temp_obj );
-    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )1u );
-
-    return NS(Buffer_can_add_object)( buffer, sizeof( elem_t ),
-        num_dataptrs, &sizes[ 0 ], &counts[ 0 ], ptr_requ_objects,
-            ptr_requ_slots, ptr_requ_dataptrs );
-}
-
-SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam6D)* NS(BeamBeam6D_new)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_UINT64_T const data_size )
-{
-    typedef NS(buffer_size_t) buf_size_t;
-    typedef NS(BeamBeam6D) elem_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC elem_t* ptr_to_elem_t;
-
-    buf_size_t const offsets[] = { offsetof( elem_t, data ) };
-    buf_size_t const sizes[]   = { sizeof( SIXTRL_REAL_T ) };
-    buf_size_t const counts[]  = { data_size };
-    buf_size_t num_dataptrs    = ( buf_size_t )0u;
-
-    elem_t temp_obj;
-    NS(BeamBeam6D_preset)( &temp_obj );
-    NS(BeamBeam6D_set_data_size)( &temp_obj, data_size );
-
-    num_dataptrs = NS(BeamBeam6D_get_required_num_dataptrs)( buffer, &temp_obj );
-    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )1u );
-
-    return ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
-        NS(Buffer_add_object)( buffer, &temp_obj, sizeof( elem_t ),
-            NS(OBJECT_TYPE_BEAM_BEAM_6D), num_dataptrs,
-                &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
-}
-
-SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam6D)* NS(BeamBeam6D_add)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_UINT64_T const  data_size,
-    NS(beambeam4d_real_ptr_t) SIXTRL_RESTRICT input_data )
-{
-    typedef NS(buffer_size_t) buf_size_t;
-    typedef NS(BeamBeam6D) elem_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC elem_t* ptr_to_elem_t;
-
-    buf_size_t const offsets[] = { offsetof( elem_t, data ) };
-    buf_size_t const sizes[]   = { sizeof( SIXTRL_REAL_T ) };
-    buf_size_t const counts[]  = { data_size };
-    buf_size_t num_dataptrs    = ( buf_size_t )0u;
-
-    elem_t temp_obj;
-    NS(BeamBeam6D_preset)( &temp_obj );
-    NS(BeamBeam6D_set_data_size)( &temp_obj, data_size );
-    NS(BeamBeam6D_assign_data_ptr)( &temp_obj, input_data );
-    num_dataptrs = NS(BeamBeam6D_get_required_num_dataptrs)(
-        buffer, SIXTRL_NULLPTR );
-
-    return ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
-        NS(Buffer_add_object)( buffer, &temp_obj, sizeof( elem_t ),
-            NS(OBJECT_TYPE_BEAM_BEAM_6D), num_dataptrs,
-                &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
-}
-
-SIXTRL_BUFFER_DATAPTR_DEC NS(BeamBeam6D)* NS(BeamBeam6D_add_copy)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT orig )
-{
-    return NS(BeamBeam6D_add)( buffer,
-        NS(BeamBeam6D_get_data_size)( orig ),
-        NS(BeamBeam6D_get_data)( ( NS(BeamBeam6D)* )orig ) );
 }
 
 /* end: sixtracklib/common/be_beamfields/be_beamfields.c */

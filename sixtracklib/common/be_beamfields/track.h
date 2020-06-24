@@ -91,7 +91,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_4d)(
     typedef SIXTRL_REAL_T real_t;
     typedef SIXTRL_BE_DATAPTR_DEC NS(BB4D_data)* data_ptr_t;
 
-    data_ptr_t bb4ddata = ( data_ptr_t )NS(BeamBeam4D_get_const_data)( bb );
+    data_ptr_t bb4ddata = ( data_ptr_t )NS(BeamBeam4D_const_data)( bb );
 
     /*
     // Test data transfer
@@ -336,7 +336,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_6d)(
     int i_slice;
 
     // Start Gianni's part
-    data_ptr_t bb6ddata = ( data_ptr_t )NS(BeamBeam6D_get_const_data)( bb );
+    data_ptr_t bb6ddata = ( data_ptr_t )NS(BeamBeam6D_const_data)( bb );
 
     SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index )
         == ( NS(particle_index_t) )1 );
