@@ -1171,39 +1171,39 @@ SIXTRL_REAL_T NS(LineDensityProfileData_interpolate_2nd_derivative_ext)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-void NS(LineDensityProfileData_set_z0_ext)( SIXTRL_BUFFER_DATAPTR_DEC
-        NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
+NS(arch_status_t) NS(LineDensityProfileData_set_z0_ext)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     SIXTRL_REAL_T const z0 ) SIXTRL_NOEXCEPT
 {
-    NS(LineDensityProfileData_set_z0)( data, z0 );
+    return NS(LineDensityProfileData_set_z0)( data, z0 );
 }
 
-void NS(LineDensityProfileData_set_dz_ext)(
+NS(arch_status_t) NS(LineDensityProfileData_set_dz_ext)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     SIXTRL_REAL_T const dz ) SIXTRL_NOEXCEPT
 {
-    NS(LineDensityProfileData_set_dz)( data, dz );
+    return NS(LineDensityProfileData_set_dz)( data, dz );
 }
 
-void NS(LineDensityProfileData_set_values_addr_ext)( SIXTRL_BUFFER_DATAPTR_DEC
-        NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
+NS(arch_status_t) NS(LineDensityProfileData_set_values_addr_ext)(
+    SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(buffer_addr_t) const values_addr ) SIXTRL_NOEXCEPT
 {
-    NS(LineDensityProfileData_set_values_addr)( data, values_addr );
+    return NS(LineDensityProfileData_set_values_addr)( data, values_addr );
 }
 
-void NS(LineDensityProfileData_set_derivatives_addr_ext)(
+NS(arch_status_t) NS(LineDensityProfileData_set_derivatives_addr_ext)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(buffer_addr_t) const derivatives_addr ) SIXTRL_NOEXCEPT
 {
-    NS(LineDensityProfileData_set_derivatives_addr)( data, derivatives_addr );
+    return NS(LineDensityProfileData_set_derivatives_addr)( data, derivatives_addr );
 }
 
-void NS(LineDensityProfileData_set_method_ext)(
+NS(arch_status_t) NS(LineDensityProfileData_set_method_ext)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(math_interpol_t) const method ) SIXTRL_NOEXCEPT
 {
-    NS(LineDensityProfileData_set_method)( data, method );
+    return NS(LineDensityProfileData_set_method)( data, method );
 }
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData) const*
@@ -1333,6 +1333,7 @@ NS(arch_status_t) NS(LineDensityProfileData_attributes_counts)(
 
 bool NS(LineDensityProfileData_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(math_abscissa_idx_t) const capacity,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)*
@@ -1341,17 +1342,40 @@ bool NS(LineDensityProfileData_can_be_added)(
     typedef NS(buffer_size_t) buf_size_t;
     bool can_be_added = false;
 
-    buf_size_t num_dataptrs = ( buf_size_t )0u;
+    buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+    buf_size_t ndataptrs = ( buf_size_t )0u;
+
     NS(LineDensityProfileData) data;
-    NS(LineDensityProfileData_preset)( &data );
+    NS(arch_status_t) status = NS(LineDensityProfileData_clear)( &data );
+    status |= NS(LineDensityProfileData_set_capacity)( &data, capacity );
+    status |= NS(LineDensityProfileData_set_num_values)( &data, capacity );
+    ndataptrs = NS(LineDensityProfileData_num_dataptrs)( &data );
 
-    num_dataptrs = NS(LineDensityProfileData_num_dataptrs)( &data );
-    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )2u );
+    if( ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) &&
+        ( ndataptrs == ( buf_size_t )2u ) && ( slot_size > ( buf_size_t )0 ) &&
+        ( buffer != SIXTRL_NULLPTR ) &&
+        ( capacity > ( NS(math_abscissa_idx_t) )0 ) )
+    {
+        NS(buffer_size_t) sizes[ 2 ];
+        NS(buffer_size_t) counts[ 2 ];
 
-    can_be_added = NS(Buffer_can_add_object)( buffer, sizeof(
-        NS(LineDensityProfileData) ), num_dataptrs, SIXTRL_NULLPTR,
-            SIXTRL_NULLPTR, ptr_requ_objects, ptr_requ_slots,
-                ptr_requ_dataptrs );
+        status = NS(LineDensityProfileData_attributes_sizes)(
+            &sizes[ 0 ], ( buf_size_t )2u, &data, slot_size );
+
+        if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+        {
+            status = NS(LineDensityProfileData_attributes_counts)(
+                &counts[ 0 ], ( buf_size_t )2u, &data, slot_size );
+        }
+
+        if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+        {
+            can_be_added = NS(Buffer_can_add_object)( buffer, sizeof(
+                NS(LineDensityProfileData) ), ndataptrs, SIXTRL_NULLPTR,
+                    SIXTRL_NULLPTR, ptr_requ_objects, ptr_requ_slots,
+                        ptr_requ_dataptrs );
+        }
+    }
 
     return can_be_added;
 }
@@ -1370,9 +1394,6 @@ NS(LineDensityProfileData_new)(
     {
         buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
 
-        NS(arch_status_t) status = ( NS(arch_status_t)
-            )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
-
         SIXTRL_ARGPTR_DEC buf_size_t sizes[ 2u ];
         SIXTRL_ARGPTR_DEC buf_size_t counts[ 2u ];
         SIXTRL_ARGPTR_DEC buf_size_t offsets[ 2u ];
@@ -1380,13 +1401,14 @@ NS(LineDensityProfileData_new)(
         buf_size_t num_dataptrs = ( buf_size_t )0u;
 
         NS(LineDensityProfileData) data;
-        NS(LineDensityProfileData_preset)( &data );
-        NS(LineDensityProfileData_set_capacity)( &data, capacity );
-        NS(LineDensityProfileData_set_num_values)( &data, capacity );
-
+        NS(arch_status_t) status = NS(LineDensityProfileData_clear)( &data );
+        status |= NS(LineDensityProfileData_set_capacity)( &data, capacity );
+        status |= NS(LineDensityProfileData_set_num_values)( &data, capacity );
         num_dataptrs = NS(LineDensityProfileData_num_dataptrs)( &data );
 
-        if( num_dataptrs == ( buf_size_t )2u )
+        if( ( num_dataptrs == ( buf_size_t )2u ) &&
+            ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) &&
+            ( slot_size > ( buf_size_t )0 ) && ( buffer != SIXTRL_NULLPTR ) )
         {
             status = NS(LineDensityProfileData_attributes_offsets)(
                 &offsets[ 0 ], ( buf_size_t )2u, &data, slot_size );
@@ -1429,6 +1451,11 @@ SIXTRL_BE_ARGPTR_DEC NS(LineDensityProfileData)* NS(LineDensityProfileData_add)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)*
         added_elem = SIXTRL_NULLPTR;
 
+    if( num_values < ( NS(math_abscissa_idx_t) )0 )
+    {
+        num_values = ( NS(math_abscissa_idx_t) )0;
+    }
+
     if( ( capacity < num_values ) &&
         ( num_values > ( NS(math_abscissa_idx_t) )0 ) )
     {
@@ -1440,33 +1467,26 @@ SIXTRL_BE_ARGPTR_DEC NS(LineDensityProfileData)* NS(LineDensityProfileData_add)(
     {
         buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
 
-        NS(arch_status_t) status = ( NS(arch_status_t)
-            )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
-
         SIXTRL_ARGPTR_DEC buf_size_t sizes[ 2u ];
         SIXTRL_ARGPTR_DEC buf_size_t counts[ 2u ];
         SIXTRL_ARGPTR_DEC buf_size_t offsets[ 2u ];
 
         buf_size_t num_dataptrs = ( buf_size_t )0u;
 
-        if( num_values < ( NS(math_abscissa_idx_t) )0 )
-        {
-            num_values = ( NS(math_abscissa_idx_t) )0;
-        }
-
         NS(LineDensityProfileData) data;
-        NS(LineDensityProfileData_preset)( &data );
-        NS(LineDensityProfileData_set_capacity)( &data, capacity );
-        NS(LineDensityProfileData_set_num_values)( &data, num_values );
-        NS(LineDensityProfileData_set_method)( &data, method );
-        NS(LineDensityProfileData_set_values_addr)( &data, values_addr );
-        NS(LineDensityProfileData_set_z0)( &data, z0 );
-        NS(LineDensityProfileData_set_z0)( &data, dz );
-        NS(LineDensityProfileData_set_derivatives_addr)(
-            &data, derivatives_addr );
-
+        NS(arch_status_t) status = NS(LineDensityProfileData_clear)( &data );
+        status |= NS(LineDensityProfileData_set_capacity)( &data, capacity );
+        status |= NS(LineDensityProfileData_set_num_values)( &data, num_values );
+        status |= NS(LineDensityProfileData_set_method)( &data, method );
+        status |= NS(LineDensityProfileData_set_values_addr)( &data, values_addr );
+        status |= NS(LineDensityProfileData_set_z0)( &data, z0 );
+        status |= NS(LineDensityProfileData_set_z0)( &data, dz );
+        status |= NS(LineDensityProfileData_set_derivatives_addr)(
+                        &data, derivatives_addr );
         num_dataptrs = NS(LineDensityProfileData_num_dataptrs)( &data );
-        if( num_dataptrs == ( buf_size_t )2u )
+
+        if( ( num_dataptrs == ( buf_size_t )2u ) &&
+            ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) )
         {
             status = NS(LineDensityProfileData_attributes_offsets)(
                 &offsets[ 0 ], ( buf_size_t )2u, &data, slot_size );
@@ -1521,6 +1541,7 @@ NS(LineDensityProfileData_add_copy)(
 
         buf_size_t num_dataptrs = ( buf_size_t )0u;
         num_dataptrs = NS(LineDensityProfileData_num_dataptrs)( data );
+
         if( num_dataptrs == ( buf_size_t )2u )
         {
             status = NS(LineDensityProfileData_attributes_offsets)(

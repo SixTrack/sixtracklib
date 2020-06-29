@@ -880,7 +880,7 @@ SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SpaceChargeQGaussianProfile_copy)(
 
 typedef struct NS(LineDensityProfileData)
 {
-    NS(math_interpol_t)     method           SIXTRL_ALIGN( 8 );
+    NS(math_interpol_int_t) method           SIXTRL_ALIGN( 8 );
     NS(math_abscissa_idx_t) num_values       SIXTRL_ALIGN( 8 );
     NS(buffer_addr_t)       values_addr      SIXTRL_ALIGN( 8 );
     NS(buffer_addr_t)       derivatives_addr SIXTRL_ALIGN( 8 );
@@ -896,7 +896,7 @@ SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)*
 NS(LineDensityProfileData_preset)( SIXTRL_BE_ARGPTR_DEC
     NS(LineDensityProfileData)* SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN void NS(LineDensityProfileData_clear)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(LineDensityProfileData_clear)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)*
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT;
 
@@ -1041,31 +1041,38 @@ NS(LineDensityProfileData_prepare_interpolation)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_STATIC SIXTRL_FN void NS(LineDensityProfileData_set_num_values)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
+NS(LineDensityProfileData_set_num_values)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(math_abscissa_idx_t) const num_values ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN void NS(LineDensityProfileData_set_capacity)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
+NS(LineDensityProfileData_set_capacity)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(math_abscissa_idx_t) const capacity ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN void NS(LineDensityProfileData_set_z0)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
+NS(LineDensityProfileData_set_z0)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     SIXTRL_REAL_T const z0 ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN void NS(LineDensityProfileData_set_dz)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
+NS(LineDensityProfileData_set_dz)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     SIXTRL_REAL_T const z0 ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN void NS(LineDensityProfileData_set_values_addr)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
+NS(LineDensityProfileData_set_values_addr)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(buffer_addr_t) const values_addr ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN void NS(LineDensityProfileData_set_derivatives_addr)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
+NS(LineDensityProfileData_set_derivatives_addr)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(buffer_addr_t) const derivatives_addr ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN void NS(LineDensityProfileData_set_method)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
+NS(LineDensityProfileData_set_method)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(math_interpol_t) const method ) SIXTRL_NOEXCEPT;
 
@@ -1140,25 +1147,28 @@ NS(LineDensityProfileData_interpolate_2nd_derivative_ext)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(LineDensityProfileData_set_z0_ext)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(LineDensityProfileData_set_z0_ext)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     SIXTRL_REAL_T const z0 ) SIXTRL_NOEXCEPT;
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(LineDensityProfileData_set_dz_ext)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(LineDensityProfileData_set_dz_ext)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     SIXTRL_REAL_T const z0 ) SIXTRL_NOEXCEPT;
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(LineDensityProfileData_set_values_addr_ext)( SIXTRL_BUFFER_DATAPTR_DEC
         NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(buffer_addr_t) const values_addr ) SIXTRL_NOEXCEPT;
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(LineDensityProfileData_set_derivatives_addr_ext)( SIXTRL_BUFFER_DATAPTR_DEC
     NS(LineDensityProfileData)* SIXTRL_RESTRICT data, NS(buffer_addr_t) const
         derivatives_addr ) SIXTRL_NOEXCEPT;
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(LineDensityProfileData_set_method_ext)(
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(LineDensityProfileData_set_method_ext)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(math_interpol_t) const method ) SIXTRL_NOEXCEPT;
 
@@ -1227,6 +1237,7 @@ NS(LineDensityProfileData_attributes_counts)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(LineDensityProfileData_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    NS(math_abscissa_idx_t) const capacity,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)*
@@ -3028,23 +3039,29 @@ NS(LineDensityProfileData_preset)( SIXTRL_BE_ARGPTR_DEC
     return data;
 }
 
-SIXTRL_INLINE void NS(LineDensityProfileData_clear)( SIXTRL_BUFFER_DATAPTR_DEC
+SIXTRL_INLINE NS(arch_status_t)
+NS(LineDensityProfileData_clear)( SIXTRL_BUFFER_DATAPTR_DEC
     NS(LineDensityProfileData)* SIXTRL_RESTRICT data ) SIXTRL_NOEXCEPT
 {
     typedef SIXTRL_REAL_T real_t;
     typedef NS(math_abscissa_idx_t) absc_t;
     typedef NS(buffer_addr_t) addr_t;
 
+    NS(arch_status_t) status = (
+        NS(arch_status_t) )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
+
     SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
-    NS(LineDensityProfileData_set_method)(
+    status = NS(LineDensityProfileData_set_method)(
         data, NS(MATH_INTERPOL_NONE) );
 
-    NS(LineDensityProfileData_set_num_values)( data, ( absc_t )0 );
-    NS(LineDensityProfileData_set_values_addr)( data, ( addr_t )0 );
-    NS(LineDensityProfileData_set_derivatives_addr)( data, ( addr_t )0 );
-    NS(LineDensityProfileData_set_capacity)( data, ( absc_t )0 );
-    NS(LineDensityProfileData_set_z0)( data, ( real_t )0 );
-    NS(LineDensityProfileData_set_dz)( data, ( real_t )1 );
+    status |= NS(LineDensityProfileData_set_num_values)( data, ( absc_t )0 );
+    status |= NS(LineDensityProfileData_set_values_addr)( data, ( addr_t )0 );
+    status |= NS(LineDensityProfileData_set_derivatives_addr)( data, ( addr_t )0 );
+    status |= NS(LineDensityProfileData_set_capacity)( data, ( absc_t )0 );
+    status |= NS(LineDensityProfileData_set_z0)( data, ( real_t )0 );
+    status |= NS(LineDensityProfileData_set_dz)( data, ( real_t )1 );
+
+    return status;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -3106,8 +3123,15 @@ SIXTRL_INLINE NS(math_interpol_t) NS(LineDensityProfileData_method)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(LineDensityProfileData) *const
         SIXTRL_RESTRICT data ) SIXTRL_NOEXCEPT
 {
+    typedef NS(math_interpol_t) method_t;
     SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
-    return data->method;
+
+    SIXTRL_ASSERT(
+        ( ( method_t )data->method == NS(MATH_INTERPOL_NONE) ) ||
+        ( ( method_t )data->method == NS(MATH_INTERPOL_LINEAR) ) ||
+        ( ( method_t )data->method == NS(MATH_INTERPOL_CUBIC) ) );
+
+    return ( method_t )data->method;
 }
 
 SIXTRL_INLINE NS(math_abscissa_idx_t) NS(LineDensityProfileData_num_values)(
@@ -3331,10 +3355,13 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(LineDensityProfileData_interpolate_value)(
     SIXTRL_ASSERT( NS(LineDensityProfileData_derivatives_addr)( data ) !=
                    ( NS(buffer_addr_t) )0 );
 
-    return NS(Math_interpol_y_equ)( z, data->z0, data->dz,
+    return NS(Math_interpol_y_equ)( z,
+        NS(LineDensityProfileData_z0)( data ),
+        NS(LineDensityProfileData_dz)( data ),
         NS(LineDensityProfileData_const_values_begin)( data ),
         NS(LineDensityProfileData_const_derivatives_begin)( data ),
-        data->num_values, data->method );
+        NS(LineDensityProfileData_num_values)( data ),
+        NS(LineDensityProfileData_method)( data ) );
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T
@@ -3350,10 +3377,13 @@ NS(LineDensityProfileData_interpolate_1st_derivative)(
     SIXTRL_ASSERT( NS(LineDensityProfileData_derivatives_addr)( data ) !=
                    ( NS(buffer_addr_t) )0 );
 
-    return NS(Math_interpol_yp_equ)( z, data->z0, data->dz,
+    return NS(Math_interpol_yp_equ)( z,
+        NS(LineDensityProfileData_z0)( data ),
+        NS(LineDensityProfileData_dz)( data ),
         NS(LineDensityProfileData_const_values_begin)( data ),
         NS(LineDensityProfileData_const_derivatives_begin)( data ),
-        data->num_values, data->method );
+        NS(LineDensityProfileData_num_values)( data ),
+        NS(LineDensityProfileData_method)( data ) );
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T
@@ -3369,10 +3399,13 @@ NS(LineDensityProfileData_interpolate_2nd_derivative)(
     SIXTRL_ASSERT( NS(LineDensityProfileData_derivatives_addr)( data ) !=
                    ( NS(buffer_addr_t) )0 );
 
-    return NS(Math_interpol_ypp_equ)( z, data->z0, data->dz,
+    return NS(Math_interpol_ypp_equ)( z,
+        NS(LineDensityProfileData_z0)( data ),
+        NS(LineDensityProfileData_dz)( data ),
         NS(LineDensityProfileData_const_values_begin)( data ),
         NS(LineDensityProfileData_const_derivatives_begin)( data ),
-        data->num_values, data->method );
+        NS(LineDensityProfileData_num_values)( data ),
+        NS(LineDensityProfileData_method)( data ) );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -3407,60 +3440,68 @@ NS(LineDensityProfileData_prepare_interpolation)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_INLINE void NS(LineDensityProfileData_set_z0)(
+SIXTRL_INLINE NS(arch_status_t) NS(LineDensityProfileData_set_z0)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     SIXTRL_REAL_T const z0 ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
     data->z0 = z0;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE void NS(LineDensityProfileData_set_dz)(
+SIXTRL_INLINE NS(arch_status_t) NS(LineDensityProfileData_set_dz)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     SIXTRL_REAL_T const dz ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( dz >= ( SIXTRL_REAL_T )0 );
     data->dz = dz;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE void NS(LineDensityProfileData_set_num_values)(
+SIXTRL_INLINE NS(arch_status_t) NS(LineDensityProfileData_set_num_values)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(math_abscissa_idx_t) const num_values ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
     data->num_values = num_values;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE void NS(LineDensityProfileData_set_capacity)(
+SIXTRL_INLINE NS(arch_status_t) NS(LineDensityProfileData_set_capacity)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(math_abscissa_idx_t) const capacity ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
     data->capacity = capacity;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE void NS(LineDensityProfileData_set_values_addr)(
+SIXTRL_INLINE NS(arch_status_t) NS(LineDensityProfileData_set_values_addr)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(buffer_addr_t) const values_addr ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
     data->values_addr = values_addr;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE void NS(LineDensityProfileData_set_derivatives_addr)(
+SIXTRL_INLINE NS(arch_status_t) NS(LineDensityProfileData_set_derivatives_addr)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(buffer_addr_t) const derivatives_addr ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
     data->derivatives_addr = derivatives_addr;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE void NS(LineDensityProfileData_set_method)(
+SIXTRL_INLINE NS(arch_status_t) NS(LineDensityProfileData_set_method)(
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData)* SIXTRL_RESTRICT data,
     NS(math_interpol_t) const method ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
-    data->method = method;
+    data->method = ( NS(math_interpol_int_t) )method;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
