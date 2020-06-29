@@ -13,7 +13,6 @@
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
     #include "sixtracklib/common/internal/objects_type_id.h"
-    #include "sixtracklib/common/internal/compiler_attributes.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
     #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -37,7 +36,7 @@ NS(Drift);
 SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(Drift)* NS(Drift_preset)(
     SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN void NS(Drift_clear)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Drift_clear)(
     SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift ) SIXTRL_NOEXCEPT;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -62,6 +61,8 @@ SIXTRL_STATIC SIXTRL_FN NS(drift_real_t) NS(Drift_length)(
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Drift_set_length)(
     SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift,
     NS(drift_real_t) const length ) SIXTRL_NOEXCEPT;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Drift_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT destination,
@@ -105,6 +106,29 @@ SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(Drift)* NS(Drift_from_buffer)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Drift_attributes_offsets)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets_begin,
+    NS(buffer_size_t) const max_num_offsets,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Drift_attributes_sizes)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes_begin,
+    NS(buffer_size_t) const max_num_sizes,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(Drift_attributes_counts)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
+    NS(buffer_size_t) const max_num_counts,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t)
 NS(Drift_type_id_ext)( void ) SIXTRL_NOEXCEPT;
 
@@ -144,8 +168,9 @@ SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(DriftExact)*
 NS(DriftExact_preset)( SIXTRL_BE_ARGPTR_DEC NS(DriftExact)*
     SIXTRL_RESTRICT drift ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN void NS(DriftExact_clear)( SIXTRL_BE_ARGPTR_DEC
-    NS(DriftExact)* SIXTRL_RESTRICT drift ) SIXTRL_NOEXCEPT;
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(DriftExact_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(DriftExact)*
+        SIXTRL_RESTRICT drift ) SIXTRL_NOEXCEPT;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -217,6 +242,29 @@ NS(DriftExact_type_id_ext)( void ) SIXTRL_NOEXCEPT;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(DriftExact_attributes_offsets)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets_begin,
+    NS(buffer_size_t) const max_num_offsets,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(DriftExact_attributes_sizes)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes_begin,
+    NS(buffer_size_t) const max_num_sizes,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(DriftExact_attributes_counts)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
+    NS(buffer_size_t) const max_num_counts,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(DriftExact_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objs,
@@ -248,6 +296,7 @@ NS(DriftExact_add_copy)(
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
+    #include "sixtracklib/common/internal/compiler_attributes.h"
     #if !defined( _GPUCODE )
     #include "sixtracklib/common/buffer.h"
     #endif /* !defined( _GPUCODE ) */
@@ -264,11 +313,11 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Drift)* NS(Drift_preset)(
     return drift;
 }
 
-SIXTRL_INLINE void NS(Drift_clear)(
+SIXTRL_INLINE NS(arch_status_t) NS(Drift_clear)(
     SIXTRL_BE_ARGPTR_DEC NS(Drift)* SIXTRL_RESTRICT drift ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( drift != SIXTRL_NULLPTR );
-    NS(Drift_set_length)( drift, ( NS(drift_real_t) )0 );
+    return NS(Drift_set_length)( drift, ( NS(drift_real_t) )0 );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -281,21 +330,16 @@ SIXTRL_INLINE NS(buffer_size_t) NS(Drift_num_dataptrs)( SIXTRL_BE_ARGPTR_DEC
 }
 
 SIXTRL_INLINE NS(buffer_size_t) NS(Drift_num_slots)( SIXTRL_BE_ARGPTR_DEC const
-        NS(Drift) *const SIXTRL_RESTRICT drift,
+        NS(Drift) *const SIXTRL_RESTRICT SIXTRL_UNUSED( drift ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     NS(buffer_size_t) num_slots = ( NS(buffer_size_t) )0u;
-
-    if( ( drift != SIXTRL_NULLPTR ) && ( slot_size > ( NS(buffer_size_t) )0u ) )
-    {
-        NS(buffer_size_t) const requ_bytes =
-            NS(ManagedBuffer_get_slot_based_length)(
+    NS(buffer_size_t) const num_bytes = NS(ManagedBuffer_get_slot_based_length)(
                 sizeof( NS(Drift) ), slot_size );
 
-        num_slots = requ_bytes / slot_size;
-        if( num_slots * slot_size < requ_bytes ) ++num_slots;
-    }
-
+    SIXTRL_ASSERT( slot_size > ( NS(buffer_size_t) )0 );
+    num_slots = num_bytes / slot_size;
+    if( num_slots * slot_size < num_bytes ) ++num_slots;
     return num_slots;
 }
 
@@ -408,11 +452,11 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* NS(DriftExact_preset)(
     return drift;
 }
 
-SIXTRL_INLINE void NS(DriftExact_clear)(
+SIXTRL_INLINE NS(arch_status_t) NS(DriftExact_clear)(
     SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* SIXTRL_RESTRICT drift ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( drift != SIXTRL_NULLPTR );
-    NS(DriftExact_set_length)( drift, ( NS(drift_real_t) )0 );
+    return NS(DriftExact_set_length)( drift, ( NS(drift_real_t) )0 );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -425,21 +469,16 @@ SIXTRL_INLINE NS(buffer_size_t) NS(DriftExact_num_dataptrs)( SIXTRL_BE_ARGPTR_DE
 }
 
 SIXTRL_INLINE NS(buffer_size_t) NS(DriftExact_num_slots)( SIXTRL_BE_ARGPTR_DEC
-        const NS(DriftExact) *const SIXTRL_RESTRICT drift,
+        const NS(DriftExact) *const SIXTRL_RESTRICT SIXTRL_UNUSED( drift ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     NS(buffer_size_t) num_slots = ( NS(buffer_size_t) )0u;
-
-    if( ( drift != SIXTRL_NULLPTR ) && ( slot_size > ( NS(buffer_size_t) )0u ) )
-    {
-        NS(buffer_size_t) const requ_bytes =
-            NS(ManagedBuffer_get_slot_based_length)(
+    NS(buffer_size_t) const num_bytes = NS(ManagedBuffer_get_slot_based_length)(
                 sizeof( NS(DriftExact) ), slot_size );
 
-        num_slots = requ_bytes / slot_size;
-        if( num_slots * slot_size < requ_bytes ) ++num_slots;
-    }
-
+    SIXTRL_ASSERT( slot_size > ( NS(buffer_size_t) )0 );
+    num_slots = num_bytes / slot_size;
+    if( num_slots * slot_size < num_bytes ) ++num_slots;
     return num_slots;
 }
 
@@ -482,15 +521,15 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(DriftExact) const*
 NS(DriftExact_const_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC const
     NS(Object) *const SIXTRL_RESTRICT index_obj ) SIXTRL_NOEXCEPT
 {
-    typedef SIXTRL_BE_ARGPTR_DEC NS(DriftExact) const* ptr_drift_t;
-    ptr_drift_t elem = SIXTRL_NULLPTR;
+    typedef SIXTRL_BE_ARGPTR_DEC NS(DriftExact) const* ptr_elem_t;
+    ptr_elem_t elem = SIXTRL_NULLPTR;
 
     if( ( index_obj != SIXTRL_NULLPTR ) &&
         ( NS(Object_get_type_id)( index_obj ) ==
           NS(OBJECT_TYPE_DRIFT_EXACT) ) &&
         ( NS(Object_get_size)( index_obj ) >= sizeof( NS(DriftExact) ) ) )
     {
-        elem = ( ptr_drift_t )( uintptr_t )NS(Object_get_begin_addr)(
+        elem = ( ptr_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
             index_obj );
     }
 
@@ -550,7 +589,4 @@ SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(DriftExact)* NS(DriftExact_from_buffer)(
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
-
 #endif /* SIXTRACKLIB_COMMON_BE_DRIFT_BEAM_ELEMENT_DRIFT_H__ */
-
-/* end: sixtracklib/common/be_drift/be_drift.h */

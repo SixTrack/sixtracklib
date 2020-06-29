@@ -1,4 +1,4 @@
-set( SIXTRL_COMMON_BE_DRIFT_C99_HEADERS be_drift.h )
+set( SIXTRL_COMMON_BE_DRIFT_C99_HEADERS be_drift.h track.h )
 set( SIXTRL_COMMON_BE_DRIFT_C99_SOURCES be_drift.c )
 set( SIXTRL_COMMON_BE_DRIFT_CXX_HEADERS be_drift.hpp )
 
