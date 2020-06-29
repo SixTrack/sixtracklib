@@ -9,10 +9,13 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
-    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/internal/buffer_main_defines.h"
+    #include "sixtracklib/common/internal/compiler_attributes.h"
     #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
+    #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
@@ -31,100 +34,129 @@ NS(Cavity);
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Cavity_get_num_dataptrs)(
-    SIXTRL_BE_ARGPTR_DEC  const NS(Cavity) *const SIXTRL_RESTRICT cavity );
+SIXTRL_STATIC SIXTRL_FN NS(object_type_id_t) NS(Cavity_type_id)(
+    void ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(Cavity_get_num_slots)(
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Cavity_num_dataptrs)(
+    SIXTRL_BE_ARGPTR_DEC  const NS(Cavity) *const
+        SIXTRL_RESTRICT cavity ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(Cavity_num_slots)(
     SIXTRL_BE_ARGPTR_DEC  const NS(Cavity) *const SIXTRL_RESTRICT cavity,
-    NS(buffer_size_t) const slot_size );
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC NS(Cavity)* NS(Cavity_preset)(
-    SIXTRL_BE_ARGPTR_DEC  NS(Cavity)* SIXTRL_RESTRICT cavity );
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(Cavity)* NS(Cavity_preset)(
+    SIXTRL_BE_ARGPTR_DEC  NS(Cavity)* SIXTRL_RESTRICT cavity ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Cavity_get_voltage)(
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cavity );
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(Cavity_voltage)(
+    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const
+        SIXTRL_RESTRICT cavity ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Cavity_get_frequency)(
-    SIXTRL_BE_ARGPTR_DEC  const NS(Cavity) *const SIXTRL_RESTRICT cavity );
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(Cavity_frequency)(
+    SIXTRL_BE_ARGPTR_DEC  const NS(Cavity) *const
+        SIXTRL_RESTRICT cavity ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_REAL_T NS(Cavity_get_lag)(
-    SIXTRL_BE_ARGPTR_DEC  const NS(Cavity) *const SIXTRL_RESTRICT cavity );
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(Cavity_lag)(
+    SIXTRL_BE_ARGPTR_DEC  const NS(Cavity) *const
+        SIXTRL_RESTRICT cavity ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC void NS(Cavity_set_voltage)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Cavity_set_voltage)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity,
-    SIXTRL_REAL_T const voltage );
+    SIXTRL_REAL_T const voltage ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC void NS(Cavity_set_frequency)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Cavity_set_frequency)(
     SIXTRL_BE_ARGPTR_DEC  NS(Cavity)* SIXTRL_RESTRICT cavity,
-    SIXTRL_REAL_T const frequency );
+    SIXTRL_REAL_T const frequency ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC void NS(Cavity_set_lag)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Cavity_set_lag)(
     SIXTRL_BE_ARGPTR_DEC  NS(Cavity)* SIXTRL_RESTRICT cavity,
-    SIXTRL_REAL_T const lag );
+    SIXTRL_REAL_T const lag ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC void NS(Cavity_clear)(
-    SIXTRL_BE_ARGPTR_DEC  NS(Cavity)* SIXTRL_RESTRICT cavity );
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Cavity_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC int NS(Cavity_copy)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(Cavity_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT destination,
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT source );
-
-SIXTRL_FN SIXTRL_STATIC int NS(Cavity_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT rhs );
-
-SIXTRL_FN SIXTRL_STATIC int NS(Cavity_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold );
+    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const
+        SIXTRL_RESTRICT source ) SIXTRL_NOEXCEPT;
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity) const*
-NS(BufferIndex_get_const_cavity)(
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const index_obj );
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(Cavity) const*
+NS(Cavity_const_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC const
+    NS(Object) *const index_obj ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
-NS(BufferIndex_get_cavity)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* index_obj );
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(Cavity)*
+NS(Cavity_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC
+    NS(Object)* index_obj ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity) const*
-NS(BeamElements_managed_buffer_get_const_cavity)(
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(Cavity) const*
+NS(Cavity_const_from_manged_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const be_index,
-    NS(buffer_size_t) const slot_size );
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
-NS(BeamElements_managed_buffer_get_cavity)(
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(Cavity)*
+NS(Cavity_from_manged_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
-    NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size );
+    NS(buffer_size_t) const be_index,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
 
 #if !defined( _GPUCODE )
 
-SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity) const*
-NS(BeamElements_buffer_get_const_cavity)(
+SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(Cavity) const*
+NS(Cavity_const_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    NS(buffer_size_t) const be_index );
+    NS(buffer_size_t) const be_index ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
-NS(BeamElements_buffer_get_cavity)(
+SIXTRL_STATIC SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(Cavity)*
+NS(Cavity_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(buffer_size_t) const be_index );
+    NS(buffer_size_t) const be_index ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC bool NS(Cavity_can_be_added)(
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(Cavity_attributes_offsets)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets_begin,
+    NS(buffer_size_t) const max_num_offsets,
+    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(Cavity_attributes_sizes)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes_begin,
+    NS(buffer_size_t) const max_num_sizes,
+    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(Cavity_attributes_counts)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
+    NS(buffer_size_t) const max_num_counts,
+    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t) NS(Cavity_type_id_ext)(
+    void ) SIXTRL_NOEXCEPT;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(Cavity_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_objects,
     SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_slots,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_dataptrs );
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)*
+        SIXTRL_RESTRICT requ_dataptrs ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)* NS(Cavity_new)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(Cavity)*
+NS(Cavity_new)( SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)* NS(Cavity_add)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(Cavity)*
+NS(Cavity_add)( SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_REAL_T  const voltage, SIXTRL_REAL_T  const frequency,
     SIXTRL_REAL_T  const lag );
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(Cavity)*
 NS(Cavity_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cavity );
@@ -140,6 +172,7 @@ NS(Cavity_add_copy)(
 /* ************************************************************************* */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/buffer/managed_buffer.h"
     #if !defined( _GPUCODE )
         #include "sixtracklib/common/buffer.h"
     #endif /* !defined( _GPUCODE ) */
@@ -149,401 +182,187 @@ NS(Cavity_add_copy)(
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
+SIXTRL_INLINE NS(object_type_id_t) NS(Cavity_type_id)( void ) SIXTRL_NOEXCEPT
+{
+    return ( NS(object_type_id_t) )NS(OBJECT_TYPE_CAVITY);
+}
 
-SIXTRL_INLINE NS(buffer_size_t) NS(Cavity_get_num_dataptrs)(
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cavity )
+SIXTRL_INLINE NS(buffer_size_t) NS(Cavity_num_dataptrs)( SIXTRL_BE_ARGPTR_DEC
+    const NS(Cavity) *const SIXTRL_RESTRICT
+        SIXTRL_UNUSED( cavity ) ) SIXTRL_NOEXCEPT
 {
     return ( NS(buffer_size_t) )0u;
 }
 
-SIXTRL_INLINE NS(buffer_size_t) NS(Cavity_get_num_slots)(
-    SIXTRL_BE_ARGPTR_DEC  const NS(Cavity) *const SIXTRL_RESTRICT cavity,
-    NS(buffer_size_t) const slot_size )
+SIXTRL_INLINE NS(buffer_size_t) NS(Cavity_num_slots)( SIXTRL_BE_ARGPTR_DEC const
+    NS(Cavity) *const SIXTRL_RESTRICT SIXTRL_UNUSED( cavity ),
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
-    typedef NS(buffer_size_t) buf_size_t;
-    typedef NS(Cavity)        beam_element_t;
+    NS(buffer_size_t) num_slots = ( NS(buffer_size_t) )0;
+    NS(buffer_size_t) const num_bytes = NS(ManagedBuffer_get_slot_based_length)(
+        sizeof( NS(Cavity) ), slot_size );
 
-    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
-
-    ( void )cavity;
-
-    buf_size_t extent = NS(ManagedBuffer_get_slot_based_length)(
-        sizeof( beam_element_t ), slot_size );
-
-    SIXTRL_ASSERT( ( slot_size == ZERO ) || ( ( extent % slot_size ) == ZERO ) );
-    return ( slot_size > ZERO ) ? ( extent / slot_size ) : ( ZERO );
+    SIXTRL_ASSERT( slot_size > ( NS(buffer_size_t) )0 );
+    num_slots = num_bytes / slot_size;
+    if( num_slots * slot_size < num_bytes ) ++num_slots;
+    return num_slots;
 }
 
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Cavity)* NS(Cavity_preset)(
-    SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity )
+    SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity ) SIXTRL_NOEXCEPT
 {
-    NS(Cavity_clear)( cavity );
+    if( cavity != SIXTRL_NULLPTR ) NS(Cavity_clear)( cavity );
     return cavity;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_get_voltage)(
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cavity )
+SIXTRL_INLINE NS(arch_status_t) NS(Cavity_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity ) SIXTRL_NOEXCEPT
+{
+    NS(arch_status_t) status = NS(Cavity_set_voltage)(
+        cavity, ( SIXTRL_REAL_T )0 );
+
+    status |= NS(Cavity_set_frequency)( cavity, ( SIXTRL_REAL_T )0 );
+    status |= NS(Cavity_set_lag)( cavity, ( SIXTRL_REAL_T )0 );
+    return status;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_voltage)( SIXTRL_BE_ARGPTR_DEC const
+    NS(Cavity) *const SIXTRL_RESTRICT cavity ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( cavity != SIXTRL_NULLPTR );
     return cavity->voltage;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_get_frequency)(
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cavity )
+SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_frequency)( SIXTRL_BE_ARGPTR_DEC const
+    NS(Cavity) *const SIXTRL_RESTRICT cavity ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( cavity != SIXTRL_NULLPTR );
     return cavity->frequency;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_get_lag)(
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cavity )
+SIXTRL_INLINE SIXTRL_REAL_T NS(Cavity_lag)( SIXTRL_BE_ARGPTR_DEC const
+    NS(Cavity) *const SIXTRL_RESTRICT cavity ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( cavity != SIXTRL_NULLPTR );
     return cavity->lag;
 }
 
-SIXTRL_INLINE void NS(Cavity_set_voltage)(
+SIXTRL_INLINE NS(arch_status_t) NS(Cavity_set_voltage)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity,
-    SIXTRL_REAL_T const voltage )
+    SIXTRL_REAL_T const voltage ) SIXTRL_NOEXCEPT
 {
-    if( cavity != SIXTRL_NULLPTR ) cavity->voltage = voltage;
-    return;
+    SIXTRL_ASSERT( cavity != SIXTRL_NULLPTR );
+    cavity->voltage = voltage;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE void NS(Cavity_set_frequency)(
+SIXTRL_INLINE NS(arch_status_t) NS(Cavity_set_frequency)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity,
-    SIXTRL_REAL_T const frequency )
+    SIXTRL_REAL_T const frequency ) SIXTRL_NOEXCEPT
 {
-    if( cavity != SIXTRL_NULLPTR ) cavity->frequency = frequency;
-    return;
+    SIXTRL_ASSERT( cavity != SIXTRL_NULLPTR );
+    cavity->frequency = frequency;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE void NS(Cavity_set_lag)(
+SIXTRL_INLINE NS(arch_status_t) NS(Cavity_set_lag)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity,
-    SIXTRL_REAL_T const lag )
+    SIXTRL_REAL_T const lag ) SIXTRL_NOEXCEPT
 {
-    if( cavity != SIXTRL_NULLPTR ) cavity->lag = lag;
-    return;
+    SIXTRL_ASSERT( cavity != SIXTRL_NULLPTR );
+    cavity->lag = lag;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE void NS(Cavity_clear)(
-    SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT cavity )
-{
-    NS(Cavity_set_voltage)(   cavity, ( SIXTRL_REAL_T )0 );
-    NS(Cavity_set_frequency)( cavity, ( SIXTRL_REAL_T )0 );
-    NS(Cavity_set_lag)(       cavity, ( SIXTRL_REAL_T )0 );
-
-    return;
-}
-
-SIXTRL_INLINE int NS(Cavity_copy)(
+SIXTRL_INLINE NS(arch_status_t) NS(Cavity_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(Cavity)* SIXTRL_RESTRICT destination,
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT source )
+    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const
+        SIXTRL_RESTRICT source ) SIXTRL_NOEXCEPT
 {
-    int success = -1;
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
     if( ( destination != SIXTRL_NULLPTR ) && ( source != SIXTRL_NULLPTR ) )
     {
-        NS(Cavity_set_voltage)(
-            destination, NS(Cavity_get_voltage)( source ) );
+        status = ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 
-        NS(Cavity_set_frequency)(
-            destination, NS(Cavity_get_frequency)( source ) );
-
-        NS(Cavity_set_lag)( destination, NS(Cavity_get_lag)( source ) );
-
-        success = 0;
-    }
-
-    return success;
-}
-
-SIXTRL_INLINE int NS(Cavity_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT rhs )
-{
-    int compare_value = -1;
-
-    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
-    {
-        compare_value = 0;
-
-        if( NS(Cavity_get_voltage)( lhs ) >
-            NS(Cavity_get_voltage)( rhs ) )
+        if( destination != source )
         {
-            compare_value = +1;
-        }
-        else if( NS(Cavity_get_voltage)( lhs ) <
-                 NS(Cavity_get_voltage)( rhs ) )
-        {
-            compare_value = -1;
-        }
+            status |= NS(Cavity_set_voltage)( destination,
+                NS(Cavity_voltage)( source ) );
 
-        if( compare_value == 0 )
-        {
-            if( NS(Cavity_get_frequency)( lhs ) >
-                NS(Cavity_get_frequency)( rhs ) )
-            {
-                compare_value = +1;
-            }
-            else if( NS(Cavity_get_frequency)( lhs ) <
-                     NS(Cavity_get_frequency)( rhs ) )
-            {
-                compare_value = -1;
-            }
-        }
+            status |= NS(Cavity_set_frequency)( destination,
+                NS(Cavity_frequency)( source ) );
 
-        if( compare_value == 0 )
-        {
-            if( NS(Cavity_get_lag)( lhs ) > NS(Cavity_get_lag)( rhs ) )
-            {
-                compare_value = +1;
-            }
-            else if( NS(Cavity_get_lag)( lhs ) < NS(Cavity_get_lag)( rhs ) )
-            {
-                compare_value = -1;
-            }
+            status |= NS(Cavity_set_lag)( destination,
+                NS(Cavity_lag)( source ) );
         }
     }
-    else if( lhs != SIXTRL_NULLPTR )
-    {
-        compare_value = +1;
-    }
 
-    return compare_value;
-}
-
-SIXTRL_INLINE int NS(Cavity_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold )
-{
-    typedef SIXTRL_REAL_T       real_t;
-
-    SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0.0;
-
-    int compare_value = -1;
-
-    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) &&
-        ( treshold >= ZERO ) )
-    {
-        compare_value = 0;
-
-        if( compare_value == 0 )
-        {
-            real_t const diff =
-                NS(Cavity_get_voltage)( lhs ) - NS(Cavity_get_voltage)( rhs );
-
-            real_t const abs_diff = ( diff >= ZERO ) ? diff : -diff;
-
-            if( abs_diff > treshold )
-            {
-                if( diff > ZERO )
-                {
-                    compare_value = +1;
-                }
-                else if( diff < ZERO )
-                {
-                    compare_value = -1;
-                }
-            }
-        }
-
-        if( compare_value == 0 )
-        {
-            real_t const diff = NS(Cavity_get_frequency)( lhs ) -
-                                NS(Cavity_get_frequency)( rhs );
-
-            real_t const abs_diff = ( diff >= ZERO ) ? diff : -diff;
-
-            if( abs_diff > treshold )
-            {
-                if( diff > ZERO )
-                {
-                    compare_value = +1;
-                }
-                else if( diff < ZERO )
-                {
-                    compare_value = -1;
-                }
-            }
-        }
-
-        if( compare_value == 0 )
-        {
-            real_t const diff =
-                NS(Cavity_get_lag)( lhs ) - NS(Cavity_get_lag)( rhs );
-
-            real_t const abs_diff = ( diff >= ZERO ) ? diff : -diff;
-
-            if( abs_diff > treshold )
-            {
-                if( diff > ZERO )
-                {
-                    compare_value = +1;
-                }
-                else if( diff < ZERO )
-                {
-                    compare_value = -1;
-                }
-            }
-        }
-    }
-    else if( ( lhs != SIXTRL_NULLPTR ) && ( treshold >= ZERO ) )
-    {
-        compare_value = +1;
-    }
-
-    return compare_value;
+    return status;
 }
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity) const*
-NS(BufferIndex_get_const_cavity)(
-    SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object) *const index_obj )
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Cavity) const*
+NS(Cavity_const_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object)
+    *const SIXTRL_RESTRICT obj ) SIXTRL_NOEXCEPT
 {
-    typedef NS(Cavity) beam_element_t;
-    typedef SIXTRL_BUFFER_OBJ_DATAPTR_DEC beam_element_t const* ptr_to_be_t;
-    ptr_to_be_t ptr_to_be = SIXTRL_NULLPTR;
-
-    if( ( index_obj != SIXTRL_NULLPTR ) &&
-        ( NS(Object_get_type_id)( index_obj ) == NS(OBJECT_TYPE_CAVITY) ) &&
-        ( NS(Object_get_size)( index_obj ) >= sizeof( beam_element_t ) ) )
+    SIXTRL_BE_ARGPTR_DEC NS(Cavity) const* elem = SIXTRL_NULLPTR;
+    if( ( obj != SIXTRL_NULLPTR ) &&
+        ( NS(Object_get_type_id)( obj ) == NS(OBJECT_TYPE_CAVITY) ) &&
+        ( NS(Object_get_size)( obj ) >= sizeof( NS(Cavity) ) ) )
     {
-        ptr_to_be = ( ptr_to_be_t )( uintptr_t
-            )NS(Object_get_begin_addr)( index_obj );
+        elem = ( SIXTRL_BE_ARGPTR_DEC NS(Cavity) const* )(
+            uintptr_t )NS(Object_get_begin_addr)( obj );
     }
 
-    return ptr_to_be;
+    return elem;
 }
 
-SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
-NS(BufferIndex_get_cavity)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* index_obj )
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Cavity)* NS(Cavity_from_obj_index)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)* obj ) SIXTRL_NOEXCEPT
 {
     return ( SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
-        )NS(BufferIndex_get_const_cavity)( index_obj );
+        )NS(Cavity_const_from_obj_index)( obj );
 }
 
-SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity) const*
-NS(BeamElements_managed_buffer_get_const_cavity)(
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Cavity) const*
+NS(Cavity_const_from_manged_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
-    NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size )
+    NS(buffer_size_t) const be_index,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
-    return NS(BufferIndex_get_const_cavity)(
+    return NS(Cavity_const_from_obj_index)(
         NS(ManagedBuffer_get_const_object)( pbuffer, be_index, slot_size ) );
 }
 
-SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
-NS(BeamElements_managed_buffer_get_cavity)(
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Cavity)* NS(Cavity_from_manged_buffer)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT pbuffer,
-    NS(buffer_size_t) const be_index, NS(buffer_size_t) const slot_size )
+    NS(buffer_size_t) const be_index,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
-    return NS(BufferIndex_get_cavity)(
+    return NS(Cavity_from_obj_index)(
         NS(ManagedBuffer_get_object)( pbuffer, be_index, slot_size ) );
 }
 
 #if !defined( _GPUCODE )
 
-SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity) const*
-NS(BeamElements_buffer_get_const_cavity)(
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Cavity) const*
+NS(Cavity_const_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    NS(buffer_size_t) const be_index )
+    NS(buffer_size_t) const be_index ) SIXTRL_NOEXCEPT
 {
-    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* ptr_raw_t;
-    return NS(BeamElements_managed_buffer_get_const_cavity)(
-        ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ),
-        be_index, NS(Buffer_get_slot_size)( buffer ) );
+    return NS(Cavity_const_from_obj_index)( NS(Buffer_get_const_object)(
+        buffer, be_index ) );
 }
 
-SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)*
-NS(BeamElements_buffer_get_cavity)(
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(Cavity)* NS(Cavity_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(buffer_size_t) const be_index )
+    NS(buffer_size_t) const be_index ) SIXTRL_NOEXCEPT
 {
-    typedef SIXTRL_BUFFER_DATAPTR_DEC unsigned char* ptr_raw_t;
-    return NS(BeamElements_managed_buffer_get_cavity)(
-        ( ptr_raw_t )( uintptr_t )NS(Buffer_get_data_begin_addr)( buffer ),
-        be_index, NS(Buffer_get_slot_size)( buffer ) );
-}
-
-SIXTRL_INLINE bool NS(Cavity_can_be_added)(
-    SIXTRL_BE_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_BE_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_objects,
-    SIXTRL_BE_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_slots,
-    SIXTRL_BE_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_dataptrs )
-{
-    typedef NS(buffer_size_t) buf_size_t;
-
-    buf_size_t const num_dataptrs =
-        NS(Cavity_get_num_dataptrs)( SIXTRL_NULLPTR );
-
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes  = SIXTRL_NULLPTR;
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts = SIXTRL_NULLPTR;
-
-    return NS(Buffer_can_add_object)( buffer, sizeof( NS(Cavity) ),
-        num_dataptrs, sizes, counts, requ_objects, requ_slots, requ_dataptrs );
-}
-
-SIXTRL_INLINE SIXTRL_ARGPTR_DEC NS(Cavity)* NS(Cavity_new)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
-{
-    typedef NS(buffer_size_t)                       buf_size_t;
-    typedef SIXTRL_REAL_T                           real_t;
-    typedef NS(Cavity)                              elem_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC   elem_t*     ptr_elem_t;
-
-    buf_size_t const num_dataptrs =
-        NS(Cavity_get_num_dataptrs)( SIXTRL_NULLPTR );
-
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
-
-    elem_t temp_obj;
-    temp_obj.voltage   = ( real_t )0.0;
-    temp_obj.frequency = ( real_t )0.0;
-    temp_obj.lag       = ( real_t )0.0;
-
-    return ( ptr_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
-        NS(Buffer_add_object)( buffer, &temp_obj, sizeof( temp_obj ),
-        NS(OBJECT_TYPE_CAVITY), num_dataptrs, offsets, sizes, counts ) );
-}
-
-SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)* NS(Cavity_add)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_REAL_T  const voltage,
-    SIXTRL_REAL_T  const frequency,
-    SIXTRL_REAL_T  const lag )
-{
-    typedef NS(buffer_size_t)                       buf_size_t;
-    typedef NS(Cavity)                              elem_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC   elem_t*     ptr_elem_t;
-
-    buf_size_t const num_dataptrs =
-        NS(Cavity_get_num_dataptrs)( SIXTRL_NULLPTR );
-
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
-
-    elem_t temp_obj;
-    temp_obj.voltage   = voltage;
-    temp_obj.frequency = frequency;
-    temp_obj.lag       = lag;
-
-    return ( ptr_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
-        NS(Buffer_add_object)( buffer, &temp_obj, sizeof( temp_obj ),
-            NS(OBJECT_TYPE_CAVITY), num_dataptrs, offsets, sizes, counts ) );
-}
-
-SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)* NS(Cavity_add_copy)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_BE_ARGPTR_DEC const NS(Cavity) *const SIXTRL_RESTRICT cavity )
-{
-    return NS(Cavity_add)( buffer, NS(Cavity_get_voltage)( cavity ),
-        NS(Cavity_get_frequency)( cavity ), NS(Cavity_get_lag)( cavity ) );
-
+    return NS(Cavity_from_obj_index)(
+        NS(Buffer_get_object)( buffer, be_index ) );
 }
 
 #endif /* !defined( _GPUCODE ) */
@@ -551,7 +370,4 @@ SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(Cavity)* NS(Cavity_add_copy)(
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
-
 #endif /* SIXTRACKLIB_COMMON_BE_CAVITY_BEAM_ELEMENT_CAVITY_H__ */
-
-/*end: sixtracklib/common/be_cavity/be_cavity.h */
