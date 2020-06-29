@@ -477,19 +477,18 @@ namespace SIXTRL_CXX_NAMESPACE
     template< typename T >
     SIXTRL_INLINE typename TDipoleEdge< T >::size_type
     TDipoleEdge< T >::RequiredNumDataPtrs( typename TDipoleEdge< T >::buffer_t
-        const& SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT
+        const& SIXTRL_RESTRICT_REF SIXTRL_UNUSED( buffer ) ) SIXTRL_NOEXCEPT
     {
-        return ::NS(DipoleEdge_get_required_num_dataptrs)(
-            buffer.getCApiPtr(), nullptr );
+        return ::NS(DipoleEdge_num_dataptrs)( nullptr );
     }
 
     template< typename T >
     SIXTRL_INLINE typename TDipoleEdge< T >::size_type
     TDipoleEdge< T >::RequiredNumDataPtrs( const
         typename TDipoleEdge< T >::c_buffer_t *const SIXTRL_RESTRICT
-            buffer ) SIXTRL_NOEXCEPT
+            SIXTRL_UNUSED( buffer ) ) SIXTRL_NOEXCEPT
     {
-        return ::NS(DipoleEdge_get_required_num_dataptrs)( buffer, nullptr );
+        return ::NS(DipoleEdge_num_dataptrs)( nullptr );
     }
 
     template< typename T > void TDipoleEdge< T >::preset() SIXTRL_NOEXCEPT
@@ -684,19 +683,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
 
     DipoleEdge::size_type DipoleEdge::RequiredNumDataPtrs( DipoleEdge::buffer_t
-        const& SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT
+        const& SIXTRL_RESTRICT_REF SIXTRL_UNUSED( buffer ) ) SIXTRL_NOEXCEPT
     {
-        return ::NS(DipoleEdge_get_required_num_dataptrs)(
-            buffer.getCApiPtr(), nullptr );
+        return ::NS(DipoleEdge_num_dataptrs)( nullptr );
     }
 
 
     DipoleEdge::size_type DipoleEdge::RequiredNumDataPtrs(
         SIXTRL_BUFFER_ARGPTR_DEC const DipoleEdge::c_buffer_t *const
-                SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT
+                SIXTRL_RESTRICT SIXTRL_UNUSED( buffer ) ) SIXTRL_NOEXCEPT
     {
-        return ::NS(DipoleEdge_get_required_num_dataptrs)(
-            ptr_buffer, nullptr );
+        return ::NS(DipoleEdge_num_dataptrs)( nullptr );
     }
 
     void DipoleEdge::preset() SIXTRL_NOEXCEPT
@@ -711,12 +708,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
     DipoleEdge::value_type DipoleEdge::getR21() const SIXTRL_NOEXCEPT
     {
-        return ::NS(DipoleEdge_get_r21)( this->getCApiPtr() );
+        return ::NS(DipoleEdge_r21)( this->getCApiPtr() );
     }
 
     DipoleEdge::value_type DipoleEdge::getR43() const SIXTRL_NOEXCEPT
     {
-        return ::NS(DipoleEdge_get_r43)( this->getCApiPtr() );
+        return ::NS(DipoleEdge_r43)( this->getCApiPtr() );
     }
 
     /* ----------------------------------------------------------------- */
