@@ -16,13 +16,14 @@ NS(object_type_id_t) NS(Drift_type_id_ext)( void ) SIXTRL_NOEXCEPT
 NS(arch_status_t) NS(Drift_attributes_offsets)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const max_num_offsets,
-    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const
+        SIXTRL_RESTRICT SIXTRL_UNUSED( drift ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
 
-    if( ( offsets != SIXTRL_NULLPTR ) &&
+    if( ( offsets != SIXTRL_NULLPTR ) && ( slot_size > ZERO ) &&
         ( max_num_offsets > ( buf_size_t )0u ) )
     {
         SIXTRACKLIB_SET_VALUES( buf_size_t, offsets, max_num_offsets, ZERO );
@@ -34,13 +35,14 @@ NS(arch_status_t) NS(Drift_attributes_offsets)(
 NS(arch_status_t) NS(Drift_attributes_sizes)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes,
     NS(buffer_size_t) const max_num_sizes,
-    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const
+        SIXTRL_RESTRICT SIXTRL_UNUSED( drift ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
 
-    if( ( sizes != SIXTRL_NULLPTR ) &&
+    if( ( sizes != SIXTRL_NULLPTR ) && ( slot_size > ZERO ) &&
         ( max_num_sizes > ( buf_size_t )0u ) )
     {
         SIXTRACKLIB_SET_VALUES( buf_size_t, sizes, max_num_sizes, ZERO );
@@ -52,13 +54,14 @@ NS(arch_status_t) NS(Drift_attributes_sizes)(
 NS(arch_status_t) NS(Drift_attributes_counts)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts,
     NS(buffer_size_t) const max_num_counts,
-    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const SIXTRL_RESTRICT drift,
+    SIXTRL_BE_ARGPTR_DEC const NS(Drift) *const
+        SIXTRL_RESTRICT SIXTRL_UNUSED( drift ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
 
-    if( ( counts != SIXTRL_NULLPTR ) &&
+    if( ( counts != SIXTRL_NULLPTR ) && ( slot_size > ZERO ) &&
         ( max_num_counts > ( buf_size_t )0u ) )
     {
         SIXTRACKLIB_SET_VALUES( buf_size_t, counts, max_num_counts, ZERO );
@@ -164,61 +167,58 @@ NS(object_type_id_t) NS(DriftExact_type_id_ext)( void ) SIXTRL_NOEXCEPT
 NS(arch_status_t) NS(DriftExact_attributes_offsets)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const max_num_offsets,
-    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const
+        SIXTRL_RESTRICT SIXTRL_UNUSED( drift ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
-    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( offsets != SIXTRL_NULLPTR ) && ( drift != SIXTRL_NULLPTR ) &&
+    if( ( offsets != SIXTRL_NULLPTR ) &&
         ( max_num_offsets > ZERO ) && ( slot_size > ZERO ) )
     {
         SIXTRACKLIB_SET_VALUES( buf_size_t, offsets, max_num_offsets, ZERO );
-        status = NS(ARCH_STATUS_SUCCESS);
     }
 
-    return status;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
 NS(arch_status_t) NS(DriftExact_attributes_sizes)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes,
     NS(buffer_size_t) const max_num_sizes,
-    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const
+        SIXTRL_RESTRICT SIXTRL_UNUSED( drift ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
-    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( sizes != SIXTRL_NULLPTR ) && ( drift != SIXTRL_NULLPTR ) &&
+    if( ( sizes != SIXTRL_NULLPTR ) &&
         ( max_num_sizes > ZERO ) && ( slot_size > ZERO ) )
     {
         SIXTRACKLIB_SET_VALUES( buf_size_t, sizes, max_num_sizes, ZERO );
-        status = NS(ARCH_STATUS_SUCCESS);
     }
 
-    return status;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
 NS(arch_status_t) NS(DriftExact_attributes_counts)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts,
     NS(buffer_size_t) const max_num_counts,
-    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const SIXTRL_RESTRICT drift,
+    SIXTRL_BE_ARGPTR_DEC const NS(DriftExact) *const
+        SIXTRL_RESTRICT SIXTRL_UNUSED( drift ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
-    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( counts != SIXTRL_NULLPTR ) && ( drift != SIXTRL_NULLPTR ) &&
+    if( ( counts != SIXTRL_NULLPTR ) &&
         ( max_num_counts > ZERO ) && ( slot_size > ZERO ) )
     {
         SIXTRACKLIB_SET_VALUES( buf_size_t, counts, max_num_counts, ZERO );
-        status = NS(ARCH_STATUS_SUCCESS);
     }
 
-    return status;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
