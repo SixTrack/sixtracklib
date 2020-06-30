@@ -42,8 +42,8 @@ SIXTRL_INLINE int NS(Track_particle_xy_shift)(
 {
     typedef NS(particle_real_t) real_t;
 
-    real_t const minus_dx = -( NS(XYShift_get_dx)( xy_shift ) );
-    real_t const minus_dy = -( NS(XYShift_get_dy)( xy_shift ) );
+    real_t const minus_dx = -( NS(XYShift_dx)( xy_shift ) );
+    real_t const minus_dy = -( NS(XYShift_dy)( xy_shift ) );
 
     SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, index ) ==
                   ( NS(particle_index_t) )1 );
