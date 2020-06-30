@@ -160,7 +160,7 @@ if __name__ == '__main__':
     assert cmp_output_buffer.base != output_buffer.base
 
     nn = cmp_output_buffer.n_objects
-    ABS_DIFF = 2e-14
+    ABS_DIFF = 5e-11
 
     for ii in range(nn):
         _cmp_particles = cmp_output_buffer.get_object(ii, cls=st.Particles)
