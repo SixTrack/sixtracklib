@@ -6272,6 +6272,21 @@ st_LineDensityProfileData_prepare_interpolation = \
 st_LineDensityProfileData_prepare_interpolation.argtypes = [st_LineDensityProfileData_p]
 st_LineDensityProfileData_prepare_interpolation.restype = st_arch_status_t
 
+st_LineDensityProfileData_interpolate_value = \
+    sixtracklib.st_LineDensityProfileData_interpolate_value_ext
+st_LineDensityProfileData_interpolate_value.argtypes = [st_LineDensityProfileData_p, ct.c_double]
+st_LineDensityProfileData_interpolate_value.restype = ct.c_double
+
+st_LineDensityProfileData_interpolate_1st_derivative = \
+    sixtracklib.st_LineDensityProfileData_interpolate_1st_derivative_ext
+st_LineDensityProfileData_interpolate_1st_derivative.argtypes = [st_LineDensityProfileData_p, ct.c_double]
+st_LineDensityProfileData_interpolate_1st_derivative.restype = ct.c_double
+
+st_LineDensityProfileData_interpolate_2nd_derivative = \
+    sixtracklib.st_LineDensityProfileData_interpolate_1st_derivative_ext
+st_LineDensityProfileData_interpolate_2nd_derivative.argtypes = [st_LineDensityProfileData_p, ct.c_double]
+st_LineDensityProfileData_interpolate_2nd_derivative.restype = ct.c_double
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 st_SpaceChargeInterpolatedProfile_p = ct.c_void_p

@@ -535,15 +535,15 @@ class BeamBeam6D(CObject):
 
 class SpaceChargeCoasting(CObject):
     _typeid = st_SpaceChargeCoasting_type_id()
-    num_particles = CField(0, "float64", default=0.0)
-    circumference = CField(1, "float64", default=1.0)
-    sigma_x = CField(2, "float64", default=1.0 )
-    sigma_y = CField(3, "float64", default=1.0 )
-    length = CField(4, "float64", default=0.0 )
-    x_co = CField(5, "float64", default=0.0 )
-    y_co = CField(6, "float64", default=0.0 )
-    min_sigma_diff = CField(7, "float64", default="1e-10")
-    enabled = CField(8, "uint64", default=1)
+    num_particles = CField(0, "float64", default=0.0, alignment=8)
+    circumference = CField(1, "float64", default=1.0, alignment=8)
+    sigma_x = CField(2, "float64", default=1.0, alignment=8)
+    sigma_y = CField(3, "float64", default=1.0, alignment=8 )
+    length = CField(4, "float64", default=0.0, alignment=8 )
+    x_co = CField(5, "float64", default=0.0, alignment=8 )
+    y_co = CField(6, "float64", default=0.0, alignment=8 )
+    min_sigma_diff = CField(7, "float64", default=1e-10, alignment=8)
+    enabled = CField(8, "uint64", default=1, alignment=8)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -551,23 +551,41 @@ class SpaceChargeCoasting(CObject):
 
 class SpaceChargeQGaussianProfile(CObject):
     _typeid = st_SpaceChargeQGaussianProfile_type_id()
-    num_particles = CField(0, "float64", default=0.0)
-    bunchlength_rms = CField(1, "float64", default=1.0)
-    sigma_x = CField(2, "float64", default=1.0 )
-    sigma_y = CField(3, "float64", default=1.0 )
-    length = CField(4, "float64", default=0.0 )
-    x_co = CField(5, "float64", default=0.0 )
-    y_co = CField(6, "float64", default=0.0 )
-    min_sigma_diff = CField(7, "float64", default="1e-10")
-    q_param = CField(8, "float64", default=0.0)
-    b_param = CField(9, "float64", default=1.0)
-    enabled = CField(10, "uint64", default=1)
+    num_particles = CField(0, "float64", default=0.0, alignment=8)
+    bunchlength_rms = CField(1, "float64", default=1.0, alignment=8)
+    sigma_x = CField(2, "float64", default=1.0, alignment=8 )
+    sigma_y = CField(3, "float64", default=1.0, alignment=8 )
+    length = CField(4, "float64", default=0.0, alignment=8 )
+    x_co = CField(5, "float64", default=0.0, alignment=8 )
+    y_co = CField(6, "float64", default=0.0, alignment=8)
+    min_sigma_diff = CField(7, "float64", default=1e-10, alignment=8)
+    q_param = CField(8, "float64", default=0.0, alignment=8)
+    b_param = CField(9, "float64", default=1.0, alignment=8)
+    enabled = CField(10, "uint64", default=1, alignment=8)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
 class SpaceChargeInterpolatedProfile(CObject):
     _typeid = st_SpaceChargeInterpolatedProfile_type_id()
+    num_particles = CField(0, "float64", default=0.0, alignment=8)
+    sigma_x = CField(1, "float64", default=1.0, alignment=8)
+    sigma_y = CField(2, "float64", default=1.0, alignment=8)
+    length = CField(3, "float64", default=0.0, alignment=8)
+    x_co = CField(4, "float64", default=0.0, alignment=8 )
+    y_co = CField(5, "float64", default=0.0, alignment=8 )
+    interpol_data_addr = CField(6, "uint64", default=0, alignment=8)
+    line_density_prof_fallback = CField(7, "float64", default=1.0, alignment=8)
+    min_sigma_diff = CField(8, "float64", default=1e-10, alignment=8)
+    enabled = CField(9, "uint64", default=1, alignment=8)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @property
+    def interpol_data_offset(self):
+        return self._offsets[6] - self._offsets[0]
+
 
 
 class LimitRectEllipse(CObject):
