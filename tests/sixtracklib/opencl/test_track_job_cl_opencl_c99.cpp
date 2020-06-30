@@ -901,7 +901,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobTrackLineCompare )
             ::NS(Particles_buffer_get_const_particles)( pb, 0 ) );
 
         SIXTRL_ASSERT( particles != nullptr );
-        ::NS(BeamMonitor_clear_all)( eb );
+        ::NS(BeamMonitor_reset_all_in_buffer)( eb );
 
         std::cout << "node " << ( kk + size_t{ 1 } )
                   << " / " << num_nodes << "\r\n";
@@ -1138,7 +1138,7 @@ TEST( C99_TrackJobClTests, TrackParticles )
 
     for( size_t kk = size_t{ 0 } ; node_it != node_end ; ++node_it, ++kk )
     {
-        ::NS(BeamMonitor_clear_all)( eb );
+        ::NS(BeamMonitor_reset_all_in_buffer)( eb );
         ::NS(Particles_copy)( particles, ::NS(Particles_buffer_get_particles)(
             in_particle_buffer, size_t{ 0 } ) );
 
