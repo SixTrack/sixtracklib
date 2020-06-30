@@ -247,7 +247,7 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
 
     buf_size_t const num_beam_monitors = buf_size_t{ 2 };
 
-    SIXTRL_ASSERT( ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) ==
+    SIXTRL_ASSERT( ::NS(BeamMonitor_num_monitors_in_buffer)( eb ) ==
                    num_beam_monitors );
 
     /* -------------------------------------------------------------------- */

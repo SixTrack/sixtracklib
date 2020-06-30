@@ -90,7 +90,7 @@ TEST( C99_CudaWrappersBeamMonitorAssignOutputTests,
 
     size_t const num_beam_monitors = size_t{ 2 };
 
-    SIXTRL_ASSERT( ::NS(BeamMonitor_get_num_of_beam_monitor_objects)(
+    SIXTRL_ASSERT( ::NS(BeamMonitor_num_monitors_in_buffer)(
         beam_elements_buffer) == num_beam_monitors );
 
     /* -------------------------------------------------------------------- */
