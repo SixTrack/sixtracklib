@@ -16,6 +16,11 @@
     #include "sixtracklib/common/buffer.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
+NS(object_type_id_t) NS(DipoleEdge_type_id_ext)( void ) SIXTRL_NOEXCEPT
+{
+    return NS(DipoleEdge_type_id)();
+}
+
 NS(arch_status_t) NS(DipoleEdge_attributes_offsets)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const max_num_offsets,
@@ -74,11 +79,6 @@ NS(arch_status_t) NS(DipoleEdge_attributes_counts)(
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-NS(object_type_id_t) NS(DipoleEdge_type_id_ext)( void ) SIXTRL_NOEXCEPT
-{
-    return NS(DipoleEdge_type_id)();
-}
 
 bool NS(DipoleEdge_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
