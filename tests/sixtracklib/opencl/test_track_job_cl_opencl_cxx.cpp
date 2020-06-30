@@ -1142,7 +1142,7 @@ TEST( CXXOpenCLTrackJobClTests, TrackParticles )
         ASSERT_TRUE( ptr_output_buffer->getNumObjects() ==
                       cmp_output_buffer.getNumObjects() );
 
-        double const ABS_ERR = double{ 2e-14 };
+        double const ABS_ERR = double{ 5e-11 };
 
         if( ::NS(Particles_buffers_compare_values)(
                 ptr_output_buffer->getCApiPtr(),
