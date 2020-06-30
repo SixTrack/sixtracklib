@@ -2199,24 +2199,29 @@ namespace SIXTRL_CXX_NAMESPACE
                 buf_size_t num_be_monitors = buf_size_t{ 0 };
                 std::vector< size_t > be_mon_indices( num_e_by_e_objs, ZERO );
 
-                ret = ::NS(BeamMonitor_get_beam_monitor_indices_from_buffer)(
-                    belems, be_mon_indices.size(), be_mon_indices.data(),
-                        &num_be_monitors );
+                num_be_monitors = ::NS(BeamMonitor_monitor_indices_from_buffer)(
+                    be_mon_indices.data(), be_mon_indices.size(), belems );
 
-                SIXTRL_ASSERT( num_be_monitors <= be_mon_indices.size() );
-
-                auto ind_end = be_mon_indices.begin();
-
-                if( num_be_monitors > buf_size_t{ 0 } )
+                if( num_be_monitors <= be_mon_indices.size() )
                 {
-                    std::advance( ind_end, num_be_monitors );
+                    auto ind_end = be_mon_indices.begin();
+
+                    if( num_be_monitors > buf_size_t{ 0 } )
+                    {
+                        std::advance( ind_end, num_be_monitors );
+                    }
+
+                    this->doSetBeamMonitorIndices(
+                        be_mon_indices.begin(), ind_end );
+                    SIXTRL_ASSERT( num_be_monitors == this->numBeamMonitors() );
+
+                    this->doSetMinElementId( min_elem_id );
+                    this->doSetMaxElementId( max_elem_id );
                 }
-
-                this->doSetBeamMonitorIndices( be_mon_indices.begin(), ind_end );
-                SIXTRL_ASSERT( num_be_monitors == this->numBeamMonitors() );
-
-                this->doSetMinElementId( min_elem_id );
-                this->doSetMaxElementId( max_elem_id );
+                else
+                {
+                    ret = -1;
+                }
             }
 
             success = ( ret == 0 );
