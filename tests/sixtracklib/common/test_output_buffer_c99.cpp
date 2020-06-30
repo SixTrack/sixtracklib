@@ -112,7 +112,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
     buf_size_t until_turn_elem_by_elem = buf_size_t{ 0 };
 
     ASSERT_TRUE( buf_size_t{ 0 } ==
-        ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) );
+        ::NS(BeamMonitor_num_monitors_in_buffer)( eb ) );
 
     ret = NS(OutputBuffer_calculate_output_buffer_params)( eb, particles,
         until_turn_elem_by_elem, &num_objects, &num_slots, &num_dataptrs,
@@ -349,7 +349,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
             skip_turns, ::NS(Buffer_get_objects_end)( eb ) );
 
     SIXTRL_ASSERT( ret == 0 );
-    SIXTRL_ASSERT( ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) ==
+    SIXTRL_ASSERT( ::NS(BeamMonitor_num_monitors_in_buffer)( eb ) ==
                    buf_size_t{ 2 } );
 
     SIXTRL_ASSERT( ::NS(Buffer_get_num_of_objects)( eb ) ==
@@ -368,7 +368,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
     ASSERT_TRUE( ret == 0 );
     ASSERT_TRUE( num_objects ==
-        ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) );
+        ::NS(BeamMonitor_num_monitors_in_buffer)( eb ) );
 
     ASSERT_TRUE( num_slots != buf_size_t{ 0 } );
     ASSERT_TRUE( num_dataptrs != buf_size_t{ 0 } );
@@ -418,7 +418,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
                 ::NS(Object_get_begin_addr)( obj ) ) );
 
         SIXTRL_ASSERT( monitor != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamMonitor_get_stored_num_particles)( monitor ) >
+        SIXTRL_ASSERT( ::NS(BeamMonitor_stored_num_particles)( monitor ) >
                      buf_size_t{ 0 } );
 
         out_particles = ::NS(Particles_buffer_get_const_particles)(
@@ -428,7 +428,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
         ASSERT_TRUE( static_cast< buf_size_t >(
             ::NS(Particles_get_num_of_particles)( out_particles ) ) >=
-                ::NS(BeamMonitor_get_stored_num_particles)( monitor ) );
+                ::NS(BeamMonitor_stored_num_particles)( monitor ) );
     }
 
     /* -------------------------------------------------------------------- */
@@ -493,7 +493,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
                 ::NS(Object_get_begin_addr)( obj ) ) );
 
         SIXTRL_ASSERT( monitor != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamMonitor_get_stored_num_particles)( monitor ) >
+        SIXTRL_ASSERT( ::NS(BeamMonitor_stored_num_particles)( monitor ) >
                      buf_size_t{ 0 } );
 
         out_particles = ::NS(Particles_buffer_get_const_particles)(
@@ -503,7 +503,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
         ASSERT_TRUE( static_cast< buf_size_t >(
             ::NS(Particles_get_num_of_particles)( out_particles ) ) >=
-                ::NS(BeamMonitor_get_stored_num_particles)( monitor ) );
+                ::NS(BeamMonitor_stored_num_particles)( monitor ) );
     }
 
     /* -------------------------------------------------------------------- */
@@ -573,7 +573,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
                 ::NS(Object_get_begin_addr)( obj ) ) );
 
         SIXTRL_ASSERT( monitor != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamMonitor_get_stored_num_particles)( monitor ) >
+        SIXTRL_ASSERT( ::NS(BeamMonitor_stored_num_particles)( monitor ) >
                      buf_size_t{ 0 } );
 
         out_particles = ::NS(Particles_buffer_get_const_particles)(
@@ -583,7 +583,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
         ASSERT_TRUE( static_cast< buf_size_t >(
             ::NS(Particles_get_num_of_particles)( out_particles ) ) >=
-                ::NS(BeamMonitor_get_stored_num_particles)( monitor ) );
+                ::NS(BeamMonitor_stored_num_particles)( monitor ) );
     }
 
     /* ===================================================================== */
@@ -619,7 +619,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
         target_num_turns, skip_turns, ::NS(Buffer_get_objects_end)( eb ) );
 
     SIXTRL_ASSERT( ret == 0 );
-    SIXTRL_ASSERT( ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) ==
+    SIXTRL_ASSERT( ::NS(BeamMonitor_num_monitors_in_buffer)( eb ) ==
                    buf_size_t{ 2 } );
 
     SIXTRL_ASSERT( ::NS(Buffer_get_num_of_objects)( eb ) ==
@@ -638,7 +638,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
     ASSERT_TRUE( ret == 0 );
     ASSERT_TRUE( num_objects == buf_size_t{ 1 } +
-        ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) );
+        ::NS(BeamMonitor_num_monitors_in_buffer)( eb ) );
 
     ASSERT_TRUE( num_slots != buf_size_t{ 0 } );
     ASSERT_TRUE( num_dataptrs != buf_size_t{ 0 } );
@@ -695,7 +695,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
                 ::NS(Object_get_begin_addr)( obj ) ) );
 
         SIXTRL_ASSERT( monitor != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamMonitor_get_stored_num_particles)( monitor ) >
+        SIXTRL_ASSERT( ::NS(BeamMonitor_stored_num_particles)( monitor ) >
                      buf_size_t{ 0 } );
 
         out_particles = ::NS(Particles_buffer_get_const_particles)(
@@ -705,7 +705,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
         ASSERT_TRUE( static_cast< buf_size_t >(
             ::NS(Particles_get_num_of_particles)( out_particles ) ) >=
-                ::NS(BeamMonitor_get_stored_num_particles)( monitor ) );
+                ::NS(BeamMonitor_stored_num_particles)( monitor ) );
     }
 
     /* -------------------------------------------------------------------- */
@@ -777,7 +777,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
                 ::NS(Object_get_begin_addr)( obj ) ) );
 
         SIXTRL_ASSERT( monitor != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamMonitor_get_stored_num_particles)( monitor ) >
+        SIXTRL_ASSERT( ::NS(BeamMonitor_stored_num_particles)( monitor ) >
                      buf_size_t{ 0 } );
 
         out_particles = ::NS(Particles_buffer_get_const_particles)(
@@ -787,7 +787,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
         ASSERT_TRUE( static_cast< buf_size_t >(
             ::NS(Particles_get_num_of_particles)( out_particles ) ) >=
-                ::NS(BeamMonitor_get_stored_num_particles)( monitor ) );
+                ::NS(BeamMonitor_stored_num_particles)( monitor ) );
     }
 
     /* -------------------------------------------------------------------- */
@@ -864,7 +864,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
                 ::NS(Object_get_begin_addr)( obj ) ) );
 
         SIXTRL_ASSERT( monitor != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamMonitor_get_stored_num_particles)( monitor ) >
+        SIXTRL_ASSERT( ::NS(BeamMonitor_stored_num_particles)( monitor ) >
                      buf_size_t{ 0 } );
 
         out_particles = ::NS(Particles_buffer_get_const_particles)(
@@ -874,7 +874,7 @@ TEST( C99_CommonOutputBuffer, OutputBufferCalculateParameters )
 
         ASSERT_TRUE( static_cast< buf_size_t >(
             ::NS(Particles_get_num_of_particles)( out_particles ) ) >=
-                     ::NS(BeamMonitor_get_stored_num_particles)( monitor ) );
+                     ::NS(BeamMonitor_stored_num_particles)( monitor ) );
     }
 
     /* ===================================================================== */

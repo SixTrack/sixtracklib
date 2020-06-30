@@ -168,13 +168,13 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
 
         ASSERT_TRUE( assign_item != nullptr );
 
-        be_monitor_t const* be_mon = ::NS(BeamElements_buffer_get_beam_monitor)(
+        be_monitor_t const* be_mon = ::NS(BeamMonitor_const_from_buffer)(
             beam_elements, ::NS(AssignAddressItem_dest_elem_index)(
                 assign_item ) );
 
         SIXTRL_ASSERT( be_mon != nullptr );
 
-        SIXTRL_ASSERT( ::NS(BeamMonitor_get_out_address)( be_mon ) ==
+        SIXTRL_ASSERT( ::NS(BeamMonitor_out_address)( be_mon ) ==
             ::NS(buffer_addr_t){ 0 } );
 
         ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
@@ -182,14 +182,14 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
                 beam_elements, static_cast< ::NS(buffer_addr_t) >(
                     ii * dest_slot_size ) ) );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_mon ) ==
+        ASSERT_TRUE( ::NS(BeamMonitor_out_address)( be_mon ) ==
             static_cast< ::NS(buffer_addr_t) >( ii * dest_slot_size ) );
 
         ASSERT_TRUE( ::NS(AssignAddressItem_remap_assignment)( assign_item,
             beam_elements, ::NS(buffer_addr_t){ 192 } ) ==
                 ::NS(ARCH_STATUS_SUCCESS) );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_mon ) ==
+        ASSERT_TRUE( ::NS(BeamMonitor_out_address)( be_mon ) ==
             static_cast< ::NS(buffer_addr_t) >( ii * dest_slot_size + 192 ) );
 
         ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
@@ -197,7 +197,7 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
                 beam_elements, -( static_cast< ::NS(buffer_addr_diff_t) >(
                     ii * dest_slot_size + 192 ) ) ) );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_mon ) ==
+        ASSERT_TRUE( ::NS(BeamMonitor_out_address)( be_mon ) ==
             ::NS(buffer_addr_t){ 0 } );
     }
 
@@ -209,9 +209,8 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
         particle_set_t const* pset = ::NS(Particles_buffer_get_const_particles)(
             output_buffer, out_buffer_indices[ ii ] );
 
-        be_monitor_t const* be_mon =
-            ::NS(BeamElements_buffer_get_const_beam_monitor)( beam_elements,
-                be_mon_indices[ ii ] );
+        be_monitor_t const* be_mon = ::NS(BeamMonitor_const_from_buffer)(
+            beam_elements, be_mon_indices[ ii ] );
 
         SIXTRL_ASSERT( assign_item != nullptr );
         SIXTRL_ASSERT( pset != nullptr );
@@ -221,7 +220,7 @@ TEST( C99_Common_Buffer_AssignAddressItemTests, BeamMonitorAssignment )
             ::NS(AssignAddressItem_perform_assignment)( assign_item,
                 beam_elements, output_buffer ) );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_mon ) ==
+        ASSERT_TRUE( ::NS(BeamMonitor_out_address)( be_mon ) ==
             static_cast< ::NS(buffer_addr_t) >( reinterpret_cast< uintptr_t >(
                 pset ) ) );
 
