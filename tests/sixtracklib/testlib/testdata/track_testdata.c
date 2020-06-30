@@ -329,8 +329,8 @@ SIXTRL_HOST_FN NS(Buffer)*
 
                     case NS(OBJECT_TYPE_MULTIPOLE):
                     {
-                        typedef NS(MultiPole) belem_t;
-                        num_dataptrs += NS(MultiPole_get_num_dataptrs)(
+                        typedef NS(Multipole) belem_t;
+                        num_dataptrs += NS(Multipole_num_dataptrs)(
                             ( belem_t const* )( uintptr_t )beginaddr );
 
                         break;
@@ -338,28 +338,27 @@ SIXTRL_HOST_FN NS(Buffer)*
 
                     case NS(OBJECT_TYPE_XYSHIFT):
                     {
-                        typedef NS(XYShift) belem_t;
-                        num_dataptrs += NS(XYShift_get_num_dataptrs)(
-                            ( belem_t const* )( uintptr_t )beginaddr );
+                        typedef SIXTRL_BE_ARGPTR_DEC NS(XYShift) const* ptr_t;
+                        num_dataptrs += NS(XYShift_num_dataptrs)(
+                            ( ptr_t )( uintptr_t )beginaddr );
 
                         break;
                     }
 
                     case NS(OBJECT_TYPE_SROTATION):
                     {
-                        typedef NS(SRotation) belem_t;
-                        num_dataptrs += NS(SRotation_get_num_dataptrs)(
-                            ( belem_t const* )( uintptr_t )beginaddr );
+                        typedef SIXTRL_BE_ARGPTR_DEC NS(SRotation) const* ptr_t;
+                        num_dataptrs += NS(SRotation_num_dataptrs)(
+                            ( ptr_t )( uintptr_t )beginaddr );
 
                         break;
                     }
 
                     case NS(OBJECT_TYPE_CAVITY):
                     {
-                        typedef NS(Cavity) belem_t;
-                        num_dataptrs += NS(Cavity_get_num_dataptrs)(
-                            ( belem_t const* )( uintptr_t )beginaddr );
-
+                        typedef SIXTRL_BE_ARGPTR_DEC NS(Cavity) const* ptr_t;
+                        num_dataptrs += NS(Cavity_num_dataptrs)(
+                            ( ptr_t )( uintptr_t )beginaddr );
                         break;
                     }
 
@@ -435,69 +434,49 @@ SIXTRL_HOST_FN NS(Buffer)*
 
                         case NS(OBJECT_TYPE_MULTIPOLE):
                         {
-                            typedef NS(MultiPole) belem_t;
+                            typedef SIXTRL_BE_ARGPTR_DEC NS(Multipole) const*
+                                    ptr_elem_t;
 
-                            belem_t const* orig_belem =
-                                ( belem_t const* )( uintptr_t )beginaddr;
-
-                            belem_t* copied_belem = NS(MultiPole_add)(
-                                beam_elements_buffer,
-                                NS(MultiPole_get_order)( orig_belem ),
-                                NS(MultiPole_get_const_bal)( orig_belem ),
-                                NS(MultiPole_get_length)( orig_belem ),
-                                NS(MultiPole_get_hxl)( orig_belem ),
-                                NS(MultiPole_get_hyl)( orig_belem ) );
-
+                            SIXTRL_BE_ARGPTR_DEC NS(Multipole)* copied_belem =
+                            NS(Multipole_add_copy)( beam_elements_buffer,
+                                ( ptr_elem_t )( uintptr_t )beginaddr );
                             if( copied_belem == SIXTRL_NULLPTR ) success = -1;
                             break;
                         }
 
                         case NS(OBJECT_TYPE_XYSHIFT):
                         {
-                            typedef NS(XYShift) belem_t;
-
-                            belem_t const* orig_belem =
-                                ( belem_t const* )( uintptr_t )beginaddr;
-
-                            belem_t* copied_belem = NS(XYShift_add)(
-                                beam_elements_buffer,
-                                NS(XYShift_get_dx)( orig_belem ),
-                                NS(XYShift_get_dy)( orig_belem ) );
-
+                            typedef NS(XYShift) elem_t;
+                            typedef SIXTRL_BE_ARGPTR_DEC elem_t* ptr_dest_t;
+                            typedef SIXTRL_BE_ARGPTR_DEC elem_t const* ptr_t;
+                            ptr_t orig = ( ptr_t )( uintptr_t )beginaddr;
+                            ptr_dest_t copied_belem = NS(XYShift_add_copy)(
+                                beam_elements_buffer, orig );
                             if( copied_belem == SIXTRL_NULLPTR ) success = -1;
                             break;
                         }
 
                         case NS(OBJECT_TYPE_SROTATION):
                         {
-                            typedef NS(SRotation) belem_t;
-
-                            belem_t const* orig_belem =
-                                ( belem_t const* )( uintptr_t )beginaddr;
-
-                            belem_t* copied_belem = NS(SRotation_add_detailed)(
-                                beam_elements_buffer,
-                                NS(SRotation_get_cos_angle)( orig_belem ),
-                                NS(SRotation_get_sin_angle)( orig_belem ) );
-
+                            typedef NS(SRotation) elem_t;
+                            typedef SIXTRL_BE_ARGPTR_DEC elem_t* ptr_dest_t;
+                            typedef SIXTRL_BE_ARGPTR_DEC elem_t const* ptr_t;
+                            ptr_t orig = ( ptr_t )( uintptr_t )beginaddr;
+                            ptr_dest_t copied_belem = NS(SRotation_add_copy)(
+                                beam_elements_buffer, orig );
                             if( copied_belem == SIXTRL_NULLPTR ) success = -1;
                             break;
                         }
 
                         case NS(OBJECT_TYPE_CAVITY):
                         {
-                            typedef NS(Cavity) belem_t;
-
-                            belem_t const* orig_belem =
-                                ( belem_t const* )( uintptr_t )beginaddr;
-
-                            belem_t* copied_belem = NS(Cavity_add)(
-                                beam_elements_buffer,
-                                NS(Cavity_get_voltage)( orig_belem ),
-                                NS(Cavity_get_frequency)( orig_belem ),
-                                NS(Cavity_get_lag)( orig_belem ) );
-
-                            if( copied_belem == SIXTRL_NULLPTR ) success = -1;
+                            typedef SIXTRL_BE_ARGPTR_DEC NS(Cavity) const* ptr_t;
+                            success = ( SIXTRL_NULLPTR != NS(Cavity_add_copy)(
+                                beam_elements_buffer, ( ptr_t )( uintptr_t
+                                    )beginaddr ) )
+                                ? ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS
+                                : ( NS(arch_status_t)
+                                    )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
                             break;
                         }
 
@@ -524,5 +503,3 @@ SIXTRL_HOST_FN NS(Buffer)*
 
     return beam_elements_buffer;
 }
-
-/* end: tests/sixtracklib/testlib/testdata/track_testdata.c */
