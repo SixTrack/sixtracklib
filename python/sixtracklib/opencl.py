@@ -103,7 +103,7 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
         st_ClContextBase_reset_kernel_arguments,
         st_ClContextBase_assign_kernel_argument,
         st_ClContextBase_assign_kernel_argument_value,
-        st_ClContextBase_assign_kernel_argument_ptr,
+        st_ClContextBase_assign_kernel_argument_raw_ptr,
         st_ClContextBase_calculate_kernel_num_work_items,
         st_ClContextBase_run_kernel,
         st_ClContextBase_run_kernel_wgsize,
