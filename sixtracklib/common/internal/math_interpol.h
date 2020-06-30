@@ -33,6 +33,8 @@ SIXTRL_STATIC SIXTRL_FN NS(math_abscissa_idx_t) NS(Math_abscissa_index_equ_ex)(
 
 /* ------------------------------------------------------------------------- */
 
+typedef SIXTRL_UINT64_T NS(math_interpol_int_t);
+
 typedef enum
 {
     NS(MATH_INTERPOL_LINEAR) = 0,
