@@ -88,17 +88,17 @@ NS(arch_status_t) NS(BeamMonitor_calculate_output_buffer_params_detailed)(
     NS(particle_index_t) const min_turn_id,
     NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_objects,
     NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_slots,
-    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_data_ptrs,
+    NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_ptrs,
     NS(buffer_size_t)* SIXTRL_RESTRICT ptr_num_garbage,
     NS(buffer_size_t) const out_buffer_slot_size )
 {
-    typedef NS(buffer_size_t)                               buf_size_t;
-    typedef NS(particle_index_t)                            index_t;
-    typedef NS(be_monitor_turn_t)                           nturn_t;
-    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*  ptr_obj_t;
-    typedef SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)*           ptr_beam_monitor_t;
-    typedef NS(buffer_addr_t)                               address_t;
-    typedef NS(object_type_id_t)                            type_id_t;
+    typedef NS(buffer_size_t) buf_size_t;
+    typedef NS(particle_index_t) index_t;
+    typedef NS(be_monitor_turn_t) nturn_t;
+    typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* ptr_obj_t;
+    typedef SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor)* ptr_beam_monitor_t;
+    typedef NS(buffer_addr_t) address_t;
+    typedef NS(object_type_id_t) type_id_t;
 
     NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
@@ -140,10 +140,9 @@ NS(arch_status_t) NS(BeamMonitor_calculate_output_buffer_params_detailed)(
 
                 buf_size_t required_store_particles = ZERO;
 
-                nturn_t const skip  = NS(BeamMonitor_get_skip)( monitor );
-                nturn_t const start = NS(BeamMonitor_get_start)( monitor );
-                nturn_t const num_stores =
-                    NS(BeamMonitor_get_num_stores)( monitor );
+                nturn_t const skip  = NS(BeamMonitor_skip)( monitor );
+                nturn_t const start = NS(BeamMonitor_start)( monitor );
+                nturn_t const num_stores = NS(BeamMonitor_num_stores)( monitor );
 
                 if( ( start >= first_turn_id ) ||
                     ( NS(BeamMonitor_is_rolling)( monitor ) ) )
@@ -181,25 +180,10 @@ NS(arch_status_t) NS(BeamMonitor_calculate_output_buffer_params_detailed)(
 
     if( status == SIXTRL_ARCH_STATUS_SUCCESS )
     {
-        if(  ptr_num_objects != SIXTRL_NULLPTR )
-        {
-            *ptr_num_objects  = num_objects;
-        }
-
-        if(  ptr_num_slots != SIXTRL_NULLPTR )
-        {
-            *ptr_num_slots = num_slots;
-        }
-
-        if(  ptr_num_data_ptrs != SIXTRL_NULLPTR )
-        {
-            *ptr_num_data_ptrs  = num_dataptrs;
-        }
-
-        if(  ptr_num_garbage != SIXTRL_NULLPTR )
-        {
-            *ptr_num_garbage  = num_garbage;
-        }
+        if( ptr_num_objects != SIXTRL_NULLPTR ) *ptr_num_objects = num_objects;
+        if( ptr_num_slots   != SIXTRL_NULLPTR ) *ptr_num_slots   = num_slots;
+        if( ptr_num_garbage != SIXTRL_NULLPTR ) *ptr_num_garbage = num_garbage;
+        if( ptr_num_ptrs    != SIXTRL_NULLPTR ) *ptr_num_ptrs    = num_dataptrs;
     }
 
     return status;
@@ -309,9 +293,7 @@ NS(arch_status_t) NS(BeamMonitor_prepare_output_buffer_detailed)(
         return status;
     }
 
-    num_particles_per_turn = ( buf_size_t )(
-        1u + max_part_id - min_part_id );
-
+    num_particles_per_turn = ( buf_size_t )( 1u + max_part_id - min_part_id );
     SIXTRL_ASSERT( num_particles_per_turn > ZERO );
     status = SIXTRL_ARCH_STATUS_SUCCESS;
 
@@ -325,8 +307,8 @@ NS(arch_status_t) NS(BeamMonitor_prepare_output_buffer_detailed)(
             ptr_beam_monitor_t monitor = ( ptr_beam_monitor_t )( uintptr_t
                 )NS(Object_get_begin_addr)( be_it );
 
-            nturn_t const start = NS(BeamMonitor_get_start)( monitor );
-            nturn_t const nstores = NS(BeamMonitor_get_num_stores)( monitor );
+            nturn_t const start = NS(BeamMonitor_start)( monitor );
+            nturn_t const nstores = NS(BeamMonitor_num_stores)( monitor );
 
             if( ( start >= first_turn_id ) && ( nstores > TZERO ) )
             {
@@ -338,15 +320,9 @@ NS(arch_status_t) NS(BeamMonitor_prepare_output_buffer_detailed)(
 
                 if( particles != SIXTRL_NULLPTR )
                 {
-                    NS(BeamMonitor_set_min_particle_id)(
-                        monitor, min_part_id );
-
-                    NS(BeamMonitor_set_max_particle_id)(
-                        monitor, max_part_id );
-
-                    NS(BeamMonitor_set_out_address)(
-                        monitor, ( address_t )0u );
-
+                    NS(BeamMonitor_set_min_particle_id)( monitor, min_part_id );
+                    NS(BeamMonitor_set_max_particle_id)( monitor, max_part_id );
+                    NS(BeamMonitor_set_out_address)( monitor, ( address_t )0u );
                     ++num_beam_monitors;
                 }
                 else
