@@ -1,62 +1,55 @@
 #include "sixtracklib/common/be_rfmultipole/be_rfmultipole.h"
 #include "sixtracklib/common/buffer.h"
 
-SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole) const* NS(RFMultiPole_const_from_buffer)(
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    NS(buffer_size_t) const index )
+NS(object_type_id_t) NS(RFMultipole_type_id_ext)( void ) SIXTRL_NOEXCEPT
 {
-    return NS(RFMultiPole_const_from_obj_index)( NS(Buffer_get_const_object)(
-        buffer, index ) );
+    return NS(RFMultipole_type_id)();
 }
 
-SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* NS(RFMultiPole_from_buffer)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(buffer_size_t) const index )
-{
-    return NS(RFMultiPole_from_obj_index)( NS(Buffer_get_object)(
-        buffer, index ) );
-}
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-NS(arch_status_t) NS(RFMultiPole_attributes_offsets)(
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets_begin,
+NS(arch_status_t) NS(RFMultipole_attributes_offsets)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const max_num_offsets,
-    SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole,
-    NS(buffer_size_t) const slot_size )
+    SIXTRL_BE_ARGPTR_DEC const NS(RFMultipole) *const SIXTRL_RESTRICT mpole,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
+    NS(buffer_size_t) const ndataptrs = NS(RFMultipole_num_dataptrs)( mpole );
 
-    if( ( mpole != SIXTRL_NULLPTR ) &&
-        ( offsets_begin != SIXTRL_NULLPTR ) &&
+    if( ( mpole != SIXTRL_NULLPTR ) && ( offsets != SIXTRL_NULLPTR ) &&
         ( slot_size > ( NS(buffer_size_t) )0u ) &&
-        ( max_num_offsets >= NS(RFMultiPole_num_dataptrs)( mpole ) ) )
+        ( max_num_offsets >= ndataptrs ) )
     {
-        SIXTRL_ASSERT( NS(RFMultiPole_num_dataptrs)( mpole ) == 2u );
+        SIXTRL_ASSERT( ndataptrs == ( NS(buffer_size_t) )2u );
 
-        offsets_begin[ 0 ] = offsetof( NS(RFMultiPole), bal_addr );
-        offsets_begin[ 1 ] = offsetof( NS(RFMultiPole), phase_addr );
+        offsets[ 0 ] = offsetof( NS(RFMultipole), bal_addr );
+        offsets[ 1 ] = offsetof( NS(RFMultipole), phase_addr );
 
+        SIXTRL_ASSERT( offsets[ 0 ] % slot_size == ( NS(buffer_size_t) )0 );
+        SIXTRL_ASSERT( offsets[ 1 ] % slot_size == ( NS(buffer_size_t) )0 );
         status = NS(ARCH_STATUS_SUCCESS);
     }
 
     return status;
 }
 
-NS(arch_status_t) NS(RFMultiPole_attributes_sizes)(
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes_begin,
+NS(arch_status_t) NS(RFMultipole_attributes_sizes)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes,
     NS(buffer_size_t) const max_num_sizes,
-    SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole,
-    NS(buffer_size_t) const slot_size )
+    SIXTRL_BE_ARGPTR_DEC const NS(RFMultipole) *const SIXTRL_RESTRICT mpole,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
+    NS(buffer_size_t) const ndataptrs = NS(RFMultipole_num_dataptrs)( mpole );
 
-    if( ( mpole != SIXTRL_NULLPTR ) && ( sizes_begin != SIXTRL_NULLPTR ) &&
+    if( ( mpole != SIXTRL_NULLPTR ) && ( sizes != SIXTRL_NULLPTR ) &&
         ( slot_size > ( NS(buffer_size_t) )0u ) &&
-        ( max_num_sizes >= NS(RFMultiPole_num_dataptrs)( mpole ) ) )
+        ( max_num_sizes >= ndataptrs ) )
     {
-        SIXTRL_ASSERT( NS(RFMultiPole_num_dataptrs)( mpole ) == 2u );
-
-        sizes_begin[ 0 ] = sizeof( NS(rf_multipole_real_t) );
-        sizes_begin[ 1 ] = sizeof( NS(rf_multipole_real_t) );
+        SIXTRL_ASSERT( ndataptrs == ( NS(buffer_size_t) )2u );
+        sizes[ 0 ] = sizeof( NS(rf_multipole_real_t) );
+        sizes[ 1 ] = sizeof( NS(rf_multipole_real_t) );
 
         status = NS(ARCH_STATUS_SUCCESS);
     }
@@ -64,25 +57,23 @@ NS(arch_status_t) NS(RFMultiPole_attributes_sizes)(
     return status;
 }
 
-NS(arch_status_t) NS(RFMultiPole_attributes_counts)(
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
+NS(arch_status_t) NS(RFMultipole_attributes_counts)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts,
     NS(buffer_size_t) const max_num_counts,
-    SIXTRL_BE_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole )
+    SIXTRL_BE_ARGPTR_DEC const NS(RFMultipole) *const SIXTRL_RESTRICT mpole,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
+    NS(buffer_size_t) const ndataptrs = NS(RFMultipole_num_dataptrs)( mpole );
 
-    if( ( counts_begin != SIXTRL_NULLPTR ) &&
-        ( max_num_counts >= NS(RFMultiPole_num_dataptrs)( mpole ) ) &&
-        ( NS(RFMultiPole_order)( mpole ) >= ( NS(rf_multipole_int_t) )0u ) )
+    if( ( counts != SIXTRL_NULLPTR ) && ( max_num_counts >= ndataptrs ) &&
+        ( slot_size > ( NS(buffer_size_t) )0 ) &&
+        ( NS(RFMultipole_order)( mpole ) >= ( NS(rf_multipole_int_t) )0u ) )
     {
-        SIXTRL_ASSERT( NS(RFMultiPole_num_dataptrs)( mpole ) == 2u );
+        SIXTRL_ASSERT( ndataptrs == ( NS(buffer_size_t) )2u );
 
-        counts_begin[ 0 ] = ( NS(buffer_size_t)
-            )NS(RFMultiPole_num_bal_elements)( mpole );
-
-        counts_begin[ 1 ] = ( NS(buffer_size_t)
-            )NS(RFMultiPole_num_phase_elements)( mpole );
-
+        counts[ 0 ] = NS(RFMultipole_bal_length)( mpole );
+        counts[ 1 ] = NS(RFMultipole_phase_length)( mpole );
         status = NS(ARCH_STATUS_SUCCESS);
     }
 
@@ -91,7 +82,7 @@ NS(arch_status_t) NS(RFMultiPole_attributes_counts)(
 
 /* ------------------------------------------------------------------------- */
 
-bool NS(RFMultiPole_can_be_added)(
+bool NS(RFMultipole_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     NS(rf_multipole_int_t) const order,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
@@ -101,154 +92,191 @@ bool NS(RFMultiPole_can_be_added)(
     typedef NS(buffer_size_t) buf_size_t;
 
     bool can_be_added = false;
-    NS(arch_status_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
-
-    NS(RFMultiPole) mpole;
-    buf_size_t const num_dataptrs = NS(RFMultiPole_num_dataptrs)( &mpole );
     buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+    buf_size_t ndataptrs = ( buf_size_t )0u;
 
-    buf_size_t sizes[]  = { ( buf_size_t )0u, ( buf_size_t )0u };
-    buf_size_t counts[] = { ( buf_size_t )0u, ( buf_size_t )0u };
+    NS(RFMultipole) mpole;
+    NS(arch_status_t) status = NS(RFMultipole_clear)( &mpole );
+    status |= NS(RFMultipole_set_order)( &mpole, order );
+    ndataptrs = NS(RFMultipole_num_dataptrs)( &mpole );
 
-    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )2u );
-
-    NS(RFMultiPole_preset)( &mpole );
-    mpole.order = order;
-
-    status = NS(RFMultiPole_attributes_sizes)(
-        &sizes[ 0 ], num_dataptrs, &mpole, slot_size );
-
-    if( status == NS(ARCH_STATUS_SUCCESS) )
+    if( ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) &&
+        ( order >= ( NS(rf_multipole_int_t) )0 ) &&
+        ( ndataptrs == ( buf_size_t )2u ) && ( buffer != SIXTRL_NULLPTR ) )
     {
-        status = NS(RFMultiPole_attributes_counts)(
-            &counts[ 0 ], num_dataptrs, &mpole );
-    }
+        SIXTRL_ARGPTR_DEC buf_size_t sizes[ 2 ];
+        SIXTRL_ARGPTR_DEC buf_size_t counts[ 2 ];
 
-    if( status == NS(ARCH_STATUS_SUCCESS) )
-    {
-        can_be_added = NS(Buffer_can_add_object)( buffer,
-            sizeof( NS(RFMultiPole) ), num_dataptrs, sizes, counts,
-                ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
+        status = NS(RFMultipole_attributes_sizes)(
+            &sizes[ 0 ], ( buf_size_t )2u, &mpole, slot_size );
+
+        if( status == NS(ARCH_STATUS_SUCCESS) )
+        {
+            status = NS(RFMultipole_attributes_counts)(
+                &counts[ 0 ], ( buf_size_t )2u, &mpole, slot_size );
+        }
+
+        if( status == NS(ARCH_STATUS_SUCCESS) )
+        {
+            can_be_added = NS(Buffer_can_add_object)( buffer,
+                sizeof( NS(RFMultipole) ), ndataptrs, sizes, counts,
+                    ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
+        }
     }
 
     return can_be_added;
 }
 
-SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* NS(RFMultiPole_new)(
+SIXTRL_BE_ARGPTR_DEC NS(RFMultipole)* NS(RFMultipole_new)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(rf_multipole_int_t) const order )
 {
     typedef NS(buffer_size_t) buf_size_t;
-    SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* ptr_multipole = SIXTRL_NULLPTR;
-    NS(arch_size_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
-
-    NS(RFMultiPole) multipole;
-    buf_size_t const num_dataptrs = NS(RFMultiPole_num_dataptrs)( &multipole );
-
-    buf_size_t offsets[] = { ( buf_size_t )0u, ( buf_size_t )0u };
-    buf_size_t sizes[]   = { ( buf_size_t )0u, ( buf_size_t )0u };
-    buf_size_t counts[]  = { ( buf_size_t )0u, ( buf_size_t )0u };
+    SIXTRL_BE_ARGPTR_DEC NS(RFMultipole)* added_elem = SIXTRL_NULLPTR;
     buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+    buf_size_t ndataptrs = ( buf_size_t )0u;
 
-    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )2u );
+    NS(RFMultipole) mpole;
+    NS(arch_status_t) status = NS(RFMultipole_clear)( &mpole );
+    status |= NS(RFMultipole_set_order)( &mpole, order );
+    ndataptrs = NS(RFMultipole_num_dataptrs)( &mpole );
 
-    NS(RFMultiPole_preset)( &multipole );
-    multipole.order = order;
-
-    status = NS(RFMultiPole_attributes_offsets)(
-        &offsets[ 0 ], num_dataptrs, &multipole, slot_size );
-
-    if( status == NS(ARCH_STATUS_SUCCESS) )
+    if( ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) &&
+        ( order >= ( NS(rf_multipole_int_t) )0 ) &&
+        ( ndataptrs == ( buf_size_t )2u ) && ( buffer != SIXTRL_NULLPTR ) )
     {
-        status = NS(RFMultiPole_attributes_counts)(
-            &counts[ 0 ], num_dataptrs, &multipole );
+        SIXTRL_ARGPTR_DEC buf_size_t offsets[ 2 ];
+        SIXTRL_ARGPTR_DEC buf_size_t sizes[ 2 ];
+        SIXTRL_ARGPTR_DEC buf_size_t counts[ 2 ];
+
+        status = NS(RFMultipole_attributes_offsets)(
+            &offsets[ 0 ], ( buf_size_t )2u, &mpole, slot_size );
+
+        if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+        {
+            status = NS(RFMultipole_attributes_sizes)(
+                &sizes[ 0 ], ( buf_size_t )2u, &mpole, slot_size );
+        }
 
         if( status == NS(ARCH_STATUS_SUCCESS) )
         {
-            status = NS(RFMultiPole_attributes_sizes)(
-                &sizes[ 0 ], num_dataptrs, &multipole, slot_size );
+            status = NS(RFMultipole_attributes_counts)(
+                &counts[ 0 ], ( buf_size_t )2u, &mpole, slot_size );
+        }
+
+        if( status == NS(ARCH_STATUS_SUCCESS) )
+        {
+            added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(RFMultipole)* )(
+                uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
+                    buffer, &mpole, sizeof( NS(RFMultipole) ),
+                    NS(RFMultipole_type_id)(), ndataptrs, &offsets[ 0 ],
+                        &sizes[ 0 ], &counts[ 0 ] ) );
         }
     }
 
-    if( status == NS(ARCH_STATUS_SUCCESS) )
-    {
-        ptr_multipole = ( SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* )(
-            uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
-                buffer, &multipole, sizeof( multipole ),
-                    NS(RFMultiPole_type_id)( &multipole ), num_dataptrs,
-                        &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
-    }
-
-    return ptr_multipole;
+    return added_elem;
 }
 
-SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* NS(RFMultiPole_add)(
+SIXTRL_BE_ARGPTR_DEC NS(RFMultipole)* NS(RFMultipole_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(rf_multipole_int_t) const order,
     NS(rf_multipole_real_t) const voltage,
     NS(rf_multipole_real_t) const frequency,
     NS(rf_multipole_real_t) const lag,
-    SIXTRL_ARGPTR_DEC NS(rf_multipole_real_t) const* SIXTRL_RESTRICT bal_values,
-    SIXTRL_ARGPTR_DEC NS(rf_multipole_real_t) const*
-        SIXTRL_RESTRICT phase_values )
+    NS(buffer_addr_t) const bal_addr, NS(buffer_addr_t) const phase_addr )
 {
     typedef NS(buffer_size_t) buf_size_t;
-    SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* ptr_multipole = SIXTRL_NULLPTR;
-    NS(arch_size_t) status = SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
-
-    NS(RFMultiPole) multipole;
-    buf_size_t const num_dataptrs = NS(RFMultiPole_num_dataptrs)( &multipole );
-
-    buf_size_t offsets[] = { ( buf_size_t )0u, ( buf_size_t )0u };
-    buf_size_t sizes[]   = { ( buf_size_t )0u, ( buf_size_t )0u };
-    buf_size_t counts[]  = { ( buf_size_t )0u, ( buf_size_t )0u };
+    SIXTRL_BE_ARGPTR_DEC NS(RFMultipole)* added_elem = SIXTRL_NULLPTR;
     buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+    buf_size_t ndataptrs = ( buf_size_t )0u;
 
-    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )2u );
+    NS(RFMultipole) mpole;
+    NS(arch_status_t) status = NS(RFMultipole_clear)( &mpole );
+    status |= NS(RFMultipole_set_order)( &mpole, order );
+    status |= NS(RFMultipole_set_voltage)( &mpole, voltage );
+    status |= NS(RFMultipole_set_frequency)( &mpole, frequency );
+    status |= NS(RFMultipole_set_lag)( &mpole, lag );
+    status |= NS(RFMultipole_set_bal_addr)( &mpole, bal_addr );
+    status |= NS(RFMultipole_set_phase_addr)( &mpole, phase_addr );
+    ndataptrs = NS(RFMultipole_num_dataptrs)( &mpole );
 
-    NS(RFMultiPole_preset)( &multipole );
-    multipole.order = order;
-    multipole.voltage = voltage;
-    multipole.frequency = frequency;
-    multipole.lag = lag;
-    multipole.bal_addr = ( NS(buffer_addr_t) )( uintptr_t )bal_values;
-    multipole.phase_addr = ( NS(buffer_addr_t) )( uintptr_t )phase_values;
-
-    status = NS(RFMultiPole_attributes_offsets)(
-        &offsets[ 0 ], num_dataptrs, &multipole, slot_size );
-
-    if( status == NS(ARCH_STATUS_SUCCESS) )
+    if( ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) &&
+        ( order >= ( NS(rf_multipole_int_t) )0 ) &&
+        ( ndataptrs == ( buf_size_t )2u ) && ( buffer != SIXTRL_NULLPTR ) )
     {
-        status = NS(RFMultiPole_attributes_counts)(
-            &counts[ 0 ], num_dataptrs, &multipole );
+        SIXTRL_ARGPTR_DEC buf_size_t offsets[ 2 ];
+        SIXTRL_ARGPTR_DEC buf_size_t sizes[ 2 ];
+        SIXTRL_ARGPTR_DEC buf_size_t counts[ 2 ];
+
+        status = NS(RFMultipole_attributes_offsets)(
+            &offsets[ 0 ], ( buf_size_t )2u, &mpole, slot_size );
+
+        if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+        {
+            status = NS(RFMultipole_attributes_sizes)(
+                &sizes[ 0 ], ( buf_size_t )2u, &mpole, slot_size );
+        }
 
         if( status == NS(ARCH_STATUS_SUCCESS) )
         {
-            status = NS(RFMultiPole_attributes_sizes)(
-                &sizes[ 0 ], num_dataptrs, &multipole, slot_size );
+            status = NS(RFMultipole_attributes_counts)(
+                &counts[ 0 ], ( buf_size_t )2u, &mpole, slot_size );
+        }
+
+        if( status == NS(ARCH_STATUS_SUCCESS) )
+        {
+            added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(RFMultipole)* )(
+                uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
+                    buffer, &mpole, sizeof( NS(RFMultipole) ),
+                    NS(RFMultipole_type_id)(), ndataptrs, &offsets[ 0 ],
+                        &sizes[ 0 ], &counts[ 0 ] ) );
         }
     }
 
-    if( status == NS(ARCH_STATUS_SUCCESS) )
-    {
-        ptr_multipole = ( SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* )(
-            uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
-                buffer, &multipole, sizeof( multipole ),
-                    NS(RFMultiPole_type_id)( &multipole ), num_dataptrs,
-                        &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
-    }
-
-    return ptr_multipole;
+    return added_elem;
 }
 
-SIXTRL_BE_ARGPTR_DEC NS(RFMultiPole)* NS(RFMultiPole_add_copy)(
+SIXTRL_BE_ARGPTR_DEC NS(RFMultipole)* NS(RFMultipole_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(RFMultiPole) *const SIXTRL_RESTRICT mpole )
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(RFMultipole) *const
+        SIXTRL_RESTRICT orig )
 {
-    SIXTRL_ASSERT( mpole != SIXTRL_NULLPTR );
-    return NS(RFMultiPole_add)( buffer,
-        NS(RFMultiPole_order)( mpole ), NS(RFMultiPole_voltage)( mpole ),
-        NS(RFMultiPole_frequency)( mpole ), NS(RFMultiPole_lag)( mpole ),
-        NS(RFMultiPole_const_bal)( mpole ),
-        NS(RFMultiPole_const_phase)( mpole ) );
+    typedef NS(buffer_size_t) buf_size_t;
+    SIXTRL_BE_ARGPTR_DEC NS(RFMultipole)* added_elem = SIXTRL_NULLPTR;
+    buf_size_t const slot_size = NS(Buffer_get_slot_size)( buffer );
+    buf_size_t const ndataptrs = NS(RFMultipole_num_dataptrs)( orig );
+
+    if( ( orig != SIXTRL_NULLPTR ) &&
+        ( ndataptrs == ( buf_size_t )2u ) && ( buffer != SIXTRL_NULLPTR ) )
+    {
+        SIXTRL_ARGPTR_DEC buf_size_t offsets[ 2 ];
+        SIXTRL_ARGPTR_DEC buf_size_t sizes[ 2 ];
+        SIXTRL_ARGPTR_DEC buf_size_t counts[ 2 ];
+
+        NS(arch_status_t) status = NS(RFMultipole_attributes_offsets)(
+            &offsets[ 0 ], ( buf_size_t )2u, orig, slot_size );
+
+        if( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS )
+        {
+            status = NS(RFMultipole_attributes_sizes)(
+                &sizes[ 0 ], ( buf_size_t )2u, orig, slot_size );
+        }
+
+        if( status == NS(ARCH_STATUS_SUCCESS) )
+        {
+            status = NS(RFMultipole_attributes_counts)(
+                &counts[ 0 ], ( buf_size_t )2u, orig, slot_size );
+        }
+
+        if( status == NS(ARCH_STATUS_SUCCESS) )
+        {
+            added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(RFMultipole)* )(
+                uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
+                    buffer, orig, sizeof( NS(RFMultipole) ),
+                    NS(RFMultipole_type_id)(), ndataptrs, &offsets[ 0 ],
+                        &sizes[ 0 ], &counts[ 0 ] ) );
+        }
+    }
+
+    return added_elem;
 }
