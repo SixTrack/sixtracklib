@@ -1028,6 +1028,10 @@ st_ElemByElemConfig_set_output_store_address.restype = None
 # -----------------------------------------------------------------------------
 # BeamMonitor objects
 
+st_BeamMonitor_type_id = sixtracklib.st_BeamMonitor_type_id_ext
+st_BeamMonitor_type_id.argtypes = None
+st_BeamMonitor_type_id.restype = st_object_type_id_t
+
 st_BeamMonitor_insert_end_of_turn_monitors = (
     sixtracklib.st_BeamMonitor_insert_end_of_turn_monitors_at_pos
 )
@@ -5414,16 +5418,17 @@ if SIXTRACKLIB_MODULES.get("opencl", False):
         st_arch_size_t,
     ]
 
-    st_ClContextBase_assign_kernel_argument_ptr = (
-        sixtracklib.st_ClContextBase_assign_kernel_argument_ptr
+    st_ClContextBase_assign_kernel_argument_raw_ptr = (
+        sixtracklib.st_ClContextBase_assign_kernel_argument_raw_ptr
     )
-    st_ClContextBase_assign_kernel_argument_ptr.argtypes = [
+    st_ClContextBase_assign_kernel_argument_raw_ptr.argtypes = [
         st_ClContextBase_p,
         st_arch_kernel_id_t,
         st_arch_size_t,
+        st_arch_size_t,
         ct.c_void_p,
     ]
-    st_ClContextBase_assign_kernel_argument_ptr.restype = None
+    st_ClContextBase_assign_kernel_argument_raw_ptr.restype = None
 
     st_ClContextBase_calculate_kernel_num_work_items = (
         sixtracklib.st_ClContextBase_calculate_kernel_num_work_items
@@ -6123,7 +6128,6 @@ st_Track_all_particles_element_by_element_until_turn.argtypes = [
     ct.c_int64,
 ]
 
-
 # TriCub related methods:
 
 st_TriCubData_p = ct.c_void_p
@@ -6147,3 +6151,143 @@ st_TriCub_type_id.restype = st_object_type_id_t
 st_TriCub_data_addr_offset = sixtracklib.st_TriCub_data_addr_offset
 st_TriCub_data_addr_offset.argtypes = [st_TriCub_p]
 st_TriCub_data_addr_offset.restype = st_arch_size_t
+
+# Drift, multipole, rf multipole, cavity, xyshift, srotation, limit*
+
+st_Cavity_type_id = sixtracklib.st_Cavity_type_id_ext
+st_Cavity_type_id.argtypes = None
+st_Cavity_type_id.restype = st_object_type_id_t
+
+st_DipoleEedge_type_id = sixtracklib.st_DipoleEdge_type_id_ext
+st_DipoleEedge_type_id.argtypes = None
+st_DipoleEedge_type_id.restype = st_object_type_id_t
+
+st_Drift_type_id = sixtracklib.st_Drift_type_id_ext
+st_Drift_type_id.argtypes = None
+st_Drift_type_id.restype = st_object_type_id_t
+
+st_DriftExact_type_id = sixtracklib.st_DriftExact_type_id_ext
+st_DriftExact_type_id.argtypes = None
+st_DriftExact_type_id.restype = st_object_type_id_t
+
+st_LimitRect_type_id = sixtracklib.st_LimitRect_type_id_ext
+st_LimitRect_type_id.argtypes = None
+st_LimitRect_type_id.restype = st_object_type_id_t
+
+st_LimitEllipse_type_id = sixtracklib.st_LimitEllipse_type_id_ext
+st_LimitEllipse_type_id.argtypes = None
+st_LimitEllipse_type_id.restype = st_object_type_id_t
+
+st_LimitRectEllipse_type_id = sixtracklib.st_LimitRectEllipse_type_id_ext
+st_LimitRectEllipse_type_id.argtypes = None
+st_LimitRectEllipse_type_id.restype = st_object_type_id_t
+
+st_Multipole_type_id = sixtracklib.st_Multipole_type_id_ext
+st_Multipole_type_id.argtypes = None
+st_Multipole_type_id.restype = st_object_type_id_t
+
+st_RFMultipole_type_id = sixtracklib.st_RFMultipole_type_id_ext
+st_RFMultipole_type_id.argtypes = None
+st_RFMultipole_type_id.restype = st_object_type_id_t
+
+st_SRotation_type_id = sixtracklib.st_SRotation_type_id_ext
+st_SRotation_type_id.argtypes = None
+st_SRotation_type_id.restype = st_object_type_id_t
+
+st_XYShift_type_id = sixtracklib.st_XYShift_type_id_ext
+st_XYShift_type_id.argtypes = None
+st_XYShift_type_id.restype = st_object_type_id_t
+
+# SC related methods:
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+st_BeamBeam4D_p = ct.c_void_p
+st_NullBeamBeam4D = ct.cast( 0, st_BeamBeam4D_p )
+
+st_BeamBeam4D_type_id = sixtracklib.st_BeamBeam4D_type_id_ext
+st_BeamBeam4D_type_id.argtypes = None
+st_BeamBeam4D_type_id.restype = st_object_type_id_t
+
+st_BeamBeam4D_data_addr_offset = sixtracklib.st_BeamBeam4D_data_addr_offset_ext
+st_BeamBeam4D_data_addr_offset.argtypes = [st_BeamBeam4D_p,]
+st_BeamBeam4D_data_addr_offset.restype = st_buffer_size_t
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+st_BeamBeam6D_p = ct.c_void_p
+st_NullBeamBeam6D = ct.cast( 0, st_BeamBeam6D_p )
+
+st_BeamBeam6D_type_id = sixtracklib.st_BeamBeam6D_type_id_ext
+st_BeamBeam6D_type_id.argtypes = None
+st_BeamBeam6D_type_id.restype = st_object_type_id_t
+
+st_BeamBeam6D_data_addr_offset = sixtracklib.st_BeamBeam6D_data_addr_offset_ext
+st_BeamBeam6D_data_addr_offset.argtypes = [st_BeamBeam6D_p,]
+st_BeamBeam6D_data_addr_offset.restype = st_buffer_size_t
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+st_SpaceChargeCoasting_p = ct.c_void_p
+st_NullSpaceChargeCoasting = ct.cast( 0, st_SpaceChargeCoasting_p )
+
+st_SpaceChargeCoasting_type_id = sixtracklib.st_SpaceChargeCoasting_type_id_ext
+st_SpaceChargeCoasting_type_id.argtypes = None
+st_SpaceChargeCoasting_type_id.restype = st_object_type_id_t
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+st_SpaceChargeQGaussianProfile_p = ct.c_void_p
+st_NullSpaceChargeQGaussianProfile = ct.cast(
+    0, st_SpaceChargeQGaussianProfile_p )
+
+st_SpaceChargeQGaussianProfile_type_id = \
+    sixtracklib.st_SpaceChargeQGaussianProfile_type_id_ext
+st_SpaceChargeQGaussianProfile_type_id.argtypes = None
+st_SpaceChargeQGaussianProfile_type_id.restype = st_object_type_id_t
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+st_LineDensityProfileData_p = ct.c_void_p
+st_NullLineDensityProfileData = ct.cast(
+    0, st_LineDensityProfileData_p )
+
+st_LineDensityProfileData_type_id = \
+    sixtracklib.st_LineDensityProfileData_type_id_ext
+st_LineDensityProfileData_type_id.argtypes = None
+st_LineDensityProfileData_type_id.restype = st_object_type_id_t
+
+st_LineDensityProfileData_values_offset = \
+    sixtracklib.st_LineDensityProfileData_values_offset_ext
+st_LineDensityProfileData_values_offset.argtypes = [st_LineDensityProfileData_p]
+st_LineDensityProfileData_values_offset.restype = st_buffer_size_t
+
+st_LineDensityProfileData_derivatives_offset = \
+    sixtracklib.st_LineDensityProfileData_derivatives_offset_ext
+st_LineDensityProfileData_derivatives_offset.argtypes = [st_LineDensityProfileData_p]
+st_LineDensityProfileData_derivatives_offset.restype = st_buffer_size_t
+
+st_LineDensityProfileData_prepare_interpolation = \
+    sixtracklib.st_LineDensityProfileData_prepare_interpolation_ext
+st_LineDensityProfileData_prepare_interpolation.argtypes = [st_LineDensityProfileData_p]
+st_LineDensityProfileData_prepare_interpolation.restype = st_arch_status_t
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+st_SpaceChargeInterpolatedProfile_p = ct.c_void_p
+st_NullSpaceChargeInterpolatedProfile = ct.cast(
+    0, st_SpaceChargeInterpolatedProfile_p )
+
+st_SpaceChargeInterpolatedProfile_type_id = \
+    sixtracklib.st_SpaceChargeInterpolatedProfile_type_id_ext
+st_SpaceChargeInterpolatedProfile_type_id.argtypes = None
+st_SpaceChargeInterpolatedProfile_type_id.restype = st_object_type_id_t
+
+st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset = \
+    sixtracklib.st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset_ext
+st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset.argtypes = \
+    [st_SpaceChargeInterpolatedProfile_p,]
+st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset.restype = \
+    st_object_type_id_t
+
+
