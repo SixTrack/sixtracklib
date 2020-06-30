@@ -389,7 +389,7 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
 
             /* reset the output addresses of the eb beam monitors to prepare a
              * clean slate for the gpu tracking */
-            NS(BeamMonitor_clear_all)( eb );
+            ::NS(BeamMonitor_reset_all_in_buffer)( eb );
 
             status = ::NS(TestTrackCtrlArg_prepare_tracking)(
                 particles_arg, track_pb, beam_elements_arg, eb, result_arg );
