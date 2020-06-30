@@ -1652,11 +1652,13 @@ namespace SIXTRL_CXX_NAMESPACE
                 buf_size_t num_be_monitors = buf_size_t{ 0 };
                 std::vector< size_t > be_mon_indices( num_e_by_e_objs, ZERO );
 
-                status = ::NS(BeamMonitor_get_beam_monitor_indices_from_buffer)(
-                    belems, be_mon_indices.size(), be_mon_indices.data(),
-                        &num_be_monitors );
+                num_be_monitors = ::NS(BeamMonitor_monitor_indices_from_buffer)(
+                    be_mon_indices.data(), be_mon_indices.size(), belems );
 
-                SIXTRL_ASSERT( num_be_monitors <= be_mon_indices.size() );
+                if( num_be_monitors > be_mon_indices.size() )
+                {
+                    status = st::ARCH_STATUS_GENERAL_FAILURE;
+                }
 
                 auto ind_end = be_mon_indices.begin();
 
