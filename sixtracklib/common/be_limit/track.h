@@ -99,10 +99,10 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit_rect)(
     real_t const y = NS(Particles_get_y_value)( particles, particle_idx );
 
     index_t const new_state = ( index_t )(
-        ( x >= NS(LimitRect_get_min_x)( limit ) ) &&
-        ( x <= NS(LimitRect_get_max_x)( limit ) ) &&
-        ( y >= NS(LimitRect_get_min_y)( limit ) ) &&
-        ( y <= NS(LimitRect_get_max_y)( limit ) ) );
+        ( x >= NS(LimitRect_min_x)( limit ) ) &&
+        ( x <= NS(LimitRect_max_x)( limit ) ) &&
+        ( y >= NS(LimitRect_min_y)( limit ) ) &&
+        ( y <= NS(LimitRect_max_y)( limit ) ) );
 
     NS(Particles_update_state_value_if_not_already_lost)(
         particles, particle_idx, new_state );
@@ -122,16 +122,16 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_limit_ellipse)(
         particles, particle_idx );
 
     temp *= temp; /* temp = x² */
-    temp *= NS(LimitEllipse_get_y_half_axis_squ)( limit ); /* temp = x² * b² */
+    temp *= NS(LimitEllipse_y_half_axis_squ)( limit ); /* temp = x² * b² */
 
     y_squ *= y_squ; /* y_squ = y² */
-    y_squ *= NS(LimitEllipse_get_x_half_axis_squ)( limit ); /*y_squ = y² * a²*/
+    y_squ *= NS(LimitEllipse_x_half_axis_squ)( limit ); /*y_squ = y² * a²*/
 
     temp += y_squ; /* temp = x² * b² + y² * a² */
 
     NS(Particles_update_state_value_if_not_already_lost)( particles,
         particle_idx, ( NS(particle_index_t) )( temp <=
-            NS(LimitEllipse_get_half_axes_product_squ)( limit ) ) );
+            NS(LimitEllipse_half_axes_product_squ)( limit ) ) );
 
     return SIXTRL_TRACK_SUCCESS;
 }
