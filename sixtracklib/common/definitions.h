@@ -155,8 +155,12 @@
         /* static, inline and restrict keywords:                                    */
 
         #if !defined( SIXTRL_RESTRICT )
-        #define SIXTRL_RESTRICT SIXTRL_GPUKERNEL_RESTRICT
+            #define SIXTRL_RESTRICT SIXTRL_GPUKERNEL_RESTRICT
         #endif /* !defined( SIXTRL_RESTRICT ) */
+
+        #if !defined( SIXTRL_RESTRICT_REF )
+            #define SIXTRL_RESTRICT_REF
+        #endif /* !defined( SIXTRL_RESTRICT_REF ) */
 
         #if !defined( SIXTRL_STATIC )
             #define SIXTRL_STATIC
@@ -278,8 +282,12 @@
         /* static, inline and restrict keywords:                            */
 
         #if !defined( SIXTRL_RESTRICT )
-        #define SIXTRL_RESTRICT SIXTRL_GPUKERNEL_RESTRICT
+            #define SIXTRL_RESTRICT SIXTRL_GPUKERNEL_RESTRICT
         #endif /* !defined( SIXTRL_RESTRICT ) */
+
+        #if !defined( SIXTRL_RESTRICT_REF )
+            #define SIXTRL_RESTRICT_REF
+        #endif /* !defined( SIXTRL_RESTRICT_REF ) */
 
         #if !defined( SIXTRL_STATIC )
             #define SIXTRL_STATIC static
