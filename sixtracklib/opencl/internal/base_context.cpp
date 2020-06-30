@@ -1278,8 +1278,8 @@ namespace SIXTRL_CXX_NAMESPACE
                 SIXTRL_ASSERT( num_kernel_args  >= size_type{  0 } );
                 SIXTRL_ASSERT( num_kernel_args  <  size_type{ 32 } );
                 SIXTRL_ASSERT( pref_work_group_size > size_type{ 0 } );
-                SIXTRL_ASSERT( max_work_group_size  >= pref_work_group_size );
-                SIXTRL_ASSERT( max_work_group_size  <= size_type{ 65535 } );
+                SIXTRL_ASSERT( max_work_group_size >= pref_work_group_size );
+                SIXTRL_ASSERT( max_work_group_size <= size_type{ 0x7fffffff } );
 
                 this->m_kernel_data.back().resetArguments( num_kernel_args );
 
