@@ -1080,32 +1080,26 @@ NS(arch_status_t) NS(LineDensityProfileData_prepare_interpolation_ext)(
     NS(math_abscissa_idx_t) const num_values =
         NS(LineDensityProfileData_num_values)( data );
 
-    NS(math_interpol_t) const interpol_method =
-        NS(LineDensityProfileData_method)( data );
-
-    SIXTRL_REAL_T* temp_data = SIXTRL_NULLPTR;
-
     if( ( data != SIXTRL_NULLPTR ) &&
-        ( num_values > ( NS(math_abscissa_idx_t) )0 ) &&
-        ( interpol_method != NS(MATH_INTERPOL_NONE) ) )
+        ( num_values > ( NS(math_abscissa_idx_t) )1 ) )
     {
-        if( interpol_method == NS(MATH_INTERPOL_CUBIC) )
-        {
-            temp_data = ( SIXTRL_REAL_T* )malloc( sizeof( SIXTRL_REAL_T ) *
-                num_values * ( NS(math_abscissa_idx_t) )6 );
-        }
+        NS(math_interpol_t) const interpol_method =
+            NS(LineDensityProfileData_method)( data );
 
-        if( ( temp_data != SIXTRL_NULLPTR ) ||
-            ( interpol_method != NS(MATH_INTERPOL_CUBIC) ) )
+        if( interpol_method == NS(MATH_INTERPOL_LINEAR) )
         {
             status = NS(LineDensityProfileData_prepare_interpolation)(
-                data, temp_data );
+                data, SIXTRL_NULLPTR );
         }
-
-        if( temp_data != SIXTRL_NULLPTR )
+        else if( interpol_method == NS(MATH_INTERPOL_CUBIC) )
         {
+            SIXTRL_REAL_T* temp_data = ( SIXTRL_REAL_T* )malloc(
+                sizeof( SIXTRL_REAL_T ) * num_values * 6u );
+
+            status = NS(LineDensityProfileData_prepare_interpolation)(
+                data, temp_data );
+
             free( temp_data );
-            temp_data = SIXTRL_NULLPTR;
         }
     }
 
