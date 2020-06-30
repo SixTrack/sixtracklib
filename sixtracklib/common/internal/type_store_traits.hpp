@@ -319,6 +319,7 @@ namespace SIXTRL_CXX_NAMESPACE
             destination, source );
     }
 
+    #if !defined( __CUDACC__ )
     template< class SrcIter, class DstIter >
     static SIXTRL_FN arch_status_t Types_perform_assignment_for_range(
         SrcIter src_it, SrcIter src_end, DstIter dest_it )
@@ -328,6 +329,15 @@ namespace SIXTRL_CXX_NAMESPACE
 
         typedef typename std::iterator_traits<
             DstIter >::value_type dest_value_t;
+    #else /* Cuda */
+    template< class T >
+    static SIXTRL_FN arch_status_t Types_perform_assignment_for_range(
+        T const* SIXTRL_RESTRICT src_it, T const* SIXTRL_RESTRICT src_end,
+        T* SIXTRL_RESTRICT dest_it )
+    {
+        typedef T src_value_t;
+        typedef T dest_value_t;
+    #endif /* Cuda */
 
         arch_status_t success = ( src_it != src_end )
             ? SIXTRL_CXX_NAMESPACE::ARCH_STATUS_SUCCESS
@@ -353,7 +363,11 @@ namespace SIXTRL_CXX_NAMESPACE
         arch_size_t const num_items_to_assign )
     {
         SrcIter src_end = src_begin;
+        #if !defined( __CUDACC__ )
         std::advance( src_end, num_items_to_assign );
+        #else /* !Cuda */
+        src_end = src_end + num_items_to_assign;
+        #endif /* Cuda */
 
         return SIXTRL_CXX_NAMESPACE::Types_perform_assignment_for_range(
             src_begin, src_end, dest_begin );
