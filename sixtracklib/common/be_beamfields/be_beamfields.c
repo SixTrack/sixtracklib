@@ -649,81 +649,60 @@ NS(SpaceChargeCoasting_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
 }
 
 NS(arch_status_t) NS(SpaceChargeCoasting_attributes_offsets)(
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets_begin,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const max_num_offsets,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeCoasting) *const
-        SIXTRL_RESTRICT sc_elem,
+        SIXTRL_RESTRICT SIXTRL_UNUSED( sc_elem ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
-    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( offsets_begin != SIXTRL_NULLPTR ) && ( sc_elem != SIXTRL_NULLPTR ) &&
-        ( slot_size > ZERO ) )
+    if( ( offsets != SIXTRL_NULLPTR ) && ( slot_size > ZERO ) &&
+        ( max_num_offsets > ZERO ) )
     {
-        status = NS(ARCH_STATUS_SUCCESS);
-
-        if( max_num_offsets > ZERO )
-        {
-            SIXTRACKLIB_SET_VALUES(
-                buf_size_t, offsets_begin, max_num_offsets, ZERO );
-        }
+        SIXTRACKLIB_SET_VALUES( buf_size_t, offsets, max_num_offsets, ZERO );
     }
 
-    return status;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
 NS(arch_status_t) NS(SpaceChargeCoasting_attributes_sizes)(
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes_begin,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes,
     NS(buffer_size_t) const max_num_sizes,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeCoasting)
-        *const SIXTRL_RESTRICT sc_elem,
+        *const SIXTRL_RESTRICT SIXTRL_UNUSED( sc_elem ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
-    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( sizes_begin != SIXTRL_NULLPTR ) && ( sc_elem != SIXTRL_NULLPTR ) &&
-        ( slot_size > ZERO ) )
+    if( ( sizes != SIXTRL_NULLPTR ) && ( slot_size > ZERO ) &&
+        ( max_num_sizes > ZERO ) )
     {
-        status = NS(ARCH_STATUS_SUCCESS);
-
-        if( max_num_sizes > ZERO )
-        {
-            SIXTRACKLIB_SET_VALUES(
-                buf_size_t, sizes_begin, max_num_sizes, ZERO );
-        }
+        SIXTRACKLIB_SET_VALUES( buf_size_t, sizes, max_num_sizes, ZERO );
     }
 
-    return status;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
 NS(arch_status_t) NS(SpaceChargeCoasting_attributes_counts)(
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts,
     NS(buffer_size_t) const max_num_counts,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeCoasting)
-        *const SIXTRL_RESTRICT sc_elem,
+        *const SIXTRL_RESTRICT SIXTRL_UNUSED( sc_elem ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
-    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( counts_begin != SIXTRL_NULLPTR ) && ( sc_elem != SIXTRL_NULLPTR ) &&
-        ( slot_size > ( NS(buffer_size_t) )0 ) )
+    if( ( counts != SIXTRL_NULLPTR ) && ( slot_size > ( buf_size_t )0 ) &&
+        ( max_num_counts > ZERO ) )
     {
-        status = NS(ARCH_STATUS_SUCCESS);
-
-        if( max_num_counts > ZERO )
-        {
-            SIXTRACKLIB_SET_VALUES(
-                buf_size_t, counts_begin, max_num_counts, ZERO );
-        }
+        SIXTRACKLIB_SET_VALUES( buf_size_t, counts, max_num_counts, ZERO );
     }
 
-    return status;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -740,14 +719,15 @@ bool NS(SpaceChargeCoasting_can_be_added)(
 
     buf_size_t num_dataptrs = ( buf_size_t )0u;
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting) sc_elem;
-    NS(SpaceChargeCoasting_preset)( &sc_elem );
-
+    NS(arch_status_t) status = NS(SpaceChargeCoasting_clear)( &sc_elem );
     num_dataptrs = NS(SpaceChargeCoasting_num_dataptrs)( &sc_elem );
-    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
-    can_be_added = NS(Buffer_can_add_object)( buffer, sizeof(
-        NS(SpaceChargeCoasting) ), num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR,
-            ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
+    can_be_added = (
+        ( num_dataptrs == ( buf_size_t )0u ) &&
+        ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) &&
+        ( NS(Buffer_can_add_object)( buffer, sizeof( NS(SpaceChargeCoasting) ),
+            num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR, ptr_requ_objects,
+                ptr_requ_slots, ptr_requ_dataptrs ) ) );
 
     return can_be_added;
 }
@@ -759,15 +739,19 @@ SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* NS(SpaceChargeCoasting_new)(
     NS(buffer_size_t) num_dataptrs = ( NS(buffer_size_t) )0u;
 
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting) sc_elem;
-    NS(SpaceChargeCoasting_preset)( &sc_elem );
-
+    NS(arch_status_t) status = NS(SpaceChargeCoasting_clear)( &sc_elem );
     num_dataptrs = NS(SpaceChargeCoasting_num_dataptrs)( &sc_elem );
-    SIXTRL_ASSERT( num_dataptrs == ( NS(buffer_size_t) )0u );
 
-    added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* )( uintptr_t
-        )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer, &sc_elem,
-            sizeof( sc_elem ), NS(SpaceChargeCoasting_type_id)( &sc_elem ),
-                num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
+    if( ( num_dataptrs == ( NS(buffer_size_t) )0u ) &&
+        ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) &&
+        ( buffer != SIXTRL_NULLPTR ) )
+    {
+        added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* )(
+            uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
+                &sc_elem, sizeof( sc_elem ), NS(SpaceChargeCoasting_type_id)(),
+                    num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR,
+                        SIXTRL_NULLPTR ) );
+    }
 
     return added_elem;
 }
@@ -784,24 +768,35 @@ SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* NS(SpaceChargeCoasting_add)(
     NS(buffer_size_t) num_dataptrs = ( NS(buffer_size_t) )0u;
 
     NS(SpaceChargeCoasting) sc_elem;
-    NS(SpaceChargeCoasting_preset)( &sc_elem );
-    NS(SpaceChargeCoasting_set_num_particles)( &sc_elem, num_particles );
-    NS(SpaceChargeCoasting_set_circumference)( &sc_elem, circumference );
-    NS(SpaceChargeCoasting_set_sigma_x)( &sc_elem, sigma_x );
-    NS(SpaceChargeCoasting_set_sigma_y)( &sc_elem, sigma_y );
-    NS(SpaceChargeCoasting_set_length)( &sc_elem, length );
-    NS(SpaceChargeCoasting_set_x_co)( &sc_elem, x_co );
-    NS(SpaceChargeCoasting_set_y_co)( &sc_elem, y_co );
-    NS(SpaceChargeCoasting_set_min_sigma_diff)( &sc_elem, min_sigma_diff );
-    NS(SpaceChargeCoasting_set_enabled)( &sc_elem, enabled );
+    NS(arch_status_t) status = NS(SpaceChargeCoasting_clear)( &sc_elem );
+    status |= NS(SpaceChargeCoasting_set_num_particles)(
+        &sc_elem, num_particles );
+
+    status |= NS(SpaceChargeCoasting_set_circumference)(
+        &sc_elem, circumference );
+
+    status |= NS(SpaceChargeCoasting_set_sigma_x)( &sc_elem, sigma_x );
+    status |= NS(SpaceChargeCoasting_set_sigma_y)( &sc_elem, sigma_y );
+    status |= NS(SpaceChargeCoasting_set_length)( &sc_elem, length );
+    status |= NS(SpaceChargeCoasting_set_x_co)( &sc_elem, x_co );
+    status |= NS(SpaceChargeCoasting_set_y_co)( &sc_elem, y_co );
+    status |= NS(SpaceChargeCoasting_set_min_sigma_diff)(
+        &sc_elem, min_sigma_diff );
+
+    status |= NS(SpaceChargeCoasting_set_enabled)( &sc_elem, enabled );
 
     num_dataptrs = NS(SpaceChargeCoasting_num_dataptrs)( &sc_elem );
-    SIXTRL_ASSERT( num_dataptrs == ( NS(buffer_size_t) )0u );
 
-    added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* )( uintptr_t
-        )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer, &sc_elem,
-            sizeof( sc_elem ), NS(SpaceChargeCoasting_type_id)( &sc_elem ),
-                num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
+    if( ( buffer != SIXTRL_NULLPTR ) &&
+        ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) &&
+        ( num_dataptrs == ( NS(buffer_size_t) )0u ) )
+    {
+        added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* )(
+            uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
+                &sc_elem, sizeof( sc_elem ), NS(SpaceChargeCoasting_type_id)(),
+                    num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR,
+                        SIXTRL_NULLPTR ) );
+    }
 
     return added_elem;
 }
@@ -809,18 +804,22 @@ SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* NS(SpaceChargeCoasting_add)(
 SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* NS(SpaceChargeCoasting_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(SpaceChargeCoasting) *const
-        SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
+        SIXTRL_RESTRICT orig ) SIXTRL_NOEXCEPT
 {
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* added_elem = SIXTRL_NULLPTR;
 
     NS(buffer_size_t) const num_dataptrs =
-        NS(SpaceChargeCoasting_num_dataptrs)( sc_elem );
-    SIXTRL_ASSERT( num_dataptrs == ( NS(buffer_size_t) )0u );
+        NS(SpaceChargeCoasting_num_dataptrs)( orig );
 
-    added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* )( uintptr_t
-        )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer, sc_elem,
-            sizeof( sc_elem ), NS(SpaceChargeCoasting_type_id)( sc_elem ),
-                num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
+    if( ( orig != SIXTRL_NULLPTR ) && ( buffer != SIXTRL_NULLPTR ) &&
+        ( num_dataptrs == ( NS(buffer_size_t) )0u ) )
+    {
+        added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* )(
+            uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
+                orig, sizeof( NS(SpaceChargeCoasting) ),
+                    NS(SpaceChargeCoasting_type_id)(), num_dataptrs,
+                        SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
+    }
 
     return added_elem;
 }
@@ -855,81 +854,60 @@ NS(SpaceChargeQGaussianProfile_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
 }
 
 NS(arch_status_t) NS(SpaceChargeQGaussianProfile_attributes_offsets)(
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets_begin,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const max_num_offsets,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
-        SIXTRL_RESTRICT sc_elem,
+        SIXTRL_RESTRICT SIXTRL_UNUSED( sc_elem ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
-    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( offsets_begin != SIXTRL_NULLPTR ) && ( sc_elem != SIXTRL_NULLPTR ) &&
-        ( slot_size > ZERO ) )
+    if( ( offsets != SIXTRL_NULLPTR ) && ( slot_size > ZERO ) &&
+        ( max_num_offsets > ZERO ) )
     {
-        status = NS(ARCH_STATUS_SUCCESS);
-
-        if( max_num_offsets > ZERO )
-        {
-            SIXTRACKLIB_SET_VALUES(
-                buf_size_t, offsets_begin, max_num_offsets, ZERO );
-        }
+        SIXTRACKLIB_SET_VALUES( buf_size_t, offsets, max_num_offsets, ZERO );
     }
 
-    return status;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
 NS(arch_status_t) NS(SpaceChargeQGaussianProfile_attributes_sizes)(
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes_begin,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes,
     NS(buffer_size_t) const max_num_sizes,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeQGaussianProfile)
-        *const SIXTRL_RESTRICT sc_elem,
+        *const SIXTRL_RESTRICT SIXTRL_UNUSED( sc_elem ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
-    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( sizes_begin != SIXTRL_NULLPTR ) && ( sc_elem != SIXTRL_NULLPTR ) &&
-        ( slot_size > ZERO ) )
+    if( ( sizes != SIXTRL_NULLPTR ) && ( slot_size > ZERO ) &&
+        ( max_num_sizes > ZERO ) )
     {
-        status = NS(ARCH_STATUS_SUCCESS);
-
-        if( max_num_sizes > ZERO )
-        {
-            SIXTRACKLIB_SET_VALUES(
-                buf_size_t, sizes_begin, max_num_sizes, ZERO );
-        }
+        SIXTRACKLIB_SET_VALUES( buf_size_t, sizes, max_num_sizes, ZERO );
     }
 
-    return status;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
 NS(arch_status_t) NS(SpaceChargeQGaussianProfile_attributes_counts)(
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts,
     NS(buffer_size_t) const max_num_counts,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeQGaussianProfile)
-        *const SIXTRL_RESTRICT sc_elem,
+        *const SIXTRL_RESTRICT SIXTRL_UNUSED( sc_elem ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
-    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( counts_begin != SIXTRL_NULLPTR ) && ( sc_elem != SIXTRL_NULLPTR ) &&
-        ( slot_size > ( NS(buffer_size_t) )0 ) )
+    if( ( counts != SIXTRL_NULLPTR ) && ( slot_size > ZERO ) &&
+        ( max_num_counts > ZERO ) )
     {
-        status = NS(ARCH_STATUS_SUCCESS);
-
-        if( max_num_counts > ZERO )
-        {
-            SIXTRACKLIB_SET_VALUES(
-                buf_size_t, counts_begin, max_num_counts, ZERO );
-        }
+        SIXTRACKLIB_SET_VALUES( buf_size_t, counts, max_num_counts, ZERO );
     }
 
-    return status;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -944,36 +922,46 @@ bool NS(SpaceChargeQGaussianProfile_can_be_added)(
     typedef NS(buffer_size_t) buf_size_t;
     bool can_be_added = false;
 
-    buf_size_t num_dataptrs = ( buf_size_t )0u;
+    buf_size_t ndataptrs = ( buf_size_t )0u;
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile) sc_elem;
-    NS(SpaceChargeQGaussianProfile_preset)( &sc_elem );
+    NS(arch_status_t) const status =
+        NS(SpaceChargeQGaussianProfile_clear)( &sc_elem );
+    ndataptrs = NS(SpaceChargeQGaussianProfile_num_dataptrs)( &sc_elem );
 
-    num_dataptrs = NS(SpaceChargeQGaussianProfile_num_dataptrs)( &sc_elem );
-    SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
-
-    can_be_added = NS(Buffer_can_add_object)( buffer, sizeof(
-        NS(SpaceChargeQGaussianProfile) ), num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR,
-            ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
+    can_be_added = ( ( ndataptrs == ( buf_size_t )0 ) &&
+        ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) &&
+        ( NS(Buffer_can_add_object)( buffer,
+            sizeof( NS(SpaceChargeQGaussianProfile) ), ndataptrs,
+                SIXTRL_NULLPTR, SIXTRL_NULLPTR, ptr_requ_objects,
+                    ptr_requ_slots, ptr_requ_dataptrs ) ) );
 
     return can_be_added;
 }
 
-SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* NS(SpaceChargeQGaussianProfile_new)(
+SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
+NS(SpaceChargeQGaussianProfile_new)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
 {
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* added_elem = SIXTRL_NULLPTR;
-    NS(buffer_size_t) num_dataptrs = ( NS(buffer_size_t) )0u;
+    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
+        added_elem = SIXTRL_NULLPTR;
+
+    NS(buffer_size_t) ndataptrs = ( NS(buffer_size_t) )0u;
 
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile) sc_elem;
-    NS(SpaceChargeQGaussianProfile_preset)( &sc_elem );
+    NS(arch_status_t) const status =
+        NS(SpaceChargeQGaussianProfile_clear)( &sc_elem );
 
-    num_dataptrs = NS(SpaceChargeQGaussianProfile_num_dataptrs)( &sc_elem );
-    SIXTRL_ASSERT( num_dataptrs == ( NS(buffer_size_t) )0u );
+    ndataptrs = NS(SpaceChargeQGaussianProfile_num_dataptrs)( &sc_elem );
 
-    added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* )( uintptr_t
-        )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer, &sc_elem,
-            sizeof( sc_elem ), NS(SpaceChargeQGaussianProfile_type_id)( &sc_elem ),
-                num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
+    if( ( ndataptrs == ( NS(buffer_size_t) )0u ) &&
+        ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) )
+    {
+        added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* )(
+        uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
+            &sc_elem, sizeof( NS(SpaceChargeQGaussianProfile) ),
+                NS(SpaceChargeQGaussianProfile_type_id)(), ndataptrs,
+                    SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
+    }
 
     return added_elem;
 }
@@ -989,38 +977,47 @@ NS(SpaceChargeQGaussianProfile_add)(
     SIXTRL_REAL_T const q_param, SIXTRL_REAL_T const b_param,
     bool const enabled )
 {
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* added_elem = SIXTRL_NULLPTR;
+    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
+        added_elem = SIXTRL_NULLPTR;
+
     NS(buffer_size_t) num_dataptrs = ( NS(buffer_size_t) )0u;
 
     NS(SpaceChargeQGaussianProfile) sc_elem;
-    NS(SpaceChargeQGaussianProfile_preset)( &sc_elem );
+    NS(arch_status_t) status =
+        NS(SpaceChargeQGaussianProfile_clear)( &sc_elem );
 
-    NS(SpaceChargeQGaussianProfile_set_num_particles)(
+    status |= NS(SpaceChargeQGaussianProfile_set_num_particles)(
         &sc_elem, num_particles );
 
-    NS(SpaceChargeQGaussianProfile_set_bunchlength_rms)(
+    status |= NS(SpaceChargeQGaussianProfile_set_bunchlength_rms)(
         &sc_elem, bunchlength_rms );
 
-    NS(SpaceChargeQGaussianProfile_set_sigma_x)( &sc_elem, sigma_x );
-    NS(SpaceChargeQGaussianProfile_set_sigma_y)( &sc_elem, sigma_y );
-    NS(SpaceChargeQGaussianProfile_set_length)( &sc_elem, length );
-    NS(SpaceChargeQGaussianProfile_set_x_co)( &sc_elem, x_co );
-    NS(SpaceChargeQGaussianProfile_set_y_co)( &sc_elem, y_co );
+    status |= NS(SpaceChargeQGaussianProfile_set_sigma_x)( &sc_elem, sigma_x );
+    status |= NS(SpaceChargeQGaussianProfile_set_sigma_y)( &sc_elem, sigma_y );
+    status |= NS(SpaceChargeQGaussianProfile_set_length)( &sc_elem, length );
+    status |= NS(SpaceChargeQGaussianProfile_set_x_co)( &sc_elem, x_co );
+    status |= NS(SpaceChargeQGaussianProfile_set_y_co)( &sc_elem, y_co );
 
-    NS(SpaceChargeQGaussianProfile_set_min_sigma_diff)(
+    status |= NS(SpaceChargeQGaussianProfile_set_min_sigma_diff)(
         &sc_elem, min_sigma_diff );
 
-    NS(SpaceChargeQGaussianProfile_set_q_param)( &sc_elem, q_param );
-    NS(SpaceChargeQGaussianProfile_set_b_param)( &sc_elem, b_param );
-    NS(SpaceChargeQGaussianProfile_set_enabled)( &sc_elem, enabled );
+    status |= NS(SpaceChargeQGaussianProfile_set_q_param)( &sc_elem, q_param );
+    status |= NS(SpaceChargeQGaussianProfile_set_b_param)( &sc_elem, b_param );
+    status |= NS(SpaceChargeQGaussianProfile_set_enabled)( &sc_elem, enabled );
 
     num_dataptrs = NS(SpaceChargeQGaussianProfile_num_dataptrs)( &sc_elem );
     SIXTRL_ASSERT( num_dataptrs == ( NS(buffer_size_t) )0u );
 
-    added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* )( uintptr_t
-        )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer, &sc_elem,
-            sizeof( sc_elem ), NS(SpaceChargeQGaussianProfile_type_id)( &sc_elem ),
-                num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
+    if( ( buffer != SIXTRL_NULLPTR ) &&
+        ( num_dataptrs == ( NS(buffer_size_t) )0 ) &&
+        ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) )
+    {
+        added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* )(
+            uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
+                &sc_elem, sizeof( sc_elem ),
+                    NS(SpaceChargeQGaussianProfile_type_id)(), num_dataptrs,
+                        SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
+    }
 
     return added_elem;
 }
@@ -1029,20 +1026,23 @@ SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
 NS(SpaceChargeQGaussianProfile_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_BUFFER_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
-        SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
+        SIXTRL_RESTRICT orig ) SIXTRL_NOEXCEPT
 {
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
         added_elem = SIXTRL_NULLPTR;
 
     NS(buffer_size_t) const num_dataptrs =
-        NS(SpaceChargeQGaussianProfile_num_dataptrs)( sc_elem );
-    SIXTRL_ASSERT( num_dataptrs == ( NS(buffer_size_t) )0u );
+        NS(SpaceChargeQGaussianProfile_num_dataptrs)( orig );
 
-    added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* )(
-        uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
-            sc_elem, sizeof( sc_elem ), NS(SpaceChargeQGaussianProfile_type_id)(
-                sc_elem ), num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR,
-                    SIXTRL_NULLPTR ) );
+    if( ( orig != SIXTRL_NULLPTR ) && ( buffer != SIXTRL_NULLPTR ) &&
+        ( num_dataptrs == ( NS(buffer_size_t) )0 ) )
+    {
+        added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* )(
+            uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
+                orig, sizeof( NS(SpaceChargeQGaussianProfile) ),
+                    NS(SpaceChargeQGaussianProfile_type_id)(), num_dataptrs,
+                        SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
+    }
 
     return added_elem;
 }
@@ -1772,7 +1772,7 @@ NS(SpaceChargeInterpolatedProfile)* NS(SpaceChargeInterpolatedProfile_add)(
     NS(SpaceChargeInterpolatedProfile_set_interpol_data_addr)(
         &sc_elem, interpol_data_addr );
 
-    NS(SpaceChargeInterpolatedProfile_set_line_density_profile_fallback)(
+    NS(SpaceChargeInterpolatedProfile_set_line_density_prof_fallback)(
         &sc_elem, line_density_prof_fallback );
 
     NS(SpaceChargeInterpolatedProfile_set_min_sigma_diff)(

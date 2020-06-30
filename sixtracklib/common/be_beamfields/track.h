@@ -300,8 +300,7 @@ NS(Track_particle_space_charge_interpolated_profile)(
     else
     {
         fact_kick *=
-        NS(SpaceChargeInterpolatedProfile_line_density_profile_fallback)(
-            sc_elem );
+        NS(SpaceChargeInterpolatedProfile_line_density_prof_fallback)( sc_elem );
     }
 
     fact_kick /= ( pc0 * beta );
