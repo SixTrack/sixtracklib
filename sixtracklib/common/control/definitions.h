@@ -447,15 +447,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --  */
 
-    SIXTRL_STATIC_VAR NS(arch_size_t) const ARCH_ILLEGAL_BUFFER_ID =
-        ::NS(ARCH_ILLEGAL_BUFFER_ID);
+    SIXTRL_STATIC_VAR arch_size_t SIXTRL_CONSTEXPR_OR_CONST
+        ARCH_ILLEGAL_BUFFER_ID = static_cast< arch_size_t >(
+            SIXTRL_ARCH_ILLEGAL_BUFFER_ID );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
         ARCH_PARTICLES_BUFFER_ID = static_cast< arch_size_t >(
             SIXTRL_ARCH_PARTICLES_BUFFER_ID );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
-        ARCH_BEAM_ELEMENTS_BUFFER_ID = ::NS(ARCH_BEAM_ELEMENTS_BUFFER_ID);
+        ARCH_BEAM_ELEMENTS_BUFFER_ID = static_cast< arch_size_t >(
+            SIXTRL_ARCH_BEAM_ELEMENTS_BUFFER_ID );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
         ARCH_OUTPUT_BUFFER_ID = static_cast< arch_size_t >(
