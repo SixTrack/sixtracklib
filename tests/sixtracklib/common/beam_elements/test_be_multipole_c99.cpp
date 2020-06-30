@@ -19,12 +19,12 @@
 #include "sixtracklib/common/be_multipole/be_multipole.h"
 
 /* ************************************************************************* *
- * ****** NS(MultiPole):
+ * ****** NS(Multipole):
  * ************************************************************************* */
 
-TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
+TEST( C99CommonBeamElementMultipole, MinimalAddToBufferCopyRemapRead )
 {
-    using    belem_t = NS(MultiPole);
+    using    belem_t = NS(Multipole);
     using     size_t = NS(buffer_size_t);
     using   object_t = NS(Object);
     using      raw_t = unsigned char;
@@ -51,7 +51,7 @@ TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
     hxl_dist_t hxl_dist(    mp_real_t{  -5.0 },  mp_real_t{  +5.0 } );
     hyl_dist_t hyl_dist(    mp_real_t{  -5.0 },  mp_real_t{  +5.0 } );
     bal_dist_t bal_dist(    mp_real_t{ -10.0 },  mp_real_t{ +10.0 } );
-    ord_dist_t ord_dist(   mp_order_t{    -1 }, mp_order_t{  20   } );
+    ord_dist_t ord_dist(   mp_order_t{     0 }, mp_order_t{  20   } );
 
     static SIXTRL_CONSTEXPR_OR_CONST size_t
         NUM_BEAM_ELEMENTS = size_t{ 1000 };
@@ -79,18 +79,18 @@ TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
         mp_real_t  const hyl      = hyl_dist( prng );
         mp_order_t const order    = ord_dist( prng );
 
-        belem_t* ptr_mp = NS(MultiPole_preset)( &orig_beam_elements[ ii ] );
+        belem_t* ptr_mp = NS(Multipole_preset)( &orig_beam_elements[ ii ] );
         ASSERT_TRUE( ptr_mp != nullptr );
 
-        NS(MultiPole_set_length)( ptr_mp, length );
-        NS(MultiPole_set_hxl)( ptr_mp, hxl );
-        NS(MultiPole_set_hyl)( ptr_mp, hyl );
+        NS(Multipole_set_length)( ptr_mp, length );
+        NS(Multipole_set_hxl)( ptr_mp, hxl );
+        NS(Multipole_set_hyl)( ptr_mp, hyl );
 
         ASSERT_TRUE( std::fabs( length -
-            NS(MultiPole_get_length)( ptr_mp ) ) < EPS );
+            NS(Multipole_length)( ptr_mp ) ) < EPS );
 
-        ASSERT_TRUE( std::fabs( hxl - NS(MultiPole_get_hxl)( ptr_mp ) ) < EPS );
-        ASSERT_TRUE( std::fabs( hyl - NS(MultiPole_get_hyl)( ptr_mp ) ) < EPS );
+        ASSERT_TRUE( std::fabs( hxl - NS(Multipole_hxl)( ptr_mp ) ) < EPS );
+        ASSERT_TRUE( std::fabs( hyl - NS(Multipole_hyl)( ptr_mp ) ) < EPS );
 
         if( order >= mp_order_t{ 0 } )
         {
@@ -135,13 +135,18 @@ TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
                 *bal_it = bal_dist( prng );
             }
 
-            NS(MultiPole_assign_bal)( ptr_mp, order, bal_begin );
-            ASSERT_TRUE( NS(MultiPole_get_order)( ptr_mp ) == order );
-            ASSERT_TRUE( NS(MultiPole_get_bal_size)( ptr_mp ) ==
+            NS(arch_status_t) status = NS(Multipole_set_order)( ptr_mp, order );
+            ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
+            ASSERT_TRUE( NS(Multipole_order)( ptr_mp ) == order );
+            ASSERT_TRUE( NS(Multipole_bal_length)( ptr_mp ) ==
                             static_cast< size_t >( 2 * order + 2 ) );
 
-            mp_real_t const* cmp_bal_it =
-                NS(MultiPole_get_const_bal)( ptr_mp );
+            status = NS(Multipole_set_bal_addr)( ptr_mp,
+                static_cast< NS(buffer_addr_t) >( reinterpret_cast<
+                    uintptr_t >( bal_begin ) ) );
+            ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
+            mp_real_t const* cmp_bal_it = NS(Multipole_const_bal_begin)(
+                ptr_mp );
 
             ASSERT_TRUE( cmp_bal_it != nullptr );
 
@@ -153,10 +158,10 @@ TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
             }
 
             size_t const obj_num_dataptrs =
-                NS(MultiPole_get_num_dataptrs)( ptr_mp );
+                NS(Multipole_num_dataptrs)( ptr_mp );
 
             size_t const sizes[]  = { sizeof( mp_real_t ) };
-            size_t const counts[] = { NS(MultiPole_get_bal_size)( ptr_mp ) };
+            size_t const counts[] = { NS(Multipole_bal_length)( ptr_mp ) };
 
             bal_begin = bal_end;
 
@@ -167,14 +172,14 @@ TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
         }
         else
         {
-            NS(MultiPole_set_order)( ptr_mp, mp_order_t{ -1 } );
+            NS(Multipole_set_order)( ptr_mp, mp_order_t{ -1 } );
             num_slots += NS(ManagedBuffer_predict_required_num_slots)( nullptr,
-                sizeof( belem_t ), NS(MultiPole_get_num_dataptrs)( ptr_mp ),
+                sizeof( belem_t ), NS(Multipole_num_dataptrs)( ptr_mp ),
                     nullptr, nullptr, slot_size );
 
         }
 
-        ASSERT_TRUE( order == NS(MultiPole_get_order)( ptr_mp ) );
+        ASSERT_TRUE( order == NS(Multipole_order)( ptr_mp ) );
     }
 
     /* --------------------------------------------------------------------- */
@@ -201,25 +206,25 @@ TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
     ptr_orig = &orig_beam_elements[ be_index++ ];
 
     ASSERT_TRUE( ptr_orig != nullptr );
-    ASSERT_TRUE( ( ( NS(MultiPole_get_order)( ptr_orig ) >= mp_order_t{ 0 } ) &&
-                   ( NS(MultiPole_get_const_bal)( ptr_orig ) != nullptr ) ) ||
-                 ( ( NS(MultiPole_get_order)( ptr_orig ) <  mp_order_t{ 0 } ) &&
-                   ( NS(MultiPole_get_const_bal)( ptr_orig ) == nullptr ) ) );
+    ASSERT_TRUE( ( ( NS(Multipole_order)( ptr_orig ) >= mp_order_t{ 0 } ) &&
+                   ( NS(Multipole_const_bal_begin)( ptr_orig ) != nullptr ) ) ||
+                 ( ( NS(Multipole_order)( ptr_orig ) <  mp_order_t{ 0 } ) &&
+                   ( NS(Multipole_const_bal_begin)( ptr_orig ) == nullptr ) ) );
 
-    if( NS(MultiPole_get_order)( ptr_orig )  >= mp_order_t{ 0 } )
+    if( NS(Multipole_order)( ptr_orig )  >= mp_order_t{ 0 } )
     {
-        size_t const offsets[] = { offsetof( belem_t, bal ) };
+        size_t const offsets[] = { offsetof( belem_t, bal_addr ) };
         size_t const sizes[]   = { sizeof( ::NS(multipole_real_t) ) };
-        size_t const counts[]  = { NS(MultiPole_get_bal_size)( ptr_orig ) };
+        size_t const counts[]  = { NS(Multipole_bal_length)( ptr_orig ) };
 
         ptr_object = NS(Buffer_add_object)( eb, ptr_orig, sizeof( belem_t ),
-            BEAM_ELEMENT_TYPE_ID, NS(MultiPole_get_num_dataptrs)( ptr_orig ),
+            BEAM_ELEMENT_TYPE_ID, NS(Multipole_num_dataptrs)( ptr_orig ),
                 offsets, sizes, counts );
     }
     else
     {
         ptr_object = NS(Buffer_add_object)( eb, ptr_orig, sizeof( belem_t ),
-            BEAM_ELEMENT_TYPE_ID, NS(MultiPole_get_num_dataptrs)( ptr_orig ),
+            BEAM_ELEMENT_TYPE_ID, NS(Multipole_num_dataptrs)( ptr_orig ),
                 nullptr, nullptr, nullptr );
     }
 
@@ -235,25 +240,25 @@ TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
 
     ASSERT_TRUE( ptr_mp != nullptr );
 
-    ASSERT_TRUE( std::fabs( NS(MultiPole_get_length)( ptr_mp ) -
-                            NS(MultiPole_get_length)( ptr_orig ) ) < EPS );
+    ASSERT_TRUE( std::fabs( NS(Multipole_length)( ptr_mp ) -
+                            NS(Multipole_length)( ptr_orig ) ) < EPS );
 
-    ASSERT_TRUE( std::fabs( NS(MultiPole_get_hxl)( ptr_mp ) -
-                            NS(MultiPole_get_hxl)( ptr_orig ) ) < EPS );
+    ASSERT_TRUE( std::fabs( NS(Multipole_hxl)( ptr_mp ) -
+                            NS(Multipole_hxl)( ptr_orig ) ) < EPS );
 
-    ASSERT_TRUE( std::fabs( NS(MultiPole_get_hyl)( ptr_mp ) -
-                            NS(MultiPole_get_hyl)( ptr_orig ) ) < EPS );
+    ASSERT_TRUE( std::fabs( NS(Multipole_hyl)( ptr_mp ) -
+                            NS(Multipole_hyl)( ptr_orig ) ) < EPS );
 
-    ASSERT_TRUE( NS(MultiPole_get_order)( ptr_mp ) ==
-                 NS(MultiPole_get_order)( ptr_orig ) );
+    ASSERT_TRUE( NS(Multipole_order)( ptr_mp ) ==
+                 NS(Multipole_order)( ptr_orig ) );
 
-    if( NS(MultiPole_get_order)( ptr_orig ) > mp_order_t{ 0 } )
+    if( NS(Multipole_order)( ptr_orig ) > mp_order_t{ 0 } )
     {
-        mp_real_t const* orig_bal_it  = NS(MultiPole_get_const_bal)( ptr_orig );
+        mp_real_t const* orig_bal_it  = NS(Multipole_const_bal_begin)( ptr_orig );
         mp_real_t const* orig_bal_end = orig_bal_it;
-        std::advance( orig_bal_end, NS(MultiPole_get_bal_size)( ptr_orig ) );
+        std::advance( orig_bal_end, NS(Multipole_bal_length)( ptr_orig ) );
 
-        mp_real_t const* cmp_bal_it   = NS(MultiPole_get_const_bal)( ptr_mp );
+        mp_real_t const* cmp_bal_it   = NS(Multipole_const_bal_begin)( ptr_mp );
 
         for( ; orig_bal_it != orig_bal_end ; ++orig_bal_it, ++cmp_bal_it )
         {
@@ -262,8 +267,8 @@ TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
     }
     else
     {
-        ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_orig ) == nullptr );
-        ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_mp   ) == nullptr );
+        ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_orig ) == nullptr );
+        ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_mp   ) == nullptr );
     }
 
     /* --------------------------------------------------------------------- */
@@ -271,70 +276,74 @@ TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
     ptr_orig = &orig_beam_elements[ be_index++ ];
     ASSERT_TRUE( ptr_orig != nullptr );
 
-    ptr_mp = NS(MultiPole_new)( eb, NS(MultiPole_get_order)( ptr_orig ) );
+    ptr_mp = NS(Multipole_new)( eb, NS(Multipole_order)( ptr_orig ) );
     ASSERT_TRUE( ptr_mp != nullptr );
 
-    ASSERT_TRUE( std::fabs( NS(MultiPole_get_length)( ptr_mp ) - ZERO ) < EPS );
-    ASSERT_TRUE( std::fabs( NS(MultiPole_get_hxl)( ptr_mp )    - ZERO ) < EPS );
-    ASSERT_TRUE( std::fabs( NS(MultiPole_get_hyl)( ptr_mp )    - ZERO ) < EPS );
+    ASSERT_TRUE( std::fabs( NS(Multipole_length)( ptr_mp ) - ZERO ) < EPS );
+    ASSERT_TRUE( std::fabs( NS(Multipole_hxl)( ptr_mp )    - ZERO ) < EPS );
+    ASSERT_TRUE( std::fabs( NS(Multipole_hyl)( ptr_mp )    - ZERO ) < EPS );
 
-    NS(MultiPole_set_length)( ptr_mp, NS(MultiPole_get_length)( ptr_orig ) );
-    NS(MultiPole_set_hxl)(    ptr_mp, NS(MultiPole_get_hxl)( ptr_orig ) );
-    NS(MultiPole_set_hyl)(    ptr_mp, NS(MultiPole_get_hyl)( ptr_orig ) );
+    NS(Multipole_set_length)( ptr_mp, NS(Multipole_length)( ptr_orig ) );
+    NS(Multipole_set_hxl)(    ptr_mp, NS(Multipole_hxl)( ptr_orig ) );
+    NS(Multipole_set_hyl)(    ptr_mp, NS(Multipole_hyl)( ptr_orig ) );
 
-    ASSERT_TRUE( NS(MultiPole_get_order)( ptr_mp ) ==
-                 NS(MultiPole_get_order)( ptr_orig ) );
+    ASSERT_TRUE( NS(Multipole_order)( ptr_mp ) ==
+                 NS(Multipole_order)( ptr_orig ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(MultiPole_get_length)( ptr_orig ) -
-                                  NS(MultiPole_get_length)( ptr_mp ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Multipole_length)( ptr_orig ) -
+                                  NS(Multipole_length)( ptr_mp ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(MultiPole_get_hxl)( ptr_orig ) -
-                                  NS(MultiPole_get_hxl)( ptr_mp ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Multipole_hxl)( ptr_orig ) -
+                                  NS(Multipole_hxl)( ptr_mp ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(MultiPole_get_hyl)( ptr_orig ) -
-                                  NS(MultiPole_get_hyl)( ptr_mp ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Multipole_hyl)( ptr_orig ) -
+                                  NS(Multipole_hyl)( ptr_mp ) ) );
 
-    if( mp_order_t{ 0 } <= NS(MultiPole_get_order)( ptr_orig ) )
+    if( mp_order_t{ 0 } <= NS(Multipole_order)( ptr_orig ) )
     {
-        ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_mp ) != nullptr );
-        ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_mp ) !=
-                     NS(MultiPole_get_const_bal)( ptr_orig ) );
+        ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_mp ) != nullptr );
+        ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_mp ) !=
+                     NS(Multipole_const_bal_begin)( ptr_orig ) );
 
-        size_t const bal_size = NS(MultiPole_get_bal_size)( ptr_orig );
+        size_t const bal_size = NS(Multipole_bal_length)( ptr_orig );
 
         for( size_t ii = size_t{ 0 } ; ii < bal_size ; ++ii )
         {
             ASSERT_TRUE( EPS > std::fabs(
-                NS(MultiPole_get_bal_value)( ptr_mp, ii ) - ZERO ) );
+                NS(Multipole_bal)( ptr_mp, ii ) - ZERO ) );
         }
 
-        NS(MultiPole_set_bal)( ptr_mp,
-            NS(MultiPole_get_const_bal)( ptr_orig ) );
+        NS(Multipole_set_bal)( ptr_mp,
+            NS(Multipole_const_bal_begin)( ptr_orig ) );
 
-        for( mp_order_t ii = NS(MultiPole_get_order)( ptr_mp ) ;
+        for( mp_order_t ii = NS(Multipole_order)( ptr_mp ) ;
              ii >= mp_order_t{ 0 } ; --ii )
         {
-            ASSERT_TRUE( EPS > std::fabs(
-                NS(MultiPole_get_bal_value)( ptr_mp,   2u * ii      ) -
-                NS(MultiPole_get_bal_value)( ptr_orig, 2u * ii      ) ) );
+            SIXTRL_ASSERT( EPS > std::fabs(
+                NS(Multipole_bal)( ptr_mp,   2u * ii      ) -
+                NS(Multipole_bal)( ptr_orig, 2u * ii      ) ) );
 
             ASSERT_TRUE( EPS > std::fabs(
-                NS(MultiPole_get_bal_value)( ptr_mp,   2u * ii + 1u ) -
-                NS(MultiPole_get_bal_value)( ptr_orig, 2u * ii + 1u ) ) );
+                NS(Multipole_bal)( ptr_mp,   2u * ii      ) -
+                NS(Multipole_bal)( ptr_orig, 2u * ii      ) ) );
 
             ASSERT_TRUE( EPS > std::fabs(
-                NS(MultiPole_get_knl_value)( ptr_mp,   ii ) -
-                NS(MultiPole_get_knl_value)( ptr_orig, ii ) ) );
+                NS(Multipole_bal)( ptr_mp,   2u * ii + 1u ) -
+                NS(Multipole_bal)( ptr_orig, 2u * ii + 1u ) ) );
 
             ASSERT_TRUE( EPS > std::fabs(
-                NS(MultiPole_get_ksl_value)( ptr_mp,   ii ) -
-                NS(MultiPole_get_ksl_value)( ptr_orig, ii ) ) );
+                NS(Multipole_knl)( ptr_mp,   ii ) -
+                NS(Multipole_knl)( ptr_orig, ii ) ) );
+
+            ASSERT_TRUE( EPS > std::fabs(
+                NS(Multipole_ksl)( ptr_mp,   ii ) -
+                NS(Multipole_ksl)( ptr_orig, ii ) ) );
         }
     }
     else
     {
-        ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_mp )   == nullptr );
-        ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_orig ) == nullptr );
+        ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_mp )   == nullptr );
+        ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_orig ) == nullptr );
     }
 
     /* --------------------------------------------------------------------- */
@@ -342,57 +351,58 @@ TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
     ptr_orig = &orig_beam_elements[ be_index++ ];
     ASSERT_TRUE( ptr_orig != nullptr );
 
-    ptr_mp   = NS(MultiPole_add)( eb,
-        NS(MultiPole_get_order)( ptr_orig ),
-        NS(MultiPole_get_const_bal)( ptr_orig ),
-        NS(MultiPole_get_length)( ptr_orig ),
-        NS(MultiPole_get_hxl)( ptr_orig ),
-        NS(MultiPole_get_hyl)( ptr_orig ) );
+    ptr_mp   = NS(Multipole_add)( eb,
+        NS(Multipole_order)( ptr_orig ),
+        NS(Multipole_length)( ptr_orig ),
+        NS(Multipole_hxl)( ptr_orig ),
+        NS(Multipole_hyl)( ptr_orig ),
+        reinterpret_cast< uintptr_t >(
+            NS(Multipole_const_bal_begin)( ptr_orig ) ) );
 
     ASSERT_TRUE( ptr_mp != nullptr );
 
-    mp_order_t order = NS(MultiPole_get_order)( ptr_orig );
+    mp_order_t order = NS(Multipole_order)( ptr_orig );
 
-    ASSERT_TRUE( NS(MultiPole_get_order)( ptr_mp ) == order );
+    ASSERT_TRUE( NS(Multipole_order)( ptr_mp ) == order );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(MultiPole_get_length)( ptr_orig ) -
-                                  NS(MultiPole_get_length)( ptr_mp ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Multipole_length)( ptr_orig ) -
+                                  NS(Multipole_length)( ptr_mp ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(MultiPole_get_hxl)( ptr_orig ) -
-                                  NS(MultiPole_get_hxl)( ptr_mp ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Multipole_hxl)( ptr_orig ) -
+                                  NS(Multipole_hxl)( ptr_mp ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(MultiPole_get_hyl)( ptr_orig ) -
-                                  NS(MultiPole_get_hyl)( ptr_mp ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Multipole_hyl)( ptr_orig ) -
+                                  NS(Multipole_hyl)( ptr_mp ) ) );
 
     if( mp_order_t{ 0 } <= order )
     {
-        ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_mp ) != nullptr );
-        ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_mp ) !=
-                     NS(MultiPole_get_const_bal)( ptr_orig ) );
+        ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_mp ) != nullptr );
+        ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_mp ) !=
+                     NS(Multipole_const_bal_begin)( ptr_orig ) );
 
         for( mp_order_t ii = order ; ii >= mp_order_t{ 0 } ; --ii )
         {
             ASSERT_TRUE( EPS > std::fabs(
-                NS(MultiPole_get_bal_value)( ptr_mp,   2u * ii      ) -
-                NS(MultiPole_get_bal_value)( ptr_orig, 2u * ii      ) ) );
+                NS(Multipole_bal)( ptr_mp,   2u * ii      ) -
+                NS(Multipole_bal)( ptr_orig, 2u * ii      ) ) );
 
             ASSERT_TRUE( EPS > std::fabs(
-                NS(MultiPole_get_bal_value)( ptr_mp,   2u * ii + 1u ) -
-                NS(MultiPole_get_bal_value)( ptr_orig, 2u * ii + 1u ) ) );
+                NS(Multipole_bal)( ptr_mp,   2u * ii + 1u ) -
+                NS(Multipole_bal)( ptr_orig, 2u * ii + 1u ) ) );
 
             ASSERT_TRUE( EPS > std::fabs(
-                NS(MultiPole_get_knl_value)( ptr_mp,   ii ) -
-                NS(MultiPole_get_knl_value)( ptr_orig, ii ) ) );
+                NS(Multipole_knl)( ptr_mp,   ii ) -
+                NS(Multipole_knl)( ptr_orig, ii ) ) );
 
             ASSERT_TRUE( EPS > std::fabs(
-                NS(MultiPole_get_ksl_value)( ptr_mp,   ii ) -
-                NS(MultiPole_get_ksl_value)( ptr_orig, ii ) ) );
+                NS(Multipole_ksl)( ptr_mp,   ii ) -
+                NS(Multipole_ksl)( ptr_orig, ii ) ) );
         }
     }
     else
     {
-        ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_mp )   == nullptr );
-        ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_orig ) == nullptr );
+        ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_mp )   == nullptr );
+        ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_orig ) == nullptr );
     }
 
     /* --------------------------------------------------------------------- */
@@ -402,57 +412,58 @@ TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
         ptr_orig = &orig_beam_elements[ be_index++ ];
         ASSERT_TRUE( ptr_orig != nullptr );
 
-        ptr_mp   = NS(MultiPole_add)( eb,
-            NS(MultiPole_get_order)( ptr_orig ),
-            NS(MultiPole_get_const_bal)( ptr_orig ),
-            NS(MultiPole_get_length)( ptr_orig ),
-            NS(MultiPole_get_hxl)( ptr_orig ),
-            NS(MultiPole_get_hyl)( ptr_orig ) );
+        ptr_mp   = NS(Multipole_add)( eb,
+            NS(Multipole_order)( ptr_orig ),
+            NS(Multipole_length)( ptr_orig ),
+            NS(Multipole_hxl)( ptr_orig ),
+            NS(Multipole_hyl)( ptr_orig ),
+            reinterpret_cast< uintptr_t >(
+                NS(Multipole_const_bal_begin)( ptr_orig ) ) );
 
         ASSERT_TRUE( ptr_mp != nullptr );
 
-        mp_order_t order = NS(MultiPole_get_order)( ptr_orig );
+        mp_order_t order = NS(Multipole_order)( ptr_orig );
 
-        ASSERT_TRUE( NS(MultiPole_get_order)( ptr_mp ) == order );
+        ASSERT_TRUE( NS(Multipole_order)( ptr_mp ) == order );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(MultiPole_get_length)( ptr_orig ) -
-                                      NS(MultiPole_get_length)( ptr_mp ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Multipole_length)( ptr_orig ) -
+                                      NS(Multipole_length)( ptr_mp ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(MultiPole_get_hxl)( ptr_orig ) -
-                                      NS(MultiPole_get_hxl)( ptr_mp ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Multipole_hxl)( ptr_orig ) -
+                                      NS(Multipole_hxl)( ptr_mp ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(MultiPole_get_hyl)( ptr_orig ) -
-                                      NS(MultiPole_get_hyl)( ptr_mp ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Multipole_hyl)( ptr_orig ) -
+                                      NS(Multipole_hyl)( ptr_mp ) ) );
 
         if( mp_order_t{ 0 } <= order )
         {
-            ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_mp ) != nullptr );
-            ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_mp ) !=
-                        NS(MultiPole_get_const_bal)( ptr_orig ) );
+            ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_mp ) != nullptr );
+            ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_mp ) !=
+                        NS(Multipole_const_bal_begin)( ptr_orig ) );
 
             for( mp_order_t ii = order ; ii >= mp_order_t{ 0 } ; --ii )
             {
                 ASSERT_TRUE( EPS > std::fabs(
-                    NS(MultiPole_get_bal_value)( ptr_mp,   2u * ii      ) -
-                    NS(MultiPole_get_bal_value)( ptr_orig, 2u * ii      ) ) );
+                    NS(Multipole_bal)( ptr_mp,   2u * ii      ) -
+                    NS(Multipole_bal)( ptr_orig, 2u * ii      ) ) );
 
                 ASSERT_TRUE( EPS > std::fabs(
-                    NS(MultiPole_get_bal_value)( ptr_mp,   2u * ii + 1u ) -
-                    NS(MultiPole_get_bal_value)( ptr_orig, 2u * ii + 1u ) ) );
+                    NS(Multipole_bal)( ptr_mp,   2u * ii + 1u ) -
+                    NS(Multipole_bal)( ptr_orig, 2u * ii + 1u ) ) );
 
                 ASSERT_TRUE( EPS > std::fabs(
-                    NS(MultiPole_get_knl_value)( ptr_mp,   ii ) -
-                    NS(MultiPole_get_knl_value)( ptr_orig, ii ) ) );
+                    NS(Multipole_knl)( ptr_mp,   ii ) -
+                    NS(Multipole_knl)( ptr_orig, ii ) ) );
 
                 ASSERT_TRUE( EPS > std::fabs(
-                    NS(MultiPole_get_ksl_value)( ptr_mp,   ii ) -
-                    NS(MultiPole_get_ksl_value)( ptr_orig, ii ) ) );
+                    NS(Multipole_ksl)( ptr_mp,   ii ) -
+                    NS(Multipole_ksl)( ptr_orig, ii ) ) );
             }
         }
         else
         {
-            ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_mp )   == nullptr );
-            ASSERT_TRUE( NS(MultiPole_get_const_bal)( ptr_orig ) == nullptr );
+            ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_mp )   == nullptr );
+            ASSERT_TRUE( NS(Multipole_const_bal_begin)( ptr_orig ) == nullptr );
         }
     }
 
@@ -505,48 +516,48 @@ TEST( C99CommonBeamElementMultiPole, MinimalAddToBufferCopyRemapRead )
         ASSERT_TRUE( cmp_elem != nullptr );
         ASSERT_TRUE( cmp_elem != elem    );
 
-        mp_order_t order = NS(MultiPole_get_order)( elem );
+        mp_order_t order = NS(Multipole_order)( elem );
 
-        ASSERT_TRUE( NS(MultiPole_get_order)( cmp_elem ) == order );
+        ASSERT_TRUE( NS(Multipole_order)( cmp_elem ) == order );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(MultiPole_get_length)( elem ) -
-                                      NS(MultiPole_get_length)( cmp_elem ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Multipole_length)( elem ) -
+                                      NS(Multipole_length)( cmp_elem ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(MultiPole_get_hxl)( elem ) -
-                                      NS(MultiPole_get_hxl)( cmp_elem ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Multipole_hxl)( elem ) -
+                                      NS(Multipole_hxl)( cmp_elem ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(MultiPole_get_hyl)( elem ) -
-                                      NS(MultiPole_get_hyl)( cmp_elem ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Multipole_hyl)( elem ) -
+                                      NS(Multipole_hyl)( cmp_elem ) ) );
 
         if( mp_order_t{ 0 } <= order )
         {
-            ASSERT_TRUE( NS(MultiPole_get_const_bal)( cmp_elem ) != nullptr );
-            ASSERT_TRUE( NS(MultiPole_get_const_bal)( cmp_elem ) !=
-                         NS(MultiPole_get_const_bal)( elem ) );
+            ASSERT_TRUE( NS(Multipole_const_bal_begin)( cmp_elem ) != nullptr );
+            ASSERT_TRUE( NS(Multipole_const_bal_begin)( cmp_elem ) !=
+                         NS(Multipole_const_bal_begin)( elem ) );
 
             for( mp_order_t ii = order ; ii >= mp_order_t{ 0 } ; --ii )
             {
                 ASSERT_TRUE( EPS > std::fabs(
-                    NS(MultiPole_get_bal_value)( cmp_elem, 2u * ii      ) -
-                    NS(MultiPole_get_bal_value)( elem, 2u * ii      ) ) );
+                    NS(Multipole_bal)( cmp_elem, 2u * ii      ) -
+                    NS(Multipole_bal)( elem, 2u * ii      ) ) );
 
                 ASSERT_TRUE( EPS > std::fabs(
-                    NS(MultiPole_get_bal_value)( cmp_elem, 2u * ii + 1u ) -
-                    NS(MultiPole_get_bal_value)( elem, 2u * ii + 1u ) ) );
+                    NS(Multipole_bal)( cmp_elem, 2u * ii + 1u ) -
+                    NS(Multipole_bal)( elem, 2u * ii + 1u ) ) );
 
                 ASSERT_TRUE( EPS > std::fabs(
-                    NS(MultiPole_get_knl_value)( cmp_elem, ii ) -
-                    NS(MultiPole_get_knl_value)( elem, ii ) ) );
+                    NS(Multipole_knl)( cmp_elem, ii ) -
+                    NS(Multipole_knl)( elem, ii ) ) );
 
                 ASSERT_TRUE( EPS > std::fabs(
-                    NS(MultiPole_get_ksl_value)( cmp_elem, ii ) -
-                    NS(MultiPole_get_ksl_value)( elem, ii ) ) );
+                    NS(Multipole_ksl)( cmp_elem, ii ) -
+                    NS(Multipole_ksl)( elem, ii ) ) );
             }
         }
         else
         {
-            ASSERT_TRUE( NS(MultiPole_get_const_bal)( cmp_elem ) == nullptr );
-            ASSERT_TRUE( NS(MultiPole_get_const_bal)( elem ) == nullptr );
+            ASSERT_TRUE( NS(Multipole_const_bal_begin)( cmp_elem ) == nullptr );
+            ASSERT_TRUE( NS(Multipole_const_bal_begin)( elem ) == nullptr );
         }
     }
 

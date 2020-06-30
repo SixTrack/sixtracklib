@@ -73,15 +73,15 @@ TEST( C99CommonBeamElementCavity, MinimalAddToBufferCopyRemapRead )
         NS(Cavity_set_lag)( ptr_cav, lag );
 
         ASSERT_TRUE( EPS > std::fabs(
-            voltage  - NS(Cavity_get_voltage)( ptr_cav ) ) );
+            voltage  - NS(Cavity_voltage)( ptr_cav ) ) );
 
         ASSERT_TRUE( EPS > std::fabs(
-            frequency - NS(Cavity_get_frequency)( ptr_cav ) ) );
+            frequency - NS(Cavity_frequency)( ptr_cav ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( lag - NS(Cavity_get_lag)( ptr_cav ) ) );
+        ASSERT_TRUE( EPS > std::fabs( lag - NS(Cavity_lag)( ptr_cav ) ) );
 
         num_slots += NS(ManagedBuffer_predict_required_num_slots)( nullptr,
-            sizeof( NS(Cavity) ), NS(Cavity_get_num_dataptrs)( ptr_cav ),
+            sizeof( NS(Cavity) ), NS(Cavity_num_dataptrs)( ptr_cav ),
                 nullptr, nullptr, slot_size );
     }
 
@@ -100,7 +100,7 @@ TEST( C99CommonBeamElementCavity, MinimalAddToBufferCopyRemapRead )
     ASSERT_TRUE( ptr_orig != nullptr );
 
     object_t* ptr_object = NS(Buffer_add_object)( eb, ptr_orig, sizeof( belem_t ),
-        BEAM_ELEMENT_TYPE_ID, NS(Cavity_get_num_dataptrs)( ptr_orig ),
+        BEAM_ELEMENT_TYPE_ID, NS(Cavity_num_dataptrs)( ptr_orig ),
             nullptr, nullptr, nullptr );
 
     ASSERT_TRUE( ptr_object != nullptr );
@@ -114,14 +114,14 @@ TEST( C99CommonBeamElementCavity, MinimalAddToBufferCopyRemapRead )
 
     ASSERT_TRUE( ptr_cav != nullptr );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_voltage)( ptr_cav ) -
-                                  NS(Cavity_get_voltage)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_voltage)( ptr_cav ) -
+                                  NS(Cavity_voltage)( ptr_orig  ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_frequency)( ptr_cav ) -
-                                  NS(Cavity_get_frequency)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_frequency)( ptr_cav ) -
+                                  NS(Cavity_frequency)( ptr_orig  ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_lag)( ptr_cav ) -
-                                  NS(Cavity_get_lag)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_lag)( ptr_cav ) -
+                                  NS(Cavity_lag)( ptr_orig  ) ) );
 
     /* --------------------------------------------------------------------- */
 
@@ -131,60 +131,60 @@ TEST( C99CommonBeamElementCavity, MinimalAddToBufferCopyRemapRead )
     ASSERT_TRUE( ptr_cav != nullptr );
     ASSERT_TRUE( NS(Buffer_get_num_of_objects)( eb ) == be_index );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_voltage)( ptr_cav ) - ZERO ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_voltage)( ptr_cav ) - ZERO ) );
 
-    NS(Cavity_set_voltage)( ptr_cav, NS(Cavity_get_voltage)( ptr_orig ) );
-    NS(Cavity_set_frequency)( ptr_cav, NS(Cavity_get_frequency)( ptr_orig ) );
-    NS(Cavity_set_lag)( ptr_cav, NS(Cavity_get_lag)( ptr_orig ) );
+    NS(Cavity_set_voltage)( ptr_cav, NS(Cavity_voltage)( ptr_orig ) );
+    NS(Cavity_set_frequency)( ptr_cav, NS(Cavity_frequency)( ptr_orig ) );
+    NS(Cavity_set_lag)( ptr_cav, NS(Cavity_lag)( ptr_orig ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_voltage)( ptr_cav ) -
-                                  NS(Cavity_get_voltage)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_voltage)( ptr_cav ) -
+                                  NS(Cavity_voltage)( ptr_orig  ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_frequency)( ptr_cav ) -
-                                  NS(Cavity_get_frequency)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_frequency)( ptr_cav ) -
+                                  NS(Cavity_frequency)( ptr_orig  ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_lag)( ptr_cav ) -
-                                  NS(Cavity_get_lag)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_lag)( ptr_cav ) -
+                                  NS(Cavity_lag)( ptr_orig  ) ) );
 
     /* --------------------------------------------------------------------- */
 
     ptr_orig  = &orig_beam_elements[ be_index++ ];
     ptr_cav = NS(Cavity_add)( eb,
-        NS(Cavity_get_voltage)( ptr_orig ),
-        NS(Cavity_get_frequency)( ptr_orig ),
-        NS(Cavity_get_lag)( ptr_orig ) );
+        NS(Cavity_voltage)( ptr_orig ),
+        NS(Cavity_frequency)( ptr_orig ),
+        NS(Cavity_lag)( ptr_orig ) );
 
     ASSERT_TRUE( ptr_cav != nullptr );
     ASSERT_TRUE( NS(Buffer_get_num_of_objects)( eb ) == be_index );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_voltage)( ptr_cav ) -
-                                  NS(Cavity_get_voltage)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_voltage)( ptr_cav ) -
+                                  NS(Cavity_voltage)( ptr_orig  ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_frequency)( ptr_cav ) -
-                                  NS(Cavity_get_frequency)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_frequency)( ptr_cav ) -
+                                  NS(Cavity_frequency)( ptr_orig  ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_lag)( ptr_cav ) -
-                                  NS(Cavity_get_lag)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(Cavity_lag)( ptr_cav ) -
+                                  NS(Cavity_lag)( ptr_orig  ) ) );
 
     for( ; be_index < NUM_BEAM_ELEMENTS ; )
     {
         ptr_orig  = &orig_beam_elements[ be_index++ ];
         ptr_cav = NS(Cavity_add)( eb,
-            NS(Cavity_get_voltage)( ptr_orig ),
-            NS(Cavity_get_frequency)( ptr_orig ),
-            NS(Cavity_get_lag)( ptr_orig ) );
+            NS(Cavity_voltage)( ptr_orig ),
+            NS(Cavity_frequency)( ptr_orig ),
+            NS(Cavity_lag)( ptr_orig ) );
 
         ASSERT_TRUE( ptr_cav != nullptr );
         ASSERT_TRUE( NS(Buffer_get_num_of_objects)( eb ) == be_index );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_voltage)( ptr_cav ) -
-                                  NS(Cavity_get_voltage)( ptr_orig  ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_voltage)( ptr_cav ) -
+                                  NS(Cavity_voltage)( ptr_orig  ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_frequency)( ptr_cav ) -
-                                    NS(Cavity_get_frequency)( ptr_orig  ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_frequency)( ptr_cav ) -
+                                    NS(Cavity_frequency)( ptr_orig  ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_lag)( ptr_cav ) -
-                                    NS(Cavity_get_lag)( ptr_orig  ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_lag)( ptr_cav ) -
+                                    NS(Cavity_lag)( ptr_orig  ) ) );
     }
 
     /* --------------------------------------------------------------------- */
@@ -235,23 +235,23 @@ TEST( C99CommonBeamElementCavity, MinimalAddToBufferCopyRemapRead )
         ASSERT_TRUE( cmp_elem != nullptr );
         ASSERT_TRUE( cmp_elem != elem    );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_voltage)( elem ) -
-                                  NS(Cavity_get_voltage)( ptr_orig  ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_voltage)( elem ) -
+                                  NS(Cavity_voltage)( ptr_orig  ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_frequency)( elem ) -
-                                    NS(Cavity_get_frequency)( ptr_orig  ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_frequency)( elem ) -
+                                    NS(Cavity_frequency)( ptr_orig  ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_lag)( elem ) -
-                                    NS(Cavity_get_lag)( ptr_orig  ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_lag)( elem ) -
+                                    NS(Cavity_lag)( ptr_orig  ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_voltage)( cmp_elem ) -
-                                  NS(Cavity_get_voltage)( ptr_orig  ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_voltage)( cmp_elem ) -
+                                  NS(Cavity_voltage)( ptr_orig  ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_frequency)( cmp_elem ) -
-                                    NS(Cavity_get_frequency)( ptr_orig  ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_frequency)( cmp_elem ) -
+                                    NS(Cavity_frequency)( ptr_orig  ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_get_lag)( cmp_elem ) -
-                                    NS(Cavity_get_lag)( ptr_orig  ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(Cavity_lag)( cmp_elem ) -
+                                    NS(Cavity_lag)( ptr_orig  ) ) );
     }
 
     /* --------------------------------------------------------------------- */

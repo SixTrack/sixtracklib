@@ -65,12 +65,12 @@ TEST( C99CommonBeamElementSRotation, MinimalAddToBufferCopyRemapRead )
         NS(SRotation_set_angle)( ptr_srot, angle );
 
         ASSERT_TRUE( EPS > std::fabs(
-            std::cos( angle ) - NS(SRotation_get_cos_angle)( ptr_srot ) ) );
+            std::cos( angle ) - NS(SRotation_cos_angle)( ptr_srot ) ) );
 
         ASSERT_TRUE( EPS > std::fabs(
-            std::sin( angle ) - NS(SRotation_get_sin_angle)( ptr_srot  ) ) );
+            std::sin( angle ) - NS(SRotation_sin_angle)( ptr_srot  ) ) );
 
-        real_t const cmp_angle = NS(SRotation_get_angle)( ptr_srot );
+        real_t const cmp_angle = NS(SRotation_angle)( ptr_srot );
         real_t const delta     = std::fabs( angle - cmp_angle );
 
         if( EPS <= std::fabs( delta  ) )
@@ -79,10 +79,10 @@ TEST( C99CommonBeamElementSRotation, MinimalAddToBufferCopyRemapRead )
         }
 
         ASSERT_TRUE( EPS > std::fabs(
-            angle - NS(SRotation_get_angle)( ptr_srot ) ) );
+            angle - NS(SRotation_angle)( ptr_srot ) ) );
 
         num_slots += NS(ManagedBuffer_predict_required_num_slots)( nullptr,
-            sizeof( NS(SRotation) ), NS(SRotation_get_num_dataptrs)( ptr_srot ),
+            sizeof( NS(SRotation) ), NS(SRotation_num_dataptrs)( ptr_srot ),
                 nullptr, nullptr, slot_size );
     }
 
@@ -101,7 +101,7 @@ TEST( C99CommonBeamElementSRotation, MinimalAddToBufferCopyRemapRead )
     ASSERT_TRUE( ptr_orig != nullptr );
 
     object_t* ptr_object = NS(Buffer_add_object)( eb, ptr_orig, sizeof( belem_t ),
-        BEAM_ELEMENT_TYPE_ID, NS(SRotation_get_num_dataptrs)( ptr_orig ),
+        BEAM_ELEMENT_TYPE_ID, NS(SRotation_num_dataptrs)( ptr_orig ),
             nullptr, nullptr, nullptr );
 
     ASSERT_TRUE( ptr_object != nullptr );
@@ -115,14 +115,14 @@ TEST( C99CommonBeamElementSRotation, MinimalAddToBufferCopyRemapRead )
 
     ASSERT_TRUE( ptr_srot != nullptr );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_angle)( ptr_srot ) -
-                                  NS(SRotation_get_angle)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_angle)( ptr_srot ) -
+                                  NS(SRotation_angle)( ptr_orig  ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_cos_angle)( ptr_srot ) -
-                                  NS(SRotation_get_cos_angle)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_cos_angle)( ptr_srot ) -
+                                  NS(SRotation_cos_angle)( ptr_orig  ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_sin_angle)( ptr_srot ) -
-                                  NS(SRotation_get_sin_angle)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_sin_angle)( ptr_srot ) -
+                                  NS(SRotation_sin_angle)( ptr_orig  ) ) );
 
     /* --------------------------------------------------------------------- */
 
@@ -132,73 +132,76 @@ TEST( C99CommonBeamElementSRotation, MinimalAddToBufferCopyRemapRead )
     ASSERT_TRUE( ptr_srot != nullptr );
     ASSERT_TRUE( NS(Buffer_get_num_of_objects)( eb ) == be_index );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_angle)( ptr_srot ) - ZERO ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_angle)( ptr_srot ) - ZERO ) );
 
-    NS(SRotation_set_angle)( ptr_srot, NS(SRotation_get_angle)( ptr_orig ) );
+    NS(SRotation_set_angle)( ptr_srot, NS(SRotation_angle)( ptr_orig ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_angle)( ptr_srot ) -
-                                  NS(SRotation_get_angle)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_angle)( ptr_srot ) -
+                                  NS(SRotation_angle)( ptr_orig  ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_cos_angle)( ptr_srot ) -
-                                  NS(SRotation_get_cos_angle)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_cos_angle)( ptr_srot ) -
+                                  NS(SRotation_cos_angle)( ptr_orig  ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_sin_angle)( ptr_srot ) -
-                                  NS(SRotation_get_sin_angle)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_sin_angle)( ptr_srot ) -
+                                  NS(SRotation_sin_angle)( ptr_orig  ) ) );
     /* --------------------------------------------------------------------- */
 
     ptr_orig  = &orig_beam_elements[ be_index++ ];
-    ptr_srot = NS(SRotation_add)( eb, NS(SRotation_get_angle)( ptr_orig ) );
+    ptr_srot = NS(SRotation_add)( eb,
+        NS(SRotation_cos_angle)( ptr_orig ),
+        NS(SRotation_sin_angle)( ptr_orig ) );
 
     ASSERT_TRUE( ptr_srot != nullptr );
     ASSERT_TRUE( NS(Buffer_get_num_of_objects)( eb ) == be_index );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_angle)( ptr_srot ) -
-                                  NS(SRotation_get_angle)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_angle)( ptr_srot ) -
+                                  NS(SRotation_angle)( ptr_orig  ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_cos_angle)( ptr_srot ) -
-                                  NS(SRotation_get_cos_angle)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_cos_angle)( ptr_srot ) -
+                                  NS(SRotation_cos_angle)( ptr_orig  ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_sin_angle)( ptr_srot ) -
-                                  NS(SRotation_get_sin_angle)( ptr_orig  ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_sin_angle)( ptr_srot ) -
+                                  NS(SRotation_sin_angle)( ptr_orig  ) ) );
 
     /* --------------------------------------------------------------------- */
 
     ptr_orig  = &orig_beam_elements[ be_index++ ];
 
-    ptr_srot = NS(SRotation_add_detailed)( eb,
-        std::cos( NS(SRotation_get_angle)( ptr_orig ) ),
-        std::sin( NS(SRotation_get_angle)( ptr_orig ) ) );
+    ptr_srot = NS(SRotation_add)( eb,
+        std::cos( NS(SRotation_angle)( ptr_orig ) ),
+        std::sin( NS(SRotation_angle)( ptr_orig ) ) );
 
     ASSERT_TRUE( ptr_srot != nullptr );
     ASSERT_TRUE( NS(Buffer_get_num_of_objects)( eb ) == be_index );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_angle)( ptr_srot ) -
-                                  NS(SRotation_get_angle)( ptr_orig ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_angle)( ptr_srot ) -
+                                  NS(SRotation_angle)( ptr_orig ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_cos_angle)( ptr_srot ) -
-                                  NS(SRotation_get_cos_angle)( ptr_orig ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_cos_angle)( ptr_srot ) -
+                                  NS(SRotation_cos_angle)( ptr_orig ) ) );
 
-    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_sin_angle)( ptr_srot ) -
-                                  NS(SRotation_get_sin_angle)( ptr_orig ) ) );
+    ASSERT_TRUE( EPS > std::fabs( NS(SRotation_sin_angle)( ptr_srot ) -
+                                  NS(SRotation_sin_angle)( ptr_orig ) ) );
 
 
 
     for( ; be_index < NUM_BEAM_ELEMENTS ; )
     {
         ptr_orig = &orig_beam_elements[ be_index++ ];
-        ptr_srot = NS(SRotation_add)( eb, NS(SRotation_get_angle)( ptr_orig ) );
+        ptr_srot = NS(SRotation_add)( eb, NS(SRotation_cos_angle)( ptr_orig ),
+                                      NS(SRotation_sin_angle)( ptr_orig ) );
 
         ASSERT_TRUE( ptr_srot != nullptr );
         ASSERT_TRUE( NS(Buffer_get_num_of_objects)( eb ) == be_index );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_angle)( ptr_srot ) -
-                                      NS(SRotation_get_angle)( ptr_orig ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_angle)( ptr_srot ) -
+                                      NS(SRotation_angle)( ptr_orig ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_cos_angle)( ptr_srot ) -
-                                      NS(SRotation_get_cos_angle)( ptr_orig ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_cos_angle)( ptr_srot ) -
+                                      NS(SRotation_cos_angle)( ptr_orig ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_sin_angle)( ptr_srot ) -
-                                      NS(SRotation_get_sin_angle)( ptr_orig ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_sin_angle)( ptr_srot ) -
+                                      NS(SRotation_sin_angle)( ptr_orig ) ) );
     }
 
     /* --------------------------------------------------------------------- */
@@ -249,23 +252,23 @@ TEST( C99CommonBeamElementSRotation, MinimalAddToBufferCopyRemapRead )
         ASSERT_TRUE( cmp_elem != nullptr );
         ASSERT_TRUE( cmp_elem != elem    );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_angle)( elem ) -
-                                      NS(SRotation_get_angle)( ptr_orig ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_angle)( elem ) -
+                                      NS(SRotation_angle)( ptr_orig ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_cos_angle)( elem ) -
-                                      NS(SRotation_get_cos_angle)( ptr_orig ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_cos_angle)( elem ) -
+                                      NS(SRotation_cos_angle)( ptr_orig ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_sin_angle)( elem ) -
-                                      NS(SRotation_get_sin_angle)( ptr_orig ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_sin_angle)( elem ) -
+                                      NS(SRotation_sin_angle)( ptr_orig ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_angle)( cmp_elem ) -
-                                      NS(SRotation_get_angle)( ptr_orig ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_angle)( cmp_elem ) -
+                                      NS(SRotation_angle)( ptr_orig ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_cos_angle)( cmp_elem ) -
-                                      NS(SRotation_get_cos_angle)( ptr_orig ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_cos_angle)( cmp_elem ) -
+                                      NS(SRotation_cos_angle)( ptr_orig ) ) );
 
-        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_get_sin_angle)( cmp_elem ) -
-                                      NS(SRotation_get_sin_angle)( ptr_orig ) ) );
+        ASSERT_TRUE( EPS > std::fabs( NS(SRotation_sin_angle)( cmp_elem ) -
+                                      NS(SRotation_sin_angle)( ptr_orig ) ) );
     }
 
     /* --------------------------------------------------------------------- */
