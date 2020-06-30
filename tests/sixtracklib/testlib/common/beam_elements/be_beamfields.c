@@ -41,137 +41,6 @@ void NS(BeamBeam4D_print)(
 }
 
 /* ************************************************************************* */
-/* SpaceChargeCoasting:  */
-
-void NS(SpaceChargeCoasting_print)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT e )
-{
-    if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
-    {
-        fprintf( fp,
-                 "|sc coasting     | num_particles     = %+20.12f\r\n"
-                 "                 | circumference     = %+20.12f\r\n"
-                 "                 | sigma_x           = %+20.12f\r\n"
-                 "                 | sigma_y           = %+20.12f\r\n"
-                 "                 | length            = %+20.12f\r\n"
-                 "                 | x_co              = %+20.12f\r\n"
-                 "                 | y_co              = %+20.12f\r\n"
-                 "                 | min_sigma_diff    = %+20.12f\r\n"
-                 "                 | enabled           = %20lu\r\n",
-            e->num_particles, e->circumference, e->sigma_x, e->sigma_y,
-            e->length, e->x_co, e->y_co, e->min_sigma_diff,
-            ( unsigned long )e->enabled );
-    }
-
-    return;
-}
-
-/* ************************************************************************* */
-/* SpaceChargeQGaussianProfile:  */
-
-void NS(SpaceChargeQGaussianProfile_print)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const
-        NS(SpaceChargeQGaussianProfile) *const SIXTRL_RESTRICT e )
-{
-    if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
-    {
-        fprintf( fp,
-                 "|sc q-gaussian   | num_particles     = %+20.12f\r\n"
-                 "                 | circumference     = %+20.12f\r\n"
-                 "                 | sigma_x           = %+20.12f\r\n"
-                 "                 | sigma_y           = %+20.12f\r\n"
-                 "                 | length            = %+20.12f\r\n"
-                 "                 | x_co              = %+20.12f\r\n"
-                 "                 | y_co              = %+20.12f\r\n"
-                 "                 | min_sigma_diff    = %+20.12f\r\n"
-                 "                 | q_param           = %+20.12f\r\n"
-                 "                 | b_param           = %+20.12f\r\n"
-                 "                 | enabled           = %20lu\r\n",
-            e->num_particles, e->bunchlength_rms, e->sigma_x, e->sigma_y,
-            e->length, e->x_co, e->y_co, e->min_sigma_diff, e->q_param,
-            e->b_param, ( unsigned long )e->enabled );
-    }
-
-    return;
-}
-
-/* ************************************************************************* */
-/* SpaceChargeInterpolatedProfile:  */
-
-void NS(LineDensityProfileData_print)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BUFFER_DATAPTR_DEC const
-        NS(LineDensityProfileData) *const SIXTRL_RESTRICT e )
-{
-    if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
-    {
-        switch( NS(LineDensityProfileData_method)( e ) )
-        {
-            case NS(MATH_INTERPOL_LINEAR):
-            {
-                fprintf( fp, "|line density    | method                = linear\r\n" );
-                break;
-            }
-
-            case NS(MATH_INTERPOL_CUBIC):
-            {
-                fprintf( fp, "|line density    | method                = cubic spline\r\n" );
-                break;
-            }
-
-            default:
-            {
-                fprintf( fp, "|line density    | method                = none / unknown\r\n" );
-            }
-        };
-
-        fprintf( fp,
-                 "                 | num_values            = %21ld\r\n"
-                 "                 | values_addr           = %21lu\r\n"
-                 "                 | derivatives_addr      = %21lu\r\n"
-                 "                 | z0                    = %+20.12f\r\n"
-                 "                 | dz                    = %+20.12f\r\n"
-                 "                 | capacity              = %21ld\r\n",
-            e->num_values, ( unsigned long )e->values_addr,
-            ( unsigned long )e->derivatives_addr, e->z0, e->dz, e->capacity );
-    }
-
-    return;
-}
-
-/* ************************************************************************* */
-/* SpaceChargeInterpolatedProfile:  */
-
-void NS(SpaceChargeInterpolatedProfile_print)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const
-        NS(SpaceChargeInterpolatedProfile) *const SIXTRL_RESTRICT e )
-{
-    if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
-    {
-        fprintf( fp,
-                 "|sc interpolated | num_particles         = %+20.12f\r\n"
-                 "                 | sigma_x               = %+20.12f\r\n"
-                 "                 | sigma_y               = %+20.12f\r\n"
-                 "                 | length                = %+20.12f\r\n"
-                 "                 | x_co                  = %+20.12f\r\n"
-                 "                 | y_co                  = %+20.12f\r\n"
-                 "                 | interpol_data_addr    = %21lu\r\n"
-                 "                 | line_density_fallback = %+20.12f\r\n"
-                 "                 | min_sigma_diff        = %+20.12f\r\n"
-                 "                 | enabled               = %20lu\r\n",
-            e->num_particles, e->sigma_x, e->sigma_y, e->length, e->x_co,
-            e->y_co, ( unsigned long )e->interpol_data_addr,
-            e->line_density_prof_fallback, e->min_sigma_diff,
-            ( unsigned long )e->enabled );
-    }
-
-    return;
-}
-
-/* ************************************************************************* */
 /* BeamBeam6D:  */
 
 void NS(BeamBeam6D_print)(
@@ -238,5 +107,199 @@ void NS(BeamBeam6D_print)(
 
     return;
 }
+
+/* ************************************************************************* */
+/* SpaceChargeCoasting:  */
+
+void NS(SpaceChargeCoasting_print)(
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT e )
+{
+    if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
+    {
+        fprintf( fp,
+                 "|sc coasting     | num_particles     = %+20.12f\r\n"
+                 "                 | circumference     = %+20.12f\r\n"
+                 "                 | sigma_x           = %+20.12f\r\n"
+                 "                 | sigma_y           = %+20.12f\r\n"
+                 "                 | length            = %+20.12f\r\n"
+                 "                 | x_co              = %+20.12f\r\n"
+                 "                 | y_co              = %+20.12f\r\n"
+                 "                 | min_sigma_diff    = %+20.12f\r\n"
+                 "                 | enabled           = %20lu\r\n",
+            e->num_particles, e->circumference, e->sigma_x, e->sigma_y,
+            e->length, e->x_co, e->y_co, e->min_sigma_diff,
+            ( unsigned long )e->enabled );
+    }
+
+    return;
+}
+
+/* ************************************************************************* */
+/* SpaceChargeQGaussianProfile:  */
+
+void NS(SpaceChargeQGaussianProfile_print)(
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BE_ARGPTR_DEC const
+        NS(SpaceChargeQGaussianProfile) *const SIXTRL_RESTRICT e )
+{
+    if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
+    {
+        fprintf( fp,
+                 "|sc q-gaussian   | num_particles     = %+20.12f\r\n"
+                 "                 | circumference     = %+20.12f\r\n"
+                 "                 | sigma_x           = %+20.12f\r\n"
+                 "                 | sigma_y           = %+20.12f\r\n"
+                 "                 | length            = %+20.12f\r\n"
+                 "                 | x_co              = %+20.12f\r\n"
+                 "                 | y_co              = %+20.12f\r\n"
+                 "                 | min_sigma_diff    = %+20.12f\r\n"
+                 "                 | q_param           = %+20.12f\r\n"
+                 "                 | b_param           = %+20.12f\r\n"
+                 "                 | enabled           = %20lu\r\n",
+            e->num_particles, e->bunchlength_rms, e->sigma_x, e->sigma_y,
+            e->length, e->x_co, e->y_co, e->min_sigma_diff, e->q_param,
+            e->b_param, ( unsigned long )e->enabled );
+    }
+
+    return;
+}
+
+/* ************************************************************************* */
+/* SpaceChargeInterpolatedProfile:  */
+
+void NS(LineDensityProfileData_print)(
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BUFFER_DATAPTR_DEC const
+        NS(LineDensityProfileData) *const SIXTRL_RESTRICT e )
+{
+    if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
+    {
+        NS(math_abscissa_idx_t) const nvalues =
+            NS(LineDensityProfileData_num_values)( e );
+
+        fprintf( fp, "|lprof density data  | method            = " );
+
+        switch( NS(LineDensityProfileData_method)( e ) )
+        {
+            case NS(MATH_INTERPOL_LINEAR):
+            {
+                fprintf( fp, "linear" );
+                break;
+            }
+
+            case NS(MATH_INTERPOL_CUBIC):
+            {
+                fprintf( fp, "cubic" );
+                break;
+            }
+
+            default:
+            {
+                fprintf( fp, "n/a (unknown)" );
+            }
+        };
+
+        fprintf( fp, "\r\n"
+                "                     | num_values        = %21ld\r\n"
+                "                     | values_addr       = %21lx\r\n"
+                "                     | derivatives_addr  = %21lx\r\n"
+                "                     | z0                = %+20.12f\r\n"
+                "                     | dz                = %+20.12f\r\n"
+                "                     | capacity          = %21ld\r\n",
+                ( long int )NS(LineDensityProfileData_num_values)( e ),
+                ( uintptr_t )NS(LineDensityProfileData_values_addr)( e ),
+                ( uintptr_t )NS(LineDensityProfileData_derivatives_addr)( e ),
+                NS(LineDensityProfileData_z0)( e ),
+                NS(LineDensityProfileData_dz)( e ),
+                ( long int )NS(LineDensityProfileData_capacity)( e ) );
+
+        if( nvalues > ( NS(math_abscissa_idx_t ) )0 )
+        {
+            fprintf( fp, "                     |" " ii"
+                    "                     z"
+                    "                 value"
+                    "      derivative value\r\n" );
+        }
+
+        if( nvalues <= ( NS(math_abscissa_idx_t) )10 )
+        {
+            NS(math_abscissa_idx_t) ii = ( NS(math_abscissa_idx_t) )0;
+            SIXTRL_REAL_T z = NS(LineDensityProfileData_z0)( e );
+
+            for( ; ii < nvalues ; ++ii )
+            {
+                fprintf( fp, "                     |%3ld"
+                        "%+20.12f""%+20.12f""%+20.12f\r\n", ( long int )ii, z,
+                        NS(LineDensityProfileData_value_at_idx)( e, ii ),
+                        NS(LineDensityProfileData_derivatives_at_idx)( e, ii ) );
+
+                z += NS(LineDensityProfileData_dz)( e );
+            }
+        }
+        else
+        {
+            NS(math_abscissa_idx_t) ii = ( NS(math_abscissa_idx_t) )0;
+            SIXTRL_REAL_T z = NS(LineDensityProfileData_z0)( e );
+
+            for( ; ii < 5 ; ++ii )
+            {
+                fprintf( fp, "                     |%3ld"
+                        "%+20.12f""%+20.12f""%+20.12f\r\n", ( long int )ii, z,
+                        NS(LineDensityProfileData_value_at_idx)( e, ii ),
+                        NS(LineDensityProfileData_derivatives_at_idx)( e, ii ) );
+
+                z += NS(LineDensityProfileData_dz)( e );
+            }
+
+            fprintf( fp, "                         | .. ..................... "
+                    "..................... .....................\r\n" );
+
+            ii = nvalues - 6;
+            z = NS(LineDensityProfileData_z0)( e ) +
+                NS(LineDensityProfileData_dz)( e ) * ii;
+
+            for( ; ii < 5 ; ++ii )
+            {
+                fprintf( fp, "                     |%3ld"
+                        "%+20.12f""%+20.12f""%+20.12f\r\n", ( long int )ii, z,
+                        NS(LineDensityProfileData_value_at_idx)( e, ii ),
+                        NS(LineDensityProfileData_derivatives_at_idx)( e, ii ) );
+
+                z += NS(LineDensityProfileData_dz)( e );
+            }
+        }
+    }
+}
+
+/* ************************************************************************* */
+/* SpaceChargeInterpolatedProfile:  */
+
+void NS(SpaceChargeInterpolatedProfile_print)(
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BE_ARGPTR_DEC const
+        NS(SpaceChargeInterpolatedProfile) *const SIXTRL_RESTRICT e )
+{
+    if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
+    {
+        fprintf( fp,
+                 "|sc interpolated | num_particles         = %+20.12f\r\n"
+                 "                 | sigma_x               = %+20.12f\r\n"
+                 "                 | sigma_y               = %+20.12f\r\n"
+                 "                 | length                = %+20.12f\r\n"
+                 "                 | x_co                  = %+20.12f\r\n"
+                 "                 | y_co                  = %+20.12f\r\n"
+                 "                 | interpol_data_addr    = %21lu\r\n"
+                 "                 | line_density_fallback = %+20.12f\r\n"
+                 "                 | min_sigma_diff        = %+20.12f\r\n"
+                 "                 | enabled               = %20lu\r\n",
+            e->num_particles, e->sigma_x, e->sigma_y, e->length, e->x_co,
+            e->y_co, ( unsigned long )e->interpol_data_addr,
+            e->line_density_prof_fallback, e->min_sigma_diff,
+            ( unsigned long )e->enabled );
+    }
+}
+
+
 
 /*end: tests/sixtracklib/testlib/common/be_beamfields/be_beamfields.c */

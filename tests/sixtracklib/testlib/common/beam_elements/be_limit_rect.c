@@ -1,7 +1,7 @@
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include "sixtracklib/testlib/common/beam_elements/be_limit_rect.h"
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
-    
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stddef.h>
     #include <stdlib.h>
@@ -22,21 +22,18 @@
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 void NS(LimitRect_print)( SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const SIXTRL_RESTRICT limit_rect )
+    SIXTRL_BE_ARGPTR_DEC const NS(LimitRect) *const SIXTRL_RESTRICT limit )
 {
-    if( ( fp != SIXTRL_NULLPTR ) && ( limit_rect != SIXTRL_NULLPTR ) )
+    if( ( fp != SIXTRL_NULLPTR ) && ( limit != SIXTRL_NULLPTR ) )
     {
-        fprintf( fp,
-                 "|limit_rect       | min_x    = %+16.12f m;\r\n"
-                 "                  | max_x    = %+16.12f m;\r\n"
-                 "                  | min_y    = %+16.12f m;\r\n"
-                 "                  | max_y    = %+16.12f m;\r\n",
-                 NS(LimitRect_get_min_x)( limit_rect ),
-                 NS(LimitRect_get_max_x)( limit_rect ),
-                 NS(LimitRect_get_min_y)( limit_rect ),
-                 NS(LimitRect_get_max_y)( limit_rect ) );
+        fprintf( fp, "|limit_rect       | min_x    = %+20.12f m;\r\n"
+                "                  | max_x    = %+20.12f m;\r\n"
+                "                  | min_y    = %+20.12f m;\r\n"
+                "                  | max_y    = %+20.12f m;\r\n",
+                NS(LimitRect_min_x)( limit ), NS(LimitRect_max_x)( limit ),
+                NS(LimitRect_min_y)( limit ), NS(LimitRect_max_y)( limit ) );
     }
-    
+
     return;
 }
 

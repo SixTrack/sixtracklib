@@ -19,4 +19,3 @@ void NS(DriftExact_print)( SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
                  NS(DriftExact_length)( elem ) );
     }
 }
-

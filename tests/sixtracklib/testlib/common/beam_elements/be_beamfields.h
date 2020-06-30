@@ -27,15 +27,17 @@ extern "C" {
 
 SIXTRL_STATIC SIXTRL_FN int NS(BeamBeam4D_compare_values)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT rhs );
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const
+        SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN int NS(BeamBeam4D_compare_values_with_treshold)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold );
+    SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam4D_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam4D) *const SIXTRL_RESTRICT e );
+    SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam4D) *const
+        SIXTRL_RESTRICT e );
 
 #if !defined( _GPUCODE )
 
@@ -46,76 +48,17 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamBeam4D_print)(
 #endif /* !defined( _GPUCODE ) */
 
 /* ************************************************************************** */
-/* SpaceChargeCoasting: */
-
-SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeCoasting_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
-        *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
-        *const SIXTRL_RESTRICT rhs );
-
-SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeCoasting_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
-        *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
-        *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold );
-
-SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeCoasting_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeCoasting)
-        *const SIXTRL_RESTRICT e );
-
-#if !defined( _GPUCODE )
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SpaceChargeCoasting_print)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeCoasting)
-        *const SIXTRL_RESTRICT e );
-
-#endif /* !defined( _GPUCODE ) */
-
-/* ************************************************************************** */
-/* SpaceChargeQGaussianProfile: */
-
-SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeQGaussianProfile_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
-        *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
-        *const SIXTRL_RESTRICT rhs );
-
-SIXTRL_STATIC SIXTRL_FN int
-NS(SpaceChargeQGaussianProfile_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
-        *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
-        *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold );
-
-SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeQGaussianProfile_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeQGaussianProfile)
-        *const SIXTRL_RESTRICT e );
-
-#if !defined( _GPUCODE )
-
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SpaceChargeQGaussianProfile_print)(
-    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeQGaussianProfile)
-        *const SIXTRL_RESTRICT e );
-
-#endif /* !defined( _GPUCODE ) */
-
-
-/* ************************************************************************** */
 /* BeamBeam6D: */
 
 SIXTRL_STATIC SIXTRL_FN int NS(BeamBeam6D_compare_values)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT rhs );
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const
+        SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN int NS(BeamBeam6D_compare_values_with_treshold)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold );
+    SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam6D_print_out)(
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT e );
@@ -128,6 +71,125 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamBeam6D_print)(
 
 #endif /* !defined( _GPUCODE ) */
 
+/* ************************************************************************** */
+/* SpaceChargeCoasting: */
+
+SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeCoasting_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+        *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+        *const SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeCoasting_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+        *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+        *const SIXTRL_RESTRICT rhs,
+    SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeCoasting_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeCoasting)
+        *const SIXTRL_RESTRICT e );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SpaceChargeCoasting_print)(
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+        *const SIXTRL_RESTRICT e );
+
+#endif /* !defined( _GPUCODE ) */
+
+/* ************************************************************************** */
+/* SpaceChargeQGaussianProfile: */
+
+SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeQGaussianProfile_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+        *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+        *const SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN int
+NS(SpaceChargeQGaussianProfile_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+        *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+        *const SIXTRL_RESTRICT rhs,
+    SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeQGaussianProfile_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeQGaussianProfile)
+        *const SIXTRL_RESTRICT e );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SpaceChargeQGaussianProfile_print)(
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+        *const SIXTRL_RESTRICT e );
+
+#endif /* !defined( _GPUCODE ) */
+
+/* ************************************************************************** */
+/* LineDensityProfileData: */
+
+SIXTRL_STATIC SIXTRL_FN int NS(LineDensityProfileData_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(LineDensityProfileData) *const
+        SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(LineDensityProfileData) *const
+        SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN int
+NS(LineDensityProfileData_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(LineDensityProfileData) *const
+        SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(LineDensityProfileData) *const
+        SIXTRL_RESTRICT rhs, SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN void NS(LineDensityProfileData_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const struct NS(LineDensityProfileData) *const
+        SIXTRL_RESTRICT e );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(LineDensityProfileData_print)(
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BE_ARGPTR_DEC const NS(LineDensityProfileData) *const
+        SIXTRL_RESTRICT e );
+
+#endif /* !defined( _GPUCODE ) */
+
+
+/* ************************************************************************** */
+/* SpaceChargeInterpolatedProfile: */
+
+SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeInterpolatedProfile_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+        SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+        SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN int
+NS(SpaceChargeInterpolatedProfile_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+        SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+        SIXTRL_RESTRICT rhs, SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeInterpolatedProfile_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+        SIXTRL_RESTRICT e );
+
+#if !defined( _GPUCODE )
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SpaceChargeInterpolatedProfile_print)(
+    SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+        SIXTRL_RESTRICT e );
+
+#endif /* !defined( _GPUCODE ) */
+
+
 /* ************************************************************************* */
 /* Helper functions */
 
@@ -135,14 +197,14 @@ SIXTRL_STATIC SIXTRL_FN int NS(BeamBeam_compare_values_generic)(
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT lhs_data,
     NS(buffer_size_t) const lhs_size,
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT rhs_data,
-    NS(buffer_size_t) const rhs_size );
+    NS(buffer_size_t) const rhs_size ) SIXTRL_NOEXCEPT;
 
 SIXTRL_INLINE int NS(BeamBeam_compare_values_generic_with_treshold)(
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT lhs_data,
     NS(buffer_size_t) const lhs_size,
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT rhs_data,
     NS(buffer_size_t) const rhs_size,
-    SIXTRL_REAL_T const treshold );
+    SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT;
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
@@ -159,7 +221,7 @@ SIXTRL_INLINE int NS(BeamBeam_compare_values_generic)(
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT lhs_data,
     NS(buffer_size_t) const lhs_size,
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT rhs_data,
-    NS(buffer_size_t) const rhs_size )
+    NS(buffer_size_t) const rhs_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     int cmp_value = -1;
@@ -218,7 +280,7 @@ SIXTRL_INLINE int NS(BeamBeam_compare_values_generic_with_treshold)(
     NS(buffer_size_t) const lhs_size,
     SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT rhs_data,
     NS(buffer_size_t) const rhs_size,
-    SIXTRL_REAL_T const treshold )
+    SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
     typedef SIXTRL_REAL_T real_t;
@@ -273,7 +335,8 @@ SIXTRL_INLINE int NS(BeamBeam_compare_values_generic_with_treshold)(
 
 SIXTRL_INLINE int NS(BeamBeam4D_compare_values)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT rhs )
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const
+        SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT
 {
     return NS(BeamBeam_compare_values_generic)(
        ( SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* )( uintptr_t
@@ -285,7 +348,7 @@ SIXTRL_INLINE int NS(BeamBeam4D_compare_values)(
 SIXTRL_INLINE int NS(BeamBeam4D_compare_values_with_treshold)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold )
+    SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT
 {
     return NS(BeamBeam_compare_values_generic_with_treshold)(
        ( SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* )( uintptr_t
@@ -294,7 +357,6 @@ SIXTRL_INLINE int NS(BeamBeam4D_compare_values_with_treshold)(
            )NS(BeamBeam4D_data_addr)( rhs ), NS(BeamBeam4D_data_size)( rhs ),
        treshold );
 }
-
 
 SIXTRL_INLINE void NS(BeamBeam4D_print_out)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT e )
@@ -332,445 +394,14 @@ SIXTRL_INLINE void NS(BeamBeam4D_print_out)(
     #endif /* !defined( _GPUCODE ) */
 }
 
-/* ************************************************************************* */
-/* SpaceChargeCoasting: */
-
-SIXTRL_INLINE int NS(SpaceChargeCoasting_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT rhs )
-{
-    int cmp_result = -1;
-
-    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
-    {
-        cmp_result = 0;
-
-        if( lhs != rhs )
-        {
-            cmp_result = ( NS(Type_comp_all_equal)(
-                lhs->num_particles, rhs->num_particles ) )
-                ? 0 : ( NS(Type_comp_all_more)(
-                    lhs->num_particles, rhs->num_particles ) ) ? +1 : -1;
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = ( NS(Type_comp_all_equal)(
-                    lhs->circumference, rhs->circumference ) )
-                    ? 0 : ( NS(Type_comp_all_more)(
-                        lhs->circumference, rhs->circumference ) ) ? +1 : -1;
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = ( NS(Type_comp_all_equal)(
-                    lhs->sigma_x, rhs->sigma_x ) )
-                    ? 0 : ( NS(Type_comp_all_more)(
-                        lhs->sigma_x, rhs->sigma_x ) ) ? +1 : -1;
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = ( NS(Type_comp_all_equal)(
-                    lhs->sigma_y, rhs->sigma_y ) )
-                    ? 0 : ( NS(Type_comp_all_more)(
-                        lhs->sigma_y, rhs->sigma_y ) ) ? +1 : -1;
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = ( NS(Type_comp_all_equal)(
-                    lhs->length, rhs->length ) )
-                    ? 0 : ( NS(Type_comp_all_more)(
-                        lhs->length, rhs->length ) ) ? +1 : -1;
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = ( NS(Type_comp_all_equal)(
-                    lhs->x_co, rhs->x_co ) )
-                    ? 0 : ( NS(Type_comp_all_more)(
-                        lhs->x_co, rhs->x_co ) ) ? +1 : -1;
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = ( NS(Type_comp_all_equal)(
-                    lhs->y_co, rhs->y_co ) )
-                    ? 0 : ( NS(Type_comp_all_more)(
-                        lhs->y_co, rhs->y_co ) ) ? +1 : -1;
-            }
-
-            if( cmp_result == 0 )
-            {
-                cmp_result = ( NS(Type_comp_all_equal)(
-                    lhs->min_sigma_diff, rhs->min_sigma_diff ) )
-                    ? 0 : ( NS(Type_comp_all_more)(
-                        lhs->min_sigma_diff, rhs->min_sigma_diff ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) &&
-                ( lhs->enabled != rhs->enabled ) )
-            {
-                cmp_result = ( lhs->enabled > rhs->enabled ) ? +1 : -1;
-            }
-        }
-    }
-    else if( rhs != SIXTRL_NULLPTR )
-    {
-        cmp_result = +1;
-    }
-
-    return cmp_result;
-}
-
-SIXTRL_INLINE int NS(SpaceChargeCoasting_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold )
-{
-    int cmp_result = -1;
-
-    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
-    {
-        cmp_result = 0;
-
-        if( lhs != rhs )
-        {
-            cmp_result = ( NS(Type_comp_all_are_close)(
-                lhs->num_particles, rhs->num_particles, 0.0, treshold ) )
-                ? 0 : ( NS(Type_comp_all_more)(
-                    lhs->num_particles, rhs->num_particles ) ) ? +1 : -1;
-
-            if( ( cmp_result == 0 ) &&
-                ( !NS(Type_comp_all_are_close)(
-                    lhs->circumference, rhs->circumference, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->circumference,
-                   rhs->circumference ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) &&
-                ( !NS(Type_comp_all_are_close)(
-                    lhs->sigma_x, rhs->sigma_x, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->sigma_x,
-                   rhs->sigma_x ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) &&
-                ( !NS(Type_comp_all_are_close)(
-                    lhs->sigma_y, rhs->sigma_y, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->sigma_y,
-                   rhs->sigma_y ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) &&
-                ( !NS(Type_comp_all_are_close)(
-                    lhs->length, rhs->length, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->length,
-                   rhs->length ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) &&
-                ( !NS(Type_comp_all_are_close)(
-                    lhs->x_co, rhs->x_co, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->x_co,
-                   rhs->x_co ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) &&
-                ( !NS(Type_comp_all_are_close)(
-                    lhs->y_co, rhs->y_co, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->y_co,
-                   rhs->y_co ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) &&
-                ( !NS(Type_comp_all_are_close)(
-                    lhs->min_sigma_diff, rhs->min_sigma_diff, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->min_sigma_diff,
-                   rhs->min_sigma_diff ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( lhs->enabled != rhs->enabled ) )
-            {
-                cmp_result = ( lhs->enabled > rhs->enabled ) ? +1 : -1;
-            }
-        }
-    }
-    else if( rhs != SIXTRL_NULLPTR )
-    {
-        cmp_result = +1;
-    }
-
-    return cmp_result;
-}
-
-SIXTRL_INLINE void NS(SpaceChargeCoasting_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT e )
-{
-    #if defined( _GPUCODE )
-
-    if( != SIXTRL_NULLPTR )
-    {
-        printf( "|sc coasting     | num_particles     = %+20.12f\r\n"
-                "                 | circumference     = %+20.12f\r\n"
-                "                 | sigma_x           = %+20.12f\r\n"
-                "                 | sigma_y           = %+20.12f\r\n"
-                "                 | length            = %+20.12f\r\n"
-                "                 | x_co              = %+20.12f\r\n"
-                "                 | y_co              = %+20.12f\r\n"
-                "                 | min_sigma_diff    = %+20.12f\r\n"
-                "                 | enabled           = %20lu\r\n",
-            e->num_particles, e->circumference, e->sigma_x, e->sigma_y,
-            e->length, e->x_co, e->y_co, e->min_sigma_diff,
-            ( unsigned long )e->enabled );
-    }
-
-    #else
-
-    NS(SpaceChargeCoasting_print)( stdout, e );
-
-    #endif /* !defined( _GPUCODE ) */
-}
-
-/* ************************************************************************* */
-/* SpaceChargeQGaussianProfile: */
-
-SIXTRL_INLINE int NS(SpaceChargeQGaussianProfile_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const SIXTRL_RESTRICT rhs )
-{
-    int cmp_result = -1;
-
-    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
-    {
-        cmp_result = 0;
-
-        if( lhs != rhs )
-        {
-            cmp_result = ( NS(Type_comp_all_equal)(
-                lhs->num_particles, rhs->num_particles ) )
-                ? 0 : ( NS(Type_comp_all_more)(
-                    lhs->num_particles, rhs->num_particles ) ) ? +1 : -1;
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_equal)(
-                    lhs->bunchlength_rms, rhs->bunchlength_rms ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->bunchlength_rms,
-                    rhs->bunchlength_rms ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_equal)(
-                    lhs->sigma_x, rhs->sigma_x ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->sigma_x,
-                    rhs->sigma_x ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_equal)(
-                    lhs->sigma_y, rhs->sigma_y ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->sigma_y,
-                    rhs->sigma_y ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_equal)(
-                    lhs->length, rhs->length ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->length,
-                    rhs->length ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_equal)(
-                    lhs->x_co, rhs->x_co ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->x_co,
-                    rhs->x_co ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_equal)(
-                    lhs->y_co, rhs->y_co ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->y_co,
-                    rhs->y_co ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_equal)(
-                    lhs->min_sigma_diff, rhs->min_sigma_diff ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->min_sigma_diff,
-                    rhs->min_sigma_diff ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_equal)(
-                    lhs->q_param, rhs->q_param ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->q_param,
-                    rhs->q_param ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_equal)(
-                    lhs->b_param, rhs->b_param ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->b_param,
-                    rhs->b_param ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) &&
-                ( lhs->enabled != rhs->enabled ) )
-            {
-                cmp_result = ( lhs->enabled > rhs->enabled ) ? +1 : -1;
-            }
-        }
-    }
-    else if( rhs != SIXTRL_NULLPTR )
-    {
-        cmp_result = +1;
-    }
-
-    return cmp_result;
-}
-
-SIXTRL_INLINE int NS(SpaceChargeQGaussianProfile_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold )
-{
-     int cmp_result = -1;
-
-    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
-    {
-        cmp_result = 0;
-
-        if( lhs != rhs )
-        {
-            cmp_result = ( NS(Type_comp_all_are_close)( lhs->num_particles,
-                rhs->num_particles, 0.0, treshold ) )
-                ? 0 : ( NS(Type_comp_all_more)(
-                    lhs->num_particles, rhs->num_particles ) ) ? +1 : -1;
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_are_close)(
-                    lhs->bunchlength_rms,
-                    rhs->bunchlength_rms, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->bunchlength_rms,
-                    rhs->bunchlength_rms ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_are_close)(
-                    lhs->sigma_x, rhs->sigma_x, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->sigma_x,
-                    rhs->sigma_x ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_are_close)(
-                    lhs->sigma_y, rhs->sigma_y, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->sigma_y,
-                    rhs->sigma_y ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_are_close)(
-                    lhs->length, rhs->length, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->length,
-                    rhs->length ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_are_close)(
-                    lhs->x_co, rhs->x_co, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->x_co,
-                    rhs->x_co ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_are_close)(
-                    lhs->y_co, rhs->y_co, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->y_co,
-                    rhs->y_co ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_are_close)(
-                    lhs->min_sigma_diff,
-                    rhs->min_sigma_diff, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->min_sigma_diff,
-                    rhs->min_sigma_diff ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_are_close)(
-                    lhs->q_param, rhs->q_param, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->q_param,
-                    rhs->q_param ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) && ( NS(Type_comp_all_are_close)(
-                    lhs->b_param, rhs->b_param, 0.0, treshold ) ) )
-            {
-                cmp_result = ( NS(Type_comp_all_more)( lhs->b_param,
-                    rhs->b_param ) ) ? +1 : -1;
-            }
-
-            if( ( cmp_result == 0 ) &&
-                ( lhs->enabled != rhs->enabled ) )
-            {
-                cmp_result = ( lhs->enabled > rhs->enabled ) ? +1 : -1;
-            }
-        }
-    }
-    else if( rhs != SIXTRL_NULLPTR )
-    {
-        cmp_result = +1;
-    }
-
-    return cmp_result;
-}
-
-SIXTRL_INLINE void NS(SpaceChargeQGaussianProfile_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const SIXTRL_RESTRICT e )
-{
-    #if defined( _GPUCODE )
-
-    if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
-    {
-        printf( "|sc q-gaussian   | num_particles     = %+20.12f\r\n"
-                "                 | circumference     = %+20.12f\r\n"
-                "                 | sigma_x           = %+20.12f\r\n"
-                "                 | sigma_y           = %+20.12f\r\n"
-                "                 | length            = %+20.12f\r\n"
-                "                 | x_co              = %+20.12f\r\n"
-                "                 | y_co              = %+20.12f\r\n"
-                "                 | min_sigma_diff    = %+20.12f\r\n"
-                "                 | q_param           = %+20.12f\r\n"
-                "                 | b_param           = %+20.12f\r\n"
-                "                 | enabled           = %20lu\r\n",
-            e->num_particles, e->bunchlength_rms, e->sigma_x, e->sigma_y,
-            e->length, e->x_co, e->y_co, e->min_sigma_diff, e->q_param,
-            e->b_param, ( unsigned long )e->enabled );
-    }
-
-    #else
-
-    NS(SpaceChargeQGaussianProfile_print)( stdout, e );
-
-    #endif /* !defined( _GPUCODE ) */
-}
 
 /* ************************************************************************* */
 /* BeamBeam6D: */
 
 SIXTRL_INLINE int NS(BeamBeam6D_compare_values)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT rhs )
+    SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const
+        SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT
 {
     return NS(BeamBeam_compare_values_generic)(
        ( SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* )( uintptr_t
@@ -782,7 +413,7 @@ SIXTRL_INLINE int NS(BeamBeam6D_compare_values)(
 SIXTRL_INLINE int NS(BeamBeam6D_compare_values_with_treshold)(
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT lhs,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold )
+    SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT
 {
     return NS(BeamBeam_compare_values_generic_with_treshold)(
        ( SIXTRL_BE_DATAPTR_DEC SIXTRL_REAL_T const* )( uintptr_t
@@ -864,6 +495,795 @@ SIXTRL_INLINE void NS(BeamBeam6D_print_out)(
     #endif /* !defined( _GPUCODE ) */
 }
 
-#endif /* SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_BEAMFIELDS_C99_H__ */
+/* ************************************************************************* */
+/* SpaceChargeCoasting: */
 
-/* end: tests/sixtracklib/testlib/common/be_beamfields/be_beamfields.h */
+SIXTRL_INLINE int NS(SpaceChargeCoasting_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const
+        SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT
+{
+    int cmp_result = -1;
+
+    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
+    {
+        cmp_result = 0;
+
+        if( lhs != rhs )
+        {
+            cmp_result = NS(Type_value_comp_result)(
+                lhs->num_particles, rhs->num_particles );
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->circumference, rhs->circumference );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->sigma_x, rhs->sigma_x );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->sigma_y, rhs->sigma_y );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->length, rhs->length );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)( lhs->x_co, rhs->x_co );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(lhs->y_co, rhs->y_co );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->min_sigma_diff, rhs->min_sigma_diff );
+            }
+
+            if( ( cmp_result == 0 ) && ( lhs->enabled != rhs->enabled ) )
+            {
+                cmp_result = ( lhs->enabled > rhs->enabled ) ? +1 : -1;
+            }
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        cmp_result = +1;
+    }
+
+    return cmp_result;
+}
+
+SIXTRL_INLINE int NS(SpaceChargeCoasting_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT rhs,
+    SIXTRL_REAL_T const ABS_TOL ) SIXTRL_NOEXCEPT
+{
+    int cmp_result = -1;
+
+    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
+    {
+        cmp_result = 0;
+
+        if( lhs != rhs )
+        {
+            SIXTRL_REAL_T const REL_TOL = ( SIXTRL_REAL_T )0;
+            cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                lhs->num_particles, rhs->num_particles, REL_TOL, ABS_TOL );
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->circumference, rhs->circumference, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->sigma_x, rhs->sigma_x, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->sigma_y, rhs->sigma_y, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->length, rhs->length, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->x_co, rhs->x_co, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->y_co, rhs->y_co, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->min_sigma_diff, rhs->min_sigma_diff, REL_TOL, ABS_TOL );
+            }
+
+            if( ( cmp_result == 0 ) && ( lhs->enabled != rhs->enabled ) )
+            {
+                cmp_result = ( lhs->enabled > rhs->enabled ) ? +1 : -1;
+            }
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        cmp_result = +1;
+    }
+
+    return cmp_result;
+}
+
+SIXTRL_INLINE void NS(SpaceChargeCoasting_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT e )
+{
+    #if defined( _GPUCODE )
+
+    if( != SIXTRL_NULLPTR )
+    {
+        printf( "|sc coasting     | num_particles     = %+20.12f\r\n"
+                "                 | circumference     = %+20.12f\r\n"
+                "                 | sigma_x           = %+20.12f\r\n"
+                "                 | sigma_y           = %+20.12f\r\n"
+                "                 | length            = %+20.12f\r\n"
+                "                 | x_co              = %+20.12f\r\n"
+                "                 | y_co              = %+20.12f\r\n"
+                "                 | min_sigma_diff    = %+20.12f\r\n"
+                "                 | enabled           = %20lu\r\n",
+            e->num_particles, e->circumference, e->sigma_x, e->sigma_y,
+            e->length, e->x_co, e->y_co, e->min_sigma_diff,
+            ( unsigned long )e->enabled );
+    }
+
+    #else
+
+    NS(SpaceChargeCoasting_print)( stdout, e );
+
+    #endif /* !defined( _GPUCODE ) */
+}
+
+/* ************************************************************************* */
+/* SpaceChargeQGaussianProfile: */
+
+SIXTRL_INLINE int NS(SpaceChargeQGaussianProfile_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
+        SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT
+{
+    int cmp_result = -1;
+
+    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
+    {
+        cmp_result = 0;
+
+        if( lhs != rhs )
+        {
+            cmp_result = NS(Type_value_comp_result)(
+                lhs->num_particles, rhs->num_particles );
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->bunchlength_rms, rhs->bunchlength_rms );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->sigma_x, rhs->sigma_x );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->sigma_y, rhs->sigma_y );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->length, rhs->length );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)( lhs->x_co, rhs->x_co );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(lhs->y_co, rhs->y_co );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->q_param, rhs->q_param );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->b_param, rhs->b_param );
+            }
+
+            if( ( cmp_result == 0 ) && ( lhs->enabled != rhs->enabled ) )
+            {
+                cmp_result = ( lhs->enabled > rhs->enabled ) ? +1 : -1;
+            }
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        cmp_result = +1;
+    }
+
+    return cmp_result;
+}
+
+SIXTRL_INLINE int NS(SpaceChargeQGaussianProfile_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+        *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
+        SIXTRL_RESTRICT rhs, SIXTRL_REAL_T const ABS_TOL ) SIXTRL_NOEXCEPT
+{
+    int cmp_result = -1;
+
+    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
+    {
+        cmp_result = 0;
+
+        if( lhs != rhs )
+        {
+            SIXTRL_REAL_T const REL_TOL = ( SIXTRL_REAL_T )0;
+            cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                lhs->num_particles, rhs->num_particles, REL_TOL, ABS_TOL );
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->bunchlength_rms, rhs->bunchlength_rms,
+                        REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->sigma_x, rhs->sigma_x, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->sigma_y, rhs->sigma_y, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->length, rhs->length, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->x_co, rhs->x_co, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->y_co, rhs->y_co, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->min_sigma_diff, rhs->min_sigma_diff, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->q_param, rhs->q_param, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->b_param, rhs->b_param, REL_TOL, ABS_TOL );
+            }
+
+            if( ( cmp_result == 0 ) && ( lhs->enabled != rhs->enabled ) )
+            {
+                cmp_result = ( lhs->enabled > rhs->enabled ) ? +1 : -1;
+            }
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        cmp_result = +1;
+    }
+
+    return cmp_result;
+}
+
+SIXTRL_INLINE void NS(SpaceChargeQGaussianProfile_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+        *const SIXTRL_RESTRICT e )
+{
+    #if defined( _GPUCODE )
+
+    if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
+    {
+        printf( "|sc q-gaussian   | num_particles     = %+20.12f\r\n"
+                "                 | circumference     = %+20.12f\r\n"
+                "                 | sigma_x           = %+20.12f\r\n"
+                "                 | sigma_y           = %+20.12f\r\n"
+                "                 | length            = %+20.12f\r\n"
+                "                 | x_co              = %+20.12f\r\n"
+                "                 | y_co              = %+20.12f\r\n"
+                "                 | min_sigma_diff    = %+20.12f\r\n"
+                "                 | q_param           = %+20.12f\r\n"
+                "                 | b_param           = %+20.12f\r\n"
+                "                 | enabled           = %20lu\r\n",
+            e->num_particles, e->bunchlength_rms, e->sigma_x, e->sigma_y,
+            e->length, e->x_co, e->y_co, e->min_sigma_diff, e->q_param,
+            e->b_param, ( unsigned long )e->enabled );
+    }
+
+    #else
+
+    NS(SpaceChargeQGaussianProfile_print)( stdout, e );
+
+    #endif /* !defined( _GPUCODE ) */
+}
+
+/* ************************************************************************* */
+/* NS(LineDensityProfileData): */
+
+SIXTRL_INLINE int NS(LineDensityProfileData_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(LineDensityProfileData) *const
+        SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(LineDensityProfileData) *const
+        SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT
+{
+    int cmp_result = -1;
+
+    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
+    {
+        cmp_result = 0;
+
+        if( lhs != rhs )
+        {
+            cmp_result = ( lhs->method == rhs->method )
+                ? 0 : ( ( lhs->method > rhs->method ) ? +1 : -1 );
+
+            if( ( cmp_result == 0 ) && ( lhs->num_values != rhs->num_values ) )
+            {
+                cmp_result = ( lhs->num_values > rhs->num_values ) ? +1 : -1;
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_for_range)(
+                    NS(LineDensityProfileData_const_values_begin)( lhs ),
+                    NS(LineDensityProfileData_const_values_end)( lhs ),
+                    NS(LineDensityProfileData_const_values_begin)( rhs ) );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_for_range)(
+                    NS(LineDensityProfileData_const_derivatives_begin)( lhs ),
+                    NS(LineDensityProfileData_const_derivatives_end)( lhs ),
+                    NS(LineDensityProfileData_const_derivatives_begin)( rhs ) );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)( lhs->z0, rhs->z0 );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)( lhs->dz, rhs->dz );
+            }
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        cmp_result = +1;
+    }
+
+    return cmp_result;
+}
+
+SIXTRL_INLINE int NS(LineDensityProfileData_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(LineDensityProfileData) *const
+        SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(LineDensityProfileData) *const
+        SIXTRL_RESTRICT rhs, SIXTRL_REAL_T const ABS_TOL ) SIXTRL_NOEXCEPT
+{
+    int cmp_result = -1;
+
+    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
+    {
+        cmp_result = 0;
+
+        if( lhs != rhs )
+        {
+            SIXTRL_REAL_T const REL_TOL = ( SIXTRL_REAL_T )0;
+            cmp_result = ( lhs->method == rhs->method )
+                ? 0 : ( ( lhs->method > rhs->method ) ? +1 : -1 );
+
+            if( ( cmp_result == 0 ) && ( lhs->num_values != rhs->num_values ) )
+            {
+                cmp_result = ( lhs->num_values > rhs->num_values ) ? +1 : -1;
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result =
+                NS(Type_value_comp_result_with_tolerances_for_range)(
+                    NS(LineDensityProfileData_const_values_begin)( lhs ),
+                    NS(LineDensityProfileData_const_values_end)( lhs ),
+                    NS(LineDensityProfileData_const_values_begin)( rhs ),
+                    REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result =
+                NS(Type_value_comp_result_with_tolerances_for_range)(
+                    NS(LineDensityProfileData_const_derivatives_begin)( lhs ),
+                    NS(LineDensityProfileData_const_derivatives_end)( lhs ),
+                    NS(LineDensityProfileData_const_derivatives_begin)( rhs ),
+                    REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->z0, rhs->z0, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->dz, rhs->dz, REL_TOL, ABS_TOL );
+            }
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        cmp_result = +1;
+    }
+
+    return cmp_result;
+}
+
+SIXTRL_INLINE void NS(LineDensityProfileData_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const NS(LineDensityProfileData) *const
+        SIXTRL_RESTRICT e )
+{
+    NS(math_abscissa_idx_t) const nvalues =
+        NS(LineDensityProfileData_num_values)( e );
+
+    printf( "|lprof density data  | method            = " );
+
+    switch( NS(LineDensityProfileData_method)( e ) )
+    {
+        case NS(MATH_INTERPOL_LINEAR):
+        {
+            printf( "linear" );
+            break;
+        }
+
+        case NS(MATH_INTERPOL_CUBIC):
+        {
+            printf( "cubic" );
+            break;
+        }
+
+        default:
+        {
+            printf( "n/a (unknown)" );
+        }
+    };
+
+    printf( "\r\n"
+            "                     | num_values        = %21ld\r\n"
+            "                     | values_addr       = %21lx\r\n"
+            "                     | derivatives_addr  = %21lx\r\n"
+            "                     | z0                = %+20.12f\r\n"
+            "                     | dz                = %+20.12f\r\n"
+            "                     | capacity          = %21ld\r\n",
+            ( long int )NS(LineDensityProfileData_num_values)( e ),
+            ( uintptr_t )NS(LineDensityProfileData_values_addr)( e ),
+            ( uintptr_t )NS(LineDensityProfileData_derivatives_addr)( e ),
+            NS(LineDensityProfileData_z0)( e ),
+            NS(LineDensityProfileData_dz)( e ),
+            ( long int )NS(LineDensityProfileData_capacity)( e ) );
+
+    if( nvalues > ( NS(math_abscissa_idx_t ) )0 )
+    {
+        printf( "                     |" " ii"
+                "                     z"
+                "                 value"
+                "      derivative value\r\n" );
+    }
+
+    if( nvalues <= ( NS(math_abscissa_idx_t) )10 )
+    {
+        NS(math_abscissa_idx_t) ii = ( NS(math_abscissa_idx_t) )0;
+        SIXTRL_REAL_T z = NS(LineDensityProfileData_z0)( e );
+
+        for( ; ii < nvalues ; ++ii )
+        {
+            printf( "                     |%3ld"
+                    "%+20.12f""%+20.12f""%+20.12f\r\n",
+                    ( long int )ii, z,
+                    NS(LineDensityProfileData_value_at_idx)( e, ii ),
+                    NS(LineDensityProfileData_derivatives_at_idx)( e, ii ) );
+
+            z += NS(LineDensityProfileData_dz)( e );
+        }
+    }
+    else
+    {
+        NS(math_abscissa_idx_t) ii = ( NS(math_abscissa_idx_t) )0;
+        SIXTRL_REAL_T z = NS(LineDensityProfileData_z0)( e );
+
+        for( ; ii < 5 ; ++ii )
+        {
+            printf( "                     |%3ld"
+                    "%+20.12f""%+20.12f""%+20.12f\r\n", ( long int )ii, z,
+                    NS(LineDensityProfileData_value_at_idx)( e, ii ),
+                    NS(LineDensityProfileData_derivatives_at_idx)( e, ii ) );
+
+            z += NS(LineDensityProfileData_dz)( e );
+        }
+
+        printf( "                         | .. ..................... "
+                "..................... .....................\r\n" );
+
+        ii = nvalues - 6;
+        z = NS(LineDensityProfileData_z0)( e ) +
+            NS(LineDensityProfileData_dz)( e ) * ii;
+
+        for( ; ii < 5 ; ++ii )
+        {
+            printf( "                     |%3ld"
+                    "%+20.12f""%+20.12f""%+20.12f\r\n", ( long int )ii, z,
+                    NS(LineDensityProfileData_value_at_idx)( e, ii ),
+                    NS(LineDensityProfileData_derivatives_at_idx)( e, ii ) );
+
+            z += NS(LineDensityProfileData_dz)( e );
+        }
+    }
+}
+
+/* ************************************************************************** */
+/* SpaceChargeInterpolatedProfile: */
+
+SIXTRL_INLINE int NS(SpaceChargeInterpolatedProfile_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+        SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+        SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT
+{
+    int cmp_result = -1;
+
+    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
+    {
+        cmp_result = 0;
+
+        if( lhs != rhs )
+        {
+            cmp_result = NS(Type_value_comp_result)(
+                lhs->num_particles, rhs->num_particles );
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->sigma_x, rhs->sigma_x );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->sigma_y, rhs->sigma_y );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->length, rhs->length );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)( lhs->x_co, rhs->x_co );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)( lhs->y_co, rhs->y_co );
+            }
+
+            if( ( cmp_result == 0 ) &&
+                ( lhs->interpol_data_addr != rhs->interpol_data_addr ) )
+            {
+                cmp_result = NS(LineDensityProfileData_compare_values)(
+                    NS(SpaceChargeInterpolatedProfile_const_line_density_profile_data)( lhs ),
+                    NS(SpaceChargeInterpolatedProfile_const_line_density_profile_data)( rhs ) );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->line_density_prof_fallback,
+                    rhs->line_density_prof_fallback );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result)(
+                    lhs->min_sigma_diff, rhs->min_sigma_diff );
+            }
+
+            if( ( cmp_result == 0 ) && ( lhs->enabled != rhs->enabled ) )
+            {
+                cmp_result = ( lhs->enabled > rhs->enabled ) ? +1 : -1;
+            }
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        cmp_result = +1;
+    }
+
+    return cmp_result;
+}
+
+SIXTRL_INLINE int NS(SpaceChargeInterpolatedProfile_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+        SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+        SIXTRL_RESTRICT rhs, SIXTRL_REAL_T const ABS_TOL ) SIXTRL_NOEXCEPT
+{
+    int cmp_result = -1;
+
+    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
+    {
+        cmp_result = 0;
+
+        if( lhs != rhs )
+        {
+            SIXTRL_REAL_T const REL_TOL = ( SIXTRL_REAL_T )0;
+            cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                lhs->num_particles, rhs->num_particles, REL_TOL, ABS_TOL );
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->sigma_x, rhs->sigma_x, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->sigma_y, rhs->sigma_y, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->length, rhs->length, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->x_co, rhs->x_co, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->y_co, rhs->y_co, REL_TOL, ABS_TOL );
+            }
+
+            if( ( cmp_result == 0 ) &&
+                ( lhs->interpol_data_addr != rhs->interpol_data_addr ) )
+            {
+                cmp_result = NS(LineDensityProfileData_compare_values_with_treshold)(
+                    NS(SpaceChargeInterpolatedProfile_const_line_density_profile_data)( lhs ),
+                    NS(SpaceChargeInterpolatedProfile_const_line_density_profile_data)(
+                        rhs ), ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->line_density_prof_fallback,
+                    rhs->line_density_prof_fallback, REL_TOL, ABS_TOL );
+            }
+
+            if( cmp_result == 0 )
+            {
+                cmp_result = NS(Type_value_comp_result_with_tolerances)(
+                    lhs->min_sigma_diff, rhs->min_sigma_diff, REL_TOL, ABS_TOL );
+            }
+
+            if( ( cmp_result == 0 ) && ( lhs->enabled != rhs->enabled ) )
+            {
+                cmp_result = ( lhs->enabled > rhs->enabled ) ? +1 : -1;
+            }
+        }
+    }
+    else if( rhs != SIXTRL_NULLPTR )
+    {
+        cmp_result = +1;
+    }
+
+    return cmp_result;
+}
+
+SIXTRL_INLINE void NS(SpaceChargeInterpolatedProfile_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeInterpolatedProfile) *const
+        SIXTRL_RESTRICT e )
+{
+    SIXTRL_ASSERT( e != SIXTRL_NULLPTR );
+    printf( "|sc interpolated | num_particles         = %+20.12f\r\n"
+            "                 | sigma_x               = %+20.12f\r\n"
+            "                 | sigma_y               = %+20.12f\r\n"
+            "                 | length                = %+20.12f\r\n"
+            "                 | x_co                  = %+20.12f\r\n"
+            "                 | y_co                  = %+20.12f\r\n"
+            "                 | interpol_data_addr    = %21lx\r\n"
+            "                 | line_density_fallback = %+20.12f\r\n"
+            "                 | min_sigma_diff        = %+20.12f\r\n"
+            "                 | enabled               = %20lu\r\n",
+            NS(SpaceChargeInterpolatedProfile_num_particles)( e ),
+            NS(SpaceChargeInterpolatedProfile_sigma_x)( e ),
+            NS(SpaceChargeInterpolatedProfile_sigma_y)( e ),
+            NS(SpaceChargeInterpolatedProfile_length)( e ),
+            NS(SpaceChargeInterpolatedProfile_x_co)( e ),
+            NS(SpaceChargeInterpolatedProfile_y_co)( e ),
+            ( uintptr_t )NS(SpaceChargeInterpolatedProfile_interpol_data_addr)(
+                e ),
+            NS(SpaceChargeInterpolatedProfile_line_density_prof_fallback)( e ),
+            NS(SpaceChargeInterpolatedProfile_min_sigma_diff)( e ),
+            ( unsigned long )e->enabled );
+}
+
+#endif /* SIXTRACKLIB_TESTLIB_COMMON_BEAM_ELEMENTS_BEAMFIELDS_C99_H__ */
