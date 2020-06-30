@@ -272,78 +272,56 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
 
             case NS(OBJECT_TYPE_MULTIPOLE):
             {
-                typedef NS(MultiPole) beam_element_t;
-                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
-
-                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+                typedef SIXTRL_BE_ARGPTR_DEC NS(Multipole) const* ptr_elem_t;
+                ptr_elem_t elem = ( ptr_elem_t )( uintptr_t )begin_addr;
 
                 ++requ_num_objects;
-                requ_num_slots =
-                    NS(MultiPole_get_num_slots)( ptr_begin, slot_size );
-
-                requ_num_dataptrs =
-                    NS(MultiPole_get_num_dataptrs)( ptr_begin );
+                requ_num_slots = NS(Multipole_num_slots)( elem, slot_size );
+                requ_num_dataptrs = NS(Multipole_num_dataptrs)( elem );
                 break;
             }
 
             case NS(OBJECT_TYPE_RF_MULTIPOLE):
             {
-                typedef NS(RFMultiPole) beam_element_t;
-                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
+                typedef SIXTRL_BE_ARGPTR_DEC NS(RFMultipole) const* ptr_t;
+                ptr_t elem = ( ptr_t )( uintptr_t )begin_addr;
 
-                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
                 ++requ_num_objects;
-                requ_num_slots = NS(RFMultiPole_num_slots)( ptr_begin, slot_size );
-                requ_num_dataptrs = NS(RFMultiPole_num_dataptrs)( ptr_begin );
+                requ_num_slots = NS(RFMultipole_num_slots)( elem, slot_size );
+                requ_num_dataptrs = NS(RFMultipole_num_dataptrs)( elem );
                 break;
             }
 
             case NS(OBJECT_TYPE_XYSHIFT):
             {
-                typedef NS(XYShift) beam_element_t;
-                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
-
-                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+                typedef SIXTRL_BE_ARGPTR_DEC NS(XYShift) const* ptr_elem_t;
+                ptr_elem_t elem = ( ptr_elem_t )( uintptr_t )begin_addr;
 
                 ++requ_num_objects;
-                requ_num_slots =
-                    NS(XYShift_get_num_slots)( ptr_begin, slot_size );
-
-                requ_num_dataptrs =
-                    NS(XYShift_get_num_dataptrs)( ptr_begin );
-
+                requ_num_slots = NS(XYShift_num_slots)( elem, slot_size );
+                requ_num_dataptrs = NS(XYShift_num_dataptrs)( elem );
                 break;
             }
 
             case NS(OBJECT_TYPE_SROTATION):
             {
-                typedef NS(SRotation) beam_element_t;
-                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
-
-                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+                typedef SIXTRL_BE_ARGPTR_DEC NS(SRotation) const* ptr_elem_t;
+                ptr_elem_t elem = ( ptr_elem_t )( uintptr_t )begin_addr;
 
                 ++requ_num_objects;
-                requ_num_slots =
-                    NS(SRotation_get_num_slots)( ptr_begin, slot_size );
-
-                requ_num_dataptrs =
-                    NS(SRotation_get_num_dataptrs)( ptr_begin );
+                requ_num_slots = NS(SRotation_num_slots)( elem, slot_size );
+                requ_num_dataptrs = NS(SRotation_num_dataptrs)( elem );
                 break;
             }
 
             case NS(OBJECT_TYPE_CAVITY):
             {
-                typedef NS(Cavity) beam_element_t;
-                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
-
-                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+                typedef SIXTRL_BE_ARGPTR_DEC NS(Cavity) const* ptr_elem_t;
+                ptr_elem_t elem = ( ptr_elem_t )( uintptr_t )begin_addr;
 
                 ++requ_num_objects;
-                requ_num_slots =
-                    NS(Cavity_get_num_slots)( ptr_begin, slot_size );
-
-                requ_num_dataptrs =
-                    NS(Cavity_get_num_dataptrs)( ptr_begin );
+                requ_num_dataptrs = NS(Cavity_num_dataptrs)( elem );
+                requ_num_slots = NS(Cavity_num_slots)( elem, slot_size );
                 break;
             }
 
@@ -355,8 +333,8 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
                 ptr_elem_t elem = ( ptr_elem_t )( uintptr_t )begin_addr;
 
                 ++requ_num_objects;
-                requ_num_slots    = NS(BeamBeam4D_num_slots)( elem, slot_size );
                 requ_num_dataptrs = NS(BeamBeam4D_num_dataptrs)( elem );
+                requ_num_slots = NS(BeamBeam4D_num_slots)( elem, slot_size );
 
                 break;
             }
@@ -367,8 +345,8 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
                 ptr_elem_t elem = ( ptr_elem_t )( uintptr_t )begin_addr;
 
                 ++requ_num_objects;
-                requ_num_slots    = NS(BeamBeam6D_num_slots)( elem, slot_size );
                 requ_num_dataptrs = NS(BeamBeam6D_num_dataptrs)( elem );
+                requ_num_slots = NS(BeamBeam6D_num_slots)( elem, slot_size );
 
                 break;
             }
@@ -428,97 +406,58 @@ SIXTRL_INLINE int NS(BeamElements_calc_buffer_parameters_for_object)(
 
             case NS(OBJECT_TYPE_BEAM_MONITOR):
             {
-                typedef NS(BeamMonitor) beam_element_t;
-                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
-
-                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+                typedef SIXTRL_BE_ARGPTR_DEC NS(BeamMonitor) const* ptr_elem_t;
+                ptr_elem_t elem = ( ptr_elem_t )( uintptr_t )begin_addr;
 
                 ++requ_num_objects;
-
-                requ_num_slots = NS(BeamMonitor_get_num_slots)(
-                    ptr_begin, slot_size );
-
-                requ_num_dataptrs = NS(BeamMonitor_get_num_dataptrs)(
-                    ptr_begin );
-
+                requ_num_slots = NS(BeamMonitor_num_slots)( elem, slot_size );
+                requ_num_dataptrs = NS(BeamMonitor_num_dataptrs)( elem );
                 break;
             }
 
             case NS(OBJECT_TYPE_LIMIT_RECT):
             {
-                typedef NS(LimitRect) beam_element_t;
-                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
-
-                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+                typedef SIXTRL_BE_ARGPTR_DEC NS(LimitRect) const* ptr_elem_t;
+                ptr_elem_t elem = ( ptr_elem_t )( uintptr_t )begin_addr;
 
                 ++requ_num_objects;
-
-                requ_num_slots =
-                NS(LimitRect_get_required_num_slots_on_managed_buffer)(
-                    SIXTRL_NULLPTR, ptr_begin, slot_size );
-
-                requ_num_dataptrs =
-                NS(LimitRect_get_required_num_dataptrs_on_managed_buffer)(
-                    SIXTRL_NULLPTR, ptr_begin, slot_size );
-
+                requ_num_slots = NS(LimitRect_num_slots)( elem, slot_size );
+                requ_num_dataptrs = NS(LimitRect_num_dataptrs)( elem );
                 break;
             }
 
             case NS(OBJECT_TYPE_LIMIT_ELLIPSE):
             {
-                typedef NS(LimitEllipse) beam_element_t;
-                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
-
-                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+                typedef SIXTRL_BE_ARGPTR_DEC NS(LimitEllipse) const* ptr_elem_t;
+                ptr_elem_t elem = ( ptr_elem_t )( uintptr_t )begin_addr;
 
                 ++requ_num_objects;
-
-                requ_num_slots =
-                NS(LimitEllipse_get_required_num_slots_on_managed_buffer)(
-                    SIXTRL_NULLPTR, ptr_begin, slot_size );
-
-                requ_num_dataptrs =
-                NS(LimitEllipse_get_required_num_dataptrs_on_managed_buffer)(
-                    SIXTRL_NULLPTR, ptr_begin, slot_size );
-
+                requ_num_slots = NS(LimitEllipse_num_slots)( elem, slot_size );
+                requ_num_dataptrs = NS(LimitEllipse_num_dataptrs)( elem );
                 break;
             }
 
             case NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE):
             {
-                typedef NS(LimitRectEllipse) beam_element_t;
-                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
-
-                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+                typedef SIXTRL_BE_ARGPTR_DEC NS(LimitRectEllipse) const*
+                        ptr_elem_t;
+                ptr_elem_t elem = ( ptr_elem_t )( uintptr_t )begin_addr;
 
                 ++requ_num_objects;
-
+                requ_num_dataptrs = NS(LimitRectEllipse_num_dataptrs)( elem );
                 requ_num_slots = NS(LimitRectEllipse_num_slots)(
-                    ptr_begin, slot_size );
-
-                requ_num_dataptrs =
-                    NS(LimitRectEllipse_num_dataptrs)( ptr_begin );
-
+                    elem, slot_size );
                 break;
             }
 
             case NS(OBJECT_TYPE_DIPEDGE):
             {
-                typedef NS(DipoleEdge) beam_element_t;
-                typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_belem_t;
-
-                ptr_belem_t ptr_begin = ( ptr_belem_t )( uintptr_t )begin_addr;
+                typedef SIXTRL_BE_ARGPTR_DEC NS(DipoleEdge) const* ptr_belem_t;
+                ptr_belem_t elem = ( ptr_belem_t )( uintptr_t )begin_addr;
 
                 ++requ_num_objects;
-
-                requ_num_slots =
-                NS(DipoleEdge_get_required_num_slots_on_managed_buffer)(
-                    SIXTRL_NULLPTR, ptr_begin, slot_size );
-
-                requ_num_dataptrs =
-                NS(DipoleEdge_get_required_num_dataptrs_on_managed_buffer)(
-                    SIXTRL_NULLPTR, ptr_begin, slot_size );
-
+                requ_num_slots = NS(DipoleEdge_num_slots)( elem, slot_size );
+                requ_num_dataptrs = NS(DipoleEdge_num_dataptrs)( elem );
                 break;
             }
 
@@ -627,11 +566,11 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
 
                 case NS(OBJECT_TYPE_MULTIPOLE):
                 {
-                    typedef NS(MultiPole)                           belem_t;
+                    typedef NS(Multipole)                           belem_t;
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t*           ptr_dest_t;
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t const*     ptr_src_t;
 
-                    success = NS(MultiPole_copy)(
+                    success = NS(Multipole_copy)(
                         ( ptr_dest_t )( uintptr_t )dest_addr,
                         ( ptr_src_t  )( uintptr_t )src_addr );
 
@@ -640,11 +579,11 @@ SIXTRL_INLINE int NS(BeamElements_copy_object)(
 
                 case NS(OBJECT_TYPE_RF_MULTIPOLE):
                 {
-                    typedef NS(RFMultiPole) beam_element_t;
+                    typedef NS(RFMultipole) beam_element_t;
                     typedef SIXTRL_BE_ARGPTR_DEC beam_element_t* ptr_dest_t;
                     typedef SIXTRL_BE_ARGPTR_DEC beam_element_t const* ptr_src_t;
 
-                    success = NS(RFMultiPole_copy)(
+                    success = NS(RFMultipole_copy)(
                         ( ptr_dest_t )( uintptr_t )dest_addr,
                         ( ptr_src_t  )( uintptr_t )src_addr );
 
@@ -879,17 +818,17 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamElements_clear_object)(
 
                 case NS(OBJECT_TYPE_MULTIPOLE):
                 {
-                    typedef NS(MultiPole)                 belem_t;
+                    typedef NS(Multipole)                 belem_t;
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
-                    NS(MultiPole_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    NS(Multipole_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
                     break;
                 }
 
                 case NS(OBJECT_TYPE_RF_MULTIPOLE):
                 {
-                    typedef NS(RFMultiPole) belem_t;
+                    typedef NS(RFMultipole) belem_t;
                     typedef SIXTRL_BE_ARGPTR_DEC belem_t* ptr_belem_t;
-                    NS(RFMultiPole_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
+                    NS(RFMultipole_clear)( ( ptr_belem_t )( uintptr_t )obj_addr );
                     break;
                 }
 
@@ -1125,30 +1064,30 @@ SIXTRL_INLINE int NS(BeamElements_add_single_new_to_buffer)(
 
             case NS(OBJECT_TYPE_MULTIPOLE):
             {
-                typedef NS(MultiPole)                    mp_t;
+                typedef NS(Multipole)                    mp_t;
                 typedef NS(multipole_order_t)            mp_order_t;
                 typedef SIXTRL_BE_ARGPTR_DEC mp_t const* ptr_mp_t;
 
                 ptr_mp_t ptr_mp = ( ptr_mp_t )( uintptr_t )begin_addr;
-                mp_order_t const order = NS(MultiPole_get_order)( ptr_mp );
+                mp_order_t const order = NS(Multipole_order)( ptr_mp );
 
                 success = ( SIXTRL_NULLPTR !=
-                    NS(MultiPole_new)( buffer, order ) ) ? 0 : -1;
+                    NS(Multipole_new)( buffer, order ) ) ? 0 : -1;
 
                 break;
             }
 
             case NS(OBJECT_TYPE_RF_MULTIPOLE):
             {
-                typedef NS(RFMultiPole)                  mp_t;
+                typedef NS(RFMultipole)                  mp_t;
                 typedef NS(rf_multipole_int_t)           mp_order_t;
                 typedef SIXTRL_BE_ARGPTR_DEC mp_t const* ptr_mp_t;
 
                 ptr_mp_t ptr_mp = ( ptr_mp_t )( uintptr_t )begin_addr;
-                mp_order_t const order = NS(RFMultiPole_order)( ptr_mp );
+                mp_order_t const order = NS(RFMultipole_order)( ptr_mp );
 
                 success = ( SIXTRL_NULLPTR !=
-                    NS(RFMultiPole_new)( buffer, order ) ) ? 0 : -1;
+                    NS(RFMultipole_new)( buffer, order ) ) ? 0 : -1;
 
                 break;
             }
@@ -1330,26 +1269,26 @@ SIXTRL_INLINE int NS(BeamElements_copy_single_to_buffer)(
 
             case NS(OBJECT_TYPE_MULTIPOLE):
             {
-                typedef NS(MultiPole)                    mp_t;
+                typedef NS(Multipole)                    mp_t;
                 typedef SIXTRL_BE_ARGPTR_DEC mp_t const* ptr_mp_t;
 
                 ptr_mp_t ptr_mp = ( ptr_mp_t )( uintptr_t )begin_addr;
 
                 success = ( SIXTRL_NULLPTR !=
-                    NS(MultiPole_add_copy)( buffer, ptr_mp ) ) ? 0 : -1;
+                    NS(Multipole_add_copy)( buffer, ptr_mp ) ) ? 0 : -1;
 
                 break;
             }
 
             case NS(OBJECT_TYPE_RF_MULTIPOLE):
             {
-                typedef NS(RFMultiPole) mp_t;
+                typedef NS(RFMultipole) mp_t;
                 typedef SIXTRL_BE_ARGPTR_DEC mp_t const* ptr_mp_t;
 
                 ptr_mp_t ptr_mp = ( ptr_mp_t )( uintptr_t )begin_addr;
 
                 success = ( SIXTRL_NULLPTR !=
-                    NS(RFMultiPole_add_copy)( buffer, ptr_mp ) ) ? 0 : -1;
+                    NS(RFMultipole_add_copy)( buffer, ptr_mp ) ) ? 0 : -1;
 
                 break;
             }
