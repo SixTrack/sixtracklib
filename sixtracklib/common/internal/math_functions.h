@@ -142,12 +142,12 @@ namespace SIXTRL_CXX_NAMESPACE
     template< typename T >
     SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
     typename TypeMethodParamTraits< T >::value_type atan2(
-        typename TypeMethodParamTraits< T >::const_argument_type x,
-        typename TypeMethodParamTraits< T >::const_argument_type y
+        typename TypeMethodParamTraits< T >::const_argument_type y,
+        typename TypeMethodParamTraits< T >::const_argument_type x
     ) SIXTRL_NOEXCEPT
     {
         using std::atan2;
-        return atan2( x, y );
+        return atan2( y, x );
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -271,12 +271,12 @@ template< typename T >
 SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
 typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits< T >::value_type
 NS(atan2)( typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
-                T >::const_argument_type x,
+                T >::const_argument_type y,
            typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
-                T >::const_argument_type y ) SIXTRL_NOEXCEPT
+                T >::const_argument_type x ) SIXTRL_NOEXCEPT
 {
     using std::atan2;
-    return atan2( x, y );
+    return atan2( y, x );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -402,7 +402,7 @@ SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
 NS(tan)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
-NS(atan2)( SIXTRL_REAL_T const x, SIXTRL_REAL_T const y ) SIXTRL_NOEXCEPT;
+NS(atan2)( SIXTRL_REAL_T const y, SIXTRL_REAL_T const x ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
 NS(sqrt)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
@@ -485,13 +485,13 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(tan)( SIXTRL_REAL_T const x ) SIXTRL_NOEXCEPT
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(atan2)(
-    SIXTRL_REAL_T const x, SIXTRL_REAL_T const y ) SIXTRL_NOEXCEPT
+    SIXTRL_REAL_T const y, SIXTRL_REAL_T const x ) SIXTRL_NOEXCEPT
 {
     #if defined( __cplusplus )
     using std::atan2;
     #endif /* defined( __cplusplus ) */
 
-    return atan2( x, y );
+    return atan2( y, x );
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(sqrt)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT
