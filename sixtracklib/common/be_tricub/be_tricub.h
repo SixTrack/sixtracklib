@@ -168,7 +168,7 @@ SIXTRL_STATIC SIXTRL_FN void NS(TriCubData_set_table_addr)(
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_STATIC SIXTRL_FN NS(object_type_id_t) NS(TriCubData_type_id)(
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data );
+    void ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(TriCubData_num_dataptrs)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data );
@@ -197,8 +197,6 @@ NS(TriCubData_from_managed_buffer)(
     NS(buffer_size_t) const index, NS(buffer_size_t) const slot_size );
 
 #if !defined( _GPUCODE )
-
-SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t) NS(TriCubData_type_id_ext)( void );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData) const*
 NS(TriCubData_const_from_buffer)(
@@ -230,7 +228,7 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(TriCubData_attributes_counts)(
 /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t)
-    NS(TriCubData_type_id_ext)( void );
+    NS(TriCubData_type_id_ext)( void ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(TriCubData_ptr_offset)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT d );
@@ -365,8 +363,8 @@ SIXTRL_STATIC SIXTRL_FN void NS(TriCub_set_data_addr)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_FN NS(object_type_id_t) NS(TriCub_type_id)(
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub );
+SIXTRL_STATIC SIXTRL_FN NS(object_type_id_t)
+    NS(TriCub_type_id)( void ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(TriCub_num_dataptrs)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub );
@@ -777,11 +775,9 @@ SIXTRL_INLINE void NS(TriCubData_set_table_addr)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE NS(object_type_id_t) NS(TriCubData_type_id)(
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCubData) *const SIXTRL_RESTRICT data )
+SIXTRL_INLINE NS(object_type_id_t) NS(TriCubData_type_id)() SIXTRL_NOEXCEPT
 {
-    ( void )data;
-    return NS(OBJECT_TYPE_TRICUB_DATA);
+    return ( NS(object_type_id_t) )NS(OBJECT_TYPE_TRICUB_DATA);
 }
 
 SIXTRL_INLINE NS(buffer_size_t) NS(TriCubData_num_dataptrs)(
@@ -1096,11 +1092,9 @@ SIXTRL_INLINE void NS(TriCub_set_data_addr)( SIXTRL_BE_ARGPTR_DEC NS(TriCub)*
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE NS(object_type_id_t) NS(TriCub_type_id)(
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(TriCub) *const SIXTRL_RESTRICT tricub )
+SIXTRL_INLINE NS(object_type_id_t) NS(TriCub_type_id)( void ) SIXTRL_NOEXCEPT
 {
-    ( void )tricub;
-    return NS(OBJECT_TYPE_TRICUB);
+    return ( NS(object_type_id_t) )NS(OBJECT_TYPE_TRICUB);
 }
 
 SIXTRL_INLINE NS(buffer_size_t) NS(TriCub_num_dataptrs)(

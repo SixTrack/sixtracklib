@@ -10,6 +10,11 @@
 #include "sixtracklib/common/buffer/assign_address_item.h"
 #include "sixtracklib/common/buffer.h"
 
+NS(object_type_id_t) NS(TriCubData_type_id_ext)( void ) SIXTRL_NOEXCEPT
+{
+    return ( NS(object_type_id_t) )NS(OBJECT_TYPE_TRICUB_DATA);
+}
+
 NS(arch_status_t) NS(TriCubData_attributes_offsets)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const max_num_offsets,
@@ -209,7 +214,7 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* NS(TriCubData_new)(
         ptr_tricub_data = ( SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* )(
             uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
                 buffer, &tricub_data, sizeof( tricub_data ),
-                    NS(TriCubData_type_id)( &tricub_data ), num_dataptrs,
+                    NS(TriCubData_type_id)(), num_dataptrs,
                         &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
     }
 
@@ -281,7 +286,7 @@ NS(TriCubData_add)(
         ptr_tricub_data = ( SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData)* )(
             uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)(
                 buffer, &tricub_data, sizeof( tricub_data ),
-                    NS(TriCubData_type_id)( &tricub_data ), num_dataptrs,
+                    NS(TriCubData_type_id)(), num_dataptrs,
                         &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
     }
 
@@ -363,7 +368,7 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_new)(
 
     return ( SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* )( uintptr_t
         )NS(Object_get_begin_addr)( NS(Buffer_add_trivial_object)( buffer,
-            &tricub, sizeof( tricub ), NS(TriCub_type_id)( &tricub ) ) );
+            &tricub, sizeof( tricub ), NS(TriCub_type_id)() ) );
 }
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_add)(
@@ -392,7 +397,7 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_add)(
 
     return ( SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* )( uintptr_t
         )NS(Object_get_begin_addr)( NS(Buffer_add_trivial_object)( buffer,
-            &tricub, sizeof( tricub ), NS(TriCub_type_id)( &tricub ) ) );
+            &tricub, sizeof( tricub ), NS(TriCub_type_id)() ) );
 }
 
 SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_add_copy)(
@@ -404,7 +409,7 @@ SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* NS(TriCub_add_copy)(
 
     return ( SIXTRL_BUFFER_DATAPTR_DEC NS(TriCub)* )( uintptr_t
         )NS(Object_get_begin_addr)( NS(Buffer_add_trivial_object)( buffer,
-            tricub, sizeof( NS(TriCub) ), NS(TriCub_type_id)( tricub ) ) );
+            tricub, sizeof( NS(TriCub) ), NS(TriCub_type_id)() ) );
 }
 
 /* ------------------------------------------------------------------------ */
