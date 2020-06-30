@@ -72,9 +72,8 @@ set_target_properties( sixtrack_cuda_host PROPERTIES LINKER_LANGUAGE C )
 set_target_properties( sixtrack_cuda_host PROPERTIES CXX_STANDARD 11 )
 set_target_properties( sixtrack_cuda_host PROPERTIES CXX_STANDARD_REQUIRED ON )
 
-target_compile_options( sixtrack_cuda_host BEFORE PUBLIC
-        ${SIXTRACKLIB_CPU_FLAGS} ${SIXTRACKLIB_CXX_FLAGS}
-        ${SIXTRACKL_CXX_AUTOVEC_FLAGS} )
+# target_compile_options( sixtrack_cuda_host BEFORE PUBLIC
+#         ${SIXTRACKLIB_CXX_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_cuda_host as a module for sixtracklib:
