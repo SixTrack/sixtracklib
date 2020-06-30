@@ -326,7 +326,9 @@ SIXTRL_STATIC_VAR NS(node_id_str_fmt_t) const NS(NODE_ID_STR_FORMAT_ILLEGAL) =
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }
+#endif /* C++. Host */
 
+#if defined( __cplusplus )
 namespace SIXTRL_CXX_NAMESPACE
 {
     typedef ::NS(ctrl_status_t)       ctrl_status_t;
@@ -449,29 +451,35 @@ namespace SIXTRL_CXX_NAMESPACE
         ::NS(ARCH_ILLEGAL_BUFFER_ID);
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
-        ARCH_PARTICLES_BUFFER_ID = ::NS(ARCH_PARTICLES_BUFFER_ID);
+        ARCH_PARTICLES_BUFFER_ID = static_cast< arch_size_t >(
+            SIXTRL_ARCH_PARTICLES_BUFFER_ID );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
         ARCH_BEAM_ELEMENTS_BUFFER_ID = ::NS(ARCH_BEAM_ELEMENTS_BUFFER_ID);
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
-        ARCH_OUTPUT_BUFFER_ID = ::NS(ARCH_OUTPUT_BUFFER_ID);
+        ARCH_OUTPUT_BUFFER_ID = static_cast< arch_size_t >(
+            SIXTRL_ARCH_OUTPUT_BUFFER_ID );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
-        ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID =
-            ::NS(ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID);
+        ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID = static_cast< arch_size_t >(
+            SIXTRL_ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
-        ARCH_PARTICLE_ADDR_BUFFER_ID = ::NS(ARCH_PARTICLE_ADDR_BUFFER_ID);
+        ARCH_PARTICLE_ADDR_BUFFER_ID = static_cast< arch_size_t >(
+            SIXTRL_ARCH_PARTICLE_ADDR_BUFFER_ID );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
-        ARCH_MIN_USER_DEFINED_BUFFER_ID = NS(ARCH_MIN_USER_DEFINED_BUFFER_ID);
+        ARCH_MIN_USER_DEFINED_BUFFER_ID = static_cast< arch_size_t >(
+            SIXTRL_ARCH_MIN_USER_DEFINED_BUFFER_ID );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
-        ARCH_EXTERNAL_BUFFER_ID = ::NS(ARCH_EXTERNAL_BUFFER_ID);
+        ARCH_EXTERNAL_BUFFER_ID = static_cast< arch_size_t >(
+            SIXTRL_ARCH_EXTERNAL_BUFFER_ID );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST arch_size_t
-        ARCH_MAX_USER_DEFINED_BUFFER_ID = ::NS(ARCH_MAX_USER_DEFINED_BUFFER_ID);
+        ARCH_MAX_USER_DEFINED_BUFFER_ID = static_cast< arch_size_t >(
+            SIXTRL_ARCH_MAX_USER_DEFINED_BUFFER_ID );
 
     /* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --  */
 
@@ -495,8 +503,7 @@ namespace SIXTRL_CXX_NAMESPACE
         NODE_ID_STR_FORMAT_DEFAULT = static_cast< node_id_str_fmt_t >(
             SIXTRL_NODE_ID_STR_FORMAT_DEFAULT );
 }
-
-#endif /* C++, Host */
+#endif /* C++ */
 
 #endif /* SIXTRACKLIB_COMMON_CONTROL_DEFINITIONS_H__ */
 
