@@ -23,7 +23,9 @@ from .opencl import ClNodeId, ClController, ClArgument
 from .trackjob import TrackJob
 from .config_helper import supports
 
-from .interpol import LineDensityProfileData
+from .interpol import (
+    LineDensityProfileData,
+    LineDensityProfileData_buffer_create_assign_address_item )
 
 from .tricub import (
     TriCub,
