@@ -19,6 +19,7 @@ from .stcommon import st_BeamBeam4D_type_id, st_BeamBeam4D_data_addr_offset, \
     st_LimitRectEllipse_type_id, st_Multipole_type_id, st_RFMultipole_type_id, \
     st_SpaceChargeCoasting_type_id, \
     st_SpaceChargeQGaussianProfile_type_id, st_LineDensityProfileData_type_id, \
+    st_NullSpaceChargeInterpolatedProfile, \
     st_SpaceChargeInterpolatedProfile_type_id, \
     st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset, \
     st_SRotation_type_id, st_XYShift_type_id
@@ -581,11 +582,6 @@ class SpaceChargeInterpolatedProfile(CObject):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-    @property
-    def interpol_data_offset(self):
-        return self._offsets[6] - self._offsets[0]
-
 
 
 class LimitRectEllipse(CObject):
