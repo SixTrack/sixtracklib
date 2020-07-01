@@ -67,6 +67,15 @@ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
     NS(CudaArgument)* SIXTRL_RESTRICT debug_register_arg );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN
+void NS(AssignAddressItem_process_managed_buffer_cuda_wrapper)(
+    const NS(CudaKernelConfig) *const SIXTRL_RESTRICT kernel_config,
+    NS(CudaArgument)* SIXTRL_RESTRICT assign_buffer_arg,
+    NS(CudaArgument)* SIXTRL_RESTRICT dest_buffer_arg,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(CudaArgument)* SIXTRL_RESTRICT src_buffer_arg,
+    NS(buffer_size_t) const src_buffer_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN
 void NS(Particles_buffer_store_all_addresses_cuda_wrapper)(
     const NS(CudaKernelConfig) *const SIXTRL_RESTRICT kernel_config,
     NS(CudaArgument)* SIXTRL_RESTRICT particles_addresses_arg,
