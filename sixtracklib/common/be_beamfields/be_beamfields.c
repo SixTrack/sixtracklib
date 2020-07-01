@@ -1221,7 +1221,7 @@ NS(LineDensityProfileData_from_buffer_ext)(
 /* ------------------------------------------------------------------------- */
 
 NS(arch_status_t) NS(LineDensityProfileData_attributes_offsets)(
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets_begin,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const max_num_offsets,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(LineDensityProfileData) *const
         SIXTRL_RESTRICT data,
@@ -1231,33 +1231,32 @@ NS(arch_status_t) NS(LineDensityProfileData_attributes_offsets)(
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( offsets_begin != SIXTRL_NULLPTR ) && ( data != SIXTRL_NULLPTR ) &&
-        ( slot_size > ZERO ) && ( max_num_offsets > ( buf_size_t )2u ) )
+    if( ( offsets != SIXTRL_NULLPTR ) && ( data != SIXTRL_NULLPTR ) &&
+        ( slot_size > ZERO ) && ( max_num_offsets >= ( buf_size_t )2u ) )
     {
-        offsets_begin[ 0 ] = ( buf_size_t )offsetof(
+        offsets[ 0 ] = ( buf_size_t )offsetof(
             NS(LineDensityProfileData), values_addr );
 
-        offsets_begin[ 1 ] = ( buf_size_t )offsetof(
+        offsets[ 1 ] = ( buf_size_t )offsetof(
             NS(LineDensityProfileData), derivatives_addr );
 
-        if( ( offsets_begin[ 0 ] % slot_size == ( buf_size_t )0 ) &&
-            ( offsets_begin[ 0 ] % slot_size == ( buf_size_t )0 ) )
-        {
-            status = NS(ARCH_STATUS_SUCCESS);
+        SIXTRL_ASSERT( offsets[ 0 ] % slot_size == ( buf_size_t )0 );
+        SIXTRL_ASSERT( offsets[ 0 ] % slot_size == ( buf_size_t )0 );
 
-            if( max_num_offsets > ( buf_size_t )2u )
-            {
-                SIXTRACKLIB_SET_VALUES( buf_size_t, &offsets_begin[ 2 ],
-                                        max_num_offsets - 2u, ZERO );
-            }
+        if( max_num_offsets > ( buf_size_t )2u )
+        {
+            SIXTRACKLIB_SET_VALUES(
+                buf_size_t, &offsets[ 2 ], max_num_offsets - 2u, ZERO );
         }
+
+        status = NS(ARCH_STATUS_SUCCESS);
     }
 
     return status;
 }
 
 NS(arch_status_t) NS(LineDensityProfileData_attributes_sizes)(
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes_begin,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes,
     NS(buffer_size_t) const max_num_sizes,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(LineDensityProfileData)
         *const SIXTRL_RESTRICT data,
@@ -1267,29 +1266,26 @@ NS(arch_status_t) NS(LineDensityProfileData_attributes_sizes)(
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( sizes_begin != SIXTRL_NULLPTR ) && ( data != SIXTRL_NULLPTR ) &&
-        ( slot_size > ZERO ) && ( max_num_sizes > ( buf_size_t )2u ) )
+    if( ( sizes != SIXTRL_NULLPTR ) && ( data != SIXTRL_NULLPTR ) &&
+        ( slot_size > ZERO ) && ( max_num_sizes >= ( buf_size_t )2u ) )
     {
-        sizes_begin[ 0 ] = NS(ManagedBuffer_get_slot_based_length)(
-            sizeof( SIXTRL_REAL_T ), slot_size );
-
-        sizes_begin[ 1 ] = NS(ManagedBuffer_get_slot_based_length)(
-            sizeof( SIXTRL_REAL_T ), slot_size );
-
-        status = NS(ARCH_STATUS_SUCCESS);
+        sizes[ 0 ] = sizeof( SIXTRL_REAL_T );
+        sizes[ 1 ] = sizeof( SIXTRL_REAL_T );
 
         if( max_num_sizes > ( buf_size_t )2u )
         {
             SIXTRACKLIB_SET_VALUES(
-                buf_size_t, &sizes_begin[ 2 ], max_num_sizes - 2u, ZERO );
+                buf_size_t, &sizes[ 2 ], max_num_sizes - 2u, ZERO );
         }
+
+        status = NS(ARCH_STATUS_SUCCESS);
     }
 
     return status;
 }
 
 NS(arch_status_t) NS(LineDensityProfileData_attributes_counts)(
-    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts,
     NS(buffer_size_t) const max_num_counts,
     SIXTRL_BUFFER_DATAPTR_DEC const NS(LineDensityProfileData)
         *const SIXTRL_RESTRICT data,
@@ -1299,24 +1295,20 @@ NS(arch_status_t) NS(LineDensityProfileData_attributes_counts)(
     SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
-    if( ( counts_begin != SIXTRL_NULLPTR ) && ( data != SIXTRL_NULLPTR ) &&
-        ( max_num_counts > ( buf_size_t )2u ) &&
+    if( ( counts != SIXTRL_NULLPTR ) && ( data != SIXTRL_NULLPTR ) &&
+        ( max_num_counts >= ( buf_size_t )2u ) &&
         ( slot_size > ( NS(buffer_size_t) )0u ) &&
         ( NS(LineDensityProfileData_capacity)( data ) >=
           ( NS(math_abscissa_idx_t) )0u ) )
     {
-        counts_begin[ 0 ] = ( buf_size_t
-            )NS(LineDensityProfileData_capacity)( data );
-
-        counts_begin[ 1 ] = ( buf_size_t
-            )NS(LineDensityProfileData_capacity)( data );
-
+        counts[ 0 ] = ( buf_size_t )NS(LineDensityProfileData_capacity)( data );
+        counts[ 1 ] = ( buf_size_t )NS(LineDensityProfileData_capacity)( data );
         status = NS(ARCH_STATUS_SUCCESS);
 
         if( max_num_counts > ( buf_size_t )2u )
         {
             SIXTRACKLIB_SET_VALUES(
-                buf_size_t, &counts_begin[ 2 ], max_num_counts - 2u, ZERO );
+                buf_size_t, &counts[ 2 ], max_num_counts - 2u, ZERO );
         }
     }
 

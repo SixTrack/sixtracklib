@@ -892,12 +892,12 @@ SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SpaceChargeQGaussianProfile_copy)(
 typedef struct NS(LineDensityProfileData)
 {
     NS(math_interpol_int_t) method           SIXTRL_ALIGN( 8 );
-    NS(math_abscissa_idx_t) num_values       SIXTRL_ALIGN( 8 );
+    NS(math_abscissa_idx_t) capacity         SIXTRL_ALIGN( 8 );
     NS(buffer_addr_t)       values_addr      SIXTRL_ALIGN( 8 );
     NS(buffer_addr_t)       derivatives_addr SIXTRL_ALIGN( 8 );
     SIXTRL_REAL_T           z0               SIXTRL_ALIGN( 8 );
     SIXTRL_REAL_T           dz               SIXTRL_ALIGN( 8 );
-    NS(math_abscissa_idx_t) capacity         SIXTRL_ALIGN( 8 );
+    NS(math_abscissa_idx_t) num_values       SIXTRL_ALIGN( 8 );
 }
 NS(LineDensityProfileData);
 
@@ -3106,12 +3106,12 @@ NS(LineDensityProfileData_clear)( SIXTRL_BUFFER_DATAPTR_DEC
     status = NS(LineDensityProfileData_set_method)(
         data, NS(MATH_INTERPOL_NONE) );
 
-    status |= NS(LineDensityProfileData_set_num_values)( data, ( absc_t )0 );
+    status |= NS(LineDensityProfileData_set_capacity)( data, ( absc_t )2 );
     status |= NS(LineDensityProfileData_set_values_addr)( data, ( addr_t )0 );
     status |= NS(LineDensityProfileData_set_derivatives_addr)( data, ( addr_t )0 );
-    status |= NS(LineDensityProfileData_set_capacity)( data, ( absc_t )0 );
     status |= NS(LineDensityProfileData_set_z0)( data, ( real_t )0 );
     status |= NS(LineDensityProfileData_set_dz)( data, ( real_t )1 );
+    status |= NS(LineDensityProfileData_set_num_values)( data, ( absc_t )0 );
 
     return status;
 }
@@ -3148,8 +3148,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(LineDensityProfileData_num_slots)(
         SIXTRL_ASSERT( NS(LineDensityProfileData_num_dataptrs)( data ) ==
             ( st_size_t )2u );
 
-        if( ( data != SIXTRL_NULLPTR ) &&
-            ( data->capacity > ( absc_t )0 ) )
+        if( ( data != SIXTRL_NULLPTR ) && ( data->capacity > ( absc_t )0 ) )
         {
             st_size_t const capacity = ( st_size_t
                 )NS(LineDensityProfileData_capacity)( data );
@@ -3472,7 +3471,7 @@ NS(LineDensityProfileData_prepare_interpolation)(
     NS(arch_status_t) status = ( NS(arch_status_t)
         )SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE;
 
-    if( ( data != SIXTRL_NULLPTR ) && ( temp_data != SIXTRL_NULLPTR ) &&
+    if( ( data != SIXTRL_NULLPTR ) &&
         ( NS(LineDensityProfileData_values_addr)( data ) != ( addr_t )0 ) &&
         ( NS(LineDensityProfileData_derivatives_addr)( data ) != ( addr_t )0 ) &&
         ( NS(LineDensityProfileData_num_values)( data ) >
