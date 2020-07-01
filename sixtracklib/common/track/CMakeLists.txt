@@ -3,7 +3,8 @@
 
 set( SIXTRL_COMMON_TRACK_C99_SOURCES track.c )
 set( SIXTRL_COMMON_TRACK_C99_HEADERS definitions.h track.h track_kernel_impl.h
-     track_kernel_opt_impl.h track_job_base.h track_job_cpu.h )
+     track_kernel_opt_impl.h track_job_base.h track_job_cpu.h
+     track_job_buffer_store.h )
 
 add_library( sixtrack_common_track OBJECT
     ${SIXTRL_COMMON_TRACK_C99_HEADERS} ${SIXTRL_COMMON_TRACK_C99_SOURCES} )
@@ -32,7 +33,8 @@ set( SIXTRL_COMMON_TRACK_CXX_HEADERS track_job_base.hpp
 
 set( SIXTRL_COMMON_TRACK_CXX_SOURCES track_job_base.cpp track_job_base_c99.cpp
     track_job_ctrl_arg_base.cpp track_job_nodectrl_arg_base.cpp
-     track_job_cpu.cpp track_job_cpu_c99.cpp )
+     track_job_cpu.cpp track_job_cpu_c99.cpp
+     track_job_buffer_store.cpp )
 
 add_library( sixtrack_common_track_cxx OBJECT
     ${SIXTRL_COMMON_TRACK_CXX_HEADERS} ${SIXTRL_COMMON_TRACK_CXX_SOURCES}
