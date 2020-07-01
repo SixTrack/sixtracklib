@@ -114,6 +114,7 @@ set( SIXTRACKLIB_CUDA_PART_DEVICE_HEADERS
      kernels/extract_particles_addr.cuh
      kernels/managed_buffer_remap.cuh
      kernels/track_particles.cuh
+     kernels/assign_address_item.cuh
 )
 
 set( SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES
@@ -122,6 +123,7 @@ set( SIXTRACKLIB_CUDA_PART_DEVICE_SOURCES
      kernels/extract_particles_addr.cu
      kernels/managed_buffer_remap.cu
      kernels/track_particles.cu
+     kernels/assign_address_item.cu
 )
 
 add_library( sixtrack_cuda_device OBJECT
