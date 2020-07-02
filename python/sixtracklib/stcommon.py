@@ -3751,6 +3751,243 @@ st_TrackJobNew_uses_arguments = sixtracklib.st_TrackJobNew_uses_arguments
 st_TrackJobNew_uses_arguments.argtypes = [st_TrackJobBaseNew_p]
 st_TrackJobNew_uses_arguments.restype = ct.c_bool
 
+# -----------------------------------------------------------------------------
+
+st_TrackJobNew_add_assign_address_item = \
+    sixtracklib.st_TrackJobNew_add_assign_address_item
+st_TrackJobNew_add_assign_address_item.restype = st_AssignAddressItem_p
+st_TrackJobNew_add_assign_address_item.argtypes = [
+    st_TrackJobBaseNew_p,st_AssignAddressItem_p ]
+
+st_TrackJobNew_add_assign_address_item_detailed = \
+    sixtracklib.st_TrackJobNew_add_assign_address_item_detailed
+st_TrackJobNew_add_assign_address_item_detailed.argtypes = [
+    st_TrackJobBaseNew_p, st_object_type_id_t, st_buffer_size_t,
+    st_buffer_size_t, st_buffer_size_t, st_object_type_id_t, st_buffer_size_t,
+    st_buffer_size_t, st_buffer_size_t, ]
+st_TrackJobNew_add_assign_address_item_detailed.restype = st_AssignAddressItem_p
+
+st_TrackJobNew_remove_assign_address_item = \
+    sixtracklib.st_TrackJobNew_remove_assign_address_item
+st_TrackJobNew_remove_assign_address_item.restype = st_arch_status_t
+st_TrackJobNew_remove_assign_address_item.argtypes = [
+    st_TrackJobBaseNew_p, st_AssignAddressItem_p ]
+
+st_TrackJobNew_remove_assign_address_item_by_key_and_index = \
+    sixtracklib.st_TrackJobNew_remove_assign_address_item_by_key_and_index
+st_TrackJobNew_remove_assign_address_item_by_key_and_index.restype = st_arch_status_t
+st_TrackJobNew_remove_assign_address_item_by_key_and_index.argtypes = [
+    st_TrackJobBaseNew_p,st_TrackJobDestSrcBufferIds_p, st_buffer_size_t ]
+
+st_TrackJobNew_has_assign_address_item = \
+    sixtracklib.st_TrackJobNew_has_assign_address_item
+st_TrackJobNew_has_assign_address_item.restype = ct.c_bool
+st_TrackJobNew_has_assign_address_item.argtypes = [
+    st_TrackJobBaseNew_p, st_AssignAddressItem_p ]
+
+st_TrackJobNew_has_assign_item_by_index = \
+    sixtracklib.st_TrackJobNew_has_assign_item_by_index
+st_TrackJobNew_has_assign_item_by_index.restype = ct.c_bool
+st_TrackJobNew_has_assign_item_by_index.argtypes = [
+    st_TrackJobBaseNew_p, st_buffer_size_t, st_buffer_size_t, st_buffer_size_t ]
+
+st_TrackJobNew_has_assign_address_item_detailed = \
+    sixtracklib.st_TrackJobNew_has_assign_address_item_detailed
+st_TrackJobNew_has_assign_address_item_detailed.restype = ct.c_bool
+st_TrackJobNew_has_assign_address_item_detailed.argtypes = [
+    st_TrackJobBaseNew_p, st_object_type_id_t, st_buffer_size_t,
+    st_buffer_size_t, st_buffer_size_t, st_object_type_id_t, st_buffer_size_t,
+    st_buffer_size_t, st_buffer_size_t ]
+
+st_TrackJobNew_index_of_assign_address_item_detailed = \
+    sixtracklib.st_TrackJobNew_index_of_assign_address_item_detailed
+st_TrackJobNew_index_of_assign_address_item_detailed.restype = st_buffer_size_t
+st_TrackJobNew_index_of_assign_address_item_detailed.argtypes = [
+    st_TrackJobBaseNew_p, st_object_type_id_t, st_buffer_size_t,
+    st_buffer_size_t, st_buffer_size_t, st_object_type_id_t,
+    st_buffer_size_t, st_buffer_size_t, st_buffer_size_t, ]
+
+st_TrackJobNew_index_of_assign_address_item = \
+    sixtracklib.st_TrackJobNew_index_of_assign_address_item
+st_TrackJobNew_index_of_assign_address_item.restype = st_buffer_size_t
+st_TrackJobNew_index_of_assign_address_item.argtypes = [
+    st_TrackJobBaseNew_p, st_AssignAddressItem_p ]
+
+st_TrackJobNew_has_assign_items = sixtracklib.st_TrackJobNew_has_assign_items
+st_TrackJobNew_has_assign_items.restype = ct.c_bool
+st_TrackJobNew_has_assign_items.argtypes = [
+    st_TrackJobBaseNew_p, st_buffer_size_t, st_buffer_size_t ]
+
+st_TrackJobNew_num_assign_items = sixtracklib.st_TrackJobNew_num_assign_items
+st_TrackJobNew_num_assign_items.restype = st_buffer_size_t
+st_TrackJobNew_num_assign_items.argtypes = [
+    st_TrackJobBaseNew_p, st_buffer_size_t, st_buffer_size_t ]
+
+st_TrackJobNew_total_num_assign_items = \
+    sixtracklib.st_TrackJobNew_total_num_assign_items
+st_TrackJobNew_total_num_assign_items.restype = st_buffer_size_t
+st_TrackJobNew_total_num_assign_items.argtypes = [ st_TrackJobBaseNew_p ]
+
+st_TrackJobNew_ptr_assign_address_item = \
+    sixtracklib.st_TrackJobNew_ptr_assign_address_item
+st_TrackJobNew_ptr_assign_address_item.restype = st_AssignAddressItem_p
+st_TrackJobNew_ptr_assign_address_item.argtypes = [
+    st_TrackJobBaseNew_p, st_AssignAddressItem_p ]
+
+st_TrackJobNew_ptr_assign_address_item_detailed = \
+    sixtracklib.st_TrackJobNew_ptr_assign_address_item_detailed
+st_TrackJobNew_ptr_assign_address_item_detailed.restype = st_AssignAddressItem_p
+st_TrackJobNew_ptr_assign_address_item_detailed.argtypes = [
+    st_TrackJobBaseNew_p, st_object_type_id_t, st_buffer_size_t,
+    st_buffer_size_t, st_buffer_size_t, st_object_type_id_t, st_buffer_size_t,
+    st_buffer_size_t, st_buffer_size_t ]
+
+st_TrackJobNew_ptr_assign_address_item_by_index = \
+    sixtracklib.st_TrackJobNew_ptr_assign_address_item_by_index
+st_TrackJobNew_ptr_assign_address_item_by_index.restype = st_AssignAddressItem_p
+st_TrackJobNew_ptr_assign_address_item_by_index.argtypes = [
+    st_TrackJobBaseNew_p, st_buffer_size_t, st_buffer_size_t, st_buffer_size_t ]
+
+st_TrackJobNew_num_distinct_available_assign_address_items_dest_src_pairs = \
+    sixtracklib.st_TrackJobNew_num_distinct_available_assign_address_items_dest_src_pairs
+st_TrackJobNew_num_distinct_available_assign_address_items_dest_src_pairs.restype = st_buffer_size_t
+st_TrackJobNew_num_distinct_available_assign_address_items_dest_src_pairs.argtypes = [
+    st_TrackJobBaseNew_p ]
+
+st_TrackJobNew_available_assign_address_items_dest_src_pairs = \
+    sixtracklib.st_TrackJobNew_available_assign_address_items_dest_src_pairs
+st_TrackJobNew_available_assign_address_items_dest_src_pairs.restype = st_buffer_size_t
+st_TrackJobNew_available_assign_address_items_dest_src_pairs.argtypes = [
+    st_TrackJobBaseNew_p,st_buffer_size_t, st_TrackJobDestSrcBufferIds_p ]
+
+st_TrackJobNew_buffer_by_buffer_id = sixtracklib.st_TrackJobNew_buffer_by_buffer_id
+st_TrackJobNew_buffer_by_buffer_id.restype = st_Buffer_p
+st_TrackJobNew_buffer_by_buffer_id.argtypes = [
+    st_TrackJobBaseNew_p, st_buffer_size_t ]
+
+st_TrackJobNew_const_buffer_by_buffer_id = \
+    sixtracklib.st_TrackJobNew_const_buffer_by_buffer_id
+st_TrackJobNew_const_buffer_by_buffer_id.restype = st_Buffer_p
+st_TrackJobNew_const_buffer_by_buffer_id.argtypes = [
+    st_TrackJobBaseNew_p, st_buffer_size_t ]
+
+st_TrackJobNew_is_buffer_by_buffer_id = \
+    sixtracklib.st_TrackJobNew_is_buffer_by_buffer_id
+st_TrackJobNew_is_buffer_by_buffer_id.restype = ct.c_bool
+st_TrackJobNew_is_buffer_by_buffer_id.argtypes = [
+    st_TrackJobBaseNew_p, st_buffer_size_t ]
+
+st_TrackJobNew_is_raw_memory_by_buffer_id = \
+    sixtracklib.st_TrackJobNew_is_raw_memory_by_buffer_id
+st_TrackJobNew_is_raw_memory_by_buffer_id.restype = ct.c_bool
+st_TrackJobNew_is_raw_memory_by_buffer_id.argtypes = [
+    st_TrackJobBaseNew_p, st_buffer_size_t ]
+
+st_TrackJobNew_assign_item_dest_src_begin = \
+    sixtracklib.st_TrackJobNew_assign_item_dest_src_begin
+st_TrackJobNew_assign_item_dest_src_begin.restype = st_TrackJobDestSrcBufferIds_p
+st_TrackJobNew_assign_item_dest_src_begin.argtypes = [ st_TrackJobBaseNew_p ]
+
+st_TrackJobNew_assign_item_dest_src_end = \
+    sixtracklib.st_TrackJobNew_assign_item_dest_src_end
+st_TrackJobNew_assign_item_dest_src_end.restype = st_TrackJobDestSrcBufferIds_p
+st_TrackJobNew_assign_item_dest_src_end.argtypes = [ st_TrackJobBaseNew_p ]
+
+st_TrackJobNew_commit_address_assignments = \
+    sixtracklib.st_TrackJobNew_commit_address_assignments
+st_TrackJobNew_commit_address_assignments.restype = st_arch_status_t
+st_TrackJobNew_commit_address_assignments.argtypes = [ st_TrackJobBaseNew_p ]
+
+st_TrackJobNew_assign_all_addresses = \
+    sixtracklib.st_TrackJobNew_assign_all_addresses
+st_TrackJobNew_assign_all_addresses.restype = st_arch_status_t
+st_TrackJobNew_assign_all_addresses.argtypes = [ st_TrackJobBaseNew_p ]
+
+st_TrackJobNew_assign_addresses = \
+    sixtracklib.st_TrackJobNew_assign_addresses
+st_TrackJobNew_assign_addresses.restype = st_arch_status_t
+st_TrackJobNew_assign_addresses.argtypes = [
+    st_TrackJobBaseNew_p, st_buffer_size_t, st_buffer_size_t ]
+
+# -----------------------------------------------------------------------------
+
+st_TrackJobNew_stored_buffers_capacity = \
+    sixtracklib.st_TrackJobNew_stored_buffers_capacity
+st_TrackJobNew_stored_buffers_capacity.restype = st_arch_size_t
+st_TrackJobNew_stored_buffers_capacity.argtypes = [ st_TrackJobBaseNew_p ]
+
+st_TrackJobNew_reserve_stored_buffers_capacity = \
+    sixtracklib.st_TrackJobNew_reserve_stored_buffers_capacity
+st_TrackJobNew_reserve_stored_buffers_capacity.restype = st_arch_status_t
+st_TrackJobNew_reserve_stored_buffers_capacity.argtypes = [
+    st_TrackJobBaseNew_p, st_arch_size_t ]
+
+st_TrackJobNew_has_stored_buffers = \
+    sixtracklib.st_TrackJobNew_has_stored_buffers
+st_TrackJobNew_has_stored_buffers.restype = ct.c_bool
+st_TrackJobNew_has_stored_buffers.argtypes = [ st_TrackJobBaseNew_p ]
+
+st_TrackJobNew_has_stored_buffers = \
+    sixtracklib.st_TrackJobNew_has_stored_buffers
+st_TrackJobNew_has_stored_buffers.restype = ct.c_bool
+st_TrackJobNew_has_stored_buffers.argtypes = [ st_TrackJobBaseNew_p ]
+
+st_TrackJobNew_num_stored_buffers = \
+    sixtracklib.st_TrackJobNew_num_stored_buffers
+st_TrackJobNew_num_stored_buffers.restype = st_arch_size_t
+st_TrackJobNew_num_stored_buffers.argtypes = [ st_TrackJobBaseNew_p ]
+
+st_TrackJobNew_min_stored_buffer_id = \
+    sixtracklib.st_TrackJobNew_min_stored_buffer_id
+st_TrackJobNew_min_stored_buffer_id.restype = st_arch_size_t
+st_TrackJobNew_min_stored_buffer_id.argtypes = [ st_TrackJobBaseNew_p ]
+
+st_TrackJobNew_max_stored_buffer_id = \
+    sixtracklib.st_TrackJobNew_max_stored_buffer_id
+st_TrackJobNew_max_stored_buffer_id.restype = st_arch_size_t
+st_TrackJobNew_max_stored_buffer_id.argtypes = [ st_TrackJobBaseNew_p ]
+
+st_TrackJobNew_create_stored_buffer = \
+    sixtracklib.st_TrackJobNew_create_stored_buffer
+st_TrackJobNew_create_stored_buffer.restype = st_arch_size_t
+st_TrackJobNew_create_stored_buffer.argtypes = [
+    st_TrackJobBaseNew_p, st_buffer_size_t ]
+
+st_TrackJobNew_add_stored_buffer = \
+    sixtracklib.st_TrackJobNew_add_stored_buffer
+st_TrackJobNew_add_stored_buffer.restype = st_arch_size_t
+st_TrackJobNew_add_stored_buffer.argtypes = [
+        st_TrackJobBaseNew_p, st_Buffer_p, ct.c_bool, ct.c_bool ]
+
+st_TrackJobNew_owns_stored_buffer = sixtracklib.st_TrackJobNew_owns_stored_buffer
+st_TrackJobNew_owns_stored_buffer.restype = ct.c_bool
+st_TrackJobNew_owns_stored_buffer.argtypes = [
+    st_TrackJobBaseNew_p, st_arch_size_t ]
+
+st_TrackJobNew_remove_stored_buffer = sixtracklib.st_TrackJobNew_remove_stored_buffer
+st_TrackJobNew_remove_stored_buffer.restype = st_arch_status_t
+st_TrackJobNew_remove_stored_buffer.argtypes = [
+    st_TrackJobBaseNew_p, st_arch_size_t ]
+
+st_TrackJobNew_stored_buffer = sixtracklib.st_TrackJobNew_stored_buffer
+st_TrackJobNew_stored_buffer.restype = st_Buffer_p
+st_TrackJobNew_stored_buffer.argtypes = [ st_TrackJobBaseNew_p, st_arch_size_t ]
+
+st_TrackJobNew_const_stored_buffer = sixtracklib.st_TrackJobNew_const_stored_buffer
+st_TrackJobNew_const_stored_buffer.restype = st_Buffer_p
+st_TrackJobNew_const_stored_buffer.argtypes = [
+    st_TrackJobBaseNew_p, st_arch_size_t ]
+
+st_TrackJobNew_push_stored_buffer = sixtracklib.st_TrackJobNew_push_stored_buffer
+st_TrackJobNew_push_stored_buffer.restype = st_arch_size_t
+st_TrackJobNew_push_stored_buffer.argtypes = [
+        st_TrackJobBaseNew_p, st_arch_size_t ]
+
+st_TrackJobNew_collect_stored_buffer = \
+    sixtracklib.st_TrackJobNew_collect_stored_buffer
+st_TrackJobNew_collect_stored_buffer.restype = st_arch_status_t
+st_TrackJobNew_collect_stored_buffer.argtypes = [ st_TrackJobBaseNew_p ]
+
 # ==============================================================================
 # Cuda-Context methods
 
@@ -6304,5 +6541,3 @@ st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset.argtypes = \
     [st_SpaceChargeInterpolatedProfile_p,]
 st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset.restype = \
     st_object_type_id_t
-
-
