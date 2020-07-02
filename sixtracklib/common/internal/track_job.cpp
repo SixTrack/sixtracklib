@@ -651,10 +651,10 @@ bool NS(TrackJob_has_particles_addr)(
 
 ::NS(arch_status_t) NS(TrackJob_remove_assign_address_item)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
-    const ::NS(AssignAddressItem) *const SIXTRL_RESTRICT_REF assign_item )
+    const ::NS(AssignAddressItem) *const SIXTRL_RESTRICT_REF item_to_remove )
 {
     st::AssignAddressItem const* ptr_cxx_item = reinterpret_cast<
-        st::AssignAddressItem const* >( assign_item );
+        st::AssignAddressItem const* >( item_to_remove );
 
     return ( ( job != nullptr ) && ( ptr_cxx_item != nullptr ) )
         ? job->remove_assign_address_item( *ptr_cxx_item )
@@ -674,10 +674,10 @@ bool NS(TrackJob_has_particles_addr)(
 
 bool NS(TrackJob_has_assign_address_item)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
-    const ::NS(AssignAddressItem) *const SIXTRL_RESTRICT_REF assign_item )
+    const ::NS(AssignAddressItem) *const SIXTRL_RESTRICT item )
 {
     st::AssignAddressItem  const* ptr_cxx_item = reinterpret_cast<
-        st::AssignAddressItem const* >( assign_item );
+        st::AssignAddressItem const* >( item );
 
     return ( ( job != nullptr ) && ( ptr_cxx_item != nullptr ) &&
              ( job->has_assign_address_item( *ptr_cxx_item ) ) );
@@ -770,16 +770,14 @@ bool NS(TrackJob_has_assign_items)(
 
 ::NS(AssignAddressItem) const* NS(TrackJob_ptr_assign_address_item)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
-    const ::NS(AssignAddressItem) *const SIXTRL_RESTRICT assign_address_item )
+    const ::NS(AssignAddressItem) *const SIXTRL_RESTRICT item )
 {
     ::NS(AssignAddressItem) const* ptr_item = nullptr;
 
-    if( ( job != nullptr ) && ( assign_address_item != nullptr ) )
+    if( ( job != nullptr ) && ( item != nullptr ) )
     {
         st::AssignAddressItem const* _ptr = job->ptr_assign_address_item(
-            *( reinterpret_cast< st::AssignAddressItem const* >(
-                assign_address_item ) ) );
-
+            *( reinterpret_cast< st::AssignAddressItem const* >( item ) ) );
         if( _ptr != nullptr ) ptr_item = _ptr->getCApiPtr();
     }
 

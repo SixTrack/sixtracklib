@@ -684,7 +684,7 @@ namespace SIXTRL_CXX_NAMESPACE
     /* ----------------------------------------------------------------- */
 
     tjob_t::assign_item_t* tjob_t::add_assign_address_item(
-        tjob_t::assign_item_t const& SIXTRL_RESTRICT_REF assign_item_to_add )
+        tjob_t::assign_item_t const& SIXTRL_RESTRICT assign_item_to_add )
     {
         tjob_t::assign_item_t* item = nullptr;
 
