@@ -47,7 +47,7 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     # test_cuda_assign_address_item.py:
 
     add_test( NAME Python_Cuda_CudaTrackJob_AssignAddressItem
-              COMMAND ${PYTHON_EXECUTABLE} ${PRG_DIR}/test_cuda_assign_address_item.py
+              COMMAND ${PYTHON_EXECUTABLE} ${PRG_DIR}/test_cuda_assign_address_items.py
               WORKING_DIRECTORY ${WORK_DIR} )
 
 
