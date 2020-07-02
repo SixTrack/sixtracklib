@@ -412,6 +412,238 @@ SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_uses_controller)(
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_uses_arguments)(
     const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job );
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem)*
+NS(TrackJobNew_add_assign_address_item)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT_REF assign_item_to_add );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem)*
+NS(TrackJobNew_add_assign_address_item_detailed)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(object_type_id_t) const dest_type_id,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const dest_elem_index,
+    NS(buffer_size_t) const dest_pointer_offset,
+    NS(object_type_id_t) const src_type_id,
+    NS(buffer_size_t) const src_buffer_id,
+    NS(buffer_size_t) const src_elem_index,
+    NS(buffer_size_t) const src_pointer_offset );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJobNew_remove_assign_address_item)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(AssignAddressItem)* SIXTRL_RESTRICT item_to_remove );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJobNew_remove_assign_address_item_by_key_and_index)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    const NS(TrackJobDestSrcBufferIds) *const SIXTRL_RESTRICT_REF key,
+    NS(buffer_size_t) const index_of_item_to_remove );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_has_assign_address_item)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT_REF
+        assign_item_to_add ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_has_assign_item_by_index)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const src_buffer_id,
+    NS(buffer_size_t) const assign_item_index ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_has_assign_address_item_detailed)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(object_type_id_t) const dest_type_id,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const dest_elem_index,
+    NS(buffer_size_t) const dest_pointer_offset,
+    NS(object_type_id_t) const src_type_id,
+    NS(buffer_size_t) const src_buffer_id,
+    NS(buffer_size_t) const src_elem_index,
+    NS(buffer_size_t) const src_pointer_offset ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(TrackJobNew_index_of_assign_address_item_detailed)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(object_type_id_t) const dest_type_id,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const dest_elem_index,
+    NS(buffer_size_t) const dest_pointer_offset,
+    NS(object_type_id_t) const src_type_id,
+    NS(buffer_size_t) const src_buffer_id,
+    NS(buffer_size_t) const src_elem_index,
+    NS(buffer_size_t) const src_pointer_offset ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(TrackJobNew_index_of_assign_address_item)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    const NS(AssignAddressItem) *const
+        SIXTRL_RESTRICT assign_item_to_add ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_has_assign_items)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const src_buffer_id ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t) NS(TrackJobNew_num_assign_items)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const src_buffer_id ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(TrackJobNew_total_num_assign_items)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem) const*
+NS(TrackJobNew_ptr_assign_address_item)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT
+        assign_address_item ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem) const*
+NS(TrackJobNew_ptr_assign_address_item_detailed)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(object_type_id_t) const dest_type_id,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const dest_elem_index,
+    NS(buffer_size_t) const dest_pointer_offset,
+    NS(object_type_id_t) const src_type_id,
+    NS(buffer_size_t) const src_buffer_id,
+    NS(buffer_size_t) const src_elem_index,
+    NS(buffer_size_t) const src_pointer_offset ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem) const*
+NS(TrackJobNew_ptr_assign_address_item_by_index)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const src_buffer_id,
+    NS(buffer_size_t) const assign_address_item_index ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(TrackJobNew_num_distinct_available_assign_address_items_dest_src_pairs)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
+NS(TrackJobNew_available_assign_address_items_dest_src_pairs)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const max_num_pairs,
+    NS(TrackJobDestSrcBufferIds)* pairs_begin ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)* NS(TrackJobNew_buffer_by_buffer_id)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const buffer_id ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer) const*
+NS(TrackJobNew_const_buffer_by_buffer_id)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const buffer_id ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_is_buffer_by_buffer_id)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const buffer_id ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_is_raw_memory_by_buffer_id)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const buffer_id ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*
+NS(TrackJobNew_assign_items_begin)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const src_buffer_id ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*
+NS(TrackJobNew_assign_items_end)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const src_buffer_id ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobDestSrcBufferIds) const*
+NS(TrackJobNew_assign_item_dest_src_begin)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(TrackJobDestSrcBufferIds) const*
+NS(TrackJobNew_assign_item_dest_src_end)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJobNew_commit_address_assignments)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJobNew_assign_all_addresses)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJobNew_assign_addresses)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(buffer_size_t) const src_buffer_id );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJobNew_stored_buffers_capacity)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJobNew_reserve_stored_buffers_capacity)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(arch_size_t) const capacity );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_has_stored_buffers)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJobNew_num_stored_buffers)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJobNew_min_stored_buffer_id)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJobNew_max_stored_buffer_id)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJobNew_create_stored_buffer)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(buffer_size_t) const buffer_capacity );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(TrackJobNew_add_stored_buffer)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(Buffer)* SIXTRL_RESTRICT buffer, bool const take_ownership,
+    bool const delete_ptr_after_move );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJobNew_owns_stored_buffer)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(arch_size_t) const buffer_id ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJobNew_remove_stored_buffer)( NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(arch_size_t) const buffer_index );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer)* NS(TrackJobNew_stored_buffer)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(arch_size_t) const buffer_id ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(Buffer) const*
+NS(TrackJobNew_const_stored_buffer)(
+    const NS(TrackJobBaseNew) *const SIXTRL_RESTRICT job,
+    NS(arch_size_t) const buffer_id ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJobNew_push_stored_buffer)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(arch_size_t) const buffer_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(TrackJobNew_collect_stored_buffer)(
+    NS(TrackJobBaseNew)* SIXTRL_RESTRICT job,
+    NS(arch_size_t) const buffer_id );
+
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && !defined( __CUDA_ARCH__ )
 } /* extern "C" { */
 #endif /* C++, Host */
