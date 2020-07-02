@@ -31,6 +31,7 @@ __global__ void NS(AssignAddressItem_process_managed_buffer_cuda)(
     NS(buffer_size_t) const start_idx = NS(Cuda_get_1d_thread_id_in_kernel)();
     NS(buffer_size_t) const stride = NS(Cuda_get_total_num_threads_in_kernel)();
 
+    NS(arch_status_t) const status =
     NS(AssignAddressItem_perform_address_assignment_kernel_impl)(
         assign_buffer, assign_slot_size, start_idx, stride,
         dest_buffer, dest_slot_size, dest_buffer_id,

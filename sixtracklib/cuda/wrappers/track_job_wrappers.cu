@@ -414,7 +414,7 @@ void NS(AssignAddressItem_process_managed_buffer_cuda_wrapper)(
         NS(CudaKernelConfig_get_ptr_const_blocks)( kernel_config );
 
     dim3 const* ptr_threads =
-            NS(CudaKernelConfig_get_ptr_const_threads_per_block)( kernel_config );
+        NS(CudaKernelConfig_get_ptr_const_threads_per_block)( kernel_config );
 
     NS(buffer_size_t) const assign_slot_size =  NS(Buffer_get_slot_size)(
         NS(Argument_get_const_cobjects_buffer)( dest_buffer_arg ) );
@@ -441,19 +441,15 @@ void NS(AssignAddressItem_process_managed_buffer_cuda_wrapper)(
         assign_buffer_arg ) != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( assign_slot_size > ( NS(buffer_size_t) )0 );
 
-
     SIXTRL_ASSERT( dest_buffer_arg != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( NS(Argument_get_arch_id)( dest_buffer_arg ) ==
                NS(ARCHITECTURE_CUDA) );
     SIXTRL_ASSERT( NS(Argument_uses_cobjects_buffer)( dest_buffer_arg ) );
     SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
         dest_buffer_arg ) != SIXTRL_NULLPTR );
-
-    SIXTRL_ASSERT( NS(Buffer_get_num_of_objects)(
-        NS(Argument_get_const_cobjects_buffer)( dest_buffer_arg ) ) >
-            dest_buffer_id );
     SIXTRL_ASSERT( dest_slot_size > ( NS(buffer_size_t) )0u );
-
+    SIXTRL_ASSERT( dest_buffer_id != (
+        NS(buffer_size_t) )SIXTRL_ARCH_ILLEGAL_BUFFER_ID );
 
     SIXTRL_ASSERT( src_buffer_arg != SIXTRL_NULLPTR );
     SIXTRL_ASSERT( NS(Argument_get_arch_id)( src_buffer_arg ) ==
@@ -462,11 +458,9 @@ void NS(AssignAddressItem_process_managed_buffer_cuda_wrapper)(
     SIXTRL_ASSERT( NS(Argument_uses_cobjects_buffer)( src_buffer_arg ) );
     SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
         src_buffer_arg ) != SIXTRL_NULLPTR );
-
-    SIXTRL_ASSERT( NS(Buffer_get_num_of_objects)(
-        NS(Argument_get_const_cobjects_buffer)( src_buffer_arg ) ) >
-            src_buffer_id );
     SIXTRL_ASSERT( src_slot_size > ( NS(buffer_size_t) )0u );
+    SIXTRL_ASSERT( src_buffer_id != (
+        NS(buffer_size_t) )SIXTRL_ARCH_ILLEGAL_BUFFER_ID );
 
     NS(AssignAddressItem_process_managed_buffer_cuda)<<< *ptr_blocks,
         *ptr_threads >>>(
