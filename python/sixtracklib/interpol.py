@@ -6,6 +6,7 @@ import ctypes as ct
 from cobjects import CBuffer, CObject, CField
 
 from .trackjob import TrackJob
+from .cuda import CudaTrackJob
 from .beam_elements import Elements, SpaceChargeInterpolatedProfile
 from .buffer import AssignAddressItem, get_cbuffer_from_obj, Buffer
 from .stcommon import st_ARCH_STATUS_SUCCESS, \
@@ -101,7 +102,8 @@ class LineDensityProfileData(CObject):
 
 def LineDensityProfileData_buffer_create_assign_address_item(
     track_job, be_sc_index, interpol_buffer_id, lp_data_index ):
-    assert isinstance(track_job, TrackJob)
+    assert isinstance(track_job, TrackJob) or \
+           isinstance(track_job, CudaTrackJob)
     assert interpol_buffer_id != st_ARCH_ILLEGAL_BUFFER_ID.value
     assert track_job.min_stored_buffer_id <= interpol_buffer_id
     assert track_job.max_stored_buffer_id >= interpol_buffer_id
