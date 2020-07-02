@@ -95,6 +95,7 @@ if __name__ == '__main__':
     # Create the track-job
     job = st.TrackJob(lattice, beam)
     #job = st.TrackJob(lattice, beam, device="opencl:1.0")
+    #job = st.CudaTrackJob(lattice, beam)
 
     # --------------------------------------------------------------------------
     # E) Add the interpol_buffer to the track-job. This allows the track job
@@ -138,9 +139,9 @@ if __name__ == '__main__':
     job.collect_beam_elements()
     job.collect_stored_buffer(interpol_buffer_id)
 
-    sc0 = job.beam_elements_buffer.get_object(sc0_index)
-    sc1 = job.beam_elements_buffer.get_object(sc1_index)
-    sc2 = job.beam_elements_buffer.get_object(sc2_index)
+    sc0 = lattice.cbuffer.get_object(sc0_index)
+    sc1 = lattice.cbuffer.get_object(sc1_index)
+    sc2 = lattice.cbuffer.get_object(sc2_index)
 
     if job.arch_str == 'cpu':
         print( f"""
